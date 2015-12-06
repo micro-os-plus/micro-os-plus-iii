@@ -1,0 +1,5 @@
+{
+	"$schema": "http://xcdl.github.io/schemas/xcdl-1-1.json",
+	"name": "/ilg/portable/posix-io",
+	"description": "POSIX IO layer, supporting devices, files and sockets."
+}
