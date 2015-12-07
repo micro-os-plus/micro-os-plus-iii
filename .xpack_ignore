@@ -3,7 +3,10 @@
 .project
 .settings/
 .yotta.json
+Debug
 NOTICE.md
+Release
+test-manager-debug
 Thumbs.db
 build/
 upload.tar.gz

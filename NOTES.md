@@ -1,9 +1,10 @@
 ## Documentation
 
-The latest POSIX specs are available from [IEEE The Opne Group](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html).
+The latest POSIX specs are available from [IEEE The Open Group](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html).
 
 ## Tests
 
 Compile only tests, using the host toolchain:
 
-* TBD
+* manager - test the FileDescriptorsManager class
+

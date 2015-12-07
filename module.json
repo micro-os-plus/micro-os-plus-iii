@@ -1,6 +1,6 @@
 {
 	"name": "ilg-posix-io",
-	"description": "An xPack with portable POSIX IO layer, supporting devices, files and sockets.",
+	"description": "An xPack with a portable POSIX IO layer, supporting devices, files and sockets.",
 	"version": "0.1.1",
 	"keywords": [
 		"posix",

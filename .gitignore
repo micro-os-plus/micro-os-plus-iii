@@ -7,3 +7,5 @@ upload.tar.gz
 yotta_modules/
 yotta_targets/
 test-manager-debug
+Debug
+Release
