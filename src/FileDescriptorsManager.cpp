@@ -83,6 +83,7 @@ FileDescriptorsManager::allocFileDescriptor (PosixIo* afile)
       // Already allocated
       return EBUSY;
     }
+
   for (size_t i = 3;
       i < (sizeof(openedFileDescriptors) / sizeof(openedFileDescriptors[0]));
       ++i)

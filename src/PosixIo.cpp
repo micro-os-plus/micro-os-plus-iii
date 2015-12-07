@@ -31,7 +31,7 @@ PosixIo::PosixIo ()
 
 PosixIo::~PosixIo ()
 {
-
+  ;
 }
 
 // ----------------------------------------------------------------------------
@@ -50,24 +50,6 @@ PosixIo::close (void)
   fFileDescriptor = noFileDescriptor;
 
   return ret;
-}
-
-void
-PosixIo::setFileDescriptor (fileDescriptor_t fildes)
-{
-  fFileDescriptor = fildes;
-}
-
-void
-PosixIo::clearFileDescriptor (void)
-{
-  fFileDescriptor = noFileDescriptor;
-}
-
-fileDescriptor_t
-PosixIo::getFileDescriptor (void)
-{
-  return fFileDescriptor;
 }
 
 // ----------------------------------------------------------------------------

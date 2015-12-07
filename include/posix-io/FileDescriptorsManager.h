@@ -16,8 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef INCLUDE_POSIX_IO_OPENEDFILES_H_
-#define INCLUDE_POSIX_IO_OPENEDFILES_H_
+#ifndef INCLUDE_POSIX_IO_FILE_DESCRIPTORS_MANAGER_H_
+#define INCLUDE_POSIX_IO_FILE_DESCRIPTORS_MANAGER_H_
 
 #include "posix-io/types.h"
 #include <cstddef>
@@ -43,9 +43,8 @@ public:
 
   static int
   freeFileDescriptor (fileDescriptor_t fildes);
-
 };
 
 // ----------------------------------------------------------------------------
 
-#endif /* INCLUDE_POSIX_IO_OPENEDFILES_H_ */
+#endif /* INCLUDE_POSIX_IO_FILE_DESCRIPTORS_MANAGER_H_ */

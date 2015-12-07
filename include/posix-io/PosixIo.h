@@ -16,8 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef INCLUDE_POSIX_IO_POSIXIO_H_
-#define INCLUDE_POSIX_IO_POSIXIO_H_
+#ifndef INCLUDE_POSIX_IO_POSIX_IO_H_
+#define INCLUDE_POSIX_IO_POSIX_IO_H_
 
 #include "posix-io/types.h"
 #include <cstddef>
@@ -68,9 +68,28 @@ protected:
   fileDescriptor_t fFileDescriptor;
 
   // --------------------------------------------------------------------------
-
 };
 
 // ----------------------------------------------------------------------------
 
-#endif /* INCLUDE_POSIX_IO_POSIXIO_H_ */
+inline void
+PosixIo::setFileDescriptor (fileDescriptor_t fildes)
+{
+  fFileDescriptor = fildes;
+}
+
+inline void
+PosixIo::clearFileDescriptor (void)
+{
+  fFileDescriptor = noFileDescriptor;
+}
+
+inline fileDescriptor_t
+PosixIo::getFileDescriptor (void)
+{
+  return fFileDescriptor;
+}
+
+// ----------------------------------------------------------------------------
+
+#endif /* INCLUDE_POSIX_IO_POSIX_IO_H_ */
