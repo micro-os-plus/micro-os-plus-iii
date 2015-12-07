@@ -7,8 +7,8 @@
 	"repository": 
 	{
 		"type": "git",
-		"url": "https://github.com/xpacks/posix-io.git",
-		"archive": "https://github.com/xpacks/posix-io/archive/xpack.zip"
+		"url": "https://github.com/micro-os-plus/posix-io.git",
+		"archive": "https://github.com/micro-os-plus/posix-io/archive/xpack.zip"
 	},
 
 	"version": "0.1.1",
@@ -22,11 +22,11 @@
 		"portable"
 	],
 
-	"homepage": "https://github.com/xpacks/posix-io",
+	"homepage": "https://github.com/micro-os-plus/posix-io",
 	"support": [
 		{
 			"description": "all issues",
-			"url": "https://github.com/xpacks/posix-io/issues"
+			"url": "https://github.com/micro-os-plus/posix-io/issues"
 		}
 	],
 

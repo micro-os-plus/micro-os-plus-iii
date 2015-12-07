@@ -4,14 +4,14 @@ An xPack with a portable POSIX IO layer, supporting devices, files and sockets.
 
 ## Package
 
-[POSIX IO](https://github.com/xpacks/posix-io) package details:
+[POSIX IO](https://github.com/micro-os-plus/posix-io) package details:
 
 * type: [xcdl](http://xcdl.github.io)
 * yotta name: `ilg-posix-io`
 * yotta repo: http://yotta.mbed.com/#/module/ilg-posix-io/0.1.1
-* git repo: https://github.com/xpacks/posix-io.git
-* homepage: https://github.com/xpacks/posix-io
-* latest archive: https://github.com/xpacks/posix-io/archive/xpack.zip
+* git repo: https://github.com/micro-os-plus/posix-io.git
+* homepage: https://github.com/micro-os-plus/posix-io
+* latest archive: https://github.com/micro-os-plus/posix-io/archive/xpack.zip
 
 ## Version
 
@@ -31,7 +31,7 @@ An xPack with a portable POSIX IO layer, supporting devices, files and sockets.
 
 ## Support
 
-* [all issues](https://github.com/xpacks/posix-io/issues)
+* [all issues](https://github.com/micro-os-plus/posix-io/issues)
 
 ## Dependencies
 
