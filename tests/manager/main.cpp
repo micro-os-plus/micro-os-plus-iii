@@ -16,43 +16,32 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <posix-io/FileDescriptorsManager.h>
+#include "posix-io/FileDescriptorsManager.h"
 #include "posix-io/PosixIo.h"
 #include <cerrno>
 #include <cassert>
+#include <cstdio>
+#include <cstring>
 
 // -----------------------------------------------------------------------------
 
 // Mock class, all methods return ENOSYS, as not implemented.
 
-class PosixTest : public PosixIo
+class PosixTest : public os::PosixIo
 {
 public:
+
   PosixTest ();
-  virtual
-  ~PosixTest ();
 
-  virtual ssize_t
-  read (void *buf, size_t nbyte);
-
-  virtual ssize_t
-  write (const void *buf, size_t nbyte);
+private:
 
   virtual int
-  ioctl (unsigned long request, ...);
-
-  virtual int
-  closeImplementation (void);
+  doOpen (const char *path, int oflag, ...);
 };
 
 PosixTest::PosixTest ()
 {
-
-}
-
-PosixTest::~PosixTest ()
-{
-
+  ;
 }
 
 #if defined ( __GNUC__ )
@@ -60,93 +49,80 @@ PosixTest::~PosixTest ()
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
 
-ssize_t
-PosixTest::read (void *buf, size_t nbyte)
-{
-  return ENOSYS;
-}
-
-ssize_t
-PosixTest::write (const void *buf, size_t nbyte)
-{
-  return ENOSYS;
-}
-
 int
-PosixTest::ioctl (unsigned long request, ...)
+PosixTest::doOpen (const char *path, int oflag, ...)
 {
-  return ENOSYS;
+  errno = ENOSYS;
+  return -1;
 }
 
 #if defined ( __GNUC__ )
 #pragma GCC diagnostic pop
 #endif
 
-int
-PosixTest::closeImplementation (void)
-{
-  return ENOSYS;
-}
-
 // -----------------------------------------------------------------------------
 
-PosixTest test;
-PosixTest test_2;
-PosixTest test_3;
+PosixTest test1;
+PosixTest test2;
+PosixTest test3;
 
 // -----------------------------------------------------------------------------
 
 int
 main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
-  size_t sz = FileDescriptorsManager::getSize ();
+  size_t sz = os::FileDescriptorsManager::getSize ();
   // Size must be 5 for this test
   assert(sz == 5);
 
   // Check limits
-  assert(FileDescriptorsManager::checkFileDescriptor (-1) == false);
-  assert(FileDescriptorsManager::checkFileDescriptor (sz) == false);
+  assert(os::FileDescriptorsManager::checkFileDescriptor (-1) == false);
+  assert(os::FileDescriptorsManager::checkFileDescriptor (sz) == false);
 
   // Allocation should start with 3 (stdin, stdout, stderr preserved)
-  fileDescriptor_t fd;
-  fd = FileDescriptorsManager::allocFileDescriptor (&test);
-  assert(fd == 3);
+  int fd1;
+  fd1 = os::FileDescriptorsManager::allocFileDescriptor (&test1);
+  assert(fd1 == 3);
 
   // Get it back; is it the same?
-  assert(FileDescriptorsManager::getPosixIo (fd) == &test);
-  assert(test.getFileDescriptor () == fd);
+  assert(os::FileDescriptorsManager::getPosixIo (fd1) == &test1);
+  assert(test1.getFileDescriptor () == fd1);
 
   // Reallocate opened file, must be busy
-  fileDescriptor_t fd_2;
-  fd_2 = FileDescriptorsManager::allocFileDescriptor (&test);
-  assert(fd_2 == EBUSY);
+  int fd2;
+  fd2 = os::FileDescriptorsManager::allocFileDescriptor (&test1);
+  assert((fd2 == -1) && (errno == EBUSY));
 
   // Free descriptor
-  assert(FileDescriptorsManager::freeFileDescriptor (fd) == 0);
-  assert(FileDescriptorsManager::getPosixIo (fd) == nullptr);
-  assert(test.getFileDescriptor () == noFileDescriptor);
+  assert(os::FileDescriptorsManager::freeFileDescriptor (fd1) == 0);
+  assert(os::FileDescriptorsManager::getPosixIo (fd1) == nullptr);
+  assert(test1.getFileDescriptor () == os::noFileDescriptor);
 
   // With clean table, alloc to fill the table (size is 5)
-  fd = FileDescriptorsManager::allocFileDescriptor (&test);
-  assert(fd == 3);
-  fd_2 = FileDescriptorsManager::allocFileDescriptor (&test_2);
-  assert(fd_2 == 4);
+  fd1 = os::FileDescriptorsManager::allocFileDescriptor (&test1);
+  assert(fd1 == 3);
+  fd2 = os::FileDescriptorsManager::allocFileDescriptor (&test2);
+  assert(fd2 == 4);
 
   // Table full
-  fileDescriptor_t fd_3;
-  fd_3 = FileDescriptorsManager::allocFileDescriptor (&test_3);
-  assert(fd_3 == ENFILE);
+  int fd3;
+  fd3 = os::FileDescriptorsManager::allocFileDescriptor (&test3);
+  assert((fd3 == -1) && (errno == ENFILE));
 
   // Free outside range
-  assert(FileDescriptorsManager::freeFileDescriptor(-1) == EBADF);
-  assert(FileDescriptorsManager::freeFileDescriptor(sz) == EBADF);
+  assert(
+      (os::FileDescriptorsManager::freeFileDescriptor(-1) == -1) && (errno == EBADF));
+  assert(
+      (os::FileDescriptorsManager::freeFileDescriptor(sz) == -1) && (errno == EBADF));
 
   // Free last
-  assert(FileDescriptorsManager::freeFileDescriptor (sz - 1) == 0);
+  assert(os::FileDescriptorsManager::freeFileDescriptor (sz - 1) == 0);
 
   // Reallocate last
-  fd_3 = FileDescriptorsManager::allocFileDescriptor (&test_3);
-  assert(fd_3 == ((fileDescriptor_t )(sz - 1)));
+  fd3 = os::FileDescriptorsManager::allocFileDescriptor (&test3);
+  assert(fd3 == ((os::fileDescriptor_t )(sz - 1)));
+
+  std::printf ("'test-manager-debug' done.\n");
 
   // Success!
   return 0;

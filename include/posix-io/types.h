@@ -21,10 +21,15 @@
 
 // ----------------------------------------------------------------------------
 
-typedef int fileDescriptor_t;
-class PosixIo;
+namespace os
+{
 
-constexpr fileDescriptor_t noFileDescriptor = -1;
+  typedef int fileDescriptor_t;
+  class PosixIo;
+
+  constexpr fileDescriptor_t noFileDescriptor = -1;
+
+} // namespace os
 
 // ----------------------------------------------------------------------------
 

@@ -16,103 +16,89 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <posix-io/FileDescriptorsManager.h>
+#include "posix-io/FileDescriptorsManager.h"
 #include "posix-io/PosixIo.h"
 #include <cerrno>
 #include <cassert>
 
-// ----------------------------------------------------------------------------
-
-// This definition should be somewhere else, in a configuration header
-#if !defined(OS_INTEGER_FILE_DESCRIPTORS_MANAGER_ARRAY_SIZE)
-#define OS_INTEGER_FILE_DESCRIPTORS_MANAGER_ARRAY_SIZE   10
-#endif
-
-// ----------------------------------------------------------------------------
-
-// Table of all open files, similar to POSIX
-static PosixIo* openedFileDescriptors[OS_INTEGER_FILE_DESCRIPTORS_MANAGER_ARRAY_SIZE];
-
-// ----------------------------------------------------------------------------
-
-FileDescriptorsManager::FileDescriptorsManager ()
+namespace os
 {
-  for (size_t i = 0;
-      i < (sizeof(openedFileDescriptors) / sizeof(openedFileDescriptors[0]));
-      ++i)
-    {
-      openedFileDescriptors[i] = nullptr;
-    }
-}
 
-size_t
-FileDescriptorsManager::getSize (void)
-{
-  return sizeof(openedFileDescriptors) / sizeof(openedFileDescriptors[0]);
-}
+  // ----------------------------------------------------------------------------
 
-bool
-FileDescriptorsManager::checkFileDescriptor (int fildes)
-{
-  if ((fildes < 0)
-      || (((size_t) fildes)
-          >= (sizeof(openedFileDescriptors) / sizeof(openedFileDescriptors[0]))))
-    {
-      return false;
-    }
-  return true;
-}
+  // Static table of all open file descriptors, similar to POSIX
+  PosixIo* FileDescriptorsManager::openedFileDescriptors[OS_INTEGER_FILE_DESCRIPTORS_MANAGER_ARRAY_SIZE];
 
-PosixIo*
-FileDescriptorsManager::getPosixIo (int fildes)
-{
-  assert(
-      (fildes > 0)
-          && (((size_t ) fildes)
-              < (sizeof(openedFileDescriptors)
-                  / sizeof(openedFileDescriptors[0]))));
+  // --------------------------------------------------------------------------
 
-  return openedFileDescriptors[fildes];
-}
+  FileDescriptorsManager::FileDescriptorsManager ()
+  {
+    // Superfluous, it should be cleared as the entire BSS.
+    for (std::size_t i = 0; i < getSize (); ++i)
+      {
+        openedFileDescriptors[i] = nullptr;
+      }
+  }
 
-fileDescriptor_t
-FileDescriptorsManager::allocFileDescriptor (PosixIo* afile)
-{
-  if (afile->getFileDescriptor () > 0)
-    {
-      // Already allocated
-      return EBUSY;
-    }
+  bool
+  FileDescriptorsManager::checkFileDescriptor (int fildes)
+  {
+    if ((fildes < 0) || (((std::size_t) fildes) >= getSize ()))
+      {
+        return false;
+      }
+    return true;
+  }
 
-  for (size_t i = 3;
-      i < (sizeof(openedFileDescriptors) / sizeof(openedFileDescriptors[0]));
-      ++i)
-    {
-      if (openedFileDescriptors[i] == nullptr)
-        {
-          openedFileDescriptors[i] = afile;
-          afile->setFileDescriptor (i);
-          return i;
-        }
-    }
+  PosixIo*
+  FileDescriptorsManager::getPosixIo (int fildes)
+  {
+    assert((fildes > 0) && (((std::size_t ) fildes) < getSize ()));
 
-  // Too many files open in system.
-  return ENFILE;
-}
+    return openedFileDescriptors[fildes];
+  }
 
-int
-FileDescriptorsManager::freeFileDescriptor (int fildes)
-{
-  if ((fildes < 0)
-      || (((size_t) fildes)
-          >= (sizeof(openedFileDescriptors) / sizeof(openedFileDescriptors[0]))))
-    {
-      return EBADF;
-    }
-  openedFileDescriptors[fildes]->clearFileDescriptor ();
-  openedFileDescriptors[fildes] = nullptr;
-  return 0;
-}
+  int
+  FileDescriptorsManager::allocFileDescriptor (PosixIo* io)
+  {
+    if (io->getFileDescriptor () > 0)
+      {
+        // Already allocated
+        errno = EBUSY;
+        return -1;
+      }
+
+    // Reserve 0, 1, 2 (stdin, stdout, stderr)
+    for (std::size_t i = 3; i < getSize (); ++i)
+      {
+        if (openedFileDescriptors[i] == nullptr)
+          {
+            openedFileDescriptors[i] = io;
+            io->setFileDescriptor (i);
+            return i;
+          }
+      }
+
+    // Too many files open in system.
+    errno = ENFILE;
+    return -1;
+  }
+
+  int
+  FileDescriptorsManager::freeFileDescriptor (int fildes)
+  {
+    if ((fildes < 0) || (((std::size_t) fildes) >= getSize ()))
+      {
+        errno = EBADF;
+        return -1;
+      }
+
+    openedFileDescriptors[fildes]->clearFileDescriptor ();
+    openedFileDescriptors[fildes] = nullptr;
+    return 0;
+  }
+
+} // namespace os
 
 // ----------------------------------------------------------------------------
 

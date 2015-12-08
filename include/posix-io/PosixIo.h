@@ -19,76 +19,99 @@
 #ifndef INCLUDE_POSIX_IO_POSIX_IO_H_
 #define INCLUDE_POSIX_IO_POSIX_IO_H_
 
-#include "posix-io/types.h"
+#include "posix-io/Types.h"
 #include <cstddef>
 
 // ----------------------------------------------------------------------------
 
-// Abstract class
-class PosixIo
+namespace os
 {
-public:
-  PosixIo ();
 
-  virtual
-  ~PosixIo ();
+  // Abstract class
+  class PosixIo
+  {
+  public:
+
+    PosixIo ();
+
+    virtual
+    ~PosixIo ();
+
+    // ------------------------------------------------------------------------
+
+    int
+    open (const char *path, int oflag, ...);
+
+    ssize_t
+    read (void *buf, size_t nbyte);
+
+    ssize_t
+    write (const void *buf, size_t nbyte);
+
+    virtual int
+    ioctl (int request, ...);
+
+    int
+    close (void);
+
+    // ------------------------------------------------------------------------
+
+    void
+    setFileDescriptor (fileDescriptor_t fildes);
+
+    void
+    clearFileDescriptor (void);
+
+    fileDescriptor_t
+    getFileDescriptor (void);
+
+  protected:
+
+    virtual int
+    doOpen (const char *path, int oflag, ...) = 0;
+
+    virtual int
+    doClose (void);
+
+    virtual ssize_t
+    doRead (void *buf, size_t nbyte);
+
+    virtual ssize_t
+    doWrite (const void *buf, size_t nbyte);
+
+    virtual int
+    doIoctl (int request, ...);
+
+    // ------------------------------------------------------------------------
+
+  protected:
+
+    fileDescriptor_t fFileDescriptor;
+
+    // ------------------------------------------------------------------------
+  };
 
   // --------------------------------------------------------------------------
 
-  int
-  open (void);
+  inline void
+  PosixIo::setFileDescriptor (fileDescriptor_t fildes)
+  {
+    fFileDescriptor = fildes;
+  }
 
-  virtual ssize_t
-  read (void *buf, size_t nbyte) = 0;
+  inline void
+  PosixIo::clearFileDescriptor (void)
+  {
+    fFileDescriptor = noFileDescriptor;
+  }
 
-  virtual ssize_t
-  write (const void *buf, size_t nbyte) = 0;
+  inline fileDescriptor_t
+  PosixIo::getFileDescriptor (void)
+  {
+    return fFileDescriptor;
+  }
 
-  virtual int
-  ioctl (unsigned long request, ...) = 0;
-
-  int
-  close (void);
-
-  virtual int
-  closeImplementation (void) = 0;
-
-  // --------------------------------------------------------------------------
-
-  void
-  setFileDescriptor (fileDescriptor_t fildes);
-  void
-  clearFileDescriptor (void);
-  fileDescriptor_t
-  getFileDescriptor (void);
-
-  // --------------------------------------------------------------------------
-
-protected:
-  fileDescriptor_t fFileDescriptor;
-
-  // --------------------------------------------------------------------------
-};
-
-// ----------------------------------------------------------------------------
-
-inline void
-PosixIo::setFileDescriptor (fileDescriptor_t fildes)
-{
-  fFileDescriptor = fildes;
-}
-
-inline void
-PosixIo::clearFileDescriptor (void)
-{
-  fFileDescriptor = noFileDescriptor;
-}
-
-inline fileDescriptor_t
-PosixIo::getFileDescriptor (void)
-{
-  return fFileDescriptor;
-}
+} // namespace os
 
 // ----------------------------------------------------------------------------
 

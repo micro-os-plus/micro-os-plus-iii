@@ -24,26 +24,50 @@
 
 // ----------------------------------------------------------------------------
 
-class FileDescriptorsManager
+// This definition should be somewhere else, in a configuration header
+#if !defined(OS_INTEGER_FILE_DESCRIPTORS_MANAGER_ARRAY_SIZE)
+#define OS_INTEGER_FILE_DESCRIPTORS_MANAGER_ARRAY_SIZE   (10)
+#endif
+
+// ----------------------------------------------------------------------------
+
+namespace os
 {
-public:
-  FileDescriptorsManager ();
 
-  static size_t
-  getSize (void);
+  class FileDescriptorsManager
+  {
+  public:
+    FileDescriptorsManager ();
 
-  static bool
-  checkFileDescriptor (int fildes);
+    static size_t
+    getSize (void);
 
-  static PosixIo*
-  getPosixIo (int fildes);
+    static bool
+    checkFileDescriptor (int fildes);
 
-  static fileDescriptor_t
-  allocFileDescriptor (PosixIo* afile);
+    static PosixIo*
+    getPosixIo (int fildes);
 
-  static int
-  freeFileDescriptor (fileDescriptor_t fildes);
-};
+    static int
+    allocFileDescriptor (PosixIo* io);
+
+    static int
+    freeFileDescriptor (fileDescriptor_t fildes);
+
+    // ------------------------------------------------------------------------
+  private:
+    static PosixIo* openedFileDescriptors[OS_INTEGER_FILE_DESCRIPTORS_MANAGER_ARRAY_SIZE];
+  };
+
+  // --------------------------------------------------------------------------
+
+  inline size_t
+  FileDescriptorsManager::getSize (void)
+  {
+    return sizeof(openedFileDescriptors) / sizeof(openedFileDescriptors[0]);
+  }
+
+} // namespace os
 
 // ----------------------------------------------------------------------------
 
