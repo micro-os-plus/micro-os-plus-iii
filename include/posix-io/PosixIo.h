@@ -21,7 +21,6 @@
 
 #include "posix-io/Types.h"
 #include <cstddef>
-#include <cstdarg>
 
 // ----------------------------------------------------------------------------
 
@@ -43,20 +42,14 @@ namespace os
     int
     open (const char *path, int oflag, ...);
 
-    int
-    vopen (const char *path, int oflag, va_list args);
-
     ssize_t
     read (void *buf, size_t nbyte);
 
     ssize_t
     write (const void *buf, size_t nbyte);
 
-    int
+    virtual int
     ioctl (int request, ...);
-
-    int
-    vioctl (int request, va_list args);
 
     int
     close (void);
@@ -75,7 +68,7 @@ namespace os
   protected:
 
     virtual int
-    doOpen (const char *path, int oflag, va_list args) = 0;
+    doOpen (const char *path, int oflag, ...) = 0;
 
     virtual int
     doClose (void);
@@ -87,7 +80,7 @@ namespace os
     doWrite (const void *buf, size_t nbyte);
 
     virtual int
-    doIoctl (int request, va_list args);
+    doIoctl (int request, ...);
 
     // ------------------------------------------------------------------------
 

@@ -17,11 +17,9 @@
  */
 
 #include "posix-io/PosixDevice.h"
-#include "posix-io/FileDescriptorsManager.h"
 #include <cerrno>
 #include <cassert>
 #include <cstdio>
-#include <cstdarg>
 
 // -----------------------------------------------------------------------------
 
@@ -30,34 +28,21 @@
 class PosixDeviceTest : public os::PosixDevice
 {
 public:
-
   PosixDeviceTest (const char* deviceName, uint32_t deviceNumber);
-
-  int
-  getMode (void);
 
 private:
 
   virtual int
-  doOpen (const char *path, int oflag, va_list args);
+  doOpen (const char *path, int oflag, ...);
 
 private:
-
   uint32_t fdeviceNumber;
-  uint32_t fMode;
 };
 
 PosixDeviceTest::PosixDeviceTest (const char* deviceName, uint32_t deviceNumber) :
     PosixDevice (deviceName)
 {
   fdeviceNumber = deviceNumber;
-  fMode = 0;
-}
-
-int
-PosixDeviceTest::getMode (void)
-{
-  return fMode;
 }
 
 #if defined ( __GNUC__ )
@@ -66,11 +51,10 @@ PosixDeviceTest::getMode (void)
 #endif
 
 int
-PosixDeviceTest::doOpen (const char *path, int oflag, va_list args)
+PosixDeviceTest::doOpen (const char *path, int oflag, ...)
 {
-  fMode = va_arg(args, int);
-
-  return 0;
+  errno = ENOSYS;
+  return -1;
 }
 
 #if defined ( __GNUC__ )
@@ -84,42 +68,9 @@ PosixDeviceTest test ("test", 1);
 
 // -----------------------------------------------------------------------------
 
-extern "C"
-{
-  int
-  __posix_open (const char *path, int oflag, ...);
-
-  int
-  __posix_close (int fildes);
-}
-
-// -----------------------------------------------------------------------------
-
 int
 main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
-
-  // Check if
-  assert(os::PosixDevice::getRegisteredDevice (0) == &test);
-
-  int fd;
-  fd = __posix_open ("/dev/test", 0, 123);
-  assert((fd >= 3) && (errno == 0));
-
-  // Get it back; is it the same?
-  assert(os::FileDescriptorsManager::getPosixIo (fd) == &test);
-  assert(test.getFileDescriptor () == fd);
-
-  // Check passing variadic mode
-  assert(test.getMode () == 123);
-
-  // Close and free descriptor
-  int ret = __posix_close (fd);
-  assert((ret == 0) && (errno == 0));
-
-  // Check if descriptor freed.
-  assert(os::FileDescriptorsManager::getPosixIo (fd) == nullptr);
-  assert(test.getFileDescriptor () == os::noFileDescriptor);
 
   std::printf ("'test-device-debug' done.\n");
 
