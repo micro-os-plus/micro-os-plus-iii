@@ -157,11 +157,9 @@ __posix_open (const char *path, int oflag, ...)
   os::PosixIo* io = os::PosixDevice::identifyPosixDevice (path);
   if (io != nullptr)
     {
-      int ret;
-
       va_list args;
       va_start(args, oflag);
-      ret = io->open (path, oflag, args);
+      int ret = io->vopen (path, oflag, args);
       va_end(args);
 
       return ret;
@@ -207,11 +205,9 @@ __posix_ioctl (int fildes, unsigned long request, ...)
       return -1;
     }
 
-  int ret;
-
   va_list args;
   va_start(args, request);
-  ret = io->ioctl (request, args);
+  int ret = io->vioctl (request, args);
   va_end(args);
 
   return ret;

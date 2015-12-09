@@ -22,6 +22,12 @@
 #include <cerrno>
 #include <cstdarg>
 
+// Variadic calls are processed in two steps, first prepare a
+// va_list structure, than call helper functions like vopen()
+// vioctl(), that use 'va_list args'.
+//
+// virtual functions need not be variadic, they also use 'va_list args'.
+
 namespace os
 {
 
@@ -42,15 +48,22 @@ namespace os
   int
   PosixIo::open (const char *path, int oflag, ...)
   {
-    int ret;
+    // Forward to the variadic version of the function.
+    va_list args;
+    va_start(args, oflag);
+    int ret = vopen (path, oflag, args);
+    va_end(args);
 
+    return ret;
+  }
+
+  int
+  PosixIo::vopen (const char *path, int oflag, va_list args)
+  {
     errno = 0;
 
     // Execute the implementation specific code.
-    va_list args;
-    va_start(args, oflag);
-    ret = doOpen (path, oflag, args);
-    va_end(args);
+    int ret = doOpen (path, oflag, args);
 
     if (ret == 0)
       {
@@ -69,12 +82,10 @@ namespace os
   int
   PosixIo::close (void)
   {
-    int ret;
-
     errno = 0;
 
     // Execute the implementation specific code.
-    ret = doClose ();
+    int ret = doClose ();
 
     // Remove this IO from the file descriptors registry.
     FileDescriptorsManager::freeFileDescriptor (fFileDescriptor);
@@ -108,17 +119,22 @@ namespace os
   int
   PosixIo::ioctl (int request, ...)
   {
-    int ret;
-
-    errno = 0;
-
-    // Execute the implementation specific code.
+    // Forward to the variadic version of the function.
     va_list args;
     va_start(args, request);
-    ret = doIoctl (request, args);
+    int ret = vioctl (request, args);
     va_end(args);
 
     return ret;
+  }
+
+  int
+  PosixIo::vioctl (int request, va_list args)
+  {
+    errno = 0;
+
+    // Execute the implementation specific code.
+    return doIoctl (request, args);
   }
 
   // ----------------------------------------------------------------------------
@@ -126,8 +142,7 @@ namespace os
   int
   PosixIo::doClose (void)
   {
-    errno = ENOSYS; // Not implemented
-    return -1;
+    return 0; // Always return success
   }
 
 #pragma GCC diagnostic push
@@ -148,7 +163,7 @@ namespace os
   }
 
   int
-  PosixIo::doIoctl (int request, ...)
+  PosixIo::doIoctl (int request, va_list args)
   {
     errno = ENOSYS; // Not implemented
     return -1;

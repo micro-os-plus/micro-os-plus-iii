@@ -50,6 +50,7 @@ namespace os
           {
             registryArray[i] = this;
             found = true;
+            continue;
           }
 #if defined(DEBUG)
         // Validate the device name by checking duplicates.
