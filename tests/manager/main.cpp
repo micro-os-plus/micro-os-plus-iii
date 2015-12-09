@@ -36,7 +36,7 @@ public:
 private:
 
   virtual int
-  doOpen (const char *path, int oflag, ...);
+  doOpen (const char *path, int oflag, va_list args);
 };
 
 PosixTest::PosixTest ()
@@ -50,7 +50,7 @@ PosixTest::PosixTest ()
 #endif
 
 int
-PosixTest::doOpen (const char *path, int oflag, ...)
+PosixTest::doOpen (const char *path, int oflag, va_list args)
 {
   errno = ENOSYS;
   return -1;

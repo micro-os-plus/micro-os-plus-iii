@@ -57,6 +57,9 @@ namespace os
     static PosixIo*
     identifyPosixDevice (const char* path);
 
+    static PosixDevice*
+    getRegisteredDevice (std::size_t index);
+
   protected:
 
     void
@@ -64,9 +67,6 @@ namespace os
 
     void
     deRegisterDevice (void);
-
-    PosixDevice*
-    getRegisteredDevice (std::size_t index);
 
     // ------------------------------------------------------------------------
   protected:
