@@ -17,6 +17,7 @@
  */
 
 #include "posix-io/FileDescriptorsManager.h"
+#include "posix-io/PosixIoImplementation.h"
 #include "posix-io/PosixIo.h"
 #include <cassert>
 #include <cerrno>
@@ -33,9 +34,10 @@ namespace os
 
   // --------------------------------------------------------------------------
 
-  PosixIo::PosixIo ()
+  PosixIo::PosixIo (PosixIoImplementation& impl) :
+      fImpl (impl)
   {
-    fFileDescriptor = noFileDescriptor;
+    this->fFileDescriptor = noFileDescriptor;
   }
 
   PosixIo::~PosixIo ()
@@ -63,7 +65,7 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    int ret = doOpen (path, oflag, args);
+    int ret = fImpl.open (path, oflag, args);
 
     if (ret == 0)
       {
@@ -72,7 +74,7 @@ namespace os
         if (ret == -1)
           {
             // If allocation failed, close it.
-            doClose ();
+            fImpl.close ();
             fFileDescriptor = noFileDescriptor;
           }
       }
@@ -85,7 +87,7 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    int ret = doClose ();
+    int ret = fImpl.close ();
 
     // Remove this IO from the file descriptors registry.
     FileDescriptorsManager::freeFileDescriptor (fFileDescriptor);
@@ -96,7 +98,7 @@ namespace os
 
   // ----------------------------------------------------------------------------
 
-  // All these wrappers are required just to clear 'errno'.
+  // All these wrappers are required to clear 'errno'.
 
   ssize_t
   PosixIo::read (void *buf, size_t nbyte)
@@ -104,7 +106,7 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    return doRead (buf, nbyte);
+    return fImpl.read (buf, nbyte);
   }
 
   ssize_t
@@ -113,7 +115,7 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    return doWrite (buf, nbyte);
+    return fImpl.write (buf, nbyte);
   }
 
   int
@@ -134,43 +136,9 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    return doIoctl (request, args);
+    return fImpl.ioctl (request, args);
   }
 
-  // ----------------------------------------------------------------------------
-
-  int
-  PosixIo::doClose (void)
-  {
-    return 0; // Always return success
-  }
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
-  ssize_t
-  PosixIo::doRead (void *buf, size_t nbyte)
-  {
-    errno = ENOSYS; // Not implemented
-    return -1;
-  }
-
-  ssize_t
-  PosixIo::doWrite (const void *buf, size_t nbyte)
-  {
-    errno = ENOSYS; // Not implemented
-    return -1;
-  }
-
-  int
-  PosixIo::doIoctl (int request, va_list args)
-  {
-    errno = ENOSYS; // Not implemented
-    return -1;
-  }
-
-#pragma GCC diagnostic pop
-
-} // namespace os
+} /* namespace os */
 
 // ----------------------------------------------------------------------------

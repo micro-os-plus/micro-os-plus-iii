@@ -25,11 +25,10 @@ namespace os
 {
 
   typedef int fileDescriptor_t;
-  class PosixIo;
 
   constexpr fileDescriptor_t noFileDescriptor = -1;
 
-} // namespace os
+} /* namespace os */
 
 // ----------------------------------------------------------------------------
 

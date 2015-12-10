@@ -17,6 +17,7 @@
  */
 
 #include "posix-io/PosixDevice.h"
+#include "posix-io/PosixDeviceImplementation.h"
 #include <cstdlib>
 #include <unistd.h>
 #include <cstring>
@@ -27,101 +28,18 @@ namespace os
 
   // ----------------------------------------------------------------------------
 
-  PosixDevice* PosixDevice::registryArray[OS_INTEGER_POSIX_DEVICE_ARRAY_SIZE];
-
-  PosixDevice::PosixDevice (const char* deviceName)
+  PosixDevice::PosixDevice (PosixDeviceImplementation& impl) :
+      PosixIo (static_cast<PosixIoImplementation&> (impl))
   {
-    fDeviceName = deviceName;
-    registerDevice ();
+    ;
   }
 
-  PosixDevice::~PosixDevice ()
+  bool
+  PosixDevice::matchName (const char* name) const
   {
-    deRegisterDevice ();
+    return ((PosixDeviceImplementation&) fImpl).matchName (name);
   }
 
-  void
-  PosixDevice::registerDevice (void)
-  {
-    bool found = false;
-    for (std::size_t i = 0; i < getRegistrySize (); ++i)
-      {
-        if (registryArray[i] == nullptr)
-          {
-            registryArray[i] = this;
-            found = true;
-            continue;
-          }
-#if defined(DEBUG)
-        // Validate the device name by checking duplicates.
-        if (std::strcmp (fDeviceName, registryArray[i]->fDeviceName) == 0)
-          {
-            const char* msg = "Duplicate PosixDevice name. Abort.\n";
-#if defined(OS_INCLUDE_TRACE_PRINTF)
-            trace_printf(msg);
-#else
-            ::write (2, msg, strlen (msg));
-#endif
-            abort ();
-          }
-#endif
-      }
-
-    if (found)
-      {
-        return;
-      }
-
-    // TODO: call trace_printf() from the separate package, when available.
-    const char* msg = "Max number of PosixDevices reached. Abort.\n";
-#if defined(OS_INCLUDE_TRACE_PRINTF)
-    trace_printf(msg);
-#else
-    ::write (2, msg, strlen (msg));
-#endif
-    abort ();
-  }
-
-  void
-  PosixDevice::deRegisterDevice (void)
-  {
-    for (std::size_t i = 0; i < getRegistrySize (); ++i)
-      {
-        if (registryArray[i] == this)
-          {
-            registryArray[i] = nullptr;
-            return;
-          }
-      }
-
-    // Not found... It would be good to tell.
-  }
-
-  PosixIo*
-  PosixDevice::identifyPosixDevice (const char* path)
-  {
-    assert(path != nullptr);
-
-    const char* prefix = PosixDevice::getDevicePrefix ();
-    if (std::strncmp (prefix, path, std::strlen (prefix)) != 0)
-      {
-        // The device prefix does not match, not a device.
-        return nullptr;
-      }
-
-    // The prefix was identified; try to identify the rest of the path
-    const char* name = path + std::strlen (prefix);
-    for (std::size_t i = 0; i < getRegistrySize (); ++i)
-      {
-        if (std::strcmp (name, registryArray[i]->fDeviceName) == 0)
-          {
-            return registryArray[i];
-          }
-      }
-
-    return nullptr;
-  }
-
-} // namespace os
+} /* namespace os */
 
 // ----------------------------------------------------------------------------

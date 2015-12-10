@@ -18,6 +18,7 @@
 
 #include "posix-io/FileDescriptorsManager.h"
 #include "posix-io/PosixIo.h"
+#include "posix-io/PosixIoImplementation.h"
 #include <cerrno>
 #include <cassert>
 #include <cstdio>
@@ -27,22 +28,13 @@
 
 // Mock class, all methods return ENOSYS, as not implemented.
 
-class PosixTest : public os::PosixIo
+class TestPosixIoImplementation : public os::PosixIoImplementation
 {
 public:
 
-  PosixTest ();
-
-private:
-
   virtual int
-  doOpen (const char *path, int oflag, va_list args);
+  open (const char *path, int oflag, va_list args);
 };
-
-PosixTest::PosixTest ()
-{
-  ;
-}
 
 #if defined ( __GNUC__ )
 #pragma GCC diagnostic push
@@ -50,7 +42,7 @@ PosixTest::PosixTest ()
 #endif
 
 int
-PosixTest::doOpen (const char *path, int oflag, va_list args)
+TestPosixIoImplementation::open (const char *path, int oflag, va_list args)
 {
   errno = ENOSYS;
   return -1;
@@ -62,9 +54,14 @@ PosixTest::doOpen (const char *path, int oflag, va_list args)
 
 // -----------------------------------------------------------------------------
 
-PosixTest test1;
-PosixTest test2;
-PosixTest test3;
+os::FileDescriptorsManager descriptorsManager
+  { 5 };
+
+TestPosixIoImplementation impl;
+
+os::PosixIo test1 (impl);
+os::PosixIo test2 (impl);
+os::PosixIo test3 (impl);
 
 // -----------------------------------------------------------------------------
 
@@ -74,6 +71,11 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   size_t sz = os::FileDescriptorsManager::getSize ();
   // Size must be 5 for this test
   assert(sz == 5);
+
+  for (std::size_t i = 0; i < sz; ++i)
+    {
+      assert(os::FileDescriptorsManager::getPosixIo (i) == nullptr);
+    }
 
   // Check limits
   assert(os::FileDescriptorsManager::checkFileDescriptor (-1) == false);
@@ -122,7 +124,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   fd3 = os::FileDescriptorsManager::allocFileDescriptor (&test3);
   assert(fd3 == ((os::fileDescriptor_t )(sz - 1)));
 
-  std::printf ("'test-manager-debug' done.\n");
+  std::printf ("'test-descriptors-manager-debug' done.\n");
 
   // Success!
   return 0;

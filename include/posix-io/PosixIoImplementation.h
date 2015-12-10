@@ -16,51 +16,46 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef INCLUDE_POSIX_IO_POSIX_DEVICE_H_
-#define INCLUDE_POSIX_IO_POSIX_DEVICE_H_
+#ifndef POSIX_IO_IMPLEMENTATION_H_
+#define POSIX_IO_IMPLEMENTATION_H_
 
-// ----------------------------------------------------------------------------
-
-#include <sys/types.h>
-#include "posix-io/PosixIo.h"
-
-// ----------------------------------------------------------------------------
-
-#if ! defined(OS_STRING_POSIX_DEVICE_PREFIX)
-#define OS_STRING_POSIX_DEVICE_PREFIX "/dev/"
-#endif
+#include <cstdarg>
 
 // ----------------------------------------------------------------------------
 
 namespace os
 {
-  class PosixDeviceImplementation;
 
-  class PosixDevice : public PosixIo
+  class PosixIoImplementation
   {
   public:
 
-    PosixDevice (PosixDeviceImplementation& impl);
+    PosixIoImplementation ();
+
+    virtual
+    ~PosixIoImplementation ();
 
     // ------------------------------------------------------------------------
 
-    bool
-    matchName (const char* name) const;
+    virtual int
+    open (const char *path, int oflag, va_list args) = 0;
 
-    static const char*
-    getDevicePrefix (void);
+    virtual int
+    close (void);
+
+    virtual ssize_t
+    read (void *buf, size_t nbyte);
+
+    virtual ssize_t
+    write (const void *buf, size_t nbyte);
+
+    virtual int
+    ioctl (int request, va_list args);
+
   };
-
-  // --------------------------------------------------------------------------
-
-  inline const char*
-  PosixDevice::getDevicePrefix (void)
-  {
-    return OS_STRING_POSIX_DEVICE_PREFIX;
-  }
 
 } /* namespace os */
 
 // ----------------------------------------------------------------------------
 
-#endif /* INCLUDE_POSIX_IO_POSIX_DEVICE_H_ */
+#endif /* POSIX_IO_IMPLEMENTATION_H_ */

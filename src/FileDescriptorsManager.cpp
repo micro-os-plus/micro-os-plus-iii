@@ -26,36 +26,38 @@ namespace os
 
   // ----------------------------------------------------------------------------
 
-  // Static table of all open file descriptors, similar to POSIX
-  PosixIo* FileDescriptorsManager::openedFileDescriptors[OS_INTEGER_FILE_DESCRIPTORS_MANAGER_ARRAY_SIZE];
+  std::size_t FileDescriptorsManager::sfSize;
+  PosixIo** FileDescriptorsManager::sfDescriptorsArray;
 
   // --------------------------------------------------------------------------
 
-  FileDescriptorsManager::FileDescriptorsManager ()
+  FileDescriptorsManager::FileDescriptorsManager (size_t size)
   {
-    // Superfluous, it should be cleared as the entire BSS.
+    assert(size > 3);
+
+    sfSize = size;
+    sfDescriptorsArray = new PosixIo*[size];
+
     for (std::size_t i = 0; i < getSize (); ++i)
       {
-        openedFileDescriptors[i] = nullptr;
+        sfDescriptorsArray[i] = nullptr;
       }
+  }
+
+  FileDescriptorsManager::~FileDescriptorsManager ()
+  {
+    delete sfDescriptorsArray;
+    sfSize = 0;
   }
 
   bool
   FileDescriptorsManager::checkFileDescriptor (int fildes)
   {
-    if ((fildes < 0) || (((std::size_t) fildes) >= getSize ()))
+    if ((fildes < 0) || (((std::size_t) fildes) >= sfSize))
       {
         return false;
       }
     return true;
-  }
-
-  PosixIo*
-  FileDescriptorsManager::getPosixIo (int fildes)
-  {
-    assert((fildes > 0) && (((std::size_t ) fildes) < getSize ()));
-
-    return openedFileDescriptors[fildes];
   }
 
   int
@@ -69,11 +71,11 @@ namespace os
       }
 
     // Reserve 0, 1, 2 (stdin, stdout, stderr)
-    for (std::size_t i = 3; i < getSize (); ++i)
+    for (std::size_t i = 3; i < sfSize; ++i)
       {
-        if (openedFileDescriptors[i] == nullptr)
+        if (sfDescriptorsArray[i] == nullptr)
           {
-            openedFileDescriptors[i] = io;
+            sfDescriptorsArray[i] = io;
             io->setFileDescriptor (i);
             return i;
           }
@@ -87,18 +89,18 @@ namespace os
   int
   FileDescriptorsManager::freeFileDescriptor (int fildes)
   {
-    if ((fildes < 0) || (((std::size_t) fildes) >= getSize ()))
+    if ((fildes < 0) || (((std::size_t) fildes) >= sfSize))
       {
         errno = EBADF;
         return -1;
       }
 
-    openedFileDescriptors[fildes]->clearFileDescriptor ();
-    openedFileDescriptors[fildes] = nullptr;
+    sfDescriptorsArray[fildes]->clearFileDescriptor ();
+    sfDescriptorsArray[fildes] = nullptr;
     return 0;
   }
 
-} // namespace os
+} /* namespace os */
 
 // ----------------------------------------------------------------------------
 

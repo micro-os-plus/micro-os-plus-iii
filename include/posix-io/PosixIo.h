@@ -27,13 +27,13 @@
 
 namespace os
 {
+  class PosixIoImplementation;
 
-  // Abstract class
   class PosixIo
   {
   public:
 
-    PosixIo ();
+    PosixIo (PosixIoImplementation& impl);
 
     virtual
     ~PosixIo ();
@@ -70,32 +70,15 @@ namespace os
     clearFileDescriptor (void);
 
     fileDescriptor_t
-    getFileDescriptor (void);
-
-  protected:
-
-    virtual int
-    doOpen (const char *path, int oflag, va_list args) = 0;
-
-    virtual int
-    doClose (void);
-
-    virtual ssize_t
-    doRead (void *buf, size_t nbyte);
-
-    virtual ssize_t
-    doWrite (const void *buf, size_t nbyte);
-
-    virtual int
-    doIoctl (int request, va_list args);
+    getFileDescriptor (void) const;
 
     // ------------------------------------------------------------------------
 
   protected:
+
+    PosixIoImplementation& fImpl;
 
     fileDescriptor_t fFileDescriptor;
-
-    // ------------------------------------------------------------------------
   };
 
   // --------------------------------------------------------------------------
@@ -113,12 +96,12 @@ namespace os
   }
 
   inline fileDescriptor_t
-  PosixIo::getFileDescriptor (void)
+  PosixIo::getFileDescriptor (void) const
   {
     return fFileDescriptor;
   }
 
-} // namespace os
+} /* namespace os */
 
 // ----------------------------------------------------------------------------
 

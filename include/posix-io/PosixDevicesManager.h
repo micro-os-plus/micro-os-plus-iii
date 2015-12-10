@@ -16,51 +16,69 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef INCLUDE_POSIX_IO_POSIX_DEVICE_H_
-#define INCLUDE_POSIX_IO_POSIX_DEVICE_H_
+#ifndef POSIX_DEVICES_MANAGER_H_
+#define POSIX_DEVICES_MANAGER_H_
 
-// ----------------------------------------------------------------------------
-
-#include <sys/types.h>
-#include "posix-io/PosixIo.h"
-
-// ----------------------------------------------------------------------------
-
-#if ! defined(OS_STRING_POSIX_DEVICE_PREFIX)
-#define OS_STRING_POSIX_DEVICE_PREFIX "/dev/"
-#endif
+#include <cstddef>
+#include <cassert>
 
 // ----------------------------------------------------------------------------
 
 namespace os
 {
-  class PosixDeviceImplementation;
+  class PosixDevice;
 
-  class PosixDevice : public PosixIo
+  class PosixDevicesManager
   {
   public:
 
-    PosixDevice (PosixDeviceImplementation& impl);
+    PosixDevicesManager (size_t size);
+
+    ~PosixDevicesManager ();
 
     // ------------------------------------------------------------------------
 
-    bool
-    matchName (const char* name) const;
+    static void
+    registerDevice (PosixDevice* device);
 
-    static const char*
-    getDevicePrefix (void);
+    static void
+    deRegisterDevice (PosixDevice* device);
+
+    static PosixDevice*
+    identifyPosixDevice (const char* path);
+
+    static std::size_t
+    getSize (void);
+
+    static PosixDevice*
+    getRegisteredDevice (std::size_t index);
+
+    // ------------------------------------------------------------------------
+
+  private:
+
+    static size_t sfSize;
+
+    static PosixDevice** sfRegistryArray;
   };
 
   // --------------------------------------------------------------------------
 
-  inline const char*
-  PosixDevice::getDevicePrefix (void)
+  inline std::size_t
+  PosixDevicesManager::getSize (void)
   {
-    return OS_STRING_POSIX_DEVICE_PREFIX;
+    return sfSize;
+  }
+
+  inline PosixDevice*
+  PosixDevicesManager::getRegisteredDevice (std::size_t index)
+  {
+    assert(index < sfSize);
+    return sfRegistryArray[index];
   }
 
 } /* namespace os */
 
 // ----------------------------------------------------------------------------
 
-#endif /* INCLUDE_POSIX_IO_POSIX_DEVICE_H_ */
+#endif /* POSIX_DEVICES_MANAGER_H_ */

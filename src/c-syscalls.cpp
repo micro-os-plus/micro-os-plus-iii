@@ -19,6 +19,7 @@
 #include "posix-io/FileDescriptorsManager.h"
 #include "posix-io/PosixIo.h"
 #include "posix-io/PosixDevice.h"
+#include "posix-io/PosixDevicesManager.h"
 #include <cstdarg>
 #include <cerrno>
 
@@ -154,7 +155,7 @@ __posix_open (const char *path, int oflag, ...)
       return -1;
     }
 
-  os::PosixIo* io = os::PosixDevice::identifyPosixDevice (path);
+  os::PosixIo* io = os::PosixDevicesManager::identifyPosixDevice (path);
   if (io != nullptr)
     {
       va_list args;

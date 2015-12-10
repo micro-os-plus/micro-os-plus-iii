@@ -21,23 +21,24 @@
 
 #include "posix-io/types.h"
 #include <cstddef>
-
-// ----------------------------------------------------------------------------
-
-// This definition should be somewhere else, in a configuration header
-#if !defined(OS_INTEGER_FILE_DESCRIPTORS_MANAGER_ARRAY_SIZE)
-#define OS_INTEGER_FILE_DESCRIPTORS_MANAGER_ARRAY_SIZE   (10)
-#endif
+#include <cassert>
 
 // ----------------------------------------------------------------------------
 
 namespace os
 {
 
+  class PosixIo;
+
   class FileDescriptorsManager
   {
   public:
-    FileDescriptorsManager ();
+
+    FileDescriptorsManager (size_t size);
+
+    ~FileDescriptorsManager ();
+
+    // ------------------------------------------------------------------------
 
     static size_t
     getSize (void);
@@ -56,7 +57,10 @@ namespace os
 
     // ------------------------------------------------------------------------
   private:
-    static PosixIo* openedFileDescriptors[OS_INTEGER_FILE_DESCRIPTORS_MANAGER_ARRAY_SIZE];
+
+    static std::size_t sfSize;
+
+    static PosixIo** sfDescriptorsArray;
   };
 
   // --------------------------------------------------------------------------
@@ -64,10 +68,18 @@ namespace os
   inline size_t
   FileDescriptorsManager::getSize (void)
   {
-    return sizeof(openedFileDescriptors) / sizeof(openedFileDescriptors[0]);
+    return sfSize;
   }
 
-} // namespace os
+  inline PosixIo*
+  FileDescriptorsManager::getPosixIo (int fildes)
+  {
+    assert((fildes >= 0) && (((std::size_t ) fildes) < sfSize));
+
+    return sfDescriptorsArray[fildes];
+  }
+
+} /* namespace os */
 
 // ----------------------------------------------------------------------------
 
