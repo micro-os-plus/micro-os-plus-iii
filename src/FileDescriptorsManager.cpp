@@ -63,7 +63,7 @@ namespace os
   int
   FileDescriptorsManager::allocFileDescriptor (PosixIo* io)
   {
-    if (io->getFileDescriptor () > 0)
+    if (io->getFileDescriptor () >= 0)
       {
         // Already allocated
         errno = EBUSY;

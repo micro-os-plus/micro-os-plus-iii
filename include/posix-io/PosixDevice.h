@@ -34,21 +34,30 @@
 
 namespace os
 {
-  class PosixDeviceImplementation;
-
   class PosixDevice : public PosixIo
   {
   public:
 
-    PosixDevice (PosixDeviceImplementation& impl);
+    PosixDevice (const char* name);
+
+    virtual
+    ~PosixDevice ();
 
     // ------------------------------------------------------------------------
 
-    bool
+    virtual bool
     matchName (const char* name) const;
+
+    const char*
+    getName (void);
 
     static const char*
     getDevicePrefix (void);
+
+  protected:
+
+    const char* fName;
+
   };
 
   // --------------------------------------------------------------------------
@@ -57,6 +66,12 @@ namespace os
   PosixDevice::getDevicePrefix (void)
   {
     return OS_STRING_POSIX_DEVICE_PREFIX;
+  }
+
+  inline const char*
+  PosixDevice::getName (void)
+  {
+    return fName;
   }
 
 } /* namespace os */

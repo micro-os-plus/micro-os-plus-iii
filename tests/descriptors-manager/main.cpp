@@ -18,7 +18,7 @@
 
 #include "posix-io/FileDescriptorsManager.h"
 #include "posix-io/PosixIo.h"
-#include "posix-io/PosixIoImplementation.h"
+#include "posix-io/PosixDevice.h"
 #include <cerrno>
 #include <cassert>
 #include <cstdio>
@@ -28,12 +28,12 @@
 
 // Mock class, all methods return ENOSYS, as not implemented.
 
-class TestPosixIoImplementation : public os::PosixIoImplementation
+class TestPosixIo : public os::PosixIo
 {
 public:
 
   virtual int
-  open (const char *path, int oflag, va_list args);
+  doOpen (const char *path, int oflag, va_list args);
 };
 
 #if defined ( __GNUC__ )
@@ -42,7 +42,7 @@ public:
 #endif
 
 int
-TestPosixIoImplementation::open (const char *path, int oflag, va_list args)
+TestPosixIo::doOpen (const char *path, int oflag, va_list args)
 {
   errno = ENOSYS;
   return -1;
@@ -57,11 +57,9 @@ TestPosixIoImplementation::open (const char *path, int oflag, va_list args)
 os::FileDescriptorsManager descriptorsManager
   { 5 };
 
-TestPosixIoImplementation impl;
-
-os::PosixIo test1 (impl);
-os::PosixIo test2 (impl);
-os::PosixIo test3 (impl);
+TestPosixIo test1;
+TestPosixIo test2;
+TestPosixIo test3;
 
 // -----------------------------------------------------------------------------
 

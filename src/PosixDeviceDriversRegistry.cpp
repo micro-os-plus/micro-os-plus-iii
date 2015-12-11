@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "posix-io/PosixDevicesManager.h"
+#include "posix-io/PosixDevicesRegistry.h"
 #include "posix-io/PosixDevice.h"
 #include <cassert>
 #include <cstring>
@@ -26,13 +26,13 @@ namespace os
 
   // --------------------------------------------------------------------------
 
-  size_t PosixDevicesManager::sfSize;
+  size_t PosixDevicesRegistry::sfSize;
 
-  PosixDevice** PosixDevicesManager::sfRegistryArray;
+  PosixDevice** PosixDevicesRegistry::sfRegistryArray;
 
   // --------------------------------------------------------------------------
 
-  PosixDevicesManager::PosixDevicesManager (size_t size)
+  PosixDevicesRegistry::PosixDevicesRegistry (size_t size)
   {
     assert(size > 0);
 
@@ -46,7 +46,7 @@ namespace os
 
   }
 
-  PosixDevicesManager::~PosixDevicesManager ()
+  PosixDevicesRegistry::~PosixDevicesRegistry ()
   {
     delete sfRegistryArray;
     sfSize = 0;
@@ -55,15 +55,37 @@ namespace os
   // --------------------------------------------------------------------------
 
   void
-  PosixDevicesManager::registerDevice (PosixDevice* device)
+  PosixDevicesRegistry::add (PosixDevice* driver)
   {
+    bool found = false;
     for (std::size_t i = 0; i < sfSize; ++i)
       {
         if (sfRegistryArray[i] == nullptr)
           {
-            sfRegistryArray[i] = device;
-            return;
+            sfRegistryArray[i] = driver;
+            found = true;
+            continue;
           }
+
+#if defined(DEBUG)
+        // Validate the device name by checking duplicates.
+        if (std::strcmp (driver->getName (), sfRegistryArray[i]->getName ())
+            == 0)
+          {
+            const char* msg = "Duplicate PosixDevice name. Abort.\n";
+#if defined(OS_INCLUDE_TRACE_PRINTF)
+            trace_printf(msg);
+#else
+            ::write (2, msg, strlen (msg));
+#endif
+            abort ();
+          }
+#endif
+      }
+
+    if (found)
+      {
+        return;
       }
 
     // TODO: call trace_printf() from the separate package, when available.
@@ -77,11 +99,11 @@ namespace os
   }
 
   void
-  PosixDevicesManager::deRegisterDevice (PosixDevice* device)
+  PosixDevicesRegistry::remove (PosixDevice* driver)
   {
     for (std::size_t i = 0; i < sfSize; ++i)
       {
-        if (sfRegistryArray[i] == device)
+        if (sfRegistryArray[i] == driver)
           {
             sfRegistryArray[i] = nullptr;
             return;
@@ -91,8 +113,11 @@ namespace os
     // Not found... It would be good to tell.
   }
 
+  /**
+   * return pointer to device or nullptr if not found.
+   */
   PosixDevice*
-  PosixDevicesManager::identifyPosixDevice (const char* path)
+  PosixDevicesRegistry::identifyDevice (const char* path)
   {
     assert(path != nullptr);
 
@@ -103,17 +128,19 @@ namespace os
         return nullptr;
       }
 
-    // The prefix was identified; try to identify the rest of the path
+    // The prefix was identified; try to match the rest of the path.
     const char* name = path + std::strlen (prefix);
     for (std::size_t i = 0; i < sfSize; ++i)
       {
         if (sfRegistryArray[i] != nullptr
             && sfRegistryArray[i]->matchName (name))
           {
+            // Return the first device that matches the path.
             return sfRegistryArray[i];
           }
       }
 
+    // Not a known device.
     return nullptr;
   }
 

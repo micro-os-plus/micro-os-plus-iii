@@ -16,10 +16,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "posix-io/PosixDevice.h"
 #include "posix-io/FileDescriptorsManager.h"
-#include "posix-io/PosixDevicesManager.h"
-#include "posix-io/PosixDeviceImplementation.h"
+#include "posix-io/PosixDevice.h"
+#include "posix-io/PosixDevicesRegistry.h"
 #include <cerrno>
 #include <cassert>
 #include <cstdio>
@@ -29,14 +28,14 @@
 
 // Test class, all methods return ENOSYS, as not implemented, except open().
 
-class TestPosixDeviceImplementation : public os::PosixDeviceImplementation
+class TestPosixDevice : public os::PosixDevice
 {
 public:
 
-  TestPosixDeviceImplementation (const char* deviceName, uint32_t deviceNumber);
+  TestPosixDevice (const char* deviceName, uint32_t deviceNumber);
 
   virtual int
-  open (const char *path, int oflag, va_list args);
+  doOpen (const char *path, int oflag, va_list args);
 
   int
   getMode (void);
@@ -48,16 +47,15 @@ private:
 
 };
 
-TestPosixDeviceImplementation::TestPosixDeviceImplementation (
-    const char* deviceName, uint32_t deviceNumber) :
-    PosixDeviceImplementation (deviceName)
+TestPosixDevice::TestPosixDevice (const char* deviceName, uint32_t deviceNumber) :
+    PosixDevice (deviceName)
 {
   fDeviceNumber = deviceNumber;
   fMode = 0;
 }
 
 int
-TestPosixDeviceImplementation::getMode (void)
+TestPosixDevice::getMode (void)
 {
   return fMode;
 }
@@ -68,7 +66,7 @@ TestPosixDeviceImplementation::getMode (void)
 #endif
 
 int
-TestPosixDeviceImplementation::open (const char *path, int oflag, va_list args)
+TestPosixDevice::doOpen (const char *path, int oflag, va_list args)
 {
   fMode = va_arg(args, int);
 
@@ -86,14 +84,12 @@ os::FileDescriptorsManager descriptorsManager
   { DESCRIPTORS_ARRAY_SIZE };
 
 #define DEVICES_ARRAY_SIZE (3)
-os::PosixDevicesManager devicesManager
+os::PosixDevicesRegistry devicesRegistry
   { DEVICES_ARRAY_SIZE };
 
 // This device will be mapped as "/dev/test"
-TestPosixDeviceImplementation testImpl
+TestPosixDevice test
   { "test", 1 };
-os::PosixDevice test
-  { testImpl };
 
 // -----------------------------------------------------------------------------
 
@@ -111,20 +107,20 @@ extern "C"
 int
 main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
-  std::size_t sz = os::PosixDevicesManager::getSize ();
+  std::size_t sz = os::PosixDevicesRegistry::getSize ();
   assert(sz == DEVICES_ARRAY_SIZE);
 
   // Check if initial status is empty
   for (std::size_t i = 0; i < sz; ++i)
     {
-      assert(os::PosixDevicesManager::getRegisteredDevice (i) == nullptr);
+      assert(os::PosixDevicesRegistry::getDevice (i) == nullptr);
     }
 
   // Register device
-  devicesManager.registerDevice (&test);
+  os::PosixDevicesRegistry::add (&test);
 
   // Check if first device is registered.
-  assert(os::PosixDevicesManager::getRegisteredDevice (0) == &test);
+  assert(os::PosixDevicesRegistry::getDevice (0) == &test);
 
   int fd;
   fd = __posix_open ("/dev/test", 0, 123);
@@ -135,7 +131,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   assert(test.getFileDescriptor () == fd);
 
   // Check passing variadic mode
-  assert(testImpl.getMode () == 123);
+  assert(test.getMode () == 123);
 
   // Close and free descriptor
   int ret = __posix_close (fd);

@@ -19,7 +19,7 @@
 #include "posix-io/FileDescriptorsManager.h"
 #include "posix-io/PosixIo.h"
 #include "posix-io/PosixDevice.h"
-#include "posix-io/PosixDevicesManager.h"
+#include "posix-io/PosixDevicesRegistry.h"
 #include <cstdarg>
 #include <cerrno>
 
@@ -155,12 +155,14 @@ __posix_open (const char *path, int oflag, ...)
       return -1;
     }
 
-  os::PosixIo* io = os::PosixDevicesManager::identifyPosixDevice (path);
-  if (io != nullptr)
+  os::PosixDevice* device = os::PosixDevicesRegistry::identifyDevice (path);
+  if (device != nullptr)
     {
+      // Similar to PosixIo::open().
+
       va_list args;
       va_start(args, oflag);
-      int ret = io->vopen (path, oflag, args);
+      int ret = device->vopen (path, oflag, args);
       va_end(args);
 
       return ret;
@@ -171,6 +173,20 @@ __posix_open (const char *path, int oflag, ...)
   errno = EBADF;
   return -1;
 }
+
+int __attribute__((weak))
+__posix_close (int fildes)
+{
+  os::PosixIo* io = os::FileDescriptorsManager::getPosixIo (fildes);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->close ();
+}
+
+// ----------------------------------------------------------------------------
 
 ssize_t __attribute__((weak))
 __posix_read (int fildes, void *buf, size_t nbyte)
@@ -212,18 +228,6 @@ __posix_ioctl (int fildes, unsigned long request, ...)
   va_end(args);
 
   return ret;
-}
-
-int __attribute__((weak))
-__posix_close (int fildes)
-{
-  os::PosixIo* io = os::FileDescriptorsManager::getPosixIo (fildes);
-  if (io == nullptr)
-    {
-      errno = EBADF;
-      return -1;
-    }
-  return io->close ();
 }
 
 // ----------------------------------------------------------------------------

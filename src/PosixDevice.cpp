@@ -17,27 +17,31 @@
  */
 
 #include "posix-io/PosixDevice.h"
-#include "posix-io/PosixDeviceImplementation.h"
-#include <cstdlib>
-#include <unistd.h>
 #include <cstring>
 #include <cassert>
 
 namespace os
 {
 
-  // ----------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
-  PosixDevice::PosixDevice (PosixDeviceImplementation& impl) :
-      PosixIo (static_cast<PosixIoImplementation&> (impl))
+  PosixDevice::PosixDevice (const char* name)
   {
-    ;
+    fName = name;
+  }
+
+  PosixDevice::~PosixDevice ()
+  {
+    fName = nullptr;
   }
 
   bool
   PosixDevice::matchName (const char* name) const
   {
-    return ((PosixDeviceImplementation&) fImpl).matchName (name);
+    assert(name != nullptr);
+    assert(fName != nullptr);
+
+    return (std::strcmp (name, fName) == 0);
   }
 
 } /* namespace os */

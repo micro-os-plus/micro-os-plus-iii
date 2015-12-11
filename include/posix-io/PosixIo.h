@@ -27,13 +27,11 @@
 
 namespace os
 {
-  class PosixIoImplementation;
-
   class PosixIo
   {
   public:
 
-    PosixIo (PosixIoImplementation& impl);
+    PosixIo ();
 
     virtual
     ~PosixIo ();
@@ -46,6 +44,9 @@ namespace os
     int
     vopen (const char *path, int oflag, va_list args);
 
+    int
+    close (void);
+
     ssize_t
     read (void *buf, size_t nbyte);
 
@@ -57,9 +58,6 @@ namespace os
 
     int
     vioctl (int request, va_list args);
-
-    int
-    close (void);
 
     // ------------------------------------------------------------------------
 
@@ -74,9 +72,26 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-  protected:
+    // Implementations
 
-    PosixIoImplementation& fImpl;
+    virtual int
+    doOpen (const char *path, int oflag, va_list args) = 0;
+
+    virtual int
+    doClose (void);
+
+    virtual ssize_t
+    doRead (void *buf, size_t nbyte);
+
+    virtual ssize_t
+    doWrite (const void *buf, size_t nbyte);
+
+    virtual int
+    doIoctl (int request, va_list args);
+
+    // ------------------------------------------------------------------------
+
+  protected:
 
     fileDescriptor_t fFileDescriptor;
   };

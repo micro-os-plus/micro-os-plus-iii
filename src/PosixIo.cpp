@@ -17,32 +17,28 @@
  */
 
 #include "posix-io/FileDescriptorsManager.h"
-#include "posix-io/PosixIoImplementation.h"
 #include "posix-io/PosixIo.h"
 #include <cassert>
 #include <cerrno>
 #include <cstdarg>
 
 // Variadic calls are processed in two steps, first prepare a
-// va_list structure, than call helper functions like vopen()
-// vioctl(), that use 'va_list args'.
-//
-// virtual functions need not be variadic, they also use 'va_list args'.
+// va_list structure, then call implementation functions like doOpen()
+// doIoctl(), that use 'va_list args'.
 
 namespace os
 {
 
   // --------------------------------------------------------------------------
 
-  PosixIo::PosixIo (PosixIoImplementation& impl) :
-      fImpl (impl)
+  PosixIo::PosixIo ()
   {
     this->fFileDescriptor = noFileDescriptor;
   }
 
   PosixIo::~PosixIo ()
   {
-    ;
+    this->fFileDescriptor = noFileDescriptor;
   }
 
   // --------------------------------------------------------------------------
@@ -64,20 +60,19 @@ namespace os
   {
     errno = 0;
 
-    // Execute the implementation specific code.
-    int ret = fImpl.open (path, oflag, args);
-
+    int ret = doOpen (path, oflag, args);
     if (ret == 0)
       {
         // If successful, allocate a file descriptor
         ret = FileDescriptorsManager::allocFileDescriptor (this);
         if (ret == -1)
           {
-            // If allocation failed, close it.
-            fImpl.close ();
+            // If allocation failed, close this object.
+            doClose ();
             fFileDescriptor = noFileDescriptor;
           }
       }
+
     return ret;
   }
 
@@ -87,7 +82,7 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    int ret = fImpl.close ();
+    int ret = doClose ();
 
     // Remove this IO from the file descriptors registry.
     FileDescriptorsManager::freeFileDescriptor (fFileDescriptor);
@@ -96,7 +91,7 @@ namespace os
     return ret;
   }
 
-  // ----------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
   // All these wrappers are required to clear 'errno'.
 
@@ -106,7 +101,7 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    return fImpl.read (buf, nbyte);
+    return doRead (buf, nbyte);
   }
 
   ssize_t
@@ -115,7 +110,7 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    return fImpl.write (buf, nbyte);
+    return doWrite (buf, nbyte);
   }
 
   int
@@ -136,8 +131,45 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    return fImpl.ioctl (request, args);
+    return doIoctl (request, args);
   }
+
+  // --------------------------------------------------------------------------
+
+  // doOpen() is not here because it is virtual,
+  // it must be implemented by derived classes.
+
+  int
+  PosixIo::doClose (void)
+  {
+    return 0; // Always return success
+  }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+  ssize_t
+  PosixIo::doRead (void *buf, size_t nbyte)
+  {
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  ssize_t
+  PosixIo::doWrite (const void *buf, size_t nbyte)
+  {
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  PosixIo::doIoctl (int request, va_list args)
+  {
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+#pragma GCC diagnostic pop
 
 } /* namespace os */
 

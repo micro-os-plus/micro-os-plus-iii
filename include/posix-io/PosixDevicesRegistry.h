@@ -16,37 +16,69 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POSIX_DEVICE_IMPLEMENTATION_H_
-#define POSIX_DEVICE_IMPLEMENTATION_H_
+#ifndef POSIX_DEVICES_MANAGER_H_
+#define POSIX_DEVICES_MANAGER_H_
 
-#include "posix-io/PosixIoImplementation.h"
+#include <cstddef>
+#include <cassert>
 
 // ----------------------------------------------------------------------------
 
 namespace os
 {
+  class PosixDevice;
 
-  class PosixDeviceImplementation : public PosixIoImplementation
+  class PosixDevicesRegistry
   {
   public:
 
-    PosixDeviceImplementation (const char* name);
+    PosixDevicesRegistry (size_t size);
+
+    ~PosixDevicesRegistry ();
 
     // ------------------------------------------------------------------------
 
-    virtual
-    ~PosixDeviceImplementation ();
+    static void
+    add (PosixDevice* driver);
 
-    virtual bool
-    matchName (const char* name) const;
+    static void
+    remove (PosixDevice* driver);
 
-  protected:
+    static PosixDevice*
+    identifyDevice (const char* path);
 
-    const char* fName;
+    static std::size_t
+    getSize (void);
+
+    static PosixDevice*
+    getDevice (std::size_t index);
+
+    // ------------------------------------------------------------------------
+
+  private:
+
+    static size_t sfSize;
+
+    static PosixDevice** sfRegistryArray;
   };
+
+  // --------------------------------------------------------------------------
+
+  inline std::size_t
+  PosixDevicesRegistry::getSize (void)
+  {
+    return sfSize;
+  }
+
+  inline PosixDevice*
+  PosixDevicesRegistry::getDevice (std::size_t index)
+  {
+    assert(index < sfSize);
+    return sfRegistryArray[index];
+  }
 
 } /* namespace os */
 
 // ----------------------------------------------------------------------------
 
-#endif /* POSIX_DEVICE_IMPLEMENTATION_H_ */
+#endif /* POSIX_DEVICES_MANAGER_H_ */
