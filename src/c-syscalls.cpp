@@ -26,28 +26,28 @@
 
 #if defined(OS_REDEFINE_POSIX_SYSCALLS)
 
-#define chown __posix_chown
-#define close __posix_close
-#define execve __posix_execve
-#define fcntl __posix_fork
-#define fork __posix_fork
-#define fstat __posix_fstat
-#define getpid __posix_getpid
-#define gettimeofday __posix_gettimeofday
-#define ioctl __posix_ioctl
-#define isatty __posix_isatty
-#define kill __posix_kill
-#define link __posix_link
-#define lseek __posix_lseek
-#define open __posix_open
-#define raise __posix_raise
-#define read __posix_read
-#define readlink __posix_readlink
-#define stat __posix_stat
-#define symlink __posix_symlink
-#define times __posix_times
-#define unlink __posix_unlink
-#define write __posix_write
+#define __posix_chown chown
+#define __posix_close close
+#define __posix_execve execve
+#define __posix_fork fcntl
+#define __posix_fork fork
+#define __posix_fstat fstat
+#define __posix_getpid getpid
+#define __posix_gettimeofday gettimeofday
+#define __posix_ioctl ioctl
+#define __posix_isatty isatty
+#define __posix_kill kill
+#define __posix_link link
+#define __posix_lseek lseek
+#define __posix_open open
+#define __posix_raise raise
+#define __posix_read read
+#define __posix_readlink readlink
+#define __posix_stat stat
+#define __posix_symlink symlink
+#define __posix_times times
+#define __posix_unlink unlink
+#define __posix_write write
 
 #endif
 
