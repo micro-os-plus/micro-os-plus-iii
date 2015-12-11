@@ -19,7 +19,6 @@
 #include "posix-io/FileDescriptorsManager.h"
 #include "posix-io/PosixIo.h"
 #include "posix-io/PosixDevice.h"
-#include "posix-io/PosixDevicesRegistry.h"
 #include <cstdarg>
 #include <cerrno>
 
@@ -149,35 +148,27 @@ extern "C"
 int __attribute__((weak))
 __posix_open (const char *path, int oflag, ...)
 {
-  if (path == nullptr)
+  va_list args;
+  va_start(args, oflag);
+  os::PosixIo* io = os::PosixIo::vopen (path, oflag, args);
+  va_end(args);
+
+  if (io == nullptr)
     {
-      errno = EBADF;
+      // Return POSIX style error indicator.
       return -1;
     }
 
-  os::PosixDevice* device = os::PosixDevicesRegistry::identifyDevice (path);
-  if (device != nullptr)
-    {
-      // Similar to PosixIo::open().
-
-      va_list args;
-      va_start(args, oflag);
-      int ret = device->vopen (path, oflag, args);
-      va_end(args);
-
-      return ret;
-    }
-
-  // TODO: process files from file systems.
-
-  errno = EBADF;
-  return -1;
+  // Return non-negative POSIX file descriptor.
+  return io->getFileDescriptor ();
 }
 
 int __attribute__((weak))
 __posix_close (int fildes)
 {
-  os::PosixIo* io = os::FileDescriptorsManager::getPosixIo (fildes);
+  // The flow is identical for all POSIX functions: identify the C++
+  // object and call the corresponding C++ method.
+  os::PosixIo* io = os::FileDescriptorsManager::getObject (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -191,7 +182,7 @@ __posix_close (int fildes)
 ssize_t __attribute__((weak))
 __posix_read (int fildes, void *buf, size_t nbyte)
 {
-  os::PosixIo* io = os::FileDescriptorsManager::getPosixIo (fildes);
+  os::PosixIo* io = os::FileDescriptorsManager::getObject (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -203,7 +194,7 @@ __posix_read (int fildes, void *buf, size_t nbyte)
 ssize_t __attribute__((weak))
 __posix_write (int fildes, const void *buf, size_t nbyte)
 {
-  os::PosixIo* io = os::FileDescriptorsManager::getPosixIo (fildes);
+  os::PosixIo* io = os::FileDescriptorsManager::getObject (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -215,7 +206,7 @@ __posix_write (int fildes, const void *buf, size_t nbyte)
 int __attribute__((weak))
 __posix_ioctl (int fildes, unsigned long request, ...)
 {
-  os::PosixIo* io = os::FileDescriptorsManager::getPosixIo (fildes);
+  os::PosixIo* io = os::FileDescriptorsManager::getObject (fildes);
   if (io == nullptr)
     {
       errno = EBADF;

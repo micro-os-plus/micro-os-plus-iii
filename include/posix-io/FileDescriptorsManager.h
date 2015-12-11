@@ -44,16 +44,16 @@ namespace os
     getSize (void);
 
     static bool
-    checkFileDescriptor (int fildes);
+    isValid (int fildes);
 
     static PosixIo*
-    getPosixIo (int fildes);
+    getObject (int fildes);
 
     static int
-    allocFileDescriptor (PosixIo* io);
+    alloc (PosixIo* io);
 
     static int
-    freeFileDescriptor (fileDescriptor_t fildes);
+    free (fileDescriptor_t fildes);
 
     // ------------------------------------------------------------------------
   private:
@@ -72,7 +72,7 @@ namespace os
   }
 
   inline PosixIo*
-  FileDescriptorsManager::getPosixIo (int fildes)
+  FileDescriptorsManager::getObject (int fildes)
   {
     assert((fildes >= 0) && (((std::size_t ) fildes) < sfSize));
 

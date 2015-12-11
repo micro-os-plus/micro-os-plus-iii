@@ -32,7 +32,7 @@ namespace os
   {
   public:
 
-    PosixDevicesRegistry (size_t size);
+    PosixDevicesRegistry (std::size_t size);
 
     ~PosixDevicesRegistry ();
 
@@ -57,7 +57,7 @@ namespace os
 
   private:
 
-    static size_t sfSize;
+    static std::size_t sfSize;
 
     static PosixDevice** sfRegistryArray;
   };

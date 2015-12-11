@@ -72,54 +72,54 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
   for (std::size_t i = 0; i < sz; ++i)
     {
-      assert(os::FileDescriptorsManager::getPosixIo (i) == nullptr);
+      assert(os::FileDescriptorsManager::getObject (i) == nullptr);
     }
 
   // Check limits
-  assert(os::FileDescriptorsManager::checkFileDescriptor (-1) == false);
-  assert(os::FileDescriptorsManager::checkFileDescriptor (sz) == false);
+  assert(os::FileDescriptorsManager::isValid (-1) == false);
+  assert(os::FileDescriptorsManager::isValid (sz) == false);
 
   // Allocation should start with 3 (stdin, stdout, stderr preserved)
   int fd1;
-  fd1 = os::FileDescriptorsManager::allocFileDescriptor (&test1);
+  fd1 = os::FileDescriptorsManager::alloc (&test1);
   assert(fd1 == 3);
 
   // Get it back; is it the same?
-  assert(os::FileDescriptorsManager::getPosixIo (fd1) == &test1);
+  assert(os::FileDescriptorsManager::getObject (fd1) == &test1);
   assert(test1.getFileDescriptor () == fd1);
 
   // Reallocate opened file, must be busy
   int fd2;
-  fd2 = os::FileDescriptorsManager::allocFileDescriptor (&test1);
+  fd2 = os::FileDescriptorsManager::alloc (&test1);
   assert((fd2 == -1) && (errno == EBUSY));
 
   // Free descriptor
-  assert(os::FileDescriptorsManager::freeFileDescriptor (fd1) == 0);
-  assert(os::FileDescriptorsManager::getPosixIo (fd1) == nullptr);
+  assert(os::FileDescriptorsManager::free (fd1) == 0);
+  assert(os::FileDescriptorsManager::getObject (fd1) == nullptr);
   assert(test1.getFileDescriptor () == os::noFileDescriptor);
 
   // With clean table, alloc to fill the table (size is 5)
-  fd1 = os::FileDescriptorsManager::allocFileDescriptor (&test1);
+  fd1 = os::FileDescriptorsManager::alloc (&test1);
   assert(fd1 == 3);
-  fd2 = os::FileDescriptorsManager::allocFileDescriptor (&test2);
+  fd2 = os::FileDescriptorsManager::alloc (&test2);
   assert(fd2 == 4);
 
   // Table full
   int fd3;
-  fd3 = os::FileDescriptorsManager::allocFileDescriptor (&test3);
+  fd3 = os::FileDescriptorsManager::alloc (&test3);
   assert((fd3 == -1) && (errno == ENFILE));
 
   // Free outside range
   assert(
-      (os::FileDescriptorsManager::freeFileDescriptor(-1) == -1) && (errno == EBADF));
+      (os::FileDescriptorsManager::free(-1) == -1) && (errno == EBADF));
   assert(
-      (os::FileDescriptorsManager::freeFileDescriptor(sz) == -1) && (errno == EBADF));
+      (os::FileDescriptorsManager::free(sz) == -1) && (errno == EBADF));
 
   // Free last
-  assert(os::FileDescriptorsManager::freeFileDescriptor (sz - 1) == 0);
+  assert(os::FileDescriptorsManager::free (sz - 1) == 0);
 
   // Reallocate last
-  fd3 = os::FileDescriptorsManager::allocFileDescriptor (&test3);
+  fd3 = os::FileDescriptorsManager::alloc (&test3);
   assert(fd3 == ((os::fileDescriptor_t )(sz - 1)));
 
   std::printf ("'test-descriptors-manager-debug' done.\n");

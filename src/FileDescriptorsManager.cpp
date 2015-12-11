@@ -51,7 +51,7 @@ namespace os
   }
 
   bool
-  FileDescriptorsManager::checkFileDescriptor (int fildes)
+  FileDescriptorsManager::isValid (int fildes)
   {
     if ((fildes < 0) || (((std::size_t) fildes) >= sfSize))
       {
@@ -61,7 +61,7 @@ namespace os
   }
 
   int
-  FileDescriptorsManager::allocFileDescriptor (PosixIo* io)
+  FileDescriptorsManager::alloc (PosixIo* io)
   {
     if (io->getFileDescriptor () >= 0)
       {
@@ -87,7 +87,7 @@ namespace os
   }
 
   int
-  FileDescriptorsManager::freeFileDescriptor (int fildes)
+  FileDescriptorsManager::free (int fildes)
   {
     if ((fildes < 0) || (((std::size_t) fildes) >= sfSize))
       {

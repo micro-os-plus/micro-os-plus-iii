@@ -38,10 +38,10 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    int
+    static PosixIo*
     open (const char *path, int oflag, ...);
 
-    int
+    static PosixIo*
     vopen (const char *path, int oflag, va_list args);
 
     int
@@ -74,6 +74,9 @@ namespace os
 
     // Implementations
 
+    /**
+     * return file descriptor or -1 & errno
+     */
     virtual int
     doOpen (const char *path, int oflag, va_list args) = 0;
 

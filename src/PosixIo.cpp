@@ -18,6 +18,8 @@
 
 #include "posix-io/FileDescriptorsManager.h"
 #include "posix-io/PosixIo.h"
+#include "posix-io/PosixDevice.h"
+#include "posix-io/PosixDevicesRegistry.h"
 #include <cassert>
 #include <cerrno>
 #include <cstdarg>
@@ -43,37 +45,68 @@ namespace os
 
   // --------------------------------------------------------------------------
 
-  int
+  PosixIo*
   PosixIo::open (const char *path, int oflag, ...)
   {
     // Forward to the variadic version of the function.
     va_list args;
     va_start(args, oflag);
-    int ret = vopen (path, oflag, args);
+    PosixIo* ret = vopen (path, oflag, args);
     va_end(args);
 
     return ret;
   }
 
-  int
+  /**
+   * The actual open workhorse. Using the 'path', try to identify the
+   * IO object, then call the implementation. If successful, allocate a
+   * new POSIX file descriptor, to be used by C functions.
+   */
+  PosixIo*
   PosixIo::vopen (const char *path, int oflag, va_list args)
   {
     errno = 0;
 
-    int ret = doOpen (path, oflag, args);
-    if (ret == 0)
+    if (path == nullptr)
       {
-        // If successful, allocate a file descriptor
-        ret = FileDescriptorsManager::allocFileDescriptor (this);
-        if (ret == -1)
-          {
-            // If allocation failed, close this object.
-            doClose ();
-            fFileDescriptor = noFileDescriptor;
-          }
+        errno = EBADF;
+        return nullptr;
       }
 
-    return ret;
+    int oret;
+
+    os::PosixIo* io = os::PosixDevicesRegistry::identifyDevice (path);
+    if (io != nullptr)
+      {
+        oret = io->doOpen (path, oflag, args);
+      }
+    else
+      {
+        // TODO: process files from file systems.
+        errno = EBADF;
+        oret = -1;
+      }
+
+    if (oret < 0)
+      {
+        // Open failed.
+        return nullptr;
+      }
+
+    // If successful, allocate a file descriptor
+    int fd = FileDescriptorsManager::alloc (io);
+    if (fd < 0)
+      {
+        // If allocation failed, close this object.
+        if (io != nullptr)
+          {
+            io->doClose ();
+            io->clearFileDescriptor ();
+          }
+        return nullptr;
+      }
+
+    return io;
   }
 
   int
@@ -85,7 +118,7 @@ namespace os
     int ret = doClose ();
 
     // Remove this IO from the file descriptors registry.
-    FileDescriptorsManager::freeFileDescriptor (fFileDescriptor);
+    FileDescriptorsManager::free (fFileDescriptor);
     fFileDescriptor = noFileDescriptor;
 
     return ret;
@@ -93,7 +126,7 @@ namespace os
 
   // --------------------------------------------------------------------------
 
-  // All these wrappers are required to clear 'errno'.
+// All these wrappers are required to clear 'errno'.
 
   ssize_t
   PosixIo::read (void *buf, size_t nbyte)
@@ -136,8 +169,8 @@ namespace os
 
   // --------------------------------------------------------------------------
 
-  // doOpen() is not here because it is virtual,
-  // it must be implemented by derived classes.
+// doOpen() is not here because it is virtual,
+// it must be implemented by derived classes.
 
   int
   PosixIo::doClose (void)
