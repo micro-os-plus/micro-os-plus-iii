@@ -20,6 +20,10 @@
 #include "posix-io/PosixDevice.h"
 #include <cassert>
 #include <cstring>
+#include <cstdlib>
+#if defined(OS_INCLUDE_TRACE_PRINTF)
+#include "diag/Trace.h"
+#endif
 
 namespace os
 {
@@ -78,7 +82,7 @@ namespace os
 #else
             ::write (2, msg, strlen (msg));
 #endif
-            abort ();
+            std::abort ();
           }
 #endif
       }
@@ -95,7 +99,7 @@ namespace os
 #else
     ::write (2, msg, strlen (msg));
 #endif
-    abort ();
+    std::abort ();
   }
 
   void

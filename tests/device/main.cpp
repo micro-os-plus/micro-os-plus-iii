@@ -166,7 +166,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   assert(os::FileDescriptorsManager::getObject (fd) == nullptr);
   assert(test.getFileDescriptor () == os::noFileDescriptor);
 
-  std::printf ("'test-device-debug' done.\n");
+  std::printf ("'test-device-debug' succeeded.\n");
 
   // Success!
   return 0;

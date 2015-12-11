@@ -22,6 +22,7 @@
 #include "posix-io/Types.h"
 #include <cstddef>
 #include <cstdarg>
+#include <sys/types.h>
 
 // ----------------------------------------------------------------------------
 
