@@ -56,8 +56,10 @@
 extern "C"
 {
 
-  // Redefine the standard POSIX functions.
-  // Original names are prefixed to avoid clashes during tests.
+  // The standard POSIX IO functions.
+  //
+  // Original names are prefixed to avoid clashes during tests,
+  // but can be redefined to standard names using the above macro.
 
   int __attribute__((weak))
   __posix_chown (const char* path, uid_t owner, gid_t group);
@@ -98,6 +100,21 @@ extern "C"
   off_t __attribute__((weak))
   __posix_lseek (int fildes, off_t offset, int whence);
 
+  /**
+   * @brief Open file relative to directory file descriptor.
+   *
+   * @headerfile <fcntl.h>
+   *
+   * @param [in] path The _path_ argument points to a pathname naming the file.
+   * @param [in] oflag Values for _oflag_ are constructed by a bitwise-inclusive
+   * OR of flags from the following list, defined in `<fcntl.h>`.
+   *
+   * @return Upon successful completion, this function shall open the file and
+   * return a non-negative integer representing the lowest numbered unused file
+   * descriptor. Otherwise, this function shall return -1 and set _errno_
+   * to indicate the error. If -1 is returned, no files shall be created
+   * or modified.
+   */
   int __attribute__((weak))
   __posix_open (const char* path, int oflag, ...);
 
@@ -139,12 +156,22 @@ extern "C"
 // with their new versions like strtok_r().
 //
 // 'errno' is not a problem, since the standard headers
-// defines it as '*(__errno())'; if you use a multi-threaded
+// define it as '*(__errno())'; if you use a multi-threaded
 // environment, be sure you redefine __errno() to return a
 // thread specific pointer.
 
 // ----------------------------------------------------------------------------
 
+/**
+ * @details
+ *
+ * The `open()` function shall establish the connection between a file and a
+ * file descriptor. It shall create an open file description that refers
+ * to a file and a file descriptor that refers to that open file
+ * description. The file descriptor is used by other I/O functions to
+ * refer to that file. The _path_ argument points to a pathname naming
+ * the file.
+ */
 int __attribute__((weak))
 __posix_open (const char *path, int oflag, ...)
 {
@@ -219,6 +246,18 @@ __posix_ioctl (int fildes, unsigned long request, ...)
   va_end(args);
 
   return ret;
+}
+
+off_t __attribute__((weak))
+__posix_lseek (int fildes, off_t offset, int whence)
+{
+  os::PosixIo* io = os::FileDescriptorsManager::getObject (fildes);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->lseek (offset, whence);
 }
 
 // ----------------------------------------------------------------------------
@@ -303,13 +342,6 @@ __posix_link (const char* existing, const char* _new)
 {
   errno = ENOSYS; // Not implemented
   return -1;
-}
-
-off_t __attribute__((weak))
-__posix_lseek (int fildes, off_t offset, int whence)
-{
-  errno = ENOSYS; // Not implemented
-  return ((off_t) -1);
 }
 
 int __attribute__((weak))

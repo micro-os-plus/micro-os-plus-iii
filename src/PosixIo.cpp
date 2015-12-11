@@ -167,6 +167,15 @@ namespace os
     return doIoctl (request, args);
   }
 
+  off_t
+  PosixIo::lseek (off_t offset, int whence)
+  {
+    errno = 0;
+
+    // Execute the implementation specific code.
+    return doLseek (offset, whence);
+  }
+
   // --------------------------------------------------------------------------
 
 // doOpen() is not here because it is virtual,
@@ -197,6 +206,13 @@ namespace os
 
   int
   PosixIo::doIoctl (int request, va_list args)
+  {
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  off_t
+  PosixIo::doLseek (off_t offset, int whence)
   {
     errno = ENOSYS; // Not implemented
     return -1;

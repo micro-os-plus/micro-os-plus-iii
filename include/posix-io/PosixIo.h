@@ -22,6 +22,7 @@
 #include "posix-io/Types.h"
 #include <cstddef>
 #include <cstdarg>
+// Needed for ssize_t
 #include <sys/types.h>
 
 // ----------------------------------------------------------------------------
@@ -38,6 +39,9 @@ namespace os
     ~PosixIo ();
 
     // ------------------------------------------------------------------------
+
+    // TODO: check if non-static open() is needed,
+    // for use in C++ only apps.
 
     static PosixIo*
     open (const char *path, int oflag, ...);
@@ -59,6 +63,9 @@ namespace os
 
     int
     vioctl (int request, va_list args);
+
+    off_t
+    lseek (off_t offset, int whence);
 
     // ------------------------------------------------------------------------
 
@@ -92,6 +99,9 @@ namespace os
 
     virtual int
     doIoctl (int request, va_list args);
+
+    virtual off_t
+    doLseek (off_t offset, int whence);
 
     // ------------------------------------------------------------------------
 
