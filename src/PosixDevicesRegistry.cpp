@@ -36,7 +36,7 @@ namespace os
 
   // --------------------------------------------------------------------------
 
-  PosixDevicesRegistry::PosixDevicesRegistry (size_t size)
+  PosixDevicesRegistry::PosixDevicesRegistry (std::size_t size)
   {
     assert(size > 0);
 
@@ -59,21 +59,21 @@ namespace os
   // --------------------------------------------------------------------------
 
   void
-  PosixDevicesRegistry::add (PosixDevice* driver)
+  PosixDevicesRegistry::add (PosixDevice* device)
   {
     bool found = false;
     for (std::size_t i = 0; i < sfSize; ++i)
       {
         if (sfRegistryArray[i] == nullptr)
           {
-            sfRegistryArray[i] = driver;
+            sfRegistryArray[i] = device;
             found = true;
             continue;
           }
 
 #if defined(DEBUG)
         // Validate the device name by checking duplicates.
-        if (std::strcmp (driver->getName (), sfRegistryArray[i]->getName ())
+        if (std::strcmp (device->getName (), sfRegistryArray[i]->getName ())
             == 0)
           {
             const char* msg = "Duplicate PosixDevice name. Abort.\n";
@@ -103,11 +103,11 @@ namespace os
   }
 
   void
-  PosixDevicesRegistry::remove (PosixDevice* driver)
+  PosixDevicesRegistry::remove (PosixDevice* device)
   {
     for (std::size_t i = 0; i < sfSize; ++i)
       {
-        if (sfRegistryArray[i] == driver)
+        if (sfRegistryArray[i] == device)
           {
             sfRegistryArray[i] = nullptr;
             return;
