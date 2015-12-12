@@ -96,6 +96,18 @@ extern "C"
   int __attribute__((weak))
   __posix_ioctl (int fildes, int request, ...);
 
+  /**
+   * @brief Test for a terminal device.
+   *
+   * @headerfile <unistd.h>
+   *
+   * @param [in] fildes Non-negative file descriptor.
+   *
+   * @return This function shall return 1 if _fildes_ is associated
+   * with a terminal; otherwise, it shall return 0 and may set _errno_
+   * to indicate the error.
+   *
+   */
   int __attribute__((weak))
   __posix_isatty (int fildes);
 
@@ -268,6 +280,12 @@ __posix_lseek (int fildes, off_t offset, int whence)
   return io->lseek (offset, whence);
 }
 
+/**
+ * @details
+ *
+ * This function shall test whether _fildes_, an open file descriptor,
+ * is associated with a terminal device.
+ */
 int __attribute__((weak))
 __posix_isatty (int fildes)
 {
