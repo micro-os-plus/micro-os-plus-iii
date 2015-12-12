@@ -278,7 +278,7 @@ namespace os
   int
   PosixIo::doIsatty (void)
   {
-    errno = ENOSYS; // Not implemented
+    errno = ENOTTY; // Not a TTY
     return 0;
   }
 
