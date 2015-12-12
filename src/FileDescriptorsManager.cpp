@@ -31,7 +31,7 @@ namespace os
 
   // --------------------------------------------------------------------------
 
-  FileDescriptorsManager::FileDescriptorsManager (size_t size)
+  FileDescriptorsManager::FileDescriptorsManager (std::size_t size)
   {
     assert(size > 3);
 

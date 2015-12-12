@@ -34,7 +34,7 @@ namespace os
   {
   public:
 
-    FileDescriptorsManager (size_t size);
+    FileDescriptorsManager (std::size_t size);
 
     ~FileDescriptorsManager ();
 

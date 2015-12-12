@@ -48,22 +48,22 @@ namespace os
     open (const char *path, int oflag, ...);
 
     static PosixIo*
-    vopen (const char *path, int oflag, va_list args);
+    vopen (const char *path, int oflag, std::va_list args);
 
     int
     close (void);
 
     ssize_t
-    read (void *buf, size_t nbyte);
+    read (void *buf, std::size_t nbyte);
 
     ssize_t
-    write (const void *buf, size_t nbyte);
+    write (const void *buf, std::size_t nbyte);
 
     int
     ioctl (int request, ...);
 
     int
-    vioctl (int request, va_list args);
+    vioctl (int request, std::va_list args);
 
     off_t
     lseek (off_t offset, int whence);
@@ -75,7 +75,7 @@ namespace os
     fcntl (int cmd, ...);
 
     int
-    vfcntl (int cmd, va_list args);
+    vfcntl (int cmd, std::va_list args);
 
     int
     fstat (struct stat* buf);
@@ -105,19 +105,19 @@ namespace os
      * return file descriptor or -1 & errno
      */
     virtual int
-    doOpen (const char *path, int oflag, va_list args) = 0;
+    doOpen (const char *path, int oflag, std::va_list args) = 0;
 
     virtual int
     doClose (void);
 
     virtual ssize_t
-    doRead (void *buf, size_t nbyte);
+    doRead (void *buf, std::size_t nbyte);
 
     virtual ssize_t
-    doWrite (const void *buf, size_t nbyte);
+    doWrite (const void *buf, std::size_t nbyte);
 
     virtual int
-    doIoctl (int request, va_list args);
+    doIoctl (int request, std::va_list args);
 
     virtual off_t
     doLseek (off_t offset, int whence);

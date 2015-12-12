@@ -49,7 +49,7 @@ namespace os
   PosixIo::open (const char *path, int oflag, ...)
   {
     // Forward to the variadic version of the function.
-    va_list args;
+    std::va_list args;
     va_start(args, oflag);
     PosixIo* ret = vopen (path, oflag, args);
     va_end(args);
@@ -63,7 +63,7 @@ namespace os
    * new POSIX file descriptor, to be used by C functions.
    */
   PosixIo*
-  PosixIo::vopen (const char *path, int oflag, va_list args)
+  PosixIo::vopen (const char *path, int oflag, std::va_list args)
   {
     errno = 0;
 
@@ -129,7 +129,7 @@ namespace os
 // All these wrappers are required to clear 'errno'.
 
   ssize_t
-  PosixIo::read (void *buf, size_t nbyte)
+  PosixIo::read (void *buf, std::size_t nbyte)
   {
     errno = 0;
 
@@ -138,7 +138,7 @@ namespace os
   }
 
   ssize_t
-  PosixIo::write (const void *buf, size_t nbyte)
+  PosixIo::write (const void *buf, std::size_t nbyte)
   {
     errno = 0;
 
@@ -150,7 +150,7 @@ namespace os
   PosixIo::ioctl (int request, ...)
   {
     // Forward to the variadic version of the function.
-    va_list args;
+    std::va_list args;
     va_start(args, request);
     int ret = vioctl (request, args);
     va_end(args);
@@ -159,7 +159,7 @@ namespace os
   }
 
   int
-  PosixIo::vioctl (int request, va_list args)
+  PosixIo::vioctl (int request, std::va_list args)
   {
     errno = 0;
 
@@ -189,7 +189,7 @@ namespace os
   PosixIo::fcntl (int cmd, ...)
   {
     // Forward to the variadic version of the function.
-    va_list args;
+    std::va_list args;
     va_start(args, cmd);
     int ret = vfcntl (cmd, args);
     va_end(args);
@@ -198,7 +198,7 @@ namespace os
   }
 
   int
-  PosixIo::vfcntl (int cmd, va_list args)
+  PosixIo::vfcntl (int cmd, std::va_list args)
   {
     errno = 0;
 
@@ -248,21 +248,21 @@ namespace os
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
   ssize_t
-  PosixIo::doRead (void *buf, size_t nbyte)
+  PosixIo::doRead (void *buf, std::size_t nbyte)
   {
     errno = ENOSYS; // Not implemented
     return -1;
   }
 
   ssize_t
-  PosixIo::doWrite (const void *buf, size_t nbyte)
+  PosixIo::doWrite (const void *buf, std::size_t nbyte)
   {
     errno = ENOSYS; // Not implemented
     return -1;
   }
 
   int
-  PosixIo::doIoctl (int request, va_list args)
+  PosixIo::doIoctl (int request, std::va_list args)
   {
     errno = ENOSYS; // Not implemented
     return -1;
@@ -283,7 +283,7 @@ namespace os
   }
 
   int
-  PosixIo::doFcntl (int cmd, va_list args)
+  PosixIo::doFcntl (int cmd, std::va_list args)
   {
     errno = ENOSYS; // Not implemented
     return -1;
