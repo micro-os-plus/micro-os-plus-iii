@@ -39,10 +39,10 @@ namespace os
     // ------------------------------------------------------------------------
 
     static void
-    add (PosixDevice* driver);
+    add (PosixDevice* device);
 
     static void
-    remove (PosixDevice* driver);
+    remove (PosixDevice* device);
 
     static PosixDevice*
     identifyDevice (const char* path);
