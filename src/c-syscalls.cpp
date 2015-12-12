@@ -24,7 +24,7 @@
 
 // ----------------------------------------------------------------------------
 
-#if defined(OS_REDEFINE_POSIX_SYSCALLS)
+#if !defined(OS_BOOL_PREFIX_POSIX_SYSCALLS)
 
 #define __posix_chown chown
 #define __posix_close close

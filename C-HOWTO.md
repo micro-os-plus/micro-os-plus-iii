@@ -14,17 +14,17 @@ extern "C" int __attribute__((weak))
 __posix_open (const char* path, int oflag, ...);
 ```
 
-## `OS_REDEFINE_POSIX_SYSCALLS`
-
-To help integration with embedded applications, it is possible to redefine
-all these funtions to standard posix names. For this, define the 
-`OS_REDEFINE_POSIX_SYSCALLS` preprocessor macro.
-
-The effect is adding macros to the file where the C API functions are implemented:
+By default this prefix is removed by a set of macros like:
 
 ```
 #define __posix_open open
 ```
+
+## `OS_BOOL_PREFIX_POSIX_SYSCALLS`
+
+For test purposes, these macros can be disabled, and the function names remain prefixed with `__posix_`.
+
+Do not define this macro in normal applications.
 
 ## Using drivers in C
 
@@ -65,6 +65,8 @@ For example, for an USART driver, define:
 
     int
     usart_ioctl (int request, va_list args);
+    
+    ...
 
 ```
 

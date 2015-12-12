@@ -23,6 +23,9 @@
 #include <cassert>
 #include <cstdio>
 #include <cstring>
+#if defined(OS_INCLUDE_TRACE_PRINTF)
+#include "diag/Trace.h"
+#endif
 
 // -----------------------------------------------------------------------------
 
@@ -110,10 +113,8 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   assert((fd3 == -1) && (errno == ENFILE));
 
   // Free outside range
-  assert(
-      (os::FileDescriptorsManager::free(-1) == -1) && (errno == EBADF));
-  assert(
-      (os::FileDescriptorsManager::free(sz) == -1) && (errno == EBADF));
+  assert((os::FileDescriptorsManager::free(-1) == -1) && (errno == EBADF));
+  assert((os::FileDescriptorsManager::free(sz) == -1) && (errno == EBADF));
 
   // Free last
   assert(os::FileDescriptorsManager::free (sz - 1) == 0);
@@ -122,7 +123,12 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   fd3 = os::FileDescriptorsManager::alloc (&test3);
   assert(fd3 == ((os::fileDescriptor_t )(sz - 1)));
 
-  std::printf ("'test-descriptors-manager-debug' done.\n");
+  const char* msg = "'test-descriptors-manager-debug' done.\n";
+#if defined(OS_INCLUDE_TRACE_PRINTF)
+  trace_puts(msg);
+#else
+  std::puts (msg);
+#endif
 
   // Success!
   return 0;

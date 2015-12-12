@@ -24,6 +24,9 @@
 #include <cassert>
 #include <cstdio>
 #include <cstdarg>
+#if defined(OS_INCLUDE_TRACE_PRINTF)
+#include "diag/Trace.h"
+#endif
 
 // -----------------------------------------------------------------------------
 
@@ -76,6 +79,11 @@ TestPosixDevice::doOpen (const char *path, int oflag, va_list args)
 
 #if defined ( __GNUC__ )
 #pragma GCC diagnostic pop
+#endif
+
+#if !defined(OS_BOOL_PREFIX_POSIX_SYSCALLS)
+#define __posix_close close
+#define __posix_open open
 #endif
 
 // -----------------------------------------------------------------------------
@@ -166,7 +174,12 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   assert(os::FileDescriptorsManager::getObject (fd) == nullptr);
   assert(test.getFileDescriptor () == os::noFileDescriptor);
 
-  std::printf ("'test-device-debug' succeeded.\n");
+  const char* msg = "'test-device-debug' succeeded.\n";
+#if defined(OS_INCLUDE_TRACE_PRINTF)
+  trace_puts (msg);
+#else
+  std::puts (msg);
+#endif
 
   // Success!
   return 0;
