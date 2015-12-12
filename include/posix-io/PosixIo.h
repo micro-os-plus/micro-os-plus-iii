@@ -24,6 +24,7 @@
 #include <cstdarg>
 // Needed for ssize_t
 #include <sys/types.h>
+#include <sys/stat.h>
 
 // ----------------------------------------------------------------------------
 
@@ -67,6 +68,24 @@ namespace os
     off_t
     lseek (off_t offset, int whence);
 
+    int
+    isatty (void);
+
+    int
+    fcntl (int cmd, ...);
+
+    int
+    vfcntl (int cmd, va_list args);
+
+    int
+    fstat (struct stat* buf);
+
+    int
+    ftruncate (off_t length);
+
+    int
+    fsync (void);
+
     // ------------------------------------------------------------------------
 
     void
@@ -102,6 +121,21 @@ namespace os
 
     virtual off_t
     doLseek (off_t offset, int whence);
+
+    virtual int
+    doIsatty (void);
+
+    virtual int
+    doFcntl (int cmd, va_list args);
+
+    virtual int
+    doFstat (struct stat* buf);
+
+    virtual int
+    doFtruncate (off_t length);
+
+    virtual int
+    doFsync (void);
 
     // ------------------------------------------------------------------------
 

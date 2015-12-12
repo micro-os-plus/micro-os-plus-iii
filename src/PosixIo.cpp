@@ -176,6 +176,63 @@ namespace os
     return doLseek (offset, whence);
   }
 
+  int
+  PosixIo::isatty (void)
+  {
+    errno = 0;
+
+    // Execute the implementation specific code.
+    return doIsatty ();
+  }
+
+  int
+  PosixIo::fcntl (int cmd, ...)
+  {
+    // Forward to the variadic version of the function.
+    va_list args;
+    va_start(args, cmd);
+    int ret = vfcntl (cmd, args);
+    va_end(args);
+
+    return ret;
+  }
+
+  int
+  PosixIo::vfcntl (int cmd, va_list args)
+  {
+    errno = 0;
+
+    // Execute the implementation specific code.
+    return doFcntl (cmd, args);
+  }
+
+  int
+  PosixIo::fstat (struct stat* buf)
+  {
+    errno = 0;
+
+    // Execute the implementation specific code.
+    return doFstat (buf);
+  }
+
+  int
+  PosixIo::ftruncate (off_t length)
+  {
+    errno = 0;
+
+    // Execute the implementation specific code.
+    return doFtruncate (length);
+  }
+
+  int
+  PosixIo::fsync (void)
+  {
+    errno = 0;
+
+    // Execute the implementation specific code.
+    return doFsync ();
+  }
+
   // --------------------------------------------------------------------------
 
 // doOpen() is not here because it is virtual,
@@ -213,6 +270,41 @@ namespace os
 
   off_t
   PosixIo::doLseek (off_t offset, int whence)
+  {
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  PosixIo::doIsatty (void)
+  {
+    errno = ENOSYS; // Not implemented
+    return 0;
+  }
+
+  int
+  PosixIo::doFcntl (int cmd, va_list args)
+  {
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  PosixIo::doFstat (struct stat* buf)
+  {
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  PosixIo::doFtruncate (off_t length)
+  {
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  PosixIo::doFsync (void)
   {
     errno = ENOSYS; // Not implemented
     return -1;

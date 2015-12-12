@@ -32,6 +32,8 @@
 #define __posix_fork fcntl
 #define __posix_fork fork
 #define __posix_fstat fstat
+#define __posix_ftruncate ftruncate
+#define __posix_fsync fsync
 #define __posix_getpid getpid
 #define __posix_gettimeofday gettimeofday
 #define __posix_ioctl ioctl
@@ -78,6 +80,12 @@ extern "C"
 
   int __attribute__((weak))
   __posix_fstat (int fildes, struct stat* buf);
+
+  int __attribute__((weak))
+  __posix_ftruncate (int fildes, off_t length);
+
+  pid_t __attribute__((weak))
+  __posix_fsync (void);
 
   pid_t __attribute__((weak))
   __posix_getpid (void);
@@ -260,6 +268,72 @@ __posix_lseek (int fildes, off_t offset, int whence)
   return io->lseek (offset, whence);
 }
 
+int __attribute__((weak))
+__posix_isatty (int fildes)
+{
+  os::PosixIo* io = os::FileDescriptorsManager::getObject (fildes);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->isatty ();
+}
+
+int __attribute__((weak))
+__posix_fcntl (int fildes, int cmd, ...)
+{
+  os::PosixIo* io = os::FileDescriptorsManager::getObject (fildes);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+
+  va_list args;
+  va_start(args, cmd);
+  int ret = io->vfcntl (cmd, args);
+  va_end(args);
+
+  return ret;
+}
+
+int __attribute__((weak))
+__posix_fstat (int fildes, struct stat* buf)
+{
+  os::PosixIo* io = os::FileDescriptorsManager::getObject (fildes);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->fstat (buf);
+}
+
+int __attribute__((weak))
+__posix_ftruncate (int fildes, off_t length)
+{
+  os::PosixIo* io = os::FileDescriptorsManager::getObject (fildes);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->ftruncate (length);
+}
+
+int __attribute__((weak))
+__posix_fsync (int fildes)
+{
+  os::PosixIo* io = os::FileDescriptorsManager::getObject (fildes);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->fsync ();
+}
+
 // ----------------------------------------------------------------------------
 
 // These functions are defined here to avoid linker errors in freestanding
@@ -288,25 +362,11 @@ __posix_execve (const char *path, char * const argv[], char * const envp[])
   return -1;
 }
 
-int __attribute__((weak))
-__posix_fcntl (int fildes, int cmd, ...)
-{
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
 pid_t __attribute__((weak))
 __posix_fork (void)
 {
   errno = ENOSYS; // Not implemented
   return ((pid_t) -1);
-}
-
-int __attribute__((weak))
-__posix_fstat (int fildes, struct stat* buf)
-{
-  errno = ENOSYS; // Not implemented
-  return -1;
 }
 
 pid_t __attribute__((weak))
@@ -321,13 +381,6 @@ __posix_gettimeofday (struct timeval* ptimeval, void* ptimezone)
 {
   errno = ENOSYS; // Not implemented
   return -1;
-}
-
-int __attribute__((weak))
-__posix_isatty (int fildes)
-{
-  errno = ENOSYS; // Not implemented
-  return 0; // Not a TTY
 }
 
 int __attribute__((weak))
