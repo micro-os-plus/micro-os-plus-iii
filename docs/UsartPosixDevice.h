@@ -5,6 +5,7 @@ class UsartPosixDevice : public os::PosixDevice
 public:
   UsartPosixDevice (const char* name);
 
+  virtual
   ~UsartPosixDevice ();
 
   virtual int
@@ -21,6 +22,9 @@ public:
 
   virtual int
   doIoctl (int request, va_list args);
+
+  virtual int
+  doIsatty ();
 
 private:
 

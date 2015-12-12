@@ -58,3 +58,9 @@ UsartPosixDevice::doIoctl (int request, va_list args)
 {
   return usart_ioctl (request, args);
 }
+
+int
+UsartPosixDevice::doIsatty (void)
+{
+  return 1; // Yes, this is a TTY.
+}
