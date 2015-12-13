@@ -47,7 +47,7 @@ namespace os
     isValid (int fildes);
 
     static PosixIo*
-    getObject (int fildes);
+    getIo (int fildes);
 
     static int
     alloc (PosixIo* io);
@@ -72,7 +72,7 @@ namespace os
   }
 
   inline PosixIo*
-  FileDescriptorsManager::getObject (int fildes)
+  FileDescriptorsManager::getIo (int fildes)
   {
     assert((fildes >= 0) && (((std::size_t ) fildes) < sfSize));
 

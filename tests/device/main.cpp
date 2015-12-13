@@ -141,7 +141,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   fd = io->getFileDescriptor ();
 
   // Get it back; is it the same?
-  assert(os::FileDescriptorsManager::getObject (fd) == &test);
+  assert(os::FileDescriptorsManager::getIo (fd) == &test);
 
   // Check passing variadic mode.
   assert(test.getMode () == 123);
@@ -151,7 +151,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   assert((ret == 0) && (errno == 0));
 
   // Check if descriptor freed.
-  assert(os::FileDescriptorsManager::getObject (fd) == nullptr);
+  assert(os::FileDescriptorsManager::getIo (fd) == nullptr);
   assert(test.getFileDescriptor () == os::noFileDescriptor);
 
   // Test C API
@@ -160,7 +160,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   assert((fd >= 3) && (errno == 0));
 
   // Get it back; is it the same?
-  assert(os::FileDescriptorsManager::getObject (fd) == &test);
+  assert(os::FileDescriptorsManager::getIo (fd) == &test);
   assert(test.getFileDescriptor () == fd);
 
   // Check passing variadic mode.
@@ -171,7 +171,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   assert((ret == 0) && (errno == 0));
 
   // Check if descriptor freed.
-  assert(os::FileDescriptorsManager::getObject (fd) == nullptr);
+  assert(os::FileDescriptorsManager::getIo (fd) == nullptr);
   assert(test.getFileDescriptor () == os::noFileDescriptor);
 
   const char* msg = "'test-device-debug' succeeded.\n";
