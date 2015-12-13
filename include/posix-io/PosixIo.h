@@ -102,7 +102,7 @@ namespace os
     // Implementations
 
     /**
-     * return file descriptor or -1 & errno
+     * return 0 if success or -1 & errno
      */
     virtual int
     doOpen (const char *path, int oflag, std::va_list args) = 0;
