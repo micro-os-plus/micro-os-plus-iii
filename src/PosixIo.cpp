@@ -20,6 +20,8 @@
 #include "posix-io/PosixIo.h"
 #include "posix-io/PosixDevice.h"
 #include "posix-io/PosixDevicesRegistry.h"
+#include "posix-io/PosixFileSystem.h"
+#include "posix-io/PosixFileSystemsManager.h"
 #include <cassert>
 #include <cerrno>
 #include <cstdarg>
@@ -73,27 +75,43 @@ namespace os
         return nullptr;
       }
 
-    int oret;
-
+    // First check if path is a device.
     os::PosixIo* io = os::PosixDevicesRegistry::identifyDevice (path);
     if (io != nullptr)
       {
-        oret = io->doOpen (path, oflag, args);
+        // If so, use the implementation to open the device.
+        int oret = io->doOpen (path, oflag, args);
+        if (oret < 0)
+          {
+            // Open failed.
+            return nullptr;
+          }
       }
     else
       {
-        // TODO: process files from file systems.
-        errno = EBADF;
-        oret = -1;
+        const char* adjusted_path = path;
+        os::PosixFileSystem* fs = os::PosixFileSystemsManager::getFileSystem (
+            &adjusted_path);
+
+        // The manager will return null if there are no file systems
+        // registered, no need to check this condition separately.
+        if (fs == nullptr)
+          {
+            errno = EBADF;
+            return nullptr;
+          }
+
+        // Use the file system implementation to open the file, using
+        // the adjusted path (mount point prefix removed).
+        io = fs->open (adjusted_path, oflag, args);
+        if (io == nullptr)
+          {
+            // Open failed.
+            return nullptr;
+          }
       }
 
-    if (oret < 0)
-      {
-        // Open failed.
-        return nullptr;
-      }
-
-    // If successful, allocate a file descriptor
+    // If successful, allocate a file descriptor.
     int fd = FileDescriptorsManager::alloc (io);
     if (fd < 0)
       {
@@ -106,6 +124,7 @@ namespace os
         return nullptr;
       }
 
+    // Return a valid pointer to an object derived from PosixIo.
     return io;
   }
 
