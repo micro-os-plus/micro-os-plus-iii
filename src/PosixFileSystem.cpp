@@ -18,7 +18,7 @@
 
 #include "posix-io/PosixIo.h"
 #include "posix-io/PosixFileSystem.h"
-#include "posix-io/PosixDirectory.h"
+#include "posix-io/PosixDir.h"
 #include <cerrno>
 #include <cassert>
 
@@ -53,7 +53,7 @@ namespace os
     return do_open (path, oflag, args);
   }
 
-  PosixDirectory*
+  PosixDir*
   PosixFileSystem::opendir (const char *dirpath)
   {
     if (fBlockDevice == nullptr)
@@ -76,7 +76,7 @@ namespace os
     return nullptr;
   }
 
-  PosixDirectory*
+  PosixDir*
   PosixFileSystem::do_opendir (const char *dirpath)
   {
     // TODO: implement and return the object.

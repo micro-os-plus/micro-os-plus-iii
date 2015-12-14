@@ -34,7 +34,7 @@ struct dirent
 };
 
 // The content of this structure is not relevant, it is here just to keep
-// POSIX compatibility, in real life the PosixDirectory class is used
+// POSIX compatibility, in real life the PosixDir class is used
 // and casted to DIR.
 typedef struct
 {

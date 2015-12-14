@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "posix-io/PosixDirectory.h"
+#include "posix-io/PosixDir.h"
 #include "posix-io/PosixFileSystem.h"
 #include "posix-io/PosixFileSystemsManager.h"
 #include <cerrno>
@@ -27,21 +27,21 @@
 namespace os
 {
 
-  PosixDirectory::PosixDirectory (PosixFileSystem* fileSystem) :
+  PosixDir::PosixDir (PosixFileSystem* fileSystem) :
       fFileSystem (fileSystem)
   {
     ;
   }
 
-  PosixDirectory::~PosixDirectory ()
+  PosixDir::~PosixDir ()
   {
     fFileSystem = nullptr;
   }
 
   // --------------------------------------------------------------------------
 
-  PosixDirectory*
-  PosixDirectory::open (const char* dirname)
+  PosixDir*
+  PosixDir::open (const char* dirname)
   {
     errno = 0;
 
@@ -63,7 +63,7 @@ namespace os
   }
 
   struct dirent*
-  PosixDirectory::read (void)
+  PosixDir::read (void)
   {
     assert(fFileSystem != nullptr);
     errno = 0;
@@ -73,7 +73,7 @@ namespace os
   }
 
   void
-  PosixDirectory::rewind (void)
+  PosixDir::rewind (void)
   {
     assert(fFileSystem != nullptr);
     errno = 0;
@@ -83,7 +83,7 @@ namespace os
   }
 
   int
-  PosixDirectory::close (void)
+  PosixDir::close (void)
   {
     assert(fFileSystem != nullptr);
     errno = 0;
@@ -99,21 +99,21 @@ namespace os
   // implemented by derived classes.
 
   struct dirent*
-  PosixDirectory::do_read (void)
+  PosixDir::do_read (void)
   {
     // Return end of directory.
     return nullptr;
   }
 
   void
-  PosixDirectory::do_rewind (void)
+  PosixDir::do_rewind (void)
   {
     // Ignore rewind.
     return;
   }
 
   int
-  PosixDirectory::do_close (void)
+  PosixDir::do_close (void)
   {
     // Ignore close, return ok.
     return 0;

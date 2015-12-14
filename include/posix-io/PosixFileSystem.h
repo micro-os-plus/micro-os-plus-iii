@@ -30,7 +30,7 @@
 namespace os
 {
   class PosixIo;
-  class PosixDirectory;
+  class PosixDir;
   class BlockDevice;
 
   class PosixFileSystem
@@ -47,7 +47,7 @@ namespace os
     PosixIo*
     open (const char *path, int oflag, std::va_list args);
 
-    PosixDirectory*
+    PosixDir*
     opendir (const char *dirpath);
 
     // ------------------------------------------------------------------------
@@ -83,7 +83,7 @@ namespace os
     virtual PosixIo*
     do_open (const char *path, int oflag, std::va_list args);
 
-    virtual PosixDirectory*
+    virtual PosixDir*
     do_opendir (const char *dirpath);
 
     // ------------------------------------------------------------------------

@@ -21,7 +21,7 @@
 #include "posix-io/PosixDevice.h"
 #include "posix-io/PosixFileSystem.h"
 #include "posix-io/PosixFileSystemsManager.h"
-#include "posix-io/PosixDirectory.h"
+#include "posix-io/PosixDir.h"
 #include <cstdarg>
 #include <cerrno>
 
@@ -602,7 +602,7 @@ struct dirent*
 __attribute__((weak))
 __posix_readdir (DIR* dirp)
 {
-  os::PosixDirectory* dir = (os::PosixDirectory*) (dirp);
+  os::PosixDir* dir = (os::PosixDir*) (dirp);
   if (dir == nullptr)
     {
       errno = ENOENT;
@@ -623,7 +623,7 @@ __posix_readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result)
 void __attribute__((weak))
 __posix_rewinddir (DIR* dirp)
 {
-  os::PosixDirectory* dir = (os::PosixDirectory*) (dirp);
+  os::PosixDir* dir = (os::PosixDir*) (dirp);
   if (dir == nullptr)
     {
       errno = ENOENT;
@@ -635,7 +635,7 @@ __posix_rewinddir (DIR* dirp)
 int __attribute__((weak))
 __posix_closedir (DIR* dirp)
 {
-  os::PosixDirectory* dir = (os::PosixDirectory*) (dirp);
+  os::PosixDir* dir = (os::PosixDir*) (dirp);
   if (dir == nullptr)
     {
       errno = ENOENT;

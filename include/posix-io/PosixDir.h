@@ -36,18 +36,18 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
-  class PosixDirectory
+  class PosixDir
   {
   public:
 
-    PosixDirectory (PosixFileSystem* fileSystem);
+    PosixDir (PosixFileSystem* fileSystem);
 
     virtual
-    ~PosixDirectory ();
+    ~PosixDir ();
 
     // ------------------------------------------------------------------------
 
-    static PosixDirectory*
+    static PosixDir*
     open (const char* dirname);
 
     struct dirent *
@@ -64,7 +64,7 @@ namespace os
     /**
      * @return 0 if successful, otherwise -1 and errno.
      */
-    virtual PosixDirectory*
+    virtual PosixDir*
     do_open (const char* dirname) = 0;
 
     virtual struct dirent*
@@ -95,13 +95,13 @@ namespace os
   // --------------------------------------------------------------------------
 
   inline void
-  PosixDirectory::setFileSystem (PosixFileSystem* fileSystem)
+  PosixDir::setFileSystem (PosixFileSystem* fileSystem)
   {
     fFileSystem = fileSystem;
   }
 
   inline PosixFileSystem*
-  PosixDirectory::getFileSystem (void)
+  PosixDir::getFileSystem (void)
   {
     return fFileSystem;
   }
