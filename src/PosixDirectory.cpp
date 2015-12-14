@@ -19,11 +19,14 @@
 #include "posix-io/PosixDirectory.h"
 #include "posix-io/PosixFileSystem.h"
 #include <cerrno>
+#include <cassert>
+
+// ----------------------------------------------------------------------------
 
 namespace os
 {
 
-  PosixDirectory::PosixDirectory (PosixFileSystem& fileSystem) :
+  PosixDirectory::PosixDirectory (PosixFileSystem* fileSystem) :
       fFileSystem (fileSystem)
   {
     ;
@@ -31,54 +34,78 @@ namespace os
 
   PosixDirectory::~PosixDirectory ()
   {
-    ;
+    fFileSystem = nullptr;
   }
 
-  struct dirent *
-  PosixDirectory::read (void)
+  // --------------------------------------------------------------------------
+
+  int
+  PosixDirectory::open (const char* dirname)
   {
+    assert(fFileSystem != nullptr);
     errno = 0;
 
-    return doRead ();
+    // Execute the implementation specific code.
+    return do_open (dirname);
+  }
+
+  struct dirent*
+  PosixDirectory::read (void)
+  {
+    assert(fFileSystem != nullptr);
+    errno = 0;
+
+    // Execute the implementation specific code.
+    return do_read ();
   }
 
   void
   PosixDirectory::rewind (void)
   {
+    assert(fFileSystem != nullptr);
     errno = 0;
 
-    doRewind ();
+    // Execute the implementation specific code.
+    do_rewind ();
   }
 
   int
   PosixDirectory::close (void)
   {
+    assert(fFileSystem != nullptr);
     errno = 0;
 
-    return doClose ();
+    // Execute the implementation specific code.
+    return do_close ();
   }
 
+  // --------------------------------------------------------------------------
   // Default implementations; overwrite them with real code.
 
+  // do_open() is not here because it is an abstract virtual to be
+  // implemented by derived classes.
+
   struct dirent*
-  PosixDirectory::doRead (void)
+  PosixDirectory::do_read (void)
   {
     // Return end of directory.
     return nullptr;
   }
 
   void
-  PosixDirectory::doRewind (void)
+  PosixDirectory::do_rewind (void)
   {
-    // Ignore.
+    // Ignore rewind.
     return;
   }
 
   int
-  PosixDirectory::doClose (void)
+  PosixDirectory::do_close (void)
   {
-    // Ignore, return ok.
+    // Ignore close, return ok.
     return 0;
   }
 
-}
+} /* namespace os */
+
+// ----------------------------------------------------------------------------

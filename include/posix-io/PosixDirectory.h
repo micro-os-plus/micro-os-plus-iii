@@ -19,6 +19,8 @@
 #ifndef POSIX_DIRECTORY_H_
 #define POSIX_DIRECTORY_H_
 
+// ----------------------------------------------------------------------------
+
 #include "posix-io/PosixFileSystem.h"
 
 #if defined(__ARM_EABI__)
@@ -26,6 +28,8 @@
 #else
 #include <dirent.h>
 #endif
+
+// ----------------------------------------------------------------------------
 
 namespace os
 {
@@ -36,13 +40,15 @@ namespace os
   {
   public:
 
-    PosixDirectory (PosixFileSystem& fileSystem);
+    PosixDirectory (PosixFileSystem* fileSystem);
 
     virtual
     ~PosixDirectory ();
 
-    // int
-    // opendir (const char* dirname);
+    // ------------------------------------------------------------------------
+
+    int
+    open (const char* dirname);
 
     struct dirent *
     read (void);
@@ -53,30 +59,46 @@ namespace os
     int
     close (void);
 
+    // ------------------------------------------------------------------------
+
+    /**
+     * @return 0 if successful, otherwise -1 and errno.
+     */
+    virtual int
+    do_open (const char* dirname) = 0;
+
     virtual struct dirent*
-    doRead (void);
+    do_read (void);
 
     virtual void
-    doRewind (void);
+    do_rewind (void);
 
     virtual int
-    doClose (void);
+    do_close (void);
 
-    PosixFileSystem&
+    // ------------------------------------------------------------------------
+
+    PosixFileSystem*
     getFileSystem (void);
 
   protected:
-    PosixFileSystem& fFileSystem;
+
+    PosixFileSystem* fFileSystem;
     struct dirent fDirEntry;
   };
 
 #pragma GCC diagnostic pop
 
-  inline PosixFileSystem&
+  // --------------------------------------------------------------------------
+
+  inline PosixFileSystem*
   PosixDirectory::getFileSystem (void)
   {
     return fFileSystem;
   }
-}
+
+} /* namespace os */
+
+// ----------------------------------------------------------------------------
 
 #endif /* POSIX_DIRECTORY_H_ */
