@@ -18,6 +18,7 @@
 
 #include "posix-io/PosixIo.h"
 #include "posix-io/PosixFileSystem.h"
+#include "posix-io/PosixDirectory.h"
 #include <cerrno>
 
 namespace os
@@ -44,6 +45,14 @@ namespace os
   PosixIo*
   PosixFileSystem::open (const char *path, int oflag, std::va_list args)
   {
+    // TODO: implement
+    return nullptr;
+  }
+
+  PosixDirectory*
+  PosixFileSystem::opendir (const char *dirpath)
+  {
+    // TODO: implement
     return nullptr;
   }
 

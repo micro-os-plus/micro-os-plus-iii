@@ -23,9 +23,18 @@
 #define OS_INTEGER_DIRENT_NAME_MAX  (256)
 #endif
 
-typedef struct dirent
+struct dirent
 {
+  ino_t d_ino;
   char d_name[OS_INTEGER_DIRENT_NAME_MAX];
+};
+
+// The content of this structure is not relevant, it is here just to keep
+// POSIX compatibility, in real life the PosixDirectory class is used
+// and casted to DIR.
+typedef struct
+{
+  ;
 } DIR;
 
 DIR*
@@ -34,14 +43,15 @@ opendir (const char* dirname);
 struct dirent*
 readdir (DIR* dirp);
 
+#if 0
 int
 readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result);
+#endif
 
 void
 rewinddir (DIR* dirp);
 
 int
 closedir (DIR *dirp);
-
 
 #endif /* INCLUDE_POSIX_IO_DIRENT_H_ */

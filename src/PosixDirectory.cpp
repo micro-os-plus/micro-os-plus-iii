@@ -16,37 +16,69 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "posix-io/PosixFileSystemsManager.h"
+#include "posix-io/PosixDirectory.h"
+#include "posix-io/PosixFileSystem.h"
+#include <cerrno>
 
 namespace os
 {
 
-  PosixFileSystemsManager::PosixFileSystemsManager ()
+  PosixDirectory::PosixDirectory (PosixFileSystem& fileSystem) :
+      fFileSystem (fileSystem)
   {
-    // TODO Auto-generated constructor stub
+    ;
   }
 
-  PosixFileSystemsManager::~PosixFileSystemsManager ()
+  PosixDirectory::~PosixDirectory ()
   {
-    // TODO Auto-generated destructor stub
+    ;
   }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
-  PosixFileSystem*
-  PosixFileSystemsManager::getFileSystem (const char** path)
+  struct dirent *
+  PosixDirectory::read (void)
   {
+    errno = 0;
+
+    return doRead ();
+  }
+
+  void
+  PosixDirectory::rewind (void)
+  {
+    errno = 0;
+
+    doRewind ();
+  }
+
+  int
+  PosixDirectory::close (void)
+  {
+    errno = 0;
+
+    return doClose ();
+  }
+
+  // Default implementations; overwrite them with real code.
+
+  struct dirent*
+  PosixDirectory::doRead (void)
+  {
+    // Return end of directory.
     return nullptr;
   }
 
-  PosixFileSystem*
-  PosixFileSystemsManager::getFileSystem (const char** path1,
-                                          const char** path2)
+  void
+  PosixDirectory::doRewind (void)
   {
-    return nullptr;
+    // Ignore.
+    return;
   }
 
-#pragma GCC diagnostic pop
+  int
+  PosixDirectory::doClose (void)
+  {
+    // Ignore, return ok.
+    return 0;
+  }
 
-} /* namespace os */
+}

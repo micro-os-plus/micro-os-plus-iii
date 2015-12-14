@@ -21,6 +21,7 @@
 #include "posix-io/PosixDevice.h"
 #include "posix-io/PosixFileSystem.h"
 #include "posix-io/PosixFileSystemsManager.h"
+#include "posix-io/PosixDirectory.h"
 #include <cstdarg>
 #include <cerrno>
 
@@ -81,7 +82,7 @@
 #define __posix_raise raise
 #define __posix_read read
 #define __posix_readdir readdir
-#define __posix_readdir_r readdir_r
+//#define __posix_readdir_r readdir_r
 #define __posix_readlink readlink
 #define __posix_rename rename
 #define __posix_rewinddir rewinddir
@@ -579,43 +580,68 @@ __posix_rmdir (const char *path)
   return fs->rmdir (adjusted_path);
 }
 
-// DIR
+// Directories functions.
 
 DIR*
 __attribute__((weak))
-__posix_opendir (const char* dirname)
+__posix_opendir (const char* dirpath)
 {
-  errno = ENOSYS; // Not implemented
-  return nullptr;
+  const char* adjusted_dirpath = dirpath;
+  os::PosixFileSystem* fs = os::PosixFileSystemsManager::getFileSystem (
+      &adjusted_dirpath);
+
+  if (fs == nullptr)
+    {
+      errno = ENOENT;
+      return nullptr;
+    }
+  return (DIR*) fs->opendir (adjusted_dirpath);
 }
 
 struct dirent*
 __attribute__((weak))
 __posix_readdir (DIR* dirp)
 {
-  errno = ENOSYS; // Not implemented
-  return nullptr;
+  os::PosixDirectory* dir = (os::PosixDirectory*) (dirp);
+  if (dir == nullptr)
+    {
+      errno = ENOENT;
+      return nullptr;
+    }
+  return dir->read ();
 }
 
+#if 0
 int __attribute__((weak))
 __posix_readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result)
-{
-  errno = ENOSYS; // Not implemented
-  return ((ssize_t) -1);
-}
+  {
+    errno = ENOSYS; // Not implemented
+    return ((ssize_t) -1);
+  }
+#endif
 
 void __attribute__((weak))
 __posix_rewinddir (DIR* dirp)
 {
-  errno = ENOSYS; // Not implemented
-  return;
+  os::PosixDirectory* dir = (os::PosixDirectory*) (dirp);
+  if (dir == nullptr)
+    {
+      errno = ENOENT;
+      return;
+    }
+  return dir->rewind ();
 }
 
 int __attribute__((weak))
 __posix_closedir (DIR* dirp)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  os::PosixDirectory* dir = (os::PosixDirectory*) (dirp);
+  if (dir == nullptr)
+    {
+      errno = ENOENT;
+      return -1;
+    }
+  return dir->close ();
 }
 
 // ----------------------------------------------------------------------------

@@ -26,6 +26,7 @@
 namespace os
 {
   class PosixIo;
+  class PosixDirectory;
 
   class PosixFileSystem
   {
@@ -38,6 +39,11 @@ namespace os
 
     PosixIo*
     open (const char *path, int oflag, std::va_list args);
+
+    PosixDirectory*
+    opendir(const char *dirpath);
+
+    // --- File non-io functions.
 
     int
     chmod (const char* path, mode_t mode);
@@ -63,7 +69,8 @@ namespace os
     int
     rmdir (const char *path);
 
-    // ---
+    // --- Support functions.
+
     const char*
     adjustPath (const char* path);
 
