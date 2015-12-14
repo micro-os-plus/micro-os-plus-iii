@@ -31,12 +31,13 @@ namespace os
 {
   class PosixIo;
   class PosixDirectory;
+  class BlockDevice;
 
   class PosixFileSystem
   {
   public:
 
-    PosixFileSystem ();
+    PosixFileSystem (BlockDevice* blockDevice);
 
     virtual
     ~PosixFileSystem ();
@@ -77,6 +78,15 @@ namespace os
     rmdir (const char *path);
 
     // ------------------------------------------------------------------------
+  protected:
+
+    virtual PosixIo*
+    do_open (const char *path, int oflag, std::va_list args);
+
+    virtual PosixDirectory*
+    do_opendir (const char *dirpath);
+
+    // ------------------------------------------------------------------------
 
     virtual int
     do_chmod (const char* path, mode_t mode);
@@ -105,9 +115,13 @@ namespace os
     // ------------------------------------------------------------------------
     // --- Support functions.
 
+  public:
     const char*
     adjustPath (const char* path);
 
+  protected:
+
+    BlockDevice* fBlockDevice;
   };
 
 } /* namespace os */

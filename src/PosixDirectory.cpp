@@ -18,6 +18,7 @@
 
 #include "posix-io/PosixDirectory.h"
 #include "posix-io/PosixFileSystem.h"
+#include "posix-io/PosixFileSystemsManager.h"
 #include <cerrno>
 #include <cassert>
 
@@ -39,14 +40,26 @@ namespace os
 
   // --------------------------------------------------------------------------
 
-  int
+  PosixDirectory*
   PosixDirectory::open (const char* dirname)
   {
-    assert(fFileSystem != nullptr);
     errno = 0;
 
-    // Execute the implementation specific code.
-    return do_open (dirname);
+    const char* adjusted_dirname = dirname;
+    os::PosixFileSystem* fs = os::PosixFileSystemsManager::getFileSystem (
+        &adjusted_dirname);
+
+    // The manager will return null if there are no file systems
+    // registered, no need to check this condition separately.
+    if (fs == nullptr)
+      {
+        errno = EBADF;
+        return nullptr;
+      }
+
+    // Use the file system implementation to open the directory, using
+    // the adjusted path (mount point prefix removed).
+    return fs->opendir (adjusted_dirname);
   }
 
   struct dirent*

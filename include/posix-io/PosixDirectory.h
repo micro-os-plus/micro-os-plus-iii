@@ -47,7 +47,7 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    int
+    static PosixDirectory*
     open (const char* dirname);
 
     struct dirent *
@@ -64,7 +64,7 @@ namespace os
     /**
      * @return 0 if successful, otherwise -1 and errno.
      */
-    virtual int
+    virtual PosixDirectory*
     do_open (const char* dirname) = 0;
 
     virtual struct dirent*
@@ -78,6 +78,9 @@ namespace os
 
     // ------------------------------------------------------------------------
 
+    void
+    setFileSystem (PosixFileSystem* fileSystem);
+
     PosixFileSystem*
     getFileSystem (void);
 
@@ -90,6 +93,12 @@ namespace os
 #pragma GCC diagnostic pop
 
   // --------------------------------------------------------------------------
+
+  inline void
+  PosixDirectory::setFileSystem (PosixFileSystem* fileSystem)
+  {
+    fFileSystem = fileSystem;
+  }
 
   inline PosixFileSystem*
   PosixDirectory::getFileSystem (void)

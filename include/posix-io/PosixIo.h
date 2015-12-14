@@ -43,9 +43,6 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    // TODO: check if non-static open() is needed,
-    // for use in C++ only apps.
-
     static PosixIo*
     open (const char *path, int oflag, ...);
 

@@ -20,43 +20,66 @@
 #include "posix-io/PosixFileSystem.h"
 #include "posix-io/PosixDirectory.h"
 #include <cerrno>
+#include <cassert>
 
 // ----------------------------------------------------------------------------
 
 namespace os
 {
 
-  PosixFileSystem::PosixFileSystem ()
+  PosixFileSystem::PosixFileSystem (BlockDevice* blockDevice) :
+      fBlockDevice (blockDevice)
   {
-    // TODO Auto-generated constructor stub
-
+    ;
   }
 
   PosixFileSystem::~PosixFileSystem ()
   {
-    // TODO Auto-generated destructor stub
+    fBlockDevice = nullptr;
   }
 
   // --------------------------------------------------------------------------
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
-  // TODO: Should we allow C++ to open files directly using
-  // the derived objects, or ask everything to go via PosixIo::open()?
-  // If so, we must allocate a file descriptor here, not in PosixIo?
-
   PosixIo*
   PosixFileSystem::open (const char *path, int oflag, std::va_list args)
   {
-    // TODO: implement
-    return nullptr;
+    if (fBlockDevice == nullptr)
+      {
+        errno = EBADF;
+        return nullptr;
+      }
+
+    // Execute the implementation specific code.
+    return do_open (path, oflag, args);
   }
 
   PosixDirectory*
   PosixFileSystem::opendir (const char *dirpath)
   {
-    // TODO: implement
+    if (fBlockDevice == nullptr)
+      {
+        errno = EBADF;
+        return nullptr;
+      }
+    // TODO: implement and return the object.
+    return do_opendir (dirpath);
+
+  }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+  PosixIo*
+  PosixFileSystem::do_open (const char *path, int oflag, std::va_list args)
+  {
+    // TODO: implement and return the object.
+    return nullptr;
+  }
+
+  PosixDirectory*
+  PosixFileSystem::do_opendir (const char *dirpath)
+  {
+    // TODO: implement and return the object.
     return nullptr;
   }
 
@@ -65,6 +88,7 @@ namespace os
   int
   PosixFileSystem::chmod (const char* path, mode_t mode)
   {
+    assert(fBlockDevice != nullptr);
     errno = 0;
 
     // Execute the implementation specific code.
@@ -74,6 +98,7 @@ namespace os
   int
   PosixFileSystem::stat (const char* path, struct stat* buf)
   {
+    assert(fBlockDevice != nullptr);
     errno = 0;
 
     // Execute the implementation specific code.
@@ -83,6 +108,7 @@ namespace os
   int
   PosixFileSystem::truncate (const char* path, off_t length)
   {
+    assert(fBlockDevice != nullptr);
     errno = 0;
 
     // Execute the implementation specific code.
@@ -92,6 +118,7 @@ namespace os
   int
   PosixFileSystem::rename (const char* existing, const char* _new)
   {
+    assert(fBlockDevice != nullptr);
     errno = 0;
 
     // Execute the implementation specific code.
@@ -101,6 +128,7 @@ namespace os
   int
   PosixFileSystem::unlink (const char* path)
   {
+    assert(fBlockDevice != nullptr);
     errno = 0;
 
     // Execute the implementation specific code.
@@ -110,6 +138,7 @@ namespace os
   int
   PosixFileSystem::utime (const char* path, const struct utimbuf* times)
   {
+    assert(fBlockDevice != nullptr);
     errno = 0;
 
     // Execute the implementation specific code.
@@ -119,6 +148,7 @@ namespace os
   int
   PosixFileSystem::mkdir (const char* path, mode_t mode)
   {
+    assert(fBlockDevice != nullptr);
     errno = 0;
 
     // Execute the implementation specific code.
@@ -128,6 +158,7 @@ namespace os
   int
   PosixFileSystem::rmdir (const char *path)
   {
+    assert(fBlockDevice != nullptr);
     errno = 0;
 
     // Execute the implementation specific code.

@@ -25,12 +25,12 @@ namespace os
 
   PosixFileSystemsManager::PosixFileSystemsManager ()
   {
-    // TODO Auto-generated constructor stub
+    ;
   }
 
   PosixFileSystemsManager::~PosixFileSystemsManager ()
   {
-    // TODO Auto-generated destructor stub
+    ;
   }
 
   // --------------------------------------------------------------------------
