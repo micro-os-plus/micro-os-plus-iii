@@ -39,7 +39,7 @@ public:
   TestPosixDevice (const char* deviceName, uint32_t deviceNumber);
 
   virtual int
-  doOpen (const char *path, int oflag, va_list args);
+  do_open (const char *path, int oflag, va_list args);
 
   int
   getMode (void);
@@ -70,7 +70,7 @@ TestPosixDevice::getMode (void)
 #endif
 
 int
-TestPosixDevice::doOpen (const char *path, int oflag, va_list args)
+TestPosixDevice::do_open (const char *path, int oflag, va_list args)
 {
   fMode = va_arg(args, int);
 

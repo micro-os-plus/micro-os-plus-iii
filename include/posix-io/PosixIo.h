@@ -19,6 +19,8 @@
 #ifndef INCLUDE_POSIX_IO_POSIX_IO_H_
 #define INCLUDE_POSIX_IO_POSIX_IO_H_
 
+// ----------------------------------------------------------------------------
+
 #include "posix-io/Types.h"
 #include <cstddef>
 #include <cstdarg>
@@ -98,44 +100,43 @@ namespace os
     getFileDescriptor (void) const;
 
     // ------------------------------------------------------------------------
-
     // Implementations
 
     /**
      * return 0 if success or -1 & errno
      */
     virtual int
-    doOpen (const char *path, int oflag, std::va_list args) = 0;
+    do_open (const char *path, int oflag, std::va_list args) = 0;
 
     virtual int
-    doClose (void);
+    do_close (void);
 
     virtual ssize_t
-    doRead (void *buf, std::size_t nbyte);
+    do_read (void *buf, std::size_t nbyte);
 
     virtual ssize_t
-    doWrite (const void *buf, std::size_t nbyte);
+    do_write (const void *buf, std::size_t nbyte);
 
     virtual int
-    doIoctl (int request, std::va_list args);
+    do_ioctl (int request, std::va_list args);
 
     virtual off_t
-    doLseek (off_t offset, int whence);
+    do_lseek (off_t offset, int whence);
 
     virtual int
-    doIsatty (void);
+    do_isatty (void);
 
     virtual int
-    doFcntl (int cmd, va_list args);
+    do_fcntl (int cmd, va_list args);
 
     virtual int
-    doFstat (struct stat* buf);
+    do_fstat (struct stat* buf);
 
     virtual int
-    doFtruncate (off_t length);
+    do_ftruncate (off_t length);
 
     virtual int
-    doFsync (void);
+    do_fsync (void);
 
     // ------------------------------------------------------------------------
 

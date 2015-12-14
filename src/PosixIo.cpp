@@ -26,6 +26,8 @@
 #include <cerrno>
 #include <cstdarg>
 
+// ----------------------------------------------------------------------------
+
 // Variadic calls are processed in two steps, first prepare a
 // va_list structure, then call implementation functions like doOpen()
 // doIoctl(), that use 'va_list args'.
@@ -80,7 +82,7 @@ namespace os
     if (io != nullptr)
       {
         // If so, use the implementation to open the device.
-        int oret = io->doOpen (path, oflag, args);
+        int oret = io->do_open (path, oflag, args);
         if (oret < 0)
           {
             // Open failed.
@@ -118,7 +120,7 @@ namespace os
         // If allocation failed, close this object.
         if (io != nullptr)
           {
-            io->doClose ();
+            io->do_close ();
             io->clearFileDescriptor ();
           }
         return nullptr;
@@ -134,7 +136,7 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    int ret = doClose ();
+    int ret = do_close ();
 
     // Remove this IO from the file descriptors registry.
     FileDescriptorsManager::free (fFileDescriptor);
@@ -153,7 +155,7 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    return doRead (buf, nbyte);
+    return do_read (buf, nbyte);
   }
 
   ssize_t
@@ -162,7 +164,7 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    return doWrite (buf, nbyte);
+    return do_write (buf, nbyte);
   }
 
   int
@@ -183,7 +185,7 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    return doIoctl (request, args);
+    return do_ioctl (request, args);
   }
 
   off_t
@@ -192,7 +194,7 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    return doLseek (offset, whence);
+    return do_lseek (offset, whence);
   }
 
   int
@@ -201,7 +203,7 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    return doIsatty ();
+    return do_isatty ();
   }
 
   int
@@ -222,7 +224,7 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    return doFcntl (cmd, args);
+    return do_fcntl (cmd, args);
   }
 
   int
@@ -231,7 +233,7 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    return doFstat (buf);
+    return do_fstat (buf);
   }
 
   int
@@ -240,7 +242,7 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    return doFtruncate (length);
+    return do_ftruncate (length);
   }
 
   int
@@ -249,16 +251,16 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    return doFsync ();
+    return do_fsync ();
   }
 
   // --------------------------------------------------------------------------
 
-// doOpen() is not here because it is virtual,
-// it must be implemented by derived classes.
+  // doOpen() is not here because it is virtual,
+  // it must be implemented by derived classes.
 
   int
-  PosixIo::doClose (void)
+  PosixIo::do_close (void)
   {
     return 0; // Always return success
   }
@@ -267,63 +269,63 @@ namespace os
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
   ssize_t
-  PosixIo::doRead (void *buf, std::size_t nbyte)
+  PosixIo::do_read (void *buf, std::size_t nbyte)
   {
     errno = ENOSYS; // Not implemented
     return -1;
   }
 
   ssize_t
-  PosixIo::doWrite (const void *buf, std::size_t nbyte)
+  PosixIo::do_write (const void *buf, std::size_t nbyte)
   {
     errno = ENOSYS; // Not implemented
     return -1;
   }
 
   int
-  PosixIo::doIoctl (int request, std::va_list args)
+  PosixIo::do_ioctl (int request, std::va_list args)
   {
     errno = ENOSYS; // Not implemented
     return -1;
   }
 
   off_t
-  PosixIo::doLseek (off_t offset, int whence)
+  PosixIo::do_lseek (off_t offset, int whence)
   {
     errno = ENOSYS; // Not implemented
     return -1;
   }
 
   int
-  PosixIo::doIsatty (void)
+  PosixIo::do_isatty (void)
   {
     errno = ENOTTY; // Not a TTY
     return 0;
   }
 
   int
-  PosixIo::doFcntl (int cmd, std::va_list args)
+  PosixIo::do_fcntl (int cmd, std::va_list args)
   {
     errno = ENOSYS; // Not implemented
     return -1;
   }
 
   int
-  PosixIo::doFstat (struct stat* buf)
+  PosixIo::do_fstat (struct stat* buf)
   {
     errno = ENOSYS; // Not implemented
     return -1;
   }
 
   int
-  PosixIo::doFtruncate (off_t length)
+  PosixIo::do_ftruncate (off_t length)
   {
     errno = ENOSYS; // Not implemented
     return -1;
   }
 
   int
-  PosixIo::doFsync (void)
+  PosixIo::do_fsync (void)
   {
     errno = ENOSYS; // Not implemented
     return -1;
