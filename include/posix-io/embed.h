@@ -19,10 +19,14 @@
 #ifndef INCLUDE_POSIX_IO_EMBED_H_
 #define INCLUDE_POSIX_IO_EMBED_H_
 
+// ----------------------------------------------------------------------------
+
 int __attribute__((weak))
 ioctl (int fildes, unsigned long request, ...);
 
 void
 sync (void);
+
+// ----------------------------------------------------------------------------
 
 #endif /* INCLUDE_POSIX_IO_EMBED_H_ */

@@ -19,6 +19,8 @@
 #ifndef POSIX_FILE_SYSTEMS_MANAGER_H_
 #define POSIX_FILE_SYSTEMS_MANAGER_H_
 
+// ----------------------------------------------------------------------------
+
 namespace os
 {
   class PosixFileSystem;
@@ -26,9 +28,12 @@ namespace os
   class PosixFileSystemsManager
   {
   public:
+
     PosixFileSystemsManager ();
 
     ~PosixFileSystemsManager ();
+
+    // ------------------------------------------------------------------------
 
     static PosixFileSystem*
     getFileSystem (const char** path);
@@ -48,5 +53,7 @@ namespace os
   };
 
 } /* namespace os */
+
+// ----------------------------------------------------------------------------
 
 #endif /* POSIX_FILE_SYSTEMS_MANAGER_H_ */

@@ -21,6 +21,8 @@
 #include <cerrno>
 #include <cassert>
 
+// ----------------------------------------------------------------------------
+
 namespace os
 {
 
@@ -49,6 +51,8 @@ namespace os
     delete sfDescriptorsArray;
     sfSize = 0;
   }
+
+  // --------------------------------------------------------------------------
 
   bool
   FileDescriptorsManager::isValid (int fildes)

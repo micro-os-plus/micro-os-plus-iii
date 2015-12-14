@@ -18,6 +18,8 @@
 
 #include "posix-io/PosixFileSystemsManager.h"
 
+// ----------------------------------------------------------------------------
+
 namespace os
 {
 
@@ -30,6 +32,8 @@ namespace os
   {
     // TODO Auto-generated destructor stub
   }
+
+  // --------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -50,3 +54,5 @@ namespace os
 #pragma GCC diagnostic pop
 
 } /* namespace os */
+
+// ----------------------------------------------------------------------------

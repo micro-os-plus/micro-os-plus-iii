@@ -19,9 +19,13 @@
 #ifndef INCLUDE_POSIX_IO_DIRENT_H_
 #define INCLUDE_POSIX_IO_DIRENT_H_
 
+// ----------------------------------------------------------------------------
+
 #if !defined(OS_INTEGER_DIRENT_NAME_MAX)
 #define OS_INTEGER_DIRENT_NAME_MAX  (256)
 #endif
+
+// ----------------------------------------------------------------------------
 
 struct dirent
 {
@@ -36,6 +40,8 @@ typedef struct
 {
   ;
 } DIR;
+
+// ----------------------------------------------------------------------------
 
 DIR*
 opendir (const char* dirname);
@@ -53,5 +59,7 @@ rewinddir (DIR* dirp);
 
 int
 closedir (DIR *dirp);
+
+// ----------------------------------------------------------------------------
 
 #endif /* INCLUDE_POSIX_IO_DIRENT_H_ */

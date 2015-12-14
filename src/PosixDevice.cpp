@@ -20,6 +20,8 @@
 #include <cstring>
 #include <cassert>
 
+// ----------------------------------------------------------------------------
+
 namespace os
 {
 
@@ -34,6 +36,8 @@ namespace os
   {
     fName = nullptr;
   }
+
+  // --------------------------------------------------------------------------
 
   bool
   PosixDevice::matchName (const char* name) const

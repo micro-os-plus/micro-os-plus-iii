@@ -19,7 +19,11 @@
 #ifndef INCLUDE_POSIX_IO_UTIME_H_
 #define INCLUDE_POSIX_IO_UTIME_H_
 
+// ----------------------------------------------------------------------------
+
 int
 utime (const char *path, const struct utimbuf* times);
+
+// ----------------------------------------------------------------------------
 
 #endif /* INCLUDE_POSIX_IO_UTIME_H_ */

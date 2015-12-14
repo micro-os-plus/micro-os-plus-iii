@@ -19,6 +19,8 @@
 #ifndef POSIX_DEVICES_MANAGER_H_
 #define POSIX_DEVICES_MANAGER_H_
 
+// ----------------------------------------------------------------------------
+
 #include <cstddef>
 #include <cassert>
 

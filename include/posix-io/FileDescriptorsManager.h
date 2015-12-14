@@ -19,6 +19,8 @@
 #ifndef INCLUDE_POSIX_IO_FILE_DESCRIPTORS_MANAGER_H_
 #define INCLUDE_POSIX_IO_FILE_DESCRIPTORS_MANAGER_H_
 
+// ----------------------------------------------------------------------------
+
 #include "posix-io/Types.h"
 #include <cstddef>
 #include <cassert>
