@@ -19,9 +19,13 @@
 #ifndef POSIX_FILE_SYSTEM_H_
 #define POSIX_FILE_SYSTEM_H_
 
+// ----------------------------------------------------------------------------
+
 #include <cstdarg>
 #include <sys/stat.h>
 #include <utime.h>
+
+// ----------------------------------------------------------------------------
 
 namespace os
 {
@@ -37,12 +41,15 @@ namespace os
     virtual
     ~PosixFileSystem ();
 
+    // ------------------------------------------------------------------------
+
     PosixIo*
     open (const char *path, int oflag, std::va_list args);
 
     PosixDirectory*
-    opendir(const char *dirpath);
+    opendir (const char *dirpath);
 
+    // ------------------------------------------------------------------------
     // --- File non-io functions.
 
     int
@@ -69,6 +76,33 @@ namespace os
     int
     rmdir (const char *path);
 
+    // ------------------------------------------------------------------------
+
+    virtual int
+    do_chmod (const char* path, mode_t mode);
+
+    virtual int
+    do_stat (const char* path, struct stat* buf);
+
+    virtual int
+    do_truncate (const char* path, off_t length);
+
+    virtual int
+    do_rename (const char* existing, const char* _new);
+
+    virtual int
+    do_unlink (const char* path);
+
+    virtual int
+    do_utime (const char* path, const struct utimbuf* times);
+
+    virtual int
+    do_mkdir (const char* path, mode_t mode);
+
+    virtual int
+    do_rmdir (const char *path);
+
+    // ------------------------------------------------------------------------
     // --- Support functions.
 
     const char*
@@ -77,5 +111,7 @@ namespace os
   };
 
 } /* namespace os */
+
+// ----------------------------------------------------------------------------
 
 #endif /* POSIX_FILE_SYSTEM_H_ */

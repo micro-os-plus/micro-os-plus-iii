@@ -21,6 +21,8 @@
 #include "posix-io/PosixDirectory.h"
 #include <cerrno>
 
+// ----------------------------------------------------------------------------
+
 namespace os
 {
 
@@ -34,6 +36,8 @@ namespace os
   {
     // TODO Auto-generated destructor stub
   }
+
+  // --------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -56,60 +60,78 @@ namespace os
     return nullptr;
   }
 
+  // --------------------------------------------------------------------------
+
   int
   PosixFileSystem::chmod (const char* path, mode_t mode)
   {
-    errno = ENOSYS; // Not implemented
-    return -1;
+    errno = 0;
+
+    // Execute the implementation specific code.
+    return do_chmod (path, mode);
   }
 
   int
   PosixFileSystem::stat (const char* path, struct stat* buf)
   {
-    errno = ENOSYS; // Not implemented
-    return -1;
+    errno = 0;
+
+    // Execute the implementation specific code.
+    return do_stat (path, buf);
   }
 
   int
   PosixFileSystem::truncate (const char* path, off_t length)
   {
-    errno = ENOSYS; // Not implemented
-    return -1;
+    errno = 0;
+
+    // Execute the implementation specific code.
+    return do_truncate (path, length);
   }
 
   int
   PosixFileSystem::rename (const char* existing, const char* _new)
   {
-    errno = ENOSYS; // Not implemented
-    return -1;
+    errno = 0;
+
+    // Execute the implementation specific code.
+    return do_rename (existing, _new);
   }
 
   int
   PosixFileSystem::unlink (const char* path)
   {
-    errno = ENOSYS; // Not implemented
-    return -1;
+    errno = 0;
+
+    // Execute the implementation specific code.
+    return do_unlink (path);
   }
 
   int
   PosixFileSystem::utime (const char* path, const struct utimbuf* times)
   {
-    errno = ENOSYS; // Not implemented
-    return -1;
+    errno = 0;
+
+    // Execute the implementation specific code.
+    return do_utime (path, times);
   }
 
   int
   PosixFileSystem::mkdir (const char* path, mode_t mode)
   {
-    errno = ENOSYS; // Not implemented
-    return -1;
+    errno = 0;
+
+    // Execute the implementation specific code.
+    return do_mkdir (path, mode);
   }
 
   int
   PosixFileSystem::rmdir (const char *path)
   {
-    errno = ENOSYS; // Not implemented
-    return -1;
+    errno = 0;
+
+    // Execute the implementation specific code.
+    return do_rmdir (path);
   }
 
   // ---
@@ -120,6 +142,66 @@ namespace os
     return path;
   }
 
+  // --------------------------------------------------------------------------
+
+  int
+  PosixFileSystem::do_chmod (const char* path, mode_t mode)
+  {
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  PosixFileSystem::do_stat (const char* path, struct stat* buf)
+  {
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  PosixFileSystem::do_truncate (const char* path, off_t length)
+  {
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  PosixFileSystem::do_rename (const char* existing, const char* _new)
+  {
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  PosixFileSystem::do_unlink (const char* path)
+  {
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  PosixFileSystem::do_utime (const char* path, const struct utimbuf* times)
+  {
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  PosixFileSystem::do_mkdir (const char* path, mode_t mode)
+  {
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  PosixFileSystem::do_rmdir (const char *path)
+  {
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
 #pragma GCC diagnostic pop
 
 } /* namespace os */
+
+// ----------------------------------------------------------------------------
