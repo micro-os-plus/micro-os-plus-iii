@@ -34,6 +34,8 @@
 
 namespace os
 {
+  // --------------------------------------------------------------------------
+
   class PosixDevice : public PosixIo
   {
   public:
