@@ -43,7 +43,7 @@ namespace os
   {
   public:
 
-    PosixFile (PosixFileSystem* fileSystem);
+    PosixFile ();
 
     ~PosixFile ();
 
