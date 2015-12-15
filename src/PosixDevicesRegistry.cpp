@@ -45,11 +45,10 @@ namespace os
     sfSize = size;
     sfRegistryArray = new PosixDevice*[size];
 
-    for (std::size_t i = 0; i < getSize (); ++i)
+    for (std::size_t i = 0; i < size; ++i)
       {
         sfRegistryArray[i] = nullptr;
       }
-
   }
 
   PosixDevicesRegistry::~PosixDevicesRegistry ()
