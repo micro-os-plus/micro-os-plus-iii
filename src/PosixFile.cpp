@@ -28,10 +28,9 @@ namespace os
 
   // --------------------------------------------------------------------------
 
-  PosixFile::PosixFile (PosixFileSystem* fileSystem) :
-      fFileSystem (fileSystem)
+  PosixFile::PosixFile ()
   {
-    ;
+    fFileSystem = nullptr;
   }
 
   PosixFile::~PosixFile ()

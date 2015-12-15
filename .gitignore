@@ -9,5 +9,4 @@ yotta_targets/
 test-manager-debug
 Debug
 Release
-test-device-debug
-test-descriptors-manager-debug
+test-*
