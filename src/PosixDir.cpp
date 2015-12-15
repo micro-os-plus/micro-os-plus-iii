@@ -27,6 +27,8 @@
 namespace os
 {
 
+  // --------------------------------------------------------------------------
+
   PosixDir::PosixDir (PosixFileSystem* fileSystem) :
       fFileSystem (fileSystem)
   {
@@ -46,7 +48,7 @@ namespace os
     errno = 0;
 
     const char* adjusted_dirname = dirname;
-    os::PosixFileSystem* fs = os::PosixFileSystemsManager::getFileSystem (
+    os::PosixFileSystem* fs = os::PosixFileSystemsManager::identifyFileSystem (
         &adjusted_dirname);
 
     // The manager will return null if there are no file systems

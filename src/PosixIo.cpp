@@ -92,7 +92,7 @@ namespace os
     else
       {
         const char* adjusted_path = path;
-        os::PosixFileSystem* fs = os::PosixFileSystemsManager::getFileSystem (
+        os::PosixFileSystem* fs = os::PosixFileSystemsManager::identifyFileSystem (
             &adjusted_path);
 
         // The manager will return null if there are no file systems
