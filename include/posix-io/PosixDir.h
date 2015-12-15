@@ -33,6 +33,8 @@
 
 namespace os
 {
+  // --------------------------------------------------------------------------
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
@@ -62,7 +64,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     /**
-     * @return 0 if successful, otherwise -1 and errno.
+     * @return object if successful, otherwise nullptr and errno.
      */
     virtual PosixDir*
     do_open (const char* dirname) = 0;
