@@ -49,7 +49,7 @@ namespace os
 
   public:
 
-    PosixFileSystem (BlockDevice* blockDevice);
+    PosixFileSystem ();
 
     virtual
     ~PosixFileSystem ();
@@ -134,13 +134,19 @@ namespace os
     do_sync (void);
 
     virtual int
-    do_mount (int flags);
+    do_mount (unsigned int flags);
 
     virtual int
-    do_unmount (int flags);
+    do_unmount (unsigned int flags);
 
     // ------------------------------------------------------------------------
     // --- Support functions.
+
+    void
+    setBlockDevice (BlockDevice* blockDevice);
+
+    BlockDevice*
+    getBlockDevice (void);
 
   public:
 
@@ -151,6 +157,19 @@ namespace os
 
     BlockDevice* fBlockDevice;
   };
+
+  inline void
+  PosixFileSystem::setBlockDevice (BlockDevice* blockDevice)
+  {
+    fBlockDevice = blockDevice;
+  }
+
+  inline BlockDevice*
+  PosixFileSystem::getBlockDevice (void)
+  {
+    return fBlockDevice;
+  }
+
 
 } /* namespace os */
 

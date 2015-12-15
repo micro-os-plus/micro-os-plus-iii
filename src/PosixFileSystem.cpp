@@ -30,10 +30,9 @@ namespace os
 
   // --------------------------------------------------------------------------
 
-  PosixFileSystem::PosixFileSystem (BlockDevice* blockDevice) :
-      fBlockDevice (blockDevice)
+  PosixFileSystem::PosixFileSystem ()
   {
-    ;
+    fBlockDevice = nullptr;
   }
 
   PosixFileSystem::~PosixFileSystem ()
@@ -64,7 +63,8 @@ namespace os
         errno = EBADF;
         return nullptr;
       }
-    // TODO: implement and return the object.
+
+    // Execute the implementation specific code.
     return do_opendir (dirpath);
 
   }
@@ -280,14 +280,14 @@ namespace os
   }
 
   int
-  PosixFileSystem::do_mount (int flags)
+  PosixFileSystem::do_mount (unsigned int flags)
   {
     errno = ENOSYS; // Not implemented
     return -1;
   }
 
   int
-  PosixFileSystem::do_unmount (int flags)
+  PosixFileSystem::do_unmount (unsigned int flags)
   {
     errno = ENOSYS; // Not implemented
     return -1;
