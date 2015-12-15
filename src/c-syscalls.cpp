@@ -19,6 +19,7 @@
 #include "posix-io/FileDescriptorsManager.h"
 #include "posix-io/PosixIo.h"
 #include "posix-io/PosixDevice.h"
+#include "posix-io/PosixFile.h"
 #include "posix-io/PosixFileSystem.h"
 #include "posix-io/PosixFileSystemsManager.h"
 #include "posix-io/PosixDir.h"
@@ -456,138 +457,74 @@ __posix_fsync (int fildes)
 }
 
 // ----------------------------------------------------------------------------
-
-// ---- POSIX FileSystem functions --------------------------------------------
+// ----- POSIX File functions -----
 
 int __attribute__((weak))
 __posix_chmod (const char* path, mode_t mode)
 {
-  const char* adjusted_path = path;
-  os::PosixFileSystem* fs = os::PosixFileSystemsManager::getFileSystem (
-      &adjusted_path);
-
-  if (fs == nullptr)
-    {
-      errno = ENOENT;
-      return -1;
-    }
-  return fs->chmod (adjusted_path, mode);
+  return os::PosixFile::chmod (path, mode);
 }
 
 int __attribute__((weak))
 __posix_stat (const char* path, struct stat* buf)
 {
-  const char* adjusted_path = path;
-  os::PosixFileSystem* fs = os::PosixFileSystemsManager::getFileSystem (
-      &adjusted_path);
-
-  if (fs == nullptr)
-    {
-      errno = ENOENT;
-      return -1;
-    }
-  return fs->stat (adjusted_path, buf);
+  return os::PosixFile::stat (path, buf);
 }
 
 int __attribute__((weak))
 __posix_truncate (const char* path, off_t length)
 {
-  const char* adjusted_path = path;
-  os::PosixFileSystem* fs = os::PosixFileSystemsManager::getFileSystem (
-      &adjusted_path);
-
-  if (fs == nullptr)
-    {
-      errno = ENOENT;
-      return -1;
-    }
-  return fs->truncate (adjusted_path, length);
+  return os::PosixFile::truncate (path, length);
 }
 
 int __attribute__((weak))
 __posix_rename (const char* existing, const char* _new)
 {
-  const char* adjusted_existing = existing;
-  const char* adjusted_new = _new;
-  os::PosixFileSystem* fs = os::PosixFileSystemsManager::getFileSystem (
-      &adjusted_existing, &adjusted_new);
-
-  if (fs == nullptr)
-    {
-      errno = ENOENT;
-      return -1;
-    }
-  return fs->rename (adjusted_existing, adjusted_new);
+  return os::PosixFile::rename (existing, _new);
 }
 
 int __attribute__((weak))
 __posix_unlink (const char* path)
 {
-  const char* adjusted_path = path;
-  os::PosixFileSystem* fs = os::PosixFileSystemsManager::getFileSystem (
-      &adjusted_path);
-
-  if (fs == nullptr)
-    {
-      errno = ENOENT;
-      return -1;
-    }
-  return fs->unlink (adjusted_path);
+  return os::PosixFile::unlink (path);
 }
 
 int __attribute__((weak))
 __posix_utime (const char* path, const struct utimbuf* times)
 {
-  const char* adjusted_path = path;
-  os::PosixFileSystem* fs = os::PosixFileSystemsManager::getFileSystem (
-      &adjusted_path);
-
-  if (fs == nullptr)
-    {
-      errno = ENOENT;
-      return -1;
-    }
-  return fs->utime (adjusted_path, times);
+  return os::PosixFile::utime (path, times);
 }
+
+// ----------------------------------------------------------------------------
+// ----- POSIX FileSystem functions -----
 
 int __attribute__((weak))
 __posix_mkdir (const char* path, mode_t mode)
 {
-  const char* adjusted_path = path;
-  os::PosixFileSystem* fs = os::PosixFileSystemsManager::getFileSystem (
-      &adjusted_path);
-
-  if (fs == nullptr)
-    {
-      errno = ENOENT;
-      return -1;
-    }
-  return fs->mkdir (adjusted_path, mode);
+  return os::PosixFileSystem::mkdir (path, mode);
 }
 
 int __attribute__((weak))
 __posix_rmdir (const char *path)
 {
-  const char* adjusted_path = path;
-  os::PosixFileSystem* fs = os::PosixFileSystemsManager::getFileSystem (
-      &adjusted_path);
-
-  if (fs == nullptr)
-    {
-      errno = ENOENT;
-      return -1;
-    }
-  return fs->rmdir (adjusted_path);
+  return os::PosixFileSystem::rmdir (path);
 }
 
-// Directories functions.
+void __attribute__((weak))
+__posix_sync (void)
+{
+  return os::PosixFileSystem::sync ();
+}
+
+// ----------------------------------------------------------------------------
+// ----- Directories functions -----
 
 DIR*
 __attribute__((weak))
 __posix_opendir (const char* dirpath)
 {
   const char* adjusted_dirpath = dirpath;
-  os::PosixFileSystem* fs = os::PosixFileSystemsManager::getFileSystem (
+  os::PosixFileSystem* fs = os::PosixFileSystemsManager::identifyFileSystem (
       &adjusted_dirpath);
 
   if (fs == nullptr)
@@ -709,12 +646,6 @@ __posix_select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
     return -1;
   }
 #endif
-
-void __attribute__((weak))
-__posix_sync (void)
-{
-  errno = ENOSYS; // Not implemented
-}
 
 clock_t
 __attribute__((weak))
