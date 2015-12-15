@@ -19,38 +19,88 @@
 #ifndef POSIX_FILE_SYSTEMS_MANAGER_H_
 #define POSIX_FILE_SYSTEMS_MANAGER_H_
 
+#include <cstddef>
+#include <cassert>
+
 // ----------------------------------------------------------------------------
 
 namespace os
 {
+  // --------------------------------------------------------------------------
+
   class PosixFileSystem;
+
+  // --------------------------------------------------------------------------
 
   class PosixFileSystemsManager
   {
   public:
 
-    PosixFileSystemsManager ();
+    PosixFileSystemsManager (std::size_t size);
 
     ~PosixFileSystemsManager ();
 
     // ------------------------------------------------------------------------
 
     static PosixFileSystem*
-    getFileSystem (const char** path);
+    identifyFileSystem (const char** path1, const char** path2 = nullptr);
+
+    static int
+    setRoot (PosixFileSystem* fs, int flags);
 
     static PosixFileSystem*
-    getFileSystem (const char** path1, const char** path2);
+    getRoot (void);
 
     static int
-    setRoot (PosixFileSystem* fs);
+    mount (PosixFileSystem* fs, const char* path, int flags);
 
     static int
-    mount (PosixFileSystem* fs, const char* path);
+    umount (const char* path, int flags);
 
-    static int
-    umount (const char* path);
+    static std::size_t
+    getSize (void);
+
+    static PosixFileSystem*
+    getFileSystem (std::size_t index);
+
+    static const char*
+    getPath (std::size_t index);
+
+  protected:
+
+    static std::size_t sfSize;
+
+    static PosixFileSystem* sfRoot;
+    static PosixFileSystem** sfFileSystemsArray;
+    static const char** sfPathsArray;
 
   };
+
+  inline std::size_t
+  PosixFileSystemsManager::getSize (void)
+  {
+    return sfSize;
+  }
+
+  inline PosixFileSystem*
+  PosixFileSystemsManager::getFileSystem (std::size_t index)
+  {
+    assert(index < sfSize);
+    return sfFileSystemsArray[index];
+  }
+
+  inline const char*
+  PosixFileSystemsManager::getPath (std::size_t index)
+  {
+    assert(index < sfSize);
+    return sfPathsArray[index];
+  }
+
+  inline PosixFileSystem*
+  PosixFileSystemsManager::getRoot (void)
+  {
+    return sfRoot;
+  }
 
 } /* namespace os */
 
