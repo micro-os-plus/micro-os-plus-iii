@@ -48,7 +48,7 @@ namespace os
 
   FileDescriptorsManager::~FileDescriptorsManager ()
   {
-    delete sfDescriptorsArray;
+    delete[] sfDescriptorsArray;
     sfSize = 0;
   }
 

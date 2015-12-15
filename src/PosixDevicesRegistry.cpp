@@ -53,7 +53,7 @@ namespace os
 
   PosixDevicesRegistry::~PosixDevicesRegistry ()
   {
-    delete sfRegistryArray;
+    delete[] sfRegistryArray;
     sfSize = 0;
   }
 
