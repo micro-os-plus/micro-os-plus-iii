@@ -19,6 +19,7 @@
 #include "posix-io/PosixIo.h"
 #include "posix-io/PosixFileSystem.h"
 #include "posix-io/PosixDir.h"
+#include "posix-io/PosixFileSystemsManager.h"
 #include <cerrno>
 #include <cassert>
 
@@ -26,6 +27,8 @@
 
 namespace os
 {
+
+  // --------------------------------------------------------------------------
 
   PosixFileSystem::PosixFileSystem (BlockDevice* blockDevice) :
       fBlockDevice (blockDevice)
@@ -145,27 +148,66 @@ namespace os
     return do_utime (path, times);
   }
 
+  // --------------------------------------------------------------------------
+
   int
   PosixFileSystem::mkdir (const char* path, mode_t mode)
   {
-    assert(fBlockDevice != nullptr);
+    const char* adjusted_path = path;
+    os::PosixFileSystem* fs = os::PosixFileSystemsManager::identifyFileSystem (
+        &adjusted_path);
+
+    if (fs == nullptr)
+      {
+        errno = ENOENT;
+        return -1;
+      }
+
+    assert(fs->fBlockDevice != nullptr);
     errno = 0;
 
     // Execute the implementation specific code.
-    return do_mkdir (path, mode);
+    return fs->do_mkdir (path, mode);
   }
 
   int
   PosixFileSystem::rmdir (const char *path)
   {
-    assert(fBlockDevice != nullptr);
+    const char* adjusted_path = path;
+    os::PosixFileSystem* fs = os::PosixFileSystemsManager::identifyFileSystem (
+        &adjusted_path);
+
+    if (fs == nullptr)
+      {
+        errno = ENOENT;
+        return -1;
+      }
+
+    assert(fs->fBlockDevice != nullptr);
     errno = 0;
 
     // Execute the implementation specific code.
-    return do_rmdir (path);
+    return fs->do_rmdir (path);
   }
 
-  // ---
+  void
+  PosixFileSystem::sync (void)
+  {
+    errno = 0;
+
+    // Enumerate all mounted file systems and sync them.
+    for (size_t i = 0; i < PosixFileSystemsManager::getSize (); ++i)
+      {
+        PosixFileSystem* fs = PosixFileSystemsManager::getFileSystem (i);
+        if (fs != nullptr)
+          {
+            fs->do_sync ();
+          }
+      }
+  }
+
+  // --------------------------------------------------------------------------
+
   const
   char*
   PosixFileSystem::adjustPath (const char* path)
@@ -226,6 +268,26 @@ namespace os
 
   int
   PosixFileSystem::do_rmdir (const char *path)
+  {
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  void
+  PosixFileSystem::do_sync (void)
+  {
+    errno = ENOSYS; // Not implemented
+  }
+
+  int
+  PosixFileSystem::do_mount (int flags)
+  {
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  int
+  PosixFileSystem::do_unmount (int flags)
   {
     errno = ENOSYS; // Not implemented
     return -1;

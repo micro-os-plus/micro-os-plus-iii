@@ -29,12 +29,24 @@
 
 namespace os
 {
+  // --------------------------------------------------------------------------
+
   class PosixIo;
+  class PosixFile;
   class PosixDir;
   class BlockDevice;
 
+  // --------------------------------------------------------------------------
+
   class PosixFileSystem
   {
+    // ------------------------------------------------------------------------
+
+    friend class PosixFile;
+    friend class PosixFileSystemsManager;
+
+    // ------------------------------------------------------------------------
+
   public:
 
     PosixFileSystem (BlockDevice* blockDevice);
@@ -51,7 +63,27 @@ namespace os
     opendir (const char *dirpath);
 
     // ------------------------------------------------------------------------
-    // --- File non-io functions.
+    // ----- Non-io functions -----
+
+    static int
+    mkdir (const char* path, mode_t mode);
+
+    static int
+    rmdir (const char *path);
+
+    static void
+    sync (void);
+
+    // ------------------------------------------------------------------------
+  protected:
+
+    virtual PosixIo*
+    do_open (const char *path, int oflag, std::va_list args);
+
+    virtual PosixDir*
+    do_opendir (const char *dirpath);
+
+    // ------------------------------------------------------------------------
 
     int
     chmod (const char* path, mode_t mode);
@@ -71,22 +103,8 @@ namespace os
     int
     utime (const char* path, const struct utimbuf* times);
 
-    int
-    mkdir (const char* path, mode_t mode);
-
-    int
-    rmdir (const char *path);
-
     // ------------------------------------------------------------------------
-  protected:
-
-    virtual PosixIo*
-    do_open (const char *path, int oflag, std::va_list args);
-
-    virtual PosixDir*
-    do_opendir (const char *dirpath);
-
-    // ------------------------------------------------------------------------
+    // ----- Implementations -----
 
     virtual int
     do_chmod (const char* path, mode_t mode);
@@ -112,10 +130,20 @@ namespace os
     virtual int
     do_rmdir (const char *path);
 
+    virtual void
+    do_sync (void);
+
+    virtual int
+    do_mount (int flags);
+
+    virtual int
+    do_unmount (int flags);
+
     // ------------------------------------------------------------------------
     // --- Support functions.
 
   public:
+
     const char*
     adjustPath (const char* path);
 
