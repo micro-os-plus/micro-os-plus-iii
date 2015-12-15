@@ -53,8 +53,8 @@ namespace os
 
   PosixFileSystemsManager::~PosixFileSystemsManager ()
   {
-    delete sfFileSystemsArray;
-    delete sfPathsArray;
+    delete[] sfFileSystemsArray;
+    delete[] sfPathsArray;
     sfSize = 0;
   }
 
@@ -90,9 +90,10 @@ namespace os
       }
 
     // If root file system defined, return it.
-    if (sfRoot != nullptr){
+    if (sfRoot != nullptr)
+      {
         return sfRoot;
-    }
+      }
 
     // Not found.
     return nullptr;
@@ -113,7 +114,7 @@ namespace os
 
   int
   PosixFileSystemsManager::mount (PosixFileSystem* fs, const char* path,
-                                  int flags)
+                                  BlockDevice* blockDevice, unsigned int flags)
   {
     assert(fs != nullptr);
     assert(path != nullptr);
@@ -126,6 +127,7 @@ namespace os
       {
         if (sfFileSystemsArray[i] == nullptr)
           {
+            fs->setBlockDevice (blockDevice);
             fs->do_mount (flags);
 
             sfFileSystemsArray[i] = fs;
@@ -142,7 +144,7 @@ namespace os
   }
 
   int
-  PosixFileSystemsManager::umount (const char* path, int flags)
+  PosixFileSystemsManager::umount (const char* path, unsigned int flags)
   {
     assert(path != nullptr);
     errno = 0;
@@ -153,6 +155,7 @@ namespace os
           {
             sfFileSystemsArray[i]->do_sync ();
             sfFileSystemsArray[i]->do_unmount (flags);
+            sfFileSystemsArray[i]->setBlockDevice (nullptr);
 
             sfFileSystemsArray[i] = nullptr;
             sfPathsArray[i] = nullptr;

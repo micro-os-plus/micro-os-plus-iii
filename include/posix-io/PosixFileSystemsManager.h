@@ -52,10 +52,10 @@ namespace os
     getRoot (void);
 
     static int
-    mount (PosixFileSystem* fs, const char* path, int flags);
+    mount (PosixFileSystem* fs, const char* path, BlockDevice* blockDevice, unsigned int flags);
 
     static int
-    umount (const char* path, int flags);
+    umount (const char* path, int unsigned flags);
 
     static std::size_t
     getSize (void);
