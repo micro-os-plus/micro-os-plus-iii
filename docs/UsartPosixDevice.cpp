@@ -3,16 +3,16 @@
 extern "C"
 {
   int
-  usart_open (const char *path, int oflag, va_list args);
+  usart_open (const char* path, int oflag, va_list args);
 
   int
   usart_close (void);
 
   ssize_t
-  usart_read (void *buf, size_t nbyte);
+  usart_read (void* buf, size_t nbyte);
 
   ssize_t
-  usart_write (const void *buf, size_t nbyte);
+  usart_write (const void* buf, size_t nbyte);
 
   int
   usart_ioctl (int request, va_list args);
@@ -30,7 +30,7 @@ UsartPosixDevice::~UsartPosixDevice ()
 }
 
 int
-UsartPosixDevice::doOpen (const char *path, int oflag, va_list args)
+UsartPosixDevice::doOpen (const char* path, int oflag, va_list args)
 {
   return usart_open (path, oflags, args);
 }
@@ -42,13 +42,13 @@ UsartPosixDevice::doClose (void)
 }
 
 ssize_t
-UsartPosixDevice::doRead (void *buf, size_t nbyte)
+UsartPosixDevice::doRead (void* buf, size_t nbyte)
 {
   return usart_read (buf, nbyte);
 }
 
 ssize_t
-UsartPosixDevice::doWrite (const void *buf, size_t nbyte)
+UsartPosixDevice::doWrite (const void* buf, size_t nbyte)
 {
   return usart_write (buf, nvyte);
 }

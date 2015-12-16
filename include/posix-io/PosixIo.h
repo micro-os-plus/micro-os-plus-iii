@@ -64,19 +64,19 @@ namespace os
     // ------------------------------------------------------------------------
 
     static PosixIo*
-    open (const char *path, int oflag, ...);
+    open (const char* path, int oflag, ...);
 
     static PosixIo*
-    vopen (const char *path, int oflag, std::va_list args);
+    vopen (const char* path, int oflag, std::va_list args);
 
     int
     close (void);
 
     ssize_t
-    read (void *buf, std::size_t nbyte);
+    read (void* buf, std::size_t nbyte);
 
     ssize_t
-    write (const void *buf, std::size_t nbyte);
+    write (const void* buf, std::size_t nbyte);
 
     int
     ioctl (int request, ...);
@@ -128,16 +128,16 @@ namespace os
      * return 0 if success or -1 & errno
      */
     virtual int
-    do_open (const char *path, int oflag, std::va_list args) = 0;
+    do_open (const char* path, int oflag, std::va_list args) = 0;
 
     virtual int
     do_close (void);
 
     virtual ssize_t
-    do_read (void *buf, std::size_t nbyte);
+    do_read (void* buf, std::size_t nbyte);
 
     virtual ssize_t
-    do_write (const void *buf, std::size_t nbyte);
+    do_write (const void* buf, std::size_t nbyte);
 
     virtual int
     do_ioctl (int request, std::va_list args);

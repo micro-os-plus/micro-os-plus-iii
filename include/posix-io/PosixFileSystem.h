@@ -60,10 +60,10 @@ namespace os
     // ------------------------------------------------------------------------
 
     PosixIo*
-    open (const char *path, int oflag, std::va_list args);
+    open (const char* path, int oflag, std::va_list args);
 
     PosixDir*
-    opendir (const char *dirpath);
+    opendir (const char* dirpath);
 
     // ------------------------------------------------------------------------
     // ----- Non-io functions -----
@@ -72,7 +72,7 @@ namespace os
     mkdir (const char* path, mode_t mode);
 
     static int
-    rmdir (const char *path);
+    rmdir (const char* path);
 
     static void
     sync (void);
@@ -87,10 +87,10 @@ namespace os
   protected:
 
     virtual PosixFile*
-    do_open (const char *path, int oflag, std::va_list args);
+    do_open (const char* path, int oflag, std::va_list args);
 
     virtual PosixDir*
-    do_opendir (const char *dirpath);
+    do_opendir (const char* dirpath);
 
     // ------------------------------------------------------------------------
 
@@ -137,7 +137,7 @@ namespace os
     do_mkdir (const char* path, mode_t mode);
 
     virtual int
-    do_rmdir (const char *path);
+    do_rmdir (const char* path);
 
     virtual void
     do_sync (void);

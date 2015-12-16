@@ -52,16 +52,16 @@ For example, for an USART driver, define:
 
 ```
 	int
-    usart_open (const char *path, int oflag, va_list args);
+    usart_open (const char* path, int oflag, va_list args);
 
     int
     usart_close (void);
 
     ssize_t
-    usart_read (void *buf, size_t nbyte);
+    usart_read (void* buf, size_t nbyte);
 
     ssize_t
-    usart_write (const void *buf, size_t nbyte);
+    usart_write (const void* buf, size_t nbyte);
 
     int
     usart_ioctl (int request, va_list args);

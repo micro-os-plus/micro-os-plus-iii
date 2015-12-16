@@ -41,7 +41,7 @@ public:
   TestPosixFile ();
 
   int
-  do_open (const char *path, int oflag, std::va_list args);
+  do_open (const char* path, int oflag, std::va_list args);
 
 private:
 
@@ -60,7 +60,7 @@ TestPosixFile::TestPosixFile ()
 #endif
 
 int
-TestPosixFile::do_open (const char *path, int oflag, std::va_list args)
+TestPosixFile::do_open (const char* path, int oflag, std::va_list args)
 {
   va_arg(args, int);
 

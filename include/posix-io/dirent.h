@@ -58,7 +58,7 @@ void
 rewinddir (DIR* dirp);
 
 int
-closedir (DIR *dirp);
+closedir (DIR* dirp);
 
 // ----------------------------------------------------------------------------
 

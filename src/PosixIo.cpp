@@ -53,7 +53,7 @@ namespace os
   // --------------------------------------------------------------------------
 
   PosixIo*
-  PosixIo::open (const char *path, int oflag, ...)
+  PosixIo::open (const char* path, int oflag, ...)
   {
     // Forward to the variadic version of the function.
     std::va_list args;
@@ -70,7 +70,7 @@ namespace os
    * new POSIX file descriptor, to be used by C functions.
    */
   PosixIo*
-  PosixIo::vopen (const char *path, int oflag, std::va_list args)
+  PosixIo::vopen (const char* path, int oflag, std::va_list args)
   {
     errno = 0;
 
@@ -167,7 +167,7 @@ namespace os
 // All these wrappers are required to clear 'errno'.
 
   ssize_t
-  PosixIo::read (void *buf, std::size_t nbyte)
+  PosixIo::read (void* buf, std::size_t nbyte)
   {
     errno = 0;
 
@@ -176,7 +176,7 @@ namespace os
   }
 
   ssize_t
-  PosixIo::write (const void *buf, std::size_t nbyte)
+  PosixIo::write (const void* buf, std::size_t nbyte)
   {
     errno = 0;
 
@@ -286,14 +286,14 @@ namespace os
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
   ssize_t
-  PosixIo::do_read (void *buf, std::size_t nbyte)
+  PosixIo::do_read (void* buf, std::size_t nbyte)
   {
     errno = ENOSYS; // Not implemented
     return -1;
   }
 
   ssize_t
-  PosixIo::do_write (const void *buf, std::size_t nbyte)
+  PosixIo::do_write (const void* buf, std::size_t nbyte)
   {
     errno = ENOSYS; // Not implemented
     return -1;

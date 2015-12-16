@@ -47,7 +47,7 @@ namespace os
   // --------------------------------------------------------------------------
 
   PosixIo*
-  PosixFileSystem::open (const char *path, int oflag, std::va_list args)
+  PosixFileSystem::open (const char* path, int oflag, std::va_list args)
   {
     if (fBlockDevice == nullptr)
       {
@@ -69,7 +69,7 @@ namespace os
   }
 
   PosixDir*
-  PosixFileSystem::opendir (const char *dirpath)
+  PosixFileSystem::opendir (const char* dirpath)
   {
     if (fBlockDevice == nullptr)
       {
@@ -94,7 +94,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
   PosixFile*
-  PosixFileSystem::do_open (const char *path, int oflag, std::va_list args)
+  PosixFileSystem::do_open (const char* path, int oflag, std::va_list args)
   {
     // TODO: implement and return the object.
     PosixFile* file = static_cast<PosixFile*> (fFilesPool->aquire ());
@@ -103,7 +103,7 @@ namespace os
   }
 
   PosixDir*
-  PosixFileSystem::do_opendir (const char *dirpath)
+  PosixFileSystem::do_opendir (const char* dirpath)
   {
     // TODO: implement and return the object.
     return nullptr;
@@ -194,7 +194,7 @@ namespace os
   }
 
   int
-  PosixFileSystem::rmdir (const char *path)
+  PosixFileSystem::rmdir (const char* path)
   {
     const char* adjusted_path = path;
     os::PosixFileSystem* fs = os::PosixFileSystemsManager::identifyFileSystem (
@@ -290,7 +290,7 @@ namespace os
   }
 
   int
-  PosixFileSystem::do_rmdir (const char *path)
+  PosixFileSystem::do_rmdir (const char* path)
   {
     errno = ENOSYS; // Not implemented
     return -1;
