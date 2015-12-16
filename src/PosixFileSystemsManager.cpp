@@ -72,11 +72,15 @@ namespace os
 
     for (std::size_t i = 0; i < sfSize; ++i)
       {
+        if (sfPathsArray[i] == nullptr)
+          {
+            continue;
+          }
+
         size_t len = std::strlen (sfPathsArray[i]);
 
         // Check if path1 starts with the mounted path.
-        if (sfPathsArray[i] != nullptr
-            && std::strncmp (sfPathsArray[i], *path1, len) == 0)
+        if (std::strncmp (sfPathsArray[i], *path1, len) == 0)
           {
             // If so, adjust paths to skip over prefix, but keep '/'.
             *path1 = (*path1 + len - 1);
@@ -102,13 +106,16 @@ namespace os
 #pragma GCC diagnostic pop
 
   int
-  PosixFileSystemsManager::setRoot (PosixFileSystem* fs, int flags)
+  PosixFileSystemsManager::setRoot (PosixFileSystem* fs,
+                                    BlockDevice* blockDevice,
+                                    unsigned int flags)
   {
     assert(fs != nullptr);
     errno = 0;
 
     sfRoot = fs;
 
+    fs->setBlockDevice (blockDevice);
     return fs->do_mount (flags);
   }
 
@@ -122,6 +129,19 @@ namespace os
     assert(path[std::strlen (path) - 1] == '/');
 
     errno = 0;
+
+    for (std::size_t i = 0; i < sfSize; ++i)
+      {
+        if (sfPathsArray[i] != nullptr)
+          {
+            if (std::strcmp (sfPathsArray[i], path) == 0)
+              {
+                // Folder already mounted.
+                errno = EBUSY;
+                return -1;
+              }
+          }
+      }
 
     for (std::size_t i = 0; i < sfSize; ++i)
       {

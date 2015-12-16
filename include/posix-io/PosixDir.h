@@ -42,7 +42,7 @@ namespace os
   {
   public:
 
-    PosixDir (PosixFileSystem* fileSystem);
+    PosixDir (void);
 
     virtual
     ~PosixDir ();

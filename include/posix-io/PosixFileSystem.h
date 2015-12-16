@@ -35,6 +35,7 @@ namespace os
   class PosixFile;
   class PosixDir;
   class BlockDevice;
+  class PosixPool;
 
   // --------------------------------------------------------------------------
 
@@ -43,13 +44,15 @@ namespace os
     // ------------------------------------------------------------------------
 
     friend class PosixFile;
+    friend class PosixDir;
     friend class PosixFileSystemsManager;
+    friend class PosixIo;
 
     // ------------------------------------------------------------------------
 
   public:
 
-    PosixFileSystem ();
+    PosixFileSystem (PosixPool* filesPool, PosixPool* dirsPool);
 
     virtual
     ~PosixFileSystem ();
@@ -75,9 +78,15 @@ namespace os
     sync (void);
 
     // ------------------------------------------------------------------------
+    // --- Support functions.
+
+    BlockDevice*
+    getBlockDevice (void);
+
+    // ------------------------------------------------------------------------
   protected:
 
-    virtual PosixIo*
+    virtual PosixFile*
     do_open (const char *path, int oflag, std::va_list args);
 
     virtual PosixDir*
@@ -142,11 +151,14 @@ namespace os
     // ------------------------------------------------------------------------
     // --- Support functions.
 
+    PosixPool*
+    getFilesPool (void);
+
+    PosixPool*
+    getDirsPool (void);
+
     void
     setBlockDevice (BlockDevice* blockDevice);
-
-    BlockDevice*
-    getBlockDevice (void);
 
   public:
 
@@ -155,8 +167,23 @@ namespace os
 
   protected:
 
+    PosixPool* fFilesPool;
+    PosixPool* fDirsPool;
+
     BlockDevice* fBlockDevice;
   };
+
+  inline PosixPool*
+  PosixFileSystem::getFilesPool (void)
+  {
+    return fFilesPool;
+  }
+
+  inline PosixPool*
+  PosixFileSystem::getDirsPool (void)
+  {
+    return fDirsPool;
+  }
 
   inline void
   PosixFileSystem::setBlockDevice (BlockDevice* blockDevice)
@@ -169,7 +196,6 @@ namespace os
   {
     return fBlockDevice;
   }
-
 
 } /* namespace os */
 

@@ -46,13 +46,14 @@ namespace os
     identifyFileSystem (const char** path1, const char** path2 = nullptr);
 
     static int
-    setRoot (PosixFileSystem* fs, int flags);
+    setRoot (PosixFileSystem* fs, BlockDevice* blockDevice, unsigned int flags);
 
     static PosixFileSystem*
     getRoot (void);
 
     static int
-    mount (PosixFileSystem* fs, const char* path, BlockDevice* blockDevice, unsigned int flags);
+    mount (PosixFileSystem* fs, const char* path, BlockDevice* blockDevice,
+           unsigned int flags);
 
     static int
     umount (const char* path, int unsigned flags);

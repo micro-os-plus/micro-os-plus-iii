@@ -18,8 +18,10 @@
 
 #include "posix-io/PosixIo.h"
 #include "posix-io/PosixFileSystem.h"
+#include "posix-io/PosixFile.h"
 #include "posix-io/PosixDir.h"
 #include "posix-io/PosixFileSystemsManager.h"
+#include "posix-io/PosixPool.h"
 #include <cerrno>
 #include <cassert>
 
@@ -30,8 +32,10 @@ namespace os
 
   // --------------------------------------------------------------------------
 
-  PosixFileSystem::PosixFileSystem ()
+  PosixFileSystem::PosixFileSystem (PosixPool* filesPool, PosixPool* dirsPool)
   {
+    fFilesPool = filesPool;
+    fDirsPool = dirsPool;
     fBlockDevice = nullptr;
   }
 
@@ -51,8 +55,17 @@ namespace os
         return nullptr;
       }
 
-    // Execute the implementation specific code.
-    return do_open (path, oflag, args);
+    // Get a PosixFile object from the pool.
+    PosixFile* file = static_cast<PosixFile*> (fFilesPool->aquire ());
+
+    // Associate the file with this file system (used, for example,
+    // to reach the pools at close).
+    file->setFileSystem (this);
+
+    // Execute the file specific implementation code.
+    file->do_open (path, oflag, args);
+
+    return file;
   }
 
   PosixDir*
@@ -64,18 +77,28 @@ namespace os
         return nullptr;
       }
 
-    // Execute the implementation specific code.
-    return do_opendir (dirpath);
+    // Get a PosixDir object from the pool.
+    PosixDir* dir = static_cast<PosixDir*> (fDirsPool->aquire ());
 
+    // Associate the dir with this file system (used, for example,
+    // to reach the pools at close).
+    dir->setFileSystem (this);
+
+    // Execute the dir specific implementation code.
+    dir->do_open (dirpath);
+
+    return dir;
   }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-  PosixIo*
+  PosixFile*
   PosixFileSystem::do_open (const char *path, int oflag, std::va_list args)
   {
     // TODO: implement and return the object.
+    PosixFile* file = static_cast<PosixFile*> (fFilesPool->aquire ());
+    file->open (path, oflag, args);
     return nullptr;
   }
 
@@ -167,7 +190,7 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    return fs->do_mkdir (path, mode);
+    return fs->do_mkdir (adjusted_path, mode);
   }
 
   int
@@ -187,7 +210,7 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    return fs->do_rmdir (path);
+    return fs->do_rmdir (adjusted_path);
   }
 
   void
