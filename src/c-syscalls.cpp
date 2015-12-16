@@ -125,7 +125,7 @@ extern "C"
   __posix_close (int fildes);
 
   int __attribute__((weak))
-  __posix_closedir (DIR *dirp);
+  __posix_closedir (DIR* dirp);
 
   int __attribute__((weak))
   __posix_execve (const char* path, char* const argv[], char* const envp[]);
@@ -142,8 +142,8 @@ extern "C"
   int __attribute__((weak))
   __posix_ftruncate (int fildes, off_t length);
 
-  pid_t __attribute__((weak))
-  __posix_fsync (void);
+  int __attribute__((weak))
+  __posix_fsync (int fildes);
 
   char*
   __attribute__((weak))
@@ -215,7 +215,7 @@ extern "C"
 
   struct dirent*
   __attribute__((weak))
-  __posix_readdir (DIR *dirp);
+  __posix_readdir (DIR* dirp);
 
   int __attribute__((weak))
   __posix_readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result);
@@ -227,10 +227,10 @@ extern "C"
   __posix_rename (const char* oldfn, const char* newfn);
 
   void __attribute__((weak))
-  __posix_rewinddir (DIR *dirp);
+  __posix_rewinddir (DIR* dirp);
 
   int __attribute__((weak))
-  __posix_rmdir (const char *path);
+  __posix_rmdir (const char* path);
 
 #if 0
   int __attribute__((weak))
@@ -297,7 +297,7 @@ extern "C"
  * the file.
  */
 int __attribute__((weak))
-__posix_open (const char *path, int oflag, ...)
+__posix_open (const char* path, int oflag, ...)
 {
   va_list args;
   va_start(args, oflag);
@@ -331,7 +331,7 @@ __posix_close (int fildes)
 // ----------------------------------------------------------------------------
 
 ssize_t __attribute__((weak))
-__posix_read (int fildes, void *buf, size_t nbyte)
+__posix_read (int fildes, void* buf, size_t nbyte)
 {
   os::PosixIo* io = os::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
@@ -343,7 +343,7 @@ __posix_read (int fildes, void *buf, size_t nbyte)
 }
 
 ssize_t __attribute__((weak))
-__posix_write (int fildes, const void *buf, size_t nbyte)
+__posix_write (int fildes, const void* buf, size_t nbyte)
 {
   os::PosixIo* io = os::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
@@ -355,7 +355,7 @@ __posix_write (int fildes, const void *buf, size_t nbyte)
 }
 
 int __attribute__((weak))
-__posix_ioctl (int fildes, unsigned long request, ...)
+__posix_ioctl (int fildes, int request, ...)
 {
   os::PosixIo* io = os::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
@@ -505,7 +505,7 @@ __posix_mkdir (const char* path, mode_t mode)
 }
 
 int __attribute__((weak))
-__posix_rmdir (const char *path)
+__posix_rmdir (const char* path)
 {
   return os::PosixFileSystem::rmdir (path);
 }
@@ -596,7 +596,7 @@ __posix_closedir (DIR* dirp)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
 int __attribute__((weak))
-__posix_execve (const char *path, char * const argv[], char * const envp[])
+__posix_execve (const char* path, char* const argv[], char* const envp[])
 {
   errno = ENOSYS; // Not implemented
   return -1;
@@ -674,7 +674,7 @@ __posix_chdir (const char* path)
 
 char*
 __attribute__((weak))
-__posix_getcwd (char *buf, size_t size)
+__posix_getcwd (char* buf, size_t size)
 {
   errno = ENOSYS; // Not implemented
   return nullptr;
