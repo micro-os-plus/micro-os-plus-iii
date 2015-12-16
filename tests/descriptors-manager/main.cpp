@@ -36,7 +36,7 @@ class TestPosixIo : public os::PosixIo
 public:
 
   virtual int
-  doOpen (const char *path, int oflag, va_list args);
+  do_open (const char *path, int oflag, va_list args);
 };
 
 #if defined ( __GNUC__ )
@@ -45,7 +45,7 @@ public:
 #endif
 
 int
-TestPosixIo::doOpen (const char *path, int oflag, va_list args)
+TestPosixIo::do_open (const char *path, int oflag, va_list args)
 {
   errno = ENOSYS;
   return -1;
@@ -75,7 +75,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
   for (std::size_t i = 0; i < sz; ++i)
     {
-      assert(os::FileDescriptorsManager::getObject (i) == nullptr);
+      assert(os::FileDescriptorsManager::getIo (i) == nullptr);
     }
 
   // Check limits
@@ -88,7 +88,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   assert(fd1 == 3);
 
   // Get it back; is it the same?
-  assert(os::FileDescriptorsManager::getObject (fd1) == &test1);
+  assert(os::FileDescriptorsManager::getIo (fd1) == &test1);
   assert(test1.getFileDescriptor () == fd1);
 
   // Reallocate opened file, must be busy
@@ -98,7 +98,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
   // Free descriptor
   assert(os::FileDescriptorsManager::free (fd1) == 0);
-  assert(os::FileDescriptorsManager::getObject (fd1) == nullptr);
+  assert(os::FileDescriptorsManager::getIo (fd1) == nullptr);
   assert(test1.getFileDescriptor () == os::noFileDescriptor);
 
   // With clean table, alloc to fill the table (size is 5)
