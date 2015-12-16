@@ -19,6 +19,7 @@
 #include "posix-io/PosixDir.h"
 #include "posix-io/PosixFileSystem.h"
 #include "posix-io/PosixFileSystemsManager.h"
+#include "posix-io/PosixPool.h"
 #include <cerrno>
 #include <cassert>
 
@@ -29,10 +30,9 @@ namespace os
 
   // --------------------------------------------------------------------------
 
-  PosixDir::PosixDir (PosixFileSystem* fileSystem) :
-      fFileSystem (fileSystem)
+  PosixDir::PosixDir (void)
   {
-    ;
+    fFileSystem = nullptr;
   }
 
   PosixDir::~PosixDir ()
@@ -91,7 +91,13 @@ namespace os
     errno = 0;
 
     // Execute the implementation specific code.
-    return do_close ();
+    int ret = do_close ();
+    PosixPool* pool = fFileSystem->getDirsPool ();
+    if (pool != nullptr)
+      {
+        pool->release (this);
+      }
+    return ret;
   }
 
   // --------------------------------------------------------------------------

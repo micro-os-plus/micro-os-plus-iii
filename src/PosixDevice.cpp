@@ -29,6 +29,7 @@ namespace os
 
   PosixDevice::PosixDevice (const char* name)
   {
+    fType = Type::DEVICE;
     fName = name;
   }
 

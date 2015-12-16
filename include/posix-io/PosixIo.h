@@ -34,9 +34,27 @@ namespace os
 {
   // --------------------------------------------------------------------------
 
+  class PosixFileSystem;
+
+  // --------------------------------------------------------------------------
+
   class PosixIo
   {
+    // ------------------------------------------------------------------------
+
+    friend class PosixFileSystem;
+
+    // ------------------------------------------------------------------------
+
   public:
+
+    using type_t = unsigned int;
+    enum class Type
+      : type_t
+        { UNKNOWN, DEVICE, FILE, SOCKET
+    };
+
+    // ------------------------------------------------------------------------
 
     PosixIo ();
 
@@ -89,6 +107,9 @@ namespace os
 
     // ------------------------------------------------------------------------
 
+    Type
+    getType (void);
+
     void
     setFileDescriptor (fileDescriptor_t fildes);
 
@@ -97,6 +118,8 @@ namespace os
 
     fileDescriptor_t
     getFileDescriptor (void) const;
+
+  protected:
 
     // ------------------------------------------------------------------------
     // Implementations
@@ -141,10 +164,17 @@ namespace os
 
   protected:
 
+    Type fType;
     fileDescriptor_t fFileDescriptor;
   };
 
   // --------------------------------------------------------------------------
+
+  inline PosixIo::Type
+  PosixIo::getType (void)
+  {
+    return fType;
+  }
 
   inline void
   PosixIo::setFileDescriptor (fileDescriptor_t fildes)

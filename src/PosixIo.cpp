@@ -20,8 +20,10 @@
 #include "posix-io/PosixIo.h"
 #include "posix-io/PosixDevice.h"
 #include "posix-io/PosixDevicesRegistry.h"
+#include "posix-io/PosixFile.h"
 #include "posix-io/PosixFileSystem.h"
 #include "posix-io/PosixFileSystemsManager.h"
+#include "posix-io/PosixPool.h"
 #include <cassert>
 #include <cerrno>
 #include <cstdarg>
@@ -39,12 +41,13 @@ namespace os
 
   PosixIo::PosixIo ()
   {
-    this->fFileDescriptor = noFileDescriptor;
+    fType = Type::UNKNOWN;
+    fFileDescriptor = noFileDescriptor;
   }
 
   PosixIo::~PosixIo ()
   {
-    this->fFileDescriptor = noFileDescriptor;
+    fFileDescriptor = noFileDescriptor;
   }
 
   // --------------------------------------------------------------------------
@@ -92,8 +95,8 @@ namespace os
     else
       {
         const char* adjusted_path = path;
-        os::PosixFileSystem* fs = os::PosixFileSystemsManager::identifyFileSystem (
-            &adjusted_path);
+        os::PosixFileSystem* fs =
+            os::PosixFileSystemsManager::identifyFileSystem (&adjusted_path);
 
         // The manager will return null if there are no file systems
         // registered, no need to check this condition separately.
@@ -142,6 +145,20 @@ namespace os
     FileDescriptorsManager::free (fFileDescriptor);
     fFileDescriptor = noFileDescriptor;
 
+    if (getType () == Type::FILE)
+      {
+        // Files is free, return it to the pool.
+        PosixFile* file = static_cast<PosixFile*> (this);
+        PosixFileSystem* fs = file->getFileSystem ();
+        if (fs != nullptr)
+          {
+            PosixPool* pool = fs->getFilesPool ();
+            if (pool != nullptr)
+              {
+                pool->release (file);
+              }
+          }
+      }
     return ret;
   }
 

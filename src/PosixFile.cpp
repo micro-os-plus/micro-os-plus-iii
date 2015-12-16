@@ -30,6 +30,7 @@ namespace os
 
   PosixFile::PosixFile ()
   {
+    fType = Type::FILE;
     fFileSystem = nullptr;
   }
 
