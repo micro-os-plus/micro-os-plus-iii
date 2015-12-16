@@ -35,69 +35,6 @@
 
 // -----------------------------------------------------------------------------
 
-// Test class, all methods return ENOSYS, as not implemented, except open().
-
-class TestFile : public os::PosixFile
-{
-public:
-
-  TestFile ();
-
-  int
-  do_open (const char* path, int oflag, std::va_list args);
-
-  int
-  getMode (void);
-
-  const char*
-  getPath (void);
-
-private:
-
-  uint32_t fSomething;
-  const char* fPath;
-  int fMode;
-
-};
-
-TestFile::TestFile ()
-{
-  fPath = nullptr;
-  fMode = -1;
-  fSomething = 1;
-}
-
-int
-TestFile::getMode (void)
-{
-  return fMode;
-}
-
-const char*
-TestFile::getPath (void)
-{
-  return fPath;
-}
-
-#if defined ( __GNUC__ )
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
-
-int
-TestFile::do_open (const char *path, int oflag, std::va_list args)
-{
-  va_arg(args, int);
-
-  return 0;
-}
-
-#if defined ( __GNUC__ )
-#pragma GCC diagnostic pop
-#endif
-
-// -----------------------------------------------------------------------------
-
 enum class Cmds
   : unsigned int
     { UNKNOWN,
@@ -111,7 +48,225 @@ enum class Cmds
   UTIME,
   MKDIR,
   RMDIR,
+  OPEN,
+  CLOSE,
+  READ,
+  WRITE,
+  IOCTL,
+  LSEEK,
+  ISATTY,
+  FCNTL,
+  FSTAT,
+  FTRUNCATE,
+  FSYNC
 };
+
+// Test class, all methods return ENOSYS, as not implemented, except open().
+
+class TestFile : public os::PosixFile
+{
+public:
+
+  TestFile ();
+
+  Cmds
+  getCmd (void);
+
+  int
+  getMode (void);
+
+  const char*
+  getPath (void);
+
+  unsigned int
+  getNumber (void);
+
+  void*
+  getPtr (void);
+
+protected:
+
+  int
+  do_open (const char* path, int oflag, std::va_list args);
+
+  virtual int
+  do_close (void);
+
+  virtual ssize_t
+  do_read (void* buf, std::size_t nbyte);
+
+  virtual ssize_t
+  do_write (const void* buf, std::size_t nbyte);
+
+  virtual int
+  do_ioctl (int request, std::va_list args);
+
+  virtual off_t
+  do_lseek (off_t offset, int whence);
+
+  virtual int
+  do_isatty (void);
+
+  virtual int
+  do_fcntl (int cmd, va_list args);
+
+  virtual int
+  do_fstat (struct stat* buf);
+
+  virtual int
+  do_ftruncate (off_t length);
+
+  virtual int
+  do_fsync (void);
+
+private:
+
+  uint32_t fSomething;
+  const char* fPath;
+  int fMode;
+  unsigned int fNumber;
+  void* fPtr;
+  Cmds fCmd;
+
+};
+
+TestFile::TestFile ()
+{
+  fCmd = Cmds::NOTSET;
+  fPath = nullptr;
+  fMode = -1;
+  fSomething = 1;
+  fNumber = 1;
+  fPtr = nullptr;
+}
+
+inline Cmds
+TestFile::getCmd (void)
+{
+  return fCmd;
+}
+
+inline unsigned int
+TestFile::getNumber (void)
+{
+  return fNumber;
+}
+
+inline int
+TestFile::getMode (void)
+{
+  return fMode;
+}
+
+inline const char*
+TestFile::getPath (void)
+{
+  return fPath;
+}
+
+inline void*
+TestFile::getPtr (void)
+{
+  return fPtr;
+}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+int
+TestFile::do_open (const char* path, int oflag, std::va_list args)
+{
+  fPath = path;
+
+  fNumber = oflag;
+
+  fMode = va_arg(args, int);
+  return 0;
+}
+
+int
+TestFile::do_close (void)
+{
+  fCmd = Cmds::CLOSE;
+  return 0; // Always return success
+}
+
+ssize_t
+TestFile::do_read (void *buf, std::size_t nbyte)
+{
+  fCmd = Cmds::READ;
+  fPtr = buf;
+  fNumber = nbyte;
+  return 0;
+}
+
+ssize_t
+TestFile::do_write (const void* buf, std::size_t nbyte)
+{
+  fCmd = Cmds::WRITE;
+  fPtr = (void*) buf;
+  fNumber = nbyte;
+  return 0;
+}
+
+int
+TestFile::do_ioctl (int request, std::va_list args)
+{
+  fCmd = Cmds::IOCTL;
+  fNumber = request;
+  fMode = va_arg(args, int);
+  return 0;
+}
+
+off_t
+TestFile::do_lseek (off_t offset, int whence)
+{
+  fCmd = Cmds::LSEEK;
+  fNumber = offset;
+  fMode = whence;
+  return 0;
+}
+
+int
+TestFile::do_isatty (void)
+{
+  fCmd = Cmds::ISATTY;
+  return 0;
+}
+
+int
+TestFile::do_fcntl (int cmd, std::va_list args)
+{
+  fCmd = Cmds::FCNTL;
+  fNumber = cmd;
+  fMode = va_arg(args, int);
+  return 0;
+}
+
+int
+TestFile::do_fstat (struct stat* buf)
+{
+  fCmd = Cmds::FSTAT;
+  fPtr = buf;
+  return 0;
+}
+
+int
+TestFile::do_ftruncate (off_t length)
+{
+  fCmd = Cmds::FTRUNCATE;
+  fNumber = length;
+  return 0;
+}
+
+int
+TestFile::do_fsync (void)
+{
+  fCmd = Cmds::FSYNC;
+  return 0;
+}
+
+// -----------------------------------------------------------------------------
 
 class TestFileSystem : public os::PosixFileSystem
 {
@@ -150,7 +305,7 @@ public:
   do_mkdir (const char* path, mode_t mode);
 
   virtual int
-  do_rmdir (const char *path);
+  do_rmdir (const char* path);
 
   // -----
 
@@ -315,7 +470,7 @@ TestFileSystem::do_mkdir (const char* path, mode_t mode)
 }
 
 int
-TestFileSystem::do_rmdir (const char *path)
+TestFileSystem::do_rmdir (const char* path)
 {
   fCmd = Cmds::RMDIR;
   fPath = path;
@@ -382,10 +537,45 @@ extern "C"
   __posix_mkdir (const char* path, mode_t mode);
 
   int
-  __posix_rmdir (const char *path);
+  __posix_rmdir (const char* path);
 
   void
   __posix_sync (void);
+
+  // -----
+
+  int
+  __posix_open (const char* path, int oflag, ...);
+
+  int
+  __posix_close (int fildes);
+
+  ssize_t
+  __posix_read (int fildes, void* buf, size_t nbyte);
+
+  ssize_t
+  __posix_write (int fildes, const void* buf, size_t nbyte);
+
+  int
+  __posix_ioctl (int fildes, int request, ...);
+
+  off_t
+  __posix_lseek (int fildes, off_t offset, int whence);
+
+  int
+  __posix_isatty (int fildes);
+
+  int
+  __posix_fcntl (int fildes, int cmd, ...);
+
+  int
+  __posix_fstat (int fildes, struct stat* buf);
+
+  int
+  __posix_ftruncate (int fildes, off_t length);
+
+  int
+  __posix_fsync (int fildes);
 
 }
 
@@ -574,6 +764,107 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert(babu.getCmd () == Cmds::RMDIR);
       assert(babu.getSyncCount () == cnt + 1);
 
+    }
+
+    {
+      // Test OPEN
+      errno = -2;
+      int fd = __posix_open ("/babu/f1", 123, 234);
+      assert((fd >= 0) && (errno == 0));
+
+      os::PosixIo* io = os::FileDescriptorsManager::getIo (fd);
+      assert(io != nullptr);
+
+      assert(io->getType () == os::PosixIo::Type::FILE);
+
+      TestFile* file = static_cast<TestFile*> (io);
+      // Must be the first used slot in the pool.
+      assert(filesPool.getObject (0) == file);
+      assert(filesPool.getFlag (0) == true);
+
+      // Check params passing.
+      assert(std::strcmp ("/f1", file->getPath ()) == 0);
+      assert(file->getNumber () == 123);
+      assert(file->getMode () == 234);
+
+      int ret;
+
+      // Test READ
+      errno = -2;
+      char buf[3];
+      ret = __posix_read (fd, (void*) buf, 321);
+      assert((ret == 0) && (errno == 0));
+      assert(file->getCmd () == Cmds::READ);
+      assert(file->getPtr () == buf);
+      assert(file->getNumber () == 321);
+
+      // Test WRITE
+      errno = -2;
+      ret = __posix_write (fd, (const void*) buf, 432);
+      assert((ret == 0) && (errno == 0));
+      assert(file->getCmd () == Cmds::WRITE);
+      assert(file->getPtr () == buf);
+      assert(file->getNumber () == 432);
+
+      // Test IOCTL
+      errno = -2;
+      ret = __posix_ioctl (fd, 222, 876);
+      assert((ret == 0) && (errno == 0));
+      assert(file->getCmd () == Cmds::IOCTL);
+      assert(file->getNumber () == 222);
+      assert(file->getMode () == 876);
+
+      // Test LSEEK
+      errno = -2;
+      ret = __posix_lseek (fd, 333, 555);
+      assert((ret == 0) && (errno == 0));
+      assert(file->getCmd () == Cmds::LSEEK);
+      assert(file->getNumber () == 333);
+      assert(file->getMode () == 555);
+
+      // Test ISATTY
+      errno = -2;
+      ret = __posix_isatty (fd);
+      assert((ret == 0) && (errno == 0));
+      assert(file->getCmd () == Cmds::ISATTY);
+
+      // Test FCNTL
+      errno = -2;
+      ret = __posix_fcntl (fd, 444, 987);
+      assert((ret == 0) && (errno == 0));
+      assert(file->getCmd () == Cmds::FCNTL);
+      assert(file->getNumber () == 444);
+      assert(file->getMode () == 987);
+
+      // Test FSTAT
+      errno = -2;
+      struct stat stat_buf;
+      ret = __posix_fstat (fd, &stat_buf);
+      assert((ret == 0) && (errno == 0));
+      assert(file->getCmd () == Cmds::FSTAT);
+      assert(file->getPtr () == &stat_buf);
+
+      // Test FTRUNCATE
+      errno = -2;
+      ret = __posix_ftruncate (fd, 999);
+      assert((ret == 0) && (errno == 0));
+      assert(file->getCmd () == Cmds::FTRUNCATE);
+      assert(file->getNumber () == 999);
+
+      // Test FSYNC
+      errno = -2;
+      ret = __posix_fsync (fd);
+      assert((ret == 0) && (errno == 0));
+      assert(file->getCmd () == Cmds::FSYNC);
+
+      // Test CLOSE
+      errno = -2;
+      ret = __posix_close (fd);
+      assert((ret == 0) && (errno == 0));
+      assert(file->getCmd () == Cmds::CLOSE);
+
+      // Must no longer be in the pool
+      assert(filesPool.getFlag (0) == false);
     }
 
   const char* msg = "'test-file-debug' succeeded.\n";
