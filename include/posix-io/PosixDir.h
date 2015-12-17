@@ -40,6 +40,8 @@ namespace os
 
   class PosixDir
   {
+    friend class PosixFileSystem;
+
   public:
 
     PosixDir (void);
@@ -61,7 +63,17 @@ namespace os
     int
     close (void);
 
+    struct dirent*
+    getDirEntry (void);
+
+    const char*
+    getName (void);
+
+    PosixFileSystem*
+    getFileSystem (void);
+
     // ------------------------------------------------------------------------
+  protected:
 
     /**
      * @return object if successful, otherwise nullptr and errno.
@@ -83,9 +95,6 @@ namespace os
     void
     setFileSystem (PosixFileSystem* fileSystem);
 
-    PosixFileSystem*
-    getFileSystem (void);
-
   protected:
 
     PosixFileSystem* fFileSystem;
@@ -106,6 +115,18 @@ namespace os
   PosixDir::getFileSystem (void)
   {
     return fFileSystem;
+  }
+
+  inline struct dirent*
+  PosixDir::getDirEntry (void)
+  {
+    return &fDirEntry;
+  }
+
+  inline const char*
+  PosixDir::getName (void)
+  {
+    return &fDirEntry.d_name[0];
   }
 
 } /* namespace os */

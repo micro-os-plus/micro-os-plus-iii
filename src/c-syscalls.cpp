@@ -520,19 +520,10 @@ __posix_sync (void)
 // ----- Directories functions -----
 
 DIR*
-__attribute__((weak))
+//__attribute__((weak))
 __posix_opendir (const char* dirpath)
 {
-  const char* adjusted_dirpath = dirpath;
-  os::PosixFileSystem* fs = os::PosixFileSystemsManager::identifyFileSystem (
-      &adjusted_dirpath);
-
-  if (fs == nullptr)
-    {
-      errno = ENOENT;
-      return nullptr;
-    }
-  return (DIR*) fs->opendir (adjusted_dirpath);
+  return (DIR*) os::PosixDir::open (dirpath);
 }
 
 struct dirent*
