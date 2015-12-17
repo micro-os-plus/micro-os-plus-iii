@@ -58,11 +58,14 @@
 //#include <utime.h>
 #endif
 
+#define __posix_accept accept
+#define __posix_bind bind
 #define __posix_chdir chdir
 #define __posix_chmod chmod
 #define __posix_chown chown
 #define __posix_close close
 #define __posix_closedir closedir
+#define __posix_connect connect
 #define __posix_execve execve
 #define __posix_fcntl fcntl
 #define __posix_fork fork
@@ -70,12 +73,16 @@
 #define __posix_ftruncate ftruncate
 #define __posix_fsync fsync
 #define __posix_getcwd getcwd
+#define __posix_getpeername getpeername
 #define __posix_getpid getpid
+#define __posix_getsockname getsockname
+#define __posix_getsockopt getsockopt
 #define __posix_gettimeofday gettimeofday
 #define __posix_ioctl ioctl
 #define __posix_isatty isatty
 #define __posix_kill kill
 #define __posix_link link
+#define __posix_listen listen
 #define __posix_lseek lseek
 #define __posix_mkdir mkdir
 #define __posix_open open
@@ -85,10 +92,21 @@
 #define __posix_readdir readdir
 //#define __posix_readdir_r readdir_r
 #define __posix_readlink readlink
+#define __posix_recv recv
+#define __posix_recvfrom recvfrom
+#define __posix_recvmsg recvmsg
 #define __posix_rename rename
 #define __posix_rewinddir rewinddir
 #define __posix_rmdir rmdir
 //#define __posix_select select
+#define __posix_send send
+#define __posix_sendmsg sendmsg
+#define __posix_sendto sendto
+#define __posix_setsockopt setsockopt
+#define __posix_shutdown shutdown
+#define __posix_sockatmark sockatmark
+#define __posix_socket socket
+#define __posix_socketpair socketpair
 #define __posix_stat stat
 #define __posix_symlink symlink
 #define __posix_sync sync
@@ -98,6 +116,7 @@
 #define __posix_utime utime
 #define __posix_wait wait
 #define __posix_write write
+#define __posix_writev writev
 
 #else
 
@@ -105,12 +124,23 @@
 // with prefixed names, to avoid clashes with system functions.
 
 #include <dirent.h>
+#include <sys/socket.h>
 
 extern "C"
 {
 
   // The standard POSIX IO functions. Prototypes are from:
   // http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html
+
+  // The socket definitions are from:
+  // http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_socket.h.html
+
+  int __attribute__((weak))
+  __posix_accept (int socket, struct sockaddr* address, socklen_t* address_len);
+
+  int __attribute__((weak))
+  __posix_bind (int socket, const struct sockaddr* address,
+                socklen_t address_len);
 
   int __attribute__((weak))
   __posix_chdir (const char* path);
@@ -126,6 +156,10 @@ extern "C"
 
   int __attribute__((weak))
   __posix_closedir (DIR* dirp);
+
+  int __attribute__((weak))
+  __posix_connect (int socket, const struct sockaddr* address,
+                   socklen_t address_len);
 
   int __attribute__((weak))
   __posix_execve (const char* path, char* const argv[], char* const envp[]);
@@ -147,10 +181,22 @@ extern "C"
 
   char*
   __attribute__((weak))
-  __posix_getcwd (char *buf, size_t size);
+  __posix_getcwd (char* buf, size_t size);
+
+  int __attribute__((weak))
+  __posix_getpeername (int socket, struct sockaddr* address,
+                       socklen_t* address_len);
 
   pid_t __attribute__((weak))
   __posix_getpid (void);
+
+  int __attribute__((weak))
+  __posix_getsockname (int socket, struct sockaddr* address,
+                       socklen_t* address_len);
+
+  int __attribute__((weak))
+  __posix_getsockopt (int socket, int level, int option_name,
+                      void* option_value, socklen_t* option_len);
 
   int __attribute__((weak))
   __posix_gettimeofday (struct timeval* ptimeval, void* ptimezone);
@@ -178,6 +224,9 @@ extern "C"
 
   int __attribute__((weak))
   __posix_link (const char* existing, const char* _new);
+
+  int __attribute__((weak))
+  __posix_listen (int socket, int backlog);
 
   off_t __attribute__((weak))
   __posix_lseek (int fildes, off_t offset, int whence);
@@ -217,11 +266,23 @@ extern "C"
   __attribute__((weak))
   __posix_readdir (DIR* dirp);
 
+#if 0
   int __attribute__((weak))
   __posix_readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result);
+#endif
 
   ssize_t __attribute__((weak))
   __posix_readlink (const char* path, char* buf, size_t bufsize);
+
+  ssize_t __attribute__((weak))
+  __posix_recv (int socket, void* buffer, size_t length, int flags);
+
+  ssize_t __attribute__((weak))
+  __posix_recvfrom (int socket, void* buffer, size_t length, int flags,
+                    struct sockaddr* address, socklen_t* address_len);
+
+  ssize_t __attribute__((weak))
+  __posix_recvmsg (int socket, struct msghdr* message, int flags);
 
   int __attribute__((weak))
   __posix_rename (const char* oldfn, const char* newfn);
@@ -237,6 +298,32 @@ extern "C"
   __posix_select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
       struct timeval* timeout);
 #endif
+
+  ssize_t __attribute__((weak))
+  __posix_send (int socket, const void* buffer, size_t length, int flags);
+
+  ssize_t __attribute__((weak))
+  __posix_sendmsg (int socket, const struct msghdr* message, int flags);
+
+  ssize_t __attribute__((weak))
+  __posix_sendto (int socket, const void* message, size_t length, int flags,
+                  const struct sockaddr* dest_addr, socklen_t dest_len);
+
+  int __attribute__((weak))
+  __posix_setsockopt (int socket, int level, int option_name,
+                      const void* option_value, socklen_t option_len);
+
+  int __attribute__((weak))
+  __posix_shutdown (int socket, int how);
+
+  int __attribute__((weak))
+  __posix_sockatmark (int s);
+
+  int __attribute__((weak))
+  __posix_socket (int domain, int type, int protocol);
+
+  int __attribute__((weak))
+  __posix_socketpair (int domain, int type, int protocol, int socket_vector[2]);
 
   int __attribute__((weak))
   __posix_stat (const char* path, struct stat* buf);
@@ -265,6 +352,8 @@ extern "C"
   ssize_t __attribute__((weak))
   __posix_write (int fildes, const void* buf, size_t nbyte);
 
+  ssize_t __attribute__((weak))
+  __posix_writev (int fildes, const struct iovec* iov, int iovcnt);
 }
 
 #endif
@@ -352,6 +441,18 @@ __posix_write (int fildes, const void* buf, size_t nbyte)
       return -1;
     }
   return io->write (buf, nbyte);
+}
+
+ssize_t __attribute__((weak))
+__posix_writev (int fildes, const struct iovec* iov, int iovcnt)
+{
+  os::PosixIo* io = os::FileDescriptorsManager::getIo (fildes);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->writev (iov, iovcnt);
 }
 
 int __attribute__((weak))
@@ -571,6 +672,147 @@ __posix_closedir (DIR* dirp)
     }
   return dir->close ();
 }
+
+// ----------------------------------------------------------------------------
+// Socket functions
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+int __attribute__((weak))
+__posix_accept (int socket, struct sockaddr* address, socklen_t* address_len)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int __attribute__((weak))
+__posix_bind (int socket, const struct sockaddr* address, socklen_t address_len)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int __attribute__((weak))
+__posix_connect (int socket, const struct sockaddr* address,
+                 socklen_t address_len)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int __attribute__((weak))
+__posix_getpeername (int socket, struct sockaddr* address,
+                     socklen_t* address_len)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int __attribute__((weak))
+__posix_getsockname (int socket, struct sockaddr* address,
+                     socklen_t* address_len)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int __attribute__((weak))
+__posix_getsockopt (int socket, int level, int option_name, void* option_value,
+                    socklen_t* option_len)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int __attribute__((weak))
+__posix_listen (int socket, int backlog)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+ssize_t __attribute__((weak))
+__posix_recv (int socket, void* buffer, size_t length, int flags)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+ssize_t __attribute__((weak))
+__posix_recvfrom (int socket, void* buffer, size_t length, int flags,
+                  struct sockaddr* address, socklen_t* address_len)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+ssize_t __attribute__((weak))
+__posix_recvmsg (int socket, struct msghdr* message, int flags)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+ssize_t __attribute__((weak))
+__posix_send (int socket, const void* buffer, size_t length, int flags)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+ssize_t __attribute__((weak))
+__posix_sendmsg (int socket, const struct msghdr* message, int flags)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+ssize_t __attribute__((weak))
+__posix_sendto (int socket, const void* message, size_t length, int flags,
+                const struct sockaddr* dest_addr, socklen_t dest_len)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int __attribute__((weak))
+__posix_setsockopt (int socket, int level, int option_name,
+                    const void* option_value, socklen_t option_len)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int __attribute__((weak))
+__posix_shutdown (int socket, int how)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int __attribute__((weak))
+__posix_sockatmark (int s)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int __attribute__((weak))
+__posix_socket (int domain, int type, int protocol)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int __attribute__((weak))
+__posix_socketpair (int domain, int type, int protocol, int socket_vector[2])
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+#pragma GCC diagnostic pop
 
 // ----------------------------------------------------------------------------
 
