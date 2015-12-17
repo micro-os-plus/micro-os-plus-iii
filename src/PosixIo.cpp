@@ -184,6 +184,15 @@ namespace os
     return do_write (buf, nbyte);
   }
 
+  ssize_t
+  PosixIo::writev (const struct iovec* iov, int iovcnt)
+  {
+    errno = 0;
+
+    // Execute the implementation specific code.
+    return do_writev (iov, iovcnt);
+  }
+
   int
   PosixIo::ioctl (int request, ...)
   {
@@ -294,6 +303,13 @@ namespace os
 
   ssize_t
   PosixIo::do_write (const void* buf, std::size_t nbyte)
+  {
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
+
+  ssize_t
+  PosixIo::do_writev (const struct iovec* iov, int iovcnt)
   {
     errno = ENOSYS; // Not implemented
     return -1;

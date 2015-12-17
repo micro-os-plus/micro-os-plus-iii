@@ -27,6 +27,7 @@
 // Needed for ssize_t
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/uio.h>
 
 // ----------------------------------------------------------------------------
 
@@ -77,6 +78,9 @@ namespace os
 
     ssize_t
     write (const void* buf, std::size_t nbyte);
+
+    ssize_t
+    writev (const struct iovec* iov, int iovcnt);
 
     int
     ioctl (int request, ...);
@@ -138,6 +142,9 @@ namespace os
 
     virtual ssize_t
     do_write (const void* buf, std::size_t nbyte);
+
+    ssize_t
+    do_writev (const struct iovec* iov, int iovcnt);
 
     virtual int
     do_ioctl (int request, std::va_list args);
