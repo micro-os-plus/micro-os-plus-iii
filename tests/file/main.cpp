@@ -33,7 +33,7 @@
 #endif
 #include "utime.h"
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 enum class Cmds
   : unsigned int
@@ -61,7 +61,8 @@ enum class Cmds
   FSYNC
 };
 
-// Test class, all methods return ENOSYS, as not implemented, except open().
+// Test class, all methods store the input in local variables,
+// to be checked later.
 
 class TestFile : public os::PosixFile
 {
@@ -69,6 +70,7 @@ public:
 
   TestFile ();
 
+  // Methods used for test purposes only.
   Cmds
   getCmd (void);
 
@@ -86,38 +88,40 @@ public:
 
 protected:
 
-  int
-  do_open (const char* path, int oflag, std::va_list args);
+  // Implementations.
 
   virtual int
-  do_close (void);
-
-  virtual ssize_t
-  do_read (void* buf, std::size_t nbyte);
-
-  virtual ssize_t
-  do_write (const void* buf, std::size_t nbyte);
+  do_open (const char* path, int oflag, std::va_list args) override;
 
   virtual int
-  do_ioctl (int request, std::va_list args);
+  do_close (void) override;
+
+  virtual ssize_t
+  do_read (void* buf, std::size_t nbyte) override;
+
+  virtual ssize_t
+  do_write (const void* buf, std::size_t nbyte) override;
+
+  virtual int
+  do_ioctl (int request, std::va_list args) override;
 
   virtual off_t
-  do_lseek (off_t offset, int whence);
+  do_lseek (off_t offset, int whence) override;
 
   virtual int
-  do_isatty (void);
+  do_isatty (void) override;
 
   virtual int
-  do_fcntl (int cmd, va_list args);
+  do_fcntl (int cmd, va_list args) override;
 
   virtual int
-  do_fstat (struct stat* buf);
+  do_fstat (struct stat* buf) override;
 
   virtual int
-  do_ftruncate (off_t length);
+  do_ftruncate (off_t length) override;
 
   virtual int
-  do_fsync (void);
+  do_fsync (void) override;
 
 private:
 
@@ -169,9 +173,6 @@ TestFile::getPtr (void)
 {
   return fPtr;
 }
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 
 int
 TestFile::do_open (const char* path, int oflag, std::va_list args)
@@ -266,7 +267,7 @@ TestFile::do_fsync (void)
   return 0;
 }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 class TestFileSystem : public os::PosixFileSystem
 {
@@ -274,41 +275,7 @@ public:
 
   TestFileSystem (os::PosixPool* filesPool, os::PosixPool* dirsPool);
 
-  virtual int
-  do_mount (unsigned int flags);
-
-  virtual int
-  do_unmount (unsigned int flags);
-
-  virtual void
-  do_sync (void);
-
-  virtual int
-  do_chmod (const char* path, mode_t mode);
-
-  virtual int
-  do_stat (const char* path, struct stat* buf);
-
-  virtual int
-  do_truncate (const char* path, off_t length);
-
-  virtual int
-  do_rename (const char* existing, const char* _new);
-
-  virtual int
-  do_unlink (const char* path);
-
-  virtual int
-  do_utime (const char* path, const struct utimbuf* times);
-
-  virtual int
-  do_mkdir (const char* path, mode_t mode);
-
-  virtual int
-  do_rmdir (const char* path);
-
-  // -----
-
+  // Methods used for test purposes only.
   unsigned int
   getFlags (void);
 
@@ -326,6 +293,43 @@ public:
 
   void*
   getPtr (void);
+
+protected:
+
+  // Implementations.
+
+  virtual int
+  do_mount (unsigned int flags) override;
+
+  virtual int
+  do_unmount (unsigned int flags) override;
+
+  virtual void
+  do_sync (void) override;
+
+  virtual int
+  do_chmod (const char* path, mode_t mode) override;
+
+  virtual int
+  do_stat (const char* path, struct stat* buf) override;
+
+  virtual int
+  do_truncate (const char* path, off_t length) override;
+
+  virtual int
+  do_rename (const char* existing, const char* _new) override;
+
+  virtual int
+  do_unlink (const char* path) override;
+
+  virtual int
+  do_utime (const char* path, const struct utimbuf* times) override;
+
+  virtual int
+  do_mkdir (const char* path, mode_t mode) override;
+
+  virtual int
+  do_rmdir (const char* path) override;
 
 private:
 
@@ -347,28 +351,6 @@ TestFileSystem::TestFileSystem (os::PosixPool* filesPool,
   fPath = nullptr;
   fNumber = 0;
   fPtr = nullptr;
-}
-
-int
-TestFileSystem::do_mount (unsigned int flags)
-{
-  fMountFlags = flags;
-
-  return 0;
-}
-
-int
-TestFileSystem::do_unmount (unsigned int flags)
-{
-  fMountFlags = flags;
-
-  return 0;
-}
-
-void
-TestFileSystem::do_sync (void)
-{
-  fSyncCount++;
 }
 
 inline unsigned int
@@ -405,6 +387,31 @@ inline void*
 TestFileSystem::getPtr (void)
 {
   return fPtr;
+}
+
+
+// ----------------------------------------------------------------------------
+
+int
+TestFileSystem::do_mount (unsigned int flags)
+{
+  fMountFlags = flags;
+
+  return 0;
+}
+
+int
+TestFileSystem::do_unmount (unsigned int flags)
+{
+  fMountFlags = flags;
+
+  return 0;
+}
+
+void
+TestFileSystem::do_sync (void)
+{
+  fSyncCount++;
 }
 
 int
@@ -477,39 +484,44 @@ TestFileSystem::do_rmdir (const char* path)
   return 0;
 }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
+// Required only as a reference, no functionality needed.
 class TestBlockDevice : public os::BlockDevice
 {
 public:
   TestBlockDevice () = default;
 };
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 using TestFilePool = os::TPosixPool<TestFile>;
 
 constexpr std::size_t FILES_POOL_ARRAY_SIZE = 2;
 
+// Pool of File objects, used in common by all filesystems.
 TestFilePool filesPool
   { FILES_POOL_ARRAY_SIZE };
 
+// File systems, all using the same pool.
+TestFileSystem root (&filesPool, nullptr);
+TestFileSystem babu (&filesPool, nullptr);
+TestFileSystem babu2 (&filesPool, nullptr);
+
+// Static manager
+os::FileDescriptorsManager dm
+  { 5 };
+
+// Static manager
+os::PosixFileSystemsManager fsm
+  { 2 };
+
+// Block devices, just referenced, no calls forwarded to them.
 TestBlockDevice rootDevice;
 TestBlockDevice babuDevice;
 TestBlockDevice babuDevice2;
 
-TestFileSystem root (&filesPool, nullptr);
-
-TestFileSystem babu (&filesPool, nullptr);
-TestFileSystem babu2 (&filesPool, nullptr);
-
-os::FileDescriptorsManager dm
-  { 5 };
-
-os::PosixFileSystemsManager fsm
-  { 2 };
-
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 extern "C"
 {
@@ -579,7 +591,7 @@ extern "C"
 
 }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 int
 main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
@@ -878,5 +890,5 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   return 0;
 }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
