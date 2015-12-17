@@ -27,7 +27,7 @@
 #include "diag/Trace.h"
 #endif
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 // Mock class, all methods return ENOSYS, as not implemented.
 
@@ -55,7 +55,7 @@ TestPosixIo::do_open (const char *path, int oflag, va_list args)
 #pragma GCC diagnostic pop
 #endif
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 os::FileDescriptorsManager descriptorsManager
   { 5 };
@@ -64,7 +64,7 @@ TestPosixIo test1;
 TestPosixIo test2;
 TestPosixIo test3;
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 int
 main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
@@ -134,5 +134,5 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   return 0;
 }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 

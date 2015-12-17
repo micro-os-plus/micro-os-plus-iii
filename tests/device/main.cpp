@@ -28,7 +28,7 @@
 #include "diag/Trace.h"
 #endif
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 // Test class, all methods return ENOSYS, as not implemented, except open().
 
@@ -86,7 +86,7 @@ TestPosixDevice::do_open (const char* path, int oflag, va_list args)
 #define __posix_open open
 #endif
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 #define DESCRIPTORS_ARRAY_SIZE (5)
 os::FileDescriptorsManager descriptorsManager
@@ -100,7 +100,7 @@ os::PosixDevicesRegistry devicesRegistry
 TestPosixDevice test
   { "test", 1 };
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 extern "C"
 {
@@ -111,7 +111,7 @@ extern "C"
   __posix_close (int fildes);
 }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 int
 main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
@@ -185,5 +185,5 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   return 0;
 }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 

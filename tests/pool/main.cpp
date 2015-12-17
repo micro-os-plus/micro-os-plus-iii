@@ -30,7 +30,7 @@
 #include "diag/Trace.h"
 #endif
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 // Test class, all methods return ENOSYS, as not implemented, except open().
 
@@ -71,7 +71,7 @@ TestPosixFile::do_open (const char* path, int oflag, std::va_list args)
 #pragma GCC diagnostic pop
 #endif
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 using TestFilePool = os::TPosixPool<TestPosixFile>;
 
@@ -80,7 +80,7 @@ constexpr std::size_t POOL_ARRAY_SIZE = 2;
 TestFilePool pool
   { POOL_ARRAY_SIZE };
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 int
 main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
@@ -125,5 +125,5 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   return 0;
 }
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
