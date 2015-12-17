@@ -98,7 +98,7 @@
 #define __posix_rename rename
 #define __posix_rewinddir rewinddir
 #define __posix_rmdir rmdir
-//#define __posix_select select
+#define __posix_select select
 #define __posix_send send
 #define __posix_sendmsg sendmsg
 #define __posix_sendto sendto
@@ -293,11 +293,9 @@ extern "C"
   int __attribute__((weak))
   __posix_rmdir (const char* path);
 
-#if 0
   int __attribute__((weak))
   __posix_select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
-      struct timeval* timeout);
-#endif
+                  struct timeval* timeout);
 
   ssize_t __attribute__((weak))
   __posix_send (int socket, const void* buffer, size_t length, int flags);
@@ -385,7 +383,7 @@ extern "C"
  * refer to that file. The _path_ argument points to a pathname naming
  * the file.
  */
-int __attribute__((weak))
+int
 __posix_open (const char* path, int oflag, ...)
 {
   va_list args;
@@ -403,7 +401,7 @@ __posix_open (const char* path, int oflag, ...)
   return io->getFileDescriptor ();
 }
 
-int __attribute__((weak))
+int
 __posix_close (int fildes)
 {
   // The flow is identical for all POSIX functions: identify the C++
@@ -419,7 +417,7 @@ __posix_close (int fildes)
 
 // ----------------------------------------------------------------------------
 
-ssize_t __attribute__((weak))
+ssize_t
 __posix_read (int fildes, void* buf, size_t nbyte)
 {
   os::PosixIo* io = os::FileDescriptorsManager::getIo (fildes);
@@ -431,7 +429,7 @@ __posix_read (int fildes, void* buf, size_t nbyte)
   return io->read (buf, nbyte);
 }
 
-ssize_t __attribute__((weak))
+ssize_t
 __posix_write (int fildes, const void* buf, size_t nbyte)
 {
   os::PosixIo* io = os::FileDescriptorsManager::getIo (fildes);
@@ -443,7 +441,7 @@ __posix_write (int fildes, const void* buf, size_t nbyte)
   return io->write (buf, nbyte);
 }
 
-ssize_t __attribute__((weak))
+ssize_t
 __posix_writev (int fildes, const struct iovec* iov, int iovcnt)
 {
   os::PosixIo* io = os::FileDescriptorsManager::getIo (fildes);
@@ -455,7 +453,7 @@ __posix_writev (int fildes, const struct iovec* iov, int iovcnt)
   return io->writev (iov, iovcnt);
 }
 
-int __attribute__((weak))
+int
 __posix_ioctl (int fildes, int request, ...)
 {
   os::PosixIo* io = os::FileDescriptorsManager::getIo (fildes);
@@ -473,7 +471,7 @@ __posix_ioctl (int fildes, int request, ...)
   return ret;
 }
 
-off_t __attribute__((weak))
+off_t
 __posix_lseek (int fildes, off_t offset, int whence)
 {
   os::PosixIo* io = os::FileDescriptorsManager::getIo (fildes);
@@ -491,7 +489,7 @@ __posix_lseek (int fildes, off_t offset, int whence)
  * This function shall test whether _fildes_, an open file descriptor,
  * is associated with a terminal device.
  */
-int __attribute__((weak))
+int
 __posix_isatty (int fildes)
 {
   os::PosixIo* io = os::FileDescriptorsManager::getIo (fildes);
@@ -503,7 +501,7 @@ __posix_isatty (int fildes)
   return io->isatty ();
 }
 
-int __attribute__((weak))
+int
 __posix_fcntl (int fildes, int cmd, ...)
 {
   os::PosixIo* io = os::FileDescriptorsManager::getIo (fildes);
@@ -521,7 +519,7 @@ __posix_fcntl (int fildes, int cmd, ...)
   return ret;
 }
 
-int __attribute__((weak))
+int
 __posix_fstat (int fildes, struct stat* buf)
 {
   os::PosixIo* io = os::FileDescriptorsManager::getIo (fildes);
@@ -533,7 +531,7 @@ __posix_fstat (int fildes, struct stat* buf)
   return io->fstat (buf);
 }
 
-int __attribute__((weak))
+int
 __posix_ftruncate (int fildes, off_t length)
 {
   os::PosixIo* io = os::FileDescriptorsManager::getIo (fildes);
@@ -545,7 +543,7 @@ __posix_ftruncate (int fildes, off_t length)
   return io->ftruncate (length);
 }
 
-int __attribute__((weak))
+int
 __posix_fsync (int fildes)
 {
   os::PosixIo* io = os::FileDescriptorsManager::getIo (fildes);
@@ -560,37 +558,37 @@ __posix_fsync (int fildes)
 // ----------------------------------------------------------------------------
 // ----- POSIX File functions -----
 
-int __attribute__((weak))
+int
 __posix_chmod (const char* path, mode_t mode)
 {
   return os::PosixFile::chmod (path, mode);
 }
 
-int __attribute__((weak))
+int
 __posix_stat (const char* path, struct stat* buf)
 {
   return os::PosixFile::stat (path, buf);
 }
 
-int __attribute__((weak))
+int
 __posix_truncate (const char* path, off_t length)
 {
   return os::PosixFile::truncate (path, length);
 }
 
-int __attribute__((weak))
+int
 __posix_rename (const char* existing, const char* _new)
 {
   return os::PosixFile::rename (existing, _new);
 }
 
-int __attribute__((weak))
+int
 __posix_unlink (const char* path)
 {
   return os::PosixFile::unlink (path);
 }
 
-int __attribute__((weak))
+int
 __posix_utime (const char* path, const struct utimbuf* times)
 {
   return os::PosixFile::utime (path, times);
@@ -599,19 +597,19 @@ __posix_utime (const char* path, const struct utimbuf* times)
 // ----------------------------------------------------------------------------
 // ----- POSIX FileSystem functions -----
 
-int __attribute__((weak))
+int
 __posix_mkdir (const char* path, mode_t mode)
 {
   return os::PosixFileSystem::mkdir (path, mode);
 }
 
-int __attribute__((weak))
+int
 __posix_rmdir (const char* path)
 {
   return os::PosixFileSystem::rmdir (path);
 }
 
-void __attribute__((weak))
+void
 __posix_sync (void)
 {
   return os::PosixFileSystem::sync ();
@@ -621,14 +619,12 @@ __posix_sync (void)
 // ----- Directories functions -----
 
 DIR*
-//__attribute__((weak))
 __posix_opendir (const char* dirpath)
 {
   return (DIR*) os::PosixDir::open (dirpath);
 }
 
 struct dirent*
-__attribute__((weak))
 __posix_readdir (DIR* dirp)
 {
   os::PosixDir* dir = (os::PosixDir*) (dirp);
@@ -641,7 +637,7 @@ __posix_readdir (DIR* dirp)
 }
 
 #if 0
-int __attribute__((weak))
+int
 __posix_readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result)
   {
     errno = ENOSYS; // Not implemented
@@ -649,7 +645,7 @@ __posix_readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result)
   }
 #endif
 
-void __attribute__((weak))
+void
 __posix_rewinddir (DIR* dirp)
 {
   os::PosixDir* dir = (os::PosixDir*) (dirp);
@@ -661,7 +657,7 @@ __posix_rewinddir (DIR* dirp)
   return dir->rewind ();
 }
 
-int __attribute__((weak))
+int
 __posix_closedir (DIR* dirp)
 {
   os::PosixDir* dir = (os::PosixDir*) (dirp);
@@ -679,21 +675,21 @@ __posix_closedir (DIR* dirp)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-int __attribute__((weak))
+int
 __posix_accept (int socket, struct sockaddr* address, socklen_t* address_len)
 {
   errno = ENOSYS; // Not implemented
   return -1;
 }
 
-int __attribute__((weak))
+int
 __posix_bind (int socket, const struct sockaddr* address, socklen_t address_len)
 {
   errno = ENOSYS; // Not implemented
   return -1;
 }
 
-int __attribute__((weak))
+int
 __posix_connect (int socket, const struct sockaddr* address,
                  socklen_t address_len)
 {
@@ -701,7 +697,7 @@ __posix_connect (int socket, const struct sockaddr* address,
   return -1;
 }
 
-int __attribute__((weak))
+int
 __posix_getpeername (int socket, struct sockaddr* address,
                      socklen_t* address_len)
 {
@@ -709,7 +705,7 @@ __posix_getpeername (int socket, struct sockaddr* address,
   return -1;
 }
 
-int __attribute__((weak))
+int
 __posix_getsockname (int socket, struct sockaddr* address,
                      socklen_t* address_len)
 {
@@ -717,7 +713,7 @@ __posix_getsockname (int socket, struct sockaddr* address,
   return -1;
 }
 
-int __attribute__((weak))
+int
 __posix_getsockopt (int socket, int level, int option_name, void* option_value,
                     socklen_t* option_len)
 {
@@ -725,21 +721,21 @@ __posix_getsockopt (int socket, int level, int option_name, void* option_value,
   return -1;
 }
 
-int __attribute__((weak))
+int
 __posix_listen (int socket, int backlog)
 {
   errno = ENOSYS; // Not implemented
   return -1;
 }
 
-ssize_t __attribute__((weak))
+ssize_t
 __posix_recv (int socket, void* buffer, size_t length, int flags)
 {
   errno = ENOSYS; // Not implemented
   return -1;
 }
 
-ssize_t __attribute__((weak))
+ssize_t
 __posix_recvfrom (int socket, void* buffer, size_t length, int flags,
                   struct sockaddr* address, socklen_t* address_len)
 {
@@ -747,28 +743,28 @@ __posix_recvfrom (int socket, void* buffer, size_t length, int flags,
   return -1;
 }
 
-ssize_t __attribute__((weak))
+ssize_t
 __posix_recvmsg (int socket, struct msghdr* message, int flags)
 {
   errno = ENOSYS; // Not implemented
   return -1;
 }
 
-ssize_t __attribute__((weak))
+ssize_t
 __posix_send (int socket, const void* buffer, size_t length, int flags)
 {
   errno = ENOSYS; // Not implemented
   return -1;
 }
 
-ssize_t __attribute__((weak))
+ssize_t
 __posix_sendmsg (int socket, const struct msghdr* message, int flags)
 {
   errno = ENOSYS; // Not implemented
   return -1;
 }
 
-ssize_t __attribute__((weak))
+ssize_t
 __posix_sendto (int socket, const void* message, size_t length, int flags,
                 const struct sockaddr* dest_addr, socklen_t dest_len)
 {
@@ -776,7 +772,7 @@ __posix_sendto (int socket, const void* message, size_t length, int flags,
   return -1;
 }
 
-int __attribute__((weak))
+int
 __posix_setsockopt (int socket, int level, int option_name,
                     const void* option_value, socklen_t option_len)
 {
@@ -784,28 +780,28 @@ __posix_setsockopt (int socket, int level, int option_name,
   return -1;
 }
 
-int __attribute__((weak))
+int
 __posix_shutdown (int socket, int how)
 {
   errno = ENOSYS; // Not implemented
   return -1;
 }
 
-int __attribute__((weak))
+int
 __posix_sockatmark (int s)
 {
   errno = ENOSYS; // Not implemented
   return -1;
 }
 
-int __attribute__((weak))
+int
 __posix_socket (int domain, int type, int protocol)
 {
   errno = ENOSYS; // Not implemented
   return -1;
 }
 
-int __attribute__((weak))
+int
 __posix_socketpair (int domain, int type, int protocol, int socket_vector[2])
 {
   errno = ENOSYS; // Not implemented
@@ -828,60 +824,57 @@ __posix_socketpair (int domain, int type, int protocol, int socket_vector[2])
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-int __attribute__((weak))
+int
 __posix_execve (const char* path, char* const argv[], char* const envp[])
 {
   errno = ENOSYS; // Not implemented
   return -1;
 }
 
-pid_t __attribute__((weak))
+pid_t
 __posix_fork (void)
 {
   errno = ENOSYS; // Not implemented
   return ((pid_t) -1);
 }
 
-pid_t __attribute__((weak))
+pid_t
 __posix_getpid (void)
 {
   errno = ENOSYS; // Not implemented
   return ((pid_t) -1);
 }
 
-int __attribute__((weak))
+int
 __posix_gettimeofday (struct timeval* ptimeval, void* ptimezone)
 {
   errno = ENOSYS; // Not implemented
   return -1;
 }
 
-int __attribute__((weak))
+int
 __posix_kill (pid_t pid, int sig)
 {
   errno = ENOSYS; // Not implemented
   return -1;
 }
 
-int __attribute__((weak))
+int
 __posix_raise (int sig)
 {
   errno = ENOSYS; // Not implemented
   return -1;
 }
 
-#if 0
-int __attribute__((weak))
+int
 __posix_select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
-    struct timeval* timeout)
-  {
-    errno = ENOSYS; // Not implemented
-    return -1;
-  }
-#endif
+                struct timeval* timeout)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
 
 clock_t
-__attribute__((weak))
 __posix_times (struct tms* buf)
 {
   errno = ENOSYS; // Not implemented
@@ -889,7 +882,6 @@ __posix_times (struct tms* buf)
 }
 
 pid_t
-__attribute__((weak))
 __posix_wait (int* stat_loc)
 {
   errno = ENOSYS; // Not implemented
@@ -898,7 +890,7 @@ __posix_wait (int* stat_loc)
 
 // File system related - not implemented
 
-int __attribute__((weak))
+int
 __posix_chdir (const char* path)
 {
   errno = ENOSYS; // Not implemented
@@ -906,28 +898,27 @@ __posix_chdir (const char* path)
 }
 
 char*
-__attribute__((weak))
 __posix_getcwd (char* buf, size_t size)
 {
   errno = ENOSYS; // Not implemented
   return nullptr;
 }
 
-int __attribute__((weak))
+int
 __posix_chown (const char* path, uid_t owner, gid_t group)
 {
   errno = ENOSYS; // Not implemented
   return -1;
 }
 
-int __attribute__((weak))
+int
 __posix_link (const char* existing, const char* _new)
 {
   errno = ENOSYS; // Not implemented
   return -1;
 }
 
-int __attribute__((weak))
+int
 __posix_symlink (const char* existing, const char* _new)
 {
   errno = ENOSYS; // Not implemented
@@ -935,7 +926,6 @@ __posix_symlink (const char* existing, const char* _new)
 }
 
 ssize_t
-__attribute__((weak))
 __posix_readlink (const char* path, char* buf, size_t bufsize)
 {
   errno = ENOSYS; // Not implemented
