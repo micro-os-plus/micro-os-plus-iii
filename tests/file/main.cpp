@@ -389,7 +389,6 @@ TestFileSystem::getPtr (void)
   return fPtr;
 }
 
-
 // ----------------------------------------------------------------------------
 
 int
@@ -710,6 +709,10 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       errno = -2;
       assert(
           (os::PosixFileSystemsManager::mount (&babu, "/babu/", &babuDevice, 124) == 0) && (errno == 0));
+    }
+
+    {
+      // C API
 
       // CHMOD
       errno = -2;
@@ -775,10 +778,82 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert(errno == 0);
       assert(babu.getCmd () == Cmds::RMDIR);
       assert(babu.getSyncCount () == cnt + 1);
-
     }
 
     {
+      // C++ API
+
+      // CHMOD
+      errno = -2;
+      assert((os::PosixFile::chmod ("/babu/p1", 321) == 0) && (errno == 0));
+      assert(babu.getCmd () == Cmds::CHMOD);
+      assert(babu.getNumber () == 321);
+      assert(std::strcmp ("/p1", babu.getPath ()) == 0);
+
+      // STAT
+      errno = -2;
+      struct stat stat_buf;
+      assert(
+          (os::PosixFile::stat ("/babu/p2", &stat_buf) == 0) && (errno == 0));
+      assert(babu.getCmd () == Cmds::STAT);
+      assert(babu.getPtr () == &stat_buf);
+      assert(std::strcmp ("/p2", babu.getPath ()) == 0);
+
+      // TRUNCATE
+      errno = -2;
+      assert((os::PosixFile::truncate ("/babu/p3", 876) == 0) && (errno == 0));
+      assert(babu.getCmd () == Cmds::TRUNCATE);
+      assert(babu.getNumber () == 876);
+      assert(std::strcmp ("/p3", babu.getPath ()) == 0);
+
+      // RENAME
+      errno = -2;
+      assert(
+          (os::PosixFile::rename ("/babu/p4", "/babu/p4-new") == 0) && (errno == 0));
+      assert(babu.getCmd () == Cmds::RENAME);
+      assert(std::strcmp ("/p4", babu.getPath ()) == 0);
+      assert(std::strcmp ("/p4-new", (const char* )babu.getPtr ()) == 0);
+
+      // UNLINK
+      errno = -2;
+      assert((os::PosixFile::unlink ("/babu/p5") ==0) && (errno == 0));
+      assert(babu.getCmd () == Cmds::UNLINK);
+      assert(std::strcmp ("/p5", babu.getPath ()) == 0);
+
+      // UTIME
+      errno = -2;
+      struct utimbuf times;
+      assert((os::PosixFile::utime ("/babu/p6", &times) ==0) && (errno == 0));
+      assert(babu.getCmd () == Cmds::UTIME);
+      assert(babu.getPtr () == &times);
+      assert(std::strcmp ("/p6", babu.getPath ()) == 0);
+
+      // MKDIR
+      errno = -2;
+      assert(
+          (os::PosixFileSystem::mkdir ("/babu/p7", 654) ==0) && (errno == 0));
+      assert(babu.getCmd () == Cmds::MKDIR);
+      assert(babu.getNumber () == 654);
+      assert(std::strcmp ("/p7", babu.getPath ()) == 0);
+
+      // RMDIR
+      errno = -2;
+      assert((os::PosixFileSystem::rmdir ("/babu/p8") ==0) && (errno == 0));
+      assert(babu.getCmd () == Cmds::RMDIR);
+      assert(std::strcmp ("/p8", babu.getPath ()) == 0);
+
+      // SYNC
+      unsigned int cnt = babu.getSyncCount ();
+      errno = -2;
+      os::PosixFileSystem::sync ();
+      assert(errno == 0);
+      assert(babu.getCmd () == Cmds::RMDIR);
+      assert(babu.getSyncCount () == cnt + 1);
+    }
+
+    {
+      // C API
+
       // Test OPEN
       errno = -2;
       int fd = __posix_open ("/babu/f1", 123, 234);
@@ -874,6 +949,106 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       ret = __posix_close (fd);
       assert((ret == 0) && (errno == 0));
       assert(file->getCmd () == Cmds::CLOSE);
+
+      // Must no longer be in the pool
+      assert(filesPool.getFlag (0) == false);
+    }
+
+    {
+      // C++ API
+
+      // Test OPEN
+      errno = -2;
+      os::PosixIo* file = os::PosixIo::open ("/babu/f1", 123, 234);
+      assert((file != nullptr) && (errno == 0));
+
+      assert(file->getType () == os::PosixIo::Type::FILE);
+
+      TestFile* tfile = static_cast<TestFile*> (file);
+      // Must be the first used slot in the pool.
+      assert(filesPool.getObject (0) == tfile);
+      assert(filesPool.getFlag (0) == true);
+
+      // Check params passing.
+      assert(std::strcmp ("/f1", tfile->getPath ()) == 0);
+      assert(tfile->getNumber () == 123);
+      assert(tfile->getMode () == 234);
+
+      int ret;
+
+      // Test READ
+      errno = -2;
+      char buf[3];
+      ret = file->read ((void*) buf, 321);
+      assert((ret == 0) && (errno == 0));
+      assert(tfile->getCmd () == Cmds::READ);
+      assert(tfile->getPtr () == buf);
+      assert(tfile->getNumber () == 321);
+
+      // Test WRITE
+      errno = -2;
+      ret = file->write ((const void*) buf, 432);
+      assert((ret == 0) && (errno == 0));
+      assert(tfile->getCmd () == Cmds::WRITE);
+      assert(tfile->getPtr () == buf);
+      assert(tfile->getNumber () == 432);
+
+      // Test IOCTL
+      errno = -2;
+      ret = file->ioctl (222, 876);
+      assert((ret == 0) && (errno == 0));
+      assert(tfile->getCmd () == Cmds::IOCTL);
+      assert(tfile->getNumber () == 222);
+      assert(tfile->getMode () == 876);
+
+      // Test LSEEK
+      errno = -2;
+      ret = file->lseek (333, 555);
+      assert((ret == 0) && (errno == 0));
+      assert(tfile->getCmd () == Cmds::LSEEK);
+      assert(tfile->getNumber () == 333);
+      assert(tfile->getMode () == 555);
+
+      // Test ISATTY
+      errno = -2;
+      ret = file->isatty ();
+      assert((ret == 0) && (errno == 0));
+      assert(tfile->getCmd () == Cmds::ISATTY);
+
+      // Test FCNTL
+      errno = -2;
+      ret = file->fcntl (444, 987);
+      assert((ret == 0) && (errno == 0));
+      assert(tfile->getCmd () == Cmds::FCNTL);
+      assert(tfile->getNumber () == 444);
+      assert(tfile->getMode () == 987);
+
+      // Test FSTAT
+      errno = -2;
+      struct stat stat_buf;
+      ret = file->fstat (&stat_buf);
+      assert((ret == 0) && (errno == 0));
+      assert(tfile->getCmd () == Cmds::FSTAT);
+      assert(tfile->getPtr () == &stat_buf);
+
+      // Test FTRUNCATE
+      errno = -2;
+      ret = file->ftruncate (999);
+      assert((ret == 0) && (errno == 0));
+      assert(tfile->getCmd () == Cmds::FTRUNCATE);
+      assert(tfile->getNumber () == 999);
+
+      // Test FSYNC
+      errno = -2;
+      ret = file->fsync ();
+      assert((ret == 0) && (errno == 0));
+      assert(tfile->getCmd () == Cmds::FSYNC);
+
+      // Test CLOSE
+      errno = -2;
+      ret = file->close ();
+      assert((ret == 0) && (errno == 0));
+      assert(tfile->getCmd () == Cmds::CLOSE);
 
       // Must no longer be in the pool
       assert(filesPool.getFlag (0) == false);

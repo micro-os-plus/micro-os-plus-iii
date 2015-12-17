@@ -39,6 +39,18 @@ namespace os
     fFileSystem = nullptr;
   }
 
+  PosixFile*
+  PosixFile::open (const char* path, int oflag, ...)
+  {
+    // Forward to the variadic version of the function.
+    std::va_list args;
+    va_start(args, oflag);
+    PosixFile* ret = vopen (path, oflag, args);
+    va_end(args);
+
+    return ret;
+  }
+
   // ------------------------------------------------------------------------
   // Functions related to files, other than IO. The implementations is
   // specific to the FileSystem object.

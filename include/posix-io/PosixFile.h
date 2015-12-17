@@ -42,11 +42,22 @@ namespace os
 
   class PosixFile : public PosixIo
   {
+    friend class PosixFileSystem;
+
   public:
 
     PosixFile ();
 
     ~PosixFile ();
+
+    // ------------------------------------------------------------------------
+    // Same as PosixIo versions, but return a PosixFile
+
+    static PosixFile*
+    open (const char* path, int oflag, ...);
+
+    static PosixFile*
+    vopen (const char* path, int oflag, std::va_list args);
 
     // ------------------------------------------------------------------------
     // There is a small catch here, these functions are implemented in the
@@ -73,11 +84,13 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    void
-    setFileSystem (PosixFileSystem* fileSystem);
-
     PosixFileSystem*
     getFileSystem (void);
+
+  protected:
+
+    void
+    setFileSystem (PosixFileSystem* fileSystem);
 
   protected:
 
@@ -85,6 +98,12 @@ namespace os
   };
 
   // --------------------------------------------------------------------------
+
+  inline PosixFile*
+  PosixFile::vopen (const char* path, int oflag, std::va_list args)
+  {
+    return static_cast<PosixFile*> (PosixIo::vopen (path, oflag, args));
+  }
 
   inline void
   PosixFile::setFileSystem (PosixFileSystem* fileSystem)
