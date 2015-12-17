@@ -315,7 +315,7 @@ extern "C"
   __posix_shutdown (int socket, int how);
 
   int __attribute__((weak))
-  __posix_sockatmark (int s);
+  __posix_sockatmark (int socket);
 
   int __attribute__((weak))
   __posix_socket (int domain, int type, int protocol);
@@ -788,7 +788,7 @@ __posix_shutdown (int socket, int how)
 }
 
 int
-__posix_sockatmark (int s)
+__posix_sockatmark (int socket)
 {
   errno = ENOSYS; // Not implemented
   return -1;
