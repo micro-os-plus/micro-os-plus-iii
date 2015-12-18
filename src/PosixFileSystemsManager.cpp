@@ -77,7 +77,7 @@ namespace os
             continue;
           }
 
-        size_t len = std::strlen (sfPathsArray[i]);
+        auto len = std::strlen (sfPathsArray[i]);
 
         // Check if path1 starts with the mounted path.
         if (std::strncmp (sfPathsArray[i], *path1, len) == 0)

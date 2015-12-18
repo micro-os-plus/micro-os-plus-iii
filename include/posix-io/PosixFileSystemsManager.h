@@ -37,6 +37,7 @@ namespace os
   public:
 
     PosixFileSystemsManager (std::size_t size);
+    PosixFileSystemsManager (const PosixFileSystemsManager&) = delete;
 
     ~PosixFileSystemsManager ();
 

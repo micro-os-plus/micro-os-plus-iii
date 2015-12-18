@@ -41,6 +41,7 @@ namespace os
   public:
 
     FileDescriptorsManager (std::size_t size);
+    FileDescriptorsManager (const FileDescriptorsManager&) = delete;
 
     ~FileDescriptorsManager ();
 

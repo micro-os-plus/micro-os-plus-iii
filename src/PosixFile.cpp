@@ -45,7 +45,7 @@ namespace os
     // Forward to the variadic version of the function.
     std::va_list args;
     va_start(args, oflag);
-    PosixFile* ret = vopen (path, oflag, args);
+    auto ret = vopen (path, oflag, args);
     va_end(args);
 
     return ret;
@@ -59,7 +59,7 @@ namespace os
   PosixFile::chmod (const char* path, mode_t mode)
   {
     const char* adjusted_path = path;
-    os::PosixFileSystem* fs = os::PosixFileSystemsManager::identifyFileSystem (
+    auto* const fs = os::PosixFileSystemsManager::identifyFileSystem (
         &adjusted_path);
 
     if (fs == nullptr)
@@ -75,7 +75,7 @@ namespace os
   PosixFile::stat (const char* path, struct stat* buf)
   {
     const char* adjusted_path = path;
-    os::PosixFileSystem* fs = os::PosixFileSystemsManager::identifyFileSystem (
+    auto* const fs = os::PosixFileSystemsManager::identifyFileSystem (
         &adjusted_path);
 
     if (fs == nullptr)
@@ -91,7 +91,7 @@ namespace os
   PosixFile::truncate (const char* path, off_t length)
   {
     const char* adjusted_path = path;
-    os::PosixFileSystem* fs = os::PosixFileSystemsManager::identifyFileSystem (
+    auto* const fs = os::PosixFileSystemsManager::identifyFileSystem (
         &adjusted_path);
 
     if (fs == nullptr)
@@ -106,9 +106,9 @@ namespace os
   int
   PosixFile::rename (const char* existing, const char* _new)
   {
-    const char* adjusted_existing = existing;
-    const char* adjusted_new = _new;
-    os::PosixFileSystem* fs = os::PosixFileSystemsManager::identifyFileSystem (
+    auto adjusted_existing = existing;
+    auto adjusted_new = _new;
+    auto* const fs = os::PosixFileSystemsManager::identifyFileSystem (
         &adjusted_existing, &adjusted_new);
 
     if (fs == nullptr)
@@ -123,8 +123,8 @@ namespace os
   int
   PosixFile::unlink (const char* path)
   {
-    const char* adjusted_path = path;
-    os::PosixFileSystem* fs = os::PosixFileSystemsManager::identifyFileSystem (
+    auto adjusted_path = path;
+    auto* const fs = os::PosixFileSystemsManager::identifyFileSystem (
         &adjusted_path);
 
     if (fs == nullptr)
@@ -139,8 +139,8 @@ namespace os
   int
   PosixFile::utime (const char* path, const struct utimbuf* times)
   {
-    const char* adjusted_path = path;
-    os::PosixFileSystem* fs = os::PosixFileSystemsManager::identifyFileSystem (
+    auto adjusted_path = path;
+    auto* const fs = os::PosixFileSystemsManager::identifyFileSystem (
         &adjusted_path);
 
     if (fs == nullptr)

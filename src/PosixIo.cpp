@@ -94,9 +94,9 @@ namespace os
       }
     else
       {
-        const char* adjusted_path = path;
-        os::PosixFileSystem* fs =
-            os::PosixFileSystemsManager::identifyFileSystem (&adjusted_path);
+        auto adjusted_path = path;
+        const auto fs = os::PosixFileSystemsManager::identifyFileSystem (
+            &adjusted_path);
 
         // The manager will return null if there are no file systems
         // registered, no need to check this condition separately.
@@ -148,11 +148,11 @@ namespace os
     if (getType () == Type::FILE)
       {
         // Files is free, return it to the pool.
-        PosixFile* file = static_cast<PosixFile*> (this);
-        PosixFileSystem* fs = file->getFileSystem ();
+        auto file = static_cast<PosixFile*> (this);
+        auto fs = file->getFileSystem ();
         if (fs != nullptr)
           {
-            PosixPool* pool = fs->getFilesPool ();
+            auto pool = fs->getFilesPool ();
             if (pool != nullptr)
               {
                 pool->release (file);

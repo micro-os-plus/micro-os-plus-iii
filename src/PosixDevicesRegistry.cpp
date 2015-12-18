@@ -126,7 +126,7 @@ namespace os
   {
     assert(path != nullptr);
 
-    const char* prefix = PosixDevice::getDevicePrefix ();
+    auto prefix = PosixDevice::getDevicePrefix ();
     if (std::strncmp (prefix, path, std::strlen (prefix)) != 0)
       {
         // The device prefix does not match, not a device.
@@ -134,7 +134,7 @@ namespace os
       }
 
     // The prefix was identified; try to match the rest of the path.
-    const char* name = path + std::strlen (prefix);
+    auto name = path + std::strlen (prefix);
     for (std::size_t i = 0; i < sfSize; ++i)
       {
         if (sfRegistryArray[i] != nullptr

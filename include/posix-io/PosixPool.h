@@ -33,6 +33,7 @@ namespace os
   {
   public:
     PosixPool (std::size_t size);
+    PosixPool (const PosixPool&) = delete;
 
     virtual
     ~PosixPool ();
@@ -48,13 +49,13 @@ namespace os
     // ------------------------------------------------------------------------
 
     std::size_t
-    getSize (void);
+    getSize (void) const;
 
     void*
-    getObject (std::size_t index);
+    getObject (std::size_t index) const;
 
     bool
-    getFlag (std::size_t index);
+    getFlag (std::size_t index) const;
 
     // ------------------------------------------------------------------------
 
@@ -68,19 +69,19 @@ namespace os
   // --------------------------------------------------------------------------
 
   inline std::size_t
-  PosixPool::getSize (void)
+  PosixPool::getSize (void) const
   {
     return fSize;
   }
 
   inline void*
-  PosixPool::getObject (std::size_t index)
+  PosixPool::getObject (std::size_t index) const
   {
     return fArray[index];
   }
 
   inline bool
-  PosixPool::getFlag (std::size_t index)
+  PosixPool::getFlag (std::size_t index) const
   {
     return fInUse[index];
   }

@@ -56,7 +56,7 @@ namespace os
       }
 
     // Get a PosixFile object from the pool.
-    PosixFile* file = static_cast<PosixFile*> (fFilesPool->aquire ());
+    auto* const file = static_cast<PosixFile*> (fFilesPool->aquire ());
 
     // Associate the file with this file system (used, for example,
     // to reach the pools at close).
@@ -78,7 +78,7 @@ namespace os
       }
 
     // Get a PosixDir object from the pool.
-    PosixDir* dir = static_cast<PosixDir*> (fDirsPool->aquire ());
+    auto* const dir = static_cast<PosixDir*> (fDirsPool->aquire ());
 
     // Associate the dir with this file system (used, for example,
     // to reach the pools at close).
@@ -97,7 +97,7 @@ namespace os
   PosixFileSystem::do_open (const char* path, int oflag, std::va_list args)
   {
     // TODO: implement and return the object.
-    PosixFile* file = static_cast<PosixFile*> (fFilesPool->aquire ());
+    auto* const file = static_cast<PosixFile*> (fFilesPool->aquire ());
     file->open (path, oflag, args);
     return nullptr;
   }
@@ -176,8 +176,8 @@ namespace os
   int
   PosixFileSystem::mkdir (const char* path, mode_t mode)
   {
-    const char* adjusted_path = path;
-    os::PosixFileSystem* fs = os::PosixFileSystemsManager::identifyFileSystem (
+    auto adjusted_path = path;
+    auto* const fs = os::PosixFileSystemsManager::identifyFileSystem (
         &adjusted_path);
 
     if (fs == nullptr)
@@ -196,8 +196,8 @@ namespace os
   int
   PosixFileSystem::rmdir (const char* path)
   {
-    const char* adjusted_path = path;
-    os::PosixFileSystem* fs = os::PosixFileSystemsManager::identifyFileSystem (
+    auto adjusted_path = path;
+    auto* const fs = os::PosixFileSystemsManager::identifyFileSystem (
         &adjusted_path);
 
     if (fs == nullptr)
@@ -219,9 +219,9 @@ namespace os
     errno = 0;
 
     // Enumerate all mounted file systems and sync them.
-    for (size_t i = 0; i < PosixFileSystemsManager::getSize (); ++i)
+    for (std::size_t i = 0; i < PosixFileSystemsManager::getSize (); ++i)
       {
-        PosixFileSystem* fs = PosixFileSystemsManager::getFileSystem (i);
+        auto fs = PosixFileSystemsManager::getFileSystem (i);
         if (fs != nullptr)
           {
             fs->do_sync ();

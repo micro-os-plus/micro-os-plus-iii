@@ -39,6 +39,7 @@ namespace os
   public:
 
     PosixDevicesRegistry (std::size_t size);
+    PosixDevicesRegistry (const PosixDevicesRegistry&) = delete;
 
     ~PosixDevicesRegistry ();
 

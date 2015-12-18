@@ -53,6 +53,7 @@ namespace os
   public:
 
     PosixFileSystem (PosixPool* filesPool, PosixPool* dirsPool);
+    PosixFileSystem (const PosixFileSystem&) = delete;
 
     virtual
     ~PosixFileSystem ();
@@ -81,7 +82,13 @@ namespace os
     // --- Support functions.
 
     BlockDevice*
-    getBlockDevice (void);
+    getBlockDevice (void) const;
+
+    PosixPool*
+    getFilesPool (void) const;
+
+    PosixPool*
+    getDirsPool (void) const;
 
     // ------------------------------------------------------------------------
   protected:
@@ -151,12 +158,6 @@ namespace os
     // ------------------------------------------------------------------------
     // --- Support functions.
 
-    PosixPool*
-    getFilesPool (void);
-
-    PosixPool*
-    getDirsPool (void);
-
     void
     setBlockDevice (BlockDevice* blockDevice);
 
@@ -174,13 +175,13 @@ namespace os
   };
 
   inline PosixPool*
-  PosixFileSystem::getFilesPool (void)
+  PosixFileSystem::getFilesPool (void) const
   {
     return fFilesPool;
   }
 
   inline PosixPool*
-  PosixFileSystem::getDirsPool (void)
+  PosixFileSystem::getDirsPool (void) const
   {
     return fDirsPool;
   }
@@ -192,7 +193,7 @@ namespace os
   }
 
   inline BlockDevice*
-  PosixFileSystem::getBlockDevice (void)
+  PosixFileSystem::getBlockDevice (void) const
   {
     return fBlockDevice;
   }

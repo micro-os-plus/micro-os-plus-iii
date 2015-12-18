@@ -44,6 +44,8 @@ namespace os
           }
       }
 
+      TPosixPool (const TPosixPool&) = delete;
+
       virtual
       ~TPosixPool ()
       {

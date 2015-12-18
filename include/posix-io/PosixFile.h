@@ -47,6 +47,7 @@ namespace os
   public:
 
     PosixFile ();
+    PosixFile (const PosixFile&) = delete;
 
     ~PosixFile ();
 
@@ -85,7 +86,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     PosixFileSystem*
-    getFileSystem (void);
+    getFileSystem (void) const;
 
   protected:
 
@@ -112,7 +113,7 @@ namespace os
   }
 
   inline PosixFileSystem*
-  PosixFile::getFileSystem (void)
+  PosixFile::getFileSystem (void) const
   {
     return fFileSystem;
   }

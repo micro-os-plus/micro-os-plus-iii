@@ -58,6 +58,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     PosixIo ();
+    PosixIo (const PosixIo&) = delete;
 
     virtual
     ~PosixIo ();
@@ -112,7 +113,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     Type
-    getType (void);
+    getType (void) const;
 
     void
     setFileDescriptor (fileDescriptor_t fildes);
@@ -178,7 +179,7 @@ namespace os
   // --------------------------------------------------------------------------
 
   inline PosixIo::Type
-  PosixIo::getType (void)
+  PosixIo::getType (void) const
   {
     return fType;
   }

@@ -41,6 +41,7 @@ namespace os
   public:
 
     PosixDevice (const char* name);
+    PosixDevice (const PosixDevice&) = delete;
 
     virtual
     ~PosixDevice ();
@@ -51,7 +52,7 @@ namespace os
     matchName (const char* name) const;
 
     const char*
-    getName (void);
+    getName (void) const;
 
     static const char*
     getDevicePrefix (void);
@@ -71,7 +72,7 @@ namespace os
   }
 
   inline const char*
-  PosixDevice::getName (void)
+  PosixDevice::getName (void) const
   {
     return fName;
   }

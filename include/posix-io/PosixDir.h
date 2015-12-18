@@ -45,6 +45,7 @@ namespace os
   public:
 
     PosixDir (void);
+    PosixDir (const PosixDir&) = delete;
 
     virtual
     ~PosixDir ();
@@ -67,10 +68,10 @@ namespace os
     getDirEntry (void);
 
     const char*
-    getName (void);
+    getName (void) const;
 
     PosixFileSystem*
-    getFileSystem (void);
+    getFileSystem (void) const;
 
     // ------------------------------------------------------------------------
   protected:
@@ -112,7 +113,7 @@ namespace os
   }
 
   inline PosixFileSystem*
-  PosixDir::getFileSystem (void)
+  PosixDir::getFileSystem (void) const
   {
     return fFileSystem;
   }
@@ -124,7 +125,7 @@ namespace os
   }
 
   inline const char*
-  PosixDir::getName (void)
+  PosixDir::getName (void) const
   {
     return &fDirEntry.d_name[0];
   }

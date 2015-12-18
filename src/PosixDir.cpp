@@ -47,8 +47,8 @@ namespace os
   {
     errno = 0;
 
-    const char* adjusted_dirname = dirname;
-    os::PosixFileSystem* fs = os::PosixFileSystemsManager::identifyFileSystem (
+    auto adjusted_dirname = dirname;
+    auto* const fs = os::PosixFileSystemsManager::identifyFileSystem (
         &adjusted_dirname);
 
     // The manager will return null if there are no file systems
@@ -92,7 +92,7 @@ namespace os
 
     // Execute the implementation specific code.
     int ret = do_close ();
-    PosixPool* pool = fFileSystem->getDirsPool ();
+    auto* const pool = fFileSystem->getDirsPool ();
     if (pool != nullptr)
       {
         pool->release (this);
