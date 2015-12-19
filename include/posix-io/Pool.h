@@ -16,14 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POSIX_IO_FILE_DESCRIPTORS_MANAGER_H_
-#define POSIX_IO_FILE_DESCRIPTORS_MANAGER_H_
+#ifndef POSIX_IO_POOL_H_
+#define POSIX_IO_POOL_H_
 
 // ----------------------------------------------------------------------------
 
-#include "posix-io/Types.h"
 #include <cstddef>
-#include <cassert>
 
 // ----------------------------------------------------------------------------
 
@@ -31,61 +29,63 @@ namespace os
 {
   namespace posix
   {
-
     // ------------------------------------------------------------------------
 
-    class IO;
-
-    // ------------------------------------------------------------------------
-
-    class FileDescriptorsManager
+    class Pool
     {
     public:
+      Pool (std::size_t size);
+      Pool (const Pool&) = delete;
 
-      FileDescriptorsManager (std::size_t size);
-      FileDescriptorsManager (const FileDescriptorsManager&) = delete;
+      virtual
+      ~Pool ();
 
-      ~FileDescriptorsManager ();
+      // ----------------------------------------------------------------------
+
+      void*
+      aquire (void);
+
+      bool
+      release (void* obj);
 
       // ----------------------------------------------------------------------
 
-      static size_t
-      getSize (void);
+      std::size_t
+      getSize (void) const;
 
-      static bool
-      isValid (int fildes);
+      void*
+      getObject (std::size_t index) const;
 
-      static IO*
-      getIo (int fildes);
-
-      static int
-      alloc (IO* io);
-
-      static int
-      free (fileDescriptor_t fildes);
+      bool
+      getFlag (std::size_t index) const;
 
       // ----------------------------------------------------------------------
-    private:
 
-      static std::size_t sfSize;
+    protected:
 
-      static IO** sfDescriptorsArray;
+      void** fArray;
+      bool* fInUse;
+      std::size_t fSize;
     };
 
     // ------------------------------------------------------------------------
 
-    inline size_t
-    FileDescriptorsManager::getSize (void)
+    inline std::size_t
+    Pool::getSize (void) const
     {
-      return sfSize;
+      return fSize;
     }
 
-    inline IO*
-    FileDescriptorsManager::getIo (int fildes)
+    inline void*
+    Pool::getObject (std::size_t index) const
     {
-      assert((fildes >= 0) && (((std::size_t ) fildes) < sfSize));
+      return fArray[index];
+    }
 
-      return sfDescriptorsArray[fildes];
+    inline bool
+    Pool::getFlag (std::size_t index) const
+    {
+      return fInUse[index];
     }
 
   } /* namespace posix */
@@ -93,4 +93,4 @@ namespace os
 
 // ----------------------------------------------------------------------------
 
-#endif /* POSIX_IO_FILE_DESCRIPTORS_MANAGER_H_ */
+#endif /* POSIX_IO_POOL_H_ */

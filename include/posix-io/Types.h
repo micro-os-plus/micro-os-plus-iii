@@ -16,20 +16,23 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef INCLUDE_POSIX_IO_TYPES_H_
-#define INCLUDE_POSIX_IO_TYPES_H_
+#ifndef POSIX_IO_TYPES_H_
+#define POSIX_IO_TYPES_H_
 
 // ----------------------------------------------------------------------------
 
 namespace os
 {
+  namespace posix
+  {
 
-  typedef int fileDescriptor_t;
+    typedef int fileDescriptor_t;
 
-  constexpr fileDescriptor_t noFileDescriptor = -1;
+    constexpr fileDescriptor_t noFileDescriptor = -1;
 
+  } /* namespace posix */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------
 
-#endif /* INCLUDE_POSIX_IO_TYPES_H_ */
+#endif /* POSIX_IO_TYPES_H_ */

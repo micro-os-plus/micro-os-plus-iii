@@ -17,11 +17,11 @@
  */
 
 #include "posix-io/FileDescriptorsManager.h"
-#include "posix-io/PosixIo.h"
-#include "posix-io/PosixFile.h"
-#include "posix-io/PosixFileSystem.h"
-#include "posix-io/TPosixPool.h"
-#include "posix-io/PosixFileSystemsManager.h"
+#include "posix-io/IO.h"
+#include "posix-io/File.h"
+#include "posix-io/FileSystem.h"
+#include "posix-io/TPool.h"
+#include "posix-io/MountManager.h"
 #include "posix-io/BlockDevice.h"
 #include <cerrno>
 #include <cassert>
@@ -64,7 +64,7 @@ enum class Cmds
 // Test class, all methods store the input in local variables,
 // to be checked later.
 
-class TestFile : public os::PosixFile
+class TestFile : public os::posix::File
 {
 public:
 
@@ -269,11 +269,11 @@ TestFile::do_fsync (void)
 
 // ----------------------------------------------------------------------------
 
-class TestFileSystem : public os::PosixFileSystem
+class TestFileSystem : public os::posix::FileSystem
 {
 public:
 
-  TestFileSystem (os::PosixPool* filesPool, os::PosixPool* dirsPool);
+  TestFileSystem (os::posix::Pool* filesPool, os::posix::Pool* dirsPool);
 
   // Methods used for test purposes only.
   unsigned int
@@ -339,11 +339,12 @@ private:
   const char* fPath;
   unsigned int fNumber;
   void* fPtr;
+
 };
 
-TestFileSystem::TestFileSystem (os::PosixPool* filesPool,
-                                os::PosixPool* dirsPool) :
-    os::PosixFileSystem (filesPool, dirsPool)
+TestFileSystem::TestFileSystem (os::posix::Pool* filesPool,
+                                os::posix::Pool* dirsPool) :
+    os::posix::FileSystem (filesPool, dirsPool)
 {
   fMountFlags = 1;
   fCmd = Cmds::NOTSET;
@@ -486,7 +487,7 @@ TestFileSystem::do_rmdir (const char* path)
 // ----------------------------------------------------------------------------
 
 // Required only as a reference, no functionality needed.
-class TestBlockDevice : public os::BlockDevice
+class TestBlockDevice : public os::posix::BlockDevice
 {
 public:
   TestBlockDevice () = default;
@@ -494,7 +495,7 @@ public:
 
 // ----------------------------------------------------------------------------
 
-using TestFilePool = os::TPosixPool<TestFile>;
+using TestFilePool = os::posix::TPool<TestFile>;
 
 constexpr std::size_t FILES_POOL_ARRAY_SIZE = 2;
 
@@ -503,22 +504,25 @@ TestFilePool filesPool
   { FILES_POOL_ARRAY_SIZE };
 
 // File systems, all using the same pool.
-TestFileSystem root (&filesPool, nullptr);
-TestFileSystem babu (&filesPool, nullptr);
-TestFileSystem babu2 (&filesPool, nullptr);
+TestFileSystem root_fs
+  { &filesPool, nullptr };
+TestFileSystem fs1
+  { &filesPool, nullptr };
+TestFileSystem fs2
+  { &filesPool, nullptr };
 
 // Static manager
-os::FileDescriptorsManager dm
+os::posix::FileDescriptorsManager dm
   { 5 };
 
 // Static manager
-os::PosixFileSystemsManager fsm
+os::posix::MountManager mm
   { 2 };
 
 // Block devices, just referenced, no calls forwarded to them.
-TestBlockDevice rootDevice;
-TestBlockDevice babuDevice;
-TestBlockDevice babuDevice2;
+TestBlockDevice root_dev;
+TestBlockDevice dev1;
+TestBlockDevice dev2;
 
 // ----------------------------------------------------------------------------
 
@@ -596,119 +600,116 @@ int
 main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
     {
-      // ----- FileSystemsManager -----
+      // ----- MountManager -----
 
       // Check initial size.
-      assert(fsm.getSize () == 2);
+      assert(mm.getSize () == 2);
 
       // Check if FileSystemsManger is empty.
-      for (std::size_t i = 0; i < fsm.getSize (); ++i)
+      for (std::size_t i = 0; i < mm.getSize (); ++i)
         {
-          assert(fsm.getFileSystem (i) == nullptr);
-          assert(fsm.getPath (i) == nullptr);
+          assert(mm.getFileSystem (i) == nullptr);
+          assert(mm.getPath (i) == nullptr);
         }
-      assert(fsm.getRoot () == nullptr);
+      assert(mm.getRoot () == nullptr);
 
       const char* path1 = "/babu/riba";
       const char* path2 = path1;
 
       // No file system, identify nothing
-      assert(fsm.identifyFileSystem (&path2, nullptr) == nullptr);
+      assert(
+          os::posix::MountManager::identifyFileSystem (&path2, nullptr)
+              == nullptr);
 
-      // Check if root file system flags are those set by constructor.
-      assert(root.getFlags () == 1);
+      // Check if root_fs file system flags are those set by constructor.
+      assert(root_fs.getFlags () == 1);
 
       // Check setRoot(), and mount().
-      assert(fsm.setRoot (&root, &rootDevice, 123) == 0);
-      assert(fsm.getRoot () == &root);
-      assert(root.getBlockDevice () == &rootDevice);
+      assert(os::posix::MountManager::setRoot (&root_fs, &root_dev, 123) == 0);
+      assert(os::posix::MountManager::getRoot () == &root_fs);
+      assert(root_fs.getBlockDevice () == &root_dev);
 
       // Check mount flags.
-      assert(root.getFlags () == 123);
+      assert(root_fs.getFlags () == 123);
 
       // No file systems mounted, identify root.
       assert(
-          os::PosixFileSystemsManager::identifyFileSystem (&path2, nullptr)
-              == &root);
+          os::posix::MountManager::identifyFileSystem (&path2, nullptr)
+              == &root_fs);
       assert(path2 == path1);
     }
 
     {
-      // ----- FileSystemsManager mounts & umounts -----
+      // ----- MountManager mounts & umounts -----
 
       errno = -2;
       assert(
-          (os::PosixFileSystemsManager::mount (&babu, "/babu/", &babuDevice, 124) == 0) && (errno == 0));
-      assert(os::PosixFileSystemsManager::getFileSystem (0) == &babu);
-      assert(babu.getBlockDevice () == &babuDevice);
+          (os::posix::MountManager::mount (&fs1, "/fs1/", &dev1, 124) == 0) && (errno == 0));
+      assert(os::posix::MountManager::getFileSystem (0) == &fs1);
+      assert(fs1.getBlockDevice () == &dev1);
 
-      assert(babu.getFlags () == 124);
+      assert(fs1.getFlags () == 124);
 
       // Check not mounted file, should return root
       const char* path1 = "/baburiba";
       const char* path2 = path1;
 
       assert(
-          os::PosixFileSystemsManager::identifyFileSystem (&path2, nullptr)
-              == &root);
+          os::posix::MountManager::identifyFileSystem (&path2, nullptr)
+              == &root_fs);
       assert(path2 == path1);
 
       // Check busy error
       errno = -2;
-      assert(
-          os::PosixFileSystemsManager::mount (&babu, "/babu/", &babuDevice, 124)
-              == -1);
+      assert(os::posix::MountManager::mount (&fs1, "/fs1/", &dev1, 124) == -1);
       assert(errno == EBUSY);
 
-      path1 = "/babu/riba";
+      path1 = "/fs1/babu";
       path2 = path1;
 
-      const char* path3 = "/babu/biba";
+      const char* path3 = "/fs1/riba";
       const char* path4 = path3;
 
       // Check if identified properly
       assert(
-          os::PosixFileSystemsManager::identifyFileSystem (&path2, &path4)
-              == &babu);
+          os::posix::MountManager::identifyFileSystem (&path2, &path4) == &fs1);
 
       // Check if path adjusted properly
-      assert(path2 == (path1 + std::strlen ("/babu")));
-      assert(path4 == (path3 + std::strlen ("/babu")));
+      assert(path2 == (path1 + std::strlen ("/fs1")));
+      assert(path4 == (path3 + std::strlen ("/fs1")));
 
       // Check size exceeded
       errno = -2;
       assert(
-          (os::PosixFileSystemsManager::mount (&babu2, "/babu2/", &babuDevice2, 124) == 0) && (errno == 0));
+          (os::posix::MountManager::mount (&fs2, "/fs2/", &dev2, 124) == 0) && (errno == 0));
       errno = -2;
-      assert(
-          os::PosixFileSystemsManager::mount (&babu2, "/babu3/", &babuDevice2,
-                                              124) == -1);
+      assert(os::posix::MountManager::mount (&fs2, "/fs3/", &dev2, 124) == -1);
       assert(errno == ENOENT);
 
       // Check umounts
-      unsigned int cnt = babu.getSyncCount ();
+      unsigned int cnt = fs1.getSyncCount ();
       errno = -2;
       assert(
-          (os::PosixFileSystemsManager::umount ("/babu/", 134) == 0) && (errno == 0));
-      assert(babu.getFlags () == 134);
-      assert(babu.getSyncCount () == cnt + 1);
-      assert(babu.getBlockDevice () == nullptr);
+          (os::posix::MountManager::umount ("/fs1/", 134) == 0) && (errno == 0));
+      assert(fs1.getFlags () == 134);
+      assert(fs1.getSyncCount () == cnt + 1);
+      assert(fs1.getBlockDevice () == nullptr);
 
       // Check umounts
-      cnt = babu2.getSyncCount ();
+      cnt = fs2.getSyncCount ();
       errno = -2;
       assert(
-          (os::PosixFileSystemsManager::umount ("/babu2/", 144) == 0) && (errno == 0));
-      assert(babu2.getFlags () == 144);
-      assert(babu2.getSyncCount () == cnt + 1);
-      assert(babu2.getBlockDevice () == nullptr);
+          (os::posix::MountManager::umount ("/fs2/", 144) == 0) && (errno == 0));
+      assert(fs2.getFlags () == 144);
+      assert(fs2.getSyncCount () == cnt + 1);
+      assert(fs2.getBlockDevice () == nullptr);
     }
 
     {
       // Mount again
       errno = -2;
       assert(
-          (os::PosixFileSystemsManager::mount (&babu, "/babu/", &babuDevice, 124) == 0) && (errno == 0));
+          (os::posix::MountManager::mount (&fs1, "/fs1/", &dev1, 124) == 0) && (errno == 0));
     }
 
     {
@@ -716,68 +717,67 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       // CHMOD
       errno = -2;
-      assert((__posix_chmod ("/babu/p1", 321) == 0) && (errno == 0));
-      assert(babu.getCmd () == Cmds::CHMOD);
-      assert(babu.getNumber () == 321);
-      assert(std::strcmp ("/p1", babu.getPath ()) == 0);
+      assert((__posix_chmod ("/fs1/p1", 321) == 0) && (errno == 0));
+      assert(fs1.getCmd () == Cmds::CHMOD);
+      assert(fs1.getNumber () == 321);
+      assert(std::strcmp ("/p1", fs1.getPath ()) == 0);
 
       // STAT
       errno = -2;
       struct stat stat_buf;
-      assert((__posix_stat ("/babu/p2", &stat_buf) == 0) && (errno == 0));
-      assert(babu.getCmd () == Cmds::STAT);
-      assert(babu.getPtr () == &stat_buf);
-      assert(std::strcmp ("/p2", babu.getPath ()) == 0);
+      assert((__posix_stat ("/fs1/p2", &stat_buf) == 0) && (errno == 0));
+      assert(fs1.getCmd () == Cmds::STAT);
+      assert(fs1.getPtr () == &stat_buf);
+      assert(std::strcmp ("/p2", fs1.getPath ()) == 0);
 
       // TRUNCATE
       errno = -2;
-      assert((__posix_truncate ("/babu/p3", 876) == 0) && (errno == 0));
-      assert(babu.getCmd () == Cmds::TRUNCATE);
-      assert(babu.getNumber () == 876);
-      assert(std::strcmp ("/p3", babu.getPath ()) == 0);
+      assert((__posix_truncate ("/fs1/p3", 876) == 0) && (errno == 0));
+      assert(fs1.getCmd () == Cmds::TRUNCATE);
+      assert(fs1.getNumber () == 876);
+      assert(std::strcmp ("/p3", fs1.getPath ()) == 0);
 
       // RENAME
       errno = -2;
-      assert(
-          (__posix_rename ("/babu/p4", "/babu/p4-new") == 0) && (errno == 0));
-      assert(babu.getCmd () == Cmds::RENAME);
-      assert(std::strcmp ("/p4", babu.getPath ()) == 0);
-      assert(std::strcmp ("/p4-new", (const char* )babu.getPtr ()) == 0);
+      assert((__posix_rename ("/fs1/p4", "/fs1/p4-new") == 0) && (errno == 0));
+      assert(fs1.getCmd () == Cmds::RENAME);
+      assert(std::strcmp ("/p4", fs1.getPath ()) == 0);
+      assert(std::strcmp ("/p4-new", (const char* )fs1.getPtr ()) == 0);
 
       // UNLINK
       errno = -2;
-      assert((__posix_unlink ("/babu/p5") ==0) && (errno == 0));
-      assert(babu.getCmd () == Cmds::UNLINK);
-      assert(std::strcmp ("/p5", babu.getPath ()) == 0);
+      assert((__posix_unlink ("/fs1/p5") ==0) && (errno == 0));
+      assert(fs1.getCmd () == Cmds::UNLINK);
+      assert(std::strcmp ("/p5", fs1.getPath ()) == 0);
 
       // UTIME
       errno = -2;
       struct utimbuf times;
-      assert((__posix_utime ("/babu/p6", &times) ==0) && (errno == 0));
-      assert(babu.getCmd () == Cmds::UTIME);
-      assert(babu.getPtr () == &times);
-      assert(std::strcmp ("/p6", babu.getPath ()) == 0);
+      assert((__posix_utime ("/fs1/p6", &times) ==0) && (errno == 0));
+      assert(fs1.getCmd () == Cmds::UTIME);
+      assert(fs1.getPtr () == &times);
+      assert(std::strcmp ("/p6", fs1.getPath ()) == 0);
 
       // MKDIR
       errno = -2;
-      assert((__posix_mkdir ("/babu/p7", 654) ==0) && (errno == 0));
-      assert(babu.getCmd () == Cmds::MKDIR);
-      assert(babu.getNumber () == 654);
-      assert(std::strcmp ("/p7", babu.getPath ()) == 0);
+      assert((__posix_mkdir ("/fs1/p7", 654) ==0) && (errno == 0));
+      assert(fs1.getCmd () == Cmds::MKDIR);
+      assert(fs1.getNumber () == 654);
+      assert(std::strcmp ("/p7", fs1.getPath ()) == 0);
 
       // RMDIR
       errno = -2;
-      assert((__posix_rmdir ("/babu/p8") ==0) && (errno == 0));
-      assert(babu.getCmd () == Cmds::RMDIR);
-      assert(std::strcmp ("/p8", babu.getPath ()) == 0);
+      assert((__posix_rmdir ("/fs1/p8") ==0) && (errno == 0));
+      assert(fs1.getCmd () == Cmds::RMDIR);
+      assert(std::strcmp ("/p8", fs1.getPath ()) == 0);
 
       // SYNC
-      unsigned int cnt = babu.getSyncCount ();
+      unsigned int cnt = fs1.getSyncCount ();
       errno = -2;
       __posix_sync ();
       assert(errno == 0);
-      assert(babu.getCmd () == Cmds::RMDIR);
-      assert(babu.getSyncCount () == cnt + 1);
+      assert(fs1.getCmd () == Cmds::RMDIR);
+      assert(fs1.getSyncCount () == cnt + 1);
     }
 
     {
@@ -785,70 +785,70 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       // CHMOD
       errno = -2;
-      assert((os::PosixFile::chmod ("/babu/p1", 321) == 0) && (errno == 0));
-      assert(babu.getCmd () == Cmds::CHMOD);
-      assert(babu.getNumber () == 321);
-      assert(std::strcmp ("/p1", babu.getPath ()) == 0);
+      assert((os::posix::File::chmod ("/fs1/p1", 321) == 0) && (errno == 0));
+      assert(fs1.getCmd () == Cmds::CHMOD);
+      assert(fs1.getNumber () == 321);
+      assert(std::strcmp ("/p1", fs1.getPath ()) == 0);
 
       // STAT
       errno = -2;
       struct stat stat_buf;
       assert(
-          (os::PosixFile::stat ("/babu/p2", &stat_buf) == 0) && (errno == 0));
-      assert(babu.getCmd () == Cmds::STAT);
-      assert(babu.getPtr () == &stat_buf);
-      assert(std::strcmp ("/p2", babu.getPath ()) == 0);
+          (os::posix::File::stat ("/fs1/p2", &stat_buf) == 0) && (errno == 0));
+      assert(fs1.getCmd () == Cmds::STAT);
+      assert(fs1.getPtr () == &stat_buf);
+      assert(std::strcmp ("/p2", fs1.getPath ()) == 0);
 
       // TRUNCATE
       errno = -2;
-      assert((os::PosixFile::truncate ("/babu/p3", 876) == 0) && (errno == 0));
-      assert(babu.getCmd () == Cmds::TRUNCATE);
-      assert(babu.getNumber () == 876);
-      assert(std::strcmp ("/p3", babu.getPath ()) == 0);
+      assert((os::posix::File::truncate ("/fs1/p3", 876) == 0) && (errno == 0));
+      assert(fs1.getCmd () == Cmds::TRUNCATE);
+      assert(fs1.getNumber () == 876);
+      assert(std::strcmp ("/p3", fs1.getPath ()) == 0);
 
       // RENAME
       errno = -2;
       assert(
-          (os::PosixFile::rename ("/babu/p4", "/babu/p4-new") == 0) && (errno == 0));
-      assert(babu.getCmd () == Cmds::RENAME);
-      assert(std::strcmp ("/p4", babu.getPath ()) == 0);
-      assert(std::strcmp ("/p4-new", (const char* )babu.getPtr ()) == 0);
+          (os::posix::File::rename ("/fs1/p4", "/fs1/p4-new") == 0) && (errno == 0));
+      assert(fs1.getCmd () == Cmds::RENAME);
+      assert(std::strcmp ("/p4", fs1.getPath ()) == 0);
+      assert(std::strcmp ("/p4-new", (const char* )fs1.getPtr ()) == 0);
 
       // UNLINK
       errno = -2;
-      assert((os::PosixFile::unlink ("/babu/p5") ==0) && (errno == 0));
-      assert(babu.getCmd () == Cmds::UNLINK);
-      assert(std::strcmp ("/p5", babu.getPath ()) == 0);
+      assert((os::posix::File::unlink ("/fs1/p5") ==0) && (errno == 0));
+      assert(fs1.getCmd () == Cmds::UNLINK);
+      assert(std::strcmp ("/p5", fs1.getPath ()) == 0);
 
       // UTIME
       errno = -2;
       struct utimbuf times;
-      assert((os::PosixFile::utime ("/babu/p6", &times) ==0) && (errno == 0));
-      assert(babu.getCmd () == Cmds::UTIME);
-      assert(babu.getPtr () == &times);
-      assert(std::strcmp ("/p6", babu.getPath ()) == 0);
+      assert((os::posix::File::utime ("/fs1/p6", &times) ==0) && (errno == 0));
+      assert(fs1.getCmd () == Cmds::UTIME);
+      assert(fs1.getPtr () == &times);
+      assert(std::strcmp ("/p6", fs1.getPath ()) == 0);
 
       // MKDIR
       errno = -2;
       assert(
-          (os::PosixFileSystem::mkdir ("/babu/p7", 654) ==0) && (errno == 0));
-      assert(babu.getCmd () == Cmds::MKDIR);
-      assert(babu.getNumber () == 654);
-      assert(std::strcmp ("/p7", babu.getPath ()) == 0);
+          (os::posix::FileSystem::mkdir ("/fs1/p7", 654) ==0) && (errno == 0));
+      assert(fs1.getCmd () == Cmds::MKDIR);
+      assert(fs1.getNumber () == 654);
+      assert(std::strcmp ("/p7", fs1.getPath ()) == 0);
 
       // RMDIR
       errno = -2;
-      assert((os::PosixFileSystem::rmdir ("/babu/p8") ==0) && (errno == 0));
-      assert(babu.getCmd () == Cmds::RMDIR);
-      assert(std::strcmp ("/p8", babu.getPath ()) == 0);
+      assert((os::posix::FileSystem::rmdir ("/fs1/p8") ==0) && (errno == 0));
+      assert(fs1.getCmd () == Cmds::RMDIR);
+      assert(std::strcmp ("/p8", fs1.getPath ()) == 0);
 
       // SYNC
-      unsigned int cnt = babu.getSyncCount ();
+      unsigned int cnt = fs1.getSyncCount ();
       errno = -2;
-      os::PosixFileSystem::sync ();
+      os::posix::FileSystem::sync ();
       assert(errno == 0);
-      assert(babu.getCmd () == Cmds::RMDIR);
-      assert(babu.getSyncCount () == cnt + 1);
+      assert(fs1.getCmd () == Cmds::RMDIR);
+      assert(fs1.getSyncCount () == cnt + 1);
     }
 
     {
@@ -856,13 +856,13 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       // Test OPEN
       errno = -2;
-      int fd = __posix_open ("/babu/f1", 123, 234);
+      int fd = __posix_open ("/fs1/f1", 123, 234);
       assert((fd >= 0) && (errno == 0));
 
-      os::PosixIo* io = os::FileDescriptorsManager::getIo (fd);
+      os::posix::IO* io = os::posix::FileDescriptorsManager::getIo (fd);
       assert(io != nullptr);
 
-      assert(io->getType () == os::PosixIo::Type::FILE);
+      assert(io->getType () == os::posix::IO::Type::FILE);
 
       TestFile* file = static_cast<TestFile*> (io);
       // Must be the first used slot in the pool.
@@ -959,10 +959,10 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       // Test OPEN
       errno = -2;
-      os::PosixIo* file = os::PosixIo::open ("/babu/f1", 123, 234);
+      os::posix::IO* file = os::posix::open ("/fs1/f1", 123, 234);
       assert((file != nullptr) && (errno == 0));
 
-      assert(file->getType () == os::PosixIo::Type::FILE);
+      assert(file->getType () == os::posix::IO::Type::FILE);
 
       TestFile* tfile = static_cast<TestFile*> (file);
       // Must be the first used slot in the pool.

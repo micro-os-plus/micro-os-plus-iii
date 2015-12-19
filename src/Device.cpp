@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "posix-io/PosixDevice.h"
+#include "posix-io/Device.h"
 #include <cstring>
 #include <cassert>
 
@@ -24,31 +24,33 @@
 
 namespace os
 {
-
-  // --------------------------------------------------------------------------
-
-  PosixDevice::PosixDevice (const char* name)
+  namespace posix
   {
-    fType = Type::DEVICE;
-    fName = name;
-  }
+    // ------------------------------------------------------------------------
 
-  PosixDevice::~PosixDevice ()
-  {
-    fName = nullptr;
-  }
+    Device::Device (const char* name)
+    {
+      fType = Type::DEVICE;
+      fName = name;
+    }
 
-  // --------------------------------------------------------------------------
+    Device::~Device ()
+    {
+      fName = nullptr;
+    }
 
-  bool
-  PosixDevice::matchName (const char* name) const
-  {
-    assert(name != nullptr);
-    assert(fName != nullptr);
+    // ------------------------------------------------------------------------
 
-    return (std::strcmp (name, fName) == 0);
-  }
+    bool
+    Device::matchName (const char* name) const
+    {
+      assert(name != nullptr);
+      assert(fName != nullptr);
 
+      return (std::strcmp (name, fName) == 0);
+    }
+
+  } /* namespace posix */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------

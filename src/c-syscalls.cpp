@@ -17,12 +17,12 @@
  */
 
 #include "posix-io/FileDescriptorsManager.h"
-#include "posix-io/PosixIo.h"
-#include "posix-io/PosixDevice.h"
-#include "posix-io/PosixFile.h"
-#include "posix-io/PosixFileSystem.h"
-#include "posix-io/PosixFileSystemsManager.h"
-#include "posix-io/PosixDir.h"
+#include "posix-io/IO.h"
+#include "posix-io/Device.h"
+#include "posix-io/File.h"
+#include "posix-io/FileSystem.h"
+#include "posix-io/MountManager.h"
+#include "posix-io/Directory.h"
 #include <cstdarg>
 #include <cerrno>
 
@@ -388,7 +388,7 @@ __posix_open (const char* path, int oflag, ...)
 {
   va_list args;
   va_start(args, oflag);
-  auto io = os::PosixIo::vopen (path, oflag, args);
+  auto io = os::posix::vopen (path, oflag, args);
   va_end(args);
 
   if (io == nullptr)
@@ -406,7 +406,7 @@ __posix_close (int fildes)
 {
   // The flow is identical for all POSIX functions: identify the C++
   // object and call the corresponding C++ method.
-  auto io = os::FileDescriptorsManager::getIo (fildes);
+  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -420,7 +420,7 @@ __posix_close (int fildes)
 ssize_t
 __posix_read (int fildes, void* buf, size_t nbyte)
 {
-  auto io = os::FileDescriptorsManager::getIo (fildes);
+  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -432,7 +432,7 @@ __posix_read (int fildes, void* buf, size_t nbyte)
 ssize_t
 __posix_write (int fildes, const void* buf, size_t nbyte)
 {
-  auto io = os::FileDescriptorsManager::getIo (fildes);
+  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -444,7 +444,7 @@ __posix_write (int fildes, const void* buf, size_t nbyte)
 ssize_t
 __posix_writev (int fildes, const struct iovec* iov, int iovcnt)
 {
-  auto io = os::FileDescriptorsManager::getIo (fildes);
+  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -456,7 +456,7 @@ __posix_writev (int fildes, const struct iovec* iov, int iovcnt)
 int
 __posix_ioctl (int fildes, int request, ...)
 {
-  auto io = os::FileDescriptorsManager::getIo (fildes);
+  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -474,7 +474,7 @@ __posix_ioctl (int fildes, int request, ...)
 off_t
 __posix_lseek (int fildes, off_t offset, int whence)
 {
-  auto io = os::FileDescriptorsManager::getIo (fildes);
+  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -492,7 +492,7 @@ __posix_lseek (int fildes, off_t offset, int whence)
 int
 __posix_isatty (int fildes)
 {
-  auto io = os::FileDescriptorsManager::getIo (fildes);
+  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -504,7 +504,7 @@ __posix_isatty (int fildes)
 int
 __posix_fcntl (int fildes, int cmd, ...)
 {
-  auto io = os::FileDescriptorsManager::getIo (fildes);
+  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -522,7 +522,7 @@ __posix_fcntl (int fildes, int cmd, ...)
 int
 __posix_fstat (int fildes, struct stat* buf)
 {
-  auto io = os::FileDescriptorsManager::getIo (fildes);
+  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -534,7 +534,7 @@ __posix_fstat (int fildes, struct stat* buf)
 int
 __posix_ftruncate (int fildes, off_t length)
 {
-  auto io = os::FileDescriptorsManager::getIo (fildes);
+  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -546,7 +546,7 @@ __posix_ftruncate (int fildes, off_t length)
 int
 __posix_fsync (int fildes)
 {
-  auto io = os::FileDescriptorsManager::getIo (fildes);
+  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -561,37 +561,37 @@ __posix_fsync (int fildes)
 int
 __posix_chmod (const char* path, mode_t mode)
 {
-  return os::PosixFile::chmod (path, mode);
+  return os::posix::File::chmod (path, mode);
 }
 
 int
 __posix_stat (const char* path, struct stat* buf)
 {
-  return os::PosixFile::stat (path, buf);
+  return os::posix::File::stat (path, buf);
 }
 
 int
 __posix_truncate (const char* path, off_t length)
 {
-  return os::PosixFile::truncate (path, length);
+  return os::posix::File::truncate (path, length);
 }
 
 int
 __posix_rename (const char* existing, const char* _new)
 {
-  return os::PosixFile::rename (existing, _new);
+  return os::posix::File::rename (existing, _new);
 }
 
 int
 __posix_unlink (const char* path)
 {
-  return os::PosixFile::unlink (path);
+  return os::posix::File::unlink (path);
 }
 
 int
 __posix_utime (const char* path, const struct utimbuf* times)
 {
-  return os::PosixFile::utime (path, times);
+  return os::posix::File::utime (path, times);
 }
 
 // ----------------------------------------------------------------------------
@@ -600,19 +600,19 @@ __posix_utime (const char* path, const struct utimbuf* times)
 int
 __posix_mkdir (const char* path, mode_t mode)
 {
-  return os::PosixFileSystem::mkdir (path, mode);
+  return os::posix::FileSystem::mkdir (path, mode);
 }
 
 int
 __posix_rmdir (const char* path)
 {
-  return os::PosixFileSystem::rmdir (path);
+  return os::posix::FileSystem::rmdir (path);
 }
 
 void
 __posix_sync (void)
 {
-  return os::PosixFileSystem::sync ();
+  return os::posix::FileSystem::sync ();
 }
 
 // ----------------------------------------------------------------------------
@@ -621,13 +621,13 @@ __posix_sync (void)
 DIR*
 __posix_opendir (const char* dirpath)
 {
-  return (DIR*) os::PosixDir::open (dirpath);
+  return (DIR*) os::posix::Directory::open (dirpath);
 }
 
 struct dirent*
 __posix_readdir (DIR* dirp)
 {
-  auto dir = reinterpret_cast<os::PosixDir*> (dirp);
+  auto dir = reinterpret_cast<os::posix::Directory*> (dirp);
   if (dir == nullptr)
     {
       errno = ENOENT;
@@ -648,7 +648,7 @@ __posix_readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result)
 void
 __posix_rewinddir (DIR* dirp)
 {
-  auto dir = reinterpret_cast<os::PosixDir*> (dirp);
+  auto dir = reinterpret_cast<os::posix::Directory*> (dirp);
   if (dir == nullptr)
     {
       errno = ENOENT;
@@ -660,7 +660,7 @@ __posix_rewinddir (DIR* dirp)
 int
 __posix_closedir (DIR* dirp)
 {
-  auto dir = reinterpret_cast<os::PosixDir*> (dirp);
+  auto dir = reinterpret_cast<os::posix::Directory*> (dirp);
   if (dir == nullptr)
     {
       errno = ENOENT;

@@ -16,8 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef INCLUDE_POSIX_IO_UTIME_H_
-#define INCLUDE_POSIX_IO_UTIME_H_
+#ifndef POSIX_IO_UTIME_H_
+#define POSIX_IO_UTIME_H_
 
 // ----------------------------------------------------------------------------
 
@@ -26,4 +26,4 @@ utime (const char *path, const struct utimbuf* times);
 
 // ----------------------------------------------------------------------------
 
-#endif /* INCLUDE_POSIX_IO_UTIME_H_ */
+#endif /* POSIX_IO_UTIME_H_ */

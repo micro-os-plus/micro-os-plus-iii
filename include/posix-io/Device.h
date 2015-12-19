@@ -16,66 +16,72 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POSIX_IO_TPOSIX_POOL_H_
-#define POSIX_IO_TPOSIX_POOL_H_
+#ifndef POSIX_IO_DEVICE_H_
+#define POSIX_IO_DEVICE_H_
 
 // ----------------------------------------------------------------------------
 
-#include "posix-io/PosixPool.h"
+#include <sys/types.h>
+#include "posix-io/IO.h"
+
+// ----------------------------------------------------------------------------
+
+#if ! defined(OS_STRING_POSIX_DEVICE_PREFIX)
+#define OS_STRING_POSIX_DEVICE_PREFIX "/dev/"
+#endif
 
 // ----------------------------------------------------------------------------
 
 namespace os
 {
-  // --------------------------------------------------------------------------
+  namespace posix
+  {
+    // ------------------------------------------------------------------------
 
-  template<typename T>
-    class TPosixPool : public PosixPool
+    class Device : public IO
     {
     public:
 
-      TPosixPool (std::size_t size) :
-          PosixPool (size)
-      {
-        fArray = reinterpret_cast<void**> (new T*[size]);
-        for (std::size_t i = 0; i < size; ++i)
-          {
-            fArray[i] = new T;
-          }
-      }
-
-      TPosixPool (const TPosixPool&) = delete;
+      Device (const char* name);
+      Device (const Device&) = delete;
 
       virtual
-      ~TPosixPool ()
-      {
-        for (std::size_t i = 0; i < fSize; ++i)
-          {
-            delete static_cast<T*> (fArray[i]);
-          }
-        delete[] fArray;
-        fSize = 0;
-      }
+      ~Device ();
 
       // ----------------------------------------------------------------------
 
-      inline T*
-      __attribute__((always_inline))
-      aquire (void)
-      {
-        return static_cast<T*> (PosixPool::aquire ());
-      }
+      virtual bool
+      matchName (const char* name) const;
 
-      inline bool
-      __attribute__((always_inline))
-      release (T* obj)
-      {
-        return PosixPool::release (obj);
-      }
+      const char*
+      getName (void) const;
+
+      static const char*
+      getDevicePrefix (void);
+
+    protected:
+
+      const char* fName;
+
     };
 
+    // ------------------------------------------------------------------------
+
+    inline const char*
+    Device::getDevicePrefix (void)
+    {
+      return OS_STRING_POSIX_DEVICE_PREFIX;
+    }
+
+    inline const char*
+    Device::getName (void) const
+    {
+      return fName;
+    }
+
+  } /* namespace posix */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------
 
-#endif /* POSIX_IO_TPOSIX_POOL_H_ */
+#endif /* POSIX_IO_DEVICE_H_ */

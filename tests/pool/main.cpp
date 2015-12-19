@@ -17,11 +17,11 @@
  */
 
 #include "posix-io/FileDescriptorsManager.h"
-#include "posix-io/PosixIo.h"
-#include "posix-io/PosixFile.h"
-#include "posix-io/PosixDevice.h"
-#include "posix-io/PosixDevicesRegistry.h"
-#include "posix-io/TPosixPool.h"
+#include "posix-io/IO.h"
+#include "posix-io/File.h"
+#include "posix-io/Device.h"
+#include "posix-io/DevicesRegistry.h"
+#include "posix-io/TPool.h"
 #include <cerrno>
 #include <cassert>
 #include <cstdio>
@@ -34,11 +34,11 @@
 
 // Test class, all methods return ENOSYS, as not implemented, except open().
 
-class TestPosixFile : public os::PosixFile
+class TestFile : public os::posix::File
 {
 public:
 
-  TestPosixFile ();
+  TestFile ();
 
   int
   do_open (const char* path, int oflag, std::va_list args);
@@ -49,7 +49,7 @@ private:
 
 };
 
-TestPosixFile::TestPosixFile ()
+TestFile::TestFile ()
 {
   fSomething = 1;
 }
@@ -60,7 +60,7 @@ TestPosixFile::TestPosixFile ()
 #endif
 
 int
-TestPosixFile::do_open (const char* path, int oflag, std::va_list args)
+TestFile::do_open (const char* path, int oflag, std::va_list args)
 {
   va_arg(args, int);
 
@@ -73,7 +73,7 @@ TestPosixFile::do_open (const char* path, int oflag, std::va_list args)
 
 // ----------------------------------------------------------------------------
 
-using TestFilePool = os::TPosixPool<TestPosixFile>;
+using TestFilePool = os::posix::TPool<TestFile>;
 
 constexpr std::size_t POOL_ARRAY_SIZE = 2;
 
@@ -92,7 +92,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert(pool.getFlag (i) == false);
     }
 
-  TestPosixFile* fil = pool.aquire ();
+  TestFile* fil = pool.aquire ();
   assert(pool.getFlag (0) == true);
   assert(fil == pool.getObject (0));
 

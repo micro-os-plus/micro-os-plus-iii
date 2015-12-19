@@ -17,9 +17,9 @@
  */
 
 #include "posix-io/FileDescriptorsManager.h"
-#include "posix-io/PosixIo.h"
-#include "posix-io/PosixDevice.h"
-#include "posix-io/PosixDevicesRegistry.h"
+#include "posix-io/IO.h"
+#include "posix-io/Device.h"
+#include "posix-io/DevicesRegistry.h"
 #include <cerrno>
 #include <cassert>
 #include <cstdio>
@@ -32,11 +32,11 @@
 
 // Test class, all methods return ENOSYS, as not implemented, except open().
 
-class TestPosixDevice : public os::PosixDevice
+class TestDevice : public os::posix::Device
 {
 public:
 
-  TestPosixDevice (const char* deviceName, uint32_t deviceNumber);
+  TestDevice (const char* deviceName, uint32_t deviceNumber);
 
   virtual int
   do_open (const char* path, int oflag, va_list args);
@@ -51,15 +51,15 @@ private:
 
 };
 
-TestPosixDevice::TestPosixDevice (const char* deviceName, uint32_t deviceNumber) :
-    PosixDevice (deviceName)
+TestDevice::TestDevice (const char* deviceName, uint32_t deviceNumber) :
+    Device (deviceName)
 {
   fDeviceNumber = deviceNumber;
   fMode = 0;
 }
 
 int
-TestPosixDevice::getMode (void)
+TestDevice::getMode (void)
 {
   return fMode;
 }
@@ -70,7 +70,7 @@ TestPosixDevice::getMode (void)
 #endif
 
 int
-TestPosixDevice::do_open (const char* path, int oflag, va_list args)
+TestDevice::do_open (const char* path, int oflag, va_list args)
 {
   fMode = va_arg(args, int);
 
@@ -89,15 +89,15 @@ TestPosixDevice::do_open (const char* path, int oflag, va_list args)
 // ----------------------------------------------------------------------------
 
 #define DESCRIPTORS_ARRAY_SIZE (5)
-os::FileDescriptorsManager descriptorsManager
+os::posix::FileDescriptorsManager descriptorsManager
   { DESCRIPTORS_ARRAY_SIZE };
 
 #define DEVICES_ARRAY_SIZE (3)
-os::PosixDevicesRegistry devicesRegistry
+os::posix::DevicesRegistry devicesRegistry
   { DEVICES_ARRAY_SIZE };
 
 // This device will be mapped as "/dev/test"
-TestPosixDevice test
+TestDevice test
   { "test", 1 };
 
 // ----------------------------------------------------------------------------
@@ -116,32 +116,32 @@ extern "C"
 int
 main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
-  std::size_t sz = os::PosixDevicesRegistry::getSize ();
+  std::size_t sz = os::posix::DevicesRegistry::getSize ();
   assert(sz == DEVICES_ARRAY_SIZE);
 
   // Check if initial status is empty.
   for (std::size_t i = 0; i < sz; ++i)
     {
-      assert(os::PosixDevicesRegistry::getDevice (i) == nullptr);
+      assert(os::posix::DevicesRegistry::getDevice (i) == nullptr);
     }
 
   // Register device
-  os::PosixDevicesRegistry::add (&test);
+  os::posix::DevicesRegistry::add (&test);
 
   // Check if first device is registered.
-  assert(os::PosixDevicesRegistry::getDevice (0) == &test);
+  assert(os::posix::DevicesRegistry::getDevice (0) == &test);
 
   // Test C++ API
 
-  os::PosixIo* io;
-  io = os::PosixIo::open ("/dev/test", 0, 123);
+  os::posix::IO* io;
+  io = os::posix::open ("/dev/test", 0, 123);
   assert((io != nullptr) && (errno == 0));
 
   int fd;
   fd = io->getFileDescriptor ();
 
   // Get it back; is it the same?
-  assert(os::FileDescriptorsManager::getIo (fd) == &test);
+  assert(os::posix::FileDescriptorsManager::getIo (fd) == &test);
 
   // Check passing variadic mode.
   assert(test.getMode () == 123);
@@ -151,8 +151,8 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   assert((ret == 0) && (errno == 0));
 
   // Check if descriptor freed.
-  assert(os::FileDescriptorsManager::getIo (fd) == nullptr);
-  assert(test.getFileDescriptor () == os::noFileDescriptor);
+  assert(os::posix::FileDescriptorsManager::getIo (fd) == nullptr);
+  assert(test.getFileDescriptor () == os::posix::noFileDescriptor);
 
   // Test C API
 
@@ -160,7 +160,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   assert((fd >= 3) && (errno == 0));
 
   // Get it back; is it the same?
-  assert(os::FileDescriptorsManager::getIo (fd) == &test);
+  assert(os::posix::FileDescriptorsManager::getIo (fd) == &test);
   assert(test.getFileDescriptor () == fd);
 
   // Check passing variadic mode.
@@ -171,8 +171,8 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   assert((ret == 0) && (errno == 0));
 
   // Check if descriptor freed.
-  assert(os::FileDescriptorsManager::getIo (fd) == nullptr);
-  assert(test.getFileDescriptor () == os::noFileDescriptor);
+  assert(os::posix::FileDescriptorsManager::getIo (fd) == nullptr);
+  assert(test.getFileDescriptor () == os::posix::noFileDescriptor);
 
   const char* msg = "'test-device-debug' succeeded.\n";
 #if defined(OS_INCLUDE_TRACE_PRINTF)

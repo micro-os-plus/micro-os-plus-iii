@@ -16,8 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef INCLUDE_POSIX_IO_DIRENT_H_
-#define INCLUDE_POSIX_IO_DIRENT_H_
+#ifndef POSIX_IO_DIRENT_H_
+#define POSIX_IO_DIRENT_H_
 
 // ----------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ struct dirent
 };
 
 // The content of this structure is not relevant, it is here just to keep
-// POSIX compatibility, in real life the PosixDir class is used
+// POSIX compatibility, in real life the Directory class is used
 // and casted to DIR.
 typedef struct
 {
@@ -62,4 +62,4 @@ closedir (DIR* dirp);
 
 // ----------------------------------------------------------------------------
 
-#endif /* INCLUDE_POSIX_IO_DIRENT_H_ */
+#endif /* POSIX_IO_DIRENT_H_ */

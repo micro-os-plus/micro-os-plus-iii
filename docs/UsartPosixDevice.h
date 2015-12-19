@@ -1,30 +1,30 @@
-#include "posix-io/PosixDevice.h"
+#include "posix-io/Device.h"
 
-class UsartPosixDevice : public os::PosixDevice
+class UsartDevice : public os::posix::Device
 {
 public:
-  UsartPosixDevice (const char* name);
+  UsartDevice (const char* name);
 
   virtual
-  ~UsartPosixDevice ();
+  ~UsartDevice ();
 
   virtual int
-  doOpen (const char* path, int oflag, va_list args);
+  do_open (const char* path, int oflag, va_list args);
 
   virtual int
-  doClose (void);
+  do_close (void);
 
   virtual ssize_t
-  doRead (void* buf, size_t nbyte);
+  do_read (void* buf, size_t nbyte);
 
   virtual ssize_t
-  doWrite (const void* buf, size_t nbyte);
+  do_write (const void* buf, size_t nbyte);
 
   virtual int
-  doIoctl (int request, va_list args);
+  do_ioctl (int request, va_list args);
 
   virtual int
-  doIsatty ();
+  do_isatty ();
 
 private:
 

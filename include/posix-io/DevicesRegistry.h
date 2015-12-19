@@ -16,12 +16,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POSIX_IO_FILE_DESCRIPTORS_MANAGER_H_
-#define POSIX_IO_FILE_DESCRIPTORS_MANAGER_H_
+#ifndef POSIX_IO_DEVICES_MANAGER_H_
+#define POSIX_IO_DEVICES_MANAGER_H_
 
 // ----------------------------------------------------------------------------
 
-#include "posix-io/Types.h"
 #include <cstddef>
 #include <cassert>
 
@@ -31,61 +30,60 @@ namespace os
 {
   namespace posix
   {
+    // ------------------------------------------------------------------------
+
+    class Device;
 
     // ------------------------------------------------------------------------
 
-    class IO;
-
-    // ------------------------------------------------------------------------
-
-    class FileDescriptorsManager
+    class DevicesRegistry
     {
     public:
 
-      FileDescriptorsManager (std::size_t size);
-      FileDescriptorsManager (const FileDescriptorsManager&) = delete;
+      DevicesRegistry (std::size_t size);
+      DevicesRegistry (const DevicesRegistry&) = delete;
 
-      ~FileDescriptorsManager ();
+      ~DevicesRegistry ();
 
       // ----------------------------------------------------------------------
 
-      static size_t
+      static void
+      add (Device* device);
+
+      static void
+      remove (Device* device);
+
+      static Device*
+      identifyDevice (const char* path);
+
+      static std::size_t
       getSize (void);
 
-      static bool
-      isValid (int fildes);
-
-      static IO*
-      getIo (int fildes);
-
-      static int
-      alloc (IO* io);
-
-      static int
-      free (fileDescriptor_t fildes);
+      static Device*
+      getDevice (std::size_t index);
 
       // ----------------------------------------------------------------------
+
     private:
 
       static std::size_t sfSize;
 
-      static IO** sfDescriptorsArray;
+      static Device** sfRegistryArray;
     };
 
     // ------------------------------------------------------------------------
 
-    inline size_t
-    FileDescriptorsManager::getSize (void)
+    inline std::size_t
+    DevicesRegistry::getSize (void)
     {
       return sfSize;
     }
 
-    inline IO*
-    FileDescriptorsManager::getIo (int fildes)
+    inline Device*
+    DevicesRegistry::getDevice (std::size_t index)
     {
-      assert((fildes >= 0) && (((std::size_t ) fildes) < sfSize));
-
-      return sfDescriptorsArray[fildes];
+      assert(index < sfSize);
+      return sfRegistryArray[index];
     }
 
   } /* namespace posix */
@@ -93,4 +91,4 @@ namespace os
 
 // ----------------------------------------------------------------------------
 
-#endif /* POSIX_IO_FILE_DESCRIPTORS_MANAGER_H_ */
+#endif /* POSIX_IO_DEVICES_MANAGER_H_ */

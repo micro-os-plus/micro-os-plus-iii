@@ -16,17 +16,20 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BLOCKDEVICE_H_
-#define BLOCKDEVICE_H_
+#ifndef POSIX_IO_BLOCK_DEVICE_H_
+#define POSIX_IO_BLOCK_DEVICE_H_
 
 namespace os
 {
-  class BlockDevice
+  namespace posix
   {
-  public:
-    BlockDevice () = default;
+    class BlockDevice
+    {
+    public:
+      BlockDevice () = default;
 
-  };
+    };
+  } /* namespace posix */
 } /* namespace os */
 
-#endif /* BLOCKDEVICE_H_ */
+#endif /* POSIX_IO_BLOCK_DEVICE_H_ */

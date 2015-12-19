@@ -17,7 +17,7 @@
  */
 
 #include "posix-io/FileDescriptorsManager.h"
-#include "posix-io/PosixIo.h"
+#include "posix-io/IO.h"
 #include <cerrno>
 #include <cassert>
 
@@ -25,85 +25,87 @@
 
 namespace os
 {
-
-  // ----------------------------------------------------------------------------
-
-  std::size_t FileDescriptorsManager::sfSize;
-  PosixIo** FileDescriptorsManager::sfDescriptorsArray;
-
-  // --------------------------------------------------------------------------
-
-  FileDescriptorsManager::FileDescriptorsManager (std::size_t size)
+  namespace posix
   {
-    assert(size > 3);
+    // ------------------------------------------------------------------------
 
-    sfSize = size;
-    sfDescriptorsArray = new PosixIo*[size];
+    std::size_t FileDescriptorsManager::sfSize;
+    IO** FileDescriptorsManager::sfDescriptorsArray;
 
-    for (std::size_t i = 0; i < getSize (); ++i)
-      {
-        sfDescriptorsArray[i] = nullptr;
-      }
-  }
+    // ------------------------------------------------------------------------
 
-  FileDescriptorsManager::~FileDescriptorsManager ()
-  {
-    delete[] sfDescriptorsArray;
-    sfSize = 0;
-  }
+    FileDescriptorsManager::FileDescriptorsManager (std::size_t size)
+    {
+      assert(size > 3);
 
-  // --------------------------------------------------------------------------
+      sfSize = size;
+      sfDescriptorsArray = new IO*[size];
 
-  bool
-  FileDescriptorsManager::isValid (int fildes)
-  {
-    if ((fildes < 0) || (((std::size_t) fildes) >= sfSize))
-      {
-        return false;
-      }
-    return true;
-  }
+      for (std::size_t i = 0; i < getSize (); ++i)
+        {
+          sfDescriptorsArray[i] = nullptr;
+        }
+    }
 
-  int
-  FileDescriptorsManager::alloc (PosixIo* io)
-  {
-    if (io->getFileDescriptor () >= 0)
-      {
-        // Already allocated
-        errno = EBUSY;
-        return -1;
-      }
+    FileDescriptorsManager::~FileDescriptorsManager ()
+    {
+      delete[] sfDescriptorsArray;
+      sfSize = 0;
+    }
 
-    // Reserve 0, 1, 2 (stdin, stdout, stderr)
-    for (std::size_t i = 3; i < sfSize; ++i)
-      {
-        if (sfDescriptorsArray[i] == nullptr)
-          {
-            sfDescriptorsArray[i] = io;
-            io->setFileDescriptor (i);
-            return i;
-          }
-      }
+    // ------------------------------------------------------------------------
 
-    // Too many files open in system.
-    errno = ENFILE;
-    return -1;
-  }
+    bool
+    FileDescriptorsManager::isValid (int fildes)
+    {
+      if ((fildes < 0) || (((std::size_t) fildes) >= sfSize))
+        {
+          return false;
+        }
+      return true;
+    }
 
-  int
-  FileDescriptorsManager::free (int fildes)
-  {
-    if ((fildes < 0) || (((std::size_t) fildes) >= sfSize))
-      {
-        errno = EBADF;
-        return -1;
-      }
+    int
+    FileDescriptorsManager::alloc (IO* io)
+    {
+      if (io->getFileDescriptor () >= 0)
+        {
+          // Already allocated
+          errno = EBUSY;
+          return -1;
+        }
 
-    sfDescriptorsArray[fildes]->clearFileDescriptor ();
-    sfDescriptorsArray[fildes] = nullptr;
-    return 0;
-  }
+      // Reserve 0, 1, 2 (stdin, stdout, stderr)
+      for (std::size_t i = 3; i < sfSize; ++i)
+        {
+          if (sfDescriptorsArray[i] == nullptr)
+            {
+              sfDescriptorsArray[i] = io;
+              io->setFileDescriptor (i);
+              return i;
+            }
+        }
 
+      // Too many files open in system.
+      errno = ENFILE;
+      return -1;
+    }
+
+    int
+    FileDescriptorsManager::free (int fildes)
+    {
+      if ((fildes < 0) || (((std::size_t) fildes) >= sfSize))
+        {
+          errno = EBADF;
+          return -1;
+        }
+
+      sfDescriptorsArray[fildes]->clearFileDescriptor ();
+      sfDescriptorsArray[fildes] = nullptr;
+      return 0;
+    }
+
+  } /* namespace posix */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------

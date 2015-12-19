@@ -17,8 +17,8 @@
  */
 
 #include "posix-io/FileDescriptorsManager.h"
-#include "posix-io/PosixIo.h"
-#include "posix-io/PosixDevice.h"
+#include "posix-io/IO.h"
+#include "posix-io/Device.h"
 #include <cerrno>
 #include <cassert>
 #include <cstdio>
@@ -31,12 +31,13 @@
 
 // Mock class, all methods return ENOSYS, as not implemented.
 
-class TestPosixIo : public os::PosixIo
+class TestIO : public os::posix::IO
 {
 public:
 
   virtual int
   do_open (const char *path, int oflag, va_list args);
+
 };
 
 #if defined ( __GNUC__ )
@@ -45,7 +46,7 @@ public:
 #endif
 
 int
-TestPosixIo::do_open (const char *path, int oflag, va_list args)
+TestIO::do_open (const char *path, int oflag, va_list args)
 {
   errno = ENOSYS;
   return -1;
@@ -57,71 +58,76 @@ TestPosixIo::do_open (const char *path, int oflag, va_list args)
 
 // ----------------------------------------------------------------------------
 
-os::FileDescriptorsManager descriptorsManager
-  { 5 };
+// Size must be 5 for this test.
+constexpr std::size_t FD_MANAGER_ARRAY_SIZE = 5;
 
-TestPosixIo test1;
-TestPosixIo test2;
-TestPosixIo test3;
+os::posix::FileDescriptorsManager descriptorsManager
+  { FD_MANAGER_ARRAY_SIZE };
+
+TestIO test1;
+TestIO test2;
+TestIO test3;
 
 // ----------------------------------------------------------------------------
 
 int
 main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
-  size_t sz = os::FileDescriptorsManager::getSize ();
+  size_t sz = os::posix::FileDescriptorsManager::getSize ();
   // Size must be 5 for this test
-  assert(sz == 5);
+  assert(sz == FD_MANAGER_ARRAY_SIZE);
 
   for (std::size_t i = 0; i < sz; ++i)
     {
-      assert(os::FileDescriptorsManager::getIo (i) == nullptr);
+      assert(os::posix::FileDescriptorsManager::getIo (i) == nullptr);
     }
 
-  // Check limits
-  assert(os::FileDescriptorsManager::isValid (-1) == false);
-  assert(os::FileDescriptorsManager::isValid (sz) == false);
+  // Check limits.
+  assert(os::posix::FileDescriptorsManager::isValid (-1) == false);
+  assert(os::posix::FileDescriptorsManager::isValid (sz) == false);
 
-  // Allocation should start with 3 (stdin, stdout, stderr preserved)
+  // Allocation should start with 3 (stdin, stdout, stderr preserved).
   int fd1;
-  fd1 = os::FileDescriptorsManager::alloc (&test1);
+  fd1 = os::posix::FileDescriptorsManager::alloc (&test1);
   assert(fd1 == 3);
 
   // Get it back; is it the same?
-  assert(os::FileDescriptorsManager::getIo (fd1) == &test1);
+  assert(os::posix::FileDescriptorsManager::getIo (fd1) == &test1);
   assert(test1.getFileDescriptor () == fd1);
 
-  // Reallocate opened file, must be busy
+  // Reallocate opened file, must be busy.
   int fd2;
-  fd2 = os::FileDescriptorsManager::alloc (&test1);
+  fd2 = os::posix::FileDescriptorsManager::alloc (&test1);
   assert((fd2 == -1) && (errno == EBUSY));
 
-  // Free descriptor
-  assert(os::FileDescriptorsManager::free (fd1) == 0);
-  assert(os::FileDescriptorsManager::getIo (fd1) == nullptr);
-  assert(test1.getFileDescriptor () == os::noFileDescriptor);
+  // Free descriptor.
+  assert(os::posix::FileDescriptorsManager::free (fd1) == 0);
+  assert(os::posix::FileDescriptorsManager::getIo (fd1) == nullptr);
+  assert(test1.getFileDescriptor () == os::posix::noFileDescriptor);
 
-  // With clean table, alloc to fill the table (size is 5)
-  fd1 = os::FileDescriptorsManager::alloc (&test1);
+  // With clean table, alloc repeatedly to fill the table (size is 5).
+  fd1 = os::posix::FileDescriptorsManager::alloc (&test1);
   assert(fd1 == 3);
-  fd2 = os::FileDescriptorsManager::alloc (&test2);
+  fd2 = os::posix::FileDescriptorsManager::alloc (&test2);
   assert(fd2 == 4);
 
-  // Table full
+  // Table full.
   int fd3;
-  fd3 = os::FileDescriptorsManager::alloc (&test3);
+  fd3 = os::posix::FileDescriptorsManager::alloc (&test3);
   assert((fd3 == -1) && (errno == ENFILE));
 
-  // Free outside range
-  assert((os::FileDescriptorsManager::free(-1) == -1) && (errno == EBADF));
-  assert((os::FileDescriptorsManager::free(sz) == -1) && (errno == EBADF));
+  // Free outside range.
+  assert(
+      (os::posix::FileDescriptorsManager::free(-1) == -1) && (errno == EBADF));
+  assert(
+      (os::posix::FileDescriptorsManager::free(sz) == -1) && (errno == EBADF));
 
-  // Free last
-  assert(os::FileDescriptorsManager::free (sz - 1) == 0);
+  // Free last.
+  assert(os::posix::FileDescriptorsManager::free (sz - 1) == 0);
 
-  // Reallocate last
-  fd3 = os::FileDescriptorsManager::alloc (&test3);
-  assert(fd3 == ((os::fileDescriptor_t )(sz - 1)));
+  // Reallocate last.
+  fd3 = os::posix::FileDescriptorsManager::alloc (&test3);
+  assert(fd3 == ((os::posix::fileDescriptor_t )(sz - 1)));
 
   const char* msg = "'test-descriptors-manager-debug' done.\n";
 #if defined(OS_INCLUDE_TRACE_PRINTF)

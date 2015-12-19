@@ -1,0 +1,128 @@
+/*
+ * This file is part of the µOS++ distribution.
+ *   (https://github.com/micro-os-plus)
+ * Copyright (c) 2015 Liviu Ionescu.
+ *
+ * µOS++ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, version 3.
+ *
+ * µOS++ is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef POSIX_IO_FILE_H_
+#define POSIX_IO_FILE_H_
+
+// ----------------------------------------------------------------------------
+
+#include "posix-io/IO.h"
+
+#if defined(__ARM_EABI__)
+#include "posix-io/utime.h"
+#else
+#include <utime.h>
+#endif
+
+// ----------------------------------------------------------------------------
+
+namespace os
+{
+  namespace posix
+  {
+    // ------------------------------------------------------------------------
+
+    class FileSystem;
+    class Pool;
+
+    // ------------------------------------------------------------------------
+
+    class File : public IO
+    {
+      friend class FileSystem;
+
+    public:
+
+      File ();
+      File (const File&) = delete;
+
+      ~File ();
+
+      // ----------------------------------------------------------------------
+      // Same as IO versions, but return a File
+
+      static File*
+      open (const char* path, int oflag, ...);
+
+      static File*
+      vopen (const char* path, int oflag, std::va_list args);
+
+      // ----------------------------------------------------------------------
+      // There is a small catch here, these functions are implemented in the
+      // FileSystem object, but since the path refers to a file, it seems
+      // more natural to address them within File.
+
+      static int
+      chmod (const char* path, mode_t mode);
+
+      static int
+      stat (const char* path, struct stat* buf);
+
+      static int
+      truncate (const char* path, off_t length);
+
+      static int
+      rename (const char* existing, const char* _new);
+
+      static int
+      unlink (const char* path);
+
+      static int
+      utime (const char* path, const struct utimbuf* times);
+
+      // ----------------------------------------------------------------------
+
+      FileSystem*
+      getFileSystem (void) const;
+
+    protected:
+
+      void
+      setFileSystem (FileSystem* fileSystem);
+
+    protected:
+
+      FileSystem* fFileSystem;
+    };
+
+    // ------------------------------------------------------------------------
+
+    inline File*
+    File::vopen (const char* path, int oflag, std::va_list args)
+    {
+      return static_cast<File*> (os::posix::vopen (path, oflag, args));
+    }
+
+    inline void
+    File::setFileSystem (FileSystem* fileSystem)
+    {
+      fFileSystem = fileSystem;
+    }
+
+    inline FileSystem*
+    File::getFileSystem (void) const
+    {
+      return fFileSystem;
+    }
+
+  } /* namespace posix */
+} /* namespace os */
+
+// ----------------------------------------------------------------------------
+
+#endif /* POSIX_IO_FILE_H_ */

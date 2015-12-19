@@ -17,12 +17,12 @@
  */
 
 #include "posix-io/FileDescriptorsManager.h"
-#include "posix-io/PosixIo.h"
-#include "posix-io/PosixDir.h"
-#include "posix-io/PosixFile.h"
-#include "posix-io/PosixFileSystem.h"
-#include "posix-io/TPosixPool.h"
-#include "posix-io/PosixFileSystemsManager.h"
+#include "posix-io/IO.h"
+#include "posix-io/Directory.h"
+#include "posix-io/File.h"
+#include "posix-io/FileSystem.h"
+#include "posix-io/TPool.h"
+#include "posix-io/MountManager.h"
 #include "posix-io/BlockDevice.h"
 #include <cerrno>
 #include <cassert>
@@ -41,7 +41,7 @@ enum class Cmds
     { UNKNOWN, NOTSET, OPEN, CLOSE, READ, REWIND
 };
 
-class TestFile : public os::PosixFile
+class TestFile : public os::posix::File
 {
 public:
 
@@ -135,7 +135,7 @@ TestFile::do_close (void)
 // Test class, all methods store the input in local variables,
 // to be checked later.
 
-class TestDir : public os::PosixDir
+class TestDir : public os::posix::Directory
 {
 public:
 
@@ -152,7 +152,7 @@ protected:
 
   // Implementations.
 
-  virtual PosixDir*
+  virtual Directory*
   do_open (const char* dirname) override;
 
   virtual struct dirent*
@@ -191,7 +191,7 @@ TestDir::getPath (void)
   return fPath;
 }
 
-os::PosixDir*
+os::posix::Directory*
 TestDir::do_open (const char* dirname)
 {
   fPath = dirname;
@@ -228,11 +228,11 @@ TestDir::do_rewind (void)
 
 // ----------------------------------------------------------------------------
 
-class TestFileSystem : public os::PosixFileSystem
+class TestFileSystem : public os::posix::FileSystem
 {
 public:
 
-  TestFileSystem (os::PosixPool* filesPool, os::PosixPool* dirsPool);
+  TestFileSystem (os::posix::Pool* filesPool, os::posix::Pool* dirsPool);
 
   // Methods used for test purposes only.
   unsigned int
@@ -264,9 +264,9 @@ private:
   unsigned int fSyncCount;
 };
 
-TestFileSystem::TestFileSystem (os::PosixPool* filesPool,
-                                os::PosixPool* dirsPool) :
-    os::PosixFileSystem (filesPool, dirsPool)
+TestFileSystem::TestFileSystem (os::posix::Pool* filesPool,
+                                os::posix::Pool* dirsPool) :
+    os::posix::FileSystem (filesPool, dirsPool)
 {
   fMountFlags = 1;
   fCmd = Cmds::NOTSET;
@@ -316,7 +316,7 @@ TestFileSystem::do_sync (void)
 // ----------------------------------------------------------------------------
 
 // Required only as a reference, no functionality needed.
-class TestBlockDevice : public os::BlockDevice
+class TestBlockDevice : public os::posix::BlockDevice
 {
 public:
   TestBlockDevice () = default;
@@ -324,7 +324,7 @@ public:
 
 // ----------------------------------------------------------------------------
 
-using TestFilePool = os::TPosixPool<TestFile>;
+using TestFilePool = os::posix::TPool<TestFile>;
 
 constexpr std::size_t FILES_POOL_ARRAY_SIZE = 2;
 
@@ -332,7 +332,7 @@ constexpr std::size_t FILES_POOL_ARRAY_SIZE = 2;
 TestFilePool filesPool
   { FILES_POOL_ARRAY_SIZE };
 
-using TestDirPool = os::TPosixPool<TestDir>;
+using TestDirPool = os::posix::TPool<TestDir>;
 
 constexpr std::size_t DIRS_POOL_ARRAY_SIZE = 2;
 
@@ -345,11 +345,11 @@ TestFileSystem root (&filesPool, &dirsPool);
 TestFileSystem babu (&filesPool, &dirsPool);
 
 // Static manager
-os::FileDescriptorsManager dm
+os::posix::FileDescriptorsManager dm
   { 5 };
 
 // Static manager
-os::PosixFileSystemsManager fsm
+os::posix::MountManager fsm
   { 2 };
 
 // Block devices, just referenced, no calls forwarded to them.
@@ -383,7 +383,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       // Mount
       errno = -2;
       assert(
-          (os::PosixFileSystemsManager::mount (&babu, "/babu/", &babuDevice, 124) == 0) && (errno == 0));
+          (os::posix::MountManager::mount (&babu, "/babu/", &babuDevice, 124) == 0) && (errno == 0));
     }
 
     {
@@ -465,7 +465,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       // Test OPEN
       errno = -2;
-      os::PosixDir* dir = os::PosixDir::open ("/babu/d2");
+      os::posix::Directory* dir = os::posix::Directory::open ("/babu/d2");
       assert((dir != nullptr) && (errno == 0));
 
       // Must be the first used slot in the pool.

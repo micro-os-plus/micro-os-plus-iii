@@ -46,7 +46,7 @@ ret = close(fd);
 
 Although a small C++ glue code is required to allow registration to the central drivers registry, it is perfectly possible to integrate drivers with C implementations.
 
-For this, define C functions with prototypes identical to the `doXxx()` functions in the `PosixIo.h`.
+For this, define C functions with prototypes identical to the `doXxx()` functions in the `IO.h`.
 
 For example, for an USART driver, define:
 
@@ -81,9 +81,9 @@ mode = va_arg(args, int);
 
 ### C++ glue code
 
-To link the implementation to the POSIX IO subsystem, it is necessary to define an object derived from `os::PosixDevice` and implement the `doXxx()` functions.
+To link the implementation to the POSIX IO subsystem, it is necessary to define an object derived from `os::posix::Device` and implement the `do_xxx()` functions.
 
-For an complete example, please check the sample `UsartPosixDevice` class in `docs`.
+For an complete example, please check the sample `UsartDevice` class in `docs`.
 
 ### Further improvements
 

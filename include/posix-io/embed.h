@@ -16,8 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef INCLUDE_POSIX_IO_EMBED_H_
-#define INCLUDE_POSIX_IO_EMBED_H_
+#ifndef POSIX_IO_EMBED_H_
+#define POSIX_IO_EMBED_H_
 
 // ----------------------------------------------------------------------------
 
@@ -29,4 +29,4 @@ sync (void);
 
 // ----------------------------------------------------------------------------
 
-#endif /* INCLUDE_POSIX_IO_EMBED_H_ */
+#endif /* POSIX_IO_EMBED_H_ */
