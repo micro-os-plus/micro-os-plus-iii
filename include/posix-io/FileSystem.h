@@ -40,7 +40,7 @@ namespace os
     class Pool;
 
     // ----------------------------------------------------------------------
-    // ----- Non-io functions -----
+    // ----- Non-io, global file system functions -----
 
     int
     mkdir (const char* path, mode_t mode);
@@ -50,6 +50,27 @@ namespace os
 
     void
     sync (void);
+
+    // ----------------------------------------------------------------------
+    // ----- Non-io, file functions -----
+
+    int
+    chmod (const char* path, mode_t mode);
+
+    int
+    stat (const char* path, struct stat* buf);
+
+    int
+    truncate (const char* path, off_t length);
+
+    int
+    rename (const char* existing, const char* _new);
+
+    int
+    unlink (const char* path);
+
+    int
+    utime (const char* path, const struct utimbuf* times);
 
     // ------------------------------------------------------------------------
 
@@ -70,6 +91,24 @@ namespace os
 
       friend void
       sync (void);
+
+      friend int
+      chmod (const char* path, mode_t mode);
+
+      friend int
+      stat (const char* path, struct stat* buf);
+
+      friend int
+      truncate (const char* path, off_t length);
+
+      friend int
+      rename (const char* existing, const char* _new);
+
+      friend int
+      unlink (const char* path);
+
+      friend int
+      utime (const char* path, const struct utimbuf* times);
 
       // ----------------------------------------------------------------------
 

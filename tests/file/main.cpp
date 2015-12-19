@@ -785,7 +785,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       // CHMOD
       errno = -2;
-      assert((os::posix::File::chmod ("/fs1/p1", 321) == 0) && (errno == 0));
+      assert((os::posix::chmod ("/fs1/p1", 321) == 0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::CHMOD);
       assert(fs1.getNumber () == 321);
       assert(std::strcmp ("/p1", fs1.getPath ()) == 0);
@@ -793,15 +793,14 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       // STAT
       errno = -2;
       struct stat stat_buf;
-      assert(
-          (os::posix::File::stat ("/fs1/p2", &stat_buf) == 0) && (errno == 0));
+      assert((os::posix::stat ("/fs1/p2", &stat_buf) == 0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::STAT);
       assert(fs1.getPtr () == &stat_buf);
       assert(std::strcmp ("/p2", fs1.getPath ()) == 0);
 
       // TRUNCATE
       errno = -2;
-      assert((os::posix::File::truncate ("/fs1/p3", 876) == 0) && (errno == 0));
+      assert((os::posix::truncate ("/fs1/p3", 876) == 0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::TRUNCATE);
       assert(fs1.getNumber () == 876);
       assert(std::strcmp ("/p3", fs1.getPath ()) == 0);
@@ -809,21 +808,21 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       // RENAME
       errno = -2;
       assert(
-          (os::posix::File::rename ("/fs1/p4", "/fs1/p4-new") == 0) && (errno == 0));
+          (os::posix::rename ("/fs1/p4", "/fs1/p4-new") == 0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::RENAME);
       assert(std::strcmp ("/p4", fs1.getPath ()) == 0);
       assert(std::strcmp ("/p4-new", (const char* )fs1.getPtr ()) == 0);
 
       // UNLINK
       errno = -2;
-      assert((os::posix::File::unlink ("/fs1/p5") ==0) && (errno == 0));
+      assert((os::posix::unlink ("/fs1/p5") ==0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::UNLINK);
       assert(std::strcmp ("/p5", fs1.getPath ()) == 0);
 
       // UTIME
       errno = -2;
       struct utimbuf times;
-      assert((os::posix::File::utime ("/fs1/p6", &times) ==0) && (errno == 0));
+      assert((os::posix::utime ("/fs1/p6", &times) ==0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::UTIME);
       assert(fs1.getPtr () == &times);
       assert(std::strcmp ("/p6", fs1.getPath ()) == 0);

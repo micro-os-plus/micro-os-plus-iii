@@ -561,37 +561,37 @@ __posix_fsync (int fildes)
 int
 __posix_chmod (const char* path, mode_t mode)
 {
-  return os::posix::File::chmod (path, mode);
+  return os::posix::chmod (path, mode);
 }
 
 int
 __posix_stat (const char* path, struct stat* buf)
 {
-  return os::posix::File::stat (path, buf);
+  return os::posix::stat (path, buf);
 }
 
 int
 __posix_truncate (const char* path, off_t length)
 {
-  return os::posix::File::truncate (path, length);
+  return os::posix::truncate (path, length);
 }
 
 int
 __posix_rename (const char* existing, const char* _new)
 {
-  return os::posix::File::rename (existing, _new);
+  return os::posix::rename (existing, _new);
 }
 
 int
 __posix_unlink (const char* path)
 {
-  return os::posix::File::unlink (path);
+  return os::posix::unlink (path);
 }
 
 int
 __posix_utime (const char* path, const struct utimbuf* times)
 {
-  return os::posix::File::utime (path, times);
+  return os::posix::utime (path, times);
 }
 
 // ----------------------------------------------------------------------------

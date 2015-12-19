@@ -91,6 +91,107 @@ namespace os
     }
 
     // ------------------------------------------------------------------------
+    // Functions related to files, other than IO. The implementations is
+    // specific to each FileSystem.
+
+    int
+    chmod (const char* path, mode_t mode)
+    {
+      const char* adjusted_path = path;
+      auto* const fs = os::posix::MountManager::identifyFileSystem (
+          &adjusted_path);
+
+      if (fs == nullptr)
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
+      return fs->chmod (adjusted_path, mode);
+    }
+
+    int
+    stat (const char* path, struct stat* buf)
+    {
+      const char* adjusted_path = path;
+      auto* const fs = os::posix::MountManager::identifyFileSystem (
+          &adjusted_path);
+
+      if (fs == nullptr)
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
+      return fs->stat (adjusted_path, buf);
+    }
+
+    int
+    truncate (const char* path, off_t length)
+    {
+      const char* adjusted_path = path;
+      auto* const fs = os::posix::MountManager::identifyFileSystem (
+          &adjusted_path);
+
+      if (fs == nullptr)
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
+      return fs->truncate (adjusted_path, length);
+    }
+
+    int
+    rename (const char* existing, const char* _new)
+    {
+      auto adjusted_existing = existing;
+      auto adjusted_new = _new;
+      auto* const fs = os::posix::MountManager::identifyFileSystem (
+          &adjusted_existing, &adjusted_new);
+
+      if (fs == nullptr)
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
+      return fs->rename (adjusted_existing, adjusted_new);
+    }
+
+    int
+    unlink (const char* path)
+    {
+      auto adjusted_path = path;
+      auto* const fs = os::posix::MountManager::identifyFileSystem (
+          &adjusted_path);
+
+      if (fs == nullptr)
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
+      return fs->unlink (adjusted_path);
+    }
+
+    int
+    utime (const char* path, const struct utimbuf* times)
+    {
+      auto adjusted_path = path;
+      auto* const fs = os::posix::MountManager::identifyFileSystem (
+          &adjusted_path);
+
+      if (fs == nullptr)
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
+      return fs->utime (adjusted_path, times);
+    }
+
+    // ------------------------------------------------------------------------
 
     FileSystem::FileSystem (Pool* filesPool, Pool* dirsPool)
     {

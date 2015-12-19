@@ -63,29 +63,7 @@ namespace os
       vopen (const char* path, int oflag, std::va_list args);
 
       // ----------------------------------------------------------------------
-      // There is a small catch here, these functions are implemented in the
-      // FileSystem object, but since the path refers to a file, it seems
-      // more natural to address them within File.
-
-      static int
-      chmod (const char* path, mode_t mode);
-
-      static int
-      stat (const char* path, struct stat* buf);
-
-      static int
-      truncate (const char* path, off_t length);
-
-      static int
-      rename (const char* existing, const char* _new);
-
-      static int
-      unlink (const char* path);
-
-      static int
-      utime (const char* path, const struct utimbuf* times);
-
-      // ----------------------------------------------------------------------
+      // Support functions.
 
       FileSystem*
       getFileSystem (void) const;
