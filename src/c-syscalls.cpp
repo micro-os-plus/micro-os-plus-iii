@@ -621,13 +621,13 @@ __posix_sync (void)
 DIR*
 __posix_opendir (const char* dirpath)
 {
-  return (DIR*) os::posix::Directory::open (dirpath);
+  return (DIR*) os::posix::opendir (dirpath);
 }
 
 struct dirent*
 __posix_readdir (DIR* dirp)
 {
-  auto dir = reinterpret_cast<os::posix::Directory*> (dirp);
+  auto* const dir = reinterpret_cast<os::posix::Directory*> (dirp);
   if (dir == nullptr)
     {
       errno = ENOENT;
@@ -648,7 +648,7 @@ __posix_readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result)
 void
 __posix_rewinddir (DIR* dirp)
 {
-  auto dir = reinterpret_cast<os::posix::Directory*> (dirp);
+  auto* const dir = reinterpret_cast<os::posix::Directory*> (dirp);
   if (dir == nullptr)
     {
       errno = ENOENT;
@@ -660,7 +660,7 @@ __posix_rewinddir (DIR* dirp)
 int
 __posix_closedir (DIR* dirp)
 {
-  auto dir = reinterpret_cast<os::posix::Directory*> (dirp);
+  auto* const dir = reinterpret_cast<os::posix::Directory*> (dirp);
   if (dir == nullptr)
     {
       errno = ENOENT;

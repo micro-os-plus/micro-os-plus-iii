@@ -32,20 +32,8 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    Directory::Directory (void)
-    {
-      fFileSystem = nullptr;
-    }
-
-    Directory::~Directory ()
-    {
-      fFileSystem = nullptr;
-    }
-
-    // ------------------------------------------------------------------------
-
     Directory*
-    Directory::open (const char* dirname)
+    opendir (const char* dirname)
     {
       errno = 0;
 
@@ -65,6 +53,20 @@ namespace os
       // the adjusted path (mount point prefix removed).
       return fs->opendir (adjusted_dirname);
     }
+
+    // ------------------------------------------------------------------------
+
+    Directory::Directory (void)
+    {
+      fFileSystem = nullptr;
+    }
+
+    Directory::~Directory ()
+    {
+      fFileSystem = nullptr;
+    }
+
+    // ------------------------------------------------------------------------
 
     struct dirent*
     Directory::read (void)

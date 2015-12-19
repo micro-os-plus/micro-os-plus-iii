@@ -465,7 +465,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       // Test OPEN
       errno = -2;
-      os::posix::Directory* dir = os::posix::Directory::open ("/babu/d2");
+      os::posix::Directory* dir = os::posix::opendir ("/babu/d2");
       assert((dir != nullptr) && (errno == 0));
 
       // Must be the first used slot in the pool.

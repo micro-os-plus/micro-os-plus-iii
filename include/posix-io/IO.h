@@ -55,6 +55,7 @@ namespace os
       // ----------------------------------------------------------------------
 
       friend class FileSystem;
+
       friend IO*
       vopen (const char* path, int oflag, std::va_list args);
 

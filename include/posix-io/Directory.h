@@ -37,6 +37,15 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
+    class Directory;
+
+    // ------------------------------------------------------------------------
+
+    Directory*
+    opendir (const char* dirname);
+
+    // ------------------------------------------------------------------------
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
@@ -54,9 +63,6 @@ namespace os
 
       // ----------------------------------------------------------------------
 
-      static Directory*
-      open (const char* dirname);
-
       struct dirent *
       read (void);
 
@@ -65,6 +71,9 @@ namespace os
 
       int
       close (void);
+
+      // ----------------------------------------------------------------------
+      // Support functions.
 
       struct dirent*
       getDirEntry (void);
