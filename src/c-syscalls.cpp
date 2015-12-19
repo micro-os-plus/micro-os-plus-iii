@@ -358,16 +358,11 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 
-// Reentrancy notes and 'errno'.
+// Notes: Reentrancy and 'errno'.
 //
-// These functions do not handle reentrancy, so do not
-// use non reentrant functions like strtok(), but replace them
-// with their new versions like strtok_r().
-//
-// 'errno' is not a problem, since the standard headers
-// define it as '*(__errno())'; if you use a multi-threaded
-// environment, be sure you redefine __errno() to return a
-// thread specific pointer.
+// The standard headers define errno as '*(__errno())';
+// If you use a multi-threaded environment, be sure you
+// redefine __errno() to return a thread specific pointer.
 
 // ----------------------------------------------------------------------------
 
@@ -388,7 +383,7 @@ __posix_open (const char* path, int oflag, ...)
 {
   va_list args;
   va_start(args, oflag);
-  auto io = os::posix::vopen (path, oflag, args);
+  auto* const io = os::posix::vopen (path, oflag, args);
   va_end(args);
 
   if (io == nullptr)
@@ -406,7 +401,7 @@ __posix_close (int fildes)
 {
   // The flow is identical for all POSIX functions: identify the C++
   // object and call the corresponding C++ method.
-  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
+  auto* const io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -420,7 +415,7 @@ __posix_close (int fildes)
 ssize_t
 __posix_read (int fildes, void* buf, size_t nbyte)
 {
-  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
+  auto* const io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -432,7 +427,7 @@ __posix_read (int fildes, void* buf, size_t nbyte)
 ssize_t
 __posix_write (int fildes, const void* buf, size_t nbyte)
 {
-  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
+  auto* const io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -444,7 +439,7 @@ __posix_write (int fildes, const void* buf, size_t nbyte)
 ssize_t
 __posix_writev (int fildes, const struct iovec* iov, int iovcnt)
 {
-  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
+  auto* const io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -456,7 +451,7 @@ __posix_writev (int fildes, const struct iovec* iov, int iovcnt)
 int
 __posix_ioctl (int fildes, int request, ...)
 {
-  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
+  auto* const io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -474,7 +469,7 @@ __posix_ioctl (int fildes, int request, ...)
 off_t
 __posix_lseek (int fildes, off_t offset, int whence)
 {
-  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
+  auto* const io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -492,7 +487,7 @@ __posix_lseek (int fildes, off_t offset, int whence)
 int
 __posix_isatty (int fildes)
 {
-  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
+  auto* const io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -504,7 +499,7 @@ __posix_isatty (int fildes)
 int
 __posix_fcntl (int fildes, int cmd, ...)
 {
-  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
+  auto* const io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -522,7 +517,7 @@ __posix_fcntl (int fildes, int cmd, ...)
 int
 __posix_fstat (int fildes, struct stat* buf)
 {
-  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
+  auto* const io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -534,7 +529,7 @@ __posix_fstat (int fildes, struct stat* buf)
 int
 __posix_ftruncate (int fildes, off_t length)
 {
-  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
+  auto* const io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -546,7 +541,7 @@ __posix_ftruncate (int fildes, off_t length)
 int
 __posix_fsync (int fildes)
 {
-  auto io = os::posix::FileDescriptorsManager::getIo (fildes);
+  auto* const io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
       errno = EBADF;
@@ -621,7 +616,7 @@ __posix_sync (void)
 DIR*
 __posix_opendir (const char* dirpath)
 {
-  return (DIR*) os::posix::opendir (dirpath);
+  return reinterpret_cast<DIR*> (os::posix::opendir (dirpath));
 }
 
 struct dirent*
