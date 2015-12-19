@@ -45,6 +45,7 @@ namespace os
     class File : public IO
     {
       friend class FileSystem;
+      friend class IO;
 
     public:
 
@@ -52,15 +53,6 @@ namespace os
       File (const File&) = delete;
 
       ~File ();
-
-      // ----------------------------------------------------------------------
-      // Same as IO versions, but return a File
-
-      static File*
-      open (const char* path, int oflag, ...);
-
-      static File*
-      vopen (const char* path, int oflag, std::va_list args);
 
       // ----------------------------------------------------------------------
       // Support functions.
@@ -79,12 +71,6 @@ namespace os
     };
 
     // ------------------------------------------------------------------------
-
-    inline File*
-    File::vopen (const char* path, int oflag, std::va_list args)
-    {
-      return static_cast<File*> (os::posix::vopen (path, oflag, args));
-    }
 
     inline void
     File::setFileSystem (FileSystem* fileSystem)

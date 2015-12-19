@@ -40,18 +40,6 @@ namespace os
       fFileSystem = nullptr;
     }
 
-    File*
-    File::open (const char* path, int oflag, ...)
-    {
-      // Forward to the variadic version of the function.
-      std::va_list args;
-      va_start(args, oflag);
-      File* const ret = vopen (path, oflag, args);
-      va_end(args);
-
-      return ret;
-    }
-
   } /* namespace posix */
 } /* namespace os */
 
