@@ -158,6 +158,7 @@ namespace os
                 {
                   pool->release (file);
                 }
+              file->setFileSystem (nullptr);
             }
         }
       return ret;
