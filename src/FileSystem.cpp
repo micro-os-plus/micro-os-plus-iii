@@ -34,6 +34,64 @@ namespace os
 
     // ------------------------------------------------------------------------
 
+    int
+    mkdir (const char* path, mode_t mode)
+    {
+      auto adjusted_path = path;
+      auto* const fs = os::posix::MountManager::identifyFileSystem (
+          &adjusted_path);
+
+      if (fs == nullptr)
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
+      assert(fs->getBlockDevice () != nullptr);
+      errno = 0;
+
+      // Execute the implementation specific code.
+      return fs->do_mkdir (adjusted_path, mode);
+    }
+
+    int
+    rmdir (const char* path)
+    {
+      auto adjusted_path = path;
+      auto* const fs = os::posix::MountManager::identifyFileSystem (
+          &adjusted_path);
+
+      if (fs == nullptr)
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
+      assert(fs->getBlockDevice () != nullptr);
+      errno = 0;
+
+      // Execute the implementation specific code.
+      return fs->do_rmdir (adjusted_path);
+    }
+
+    void
+    sync (void)
+    {
+      errno = 0;
+
+      // Enumerate all mounted file systems and sync them.
+      for (std::size_t i = 0; i < MountManager::getSize (); ++i)
+        {
+          auto fs = MountManager::getFileSystem (i);
+          if (fs != nullptr)
+            {
+              fs->do_sync ();
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------------
+
     FileSystem::FileSystem (Pool* filesPool, Pool* dirsPool)
     {
       fFilesPool = filesPool;
@@ -153,64 +211,6 @@ namespace os
 
       // Execute the implementation specific code.
       return do_utime (path, times);
-    }
-
-    // ------------------------------------------------------------------------
-
-    int
-    FileSystem::mkdir (const char* path, mode_t mode)
-    {
-      auto adjusted_path = path;
-      auto* const fs = os::posix::MountManager::identifyFileSystem (
-          &adjusted_path);
-
-      if (fs == nullptr)
-        {
-          errno = ENOENT;
-          return -1;
-        }
-
-      assert(fs->fBlockDevice != nullptr);
-      errno = 0;
-
-      // Execute the implementation specific code.
-      return fs->do_mkdir (adjusted_path, mode);
-    }
-
-    int
-    FileSystem::rmdir (const char* path)
-    {
-      auto adjusted_path = path;
-      auto* const fs = os::posix::MountManager::identifyFileSystem (
-          &adjusted_path);
-
-      if (fs == nullptr)
-        {
-          errno = ENOENT;
-          return -1;
-        }
-
-      assert(fs->fBlockDevice != nullptr);
-      errno = 0;
-
-      // Execute the implementation specific code.
-      return fs->do_rmdir (adjusted_path);
-    }
-
-    void
-    FileSystem::sync (void)
-    {
-      errno = 0;
-
-      // Enumerate all mounted file systems and sync them.
-      for (std::size_t i = 0; i < MountManager::getSize (); ++i)
-        {
-          auto fs = MountManager::getFileSystem (i);
-          if (fs != nullptr)
-            {
-              fs->do_sync ();
-            }
-        }
     }
 
     // ------------------------------------------------------------------------

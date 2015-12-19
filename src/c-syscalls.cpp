@@ -600,19 +600,19 @@ __posix_utime (const char* path, const struct utimbuf* times)
 int
 __posix_mkdir (const char* path, mode_t mode)
 {
-  return os::posix::FileSystem::mkdir (path, mode);
+  return os::posix::mkdir (path, mode);
 }
 
 int
 __posix_rmdir (const char* path)
 {
-  return os::posix::FileSystem::rmdir (path);
+  return os::posix::rmdir (path);
 }
 
 void
 __posix_sync (void)
 {
-  return os::posix::FileSystem::sync ();
+  return os::posix::sync ();
 }
 
 // ----------------------------------------------------------------------------

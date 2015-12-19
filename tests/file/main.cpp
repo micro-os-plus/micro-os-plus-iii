@@ -830,22 +830,21 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       // MKDIR
       errno = -2;
-      assert(
-          (os::posix::FileSystem::mkdir ("/fs1/p7", 654) ==0) && (errno == 0));
+      assert((os::posix::mkdir ("/fs1/p7", 654) ==0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::MKDIR);
       assert(fs1.getNumber () == 654);
       assert(std::strcmp ("/p7", fs1.getPath ()) == 0);
 
       // RMDIR
       errno = -2;
-      assert((os::posix::FileSystem::rmdir ("/fs1/p8") ==0) && (errno == 0));
+      assert((os::posix::rmdir ("/fs1/p8") ==0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::RMDIR);
       assert(std::strcmp ("/p8", fs1.getPath ()) == 0);
 
       // SYNC
       unsigned int cnt = fs1.getSyncCount ();
       errno = -2;
-      os::posix::FileSystem::sync ();
+      os::posix::sync ();
       assert(errno == 0);
       assert(fs1.getCmd () == Cmds::RMDIR);
       assert(fs1.getSyncCount () == cnt + 1);

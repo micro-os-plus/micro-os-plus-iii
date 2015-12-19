@@ -39,6 +39,18 @@ namespace os
     class BlockDevice;
     class Pool;
 
+    // ----------------------------------------------------------------------
+    // ----- Non-io functions -----
+
+    int
+    mkdir (const char* path, mode_t mode);
+
+    int
+    rmdir (const char* path);
+
+    void
+    sync (void);
+
     // ------------------------------------------------------------------------
 
     class FileSystem
@@ -49,6 +61,15 @@ namespace os
       friend class Directory;
       friend class MountManager;
       friend class IO;
+
+      friend int
+      mkdir (const char* path, mode_t mode);
+
+      friend int
+      rmdir (const char* path);
+
+      friend void
+      sync (void);
 
       // ----------------------------------------------------------------------
 
@@ -67,18 +88,6 @@ namespace os
 
       Directory*
       opendir (const char* dirpath);
-
-      // ----------------------------------------------------------------------
-      // ----- Non-io functions -----
-
-      static int
-      mkdir (const char* path, mode_t mode);
-
-      static int
-      rmdir (const char* path);
-
-      static void
-      sync (void);
 
       // ----------------------------------------------------------------------
       // --- Support functions.
