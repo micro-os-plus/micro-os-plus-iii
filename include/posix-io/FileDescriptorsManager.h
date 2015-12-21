@@ -35,6 +35,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     class IO;
+    class Socket;
 
     // ------------------------------------------------------------------------
 
@@ -57,6 +58,9 @@ namespace os
 
       static IO*
       getIo (int fildes);
+
+      static Socket*
+      getSocket (int fildes);
 
       static int
       alloc (IO* io);

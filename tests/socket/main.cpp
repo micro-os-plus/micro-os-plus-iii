@@ -23,6 +23,7 @@
 #include "posix-io/TPool.h"
 #include "posix-io/MountManager.h"
 #include "posix-io/BlockDevice.h"
+#include "posix-io/Socket.h"
 #include <cerrno>
 #include <cassert>
 #include <cstdio>
@@ -64,11 +65,11 @@ enum class Cmds
 // Test class, all methods store the input in local variables,
 // to be checked later.
 
-class TestFile : public os::posix::File
+class TestSocket : public os::posix::Socket
 {
 public:
 
-  TestFile ();
+  TestSocket ();
 
   // Methods used for test purposes only.
   Cmds
@@ -90,8 +91,11 @@ protected:
 
   // Implementations.
 
+  virtual bool
+  tryMatch(int domain, int type, int protocol);
+
   virtual int
-  do_open (const char* path, int oflag, std::va_list args) override;
+  do_socket (int domain, int type, int protocol) override;
 
   virtual int
   do_close (void) override;
@@ -102,26 +106,66 @@ protected:
   virtual ssize_t
   do_write (const void* buf, std::size_t nbyte) override;
 
+  ssize_t
+  do_writev (const struct iovec* iov, int iovcnt) override;
+
   virtual int
   do_ioctl (int request, std::va_list args) override;
-
-  virtual off_t
-  do_lseek (off_t offset, int whence) override;
-
-  virtual int
-  do_isatty (void) override;
 
   virtual int
   do_fcntl (int cmd, va_list args) override;
 
-  virtual int
-  do_fstat (struct stat* buf) override;
+  Socket*
+  do_accept (struct sockaddr* address, socklen_t* address_len) override;
 
-  virtual int
-  do_ftruncate (off_t length) override;
+  int
+  do_bind (const struct sockaddr* address, socklen_t address_len) override;
 
-  virtual int
-  do_fsync (void) override;
+  int
+  do_connect (const struct sockaddr* address, socklen_t address_len) override;
+
+  int
+  do_getpeername (struct sockaddr* address, socklen_t* address_len) override;
+
+  int
+  do_getsockname (struct sockaddr* address, socklen_t* address_len) override;
+
+  int
+  do_getsockopt (int level, int option_name, void* option_value,
+                 socklen_t* option_len) override;
+
+  int
+  do_listen (int backlog) override;
+
+  ssize_t
+  do_recv (void* buffer, size_t length, int flags) override;
+
+  ssize_t
+  do_recvfrom (void* buffer, size_t length, int flags,
+               struct sockaddr* address, socklen_t* address_len) override;
+
+  ssize_t
+  do_recvmsg (struct msghdr* message, int flags) override;
+
+  ssize_t
+  do_send (const void* buffer, size_t length, int flags) override;
+
+  ssize_t
+  do_sendmsg (const struct msghdr* message, int flags) override;
+
+  ssize_t
+  do_sendto (const void* message, size_t length, int flags,
+             const struct sockaddr* dest_addr, socklen_t dest_len) override;
+
+  int
+  do_setsockopt (int level, int option_name, const void* option_value,
+                 socklen_t option_len) override;
+
+  int
+  do_shutdown (int how) override;
+
+  int
+  do_sockatmark (void) override;
 
 private:
 
@@ -134,7 +178,7 @@ private:
 
 };
 
-TestFile::TestFile ()
+TestSocket::TestSocket ()
 {
   fCmd = Cmds::NOTSET;
   fPath = nullptr;
@@ -145,55 +189,45 @@ TestFile::TestFile ()
 }
 
 inline Cmds
-TestFile::getCmd (void)
+TestSocket::getCmd (void)
 {
   return fCmd;
 }
 
 inline unsigned int
-TestFile::getNumber (void)
+TestSocket::getNumber (void)
 {
   return fNumber;
 }
 
 inline int
-TestFile::getMode (void)
+TestSocket::getMode (void)
 {
   return fMode;
 }
 
 inline const char*
-TestFile::getPath (void)
+TestSocket::getPath (void)
 {
   return fPath;
 }
 
 inline void*
-TestFile::getPtr (void)
+TestSocket::getPtr (void)
 {
   return fPtr;
 }
 
-int
-TestFile::do_open (const char* path, int oflag, std::va_list args)
-{
-  fPath = path;
-
-  fNumber = oflag;
-
-  fMode = va_arg(args, int);
-  return 0;
-}
 
 int
-TestFile::do_close (void)
+TestSocket::do_close (void)
 {
   fCmd = Cmds::CLOSE;
   return 0; // Always return success
 }
 
 ssize_t
-TestFile::do_read (void *buf, std::size_t nbyte)
+TestSocket::do_read (void *buf, std::size_t nbyte)
 {
   fCmd = Cmds::READ;
   fPtr = buf;
@@ -202,7 +236,7 @@ TestFile::do_read (void *buf, std::size_t nbyte)
 }
 
 ssize_t
-TestFile::do_write (const void* buf, std::size_t nbyte)
+TestSocket::do_write (const void* buf, std::size_t nbyte)
 {
   fCmd = Cmds::WRITE;
   fPtr = (void*) buf;
@@ -211,7 +245,7 @@ TestFile::do_write (const void* buf, std::size_t nbyte)
 }
 
 int
-TestFile::do_ioctl (int request, std::va_list args)
+TestSocket::do_ioctl (int request, std::va_list args)
 {
   fCmd = Cmds::IOCTL;
   fNumber = request;
@@ -219,24 +253,9 @@ TestFile::do_ioctl (int request, std::va_list args)
   return 0;
 }
 
-off_t
-TestFile::do_lseek (off_t offset, int whence)
-{
-  fCmd = Cmds::LSEEK;
-  fNumber = offset;
-  fMode = whence;
-  return 0;
-}
 
 int
-TestFile::do_isatty (void)
-{
-  fCmd = Cmds::ISATTY;
-  return 0;
-}
-
-int
-TestFile::do_fcntl (int cmd, std::va_list args)
+TestSocket::do_fcntl (int cmd, std::va_list args)
 {
   fCmd = Cmds::FCNTL;
   fNumber = cmd;
@@ -244,258 +263,128 @@ TestFile::do_fcntl (int cmd, std::va_list args)
   return 0;
 }
 
-int
-TestFile::do_fstat (struct stat* buf)
+
+Socket*
+TestSocket::do_accept (struct sockaddr* address, socklen_t* address_len)
 {
-  fCmd = Cmds::FSTAT;
-  fPtr = buf;
-  return 0;
+  errno = ENOSYS; // Not implemented
+  return nullptr;
 }
 
 int
-TestFile::do_ftruncate (off_t length)
+TestSocket::do_bind (const struct sockaddr* address, socklen_t address_len)
 {
-  fCmd = Cmds::FTRUNCATE;
-  fNumber = length;
-  return 0;
+  errno = ENOSYS; // Not implemented
+  return -1;
 }
 
 int
-TestFile::do_fsync (void)
+TestSocket::do_connect (const struct sockaddr* address, socklen_t address_len)
 {
-  fCmd = Cmds::FSYNC;
-  return 0;
+  errno = ENOSYS; // Not implemented
+  return -1;
 }
+
+int
+TestSocket::do_getpeername (struct sockaddr* address, socklen_t* address_len)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int
+TestSocket::do_getsockname (struct sockaddr* address, socklen_t* address_len)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int
+TestSocket::do_getsockopt (int level, int option_name, void* option_value,
+                       socklen_t* option_len)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int
+TestSocket::do_listen (int backlog)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+ssize_t
+TestSocket::do_recv (void* buffer, size_t length, int flags)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+ssize_t
+TestSocket::do_recvfrom (void* buffer, size_t length, int flags,
+                     struct sockaddr* address, socklen_t* address_len)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+ssize_t
+TestSocket::do_recvmsg (struct msghdr* message, int flags)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+ssize_t
+TestSocket::do_send (const void* buffer, size_t length, int flags)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+ssize_t
+TestSocket::do_sendmsg (const struct msghdr* message, int flags)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+ssize_t
+TestSocket::do_sendto (const void* message, size_t length, int flags,
+                   const struct sockaddr* dest_addr, socklen_t dest_len)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int
+TestSocket::do_setsockopt (int level, int option_name, const void* option_value,
+                       socklen_t option_len)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int
+TestSocket::do_shutdown (int how)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int
+TestSocket::do_sockatmark (void)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+
 
 // ----------------------------------------------------------------------------
 
-class TestFileSystem : public os::posix::FileSystem
-{
-public:
-
-  TestFileSystem (os::posix::Pool* filesPool, os::posix::Pool* dirsPool);
-
-  // Methods used for test purposes only.
-  unsigned int
-  getFlags (void);
-
-  Cmds
-  getCmd (void);
-
-  unsigned int
-  getSyncCount (void);
-
-  unsigned int
-  getNumber (void);
-
-  const char*
-  getPath (void);
-
-  void*
-  getPtr (void);
-
-protected:
-
-  // Implementations.
-
-  virtual int
-  do_mount (unsigned int flags) override;
-
-  virtual int
-  do_unmount (unsigned int flags) override;
-
-  virtual void
-  do_sync (void) override;
-
-  virtual int
-  do_chmod (const char* path, mode_t mode) override;
-
-  virtual int
-  do_stat (const char* path, struct stat* buf) override;
-
-  virtual int
-  do_truncate (const char* path, off_t length) override;
-
-  virtual int
-  do_rename (const char* existing, const char* _new) override;
-
-  virtual int
-  do_unlink (const char* path) override;
-
-  virtual int
-  do_utime (const char* path, const struct utimbuf* times) override;
-
-  virtual int
-  do_mkdir (const char* path, mode_t mode) override;
-
-  virtual int
-  do_rmdir (const char* path) override;
-
-private:
-
-  unsigned int fMountFlags;
-  Cmds fCmd;
-  unsigned int fSyncCount;
-  const char* fPath;
-  unsigned int fNumber;
-  void* fPtr;
-
-};
-
-TestFileSystem::TestFileSystem (os::posix::Pool* filesPool,
-                                os::posix::Pool* dirsPool) :
-    os::posix::FileSystem (filesPool, dirsPool)
-{
-  fMountFlags = 1;
-  fCmd = Cmds::NOTSET;
-  fSyncCount = 1;
-  fPath = nullptr;
-  fNumber = 0;
-  fPtr = nullptr;
-}
-
-inline unsigned int
-TestFileSystem::getFlags (void)
-{
-  return fMountFlags;
-}
-
-inline Cmds
-TestFileSystem::getCmd (void)
-{
-  return fCmd;
-}
-
-inline unsigned int
-TestFileSystem::getSyncCount (void)
-{
-  return fSyncCount;
-}
-
-inline unsigned int
-TestFileSystem::getNumber (void)
-{
-  return fNumber;
-}
-
-inline const char*
-TestFileSystem::getPath (void)
-{
-  return fPath;
-}
-
-inline void*
-TestFileSystem::getPtr (void)
-{
-  return fPtr;
-}
-
-// ----------------------------------------------------------------------------
-
-int
-TestFileSystem::do_mount (unsigned int flags)
-{
-  fMountFlags = flags;
-
-  return 0;
-}
-
-int
-TestFileSystem::do_unmount (unsigned int flags)
-{
-  fMountFlags = flags;
-
-  return 0;
-}
-
-void
-TestFileSystem::do_sync (void)
-{
-  fSyncCount++;
-}
-
-int
-TestFileSystem::do_chmod (const char* path, mode_t mode)
-{
-  fCmd = Cmds::CHMOD;
-  fPath = path;
-  fNumber = mode;
-  return 0;
-}
-
-int
-TestFileSystem::do_stat (const char* path, struct stat* buf)
-{
-  fCmd = Cmds::STAT;
-  fPath = path;
-  fPtr = buf;
-  return 0;
-}
-
-int
-TestFileSystem::do_truncate (const char* path, off_t length)
-{
-  fCmd = Cmds::TRUNCATE;
-  fPath = path;
-  fNumber = length;
-  return 0;
-}
-
-int
-TestFileSystem::do_rename (const char* existing, const char* _new)
-{
-  fCmd = Cmds::RENAME;
-  fPath = existing;
-  fPtr = (void*) _new;
-  return 0;
-}
-
-int
-TestFileSystem::do_unlink (const char* path)
-{
-  fCmd = Cmds::UNLINK;
-  fPath = path;
-  return 0;
-}
-
-int
-TestFileSystem::do_utime (const char* path, const struct utimbuf* times)
-{
-  fCmd = Cmds::UTIME;
-  fPath = path;
-  fPtr = (void*) times;
-  return 0;
-}
-
-int
-TestFileSystem::do_mkdir (const char* path, mode_t mode)
-{
-  fCmd = Cmds::MKDIR;
-  fPath = path;
-  fNumber = mode;
-  return 0;
-}
-
-int
-TestFileSystem::do_rmdir (const char* path)
-{
-  fCmd = Cmds::RMDIR;
-  fPath = path;
-  return 0;
-}
-
-// ----------------------------------------------------------------------------
-
-// Required only as a reference, no functionality needed.
-class TestBlockDevice : public os::posix::BlockDevice
-{
-public:
-  TestBlockDevice () = default;
-};
-
-// ----------------------------------------------------------------------------
-
-using TestFilePool = os::posix::TPool<TestFile>;
+using TestFilePool = os::posix::TPool<TestSocket>;
 
 constexpr std::size_t FILES_POOL_ARRAY_SIZE = 2;
 
@@ -862,7 +751,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       assert(io->getType () == os::posix::IO::Type::FILE);
 
-      TestFile* file = static_cast<TestFile*> (io);
+      TestSocket* file = static_cast<TestSocket*> (io);
       // Must be the first used slot in the pool.
       assert(filesPool.getObject (0) == file);
       assert(filesPool.getFlag (0) == true);
@@ -955,43 +844,14 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
     {
       // C++ API
 
-      // Test OPEN via namespace generic call.
+      // Test OPEN
       errno = -2;
-      os::posix::IO* io = os::posix::open ("/fs1/f0", 124, 235);
-      assert((io != nullptr) && (errno == 0));
-
-      assert(io->getType () == os::posix::IO::Type::FILE);
-
-      TestFile* tfile = static_cast<TestFile*> (io);
-
-      // Must be the first used slot in the pool.
-      assert(filesPool.getObject (0) == tfile);
-      assert(filesPool.getFlag (0) == true);
-
-      // Check params passing.
-      assert(std::strcmp ("/f0", tfile->getPath ()) == 0);
-      assert(tfile->getNumber () == 124);
-      assert(tfile->getMode () == 235);
-
-      // Test CLOSE
-      errno = -2;
-      int ret = io->close ();
-      assert((ret == 0) && (errno == 0));
-      assert(tfile->getCmd () == Cmds::CLOSE);
-
-      // Must no longer be in the pool
-      assert(filesPool.getFlag (0) == false);
-    }
-
-    {
-      // Test OPEN via class call.
-      errno = -2;
-      os::posix::File* file = os::posix::File::open ("/fs1/f1", 123, 234);
+      os::posix::IO* file = os::posix::open ("/fs1/f1", 123, 234);
       assert((file != nullptr) && (errno == 0));
 
       assert(file->getType () == os::posix::IO::Type::FILE);
 
-      TestFile* tfile = static_cast<TestFile*> (file);
+      TestSocket* tfile = static_cast<TestSocket*> (file);
       // Must be the first used slot in the pool.
       assert(filesPool.getObject (0) == tfile);
       assert(filesPool.getFlag (0) == true);

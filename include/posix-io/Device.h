@@ -50,6 +50,9 @@ namespace os
 
       // ----------------------------------------------------------------------
 
+      virtual int
+      do_open (const char* path, int oflag, std::va_list args) = 0;
+
       virtual bool
       matchName (const char* name) const;
 

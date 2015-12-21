@@ -23,6 +23,7 @@
 #include "posix-io/FileSystem.h"
 #include "posix-io/MountManager.h"
 #include "posix-io/Directory.h"
+#include "posix-io/Socket.h"
 #include <cstdarg>
 #include <cerrno>
 
@@ -472,10 +473,18 @@ __posix_lseek (int fildes, off_t offset, int whence)
   auto* const io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
-      errno = EBADF;
+      errno = EBADF; // Fildes is not an open file descriptor.
       return -1;
     }
-  return io->lseek (offset, whence);
+
+  // Works only on files (Does not work on sockets, pipes or FIFOs...)
+  if ((io->getType () & os::posix::IO::Type::FILE) == 0)
+    {
+      errno = ESPIPE; // Not a file.
+      return -1;
+    }
+
+  return static_cast<os::posix::File*> (io)->lseek (offset, whence);
 }
 
 /**
@@ -535,7 +544,15 @@ __posix_ftruncate (int fildes, off_t length)
       errno = EBADF;
       return -1;
     }
-  return io->ftruncate (length);
+
+  // Works only on files (Does not work on sockets, pipes or FIFOs...)
+  if ((io->getType () & os::posix::IO::Type::FILE) == 0)
+    {
+      errno = EINVAL; // Not a file.
+      return -1;
+    }
+
+  return static_cast<os::posix::File*> (io)->ftruncate (length);
 }
 
 int
@@ -547,7 +564,15 @@ __posix_fsync (int fildes)
       errno = EBADF;
       return -1;
     }
-  return io->fsync ();
+
+  // Works only on files (Does not work on sockets, pipes or FIFOs...)
+  if ((io->getType () & os::posix::IO::Type::FILE) == 0)
+    {
+      errno = EINVAL; // Not a file.
+      return -1;
+    }
+
+  return static_cast<os::posix::File*> (io)->fsync ();
 }
 
 // ----------------------------------------------------------------------------
@@ -693,120 +718,201 @@ __posix_socketpair (int domain, int type, int protocol, int socket_vector[2])
 int
 __posix_accept (int socket, struct sockaddr* address, socklen_t* address_len)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  auto* const io = os::posix::FileDescriptorsManager::getSocket (socket);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  auto* const new_socket = io->accept (address, address_len);
+  return new_socket->getFileDescriptor ();
 }
 
 int
 __posix_bind (int socket, const struct sockaddr* address, socklen_t address_len)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  auto* const io = os::posix::FileDescriptorsManager::getSocket (socket);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->bind (address, address_len);
 }
 
 int
 __posix_connect (int socket, const struct sockaddr* address,
                  socklen_t address_len)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  auto* const io = os::posix::FileDescriptorsManager::getSocket (socket);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->connect (address, address_len);
 }
 
 int
 __posix_getpeername (int socket, struct sockaddr* address,
                      socklen_t* address_len)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  auto* const io = os::posix::FileDescriptorsManager::getSocket (socket);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->getpeername (address, address_len);
 }
 
 int
 __posix_getsockname (int socket, struct sockaddr* address,
                      socklen_t* address_len)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  auto* const io = os::posix::FileDescriptorsManager::getSocket (socket);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->getsockname (address, address_len);
 }
 
 int
 __posix_getsockopt (int socket, int level, int option_name, void* option_value,
                     socklen_t* option_len)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  auto* const io = os::posix::FileDescriptorsManager::getSocket (socket);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->getsockopt (level, option_name, option_value, option_len);
 }
 
 int
 __posix_listen (int socket, int backlog)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  auto* const io = os::posix::FileDescriptorsManager::getSocket (socket);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->listen (backlog);
 }
 
 ssize_t
 __posix_recv (int socket, void* buffer, size_t length, int flags)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  auto* const io = os::posix::FileDescriptorsManager::getSocket (socket);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->recv (buffer, length, flags);
 }
 
 ssize_t
 __posix_recvfrom (int socket, void* buffer, size_t length, int flags,
                   struct sockaddr* address, socklen_t* address_len)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  auto* const io = os::posix::FileDescriptorsManager::getSocket (socket);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->recvfrom (buffer, length, flags, address, address_len);
 }
 
 ssize_t
 __posix_recvmsg (int socket, struct msghdr* message, int flags)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  auto* const io = os::posix::FileDescriptorsManager::getSocket (socket);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->recvmsg (message, flags);
 }
 
 ssize_t
 __posix_send (int socket, const void* buffer, size_t length, int flags)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  auto* const io = os::posix::FileDescriptorsManager::getSocket (socket);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->send (buffer, length, flags);
 }
 
 ssize_t
 __posix_sendmsg (int socket, const struct msghdr* message, int flags)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  auto* const io = os::posix::FileDescriptorsManager::getSocket (socket);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->sendmsg (message, flags);
 }
 
 ssize_t
 __posix_sendto (int socket, const void* message, size_t length, int flags,
                 const struct sockaddr* dest_addr, socklen_t dest_len)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  auto* const io = os::posix::FileDescriptorsManager::getSocket (socket);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->sendto (message, length, flags, dest_addr, dest_len);
 }
 
 int
 __posix_setsockopt (int socket, int level, int option_name,
                     const void* option_value, socklen_t option_len)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  auto* const io = os::posix::FileDescriptorsManager::getSocket (socket);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->setsockopt (level, option_name, option_value, option_len);
 }
 
 int
 __posix_shutdown (int socket, int how)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  auto* const io = os::posix::FileDescriptorsManager::getSocket (socket);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->shutdown (how);
 }
 
 int
 __posix_sockatmark (int socket)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  auto* const io = os::posix::FileDescriptorsManager::getSocket (socket);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return io->sockatmark ();
 }
 
 #pragma GCC diagnostic pop

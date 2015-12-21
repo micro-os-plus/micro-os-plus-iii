@@ -139,6 +139,12 @@ namespace os
           return -1;
         }
 
+      if (length < 0)
+        {
+          errno = EINVAL;
+          return -1;
+        }
+
       return fs->truncate (adjusted_path, length);
     }
 

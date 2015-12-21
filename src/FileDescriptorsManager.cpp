@@ -18,6 +18,7 @@
 
 #include "posix-io/FileDescriptorsManager.h"
 #include "posix-io/IO.h"
+#include "posix-io/Socket.h"
 #include <cerrno>
 #include <cassert>
 
@@ -103,6 +104,18 @@ namespace os
       sfDescriptorsArray[fildes]->clearFileDescriptor ();
       sfDescriptorsArray[fildes] = nullptr;
       return 0;
+    }
+
+    Socket*
+    FileDescriptorsManager::getSocket (int fildes)
+    {
+      assert((fildes >= 0) && (((std::size_t ) fildes) < sfSize));
+      auto* const io = sfDescriptorsArray[fildes];
+      if (io->getType () != IO::Type::SOCKET)
+        {
+          return nullptr;
+        }
+      return reinterpret_cast<Socket*> (io);
     }
 
   } /* namespace posix */

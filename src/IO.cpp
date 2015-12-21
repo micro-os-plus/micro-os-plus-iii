@@ -73,7 +73,7 @@ namespace os
       if (io != nullptr)
         {
           // If so, use the implementation to open the device.
-          int oret = io->do_open (path, oflag, args);
+          int oret = static_cast<Device*> (io)->do_open (path, oflag, args);
           if (oret < 0)
             {
               // Open failed.
@@ -105,27 +105,34 @@ namespace os
         }
 
       // If successful, allocate a file descriptor.
-      int fd = FileDescriptorsManager::alloc (io);
+      // Return a valid pointer to an object derived from IO, or nullptr.
+      return io->allocFileDescriptor ();
+    }
+
+    // ------------------------------------------------------------------------
+
+    IO*
+    IO::allocFileDescriptor (void)
+    {
+
+      int fd = FileDescriptorsManager::alloc (this);
       if (fd < 0)
         {
           // If allocation failed, close this object.
-          if (io != nullptr)
-            {
-              io->do_close ();
-              io->clearFileDescriptor ();
-            }
+          do_close ();
+          clearFileDescriptor ();
           return nullptr;
         }
 
       // Return a valid pointer to an object derived from IO.
-      return io;
+      return this;
     }
 
     // ------------------------------------------------------------------------
 
     IO::IO ()
     {
-      fType = Type::UNKNOWN;
+      fType = Type::NOTSET;
       fFileDescriptor = noFileDescriptor;
     }
 
@@ -216,24 +223,6 @@ namespace os
       return do_ioctl (request, args);
     }
 
-    off_t
-    IO::lseek (off_t offset, int whence)
-    {
-      errno = 0;
-
-      // Execute the implementation specific code.
-      return do_lseek (offset, whence);
-    }
-
-    int
-    IO::isatty (void)
-    {
-      errno = 0;
-
-      // Execute the implementation specific code.
-      return do_isatty ();
-    }
-
     int
     IO::fcntl (int cmd, ...)
     {
@@ -256,30 +245,22 @@ namespace os
     }
 
     int
+    IO::isatty (void)
+    {
+      errno = 0;
+
+      // Execute the implementation specific code.
+      return do_isatty ();
+    }
+
+    // fstat() on a socket returns a zero'd buffer.
+    int
     IO::fstat (struct stat* buf)
     {
       errno = 0;
 
       // Execute the implementation specific code.
       return do_fstat (buf);
-    }
-
-    int
-    IO::ftruncate (off_t length)
-    {
-      errno = 0;
-
-      // Execute the implementation specific code.
-      return do_ftruncate (length);
-    }
-
-    int
-    IO::fsync (void)
-    {
-      errno = 0;
-
-      // Execute the implementation specific code.
-      return do_fsync ();
     }
 
     // ------------------------------------------------------------------------
@@ -324,20 +305,6 @@ namespace os
       return -1;
     }
 
-    off_t
-    IO::do_lseek (off_t offset, int whence)
-    {
-      errno = ENOSYS; // Not implemented
-      return -1;
-    }
-
-    int
-    IO::do_isatty (void)
-    {
-      errno = ENOTTY; // Not a TTY
-      return 0;
-    }
-
     int
     IO::do_fcntl (int cmd, std::va_list args)
     {
@@ -346,21 +313,14 @@ namespace os
     }
 
     int
+    IO::do_isatty (void)
+    {
+      errno = ENOTTY; // By default, it is not a TTY.
+      return 0;
+    }
+
+    int
     IO::do_fstat (struct stat* buf)
-    {
-      errno = ENOSYS; // Not implemented
-      return -1;
-    }
-
-    int
-    IO::do_ftruncate (off_t length)
-    {
-      errno = ENOSYS; // Not implemented
-      return -1;
-    }
-
-    int
-    IO::do_fsync (void)
     {
       errno = ENOSYS; // Not implemented
       return -1;

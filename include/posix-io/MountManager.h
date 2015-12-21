@@ -70,7 +70,7 @@ namespace os
       static const char*
       getPath (std::size_t index);
 
-    protected:
+    private:
 
       static std::size_t sfSize;
 

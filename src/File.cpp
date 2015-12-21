@@ -29,6 +29,20 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
+    File*
+    File::open (const char* path, int oflag, ...)
+    {
+      // Forward to the variadic version of the function.
+      std::va_list args;
+      va_start(args, oflag);
+      auto* const ret = vopen (path, oflag, args);
+      va_end(args);
+
+      return ret;
+    }
+
+    // ------------------------------------------------------------------------
+
     File::File ()
     {
       fType = Type::FILE;
@@ -38,6 +52,67 @@ namespace os
     File::~File ()
     {
       fFileSystem = nullptr;
+    }
+
+    // ------------------------------------------------------------------------
+
+    off_t
+    File::lseek (off_t offset, int whence)
+    {
+      errno = 0;
+
+      // Execute the implementation specific code.
+      return do_lseek (offset, whence);
+    }
+
+    int
+    File::ftruncate (off_t length)
+    {
+      if (length < 0)
+        {
+          errno = EINVAL;
+          return -1;
+        }
+
+      errno = 0;
+
+      // Execute the implementation specific code.
+      return do_ftruncate (length);
+    }
+
+    int
+    File::fsync (void)
+    {
+      errno = 0;
+
+      // Execute the implementation specific code.
+      return do_fsync ();
+    }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+    off_t
+    File::do_lseek (off_t offset, int whence)
+    {
+      errno = ENOSYS; // Not implemented
+      return -1;
+    }
+
+    int
+    File::do_ftruncate (off_t length)
+    {
+      errno = ENOSYS; // Not implemented
+      return -1;
+    }
+
+#pragma GCC diagnostic pop
+
+    int
+    File::do_fsync (void)
+    {
+      errno = ENOSYS; // Not implemented
+      return -1;
     }
 
   } /* namespace posix */

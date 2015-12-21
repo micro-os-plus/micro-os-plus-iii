@@ -84,8 +84,10 @@ namespace os
       FileSystem*
       getFileSystem (void) const;
 
-      // ----------------------------------------------------------------------
     protected:
+
+      // ----------------------------------------------------------------------
+      // Implementations.
 
       /**
        * @return object if successful, otherwise nullptr and errno.
@@ -103,11 +105,12 @@ namespace os
       do_close (void);
 
       // ----------------------------------------------------------------------
+      // Support functions.
 
       void
       setFileSystem (FileSystem* fileSystem);
 
-    protected:
+    private:
 
       FileSystem* fFileSystem;
       struct dirent fDirEntry;

@@ -129,7 +129,7 @@ namespace os
       opendir (const char* dirpath);
 
       // ----------------------------------------------------------------------
-      // --- Support functions.
+      // Support functions.
 
       BlockDevice*
       getBlockDevice (void) const;
@@ -140,8 +140,10 @@ namespace os
       Pool*
       getDirsPool (void) const;
 
-      // ----------------------------------------------------------------------
     protected:
+
+      // ----------------------------------------------------------------------
+      // Called from namespace friend functions.
 
       int
       chmod (const char* path, mode_t mode);
@@ -162,7 +164,7 @@ namespace os
       utime (const char* path, const struct utimbuf* times);
 
       // ----------------------------------------------------------------------
-      // ----- Implementations -----
+      // Implementations.
 
       virtual int
       do_chmod (const char* path, mode_t mode);
@@ -198,7 +200,7 @@ namespace os
       do_unmount (unsigned int flags);
 
       // ----------------------------------------------------------------------
-      // --- Support functions.
+      // Support functions.
 
       void
       setBlockDevice (BlockDevice* blockDevice);
@@ -208,7 +210,7 @@ namespace os
       const char*
       adjustPath (const char* path);
 
-    protected:
+    private:
 
       Pool* fFilesPool;
       Pool* fDirsPool;

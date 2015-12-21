@@ -55,6 +55,7 @@ namespace os
       // ----------------------------------------------------------------------
 
       friend class FileSystem;
+      friend class FileDescriptorsManager;
 
       friend IO*
       vopen (const char* path, int oflag, std::va_list args);
@@ -64,9 +65,13 @@ namespace os
     public:
 
       using type_t = unsigned int;
-      enum class Type
+      enum Type
         : type_t
-          { UNKNOWN, DEVICE, FILE, SOCKET
+          { UNKNOWN = 0,
+        NOTSET = 1 << 0,
+        DEVICE = 1 << 1,
+        FILE = 1 << 2,
+        SOCKET = 1 << 3
       };
 
       // ----------------------------------------------------------------------
@@ -97,12 +102,6 @@ namespace os
       int
       vioctl (int request, std::va_list args);
 
-      off_t
-      lseek (off_t offset, int whence);
-
-      int
-      isatty (void);
-
       int
       fcntl (int cmd, ...);
 
@@ -110,24 +109,16 @@ namespace os
       vfcntl (int cmd, std::va_list args);
 
       int
+      isatty (void);
+
+      int
       fstat (struct stat* buf);
 
-      int
-      ftruncate (off_t length);
-
-      int
-      fsync (void);
-
       // ----------------------------------------------------------------------
+      // Support functions.
 
       Type
       getType (void) const;
-
-      void
-      setFileDescriptor (fileDescriptor_t fildes);
-
-      void
-      clearFileDescriptor (void);
 
       fileDescriptor_t
       getFileDescriptor (void) const;
@@ -135,13 +126,10 @@ namespace os
     protected:
 
       // ----------------------------------------------------------------------
-      // Implementations
+      // Implementations.
 
-      /**
-       * return 0 if success or -1 & errno
-       */
-      virtual int
-      do_open (const char* path, int oflag, std::va_list args) = 0;
+      // do_open() is not here, because it is not common
+      // (for example for sockets()).
 
       virtual int
       do_close (void);
@@ -158,29 +146,35 @@ namespace os
       virtual int
       do_ioctl (int request, std::va_list args);
 
-      virtual off_t
-      do_lseek (off_t offset, int whence);
+      virtual int
+      do_fcntl (int cmd, va_list args);
 
       virtual int
       do_isatty (void);
 
       virtual int
-      do_fcntl (int cmd, va_list args);
-
-      virtual int
       do_fstat (struct stat* buf);
 
-      virtual int
-      do_ftruncate (off_t length);
+      // ----------------------------------------------------------------------
+      // Support functions.
 
-      virtual int
-      do_fsync (void);
+      void
+      setFileDescriptor (fileDescriptor_t fildes);
+
+      void
+      clearFileDescriptor (void);
+
+      IO*
+      allocFileDescriptor (void);
 
       // ----------------------------------------------------------------------
 
     protected:
 
       Type fType;
+
+    private:
+
       fileDescriptor_t fFileDescriptor;
     };
 

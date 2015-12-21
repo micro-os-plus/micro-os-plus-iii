@@ -63,6 +63,8 @@ namespace os
 
     protected:
 
+      // Referred directly in TPool.
+
       void** fArray;
       bool* fInUse;
       std::size_t fSize;

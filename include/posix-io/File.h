@@ -55,6 +55,25 @@ namespace os
       ~File ();
 
       // ----------------------------------------------------------------------
+
+      static File*
+      open (const char* path, int oflag, ...);
+
+      static File*
+      vopen (const char* path, int oflag, std::va_list args);
+
+      // ----------------------------------------------------------------------
+
+      off_t
+      lseek (off_t offset, int whence);
+
+      int
+      ftruncate (off_t length);
+
+      int
+      fsync (void);
+
+      // ----------------------------------------------------------------------
       // Support functions.
 
       FileSystem*
@@ -62,15 +81,42 @@ namespace os
 
     protected:
 
+      // ----------------------------------------------------------------------
+      // Implementations
+
+      /**
+       * return 0 if success or -1 & errno
+       */
+      virtual int
+      do_open (const char* path, int oflag, std::va_list args) = 0;
+
+      virtual off_t
+      do_lseek (off_t offset, int whence);
+
+      virtual int
+      do_ftruncate (off_t length);
+
+      virtual int
+      do_fsync (void);
+
+      // ----------------------------------------------------------------------
+      // Support functions.
+
       void
       setFileSystem (FileSystem* fileSystem);
 
-    protected:
+    private:
 
       FileSystem* fFileSystem;
     };
 
     // ------------------------------------------------------------------------
+
+    inline File*
+    File::vopen (const char* path, int oflag, std::va_list args)
+    {
+      return static_cast<File*> (os::posix::vopen (path, oflag, args));
+    }
 
     inline void
     File::setFileSystem (FileSystem* fileSystem)
