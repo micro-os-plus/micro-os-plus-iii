@@ -20,7 +20,7 @@
 #include "posix-io/NetStack.h"
 #include "posix-io/Pool.h"
 #include <cerrno>
-#include <sys/socket.h>
+#include "posix/sys/socket.h"
 
 // ----------------------------------------------------------------------------
 

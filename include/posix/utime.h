@@ -16,50 +16,33 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POSIX_IO_DIRENT_H_
-#define POSIX_IO_DIRENT_H_
+#ifndef POSIX_IO_UTIME_H_
+#define POSIX_IO_UTIME_H_
 
 // ----------------------------------------------------------------------------
 
-#if !defined(OS_INTEGER_DIRENT_NAME_MAX)
-#define OS_INTEGER_DIRENT_NAME_MAX  (256)
+#if !defined(__ARM_EABI__)
+#include <sys/select.h>
+#else
+
+#include <sys/types.h>
+
+#ifdef __cplusplus
+extern "C"
+  {
 #endif
 
 // ----------------------------------------------------------------------------
 
-struct dirent
-{
-  ino_t d_ino;
-  char d_name[OS_INTEGER_DIRENT_NAME_MAX];
-};
-
-// The content of this structure is not relevant, it is here just to keep
-// POSIX compatibility, in real life the Directory class is used
-// and casted to DIR.
-typedef struct
-{
-  ;
-} DIR;
+    int
+    utime (const char *path, const struct utimbuf* times);
 
 // ----------------------------------------------------------------------------
 
-DIR*
-opendir (const char* dirname);
-
-struct dirent*
-readdir (DIR* dirp);
-
-#if 0
-int
-readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result);
+#ifdef __cplusplus
+  }
 #endif
 
-void
-rewinddir (DIR* dirp);
+#endif /* __ARM_EABI__ */
 
-int
-closedir (DIR* dirp);
-
-// ----------------------------------------------------------------------------
-
-#endif /* POSIX_IO_DIRENT_H_ */
+#endif /* POSIX_IO_UTIME_H_ */

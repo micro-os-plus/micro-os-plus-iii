@@ -23,11 +23,7 @@
 
 #include "posix-io/IO.h"
 
-#if defined(__ARM_EABI__)
-#include "posix-io/utime.h"
-#else
-#include <utime.h>
-#endif
+#include "posix/utime.h"
 
 // ----------------------------------------------------------------------------
 

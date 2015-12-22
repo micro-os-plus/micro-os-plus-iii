@@ -31,6 +31,7 @@
 #include "diag/Trace.h"
 #endif
 #include "utime.h"
+#include "posix/sys/socket.h"
 
 // ----------------------------------------------------------------------------
 

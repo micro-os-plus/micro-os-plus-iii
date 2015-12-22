@@ -23,11 +23,7 @@
 
 #include "posix-io/FileSystem.h"
 
-#if defined(__ARM_EABI__)
-#include "posix-io/dirent.h"
-#else
-#include <dirent.h>
-#endif
+#include "posix/dirent.h"
 
 // ----------------------------------------------------------------------------
 

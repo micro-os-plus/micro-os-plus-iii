@@ -47,9 +47,13 @@
 
 // The newlib definitions do not include some functions, like
 // those for directory reading, utime, select.
-#include "posix-io/dirent.h"
-#include "posix-io/utime.h"
-#include "posix-io/embed.h"
+#include "posix/dirent.h"
+#include "posix/utime.h"
+#include "posix/embed.h"
+#include "posix/stropts.h"
+#include "posix/sys/uio.h"
+#include "posix/sys/select.h"
+
 #else
 // ioctl()
 #include <stropts.h>
@@ -124,8 +128,8 @@
 // This is the test case, when the functions are declared locally,
 // with prefixed names, to avoid clashes with system functions.
 
-#include <dirent.h>
-#include <sys/socket.h>
+#include "posix/dirent.h"
+#include "posix/sys/socket.h"
 
 extern "C"
 {
@@ -715,12 +719,14 @@ __posix_socket (int domain, int type, int protocol)
   return sock->getFileDescriptor ();
 }
 
+#if 0
 int
 __posix_socketpair (int domain, int type, int protocol, int socket_vector[2])
 {
   errno = ENOSYS; // Not implemented
   return -1;
 }
+#endif
 
 int
 __posix_accept (int socket, struct sockaddr* address, socklen_t* address_len)

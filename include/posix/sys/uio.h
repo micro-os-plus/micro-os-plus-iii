@@ -16,14 +16,33 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POSIX_IO_UTIME_H_
-#define POSIX_IO_UTIME_H_
+#ifndef POSIX_IO_SYS_UIO_H_
+#define POSIX_IO_SYS_UIO_H_
 
-// ----------------------------------------------------------------------------
+#if !defined(__ARM_EABI__)
+#include <sys/uio.h>
+#else
 
-int
-utime (const char *path, const struct utimbuf* times);
+#include <sys/types.h>
 
-// ----------------------------------------------------------------------------
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
-#endif /* POSIX_IO_UTIME_H_ */
+  struct iovec
+  {
+    void* iov_base;  // Base address of a memory region for input or output.
+    size_t iov_len;   // The size of the memory pointed to by iov_base.
+  };
+
+  ssize_t
+  writev (int fildes, const struct iovec* iov, int iovcnt);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* __ARM_EABI__ */
+
+#endif /* POSIX_IO_SYS_UIO_H_ */

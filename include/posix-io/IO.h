@@ -27,7 +27,7 @@
 // Needed for ssize_t
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/uio.h>
+#include "posix/sys/uio.h"
 
 // ----------------------------------------------------------------------------
 
@@ -39,6 +39,7 @@ namespace os
 
     class IO;
     class FileSystem;
+    //struct iovec;
 
     // ------------------------------------------------------------------------
 
