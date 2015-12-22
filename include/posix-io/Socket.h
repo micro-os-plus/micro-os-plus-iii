@@ -39,13 +39,22 @@ namespace os
     Socket*
     socket (int domain, int type, int protocol);
 
+#if 0
     int
     socketpair (int domain, int type, int protocol, Socket* socket_vector[2]);
+#endif
 
     // ------------------------------------------------------------------------
 
     class Socket : public IO
     {
+      // ----------------------------------------------------------------------
+
+      friend Socket*
+      socket (int domain, int type, int protocol);
+
+      // ----------------------------------------------------------------------
+
     public:
 
       Socket ();
@@ -110,16 +119,15 @@ namespace os
       // ----------------------------------------------------------------------
     protected:
 
-      /* virtual */
-      bool
-      tryMatch (int domain, int type, int protocol);
+      /**
+       * return 0 if success or -1 & errno
+       */
+      virtual int
+      do_socket (int domain, int type, int protocol) = 0;
 
-      /* virtual */
-      int
-      do_socket (int domain, int type, int protocol);
-
-      virtual Socket*
-      do_accept (struct sockaddr* address, socklen_t* address_len);
+      virtual int
+      do_accept (Socket* sock, struct sockaddr* address,
+                 socklen_t* address_len);
 
       virtual int
       do_bind (const struct sockaddr* address, socklen_t address_len);
@@ -169,6 +177,9 @@ namespace os
 
       virtual int
       do_sockatmark (void);
+
+      virtual void
+      doRelease (void) override;
 
     };
 

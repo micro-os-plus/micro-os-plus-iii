@@ -52,6 +52,7 @@ enum class Cmds
   CLOSE,
   READ,
   WRITE,
+  WRITEV,
   IOCTL,
   LSEEK,
   ISATTY,
@@ -71,6 +72,10 @@ public:
   TestFile ();
 
   // Methods used for test purposes only.
+
+  void
+  clear (void);
+
   Cmds
   getCmd (void);
 
@@ -101,6 +106,9 @@ protected:
 
   virtual ssize_t
   do_write (const void* buf, std::size_t nbyte) override;
+
+  virtual ssize_t
+  do_writev (const struct iovec* iov, int iovcnt) override;
 
   virtual int
   do_ioctl (int request, std::va_list args) override;
@@ -135,6 +143,12 @@ private:
 };
 
 TestFile::TestFile ()
+{
+  clear ();
+}
+
+void
+TestFile::clear (void)
 {
   fCmd = Cmds::NOTSET;
   fPath = nullptr;
@@ -198,7 +212,7 @@ TestFile::do_read (void *buf, std::size_t nbyte)
   fCmd = Cmds::READ;
   fPtr = buf;
   fNumber = nbyte;
-  return 0;
+  return nbyte / 2;
 }
 
 ssize_t
@@ -207,6 +221,15 @@ TestFile::do_write (const void* buf, std::size_t nbyte)
   fCmd = Cmds::WRITE;
   fPtr = (void*) buf;
   fNumber = nbyte;
+  return nbyte / 2;
+}
+
+ssize_t
+TestFile::do_writev (const struct iovec* iov, int iovcnt)
+{
+  fCmd = Cmds::WRITEV;
+  fPtr = (void*) iov;
+  fNumber = iovcnt;
   return 0;
 }
 
@@ -571,6 +594,9 @@ extern "C"
   ssize_t
   __posix_write (int fildes, const void* buf, size_t nbyte);
 
+  ssize_t
+  __posix_writev (int fildes, const struct iovec* iov, int iovcnt);
+
   int
   __posix_ioctl (int fildes, int request, ...);
 
@@ -876,23 +902,35 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       // Test READ
       errno = -2;
+      file->clear ();
       char buf[3];
-      ret = __posix_read (fd, (void*) buf, 321);
-      assert((ret == 0) && (errno == 0));
+      ret = __posix_read (fd, (void*) buf, 320);
+      assert((ret == (320/2)) && (errno == 0));
       assert(file->getCmd () == Cmds::READ);
       assert(file->getPtr () == buf);
-      assert(file->getNumber () == 321);
+      assert(file->getNumber () == 320);
 
       // Test WRITE
       errno = -2;
+      file->clear ();
       ret = __posix_write (fd, (const void*) buf, 432);
-      assert((ret == 0) && (errno == 0));
+      assert((ret == (432/2)) && (errno == 0));
       assert(file->getCmd () == Cmds::WRITE);
       assert(file->getPtr () == buf);
       assert(file->getNumber () == 432);
 
+      // Test WRITEV
+      errno = -2;
+      file->clear ();
+      ret = __posix_writev (fd, (const struct iovec*) buf, 234);
+      assert((ret == 0) && (errno == 0));
+      assert(file->getCmd () == Cmds::WRITEV);
+      assert(file->getPtr () == buf);
+      assert(file->getNumber () == 234);
+
       // Test IOCTL
       errno = -2;
+      file->clear ();
       ret = __posix_ioctl (fd, 222, 876);
       assert((ret == 0) && (errno == 0));
       assert(file->getCmd () == Cmds::IOCTL);
@@ -901,6 +939,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       // Test LSEEK
       errno = -2;
+      file->clear ();
       ret = __posix_lseek (fd, 333, 555);
       assert((ret == 0) && (errno == 0));
       assert(file->getCmd () == Cmds::LSEEK);
@@ -909,12 +948,14 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       // Test ISATTY
       errno = -2;
+      file->clear ();
       ret = __posix_isatty (fd);
       assert((ret == 0) && (errno == 0));
       assert(file->getCmd () == Cmds::ISATTY);
 
       // Test FCNTL
       errno = -2;
+      file->clear ();
       ret = __posix_fcntl (fd, 444, 987);
       assert((ret == 0) && (errno == 0));
       assert(file->getCmd () == Cmds::FCNTL);
@@ -923,6 +964,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       // Test FSTAT
       errno = -2;
+      file->clear ();
       struct stat stat_buf;
       ret = __posix_fstat (fd, &stat_buf);
       assert((ret == 0) && (errno == 0));
@@ -931,6 +973,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       // Test FTRUNCATE
       errno = -2;
+      file->clear ();
       ret = __posix_ftruncate (fd, 999);
       assert((ret == 0) && (errno == 0));
       assert(file->getCmd () == Cmds::FTRUNCATE);
@@ -938,12 +981,14 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       // Test FSYNC
       errno = -2;
+      file->clear ();
       ret = __posix_fsync (fd);
       assert((ret == 0) && (errno == 0));
       assert(file->getCmd () == Cmds::FSYNC);
 
       // Test CLOSE
       errno = -2;
+      file->clear ();
       ret = __posix_close (fd);
       assert((ret == 0) && (errno == 0));
       assert(file->getCmd () == Cmds::CLOSE);
@@ -1006,19 +1051,27 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       // Test READ
       errno = -2;
       char buf[3];
-      ret = file->read ((void*) buf, 321);
-      assert((ret == 0) && (errno == 0));
+      ret = file->read ((void*) buf, 320);
+      assert((ret == (320/2)) && (errno == 0));
       assert(tfile->getCmd () == Cmds::READ);
       assert(tfile->getPtr () == buf);
-      assert(tfile->getNumber () == 321);
+      assert(tfile->getNumber () == 320);
 
       // Test WRITE
       errno = -2;
       ret = file->write ((const void*) buf, 432);
-      assert((ret == 0) && (errno == 0));
+      assert((ret == (432/2)) && (errno == 0));
       assert(tfile->getCmd () == Cmds::WRITE);
       assert(tfile->getPtr () == buf);
       assert(tfile->getNumber () == 432);
+
+      // Test WRITEV
+      errno = -2;
+      ret = file->writev ((const struct iovec*) buf, 234);
+      assert((ret == 0) && (errno == 0));
+      assert(tfile->getCmd () == Cmds::WRITEV);
+      assert(tfile->getPtr () == buf);
+      assert(tfile->getNumber () == 234);
 
       // Test IOCTL
       errno = -2;

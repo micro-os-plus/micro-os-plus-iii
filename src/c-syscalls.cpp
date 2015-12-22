@@ -321,8 +321,10 @@ extern "C"
   int __attribute__((weak))
   __posix_socket (int domain, int type, int protocol);
 
+#if 0
   int __attribute__((weak))
   __posix_socketpair (int domain, int type, int protocol, int socket_vector[2]);
+#endif
 
   int __attribute__((weak))
   __posix_stat (const char* path, struct stat* buf);
@@ -704,8 +706,13 @@ __posix_closedir (DIR* dirp)
 int
 __posix_socket (int domain, int type, int protocol)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  auto* const sock = os::posix::socket (domain, type, protocol);
+  if (sock == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+  return sock->getFileDescriptor ();
 }
 
 int

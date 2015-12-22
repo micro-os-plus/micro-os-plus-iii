@@ -18,12 +18,10 @@
 
 #include "posix-io/FileDescriptorsManager.h"
 #include "posix-io/IO.h"
-#include "posix-io/File.h"
-#include "posix-io/FileSystem.h"
 #include "posix-io/TPool.h"
-#include "posix-io/MountManager.h"
-#include "posix-io/BlockDevice.h"
 #include "posix-io/Socket.h"
+#include "posix-io/NetInterface.h"
+#include "posix-io/NetStack.h"
 #include <cerrno>
 #include <cassert>
 #include <cstdio>
@@ -40,26 +38,29 @@ enum class Cmds
   : unsigned int
     { UNKNOWN,
   NOTSET,
-  SYNC,
-  CHMOD,
-  STAT,
-  TRUNCATE,
-  RENAME,
-  UNLINK,
-  UTIME,
-  MKDIR,
-  RMDIR,
-  OPEN,
   CLOSE,
   READ,
   WRITE,
+  WRITEV,
   IOCTL,
-  LSEEK,
-  ISATTY,
   FCNTL,
-  FSTAT,
-  FTRUNCATE,
-  FSYNC
+  SOCKET,
+  ACCEPT,
+  BIND,
+  CONNECT,
+  GETPEERNAME,
+  GETSOCKNAME,
+  GETSOCKOPT,
+  LISTEN,
+  RECV,
+  RECVFROM,
+  RECVMSG,
+  SEND,
+  SENDMSG,
+  SENDTO,
+  SETSOCKOPT,
+  SHUTDOWN,
+  SOCKATMARK
 };
 
 // Test class, all methods store the input in local variables,
@@ -72,6 +73,10 @@ public:
   TestSocket ();
 
   // Methods used for test purposes only.
+
+  void
+  clear (void);
+
   Cmds
   getCmd (void);
 
@@ -82,17 +87,26 @@ public:
   getPath (void);
 
   unsigned int
-  getNumber (void);
+  getNumber1 (void);
+
+  unsigned int
+  getNumber2 (void);
+
+  unsigned int
+  getNumber3 (void);
 
   void*
-  getPtr (void);
+  getPtr1 (void);
+
+  void*
+  getPtr2 (void);
+
+  void*
+  getPtr3 (void);
 
 protected:
 
   // Implementations.
-
-  virtual bool
-  tryMatch(int domain, int type, int protocol);
 
   virtual int
   do_socket (int domain, int type, int protocol) override;
@@ -106,7 +120,7 @@ protected:
   virtual ssize_t
   do_write (const void* buf, std::size_t nbyte) override;
 
-  ssize_t
+  virtual ssize_t
   do_writev (const struct iovec* iov, int iovcnt) override;
 
   virtual int
@@ -115,8 +129,9 @@ protected:
   virtual int
   do_fcntl (int cmd, va_list args) override;
 
-  Socket*
-  do_accept (struct sockaddr* address, socklen_t* address_len) override;
+  int
+  do_accept (Socket* sock, struct sockaddr* address, socklen_t* address_len)
+      override;
 
   int
   do_bind (const struct sockaddr* address, socklen_t address_len) override;
@@ -141,8 +156,8 @@ protected:
   do_recv (void* buffer, size_t length, int flags) override;
 
   ssize_t
-  do_recvfrom (void* buffer, size_t length, int flags,
-               struct sockaddr* address, socklen_t* address_len) override;
+  do_recvfrom (void* buffer, size_t length, int flags, struct sockaddr* address,
+               socklen_t* address_len) override;
 
   ssize_t
   do_recvmsg (struct msghdr* message, int flags) override;
@@ -172,20 +187,34 @@ private:
   uint32_t fSomething;
   const char* fPath;
   int fMode;
-  unsigned int fNumber;
-  void* fPtr;
+  unsigned int fNumber1;
+  unsigned int fNumber2;
+  unsigned int fNumber3;
+  void* fPtr1;
+  void* fPtr2;
+  void* fPtr3;
   Cmds fCmd;
 
 };
 
 TestSocket::TestSocket ()
 {
+  clear ();
+}
+
+void
+TestSocket::clear (void)
+{
   fCmd = Cmds::NOTSET;
   fPath = nullptr;
   fMode = -1;
   fSomething = 1;
-  fNumber = 1;
-  fPtr = nullptr;
+  fNumber1 = 1;
+  fNumber2 = 1;
+  fNumber3 = 1;
+  fPtr1 = nullptr;
+  fPtr2 = nullptr;
+  fPtr3 = nullptr;
 }
 
 inline Cmds
@@ -195,9 +224,21 @@ TestSocket::getCmd (void)
 }
 
 inline unsigned int
-TestSocket::getNumber (void)
+TestSocket::getNumber1 (void)
 {
-  return fNumber;
+  return fNumber1;
+}
+
+inline unsigned int
+TestSocket::getNumber2 (void)
+{
+  return fNumber2;
+}
+
+inline unsigned int
+TestSocket::getNumber3 (void)
+{
+  return fNumber3;
 }
 
 inline int
@@ -213,11 +254,22 @@ TestSocket::getPath (void)
 }
 
 inline void*
-TestSocket::getPtr (void)
+TestSocket::getPtr1 (void)
 {
-  return fPtr;
+  return fPtr1;
 }
 
+inline void*
+TestSocket::getPtr2 (void)
+{
+  return fPtr2;
+}
+
+inline void*
+TestSocket::getPtr3 (void)
+{
+  return fPtr3;
+}
 
 int
 TestSocket::do_close (void)
@@ -230,8 +282,8 @@ ssize_t
 TestSocket::do_read (void *buf, std::size_t nbyte)
 {
   fCmd = Cmds::READ;
-  fPtr = buf;
-  fNumber = nbyte;
+  fPtr1 = buf;
+  fNumber1 = nbyte;
   return 0;
 }
 
@@ -239,8 +291,17 @@ ssize_t
 TestSocket::do_write (const void* buf, std::size_t nbyte)
 {
   fCmd = Cmds::WRITE;
-  fPtr = (void*) buf;
-  fNumber = nbyte;
+  fPtr1 = (void*) buf;
+  fNumber1 = nbyte;
+  return 0;
+}
+
+ssize_t
+TestSocket::do_writev (const struct iovec* iov, int iovcnt)
+{
+  fCmd = Cmds::WRITEV;
+  fPtr1 = (void*) iov;
+  fNumber1 = iovcnt;
   return 0;
 }
 
@@ -248,208 +309,281 @@ int
 TestSocket::do_ioctl (int request, std::va_list args)
 {
   fCmd = Cmds::IOCTL;
-  fNumber = request;
+  fNumber1 = request;
   fMode = va_arg(args, int);
   return 0;
 }
-
 
 int
 TestSocket::do_fcntl (int cmd, std::va_list args)
 {
   fCmd = Cmds::FCNTL;
-  fNumber = cmd;
+  fNumber1 = cmd;
   fMode = va_arg(args, int);
   return 0;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 
-Socket*
-TestSocket::do_accept (struct sockaddr* address, socklen_t* address_len)
+int
+TestSocket::do_socket (int domain, int type, int protocol)
 {
-  errno = ENOSYS; // Not implemented
-  return nullptr;
+  fCmd = Cmds::SOCKET;
+  fNumber1 = domain;
+  fNumber2 = type;
+  fNumber3 = protocol;
+
+  return 0;
+}
+
+int
+TestSocket::do_accept (Socket* sock, struct sockaddr* address,
+                       socklen_t* address_len)
+{
+  fCmd = Cmds::SOCKET;
+  fPtr1 = address;
+  fPtr2 = address_len;
+
+  return 0;
 }
 
 int
 TestSocket::do_bind (const struct sockaddr* address, socklen_t address_len)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  fCmd = Cmds::BIND;
+  fPtr1 = (void*) address;
+  fNumber1 = address_len;
+
+  return 0;
 }
 
 int
 TestSocket::do_connect (const struct sockaddr* address, socklen_t address_len)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  fCmd = Cmds::CONNECT;
+  fPtr1 = (void*) address;
+  fNumber1 = address_len;
+
+  return 0;
 }
 
 int
 TestSocket::do_getpeername (struct sockaddr* address, socklen_t* address_len)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  fCmd = Cmds::GETPEERNAME;
+  fPtr1 = (void*) address;
+  fPtr2 = address_len;
+
+  return 0;
 }
 
 int
 TestSocket::do_getsockname (struct sockaddr* address, socklen_t* address_len)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  fCmd = Cmds::GETSOCKNAME;
+  fPtr1 = (void*) address;
+  fPtr2 = address_len;
+
+  return 0;
 }
 
 int
 TestSocket::do_getsockopt (int level, int option_name, void* option_value,
-                       socklen_t* option_len)
+                           socklen_t* option_len)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  fCmd = Cmds::GETSOCKOPT;
+  fNumber1 = level;
+  fNumber2 = option_name;
+  fPtr1 = option_value;
+  fPtr2 = option_len;
+
+  return 0;
 }
 
 int
 TestSocket::do_listen (int backlog)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  fCmd = Cmds::LISTEN;
+  fNumber1 = backlog;
+
+  return 0;
 }
 
 ssize_t
 TestSocket::do_recv (void* buffer, size_t length, int flags)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  fCmd = Cmds::RECV;
+  fPtr1 = buffer;
+  fNumber1 = length;
+  fNumber2 = flags;
+
+  return length / 2;
 }
 
 ssize_t
 TestSocket::do_recvfrom (void* buffer, size_t length, int flags,
-                     struct sockaddr* address, socklen_t* address_len)
+                         struct sockaddr* address, socklen_t* address_len)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  fCmd = Cmds::RECVFROM;
+  fPtr1 = buffer;
+  fNumber1 = length;
+  fNumber2 = flags;
+  fPtr2 = address;
+  fPtr3 = address_len;
+
+  return length / 2;
 }
 
 ssize_t
 TestSocket::do_recvmsg (struct msghdr* message, int flags)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  fCmd = Cmds::RECVMSG;
+  fPtr1 = message;
+  fNumber1 = flags;
+
+  return flags / 2;
 }
 
 ssize_t
 TestSocket::do_send (const void* buffer, size_t length, int flags)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  fCmd = Cmds::SEND;
+  fPtr1 = (void*) buffer;
+  fNumber1 = length;
+  fNumber2 = flags;
+
+  return length / 2;
 }
 
 ssize_t
 TestSocket::do_sendmsg (const struct msghdr* message, int flags)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  fCmd = Cmds::SENDMSG;
+  fPtr1 = (void*) message;
+  fNumber1 = flags;
+
+  return flags / 2;
 }
 
 ssize_t
 TestSocket::do_sendto (const void* message, size_t length, int flags,
-                   const struct sockaddr* dest_addr, socklen_t dest_len)
+                       const struct sockaddr* dest_addr, socklen_t dest_len)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  fCmd = Cmds::SENDTO;
+  fPtr1 = (void*) message;
+  fNumber1 = length;
+  fNumber2 = flags;
+  fPtr2 = (void*) dest_addr;
+  fNumber3 = dest_len;
+
+  return length / 2;
 }
 
 int
 TestSocket::do_setsockopt (int level, int option_name, const void* option_value,
-                       socklen_t option_len)
+                           socklen_t option_len)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  fCmd = Cmds::SETSOCKOPT;
+  fNumber1 = level;
+  fNumber2 = option_name;
+  fPtr1 = (void*) option_value;
+  fNumber3 = option_len;
+
+  return 0;
 }
 
 int
 TestSocket::do_shutdown (int how)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  fCmd = Cmds::SHUTDOWN;
+  fNumber1 = how;
+
+  return 0;
 }
+
+#pragma GCC diagnostic pop
 
 int
 TestSocket::do_sockatmark (void)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  fCmd = Cmds::SOCKATMARK;
+
+  return 0;
 }
-
-
 
 // ----------------------------------------------------------------------------
 
-using TestFilePool = os::posix::TPool<TestSocket>;
-
-constexpr std::size_t FILES_POOL_ARRAY_SIZE = 2;
-
-// Pool of File objects, used in common by all filesystems.
-TestFilePool filesPool
-  { FILES_POOL_ARRAY_SIZE };
-
-// File systems, all using the same pool.
-TestFileSystem root_fs
-  { &filesPool, nullptr };
-TestFileSystem fs1
-  { &filesPool, nullptr };
-TestFileSystem fs2
-  { &filesPool, nullptr };
-
-// Static manager
-os::posix::FileDescriptorsManager dm
-  { 5 };
-
-// Static manager
-os::posix::MountManager mm
-  { 2 };
-
-// Block devices, just referenced, no calls forwarded to them.
-TestBlockDevice root_dev;
-TestBlockDevice dev1;
-TestBlockDevice dev2;
+class TestNetInterface : public os::posix::NetInterface
+{
+public:
+  TestNetInterface () = default;
+};
 
 // ----------------------------------------------------------------------------
 
 extern "C"
 {
   int
-  __posix_chmod (const char* path, mode_t mode);
+  __posix_socket (int domain, int type, int protocol);
 
   int
-  __posix_stat (const char* path, struct stat* buf);
+  __posix_accept (int socket, struct sockaddr* address, socklen_t* address_len);
 
   int
-  __posix_truncate (const char* path, off_t length);
+  __posix_bind (int socket, const struct sockaddr* address,
+                socklen_t address_len);
 
   int
-  __posix_rename (const char* existing, const char* _new);
+  __posix_connect (int socket, const struct sockaddr* address,
+                   socklen_t address_len);
 
-  int
-  __posix_unlink (const char* path);
+  int __attribute__((weak))
+  __posix_getpeername (int socket, struct sockaddr* address,
+                       socklen_t* address_len);
 
-  int
-  __posix_utime (const char* path, const struct utimbuf* times);
+  int __attribute__((weak))
+  __posix_getsockname (int socket, struct sockaddr* address,
+                       socklen_t* address_len);
 
-  // -----
+  int __attribute__((weak))
+  __posix_getsockopt (int socket, int level, int option_name,
+                      void* option_value, socklen_t* option_len);
 
-  int
-  __posix_mkdir (const char* path, mode_t mode);
+  int __attribute__((weak))
+  __posix_listen (int socket, int backlog);
 
-  int
-  __posix_rmdir (const char* path);
+  ssize_t __attribute__((weak))
+  __posix_recv (int socket, void* buffer, size_t length, int flags);
 
-  void
-  __posix_sync (void);
+  ssize_t __attribute__((weak))
+  __posix_recvfrom (int socket, void* buffer, size_t length, int flags,
+                    struct sockaddr* address, socklen_t* address_len);
 
-  // -----
+  ssize_t __attribute__((weak))
+  __posix_recvmsg (int socket, struct msghdr* message, int flags);
 
-  int
-  __posix_open (const char* path, int oflag, ...);
+  ssize_t __attribute__((weak))
+  __posix_send (int socket, const void* buffer, size_t length, int flags);
+
+  ssize_t __attribute__((weak))
+  __posix_sendmsg (int socket, const struct msghdr* message, int flags);
+
+  ssize_t __attribute__((weak))
+  __posix_sendto (int socket, const void* message, size_t length, int flags,
+                  const struct sockaddr* dest_addr, socklen_t dest_len);
+
+  int __attribute__((weak))
+  __posix_setsockopt (int socket, int level, int option_name,
+                      const void* option_value, socklen_t option_len);
+
+  int __attribute__((weak))
+  __posix_shutdown (int socket, int how);
+
+  int __attribute__((weak))
+  __posix_sockatmark (int socket);
+
+  // --------------------------------------------------------------------------
 
   int
   __posix_close (int fildes);
@@ -463,485 +597,301 @@ extern "C"
   int
   __posix_ioctl (int fildes, int request, ...);
 
-  off_t
-  __posix_lseek (int fildes, off_t offset, int whence);
-
-  int
-  __posix_isatty (int fildes);
-
-  int
-  __posix_fcntl (int fildes, int cmd, ...);
-
-  int
-  __posix_fstat (int fildes, struct stat* buf);
-
-  int
-  __posix_ftruncate (int fildes, off_t length);
-
-  int
-  __posix_fsync (int fildes);
-
 }
+
+// ----------------------------------------------------------------------------
+
+using TestSocketPool = os::posix::TPool<TestSocket>;
+
+constexpr std::size_t SOCKETS_POOL_ARRAY_SIZE = 2;
+
+// Pool of File objects, used in common by all filesystems.
+TestSocketPool socketsPool
+  { SOCKETS_POOL_ARRAY_SIZE };
+
+TestNetInterface if0;
+
+os::posix::NetStack net
+  { &socketsPool };
+
+// Static manager
+os::posix::FileDescriptorsManager dm
+  { 5 };
 
 // ----------------------------------------------------------------------------
 
 int
 main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
-    {
-      // ----- MountManager -----
-
-      // Check initial size.
-      assert(mm.getSize () == 2);
-
-      // Check if FileSystemsManger is empty.
-      for (std::size_t i = 0; i < mm.getSize (); ++i)
-        {
-          assert(mm.getFileSystem (i) == nullptr);
-          assert(mm.getPath (i) == nullptr);
-        }
-      assert(mm.getRoot () == nullptr);
-
-      const char* path1 = "/babu/riba";
-      const char* path2 = path1;
-
-      // No file system, identify nothing
-      assert(
-          os::posix::MountManager::identifyFileSystem (&path2, nullptr)
-              == nullptr);
-
-      // Check if root_fs file system flags are those set by constructor.
-      assert(root_fs.getFlags () == 1);
-
-      // Check setRoot(), and mount().
-      assert(os::posix::MountManager::setRoot (&root_fs, &root_dev, 123) == 0);
-      assert(os::posix::MountManager::getRoot () == &root_fs);
-      assert(root_fs.getBlockDevice () == &root_dev);
-
-      // Check mount flags.
-      assert(root_fs.getFlags () == 123);
-
-      // No file systems mounted, identify root.
-      assert(
-          os::posix::MountManager::identifyFileSystem (&path2, nullptr)
-              == &root_fs);
-      assert(path2 == path1);
-    }
-
-    {
-      // ----- MountManager mounts & umounts -----
-
-      errno = -2;
-      assert(
-          (os::posix::MountManager::mount (&fs1, "/fs1/", &dev1, 124) == 0) && (errno == 0));
-      assert(os::posix::MountManager::getFileSystem (0) == &fs1);
-      assert(fs1.getBlockDevice () == &dev1);
-
-      assert(fs1.getFlags () == 124);
-
-      // Check not mounted file, should return root
-      const char* path1 = "/baburiba";
-      const char* path2 = path1;
-
-      assert(
-          os::posix::MountManager::identifyFileSystem (&path2, nullptr)
-              == &root_fs);
-      assert(path2 == path1);
-
-      // Check busy error
-      errno = -2;
-      assert(os::posix::MountManager::mount (&fs1, "/fs1/", &dev1, 124) == -1);
-      assert(errno == EBUSY);
-
-      path1 = "/fs1/babu";
-      path2 = path1;
-
-      const char* path3 = "/fs1/riba";
-      const char* path4 = path3;
-
-      // Check if identified properly
-      assert(
-          os::posix::MountManager::identifyFileSystem (&path2, &path4) == &fs1);
-
-      // Check if path adjusted properly
-      assert(path2 == (path1 + std::strlen ("/fs1")));
-      assert(path4 == (path3 + std::strlen ("/fs1")));
-
-      // Check size exceeded
-      errno = -2;
-      assert(
-          (os::posix::MountManager::mount (&fs2, "/fs2/", &dev2, 124) == 0) && (errno == 0));
-      errno = -2;
-      assert(os::posix::MountManager::mount (&fs2, "/fs3/", &dev2, 124) == -1);
-      assert(errno == ENOENT);
-
-      // Check umounts
-      unsigned int cnt = fs1.getSyncCount ();
-      errno = -2;
-      assert(
-          (os::posix::MountManager::umount ("/fs1/", 134) == 0) && (errno == 0));
-      assert(fs1.getFlags () == 134);
-      assert(fs1.getSyncCount () == cnt + 1);
-      assert(fs1.getBlockDevice () == nullptr);
-
-      // Check umounts
-      cnt = fs2.getSyncCount ();
-      errno = -2;
-      assert(
-          (os::posix::MountManager::umount ("/fs2/", 144) == 0) && (errno == 0));
-      assert(fs2.getFlags () == 144);
-      assert(fs2.getSyncCount () == cnt + 1);
-      assert(fs2.getBlockDevice () == nullptr);
-    }
-
-    {
-      // Mount again
-      errno = -2;
-      assert(
-          (os::posix::MountManager::mount (&fs1, "/fs1/", &dev1, 124) == 0) && (errno == 0));
-    }
 
     {
       // C API
 
-      // CHMOD
+      // Test SOCKET.
       errno = -2;
-      assert((__posix_chmod ("/fs1/p1", 321) == 0) && (errno == 0));
-      assert(fs1.getCmd () == Cmds::CHMOD);
-      assert(fs1.getNumber () == 321);
-      assert(std::strcmp ("/p1", fs1.getPath ()) == 0);
-
-      // STAT
-      errno = -2;
-      struct stat stat_buf;
-      assert((__posix_stat ("/fs1/p2", &stat_buf) == 0) && (errno == 0));
-      assert(fs1.getCmd () == Cmds::STAT);
-      assert(fs1.getPtr () == &stat_buf);
-      assert(std::strcmp ("/p2", fs1.getPath ()) == 0);
-
-      // TRUNCATE
-      errno = -2;
-      assert((__posix_truncate ("/fs1/p3", 876) == 0) && (errno == 0));
-      assert(fs1.getCmd () == Cmds::TRUNCATE);
-      assert(fs1.getNumber () == 876);
-      assert(std::strcmp ("/p3", fs1.getPath ()) == 0);
-
-      // RENAME
-      errno = -2;
-      assert((__posix_rename ("/fs1/p4", "/fs1/p4-new") == 0) && (errno == 0));
-      assert(fs1.getCmd () == Cmds::RENAME);
-      assert(std::strcmp ("/p4", fs1.getPath ()) == 0);
-      assert(std::strcmp ("/p4-new", (const char* )fs1.getPtr ()) == 0);
-
-      // UNLINK
-      errno = -2;
-      assert((__posix_unlink ("/fs1/p5") ==0) && (errno == 0));
-      assert(fs1.getCmd () == Cmds::UNLINK);
-      assert(std::strcmp ("/p5", fs1.getPath ()) == 0);
-
-      // UTIME
-      errno = -2;
-      struct utimbuf times;
-      assert((__posix_utime ("/fs1/p6", &times) ==0) && (errno == 0));
-      assert(fs1.getCmd () == Cmds::UTIME);
-      assert(fs1.getPtr () == &times);
-      assert(std::strcmp ("/p6", fs1.getPath ()) == 0);
-
-      // MKDIR
-      errno = -2;
-      assert((__posix_mkdir ("/fs1/p7", 654) ==0) && (errno == 0));
-      assert(fs1.getCmd () == Cmds::MKDIR);
-      assert(fs1.getNumber () == 654);
-      assert(std::strcmp ("/p7", fs1.getPath ()) == 0);
-
-      // RMDIR
-      errno = -2;
-      assert((__posix_rmdir ("/fs1/p8") ==0) && (errno == 0));
-      assert(fs1.getCmd () == Cmds::RMDIR);
-      assert(std::strcmp ("/p8", fs1.getPath ()) == 0);
-
-      // SYNC
-      unsigned int cnt = fs1.getSyncCount ();
-      errno = -2;
-      __posix_sync ();
-      assert(errno == 0);
-      assert(fs1.getCmd () == Cmds::RMDIR);
-      assert(fs1.getSyncCount () == cnt + 1);
-    }
-
-    {
-      // C++ API
-
-      // CHMOD
-      errno = -2;
-      assert((os::posix::chmod ("/fs1/p1", 321) == 0) && (errno == 0));
-      assert(fs1.getCmd () == Cmds::CHMOD);
-      assert(fs1.getNumber () == 321);
-      assert(std::strcmp ("/p1", fs1.getPath ()) == 0);
-
-      // STAT
-      errno = -2;
-      struct stat stat_buf;
-      assert((os::posix::stat ("/fs1/p2", &stat_buf) == 0) && (errno == 0));
-      assert(fs1.getCmd () == Cmds::STAT);
-      assert(fs1.getPtr () == &stat_buf);
-      assert(std::strcmp ("/p2", fs1.getPath ()) == 0);
-
-      // TRUNCATE
-      errno = -2;
-      assert((os::posix::truncate ("/fs1/p3", 876) == 0) && (errno == 0));
-      assert(fs1.getCmd () == Cmds::TRUNCATE);
-      assert(fs1.getNumber () == 876);
-      assert(std::strcmp ("/p3", fs1.getPath ()) == 0);
-
-      // RENAME
-      errno = -2;
-      assert(
-          (os::posix::rename ("/fs1/p4", "/fs1/p4-new") == 0) && (errno == 0));
-      assert(fs1.getCmd () == Cmds::RENAME);
-      assert(std::strcmp ("/p4", fs1.getPath ()) == 0);
-      assert(std::strcmp ("/p4-new", (const char* )fs1.getPtr ()) == 0);
-
-      // UNLINK
-      errno = -2;
-      assert((os::posix::unlink ("/fs1/p5") ==0) && (errno == 0));
-      assert(fs1.getCmd () == Cmds::UNLINK);
-      assert(std::strcmp ("/p5", fs1.getPath ()) == 0);
-
-      // UTIME
-      errno = -2;
-      struct utimbuf times;
-      assert((os::posix::utime ("/fs1/p6", &times) ==0) && (errno == 0));
-      assert(fs1.getCmd () == Cmds::UTIME);
-      assert(fs1.getPtr () == &times);
-      assert(std::strcmp ("/p6", fs1.getPath ()) == 0);
-
-      // MKDIR
-      errno = -2;
-      assert((os::posix::mkdir ("/fs1/p7", 654) ==0) && (errno == 0));
-      assert(fs1.getCmd () == Cmds::MKDIR);
-      assert(fs1.getNumber () == 654);
-      assert(std::strcmp ("/p7", fs1.getPath ()) == 0);
-
-      // RMDIR
-      errno = -2;
-      assert((os::posix::rmdir ("/fs1/p8") ==0) && (errno == 0));
-      assert(fs1.getCmd () == Cmds::RMDIR);
-      assert(std::strcmp ("/p8", fs1.getPath ()) == 0);
-
-      // SYNC
-      unsigned int cnt = fs1.getSyncCount ();
-      errno = -2;
-      os::posix::sync ();
-      assert(errno == 0);
-      assert(fs1.getCmd () == Cmds::RMDIR);
-      assert(fs1.getSyncCount () == cnt + 1);
-    }
-
-    {
-      // C API
-
-      // Test OPEN
-      errno = -2;
-      int fd = __posix_open ("/fs1/f1", 123, 234);
-      assert((fd >= 0) && (errno == 0));
+      int fd;
+      assert(((fd = __posix_socket (123, 234, 345)) == 3) && (errno == 0));
 
       os::posix::IO* io = os::posix::FileDescriptorsManager::getIo (fd);
       assert(io != nullptr);
 
-      assert(io->getType () == os::posix::IO::Type::FILE);
+      assert(io->getType () == os::posix::IO::Type::SOCKET);
 
-      TestSocket* file = static_cast<TestSocket*> (io);
-      // Must be the first used slot in the pool.
-      assert(filesPool.getObject (0) == file);
-      assert(filesPool.getFlag (0) == true);
+      TestSocket* tsock = static_cast<TestSocket*> (io);
+      assert(socketsPool.getObject (0) == tsock);
+      assert(socketsPool.getFlag (0) == true);
 
-      // Check params passing.
-      assert(std::strcmp ("/f1", file->getPath ()) == 0);
-      assert(file->getNumber () == 123);
-      assert(file->getMode () == 234);
+      // Check SOCKET params.
+      assert(tsock->getCmd () == Cmds::SOCKET);
+      assert(tsock->getNumber1 () == 123);
+      assert(tsock->getNumber2 () == 234);
+      assert(tsock->getNumber3 () == 345);
 
-      int ret;
+      int fd2;
+      struct sockaddr addr1;
+      socklen_t len1;
+      assert(((fd2 = __posix_accept(fd, &addr1, &len1)) == 4) && (errno == 0));
 
-      // Test READ
+      os::posix::IO* io2 = os::posix::FileDescriptorsManager::getIo (fd2);
+      assert(io2 != nullptr);
+
+      assert(io2->getType () == os::posix::IO::Type::SOCKET);
+
+      TestSocket* tsock2 = static_cast<TestSocket*> (io2);
+      assert(socketsPool.getObject (1) == tsock2);
+      assert(socketsPool.getFlag (1) == true);
+
+      assert(tsock->getPtr1 () == &addr1);
+      assert(tsock->getPtr2 () == &len1);
+
+      // Test second socket CLOSE.
       errno = -2;
-      char buf[3];
-      ret = __posix_read (fd, (void*) buf, 321);
+      tsock->clear ();
+      int ret = __posix_close (fd2);
       assert((ret == 0) && (errno == 0));
-      assert(file->getCmd () == Cmds::READ);
-      assert(file->getPtr () == buf);
-      assert(file->getNumber () == 321);
-
-      // Test WRITE
-      errno = -2;
-      ret = __posix_write (fd, (const void*) buf, 432);
-      assert((ret == 0) && (errno == 0));
-      assert(file->getCmd () == Cmds::WRITE);
-      assert(file->getPtr () == buf);
-      assert(file->getNumber () == 432);
-
-      // Test IOCTL
-      errno = -2;
-      ret = __posix_ioctl (fd, 222, 876);
-      assert((ret == 0) && (errno == 0));
-      assert(file->getCmd () == Cmds::IOCTL);
-      assert(file->getNumber () == 222);
-      assert(file->getMode () == 876);
-
-      // Test LSEEK
-      errno = -2;
-      ret = __posix_lseek (fd, 333, 555);
-      assert((ret == 0) && (errno == 0));
-      assert(file->getCmd () == Cmds::LSEEK);
-      assert(file->getNumber () == 333);
-      assert(file->getMode () == 555);
-
-      // Test ISATTY
-      errno = -2;
-      ret = __posix_isatty (fd);
-      assert((ret == 0) && (errno == 0));
-      assert(file->getCmd () == Cmds::ISATTY);
-
-      // Test FCNTL
-      errno = -2;
-      ret = __posix_fcntl (fd, 444, 987);
-      assert((ret == 0) && (errno == 0));
-      assert(file->getCmd () == Cmds::FCNTL);
-      assert(file->getNumber () == 444);
-      assert(file->getMode () == 987);
-
-      // Test FSTAT
-      errno = -2;
-      struct stat stat_buf;
-      ret = __posix_fstat (fd, &stat_buf);
-      assert((ret == 0) && (errno == 0));
-      assert(file->getCmd () == Cmds::FSTAT);
-      assert(file->getPtr () == &stat_buf);
-
-      // Test FTRUNCATE
-      errno = -2;
-      ret = __posix_ftruncate (fd, 999);
-      assert((ret == 0) && (errno == 0));
-      assert(file->getCmd () == Cmds::FTRUNCATE);
-      assert(file->getNumber () == 999);
-
-      // Test FSYNC
-      errno = -2;
-      ret = __posix_fsync (fd);
-      assert((ret == 0) && (errno == 0));
-      assert(file->getCmd () == Cmds::FSYNC);
-
-      // Test CLOSE
-      errno = -2;
-      ret = __posix_close (fd);
-      assert((ret == 0) && (errno == 0));
-      assert(file->getCmd () == Cmds::CLOSE);
+      assert(tsock2->getCmd () == Cmds::CLOSE);
 
       // Must no longer be in the pool
-      assert(filesPool.getFlag (0) == false);
+      assert(socketsPool.getFlag (1) == false);
+
+      // Test BIND
+      errno = -2;
+      tsock->clear ();
+      assert(((ret = __posix_bind(fd, &addr1, 123)) == 0) && (errno == 0));
+
+      assert(tsock->getCmd () == Cmds::BIND);
+      assert(tsock->getPtr1 () == &addr1);
+      assert(tsock->getNumber1 () == 123);
+
+      // Test CONNECT
+      errno = -2;
+      tsock->clear ();
+      assert(((ret = __posix_connect(fd, &addr1, 234)) == 0) && (errno == 0));
+
+      assert(tsock->getCmd () == Cmds::CONNECT);
+      assert(tsock->getPtr1 () == &addr1);
+      assert(tsock->getNumber1 () == 234);
+
+      // Test GETPEERNAME
+      errno = -2;
+      tsock->clear ();
+      assert(
+          ((ret = __posix_getpeername(fd, &addr1, &len1)) == 0) && (errno == 0));
+
+      assert(tsock->getCmd () == Cmds::GETPEERNAME);
+      assert(tsock->getPtr1 () == &addr1);
+      assert(tsock->getPtr2 () == &len1);
+
+      // Test GETSOCKNAME
+      errno = -2;
+      tsock->clear ();
+      assert(
+          ((ret = __posix_getsockname(fd, &addr1, &len1)) == 0) && (errno == 0));
+
+      assert(tsock->getCmd () == Cmds::GETSOCKNAME);
+      assert(tsock->getPtr1 () == &addr1);
+      assert(tsock->getPtr2 () == &len1);
+
+      // Test GETSOCKOPT
+      errno = -2;
+      tsock->clear ();
+      char opt[2];
+      assert(
+          ((ret = __posix_getsockopt(fd, 123, 234, (void*)&opt, &len1)) == 0) && (errno == 0));
+
+      assert(tsock->getCmd () == Cmds::GETSOCKOPT);
+      assert(tsock->getNumber1 () == 123);
+      assert(tsock->getNumber2 () == 234);
+      assert(tsock->getPtr1 () == &opt);
+      assert(tsock->getPtr2 () == &len1);
+
+      // Test RECV
+      errno = -2;
+      tsock->clear ();
+      char buf[2];
+      assert(
+          ((ret = __posix_recv(fd, &buf, 234, 345)) == (234/2)) && (errno == 0));
+
+      assert(tsock->getCmd () == Cmds::RECV);
+      assert(tsock->getPtr1 () == &buf);
+      assert(tsock->getNumber1 () == 234);
+      assert(tsock->getNumber2 () == 345);
+
+      // Test RECVFROM
+      errno = -2;
+      tsock->clear ();
+      assert(
+          ((ret = __posix_recvfrom(fd, &buf, 234, 345, &addr1, &len1)) == (234/2)) && (errno == 0));
+
+      assert(tsock->getCmd () == Cmds::RECVFROM);
+      assert(tsock->getPtr1 () == &buf);
+      assert(tsock->getNumber1 () == 234);
+      assert(tsock->getNumber2 () == 345);
+      assert(tsock->getPtr2 () == &addr1);
+      assert(tsock->getPtr3 () == &len1);
+
+      // Test RECVMSG
+      errno = -2;
+      tsock->clear ();
+      assert(
+          ((ret = __posix_recvmsg(fd, (struct msghdr*)&buf, 234)) == (234/2)) && (errno == 0));
+
+      assert(tsock->getCmd () == Cmds::RECVMSG);
+      assert(tsock->getPtr1 () == &buf);
+      assert(tsock->getNumber1 () == 234);
+
+      // Test SEND
+      errno = -2;
+      tsock->clear ();
+      assert(
+          ((ret = __posix_send(fd, &buf, 234, 345)) == (234/2)) && (errno == 0));
+
+      assert(tsock->getCmd () == Cmds::SEND);
+      assert(tsock->getPtr1 () == &buf);
+      assert(tsock->getNumber1 () == 234);
+      assert(tsock->getNumber2 () == 345);
+
+      // Test SENDMSG
+      errno = -2;
+      tsock->clear ();
+      assert(
+          ((ret = __posix_sendmsg(fd, (struct msghdr*)&buf, 234)) == (234/2)) && (errno == 0));
+
+      assert(tsock->getCmd () == Cmds::SENDMSG);
+      assert(tsock->getPtr1 () == &buf);
+      assert(tsock->getNumber1 () == 234);
+
+      // Test SENDTO
+      errno = -2;
+      tsock->clear ();
+      assert(
+          ((ret = __posix_sendto(fd, &buf, 234, 345, &addr1, 456)) == (234/2)) && (errno == 0));
+
+      assert(tsock->getCmd () == Cmds::SENDTO);
+      assert(tsock->getPtr1 () == &buf);
+      assert(tsock->getNumber1 () == 234);
+      assert(tsock->getNumber2 () == 345);
+      assert(tsock->getPtr2 () == &addr1);
+      assert(tsock->getNumber3 () == 456);
+
+      // Test SETSOCKOPT
+      errno = -2;
+      tsock->clear ();
+      assert(
+          ((ret = __posix_setsockopt(fd, 123, 234, (void*)&opt, 345)) == 0) && (errno == 0));
+
+      assert(tsock->getCmd () == Cmds::SETSOCKOPT);
+      assert(tsock->getNumber1 () == 123);
+      assert(tsock->getNumber2 () == 234);
+      assert(tsock->getPtr1 () == &opt);
+      assert(tsock->getNumber3 () == 345);
+
+      // Test SHUTDOWN
+      errno = -2;
+      tsock->clear ();
+      assert(((ret = __posix_shutdown(fd, 123)) == 0) && (errno == 0));
+
+      assert(tsock->getCmd () == Cmds::SHUTDOWN);
+      assert(tsock->getNumber1 () == 123);
+
+      // Test SOCKATMARK
+      errno = -2;
+      tsock->clear ();
+      assert(((ret = __posix_sockatmark(fd)) == 0) && (errno == 0));
+
+      assert(tsock->getCmd () == Cmds::SOCKATMARK);
+
+      // Test CLOSE.
+      errno = -2;
+      tsock->clear ();
+      ret = __posix_close (fd);
+      assert((ret == 0) && (errno == 0));
+      assert(tsock->getCmd () == Cmds::CLOSE);
+
+      // Must no longer be in the pool
+      assert(socketsPool.getFlag (0) == false);
     }
 
     {
       // C++ API
 
-      // Test OPEN
+      // Test SOCKET.
       errno = -2;
-      os::posix::IO* file = os::posix::open ("/fs1/f1", 123, 234);
-      assert((file != nullptr) && (errno == 0));
+      os::posix::Socket* sock;
+      assert(
+          ((sock = os::posix::socket(123, 234, 345)) != nullptr) && errno == 0);
+      assert(sock->getType () == os::posix::IO::Type::SOCKET);
 
-      assert(file->getType () == os::posix::IO::Type::FILE);
+      assert(sock->getFileDescriptor () > 0);
 
-      TestSocket* tfile = static_cast<TestSocket*> (file);
-      // Must be the first used slot in the pool.
-      assert(filesPool.getObject (0) == tfile);
-      assert(filesPool.getFlag (0) == true);
+      TestSocket* tsock = static_cast<TestSocket*> (sock);
+      assert(socketsPool.getObject (0) == tsock);
+      assert(socketsPool.getFlag (0) == true);
 
-      // Check params passing.
-      assert(std::strcmp ("/f1", tfile->getPath ()) == 0);
-      assert(tfile->getNumber () == 123);
-      assert(tfile->getMode () == 234);
+      // Check SOCKET params.
+      assert(tsock->getCmd () == Cmds::SOCKET);
+      assert(tsock->getNumber1 () == 123);
+      assert(tsock->getNumber2 () == 234);
+      assert(tsock->getNumber3 () == 345);
 
-      int ret;
+      struct sockaddr addr1;
+      socklen_t len1;
+      os::posix::Socket* sock2;
+      assert(
+          ((sock2 = sock->accept(&addr1, &len1)) != nullptr) && (errno == 0));
 
-      // Test READ
+      assert(sock2->getType () == os::posix::IO::Type::SOCKET);
+
+      assert(sock2->getFileDescriptor () > 0);
+
+      TestSocket* tsock2 = static_cast<TestSocket*> (sock2);
+      assert(socketsPool.getObject (1) == tsock2);
+      assert(socketsPool.getFlag (1) == true);
+
+      assert(tsock->getPtr1 () == &addr1);
+      assert(tsock->getPtr2 () == &len1);
+
+      // Test second socket CLOSE.
       errno = -2;
-      char buf[3];
-      ret = file->read ((void*) buf, 321);
+      tsock->clear ();
+      int ret = sock2->close ();
       assert((ret == 0) && (errno == 0));
-      assert(tfile->getCmd () == Cmds::READ);
-      assert(tfile->getPtr () == buf);
-      assert(tfile->getNumber () == 321);
-
-      // Test WRITE
-      errno = -2;
-      ret = file->write ((const void*) buf, 432);
-      assert((ret == 0) && (errno == 0));
-      assert(tfile->getCmd () == Cmds::WRITE);
-      assert(tfile->getPtr () == buf);
-      assert(tfile->getNumber () == 432);
-
-      // Test IOCTL
-      errno = -2;
-      ret = file->ioctl (222, 876);
-      assert((ret == 0) && (errno == 0));
-      assert(tfile->getCmd () == Cmds::IOCTL);
-      assert(tfile->getNumber () == 222);
-      assert(tfile->getMode () == 876);
-
-      // Test LSEEK
-      errno = -2;
-      ret = file->lseek (333, 555);
-      assert((ret == 0) && (errno == 0));
-      assert(tfile->getCmd () == Cmds::LSEEK);
-      assert(tfile->getNumber () == 333);
-      assert(tfile->getMode () == 555);
-
-      // Test ISATTY
-      errno = -2;
-      ret = file->isatty ();
-      assert((ret == 0) && (errno == 0));
-      assert(tfile->getCmd () == Cmds::ISATTY);
-
-      // Test FCNTL
-      errno = -2;
-      ret = file->fcntl (444, 987);
-      assert((ret == 0) && (errno == 0));
-      assert(tfile->getCmd () == Cmds::FCNTL);
-      assert(tfile->getNumber () == 444);
-      assert(tfile->getMode () == 987);
-
-      // Test FSTAT
-      errno = -2;
-      struct stat stat_buf;
-      ret = file->fstat (&stat_buf);
-      assert((ret == 0) && (errno == 0));
-      assert(tfile->getCmd () == Cmds::FSTAT);
-      assert(tfile->getPtr () == &stat_buf);
-
-      // Test FTRUNCATE
-      errno = -2;
-      ret = file->ftruncate (999);
-      assert((ret == 0) && (errno == 0));
-      assert(tfile->getCmd () == Cmds::FTRUNCATE);
-      assert(tfile->getNumber () == 999);
-
-      // Test FSYNC
-      errno = -2;
-      ret = file->fsync ();
-      assert((ret == 0) && (errno == 0));
-      assert(tfile->getCmd () == Cmds::FSYNC);
-
-      // Test CLOSE
-      errno = -2;
-      ret = file->close ();
-      assert((ret == 0) && (errno == 0));
-      assert(tfile->getCmd () == Cmds::CLOSE);
+      assert(tsock2->getCmd () == Cmds::CLOSE);
 
       // Must no longer be in the pool
-      assert(filesPool.getFlag (0) == false);
+      assert(socketsPool.getFlag (1) == false);
+
+      // Test CLOSE.
+      errno = -2;
+      ret = sock->close ();
+      assert((ret == 0) && (errno == 0));
+      assert(tsock->getCmd () == Cmds::CLOSE);
+
+      // Must no longer be in the pool
+      assert(socketsPool.getFlag (0) == false);
     }
 
-  const char* msg = "'test-file-debug' succeeded.\n";
+  const char* msg = "'test-socket-debug' succeeded.\n";
 #if defined(OS_INCLUDE_TRACE_PRINTF)
   trace_puts (msg);
 #else

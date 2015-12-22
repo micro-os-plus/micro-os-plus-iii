@@ -33,7 +33,7 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    size_t CharDevicesRegistry::sfSize;
+    std::size_t CharDevicesRegistry::sfSize;
 
     CharDevice** CharDevicesRegistry::sfRegistryArray;
 

@@ -16,11 +16,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POSIX_IO_CHAR_DEVICES_REGISTRY_H_
-#define POSIX_IO_CHAR_DEVICES_REGISTRY_H_
+#ifndef POSIX_IO_NET_STACK_H_
+#define POSIX_IO_NET_STACK_H_
 
 // ----------------------------------------------------------------------------
 
+#include "posix-io/Types.h"
 #include <cstddef>
 #include <cassert>
 
@@ -30,60 +31,42 @@ namespace os
 {
   namespace posix
   {
-    // ------------------------------------------------------------------------
-
-    class CharDevice;
 
     // ------------------------------------------------------------------------
 
-    class CharDevicesRegistry
+    class IO;
+    class Socket;
+    class Pool;
+
+    // ------------------------------------------------------------------------
+
+    class NetStack
     {
     public:
 
-      CharDevicesRegistry (std::size_t size);
-      CharDevicesRegistry (const CharDevicesRegistry&) = delete;
+      NetStack (Pool* socketsPool);
+      NetStack (const NetStack&) = delete;
 
-      ~CharDevicesRegistry ();
-
-      // ----------------------------------------------------------------------
-
-      static void
-      add (CharDevice* device);
-
-      static void
-      remove (CharDevice* device);
-
-      static CharDevice*
-      identifyDevice (const char* path);
-
-      static std::size_t
-      getSize (void);
-
-      static CharDevice*
-      getDevice (std::size_t index);
+      ~NetStack ();
 
       // ----------------------------------------------------------------------
 
+      static Pool*
+      getSocketsPool (void);
+
+      // ----------------------------------------------------------------------
     private:
 
-      static std::size_t sfSize;
+      static Pool* sfSocketsPool;
 
-      static CharDevice** sfRegistryArray;
     };
 
     // ------------------------------------------------------------------------
 
-    inline std::size_t
-    CharDevicesRegistry::getSize (void)
+    inline Pool*
+    NetStack::getSocketsPool (void)
     {
-      return sfSize;
-    }
-
-    inline CharDevice*
-    CharDevicesRegistry::getDevice (std::size_t index)
-    {
-      assert(index < sfSize);
-      return sfRegistryArray[index];
+      return sfSocketsPool;
     }
 
   } /* namespace posix */
@@ -91,4 +74,4 @@ namespace os
 
 // ----------------------------------------------------------------------------
 
-#endif /* POSIX_IO_CHAR_DEVICES_REGISTRY_H_ */
+#endif /* POSIX_IO_NET_STACK_H_ */

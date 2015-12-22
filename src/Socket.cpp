@@ -17,6 +17,8 @@
  */
 
 #include "posix-io/Socket.h"
+#include "posix-io/NetStack.h"
+#include "posix-io/Pool.h"
 #include <cerrno>
 #include <sys/socket.h>
 
@@ -34,14 +36,32 @@ namespace os
     Socket*
     socket (int domain, int type, int protocol)
     {
-      return nullptr;
+      errno = 0;
+
+      Socket* sock =
+          reinterpret_cast<Socket*> (NetStack::getSocketsPool ()->aquire ());
+      if (sock == nullptr)
+        {
+          errno = ENFILE;
+          return nullptr;
+        }
+      int ret = sock->do_socket (domain, type, protocol);
+      if (ret < 0)
+        {
+          sock->close ();
+          return nullptr;
+        }
+      sock->allocFileDescriptor ();
+      return sock;
     }
 
+#if 0
     Socket*
     socketpair (int domain, int type, int protocol, int socket_vector[2])
-    {
-      return nullptr;
-    }
+      {
+        return nullptr;
+      }
+#endif
 
 #pragma GCC diagnostic pop
 
@@ -49,7 +69,7 @@ namespace os
 
     Socket::Socket ()
     {
-      ;
+      fType = Type::SOCKET;
     }
 
     Socket::~Socket ()
@@ -59,14 +79,41 @@ namespace os
 
     // ------------------------------------------------------------------------
 
+    void
+    Socket::doRelease (void)
+    {
+      // Files is free, return it to the pool.
+      auto pool = NetStack::getSocketsPool ();
+      if (pool != nullptr)
+        {
+          pool->release (this);
+        }
+    }
+
+    // ------------------------------------------------------------------------
+
     Socket*
     Socket::accept (struct sockaddr* address, socklen_t* address_len)
     {
       errno = 0;
 
-      // Execute the implementation specific code.
-      auto* const new_socket = do_accept (address, address_len);
+      auto pool = NetStack::getSocketsPool ();
+      if (pool == nullptr)
+        {
+          errno = EMFILE; // Pool is considered the per-process table.
+          return nullptr;
+        }
+
+      Socket* const new_socket = static_cast<Socket*> (pool->aquire ());
       if (new_socket == nullptr)
+        {
+          errno = EMFILE; // Pool is considered the per-process table.
+          return nullptr;
+        }
+
+      // Execute the implementation specific code.
+      int ret = do_accept (new_socket, address, address_len);
+      if (ret < 0)
         {
           return nullptr;
         }
@@ -215,11 +262,12 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-    Socket*
-    Socket::do_accept (struct sockaddr* address, socklen_t* address_len)
+    int
+    Socket::do_accept (Socket* sock, struct sockaddr* address,
+                       socklen_t* address_len)
     {
       errno = ENOSYS; // Not implemented
-      return nullptr;
+      return -1;
     }
 
     int
