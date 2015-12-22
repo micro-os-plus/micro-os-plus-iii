@@ -99,6 +99,9 @@ namespace os
       virtual int
       do_fsync (void);
 
+      virtual void
+      doRelease (void) override;
+
       // ----------------------------------------------------------------------
       // Support functions.
 

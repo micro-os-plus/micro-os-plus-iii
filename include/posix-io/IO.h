@@ -140,7 +140,7 @@ namespace os
       virtual ssize_t
       do_write (const void* buf, std::size_t nbyte);
 
-      ssize_t
+      virtual ssize_t
       do_writev (const struct iovec* iov, int iovcnt);
 
       virtual int
@@ -157,6 +157,11 @@ namespace os
 
       // ----------------------------------------------------------------------
       // Support functions.
+
+      // Is called at the end of close, to release objects
+      // acquired from a pool.
+      virtual void
+      doRelease (void);
 
       void
       setFileDescriptor (fileDescriptor_t fildes);

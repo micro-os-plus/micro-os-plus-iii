@@ -19,6 +19,7 @@
 #include "posix-io/File.h"
 #include "posix-io/FileSystem.h"
 #include "posix-io/MountManager.h"
+#include "posix-io/Pool.h"
 #include <cerrno>
 
 // ----------------------------------------------------------------------------
@@ -52,6 +53,24 @@ namespace os
     File::~File ()
     {
       fFileSystem = nullptr;
+    }
+
+    // ------------------------------------------------------------------------
+
+    void
+    File::doRelease (void)
+    {
+      // Files is free, return it to the pool.
+      auto fs = getFileSystem ();
+      if (fs != nullptr)
+        {
+          auto pool = fs->getFilesPool ();
+          if (pool != nullptr)
+            {
+              pool->release (this);
+            }
+          setFileSystem (nullptr);
+        }
     }
 
     // ------------------------------------------------------------------------

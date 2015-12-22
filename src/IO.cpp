@@ -24,6 +24,7 @@
 #include "posix-io/FileSystem.h"
 #include "posix-io/MountManager.h"
 #include "posix-io/Pool.h"
+#include "posix-io/NetStack.h"
 #include <cassert>
 #include <cerrno>
 #include <cstdarg>
@@ -153,22 +154,15 @@ namespace os
       FileDescriptorsManager::free (fFileDescriptor);
       fFileDescriptor = noFileDescriptor;
 
-      if (getType () == Type::FILE)
-        {
-          // Files is free, return it to the pool.
-          auto file = static_cast<File*> (this);
-          auto fs = file->getFileSystem ();
-          if (fs != nullptr)
-            {
-              auto pool = fs->getFilesPool ();
-              if (pool != nullptr)
-                {
-                  pool->release (file);
-                }
-              file->setFileSystem (nullptr);
-            }
-        }
+      // Release objects acquired from a pool.
+      doRelease ();
       return ret;
+    }
+
+    void
+    IO::doRelease (void)
+    {
+      return;
     }
 
     // ------------------------------------------------------------------------
