@@ -18,7 +18,7 @@
 
 #include "posix-io/FileDescriptorsManager.h"
 #include "posix-io/IO.h"
-#include "posix-io/Device.h"
+#include "posix-io/CharDevice.h"
 #include "posix-io/File.h"
 #include "posix-io/FileSystem.h"
 #include "posix-io/MountManager.h"

@@ -16,13 +16,19 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POSIX_IO_DEVICES_MANAGER_H_
-#define POSIX_IO_DEVICES_MANAGER_H_
+#ifndef POSIX_IO_CHAR_DEVICE_H_
+#define POSIX_IO_CHAR_DEVICE_H_
 
 // ----------------------------------------------------------------------------
 
-#include <cstddef>
-#include <cassert>
+#include <sys/types.h>
+#include "posix-io/IO.h"
+
+// ----------------------------------------------------------------------------
+
+#if ! defined(OS_STRING_POSIX_DEVICE_PREFIX)
+#define OS_STRING_POSIX_DEVICE_PREFIX "/dev/"
+#endif
 
 // ----------------------------------------------------------------------------
 
@@ -32,58 +38,48 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    class Device;
-
-    // ------------------------------------------------------------------------
-
-    class DevicesRegistry
+    class CharDevice : public IO
     {
     public:
 
-      DevicesRegistry (std::size_t size);
-      DevicesRegistry (const DevicesRegistry&) = delete;
+      CharDevice (const char* name);
+      CharDevice (const CharDevice&) = delete;
 
-      ~DevicesRegistry ();
-
-      // ----------------------------------------------------------------------
-
-      static void
-      add (Device* device);
-
-      static void
-      remove (Device* device);
-
-      static Device*
-      identifyDevice (const char* path);
-
-      static std::size_t
-      getSize (void);
-
-      static Device*
-      getDevice (std::size_t index);
+      virtual
+      ~CharDevice ();
 
       // ----------------------------------------------------------------------
 
-    private:
+      virtual int
+      do_open (const char* path, int oflag, std::va_list args) = 0;
 
-      static std::size_t sfSize;
+      virtual bool
+      matchName (const char* name) const;
 
-      static Device** sfRegistryArray;
+      const char*
+      getName (void) const;
+
+      static const char*
+      getDevicePrefix (void);
+
+    protected:
+
+      const char* fName;
+
     };
 
     // ------------------------------------------------------------------------
 
-    inline std::size_t
-    DevicesRegistry::getSize (void)
+    inline const char*
+    CharDevice::getDevicePrefix (void)
     {
-      return sfSize;
+      return OS_STRING_POSIX_DEVICE_PREFIX;
     }
 
-    inline Device*
-    DevicesRegistry::getDevice (std::size_t index)
+    inline const char*
+    CharDevice::getName (void) const
     {
-      assert(index < sfSize);
-      return sfRegistryArray[index];
+      return fName;
     }
 
   } /* namespace posix */
@@ -91,4 +87,4 @@ namespace os
 
 // ----------------------------------------------------------------------------
 
-#endif /* POSIX_IO_DEVICES_MANAGER_H_ */
+#endif /* POSIX_IO_CHAR_DEVICE_H_ */

@@ -16,8 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "posix-io/DevicesRegistry.h"
-#include "posix-io/Device.h"
+#include "posix-io/CharDevicesRegistry.h"
+#include "posix-io/CharDevice.h"
 #include <cassert>
 #include <cstring>
 #include <cstdlib>
@@ -33,18 +33,18 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    size_t DevicesRegistry::sfSize;
+    size_t CharDevicesRegistry::sfSize;
 
-    Device** DevicesRegistry::sfRegistryArray;
+    CharDevice** CharDevicesRegistry::sfRegistryArray;
 
     // ------------------------------------------------------------------------
 
-    DevicesRegistry::DevicesRegistry (std::size_t size)
+    CharDevicesRegistry::CharDevicesRegistry (std::size_t size)
     {
       assert(size > 0);
 
       sfSize = size;
-      sfRegistryArray = new Device*[size];
+      sfRegistryArray = new CharDevice*[size];
 
       for (std::size_t i = 0; i < size; ++i)
         {
@@ -52,7 +52,7 @@ namespace os
         }
     }
 
-    DevicesRegistry::~DevicesRegistry ()
+    CharDevicesRegistry::~CharDevicesRegistry ()
     {
       delete[] sfRegistryArray;
       sfSize = 0;
@@ -61,7 +61,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     void
-    DevicesRegistry::add (Device* device)
+    CharDevicesRegistry::add (CharDevice* device)
     {
       bool found = false;
       for (std::size_t i = 0; i < sfSize; ++i)
@@ -105,7 +105,7 @@ namespace os
     }
 
     void
-    DevicesRegistry::remove (Device* device)
+    CharDevicesRegistry::remove (CharDevice* device)
     {
       for (std::size_t i = 0; i < sfSize; ++i)
         {
@@ -122,12 +122,12 @@ namespace os
     /**
      * return pointer to device or nullptr if not found.
      */
-    Device*
-    DevicesRegistry::identifyDevice (const char* path)
+    CharDevice*
+    CharDevicesRegistry::identifyDevice (const char* path)
     {
       assert(path != nullptr);
 
-      auto prefix = Device::getDevicePrefix ();
+      auto prefix = CharDevice::getDevicePrefix ();
       if (std::strncmp (prefix, path, std::strlen (prefix)) != 0)
         {
           // The device prefix does not match, not a device.

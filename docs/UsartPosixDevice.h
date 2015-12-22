@@ -1,4 +1,4 @@
-#include "posix-io/Device.h"
+#include "posix-io/CharDevice.h"
 
 class UsartDevice : public os::posix::Device
 {

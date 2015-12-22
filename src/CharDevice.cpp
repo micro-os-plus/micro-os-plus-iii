@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "posix-io/Device.h"
+#include "posix-io/CharDevice.h"
 #include <cstring>
 #include <cassert>
 
@@ -28,13 +28,13 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    Device::Device (const char* name)
+    CharDevice::CharDevice (const char* name)
     {
       fType = Type::DEVICE;
       fName = name;
     }
 
-    Device::~Device ()
+    CharDevice::~CharDevice ()
     {
       fName = nullptr;
     }
@@ -42,7 +42,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     bool
-    Device::matchName (const char* name) const
+    CharDevice::matchName (const char* name) const
     {
       assert(name != nullptr);
       assert(fName != nullptr);

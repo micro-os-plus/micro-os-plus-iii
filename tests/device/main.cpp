@@ -18,8 +18,8 @@
 
 #include "posix-io/FileDescriptorsManager.h"
 #include "posix-io/IO.h"
-#include "posix-io/Device.h"
-#include "posix-io/DevicesRegistry.h"
+#include "posix-io/CharDevice.h"
+#include "posix-io/CharDevicesRegistry.h"
 #include <cerrno>
 #include <cassert>
 #include <cstdio>
@@ -32,7 +32,7 @@
 
 // Test class, all methods return ENOSYS, as not implemented, except open().
 
-class TestDevice : public os::posix::Device
+class TestDevice : public os::posix::CharDevice
 {
 public:
 
@@ -52,7 +52,7 @@ private:
 };
 
 TestDevice::TestDevice (const char* deviceName, uint32_t deviceNumber) :
-    Device (deviceName)
+    CharDevice (deviceName)
 {
   fDeviceNumber = deviceNumber;
   fMode = 0;
@@ -93,7 +93,7 @@ os::posix::FileDescriptorsManager descriptorsManager
   { DESCRIPTORS_ARRAY_SIZE };
 
 #define DEVICES_ARRAY_SIZE (3)
-os::posix::DevicesRegistry devicesRegistry
+os::posix::CharDevicesRegistry devicesRegistry
   { DEVICES_ARRAY_SIZE };
 
 // This device will be mapped as "/dev/test"
@@ -116,63 +116,67 @@ extern "C"
 int
 main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
-  std::size_t sz = os::posix::DevicesRegistry::getSize ();
+  std::size_t sz = os::posix::CharDevicesRegistry::getSize ();
   assert(sz == DEVICES_ARRAY_SIZE);
 
   // Check if initial status is empty.
   for (std::size_t i = 0; i < sz; ++i)
     {
-      assert(os::posix::DevicesRegistry::getDevice (i) == nullptr);
+      assert(os::posix::CharDevicesRegistry::getDevice (i) == nullptr);
     }
 
   // Register device
-  os::posix::DevicesRegistry::add (&test);
+  os::posix::CharDevicesRegistry::add (&test);
 
   // Check if first device is registered.
-  assert(os::posix::DevicesRegistry::getDevice (0) == &test);
+  assert(os::posix::CharDevicesRegistry::getDevice (0) == &test);
 
-  // Test C++ API
+    {
+      // Test C++ API
 
-  os::posix::IO* io;
-  io = os::posix::open ("/dev/test", 0, 123);
-  assert((io != nullptr) && (errno == 0));
+      os::posix::IO* io;
+      io = os::posix::open ("/dev/test", 0, 123);
+      assert((io != nullptr) && (errno == 0));
 
-  int fd;
-  fd = io->getFileDescriptor ();
+      int fd;
+      fd = io->getFileDescriptor ();
 
-  // Get it back; is it the same?
-  assert(os::posix::FileDescriptorsManager::getIo (fd) == &test);
+      // Get it back; is it the same?
+      assert(os::posix::FileDescriptorsManager::getIo (fd) == &test);
 
-  // Check passing variadic mode.
-  assert(test.getMode () == 123);
+      // Check passing variadic mode.
+      assert(test.getMode () == 123);
 
-  // Close and free descriptor.
-  int ret = io->close ();
-  assert((ret == 0) && (errno == 0));
+      // Close and free descriptor.
+      int ret = io->close ();
+      assert((ret == 0) && (errno == 0));
 
-  // Check if descriptor freed.
-  assert(os::posix::FileDescriptorsManager::getIo (fd) == nullptr);
-  assert(test.getFileDescriptor () == os::posix::noFileDescriptor);
+      // Check if descriptor freed.
+      assert(os::posix::FileDescriptorsManager::getIo (fd) == nullptr);
+      assert(test.getFileDescriptor () == os::posix::noFileDescriptor);
+    }
 
-  // Test C API
+    {
+      // Test C API
 
-  fd = __posix_open ("/dev/test", 0, 234);
-  assert((fd >= 3) && (errno == 0));
+      int fd = __posix_open ("/dev/test", 0, 234);
+      assert((fd >= 3) && (errno == 0));
 
-  // Get it back; is it the same?
-  assert(os::posix::FileDescriptorsManager::getIo (fd) == &test);
-  assert(test.getFileDescriptor () == fd);
+      // Get it back; is it the same?
+      assert(os::posix::FileDescriptorsManager::getIo (fd) == &test);
+      assert(test.getFileDescriptor () == fd);
 
-  // Check passing variadic mode.
-  assert(test.getMode () == 234);
+      // Check passing variadic mode.
+      assert(test.getMode () == 234);
 
-  // Close and free descriptor
-  ret = __posix_close (fd);
-  assert((ret == 0) && (errno == 0));
+      // Close and free descriptor
+      int ret = __posix_close (fd);
+      assert((ret == 0) && (errno == 0));
 
-  // Check if descriptor freed.
-  assert(os::posix::FileDescriptorsManager::getIo (fd) == nullptr);
-  assert(test.getFileDescriptor () == os::posix::noFileDescriptor);
+      // Check if descriptor freed.
+      assert(os::posix::FileDescriptorsManager::getIo (fd) == nullptr);
+      assert(test.getFileDescriptor () == os::posix::noFileDescriptor);
+    }
 
   const char* msg = "'test-device-debug' succeeded.\n";
 #if defined(OS_INCLUDE_TRACE_PRINTF)

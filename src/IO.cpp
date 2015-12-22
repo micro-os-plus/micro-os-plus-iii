@@ -18,8 +18,8 @@
 
 #include "posix-io/FileDescriptorsManager.h"
 #include "posix-io/IO.h"
-#include "posix-io/Device.h"
-#include "posix-io/DevicesRegistry.h"
+#include "posix-io/CharDevice.h"
+#include "posix-io/CharDevicesRegistry.h"
 #include "posix-io/File.h"
 #include "posix-io/FileSystem.h"
 #include "posix-io/MountManager.h"
@@ -69,11 +69,11 @@ namespace os
         }
 
       // First check if path is a device.
-      os::posix::IO* io = os::posix::DevicesRegistry::identifyDevice (path);
+      os::posix::IO* io = os::posix::CharDevicesRegistry::identifyDevice (path);
       if (io != nullptr)
         {
           // If so, use the implementation to open the device.
-          int oret = static_cast<Device*> (io)->do_open (path, oflag, args);
+          int oret = static_cast<CharDevice*> (io)->do_open (path, oflag, args);
           if (oret < 0)
             {
               // Open failed.
