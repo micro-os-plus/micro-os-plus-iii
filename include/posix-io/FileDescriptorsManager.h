@@ -21,7 +21,7 @@
 
 // ----------------------------------------------------------------------------
 
-#include "posix-io/Types.h"
+#include <posix-io/types_.h>
 #include <cstddef>
 #include <cassert>
 
@@ -87,7 +87,9 @@ namespace os
     inline IO*
     FileDescriptorsManager::getIo (int fildes)
     {
+#if !defined(__ARM_EABI__)
       assert((fildes >= 0) && (((std::size_t ) fildes) < sfSize));
+#endif
 
       return sfDescriptorsArray[fildes];
     }

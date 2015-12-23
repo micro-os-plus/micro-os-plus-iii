@@ -16,6 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <posix-io/types_.h>
 #include "posix-io/FileDescriptorsManager.h"
 #include "posix-io/IO.h"
 #include "posix-io/CharDevice.h"
@@ -29,7 +30,7 @@
 
 // ----------------------------------------------------------------------------
 
-#if !defined(OS_BOOL_PREFIX_POSIX_SYSCALLS)
+#if false //!defined(OS_BOOL_PREFIX_POSIX_SYSCALLS_)
 
 // This is the common use case, when the functions are declared in the
 // system headers, and the implementation is defined here, and, being
@@ -128,242 +129,19 @@
 // This is the test case, when the functions are declared locally,
 // with prefixed names, to avoid clashes with system functions.
 
-#include "posix/dirent.h"
-#include "posix/sys/socket.h"
-
-extern "C"
-{
-
-  // The standard POSIX IO functions. Prototypes are from:
-  // http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html
-
-  // The socket definitions are from:
-  // http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/sys_socket.h.html
-
-  int __attribute__((weak))
-  __posix_accept (int socket, struct sockaddr* address, socklen_t* address_len);
-
-  int __attribute__((weak))
-  __posix_bind (int socket, const struct sockaddr* address,
-                socklen_t address_len);
-
-  int __attribute__((weak))
-  __posix_chdir (const char* path);
-
-  int __attribute__((weak))
-  __posix_chmod (const char* path, mode_t mode);
-
-  int __attribute__((weak))
-  __posix_chown (const char* path, uid_t owner, gid_t group);
-
-  int __attribute__((weak))
-  __posix_close (int fildes);
-
-  int __attribute__((weak))
-  __posix_closedir (DIR* dirp);
-
-  int __attribute__((weak))
-  __posix_connect (int socket, const struct sockaddr* address,
-                   socklen_t address_len);
-
-  int __attribute__((weak))
-  __posix_execve (const char* path, char* const argv[], char* const envp[]);
-
-  int __attribute__((weak))
-  __posix_fcntl (int fildes, int cmd, ...);
-
-  pid_t __attribute__((weak))
-  __posix_fork (void);
-
-  int __attribute__((weak))
-  __posix_fstat (int fildes, struct stat* buf);
-
-  int __attribute__((weak))
-  __posix_ftruncate (int fildes, off_t length);
-
-  int __attribute__((weak))
-  __posix_fsync (int fildes);
-
-  char*
-  __attribute__((weak))
-  __posix_getcwd (char* buf, size_t size);
-
-  int __attribute__((weak))
-  __posix_getpeername (int socket, struct sockaddr* address,
-                       socklen_t* address_len);
-
-  pid_t __attribute__((weak))
-  __posix_getpid (void);
-
-  int __attribute__((weak))
-  __posix_getsockname (int socket, struct sockaddr* address,
-                       socklen_t* address_len);
-
-  int __attribute__((weak))
-  __posix_getsockopt (int socket, int level, int option_name,
-                      void* option_value, socklen_t* option_len);
-
-  int __attribute__((weak))
-  __posix_gettimeofday (struct timeval* ptimeval, void* ptimezone);
-
-  int __attribute__((weak))
-  __posix_ioctl (int fildes, int request, ...);
-
-  /**
-   * @brief Test for a terminal device.
-   *
-   * @headerfile <unistd.h>
-   *
-   * @param [in] fildes Non-negative file descriptor.
-   *
-   * @return This function shall return 1 if _fildes_ is associated
-   * with a terminal; otherwise, it shall return 0 and may set _errno_
-   * to indicate the error.
-   *
-   */
-  int __attribute__((weak))
-  __posix_isatty (int fildes);
-
-  int __attribute__((weak))
-  __posix_kill (pid_t pid, int sig);
-
-  int __attribute__((weak))
-  __posix_link (const char* existing, const char* _new);
-
-  int __attribute__((weak))
-  __posix_listen (int socket, int backlog);
-
-  off_t __attribute__((weak))
-  __posix_lseek (int fildes, off_t offset, int whence);
-
-  int __attribute__((weak))
-  __posix_mkdir (const char* path, mode_t mode);
-
-  /**
-   * @brief Open file relative to directory file descriptor.
-   *
-   * @headerfile <fcntl.h>
-   *
-   * @param [in] path The _path_ argument points to a pathname naming the file.
-   * @param [in] oflag Values for _oflag_ are constructed by a bitwise-inclusive
-   * OR of flags from the following list, defined in `<fcntl.h>`.
-   *
-   * @return Upon successful completion, this function shall open the file and
-   * return a non-negative integer representing the lowest numbered unused file
-   * descriptor. Otherwise, this function shall return -1 and set _errno_
-   * to indicate the error. If -1 is returned, no files shall be created
-   * or modified.
-   */
-  int __attribute__((weak))
-  __posix_open (const char* path, int oflag, ...);
-
-  DIR*
-  __attribute__((weak))
-  __posix_opendir (const char* dirname);
-
-  int __attribute__((weak))
-  __posix_raise (int sig);
-
-  ssize_t __attribute__((weak))
-  __posix_read (int fildes, void* buf, size_t nbyte);
-
-  struct dirent*
-  __attribute__((weak))
-  __posix_readdir (DIR* dirp);
-
-#if 0
-  int __attribute__((weak))
-  __posix_readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result);
 #endif
 
-  ssize_t __attribute__((weak))
-  __posix_readlink (const char* path, char* buf, size_t bufsize);
-
-  ssize_t __attribute__((weak))
-  __posix_recv (int socket, void* buffer, size_t length, int flags);
-
-  ssize_t __attribute__((weak))
-  __posix_recvfrom (int socket, void* buffer, size_t length, int flags,
-                    struct sockaddr* address, socklen_t* address_len);
-
-  ssize_t __attribute__((weak))
-  __posix_recvmsg (int socket, struct msghdr* message, int flags);
-
-  int __attribute__((weak))
-  __posix_rename (const char* oldfn, const char* newfn);
-
-  void __attribute__((weak))
-  __posix_rewinddir (DIR* dirp);
-
-  int __attribute__((weak))
-  __posix_rmdir (const char* path);
-
-  int __attribute__((weak))
-  __posix_select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
-                  struct timeval* timeout);
-
-  ssize_t __attribute__((weak))
-  __posix_send (int socket, const void* buffer, size_t length, int flags);
-
-  ssize_t __attribute__((weak))
-  __posix_sendmsg (int socket, const struct msghdr* message, int flags);
-
-  ssize_t __attribute__((weak))
-  __posix_sendto (int socket, const void* message, size_t length, int flags,
-                  const struct sockaddr* dest_addr, socklen_t dest_len);
-
-  int __attribute__((weak))
-  __posix_setsockopt (int socket, int level, int option_name,
-                      const void* option_value, socklen_t option_len);
-
-  int __attribute__((weak))
-  __posix_shutdown (int socket, int how);
-
-  int __attribute__((weak))
-  __posix_sockatmark (int socket);
-
-  int __attribute__((weak))
-  __posix_socket (int domain, int type, int protocol);
-
-#if 0
-  int __attribute__((weak))
-  __posix_socketpair (int domain, int type, int protocol, int socket_vector[2]);
-#endif
-
-  int __attribute__((weak))
-  __posix_stat (const char* path, struct stat* buf);
-
-  void __attribute__((weak))
-  __posix_sync (void);
-
-  int __attribute__((weak))
-  __posix_symlink (const char* existing, const char* _new);
-
-  clock_t __attribute__((weak))
-  __posix_times (struct tms* buf);
-
-  int __attribute__((weak))
-  __posix_truncate (const char* path, off_t length);
-
-  int __attribute__((weak))
-  __posix_unlink (const char* name);
-
-  int __attribute__((weak))
-  __posix_utime (const char* path, const struct utimbuf* times);
-
-  pid_t __attribute__((weak))
-  __posix_wait (int* stat_loc);
-
-  ssize_t __attribute__((weak))
-  __posix_write (int fildes, const void* buf, size_t nbyte);
-
-  ssize_t __attribute__((weak))
-  __posix_writev (int fildes, const struct iovec* iov, int iovcnt);
-}
-
-#endif
 
 // ----------------------------------------------------------------------------
+
+// Notes: Function prefix.
+//
+// To facilitate testing on POSIX platforms, and also to allow
+// integration on custom platforms, all function names are prefixed
+// with '__posix_'.
+// For embedded environments it is possible to also add aliases to the
+// standard, non-prefixed names, by adding the following preprocessor
+// definition: OS_INCLUDE_STANDARD_POSIX_FUNCTIONS
 
 // Notes: Reentrancy and 'errno'.
 //
@@ -722,10 +500,10 @@ __posix_socket (int domain, int type, int protocol)
 #if 0
 int
 __posix_socketpair (int domain, int type, int protocol, int socket_vector[2])
-{
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
+  {
+    errno = ENOSYS; // Not implemented
+    return -1;
+  }
 #endif
 
 int
@@ -944,6 +722,62 @@ __posix_sockatmark (int socket)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
+// ----------------------------------------------------------------------------
+// Not yet implemented.
+
+int __attribute__((weak))
+__posix_readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int __attribute__((weak))
+__posix_socketpair (int domain, int type, int protocol, int socket_vector[2])
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int
+__posix_gettimeofday (struct timeval* ptimeval, void* ptimezone)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int
+__posix_select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
+                struct timeval* timeout)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+clock_t
+__posix_times (struct tms* buf)
+{
+  errno = ENOSYS; // Not implemented
+  return ((clock_t) -1);
+}
+
+int
+__posix_chdir (const char* path)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+char*
+__posix_getcwd (char* buf, size_t size)
+{
+  errno = ENOSYS; // Not implemented
+  return nullptr;
+}
+
+// ----------------------------------------------------------------------------
+// Unavailable in non-Unix embedded environments.
+
 int
 __posix_execve (const char* path, char* const argv[], char* const envp[])
 {
@@ -966,13 +800,6 @@ __posix_getpid (void)
 }
 
 int
-__posix_gettimeofday (struct timeval* ptimeval, void* ptimezone)
-{
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
-int
 __posix_kill (pid_t pid, int sig)
 {
   errno = ENOSYS; // Not implemented
@@ -986,42 +813,11 @@ __posix_raise (int sig)
   return -1;
 }
 
-int
-__posix_select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
-                struct timeval* timeout)
-{
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
-clock_t
-__posix_times (struct tms* buf)
-{
-  errno = ENOSYS; // Not implemented
-  return ((clock_t) -1);
-}
-
 pid_t
 __posix_wait (int* stat_loc)
 {
   errno = ENOSYS; // Not implemented
   return ((pid_t) -1);
-}
-
-// File system related - not implemented
-
-int
-__posix_chdir (const char* path)
-{
-  errno = ENOSYS; // Not implemented
-  return -1;
-}
-
-char*
-__posix_getcwd (char* buf, size_t size)
-{
-  errno = ENOSYS; // Not implemented
-  return nullptr;
 }
 
 int
@@ -1052,7 +848,208 @@ __posix_readlink (const char* path, char* buf, size_t bufsize)
   return ((ssize_t) -1);
 }
 
+// ----------------------------------------------------------------------------
+
 #pragma GCC diagnostic pop
+
+#if defined(OS_INCLUDE_STANDARD_POSIX_FUNCTIONS)
+
+// For embedded environment that use POSIX system calls, redefine
+// all functions without the '__posix_' prefix.
+
+extern "C"
+{
+
+  int __attribute__((weak, alias ("__posix_accept")))
+  accept (int socket, struct sockaddr* address, socklen_t* address_len);
+
+  int __attribute__((weak, alias ("__posix_bind")))
+  bind (int socket, const struct sockaddr* address, socklen_t address_len);
+
+  int __attribute__((weak, alias ("__posix_chdir")))
+  chdir (const char* path);
+
+  int __attribute__((weak, alias ("__posix_chmod")))
+  chmod (const char* path, mode_t mode);
+
+  int __attribute__((weak, alias ("__posix_chown")))
+  chown (const char* path, uid_t owner, gid_t group);
+
+  int __attribute__((weak, alias ("__posix_close")))
+  close (int fildes);
+
+  int __attribute__((weak, alias ("__posix_closedir")))
+  closedir (DIR* dirp);
+
+  int __attribute__((weak, alias ("__posix_connect")))
+  connect (int socket, const struct sockaddr* address, socklen_t address_len);
+
+  int __attribute__((weak, alias ("__posix_execve")))
+  execve (const char* path, char* const argv[], char* const envp[]);
+
+  int __attribute__((weak, alias ("__posix_fcntl")))
+  fcntl (int fildes, int cmd, ...);
+
+  pid_t __attribute__((weak, alias ("__posix_fork")))
+  fork (void);
+
+  int __attribute__((weak, alias ("__posix_fstat")))
+  fstat (int fildes, struct stat* buf);
+
+  int __attribute__((weak, alias ("__posix_ftruncate")))
+  ftruncate (int fildes, off_t length);
+
+  int __attribute__((weak, alias ("__posix_fsync")))
+  fsync (int fildes);
+
+  char*
+  __attribute__((weak, alias ("__posix_getcwd")))
+  getcwd (char* buf, size_t size);
+
+  int __attribute__((weak, alias ("__posix_getpeername")))
+  getpeername (int socket, struct sockaddr* address, socklen_t* address_len);
+
+  pid_t __attribute__((weak, alias ("__posix_getpid")))
+  getpid (void);
+
+  int __attribute__((weak, alias ("__posix_getsockname")))
+  getsockname (int socket, struct sockaddr* address, socklen_t* address_len);
+
+  int __attribute__((weak, alias ("__posix_getsockopt")))
+  getsockopt (int socket, int level, int option_name, void* option_value,
+              socklen_t* option_len);
+
+  int __attribute__((weak, alias ("__posix_gettimeofday")))
+  gettimeofday (struct timeval* ptimeval, void* ptimezone);
+
+  int __attribute__((weak, alias ("__posix_ioctl")))
+  ioctl (int fildes, int request, ...);
+
+  int __attribute__((weak, alias ("__posix_isatty")))
+  isatty (int fildes);
+
+  int __attribute__((weak, alias ("__posix_kill")))
+  kill (pid_t pid, int sig);
+
+  int __attribute__((weak, alias ("__posix_link")))
+  link (const char* existing, const char* _new);
+
+  int __attribute__((weak, alias ("__posix_listen")))
+  listen (int socket, int backlog);
+
+  off_t __attribute__((weak, alias ("__posix_lseek")))
+  lseek (int fildes, off_t offset, int whence);
+
+  int __attribute__((weak, alias ("__posix_mkdir")))
+  mkdir (const char* path, mode_t mode);
+
+  int __attribute__((weak, alias ("__posix_open")))
+  open (const char* path, int oflag, ...);
+
+  DIR*
+  __attribute__((weak, alias ("__posix_opendir")))
+  opendir (const char* dirname);
+
+  int __attribute__((weak, alias ("__posix_raise")))
+  raise (int sig);
+
+  ssize_t __attribute__((weak, alias ("__posix_read")))
+  read (int fildes, void* buf, size_t nbyte);
+
+  struct dirent*
+  __attribute__((weak, alias ("__posix_readdir")))
+  readdir (DIR* dirp);
+
+  int __attribute__((weak, alias ("__posix_readdir_r")))
+  readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result);
+
+  ssize_t __attribute__((weak, alias ("__posix_readlink")))
+  readlink (const char* path, char* buf, size_t bufsize);
+
+  ssize_t __attribute__((weak, alias ("__posix_recv")))
+  recv (int socket, void* buffer, size_t length, int flags);
+
+  ssize_t __attribute__((weak, alias ("__posix_recvfrom")))
+  recvfrom (int socket, void* buffer, size_t length, int flags,
+            struct sockaddr* address, socklen_t* address_len);
+
+  ssize_t __attribute__((weak, alias ("__posix_recvmsg")))
+  recvmsg (int socket, struct msghdr* message, int flags);
+
+  int __attribute__((weak, alias ("__posix_rename")))
+  rename (const char* oldfn, const char* newfn);
+
+  void __attribute__((weak, alias ("__posix_rewinddir")))
+  rewinddir (DIR* dirp);
+
+  int __attribute__((weak, alias ("__posix_rmdir")))
+  rmdir (const char* path);
+
+  int __attribute__((weak, alias ("__posix_select")))
+  select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
+          struct timeval* timeout);
+
+  ssize_t __attribute__((weak, alias ("__posix_send")))
+  send (int socket, const void* buffer, size_t length, int flags);
+
+  ssize_t __attribute__((weak, alias ("__posix_sendmsg")))
+  sendmsg (int socket, const struct msghdr* message, int flags);
+
+  ssize_t __attribute__((weak, alias ("__posix_sendto")))
+  sendto (int socket, const void* message, size_t length, int flags,
+          const struct sockaddr* dest_addr, socklen_t dest_len);
+
+  int __attribute__((weak, alias ("__posix_setsockopt")))
+  setsockopt (int socket, int level, int option_name, const void* option_value,
+              socklen_t option_len);
+
+  int __attribute__((weak, alias ("__posix_shutdown")))
+  shutdown (int socket, int how);
+
+  int __attribute__((weak, alias ("__posix_sockatmark")))
+  sockatmark (int socket);
+
+  int __attribute__((weak, alias ("__posix_socket")))
+  socket (int domain, int type, int protocol);
+
+#if 0
+  int __attribute__((weak, alias ("__posix_socketpair")))
+  socketpair (int domain, int type, int protocol, int socket_vector[2]);
+#endif
+
+  int __attribute__((weak, alias ("__posix_stat")))
+  stat (const char* path, struct stat* buf);
+
+  void __attribute__((weak, alias ("__posix_sync")))
+  sync (void);
+
+  int __attribute__((weak, alias ("__posix_symlink")))
+  symlink (const char* existing, const char* _new);
+
+  clock_t __attribute__((weak, alias ("__posix_times")))
+  times (struct tms* buf);
+
+  int __attribute__((weak, alias ("__posix_truncate")))
+  truncate (const char* path, off_t length);
+
+  int __attribute__((weak, alias ("__posix_unlink")))
+  unlink (const char* name);
+
+  int __attribute__((weak, alias ("__posix_utime")))
+  utime (const char* path, const struct utimbuf* times);
+
+  pid_t __attribute__((weak, alias ("__posix_wait")))
+  wait (int* stat_loc);
+
+  ssize_t __attribute__((weak, alias ("__posix_write")))
+  write (int fildes, const void* buf, size_t nbyte);
+
+  ssize_t __attribute__((weak, alias ("__posix_writev")))
+  writev (int fildes, const struct iovec* iov, int iovcnt);
+
+}
+
+#endif /* !defined(OS_DO_NOT_OVERRIDE_POSIX_FUNCTIONS) */
 
 // ----------------------------------------------------------------------------
 
