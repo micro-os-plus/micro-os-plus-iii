@@ -21,7 +21,7 @@
 
 // ----------------------------------------------------------------------------
 
-#include <posix-io/types_.h>
+#include "posix-io/types.h"
 #include <cstddef>
 #include <cassert>
 
