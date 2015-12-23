@@ -28,6 +28,10 @@
 #include "diag/Trace.h"
 #endif
 
+#if defined(__ARM_EABI__)
+#include "posix-io/redefinitions.h"
+#endif
+
 // ----------------------------------------------------------------------------
 
 // Test class, all methods return ENOSYS, as not implemented, except open().

@@ -34,6 +34,10 @@
 #endif
 #include "utime.h"
 
+#if defined(__ARM_EABI__)
+#include "posix-io/redefinitions.h"
+#endif
+
 // ----------------------------------------------------------------------------
 
 enum class Cmds
@@ -132,6 +136,9 @@ TestFile::do_close (void)
   return 0; // Always return success
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
 // Test class, all methods store the input in local variables,
 // to be checked later.
 
@@ -171,6 +178,8 @@ private:
   unsigned int fCount;
 
 };
+
+#pragma GCC diagnostic pop
 
 TestDir::TestDir ()
 {

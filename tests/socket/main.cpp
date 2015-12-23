@@ -33,6 +33,10 @@
 #include "utime.h"
 #include "posix/sys/socket.h"
 
+#if defined(__ARM_EABI__)
+#include "posix-io/redefinitions.h"
+#endif
+
 // ----------------------------------------------------------------------------
 
 enum class Cmds
