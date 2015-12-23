@@ -24,6 +24,7 @@
 #include <cassert>
 #include <cstdio>
 #include <cstdarg>
+#include <fcntl.h>
 #if defined(OS_INCLUDE_TRACE_PRINTF)
 #include "diag/Trace.h"
 #endif
@@ -85,11 +86,6 @@ TestDevice::do_open (const char* path, int oflag, va_list args)
 #pragma GCC diagnostic pop
 #endif
 
-#if !defined(OS_BOOL_PREFIX_POSIX_SYSCALLS)
-#define __posix_close close
-#define __posix_open open
-#endif
-
 // ----------------------------------------------------------------------------
 
 #define DESCRIPTORS_ARRAY_SIZE (5)
@@ -103,17 +99,6 @@ os::posix::CharDevicesRegistry devicesRegistry
 // This device will be mapped as "/dev/test"
 TestDevice test
   { "test", 1 };
-
-// ----------------------------------------------------------------------------
-
-extern "C"
-{
-  int
-  __posix_open (const char* path, int oflag, ...);
-
-  int
-  __posix_close (int fildes);
-}
 
 // ----------------------------------------------------------------------------
 
