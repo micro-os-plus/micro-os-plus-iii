@@ -64,17 +64,14 @@ namespace os
     void
     CharDevicesRegistry::add (CharDevice* device)
     {
-      bool found = false;
+#if defined(DEBUG)
       for (std::size_t i = 0; i < sfSize; ++i)
         {
           if (sfRegistryArray[i] == nullptr)
             {
-              sfRegistryArray[i] = device;
-              found = true;
               continue;
             }
 
-#if defined(DEBUG)
           // Validate the device name by checking duplicates.
           if (std::strcmp (device->getName (), sfRegistryArray[i]->getName ())
               == 0)
@@ -87,12 +84,17 @@ namespace os
 #endif
               std::abort ();
             }
-#endif
-        }
 
-      if (found)
+        }
+#endif // DEBUG
+
+      for (std::size_t i = 0; i < sfSize; ++i)
         {
-          return;
+          if (sfRegistryArray[i] == nullptr)
+            {
+              sfRegistryArray[i] = device;
+              return;
+            }
         }
 
       // TODO: call trace_printf() from the separate package, when available.
