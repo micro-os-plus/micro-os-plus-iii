@@ -271,6 +271,11 @@ extern "C"
   ssize_t __attribute__((weak))
   __posix_writev (int fildes, const struct iovec* iov, int iovcnt);
 
+  // --------------------------------------------------------------------------
+
+  void
+  __initialize_args (int* p_argc, char*** p_argv);
+
 #ifdef __cplusplus
 }
 #endif

@@ -30,7 +30,15 @@
 #endif
 
 #if defined(__ARM_EABI__)
+
+extern "C"
+{
+  int
+  ioctl (int fildes, int request, ...);
+}
+
 #include "posix-io/redefinitions.h"
+
 #endif
 
 // ----------------------------------------------------------------------------

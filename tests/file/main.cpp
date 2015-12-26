@@ -32,9 +32,28 @@
 #include "diag/Trace.h"
 #endif
 #include "utime.h"
+#include <unistd.h>
+#include <sys/stat.h>
 
 #if defined(__ARM_EABI__)
+
+extern "C"
+{
+  void
+  sync (void);
+
+  int
+  open (const char* path, int oflag, ...);
+
+  ssize_t
+  writev (int fildes, const struct iovec* iov, int iovcnt);
+
+  int
+  fcntl (int fildes, int cmd, ...);
+}
+
 #include "posix-io/redefinitions.h"
+
 #endif
 
 // ----------------------------------------------------------------------------
