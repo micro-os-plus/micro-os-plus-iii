@@ -1,10 +1,10 @@
-# POSIX IO
+# POSIX IO Drivers
 
 An xPack with drivers for the POSIX layer.
 
 ## Package
 
-[POSIX IO](https://github.com/micro-os-plus/posix-drivers) package details:
+[POSIX IO Drivers](https://github.com/micro-os-plus/posix-drivers) package details:
 
 * type: [xcdl](http://xcdl.github.io)
 * yotta name: `ilg-posix-drivers`

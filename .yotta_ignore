@@ -3,9 +3,9 @@
 .project
 .settings/
 .yotta.json
-Debug
+Debug/
 NOTICE.md
-Release
+Release/
 Thumbs.db
 build/
 test-*/
