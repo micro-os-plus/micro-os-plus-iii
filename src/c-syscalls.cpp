@@ -26,6 +26,8 @@
 #include "posix-io/Directory.h"
 #include "posix-io/Socket.h"
 
+#include "posix/sys/uio.h"
+
 #include <cstdarg>
 #include <cerrno>
 

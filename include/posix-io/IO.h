@@ -25,12 +25,13 @@
 
 #include <cstddef>
 #include <cstdarg>
+
 // Needed for ssize_t
 #include <sys/types.h>
-#include <sys/stat.h>
-#include "posix/sys/uio.h"
 
 // ----------------------------------------------------------------------------
+
+struct iovec;
 
 namespace os
 {
@@ -40,7 +41,6 @@ namespace os
 
     class IO;
     class FileSystem;
-    //struct iovec;
 
     // ------------------------------------------------------------------------
 
@@ -140,7 +140,7 @@ namespace os
       do_writev (const struct iovec* iov, int iovcnt);
 
       virtual int
-      do_vfcntl (int cmd, va_list args);
+      do_vfcntl (int cmd, std::va_list args);
 
       virtual int
       do_isatty (void);
