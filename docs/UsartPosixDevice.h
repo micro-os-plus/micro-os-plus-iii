@@ -9,7 +9,7 @@ public:
   ~UsartDevice ();
 
   virtual int
-  do_open (const char* path, int oflag, va_list args);
+  do_vopen (const char* path, int oflag, va_list args);
 
   virtual int
   do_close (void);
@@ -21,7 +21,7 @@ public:
   do_write (const void* buf, size_t nbyte);
 
   virtual int
-  do_ioctl (int request, va_list args);
+  do_vioctl (int request, va_list args);
 
   virtual int
   do_isatty ();

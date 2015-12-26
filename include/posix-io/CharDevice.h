@@ -21,7 +21,6 @@
 
 // ----------------------------------------------------------------------------
 
-#include <sys/types.h>
 #include "posix-io/IO.h"
 
 // ----------------------------------------------------------------------------
@@ -40,6 +39,13 @@ namespace os
 
     class CharDevice : public IO
     {
+      // ----------------------------------------------------------------------
+
+      friend IO*
+      vopen (const char* path, int oflag, std::va_list args);
+
+      // ----------------------------------------------------------------------
+
     public:
 
       CharDevice (const char* name);
@@ -48,10 +54,13 @@ namespace os
       virtual
       ~CharDevice ();
 
-      // ----------------------------------------------------------------------
+      int
+      ioctl (int request, ...);
 
-      virtual int
-      do_open (const char* path, int oflag, std::va_list args) = 0;
+      int
+      vioctl (int request, std::va_list args);
+
+      // ----------------------------------------------------------------------
 
       virtual bool
       matchName (const char* name) const;
@@ -61,6 +70,21 @@ namespace os
 
       static const char*
       getDevicePrefix (void);
+
+      // ----------------------------------------------------------------------
+
+    protected:
+
+      virtual int
+      do_vopen (const char* path, int oflag, std::va_list args) = 0;
+
+      virtual int
+      do_vioctl (int request, std::va_list args);
+
+      virtual int
+      do_isatty (void) override;
+
+      // ----------------------------------------------------------------------
 
     protected:
 

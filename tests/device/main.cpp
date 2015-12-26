@@ -35,6 +35,11 @@
 
 // ----------------------------------------------------------------------------
 
+enum class Cmds
+  : unsigned int
+    { UNKNOWN, NOTSET, OPEN, CLOSE, READ, WRITE, WRITEV, IOCTL
+};
+
 // Test class, all methods return ENOSYS, as not implemented, except open().
 
 class TestDevice : public os::posix::CharDevice
@@ -43,16 +48,32 @@ public:
 
   TestDevice (const char* deviceName, uint32_t deviceNumber);
 
-  virtual int
-  do_open (const char* path, int oflag, va_list args);
+  void
+  clear (void);
+
+  Cmds
+  getCmd (void);
 
   int
   getMode (void);
+
+  unsigned int
+  getNumber (void);
+
+protected:
+
+  virtual int
+  do_vopen (const char* path, int oflag, va_list args) override;
+
+  virtual int
+  do_vioctl (int request, std::va_list args) override;
 
 private:
 
   uint32_t fDeviceNumber;
   uint32_t fMode;
+  unsigned int fNumber;
+  Cmds fCmd;
 
 };
 
@@ -60,13 +81,34 @@ TestDevice::TestDevice (const char* deviceName, uint32_t deviceNumber) :
     CharDevice (deviceName)
 {
   fDeviceNumber = deviceNumber;
-  fMode = 0;
+
+  clear ();
 }
 
-int
+void
+TestDevice::clear (void)
+{
+  fCmd = Cmds::NOTSET;
+  fMode = 0;
+  fNumber = 1;
+}
+
+inline int
 TestDevice::getMode (void)
 {
   return fMode;
+}
+
+inline Cmds
+TestDevice::getCmd (void)
+{
+  return fCmd;
+}
+
+inline unsigned int
+TestDevice::getNumber (void)
+{
+  return fNumber;
 }
 
 #if defined ( __GNUC__ )
@@ -75,7 +117,16 @@ TestDevice::getMode (void)
 #endif
 
 int
-TestDevice::do_open (const char* path, int oflag, va_list args)
+TestDevice::do_vioctl (int request, std::va_list args)
+{
+  fCmd = Cmds::IOCTL;
+  fNumber = request;
+  fMode = va_arg(args, int);
+  return 0;
+}
+
+int
+TestDevice::do_vopen (const char* path, int oflag, va_list args)
 {
   fMode = va_arg(args, int);
 
@@ -136,8 +187,16 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       // Check passing variadic mode.
       assert(test.getMode () == 123);
 
+      // Test IOCTL
+      errno = -2;
+      int ret = test.ioctl (222, 876);
+      assert((ret == 0) && (errno == 0));
+      assert(test.getCmd () == Cmds::IOCTL);
+      assert(test.getNumber () == 222);
+      assert(test.getMode () == 876);
+
       // Close and free descriptor.
-      int ret = io->close ();
+      ret = io->close ();
       assert((ret == 0) && (errno == 0));
 
       // Check if descriptor freed.
@@ -155,11 +214,21 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert(os::posix::FileDescriptorsManager::getIo (fd) == &test);
       assert(test.getFileDescriptor () == fd);
 
+      assert(test.getType () == os::posix::IO::Type::DEVICE);
+
       // Check passing variadic mode.
       assert(test.getMode () == 234);
 
+      // Test IOCTL
+      errno = -2;
+      int ret = __posix_ioctl (fd, 222, 876);
+      assert((ret == 0) && (errno == 0));
+      assert(test.getCmd () == Cmds::IOCTL);
+      assert(test.getNumber () == 222);
+      assert(test.getMode () == 876);
+
       // Close and free descriptor
-      int ret = __posix_close (fd);
+      ret = __posix_close (fd);
       assert((ret == 0) && (errno == 0));
 
       // Check if descriptor freed.

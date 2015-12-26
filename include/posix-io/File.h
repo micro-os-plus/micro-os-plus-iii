@@ -84,7 +84,7 @@ namespace os
        * return 0 if success or -1 & errno
        */
       virtual int
-      do_open (const char* path, int oflag, std::va_list args) = 0;
+      do_vopen (const char* path, int oflag, std::va_list args) = 0;
 
       virtual off_t
       do_lseek (off_t offset, int whence);

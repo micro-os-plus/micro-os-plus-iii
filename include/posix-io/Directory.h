@@ -89,7 +89,7 @@ namespace os
        * @return object if successful, otherwise nullptr and errno.
        */
       virtual Directory*
-      do_open (const char* dirname) = 0;
+      do_vopen (const char* dirname) = 0;
 
       virtual struct dirent*
       do_read (void);

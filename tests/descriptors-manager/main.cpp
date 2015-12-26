@@ -36,7 +36,7 @@ class TestIO : public os::posix::IO
 public:
 
   virtual int
-  do_open (const char *path, int oflag, va_list args);
+  do_vopen (const char *path, int oflag, va_list args);
 
 };
 
@@ -46,7 +46,7 @@ public:
 #endif
 
 int
-TestIO::do_open (const char *path, int oflag, va_list args)
+TestIO::do_vopen (const char *path, int oflag, va_list args)
 {
   errno = ENOSYS;
   return -1;

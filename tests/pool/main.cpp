@@ -39,7 +39,7 @@ public:
   TestFile ();
 
   int
-  do_open (const char* path, int oflag, std::va_list args);
+  do_vopen (const char* path, int oflag, std::va_list args);
 
 private:
 
@@ -58,7 +58,7 @@ TestFile::TestFile ()
 #endif
 
 int
-TestFile::do_open (const char* path, int oflag, std::va_list args)
+TestFile::do_vopen (const char* path, int oflag, std::va_list args)
 {
   va_arg(args, int);
 

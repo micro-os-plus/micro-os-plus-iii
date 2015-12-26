@@ -25,6 +25,7 @@
 #include "posix-io/MountManager.h"
 #include "posix-io/Pool.h"
 #include "posix-io/NetStack.h"
+
 #include <cassert>
 #include <cerrno>
 #include <cstdarg>
@@ -74,7 +75,8 @@ namespace os
       if (io != nullptr)
         {
           // If so, use the implementation to open the device.
-          int oret = static_cast<CharDevice*> (io)->do_open (path, oflag, args);
+          int oret = static_cast<CharDevice*> (io)->do_vopen (path, oflag,
+                                                              args);
           if (oret < 0)
             {
               // Open failed.
@@ -197,27 +199,6 @@ namespace os
     }
 
     int
-    IO::ioctl (int request, ...)
-    {
-      // Forward to the variadic version of the function.
-      std::va_list args;
-      va_start(args, request);
-      int ret = vioctl (request, args);
-      va_end(args);
-
-      return ret;
-    }
-
-    int
-    IO::vioctl (int request, std::va_list args)
-    {
-      errno = 0;
-
-      // Execute the implementation specific code.
-      return do_ioctl (request, args);
-    }
-
-    int
     IO::fcntl (int cmd, ...)
     {
       // Forward to the variadic version of the function.
@@ -235,7 +216,7 @@ namespace os
       errno = 0;
 
       // Execute the implementation specific code.
-      return do_fcntl (cmd, args);
+      return do_vfcntl (cmd, args);
     }
 
     int
@@ -293,14 +274,7 @@ namespace os
     }
 
     int
-    IO::do_ioctl (int request, std::va_list args)
-    {
-      errno = ENOSYS; // Not implemented
-      return -1;
-    }
-
-    int
-    IO::do_fcntl (int cmd, std::va_list args)
+    IO::do_vfcntl (int cmd, std::va_list args)
     {
       errno = ENOSYS; // Not implemented
       return -1;

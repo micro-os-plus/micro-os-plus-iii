@@ -100,7 +100,7 @@ protected:
   // Implementations.
 
   virtual int
-  do_open (const char* path, int oflag, std::va_list args) override;
+  do_vopen (const char* path, int oflag, std::va_list args) override;
 
   virtual int
   do_close (void) override;
@@ -114,9 +114,6 @@ protected:
   virtual ssize_t
   do_writev (const struct iovec* iov, int iovcnt) override;
 
-  virtual int
-  do_ioctl (int request, std::va_list args) override;
-
   virtual off_t
   do_lseek (off_t offset, int whence) override;
 
@@ -124,7 +121,7 @@ protected:
   do_isatty (void) override;
 
   virtual int
-  do_fcntl (int cmd, va_list args) override;
+  do_vfcntl (int cmd, va_list args) override;
 
   virtual int
   do_fstat (struct stat* buf) override;
@@ -193,7 +190,7 @@ TestFile::getPtr (void)
 }
 
 int
-TestFile::do_open (const char* path, int oflag, std::va_list args)
+TestFile::do_vopen (const char* path, int oflag, std::va_list args)
 {
   fPath = path;
 
@@ -237,15 +234,6 @@ TestFile::do_writev (const struct iovec* iov, int iovcnt)
   return 0;
 }
 
-int
-TestFile::do_ioctl (int request, std::va_list args)
-{
-  fCmd = Cmds::IOCTL;
-  fNumber = request;
-  fMode = va_arg(args, int);
-  return 0;
-}
-
 off_t
 TestFile::do_lseek (off_t offset, int whence)
 {
@@ -263,7 +251,7 @@ TestFile::do_isatty (void)
 }
 
 int
-TestFile::do_fcntl (int cmd, std::va_list args)
+TestFile::do_vfcntl (int cmd, std::va_list args)
 {
   fCmd = Cmds::FCNTL;
   fNumber = cmd;
@@ -550,79 +538,6 @@ os::posix::MountManager mm
 TestBlockDevice root_dev;
 TestBlockDevice dev1;
 TestBlockDevice dev2;
-
-// ----------------------------------------------------------------------------
-
-extern "C"
-{
-  int
-  __posix_chmod (const char* path, mode_t mode);
-
-  int
-  __posix_stat (const char* path, struct stat* buf);
-
-  int
-  __posix_truncate (const char* path, off_t length);
-
-  int
-  __posix_rename (const char* existing, const char* _new);
-
-  int
-  __posix_unlink (const char* path);
-
-  int
-  __posix_utime (const char* path, const struct utimbuf* times);
-
-  // -----
-
-  int
-  __posix_mkdir (const char* path, mode_t mode);
-
-  int
-  __posix_rmdir (const char* path);
-
-  void
-  __posix_sync (void);
-
-  // -----
-
-  int
-  __posix_open (const char* path, int oflag, ...);
-
-  int
-  __posix_close (int fildes);
-
-  ssize_t
-  __posix_read (int fildes, void* buf, size_t nbyte);
-
-  ssize_t
-  __posix_write (int fildes, const void* buf, size_t nbyte);
-
-  ssize_t
-  __posix_writev (int fildes, const struct iovec* iov, int iovcnt);
-
-  int
-  __posix_ioctl (int fildes, int request, ...);
-
-  off_t
-  __posix_lseek (int fildes, off_t offset, int whence);
-
-  int
-  __posix_isatty (int fildes);
-
-  int
-  __posix_fcntl (int fildes, int cmd, ...);
-
-  int
-  __posix_fstat (int fildes, struct stat* buf);
-
-  int
-  __posix_ftruncate (int fildes, off_t length);
-
-  int
-  __posix_fsync (int fildes);
-
-}
 
 // ----------------------------------------------------------------------------
 
@@ -932,15 +847,6 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert(file->getPtr () == buf);
       assert(file->getNumber () == 234);
 
-      // Test IOCTL
-      errno = -2;
-      file->clear ();
-      ret = __posix_ioctl (fd, 222, 876);
-      assert((ret == 0) && (errno == 0));
-      assert(file->getCmd () == Cmds::IOCTL);
-      assert(file->getNumber () == 222);
-      assert(file->getMode () == 876);
-
       // Test LSEEK
       errno = -2;
       file->clear ();
@@ -1076,14 +982,6 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert(tfile->getCmd () == Cmds::WRITEV);
       assert(tfile->getPtr () == buf);
       assert(tfile->getNumber () == 234);
-
-      // Test IOCTL
-      errno = -2;
-      ret = file->ioctl (222, 876);
-      assert((ret == 0) && (errno == 0));
-      assert(tfile->getCmd () == Cmds::IOCTL);
-      assert(tfile->getNumber () == 222);
-      assert(tfile->getMode () == 876);
 
       // Test LSEEK
       errno = -2;

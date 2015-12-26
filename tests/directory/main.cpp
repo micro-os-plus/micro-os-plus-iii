@@ -72,7 +72,7 @@ protected:
   // Implementations.
 
   virtual int
-  do_open (const char* path, int oflag, std::va_list args) override;
+  do_vopen (const char* path, int oflag, std::va_list args) override;
 
   virtual int
   do_close (void) override;
@@ -119,7 +119,7 @@ TestFile::getPath (void)
 }
 
 int
-TestFile::do_open (const char* path, int oflag, std::va_list args)
+TestFile::do_vopen (const char* path, int oflag, std::va_list args)
 {
   fPath = path;
 
@@ -160,7 +160,7 @@ protected:
   // Implementations.
 
   virtual Directory*
-  do_open (const char* dirname) override;
+  do_vopen (const char* dirname) override;
 
   virtual struct dirent*
   do_read (void) override;
@@ -201,7 +201,7 @@ TestDir::getPath (void)
 }
 
 os::posix::Directory*
-TestDir::do_open (const char* dirname)
+TestDir::do_vopen (const char* dirname)
 {
   fPath = dirname;
   fCount = 1;
@@ -365,23 +365,6 @@ os::posix::MountManager fsm
 TestBlockDevice rootDevice;
 TestBlockDevice babuDevice;
 TestBlockDevice babuDevice2;
-
-// ----------------------------------------------------------------------------
-
-extern "C"
-{
-  DIR*
-  __posix_opendir (const char* dirname);
-
-  struct dirent*
-  __posix_readdir (DIR* dirp);
-
-  void
-  __posix_rewinddir (DIR* dirp);
-
-  int
-  __posix_closedir (DIR* dirp);
-}
 
 // ----------------------------------------------------------------------------
 

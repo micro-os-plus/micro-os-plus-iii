@@ -30,7 +30,7 @@ UsartDevice::~UsartDevice ()
 }
 
 int
-UsartDevice::do_open (const char* path, int oflag, va_list args)
+UsartDevice::do_vopen (const char* path, int oflag, va_list args)
 {
   return usart_open (path, oflags, args);
 }
@@ -54,7 +54,7 @@ UsartDevice::do_write (const void* buf, size_t nbyte)
 }
 
 int
-UsartDevice::do_ioctl (int request, va_list args)
+UsartDevice::do_vioctl (int request, va_list args)
 {
   return usart_ioctl (request, args);
 }

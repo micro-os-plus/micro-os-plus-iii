@@ -25,6 +25,7 @@
 #include "posix-io/MountManager.h"
 #include "posix-io/Directory.h"
 #include "posix-io/Socket.h"
+
 #include <cstdarg>
 #include <cerrno>
 
@@ -139,9 +140,16 @@ __posix_ioctl (int fildes, int request, ...)
       return -1;
     }
 
+  // Works only on STREAMS (CherDevices, in this implementation)
+  if ((io->getType () & os::posix::IO::Type::DEVICE) == 0)
+    {
+      errno = ENOTTY; // Not a stream.
+      return -1;
+    }
+
   va_list args;
   va_start(args, request);
-  int ret = io->vioctl (request, args);
+  int ret = static_cast<os::posix::CharDevice*> (io)->vioctl (request, args);
   va_end(args);
 
   return ret;

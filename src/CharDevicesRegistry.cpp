@@ -18,6 +18,7 @@
 
 #include "posix-io/CharDevicesRegistry.h"
 #include "posix-io/CharDevice.h"
+
 #include <cassert>
 #include <cstring>
 #include <cstdlib>

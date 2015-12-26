@@ -22,6 +22,7 @@
 #include "posix-io/Directory.h"
 #include "posix-io/MountManager.h"
 #include "posix-io/Pool.h"
+
 #include <cerrno>
 #include <cassert>
 
@@ -229,7 +230,7 @@ namespace os
       file->setFileSystem (this);
 
       // Execute the file specific implementation code.
-      file->do_open (path, oflag, args);
+      file->do_vopen (path, oflag, args);
 
       return file;
     }
@@ -251,7 +252,7 @@ namespace os
       dir->setFileSystem (this);
 
       // Execute the dir specific implementation code.
-      dir->do_open (dirpath);
+      dir->do_vopen (dirpath);
 
       return dir;
     }

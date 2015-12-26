@@ -22,6 +22,7 @@
 // ----------------------------------------------------------------------------
 
 #include "posix-io/types.h"
+
 #include <cstddef>
 #include <cstdarg>
 // Needed for ssize_t
@@ -98,12 +99,6 @@ namespace os
       writev (const struct iovec* iov, int iovcnt);
 
       int
-      ioctl (int request, ...);
-
-      int
-      vioctl (int request, std::va_list args);
-
-      int
       fcntl (int cmd, ...);
 
       int
@@ -129,7 +124,7 @@ namespace os
       // ----------------------------------------------------------------------
       // Implementations.
 
-      // do_open() is not here, because it is not common
+      // do_vopen() is not here, because it is not common
       // (for example for sockets()).
 
       virtual int
@@ -145,10 +140,7 @@ namespace os
       do_writev (const struct iovec* iov, int iovcnt);
 
       virtual int
-      do_ioctl (int request, std::va_list args);
-
-      virtual int
-      do_fcntl (int cmd, va_list args);
+      do_vfcntl (int cmd, va_list args);
 
       virtual int
       do_isatty (void);

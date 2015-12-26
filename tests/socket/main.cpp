@@ -129,10 +129,7 @@ protected:
   do_writev (const struct iovec* iov, int iovcnt) override;
 
   virtual int
-  do_ioctl (int request, std::va_list args) override;
-
-  virtual int
-  do_fcntl (int cmd, va_list args) override;
+  do_vfcntl (int cmd, va_list args) override;
 
   int
   do_accept (Socket* sock, struct sockaddr* address, socklen_t* address_len)
@@ -311,16 +308,7 @@ TestSocket::do_writev (const struct iovec* iov, int iovcnt)
 }
 
 int
-TestSocket::do_ioctl (int request, std::va_list args)
-{
-  fCmd = Cmds::IOCTL;
-  fNumber1 = request;
-  fMode = va_arg(args, int);
-  return 0;
-}
-
-int
-TestSocket::do_fcntl (int cmd, std::va_list args)
+TestSocket::do_vfcntl (int cmd, std::va_list args)
 {
   fCmd = Cmds::FCNTL;
   fNumber1 = cmd;
@@ -524,85 +512,6 @@ class TestNetInterface : public os::posix::NetInterface
 public:
   TestNetInterface () = default;
 };
-
-// ----------------------------------------------------------------------------
-
-extern "C"
-{
-  int
-  __posix_socket (int domain, int type, int protocol);
-
-  int
-  __posix_accept (int socket, struct sockaddr* address, socklen_t* address_len);
-
-  int
-  __posix_bind (int socket, const struct sockaddr* address,
-                socklen_t address_len);
-
-  int
-  __posix_connect (int socket, const struct sockaddr* address,
-                   socklen_t address_len);
-
-  int __attribute__((weak))
-  __posix_getpeername (int socket, struct sockaddr* address,
-                       socklen_t* address_len);
-
-  int __attribute__((weak))
-  __posix_getsockname (int socket, struct sockaddr* address,
-                       socklen_t* address_len);
-
-  int __attribute__((weak))
-  __posix_getsockopt (int socket, int level, int option_name,
-                      void* option_value, socklen_t* option_len);
-
-  int __attribute__((weak))
-  __posix_listen (int socket, int backlog);
-
-  ssize_t __attribute__((weak))
-  __posix_recv (int socket, void* buffer, size_t length, int flags);
-
-  ssize_t __attribute__((weak))
-  __posix_recvfrom (int socket, void* buffer, size_t length, int flags,
-                    struct sockaddr* address, socklen_t* address_len);
-
-  ssize_t __attribute__((weak))
-  __posix_recvmsg (int socket, struct msghdr* message, int flags);
-
-  ssize_t __attribute__((weak))
-  __posix_send (int socket, const void* buffer, size_t length, int flags);
-
-  ssize_t __attribute__((weak))
-  __posix_sendmsg (int socket, const struct msghdr* message, int flags);
-
-  ssize_t __attribute__((weak))
-  __posix_sendto (int socket, const void* message, size_t length, int flags,
-                  const struct sockaddr* dest_addr, socklen_t dest_len);
-
-  int __attribute__((weak))
-  __posix_setsockopt (int socket, int level, int option_name,
-                      const void* option_value, socklen_t option_len);
-
-  int __attribute__((weak))
-  __posix_shutdown (int socket, int how);
-
-  int __attribute__((weak))
-  __posix_sockatmark (int socket);
-
-  // --------------------------------------------------------------------------
-
-  int
-  __posix_close (int fildes);
-
-  ssize_t
-  __posix_read (int fildes, void* buf, size_t nbyte);
-
-  ssize_t
-  __posix_write (int fildes, const void* buf, size_t nbyte);
-
-  int
-  __posix_ioctl (int fildes, int request, ...);
-
-}
 
 // ----------------------------------------------------------------------------
 

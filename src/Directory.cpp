@@ -20,6 +20,7 @@
 #include "posix-io/FileSystem.h"
 #include "posix-io/MountManager.h"
 #include "posix-io/Pool.h"
+
 #include <cerrno>
 #include <cassert>
 
@@ -107,7 +108,7 @@ namespace os
     // ------------------------------------------------------------------------
     // Default implementations; overwrite them with real code.
 
-    // do_open() is not here because it is an abstract virtual to be
+    // do_vopen() is not here because it is an abstract virtual to be
     // implemented by derived classes.
 
     struct dirent*
