@@ -37,6 +37,18 @@ namespace os
     int
     mkdir (const char* path, mode_t mode)
     {
+      if (path == nullptr)
+        {
+          errno = EFAULT;
+          return -1;
+        }
+
+      if (*path == '\0')
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
       auto adjusted_path = path;
       auto* const fs = os::posix::MountManager::identifyFileSystem (
           &adjusted_path);
@@ -57,6 +69,18 @@ namespace os
     int
     rmdir (const char* path)
     {
+      if (path == nullptr)
+        {
+          errno = EFAULT;
+          return -1;
+        }
+
+      if (*path == '\0')
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
       auto adjusted_path = path;
       auto* const fs = os::posix::MountManager::identifyFileSystem (
           &adjusted_path);
@@ -97,6 +121,18 @@ namespace os
     int
     chmod (const char* path, mode_t mode)
     {
+      if (path == nullptr)
+        {
+          errno = EFAULT;
+          return -1;
+        }
+
+      if (*path == '\0')
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
       const char* adjusted_path = path;
       auto* const fs = os::posix::MountManager::identifyFileSystem (
           &adjusted_path);
@@ -113,6 +149,18 @@ namespace os
     int
     stat (const char* path, struct stat* buf)
     {
+      if ((path == nullptr) || (buf == nullptr))
+        {
+          errno = EFAULT;
+          return -1;
+        }
+
+      if (*path == '\0')
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
       const char* adjusted_path = path;
       auto* const fs = os::posix::MountManager::identifyFileSystem (
           &adjusted_path);
@@ -129,6 +177,18 @@ namespace os
     int
     truncate (const char* path, off_t length)
     {
+      if (path == nullptr)
+        {
+          errno = EFAULT;
+          return -1;
+        }
+
+      if (*path == '\0')
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
       const char* adjusted_path = path;
       auto* const fs = os::posix::MountManager::identifyFileSystem (
           &adjusted_path);
@@ -151,6 +211,18 @@ namespace os
     int
     rename (const char* existing, const char* _new)
     {
+      if ((existing == nullptr) || (_new == nullptr))
+        {
+          errno = EFAULT;
+          return -1;
+        }
+
+      if ((*existing == '\0') || (*_new == '\0'))
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
       auto adjusted_existing = existing;
       auto adjusted_new = _new;
       auto* const fs = os::posix::MountManager::identifyFileSystem (
@@ -168,6 +240,18 @@ namespace os
     int
     unlink (const char* path)
     {
+      if (path == nullptr)
+        {
+          errno = EFAULT;
+          return -1;
+        }
+
+      if (*path == '\0')
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
       auto adjusted_path = path;
       auto* const fs = os::posix::MountManager::identifyFileSystem (
           &adjusted_path);
@@ -184,6 +268,18 @@ namespace os
     int
     utime (const char* path, const struct utimbuf* times)
     {
+      if ((path == nullptr) || (times == nullptr))
+        {
+          errno = EFAULT;
+          return -1;
+        }
+
+      if (*path == '\0')
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
       auto adjusted_path = path;
       auto* const fs = os::posix::MountManager::identifyFileSystem (
           &adjusted_path);

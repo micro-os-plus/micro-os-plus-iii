@@ -30,12 +30,23 @@ namespace os
 {
   namespace posix
   {
-
     // ------------------------------------------------------------------------
 
     Directory*
     opendir (const char* dirname)
     {
+      if (dirname == nullptr)
+        {
+          errno = EFAULT;
+          return nullptr;
+        }
+
+      if (*dirname == '\0')
+        {
+          errno = ENOENT;
+          return nullptr;
+        }
+
       errno = 0;
 
       auto adjusted_dirname = dirname;

@@ -62,13 +62,19 @@ namespace os
     IO*
     vopen (const char* path, int oflag, std::va_list args)
     {
-      errno = 0;
-
       if (path == nullptr)
         {
-          errno = EBADF;
+          errno = EFAULT;
           return nullptr;
         }
+
+      if (*path == '\0')
+        {
+          errno = ENOENT;
+          return nullptr;
+        }
+
+      errno = 0;
 
       // First check if path is a device.
       os::posix::IO* io = os::posix::CharDevicesRegistry::identifyDevice (path);
@@ -144,6 +150,8 @@ namespace os
       fFileDescriptor = noFileDescriptor;
     }
 
+    // ------------------------------------------------------------------------
+
     int
     IO::close (void)
     {
@@ -174,6 +182,13 @@ namespace os
     ssize_t
     IO::read (void* buf, std::size_t nbyte)
     {
+
+      if (buf == nullptr)
+        {
+          errno = EFAULT;
+          return -1;
+        }
+
       errno = 0;
 
       // Execute the implementation specific code.
@@ -183,6 +198,12 @@ namespace os
     ssize_t
     IO::write (const void* buf, std::size_t nbyte)
     {
+      if (buf == nullptr)
+        {
+          errno = EFAULT;
+          return -1;
+        }
+
       errno = 0;
 
       // Execute the implementation specific code.
@@ -192,6 +213,18 @@ namespace os
     ssize_t
     IO::writev (const struct iovec* iov, int iovcnt)
     {
+      if (iov == nullptr)
+        {
+          errno = EFAULT;
+          return -1;
+        }
+
+      if (iovcnt <= 0)
+        {
+          errno = EINVAL;
+          return -1;
+        }
+
       errno = 0;
 
       // Execute the implementation specific code.
@@ -232,6 +265,12 @@ namespace os
     int
     IO::fstat (struct stat* buf)
     {
+      if (buf == nullptr)
+        {
+          errno = EFAULT;
+          return -1;
+        }
+
       errno = 0;
 
       // Execute the implementation specific code.
@@ -266,11 +305,26 @@ namespace os
       return -1;
     }
 
+    // This is not exactly standard, since POSIX requires writev() to be
+    // atomic, but functionally it is close. Override it and implement
+    // it properly in the derived class.
+
     ssize_t
     IO::do_writev (const struct iovec* iov, int iovcnt)
     {
-      errno = ENOSYS; // Not implemented
-      return -1;
+      ssize_t total = 0;
+
+      const struct iovec* p = iov;
+      for (int i = 0; i < iovcnt; ++i, ++p)
+        {
+          ssize_t ret = do_write (p->iov_base, p->iov_len);
+          if (ret < 0)
+            {
+              return ret;
+            }
+          total += ret;
+        }
+      return total;
     }
 
     int
