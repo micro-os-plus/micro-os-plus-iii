@@ -14,6 +14,9 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Contributors:
+ *   - Lix Paulian
  */
 
 #include "posix-drivers/CmsisUsartCharDevice.h"
@@ -44,18 +47,18 @@ namespace os
 
     CmsisUsartCharDevice::~CmsisUsartCharDevice ()
     {
-      ;
+      fRxSem = nullptr;
+      fTxSem = nullptr;
     }
 
     // ------------------------------------------------------------------------
 
-#if defined ( __GNUC__ )
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
 
     int
-    CmsisUsartCharDevice::do_vopen (const char* path, int oflag, va_list args)
+    CmsisUsartCharDevice::do_vopen (const char* path, int oflag,
+                                    std::va_list args)
     {
       if (fRxSem != nullptr)
         {
@@ -70,47 +73,59 @@ namespace os
           fRxSem = osSemaphoreCreate (osSemaphore(fRxSem), 1);
           fTxSem = osSemaphoreCreate (osSemaphore(fTxSem), 1);
 
-          if (fRxSem == NULL || fTxSem == NULL)
+          if ((fRxSem == nullptr) || (fTxSem == nullptr))
             {
               result = ARM_DRIVER_ERROR;
               break;
             }
 
+          // These are present here for some obscure reasons related to inits.
+          // Might not be the best solution.
           osSemaphoreWait (fRxSem, 1);
           osSemaphoreWait (fTxSem, 1);
 
-          if ((result = fDriver->Initialize (fEventCallBack)))
+          result = fDriver->Initialize (fEventCallBack);
+          if (result != ARM_DRIVER_OK)
             break;
 
-          if ((result = fDriver->PowerControl (ARM_POWER_FULL)))
+          result = fDriver->PowerControl (ARM_POWER_FULL);
+          if (result != ARM_DRIVER_OK)
             break;
 
-          // default configuration: 8 bits, no parity, 1 stop bit,
-          // no flow control, 115200 bps
-          if ((result = fDriver->Control (ARM_USART_MODE_ASYNCHRONOUS |
+          // Default configuration: 8 bits, no parity, 1 stop bit,
+          // no flow control, 115200 bps.
+          result = fDriver->Control (ARM_USART_MODE_ASYNCHRONOUS |
           ARM_USART_DATA_BITS_8 |
           ARM_USART_PARITY_NONE |
           ARM_USART_STOP_BITS_1 |
           ARM_USART_FLOW_CONTROL_NONE,
-                                          115200)))
+                                     115200);
+          if (result != ARM_DRIVER_OK)
             break;
 
-          /* enable TX output */
-          if ((result = fDriver->Control (ARM_USART_CONTROL_TX, 1)))
+          // Enable TX output.
+          result = fDriver->Control (ARM_USART_CONTROL_TX, 1);
+          if (result != ARM_DRIVER_OK)
             break;
 
-          /* enable RX input */
-          if ((result = fDriver->Control (ARM_USART_CONTROL_RX, 1)))
+          // Enable RX input.
+          result = fDriver->Control (ARM_USART_CONTROL_RX, 1);
+          if (result != ARM_DRIVER_OK)
             break;
 
         }
-      while (0);
+      while (false);
 
       if (result != ARM_DRIVER_OK)
         {
+          fDriver->PowerControl (ARM_POWER_OFF);
+          fDriver->Uninitialize ();
+
           errno = ENOSR;
           return -1;
         }
+
+      // Return POSIX OK.
       return 0;
     }
 
@@ -129,12 +144,13 @@ namespace os
       osSemaphoreDelete (fTxSem);
       fTxSem = nullptr;
 
-      /* disable USART and I/O pins used */
+      // Disable USART and I/O pins used.
       fDriver->Control (ARM_USART_CONTROL_TX, 0);
       fDriver->Control (ARM_USART_CONTROL_RX, 0);
       fDriver->PowerControl (ARM_POWER_OFF);
       fDriver->Uninitialize ();
 
+      // Return POSIX OK.
       return 0;
     }
 
@@ -144,12 +160,14 @@ namespace os
       ARM_USART_STATUS status;
       ssize_t count = -1;
 
-      if ((fDriver->Receive ((void *) buf, nbyte)) == ARM_DRIVER_OK)
+      if ((fDriver->Receive (buf, nbyte)) == ARM_DRIVER_OK)
         {
           osSemaphoreWait (fRxSem, osWaitForever);
           status = fDriver->GetStatus ();
           if (!status.rx_framing_error)
-            count = fDriver->GetRxCount ();
+            {
+              count = fDriver->GetRxCount ();
+            }
         }
       fDriver->Control (ARM_USART_ABORT_RECEIVE, 1);
 
@@ -157,20 +175,24 @@ namespace os
         {
           errno = EIO;
         }
+
+      // Actual number of chars received in buffer.
       return count;
     }
 
     ssize_t
     CmsisUsartCharDevice::do_write (const void* buf, std::size_t nbyte)
     {
-      ARM_USART_STATUS status;
       ssize_t count;
 
+      ARM_USART_STATUS status;
       status = fDriver->GetStatus ();
       if (status.tx_busy)
-        osSemaphoreWait (fTxSem, osWaitForever);
+        {
+          osSemaphoreWait (fTxSem, osWaitForever);
+        }
 
-      if ((fDriver->Send ((void *) buf, nbyte)) == ARM_DRIVER_OK)
+      if ((fDriver->Send (buf, nbyte)) == ARM_DRIVER_OK)
         {
           osSemaphoreWait (fTxSem, osWaitForever);
           count = fDriver->GetTxCount ();
@@ -180,24 +202,26 @@ namespace os
           count = -1;
           errno = EIO;
         }
+
+      // Actual number of chars transmitted from buffer.
       return count;
     }
 
+#if 0
     ssize_t
     CmsisUsartCharDevice::do_writev (const struct iovec* iov, int iovcnt)
-    {
-      errno = ENOSYS; // Not implemented
-      return -1;
-    }
+      {
+        errno = ENOSYS; // Not implemented
+        return -1;
+      }
 
     int
     CmsisUsartCharDevice::do_vioctl (int request, std::va_list args)
-    {
-      errno = ENOSYS; // Not implemented
-      return -1;
-    }
+      {
+        errno = ENOSYS; // Not implemented
+        return -1;
+      }
 
-#if 0
     int
     CmsisUsartCharDevice::do_vfcntl (int cmd, std::va_list args)
       {
@@ -206,15 +230,23 @@ namespace os
       }
 #endif
 
+    // ------------------------------------------------------------------------
+
+    // This function is called by the CMSIS driver in an interrupt context.
+
     void
     CmsisUsartCharDevice::eventCallBack (uint32_t event)
     {
       if ((event
           & (ARM_USART_EVENT_RECEIVE_COMPLETE | ARM_USART_EVENT_RX_FRAMING_ERROR))
           || ((event & ARM_USART_EVENT_RX_TIMEOUT) && fDriver->GetRxCount ()))
-        osSemaphoreRelease (fRxSem);
+        {
+          osSemaphoreRelease (fRxSem);
+        }
       else if (event & ARM_USART_EVENT_TX_COMPLETE)
-        osSemaphoreRelease (fTxSem);
+        {
+          osSemaphoreRelease (fTxSem);
+        }
     }
 
 #pragma GCC diagnostic pop

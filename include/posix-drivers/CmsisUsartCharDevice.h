@@ -81,13 +81,13 @@ namespace os
       virtual ssize_t
       do_write (const void* buf, std::size_t nbyte) override;
 
+#if 0
       virtual ssize_t
       do_writev (const struct iovec* iov, int iovcnt) override;
 
       virtual int
       do_vioctl (int request, std::va_list args) override;
 
-#if 0
       virtual int
       do_vfcntl (int cmd, va_list args) override;
 #endif
