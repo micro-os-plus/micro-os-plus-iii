@@ -85,7 +85,8 @@ namespace os
           if ((result = fDriver->PowerControl (ARM_POWER_FULL)))
             break;
 
-          /* default configuration: 8 bits, no parity, 1 stop bit, no flow control, 115200 bps */
+          // default configuration: 8 bits, no parity, 1 stop bit,
+          // no flow control, 115200 bps
           if ((result = fDriver->Control (ARM_USART_MODE_ASYNCHRONOUS |
           ARM_USART_DATA_BITS_8 |
           ARM_USART_PARITY_NONE |
@@ -116,8 +117,6 @@ namespace os
     int
     CmsisUsartCharDevice::do_close (void)
     {
-      int32_t result;
-
       if (fRxSem == nullptr)
         {
           errno = EBADF; // Not opened.
@@ -130,28 +129,12 @@ namespace os
       osSemaphoreDelete (fTxSem);
       fTxSem = nullptr;
 
-      do
-        {
-          /* disable TX output */
-          if ((result = fDriver->Control (ARM_USART_CONTROL_TX, 0)))
-            break;
+      /* disable USART and I/O pins used */
+      fDriver->Control (ARM_USART_CONTROL_TX, 0);
+      fDriver->Control (ARM_USART_CONTROL_RX, 0);
+      fDriver->PowerControl (ARM_POWER_OFF);
+      fDriver->Uninitialize ();
 
-          /* disable RX input */
-          if ((result = fDriver->Control (ARM_USART_CONTROL_RX, 0)))
-            break;
-
-          if ((result = fDriver->PowerControl (ARM_POWER_OFF)))
-            break;
-
-          result = fDriver->Uninitialize ();
-        }
-      while (0);
-
-      if (result != ARM_DRIVER_OK)
-        {
-          errno = EBUSY;
-          return -1;
-        }
       return 0;
     }
 
@@ -187,7 +170,12 @@ namespace os
       if (status.tx_busy)
         osSemaphoreWait (fTxSem, osWaitForever);
 
-      if ((count = fDriver->Send ((void *) buf, nbyte)) != ARM_DRIVER_OK)
+      if ((fDriver->Send ((void *) buf, nbyte)) == ARM_DRIVER_OK)
+        {
+          osSemaphoreWait (fTxSem, osWaitForever);
+          count = fDriver->GetTxCount ();
+        }
+      else
         {
           count = -1;
           errno = EIO;
@@ -221,11 +209,11 @@ namespace os
     void
     CmsisUsartCharDevice::eventCallBack (uint32_t event)
     {
-      if (event
-          & (ARM_USART_EVENT_RX_TIMEOUT | ARM_USART_EVENT_RECEIVE_COMPLETE
-              | ARM_USART_EVENT_RX_FRAMING_ERROR))
+      if ((event
+          & (ARM_USART_EVENT_RECEIVE_COMPLETE | ARM_USART_EVENT_RX_FRAMING_ERROR))
+          || ((event & ARM_USART_EVENT_RX_TIMEOUT) && fDriver->GetRxCount ()))
         osSemaphoreRelease (fRxSem);
-      else if (event & ARM_USART_EVENT_TRANSFER_COMPLETE)
+      else if (event & ARM_USART_EVENT_TX_COMPLETE)
         osSemaphoreRelease (fTxSem);
     }
 
