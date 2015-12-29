@@ -27,6 +27,7 @@
 #define __posix_chdir chdir
 #define __posix_chmod chmod
 #define __posix_chown chown
+#define __posix_clock clock
 #define __posix_close close
 #define __posix_closedir closedir
 #define __posix_connect connect
@@ -74,6 +75,7 @@
 #define __posix_stat stat
 #define __posix_symlink symlink
 #define __posix_sync sync
+#define __posix_system system
 #define __posix_times times
 #define __posix_truncate truncate
 #define __posix_unlink unlink

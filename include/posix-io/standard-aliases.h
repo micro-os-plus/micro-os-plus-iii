@@ -41,6 +41,9 @@ extern "C"
   int __attribute__((weak, alias ("__posix_chown")))
   chown (const char* path, uid_t owner, gid_t group);
 
+  clock_t __attribute__((weak, alias ("__posix_clock")))
+  clock (void);
+
   int __attribute__((weak, alias ("__posix_close")))
   close (int fildes);
 
@@ -191,6 +194,9 @@ extern "C"
 
   int __attribute__((weak, alias ("__posix_symlink")))
   symlink (const char* existing, const char* _new);
+
+  int __attribute__((weak, alias ("__posix_system")))
+  system (const char *command);
 
   clock_t __attribute__((weak, alias ("__posix_times")))
   times (struct tms* buf);

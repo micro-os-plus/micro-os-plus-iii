@@ -50,6 +50,13 @@
 
 // ----------------------------------------------------------------------------
 
+extern "C"
+{
+  void
+  initialise_monitor_handles (void);
+}
+
+// ----------------------------------------------------------------------------
 // ---- POSIX IO functions ----------------------------------------------------
 
 /**
@@ -684,6 +691,13 @@ __posix_getcwd (char* buf, size_t size)
 // ----------------------------------------------------------------------------
 // Unavailable in non-Unix embedded environments.
 
+clock_t
+__posix_clock (void)
+{
+  errno = ENOSYS; // Not implemented
+  return (clock_t)-1;
+}
+
 int
 __posix_execve (const char* path, char* const argv[], char* const envp[])
 {
@@ -714,6 +728,13 @@ __posix_kill (pid_t pid, int sig)
 
 int
 __posix_raise (int sig)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int
+__posix_system (const char *command)
 {
   errno = ENOSYS; // Not implemented
   return -1;
@@ -754,7 +775,12 @@ __posix_readlink (const char* path, char* buf, size_t bufsize)
   return ((ssize_t) -1);
 }
 
+#pragma GCC diagnostic pop
+
 // ----------------------------------------------------------------------------
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 
 // This is the standard default implementation for the routine to
 // process args. It returns a single empty arg.
@@ -787,6 +813,13 @@ __initialize_args (int* p_argc, char*** p_argv)
 }
 
 #pragma GCC diagnostic pop
+
+// Default STDIN, STDOUT, STDERR not defined.
+void
+initialise_monitor_handles (void)
+{
+  ;
+}
 
 // ----------------------------------------------------------------------------
 
