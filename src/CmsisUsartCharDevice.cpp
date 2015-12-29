@@ -43,6 +43,9 @@ namespace os
 
       fRxSem = nullptr;
       fTxSem = nullptr;
+
+      fCntIn = 0;
+      fCntOut = 0;
     }
 
     CmsisUsartCharDevice::~CmsisUsartCharDevice ()
@@ -84,6 +87,9 @@ namespace os
           osSemaphoreWait (fRxSem, 1);
           osSemaphoreWait (fTxSem, 1);
 
+          fCntIn = 0;
+          fCntOut = 0;
+
           result = fDriver->Initialize (fEventCallBack);
           if (result != ARM_DRIVER_OK)
             break;
@@ -113,6 +119,9 @@ namespace os
           if (result != ARM_DRIVER_OK)
             break;
 
+          result = fDriver->Receive (fBuffer, BUFF_LEN);
+          if (result != ARM_DRIVER_OK)
+            break;
         }
       while (false);
 
@@ -157,23 +166,29 @@ namespace os
     ssize_t
     CmsisUsartCharDevice::do_read (void* buf, std::size_t nbyte)
     {
+      ssize_t count = 0;
+      uint8_t *ubuf = (uint8_t *) buf;
       ARM_USART_STATUS status;
-      ssize_t count = -1;
 
-      if ((fDriver->Receive (buf, nbyte)) == ARM_DRIVER_OK)
+      while (fCntOut == ((fCntIn = fDriver->GetRxCount ())))
         {
-          osSemaphoreWait (fRxSem, osWaitForever);
+          osSemaphoreWait (fRxSem, osWaitForever);  // wait for an event
+
           status = fDriver->GetStatus ();
-          if (!status.rx_framing_error)
+          if (status.rx_framing_error)  // other error checking should be added here
             {
-              count = fDriver->GetRxCount ();
+              errno = EIO;
+              return -1;
             }
         }
-      fDriver->Control (ARM_USART_ABORT_RECEIVE, 1);
 
-      if (count == -1)
+      for (; fCntIn != fCntOut; count++, nbyte--)
         {
-          errno = EIO;
+          if (!nbyte)
+            break;      // caller's buffer full
+          *ubuf++ = fBuffer[fCntOut++];
+          if (fCntOut >= BUFF_LEN)
+            fCntOut = 0;
         }
 
       // Actual number of chars received in buffer.
@@ -238,12 +253,15 @@ namespace os
     CmsisUsartCharDevice::eventCallBack (uint32_t event)
     {
       if ((event
-          & (ARM_USART_EVENT_RECEIVE_COMPLETE | ARM_USART_EVENT_RX_FRAMING_ERROR))
-          || ((event & ARM_USART_EVENT_RX_TIMEOUT) && fDriver->GetRxCount ()))
+          & (ARM_USART_EVENT_RECEIVE_COMPLETE | ARM_USART_EVENT_RX_FRAMING_ERROR
+              | ARM_USART_EVENT_RX_TIMEOUT)))
         {
-          osSemaphoreRelease (fRxSem);
+          if (event & ARM_USART_EVENT_RECEIVE_COMPLETE)
+            fDriver->Receive (fBuffer, BUFF_LEN); // re-initialize to buffer start
+          else
+            osSemaphoreRelease (fRxSem);
         }
-      else if (event & ARM_USART_EVENT_TX_COMPLETE)
+      if (event & ARM_USART_EVENT_TX_COMPLETE)
         {
           osSemaphoreRelease (fTxSem);
         }
