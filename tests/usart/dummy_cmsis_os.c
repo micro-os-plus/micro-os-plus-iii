@@ -21,10 +21,8 @@
 // There is no functionality at all, the purpose of these definitions
 // is only to keep the linker happy when building the tests.
 
-#if defined ( __GNUC__ )
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
 
 osSemaphoreId
 osSemaphoreCreate (const osSemaphoreDef_t *semaphore_def, int32_t count)
