@@ -28,6 +28,8 @@
 #include <cstdarg>
 #include <cstdlib>
 
+#define BUFF_LEN 200
+
 // ----------------------------------------------------------------------------
 
 // Forward definitions to avoid "Driver_USART.h"
@@ -104,6 +106,9 @@ namespace os
 
       osSemaphoreId fTxSem; //
       osSemaphoreDef(fTxSem);
+
+      uint8_t fBuffer[BUFF_LEN];
+      uint16_t fCntIn, fCntOut;
 
     };
 
