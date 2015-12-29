@@ -3,13 +3,12 @@
 .project
 .settings/
 .yotta.json
-Debug
+Debug/
 NOTICE.md
-Release
-test-manager-debug
+Release/
+test-*/
 Thumbs.db
 build/
 upload.tar.gz
 yotta_modules/
 yotta_targets/
-
