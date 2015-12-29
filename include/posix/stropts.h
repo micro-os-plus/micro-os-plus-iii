@@ -20,7 +20,8 @@
 #define POSIX_IO_STROPTS_H_
 
 #if !defined(__ARM_EABI__)
-#include <stropts.h>
+//#include <stropts.h>
+#include <sys/ioctl.h>
 #else
 
 #ifdef __cplusplus
