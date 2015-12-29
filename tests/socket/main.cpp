@@ -22,16 +22,16 @@
 #include "posix-io/Socket.h"
 #include "posix-io/NetInterface.h"
 #include "posix-io/NetStack.h"
+#include "diag/trace.h"
+
+#include "posix/sys/socket.h"
+
 #include <cerrno>
 #include <cassert>
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>
-#if defined(OS_INCLUDE_TRACE_PRINTF)
-#include "diag/Trace.h"
-#endif
 #include "utime.h"
-#include "posix/sys/socket.h"
 
 #if defined(__ARM_EABI__)
 #include "posix-io/redefinitions.h"
@@ -537,7 +537,6 @@ os::posix::FileDescriptorsManager dm
 int
 main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
-
     {
       // C API
 
@@ -805,12 +804,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert(socketsPool.getFlag (0) == false);
     }
 
-  const char* msg = "'test-socket-debug' succeeded.\n";
-#if defined(OS_INCLUDE_TRACE_PRINTF)
-  trace_puts (msg);
-#else
-  std::puts (msg);
-#endif
+  trace_puts ("'test-socket-debug' succeeded.");
 
   // Success!
   return 0;

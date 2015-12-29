@@ -18,13 +18,11 @@
 
 #include "posix-io/CharDevicesRegistry.h"
 #include "posix-io/CharDevice.h"
+#include "diag/trace.h"
 
 #include <cassert>
 #include <cstring>
 #include <cstdlib>
-#if defined(OS_INCLUDE_TRACE_PRINTF)
-#include "diag/Trace.h"
-#endif
 
 // ----------------------------------------------------------------------------
 
@@ -76,12 +74,7 @@ namespace os
           if (std::strcmp (device->getName (), sfRegistryArray[i]->getName ())
               == 0)
             {
-              const char* msg = "Duplicate Device name. Abort.\n";
-#if defined(OS_INCLUDE_TRACE_PRINTF)
-              trace_printf(msg);
-#else
-              ::write (2, msg, strlen (msg));
-#endif
+              trace_puts ("Duplicate Device name. Abort.");
               std::abort ();
             }
 
@@ -97,13 +90,7 @@ namespace os
             }
         }
 
-      // TODO: call trace_printf() from the separate package, when available.
-      const char* msg = "Max number of Devices reached. Abort.\n";
-#if defined(OS_INCLUDE_TRACE_PRINTF)
-      trace_printf(msg);
-#else
-      ::write (2, msg, strlen (msg));
-#endif
+      trace_puts ("Max number of Devices reached. Abort.");
       std::abort ();
     }
 

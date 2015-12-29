@@ -20,13 +20,12 @@
 #include "posix-io/IO.h"
 #include "posix-io/File.h"
 #include "posix-io/TPool.h"
+#include "diag/trace.h"
+
 #include <cerrno>
 #include <cassert>
 #include <cstdio>
 #include <cstdarg>
-#if defined(OS_INCLUDE_TRACE_PRINTF)
-#include "diag/Trace.h"
-#endif
 
 // ----------------------------------------------------------------------------
 
@@ -52,10 +51,8 @@ TestFile::TestFile ()
   fSomething = 1;
 }
 
-#if defined ( __GNUC__ )
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
 
 int
 TestFile::do_vopen (const char* path, int oflag, std::va_list args)
@@ -65,9 +62,7 @@ TestFile::do_vopen (const char* path, int oflag, std::va_list args)
   return 0;
 }
 
-#if defined ( __GNUC__ )
 #pragma GCC diagnostic pop
-#endif
 
 // ----------------------------------------------------------------------------
 
@@ -112,12 +107,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   fil = pool.aquire ();
   assert(fil == nullptr);
 
-  const char* msg = "'test-pool-debug' succeeded.\n";
-#if defined(OS_INCLUDE_TRACE_PRINTF)
-  trace_puts (msg);
-#else
-  std::puts (msg);
-#endif
+  trace_puts ("'test-pool-debug' succeeded.\n");
 
   // Success!
   return 0;

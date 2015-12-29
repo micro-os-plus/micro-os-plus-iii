@@ -24,14 +24,13 @@
 #include "posix-io/TPool.h"
 #include "posix-io/MountManager.h"
 #include "posix-io/BlockDevice.h"
+#include "diag/trace.h"
+
 #include <cerrno>
 #include <cassert>
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>
-#if defined(OS_INCLUDE_TRACE_PRINTF)
-#include "diag/Trace.h"
-#endif
 #include "utime.h"
 
 #if defined(__ARM_EABI__)
@@ -504,12 +503,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert(dirsPool.getFlag (0) == false);
     }
 
-  const char* msg = "'test-directory-debug' succeeded.\n";
-#if defined(OS_INCLUDE_TRACE_PRINTF)
-  trace_puts (msg);
-#else
-  std::puts (msg);
-#endif
+  trace_puts ("'test-directory-debug' succeeded.");
 
   // Success!
   return 0;

@@ -19,13 +19,12 @@
 #include "posix-io/FileDescriptorsManager.h"
 #include "posix-io/IO.h"
 #include "posix-io/CharDevice.h"
+#include "diag/trace.h"
+
 #include <cerrno>
 #include <cassert>
 #include <cstdio>
 #include <cstring>
-#if defined(OS_INCLUDE_TRACE_PRINTF)
-#include "diag/Trace.h"
-#endif
 
 // ----------------------------------------------------------------------------
 
@@ -40,10 +39,8 @@ public:
 
 };
 
-#if defined ( __GNUC__ )
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
 
 int
 TestIO::do_vopen (const char *path, int oflag, va_list args)
@@ -52,9 +49,7 @@ TestIO::do_vopen (const char *path, int oflag, va_list args)
   return -1;
 }
 
-#if defined ( __GNUC__ )
 #pragma GCC diagnostic pop
-#endif
 
 // ----------------------------------------------------------------------------
 
@@ -75,66 +70,61 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
   size_t sz = os::posix::FileDescriptorsManager::getSize ();
   // Size must be 5 for this test
-  assert(sz == FD_MANAGER_ARRAY_SIZE);
+  assert (sz == FD_MANAGER_ARRAY_SIZE);
 
   for (std::size_t i = 0; i < sz; ++i)
     {
-      assert(os::posix::FileDescriptorsManager::getIo (i) == nullptr);
+      assert (os::posix::FileDescriptorsManager::getIo (i) == nullptr);
     }
 
   // Check limits.
-  assert(os::posix::FileDescriptorsManager::isValid (-1) == false);
-  assert(os::posix::FileDescriptorsManager::isValid (sz) == false);
+  assert (os::posix::FileDescriptorsManager::isValid (-1) == false);
+  assert (os::posix::FileDescriptorsManager::isValid (sz) == false);
 
   // Allocation should start with 3 (stdin, stdout, stderr preserved).
   int fd1;
   fd1 = os::posix::FileDescriptorsManager::alloc (&test1);
-  assert(fd1 == 3);
+  assert (fd1 == 3);
 
   // Get it back; is it the same?
-  assert(os::posix::FileDescriptorsManager::getIo (fd1) == &test1);
-  assert(test1.getFileDescriptor () == fd1);
+  assert (os::posix::FileDescriptorsManager::getIo (fd1) == &test1);
+  assert (test1.getFileDescriptor () == fd1);
 
   // Reallocate opened file, must be busy.
   int fd2;
   fd2 = os::posix::FileDescriptorsManager::alloc (&test1);
-  assert((fd2 == -1) && (errno == EBUSY));
+  assert ((fd2 == -1) && (errno == EBUSY));
 
   // Free descriptor.
-  assert(os::posix::FileDescriptorsManager::free (fd1) == 0);
-  assert(os::posix::FileDescriptorsManager::getIo (fd1) == nullptr);
-  assert(test1.getFileDescriptor () == os::posix::noFileDescriptor);
+  assert (os::posix::FileDescriptorsManager::free (fd1) == 0);
+  assert (os::posix::FileDescriptorsManager::getIo (fd1) == nullptr);
+  assert (test1.getFileDescriptor () == os::posix::noFileDescriptor);
 
   // With clean table, alloc repeatedly to fill the table (size is 5).
   fd1 = os::posix::FileDescriptorsManager::alloc (&test1);
-  assert(fd1 == 3);
+  assert (fd1 == 3);
   fd2 = os::posix::FileDescriptorsManager::alloc (&test2);
-  assert(fd2 == 4);
+  assert (fd2 == 4);
 
   // Table full.
   int fd3;
   fd3 = os::posix::FileDescriptorsManager::alloc (&test3);
-  assert((fd3 == -1) && (errno == ENFILE));
+  assert ((fd3 == -1) && (errno == ENFILE));
 
   // Free outside range.
-  assert(
-      (os::posix::FileDescriptorsManager::free(-1) == -1) && (errno == EBADF));
-  assert(
-      (os::posix::FileDescriptorsManager::free(sz) == -1) && (errno == EBADF));
+  assert (
+      (os::posix::FileDescriptorsManager::free (-1) == -1) && (errno == EBADF));
+  assert (
+      (os::posix::FileDescriptorsManager::free (sz) == -1) && (errno == EBADF));
 
   // Free last.
-  assert(os::posix::FileDescriptorsManager::free (sz - 1) == 0);
+  assert (os::posix::FileDescriptorsManager::free (sz - 1) == 0);
 
   // Reallocate last.
   fd3 = os::posix::FileDescriptorsManager::alloc (&test3);
-  assert(fd3 == ((os::posix::fileDescriptor_t )(sz - 1)));
+  assert (fd3 == ((os::posix::fileDescriptor_t) (sz - 1)));
 
-  const char* msg = "'test-descriptors-manager-debug' done.\n";
-#if defined(OS_INCLUDE_TRACE_PRINTF)
-  trace_puts(msg);
-#else
-  std::puts (msg);
-#endif
+  trace_puts ("'test-descriptors-manager-debug' done.");
 
   // Success!
   return 0;
