@@ -26,6 +26,8 @@
 #include "posix-io/Pool.h"
 #include "posix-io/NetStack.h"
 
+#include "posix/sys/uio.h"
+
 #include <cassert>
 #include <cerrno>
 #include <cstdarg>
