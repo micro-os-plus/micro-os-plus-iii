@@ -147,6 +147,25 @@ extern "C"
     return __posix_write (fildes, buf, nbyte);
   }
 
+  // --------------------------------------------------------------------------
+
+  void*
+  _sbrk (ptrdiff_t incr);
+
+  void*
+  __attribute__((weak))
+  sbrk (ptrdiff_t incr)
+  {
+    return _sbrk (incr);
+  }
+
+  void*
+  __attribute__((weak))
+  _sbrk_r (void* ptr, ptrdiff_t incr)
+  {
+    return _sbrk (incr);
+  }
+
 #pragma GCC diagnostic pop
 
 }
