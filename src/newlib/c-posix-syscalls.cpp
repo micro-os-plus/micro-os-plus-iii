@@ -28,6 +28,8 @@
 
 #include "posix/sys/uio.h"
 
+#include "diag/trace.h"
+
 #include <cstdarg>
 #include <cerrno>
 
@@ -109,6 +111,10 @@ __posix_read (int fildes, void* buf, size_t nbyte)
   auto* const io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
+      if (fildes == 0)
+        {
+          return 0; // Default empty input (EOF).
+        }
       errno = EBADF;
       return -1;
     }
@@ -121,6 +127,10 @@ __posix_write (int fildes, const void* buf, size_t nbyte)
   auto* const io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
+      if (fildes == 1 || fildes == 2)
+        {
+          return trace_write (buf, nbyte); // Default output on trace.
+        }
       errno = EBADF;
       return -1;
     }
@@ -196,6 +206,10 @@ __posix_isatty (int fildes)
   auto* const io = os::posix::FileDescriptorsManager::getIo (fildes);
   if (io == nullptr)
     {
+      if (fildes <= 2)
+        {
+          return true; // Default TTY for STDIN/OUT/ERR.
+        }
       errno = EBADF;
       return -1;
     }
@@ -695,7 +709,7 @@ clock_t
 __posix_clock (void)
 {
   errno = ENOSYS; // Not implemented
-  return (clock_t)-1;
+  return (clock_t) -1;
 }
 
 int
@@ -777,70 +791,38 @@ __posix_readlink (const char* path, char* buf, size_t bufsize)
 
 #pragma GCC diagnostic pop
 
-// ----------------------------------------------------------------------------
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
-// This is the standard default implementation for the routine to
-// process args. It returns a single empty arg.
-//
-// For semihosting applications, this is redefined to get the real
-// args from the debugger.
-//
-// You can redefine it to fetch some args in a non-volatile memory.
-
-void __attribute__((weak))
-__initialize_args (int* p_argc, char*** p_argv)
-{
-  // By the time we reach this, the data and bss should have been initialised.
-
-  // The strings pointed to by the argv array shall be modifiable by the
-  // program, and retain their last-stored values between program startup
-  // and program termination. (static, no const)
-  static char name[] = "";
-
-  // The string pointed to by argv[0] represents the program name;
-  // argv[0][0] shall be the null character if the program name is not
-  // available from the host environment. argv[argc] shall be a null pointer.
-  // (static, no const)
-  static char* argv[2] =
-    { name, NULL };
-
-  *p_argc = 1;
-  *p_argv = &argv[0];
-  return;
-}
-
-#pragma GCC diagnostic pop
-
-// Default STDIN, STDOUT, STDERR not defined.
 void
 initialise_monitor_handles (void)
 {
-  ;
+  // Default STDIN, STDOUT, STDERR not required, the  __posix_write()
+  // implementation defaults STDOUT/ERR to trace_write().
 }
 
 // ----------------------------------------------------------------------------
+
+#if defined(__ARM_EABI__) && (__STDC_HOSTED__ != 0)
 
 // The aliases must be in the same compilation unit as the names
 // they alias.
 
-#if defined(OS_INCLUDE_STANDARD_POSIX_FUNCTIONS)
+#if defined(OS_INCLUDE_NEWLIB_POSIX_FUNCTIONS)
 
-// For embedded environment that use POSIX system calls, redefine
-// all functions without the '__posix_' prefix.
+// For special embedded environment that use POSIX system calls
+// with the newlib reentrant code, redefine
+// some functions with _name(), others directly with name().
 
-#include "posix-io/standard-aliases.h"
+#include "posix-io/newlib-aliases.h"
 
-#elif defined(OS_INCLUDE_NEWLIB_POSIX_FUNCTIONS)
+#else
 
-// For embedded environment that use POSIX system calls, redefine
-// some functions with _name(), some directly with name().
+// For regular embedded environment that use POSIX system calls,
+// redefine **all** functions without the '__posix_' prefix.
 
 #include "posix-io/standard-aliases.h"
 
 #endif
+
+#endif /* defined(__ARM_EABI__) && (__STDC_HOSTED__ != 0) */
 
 // ----------------------------------------------------------------------------
 
