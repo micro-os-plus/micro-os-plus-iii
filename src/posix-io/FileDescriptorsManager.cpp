@@ -57,6 +57,18 @@ namespace os
 
     // ------------------------------------------------------------------------
 
+    IO*
+    FileDescriptorsManager::getIo (int fildes)
+    {
+      // Check if valid descriptor or buffer not yet initialised
+      if ((fildes < 0) || (((std::size_t) fildes) >= sfSize)
+          || (sfDescriptorsArray == nullptr))
+        {
+          return nullptr;
+        }
+      return sfDescriptorsArray[fildes];
+    }
+
     bool
     FileDescriptorsManager::isValid (int fildes)
     {
@@ -91,6 +103,27 @@ namespace os
       // Too many files open in system.
       errno = ENFILE;
       return -1;
+    }
+
+    int
+    FileDescriptorsManager::assign (fileDescriptor_t fildes, IO* io)
+    {
+      if ((fildes < 0) || (((std::size_t) fildes) >= sfSize))
+        {
+          errno = EBADF;
+          return -1;
+        }
+
+      if (io->getFileDescriptor () >= 0)
+        {
+          // Already allocated
+          errno = EBUSY;
+          return -1;
+        }
+
+      sfDescriptorsArray[fildes] = io;
+      io->setFileDescriptor (fildes);
+      return fildes;
     }
 
     int

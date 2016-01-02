@@ -67,6 +67,9 @@ namespace os
       alloc (IO* io);
 
       static int
+      assign (fileDescriptor_t fildes, IO* io);
+
+      static int
       free (fileDescriptor_t fildes);
 
       // ----------------------------------------------------------------------
@@ -83,16 +86,6 @@ namespace os
     FileDescriptorsManager::getSize (void)
     {
       return sfSize;
-    }
-
-    inline IO*
-    FileDescriptorsManager::getIo (int fildes)
-    {
-#if !defined(__ARM_EABI__)
-      assert((fildes >= 0) && (((std::size_t ) fildes) < sfSize));
-#endif
-
-      return sfDescriptorsArray[fildes];
     }
 
   } /* namespace posix */
