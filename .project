@@ -30,5 +30,10 @@
 			<type>2</type>
 			<location>/Users/ilg/My Files/MacBookPro Projects/uOS/micro-os-plus-iiie.git/ilg/portable/diag-trace-xpack/src</location>
 		</link>
+		<link>
+			<name>src/posix-arch</name>
+			<type>2</type>
+			<location>/Users/ilg/My Files/MacBookPro Projects/uOS/micro-os-plus-iiie.git/ilg/synthetic/posix-arch-xpack/src</location>
+		</link>
 	</linkedResources>
 </projectDescription>

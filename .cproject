@@ -60,7 +60,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="src/diag-trace/trace-itm.c|src/diag-trace/trace-posix-stderr.c|src/diag-trace/trace-semihosting-output.c|src/diag-trace/trace-semihosting-debug.c|src/diag-trace/trace-posix.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="src/posix-arch/diag/trace-posix-stdout.cpp|src/newlib/c-newlib-reent.cpp|src/diag-trace/trace-itm.c|src/diag-trace/trace-posix-stderr.c|src/diag-trace/trace-semihosting-output.c|src/diag-trace/trace-semihosting-debug.c|src/diag-trace/trace-posix.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -134,7 +134,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="diag-trace/trace-itm.c|diag-trace/trace-posix-stderr.c|diag-trace/trace-semihosting-output.c|diag-trace/trace-semihosting-debug.c|diag-trace/trace-posix.c" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
+						<entry excluding="posix-arch/diag/trace-posix-stderr.cpp|newlib/c-newlib-reent.cpp|diag-trace/trace-itm.c|diag-trace/trace-posix-stderr.c|diag-trace/trace-semihosting-output.c|diag-trace/trace-semihosting-debug.c|diag-trace/trace-posix.c" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="tests/descriptors-manager"/>
 					</sourceEntries>
 				</configuration>
@@ -208,7 +208,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="diag-trace/trace-itm.c|diag-trace/trace-posix-stderr.c|diag-trace/trace-semihosting-output.c|diag-trace/trace-semihosting-debug.c|diag-trace/trace-posix.c" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
+						<entry excluding="posix-arch/diag/trace-posix-stdout.cpp|newlib/c-newlib-reent.cpp|diag-trace/trace-itm.c|diag-trace/trace-posix-stderr.c|diag-trace/trace-semihosting-output.c|diag-trace/trace-semihosting-debug.c|diag-trace/trace-posix.c" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="tests/device"/>
 					</sourceEntries>
 				</configuration>
@@ -282,7 +282,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="diag-trace/trace-itm.c|diag-trace/trace-posix-stderr.c|diag-trace/trace-semihosting-output.c|diag-trace/trace-semihosting-debug.c|diag-trace/trace-posix.c" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
+						<entry excluding="posix-arch/diag/trace-posix-stdout.cpp|newlib/c-newlib-reent.cpp|diag-trace/trace-itm.c|diag-trace/trace-posix-stderr.c|diag-trace/trace-semihosting-output.c|diag-trace/trace-semihosting-debug.c|diag-trace/trace-posix.c" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="tests/pool"/>
 					</sourceEntries>
 				</configuration>
@@ -356,7 +356,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="diag-trace/trace-itm.c|diag-trace/trace-posix-stderr.c|diag-trace/trace-semihosting-output.c|diag-trace/trace-semihosting-debug.c|diag-trace/trace-posix.c" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
+						<entry excluding="posix-arch/diag/trace-posix-stdout.cpp|newlib/c-newlib-reent.cpp|diag-trace/trace-itm.c|diag-trace/trace-posix-stderr.c|diag-trace/trace-semihosting-output.c|diag-trace/trace-semihosting-debug.c|diag-trace/trace-posix.c" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="tests/file"/>
 					</sourceEntries>
 				</configuration>
@@ -430,7 +430,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="diag-trace/trace-itm.c|diag-trace/trace-posix-stderr.c|diag-trace/trace-semihosting-output.c|diag-trace/trace-semihosting-debug.c|diag-trace/trace-posix.c" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
+						<entry excluding="posix-arch/diag/trace-posix-stdout.cpp|newlib/c-newlib-reent.cpp|diag-trace/trace-itm.c|diag-trace/trace-posix-stderr.c|diag-trace/trace-semihosting-output.c|diag-trace/trace-semihosting-debug.c|diag-trace/trace-posix.c" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="tests/directory"/>
 					</sourceEntries>
 				</configuration>
@@ -504,7 +504,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="diag-trace/trace-itm.c|diag-trace/trace-posix-stderr.c|diag-trace/trace-semihosting-output.c|diag-trace/trace-semihosting-debug.c|diag-trace/trace-posix.c" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
+						<entry excluding="posix-arch/diag/trace-posix-stdout.cpp|newlib/c-newlib-reent.cpp|diag-trace/trace-itm.c|diag-trace/trace-posix-stderr.c|diag-trace/trace-semihosting-output.c|diag-trace/trace-semihosting-debug.c|diag-trace/trace-posix.c" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="tests/socket"/>
 					</sourceEntries>
 				</configuration>
