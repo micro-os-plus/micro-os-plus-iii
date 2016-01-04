@@ -331,7 +331,6 @@ namespace os
                       }
                     if (nbyte > 0)
                       {
-                        // TODO: check exit
                         if (fDriver->Send (pbuf, nbyte) != ARM_DRIVER_OK)
                           {
                             errno = EIO;
