@@ -57,12 +57,19 @@ public:
   inline
   TestCriticalSection ()
   {
+    // Code to enter critical section
+    // fStatus=ceva();
   }
 
   inline
   ~TestCriticalSection ()
   {
+    // Code to exit critical section
+    // altceva(fStatus);
   }
+
+private:
+  // uint32_t fStatus;
 };
 
 using BufferedCmsisUsartCharDevice =
