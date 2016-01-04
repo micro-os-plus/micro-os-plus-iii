@@ -119,6 +119,9 @@ namespace os
       fileDescriptor_t
       getFileDescriptor (void) const;
 
+      bool
+      isOpened (void);
+
     protected:
 
       // ----------------------------------------------------------------------
@@ -155,6 +158,9 @@ namespace os
       // acquired from a pool.
       virtual void
       doRelease (void);
+
+      virtual bool
+      doIsOpened (void);
 
       void
       setFileDescriptor (fileDescriptor_t fildes);
@@ -200,6 +206,12 @@ namespace os
     IO::getFileDescriptor (void) const
     {
       return fFileDescriptor;
+    }
+
+    inline bool
+    IO::isOpened (void)
+    {
+      return doIsOpened ();
     }
 
   } /* namespace posix */

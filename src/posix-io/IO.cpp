@@ -159,6 +159,12 @@ namespace os
     {
       errno = 0;
 
+      if (!isOpened ())
+        {
+          errno = EBADF; // Not opened.
+          return -1;
+        }
+
       // Execute the implementation specific code.
       int ret = do_close ();
 
@@ -177,6 +183,12 @@ namespace os
       return;
     }
 
+    bool
+    IO::doIsOpened (void)
+    {
+      return true;
+    }
+
     // ------------------------------------------------------------------------
 
     // All these wrappers are required to clear 'errno'.
@@ -188,6 +200,12 @@ namespace os
       if (buf == nullptr)
         {
           errno = EFAULT;
+          return -1;
+        }
+
+      if (!isOpened ())
+        {
+          errno = EBADF; // Not opened.
           return -1;
         }
 
@@ -206,7 +224,18 @@ namespace os
           return -1;
         }
 
+      if (!isOpened ())
+        {
+          errno = EBADF; // Not opened.
+          return -1;
+        }
+
       errno = 0;
+
+      if (nbyte == 0)
+        {
+          return 0; // Nothing to do.
+        }
 
       // Execute the implementation specific code.
       return do_write (buf, nbyte);
@@ -224,6 +253,12 @@ namespace os
       if (iovcnt <= 0)
         {
           errno = EINVAL;
+          return -1;
+        }
+
+      if (!isOpened ())
+        {
+          errno = EBADF; // Not opened.
           return -1;
         }
 
@@ -248,6 +283,12 @@ namespace os
     int
     IO::vfcntl (int cmd, std::va_list args)
     {
+      if (!isOpened ())
+        {
+          errno = EBADF; // Not opened.
+          return -1;
+        }
+
       errno = 0;
 
       // Execute the implementation specific code.
@@ -270,6 +311,12 @@ namespace os
       if (buf == nullptr)
         {
           errno = EFAULT;
+          return -1;
+        }
+
+      if (!isOpened ())
+        {
+          errno = EBADF; // Not opened.
           return -1;
         }
 
