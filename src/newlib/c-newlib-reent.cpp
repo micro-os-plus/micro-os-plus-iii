@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if defined(__ARM_EABI__)
+
 #include "posix-io/types.h"
 
 // ----------------------------------------------------------------------------
@@ -169,6 +171,8 @@ extern "C"
 #pragma GCC diagnostic pop
 
 }
+
+#endif /* defined(__ARM_EABI__) */
 
 // ----------------------------------------------------------------------------
 
