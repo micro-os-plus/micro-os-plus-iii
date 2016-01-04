@@ -72,6 +72,9 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
+					<sourceEntries>
+						<entry excluding="src/CmsisUsartCharDevice.cpp|src/posix-arch/diag/trace-posix-stdout.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+					</sourceEntries>
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
@@ -96,6 +99,10 @@
 							<builder buildPath="${workspace_loc:/posix-io-xpack}/Debug" id="cdt.managedbuild.target.gnu.builder.macosx.exe.debug.309371455" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.macosx.exe.debug"/>
 							<tool id="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.debug.943411277" name="MacOS X C Linker" superClass="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.debug"/>
 							<tool id="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.debug.516440627" name="MacOS X C++ Linker" superClass="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.debug">
+								<option id="macosx.cpp.link.option.other.1822823096" name="Other options (-Xlinker [option])" superClass="macosx.cpp.link.option.other" valueType="stringList">
+									<listOptionValue builtIn="false" value="-map"/>
+									<listOptionValue builtIn="false" value="x.map"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.macosx.cpp.linker.input.1030298384" superClass="cdt.managedbuild.tool.macosx.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -107,6 +114,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/posix-drivers-xpack/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/arm-cmsis-xpack/CMSIS/Driver/Include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/arm-cmsis-xpack/CMSIS/RTOS/Template}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/portable/diag-trace-xpack/include}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.772612569" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -119,6 +127,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/posix-drivers-xpack/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/arm-cmsis-xpack/CMSIS/Driver/Include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/arm-cmsis-xpack/CMSIS/RTOS/Template}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/portable/diag-trace-xpack/include}&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.dialect.std.2026595517" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" value="gnu.cpp.compiler.dialect.default" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.dialect.flags.1833142707" name="Other dialect flags" superClass="gnu.cpp.compiler.option.dialect.flags" value="-std=c++11" valueType="string"/>
@@ -136,6 +145,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/posix-drivers-xpack/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/arm-cmsis-xpack/CMSIS/Driver/Include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/arm-cmsis-xpack/CMSIS/RTOS/Template}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/portable/diag-trace-xpack/include}&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.dialect.std.260388638" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" value="gnu.c.compiler.dialect.c11" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.warnings.extrawarn.1972958611" name="Extra warnings (-Wextra)" superClass="gnu.c.compiler.option.warnings.extrawarn" value="true" valueType="boolean"/>
@@ -147,9 +157,96 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
+						<entry excluding="CmsisUsartCharDevice.cpp|posix-arch/diag/trace-posix-stdout.cpp" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="tests/file"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="tests/usart"/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.config.gnu.macosx.exe.debug.1096629270.183563323.100602121.1508084924.2010317743.1525051572.1314838253">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.macosx.exe.debug.1096629270.183563323.100602121.1508084924.2010317743.1525051572.1314838253" moduleId="org.eclipse.cdt.core.settings" name="test-bcbuff-debug">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.MachO64" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.macosx.exe.debug.1096629270.183563323.100602121.1508084924.2010317743.1525051572.1314838253" name="test-bcbuff-debug" parent="cdt.managedbuild.config.gnu.macosx.exe.debug">
+					<folderInfo id="cdt.managedbuild.config.gnu.macosx.exe.debug.1096629270.183563323.100602121.1508084924.2010317743.1525051572.1314838253." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.macosx.exe.debug.2072976866" name="MacOSX GCC" superClass="cdt.managedbuild.toolchain.gnu.macosx.exe.debug">
+							<targetPlatform id="cdt.managedbuild.target.gnu.platform.macosx.exe.debug.1546556012" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.macosx.exe.debug"/>
+							<builder buildPath="${workspace_loc:/posix-io-xpack}/Debug" id="cdt.managedbuild.target.gnu.builder.macosx.exe.debug.756271070" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.macosx.exe.debug"/>
+							<tool id="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.debug.1368859802" name="MacOS X C Linker" superClass="cdt.managedbuild.tool.macosx.c.linker.macosx.exe.debug"/>
+							<tool id="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.debug.1659668802" name="MacOS X C++ Linker" superClass="cdt.managedbuild.tool.macosx.cpp.linker.macosx.exe.debug">
+								<option id="macosx.cpp.link.option.other.1049873855" name="Other options (-Xlinker [option])" superClass="macosx.cpp.link.option.other" valueType="stringList">
+									<listOptionValue builtIn="false" value="-map"/>
+									<listOptionValue builtIn="false" value="x.map"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.macosx.cpp.linker.input.1907303248" superClass="cdt.managedbuild.tool.macosx.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.macosx.exe.debug.1875671218" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.macosx.exe.debug">
+								<option id="gnu.both.asm.option.include.paths.679832845" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/posix-io-xpack/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/posix-drivers-xpack/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/arm-cmsis-xpack/CMSIS/Driver/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/arm-cmsis-xpack/CMSIS/RTOS/Template}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/portable/diag-trace-xpack/include}&quot;"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.412417199" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.macosx.base.1461186386" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.macosx.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.debug.1223970357" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.debug">
+								<option id="gnu.cpp.compilermacosx.exe.debug.option.optimization.level.563845905" name="Optimization Level" superClass="gnu.cpp.compilermacosx.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.macosx.exe.debug.option.debugging.level.194909981" name="Debug Level" superClass="gnu.cpp.compiler.macosx.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.include.paths.96355357" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/posix-io-xpack/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/posix-drivers-xpack/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/arm-cmsis-xpack/CMSIS/Driver/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/arm-cmsis-xpack/CMSIS/RTOS/Template}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/portable/diag-trace-xpack/include}&quot;"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.dialect.std.1032007028" name="Language standard" superClass="gnu.cpp.compiler.option.dialect.std" value="gnu.cpp.compiler.dialect.default" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.dialect.flags.1594104047" name="Other dialect flags" superClass="gnu.cpp.compiler.option.dialect.flags" value="-std=c++11" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.warnings.extrawarn.154124859" name="Extra warnings (-Wextra)" superClass="gnu.cpp.compiler.option.warnings.extrawarn" value="true" valueType="boolean"/>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.874909956" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="DEBUG"/>
+									<listOptionValue builtIn="false" value="TRACE"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1069008393" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.macosx.exe.debug.311180808" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.macosx.exe.debug">
+								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.macosx.exe.debug.option.optimization.level.1373212879" name="Optimization Level" superClass="gnu.c.compiler.macosx.exe.debug.option.optimization.level" valueType="enumerated"/>
+								<option id="gnu.c.compiler.macosx.exe.debug.option.debugging.level.1745075999" name="Debug Level" superClass="gnu.c.compiler.macosx.exe.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.include.paths.766290595" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/posix-io-xpack/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/posix-drivers-xpack/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/arm-cmsis-xpack/CMSIS/Driver/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/arm-cmsis-xpack/CMSIS/RTOS/Template}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/portable/diag-trace-xpack/include}&quot;"/>
+								</option>
+								<option id="gnu.c.compiler.option.dialect.std.1955528013" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" value="gnu.c.compiler.dialect.c11" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.warnings.extrawarn.217860387" name="Extra warnings (-Wextra)" superClass="gnu.c.compiler.option.warnings.extrawarn" value="true" valueType="boolean"/>
+								<option id="gnu.c.compiler.option.preprocessor.def.symbols.1406996542" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="DEBUG"/>
+									<listOptionValue builtIn="false" value="TRACE"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1212833170" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="CmsisUsartCharDevice.cpp|posix-arch/diag/trace-posix-stdout.cpp" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="tests/bcbuff"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -166,16 +263,28 @@
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.macosx.exe.debug.1096629270.183563323.100602121.1508084924.2010317743.1525051572;cdt.managedbuild.config.gnu.macosx.exe.debug.1096629270.183563323.100602121.1508084924.2010317743.1525051572.;cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.debug.1531646131;cdt.managedbuild.tool.gnu.cpp.compiler.input.819261635">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.10748421;ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.10748421.;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.42917846;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.272081430">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.10748421;ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.10748421.;ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.213616891;ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.input.115467136">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.10748421.1733064824;ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.10748421.1733064824.;cdt.managedbuild.tool.gnu.cpp.compiler.macosx.base.1749233487;cdt.managedbuild.tool.gnu.cpp.compiler.input.587482751">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.macosx.exe.debug.1096629270.183563323.100602121.1508084924.2010317743.1525051572;cdt.managedbuild.config.gnu.macosx.exe.debug.1096629270.183563323.100602121.1508084924.2010317743.1525051572.;cdt.managedbuild.tool.gnu.c.compiler.macosx.exe.debug.1443462578;cdt.managedbuild.tool.gnu.c.compiler.input.1662064795">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.macosx.exe.debug.1096629270.183563323.100602121.1508084924.2010317743.1525051572.1314838253;cdt.managedbuild.config.gnu.macosx.exe.debug.1096629270.183563323.100602121.1508084924.2010317743.1525051572.1314838253.;cdt.managedbuild.tool.gnu.c.compiler.macosx.exe.debug.311180808;cdt.managedbuild.tool.gnu.c.compiler.input.1212833170">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.macosx.exe.debug.1096629270.183563323.100602121.1508084924.2010317743.1525051572.1314838253;cdt.managedbuild.config.gnu.macosx.exe.debug.1096629270.183563323.100602121.1508084924.2010317743.1525051572.1314838253.;cdt.managedbuild.tool.gnu.cpp.compiler.macosx.exe.debug.1223970357;cdt.managedbuild.tool.gnu.cpp.compiler.input.1069008393">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="ilg.gnuarmeclipse.managedbuild.cross.config.elf.release.603382886;ilg.gnuarmeclipse.managedbuild.cross.config.elf.release.603382886.;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.2067308846;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.2024066717">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.10748421.1733064824;ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.10748421.1733064824.;cdt.managedbuild.tool.gnu.c.compiler.macosx.base.644791149;cdt.managedbuild.tool.gnu.c.compiler.input.75569991">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.10748421;ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.10748421.;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.42917846;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.272081430">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.10748421;ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.10748421.;ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.213616891;ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.input.115467136">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="ilg.gnuarmeclipse.managedbuild.cross.config.elf.release.603382886;ilg.gnuarmeclipse.managedbuild.cross.config.elf.release.603382886.;ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.98249122;ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.input.105121368">
@@ -184,13 +293,7 @@
 		<scannerConfigBuildInfo instanceId="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.10748421.1733064824;ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.10748421.1733064824.;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.423214947;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.2114849963">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="ilg.gnuarmeclipse.managedbuild.cross.config.elf.release.603382886;ilg.gnuarmeclipse.managedbuild.cross.config.elf.release.603382886.;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.2067308846;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.2024066717">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.10748421.1733064824;ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.10748421.1733064824.;ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.1007207734;ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.input.1863871005">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.10748421.1733064824;ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.10748421.1733064824.;cdt.managedbuild.tool.gnu.c.compiler.macosx.base.644791149;cdt.managedbuild.tool.gnu.c.compiler.input.75569991">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 	</storageModule>
