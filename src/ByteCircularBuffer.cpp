@@ -147,6 +147,20 @@ namespace os
       return adjust;
     }
 
+    void
+    ByteCircularBuffer::retreatBack (void)
+    {
+      if (fBack == fBuf)
+        {
+          fBack = (uint8_t*) (fBuf + fSize - 1);
+        }
+      else
+        {
+          fBack -= 1;
+        }
+      fLen--;
+    }
+
     std::size_t
     ByteCircularBuffer::popFront (uint8_t* buf)
     {

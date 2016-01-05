@@ -58,6 +58,9 @@ namespace os
       std::size_t
       advanceBack (std::size_t count);
 
+      void
+      retreatBack (void);
+
       // Retrieve bytes from the front of the buffer.
       std::size_t
       popFront (uint8_t* buf);
