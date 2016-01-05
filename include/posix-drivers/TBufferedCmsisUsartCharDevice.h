@@ -24,6 +24,8 @@
 #include "posix-io/CharDevice.h"
 #include "posix-drivers/ByteCircularBuffer.h"
 
+#include "diag/trace.h"
+
 #include "cmsis_os.h"
 #include "Driver_USART.h"
 
@@ -39,10 +41,11 @@
 // back a data pointer, so this should be implemented as a truly static
 // function that forwards the event to the instance.
 
-// TODO:
+// TODO: (multiline)
 // - add flow control on both send & receive
 // - add link control (connected/disconnected)
 // - cancel pending reads/writes at close
+// - add error processing
 
 namespace os
 {
@@ -118,6 +121,8 @@ namespace os
         os::dev::ByteCircularBuffer* fRxBuf;
         os::dev::ByteCircularBuffer* fTxBuf;
 
+        std::size_t fRxCount;bool volatile fTxBusy;
+
       };
 
     // ------------------------------------------------------------------------
@@ -128,15 +133,18 @@ namespace os
           ARM_USART_SignalEvent_t eventCallBack,
           os::dev::ByteCircularBuffer* rxBuf,
           os::dev::ByteCircularBuffer* txBuf) :
-          CharDevice (deviceName), //
+          //
+          CharDevice (deviceName), // Construct parent.
+          //
           fDriver (driver), //
           fEventCallBack (eventCallBack), //
+          fRxSem (nullptr), //
+          fTxSem (nullptr), //
           fRxBuf (rxBuf), //
-          fTxBuf (txBuf) //
+          fTxBuf (txBuf), //
+          fRxCount (0), //
+          fTxBusy (false) //
       {
-        fRxSem = nullptr;
-        fTxSem = nullptr;
-
         assert(rxBuf != nullptr);
         // txBuf may be null.
       }
@@ -317,25 +325,25 @@ namespace os
 
                     status = fDriver->GetStatus ();
                   }
-                // TODO: check if status can be non-busy between interrupts,
-                // since this can lead to unordered writes. If so, a local
-                // busy flag needs to be maintained.
-                if (!status.tx_busy)
+                // We use our own tx busy flag because the ARM driver's flag
+                // may become free between transmissions.
+                if (!fTxBusy)
                   {
                     uint8_t* pbuf;
-                    std::size_t nbyte;
+                    std::size_t nb;
                       {
                         CriticalSection cs; // -----
 
-                        nbyte = fTxBuf->getFrontContiguousBuffer (&pbuf);
+                        nb = fTxBuf->getFrontContiguousBuffer (&pbuf);
                       }
-                    if (nbyte > 0)
+                    if (nb > 0)
                       {
-                        if (fDriver->Send (pbuf, nbyte) != ARM_DRIVER_OK)
+                        if (fDriver->Send (pbuf, nb) != ARM_DRIVER_OK)
                           {
                             errno = EIO;
                             return -1;
                           }
+                        fTxBusy = true;
                       }
                   }
 
@@ -345,9 +353,9 @@ namespace os
 
                     isBelowHWM = fTxBuf->isBelowHighWaterMark ();
                   }
-                if (isBelowHWM && (count > 0))
+                if (count == nbyte)
                   {
-                    return count;
+                    return nbyte;
                   }
 
                 // Block and wait for buffer to be freed.
@@ -432,16 +440,32 @@ namespace os
                 | ARM_USART_EVENT_RX_FRAMING_ERROR | ARM_USART_EVENT_RX_TIMEOUT)))
           {
             // TODO: process errors and timeouts
-            std::size_t count = fDriver->GetRxCount ();
+            std::size_t tmpCount = fDriver->GetRxCount ();
+            std::size_t count = tmpCount - fRxCount;
+            fRxCount = tmpCount;
             std::size_t adjust = fRxBuf->advanceBack (count);
             assert(count == adjust);
 
-            uint8_t* pbuf;
-            std::size_t nbyte = fRxBuf->getBackContiguousBuffer (&pbuf);
-            if (nbyte > 0)
+            if (event & ARM_USART_EVENT_RECEIVE_COMPLETE)
               {
+                uint8_t* pbuf;
+                std::size_t nbyte = fRxBuf->getBackContiguousBuffer (&pbuf);
+                if (nbyte == 0)
+                  {
+                    // Overwrite the last byte, but keep the driver in
+                    // receive mode continuously.
+                    fRxBuf->retreatBack ();
+                    nbyte = fRxBuf->getBackContiguousBuffer (&pbuf);
+                  }
+                assert(nbyte > 0);
+
                 // Read as much as we can.
-                fDriver->Receive (pbuf, nbyte);
+                int32_t status;
+                status = fDriver->Receive (pbuf, nbyte);
+                // TODO: implement error processing.
+                assert(status == ARM_DRIVER_OK);
+
+                fRxCount = 0;
               }
             if (count > 0)
               {
@@ -461,7 +485,14 @@ namespace os
                 std::size_t nbyte = fTxBuf->getFrontContiguousBuffer (&pbuf);
                 if (nbyte > 0)
                   {
-                    fDriver->Send (pbuf, nbyte);
+                    int32_t status;
+                    status = fDriver->Send (pbuf, nbyte);
+                    // TODO: implement error processing
+                    assert(status == ARM_DRIVER_OK);
+                  }
+                else
+                  {
+                    fTxBusy = false;
                   }
                 if (fTxBuf->isBelowLowWaterMark ())
                   {
