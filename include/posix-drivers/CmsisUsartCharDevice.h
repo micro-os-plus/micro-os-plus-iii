@@ -108,7 +108,7 @@ namespace os
       osSemaphoreDef(fTxSem);
 
       uint8_t fBuffer[BUFF_LEN];
-      uint16_t fCntIn, fCntOut;
+      std::size_t fCntIn, fCntOut;
 
     };
 

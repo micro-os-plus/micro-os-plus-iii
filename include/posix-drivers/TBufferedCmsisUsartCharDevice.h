@@ -121,7 +121,8 @@ namespace os
         os::dev::ByteCircularBuffer* fRxBuf;
         os::dev::ByteCircularBuffer* fTxBuf;
 
-        std::size_t fRxCount;bool volatile fTxBusy;
+        std::size_t fRxCount; //
+        bool volatile fTxBusy;
 
       };
 

@@ -35,11 +35,11 @@ namespace os
 
     CmsisUsartCharDevice::CmsisUsartCharDevice (
         const char* deviceName, ARM_DRIVER_USART* driver,
-        ARM_USART_SignalEvent_t eventCallBack) :
+        ARM_USART_SignalEvent_t callBack) :
         CharDevice (deviceName)
     {
       fDriver = driver;
-      fEventCallBack = eventCallBack;
+      fEventCallBack = callBack;
 
       fRxSem = nullptr;
       fTxSem = nullptr;
@@ -174,7 +174,10 @@ namespace os
         {
           osSemaphoreWait (fRxSem, osWaitForever);  // wait for an event
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
           status = fDriver->GetStatus ();
+#pragma GCC diagnostic pop
           if (status.rx_framing_error)  // other error checking should be added here
             {
               errno = EIO;
@@ -201,7 +204,10 @@ namespace os
       ssize_t count;
 
       ARM_USART_STATUS status;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
       status = fDriver->GetStatus ();
+#pragma GCC diagnostic pop
       if (status.tx_busy)
         {
           osSemaphoreWait (fTxSem, osWaitForever);

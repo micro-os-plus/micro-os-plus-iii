@@ -31,12 +31,12 @@ namespace os
     // ------------------------------------------------------------------------
 
     ByteCircularBuffer::ByteCircularBuffer (const uint8_t* buf,
-                                            std::size_t size,
+                                            std::size_t siz,
                                             std::size_t highWaterMark,
                                             std::size_t lowWaterMark) :
         fBuf (buf), //
-        fSize (size), //
-        fHighWaterMark (highWaterMark <= fSize ? highWaterMark : size), //
+        fSize (siz), //
+        fHighWaterMark (highWaterMark <= fSize ? highWaterMark : siz), //
         fLowWaterMark (lowWaterMark)
     {
       assert(fLowWaterMark <= fHighWaterMark);
@@ -45,8 +45,8 @@ namespace os
     }
 
     ByteCircularBuffer::ByteCircularBuffer (const uint8_t* buf,
-                                            std::size_t size) :
-        ByteCircularBuffer (buf, size, size, 0)
+                                            std::size_t siz) :
+        ByteCircularBuffer (buf, siz, siz, 0)
     {
       ;
     }
@@ -88,38 +88,38 @@ namespace os
     {
       assert(buf != nullptr);
 
-      std::size_t length = count;
+      std::size_t len = count;
       if (count > (fSize - fLen))
         {
-          length = fSize - fLen;
+          len = fSize - fLen;
         }
 
-      if (length == 0)
+      if (len == 0)
         {
           return 0;
         }
 
       std::size_t sizeToEnd = (std::size_t) (fSize - (fBack - fBuf));
-      if (length <= sizeToEnd)
+      if (len <= sizeToEnd)
         {
-          std::memcpy (fBack, buf, length);
-          fBack += length;
+          std::memcpy (fBack, buf, len);
+          fBack += len;
           if ((std::size_t) (fBack - fBuf) >= fSize)
             {
               // Wrap.
               fBack = const_cast<uint8_t* volatile > (fBuf);
             }
-          fLen += length;
+          fLen += len;
         }
       else
         {
           std::memcpy (fBack, buf, sizeToEnd);
           fBack = const_cast<uint8_t* volatile > (fBuf);
-          std::memcpy (fBack, buf + sizeToEnd, length - sizeToEnd);
-          fBack += (length - sizeToEnd);
-          fLen += length;
+          std::memcpy (fBack, buf + sizeToEnd, len - sizeToEnd);
+          fBack += (len - sizeToEnd);
+          fLen += len;
         }
-      return length;
+      return len;
     }
 
     std::size_t
@@ -185,36 +185,36 @@ namespace os
     }
 
     std::size_t
-    ByteCircularBuffer::popFront (uint8_t* buf, std::size_t size)
+    ByteCircularBuffer::popFront (uint8_t* buf, std::size_t siz)
     {
       assert(buf != nullptr);
 
-      std::size_t length = size;
-      if (length > fLen)
+      std::size_t len = siz;
+      if (len > fLen)
         {
-          length = fLen;
+          len = fLen;
         }
 
       std::size_t sizeToEnd = fSize - (std::size_t) (fFront - fBuf);
-      if (length <= sizeToEnd)
+      if (len <= sizeToEnd)
         {
-          std::memcpy (buf, fFront, length);
-          fFront += length;
+          std::memcpy (buf, fFront, len);
+          fFront += len;
           if ((std::size_t) (fFront - fBuf) >= fSize)
             {
               fFront = const_cast<uint8_t* volatile > (fBuf);
             }
-          fLen -= length;
+          fLen -= len;
         }
       else
         {
           std::memcpy (buf, fFront, sizeToEnd);
           fFront = const_cast<uint8_t* volatile > (fBuf);
-          std::memcpy (buf + sizeToEnd, fFront, length - sizeToEnd);
-          fFront += (length - sizeToEnd);
-          fLen -= length;
+          std::memcpy (buf + sizeToEnd, fFront, len - sizeToEnd);
+          fFront += (len - sizeToEnd);
+          fLen -= len;
         }
-      return length;
+      return len;
     }
 
     std::size_t
@@ -249,13 +249,13 @@ namespace os
       *ppbuf = fFront;
 
       std::size_t sizeToEnd = fSize - (std::size_t) (fFront - fBuf);
-      std::size_t length = sizeToEnd;
-      if (length > fLen)
+      std::size_t len = sizeToEnd;
+      if (len > fLen)
         {
-          length = fLen;
+          len = fLen;
         }
 
-      return length;
+      return len;
     }
 
     std::size_t
@@ -265,13 +265,13 @@ namespace os
       *ppbuf = fBack;
 
       std::size_t sizeToEnd = fSize - (std::size_t) (fBack - fBuf);
-      std::size_t length = sizeToEnd;
-      if (length > (fSize - fLen))
+      std::size_t len = sizeToEnd;
+      if (len > (fSize - fLen))
         {
-          length = fSize - fLen;
+          len = fSize - fLen;
         }
 
-      return length;
+      return len;
     }
 
     void
