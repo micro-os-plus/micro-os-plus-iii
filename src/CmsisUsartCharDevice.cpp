@@ -167,7 +167,7 @@ namespace os
     CmsisUsartCharDevice::do_read (void* buf, std::size_t nbyte)
     {
       ssize_t count = 0;
-      uint8_t *ubuf = (uint8_t *) buf;
+      uint8_t* ubuf = (uint8_t*) buf;
       ARM_USART_STATUS status;
 
       while (fCntOut == ((fCntIn = fDriver->GetRxCount ())))
