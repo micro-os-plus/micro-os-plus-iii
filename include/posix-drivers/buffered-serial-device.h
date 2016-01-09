@@ -23,7 +23,7 @@
 
 #include "posix-io/CharDevice.h"
 #include "posix-drivers/ByteCircularBuffer.h"
-#include "posix-drivers/Cmsis_serial_driver.h"
+#include "posix-drivers/cmsis-driver-serial.h"
 
 #include "diag/trace.h"
 
@@ -205,7 +205,7 @@ namespace os
             if (result != ARM_DRIVER_OK)
               break;
 
-            result = driver_->configure_power (ARM_POWER_FULL);
+            result = driver_->power (ARM_POWER_FULL);
             if (result != ARM_DRIVER_OK)
               break;
 
@@ -241,7 +241,7 @@ namespace os
 
         if (result != ARM_DRIVER_OK)
           {
-            driver_->configure_power (ARM_POWER_OFF);
+            driver_->power (ARM_POWER_OFF);
             driver_->uninitialize ();
 
             errno = ENOSR;
@@ -272,7 +272,7 @@ namespace os
         // Disable USART and I/O pins used.
         driver_->control (ARM_USART_CONTROL_TX, 0);
         driver_->control (ARM_USART_CONTROL_RX, 0);
-        driver_->configure_power (ARM_POWER_OFF);
+        driver_->power (ARM_POWER_OFF);
         driver_->uninitialize ();
 
         // Return POSIX OK.
@@ -326,18 +326,18 @@ namespace os
               }
             while (true)
               {
-                ARM_USART_STATUS status;
-                  {
-                    Critical_section cs; // -----
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Waggregate-return"
-                    status = driver_->get_status ();
-#pragma GCC diagnostic pop
-
-                  }
-                // We use our own tx busy flag because the ARM driver's flag
-                // may become free between transmissions.
+//                ARM_USART_STATUS status;
+//                  {
+//                    Critical_section cs; // -----
+//
+//#pragma GCC diagnostic push
+//#pragma GCC diagnostic ignored "-Waggregate-return"
+//                    status = driver_->get_status ();
+//#pragma GCC diagnostic pop
+//
+//                  }
+                // We use a local tx busy flag because the ARM driver's flag
+                // may become not-busy between transmissions.
                 if (!tx_busy_)
                   {
                     uint8_t* pbuf;
@@ -521,6 +521,7 @@ namespace os
           }
       }
 
+    // Static call-back; forward to object implementation.
     template<typename Cs_T>
       void
       Buffered_serial_device<Cs_T>::signal_event (

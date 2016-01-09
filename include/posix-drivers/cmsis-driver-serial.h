@@ -16,8 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef POSIX_DRIVERS_CMSIS_SERIAL_DRIVER_H_
-#define POSIX_DRIVERS_CMSIS_SERIAL_DRIVER_H_
+#ifndef POSIX_DRIVERS_CMSIS_DRIVER_SERIAL_H_
+#define POSIX_DRIVERS_CMSIS_DRIVER_SERIAL_H_
 
 #include "Driver_USART.h"
 
@@ -43,7 +43,7 @@ namespace os
 
         // --------------------------------------------------------------------
 
-        Serial () = default;
+        Serial ();
 
         virtual
         ~Serial () = default;
@@ -56,14 +56,14 @@ namespace os
         virtual ARM_USART_CAPABILITIES
         get_capabilities (void) = 0;
 
-        virtual int32_t
-        initialize (signal_event_t cb_event, const void* cb_object) = 0;
+        int32_t
+        initialize (signal_event_t cb_event, const void* cb_object = nullptr);
 
         virtual int32_t
         uninitialize (void) = 0;
 
         virtual int32_t
-        configure_power (ARM_POWER_STATE state) = 0;
+        power (ARM_POWER_STATE state) = 0;
 
         virtual int32_t
         send (const void* data, uint32_t num) = 0;
@@ -92,9 +92,22 @@ namespace os
         virtual ARM_USART_MODEM_STATUS
         get_modem_status (void) = 0;
 
+        void
+        event_callback (uint32_t event);
+
+      protected:
+
+        virtual int32_t
+        do_initialize (void) = 0;
+
+      protected:
+
+        signal_event_t cb_event_;
+        const void* cb_object_;
+
       };
     } /* namespace driver */
   } /* namespace cmsis */
 } /* namespace os */
 
-#endif /* POSIX_DRIVERS_CMSIS_SERIAL_DRIVER_H_ */
+#endif /* POSIX_DRIVERS_CMSIS_DRIVER_SERIAL_H_ */
