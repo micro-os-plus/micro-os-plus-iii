@@ -42,6 +42,9 @@ namespace os
 
       // ----------------------------------------------------------------------
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
       ARM_DRIVER_VERSION
       Usart_wrapper::get_version (void)
       {
@@ -53,6 +56,8 @@ namespace os
       {
         return driver_->GetCapabilities ();
       }
+
+#pragma GCC diagnostic pop
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
