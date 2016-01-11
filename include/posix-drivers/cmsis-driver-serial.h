@@ -22,6 +22,7 @@
 #include "Driver_USART.h"
 
 // ----------------------------------------------------------------------------
+#ifdef __cplusplus
 
 namespace os
 {
@@ -93,7 +94,7 @@ namespace os
         get_modem_status (void) = 0;
 
         void
-        event_callback (uint32_t event);
+        signal_event (uint32_t event);
 
       protected:
 
@@ -102,12 +103,20 @@ namespace os
 
       protected:
 
-        signal_event_t cb_event_;
-        const void* cb_object_;
+        signal_event_t cb_event_; // Pointer to static function.
+        const void* cb_object_; // Pointer to object instance.
 
       };
     } /* namespace driver */
   } /* namespace cmsis */
 } /* namespace os */
+
+#endif /* __cplusplus */
+
+extern "C"
+{
+  void
+  cmsis_driver_serial_signal_event (void* object, uint32_t event);
+}
 
 #endif /* POSIX_DRIVERS_CMSIS_DRIVER_SERIAL_H_ */

@@ -47,7 +47,7 @@ namespace os
       // ----------------------------------------------------------------------
 
       void
-      Serial::event_callback (uint32_t event)
+      Serial::signal_event (uint32_t event)
       {
         if (cb_event_ != nullptr)
           {
@@ -59,3 +59,10 @@ namespace os
   } /* namespace cmsis */
 } /* namespace os */
 
+// Forward C calls to C++ implementation.
+
+void
+cmsis_driver_serial_signal_event(void* object, uint32_t event)
+{
+  ((os::cmsis::driver::Serial*)object)->signal_event(event);
+}
