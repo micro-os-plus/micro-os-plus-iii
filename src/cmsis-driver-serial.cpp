@@ -51,6 +51,7 @@ namespace os
       {
         if (cb_event_ != nullptr)
           {
+            // Forward event to registered callback.
             cb_event_ (cb_object_, event);
           }
       }
@@ -62,7 +63,7 @@ namespace os
 // Forward C calls to C++ implementation.
 
 void
-cmsis_driver_serial_signal_event(void* object, uint32_t event)
+cmsis_driver_serial_signal_event (void* object, uint32_t event)
 {
-  ((os::cmsis::driver::Serial*)object)->signal_event(event);
+  ((os::cmsis::driver::Serial*) object)->signal_event (event);
 }
