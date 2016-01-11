@@ -69,12 +69,11 @@ namespace os
 
         // --------------------------------------------------------------------
 
-        // Static callback, that will call the object callback
+        // Static function called by the CMSIS driver in an
+        // interrupt context.
+
         static void
         signal_event (Buffered_serial_device* object, uint32_t event);
-
-        void
-        do_signal_event (uint32_t event);
 
         // --------------------------------------------------------------------
 
@@ -150,7 +149,16 @@ namespace os
           tx_busy_ (false) //
       {
         assert(rx_buf != nullptr);
-        // tx_buf may be null.
+
+        // Do not check the same for tx_buf, it may be null.
+
+        // Initialise the driver to call back this instance.
+        // Also allocate IO resources.
+        int result =
+            driver_->initialize (
+                reinterpret_cast<os::cmsis::driver::Serial::signal_event_t> (signal_event),
+                this);
+        assert(result == ARM_DRIVER_OK);
       }
 
     template<typename Cs_T>
@@ -158,6 +166,9 @@ namespace os
       {
         rx_sem_ = nullptr;
         tx_sem_ = nullptr;
+
+        // Free IO resources.
+        driver_->uninitialize ();
       }
 
     // ------------------------------------------------------------------------
@@ -197,18 +208,6 @@ namespace os
                 tx_buf_->clear ();
               }
 
-            // Initialise the driver to call back this instance.
-            result =
-                driver_->initialize (
-                    reinterpret_cast<os::cmsis::driver::Serial::signal_event_t> (signal_event),
-                    this);
-            if (result != ARM_DRIVER_OK)
-              break;
-
-            result = driver_->power (ARM_POWER_FULL);
-            if (result != ARM_DRIVER_OK)
-              break;
-
             // Default configuration: 8 bits, no parity, 1 stop bit,
             // no flow control, 115200 bps.
             result = driver_->control (ARM_USART_MODE_ASYNCHRONOUS |
@@ -241,9 +240,6 @@ namespace os
 
         if (result != ARM_DRIVER_OK)
           {
-            driver_->power (ARM_POWER_OFF);
-            driver_->uninitialize ();
-
             errno = ENOSR;
             return -1;
           }
@@ -272,8 +268,6 @@ namespace os
         // Disable USART and I/O pins used.
         driver_->control (ARM_USART_CONTROL_TX, 0);
         driver_->control (ARM_USART_CONTROL_RX, 0);
-        driver_->power (ARM_POWER_OFF);
-        driver_->uninitialize ();
 
         // Return POSIX OK.
         return 0;
@@ -442,92 +436,84 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    // This function is called by the CMSIS driver in an interrupt context.
-
     template<typename Cs_T>
       void
-      Buffered_serial_device<Cs_T>::do_signal_event (uint32_t event)
+      Buffered_serial_device<Cs_T>::signal_event (
+          Buffered_serial_device* object, uint32_t event)
       {
         if ((event
             & (ARM_USART_EVENT_RECEIVE_COMPLETE
                 | ARM_USART_EVENT_RX_FRAMING_ERROR | ARM_USART_EVENT_RX_TIMEOUT)))
           {
             // TODO: process errors and timeouts
-            std::size_t tmpCount = driver_->get_rx_count ();
-            std::size_t count = tmpCount - rx_count_;
-            rx_count_ = tmpCount;
-            std::size_t adjust = rx_buf_->advanceBack (count);
+            std::size_t tmpCount = object->driver_->get_rx_count ();
+            std::size_t count = tmpCount - object->rx_count_;
+            object->rx_count_ = tmpCount;
+            std::size_t adjust = object->rx_buf_->advanceBack (count);
             assert(count == adjust);
 
             if (event & ARM_USART_EVENT_RECEIVE_COMPLETE)
               {
                 uint8_t* pbuf;
-                std::size_t nbyte = rx_buf_->getBackContiguousBuffer (&pbuf);
+                std::size_t nbyte = object->rx_buf_->getBackContiguousBuffer (
+                    &pbuf);
                 if (nbyte == 0)
                   {
                     // Overwrite the last byte, but keep the driver in
                     // receive mode continuously.
-                    rx_buf_->retreatBack ();
-                    nbyte = rx_buf_->getBackContiguousBuffer (&pbuf);
+                    object->rx_buf_->retreatBack ();
+                    nbyte = object->rx_buf_->getBackContiguousBuffer (&pbuf);
                   }
                 assert(nbyte > 0);
 
                 // Read as much as we can.
                 int32_t status;
-                status = driver_->receive (pbuf, nbyte);
+                status = object->driver_->receive (pbuf, nbyte);
                 // TODO: implement error processing.
                 assert(status == ARM_DRIVER_OK);
 
-                rx_count_ = 0;
+                object->rx_count_ = 0;
               }
             if (count > 0)
               {
                 // Immediately wake up, do not wait to reach any water mark.
-                osSemaphoreRelease (rx_sem_);
+                osSemaphoreRelease (object->rx_sem_);
               }
           }
         if (event & ARM_USART_EVENT_TX_COMPLETE)
           {
-            if (tx_buf_ != nullptr)
+            if (object->tx_buf_ != nullptr)
               {
-                std::size_t count = driver_->get_tx_count ();
-                std::size_t adjust = tx_buf_->advanceFront (count);
+                std::size_t count = object->driver_->get_tx_count ();
+                std::size_t adjust = object->tx_buf_->advanceFront (count);
                 assert(count == adjust);
 
                 uint8_t* pbuf;
-                std::size_t nbyte = tx_buf_->getFrontContiguousBuffer (&pbuf);
+                std::size_t nbyte = object->tx_buf_->getFrontContiguousBuffer (
+                    &pbuf);
                 if (nbyte > 0)
                   {
                     int32_t status;
-                    status = driver_->send (pbuf, nbyte);
+                    status = object->driver_->send (pbuf, nbyte);
                     // TODO: implement error processing
                     assert(status == ARM_DRIVER_OK);
                   }
                 else
                   {
-                    tx_busy_ = false;
+                    object->tx_busy_ = false;
                   }
-                if (tx_buf_->isBelowLowWaterMark ())
+                if (object->tx_buf_->isBelowLowWaterMark ())
                   {
                     // Wake up thread, to come and send more bytes.
-                    osSemaphoreRelease (tx_sem_);
+                    osSemaphoreRelease (object->tx_sem_);
                   }
               }
             else
               {
                 // No buffer, wake up the thread to return from write().
-                osSemaphoreRelease (tx_sem_);
+                osSemaphoreRelease (object->tx_sem_);
               }
           }
-      }
-
-    // Static call-back; forward to object implementation.
-    template<typename Cs_T>
-      void
-      Buffered_serial_device<Cs_T>::signal_event (
-          Buffered_serial_device* object, uint32_t event)
-      {
-        object->do_signal_event (event);
       }
 
 #pragma GCC diagnostic pop
