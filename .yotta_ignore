@@ -1,0 +1,14 @@
+.DS_Store
+.cproject
+.project
+.settings/
+.yotta.json
+Debug/
+NOTICE.md
+Release/
+Thumbs.db
+build/
+test-*/
+upload.tar.gz
+yotta_modules/
+yotta_targets/

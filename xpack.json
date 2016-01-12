@@ -1,0 +1,59 @@
+{
+	"$schema": "http://xcdl.github.io/schemas/xpack-1-1.json",
+	"name": "ilg-cmsis-plus",
+	"title": "ARM Semihosting",
+	"description": "An xPack with CMSIS++, a C++ version of CMSIS.",
+	"xcdlFile": ".xcdl.json",
+	"repository": 
+	{
+		"type": "git",
+		"url": "https://github.com/micro-os-plus/cmsis-plus.git",
+		"archive": "https://github.com/micro-os-plus/cmsis-plus/archive/xpack.zip"
+	},
+
+	"version": "0.1.1",
+	"releases": [
+		
+	],
+
+	"keywords": [
+		"arm",
+		"cmsis",
+		"cortex",
+		"c++"
+	],
+
+	"homepage": "https://github.com/micro-os-plus/cmsis-plus",
+	"support": [
+		{
+			"description": "forum",
+			"url": "http://www.element14.com/community/groups/gnu-arm-eclipse"
+		},
+
+		{
+			"description": "bugs & enhancements",
+			"url": "https://github.com/micro-os-plus/cmsis-plus/issues"
+		}
+	],
+
+	"license": "LGPL-3.0",
+	"maintainers": [
+		{
+			"name": "Liviu Ionescu",
+			"email": "ilg@livius.net",
+			"url": "http://liviusdotnet.worldpress.com"
+		}
+	],
+
+	"contributors": [
+		{
+			"name": "Liviu Ionescu",
+			"email": "ilg@livius.net",
+			"url": "http://liviusdotnet.worldpress.com"
+		}
+	],
+
+	"dependencies": [
+		
+	]
+}
