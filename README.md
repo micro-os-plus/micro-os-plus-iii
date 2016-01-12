@@ -1,10 +1,10 @@
-# ARM Semihosting
+# CMSIS++
 
 An xPack with CMSIS++, a C++ version of CMSIS.
 
 ## Package
 
-[ARM Semihosting](https://github.com/micro-os-plus/cmsis-plus) package details:
+[CMSIS++](https://github.com/micro-os-plus/cmsis-plus) package details:
 
 * type: [xcdl](http://xcdl.github.io)
 * yotta name: `ilg-cmsis-plus`
