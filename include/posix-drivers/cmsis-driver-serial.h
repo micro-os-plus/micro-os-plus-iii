@@ -19,7 +19,7 @@
 #ifndef POSIX_DRIVERS_CMSIS_DRIVER_SERIAL_H_
 #define POSIX_DRIVERS_CMSIS_DRIVER_SERIAL_H_
 
-#include "Driver_USART.h"
+// #include "Driver_USART.h"
 
 // ----------------------------------------------------------------------------
 #ifdef __cplusplus

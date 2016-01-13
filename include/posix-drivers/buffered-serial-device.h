@@ -23,12 +23,11 @@
 
 #include "posix-io/CharDevice.h"
 #include "posix-drivers/ByteCircularBuffer.h"
-#include "posix-drivers/cmsis-driver-serial.h"
+#include "cmsis-plus/drivers/serial.h"
 
 #include "diag/trace.h"
 
 #include "cmsis_os.h"
-#include "Driver_USART.h"
 
 #include <cstdarg>
 #include <cstdlib>
@@ -152,13 +151,9 @@ namespace os
 
         // Do not check the same for tx_buf, it may be null.
 
-        // Initialise the driver to call back this instance.
-        // Also allocate IO resources.
-        int result =
-            driver_->initialize (
-                reinterpret_cast<os::cmsis::driver::Serial::signal_event_t> (signal_event),
-                this);
-        assert(result == ARM_DRIVER_OK);
+        driver_->register_callback (
+            reinterpret_cast<os::cmsis::driver::signal_event_t> (signal_event),
+            this);
       }
 
     template<typename Cs_T>
@@ -167,8 +162,6 @@ namespace os
         rx_sem_ = nullptr;
         tx_sem_ = nullptr;
 
-        // Free IO resources.
-        driver_->uninitialize ();
       }
 
     // ------------------------------------------------------------------------
@@ -197,7 +190,7 @@ namespace os
 
             if ((rx_sem_ == nullptr) || (tx_sem_ == nullptr))
               {
-                result = ARM_DRIVER_ERROR;
+                result = os::cmsis::driver::ERROR;
                 break;
               }
 
@@ -210,35 +203,36 @@ namespace os
 
             // Default configuration: 8 bits, no parity, 1 stop bit,
             // no flow control, 115200 bps.
-            result = driver_->control (ARM_USART_MODE_ASYNCHRONOUS |
-            ARM_USART_DATA_BITS_8 |
-            ARM_USART_PARITY_NONE |
-            ARM_USART_STOP_BITS_1 |
-            ARM_USART_FLOW_CONTROL_NONE,
-                                       115200);
-            if (result != ARM_DRIVER_OK)
+            result = driver_->configure (
+                os::cmsis::driver::serial::MODE_ASYNCHRONOUS
+                    | os::cmsis::driver::serial::DATA_BITS_8
+                    | os::cmsis::driver::serial::PARITY_NONE
+                    | os::cmsis::driver::serial::STOP_BITS_1
+                    | os::cmsis::driver::serial::FLOW_CONTROL_NONE,
+                115200);
+            if (result != os::cmsis::driver::STATUS_OK)
               break;
 
             // Enable TX output.
-            result = driver_->control (ARM_USART_CONTROL_TX, 1);
-            if (result != ARM_DRIVER_OK)
+            result = driver_->control (os::cmsis::driver::serial::ENABLE_TX);
+            if (result != os::cmsis::driver::STATUS_OK)
               break;
 
             // Enable RX input.
-            result = driver_->control (ARM_USART_CONTROL_RX, 1);
-            if (result != ARM_DRIVER_OK)
+            result = driver_->control (os::cmsis::driver::serial::ENABLE_RX);
+            if (result != os::cmsis::driver::STATUS_OK)
               break;
 
             uint8_t* pbuf;
             std::size_t nbyte = rx_buf_->getBackContiguousBuffer (&pbuf);
 
             result = driver_->receive (pbuf, nbyte);
-            if (result != ARM_DRIVER_OK)
+            if (result != os::cmsis::driver::STATUS_OK)
               break;
           }
         while (false); // Actually NOT a loop, just a sequence of ifs!
 
-        if (result != ARM_DRIVER_OK)
+        if (result != os::cmsis::driver::STATUS_OK)
           {
             errno = ENOSR;
             return -1;
@@ -265,9 +259,9 @@ namespace os
         osSemaphoreDelete (tx_sem_);
         tx_sem_ = nullptr;
 
-        // Disable USART and I/O pins used.
-        driver_->control (ARM_USART_CONTROL_TX, 0);
-        driver_->control (ARM_USART_CONTROL_RX, 0);
+        // Disable transmitter and receiver.
+        driver_->control (os::cmsis::driver::serial::DISABLE_TX);
+        driver_->control (os::cmsis::driver::serial::DISABLE_RX);
 
         // Return POSIX OK.
         return 0;
@@ -343,7 +337,8 @@ namespace os
                       }
                     if (nb > 0)
                       {
-                        if (driver_->send (pbuf, nb) != ARM_DRIVER_OK)
+                        if (driver_->send (pbuf, nb)
+                            != os::cmsis::driver::STATUS_OK)
                           {
                             errno = EIO;
                             return -1;
@@ -383,17 +378,14 @@ namespace os
           {
             // Do not use a transmit buffer, send directly from the user buffer.
             // Wait while transmitting.
-            ARM_USART_STATUS status;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Waggregate-return"
+            os::cmsis::driver::serial::Status status;
             status = driver_->get_status ();
-#pragma GCC diagnostic pop
-            if (status.tx_busy)
+            if (status.is_tx_busy ())
               {
                 osSemaphoreWait (tx_sem_, osWaitForever);
               }
 
-            if ((driver_->send (buf, nbyte)) == ARM_DRIVER_OK)
+            if ((driver_->send (buf, nbyte)) == os::cmsis::driver::STATUS_OK)
               {
                 osSemaphoreWait (tx_sem_, osWaitForever);
                 count = driver_->get_tx_count ();
@@ -442,8 +434,9 @@ namespace os
           Buffered_serial_device* object, uint32_t event)
       {
         if ((event
-            & (ARM_USART_EVENT_RECEIVE_COMPLETE
-                | ARM_USART_EVENT_RX_FRAMING_ERROR | ARM_USART_EVENT_RX_TIMEOUT)))
+            & (os::cmsis::driver::serial::Event::receive_complete
+                | os::cmsis::driver::serial::Event::rx_framing_error
+                | os::cmsis::driver::serial::Event::rx_timeout)))
           {
             // TODO: process errors and timeouts
             std::size_t tmpCount = object->driver_->get_rx_count ();
@@ -452,7 +445,7 @@ namespace os
             std::size_t adjust = object->rx_buf_->advanceBack (count);
             assert(count == adjust);
 
-            if (event & ARM_USART_EVENT_RECEIVE_COMPLETE)
+            if (event & os::cmsis::driver::serial::Event::receive_complete)
               {
                 uint8_t* pbuf;
                 std::size_t nbyte = object->rx_buf_->getBackContiguousBuffer (
@@ -470,7 +463,7 @@ namespace os
                 int32_t status;
                 status = object->driver_->receive (pbuf, nbyte);
                 // TODO: implement error processing.
-                assert(status == ARM_DRIVER_OK);
+                assert(status == os::cmsis::driver::STATUS_OK);
 
                 object->rx_count_ = 0;
               }
@@ -480,7 +473,7 @@ namespace os
                 osSemaphoreRelease (object->rx_sem_);
               }
           }
-        if (event & ARM_USART_EVENT_TX_COMPLETE)
+        if (event & os::cmsis::driver::serial::Event::tx_complete)
           {
             if (object->tx_buf_ != nullptr)
               {
@@ -496,7 +489,7 @@ namespace os
                     int32_t status;
                     status = object->driver_->send (pbuf, nbyte);
                     // TODO: implement error processing
-                    assert(status == ARM_DRIVER_OK);
+                    assert(status == os::cmsis::driver::STATUS_OK);
                   }
                 else
                   {
