@@ -50,16 +50,16 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
 
-      Version&
-      Usart_wrapper::get_version (void) noexcept
+      const Version&
+      Usart_wrapper::get_version (void) const noexcept
       {
         // C++ magic, get the address from inside the Keil driver.
         ARM_DRIVER_VERSION&& p = std::move (driver_->GetVersion ());
         return (Version&) p;
       }
 
-      serial::Capabilities&
-      Usart_wrapper::get_capabilities (void) noexcept
+      const serial::Capabilities&
+      Usart_wrapper::get_capabilities (void) const noexcept
       {
         // C++ magic, get the address from inside the Keil driver.
         ARM_USART_CAPABILITIES&& p = std::move (driver_->GetCapabilities ());
@@ -68,7 +68,7 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-      int32_t
+      status_t
       Usart_wrapper::power (Power state) noexcept
       {
         status_t status;
@@ -111,7 +111,21 @@ namespace os
       }
 
       status_t
-      Usart_wrapper::configure_modem_line (serial::Modem_config ctrl) noexcept
+      Usart_wrapper::control (serial::control_t ctrl) noexcept
+      {
+        switch (ctrl)
+          {
+          case serial::DISABLE_TX:
+          case serial::DISABLE_RX:
+          case serial::DISABLE_BREAK:
+            return driver_->Control (
+                ctrl - (serial::DISABLE_TX - serial::ENABLE_TX), 0);
+          }
+        return driver_->Control (ctrl, 1);
+      }
+
+      status_t
+      Usart_wrapper::control_modem_line (serial::Modem_control ctrl) noexcept
       {
         return driver_->SetModemControl ((ARM_USART_MODEM_CONTROL) ctrl);
       }

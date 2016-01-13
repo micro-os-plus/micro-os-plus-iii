@@ -50,6 +50,8 @@ namespace os
         using bit_number_t = uint32_t;
         using config_t = uint32_t;
         using config_arg_t = uint32_t;
+        using control_t = uint32_t;
+        using control_arg_t = uint32_t;
 
         // ****** Serial Control Codes *****
 
@@ -58,142 +60,153 @@ namespace os
 
         // ----- Serial Control Codes: Mode -----
         ///< UART = (Asynchronous);; arg = Baudrate
-        constexpr config_arg_t MODE_ASYNCHRONOUS = (0x01UL << CONTROL_Pos);
+        constexpr config_t MODE_ASYNCHRONOUS = (0x01UL << CONTROL_Pos);
 
         ///< Synchronous Master = (generates clock signal); arg = Baudrate
-        constexpr config_arg_t MODE_SYNCHRONOUS_MASTER = (0x02UL << CONTROL_Pos);
+        constexpr config_t MODE_SYNCHRONOUS_MASTER = (0x02UL << CONTROL_Pos);
 
         ///< Synchronous Slave = (external clock signal);
-        constexpr config_arg_t MODE_SYNCHRONOUS_SLAVE = (0x03UL << CONTROL_Pos);
+        constexpr config_t MODE_SYNCHRONOUS_SLAVE = (0x03UL << CONTROL_Pos);
 
         ///< UART Single-wire = (half-duplex);; arg = Baudrate
-        constexpr config_arg_t MODE_SINGLE_WIRE = (0x04UL << CONTROL_Pos);
+        constexpr config_t MODE_SINGLE_WIRE = (0x04UL << CONTROL_Pos);
 
         ///< UART IrDA; arg = Baudrate
-        constexpr config_arg_t MODE_IRDA = (0x05UL << CONTROL_Pos);
+        constexpr config_t MODE_IRDA = (0x05UL << CONTROL_Pos);
 
         ///< UART Smart Card; arg = Baudrate
-        constexpr config_arg_t MODE_SMART_CARD = (0x06UL << CONTROL_Pos);
+        constexpr config_t MODE_SMART_CARD = (0x06UL << CONTROL_Pos);
 
         // ----- Serial Control Codes: Mode Parameters: Data Bits -----
         constexpr bit_number_t DATA_BITS_Pos = 8;
-        constexpr config_arg_t DATA_BITS_Msk = (7UL << DATA_BITS_Pos);
+        constexpr config_t DATA_BITS_Msk = (7UL << DATA_BITS_Pos);
 
         ///< 5 Data bits
-        constexpr config_arg_t DATA_BITS_5 = (5UL << DATA_BITS_Pos);
+        constexpr config_t DATA_BITS_5 = (5UL << DATA_BITS_Pos);
 
         ///< 6 Data bit
-        constexpr config_arg_t DATA_BITS_6 = (6UL << DATA_BITS_Pos);
+        constexpr config_t DATA_BITS_6 = (6UL << DATA_BITS_Pos);
 
         ///< 7 Data bits
-        constexpr config_arg_t DATA_BITS_7 = (7UL << DATA_BITS_Pos);
+        constexpr config_t DATA_BITS_7 = (7UL << DATA_BITS_Pos);
 
         ///< 8 Data bits = (default);
-        constexpr config_arg_t DATA_BITS_8 = (0UL << DATA_BITS_Pos);
+        constexpr config_t DATA_BITS_8 = (0UL << DATA_BITS_Pos);
 
         ///< 9 Data bits
-        constexpr config_arg_t DATA_BITS_9 = (1UL << DATA_BITS_Pos);
+        constexpr config_t DATA_BITS_9 = (1UL << DATA_BITS_Pos);
 
         // ----- Serial Control Codes: Mode Parameters: Parity -----
         constexpr bit_number_t PARITY_Pos = 12;
-        constexpr config_arg_t PARITY_Msk = (3UL << PARITY_Pos);
+        constexpr config_t PARITY_Msk = (3UL << PARITY_Pos);
 
         ///< No Parity = (default);
-        constexpr config_arg_t PARITY_NONE = (0UL << PARITY_Pos);
+        constexpr config_t PARITY_NONE = (0UL << PARITY_Pos);
 
         ///< Even Parity
-        constexpr config_arg_t PARITY_EVEN = (1UL << PARITY_Pos);
+        constexpr config_t PARITY_EVEN = (1UL << PARITY_Pos);
 
         ///< Odd Parity
-        constexpr config_arg_t PARITY_ODD = (2UL << PARITY_Pos);
+        constexpr config_t PARITY_ODD = (2UL << PARITY_Pos);
 
         // ----- Serial Control Codes: Mode Parameters: Stop Bits -----
         constexpr bit_number_t STOP_BITS_Pos = 14;
-        constexpr config_arg_t STOP_BITS_Msk = (3UL << STOP_BITS_Pos);
+        constexpr config_t STOP_BITS_Msk = (3UL << STOP_BITS_Pos);
 
         ///< 1 Stop bit = (default);
-        constexpr config_arg_t STOP_BITS_1 = (0UL << STOP_BITS_Pos);
+        constexpr config_t STOP_BITS_1 = (0UL << STOP_BITS_Pos);
 
         ///< 2 Stop bits
-        constexpr config_arg_t STOP_BITS_2 = (1UL << STOP_BITS_Pos);
+        constexpr config_t STOP_BITS_2 = (1UL << STOP_BITS_Pos);
 
         ///< 1.5 Stop bits
-        constexpr config_arg_t STOP_BITS_1_5 = (2UL << STOP_BITS_Pos);
+        constexpr config_t STOP_BITS_1_5 = (2UL << STOP_BITS_Pos);
 
         ///< 0.5 Stop bits
-        constexpr config_arg_t STOP_BITS_0_5 = (3UL << STOP_BITS_Pos);
+        constexpr config_t STOP_BITS_0_5 = (3UL << STOP_BITS_Pos);
 
         // ----- Serial Control Codes: Mode Parameters: Flow Control -----
         constexpr bit_number_t FLOW_CONTROL_Pos = 16;
-        constexpr config_arg_t FLOW_CONTROL_Msk = (3UL << FLOW_CONTROL_Pos);
+        constexpr config_t FLOW_CONTROL_Msk = (3UL << FLOW_CONTROL_Pos);
 
         ///< No Flow Control = (default);
-        constexpr config_arg_t FLOW_CONTROL_NONE = (0UL << FLOW_CONTROL_Pos);
+        constexpr config_t FLOW_CONTROL_NONE = (0UL << FLOW_CONTROL_Pos);
 
         ///< RTS Flow Control
-        constexpr config_arg_t FLOW_CONTROL_RTS = (1UL << FLOW_CONTROL_Pos);
+        constexpr config_t FLOW_CONTROL_RTS = (1UL << FLOW_CONTROL_Pos);
 
         ///< CTS Flow Control
-        constexpr config_arg_t FLOW_CONTROL_CTS = (2UL << FLOW_CONTROL_Pos);
+        constexpr config_t FLOW_CONTROL_CTS = (2UL << FLOW_CONTROL_Pos);
 
         ///< RTS/CTS Flow Control
-        constexpr config_arg_t FLOW_CONTROL_RTS_CTS = (3UL << FLOW_CONTROL_Pos);
+        constexpr config_t FLOW_CONTROL_RTS_CTS = (3UL << FLOW_CONTROL_Pos);
 
         // ----- Serial Control Codes: Mode Parameters: Clock Polarity = (Synchronous mode); -----
         constexpr bit_number_t CPOL_Pos = 18;
-        constexpr config_arg_t CPOL_Msk = (1UL << CPOL_Pos);
+        constexpr config_t CPOL_Msk = (1UL << CPOL_Pos);
 
         ///< CPOL = 0 = (default);
-        constexpr config_arg_t CPOL0 = (0UL << CPOL_Pos);
+        constexpr config_t CPOL0 = (0UL << CPOL_Pos);
 
         ///< CPOL = 1
-        constexpr config_arg_t CPOL1 = (1UL << CPOL_Pos);
+        constexpr config_t CPOL1 = (1UL << CPOL_Pos);
 
         // ----- Serial Control Codes: Mode Parameters: Clock Phase = (Synchronous mode); -----
         constexpr bit_number_t CPHA_Pos = 19;
-        constexpr config_arg_t CPHA_Msk = (1UL << CPHA_Pos);
+        constexpr config_t CPHA_Msk = (1UL << CPHA_Pos);
 
         ///< CPHA = 0 = (default);
-        constexpr config_arg_t CPHA0 = (0UL << CPHA_Pos);
+        constexpr config_t CPHA0 = (0UL << CPHA_Pos);
 
         ///< CPHA = 1
-        constexpr config_arg_t CPHA1 = (1UL << CPHA_Pos);
+        constexpr config_t CPHA1 = (1UL << CPHA_Pos);
 
         // ----- Serial Control Codes: Miscellaneous Controls  -----
 
         ///< Set default Transmit value = (Synchronous Receive only); arg = value
-        constexpr config_arg_t SET_DEFAULT_TX_VALUE = (0x10UL << CONTROL_Pos);
+        constexpr config_t DEFAULT_TX_VALUE = (0x10UL << CONTROL_Pos);
 
         ///< Set IrDA Pulse in ns; arg: 0=3/16 of bit period
-        constexpr config_arg_t SET_IRDA_PULSE = (0x11UL << CONTROL_Pos);
+        constexpr config_t IRDA_PULSE = (0x11UL << CONTROL_Pos);
 
         ///< Set Smart Card Guard Time; arg = number of bit periods
-        constexpr config_arg_t SET_SMART_CARD_GUARD_TIME = (0x12UL
-            << CONTROL_Pos);
+        constexpr config_t SMART_CARD_GUARD_TIME = (0x12UL << CONTROL_Pos);
 
         ///< Set Smart Card Clock in Hz; arg: 0=Clock not generated
-        constexpr config_arg_t SET_SMART_CARD_CLOCK = (0x13UL << CONTROL_Pos);
+        constexpr config_t SMART_CARD_CLOCK = (0x13UL << CONTROL_Pos);
 
         ///< Smart Card NACK generation; arg: 0=disabled, 1=enabled
-        constexpr config_arg_t CONTROL_SMART_CARD_NACK = (0x14UL << CONTROL_Pos);
+        constexpr config_t SMART_CARD_NACK = (0x14UL << CONTROL_Pos);
 
-        ///< Transmitter; arg: 0=disabled, 1=enabled
-        constexpr config_arg_t CONTROL_TX = (0x15UL << CONTROL_Pos);
+        // --------------------------------------------------------------------
+        // ----- Commands -----
 
-        ///< Receiver; arg: 0=disabled, 1=enabled
-        constexpr config_arg_t CONTROL_RX = (0x16UL << CONTROL_Pos);
+        ///< Enable Transmitter
+        constexpr control_t ENABLE_TX = (0x15UL << CONTROL_Pos);
 
-        ///< Continuous Break transmission; arg: 0=disabled, 1=enabled
-        constexpr config_arg_t CONTROL_BREAK = (0x17UL << CONTROL_Pos);
+        ///< Enable Receiver
+        constexpr control_t ENABLE_RX = (0x16UL << CONTROL_Pos);
+
+        ///< Enable Continuous Break transmission
+        constexpr control_t ENABLE_BREAK = (0x17UL << CONTROL_Pos);
 
         ///< Abort @ref Send
-        constexpr config_arg_t ABORT_SEND = (0x18UL << CONTROL_Pos);
+        constexpr control_t ABORT_SEND = (0x18UL << CONTROL_Pos);
 
         ///< Abort @ref Receive
-        constexpr config_arg_t ABORT_RECEIVE = (0x19UL << CONTROL_Pos);
+        constexpr control_t ABORT_RECEIVE = (0x19UL << CONTROL_Pos);
 
         ///< Abort @ref Transfer
-        constexpr config_arg_t ABORT_TRANSFER = (0x1AUL << CONTROL_Pos);
+        constexpr control_t ABORT_TRANSFER = (0x1AUL << CONTROL_Pos);
+
+        ///< Disable Transmitter
+        constexpr control_t DISABLE_TX = (0x25UL << CONTROL_Pos);
+
+        ///< Disable Receiver
+        constexpr control_t DISABLE_RX = (0x26UL << CONTROL_Pos);
+
+        ///< Disable Continuous Break transmission;
+        constexpr control_t DISABLE_BREAK = (0x27UL << CONTROL_Pos);
 
         // --------------------------------------------------------------------
         // ****** Serial specific error codes *****
@@ -255,6 +268,8 @@ namespace os
 
           // ------------------------------------------------------------------
 
+        public:
+
           // For compatibility with ARM CMSIS, these bits should be
           // exactly in this order.
 
@@ -288,7 +303,7 @@ namespace os
         /**
          * @brief Configuration to change the serial modem lines.
          */
-        enum class Modem_config
+        enum class Modem_control
           : modem_config_t
             {
               //
@@ -500,8 +515,8 @@ namespace os
          * @brief       Get driver capabilities
          * @return      @ref ARM_USART_CAPABILITIES
          */
-        virtual serial::Capabilities&
-        get_capabilities (void) noexcept = 0;
+        virtual const serial::Capabilities&
+        get_capabilities (void) const noexcept = 0;
 
         /**
          * @brief       Register event callback.
@@ -565,6 +580,15 @@ namespace os
         configure (serial::config_t cfg, serial::config_arg_t arg) noexcept = 0;
 
         /**
+         * @brief       Control the serial interface.
+         * @param[in]   control  Operation
+         * @param[in]   arg      Argument of operation (optional)
+         * @return      common @ref execution_status and driver specific @ref usart_execution_status
+         */
+        virtual status_t
+        control (serial::control_t ctrl) noexcept = 0;
+
+        /**
          * @brief       Get serial port status.
          * @return      USART status @ref ARM_USART_STATUS
          */
@@ -577,7 +601,7 @@ namespace os
          * @return      @ref execution_status
          */
         virtual status_t
-        configure_modem_line (serial::Modem_config cfg) noexcept = 0;
+        control_modem_line (serial::Modem_control ctrl) noexcept = 0;
 
         /**
          * @brief       Get serial modem lines state.

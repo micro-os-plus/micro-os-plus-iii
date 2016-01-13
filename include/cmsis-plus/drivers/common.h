@@ -138,8 +138,8 @@ namespace os
          * @brief       Get driver version.
          * @return      @ref ARM_DRIVER_VERSION
          */
-        virtual Version&
-        get_version (void) noexcept = 0;
+        virtual const Version&
+        get_version (void) const noexcept = 0;
 
         /**
          * @brief       Power up/down serial port.

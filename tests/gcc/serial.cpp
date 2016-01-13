@@ -32,11 +32,11 @@ public:
   virtual
   ~TestSerial () override;
 
-  virtual os::cmsis::driver::Version&
-  get_version (void) noexcept override;
+  virtual const os::cmsis::driver::Version&
+  get_version (void) const noexcept override;
 
-  virtual os::cmsis::driver::serial::Capabilities&
-  get_capabilities (void) noexcept override;
+  virtual const os::cmsis::driver::serial::Capabilities&
+  get_capabilities (void) const noexcept override;
 
   virtual os::cmsis::driver::status_t
   power (os::cmsis::driver::Power state) noexcept override;
@@ -50,11 +50,14 @@ public:
   virtual os::cmsis::driver::status_t
   configure (uint32_t ctrl, uint32_t arg) noexcept override;
 
+  virtual os::cmsis::driver::status_t
+  control (os::cmsis::driver::serial::control_t ctrl) noexcept override;
+
   virtual os::cmsis::driver::serial::Status&
   get_status (void) noexcept override;
 
   virtual os::cmsis::driver::status_t
-  configure_modem_line (os::cmsis::driver::serial::Modem_config ctrl)
+  control_modem_line (os::cmsis::driver::serial::Modem_control ctrl)
       noexcept override;
 
   virtual os::cmsis::driver::serial::Modem_status&
@@ -97,14 +100,14 @@ TestSerial::~TestSerial ()
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-os::cmsis::driver::Version&
-TestSerial::get_version (void) noexcept
+const os::cmsis::driver::Version&
+TestSerial::get_version (void) const noexcept
 {
   return version_;
 }
 
-os::cmsis::driver::serial::Capabilities&
-TestSerial::get_capabilities (void) noexcept
+const os::cmsis::driver::serial::Capabilities&
+TestSerial::get_capabilities (void) const noexcept
 {
   return capabilities_;
 }
@@ -134,6 +137,12 @@ TestSerial::configure (os::cmsis::driver::serial::config_t cfg,
   return os::cmsis::driver::STATUS_OK;
 }
 
+os::cmsis::driver::status_t
+TestSerial::control (os::cmsis::driver::serial::control_t ctrl) noexcept
+{
+  return os::cmsis::driver::STATUS_OK;
+}
+
 os::cmsis::driver::serial::Status&
 TestSerial::get_status (void) noexcept
 {
@@ -141,7 +150,7 @@ TestSerial::get_status (void) noexcept
 }
 
 os::cmsis::driver::status_t
-TestSerial::configure_modem_line (os::cmsis::driver::serial::Modem_config ctrl) noexcept
+TestSerial::control_modem_line (os::cmsis::driver::serial::Modem_control ctrl) noexcept
 {
   return os::cmsis::driver::STATUS_OK;
 }
@@ -213,7 +222,8 @@ test_serial (void)
   assert(!capa.event_dcd);
   assert(capa.event_ri);
 
-  os::cmsis::driver::serial::Capabilities& caparef = test.get_capabilities ();
+  const os::cmsis::driver::serial::Capabilities& caparef =
+      test.get_capabilities ();
   assert(caparef.asynchronous);
   assert(!caparef.synchronous_master);
   assert(caparef.synchronous_slave);
@@ -296,16 +306,16 @@ test_serial (void)
   assert(wrap.get_rx_count () == 87);
   assert(wrap.configure (22, 33) == 55);
   assert(
-      wrap.configure_modem_line (
-          os::cmsis::driver::serial::Modem_config::clear_rts) == 21);
+      wrap.control_modem_line (
+          os::cmsis::driver::serial::Modem_control::clear_rts) == 21);
   assert(
-      wrap.configure_modem_line (os::cmsis::driver::serial::Modem_config::set_rts)
-          == 22);
+      wrap.control_modem_line (
+          os::cmsis::driver::serial::Modem_control::set_rts) == 22);
   assert(
-      wrap.configure_modem_line (
-          os::cmsis::driver::serial::Modem_config::clear_dtr) == 23);
+      wrap.control_modem_line (
+          os::cmsis::driver::serial::Modem_control::clear_dtr) == 23);
   assert(
-      wrap.configure_modem_line (os::cmsis::driver::serial::Modem_config::set_dtr)
-          == 24);
+      wrap.control_modem_line (
+          os::cmsis::driver::serial::Modem_control::set_dtr) == 24);
 
 }

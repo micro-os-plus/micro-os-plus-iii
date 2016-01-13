@@ -20,9 +20,17 @@
 #define CMSIS_DRIVER_USART_WRAPPER_H_
 
 #include <cmsis-plus/drivers/serial.h>
-#include <Driver_USART.h>
 
 // ----------------------------------------------------------------------------
+
+extern "C"
+{
+  // Avoid to include <Driver_USART.h>
+  typedef void
+  (*ARM_USART_SignalEvent_t) (uint32_t event);
+
+  typedef struct _ARM_DRIVER_USART const ARM_DRIVER_USART;
+}
 
 namespace os
 {
@@ -49,11 +57,11 @@ namespace os
 
         // --------------------------------------------------------------------
 
-        virtual Version&
-        get_version (void) noexcept override;
+        virtual const Version&
+        get_version (void) const noexcept override;
 
-        virtual serial::Capabilities&
-        get_capabilities (void) noexcept override;
+        virtual const serial::Capabilities&
+        get_capabilities (void) const noexcept override;
 
         virtual status_t
         power (Power state) noexcept override;
@@ -68,11 +76,14 @@ namespace os
         configure (serial::config_t ctrl, serial::config_arg_t arg)
             noexcept override;
 
+        virtual status_t
+        control (serial::control_t ctrl) noexcept override;
+
         virtual serial::Status&
         get_status (void) noexcept override;
 
         virtual status_t
-        configure_modem_line (serial::Modem_config control) noexcept override;
+        control_modem_line (serial::Modem_control ctrl) noexcept override;
 
         virtual serial::Modem_status&
         get_modem_status (void) noexcept override;
@@ -98,7 +109,8 @@ namespace os
         /// Pointer to CMSIS USART Keil driver.
         ARM_DRIVER_USART* driver_;
 
-        /// Pointer to non-reentrant callback.
+        /// Pointer to non-reentrant callback. Must be stored because
+        /// Initialise() is now delayed just before PowerControl(FULL).
         ARM_USART_SignalEvent_t c_cb_func_;
 
       };
