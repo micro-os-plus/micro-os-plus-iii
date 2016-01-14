@@ -33,10 +33,10 @@ public:
   ~TestSerial () override;
 
   virtual const os::cmsis::driver::Version&
-  get_version (void) const noexcept override;
+  get_version (void) noexcept override;
 
   virtual const os::cmsis::driver::serial::Capabilities&
-  get_capabilities (void) const noexcept override;
+  get_capabilities (void) noexcept override;
 
   virtual os::cmsis::driver::status_t
   power (os::cmsis::driver::Power state) noexcept override;
@@ -101,13 +101,13 @@ TestSerial::~TestSerial ()
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
 const os::cmsis::driver::Version&
-TestSerial::get_version (void) const noexcept
+TestSerial::get_version (void) noexcept
 {
   return version_;
 }
 
 const os::cmsis::driver::serial::Capabilities&
-TestSerial::get_capabilities (void) const noexcept
+TestSerial::get_capabilities (void) noexcept
 {
   return capabilities_;
 }

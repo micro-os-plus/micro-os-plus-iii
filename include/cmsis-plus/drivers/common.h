@@ -65,8 +65,12 @@ namespace os
         : power_t
           {
             //
-        off, //
-        low, //
+
+        // Completely power off the device.
+        off,
+        // Low power mode.
+        low,
+        // Fully power on the
         full
       };
 
@@ -78,9 +82,10 @@ namespace os
 
         // --------------------------------------------------------------------
 
+        constexpr
         Version (version_t api, version_t drv) noexcept;
 
-        ~Version () = default;
+        ~Version () noexcept = default;
 
         // --------------------------------------------------------------------
 
@@ -98,7 +103,7 @@ namespace os
         version_t const drv_; ///< Driver version
       };
 
-      inline
+      inline constexpr
       Version::Version (version_t api, version_t drv) noexcept :
       api_ (api), //
       drv_ (drv)
@@ -139,7 +144,7 @@ namespace os
          * @return      @ref ARM_DRIVER_VERSION
          */
         virtual const Version&
-        get_version (void) const noexcept = 0;
+        get_version (void) noexcept = 0;
 
         /**
          * @brief       Power up/down serial port.

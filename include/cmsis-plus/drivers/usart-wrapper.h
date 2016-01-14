@@ -21,16 +21,24 @@
 
 #include <cmsis-plus/drivers/serial.h>
 
+#include <Driver_USART.h>
+
 // ----------------------------------------------------------------------------
 
-extern "C"
-{
-  // Avoid to include <Driver_USART.h>
-  typedef void
-  (*ARM_USART_SignalEvent_t) (uint32_t event);
-
-  typedef struct _ARM_DRIVER_USART const ARM_DRIVER_USART;
-}
+//extern "C"
+//{
+//  // Avoid to include <Driver_USART.h>
+//  typedef void
+//  (*ARM_USART_SignalEvent_t) (uint32_t event);
+//
+//  typedef struct _ARM_DRIVER_USART const ARM_DRIVER_USART;
+//
+//  typedef struct _ARM_DRIVER_VERSION_ {
+//    uint16_t api;                         ///< API version
+//    uint16_t drv;                         ///< Driver version
+//  } ARM_DRIVER_VERSION_;
+//
+//}
 
 namespace os
 {
@@ -58,10 +66,10 @@ namespace os
         // --------------------------------------------------------------------
 
         virtual const Version&
-        get_version (void) const noexcept override;
+        get_version (void) noexcept override;
 
         virtual const serial::Capabilities&
-        get_capabilities (void) const noexcept override;
+        get_capabilities (void) noexcept override;
 
         virtual status_t
         power (Power state) noexcept override;
@@ -112,6 +120,33 @@ namespace os
         /// Pointer to non-reentrant callback. Must be stored because
         /// Initialise() is now delayed just before PowerControl(FULL).
         ARM_USART_SignalEvent_t c_cb_func_;
+
+        // Kludge to convert return by value to return by reference.
+
+        union
+        {
+          ARM_DRIVER_VERSION c_version;
+          Version version
+            { 0, 0 };
+        } u_v_;
+
+        union
+        {
+          ARM_USART_CAPABILITIES c_capa;
+          serial::Capabilities capa;
+        } u_c_;
+
+        union
+        {
+          ARM_USART_STATUS c_status;
+          serial::Status status;
+        } u_s_;
+
+        union
+        {
+          ARM_USART_MODEM_STATUS c_modem_status;
+          serial::Modem_status modem_status;
+        } u_m_;
 
       };
 

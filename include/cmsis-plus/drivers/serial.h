@@ -516,7 +516,7 @@ namespace os
          * @return      @ref ARM_USART_CAPABILITIES
          */
         virtual const serial::Capabilities&
-        get_capabilities (void) const noexcept = 0;
+        get_capabilities (void) noexcept = 0;
 
         /**
          * @brief       Register event callback.

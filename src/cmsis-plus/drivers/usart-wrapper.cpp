@@ -51,19 +51,18 @@ namespace os
 #pragma GCC diagnostic ignored "-Waggregate-return"
 
       const Version&
-      Usart_wrapper::get_version (void) const noexcept
+      Usart_wrapper::get_version (void) noexcept
       {
-        // C++ magic, get the address from inside the Keil driver.
-        ARM_DRIVER_VERSION&& p = std::move (driver_->GetVersion ());
-        return (Version&) p;
+        u_v_.c_version = driver_->GetVersion ();
+        return u_v_.version;;
       }
 
       const serial::Capabilities&
-      Usart_wrapper::get_capabilities (void) const noexcept
+      Usart_wrapper::get_capabilities (void) noexcept
       {
         // C++ magic, get the address from inside the Keil driver.
-        ARM_USART_CAPABILITIES&& p = std::move (driver_->GetCapabilities ());
-        return (serial::Capabilities&) p;
+        u_c_.c_capa = driver_->GetCapabilities ();
+        return u_c_.capa;
       }
 
 #pragma GCC diagnostic pop
@@ -136,17 +135,16 @@ namespace os
       serial::Status&
       Usart_wrapper::get_status (void) noexcept
       {
-        // C++ magic, get the address from inside the Keil driver.
-        ARM_USART_STATUS&& p = std::move (driver_->GetStatus ());
-        return (serial::Status&) p;
+        u_s_.c_status = driver_->GetStatus ();
+        return u_s_.status;
       }
 
       serial::Modem_status&
       Usart_wrapper::get_modem_status (void) noexcept
       {
         // C++ magic, get the address from inside the Keil driver.
-        ARM_USART_MODEM_STATUS&& p = std::move (driver_->GetModemStatus ());
-        return (serial::Modem_status&) p;
+        u_m_.c_modem_status = driver_->GetModemStatus ();
+        return u_m_.modem_status;
       }
 
 #pragma GCC diagnostic pop
