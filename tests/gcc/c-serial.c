@@ -125,7 +125,7 @@ Test_GetRxCount (void)
 int32_t
 Test_Control (uint32_t control, uint32_t arg)
 {
-  return control + arg;
+  return (int32_t)(control + arg);
 }
 
 int32_t

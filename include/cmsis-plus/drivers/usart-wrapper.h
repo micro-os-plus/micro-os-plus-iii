@@ -21,24 +21,16 @@
 
 #include <cmsis-plus/drivers/serial.h>
 
-#include <Driver_USART.h>
-
 // ----------------------------------------------------------------------------
 
-//extern "C"
-//{
-//  // Avoid to include <Driver_USART.h>
-//  typedef void
-//  (*ARM_USART_SignalEvent_t) (uint32_t event);
-//
-//  typedef struct _ARM_DRIVER_USART const ARM_DRIVER_USART;
-//
-//  typedef struct _ARM_DRIVER_VERSION_ {
-//    uint16_t api;                         ///< API version
-//    uint16_t drv;                         ///< Driver version
-//  } ARM_DRIVER_VERSION_;
-//
-//}
+extern "C"
+{
+  // Avoid to include <Driver_USART.h>
+  typedef void
+  (*ARM_USART_SignalEvent_t) (uint32_t event);
+
+  typedef struct _ARM_DRIVER_USART const ARM_DRIVER_USART;
+}
 
 namespace os
 {
@@ -47,6 +39,9 @@ namespace os
     namespace driver
     {
       // ======================================================================
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
 
       // This wrapper makes a CMSIS USART Keil driver behave like a
       // CMSIS++ Serial driver.
@@ -121,34 +116,18 @@ namespace os
         /// Initialise() is now delayed just before PowerControl(FULL).
         ARM_USART_SignalEvent_t c_cb_func_;
 
-        // Kludge to convert return by value to return by reference.
+        // Kludge. The Keil driver structures are copied here and
+        // references to these objects are returned.
 
-        union
-        {
-          ARM_DRIVER_VERSION c_version;
-          Version version
-            { 0, 0 };
-        } u_v_;
-
-        union
-        {
-          ARM_USART_CAPABILITIES c_capa;
-          serial::Capabilities capa;
-        } u_c_;
-
-        union
-        {
-          ARM_USART_STATUS c_status;
-          serial::Status status;
-        } u_s_;
-
-        union
-        {
-          ARM_USART_MODEM_STATUS c_modem_status;
-          serial::Modem_status modem_status;
-        } u_m_;
+        Version version_
+          { 0, 0 };
+        serial::Capabilities capa_;
+        serial::Status status_;
+        serial::Modem_status modem_status_;
 
       };
+
+#pragma GCC diagnostic pop
 
     } /* namespace driver */
   } /* namespace cmsis */

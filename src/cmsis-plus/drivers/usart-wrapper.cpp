@@ -17,6 +17,7 @@
  */
 
 #include <cmsis-plus/drivers/usart-wrapper.h>
+
 #include <Driver_USART.h>
 
 #include <utility>
@@ -49,20 +50,22 @@ namespace os
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
 
       const Version&
       Usart_wrapper::get_version (void) noexcept
       {
-        u_v_.c_version = driver_->GetVersion ();
-        return u_v_.version;;
+        // Overwrite the C++ instance. Assume same layout.
+        *((ARM_DRIVER_VERSION*) (&version_)) = driver_->GetVersion ();
+        return version_;
       }
 
       const serial::Capabilities&
       Usart_wrapper::get_capabilities (void) noexcept
       {
-        // C++ magic, get the address from inside the Keil driver.
-        u_c_.c_capa = driver_->GetCapabilities ();
-        return u_c_.capa;
+        // Overwrite the C++ instance. Assume same layout.
+        *((ARM_USART_CAPABILITIES*) (&capa_)) = driver_->GetCapabilities ();
+        return capa_;
       }
 
 #pragma GCC diagnostic pop
@@ -131,20 +134,23 @@ namespace os
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
 
       serial::Status&
       Usart_wrapper::get_status (void) noexcept
       {
-        u_s_.c_status = driver_->GetStatus ();
-        return u_s_.status;
+        // Overwrite the C++ instance. Assume same layout.
+        *((ARM_USART_STATUS*) (&status_)) = driver_->GetStatus ();
+        return status_;
       }
 
       serial::Modem_status&
       Usart_wrapper::get_modem_status (void) noexcept
       {
-        // C++ magic, get the address from inside the Keil driver.
-        u_m_.c_modem_status = driver_->GetModemStatus ();
-        return u_m_.modem_status;
+        // Overwrite the C++ instance. Assume same layout.
+        *((ARM_USART_MODEM_STATUS*) (&modem_status_)) =
+            driver_->GetModemStatus ();
+        return modem_status_;
       }
 
 #pragma GCC diagnostic pop
