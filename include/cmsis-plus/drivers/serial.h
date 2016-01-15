@@ -495,8 +495,6 @@ namespace os
 
       // ======================================================================
 
-      // TODO: move get_version() and power() to base class.
-
       class Serial : public Base
       {
 
@@ -505,6 +503,16 @@ namespace os
         // --------------------------------------------------------------------
 
         Serial () noexcept;
+
+        Serial (const Serial&) = delete;
+
+        Serial (Serial&&) = delete;
+
+        Serial&
+        operator= (const Serial&) = delete;
+
+        Serial&
+        operator= (Serial&&) = delete;
 
         virtual
         ~Serial () noexcept = default;
