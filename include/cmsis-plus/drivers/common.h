@@ -1,7 +1,7 @@
 /*
  * This file is part of the µOS++ distribution.
  *   (https://github.com/micro-os-plus)
- * Copyright (c) 2015 Liviu Ionescu.
+ * Copyright (c) 2016 Liviu Ionescu.
  * Copyright (c) 2013-2014 ARM Ltd.
  *
  * µOS++ is free software: you can redistribute it and/or modify
@@ -83,7 +83,15 @@ namespace os
         // --------------------------------------------------------------------
 
         constexpr
+        Version () noexcept;
+
+        constexpr
         Version (version_t api, version_t drv) noexcept;
+
+        Version (const Version&) = default;
+
+        Version&
+        operator= (const Version&) = default;
 
         ~Version () noexcept = default;
 
@@ -99,9 +107,17 @@ namespace os
 
       private:
 
-        version_t const api_; ///< API version
-        version_t const drv_; ///< Driver version
+        version_t api_; ///< API version
+        version_t drv_; ///< Driver version
       };
+
+      inline constexpr
+      Version::Version () noexcept :
+      api_ (0), //
+      drv_ (0)
+        {
+          ;
+        }
 
       inline constexpr
       Version::Version (version_t api, version_t drv) noexcept :
