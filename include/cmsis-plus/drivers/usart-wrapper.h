@@ -60,40 +60,16 @@ namespace os
 
         // --------------------------------------------------------------------
 
+      protected:
+
         virtual const Version&
-        get_version (void) noexcept override;
+        do_get_version (void) noexcept override;
 
         virtual const serial::Capabilities&
-        get_capabilities (void) noexcept override;
+        do_get_capabilities (void) noexcept override;
 
         virtual status_t
-        power (Power state) noexcept override;
-
-        virtual std::size_t
-        get_tx_count (void) noexcept override;
-
-        virtual std::size_t
-        get_rx_count (void) noexcept override;
-
-        virtual status_t
-        configure (serial::config_t ctrl, serial::config_arg_t arg)
-            noexcept override;
-
-        virtual status_t
-        control (serial::control_t ctrl) noexcept override;
-
-        virtual serial::Status&
-        get_status (void) noexcept override;
-
-        virtual status_t
-        control_modem_line (serial::Modem_control ctrl) noexcept override;
-
-        virtual serial::Modem_status&
-        get_modem_status (void) noexcept override;
-
-        // --------------------------------------------------------------------
-
-      protected:
+        do_power (Power state) noexcept override;
 
         virtual status_t
         do_send (const void* data, std::size_t num) noexcept override;
@@ -104,6 +80,28 @@ namespace os
         virtual status_t
         do_transfer (const void* data_out, void* data_in, std::size_t num)
             noexcept override;
+
+        virtual std::size_t
+        do_get_tx_count (void) noexcept override;
+
+        virtual std::size_t
+        do_get_rx_count (void) noexcept override;
+
+        virtual status_t
+        do_configure (serial::config_t ctrl, serial::config_arg_t arg)
+            noexcept override;
+
+        virtual status_t
+        do_control (serial::control_t ctrl) noexcept override;
+
+        virtual serial::Status&
+        do_get_status (void) noexcept override;
+
+        virtual status_t
+        do_control_modem_line (serial::Modem_control ctrl) noexcept override;
+
+        virtual serial::Modem_status&
+        do_get_modem_status (void) noexcept override;
 
         // --------------------------------------------------------------------
 
@@ -116,8 +114,12 @@ namespace os
         /// Initialise() is now delayed just before PowerControl(FULL).
         ARM_USART_SignalEvent_t c_cb_func_;
 
-        // Kludge. The Keil driver structures are copied here and
-        // references to these objects are returned.
+        // Attempts to somehow use && failed, since the Keil driver
+        // functions return temporary objects. So the only portable
+        // solution was to copy these objects here and return
+        // references to these objects.
+        // (Not particularly proud of this solution, but could not find
+        // a better one.)
 
         Version version_
           { 0, 0 };

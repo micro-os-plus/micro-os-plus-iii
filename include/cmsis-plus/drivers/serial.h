@@ -512,13 +512,6 @@ namespace os
         // --------------------------------------------------------------------
 
         /**
-         * @brief       Get driver capabilities
-         * @return      @ref ARM_USART_CAPABILITIES
-         */
-        virtual const serial::Capabilities&
-        get_capabilities (void) noexcept = 0;
-
-        /**
          * @brief       Register event callback.
          * @param[in]   cb_event  Pointer to @ref ARM_USART_SignalEvent
          * @return      @ref execution_status
@@ -526,6 +519,15 @@ namespace os
         void
         register_callback (signal_event_t cb_func, const void* cb_object =
                                nullptr) noexcept;
+
+        // --------------------------------------------------------------------
+
+        /**
+         * @brief       Get driver capabilities
+         * @return      @ref ARM_USART_CAPABILITIES
+         */
+        const serial::Capabilities&
+        get_capabilities (void) noexcept;
 
         /**
          * @brief       Start the serial transmitter.
@@ -547,9 +549,9 @@ namespace os
 
         /**
          * @brief       Start sending/receiving data to/from the serial transmitter/receiver.
-         * @param[in]   data_out  Pointer to buffer with data to send to USART transmitter
-         * @param[out]  data_in   Pointer to buffer for data to receive from USART receiver
-         * @param[in]   num       Number of data items to transfer
+         * @param[in]   data_out  Pointer to buffer with data to send
+         * @param[out]  data_in   Pointer to buffer for data to receive
+         * @param[in]   num       Number of bytes to transfer
          * @return      @ref execution_status
          */
         status_t
@@ -557,18 +559,18 @@ namespace os
             noexcept;
 
         /**
-         * @brief       Get transmitted data count.
-         * @return      number of data items transmitted
+         * @brief       Get transmitted bytes count.
+         * @return      number of bytes transmitted
          */
-        virtual std::size_t
-        get_tx_count (void) noexcept = 0;
+        std::size_t
+        get_tx_count (void) noexcept;
 
         /**
-         * @brief       Get received data count.
-         * @return      number of data items received
+         * @brief       Get received bytes count.
+         * @return      number of bytes received
          */
-        virtual std::size_t
-        get_rx_count (void) noexcept = 0;
+        std::size_t
+        get_rx_count (void) noexcept;
 
         /**
          * @brief       Configure the serial interface.
@@ -576,8 +578,8 @@ namespace os
          * @param[in]   arg      Argument of operation (optional)
          * @return      common @ref execution_status and driver specific @ref usart_execution_status
          */
-        virtual status_t
-        configure (serial::config_t cfg, serial::config_arg_t arg) noexcept = 0;
+        status_t
+        configure (serial::config_t cfg, serial::config_arg_t arg) noexcept;
 
         /**
          * @brief       Control the serial interface.
@@ -585,30 +587,30 @@ namespace os
          * @param[in]   arg      Argument of operation (optional)
          * @return      common @ref execution_status and driver specific @ref usart_execution_status
          */
-        virtual status_t
-        control (serial::control_t ctrl) noexcept = 0;
+        status_t
+        control (serial::control_t ctrl) noexcept;
 
         /**
          * @brief       Get serial port status.
-         * @return      USART status @ref ARM_USART_STATUS
+         * @return      Serial status @ref ARM_USART_STATUS
          */
-        virtual serial::Status&
-        get_status (void) noexcept = 0;
+        serial::Status&
+        get_status (void) noexcept;
 
         /**
          * @brief       Configure serial modem lines.
          * @param[in]   control  @ref ARM_USART_MODEM_CONTROL
          * @return      @ref execution_status
          */
-        virtual status_t
-        control_modem_line (serial::Modem_control ctrl) noexcept = 0;
+        status_t
+        control_modem_line (serial::Modem_control ctrl) noexcept;
 
         /**
          * @brief       Get serial modem lines state.
          * @return      modem status @ref ARM_USART_MODEM_STATUS
          */
-        virtual serial::Modem_status&
-        get_modem_status (void) noexcept = 0;
+        serial::Modem_status&
+        get_modem_status (void) noexcept;
 
         /**
          * @brief       Signal serial events.
@@ -622,6 +624,9 @@ namespace os
 
         // ----- To be implemented by derived classes -----
 
+        virtual const serial::Capabilities&
+        do_get_capabilities (void) noexcept = 0;
+
         virtual status_t
         do_send (const void* data, std::size_t num) noexcept = 0;
 
@@ -631,6 +636,28 @@ namespace os
         virtual status_t
         do_transfer (const void* data_out, void* data_in, std::size_t num)
             noexcept = 0;
+
+        virtual std::size_t
+        do_get_tx_count (void) noexcept = 0;
+
+        virtual std::size_t
+        do_get_rx_count (void) noexcept = 0;
+
+        virtual status_t
+        do_configure (serial::config_t cfg, serial::config_arg_t arg)
+            noexcept = 0;
+
+        virtual status_t
+        do_control (serial::control_t ctrl) noexcept = 0;
+
+        virtual serial::Status&
+        do_get_status (void) noexcept = 0;
+
+        virtual status_t
+        do_control_modem_line (serial::Modem_control ctrl) noexcept = 0;
+
+        virtual serial::Modem_status&
+        do_get_modem_status (void) noexcept = 0;
 
       protected:
 
@@ -716,9 +743,57 @@ namespace os
         {
           return ri;
         }
+      } /* namespace serial */
 
       // ----------------------------------------------------------------------
-      } /* namespace serial */
+
+      inline const serial::Capabilities&
+      Serial::get_capabilities (void) noexcept
+      {
+        return do_get_capabilities ();
+      }
+
+      inline std::size_t
+      Serial::get_tx_count (void) noexcept
+      {
+        return do_get_tx_count ();
+      }
+
+      inline std::size_t
+      Serial::get_rx_count (void) noexcept
+      {
+        return do_get_rx_count ();
+      }
+
+      inline status_t
+      Serial::configure (serial::config_t cfg, serial::config_arg_t arg) noexcept
+      {
+        return do_configure (cfg, arg);
+      }
+
+      inline status_t
+      Serial::control (serial::control_t ctrl) noexcept
+      {
+        return do_control (ctrl);
+      }
+
+      inline serial::Status&
+      Serial::get_status (void) noexcept
+      {
+        return do_get_status ();
+      }
+
+      inline status_t
+      Serial::control_modem_line (serial::Modem_control ctrl) noexcept
+      {
+        return do_control_modem_line (ctrl);
+      }
+
+      inline serial::Modem_status&
+      Serial::get_modem_status (void) noexcept
+      {
+        return do_get_modem_status ();
+      }
 
     } /* namespace driver */
   } /* namespace cmsis */

@@ -32,38 +32,15 @@ public:
   virtual
   ~TestSerial () override;
 
+protected:
   virtual const os::cmsis::driver::Version&
-  get_version (void) noexcept override;
+  do_get_version (void) noexcept override;
 
   virtual const os::cmsis::driver::serial::Capabilities&
-  get_capabilities (void) noexcept override;
+  do_get_capabilities (void) noexcept override;
 
   virtual os::cmsis::driver::status_t
-  power (os::cmsis::driver::Power state) noexcept override;
-
-  virtual std::size_t
-  get_tx_count (void) noexcept override;
-
-  virtual std::size_t
-  get_rx_count (void) noexcept override;
-
-  virtual os::cmsis::driver::status_t
-  configure (uint32_t ctrl, uint32_t arg) noexcept override;
-
-  virtual os::cmsis::driver::status_t
-  control (os::cmsis::driver::serial::control_t ctrl) noexcept override;
-
-  virtual os::cmsis::driver::serial::Status&
-  get_status (void) noexcept override;
-
-  virtual os::cmsis::driver::status_t
-  control_modem_line (os::cmsis::driver::serial::Modem_control ctrl)
-      noexcept override;
-
-  virtual os::cmsis::driver::serial::Modem_status&
-  get_modem_status (void) noexcept override;
-
-protected:
+  do_power (os::cmsis::driver::Power state) noexcept override;
 
   virtual os::cmsis::driver::status_t
   do_send (const void* data, std::size_t num) noexcept override;
@@ -74,6 +51,28 @@ protected:
   virtual os::cmsis::driver::status_t
   do_transfer (const void* data_out, void* data_in, std::size_t num)
       noexcept override;
+
+  virtual std::size_t
+  do_get_tx_count (void) noexcept override;
+
+  virtual std::size_t
+  do_get_rx_count (void) noexcept override;
+
+  virtual os::cmsis::driver::status_t
+  do_configure (uint32_t ctrl, uint32_t arg) noexcept override;
+
+  virtual os::cmsis::driver::status_t
+  do_control (os::cmsis::driver::serial::control_t ctrl) noexcept override;
+
+  virtual os::cmsis::driver::serial::Status&
+  do_get_status (void) noexcept override;
+
+  virtual os::cmsis::driver::status_t
+  do_control_modem_line (os::cmsis::driver::serial::Modem_control ctrl)
+      noexcept override;
+
+  virtual os::cmsis::driver::serial::Modem_status&
+  do_get_modem_status (void) noexcept override;
 
 private:
   os::cmsis::driver::Version version_
@@ -101,64 +100,21 @@ TestSerial::~TestSerial ()
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
 const os::cmsis::driver::Version&
-TestSerial::get_version (void) noexcept
+TestSerial::do_get_version (void) noexcept
 {
   return version_;
 }
 
 const os::cmsis::driver::serial::Capabilities&
-TestSerial::get_capabilities (void) noexcept
+TestSerial::do_get_capabilities (void) noexcept
 {
   return capabilities_;
 }
 
 os::cmsis::driver::status_t
-TestSerial::power (os::cmsis::driver::Power state) noexcept
+TestSerial::do_power (os::cmsis::driver::Power state) noexcept
 {
   return os::cmsis::driver::STATUS_OK;
-}
-
-std::size_t
-TestSerial::get_tx_count (void) noexcept
-{
-  return 0;
-}
-
-std::size_t
-TestSerial::get_rx_count (void) noexcept
-{
-  return 0;
-}
-
-os::cmsis::driver::status_t
-TestSerial::configure (os::cmsis::driver::serial::config_t cfg,
-                       os::cmsis::driver::serial::config_arg_t arg) noexcept
-{
-  return os::cmsis::driver::STATUS_OK;
-}
-
-os::cmsis::driver::status_t
-TestSerial::control (os::cmsis::driver::serial::control_t ctrl) noexcept
-{
-  return os::cmsis::driver::STATUS_OK;
-}
-
-os::cmsis::driver::serial::Status&
-TestSerial::get_status (void) noexcept
-{
-  return status_;
-}
-
-os::cmsis::driver::status_t
-TestSerial::control_modem_line (os::cmsis::driver::serial::Modem_control ctrl) noexcept
-{
-  return os::cmsis::driver::STATUS_OK;
-}
-
-os::cmsis::driver::serial::Modem_status&
-TestSerial::get_modem_status (void) noexcept
-{
-  return modem_status_;
 }
 
 os::cmsis::driver::status_t
@@ -177,6 +133,50 @@ os::cmsis::driver::status_t
 TestSerial::do_transfer (const void* data_out, void* data_in, std::size_t num) noexcept
 {
   return os::cmsis::driver::STATUS_OK;
+}
+
+std::size_t
+TestSerial::do_get_tx_count (void) noexcept
+{
+  return 0;
+}
+
+std::size_t
+TestSerial::do_get_rx_count (void) noexcept
+{
+  return 0;
+}
+
+os::cmsis::driver::status_t
+TestSerial::do_configure (os::cmsis::driver::serial::config_t cfg,
+                          os::cmsis::driver::serial::config_arg_t arg) noexcept
+{
+  return os::cmsis::driver::STATUS_OK;
+}
+
+os::cmsis::driver::status_t
+TestSerial::do_control (os::cmsis::driver::serial::control_t ctrl) noexcept
+{
+  return os::cmsis::driver::STATUS_OK;
+}
+
+os::cmsis::driver::serial::Status&
+TestSerial::do_get_status (void) noexcept
+{
+  return status_;
+}
+
+os::cmsis::driver::status_t
+TestSerial::do_control_modem_line (
+    os::cmsis::driver::serial::Modem_control ctrl) noexcept
+{
+  return os::cmsis::driver::STATUS_OK;
+}
+
+os::cmsis::driver::serial::Modem_status&
+TestSerial::do_get_modem_status (void) noexcept
+{
+  return modem_status_;
 }
 
 #pragma GCC diagnostic pop

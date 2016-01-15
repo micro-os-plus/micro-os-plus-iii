@@ -143,20 +143,42 @@ namespace os
          * @brief       Get driver version.
          * @return      @ref ARM_DRIVER_VERSION
          */
-        virtual const Version&
-        get_version (void) noexcept = 0;
+        const Version&
+        get_version (void) noexcept;
 
         /**
-         * @brief       Power up/down serial port.
+         * @brief       Power up/down device.
          * @param[in]   state  Power state
          * @return      @ref execution_status
          */
+        status_t
+        power (Power state) noexcept;
+
+        // --------------------------------------------------------------------
+
+      protected:
+
+        virtual const Version&
+        do_get_version (void) noexcept = 0;
+
         virtual status_t
-        power (Power state) noexcept = 0;
+        do_power (Power state) noexcept = 0;
 
       };
 
-    // ----------------------------------------------------------------------
+      // ----------------------------------------------------------------------
+
+      inline const Version&
+      Base::get_version (void) noexcept
+      {
+        return do_get_version ();
+      }
+
+      inline status_t
+      Base::power (Power state) noexcept
+      {
+        return do_power (state);
+      }
 
     } /* namespace driver */
   } /* namespace cmsis */
