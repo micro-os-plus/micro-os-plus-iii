@@ -493,12 +493,6 @@ namespace os
           return do_configure_address (dev_addr);
         }
 
-        inline status_t
-        Device::read_setup_packet (uint8_t* buf) noexcept
-        {
-          return do_read_setup_packet (buf);
-        }
-
         inline device::frame_number_t
         Device::get_frame_number (void) noexcept
         {
@@ -513,7 +507,7 @@ namespace os
         }
 
         inline status_t
-        Device::do_unconfigure_endpoint (endpoint_t ep_addr) noexcept
+        Device::unconfigure_endpoint (endpoint_t ep_addr) noexcept
         {
           return do_unconfigure_endpoint (ep_addr);
         }
@@ -522,12 +516,6 @@ namespace os
         Device::stall_endpoint (endpoint_t ep_addr, bool stall) noexcept
         {
           return do_stall_endpoint (ep_addr, stall);
-        }
-
-        inline status_t
-        Device::transfer (endpoint_t ep_addr, uint8_t* data, std::size_t num) noexcept
-        {
-          return do_transfer (ep_addr, data, num);
         }
 
         inline std::size_t
