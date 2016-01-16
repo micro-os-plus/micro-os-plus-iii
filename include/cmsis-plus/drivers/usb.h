@@ -101,6 +101,20 @@ namespace os
 
         constexpr packet_size_t ENDPOINT_MAX_PACKET_SIZE_MASK = 0x07FF;
 
+        // --------------------------------------------------------------------
+        using frame_number_t = uint16_t;
+
+        using device_address_t = uint8_t;
+
+        //using ARM_USBH_PIPE_HANDLE = uint32_t;
+        using pipe_t = uint32_t;
+        using port_t = uint8_t;
+
+        using hub_addr_t = uint8_t;
+        using hub_port_t = uint8_t;
+
+        using polling_interval_t = uint8_t;
+
       } /* namespace usb */
     } /* namespace driver */
   } /* namespace cmsis */

@@ -24,6 +24,9 @@ test_serial ();
 extern void
 test_usbd (void);
 
+extern void
+test_usbh (void);
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
@@ -33,6 +36,8 @@ main (int argc, char* argv[])
   test_serial ();
 
   test_usbd ();
+
+  test_usbh ();
 
   printf ("%s done.", argv[0]);
   return 0;
