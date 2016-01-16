@@ -82,10 +82,6 @@ private:
     { 1, 2 }; //
   serial::Capabilities capabilities_
     { true, 0, true, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, true, 0, true };
-  serial::Status status_
-    { 0, 0, 0, 0, 0, 0, 0 };
-  serial::Modem_status modem_status_
-    { 0, 0, 0, 0 };
 
 };
 
@@ -189,16 +185,16 @@ extern ARM_DRIVER_USART test_usart;
 void
 test_serial (void);
 
-TestSerial ser_test;
+static TestSerial device;
 
-Usart_wrapper wrap
+static Usart_wrapper wrap
   { &test_usart, nullptr };
 
 void
 test_serial (void)
 {
   serial::Capabilities capa;
-  capa = ser_test.get_capabilities ();
+  capa = device.get_capabilities ();
   assert(capa.asynchronous);
   assert(!capa.synchronous_master);
   assert(capa.synchronous_slave);
@@ -223,7 +219,7 @@ test_serial (void)
   assert(!capa.event_dcd);
   assert(capa.event_ri);
 
-  const serial::Capabilities& caparef = ser_test.get_capabilities ();
+  const serial::Capabilities& caparef = device.get_capabilities ();
   assert(caparef.asynchronous);
   assert(!caparef.synchronous_master);
   assert(caparef.synchronous_slave);

@@ -1,3 +1,21 @@
+/*
+ * This file is part of the µOS++ distribution.
+ *   (https://github.com/micro-os-plus)
+ * Copyright (c) 2016 Liviu Ionescu.
+ *
+ * µOS++ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, version 3.
+ *
+ * µOS++ is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <Driver_USART.h>
 #include <stdint.h>
 
@@ -17,28 +35,29 @@ ARM_USART_CAPABILITIES
 Test_GetCapabilities (void)
 {
   static ARM_USART_CAPABILITIES capa =
-    { //
-      .asynchronous = 1,      ///< supports UART (Asynchronous) mode
-          .synchronous_master = 0,      ///< supports Synchronous Master mode
-          .synchronous_slave = 1,      ///< supports Synchronous Slave mode
-          .single_wire = 0,      ///< supports UART Single-wire mode
-          .irda = 0,      ///< supports UART IrDA mode
-          .smart_card = 1,      ///< supports UART Smart Card mode
-          .smart_card_clock = 0,      ///< Smart Card Clock generator available
-          .flow_control_rts = 1,      ///< RTS Flow Control available
-          .flow_control_cts = 1,      ///< CTS Flow Control available
-          .event_tx_complete = 1, ///< Transmit completed event: \ref ARM_USART_EVENT_TX_COMPLETE
-          .event_rx_timeout = 1, ///< Signal receive character timeout event: \ref ARM_USART_EVENT_RX_TIMEOUT
-          .rts = 1,      ///< RTS Line: 0=not available, 1=available
-          .cts = 0,      ///< CTS Line: 0=not available, 1=available
-          .dtr = 0,      ///< DTR Line: 0=not available, 1=available
-          .dsr = 0,      ///< DSR Line: 0=not available, 1=available
-          .dcd = 0,      ///< DCD Line: 0=not available, 1=available
-          .ri = 1,      ///< RI Line: 0=not available, 1=available
-          .event_cts = 0, ///< Signal CTS change event: \ref ARM_USART_EVENT_CTS
-          .event_dsr = 1, ///< Signal DSR change event: \ref ARM_USART_EVENT_DSR
-          .event_dcd = 0, ///< Signal DCD change event: \ref ARM_USART_EVENT_DCD
-          .event_ri = 1,   ///< Signal RI change event: \ref ARM_USART_EVENT_RI
+    {
+    //
+        .asynchronous = 1,      ///< supports UART (Asynchronous) mode
+        .synchronous_master = 0,      ///< supports Synchronous Master mode
+        .synchronous_slave = 1,      ///< supports Synchronous Slave mode
+        .single_wire = 0,      ///< supports UART Single-wire mode
+        .irda = 0,      ///< supports UART IrDA mode
+        .smart_card = 1,      ///< supports UART Smart Card mode
+        .smart_card_clock = 0,      ///< Smart Card Clock generator available
+        .flow_control_rts = 1,      ///< RTS Flow Control available
+        .flow_control_cts = 1,      ///< CTS Flow Control available
+        .event_tx_complete = 1, ///< Transmit completed event: \ref ARM_USART_EVENT_TX_COMPLETE
+        .event_rx_timeout = 1, ///< Signal receive character timeout event: \ref ARM_USART_EVENT_RX_TIMEOUT
+        .rts = 1,      ///< RTS Line: 0=not available, 1=available
+        .cts = 0,      ///< CTS Line: 0=not available, 1=available
+        .dtr = 0,      ///< DTR Line: 0=not available, 1=available
+        .dsr = 0,      ///< DSR Line: 0=not available, 1=available
+        .dcd = 0,      ///< DCD Line: 0=not available, 1=available
+        .ri = 1,      ///< RI Line: 0=not available, 1=available
+        .event_cts = 0, ///< Signal CTS change event: \ref ARM_USART_EVENT_CTS
+        .event_dsr = 1, ///< Signal DSR change event: \ref ARM_USART_EVENT_DSR
+        .event_dcd = 0, ///< Signal DCD change event: \ref ARM_USART_EVENT_DCD
+        .event_ri = 1,   ///< Signal RI change event: \ref ARM_USART_EVENT_RI
       };
   return capa;
 }
@@ -96,19 +115,19 @@ Test_PowerControl (ARM_POWER_STATE state)
 int32_t
 Test_Send (const void *data, uint32_t num)
 {
-  return (int32_t)num;
+  return (int32_t) num;
 }
 
 int32_t
 Test_Receive (void *data, uint32_t num)
 {
-  return (int32_t)num;
+  return (int32_t) num;
 }
 
 int32_t
 Test_Transfer (const void *data_out, void *data_in, uint32_t num)
 {
-  return (int32_t)num;
+  return (int32_t) num;
 }
 
 uint32_t
@@ -125,7 +144,7 @@ Test_GetRxCount (void)
 int32_t
 Test_Control (uint32_t control, uint32_t arg)
 {
-  return (int32_t)(control + arg);
+  return (int32_t) (control + arg);
 }
 
 int32_t

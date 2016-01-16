@@ -17,6 +17,8 @@
  */
 
 #include <cmsis-plus/drivers/usb-device.h>
+#include <cmsis-plus/drivers/usbd-wrapper.h>
+
 #include <cassert>
 
 using namespace os::cmsis::driver;
@@ -197,23 +199,68 @@ Test_usb_device::do_abort_transfer (usb::endpoint_t ep_addr) noexcept
 
 #pragma GCC diagnostic pop
 
-Test_usb_device usbd_test;
+static Test_usb_device device;
 
 void
 test_usbd (void);
+
+extern ARM_DRIVER_USBD test_usbd_driver;
+
+static Usbd_wrapper wrap
+  { &test_usbd_driver, nullptr, nullptr };
 
 void
 test_usbd (void)
 {
   Version version;
-  version = usbd_test.get_version ();
+  version = device.get_version ();
   assert(version.get_api () == 0x0123);
   assert(version.get_drv () == 0x0124);
 
   usb::device::Capabilities capa;
-  capa = usbd_test.get_capabilities ();
+  capa = device.get_capabilities ();
   assert(capa.vbus_detection);
   assert(!capa.event_vbus_on);
   assert(capa.event_vbus_off);
+
+  version = wrap.get_version ();
+  assert(version.get_api () == 0x1234);
+  assert(version.get_drv () == 0x5678);
+
+  capa = wrap.get_capabilities ();
+  assert(capa.vbus_detection);
+  assert(capa.event_vbus_on);
+  assert(!capa.event_vbus_off);
+
+  usb::device::Status status = wrap.get_status ();
+
+  assert(!status.is_vbus_on ());
+  assert(status.get_speed () == 2);
+  assert(status.is_active ());
+
+  assert(wrap.power (Power::full) == 11);
+  assert(wrap.power (Power::off) == 22);
+  assert(wrap.power (Power::low) == 33);
+
+  assert(wrap.connect () == 4);
+  assert(wrap.disconnect () == 5);
+  assert(wrap.wakeup_remote () == 6);
+  assert(wrap.configure_address (31) == 31);
+
+  uint8_t buf[10];
+  assert(wrap.read_setup_packet (buf) == 7);
+
+  assert(wrap.configure_endpoint (2, 0, 1) == 2);
+  assert(wrap.unconfigure_endpoint (3) == 3);
+  assert(wrap.stall_endpoint (4, true) == 4);
+
+  assert(wrap.transfer (5, buf, sizeof(buf)) == 5);
+  assert(wrap.transfer (5, buf, 0) == STATUS_OK);
+
+  assert(wrap.get_transfer_count (6) == 6);
+
+  assert(wrap.abort_transfer (7) == 7);
+
+  assert(wrap.get_frame_number () == 8);
 
 }
