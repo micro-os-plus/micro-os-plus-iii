@@ -175,6 +175,9 @@ namespace os
 
         // ====================================================================
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
         class Device : public Base
         {
 
@@ -424,6 +427,8 @@ namespace os
 
           device::Status status_;
         };
+
+#pragma GCC diagnostic pop
 
         // ----------------------------------------------------------------------
         // ----- Definitions -----

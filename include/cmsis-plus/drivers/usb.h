@@ -44,7 +44,7 @@ namespace os
 
         // --------------------------------------------------------------------
 
-        using speed_t = uint32_t;
+        using speed_t = uint8_t;
 
         /**
          * @brief USB Speed.

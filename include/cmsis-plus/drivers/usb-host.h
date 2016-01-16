@@ -49,6 +49,9 @@ namespace os
         {
           // ==================================================================
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
           /**
            * @brief USB Host Driver Capabilities.
            */
@@ -74,6 +77,8 @@ namespace os
             ///< Signal Overcurrent event
             bool event_overcurrent :1;
           };
+
+#pragma GCC diagnostic pop
 
           // ==================================================================
           // ----- USB Host Status -----
@@ -195,6 +200,9 @@ namespace os
         } /* namespace host */
 
         // ====================================================================
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
 
         class Host : public Base
         {
@@ -360,6 +368,8 @@ namespace os
 
           host::Status status_;
         };
+
+#pragma GCC diagnostic pop
 
         // --------------------------------------------------------------------
         // ----- Definitions -----
