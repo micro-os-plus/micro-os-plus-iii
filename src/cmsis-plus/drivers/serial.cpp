@@ -43,7 +43,30 @@ namespace os
       {
         cb_func_ = nullptr;
         cb_object_ = nullptr;
+
+        clean ();
       }
+
+      // ----------------------------------------------------------------------
+
+      void
+      Serial::clean (void) noexcept
+      {
+        status_.rx_break = false;
+        status_.rx_busy = false;
+        status_.rx_framing_error = false;
+        status_.rx_overflow = false;
+        status_.rx_parity_error = false;
+        status_.tx_busy = false;
+        status_.tx_underflow = false;
+
+        modem_status_.cts = false;
+        modem_status_.dsr = false;
+        modem_status_.dcd = false;
+        modem_status_.ri = false;
+      }
+
+      // ----------------------------------------------------------------------
 
       void
       Serial::register_callback (signal_event_t cb_func, const void* cb_object) noexcept
@@ -58,7 +81,7 @@ namespace os
         assert(data != nullptr);
         if (num == 0)
           {
-            return os::cmsis::driver::STATUS_OK;
+            return STATUS_OK;
           }
         return do_send (data, num);
       }
@@ -69,7 +92,7 @@ namespace os
         assert(data != nullptr);
         if (num == 0)
           {
-            return os::cmsis::driver::STATUS_OK;
+            return STATUS_OK;
           }
         return do_receive (data, num);
       }
@@ -81,7 +104,7 @@ namespace os
         assert(data_in != nullptr);
         if (num == 0)
           {
-            return os::cmsis::driver::STATUS_OK;
+            return STATUS_OK;
           }
         return do_transfer (data_out, data_in, num);
       }

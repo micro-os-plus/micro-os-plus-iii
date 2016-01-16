@@ -495,6 +495,9 @@ namespace os
 
       // ======================================================================
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
       class Serial : public Base
       {
 
@@ -628,6 +631,9 @@ namespace os
         void
         signal_event (event_t event) noexcept;
 
+        void
+        clean (void) noexcept;
+
       protected:
 
         // ----- To be implemented by derived classes -----
@@ -675,7 +681,12 @@ namespace os
         /// Pointer to object instance associated with this driver.
         const void* cb_object_;
 
+        serial::Status status_;
+        serial::Modem_status modem_status_;
+
       };
+
+#pragma GCC diagnostic pop
 
       // ----------------------------------------------------------------------
       // ----- Definitions -----
