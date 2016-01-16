@@ -3,11 +3,11 @@
 ## Criticism
 
 * non-reentrant callbacks
-* pointer to functions, not to data
-* initialize enable clocks, which means powers up the device
-* register callbacks linked to hardware inits
-* initialize/unitialize linked to power up/down
-* register callbacks linked with hardware inits
+* return aggregates (version, capabilities, status)
+* driver defined as pointer to struct of functions, not to data, which makes code reusability difficult for multiple similar implementations
+* Initialize() enable clocks, which means it powers up the device
+* callbacks registered together with hardware inits
+* initialize/unitialize must be linked to power up/down
 
 ### USART
 
