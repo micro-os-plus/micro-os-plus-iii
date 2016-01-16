@@ -210,29 +210,29 @@ namespace os
                     | os::cmsis::driver::serial::STOP_BITS_1
                     | os::cmsis::driver::serial::FLOW_CONTROL_NONE,
                 115200);
-            if (result != os::cmsis::driver::STATUS_OK)
+            if (result != os::cmsis::driver::RETURN_OK)
               break;
 
             // Enable TX output.
             result = driver_->control (os::cmsis::driver::serial::ENABLE_TX);
-            if (result != os::cmsis::driver::STATUS_OK)
+            if (result != os::cmsis::driver::RETURN_OK)
               break;
 
             // Enable RX input.
             result = driver_->control (os::cmsis::driver::serial::ENABLE_RX);
-            if (result != os::cmsis::driver::STATUS_OK)
+            if (result != os::cmsis::driver::RETURN_OK)
               break;
 
             uint8_t* pbuf;
             std::size_t nbyte = rx_buf_->getBackContiguousBuffer (&pbuf);
 
             result = driver_->receive (pbuf, nbyte);
-            if (result != os::cmsis::driver::STATUS_OK)
+            if (result != os::cmsis::driver::RETURN_OK)
               break;
           }
         while (false); // Actually NOT a loop, just a sequence of ifs!
 
-        if (result != os::cmsis::driver::STATUS_OK)
+        if (result != os::cmsis::driver::RETURN_OK)
           {
             errno = ENOSR;
             return -1;
@@ -338,7 +338,7 @@ namespace os
                     if (nb > 0)
                       {
                         if (driver_->send (pbuf, nb)
-                            != os::cmsis::driver::STATUS_OK)
+                            != os::cmsis::driver::RETURN_OK)
                           {
                             errno = EIO;
                             return -1;
@@ -385,7 +385,7 @@ namespace os
                 osSemaphoreWait (tx_sem_, osWaitForever);
               }
 
-            if ((driver_->send (buf, nbyte)) == os::cmsis::driver::STATUS_OK)
+            if ((driver_->send (buf, nbyte)) == os::cmsis::driver::RETURN_OK)
               {
                 osSemaphoreWait (tx_sem_, osWaitForever);
                 count = driver_->get_tx_count ();
@@ -463,7 +463,7 @@ namespace os
                 int32_t status;
                 status = object->driver_->receive (pbuf, nbyte);
                 // TODO: implement error processing.
-                assert(status == os::cmsis::driver::STATUS_OK);
+                assert(status == os::cmsis::driver::RETURN_OK);
 
                 object->rx_count_ = 0;
               }
@@ -489,7 +489,7 @@ namespace os
                     int32_t status;
                     status = object->driver_->send (pbuf, nbyte);
                     // TODO: implement error processing
-                    assert(status == os::cmsis::driver::STATUS_OK);
+                    assert(status == os::cmsis::driver::RETURN_OK);
                   }
                 else
                   {
