@@ -87,10 +87,10 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-      status_t
+      return_t
       Usart_wrapper::do_power (Power state) noexcept
       {
-        status_t status;
+        return_t status;
 
         if (state == Power::full)
           {
@@ -111,19 +111,19 @@ namespace os
         return status;
       }
 
-      status_t
+      return_t
       Usart_wrapper::do_send (const void* data, std::size_t num) noexcept
       {
         return driver_->Send (data, num);
       }
 
-      status_t
+      return_t
       Usart_wrapper::do_receive (void* data, std::size_t num) noexcept
       {
         return driver_->Receive (data, num);
       }
 
-      status_t
+      return_t
       Usart_wrapper::do_transfer (const void* data_out, void* data_in,
                                   std::size_t num) noexcept
       {
@@ -142,14 +142,14 @@ namespace os
         return driver_->GetRxCount ();
       }
 
-      status_t
+      return_t
       Usart_wrapper::do_configure (serial::config_t cfg,
                                    serial::config_arg_t arg) noexcept
       {
         return driver_->Control (cfg, arg);
       }
 
-      status_t
+      return_t
       Usart_wrapper::do_control (serial::control_t ctrl) noexcept
       {
         switch (ctrl)
@@ -163,7 +163,7 @@ namespace os
         return driver_->Control (ctrl, 1);
       }
 
-      status_t
+      return_t
       Usart_wrapper::do_control_modem_line (serial::Modem_control ctrl) noexcept
       {
         return driver_->SetModemControl ((ARM_USART_MODEM_CONTROL) ctrl);

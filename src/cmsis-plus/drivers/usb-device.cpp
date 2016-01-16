@@ -67,20 +67,20 @@ namespace os
 
         // ----------------------------------------------------------------------
 
-        status_t
+        return_t
         Device::read_setup_packet (uint8_t* buf) noexcept
         {
           assert(buf != nullptr);
           return do_read_setup_packet (buf);
         }
 
-        status_t
+        return_t
         Device::transfer (endpoint_t ep_addr, uint8_t* data, std::size_t num) noexcept
         {
           assert(data != nullptr);
           if (num == 0)
             {
-              return STATUS_OK;
+              return RETURN_OK;
             }
           return do_transfer (ep_addr, data, num);
         }

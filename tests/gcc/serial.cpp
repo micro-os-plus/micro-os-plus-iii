@@ -40,19 +40,19 @@ protected:
   virtual const Version&
   do_get_version (void) noexcept override;
 
-  virtual status_t
+  virtual return_t
   do_power (Power state) noexcept override;
 
   virtual const serial::Capabilities&
   do_get_capabilities (void) noexcept override;
 
-  virtual status_t
+  virtual return_t
   do_send (const void* data, std::size_t num) noexcept override;
 
-  virtual status_t
+  virtual return_t
   do_receive (void* data, std::size_t num) noexcept override;
 
-  virtual status_t
+  virtual return_t
   do_transfer (const void* data_out, void* data_in, std::size_t num)
       noexcept override;
 
@@ -62,16 +62,16 @@ protected:
   virtual std::size_t
   do_get_rx_count (void) noexcept override;
 
-  virtual status_t
+  virtual return_t
   do_configure (uint32_t ctrl, uint32_t arg) noexcept override;
 
-  virtual status_t
+  virtual return_t
   do_control (serial::control_t ctrl) noexcept override;
 
   virtual serial::Status&
   do_get_status (void) noexcept override;
 
-  virtual status_t
+  virtual return_t
   do_control_modem_line (serial::Modem_control ctrl) noexcept override;
 
   virtual serial::Modem_status&
@@ -110,28 +110,28 @@ TestSerial::do_get_capabilities (void) noexcept
   return capabilities_;
 }
 
-status_t
+return_t
 TestSerial::do_power (Power state) noexcept
 {
-  return STATUS_OK;
+  return RETURN_OK;
 }
 
-status_t
+return_t
 TestSerial::do_send (const void* data, std::size_t num) noexcept
 {
-  return STATUS_OK;
+  return RETURN_OK;
 }
 
-status_t
+return_t
 TestSerial::do_receive (void* data, std::size_t num) noexcept
 {
-  return STATUS_OK;
+  return RETURN_OK;
 }
 
-status_t
+return_t
 TestSerial::do_transfer (const void* data_out, void* data_in, std::size_t num) noexcept
 {
-  return STATUS_OK;
+  return RETURN_OK;
 }
 
 std::size_t
@@ -146,16 +146,16 @@ TestSerial::do_get_rx_count (void) noexcept
   return 0;
 }
 
-status_t
+return_t
 TestSerial::do_configure (serial::config_t cfg, serial::config_arg_t arg) noexcept
 {
-  return STATUS_OK;
+  return RETURN_OK;
 }
 
-status_t
+return_t
 TestSerial::do_control (serial::control_t ctrl) noexcept
 {
-  return STATUS_OK;
+  return RETURN_OK;
 }
 
 serial::Status&
@@ -164,10 +164,10 @@ TestSerial::do_get_status (void) noexcept
   return status_;
 }
 
-status_t
+return_t
 TestSerial::do_control_modem_line (serial::Modem_control ctrl) noexcept
 {
-  return STATUS_OK;
+  return RETURN_OK;
 }
 
 serial::Modem_status&

@@ -75,36 +75,36 @@ namespace os
         cb_object_ = cb_object;
       }
 
-      status_t
+      return_t
       Serial::send (const void* data, std::size_t num) noexcept
       {
         assert(data != nullptr);
         if (num == 0)
           {
-            return STATUS_OK;
+            return RETURN_OK;
           }
         return do_send (data, num);
       }
 
-      status_t
+      return_t
       Serial::receive (void* data, std::size_t num) noexcept
       {
         assert(data != nullptr);
         if (num == 0)
           {
-            return STATUS_OK;
+            return RETURN_OK;
           }
         return do_receive (data, num);
       }
 
-      status_t
+      return_t
       Serial::transfer (const void* data_out, void* data_in, std::size_t num) noexcept
       {
         assert(data_out != nullptr);
         assert(data_in != nullptr);
         if (num == 0)
           {
-            return STATUS_OK;
+            return RETURN_OK;
           }
         return do_transfer (data_out, data_in, num);
       }

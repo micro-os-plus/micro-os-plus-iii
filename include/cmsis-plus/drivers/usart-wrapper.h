@@ -78,16 +78,16 @@ namespace os
         virtual const serial::Capabilities&
         do_get_capabilities (void) noexcept override;
 
-        virtual status_t
+        virtual return_t
         do_power (Power state) noexcept override;
 
-        virtual status_t
+        virtual return_t
         do_send (const void* data, std::size_t num) noexcept override;
 
-        virtual status_t
+        virtual return_t
         do_receive (void* data, std::size_t num) noexcept override;
 
-        virtual status_t
+        virtual return_t
         do_transfer (const void* data_out, void* data_in, std::size_t num)
             noexcept override;
 
@@ -97,17 +97,17 @@ namespace os
         virtual std::size_t
         do_get_rx_count (void) noexcept override;
 
-        virtual status_t
+        virtual return_t
         do_configure (serial::config_t ctrl, serial::config_arg_t arg)
             noexcept override;
 
-        virtual status_t
+        virtual return_t
         do_control (serial::control_t ctrl) noexcept override;
 
         virtual serial::Status&
         do_get_status (void) noexcept override;
 
-        virtual status_t
+        virtual return_t
         do_control_modem_line (serial::Modem_control ctrl) noexcept override;
 
         virtual serial::Modem_status&

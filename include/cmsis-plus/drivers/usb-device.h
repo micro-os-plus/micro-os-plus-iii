@@ -47,26 +47,37 @@ namespace os
       {
         namespace device
         {
-          using frame_number_t = uint16_t;
-          using device_address_t = uint8_t;
+          // ==================================================================
 
-          // ------------------------------------------------------------------
+          /**
+           * @brief USB Device Driver Capabilities.
+           */
+          class Capabilities
+          {
+          public:
 
-          typedef void
-          (*signal_device_event_t) (const void* object, event_t event);
+            // For compatibility with ARM CMSIS, these bits should be
+            // exactly in this order.
 
-          typedef void
-          (*signal_endpoint_event_t) (const void* object, endpoint_t ep_addr,
-                                      event_t event);
+            ///< VBUS detection
+            bool vbus_detection :1;
+
+            ///< Signal VBUS On event
+            bool event_vbus_on :1;
+
+            ///< Signal VBUS Off event
+            bool event_vbus_off :1;
+
+          };
 
           // ==================================================================
-          // ----- USBD Status -----
+          // ----- USB Device Status -----
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
           /**
-           * @brief @brief USB Device State
+           * @brief USB Device State
            */
           class Status
           {
@@ -151,28 +162,14 @@ namespace os
             in = (1UL << 2),
           };
 
-          // ==================================================================
+          // ------------------------------------------------------------------
 
-          /**
-           * @brief USB Device Driver Capabilities.
-           */
-          class Capabilities
-          {
-          public:
+          typedef void
+          (*signal_device_event_t) (const void* object, event_t event);
 
-            // For compatibility with ARM CMSIS, these bits should be
-            // exactly in this order.
-
-            ///< VBUS detection
-            bool vbus_detection :1;
-
-            ///< Signal VBUS On event
-            bool event_vbus_on :1;
-
-            ///< Signal VBUS Off event
-            bool event_vbus_off :1;
-
-          };
+          typedef void
+          (*signal_endpoint_event_t) (const void* object, endpoint_t ep_addr,
+                                      event_t event);
 
         } /* namespace device */
 
@@ -228,14 +225,14 @@ namespace os
            * @brief       Connect USB Device.
            * @return      @ref execution_status
            */
-          status_t
+          return_t
           connect (void) noexcept;
 
           /**
            * @brief       Disconnect USB Device.
            * @return      @ref execution_status
            */
-          status_t
+          return_t
           disconnect (void) noexcept;
 
           /**
@@ -249,7 +246,7 @@ namespace os
            * @brief       Trigger USB Remote Wakeup.
            * @return      @ref execution_status
            */
-          status_t
+          return_t
           wakeup_remote (void) noexcept;
 
           /**
@@ -257,22 +254,22 @@ namespace os
            * @param [in]   dev_addr  Device Address
            * @return      @ref execution_status
            */
-          status_t
-          configure_address (device::device_address_t dev_addr) noexcept;
+          return_t
+          configure_address (device_address_t dev_addr) noexcept;
 
           /**
            * @brief       Read setup packet received over Control Endpoint.
            * @param [out]  setup  Pointer to buffer for setup packet
            * @return      @ref execution_status
            */
-          status_t
+          return_t
           read_setup_packet (uint8_t* buf) noexcept;
 
           /**
            * @brief       Get current USB Frame Number.
            * @return      Frame Number
            */
-          device::frame_number_t
+          frame_number_t
           get_frame_number (void) noexcept;
 
           /**
@@ -284,8 +281,8 @@ namespace os
            * @param [in]   ep_max_packet_size Endpoint Maximum Packet Size
            * @return      @ref execution_status
            */
-          status_t
-          configure_endpoint (endpoint_t ep_addr, endpoint_type_t ep_type,
+          return_t
+          configure_endpoint (endpoint_t ep_addr, Endpoint_type ep_type,
                               packet_size_t ep_max_packet_size) noexcept;
 
           /**
@@ -295,7 +292,7 @@ namespace os
            *                - ep_addr.7:    Direction
            * @return      @ref execution_status
            */
-          status_t
+          return_t
           unconfigure_endpoint (endpoint_t ep_addr) noexcept;
 
           /**
@@ -308,7 +305,7 @@ namespace os
            *                - \b true Set
            * @return      @ref execution_status
            */
-          status_t
+          return_t
           stall_endpoint (endpoint_t ep_addr, bool stall) noexcept;
 
           /**
@@ -320,7 +317,7 @@ namespace os
            * @param [in]   num  Number of data bytes to transfer
            * @return      @ref execution_status
            */
-          status_t
+          return_t
           transfer (endpoint_t ep_addr, uint8_t* data, std::size_t num)
               noexcept;
 
@@ -341,7 +338,7 @@ namespace os
            *                - ep_addr.7:    Direction
            * @return      @ref execution_status
            */
-          status_t
+          return_t
           abort_transfer (endpoint_t ep_addr) noexcept;
 
           /**
@@ -368,45 +365,45 @@ namespace os
           virtual const device::Capabilities&
           do_get_capabilities (void) noexcept = 0;
 
-          virtual status_t
+          virtual return_t
           do_connect (void) noexcept = 0;
 
-          virtual status_t
+          virtual return_t
           do_disconnect (void) noexcept = 0;
 
           virtual device::Status&
           do_get_status (void) noexcept = 0;
 
-          virtual status_t
+          virtual return_t
           do_wakeup_remote (void) noexcept = 0;
 
-          virtual status_t
-          do_configure_address (device::device_address_t dev_addr) noexcept = 0;
+          virtual return_t
+          do_configure_address (device_address_t dev_addr) noexcept = 0;
 
-          virtual status_t
+          virtual return_t
           do_read_setup_packet (uint8_t* buf) noexcept = 0;
 
-          virtual device::frame_number_t
+          virtual frame_number_t
           do_get_frame_number (void) noexcept = 0;
 
-          virtual status_t
-          do_configure_endpoint (endpoint_t ep_addr, endpoint_type_t ep_type,
+          virtual return_t
+          do_configure_endpoint (endpoint_t ep_addr, Endpoint_type ep_type,
                                  packet_size_t ep_max_packet_size) noexcept = 0;
 
-          virtual status_t
+          virtual return_t
           do_unconfigure_endpoint (endpoint_t ep_addr) noexcept = 0;
 
-          virtual status_t
+          virtual return_t
           do_stall_endpoint (endpoint_t ep_addr, bool stall) noexcept = 0;
 
-          virtual status_t
+          virtual return_t
           do_transfer (endpoint_t ep_addr, uint8_t* data, std::size_t num)
               noexcept = 0;
 
           virtual std::size_t
           do_get_transfer_count (endpoint_t ep_addr) noexcept = 0;
 
-          virtual status_t
+          virtual return_t
           do_abort_transfer (endpoint_t ep_addr) noexcept = 0;
 
         private:
@@ -469,50 +466,50 @@ namespace os
           return do_get_status ();
         }
 
-        inline status_t
+        inline return_t
         Device::connect (void) noexcept
         {
           return do_connect ();
         }
 
-        inline status_t
+        inline return_t
         Device::disconnect (void) noexcept
         {
           return do_disconnect ();
         }
 
-        inline status_t
+        inline return_t
         Device::wakeup_remote (void) noexcept
         {
           return do_wakeup_remote ();
         }
 
-        inline status_t
+        inline return_t
         Device::configure_address (uint8_t dev_addr) noexcept
         {
           return do_configure_address (dev_addr);
         }
 
-        inline device::frame_number_t
+        inline frame_number_t
         Device::get_frame_number (void) noexcept
         {
           return do_get_frame_number ();
         }
 
-        inline status_t
-        Device::configure_endpoint (endpoint_t ep_addr, endpoint_type_t ep_type,
+        inline return_t
+        Device::configure_endpoint (endpoint_t ep_addr, Endpoint_type ep_type,
                                     packet_size_t ep_max_packet_size) noexcept
         {
           return do_configure_endpoint (ep_addr, ep_type, ep_max_packet_size);
         }
 
-        inline status_t
+        inline return_t
         Device::unconfigure_endpoint (endpoint_t ep_addr) noexcept
         {
           return do_unconfigure_endpoint (ep_addr);
         }
 
-        inline status_t
+        inline return_t
         Device::stall_endpoint (endpoint_t ep_addr, bool stall) noexcept
         {
           return do_stall_endpoint (ep_addr, stall);
@@ -524,7 +521,7 @@ namespace os
           return do_get_transfer_count (ep_addr);
         }
 
-        inline status_t
+        inline return_t
         Device::abort_transfer (endpoint_t ep_addr) noexcept
         {
           return do_abort_transfer (ep_addr);

@@ -40,50 +40,49 @@ protected:
   const usb::device::Capabilities&
   do_get_capabilities (void) noexcept override;
 
-  virtual status_t
+  virtual return_t
   do_power (Power state) noexcept override;
 
-  virtual status_t
+  virtual return_t
   do_connect (void) noexcept override;
 
-  virtual status_t
+  virtual return_t
   do_disconnect (void) noexcept override;
 
   virtual usb::device::Status&
   do_get_status (void) noexcept override;
 
-  virtual status_t
+  virtual return_t
   do_wakeup_remote (void) noexcept override;
 
-  virtual status_t
-  do_configure_address (usb::device::device_address_t dev_addr)
-      noexcept override;
+  virtual return_t
+  do_configure_address (usb::device_address_t dev_addr) noexcept override;
 
-  virtual status_t
+  virtual return_t
   do_read_setup_packet (uint8_t* buf) noexcept override;
 
-  virtual usb::device::frame_number_t
+  virtual usb::frame_number_t
   do_get_frame_number (void) noexcept override;
 
-  virtual status_t
-  do_configure_endpoint (usb::endpoint_t ep_addr, usb::endpoint_type_t ep_type,
+  virtual return_t
+  do_configure_endpoint (usb::endpoint_t ep_addr, usb::Endpoint_type ep_type,
                          usb::packet_size_t ep_max_packet_size)
                              noexcept override;
 
-  virtual status_t
+  virtual return_t
   do_unconfigure_endpoint (usb::endpoint_t ep_addr) noexcept override;
 
-  virtual status_t
+  virtual return_t
   do_stall_endpoint (usb::endpoint_t ep_addr, bool stall) noexcept override;
 
-  virtual status_t
+  virtual return_t
   do_transfer (usb::endpoint_t ep_addr, uint8_t* data, std::size_t num)
       noexcept override;
 
   virtual std::size_t
   do_get_transfer_count (usb::endpoint_t ep_addr) noexcept override;
 
-  virtual status_t
+  virtual return_t
   do_abort_transfer (usb::endpoint_t ep_addr) noexcept override;
 
 private:
@@ -110,22 +109,22 @@ Test_usb_device::do_get_capabilities (void) noexcept
   return capabilities_;
 }
 
-status_t
+return_t
 Test_usb_device::do_power (Power state) noexcept
 {
-  return STATUS_OK;
+  return RETURN_OK;
 }
 
-status_t
+return_t
 Test_usb_device::do_connect (void) noexcept
 {
-  return STATUS_OK;
+  return RETURN_OK;
 }
 
-status_t
+return_t
 Test_usb_device::do_disconnect (void) noexcept
 {
-  return STATUS_OK;
+  return RETURN_OK;
 }
 
 usb::device::Status&
@@ -134,55 +133,55 @@ Test_usb_device::do_get_status (void) noexcept
   return status_;
 }
 
-status_t
+return_t
 Test_usb_device::do_wakeup_remote (void) noexcept
 {
-  return STATUS_OK;
+  return RETURN_OK;
 }
 
-status_t
-Test_usb_device::do_configure_address (usb::device::device_address_t dev_addr) noexcept
+return_t
+Test_usb_device::do_configure_address (usb::device_address_t dev_addr) noexcept
 {
-  return STATUS_OK;
+  return RETURN_OK;
 }
 
-status_t
+return_t
 Test_usb_device::do_read_setup_packet (uint8_t* buf) noexcept
 {
-  return STATUS_OK;
+  return RETURN_OK;
 }
 
-usb::device::frame_number_t
+usb::frame_number_t
 Test_usb_device::do_get_frame_number (void) noexcept
 {
   return 0;
 }
 
-status_t
+return_t
 Test_usb_device::do_configure_endpoint (usb::endpoint_t ep_addr,
-                                        usb::endpoint_type_t ep_type,
+                                        usb::Endpoint_type ep_type,
                                         usb::packet_size_t ep_max_packet_size) noexcept
 {
-  return STATUS_OK;
+  return RETURN_OK;
 }
 
-status_t
+return_t
 Test_usb_device::do_unconfigure_endpoint (usb::endpoint_t ep_addr) noexcept
 {
-  return STATUS_OK;
+  return RETURN_OK;
 }
 
-status_t
+return_t
 Test_usb_device::do_stall_endpoint (usb::endpoint_t ep_addr, bool stall) noexcept
 {
-  return STATUS_OK;
+  return RETURN_OK;
 }
 
-status_t
+return_t
 Test_usb_device::do_transfer (usb::endpoint_t ep_addr, uint8_t* data,
                               std::size_t num) noexcept
 {
-  return STATUS_OK;
+  return RETURN_OK;
 }
 
 std::size_t
@@ -191,10 +190,10 @@ Test_usb_device::do_get_transfer_count (usb::endpoint_t ep_addr) noexcept
   return 0;
 }
 
-status_t
+return_t
 Test_usb_device::do_abort_transfer (usb::endpoint_t ep_addr) noexcept
 {
-  return STATUS_OK;
+  return RETURN_OK;
 }
 
 #pragma GCC diagnostic pop
@@ -250,12 +249,12 @@ test_usbd (void)
   uint8_t buf[10];
   assert(wrap.read_setup_packet (buf) == 7);
 
-  assert(wrap.configure_endpoint (2, 0, 1) == 2);
+  assert(wrap.configure_endpoint (2, usb::Endpoint_type::control, 1) == 2);
   assert(wrap.unconfigure_endpoint (3) == 3);
   assert(wrap.stall_endpoint (4, true) == 4);
 
   assert(wrap.transfer (5, buf, sizeof(buf)) == 5);
-  assert(wrap.transfer (5, buf, 0) == STATUS_OK);
+  assert(wrap.transfer (5, buf, 0) == RETURN_OK);
 
   assert(wrap.get_transfer_count (6) == 6);
 

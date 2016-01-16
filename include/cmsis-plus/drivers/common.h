@@ -43,18 +43,18 @@ namespace os
 
       using version_t = uint16_t;
       using event_t = uint32_t;
-      using status_t = int32_t;
+      using return_t = int32_t;
       using power_t = uint32_t;
 
-      // Status & error codes
-      constexpr status_t STATUS_OK = 0;
+      // Return & error codes
+      constexpr return_t RETURN_OK = 0;
 
-      constexpr status_t ERROR = -1;
-      constexpr status_t ERROR_BUSY = -2;
-      constexpr status_t ERROR_TIMEOUT = -3;
-      constexpr status_t ERROR_UNSUPPORTED = -4;
-      constexpr status_t ERROR_PARAMETER = -5;
-      constexpr status_t ERROR_SPECIFIC = -6;
+      constexpr return_t ERROR = -1;
+      constexpr return_t ERROR_BUSY = -2;
+      constexpr return_t ERROR_TIMEOUT = -3;
+      constexpr return_t ERROR_UNSUPPORTED = -4;
+      constexpr return_t ERROR_PARAMETER = -5;
+      constexpr return_t ERROR_SPECIFIC = -6;
 
       typedef void
       (*signal_event_t) (const void* object, event_t event);
@@ -167,7 +167,7 @@ namespace os
          * @param[in]   state  Power state
          * @return      @ref execution_status
          */
-        status_t
+        return_t
         power (Power state) noexcept;
 
         // --------------------------------------------------------------------
@@ -177,7 +177,7 @@ namespace os
         virtual const Version&
         do_get_version (void) noexcept = 0;
 
-        virtual status_t
+        virtual return_t
         do_power (Power state) noexcept = 0;
 
       };
@@ -190,7 +190,7 @@ namespace os
         return do_get_version ();
       }
 
-      inline status_t
+      inline return_t
       Base::power (Power state) noexcept
       {
         return do_power (state);

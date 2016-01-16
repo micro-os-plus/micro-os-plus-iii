@@ -82,12 +82,12 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-      status_t
+      return_t
       Usbd_wrapper::do_power (Power state) noexcept
       {
         assert(driver_ != nullptr);
 
-        status_t status;
+        return_t status;
 
         if (state == Power::full)
           {
@@ -109,64 +109,64 @@ namespace os
         return status;
       }
 
-      status_t
+      return_t
       Usbd_wrapper::do_connect (void) noexcept
       {
         return driver_->DeviceConnect ();
       }
 
-      status_t
+      return_t
       Usbd_wrapper::do_disconnect (void) noexcept
       {
         return driver_->DeviceDisconnect ();
       }
 
-      status_t
+      return_t
       Usbd_wrapper::do_wakeup_remote (void) noexcept
       {
         return driver_->DeviceRemoteWakeup ();
       }
 
-      status_t
-      Usbd_wrapper::do_configure_address (
-          usb::device::device_address_t dev_addr) noexcept
+      return_t
+      Usbd_wrapper::do_configure_address (usb::device_address_t dev_addr) noexcept
       {
         return driver_->DeviceSetAddress (dev_addr);
       }
 
-      status_t
+      return_t
       Usbd_wrapper::do_read_setup_packet (uint8_t* buf) noexcept
       {
         return driver_->ReadSetupPacket (buf);
       }
 
-      usb::device::frame_number_t
+      usb::frame_number_t
       Usbd_wrapper::do_get_frame_number (void) noexcept
       {
         return driver_->GetFrameNumber ();
       }
 
-      status_t
+      return_t
       Usbd_wrapper::do_configure_endpoint (
-          usb::endpoint_t ep_addr, usb::endpoint_type_t ep_type,
+          usb::endpoint_t ep_addr, usb::Endpoint_type ep_type,
           usb::packet_size_t ep_max_packet_size) noexcept
       {
-        return driver_->EndpointConfigure (ep_addr, ep_type, ep_max_packet_size);
+        return driver_->EndpointConfigure (ep_addr, (uint8_t) ep_type,
+                                           ep_max_packet_size);
       }
 
-      status_t
+      return_t
       Usbd_wrapper::do_unconfigure_endpoint (usb::endpoint_t ep_addr) noexcept
       {
         return driver_->EndpointUnconfigure (ep_addr);
       }
 
-      status_t
+      return_t
       Usbd_wrapper::do_stall_endpoint (usb::endpoint_t ep_addr, bool stall) noexcept
       {
         return driver_->EndpointStall (ep_addr, stall);
       }
 
-      status_t
+      return_t
       Usbd_wrapper::do_transfer (usb::endpoint_t ep_addr, uint8_t* data,
                                  std::size_t num) noexcept
       {
@@ -179,7 +179,7 @@ namespace os
         return driver_->EndpointTransferGetResult (ep_addr);
       }
 
-      status_t
+      return_t
       Usbd_wrapper::do_abort_transfer (usb::endpoint_t ep_addr) noexcept
       {
         return driver_->EndpointTransferAbort (ep_addr);

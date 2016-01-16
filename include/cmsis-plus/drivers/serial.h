@@ -212,28 +212,28 @@ namespace os
         // ****** Serial specific error codes *****
 
         ///< Specified Mode not supported
-        constexpr status_t ERROR_MODE = ERROR_SPECIFIC - 1;
+        constexpr return_t ERROR_MODE = ERROR_SPECIFIC - 1;
 
         ///< Specified baudrate not supported
-        constexpr status_t ERROR_BAUDRATE = ERROR_SPECIFIC - 2;
+        constexpr return_t ERROR_BAUDRATE = ERROR_SPECIFIC - 2;
 
         ///< Specified number of Data bits not supported
-        constexpr status_t ERROR_DATA_BITS = ERROR_SPECIFIC - 3;
+        constexpr return_t ERROR_DATA_BITS = ERROR_SPECIFIC - 3;
 
         ///< Specified Parity not supported
-        constexpr status_t ERROR_PARITY = ERROR_SPECIFIC - 4;
+        constexpr return_t ERROR_PARITY = ERROR_SPECIFIC - 4;
 
         ///< Specified number of Stop bits not supported
-        constexpr status_t ERROR_STOP_BITS = ERROR_SPECIFIC - 5;
+        constexpr return_t ERROR_STOP_BITS = ERROR_SPECIFIC - 5;
 
         ///< Specified Flow Control not supported
-        constexpr status_t ERROR_FLOW_CONTROL = ERROR_SPECIFIC - 6;
+        constexpr return_t ERROR_FLOW_CONTROL = ERROR_SPECIFIC - 6;
 
         ///< Specified Clock Polarity not supported
-        constexpr status_t ERROR_CPOL = ERROR_SPECIFIC - 7;
+        constexpr return_t ERROR_CPOL = ERROR_SPECIFIC - 7;
 
         ///< Specified Clock Phase not supported
-        constexpr status_t ERROR_CPHA = ERROR_SPECIFIC - 8;
+        constexpr return_t ERROR_CPHA = ERROR_SPECIFIC - 8;
 
         // ====================================================================
         // ***** Serial Status *****
@@ -546,7 +546,7 @@ namespace os
          * @param[in]   num   Number of data items to send
          * @return      @ref execution_status
          */
-        status_t
+        return_t
         send (const void* data, std::size_t num) noexcept;
 
         /**
@@ -555,7 +555,7 @@ namespace os
          * @param[in]   num   Number of data items to receive
          * @return      @ref execution_status
          */
-        status_t
+        return_t
         receive (void* data, std::size_t num) noexcept;
 
         /**
@@ -565,7 +565,7 @@ namespace os
          * @param[in]   num       Number of bytes to transfer
          * @return      @ref execution_status
          */
-        status_t
+        return_t
         transfer (const void* data_out, void* data_in, std::size_t num)
             noexcept;
 
@@ -589,7 +589,7 @@ namespace os
          * @param[in]   arg      Argument of operation (optional)
          * @return      common @ref execution_status and driver specific @ref usart_execution_status
          */
-        status_t
+        return_t
         configure (serial::config_t cfg, serial::config_arg_t arg) noexcept;
 
         /**
@@ -598,7 +598,7 @@ namespace os
          * @param[in]   arg      Argument of operation (optional)
          * @return      common @ref execution_status and driver specific @ref usart_execution_status
          */
-        status_t
+        return_t
         control (serial::control_t ctrl) noexcept;
 
         /**
@@ -613,7 +613,7 @@ namespace os
          * @param[in]   control  @ref ARM_USART_MODEM_CONTROL
          * @return      @ref execution_status
          */
-        status_t
+        return_t
         control_modem_line (serial::Modem_control ctrl) noexcept;
 
         /**
@@ -641,13 +641,13 @@ namespace os
         virtual const serial::Capabilities&
         do_get_capabilities (void) noexcept = 0;
 
-        virtual status_t
+        virtual return_t
         do_send (const void* data, std::size_t num) noexcept = 0;
 
-        virtual status_t
+        virtual return_t
         do_receive (void* data, std::size_t num) noexcept = 0;
 
-        virtual status_t
+        virtual return_t
         do_transfer (const void* data_out, void* data_in, std::size_t num)
             noexcept = 0;
 
@@ -657,17 +657,17 @@ namespace os
         virtual std::size_t
         do_get_rx_count (void) noexcept = 0;
 
-        virtual status_t
+        virtual return_t
         do_configure (serial::config_t cfg, serial::config_arg_t arg)
             noexcept = 0;
 
-        virtual status_t
+        virtual return_t
         do_control (serial::control_t ctrl) noexcept = 0;
 
         virtual serial::Status&
         do_get_status (void) noexcept = 0;
 
-        virtual status_t
+        virtual return_t
         do_control_modem_line (serial::Modem_control ctrl) noexcept = 0;
 
         virtual serial::Modem_status&
@@ -784,13 +784,13 @@ namespace os
         return do_get_rx_count ();
       }
 
-      inline status_t
+      inline return_t
       Serial::configure (serial::config_t cfg, serial::config_arg_t arg) noexcept
       {
         return do_configure (cfg, arg);
       }
 
-      inline status_t
+      inline return_t
       Serial::control (serial::control_t ctrl) noexcept
       {
         return do_control (ctrl);
@@ -802,7 +802,7 @@ namespace os
         return do_get_status ();
       }
 
-      inline status_t
+      inline return_t
       Serial::control_modem_line (serial::Modem_control ctrl) noexcept
       {
         return do_control_modem_line (ctrl);
