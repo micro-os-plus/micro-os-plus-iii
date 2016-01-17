@@ -314,19 +314,20 @@ namespace os
               }
             while (true)
               {
-//                ARM_USART_STATUS status;
-//                  {
-//                    Critical_section cs; // -----
-//
-//#pragma GCC diagnostic push
-//#pragma GCC diagnostic ignored "-Waggregate-return"
-//                    status = driver_->get_status ();
-//#pragma GCC diagnostic pop
-//
-//                  }
+                os::cmsis::driver::serial::Status status;
+                  {
+                    Critical_section cs; // -----
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+                    status = driver_->get_status ();
+#pragma GCC diagnostic pop
+
+                  }
                 // We use a local tx busy flag because the ARM driver's flag
                 // may become not-busy between transmissions.
-                if (!tx_busy_)
+                if (!status.tx_busy)
+//                if (!tx_busy_)
                   {
                     uint8_t* pbuf;
                     std::size_t nb;
@@ -343,7 +344,7 @@ namespace os
                             errno = EIO;
                             return -1;
                           }
-                        tx_busy_ = true;
+//                        tx_busy_ = true;
                       }
                   }
 
