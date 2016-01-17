@@ -210,6 +210,7 @@ namespace os
                     | os::cmsis::driver::serial::STOP_BITS_1
                     | os::cmsis::driver::serial::FLOW_CONTROL_NONE,
                 115200);
+            // assert(result == os::cmsis::driver::RETURN_OK);
             if (result != os::cmsis::driver::RETURN_OK)
               break;
 
@@ -253,15 +254,30 @@ namespace os
       int
       Buffered_serial_device<Cs_T>::do_close (void)
       {
+        // Abort pending reads.
+        os::cmsis::driver::return_t ret;
+        ret = driver_->control (os::cmsis::driver::serial::ABORT_RECEIVE);
+        assert(ret == os::cmsis::driver::RETURN_OK);
+
+        // TODO: should we wait for write to complete? what if flow
+        // control prevents this?
+        // Abort pending writes.
+        // driver_->control (os::cmsis::driver::serial::ABORT_SEND);
+
+        // Disable transmitter and receiver.
+        ret = driver_->control (os::cmsis::driver::serial::DISABLE_TX);
+        assert(ret == os::cmsis::driver::RETURN_OK);
+
+        ret = driver_->control (os::cmsis::driver::serial::DISABLE_RX);
+        assert(ret == os::cmsis::driver::RETURN_OK);
+        ret = driver_->control (os::cmsis::driver::serial::DISABLE_BREAK);
+        assert(ret == os::cmsis::driver::RETURN_OK);
+
         osSemaphoreDelete (rx_sem_);
         rx_sem_ = nullptr;
 
         osSemaphoreDelete (tx_sem_);
         tx_sem_ = nullptr;
-
-        // Disable transmitter and receiver.
-        driver_->control (os::cmsis::driver::serial::DISABLE_TX);
-        driver_->control (os::cmsis::driver::serial::DISABLE_RX);
 
         // Return POSIX OK.
         return 0;
@@ -434,6 +450,11 @@ namespace os
       Buffered_serial_device<Cs_T>::signal_event (
           Buffered_serial_device* object, uint32_t event)
       {
+        if (object->rx_sem_ == nullptr)
+          {
+            // After close(), ignore interrupts.
+            return;
+          }
         if ((event
             & (os::cmsis::driver::serial::Event::receive_complete
                 | os::cmsis::driver::serial::Event::rx_framing_error
