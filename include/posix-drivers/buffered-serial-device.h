@@ -196,6 +196,8 @@ namespace os
 
             // Clear buffers.
             rx_buf_->clear ();
+            rx_count_ = 0;
+
             if (tx_buf_ != nullptr)
               {
                 tx_buf_->clear ();
@@ -215,12 +217,14 @@ namespace os
               break;
 
             // Enable TX output.
-            result = driver_->control (os::cmsis::driver::serial::ENABLE_TX);
+            result = driver_->control (
+                os::cmsis::driver::serial::Control::enable_tx);
             if (result != os::cmsis::driver::RETURN_OK)
               break;
 
             // Enable RX input.
-            result = driver_->control (os::cmsis::driver::serial::ENABLE_RX);
+            result = driver_->control (
+                os::cmsis::driver::serial::Control::enable_rx);
             if (result != os::cmsis::driver::RETURN_OK)
               break;
 
@@ -254,23 +258,39 @@ namespace os
       int
       Buffered_serial_device<Cs_T>::do_close (void)
       {
+
+        // Wait for write to complete.
+        // TODO: what if flow control prevents this?
+        if (tx_buf_ != nullptr)
+          {
+            for (;;)
+              {
+                if (tx_buf_->isEmpty ())
+                  {
+                    break;
+                  }
+                osSemaphoreWait (tx_sem_, osWaitForever);
+              }
+          }
+
         // Abort pending reads.
         os::cmsis::driver::return_t ret;
-        ret = driver_->control (os::cmsis::driver::serial::ABORT_RECEIVE);
+        ret = driver_->control (
+            os::cmsis::driver::serial::Control::abort_receive);
         assert(ret == os::cmsis::driver::RETURN_OK);
 
-        // TODO: should we wait for write to complete? what if flow
-        // control prevents this?
         // Abort pending writes.
-        // driver_->control (os::cmsis::driver::serial::ABORT_SEND);
+        ret = driver_->control (os::cmsis::driver::serial::Control::abort_send);
+        assert(ret == os::cmsis::driver::RETURN_OK);
 
         // Disable transmitter and receiver.
-        ret = driver_->control (os::cmsis::driver::serial::DISABLE_TX);
+        ret = driver_->control (os::cmsis::driver::serial::Control::disable_tx);
         assert(ret == os::cmsis::driver::RETURN_OK);
 
-        ret = driver_->control (os::cmsis::driver::serial::DISABLE_RX);
+        ret = driver_->control (os::cmsis::driver::serial::Control::disable_rx);
         assert(ret == os::cmsis::driver::RETURN_OK);
-        ret = driver_->control (os::cmsis::driver::serial::DISABLE_BREAK);
+        ret = driver_->control (
+            os::cmsis::driver::serial::Control::disable_break);
         assert(ret == os::cmsis::driver::RETURN_OK);
 
         osSemaphoreDelete (rx_sem_);
@@ -396,15 +416,27 @@ namespace os
             // Do not use a transmit buffer, send directly from the user buffer.
             // Wait while transmitting.
             os::cmsis::driver::serial::Status status;
-            status = driver_->get_status ();
-            if (status.is_tx_busy ())
+            for (;;)
               {
+                status = driver_->get_status ();
+                if (!status.is_tx_busy ())
+                  {
+                    break;
+                  }
                 osSemaphoreWait (tx_sem_, osWaitForever);
               }
 
             if ((driver_->send (buf, nbyte)) == os::cmsis::driver::RETURN_OK)
               {
-                osSemaphoreWait (tx_sem_, osWaitForever);
+                for (;;)
+                  {
+                    status = driver_->get_status ();
+                    if (!status.is_tx_busy ())
+                      {
+                        break;
+                      }
+                    osSemaphoreWait (tx_sem_, osWaitForever);
+                  }
                 count = driver_->get_tx_count ();
               }
             else
@@ -528,6 +560,15 @@ namespace os
                 // No buffer, wake up the thread to return from write().
                 osSemaphoreRelease (object->tx_sem_);
               }
+          }
+        if (event & os::cmsis::driver::serial::Event::dcd)
+          {
+          }
+        if (event & os::cmsis::driver::serial::Event::cts)
+          {
+          }
+        if (event & os::cmsis::driver::serial::Event::dsr)
+          {
           }
       }
 
