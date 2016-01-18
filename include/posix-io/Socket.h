@@ -180,7 +180,7 @@ namespace os
       do_sockatmark (void);
 
       virtual void
-      doRelease (void) override;
+      do_release (void) override;
 
     };
 

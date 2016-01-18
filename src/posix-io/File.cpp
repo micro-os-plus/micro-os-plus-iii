@@ -59,7 +59,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     void
-    File::doRelease (void)
+    File::do_release (void)
     {
       // Files is free, return it to the pool.
       auto fs = getFileSystem ();

@@ -119,8 +119,13 @@ namespace os
       fileDescriptor_t
       getFileDescriptor (void) const;
 
+#if 0
       bool
-      isOpened (void);
+      is_opened (void);
+
+      bool
+      is_connected (void);
+#endif
 
     protected:
 
@@ -157,10 +162,13 @@ namespace os
       // Is called at the end of close, to release objects
       // acquired from a pool.
       virtual void
-      doRelease (void);
+      do_release (void);
 
       virtual bool
-      doIsOpened (void);
+      do_is_opened (void);
+
+      virtual bool
+      do_is_connected (void);
 
       void
       setFileDescriptor (fileDescriptor_t fildes);
@@ -208,13 +216,22 @@ namespace os
       return fFileDescriptor;
     }
 
-    inline bool
-    IO::isOpened (void)
+#if 0
+  inline bool
+  IO::is_opened (void)
     {
-      return doIsOpened ();
+      return do_is_opened ();
     }
 
-  } /* namespace posix */
+  inline bool
+  IO::is_connected (void)
+    {
+      return do_is_connected ();
+    }
+#endif
+
+}
+/* namespace posix */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------

@@ -159,7 +159,7 @@ namespace os
     {
       errno = 0;
 
-      if (!isOpened ())
+      if (!do_is_opened ())
         {
           errno = EBADF; // Not opened.
           return -1;
@@ -173,18 +173,24 @@ namespace os
       fFileDescriptor = noFileDescriptor;
 
       // Release objects acquired from a pool.
-      doRelease ();
+      do_release ();
       return ret;
     }
 
     void
-    IO::doRelease (void)
+    IO::do_release (void)
     {
       return;
     }
 
     bool
-    IO::doIsOpened (void)
+    IO::do_is_opened (void)
+    {
+      return true;
+    }
+
+    bool
+    IO::do_is_connected (void)
     {
       return true;
     }
@@ -203,9 +209,15 @@ namespace os
           return -1;
         }
 
-      if (!isOpened ())
+      if (!do_is_opened ())
         {
           errno = EBADF; // Not opened.
+          return -1;
+        }
+
+      if (!do_is_connected ())
+        {
+          errno = EIO; // Not opened.
           return -1;
         }
 
@@ -224,9 +236,15 @@ namespace os
           return -1;
         }
 
-      if (!isOpened ())
+      if (!do_is_opened ())
         {
           errno = EBADF; // Not opened.
+          return -1;
+        }
+
+      if (!do_is_connected ())
+        {
+          errno = EIO; // Not opened.
           return -1;
         }
 
@@ -256,9 +274,15 @@ namespace os
           return -1;
         }
 
-      if (!isOpened ())
+      if (!do_is_opened ())
         {
           errno = EBADF; // Not opened.
+          return -1;
+        }
+
+      if (!do_is_connected ())
+        {
+          errno = EIO; // Not opened.
           return -1;
         }
 
@@ -283,9 +307,15 @@ namespace os
     int
     IO::vfcntl (int cmd, std::va_list args)
     {
-      if (!isOpened ())
+      if (!do_is_opened ())
         {
           errno = EBADF; // Not opened.
+          return -1;
+        }
+
+      if (!do_is_connected ())
+        {
+          errno = EIO; // Not opened.
           return -1;
         }
 
@@ -314,9 +344,15 @@ namespace os
           return -1;
         }
 
-      if (!isOpened ())
+      if (!do_is_opened ())
         {
           errno = EBADF; // Not opened.
+          return -1;
+        }
+
+      if (!do_is_connected ())
+        {
+          errno = EIO; // Not opened.
           return -1;
         }
 

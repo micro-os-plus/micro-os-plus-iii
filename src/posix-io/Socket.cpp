@@ -81,7 +81,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     void
-    Socket::doRelease (void)
+    Socket::do_release (void)
     {
       // Files is free, return it to the pool.
       auto pool = NetStack::getSocketsPool ();
