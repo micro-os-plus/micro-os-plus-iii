@@ -21,13 +21,13 @@
 
 // ----------------------------------------------------------------------------
 
-#include "posix-io/CharDevice.h"
-#include "posix-drivers/ByteCircularBuffer.h"
-#include "cmsis-plus/drivers/serial.h"
+#include <posix-io/CharDevice.h>
+#include <posix-drivers/ByteCircularBuffer.h>
+#include <cmsis-plus/drivers/serial.h>
 
-#include "diag/trace.h"
+#include <diag/trace.h>
 
-#include "cmsis_os.h"
+#include <cmsis_os.h>
 
 #include <cstdarg>
 #include <cstdlib>
@@ -62,6 +62,17 @@ namespace os
                                 os::cmsis::driver::Serial* driver,
                                 os::dev::ByteCircularBuffer* rx_buf,
                                 os::dev::ByteCircularBuffer* tx_buf);
+
+        // Prevent copy, move, assign
+        Buffered_serial_device (const Buffered_serial_device&) = delete;
+
+        Buffered_serial_device (Buffered_serial_device&&) = delete;
+
+        Buffered_serial_device&
+        operator= (const Buffered_serial_device&) = delete;
+
+        Buffered_serial_device&
+        operator= (Buffered_serial_device&&) = delete;
 
         virtual
         ~Buffered_serial_device ();
@@ -102,7 +113,10 @@ namespace os
 #endif
 
         virtual bool
-        doIsOpened (void) override;
+        do_is_opened (void) override;
+
+        virtual bool
+        do_is_connected (void) override;
 
         // --------------------------------------------------------------------
 
@@ -110,6 +124,9 @@ namespace os
 
         // Pointer to actual CMSIS-like serial driver (usart or usb cdc acm)
         os::cmsis::driver::Serial* driver_;
+
+        osSemaphoreId open_sem_; //
+        osSemaphoreDef(open_sem_);
 
         osSemaphoreId rx_sem_; //
         osSemaphoreDef(rx_sem_);
@@ -122,6 +139,7 @@ namespace os
 
         std::size_t rx_count_; //
         bool volatile tx_busy_;
+        bool volatile is_connected_;
         // Padding!
 
       };
@@ -140,12 +158,14 @@ namespace os
           CharDevice (deviceName), // Construct parent.
           //
           driver_ (driver), //
+          open_sem_ (nullptr), //
           rx_sem_ (nullptr), //
           tx_sem_ (nullptr), //
           rx_buf_ (rx_buf), //
           tx_buf_ (tx_buf), //
           rx_count_ (0), //
-          tx_busy_ (false) //
+          tx_busy_ (false), //
+          is_connected_ (false)
       {
         assert(rx_buf != nullptr);
 
@@ -159,9 +179,11 @@ namespace os
     template<typename Cs_T>
       Buffered_serial_device<Cs_T>::~Buffered_serial_device ()
       {
+        driver_ = nullptr;
+
+        open_sem_ = nullptr;
         rx_sem_ = nullptr;
         tx_sem_ = nullptr;
-
       }
 
     // ------------------------------------------------------------------------
@@ -174,7 +196,7 @@ namespace os
       Buffered_serial_device<Cs_T>::do_vopen (const char* path, int oflag,
                                               std::va_list args)
       {
-        if (rx_sem_ != nullptr)
+        if (open_sem_ != nullptr)
           {
             errno = EEXIST; // Already opened
             return -1;
@@ -185,10 +207,12 @@ namespace os
         do
           {
             // Start disabled, the first wait will block.
+            open_sem_ = osSemaphoreCreate (osSemaphore(open_sem_), 0);
             rx_sem_ = osSemaphoreCreate (osSemaphore(rx_sem_), 0);
             tx_sem_ = osSemaphoreCreate (osSemaphore(tx_sem_), 0);
 
-            if ((rx_sem_ == nullptr) || (tx_sem_ == nullptr))
+            if ((open_sem_ == nullptr) || (rx_sem_ == nullptr)
+                || (tx_sem_ == nullptr))
               {
                 result = os::cmsis::driver::ERROR;
                 break;
@@ -243,15 +267,44 @@ namespace os
             return -1;
           }
 
-        // Return POSIX OK.
+        os::cmsis::driver::serial::Capabilities capa;
+        capa = driver_->get_capabilities ();
+        if (capa.dcd)
+          {
+            os::cmsis::driver::serial::Modem_status status;
+            for (;;)
+              {
+                  {
+                    Critical_section cs; // -----
+
+                    status = driver_->get_modem_status ();
+                  }
+                if (status.is_dcd_active ())
+                  {
+                    break;
+                  }
+                osSemaphoreWait (open_sem_, osWaitForever);
+              }
+          }
+
+        is_connected_ = true;
+
+        // Return POSIX idea of OK.
         return 0;
       }
 
     template<typename Cs_T>
       bool
-      Buffered_serial_device<Cs_T>::doIsOpened (void)
+      Buffered_serial_device<Cs_T>::do_is_opened (void)
       {
-        return (rx_sem_ != nullptr);
+        return (open_sem_ != nullptr);
+      }
+
+    template<typename Cs_T>
+      bool
+      Buffered_serial_device<Cs_T>::do_is_connected (void)
+      {
+        return is_connected_;
       }
 
     template<typename Cs_T>
@@ -259,17 +312,20 @@ namespace os
       Buffered_serial_device<Cs_T>::do_close (void)
       {
 
-        // Wait for write to complete.
-        // TODO: what if flow control prevents this?
-        if (tx_buf_ != nullptr)
+        if (is_connected_)
           {
-            for (;;)
+            // Wait for write to complete.
+            // TODO: what if flow control prevents this?
+            if (tx_buf_ != nullptr)
               {
-                if (tx_buf_->isEmpty ())
+                for (;;)
                   {
-                    break;
+                    if (tx_buf_->isEmpty ())
+                      {
+                        break;
+                      }
+                    osSemaphoreWait (tx_sem_, osWaitForever);
                   }
-                osSemaphoreWait (tx_sem_, osWaitForever);
               }
           }
 
@@ -299,7 +355,12 @@ namespace os
         osSemaphoreDelete (tx_sem_);
         tx_sem_ = nullptr;
 
-        // Return POSIX OK.
+        osSemaphoreDelete (open_sem_);
+        open_sem_ = nullptr;
+
+        is_connected_ = false;
+
+        // Return POSIX idea of OK.
         return 0;
       }
 
@@ -322,7 +383,11 @@ namespace os
                 // Actual number of chars received in buffer.
                 return count;
               }
-
+            if (!is_connected_)
+              {
+                errno = EIO;
+                return -1;
+              }
             // Block and wait for bytes to arrive.
             osSemaphoreWait (rx_sem_, osWaitForever);
           }
@@ -395,6 +460,17 @@ namespace os
                     return nbyte;
                   }
 
+                if (!is_connected_)
+                  {
+                    if (count > 0)
+                      {
+                        return count;
+                      }
+
+                    errno = EIO;
+                    return -1;
+                  }
+
                 // Block and wait for buffer to be freed.
                 osSemaphoreWait (tx_sem_, osWaitForever);
 
@@ -418,6 +494,12 @@ namespace os
             os::cmsis::driver::serial::Status status;
             for (;;)
               {
+                if (!is_connected_)
+                  {
+                    errno = EIO;
+                    return -1;
+                  }
+
                 status = driver_->get_status ();
                 if (!status.is_tx_busy ())
                   {
@@ -430,6 +512,12 @@ namespace os
               {
                 for (;;)
                   {
+                    if (!is_connected_)
+                      {
+                        errno = EIO;
+                        return -1;
+                      }
+
                     status = driver_->get_status ();
                     if (!status.is_tx_busy ())
                       {
@@ -445,6 +533,7 @@ namespace os
                 errno = EIO;
               }
           }
+
         // Actual number of bytes transmitted from buffer.
         return count;
       }
@@ -563,12 +652,32 @@ namespace os
           }
         if (event & os::cmsis::driver::serial::Event::dcd)
           {
+            os::cmsis::driver::serial::Modem_status status;
+            status = object->driver_->get_modem_status ();
+
+            bool is_dcd_active = status.is_dcd_active ();
+            object->is_connected_ = is_dcd_active;
+            if (is_dcd_active)
+              {
+                // Connected, wake-up open().
+                osSemaphoreRelease (object->open_sem_);
+              }
+            else
+              {
+                // Disconnected, cancel read.
+                osSemaphoreRelease (object->rx_sem_);
+
+                // Cancel write.
+                osSemaphoreRelease (object->tx_sem_);
+              }
           }
         if (event & os::cmsis::driver::serial::Event::cts)
           {
+            // TODO: add flow control
           }
         if (event & os::cmsis::driver::serial::Event::dsr)
           {
+            // TODO: add flow control
           }
       }
 
