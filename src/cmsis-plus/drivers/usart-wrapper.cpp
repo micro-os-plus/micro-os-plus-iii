@@ -154,11 +154,13 @@ namespace os
       {
         switch (ctrl)
           {
-          case serial::DISABLE_TX:
-          case serial::DISABLE_RX:
-          case serial::DISABLE_BREAK:
+          case serial::Control::disable_tx:
+          case serial::Control::disable_rx:
+          case serial::Control::disable_break:
             return driver_->Control (
-                ctrl - (serial::DISABLE_TX - serial::ENABLE_TX), 0);
+                ctrl
+                    - (serial::Control::disable_tx - serial::Control::enable_tx),
+                0);
           }
         return driver_->Control (ctrl, 1);
       }

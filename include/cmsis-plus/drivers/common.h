@@ -46,14 +46,22 @@ namespace os
       using return_t = int32_t;
       using power_t = uint32_t;
 
-      // Return & error codes
+      // ----- Return & error codes -----
+
+      ///< Operation succeeded
       constexpr return_t RETURN_OK = 0;
 
+      ///< Unspecified error
       constexpr return_t ERROR = -1;
+      ///< Driver is busy
       constexpr return_t ERROR_BUSY = -2;
+      ///< Timeout occurred
       constexpr return_t ERROR_TIMEOUT = -3;
+      ///< Operation not supported
       constexpr return_t ERROR_UNSUPPORTED = -4;
+      ///< Parameter error
       constexpr return_t ERROR_PARAMETER = -5;
+      ///< Start of driver specific errors
       constexpr return_t ERROR_SPECIFIC = -6;
 
       typedef void

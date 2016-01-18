@@ -109,18 +109,7 @@ namespace os
         return do_transfer (data_out, data_in, num);
       }
 
-      // ----------------------------------------------------------------------
-
-      void
-      Serial::signal_event (event_t event) noexcept
-      {
-        if (cb_func_ != nullptr)
-          {
-            // Forward event to registered callback.
-            cb_func_ (cb_object_, event);
-          }
-      }
-
+    // ------------------------------------------------------------------------
     } /* namespace driver */
   } /* namespace cmsis */
 } /* namespace os */

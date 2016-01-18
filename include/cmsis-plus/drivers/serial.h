@@ -55,27 +55,27 @@ namespace os
 
         // ****** Serial Control Codes *****
 
-        constexpr bit_number_t CONTROL_Pos = 0;
-        constexpr config_t CONTROL_Msk (0xFFUL << CONTROL_Pos);
+        constexpr bit_number_t CONFIG_Pos = 0;
+        constexpr config_t CONFIG_Msk (0xFFUL << CONFIG_Pos);
 
         // ----- Serial Control Codes: Mode -----
         ///< UART = (Asynchronous);; arg = Baudrate
-        constexpr config_t MODE_ASYNCHRONOUS = (0x01UL << CONTROL_Pos);
+        constexpr config_t MODE_ASYNCHRONOUS = (0x01UL << CONFIG_Pos);
 
         ///< Synchronous Master = (generates clock signal); arg = Baudrate
-        constexpr config_t MODE_SYNCHRONOUS_MASTER = (0x02UL << CONTROL_Pos);
+        constexpr config_t MODE_SYNCHRONOUS_MASTER = (0x02UL << CONFIG_Pos);
 
         ///< Synchronous Slave = (external clock signal);
-        constexpr config_t MODE_SYNCHRONOUS_SLAVE = (0x03UL << CONTROL_Pos);
+        constexpr config_t MODE_SYNCHRONOUS_SLAVE = (0x03UL << CONFIG_Pos);
 
         ///< UART Single-wire = (half-duplex);; arg = Baudrate
-        constexpr config_t MODE_SINGLE_WIRE = (0x04UL << CONTROL_Pos);
+        constexpr config_t MODE_SINGLE_WIRE = (0x04UL << CONFIG_Pos);
 
         ///< UART IrDA; arg = Baudrate
-        constexpr config_t MODE_IRDA = (0x05UL << CONTROL_Pos);
+        constexpr config_t MODE_IRDA = (0x05UL << CONFIG_Pos);
 
         ///< UART Smart Card; arg = Baudrate
-        constexpr config_t MODE_SMART_CARD = (0x06UL << CONTROL_Pos);
+        constexpr config_t MODE_SMART_CARD = (0x06UL << CONFIG_Pos);
 
         // ----- Serial Control Codes: Mode Parameters: Data Bits -----
         constexpr bit_number_t DATA_BITS_Pos = 8;
@@ -126,20 +126,20 @@ namespace os
         constexpr config_t STOP_BITS_0_5 = (3UL << STOP_BITS_Pos);
 
         // ----- Serial Control Codes: Mode Parameters: Flow Control -----
-        constexpr bit_number_t FLOW_CONTROL_Pos = 16;
-        constexpr config_t FLOW_CONTROL_Msk = (3UL << FLOW_CONTROL_Pos);
+        constexpr bit_number_t FLOW_CONFIG_Pos = 16;
+        constexpr config_t FLOW_CONTROL_Msk = (3UL << FLOW_CONFIG_Pos);
 
         ///< No Flow Control = (default);
-        constexpr config_t FLOW_CONTROL_NONE = (0UL << FLOW_CONTROL_Pos);
+        constexpr config_t FLOW_CONTROL_NONE = (0UL << FLOW_CONFIG_Pos);
 
         ///< RTS Flow Control
-        constexpr config_t FLOW_CONTROL_RTS = (1UL << FLOW_CONTROL_Pos);
+        constexpr config_t FLOW_CONTROL_RTS = (1UL << FLOW_CONFIG_Pos);
 
         ///< CTS Flow Control
-        constexpr config_t FLOW_CONTROL_CTS = (2UL << FLOW_CONTROL_Pos);
+        constexpr config_t FLOW_CONTROL_CTS = (2UL << FLOW_CONFIG_Pos);
 
         ///< RTS/CTS Flow Control
-        constexpr config_t FLOW_CONTROL_RTS_CTS = (3UL << FLOW_CONTROL_Pos);
+        constexpr config_t FLOW_CONTROL_RTS_CTS = (3UL << FLOW_CONFIG_Pos);
 
         // ----- Serial Control Codes: Mode Parameters: Clock Polarity = (Synchronous mode); -----
         constexpr bit_number_t CPOL_Pos = 18;
@@ -164,49 +164,54 @@ namespace os
         // ----- Serial Control Codes: Miscellaneous Controls  -----
 
         ///< Set default Transmit value = (Synchronous Receive only); arg = value
-        constexpr config_t DEFAULT_TX_VALUE = (0x10UL << CONTROL_Pos);
+        constexpr config_t DEFAULT_TX_VALUE = (0x10UL << CONFIG_Pos);
 
         ///< Set IrDA Pulse in ns; arg: 0=3/16 of bit period
-        constexpr config_t IRDA_PULSE = (0x11UL << CONTROL_Pos);
+        constexpr config_t IRDA_PULSE = (0x11UL << CONFIG_Pos);
 
         ///< Set Smart Card Guard Time; arg = number of bit periods
-        constexpr config_t SMART_CARD_GUARD_TIME = (0x12UL << CONTROL_Pos);
+        constexpr config_t SMART_CARD_GUARD_TIME = (0x12UL << CONFIG_Pos);
 
         ///< Set Smart Card Clock in Hz; arg: 0=Clock not generated
-        constexpr config_t SMART_CARD_CLOCK = (0x13UL << CONTROL_Pos);
+        constexpr config_t SMART_CARD_CLOCK = (0x13UL << CONFIG_Pos);
 
         ///< Smart Card NACK generation; arg: 0=disabled, 1=enabled
-        constexpr config_t SMART_CARD_NACK = (0x14UL << CONTROL_Pos);
+        constexpr config_t SMART_CARD_NACK = (0x14UL << CONFIG_Pos);
 
         // --------------------------------------------------------------------
         // ----- Commands -----
 
-        ///< Enable Transmitter
-        constexpr control_t ENABLE_TX = (0x15UL << CONTROL_Pos);
+        enum Control
+          : control_t
+            {
+              //
+          ///< Enable Transmitter
+          enable_tx = (0x15UL << CONFIG_Pos),
 
-        ///< Enable Receiver
-        constexpr control_t ENABLE_RX = (0x16UL << CONTROL_Pos);
+          ///< Enable Receiver
+          enable_rx = (0x16UL << CONFIG_Pos),
 
-        ///< Enable Continuous Break transmission
-        constexpr control_t ENABLE_BREAK = (0x17UL << CONTROL_Pos);
+          ///< Enable Continuous Break transmission
+          enable_break = (0x17UL << CONFIG_Pos),
 
-        ///< Abort @ref Send
-        constexpr control_t ABORT_SEND = (0x18UL << CONTROL_Pos);
+          ///< Abort @ref Send
+          abort_send = (0x18UL << CONFIG_Pos),
 
-        ///< Abort @ref Receive
-        constexpr control_t ABORT_RECEIVE = (0x19UL << CONTROL_Pos);
+          ///< Abort @ref Receive
+          abort_receive = (0x19UL << CONFIG_Pos),
 
-        ///< Abort @ref Transfer
-        constexpr control_t ABORT_TRANSFER = (0x1AUL << CONTROL_Pos);
+          ///< Abort @ref Transfer
+          abort_transfer = (0x1AUL << CONFIG_Pos),
 
-        ///< Disable Transmitter
-        constexpr control_t DISABLE_TX = (0x25UL << CONTROL_Pos);
+          ///< Disable Transmitter
+          disable_tx = (0x25UL << CONFIG_Pos),
 
-        ///< Disable Receiver
-        constexpr control_t DISABLE_RX = (0x26UL << CONTROL_Pos);
+          ///< Disable Receiver
+          disable_rx = (0x26UL << CONFIG_Pos),
 
-        ///< Disable Continuous Break transmission;
-        constexpr control_t DISABLE_BREAK = (0x27UL << CONTROL_Pos);
+          ///< Disable Continuous Break transmission;
+          disable_break = (0x27UL << CONFIG_Pos)
+        };
 
         // --------------------------------------------------------------------
         // ****** Serial specific error codes *****
@@ -812,6 +817,16 @@ namespace os
       Serial::get_modem_status (void) noexcept
       {
         return do_get_modem_status ();
+      }
+
+      inline void
+      Serial::signal_event (event_t event) noexcept
+      {
+        if (cb_func_ != nullptr)
+          {
+            // Forward event to registered callback.
+            cb_func_ (cb_object_, event);
+          }
       }
 
     } /* namespace driver */
