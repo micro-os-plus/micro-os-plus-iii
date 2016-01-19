@@ -25,15 +25,19 @@ of a common set of functions and different pointers to data
 
 ## RTOS
 
-* should not return agregate osEvent
+* makes use of dinamic allocator for stack, queues, etc
 * makes heavy use of macros to define static object instances and to refer to them
-* has no support for critical sections 
+* should not return agregate (osEvent)
+* has no support for critical sections (interrupts & scheduler)
+* has no public memory allocator
+* inconsecvent names (thread name, timer name & function)
+* missing osPoolDelete(), osMessageDelete(), osMailDelete()
 
 Suggestions:
 
 * add interrupts mask/restore
 * add scheduler stop/restore
-
+* add malloc/free
 
 ### Semaphore
 
