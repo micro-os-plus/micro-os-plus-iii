@@ -819,7 +819,7 @@ namespace os
         return do_get_modem_status ();
       }
 
-      inline void
+      inline void /* __attribute__((always_inline)) */
       Serial::signal_event (event_t event) noexcept
       {
         if (cb_func_ != nullptr)
