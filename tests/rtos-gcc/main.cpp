@@ -22,19 +22,35 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
+// ----------------------------------------------------------------------------
+
 void
-thread (const void* args)
+task_function (const void* args);
+
+void
+timer_callback (const void* args);
+
+// ----------------------------------------------------------------------------
+
+void
+task_function (const void* args)
 {
   ;
 }
-osThreadDef(thread, osPriorityNormal, 1, 0);
+
+osThreadDef(task_function, osPriorityNormal, 1, 0);
+
+// ----------------------------------------------------------------------------
 
 void
 timer_callback (const void* args)
 {
   ;
 }
-osTimerDef(timer1, timer_callback);
+
+osTimerDef(timer, timer_callback);
+
+// ----------------------------------------------------------------------------
 
 int
 main (int argc, char* argv[])
@@ -42,10 +58,10 @@ main (int argc, char* argv[])
     {
       // Keil API.
 
-      osThreadId th = osThreadCreate (osThread(thread), nullptr);
+      osThreadId th = osThreadCreate (osThread(task_function), nullptr);
       osThreadTerminate (th);
 
-      osTimerId tm = osTimerCreate (osTimer(timer1), osTimerOnce, nullptr);
+      osTimerId tm = osTimerCreate (osTimer(timer), osTimerOnce, nullptr);
       osTimerDelete (tm);
     }
 
@@ -53,8 +69,8 @@ main (int argc, char* argv[])
       // Extended API.
 
       osThread th;
-      osThreadCreateEx (&th, "thread", thread, osPriorityNormal, nullptr, 0, 1,
-                        nullptr);
+      osThreadCreateEx (&th, "thread", osPriorityNormal, nullptr, 0,
+                        task_function, nullptr);
 
       osThreadTerminate (&th);
 

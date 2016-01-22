@@ -29,12 +29,16 @@
 #define CMSIS_PLUS_RTOS_OS_H_
 
 #include <cstdint>
+#include <cstddef>
 
 // ----------------------------------------------------------------------------
 
 #ifdef  __cplusplus
 
 #include <cstddef>
+#if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
+#include <functional>
+#endif
 
 namespace os
 {
@@ -51,21 +55,51 @@ namespace os
         : return_t
           {
             //
-        os_ok = 0, ///< function completed; no error or event occurred.
-        os_event_signal = 0x08, ///< function completed; signal event occurred.
-        os_event_message = 0x10, ///< function completed; message event occurred.
-        os_event_mail = 0x20, ///< function completed; mail event occurred.
-        os_event_timeout = 0x40, ///< function completed; timeout occurred.
-        os_error_parameter = 0x80, ///< parameter error: a mandatory parameter was missing or specified an incorrect object.
-        os_error_resource = 0x81, ///< resource not available: a specified resource was not available.
-        os_error_timeout_resource = 0xC1, ///< resource not available within given time: a specified resource was not available within the timeout period.
-        os_error_isr = 0x82, ///< not allowed in ISR context: the function cannot be called from interrupt service routines.
-        os_error_isr_recursive = 0x83, ///< function called multiple times from ISR with same object.
-        os_error_priority = 0x84, ///< system cannot determine priority or thread has illegal priority.
-        os_error_no_memory = 0x85, ///< system is out of memory: it was impossible to allocate or reserve memory for the operation.
-        os_error_value = 0x86, ///< value of a parameter is out of range.
-        os_error_os = 0xFF, ///< unspecified RTOS error: run-time error but no other error message fits.
-        os_status_reserved = 0x7FFFFFFF ///< prevent from enum down-size compiler optimization.
+        ///< function completed; no error or event occurred.
+        os_ok = 0,
+
+        ///< function completed; signal event occurred.
+        os_event_signal = 0x08,
+
+        ///< function completed; message event occurred.
+        os_event_message = 0x10,
+
+        ///< function completed; mail event occurred.
+        os_event_mail = 0x20,
+
+        ///< function completed; timeout occurred.
+        os_event_timeout = 0x40,
+
+        ///< parameter error: a mandatory parameter was missing or specified an incorrect object.
+        os_error_parameter = 0x80,
+
+        ///< resource not available: a specified resource was not available.
+        os_error_resource = 0x81,
+
+        ///< resource not available within given time: a specified resource was not available within the timeout period.
+        os_error_timeout_resource = 0xC1,
+
+        ///< not allowed in ISR context: the function cannot be called from interrupt service routines.
+        os_error_isr = 0x82,
+
+        ///< function called multiple times from ISR with same object.
+        os_error_isr_recursive = 0x83,
+
+        ///< system cannot determine priority or thread has illegal priority.
+        os_error_priority = 0x84,
+
+        ///< system is out of memory: it was impossible to allocate or reserve memory for the operation.
+        os_error_no_memory = 0x85,
+
+        ///< value of a parameter is out of range.
+        os_error_value = 0x86,
+
+        ///< unspecified RTOS error: run-time error but no other error message fits.
+        os_error_os = 0xFF,
+
+        ///< prevent from enum down-size compiler optimization.
+        /// (Actually redundant in C++ if the underlying type is 32 bits)
+        os_status_reserved = 0x7FFFFFFF
       };
 
       // ----------------------------------------------------------------------
@@ -114,7 +148,7 @@ namespace os
       // TODO: Get rid of this ugly structure.
 #if 1
       /// Event structure contains detailed information about an event.
-      using event_t = struct
+      using event_t = struct event_t
         {
           return_t status; ///< status code: event or error information
           union
@@ -166,10 +200,49 @@ namespace os
         constexpr uint32_t
         compute_sys_ticks (uint32_t microsec)
         {
-          return (((uint64_t) microsec) * SYS_TICK_FREQUENCY_HZ) / 1000000;
+          return (uint32_t) ((((uint64_t) microsec) * SYS_TICK_FREQUENCY_HZ)
+              / 1000000UL);
+        }
+
+        constexpr uint32_t
+        compute_sys_ticks (uint64_t microsec)
+        {
+          return (uint32_t) (((microsec) * SYS_TICK_FREQUENCY_HZ) / 1000000UL);
         }
 
       } /* namespace kernel */
+
+      // ----------------------------------------------------------------------
+
+      namespace scheduler
+      {
+        using status_t = bool;
+
+        // Lock the scheduler (prevent it from switching threads).
+        // @return The previous status of the scheduler
+        status_t
+        lock (void);
+
+        // Restore the scheduler status
+        status_t
+        unlock (status_t status);
+
+      } /* namespace scheduler */
+
+      // TODO: define all levels of critical sections
+      // (kernel, real-time(level), complete)
+      namespace critical
+      {
+        using status_t = uint32_t;
+
+        // Enter an IRQ critical section
+        status_t
+        enter (void);
+
+        // Exit an IRQ critical section
+        status_t
+        exit (status_t status);
+      }
 
       // ----------------------------------------------------------------------
       //  ==== Thread Management ====
@@ -206,11 +279,22 @@ namespace os
         /// @return status code that indicates the execution status of the function.
         return_t
         delay (millis_t millisec);
+
+        void
+        sleep_for_ticks (uint32_t);
+
       }
 
       /// Entry point of a thread.
       typedef void
-      (*thread_func_t) (const void* args);
+      (*thread_func_cvp_t) (const void* args);
+
+      // Other possible entry points.
+      typedef void
+      (*thread_func_vp_t) (void* args);
+
+      typedef void
+      (*thread_func_v_t) (void);
 
       // ======================================================================
 
@@ -238,6 +322,9 @@ namespace os
 
       // ======================================================================
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
       class Thread : public Named_object
       {
       public:
@@ -245,13 +332,28 @@ namespace os
         /// Create a thread and add it to Active Threads and set it to state READY.
         /// @param         name         name of the thread function.
         /// @param         priority     initial priority of the thread function.
-        /// @param         instances    number of possible thread instances.
         /// @param         stacksz      stack size (in bytes) requirements for the thread function.
         /// @param [in]     argument      pointer that is passed to the thread function as start argument.
         /// @return thread ID for reference by other functions or NULL in case of error.
-        Thread (const char* name, thread_func_t function, priority_t prio,
-                void* stack, std::size_t stack_size_bytes,
-                uint32_t max_instances, const void* args);
+        Thread (const char* name, Priority prio, void* stack,
+                std::size_t stack_size_bytes, thread_func_cvp_t function,
+                const void* args);
+
+        Thread (const char* name, Priority prio, void* stack,
+                std::size_t stack_size_bytes, thread_func_vp_t function,
+                void* args);
+
+        Thread (const char* name, Priority prio, void* stack,
+                std::size_t stack_size_bytes, thread_func_v_t function);
+
+#if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
+
+        template<typename Callable_T, typename ... Args_T>
+          explicit
+          Thread (const char* name, Priority prio, std::size_t stack_size_bytes,
+                  Callable_T&& function, Args_T&&... args);
+
+#endif
 
         Thread (const Thread&) = delete;
         Thread (Thread&&) = delete;
@@ -268,15 +370,15 @@ namespace os
         /// Get current priority of an active thread.
         /// @param [in]     thread_id     thread ID obtained by @ref osThreadCreate or @ref osThreadGetId.
         /// @return current priority value of the thread function.
-        priority_t
+        Priority
         get_priority (void);
 
         /// Change priority of an active thread.
         /// @param [in]     thread_id     thread ID obtained by @ref osThreadCreate or @ref osThreadGetId.
         /// @param [in]     priority      new priority value for the thread function.
         /// @return status code that indicates the execution status of the function.
-        priority_t
-        set_priority (priority_t prio);
+        Priority
+        set_priority (Priority prio);
 
         /// Set the specified Signal Flags of an active thread.
         /// @param [in]     thread_id     thread ID obtained by @ref osThreadCreate or @ref osThreadGetId.
@@ -292,12 +394,34 @@ namespace os
         signals_t
         clear_signals (signals_t signals);
 
+#if defined(TESTING)
+        void
+        __run_function (void);
+#endif
+
       protected:
 
-        priority_t prio_;
+#if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
+        template<typename Binding_T>
+          static void
+          run_binding (void* binding);
+#endif
+
+      protected:
+
+        Priority prio_;
+
+        thread_func_cvp_t func_;
+        const void* args_;
+
+#if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
+        bool has_binding_;
+#endif
 
         // Add internal data
       };
+
+#pragma GCC diagnostic pop
 
       /// Entry point of a timer call back function.
       typedef void
@@ -587,14 +711,7 @@ namespace os
         // Add internal data
       };
 
-      // ========================================================================
-
-      inline
-      Named_object::Named_object (const char* name) :
-          name_ (name != nullptr ? name : "")
-      {
-        ;
-      }
+      // ======================================================================
 
       inline
       Named_object::~Named_object ()
@@ -607,6 +724,64 @@ namespace os
       {
         return name_;
       }
+
+      // ======================================================================
+
+      inline
+      Thread::Thread (const char* name, Priority prio, void* stack,
+                      std::size_t stack_size_bytes, thread_func_vp_t function,
+                      void* args) :
+          Thread
+            { name, prio, stack, stack_size_bytes, (thread_func_cvp_t) function,
+                (const void*) args }
+      {
+        ;
+      }
+
+      inline
+      Thread::Thread (const char* name, Priority prio, void* stack,
+                      std::size_t stack_size_bytes, thread_func_v_t function) :
+          Thread
+            { name, prio, stack, stack_size_bytes, (thread_func_cvp_t) function,
+                (const void*) nullptr }
+      {
+        ;
+      }
+
+#if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
+
+      template<typename Binding_T>
+        void
+        Thread::run_binding (void* binding)
+        {
+          Binding_T* b = (Binding_T*) binding;
+          (*b) ();
+        }
+
+      template<typename Callable_T, typename ... Args_T>
+        Thread::Thread (const char* name, Priority prio,
+                        std::size_t stack_size_bytes, Callable_T&& function,
+                        Args_T&&... args) :
+            Thread
+              { name, prio, (void*) nullptr, stack_size_bytes,
+                  (thread_func_cvp_t) nullptr, (const void*) nullptr }
+        {
+          using Binding = decltype(std::bind (std::forward<Callable_T> (function),
+                  std::forward<Args_T>(args)...));
+
+          // Dynamic allocation!
+          // TODO: use a smart pointer with an appropriate delete function.
+          Binding* binding = new Binding (
+              std::bind (std::forward<Callable_T> (function),
+                         std::forward<Args_T>(args)...));
+
+          func_ = reinterpret_cast<thread_func_cvp_t> (&run_binding<Binding> );
+          args_ = (void*) binding;
+
+          has_binding_ = false;
+        }
+
+#endif
 
     } /* namespace rtos */
   } /* namespace cmsis */

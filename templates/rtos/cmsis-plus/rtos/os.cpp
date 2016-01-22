@@ -1,7 +1,7 @@
 /*
  * This file is part of the µOS++ distribution.
  *   (https://github.com/micro-os-plus)
- * Copyright (c) 2015 Liviu Ionescu.
+ * Copyright (c) 2016 Liviu Ionescu.
  *
  * µOS++ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -60,7 +60,8 @@ namespace os
 
       // ======================================================================
 
-      Thread no_thread ("none", nullptr, 0, nullptr, 0, 1, nullptr);
+      Thread no_thread
+        { "none", Priority::normal, nullptr, 0, (thread_func_cvp_t) nullptr, nullptr };
 
       namespace thread
       {
@@ -93,34 +94,80 @@ namespace os
         {
           return os_ok;
         }
+
+        void
+        sleep_for_ticks (uint32_t)
+        {
+          ;
+        }
+
       }
 
       // ======================================================================
 
-      Thread::Thread (const char* name, thread_func_t function, priority_t prio,
-                      void* stack, std::size_t stack_size_bytes,
-                      uint32_t max_instances, const void* args) : //
-          Named_object (name), //
-          prio_ (prio)
+      Named_object::Named_object (const char* name) :
+          name_ (name != nullptr ? name : "-")
       {
         ;
       }
+
+      // ======================================================================
+
+      Thread::Thread (const char* name, Priority prio, void* stack,
+                      std::size_t stack_size_bytes, thread_func_cvp_t function,
+                      const void* args) : //
+          Named_object
+            { name }, //
+          prio_
+            { prio }, //
+          func_
+            { function }, //
+          args_
+            { args } //
+      {
+#if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
+        has_binding_ = false;
+#endif
+      }
+
+//      Thread::Thread (thread_func_t function, const void* args) : //
+//          Named_object
+//            { nullptr }, //
+//          prio_
+//            { Priority::normal }, //
+//          func_
+//            { function }, //
+//          args_
+//            { args } //
+//      {
+//#if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
+//        has_binding_ = false;
+//#endif
+//      }
 
       Thread::~Thread ()
       {
-        ;
+#if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
+        if (has_binding_ && args_ != nullptr)
+          {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdelete-incomplete"
+            delete args_;
+#pragma GCC diagnostic pop
+          }
+#endif
       }
 
-      priority_t
+      Priority
       Thread::get_priority (void)
       {
         return prio_;
       }
 
-      priority_t
-      Thread::set_priority (priority_t prio)
+      Priority
+      Thread::set_priority (Priority prio)
       {
-        priority_t ret = prio_;
+        Priority ret = prio_;
         prio_ = prio;
         return ret;
       }
@@ -136,6 +183,14 @@ namespace os
       {
         return 0;
       }
+
+#if defined(TESTING)
+      void
+      Thread::__run_function (void)
+      {
+        func_ (args_);
+      }
+#endif
 
       // ======================================================================
 
