@@ -85,19 +85,19 @@ osThreadCreate (const osThreadDef_t *thread_def, void *args)
 {
   // Do not pass a stack pointer; it'll be allocated dynamically.
   return reinterpret_cast<osThreadId> (new (thread_def->data) Thread (
-      thread_def->name, thread_def->pthread, thread_def->tpriority, nullptr,
-      thread_def->stacksize, thread_def->instances, args));
+      thread_def->name, (Priority) thread_def->tpriority, nullptr,
+      thread_def->stacksize, thread_def->pthread, args));
 }
 
 osThreadId
-osThreadCreateEx (osThread* addr, const char* name, os_pthread function,
-                  osPriority prio, void* stack, size_t stack_size_bytes,
-                  uint32_t max_instances, const void* args)
+osThreadCreateEx (osThread* addr, const char* name, osPriority prio,
+                  void* stack, size_t stack_size_bytes, os_pthread function,
+                  const void* args)
 {
-  return reinterpret_cast<osThreadId> (new (addr) Thread (name, function, prio,
+  return reinterpret_cast<osThreadId> (new (addr) Thread (name, (Priority) prio,
                                                           stack,
                                                           stack_size_bytes,
-                                                          max_instances, args));
+                                                          function, args));
 }
 
 osThreadId
@@ -123,7 +123,7 @@ osStatus
 osThreadSetPriority (osThreadId thread_id, osPriority priority)
 {
   return static_cast<osStatus> ((reinterpret_cast<Thread&> (thread_id)).set_priority (
-      priority));
+      (Priority) priority));
 }
 
 osPriority
@@ -144,6 +144,9 @@ osDelay (uint32_t millisec)
 
 #if (defined (osFeature_Wait)  &&  (osFeature_Wait != 0))     // Generic Wait available
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
 osEvent
 osWait (uint32_t millisec)
 {
@@ -153,6 +156,8 @@ osWait (uint32_t millisec)
   event.status = static_cast<osStatus> (ret);
   return event;
 }
+
+#pragma GCC diagnostic pop
 
 osStatus
 osWaitEx (uint32_t millisec)
@@ -217,6 +222,9 @@ osSignalClear (osThreadId thread_id, int32_t signals)
   return static_cast<int32_t> (((Thread&) (thread_id)).clear_signals (signals));
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
 osEvent
 osSignalWait (int32_t signals, uint32_t millisec)
 {
@@ -226,6 +234,8 @@ osSignalWait (int32_t signals, uint32_t millisec)
   event.status = static_cast<osStatus> (ret);
   return event;
 }
+
+#pragma GCC diagnostic pop
 
 osStatus
 osSignalWaitEx (int32_t signals, uint32_t millisec)
@@ -387,11 +397,16 @@ osStatus
 osMessagePut (osMessageQId queue_id, uint32_t info, uint32_t millisec)
 {
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wint-to-void-pointer-cast"
+#if defined ( __clang__ )
+#pragma clang diagnostic ignored "-Wint-to-void-pointer-cast"
+#endif
   return static_cast<osStatus> ((reinterpret_cast<Message_queue&> (queue_id)).put (
       (void*) info, millisec));
 #pragma GCC diagnostic pop
 }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
 
 osEvent
 osMessageGet (osMessageQId queue_id, uint32_t millisec)
@@ -402,6 +417,8 @@ osMessageGet (osMessageQId queue_id, uint32_t millisec)
   event.status = static_cast<osStatus> (ret);
   return event;
 }
+
+#pragma GCC diagnostic pop
 
 osStatus
 osMessageGetEx (osMessageQId queue_id, uint32_t millisec)
@@ -459,6 +476,9 @@ osMailPut (osMailQId queue_id, void *mail)
       mail));
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
 osEvent
 osMailGet (osMailQId queue_id, uint32_t millisec)
 {
@@ -468,6 +488,8 @@ osMailGet (osMailQId queue_id, uint32_t millisec)
   event.status = static_cast<osStatus> (ret);
   return event;
 }
+
+#pragma GCC diagnostic pop
 
 osStatus
 osMailGetEx (osMailQId queue_id, uint32_t millisec)

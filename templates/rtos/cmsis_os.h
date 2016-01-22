@@ -168,7 +168,11 @@ extern "C"
 
 // >>> the following data type definitions may shall adapted towards a specific RTOS
 
-#define OS_THREAD_SIZE_WORDS  2
+#if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
+#define OS_THREAD_SIZE_WORDS  5
+#else
+#define OS_THREAD_SIZE_WORDS  4
+#endif
 #define OS_TIMER_SIZE_WORDS  1
 #define OS_MUTEX_SIZE_WORDS  1
 #define OS_SEMAPHORE_SIZE_WORDS  1
@@ -239,6 +243,9 @@ extern "C"
   /// @note CAN BE CHANGED: @b os_mailQ_cb is implementation specific in every CMSIS-RTOS.
   typedef osMailQ *osMailQId;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
   /// Thread Definition structure contains startup information of a thread.
   /// @note CAN BE CHANGED: @b os_thread_def is implementation specific in every CMSIS-RTOS.
   typedef struct os_thread_def
@@ -246,10 +253,12 @@ extern "C"
     const char* name;
     os_pthread pthread; ///< start address of thread function
     osPriority tpriority; ///< initial thread priority
-    uint32_t instances; ///< maximum number of instances of that thread function
+    // uint32_t instances; ///< maximum number of instances of that thread function
     uint32_t stacksize; ///< stack size requirements in bytes; 0 is default stack size
     osThread* data;
   } osThreadDef_t;
+
+#pragma GCC diagnostic pop
 
   /// Timer Definition structure contains timer parameters.
   /// @note CAN BE CHANGED: @b os_timer_def is implementation specific in every CMSIS-RTOS.
@@ -383,7 +392,7 @@ extern const osThreadDef_t os_thread_def_##name
 #define osThreadDef(name, priority, instances, stacksz)  \
 struct os_thread_data os_thread_data_##name; \
 const osThreadDef_t os_thread_def_##name = \
-{ "##name", (name), (priority), (instances), (stacksz), &os_thread_data_##name }
+{ "##name", (name), (priority), /* (instances), */ (stacksz), &os_thread_data_##name }
 #endif
 
   /// Access a Thread definition.
@@ -836,6 +845,18 @@ const osMailQDef_t os_mailQ_def_##name =  \
   osMailFree (osMailQId queue_id, void *mail);
 
 #endif  // Mail Queues available
+
+  // --------------------------------------------------------------------------
+  // Calls from Interrupt Service Routines
+  //
+  // The following CMSIS-RTOS functions can be called from threads and Interrupt Service Routines (ISR):
+  //
+  // - osKernelRunning
+  // - osSignalSet
+  // - osSemaphoreRelease
+  // - osPoolAlloc, osPoolCAlloc, osPoolFree
+  // - osMessagePut, osMessageGet
+  // - osMailAlloc, osMailCAlloc, osMailGet, osMailPut, osMailFree
 
 #ifdef  __cplusplus
 }

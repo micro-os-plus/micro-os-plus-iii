@@ -45,9 +45,9 @@ extern "C"
   // ===== Thread Management =====
 
   osThreadId
-  osThreadCreateEx (osThread* addr, const char* name, os_pthread function,
-                    osPriority prio, void* stack, size_t stack_size_bytes,
-                    uint32_t max_instances, const void* args);
+  osThreadCreateEx (osThread* addr, const char* name, osPriority prio,
+                    void* stack, size_t stack_size_bytes, os_pthread function,
+                    const void* args);
 
   // --------------------------------------------------------------------------
 
@@ -114,7 +114,7 @@ extern "C"
                      void* mem, osThreadId thread_id);
 
   osStatus
-  osMessageGetEx (osMailQ* addr, osMessageQId queue_id, uint32_t millisec);
+  osMessageGetEx (osMessageQId queue_id, uint32_t millisec);
 
   void
   osMessageDeleteEx (osMessageQId queue_id);
@@ -168,6 +168,13 @@ extern "C"
 
   void
   osFree (void*);
+
+// --------------------------------------------------------------------------
+// Calls from Interrupt Service Routines
+//
+// The following CMSIS-RTOS functions can be called from threads and Interrupt Service Routines (ISR):
+//
+// - osCriticalEnter, osCriticalExit (although with little effect)
 
 #ifdef  __cplusplus
 }
