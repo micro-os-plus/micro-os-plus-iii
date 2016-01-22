@@ -1,0 +1,395 @@
+/*
+ * This file is part of the µOS++ distribution.
+ *   (https://github.com/micro-os-plus)
+ * Copyright (c) 2016 Liviu Ionescu.
+ *
+ * µOS++ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, version 3.
+ *
+ * µOS++ is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+ * This file is part of the CMSIS++ proposal, intended as a CMSIS
+ * replacement for C++ applications.
+ *
+ * The code is inspired by LLVM libcxx and GNU libstdc++-v3.
+ */
+
+#ifndef CMSIS_PLUS_THREAD_
+#define CMSIS_PLUS_THREAD_
+
+#include <cmsis-plus/rtos/os.h>
+
+#include <cstddef>
+#include <chrono>
+#include <iostream>
+// #include <memory>
+
+namespace os
+{
+  namespace cmsis
+  {
+    namespace std
+    {
+      // ======================================================================
+
+      class thread
+      {
+      public:
+        class id;
+        using native_handle_type = os::cmsis::rtos::Thread*;
+
+        thread () noexcept = default;
+
+        template<typename Callable_T, typename ... Args_T>
+          explicit
+          thread (Callable_T&& f, Args_T&&... args);
+
+        // Non ISO, specific CMSIS RTOS detailed constructors. Do not use
+        // dynamic memory.
+        thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
+                os::cmsis::rtos::Priority prio,
+                os::cmsis::rtos::thread_func_cvp_t function, const void* args);
+
+        thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
+                os::cmsis::rtos::Priority prio,
+                os::cmsis::rtos::thread_func_vp_t function, void* args);
+
+        thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
+                os::cmsis::rtos::Priority prio,
+                os::cmsis::rtos::thread_func_v_t function);
+
+        // This is a very generic template, not used as is,
+        // it is implemented only for "const char*" & "size_t".
+        template<typename N_T, typename SZ_T, typename Callable_T,
+            typename ... Args_T>
+          explicit
+          thread (N_T* name, SZ_T stack_size_bytes, Callable_T&& f,
+                  Args_T&&... args);
+
+        ~thread ();
+
+        thread (const thread&) = delete;
+        thread (thread&& t) noexcept;
+
+        thread&
+        operator= (const thread&) = delete;
+        thread&
+        operator= (thread&& t) noexcept;
+
+        // --------------------------------------------------------------------
+
+        void
+        swap (thread& t) noexcept;
+
+        bool
+        joinable () const noexcept;
+
+        void
+        join ();
+
+        void
+        detach ();
+
+        id
+        get_id () const noexcept;
+
+        native_handle_type
+        native_handle ();
+
+        static unsigned
+        hardware_concurrency () noexcept;
+
+        class id
+        {
+        public:
+          id () noexcept;
+
+          explicit
+          id (native_handle_type id) noexcept;
+
+        private:
+
+          friend class thread;
+#if 0
+          friend class hash<thread::id>;
+#endif
+
+          // The id is actually a pointer to the system thread.
+          native_handle_type thread_;
+
+          // Only two of them, the other 4 are defined in terms of these.
+          friend bool
+          operator== (thread::id x, thread::id y) noexcept;
+
+          friend bool
+          operator< (thread::id x, thread::id y) noexcept;
+        };
+
+      private:
+
+        id id_;
+      };
+
+      // ======================================================================
+
+      void
+      swap (thread& x, thread& y) noexcept;
+
+      bool
+      operator== (thread::id x, thread::id y) noexcept;
+      bool
+      operator!= (thread::id x, thread::id y) noexcept;
+      bool
+      operator< (thread::id x, thread::id y) noexcept;
+      bool
+      operator<= (thread::id x, thread::id y) noexcept;
+      bool
+      operator> (thread::id x, thread::id y) noexcept;
+      bool
+      operator>= (thread::id x, thread::id y) noexcept;
+
+#if 0
+      template<class charT, class traits>
+      basic_ostream<charT, traits>&
+      operator<<(basic_ostream<charT, traits>& out, thread::id id);
+#endif
+
+      // ======================================================================
+
+      namespace this_thread
+      {
+
+        thread::id
+        get_id () noexcept;
+
+        void
+        yield () noexcept;
+
+        template<typename Clock_T, typename Duration_T>
+          void
+          sleep_until (
+              const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time);
+
+        template<typename Rep_T, typename Period_T>
+          void
+          sleep_for (const ::std::chrono::duration<Rep_T, Period_T>& rel_time);
+
+      } /* namespace this_thread */
+
+      // ----------------------------------------------------------------------
+
+      inline void
+      swap (thread& x, thread& y) noexcept
+      {
+        x.swap (y);
+      }
+
+      inline bool
+      operator== (thread::id x, thread::id y) noexcept
+      {
+        return x.thread_ == y.thread_;
+      }
+
+      inline bool
+      operator!= (thread::id x, thread::id y) noexcept
+      {
+        return !(x == y);
+      }
+
+      inline bool
+      operator< (thread::id x, thread::id y) noexcept
+      {
+        return x.thread_ < y.thread_;
+      }
+
+      inline bool
+      operator<= (thread::id x, thread::id y) noexcept
+      {
+        return !(y < x);
+      }
+
+      inline bool
+      operator> (thread::id x, thread::id y) noexcept
+      {
+        return y < x;
+      }
+
+      inline bool
+      operator>= (thread::id x, thread::id y) noexcept
+      {
+        return !(x < y);
+      }
+
+      // ----------------------------------------------------------------------
+
+      inline thread::id
+      thread::get_id () const noexcept
+      {
+        return id_;
+      }
+
+      inline thread::native_handle_type
+      thread::native_handle ()
+      {
+        return id_.thread_;
+      }
+
+      inline unsigned
+      thread::hardware_concurrency () noexcept
+      {
+        return 1;
+      }
+
+      template<typename Callable_T, typename ... Args_T>
+        thread::thread (Callable_T&& f, Args_T&&... args)
+        {
+          id_ = id
+            { new os::cmsis::rtos::Thread (nullptr, 0,
+                                           os::cmsis::rtos::Priority::normal,
+                                           ::std::forward<Callable_T> (f),
+                                           ::std::forward<Args_T>(args)...) };
+        }
+
+      // Implement only a specialised version of this template.
+      template<typename N_T = char, typename SZ_T = ::std::size_t,
+          typename Callable_T, typename ... Args_T>
+        thread::thread (N_T* name, SZ_T stack_size_bytes, Callable_T&& f,
+                        Args_T&&... args)
+        {
+          id_ = id
+            { new os::cmsis::rtos::Thread (name,
+                                           (::std::size_t) stack_size_bytes,
+                                           os::cmsis::rtos::Priority::normal,
+                                           ::std::forward<Callable_T> (f),
+                                           ::std::forward<Args_T>(args)...) };
+        }
+
+      inline
+      thread::thread (const char* name, void* stack,
+                      ::std::size_t stack_size_bytes,
+                      os::cmsis::rtos::Priority prio,
+                      os::cmsis::rtos::thread_func_cvp_t function,
+                      const void* args)
+      {
+        id_ = id
+          { new os::cmsis::rtos::Thread (name, stack, stack_size_bytes, prio,
+                                         function, args) };
+      }
+
+      inline
+      thread::thread (const char* name, void* stack,
+                      ::std::size_t stack_size_bytes,
+                      os::cmsis::rtos::Priority prio,
+                      os::cmsis::rtos::thread_func_vp_t function, void* args) :
+          thread
+            { name, stack, stack_size_bytes, prio,
+                (os::cmsis::rtos::thread_func_cvp_t) function,
+                (const void*) args }
+      {
+        ;
+      }
+
+      inline
+      thread::thread (const char* name, void* stack,
+                      ::std::size_t stack_size_bytes,
+                      os::cmsis::rtos::Priority prio,
+                      os::cmsis::rtos::thread_func_v_t function) :
+          thread
+            { name, stack, stack_size_bytes, prio,
+                (os::cmsis::rtos::thread_func_cvp_t) function,
+                (const void*) nullptr }
+      {
+        ;
+      }
+
+      // ----------------------------------------------------------------------
+
+      inline
+      thread::id::id () noexcept : thread_(nullptr)
+        {
+          ;
+        }
+
+      inline
+      thread::id::id (native_handle_type __id) noexcept : thread_(__id)
+        {
+          ;
+        }
+
+      // ----------------------------------------------------------------------
+
+      namespace this_thread
+      {
+
+        /// yield
+        inline void
+        yield () noexcept
+        {
+          os::cmsis::rtos::thread::yield ();
+        }
+
+        inline thread::id
+        get_id () noexcept
+        {
+          return thread::id (&os::cmsis::rtos::thread::get_current ());
+        }
+
+        template<class _Rep, class _Period>
+          void
+          sleep_for (const ::std::chrono::duration<_Rep, _Period>& __d)
+          {
+            using namespace ::std::chrono;
+            if (__d > duration<_Rep, _Period>::zero ())
+              {
+                microseconds __us;
+                if (__d < microseconds::max ())
+                  {
+                    __us = duration_cast<microseconds> (__d);
+                    if (__us < __d)
+                      ++__us;
+                  }
+                else
+                  {
+                    __us = microseconds::max ();
+                  }
+
+                os::cmsis::rtos::thread::sleep_for_ticks (
+                    os::cmsis::rtos::kernel::compute_sys_ticks (
+                        (uint64_t) __us.count ()));
+              }
+          }
+      }
+
+      template<typename _Clock, typename _Duration>
+        inline void
+        sleep_until (
+            const ::std::chrono::time_point<_Clock, _Duration>& __atime)
+        {
+          auto __now = _Clock::now ();
+          if (_Clock::is_steady)
+            {
+              if (__now < __atime)
+                sleep_for (__atime - __now);
+              return;
+            }
+          while (__now < __atime)
+            {
+              sleep_for (__atime - __now);
+              __now = _Clock::now ();
+            }
+        }
+
+    } /* namespace std */
+  } /* namespace cmsis */
+} /* namespace os */
+
+#endif /* CMSIS_PLUS_THREAD_ */
