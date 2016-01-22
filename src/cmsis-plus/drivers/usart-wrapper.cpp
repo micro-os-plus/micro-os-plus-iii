@@ -114,20 +114,21 @@ namespace os
       return_t
       Usart_wrapper::do_send (const void* data, std::size_t num) noexcept
       {
-        return driver_->Send (data, num);
+        return driver_->Send (data, static_cast<uint32_t> (num));
       }
 
       return_t
       Usart_wrapper::do_receive (void* data, std::size_t num) noexcept
       {
-        return driver_->Receive (data, num);
+        return driver_->Receive (data, static_cast<uint32_t> (num));
       }
 
       return_t
       Usart_wrapper::do_transfer (const void* data_out, void* data_in,
                                   std::size_t num) noexcept
       {
-        return driver_->Transfer (data_out, data_in, num);
+        return driver_->Transfer (data_out, data_in,
+                                  static_cast<uint32_t> (num));
       }
 
       std::size_t
