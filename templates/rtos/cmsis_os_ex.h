@@ -45,9 +45,9 @@ extern "C"
   // ===== Thread Management =====
 
   osThreadId
-  osThreadCreateEx (osThread* addr, const char* name, osPriority prio,
-                    void* stack, size_t stack_size_bytes, os_pthread function,
-                    const void* args);
+  osThreadCreateEx (osThread* addr, const char* name, void* stack,
+                    size_t stack_size_bytes, osPriority prio,
+                    os_pthread function, const void* args);
 
   // --------------------------------------------------------------------------
 

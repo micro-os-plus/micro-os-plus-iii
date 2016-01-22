@@ -335,23 +335,21 @@ namespace os
         /// @param         stacksz      stack size (in bytes) requirements for the thread function.
         /// @param [in]     argument      pointer that is passed to the thread function as start argument.
         /// @return thread ID for reference by other functions or NULL in case of error.
-        Thread (const char* name, Priority prio, void* stack,
-                std::size_t stack_size_bytes, thread_func_cvp_t function,
-                const void* args);
+        Thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
+                Priority prio, thread_func_cvp_t function, const void* args);
 
-        Thread (const char* name, Priority prio, void* stack,
-                std::size_t stack_size_bytes, thread_func_vp_t function,
-                void* args);
+        Thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
+                Priority prio, thread_func_vp_t function, void* args);
 
-        Thread (const char* name, Priority prio, void* stack,
-                std::size_t stack_size_bytes, thread_func_v_t function);
+        Thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
+                Priority prio, thread_func_v_t function);
 
 #if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
 
         template<typename Callable_T, typename ... Args_T>
           explicit
-          Thread (const char* name, Priority prio, std::size_t stack_size_bytes,
-                  Callable_T&& function, Args_T&&... args);
+          Thread (const char* name, ::std::size_t stack_size_bytes,
+                  Priority prio, Callable_T&& function, Args_T&&... args);
 
 #endif
 
@@ -393,6 +391,12 @@ namespace os
         /// @return previous signal flags of the specified thread or 0x80000000 in case of incorrect parameters or call from ISR.
         signals_t
         clear_signals (signals_t signals);
+
+        void
+        join (void);
+
+        void
+        detach (void);
 
 #if defined(TESTING)
         void
@@ -567,7 +571,7 @@ namespace os
         /// @param         no            maximum number of blocks (objects) in the memory pool.
         /// @param         type          data type of a single block (object).
         /// @return memory pool ID for reference by other functions or NULL in case of error.
-        Pool (const char* name, std::size_t items, std::size_t item_size,
+        Pool (const char* name, ::std::size_t items, ::std::size_t item_size,
               void* mem);
 
         Pool (const Pool&) = delete;
@@ -615,7 +619,7 @@ namespace os
         /// @param         type          data type of a single message element (for debugger).
         /// @param [in]    thread_id     thread ID (obtained by @ref osThreadCreate or @ref osThreadGetId) or NULL.
         /// @return message queue ID for reference by other functions or NULL in case of error.
-        Message_queue (const char* name, std::size_t items, void* mem,
+        Message_queue (const char* name, ::std::size_t items, void* mem,
                        Thread* thread);
 
         Message_queue (const Message_queue&) = delete;
@@ -659,8 +663,8 @@ namespace os
         /// @param         type          data type of a single message element
         /// @param [in]    thread_id     thread ID (obtained by @ref osThreadCreate or @ref osThreadGetId) or NULL.
         /// @return mail queue ID for reference by other functions or NULL in case of error.
-        Mail_queue (const char* name, std::size_t messages,
-                    std::size_t message_size, void* mem, Thread* thread);
+        Mail_queue (const char* name, ::std::size_t messages,
+                    ::std::size_t message_size, void* mem, Thread* thread);
 
         Mail_queue (const Mail_queue&) = delete;
         Mail_queue (Mail_queue&&) = delete;
@@ -728,21 +732,22 @@ namespace os
       // ======================================================================
 
       inline
-      Thread::Thread (const char* name, Priority prio, void* stack,
-                      std::size_t stack_size_bytes, thread_func_vp_t function,
-                      void* args) :
+      Thread::Thread (const char* name, void* stack,
+                      ::std::size_t stack_size_bytes, Priority prio,
+                      thread_func_vp_t function, void* args) :
           Thread
-            { name, prio, stack, stack_size_bytes, (thread_func_cvp_t) function,
+            { name, stack, stack_size_bytes, prio, (thread_func_cvp_t) function,
                 (const void*) args }
       {
         ;
       }
 
       inline
-      Thread::Thread (const char* name, Priority prio, void* stack,
-                      std::size_t stack_size_bytes, thread_func_v_t function) :
+      Thread::Thread (const char* name, void* stack,
+                      ::std::size_t stack_size_bytes, Priority prio,
+                      thread_func_v_t function) :
           Thread
-            { name, prio, stack, stack_size_bytes, (thread_func_cvp_t) function,
+            { name, stack, stack_size_bytes, prio, (thread_func_cvp_t) function,
                 (const void*) nullptr }
       {
         ;
@@ -759,21 +764,20 @@ namespace os
         }
 
       template<typename Callable_T, typename ... Args_T>
-        Thread::Thread (const char* name, Priority prio,
-                        std::size_t stack_size_bytes, Callable_T&& function,
-                        Args_T&&... args) :
+        Thread::Thread (const char* name, ::std::size_t stack_size_bytes,
+                        Priority prio, Callable_T&& function, Args_T&&... args) :
             Thread
-              { name, prio, (void*) nullptr, stack_size_bytes,
+              { name, (void*) nullptr, stack_size_bytes, prio,
                   (thread_func_cvp_t) nullptr, (const void*) nullptr }
         {
-          using Binding = decltype(std::bind (std::forward<Callable_T> (function),
-                  std::forward<Args_T>(args)...));
+          using Binding = decltype(::std::bind (::std::forward<Callable_T> (function),
+                  ::std::forward<Args_T>(args)...));
 
           // Dynamic allocation!
           // TODO: use a smart pointer with an appropriate delete function.
           Binding* binding = new Binding (
-              std::bind (std::forward<Callable_T> (function),
-                         std::forward<Args_T>(args)...));
+              ::std::bind (::std::forward<Callable_T> (function),
+                           ::std::forward<Args_T>(args)...));
 
           func_ = reinterpret_cast<thread_func_cvp_t> (&run_binding<Binding> );
           args_ = (void*) binding;

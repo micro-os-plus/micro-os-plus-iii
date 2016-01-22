@@ -35,24 +35,28 @@ namespace os
         return_t
         initialise (void)
         {
+          // TODO
           return os_ok;
         }
 
         return_t
         start (void)
         {
+          // TODO
           return os_ok;
         }
 
         bool
         is_running (void)
         {
+          // TODO
           return true;
         }
 
         uint32_t
         get_ticks (void)
         {
+          // TODO
           return 1234;
         }
 
@@ -61,44 +65,50 @@ namespace os
       // ======================================================================
 
       Thread no_thread
-        { "none", Priority::normal, nullptr, 0, (thread_func_cvp_t) nullptr, nullptr };
+        { "none", nullptr, 0, Priority::normal, (thread_func_cvp_t) nullptr,
+            nullptr };
 
       namespace thread
       {
         Thread&
         get_current (void)
         {
+          // TODO
           return no_thread;
         }
 
         return_t
         yield (void)
         {
+          // TODO
           return os_ok;
         }
 
         return_t
         wait (millis_t millisec, event_t* ret)
         {
+          // TODO
           return os_ok;
         }
 
         return_t
         wait_signals (signals_t signals, millis_t millisec, signals_t* ret)
         {
+          // TODO
           return os_ok;
         }
 
         return_t
         delay (millis_t millisec)
         {
+          // TODO
           return os_ok;
         }
 
         void
         sleep_for_ticks (uint32_t)
         {
-          ;
+          // TODO
         }
 
       }
@@ -113,9 +123,9 @@ namespace os
 
       // ======================================================================
 
-      Thread::Thread (const char* name, Priority prio, void* stack,
-                      std::size_t stack_size_bytes, thread_func_cvp_t function,
-                      const void* args) : //
+      Thread::Thread (const char* name, void* stack,
+                      std::size_t stack_size_bytes, Priority prio,
+                      thread_func_cvp_t function, const void* args) : //
           Named_object
             { name }, //
           prio_
@@ -129,21 +139,6 @@ namespace os
         has_binding_ = false;
 #endif
       }
-
-//      Thread::Thread (thread_func_t function, const void* args) : //
-//          Named_object
-//            { nullptr }, //
-//          prio_
-//            { Priority::normal }, //
-//          func_
-//            { function }, //
-//          args_
-//            { args } //
-//      {
-//#if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
-//        has_binding_ = false;
-//#endif
-//      }
 
       Thread::~Thread ()
       {
@@ -175,13 +170,27 @@ namespace os
       signals_t
       Thread::set_signals (signals_t signals)
       {
+        // TODO
         return 0;
       }
 
       signals_t
       Thread::clear_signals (signals_t signals)
       {
+        // TODO
         return 0;
+      }
+
+      void
+      Thread::join (void)
+      {
+        // TODO
+      }
+
+      void
+      Thread::detach (void)
+      {
+        // TODO
       }
 
 #if defined(TESTING)
@@ -198,23 +207,25 @@ namespace os
                     void* args) : //
           Named_object (name)
       {
-        ;
+        // TODO
       }
 
       Timer::~Timer ()
       {
-        ;
+        // TODO
       }
 
       return_t
       Timer::start (millis_t millisec)
       {
+        // TODO
         return os_ok;
       }
 
       return_t
       Timer::stop (void)
       {
+        // TODO
         return os_ok;
       }
 
@@ -223,12 +234,12 @@ namespace os
       Mutex::Mutex (const char* name) :
           Named_object (name)
       {
-        ;
+        // TODO
       }
 
       Mutex::~Mutex ()
       {
-        ;
+        // TODO
       }
 
       return_t
@@ -248,12 +259,12 @@ namespace os
       Semaphore::Semaphore (const char* name, int32_t count, uint32_t max_count) :
           Named_object (name)
       {
-        ;
+        // TODO
       }
 
       Semaphore::~Semaphore ()
       {
-        ;
+        // TODO
       }
 
       int32_t
@@ -274,29 +285,32 @@ namespace os
                   void* mem) :
           Named_object (name)
       {
-        ;
+        // TODO
       }
 
       Pool::~Pool ()
       {
-        ;
+        // TODO
       }
 
       void*
       Pool::alloc (void)
       {
+        // TODO
         return nullptr;
       }
 
       void*
       Pool::calloc (void)
       {
+        // TODO
         return nullptr;
       }
 
       return_t
       Pool::free (void* block)
       {
+        // TODO
         return os_ok;
       }
 
@@ -306,23 +320,25 @@ namespace os
                                     void* mem, Thread* thread) :
           Named_object (name)
       {
-        ;
+        // TODO
       }
 
       Message_queue::~Message_queue ()
       {
-        ;
+        // TODO
       }
 
       return_t
       Message_queue::put (void* info, millis_t millisec)
       {
+        // TODO
         return os_ok;
       }
 
       return_t
       Message_queue::get (millis_t millisec, void** ret)
       {
+        // TODO
         return os_ok;
       }
 
@@ -333,41 +349,46 @@ namespace os
                               Thread* thread) :
           Named_object (name)
       {
-        ;
+        // TODO
       }
 
       Mail_queue::~Mail_queue ()
       {
-        ;
+        // TODO
       }
 
       void*
       Mail_queue::alloc (millis_t millisec)
       {
+        // TODO
         return nullptr;
       }
 
       void*
       Mail_queue::calloc (millis_t millisec)
       {
+        // TODO
         return nullptr;
       }
 
       return_t
       Mail_queue::put (void* mail)
       {
+        // TODO
         return os_ok;
       }
 
       return_t
       Mail_queue::get (millis_t millisec, void** ret)
       {
+        // TODO
         return os_ok;
       }
 
       return_t
       Mail_queue::free (void* mail)
       {
+        // TODO
         return os_ok;
       }
 
