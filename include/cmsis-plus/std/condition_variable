@@ -1,0 +1,158 @@
+/*
+ * This file is part of the µOS++ distribution.
+ *   (https://github.com/micro-os-plus)
+ * Copyright (c) 2016 Liviu Ionescu.
+ *
+ * µOS++ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, version 3.
+ *
+ * µOS++ is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+ * This file is part of the CMSIS++ proposal, intended as a CMSIS
+ * replacement for C++ applications.
+ *
+ * The code is inspired by LLVM libcxx and GNU libstdc++-v3.
+ */
+
+#ifndef CMSIS_PLUS_STD_CONDITION_VARIABLE_
+#define CMSIS_PLUS_STD_CONDITION_VARIABLE_
+
+#include <cmsis-plus/rtos/os.h>
+#if defined(TRACE)
+#include <diag/trace.h>
+#endif
+
+#include <cmsis-plus/std/mutex>
+#include <memory>
+
+namespace os
+{
+  namespace cmsis
+  {
+    namespace std
+    {
+      // ======================================================================
+
+      enum class cv_status
+      {
+        no_timeout, //
+        timeout
+      };
+
+      class condition_variable
+      {
+      public:
+
+        condition_variable ();
+        ~condition_variable ();
+
+        condition_variable (const condition_variable&) = delete;
+        condition_variable&
+        operator= (const condition_variable&) = delete;
+
+        void
+        notify_one () noexcept;
+
+        void
+        notify_all () noexcept;
+
+        void
+        wait (unique_lock<mutex>& lock);
+
+        template<class Predicate>
+          void
+          wait (unique_lock<mutex>& lock, Predicate pred);
+
+        template<class Clock, class Duration>
+          cv_status
+          wait_until (unique_lock<mutex>& lock,
+                      const chrono::time_point<Clock, Duration>& abs_time);
+
+        template<class Clock, class Duration, class Predicate>
+          bool
+          wait_until (unique_lock<mutex>& lock,
+                      const chrono::time_point<Clock, Duration>& abs_time,
+                      Predicate pred);
+
+        template<class Rep, class Period>
+          cv_status
+          wait_for (unique_lock<mutex>& lock,
+                    const chrono::duration<Rep, Period>& rel_time);
+
+        template<class Rep, class Period, class Predicate>
+          bool
+          wait_for (unique_lock<mutex>& lock,
+                    const chrono::duration<Rep, Period>& rel_time,
+                    Predicate pred);
+
+        typedef pthread_cond_t* native_handle_type;
+
+        native_handle_type
+        native_handle ();
+      };
+
+      void
+      notify_all_at_thread_exit (condition_variable& cond,
+                                 unique_lock<mutex> lk);
+
+      class condition_variable_any
+      {
+      public:
+
+        condition_variable_any ();
+
+        ~condition_variable_any ();
+
+        condition_variable_any (const condition_variable_any&) = delete;
+        condition_variable_any&
+        operator= (const condition_variable_any&) = delete;
+
+        void
+        notify_one () noexcept;
+
+        void
+        notify_all () noexcept;
+
+        template<class Lock>
+          void
+          wait (Lock& lock);
+
+        template<class Lock, class Predicate>
+          void
+          wait (Lock& lock, Predicate pred);
+
+        template<class Lock, class Clock, class Duration>
+          cv_status
+          wait_until (Lock& lock,
+                      const chrono::time_point<Clock, Duration>& abs_time);
+
+        template<class Lock, class Clock, class Duration, class Predicate>
+          bool
+          wait_until (Lock& lock,
+                      const chrono::time_point<Clock, Duration>& abs_time,
+                      Predicate pred);
+
+        template<class Lock, class Rep, class Period>
+          cv_status
+          wait_for (Lock& lock, const chrono::duration<Rep, Period>& rel_time);
+
+        template<class Lock, class Rep, class Period, class Predicate>
+          bool
+          wait_for (Lock& lock, const chrono::duration<Rep, Period>& rel_time,
+                    Predicate pred);
+      };
+
+    } /* namespace std */
+  } /* namespace cmsis */
+} /* namespace os */
+
+#endif /* CMSIS_PLUS_STD_CONDITION_VARIABLE_ */

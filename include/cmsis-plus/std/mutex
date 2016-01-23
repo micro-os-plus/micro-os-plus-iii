@@ -1,0 +1,316 @@
+/*
+ * This file is part of the µOS++ distribution.
+ *   (https://github.com/micro-os-plus)
+ * Copyright (c) 2016 Liviu Ionescu.
+ *
+ * µOS++ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, version 3.
+ *
+ * µOS++ is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+ * This file is part of the CMSIS++ proposal, intended as a CMSIS
+ * replacement for C++ applications.
+ *
+ * The code is inspired by LLVM libcxx and GNU libstdc++-v3.
+ */
+
+#ifndef CMSIS_PLUS_STD_MUTEX_
+#define CMSIS_PLUS_STD_MUTEX_
+
+#include <cmsis-plus/rtos/os.h>
+#if defined(TRACE)
+#include <diag/trace.h>
+#endif
+
+namespace os
+{
+  namespace cmsis
+  {
+    namespace std
+    {
+      // ======================================================================
+
+      class mutex
+      {
+      public:
+
+        constexpr
+        mutex () noexcept;
+
+        ~mutex ();
+
+        mutex (const mutex&) = delete;
+        mutex&
+        operator= (const mutex&) = delete;
+
+        void
+        lock ();
+
+        bool
+        try_lock ();
+
+        void
+        unlock ();
+
+        typedef pthread_mutex_t* native_handle_type;
+
+        native_handle_type
+        native_handle ();
+      };
+
+      class recursive_mutex
+      {
+      public:
+
+        recursive_mutex ();
+
+        ~recursive_mutex ();
+
+        recursive_mutex (const recursive_mutex&) = delete;
+        recursive_mutex&
+        operator= (const recursive_mutex&) = delete;
+
+        void
+        lock ();
+
+        bool
+        try_lock () noexcept;
+
+        void
+        unlock ();
+
+        typedef pthread_mutex_t* native_handle_type;
+
+        typedef implementation-defined native_handle_type;
+
+        native_handle_type
+        native_handle ();
+      };
+
+      class timed_mutex
+      {
+      public:
+
+        timed_mutex ();
+
+        ~timed_mutex ();
+
+        timed_mutex (const timed_mutex&) = delete;
+        timed_mutex&
+        operator= (const timed_mutex&) = delete;
+
+        void
+        lock ();
+
+        bool
+        try_lock ();
+
+        template<class Rep, class Period>
+          bool
+          try_lock_for (const chrono::duration<Rep, Period>& rel_time);
+
+        template<class Clock, class Duration>
+          bool
+          try_lock_until (const chrono::time_point<Clock, Duration>& abs_time);
+
+        void
+        unlock ();
+
+        typedef implementation-defined native_handle_type;
+        native_handle_type
+        native_handle ();
+      };
+
+      class recursive_timed_mutex
+      {
+      public:
+
+        recursive_timed_mutex ();
+
+        ~recursive_timed_mutex ();
+
+        recursive_timed_mutex (const recursive_timed_mutex&) = delete;
+        recursive_timed_mutex&
+        operator= (const recursive_timed_mutex&) = delete;
+
+        void
+        lock ();
+
+        bool
+        try_lock () noexcept;
+
+        template<class Rep, class Period>
+          bool
+          try_lock_for (const chrono::duration<Rep, Period>& rel_time);
+
+        template<class Clock, class Duration>
+          bool
+          try_lock_until (const chrono::time_point<Clock, Duration>& abs_time);
+
+        void
+        unlock ();
+
+        typedef implementation-defined native_handle_type;
+        native_handle_type
+        native_handle ();
+      };
+
+      struct defer_lock_t
+      {
+      };
+
+      struct try_to_lock_t
+      {
+      };
+
+      struct adopt_lock_t
+      {
+      };
+
+      constexpr defer_lock_t defer_lock
+        { };
+
+      constexpr try_to_lock_t try_to_lock
+        { };
+
+      constexpr adopt_lock_t adopt_lock
+        { };
+
+      template<class Mutex>
+        class lock_guard
+        {
+        public:
+
+          typedef Mutex mutex_type;
+
+          explicit
+          lock_guard (mutex_type& m);
+
+          lock_guard (mutex_type& m, adopt_lock_t);
+
+          ~lock_guard ();
+
+          lock_guard (lock_guard const&) = delete;
+          lock_guard&
+          operator= (lock_guard const&) = delete;
+
+        private:
+
+          mutex_type& pm; // exposition only
+        };
+
+      template<class Mutex>
+        class unique_lock
+        {
+        public:
+
+          typedef Mutex mutex_type;
+
+          unique_lock () noexcept;
+
+          explicit
+          unique_lock (mutex_type& m);
+
+          unique_lock (mutex_type& m, defer_lock_t) noexcept;
+
+          unique_lock (mutex_type& m, try_to_lock_t);
+
+          unique_lock (mutex_type& m, adopt_lock_t);
+
+          template<class Clock, class Duration>
+            unique_lock (mutex_type& m,
+                         const chrono::time_point<Clock, Duration>& abs_time);
+
+          template<class Rep, class Period>
+            unique_lock (mutex_type& m,
+                         const chrono::duration<Rep, Period>& rel_time);
+
+          ~unique_lock ();
+
+          unique_lock (unique_lock const&) = delete;
+          unique_lock&
+          operator= (unique_lock const&) = delete;
+
+          unique_lock (unique_lock&& u) noexcept;
+          unique_lock&
+          operator= (unique_lock&& u) noexcept;
+
+          void
+          lock ();
+
+          bool
+          try_lock ();
+
+          template<class Rep, class Period>
+            bool
+            try_lock_for (const chrono::duration<Rep, Period>& rel_time);
+
+          template<class Clock, class Duration>
+            bool
+            try_lock_until (
+                const chrono::time_point<Clock, Duration>& abs_time);
+
+          void
+          unlock ();
+
+          void
+          swap (unique_lock& u) noexcept;
+
+          mutex_type*
+          release () noexcept;
+
+          bool
+          owns_lock () const noexcept;
+
+          explicit
+          operator bool () const noexcept;
+
+          mutex_type*
+          mutex () const noexcept;
+
+        private:
+
+          mutex_type* pm; // exposition only
+          bool owns; // exposition only
+        };
+
+      template<class Mutex>
+        void
+        swap (unique_lock<Mutex>& x, unique_lock<Mutex>& y) noexcept;
+
+      template<class L1, class L2, class ... L3>
+        int
+        try_lock (L1&, L2&, L3&...);
+
+      template<class L1, class L2, class ... L3>
+        void
+        lock (L1&, L2&, L3&...);
+
+      struct once_flag
+      {
+        constexpr
+        once_flag () noexcept;
+
+        once_flag (const once_flag&) = delete;
+        once_flag&
+        operator= (const once_flag&) = delete;
+      };
+
+      template<class Callable, class ...Args>
+        void
+        call_once (once_flag& flag, Callable&& func, Args&&... args);
+
+    } /* namespace std */
+  } /* namespace cmsis */
+} /* namespace os */
+
+#endif /* CMSIS_PLUS_STD_MUTEX_ */
