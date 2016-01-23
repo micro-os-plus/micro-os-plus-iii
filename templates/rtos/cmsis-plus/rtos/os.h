@@ -29,7 +29,6 @@
 #define CMSIS_PLUS_RTOS_OS_H_
 
 #include <diag/trace.h>
-
 #include <cstdint>
 #include <cstddef>
 
@@ -41,6 +40,7 @@
 #if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
 #include <functional>
 #endif
+#include <memory>
 
 namespace os
 {
@@ -289,14 +289,14 @@ namespace os
 
       /// Entry point of a thread.
       typedef void
-      (*thread_func_cvp_t) (const void* args);
+      (*Thread_func_cvp) (const void* args);
 
       // Other possible entry points.
       typedef void
-      (*thread_func_vp_t) (void* args);
+      (*Thread_func_vp) (void* args);
 
       typedef void
-      (*thread_func_v_t) (void);
+      (*Thread_func_v) (void);
 
       // ======================================================================
 
@@ -338,13 +338,13 @@ namespace os
         /// @param [in]     argument      pointer that is passed to the thread function as start argument.
         /// @return thread ID for reference by other functions or NULL in case of error.
         Thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
-                Priority prio, thread_func_cvp_t function, const void* args);
+                Priority prio, Thread_func_cvp function, const void* args);
 
         Thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
-                Priority prio, thread_func_vp_t function, void* args);
+                Priority prio, Thread_func_vp function, void* args);
 
         Thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
-                Priority prio, thread_func_v_t function);
+                Priority prio, Thread_func_v function);
 
 #if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
 
@@ -411,21 +411,28 @@ namespace os
 #if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
         template<typename Binding_T>
           static void
-          run_binding (void* binding);
+          run_function_object (const void* binding);
 #endif
+
+        // Type of unique pointer used to store argument,
+        // possibly with deleter when using bind().
+        using Args_ptr = ::std::unique_ptr<void*, void (*) (void**)>;
+
+        template<typename Binding_T>
+          static void
+          delete_function_object (const Args_ptr::element_type* func_obj);
 
       protected:
 
         Priority prio_;
 
-        thread_func_cvp_t func_;
-        const void* args_;
+        Thread_func_cvp func_ptr_;
 
-#if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
-        bool has_binding_;
-#endif
+        // Empty argument pointer with empty deleter.
+        Args_ptr args_ptr_
+          { nullptr, nullptr };
 
-        // Add internal data
+        // Add other internal data
       };
 
 #pragma GCC diagnostic pop
@@ -737,9 +744,9 @@ namespace os
       inline
       Thread::Thread (const char* name, void* stack,
                       ::std::size_t stack_size_bytes, Priority prio,
-                      thread_func_vp_t function, void* args) :
+                      Thread_func_vp function, void* args) :
           Thread
-            { name, stack, stack_size_bytes, prio, (thread_func_cvp_t) function,
+            { name, stack, stack_size_bytes, prio, (Thread_func_cvp) function,
                 (const void*) args }
       {
         ;
@@ -748,9 +755,9 @@ namespace os
       inline
       Thread::Thread (const char* name, void* stack,
                       ::std::size_t stack_size_bytes, Priority prio,
-                      thread_func_v_t function) :
+                      Thread_func_v function) :
           Thread
-            { name, stack, stack_size_bytes, prio, (thread_func_cvp_t) function,
+            { name, stack, stack_size_bytes, prio, (Thread_func_cvp) function,
                 (const void*) nullptr }
       {
         ;
@@ -758,12 +765,30 @@ namespace os
 
 #if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
 
-      template<typename Binding_T>
+      template<typename F_T>
         void
-        Thread::run_binding (void* binding)
+        Thread::run_function_object (const void* binding)
         {
-          Binding_T* b = (Binding_T*) binding;
+          using Function_object = F_T;
+
+          Function_object* b = (Function_object*) binding;
           (*b) ();
+        }
+
+      template<typename F_T>
+        void
+        Thread::delete_function_object (
+            const Args_ptr::element_type* func_obj)
+        {
+          using Function_object = F_T;
+
+          Function_object* b = (Function_object*) func_obj;
+
+          // os::trace::printf ("%s\n", __PRETTY_FUNCTION__);
+
+          // The delete now has the knowledge required to
+          // correctly delete the object (i.e. the object size).
+          delete b;
         }
 
       template<typename Callable_T, typename ... Args_T>
@@ -771,21 +796,32 @@ namespace os
                         Priority prio, Callable_T&& function, Args_T&&... args) :
             Thread
               { name, (void*) nullptr, stack_size_bytes, prio,
-                  (thread_func_cvp_t) nullptr, (const void*) nullptr }
+                  (Thread_func_cvp) nullptr, (const void*) nullptr }
         {
-          using Binding = decltype(::std::bind (::std::forward<Callable_T> (function),
+          using Function_object = decltype(::std::bind (::std::forward<Callable_T> (function),
                   ::std::forward<Args_T>(args)...));
 
-          // Dynamic allocation!
-          // TODO: use a smart pointer with an appropriate delete function.
-          Binding* binding = new Binding (
+          // Dynamic allocation! The size depends on the number of arguments.
+          // This creates a small problem, since both running the function
+          // and deleting the object requires the type. It is passes as
+          // template functions.
+          Function_object* funct_obj = new Function_object (
               ::std::bind (::std::forward<Callable_T> (function),
                            ::std::forward<Args_T>(args)...));
 
-          func_ = reinterpret_cast<thread_func_cvp_t> (&run_binding<Binding> );
-          args_ = (void*) binding;
+          // The function to start the thread is a custom proxy that
+          // knows how to get the variadic arguments.
+          func_ptr_ = &run_function_object<Function_object>;
 
-          has_binding_ = false;
+          // Create a unique_ptr with the raw pointer to the function
+          // and a custom deleter.
+          Args_ptr ap
+            { (Args_ptr::element_type*) funct_obj,
+                (Args_ptr::deleter_type) &delete_function_object<
+                    Function_object> };
+
+          // Move pointer to thread storage.
+          args_ptr_ = std::move (ap);
         }
 
 #endif

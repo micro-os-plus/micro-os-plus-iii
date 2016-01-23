@@ -65,7 +65,7 @@ namespace os
       // ======================================================================
 
       Thread no_thread
-        { "none", nullptr, 0, Priority::normal, (thread_func_cvp_t) nullptr,
+        { "none", nullptr, 0, Priority::normal, (Thread_func_cvp) nullptr,
             nullptr };
 
       namespace thread
@@ -125,19 +125,16 @@ namespace os
 
       Thread::Thread (const char* name, void* stack,
                       std::size_t stack_size_bytes, Priority prio,
-                      thread_func_cvp_t function, const void* args) : //
+                      Thread_func_cvp function, const void* args) : //
           Named_object
             { name }, //
           prio_
             { prio }, //
-          func_
+          func_ptr_
             { function }, //
-          args_
-            { args } //
+          args_ptr_
+            { (Args_ptr::element_type*) args, nullptr } //
       {
-#if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
-        has_binding_ = false;
-#endif
 #if defined(TRACE)
         os::trace::printf ("%s(\"%s\", %d) @%p \n", __func__, get_name (),
                            stack_size_bytes, this);
@@ -148,15 +145,6 @@ namespace os
       {
 #if defined(TRACE)
         os::trace::printf ("%s() @%p \n", __func__, this);
-#endif
-#if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
-        if (has_binding_ && args_ != nullptr)
-          {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdelete-incomplete"
-            delete args_;
-#pragma GCC diagnostic pop
-          }
 #endif
       }
 
@@ -204,7 +192,7 @@ namespace os
       void
       Thread::__run_function (void)
       {
-        func_ (args_);
+        func_ptr_ (args_ptr_.get());
       }
 #endif
 
