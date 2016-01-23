@@ -138,10 +138,17 @@ namespace os
 #if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
         has_binding_ = false;
 #endif
+#if defined(TRACE)
+        os::trace::printf ("%s(\"%s\", %d) @%p \n", __func__, get_name (),
+                           stack_size_bytes, this);
+#endif
       }
 
       Thread::~Thread ()
       {
+#if defined(TRACE)
+        os::trace::printf ("%s() @%p \n", __func__, this);
+#endif
 #if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
         if (has_binding_ && args_ != nullptr)
           {

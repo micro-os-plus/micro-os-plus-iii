@@ -17,6 +17,8 @@
  */
 
 #include <cmsis-plus/std/thread>
+#include <diag/trace.h>
+
 #include <cstdio>
 #include <iostream>
 
@@ -39,19 +41,20 @@ task3 (void* args);
 void
 task1 (void)
 {
-  std::cout << "task1()" << std::endl;
+  os::trace::printf ("task1()\n");
+  ;
 }
 
 void
 task2 (const void* args)
 {
-  std::cout << "task2(" << args << ")" << std::endl;
+  os::trace::printf ("task2(%p)\n", args);
 }
 
 void
 task3 (void* args)
 {
-  std::cout << "task3(" << args << ")" << std::endl;
+  os::trace::printf ("task3(%p)\n", args);
 }
 
 // ----------------------------------------------------------------------------
@@ -80,6 +83,8 @@ main (int argc, char* argv[])
 
   th11.native_handle ()->__run_function ();
 
+  new int ();
+
   thread th12
     { "th12", 777, task1 };
 
@@ -105,7 +110,13 @@ main (int argc, char* argv[])
 
   th11.native_handle ()->set_priority (rtos::Priority::high);
 
-  printf ("%s done.", argv[0]);
+  th11.join ();
+  th12.join ();
+  th13.join ();
+  th21.join ();
+  th31.join ();
+
+  os::trace::printf ("%s done.\n", argv[0]);
   return 0;
 }
 

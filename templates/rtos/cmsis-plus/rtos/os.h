@@ -28,6 +28,8 @@
 #ifndef CMSIS_PLUS_RTOS_OS_H_
 #define CMSIS_PLUS_RTOS_OS_H_
 
+#include <diag/trace.h>
+
 #include <cstdint>
 #include <cstddef>
 
@@ -353,6 +355,7 @@ namespace os
 
 #endif
 
+        // Prevent any copy or move.
         Thread (const Thread&) = delete;
         Thread (Thread&&) = delete;
         Thread&

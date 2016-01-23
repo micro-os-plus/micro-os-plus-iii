@@ -48,6 +48,8 @@ namespace os
       {
       public:
         class id;
+
+        // TODO: make it a smart pointer?
         using native_handle_type = os::cmsis::rtos::Thread*;
 
         thread () noexcept = default;
@@ -109,6 +111,7 @@ namespace os
           id (native_handle_type system_thread) noexcept;
 
 #if 0
+          // TODO: rework when using a smart pointer
           id (const id&) = default;
           id (id&&) = delete;
           id&
