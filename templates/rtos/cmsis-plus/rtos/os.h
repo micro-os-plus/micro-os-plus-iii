@@ -408,19 +408,21 @@ namespace os
 
       protected:
 
-#if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
-        template<typename Binding_T>
-          static void
-          run_function_object (const void* binding);
-#endif
-
         // Type of unique pointer used to store argument,
         // possibly with deleter when using bind().
         using Args_ptr = ::std::unique_ptr<void*, void (*) (void**)>;
 
+#if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
+
+        template<typename Binding_T>
+          static void
+          run_function_object (const void* binding);
+
         template<typename Binding_T>
           static void
           delete_function_object (const Args_ptr::element_type* func_obj);
+
+#endif
 
       protected:
 
