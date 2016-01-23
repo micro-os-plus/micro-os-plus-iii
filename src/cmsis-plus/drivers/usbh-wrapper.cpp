@@ -174,7 +174,7 @@ namespace os
       Usbh_wrapper::do_transfer (usb::pipe_t pipe, uint32_t packet,
                                  uint8_t* data, std::size_t num) noexcept
       {
-        return driver_->PipeTransfer (pipe, packet, data, num);
+        return driver_->PipeTransfer (pipe, packet, data, (uint32_t)num);
       }
 
       std::size_t

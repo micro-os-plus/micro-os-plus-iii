@@ -170,7 +170,7 @@ namespace os
       Usbd_wrapper::do_transfer (usb::endpoint_t ep_addr, uint8_t* data,
                                  std::size_t num) noexcept
       {
-        return driver_->EndpointTransfer (ep_addr, data, num);
+        return driver_->EndpointTransfer (ep_addr, data, (uint32_t)num);
       }
 
       std::size_t
