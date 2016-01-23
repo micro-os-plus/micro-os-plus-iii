@@ -27,6 +27,9 @@
 #define CMSIS_PLUS_THREAD_
 
 #include <cmsis-plus/rtos/os.h>
+#if defined(TRACE)
+#include <diag/trace.h>
+#endif
 
 #include <cstddef>
 #include <chrono>
@@ -53,22 +56,11 @@ namespace os
           explicit
           thread (Callable_T&& f, Args_T&&... args);
 
-        // Non ISO, specific CMSIS RTOS detailed constructors. Do not use
-        // dynamic memory.
-        thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
-                os::cmsis::rtos::Priority prio,
-                os::cmsis::rtos::thread_func_cvp_t function, const void* args);
+        // CMSIS RTOS specific constructors (extension to the ISO standard),
+        // used to create threads with name and custom stack.
 
-        thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
-                os::cmsis::rtos::Priority prio,
-                os::cmsis::rtos::thread_func_vp_t function, void* args);
-
-        thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
-                os::cmsis::rtos::Priority prio,
-                os::cmsis::rtos::thread_func_v_t function);
-
-        // This is a very generic template, not used as is,
-        // it is implemented only for "const char*" & "size_t".
+        // This is a very generic template, intentionally not implemented
+        // as is, but only for "const char*" & "size_t".
         template<typename N_T, typename SZ_T, typename Callable_T,
             typename ... Args_T>
           explicit
@@ -114,7 +106,18 @@ namespace os
           id () noexcept;
 
           explicit
-          id (native_handle_type id) noexcept;
+          id (native_handle_type system_thread) noexcept;
+
+#if 0
+          id (const id&) = default;
+          id (id&&) = delete;
+          id&
+          operator= (const id&) = default;
+          id&
+          operator= (id&&) = delete;
+#endif
+
+          ~id ();
 
         private:
 
@@ -124,7 +127,7 @@ namespace os
 #endif
 
           // The id is actually a pointer to the system thread.
-          native_handle_type thread_;
+          native_handle_type system_thread_;
 
           // Only two of them, the other 4 are defined in terms of these.
           friend bool
@@ -136,6 +139,10 @@ namespace os
 
       private:
 
+        // The current implementation creates lots of temporary id() objects
+        // and copies them here. Probably a better strategy would be to
+        // move them, this would allow the use of a smart pointer to
+        // automatically delete the system thread.
         id id_;
       };
 
@@ -196,7 +203,7 @@ namespace os
       inline bool
       operator== (thread::id x, thread::id y) noexcept
       {
-        return x.thread_ == y.thread_;
+        return x.system_thread_ == y.system_thread_;
       }
 
       inline bool
@@ -208,7 +215,7 @@ namespace os
       inline bool
       operator< (thread::id x, thread::id y) noexcept
       {
-        return x.thread_ < y.thread_;
+        return x.system_thread_ < y.system_thread_;
       }
 
       inline bool
@@ -240,7 +247,7 @@ namespace os
       inline thread::native_handle_type
       thread::native_handle ()
       {
-        return id_.thread_;
+        return id_.system_thread_;
       }
 
       inline unsigned
@@ -252,6 +259,9 @@ namespace os
       template<typename Callable_T, typename ... Args_T>
         thread::thread (Callable_T&& f, Args_T&&... args)
         {
+#if defined(TRACE)
+          os::trace::printf ("%s() @%p\n", __func__, this);
+#endif
           id_ = id
             { new os::cmsis::rtos::Thread (nullptr, 0,
                                            os::cmsis::rtos::Priority::normal,
@@ -265,6 +275,10 @@ namespace os
         thread::thread (N_T* name, SZ_T stack_size_bytes, Callable_T&& f,
                         Args_T&&... args)
         {
+#if defined(TRACE)
+          os::trace::printf ("%s(\"%s\", %d) @%p \n", __func__, name,
+                             stack_size_bytes, this);
+#endif
           id_ = id
             { new os::cmsis::rtos::Thread (name,
                                            (::std::size_t) stack_size_bytes,
@@ -273,57 +287,29 @@ namespace os
                                            ::std::forward<Args_T>(args)...) };
         }
 
-      inline
-      thread::thread (const char* name, void* stack,
-                      ::std::size_t stack_size_bytes,
-                      os::cmsis::rtos::Priority prio,
-                      os::cmsis::rtos::thread_func_cvp_t function,
-                      const void* args)
-      {
-        id_ = id
-          { new os::cmsis::rtos::Thread (name, stack, stack_size_bytes, prio,
-                                         function, args) };
-      }
-
-      inline
-      thread::thread (const char* name, void* stack,
-                      ::std::size_t stack_size_bytes,
-                      os::cmsis::rtos::Priority prio,
-                      os::cmsis::rtos::thread_func_vp_t function, void* args) :
-          thread
-            { name, stack, stack_size_bytes, prio,
-                (os::cmsis::rtos::thread_func_cvp_t) function,
-                (const void*) args }
-      {
-        ;
-      }
-
-      inline
-      thread::thread (const char* name, void* stack,
-                      ::std::size_t stack_size_bytes,
-                      os::cmsis::rtos::Priority prio,
-                      os::cmsis::rtos::thread_func_v_t function) :
-          thread
-            { name, stack, stack_size_bytes, prio,
-                (os::cmsis::rtos::thread_func_cvp_t) function,
-                (const void*) nullptr }
-      {
-        ;
-      }
-
       // ----------------------------------------------------------------------
 
       inline
-      thread::id::id () noexcept : thread_(nullptr)
+      thread::id::id () noexcept :
+      system_thread_
+        { nullptr}
         {
           ;
         }
 
       inline
-      thread::id::id (native_handle_type __id) noexcept : thread_(__id)
+      thread::id::id (native_handle_type system_thread) noexcept :
+      system_thread_
+        { system_thread}
         {
           ;
         }
+
+      inline
+      thread::id::~id ()
+      {
+        ;
+      }
 
       // ----------------------------------------------------------------------
 
