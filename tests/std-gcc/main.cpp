@@ -17,7 +17,7 @@
  */
 
 #include <cmsis-plus/std/thread>
-#include <diag/trace.h>
+#include <cmsis-plus/diag/trace.h>
 
 #include <cstdio>
 #include <iostream>

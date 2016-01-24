@@ -28,7 +28,7 @@
 
 #include <cmsis-plus/rtos/os.h>
 #if defined(TRACE)
-#include <diag/trace.h>
+#include <cmsis-plus/diag/trace.h>
 #endif
 
 namespace os

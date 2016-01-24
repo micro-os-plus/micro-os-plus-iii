@@ -18,7 +18,7 @@
 
 #if defined(TRACE)
 
-#include "diag/trace.h"
+#include <cmsis-plus/diag/trace.h>
 #include <cstddef>
 #include <unistd.h>
 
