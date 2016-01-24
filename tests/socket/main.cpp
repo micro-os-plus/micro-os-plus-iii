@@ -22,7 +22,7 @@
 #include "posix-io/Socket.h"
 #include "posix-io/NetInterface.h"
 #include "posix-io/NetStack.h"
-#include "diag/trace.h"
+#include <cmsis-plus/diag/trace.h>
 
 #include "posix/sys/socket.h"
 

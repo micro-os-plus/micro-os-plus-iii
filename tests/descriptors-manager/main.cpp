@@ -19,7 +19,7 @@
 #include "posix-io/FileDescriptorsManager.h"
 #include "posix-io/IO.h"
 #include "posix-io/CharDevice.h"
-#include "diag/trace.h"
+#include <cmsis-plus/diag/trace.h>
 
 #include <cerrno>
 #include <cassert>

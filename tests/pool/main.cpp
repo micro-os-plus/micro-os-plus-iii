@@ -20,7 +20,7 @@
 #include "posix-io/IO.h"
 #include "posix-io/File.h"
 #include "posix-io/TPool.h"
-#include "diag/trace.h"
+#include <cmsis-plus/diag/trace.h>
 
 #include <cerrno>
 #include <cassert>

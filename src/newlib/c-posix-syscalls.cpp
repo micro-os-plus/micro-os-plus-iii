@@ -28,7 +28,7 @@
 
 #include "posix/sys/uio.h"
 
-#include "diag/trace.h"
+#include <cmsis-plus/diag/trace.h>
 
 #include <cstdarg>
 #include <cerrno>

@@ -20,7 +20,7 @@
 #include "posix-io/IO.h"
 #include "posix-io/CharDevice.h"
 #include "posix-io/CharDevicesRegistry.h"
-#include "diag/trace.h"
+#include <cmsis-plus/diag/trace.h>
 
 #include "posix/stropts.h"
 

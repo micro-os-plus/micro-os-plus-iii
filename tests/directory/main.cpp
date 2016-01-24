@@ -24,7 +24,7 @@
 #include "posix-io/TPool.h"
 #include "posix-io/MountManager.h"
 #include "posix-io/BlockDevice.h"
-#include "diag/trace.h"
+#include <cmsis-plus/diag/trace.h>
 
 #include <cerrno>
 #include <cassert>

@@ -18,7 +18,7 @@
 
 #include "posix-io/CharDevicesRegistry.h"
 #include "posix-io/CharDevice.h"
-#include "diag/trace.h"
+#include <cmsis-plus/diag/trace.h>
 
 #include <cassert>
 #include <cstring>
