@@ -38,8 +38,7 @@
 
 // TODO: (multiline)
 // - add flow control on both send & receive
-// - add link control (connected/disconnected)
-// - cancel pending reads/writes at close
+// - cancel pending reads/writes at close (partly done)
 // - add error processing
 
 namespace os
@@ -252,18 +251,12 @@ namespace os
             if (result != os::cmsis::driver::RETURN_OK)
               break;
 
-            uint8_t* pbuf;
-            std::size_t nbyte = rx_buf_->getBackContiguousBuffer (&pbuf);
-
-            result = driver_->receive (pbuf, nbyte);
-            if (result != os::cmsis::driver::RETURN_OK)
-              break;
           }
         while (false); // Actually NOT a loop, just a sequence of ifs!
 
         if (result != os::cmsis::driver::RETURN_OK)
           {
-            errno = ENOSR;
+            errno = EIO;
             return -1;
           }
 
@@ -285,6 +278,16 @@ namespace os
                   }
                 osSemaphoreWait (open_sem_, osWaitForever);
               }
+          }
+
+        uint8_t* pbuf;
+        std::size_t nbyte = rx_buf_->getBackContiguousBuffer (&pbuf);
+
+        result = driver_->receive (pbuf, nbyte);
+        if (result != os::cmsis::driver::RETURN_OK)
+          {
+            errno = EIO;
+            return -1;
           }
 
         is_connected_ = true;
@@ -425,10 +428,7 @@ namespace os
 #pragma GCC diagnostic pop
 
                   }
-                // We use a local tx busy flag because the ARM driver's flag
-                // may become not-busy between transmissions.
                 if (!status.tx_busy)
-//                if (!tx_busy_)
                   {
                     uint8_t* pbuf;
                     std::size_t nb;
@@ -445,7 +445,6 @@ namespace os
                             errno = EIO;
                             return -1;
                           }
-//                        tx_busy_ = true;
                       }
                   }
 
