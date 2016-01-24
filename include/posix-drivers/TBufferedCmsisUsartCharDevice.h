@@ -24,7 +24,7 @@
 #include "posix-io/CharDevice.h"
 #include "posix-drivers/ByteCircularBuffer.h"
 
-#include "diag/trace.h"
+#include <cmsis-plus/diag/trace.h>
 
 #include "cmsis_os.h"
 #include "Driver_USART.h"

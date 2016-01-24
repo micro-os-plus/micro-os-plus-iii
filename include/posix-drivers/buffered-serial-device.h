@@ -25,7 +25,7 @@
 #include <posix-drivers/ByteCircularBuffer.h>
 #include <cmsis-plus/drivers/serial.h>
 
-#include <diag/trace.h>
+#include <cmsis-plus/diag/trace.h>
 
 #include <cmsis_os.h>
 

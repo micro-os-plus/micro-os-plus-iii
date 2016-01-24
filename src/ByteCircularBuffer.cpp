@@ -17,7 +17,7 @@
  */
 
 #include "posix-drivers/ByteCircularBuffer.h"
-#include "diag/trace.h"
+#include <cmsis-plus/diag/trace.h>
 
 #include <cstring>
 #include <cassert>
