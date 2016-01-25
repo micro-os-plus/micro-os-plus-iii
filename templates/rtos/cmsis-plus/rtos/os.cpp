@@ -18,6 +18,8 @@
 
 #include <cmsis-plus/rtos/os.h>
 
+using namespace os::cmsis;
+
 namespace os
 {
   namespace cmsis
@@ -33,7 +35,7 @@ namespace os
       namespace kernel
       {
         return_t
-        initialise (void)
+        initialize (void)
         {
           // TODO
           return os_ok;
@@ -135,17 +137,13 @@ namespace os
           args_ptr_
             { (Args_ptr::element_type*) args, nullptr } //
       {
-#if defined(TRACE)
-        os::trace::printf ("%s(\"%s\", %d) @%p \n", __func__, get_name (),
-                           stack_size_bytes, this);
-#endif
+        trace::printf ("%s(\"%s\", %d) @%p \n", __func__, get_name (),
+                       stack_size_bytes, this);
       }
 
       Thread::~Thread ()
       {
-#if defined(TRACE)
-        os::trace::printf ("%s() @%p \n", __func__, this);
-#endif
+        trace::printf ("%s() @%p \n", __func__, this);
       }
 
       Priority
@@ -192,7 +190,7 @@ namespace os
       void
       Thread::__run_function (void)
       {
-        func_ptr_ (args_ptr_.get());
+        func_ptr_ (args_ptr_.get ());
       }
 #endif
 

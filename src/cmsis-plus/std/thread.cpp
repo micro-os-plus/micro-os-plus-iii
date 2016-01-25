@@ -17,7 +17,9 @@
  */
 
 #include <cmsis-plus/std/thread>
-//#include <cmsis-plus/diag/trace.h>
+#include <cstdlib>
+
+using namespace os::cmsis;
 
 // ----------------------------------------------------------------------------
 
@@ -39,9 +41,8 @@ namespace os
       {
         if (joinable ())
           {
-#if defined(TRACE)
-            os::trace::printf ("%s() @%p attempt to assign a running thread\n", __PRETTY_FUNCTION__, this);
-#endif
+            trace::printf ("%s() @%p attempt to assign a running thread\n",
+                           __PRETTY_FUNCTION__, this);
             ::std::abort (); // in ISO it is std::terminate()
           }
         swap (t);
@@ -50,14 +51,11 @@ namespace os
 
       thread::~thread ()
       {
-#if defined(TRACE)
-        os::trace::printf ("%s() @%p\n", __func__, this);
-#endif
+        trace::printf ("%s() @%p\n", __func__, this);
         if (joinable ())
           {
-#if defined(TRACE)
-            os::trace::printf ("%s() @%p attempt to destruct a running thread\n", __PRETTY_FUNCTION__, this);
-#endif
+            trace::printf ("%s() @%p attempt to destruct a running thread\n",
+                           __PRETTY_FUNCTION__, this);
             ::std::abort (); // in ISO it is std::terminate()
           }
 
@@ -83,9 +81,7 @@ namespace os
       void
       thread::join ()
       {
-#if defined(TRACE)
-        os::trace::printf ("%s() @%p\n", __func__, this);
-#endif
+        trace::printf ("%s() @%p\n", __func__, this);
         if (id_ != id ())
           {
             id_.system_thread_->join ();
@@ -95,17 +91,13 @@ namespace os
           }
 
         id_ = id ();
-#if defined(TRACE)
-        os::trace::printf ("%s() @%p joined\n", __func__, this);
-#endif
+        trace::printf ("%s() @%p joined\n", __func__, this);
       }
 
       void
       thread::detach ()
       {
-#if defined(TRACE)
-        os::trace::printf ("%s() @%p\n", __func__, this);
-#endif
+        trace::printf ("%s() @%p\n", __func__, this);
         if (id_ != id ())
           {
             id_.system_thread_->detach ();
@@ -116,9 +108,7 @@ namespace os
         // TODO: arrange to delete it at exit()?
 
         id_ = id ();
-#if defined(TRACE)
-        os::trace::printf ("%s() @%p detached\n", __func__, this);
-#endif
+        trace::printf ("%s() @%p detached\n", __func__, this);
       }
 
     } /* namespace std */

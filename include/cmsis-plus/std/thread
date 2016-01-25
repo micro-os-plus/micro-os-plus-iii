@@ -263,7 +263,7 @@ namespace os
         thread::thread (Callable_T&& f, Args_T&&... args)
         {
 #if defined(TRACE)
-          os::trace::printf ("%s() @%p\n", __func__, this);
+          os::cmsis::trace::printf ("%s() @%p\n", __func__, this);
 #endif
           id_ = id
             { new os::cmsis::rtos::Thread (nullptr, 0,
@@ -279,8 +279,8 @@ namespace os
                         Args_T&&... args)
         {
 #if defined(TRACE)
-          os::trace::printf ("%s(\"%s\", %d) @%p \n", __func__, name,
-                             stack_size_bytes, this);
+          os::cmsis::trace::printf ("%s(\"%s\", %d) @%p \n", __func__, name,
+              stack_size_bytes, this);
 #endif
           id_ = id
             { new os::cmsis::rtos::Thread (name,

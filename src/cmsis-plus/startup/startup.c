@@ -16,6 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cmsis-plus/diag/trace.h>
+
 #include <stdint.h>
 #include <sys/types.h>
 
@@ -305,6 +307,10 @@ _start (void)
   // clock frequency in the global CMSIS variable, cleared above.
   __initialize_hardware ();
 
+  // Initialise the trace output device. From this moment on,
+  // trace_printf() calls are available (including in static constructors).
+  __initialize_trace();
+
   // Get the argc/argv (useful in semihosting configurations).
   int argc;
   char** argv;
@@ -326,12 +332,18 @@ _start (void)
   // performed a reset.
   for (;;)
     ;
+  /* NOTREACHED */
 }
 
 // ----------------------------------------------------------------------------
 
 #if !defined(OS_USE_SEMIHOSTING)
 
+// Semihosting uses a more elaborate version of __initialize_args()
+// to parse args received from host.
+
+// `initialise_monitor_handles()` is a newlib libgloss function used to prepare
+// the stdio files when using semihosting. Better keep the name the same.
 #if __STDC_HOSTED__ != 0
 extern void
 initialise_monitor_handles (void);

@@ -56,7 +56,7 @@ namespace os
       std::va_list args;
       va_start(args, format);
 
-      int ret = os::trace::vprintf (format, args);
+      int ret = trace::vprintf (format, args);
 
       va_end(args);
       return ret;
@@ -137,7 +137,7 @@ namespace os
 // in a different translation units (and usually they are).
 
 void __attribute__((weak))
-trace_initialize (void)
+__initialize_trace (void)
 {
   os::trace::initialize ();
 }

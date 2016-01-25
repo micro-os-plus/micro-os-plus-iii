@@ -22,6 +22,8 @@
 #include <cstdio>
 #include <iostream>
 
+using namespace os::cmsis;
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
@@ -41,20 +43,20 @@ task3 (void* args);
 void
 task1 (void)
 {
-  os::trace::printf ("task1()\n");
+  trace::printf ("task1()\n");
   ;
 }
 
 void
 task2 (const void* args)
 {
-  os::trace::printf ("task2(%p)\n", args);
+  trace::printf ("task2(%p)\n", args);
 }
 
 void
 task3 (void* args)
 {
-  os::trace::printf ("task3(%p)\n", args);
+  trace::printf ("task3(%p)\n", args);
 }
 
 // ----------------------------------------------------------------------------
@@ -73,7 +75,7 @@ sleep_for_ticks (uint32_t)
 int
 main (int argc, char* argv[])
 {
-  using namespace std::chrono;
+  using namespace ::std::chrono;
   using namespace os::cmsis::std;
   using namespace os::cmsis;
 
@@ -116,7 +118,7 @@ main (int argc, char* argv[])
   th21.join ();
   th31.join ();
 
-  os::trace::printf ("%s done.\n", argv[0]);
+  trace::printf ("%s done.\n", argv[0]);
   return 0;
 }
 

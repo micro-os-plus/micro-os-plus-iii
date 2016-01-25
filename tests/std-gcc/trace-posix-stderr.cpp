@@ -26,25 +26,28 @@
 
 namespace os
 {
-  namespace trace
+  namespace cmsis
   {
-    // ------------------------------------------------------------------------
-
-    void
-    initialize (void)
+    namespace trace
     {
-      ; // For POSIX no inits are required.
-    }
+      // ------------------------------------------------------------------------
 
-    // ------------------------------------------------------------------------
+      void
+      initialize (void)
+      {
+        ; // For POSIX no inits are required.
+      }
 
-    ssize_t
-    write (const void* buf, std::size_t nbyte)
-    {
-      return ::write (2, buf, nbyte); // Forward to STDERR.
-    }
+      // ------------------------------------------------------------------------
 
-  } /* namespace trace */
+      ssize_t
+      write (const void* buf, std::size_t nbyte)
+      {
+        return ::write (2, buf, nbyte); // Forward to STDERR.
+      }
+
+    } /* namespace trace */
+  }
 } /* namespace os */
 
 #endif /* defined(TRACE) */
