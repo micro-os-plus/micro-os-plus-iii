@@ -19,8 +19,9 @@
 #include <cmsis_device.h>
 #include <cmsis-plus/arm/semihosting.h>
 #include <cmsis-plus/diag/trace.h>
-#include <string.h>
 #include <cmsis-plus/cortexm/exception-handlers.h>
+
+#include <string.h>
 
 // ----------------------------------------------------------------------------
 

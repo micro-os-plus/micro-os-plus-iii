@@ -29,6 +29,7 @@
 #define CMSIS_PLUS_DRIVERS_USB_H_
 
 // ----------------------------------------------------------------------------
+
 #ifdef __cplusplus
 
 #include <cstdint>
@@ -121,5 +122,7 @@ namespace os
 } /* namespace os */
 
 #endif /* __cplusplus */
+
+// ----------------------------------------------------------------------------
 
 #endif /* CMSIS_PLUS_DRIVERS_USB_H_ */

@@ -105,3 +105,5 @@ namespace os
     } /* namespace driver */
   } /* namespace cmsis */
 } /* namespace os */
+
+// ----------------------------------------------------------------------------

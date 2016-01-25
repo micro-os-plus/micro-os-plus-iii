@@ -26,6 +26,8 @@
 #ifndef CMSIS_PLUS_STD_THREAD_
 #define CMSIS_PLUS_STD_THREAD_
 
+// ----------------------------------------------------------------------------
+
 #include <cmsis-plus/rtos/os.h>
 #if defined(TRACE)
 #include <cmsis-plus/diag/trace.h>
@@ -35,6 +37,8 @@
 #include <chrono>
 #include <iostream>
 // #include <memory>
+
+// ----------------------------------------------------------------------------
 
 namespace os
 {
@@ -380,5 +384,7 @@ namespace os
     } /* namespace std */
   } /* namespace cmsis */
 } /* namespace os */
+
+// ----------------------------------------------------------------------------
 
 #endif /* CMSIS_PLUS_STD_THREAD_ */

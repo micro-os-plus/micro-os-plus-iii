@@ -16,8 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CORTEXM_EXCEPTION_HANDLERS_H_
-#define CORTEXM_EXCEPTION_HANDLERS_H_
+#ifndef CMSIS_PLUS_CORTEXM_EXCEPTION_HANDLERS_H_
+#define CMSIS_PLUS_CORTEXM_EXCEPTION_HANDLERS_H_
 
 #include <stdint.h>
 
@@ -113,4 +113,4 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 
-#endif // CORTEXM_EXCEPTION_HANDLERS_H_
+#endif /* CMSIS_PLUS_CORTEXM_EXCEPTION_HANDLERS_H_ */

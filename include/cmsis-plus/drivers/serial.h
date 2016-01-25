@@ -835,4 +835,6 @@ namespace os
 
 #endif /* __cplusplus */
 
+// ----------------------------------------------------------------------------
+
 #endif /* CMSIS_PLUS_DRIVERS_SERIAL_H_ */

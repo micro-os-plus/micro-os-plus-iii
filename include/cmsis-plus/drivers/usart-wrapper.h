@@ -145,4 +145,6 @@ namespace os
   } /* namespace cmsis */
 } /* namespace os */
 
+// ----------------------------------------------------------------------------
+
 #endif /* CMSIS_DRIVER_USART_WRAPPER_H_ */

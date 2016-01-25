@@ -29,6 +29,7 @@
 #define CMSIS_PLUS_DRIVERS_USB_HOST_H_
 
 // ----------------------------------------------------------------------------
+
 #ifdef __cplusplus
 
 #include <cmsis-plus/drivers/common.h>
@@ -494,5 +495,7 @@ namespace os
 } /* namespace os */
 
 #endif /* __cplusplus */
+
+// ----------------------------------------------------------------------------
 
 #endif /* CMSIS_PLUS_DRIVERS_USB_HOST_H_ */

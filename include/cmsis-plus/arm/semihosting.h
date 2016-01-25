@@ -16,8 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ARM_SEMIHOSTING_H_
-#define ARM_SEMIHOSTING_H_
+#ifndef CMSIS_PLUS_ARM_SEMIHOSTING_H_
+#define CMSIS_PLUS_ARM_SEMIHOSTING_H_
 
 // ----------------------------------------------------------------------------
 
@@ -130,4 +130,4 @@ report_exception (int reason)
 
 // ----------------------------------------------------------------------------
 
-#endif /* ARM_SEMIHOSTING_H_ */
+#endif /* CMSIS_PLUS_ARM_SEMIHOSTING_H_ */

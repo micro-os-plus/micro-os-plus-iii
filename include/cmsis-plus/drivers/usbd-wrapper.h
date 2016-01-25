@@ -161,4 +161,6 @@ namespace os
   } /* namespace cmsis */
 } /* namespace os */
 
+// ----------------------------------------------------------------------------
+
 #endif /* CMSIS_DRIVER_USBD_WRAPPER_H_ */
