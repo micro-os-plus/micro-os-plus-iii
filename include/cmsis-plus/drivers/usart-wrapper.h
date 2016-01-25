@@ -121,7 +121,7 @@ namespace os
         ARM_DRIVER_USART* driver_;
 
         /// Pointer to non-reentrant callback. Must be stored because
-        /// Initialise() is now delayed just before PowerControl(FULL).
+        /// Initialize() is now delayed just before PowerControl(FULL).
         ARM_USART_SignalEvent_t c_cb_func_;
 
         // Attempts to somehow use && failed, since the Keil driver

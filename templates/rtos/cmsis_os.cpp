@@ -51,7 +51,7 @@ static_assert(sizeof(Mail_queue) == sizeof(osMailQ), "adjust size of osMailQ");
 osStatus
 osKernelInitialize (void)
 {
-  return static_cast<osStatus> (kernel::initialise ());
+  return static_cast<osStatus> (kernel::initialize ());
 }
 
 osStatus

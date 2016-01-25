@@ -175,7 +175,7 @@ namespace os
         /// Initialize the RTOS Kernel for creating objects.
         /// @return status code that indicates the execution status of the function.
         return_t
-        initialise (void);
+        initialize (void);
 
         /// Start the RTOS Kernel.
         /// @return status code that indicates the execution status of the function.

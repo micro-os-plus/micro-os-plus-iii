@@ -137,7 +137,7 @@ namespace os
         ARM_DRIVER_USBD* driver_;
 
         /// Pointer to non-reentrant callback. Must be stored because
-        /// Initialise() is now delayed just before PowerControl(FULL).
+        /// Initialize() is now delayed just before PowerControl(FULL).
         ARM_USBD_SignalDeviceEvent_t c_cb_device_func_;
         ARM_USBD_SignalEndpointEvent_t c_cb_endpoint_func_;
 

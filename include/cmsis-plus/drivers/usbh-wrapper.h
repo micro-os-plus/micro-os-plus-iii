@@ -143,7 +143,7 @@ namespace os
         ARM_DRIVER_USBH* driver_;
 
         /// Pointer to non-reentrant callback. Must be stored because
-        /// Initialise() is now delayed just before PowerControl(FULL).
+        /// Initialize() is now delayed just before PowerControl(FULL).
         ARM_USBH_SignalPortEvent_t c_cb_port_func_;
         ARM_USBH_SignalPipeEvent_t c_cb_pipe_func_;
 
