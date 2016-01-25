@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cmsis_device.h"
+#include <cmsis_device.h>
 #include <cmsis-plus/arm/semihosting.h>
 #include <cmsis-plus/diag/trace.h>
 #include <string.h>

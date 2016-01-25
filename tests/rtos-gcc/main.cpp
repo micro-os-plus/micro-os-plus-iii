@@ -69,7 +69,7 @@ main (int argc, char* argv[])
       // Extended API.
 
       osThread th;
-      osThreadCreateEx (&th, "thread", osPriorityNormal, nullptr, 0,
+      osThreadCreateEx (&th, "thread", nullptr, 0, osPriorityNormal,
                         task_function, nullptr);
 
       osThreadTerminate (&th);
