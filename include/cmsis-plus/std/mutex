@@ -26,10 +26,15 @@
 #ifndef CMSIS_PLUS_STD_MUTEX_
 #define CMSIS_PLUS_STD_MUTEX_
 
+// ----------------------------------------------------------------------------
+
 #include <cmsis-plus/rtos/os.h>
-#if defined(TRACE)
 #include <cmsis-plus/diag/trace.h>
-#endif
+
+#include <cmsis-plus/std/system_error>
+#include <cerrno>
+#include <chrono>
+#include <tuple>
 
 namespace os
 {
@@ -41,12 +46,18 @@ namespace os
 
       class mutex
       {
+      private:
+
+        using native_type = os::cmsis::rtos::Mutex;
+
       public:
+
+        using native_handle_type = native_type*;
 
         constexpr
         mutex () noexcept;
 
-        ~mutex ();
+        ~mutex () = default;
 
         mutex (const mutex&) = delete;
         mutex&
@@ -61,19 +72,29 @@ namespace os
         void
         unlock ();
 
-        typedef pthread_mutex_t* native_handle_type;
-
         native_handle_type
         native_handle ();
+
+      protected:
+
+        native_type nm_;
       };
+
+      // ======================================================================
 
       class recursive_mutex
       {
+      private:
+
+        using native_type = os::cmsis::rtos::Recursive_mutex;
+
       public:
 
-        recursive_mutex ();
+        using native_handle_type = native_type*;
 
-        ~recursive_mutex ();
+        recursive_mutex () = default;
+
+        ~recursive_mutex () = default;
 
         recursive_mutex (const recursive_mutex&) = delete;
         recursive_mutex&
@@ -88,81 +109,65 @@ namespace os
         void
         unlock ();
 
-        typedef pthread_mutex_t* native_handle_type;
-
-        typedef implementation-defined native_handle_type;
-
         native_handle_type
         native_handle ();
+
+      protected:
+
+        os::cmsis::rtos::Recursive_mutex nm_;
       };
 
-      class timed_mutex
+      // ======================================================================
+
+      class timed_mutex : public mutex
       {
       public:
 
-        timed_mutex ();
+        timed_mutex () = default;
 
-        ~timed_mutex ();
+        ~timed_mutex () = default;
 
         timed_mutex (const timed_mutex&) = delete;
         timed_mutex&
         operator= (const timed_mutex&) = delete;
 
-        void
-        lock ();
-
-        bool
-        try_lock ();
-
-        template<class Rep, class Period>
+        template<typename Rep_T, typename Period_T>
           bool
-          try_lock_for (const chrono::duration<Rep, Period>& rel_time);
+          try_lock_for (
+              const ::std::chrono::duration<Rep_T, Period_T>& rel_time);
 
-        template<class Clock, class Duration>
+        template<typename Clock_T, typename Duration_T>
           bool
-          try_lock_until (const chrono::time_point<Clock, Duration>& abs_time);
-
-        void
-        unlock ();
-
-        typedef implementation-defined native_handle_type;
-        native_handle_type
-        native_handle ();
+          try_lock_until (
+              const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time);
       };
 
-      class recursive_timed_mutex
+      // ======================================================================
+
+      class recursive_timed_mutex : recursive_mutex
       {
       public:
 
-        recursive_timed_mutex ();
+        recursive_timed_mutex () = default;
 
-        ~recursive_timed_mutex ();
+        ~recursive_timed_mutex () = default;
 
         recursive_timed_mutex (const recursive_timed_mutex&) = delete;
         recursive_timed_mutex&
         operator= (const recursive_timed_mutex&) = delete;
 
-        void
-        lock ();
-
-        bool
-        try_lock () noexcept;
-
-        template<class Rep, class Period>
+        template<typename Rep_T, typename Period_T>
           bool
-          try_lock_for (const chrono::duration<Rep, Period>& rel_time);
+          try_lock_for (
+              const ::std::chrono::duration<Rep_T, Period_T>& rel_time);
 
-        template<class Clock, class Duration>
+        template<typename Clock_T, typename Duration_T>
           bool
-          try_lock_until (const chrono::time_point<Clock, Duration>& abs_time);
-
-        void
-        unlock ();
-
-        typedef implementation-defined native_handle_type;
-        native_handle_type
-        native_handle ();
+          try_lock_until (
+              const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time);
       };
+
+      // ======================================================================
 
       struct defer_lock_t
       {
@@ -185,12 +190,14 @@ namespace os
       constexpr adopt_lock_t adopt_lock
         { };
 
-      template<class Mutex>
+      // ======================================================================
+
+      template<typename Mutex_T>
         class lock_guard
         {
         public:
 
-          typedef Mutex mutex_type;
+          typedef Mutex_T mutex_type;
 
           explicit
           lock_guard (mutex_type& m);
@@ -205,15 +212,17 @@ namespace os
 
         private:
 
-          mutex_type& pm; // exposition only
+          mutex_type& m_;
         };
 
-      template<class Mutex>
+      // ======================================================================
+
+      template<typename Mutex_T>
         class unique_lock
         {
         public:
 
-          typedef Mutex mutex_type;
+          typedef Mutex_T mutex_type;
 
           unique_lock () noexcept;
 
@@ -226,13 +235,14 @@ namespace os
 
           unique_lock (mutex_type& m, adopt_lock_t);
 
-          template<class Clock, class Duration>
-            unique_lock (mutex_type& m,
-                         const chrono::time_point<Clock, Duration>& abs_time);
+          template<typename Clock_T, typename Duration_T>
+            unique_lock (
+                mutex_type& m,
+                const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time);
 
-          template<class Rep, class Period>
+          template<typename Rep, typename Period>
             unique_lock (mutex_type& m,
-                         const chrono::duration<Rep, Period>& rel_time);
+                         const ::std::chrono::duration<Rep, Period>& rel_time);
 
           ~unique_lock ();
 
@@ -250,14 +260,14 @@ namespace os
           bool
           try_lock ();
 
-          template<class Rep, class Period>
+          template<typename Rep, typename Period>
             bool
-            try_lock_for (const chrono::duration<Rep, Period>& rel_time);
+            try_lock_for (const ::std::chrono::duration<Rep, Period>& rel_time);
 
-          template<class Clock, class Duration>
+          template<typename Clock_T, typename Duration_T>
             bool
             try_lock_until (
-                const chrono::time_point<Clock, Duration>& abs_time);
+                const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time);
 
           void
           unlock ();
@@ -279,19 +289,21 @@ namespace os
 
         private:
 
-          mutex_type* pm; // exposition only
-          bool owns; // exposition only
+          mutex_type* m_;
+          bool owns_;
         };
 
-      template<class Mutex>
-        void
-        swap (unique_lock<Mutex>& x, unique_lock<Mutex>& y) noexcept;
+      // ======================================================================
 
-      template<class L1, class L2, class ... L3>
+      template<typename Mutex_T>
+        void
+        swap (unique_lock<Mutex_T>& x, unique_lock<Mutex_T>& y) noexcept;
+
+      template<typename L1, typename L2, typename ... L3>
         int
         try_lock (L1&, L2&, L3&...);
 
-      template<class L1, class L2, class ... L3>
+      template<typename L1, typename L2, typename ... L3>
         void
         lock (L1&, L2&, L3&...);
 
@@ -303,11 +315,594 @@ namespace os
         once_flag (const once_flag&) = delete;
         once_flag&
         operator= (const once_flag&) = delete;
+
+      private:
+
+        unsigned long state_;
+
+        template<class Callable_T, class ... Args_T>
+          friend void
+          call_once (once_flag&, Callable_T&& func, Args_T&&... args);
       };
 
-      template<class Callable, class ...Args>
+      template<typename Callable_T, typename ...Args_T>
         void
-        call_once (once_flag& flag, Callable&& func, Args&&... args);
+        call_once (once_flag& flag, Callable_T&& func, Args_T&&... args);
+
+    } /* namespace std */
+  } /* namespace cmsis */
+} /* namespace os */
+
+// ----------------------------------------------------------------------------
+// Inline & template implementations.
+
+namespace os
+{
+  namespace cmsis
+  {
+    namespace std
+    {
+      // ======================================================================
+
+      inline mutex::native_handle_type
+      mutex::native_handle ()
+      {
+        return &nm_;
+      }
+
+      // ======================================================================
+
+      inline recursive_mutex::native_handle_type
+      recursive_mutex::native_handle ()
+      {
+        return &nm_;
+      }
+
+      // ======================================================================
+
+      template<typename Rep_T, typename Period_T>
+        bool
+        timed_mutex::try_lock_for (
+            const ::std::chrono::duration<Rep_T, Period_T>& rel_time)
+        {
+          using namespace ::std::chrono;
+           os::cmsis::rtos::sys_ticks_t ticks = 0;
+          if (rel_time > duration<Rep_T, Period_T>::zero ())
+            {
+               microseconds micros;
+              if (rel_time < microseconds::max ())
+                {
+                  micros = duration_cast<microseconds> (rel_time);
+                  if (micros < rel_time)
+                    {
+                      ++micros;
+                    }
+                }
+              else
+                {
+                  micros = microseconds::max ();
+                }
+              ticks = os::cmsis::rtos::kernel::compute_sys_ticks (
+                  (uint64_t) micros.count ());
+            }
+
+          rtos::return_t ret;
+          ret = nm_.try_wait (ticks);
+          if (ret == rtos::Return::os_ok)
+            {
+              return true;
+            }
+          else if (ret == rtos::Return::os_error_timeout_resource)
+            {
+              return false;
+            }
+
+          __throw_system_error ((int)ret, "timed_mutex try_lock failed");
+          return false;
+
+        }
+
+      template<typename Clock_T, typename Duration_T>
+        bool
+        timed_mutex::try_lock_until (
+            const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time)
+        {
+          using Clock = Clock_T;
+
+          auto now = Clock::now ();
+          while (now < abs_time)
+            {
+              if (try_lock_for (abs_time - now))
+                {
+                  return true;
+                }
+              now = Clock::now ();
+            }
+
+        }
+
+      // ======================================================================
+
+      template<typename Rep_T, typename Period_T>
+        bool
+        recursive_timed_mutex::try_lock_for (
+            const ::std::chrono::duration<Rep_T, Period_T>& rel_time)
+        {
+          using namespace ::std::chrono;
+           os::cmsis::rtos::sys_ticks_t ticks = 0;
+          if (rel_time > duration<Rep_T, Period_T>::zero ())
+            {
+               microseconds micros;
+              if (rel_time < microseconds::max ())
+                {
+                  micros = duration_cast<microseconds> (rel_time);
+                  if (micros < rel_time)
+                    {
+                      ++micros;
+                    }
+                }
+              else
+                {
+                  micros = microseconds::max ();
+                }
+              ticks = os::cmsis::rtos::kernel::compute_sys_ticks (
+                  (uint64_t) micros.count ());
+            }
+
+          rtos::return_t ret;
+          ret = nm_.try_wait (ticks);
+          if (ret == rtos::Return::os_ok)
+            {
+              return true;
+            }
+          else if (ret == rtos::Return::os_error_timeout_resource)
+            {
+              return false;
+            }
+
+          __throw_system_error ((int)ret, "timed_mutex try_lock failed");
+          return false;
+
+        }
+
+      template<typename Clock_T, typename Duration_T>
+        bool
+        recursive_timed_mutex::try_lock_until (
+            const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time)
+        {
+          using Clock = Clock_T;
+
+          auto now = Clock::now ();
+          while (now < abs_time)
+            {
+              if (try_lock_for (abs_time - now))
+                {
+                  return true;
+                }
+              now = Clock::now ();
+            }
+
+        }
+
+      // ======================================================================
+
+      template<typename Mutex_T>
+        inline
+        lock_guard<Mutex_T>::lock_guard (mutex_type& m) :
+            m_ (m)
+        {
+          m_.lock ();
+        }
+
+      template<typename Mutex_T>
+        inline
+        lock_guard<Mutex_T>::lock_guard (mutex_type& m, adopt_lock_t) :
+            m_ (m)
+        {
+          m_.lock ();
+        }
+
+      template<typename Mutex_T>
+        inline
+        lock_guard<Mutex_T>::~lock_guard ()
+        {
+          m_.unlock ();
+        }
+
+      // ======================================================================
+
+      template<typename Mutex_T>
+        inline
+        unique_lock<Mutex_T>::unique_lock () noexcept :
+        m_ (nullptr), //
+        owns_ (false)
+          {
+            ;
+          }
+
+      template<typename Mutex_T>
+        inline
+        unique_lock<Mutex_T>::unique_lock (mutex_type& m) :
+            m_ (&m), //
+            owns_ (true)
+        {
+          m_->lock ();
+        }
+
+      template<typename Mutex_T>
+        inline
+        unique_lock<Mutex_T>::unique_lock (mutex_type& m, defer_lock_t) noexcept:
+        m_ (&m), //
+        owns_ (false)
+          {
+          }
+
+      template<typename Mutex_T>
+        inline
+        unique_lock<Mutex_T>::unique_lock (mutex_type& m, try_to_lock_t) :
+            m_ (&m), //
+            owns_ (m.try_lock ())
+        {
+        }
+
+      template<typename Mutex_T>
+        inline
+        unique_lock<Mutex_T>::unique_lock (mutex_type& m, adopt_lock_t) :
+            m_ (&m), //
+            owns_ (true)
+        {
+        }
+
+      template<typename Mutex_T>
+        template<typename Clock_T, typename Duration_T>
+          inline
+          unique_lock<Mutex_T>::unique_lock (
+              mutex_type& m,
+              const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time) :
+              m_ (&m), //
+              owns_ (m.try_lock_until (abs_time))
+          {
+          }
+
+      template<typename Mutex_T>
+        template<typename Rep, typename Period>
+          inline
+          unique_lock<Mutex_T>::unique_lock (
+              mutex_type& m,
+              const ::std::chrono::duration<Rep, Period>& rel_time) :
+              m_ (&m), //
+              owns_ (m.try_lock_for (rel_time))
+          {
+            ;
+          }
+
+      template<typename Mutex_T>
+        inline
+        unique_lock<Mutex_T>::~unique_lock ()
+        {
+          if (owns_)
+            m_->unlock ();
+        }
+
+      template<typename Mutex_T>
+        inline
+        unique_lock<Mutex_T>::unique_lock (unique_lock&& u) noexcept :
+        m_(u.m_), //
+        owns_(u.owns_)
+          {
+            u.m_ = nullptr;
+            u.owns_ = false;
+          }
+
+      template<typename Mutex_T>
+        inline unique_lock<Mutex_T>&
+        unique_lock<Mutex_T>::operator= (unique_lock&& u) noexcept
+        {
+          if (owns_)
+            {
+              m_->unlock ();
+            }
+          m_ = u.m_;
+          owns_ = u.owns_;
+          u.m_ = nullptr;
+          u.owns_ = false;
+          return *this;
+        }
+
+      template<typename Mutex_T>
+        void
+        unique_lock<Mutex_T>::lock ()
+        {
+          if (m_ == nullptr)
+            {
+              __throw_system_error (EPERM,
+                                    "unique_lock::lock: references null mutex");
+            }
+          if (owns_)
+            {
+              __throw_system_error (EDEADLK,
+                                    "unique_lock::lock: already locked");
+            }
+          m_->lock ();
+          owns_ = true;
+        }
+
+      template<typename Mutex_T>
+        bool
+        unique_lock<Mutex_T>::try_lock ()
+        {
+          if (m_ == nullptr)
+            {
+              __throw_system_error (
+                  EPERM, "unique_lock::try_lock: references null mutex");
+            }
+          if (owns_)
+            {
+              __throw_system_error (EDEADLK,
+                                    "unique_lock::try_lock: already locked");
+            }
+          owns_ = m_->try_lock ();
+          return owns_;
+        }
+
+      template<typename Mutex_T>
+        template<typename Rep, typename Period>
+          bool
+          unique_lock<Mutex_T>::try_lock_for (
+              const ::std::chrono::duration<Rep, Period>& rel_time)
+          {
+            if (m_ == nullptr)
+              {
+                __throw_system_error (
+                    EPERM, "unique_lock::try_lock_for: references null mutex");
+              }
+            if (owns_)
+              {
+                __throw_system_error (
+                    EDEADLK, "unique_lock::try_lock_for: already locked");
+              }
+            owns_ = m_->try_lock_for (rel_time);
+            return owns_;
+          }
+
+      template<typename Mutex_T>
+        template<typename Clock_T, typename Duration_T>
+          bool
+          unique_lock<Mutex_T>::try_lock_until (
+              const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time)
+          {
+            if (m_ == nullptr)
+              {
+                __throw_system_error (
+                    EPERM,
+                    "unique_lock::try_lock_until: references null mutex");
+              }
+            if (owns_)
+              {
+                __throw_system_error (
+                    EDEADLK, "unique_lock::try_lock_until: already locked");
+              }
+            owns_ = m_->try_lock_until (abs_time);
+            return owns_;
+          }
+
+      template<typename Mutex_T>
+        void
+        unique_lock<Mutex_T>::unlock ()
+        {
+          if (!owns_)
+            {
+              __throw_system_error (EPERM, "unique_lock::unlock: not locked");
+            }
+          m_->unlock ();
+          owns_ = false;
+        }
+
+      template<typename Mutex_T>
+        inline void
+        unique_lock<Mutex_T>::swap (unique_lock& u) noexcept
+        {
+          ::std::swap (m_, u.m_);
+          ::std::swap (owns_, u.owns_);
+        }
+
+      template<typename Mutex_T>
+        typename unique_lock<Mutex_T>::mutex_type*
+        unique_lock<Mutex_T>::release () noexcept
+        {
+          mutex_type* m = m_;
+          m_ = nullptr;
+          owns_ = false;
+          return m;
+        }
+
+      template<typename Mutex_T>
+        inline bool
+        unique_lock<Mutex_T>::owns_lock () const noexcept
+        {
+          return owns_;
+        }
+
+      template<typename Mutex_T>
+        unique_lock<Mutex_T>::operator bool () const noexcept
+        {
+          return owns_;
+        }
+
+      template<typename Mutex_T>
+        typename unique_lock<Mutex_T>::mutex_type*
+        unique_lock<Mutex_T>::mutex () const noexcept
+        {
+          return m_;
+        }
+
+      // ======================================================================
+
+      template<typename Mutex_T>
+        inline void
+        swap (unique_lock<Mutex_T>& x, unique_lock<Mutex_T>& y) noexcept
+        {
+          x.swap (y);
+        }
+
+      template<typename L1_T, typename L2_T>
+        int
+        try_lock (L1_T& lk1, L2_T& lk2)
+        {
+          unique_lock<L1_T> ulock (lk1, try_to_lock);
+
+          if (ulock.owns_lock ())
+            {
+              if (lk2.try_lock ())
+                {
+                  ulock.release ();
+                  return -1;
+                }
+              else
+                return 1;
+            }
+          return 0;
+        }
+
+      template<typename L1_T, typename L2_T, typename L3_T, typename ... L4_T>
+        int
+        try_lock (L1_T& lk1, L2_T& lk2, L2_T& lk3, L4_T&... lk4)
+        {
+          int ret = 0;
+          unique_lock<L1_T> ulock (lk1, try_to_lock);
+
+          if (ulock.owns_lock ())
+            {
+              ret = try_lock (lk2, lk3, lk4...);
+              if (ret == -1)
+                {
+                  ulock.release ();
+                }
+              else
+                {
+                  ++ret;
+                }
+            }
+          return ret;
+
+        }
+
+      template<typename L1_T, typename L2_T>
+        void
+        lock (L1_T& lk1, L2_T& lk2)
+        {
+          while (true)
+            {
+                {
+                  unique_lock<L1_T> ulock1 (lk1);
+
+                  if (lk2.try_lock ())
+                    {
+                      ulock1.release ();
+                      break;
+                    }
+                }
+              os::cmsis::rtos::thread::yield ();
+                {
+                  unique_lock<L2_T> ulock2 (lk2);
+
+                  if (lk1.try_lock ())
+                    {
+                      ulock2.release ();
+                      break;
+                    }
+                }
+              os::cmsis::rtos::thread::yield ();
+            }
+        }
+
+      template<typename L1_T, typename L2_T, typename L3_T, typename ...L4_T>
+        void
+        __lock_first (int ix, L1_T& lk1, L2_T& lk2, L3_T& lk3, L4_T& ...lk4)
+        {
+          while (true)
+            {
+              switch (ix)
+                {
+                case 0:
+                  {
+                    unique_lock<L1_T> ulock1 (lk1);
+
+                    ix = try_lock (lk2, lk3, lk4...);
+                    if (ix == -1)
+                      {
+                        ulock1.release ();
+                        return;
+                      }
+                  }
+                  ++ix;
+                  os::cmsis::rtos::thread::yield ();
+                  break;
+
+                case 1:
+                  {
+                    unique_lock<L2_T> ulock2 (lk2);
+
+                    ix = try_lock (lk3, lk4..., lk1);
+                    if (ix == -1)
+                      {
+                        ulock2.release ();
+                        return;
+                      }
+                  }
+                  if (ix == sizeof...(L4_T) + 1)
+                    {
+                      ix = 0;
+                    }
+                  else
+                    {
+                      ix += 2;
+                    }
+                  os::cmsis::rtos::thread::yield();
+                  break;
+
+                  default:
+                  __lock_first(ix - 2, lk3, lk4..., lk1, lk2);
+                  return;
+                }
+            }
+        }
+
+      template<typename L1_T, typename L2_T, typename L3_T, typename ... L4_T>
+        void
+        lock (L1_T& lk1, L2_T& lk2, L3_T& lk3, L4_T&... lk4)
+        {
+          __lock_first (0, lk1, lk2, lk3, lk4...);
+        }
+
+      // ======================================================================
+
+      inline constexpr
+      once_flag::once_flag () noexcept:
+      state_(0)
+        {
+          ;
+        }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+      template<typename Callable_T, typename ...Args_T>
+        void
+        call_once (once_flag& flag, Callable_T&& func, Args_T&&... args)
+        {
+          typedef ::std::tuple<Callable_T&&, Args_T&&...> Tuple;
+          Tuple tuple (::std::forward<Callable_T> (func),
+                       ::std::forward<Args_T>(args)...);
+          // TODO: implement
+#if 0
+          __call_once_param < Tuple > __p (tuple);
+          __call_once (__flag.__state_, &__p, &__call_once_proxy<tuple>);
+#endif
+
+        }
+
+#pragma GCC diagnostic pop
 
     } /* namespace std */
   } /* namespace cmsis */
