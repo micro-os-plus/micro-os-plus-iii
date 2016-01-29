@@ -95,15 +95,15 @@ main (int argc, char* argv[])
   char* ch2;
 
   Thread t01
-    { "t01", nullptr, 0, Priority::normal, f0 };
+    { "t01", nullptr, 0, Priority::normal, (Thread_func_vp)f0 };
   t01.__run_function ();
 
   Thread t12
-    { "t12", nullptr, 0, Priority::normal, f1, nullptr };
+    { "t12", nullptr, 0, Priority::normal, (Thread_func_vp)f1, nullptr };
   t12.__run_function ();
 
   Thread t13
-    { "t13", nullptr, 0, Priority::normal, f1, &ch1 };
+    { "t13", nullptr, 0, Priority::normal, (Thread_func_vp)f1, &ch1 };
   t13.__run_function ();
 
   Thread t15

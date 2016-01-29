@@ -37,9 +37,7 @@
 #ifdef  __cplusplus
 
 #include <cstddef>
-#if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
 #include <functional>
-#endif
 #include <memory>
 
 namespace os
@@ -228,8 +226,8 @@ namespace os
           compute_sys_ticks (Rep_T microsec)
           {
             // TODO: add some restrictions to match only numeric types
-            return (uint32_t) ((((microsec) * ((Rep_T)SYS_TICK_FREQUENCY_HZ)) + (Rep_T)999999UL)
-                / (Rep_T)1000000UL);
+            return (uint32_t) ((((microsec) * ((Rep_T) SYS_TICK_FREQUENCY_HZ))
+                + (Rep_T) 999999UL) / (Rep_T) 1000000UL);
           }
 
         const char*
@@ -313,15 +311,19 @@ namespace os
       }
 
       /// Entry point of a thread.
+#if 0
       typedef void
       (*Thread_func_cvp) (const void* args);
+#endif
 
       // Other possible entry points.
       typedef void
       (*Thread_func_vp) (void* args);
 
+#if 0
       typedef void
       (*Thread_func_v) (void);
+#endif
 
       // ======================================================================
 
@@ -362,14 +364,18 @@ namespace os
         /// @param         stacksz      stack size (in bytes) requirements for the thread function.
         /// @param [in]     argument      pointer that is passed to the thread function as start argument.
         /// @return thread ID for reference by other functions or NULL in case of error.
+#if 0
         Thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
                 Priority prio, Thread_func_cvp function, const void* args);
+#endif
 
         Thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
-                Priority prio, Thread_func_vp function, void* args);
+                Priority prio, Thread_func_vp function, void* args = nullptr);
 
+#if 0
         Thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
                 Priority prio, Thread_func_v function);
+#endif
 
         template<typename Callable_T, typename ... Args_T>
           explicit
@@ -445,7 +451,7 @@ namespace os
 
         Priority prio_;
 
-        Thread_func_cvp func_ptr_;
+        Thread_func_vp func_ptr_;
 
         // Empty argument pointer with empty deleter.
         Args_ptr args_ptr_
@@ -593,6 +599,39 @@ namespace os
       protected:
 
         // Add internal data
+      };
+
+      // ======================================================================
+
+      class Condition_variable : public Named_object
+      {
+      public:
+
+        Condition_variable (const char* name);
+        Condition_variable ();
+
+        Condition_variable (const Condition_variable&) = delete;
+        Condition_variable (Condition_variable&&) = delete;
+        Condition_variable&
+        operator= (const Condition_variable&) = delete;
+        Condition_variable&
+        operator= (Condition_variable&&) = delete;
+
+        /// Delete a Mutex that was created by @ref osMutexCreate.
+        /// @param [in]     mutex_id      mutex ID obtained by @ref osMutexCreate.
+        /// @return status code that indicates the execution status of the function.
+        ~Condition_variable ();
+
+        return_t
+        notify_one () noexcept;
+
+        return_t
+        notify_all () noexcept;
+
+      protected:
+
+        // Add internal data
+
       };
 
       // ======================================================================
@@ -793,6 +832,20 @@ namespace os
         // Add internal data
       };
 
+
+    } /* namespace rtos */
+  } /* namespace cmsis */
+} /* namespace os */
+
+// ============================================================================
+// Inline & template implementations.
+
+namespace os
+{
+  namespace cmsis
+  {
+    namespace rtos
+    {
       // ======================================================================
 
       inline
@@ -809,6 +862,7 @@ namespace os
 
       // ======================================================================
 
+#if 0
       inline
       Thread::Thread (const char* name, void* stack,
                       ::std::size_t stack_size_bytes, Priority prio,
@@ -830,6 +884,7 @@ namespace os
       {
         ;
       }
+#endif
 
       template<typename F_T>
         void
@@ -861,7 +916,7 @@ namespace os
                         Priority prio, Callable_T&& function, Args_T&&... args) :
             Thread
               { name, (void*) nullptr, stack_size_bytes, prio,
-                  (Thread_func_cvp) nullptr, (const void*) nullptr }
+                  (Thread_func_vp) nullptr, (void*) nullptr }
         {
           using Function_object = decltype(::std::bind (::std::forward<Callable_T> (function),
                   ::std::forward<Args_T>(args)...));
@@ -876,7 +931,7 @@ namespace os
 
           // The function to start the thread is a custom proxy that
           // knows how to get the variadic arguments.
-          func_ptr_ = &run_function_object<Function_object>;
+          func_ptr_ = (Thread_func_vp)&run_function_object<Function_object>;
 
           // Create a unique_ptr with the raw pointer to the function
           // and a custom deleter.
@@ -888,12 +943,27 @@ namespace os
           args_ptr_ = ::std::move (ap);
         }
 
+      // ======================================================================
+
       inline
       Mutex::Mutex () :
-          Mutex (nullptr)
+          Mutex
+            { nullptr }
       {
         ;
       }
+
+      // ======================================================================
+
+      inline
+      Condition_variable::Condition_variable () :
+          Condition_variable
+            { nullptr }
+      {
+        ;
+      }
+
+    // ======================================================================
 
     } /* namespace rtos */
   } /* namespace cmsis */

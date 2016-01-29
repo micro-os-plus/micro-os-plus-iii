@@ -129,7 +129,7 @@ namespace os
 // ======================================================================
 
       Thread no_thread
-        { "none", nullptr, 0, Priority::normal, (Thread_func_cvp) nullptr,
+        { "none", nullptr, 0, Priority::normal, (Thread_func_vp) nullptr,
             nullptr };
 
       namespace thread
@@ -180,7 +180,7 @@ namespace os
 
       }
 
-// ======================================================================
+      // ======================================================================
 
       Named_object::Named_object (const char* name) :
           name_ (name != nullptr ? name : "-")
@@ -188,11 +188,11 @@ namespace os
         ;
       }
 
-// ======================================================================
+      // ======================================================================
 
       Thread::Thread (const char* name, void* stack,
                       std::size_t stack_size_bytes, Priority prio,
-                      Thread_func_cvp function, const void* args) : //
+                      Thread_func_vp function,  void* args) : //
           Named_object
             { name }, //
           prio_
@@ -287,7 +287,7 @@ namespace os
         return os_ok;
       }
 
-// ======================================================================
+      // ======================================================================
 
       Mutex::Mutex (const char* name) :
           Named_object (name)
@@ -347,6 +347,31 @@ namespace os
       Recursive_mutex::release (void)
       {
         return os_ok;
+      }
+
+      // ======================================================================
+
+      Condition_variable::Condition_variable (const char* name) :
+          Named_object (name)
+      {
+        // TODO
+      }
+
+      Condition_variable::~Condition_variable ()
+      {
+        // TODO
+      }
+
+      return_t
+      Condition_variable::notify_one () noexcept
+      {
+        // TODO
+      }
+
+      return_t
+      Condition_variable::notify_all () noexcept
+      {
+        // TODO
       }
 
       // ======================================================================

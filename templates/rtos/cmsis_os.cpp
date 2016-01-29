@@ -89,7 +89,7 @@ osThreadCreate (const osThreadDef_t *thread_def, void *args)
   // Do not pass a stack pointer; it'll be allocated dynamically.
   return reinterpret_cast<osThreadId> (new (thread_def->data) Thread (
       thread_def->name, nullptr, thread_def->stacksize,
-      (Priority) thread_def->tpriority, thread_def->pthread, args));
+      (Priority) thread_def->tpriority, (Thread_func_vp)thread_def->pthread, args));
 }
 
 osThreadId
@@ -100,7 +100,7 @@ osThreadCreateEx (osThread* addr, const char* name, void* stack,
   return reinterpret_cast<osThreadId> (new (addr) Thread (name, stack,
                                                           stack_size_bytes,
                                                           (Priority) prio,
-                                                          function, args));
+                                                          (Thread_func_vp)function, (void*)args));
 }
 
 osThreadId
