@@ -228,8 +228,8 @@ namespace os
           compute_sys_ticks (Rep_T microsec)
           {
             // TODO: add some restrictions to match only numeric types
-            return (uint32_t) ((((microsec) * SYS_TICK_FREQUENCY_HZ) + 999999UL)
-                / 1000000UL);
+            return (uint32_t) ((((microsec) * ((Rep_T)SYS_TICK_FREQUENCY_HZ)) + (Rep_T)999999UL)
+                / (Rep_T)1000000UL);
           }
 
         const char*
