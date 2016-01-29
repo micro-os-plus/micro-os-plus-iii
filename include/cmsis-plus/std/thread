@@ -36,6 +36,7 @@
 #include <cstddef>
 #include <chrono>
 #include <iostream>
+#include <type_traits>
 // #include <memory>
 
 // ----------------------------------------------------------------------------
@@ -51,9 +52,9 @@ namespace os
       class thread
       {
       public:
+
         class id;
 
-        // TODO: make it a smart pointer?
         using native_handle_type = os::cmsis::rtos::Thread*;
 
         thread () noexcept = default;
@@ -65,13 +66,38 @@ namespace os
         // CMSIS RTOS specific constructors (extension to the ISO standard),
         // used to create threads with name and custom stack.
 
+        thread (native_handle_type native) noexcept;
+
+#if 0
         // This is a very generic template, intentionally not implemented
         // as is, but only for "const char*" & "size_t".
-        template<typename N_T, typename SZ_T, typename Callable_T,
-            typename ... Args_T>
-          explicit
-          thread (N_T* name, SZ_T stack_size_bytes, Callable_T&& f,
-                  Args_T&&... args);
+        template<typename N_T,//
+        //typename ::std::enable_if<::std::is_same<N_T, const char>::value>::type, //
+        //typename ::std::enable_if<::std::is_same<void, const char>::value>::type, //
+        //typename ::std::enable_if<true>::type* = nullptr, // ok
+        // typename ::std::enable_if<::std::is_same<void, void>::value>::type* = nullptr, // ok
+        //typename ::std::enable_if<::std::is_same<N_T, const char>::value>::type* = nullptr, // ok
+        typename ::std::enable_if<::std::is_same<N_T, char>::value>::type* =
+        nullptr,// ok
+//            typename ::std::enable_if<
+//                ::std::is_same<::std::remove_const<N_T>::type, char>::value>::type* =
+//                nullptr, // not ok
+        typename SZ_T,//
+        typename Callable_T, typename ... Args_T>
+        explicit
+        thread (N_T* name, SZ_T stack_size_bytes, Callable_T&& f,
+            Args_T&&... args)
+          {
+            os::cmsis::trace::printf ("%s(\"%s\", %d) @%p \n", __func__, name,
+                stack_size_bytes, this);
+            id_ = id
+              { new os::cmsis::rtos::Thread (name,
+                    (::std::size_t) stack_size_bytes,
+                    os::cmsis::rtos::Priority::normal,
+                    ::std::forward<Callable_T> (f),
+                    ::std::forward<Args_T>(args)...)};
+          }
+#endif
 
         ~thread ();
 
@@ -113,16 +139,6 @@ namespace os
 
           explicit
           id (native_handle_type system_thread) noexcept;
-
-#if 0
-          // TODO: rework when using a smart pointer
-          id (const id&) = default;
-          id (id&&) = delete;
-          id&
-          operator= (const id&) = default;
-          id&
-          operator= (id&&) = delete;
-#endif
 
           ~id ();
 
@@ -194,12 +210,25 @@ namespace os
               const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time);
 
         template<typename Rep_T, typename Period_T>
-          void
+          constexpr void
           sleep_for (const ::std::chrono::duration<Rep_T, Period_T>& rel_time);
 
       } /* namespace this_thread */
 
-      // ----------------------------------------------------------------------
+    } /* namespace std */
+  } /* namespace cmsis */
+} /* namespace os */
+
+// ----------------------------------------------------------------------------
+// Inline & template implementations.
+
+namespace os
+{
+  namespace cmsis
+  {
+    namespace std
+    {
+      // ======================================================================
 
       inline void
       swap (thread& x, thread& y) noexcept
@@ -266,9 +295,7 @@ namespace os
       template<typename Callable_T, typename ... Args_T>
         thread::thread (Callable_T&& f, Args_T&&... args)
         {
-#if defined(TRACE)
           os::cmsis::trace::printf ("%s() @%p\n", __func__, this);
-#endif
           id_ = id
             { new os::cmsis::rtos::Thread (nullptr, 0,
                                            os::cmsis::rtos::Priority::normal,
@@ -276,38 +303,43 @@ namespace os
                                            ::std::forward<Args_T>(args)...) };
         }
 
+      inline
+      thread::thread (native_handle_type native) noexcept
+      {
+        id_ = id
+          { native };
+      }
+
+#if 0
       // Implement only a specialised version of this template.
-      template<typename N_T = char, typename SZ_T = ::std::size_t,
-          typename Callable_T, typename ... Args_T>
-        thread::thread (N_T* name, SZ_T stack_size_bytes, Callable_T&& f,
-                        Args_T&&... args)
+      template<typename N_T /*= char */, typename SZ_T /*= ::std::size_t*/,
+      typename Callable_T, typename ... Args_T>
+      thread::thread (N_T* name, SZ_T stack_size_bytes, Callable_T&& f,
+          Args_T&&... args)
         {
-#if defined(TRACE)
           os::cmsis::trace::printf ("%s(\"%s\", %d) @%p \n", __func__, name,
               stack_size_bytes, this);
-#endif
           id_ = id
             { new os::cmsis::rtos::Thread (name,
-                                           (::std::size_t) stack_size_bytes,
-                                           os::cmsis::rtos::Priority::normal,
-                                           ::std::forward<Callable_T> (f),
-                                           ::std::forward<Args_T>(args)...) };
+                  (::std::size_t) stack_size_bytes,
+                  os::cmsis::rtos::Priority::normal,
+                  ::std::forward<Callable_T> (f),
+                  ::std::forward<Args_T>(args)...)};
         }
+#endif
 
       // ----------------------------------------------------------------------
 
       inline
       thread::id::id () noexcept :
-      system_thread_
-        { nullptr}
+      system_thread_ ( nullptr)
         {
           ;
         }
 
       inline
       thread::id::id (native_handle_type system_thread) noexcept :
-      system_thread_
-        { system_thread}
+      system_thread_ ( system_thread)
         {
           ;
         }
@@ -336,48 +368,70 @@ namespace os
           return thread::id (&os::cmsis::rtos::thread::get_current ());
         }
 
-        template<class _Rep, class _Period>
-          void
-          sleep_for (const ::std::chrono::duration<_Rep, _Period>& __d)
+        // Note: there is no absolute guarantee that the
+        // sleep will not return earlier, so the application
+        // might need to retry.
+
+        // Note the constexpr return type, which tries to compute everything at
+        // compile time. And, for constant durations, it succeeds.
+        // However, due to an odd behaviour, if there are calls with
+        // non-constant arguments, they are used always.
+        template<class Rep_T, class Period_T>
+          constexpr void
+          sleep_for (const ::std::chrono::duration<Rep_T, Period_T>& rel_time)
           {
             using namespace ::std::chrono;
-            if (__d > duration<_Rep, _Period>::zero ())
+
+            if (rel_time > duration<Rep_T, Period_T>::zero ())
               {
-                microseconds __us;
-                if (__d < microseconds::max ())
+                microseconds micros = microseconds::zero();
+                if (rel_time < microseconds::max ())
                   {
-                    __us = duration_cast<microseconds> (__d);
-                    if (__us < __d)
-                      ++__us;
+                    micros = duration_cast<microseconds> (rel_time);
+                    if (micros < rel_time)
+                      {
+                        ++micros;
+                      }
                   }
                 else
                   {
-                    __us = microseconds::max ();
+                    micros = microseconds::max ();
                   }
 
-                os::cmsis::rtos::thread::sleep_for_ticks (
+                // The RTOS can sleep only for ticks, so convert
+                // micros to ticks.
+                os::cmsis::rtos::thread::sleep (
                     os::cmsis::rtos::kernel::compute_sys_ticks (
-                        (uint64_t) __us.count ()));
+                        micros.count ()));
+
               }
           }
       }
 
-      template<typename _Clock, typename _Duration>
+      template<typename Clock_T, typename Duration_T>
         inline void
         sleep_until (
-            const ::std::chrono::time_point<_Clock, _Duration>& __atime)
+            const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time)
         {
-          auto __now = _Clock::now ();
-          if (_Clock::is_steady)
+          using Clock = Clock_T;
+
+          auto now = Clock::now ();
+#if 0
+          if (Clock::is_steady)
             {
-              if (__now < __atime)
-                sleep_for (__atime - __now);
+              // In the GCC implementation,
+              // steady clocks are trustworthy, one sleep is enough.
+              if (now < abs_time)
+                {
+                  sleep_for (abs_time - now);
+                }
               return;
             }
-          while (__now < __atime)
+#endif
+          while (now < abs_time)
             {
-              sleep_for (__atime - __now);
-              __now = _Clock::now ();
+              sleep_for (abs_time - now);
+              now = Clock::now ();
             }
         }
 
