@@ -55,16 +55,78 @@ namespace os
           return true;
         }
 
-        uint32_t
-        get_ticks (void)
+        uint64_t
+        get_current_systick (Current_systick* details)
         {
           // TODO
           return 1234;
         }
 
+        const char*
+        strerror (return_t ret)
+        {
+          const char* str;
+          switch (ret)
+            {
+            case Return::os_event_signal:
+              str = "signal event occurred";
+              break;
+
+            case Return::os_event_message:
+              str = "message event occurred";
+              break;
+
+            case Return::os_event_mail:
+              str = "mail event occurred";
+              break;
+
+            case Return::os_event_timeout:
+              str = "timeout occurred";
+              break;
+
+            case Return::os_error_parameter:
+              str = "mandatory parameter missing or incorrect object";
+              break;
+
+            case Return::os_error_resource:
+              str = "resource not available";
+              break;
+
+            case Return::os_error_timeout_resource:
+              str = "resource not available within given time";
+              break;
+
+            case Return::os_error_isr:
+              str = "not allowed in ISR context";
+              break;
+
+            case Return::os_error_isr_recursive:
+              str = "function called multiple times from ISR with same object";
+              break;
+
+            case Return::os_error_priority:
+              str =
+                  "system cannot determine priority or thread has illegal priority";
+              break;
+
+            case Return::os_error_no_memory:
+              str = "system is out of memory";
+              break;
+
+            case Return::os_error_value:
+              str = "value of a parameter is out of range";
+              break;
+
+            default:
+              str = "unknown error";
+              break;
+            }
+          return str;
+        }
+
       } /* namespace kernel */
 
-      // ======================================================================
+// ======================================================================
 
       Thread no_thread
         { "none", nullptr, 0, Priority::normal, (Thread_func_cvp) nullptr,
@@ -100,22 +162,25 @@ namespace os
           return os_ok;
         }
 
+#if 0
         return_t
         delay (millis_t millisec)
+          {
+            // TODO
+            return os_ok;
+          }
+#endif
+
+        return_t
+        sleep (sys_ticks_t ticks)
         {
           // TODO
           return os_ok;
         }
 
-        void
-        sleep_for_ticks (uint32_t)
-        {
-          // TODO
-        }
-
       }
 
-      // ======================================================================
+// ======================================================================
 
       Named_object::Named_object (const char* name) :
           name_ (name != nullptr ? name : "-")
@@ -123,7 +188,7 @@ namespace os
         ;
       }
 
-      // ======================================================================
+// ======================================================================
 
       Thread::Thread (const char* name, void* stack,
                       std::size_t stack_size_bytes, Priority prio,
@@ -194,7 +259,7 @@ namespace os
       }
 #endif
 
-      // ======================================================================
+// ======================================================================
 
       Timer::Timer (const char* name, timer_func_t function, timer_type_t type,
                     void* args) : //
@@ -222,7 +287,7 @@ namespace os
         return os_ok;
       }
 
-      // ======================================================================
+// ======================================================================
 
       Mutex::Mutex (const char* name) :
           Named_object (name)
@@ -236,13 +301,50 @@ namespace os
       }
 
       return_t
-      Mutex::wait (millis_t millisec)
+      Mutex::wait (void)
+      {
+        return os_ok;
+      }
+
+      return_t
+      Mutex::try_wait (sys_ticks_t ticks)
       {
         return os_ok;
       }
 
       return_t
       Mutex::release (void)
+      {
+        return os_ok;
+      }
+
+      // ======================================================================
+
+      Recursive_mutex::Recursive_mutex (const char* name) :
+          Named_object (name)
+      {
+        // TODO
+      }
+
+      Recursive_mutex::~Recursive_mutex ()
+      {
+        // TODO
+      }
+
+      return_t
+      Recursive_mutex::wait (void)
+      {
+        return os_ok;
+      }
+
+      return_t
+      Recursive_mutex::try_wait (sys_ticks_t ticks)
+      {
+        return os_ok;
+      }
+
+      return_t
+      Recursive_mutex::release (void)
       {
         return os_ok;
       }
@@ -272,7 +374,7 @@ namespace os
         return os_ok;
       }
 
-      // ======================================================================
+// ======================================================================
 
       Pool::Pool (const char* name, std::size_t items, std::size_t item_size,
                   void* mem) :
@@ -307,7 +409,7 @@ namespace os
         return os_ok;
       }
 
-      // ======================================================================
+// ======================================================================
 
       Message_queue::Message_queue (const char* name, std::size_t items,
                                     void* mem, Thread* thread) :
@@ -335,7 +437,7 @@ namespace os
         return os_ok;
       }
 
-      // ======================================================================
+// ======================================================================
 
       Mail_queue::Mail_queue (const char* name, std::size_t messages,
                               std::size_t message_size, void* mem,

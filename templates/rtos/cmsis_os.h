@@ -171,7 +171,7 @@ extern "C"
 #if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
 #define OS_THREAD_SIZE_WORDS  5
 #else
-#define OS_THREAD_SIZE_WORDS  4
+#define OS_THREAD_SIZE_WORDS  5
 #endif
 #define OS_TIMER_SIZE_WORDS  1
 #define OS_MUTEX_SIZE_WORDS  1

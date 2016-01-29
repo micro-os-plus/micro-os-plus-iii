@@ -163,6 +163,7 @@ extern "C"
 
   // ----- Memory allocation. -----
 
+  // TODO: change system malloc()/free()?
   void*
   osMalloc (size_t);
 

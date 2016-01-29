@@ -71,7 +71,10 @@ osKernelRunning (void)
 uint32_t
 osKernelSysTick (void)
 {
-  return kernel::get_ticks ();
+  Current_systick crt;
+  kernel::get_current_systick (&crt);
+  // Convert ticks to cycles.
+  return static_cast<uint32_t> (crt.ticks) * crt.divisor + crt.cycles;
 }
 
 #endif    // System Timer available
@@ -139,10 +142,11 @@ osThreadGetPriority (osThreadId thread_id)
 osStatus
 osDelay (uint32_t millisec)
 {
-  return static_cast<osStatus> (thread::delay (millisec));
+  return static_cast<osStatus> (thread::sleep (
+      kernel::compute_sys_ticks (millisec * 1000)));
 }
 
-#if (defined (osFeature_Wait)  &&  (osFeature_Wait != 0))     // Generic Wait available
+#if (defined (osFeature_Wait)  &&  (osFeature_Wait != 0))
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
@@ -264,8 +268,9 @@ osMutexCreateEx (osMutex* addr, const char* name)
 osStatus
 osMutexWait (osMutexId mutex_id, uint32_t millisec)
 {
-  return static_cast<osStatus> ((reinterpret_cast<Mutex&> (mutex_id)).wait (
-      millisec));
+
+  return static_cast<osStatus> ((reinterpret_cast<Mutex&> (mutex_id)).try_wait (
+      kernel::compute_sys_ticks (millisec * 1000)));
 }
 
 osStatus
@@ -285,7 +290,7 @@ osMutexDelete (osMutexId mutex_id)
 
 //  ==== Semaphore Management Functions ====
 
-#if (defined (osFeature_Semaphore)  &&  (osFeature_Semaphore != 0))     // Semaphore available
+#if (defined (osFeature_Semaphore)  &&  (osFeature_Semaphore != 0))
 
 osSemaphoreId
 osSemaphoreCreate (const osSemaphoreDef_t *semaphore_def, int32_t count)
@@ -322,13 +327,13 @@ osSemaphoreDelete (osSemaphoreId semaphore_id)
   return osOK;
 }
 
-#endif     // Semaphore available
+#endif /* Semaphore available */
 
 // ----------------------------------------------------------------------------
 
 //  ==== Memory Pool Management Functions ====
 
-#if (defined (osFeature_Pool)  &&  (osFeature_Pool != 0))  // Memory Pool Management available
+#if (defined (osFeature_Pool)  &&  (osFeature_Pool != 0))
 
 osPoolId
 osPoolCreate (const osPoolDef_t *pool_def)
@@ -369,13 +374,13 @@ osPoolDeleteEx (osPoolId pool_id)
   (reinterpret_cast<Pool&> (pool_id)).~Pool ();
 }
 
-#endif   // Memory Pool Management available
+#endif /* Memory Pool Management available */
 
 // ----------------------------------------------------------------------------
 
 //  ==== Message Queue Management Functions ====
 
-#if (defined (osFeature_MessageQ)  &&  (osFeature_MessageQ != 0))     // Message Queues available
+#if (defined (osFeature_MessageQ)  &&  (osFeature_MessageQ != 0))
 
 osMessageQId
 osMessageCreate (const osMessageQDef_t *queue_def, osThreadId thread_id)
@@ -433,13 +438,13 @@ osMessageDeleteEx (osMessageQId queue_id)
   (reinterpret_cast<Message_queue&> (queue_id)).~Message_queue ();
 }
 
-#endif     // Message Queues available
+#endif /* Message Queues available */
 
 // ----------------------------------------------------------------------------
 
 //  ==== Mail Queue Management Functions ====
 
-#if (defined (osFeature_MailQ)  &&  (osFeature_MailQ != 0))     // Mail Queues available
+#if (defined (osFeature_MailQ)  &&  (osFeature_MailQ != 0))
 
 osMailQId
 osMailCreate (const osMailQDef_t *queue_def, osThreadId thread_id)
@@ -511,6 +516,6 @@ osMailDeleteEx (osMailQId queue_id)
   (reinterpret_cast<Mail_queue&> (queue_id)).~Mail_queue ();
 }
 
-#endif  // Mail Queues available
+#endif /* Mail Queues available */
 
 // ----------------------------------------------------------------------------

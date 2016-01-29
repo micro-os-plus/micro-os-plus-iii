@@ -101,7 +101,7 @@ namespace os
 
         ///< prevent from enum down-size compiler optimization.
         /// (Actually redundant in C++ if the underlying type is 32 bits)
-        os_status_reserved = 0x7FFFFFFF
+        os_return_reserved = 0x7FFFFFFF
       };
 
       // ----------------------------------------------------------------------
@@ -119,7 +119,7 @@ namespace os
         normal = 0, ///< priority: normal (default)
         above_normal = +1, ///< priority: above normal
         high = +2, ///< priority: high
-        realtime = +4, ///< priority: realtime (highest)
+        realtime = +3, ///< priority: realtime (highest)
         error = 0x84 ///< system cannot determine priority or thread has illegal priority
       };
 
@@ -137,8 +137,9 @@ namespace os
       };
 
       using millis_t = uint32_t;
+      using sys_ticks_t = uint32_t;
 
-      constexpr millis_t WAIT_FOREVER = 0xFFFFFFFF;
+      constexpr sys_ticks_t WAIT_FOREVER = 0xFFFFFFFF;
 
       constexpr uint32_t MAX_SEMAPHORE_COUNT = 0xFFFFFFFF;
 
@@ -169,10 +170,23 @@ namespace os
 
       // ----------------------------------------------------------------------
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+      typedef struct current_systick_s
+      {
+        uint64_t ticks; // Count of SysTick ticks since core reset
+        uint32_t cycles; // Count of SysTick cycles since timer reload (24 bits)
+        uint32_t divisor; // SysTick reload value (24 bits)
+        uint32_t core_frequency_hz; // Core clock frequency Hz
+      } Current_systick;
+
+#pragma GCC diagnostic pop
+
       //  ==== Kernel Control Functions ====
       namespace kernel
       {
-        /// Initialize the RTOS Kernel for creating objects.
+        /// Initialise the RTOS Kernel for creating objects.
         /// @return status code that indicates the execution status of the function.
         return_t
         initialize (void);
@@ -187,30 +201,39 @@ namespace os
         bool
         is_running (void);
 
+#if 0
         /// Get the RTOS kernel system timer counter.
         /// @return RTOS kernel system timer as 32-bit value
         uint32_t
         get_ticks (void);
+#endif
+
+        /// Get the current SysTick counter (ticks & cycles).
+        /// @param [out] details pointer to storage where to store counters;
+        /// may be null if details are not needed
+        /// @return Number of ticks since reset.
+        uint64_t
+        get_current_systick (Current_systick* details = nullptr);
 
         /// The RTOS kernel system timer frequency in Hz.
         /// \note Reflects the system timer setting and is typically defined in a configuration file.
         constexpr uint32_t SYS_TICK_FREQUENCY_HZ = 1000; // TODO: Param
 
         /// Convert a microseconds value to a RTOS kernel system timer value.
-        /// @param         microsec     time value in microseconds.
-        /// @return time value normalized to the @ref osKernelSysTickFrequency
-        constexpr uint32_t
-        compute_sys_ticks (uint32_t microsec)
-        {
-          return (uint32_t) ((((uint64_t) microsec) * SYS_TICK_FREQUENCY_HZ)
-              / 1000000UL);
-        }
+        /// Always round up.
+        /// @param [in]  microsec     time value in microseconds.
+        /// @return number of system ticks
+        template<typename Rep_T>
+          constexpr uint32_t
+          compute_sys_ticks (Rep_T microsec)
+          {
+            // TODO: add some restrictions to match only numeric types
+            return (uint32_t) ((((microsec) * SYS_TICK_FREQUENCY_HZ) + 999999UL)
+                / 1000000UL);
+          }
 
-        constexpr uint32_t
-        compute_sys_ticks (uint64_t microsec)
-        {
-          return (uint32_t) (((microsec) * SYS_TICK_FREQUENCY_HZ) / 1000000UL);
-        }
+        const char*
+        strerror (return_t);
 
       } /* namespace kernel */
 
@@ -276,14 +299,16 @@ namespace os
         return_t
         wait_signals (signals_t signals, millis_t millisec, signals_t* ret);
 
+#if 0
         /// Wait for Timeout (Time Delay).
         /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue "Time delay" value
         /// @return status code that indicates the execution status of the function.
         return_t
         delay (millis_t millisec);
+#endif
 
-        void
-        sleep_for_ticks (uint32_t);
+        return_t
+        sleep (sys_ticks_t ticks);
 
       }
 
@@ -346,14 +371,10 @@ namespace os
         Thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
                 Priority prio, Thread_func_v function);
 
-#if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
-
         template<typename Callable_T, typename ... Args_T>
           explicit
           Thread (const char* name, ::std::size_t stack_size_bytes,
                   Priority prio, Callable_T&& function, Args_T&&... args);
-
-#endif
 
         // Prevent any copy or move.
         Thread (const Thread&) = delete;
@@ -412,8 +433,6 @@ namespace os
         // possibly with deleter when using bind().
         using Args_ptr = ::std::unique_ptr<void*, void (*) (void**)>;
 
-#if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
-
         template<typename Binding_T>
           static void
           run_function_object (const void* binding);
@@ -421,8 +440,6 @@ namespace os
         template<typename Binding_T>
           static void
           delete_function_object (const Args_ptr::element_type* func_obj);
-
-#endif
 
       protected:
 
@@ -498,6 +515,7 @@ namespace os
         /// @param         name          name of the mutex object.
         /// @return mutex ID for reference by other functions or NULL in case of error.
         Mutex (const char* name);
+        Mutex ();
 
         Mutex (const Mutex&) = delete;
         Mutex (Mutex&&) = delete;
@@ -513,10 +531,58 @@ namespace os
 
         /// Wait until a Mutex becomes available.
         /// @param [in]     mutex_id      mutex ID obtained by @ref osMutexCreate.
-        /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
         /// @return status code that indicates the execution status of the function.
         return_t
-        wait (millis_t millisec);
+        wait (void);
+
+        return_t
+        try_wait (sys_ticks_t ticks = 0);
+
+        /// Release a Mutex that was obtained by @ref osMutexWait.
+        /// @param [in]     mutex_id      mutex ID obtained by @ref osMutexCreate.
+        /// @return status code that indicates the execution status of the function.
+        return_t
+        release (void);
+
+      protected:
+
+        // Add internal data
+      };
+
+      // ======================================================================
+
+      class Recursive_mutex : public Named_object
+      {
+      public:
+
+        /// Create and initialize a recursive mutex object.
+        /// @param         name          name of the mutex object.
+        /// @return mutex ID for reference by other functions or NULL in case of error.
+        Recursive_mutex (const char* name);
+        Recursive_mutex ();
+
+        Recursive_mutex (const Recursive_mutex&) = delete;
+        Recursive_mutex (Recursive_mutex&&) = delete;
+        Recursive_mutex&
+        operator= (const Recursive_mutex&) = delete;
+        Recursive_mutex&
+        operator= (Recursive_mutex&&) = delete;
+
+        /// Delete a Mutex that was created by @ref osMutexCreate.
+        /// @param [in]     mutex_id      mutex ID obtained by @ref osMutexCreate.
+        /// @return status code that indicates the execution status of the function.
+        ~Recursive_mutex ();
+
+        /// Wait until a Mutex becomes available.
+        /// @param [in]     mutex_id      mutex ID obtained by @ref osMutexCreate.
+        /// @return status code that indicates the execution status of the function.
+        return_t
+        wait (void);
+
+        // Normally should not return before ticks expire if ownership
+        // is not obtained.
+        return_t
+        try_wait (sys_ticks_t ticks = 0);
 
         /// Release a Mutex that was obtained by @ref osMutexWait.
         /// @param [in]     mutex_id      mutex ID obtained by @ref osMutexCreate.
@@ -765,8 +831,6 @@ namespace os
         ;
       }
 
-#if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
-
       template<typename F_T>
         void
         Thread::run_function_object (const void* binding)
@@ -779,8 +843,7 @@ namespace os
 
       template<typename F_T>
         void
-        Thread::delete_function_object (
-            const Args_ptr::element_type* func_obj)
+        Thread::delete_function_object (const Args_ptr::element_type* func_obj)
         {
           using Function_object = F_T;
 
@@ -819,14 +882,18 @@ namespace os
           // and a custom deleter.
           Args_ptr ap
             { (Args_ptr::element_type*) funct_obj,
-                (Args_ptr::deleter_type) &delete_function_object<
-                    Function_object> };
+                (Args_ptr::deleter_type) &delete_function_object<Function_object> };
 
           // Move pointer to thread storage.
-          args_ptr_ = std::move (ap);
+          args_ptr_ = ::std::move (ap);
         }
 
-#endif
+      inline
+      Mutex::Mutex () :
+          Mutex (nullptr)
+      {
+        ;
+      }
 
     } /* namespace rtos */
   } /* namespace cmsis */
