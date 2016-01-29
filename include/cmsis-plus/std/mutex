@@ -114,7 +114,7 @@ namespace os
 
       protected:
 
-        os::cmsis::rtos::Recursive_mutex nm_;
+        native_type nm_;
       };
 
       // ======================================================================
@@ -333,7 +333,7 @@ namespace os
   } /* namespace cmsis */
 } /* namespace os */
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 // Inline & template implementations.
 
 namespace os
