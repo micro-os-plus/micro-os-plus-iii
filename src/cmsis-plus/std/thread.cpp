@@ -50,9 +50,9 @@ namespace os
       }
 
       void
-      thread::delete_system_thread(void)
+      thread::delete_system_thread (void)
       {
-        if (id_ != id())
+        if (id_ != id ())
           {
             void* args = id_.system_thread_->get_function_args ();
             if (args != nullptr && function_object_deleter_ != nullptr)
@@ -76,7 +76,7 @@ namespace os
             ::std::abort (); // in ISO it is std::terminate()
           }
 
-        delete_system_thread();
+        delete_system_thread ();
       }
 
       // ----------------------------------------------------------------------
@@ -98,7 +98,7 @@ namespace os
       {
         trace::printf ("%s() @%p\n", __func__, this);
 
-        delete_system_thread();
+        delete_system_thread ();
 
         id_ = id ();
         trace::printf ("%s() @%p joined\n", __func__, this);

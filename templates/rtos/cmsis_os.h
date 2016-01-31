@@ -181,6 +181,9 @@ extern "C"
     void* content[OS_THREAD_SIZE_WORDS];
   } osThread;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
   typedef struct os_thread_attr
   {
     const char* name;
@@ -188,6 +191,8 @@ extern "C"
     size_t stack_size_bytes;
     uint8_t priority;
   } osThreadAttr;
+
+#pragma GCC diagnostic pop
 
   typedef struct os_timer_data
   {
@@ -850,17 +855,17 @@ const osMailQDef_t os_mailQ_def_##name =  \
 
 #endif  // Mail Queues available
 
-  // --------------------------------------------------------------------------
-  // Calls from Interrupt Service Routines
-  //
-  // The following CMSIS-RTOS functions can be called from threads and Interrupt Service Routines (ISR):
-  //
-  // - osKernelRunning
-  // - osSignalSet
-  // - osSemaphoreRelease
-  // - osPoolAlloc, osPoolCAlloc, osPoolFree
-  // - osMessagePut, osMessageGet
-  // - osMailAlloc, osMailCAlloc, osMailGet, osMailPut, osMailFree
+// --------------------------------------------------------------------------
+// Calls from Interrupt Service Routines
+//
+// The following CMSIS-RTOS functions can be called from threads and Interrupt Service Routines (ISR):
+//
+// - osKernelRunning
+// - osSignalSet
+// - osSemaphoreRelease
+// - osPoolAlloc, osPoolCAlloc, osPoolFree
+// - osMessagePut, osMessageGet
+// - osMailAlloc, osMailCAlloc, osMailGet, osMailPut, osMailFree
 
 #ifdef  __cplusplus
 }

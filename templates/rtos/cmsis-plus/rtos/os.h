@@ -320,19 +320,8 @@ namespace os
       }
 
       /// Entry point of a thread.
-#if 0
-      typedef void
-      (*Thread_func_cvp) (const void* args);
-#endif
-
-      // Other possible entry points.
       typedef void
       (*Thread_func_vp) (void* args);
-
-#if 0
-      typedef void
-      (*Thread_func_v) (void);
-#endif
 
       // ======================================================================
 
@@ -363,121 +352,7 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
-#if 0
-      class Thread : public Named_object
-        {
-        public:
-
-          /// Create a thread and add it to Active Threads and set it to state READY.
-          /// @param         name         name of the thread function.
-          /// @param         priority     initial priority of the thread function.
-          /// @param         stacksz      stack size (in bytes) requirements for the thread function.
-          /// @param [in]     argument      pointer that is passed to the thread function as start argument.
-          /// @return thread ID for reference by other functions or NULL in case of error.
-#if 0
-          Thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
-              Priority prio, Thread_func_cvp function, const void* args);
-#endif
-
-          Thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
-              Priority prio, Thread_func_vp function, void* args = nullptr);
-
-#if 0
-          Thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
-              Priority prio, Thread_func_v function);
-#endif
-
-          template<typename Callable_T, typename ... Args_T>
-          explicit
-          Thread (const char* name, ::std::size_t stack_size_bytes,
-              Priority prio, Callable_T&& function, Args_T&&... args);
-
-          // Prevent any copy or move.
-          Thread (const Thread&) = delete;
-          Thread (Thread&&) = delete;
-          Thread&
-          operator= (const Thread&) = delete;
-          Thread&
-          operator= (Thread&&) = delete;
-
-          /// Terminate execution of a thread and remove it from Active Threads.
-          /// @param [in]     thread_id   thread ID obtained by @ref osThreadCreate or @ref osThreadGetId.
-          /// @return status code that indicates the execution status of the function.
-          ~Thread ();
-
-          /// Get current priority of an active thread.
-          /// @param [in]     thread_id     thread ID obtained by @ref osThreadCreate or @ref osThreadGetId.
-          /// @return current priority value of the thread function.
-          Priority
-          get_priority (void);
-
-          /// Change priority of an active thread.
-          /// @param [in]     thread_id     thread ID obtained by @ref osThreadCreate or @ref osThreadGetId.
-          /// @param [in]     priority      new priority value for the thread function.
-          /// @return status code that indicates the execution status of the function.
-          Priority
-          set_priority (Priority prio);
-
-          /// Set the specified Signal Flags of an active thread.
-          /// @param [in]     thread_id     thread ID obtained by @ref osThreadCreate or @ref osThreadGetId.
-          /// @param [in]     signals       specifies the signal flags of the thread that should be set.
-          /// @return previous signal flags of the specified thread or 0x80000000 in case of incorrect parameters.
-          signal_flags_t
-          set_signals (signal_flags_t signals);
-
-          /// Clear the specified Signal Flags of an active thread.
-          /// @param [in]     thread_id     thread ID obtained by @ref osThreadCreate or @ref osThreadGetId.
-          /// @param [in]     signals       specifies the signal flags of the thread that shall be cleared.
-          /// @return previous signal flags of the specified thread or 0x80000000 in case of incorrect parameters or call from ISR.
-          signal_flags_t
-          clear_signals (signal_flags_t signals);
-
-          void
-          join (void);
-
-          void
-          detach (void);
-
-#if defined(TESTING)
-          void
-          __run_function (void);
-#endif
-
-        protected:
-
-          // Type of unique pointer used to store argument,
-          // possibly with deleter when using bind().
-          using Args_ptr = ::std::unique_ptr<void*, void (*) (void**)>;
-
-          template<typename Binding_T>
-          static void
-          run_function_object (const void* binding);
-
-          template<typename Binding_T>
-          static void
-          delete_function_object (const Args_ptr::element_type* func_obj);
-
-        protected:
-
-          Priority prio_;
-
-          Thread_func_vp func_ptr_;
-
-          // Empty argument pointer with empty deleter.
-          Args_ptr args_ptr_
-            { nullptr, nullptr};
-
-          // Add other internal data
-        };
-#else
-
       using thread_func_vp_t = void* (*) (void* args);
-
-#if 0
-      // The pointer is a generic void*;
-      // the deleter receives a pointer to it.
-      using thread_func_args_ptr_t = ::std::unique_ptr<void*, void (*) (void**)>;
-#endif
 
       using thread_attr_t = struct thread_attr_s
         {
@@ -704,11 +579,11 @@ namespace os
 #endif
 
         void*
-        get_function_args(void);
+        get_function_args (void);
 
 #if defined(TESTING)
-          void
-          __run_function (void);
+        void
+        __run_function (void);
 #endif
 
       protected:
@@ -726,7 +601,6 @@ namespace os
 
       };
 
-#endif
 #pragma GCC diagnostic pop
 
       // ======================================================================
@@ -1127,89 +1001,6 @@ namespace os
       }
 
       // ======================================================================
-#if 0
-
-#if 0
-      inline
-      Thread::Thread (const char* name, void* stack,
-          ::std::size_t stack_size_bytes, Priority prio,
-          Thread_func_vp function, void* args) :
-      Thread
-        { name, stack, stack_size_bytes, prio, (Thread_func_cvp) function,
-          (const void*) args}
-        {
-          ;
-        }
-
-      inline
-      Thread::Thread (const char* name, void* stack,
-          ::std::size_t stack_size_bytes, Priority prio,
-          Thread_func_v function) :
-      Thread
-        { name, stack, stack_size_bytes, prio, (Thread_func_cvp) function,
-          (const void*) nullptr}
-        {
-          ;
-        }
-#endif
-
-      template<typename F_T>
-      void
-      Thread::run_function_object (const void* binding)
-        {
-          using Function_object = F_T;
-
-          Function_object* b = (Function_object*) binding;
-          (*b) ();
-        }
-
-      template<typename F_T>
-      void
-      Thread::delete_function_object (const Args_ptr::element_type* func_obj)
-        {
-          using Function_object = F_T;
-
-          Function_object* b = (Function_object*) func_obj;
-
-          // os::trace::printf ("%s\n", __PRETTY_FUNCTION__);
-
-          // The delete now has the knowledge required to
-          // correctly delete the object (i.e. the object size).
-          delete b;
-        }
-
-      template<typename Callable_T, typename ... Args_T>
-      Thread::Thread (const char* name, ::std::size_t stack_size_bytes,
-          Priority prio, Callable_T&& function, Args_T&&... args) :
-      Thread
-        { name, (void*) nullptr, stack_size_bytes, prio,
-          (Thread_func_vp) nullptr, (void*) nullptr}
-        {
-          using Function_object = decltype(::std::bind (::std::forward<Callable_T> (function),
-                  ::std::forward<Args_T>(args)...));
-
-          // Dynamic allocation! The size depends on the number of arguments.
-          // This creates a small problem, since both running the function
-          // and deleting the object requires the type. It is passes as
-          // template functions.
-          Function_object* funct_obj = new Function_object (
-              ::std::bind (::std::forward<Callable_T> (function),
-                  ::std::forward<Args_T>(args)...));
-
-          // The function to start the thread is a custom proxy that
-          // knows how to get the variadic arguments.
-          func_ptr_ = (Thread_func_vp)&run_function_object<Function_object>;
-
-          // Create a unique_ptr with the raw pointer to the function
-          // and a custom deleter.
-          Args_ptr ap
-            { (Args_ptr::element_type*) funct_obj,
-              (Args_ptr::deleter_type) &delete_function_object<Function_object>};
-
-          // Move pointer to thread storage.
-          args_ptr_ = ::std::move (ap);
-        }
-#else
 
       inline bool
       Thread::operator == (const Thread& rhs) const
@@ -1218,12 +1009,10 @@ namespace os
       }
 
       inline void*
-      Thread::get_function_args(void)
+      Thread::get_function_args (void)
       {
         return func_args_ptr_;
       }
-
-#endif
 
       // ======================================================================
 

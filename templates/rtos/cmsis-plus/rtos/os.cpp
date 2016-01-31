@@ -131,6 +131,9 @@ namespace os
 // ======================================================================
 
       void*
+      no_thread_func (void* args);
+
+      void*
       no_thread_func (void* args)
       {
         return nullptr;
@@ -197,78 +200,6 @@ namespace os
       }
 
       // ======================================================================
-
-#if 0
-      Thread::Thread (const char* name, void* stack,
-          std::size_t stack_size_bytes, Priority prio,
-          Thread_func_vp function, void* args) : //
-      Named_object
-        { name}, //
-      prio_
-        { prio}, //
-      func_ptr_
-        { function}, //
-      args_ptr_
-        { (Args_ptr::element_type*) args, nullptr} //
-        {
-          trace::printf ("%s(\"%s\", %d) @%p \n", __func__, get_name (),
-              stack_size_bytes, this);
-        }
-
-      Thread::~Thread ()
-        {
-          trace::printf ("%s() @%p \n", __func__, this);
-        }
-
-      Priority
-      Thread::get_priority (void)
-        {
-          return prio_;
-        }
-
-      Priority
-      Thread::set_priority (Priority prio)
-        {
-          Priority ret = prio_;
-          prio_ = prio;
-          return ret;
-        }
-
-      signal_flags_t
-      Thread::set_signals (signal_flags_t signals)
-        {
-          // TODO
-          return 0;
-        }
-
-      signal_flags_t
-      Thread::clear_signals (signal_flags_t signals)
-        {
-          // TODO
-          return 0;
-        }
-
-      void
-      Thread::join (void)
-        {
-          // TODO
-        }
-
-      void
-      Thread::detach (void)
-        {
-          // TODO
-        }
-
-#if defined(TESTING)
-      void
-      Thread::__run_function (void)
-        {
-          func_ptr_ (args_ptr_.get ());
-        }
-#endif
-
-#else
 
       Thread::Thread (const thread_attr_t* attr, thread_func_vp_t function,
                       void* args) :
@@ -344,8 +275,6 @@ namespace os
         assert(func_ptr_ != nullptr);
         func_ptr_ (func_args_ptr_);
       }
-#endif
-
 #endif
 
       // ======================================================================

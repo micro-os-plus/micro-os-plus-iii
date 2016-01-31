@@ -48,6 +48,9 @@ namespace os
           return "system";
         }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
         virtual ::std::string
         message (int i) const
         {
@@ -57,6 +60,9 @@ namespace os
           return ::std::string ("");
 #endif
         }
+
+#pragma GCC diagnostic pop
+
       };
 
       struct cmsis_error_category : public ::std::error_category
@@ -67,6 +73,9 @@ namespace os
           return "cmsis";
         }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
         virtual ::std::string
         message (int i) const
         {
@@ -76,6 +85,9 @@ namespace os
           return ::std::string ("");
 #endif
         }
+
+#pragma GCC diagnostic pop
+
       };
 
 #endif
