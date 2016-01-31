@@ -31,7 +31,7 @@
 
 #include <cmsis_os.h>
 
-#include <cstddef>
+#include <stddef.h>
 
 // ----------------------------------------------------------------------------
 
@@ -45,8 +45,7 @@ extern "C"
   // ===== Thread Management =====
 
   osThreadId
-  osThreadCreateEx (osThread* addr, const char* name, void* stack,
-                    size_t stack_size_bytes, osPriority prio,
+  osThreadCreateEx (osThread* addr, const osThreadAttr* attr,
                     os_pthread function, const void* args);
 
   // --------------------------------------------------------------------------

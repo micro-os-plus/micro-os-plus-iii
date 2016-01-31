@@ -51,7 +51,11 @@ namespace os
         virtual ::std::string
         message (int i) const
         {
+#if defined(DEBUG)
           return ::std::string (strerror (i));
+#else
+          return ::std::string ("");
+#endif
         }
       };
 
@@ -66,7 +70,11 @@ namespace os
         virtual ::std::string
         message (int i) const
         {
-          return ::std::string (rtos::kernel::strerror ((rtos::return_t) i));
+#if defined(DEBUG)
+          return ::std::string (rtos::kernel::strerror ((rtos::status_t) i));
+#else
+          return ::std::string ("");
+#endif
         }
       };
 

@@ -49,6 +49,23 @@ namespace os
         return *this;
       }
 
+      void
+      thread::delete_system_thread(void)
+      {
+        if (id_ != id())
+          {
+            void* args = id_.system_thread_->get_function_args ();
+            if (args != nullptr && function_object_deleter_ != nullptr)
+              {
+                // Manually delete the function object used to store arguments.
+                function_object_deleter_ (args);
+              }
+
+            // Manually delete the system thread.
+            delete id_.system_thread_;
+          }
+      }
+
       thread::~thread ()
       {
         trace::printf ("%s() @%p\n", __func__, this);
@@ -59,9 +76,7 @@ namespace os
             ::std::abort (); // in ISO it is std::terminate()
           }
 
-        // Manually delete the system thread. An unique_ptr in id and
-        // the move semantic would probably be a better idea.
-        delete id_.system_thread_;
+        delete_system_thread();
       }
 
       // ----------------------------------------------------------------------
@@ -82,13 +97,8 @@ namespace os
       thread::join ()
       {
         trace::printf ("%s() @%p\n", __func__, this);
-        if (id_ != id ())
-          {
-            id_.system_thread_->join ();
 
-            // The thread was terminated, free resources.
-            delete id_.system_thread_;
-          }
+        delete_system_thread();
 
         id_ = id ();
         trace::printf ("%s() @%p joined\n", __func__, this);

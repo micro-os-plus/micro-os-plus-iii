@@ -37,6 +37,8 @@ using namespace os::cmsis::rtos;
 // Validate C structs sizes (should match the C++ objects sizes).
 
 static_assert(sizeof(Thread) == sizeof(osThread), "adjust size of osThread");
+static_assert(sizeof(thread_attr_t) == sizeof(osThreadAttr), "adjust size of osThreadAttr");
+
 static_assert(sizeof(Timer) == sizeof(osTimer), "adjust size of osTimer");
 static_assert(sizeof(Mutex) == sizeof(osMutex), "adjust size of osMutex");
 static_assert(sizeof(Semaphore) == sizeof(osSemaphore), "adjust size of osSemaphore");
@@ -71,7 +73,7 @@ osKernelRunning (void)
 uint32_t
 osKernelSysTick (void)
 {
-  Current_systick crt;
+  current_systick_t crt;
   kernel::get_current_systick (&crt);
   // Convert ticks to cycles.
   return static_cast<uint32_t> (crt.ticks) * crt.divisor + crt.cycles;
@@ -86,22 +88,19 @@ osKernelSysTick (void)
 osThreadId
 osThreadCreate (const osThreadDef_t *thread_def, void *args)
 {
-  // Do not pass a stack pointer; it'll be allocated dynamically.
   return reinterpret_cast<osThreadId> (new (thread_def->data) Thread (
-      thread_def->name, nullptr, thread_def->stacksize,
-      (Priority) thread_def->tpriority, (Thread_func_vp)thread_def->pthread, args));
+      (thread_attr_t*) nullptr, (thread_func_vp_t) thread_def->pthread, args));
 }
 
+#if 1
 osThreadId
-osThreadCreateEx (osThread* addr, const char* name, void* stack,
-                  size_t stack_size_bytes, osPriority prio, os_pthread function,
+osThreadCreateEx (osThread* addr, const osThreadAttr* attr, os_pthread function,
                   const void* args)
 {
-  return reinterpret_cast<osThreadId> (new (addr) Thread (name, stack,
-                                                          stack_size_bytes,
-                                                          (Priority) prio,
-                                                          (Thread_func_vp)function, (void*)args));
+  return reinterpret_cast<osThreadId> (new (addr) Thread (
+      (thread_attr_t*) attr, (thread_func_vp_t) function, (void*) args));
 }
+#endif
 
 osThreadId
 osThreadGetId (void)
@@ -125,14 +124,14 @@ osThreadYield (void)
 osStatus
 osThreadSetPriority (osThreadId thread_id, osPriority priority)
 {
-  return static_cast<osStatus> ((reinterpret_cast<Thread&> (thread_id)).set_priority (
-      (Priority) priority));
+  return static_cast<osStatus> ((reinterpret_cast<Thread&> (thread_id)).set_sched_prio (
+      (priority_t) priority));
 }
 
 osPriority
 osThreadGetPriority (osThreadId thread_id)
 {
-  return static_cast<osPriority> ((reinterpret_cast<Thread&> (thread_id)).get_priority ());
+  return static_cast<osPriority> ((reinterpret_cast<Thread&> (thread_id)).get_sched_prio ());
 }
 
 // ----------------------------------------------------------------------------
@@ -156,7 +155,7 @@ osWait (uint32_t millisec)
 {
   osEvent event;
 
-  return_t ret = thread::wait (millisec, (event_t*) &event);
+  status_t ret = thread::wait (millisec, (event_t*) &event);
   event.status = static_cast<osStatus> (ret);
   return event;
 }
@@ -179,15 +178,15 @@ osTimerId
 osTimerCreate (const osTimerDef_t *timer_def, os_timer_type type, void *args)
 {
   return reinterpret_cast<osTimerId> (new ((void*) &timer_def->data) Timer (
-      timer_def->name, timer_def->ptimer, type, args));
+      timer_def->name, timer_def->ptimer, (timer_type_t) type, args));
 }
 
 osTimerId
 osTimerCreateEx (osTimer* addr, const char* name, os_ptimer function,
                  os_timer_type type, void* args)
 {
-  return reinterpret_cast<osTimerId> (new ((void*) addr) Timer (name, function,
-                                                                type, args));
+  return reinterpret_cast<osTimerId> (new ((void*) addr) Timer (
+      name, function, (timer_type_t) type, args));
 }
 
 osStatus
@@ -214,17 +213,19 @@ osTimerDelete (osTimerId timer_id)
 
 //  ==== Signal Management ====
 
+#if 0
 int32_t
 osSignalSet (osThreadId thread_id, int32_t signals)
-{
-  return static_cast<int32_t> (((Thread&) (thread_id)).set_signals (signals));
-}
+  {
+    return static_cast<int32_t> (((Thread&) (thread_id)).set_signals (signals));
+  }
 
 int32_t
 osSignalClear (osThreadId thread_id, int32_t signals)
-{
-  return static_cast<int32_t> (((Thread&) (thread_id)).clear_signals (signals));
-}
+  {
+    return static_cast<int32_t> (((Thread&) (thread_id)).clear_signals (signals));
+  }
+#endif
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
@@ -233,8 +234,8 @@ osEvent
 osSignalWait (int32_t signals, uint32_t millisec)
 {
   osEvent event;
-  return_t ret = thread::wait_signals (signals, millisec,
-                                       (signals_t*) &event.value.signals);
+  status_t ret = thread::wait_signals (signals, millisec,
+                                       (signal_flags_t*) &event.value.signals);
   event.status = static_cast<osStatus> (ret);
   return event;
 }
@@ -417,7 +418,7 @@ osEvent
 osMessageGet (osMessageQId queue_id, uint32_t millisec)
 {
   osEvent event;
-  return_t ret = (reinterpret_cast<Message_queue&> (queue_id)).get (
+  status_t ret = (reinterpret_cast<Message_queue&> (queue_id)).get (
       millisec, (void**) &event.value.p);
   event.status = static_cast<osStatus> (ret);
   return event;
@@ -488,7 +489,7 @@ osEvent
 osMailGet (osMailQId queue_id, uint32_t millisec)
 {
   osEvent event;
-  return_t ret = (reinterpret_cast<Mail_queue&> (queue_id)).get (
+  status_t ret = (reinterpret_cast<Mail_queue&> (queue_id)).get (
       millisec, (void**) &event.value.p);
   event.status = static_cast<osStatus> (ret);
   return event;

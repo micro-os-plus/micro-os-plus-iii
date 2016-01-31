@@ -168,11 +168,7 @@ extern "C"
 
 // >>> the following data type definitions may shall adapted towards a specific RTOS
 
-#if defined(OS_INCLUDE_CMSIS_THREAD_VARIADICS)
-#define OS_THREAD_SIZE_WORDS  5
-#else
-#define OS_THREAD_SIZE_WORDS  5
-#endif
+#define OS_THREAD_SIZE_WORDS  6
 #define OS_TIMER_SIZE_WORDS  1
 #define OS_MUTEX_SIZE_WORDS  1
 #define OS_SEMAPHORE_SIZE_WORDS  1
@@ -184,6 +180,14 @@ extern "C"
   {
     void* content[OS_THREAD_SIZE_WORDS];
   } osThread;
+
+  typedef struct os_thread_attr
+  {
+    const char* name;
+    void* stack_addr;
+    size_t stack_size_bytes;
+    uint8_t priority;
+  } osThreadAttr;
 
   typedef struct os_timer_data
   {
@@ -392,7 +396,7 @@ extern const osThreadDef_t os_thread_def_##name
 #define osThreadDef(name, priority, instances, stacksz)  \
 struct os_thread_data os_thread_data_##name; \
 const osThreadDef_t os_thread_def_##name = \
-{ "##name", (name), (priority), /* (instances), */ (stacksz), &os_thread_data_##name }
+{ "##name", (os_pthread)(name), (priority), /* (instances), */ (stacksz), &os_thread_data_##name }
 #endif
 
   /// Access a Thread definition.
@@ -477,7 +481,7 @@ extern const osTimerDef_t os_timer_def_##name
 #define osTimerDef(name, function)  \
 struct os_timer_data os_timer_data_##name; \
 const osTimerDef_t os_timer_def_##name = \
-{ "##name", (function), &os_timer_data_##name }
+{ "##name", (os_ptimer)(function), &os_timer_data_##name }
 #endif
 
   /// Access a Timer definition.

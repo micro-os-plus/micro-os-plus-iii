@@ -34,9 +34,9 @@ namespace os
       void
       condition_variable::notify_one () noexcept
       {
-        rtos::return_t ret;
+        rtos::status_t ret;
         ret = ncv_.notify_one ();
-        if (ret != rtos::Return::os_ok)
+        if (ret != rtos::status::ok)
           {
             __throw_cmsis_error ((int) ret,
                                  "condition_variable::notify_one() failed");
@@ -46,9 +46,9 @@ namespace os
       void
       condition_variable::notify_all () noexcept
       {
-        rtos::return_t ret;
+        rtos::status_t ret;
         ret = ncv_.notify_all ();
-        if (ret != rtos::Return::os_ok)
+        if (ret != rtos::status::ok)
           {
             __throw_cmsis_error ((int) ret,
                                  "condition_variable::notify_all() failed");

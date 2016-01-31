@@ -18,6 +18,8 @@
 
 #include <cmsis-plus/rtos/os.h>
 
+#include <cassert>
+
 using namespace os::cmsis;
 
 namespace os
@@ -34,18 +36,18 @@ namespace os
 
       namespace kernel
       {
-        return_t
+        status_t
         initialize (void)
         {
           // TODO
-          return os_ok;
+          return status::ok;
         }
 
-        return_t
+        status_t
         start (void)
         {
           // TODO
-          return os_ok;
+          return status::ok;
         }
 
         bool
@@ -56,64 +58,64 @@ namespace os
         }
 
         uint64_t
-        get_current_systick (Current_systick* details)
+        get_current_systick (current_systick_t* details)
         {
           // TODO
           return 1234;
         }
 
         const char*
-        strerror (return_t ret)
+        strerror (status_t ret)
         {
           const char* str;
           switch (ret)
             {
-            case Return::os_event_signal:
+            case status::event_signal:
               str = "signal event occurred";
               break;
 
-            case Return::os_event_message:
+            case status::event_message:
               str = "message event occurred";
               break;
 
-            case Return::os_event_mail:
+            case status::event_mail:
               str = "mail event occurred";
               break;
 
-            case Return::os_event_timeout:
+            case status::event_timeout:
               str = "timeout occurred";
               break;
 
-            case Return::os_error_parameter:
+            case status::error_parameter:
               str = "mandatory parameter missing or incorrect object";
               break;
 
-            case Return::os_error_resource:
+            case status::error_resource:
               str = "resource not available";
               break;
 
-            case Return::os_error_timeout_resource:
+            case status::error_timeout_resource:
               str = "resource not available within given time";
               break;
 
-            case Return::os_error_isr:
+            case status::error_isr:
               str = "not allowed in ISR context";
               break;
 
-            case Return::os_error_isr_recursive:
+            case status::error_isr_recursive:
               str = "function called multiple times from ISR with same object";
               break;
 
-            case Return::os_error_priority:
+            case status::error_priority:
               str =
                   "system cannot determine priority or thread has illegal priority";
               break;
 
-            case Return::os_error_no_memory:
+            case status::error_no_memory:
               str = "system is out of memory";
               break;
 
-            case Return::os_error_value:
+            case status::error_value:
               str = "value of a parameter is out of range";
               break;
 
@@ -128,9 +130,14 @@ namespace os
 
 // ======================================================================
 
+      void*
+      no_thread_func (void* args)
+      {
+        return nullptr;
+      }
+
       Thread no_thread
-        { "none", nullptr, 0, Priority::normal, (Thread_func_vp) nullptr,
-            nullptr };
+        { nullptr, (thread_func_vp_t) no_thread_func, nullptr };
 
       namespace thread
       {
@@ -141,41 +148,42 @@ namespace os
           return no_thread;
         }
 
-        return_t
+        status_t
         yield (void)
         {
           // TODO
-          return os_ok;
+          return status::ok;
         }
 
-        return_t
+        status_t
         wait (millis_t millisec, event_t* ret)
         {
           // TODO
-          return os_ok;
+          return status::ok;
         }
 
-        return_t
-        wait_signals (signals_t signals, millis_t millisec, signals_t* ret)
+        status_t
+        wait_signals (signal_flags_t signals, millis_t millisec,
+                      signal_flags_t* ret)
         {
           // TODO
-          return os_ok;
+          return status::ok;
         }
 
 #if 0
-        return_t
+        status_t
         delay (millis_t millisec)
           {
             // TODO
-            return os_ok;
+            return status::ok;
           }
 #endif
 
-        return_t
+        status_t
         sleep (sys_ticks_t ticks)
         {
           // TODO
-          return os_ok;
+          return status::ok;
         }
 
       }
@@ -190,20 +198,111 @@ namespace os
 
       // ======================================================================
 
+#if 0
       Thread::Thread (const char* name, void* stack,
-                      std::size_t stack_size_bytes, Priority prio,
-                      Thread_func_vp function,  void* args) : //
-          Named_object
-            { name }, //
-          prio_
-            { prio }, //
-          func_ptr_
-            { function }, //
-          args_ptr_
-            { (Args_ptr::element_type*) args, nullptr } //
+          std::size_t stack_size_bytes, Priority prio,
+          Thread_func_vp function, void* args) : //
+      Named_object
+        { name}, //
+      prio_
+        { prio}, //
+      func_ptr_
+        { function}, //
+      args_ptr_
+        { (Args_ptr::element_type*) args, nullptr} //
+        {
+          trace::printf ("%s(\"%s\", %d) @%p \n", __func__, get_name (),
+              stack_size_bytes, this);
+        }
+
+      Thread::~Thread ()
+        {
+          trace::printf ("%s() @%p \n", __func__, this);
+        }
+
+      Priority
+      Thread::get_priority (void)
+        {
+          return prio_;
+        }
+
+      Priority
+      Thread::set_priority (Priority prio)
+        {
+          Priority ret = prio_;
+          prio_ = prio;
+          return ret;
+        }
+
+      signal_flags_t
+      Thread::set_signals (signal_flags_t signals)
+        {
+          // TODO
+          return 0;
+        }
+
+      signal_flags_t
+      Thread::clear_signals (signal_flags_t signals)
+        {
+          // TODO
+          return 0;
+        }
+
+      void
+      Thread::join (void)
+        {
+          // TODO
+        }
+
+      void
+      Thread::detach (void)
+        {
+          // TODO
+        }
+
+#if defined(TESTING)
+      void
+      Thread::__run_function (void)
+        {
+          func_ptr_ (args_ptr_.get ());
+        }
+#endif
+
+#else
+
+      Thread::Thread (const thread_attr_t* attr, thread_func_vp_t function,
+                      void* args) :
+          Named_object (attr != nullptr ? attr->name : nullptr)
       {
+        assert(function != nullptr);
+
+        if (attr != nullptr)
+          {
+            // Get attributes from user structure.
+            prio_ = attr->priority;
+            // TODO: check min size
+            stack_size_bytes_ = attr->stack_size_bytes;
+            // TODO: align stack
+            stack_addr_ = attr->stack_addr;
+          }
+        else
+          {
+            // Default attributes.
+            prio_ = priority::normal;
+            stack_size_bytes_ = 0;
+            stack_addr_ = nullptr;
+          }
+
+        if (stack_addr_ == nullptr)
+          {
+            // TODO: alloc default stack size
+          }
+
+        func_ptr_ = function;
+        func_args_ptr_ = args;
+
         trace::printf ("%s(\"%s\", %d) @%p \n", __func__, get_name (),
-                       stack_size_bytes, this);
+                       stack_size_bytes_, this);
       }
 
       Thread::~Thread ()
@@ -211,55 +310,45 @@ namespace os
         trace::printf ("%s() @%p \n", __func__, this);
       }
 
-      Priority
-      Thread::get_priority (void)
+      priority_t
+      Thread::get_sched_prio (void)
       {
         return prio_;
       }
 
-      Priority
-      Thread::set_priority (Priority prio)
+      status_t
+      Thread::set_sched_prio (priority_t prio)
       {
-        Priority ret = prio_;
         prio_ = prio;
-        return ret;
+        return status::ok;
       }
 
-      signals_t
-      Thread::set_signals (signals_t signals)
+      status_t
+      Thread::join (void** exit_ptr)
       {
         // TODO
-        return 0;
+        return status::ok;
       }
 
-      signals_t
-      Thread::clear_signals (signals_t signals)
-      {
-        // TODO
-        return 0;
-      }
-
-      void
-      Thread::join (void)
-      {
-        // TODO
-      }
-
-      void
+      status_t
       Thread::detach (void)
       {
         // TODO
+        return status::ok;
       }
 
 #if defined(TESTING)
       void
       Thread::__run_function (void)
       {
-        func_ptr_ (args_ptr_.get ());
+        assert(func_ptr_ != nullptr);
+        func_ptr_ (func_args_ptr_);
       }
 #endif
 
-// ======================================================================
+#endif
+
+      // ======================================================================
 
       Timer::Timer (const char* name, timer_func_t function, timer_type_t type,
                     void* args) : //
@@ -273,18 +362,18 @@ namespace os
         // TODO
       }
 
-      return_t
+      status_t
       Timer::start (millis_t millisec)
       {
         // TODO
-        return os_ok;
+        return status::ok;
       }
 
-      return_t
+      status_t
       Timer::stop (void)
       {
         // TODO
-        return os_ok;
+        return status::ok;
       }
 
       // ======================================================================
@@ -300,22 +389,22 @@ namespace os
         // TODO
       }
 
-      return_t
+      status_t
       Mutex::wait (void)
       {
-        return os_ok;
+        return status::ok;
       }
 
-      return_t
+      status_t
       Mutex::try_wait (sys_ticks_t ticks)
       {
-        return os_ok;
+        return status::ok;
       }
 
-      return_t
+      status_t
       Mutex::release (void)
       {
-        return os_ok;
+        return status::ok;
       }
 
       // ======================================================================
@@ -331,22 +420,22 @@ namespace os
         // TODO
       }
 
-      return_t
+      status_t
       Recursive_mutex::wait (void)
       {
-        return os_ok;
+        return status::ok;
       }
 
-      return_t
+      status_t
       Recursive_mutex::try_wait (sys_ticks_t ticks)
       {
-        return os_ok;
+        return status::ok;
       }
 
-      return_t
+      status_t
       Recursive_mutex::release (void)
       {
-        return os_ok;
+        return status::ok;
       }
 
       // ======================================================================
@@ -362,16 +451,18 @@ namespace os
         // TODO
       }
 
-      return_t
+      status_t
       Condition_variable::notify_one () noexcept
       {
         // TODO
+        return status::ok;
       }
 
-      return_t
+      status_t
       Condition_variable::notify_all () noexcept
       {
         // TODO
+        return status::ok;
       }
 
       // ======================================================================
@@ -390,16 +481,16 @@ namespace os
       int32_t
       Semaphore::wait (millis_t millisec)
       {
-        return os_ok;
+        return status::ok;
       }
 
-      return_t
+      status_t
       Semaphore::release (void)
       {
-        return os_ok;
+        return status::ok;
       }
 
-// ======================================================================
+      // ======================================================================
 
       Pool::Pool (const char* name, std::size_t items, std::size_t item_size,
                   void* mem) :
@@ -427,14 +518,14 @@ namespace os
         return nullptr;
       }
 
-      return_t
+      status_t
       Pool::free (void* block)
       {
         // TODO
-        return os_ok;
+        return status::ok;
       }
 
-// ======================================================================
+      // ======================================================================
 
       Message_queue::Message_queue (const char* name, std::size_t items,
                                     void* mem, Thread* thread) :
@@ -448,21 +539,21 @@ namespace os
         // TODO
       }
 
-      return_t
+      status_t
       Message_queue::put (void* info, millis_t millisec)
       {
         // TODO
-        return os_ok;
+        return status::ok;
       }
 
-      return_t
+      status_t
       Message_queue::get (millis_t millisec, void** ret)
       {
         // TODO
-        return os_ok;
+        return status::ok;
       }
 
-// ======================================================================
+      // ======================================================================
 
       Mail_queue::Mail_queue (const char* name, std::size_t messages,
                               std::size_t message_size, void* mem,
@@ -491,25 +582,25 @@ namespace os
         return nullptr;
       }
 
-      return_t
+      status_t
       Mail_queue::put (void* mail)
       {
         // TODO
-        return os_ok;
+        return status::ok;
       }
 
-      return_t
+      status_t
       Mail_queue::get (millis_t millisec, void** ret)
       {
         // TODO
-        return os_ok;
+        return status::ok;
       }
 
-      return_t
+      status_t
       Mail_queue::free (void* mail)
       {
         // TODO
-        return os_ok;
+        return status::ok;
       }
 
     // ======================================================================

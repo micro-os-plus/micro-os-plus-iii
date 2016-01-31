@@ -17,14 +17,14 @@
  */
 
 #include <cmsis_os_ex.h>
-#include <cstdio>
+#include <stdio.h>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
 // ----------------------------------------------------------------------------
 
-void
+void*
 task_function (const void* args);
 
 void
@@ -32,13 +32,11 @@ timer_callback (const void* args);
 
 // ----------------------------------------------------------------------------
 
-void
+void*
 task_function (const void* args)
 {
-  ;
+  return NULL;
 }
-
-osThreadDef(task_function, osPriorityNormal, 1, 0);
 
 // ----------------------------------------------------------------------------
 
@@ -48,37 +46,64 @@ timer_callback (const void* args)
   ;
 }
 
-osTimerDef(timer, timer_callback);
-
 // ----------------------------------------------------------------------------
 
 int
 main (int argc, char* argv[])
 {
+  struct
+  {
+    int n;
+  } args;
+
     {
       // Keil API.
 
-      osThreadId th = osThreadCreate (osThread(task_function), nullptr);
+      // Thread is static, but stack is dynamically allocated.
+      static osThreadDef(task_function, osPriorityNormal, 1, 0);
+      osThreadId th = osThreadCreate (osThread(task_function), &args);
+
+      osThreadGetPriority(th);
       osThreadTerminate (th);
 
-      osTimerId tm = osTimerCreate (osTimer(timer), osTimerOnce, nullptr);
+      static osTimerDef(timer, timer_callback);
+      osTimerId tm = osTimerCreate (osTimer(timer), osTimerOnce, NULL);
       osTimerDelete (tm);
     }
 
+#if 1
     {
       // Extended API.
 
-      osThread th;
-      osThreadCreateEx (&th, "thread", nullptr, 0, osPriorityNormal,
-                        task_function, nullptr);
+      // POSIX Thread with default settings (stack is dynamically allocated).
+      static osThread thread1;
+      osThreadCreateEx (&thread1, NULL, (os_pthread) task_function, &args);
 
-      osThreadTerminate (&th);
+      osThreadGetPriority (&thread1);
+      osThreadTerminate (&thread1);
 
-      osTimer tm;
-      osTimerCreateEx (&tm, "timer", timer_callback, osTimerOnce, nullptr);
+      // POSIX Thread with static stack and full settings
+      static uint8_t stack[300];
+      const osThreadAttr attr =
+        {
+        //
+            .name = "th2", //
+            .stack_addr = stack, //
+            .stack_size_bytes = sizeof(stack), //
+            .priority = osPriorityNormal //
+          };
+      static osThread th2;
+      osThreadCreateEx (&th2, &attr, (os_pthread) task_function, &args);
+
+      osThreadGetPriority (&th2);
+      osThreadTerminate (&th2);
+
+      static osTimer tm;
+      osTimerCreateEx (&tm, "timer", timer_callback, osTimerOnce, NULL);
 
       osTimerDelete (&tm);
     }
+#endif
 
   printf ("%s done.", argv[0]);
   return 0;

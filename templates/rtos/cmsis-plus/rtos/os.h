@@ -49,85 +49,93 @@ namespace os
       // ----------------------------------------------------------------------
 
       /// Status code values returned by CMSIS-RTOS functions.
-      using return_t = uint32_t;
+      using status_t = uint32_t;
 
-      enum Return
-        : return_t
-          {
-            //
-        ///< function completed; no error or event occurred.
-        os_ok = 0,
+      namespace status
+      {
+        // Explicit namespace preferred over scoped enum,
+        // otherwise too many casts are required.
+        enum
+          : status_t
+            {
+              //
+          ///< function completed; no error or event occurred.
+          ok = 0,
 
-        ///< function completed; signal event occurred.
-        os_event_signal = 0x08,
+          ///< function completed; signal event occurred.
+          event_signal = 0x08,
 
-        ///< function completed; message event occurred.
-        os_event_message = 0x10,
+          ///< function completed; message event occurred.
+          event_message = 0x10,
 
-        ///< function completed; mail event occurred.
-        os_event_mail = 0x20,
+          ///< function completed; mail event occurred.
+          event_mail = 0x20,
 
-        ///< function completed; timeout occurred.
-        os_event_timeout = 0x40,
+          ///< function completed; timeout occurred.
+          event_timeout = 0x40,
 
-        ///< parameter error: a mandatory parameter was missing or specified an incorrect object.
-        os_error_parameter = 0x80,
+          ///< parameter error: a mandatory parameter was missing or specified an incorrect object.
+          error_parameter = 0x80,
 
-        ///< resource not available: a specified resource was not available.
-        os_error_resource = 0x81,
+          ///< resource not available: a specified resource was not available.
+          error_resource = 0x81,
 
-        ///< resource not available within given time: a specified resource was not available within the timeout period.
-        os_error_timeout_resource = 0xC1,
+          ///< resource not available within given time: a specified resource was not available within the timeout period.
+          error_timeout_resource = 0xC1,
 
-        ///< not allowed in ISR context: the function cannot be called from interrupt service routines.
-        os_error_isr = 0x82,
+          ///< not allowed in ISR context: the function cannot be called from interrupt service routines.
+          error_isr = 0x82,
 
-        ///< function called multiple times from ISR with same object.
-        os_error_isr_recursive = 0x83,
+          ///< function called multiple times from ISR with same object.
+          error_isr_recursive = 0x83,
 
-        ///< system cannot determine priority or thread has illegal priority.
-        os_error_priority = 0x84,
+          ///< system cannot determine priority or thread has illegal priority.
+          error_priority = 0x84,
 
-        ///< system is out of memory: it was impossible to allocate or reserve memory for the operation.
-        os_error_no_memory = 0x85,
+          ///< system is out of memory: it was impossible to allocate or reserve memory for the operation.
+          error_no_memory = 0x85,
 
-        ///< value of a parameter is out of range.
-        os_error_value = 0x86,
+          ///< value of a parameter is out of range.
+          error_value = 0x86,
 
-        ///< unspecified RTOS error: run-time error but no other error message fits.
-        os_error_os = 0xFF,
+          ///< unspecified RTOS error: run-time error but no other error message fits.
+          error_os = 0xFF,
 
-        ///< prevent from enum down-size compiler optimization.
-        /// (Actually redundant in C++ if the underlying type is 32 bits)
-        os_return_reserved = 0x7FFFFFFF
-      };
+          ///< prevent from enum down-size compiler optimisation.
+          /// (Actually redundant in C++ if the underlying type is 32 bits)
+          reserved = 0x7FFFFFFF
+        };
+      } /* namespace status */
 
       // ----------------------------------------------------------------------
 
-      using priority_t = int32_t;
+      using priority_t = int8_t;
 
       /// Priorities used for thread control.
-      enum class Priority
-        : priority_t
-          {
-            //
-        idle = -3, ///< priority: idle (lowest)
-        low = -2, ///< priority: low
-        below_normal = -1, ///< priority: below normal
-        normal = 0, ///< priority: normal (default)
-        above_normal = +1, ///< priority: above normal
-        high = +2, ///< priority: high
-        realtime = +3, ///< priority: realtime (highest)
-        error = 0x84 ///< system cannot determine priority or thread has illegal priority
-      };
+      // Explicit namespace preferred over scoped enum,
+      // otherwise too many casts are required.
+      namespace priority
+      {
+        enum
+          : priority_t
+            {
+              //
+          idle = -30, ///< priority: idle (lowest)
+          low = -20, ///< priority: low
+          below_normal = -10, ///< priority: below normal
+          normal = 0, ///< priority: normal (default)
+          above_normal = +10, ///< priority: above normal
+          high = +20, ///< priority: high
+          realtime = +30 ///< priority: realtime (highest)
+        // error = 0x84 ///< system cannot determine priority or thread has illegal priority
+        };
+      } /* namespace priority */
 
       // ----------------------------------------------------------------------
 
-      using timer_type_t = uint32_t;
-
       /// Timer type value for the timer definition.
-      enum class Timer_type
-        : timer_type_t
+      enum class timer_type_t
+        : uint32_t
           {
             //
         once = 0, //
@@ -144,19 +152,19 @@ namespace os
       class Mail_queue;
       class Message_queue;
 
-      using signals_t = int32_t;
+      using signal_flags_t = int32_t;
 
       // TODO: Get rid of this ugly structure.
 #if 1
       /// Event structure contains detailed information about an event.
-      using event_t = struct event_t
+      using event_t = struct event_s
         {
-          return_t status; ///< status code: event or error information
+          status_t status; ///< status code: event or error information
           union
             {
               uint32_t v; ///< message as 32-bit value
               void* p;///< message or mail as void pointer
-              signals_t signals;///< signal flags
+              signal_flags_t signals;///< signal flags
             }value; ///< event value
           union
             {
@@ -177,7 +185,7 @@ namespace os
         uint32_t cycles; // Count of SysTick cycles since timer reload (24 bits)
         uint32_t divisor; // SysTick reload value (24 bits)
         uint32_t core_frequency_hz; // Core clock frequency Hz
-      } Current_systick;
+      } current_systick_t;
 
 #pragma GCC diagnostic pop
 
@@ -186,12 +194,12 @@ namespace os
       {
         /// Initialise the RTOS Kernel for creating objects.
         /// @return status code that indicates the execution status of the function.
-        return_t
+        status_t
         initialize (void);
 
         /// Start the RTOS Kernel.
         /// @return status code that indicates the execution status of the function.
-        return_t
+        status_t
         start (void);
 
         /// Check if the RTOS kernel is already started.
@@ -211,7 +219,7 @@ namespace os
         /// may be null if details are not needed
         /// @return Number of ticks since reset.
         uint64_t
-        get_current_systick (Current_systick* details = nullptr);
+        get_current_systick (current_systick_t* details = nullptr);
 
         /// The RTOS kernel system timer frequency in Hz.
         /// \note Reflects the system timer setting and is typically defined in a configuration file.
@@ -231,7 +239,7 @@ namespace os
           }
 
         const char*
-        strerror (return_t);
+        strerror (status_t);
 
       } /* namespace kernel */
 
@@ -281,21 +289,22 @@ namespace os
 
         /// Pass control to next thread that is in state \b READY.
         /// @return status code that indicates the execution status of the function.
-        return_t
+        status_t
         yield (void);
 
         /// Wait for Signal, Message, Mail, or Timeout.
         /// @param [in] millisec          @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out
         /// @return event that contains signal, message, or mail information or error code.
-        return_t
+        status_t
         wait (millis_t millisec, event_t* ret);
 
         /// Wait for one or more Signal Flags to become signaled for the current \b RUNNING thread.
         /// @param [in]     signals       wait until all specified signal flags set or 0 for any single signal flag.
         /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
         /// @return event flag information or error code.
-        return_t
-        wait_signals (signals_t signals, millis_t millisec, signals_t* ret);
+        status_t
+        wait_signals (signal_flags_t signals, millis_t millisec,
+                      signal_flags_t* ret);
 
 #if 0
         /// Wait for Timeout (Time Delay).
@@ -305,7 +314,7 @@ namespace os
         delay (millis_t millisec);
 #endif
 
-        return_t
+        status_t
         sleep (sys_ticks_t ticks);
 
       }
@@ -354,33 +363,157 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+#if 0
+      class Thread : public Named_object
+        {
+        public:
+
+          /// Create a thread and add it to Active Threads and set it to state READY.
+          /// @param         name         name of the thread function.
+          /// @param         priority     initial priority of the thread function.
+          /// @param         stacksz      stack size (in bytes) requirements for the thread function.
+          /// @param [in]     argument      pointer that is passed to the thread function as start argument.
+          /// @return thread ID for reference by other functions or NULL in case of error.
+#if 0
+          Thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
+              Priority prio, Thread_func_cvp function, const void* args);
+#endif
+
+          Thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
+              Priority prio, Thread_func_vp function, void* args = nullptr);
+
+#if 0
+          Thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
+              Priority prio, Thread_func_v function);
+#endif
+
+          template<typename Callable_T, typename ... Args_T>
+          explicit
+          Thread (const char* name, ::std::size_t stack_size_bytes,
+              Priority prio, Callable_T&& function, Args_T&&... args);
+
+          // Prevent any copy or move.
+          Thread (const Thread&) = delete;
+          Thread (Thread&&) = delete;
+          Thread&
+          operator= (const Thread&) = delete;
+          Thread&
+          operator= (Thread&&) = delete;
+
+          /// Terminate execution of a thread and remove it from Active Threads.
+          /// @param [in]     thread_id   thread ID obtained by @ref osThreadCreate or @ref osThreadGetId.
+          /// @return status code that indicates the execution status of the function.
+          ~Thread ();
+
+          /// Get current priority of an active thread.
+          /// @param [in]     thread_id     thread ID obtained by @ref osThreadCreate or @ref osThreadGetId.
+          /// @return current priority value of the thread function.
+          Priority
+          get_priority (void);
+
+          /// Change priority of an active thread.
+          /// @param [in]     thread_id     thread ID obtained by @ref osThreadCreate or @ref osThreadGetId.
+          /// @param [in]     priority      new priority value for the thread function.
+          /// @return status code that indicates the execution status of the function.
+          Priority
+          set_priority (Priority prio);
+
+          /// Set the specified Signal Flags of an active thread.
+          /// @param [in]     thread_id     thread ID obtained by @ref osThreadCreate or @ref osThreadGetId.
+          /// @param [in]     signals       specifies the signal flags of the thread that should be set.
+          /// @return previous signal flags of the specified thread or 0x80000000 in case of incorrect parameters.
+          signal_flags_t
+          set_signals (signal_flags_t signals);
+
+          /// Clear the specified Signal Flags of an active thread.
+          /// @param [in]     thread_id     thread ID obtained by @ref osThreadCreate or @ref osThreadGetId.
+          /// @param [in]     signals       specifies the signal flags of the thread that shall be cleared.
+          /// @return previous signal flags of the specified thread or 0x80000000 in case of incorrect parameters or call from ISR.
+          signal_flags_t
+          clear_signals (signal_flags_t signals);
+
+          void
+          join (void);
+
+          void
+          detach (void);
+
+#if defined(TESTING)
+          void
+          __run_function (void);
+#endif
+
+        protected:
+
+          // Type of unique pointer used to store argument,
+          // possibly with deleter when using bind().
+          using Args_ptr = ::std::unique_ptr<void*, void (*) (void**)>;
+
+          template<typename Binding_T>
+          static void
+          run_function_object (const void* binding);
+
+          template<typename Binding_T>
+          static void
+          delete_function_object (const Args_ptr::element_type* func_obj);
+
+        protected:
+
+          Priority prio_;
+
+          Thread_func_vp func_ptr_;
+
+          // Empty argument pointer with empty deleter.
+          Args_ptr args_ptr_
+            { nullptr, nullptr};
+
+          // Add other internal data
+        };
+#else
+
+      using thread_func_vp_t = void* (*) (void* args);
+
+#if 0
+      // The pointer is a generic void*;
+      // the deleter receives a pointer to it.
+      using thread_func_args_ptr_t = ::std::unique_ptr<void*, void (*) (void**)>;
+#endif
+
+      using thread_attr_t = struct thread_attr_s
+        {
+          const char* name;
+          void* stack_addr;
+          ::std::size_t stack_size_bytes;
+          priority_t priority;
+        };
+
       class Thread : public Named_object
       {
       public:
 
-        /// Create a thread and add it to Active Threads and set it to state READY.
-        /// @param         name         name of the thread function.
-        /// @param         priority     initial priority of the thread function.
-        /// @param         stacksz      stack size (in bytes) requirements for the thread function.
-        /// @param [in]     argument      pointer that is passed to the thread function as start argument.
-        /// @return thread ID for reference by other functions or NULL in case of error.
-#if 0
-        Thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
-                Priority prio, Thread_func_cvp function, const void* args);
-#endif
-
-        Thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
-                Priority prio, Thread_func_vp function, void* args = nullptr);
-
-#if 0
-        Thread (const char* name, void* stack, ::std::size_t stack_size_bytes,
-                Priority prio, Thread_func_v function);
-#endif
-
-        template<typename Callable_T, typename ... Args_T>
-          explicit
-          Thread (const char* name, ::std::size_t stack_size_bytes,
-                  Priority prio, Callable_T&& function, Args_T&&... args);
+        /**
+         * @brief Create a new tread.
+         *
+         * @details
+         * Create a new thread, with attributes specified by attr.
+         * If attr is NULL, the default attributes shall be used.
+         * If the attributes specified by attr are modified later,
+         * the thread's attributes shall not be affected.
+         *
+         * The thread is created executing function with args as its
+         * sole argument. If the start_routine returns, the effect
+         * shall be as if there was an implicit call to exit() using
+         * the return value of function as the exit status. Note that
+         * the thread in which main() was originally invoked differs
+         * from this. When it returns from main(), the effect shall
+         * be as if there was an implicit call to exit() using the
+         * return value of main() as the exit status.
+         *
+         * Compatible with pthread_create().
+         * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html
+         */
+        Thread (const thread_attr_t* attr, thread_func_vp_t function,
+                void* args);
 
         // Prevent any copy or move.
         Thread (const Thread&) = delete;
@@ -390,83 +523,217 @@ namespace os
         Thread&
         operator= (Thread&&) = delete;
 
-        /// Terminate execution of a thread and remove it from Active Threads.
-        /// @param [in]     thread_id   thread ID obtained by @ref osThreadCreate or @ref osThreadGetId.
-        /// @return status code that indicates the execution status of the function.
         ~Thread ();
 
-        /// Get current priority of an active thread.
-        /// @param [in]     thread_id     thread ID obtained by @ref osThreadCreate or @ref osThreadGetId.
-        /// @return current priority value of the thread function.
-        Priority
-        get_priority (void);
+        /**
+         * @brief Compare thread IDs.
+         *
+         * @details
+         * pthread_equal()
+         * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_equal.html
+         *
+         * @return true if the given thread is the same as this thread.
+         */
+        bool
+        operator== (const Thread& rhs) const;
 
-        /// Change priority of an active thread.
-        /// @param [in]     thread_id     thread ID obtained by @ref osThreadCreate or @ref osThreadGetId.
-        /// @param [in]     priority      new priority value for the thread function.
-        /// @return status code that indicates the execution status of the function.
-        Priority
-        set_priority (Priority prio);
+        /**
+         * @brief Cancel thread execution.
+         *
+         * @details
+         * pthread_cancel()
+         * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cancel.html
+         *
+         *
+         * The cancel() function shall not return an error code of [EINTR].
+         * If an implementation detects use of a thread ID after the end
+         * of its lifetime, it is recommended that the function should
+         * fail and report an [ESRCH] error.
+         *
+         * @return if successful, return Return::os_ok; otherwise an
+         * error number is returned.
+         */
+        status_t
+        cancel (void);
 
-        /// Set the specified Signal Flags of an active thread.
-        /// @param [in]     thread_id     thread ID obtained by @ref osThreadCreate or @ref osThreadGetId.
-        /// @param [in]     signals       specifies the signal flags of the thread that should be set.
-        /// @return previous signal flags of the specified thread or 0x80000000 in case of incorrect parameters.
-        signals_t
-        set_signals (signals_t signals);
+        /**
+         * @brief Wait for thread termination.
+         *
+         * @details
+         *
+         * Suspend execution of the calling thread until the target thread
+         * terminates, unless the target thread has already terminated.
+         * On return from a successful join() call with a non-NULL
+         * exit_ptr argument, the value passed to exit() by the
+         * terminating thread shall be made available in the location
+         * referenced by exit_ptr. When a join() returns successfully,
+         * the target thread has been terminated. The results of
+         * multiple simultaneous calls to join() specifying the
+         * same target thread are undefined. If the thread calling
+         * join() is cancelled, then the target thread shall not be
+         * detached.
+         *
+         * pthread_join()
+         * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_join.html
+         *
+         * @return if successful, return Return::os_ok; otherwise an
+         * error number is returned.
+         *
+         * The join() function may fail if:
+         * [EDEADLK] A deadlock was detected.
+         *
+         * The join() function shall not return an error code of [EINTR].
+         */
+        status_t
+        join (void** exit_ptr);
 
-        /// Clear the specified Signal Flags of an active thread.
-        /// @param [in]     thread_id     thread ID obtained by @ref osThreadCreate or @ref osThreadGetId.
-        /// @param [in]     signals       specifies the signal flags of the thread that shall be cleared.
-        /// @return previous signal flags of the specified thread or 0x80000000 in case of incorrect parameters or call from ISR.
-        signals_t
-        clear_signals (signals_t signals);
-
-        void
-        join (void);
-
-        void
+        /**
+         * @brief Detach a thread.
+         *
+         * @details
+         * Indicate to the implementation that storage for the thread
+         * thread can be reclaimed when that thread terminates. If
+         * thread has not terminated, detach() shall not cause it
+         * to terminate. The behaviour is undefined if the value
+         * specified by the thread argument to detach() does not
+         * refer to a joinable thread.
+         *
+         * pthread_detach()
+         * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_detach.html
+         *
+         *
+         * @return if successful, return Return::os_ok; otherwise an
+         * error number is returned.
+         *
+         * The detach() function shall not return an error code of [EINTR].
+         */
+        status_t
         detach (void);
 
-#if defined(TESTING)
+        /**
+         * @brief Terminate thread.
+         *
+         * @details
+         * Terminate the calling thread and make the value value_ptr
+         * available to any successful join with the terminating thread.
+         * Any cancellation cleanup handlers that have been pushed and
+         * not yet popped shall be popped in the reverse order that
+         * they were pushed and then executed. After all cancellation
+         * cleanup handlers have been executed, if the thread has any
+         * thread-specific data, appropriate destructor functions
+         * shall be called in an unspecified order. Thread termination
+         * does not release any application visible process resources,
+         * including, but not limited to, mutexes and file descriptors,
+         * nor does it perform any process-level cleanup actions,
+         * including, but not limited to, calling any atexit() routines
+         * that may exist.
+         * An implicit call to exit() is made when a thread other
+         * than the thread in which main() was first invoked returns
+         * from the start routine that was used to create it.
+         * The function's return value shall serve as the thread's
+         * exit status.
+         * The behaviour of exit() is undefined if called from a
+         * cancellation cleanup handler or destructor function that
+         * was invoked as a result of either an implicit or explicit
+         * call to exit().
+         * After a thread has terminated, the result of access to
+         * local (auto) variables of the thread is undefined.
+         * Thus, references to local variables of the exiting
+         * thread should not be used for the exit() value_ptr
+         * parameter value.
+         *
+         * pthread_exit()
+         * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_exit.html
+         *
+         * @return -
+         */
         void
-        __run_function (void);
+        exit (void* value_ptr);
+
+        /**
+         * @brief Set dynamic scheduling priority.
+         *
+         * @details
+         * Set the scheduling priority for the thread to the value given
+         * by prio.
+         *
+         * pthread_setschedprio()
+         * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_setschedprio.html
+         *
+         * @return if successful, return Return::os_ok; otherwise an
+         * error number is returned.
+         *
+         * [EINVAL]
+         * The value of prio is invalid for the scheduling policy of the
+         * specified thread.
+         * [EPERM]
+         * The caller does not have appropriate privileges to set the
+         * scheduling priority of the specified thread.
+         *
+         * If an implementation detects use of a thread ID after the end
+         * of its lifetime, it is recommended that the function should
+         * fail and report an [ESRCH] error.
+         *
+         * The pthread_setschedprio() function shall not return an error
+         * code of [EINTR].
+         */
+        status_t
+        set_sched_prio (priority_t prio);
+
+        /**
+         * @brief Get the current scheduling priority.
+         *
+         * No POSIX equivalent.
+         */
+        priority_t
+        get_sched_prio (void);
+
+#if 0
+        // ???
+        result_t
+        set_cancel_state (int, int *);
+        result_t
+        set_cancel_type (int, int *);
+
+        result_t
+        get_sched_param (int *, struct sched_param *);
+        result_t
+        set_sched_param (int, const struct sched_param *);
+
+        //void test_cancel(void);
+#endif
+
+        void*
+        get_function_args(void);
+
+#if defined(TESTING)
+          void
+          __run_function (void);
 #endif
 
       protected:
 
-        // Type of unique pointer used to store argument,
-        // possibly with deleter when using bind().
-        using Args_ptr = ::std::unique_ptr<void*, void (*) (void**)>;
+        ::std::size_t stack_size_bytes_;
 
-        template<typename Binding_T>
-          static void
-          run_function_object (const void* binding);
+        void* stack_addr_;
 
-        template<typename Binding_T>
-          static void
-          delete_function_object (const Args_ptr::element_type* func_obj);
+        priority_t prio_;
 
-      protected:
-
-        Priority prio_;
-
-        Thread_func_vp func_ptr_;
-
-        // Empty argument pointer with empty deleter.
-        Args_ptr args_ptr_
-          { nullptr, nullptr };
+        thread_func_vp_t func_ptr_;
+        void* func_args_ptr_;
 
         // Add other internal data
+
       };
 
+#endif
 #pragma GCC diagnostic pop
+
+      // ======================================================================
 
       /// Entry point of a timer call back function.
       typedef void
       (*timer_func_t) (const void* args);
-
-      // ======================================================================
 
       class Timer : public Named_object
       {
@@ -497,13 +764,13 @@ namespace os
         /// @param [in]     timer_id      timer ID obtained by @ref osTimerCreate.
         /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue "Time delay" value of the timer.
         /// @return status code that indicates the execution status of the function.
-        return_t
+        status_t
         start (millis_t millisec);
 
         /// Stop the timer.
         /// @param [in]     timer_id      timer ID obtained by @ref osTimerCreate.
         /// @return status code that indicates the execution status of the function.
-        return_t
+        status_t
         stop (void);
 
       protected:
@@ -538,16 +805,16 @@ namespace os
         /// Wait until a Mutex becomes available.
         /// @param [in]     mutex_id      mutex ID obtained by @ref osMutexCreate.
         /// @return status code that indicates the execution status of the function.
-        return_t
+        status_t
         wait (void);
 
-        return_t
+        status_t
         try_wait (sys_ticks_t ticks = 0);
 
         /// Release a Mutex that was obtained by @ref osMutexWait.
         /// @param [in]     mutex_id      mutex ID obtained by @ref osMutexCreate.
         /// @return status code that indicates the execution status of the function.
-        return_t
+        status_t
         release (void);
 
       protected:
@@ -582,18 +849,18 @@ namespace os
         /// Wait until a Mutex becomes available.
         /// @param [in]     mutex_id      mutex ID obtained by @ref osMutexCreate.
         /// @return status code that indicates the execution status of the function.
-        return_t
+        status_t
         wait (void);
 
         // Normally should not return before ticks expire if ownership
         // is not obtained.
-        return_t
+        status_t
         try_wait (sys_ticks_t ticks = 0);
 
         /// Release a Mutex that was obtained by @ref osMutexWait.
         /// @param [in]     mutex_id      mutex ID obtained by @ref osMutexCreate.
         /// @return status code that indicates the execution status of the function.
-        return_t
+        status_t
         release (void);
 
       protected:
@@ -622,10 +889,10 @@ namespace os
         /// @return status code that indicates the execution status of the function.
         ~Condition_variable ();
 
-        return_t
+        status_t
         notify_one () noexcept;
 
-        return_t
+        status_t
         notify_all () noexcept;
 
       protected:
@@ -669,7 +936,7 @@ namespace os
         /// Release a Semaphore token.
         /// @param [in]     semaphore_id  semaphore object referenced with @ref osSemaphoreCreate.
         /// @return status code that indicates the execution status of the function.
-        return_t
+        status_t
         release (void);
 
       protected:
@@ -716,7 +983,7 @@ namespace os
         void*
         calloc (void);
 
-        return_t
+        status_t
         free (void* block);
 
       protected:
@@ -753,14 +1020,14 @@ namespace os
         /// @param [in]     info          message information.
         /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
         /// @return status code that indicates the execution status of the function.
-        return_t
+        status_t
         put (void* info, millis_t millisec);
 
         /// Get a Message or Wait for a Message from a Queue.
         /// @param [in]     queue_id      message queue ID obtained with @ref osMessageCreate.
         /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
         /// @return event information that includes status code.
-        return_t
+        status_t
         get (millis_t millisec, void** ret);
 
       protected:
@@ -810,28 +1077,27 @@ namespace os
         /// @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
         /// @param [in]     mail          memory block previously allocated with @ref osMailAlloc or @ref osMailCAlloc.
         /// @return status code that indicates the execution status of the function.
-        return_t
+        status_t
         put (void* mail);
 
         /// Get a mail from a queue.
         /// @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
         /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out
         /// @return event that contains mail information or error code.
-        return_t
+        status_t
         get (millis_t millisec, void** ret);
 
         /// Free a memory block from a mail.
         /// @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
         /// @param [in]     mail          pointer to the memory block that was obtained with @ref osMailGet.
         /// @return status code that indicates the execution status of the function.
-        return_t
+        status_t
         free (void* mail);
 
       protected:
 
         // Add internal data
       };
-
 
     } /* namespace rtos */
   } /* namespace cmsis */
@@ -861,34 +1127,35 @@ namespace os
       }
 
       // ======================================================================
+#if 0
 
 #if 0
       inline
       Thread::Thread (const char* name, void* stack,
-                      ::std::size_t stack_size_bytes, Priority prio,
-                      Thread_func_vp function, void* args) :
-          Thread
-            { name, stack, stack_size_bytes, prio, (Thread_func_cvp) function,
-                (const void*) args }
-      {
-        ;
-      }
+          ::std::size_t stack_size_bytes, Priority prio,
+          Thread_func_vp function, void* args) :
+      Thread
+        { name, stack, stack_size_bytes, prio, (Thread_func_cvp) function,
+          (const void*) args}
+        {
+          ;
+        }
 
       inline
       Thread::Thread (const char* name, void* stack,
-                      ::std::size_t stack_size_bytes, Priority prio,
-                      Thread_func_v function) :
-          Thread
-            { name, stack, stack_size_bytes, prio, (Thread_func_cvp) function,
-                (const void*) nullptr }
-      {
-        ;
-      }
+          ::std::size_t stack_size_bytes, Priority prio,
+          Thread_func_v function) :
+      Thread
+        { name, stack, stack_size_bytes, prio, (Thread_func_cvp) function,
+          (const void*) nullptr}
+        {
+          ;
+        }
 #endif
 
       template<typename F_T>
-        void
-        Thread::run_function_object (const void* binding)
+      void
+      Thread::run_function_object (const void* binding)
         {
           using Function_object = F_T;
 
@@ -897,8 +1164,8 @@ namespace os
         }
 
       template<typename F_T>
-        void
-        Thread::delete_function_object (const Args_ptr::element_type* func_obj)
+      void
+      Thread::delete_function_object (const Args_ptr::element_type* func_obj)
         {
           using Function_object = F_T;
 
@@ -912,11 +1179,11 @@ namespace os
         }
 
       template<typename Callable_T, typename ... Args_T>
-        Thread::Thread (const char* name, ::std::size_t stack_size_bytes,
-                        Priority prio, Callable_T&& function, Args_T&&... args) :
-            Thread
-              { name, (void*) nullptr, stack_size_bytes, prio,
-                  (Thread_func_vp) nullptr, (void*) nullptr }
+      Thread::Thread (const char* name, ::std::size_t stack_size_bytes,
+          Priority prio, Callable_T&& function, Args_T&&... args) :
+      Thread
+        { name, (void*) nullptr, stack_size_bytes, prio,
+          (Thread_func_vp) nullptr, (void*) nullptr}
         {
           using Function_object = decltype(::std::bind (::std::forward<Callable_T> (function),
                   ::std::forward<Args_T>(args)...));
@@ -927,7 +1194,7 @@ namespace os
           // template functions.
           Function_object* funct_obj = new Function_object (
               ::std::bind (::std::forward<Callable_T> (function),
-                           ::std::forward<Args_T>(args)...));
+                  ::std::forward<Args_T>(args)...));
 
           // The function to start the thread is a custom proxy that
           // knows how to get the variadic arguments.
@@ -937,11 +1204,26 @@ namespace os
           // and a custom deleter.
           Args_ptr ap
             { (Args_ptr::element_type*) funct_obj,
-                (Args_ptr::deleter_type) &delete_function_object<Function_object> };
+              (Args_ptr::deleter_type) &delete_function_object<Function_object>};
 
           // Move pointer to thread storage.
           args_ptr_ = ::std::move (ap);
         }
+#else
+
+      inline bool
+      Thread::operator == (const Thread& rhs) const
+      {
+        return this == &rhs;
+      }
+
+      inline void*
+      Thread::get_function_args(void)
+      {
+        return func_args_ptr_;
+      }
+
+#endif
 
       // ======================================================================
 

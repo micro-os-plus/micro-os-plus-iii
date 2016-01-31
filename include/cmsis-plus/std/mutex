@@ -386,13 +386,13 @@ namespace os
                   (uint64_t) micros.count ());
             }
 
-          rtos::return_t ret;
+          rtos::status_t ret;
           ret = nm_.try_wait (ticks);
-          if (ret == rtos::Return::os_ok)
+          if (ret == rtos::status::ok)
             {
               return true;
             }
-          else if (ret == rtos::Return::os_error_timeout_resource)
+          else if (ret == rtos::status::error_timeout_resource)
             {
               return false;
             }
@@ -449,13 +449,13 @@ namespace os
                   (uint64_t) micros.count ());
             }
 
-          rtos::return_t ret;
+          rtos::status_t ret;
           ret = nm_.try_wait (ticks);
-          if (ret == rtos::Return::os_ok)
+          if (ret == rtos::status::ok)
             {
               return true;
             }
-          else if (ret == rtos::Return::os_error_timeout_resource)
+          else if (ret == rtos::status::error_timeout_resource)
             {
               return false;
             }

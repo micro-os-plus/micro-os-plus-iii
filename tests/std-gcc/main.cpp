@@ -39,6 +39,9 @@ task2 (const void* args);
 void
 task3 (void* args);
 
+void
+task4 (int n, const char* str);
+
 // ----------------------------------------------------------------------------
 
 void
@@ -57,6 +60,12 @@ void
 task3 (void* args)
 {
   trace::printf ("task3(%p)\n", args);
+}
+
+void
+task4 (int n, const char* str)
+{
+  trace::printf ("task4(%d, %s)\n", n, str);
 }
 
 // ----------------------------------------------------------------------------
@@ -92,15 +101,21 @@ main (int argc, char* argv[])
 
   new int ();
 
+  static uint8_t stack12[300];
+  const rtos::thread_attr_t attr12
+    { "th12", stack12, sizeof(stack12), rtos::priority::normal };
+
   thread th12
-    { new rtos::Thread
-      { "th12", 777, rtos::Priority::normal, task1 } };
+    { &attr12, task1 };
 
   th12.native_handle ()->__run_function ();
 
+  static uint8_t stack13[300];
+   rtos::thread_attr_t attr13
+    { "th13", stack13, sizeof(stack13), rtos::priority::normal };
+
   thread th13
-    { new rtos::Thread
-      { (char*) "th13", 777, rtos::Priority::normal, task1 } };
+    { &attr13, task1 };
 
   th13.native_handle ()->__run_function ();
 
@@ -116,6 +131,17 @@ main (int argc, char* argv[])
 
   th31.native_handle ()->__run_function ();
 
+  thread th41
+    { task4, 7, "xyz" };
+
+  th41.native_handle ()->__run_function ();
+
+#if 0
+  // Fails, nullptr is not matched with attributes
+  thread th51
+    { nullptr, task4, 7, "xyz" };
+#endif
+
   this_thread::sleep_for (microseconds (3001001));
   this_thread::sleep_for (milliseconds (3001));
   this_thread::sleep_for (seconds (3));
@@ -125,13 +151,15 @@ main (int argc, char* argv[])
   this_thread::sleep_for (milliseconds (n));
 #endif
 
-  th11.native_handle ()->set_priority (rtos::Priority::high);
+  //th11.native_handle ()->set_priority (rtos::Priority::high);
 
   th11.join ();
   th12.join ();
   th13.join ();
   th21.join ();
   th31.join ();
+  th41.join ();
+
 #endif
 
   trace::printf ("%s done.\n", argv[0]);

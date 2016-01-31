@@ -53,51 +53,66 @@ namespace os
       {
       public:
 
-        class id;
-
         using native_handle_type = os::cmsis::rtos::Thread*;
+
+        class id
+        {
+        public:
+          id () noexcept;
+
+          explicit
+          id (native_handle_type system_thread) noexcept;
+
+          ~id ();
+
+        private:
+
+          friend class thread;
+#if 0
+          friend class hash<thread::id>;
+#endif
+
+          // The id is actually a pointer to the system thread.
+          native_handle_type system_thread_;
+
+          // Only two of them, the other 4 are defined in terms of these.
+          friend bool
+          operator== (thread::id x, thread::id y) noexcept;
+
+          friend bool
+          operator< (thread::id x, thread::id y) noexcept;
+        };
 
         thread () noexcept = default;
 
-        template<typename Callable_T, typename ... Args_T>
+        template<
+            typename Callable_T, //
+            typename = typename ::std::enable_if<
+                !::std::is_same<Callable_T, ::std::nullptr_t>::value>::type,
+            typename ... Args_T>
           explicit
           thread (Callable_T&& f, Args_T&&... args);
 
         // CMSIS RTOS specific constructors (extension to the ISO standard),
-        // used to create threads with name and custom stack.
+        // used to create threads with POSIX custom attributes.
 
-        thread (native_handle_type native) noexcept;
+        template<
+            typename Attr_T, //
+            typename = typename ::std::enable_if<
+                ::std::is_same<Attr_T, os::cmsis::rtos::thread_attr_t>::value
+                    || ::std::is_same<Attr_T, ::std::nullptr_t>::value>::type,
+            typename Callable_T, typename ... Args_T>
+          explicit
+          thread (Attr_T* attr, Callable_T&& f, Args_T&&... args);
 
-#if 0
-        // This is a very generic template, intentionally not implemented
-        // as is, but only for "const char*" & "size_t".
-        template<typename N_T,//
-        //typename ::std::enable_if<::std::is_same<N_T, const char>::value>::type, //
-        //typename ::std::enable_if<::std::is_same<void, const char>::value>::type, //
-        //typename ::std::enable_if<true>::type* = nullptr, // ok
-        // typename ::std::enable_if<::std::is_same<void, void>::value>::type* = nullptr, // ok
-        //typename ::std::enable_if<::std::is_same<N_T, const char>::value>::type* = nullptr, // ok
-        typename ::std::enable_if<::std::is_same<N_T, char>::value>::type* =
-        nullptr,// ok
-//            typename ::std::enable_if<
-//                ::std::is_same<::std::remove_const<N_T>::type, char>::value>::type* =
-//                nullptr, // not ok
-        typename SZ_T,//
-        typename Callable_T, typename ... Args_T>
-        explicit
-        thread (N_T* name, SZ_T stack_size_bytes, Callable_T&& f,
-            Args_T&&... args)
-          {
-            os::cmsis::trace::printf ("%s(\"%s\", %d) @%p \n", __func__, name,
-                stack_size_bytes, this);
-            id_ = id
-              { new os::cmsis::rtos::Thread (name,
-                    (::std::size_t) stack_size_bytes,
-                    os::cmsis::rtos::Priority::normal,
-                    ::std::forward<Callable_T> (f),
-                    ::std::forward<Args_T>(args)...)};
-          }
-#endif
+        template<
+            typename Attr_T, //
+            typename = typename ::std::enable_if<
+                ::std::is_same<Attr_T, os::cmsis::rtos::thread_attr_t>::value
+                    || ::std::is_same<Attr_T, ::std::nullptr_t>::value>::type,
+            typename Callable_T, typename ... Args_T>
+          explicit
+          thread (const Attr_T* attr, Callable_T&& f, Args_T&&... args);
 
         ~thread ();
 
@@ -132,41 +147,28 @@ namespace os
         static unsigned
         hardware_concurrency () noexcept;
 
-        class id
-        {
-        public:
-          id () noexcept;
-
-          explicit
-          id (native_handle_type system_thread) noexcept;
-
-          ~id ();
-
-        private:
-
-          friend class thread;
-#if 0
-          friend class hash<thread::id>;
-#endif
-
-          // The id is actually a pointer to the system thread.
-          native_handle_type system_thread_;
-
-          // Only two of them, the other 4 are defined in terms of these.
-          friend bool
-          operator== (thread::id x, thread::id y) noexcept;
-
-          friend bool
-          operator< (thread::id x, thread::id y) noexcept;
-        };
-
       private:
 
+        template<typename F_T>
+          static void
+          run_function_object (const void* func_object);
+
+        template<typename F_T>
+          static void
+          delete_function_object (const void* func_obj);
+
+        void
+        delete_system_thread (void);
+
         // The current implementation creates lots of temporary id() objects
-        // and copies them here. Probably a better strategy would be to
-        // move them, this would allow the use of a smart pointer to
-        // automatically delete the system thread.
+        // and copies (moves?) them here.
         id id_;
+
+        using function_object_deleter_t = void (*) (void*);
+        function_object_deleter_t function_object_deleter_ = nullptr;
+
+      public:
+
       };
 
       // ======================================================================
@@ -272,63 +274,7 @@ namespace os
         return !(x < y);
       }
 
-      // ----------------------------------------------------------------------
-
-      inline thread::id
-      thread::get_id () const noexcept
-      {
-        return id_;
-      }
-
-      inline thread::native_handle_type
-      thread::native_handle ()
-      {
-        return id_.system_thread_;
-      }
-
-      inline unsigned
-      thread::hardware_concurrency () noexcept
-      {
-        return 1;
-      }
-
-      template<typename Callable_T, typename ... Args_T>
-        thread::thread (Callable_T&& f, Args_T&&... args)
-        {
-          os::cmsis::trace::printf ("%s() @%p\n", __func__, this);
-          id_ = id
-            { new os::cmsis::rtos::Thread (nullptr, 0,
-                                           os::cmsis::rtos::Priority::normal,
-                                           ::std::forward<Callable_T> (f),
-                                           ::std::forward<Args_T>(args)...) };
-        }
-
-      inline
-      thread::thread (native_handle_type native) noexcept
-      {
-        id_ = id
-          { native };
-      }
-
-#if 0
-      // Implement only a specialised version of this template.
-      template<typename N_T /*= char */, typename SZ_T /*= ::std::size_t*/,
-      typename Callable_T, typename ... Args_T>
-      thread::thread (N_T* name, SZ_T stack_size_bytes, Callable_T&& f,
-          Args_T&&... args)
-        {
-          os::cmsis::trace::printf ("%s(\"%s\", %d) @%p \n", __func__, name,
-              stack_size_bytes, this);
-          id_ = id
-            { new os::cmsis::rtos::Thread (name,
-                  (::std::size_t) stack_size_bytes,
-                  os::cmsis::rtos::Priority::normal,
-                  ::std::forward<Callable_T> (f),
-                  ::std::forward<Args_T>(args)...)};
-        }
-#endif
-
-      // ----------------------------------------------------------------------
+      // ======================================================================
 
       inline
       thread::id::id () noexcept :
@@ -351,6 +297,104 @@ namespace os
       }
 
       // ----------------------------------------------------------------------
+
+      inline thread::id
+      thread::get_id () const noexcept
+      {
+        return id_;
+      }
+
+      inline thread::native_handle_type
+      thread::native_handle ()
+      {
+        return id_.system_thread_;
+      }
+
+      inline unsigned
+      thread::hardware_concurrency () noexcept
+      {
+        return 1;
+      }
+
+      template<typename F_T>
+        void
+        thread::run_function_object (const void* func_obj)
+        {
+          using Function_object = F_T;
+
+          Function_object* f = (Function_object*) func_obj;
+          (*f) ();
+        }
+
+      template<typename F_T>
+        void
+        thread::delete_function_object (const void* func_obj)
+        {
+          using Function_object = F_T;
+
+          Function_object* f = (Function_object*) func_obj;
+
+          os::cmsis::trace::printf ("%s\n", __PRETTY_FUNCTION__);
+
+          // The delete now has the knowledge required to
+          // correctly delete the object (i.e. the object size).
+          delete f;
+        }
+
+      template<typename Callable_T, typename T, typename ... Args_T>
+        thread::thread (Callable_T&& f, Args_T&&... args) :
+            thread ((os::cmsis::rtos::thread_attr_t*) nullptr,
+                    ::std::forward<Callable_T> (f),
+                    ::std::forward<Args_T>(args)...)
+        {
+          ;
+        }
+
+      template<typename Attr_T, typename T, typename Callable_T,
+          typename ... Args_T>
+        thread::thread (const Attr_T* attr, Callable_T&& f, Args_T&&... args) :
+            thread ((Attr_T*) attr, ::std::forward<Callable_T> (f),
+                    ::std::forward<Args_T>(args)...)
+        {
+          ;
+        }
+
+      template<typename Attr_T, typename T, typename Callable_T,
+          typename ... Args_T>
+
+        thread::thread (Attr_T* attr, Callable_T&& f, Args_T&&... args)
+        {
+          // static_assert(::std::is_same<Attr_T, os::cmsis::rtos::thread_attr_t>::value, "first param must be thread_attr_t*");
+
+          os::cmsis::trace::printf ("%s(%p) @%p\n", __func__, attr, this);
+
+          using Function_object = decltype(::std::bind (::std::forward<Callable_T> (f),
+                  ::std::forward<Args_T>(args)...));
+
+          // Dynamic allocation! The size depends on the number of arguments.
+          // This creates a small problem, since both running the function
+          // and deleting the object requires the type. It is passes as
+          // template functions.
+          Function_object* funct_obj = new Function_object (
+              ::std::bind (::std::forward<Callable_T> (f),
+                           ::std::forward<Args_T>(args)...));
+
+          // The function to start the thread is a custom proxy that
+          // knows how to get the variadic arguments.
+          id_ = id
+            { new os::cmsis::rtos::Thread (
+                attr,
+                (os::cmsis::rtos::thread_func_vp_t) &run_function_object<
+                    Function_object>,
+                (void*) funct_obj) };
+
+          // The deleter, to be used during destruction.
+          function_object_deleter_ =
+              (function_object_deleter_t) &delete_function_object<
+                  Function_object>;
+        }
+
+      // ======================================================================
 
       namespace this_thread
       {
@@ -384,7 +428,7 @@ namespace os
 
             if (rel_time > duration<Rep_T, Period_T>::zero ())
               {
-                microseconds micros = microseconds::zero();
+                microseconds micros = microseconds::zero ();
                 if (rel_time < microseconds::max ())
                   {
                     micros = duration_cast<microseconds> (rel_time);
