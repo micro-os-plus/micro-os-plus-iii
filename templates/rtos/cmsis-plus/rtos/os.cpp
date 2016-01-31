@@ -201,6 +201,25 @@ namespace os
 
       // ======================================================================
 
+      /**
+       * @details
+       * Create a new thread, with attributes specified by attr.
+       * If attr is NULL, the default attributes shall be used.
+       * If the attributes specified by attr are modified later,
+       * the thread's attributes shall not be affected.
+       *
+       * The thread is created executing function with args as its
+       * sole argument. If the start_routine returns, the effect
+       * shall be as if there was an implicit call to exit() using
+       * the return value of function as the exit status. Note that
+       * the thread in which main() was originally invoked differs
+       * from this. When it returns from main(), the effect shall
+       * be as if there was an implicit call to exit() using the
+       * return value of main() as the exit status.
+       *
+       * Compatible with pthread_create().
+       * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html
+       */
       Thread::Thread (const thread_attr_t* attr, thread_func_t function,
                       void* args) :
           Named_object (attr != nullptr ? attr->name : nullptr)
@@ -241,12 +260,23 @@ namespace os
         trace::printf ("%s() @%p \n", __func__, this);
       }
 
+      /**
+       *
+       */
       priority_t
       Thread::get_sched_prio (void)
       {
         return prio_;
       }
 
+      /**
+       * @details
+       * Set the scheduling priority for the thread to the value given
+       * by prio.
+       *
+       * pthread_setschedprio()
+       * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_setschedprio.html
+       */
       status_t
       Thread::set_sched_prio (priority_t prio)
       {
@@ -254,6 +284,24 @@ namespace os
         return status::ok;
       }
 
+      /**
+       * @details
+       *
+       * Suspend execution of the calling thread until the target thread
+       * terminates, unless the target thread has already terminated.
+       * On return from a successful join() call with a non-NULL
+       * exit_ptr argument, the value passed to exit() by the
+       * terminating thread shall be made available in the location
+       * referenced by exit_ptr. When a join() returns successfully,
+       * the target thread has been terminated. The results of
+       * multiple simultaneous calls to join() specifying the
+       * same target thread are undefined. If the thread calling
+       * join() is cancelled, then the target thread shall not be
+       * detached.
+       *
+       * pthread_join()
+       * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_join.html
+       */
       status_t
       Thread::join (void** exit_ptr)
       {
@@ -261,11 +309,81 @@ namespace os
         return status::ok;
       }
 
+      /**
+       * @details
+       * Indicate to the implementation that storage for the thread
+       * thread can be reclaimed when that thread terminates. If
+       * thread has not terminated, detach() shall not cause it
+       * to terminate. The behaviour is undefined if the value
+       * specified by the thread argument to detach() does not
+       * refer to a joinable thread.
+       *
+       * pthread_detach()
+       * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_detach.html
+       */
       status_t
       Thread::detach (void)
       {
         // TODO
         return status::ok;
+      }
+
+      /**
+       * @details
+       * pthread_cancel()
+       * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cancel.html
+       *
+       *
+       * The cancel() function shall not return an error code of [EINTR].
+       * If an implementation detects use of a thread ID after the end
+       * of its lifetime, it is recommended that the function should
+       * fail and report an [ESRCH] error.
+       * error number is returned.
+       */
+      status_t
+      Thread::cancel (void)
+      {
+        // TODO
+        return status::ok;
+      }
+
+      /**
+       * @details
+       * Terminate the calling thread and make the value value_ptr
+       * available to any successful join with the terminating thread.
+       * Any cancellation cleanup handlers that have been pushed and
+       * not yet popped shall be popped in the reverse order that
+       * they were pushed and then executed. After all cancellation
+       * cleanup handlers have been executed, if the thread has any
+       * thread-specific data, appropriate destructor functions
+       * shall be called in an unspecified order. Thread termination
+       * does not release any application visible process resources,
+       * including, but not limited to, mutexes and file descriptors,
+       * nor does it perform any process-level cleanup actions,
+       * including, but not limited to, calling any atexit() routines
+       * that may exist.
+       * An implicit call to exit() is made when a thread other
+       * than the thread in which main() was first invoked returns
+       * from the start routine that was used to create it.
+       * The function's return value shall serve as the thread's
+       * exit status.
+       * The behaviour of exit() is undefined if called from a
+       * cancellation cleanup handler or destructor function that
+       * was invoked as a result of either an implicit or explicit
+       * call to exit().
+       * After a thread has terminated, the result of access to
+       * local (auto) variables of the thread is undefined.
+       * Thus, references to local variables of the exiting
+       * thread should not be used for the exit() value_ptr
+       * parameter value.
+       *
+       * pthread_exit()
+       * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_exit.html
+       */
+      void
+      Thread::exit (void* value_ptr)
+      {
+        // TODO
       }
 
 #if defined(TESTING)
