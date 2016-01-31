@@ -89,7 +89,7 @@ osThreadId
 osThreadCreate (const osThreadDef_t *thread_def, void *args)
 {
   return reinterpret_cast<osThreadId> (new (thread_def->data) Thread (
-      (thread_attr_t*) nullptr, (thread_func_vp_t) thread_def->pthread, args));
+      (thread_attr_t*) nullptr, (thread_func_t) thread_def->pthread, args));
 }
 
 #if 1
@@ -98,7 +98,7 @@ osThreadCreateEx (osThread* addr, const osThreadAttr* attr, os_pthread function,
                   const void* args)
 {
   return reinterpret_cast<osThreadId> (new (addr) Thread (
-      (thread_attr_t*) attr, (thread_func_vp_t) function, (void*) args));
+      (thread_attr_t*) attr, (thread_func_t) function, (void*) args));
 }
 #endif
 

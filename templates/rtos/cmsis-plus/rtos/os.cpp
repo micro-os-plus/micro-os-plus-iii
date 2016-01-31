@@ -140,7 +140,7 @@ namespace os
       }
 
       Thread no_thread
-        { nullptr, (thread_func_vp_t) no_thread_func, nullptr };
+        { nullptr, (thread_func_t) no_thread_func, nullptr };
 
       namespace thread
       {
@@ -201,7 +201,7 @@ namespace os
 
       // ======================================================================
 
-      Thread::Thread (const thread_attr_t* attr, thread_func_vp_t function,
+      Thread::Thread (const thread_attr_t* attr, thread_func_t function,
                       void* args) :
           Named_object (attr != nullptr ? attr->name : nullptr)
       {
@@ -229,8 +229,8 @@ namespace os
             // TODO: alloc default stack size
           }
 
-        func_ptr_ = function;
-        func_args_ptr_ = args;
+        func_ = function;
+        func_args_ = args;
 
         trace::printf ("%s(\"%s\", %d) @%p \n", __func__, get_name (),
                        stack_size_bytes_, this);
@@ -272,8 +272,8 @@ namespace os
       void
       Thread::__run_function (void)
       {
-        assert(func_ptr_ != nullptr);
-        func_ptr_ (func_args_ptr_);
+        assert(func_ != nullptr);
+        func_ (func_args_);
       }
 #endif
 

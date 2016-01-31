@@ -384,7 +384,7 @@ namespace os
           id_ = id
             { new os::cmsis::rtos::Thread (
                 attr,
-                (os::cmsis::rtos::thread_func_vp_t) &run_function_object<
+                (os::cmsis::rtos::thread_func_t) &run_function_object<
                     Function_object>,
                 (void*) funct_obj) };
 

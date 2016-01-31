@@ -352,7 +352,7 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
-      using thread_func_vp_t = void* (*) (void* args);
+      using thread_func_t = void* (*) (void* args);
 
       using thread_attr_t = struct thread_attr_s
         {
@@ -387,8 +387,7 @@ namespace os
          * Compatible with pthread_create().
          * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html
          */
-        Thread (const thread_attr_t* attr, thread_func_vp_t function,
-                void* args);
+        Thread (const thread_attr_t* attr, thread_func_t function, void* args);
 
         // Prevent any copy or move.
         Thread (const Thread&) = delete;
@@ -594,8 +593,8 @@ namespace os
 
         priority_t prio_;
 
-        thread_func_vp_t func_ptr_;
-        void* func_args_ptr_;
+        thread_func_t func_;
+        void* func_args_;
 
         // Add other internal data
 
@@ -1011,7 +1010,7 @@ namespace os
       inline void*
       Thread::get_function_args (void)
       {
-        return func_args_ptr_;
+        return func_args_;
       }
 
       // ======================================================================
