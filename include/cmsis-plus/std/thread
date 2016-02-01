@@ -99,7 +99,7 @@ namespace os
         template<
             typename Attr_T, //
             typename = typename ::std::enable_if<
-                ::std::is_same<Attr_T, os::cmsis::rtos::thread_attr_t>::value
+                ::std::is_same<Attr_T, os::cmsis::rtos::thread::attr_t>::value
                     || ::std::is_same<Attr_T, ::std::nullptr_t>::value>::type,
             typename Callable_T, typename ... Args_T>
           explicit
@@ -108,7 +108,7 @@ namespace os
         template<
             typename Attr_T, //
             typename = typename ::std::enable_if<
-                ::std::is_same<Attr_T, os::cmsis::rtos::thread_attr_t>::value
+                ::std::is_same<Attr_T, os::cmsis::rtos::thread::attr_t>::value
                     || ::std::is_same<Attr_T, ::std::nullptr_t>::value>::type,
             typename Callable_T, typename ... Args_T>
           explicit
@@ -343,7 +343,7 @@ namespace os
 
       template<typename Callable_T, typename T, typename ... Args_T>
         thread::thread (Callable_T&& f, Args_T&&... args) :
-            thread ((os::cmsis::rtos::thread_attr_t*) nullptr,
+            thread ((os::cmsis::rtos::thread::attr_t*) nullptr,
                     ::std::forward<Callable_T> (f),
                     ::std::forward<Args_T>(args)...)
         {
@@ -364,7 +364,7 @@ namespace os
 
         thread::thread (Attr_T* attr, Callable_T&& f, Args_T&&... args)
         {
-          // static_assert(::std::is_same<Attr_T, os::cmsis::rtos::thread_attr_t>::value, "first param must be thread_attr_t*");
+          // static_assert(::std::is_same<Attr_T, os::cmsis::rtos::thread::attr_t>::value, "first param must be thread_attr_t*");
 
           os::cmsis::trace::printf ("%s(%p) @%p\n", __func__, attr, this);
 
@@ -384,7 +384,7 @@ namespace os
           id_ = id
             { new os::cmsis::rtos::Thread (
                 attr,
-                (os::cmsis::rtos::thread_func_t) &run_function_object<
+                (os::cmsis::rtos::thread::func_t) &run_function_object<
                     Function_object>,
                 (void*) funct_obj) };
 

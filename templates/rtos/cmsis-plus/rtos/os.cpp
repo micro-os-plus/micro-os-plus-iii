@@ -140,7 +140,7 @@ namespace os
       }
 
       Thread no_thread
-        { nullptr, (thread_func_t) no_thread_func, nullptr };
+        { nullptr, (thread::func_t) no_thread_func, nullptr };
 
       namespace thread
       {
@@ -203,6 +203,7 @@ namespace os
 
       /**
        * @details
+       *
        * Create a new thread, with attributes specified by attr.
        * If attr is NULL, the default attributes shall be used.
        * If the attributes specified by attr are modified later,
@@ -220,7 +221,7 @@ namespace os
        * Compatible with pthread_create().
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html
        */
-      Thread::Thread (const thread_attr_t* attr, thread_func_t function,
+      Thread::Thread (const thread::attr_t* attr, thread::func_t function,
                       void* args) :
           Named_object (attr != nullptr ? attr->name : nullptr)
       {
@@ -238,7 +239,7 @@ namespace os
         else
           {
             // Default attributes.
-            prio_ = priority::normal;
+            prio_ = thread::priority::normal;
             stack_size_bytes_ = 0;
             stack_addr_ = nullptr;
           }
@@ -263,7 +264,7 @@ namespace os
       /**
        *
        */
-      priority_t
+      thread::priority_t
       Thread::get_sched_prio (void)
       {
         return prio_;
@@ -276,9 +277,10 @@ namespace os
        *
        * pthread_setschedprio()
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_setschedprio.html
+       *
        */
       status_t
-      Thread::set_sched_prio (priority_t prio)
+      Thread::set_sched_prio (thread::priority_t prio)
       {
         prio_ = prio;
         return status::ok;
@@ -286,7 +288,6 @@ namespace os
 
       /**
        * @details
-       *
        * Suspend execution of the calling thread until the target thread
        * terminates, unless the target thread has already terminated.
        * On return from a successful join() call with a non-NULL
@@ -301,6 +302,8 @@ namespace os
        *
        * pthread_join()
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_join.html
+       *
+       * @note Cannot be called from Interrupt Service Routines.
        */
       status_t
       Thread::join (void** exit_ptr)
@@ -320,6 +323,8 @@ namespace os
        *
        * pthread_detach()
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_detach.html
+       *
+       * @note Cannot be called from Interrupt Service Routines.
        */
       status_t
       Thread::detach (void)
@@ -339,6 +344,8 @@ namespace os
        * of its lifetime, it is recommended that the function should
        * fail and report an [ESRCH] error.
        * error number is returned.
+       *
+       * @note Cannot be called from Interrupt Service Routines.
        */
       status_t
       Thread::cancel (void)
@@ -379,6 +386,8 @@ namespace os
        *
        * pthread_exit()
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_exit.html
+       *
+       * @note Cannot be called from Interrupt Service Routines.
        */
       void
       Thread::exit (void* value_ptr)
@@ -397,8 +406,8 @@ namespace os
 
       // ======================================================================
 
-      Timer::Timer (const char* name, timer_func_t function, timer_type_t type,
-                    void* args) : //
+      Timer::Timer (const char* name, timer::func_t function,
+                    timer::type_t type, void* args) : //
           Named_object (name)
       {
         // TODO
@@ -425,10 +434,41 @@ namespace os
 
       // ======================================================================
 
-      Mutex::Mutex (const char* name) :
-          Named_object (name)
+      namespace mutex
+      {
+        const attr_t normal_initializer
+          {
+          //
+              nullptr,//
+              thread::priority::max, //
+              protocol::none, //
+              robustness::stalled, //
+              type::normal //
+          };
+        const attr_t recursive_initializer
+          {
+          //
+              nullptr,//
+              thread::priority::max, //
+              protocol::none, //
+              robustness::stalled, //
+              type::recursive //
+          };
+      }
+
+      Mutex::Mutex (const mutex::attr_t* attr) :
+          Named_object (attr != nullptr ? attr->name : nullptr)
       {
         // TODO
+        if (attr == nullptr)
+          {
+            attr = &mutex::normal_initializer;
+          }
+
+        prio_ceiling_ = attr->priority_ceiling;
+        protocol_ = attr->protocol;
+        robustness_ = attr->robustness;
+        type_ = attr->type;
       }
 
       Mutex::~Mutex ()
@@ -436,20 +476,181 @@ namespace os
         // TODO
       }
 
+      /**
+       * @details
+       * If the mutex is free, lock it. If the mutex is already
+       * locked by another thread, the calling thread shall block
+       * until the mutex becomes available. This operation shall
+       * return with the mutex object referenced by mutex in the
+       * locked state with the calling thread as its owner. If a
+       * thread attempts to relock a mutex that it has already
+       * locked, Mutex::lock() shall behave as described in the
+       * **Relock** column of the following table. If a thread
+       * attempts to unlock a mutex that it has not locked or a
+       * mutex which is unlocked, Mutex::unlock() shall behave as
+       * described in the **Unlock When Not Owner** column of the
+       * following table.
+       *
+       * TODO: add table
+       *
+       * Where the table indicates recursive behavior, the mutex
+       * shall maintain the concept of a lock count. When a thread
+       * successfully acquires a mutex for the first time, the
+       * lock count shall be set to one. Every time a thread
+       * relocks this mutex, the lock count shall be incremented
+       * by one. Each time the thread unlocks the mutex, the
+       * lock count shall be decremented by one. When the lock
+       * count reaches zero, the mutex shall become available
+       * for other threads to acquire.
+       *
+       * pthread_mutex_lock()
+       * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_lock.html
+       *
+       * @note Cannot be called from Interrupt Service Routines.
+       */
       status_t
-      Mutex::wait (void)
+      Mutex::lock (void)
       {
         return status::ok;
       }
 
+      /**
+       * @details
+       * Try to lock the mutex as Mutex::lock(), except that if the
+       * mutex object referenced by mutex is currently locked (by
+       * any thread, including the current thread), the call shall
+       * return immediately. If the mutex type is PTHREAD_MUTEX_RECURSIVE
+       * and the mutex is currently owned by the calling thread,
+       * the mutex lock count shall be incremented by one and the
+       * Mutex::trylock() function shall immediately return success.
+       *
+       * If _mutex_ is a robust mutex and the process containing
+       * the owning thread terminated while holding the mutex lock,
+       * a call to Mutex::lock() shall return the error value
+       * [EOWNERDEAD]. If _mutex_ is a robust mutex and the owning
+       * thread terminated while holding the mutex lock, a call
+       * to Mutex::lock() may return the error value [EOWNERDEAD]
+       * even if the process in which the owning thread resides
+       * has not terminated. In these cases, the mutex is locked
+       * by the thread but the state it protects is marked as
+       * inconsistent. The application should ensure that the
+       * state is made consistent for reuse and when that is
+       * complete call Mutex::consistent(). If the application
+       * is unable to recover the state, it should unlock the
+       * mutex without a prior call to Mutex::consistent(), after
+       * which the mutex is marked permanently unusable.
+       *
+       * pthread_mutex_trylock()
+       * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_lock.html
+       *
+       * @note Cannot be called from Interrupt Service Routines.
+       */
       status_t
-      Mutex::try_wait (sys_ticks_t ticks)
+      Mutex::try_lock (void)
       {
         return status::ok;
       }
 
+      /**
+       * @details
+       * Try to lock the mutex object referenced by mutex. If the mutex
+       * is already locked, the calling thread shall block until the
+       * mutex becomes available as in the Mutex::lock() function. If the
+       * mutex cannot be locked without waiting for another thread to
+       * unlock the mutex, this wait shall be terminated when the specified
+       * timeout expires.
+       *
+       * The timeout shall expire after the given number of system ticks.
+       *
+       * Under no circumstance shall the function fail with a timeout
+       * if the mutex can be locked immediately.
+       *
+       * As a consequence of the priority inheritance rules (for
+       * mutexes initialized with the PRIO_INHERIT protocol),
+       * if a timed mutex wait is terminated because its timeout
+       * expires, the priority of the owner of the mutex shall be
+       * adjusted as necessary to reflect the fact that this thread
+       * is no longer among the threads waiting for the mutex.
+       *
+       * pthread_mutex_timedlock()
+       * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_timedlock.html
+       *
+       * Differences from the standard:
+       * - the timeout is not expressed as an absolute time point, but
+       * as a relative number of system ticks.
+       *
+       * @note Cannot be called from Interrupt Service Routines.
+       */
       status_t
-      Mutex::release (void)
+      Mutex::timed_lock (sys_ticks_t ticks)
+      {
+        return status::ok;
+      }
+
+      /**
+       * @details
+       * Release the mutex object referenced by _mutex_. The manner
+       * in which a mutex is released is dependent upon the mutex's
+       * type attribute. If there are threads blocked on the mutex
+       * object referenced by mutex when Mutex::unlock() is called,
+       * resulting in the mutex becoming available, the scheduling
+       * policy shall determine which thread shall acquire the mutex.
+       *
+       * (In the case of PTHREAD_MUTEX_RECURSIVE mutexes, the mutex
+       * shall become available when the count reaches zero and the
+       * calling thread no longer has any locks on this mutex.)
+       *
+       * pthread_mutex_unlock()
+       * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_lock.html
+       *
+       * @note Cannot be called from Interrupt Service Routines.
+       */
+      status_t
+      Mutex::unlock (void)
+      {
+        return status::ok;
+      }
+
+      /**
+       * @details
+       * Return the current priority ceiling of the mutex.
+       *
+       * pthread_mutex_getprioceiling()
+       * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_getprioceiling.html
+       *
+       * @note Cannot be called from Interrupt Service Routines.
+       */
+      status_t
+      Mutex::get_prio_ceiling (thread::priority_t* prio_ceiling)
+      {
+        if (prio_ceiling != nullptr)
+          {
+            *prio_ceiling = prio_ceiling_;
+          }
+        return status::ok;
+      }
+
+      /**
+       * @details
+       * Attempt to lock the mutex as if by a call to Mutex::lock(),
+       * except that the process of locking the mutex need not adhere
+       * to the priority protect protocol. On acquiring the mutex
+       * it shall change the mutex's priority ceiling and then
+       * release the mutex as if by a call to Mutex::unlock().
+       * When the change is successful, the previous value of
+       * the priority ceiling shall be returned in old_ceiling.
+       *
+       * If Mutex::set_prio_ceiling() function fails, the mutex
+       * priority ceiling shall not be changed.
+       *
+       * pthread_mutex_setprioceiling()
+       * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_getprioceiling.html
+       *
+       * @note Cannot be called from Interrupt Service Routines.
+       */
+      status_t
+      Mutex::set_prio_ceiling (thread::priority_t prio_ceiling,
+                               thread::priority_t* old_prio_ceiling)
       {
         return status::ok;
       }

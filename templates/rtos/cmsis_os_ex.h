@@ -75,7 +75,7 @@ extern "C"
   // ===== Mutex Management =====
 
   osMutexId
-  osMutexCreateEx (osMutex* addr, const char* name);
+  osMutexCreateEx (osMutex* addr, const osMutexAttr* attr);
 
 // ===== Semaphore Management Functions =====
 

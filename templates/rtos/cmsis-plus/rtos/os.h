@@ -109,38 +109,7 @@ namespace os
 
       // ----------------------------------------------------------------------
 
-      using priority_t = int8_t;
-
-      /// Priorities used for thread control.
-      // Explicit namespace preferred over scoped enum,
-      // otherwise too many casts are required.
-      namespace priority
-      {
-        enum
-          : priority_t
-            {
-              //
-          idle = -30, ///< priority: idle (lowest)
-          low = -20, ///< priority: low
-          below_normal = -10, ///< priority: below normal
-          normal = 0, ///< priority: normal (default)
-          above_normal = +10, ///< priority: above normal
-          high = +20, ///< priority: high
-          realtime = +30 ///< priority: realtime (highest)
-        // error = 0x84 ///< system cannot determine priority or thread has illegal priority
-        };
-      } /* namespace priority */
-
       // ----------------------------------------------------------------------
-
-      /// Timer type value for the timer definition.
-      enum class timer_type_t
-        : uint32_t
-          {
-            //
-        once = 0, //
-        periodic = 1 //
-      };
 
       using millis_t = uint32_t;
       using sys_ticks_t = uint32_t;
@@ -319,10 +288,6 @@ namespace os
 
       }
 
-      /// Entry point of a thread.
-      typedef void
-      (*Thread_func_vp) (void* args);
-
       // ======================================================================
 
       class Named_object
@@ -349,18 +314,49 @@ namespace os
 
       // ======================================================================
 
+      namespace thread
+      {
+        using priority_t = int8_t;
+
+        /// Priorities used for thread control.
+        // Explicit namespace preferred over scoped enum,
+        // otherwise too many casts are required.
+        namespace priority
+        {
+          enum
+            : priority_t
+              {
+                //
+            idle = -30, ///< priority: idle (lowest)
+            low = -20, ///< priority: low
+            below_normal = -10, ///< priority: below normal
+            normal = 0, ///< priority: normal (default)
+            above_normal = +10, ///< priority: above normal
+            high = +20, ///< priority: high
+            realtime = +30, ///< priority: realtime (highest)
+            // error = 0x84 ///< system cannot determine priority or thread has illegal priority
+            max = 0x7F
+          };
+        } /* namespace priority */
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
-      using thread_func_t = void* (*) (void* args);
+        using attr_t = struct attr_s
+          {
+            const char* name;
+            void* stack_addr;
+            ::std::size_t stack_size_bytes;
+            priority_t priority;
+          };
 
-      using thread_attr_t = struct thread_attr_s
-        {
-          const char* name;
-          void* stack_addr;
-          ::std::size_t stack_size_bytes;
-          priority_t priority;
-        };
+#pragma GCC diagnostic pop
+
+        using func_t = void* (*) (void* args);
+      }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
 
       class Thread : public Named_object
       {
@@ -369,7 +365,8 @@ namespace os
         /**
          * @brief Create a new thread.
          */
-        Thread (const thread_attr_t* attr, thread_func_t function, void* args);
+        Thread (const thread::attr_t* attr, thread::func_t function,
+                void* args);
 
         // Prevent any copy or move.
         Thread (const Thread&) = delete;
@@ -392,7 +389,7 @@ namespace os
         /**
          * @brief Cancel thread execution.
          *
-         * @return if successful, return Return::os_ok; otherwise an
+         * @return if successful, return status::ok; otherwise an
          * error number is returned.
          */
         status_t
@@ -401,7 +398,7 @@ namespace os
         /**
          * @brief Wait for thread termination.
          *
-         * @return if successful, return Return::os_ok; otherwise an
+         * @return if successful, return status::ok; otherwise an
          * error number is returned.
          *
          * The join() function may fail if:
@@ -415,7 +412,7 @@ namespace os
         /**
          * @brief Detach a thread.
          *
-         * @return if successful, return Return::os_ok; otherwise an
+         * @return if successful, return status::ok; otherwise an
          * error number is returned.
          *
          * The detach() function shall not return an error code of [EINTR].
@@ -434,7 +431,7 @@ namespace os
         /**
          * @brief Set dynamic scheduling priority.
          *
-         * @return if successful, return Return::os_ok; otherwise an
+         * @return if successful, return status::ok; otherwise an
          * error number is returned.
          *
          * [EINVAL]
@@ -452,14 +449,14 @@ namespace os
          * code of [EINTR].
          */
         status_t
-        set_sched_prio (priority_t prio);
+        set_sched_prio (thread::priority_t prio);
 
         /**
          * @brief Get the current scheduling priority.
          *
          * No POSIX equivalent.
          */
-        priority_t
+        thread::priority_t
         get_sched_prio (void);
 
 #if 0
@@ -491,9 +488,9 @@ namespace os
 
         void* stack_addr_;
 
-        priority_t prio_;
+        thread::priority_t prio_;
 
-        thread_func_t func_;
+        thread::func_t func_;
 
         void* func_args_;
 
@@ -505,9 +502,21 @@ namespace os
 
       // ======================================================================
 
-      /// Entry point of a timer call back function.
-      typedef void
-      (*timer_func_t) (const void* args);
+      namespace timer
+      {
+        /// Entry point of a timer call back function.
+        typedef void
+        (*func_t) (void* args);
+
+        /// Timer type value for the timer definition.
+        using type_t = enum class type
+        : uint32_t
+          {
+            //
+            once = 0,//
+            periodic = 1//
+          };
+      }
 
       class Timer : public Named_object
       {
@@ -519,7 +528,7 @@ namespace os
         /// @param [in]     type          osTimerOnce for one-shot or osTimerPeriodic for periodic behavior.
         /// @param [in]     argument      argument to the timer call back function.
         /// @return timer ID for reference by other functions or NULL in case of error.
-        Timer (const char* name, timer_func_t function, timer_type_t type,
+        Timer (const char* name, timer::func_t function, timer::type_t type,
                void* args);
 
         Timer (const Timer&) = delete;
@@ -554,15 +563,61 @@ namespace os
 
       // ======================================================================
 
+      namespace mutex
+      {
+        using protocol_t = enum class protocol
+        : uint8_t
+          {
+            //
+            none = 0,//
+            inherit = 1,//
+            protect = 2
+          };
+
+        using robustness_t = enum class robustness
+        : uint8_t
+          {
+            //
+            stalled = 0,//
+            robust = 1,//
+          };
+
+        using type_t = enum class type
+        : uint8_t
+          {
+            //
+            normal = 0,//
+            errorcheck = 1,//
+            recursive = 2,
+          };
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+        // TODO: make class?
+        using attr_t = struct attr_s
+          {
+            const char* name;
+            thread::priority_t priority_ceiling;
+            protocol_t protocol; // none = 0, inherit = 1, protect = 2
+            robustness_t robustness;// stalled = 0, robust = 1
+            type_t type;// normal = 0, errorcheck = 1, recursive = 2
+          };
+
+#pragma GCC diagnostic pop
+
+        extern const attr_t normal_initializer;
+        extern const attr_t recursive_initializer;
+      }
+
       class Mutex : public Named_object
       {
       public:
 
-        /// Create and Initialize a Mutex object.
-        /// @param         name          name of the mutex object.
-        /// @return mutex ID for reference by other functions or NULL in case of error.
-        Mutex (const char* name);
-        Mutex ();
+        /**
+         * @brief Create and initialise a mutex.
+         */
+        Mutex (const mutex::attr_t* attr = nullptr);
 
         Mutex (const Mutex&) = delete;
         Mutex (Mutex&&) = delete;
@@ -571,29 +626,81 @@ namespace os
         Mutex&
         operator= (Mutex&&) = delete;
 
-        /// Delete a Mutex that was created by @ref osMutexCreate.
-        /// @param [in]     mutex_id      mutex ID obtained by @ref osMutexCreate.
-        /// @return status code that indicates the execution status of the function.
+        /**
+         * @brief Delete a mutex.
+         */
         ~Mutex ();
 
-        /// Wait until a Mutex becomes available.
-        /// @param [in]     mutex_id      mutex ID obtained by @ref osMutexCreate.
-        /// @return status code that indicates the execution status of the function.
+        /**
+         * @brief Lock the mutex.
+         *
+         * @return If successful, return status::ok; otherwise return an
+         * error number.
+         */
         status_t
-        wait (void);
+        lock (void);
 
+        /**
+         * @brief Try to lock the mutex.
+         *
+         * @return If successful, return status::ok; otherwise return an
+         * error number.
+         */
         status_t
-        try_wait (sys_ticks_t ticks = 0);
+        try_lock (void);
 
-        /// Release a Mutex that was obtained by @ref osMutexWait.
-        /// @param [in]     mutex_id      mutex ID obtained by @ref osMutexCreate.
-        /// @return status code that indicates the execution status of the function.
+        /**
+         * @brief Timed attempt to lock the mutex.
+         *
+         * @param [in] ticks Number of ticks to wait.
+         *
+         * @return If successful, return status::ok; otherwise return an
+         * error number.
+         */
         status_t
-        release (void);
+        timed_lock (sys_ticks_t ticks);
+
+        /**
+         * @brief Unlock the mutex.
+         *
+         * @return If successful, return status::ok; otherwise return an
+         * error number.
+         */
+        status_t
+        unlock (void);
+
+        /**
+         * @brief Get the priority ceiling of a mutex.
+         *
+         * @param [out] prio_ceiling pointer to location where to store the priority.
+         *
+         * @return If successful, return status::ok; otherwise return an
+         * error number.
+         */
+        status_t
+        get_prio_ceiling (thread::priority_t* prio_ceiling);
+
+        /**
+         * @brief Set the priority ceiling of a mutex.
+         *
+         * @param [in] prio_ceiling new priority.
+         * @param [out] old_prio_ceiling pointer to location where to
+         * store the previous priority.
+         *
+         * @return If successful, return status::ok; otherwise return an
+         * error number.
+         */
+        status_t
+        set_prio_ceiling (thread::priority_t prio_ceiling,
+                          thread::priority_t* old_prio_ceiling);
 
       protected:
 
         // Add internal data
+        thread::priority_t prio_ceiling_;
+        mutex::protocol_t protocol_; // none = 0, inherit = 1, protect = 2
+        mutex::robustness_t robustness_; // stalled = 0, robust = 1
+        mutex::type_t type_; // normal = 0, errorcheck = 1, recursive = 2
       };
 
       // ======================================================================
@@ -917,16 +1024,6 @@ namespace os
       Thread::get_function_args (void)
       {
         return func_args_;
-      }
-
-      // ======================================================================
-
-      inline
-      Mutex::Mutex () :
-          Mutex
-            { nullptr }
-      {
-        ;
       }
 
       // ======================================================================

@@ -102,8 +102,8 @@ main (int argc, char* argv[])
   new int ();
 
   static uint8_t stack12[300];
-  const rtos::thread_attr_t attr12
-    { "th12", stack12, sizeof(stack12), rtos::priority::normal };
+  const rtos::thread::attr_t attr12
+    { "th12", stack12, sizeof(stack12), rtos::thread::priority::normal };
 
   thread th12
     { &attr12, task1 };
@@ -111,8 +111,8 @@ main (int argc, char* argv[])
   th12.native_handle ()->__run_function ();
 
   static uint8_t stack13[300];
-   rtos::thread_attr_t attr13
-    { "th13", stack13, sizeof(stack13), rtos::priority::normal };
+  rtos::thread::attr_t attr13
+    { "th13", stack13, sizeof(stack13), rtos::thread::priority::normal };
 
   thread th13
     { &attr13, task1 };
@@ -139,7 +139,7 @@ main (int argc, char* argv[])
 #if 0
   // Fails, nullptr is not matched with attributes
   thread th51
-    { nullptr, task4, 7, "xyz" };
+    { nullptr, task4, 7, "xyz"};
 #endif
 
   this_thread::sleep_for (microseconds (3001001));

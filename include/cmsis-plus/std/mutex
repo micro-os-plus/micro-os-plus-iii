@@ -57,6 +57,9 @@ namespace os
         constexpr
         mutex () noexcept;
 
+        // Extension to ISO.
+        mutex (os::cmsis::rtos::mutex::attr_t* attr) noexcept;
+
         ~mutex () = default;
 
         mutex (const mutex&) = delete;
@@ -86,13 +89,16 @@ namespace os
       {
       private:
 
-        using native_type = os::cmsis::rtos::Recursive_mutex;
+        using native_type = os::cmsis::rtos::Mutex;
 
       public:
 
         using native_handle_type = native_type*;
 
-        recursive_mutex () = default;
+        recursive_mutex ();
+
+        // Extension to ISO.
+        recursive_mutex (os::cmsis::rtos::mutex::attr_t* attr);
 
         ~recursive_mutex () = default;
 
@@ -125,6 +131,9 @@ namespace os
 
         timed_mutex () = default;
 
+        // Extension to ISO.
+        timed_mutex (os::cmsis::rtos::mutex::attr_t* attr);
+
         ~timed_mutex () = default;
 
         timed_mutex (const timed_mutex&) = delete;
@@ -149,6 +158,9 @@ namespace os
       public:
 
         recursive_timed_mutex () = default;
+
+        // Extension to ISO.
+        recursive_timed_mutex (os::cmsis::rtos::mutex::attr_t* attr);
 
         ~recursive_timed_mutex () = default;
 
@@ -344,6 +356,14 @@ namespace os
     {
       // ======================================================================
 
+      inline
+      mutex::mutex (os::cmsis::rtos::mutex::attr_t* attr) noexcept :
+      nm_
+        { attr}
+        {
+          ;
+        }
+
       inline mutex::native_handle_type
       mutex::native_handle ()
       {
@@ -351,6 +371,22 @@ namespace os
       }
 
       // ======================================================================
+
+      inline
+      recursive_mutex::recursive_mutex () :
+          nm_
+            { &os::cmsis::rtos::mutex::recursive_initializer }
+      {
+        ;
+      }
+
+      inline
+      recursive_mutex::recursive_mutex (os::cmsis::rtos::mutex::attr_t* attr) :
+          nm_
+            { attr }
+      {
+        ;
+      }
 
       inline recursive_mutex::native_handle_type
       recursive_mutex::native_handle ()
@@ -360,16 +396,24 @@ namespace os
 
       // ======================================================================
 
+      inline
+      timed_mutex::timed_mutex (os::cmsis::rtos::mutex::attr_t* attr) :
+          mutex
+            { attr }
+      {
+        ;
+      }
+
       template<typename Rep_T, typename Period_T>
         bool
         timed_mutex::try_lock_for (
             const ::std::chrono::duration<Rep_T, Period_T>& rel_time)
         {
           using namespace ::std::chrono;
-           os::cmsis::rtos::sys_ticks_t ticks = 0;
+          os::cmsis::rtos::sys_ticks_t ticks = 0;
           if (rel_time > duration<Rep_T, Period_T>::zero ())
             {
-               microseconds micros;
+              microseconds micros;
               if (rel_time < microseconds::max ())
                 {
                   micros = duration_cast<microseconds> (rel_time);
@@ -387,7 +431,7 @@ namespace os
             }
 
           rtos::status_t ret;
-          ret = nm_.try_wait (ticks);
+          ret = nm_.timed_lock (ticks);
           if (ret == rtos::status::ok)
             {
               return true;
@@ -397,7 +441,7 @@ namespace os
               return false;
             }
 
-          __throw_system_error ((int)ret, "timed_mutex try_lock failed");
+          __throw_system_error ((int) ret, "timed_mutex try_lock failed");
           return false;
 
         }
@@ -423,16 +467,25 @@ namespace os
 
       // ======================================================================
 
+      inline
+      recursive_timed_mutex::recursive_timed_mutex (
+          os::cmsis::rtos::mutex::attr_t* attr) :
+          recursive_mutex
+            { attr }
+      {
+        ;
+      }
+
       template<typename Rep_T, typename Period_T>
         bool
         recursive_timed_mutex::try_lock_for (
             const ::std::chrono::duration<Rep_T, Period_T>& rel_time)
         {
           using namespace ::std::chrono;
-           os::cmsis::rtos::sys_ticks_t ticks = 0;
+          os::cmsis::rtos::sys_ticks_t ticks = 0;
           if (rel_time > duration<Rep_T, Period_T>::zero ())
             {
-               microseconds micros;
+              microseconds micros;
               if (rel_time < microseconds::max ())
                 {
                   micros = duration_cast<microseconds> (rel_time);
@@ -450,7 +503,7 @@ namespace os
             }
 
           rtos::status_t ret;
-          ret = nm_.try_wait (ticks);
+          ret = nm_.timed_lock (ticks);
           if (ret == rtos::status::ok)
             {
               return true;
@@ -460,7 +513,7 @@ namespace os
               return false;
             }
 
-          __throw_system_error ((int)ret, "timed_mutex try_lock failed");
+          __throw_system_error ((int) ret, "timed_mutex try_lock failed");
           return false;
 
         }

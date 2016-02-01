@@ -170,7 +170,7 @@ extern "C"
 
 #define OS_THREAD_SIZE_WORDS  6
 #define OS_TIMER_SIZE_WORDS  1
-#define OS_MUTEX_SIZE_WORDS  1
+#define OS_MUTEX_SIZE_WORDS  2
 #define OS_SEMAPHORE_SIZE_WORDS  1
 #define OS_POOL_SIZE_WORDS  1
 #define OS_MESSAGEQ_SIZE_WORDS  1
@@ -203,6 +203,16 @@ extern "C"
   {
     void* content[OS_MUTEX_SIZE_WORDS];
   } osMutex;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+  typedef struct os_mutex_attr
+  {
+    const char* name;
+  } osMutexAttr;
+
+#pragma GCC diagnostic pop
 
   typedef struct os_semaphore_data
   {

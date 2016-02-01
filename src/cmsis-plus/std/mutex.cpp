@@ -34,10 +34,10 @@ namespace os
       mutex::lock ()
       {
         rtos::status_t ret;
-        ret = nm_.wait ();
+        ret = nm_.lock ();
         if (ret != rtos::status::ok)
           {
-            __throw_cmsis_error ((int)ret, "mutex lock failed");
+            __throw_cmsis_error ((int) ret, "mutex lock failed");
           }
       }
 
@@ -45,7 +45,7 @@ namespace os
       mutex::try_lock ()
       {
         rtos::status_t ret;
-        ret = nm_.try_wait ();
+        ret = nm_.try_lock ();
         if (ret == rtos::status::ok)
           {
             return true;
@@ -55,7 +55,7 @@ namespace os
             return false;
           }
 
-        __throw_cmsis_error ((int)ret, "mutex try_lock failed");
+        __throw_cmsis_error ((int) ret, "mutex try_lock failed");
         return false;
       }
 
@@ -63,10 +63,10 @@ namespace os
       mutex::unlock ()
       {
         rtos::status_t ret;
-        ret = nm_.release ();
+        ret = nm_.unlock ();
         if (ret != rtos::status::ok)
           {
-            __throw_cmsis_error ((int)ret, "mutex unlock failed");
+            __throw_cmsis_error ((int) ret, "mutex unlock failed");
           }
       }
 
@@ -76,10 +76,10 @@ namespace os
       recursive_mutex::lock ()
       {
         rtos::status_t ret;
-        ret = nm_.wait ();
+        ret = nm_.lock ();
         if (ret != rtos::status::ok)
           {
-            __throw_cmsis_error ((int)ret, "recursive_mutex lock failed");
+            __throw_cmsis_error ((int) ret, "recursive_mutex lock failed");
           }
       }
 
@@ -87,7 +87,7 @@ namespace os
       recursive_mutex::try_lock () noexcept
       {
         rtos::status_t ret;
-        ret = nm_.try_wait ();
+        ret = nm_.try_lock ();
         if (ret == rtos::status::ok)
           {
             return true;
@@ -97,7 +97,7 @@ namespace os
             return false;
           }
 
-        __throw_cmsis_error ((int)ret, "recursive_mutex try_lock failed");
+        __throw_cmsis_error ((int) ret, "recursive_mutex try_lock failed");
         return false;
       }
 
@@ -105,15 +105,14 @@ namespace os
       recursive_mutex::unlock ()
       {
         rtos::status_t ret;
-        ret = nm_.release ();
+        ret = nm_.unlock ();
         if (ret != rtos::status::ok)
           {
-            __throw_cmsis_error ((int)ret, "recursive_mutex unlock failed");
+            __throw_cmsis_error ((int) ret, "recursive_mutex unlock failed");
           }
       }
 
-      // ======================================================================
-
+    // ======================================================================
 
     } /* namespace std */
   } /* namespace cmsis */

@@ -37,7 +37,7 @@ using namespace os::cmsis::rtos;
 // Validate C structs sizes (should match the C++ objects sizes).
 
 static_assert(sizeof(Thread) == sizeof(osThread), "adjust size of osThread");
-static_assert(sizeof(thread_attr_t) == sizeof(osThreadAttr), "adjust size of osThreadAttr");
+static_assert(sizeof(thread::attr_t) == sizeof(osThreadAttr), "adjust size of osThreadAttr");
 
 static_assert(sizeof(Timer) == sizeof(osTimer), "adjust size of osTimer");
 static_assert(sizeof(Mutex) == sizeof(osMutex), "adjust size of osMutex");
@@ -88,19 +88,19 @@ osKernelSysTick (void)
 osThreadId
 osThreadCreate (const osThreadDef_t *thread_def, void *args)
 {
-  return reinterpret_cast<osThreadId> (new (thread_def->data) Thread (
-      (thread_attr_t*) nullptr, (thread_func_t) thread_def->pthread, args));
+  Thread* thread = new (thread_def->data) Thread (
+      (thread::attr_t*) nullptr, (thread::func_t) thread_def->pthread, args);
+  return reinterpret_cast<osThreadId> (thread);
 }
 
-#if 1
 osThreadId
 osThreadCreateEx (osThread* addr, const osThreadAttr* attr, os_pthread function,
                   const void* args)
 {
-  return reinterpret_cast<osThreadId> (new (addr) Thread (
-      (thread_attr_t*) attr, (thread_func_t) function, (void*) args));
+  Thread* thread = new (addr) Thread ((thread::attr_t*) attr,
+                                      (thread::func_t) function, (void*) args);
+  return reinterpret_cast<osThreadId> (thread);
 }
-#endif
 
 osThreadId
 osThreadGetId (void)
@@ -124,14 +124,17 @@ osThreadYield (void)
 osStatus
 osThreadSetPriority (osThreadId thread_id, osPriority priority)
 {
+  thread::priority_t prio = static_cast<thread::priority_t> (priority * 10);
   return static_cast<osStatus> ((reinterpret_cast<Thread&> (thread_id)).set_sched_prio (
-      (priority_t) priority));
+      prio));
 }
 
 osPriority
 osThreadGetPriority (osThreadId thread_id)
 {
-  return static_cast<osPriority> ((reinterpret_cast<Thread&> (thread_id)).get_sched_prio ());
+  thread::priority_t prio =
+      (reinterpret_cast<Thread&> (thread_id)).get_sched_prio ();
+  return static_cast<osPriority> (prio / 10);
 }
 
 // ----------------------------------------------------------------------------
@@ -178,7 +181,8 @@ osTimerId
 osTimerCreate (const osTimerDef_t *timer_def, os_timer_type type, void *args)
 {
   return reinterpret_cast<osTimerId> (new ((void*) &timer_def->data) Timer (
-      timer_def->name, timer_def->ptimer, (timer_type_t) type, args));
+      timer_def->name, (timer::func_t) timer_def->ptimer, (timer::type_t) type,
+      args));
 }
 
 osTimerId
@@ -186,7 +190,7 @@ osTimerCreateEx (osTimer* addr, const char* name, os_ptimer function,
                  os_timer_type type, void* args)
 {
   return reinterpret_cast<osTimerId> (new ((void*) addr) Timer (
-      name, function, (timer_type_t) type, args));
+      name, (timer::func_t) function, (timer::type_t) type, args));
 }
 
 osStatus
@@ -257,27 +261,46 @@ osMutexId
 osMutexCreate (const osMutexDef_t *mutex_def)
 {
   return reinterpret_cast<osMutexId> (new ((void*) &mutex_def->data) Mutex (
-      mutex_def->name));
+      (const mutex::attr_t*) nullptr));
 }
 
 osMutexId
-osMutexCreateEx (osMutex* addr, const char* name)
+osMutexCreateEx (osMutex* addr, const osMutexAttr* attr)
 {
-  return reinterpret_cast<osMutexId> (new ((void*) addr) Mutex (name));
+  return reinterpret_cast<osMutexId> (new ((void*) addr) Mutex (
+      (const mutex::attr_t*) attr));
 }
 
 osStatus
 osMutexWait (osMutexId mutex_id, uint32_t millisec)
 {
+  status_t status;
+  if (millisec == osWaitForever)
+    {
+      status = (reinterpret_cast<Mutex&> (mutex_id)).lock ();
+    }
+  else if (millisec == 0)
+    {
+      status = (reinterpret_cast<Mutex&> (mutex_id)).try_lock ();
+    }
+  else
+    {
+      status = (reinterpret_cast<Mutex&> (mutex_id)).timed_lock (
+          kernel::compute_sys_ticks (millisec * 1000));
+    }
 
-  return static_cast<osStatus> ((reinterpret_cast<Mutex&> (mutex_id)).try_wait (
-      kernel::compute_sys_ticks (millisec * 1000)));
+  // TODO: return legacy code for POSIX codes
+  return static_cast<osStatus> (status);
 }
 
 osStatus
 osMutexRelease (osMutexId mutex_id)
 {
-  return static_cast<osStatus> ((reinterpret_cast<Mutex&> (mutex_id)).release ());
+  status_t status;
+  status = (reinterpret_cast<Mutex&> (mutex_id)).unlock ();
+
+  // TODO: return legacy code for POSIX codes
+  return static_cast<osStatus> (status);
 }
 
 osStatus
