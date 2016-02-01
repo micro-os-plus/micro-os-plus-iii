@@ -4,13 +4,43 @@ These are some issues related to the current CMSIS APIs, with suggestions based 
 
 ## RTOS
 
+As a personal remark, the design of the CMSIS RTOS API seems greatly influenced 
+by Keil RTX (function names and prototypes, but not necessarily the most
+fortunate design), with some ideas from POSIX threads (pthreads, an 
+established standard).
+
+However the expected influence from POSIX threads is mostly aparent and 
+inconsecvent.
+
+In POSIX threads one of the design characteristics is the use of attributes
+to configure various creation parameters, instead of passing all of them
+in a long prototype. All functions used to create objects have a pointer
+to the attributes. For simple use cases, this pointer can be NULL, and 
+reasonable defaults are applied. Following this pointer, the function
+pototypes include a minimum 
+set of mandatory parameters (like pointer to thread function).
+
+This design pattern allows to clearly separate simple use cases from
+advanced ones.
+
+The RTOS design introduces `*Def` structures, and a pointer to them is 
+passed to the creation functions, but this pointer is mandatory, it
+cannot be NULL, so there is not distinction between simple and advanced 
+use cases.
+
+Even worse, not all creation parameters are available, neither
+in the `*Def` structure nor in the `*Create()` prototype (for example
+the location of the thread stack area, the semaphore max count, etc). 
+
+Neither the split between which parameters go to the `*Def` structure 
+and which go to the `*Create()` prototype is not very obvious and 
+consecvent (as it is in POSIX threads).
+
 
 ### Makes heavy use of macros to define static object instances and to refer to them
 
-Instead of passing multiple arguments to the `XyzCreate()`, most arguments are 
-stored in a `*Def` structure and the pointer to it is passed to the `XyzCreate()`.
-
-This structure is created using a macro, which looks like a function
+The `*Def` structure passed to the `XyzCreate()` is created using a macro, 
+which looks like a function
 call, making the definition quite confusing.
 
 For example
@@ -35,7 +65,9 @@ int main (void) {
 
 Suggestion:
 
-Give up all these macros and create objects with multiple arguments, as usual.
+Give up all these macros and use the POSIX approach, i.e. use
+attributes. When defults are enough, allow simple creations, with
+minimum arguments.
 
 ```
 #include <cmsis_os_ex.h>
@@ -46,7 +78,7 @@ OSThread th1;
 
 int main (void) {
 
-	osThreadCreateEx(&th1, "task1", NULL, 0, osPriorityNormal, task_1, NULL);
+	osThreadCreateEx(&th1, NULL, task_1, NULL);
 	
 	// ...
 	
@@ -62,23 +94,26 @@ int main (void) {
 
 Although the macros defining objects allow to statically allocate storage for
 objects, some of them internally still allocate storage on the heap, for example 
-the thread stack.
+for the thread stack.
 
 There is no way to avoid these allocations.
 
 Suggestion:
 
-* add parameters to all functions and allow to pass a pointer to a user defined
+* add attributes and allow to pass a pointer to a user defined
 storage.
 
 ### All time durations are in milliseconds, while the system timer counts ticks
 
-Although the usual setting for the system timer is with 1000 ticks per second, 
+Although the usual system timer is set for 1000 ticks per second, 
 which corresponds to 1 ms per tick, this is not mandatory, and some applications
 might very well use different timer settings.
 
 Since all system timeouts are actually implemented as timer ticks, it is
 more accurate to use number of ticks, not milliseconds, for all timeouts.
+
+This is also both a POSIX requirement, and a ISO C/C++ specs reqirement, to 
+use clock ticks and round timings to the next clock interval.
 
 Suggestion:
 
@@ -103,13 +138,6 @@ Suggestion:
 
 * use a separate name for all objects.
 
-```
-	osThreadCreateEx(&th1, "task1", NULL, 0, osPriorityNormal, task_1, NULL);
-
-	// ...
-	
-	osTimerCreateEx(&tm1, "timer1", timer_1, osTimerOnce, NULL);
-```
 
 ### There is no support for critical sections (interrupts & scheduler)
 
@@ -175,7 +203,16 @@ Suggestion:
 
 ### Threads
 
-#### There is no mechanism to tell if a thread terminated or not
+#### There are very few priority levels
+
+There are only 7 thread priorityes, including idle, which might not be
+enough.
+
+Suggestion:
+
+* extend the range to 256 levels, and represent it as unsigned (0-255).
+
+#### There is no mechanism to tell if a thread has terminated or not
 
 The specs currently do not define what happens if a thread exits, and there
 is no mechanism to tell is a thread terminated or not.
@@ -205,14 +242,6 @@ Suggestion:
 
 * add max_count, default 0xFFFFFFFF; to create a binary semaphore use max_count = 1.
 
-```
-
-  osSemaphoreId
-  osSemaphoreCreateEx (osSemaphoreId addr, const char* name,
-                       int32_t initial_count, uint32_t max_count);
-
-```
-
 ### Mutexes
 
 #### There is no way to poll the mutex if available
@@ -225,10 +254,30 @@ Suggestion:
 
 #### There is no recursive mutex
 
+The specs do not define if the mutex is normal or recursive. However, RTX
+implements recursive mutexes.
+
 Suggestion:
 
-* add Recursive_mutex()
+* add an explicit and documented method to create normal and recursive mutexes.
 
+#### The single osMutexWait() has three different functions
+
+In POSIX there are three different functions to lock a mutex:
+
+```
+  lock();
+  try_lock();
+  timed_lock();
+```
+
+In CMSIS RTOS all are multiplexed on a single call, with a timeout parameter
+that may be 0, if try_lock() is needed, or a timeout, with 0xFFFFFFFF to mean
+_forever_.
+
+Although functionally equivalent, the POSIX design increases readability 
+and is prefered.
+  
 ## CMSIS Drivers 
 
 * uses non-reentrant callbacks
