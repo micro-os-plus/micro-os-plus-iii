@@ -17,6 +17,7 @@
  */
 
 #include <cmsis-plus/std/thread>
+#include <cmsis-plus/rtos/systick-clock.h>
 #include <cmsis-plus/diag/trace.h>
 
 #include <cstdio>
@@ -150,6 +151,10 @@ main (int argc, char* argv[])
   this_thread::sleep_for (microseconds (3001001));
   this_thread::sleep_for (milliseconds (3001));
   this_thread::sleep_for (seconds (3));
+  this_thread::sleep_for (systicks (3003));
+
+  auto tp = Systick_clock::now();
+  trace::printf ("now() = %d \n", tp);
 
 #if 0
   int n = 70;
