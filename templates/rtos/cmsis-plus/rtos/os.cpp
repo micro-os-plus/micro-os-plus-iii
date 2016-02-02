@@ -201,6 +201,35 @@ namespace os
 
       // ======================================================================
 
+      namespace thread
+      {
+        const Attributes initializer
+          { nullptr };
+      } /* namespace thread */
+
+      /**
+       * @details
+       *
+       * Create a new thread, with default attributes.
+       *
+       * The thread is created executing function with args as its
+       * sole argument. If the start_routine returns, the effect
+       * shall be as if there was an implicit call to exit() using
+       * the return value of function as the exit status. Note that
+       * the thread in which main() was originally invoked differs
+       * from this. When it returns from main(), the effect shall
+       * be as if there was an implicit call to exit() using the
+       * return value of main() as the exit status.
+       *
+       * Compatible with pthread_create().
+       * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html
+       */
+      Thread::Thread (thread::func_t function, void* args) :
+          Thread (thread::initializer, function, args)
+      {
+        ;
+      }
+
       /**
        * @details
        *
@@ -221,28 +250,18 @@ namespace os
        * Compatible with pthread_create().
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html
        */
-      Thread::Thread (const thread::attr_t* attr, thread::func_t function,
+      Thread::Thread (const thread::Attributes& attr, thread::func_t function,
                       void* args) :
-          Named_object (attr != nullptr ? attr->name : nullptr)
+          Named_object (attr.get_name ())
       {
         assert(function != nullptr);
 
-        if (attr != nullptr)
-          {
-            // Get attributes from user structure.
-            prio_ = attr->priority;
-            // TODO: check min size
-            stack_size_bytes_ = attr->stack_size_bytes;
-            // TODO: align stack
-            stack_addr_ = attr->stack_addr;
-          }
-        else
-          {
-            // Default attributes.
-            prio_ = thread::priority::normal;
-            stack_size_bytes_ = 0;
-            stack_addr_ = nullptr;
-          }
+        // Get attributes from user structure.
+        attr.get_priority (&prio_);
+        // TODO: check min size
+        attr.get_stack_size_bytes (&stack_size_bytes_);
+        // TODO: align stack
+        attr.get_stack_address (&stack_addr_);
 
         if (stack_addr_ == nullptr)
           {
@@ -441,8 +460,32 @@ namespace os
 
         const Recursive_attributes recursive_initializer
           { nullptr };
+      } /* namespace mutex */
+
+      /**
+       * @details
+       *
+       * Initialize the mutex with default attributes.
+       *
+       * pthread_mutex_init()
+       * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_init.html
+       */
+      Mutex::Mutex () :
+          Mutex
+            { mutex::normal_initializer }
+      {
+        ;
       }
 
+      /**
+       * @details
+       * Initialize the mutex with attributes specified by _attr_.
+       * Upon successful initialization, the state of the mutex becomes
+       * initialized and unlocked.
+       *
+       * pthread_mutex_init()
+       * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_init.html
+       */
       Mutex::Mutex (const mutex::Attributes& attr) :
           Named_object (attr.get_name ())
       {
@@ -452,6 +495,19 @@ namespace os
         attr.get_type (&type_);
       }
 
+      /**
+       * @details
+       * Destroy the mutex object.
+       * It shall be safe to destroy an initialized mutex that is
+       * unlocked. Attempting to destroy a locked mutex or a mutex
+       * that is referenced (for example, while being used in a
+       * pthread_cond_timedwait() or pthread_cond_wait()) by another
+       * thread results in undefined behavior.
+
+       *
+       * pthread_mutex_destroy()
+       * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_init.html
+       */
       Mutex::~Mutex ()
       {
         // TODO
@@ -492,6 +548,7 @@ namespace os
       result_t
       Mutex::lock (void)
       {
+        // TODO
         return result::ok;
       }
 
@@ -529,6 +586,7 @@ namespace os
       result_t
       Mutex::try_lock (void)
       {
+        // TODO
         return result::ok;
       }
 
@@ -565,6 +623,7 @@ namespace os
       result_t
       Mutex::timed_lock (sys_ticks_t ticks)
       {
+        // TODO
         return result::ok;
       }
 
@@ -589,6 +648,7 @@ namespace os
       result_t
       Mutex::unlock (void)
       {
+        // TODO
         return result::ok;
       }
 
@@ -633,6 +693,35 @@ namespace os
       Mutex::set_prio_ceiling (thread::priority_t prio_ceiling,
                                thread::priority_t* old_prio_ceiling)
       {
+        // TODO
+        return result::ok;
+      }
+
+      /**
+       * @details
+       * If the robust mutex is in an inconsistent state, the
+       * Mutex::consistent() function can be used to mark the
+       * state protected by the mutex referenced by mutex as
+       * consistent again.
+       *
+       * If an owner of a robust mutex terminates while holding
+       * the mutex, the mutex becomes inconsistent and the next
+       * thread that acquires the mutex lock shall be notified
+       * of the state by the return value [EOWNERDEAD]. In this
+       * case, the mutex does not become normally usable again
+       * until the state is marked consistent.
+       *
+       * If the thread which acquired the mutex lock with the
+       * return value [EOWNERDEAD] terminates before calling
+       * either Mutex::consistent() or Mutex::unlock(), the
+       * next thread that acquires the mutex lock shall be
+       * notified about the state of the mutex by the return
+       * value [EOWNERDEAD].
+       */
+      result_t
+      Mutex::consistent (void)
+      {
+        // TODO
         return result::ok;
       }
 

@@ -37,7 +37,7 @@ using namespace os::cmsis::rtos;
 // Validate C structs sizes (should match the C++ objects sizes).
 
 static_assert(sizeof(Thread) == sizeof(osThread), "adjust size of osThread");
-static_assert(sizeof(thread::attr_t) == sizeof(osThreadAttr), "adjust size of osThreadAttr");
+static_assert(sizeof(thread::Attributes) == sizeof(osThreadAttr), "adjust size of osThreadAttr");
 
 static_assert(sizeof(Timer) == sizeof(osTimer), "adjust size of osTimer");
 static_assert(sizeof(Mutex) == sizeof(osMutex), "adjust size of osMutex");
@@ -89,7 +89,7 @@ osThreadId
 osThreadCreate (const osThreadDef_t *thread_def, void *args)
 {
   Thread* thread = new (thread_def->data) Thread (
-      (thread::attr_t*) nullptr, (thread::func_t) thread_def->pthread, args);
+      (thread::func_t) thread_def->pthread, args);
   return reinterpret_cast<osThreadId> (thread);
 }
 
@@ -97,7 +97,7 @@ osThreadId
 osThreadCreateEx (osThread* addr, const osThreadAttr* attr, os_pthread function,
                   const void* args)
 {
-  Thread* thread = new (addr) Thread ((thread::attr_t*) attr,
+  Thread* thread = new (addr) Thread ((thread::Attributes&) *attr,
                                       (thread::func_t) function, (void*) args);
   return reinterpret_cast<osThreadId> (thread);
 }

@@ -99,20 +99,18 @@ namespace os
         template<
             typename Attr_T, //
             typename = typename ::std::enable_if<
-                ::std::is_same<Attr_T, os::cmsis::rtos::thread::attr_t>::value
-                    || ::std::is_same<Attr_T, ::std::nullptr_t>::value>::type,
+                ::std::is_same<Attr_T, os::cmsis::rtos::thread::Attributes>::value>::type,
             typename Callable_T, typename ... Args_T>
           explicit
-          thread (Attr_T* attr, Callable_T&& f, Args_T&&... args);
+          thread (Attr_T& attr, Callable_T&& f, Args_T&&... args);
 
         template<
             typename Attr_T, //
             typename = typename ::std::enable_if<
-                ::std::is_same<Attr_T, os::cmsis::rtos::thread::attr_t>::value
-                    || ::std::is_same<Attr_T, ::std::nullptr_t>::value>::type,
+                ::std::is_same<Attr_T, os::cmsis::rtos::thread::Attributes>::value>::type,
             typename Callable_T, typename ... Args_T>
           explicit
-          thread (const Attr_T* attr, Callable_T&& f, Args_T&&... args);
+          thread (const Attr_T& attr, Callable_T&& f, Args_T&&... args);
 
         ~thread ();
 
@@ -343,7 +341,7 @@ namespace os
 
       template<typename Callable_T, typename T, typename ... Args_T>
         thread::thread (Callable_T&& f, Args_T&&... args) :
-            thread ((os::cmsis::rtos::thread::attr_t*) nullptr,
+            thread (os::cmsis::rtos::thread::initializer,
                     ::std::forward<Callable_T> (f),
                     ::std::forward<Args_T>(args)...)
         {
@@ -352,8 +350,8 @@ namespace os
 
       template<typename Attr_T, typename T, typename Callable_T,
           typename ... Args_T>
-        thread::thread (const Attr_T* attr, Callable_T&& f, Args_T&&... args) :
-            thread ((Attr_T*) attr, ::std::forward<Callable_T> (f),
+        thread::thread (const Attr_T& attr, Callable_T&& f, Args_T&&... args) :
+            thread ((Attr_T&) attr, ::std::forward<Callable_T> (f),
                     ::std::forward<Args_T>(args)...)
         {
           ;
@@ -362,11 +360,11 @@ namespace os
       template<typename Attr_T, typename T, typename Callable_T,
           typename ... Args_T>
 
-        thread::thread (Attr_T* attr, Callable_T&& f, Args_T&&... args)
+        thread::thread (Attr_T& attr, Callable_T&& f, Args_T&&... args)
         {
           // static_assert(::std::is_same<Attr_T, os::cmsis::rtos::thread::attr_t>::value, "first param must be thread_attr_t*");
 
-          os::cmsis::trace::printf ("%s(%p) @%p\n", __func__, attr, this);
+          os::cmsis::trace::printf ("%s(%p) @%p\n", __func__, &attr, this);
 
           using Function_object = decltype(::std::bind (::std::forward<Callable_T> (f),
                   ::std::forward<Args_T>(args)...));

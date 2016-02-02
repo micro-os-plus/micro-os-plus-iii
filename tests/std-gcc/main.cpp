@@ -102,20 +102,25 @@ main (int argc, char* argv[])
   new int ();
 
   static uint8_t stack12[300];
-  const rtos::thread::attr_t attr12
-    { "th12", stack12, sizeof(stack12), rtos::thread::priority::normal };
+  rtos::thread::Attributes attr12
+    { "th12" };
+  attr12.set_stack_address ((void*) stack12);
+  attr12.set_stack_size_bytes (sizeof(stack12));
 
   thread th12
-    { &attr12, task1 };
+    { attr12, task1 };
 
   th12.native_handle ()->__run_function ();
 
   static uint8_t stack13[300];
-  rtos::thread::attr_t attr13
-    { "th13", stack13, sizeof(stack13), rtos::thread::priority::normal };
+  rtos::thread::Attributes attr13
+    { "th13" };
+  attr13.set_stack_address ((void*) stack13);
+  attr13.set_stack_size_bytes (sizeof(stack13));
+  attr13.set_priority (rtos::thread::priority::normal);
 
   thread th13
-    { &attr13, task1 };
+    { attr13, task1 };
 
   th13.native_handle ()->__run_function ();
 

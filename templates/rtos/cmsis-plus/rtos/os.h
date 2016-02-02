@@ -281,7 +281,6 @@ namespace os
 
         result_t
         sleep (sys_ticks_t ticks);
-
       }
 
       // ======================================================================
@@ -338,15 +337,55 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
-        using attr_t = struct attr_s
-          {
-            const char* name;
-            void* stack_addr;
-            ::std::size_t stack_size_bytes;
-            priority_t priority;
-          };
+        class Attributes : public Named_object
+        {
+        public:
+
+          Attributes (const char* name);
+
+          Attributes (const Attributes&) = default;
+          Attributes (Attributes&&) = default;
+          Attributes&
+          operator= (const Attributes&) = default;
+          Attributes&
+          operator= (Attributes&&) = default;
+
+          /**
+           * @brief Delete a mutex attributes.
+           */
+          ~Attributes () = default;
+
+          result_t
+          get_stack_address (void** stack_address) const;
+
+          result_t
+          set_stack_address (void* stack_address);
+
+          result_t
+          get_stack_size_bytes (::std::size_t* stack_size_bytes) const;
+
+          result_t
+          set_stack_size_bytes (::std::size_t stack_size_bytes);
+
+          result_t
+          get_priority (priority_t* priority) const;
+
+          result_t
+          set_priority (priority_t priority);
+
+        protected:
+
+          void* stack_addr_;
+
+          ::std::size_t stack_size_bytes_;
+
+          priority_t priority_;
+
+        };
 
 #pragma GCC diagnostic pop
+
+        extern const Attributes initializer;
 
         using func_args_t = void*;
         using func_t = void* (*) (func_args_t args);
@@ -360,9 +399,14 @@ namespace os
       public:
 
         /**
-         * @brief Create a new thread.
+         * @brief Create a new thread with default settings.
          */
-        Thread (const thread::attr_t* attr, thread::func_t function,
+        Thread (thread::func_t function, void* args);
+
+        /**
+         * @brief Create a new thread with custom settings.
+         */
+        Thread (const thread::Attributes& attr, thread::func_t function,
                 void* args);
 
         // Prevent any copy or move.
@@ -699,6 +743,9 @@ namespace os
          */
         ~Mutex ();
 
+        bool
+        operator== (const Mutex& rhs) const;
+
         /**
          * @brief Lock the mutex.
          *
@@ -761,6 +808,15 @@ namespace os
         result_t
         set_prio_ceiling (thread::priority_t prio_ceiling,
                           thread::priority_t* old_prio_ceiling = nullptr);
+
+        /**
+         * @brief Mark state protected by robust mutex as consistent.
+         *
+         * @return If successful, return status::ok; otherwise return an
+         * error number.
+         */
+        result_t
+        consistent (void);
 
       protected:
 
@@ -1030,6 +1086,69 @@ namespace os
 
       // ======================================================================
 
+      namespace thread
+      {
+        inline
+        Attributes::Attributes (const char* name) :
+            Named_object (name)
+        {
+          stack_addr_ = nullptr;
+          stack_size_bytes_ = 0;
+          priority_ = thread::priority::normal;
+        }
+
+        inline result_t
+        Attributes::get_stack_address (void** stack_address) const
+        {
+          if (stack_address != nullptr)
+            {
+              *stack_address = stack_addr_;
+            }
+          return result::ok;
+        }
+
+        inline result_t
+        Attributes::set_stack_address (void* stack_address)
+        {
+          stack_addr_ = stack_address;
+          return result::ok;
+        }
+
+        inline result_t
+        Attributes::get_stack_size_bytes (::std::size_t* stack_size_bytes) const
+        {
+          if (stack_size_bytes != nullptr)
+            {
+              *stack_size_bytes = stack_size_bytes_;
+            }
+          return result::ok;
+        }
+
+        inline result_t
+        Attributes::set_stack_size_bytes (::std::size_t stack_size_bytes)
+        {
+          stack_size_bytes_ = stack_size_bytes;
+          return result::ok;
+        }
+
+        inline result_t
+        Attributes::get_priority (priority_t* priority) const
+        {
+          if (priority != nullptr)
+            {
+              *priority = priority_;
+            }
+          return result::ok;
+        }
+
+        inline result_t
+        Attributes::set_priority (priority_t priority)
+        {
+          priority_ = priority;
+          return result::ok;
+        }
+
+      }
       /**
        * @details
        * pthread_equal()
@@ -1142,15 +1261,14 @@ namespace os
         }
       }
 
-      // ======================================================================
-
-      inline
-      Mutex::Mutex () :
-          Mutex
-            { mutex::normal_initializer }
+      inline bool
+      Mutex::operator == (const Mutex& rhs) const
       {
-        ;
+        return this == &rhs;
       }
+
+
+      // ======================================================================
 
       inline
       Condition_variable::Condition_variable () :

@@ -31,7 +31,7 @@ namespace _3
     };
 
   void*
-  task_function (const args_t* args);
+  task1 (const args_t* args);
 
   void
   timer_callback (const void* args);
@@ -39,7 +39,7 @@ namespace _3
 // ----------------------------------------------------------------------------
 
   void*
-  task_function (const args_t* args)
+  task1 (const args_t* args)
   {
     return NULL;
   }
@@ -66,10 +66,21 @@ namespace _3
       { 7 };
 
       {
+        // Thread with default attributes
         rtos::Thread th1
-          { nullptr, (rtos::thread::func_t) task_function,
-              (rtos::thread::func_args_t) &args };
+          { (rtos::thread::func_t) task1, (rtos::thread::func_args_t) &args };
 
+        static uint8_t stack2[300];
+        rtos::thread::Attributes attr2
+          { "thread2" };
+        attr2.set_stack_address ((void*) stack2);
+        attr2.set_stack_size_bytes (sizeof(stack2));
+        attr2.set_priority (rtos::thread::priority::normal);
+
+        // Thread with custom attributes
+        rtos::Thread th13
+          { attr2, (rtos::thread::func_t) task1,
+              (rtos::thread::func_args_t) &args };
       }
 
       {
