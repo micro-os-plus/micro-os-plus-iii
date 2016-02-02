@@ -33,40 +33,40 @@ namespace os
       void
       mutex::lock ()
       {
-        rtos::status_t ret;
-        ret = nm_.lock ();
-        if (ret != rtos::status::ok)
+        rtos::result_t res;
+        res = nm_.lock ();
+        if (res != rtos::result::ok)
           {
-            __throw_cmsis_error ((int) ret, "mutex lock failed");
+            __throw_cmsis_error ((int) res, "mutex lock failed");
           }
       }
 
       bool
       mutex::try_lock ()
       {
-        rtos::status_t ret;
-        ret = nm_.try_lock ();
-        if (ret == rtos::status::ok)
+        rtos::result_t res;
+        res = nm_.try_lock ();
+        if (res == rtos::result::ok)
           {
             return true;
           }
-        else if (ret == rtos::status::error_timeout_resource)
+        else if (res == rtos::result::error_timeout_resource)
           {
             return false;
           }
 
-        __throw_cmsis_error ((int) ret, "mutex try_lock failed");
+        __throw_cmsis_error ((int) res, "mutex try_lock failed");
         return false;
       }
 
       void
       mutex::unlock ()
       {
-        rtos::status_t ret;
-        ret = nm_.unlock ();
-        if (ret != rtos::status::ok)
+        rtos::result_t res;
+        res = nm_.unlock ();
+        if (res != rtos::result::ok)
           {
-            __throw_cmsis_error ((int) ret, "mutex unlock failed");
+            __throw_cmsis_error ((int) res, "mutex unlock failed");
           }
       }
 
@@ -75,40 +75,40 @@ namespace os
       void
       recursive_mutex::lock ()
       {
-        rtos::status_t ret;
-        ret = nm_.lock ();
-        if (ret != rtos::status::ok)
+        rtos::result_t res;
+        res = nm_.lock ();
+        if (res != rtos::result::ok)
           {
-            __throw_cmsis_error ((int) ret, "recursive_mutex lock failed");
+            __throw_cmsis_error ((int) res, "recursive_mutex lock failed");
           }
       }
 
       bool
       recursive_mutex::try_lock () noexcept
       {
-        rtos::status_t ret;
-        ret = nm_.try_lock ();
-        if (ret == rtos::status::ok)
+        rtos::result_t res;
+        res = nm_.try_lock ();
+        if (res == rtos::result::ok)
           {
             return true;
           }
-        else if (ret == rtos::status::error_timeout_resource)
+        else if (res == rtos::result::error_timeout_resource)
           {
             return false;
           }
 
-        __throw_cmsis_error ((int) ret, "recursive_mutex try_lock failed");
+        __throw_cmsis_error ((int) res, "recursive_mutex try_lock failed");
         return false;
       }
 
       void
       recursive_mutex::unlock ()
       {
-        rtos::status_t ret;
-        ret = nm_.unlock ();
-        if (ret != rtos::status::ok)
+        rtos::result_t res;
+        res = nm_.unlock ();
+        if (res != rtos::result::ok)
           {
-            __throw_cmsis_error ((int) ret, "recursive_mutex unlock failed");
+            __throw_cmsis_error ((int) res, "recursive_mutex unlock failed");
           }
       }
 

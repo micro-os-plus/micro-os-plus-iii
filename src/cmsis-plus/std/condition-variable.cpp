@@ -34,11 +34,11 @@ namespace os
       void
       condition_variable::notify_one () noexcept
       {
-        rtos::status_t ret;
-        ret = ncv_.notify_one ();
-        if (ret != rtos::status::ok)
+        rtos::result_t res;
+        res = ncv_.notify_one ();
+        if (res != rtos::result::ok)
           {
-            __throw_cmsis_error ((int) ret,
+            __throw_cmsis_error ((int) res,
                                  "condition_variable::notify_one() failed");
           }
       }
@@ -46,11 +46,11 @@ namespace os
       void
       condition_variable::notify_all () noexcept
       {
-        rtos::status_t ret;
-        ret = ncv_.notify_all ();
-        if (ret != rtos::status::ok)
+        rtos::result_t res;
+        res = ncv_.notify_all ();
+        if (res != rtos::result::ok)
           {
-            __throw_cmsis_error ((int) ret,
+            __throw_cmsis_error ((int) res,
                                  "condition_variable::notify_all() failed");
           }
       }

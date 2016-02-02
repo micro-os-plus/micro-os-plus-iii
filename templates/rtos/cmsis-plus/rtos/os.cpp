@@ -36,18 +36,18 @@ namespace os
 
       namespace kernel
       {
-        status_t
+        result_t
         initialize (void)
         {
           // TODO
-          return status::ok;
+          return result::ok;
         }
 
-        status_t
+        result_t
         start (void)
         {
           // TODO
-          return status::ok;
+          return result::ok;
         }
 
         bool
@@ -65,57 +65,57 @@ namespace os
         }
 
         const char*
-        strerror (status_t ret)
+        strerror (result_t res)
         {
           const char* str;
-          switch (ret)
+          switch (res)
             {
-            case status::event_signal:
+            case result::event_signal:
               str = "signal event occurred";
               break;
 
-            case status::event_message:
+            case result::event_message:
               str = "message event occurred";
               break;
 
-            case status::event_mail:
+            case result::event_mail:
               str = "mail event occurred";
               break;
 
-            case status::event_timeout:
+            case result::event_timeout:
               str = "timeout occurred";
               break;
 
-            case status::error_parameter:
+            case result::error_parameter:
               str = "mandatory parameter missing or incorrect object";
               break;
 
-            case status::error_resource:
+            case result::error_resource:
               str = "resource not available";
               break;
 
-            case status::error_timeout_resource:
+            case result::error_timeout_resource:
               str = "resource not available within given time";
               break;
 
-            case status::error_isr:
+            case result::error_isr:
               str = "not allowed in ISR context";
               break;
 
-            case status::error_isr_recursive:
+            case result::error_isr_recursive:
               str = "function called multiple times from ISR with same object";
               break;
 
-            case status::error_priority:
+            case result::error_priority:
               str =
                   "system cannot determine priority or thread has illegal priority";
               break;
 
-            case status::error_no_memory:
+            case result::error_no_memory:
               str = "system is out of memory";
               break;
 
-            case status::error_value:
+            case result::error_value:
               str = "value of a parameter is out of range";
               break;
 
@@ -151,42 +151,42 @@ namespace os
           return no_thread;
         }
 
-        status_t
+        result_t
         yield (void)
         {
           // TODO
-          return status::ok;
+          return result::ok;
         }
 
-        status_t
+        result_t
         wait (millis_t millisec, event_t* ret)
         {
           // TODO
-          return status::ok;
+          return result::ok;
         }
 
-        status_t
+        result_t
         wait_signals (signal_flags_t signals, millis_t millisec,
                       signal_flags_t* ret)
         {
           // TODO
-          return status::ok;
+          return result::ok;
         }
 
 #if 0
-        status_t
+        result_t
         delay (millis_t millisec)
           {
             // TODO
-            return status::ok;
+            return result::ok;
           }
 #endif
 
-        status_t
+        result_t
         sleep (sys_ticks_t ticks)
         {
           // TODO
-          return status::ok;
+          return result::ok;
         }
 
       }
@@ -279,11 +279,11 @@ namespace os
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_setschedprio.html
        *
        */
-      status_t
+      result_t
       Thread::set_sched_prio (thread::priority_t prio)
       {
         prio_ = prio;
-        return status::ok;
+        return result::ok;
       }
 
       /**
@@ -305,11 +305,11 @@ namespace os
        *
        * @note Cannot be called from Interrupt Service Routines.
        */
-      status_t
+      result_t
       Thread::join (void** exit_ptr)
       {
         // TODO
-        return status::ok;
+        return result::ok;
       }
 
       /**
@@ -326,11 +326,11 @@ namespace os
        *
        * @note Cannot be called from Interrupt Service Routines.
        */
-      status_t
+      result_t
       Thread::detach (void)
       {
         // TODO
-        return status::ok;
+        return result::ok;
       }
 
       /**
@@ -347,11 +347,11 @@ namespace os
        *
        * @note Cannot be called from Interrupt Service Routines.
        */
-      status_t
+      result_t
       Thread::cancel (void)
       {
         // TODO
-        return status::ok;
+        return result::ok;
       }
 
       /**
@@ -418,18 +418,18 @@ namespace os
         // TODO
       }
 
-      status_t
+      result_t
       Timer::start (millis_t millisec)
       {
         // TODO
-        return status::ok;
+        return result::ok;
       }
 
-      status_t
+      result_t
       Timer::stop (void)
       {
         // TODO
-        return status::ok;
+        return result::ok;
       }
 
       // ======================================================================
@@ -508,10 +508,10 @@ namespace os
        *
        * @note Cannot be called from Interrupt Service Routines.
        */
-      status_t
+      result_t
       Mutex::lock (void)
       {
-        return status::ok;
+        return result::ok;
       }
 
       /**
@@ -545,10 +545,10 @@ namespace os
        *
        * @note Cannot be called from Interrupt Service Routines.
        */
-      status_t
+      result_t
       Mutex::try_lock (void)
       {
-        return status::ok;
+        return result::ok;
       }
 
       /**
@@ -581,10 +581,10 @@ namespace os
        *
        * @note Cannot be called from Interrupt Service Routines.
        */
-      status_t
+      result_t
       Mutex::timed_lock (sys_ticks_t ticks)
       {
-        return status::ok;
+        return result::ok;
       }
 
       /**
@@ -605,10 +605,10 @@ namespace os
        *
        * @note Cannot be called from Interrupt Service Routines.
        */
-      status_t
+      result_t
       Mutex::unlock (void)
       {
-        return status::ok;
+        return result::ok;
       }
 
       /**
@@ -620,14 +620,14 @@ namespace os
        *
        * @note Cannot be called from Interrupt Service Routines.
        */
-      status_t
+      result_t
       Mutex::get_prio_ceiling (thread::priority_t* prio_ceiling)
       {
         if (prio_ceiling != nullptr)
           {
             *prio_ceiling = prio_ceiling_;
           }
-        return status::ok;
+        return result::ok;
       }
 
       /**
@@ -648,11 +648,11 @@ namespace os
        *
        * @note Cannot be called from Interrupt Service Routines.
        */
-      status_t
+      result_t
       Mutex::set_prio_ceiling (thread::priority_t prio_ceiling,
                                thread::priority_t* old_prio_ceiling)
       {
-        return status::ok;
+        return result::ok;
       }
 
       // ======================================================================
@@ -668,22 +668,22 @@ namespace os
         // TODO
       }
 
-      status_t
+      result_t
       Recursive_mutex::wait (void)
       {
-        return status::ok;
+        return result::ok;
       }
 
-      status_t
+      result_t
       Recursive_mutex::try_wait (sys_ticks_t ticks)
       {
-        return status::ok;
+        return result::ok;
       }
 
-      status_t
+      result_t
       Recursive_mutex::release (void)
       {
-        return status::ok;
+        return result::ok;
       }
 
       // ======================================================================
@@ -699,18 +699,18 @@ namespace os
         // TODO
       }
 
-      status_t
+      result_t
       Condition_variable::notify_one () noexcept
       {
         // TODO
-        return status::ok;
+        return result::ok;
       }
 
-      status_t
+      result_t
       Condition_variable::notify_all () noexcept
       {
         // TODO
-        return status::ok;
+        return result::ok;
       }
 
       // ======================================================================
@@ -729,13 +729,13 @@ namespace os
       int32_t
       Semaphore::wait (millis_t millisec)
       {
-        return status::ok;
+        return result::ok;
       }
 
-      status_t
+      result_t
       Semaphore::release (void)
       {
-        return status::ok;
+        return result::ok;
       }
 
       // ======================================================================
@@ -766,11 +766,11 @@ namespace os
         return nullptr;
       }
 
-      status_t
+      result_t
       Pool::free (void* block)
       {
         // TODO
-        return status::ok;
+        return result::ok;
       }
 
       // ======================================================================
@@ -787,18 +787,18 @@ namespace os
         // TODO
       }
 
-      status_t
+      result_t
       Message_queue::put (void* info, millis_t millisec)
       {
         // TODO
-        return status::ok;
+        return result::ok;
       }
 
-      status_t
+      result_t
       Message_queue::get (millis_t millisec, void** ret)
       {
         // TODO
-        return status::ok;
+        return result::ok;
       }
 
       // ======================================================================
@@ -830,25 +830,25 @@ namespace os
         return nullptr;
       }
 
-      status_t
+      result_t
       Mail_queue::put (void* mail)
       {
         // TODO
-        return status::ok;
+        return result::ok;
       }
 
-      status_t
+      result_t
       Mail_queue::get (millis_t millisec, void** ret)
       {
         // TODO
-        return status::ok;
+        return result::ok;
       }
 
-      status_t
+      result_t
       Mail_queue::free (void* mail)
       {
         // TODO
-        return status::ok;
+        return result::ok;
       }
 
     // ======================================================================

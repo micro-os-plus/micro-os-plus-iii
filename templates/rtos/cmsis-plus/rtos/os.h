@@ -49,14 +49,14 @@ namespace os
       // ----------------------------------------------------------------------
 
       /// Status code values returned by CMSIS-RTOS functions.
-      using status_t = uint32_t;
+      using result_t = uint32_t;
 
-      namespace status
+      namespace result
       {
         // Explicit namespace preferred over scoped enum,
         // otherwise too many casts are required.
         enum
-          : status_t
+          : result_t
             {
               //
           ///< function completed; no error or event occurred.
@@ -109,8 +109,6 @@ namespace os
 
       // ----------------------------------------------------------------------
 
-      // ----------------------------------------------------------------------
-
       using millis_t = uint32_t;
       using sys_ticks_t = uint32_t;
 
@@ -128,7 +126,7 @@ namespace os
       /// Event structure contains detailed information about an event.
       using event_t = struct event_s
         {
-          status_t status; ///< status code: event or error information
+          result_t status; ///< result code: event or error information
           union
             {
               uint32_t v; ///< message as 32-bit value
@@ -148,13 +146,13 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
-      typedef struct current_systick_s
-      {
-        uint64_t ticks; // Count of SysTick ticks since core reset
-        uint32_t cycles; // Count of SysTick cycles since timer reload (24 bits)
-        uint32_t divisor; // SysTick reload value (24 bits)
-        uint32_t core_frequency_hz; // Core clock frequency Hz
-      } current_systick_t;
+      using current_systick_t = struct current_systick_s
+        {
+          uint64_t ticks; // Count of SysTick ticks since core reset
+          uint32_t cycles;// Count of SysTick cycles since timer reload (24 bits)
+          uint32_t divisor;// SysTick reload value (24 bits)
+          uint32_t core_frequency_hz;// Core clock frequency Hz
+        };
 
 #pragma GCC diagnostic pop
 
@@ -162,13 +160,13 @@ namespace os
       namespace kernel
       {
         /// Initialise the RTOS Kernel for creating objects.
-        /// @return status code that indicates the execution status of the function.
-        status_t
+        /// @return result code that indicates the execution status of the function.
+        result_t
         initialize (void);
 
         /// Start the RTOS Kernel.
-        /// @return status code that indicates the execution status of the function.
-        status_t
+        /// @return result code that indicates the execution status of the function.
+        result_t
         start (void);
 
         /// Check if the RTOS kernel is already started.
@@ -192,7 +190,7 @@ namespace os
 
         /// The RTOS kernel system timer frequency in Hz.
         /// \note Reflects the system timer setting and is typically defined in a configuration file.
-        constexpr uint32_t SYS_TICK_FREQUENCY_HZ = 1000; // TODO: Param
+        constexpr uint32_t sys_tick_frequency_hz = 1000; // TODO: Param
 
         /// Convert a microseconds value to a RTOS kernel system timer value.
         /// Always round up.
@@ -203,12 +201,12 @@ namespace os
           compute_sys_ticks (Rep_T microsec)
           {
             // TODO: add some restrictions to match only numeric types
-            return (uint32_t) ((((microsec) * ((Rep_T) SYS_TICK_FREQUENCY_HZ))
+            return (uint32_t) ((((microsec) * ((Rep_T) sys_tick_frequency_hz))
                 + (Rep_T) 999999UL) / (Rep_T) 1000000UL);
           }
 
         const char*
-        strerror (status_t);
+        strerror (result_t);
 
       } /* namespace kernel */
 
@@ -257,21 +255,21 @@ namespace os
         get_current (void);
 
         /// Pass control to next thread that is in state \b READY.
-        /// @return status code that indicates the execution status of the function.
-        status_t
+        /// @return result code that indicates the execution status of the function.
+        result_t
         yield (void);
 
         /// Wait for Signal, Message, Mail, or Timeout.
         /// @param [in] millisec          @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out
         /// @return event that contains signal, message, or mail information or error code.
-        status_t
+        result_t
         wait (millis_t millisec, event_t* ret);
 
         /// Wait for one or more Signal Flags to become signaled for the current \b RUNNING thread.
         /// @param [in]     signals       wait until all specified signal flags set or 0 for any single signal flag.
         /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
         /// @return event flag information or error code.
-        status_t
+        result_t
         wait_signals (signal_flags_t signals, millis_t millisec,
                       signal_flags_t* ret);
 
@@ -283,7 +281,7 @@ namespace os
         delay (millis_t millisec);
 #endif
 
-        status_t
+        result_t
         sleep (sys_ticks_t ticks);
 
       }
@@ -392,7 +390,7 @@ namespace os
          * @return if successful, return status::ok; otherwise an
          * error number is returned.
          */
-        status_t
+        result_t
         cancel (void);
 
         /**
@@ -406,7 +404,7 @@ namespace os
          *
          * The join() function shall not return an error code of [EINTR].
          */
-        status_t
+        result_t
         join (void** exit_ptr);
 
         /**
@@ -417,7 +415,7 @@ namespace os
          *
          * The detach() function shall not return an error code of [EINTR].
          */
-        status_t
+        result_t
         detach (void);
 
         /**
@@ -448,7 +446,7 @@ namespace os
          * The pthread_setschedprio() function shall not return an error
          * code of [EINTR].
          */
-        status_t
+        result_t
         set_sched_prio (thread::priority_t prio);
 
         /**
@@ -547,13 +545,13 @@ namespace os
         /// @param [in]     timer_id      timer ID obtained by @ref osTimerCreate.
         /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue "Time delay" value of the timer.
         /// @return status code that indicates the execution status of the function.
-        status_t
+        result_t
         start (millis_t millisec);
 
         /// Stop the timer.
         /// @param [in]     timer_id      timer ID obtained by @ref osTimerCreate.
         /// @return status code that indicates the execution status of the function.
-        status_t
+        result_t
         stop (void);
 
       protected:
@@ -637,7 +635,7 @@ namespace os
          * @return If successful, return status::ok; otherwise return an
          * error number.
          */
-        status_t
+        result_t
         lock (void);
 
         /**
@@ -646,7 +644,7 @@ namespace os
          * @return If successful, return status::ok; otherwise return an
          * error number.
          */
-        status_t
+        result_t
         try_lock (void);
 
         /**
@@ -657,7 +655,7 @@ namespace os
          * @return If successful, return status::ok; otherwise return an
          * error number.
          */
-        status_t
+        result_t
         timed_lock (sys_ticks_t ticks);
 
         /**
@@ -666,7 +664,7 @@ namespace os
          * @return If successful, return status::ok; otherwise return an
          * error number.
          */
-        status_t
+        result_t
         unlock (void);
 
         /**
@@ -677,7 +675,7 @@ namespace os
          * @return If successful, return status::ok; otherwise return an
          * error number.
          */
-        status_t
+        result_t
         get_prio_ceiling (thread::priority_t* prio_ceiling);
 
         /**
@@ -690,7 +688,7 @@ namespace os
          * @return If successful, return status::ok; otherwise return an
          * error number.
          */
-        status_t
+        result_t
         set_prio_ceiling (thread::priority_t prio_ceiling,
                           thread::priority_t* old_prio_ceiling);
 
@@ -730,18 +728,18 @@ namespace os
         /// Wait until a Mutex becomes available.
         /// @param [in]     mutex_id      mutex ID obtained by @ref osMutexCreate.
         /// @return status code that indicates the execution status of the function.
-        status_t
+        result_t
         wait (void);
 
         // Normally should not return before ticks expire if ownership
         // is not obtained.
-        status_t
+        result_t
         try_wait (sys_ticks_t ticks = 0);
 
         /// Release a Mutex that was obtained by @ref osMutexWait.
         /// @param [in]     mutex_id      mutex ID obtained by @ref osMutexCreate.
         /// @return status code that indicates the execution status of the function.
-        status_t
+        result_t
         release (void);
 
       protected:
@@ -770,10 +768,10 @@ namespace os
         /// @return status code that indicates the execution status of the function.
         ~Condition_variable ();
 
-        status_t
+        result_t
         notify_one () noexcept;
 
-        status_t
+        result_t
         notify_all () noexcept;
 
       protected:
@@ -817,7 +815,7 @@ namespace os
         /// Release a Semaphore token.
         /// @param [in]     semaphore_id  semaphore object referenced with @ref osSemaphoreCreate.
         /// @return status code that indicates the execution status of the function.
-        status_t
+        result_t
         release (void);
 
       protected:
@@ -864,7 +862,7 @@ namespace os
         void*
         calloc (void);
 
-        status_t
+        result_t
         free (void* block);
 
       protected:
@@ -901,14 +899,14 @@ namespace os
         /// @param [in]     info          message information.
         /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
         /// @return status code that indicates the execution status of the function.
-        status_t
+        result_t
         put (void* info, millis_t millisec);
 
         /// Get a Message or Wait for a Message from a Queue.
         /// @param [in]     queue_id      message queue ID obtained with @ref osMessageCreate.
         /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
         /// @return event information that includes status code.
-        status_t
+        result_t
         get (millis_t millisec, void** ret);
 
       protected:
@@ -958,21 +956,21 @@ namespace os
         /// @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
         /// @param [in]     mail          memory block previously allocated with @ref osMailAlloc or @ref osMailCAlloc.
         /// @return status code that indicates the execution status of the function.
-        status_t
+        result_t
         put (void* mail);
 
         /// Get a mail from a queue.
         /// @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
         /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out
         /// @return event that contains mail information or error code.
-        status_t
+        result_t
         get (millis_t millisec, void** ret);
 
         /// Free a memory block from a mail.
         /// @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
         /// @param [in]     mail          pointer to the memory block that was obtained with @ref osMailGet.
         /// @return status code that indicates the execution status of the function.
-        status_t
+        result_t
         free (void* mail);
 
       protected:

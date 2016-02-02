@@ -158,8 +158,8 @@ osWait (uint32_t millisec)
 {
   osEvent event;
 
-  status_t ret = thread::wait (millisec, (event_t*) &event);
-  event.status = static_cast<osStatus> (ret);
+  result_t res = thread::wait (millisec, (event_t*) &event);
+  event.status = static_cast<osStatus> (res);
   return event;
 }
 
@@ -238,9 +238,9 @@ osEvent
 osSignalWait (int32_t signals, uint32_t millisec)
 {
   osEvent event;
-  status_t ret = thread::wait_signals (signals, millisec,
+  result_t res = thread::wait_signals (signals, millisec,
                                        (signal_flags_t*) &event.value.signals);
-  event.status = static_cast<osStatus> (ret);
+  event.status = static_cast<osStatus> (res);
   return event;
 }
 
@@ -274,7 +274,7 @@ osMutexCreateEx (osMutex* addr, const osMutexAttr* attr)
 osStatus
 osMutexWait (osMutexId mutex_id, uint32_t millisec)
 {
-  status_t status;
+  result_t status;
   if (millisec == osWaitForever)
     {
       status = (reinterpret_cast<Mutex&> (mutex_id)).lock ();
@@ -296,7 +296,7 @@ osMutexWait (osMutexId mutex_id, uint32_t millisec)
 osStatus
 osMutexRelease (osMutexId mutex_id)
 {
-  status_t status;
+  result_t status;
   status = (reinterpret_cast<Mutex&> (mutex_id)).unlock ();
 
   // TODO: return legacy code for POSIX codes
@@ -441,9 +441,9 @@ osEvent
 osMessageGet (osMessageQId queue_id, uint32_t millisec)
 {
   osEvent event;
-  status_t ret = (reinterpret_cast<Message_queue&> (queue_id)).get (
+  result_t res = (reinterpret_cast<Message_queue&> (queue_id)).get (
       millisec, (void**) &event.value.p);
-  event.status = static_cast<osStatus> (ret);
+  event.status = static_cast<osStatus> (res);
   return event;
 }
 
@@ -512,9 +512,9 @@ osEvent
 osMailGet (osMailQId queue_id, uint32_t millisec)
 {
   osEvent event;
-  status_t ret = (reinterpret_cast<Mail_queue&> (queue_id)).get (
+  result_t res = (reinterpret_cast<Mail_queue&> (queue_id)).get (
       millisec, (void**) &event.value.p);
-  event.status = static_cast<osStatus> (ret);
+  event.status = static_cast<osStatus> (res);
   return event;
 }
 
