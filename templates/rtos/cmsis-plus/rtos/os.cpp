@@ -436,39 +436,20 @@ namespace os
 
       namespace mutex
       {
-        const attr_t normal_initializer
-          {
-          //
-              nullptr,//
-              thread::priority::max, //
-              protocol::none, //
-              robustness::stalled, //
-              type::normal //
-          };
-        const attr_t recursive_initializer
-          {
-          //
-              nullptr,//
-              thread::priority::max, //
-              protocol::none, //
-              robustness::stalled, //
-              type::recursive //
-          };
+        const Attributes normal_initializer
+          { nullptr };
+
+        const Recursive_attributes recursive_initializer
+          { nullptr };
       }
 
-      Mutex::Mutex (const mutex::attr_t* attr) :
-          Named_object (attr != nullptr ? attr->name : nullptr)
+      Mutex::Mutex (const mutex::Attributes& attr) :
+          Named_object (attr.get_name ())
       {
-        // TODO
-        if (attr == nullptr)
-          {
-            attr = &mutex::normal_initializer;
-          }
-
-        prio_ceiling_ = attr->priority_ceiling;
-        protocol_ = attr->protocol;
-        robustness_ = attr->robustness;
-        type_ = attr->type;
+        attr.get_prio_ceiling (&prio_ceiling_);
+        attr.get_protocol (&protocol_);
+        attr.get_robustness (&robustness_);
+        attr.get_type (&type_);
       }
 
       Mutex::~Mutex ()
@@ -651,37 +632,6 @@ namespace os
       result_t
       Mutex::set_prio_ceiling (thread::priority_t prio_ceiling,
                                thread::priority_t* old_prio_ceiling)
-      {
-        return result::ok;
-      }
-
-      // ======================================================================
-
-      Recursive_mutex::Recursive_mutex (const char* name) :
-          Named_object (name)
-      {
-        // TODO
-      }
-
-      Recursive_mutex::~Recursive_mutex ()
-      {
-        // TODO
-      }
-
-      result_t
-      Recursive_mutex::wait (void)
-      {
-        return result::ok;
-      }
-
-      result_t
-      Recursive_mutex::try_wait (sys_ticks_t ticks)
-      {
-        return result::ok;
-      }
-
-      result_t
-      Recursive_mutex::release (void)
       {
         return result::ok;
       }

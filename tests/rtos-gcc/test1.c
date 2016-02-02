@@ -24,10 +24,10 @@
 
 // ----------------------------------------------------------------------------
 
-void*
+static void*
 task_function (const void* args);
 
-void
+static void
 timer_callback (const void* args);
 
 // ----------------------------------------------------------------------------
@@ -49,7 +49,10 @@ timer_callback (const void* args)
 // ----------------------------------------------------------------------------
 
 int
-main (int argc, char* argv[])
+test1 (void);
+
+int
+test1 (void)
 {
   struct
   {
@@ -105,7 +108,6 @@ main (int argc, char* argv[])
     }
 #endif
 
-  printf ("%s done.", argv[0]);
   return 0;
 }
 

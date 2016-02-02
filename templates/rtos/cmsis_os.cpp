@@ -260,15 +260,14 @@ osSignalWaitEx (int32_t signals, uint32_t millisec)
 osMutexId
 osMutexCreate (const osMutexDef_t *mutex_def)
 {
-  return reinterpret_cast<osMutexId> (new ((void*) &mutex_def->data) Mutex (
-      (const mutex::attr_t*) nullptr));
+  return reinterpret_cast<osMutexId> (new ((void*) &mutex_def->data) Mutex ());
 }
 
 osMutexId
 osMutexCreateEx (osMutex* addr, const osMutexAttr* attr)
 {
   return reinterpret_cast<osMutexId> (new ((void*) addr) Mutex (
-      (const mutex::attr_t*) attr));
+      (const mutex::Attributes&) *attr));
 }
 
 osStatus

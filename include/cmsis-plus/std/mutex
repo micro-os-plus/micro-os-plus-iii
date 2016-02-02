@@ -58,7 +58,7 @@ namespace os
         mutex () noexcept;
 
         // Extension to ISO.
-        mutex (os::cmsis::rtos::mutex::attr_t* attr) noexcept;
+        mutex (os::cmsis::rtos::mutex::Attributes& attr) noexcept;
 
         ~mutex () = default;
 
@@ -98,7 +98,7 @@ namespace os
         recursive_mutex ();
 
         // Extension to ISO.
-        recursive_mutex (os::cmsis::rtos::mutex::attr_t* attr);
+        recursive_mutex (os::cmsis::rtos::mutex::Attributes& attr);
 
         ~recursive_mutex () = default;
 
@@ -132,7 +132,7 @@ namespace os
         timed_mutex () = default;
 
         // Extension to ISO.
-        timed_mutex (os::cmsis::rtos::mutex::attr_t* attr);
+        timed_mutex (os::cmsis::rtos::mutex::Attributes& attr);
 
         ~timed_mutex () = default;
 
@@ -160,7 +160,7 @@ namespace os
         recursive_timed_mutex () = default;
 
         // Extension to ISO.
-        recursive_timed_mutex (os::cmsis::rtos::mutex::attr_t* attr);
+        recursive_timed_mutex (os::cmsis::rtos::mutex::Attributes& attr);
 
         ~recursive_timed_mutex () = default;
 
@@ -357,7 +357,7 @@ namespace os
       // ======================================================================
 
       inline
-      mutex::mutex (os::cmsis::rtos::mutex::attr_t* attr) noexcept :
+      mutex::mutex (os::cmsis::rtos::mutex::Attributes& attr) noexcept :
       nm_
         { attr}
         {
@@ -375,13 +375,14 @@ namespace os
       inline
       recursive_mutex::recursive_mutex () :
           nm_
-            { &os::cmsis::rtos::mutex::recursive_initializer }
+            { os::cmsis::rtos::mutex::recursive_initializer }
       {
         ;
       }
 
       inline
-      recursive_mutex::recursive_mutex (os::cmsis::rtos::mutex::attr_t* attr) :
+      recursive_mutex::recursive_mutex (
+          os::cmsis::rtos::mutex::Attributes& attr) :
           nm_
             { attr }
       {
@@ -397,7 +398,7 @@ namespace os
       // ======================================================================
 
       inline
-      timed_mutex::timed_mutex (os::cmsis::rtos::mutex::attr_t* attr) :
+      timed_mutex::timed_mutex (os::cmsis::rtos::mutex::Attributes& attr) :
           mutex
             { attr }
       {
@@ -469,7 +470,7 @@ namespace os
 
       inline
       recursive_timed_mutex::recursive_timed_mutex (
-          os::cmsis::rtos::mutex::attr_t* attr) :
+          os::cmsis::rtos::mutex::Attributes& attr) :
           recursive_mutex
             { attr }
       {

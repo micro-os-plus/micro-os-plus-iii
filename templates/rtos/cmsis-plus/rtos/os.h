@@ -37,8 +37,6 @@
 #ifdef  __cplusplus
 
 #include <cstddef>
-#include <functional>
-#include <memory>
 
 namespace os
 {
@@ -350,7 +348,8 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-        using func_t = void* (*) (void* args);
+        using func_args_t = void*;
+        using func_t = void* (*) (func_args_t args);
       }
 
 #pragma GCC diagnostic push
@@ -490,7 +489,7 @@ namespace os
 
         thread::func_t func_;
 
-        void* func_args_;
+        thread::func_args_t func_args_;
 
         // Add other internal data
 
@@ -592,21 +591,91 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
-        // TODO: make class?
-        using attr_t = struct attr_s
-          {
-            const char* name;
-            thread::priority_t priority_ceiling;
-            protocol_t protocol; // none = 0, inherit = 1, protect = 2
-            robustness_t robustness;// stalled = 0, robust = 1
-            type_t type;// normal = 0, errorcheck = 1, recursive = 2
-          };
+        class Attributes : public Named_object
+        {
+        public:
+
+          Attributes (const char* name);
+
+          Attributes (const Attributes&) = default;
+          Attributes (Attributes&&) = default;
+          Attributes&
+          operator= (const Attributes&) = default;
+          Attributes&
+          operator= (Attributes&&) = default;
+
+          /**
+           * @brief Delete a mutex attributes.
+           */
+          ~Attributes () = default;
+
+          result_t
+          get_prio_ceiling (thread::priority_t* prio_ceiling) const;
+
+          result_t
+          set_prio_ceiling (thread::priority_t prio_ceiling);
+
+          result_t
+          get_protocol (mutex::protocol_t* protocol) const;
+
+          result_t
+          set_protocol (mutex::protocol_t protocol);
+
+          result_t
+          get_robustness (mutex::robustness_t* robustness) const;
+
+          result_t
+          set_robustness (mutex::robustness_t robustness);
+
+          result_t
+          get_type (mutex::type_t* type) const;
+
+          result_t
+          set_type (mutex::type_t type);
+
+        protected:
+
+          thread::priority_t priority_ceiling_;
+          mutex::protocol_t protocol_;
+          mutex::robustness_t robustness_;
+          mutex::type_t type_;
+
+        };
 
 #pragma GCC diagnostic pop
 
-        extern const attr_t normal_initializer;
-        extern const attr_t recursive_initializer;
-      }
+        extern const Attributes normal_initializer;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+        class Recursive_attributes : public Attributes
+        {
+        public:
+
+          Recursive_attributes (const char* name);
+
+          Recursive_attributes (const Recursive_attributes&) = default;
+          Recursive_attributes (Recursive_attributes&&) = default;
+          Recursive_attributes&
+          operator= (const Recursive_attributes&) = default;
+          Recursive_attributes&
+          operator= (Recursive_attributes&&) = default;
+
+          /**
+           * @brief Delete a recursive mutex attributes.
+           */
+          ~Recursive_attributes () = default;
+
+        };
+
+#pragma GCC diagnostic pop
+
+        extern const Recursive_attributes recursive_initializer;
+
+      } /* namespace mutex */
+
+      // ======================================================================
 
       class Mutex : public Named_object
       {
@@ -615,7 +684,8 @@ namespace os
         /**
          * @brief Create and initialise a mutex.
          */
-        Mutex (const mutex::attr_t* attr = nullptr);
+        Mutex ();
+        Mutex (const mutex::Attributes& attr);
 
         Mutex (const Mutex&) = delete;
         Mutex (Mutex&&) = delete;
@@ -683,68 +753,21 @@ namespace os
          *
          * @param [in] prio_ceiling new priority.
          * @param [out] old_prio_ceiling pointer to location where to
-         * store the previous priority.
+         * store the previous priority; may be nullptr.
          *
          * @return If successful, return status::ok; otherwise return an
          * error number.
          */
         result_t
         set_prio_ceiling (thread::priority_t prio_ceiling,
-                          thread::priority_t* old_prio_ceiling);
+                          thread::priority_t* old_prio_ceiling = nullptr);
 
       protected:
 
-        // Add internal data
         thread::priority_t prio_ceiling_;
         mutex::protocol_t protocol_; // none = 0, inherit = 1, protect = 2
         mutex::robustness_t robustness_; // stalled = 0, robust = 1
         mutex::type_t type_; // normal = 0, errorcheck = 1, recursive = 2
-      };
-
-      // ======================================================================
-
-      class Recursive_mutex : public Named_object
-      {
-      public:
-
-        /// Create and initialize a recursive mutex object.
-        /// @param         name          name of the mutex object.
-        /// @return mutex ID for reference by other functions or NULL in case of error.
-        Recursive_mutex (const char* name);
-        Recursive_mutex ();
-
-        Recursive_mutex (const Recursive_mutex&) = delete;
-        Recursive_mutex (Recursive_mutex&&) = delete;
-        Recursive_mutex&
-        operator= (const Recursive_mutex&) = delete;
-        Recursive_mutex&
-        operator= (Recursive_mutex&&) = delete;
-
-        /// Delete a Mutex that was created by @ref osMutexCreate.
-        /// @param [in]     mutex_id      mutex ID obtained by @ref osMutexCreate.
-        /// @return status code that indicates the execution status of the function.
-        ~Recursive_mutex ();
-
-        /// Wait until a Mutex becomes available.
-        /// @param [in]     mutex_id      mutex ID obtained by @ref osMutexCreate.
-        /// @return status code that indicates the execution status of the function.
-        result_t
-        wait (void);
-
-        // Normally should not return before ticks expire if ownership
-        // is not obtained.
-        result_t
-        try_wait (sys_ticks_t ticks = 0);
-
-        /// Release a Mutex that was obtained by @ref osMutexWait.
-        /// @param [in]     mutex_id      mutex ID obtained by @ref osMutexCreate.
-        /// @return status code that indicates the execution status of the function.
-        result_t
-        release (void);
-
-      protected:
-
-        // Add internal data
       };
 
       // ======================================================================
@@ -1025,6 +1048,109 @@ namespace os
       }
 
       // ======================================================================
+
+      namespace mutex
+      {
+        inline
+        Attributes::Attributes (const char* name) :
+            Named_object (name)
+        {
+          priority_ceiling_ = thread::priority::max;
+          protocol_ = protocol::none;
+          robustness_ = robustness::stalled;
+          type_ = type::normal;
+        }
+
+        inline result_t
+        Attributes::get_prio_ceiling (thread::priority_t* prio_ceiling) const
+        {
+          if (prio_ceiling != nullptr)
+            {
+              *prio_ceiling = priority_ceiling_;
+            }
+          return result::ok;
+        }
+
+        inline result_t
+        Attributes::set_prio_ceiling (thread::priority_t prio_ceiling)
+        {
+          priority_ceiling_ = prio_ceiling;
+          return result::ok;
+        }
+
+        inline result_t
+        Attributes::get_protocol (protocol_t* protocol) const
+        {
+          if (protocol != nullptr)
+            {
+              *protocol = protocol_;
+            }
+          return result::ok;
+        }
+
+        inline result_t
+        Attributes::set_protocol (protocol_t protocol)
+        {
+          protocol_ = protocol;
+          return result::ok;
+        }
+
+        inline result_t
+        Attributes::get_robustness (robustness_t* robustness) const
+        {
+          if (robustness != nullptr)
+            {
+              *robustness = robustness_;
+            }
+          return result::ok;
+        }
+
+        inline result_t
+        Attributes::set_robustness (robustness_t robustness)
+        {
+          robustness_ = robustness;
+          return result::ok;
+        }
+
+        inline result_t
+        Attributes::get_type (type_t* type) const
+        {
+          if (type != nullptr)
+            {
+              *type = type_;
+            }
+          return result::ok;
+        }
+
+        inline result_t
+        Attributes::set_type (type_t type)
+        {
+          type_ = type;
+          return result::ok;
+        }
+      }
+
+      // ======================================================================
+
+      namespace mutex
+      {
+        inline
+        Recursive_attributes::Recursive_attributes (const char* name) :
+            Attributes (name)
+        {
+          type_ = type::recursive;
+        }
+      }
+
+      // ======================================================================
+
+      inline
+      Mutex::Mutex () :
+          Mutex
+            { mutex::normal_initializer }
+      {
+        ;
+      }
 
       inline
       Condition_variable::Condition_variable () :
