@@ -85,7 +85,8 @@ namespace os
       thread::swap (thread& t) noexcept
       {
         ::std::swap (id_, t.id_);
-      }
+        ::std::swap (function_object_deleter_, t.function_object_deleter_);
+       }
 
       bool
       thread::joinable () const noexcept
