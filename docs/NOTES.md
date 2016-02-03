@@ -201,6 +201,19 @@ Suggestion:
 
 * extend the API to add osPoolDelete(), osMessageDelete(), osMailDelete()
 
+### Small range for osKernelSysTick()
+
+The 32-bits value of the returned counter allows only small time ranges.
+
+For example, for a 100 MHz CPU, at 1000 ticks/sec, the SysTick counter divisor
+is 100.000, or 10^5, allowing only 4*10^(9-5), or 40000 ticks, which are
+only 40 seconds beween rollover.
+
+Suggestion:
+
+* widen the value to 64-bits.
+* return separate ticks & cycles in a structure
+
 ### Threads
 
 #### There are very few priority levels
