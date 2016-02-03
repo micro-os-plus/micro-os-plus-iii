@@ -17,7 +17,7 @@
  */
 
 #include <cmsis-plus/std/thread>
-#include <cmsis-plus/rtos/systick-clock.h>
+#include <cmsis-plus/rtos/chrono-clocks.h>
 #include <cmsis-plus/diag/trace.h>
 
 #include <cstdio>

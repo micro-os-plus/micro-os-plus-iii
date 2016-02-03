@@ -16,8 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CMSIS_PLUS_SYSTICK_CLOCK_H_
-#define CMSIS_PLUS_SYSTICK_CLOCK_H_
+#ifndef CMSIS_PLUS_CHRONO_CLOCKS_H_
+#define CMSIS_PLUS_CHRONO_CLOCKS_H_
 
 // ----------------------------------------------------------------------------
 
@@ -61,4 +61,4 @@ namespace os
   } /* namespace cmsis */
 } /* namespace os */
 
-#endif /* CMSIS_PLUS_SYSTICK_CLOCK_H_ */
+#endif /* CMSIS_PLUS_CHRONO_CLOCKS_H_ */

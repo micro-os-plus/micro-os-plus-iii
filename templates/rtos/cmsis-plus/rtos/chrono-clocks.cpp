@@ -16,7 +16,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cmsis-plus/rtos/systick-clock.h>
+#include <cmsis-plus/rtos/chrono-clocks.h>
 
 // ----------------------------------------------------------------------------
 
