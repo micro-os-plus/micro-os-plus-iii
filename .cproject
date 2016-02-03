@@ -637,7 +637,7 @@
 							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.logicalop.1584792501" name="Warn if suspicious logical ops (-Wlogical-op)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.logicalop" value="true" valueType="boolean"/>
 							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.agreggatereturn.660640406" name="Warn if struct is returned (-Wagreggate-return)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.agreggatereturn" value="true" valueType="boolean"/>
 							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.floatequal.1396391308" name="Warn if floats are compared as equal (-Wfloat-equal)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.warnings.floatequal" value="true" valueType="boolean"/>
-							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.createlisting.218235675" name="Create extended listing" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.createlisting" value="false" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.createlisting.218235675" name="Create extended listing" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.createlisting" value="true" valueType="boolean"/>
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="ilg.gnuarmeclipse.managedbuild.cross.targetPlatform.1277795967" isAbstract="false" osList="all" superClass="ilg.gnuarmeclipse.managedbuild.cross.targetPlatform"/>
 							<builder buildPath="${workspace_loc:/cmsis-plus-xpack}/Debug" id="ilg.gnuarmeclipse.managedbuild.cross.builder.1214578619" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="ilg.gnuarmeclipse.managedbuild.cross.builder"/>
 							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler.1149626578" name="Cross ARM GNU Assembler" superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler">
@@ -766,7 +766,26 @@
 		<project id="cmsis-plus-xpack.ilg.gnuarmeclipse.managedbuild.cross.target.elf.958779874" name="Executable" projectType="ilg.gnuarmeclipse.managedbuild.cross.target.elf"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
-	<storageModule moduleId="refreshScope"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="test-std-gcc-debug">
+			<resource resourceType="PROJECT" workspacePath="/cmsis-plus-xpack"/>
+		</configuration>
+		<configuration configurationName="test-eabi-gcc-debug">
+			<resource resourceType="PROJECT" workspacePath="/cmsis-plus-xpack"/>
+		</configuration>
+		<configuration configurationName="test-gcc-debug">
+			<resource resourceType="PROJECT" workspacePath="/cmsis-plus-xpack"/>
+		</configuration>
+		<configuration configurationName="test-rtos-gcc-debug">
+			<resource resourceType="PROJECT" workspacePath="/cmsis-plus-xpack"/>
+		</configuration>
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/cmsis-plus-xpack"/>
+		</configuration>
+		<configuration configurationName="test-std-eabi-gcc-debug">
+			<resource resourceType="PROJECT" workspacePath="/cmsis-plus-xpack"/>
+		</configuration>
+	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		<scannerConfigBuildInfo instanceId="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.1099817463;ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.1099817463.;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.416624043;ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.1061778533">

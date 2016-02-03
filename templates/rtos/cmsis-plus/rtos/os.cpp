@@ -61,7 +61,25 @@ namespace os
         get_current_systick (current_systick_t* details)
         {
           // TODO
+          if (details != nullptr){
+              details->core_frequency_hz = 168000000;
+              details->divisor = details->core_frequency_hz / 1000;
+#if 0
+              details->cycles = 10;
+              details->ticks = 1234;
+#else
+              details->cycles = details->divisor-1;
+              details->ticks = 0;
+#endif
+          }
           return 1234;
+        }
+
+        uint64_t
+        get_rtc_seconds_since_epoch (void)
+        {
+          // TODO
+          return 1000000;
         }
 
         const char*
@@ -727,26 +745,143 @@ namespace os
 
       // ======================================================================
 
-      Condition_variable::Condition_variable (const char* name) :
-          Named_object (name)
+      namespace cond
       {
-        // TODO
+        const Attributes initializer
+          { nullptr };
+      } /* namespace cond */
+
+      /**
+       * @details
+       */
+      Condition_variable::Condition_variable () :
+          Condition_variable (cond::initializer)
+      {
+        ;
       }
 
+      /**
+       * @details
+       */
+      Condition_variable::Condition_variable (const cond::Attributes& attr) :
+          Named_object (attr.get_name ())
+      {
+        ;
+      }
+
+      /**
+       * @details
+       * It shall be safe to destroy an initialised condition variable
+       * upon which no threads are currently blocked. Attempting to
+       * destroy a condition variable upon which other threads are
+       * currently blocked results in undefined behaviour.
+       */
       Condition_variable::~Condition_variable ()
       {
         // TODO
       }
 
+      /**
+       * @details
+       * Unblock at least one of the threads that are blocked
+       * on the specified condition variable.
+       *
+       * When each thread unblocked as a result of a
+       * Condition_variable::signal() returns from its call to
+       * Condition_variable::wait() or Condition_variable::timedwait(),
+       * the thread shall own the mutex with which it called
+       * Condition_variable::wait() or Condition_variable::timed_wait().
+       * The thread(s) that are unblocked shall contend for
+       * the mutex according to the scheduling policy (if applicable),
+       * and as if each had called Mutex::lock().
+       *
+       * Condition_variable::signal() may be called by a thread
+       * whether or not it currently owns the mutex that threads
+       * calling Condition_variable::wait() or
+       * Condition_variable::timed_wait() have associated with
+       * the condition variable during their waits; however,
+       * if predictable scheduling behavior is required, then
+       * that mutex shall be locked by the thread calling
+       * Condition_variable::broadcast().
+       *
+       * The Condition_variable::signal() function shall
+       * have no effect if there are no threads currently
+       * blocked on this condition variable.
+       */
       result_t
-      Condition_variable::notify_one () noexcept
+      Condition_variable::signal ()
       {
         // TODO
         return result::ok;
       }
 
+      /**
+       * @details
+       * Unblock all threads currently blocked on the specified
+       * condition variable.
+       *
+       * If more than one thread is blocked on a condition variable,
+       * the scheduling policy shall determine the order in which
+       * threads are unblocked.
+       *
+       * When each thread unblocked as a result of a
+       * Condition_variable::broadcast() returns from its call to
+       * Condition_variable::wait() or Condition_variable::timed_wait(),
+       * the thread shall own the mutex with which it called
+       * Condition_variable::wait() or Condition_variable::timed_wait().
+       * The thread(s) that are unblocked shall contend for
+       * the mutex according to the scheduling policy (if applicable),
+       * and as if each had called Mutex::lock().
+       *
+       * Condition_variable::broadcast() may be called by a thread
+       * whether or not it currently owns the mutex that threads
+       * calling Condition_variable::wait() or
+       * Condition_variable::timed_wait() have associated with
+       * the condition variable during their waits; however,
+       * if predictable scheduling behaviour is required, then
+       * that mutex shall be locked by the thread calling
+       * Condition_variable::broadcast().
+       *
+       * The Condition_variable::broadcast() function shall
+       * have no effect if there are no threads currently
+       * blocked on this condition variable.
+       */
       result_t
-      Condition_variable::notify_all () noexcept
+      Condition_variable::broadcast ()
+      {
+        // TODO
+        return result::ok;
+      }
+
+      /**
+       * @details
+       * Block on a condition variable. The application shall ensure
+       * that these functions are called with mutex locked by
+       * the calling thread; otherwise, an error (for
+       * PTHREAD_MUTEX_ERRORCHECK and robust mutexes) or
+       * undefined behaviour (for other mutexes) results.
+       *
+       * TODO: add more.
+       */
+      result_t
+      Condition_variable::wait (Mutex* mutex)
+      {
+        // TODO
+        return result::ok;
+      }
+
+      /**
+       * @details
+       * Block on a condition variable. The application shall ensure
+       * that these functions are called with mutex locked by
+       * the calling thread; otherwise, an error (for
+       * ERRORCHECK and robust mutexes) or
+       * undefined behaviour (for other mutexes) results.
+       *
+       * TODO: add more.
+       */
+      result_t
+      Condition_variable::timed_wait (Mutex* mutex, sys_ticks_t ticks)
       {
         // TODO
         return result::ok;

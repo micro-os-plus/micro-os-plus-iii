@@ -32,6 +32,9 @@ namespace os
   {
     namespace std
     {
+      // ======================================================================
+
+      // CMSIS++ SysTick clock.
 
       class Systick_clock
       {
@@ -56,6 +59,93 @@ namespace os
       };
 
       using systicks = Systick_clock::duration;
+
+      // ======================================================================
+
+      // CMSIS++ RTC.
+
+      class Realtime_clock
+      {
+      public:
+
+        using duration = ::std::chrono::seconds;
+        using rep = duration::rep;
+        using period = duration::period;
+        using time_point = ::std::chrono::time_point<Realtime_clock>;
+
+        // Non-monotonic, may be adjusted back in time.
+        static constexpr const bool is_steady
+          { false };
+
+        static time_point
+        now () noexcept;
+
+        // --------------------------------------------------------------------
+        // Extension to ISO
+
+        // Number of seconds from epoch (1 January 1970 00:00:00 UTC)
+        // Must be initialised during startup with the value of now().
+        // Realtime_clock::startup_time_point = Realtime_clock::now();
+        static time_point startup_time_point;
+      };
+
+      // ======================================================================
+
+      // The system_clock is basically derived from the SysTick counts.
+      // The counter is monotonic, and normally should not be adjusted,
+      // so the clock is steady.
+
+      class system_clock
+      {
+      public:
+
+        using duration = ::std::chrono::microseconds;
+        using rep = duration::rep;
+        using period = duration::period;
+        using time_point = ::std::chrono::time_point<system_clock>;
+
+        // Monotonic, never adjusted back in time.
+        static constexpr const bool is_steady
+          { true };
+
+        static time_point
+        now () noexcept;
+
+        // It is the only C++ clock that has the ability to map its
+        // time points to C-style time, and, therefore, to be displayed.
+        static time_t
+        to_time_t (const time_point& tp) noexcept;
+        static time_point
+        from_time_t (time_t t) noexcept;
+
+      };
+
+      // ======================================================================
+
+      // To simplify things, we assumed the system clock is already steady.
+      using steady_clock = system_clock;
+
+      // ======================================================================
+
+      // The high resolution clock is also based on SysTick, but also uses
+      // the counter instant value, which gives 1 CPU cycle resolution.
+
+      class high_resolution_clock
+      {
+      public:
+
+        using duration = ::std::chrono::nanoseconds;
+        using rep = duration::rep;
+        using period = duration::period;
+        using time_point = ::std::chrono::time_point<high_resolution_clock>;
+
+        // Monotonic, never adjusted back in time.
+        static constexpr const bool is_steady
+          { true };
+
+        static time_point
+        now () noexcept;
+      };
 
     } /* namespace std */
   } /* namespace cmsis */

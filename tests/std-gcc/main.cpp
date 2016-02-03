@@ -153,8 +153,21 @@ main (int argc, char* argv[])
   this_thread::sleep_for (seconds (3));
   this_thread::sleep_for (systicks (3003));
 
+  Realtime_clock::startup_time_point = Realtime_clock::now();
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
   auto tp = Systick_clock::now();
-  trace::printf ("now() = %d \n", tp);
+  trace::printf ("Systick_clock::now() = %d ticks\n", tp);
+
+  auto tp2 = cmsis::std::system_clock::now();
+  trace::printf ("system_clock::now() = %ld us\n", tp2);
+
+  auto tp3 = cmsis::std::high_resolution_clock::now();
+  trace::printf ("high_resolution_clock::now() = %ld ns\n", tp3);
+
+#pragma GCC diagnostic pop
 
 #if 0
   int n = 70;

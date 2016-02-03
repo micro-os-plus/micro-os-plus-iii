@@ -31,6 +31,16 @@ namespace os
 
       using namespace os::cmsis;
 
+      // Number of seconds from epoch (1 January 1970 00:00:00 UTC)
+      // when the system was started.
+      // Must be set during startup by reading the RTC.
+      uint64_t startup_absolute_seconds;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
+      // ======================================================================
+
       Systick_clock::time_point
       Systick_clock::now () noexcept
       {
@@ -39,6 +49,70 @@ namespace os
           { duration
             { ticks } };
       }
+
+      // ======================================================================
+
+      Realtime_clock::time_point
+      Realtime_clock::now () noexcept
+      {
+        const auto secs = rtos::kernel::get_rtc_seconds_since_epoch ();
+        return time_point
+          { duration
+            { secs } };
+      }
+
+      Realtime_clock::time_point Realtime_clock::startup_time_point;
+
+      // ======================================================================
+
+      system_clock::time_point
+      system_clock::now () noexcept
+      {
+        const auto ticks = rtos::kernel::get_current_systick ();
+        return time_point
+          { duration
+            { systicks
+              { ticks } + Realtime_clock::startup_time_point.time_since_epoch () //
+            } //
+          };
+      }
+
+      time_t
+      system_clock::to_time_t (const time_point& t) noexcept
+      {
+        return time_t (
+            ::std::chrono::duration_cast<::std::chrono::seconds> (
+                t.time_since_epoch ()).count ());
+      }
+
+      system_clock::time_point
+      system_clock::from_time_t (time_t t) noexcept
+      {
+        return system_clock::time_point (::std::chrono::seconds (t));
+      }
+
+      // ======================================================================
+
+      high_resolution_clock::time_point
+      high_resolution_clock::now () noexcept
+      {
+        rtos::current_systick_t systick_details;
+        rtos::kernel::get_current_systick (&systick_details);
+
+        // The duration is the sum of SysTick ticks plus the current
+        // count of CPU cycles (computed from the SysTick counter).
+        return time_point
+          { duration
+            { systicks
+              { systick_details.ticks }
+                + ::std::chrono::nanoseconds
+                  { systick_details.cycles * 1000000000ULL
+                      / systick_details.core_frequency_hz }
+                + Realtime_clock::startup_time_point.time_since_epoch () } //
+          };
+      }
+
+#pragma GCC diagnostic pop
 
     } /* namespace std */
   } /* namespace cmsis */

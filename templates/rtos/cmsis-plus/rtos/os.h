@@ -28,6 +28,8 @@
 #ifndef CMSIS_PLUS_RTOS_OS_H_
 #define CMSIS_PLUS_RTOS_OS_H_
 
+// ----------------------------------------------------------------------------
+
 #include <cmsis-plus/diag/trace.h>
 #include <cstdint>
 #include <cstddef>
@@ -186,6 +188,9 @@ namespace os
         uint64_t
         get_current_systick (current_systick_t* details = nullptr);
 
+        uint64_t
+        get_rtc_seconds_since_epoch (void);
+
         /// The RTOS kernel system timer frequency in Hz.
         /// \note Reflects the system timer setting and is typically defined in a configuration file.
         constexpr uint32_t sys_tick_frequency_hz = 1000; // TODO: Param
@@ -297,7 +302,7 @@ namespace os
         Named_object&
         operator= (Named_object&&) = delete;
 
-        ~Named_object ();
+        ~Named_object () = default;
 
         const char*
         get_name (void) const;
@@ -828,12 +833,41 @@ namespace os
 
       // ======================================================================
 
+      namespace cond
+      {
+        class Attributes : public Named_object
+        {
+        public:
+
+          Attributes (const char* name);
+
+          Attributes (const Attributes&) = default;
+          Attributes (Attributes&&) = default;
+          Attributes&
+          operator= (const Attributes&) = default;
+          Attributes&
+          operator= (Attributes&&) = default;
+
+          /**
+           * @brief Delete a condition variable attributes.
+           */
+          ~Attributes () = default;
+        };
+
+        extern const Attributes initializer;
+      } /* namespace cond */
+
+      // ======================================================================
+
       class Condition_variable : public Named_object
       {
       public:
 
-        Condition_variable (const char* name);
+        /**
+         * @brief Create and initialise a mutex.
+         */
         Condition_variable ();
+        Condition_variable (const cond::Attributes& attr);
 
         Condition_variable (const Condition_variable&) = delete;
         Condition_variable (Condition_variable&&) = delete;
@@ -842,16 +876,49 @@ namespace os
         Condition_variable&
         operator= (Condition_variable&&) = delete;
 
-        /// Delete a Mutex that was created by @ref osMutexCreate.
-        /// @param [in]     mutex_id      mutex ID obtained by @ref osMutexCreate.
-        /// @return status code that indicates the execution status of the function.
+        /**
+         * @brief Delete a condition variable.
+         */
         ~Condition_variable ();
 
-        result_t
-        notify_one () noexcept;
+        bool
+        operator== (const Condition_variable& rhs) const;
 
+        /**
+         * @brief Signal a condition.
+         *
+         * @return If successful, return status::ok; otherwise return an
+         * error number.
+         */
         result_t
-        notify_all () noexcept;
+        signal (void);
+
+        /**
+         * @brief Broadcast a condition.
+         *
+         * @return If successful, return status::ok; otherwise return an
+         * error number.
+         */
+        result_t
+        broadcast (void);
+
+        /**
+         * @brief Wait on a condition.
+         *
+         * @return If successful, return status::ok; otherwise return an
+         * error number.
+         */
+        result_t
+        wait (Mutex* mutex);
+
+        /**
+         * @brief Timed wait on a condition.
+         *
+         * @return If successful, return status::ok; otherwise return an
+         * error number.
+         */
+        result_t
+        timed_wait (Mutex* mutex, sys_ticks_t ticks);
 
       protected:
 
@@ -1072,12 +1139,6 @@ namespace os
     {
       // ======================================================================
 
-      inline
-      Named_object::~Named_object ()
-      {
-        ;
-      }
-
       inline const char*
       Named_object::get_name (void) const
       {
@@ -1261,21 +1322,32 @@ namespace os
         }
       }
 
+      // ======================================================================
+
       inline bool
-      Mutex::operator == (const Mutex& rhs) const
+      Mutex::operator== (const Mutex& rhs) const
       {
         return this == &rhs;
       }
 
+      // ======================================================================
+
+      namespace cond
+      {
+        inline
+        Attributes::Attributes (const char* name) :
+            Named_object (name)
+        {
+          ;
+        }
+      } /* namespace cond */
 
       // ======================================================================
 
-      inline
-      Condition_variable::Condition_variable () :
-          Condition_variable
-            { nullptr }
+      inline bool
+      Condition_variable::operator== (const Condition_variable& rhs) const
       {
-        ;
+        return this == &rhs;
       }
 
     // ======================================================================
