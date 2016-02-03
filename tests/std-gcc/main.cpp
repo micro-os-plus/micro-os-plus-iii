@@ -17,7 +17,7 @@
  */
 
 #include <cmsis-plus/std/thread>
-#include <cmsis-plus/rtos/chrono-clocks.h>
+#include <cmsis-plus/std/chrono>
 #include <cmsis-plus/std/mutex>
 #include <cmsis-plus/diag/trace.h>
 
@@ -162,7 +162,7 @@ main (int argc, char* argv[])
   this_thread::sleep_for (microseconds (1)); // 1 ticks
   this_thread::sleep_for (nanoseconds (1)); // 1 tick
 
-  my_sleep(70);
+  my_sleep (70);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
@@ -197,18 +197,18 @@ main (int argc, char* argv[])
 #endif
 
   mutex mx1;
-  mx1.lock();
-  mx1.unlock();
-  mx1.try_lock();
+  mx1.lock ();
+  mx1.unlock ();
+  mx1.try_lock ();
 
   timed_mutex mx2;
-  mx2.try_lock_for(systicks (2999));
-  mx2.try_lock_for(seconds (3));
-  mx2.try_lock_for(milliseconds (3001)); // 3001 ticks
-  mx2.try_lock_for(microseconds (3001001)); // 3002 ticks
-  mx2.try_lock_for(nanoseconds (3002000001ul)); // 3003 ticks
+  mx2.try_lock_for (systicks (2999));
+  mx2.try_lock_for (seconds (3));
+  mx2.try_lock_for (milliseconds (3001)); // 3001 ticks
+  mx2.try_lock_for (microseconds (3001001)); // 3002 ticks
+  mx2.try_lock_for (nanoseconds (3002000001ul)); // 3003 ticks
 
-  mx2.try_lock_for(microseconds (1)); // 1 tick
+  mx2.try_lock_for (microseconds (1)); // 1 tick
   mx2.try_lock_for (nanoseconds (1)); // 1 tick
 
   trace::printf ("%s done.\n", argv[0]);

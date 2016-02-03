@@ -155,9 +155,9 @@ namespace os
 #pragma GCC diagnostic ignored "-Waggregate-return"
 
         template<class _To, class Rep_T, class Period_T>
-          constexpr typename ::std::enable_if<
-              ::std::chrono::__is_duration<_To>::value, _To>::type
-          ceil (::std::chrono::duration<Rep_T, Period_T> d)
+constexpr        typename ::std::enable_if<
+        ::std::chrono::__is_duration<_To>::value, _To>::type
+        ceil (::std::chrono::duration<Rep_T, Period_T> d)
           {
             using namespace ::std::chrono;
             _To r = ::std::chrono::duration_cast<_To> (d);
@@ -171,8 +171,8 @@ namespace os
 #pragma GCC diagnostic pop
 
       }
-    } /* namespace std */
-  } /* namespace cmsis */
+  } /* namespace std */
+} /* namespace cmsis */
 } /* namespace os */
 
 #endif /* CMSIS_PLUS_CHRONO_CLOCKS_H_ */

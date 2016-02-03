@@ -34,7 +34,7 @@
 #include <cmsis-plus/std/thread>
 #include <cmsis-plus/std/system_error>
 #include <cerrno>
-#include <cmsis-plus/rtos/chrono-clocks.h>
+#include <cmsis-plus/std/chrono>
 #include <tuple>
 
 // ----------------------------------------------------------------------------

@@ -32,7 +32,7 @@
 #if defined(TRACE)
 #include <cmsis-plus/diag/trace.h>
 #endif
-#include <cmsis-plus/rtos/chrono-clocks.h>
+#include <cmsis-plus/std/chrono>
 
 #include <cstddef>
 #include <iostream>

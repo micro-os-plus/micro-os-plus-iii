@@ -61,17 +61,18 @@ namespace os
         get_current_systick (current_systick_t* details)
         {
           // TODO
-          if (details != nullptr){
+          if (details != nullptr)
+            {
               details->core_frequency_hz = 168000000;
               details->divisor = details->core_frequency_hz / 1000;
 #if 0
               details->cycles = 10;
               details->ticks = 1234;
 #else
-              details->cycles = details->divisor-1;
+              details->cycles = details->divisor - 1;
               details->ticks = 0;
 #endif
-          }
+            }
           return 1234;
         }
 
@@ -204,7 +205,7 @@ namespace os
         sleep (systicks_t ticks)
         {
           // TODO
-          trace::printf("%d ticks\n", ticks);
+          trace::printf ("%d ticks\n", ticks);
           return result::ok;
         }
 
