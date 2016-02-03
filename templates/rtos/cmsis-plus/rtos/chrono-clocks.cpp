@@ -101,6 +101,9 @@ namespace os
 
         // The duration is the sum of SysTick ticks plus the current
         // count of CPU cycles (computed from the SysTick counter).
+        // Notice: a more exact solution would be to compute
+        // ticks * divisor + cycles, but this severely reduces the
+        // range of ticks.
         return time_point
           { duration
             { systicks

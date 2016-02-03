@@ -40,7 +40,7 @@ namespace os
       {
       public:
 
-        /// type of tick counter
+        /// type of variable holding the tick counter
         using rep = uint64_t;
         /// std::ratio type representing the tick period of the clock, in seconds
         using period = ::std::ratio<1, os::cmsis::rtos::kernel::sys_tick_frequency_hz>;
@@ -58,6 +58,7 @@ namespace os
         now () noexcept;
       };
 
+      // Define a duration type, to be used in timeout expressions.
       using systicks = Systick_clock::duration;
 
       // ======================================================================
@@ -147,6 +148,29 @@ namespace os
         now () noexcept;
       };
 
+      namespace chrono
+      {
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
+        template<class _To, class Rep_T, class Period_T>
+          constexpr typename ::std::enable_if<
+              ::std::chrono::__is_duration<_To>::value, _To>::type
+          ceil (::std::chrono::duration<Rep_T, Period_T> d)
+          {
+            using namespace ::std::chrono;
+            _To r = ::std::chrono::duration_cast<_To> (d);
+            if (r < d)
+              {
+                ++r;
+              }
+            return r;
+          }
+
+#pragma GCC diagnostic pop
+
+      }
     } /* namespace std */
   } /* namespace cmsis */
 } /* namespace os */
