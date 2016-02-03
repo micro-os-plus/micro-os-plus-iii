@@ -201,9 +201,10 @@ namespace os
 #endif
 
         result_t
-        sleep (sys_ticks_t ticks)
+        sleep (systicks_t ticks)
         {
           // TODO
+          trace::printf("%d ticks\n", ticks);
           return result::ok;
         }
 
@@ -639,7 +640,7 @@ namespace os
        * @note Cannot be called from Interrupt Service Routines.
        */
       result_t
-      Mutex::timed_lock (sys_ticks_t ticks)
+      Mutex::timed_lock (systicks_t ticks)
       {
         // TODO
         return result::ok;
@@ -881,7 +882,7 @@ namespace os
        * TODO: add more.
        */
       result_t
-      Condition_variable::timed_wait (Mutex* mutex, sys_ticks_t ticks)
+      Condition_variable::timed_wait (Mutex* mutex, systicks_t ticks)
       {
         // TODO
         return result::ok;

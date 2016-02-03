@@ -110,9 +110,9 @@ namespace os
       // ----------------------------------------------------------------------
 
       using millis_t = uint32_t;
-      using sys_ticks_t = uint32_t;
+      using systicks_t = uint32_t;
 
-      constexpr sys_ticks_t WAIT_FOREVER = 0xFFFFFFFF;
+      constexpr systicks_t WAIT_FOREVER = 0xFFFFFFFF;
 
       constexpr uint32_t MAX_SEMAPHORE_COUNT = 0xFFFFFFFF;
 
@@ -285,7 +285,7 @@ namespace os
 #endif
 
         result_t
-        sleep (sys_ticks_t ticks);
+        sleep (systicks_t ticks);
       }
 
       // ======================================================================
@@ -778,7 +778,7 @@ namespace os
          * error number.
          */
         result_t
-        timed_lock (sys_ticks_t ticks);
+        timed_lock (systicks_t ticks);
 
         /**
          * @brief Unlock the mutex.
@@ -918,7 +918,7 @@ namespace os
          * error number.
          */
         result_t
-        timed_wait (Mutex* mutex, sys_ticks_t ticks);
+        timed_wait (Mutex* mutex, systicks_t ticks);
 
       protected:
 
