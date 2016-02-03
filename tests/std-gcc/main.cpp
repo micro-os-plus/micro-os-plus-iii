@@ -18,6 +18,7 @@
 
 #include <cmsis-plus/std/thread>
 #include <cmsis-plus/rtos/chrono-clocks.h>
+#include <cmsis-plus/std/mutex>
 #include <cmsis-plus/diag/trace.h>
 
 #include <cstdio>
@@ -42,6 +43,9 @@ task3 (void* args);
 
 void
 task4 (int n, const char* str);
+
+void
+my_sleep (int n);
 
 // ----------------------------------------------------------------------------
 
@@ -86,13 +90,14 @@ sleep_for_ticks (uint32_t)
 #error OS_INCLUDE_CMSIS_THREAD_VARIADICS
 #endif
 
+using namespace ::std::chrono;
+using namespace os::cmsis::std;
+using namespace os::cmsis;
+using namespace os;
+
 int
 main (int argc, char* argv[])
 {
-  using namespace ::std::chrono;
-  using namespace os::cmsis::std;
-  using namespace os::cmsis;
-  using namespace os;
 
   char c;
   thread th11
@@ -148,31 +153,37 @@ main (int argc, char* argv[])
     { nullptr, task4, 7, "xyz"};
 #endif
 
-  this_thread::sleep_for (microseconds (3001001));
-  this_thread::sleep_for (milliseconds (3001));
+  this_thread::sleep_for (systicks (2999));
   this_thread::sleep_for (seconds (3));
-  this_thread::sleep_for (systicks (3003));
+  this_thread::sleep_for (milliseconds (3001));
+  this_thread::sleep_for (microseconds (3001001)); // 3002 ticks
+  this_thread::sleep_for (nanoseconds (3002000001ul)); // 3003 ticks
 
-  Realtime_clock::startup_time_point = Realtime_clock::now();
+  this_thread::sleep_for (microseconds (1)); // 1 ticks
+  this_thread::sleep_for (nanoseconds (1)); // 1 tick
+
+  my_sleep(70);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
 
-  auto tp = Systick_clock::now();
-  trace::printf ("Systick_clock::now() = %d ticks\n", tp);
-
-  auto tp2 = cmsis::std::system_clock::now();
-  trace::printf ("system_clock::now() = %ld us\n", tp2);
-
-  auto tp3 = cmsis::std::high_resolution_clock::now();
-  trace::printf ("high_resolution_clock::now() = %ld ns\n", tp3);
+  Realtime_clock::startup_time_point = Realtime_clock::now ();
 
 #pragma GCC diagnostic pop
 
-#if 0
-  int n = 70;
-  this_thread::sleep_for (milliseconds (n));
-#endif
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
+  auto tp = Systick_clock::now ();
+  trace::printf ("Systick_clock::now() = %d ticks\n", tp);
+
+  auto tp2 = cmsis::std::system_clock::now ();
+  trace::printf ("system_clock::now() = %ld us\n", tp2);
+
+  auto tp3 = cmsis::std::high_resolution_clock::now ();
+  trace::printf ("high_resolution_clock::now() = %ld ns\n", tp3);
+
+#pragma GCC diagnostic pop
 
   //th11.native_handle ()->set_priority (rtos::Priority::high);
 
@@ -185,8 +196,31 @@ main (int argc, char* argv[])
 
 #endif
 
+  mutex mx1;
+  mx1.lock();
+  mx1.unlock();
+  mx1.try_lock();
+
+  timed_mutex mx2;
+  mx2.try_lock_for(systicks (2999));
+  mx2.try_lock_for(seconds (3));
+  mx2.try_lock_for(milliseconds (3001)); // 3001 ticks
+  mx2.try_lock_for(microseconds (3001001)); // 3002 ticks
+  mx2.try_lock_for(nanoseconds (3002000001ul)); // 3003 ticks
+
+  mx2.try_lock_for(microseconds (1)); // 1 tick
+  mx2.try_lock_for (nanoseconds (1)); // 1 tick
+
   trace::printf ("%s done.\n", argv[0]);
   return 0;
+}
+
+void
+my_sleep (int n)
+{
+#if 1
+  this_thread::sleep_for (systicks (n));
+#endif
 }
 
 #pragma GCC diagnostic pop

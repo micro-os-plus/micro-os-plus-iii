@@ -31,10 +31,13 @@
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/diag/trace.h>
 
+#include <cmsis-plus/std/thread>
 #include <cmsis-plus/std/system_error>
 #include <cerrno>
-#include <chrono>
+#include <cmsis-plus/rtos/chrono-clocks.h>
 #include <tuple>
+
+// ----------------------------------------------------------------------------
 
 namespace os
 {
@@ -54,7 +57,7 @@ namespace os
 
         using native_handle_type = native_type*;
 
-        constexpr
+        /* constexpr in ISO */
         mutex () noexcept;
 
         // Extension to ISO.
@@ -357,6 +360,12 @@ namespace os
       // ======================================================================
 
       inline
+      mutex::mutex () noexcept
+      {
+        ;
+      }
+
+      inline
       mutex::mutex (os::cmsis::rtos::mutex::Attributes& attr) noexcept :
       nm_
         { attr}
@@ -411,9 +420,10 @@ namespace os
             const ::std::chrono::duration<Rep_T, Period_T>& rel_time)
         {
           using namespace ::std::chrono;
-          os::cmsis::rtos::sys_ticks_t ticks = 0;
+          os::cmsis::rtos::systicks_t ticks = 0;
           if (rel_time > duration<Rep_T, Period_T>::zero ())
             {
+#if 0
               microseconds micros;
               if (rel_time < microseconds::max ())
                 {
@@ -429,22 +439,26 @@ namespace os
                 }
               ticks = os::cmsis::rtos::kernel::compute_sys_ticks (
                   (uint64_t) micros.count ());
+#else
+              ticks =
+                  (os::cmsis::rtos::systicks_t) (os::cmsis::std::chrono::ceil<
+                      systicks> (rel_time).count ());
+#endif
             }
 
-          rtos::result_t ret;
-          ret = nm_.timed_lock (ticks);
-          if (ret == rtos::result::ok)
+          rtos::result_t res;
+          res = nm_.timed_lock (ticks);
+          if (res == rtos::result::ok)
             {
               return true;
             }
-          else if (ret == rtos::result::error_timeout_resource)
+          else if (res == rtos::result::error_timeout_resource)
             {
               return false;
             }
 
-          __throw_system_error ((int) ret, "timed_mutex try_lock failed");
+          __throw_system_error ((int) res, "timed_mutex try_lock failed");
           return false;
-
         }
 
       template<typename Clock_T, typename Duration_T>
@@ -463,7 +477,6 @@ namespace os
                 }
               now = Clock::now ();
             }
-
         }
 
       // ======================================================================
@@ -483,9 +496,10 @@ namespace os
             const ::std::chrono::duration<Rep_T, Period_T>& rel_time)
         {
           using namespace ::std::chrono;
-          os::cmsis::rtos::sys_ticks_t ticks = 0;
+          os::cmsis::rtos::systicks_t ticks = 0;
           if (rel_time > duration<Rep_T, Period_T>::zero ())
             {
+#if 0
               microseconds micros;
               if (rel_time < microseconds::max ())
                 {
@@ -501,22 +515,26 @@ namespace os
                 }
               ticks = os::cmsis::rtos::kernel::compute_sys_ticks (
                   (uint64_t) micros.count ());
+#else
+              ticks =
+                  (os::cmsis::rtos::systicks_t) (os::cmsis::std::chrono::ceil<
+                      systicks> (rel_time).count ());
+#endif
             }
 
-          rtos::result_t ret;
-          ret = nm_.timed_lock (ticks);
-          if (ret == rtos::result::ok)
+          rtos::result_t res;
+          res = nm_.timed_lock (ticks);
+          if (res == rtos::result::ok)
             {
               return true;
             }
-          else if (ret == rtos::result::error_timeout_resource)
+          else if (res == rtos::result::error_timeout_resource)
             {
               return false;
             }
 
-          __throw_system_error ((int) ret, "timed_mutex try_lock failed");
+          __throw_system_error ((int) res, "timed_mutex try_lock failed");
           return false;
-
         }
 
       template<typename Clock_T, typename Duration_T>
@@ -535,7 +553,6 @@ namespace os
                 }
               now = Clock::now ();
             }
-
         }
 
       // ======================================================================
@@ -605,6 +622,7 @@ namespace os
             m_ (&m), //
             owns_ (true)
         {
+          ;
         }
 
       template<typename Mutex_T>
@@ -616,6 +634,7 @@ namespace os
               m_ (&m), //
               owns_ (m.try_lock_until (abs_time))
           {
+            ;
           }
 
       template<typename Mutex_T>
@@ -890,7 +909,7 @@ namespace os
                       }
                   }
                   ++ix;
-                  os::cmsis::rtos::thread::yield ();
+                  this_thread::yield ();
                   break;
 
                 case 1:
@@ -912,7 +931,7 @@ namespace os
                     {
                       ix += 2;
                     }
-                  os::cmsis::rtos::thread::yield();
+                  this_thread::yield();
                   break;
 
                   default:
