@@ -57,32 +57,6 @@ namespace os
           return true;
         }
 
-        uint64_t
-        get_current_systick (current_systick_t* details)
-        {
-          // TODO
-          if (details != nullptr)
-            {
-              details->core_frequency_hz = 168000000;
-              details->divisor = details->core_frequency_hz / 1000;
-#if 0
-              details->cycles = 10;
-              details->ticks = 1234;
-#else
-              details->cycles = details->divisor - 1;
-              details->ticks = 0;
-#endif
-            }
-          return 1234;
-        }
-
-        uint64_t
-        get_rtc_seconds_since_epoch (void)
-        {
-          // TODO
-          return 1000000;
-        }
-
         const char*
         strerror (result_t res)
         {
@@ -146,8 +120,48 @@ namespace os
         }
 
       } /* namespace kernel */
+      // ======================================================================
 
-// ======================================================================
+      uint64_t
+      Systick_clock::now (void)
+      {
+        return 12300;
+      }
+
+      uint64_t
+      Systick_clock::now (current_t* details)
+      {
+        assert(details != nullptr);
+
+        details->core_frequency_hz = 168000000;
+        details->divisor = details->core_frequency_hz / frequency_hz;
+        details->cycles = details->divisor - 1;
+        details->ticks = 12300;
+
+        return 12300;
+      }
+
+      result_t
+      Systick_clock::sleep_for (uint32_t ticks)
+      {
+        trace::printf ("Systick_clock::sleep_for %d seconds\n", ticks);
+        return result::ok;
+      }
+
+      uint64_t
+      Realtime_clock::now (void)
+      {
+        return 1000000;
+      }
+
+      result_t
+      Realtime_clock::sleep_for (uint32_t secs)
+      {
+        trace::printf ("Realtime_clock::sleep_for %d seconds\n", secs);
+        return result::ok;
+      }
+
+      // ======================================================================
 
       void*
       no_thread_func (void* args);

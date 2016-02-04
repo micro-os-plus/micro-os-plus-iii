@@ -143,20 +143,8 @@ namespace os
 
       // ----------------------------------------------------------------------
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
-
-      using current_systick_t = struct current_systick_s
-        {
-          uint64_t ticks; // Count of SysTick ticks since core reset
-          uint32_t cycles;// Count of SysTick cycles since timer reload (24 bits)
-          uint32_t divisor;// SysTick reload value (24 bits)
-          uint32_t core_frequency_hz;// Core clock frequency Hz
-        };
-
-#pragma GCC diagnostic pop
-
       //  ==== Kernel Control Functions ====
+
       namespace kernel
       {
         /// Initialise the RTOS Kernel for creating objects.
@@ -174,44 +162,68 @@ namespace os
         bool
         is_running (void);
 
-#if 0
-        /// Get the RTOS kernel system timer counter.
-        /// @return RTOS kernel system timer as 32-bit value
-        uint32_t
-        get_ticks (void);
-#endif
-
-        /// Get the current SysTick counter (ticks & cycles).
-        /// @param [out] details pointer to storage where to store counters;
-        /// may be null if details are not needed
-        /// @return Number of ticks since reset.
-        uint64_t
-        get_current_systick (current_systick_t* details = nullptr);
-
-        uint64_t
-        get_rtc_seconds_since_epoch (void);
-
-        /// The RTOS kernel system timer frequency in Hz.
-        /// \note Reflects the system timer setting and is typically defined in a configuration file.
-        constexpr uint32_t sys_tick_frequency_hz = 1000; // TODO: Param
-
-        /// Convert a microseconds value to a RTOS kernel system timer value.
-        /// Always round up.
-        /// @param [in]  microsec     time value in microseconds.
-        /// @return number of system ticks
-        template<typename Rep_T>
-          constexpr uint32_t
-          compute_sys_ticks (Rep_T microsec)
-          {
-            // TODO: add some restrictions to match only numeric types
-            return (uint32_t) ((((microsec) * ((Rep_T) sys_tick_frequency_hz))
-                + (Rep_T) 999999UL) / (Rep_T) 1000000UL);
-          }
-
         const char*
         strerror (result_t);
 
       } /* namespace kernel */
+
+      // ----------------------------------------------------------------------
+
+      class Systick_clock
+      {
+      public:
+
+        static constexpr uint32_t frequency_hz = 1000; // TODO: Param
+
+        /**
+         * @brief Tell the relative time now.
+         *
+         * @return number of SysTick ticks since startup.
+         */
+        static uint64_t
+        now (void);
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+        using current_t = struct current_s
+          {
+            uint64_t ticks; // Count of SysTick ticks since core reset
+            uint32_t cycles;// Count of SysTick cycles since timer reload (24 bits)
+            uint32_t divisor;// SysTick reload value (24 bits)
+            uint32_t core_frequency_hz;// Core clock frequency Hz
+          };
+
+#pragma GCC diagnostic pop
+
+        static uint64_t
+        now (current_t* details);
+
+        template<typename Rep_T>
+          static constexpr uint32_t
+          ticks_cast (Rep_T microsec);
+
+        static result_t
+        sleep_for (uint32_t ticks);
+      };
+
+      class Realtime_clock
+      {
+      public:
+
+        static constexpr uint32_t frequency_hz = 1;
+
+        /**
+         * @brief Tell the absolute time now.
+         *
+         * @return number of seconds since 1 January 1970 00:00:00.
+         */
+        static uint64_t
+        now (void);
+
+        static result_t
+        sleep_for (uint32_t secs);
+      };
 
       // ----------------------------------------------------------------------
 
@@ -246,6 +258,7 @@ namespace os
       }
 
       // ----------------------------------------------------------------------
+
       //  ==== Thread Management ====
 
       class Thread;
@@ -293,6 +306,7 @@ namespace os
       class Named_object
       {
       public:
+
         Named_object (const char* name);
 
         Named_object (const Named_object&) = delete;
@@ -1135,6 +1149,17 @@ namespace os
   {
     namespace rtos
     {
+      // ======================================================================
+
+      template<typename Rep_T>
+        constexpr uint32_t
+        Systick_clock::ticks_cast (Rep_T microsec)
+        {
+          // TODO: add some restrictions to match only numeric types
+          return (uint32_t) ((((microsec) * ((Rep_T) frequency_hz))
+              + (Rep_T) 999999UL) / (Rep_T) 1000000UL);
+        }
+
       // ======================================================================
 
       inline const char*

@@ -446,7 +446,7 @@ namespace os
                 // The code seems better with this variant, otherwise it
                 // does not optimise constant calls.
                 os::cmsis::rtos::thread::sleep (
-                    os::cmsis::rtos::kernel::compute_sys_ticks (
+                    os::cmsis::rtos::Systick_clock::ticks_cast (
                         micros.count ()));
 #endif
 

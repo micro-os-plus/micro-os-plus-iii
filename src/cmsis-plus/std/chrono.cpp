@@ -44,7 +44,7 @@ namespace os
       Systick_clock::time_point
       Systick_clock::now () noexcept
       {
-        const auto ticks = rtos::kernel::get_current_systick ();
+        const auto ticks = rtos::Systick_clock::now ();
         return time_point
           { duration
             { ticks } };
@@ -55,7 +55,7 @@ namespace os
       Realtime_clock::time_point
       Realtime_clock::now () noexcept
       {
-        const auto secs = rtos::kernel::get_rtc_seconds_since_epoch ();
+        const auto secs = rtos::Realtime_clock::now ();
         return time_point
           { duration
             { secs } };
@@ -68,7 +68,7 @@ namespace os
       system_clock::time_point
       system_clock::now () noexcept
       {
-        const auto ticks = rtos::kernel::get_current_systick ();
+        const auto ticks = rtos::Systick_clock::now ();
         return time_point
           { duration
             { systicks
@@ -96,8 +96,8 @@ namespace os
       high_resolution_clock::time_point
       high_resolution_clock::now () noexcept
       {
-        rtos::current_systick_t systick_details;
-        rtos::kernel::get_current_systick (&systick_details);
+        rtos::Systick_clock::current_t systick;
+        rtos::Systick_clock::now (&systick);
 
         // The duration is the sum of SysTick ticks plus the current
         // count of CPU cycles (computed from the SysTick counter).
@@ -107,10 +107,8 @@ namespace os
         return time_point
           { duration
             { systicks
-              { systick_details.ticks }
-                + ::std::chrono::nanoseconds
-                  { systick_details.cycles * 1000000000ULL
-                      / systick_details.core_frequency_hz }
+              { systick.ticks } + ::std::chrono::nanoseconds
+              { systick.cycles * 1000000000ULL / systick.core_frequency_hz }
                 + Realtime_clock::startup_time_point.time_since_epoch () } //
           };
       }

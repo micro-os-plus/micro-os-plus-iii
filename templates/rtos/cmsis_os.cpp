@@ -73,8 +73,8 @@ osKernelRunning (void)
 uint32_t
 osKernelSysTick (void)
 {
-  current_systick_t crt;
-  kernel::get_current_systick (&crt);
+  Systick_clock::current_t crt;
+  Systick_clock::now (&crt);
   // Convert ticks to cycles.
   return static_cast<uint32_t> (crt.ticks) * crt.divisor + crt.cycles;
 }
@@ -144,8 +144,8 @@ osThreadGetPriority (osThreadId thread_id)
 osStatus
 osDelay (uint32_t millisec)
 {
-  return static_cast<osStatus> (thread::sleep (
-      kernel::compute_sys_ticks (millisec * 1000)));
+  return static_cast<osStatus> (Systick_clock::sleep_for (
+      Systick_clock::ticks_cast (millisec * 1000u)));
 }
 
 #if (defined (osFeature_Wait)  &&  (osFeature_Wait != 0))
@@ -285,7 +285,7 @@ osMutexWait (osMutexId mutex_id, uint32_t millisec)
   else
     {
       status = (reinterpret_cast<Mutex&> (mutex_id)).timed_lock (
-          kernel::compute_sys_ticks (millisec * 1000));
+          Systick_clock::ticks_cast (millisec * 1000u));
     }
 
   // TODO: return legacy code for POSIX codes
