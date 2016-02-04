@@ -263,7 +263,7 @@ namespace os
 
       class Thread;
 
-      namespace thread
+      namespace this_thread
       {
         /// Return the thread ID of the current running thread.
         /// @return thread ID for reference by other functions or NULL in case of error.
@@ -289,17 +289,7 @@ namespace os
         wait_signals (signal_flags_t signals, millis_t millisec,
                       signal_flags_t* ret);
 
-#if 0
-        /// Wait for Timeout (Time Delay).
-        /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue "Time delay" value
-        /// @return status code that indicates the execution status of the function.
-        return_t
-        delay (millis_t millisec);
-#endif
-
-        result_t
-        sleep (systicks_t ticks);
-      }
+      } /* namespace this_thread */
 
       // ======================================================================
 
@@ -1373,7 +1363,7 @@ namespace os
         return this == &rhs;
       }
 
-    // ======================================================================
+// ======================================================================
 
     } /* namespace rtos */
   } /* namespace cmsis */

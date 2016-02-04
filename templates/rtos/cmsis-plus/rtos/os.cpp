@@ -144,7 +144,7 @@ namespace os
       result_t
       Systick_clock::sleep_for (uint32_t ticks)
       {
-        trace::printf ("Systick_clock::sleep_for %d seconds\n", ticks);
+        trace::printf ("Systick_clock::sleep_for %d ticks\n", ticks);
         return result::ok;
       }
 
@@ -175,7 +175,7 @@ namespace os
       Thread no_thread
         { nullptr, (thread::func_t) no_thread_func, nullptr };
 
-      namespace thread
+      namespace this_thread
       {
         Thread&
         get_current (void)
@@ -206,24 +206,7 @@ namespace os
           return result::ok;
         }
 
-#if 0
-        result_t
-        delay (millis_t millisec)
-          {
-            // TODO
-            return result::ok;
-          }
-#endif
-
-        result_t
-        sleep (systicks_t ticks)
-        {
-          // TODO
-          trace::printf ("%d ticks\n", ticks);
-          return result::ok;
-        }
-
-      }
+      } /* namespace this_thread */
 
       // ======================================================================
 
@@ -1041,7 +1024,7 @@ namespace os
         return result::ok;
       }
 
-    // ======================================================================
+// ======================================================================
 
 #pragma GCC diagnostic pop
 

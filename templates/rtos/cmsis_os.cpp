@@ -105,7 +105,7 @@ osThreadCreateEx (osThread* addr, const osThreadAttr* attr, os_pthread function,
 osThreadId
 osThreadGetId (void)
 {
-  return reinterpret_cast<osThreadId> (&thread::get_current ());
+  return reinterpret_cast<osThreadId> (&this_thread::get_current ());
 }
 
 osStatus
@@ -118,7 +118,7 @@ osThreadTerminate (osThreadId thread_id)
 osStatus
 osThreadYield (void)
 {
-  return static_cast<osStatus> (thread::yield ());
+  return static_cast<osStatus> (this_thread::yield ());
 }
 
 osStatus
@@ -158,7 +158,7 @@ osWait (uint32_t millisec)
 {
   osEvent event;
 
-  result_t res = thread::wait (millisec, (event_t*) &event);
+  result_t res = this_thread::wait (millisec, (event_t*) &event);
   event.status = static_cast<osStatus> (res);
   return event;
 }
@@ -168,7 +168,7 @@ osWait (uint32_t millisec)
 osStatus
 osWaitEx (uint32_t millisec)
 {
-  return static_cast<osStatus> (thread::wait (millisec, nullptr));
+  return static_cast<osStatus> (this_thread::wait (millisec, nullptr));
 }
 
 #endif  // Generic Wait available
@@ -238,8 +238,8 @@ osEvent
 osSignalWait (int32_t signals, uint32_t millisec)
 {
   osEvent event;
-  result_t res = thread::wait_signals (signals, millisec,
-                                       (signal_flags_t*) &event.value.signals);
+  result_t res = this_thread::wait_signals (
+      signals, millisec, (signal_flags_t*) &event.value.signals);
   event.status = static_cast<osStatus> (res);
   return event;
 }
@@ -249,8 +249,8 @@ osSignalWait (int32_t signals, uint32_t millisec)
 osStatus
 osSignalWaitEx (int32_t signals, uint32_t millisec)
 {
-  return static_cast<osStatus> (thread::wait_signals (signals, millisec,
-                                                      nullptr));
+  return static_cast<osStatus> (this_thread::wait_signals (signals, millisec,
+                                                           nullptr));
 }
 
 // ----------------------------------------------------------------------------

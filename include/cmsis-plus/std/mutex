@@ -875,7 +875,7 @@ namespace os
                       break;
                     }
                 }
-              os::cmsis::rtos::thread::yield ();
+              this_thread::yield ();
                 {
                   unique_lock<L2_T> ulock2 (lk2);
 
@@ -885,7 +885,7 @@ namespace os
                       break;
                     }
                 }
-              os::cmsis::rtos::thread::yield ();
+              this_thread::yield ();
             }
         }
 

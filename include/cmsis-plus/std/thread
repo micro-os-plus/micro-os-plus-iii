@@ -401,13 +401,13 @@ namespace os
         inline void
         yield () noexcept
         {
-          os::cmsis::rtos::thread::yield ();
+          os::cmsis::rtos::this_thread::yield ();
         }
 
         inline thread::id
         get_id () noexcept
         {
-          return thread::id (&os::cmsis::rtos::thread::get_current ());
+          return thread::id (&os::cmsis::rtos::this_thread::get_current ());
         }
 
         // This implementation currently supports only short
@@ -445,7 +445,7 @@ namespace os
 #else
                 // The code seems better with this variant, otherwise it
                 // does not optimise constant calls.
-                os::cmsis::rtos::thread::sleep (
+                os::cmsis::rtos::Systick_clock::sleep_for (
                     os::cmsis::rtos::Systick_clock::ticks_cast (
                         micros.count ()));
 #endif
