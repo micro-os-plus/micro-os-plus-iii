@@ -480,11 +480,9 @@ namespace os
          * @return if successful, return status::ok; otherwise an
          * error number is returned.
          *
-         * [EINVAL]
-         * The value of prio is invalid for the scheduling policy of the
+         * - [EINVAL] The value of prio is invalid for the scheduling policy of the
          * specified thread.
-         * [EPERM]
-         * The caller does not have appropriate privileges to set the
+         * - [EPERM] The caller does not have appropriate privileges to set the
          * scheduling priority of the specified thread.
          *
          * If an implementation detects use of a thread ID after the end
@@ -530,15 +528,15 @@ namespace os
 
       protected:
 
-        ::std::size_t stack_size_bytes_;
-
+        // TODO: group them in a Stack object
         void* stack_addr_;
-
-        thread::priority_t prio_;
+        ::std::size_t stack_size_bytes_;
 
         thread::func_t func_;
 
         thread::func_args_t func_args_;
+
+        thread::priority_t prio_;
 
         // Add other internal data
 
