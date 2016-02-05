@@ -423,27 +423,9 @@ namespace os
           os::cmsis::rtos::systicks_t ticks = 0;
           if (rel_time > duration<Rep_T, Period_T>::zero ())
             {
-#if 0
-              microseconds micros;
-              if (rel_time < microseconds::max ())
-                {
-                  micros = duration_cast<microseconds> (rel_time);
-                  if (micros < rel_time)
-                    {
-                      ++micros;
-                    }
-                }
-              else
-                {
-                  micros = microseconds::max ();
-                }
-              ticks = os::cmsis::rtos::kernel::compute_sys_ticks (
-                  (uint64_t) micros.count ());
-#else
               ticks =
                   (os::cmsis::rtos::systicks_t) (os::cmsis::std::chrono::ceil<
                       chrono::systicks> (rel_time).count ());
-#endif
             }
 
           rtos::result_t res;
@@ -499,27 +481,9 @@ namespace os
           os::cmsis::rtos::systicks_t ticks = 0;
           if (rel_time > duration<Rep_T, Period_T>::zero ())
             {
-#if 0
-              microseconds micros;
-              if (rel_time < microseconds::max ())
-                {
-                  micros = duration_cast<microseconds> (rel_time);
-                  if (micros < rel_time)
-                    {
-                      ++micros;
-                    }
-                }
-              else
-                {
-                  micros = microseconds::max ();
-                }
-              ticks = os::cmsis::rtos::kernel::compute_sys_ticks (
-                  (uint64_t) micros.count ());
-#else
               ticks =
                   (os::cmsis::rtos::systicks_t) (os::cmsis::std::chrono::ceil<
                       chrono::systicks> (rel_time).count ());
-#endif
             }
 
           rtos::result_t res;
@@ -968,7 +932,7 @@ namespace os
           Tuple tuple (::std::forward<Callable_T> (func),
                        ::std::forward<Args_T>(args)...);
           // TODO: implement
-#if 0
+#if TO_IMPLEMENT
           __call_once_param < Tuple > __p (tuple);
           __call_once (__flag.__state_, &__p, &__call_once_proxy<tuple>);
 #endif
