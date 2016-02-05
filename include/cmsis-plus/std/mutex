@@ -232,6 +232,9 @@ namespace os
 
       // ======================================================================
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
       template<typename Mutex_T>
         class unique_lock
         {
@@ -307,6 +310,8 @@ namespace os
           mutex_type* m_;
           bool owns_;
         };
+
+#pragma GCC diagnostic pop
 
       // ======================================================================
 
@@ -941,8 +946,12 @@ namespace os
 
 #pragma GCC diagnostic pop
 
+    // ------------------------------------------------------------------------
+
     } /* namespace std */
   } /* namespace cmsis */
 } /* namespace os */
+
+// ----------------------------------------------------------------------------
 
 #endif /* CMSIS_PLUS_STD_MUTEX_ */

@@ -532,8 +532,12 @@ namespace os
       template<class R, class Alloc>
         struct uses_allocator<packaged_task<R>, Alloc> ;
 
+      // ----------------------------------------------------------------------
+
     } /* namespace std */
   } /* namespace cmsis */
 } /* namespace os */
+
+// ----------------------------------------------------------------------------
 
 #endif /* CMSIS_PLUS_STD_FUTURE_ */

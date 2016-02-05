@@ -116,6 +116,8 @@ namespace os
 #endif
       }
 
+    // ------------------------------------------------------------------------
+
     } /* namespace std */
   } /* namespace cmsis */
 } /* namespace os */

@@ -927,7 +927,7 @@ namespace os
         wait (Mutex* mutex);
 
         /**
-         * @brief Timed wait on a condition.
+         * @brief Wait on a condition with timeout.
          *
          * @return If successful, return status::ok; otherwise return an
          * error number.
@@ -1376,11 +1376,13 @@ namespace os
         return this == &rhs;
       }
 
-// ======================================================================
+    // ------------------------------------------------------------------------
 
     } /* namespace rtos */
   } /* namespace cmsis */
 } /* namespace os */
+
+// ----------------------------------------------------------------------------
 
 #endif /* __cplusplus */
 

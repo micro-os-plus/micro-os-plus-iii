@@ -248,10 +248,16 @@ constexpr        //
 
 #pragma GCC diagnostic pop
 
+        // --------------------------------------------------------------------
+
       }
   /* namespace chrono */
   } /* namespace std */
 } /* namespace cmsis */
 } /* namespace os */
+
+// Hello, Eclipse formatter?!
+
+// ----------------------------------------------------------------------------
 
 #endif /* CMSIS_PLUS_CHRONO_CLOCKS_H_ */

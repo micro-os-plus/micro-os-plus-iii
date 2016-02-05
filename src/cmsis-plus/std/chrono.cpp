@@ -29,7 +29,7 @@ namespace os
       namespace chrono
       {
 
-        // ----------------------------------------------------------------------
+        // --------------------------------------------------------------------
 
         using namespace os::cmsis;
 
@@ -41,7 +41,7 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
 
-        // ======================================================================
+        // ====================================================================
 
         Systick_clock::time_point
         Systick_clock::now () noexcept
@@ -52,7 +52,7 @@ namespace os
               { ticks } };
         }
 
-        // ======================================================================
+        // ====================================================================
 
         Realtime_clock::time_point
         Realtime_clock::now () noexcept
@@ -94,7 +94,7 @@ namespace os
           return system_clock::time_point (::std::chrono::seconds (t));
         }
 
-        // ======================================================================
+        // ====================================================================
 
         high_resolution_clock::time_point
         high_resolution_clock::now () noexcept
@@ -118,7 +118,11 @@ namespace os
 
 #pragma GCC diagnostic pop
 
+      // ----------------------------------------------------------------------
+
       } /* namespace chrono */
     } /* namespace std */
   } /* namespace cmsis */
 } /* namespace os */
+
+// ----------------------------------------------------------------------------

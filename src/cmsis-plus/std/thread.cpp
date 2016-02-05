@@ -127,6 +127,8 @@ namespace os
 
       } /* namespace this_thread */
 
+    // ------------------------------------------------------------------------
+
     } /* namespace std */
   } /* namespace cmsis */
 } /* namespace os */
