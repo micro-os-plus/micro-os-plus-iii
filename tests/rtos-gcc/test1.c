@@ -108,6 +108,13 @@ test1 (void)
     }
 #endif
 
+    {
+      osThreadId id;
+      id = osThreadGetId ();
+
+      osThreadYield ();
+
+    }
   return 0;
 }
 

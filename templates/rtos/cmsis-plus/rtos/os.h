@@ -48,7 +48,9 @@ namespace os
     {
       // ----------------------------------------------------------------------
 
-      /// Status code values returned by CMSIS-RTOS functions.
+      /**
+       * Type of status code values returned by CMSIS-RTOS functions.
+       */
       using result_t = uint32_t;
 
       namespace result
@@ -148,23 +150,22 @@ namespace os
 
       namespace kernel
       {
-        /// Initialise the RTOS Kernel for creating objects.
-        /// @return result code that indicates the execution status of the function.
+        /**
+         * @brief Initialise RTOS kernel.
+         *
+         * @return result code that indicates the execution status of the function.
+         */
         result_t
         initialize (void);
 
-        /// Start the RTOS Kernel.
-        /// @return result code that indicates the execution status of the function.
-        result_t
-        start (void);
-
-        /// Check if the RTOS kernel is already started.
-        /// @return 0 RTOS is not started, 1 RTOS is started.
-        bool
-        is_running (void);
-
+        /**
+         * @brief Get an error string.
+         *
+         * @param [in] res an integer result code.
+         * @return a null terminated string.
+         */
         const char*
-        strerror (result_t);
+        strerror (result_t res);
 
       } /* namespace kernel */
 
@@ -181,7 +182,7 @@ namespace os
         /**
          * @brief Tell the relative time now.
          *
-         * @return number of SysTick ticks since startup.
+         * @return the number of SysTick ticks since startup.
          */
         static rep
         now (void);
@@ -199,13 +200,30 @@ namespace os
 
 #pragma GCC diagnostic pop
 
+        /**
+         * @brief Tell the current time.
+         *
+         * @return number of ticks since startup.
+         */
         static rep
         now (current_t* details);
 
+        /**
+         * @brief Convert microseconds to ticks.
+         *
+         * @param [in] micros the number of microseconds.
+         * @return number of ticks.
+         */
         template<typename Rep_T>
           static constexpr uint32_t
           ticks_cast (Rep_T microsec);
 
+        /**
+         * @brief Sleep a number of ticks.
+         *
+         * @param [in] ticks the number of ticks to sleep.
+         * @return result code that indicates the execution status of the function.
+         */
         static result_t
         sleep_for (sleep_rep ticks);
       };
@@ -226,6 +244,12 @@ namespace os
         static uint64_t
         now (void);
 
+        /**
+         * @brief Sleep a number of seconds.
+         *
+         * @param [in] secs the number of seconds to sleep.
+         * @return result code that indicates the execution status of the function.
+         */
         static result_t
         sleep_for (sleep_rep secs);
 
@@ -244,12 +268,37 @@ namespace os
       {
         using status_t = bool;
 
-        // Lock the scheduler (prevent it from switching threads).
-        // @return The previous status of the scheduler
+        /**
+         * @brief Start the RTOS kernel.
+         *
+         * @return result code that indicates the execution status of the function.
+         */
+        result_t
+        start (void);
+
+        /**
+         * @brief Check if RTOS is running.
+         *
+         * @return true if RTOS is running, false if RTOS was not started.
+         */
+        bool
+        is_running (void);
+
+        /**
+         * @brief Lock the scheduler.
+         *
+         * @return the previous status of the scheduler.
+         */
         status_t
         lock (void);
 
         // Restore the scheduler status
+        /**
+         * @brief Unlock the scheduler.
+         *
+         * @param [in] status the new status of the scheduler.
+         * @return the previous status of the scheduler.
+         */
         status_t
         unlock (status_t status);
 
@@ -278,22 +327,30 @@ namespace os
 
       namespace this_thread
       {
-        /// Return the thread ID of the current running thread.
-        /// @return thread ID for reference by other functions or NULL in case of error.
+        /**
+         * @brief Get current thread.
+         *
+         * @return a reference to the current running thread.
+         */
         Thread&
-        get_current (void);
+        get (void);
 
-        /// Pass control to next thread that is in state \b READY.
-        /// @return result code that indicates the execution status of the function.
+        /**
+         * @brief Yield control to next thread.
+         *
+         * @return result code that indicates the execution status of the function.
+         */
         result_t
         yield (void);
 
+        /// Legacy
         /// Wait for Signal, Message, Mail, or Timeout.
         /// @param [in] millisec          @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out
         /// @return event that contains signal, message, or mail information or error code.
         result_t
         wait (millis_t millisec, event_t* ret);
 
+        /// Legacy
         /// Wait for one or more Signal Flags to become signaled for the current \b RUNNING thread.
         /// @param [in]     signals       wait until all specified signal flags set or 0 for any single signal flag.
         /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
@@ -306,6 +363,9 @@ namespace os
 
       // ======================================================================
 
+      /**
+       * @brief Base class for named objects.
+       */
       class Named_object
       {
       public:
@@ -333,9 +393,11 @@ namespace os
 
       namespace thread
       {
+        /**
+         * Type of priorities used for thread control.
+         */
         using priority_t = int8_t;
 
-        /// Priorities used for thread control.
         // Explicit namespace preferred over scoped enum,
         // otherwise too many casts are required.
         namespace priority
@@ -359,6 +421,9 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+        /**
+         * @brief Thread attributes.
+         */
         class Attributes : public Named_object
         {
         public:
@@ -655,6 +720,9 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+        /**
+         * @brief Mutex attributes.
+         */
         class Attributes : public Named_object
         {
         public:
@@ -850,6 +918,10 @@ namespace os
 
       namespace cond
       {
+
+        /**
+         * @brief Condition variable attributes.
+         */
         class Attributes : public Named_object
         {
         public:
@@ -1154,13 +1226,18 @@ namespace os
     {
       // ======================================================================
 
+      /**
+       * @details
+       * Round up the microseconds value and convert to number of
+       * ticks, using the SysTick frequency in Hz.
+       */
       template<typename Rep_T>
         constexpr uint32_t
         Systick_clock::ticks_cast (Rep_T microsec)
         {
           // TODO: add some restrictions to match only numeric types
           return (uint32_t) ((((microsec) * ((Rep_T) frequency_hz))
-              + (Rep_T) 999999UL) / (Rep_T) 1000000UL);
+              + (Rep_T) 999999ul) / (Rep_T) 1000000ul);
         }
 
       // ======================================================================
@@ -1242,7 +1319,7 @@ namespace os
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_equal.html
        */
       inline bool
-      Thread::operator == (const Thread& rhs) const
+      Thread::operator== (const Thread& rhs) const
       {
         return this == &rhs;
       }

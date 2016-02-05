@@ -59,13 +59,13 @@ osKernelInitialize (void)
 osStatus
 osKernelStart (void)
 {
-  return static_cast<osStatus> (kernel::start ());
+  return static_cast<osStatus> (scheduler::start ());
 }
 
 int32_t
 osKernelRunning (void)
 {
-  return kernel::is_running ();
+  return scheduler::is_running ();
 }
 
 #if (defined (osFeature_SysTick)  &&  (osFeature_SysTick != 0))     // System Timer available
@@ -105,7 +105,7 @@ osThreadCreateEx (osThread* addr, const osThreadAttr* attr, os_pthread function,
 osThreadId
 osThreadGetId (void)
 {
-  return reinterpret_cast<osThreadId> (&this_thread::get_current ());
+  return reinterpret_cast<osThreadId> (&this_thread::get ());
 }
 
 osStatus

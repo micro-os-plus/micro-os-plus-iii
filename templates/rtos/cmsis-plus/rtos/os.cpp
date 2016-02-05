@@ -36,25 +36,15 @@ namespace os
 
       namespace kernel
       {
+        /**
+         * @details
+         * Create all RTOS internal objects and be ready to run.
+         */
         result_t
         initialize (void)
         {
           // TODO
           return result::ok;
-        }
-
-        result_t
-        start (void)
-        {
-          // TODO
-          return result::ok;
-        }
-
-        bool
-        is_running (void)
-        {
-          // TODO
-          return true;
         }
 
         const char*
@@ -143,6 +133,12 @@ namespace os
         return __systick_now;
       }
 
+      /**
+       * @details
+       * Put the current thread to sleep, until the next n-th
+       * SysTick occurs. Depending when the call is issued, the
+       * first tick counted may be very short.
+       */
       result_t
       Systick_clock::sleep_for (Systick_clock::sleep_rep ticks)
       {
@@ -159,6 +155,12 @@ namespace os
         return __rtc_now;
       }
 
+      /**
+       * @details
+       * Put the current thread to sleep, until the next n-th
+       * RTC second occurs. Depending when the call is issued, the
+       * first second counted may be very short.
+       */
       result_t
       Realtime_clock::sleep_for (Realtime_clock::sleep_rep secs)
       {
@@ -166,6 +168,61 @@ namespace os
         __rtc_now += secs;
         return result::ok;
       }
+
+      namespace scheduler
+      {
+        status_t sched_running = false;
+
+        /**
+         *
+         */
+        result_t
+        start (void)
+        {
+          // TODO
+          sched_running = true;
+          return result::ok;
+        }
+
+        bool
+        is_running (void)
+        {
+          // TODO
+          return sched_running;
+        }
+
+        status_t
+        lock (void)
+        {
+          status_t tmp = sched_running;
+          sched_running = false;
+          return tmp;
+        }
+
+        status_t
+        unlock (status_t status)
+        {
+          status_t tmp = sched_running;
+          sched_running = status;
+          return tmp;
+        }
+
+        void
+        __register_thread (Thread* thread)
+        {
+          // TODO
+#if defined(TESTING)
+          thread->__run_function ();
+#endif
+        }
+
+        void
+        __unregister_thread (Thread* thread)
+        {
+          // TODO
+        }
+
+      } /* namespace scheduler */
 
       // ======================================================================
 
@@ -183,13 +240,20 @@ namespace os
 
       namespace this_thread
       {
+        /**
+         *
+         */
         Thread&
-        get_current (void)
+        get (void)
         {
           // TODO
           return no_thread;
         }
 
+        /**
+         * @details
+         * Pass control to next thread that is in \b READY state.
+         */
         result_t
         yield (void)
         {
@@ -197,6 +261,7 @@ namespace os
           return result::ok;
         }
 
+        // Legacy
         result_t
         wait (millis_t millisec, event_t* ret)
         {
@@ -204,6 +269,7 @@ namespace os
           return result::ok;
         }
 
+        // Legacy
         result_t
         wait_signals (signal_flags_t signals, millis_t millisec,
                       signal_flags_t* ret)
@@ -296,11 +362,17 @@ namespace os
 
         trace::printf ("%s(\"%s\", %d) @%p \n", __func__, get_name (),
                        stack_size_bytes_, this);
+
+        scheduler::__register_thread (this);
       }
 
+      /**
+       *
+       */
       Thread::~Thread ()
       {
         trace::printf ("%s() @%p \n", __func__, this);
+        scheduler::__register_thread (this);
       }
 
       /**

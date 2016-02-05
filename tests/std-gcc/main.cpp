@@ -115,8 +115,6 @@ main (int argc, char* argv[])
       thread th11
         { task1 };
 
-      th11.native_handle ()->__run_function ();
-
       new int ();
 
       static uint8_t stack12[300];
@@ -128,8 +126,6 @@ main (int argc, char* argv[])
       thread th12
         { attr12, task1 };
 
-      th12.native_handle ()->__run_function ();
-
       static uint8_t stack13[300];
       rtos::thread::Attributes attr13
         { "th13" };
@@ -140,24 +136,16 @@ main (int argc, char* argv[])
       thread th13
         { attr13, task1 };
 
-      th13.native_handle ()->__run_function ();
-
 #if 1
 
       thread th21
         { task2, &c };
 
-      th21.native_handle ()->__run_function ();
-
       thread th31
         { task3, &c };
 
-      th31.native_handle ()->__run_function ();
-
       thread th41
         { task4, 7, "xyz" };
-
-      th41.native_handle ()->__run_function ();
 
 #if 0
       // Fails, nullptr is not matched with attributes
@@ -296,6 +284,11 @@ main (int argc, char* argv[])
       cv1.wait_for (lock, 3001001us, pred); // 3002 ticks
     }
 
+    {
+      thread::id id = this_thread::get_id ();
+
+      this_thread::yield ();
+    }
   trace::printf ("%s done.\n", argv[0]);
   return 0;
 }

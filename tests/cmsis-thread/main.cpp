@@ -95,84 +95,66 @@ main (int argc, char* argv[])
   char* ch2;
 
   Thread t01
-    { "t01", nullptr, 0, Priority::normal, (Thread_func_vp)f0 };
-  t01.__run_function ();
+    { "t01", nullptr, 0, Priority::normal, (Thread_func_vp) f0 };
 
   Thread t12
-    { "t12", nullptr, 0, Priority::normal, (Thread_func_vp)f1, nullptr };
-  t12.__run_function ();
+    { "t12", nullptr, 0, Priority::normal, (Thread_func_vp) f1, nullptr };
 
   Thread t13
-    { "t13", nullptr, 0, Priority::normal, (Thread_func_vp)f1, &ch1 };
-  t13.__run_function ();
+    { "t13", nullptr, 0, Priority::normal, (Thread_func_vp) f1, &ch1 };
 
   Thread t15
     { "t15", 0, Priority::normal, f1, nullptr };
-  t15.__run_function ();
 
   Thread t16
     { "t16", 0, Priority::normal, f1, &ch2 };
-  t16.__run_function ();
 
   Thread t21
     { "t21", nullptr, 0, Priority::normal, f2, nullptr };
-  t21.__run_function ();
 
   Thread t22
     { "t22", nullptr, 0, Priority::normal, f2, &ch1 };
-  t22.__run_function ();
 
   Thread t23
     { "t23", 0, Priority::normal, f2, nullptr };
-  t23.__run_function ();
 
   Thread t24
     { "t24", 0, Priority::normal, f2, &ch2 };
-  t24.__run_function ();
 
   Thread t31
     { "t31", 0, Priority::normal, f3, 7 };
-  t31.__run_function ();
 
   Thread t32
     { "t32", 0, Priority::normal, f3, 8 };
-  t32.__run_function ();
 
   int n = 9;
   Thread t33
     { "t33", 0, Priority::normal, f3, n };
-  t33.__run_function ();
 
   Thread t41
     { "t41", 0, Priority::normal, f4, 7, "abc" };
-  t41.__run_function ();
 
   Thread t42
     { "t42", 0, Priority::normal, f4, 8, "cde" };
-  t42.__run_function ();
 
   char* str = (char*) "fgh";
   Thread t43
     { "t43", 0, Priority::normal, f4, n, str };
-  t43.__run_function ();
 
   auto l5 = [](void)
     { trace_printf ("l5()\n");};
 
   Thread t51
     { "t51", 0, Priority::normal, l5 };
-  t51.__run_function ();
 
   auto l6 = [](const void* arg)
     { trace_printf ("l6(%p)\n", arg);};
 
   Thread t61
     { "t61", 0, Priority::normal, l6, nullptr };
-  t61.__run_function ();
 
   Thread t62
     { "t62", 0, Priority::normal, l6, &ch2 };
-  t62.__run_function ();
 
   // Capture by value
   int ln = 77;
@@ -181,12 +163,10 @@ main (int argc, char* argv[])
 
   Thread t71
     { "t71", 0, Priority::normal, l7, nullptr };
-  t71.__run_function ();
 
   ln = 78; // Should print 77
   Thread t72
     { "t72", 0, Priority::normal, l7, &ch2 };
-  t72.__run_function ();
 
   // Capture by ref
   auto l8 = [&ln](void* arg)
@@ -194,22 +174,18 @@ main (int argc, char* argv[])
 
   Thread t81
     { "t81", 0, Priority::normal, l8, nullptr };
-  t81.__run_function ();
 
   ln = 79; // Should print 79
   Thread t82
     { "t82", 0, Priority::normal, l8, &ch2 };
-  t82.__run_function ();
 
   Func1 fn1
     { 55 };
   Thread t91
     { "t91", 0, Priority::normal, fn1, "ert" };
-  t91.__run_function ();
 
   Thread t92
     { "t92", 0, Priority::normal, fn1, "asd" };
-  t92.__run_function ();
 
   return 0;
 }

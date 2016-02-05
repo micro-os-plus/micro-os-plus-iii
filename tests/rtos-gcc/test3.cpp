@@ -119,6 +119,11 @@ namespace _3
           { attr4 };
       }
 
+      {
+        rtos::this_thread::get ();
+
+        rtos::this_thread::yield ();
+      }
     return 0;
   }
 

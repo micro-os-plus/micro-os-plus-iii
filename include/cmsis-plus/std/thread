@@ -409,7 +409,7 @@ namespace os
         inline thread::id
         get_id () noexcept
         {
-          return thread::id (&os::cmsis::rtos::this_thread::get_current ());
+          return thread::id (&os::cmsis::rtos::this_thread::get ());
         }
 
         // This implementation currently supports only short
