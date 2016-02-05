@@ -19,6 +19,7 @@
 #include <cmsis-plus/std/thread>
 #include <cmsis-plus/std/chrono>
 #include <cmsis-plus/std/mutex>
+#include <cmsis-plus/std/condition_variable>
 #include <cmsis-plus/diag/trace.h>
 
 #include <cstdio>
@@ -47,6 +48,9 @@ task4 (int n, const char* str);
 void
 my_sleep (int n);
 
+bool
+is_ready (void);
+
 // ----------------------------------------------------------------------------
 
 void
@@ -71,6 +75,12 @@ void
 task4 (int n, const char* str)
 {
   trace::printf ("task4(%d, %s)\n", n, str);
+}
+
+bool
+is_ready (void)
+{
+  return true;
 }
 
 // ----------------------------------------------------------------------------
@@ -227,20 +237,64 @@ main (int argc, char* argv[])
 
 #endif
 
-  mutex mx1;
-  mx1.lock ();
-  mx1.unlock ();
-  mx1.try_lock ();
+    {
+      mutex mx1;
+      mx1.lock ();
+      mx1.unlock ();
+      mx1.try_lock ();
+    }
 
-  timed_mutex mx2;
-  mx2.try_lock_for (systicks (2999));
-  mx2.try_lock_for (seconds (3));
-  mx2.try_lock_for (milliseconds (3001)); // 3001 ticks
-  mx2.try_lock_for (microseconds (3001001)); // 3002 ticks
-  mx2.try_lock_for (nanoseconds (3002000001ul)); // 3003 ticks
+    {
+      timed_mutex mx2;
+      mx2.try_lock_for (systicks (2999));
+      mx2.try_lock_for (seconds (3));
+      mx2.try_lock_for (milliseconds (3001)); // 3001 ticks
+      mx2.try_lock_for (microseconds (3001001)); // 3002 ticks
+      mx2.try_lock_for (nanoseconds (3002000001ul)); // 3003 ticks
 
-  mx2.try_lock_for (microseconds (1)); // 1 tick
-  mx2.try_lock_for (nanoseconds (1)); // 1 tick
+      mx2.try_lock_for (microseconds (1)); // 1 tick
+      mx2.try_lock_for (nanoseconds (1)); // 1 tick
+    }
+
+    {
+      condition_variable cv1;
+      cv1.notify_one ();
+      cv1.notify_all ();
+
+      mutex mxl;
+      unique_lock<mutex> lock
+        { mxl };
+
+      cv1.wait (lock);
+
+      auto pred = []()
+        { return is_ready();};
+
+      cv1.wait (lock, pred);
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
+      cv1.wait_until (lock, chrono::system_clock::now () + 1s);
+      cv1.wait_until (lock, chrono::Systick_clock::now () + 1s);
+      cv1.wait_until (lock, chrono::Realtime_clock::now () + 1s);
+
+      cv1.wait_until (lock, chrono::system_clock::now () + 1s, pred);
+      cv1.wait_until (lock, chrono::Systick_clock::now () + 1s, pred);
+      cv1.wait_until (lock, chrono::Realtime_clock::now () + 1s, pred);
+
+#pragma GCC diagnostic pop
+
+      cv1.wait_for (lock, 2999_ticks);
+      cv1.wait_for (lock, 3s);
+      cv1.wait_for (lock, 3001ms);
+      cv1.wait_for (lock, 3001001us); // 3002 ticks
+
+      cv1.wait_for (lock, 2999_ticks, pred);
+      cv1.wait_for (lock, 3s, pred);
+      cv1.wait_for (lock, 3001ms, pred);
+      cv1.wait_for (lock, 3001001us, pred); // 3002 ticks
+    }
 
   trace::printf ("%s done.\n", argv[0]);
   return 0;

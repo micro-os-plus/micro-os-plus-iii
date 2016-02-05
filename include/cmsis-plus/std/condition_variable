@@ -26,12 +26,16 @@
 #ifndef CMSIS_PLUS_STD_CONDITION_VARIABLE_
 #define CMSIS_PLUS_STD_CONDITION_VARIABLE_
 
+// ----------------------------------------------------------------------------
+
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/diag/trace.h>
 
 #include <cmsis-plus/std/mutex>
-//#include <memory>
+#include <memory>
 #include <chrono>
+
+// ----------------------------------------------------------------------------
 
 namespace os
 {
@@ -40,6 +44,22 @@ namespace os
     namespace std
     {
       // ======================================================================
+
+      /**
+       * Condition variables provide synchronization primitives used
+       * to block a thread until notified by some other thread that
+       * some condition is met or until a system time is reached.
+       * Class `condition_variable` provides a condition variable
+       * that can only wait on an object of type `unique_lock<mutex>`,
+       * allowing maximum efficiency on some platforms. Class
+       * `condition_variable_any` provides a general condition
+       * variable that can wait on objects of user-supplied
+       * lock types.
+       *
+       * Condition variables permit concurrent invocation of
+       * the `wait`, `wait_for`, `wait_until`, `notify_one`
+       * and `notify_all` member functions.
+       */
 
       enum class cv_status
       {
@@ -58,6 +78,10 @@ namespace os
         using native_handle_type = native_type*;
 
         condition_variable ();
+
+        // Extension to ISO.
+        condition_variable (os::cmsis::rtos::cond::Attributes& attr);
+
         ~condition_variable ();
 
         condition_variable (const condition_variable&) = delete;
@@ -107,6 +131,8 @@ namespace os
       protected:
 
         native_type ncv_;
+        using Native_clock = chrono::Systick_clock;
+
       };
 
       void
@@ -115,15 +141,10 @@ namespace os
 
       class condition_variable_any
       {
-      private:
-
-        using native_type = os::cmsis::rtos::Condition_variable;
-
       public:
 
-        using native_handle_type = native_type*;
-
         condition_variable_any ();
+        condition_variable_any (os::cmsis::rtos::cond::Attributes& attr);
 
         ~condition_variable_any ();
 
@@ -170,17 +191,12 @@ namespace os
                     const ::std::chrono::duration<Rep_T, Period_T>& rel_time,
                     Predicate_T pred);
 
-      private:
-
-        void
-        __do_timed_wait (
-            unique_lock<mutex>& __lk,
-            ::std::chrono::time_point<::std::chrono::system_clock,
-                ::std::chrono::nanoseconds>) noexcept;
-
       protected:
 
-        native_type ncv_;
+        condition_variable cv_;
+        ::std::shared_ptr<mutex> mx_;
+
+        using Native_clock = chrono::Systick_clock;
 
       };
 
@@ -202,25 +218,23 @@ namespace os
       inline
       condition_variable::condition_variable ()
       {
+        ;
+      }
+
+      inline
+      condition_variable::condition_variable (
+          os::cmsis::rtos::cond::Attributes& attr) :
+          ncv_
+            { attr }
+      {
+        ;
       }
 
       inline
       condition_variable::~condition_variable ()
       {
+        ;
       }
-
-#if 0
-      template<class _To, class Rep_T, class Period_T>
-        inline typename enable_if<::std::chrono::__is_duration<_To>::value, _To>::type
-        __ceil (::std::chrono::duration<Rep_T, Period_T> __d)
-        {
-          using namespace ::std::chrono;
-          _To __r = ::std::chrono::duration_cast<_To> (__d);
-          if (__r < __d)
-            ++__r;
-          return __r;
-        }
-#endif
 
       template<class Predicate_T>
         void
@@ -230,6 +244,9 @@ namespace os
             wait (lock);
         }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
       template<class Clock_T, class Duration_T>
         cv_status
         condition_variable::wait_until (
@@ -237,12 +254,23 @@ namespace os
             const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time)
         {
           using namespace ::std::chrono;
+          using Clock = Clock_T;
 
+#if 0
           wait_for (lock, abs_time - Clock_T::now ());
           return
-              Clock_T::now () < abs_time ?
-                  cv_status::no_timeout : cv_status::timeout;
+          Clock_T::now () < abs_time ?
+          cv_status::no_timeout : cv_status::timeout;
+#else
+          // Optimise to native (ticks). LLVM compares using the
+          // original clock, which might be more accurate.
+          Native_clock::duration rel_time = ::std::chrono::duration_cast<
+              Native_clock::duration> (abs_time - Clock::now ());
+          return wait_for (lock, rel_time);
+#endif
         }
+
+#pragma GCC diagnostic pop
 
       template<class Clock_T, class Duration_T, class Predicate_T>
         bool
@@ -259,6 +287,9 @@ namespace os
           return true;
         }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
       template<class Rep_T, class Period_T>
         cv_status
         condition_variable::wait_for (
@@ -271,25 +302,17 @@ namespace os
             {
               return cv_status::timeout;
             }
-#if 0
-          typedef time_point<system_clock, duration<long double, ::std::nano> > __sys_tpf;
-          typedef time_point<system_clock, nanoseconds> __sys_tpi;
-          __sys_tpf _Max = __sys_tpi::max ();
-          system_clock::time_point __s_now = system_clock::now ();
-#endif
-          steady_clock::time_point __c_now = steady_clock::now ();
-#if 0
-          if (_Max - rel_time > __s_now)
-            {
-              __do_timed_wait (lock, __s_now + __ceil<nanoseconds> (rel_time));
-            }
-          else
-            {
-              __do_timed_wait (lock, __sys_tpi::max ());
-            }
-#endif
+
+          Native_clock::time_point start_tp = Native_clock::now ();
+
+          rtos::systicks_t ticks = os::cmsis::std::chrono::ceil<
+              ::std::chrono::duration<rtos::systicks_t,
+                  typename Native_clock::period>> (rel_time).count ();
+
+          ncv_.timed_wait (lock.mutex ()->native_handle (), ticks);
+
           return
-              steady_clock::now () - __c_now < rel_time ?
+              (Native_clock::now () - start_tp) < rel_time ?
                   cv_status::no_timeout : cv_status::timeout;
         }
 
@@ -301,13 +324,147 @@ namespace os
             const ::std::chrono::duration<Rep_T, Period_T>& rel_time,
             Predicate_T pred)
         {
-          return wait_until (lock,
-                             ::std::chrono::steady_clock::now () + rel_time,
+          return wait_until (lock, Native_clock::now () + rel_time,
                              ::std::move (pred));
         }
+
+#pragma GCC diagnostic pop
+
+      // ======================================================================
+
+      inline
+      condition_variable_any::condition_variable_any () :
+          cv_
+            { }, //
+          mx_
+            { ::std::make_shared<mutex> () }
+      {
+        ;
+      }
+
+      inline
+      condition_variable_any::condition_variable_any (
+          os::cmsis::rtos::cond::Attributes& attr) :
+          cv_
+            { attr }, //
+          mx_
+            { ::std::make_shared<mutex> () }
+      {
+        ;
+      }
+
+      inline
+      condition_variable_any::~condition_variable_any ()
+      {
+        ;
+      }
+
+      inline void
+      condition_variable_any::notify_one () noexcept
+      {
+        lock_guard<mutex> lock (*mx_);
+        cv_.notify_one ();
+      }
+
+      inline void
+      condition_variable_any::notify_all () noexcept
+      {
+        lock_guard<mutex> lock (*mx_);
+        cv_.notify_all ();
+      }
+
+      struct __lock_external
+      {
+        template<class Lock_T>
+          void
+          operator() (Lock_T* lk)
+          {
+            lk->lock ();
+          }
+      };
+
+      template<class Lock_T>
+        void
+        condition_variable_any::wait (Lock_T& lock)
+        {
+          ::std::shared_ptr<mutex> mx = mx_;
+          unique_lock<mutex> lk (*mx);
+          lock.unlock ();
+          ::std::unique_ptr<Lock_T, __lock_external> lxx(&lock);
+          lock_guard<unique_lock<mutex> > lx (lk, adopt_lock);
+          cv_.wait (lk);
+          // mx.unlock()
+          // lock.lock()
+        }
+
+      template<class Lock_T, class Predicate_T>
+        inline void
+        condition_variable_any::wait (Lock_T& lock, Predicate_T pred)
+        {
+          while (!pred ())
+            wait (lock);
+        }
+
+      template<class Lock_T, class Clock_T, class Duration_T>
+        cv_status
+        condition_variable_any::wait_until (
+            Lock_T& lock,
+            const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time)
+        {
+          ::std::shared_ptr<mutex> mx = mx_;
+          unique_lock<mutex> lk (*mx);
+          lock.unlock ();
+          ::std::unique_ptr<Lock_T, __lock_external> lxx(&lock);
+          lock_guard<unique_lock<mutex> > lx (lk, adopt_lock);
+          return cv_.wait_until (lk, abs_time);
+          // mx.unlock()
+          // lock.lock()
+        }
+
+      template<class Lock_T, class Clock_T, class Duration_T, class Predicate_T>
+        inline bool
+        condition_variable_any::wait_until (
+            Lock_T& lock,
+            const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time,
+            Predicate_T pred)
+        {
+          while (!pred ())
+            {
+              if (wait_until (lock, abs_time) == cv_status::timeout)
+                {
+                  return pred ();
+                }
+            }
+          return true;
+
+        }
+
+      template<class Lock_T, class Rep_T, class Period_T>
+        inline cv_status
+        condition_variable_any::wait_for (
+            Lock_T& lock,
+            const ::std::chrono::duration<Rep_T, Period_T>& rel_time)
+        {
+          return wait_until (lock, Native_clock::now () + rel_time);
+        }
+
+      template<class Lock_T, class Rep_T, class Period_T, class Predicate_T>
+        inline bool
+        condition_variable_any::wait_for (
+            Lock_T& lock,
+            const ::std::chrono::duration<Rep_T, Period_T>& rel_time,
+            Predicate_T pred)
+        {
+          return wait_until (lock, Native_clock::now () + rel_time,
+                             ::std::move (pred));
+        }
+
+    // ------------------------------------------------------------------------
 
     } /* namespace std */
   } /* namespace cmsis */
 } /* namespace os */
+
+// ----------------------------------------------------------------------------
 
 #endif /* CMSIS_PLUS_STD_CONDITION_VARIABLE_ */
