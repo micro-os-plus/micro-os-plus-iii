@@ -26,10 +26,10 @@
 #ifndef CMSIS_PLUS_STD_FUTURE_
 #define CMSIS_PLUS_STD_FUTURE_
 
+// NOTICE: Not yet implemented!
+
 #include <cmsis-plus/rtos/os.h>
-#if defined(TRACE)
 #include <cmsis-plus/diag/trace.h>
-#endif
 
 namespace os
 {
@@ -532,7 +532,7 @@ namespace os
       template<class R, class Alloc>
         struct uses_allocator<packaged_task<R>, Alloc> ;
 
-      // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
 
     } /* namespace std */
   } /* namespace cmsis */
