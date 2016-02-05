@@ -54,7 +54,7 @@ namespace os
       {
         if (id_ != id ())
           {
-            void* args = id_.system_thread_->get_function_args ();
+            void* args = id_.native_thread_->get_function_args ();
             if (args != nullptr && function_object_deleter_ != nullptr)
               {
                 // Manually delete the function object used to store arguments.
@@ -62,7 +62,7 @@ namespace os
               }
 
             // Manually delete the system thread.
-            delete id_.system_thread_;
+            delete id_.native_thread_;
           }
       }
 
@@ -111,7 +111,7 @@ namespace os
         trace::printf ("%s() @%p\n", __func__, this);
         if (id_ != id ())
           {
-            id_.system_thread_->detach ();
+            id_.native_thread_->detach ();
           }
 
         // The detached thread will continue to run, but we'll not have
@@ -121,6 +121,11 @@ namespace os
         id_ = id ();
         trace::printf ("%s() @%p detached\n", __func__, this);
       }
+
+      namespace this_thread
+      {
+
+      } /* namespace this_thread */
 
     } /* namespace std */
   } /* namespace cmsis */

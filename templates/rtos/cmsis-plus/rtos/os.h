@@ -111,6 +111,7 @@ namespace os
 
       using millis_t = uint32_t;
       using systicks_t = uint32_t;
+      using duration_t = uint32_t;
 
       constexpr systicks_t WAIT_FOREVER = 0xFFFFFFFF;
 
@@ -174,13 +175,15 @@ namespace os
       public:
 
         static constexpr uint32_t frequency_hz = 1000; // TODO: Param
+        using rep = uint64_t;
+        using sleep_rep = duration_t;
 
         /**
          * @brief Tell the relative time now.
          *
          * @return number of SysTick ticks since startup.
          */
-        static uint64_t
+        static rep
         now (void);
 
 #pragma GCC diagnostic push
@@ -196,7 +199,7 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-        static uint64_t
+        static rep
         now (current_t* details);
 
         template<typename Rep_T>
@@ -204,7 +207,7 @@ namespace os
           ticks_cast (Rep_T microsec);
 
         static result_t
-        sleep_for (uint32_t ticks);
+        sleep_for (sleep_rep ticks);
       };
 
       class Realtime_clock
@@ -212,6 +215,8 @@ namespace os
       public:
 
         static constexpr uint32_t frequency_hz = 1;
+        using rep = uint64_t;
+        using sleep_rep = duration_t;
 
         /**
          * @brief Tell the absolute time now.
@@ -222,7 +227,15 @@ namespace os
         now (void);
 
         static result_t
-        sleep_for (uint32_t secs);
+        sleep_for (sleep_rep secs);
+
+        // TODO: read hardware regs
+        // TODO: write hw regs
+
+        // TODO: write alarm (array)
+        // TODO: read alarm
+
+        // TODO: capabilities : nr. of alarms
       };
 
       // ----------------------------------------------------------------------

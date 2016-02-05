@@ -73,7 +73,7 @@ namespace os
 #endif
 
           // The id is actually a pointer to the system thread.
-          native_handle_type system_thread_;
+          native_handle_type native_thread_;
 
           // Only two of them, the other 4 are defined in terms of these.
           friend bool
@@ -204,15 +204,16 @@ namespace os
         void
         yield () noexcept;
 
+        // The extra Clock_T is an extension to the standard
+        template<typename Clock_T = chrono::Systick_clock, typename Rep_T,
+            typename Period_T>
+          constexpr void
+          sleep_for (const ::std::chrono::duration<Rep_T, Period_T>& rel_time);
+
         template<typename Clock_T, typename Duration_T>
           void
           sleep_until (
               const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time);
-
-        template<typename Rep_T, typename Period_T>
-          constexpr void
-          sleep_for (const ::std::chrono::duration<Rep_T, Period_T>& rel_time);
-
       } /* namespace this_thread */
 
     } /* namespace std */
@@ -239,7 +240,7 @@ namespace os
       inline bool
       operator== (thread::id x, thread::id y) noexcept
       {
-        return x.system_thread_ == y.system_thread_;
+        return x.native_thread_ == y.native_thread_;
       }
 
       inline bool
@@ -251,7 +252,7 @@ namespace os
       inline bool
       operator< (thread::id x, thread::id y) noexcept
       {
-        return x.system_thread_ < y.system_thread_;
+        return x.native_thread_ < y.native_thread_;
       }
 
       inline bool
@@ -276,14 +277,14 @@ namespace os
 
       inline
       thread::id::id () noexcept :
-      system_thread_ ( nullptr)
+      native_thread_ ( nullptr)
         {
           ;
         }
 
       inline
-      thread::id::id (native_handle_type system_thread) noexcept :
-      system_thread_ ( system_thread)
+      thread::id::id (native_handle_type native_thread) noexcept :
+      native_thread_ ( native_thread)
         {
           ;
         }
@@ -305,7 +306,7 @@ namespace os
       inline thread::native_handle_type
       thread::native_handle ()
       {
-        return id_.system_thread_;
+        return id_.native_thread_;
       }
 
       inline unsigned
@@ -399,6 +400,7 @@ namespace os
 
         /// yield
         inline void
+        __attribute__((always_inline))
         yield () noexcept
         {
           os::cmsis::rtos::this_thread::yield ();
@@ -419,9 +421,10 @@ namespace os
 
         // Note the constexpr return type, which tries to compute everything at
         // compile time. And, for constant durations, it succeeds.
+#if 0
         template<class Rep_T, class Period_T>
-          constexpr void
-          sleep_for (const ::std::chrono::duration<Rep_T, Period_T>& rel_time)
+        constexpr void
+        sleep_for (const ::std::chrono::duration<Rep_T, Period_T>& rel_time)
           {
             using namespace ::std::chrono;
 
@@ -429,7 +432,7 @@ namespace os
               {
                 // Round up to micros, in case of nanos.
                 microseconds micros =
-                    os::cmsis::std::chrono::ceil<microseconds> (rel_time);
+                os::cmsis::std::chrono::ceil<microseconds> (rel_time);
 
                 // Round up to ticks.
 #if 0
@@ -452,27 +455,95 @@ namespace os
 
               }
           }
+#endif
+
+        template<typename Clock_T, class Rep_T, class Period_T>
+          constexpr void
+          sleep_for (const ::std::chrono::duration<Rep_T, Period_T>& rel_time)
+          {
+            using namespace ::std::chrono;
+
+            using Clock = Clock_T;
+            using sleep_rep = typename Clock::sleep_rep;
+
+            if (rel_time > duration<Rep_T, Period_T>::zero ())
+              {
+                sleep_rep d = (sleep_rep) os::cmsis::std::chrono::ceil<
+                    typename Clock::duration> (rel_time).count ();
+
+                Clock::sleep_for (d);
+              }
+          }
+
+        template<typename Clock_T, typename Duration_T>
+          void
+          sleep_until (
+              const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time)
+          {
+            using Clock = Clock_T;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
+            auto now = Clock::now ();
+
+            while (now < abs_time)
+              {
+                sleep_for (abs_time - now);
+                now = Clock::now ();
+              }
+          }
+
+#pragma GCC diagnostic pop
+
+        template<typename Duration_T>
+          void
+          sleep_until (
+              const ::std::chrono::time_point<chrono::Realtime_clock, Duration_T>& abs_time)
+          {
+            using Clock = chrono::Realtime_clock;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
+            auto now = Clock::now ();
+            while (now < abs_time)
+              {
+                typename Clock::sleep_rep d = (os::cmsis::std::chrono::ceil<
+                    typename Clock::sleep_duration> (abs_time - now)).count ();
+                Clock::sleep_for (d);
+                now = Clock::now ();
+              }
+
+#pragma GCC diagnostic pop
+
+          }
+
+        template<typename Duration_T>
+          void
+          sleep_until (
+              const ::std::chrono::time_point<chrono::Systick_clock, Duration_T>& abs_time)
+          {
+            using Clock = chrono::Systick_clock;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
+            auto now = Clock::now ();
+            while (now < abs_time)
+              {
+                typename Clock::sleep_rep d = (os::cmsis::std::chrono::ceil<
+                    typename Clock::sleep_duration> (abs_time - now)).count ();
+                Clock::sleep_for (d);
+                now = Clock::now ();
+              }
+
+#pragma GCC diagnostic pop
+
+          }
+
       }
-
-      // TODO: add a specialisation to use the RTC seconds timer, or,
-      // better, define the function to call for each clock.
-
-      template<typename Clock_T, typename Duration_T>
-        inline void
-        sleep_until (
-            const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time)
-        {
-          using Clock = Clock_T;
-
-          auto now = Clock::now ();
-
-          while (now < abs_time)
-            {
-              sleep_for (abs_time - now);
-              now = Clock::now ();
-            }
-        }
-
+    /* namespace this_thread */
     } /* namespace std */
   } /* namespace cmsis */
 } /* namespace os */

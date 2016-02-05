@@ -122,13 +122,15 @@ namespace os
       } /* namespace kernel */
       // ======================================================================
 
-      uint64_t
+      static Systick_clock::rep __systick_now = 12300;
+
+      Systick_clock::rep
       Systick_clock::now (void)
       {
-        return 12300;
+        return __systick_now;
       }
 
-      uint64_t
+      Systick_clock::rep
       Systick_clock::now (current_t* details)
       {
         assert(details != nullptr);
@@ -136,28 +138,32 @@ namespace os
         details->core_frequency_hz = 168000000;
         details->divisor = details->core_frequency_hz / frequency_hz;
         details->cycles = details->divisor - 1;
-        details->ticks = 12300;
+        details->ticks = __systick_now;
 
-        return 12300;
+        return __systick_now;
       }
 
       result_t
-      Systick_clock::sleep_for (uint32_t ticks)
+      Systick_clock::sleep_for (Systick_clock::sleep_rep ticks)
       {
         trace::printf ("Systick_clock::sleep_for %d ticks\n", ticks);
+        __systick_now += ticks;
         return result::ok;
       }
 
-      uint64_t
+      static Realtime_clock::rep __rtc_now = 1000000;
+
+      Realtime_clock::rep
       Realtime_clock::now (void)
       {
-        return 1000000;
+        return __rtc_now;
       }
 
       result_t
-      Realtime_clock::sleep_for (uint32_t secs)
+      Realtime_clock::sleep_for (Realtime_clock::sleep_rep secs)
       {
         trace::printf ("Realtime_clock::sleep_for %d seconds\n", secs);
+        __rtc_now += secs;
         return result::ok;
       }
 

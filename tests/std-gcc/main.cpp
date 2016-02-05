@@ -91,6 +91,7 @@ sleep_for_ticks (uint32_t)
 #endif
 
 using namespace ::std::chrono;
+using namespace os::cmsis::std::chrono;
 using namespace os::cmsis::std;
 using namespace os::cmsis;
 using namespace os;
@@ -99,100 +100,130 @@ int
 main (int argc, char* argv[])
 {
 
-  char c;
-  thread th11
-    { task1 };
+    {
+      char c;
+      thread th11
+        { task1 };
 
-  th11.native_handle ()->__run_function ();
+      th11.native_handle ()->__run_function ();
 
-  new int ();
+      new int ();
 
-  static uint8_t stack12[300];
-  rtos::thread::Attributes attr12
-    { "th12" };
-  attr12.set_stack_address ((void*) stack12);
-  attr12.set_stack_size_bytes (sizeof(stack12));
+      static uint8_t stack12[300];
+      rtos::thread::Attributes attr12
+        { "th12" };
+      attr12.set_stack_address ((void*) stack12);
+      attr12.set_stack_size_bytes (sizeof(stack12));
 
-  thread th12
-    { attr12, task1 };
+      thread th12
+        { attr12, task1 };
 
-  th12.native_handle ()->__run_function ();
+      th12.native_handle ()->__run_function ();
 
-  static uint8_t stack13[300];
-  rtos::thread::Attributes attr13
-    { "th13" };
-  attr13.set_stack_address ((void*) stack13);
-  attr13.set_stack_size_bytes (sizeof(stack13));
-  attr13.set_priority (rtos::thread::priority::normal);
+      static uint8_t stack13[300];
+      rtos::thread::Attributes attr13
+        { "th13" };
+      attr13.set_stack_address ((void*) stack13);
+      attr13.set_stack_size_bytes (sizeof(stack13));
+      attr13.set_priority (rtos::thread::priority::normal);
 
-  thread th13
-    { attr13, task1 };
+      thread th13
+        { attr13, task1 };
 
-  th13.native_handle ()->__run_function ();
+      th13.native_handle ()->__run_function ();
 
 #if 1
 
-  thread th21
-    { task2, &c };
+      thread th21
+        { task2, &c };
 
-  th21.native_handle ()->__run_function ();
+      th21.native_handle ()->__run_function ();
 
-  thread th31
-    { task3, &c };
+      thread th31
+        { task3, &c };
 
-  th31.native_handle ()->__run_function ();
+      th31.native_handle ()->__run_function ();
 
-  thread th41
-    { task4, 7, "xyz" };
+      thread th41
+        { task4, 7, "xyz" };
 
-  th41.native_handle ()->__run_function ();
+      th41.native_handle ()->__run_function ();
 
 #if 0
-  // Fails, nullptr is not matched with attributes
-  thread th51
-    { nullptr, task4, 7, "xyz"};
+      // Fails, nullptr is not matched with attributes
+      thread th51
+        { nullptr, task4, 7, "xyz"};
 #endif
 
-  this_thread::sleep_for (systicks (2999));
-  this_thread::sleep_for (seconds (3));
-  this_thread::sleep_for (milliseconds (3001));
-  this_thread::sleep_for (microseconds (3001001)); // 3002 ticks
-  this_thread::sleep_for (nanoseconds (3002000001ul)); // 3003 ticks
-
-  this_thread::sleep_for (microseconds (1)); // 1 ticks
-  this_thread::sleep_for (nanoseconds (1)); // 1 tick
-
-  my_sleep (70);
+      th11.join ();
+      th12.join ();
+      th13.join ();
+      th21.join ();
+      th31.join ();
+      th41.join ();
+    }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
 
-  Realtime_clock::startup_time_point = Realtime_clock::now ();
+  chrono::Realtime_clock::startup_time_point = chrono::Realtime_clock::now ();
 
 #pragma GCC diagnostic pop
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
 
-  auto tp = Systick_clock::now ();
+  auto tp = chrono::Systick_clock::now ();
   trace::printf ("Systick_clock::now() = %d ticks\n", tp);
 
-  auto tp2 = cmsis::std::system_clock::now ();
+  auto tp2 = cmsis::std::chrono::system_clock::now ();
   trace::printf ("system_clock::now() = %ld us\n", tp2);
 
-  auto tp3 = cmsis::std::high_resolution_clock::now ();
+  auto tp3 = cmsis::std::chrono::high_resolution_clock::now ();
   trace::printf ("high_resolution_clock::now() = %ld ns\n", tp3);
 
 #pragma GCC diagnostic pop
 
-  //th11.native_handle ()->set_priority (rtos::Priority::high);
+  this_thread::sleep_for (2999_ticks);
+  this_thread::sleep_for (3s);
+  this_thread::sleep_for (3001ms);
+  this_thread::sleep_for (3001001us); // 3002 ticks
+  this_thread::sleep_for (3002000001ns); // 3003 ticks
 
-  th11.join ();
-  th12.join ();
-  th13.join ();
-  th21.join ();
-  th31.join ();
-  th41.join ();
+  this_thread::sleep_for (microseconds (1)); // 1 ticks
+  this_thread::sleep_for (nanoseconds (1)); // 1 tick
+
+  this_thread::sleep_for<chrono::Systick_clock> (3999_ticks);
+  this_thread::sleep_for<chrono::Systick_clock> (4s);
+  this_thread::sleep_for<chrono::Systick_clock> (4001ms);
+
+  this_thread::sleep_for<chrono::Realtime_clock> (5s);
+  this_thread::sleep_for<chrono::Realtime_clock> (5001ms);
+
+  //this_thread::sleep_for<chrono::system_clock> (3999_ticks);
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
+  this_thread::sleep_until (chrono::system_clock::now () + 1s);
+
+  this_thread::sleep_until (chrono::Systick_clock::now () + 1us);
+  this_thread::sleep_until (chrono::Systick_clock::now () + 1ms);
+  this_thread::sleep_until (chrono::Systick_clock::now () + 1s);
+
+  this_thread::sleep_until (chrono::Realtime_clock::now () + 10ms);
+  this_thread::sleep_until (chrono::Realtime_clock::now () + 10s);
+  this_thread::sleep_until (chrono::Realtime_clock::now () + 1min);
+
+#pragma GCC diagnostic pop
+
+  //::std::chrono::system_clock::time_point tp1 = ::std::chrono::system_clock::now() + 1000ms;
+  //this_thread::sleep_until (::std::chrono::system_clock::now());
+
+  //Systick_clock::time_point tp1 = Systick_clock::now() + 1000_ticks;
+  //this_thread::sleep_until (tp1);
+
+  my_sleep (70);
 
 #endif
 

@@ -442,7 +442,7 @@ namespace os
 #else
               ticks =
                   (os::cmsis::rtos::systicks_t) (os::cmsis::std::chrono::ceil<
-                      systicks> (rel_time).count ());
+                      chrono::systicks> (rel_time).count ());
 #endif
             }
 
@@ -518,7 +518,7 @@ namespace os
 #else
               ticks =
                   (os::cmsis::rtos::systicks_t) (os::cmsis::std::chrono::ceil<
-                      systicks> (rel_time).count ());
+                      chrono::systicks> (rel_time).count ());
 #endif
             }
 
