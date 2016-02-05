@@ -146,7 +146,7 @@ namespace os
       result_t
       Systick_clock::sleep_for (Systick_clock::sleep_rep ticks)
       {
-        trace::printf ("Systick_clock::sleep_for %d ticks\n", ticks);
+        trace::printf ("Systick_clock::sleep_for(%d_ticks)\n", ticks);
         __systick_now += ticks;
         return result::ok;
       }
@@ -162,7 +162,7 @@ namespace os
       result_t
       Realtime_clock::sleep_for (Realtime_clock::sleep_rep secs)
       {
-        trace::printf ("Realtime_clock::sleep_for %d seconds\n", secs);
+        trace::printf ("Realtime_clock::sleep_for(%ds)\n", secs);
         __rtc_now += secs;
         return result::ok;
       }
@@ -516,6 +516,8 @@ namespace os
         attr.get_protocol (&protocol_);
         attr.get_robustness (&robustness_);
         attr.get_type (&type_);
+
+        trace::printf ("%s() @%p \n", __func__, this);
       }
 
       /**
@@ -533,7 +535,7 @@ namespace os
        */
       Mutex::~Mutex ()
       {
-        // TODO
+        trace::printf ("%s() @%p \n", __func__, this);
       }
 
       /**
@@ -571,6 +573,7 @@ namespace os
       result_t
       Mutex::lock (void)
       {
+        trace::printf ("%s() @%p \n", __func__, this);
         // TODO
         return result::ok;
       }
@@ -609,6 +612,7 @@ namespace os
       result_t
       Mutex::try_lock (void)
       {
+        trace::printf ("%s() @%p \n", __func__, this);
         // TODO
         return result::ok;
       }
@@ -646,6 +650,7 @@ namespace os
       result_t
       Mutex::timed_lock (systicks_t ticks)
       {
+        trace::printf ("%s(%d_ticks) @%p \n", __func__, ticks, this);
         // TODO
         return result::ok;
       }
@@ -671,6 +676,7 @@ namespace os
       result_t
       Mutex::unlock (void)
       {
+        trace::printf ("%s() @%p \n", __func__, this);
         // TODO
         return result::ok;
       }
@@ -687,6 +693,7 @@ namespace os
       result_t
       Mutex::get_prio_ceiling (thread::priority_t* prio_ceiling)
       {
+        trace::printf ("%s() @%p \n", __func__, this);
         if (prio_ceiling != nullptr)
           {
             *prio_ceiling = prio_ceiling_;
@@ -716,6 +723,7 @@ namespace os
       Mutex::set_prio_ceiling (thread::priority_t prio_ceiling,
                                thread::priority_t* old_prio_ceiling)
       {
+        trace::printf ("%s() @%p \n", __func__, this);
         // TODO
         return result::ok;
       }
@@ -744,6 +752,7 @@ namespace os
       result_t
       Mutex::consistent (void)
       {
+        trace::printf ("%s() @%p \n", __func__, this);
         // TODO
         return result::ok;
       }
@@ -771,7 +780,7 @@ namespace os
       Condition_variable::Condition_variable (const cond::Attributes& attr) :
           Named_object (attr.get_name ())
       {
-        ;
+        trace::printf ("%s() @%p \n", __func__, this);
       }
 
       /**
@@ -783,6 +792,7 @@ namespace os
        */
       Condition_variable::~Condition_variable ()
       {
+        trace::printf ("%s() @%p \n", __func__, this);
         // TODO
       }
 
@@ -816,6 +826,7 @@ namespace os
       result_t
       Condition_variable::signal ()
       {
+        trace::printf ("%s() @%p \n", __func__, this);
         // TODO
         return result::ok;
       }
@@ -854,6 +865,7 @@ namespace os
       result_t
       Condition_variable::broadcast ()
       {
+        trace::printf ("%s() @%p \n", __func__, this);
         // TODO
         return result::ok;
       }
@@ -861,7 +873,7 @@ namespace os
       /**
        * @details
        * Block on a condition variable. The application shall ensure
-       * that these functions are called with mutex locked by
+       * that this function is called with mutex locked by
        * the calling thread; otherwise, an error (for
        * PTHREAD_MUTEX_ERRORCHECK and robust mutexes) or
        * undefined behaviour (for other mutexes) results.
@@ -871,6 +883,7 @@ namespace os
       result_t
       Condition_variable::wait (Mutex* mutex)
       {
+        trace::printf ("%s() @%p \n", __func__, this);
         // TODO
         return result::ok;
       }
@@ -878,7 +891,7 @@ namespace os
       /**
        * @details
        * Block on a condition variable. The application shall ensure
-       * that these functions are called with mutex locked by
+       * that this function is called with mutex locked by
        * the calling thread; otherwise, an error (for
        * ERRORCHECK and robust mutexes) or
        * undefined behaviour (for other mutexes) results.
@@ -888,6 +901,7 @@ namespace os
       result_t
       Condition_variable::timed_wait (Mutex* mutex, systicks_t ticks)
       {
+        trace::printf ("%s(%d_ticks) @%p \n", __func__, ticks, this);
         // TODO
         return result::ok;
       }
