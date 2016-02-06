@@ -82,8 +82,7 @@ extern "C"
 #if (defined (osFeature_Semaphore)  &&  (osFeature_Semaphore != 0))
 
   osSemaphoreId
-  osSemaphoreCreateEx (osSemaphoreId addr, const char* name,
-                       int32_t initial_count, uint32_t max_count);
+  osSemaphoreCreateEx (osSemaphoreId addr, const osSemaphoreAttr* attr);
 
 #endif /* osFeature_Semaphore */
 

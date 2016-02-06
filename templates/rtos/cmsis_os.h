@@ -168,17 +168,23 @@ extern "C"
 
 // >>> the following data type definitions may shall adapted towards a specific RTOS
 
-#define OS_THREAD_SIZE_WORDS  6
-#define OS_TIMER_SIZE_WORDS  1
-#define OS_MUTEX_SIZE_WORDS  2
-#define OS_SEMAPHORE_SIZE_WORDS  1
-#define OS_POOL_SIZE_WORDS  1
-#define OS_MESSAGEQ_SIZE_WORDS  1
-#define OS_MAILQ_SIZE_WORDS  1
+#define OS_THREAD_SIZE_PTRS  6
+#define OS_TIMER_SIZE_PTRS  1
+
+#define OS_MUTEX_SIZE_PTRS  2
+#if __SIZEOF_POINTER__ == __SIZEOF_LONG_LONG__
+#define OS_SEMAPHORE_SIZE_PTRS  2
+#else
+#define OS_SEMAPHORE_SIZE_PTRS  3
+#endif
+
+#define OS_POOL_SIZE_PTRS  1
+#define OS_MESSAGEQ_SIZE_PTRS  1
+#define OS_MAILQ_SIZE_PTRS  1
 
   typedef struct os_thread_data
   {
-    void* content[OS_THREAD_SIZE_WORDS];
+    void* content[OS_THREAD_SIZE_PTRS];
   } osThread;
 
 #pragma GCC diagnostic push
@@ -196,12 +202,12 @@ extern "C"
 
   typedef struct os_timer_data
   {
-    void* content[OS_TIMER_SIZE_WORDS];
+    void* content[OS_TIMER_SIZE_PTRS];
   } osTimer;
 
   typedef struct os_mutex_data
   {
-    void* content[OS_MUTEX_SIZE_WORDS];
+    void* content[OS_MUTEX_SIZE_PTRS];
   } osMutex;
 
 #pragma GCC diagnostic push
@@ -216,51 +222,63 @@ extern "C"
 
   typedef struct os_semaphore_data
   {
-    void* content[OS_SEMAPHORE_SIZE_WORDS];
+    void* content[OS_SEMAPHORE_SIZE_PTRS];
   } osSemaphore;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+  typedef struct os_semaphore_attr
+  {
+    const char* name;
+    int32_t initial_count;
+    int32_t max_count;
+  } osSemaphoreAttr;
+
+#pragma GCC diagnostic pop
 
   typedef struct os_pool_data
   {
-    void* content[OS_POOL_SIZE_WORDS];
+    void* content[OS_POOL_SIZE_PTRS];
   } osPool;
 
   typedef struct os_messageQ_data
   {
-    void* content[OS_MESSAGEQ_SIZE_WORDS];
+    void* content[OS_MESSAGEQ_SIZE_PTRS];
   } osMessageQ;
 
   typedef struct os_mailQ_data
   {
-    void* content[OS_MAILQ_SIZE_WORDS];
+    void* content[OS_MAILQ_SIZE_PTRS];
   } osMailQ;
 
   /// Thread ID identifies the thread (pointer to a thread control block).
   /// @note CAN BE CHANGED: @b os_thread_cb is implementation specific in every CMSIS-RTOS.
-  typedef osThread *osThreadId;
+  typedef osThread* osThreadId;
 
   /// Timer ID identifies the timer (pointer to a timer control block).
   /// @note CAN BE CHANGED: @b os_timer_cb is implementation specific in every CMSIS-RTOS.
-  typedef osTimer *osTimerId;
+  typedef osTimer* osTimerId;
 
   /// Mutex ID identifies the mutex (pointer to a mutex control block).
   /// @note CAN BE CHANGED: @b os_mutex_cb is implementation specific in every CMSIS-RTOS.
-  typedef osMutex *osMutexId;
+  typedef osMutex* osMutexId;
 
   /// Semaphore ID identifies the semaphore (pointer to a semaphore control block).
   /// @note CAN BE CHANGED: @b os_semaphore_cb is implementation specific in every CMSIS-RTOS.
-  typedef osSemaphore *osSemaphoreId;
+  typedef osSemaphore* osSemaphoreId;
 
   /// Pool ID identifies the memory pool (pointer to a memory pool control block).
   /// @note CAN BE CHANGED: @b os_pool_cb is implementation specific in every CMSIS-RTOS.
-  typedef osPool *osPoolId;
+  typedef osPool* osPoolId;
 
   /// Message ID identifies the message queue (pointer to a message queue control block).
   /// @note CAN BE CHANGED: @b os_messageQ_cb is implementation specific in every CMSIS-RTOS.
-  typedef osMessageQ *osMessageQId;
+  typedef osMessageQ* osMessageQId;
 
   /// Mail ID identifies the mail queue (pointer to a mail queue control block).
   /// @note CAN BE CHANGED: @b os_mailQ_cb is implementation specific in every CMSIS-RTOS.
-  typedef osMailQ *osMailQId;
+  typedef osMailQ* osMailQId;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -346,7 +364,7 @@ extern "C"
     union
     {
       uint32_t v; ///< message as 32-bit value
-      void *p; ///< message or mail as void pointer
+      void* p; ///< message or mail as void pointer
       int32_t signals; ///< signal flags
     } value; ///< event value
     union

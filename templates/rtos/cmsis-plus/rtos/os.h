@@ -117,8 +117,7 @@ namespace os
 
       constexpr systicks_t WAIT_FOREVER = 0xFFFFFFFF;
 
-      constexpr uint32_t MAX_SEMAPHORE_COUNT = 0xFFFFFFFF;
-
+      class Thread;
       class Mail_queue;
       class Message_queue;
 
@@ -288,6 +287,13 @@ namespace os
          */
         status_t
         unlock (status_t status);
+
+        // TODO: move them to ThreadsRegistry
+        void
+        __register_thread (Thread* thread);
+
+        void
+        __unregister_thread (Thread* thread);
 
       } /* namespace scheduler */
 
@@ -778,9 +784,12 @@ namespace os
       public:
 
         /**
-         * @brief Create and initialise a mutex.
+         * @brief Create and initialise a mutex with default attributes.
          */
         Mutex ();
+        /**
+         * @brief Create and initialise a mutex with custom attributes.
+         */
         Mutex (const mutex::Attributes& attr);
 
         Mutex (const Mutex&) = delete;
@@ -965,16 +974,100 @@ namespace os
 
       // ======================================================================
 
+      namespace semaphore
+      {
+        using count_t = int32_t;
+        constexpr count_t max_count_value = 0x7FFFFFFF;
+
+        /**
+         * @brief Semaphore attributes.
+         */
+        class Attributes : public Named_object
+        {
+        public:
+
+          Attributes (const char* name);
+
+          Attributes (const Attributes&) = default;
+          Attributes (Attributes&&) = default;
+          Attributes&
+          operator= (const Attributes&) = default;
+          Attributes&
+          operator= (Attributes&&) = default;
+
+          /**
+           * @brief Delete semaphore attributes.
+           */
+          ~Attributes () = default;
+
+          result_t
+          get_intial_count (count_t* initial_count) const;
+
+          result_t
+          set_intial_count (count_t initial_count);
+
+          result_t
+          get_max_count (count_t* max_count) const;
+
+          result_t
+          set_max_count (count_t max_count);
+
+        protected:
+
+          int32_t initial_count_;
+
+          int32_t max_count_;
+        };
+
+        extern const Attributes counting_initializer;
+
+        /**
+         * @brief Semaphore attributes.
+         */
+        class Binary_attributes : public Attributes
+        {
+        public:
+
+          Binary_attributes (const char* name);
+
+          Binary_attributes (const Binary_attributes&) = default;
+          Binary_attributes (Binary_attributes&&) = default;
+          Binary_attributes&
+          operator= (const Binary_attributes&) = default;
+          Binary_attributes&
+          operator= (Binary_attributes&&) = default;
+
+          /**
+           * @brief Delete semaphore attributes.
+           */
+          ~Binary_attributes () = default;
+        };
+
+        extern const Binary_attributes binary_initializer;
+      } /* namespace semaphore */
+
+      /**
+       * @class Semaphore
+       * @brief POSIX semaphore.
+       * @details
+       * Supports both counting and binary semaphores.
+       *
+       * Compatible with POSIX semaphore.
+       * http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html
+       */
       class Semaphore : public Named_object
       {
       public:
 
-        /// Create and Initialize a Semaphore object used for managing resources.
-        /// @param         name          name of the semaphore object.
-        /// @param [in]     count         number of available resources.
-        /// @return semaphore ID for reference by other functions or NULL in case of error.
-        Semaphore (const char* name, int32_t count, uint32_t max_count =
-                       MAX_SEMAPHORE_COUNT);
+        /**
+         * @brief Create a default semaphore.
+         */
+        Semaphore ();
+
+        /**
+         * @brief Create custom semaphore.
+         */
+        Semaphore (const semaphore::Attributes& attr);
 
         Semaphore (const Semaphore&) = delete;
         Semaphore (Semaphore&&) = delete;
@@ -983,25 +1076,48 @@ namespace os
         Semaphore&
         operator= (Semaphore&&) = delete;
 
-        /// Delete a Semaphore that was created by @ref osSemaphoreCreate.
-        /// @param [in]     semaphore_id  semaphore object referenced with @ref osSemaphoreCreate.
-        /// @return status code that indicates the execution status of the function.
+        /**
+         * @brief Destroy the semaphore.
+         */
         ~Semaphore ();
 
-        /// Wait until a Semaphore token becomes available.
-        /// @param [in]     semaphore_id  semaphore object referenced with @ref osSemaphoreCreate.
-        /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
-        /// @return number of available tokens, or -1 in case of incorrect parameters.
-        int32_t
-        wait (millis_t millisec);
+        bool
+        operator== (const Semaphore& rhs) const;
 
-        /// Release a Semaphore token.
-        /// @param [in]     semaphore_id  semaphore object referenced with @ref osSemaphoreCreate.
-        /// @return status code that indicates the execution status of the function.
+        /**
+         * @brief Post to (unlock) the semaphore.
+         * @return status code that indicates the execution status of the function.
+         */
         result_t
-        release (void);
+        post (void);
+
+        /**
+         * @brief Wait for the semaphore.
+         * @return status code that indicates the execution status of the function.
+         */
+        result_t
+        wait ();
+
+        /**
+         * @brief Try to wait for the semaphore.
+         * @return status code that indicates the execution status of the function.
+         */
+        result_t
+        try_wait ();
+
+        /**
+         * @brief Timed wait for the semaphore.
+         * @param [in] ticks Number of ticks to wait.
+         * @return status code that indicates the execution status of the function.
+         */
+        result_t
+        timed_wait (systicks_t ticks);
 
       protected:
+
+        semaphore::count_t count_;
+
+        semaphore::count_t max_count_;
 
         // Add internal data
       };
@@ -1399,6 +1515,70 @@ namespace os
 
       inline bool
       Condition_variable::operator== (const Condition_variable& rhs) const
+      {
+        return this == &rhs;
+      }
+
+      // ======================================================================
+
+      namespace semaphore
+      {
+        inline
+        Attributes::Attributes (const char* name) :
+            Named_object (name)
+        {
+          initial_count_ = 0;
+          max_count_ = max_count_value;
+        }
+
+        inline result_t
+        Attributes::get_intial_count (count_t* initial_count) const
+        {
+          if (initial_count != nullptr)
+            {
+              *initial_count = initial_count_;
+            }
+          return result::ok;
+        }
+
+        inline result_t
+        Attributes::set_intial_count (count_t initial_count)
+        {
+          initial_count_ = initial_count;
+          return result::ok;
+        }
+
+        inline result_t
+        Attributes::get_max_count (count_t* max_count) const
+        {
+          if (max_count != nullptr)
+            {
+              *max_count = max_count_;
+            }
+          return result::ok;
+        }
+
+        inline result_t
+        Attributes::set_max_count (count_t max_count)
+        {
+          max_count_ = max_count;
+          return result::ok;
+        }
+
+        inline
+        Binary_attributes::Binary_attributes (const char* name) :
+            Attributes (name)
+        {
+          initial_count_ = 0;
+          max_count_ = 1;
+        }
+
+      } /* namespace semaphore */
+
+      // ======================================================================
+
+      inline bool
+      Semaphore::operator== (const Semaphore& rhs) const
       {
         return this == &rhs;
       }

@@ -318,29 +318,46 @@ osMutexDelete (osMutexId mutex_id)
 osSemaphoreId
 osSemaphoreCreate (const osSemaphoreDef_t *semaphore_def, int32_t count)
 {
+  semaphore::Attributes attr
+    { semaphore_def->name };
+  attr.set_intial_count (count);
   return reinterpret_cast<osSemaphoreId> (new ((void*) &semaphore_def->data) Semaphore (
-      semaphore_def->name, count));
+      attr));
 }
 
 osSemaphoreId
-osSemaphoreCreateEx (osSemaphoreId addr, const char* name,
-                     int32_t initial_count, uint32_t max_count)
+osSemaphoreCreateEx (osSemaphoreId addr, const osSemaphoreAttr* attr)
 {
   return reinterpret_cast<osSemaphoreId> (new ((void*) addr) Semaphore (
-      name, initial_count, max_count));
+      (const semaphore::Attributes&) *attr));
 }
 
 int32_t
 osSemaphoreWait (osSemaphoreId semaphore_id, uint32_t millisec)
 {
-  return static_cast<osStatus> ((reinterpret_cast<Semaphore&> (semaphore_id)).wait (
-      millisec));
+  result_t status;
+  if (millisec == osWaitForever)
+    {
+      status = (reinterpret_cast<Semaphore&> (semaphore_id)).wait ();
+    }
+  else if (millisec == 0)
+    {
+      status = (reinterpret_cast<Semaphore&> (semaphore_id)).try_wait ();
+    }
+  else
+    {
+      status = (reinterpret_cast<Semaphore&> (semaphore_id)).timed_wait (
+          Systick_clock::ticks_cast (millisec * 1000u));
+    }
+
+  // TODO: return legacy code for POSIX codes
+  return static_cast<osStatus> (status);
 }
 
 osStatus
 osSemaphoreRelease (osSemaphoreId semaphore_id)
 {
-  return static_cast<osStatus> ((reinterpret_cast<Semaphore&> (semaphore_id)).release ());
+  return static_cast<osStatus> ((reinterpret_cast<Semaphore&> (semaphore_id)).post ());
 }
 
 osStatus
