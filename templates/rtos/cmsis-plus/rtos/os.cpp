@@ -376,7 +376,7 @@ namespace os
       }
 
       /**
-       *
+       * No POSIX equivalent.
        */
       thread::priority_t
       Thread::get_sched_prio (void)
@@ -392,6 +392,12 @@ namespace os
        * pthread_setschedprio()
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_setschedprio.html
        *
+       * If an implementation detects use of a thread ID after the end
+       * of its lifetime, it is recommended that the function should
+       * fail and report an [ESRCH] error.
+       *
+       * The pthread_setschedprio() function shall not return an error
+       * code of [EINTR].
        */
       result_t
       Thread::set_sched_prio (thread::priority_t prio)
@@ -418,6 +424,11 @@ namespace os
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_join.html
        *
        * @note Cannot be called from Interrupt Service Routines.
+       *
+       * The join() function may fail if:
+       * [EDEADLK] A deadlock was detected.
+       *
+       * The join() function shall not return an error code of [EINTR].
        */
       result_t
       Thread::join (void** exit_ptr)
@@ -439,6 +450,8 @@ namespace os
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_detach.html
        *
        * @note Cannot be called from Interrupt Service Routines.
+       *
+       * The detach() function shall not return an error code of [EINTR].
        */
       result_t
       Thread::detach (void)

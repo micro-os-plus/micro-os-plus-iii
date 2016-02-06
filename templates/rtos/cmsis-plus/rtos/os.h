@@ -152,7 +152,6 @@ namespace os
       {
         /**
          * @brief Initialise RTOS kernel.
-         *
          * @return result code that indicates the execution status of the function.
          */
         result_t
@@ -160,7 +159,6 @@ namespace os
 
         /**
          * @brief Get an error string.
-         *
          * @param [in] res an integer result code.
          * @return a null terminated string.
          */
@@ -181,7 +179,6 @@ namespace os
 
         /**
          * @brief Tell the relative time now.
-         *
          * @return the number of SysTick ticks since startup.
          */
         static rep
@@ -202,7 +199,6 @@ namespace os
 
         /**
          * @brief Tell the current time.
-         *
          * @return number of ticks since startup.
          */
         static rep
@@ -210,7 +206,6 @@ namespace os
 
         /**
          * @brief Convert microseconds to ticks.
-         *
          * @param [in] micros the number of microseconds.
          * @return number of ticks.
          */
@@ -220,7 +215,6 @@ namespace os
 
         /**
          * @brief Sleep a number of ticks.
-         *
          * @param [in] ticks the number of ticks to sleep.
          * @return result code that indicates the execution status of the function.
          */
@@ -238,7 +232,6 @@ namespace os
 
         /**
          * @brief Tell the absolute time now.
-         *
          * @return number of seconds since 1 January 1970 00:00:00.
          */
         static uint64_t
@@ -246,7 +239,6 @@ namespace os
 
         /**
          * @brief Sleep a number of seconds.
-         *
          * @param [in] secs the number of seconds to sleep.
          * @return result code that indicates the execution status of the function.
          */
@@ -270,7 +262,6 @@ namespace os
 
         /**
          * @brief Start the RTOS kernel.
-         *
          * @return result code that indicates the execution status of the function.
          */
         result_t
@@ -278,7 +269,6 @@ namespace os
 
         /**
          * @brief Check if RTOS is running.
-         *
          * @return true if RTOS is running, false if RTOS was not started.
          */
         bool
@@ -286,16 +276,13 @@ namespace os
 
         /**
          * @brief Lock the scheduler.
-         *
          * @return the previous status of the scheduler.
          */
         status_t
         lock (void);
 
-        // Restore the scheduler status
         /**
          * @brief Unlock the scheduler.
-         *
          * @param [in] status the new status of the scheduler.
          * @return the previous status of the scheduler.
          */
@@ -329,7 +316,6 @@ namespace os
       {
         /**
          * @brief Get current thread.
-         *
          * @return a reference to the current running thread.
          */
         Thread&
@@ -337,7 +323,6 @@ namespace os
 
         /**
          * @brief Yield control to next thread.
-         *
          * @return result code that indicates the execution status of the function.
          */
         result_t
@@ -508,7 +493,6 @@ namespace os
 
         /**
          * @brief Compare thread IDs.
-         *
          * @return true if the given thread is the same as this thread.
          */
         bool
@@ -516,7 +500,6 @@ namespace os
 
         /**
          * @brief Cancel thread execution.
-         *
          * @return if successful, return status::ok; otherwise an
          * error number is returned.
          */
@@ -525,32 +508,22 @@ namespace os
 
         /**
          * @brief Wait for thread termination.
-         *
          * @return if successful, return status::ok; otherwise an
          * error number is returned.
-         *
-         * The join() function may fail if:
-         * [EDEADLK] A deadlock was detected.
-         *
-         * The join() function shall not return an error code of [EINTR].
          */
         result_t
         join (void** exit_ptr);
 
         /**
          * @brief Detach a thread.
-         *
          * @return if successful, return status::ok; otherwise an
          * error number is returned.
-         *
-         * The detach() function shall not return an error code of [EINTR].
          */
         result_t
         detach (void);
 
         /**
          * @brief Terminate thread.
-         *
          * @return -
          */
         void
@@ -558,7 +531,6 @@ namespace os
 
         /**
          * @brief Set dynamic scheduling priority.
-         *
          * @return if successful, return status::ok; otherwise an
          * error number is returned.
          *
@@ -566,21 +538,13 @@ namespace os
          * specified thread.
          * - [EPERM] The caller does not have appropriate privileges to set the
          * scheduling priority of the specified thread.
-         *
-         * If an implementation detects use of a thread ID after the end
-         * of its lifetime, it is recommended that the function should
-         * fail and report an [ESRCH] error.
-         *
-         * The pthread_setschedprio() function shall not return an error
-         * code of [EINTR].
          */
         result_t
         set_sched_prio (thread::priority_t prio);
 
         /**
          * @brief Get the current scheduling priority.
-         *
-         * No POSIX equivalent.
+         * @return priority.
          */
         thread::priority_t
         get_sched_prio (void);
@@ -836,7 +800,6 @@ namespace os
 
         /**
          * @brief Lock the mutex.
-         *
          * @return If successful, return status::ok; otherwise return an
          * error number.
          */
@@ -845,7 +808,6 @@ namespace os
 
         /**
          * @brief Try to lock the mutex.
-         *
          * @return If successful, return status::ok; otherwise return an
          * error number.
          */
@@ -854,9 +816,7 @@ namespace os
 
         /**
          * @brief Timed attempt to lock the mutex.
-         *
          * @param [in] ticks Number of ticks to wait.
-         *
          * @return If successful, return status::ok; otherwise return an
          * error number.
          */
@@ -865,7 +825,6 @@ namespace os
 
         /**
          * @brief Unlock the mutex.
-         *
          * @return If successful, return status::ok; otherwise return an
          * error number.
          */
@@ -874,9 +833,7 @@ namespace os
 
         /**
          * @brief Get the priority ceiling of a mutex.
-         *
          * @param [out] prio_ceiling pointer to location where to store the priority.
-         *
          * @return If successful, return status::ok; otherwise return an
          * error number.
          */
@@ -885,11 +842,9 @@ namespace os
 
         /**
          * @brief Set the priority ceiling of a mutex.
-         *
          * @param [in] prio_ceiling new priority.
          * @param [out] old_prio_ceiling pointer to location where to
          * store the previous priority; may be nullptr.
-         *
          * @return If successful, return status::ok; otherwise return an
          * error number.
          */
@@ -899,7 +854,6 @@ namespace os
 
         /**
          * @brief Mark state protected by robust mutex as consistent.
-         *
          * @return If successful, return status::ok; otherwise return an
          * error number.
          */
@@ -973,7 +927,6 @@ namespace os
 
         /**
          * @brief Signal a condition.
-         *
          * @return If successful, return status::ok; otherwise return an
          * error number.
          */
@@ -982,7 +935,6 @@ namespace os
 
         /**
          * @brief Broadcast a condition.
-         *
          * @return If successful, return status::ok; otherwise return an
          * error number.
          */
@@ -991,7 +943,6 @@ namespace os
 
         /**
          * @brief Wait on a condition.
-         *
          * @return If successful, return status::ok; otherwise return an
          * error number.
          */
@@ -1000,7 +951,6 @@ namespace os
 
         /**
          * @brief Wait on a condition with timeout.
-         *
          * @return If successful, return status::ok; otherwise return an
          * error number.
          */
