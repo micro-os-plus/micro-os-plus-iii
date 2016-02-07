@@ -30,7 +30,9 @@
 
 // ----------------------------------------------------------------------------
 
-#include <cmsis-plus/diag/trace.h>
+// Include CMSIS++ OS implementation definitions.
+#include <cmsis-plus/rtos/os-impl.h>
+
 #include <cstdint>
 #include <cstddef>
 
@@ -107,7 +109,7 @@ namespace os
           /// (Actually redundant in C++ if the underlying type is 32 bits)
           reserved = 0x7FFFFFFF
         };
-      } /* namespace status */
+      } /* namespace result */
 
       // ----------------------------------------------------------------------
 
@@ -163,6 +165,9 @@ namespace os
          */
         const char*
         strerror (result_t res);
+
+        bool
+        is_in_irq (void);
 
       } /* namespace kernel */
 
@@ -288,7 +293,20 @@ namespace os
         status_t
         unlock (status_t status);
 
-        // TODO: move them to ThreadsRegistry
+        class Critical_section
+        {
+        public:
+
+          Critical_section ();
+
+          ~Critical_section ();
+
+        protected:
+
+          const status_t status_;
+        };
+
+        // TODO: move them to implementation ThreadsRegistry
         void
         __register_thread (Thread* thread);
 
@@ -311,6 +329,19 @@ namespace os
         status_t
         exit (status_t status);
       }
+
+      class Critical_section_irq
+      {
+      public:
+
+        Critical_section_irq ();
+
+        ~Critical_section_irq ();
+
+      protected:
+
+        const critical::status_t status_;
+      };
 
       // ----------------------------------------------------------------------
 
@@ -387,7 +418,7 @@ namespace os
         /**
          * Type of priorities used for thread control.
          */
-        using priority_t = int8_t;
+        using priority_t = uint8_t;
 
         // Explicit namespace preferred over scoped enum,
         // otherwise too many casts are required.
@@ -397,15 +428,15 @@ namespace os
             : priority_t
               {
                 //
-            idle = -30, ///< priority: idle (lowest)
-            low = -20, ///< priority: low
-            below_normal = -10, ///< priority: below normal
-            normal = 0, ///< priority: normal (default)
-            above_normal = +10, ///< priority: above normal
-            high = +20, ///< priority: high
-            realtime = +30, ///< priority: realtime (highest)
+            idle = 0, ///< priority: idle (lowest)
+            low = 0x40, ///< priority: low
+            below_normal = 0x60, ///< priority: below normal
+            normal = 0x80, ///< priority: normal (default)
+            above_normal = 0xA0, ///< priority: above normal
+            high = 0xC0, ///< priority: high
+            realtime = 0xE0, ///< priority: realtime (highest)
             // error = 0x84 ///< system cannot determine priority or thread has illegal priority
-            max = 0x7F
+            max = 0xFF
           };
         } /* namespace priority */
 
@@ -687,6 +718,8 @@ namespace os
             recursive = 2,
           };
 
+        using count_t = uint32_t;
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
@@ -847,7 +880,7 @@ namespace os
          * error number.
          */
         result_t
-        get_prio_ceiling (thread::priority_t* prio_ceiling);
+        get_prio_ceiling (thread::priority_t* prio_ceiling) const;
 
         /**
          * @brief Set the priority ceiling of a mutex.
@@ -871,10 +904,19 @@ namespace os
 
       protected:
 
-        thread::priority_t prio_ceiling_;
-        mutex::protocol_t protocol_; // none = 0, inherit = 1, protect = 2
-        mutex::robustness_t robustness_; // stalled = 0, robust = 1
-        mutex::type_t type_; // normal = 0, errorcheck = 1, recursive = 2
+        // Can be updated in different contexts (interrupts or threads)
+        Thread* volatile owner_;
+
+        // Can be updated in different contexts (interrupts or threads)
+        volatile mutex::count_t count_;
+
+        volatile thread::priority_t prio_ceiling_;
+
+        // Constants set during construction.
+        const mutex::type_t type_; // normal = 0, errorcheck = 1, recursive = 2
+        const mutex::protocol_t protocol_; // none = 0, inherit = 1, protect = 2
+        const mutex::robustness_t robustness_; // stalled = 0, robust = 1
+
       };
 
       // ======================================================================
@@ -1092,32 +1134,46 @@ namespace os
         post (void);
 
         /**
-         * @brief Wait for the semaphore.
-         * @return status code that indicates the execution status of the function.
+         * @brief Wait to lock the semaphore.
+         * @return If successful, return status::ok; otherwise return an
+         * error number.
          */
         result_t
         wait ();
 
         /**
-         * @brief Try to wait for the semaphore.
-         * @return status code that indicates the execution status of the function.
+         * @brief Try to lock  the semaphore.
+         * @return If successful, return status::ok; otherwise return an
+         * error number.
          */
         result_t
         try_wait ();
 
         /**
-         * @brief Timed wait for the semaphore.
+         * @brief Timed wait to lock the semaphore.
          * @param [in] ticks Number of ticks to wait.
-         * @return status code that indicates the execution status of the function.
+         * @return If successful, return status::ok; otherwise return an
+         * error number.
          */
         result_t
         timed_wait (systicks_t ticks);
 
+        /**
+         * @brief Get the semaphore value.
+         * @param [out] value Pointer to integer where to store the value.
+         * @return If successful, return status::ok; otherwise return an
+         * error number.
+         */
+        result_t
+        get_value (semaphore::count_t* value);
+
       protected:
 
-        semaphore::count_t count_;
+        // Can be updated in different contexts (interrupts or threads)
+        volatile semaphore::count_t count_;
 
-        semaphore::count_t max_count_;
+        // Constants set during construction.
+        const semaphore::count_t max_count_;
 
         // Add internal data
       };
@@ -1292,6 +1348,29 @@ namespace os
     {
       // ======================================================================
 
+      namespace kernel
+      {
+        ;
+      } /* namespace kernel */
+
+      namespace scheduler
+      {
+        inline
+        Critical_section::Critical_section () :
+            status_ (lock ())
+        {
+          ;
+        }
+
+        inline
+        Critical_section::~Critical_section ()
+        {
+          unlock (status_);
+        }
+
+      }
+      /* namespace scheduler */
+
       /**
        * @details
        * Round up the microseconds value and convert to number of
@@ -1312,6 +1391,21 @@ namespace os
       Named_object::get_name (void) const
       {
         return name_;
+      }
+
+      // ======================================================================
+
+      inline
+      Critical_section_irq::Critical_section_irq () :
+          status_ (critical::enter ())
+      {
+        ;
+      }
+
+      inline
+      Critical_section_irq::~Critical_section_irq ()
+      {
+        critical::exit (status_);
       }
 
       // ======================================================================
@@ -1583,7 +1677,7 @@ namespace os
         return this == &rhs;
       }
 
-    // ------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
     } /* namespace rtos */
   } /* namespace cmsis */

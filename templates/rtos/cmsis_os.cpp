@@ -335,23 +335,23 @@ osSemaphoreCreateEx (osSemaphoreId addr, const osSemaphoreAttr* attr)
 int32_t
 osSemaphoreWait (osSemaphoreId semaphore_id, uint32_t millisec)
 {
-  result_t status;
   if (millisec == osWaitForever)
     {
-      status = (reinterpret_cast<Semaphore&> (semaphore_id)).wait ();
+      (reinterpret_cast<Semaphore&> (semaphore_id)).wait ();
     }
   else if (millisec == 0)
     {
-      status = (reinterpret_cast<Semaphore&> (semaphore_id)).try_wait ();
+      (reinterpret_cast<Semaphore&> (semaphore_id)).try_wait ();
     }
   else
     {
-      status = (reinterpret_cast<Semaphore&> (semaphore_id)).timed_wait (
+      (reinterpret_cast<Semaphore&> (semaphore_id)).timed_wait (
           Systick_clock::ticks_cast (millisec * 1000u));
     }
 
-  // TODO: return legacy code for POSIX codes
-  return static_cast<osStatus> (status);
+  semaphore::count_t value;
+  (reinterpret_cast<Semaphore&> (semaphore_id)).get_value (&value);
+  return (int32_t) value;
 }
 
 osStatus

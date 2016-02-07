@@ -171,10 +171,11 @@ extern "C"
 #define OS_THREAD_SIZE_PTRS  6
 #define OS_TIMER_SIZE_PTRS  1
 
-#define OS_MUTEX_SIZE_PTRS  2
 #if __SIZEOF_POINTER__ == __SIZEOF_LONG_LONG__
+#define OS_MUTEX_SIZE_PTRS  3
 #define OS_SEMAPHORE_SIZE_PTRS  2
 #else
+#define OS_MUTEX_SIZE_PTRS  4
 #define OS_SEMAPHORE_SIZE_PTRS  3
 #endif
 

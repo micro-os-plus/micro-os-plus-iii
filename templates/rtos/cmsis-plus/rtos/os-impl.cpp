@@ -109,7 +109,16 @@ namespace os
           return str;
         }
 
+        bool
+        is_in_irq (void)
+        {
+          // TODO
+
+          return false;
+        }
+
       } /* namespace kernel */
+
       // ======================================================================
 
       static Systick_clock::rep __systick_now = 12300;
@@ -187,7 +196,6 @@ namespace os
         bool
         is_running (void)
         {
-          // TODO
           return sched_running;
         }
 
@@ -224,6 +232,23 @@ namespace os
 
       } /* namespace scheduler */
 
+      namespace critical
+      {
+        // Enter an IRQ critical section
+        status_t
+        enter (void)
+        {
+          return 0;
+        }
+
+        // Exit an IRQ critical section
+        status_t
+        exit (status_t status)
+        {
+          return 0;
+        }
+      }
+
       // ======================================================================
 
       void*
@@ -257,6 +282,7 @@ namespace os
         result_t
         yield (void)
         {
+          assert(!kernel::is_in_irq ());
           // TODO
           return result::ok;
         }
@@ -344,6 +370,7 @@ namespace os
           Named_object (attr.get_name ())
       {
         assert(function != nullptr);
+        assert(!kernel::is_in_irq ());
 
         // Get attributes from user structure.
         attr.get_priority (&prio_);
@@ -433,6 +460,7 @@ namespace os
       result_t
       Thread::join (void** exit_ptr)
       {
+        assert(!kernel::is_in_irq ());
         // TODO
         return result::ok;
       }
@@ -456,6 +484,7 @@ namespace os
       result_t
       Thread::detach (void)
       {
+        assert(!kernel::is_in_irq ());
         // TODO
         return result::ok;
       }
@@ -477,6 +506,7 @@ namespace os
       result_t
       Thread::cancel (void)
       {
+        assert(!kernel::is_in_irq ());
         // TODO
         return result::ok;
       }
@@ -519,6 +549,7 @@ namespace os
       void
       Thread::exit (void* value_ptr)
       {
+        assert(!kernel::is_in_irq ());
         // TODO
       }
 
@@ -537,6 +568,7 @@ namespace os
                     timer::type_t type, void* args) : //
           Named_object (name)
       {
+        assert(!kernel::is_in_irq ());
         // TODO
       }
 
@@ -548,6 +580,7 @@ namespace os
       result_t
       Timer::start (millis_t millisec)
       {
+        assert(!kernel::is_in_irq ());
         // TODO
         return result::ok;
       }
@@ -555,6 +588,7 @@ namespace os
       result_t
       Timer::stop (void)
       {
+        assert(!kernel::is_in_irq ());
         // TODO
         return result::ok;
       }
@@ -594,12 +628,22 @@ namespace os
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_init.html
        */
       Mutex::Mutex (const mutex::Attributes& attr) :
-          Named_object (attr.get_name ())
+          Named_object (attr.get_name ()), //
+          type_ (([&attr]()->mutex::type_t
+            { mutex::type_t type; attr.get_type (&type); return type;}) ()), //
+          protocol_ (
+              ([&attr]()->mutex::protocol_t
+                { mutex::protocol_t protocol; attr.get_protocol (&protocol); return protocol;}) ()), //
+          robustness_ (
+              ([&attr]()->mutex::robustness_t
+                { mutex::robustness_t robustness; attr.get_robustness (&robustness); return robustness;}) ())
       {
-        attr.get_prio_ceiling (&prio_ceiling_);
-        attr.get_protocol (&protocol_);
-        attr.get_robustness (&robustness_);
-        attr.get_type (&type_);
+        assert(!kernel::is_in_irq ());
+
+        attr.get_prio_ceiling (
+            const_cast<thread::priority_t*> (&prio_ceiling_));
+        owner_ = nullptr;
+        count_ = 0;
 
         trace::printf ("%s() @%p \n", __func__, this);
       }
@@ -657,6 +701,8 @@ namespace os
       result_t
       Mutex::lock (void)
       {
+        assert(!kernel::is_in_irq ());
+
         trace::printf ("%s() @%p \n", __func__, this);
         // TODO
         return result::ok;
@@ -696,6 +742,8 @@ namespace os
       result_t
       Mutex::try_lock (void)
       {
+        assert(!kernel::is_in_irq ());
+
         trace::printf ("%s() @%p \n", __func__, this);
         // TODO
         return result::ok;
@@ -734,6 +782,8 @@ namespace os
       result_t
       Mutex::timed_lock (systicks_t ticks)
       {
+        assert(!kernel::is_in_irq ());
+
         trace::printf ("%s(%d_ticks) @%p \n", __func__, ticks, this);
         // TODO
         return result::ok;
@@ -760,6 +810,8 @@ namespace os
       result_t
       Mutex::unlock (void)
       {
+        assert(!kernel::is_in_irq ());
+
         trace::printf ("%s() @%p \n", __func__, this);
         // TODO
         return result::ok;
@@ -775,8 +827,10 @@ namespace os
        * @note Cannot be called from Interrupt Service Routines.
        */
       result_t
-      Mutex::get_prio_ceiling (thread::priority_t* prio_ceiling)
+      Mutex::get_prio_ceiling (thread::priority_t* prio_ceiling) const
       {
+        assert(!kernel::is_in_irq ());
+
         trace::printf ("%s() @%p \n", __func__, this);
         if (prio_ceiling != nullptr)
           {
@@ -807,6 +861,8 @@ namespace os
       Mutex::set_prio_ceiling (thread::priority_t prio_ceiling,
                                thread::priority_t* old_prio_ceiling)
       {
+        assert(!kernel::is_in_irq ());
+
         trace::printf ("%s() @%p \n", __func__, this);
         // TODO
         return result::ok;
@@ -832,10 +888,14 @@ namespace os
        * next thread that acquires the mutex lock shall be
        * notified about the state of the mutex by the return
        * value [EOWNERDEAD].
+       *
+       * @note Cannot be called from Interrupt Service Routines.
        */
       result_t
       Mutex::consistent (void)
       {
+        assert(!kernel::is_in_irq ());
+
         trace::printf ("%s() @%p \n", __func__, this);
         // TODO
         return result::ok;
@@ -864,6 +924,8 @@ namespace os
       Condition_variable::Condition_variable (const cond::Attributes& attr) :
           Named_object (attr.get_name ())
       {
+        assert(!kernel::is_in_irq ());
+
         trace::printf ("%s() @%p \n", __func__, this);
       }
 
@@ -906,10 +968,14 @@ namespace os
        * The Condition_variable::signal() function shall
        * have no effect if there are no threads currently
        * blocked on this condition variable.
+       *
+       * @note Cannot be called from Interrupt Service Routines.
        */
       result_t
       Condition_variable::signal ()
       {
+        assert(!kernel::is_in_irq ());
+
         trace::printf ("%s() @%p \n", __func__, this);
         // TODO
         return result::ok;
@@ -945,10 +1011,14 @@ namespace os
        * The Condition_variable::broadcast() function shall
        * have no effect if there are no threads currently
        * blocked on this condition variable.
+       *
+       * @note Cannot be called from Interrupt Service Routines.
        */
       result_t
       Condition_variable::broadcast ()
       {
+        assert(!kernel::is_in_irq ());
+
         trace::printf ("%s() @%p \n", __func__, this);
         // TODO
         return result::ok;
@@ -963,10 +1033,14 @@ namespace os
        * undefined behaviour (for other mutexes) results.
        *
        * TODO: add more.
+       *
+       * @note Cannot be called from Interrupt Service Routines.
        */
       result_t
       Condition_variable::wait (Mutex* mutex)
       {
+        assert(!kernel::is_in_irq ());
+
         trace::printf ("%s() @%p \n", __func__, this);
         // TODO
         return result::ok;
@@ -981,10 +1055,14 @@ namespace os
        * undefined behaviour (for other mutexes) results.
        *
        * TODO: add more.
+       *
+       * @note Cannot be called from Interrupt Service Routines.
        */
       result_t
       Condition_variable::timed_wait (Mutex* mutex, systicks_t ticks)
       {
+        assert(!kernel::is_in_irq ());
+
         trace::printf ("%s(%d_ticks) @%p \n", __func__, ticks, this);
         // TODO
         return result::ok;
@@ -1024,10 +1102,12 @@ namespace os
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html#
        */
       Semaphore::Semaphore (const semaphore::Attributes& attr) :
-          Named_object (attr.get_name ())
+          Named_object (attr.get_name ()), //
+          max_count_ (
+              ([&attr]()->semaphore::count_t
+                { semaphore::count_t count; attr.get_max_count (&count); return count;}) ())
       {
-        attr.get_intial_count (&count_);
-        attr.get_max_count (&max_count_);
+        attr.get_intial_count (const_cast<semaphore::count_t*> (&count_));
       }
 
       /**
@@ -1084,6 +1164,11 @@ namespace os
       {
         trace::printf ("%s() @%p \n", __func__, this);
         // TODO
+        ++count_;
+        if (count_ == 0)
+          {
+            // wakeup one thread
+          }
         return result::ok;
       }
 
@@ -1112,8 +1197,25 @@ namespace os
       result_t
       Semaphore::wait ()
       {
+        assert(!kernel::is_in_irq ());
+
         trace::printf ("%s() @%p \n", __func__, this);
-        // TODO
+
+        // Critical section block.
+          {
+            Critical_section_irq cs;
+
+            // TODO
+            --count_;
+            if (count_ >= 0)
+              {
+                return result::ok;
+              }
+
+            // TODO: Add current thread to the semaphore waiting  list
+          }
+        this_thread::yield ();
+
         return result::ok;
       }
 
@@ -1137,6 +1239,8 @@ namespace os
       result_t
       Semaphore::try_wait ()
       {
+        assert(!kernel::is_in_irq ());
+
         trace::printf ("%s() @%p \n", __func__, this);
         // TODO
         return result::ok;
@@ -1164,8 +1268,20 @@ namespace os
       result_t
       Semaphore::timed_wait (systicks_t ticks)
       {
+        assert(!kernel::is_in_irq ());
+
         trace::printf ("%s(%d_ticks) @%p \n", __func__, ticks, this);
         // TODO
+        return result::ok;
+      }
+
+      result_t
+      Semaphore::get_value (semaphore::count_t* value)
+      {
+        if (value != nullptr)
+          {
+            *value = count_;
+          }
         return result::ok;
       }
 
