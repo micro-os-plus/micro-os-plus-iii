@@ -244,37 +244,18 @@ Suggestion:
 * add `get_tread_count()` and `get_thread(size_t i)`.
 
 
-### Semaphores
-
-#### Confusing definition for binary semaphore
-
-The specs mention that creating a semaphore with a count=1 is equivalent with
-creating a binary semaphore, but functionality in RTX is not consistent.
-
-Suggestion:
-
-* add max_count, default 0xFFFFFFFF; to create a binary semaphore use max_count = 1.
-
 ### Mutexes
 
-#### There is no way to poll the mutex if available
-
-It is not possible to acquire a mutex only if available, and not block if busy.
-
-Suggestion:
-
-* add `try_wait(void)` 
-
-#### There is no recursive mutex
+#### There is no explicit recursive mutex
 
 The specs do not define if the mutex is normal or recursive. However, RTX
-implements recursive mutexes.
+implements recursive mutexes (only).
 
 Suggestion:
 
 * add an explicit and documented method to create normal and recursive mutexes.
 
-#### The single osMutexWait() has three different functions
+#### The single osMutexWait() has three different meanings
 
 In POSIX there are three different functions to lock a mutex:
 
@@ -290,6 +271,34 @@ _forever_.
 
 Although functionally equivalent, the POSIX design increases readability 
 and is prefered.
+ 
+Suggestion:
+
+* add separate functions `lock()`, `try_lock()`, `timed_lock()`.
+  
+### Semaphores
+
+#### Confusing definition for binary semaphore
+
+The specs mention that creating a semaphore with a count=1 is equivalent with
+creating a binary semaphore, but functionality in RTX is not consistent.
+
+Suggestion:
+
+* add max_count, default 0xFFFFFFFF; to create a binary semaphore use max_count = 1.
+
+#### osSemaphoreWait() errors?
+
+`osSemaphoreWait()` returns the semaphore count, no errors. There is no way to differentiate timeouts or errors from normal returns.
+
+#### The single osSemaphoreWait() has three different functions
+
+See the explanation for Mutex.
+
+Suggestion:
+
+* add separate functions `wait()`, `try_wait()`, `timed_wait()`.
+  
   
 ## CMSIS Drivers 
 
