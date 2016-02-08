@@ -240,7 +240,7 @@ extern "C"
 
     // Implementation dependent
     inline ssize_t
-    trace_write (const void* buf, ::std::size_t nbyte);
+    trace_write (const void* buf, size_t nbyte);
 
     inline int
     trace_printf (const char* format, ...);
@@ -272,7 +272,7 @@ __initialize_trace (void)
 
 inline ssize_t
 __attribute__((always_inline))
-trace_write (const void* buf, ::std::size_t nbyte)
+trace_write (const void* buf, size_t nbyte)
   {
     return (ssize_t)nbyte;
   }
