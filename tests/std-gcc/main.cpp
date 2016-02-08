@@ -25,6 +25,7 @@
 #include <cstdio>
 #include <iostream>
 #include <chrono>
+//#include <atomic>
 
 using namespace os::cmsis;
 

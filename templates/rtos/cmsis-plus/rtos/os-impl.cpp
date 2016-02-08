@@ -284,7 +284,8 @@ namespace os
         {
           assert(!kernel::is_in_irq ());
           // TODO
-          return result::ok;
+
+          return this_thread::get ().get_wakeup_reason ();
         }
 
         // Legacy
@@ -384,11 +385,14 @@ namespace os
             // TODO: alloc default stack size
           }
 
+        state_ = thread::state::inactive;
+
         func_ = function;
         func_args_ = args;
 
-        trace::printf ("%s(\"%s\", %d) @%p \n", __func__, get_name (),
-                       stack_size_bytes_, this);
+        assert(prio_ != thread::priority::none);
+
+        trace::printf ("%s @%p %s\n", __func__, this, get_name ());
 
         scheduler::__register_thread (this);
       }
@@ -398,9 +402,37 @@ namespace os
        */
       Thread::~Thread ()
       {
-        trace::printf ("%s() @%p \n", __func__, this);
+        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
         scheduler::__register_thread (this);
       }
+
+      /**
+       * Internal, no POSIX equivalent.
+       */
+      void
+      Thread::wakeup (void)
+      {
+        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+        wakeup_reason_ = result::ok;
+
+        // TODO
+      }
+
+#if 1
+      /**
+       * Internal, no POSIX equivalent, used to notify timeouts or cancels.
+       */
+      void
+      Thread::wakeup (result_t reason)
+      {
+        assert(reason == result::eintr || reason == result::etimedout);
+
+        trace::printf ("%s(&d) @%p %s \n", __func__, reason, this, get_name ());
+        wakeup_reason_ = reason;
+
+        // TODO
+      }
+#endif
 
       /**
        * No POSIX equivalent.
@@ -408,6 +440,8 @@ namespace os
       thread::priority_t
       Thread::get_sched_prio (void)
       {
+        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+
         return prio_;
       }
 
@@ -429,6 +463,10 @@ namespace os
       result_t
       Thread::set_sched_prio (thread::priority_t prio)
       {
+        assert(prio != thread::priority::none);
+
+        trace::printf ("%s(%d) @%p %s\n", __func__, prio, this, get_name ());
+
         prio_ = prio;
         return result::ok;
       }
@@ -461,6 +499,9 @@ namespace os
       Thread::join (void** exit_ptr)
       {
         assert(!kernel::is_in_irq ());
+
+        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+
         // TODO
         return result::ok;
       }
@@ -485,6 +526,9 @@ namespace os
       Thread::detach (void)
       {
         assert(!kernel::is_in_irq ());
+
+        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+
         // TODO
         return result::ok;
       }
@@ -507,6 +551,9 @@ namespace os
       Thread::cancel (void)
       {
         assert(!kernel::is_in_irq ());
+
+        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+
         // TODO
         return result::ok;
       }
@@ -550,6 +597,9 @@ namespace os
       Thread::exit (void* value_ptr)
       {
         assert(!kernel::is_in_irq ());
+
+        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+
         // TODO
       }
 
@@ -1103,11 +1153,20 @@ namespace os
        */
       Semaphore::Semaphore (const semaphore::Attributes& attr) :
           Named_object (attr.get_name ()), //
-          max_count_ (
-              ([&attr]()->semaphore::count_t
-                { semaphore::count_t count; attr.get_max_count (&count); return count;}) ())
+          max_count_ (([&attr]()->semaphore::count_t
+            {
+              semaphore::count_t count;
+              attr.get_max_count (&count);
+              return count;
+            }) ())
       {
         attr.get_intial_count (const_cast<semaphore::count_t*> (&count_));
+
+        assert(max_count_ > 0);
+        assert(count_ <= max_count_);
+
+        trace::printf ("%s() @%p %s %d %d\n", __func__, this, get_name (),
+                       count_, max_count_);
       }
 
       /**
@@ -1122,7 +1181,7 @@ namespace os
        */
       Semaphore::~Semaphore ()
       {
-        ;
+        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
       }
 
       /**
@@ -1162,12 +1221,23 @@ namespace os
       result_t
       Semaphore::post (void)
       {
-        trace::printf ("%s() @%p \n", __func__, this);
-        // TODO
+        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+
+        Critical_section_irq cs; // ---- Critical section
+        if (count_ > this->max_count_)
+          {
+            return result::eoverflow;
+          }
+
         ++count_;
+
         if (count_ == 0)
           {
-            // wakeup one thread
+            // Wakeup one thread
+            if (list_.get_length () > 0)
+              {
+                list_.get_top ()->wakeup ();
+              }
           }
         return result::ok;
       }
@@ -1199,24 +1269,22 @@ namespace os
       {
         assert(!kernel::is_in_irq ());
 
-        trace::printf ("%s() @%p \n", __func__, this);
+        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
 
-        // Critical section block.
           {
-            Critical_section_irq cs;
+            Critical_section_irq cs; // ---- Critical section
 
-            // TODO
             --count_;
             if (count_ >= 0)
               {
                 return result::ok;
               }
 
-            // TODO: Add current thread to the semaphore waiting  list
+            // Add current thread to the semaphore waiting  list
+            list_.add (&this_thread::get ());
+            // `count_` is negative.
           }
-        this_thread::yield ();
-
-        return result::ok;
+        return this_thread::yield ();
       }
 
       /**
@@ -1230,9 +1298,6 @@ namespace os
        * be locked and shall remain locked until the Semaphore::post()
        * function is executed and returns successfully.
        *
-       * The function is interruptible by the delivery of an external
-       * event (signal, thread cancel, etc).
-       *
        * Compatible with POSIX `sem_trywait()`.
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_wait.html
        */
@@ -1241,9 +1306,20 @@ namespace os
       {
         assert(!kernel::is_in_irq ());
 
-        trace::printf ("%s() @%p \n", __func__, this);
-        // TODO
-        return result::ok;
+        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+
+          {
+            Critical_section_irq cs; // ---- Critical section
+
+            if (count_ > 0)
+              {
+                --count_;
+                return result::ok;
+              }
+
+            // Count may be 0 or negative
+            return result::eagain;
+          }
       }
 
       /**
@@ -1262,7 +1338,8 @@ namespace os
        * Under no circumstance shall the function fail with a timeout
        * if the semaphore can be locked immediately.
        *
-       * Compatible with POSIX `sem_timedwait()`.
+       * Compatible with POSIX `sem_timedwait()`, except the time point
+       * is replaced with a duration.
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_timedwait.html
        */
       result_t
@@ -1270,9 +1347,21 @@ namespace os
       {
         assert(!kernel::is_in_irq ());
 
-        trace::printf ("%s(%d_ticks) @%p \n", __func__, ticks, this);
-        // TODO
-        return result::ok;
+        trace::printf ("%s(%d_ticks) @%p %s\n", __func__, ticks, this,
+                       get_name ());
+          {
+            Critical_section_irq cs; // ---- Critical section
+
+            --count_;
+            if (count_ >= 0)
+              {
+                return result::ok;
+              }
+
+            // Add current thread to the semaphore waiting list.
+            list_.add (&this_thread::get ());
+          }
+        return Systick_clock::sleep_for (ticks);
       }
 
       result_t
@@ -1280,6 +1369,8 @@ namespace os
       {
         if (value != nullptr)
           {
+            Critical_section_irq cs; // ---- Critical section
+
             *value = count_;
           }
         return result::ok;
@@ -1398,7 +1489,70 @@ namespace os
         return result::ok;
       }
 
-// ======================================================================
+      namespace impl
+      {
+        // ====================================================================
+
+        Prioritised_list::Prioritised_list ()
+        {
+          for (::std::size_t i = 0; i < sizeof(array_) / sizeof(array_[0]); ++i)
+            {
+              array_[i] = nullptr;
+            }
+          count_ = 0;
+        }
+
+        Prioritised_list::~Prioritised_list ()
+        {
+          ;
+        }
+
+        void
+        Prioritised_list::add (Thread* thread)
+        {
+          assert(thread != nullptr);
+          assert(count_ < (sizeof(array_) / sizeof(array_[0]) + 1));
+
+          array_[count_++] = thread;
+        }
+
+        void
+        Prioritised_list::remove (Thread* thread)
+        {
+          // TODO
+        }
+
+        Thread*
+        Prioritised_list::get_top (void)
+        {
+          Thread* thread = nullptr;
+          thread::priority_t prio = thread::priority::none;
+          ::std::size_t pos = 0;
+
+          for (::std::size_t i = 0; i < sizeof(array_) / sizeof(array_[0]); ++i)
+            {
+              if (array_[i]->get_sched_prio () > prio)
+                {
+                  prio = array_[i]->get_sched_prio ();
+                  thread = array_[i];
+                  pos = i;
+                }
+            }
+
+          for (::std::size_t i = pos;
+              i < (sizeof(array_) / sizeof(array_[0]) - 2); ++i)
+            {
+              array_[i] = array_[i + 1];
+            }
+          count_--;
+          array_[count_] = nullptr;
+
+          return thread;
+        }
+
+      } /* namespace impl */
+
+    // ========================================================================
 
 #pragma GCC diagnostic pop
 

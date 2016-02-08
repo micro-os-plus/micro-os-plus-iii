@@ -105,6 +105,16 @@ namespace os
           ///< unspecified RTOS error: run-time error but no other error message fits.
           error_os = 0xFF,
 
+          eagain = error_resource,
+          etimedout = error_timeout_resource,
+
+          // The above values were preserved for compatibility with legacy
+          // CMSIS, but the applications should not make any assumptions
+          // on the numeric values of functions results.
+          einval = 0x100,
+          eintr = 0x101,
+          eoverflow = 0x102,
+
           ///< prevent from enum down-size compiler optimisation.
           /// (Actually redundant in C++ if the underlying type is 32 bits)
           reserved = 0x7FFFFFFF
@@ -220,7 +230,8 @@ namespace os
         /**
          * @brief Sleep a number of ticks.
          * @param [in] ticks the number of ticks to sleep.
-         * @return result code that indicates the execution status of the function.
+         * @retval result::etimedout The sleep lasted the entire duration.
+         * @retval result::eintr The sleep was interrupted.
          */
         static result_t
         sleep_for (sleep_rep ticks);
@@ -244,7 +255,8 @@ namespace os
         /**
          * @brief Sleep a number of seconds.
          * @param [in] secs the number of seconds to sleep.
-         * @return result code that indicates the execution status of the function.
+         * @retval result::etimedout The sleep lasted the entire duration.
+         * @retval result::eintr The sleep was interrupted.
          */
         static result_t
         sleep_for (sleep_rep secs);
@@ -359,8 +371,9 @@ namespace os
         get (void);
 
         /**
-         * @brief Yield control to next thread.
-         * @return result code that indicates the execution status of the function.
+         * @brief Yield CPU to next thread.
+         * @retval result::ok when successful
+         * @retval result::eintr when interrupted
          */
         result_t
         yield (void);
@@ -428,7 +441,8 @@ namespace os
             : priority_t
               {
                 //
-            idle = 0, ///< priority: idle (lowest)
+            none = 0,
+            idle = 1, ///< priority: idle (lowest)
             low = 0x40, ///< priority: low
             below_normal = 0x60, ///< priority: below normal
             normal = 0x80, ///< priority: normal (default)
@@ -439,6 +453,20 @@ namespace os
             max = 0xFF
           };
         } /* namespace priority */
+
+        using state_t = uint8_t;
+        namespace state
+        {
+          enum
+            : state_t
+              {
+                //
+            inactive = 0, //
+            ready = 1, //
+            running = 2, //
+            waiting = 3 //
+          };
+        } /* namespace state */
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -537,7 +565,7 @@ namespace os
 
         /**
          * @brief Cancel thread execution.
-         * @return if successful, return status::ok; otherwise an
+         * @return if successful, return result::ok; otherwise an
          * error number is returned.
          */
         result_t
@@ -545,7 +573,7 @@ namespace os
 
         /**
          * @brief Wait for thread termination.
-         * @return if successful, return status::ok; otherwise an
+         * @return if successful, return result::ok; otherwise an
          * error number is returned.
          */
         result_t
@@ -553,7 +581,7 @@ namespace os
 
         /**
          * @brief Detach a thread.
-         * @return if successful, return status::ok; otherwise an
+         * @return if successful, return result::ok; otherwise an
          * error number is returned.
          */
         result_t
@@ -568,7 +596,7 @@ namespace os
 
         /**
          * @brief Set dynamic scheduling priority.
-         * @return if successful, return status::ok; otherwise an
+         * @return if successful, return result::ok; otherwise an
          * error number is returned.
          *
          * - [EINVAL] The value of prio is invalid for the scheduling policy of the
@@ -601,8 +629,22 @@ namespace os
         //void test_cancel(void);
 #endif
 
+        thread::state_t
+        get_state (void);
+
+        void
+        wakeup (void);
+
+#if 1
+        void
+        wakeup (result_t reason);
+#endif
+
         void*
         get_function_args (void);
+
+        result_t
+        get_wakeup_reason (void);
 
 #if defined(TESTING)
         void
@@ -619,8 +661,10 @@ namespace os
 
         thread::func_args_t func_args_;
 
+        thread::state_t state_;
         thread::priority_t prio_;
 
+        result_t wakeup_reason_;
         // Add other internal data
 
       };
@@ -842,7 +886,7 @@ namespace os
 
         /**
          * @brief Lock the mutex.
-         * @return If successful, return status::ok; otherwise return an
+         * @return If successful, return result::ok; otherwise return an
          * error number.
          */
         result_t
@@ -850,7 +894,7 @@ namespace os
 
         /**
          * @brief Try to lock the mutex.
-         * @return If successful, return status::ok; otherwise return an
+         * @return If successful, return result::ok; otherwise return an
          * error number.
          */
         result_t
@@ -859,7 +903,7 @@ namespace os
         /**
          * @brief Timed attempt to lock the mutex.
          * @param [in] ticks Number of ticks to wait.
-         * @return If successful, return status::ok; otherwise return an
+         * @return If successful, return result::ok; otherwise return an
          * error number.
          */
         result_t
@@ -867,7 +911,7 @@ namespace os
 
         /**
          * @brief Unlock the mutex.
-         * @return If successful, return status::ok; otherwise return an
+         * @return If successful, return result::ok; otherwise return an
          * error number.
          */
         result_t
@@ -876,7 +920,7 @@ namespace os
         /**
          * @brief Get the priority ceiling of a mutex.
          * @param [out] prio_ceiling pointer to location where to store the priority.
-         * @return If successful, return status::ok; otherwise return an
+         * @return If successful, return result::ok; otherwise return an
          * error number.
          */
         result_t
@@ -887,7 +931,7 @@ namespace os
          * @param [in] prio_ceiling new priority.
          * @param [out] old_prio_ceiling pointer to location where to
          * store the previous priority; may be nullptr.
-         * @return If successful, return status::ok; otherwise return an
+         * @return If successful, return result::ok; otherwise return an
          * error number.
          */
         result_t
@@ -896,7 +940,7 @@ namespace os
 
         /**
          * @brief Mark state protected by robust mutex as consistent.
-         * @return If successful, return status::ok; otherwise return an
+         * @return If successful, return result::ok; otherwise return an
          * error number.
          */
         result_t
@@ -978,7 +1022,7 @@ namespace os
 
         /**
          * @brief Signal a condition.
-         * @return If successful, return status::ok; otherwise return an
+         * @return If successful, return result::ok; otherwise return an
          * error number.
          */
         result_t
@@ -986,7 +1030,7 @@ namespace os
 
         /**
          * @brief Broadcast a condition.
-         * @return If successful, return status::ok; otherwise return an
+         * @return If successful, return result::ok; otherwise return an
          * error number.
          */
         result_t
@@ -994,7 +1038,7 @@ namespace os
 
         /**
          * @brief Wait on a condition.
-         * @return If successful, return status::ok; otherwise return an
+         * @return If successful, return result::ok; otherwise return an
          * error number.
          */
         result_t
@@ -1002,7 +1046,7 @@ namespace os
 
         /**
          * @brief Wait on a condition with timeout.
-         * @return If successful, return status::ok; otherwise return an
+         * @return If successful, return result::ok; otherwise return an
          * error number.
          */
         result_t
@@ -1056,9 +1100,9 @@ namespace os
 
         protected:
 
-          int32_t initial_count_;
+          count_t initial_count_;
 
-          int32_t max_count_;
+          count_t max_count_;
         };
 
         extern const Attributes counting_initializer;
@@ -1086,6 +1130,7 @@ namespace os
         };
 
         extern const Binary_attributes binary_initializer;
+
       } /* namespace semaphore */
 
       /**
@@ -1094,7 +1139,13 @@ namespace os
        * @details
        * Supports both counting and binary semaphores.
        *
-       * Compatible with POSIX semaphore.
+       * Semaphores should generally be used to synchronise with
+       * events occuring on interrupts.
+       *
+       * For inter-thread synchronisation, to avoid cases of priority
+       * inversion, more suitable are mutexes.
+       *
+       * Compatible with POSIX semaphores.
        * http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html
        */
       class Semaphore : public Named_object
@@ -1127,24 +1178,25 @@ namespace os
         operator== (const Semaphore& rhs) const;
 
         /**
-         * @brief Post to (unlock) the semaphore.
-         * @return status code that indicates the execution status of the function.
+         * @brief Post (unlock) the semaphore.
+         * @retval result::ok The semaphore was posted.
+         * @retval result::eoverflow The max count was exceeded.
          */
         result_t
         post (void);
 
         /**
-         * @brief Wait to lock the semaphore.
-         * @return If successful, return status::ok; otherwise return an
-         * error number.
+         * @brief Lock the semaphore, possibly waiting.
+         * @retval result::ok The calling process successfully performed the semaphore lock operation.
+         * @retval result::eintr A cancel interrupted this function.
          */
         result_t
         wait ();
 
         /**
          * @brief Try to lock  the semaphore.
-         * @return If successful, return status::ok; otherwise return an
-         * error number.
+         * @retval result::ok The calling process successfully performed the semaphore lock operation.
+         * @retval result::eagain The semaphore was already locked.
          */
         result_t
         try_wait ();
@@ -1152,8 +1204,8 @@ namespace os
         /**
          * @brief Timed wait to lock the semaphore.
          * @param [in] ticks Number of ticks to wait.
-         * @return If successful, return status::ok; otherwise return an
-         * error number.
+         * @retval result::ok The calling process successfully performed the semaphore lock operation.
+         * @retval result::etimedout The semaphore could not be locked before the specified timeout expired.
          */
         result_t
         timed_wait (systicks_t ticks);
@@ -1161,13 +1213,14 @@ namespace os
         /**
          * @brief Get the semaphore value.
          * @param [out] value Pointer to integer where to store the value.
-         * @return If successful, return status::ok; otherwise return an
-         * error number.
+         * @retval result::ok The value was returned.
          */
         result_t
         get_value (semaphore::count_t* value);
 
       protected:
+
+        impl::Prioritised_list list_;
 
         // Can be updated in different contexts (interrupts or threads)
         volatile semaphore::count_t count_;
@@ -1484,10 +1537,22 @@ namespace os
         return this == &rhs;
       }
 
+      inline thread::state_t
+      Thread::get_state (void)
+      {
+        return state_;
+      }
+
       inline void*
       Thread::get_function_args (void)
       {
         return func_args_;
+      }
+
+      inline result_t
+      Thread::get_wakeup_reason (void)
+      {
+        return wakeup_reason_;
       }
 
       // ======================================================================
