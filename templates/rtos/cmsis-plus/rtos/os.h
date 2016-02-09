@@ -221,7 +221,7 @@ namespace os
         /**
          * @brief Convert microseconds to ticks.
          * @param [in] micros the number of microseconds.
-         * @return number of ticks.
+         * @return The number of ticks.
          */
         template<typename Rep_T>
           static constexpr uint32_t
@@ -247,7 +247,7 @@ namespace os
 
         /**
          * @brief Tell the absolute time now.
-         * @return number of seconds since 1 January 1970 00:00:00.
+         * @return The number of seconds since 1 January 1970 00:00:00.
          */
         static uint64_t
         now (void);
@@ -285,7 +285,8 @@ namespace os
 
         /**
          * @brief Check if RTOS is running.
-         * @return true if RTOS is running, false if RTOS was not started.
+         * @retval true The RTOS is running.
+         * @retval false The RTOS was not started.
          */
         bool
         is_running (void);
@@ -299,8 +300,8 @@ namespace os
 
         /**
          * @brief Unlock the scheduler.
-         * @param [in] status the new status of the scheduler.
-         * @return the previous status of the scheduler.
+         * @param [in] status The new status of the scheduler.
+         * @return The previous status of the scheduler.
          */
         status_t
         unlock (status_t status);
@@ -369,6 +370,9 @@ namespace os
          */
         Thread&
         get (void);
+
+        // TODO: investigate if this can return void, and use a different
+        // mechanism for eintr.
 
         /**
          * @brief Yield CPU to next thread.
@@ -676,31 +680,99 @@ namespace os
       namespace timer
       {
         /// Entry point of a timer call back function.
-        typedef void
-        (*func_t) (void* args);
+        using func_args_t = void*;
+        using func_t = void (*) (func_args_t args);
 
         /// Timer type value for the timer definition.
         using type_t = enum class type
-        : uint32_t
+        : uint8_t
           {
             //
             once = 0,//
             periodic = 1//
           };
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+        /**
+         * @brief Timer attributes.
+         */
+        class Attributes : public Named_object
+        {
+        public:
+
+          Attributes (const char* name);
+
+          Attributes (const Attributes&) = default;
+          Attributes (Attributes&&) = default;
+          Attributes&
+          operator= (const Attributes&) = default;
+          Attributes&
+          operator= (Attributes&&) = default;
+
+          /**
+           * @brief Delete the timer attributes.
+           */
+          ~Attributes () = default;
+
+          type_t
+          get_type (void) const;
+
+          void
+          set_type (type_t type);
+
+        protected:
+
+          type_t type_;
+
+          // Add more internal data.
+        };
+
+#pragma GCC diagnostic pop
+
+        extern const Attributes initializer;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+        class Periodic_attributes : public Attributes
+        {
+        public:
+
+          Periodic_attributes (const char* name);
+
+          Periodic_attributes (const Periodic_attributes&) = default;
+          Periodic_attributes (Periodic_attributes&&) = default;
+          Periodic_attributes&
+          operator= (const Periodic_attributes&) = default;
+          Periodic_attributes&
+          operator= (Periodic_attributes&&) = default;
+
+          /**
+           * @brief Delete the timer attributes.
+           */
+          ~Periodic_attributes () = default;
+
+        };
+
+#pragma GCC diagnostic pop
+
+        extern const Periodic_attributes periodic_initializer;
+
       }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
 
       class Timer : public Named_object
       {
       public:
 
-        /// Create a timer.
-        /// @param         name          name of the timer object.
-        /// @param         function      name of the timer call back function.
-        /// @param [in]     type          osTimerOnce for one-shot or osTimerPeriodic for periodic behavior.
-        /// @param [in]     argument      argument to the timer call back function.
-        /// @return timer ID for reference by other functions or NULL in case of error.
-        Timer (const char* name, timer::func_t function, timer::type_t type,
-               void* args);
+        Timer (timer::func_t function, timer::func_args_t args);
+
+        Timer (const timer::Attributes& attr, timer::func_t function,
+               timer::func_args_t args);
 
         Timer (const Timer&) = delete;
         Timer (Timer&&) = delete;
@@ -709,28 +781,44 @@ namespace os
         Timer&
         operator= (Timer&&) = delete;
 
-        /// Delete a timer that was created by @ref osTimerCreate.
-        /// @param [in]     timer_id      timer ID obtained by @ref osTimerCreate.
-        /// @return status code that indicates the execution status of the function.
         ~Timer ();
 
-        /// Start or restart a timer.
-        /// @param [in]     timer_id      timer ID obtained by @ref osTimerCreate.
-        /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue "Time delay" value of the timer.
-        /// @return status code that indicates the execution status of the function.
-        result_t
-        start (millis_t millisec);
+        /**
+         * @brief Compare timers.
+         * @retval true The given timer is the same as this timer.
+         * @retval false The given timer is different from this timer.
+         */
+        bool
+        operator== (const Timer& rhs) const;
 
-        /// Stop the timer.
-        /// @param [in]     timer_id      timer ID obtained by @ref osTimerCreate.
-        /// @return status code that indicates the execution status of the function.
+        /**
+         * @brief Start or restart the timer.
+         * @param [in] ticks The timer period, in ticks.
+         * @retval result::ok The timer has been started or restarted.
+         */
+        result_t
+        start (systicks_t ticks);
+
+        /**
+         * @brief Stop the timer.
+         * @retval result::ok The timer has been stopped.
+         * @retval result::eagain The timer is not yet started.
+         */
         result_t
         stop (void);
 
       protected:
 
-        // Add internal data
+        timer::func_t func_;
+
+        timer::func_args_t func_args_;
+
+        timer::type_t type_;
+
+        // Add more internal data.
       };
+
+#pragma GCC diagnostic pop
 
       // ======================================================================
 
@@ -819,6 +907,7 @@ namespace os
           mutex::robustness_t robustness_;
           mutex::type_t type_;
 
+          // Add more internal data.
         };
 
 #pragma GCC diagnostic pop
@@ -961,6 +1050,8 @@ namespace os
         const mutex::protocol_t protocol_; // none = 0, inherit = 1, protect = 2
         const mutex::robustness_t robustness_; // stalled = 0, robust = 1
 
+        // Add more internal data.
+
       };
 
       // ======================================================================
@@ -988,9 +1079,12 @@ namespace os
            * @brief Delete a condition variable attributes.
            */
           ~Attributes () = default;
+
+          // Add more internal data.
         };
 
         extern const Attributes initializer;
+
       } /* namespace cond */
 
       // ======================================================================
@@ -1054,8 +1148,7 @@ namespace os
 
       protected:
 
-        // Add internal data
-
+        // Add more internal data.
       };
 
       // ======================================================================
@@ -1103,6 +1196,8 @@ namespace os
           count_t initial_count_;
 
           count_t max_count_;
+
+          // Add more internal data.
         };
 
         extern const Attributes counting_initializer;
@@ -1228,22 +1323,72 @@ namespace os
         // Constants set during construction.
         const semaphore::count_t max_count_;
 
-        // Add internal data
+        // Add more internal data.
       };
 
       // ======================================================================
+
+      namespace pool
+      {
+        using size_t = uint16_t;
+
+        /**
+         * @brief Memory pool attributes.
+         */
+        class Attributes : public Named_object
+        {
+        public:
+
+          Attributes (const char* name);
+
+          Attributes (const Attributes&) = default;
+          Attributes (Attributes&&) = default;
+          Attributes&
+          operator= (const Attributes&) = default;
+          Attributes&
+          operator= (Attributes&&) = default;
+
+          /**
+           * @brief Delete the memory pool attributes.
+           */
+          ~Attributes () = default;
+
+          void*
+          get_pool_addr (void) const;
+
+          void
+          set_pool_addr (void* addr);
+
+        protected:
+
+          void* pool_addr_;
+
+          // Add more internal data.
+        };
+
+        extern const Attributes initializer;
+
+      } /* namespace pool */
 
       class Pool : public Named_object
       {
       public:
 
-        /// Create and Initialize a memory pool.
-        /// @param         name          name of the memory pool.
-        /// @param         no            maximum number of blocks (objects) in the memory pool.
-        /// @param         type          data type of a single block (object).
-        /// @return memory pool ID for reference by other functions or NULL in case of error.
-        Pool (const char* name, ::std::size_t items, ::std::size_t item_size,
-              void* mem);
+        /**
+         * @brief Create a memory pool with default attributes.
+         * @param [in] items The maximum number of items in the pool.
+         * @param [in] item_size_bytes The size of an item, in bytes.
+         */
+        Pool (pool::size_t items, pool::size_t item_size_bytes);
+
+        /**
+         * @brief Create a memory pool with custom attributes.
+         * @param [in] attr Reference to attributes object.
+         * @param [in] items The maximum number of items in the pool.
+         * @param [in] item_size_bytes The size of an item, in bytes.
+         */
+        Pool (const pool::Attributes& attr, pool::size_t items,
+              pool::size_t item_size_bytes);
 
         Pool (const Pool&) = delete;
         Pool (Pool&&) = delete;
@@ -1252,30 +1397,43 @@ namespace os
         Pool&
         operator= (Pool&&) = delete;
 
-        /// Return an allocated memory block back to a specific memory pool.
-        /// @param [in]     pool_id       memory pool ID obtain referenced with @ref osPoolCreate.
-        /// @param [in]     block         address of the allocated memory block that is returned to the memory pool.
-        /// @return status code that indicates the execution status of the function.
+        /**
+         * @brief Delete the memory pool.
+         */
         ~Pool ();
 
-        /// Allocate a memory block from a memory pool.
-        /// @param [in]     pool_id       memory pool ID obtain referenced with @ref osPoolCreate.
-        /// @return address of the allocated memory block or NULL in case of no memory available.
+        bool
+        operator== (const Pool& rhs) const;
+
+        /**
+         * @brief Allocate a memory block.
+         * @return Pointer to memory block, or `nullptr` if no memory available.
+         */
         void*
         alloc (void);
 
-        /// Allocate a memory block from a memory pool and set memory block to zero.
-        /// @param [in]     pool_id       memory pool ID obtain referenced with @ref osPoolCreate.
-        /// @return address of the allocated memory block or NULL in case of no memory available.
+        /**
+         * @brief Allocate and clear a memory block.
+         * @return Pointer to memory block, or `nullptr` if no memory available.
+         */
         void*
         calloc (void);
 
+        /**
+         * @brief Free the memory block.
+         * @retval result::ok The memory block was released.
+         * @retval result::error_value The block does not belong to the memory pool.
+         */
         result_t
         free (void* block);
 
       protected:
 
-        // Add internal data
+        void* pool_addr_;
+        pool::size_t items_;
+        pool::size_t item_size_bytes_;
+
+        // Add more internal data.
       };
 
       // ======================================================================
@@ -1319,7 +1477,7 @@ namespace os
 
       protected:
 
-        // Add internal data
+        // Add more internal data.
       };
 
       // ======================================================================
@@ -1383,7 +1541,7 @@ namespace os
 
       protected:
 
-        // Add internal data
+        // Add more internal data.
       };
 
     } /* namespace rtos */
@@ -1553,6 +1711,47 @@ namespace os
       Thread::get_wakeup_reason (void)
       {
         return wakeup_reason_;
+      }
+
+      // ======================================================================
+
+      namespace timer
+      {
+        inline
+        Attributes::Attributes (const char* name) :
+            Named_object (name)
+        {
+          type_ = type::once;
+        }
+
+        inline type_t
+        Attributes::get_type (void) const
+        {
+          return type_;
+        }
+
+        inline void
+        Attributes::set_type (type_t type)
+        {
+          type_ = type;
+        }
+
+        // ====================================================================
+
+        inline
+        Periodic_attributes::Periodic_attributes (const char* name) :
+            Attributes (name)
+        {
+          type_ = type::periodic;
+        }
+      } /* namespace timer */
+
+      // ======================================================================
+
+      inline bool
+      Timer::operator== (const Timer& rhs) const
+      {
+        return this == &rhs;
       }
 
       // ======================================================================
@@ -1742,7 +1941,40 @@ namespace os
         return this == &rhs;
       }
 
-// ------------------------------------------------------------------------
+      // ======================================================================
+
+      namespace pool
+      {
+        inline
+        Attributes::Attributes (const char* name) :
+            Named_object (name)
+        {
+          pool_addr_ = nullptr;
+        }
+
+        inline void*
+        Attributes::get_pool_addr (void) const
+        {
+          return pool_addr_;
+        }
+
+        inline void
+        Attributes::set_pool_addr (void* addr)
+        {
+          pool_addr_ = addr;
+        }
+
+      } /* namespace pool */
+
+      // ======================================================================
+
+      inline bool
+      Pool::operator== (const Pool& rhs) const
+      {
+        return this == &rhs;
+      }
+
+    // ------------------------------------------------------------------------
 
     } /* namespace rtos */
   } /* namespace cmsis */

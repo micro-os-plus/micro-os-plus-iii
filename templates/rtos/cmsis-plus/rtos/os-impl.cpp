@@ -39,6 +39,8 @@ namespace os
         /**
          * @details
          * Create all RTOS internal objects and be ready to run.
+         *
+         * @warning Cannot be invoked from Interrupt Service Routines.
          */
         result_t
         initialize (void)
@@ -109,6 +111,9 @@ namespace os
           return str;
         }
 
+        /**
+         *
+         */
         bool
         is_in_irq (void)
         {
@@ -123,12 +128,22 @@ namespace os
 
       static Systick_clock::rep __systick_now = 12300;
 
+      /**
+       * @details
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
       Systick_clock::rep
       Systick_clock::now (void)
       {
         return __systick_now;
       }
 
+      /**
+       * @details
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
       Systick_clock::rep
       Systick_clock::now (current_t* details)
       {
@@ -147,6 +162,8 @@ namespace os
        * Put the current thread to sleep, until the next n-th
        * SysTick occurs. Depending when the call is issued, the
        * first tick counted may be very short.
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       result_t
       Systick_clock::sleep_for (Systick_clock::sleep_rep ticks)
@@ -158,6 +175,11 @@ namespace os
 
       static Realtime_clock::rep __rtc_now = 1000000;
 
+      /**
+       * @details
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
       Realtime_clock::rep
       Realtime_clock::now (void)
       {
@@ -169,6 +191,8 @@ namespace os
        * Put the current thread to sleep, until the next n-th
        * RTC second occurs. Depending when the call is issued, the
        * first second counted may be very short.
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       result_t
       Realtime_clock::sleep_for (Realtime_clock::sleep_rep secs)
@@ -183,7 +207,9 @@ namespace os
         status_t sched_running = false;
 
         /**
+         * @details
          *
+         * @warning Cannot be invoked from Interrupt Service Routines.
          */
         result_t
         start (void)
@@ -193,12 +219,22 @@ namespace os
           return result::ok;
         }
 
+        /**
+         * @details
+         *
+         * @warning Cannot be invoked from Interrupt Service Routines.
+         */
         bool
         is_running (void)
         {
           return sched_running;
         }
 
+        /**
+         * @details
+         *
+         * @warning Cannot be invoked from Interrupt Service Routines.
+         */
         status_t
         lock (void)
         {
@@ -207,6 +243,11 @@ namespace os
           return tmp;
         }
 
+        /**
+         * @details
+         *
+         * @warning Cannot be invoked from Interrupt Service Routines.
+         */
         status_t
         unlock (status_t status)
         {
@@ -266,11 +307,15 @@ namespace os
       namespace this_thread
       {
         /**
+         * @details
          *
+         * @warning Cannot be invoked from Interrupt Service Routines.
          */
         Thread&
         get (void)
         {
+          assert(!kernel::is_in_irq ());
+
           // TODO
           return no_thread;
         }
@@ -278,6 +323,8 @@ namespace os
         /**
          * @details
          * Pass control to next thread that is in \b READY state.
+         *
+         * @warning Cannot be invoked from Interrupt Service Routines.
          */
         result_t
         yield (void)
@@ -339,6 +386,8 @@ namespace os
        *
        * Compatible with pthread_create().
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       Thread::Thread (thread::func_t function, void* args) :
           Thread (thread::initializer, function, args)
@@ -365,10 +414,13 @@ namespace os
        *
        * Compatible with pthread_create().
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       Thread::Thread (const thread::Attributes& attr, thread::func_t function,
                       void* args) :
-          Named_object (attr.get_name ())
+          Named_object
+            { attr.get_name () }
       {
         assert(function != nullptr);
         assert(!kernel::is_in_irq ());
@@ -398,7 +450,9 @@ namespace os
       }
 
       /**
+       * @details
        *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       Thread::~Thread ()
       {
@@ -407,7 +461,10 @@ namespace os
       }
 
       /**
+       * @details
        * Internal, no POSIX equivalent.
+       *
+       * @note Can be invoked from Interrupt Service Routines.
        */
       void
       Thread::wakeup (void)
@@ -420,7 +477,10 @@ namespace os
 
 #if 1
       /**
+       * @details
        * Internal, no POSIX equivalent, used to notify timeouts or cancels.
+       *
+       * @note Can be invoked from Interrupt Service Routines.
        */
       void
       Thread::wakeup (result_t reason)
@@ -488,12 +548,12 @@ namespace os
        * pthread_join()
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_join.html
        *
-       * @note Cannot be called from Interrupt Service Routines.
-       *
        * The join() function may fail if:
        * [EDEADLK] A deadlock was detected.
        *
        * The join() function shall not return an error code of [EINTR].
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       result_t
       Thread::join (void** exit_ptr)
@@ -518,9 +578,9 @@ namespace os
        * pthread_detach()
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_detach.html
        *
-       * @note Cannot be called from Interrupt Service Routines.
-       *
        * The detach() function shall not return an error code of [EINTR].
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       result_t
       Thread::detach (void)
@@ -545,7 +605,7 @@ namespace os
        * fail and report an [ESRCH] error.
        * error number is returned.
        *
-       * @note Cannot be called from Interrupt Service Routines.
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       result_t
       Thread::cancel (void)
@@ -591,7 +651,7 @@ namespace os
        * pthread_exit()
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_exit.html
        *
-       * @note Cannot be called from Interrupt Service Routines.
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       void
       Thread::exit (void* value_ptr)
@@ -614,31 +674,82 @@ namespace os
 
       // ======================================================================
 
-      Timer::Timer (const char* name, timer::func_t function,
-                    timer::type_t type, void* args) : //
-          Named_object (name)
+      namespace timer
       {
-        assert(!kernel::is_in_irq ());
-        // TODO
+        const Attributes initializer
+          { nullptr };
+      } /* namespace timer */
+
+      /**
+       * @details
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      Timer::Timer (timer::func_t function, timer::func_args_t args) :
+          Timer (timer::initializer, function, args)
+      {
+
       }
 
+      /**
+       * @details
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      Timer::Timer (const timer::Attributes& attr, timer::func_t function,
+                    timer::func_args_t args) :
+          Named_object
+            { attr.get_name () }
+
+      {
+        assert(function != nullptr);
+        assert(!kernel::is_in_irq ());
+
+        type_ = attr.get_type ();
+        func_ = function;
+        func_args_ = args;
+
+        // TODO
+        trace::printf ("%s() @%p \n", __func__, this);
+      }
+
+      /**
+       * @details
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
       Timer::~Timer ()
       {
+        trace::printf ("%s() @%p \n", __func__, this);
         // TODO
       }
 
+      /**
+       * @details
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
       result_t
-      Timer::start (millis_t millisec)
+      Timer::start (systicks_t ticks)
       {
         assert(!kernel::is_in_irq ());
+
+        trace::printf ("%s(%d) @%p \n", __func__, ticks, this);
         // TODO
         return result::ok;
       }
 
+      /**
+       * @details
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
       result_t
       Timer::stop (void)
       {
         assert(!kernel::is_in_irq ());
+
+        trace::printf ("%s() @%p \n", __func__, this);
         // TODO
         return result::ok;
       }
@@ -660,6 +771,8 @@ namespace os
        *
        * pthread_mutex_init()
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_init.html
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       Mutex::Mutex () :
           Mutex
@@ -676,6 +789,8 @@ namespace os
        *
        * pthread_mutex_init()
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_init.html
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       Mutex::Mutex (const mutex::Attributes& attr) :
           Named_object (attr.get_name ()), //
@@ -710,6 +825,8 @@ namespace os
        *
        * pthread_mutex_destroy()
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_init.html
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       Mutex::~Mutex ()
       {
@@ -746,7 +863,7 @@ namespace os
        * pthread_mutex_lock()
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_lock.html
        *
-       * @note Cannot be called from Interrupt Service Routines.
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       result_t
       Mutex::lock (void)
@@ -787,7 +904,7 @@ namespace os
        * pthread_mutex_trylock()
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_lock.html
        *
-       * @note Cannot be called from Interrupt Service Routines.
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       result_t
       Mutex::try_lock (void)
@@ -827,7 +944,7 @@ namespace os
        * - the timeout is not expressed as an absolute time point, but
        * as a relative number of system ticks.
        *
-       * @note Cannot be called from Interrupt Service Routines.
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       result_t
       Mutex::timed_lock (systicks_t ticks)
@@ -855,7 +972,7 @@ namespace os
        * pthread_mutex_unlock()
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_lock.html
        *
-       * @note Cannot be called from Interrupt Service Routines.
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       result_t
       Mutex::unlock (void)
@@ -874,7 +991,7 @@ namespace os
        * pthread_mutex_getprioceiling()
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_getprioceiling.html
        *
-       * @note Cannot be called from Interrupt Service Routines.
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       result_t
       Mutex::get_prio_ceiling (thread::priority_t* prio_ceiling) const
@@ -905,7 +1022,7 @@ namespace os
        * pthread_mutex_setprioceiling()
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_getprioceiling.html
        *
-       * @note Cannot be called from Interrupt Service Routines.
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       result_t
       Mutex::set_prio_ceiling (thread::priority_t prio_ceiling,
@@ -939,7 +1056,7 @@ namespace os
        * notified about the state of the mutex by the return
        * value [EOWNERDEAD].
        *
-       * @note Cannot be called from Interrupt Service Routines.
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       result_t
       Mutex::consistent (void)
@@ -961,6 +1078,8 @@ namespace os
 
       /**
        * @details
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       Condition_variable::Condition_variable () :
           Condition_variable (cond::initializer)
@@ -970,6 +1089,8 @@ namespace os
 
       /**
        * @details
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       Condition_variable::Condition_variable (const cond::Attributes& attr) :
           Named_object (attr.get_name ())
@@ -985,6 +1106,8 @@ namespace os
        * upon which no threads are currently blocked. Attempting to
        * destroy a condition variable upon which other threads are
        * currently blocked results in undefined behaviour.
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       Condition_variable::~Condition_variable ()
       {
@@ -1019,7 +1142,7 @@ namespace os
        * have no effect if there are no threads currently
        * blocked on this condition variable.
        *
-       * @note Cannot be called from Interrupt Service Routines.
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       result_t
       Condition_variable::signal ()
@@ -1062,7 +1185,7 @@ namespace os
        * have no effect if there are no threads currently
        * blocked on this condition variable.
        *
-       * @note Cannot be called from Interrupt Service Routines.
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       result_t
       Condition_variable::broadcast ()
@@ -1084,7 +1207,7 @@ namespace os
        *
        * TODO: add more.
        *
-       * @note Cannot be called from Interrupt Service Routines.
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       result_t
       Condition_variable::wait (Mutex* mutex)
@@ -1106,7 +1229,7 @@ namespace os
        *
        * TODO: add more.
        *
-       * @note Cannot be called from Interrupt Service Routines.
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       result_t
       Condition_variable::timed_wait (Mutex* mutex, systicks_t ticks)
@@ -1137,6 +1260,8 @@ namespace os
        *
        * Compatible with POSIX `sem_init()`.
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html#
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       Semaphore::Semaphore () :
           Semaphore (semaphore::counting_initializer)
@@ -1150,6 +1275,8 @@ namespace os
        *
        * Compatible with POSIX `sem_init()`.
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html#
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       Semaphore::Semaphore (const semaphore::Attributes& attr) :
           Named_object (attr.get_name ()), //
@@ -1178,10 +1305,14 @@ namespace os
        *
        * Compatible with POSIX `sem_destroy()`.
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_destroy.html
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       Semaphore::~Semaphore ()
       {
         trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+
+        // TODO
       }
 
       /**
@@ -1212,11 +1343,10 @@ namespace os
        * is unspecified. If the scheduling policy is SCHED_SPORADIC,
        * the semantics are as per SCHED_FIFO.
        *
-       * The function may be invoked from signal catching functions or
-       * Interrupt Service Routines.
-       *
        * Compatible with POSIX `sem_post()`
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_post.html
+       *
+       * @note Can be invoked from Interrupt Service Routines.
        */
       result_t
       Semaphore::post (void)
@@ -1263,6 +1393,8 @@ namespace os
        *
        * Compatible with POSIX `sem_wait()`.
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_wait.html
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       result_t
       Semaphore::wait ()
@@ -1300,6 +1432,8 @@ namespace os
        *
        * Compatible with POSIX `sem_trywait()`.
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_wait.html
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       result_t
       Semaphore::try_wait ()
@@ -1341,6 +1475,8 @@ namespace os
        * Compatible with POSIX `sem_timedwait()`, except the time point
        * is replaced with a duration.
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_timedwait.html
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       result_t
       Semaphore::timed_wait (systicks_t ticks)
@@ -1378,35 +1514,108 @@ namespace os
 
       // ======================================================================
 
-      Pool::Pool (const char* name, std::size_t items, std::size_t item_size,
-                  void* mem) :
-          Named_object (name)
+      namespace pool
       {
-        // TODO
+        const Attributes initializer
+          { nullptr };
+
+      } /* namespace semaphore */
+
+      /**
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      Pool::Pool (pool::size_t items, pool::size_t item_size_bytes) :
+          Pool (pool::initializer, items, item_size_bytes)
+      {
+        ;
       }
 
+      /**
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      Pool::Pool (const pool::Attributes& attr, pool::size_t items,
+                  pool::size_t item_size_bytes) :
+          Named_object (attr.get_name ())
+      {
+        assert(!kernel::is_in_irq ());
+
+        pool_addr_ = attr.get_pool_addr ();
+        items_ = items;
+        item_size_bytes_ = item_size_bytes;
+
+        assert(items_ > 0);
+        assert(item_size_bytes_ > 0);
+
+        trace::printf ("%s() @%p %s %d %d\n", __func__, this, get_name (),
+                       items_, item_size_bytes_);
+      }
+
+      /**
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
       Pool::~Pool ()
       {
+        assert(!kernel::is_in_irq ());
+
+        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+
         // TODO
       }
 
+      /**
+       * @details
+       * Allocate a fixed size memory block from the memory pool.
+       *
+       * It uses a critical section to protect simultaneous access from
+       * other threads or interrupts.
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
       void*
       Pool::alloc (void)
       {
+        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+
         // TODO
         return nullptr;
       }
 
+      /**
+       * @details
+       * Allocate a fixed size memory block from the memory pool and clear
+       * to zero the allocated block.
+       *
+       * It uses a critical section to protect simultaneous access from
+       * other threads or interrupts.
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
       void*
       Pool::calloc (void)
       {
+        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+
         // TODO
         return nullptr;
       }
 
+      /**
+       * @details
+       * Return a memory block previously allocated by `alloc()` or
+       * `calloc()` back to the memory pool.
+       *
+       * It uses a critical section to protect simultaneous access from
+       * other threads or interrupts.
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
       result_t
       Pool::free (void* block)
       {
+        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+
         // TODO
         return result::ok;
       }

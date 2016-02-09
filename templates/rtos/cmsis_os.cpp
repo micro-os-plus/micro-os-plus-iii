@@ -180,24 +180,28 @@ osWaitEx (uint32_t millisec)
 osTimerId
 osTimerCreate (const osTimerDef_t *timer_def, os_timer_type type, void *args)
 {
+  timer::Attributes attr
+    { timer_def->name };
+  attr.set_type ((timer::type_t) type);
+
   return reinterpret_cast<osTimerId> (new ((void*) &timer_def->data) Timer (
-      timer_def->name, (timer::func_t) timer_def->ptimer, (timer::type_t) type,
-      args));
+      attr, (timer::func_t) timer_def->ptimer, (timer::func_args_t) args));
 }
 
 osTimerId
-osTimerCreateEx (osTimer* addr, const char* name, os_ptimer function,
-                 os_timer_type type, void* args)
+osTimerCreateEx (osTimer* addr, osTimerAttr* attr, os_ptimer function,
+                 void* args)
 {
   return reinterpret_cast<osTimerId> (new ((void*) addr) Timer (
-      name, (timer::func_t) function, (timer::type_t) type, args));
+      (timer::Attributes&) (*attr), (timer::func_t) function,
+      (timer::func_args_t) args));
 }
 
 osStatus
 osTimerStart (osTimerId timer_id, uint32_t millisec)
 {
   return static_cast<osStatus> ((reinterpret_cast<Timer&> (timer_id)).start (
-      millisec));
+      Systick_clock::ticks_cast (millisec)));
 }
 
 osStatus
@@ -378,16 +382,20 @@ osSemaphoreDelete (osSemaphoreId semaphore_id)
 osPoolId
 osPoolCreate (const osPoolDef_t *pool_def)
 {
+  pool::Attributes attr
+    { pool_def->name };
+  attr.set_pool_addr (pool_def->pool);
   return reinterpret_cast<osPoolId> (new ((void*) &pool_def->data) Pool (
-      pool_def->name, pool_def->pool_sz, pool_def->item_sz, pool_def->pool));
+      (pool::size_t) pool_def->pool_sz, (pool::size_t) pool_def->item_sz));
 }
 
 osPoolId
-osPoolCreateEx (osPool* addr, const char* name, size_t items,
-                uint32_t item_size, void* mem)
+osPoolCreateEx (osPool* addr, const osPoolAttr* attr, size_t items,
+                size_t item_size_bytes)
 {
-  return reinterpret_cast<osPoolId> (new ((void*) addr) Pool (name, items,
-                                                              item_size, mem));
+  return reinterpret_cast<osPoolId> (new ((void*) addr) Pool (
+      (pool::Attributes&) *attr, (pool::size_t) items,
+      (pool::size_t) item_size_bytes));
 }
 
 void *

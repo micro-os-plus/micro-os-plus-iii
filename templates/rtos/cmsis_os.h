@@ -174,18 +174,18 @@ extern "C"
 
 #if __SIZEOF_POINTER__ == 4
 #define OS_THREAD_SIZE_PTRS  (7)
-#define OS_TIMER_SIZE_PTRS  (1)
+#define OS_TIMER_SIZE_PTRS  (4)
 #define OS_MUTEX_SIZE_PTRS  (4)
 #define OS_SEMAPHORE_SIZE_PTRS  (3+OS_PRIOTHREAD_SIZE_PTR)
-#define OS_POOL_SIZE_PTRS  (1)
+#define OS_POOL_SIZE_PTRS  (3)
 #define OS_MESSAGEQ_SIZE_PTRS  (1)
 #define OS_MAILQ_SIZE_PTRS  (1)
 #elif __SIZEOF_POINTER__ == 8
 #define OS_THREAD_SIZE_PTRS  (6)
-#define OS_TIMER_SIZE_PTRS  (1)
+#define OS_TIMER_SIZE_PTRS  (4)
 #define OS_MUTEX_SIZE_PTRS  (3)
 #define OS_SEMAPHORE_SIZE_PTRS  (2+OS_PRIOTHREAD_SIZE_PTR)
-#define OS_POOL_SIZE_PTRS  (1)
+#define OS_POOL_SIZE_PTRS  (3)
 #define OS_MESSAGEQ_SIZE_PTRS  (1)
 #define OS_MAILQ_SIZE_PTRS  (1)
 #else
@@ -214,6 +214,17 @@ extern "C"
   {
     void* content[OS_TIMER_SIZE_PTRS];
   } osTimer;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+  typedef struct os_timer_attr
+  {
+    const char* name;
+    uint8_t type;
+  } osTimerAttr;
+
+#pragma GCC diagnostic pop
 
   typedef struct os_mutex_data
   {
@@ -251,6 +262,12 @@ extern "C"
   {
     void* content[OS_POOL_SIZE_PTRS];
   } osPool;
+
+  typedef struct os_pool_attr
+  {
+    const char* name;
+    void* pool_addr;
+  } osPoolAttr;
 
   typedef struct os_messageQ_data
   {

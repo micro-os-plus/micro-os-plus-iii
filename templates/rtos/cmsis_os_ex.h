@@ -60,8 +60,8 @@ extern "C"
   // ===== Timer Management Functions =====
 
   osTimerId
-  osTimerCreateEx (osTimer* addr, const char* name, os_ptimer function,
-                   os_timer_type type, void* args);
+  osTimerCreateEx (osTimer* addr, osTimerAttr* attr, os_ptimer function,
+                   void* args);
 
   // --------------------------------------------------------------------------
 
@@ -93,8 +93,8 @@ extern "C"
 #if (defined (osFeature_Pool)  &&  (osFeature_Pool != 0))
 
   osPoolId
-  osPoolCreateEx (osPool* addr, const char* name, size_t items,
-                  uint32_t item_size, void* mem);
+  osPoolCreateEx (osPool* addr, const osPoolAttr* attr, size_t items,
+                  size_t item_size_bytes);
 
   void
   osPoolDeleteEx (osPoolId pool_id);
