@@ -53,16 +53,8 @@ namespace os
       /**
        * Type of status code values returned by CMSIS-RTOS functions.
        */
-      using result_t = uint32_t;
-
-      namespace result
-      {
-        // Explicit namespace preferred over scoped enum,
-        // otherwise too many casts are required.
-        enum
-          : result_t
-            {
-              //
+      using result_t = enum class result : uint32_t
+        {
           ///< function completed; no error or event occurred.
           ok = 0,
 
@@ -119,7 +111,6 @@ namespace os
           /// (Actually redundant in C++ if the underlying type is 32 bits)
           reserved = 0x7FFFFFFF
         };
-      } /* namespace result */
 
       // ----------------------------------------------------------------------
 
@@ -163,7 +154,7 @@ namespace os
       {
         /**
          * @brief Initialise RTOS kernel.
-         * @return result code that indicates the execution status of the function.
+         * @retval result::ok.
          */
         result_t
         initialize (void);
@@ -192,8 +183,8 @@ namespace os
         using sleep_rep = duration_t;
 
         /**
-         * @brief Tell the relative time now.
-         * @return the number of SysTick ticks since startup.
+         * @brief Tell the current time.
+         * @return The number of SysTick ticks since startup.
          */
         static rep
         now (void);
@@ -213,14 +204,14 @@ namespace os
 
         /**
          * @brief Tell the current time.
-         * @return number of ticks since startup.
+         * @return Accurate sampling of SysTick.
          */
         static rep
         now (current_t* details);
 
         /**
          * @brief Convert microseconds to ticks.
-         * @param [in] micros the number of microseconds.
+         * @param [in] micros The number of microseconds.
          * @return The number of ticks.
          */
         template<typename Rep_T>
@@ -278,7 +269,7 @@ namespace os
 
         /**
          * @brief Start the RTOS kernel.
-         * @return result code that indicates the execution status of the function.
+         * @retval result::ok.
          */
         result_t
         start (void);
@@ -293,7 +284,7 @@ namespace os
 
         /**
          * @brief Lock the scheduler.
-         * @return the previous status of the scheduler.
+         * @return The previous status of the scheduler.
          */
         status_t
         lock (void);
@@ -311,6 +302,13 @@ namespace os
         public:
 
           Critical_section ();
+
+          Critical_section (const Critical_section&) = delete;
+          Critical_section (Critical_section&&) = delete;
+          Critical_section&
+          operator= (const Critical_section&) = delete;
+          Critical_section&
+          operator= (Critical_section&&) = delete;
 
           ~Critical_section ();
 
@@ -343,6 +341,7 @@ namespace os
         exit (status_t status);
       }
 
+      // TODO: make template, parameter IRQ level
       class Critical_section_irq
       {
       public:
@@ -350,6 +349,13 @@ namespace os
         Critical_section_irq ();
 
         ~Critical_section_irq ();
+
+        Critical_section_irq (const Critical_section_irq&) = delete;
+        Critical_section_irq (Critical_section_irq&&) = delete;
+        Critical_section_irq&
+        operator= (const Critical_section_irq&) = delete;
+        Critical_section_irq&
+        operator= (Critical_section_irq&&) = delete;
 
       protected:
 
@@ -366,7 +372,7 @@ namespace os
       {
         /**
          * @brief Get current thread.
-         * @return a reference to the current running thread.
+         * @return Reference to the current running thread.
          */
         Thread&
         get (void);
@@ -411,12 +417,12 @@ namespace os
 
         Named_object (const char* name);
 
-        Named_object (const Named_object&) = delete;
-        Named_object (Named_object&&) = delete;
+        Named_object (const Named_object&) = default;
+        Named_object (Named_object&&) = default;
         Named_object&
-        operator= (const Named_object&) = delete;
+        operator= (const Named_object&) = default;
         Named_object&
-        operator= (Named_object&&) = delete;
+        operator= (Named_object&&) = default;
 
         ~Named_object () = default;
 
@@ -437,8 +443,8 @@ namespace os
          */
         using priority_t = uint8_t;
 
-        // Explicit namespace preferred over scoped enum,
-        // otherwise too many casts are required.
+        // Explicit namespace used because values are not restricted
+        // to the enumeration.
         namespace priority
         {
           enum
@@ -458,19 +464,13 @@ namespace os
           };
         } /* namespace priority */
 
-        using state_t = uint8_t;
-        namespace state
-        {
-          enum
-            : state_t
-              {
-                //
+        using state_t = enum class state : uint8_t
+          {
             inactive = 0, //
-            ready = 1, //
-            running = 2, //
-            waiting = 3 //
+            ready = 1,//
+            running = 2,//
+            waiting = 3//
           };
-        } /* namespace state */
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -569,24 +569,21 @@ namespace os
 
         /**
          * @brief Cancel thread execution.
-         * @return if successful, return result::ok; otherwise an
-         * error number is returned.
+         * @retval result::ok.
          */
         result_t
         cancel (void);
 
         /**
          * @brief Wait for thread termination.
-         * @return if successful, return result::ok; otherwise an
-         * error number is returned.
+         * @retval result::ok.
          */
         result_t
         join (void** exit_ptr);
 
         /**
          * @brief Detach a thread.
-         * @return if successful, return result::ok; otherwise an
-         * error number is returned.
+         * @retval result::ok.
          */
         result_t
         detach (void);
@@ -600,20 +597,16 @@ namespace os
 
         /**
          * @brief Set dynamic scheduling priority.
-         * @return if successful, return result::ok; otherwise an
-         * error number is returned.
-         *
-         * - [EINVAL] The value of prio is invalid for the scheduling policy of the
+         * @retval result::ok.
+         * @retval result::einval The value of prio is invalid for the scheduling policy of the
          * specified thread.
-         * - [EPERM] The caller does not have appropriate privileges to set the
-         * scheduling priority of the specified thread.
          */
         result_t
         set_sched_prio (thread::priority_t prio);
 
         /**
          * @brief Get the current scheduling priority.
-         * @return priority.
+         * @return The thread priority.
          */
         thread::priority_t
         get_sched_prio (void);
@@ -684,11 +677,9 @@ namespace os
         using func_t = void (*) (func_args_t args);
 
         /// Timer type value for the timer definition.
-        using type_t = enum class type
-        : uint8_t
+        using type_t = enum class type : uint8_t
           {
-            //
-            once = 0,//
+            once = 0, //
             periodic = 1//
           };
 
@@ -824,8 +815,7 @@ namespace os
 
       namespace mutex
       {
-        using protocol_t = enum class protocol
-        : uint8_t
+        using protocol_t = enum class protocol : uint8_t
           {
             //
             none = 0,//
@@ -833,16 +823,14 @@ namespace os
             protect = 2
           };
 
-        using robustness_t = enum class robustness
-        : uint8_t
+        using robustness_t = enum class robustness : uint8_t
           {
             //
             stalled = 0,//
             robust = 1,//
           };
 
-        using type_t = enum class type
-        : uint8_t
+        using type_t = enum class type : uint8_t
           {
             //
             normal = 0,//
@@ -975,16 +963,14 @@ namespace os
 
         /**
          * @brief Lock the mutex.
-         * @return If successful, return result::ok; otherwise return an
-         * error number.
+         * @retval result::ok.
          */
         result_t
         lock (void);
 
         /**
          * @brief Try to lock the mutex.
-         * @return If successful, return result::ok; otherwise return an
-         * error number.
+         * @retval result::ok.
          */
         result_t
         try_lock (void);
@@ -992,25 +978,22 @@ namespace os
         /**
          * @brief Timed attempt to lock the mutex.
          * @param [in] ticks Number of ticks to wait.
-         * @return If successful, return result::ok; otherwise return an
-         * error number.
+         * @retval result::ok.
          */
         result_t
         timed_lock (systicks_t ticks);
 
         /**
          * @brief Unlock the mutex.
-         * @return If successful, return result::ok; otherwise return an
-         * error number.
+         * @retval result::ok.
          */
         result_t
         unlock (void);
 
         /**
          * @brief Get the priority ceiling of a mutex.
-         * @param [out] prio_ceiling pointer to location where to store the priority.
-         * @return If successful, return result::ok; otherwise return an
-         * error number.
+         * @param [out] prio_ceiling Pointer to location where to store the priority.
+         * @retval result::ok.
          */
         result_t
         get_prio_ceiling (thread::priority_t* prio_ceiling) const;
@@ -1020,8 +1003,7 @@ namespace os
          * @param [in] prio_ceiling new priority.
          * @param [out] old_prio_ceiling pointer to location where to
          * store the previous priority; may be nullptr.
-         * @return If successful, return result::ok; otherwise return an
-         * error number.
+         * @retval result::ok.
          */
         result_t
         set_prio_ceiling (thread::priority_t prio_ceiling,
@@ -1029,8 +1011,7 @@ namespace os
 
         /**
          * @brief Mark state protected by robust mutex as consistent.
-         * @return If successful, return result::ok; otherwise return an
-         * error number.
+         * @retval result::ok.
          */
         result_t
         consistent (void);
@@ -1046,9 +1027,9 @@ namespace os
         volatile thread::priority_t prio_ceiling_;
 
         // Constants set during construction.
-        const mutex::type_t type_; // normal = 0, errorcheck = 1, recursive = 2
-        const mutex::protocol_t protocol_; // none = 0, inherit = 1, protect = 2
-        const mutex::robustness_t robustness_; // stalled = 0, robust = 1
+        const mutex::type_t type_; // normal, errorcheck, recursive
+        const mutex::protocol_t protocol_; // none, inherit, protect
+        const mutex::robustness_t robustness_; // stalled, robust
 
         // Add more internal data.
 
@@ -1116,32 +1097,28 @@ namespace os
 
         /**
          * @brief Signal a condition.
-         * @return If successful, return result::ok; otherwise return an
-         * error number.
+         * @retval result::ok.
          */
         result_t
         signal (void);
 
         /**
          * @brief Broadcast a condition.
-         * @return If successful, return result::ok; otherwise return an
-         * error number.
+         * @retval result::ok.
          */
         result_t
         broadcast (void);
 
         /**
          * @brief Wait on a condition.
-         * @return If successful, return result::ok; otherwise return an
-         * error number.
+         * @retval result::ok.
          */
         result_t
         wait (Mutex* mutex);
 
         /**
          * @brief Wait on a condition with timeout.
-         * @return If successful, return result::ok; otherwise return an
-         * error number.
+         * @retval result::ok.
          */
         result_t
         timed_wait (Mutex* mutex, systicks_t ticks);
@@ -1320,7 +1297,7 @@ namespace os
         // Can be updated in different contexts (interrupts or threads)
         volatile semaphore::count_t count_;
 
-        // Constants set during construction.
+        // Constant set during construction.
         const semaphore::count_t max_count_;
 
         // Add more internal data.
