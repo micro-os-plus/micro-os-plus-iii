@@ -388,6 +388,14 @@ namespace os
         result_t
         yield (void);
 
+        /**
+         * @brief Check if wake-up due to timeout.
+         * @retval true The previous sleep returned after the entire duration.
+         * @retval false The previous sleep returned due to an event.
+         */
+        bool
+        is_timeout (void);
+
         /// Legacy
         /// Wait for Signal, Message, Mail, or Timeout.
         /// @param [in] millisec          @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out
@@ -561,8 +569,9 @@ namespace os
         ~Thread ();
 
         /**
-         * @brief Compare thread IDs.
-         * @return true if the given thread is the same as this thread.
+         * @brief Compare threads.
+         * @retval true The given thread is the same as this thread.
+         * @retval false The threads are different.
          */
         bool
         operator== (const Thread& rhs) const;
@@ -614,14 +623,14 @@ namespace os
 #if 0
         // ???
         result_t
-        set_cancel_state (int, int *);
+        set_cancel_state (int, int*);
         result_t
-        set_cancel_type (int, int *);
+        set_cancel_type (int, int*);
 
         result_t
-        get_sched_param (int *, struct sched_param *);
+        get_sched_param (int*, struct sched_param*);
         result_t
-        set_sched_param (int, const struct sched_param *);
+        set_sched_param (int, const struct sched_param*);
 
         //void test_cancel(void);
 #endif
@@ -635,6 +644,10 @@ namespace os
 #if 1
         void
         wakeup (result_t reason);
+
+        //void
+        //wakeup (result_t reason, event_value_t value, event_object_t object);
+
 #endif
 
         void*
@@ -777,7 +790,7 @@ namespace os
         /**
          * @brief Compare timers.
          * @retval true The given timer is the same as this timer.
-         * @retval false The given timer is different from this timer.
+         * @retval false The timers are different.
          */
         bool
         operator== (const Timer& rhs) const;
@@ -958,6 +971,11 @@ namespace os
          */
         ~Mutex ();
 
+        /**
+         * @brief Compare mutexes.
+         * @retval true The given mutex is the same as this mutex.
+         * @retval false The mutexes are different.
+         */
         bool
         operator== (const Mutex& rhs) const;
 
@@ -1092,6 +1110,11 @@ namespace os
          */
         ~Condition_variable ();
 
+        /**
+         * @brief Compare condition variables.
+         * @retval true The given condition variable is the same as this condition variable.
+         * @retval false The condition variables are different.
+         */
         bool
         operator== (const Condition_variable& rhs) const;
 
@@ -1132,8 +1155,8 @@ namespace os
 
       namespace semaphore
       {
-        using count_t = int32_t;
-        constexpr count_t max_count_value = 0x7FFFFFFF;
+        using count_t = int16_t;
+        constexpr count_t max_count_value = 0x7FFF;
 
         /**
          * @brief Semaphore attributes.
@@ -1205,6 +1228,9 @@ namespace os
 
       } /* namespace semaphore */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
       /**
        * @class Semaphore
        * @brief POSIX semaphore.
@@ -1246,6 +1272,11 @@ namespace os
          */
         ~Semaphore ();
 
+        /**
+         * @brief Compare semaphores.
+         * @retval true The given semaphore is the same as this semaphore.
+         * @retval false The semaphores are different.
+         */
         bool
         operator== (const Semaphore& rhs) const;
 
@@ -1290,9 +1321,21 @@ namespace os
         result_t
         get_value (semaphore::count_t* value);
 
+        /**
+         * @brief Get the semaphore value.
+         * @return The semaphore value.
+         */
+        semaphore::count_t
+        value (void);
+
+        result_t
+        reset (void);
+
       protected:
 
         impl::Prioritised_list list_;
+
+        const semaphore::count_t initial_count_;
 
         // Can be updated in different contexts (interrupts or threads)
         volatile semaphore::count_t count_;
@@ -1302,6 +1345,8 @@ namespace os
 
         // Add more internal data.
       };
+
+#pragma GCC diagnostic pop
 
       // ======================================================================
 
@@ -1347,6 +1392,9 @@ namespace os
 
       } /* namespace pool */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
       class Pool : public Named_object
       {
       public:
@@ -1379,6 +1427,11 @@ namespace os
          */
         ~Pool ();
 
+        /**
+         * @brief Compare memory pools.
+         * @retval true The given memory pool is the same as this memory pool.
+         * @retval false The memory pools are different.
+         */
         bool
         operator== (const Pool& rhs) const;
 
@@ -1413,20 +1466,57 @@ namespace os
         // Add more internal data.
       };
 
+#pragma GCC diagnostic pop
+
       // ======================================================================
+
+      namespace mqueue
+      {
+        using size_t = uint16_t;
+        using priority_t = uint8_t;
+
+        /**
+         * @brief Message queue attributes.
+         */
+        class Attributes : public Named_object
+        {
+        public:
+
+          Attributes (const char* name);
+
+          Attributes (const Attributes&) = default;
+          Attributes (Attributes&&) = default;
+          Attributes&
+          operator= (const Attributes&) = default;
+          Attributes&
+          operator= (Attributes&&) = default;
+
+          /**
+           * @brief Delete the timer attributes.
+           */
+          ~Attributes () = default;
+
+        public:
+
+          // Public members, no accessors and mutators required.
+
+          void* queue_addr;
+          ::std::size_t queue_size_bytes;
+        };
+
+        extern const Attributes initializer;
+
+      } /* namespace mqueue */
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
 
       class Message_queue : public Named_object
       {
       public:
-
-        /// Create and Initialize a Message Queue.
-        /// @param         name          name of the queue.
-        /// @param         queue_sz      maximum number of messages in the queue.
-        /// @param         type          data type of a single message element (for debugger).
-        /// @param [in]    thread_id     thread ID (obtained by @ref osThreadCreate or @ref osThreadGetId) or NULL.
-        /// @return message queue ID for reference by other functions or NULL in case of error.
-        Message_queue (const char* name, ::std::size_t items, void* mem,
-                       Thread* thread);
+        Message_queue (mqueue::size_t msgs, mqueue::size_t msg_size_bytes);
+        Message_queue (const mqueue::Attributes&attr, mqueue::size_t msgs,
+                       mqueue::size_t msg_size_bytes);
 
         Message_queue (const Message_queue&) = delete;
         Message_queue (Message_queue&&) = delete;
@@ -1435,27 +1525,76 @@ namespace os
         Message_queue&
         operator= (Message_queue&&) = delete;
 
+        /**
+         * @brief Delete the message queue.
+         */
         ~Message_queue ();
 
-        /// Put a Message to a Queue.
-        /// @param [in]     queue_id      message queue ID obtained with @ref osMessageCreate.
-        /// @param [in]     info          message information.
-        /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
-        /// @return status code that indicates the execution status of the function.
+        /**
+         * @brief Compare memory queues.
+         * @retval true The given memory queue is the same as this memory queue.
+         * @retval false The memory queus are different.
+         */
+        bool
+        operator== (const Message_queue& rhs) const;
+
         result_t
-        put (void* info, millis_t millisec);
+        send (const char* msg, mqueue::size_t nbytes, mqueue::priority_t mprio);
 
-        /// Get a Message or Wait for a Message from a Queue.
-        /// @param [in]     queue_id      message queue ID obtained with @ref osMessageCreate.
-        /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
-        /// @return event information that includes status code.
         result_t
-        get (millis_t millisec, void** ret);
+        try_send (const char* msg, mqueue::size_t nbytes,
+                  mqueue::priority_t mprio);
 
-      protected:
+        result_t
+        timed_send (const char* msg, mqueue::size_t nbytes,
+                    mqueue::priority_t mprio, systicks_t ticks);
 
-        // Add more internal data.
+        result_t
+        receive (const char* msg, mqueue::size_t nbytes,
+                 mqueue::priority_t* mprio);
+
+        result_t
+        try_receive (const char* msg, mqueue::size_t nbytes,
+                     mqueue::priority_t* mprio);
+
+        result_t
+        timed_receive (const char* msg, mqueue::size_t nbytes,
+                       mqueue::priority_t* mprio, systicks_t ticks);
+
+        mqueue::size_t
+        count (void);
+
+        mqueue::size_t
+        size (void);
+
+        mqueue::size_t
+        msg_size (void);
+
+        bool
+        is_empty (void);
+
+        bool
+        is_full (void);
+
+        result_t
+        reset (void);
+
+      private:
+
+        impl::Prioritised_list send_list_;
+        impl::Prioritised_list receive_list_;
+
+        void* queue_addr_;
+        ::std::size_t queue_size_bytes_;
+
+        const mqueue::size_t msgs_;
+        const mqueue::size_t msg_size_bytes_;
+
+        mqueue::size_t count_;
+
       };
+
+#pragma GCC diagnostic pop
 
       // ======================================================================
 
@@ -1663,7 +1802,9 @@ namespace os
       }
       /**
        * @details
-       * pthread_equal()
+       * Identical threads should have the same memory address.
+       *
+       * Compatible with POSIX pthread_equal().
        * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_equal.html
        */
       inline bool
@@ -1828,6 +1969,10 @@ namespace os
 
       // ======================================================================
 
+      /**
+       * @details
+       * Identical mutexes should have the same memory address.
+       */
       inline bool
       Mutex::operator== (const Mutex& rhs) const
       {
@@ -1912,10 +2057,25 @@ namespace os
 
       // ======================================================================
 
+      /**
+       * @details
+       * Identical semaphores should have the same memory address.
+       */
       inline bool
       Semaphore::operator== (const Semaphore& rhs) const
       {
         return this == &rhs;
+      }
+
+      /**
+       * @details
+       * If positive, the semaphore value reflects the number of available resources.
+       * If negative, it counts the waiting tasks.
+       */
+      inline semaphore::count_t
+      Semaphore::value (void)
+      {
+        return count_;
       }
 
       // ======================================================================
@@ -1945,10 +2105,70 @@ namespace os
 
       // ======================================================================
 
+      /**
+       * @details
+       * Identical memory pools should have the same memory address.
+       */
       inline bool
       Pool::operator== (const Pool& rhs) const
       {
         return this == &rhs;
+      }
+
+      // ======================================================================
+
+      namespace mqueue
+      {
+        inline
+        Attributes::Attributes (const char* name) :
+            Named_object (name)
+        {
+          queue_addr = nullptr;
+          queue_size_bytes = 0;
+        }
+
+      } /* namespace mqueue */
+
+      // ======================================================================
+
+      /**
+       * @details
+       * Identical message queue should have the same memory address.
+       */
+      inline bool
+      Message_queue::operator== (const Message_queue& rhs) const
+      {
+        return this == &rhs;
+      }
+
+      inline mqueue::size_t
+      Message_queue::count (void)
+      {
+        return count_;
+      }
+
+      inline mqueue::size_t
+      Message_queue::size (void)
+      {
+        return msgs_;
+      }
+
+      inline mqueue::size_t
+      Message_queue::msg_size (void)
+      {
+        return msg_size_bytes_;
+      }
+
+      inline bool
+      Message_queue::is_empty (void)
+      {
+        return (count () == 0);
+      }
+
+      inline bool
+      Message_queue::is_full (void)
+      {
+        return (count () == size ());
       }
 
     // ------------------------------------------------------------------------

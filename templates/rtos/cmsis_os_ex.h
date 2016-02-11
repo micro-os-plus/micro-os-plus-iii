@@ -108,11 +108,8 @@ extern "C"
 #if (defined (osFeature_MessageQ)  &&  (osFeature_MessageQ != 0))
 
   osMessageQId
-  osMessageCreateEx (osMessageQ* addr, const char* name, size_t items,
-                     void* mem, osThreadId thread_id);
-
-  osStatus
-  osMessageGetEx (osMessageQId queue_id, uint32_t millisec);
+  osMessageCreateEx (osMessageQ* addr, const osMessageQAttr* attr, size_t items,
+                     size_t item_size);
 
   void
   osMessageDeleteEx (osMessageQId queue_id);
@@ -128,9 +125,6 @@ extern "C"
   osMailQId
   osMailCreateEx (osMailQ* addr, const char* name, size_t messages,
                   size_t message_size, void* mem, osThreadId thread_id);
-
-  osStatus
-  osMailGetEx (osMailQId queue_id, uint32_t millisec);
 
   void
   osMailDeleteEx (osMailQId queue_id);

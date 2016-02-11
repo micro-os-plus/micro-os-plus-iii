@@ -102,7 +102,7 @@ test1 (void)
       osThreadTerminate (&th2);
 
       static osTimer tm;
-      osTimerCreateEx (&tm, "timer", timer_callback, osTimerOnce, NULL);
+      osTimerCreateEx (&tm, NULL, timer_callback, NULL);
 
       osTimerDelete (&tm);
     }

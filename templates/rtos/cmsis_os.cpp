@@ -324,7 +324,7 @@ osSemaphoreCreate (const osSemaphoreDef_t *semaphore_def, int32_t count)
 {
   semaphore::Attributes attr
     { semaphore_def->name };
-  attr.set_intial_count (count);
+  attr.set_intial_count ((semaphore::count_t) count);
   return reinterpret_cast<osSemaphoreId> (new ((void*) &semaphore_def->data) Semaphore (
       attr));
 }
@@ -431,19 +431,32 @@ osPoolDeleteEx (osPoolId pool_id)
 #if (defined (osFeature_MessageQ)  &&  (osFeature_MessageQ != 0))
 
 osMessageQId
-osMessageCreate (const osMessageQDef_t *queue_def, osThreadId thread_id)
+osMessageCreate (const osMessageQDef_t *queue_def,
+                 osThreadId thread_id __attribute__((unused)))
 {
+#if 0
+  return reinterpret_cast<osMessageQId> (new ((void*) &queue_def->data) Fixed_message_queue (
+          queue_def->name, queue_def->queue_sz, queue_def->pool,
+          reinterpret_cast<Thread*> (thread_id)));
+#else
+  mqueue::Attributes attr
+    { queue_def->name };
+  attr.queue_addr = queue_def->queue;
+  attr.queue_size_bytes = queue_def->queue_sz;
+
   return reinterpret_cast<osMessageQId> (new ((void*) &queue_def->data) Message_queue (
-      queue_def->name, queue_def->queue_sz, queue_def->pool,
-      reinterpret_cast<Thread*> (thread_id)));
+      attr, (mqueue::size_t) queue_def->items,
+      (mqueue::size_t) queue_def->item_sz));
+#endif
 }
 
 osMessageQId
-osMessageCreateEx (osMessageQ* addr, const char* name, size_t items, void* mem,
-                   osThreadId thread_id)
+osMessageCreateEx (osMessageQ* addr, const osMessageQAttr* attr, size_t items,
+                   size_t item_size)
 {
   return reinterpret_cast<osMessageQId> (new ((void*) addr) Message_queue (
-      name, items, mem, reinterpret_cast<Thread*> (thread_id)));
+      (mqueue::Attributes&) (*attr), (mqueue::size_t) items,
+      (mqueue::size_t) item_size));
 }
 
 osStatus
@@ -451,10 +464,24 @@ osMessagePut (osMessageQId queue_id, uint32_t info, uint32_t millisec)
 {
 #pragma GCC diagnostic push
 #if defined ( __clang__ )
-#pragma clang diagnostic ignored "-Wint-to-void-pointer-cast"
+#pragma clang diagnostic ignored "-Wint-to-pointer-cast"
 #endif
-  return static_cast<osStatus> ((reinterpret_cast<Message_queue&> (queue_id)).put (
-      (void*) info, millisec));
+  if (millisec == osWaitForever)
+    {
+      return static_cast<osStatus> ((reinterpret_cast<Message_queue&> (queue_id)).send (
+          (const char*) info, sizeof(uint32_t), 0));
+    }
+  else if (millisec == 0)
+    {
+      return static_cast<osStatus> ((reinterpret_cast<Message_queue&> (queue_id)).try_send (
+          (const char*) info, sizeof(uint32_t), 0));
+    }
+  else
+    {
+      return static_cast<osStatus> ((reinterpret_cast<Message_queue&> (queue_id)).timed_send (
+          (const char*) info, sizeof(uint32_t), 0,
+          Systick_clock::ticks_cast (millisec * 1000u)));
+    }
 #pragma GCC diagnostic pop
 }
 
@@ -465,20 +492,31 @@ osEvent
 osMessageGet (osMessageQId queue_id, uint32_t millisec)
 {
   osEvent event;
-  result_t res = (reinterpret_cast<Message_queue&> (queue_id)).get (
-      millisec, (void**) &event.value.p);
+  uint32_t msg;
+  result_t res;
+  if (millisec == osWaitForever)
+    {
+      res = (reinterpret_cast<Message_queue&> (queue_id)).receive (
+          (const char*) &msg, sizeof(uint32_t), NULL);
+    }
+  else if (millisec == 0)
+    {
+      res = (reinterpret_cast<Message_queue&> (queue_id)).try_receive (
+          (const char*) &msg, sizeof(uint32_t), NULL);
+    }
+  else
+    {
+      res = (reinterpret_cast<Message_queue&> (queue_id)).timed_receive (
+          (const char*) &msg, sizeof(uint32_t), NULL,
+          Systick_clock::ticks_cast (millisec * 1000u));
+    }
+
   event.status = static_cast<osStatus> (res);
+  event.value.v = msg;
   return event;
 }
 
 #pragma GCC diagnostic pop
-
-osStatus
-osMessageGetEx (osMessageQId queue_id, uint32_t millisec)
-{
-  return static_cast<osStatus> ((reinterpret_cast<Message_queue&> (queue_id)).get (
-      millisec, nullptr));
-}
 
 void
 osMessageDeleteEx (osMessageQId queue_id)
@@ -498,8 +536,8 @@ osMailQId
 osMailCreate (const osMailQDef_t *queue_def, osThreadId thread_id)
 {
   return reinterpret_cast<osMailQId> (new ((void*) &queue_def->data) Mail_queue (
-      queue_def->name, queue_def->queue_sz, queue_def->item_sz, queue_def->pool,
-      reinterpret_cast<Thread*> (thread_id)));
+      queue_def->name, queue_def->queue_size, queue_def->item_sz,
+      queue_def->queue, reinterpret_cast<Thread*> (thread_id)));
 }
 
 osMailQId
@@ -543,13 +581,6 @@ osMailGet (osMailQId queue_id, uint32_t millisec)
 }
 
 #pragma GCC diagnostic pop
-
-osStatus
-osMailGetEx (osMailQId queue_id, uint32_t millisec)
-{
-  return static_cast<osStatus> ((reinterpret_cast<Mail_queue&> (queue_id)).get (
-      millisec, nullptr));
-}
 
 osStatus
 osMailFree (osMailQId queue_id, void *mail)

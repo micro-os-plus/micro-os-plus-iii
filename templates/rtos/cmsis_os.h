@@ -178,7 +178,7 @@ extern "C"
 #define OS_MUTEX_SIZE_PTRS  (4)
 #define OS_SEMAPHORE_SIZE_PTRS  (3+OS_PRIOTHREAD_SIZE_PTR)
 #define OS_POOL_SIZE_PTRS  (3)
-#define OS_MESSAGEQ_SIZE_PTRS  (1)
+#define OS_MESSAGEQ_SIZE_PTRS  (5+2*OS_PRIOTHREAD_SIZE_PTR)
 #define OS_MAILQ_SIZE_PTRS  (1)
 #elif __SIZEOF_POINTER__ == 8
 #define OS_THREAD_SIZE_PTRS  (6)
@@ -186,7 +186,7 @@ extern "C"
 #define OS_MUTEX_SIZE_PTRS  (3)
 #define OS_SEMAPHORE_SIZE_PTRS  (2+OS_PRIOTHREAD_SIZE_PTR)
 #define OS_POOL_SIZE_PTRS  (3)
-#define OS_MESSAGEQ_SIZE_PTRS  (1)
+#define OS_MESSAGEQ_SIZE_PTRS  (4+2*OS_PRIOTHREAD_SIZE_PTR)
 #define OS_MAILQ_SIZE_PTRS  (1)
 #else
 #error "Unsupported platform."
@@ -267,12 +267,20 @@ extern "C"
   {
     const char* name;
     void* pool_addr;
+    // size_t pool_size_bytes;
   } osPoolAttr;
 
   typedef struct os_messageQ_data
   {
     void* content[OS_MESSAGEQ_SIZE_PTRS];
   } osMessageQ;
+
+  typedef struct os_messageQ_attr
+  {
+    const char* name;
+    void* queue_addr;
+    size_t queue_size_bytes;
+  } osMessageQAttr;
 
   typedef struct os_mailQ_data
   {
@@ -354,9 +362,10 @@ extern "C"
   typedef struct os_pool_def
   {
     const char* name;
-    uint32_t pool_sz; ///< number of items (elements) in the pool
+    uint32_t items; ///< number of items (elements) in the pool
     uint32_t item_sz; ///< size of an item
     void* pool; ///< pointer to memory for pool
+    uint32_t pool_sz;
     osPool* data;
   } osPoolDef_t;
 
@@ -365,9 +374,10 @@ extern "C"
   typedef struct os_messageQ_def
   {
     const char* name;
-    uint32_t queue_sz; ///< number of elements in the queue
+    uint32_t items; ///< number of elements in the queue
     uint32_t item_sz; ///< size of an item
-    void* pool; ///< memory array for messages
+    void* queue; ///< memory array for messages
+    uint32_t queue_sz;
     osMessageQ* data;
   } osMessageQDef_t;
 
@@ -376,9 +386,10 @@ extern "C"
   typedef struct os_mailQ_def
   {
     const char* name;
-    uint32_t queue_sz; ///< number of elements in the queue
+    uint32_t items; ///< number of elements in the queue
     uint32_t item_sz; ///< size of an item
-    void* pool; ///< memory array for mail
+    void* queue; ///< memory array for mail
+    uint32_t queue_size;
     osMailQ* data;
   } osMailQDef_t;
 
@@ -736,7 +747,7 @@ extern const osPoolDef_t os_pool_def_##name
 struct os_pool_data os_pool_data_##name; \
 type os_pool_mem_##name[no]; \
 const osPoolDef_t os_pool_def_##name = \
-{ "##name", (no), sizeof(type), os_pool_mem_##name, &os_pool_data_##name }
+{ "##name", (no), sizeof(type), os_pool_mem_##name, sizeof(os_pool_mem_##name), &os_pool_data_##name }
 #endif
 
   /// @brief Access a Memory Pool definition.
@@ -793,9 +804,9 @@ extern const osMessageQDef_t os_messageQ_def_##name
 #else                            // define the object
 #define osMessageQDef(name, queue_sz, type)   \
 struct os_messageQ_data os_messageQ_data_##name; \
-type os_messageQ_mem_##name[queue_sz]; \
+void* os_messageQ_mem_##name[queue_sz]; \
 const osMessageQDef_t os_messageQ_def_##name = \
-{ "##name", (queue_sz), sizeof (type), os_messageQ_mem_##name, &os_messageQ_data_##name }
+{ "##name", (queue_sz), sizeof (type), os_messageQ_mem_##name, sizeof(os_messageQ_mem_##name), &os_messageQ_data_##name }
 #endif
 
   /// @brief Access a Message Queue Definition.
@@ -850,7 +861,7 @@ extern const osMailQDef_t os_mailQ_def_##name
 struct os_mailQ_data osmailQ_data_##name; \
 type os_mailQ_mem_##name[queue_sz]; \
 const osMailQDef_t os_mailQ_def_##name =  \
-{ "##name", (queue_sz), sizeof (type), os_mailQ_mem_##name, &osmailQ_data_##name }
+{ "##name", (queue_sz), sizeof (type), os_mailQ_mem_##name, sizeof(os_mailQ_mem_##name), &osmailQ_data_##name }
 #endif
 
   /// @brief Access a Mail Queue Definition.

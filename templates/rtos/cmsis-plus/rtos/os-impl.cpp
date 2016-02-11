@@ -1280,6 +1280,12 @@ namespace os
        */
       Semaphore::Semaphore (const semaphore::Attributes& attr) :
           Named_object (attr.get_name ()), //
+          initial_count_ (([&attr]()->semaphore::count_t
+            {
+              semaphore::count_t count;
+              attr.get_intial_count (&count);
+              return count;
+            }) ()), //
           max_count_ (([&attr]()->semaphore::count_t
             {
               semaphore::count_t count;
@@ -1291,6 +1297,8 @@ namespace os
 
         assert(max_count_ > 0);
         assert(count_ <= max_count_);
+
+        // TODO check if initial count can be negative, to validate.
 
         trace::printf ("%s() @%p %s %d %d\n", __func__, this, get_name (),
                        count_, max_count_);
@@ -1512,6 +1520,21 @@ namespace os
         return result::ok;
       }
 
+      result_t
+      Semaphore::reset (void)
+      {
+        Critical_section_irq cs; // ---- Critical section
+
+        if (count_ < 0)
+          {
+            // There are waiting tasks
+            return result::eagain;
+          }
+
+        count_ = initial_count_;
+        return result::ok;
+      }
+
       // ======================================================================
 
       namespace pool
@@ -1622,27 +1645,119 @@ namespace os
 
       // ======================================================================
 
-      Message_queue::Message_queue (const char* name, std::size_t items,
-                                    void* mem, Thread* thread) :
-          Named_object (name)
+      namespace mqueue
       {
-        // TODO
+        const Attributes initializer
+          { nullptr };
+
+      } /* namespace mqueue */
+
+      /**
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      Message_queue::Message_queue (mqueue::size_t msgs,
+                                    mqueue::size_t msg_size_bytes) :
+          Message_queue (mqueue::initializer, msgs, msg_size_bytes)
+      {
+        ;
       }
 
+      /**
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      Message_queue::Message_queue (const mqueue::Attributes&attr,
+                                    mqueue::size_t msgs,
+                                    mqueue::size_t msg_size_bytes) :
+          Named_object (attr.get_name ()), //
+          msgs_ (msgs), //
+          msg_size_bytes_ (msg_size_bytes)
+      {
+        assert(!kernel::is_in_irq ());
+
+        queue_addr_ = attr.queue_addr;
+        queue_size_bytes_ = attr.queue_size_bytes;
+        if (queue_addr_ != nullptr)
+          {
+            assert(queue_size_bytes_ > 0);
+            assert(queue_size_bytes_ >= msgs * msg_size_bytes);
+          }
+        else
+          {
+            // TODO: dynamically alloc queue (msgs * msg_size_bytes).
+          }
+
+        count_ = 0;
+
+        trace::printf ("%s() @%p %s %d %d\n", __func__, this, get_name (),
+                       msgs_, msg_size_bytes_);
+      }
+
+      /**
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
       Message_queue::~Message_queue ()
       {
+        assert(!kernel::is_in_irq ());
+
+        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+
+        // If dynamically allocated, free.
+
         // TODO
       }
 
       result_t
-      Message_queue::put (void* info, millis_t millisec)
+      Message_queue::send (const char* msg, mqueue::size_t nbytes,
+                           mqueue::priority_t mprio)
       {
         // TODO
         return result::ok;
       }
 
       result_t
-      Message_queue::get (millis_t millisec, void** ret)
+      Message_queue::try_send (const char* msg, mqueue::size_t nbytes,
+                               mqueue::priority_t mprio)
+      {
+        // TODO
+        return result::ok;
+      }
+
+      result_t
+      Message_queue::timed_send (const char* msg, mqueue::size_t nbytes,
+                                 mqueue::priority_t mprio, systicks_t ticks)
+      {
+        // TODO
+        return result::ok;
+      }
+
+      result_t
+      Message_queue::receive (const char* msg, mqueue::size_t nbytes,
+                              mqueue::priority_t* mprio)
+      {
+        // TODO
+        return result::ok;
+      }
+
+      result_t
+      Message_queue::try_receive (const char* msg, mqueue::size_t nbytes,
+                                  mqueue::priority_t* mprio)
+      {
+        // TODO
+        return result::ok;
+      }
+
+      result_t
+      Message_queue::timed_receive (const char* msg, mqueue::size_t nbytes,
+                                    mqueue::priority_t* mprio, systicks_t ticks)
+      {
+        // TODO
+        return result::ok;
+      }
+
+      result_t
+      Message_queue::reset (void)
       {
         // TODO
         return result::ok;
