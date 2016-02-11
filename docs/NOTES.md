@@ -6,8 +6,8 @@ These are some issues related to the current CMSIS APIs, with suggestions based 
 
 As a personal remark, the design of the CMSIS RTOS API seems greatly influenced 
 by Keil RTX (function names and prototypes, but not necessarily the most
-fortunate design), with some ideas from POSIX threads (pthreads, an 
-established standard).
+fortunate design), with some ideas from POSIX threads, an 
+established standard.
 
 However the expected influence from POSIX threads is mostly aparent and 
 inconsecvent.
@@ -33,7 +33,7 @@ in the `*Def` structure nor in the `*Create()` prototype (for example
 the location of the thread stack area, the semaphore max count, etc). 
 
 Neither the split between which parameters go to the `*Def` structure 
-and which go to the `*Create()` prototype is not very obvious and 
+and which go to the `*Create()` prototype is very obvious and 
 consecvent (as it is in POSIX threads).
 
 
@@ -90,7 +90,7 @@ int main (void) {
 }
 ```
 
-### Makes use of dinamic allocator for stack, queues, etc
+### Makes use of dynamic allocator for stack, queues, etc
 
 Although the macros defining objects allow to statically allocate storage for
 objects, some of them internally still allocate storage on the heap, for example 
@@ -300,6 +300,75 @@ Suggestion:
 * add separate functions `wait()`, `try_wait()`, `timed_wait()`.
   
   
+### Message queues
+
+#### The data type used in `osMessageQDef()` example is wrong
+
+The current documentation [page](http://www.keil.com/pack/doc/CMSIS/RTOS/html/group___c_m_s_i_s___r_t_o_s___message.html) defines the `type` parameter as _data type of a single message element_, which for message queues should be either int or pointer.
+
+However, the example in `osMessageCreate()` passes a structure, not a pointer to the structure.
+
+```
+typedef struct {                                 // Message object structure
+  float    voltage;                              // AD result of measured voltage
+  float    current;                              // AD result of measured current
+  int      counter;                              // A counter value
+} T_MEAS;
+ 
+osMessageQDef(MsgBox, 16, T_MEAS);               // Define message queue
+```
+
+In the RTX implementation of CMSIS RTOS this works because the data type
+is ignored by the `osMessageQDef()` macro, being replaced by an `uint32_t` (which, BTW, is not a portable way to store pointers):
+
+```
+#define osMessageQDef(name, queue_sz, type)   \
+uint32_t os_messageQ_q_##name[4+(queue_sz)] = { 0 }; \
+const osMessageQDef_t os_messageQ_def_##name = \
+{ (queue_sz), (os_messageQ_q_##name) }
+```
+
+#### Non portable message type in `osMessagePut()`
+
+The parameter used to pass messages is `uint32_t info` even when a pointer is required.
+
+In particular for 32-bits cores this can be fixed with casts, but for 64-bits platforms this is no longer possible.
+
+As a curious thing, internally RTX uses `void*` as message type, but, for unknown reasons, the CMSIS definition ended up with an integer instead of a pointer.
+
+#### Unused thread_id parameter in `osMessageQCreate()` prototype
+
+The parameter is defined as _Note: The parameter thread registers the receiving thread for a message and is needed for the general osWait function to deliver the message._
+
+However both the RTX and the FreeRTOS implementations ignore this parameter.
+
+#### The single osMessagePut() has three different meanings
+
+Based on the `millisec` parameter, the function can wait indefinitely, try to wait or wait with timeout. However, when invoked form an ISR, this parameter must be 0.
+
+This is confusing, and separate calls are prefered.
+
+#### Misplaced thread definition in documentation
+
+The explanation about thread id is listed under `osMessageQDef()` instead of 
+`osMessageCreate()` (which generally ignores it, anyway).
+
+### Mail queues
+
+#### Apparently redundant
+
+A mail queues seems to be a combination of a memory pool and a message queue, with very similar usage, which aparently makes it redundant.
+
+#### Unused thread_id parameter in `osMailQCreate()` prototype
+
+Both the RTX and the FreeRTOS implementations ignore this parameter.
+
+#### The single osMailPut() has three different meanings
+
+Based on the `millisec` parameter, the function can wait indefinitely, try to wait or wait with timeout. However, when invoked form an ISR, this parameter must be 0.
+
+This is confusing, and separate calls are prefered.
+
 ## CMSIS Drivers 
 
 * uses non-reentrant callbacks
