@@ -1709,7 +1709,7 @@ namespace os
       }
 
       result_t
-      Message_queue::send (const char* msg, mqueue::size_t nbytes,
+      Message_queue::send (const char* msg, ::std::size_t nbytes,
                            mqueue::priority_t mprio)
       {
         // TODO
@@ -1717,7 +1717,7 @@ namespace os
       }
 
       result_t
-      Message_queue::try_send (const char* msg, mqueue::size_t nbytes,
+      Message_queue::try_send (const char* msg, ::std::size_t nbytes,
                                mqueue::priority_t mprio)
       {
         // TODO
@@ -1725,7 +1725,7 @@ namespace os
       }
 
       result_t
-      Message_queue::timed_send (const char* msg, mqueue::size_t nbytes,
+      Message_queue::timed_send (const char* msg, ::std::size_t nbytes,
                                  mqueue::priority_t mprio, systicks_t ticks)
       {
         // TODO
@@ -1733,7 +1733,7 @@ namespace os
       }
 
       result_t
-      Message_queue::receive (const char* msg, mqueue::size_t nbytes,
+      Message_queue::receive (const char* msg, ::std::size_t nbytes,
                               mqueue::priority_t* mprio)
       {
         // TODO
@@ -1741,7 +1741,7 @@ namespace os
       }
 
       result_t
-      Message_queue::try_receive (const char* msg, mqueue::size_t nbytes,
+      Message_queue::try_receive (const char* msg, ::std::size_t nbytes,
                                   mqueue::priority_t* mprio)
       {
         // TODO
@@ -1749,7 +1749,7 @@ namespace os
       }
 
       result_t
-      Message_queue::timed_receive (const char* msg, mqueue::size_t nbytes,
+      Message_queue::timed_receive (const char* msg, ::std::size_t nbytes,
                                     mqueue::priority_t* mprio, systicks_t ticks)
       {
         // TODO

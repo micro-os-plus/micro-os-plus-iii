@@ -1539,26 +1539,26 @@ namespace os
         operator== (const Message_queue& rhs) const;
 
         result_t
-        send (const char* msg, mqueue::size_t nbytes, mqueue::priority_t mprio);
+        send (const char* msg, ::std::size_t nbytes, mqueue::priority_t mprio);
 
         result_t
-        try_send (const char* msg, mqueue::size_t nbytes,
+        try_send (const char* msg, ::std::size_t nbytes,
                   mqueue::priority_t mprio);
 
         result_t
-        timed_send (const char* msg, mqueue::size_t nbytes,
+        timed_send (const char* msg, ::std::size_t nbytes,
                     mqueue::priority_t mprio, systicks_t ticks);
 
         result_t
-        receive (const char* msg, mqueue::size_t nbytes,
+        receive (const char* msg, ::std::size_t nbytes,
                  mqueue::priority_t* mprio);
 
         result_t
-        try_receive (const char* msg, mqueue::size_t nbytes,
+        try_receive (const char* msg, ::std::size_t nbytes,
                      mqueue::priority_t* mprio);
 
         result_t
-        timed_receive (const char* msg, mqueue::size_t nbytes,
+        timed_receive (const char* msg, ::std::size_t nbytes,
                        mqueue::priority_t* mprio, systicks_t ticks);
 
         mqueue::size_t
