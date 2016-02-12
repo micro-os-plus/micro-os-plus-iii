@@ -1350,7 +1350,7 @@ namespace os
 
       // ======================================================================
 
-      namespace pool
+      namespace mempool
       {
         using size_t = uint16_t;
 
@@ -1390,12 +1390,12 @@ namespace os
 
         extern const Attributes initializer;
 
-      } /* namespace pool */
+      } /* namespace mempool */
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
-      class Pool : public Named_object
+      class Memory_pool : public Named_object
       {
       public:
 
@@ -1404,7 +1404,7 @@ namespace os
          * @param [in] items The maximum number of items in the pool.
          * @param [in] item_size_bytes The size of an item, in bytes.
          */
-        Pool (pool::size_t blocks, pool::size_t block_size_bytes);
+        Memory_pool (mempool::size_t blocks, mempool::size_t block_size_bytes);
 
         /**
          * @brief Create a memory pool with custom attributes.
@@ -1412,20 +1412,20 @@ namespace os
          * @param [in] items The maximum number of items in the pool.
          * @param [in] item_size_bytes The size of an item, in bytes.
          */
-        Pool (const pool::Attributes& attr, pool::size_t blocks,
-              pool::size_t block_size_bytes);
+        Memory_pool (const mempool::Attributes& attr, mempool::size_t blocks,
+                     mempool::size_t block_size_bytes);
 
-        Pool (const Pool&) = delete;
-        Pool (Pool&&) = delete;
-        Pool&
-        operator= (const Pool&) = delete;
-        Pool&
-        operator= (Pool&&) = delete;
+        Memory_pool (const Memory_pool&) = delete;
+        Memory_pool (Memory_pool&&) = delete;
+        Memory_pool&
+        operator= (const Memory_pool&) = delete;
+        Memory_pool&
+        operator= (Memory_pool&&) = delete;
 
         /**
          * @brief Delete the memory pool.
          */
-        ~Pool ();
+        ~Memory_pool ();
 
         /**
          * @brief Compare memory pools.
@@ -1433,7 +1433,7 @@ namespace os
          * @retval false The memory pools are different.
          */
         bool
-        operator== (const Pool& rhs) const;
+        operator== (const Memory_pool& rhs) const;
 
         /**
          * @brief Allocate a memory block.
@@ -1487,10 +1487,10 @@ namespace os
         impl::Prioritised_list list_;
 
         void* pool_addr_;
-        pool::size_t blocks_;
-        pool::size_t block_size_bytes_;
+        mempool::size_t blocks_;
+        mempool::size_t block_size_bytes_;
 
-        pool::size_t count_;
+        mempool::size_t count_;
 
         // Add more internal data.
       };
@@ -2045,7 +2045,7 @@ namespace os
 
       // ======================================================================
 
-      namespace pool
+      namespace mempool
       {
         inline
         Attributes::Attributes (const char* name) :
@@ -2066,7 +2066,7 @@ namespace os
           pool_addr_ = addr;
         }
 
-      } /* namespace pool */
+      } /* namespace mempool */
 
       // ======================================================================
 
@@ -2075,37 +2075,37 @@ namespace os
        * Identical memory pools should have the same memory address.
        */
       inline bool
-      Pool::operator== (const Pool& rhs) const
+      Memory_pool::operator== (const Memory_pool& rhs) const
       {
         return this == &rhs;
       }
 
       inline ::std::size_t
-      Pool::size (void)
+      Memory_pool::size (void)
       {
         return blocks_;
       }
 
       inline ::std::size_t
-      Pool::block_size (void)
+      Memory_pool::block_size (void)
       {
         return block_size_bytes_;
       }
 
       inline ::std::size_t
-      Pool::count (void)
+      Memory_pool::count (void)
       {
         return count_;
       }
 
       inline bool
-      Pool::is_empty (void)
+      Memory_pool::is_empty (void)
       {
         return (count () == 0);
       }
 
       inline bool
-      Pool::is_full (void)
+      Memory_pool::is_full (void)
       {
         return (count () == size ());
       }

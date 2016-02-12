@@ -50,8 +50,8 @@ static_assert(sizeof(mutex::Attributes) == sizeof(osMutexAttr), "adjust size of 
 static_assert(sizeof(Semaphore) == sizeof(osSemaphore), "adjust size of osSemaphore");
 static_assert(sizeof(semaphore::Attributes) == sizeof(osSemaphoreAttr), "adjust size of osSemaphoreAttr");
 
-static_assert(sizeof(Pool) == sizeof(osPool), "adjust size of osPool");
-static_assert(sizeof(pool::Attributes) == sizeof(osPoolAttr), "adjust size of osPoolAttr");
+static_assert(sizeof(Memory_pool) == sizeof(osPool), "adjust size of osPool");
+static_assert(sizeof(mempool::Attributes) == sizeof(osPoolAttr), "adjust size of osPoolAttr");
 
 static_assert(sizeof(Message_queue) == sizeof(osMessageQ), "adjust size of osMessageQ");
 static_assert(sizeof(mqueue::Attributes) == sizeof(osMessageQAttr), "adjust size of osMessageQAttr");
@@ -392,36 +392,36 @@ osSemaphoreDelete (osSemaphoreId semaphore_id)
 osPoolId
 osPoolCreate (const osPoolDef_t* pool_def)
 {
-  pool::Attributes attr
+  mempool::Attributes attr
     { pool_def->name };
   attr.set_pool_addr (pool_def->pool);
-  return reinterpret_cast<osPoolId> (new ((void*) &pool_def->data) Pool (
-      (pool::size_t) pool_def->pool_sz, (pool::size_t) pool_def->item_sz));
+  return reinterpret_cast<osPoolId> (new ((void*) &pool_def->data) Memory_pool (
+      (mempool::size_t) pool_def->pool_sz, (mempool::size_t) pool_def->item_sz));
 }
 
 osPoolId
 osPoolCreateEx (osPool* addr, const osPoolAttr* attr, size_t items,
                 size_t item_size_bytes)
 {
-  return reinterpret_cast<osPoolId> (new ((void*) addr) Pool (
-      (pool::Attributes&) *attr, (pool::size_t) items,
-      (pool::size_t) item_size_bytes));
+  return reinterpret_cast<osPoolId> (new ((void*) addr) Memory_pool (
+      (mempool::Attributes&) *attr, (mempool::size_t) items,
+      (mempool::size_t) item_size_bytes));
 }
 
 void*
 osPoolAlloc (osPoolId pool_id)
 {
-  return (reinterpret_cast<Pool&> (pool_id)).try_alloc ();
+  return (reinterpret_cast<Memory_pool&> (pool_id)).try_alloc ();
 }
 
 void*
 osPoolCAlloc (osPoolId pool_id)
 {
   void* ret;
-  ret = (reinterpret_cast<Pool&> (pool_id)).try_alloc ();
+  ret = (reinterpret_cast<Memory_pool&> (pool_id)).try_alloc ();
   if (ret != nullptr)
     {
-      memset (ret, 0, (reinterpret_cast<Pool&> (pool_id)).block_size ());
+      memset (ret, 0, (reinterpret_cast<Memory_pool&> (pool_id)).block_size ());
     }
   return ret;
 }
@@ -429,13 +429,14 @@ osPoolCAlloc (osPoolId pool_id)
 osStatus
 osPoolFree (osPoolId pool_id, void* block)
 {
-  return static_cast<osStatus> ((reinterpret_cast<Pool&> (pool_id)).free (block));
+  return static_cast<osStatus> ((reinterpret_cast<Memory_pool&> (pool_id)).free (
+      block));
 }
 
 void
 osPoolDeleteEx (osPoolId pool_id)
 {
-  (reinterpret_cast<Pool&> (pool_id)).~Pool ();
+  (reinterpret_cast<Memory_pool&> (pool_id)).~Memory_pool ();
 }
 
 #endif /* Memory Pool Management available */
@@ -452,7 +453,7 @@ osMessageCreate (const osMessageQDef_t* queue_def,
 {
 #if 0
   return reinterpret_cast<osMessageQId> (new ((void*) &queue_def->data) Fixed_message_queue (
-          queue_def->name, queue_def->queue_sz, queue_def->pool,
+          queue_def->name, queue_def->queue_sz, queue_def->mempool,
           reinterpret_cast<Thread*> (thread_id)));
 #else
   mqueue::Attributes attr
@@ -558,12 +559,12 @@ osMailQId
 osMailCreate (const osMailQDef_t* queue_def,
               osThreadId thread_id __attribute__((unused)))
 {
-  pool::Attributes pool_attr
+  mempool::Attributes pool_attr
     { queue_def->name };
   pool_attr.set_pool_addr (queue_def->pool);
-  new ((void*) &queue_def->data->pool) Pool (
-      (pool::size_t) queue_def->pool_sz,
-      (pool::size_t) queue_def->pool_item_sz);
+  new ((void*) &queue_def->data->pool) Memory_pool (
+      (mempool::size_t) queue_def->pool_sz,
+      (mempool::size_t) queue_def->pool_item_sz);
 
   mqueue::Attributes queue_attr
     { queue_def->name };
@@ -585,15 +586,15 @@ osMailAlloc (osMailQId queue_id, uint32_t millisec)
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
   if (millisec == osWaitForever)
     {
-      ret = (reinterpret_cast<Pool&> (queue_id->pool)).alloc ();
+      ret = (reinterpret_cast<Memory_pool&> (queue_id->pool)).alloc ();
     }
   else if (millisec == 0)
     {
-      ret = (reinterpret_cast<Pool&> (queue_id->pool)).try_alloc ();
+      ret = (reinterpret_cast<Memory_pool&> (queue_id->pool)).try_alloc ();
     }
   else
     {
-      ret = (reinterpret_cast<Pool&> (queue_id->pool)).timed_alloc (
+      ret = (reinterpret_cast<Memory_pool&> (queue_id->pool)).timed_alloc (
           Systick_clock::ticks_cast (millisec * 1000u));
     }
 #pragma GCC diagnostic pop
@@ -608,8 +609,9 @@ osMailCAlloc (osMailQId queue_id, uint32_t millisec)
     {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
-      memset (ret, 0,
-              (reinterpret_cast<Pool&> ((queue_id->pool))).block_size ());
+      memset (
+          ret, 0,
+          (reinterpret_cast<Memory_pool&> ((queue_id->pool))).block_size ());
 #pragma GCC diagnostic pop
     }
   return ret;

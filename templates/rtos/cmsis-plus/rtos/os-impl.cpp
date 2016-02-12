@@ -1537,7 +1537,7 @@ namespace os
 
       // ======================================================================
 
-      namespace pool
+      namespace mempool
       {
         const Attributes initializer
           { nullptr };
@@ -1548,8 +1548,9 @@ namespace os
        *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
-      Pool::Pool (pool::size_t blocks, pool::size_t block_size_bytes) :
-          Pool (pool::initializer, blocks, block_size_bytes)
+      Memory_pool::Memory_pool (mempool::size_t blocks,
+                                mempool::size_t block_size_bytes) :
+          Memory_pool (mempool::initializer, blocks, block_size_bytes)
       {
         ;
       }
@@ -1558,8 +1559,9 @@ namespace os
        *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
-      Pool::Pool (const pool::Attributes& attr, pool::size_t blocks,
-                  pool::size_t block_size_bytes) :
+      Memory_pool::Memory_pool (const mempool::Attributes& attr,
+                                mempool::size_t blocks,
+                                mempool::size_t block_size_bytes) :
           Named_object (attr.get_name ())
       {
         assert(!kernel::is_in_irq ());
@@ -1578,7 +1580,7 @@ namespace os
       /**
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
-      Pool::~Pool ()
+      Memory_pool::~Memory_pool ()
       {
         assert(!kernel::is_in_irq ());
 
@@ -1597,7 +1599,7 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       void*
-      Pool::alloc (void)
+      Memory_pool::alloc (void)
       {
         assert(!kernel::is_in_irq ());
 
@@ -1617,7 +1619,7 @@ namespace os
        * @note Can be invoked from Interrupt Service Routines.
        */
       void*
-      Pool::try_alloc (void)
+      Memory_pool::try_alloc (void)
       {
         trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
 
@@ -1635,7 +1637,7 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       void*
-      Pool::timed_alloc (systicks_t ticks)
+      Memory_pool::timed_alloc (systicks_t ticks)
       {
         assert(!kernel::is_in_irq ());
 
@@ -1656,7 +1658,7 @@ namespace os
        * @note Can be invoked from Interrupt Service Routines.
        */
       result_t
-      Pool::free (void* block)
+      Memory_pool::free (void* block)
       {
         trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
 
@@ -1665,7 +1667,7 @@ namespace os
       }
 
       result_t
-      Pool::reset (void)
+      Memory_pool::reset (void)
       {
         trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
 
