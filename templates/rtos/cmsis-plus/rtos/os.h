@@ -42,6 +42,10 @@
 
 #include <cstddef>
 
+#if !defined(OS_INTEGER_SYSTICK_FREQUENCY_HZ)
+#define OS_INTEGER_SYSTICK_FREQUENCY_HZ (1000)
+#endif
+
 namespace os
 {
   namespace cmsis
@@ -53,74 +57,28 @@ namespace os
       /**
        * Type of status code values returned by CMSIS-RTOS functions.
        */
-      using result_t = enum class result : uint32_t
-        {
-          ///< function completed; no error or event occurred.
+      using result_t = uint32_t;
+
+      namespace result
+      {
+        enum
+          : result_t
+            {
+              //
+          /**
+           * Function completed; no error or event occurred.
+           */
           ok = 0,
 
-          ///< function completed; signal event occurred.
-          event_signal = 0x08,
-
-          ///< function completed; message event occurred.
-          event_message = 0x10,
-
-          ///< function completed; mail event occurred.
-          event_mail = 0x20,
-
-          ///< function completed; timeout occurred.
-          event_timeout = 0x40,
-
-          ///< parameter error: a mandatory parameter was missing or specified an incorrect object.
-          error_parameter = 0x80,
-
-          ///< resource not available: a specified resource was not available.
-          error_resource = 0x81,
-
-          ///< resource not available within given time: a specified resource was not available within the timeout period.
-          error_timeout_resource = 0xC1,
-
-          ///< not allowed in ISR context: the function cannot be called from interrupt service routines.
-          error_isr = 0x82,
-
-          ///< function called multiple times from ISR with same object.
-          error_isr_recursive = 0x83,
-
-          ///< system cannot determine priority or thread has illegal priority.
-          error_priority = 0x84,
-
-          ///< system is out of memory: it was impossible to allocate or reserve memory for the operation.
-          error_no_memory = 0x85,
-
-          ///< value of a parameter is out of range.
-          error_value = 0x86,
-
-          ///< unspecified RTOS error: run-time error but no other error message fits.
-          error_os = 0xFF,
-
-          eagain = error_resource,
-          etimedout = error_timeout_resource,
-
-          // The above values were preserved for compatibility with legacy
-          // CMSIS, but the applications should not make any assumptions
-          // on the numeric values of functions results.
-          einval = 0x100,
-          eintr = 0x101,
-          eoverflow = 0x102,
-
-          ///< prevent from enum down-size compiler optimisation.
-          /// (Actually redundant in C++ if the underlying type is 32 bits)
-          reserved = 0x7FFFFFFF
+        // The rest of the errors are those defined by POSIX, in the
+        // <errno.h> header.
         };
+      } /* namespace result */
 
       // ----------------------------------------------------------------------
 
-      using millis_t = uint32_t;
       using systicks_t = uint32_t;
       using duration_t = uint32_t;
-
-      class Thread;
-      class Mail_queue;
-      class Message_queue;
 
       // ----------------------------------------------------------------------
 
@@ -135,14 +93,6 @@ namespace os
         result_t
         initialize (void);
 
-        /**
-         * @brief Get an error string.
-         * @param [in] res an integer result code.
-         * @return a null terminated string.
-         */
-        const char*
-        strerror (result_t res);
-
         bool
         is_in_irq (void);
 
@@ -154,7 +104,7 @@ namespace os
       {
       public:
 
-        static constexpr uint32_t frequency_hz = 1000; // TODO: Param
+        static constexpr uint32_t frequency_hz = OS_INTEGER_SYSTICK_FREQUENCY_HZ;
         using rep = uint64_t;
         using sleep_rep = duration_t;
 
@@ -1961,7 +1911,7 @@ namespace os
         return (length () == size ());
       }
 
-    // ------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
     } /* namespace rtos */
   } /* namespace cmsis */

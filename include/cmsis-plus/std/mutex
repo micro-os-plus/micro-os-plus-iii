@@ -439,7 +439,7 @@ namespace os
             {
               return true;
             }
-          else if (res == rtos::result::error_timeout_resource)
+          else if (res == ETIMEDOUT)
             {
               return false;
             }
@@ -497,7 +497,7 @@ namespace os
             {
               return true;
             }
-          else if (res == rtos::result::error_timeout_resource)
+          else if (res == ETIMEDOUT)
             {
               return false;
             }

@@ -18,6 +18,8 @@
 
 #include <cmsis-plus/std/mutex>
 
+#include <cerrno>
+
 using namespace os::cmsis;
 
 // ----------------------------------------------------------------------------
@@ -50,7 +52,7 @@ namespace os
           {
             return true;
           }
-        else if (res == rtos::result::error_timeout_resource)
+        else if (res == ETIMEDOUT)
           {
             return false;
           }
@@ -92,7 +94,7 @@ namespace os
           {
             return true;
           }
-        else if (res == rtos::result::error_timeout_resource)
+        else if (res == ETIMEDOUT)
           {
             return false;
           }

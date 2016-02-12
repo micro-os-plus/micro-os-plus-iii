@@ -19,6 +19,7 @@
 #include <cmsis-plus/rtos/os.h>
 
 #include <cassert>
+#include <cerrno>
 
 using namespace os::cmsis;
 
@@ -47,68 +48,6 @@ namespace os
         {
           // TODO
           return result::ok;
-        }
-
-        const char*
-        strerror (result_t res)
-        {
-          const char* str;
-          switch (res)
-            {
-            case result::event_signal:
-              str = "signal event occurred";
-              break;
-
-            case result::event_message:
-              str = "message event occurred";
-              break;
-
-            case result::event_mail:
-              str = "mail event occurred";
-              break;
-
-            case result::event_timeout:
-              str = "timeout occurred";
-              break;
-
-            case result::error_parameter:
-              str = "mandatory parameter missing or incorrect object";
-              break;
-
-            case result::error_resource:
-              str = "resource not available";
-              break;
-
-            case result::error_timeout_resource:
-              str = "resource not available within given time";
-              break;
-
-            case result::error_isr:
-              str = "not allowed in ISR context";
-              break;
-
-            case result::error_isr_recursive:
-              str = "function called multiple times from ISR with same object";
-              break;
-
-            case result::error_priority:
-              str =
-                  "system cannot determine priority or thread has illegal priority";
-              break;
-
-            case result::error_no_memory:
-              str = "system is out of memory";
-              break;
-
-            case result::error_value:
-              str = "value of a parameter is out of range";
-              break;
-
-            default:
-              str = "unknown error";
-              break;
-            }
-          return str;
         }
 
         /**
@@ -539,7 +478,7 @@ namespace os
       void
       Thread::wakeup (result_t reason)
       {
-        assert(reason == result::eintr || reason == result::etimedout);
+        assert(reason == EINTR || reason == ETIMEDOUT);
 
         trace::printf ("%s(&d) @%p %s \n", __func__, reason, this, name ());
         wakeup_reason_ = reason;
@@ -1408,7 +1347,7 @@ namespace os
         Critical_section_irq cs; // ---- Critical section
         if (count_ > this->max_count_)
           {
-            return result::eoverflow;
+            return EOVERFLOW;
           }
 
         ++count_;
@@ -1504,7 +1443,7 @@ namespace os
               }
 
             // Count may be 0 or negative
-            return result::eagain;
+            return EAGAIN;
           }
       }
 
@@ -1571,7 +1510,7 @@ namespace os
         if (count_ < 0)
           {
             // There are waiting tasks
-            return result::eagain;
+            return EAGAIN;
           }
 
         count_ = initial_count_;
@@ -1815,7 +1754,7 @@ namespace os
                               mqueue::priority_t* mprio)
       {
         // TODO
-        return result::event_message;
+        return result::ok; //result::event_message;
       }
 
       result_t
@@ -1823,7 +1762,7 @@ namespace os
                                   mqueue::priority_t* mprio)
       {
         // TODO return result::event_message when message;
-        return result::ok;
+        return EAGAIN;
       }
 
       result_t
