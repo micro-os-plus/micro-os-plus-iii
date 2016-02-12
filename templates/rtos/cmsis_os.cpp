@@ -135,7 +135,7 @@ osStatus
 osThreadSetPriority (osThreadId thread_id, osPriority priority)
 {
   thread::priority_t prio = static_cast<thread::priority_t> (priority * 10);
-  return static_cast<osStatus> ((reinterpret_cast<Thread&> (thread_id)).set_sched_prio (
+  return static_cast<osStatus> ((reinterpret_cast<Thread&> (thread_id)).sched_prio (
       prio));
 }
 
@@ -143,7 +143,7 @@ osPriority
 osThreadGetPriority (osThreadId thread_id)
 {
   thread::priority_t prio =
-      (reinterpret_cast<Thread&> (thread_id)).get_sched_prio ();
+      (reinterpret_cast<Thread&> (thread_id)).sched_prio ();
   return static_cast<osPriority> (prio / 10);
 }
 
@@ -188,7 +188,7 @@ osTimerCreate (const osTimerDef_t* timer_def, os_timer_type type, void* args)
 {
   timer::Attributes attr
     { timer_def->name };
-  attr.set_type ((timer::type_t) type);
+  attr.tm_type = (timer::type_t) type;
 
   return reinterpret_cast<osTimerId> (new ((void*) &timer_def->data) Timer (
       attr, (timer::func_t) timer_def->ptimer, (timer::func_args_t) args));
@@ -241,7 +241,7 @@ osSignalClear (osThreadId thread_id, int32_t signals)
 {
   int32_t ret;
   flags::clear ((Thread&) (*thread_id), (event_flags_t) signals,
-              (event_flags_t*) &ret);
+                (event_flags_t*) &ret);
   return ret;
 }
 
@@ -255,15 +255,18 @@ osSignalWait (int32_t signals, uint32_t millisec)
   result_t res;
   if (millisec == osWaitForever)
     {
-      res = flags::wait ((event_flags_t)signals, (event_flags_t*) &event.value.signals);
+      res = flags::wait ((event_flags_t) signals,
+                         (event_flags_t*) &event.value.signals);
     }
   else if (millisec == 0)
     {
-      res = flags::try_wait ((event_flags_t)signals, (event_flags_t*) &event.value.signals);
+      res = flags::try_wait ((event_flags_t) signals,
+                             (event_flags_t*) &event.value.signals);
     }
   else
     {
-      res = flags::timed_wait ((event_flags_t)signals, (event_flags_t*) &event.value.signals,
+      res = flags::timed_wait ((event_flags_t) signals,
+                               (event_flags_t*) &event.value.signals,
                                Systick_clock::ticks_cast (millisec * 1000u));
     }
   // TODO: set osEventSignal, osEventTimeout
@@ -340,7 +343,7 @@ osSemaphoreCreate (const osSemaphoreDef_t* semaphore_def, int32_t count)
 {
   semaphore::Attributes attr
     { semaphore_def->name };
-  attr.set_intial_count ((semaphore::count_t) count);
+  attr.sm_initial_count = (semaphore::count_t) count;
   return reinterpret_cast<osSemaphoreId> (new ((void*) &semaphore_def->data) Semaphore (
       attr));
 }
@@ -400,7 +403,7 @@ osPoolCreate (const osPoolDef_t* pool_def)
 {
   mempool::Attributes attr
     { pool_def->name };
-  attr.set_pool_addr (pool_def->pool);
+  attr.mp_pool_address = pool_def->pool;
   return reinterpret_cast<osPoolId> (new ((void*) &pool_def->data) Memory_pool (
       (mempool::size_t) pool_def->pool_sz, (mempool::size_t) pool_def->item_sz));
 }
@@ -464,7 +467,7 @@ osMessageCreate (const osMessageQDef_t* queue_def,
 #else
   mqueue::Attributes attr
     { queue_def->name };
-  attr.queue_addr = queue_def->queue;
+  attr.queue_address = queue_def->queue;
   attr.queue_size_bytes = queue_def->queue_sz;
 
   return reinterpret_cast<osMessageQId> (new ((void*) &queue_def->data) Message_queue (
@@ -567,14 +570,14 @@ osMailCreate (const osMailQDef_t* queue_def,
 {
   mempool::Attributes pool_attr
     { queue_def->name };
-  pool_attr.set_pool_addr (queue_def->pool);
+  pool_attr.mp_pool_address = queue_def->pool;
   new ((void*) &queue_def->data->pool) Memory_pool (
       (mempool::size_t) queue_def->pool_sz,
       (mempool::size_t) queue_def->pool_item_sz);
 
   mqueue::Attributes queue_attr
     { queue_def->name };
-  queue_attr.queue_addr = queue_def->queue;
+  queue_attr.queue_address = queue_def->queue;
   queue_attr.queue_size_bytes = queue_def->queue_sz;
   new ((void*) &queue_def->data->queue) Message_queue (
       queue_attr, (mqueue::size_t) queue_def->items,

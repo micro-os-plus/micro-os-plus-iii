@@ -402,7 +402,7 @@ namespace os
           assert(!kernel::is_in_irq ());
           // TODO
 
-          return this_thread::get ().get_wakeup_reason ();
+          return this_thread::get ().wakeup_reason ();
         }
 
       } /* namespace this_thread */
@@ -443,7 +443,8 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       Thread::Thread (thread::func_t function, void* args) :
-          Thread (thread::initializer, function, args)
+          Thread
+            { thread::initializer, function, args }
       {
         ;
       }
@@ -473,17 +474,17 @@ namespace os
       Thread::Thread (const thread::Attributes& attr, thread::func_t function,
                       void* args) :
           Named_object
-            { attr.get_name () }
+            { attr.name () }
       {
         assert(function != nullptr);
         assert(!kernel::is_in_irq ());
 
         // Get attributes from user structure.
-        attr.get_priority (&prio_);
+        prio_ = attr.th_priority;
         // TODO: check min size
-        attr.get_stack_size_bytes (&stack_size_bytes_);
+        stack_size_bytes_ = attr.th_stack_size_bytes;
         // TODO: align stack
-        attr.get_stack_address (&stack_addr_);
+        stack_addr_ = attr.th_stack_address;
 
         if (stack_addr_ == nullptr)
           {
@@ -497,7 +498,7 @@ namespace os
 
         assert(prio_ != thread::priority::none);
 
-        trace::printf ("%s @%p %s\n", __func__, this, get_name ());
+        trace::printf ("%s @%p %s\n", __func__, this, name ());
 
         scheduler::__register_thread (this);
       }
@@ -509,7 +510,7 @@ namespace os
        */
       Thread::~Thread ()
       {
-        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+        trace::printf ("%s() @%p %s\n", __func__, this, name ());
         scheduler::__register_thread (this);
       }
 
@@ -522,7 +523,7 @@ namespace os
       void
       Thread::wakeup (void)
       {
-        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+        trace::printf ("%s() @%p %s\n", __func__, this, name ());
         wakeup_reason_ = result::ok;
 
         // TODO
@@ -540,7 +541,7 @@ namespace os
       {
         assert(reason == result::eintr || reason == result::etimedout);
 
-        trace::printf ("%s(&d) @%p %s \n", __func__, reason, this, get_name ());
+        trace::printf ("%s(&d) @%p %s \n", __func__, reason, this, name ());
         wakeup_reason_ = reason;
 
         // TODO
@@ -551,9 +552,9 @@ namespace os
        * No POSIX equivalent.
        */
       thread::priority_t
-      Thread::get_sched_prio (void)
+      Thread::sched_prio (void)
       {
-        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+        trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
         return prio_;
       }
@@ -574,11 +575,11 @@ namespace os
        * code of [EINTR].
        */
       result_t
-      Thread::set_sched_prio (thread::priority_t prio)
+      Thread::sched_prio (thread::priority_t prio)
       {
         assert(prio != thread::priority::none);
 
-        trace::printf ("%s(%d) @%p %s\n", __func__, prio, this, get_name ());
+        trace::printf ("%s(%d) @%p %s\n", __func__, prio, this, name ());
 
         prio_ = prio;
         return result::ok;
@@ -613,7 +614,7 @@ namespace os
       {
         assert(!kernel::is_in_irq ());
 
-        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+        trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
         // TODO
         return result::ok;
@@ -640,7 +641,7 @@ namespace os
       {
         assert(!kernel::is_in_irq ());
 
-        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+        trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
         // TODO
         return result::ok;
@@ -665,7 +666,7 @@ namespace os
       {
         assert(!kernel::is_in_irq ());
 
-        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+        trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
         // TODO
         return result::ok;
@@ -711,7 +712,7 @@ namespace os
       {
         assert(!kernel::is_in_irq ());
 
-        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+        trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
         // TODO
       }
@@ -739,7 +740,8 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       Timer::Timer (timer::func_t function, timer::func_args_t args) :
-          Timer (timer::initializer, function, args)
+          Timer
+            { timer::initializer, function, args }
       {
 
       }
@@ -752,13 +754,13 @@ namespace os
       Timer::Timer (const timer::Attributes& attr, timer::func_t function,
                     timer::func_args_t args) :
           Named_object
-            { attr.get_name () }
+            { attr.name () }
 
       {
         assert(function != nullptr);
         assert(!kernel::is_in_irq ());
 
-        type_ = attr.get_type ();
+        type_ = attr.tm_type;
         func_ = function;
         func_args_ = args;
 
@@ -846,20 +848,15 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       Mutex::Mutex (const mutex::Attributes& attr) :
-          Named_object (attr.get_name ()), //
-          type_ (([&attr]()->mutex::type_t
-            { mutex::type_t type; attr.get_type (&type); return type;}) ()), //
-          protocol_ (
-              ([&attr]()->mutex::protocol_t
-                { mutex::protocol_t protocol; attr.get_protocol (&protocol); return protocol;}) ()), //
-          robustness_ (
-              ([&attr]()->mutex::robustness_t
-                { mutex::robustness_t robustness; attr.get_robustness (&robustness); return robustness;}) ())
+          Named_object
+            { attr.name () }, //
+          type_ (attr.mx_type), //
+          protocol_ (attr.mx_protocol), //
+          robustness_ (attr.mx_robustness) //
       {
         assert(!kernel::is_in_irq ());
 
-        attr.get_prio_ceiling (
-            const_cast<thread::priority_t*> (&prio_ceiling_));
+        prio_ceiling_ = attr.mx_priority_ceiling;
         owner_ = nullptr;
         count_ = 0;
 
@@ -1135,7 +1132,8 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       Condition_variable::Condition_variable () :
-          Condition_variable (cond::initializer)
+          Condition_variable
+            { cond::initializer }
       {
         ;
       }
@@ -1146,7 +1144,8 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       Condition_variable::Condition_variable (const cond::Attributes& attr) :
-          Named_object (attr.get_name ())
+          Named_object
+            { attr.name () }
       {
         assert(!kernel::is_in_irq ());
 
@@ -1317,7 +1316,8 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       Semaphore::Semaphore () :
-          Semaphore (semaphore::counting_initializer)
+          Semaphore
+            { semaphore::counting_initializer }
       {
         ;
       }
@@ -1332,29 +1332,20 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       Semaphore::Semaphore (const semaphore::Attributes& attr) :
-          Named_object (attr.get_name ()), //
-          initial_count_ (([&attr]()->semaphore::count_t
-            {
-              semaphore::count_t count;
-              attr.get_intial_count (&count);
-              return count;
-            }) ()), //
-          max_count_ (([&attr]()->semaphore::count_t
-            {
-              semaphore::count_t count;
-              attr.get_max_count (&count);
-              return count;
-            }) ())
+          Named_object
+            { attr.name () }, //
+          initial_count_ (attr.sm_initial_count), //
+          max_count_ (attr.sm_max_count)
       {
-        attr.get_intial_count (const_cast<semaphore::count_t*> (&count_));
+        count_ = attr.sm_initial_count;
 
         assert(max_count_ > 0);
         assert(count_ <= max_count_);
 
         // TODO check if initial count can be negative, to validate.
 
-        trace::printf ("%s() @%p %s %d %d\n", __func__, this, get_name (),
-                       count_, max_count_);
+        trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), count_,
+                       max_count_);
       }
 
       /**
@@ -1371,7 +1362,7 @@ namespace os
        */
       Semaphore::~Semaphore ()
       {
-        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+        trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
         // TODO
       }
@@ -1412,7 +1403,7 @@ namespace os
       result_t
       Semaphore::post (void)
       {
-        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+        trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
         Critical_section_irq cs; // ---- Critical section
         if (count_ > this->max_count_)
@@ -1462,7 +1453,7 @@ namespace os
       {
         assert(!kernel::is_in_irq ());
 
-        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+        trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
           {
             Critical_section_irq cs; // ---- Critical section
@@ -1501,7 +1492,7 @@ namespace os
       {
         assert(!kernel::is_in_irq ());
 
-        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+        trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
           {
             Critical_section_irq cs; // ---- Critical section
@@ -1544,8 +1535,7 @@ namespace os
       {
         assert(!kernel::is_in_irq ());
 
-        trace::printf ("%s(%d_ticks) @%p %s\n", __func__, ticks, this,
-                       get_name ());
+        trace::printf ("%s(%d_ticks) @%p %s\n", __func__, ticks, this, name ());
           {
             Critical_section_irq cs; // ---- Critical section
 
@@ -1603,7 +1593,8 @@ namespace os
        */
       Memory_pool::Memory_pool (mempool::size_t blocks,
                                 mempool::size_t block_size_bytes) :
-          Memory_pool (mempool::initializer, blocks, block_size_bytes)
+          Memory_pool
+            { mempool::initializer, blocks, block_size_bytes }
       {
         ;
       }
@@ -1615,19 +1606,20 @@ namespace os
       Memory_pool::Memory_pool (const mempool::Attributes& attr,
                                 mempool::size_t blocks,
                                 mempool::size_t block_size_bytes) :
-          Named_object (attr.get_name ())
+          Named_object
+            { attr.name () }
       {
         assert(!kernel::is_in_irq ());
 
-        pool_addr_ = attr.get_pool_addr ();
+        pool_addr_ = attr.mp_pool_address;
         blocks_ = blocks;
         block_size_bytes_ = block_size_bytes;
 
         assert(blocks_ > 0);
         assert(block_size_bytes_ > 0);
 
-        trace::printf ("%s() @%p %s %d %d\n", __func__, this, get_name (),
-                       blocks_, block_size_bytes_);
+        trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), blocks_,
+                       block_size_bytes_);
       }
 
       /**
@@ -1637,7 +1629,7 @@ namespace os
       {
         assert(!kernel::is_in_irq ());
 
-        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+        trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
         // TODO
       }
@@ -1656,7 +1648,7 @@ namespace os
       {
         assert(!kernel::is_in_irq ());
 
-        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+        trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
         // TODO
         return nullptr;
@@ -1674,7 +1666,7 @@ namespace os
       void*
       Memory_pool::try_alloc (void)
       {
-        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+        trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
         // TODO
         return nullptr;
@@ -1694,7 +1686,7 @@ namespace os
       {
         assert(!kernel::is_in_irq ());
 
-        trace::printf ("%s(%d) @%p %s\n", __func__, ticks, this, get_name ());
+        trace::printf ("%s(%d) @%p %s\n", __func__, ticks, this, name ());
 
         // TODO
         return nullptr;
@@ -1713,7 +1705,7 @@ namespace os
       result_t
       Memory_pool::free (void* block)
       {
-        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+        trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
         // TODO
         return result::ok;
@@ -1722,7 +1714,7 @@ namespace os
       result_t
       Memory_pool::reset (void)
       {
-        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+        trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
         // TODO
         return result::ok;
@@ -1755,13 +1747,14 @@ namespace os
       Message_queue::Message_queue (const mqueue::Attributes&attr,
                                     mqueue::size_t msgs,
                                     mqueue::size_t msg_size_bytes) :
-          Named_object (attr.get_name ()), //
+          Named_object
+            { attr.name () }, //
           msgs_ (msgs), //
           msg_size_bytes_ (msg_size_bytes)
       {
         assert(!kernel::is_in_irq ());
 
-        queue_addr_ = attr.queue_addr;
+        queue_addr_ = attr.queue_address;
         queue_size_bytes_ = attr.queue_size_bytes;
         if (queue_addr_ != nullptr)
           {
@@ -1775,8 +1768,8 @@ namespace os
 
         count_ = 0;
 
-        trace::printf ("%s() @%p %s %d %d\n", __func__, this, get_name (),
-                       msgs_, msg_size_bytes_);
+        trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), msgs_,
+                       msg_size_bytes_);
       }
 
       /**
@@ -1786,7 +1779,7 @@ namespace os
       {
         assert(!kernel::is_in_irq ());
 
-        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+        trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
         // If dynamically allocated, free.
 
@@ -1891,9 +1884,9 @@ namespace os
 
           for (::std::size_t i = 0; i < sizeof(array_) / sizeof(array_[0]); ++i)
             {
-              if (array_[i]->get_sched_prio () > prio)
+              if (array_[i]->sched_prio () > prio)
                 {
-                  prio = array_[i]->get_sched_prio ();
+                  prio = array_[i]->sched_prio ();
                   thread = array_[i];
                   pos = i;
                 }

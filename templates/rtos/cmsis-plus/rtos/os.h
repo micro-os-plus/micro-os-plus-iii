@@ -454,7 +454,7 @@ namespace os
         ~Named_object () = default;
 
         const char*
-        get_name (void) const;
+        name (void) const;
 
       protected:
 
@@ -519,36 +519,19 @@ namespace os
           operator= (Attributes&&) = default;
 
           /**
-           * @brief Delete a mutex attributes.
+           * @brief Delete thread attributes.
            */
           ~Attributes () = default;
 
-          result_t
-          get_stack_address (void** stack_address) const;
+        public:
 
-          result_t
-          set_stack_address (void* stack_address);
+          // Public members, no accessors and mutators required.
+          // Warning: must match the type & order of the C file header.
+          void* th_stack_address;
+          ::std::size_t th_stack_size_bytes;
+          priority_t th_priority;
 
-          result_t
-          get_stack_size_bytes (::std::size_t* stack_size_bytes) const;
-
-          result_t
-          set_stack_size_bytes (::std::size_t stack_size_bytes);
-
-          result_t
-          get_priority (priority_t* priority) const;
-
-          result_t
-          set_priority (priority_t priority);
-
-        protected:
-
-          void* stack_addr_;
-
-          ::std::size_t stack_size_bytes_;
-
-          priority_t priority_;
-
+          // Add more attributes.
         };
 
 #pragma GCC diagnostic pop
@@ -623,6 +606,8 @@ namespace os
         void
         exit (void* value_ptr);
 
+        // Accessors & mutators.
+
         /**
          * @brief Set dynamic scheduling priority.
          * @retval result::ok.
@@ -630,14 +615,14 @@ namespace os
          * specified thread.
          */
         result_t
-        set_sched_prio (thread::priority_t prio);
+        sched_prio (thread::priority_t prio);
 
         /**
          * @brief Get the current scheduling priority.
          * @return The thread priority.
          */
         thread::priority_t
-        get_sched_prio (void);
+        sched_prio (void);
 
 #if 0
         // ???
@@ -655,7 +640,7 @@ namespace os
 #endif
 
         thread::state_t
-        get_state (void);
+        state (void);
 
         void
         wakeup (void);
@@ -670,10 +655,11 @@ namespace os
 #endif
 
         void*
-        get_function_args (void);
+        function_args (void);
 
+        // Maybe make it a structure.
         result_t
-        get_wakeup_reason (void);
+        wakeup_reason (void);
 
 #if defined(TESTING)
         void
@@ -709,7 +695,7 @@ namespace os
         using func_t = void (*) (func_args_t args);
 
         /// Timer type value for the timer definition.
-        using type_t = enum class type : uint8_t
+        using type_t = enum class run : uint8_t
           {
             once = 0, //
             periodic = 1//
@@ -735,21 +721,17 @@ namespace os
           operator= (Attributes&&) = default;
 
           /**
-           * @brief Delete the timer attributes.
+           * @brief Delete timer attributes.
            */
           ~Attributes () = default;
 
-          type_t
-          get_type (void) const;
+        public:
 
-          void
-          set_type (type_t type);
+          // Public members, no accessors and mutators required.
+          // Warning: must match the type & order of the C file header.
+          type_t tm_type;
 
-        protected:
-
-          type_t type_;
-
-          // Add more internal data.
+          // Add more attributes.
         };
 
 #pragma GCC diagnostic pop
@@ -773,7 +755,7 @@ namespace os
           operator= (Periodic_attributes&&) = default;
 
           /**
-           * @brief Delete the timer attributes.
+           * @brief Delete timer attributes.
            */
           ~Periodic_attributes () = default;
 
@@ -896,38 +878,16 @@ namespace os
            */
           ~Attributes () = default;
 
-          result_t
-          get_prio_ceiling (thread::priority_t* prio_ceiling) const;
+        public:
 
-          result_t
-          set_prio_ceiling (thread::priority_t prio_ceiling);
+          // Public members, no accessors and mutators required.
+          // Warning: must match the type & order of the C file header.
+          thread::priority_t mx_priority_ceiling;
+          mutex::protocol_t mx_protocol;
+          mutex::robustness_t mx_robustness;
+          mutex::type_t mx_type;
 
-          result_t
-          get_protocol (mutex::protocol_t* protocol) const;
-
-          result_t
-          set_protocol (mutex::protocol_t protocol);
-
-          result_t
-          get_robustness (mutex::robustness_t* robustness) const;
-
-          result_t
-          set_robustness (mutex::robustness_t robustness);
-
-          result_t
-          get_type (mutex::type_t* type) const;
-
-          result_t
-          set_type (mutex::type_t type);
-
-        protected:
-
-          thread::priority_t priority_ceiling_;
-          mutex::protocol_t protocol_;
-          mutex::robustness_t robustness_;
-          mutex::type_t type_;
-
-          // Add more internal data.
+          // Add more attributes.
         };
 
 #pragma GCC diagnostic pop
@@ -1098,7 +1058,12 @@ namespace os
            */
           ~Attributes () = default;
 
-          // Add more internal data.
+        public:
+
+          // Public members, no accessors and mutators required.
+          // Warning: must match the type & order of the C file header.
+
+          // Add more attributes.
         };
 
         extern const Attributes initializer;
@@ -1198,25 +1163,15 @@ namespace os
            */
           ~Attributes () = default;
 
-          result_t
-          get_intial_count (count_t* initial_count) const;
+        public:
 
-          result_t
-          set_intial_count (count_t initial_count);
+          // Public members, no accessors and mutators required.
+          // Warning: must match the type & order of the C file header.
+          count_t sm_initial_count;
 
-          result_t
-          get_max_count (count_t* max_count) const;
+          count_t sm_max_count;
 
-          result_t
-          set_max_count (count_t max_count);
-
-        protected:
-
-          count_t initial_count_;
-
-          count_t max_count_;
-
-          // Add more internal data.
+          // Add more attributes.
         };
 
         extern const Attributes counting_initializer;
@@ -1394,17 +1349,13 @@ namespace os
            */
           ~Attributes () = default;
 
-          void*
-          get_pool_addr (void) const;
+        public:
 
-          void
-          set_pool_addr (void* addr);
+          // Public members, no accessors and mutators required.
+          // Warning: must match the type & order of the C file header.
+          void* mp_pool_address;
 
-        protected:
-
-          void* pool_addr_;
-
-          // Add more internal data.
+          // Add more attributes.
         };
 
         extern const Attributes initializer;
@@ -1547,9 +1498,11 @@ namespace os
         public:
 
           // Public members, no accessors and mutators required.
-
-          void* queue_addr;
+          // Warning: must match the type & order of the C file header.
+          void* queue_address;
           ::std::size_t queue_size_bytes;
+
+          // Add more attributes.
         };
 
         extern const Attributes initializer;
@@ -1699,7 +1652,7 @@ namespace os
       // ======================================================================
 
       inline const char*
-      Named_object::get_name (void) const
+      Named_object::name (void) const
       {
         return name_;
       }
@@ -1727,63 +1680,12 @@ namespace os
         Attributes::Attributes (const char* name) :
             Named_object (name)
         {
-          stack_addr_ = nullptr;
-          stack_size_bytes_ = 0;
-          priority_ = thread::priority::normal;
+          th_stack_address = nullptr;
+          th_stack_size_bytes = 0;
+          th_priority = thread::priority::normal;
         }
-
-        inline result_t
-        Attributes::get_stack_address (void** stack_address) const
-        {
-          if (stack_address != nullptr)
-            {
-              *stack_address = stack_addr_;
-            }
-          return result::ok;
-        }
-
-        inline result_t
-        Attributes::set_stack_address (void* stack_address)
-        {
-          stack_addr_ = stack_address;
-          return result::ok;
-        }
-
-        inline result_t
-        Attributes::get_stack_size_bytes (::std::size_t* stack_size_bytes) const
-        {
-          if (stack_size_bytes != nullptr)
-            {
-              *stack_size_bytes = stack_size_bytes_;
-            }
-          return result::ok;
-        }
-
-        inline result_t
-        Attributes::set_stack_size_bytes (::std::size_t stack_size_bytes)
-        {
-          stack_size_bytes_ = stack_size_bytes;
-          return result::ok;
-        }
-
-        inline result_t
-        Attributes::get_priority (priority_t* priority) const
-        {
-          if (priority != nullptr)
-            {
-              *priority = priority_;
-            }
-          return result::ok;
-        }
-
-        inline result_t
-        Attributes::set_priority (priority_t priority)
-        {
-          priority_ = priority;
-          return result::ok;
-        }
-
       }
+
       /**
        * @details
        * Identical threads should have the same memory address.
@@ -1798,19 +1700,19 @@ namespace os
       }
 
       inline thread::state_t
-      Thread::get_state (void)
+      Thread::state (void)
       {
         return state_;
       }
 
       inline void*
-      Thread::get_function_args (void)
+      Thread::function_args (void)
       {
         return func_args_;
       }
 
       inline result_t
-      Thread::get_wakeup_reason (void)
+      Thread::wakeup_reason (void)
       {
         return wakeup_reason_;
       }
@@ -1821,30 +1723,20 @@ namespace os
       {
         inline
         Attributes::Attributes (const char* name) :
-            Named_object (name)
+            Named_object
+              { name }
         {
-          type_ = type::once;
-        }
-
-        inline type_t
-        Attributes::get_type (void) const
-        {
-          return type_;
-        }
-
-        inline void
-        Attributes::set_type (type_t type)
-        {
-          type_ = type;
+          this->tm_type = run::once;
         }
 
         // ====================================================================
 
         inline
         Periodic_attributes::Periodic_attributes (const char* name) :
-            Attributes (name)
+            Attributes
+              { name }
         {
-          type_ = type::periodic;
+          this->tm_type = run::periodic;
         }
       } /* namespace timer */
 
@@ -1864,91 +1756,19 @@ namespace os
         Attributes::Attributes (const char* name) :
             Named_object (name)
         {
-          priority_ceiling_ = thread::priority::max;
-          protocol_ = protocol::none;
-          robustness_ = robustness::stalled;
-          type_ = type::normal;
+          mx_priority_ceiling = thread::priority::max;
+          mx_protocol = protocol::none;
+          mx_robustness = robustness::stalled;
+          mx_type = type::normal;
         }
 
-        inline result_t
-        Attributes::get_prio_ceiling (thread::priority_t* prio_ceiling) const
-        {
-          if (prio_ceiling != nullptr)
-            {
-              *prio_ceiling = priority_ceiling_;
-            }
-          return result::ok;
-        }
-
-        inline result_t
-        Attributes::set_prio_ceiling (thread::priority_t prio_ceiling)
-        {
-          priority_ceiling_ = prio_ceiling;
-          return result::ok;
-        }
-
-        inline result_t
-        Attributes::get_protocol (protocol_t* protocol) const
-        {
-          if (protocol != nullptr)
-            {
-              *protocol = protocol_;
-            }
-          return result::ok;
-        }
-
-        inline result_t
-        Attributes::set_protocol (protocol_t protocol)
-        {
-          protocol_ = protocol;
-          return result::ok;
-        }
-
-        inline result_t
-        Attributes::get_robustness (robustness_t* robustness) const
-        {
-          if (robustness != nullptr)
-            {
-              *robustness = robustness_;
-            }
-          return result::ok;
-        }
-
-        inline result_t
-        Attributes::set_robustness (robustness_t robustness)
-        {
-          robustness_ = robustness;
-          return result::ok;
-        }
-
-        inline result_t
-        Attributes::get_type (type_t* type) const
-        {
-          if (type != nullptr)
-            {
-              *type = type_;
-            }
-          return result::ok;
-        }
-
-        inline result_t
-        Attributes::set_type (type_t type)
-        {
-          type_ = type;
-          return result::ok;
-        }
-      }
-
-      // ======================================================================
-
-      namespace mutex
-      {
         inline
         Recursive_attributes::Recursive_attributes (const char* name) :
             Attributes (name)
         {
-          type_ = type::recursive;
+          mx_type = type::recursive;
         }
+
       }
 
       // ======================================================================
@@ -1969,7 +1789,8 @@ namespace os
       {
         inline
         Attributes::Attributes (const char* name) :
-            Named_object (name)
+            Named_object
+              { name }
         {
           ;
         }
@@ -1989,52 +1810,19 @@ namespace os
       {
         inline
         Attributes::Attributes (const char* name) :
-            Named_object (name)
+            Named_object
+              { name }
         {
-          initial_count_ = 0;
-          max_count_ = max_count_value;
-        }
-
-        inline result_t
-        Attributes::get_intial_count (count_t* initial_count) const
-        {
-          if (initial_count != nullptr)
-            {
-              *initial_count = initial_count_;
-            }
-          return result::ok;
-        }
-
-        inline result_t
-        Attributes::set_intial_count (count_t initial_count)
-        {
-          initial_count_ = initial_count;
-          return result::ok;
-        }
-
-        inline result_t
-        Attributes::get_max_count (count_t* max_count) const
-        {
-          if (max_count != nullptr)
-            {
-              *max_count = max_count_;
-            }
-          return result::ok;
-        }
-
-        inline result_t
-        Attributes::set_max_count (count_t max_count)
-        {
-          max_count_ = max_count;
-          return result::ok;
+          sm_initial_count = 0;
+          sm_max_count = max_count_value;
         }
 
         inline
         Binary_attributes::Binary_attributes (const char* name) :
             Attributes (name)
         {
-          initial_count_ = 0;
-          max_count_ = 1;
+          sm_initial_count = 0;
+          sm_max_count = 1;
         }
 
       } /* namespace semaphore */
@@ -2070,19 +1858,7 @@ namespace os
         Attributes::Attributes (const char* name) :
             Named_object (name)
         {
-          pool_addr_ = nullptr;
-        }
-
-        inline void*
-        Attributes::get_pool_addr (void) const
-        {
-          return pool_addr_;
-        }
-
-        inline void
-        Attributes::set_pool_addr (void* addr)
-        {
-          pool_addr_ = addr;
+          mp_pool_address = nullptr;
         }
 
       } /* namespace mempool */
@@ -2137,7 +1913,7 @@ namespace os
         Attributes::Attributes (const char* name) :
             Named_object (name)
         {
-          queue_addr = nullptr;
+          queue_address = nullptr;
           queue_size_bytes = 0;
         }
 

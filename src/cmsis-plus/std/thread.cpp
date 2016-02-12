@@ -54,7 +54,7 @@ namespace os
       {
         if (id_ != id ())
           {
-            void* args = id_.native_thread_->get_function_args ();
+            void* args = id_.native_thread_->function_args ();
             if (args != nullptr && function_object_deleter_ != nullptr)
               {
                 // Manually delete the function object used to store arguments.

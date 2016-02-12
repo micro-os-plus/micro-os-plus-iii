@@ -121,8 +121,8 @@ main (int argc, char* argv[])
       static uint8_t stack12[300];
       rtos::thread::Attributes attr12
         { "th12" };
-      attr12.set_stack_address ((void*) stack12);
-      attr12.set_stack_size_bytes (sizeof(stack12));
+      attr12.th_stack_address = ((void*) stack12);
+      attr12.th_stack_size_bytes = (sizeof(stack12));
 
       thread th12
         { attr12, task1 };
@@ -130,9 +130,9 @@ main (int argc, char* argv[])
       static uint8_t stack13[300];
       rtos::thread::Attributes attr13
         { "th13" };
-      attr13.set_stack_address ((void*) stack13);
-      attr13.set_stack_size_bytes (sizeof(stack13));
-      attr13.set_priority (rtos::thread::priority::normal);
+      attr13.th_stack_address = ((void*) stack13);
+      attr13.th_stack_size_bytes = (sizeof(stack13));
+      attr13.th_priority = (rtos::thread::priority::normal);
 
       thread th13
         { attr13, task1 };
