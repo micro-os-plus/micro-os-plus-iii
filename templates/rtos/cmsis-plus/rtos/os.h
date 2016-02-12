@@ -1404,7 +1404,7 @@ namespace os
          * @param [in] items The maximum number of items in the pool.
          * @param [in] item_size_bytes The size of an item, in bytes.
          */
-        Pool (pool::size_t items, pool::size_t item_size_bytes);
+        Pool (pool::size_t blocks, pool::size_t block_size_bytes);
 
         /**
          * @brief Create a memory pool with custom attributes.
@@ -1412,8 +1412,8 @@ namespace os
          * @param [in] items The maximum number of items in the pool.
          * @param [in] item_size_bytes The size of an item, in bytes.
          */
-        Pool (const pool::Attributes& attr, pool::size_t items,
-              pool::size_t item_size_bytes);
+        Pool (const pool::Attributes& attr, pool::size_t blocks,
+              pool::size_t block_size_bytes);
 
         Pool (const Pool&) = delete;
         Pool (Pool&&) = delete;
@@ -1437,17 +1437,24 @@ namespace os
 
         /**
          * @brief Allocate a memory block.
-         * @return Pointer to memory block, or `nullptr` if no memory available.
+         * @return Pointer to memory block.
          */
         void*
         alloc (void);
 
         /**
-         * @brief Allocate and clear a memory block.
+         * @brief Allocate a memory block.
          * @return Pointer to memory block, or `nullptr` if no memory available.
          */
         void*
-        calloc (void);
+        try_alloc (void);
+
+        /**
+         * @brief Allocate a memory block.
+         * @return Pointer to memory block, or `nullptr` if timeout.
+         */
+        void*
+        timed_alloc (systicks_t ticks);
 
         /**
          * @brief Free the memory block.
@@ -1457,11 +1464,33 @@ namespace os
         result_t
         free (void* block);
 
+        ::std::size_t
+        size (void);
+
+        ::std::size_t
+        count (void);
+
+        ::std::size_t
+        block_size (void);
+
+        bool
+        is_empty (void);
+
+        bool
+        is_full (void);
+
+        result_t
+        reset (void);
+
       protected:
 
+        impl::Prioritised_list list_;
+
         void* pool_addr_;
-        pool::size_t items_;
-        pool::size_t item_size_bytes_;
+        pool::size_t blocks_;
+        pool::size_t block_size_bytes_;
+
+        pool::size_t count_;
 
         // Add more internal data.
       };
@@ -1561,13 +1590,13 @@ namespace os
         timed_receive (const char* msg, ::std::size_t nbytes,
                        mqueue::priority_t* mprio, systicks_t ticks);
 
-        mqueue::size_t
-        count (void);
+        ::std::size_t
+        length (void);
 
-        mqueue::size_t
+        ::std::size_t
         size (void);
 
-        mqueue::size_t
+        ::std::size_t
         msg_size (void);
 
         bool
@@ -1595,70 +1624,6 @@ namespace os
       };
 
 #pragma GCC diagnostic pop
-
-      // ======================================================================
-
-      class Mail_queue : public Named_object
-      {
-      public:
-
-        /// Create and Initialize mail queue.
-        /// @param         name          name of the queue
-        /// @param         queue_sz      maximum number of messages in queue
-        /// @param         type          data type of a single message element
-        /// @param [in]    thread_id     thread ID (obtained by @ref osThreadCreate or @ref osThreadGetId) or NULL.
-        /// @return mail queue ID for reference by other functions or NULL in case of error.
-        Mail_queue (const char* name, ::std::size_t messages,
-                    ::std::size_t message_size, void* mem, Thread* thread);
-
-        Mail_queue (const Mail_queue&) = delete;
-        Mail_queue (Mail_queue&&) = delete;
-        Mail_queue&
-        operator= (const Mail_queue&) = delete;
-        Mail_queue&
-        operator= (Mail_queue&&) = delete;
-
-        ~Mail_queue ();
-
-        /// Allocate a memory block from a mail.
-        /// @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
-        /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out
-        /// @return pointer to memory block that can be filled with mail or NULL in case of error.
-        void*
-        alloc (millis_t millisec);
-
-        /// Allocate a memory block from a mail and set memory block to zero.
-        /// @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
-        /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out
-        /// @return pointer to memory block that can be filled with mail or NULL in case of error.
-        void*
-        calloc (millis_t millisec);
-
-        /// Put a mail to a queue.
-        /// @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
-        /// @param [in]     mail          memory block previously allocated with @ref osMailAlloc or @ref osMailCAlloc.
-        /// @return status code that indicates the execution status of the function.
-        result_t
-        put (void* mail);
-
-        /// Get a mail from a queue.
-        /// @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
-        /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out
-        /// @return event that contains mail information or error code.
-        result_t
-        get (millis_t millisec, void** ret);
-
-        /// Free a memory block from a mail.
-        /// @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
-        /// @param [in]     mail          pointer to the memory block that was obtained with @ref osMailGet.
-        /// @return status code that indicates the execution status of the function.
-        result_t
-        free (void* mail);
-
-      protected:
-
-        // Add more internal data.
-      };
 
     } /* namespace rtos */
   } /* namespace cmsis */
@@ -2115,6 +2080,36 @@ namespace os
         return this == &rhs;
       }
 
+      inline ::std::size_t
+      Pool::size (void)
+      {
+        return blocks_;
+      }
+
+      inline ::std::size_t
+      Pool::block_size (void)
+      {
+        return block_size_bytes_;
+      }
+
+      inline ::std::size_t
+      Pool::count (void)
+      {
+        return count_;
+      }
+
+      inline bool
+      Pool::is_empty (void)
+      {
+        return (count () == 0);
+      }
+
+      inline bool
+      Pool::is_full (void)
+      {
+        return (count () == size ());
+      }
+
       // ======================================================================
 
       namespace mqueue
@@ -2141,19 +2136,19 @@ namespace os
         return this == &rhs;
       }
 
-      inline mqueue::size_t
-      Message_queue::count (void)
+      inline ::std::size_t
+      Message_queue::length (void)
       {
         return count_;
       }
 
-      inline mqueue::size_t
+      inline ::std::size_t
       Message_queue::size (void)
       {
         return msgs_;
       }
 
-      inline mqueue::size_t
+      inline ::std::size_t
       Message_queue::msg_size (void)
       {
         return msg_size_bytes_;
@@ -2162,13 +2157,13 @@ namespace os
       inline bool
       Message_queue::is_empty (void)
       {
-        return (count () == 0);
+        return (length () == 0);
       }
 
       inline bool
       Message_queue::is_full (void)
       {
-        return (count () == size ());
+        return (length () == size ());
       }
 
     // ------------------------------------------------------------------------

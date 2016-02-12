@@ -177,7 +177,7 @@ extern "C"
 #define OS_TIMER_SIZE_PTRS  (4)
 #define OS_MUTEX_SIZE_PTRS  (4)
 #define OS_SEMAPHORE_SIZE_PTRS  (3+OS_PRIOTHREAD_SIZE_PTR)
-#define OS_POOL_SIZE_PTRS  (3)
+#define OS_POOL_SIZE_PTRS  (4+OS_PRIOTHREAD_SIZE_PTR)
 #define OS_MESSAGEQ_SIZE_PTRS  (5+2*OS_PRIOTHREAD_SIZE_PTR)
 #define OS_MAILQ_SIZE_PTRS  (1)
 #elif __SIZEOF_POINTER__ == 8
@@ -185,7 +185,7 @@ extern "C"
 #define OS_TIMER_SIZE_PTRS  (4)
 #define OS_MUTEX_SIZE_PTRS  (3)
 #define OS_SEMAPHORE_SIZE_PTRS  (2+OS_PRIOTHREAD_SIZE_PTR)
-#define OS_POOL_SIZE_PTRS  (3)
+#define OS_POOL_SIZE_PTRS  (3+OS_PRIOTHREAD_SIZE_PTR)
 #define OS_MESSAGEQ_SIZE_PTRS  (4+2*OS_PRIOTHREAD_SIZE_PTR)
 #define OS_MAILQ_SIZE_PTRS  (1)
 #else
@@ -237,6 +237,10 @@ extern "C"
   typedef struct os_mutex_attr
   {
     const char* name;
+    uint8_t priority_ceiling;
+    uint8_t protocol;
+    uint8_t robustness;
+    uint8_t type;
   } osMutexAttr;
 
 #pragma GCC diagnostic pop
@@ -252,8 +256,8 @@ extern "C"
   typedef struct os_semaphore_attr
   {
     const char* name;
-    int32_t initial_count;
-    int32_t max_count;
+    int16_t initial_count;
+    int16_t max_count;
   } osSemaphoreAttr;
 
 #pragma GCC diagnostic pop
@@ -284,7 +288,8 @@ extern "C"
 
   typedef struct os_mailQ_data
   {
-    void* content[OS_MAILQ_SIZE_PTRS];
+    osPool pool;
+    osMessageQ queue;
   } osMailQ;
 
   /// Thread ID identifies the thread (pointer to a thread control block).
@@ -376,7 +381,7 @@ extern "C"
     const char* name;
     uint32_t items; ///< number of elements in the queue
     uint32_t item_sz; ///< size of an item
-    void* queue; ///< memory array for messages
+    void* queue; ///< pointer to memory array for messages
     uint32_t queue_sz;
     osMessageQ* data;
   } osMessageQDef_t;
@@ -387,9 +392,12 @@ extern "C"
   {
     const char* name;
     uint32_t items; ///< number of elements in the queue
-    uint32_t item_sz; ///< size of an item
-    void* queue; ///< memory array for mail
-    uint32_t queue_size;
+    uint32_t pool_item_sz; ///< size of a pool item
+    uint32_t queue_item_sz; ///< size of a queue item
+    void* pool; ///< pointer to memory array for pool
+    uint32_t pool_sz;
+    void* queue; ///< pointer to memory array for queue
+    uint32_t queue_sz;
     osMailQ* data;
   } osMailQDef_t;
 
@@ -483,7 +491,7 @@ const osThreadDef_t os_thread_def_##name = \
   /// @return thread ID for reference by other functions or NULL in case of error.
   /// @note MUST REMAIN UNCHANGED: @b osThreadCreate shall be consistent in every CMSIS-RTOS.
   osThreadId
-  osThreadCreate (const osThreadDef_t *thread_def, void *argument);
+  osThreadCreate (const osThreadDef_t* thread_def, void* argument);
 
   /// Return the thread ID of the current running thread.
   /// @return thread ID for reference by other functions or NULL in case of error.
@@ -569,8 +577,8 @@ const osTimerDef_t os_timer_def_##name = \
   /// @return timer ID for reference by other functions or NULL in case of error.
   /// @note MUST REMAIN UNCHANGED: @b osTimerCreate shall be consistent in every CMSIS-RTOS.
   osTimerId
-  osTimerCreate (const osTimerDef_t *timer_def, os_timer_type type,
-                 void *argument);
+  osTimerCreate (const osTimerDef_t* timer_def, os_timer_type type,
+                 void* argument);
 
   /// Start or restart a timer.
   /// @param [in]     timer_id      timer ID obtained by @ref osTimerCreate.
@@ -648,7 +656,7 @@ const osMutexDef_t os_mutex_def_##name = \
   /// @return mutex ID for reference by other functions or NULL in case of error.
   /// @note MUST REMAIN UNCHANGED: @b osMutexCreate shall be consistent in every CMSIS-RTOS.
   osMutexId
-  osMutexCreate (const osMutexDef_t *mutex_def);
+  osMutexCreate (const osMutexDef_t* mutex_def);
 
   /// Wait until a Mutex becomes available.
   /// @param [in]     mutex_id      mutex ID obtained by @ref osMutexCreate.
@@ -703,7 +711,7 @@ const osSemaphoreDef_t os_semaphore_def_##name = \
   /// @return semaphore ID for reference by other functions or NULL in case of error.
   /// @note MUST REMAIN UNCHANGED: @b osSemaphoreCreate shall be consistent in every CMSIS-RTOS.
   osSemaphoreId
-  osSemaphoreCreate (const osSemaphoreDef_t *semaphore_def, int32_t count);
+  osSemaphoreCreate (const osSemaphoreDef_t* semaphore_def, int32_t count);
 
   /// Wait until a Semaphore token becomes available.
   /// @param [in]     semaphore_id  semaphore object referenced with @ref osSemaphoreCreate.
@@ -743,11 +751,10 @@ const osSemaphoreDef_t os_semaphore_def_##name = \
 #define osPoolDef(name, no, type)   \
 extern const osPoolDef_t os_pool_def_##name
 #else                            // define the object
-#define osPoolDef(name, no, type)   \
-struct os_pool_data os_pool_data_##name; \
-type os_pool_mem_##name[no]; \
+#define osPoolDef(name, items, type)   \
+struct { struct os_pool_data data; type pool[items]; } os_pool_##name; \
 const osPoolDef_t os_pool_def_##name = \
-{ "##name", (no), sizeof(type), os_pool_mem_##name, sizeof(os_pool_mem_##name), &os_pool_data_##name }
+{ "##name", (items), sizeof(type), os_pool_##name.pool, sizeof(os_pool_##name.pool), &os_pool_##name.data }
 #endif
 
   /// @brief Access a Memory Pool definition.
@@ -762,20 +769,20 @@ const osPoolDef_t os_pool_def_##name = \
   /// @return memory pool ID for reference by other functions or NULL in case of error.
   /// @note MUST REMAIN UNCHANGED: @b osPoolCreate shall be consistent in every CMSIS-RTOS.
   osPoolId
-  osPoolCreate (const osPoolDef_t *pool_def);
+  osPoolCreate (const osPoolDef_t* pool_def);
 
   /// Allocate a memory block from a memory pool.
   /// @param [in]     pool_id       memory pool ID obtain referenced with @ref osPoolCreate.
   /// @return address of the allocated memory block or NULL in case of no memory available.
   /// @note MUST REMAIN UNCHANGED: @b osPoolAlloc shall be consistent in every CMSIS-RTOS.
-  void *
+  void*
   osPoolAlloc (osPoolId pool_id);
 
   /// Allocate a memory block from a memory pool and set memory block to zero.
   /// @param [in]     pool_id       memory pool ID obtain referenced with @ref osPoolCreate.
   /// @return address of the allocated memory block or NULL in case of no memory available.
   /// @note MUST REMAIN UNCHANGED: @b osPoolCAlloc shall be consistent in every CMSIS-RTOS.
-  void *
+  void*
   osPoolCAlloc (osPoolId pool_id);
 
   /// Return an allocated memory block back to a specific memory pool.
@@ -784,7 +791,7 @@ const osPoolDef_t os_pool_def_##name = \
   /// @return status code that indicates the execution status of the function.
   /// @note MUST REMAIN UNCHANGED: @b osPoolFree shall be consistent in every CMSIS-RTOS.
   osStatus
-  osPoolFree (osPoolId pool_id, void *block);
+  osPoolFree (osPoolId pool_id, void* block);
 
 #endif   // Memory Pool Management available
 
@@ -802,11 +809,19 @@ const osPoolDef_t os_pool_def_##name = \
 #define osMessageQDef(name, queue_sz, type)   \
 extern const osMessageQDef_t os_messageQ_def_##name
 #else                            // define the object
-#define osMessageQDef(name, queue_sz, type)   \
-struct os_messageQ_data os_messageQ_data_##name; \
-void* os_messageQ_mem_##name[queue_sz]; \
-const osMessageQDef_t os_messageQ_def_##name = \
-{ "##name", (queue_sz), sizeof (type), os_messageQ_mem_##name, sizeof(os_messageQ_mem_##name), &os_messageQ_data_##name }
+#define osMessageQDef(name, items, type)   \
+struct { \
+    struct os_messageQ_data data; \
+    void* queue[items]; \
+} os_messageQ_##name; \
+const osMessageQDef_t os_messageQ_def_##name = { \
+    "##name", \
+    (items), \
+    sizeof (void*), \
+    os_messageQ_##name.queue, \
+    sizeof(os_messageQ_##name.queue), \
+    &os_messageQ_##name.data \
+}
 #endif
 
   /// @brief Access a Message Queue Definition.
@@ -822,7 +837,7 @@ const osMessageQDef_t os_messageQ_def_##name = \
   /// @return message queue ID for reference by other functions or NULL in case of error.
   /// @note MUST REMAIN UNCHANGED: @b osMessageCreate shall be consistent in every CMSIS-RTOS.
   osMessageQId
-  osMessageCreate (const osMessageQDef_t *queue_def, osThreadId thread_id);
+  osMessageCreate (const osMessageQDef_t* queue_def, osThreadId thread_id);
 
   /// Put a Message to a Queue.
   /// @param [in]     queue_id      message queue ID obtained with @ref osMessageCreate.
@@ -857,11 +872,23 @@ const osMessageQDef_t os_messageQ_def_##name = \
 #define osMailQDef(name, queue_sz, type) \
 extern const osMailQDef_t os_mailQ_def_##name
 #else                            // define the object
-#define osMailQDef(name, queue_sz, type) \
-struct os_mailQ_data osmailQ_data_##name; \
-type os_mailQ_mem_##name[queue_sz]; \
-const osMailQDef_t os_mailQ_def_##name =  \
-{ "##name", (queue_sz), sizeof (type), os_mailQ_mem_##name, sizeof(os_mailQ_mem_##name), &osmailQ_data_##name }
+#define osMailQDef(name, items, type) \
+struct { \
+    os_mailQ_data data; \
+    type pool[items]; \
+    void* queue[items]; \
+} osmailQ_##name; \
+const osMailQDef_t os_mailQ_def_##name = { \
+    "##name", \
+    (items), \
+    sizeof (type), \
+    sizeof (void*), \
+    os_mailQ_##name.pool, \
+    sizeof(os_mailQ_##name.pool), \
+    os_mailQ_##name.queue, \
+    sizeof(os_mailQ_##name.queue), \
+    &osmailQ_##name.data \
+}
 #endif
 
   /// @brief Access a Mail Queue Definition.
@@ -877,14 +904,14 @@ const osMailQDef_t os_mailQ_def_##name =  \
   /// @return mail queue ID for reference by other functions or NULL in case of error.
   /// @note MUST REMAIN UNCHANGED: @b osMailCreate shall be consistent in every CMSIS-RTOS.
   osMailQId
-  osMailCreate (const osMailQDef_t *queue_def, osThreadId thread_id);
+  osMailCreate (const osMailQDef_t* queue_def, osThreadId thread_id);
 
   /// Allocate a memory block from a mail.
   /// @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
   /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out
   /// @return pointer to memory block that can be filled with mail or NULL in case of error.
   /// @note MUST REMAIN UNCHANGED: @b osMailAlloc shall be consistent in every CMSIS-RTOS.
-  void *
+  void*
   osMailAlloc (osMailQId queue_id, uint32_t millisec);
 
   /// Allocate a memory block from a mail and set memory block to zero.
@@ -892,7 +919,7 @@ const osMailQDef_t os_mailQ_def_##name =  \
   /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out
   /// @return pointer to memory block that can be filled with mail or NULL in case of error.
   /// @note MUST REMAIN UNCHANGED: @b osMailCAlloc shall be consistent in every CMSIS-RTOS.
-  void *
+  void*
   osMailCAlloc (osMailQId queue_id, uint32_t millisec);
 
   /// Put a mail to a queue.
@@ -901,7 +928,7 @@ const osMailQDef_t os_mailQ_def_##name =  \
   /// @return status code that indicates the execution status of the function.
   /// @note MUST REMAIN UNCHANGED: @b osMailPut shall be consistent in every CMSIS-RTOS.
   osStatus
-  osMailPut (osMailQId queue_id, void *mail);
+  osMailPut (osMailQId queue_id, void* mail);
 
   /// Get a mail from a queue.
   /// @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
@@ -917,7 +944,7 @@ const osMailQDef_t os_mailQ_def_##name =  \
   /// @return status code that indicates the execution status of the function.
   /// @note MUST REMAIN UNCHANGED: @b osMailFree shall be consistent in every CMSIS-RTOS.
   osStatus
-  osMailFree (osMailQId queue_id, void *mail);
+  osMailFree (osMailQId queue_id, void* mail);
 
 #endif  // Mail Queues available
 

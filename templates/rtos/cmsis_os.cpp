@@ -28,6 +28,7 @@
 #include <cmsis_os_ex.h>
 #include <cmsis-plus/rtos/os.h>
 
+#include <cstring>
 #include <new>
 
 using namespace os::cmsis::rtos;
@@ -35,16 +36,25 @@ using namespace os::cmsis::rtos;
 // ----------------------------------------------------------------------------
 
 // Validate C structs sizes (should match the C++ objects sizes).
+// TODO: validate individual members (size & offset).
 
 static_assert(sizeof(Thread) == sizeof(osThread), "adjust size of osThread");
 static_assert(sizeof(thread::Attributes) == sizeof(osThreadAttr), "adjust size of osThreadAttr");
 
 static_assert(sizeof(Timer) == sizeof(osTimer), "adjust size of osTimer");
+static_assert(sizeof(timer::Attributes) == sizeof(osTimerAttr), "adjust size of osTimerAttr");
+
 static_assert(sizeof(Mutex) == sizeof(osMutex), "adjust size of osMutex");
+static_assert(sizeof(mutex::Attributes) == sizeof(osMutexAttr), "adjust size of osMutexAttr");
+
 static_assert(sizeof(Semaphore) == sizeof(osSemaphore), "adjust size of osSemaphore");
+static_assert(sizeof(semaphore::Attributes) == sizeof(osSemaphoreAttr), "adjust size of osSemaphoreAttr");
+
 static_assert(sizeof(Pool) == sizeof(osPool), "adjust size of osPool");
+static_assert(sizeof(pool::Attributes) == sizeof(osPoolAttr), "adjust size of osPoolAttr");
+
 static_assert(sizeof(Message_queue) == sizeof(osMessageQ), "adjust size of osMessageQ");
-static_assert(sizeof(Mail_queue) == sizeof(osMailQ), "adjust size of osMailQ");
+static_assert(sizeof(mqueue::Attributes) == sizeof(osMessageQAttr), "adjust size of osMessageQAttr");
 
 // ----------------------------------------------------------------------------
 
@@ -86,7 +96,7 @@ osKernelSysTick (void)
 //  ==== Thread Management ====
 
 osThreadId
-osThreadCreate (const osThreadDef_t *thread_def, void *args)
+osThreadCreate (const osThreadDef_t* thread_def, void* args)
 {
   Thread* thread = new (thread_def->data) Thread (
       (thread::func_t) thread_def->pthread, args);
@@ -178,7 +188,7 @@ osWaitEx (uint32_t millisec)
 //  ==== Timer Management Functions ====
 
 osTimerId
-osTimerCreate (const osTimerDef_t *timer_def, os_timer_type type, void *args)
+osTimerCreate (const osTimerDef_t* timer_def, os_timer_type type, void* args)
 {
   timer::Attributes attr
     { timer_def->name };
@@ -262,7 +272,7 @@ osSignalWaitEx (int32_t signals, uint32_t millisec)
 //  ==== Mutex Management ====
 
 osMutexId
-osMutexCreate (const osMutexDef_t *mutex_def)
+osMutexCreate (const osMutexDef_t* mutex_def)
 {
   return reinterpret_cast<osMutexId> (new ((void*) &mutex_def->data) Mutex ());
 }
@@ -320,7 +330,7 @@ osMutexDelete (osMutexId mutex_id)
 #if (defined (osFeature_Semaphore)  &&  (osFeature_Semaphore != 0))
 
 osSemaphoreId
-osSemaphoreCreate (const osSemaphoreDef_t *semaphore_def, int32_t count)
+osSemaphoreCreate (const osSemaphoreDef_t* semaphore_def, int32_t count)
 {
   semaphore::Attributes attr
     { semaphore_def->name };
@@ -380,7 +390,7 @@ osSemaphoreDelete (osSemaphoreId semaphore_id)
 #if (defined (osFeature_Pool)  &&  (osFeature_Pool != 0))
 
 osPoolId
-osPoolCreate (const osPoolDef_t *pool_def)
+osPoolCreate (const osPoolDef_t* pool_def)
 {
   pool::Attributes attr
     { pool_def->name };
@@ -398,20 +408,26 @@ osPoolCreateEx (osPool* addr, const osPoolAttr* attr, size_t items,
       (pool::size_t) item_size_bytes));
 }
 
-void *
+void*
 osPoolAlloc (osPoolId pool_id)
 {
-  return (reinterpret_cast<Pool&> (pool_id)).alloc ();
+  return (reinterpret_cast<Pool&> (pool_id)).try_alloc ();
 }
 
-void *
+void*
 osPoolCAlloc (osPoolId pool_id)
 {
-  return (reinterpret_cast<Pool&> (pool_id)).calloc ();
+  void* ret;
+  ret = (reinterpret_cast<Pool&> (pool_id)).try_alloc ();
+  if (ret != nullptr)
+    {
+      memset (ret, 0, (reinterpret_cast<Pool&> (pool_id)).block_size ());
+    }
+  return ret;
 }
 
 osStatus
-osPoolFree (osPoolId pool_id, void *block)
+osPoolFree (osPoolId pool_id, void* block)
 {
   return static_cast<osStatus> ((reinterpret_cast<Pool&> (pool_id)).free (block));
 }
@@ -431,7 +447,7 @@ osPoolDeleteEx (osPoolId pool_id)
 #if (defined (osFeature_MessageQ)  &&  (osFeature_MessageQ != 0))
 
 osMessageQId
-osMessageCreate (const osMessageQDef_t *queue_def,
+osMessageCreate (const osMessageQDef_t* queue_def,
                  osThreadId thread_id __attribute__((unused)))
 {
 #if 0
@@ -498,19 +514,25 @@ osMessageGet (osMessageQId queue_id, uint32_t millisec)
     {
       res = (reinterpret_cast<Message_queue&> (queue_id)).receive (
           (const char*) &msg, sizeof(uint32_t), NULL);
+      // result::event_message;
     }
   else if (millisec == 0)
     {
       res = (reinterpret_cast<Message_queue&> (queue_id)).try_receive (
           (const char*) &msg, sizeof(uint32_t), NULL);
+      // result::event_message when message;
+      // result::ok when no meessage
     }
   else
     {
       res = (reinterpret_cast<Message_queue&> (queue_id)).timed_receive (
           (const char*) &msg, sizeof(uint32_t), NULL,
           Systick_clock::ticks_cast (millisec * 1000u));
+      // result::event_message when message;
+      // result::event_timeout when timeout;
     }
 
+  // TODO: be sure osEventMessage is returned when appropriate.
   event.status = static_cast<osStatus> (res);
   event.value.v = msg;
   return event;
@@ -533,38 +555,74 @@ osMessageDeleteEx (osMessageQId queue_id)
 #if (defined (osFeature_MailQ)  &&  (osFeature_MailQ != 0))
 
 osMailQId
-osMailCreate (const osMailQDef_t *queue_def, osThreadId thread_id)
+osMailCreate (const osMailQDef_t* queue_def,
+              osThreadId thread_id __attribute__((unused)))
 {
-  return reinterpret_cast<osMailQId> (new ((void*) &queue_def->data) Mail_queue (
-      queue_def->name, queue_def->queue_size, queue_def->item_sz,
-      queue_def->queue, reinterpret_cast<Thread*> (thread_id)));
+  pool::Attributes pool_attr
+    { queue_def->name };
+  pool_attr.set_pool_addr (queue_def->pool);
+  new ((void*) &queue_def->data->pool) Pool (
+      (pool::size_t) queue_def->pool_sz,
+      (pool::size_t) queue_def->pool_item_sz);
+
+  mqueue::Attributes queue_attr
+    { queue_def->name };
+  queue_attr.queue_addr = queue_def->queue;
+  queue_attr.queue_size_bytes = queue_def->queue_sz;
+  new ((void*) &queue_def->data->queue) Message_queue (
+      queue_attr, (mqueue::size_t) queue_def->items,
+      (mqueue::size_t) queue_def->queue_item_sz);
+
+  return (osMailQId) (&queue_def->data);
 }
 
-osMailQId
-osMailCreateEx (osMailQ* addr, const char* name, size_t messages,
-                size_t message_size, void* mem, osThreadId thread_id)
-{
-  return reinterpret_cast<osMailQId> (new ((void*) addr) Mail_queue (
-      name, messages, message_size, mem, reinterpret_cast<Thread*> (thread_id)));
-}
-
-void *
+void*
 osMailAlloc (osMailQId queue_id, uint32_t millisec)
 {
-  return (reinterpret_cast<Mail_queue&> (queue_id)).alloc (millisec);
+  void* ret = nullptr;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+  if (millisec == osWaitForever)
+    {
+      ret = (reinterpret_cast<Pool&> (queue_id->pool)).alloc ();
+    }
+  else if (millisec == 0)
+    {
+      ret = (reinterpret_cast<Pool&> (queue_id->pool)).try_alloc ();
+    }
+  else
+    {
+      ret = (reinterpret_cast<Pool&> (queue_id->pool)).timed_alloc (
+          Systick_clock::ticks_cast (millisec * 1000u));
+    }
+#pragma GCC diagnostic pop
+  return ret;
 }
 
-void *
+void*
 osMailCAlloc (osMailQId queue_id, uint32_t millisec)
 {
-  return (reinterpret_cast<Mail_queue&> (queue_id)).calloc (millisec);
+  void* ret = osMailAlloc (queue_id, millisec);
+  if (ret != nullptr)
+    {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+      memset (ret, 0,
+              (reinterpret_cast<Pool&> ((queue_id->pool))).block_size ());
+#pragma GCC diagnostic pop
+    }
+  return ret;
 }
 
 osStatus
-osMailPut (osMailQId queue_id, void *mail)
+osMailPut (osMailQId queue_id, void* mail)
 {
-  return static_cast<osStatus> ((reinterpret_cast<Mail_queue&> (queue_id)).put (
-      mail));
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+  return static_cast<osStatus> ((reinterpret_cast<Message_queue&> ((queue_id->queue))).try_send (
+      (const char*) mail, sizeof(void*), 0));
+#pragma GCC diagnostic pop
 }
 
 #pragma GCC diagnostic push
@@ -574,25 +632,47 @@ osEvent
 osMailGet (osMailQId queue_id, uint32_t millisec)
 {
   osEvent event;
-  result_t res = (reinterpret_cast<Mail_queue&> (queue_id)).get (
-      millisec, (void**) &event.value.p);
+  void* msg;
+  result_t res;
+  if (millisec == osWaitForever)
+    {
+      res = (reinterpret_cast<Message_queue&> (queue_id)).receive (
+          (const char*) &msg, sizeof(void*), NULL);
+    }
+  else if (millisec == 0)
+    {
+      res = (reinterpret_cast<Message_queue&> (queue_id)).try_receive (
+          (const char*) &msg, sizeof(void*), NULL);
+    }
+  else
+    {
+      res = (reinterpret_cast<Message_queue&> (queue_id)).timed_receive (
+          (const char*) &msg, sizeof(void*), NULL,
+          Systick_clock::ticks_cast (millisec * 1000u));
+    }
+
   event.status = static_cast<osStatus> (res);
+  if (event.status == osEventMessage)
+    {
+      event.status = osEventMail;
+    }
+  event.value.p = msg;
   return event;
 }
 
 #pragma GCC diagnostic pop
 
 osStatus
-osMailFree (osMailQId queue_id, void *mail)
+osMailFree (osMailQId queue_id, void* mail)
 {
-  return static_cast<osStatus> ((reinterpret_cast<Mail_queue&> (queue_id)).free (
-      mail));
+  return osPoolFree (&(queue_id->pool), mail);
 }
 
 void
 osMailDeleteEx (osMailQId queue_id)
 {
-  (reinterpret_cast<Mail_queue&> (queue_id)).~Mail_queue ();
+  osPoolDeleteEx (&(queue_id->pool));
+  osMessageDeleteEx (&(queue_id->queue));
 }
 
 #endif /* Mail Queues available */

@@ -1548,8 +1548,8 @@ namespace os
        *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
-      Pool::Pool (pool::size_t items, pool::size_t item_size_bytes) :
-          Pool (pool::initializer, items, item_size_bytes)
+      Pool::Pool (pool::size_t blocks, pool::size_t block_size_bytes) :
+          Pool (pool::initializer, blocks, block_size_bytes)
       {
         ;
       }
@@ -1558,21 +1558,21 @@ namespace os
        *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
-      Pool::Pool (const pool::Attributes& attr, pool::size_t items,
-                  pool::size_t item_size_bytes) :
+      Pool::Pool (const pool::Attributes& attr, pool::size_t blocks,
+                  pool::size_t block_size_bytes) :
           Named_object (attr.get_name ())
       {
         assert(!kernel::is_in_irq ());
 
         pool_addr_ = attr.get_pool_addr ();
-        items_ = items;
-        item_size_bytes_ = item_size_bytes;
+        blocks_ = blocks;
+        block_size_bytes_ = block_size_bytes;
 
-        assert(items_ > 0);
-        assert(item_size_bytes_ > 0);
+        assert(blocks_ > 0);
+        assert(block_size_bytes_ > 0);
 
         trace::printf ("%s() @%p %s %d %d\n", __func__, this, get_name (),
-                       items_, item_size_bytes_);
+                       blocks_, block_size_bytes_);
       }
 
       /**
@@ -1594,10 +1594,30 @@ namespace os
        * It uses a critical section to protect simultaneous access from
        * other threads or interrupts.
        *
-       * @note Can be invoked from Interrupt Service Routines.
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       void*
       Pool::alloc (void)
+      {
+        assert(!kernel::is_in_irq ());
+
+        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+
+        // TODO
+        return nullptr;
+      }
+
+      /**
+       * @details
+       * Allocate a fixed size memory block from the memory pool.
+       *
+       * It uses a critical section to protect simultaneous access from
+       * other threads or interrupts.
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
+      void*
+      Pool::try_alloc (void)
       {
         trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
 
@@ -1607,18 +1627,19 @@ namespace os
 
       /**
        * @details
-       * Allocate a fixed size memory block from the memory pool and clear
-       * to zero the allocated block.
+       * Allocate a fixed size memory block from the memory pool.
        *
        * It uses a critical section to protect simultaneous access from
        * other threads or interrupts.
        *
-       * @note Can be invoked from Interrupt Service Routines.
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       void*
-      Pool::calloc (void)
+      Pool::timed_alloc (systicks_t ticks)
       {
-        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+        assert(!kernel::is_in_irq ());
+
+        trace::printf ("%s(%d) @%p %s\n", __func__, ticks, this, get_name ());
 
         // TODO
         return nullptr;
@@ -1636,6 +1657,15 @@ namespace os
        */
       result_t
       Pool::free (void* block)
+      {
+        trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
+
+        // TODO
+        return result::ok;
+      }
+
+      result_t
+      Pool::reset (void)
       {
         trace::printf ("%s() @%p %s\n", __func__, this, get_name ());
 
@@ -1737,14 +1767,14 @@ namespace os
                               mqueue::priority_t* mprio)
       {
         // TODO
-        return result::ok;
+        return result::event_message;
       }
 
       result_t
       Message_queue::try_receive (const char* msg, ::std::size_t nbytes,
                                   mqueue::priority_t* mprio)
       {
-        // TODO
+        // TODO return result::event_message when message;
         return result::ok;
       }
 
@@ -1752,62 +1782,13 @@ namespace os
       Message_queue::timed_receive (const char* msg, ::std::size_t nbytes,
                                     mqueue::priority_t* mprio, systicks_t ticks)
       {
-        // TODO
+        // TODO return result::event_message when message;
+        // TODO return result::event_timeout when timeout;
         return result::ok;
       }
 
       result_t
       Message_queue::reset (void)
-      {
-        // TODO
-        return result::ok;
-      }
-
-      // ======================================================================
-
-      Mail_queue::Mail_queue (const char* name, std::size_t messages,
-                              std::size_t message_size, void* mem,
-                              Thread* thread) :
-          Named_object (name)
-      {
-        // TODO
-      }
-
-      Mail_queue::~Mail_queue ()
-      {
-        // TODO
-      }
-
-      void*
-      Mail_queue::alloc (millis_t millisec)
-      {
-        // TODO
-        return nullptr;
-      }
-
-      void*
-      Mail_queue::calloc (millis_t millisec)
-      {
-        // TODO
-        return nullptr;
-      }
-
-      result_t
-      Mail_queue::put (void* mail)
-      {
-        // TODO
-        return result::ok;
-      }
-
-      result_t
-      Mail_queue::get (millis_t millisec, void** ret)
-      {
-        // TODO
-        return result::ok;
-      }
-
-      result_t
-      Mail_queue::free (void* mail)
       {
         // TODO
         return result::ok;
