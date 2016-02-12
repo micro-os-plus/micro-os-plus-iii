@@ -27,8 +27,6 @@
 
 namespace os
 {
-  namespace cmsis
-  {
     namespace driver
     {
       // ----------------------------------------------------------------------
@@ -173,7 +171,6 @@ namespace os
       }
 
     } /* namespace driver */
-  } /* namespace cmsis */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------

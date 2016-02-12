@@ -27,7 +27,7 @@
 #include <chrono>
 //#include <atomic>
 
-using namespace os::cmsis;
+using namespace os;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -102,9 +102,8 @@ sleep_for_ticks (uint32_t)
 #endif
 
 using namespace ::std::chrono;
-using namespace os::cmsis::std::chrono;
-using namespace os::cmsis::std;
-using namespace os::cmsis;
+using namespace os::std::chrono;
+using namespace os::std;
 using namespace os;
 
 int
@@ -175,10 +174,10 @@ main (int argc, char* argv[])
   auto tp = chrono::Systick_clock::now ();
   trace::printf ("Systick_clock::now() = %d ticks\n", tp);
 
-  auto tp2 = cmsis::std::chrono::system_clock::now ();
+  auto tp2 = os::std::chrono::system_clock::now ();
   trace::printf ("system_clock::now() = %ld us\n", tp2);
 
-  auto tp3 = cmsis::std::chrono::high_resolution_clock::now ();
+  auto tp3 = os::std::chrono::high_resolution_clock::now ();
   trace::printf ("high_resolution_clock::now() = %ld ns\n", tp3);
 
 #pragma GCC diagnostic pop

@@ -21,7 +21,7 @@
 
 #include <cassert>
 
-using namespace os::cmsis::driver;
+using namespace os::driver;
 
 class Test_usb_device : public usb::Device
 {

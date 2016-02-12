@@ -60,7 +60,7 @@ namespace _3
   int
   test3 (void)
   {
-    using namespace os::cmsis;
+    using namespace os;
 
     args_t args
       { 7 };
@@ -73,9 +73,9 @@ namespace _3
         static uint8_t stack2[300];
         rtos::thread::Attributes attr2
           { "thread2" };
-        attr2.set_stack_address ((void*) stack2);
-        attr2.set_stack_size_bytes (sizeof(stack2));
-        attr2.set_priority (rtos::thread::priority::normal);
+        attr2.th_stack_address = ((void*) stack2);
+        attr2.th_stack_size_bytes = (sizeof(stack2));
+        attr2.th_priority = (rtos::thread::priority::normal);
 
         // Thread with custom attributes
         rtos::Thread th13
@@ -110,10 +110,10 @@ namespace _3
 
         rtos::mutex::Attributes attr4
           { "mx4" };
-        attr4.set_prio_ceiling (77);
-        attr4.set_protocol (rtos::mutex::protocol::inherit);
-        attr4.set_robustness (rtos::mutex::robustness::robust);
-        attr4.set_type (rtos::mutex::type::recursive);
+        attr4.mx_priority_ceiling = (77);
+        attr4.mx_protocol = (rtos::mutex::protocol::inherit);
+        attr4.mx_robustness = (rtos::mutex::robustness::robust);
+        attr4.mx_type = (rtos::mutex::type::recursive);
 
         rtos::Mutex mx4
           { attr4 };

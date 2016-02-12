@@ -42,73 +42,67 @@
 
 namespace os
 {
-  namespace cmsis
+  namespace rtos
   {
-    namespace rtos
+    class Thread;
+
+    namespace impl
     {
-      class Thread;
-
-      namespace impl
-      {
-        // ----------------------------------------------------------------------
-
-        // Simple collection of threads, ordered by priorities.
-        class Prioritised_list
-        {
-        public:
-
-          Prioritised_list ();
-          ~Prioritised_list ();
-#if 1
-          void
-          add (Thread* thread);
-          void
-          remove (Thread* thread);
-
-          Thread*
-          get_top (void);
-
-          ::std::size_t
-          get_length ();
-
-          // TODO add iterator begin(), end()
-
-#endif
-        protected:
-
-          Thread* array_[OS_INTEGER_MAX_NUMBER_OF_THREADS];
-          ::std::size_t count_;
-        };
       // ----------------------------------------------------------------------
 
-      } /* namespace impl */
-    } /* namespace rtos */
-  } /* namespace cmsis */
+      // Simple collection of threads, ordered by priorities.
+      class Prioritised_list
+      {
+      public:
+
+        Prioritised_list ();
+        ~Prioritised_list ();
+#if 1
+        void
+        add (Thread* thread);
+        void
+        remove (Thread* thread);
+
+        Thread*
+        get_top (void);
+
+        ::std::size_t
+        get_length ();
+
+        // TODO add iterator begin(), end()
+
+#endif
+      protected:
+
+        Thread* array_[OS_INTEGER_MAX_NUMBER_OF_THREADS];
+        ::std::size_t count_;
+      };
+    // ----------------------------------------------------------------------
+
+    } /* namespace impl */
+  } /* namespace rtos */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------
 
 namespace os
 {
-  namespace cmsis
+  namespace rtos
   {
-    namespace rtos
+    namespace impl
     {
-      namespace impl
-      {
-        // ----------------------------------------------------------------------
-
-        inline ::std::size_t
-        Prioritised_list::get_length ()
-        {
-          return count_;
-        }
-
       // ----------------------------------------------------------------------
 
-      } /* namespace impl */
-    } /* namespace rtos */
-  } /* namespace cmsis */
+      inline ::std::size_t
+      Prioritised_list::get_length ()
+      {
+        return count_;
+      }
+
+    // ----------------------------------------------------------------------
+
+    } /* namespace impl */
+  } /* namespace rtos */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------

@@ -89,7 +89,7 @@ main (int argc, char* argv[])
   // At this stage the system clock should have already been configured
   // at high speed.
 
-  using namespace os::cmsis::rtos;
+  using namespace os::rtos;
 
   char* ch1;
   char* ch2;

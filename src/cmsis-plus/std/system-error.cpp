@@ -28,98 +28,95 @@
 
 // ----------------------------------------------------------------------------
 
-using namespace os::cmsis;
-
 namespace os
 {
-  namespace cmsis
+  namespace std
   {
-    namespace std
+    // ======================================================================
+
+    using namespace os;
+
+#if defined(__EXCEPTIONS)
+
+    struct system_error_category : public ::std::error_category
     {
-      // ======================================================================
-
-#if defined(__EXCEPTIONS)
-
-      struct system_error_category : public ::std::error_category
+      virtual const char*
+      name () const noexcept
       {
-        virtual const char*
-        name () const noexcept
-        {
-          return "system";
-        }
+        return "system";
+      }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-        virtual ::std::string
-        message (int i) const
-        {
+      virtual ::std::string
+      message (int i) const
+      {
 #if defined(DEBUG)
-          return ::std::string (strerror (i));
+        return ::std::string (strerror (i));
 #else
-          return ::std::string ("");
+        return ::std::string ("");
 #endif
-        }
+      }
 
 #pragma GCC diagnostic pop
 
-      };
+    };
 
-      struct cmsis_error_category : public ::std::error_category
+    struct cmsis_error_category : public ::std::error_category
+    {
+      virtual const char*
+      name () const noexcept
       {
-        virtual const char*
-        name () const noexcept
-        {
-          return "cmsis";
-        }
+        return "cmsis";
+      }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-        virtual ::std::string
-        message (int i) const
-        {
+      virtual ::std::string
+      message (int i) const
+      {
 #if defined(DEBUG)
-          return ::std::string (rtos::kernel::strerror ((rtos::status_t) i));
+        return ::std::string (rtos::kernel::strerror ((rtos::status_t) i));
 #else
-          return ::std::string ("");
+        return ::std::string ("");
 #endif
-        }
+      }
 
 #pragma GCC diagnostic pop
 
-      };
+    };
 
 #endif
 
-      void
-      __throw_system_error (int ev, const char* what_arg)
-      {
+    void
+    __throw_system_error (int ev, const char* what_arg)
+    {
 #if defined(__EXCEPTIONS)
-        throw ::std::system_error (
-            ::std::error_code (ev, system_error_category ()), what_arg);
+      throw ::std::system_error (
+          ::std::error_code (ev, system_error_category ()), what_arg);
 #else
-        trace_printf ("system_error(%d, %s)\n", ev, what_arg);
-        ::std::abort ();
+      trace_printf ("system_error(%d, %s)\n", ev, what_arg);
+      ::std::abort ();
 #endif
-      }
+    }
 
-      void
-      __throw_cmsis_error (int ev, const char* what_arg)
-      {
+    void
+    __throw_cmsis_error (int ev, const char* what_arg)
+    {
 #if defined(__EXCEPTIONS)
-        throw ::std::system_error (
-            ::std::error_code (ev, cmsis_error_category ()), what_arg);
+      throw ::std::system_error (
+          ::std::error_code (ev, cmsis_error_category ()), what_arg);
 #else
-        trace_printf ("system_error(%d, %s)\n", ev, what_arg);
-        ::std::abort ();
+      trace_printf ("system_error(%d, %s)\n", ev, what_arg);
+      ::std::abort ();
 #endif
-      }
+    }
 
-    // ------------------------------------------------------------------------
+  // ------------------------------------------------------------------------
 
-    } /* namespace std */
-  } /* namespace cmsis */
+  } /* namespace std */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------

@@ -26,8 +26,6 @@
 
 namespace os
 {
-  namespace cmsis
-  {
     namespace trace
     {
       // ------------------------------------------------------------------------
@@ -47,7 +45,6 @@ namespace os
       }
 
     } /* namespace trace */
-  }
 } /* namespace os */
 
 #endif /* defined(TRACE) */

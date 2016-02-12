@@ -29,8 +29,6 @@
 
 namespace os
 {
-  namespace cmsis
-  {
     namespace trace
     {
       // ------------------------------------------------------------------------
@@ -99,7 +97,6 @@ namespace os
 #endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
 
     } /* namespace trace */
-  } /* namespace cmsis */
 } /* namespace os */
 
 #endif /* defined(OS_USE_TRACE_ITM) */

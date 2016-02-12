@@ -19,118 +19,115 @@
 #include <cmsis-plus/std/thread>
 #include <cstdlib>
 
-using namespace os::cmsis;
-
 // ----------------------------------------------------------------------------
 
 namespace os
 {
-  namespace cmsis
+  namespace std
   {
-    namespace std
+    // ----------------------------------------------------------------------
+
+    using namespace os;
+
+    thread::thread (thread&& t) noexcept
     {
-      // ----------------------------------------------------------------------
+      swap (t);
+    }
 
-      thread::thread (thread&& t) noexcept
-      {
-        swap (t);
-      }
+    thread&
+    thread::operator= (thread&& t) noexcept
+    {
+      if (joinable ())
+        {
+          trace::printf ("%s() @%p attempt to assign a running thread\n",
+                         __PRETTY_FUNCTION__, this);
+          ::std::abort (); // in ISO it is std::terminate()
+        }
+      swap (t);
+      return *this;
+    }
 
-      thread&
-      thread::operator= (thread&& t) noexcept
-      {
-        if (joinable ())
-          {
-            trace::printf ("%s() @%p attempt to assign a running thread\n",
-                           __PRETTY_FUNCTION__, this);
-            ::std::abort (); // in ISO it is std::terminate()
-          }
-        swap (t);
-        return *this;
-      }
+    void
+    thread::delete_system_thread (void)
+    {
+      if (id_ != id ())
+        {
+          void* args = id_.native_thread_->function_args ();
+          if (args != nullptr && function_object_deleter_ != nullptr)
+            {
+              // Manually delete the function object used to store arguments.
+              function_object_deleter_ (args);
+            }
 
-      void
-      thread::delete_system_thread (void)
-      {
-        if (id_ != id ())
-          {
-            void* args = id_.native_thread_->function_args ();
-            if (args != nullptr && function_object_deleter_ != nullptr)
-              {
-                // Manually delete the function object used to store arguments.
-                function_object_deleter_ (args);
-              }
+          // Manually delete the system thread.
+          delete id_.native_thread_;
+        }
+    }
 
-            // Manually delete the system thread.
-            delete id_.native_thread_;
-          }
-      }
+    thread::~thread ()
+    {
+      trace::printf ("%s() @%p\n", __func__, this);
+      if (joinable ())
+        {
+          trace::printf ("%s() @%p attempt to destruct a running thread\n",
+                         __PRETTY_FUNCTION__, this);
+          ::std::abort (); // in ISO it is std::terminate()
+        }
 
-      thread::~thread ()
-      {
-        trace::printf ("%s() @%p\n", __func__, this);
-        if (joinable ())
-          {
-            trace::printf ("%s() @%p attempt to destruct a running thread\n",
-                           __PRETTY_FUNCTION__, this);
-            ::std::abort (); // in ISO it is std::terminate()
-          }
+      delete_system_thread ();
+    }
 
-        delete_system_thread ();
-      }
+    // ----------------------------------------------------------------------
 
-      // ----------------------------------------------------------------------
+    void
+    thread::swap (thread& t) noexcept
+    {
+      ::std::swap (id_, t.id_);
+      ::std::swap (function_object_deleter_, t.function_object_deleter_);
+    }
 
-      void
-      thread::swap (thread& t) noexcept
-      {
-        ::std::swap (id_, t.id_);
-        ::std::swap (function_object_deleter_, t.function_object_deleter_);
-      }
+    bool
+    thread::joinable () const noexcept
+    {
+      return !(id_ == thread::id ());
+    }
 
-      bool
-      thread::joinable () const noexcept
-      {
-        return !(id_ == thread::id ());
-      }
+    void
+    thread::join ()
+    {
+      trace::printf ("%s() @%p\n", __func__, this);
 
-      void
-      thread::join ()
-      {
-        trace::printf ("%s() @%p\n", __func__, this);
+      delete_system_thread ();
 
-        delete_system_thread ();
+      id_ = id ();
+      trace::printf ("%s() @%p joined\n", __func__, this);
+    }
 
-        id_ = id ();
-        trace::printf ("%s() @%p joined\n", __func__, this);
-      }
+    void
+    thread::detach ()
+    {
+      trace::printf ("%s() @%p\n", __func__, this);
+      if (id_ != id ())
+        {
+          id_.native_thread_->detach ();
+        }
 
-      void
-      thread::detach ()
-      {
-        trace::printf ("%s() @%p\n", __func__, this);
-        if (id_ != id ())
-          {
-            id_.native_thread_->detach ();
-          }
+      // The detached thread will continue to run, but we'll not have
+      // access to it from here, not even to delete it.
+      // TODO: arrange to delete it at exit()?
 
-        // The detached thread will continue to run, but we'll not have
-        // access to it from here, not even to delete it.
-        // TODO: arrange to delete it at exit()?
+      id_ = id ();
+      trace::printf ("%s() @%p detached\n", __func__, this);
+    }
 
-        id_ = id ();
-        trace::printf ("%s() @%p detached\n", __func__, this);
-      }
+    namespace this_thread
+    {
 
-      namespace this_thread
-      {
+    } /* namespace this_thread */
 
-      } /* namespace this_thread */
+  // ------------------------------------------------------------------------
 
-    // ------------------------------------------------------------------------
-
-    } /* namespace std */
-  } /* namespace cmsis */
+  } /* namespace std */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------

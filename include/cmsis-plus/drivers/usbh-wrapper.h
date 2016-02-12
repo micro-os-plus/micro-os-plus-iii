@@ -39,8 +39,6 @@ extern "C"
 
 namespace os
 {
-  namespace cmsis
-  {
     namespace driver
     {
       // ======================================================================
@@ -164,7 +162,6 @@ namespace os
 #pragma GCC diagnostic pop
 
     } /* namespace driver */
-  } /* namespace cmsis */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------

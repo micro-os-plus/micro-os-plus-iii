@@ -32,84 +32,81 @@
 
 namespace os
 {
-  namespace cmsis
+  namespace driver
   {
-    namespace driver
+    namespace usb
     {
-      namespace usb
+      // ----------------------------------------------------------------------
+
+      Device::Device () noexcept
       {
-        // ----------------------------------------------------------------------
+        cb_device_func_ = nullptr;
+        cb_device_object_ = nullptr;
 
-        Device::Device () noexcept
-        {
-          cb_device_func_ = nullptr;
-          cb_device_object_ = nullptr;
+        cb_endpoint_func_ = nullptr;
+        cb_endpoint_object_ = nullptr;
+      }
 
-          cb_endpoint_func_ = nullptr;
-          cb_endpoint_object_ = nullptr;
-        }
+      void
+      Device::register_device_callback (device::signal_device_event_t cb_func,
+                                        const void* cb_object) noexcept
+      {
+        cb_device_func_ = cb_func;
+        cb_device_object_ = cb_object;
+      }
 
-        void
-        Device::register_device_callback (device::signal_device_event_t cb_func,
-                                          const void* cb_object) noexcept
-        {
-          cb_device_func_ = cb_func;
-          cb_device_object_ = cb_object;
-        }
+      void
+      Device::register_endpoint_callback (
+          device::signal_endpoint_event_t cb_func, const void* cb_object) noexcept
+      {
+        cb_endpoint_func_ = cb_func;
+        cb_endpoint_object_ = cb_object;
+      }
 
-        void
-        Device::register_endpoint_callback (
-            device::signal_endpoint_event_t cb_func, const void* cb_object) noexcept
-        {
-          cb_endpoint_func_ = cb_func;
-          cb_endpoint_object_ = cb_object;
-        }
+      // ----------------------------------------------------------------------
 
-        // ----------------------------------------------------------------------
+      return_t
+      Device::read_setup_packet (uint8_t* buf) noexcept
+      {
+        assert(buf != nullptr);
+        return do_read_setup_packet (buf);
+      }
 
-        return_t
-        Device::read_setup_packet (uint8_t* buf) noexcept
-        {
-          assert(buf != nullptr);
-          return do_read_setup_packet (buf);
-        }
+      return_t
+      Device::transfer (endpoint_t ep_addr, uint8_t* data, std::size_t num) noexcept
+      {
+        assert(data != nullptr);
+        if (num == 0)
+          {
+            return RETURN_OK;
+          }
+        return do_transfer (ep_addr, data, num);
+      }
 
-        return_t
-        Device::transfer (endpoint_t ep_addr, uint8_t* data, std::size_t num) noexcept
-        {
-          assert(data != nullptr);
-          if (num == 0)
-            {
-              return RETURN_OK;
-            }
-          return do_transfer (ep_addr, data, num);
-        }
+      // ----------------------------------------------------------------------
 
-        // ----------------------------------------------------------------------
+      void
+      Device::signal_device_event (event_t event) noexcept
+      {
+        if (cb_device_func_ != nullptr)
+          {
+            // Forward event to registered callback.
+            cb_device_func_ (cb_device_object_, event);
+          }
+      }
 
-        void
-        Device::signal_device_event (event_t event) noexcept
-        {
-          if (cb_device_func_ != nullptr)
-            {
-              // Forward event to registered callback.
-              cb_device_func_ (cb_device_object_, event);
-            }
-        }
+      void
+      Device::signal_endpoint_event (endpoint_t ep_addr, event_t event) noexcept
+      {
+        if (cb_endpoint_func_ != nullptr)
+          {
+            // Forward event to registered callback.
+            cb_endpoint_func_ (cb_endpoint_object_, ep_addr, event);
+          }
+      }
 
-        void
-        Device::signal_endpoint_event (endpoint_t ep_addr, event_t event) noexcept
-        {
-          if (cb_endpoint_func_ != nullptr)
-            {
-              // Forward event to registered callback.
-              cb_endpoint_func_ (cb_endpoint_object_, ep_addr, event);
-            }
-        }
-
-      } /* namespace usb */
-    } /* namespace driver */
-  } /* namespace cmsis */
+    } /* namespace usb */
+  } /* namespace driver */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------

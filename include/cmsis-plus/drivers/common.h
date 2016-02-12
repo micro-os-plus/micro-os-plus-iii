@@ -36,177 +36,174 @@
 
 namespace os
 {
-  namespace cmsis
+  namespace driver
   {
-    namespace driver
+    // ----------------------------------------------------------------------
+
+    using version_t = uint16_t;
+    using event_t = uint32_t;
+    using return_t = int32_t;
+    using power_t = uint32_t;
+
+    // ----- Return & error codes -----
+
+    ///< Operation succeeded
+    constexpr return_t RETURN_OK = 0;
+
+    ///< Unspecified error
+    constexpr return_t ERROR = -1;
+    ///< Driver is busy
+    constexpr return_t ERROR_BUSY = -2;
+    ///< Timeout occurred
+    constexpr return_t ERROR_TIMEOUT = -3;
+    ///< Operation not supported
+    constexpr return_t ERROR_UNSUPPORTED = -4;
+    ///< Parameter error
+    constexpr return_t ERROR_PARAMETER = -5;
+    ///< Start of driver specific errors
+    constexpr return_t ERROR_SPECIFIC = -6;
+
+    typedef void
+    (*signal_event_t) (const void* object, event_t event);
+
+    // ----------------------------------------------------------------------
+
+    enum class Power
+      : power_t
+        {
+          //
+
+      // Completely power off the device.
+      off,
+      // Low power mode.
+      low,
+      // Fully power on the
+      full
+    };
+
+    // ======================================================================
+
+    class Version
     {
-      // ----------------------------------------------------------------------
+    public:
 
-      using version_t = uint16_t;
-      using event_t = uint32_t;
-      using return_t = int32_t;
-      using power_t = uint32_t;
+      // --------------------------------------------------------------------
 
-      // ----- Return & error codes -----
+      constexpr
+      Version () noexcept;
 
-      ///< Operation succeeded
-      constexpr return_t RETURN_OK = 0;
+      constexpr
+      Version (version_t api, version_t drv) noexcept;
 
-      ///< Unspecified error
-      constexpr return_t ERROR = -1;
-      ///< Driver is busy
-      constexpr return_t ERROR_BUSY = -2;
-      ///< Timeout occurred
-      constexpr return_t ERROR_TIMEOUT = -3;
-      ///< Operation not supported
-      constexpr return_t ERROR_UNSUPPORTED = -4;
-      ///< Parameter error
-      constexpr return_t ERROR_PARAMETER = -5;
-      ///< Start of driver specific errors
-      constexpr return_t ERROR_SPECIFIC = -6;
+      Version (const Version&) = default;
 
-      typedef void
-      (*signal_event_t) (const void* object, event_t event);
+      Version&
+      operator= (const Version&) = default;
 
-      // ----------------------------------------------------------------------
+      ~Version () noexcept = default;
 
-      enum class Power
-        : power_t
-          {
-            //
+      // --------------------------------------------------------------------
 
-        // Completely power off the device.
-        off,
-        // Low power mode.
-        low,
-        // Fully power on the
-        full
-      };
+      version_t
+      get_api (void) const noexcept;
 
-      // ======================================================================
+      version_t
+      get_drv (void) const noexcept;
 
-      class Version
+      // --------------------------------------------------------------------
+
+    private:
+
+      version_t api_; ///< API version
+      version_t drv_; ///< Driver version
+    };
+
+    inline constexpr
+    Version::Version () noexcept :
+    api_ (0), //
+    drv_ (0)
       {
-      public:
-
-        // --------------------------------------------------------------------
-
-        constexpr
-        Version () noexcept;
-
-        constexpr
-        Version (version_t api, version_t drv) noexcept;
-
-        Version (const Version&) = default;
-
-        Version&
-        operator= (const Version&) = default;
-
-        ~Version () noexcept = default;
-
-        // --------------------------------------------------------------------
-
-        version_t
-        get_api (void) const noexcept;
-
-        version_t
-        get_drv (void) const noexcept;
-
-        // --------------------------------------------------------------------
-
-      private:
-
-        version_t api_; ///< API version
-        version_t drv_; ///< Driver version
-      };
-
-      inline constexpr
-      Version::Version () noexcept :
-      api_ (0), //
-      drv_ (0)
-        {
-          ;
-        }
-
-      inline constexpr
-      Version::Version (version_t api, version_t drv) noexcept :
-      api_ (api), //
-      drv_ (drv)
-        {
-          ;
-        }
-
-      inline version_t
-      Version::get_api (void) const noexcept
-      {
-        return api_;
+        ;
       }
 
-      inline version_t
-      Version::get_drv (void) const noexcept
+    inline constexpr
+    Version::Version (version_t api, version_t drv) noexcept :
+    api_ (api), //
+    drv_ (drv)
       {
-        return drv_;
+        ;
       }
 
-      // ========================================================================
+    inline version_t
+    Version::get_api (void) const noexcept
+    {
+      return api_;
+    }
 
-      class Base
-      {
+    inline version_t
+    Version::get_drv (void) const noexcept
+    {
+      return drv_;
+    }
 
-      public:
+    // ========================================================================
 
-        // --------------------------------------------------------------------
+    class Base
+    {
 
-        Base () noexcept = default;
+    public:
 
-        virtual
-        ~Base () noexcept = default;
+      // --------------------------------------------------------------------
 
-        // --------------------------------------------------------------------
+      Base () noexcept = default;
 
-        /**
-         * @brief       Get driver version.
-         * @return      @ref ARM_DRIVER_VERSION
-         */
-        const Version&
-        get_version (void) noexcept;
+      virtual
+      ~Base () noexcept = default;
 
-        /**
-         * @brief       Power up/down device.
-         * @param[in]   state  Power state
-         * @return      @ref execution_status
-         */
-        return_t
-        power (Power state) noexcept;
+      // --------------------------------------------------------------------
 
-        // --------------------------------------------------------------------
+      /**
+       * @brief       Get driver version.
+       * @return      @ref ARM_DRIVER_VERSION
+       */
+      const Version&
+      get_version (void) noexcept;
 
-      protected:
+      /**
+       * @brief       Power up/down device.
+       * @param[in]   state  Power state
+       * @return      @ref execution_status
+       */
+      return_t
+      power (Power state) noexcept;
 
-        virtual const Version&
-        do_get_version (void) noexcept = 0;
+      // --------------------------------------------------------------------
 
-        virtual return_t
-        do_power (Power state) noexcept = 0;
+    protected:
 
-      };
+      virtual const Version&
+      do_get_version (void) noexcept = 0;
 
-      // ----------------------------------------------------------------------
+      virtual return_t
+      do_power (Power state) noexcept = 0;
 
-      inline const Version&
-      Base::get_version (void) noexcept
-      {
-        return do_get_version ();
-      }
+    };
 
-      inline return_t
-      Base::power (Power state) noexcept
-      {
-        return do_power (state);
-      }
+    // ----------------------------------------------------------------------
 
-    } /* namespace driver */
-  } /* namespace cmsis */
+    inline const Version&
+    Base::get_version (void) noexcept
+    {
+      return do_get_version ();
+    }
+
+    inline return_t
+    Base::power (Power state) noexcept
+    {
+      return do_power (state);
+    }
+
+  } /* namespace driver */
 } /* namespace os */
 
 #endif /* __cplusplus */

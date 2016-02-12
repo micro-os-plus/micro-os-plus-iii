@@ -38,13 +38,13 @@
 // purposes.
 //
 // The API is simple, and mimics the standard C output calls:
-// - os::cmsis::trace::printf()/trace_printf()
-// - os::cmsis::trace::puts()/trace_puts()
-// - os::cmsis::trace::putchar()/trace_putchar();
+// - os::trace::printf()/trace_printf()
+// - os::trace::puts()/trace_puts()
+// - os::trace::putchar()/trace_putchar();
 //
 // The implementation is done in:
-// - os::cmsis::trace::initialize()
-// - os::cmsis::trace::write()
+// - os::trace::initialize()
+// - os::trace::write()
 // If these functions are not defined in another place, there are
 // weak definitions that simply discard the trace output.
 //
@@ -67,37 +67,34 @@
 
 namespace os
 {
-  namespace cmsis
+  namespace trace
   {
-    namespace trace
-    {
-      // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
 
-      void
-      initialize (void);
+    void
+    initialize (void);
 
-      ssize_t
-      write (const void* buf, ::std::size_t nbyte);
+    ssize_t
+    write (const void* buf, ::std::size_t nbyte);
 
-      // ----------------------------------------------------------------------
+    // ----------------------------------------------------------------------
 
-      int
-      printf (const char* format, ...);
+    int
+    printf (const char* format, ...);
 
-      int
-      vprintf (const char* format, ::std::va_list args);
+    int
+    vprintf (const char* format, ::std::va_list args);
 
-      int
-      puts (const char* s);
+    int
+    puts (const char* s);
 
-      int
-      putchar (int c);
+    int
+    putchar (int c);
 
-      void
-      dumpArgs (int argc, char* argv[]);
+    void
+    dumpArgs (int argc, char* argv[]);
 
-    } /* namespace trace */
-  } /* namespace cmsis */
+  } /* namespace trace */
 } /* namespace os */
 
 #endif /* defined(__cplusplus) */
@@ -148,9 +145,7 @@ extern "C"
 
 namespace os
   {
-    namespace cmsis
-      {
-        namespace trace
+         namespace trace
           {
             // ----------------------------------------------------------------
 
@@ -225,91 +220,90 @@ namespace os
 #pragma GCC diagnostic pop
 
           } /* namespace trace */
-      } /* namespace cmsis */
-  } /* namespace os */
+      } /* namespace os */
 
 #endif /* defined(__cplusplus) */
 
 #if defined(__cplusplus)
-extern "C"
-  {
+    extern "C"
+      {
 #endif
 
-    inline void
-    __initialize_trace (void);
+        inline void
+        __initialize_trace (void);
 
-    // Implementation dependent
-    inline ssize_t
-    trace_write (const void* buf, size_t nbyte);
+        // Implementation dependent
+        inline ssize_t
+        trace_write (const void* buf, size_t nbyte);
 
-    inline int
-    trace_printf (const char* format, ...);
+        inline int
+        trace_printf (const char* format, ...);
 
-    inline int
-    trace_vprintf (const char* format, va_list args);
+        inline int
+        trace_vprintf (const char* format, va_list args);
 
-    inline int
-    trace_puts (const char* s);
+        inline int
+        trace_puts (const char* s);
 
-    inline int
-    trace_putchar (int c);
+        inline int
+        trace_putchar (int c);
 
-    inline void
-    trace_dump_args (int argc, char* argv[]);
+        inline void
+        trace_dump_args (int argc, char* argv[]);
 
 #if defined(__cplusplus)
-  }
+      }
 #endif
 
-inline void
-__attribute__((always_inline))
-__initialize_trace (void)
-  {
-  }
+    inline void
+    __attribute__((always_inline))
+    __initialize_trace (void)
+      {
+      }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-inline ssize_t
-__attribute__((always_inline))
-trace_write (const void* buf, size_t nbyte)
-  {
-    return (ssize_t)nbyte;
-  }
+    inline ssize_t
+    __attribute__((always_inline))
+    trace_write (const void* buf, size_t nbyte)
+      {
+        return (ssize_t)nbyte;
+      }
 
-inline int
-__attribute__((always_inline))
-trace_printf (const char* format, ...)
-  {
-    return 0;
-  }
+    inline int
+    __attribute__((always_inline))
+    trace_printf (const char* format, ...)
+      {
+        return 0;
+      }
 
-inline int
-__attribute__((always_inline))
-trace_vprintf (const char* format, va_list args)
-  {
-    return 0;
-  }
+    inline int
+    __attribute__((always_inline))
+    trace_vprintf (const char* format, va_list args)
+      {
+        return 0;
+      }
 
-inline int
-__attribute__((always_inline))
-trace_puts (const char* s)
-  {
-    return 0;
-  }
+    inline int
+    __attribute__((always_inline))
+    trace_puts (const char* s)
+      {
+        return 0;
+      }
 
-inline int
-__attribute__((always_inline))
-trace_putchar (int c)
-  {
-    return c;
-  }
+    inline int
+    __attribute__((always_inline))
+    trace_putchar (int c)
+      {
+        return c;
+      }
 
-inline void
-__attribute__((always_inline))
-trace_dump_args (int argc, char* argv[])
-  {
-  }
+    inline void
+    __attribute__((always_inline))
+    trace_dump_args (int argc, char* argv[])
+      {
+      }
 
 #pragma GCC diagnostic pop
 

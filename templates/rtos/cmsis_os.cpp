@@ -31,7 +31,7 @@
 #include <cstring>
 #include <new>
 
-using namespace os::cmsis::rtos;
+using namespace os::rtos;
 
 // ----------------------------------------------------------------------------
 

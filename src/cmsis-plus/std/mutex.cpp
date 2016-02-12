@@ -20,104 +20,101 @@
 
 #include <cerrno>
 
-using namespace os::cmsis;
-
 // ----------------------------------------------------------------------------
 
 namespace os
 {
-  namespace cmsis
+  namespace std
   {
-    namespace std
+    // ======================================================================
+
+    using namespace os;
+
+    void
+    mutex::lock ()
     {
-      // ======================================================================
+      rtos::result_t res;
+      res = nm_.lock ();
+      if (res != rtos::result::ok)
+        {
+          __throw_cmsis_error ((int) res, "mutex lock failed");
+        }
+    }
 
-      void
-      mutex::lock ()
-      {
-        rtos::result_t res;
-        res = nm_.lock ();
-        if (res != rtos::result::ok)
-          {
-            __throw_cmsis_error ((int) res, "mutex lock failed");
-          }
-      }
+    bool
+    mutex::try_lock ()
+    {
+      rtos::result_t res;
+      res = nm_.try_lock ();
+      if (res == rtos::result::ok)
+        {
+          return true;
+        }
+      else if (res == ETIMEDOUT)
+        {
+          return false;
+        }
 
-      bool
-      mutex::try_lock ()
-      {
-        rtos::result_t res;
-        res = nm_.try_lock ();
-        if (res == rtos::result::ok)
-          {
-            return true;
-          }
-        else if (res == ETIMEDOUT)
-          {
-            return false;
-          }
+      __throw_cmsis_error ((int) res, "mutex try_lock failed");
+      return false;
+    }
 
-        __throw_cmsis_error ((int) res, "mutex try_lock failed");
-        return false;
-      }
+    void
+    mutex::unlock ()
+    {
+      rtos::result_t res;
+      res = nm_.unlock ();
+      if (res != rtos::result::ok)
+        {
+          __throw_cmsis_error ((int) res, "mutex unlock failed");
+        }
+    }
 
-      void
-      mutex::unlock ()
-      {
-        rtos::result_t res;
-        res = nm_.unlock ();
-        if (res != rtos::result::ok)
-          {
-            __throw_cmsis_error ((int) res, "mutex unlock failed");
-          }
-      }
+    // ======================================================================
 
-      // ======================================================================
+    void
+    recursive_mutex::lock ()
+    {
+      rtos::result_t res;
+      res = nm_.lock ();
+      if (res != rtos::result::ok)
+        {
+          __throw_cmsis_error ((int) res, "recursive_mutex lock failed");
+        }
+    }
 
-      void
-      recursive_mutex::lock ()
-      {
-        rtos::result_t res;
-        res = nm_.lock ();
-        if (res != rtos::result::ok)
-          {
-            __throw_cmsis_error ((int) res, "recursive_mutex lock failed");
-          }
-      }
+    bool
+    recursive_mutex::try_lock () noexcept
+    {
+      rtos::result_t res;
+      res = nm_.try_lock ();
+      if (res == rtos::result::ok)
+        {
+          return true;
+        }
+      else if (res == ETIMEDOUT)
+        {
+          return false;
+        }
 
-      bool
-      recursive_mutex::try_lock () noexcept
-      {
-        rtos::result_t res;
-        res = nm_.try_lock ();
-        if (res == rtos::result::ok)
-          {
-            return true;
-          }
-        else if (res == ETIMEDOUT)
-          {
-            return false;
-          }
+      __throw_cmsis_error ((int) res, "recursive_mutex try_lock failed");
+      return false;
+    }
 
-        __throw_cmsis_error ((int) res, "recursive_mutex try_lock failed");
-        return false;
-      }
+    void
+    recursive_mutex::unlock ()
+    {
+      rtos::result_t res;
+      res = nm_.unlock ();
+      if (res != rtos::result::ok)
+        {
+          __throw_cmsis_error ((int) res, "recursive_mutex unlock failed");
+        }
+    }
 
-      void
-      recursive_mutex::unlock ()
-      {
-        rtos::result_t res;
-        res = nm_.unlock ();
-        if (res != rtos::result::ok)
-          {
-            __throw_cmsis_error ((int) res, "recursive_mutex unlock failed");
-          }
-      }
+  // ------------------------------------------------------------------------
 
-    // ------------------------------------------------------------------------
-
-    } /* namespace std */
-  } /* namespace cmsis */
+  } /* namespace std */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------

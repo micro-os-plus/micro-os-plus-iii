@@ -32,8 +32,6 @@
 
 namespace os
 {
-  namespace cmsis
-  {
     namespace driver
     {
       namespace usb
@@ -103,7 +101,6 @@ namespace os
 
       } /* namespace usb */
     } /* namespace driver */
-  } /* namespace cmsis */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------

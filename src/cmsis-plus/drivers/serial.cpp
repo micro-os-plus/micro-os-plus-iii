@@ -33,84 +33,81 @@
 
 namespace os
 {
-  namespace cmsis
+  namespace driver
   {
-    namespace driver
+    // ----------------------------------------------------------------------
+
+    Serial::Serial () noexcept
     {
-      // ----------------------------------------------------------------------
+      cb_func_ = nullptr;
+      cb_object_ = nullptr;
 
-      Serial::Serial () noexcept
-      {
-        cb_func_ = nullptr;
-        cb_object_ = nullptr;
+      clean ();
+    }
 
-        clean ();
-      }
+    // ----------------------------------------------------------------------
 
-      // ----------------------------------------------------------------------
+    void
+    Serial::clean (void) noexcept
+    {
+      status_.rx_break = false;
+      status_.rx_busy = false;
+      status_.rx_framing_error = false;
+      status_.rx_overflow = false;
+      status_.rx_parity_error = false;
+      status_.tx_busy = false;
+      status_.tx_underflow = false;
 
-      void
-      Serial::clean (void) noexcept
-      {
-        status_.rx_break = false;
-        status_.rx_busy = false;
-        status_.rx_framing_error = false;
-        status_.rx_overflow = false;
-        status_.rx_parity_error = false;
-        status_.tx_busy = false;
-        status_.tx_underflow = false;
+      modem_status_.cts = false;
+      modem_status_.dsr = false;
+      modem_status_.dcd = false;
+      modem_status_.ri = false;
+    }
 
-        modem_status_.cts = false;
-        modem_status_.dsr = false;
-        modem_status_.dcd = false;
-        modem_status_.ri = false;
-      }
+    // ----------------------------------------------------------------------
 
-      // ----------------------------------------------------------------------
+    void
+    Serial::register_callback (signal_event_t cb_func, const void* cb_object) noexcept
+    {
+      cb_func_ = cb_func;
+      cb_object_ = cb_object;
+    }
 
-      void
-      Serial::register_callback (signal_event_t cb_func, const void* cb_object) noexcept
-      {
-        cb_func_ = cb_func;
-        cb_object_ = cb_object;
-      }
+    return_t
+    Serial::send (const void* data, std::size_t num) noexcept
+    {
+      assert(data != nullptr);
+      if (num == 0)
+        {
+          return RETURN_OK;
+        }
+      return do_send (data, num);
+    }
 
-      return_t
-      Serial::send (const void* data, std::size_t num) noexcept
-      {
-        assert(data != nullptr);
-        if (num == 0)
-          {
-            return RETURN_OK;
-          }
-        return do_send (data, num);
-      }
+    return_t
+    Serial::receive (void* data, std::size_t num) noexcept
+    {
+      assert(data != nullptr);
+      if (num == 0)
+        {
+          return RETURN_OK;
+        }
+      return do_receive (data, num);
+    }
 
-      return_t
-      Serial::receive (void* data, std::size_t num) noexcept
-      {
-        assert(data != nullptr);
-        if (num == 0)
-          {
-            return RETURN_OK;
-          }
-        return do_receive (data, num);
-      }
+    return_t
+    Serial::transfer (const void* data_out, void* data_in, std::size_t num) noexcept
+    {
+      assert(data_out != nullptr);
+      assert(data_in != nullptr);
+      if (num == 0)
+        {
+          return RETURN_OK;
+        }
+      return do_transfer (data_out, data_in, num);
+    }
 
-      return_t
-      Serial::transfer (const void* data_out, void* data_in, std::size_t num) noexcept
-      {
-        assert(data_out != nullptr);
-        assert(data_in != nullptr);
-        if (num == 0)
-          {
-            return RETURN_OK;
-          }
-        return do_transfer (data_out, data_in, num);
-      }
-
-    } /* namespace driver */
-  } /* namespace cmsis */
+  } /* namespace driver */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------

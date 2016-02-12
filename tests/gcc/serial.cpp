@@ -21,7 +21,7 @@
 
 #include <cassert>
 
-using namespace os::cmsis::driver;
+using namespace os::driver;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
