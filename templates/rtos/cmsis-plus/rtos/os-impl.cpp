@@ -292,6 +292,76 @@ namespace os
 
       // ======================================================================
 
+      // ----- Signal flags -----
+
+      namespace flags
+      {
+        /**
+         * @details
+         *
+         * @note Can be invoked from Interrupt Service Routines.
+         */
+        result_t
+        set (Thread& thread, event_flags_t flags, event_flags_t* out_flags)
+        {
+          return result::ok;
+        }
+
+        /**
+         * @details
+         *
+         * @warning Cannot be invoked from Interrupt Service Routines.
+         */
+        result_t
+        clear (Thread& thread, event_flags_t flags, event_flags_t* out_flags)
+        {
+          assert(!kernel::is_in_irq ());
+
+          return result::ok;
+        }
+
+        /**
+         * @details
+         *
+         * @warning Cannot be invoked from Interrupt Service Routines.
+         */
+        result_t
+        wait (event_flags_t flags, event_flags_t* out_flags)
+        {
+          assert(!kernel::is_in_irq ());
+
+          return result::ok;
+        }
+
+        /**
+         * @details
+         *
+         * @note Can be invoked from Interrupt Service Routines.
+         */
+        result_t
+        try_wait (event_flags_t flags, event_flags_t* ret)
+        {
+          return result::ok;
+        }
+
+        /**
+         * @details
+         *
+         * @warning Cannot be invoked from Interrupt Service Routines.
+         */
+        result_t
+        timed_wait (event_flags_t flags, event_flags_t* out_flags,
+                    systicks_t ticks)
+        {
+          assert(!kernel::is_in_irq ());
+
+          return result::ok;
+        }
+
+      } /* namespace flags */
+
+      // ======================================================================
+
       void*
       no_thread_func (void* args);
 
@@ -333,23 +403,6 @@ namespace os
           // TODO
 
           return this_thread::get ().get_wakeup_reason ();
-        }
-
-        // Legacy
-        result_t
-        wait (millis_t millisec, event_t* ret)
-        {
-          // TODO
-          return result::ok;
-        }
-
-        // Legacy
-        result_t
-        wait_signals (signal_flags_t signals, millis_t millisec,
-                      signal_flags_t* ret)
-        {
-          // TODO
-          return result::ok;
         }
 
       } /* namespace this_thread */

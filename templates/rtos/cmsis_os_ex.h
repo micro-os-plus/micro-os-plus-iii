@@ -50,25 +50,11 @@ extern "C"
 
   // --------------------------------------------------------------------------
 
-  // ===== Generic Wait Functions =====
-
-  osStatus
-  osWaitEx (uint32_t millisec);
-
-  // --------------------------------------------------------------------------
-
   // ===== Timer Management Functions =====
 
   osTimerId
   osTimerCreateEx (osTimer* addr, osTimerAttr* attr, os_ptimer function,
                    void* args);
-
-  // --------------------------------------------------------------------------
-
-  // ===== Signal Management =====
-
-  osStatus
-  osSignalWaitEx (int32_t signals, uint32_t millisec);
 
   // --------------------------------------------------------------------------
 

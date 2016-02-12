@@ -118,33 +118,9 @@ namespace os
       using systicks_t = uint32_t;
       using duration_t = uint32_t;
 
-      constexpr systicks_t WAIT_FOREVER = 0xFFFFFFFF;
-
       class Thread;
       class Mail_queue;
       class Message_queue;
-
-      using signal_flags_t = int32_t;
-
-      // TODO: Get rid of this ugly structure.
-#if 1
-      /// Event structure contains detailed information about an event.
-      using event_t = struct event_s
-        {
-          result_t status; ///< result code: event or error information
-          union
-            {
-              uint32_t v; ///< message as 32-bit value
-              void* p;///< message or mail as void pointer
-              signal_flags_t signals;///< signal flags
-            }value; ///< event value
-          union
-            {
-              Mail_queue* mail_id;    ///< mail id obtained by @ref osMailCreate
-              Message_queue* message_id;///< message id obtained by @ref osMessageCreate
-            }def;                               ///< event definition
-        };
-#endif
 
       // ----------------------------------------------------------------------
 
@@ -364,6 +340,65 @@ namespace os
 
       // ----------------------------------------------------------------------
 
+      using event_flags_t = uint32_t;
+
+      // This might require further refinements.
+
+      namespace flags
+      {
+        /**
+         * @brief Clear thread flags.
+         * @param [in] thread Reference to the thread.
+         * @param [in] flags The flags, as OR-ed bit mask.
+         * @param [out] ret Pointer where to store previous flags; may be nullptr.
+         * @reval result::ok when successful.
+         */
+        result_t
+        set (Thread& thread, event_flags_t flags, event_flags_t* out_flags);
+
+        /**
+         * @brief Set thread flags.
+         * @param [in] thread Reference to the thread.
+         * @param [in] flags The signal flags, as OR-ed bit mask.
+         * @param [out] ret Pointer where to store previous flags, may be nullptr.
+         * @reval result::ok when successful.
+         */
+        result_t
+        clear (Thread& thread, event_flags_t flags, event_flags_t* out_flags);
+
+        /**
+         * @brief Wait for flags.
+         * @param [in] flags The flags, as OR-ed bit mask.
+         * @param [out] ret Pointer where to store previous flags, may be nullptr.
+         * @reval result::ok The signal condition occurred.
+         */
+        result_t
+        wait (event_flags_t flags, event_flags_t* out_flags);
+
+        /**
+         * @brief Wait for flags.
+         * @param [in] flags The flags, as OR-ed bit mask.
+         * @param [out] ret Pointer where to store previous flags, may be nullptr.
+         * @reval result::ok The signal condition occurred.
+         */
+        result_t
+        try_wait (event_flags_t flags, event_flags_t* out_flags);
+
+        /**
+         * @brief Wait for flags.
+         * @param [in] flags The signal flags, as OR-ed bit mask.
+         * @param [out] ret Pointer where to store previous flags, may be nullptr.
+         * @reval result::ok The signal condition occurred.
+         * @reval result::etimedout The signal condition did not occur during the entire timeout duration.
+         */
+        result_t
+        timed_wait (event_flags_t flags, event_flags_t* out_flags,
+                    systicks_t ticks);
+
+      } /* namespace flags */
+
+      // ----------------------------------------------------------------------
+
       //  ==== Thread Management ====
 
       class Thread;
@@ -382,8 +417,8 @@ namespace os
 
         /**
          * @brief Yield CPU to next thread.
-         * @retval result::ok when successful
-         * @retval result::eintr when interrupted
+         * @retval result::ok when successful.
+         * @retval result::eintr when interrupted.
          */
         result_t
         yield (void);
@@ -395,22 +430,6 @@ namespace os
          */
         bool
         is_timeout (void);
-
-        /// Legacy
-        /// Wait for Signal, Message, Mail, or Timeout.
-        /// @param [in] millisec          @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out
-        /// @return event that contains signal, message, or mail information or error code.
-        result_t
-        wait (millis_t millisec, event_t* ret);
-
-        /// Legacy
-        /// Wait for one or more Signal Flags to become signaled for the current \b RUNNING thread.
-        /// @param [in]     signals       wait until all specified signal flags set or 0 for any single signal flag.
-        /// @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
-        /// @return event flag information or error code.
-        result_t
-        wait_signals (signal_flags_t signals, millis_t millisec,
-                      signal_flags_t* ret);
 
       } /* namespace this_thread */
 

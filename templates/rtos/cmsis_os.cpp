@@ -168,18 +168,14 @@ osWait (uint32_t millisec)
 {
   osEvent event;
 
-  result_t res = this_thread::wait (millisec, (event_t*) &event);
+  result_t res = Systick_clock::sleep_for (
+      Systick_clock::ticks_cast (millisec));
+  // TODO: return events
   event.status = static_cast<osStatus> (res);
   return event;
 }
 
 #pragma GCC diagnostic pop
-
-osStatus
-osWaitEx (uint32_t millisec)
-{
-  return static_cast<osStatus> (this_thread::wait (millisec, nullptr));
-}
 
 #endif  // Generic Wait available
 
@@ -231,19 +227,23 @@ osTimerDelete (osTimerId timer_id)
 
 //  ==== Signal Management ====
 
-#if 0
 int32_t
 osSignalSet (osThreadId thread_id, int32_t signals)
-  {
-    return static_cast<int32_t> (((Thread&) (thread_id)).set_signals (signals));
-  }
+{
+  int32_t ret;
+  flags::set ((Thread&) (*thread_id), (event_flags_t) signals,
+              (event_flags_t*) &ret);
+  return ret;
+}
 
 int32_t
 osSignalClear (osThreadId thread_id, int32_t signals)
-  {
-    return static_cast<int32_t> (((Thread&) (thread_id)).clear_signals (signals));
-  }
-#endif
+{
+  int32_t ret;
+  flags::clear ((Thread&) (*thread_id), (event_flags_t) signals,
+              (event_flags_t*) &ret);
+  return ret;
+}
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
@@ -252,20 +252,26 @@ osEvent
 osSignalWait (int32_t signals, uint32_t millisec)
 {
   osEvent event;
-  result_t res = this_thread::wait_signals (
-      signals, millisec, (signal_flags_t*) &event.value.signals);
+  result_t res;
+  if (millisec == osWaitForever)
+    {
+      res = flags::wait ((event_flags_t)signals, (event_flags_t*) &event.value.signals);
+    }
+  else if (millisec == 0)
+    {
+      res = flags::try_wait ((event_flags_t)signals, (event_flags_t*) &event.value.signals);
+    }
+  else
+    {
+      res = flags::timed_wait ((event_flags_t)signals, (event_flags_t*) &event.value.signals,
+                               Systick_clock::ticks_cast (millisec * 1000u));
+    }
+  // TODO: set osEventSignal, osEventTimeout
   event.status = static_cast<osStatus> (res);
   return event;
 }
 
 #pragma GCC diagnostic pop
-
-osStatus
-osSignalWaitEx (int32_t signals, uint32_t millisec)
-{
-  return static_cast<osStatus> (this_thread::wait_signals (signals, millisec,
-                                                           nullptr));
-}
 
 // ----------------------------------------------------------------------------
 
