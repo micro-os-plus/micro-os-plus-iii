@@ -66,7 +66,7 @@ namespace os
         Thread*
         get_top (void);
 
-        ::std::size_t
+        std::size_t
         get_length ();
 
         // TODO add iterator begin(), end()
@@ -75,7 +75,7 @@ namespace os
       protected:
 
         Thread* array_[OS_INTEGER_MAX_NUMBER_OF_THREADS];
-        ::std::size_t count_;
+        std::size_t count_;
       };
     // ----------------------------------------------------------------------
 
@@ -93,7 +93,7 @@ namespace os
     {
       // ----------------------------------------------------------------------
 
-      inline ::std::size_t
+      inline std::size_t
       Prioritised_list::get_length ()
       {
         return count_;

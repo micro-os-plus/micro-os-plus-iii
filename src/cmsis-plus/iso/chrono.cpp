@@ -81,14 +81,14 @@ namespace os
       system_clock::to_time_t (const time_point& t) noexcept
       {
         return time_t (
-            ::std::chrono::duration_cast<::std::chrono::seconds> (
+            std::chrono::duration_cast<std::chrono::seconds> (
                 t.time_since_epoch ()).count ());
       }
 
       system_clock::time_point
       system_clock::from_time_t (time_t t) noexcept
       {
-        return system_clock::time_point (::std::chrono::seconds (t));
+        return system_clock::time_point (std::chrono::seconds (t));
       }
 
       // ====================================================================
@@ -107,7 +107,7 @@ namespace os
         return time_point
           { duration
             { systicks
-              { systick.ticks } + ::std::chrono::nanoseconds
+              { systick.ticks } + std::chrono::nanoseconds
               { systick.cycles * 1000000000ULL / systick.core_frequency_hz }
                 + Realtime_clock::startup_time_point.time_since_epoch () } //
           };

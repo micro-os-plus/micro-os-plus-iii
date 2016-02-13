@@ -37,7 +37,7 @@ namespace os
 
 #if defined(__EXCEPTIONS)
 
-    struct system_error_category : public ::std::error_category
+    struct system_error_category : public std::error_category
     {
       virtual const char*
       name () const noexcept
@@ -48,13 +48,13 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-      virtual ::std::string
+      virtual std::string
       message (int i) const
       {
 #if defined(DEBUG)
-        return ::std::string (strerror (i));
+        return std::string (strerror (i));
 #else
-        return ::std::string ("");
+        return std::string ("");
 #endif
       }
 
@@ -62,7 +62,7 @@ namespace os
 
     };
 
-    struct cmsis_error_category : public ::std::error_category
+    struct cmsis_error_category : public std::error_category
     {
       virtual const char*
       name () const noexcept
@@ -73,13 +73,13 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-      virtual ::std::string
+      virtual std::string
       message (int i) const
       {
 #if defined(DEBUG)
-        return ::std::string (rtos::kernel::strerror ((rtos::status_t) i));
+        return std::string (rtos::kernel::strerror ((rtos::status_t) i));
 #else
-        return ::std::string ("");
+        return std::string ("");
 #endif
       }
 
@@ -93,11 +93,11 @@ namespace os
     __throw_system_error (int ev, const char* what_arg)
     {
 #if defined(__EXCEPTIONS)
-      throw ::std::system_error (
-          ::std::error_code (ev, system_error_category ()), what_arg);
+      throw std::system_error (
+          std::error_code (ev, system_error_category ()), what_arg);
 #else
       trace_printf ("system_error(%d, %s)\n", ev, what_arg);
-      ::std::abort ();
+      std::abort ();
 #endif
     }
 
@@ -105,11 +105,11 @@ namespace os
     __throw_cmsis_error (int ev, const char* what_arg)
     {
 #if defined(__EXCEPTIONS)
-      throw ::std::system_error (
-          ::std::error_code (ev, cmsis_error_category ()), what_arg);
+      throw std::system_error (
+          std::error_code (ev, cmsis_error_category ()), what_arg);
 #else
       trace_printf ("system_error(%d, %s)\n", ev, what_arg);
-      ::std::abort ();
+      std::abort ();
 #endif
     }
 

@@ -143,12 +143,12 @@ namespace os
 
       template<typename Rep_T, typename Period_T>
         bool
-        try_lock_for (const ::std::chrono::duration<Rep_T, Period_T>& rel_time);
+        try_lock_for (const std::chrono::duration<Rep_T, Period_T>& rel_time);
 
       template<typename Clock_T, typename Duration_T>
         bool
         try_lock_until (
-            const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time);
+            const std::chrono::time_point<Clock_T, Duration_T>& abs_time);
     };
 
     // ======================================================================
@@ -170,12 +170,12 @@ namespace os
 
       template<typename Rep_T, typename Period_T>
         bool
-        try_lock_for (const ::std::chrono::duration<Rep_T, Period_T>& rel_time);
+        try_lock_for (const std::chrono::duration<Rep_T, Period_T>& rel_time);
 
       template<typename Clock_T, typename Duration_T>
         bool
         try_lock_until (
-            const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time);
+            const std::chrono::time_point<Clock_T, Duration_T>& abs_time);
     };
 
     // ======================================================================
@@ -252,11 +252,11 @@ namespace os
         template<typename Clock_T, typename Duration_T>
           unique_lock (
               mutex_type& m,
-              const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time);
+              const std::chrono::time_point<Clock_T, Duration_T>& abs_time);
 
         template<typename Rep, typename Period>
           unique_lock (mutex_type& m,
-                       const ::std::chrono::duration<Rep, Period>& rel_time);
+                       const std::chrono::duration<Rep, Period>& rel_time);
 
         ~unique_lock ();
 
@@ -276,12 +276,12 @@ namespace os
 
         template<typename Rep, typename Period>
           bool
-          try_lock_for (const ::std::chrono::duration<Rep, Period>& rel_time);
+          try_lock_for (const std::chrono::duration<Rep, Period>& rel_time);
 
         template<typename Clock_T, typename Duration_T>
           bool
           try_lock_until (
-              const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time);
+              const std::chrono::time_point<Clock_T, Duration_T>& abs_time);
 
         void
         unlock ();
@@ -414,9 +414,9 @@ namespace os
     template<typename Rep_T, typename Period_T>
       bool
       timed_mutex::try_lock_for (
-          const ::std::chrono::duration<Rep_T, Period_T>& rel_time)
+          const std::chrono::duration<Rep_T, Period_T>& rel_time)
       {
-        using namespace ::std::chrono;
+        using namespace std::chrono;
         os::rtos::systicks_t ticks = 0;
         if (rel_time > duration<Rep_T, Period_T>::zero ())
           {
@@ -442,7 +442,7 @@ namespace os
     template<typename Clock_T, typename Duration_T>
       bool
       timed_mutex::try_lock_until (
-          const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time)
+          const std::chrono::time_point<Clock_T, Duration_T>& abs_time)
       {
         using Clock = Clock_T;
 
@@ -471,9 +471,9 @@ namespace os
     template<typename Rep_T, typename Period_T>
       bool
       recursive_timed_mutex::try_lock_for (
-          const ::std::chrono::duration<Rep_T, Period_T>& rel_time)
+          const std::chrono::duration<Rep_T, Period_T>& rel_time)
       {
-        using namespace ::std::chrono;
+        using namespace std::chrono;
         os::rtos::systicks_t ticks = 0;
         if (rel_time > duration<Rep_T, Period_T>::zero ())
           {
@@ -499,7 +499,7 @@ namespace os
     template<typename Clock_T, typename Duration_T>
       bool
       recursive_timed_mutex::try_lock_until (
-          const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time)
+          const std::chrono::time_point<Clock_T, Duration_T>& abs_time)
       {
         using Clock = Clock_T;
 
@@ -589,7 +589,7 @@ namespace os
         inline
         unique_lock<Mutex_T>::unique_lock (
             mutex_type& m,
-            const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time) :
+            const std::chrono::time_point<Clock_T, Duration_T>& abs_time) :
             m_ (&m), //
             owns_ (m.try_lock_until (abs_time))
         {
@@ -600,7 +600,7 @@ namespace os
       template<typename Rep, typename Period>
         inline
         unique_lock<Mutex_T>::unique_lock (
-            mutex_type& m, const ::std::chrono::duration<Rep, Period>& rel_time) :
+            mutex_type& m, const std::chrono::duration<Rep, Period>& rel_time) :
             m_ (&m), //
             owns_ (m.try_lock_for (rel_time))
         {
@@ -679,7 +679,7 @@ namespace os
       template<typename Rep, typename Period>
         bool
         unique_lock<Mutex_T>::try_lock_for (
-            const ::std::chrono::duration<Rep, Period>& rel_time)
+            const std::chrono::duration<Rep, Period>& rel_time)
         {
           if (m_ == nullptr)
             {
@@ -699,7 +699,7 @@ namespace os
       template<typename Clock_T, typename Duration_T>
         bool
         unique_lock<Mutex_T>::try_lock_until (
-            const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time)
+            const std::chrono::time_point<Clock_T, Duration_T>& abs_time)
         {
           if (m_ == nullptr)
             {
@@ -731,8 +731,8 @@ namespace os
       inline void
       unique_lock<Mutex_T>::swap (unique_lock& u) noexcept
       {
-        ::std::swap (m_, u.m_);
-        ::std::swap (owns_, u.owns_);
+        std::swap (m_, u.m_);
+        std::swap (owns_, u.owns_);
       }
 
     template<typename Mutex_T>
@@ -920,9 +920,9 @@ namespace os
       void
       call_once (once_flag& flag, Callable_T&& func, Args_T&&... args)
       {
-        typedef ::std::tuple<Callable_T&&, Args_T&&...> Tuple;
-        Tuple tuple (::std::forward<Callable_T> (func),
-                     ::std::forward<Args_T>(args)...);
+        typedef std::tuple<Callable_T&&, Args_T&&...> Tuple;
+        Tuple tuple (std::forward<Callable_T> (func),
+                     std::forward<Args_T>(args)...);
         // TODO: implement
 #if TO_IMPLEMENT
         __call_once_param < Tuple > __p (tuple);

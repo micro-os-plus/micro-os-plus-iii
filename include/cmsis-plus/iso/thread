@@ -85,8 +85,8 @@ namespace os
 
       template<
           typename Callable_T, //
-          typename = typename ::std::enable_if<
-              !::std::is_same<Callable_T, ::std::nullptr_t>::value>::type,
+          typename = typename std::enable_if<
+              !std::is_same<Callable_T, std::nullptr_t>::value>::type,
           typename ... Args_T>
         explicit
         thread (Callable_T&& f, Args_T&&... args);
@@ -96,16 +96,16 @@ namespace os
 
       template<
           typename Attr_T, //
-          typename = typename ::std::enable_if<
-              ::std::is_same<Attr_T, os::rtos::thread::Attributes>::value>::type,
+          typename = typename std::enable_if<
+              std::is_same<Attr_T, os::rtos::thread::Attributes>::value>::type,
           typename Callable_T, typename ... Args_T>
         explicit
         thread (Attr_T& attr, Callable_T&& f, Args_T&&... args);
 
       template<
           typename Attr_T, //
-          typename = typename ::std::enable_if<
-              ::std::is_same<Attr_T, os::rtos::thread::Attributes>::value>::type,
+          typename = typename std::enable_if<
+              std::is_same<Attr_T, os::rtos::thread::Attributes>::value>::type,
           typename Callable_T, typename ... Args_T>
         explicit
         thread (const Attr_T& attr, Callable_T&& f, Args_T&&... args);
@@ -206,12 +206,12 @@ namespace os
       template<typename Clock_T = chrono::Systick_clock, typename Rep_T,
           typename Period_T>
         constexpr void
-        sleep_for (const ::std::chrono::duration<Rep_T, Period_T>& rel_time);
+        sleep_for (const std::chrono::duration<Rep_T, Period_T>& rel_time);
 
       template<typename Clock_T, typename Duration_T>
         void
         sleep_until (
-            const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time);
+            const std::chrono::time_point<Clock_T, Duration_T>& abs_time);
     } /* namespace this_thread */
 
   } /* namespace estd */
@@ -337,8 +337,8 @@ namespace os
 
     template<typename Callable_T, typename T, typename ... Args_T>
       thread::thread (Callable_T&& f, Args_T&&... args) :
-          thread (os::rtos::thread::initializer, ::std::forward<Callable_T> (f),
-                  ::std::forward<Args_T>(args)...)
+          thread (os::rtos::thread::initializer, std::forward<Callable_T> (f),
+                  std::forward<Args_T>(args)...)
       {
         ;
       }
@@ -346,8 +346,8 @@ namespace os
     template<typename Attr_T, typename T, typename Callable_T,
         typename ... Args_T>
       thread::thread (const Attr_T& attr, Callable_T&& f, Args_T&&... args) :
-          thread ((Attr_T&) attr, ::std::forward<Callable_T> (f),
-                  ::std::forward<Args_T>(args)...)
+          thread ((Attr_T&) attr, std::forward<Callable_T> (f),
+                  std::forward<Args_T>(args)...)
       {
         ;
       }
@@ -357,20 +357,20 @@ namespace os
 
       thread::thread (Attr_T& attr, Callable_T&& f, Args_T&&... args)
       {
-        // static_assert(::std::is_same<Attr_T, os::rtos::thread::attr_t>::value, "first param must be thread_attr_t*");
+        // static_assert(std::is_same<Attr_T, os::rtos::thread::attr_t>::value, "first param must be thread_attr_t*");
 
         os::trace::printf ("%s(%p) @%p\n", __func__, &attr, this);
 
-        using Function_object = decltype(::std::bind (::std::forward<Callable_T> (f),
-                ::std::forward<Args_T>(args)...));
+        using Function_object = decltype(std::bind (std::forward<Callable_T> (f),
+                std::forward<Args_T>(args)...));
 
         // Dynamic allocation! The size depends on the number of arguments.
         // This creates a small problem, since both running the function
         // and deleting the object requires the type. It is passes as
         // template functions.
         Function_object* funct_obj = new Function_object (
-            ::std::bind (::std::forward<Callable_T> (f),
-                         ::std::forward<Args_T>(args)...));
+            std::bind (std::forward<Callable_T> (f),
+                         std::forward<Args_T>(args)...));
 
         // The function to start the thread is a custom proxy that
         // knows how to get the variadic arguments.
@@ -416,9 +416,9 @@ namespace os
 #if 0
       template<class Rep_T, class Period_T>
       constexpr void
-      sleep_for (const ::std::chrono::duration<Rep_T, Period_T>& rel_time)
+      sleep_for (const std::chrono::duration<Rep_T, Period_T>& rel_time)
         {
-          using namespace ::std::chrono;
+          using namespace std::chrono;
 
           if (rel_time > duration<Rep_T, Period_T>::zero ())
             {
@@ -451,9 +451,9 @@ namespace os
 
       template<typename Clock_T, class Rep_T, class Period_T>
         constexpr void
-        sleep_for (const ::std::chrono::duration<Rep_T, Period_T>& rel_time)
+        sleep_for (const std::chrono::duration<Rep_T, Period_T>& rel_time)
         {
-          using namespace ::std::chrono;
+          using namespace std::chrono;
 
           using Clock = Clock_T;
           using sleep_rep = typename Clock::sleep_rep;
@@ -470,7 +470,7 @@ namespace os
       template<typename Clock_T, typename Duration_T>
         void
         sleep_until (
-            const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time)
+            const std::chrono::time_point<Clock_T, Duration_T>& abs_time)
         {
           using Clock = Clock_T;
 
@@ -491,7 +491,7 @@ namespace os
       template<typename Duration_T>
         void
         sleep_until (
-            const ::std::chrono::time_point<chrono::Realtime_clock, Duration_T>& abs_time)
+            const std::chrono::time_point<chrono::Realtime_clock, Duration_T>& abs_time)
         {
           using Clock = chrono::Realtime_clock;
 
@@ -514,7 +514,7 @@ namespace os
       template<typename Duration_T>
         void
         sleep_until (
-            const ::std::chrono::time_point<chrono::Systick_clock, Duration_T>& abs_time)
+            const std::chrono::time_point<chrono::Systick_clock, Duration_T>& abs_time)
         {
           using Clock = chrono::Systick_clock;
 

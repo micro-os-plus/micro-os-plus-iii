@@ -75,7 +75,7 @@ namespace os
     initialize (void);
 
     ssize_t
-    write (const void* buf, ::std::size_t nbyte);
+    write (const void* buf, std::size_t nbyte);
 
     // ----------------------------------------------------------------------
 
@@ -83,7 +83,7 @@ namespace os
     printf (const char* format, ...);
 
     int
-    vprintf (const char* format, ::std::va_list args);
+    vprintf (const char* format, std::va_list args);
 
     int
     puts (const char* s);

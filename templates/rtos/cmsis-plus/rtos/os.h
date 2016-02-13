@@ -476,7 +476,7 @@ namespace os
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
         void* th_stack_address;
-        ::std::size_t th_stack_size_bytes;
+        std::size_t th_stack_size_bytes;
         priority_t th_priority;
 
         // Add more attributes.
@@ -618,7 +618,7 @@ namespace os
 
       // TODO: group them in a Stack object
       void* stack_addr_;
-      ::std::size_t stack_size_bytes_;
+      std::size_t stack_size_bytes_;
 
       thread::func_t func_;
 
@@ -1382,13 +1382,13 @@ namespace os
       result_t
       free (void* block);
 
-      ::std::size_t
+      std::size_t
       size (void);
 
-      ::std::size_t
+      std::size_t
       count (void);
 
-      ::std::size_t
+      std::size_t
       block_size (void);
 
       bool
@@ -1448,7 +1448,7 @@ namespace os
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
         void* queue_address;
-        ::std::size_t queue_size_bytes;
+        std::size_t queue_size_bytes;
 
         // Add more attributes.
       };
@@ -1488,35 +1488,35 @@ namespace os
       operator== (const Message_queue& rhs) const;
 
       result_t
-      send (const char* msg, ::std::size_t nbytes, mqueue::priority_t mprio);
+      send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio);
 
       result_t
-      try_send (const char* msg, ::std::size_t nbytes,
+      try_send (const char* msg, std::size_t nbytes,
                 mqueue::priority_t mprio);
 
       result_t
-      timed_send (const char* msg, ::std::size_t nbytes,
+      timed_send (const char* msg, std::size_t nbytes,
                   mqueue::priority_t mprio, systicks_t ticks);
 
       result_t
-      receive (const char* msg, ::std::size_t nbytes,
+      receive (const char* msg, std::size_t nbytes,
                mqueue::priority_t* mprio);
 
       result_t
-      try_receive (const char* msg, ::std::size_t nbytes,
+      try_receive (const char* msg, std::size_t nbytes,
                    mqueue::priority_t* mprio);
 
       result_t
-      timed_receive (const char* msg, ::std::size_t nbytes,
+      timed_receive (const char* msg, std::size_t nbytes,
                      mqueue::priority_t* mprio, systicks_t ticks);
 
-      ::std::size_t
+      std::size_t
       length (void);
 
-      ::std::size_t
+      std::size_t
       size (void);
 
-      ::std::size_t
+      std::size_t
       msg_size (void);
 
       bool
@@ -1534,7 +1534,7 @@ namespace os
       impl::Prioritised_list receive_list_;
 
       void* queue_addr_;
-      ::std::size_t queue_size_bytes_;
+      std::size_t queue_size_bytes_;
 
       const mqueue::size_t msgs_;
       const mqueue::size_t msg_size_bytes_;
@@ -1820,19 +1820,19 @@ namespace os
       return this == &rhs;
     }
 
-    inline ::std::size_t
+    inline std::size_t
     Memory_pool::size (void)
     {
       return blocks_;
     }
 
-    inline ::std::size_t
+    inline std::size_t
     Memory_pool::block_size (void)
     {
       return block_size_bytes_;
     }
 
-    inline ::std::size_t
+    inline std::size_t
     Memory_pool::count (void)
     {
       return count_;
@@ -1876,19 +1876,19 @@ namespace os
       return this == &rhs;
     }
 
-    inline ::std::size_t
+    inline std::size_t
     Message_queue::length (void)
     {
       return count_;
     }
 
-    inline ::std::size_t
+    inline std::size_t
     Message_queue::size (void)
     {
       return msgs_;
     }
 
-    inline ::std::size_t
+    inline std::size_t
     Message_queue::msg_size (void)
     {
       return msg_size_bytes_;

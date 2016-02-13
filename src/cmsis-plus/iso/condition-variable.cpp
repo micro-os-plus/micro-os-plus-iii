@@ -72,7 +72,7 @@ namespace os
     notify_all_at_thread_exit (condition_variable& cond, unique_lock<mutex> lk)
     {
       //__thread_local_data()->notify_all_at_thread_exit(&cond, lk.release());
-      ::std::abort (); // Not implemented
+      std::abort (); // Not implemented
     }
 
 #pragma GCC diagnostic pop

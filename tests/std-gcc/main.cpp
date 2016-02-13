@@ -101,7 +101,7 @@ sleep_for_ticks (uint32_t)
 #error OS_INCLUDE_CMSIS_THREAD_VARIADICS
 #endif
 
-using namespace ::std::chrono;
+using namespace std::chrono;
 using namespace os::estd::chrono;
 using namespace os::estd;
 using namespace os;
@@ -215,8 +215,8 @@ main (int argc, char* argv[])
 
 #pragma GCC diagnostic pop
 
-  //::std::chrono::system_clock::time_point tp1 = ::std::chrono::system_clock::now() + 1000ms;
-  //this_thread::sleep_until (::std::chrono::system_clock::now());
+  //std::chrono::system_clock::time_point tp1 = std::chrono::system_clock::now() + 1000ms;
+  //this_thread::sleep_until (std::chrono::system_clock::now());
 
   //Systick_clock::time_point tp1 = Systick_clock::now() + 1000_ticks;
   //this_thread::sleep_until (tp1);

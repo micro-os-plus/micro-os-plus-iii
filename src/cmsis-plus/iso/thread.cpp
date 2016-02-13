@@ -41,7 +41,7 @@ namespace os
         {
           trace::printf ("%s() @%p attempt to assign a running thread\n",
                          __PRETTY_FUNCTION__, this);
-          ::std::abort (); // in ISO it is std::terminate()
+          std::abort (); // in ISO it is std::terminate()
         }
       swap (t);
       return *this;
@@ -71,7 +71,7 @@ namespace os
         {
           trace::printf ("%s() @%p attempt to destruct a running thread\n",
                          __PRETTY_FUNCTION__, this);
-          ::std::abort (); // in ISO it is std::terminate()
+          std::abort (); // in ISO it is std::terminate()
         }
 
       delete_system_thread ();
@@ -82,8 +82,8 @@ namespace os
     void
     thread::swap (thread& t) noexcept
     {
-      ::std::swap (id_, t.id_);
-      ::std::swap (function_object_deleter_, t.function_object_deleter_);
+      std::swap (id_, t.id_);
+      std::swap (function_object_deleter_, t.function_object_deleter_);
     }
 
     bool

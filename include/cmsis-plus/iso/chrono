@@ -35,13 +35,13 @@ namespace os
       // ======================================================================
 
       template<typename T, typename = void>
-        struct has_sleep_for : ::std::false_type
+        struct has_sleep_for : std::false_type
         {
         };
 
       template<typename T>
         struct has_sleep_for<T,
-            decltype(::std::declval<T>().has_sleep_for, void())> : ::std::true_type
+            decltype(std::declval<T>().has_sleep_for, void())> : std::true_type
         {
         };
 
@@ -57,12 +57,12 @@ namespace os
         using rep = rtos::Systick_clock::rep;
         using sleep_rep = rtos::Systick_clock::sleep_rep;
         /// std::ratio type representing the tick period of the clock, in seconds
-        using period = ::std::ratio<1, os::rtos::Systick_clock::frequency_hz>;
+        using period = std::ratio<1, os::rtos::Systick_clock::frequency_hz>;
         /// basic duration type of clock
-        using duration = ::std::chrono::duration<rep, period>;
-        using sleep_duration = ::std::chrono::duration<sleep_rep, period>;
+        using duration = std::chrono::duration<rep, period>;
+        using sleep_duration = std::chrono::duration<sleep_rep, period>;
         /// basic time_point type of clock
-        using time_point = ::std::chrono::time_point<Systick_clock>;
+        using time_point = std::chrono::time_point<Systick_clock>;
         static constexpr bool is_steady
           { true };
         static constexpr bool has_sleep_for
@@ -106,12 +106,12 @@ namespace os
         using sleep_rep = rtos::Realtime_clock::sleep_rep;
 
         /// std::ratio type representing the tick period of the clock, in seconds
-        using period = ::std::ratio<1, 1>;
+        using period = std::ratio<1, 1>;
         /// basic duration type of clock
-        using duration = ::std::chrono::duration<rep, period>;
-        using sleep_duration = ::std::chrono::duration<sleep_rep, period>;
+        using duration = std::chrono::duration<rep, period>;
+        using sleep_duration = std::chrono::duration<sleep_rep, period>;
 
-        using time_point = ::std::chrono::time_point<Realtime_clock>;
+        using time_point = std::chrono::time_point<Realtime_clock>;
 
         // Non-monotonic, may be adjusted back in time.
         static constexpr const bool is_steady
@@ -144,10 +144,10 @@ namespace os
       {
       public:
 
-        using duration = ::std::chrono::microseconds;
+        using duration = std::chrono::microseconds;
         using rep = duration::rep;
         using period = duration::period;
-        using time_point = ::std::chrono::time_point<system_clock>;
+        using time_point = std::chrono::time_point<system_clock>;
 
         // Monotonic, never adjusted back in time.
         static constexpr const bool is_steady
@@ -179,10 +179,10 @@ namespace os
       {
       public:
 
-        using duration = ::std::chrono::nanoseconds;
+        using duration = std::chrono::nanoseconds;
         using rep = duration::rep;
         using period = duration::period;
-        using time_point = ::std::chrono::time_point<high_resolution_clock>;
+        using time_point = std::chrono::time_point<high_resolution_clock>;
 
         // Monotonic, never adjusted back in time.
         static constexpr const bool is_steady
@@ -228,12 +228,12 @@ namespace os
 
       template<class _To, class Rep_T, class Period_T>
 constexpr      //
-      typename ::std::enable_if<
-      ::std::chrono::__is_duration<_To>::value, _To>::type
-      ceil (::std::chrono::duration<Rep_T, Period_T> d)
+      typename std::enable_if<
+      std::chrono::__is_duration<_To>::value, _To>::type
+      ceil (std::chrono::duration<Rep_T, Period_T> d)
         {
-          using namespace ::std::chrono;
-          _To r = ::std::chrono::duration_cast<_To> (d);
+          using namespace std::chrono;
+          _To r = std::chrono::duration_cast<_To> (d);
           if (r < d)
             {
               ++r;

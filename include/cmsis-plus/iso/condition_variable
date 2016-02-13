@@ -103,24 +103,24 @@ namespace os
         cv_status
         wait_until (
             unique_lock<mutex>& lock,
-            const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time);
+            const std::chrono::time_point<Clock_T, Duration_T>& abs_time);
 
       template<class Clock_T, class Duration_T, class Predicate_T>
         bool
         wait_until (
             unique_lock<mutex>& lock,
-            const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time,
+            const std::chrono::time_point<Clock_T, Duration_T>& abs_time,
             Predicate_T pred);
 
       template<class Rep_T, class Period_T>
         cv_status
         wait_for (unique_lock<mutex>& lock,
-                  const ::std::chrono::duration<Rep_T, Period_T>& rel_time);
+                  const std::chrono::duration<Rep_T, Period_T>& rel_time);
 
       template<class Rep_T, class Period_T, class Predicate_T>
         bool
         wait_for (unique_lock<mutex>& lock,
-                  const ::std::chrono::duration<Rep_T, Period_T>& rel_time,
+                  const std::chrono::duration<Rep_T, Period_T>& rel_time,
                   Predicate_T pred);
 
       native_handle_type
@@ -167,30 +167,30 @@ namespace os
         cv_status
         wait_until (
             Lock_T& lock,
-            const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time);
+            const std::chrono::time_point<Clock_T, Duration_T>& abs_time);
 
       template<class Lock_T, class Clock_T, class Duration_T, class Predicate_T>
         bool
         wait_until (
             Lock_T& lock,
-            const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time,
+            const std::chrono::time_point<Clock_T, Duration_T>& abs_time,
             Predicate_T pred);
 
       template<class Lock_T, class Rep_T, class Period_T>
         cv_status
         wait_for (Lock_T& lock,
-                  const ::std::chrono::duration<Rep_T, Period_T>& rel_time);
+                  const std::chrono::duration<Rep_T, Period_T>& rel_time);
 
       template<class Lock_T, class Rep_T, class Period_T, class Predicate_T>
         bool
         wait_for (Lock_T& lock,
-                  const ::std::chrono::duration<Rep_T, Period_T>& rel_time,
+                  const std::chrono::duration<Rep_T, Period_T>& rel_time,
                   Predicate_T pred);
 
     protected:
 
       condition_variable cv_;
-      ::std::shared_ptr<mutex> mx_;
+      std::shared_ptr<mutex> mx_;
 
       using Native_clock = chrono::Systick_clock;
 
@@ -243,9 +243,9 @@ namespace os
       cv_status
       condition_variable::wait_until (
           unique_lock<mutex>& lock,
-          const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time)
+          const std::chrono::time_point<Clock_T, Duration_T>& abs_time)
       {
-        using namespace ::std::chrono;
+        using namespace std::chrono;
         using Clock = Clock_T;
 
 #if 0
@@ -256,7 +256,7 @@ namespace os
 #else
         // Optimise to native (ticks). LLVM compares using the
         // original clock, which might be more accurate.
-        Native_clock::duration rel_time = ::std::chrono::duration_cast<
+        Native_clock::duration rel_time = std::chrono::duration_cast<
             Native_clock::duration> (abs_time - Clock::now ());
         return wait_for (lock, rel_time);
 #endif
@@ -268,7 +268,7 @@ namespace os
       bool
       condition_variable::wait_until (
           unique_lock<mutex>& lock,
-          const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time,
+          const std::chrono::time_point<Clock_T, Duration_T>& abs_time,
           Predicate_T pred)
       {
         while (!pred ())
@@ -286,9 +286,9 @@ namespace os
       cv_status
       condition_variable::wait_for (
           unique_lock<mutex>& lock,
-          const ::std::chrono::duration<Rep_T, Period_T>& rel_time)
+          const std::chrono::duration<Rep_T, Period_T>& rel_time)
       {
-        using namespace ::std::chrono;
+        using namespace std::chrono;
 
         if (rel_time <= rel_time.zero ())
           {
@@ -298,7 +298,7 @@ namespace os
         Native_clock::time_point start_tp = Native_clock::now ();
 
         rtos::systicks_t ticks = os::estd::chrono::ceil<
-            ::std::chrono::duration<rtos::systicks_t,
+            std::chrono::duration<rtos::systicks_t,
                 typename Native_clock::period>> (rel_time).count ();
 
         ncv_.timed_wait (lock.mutex ()->native_handle (), ticks);
@@ -313,11 +313,11 @@ namespace os
       bool
       condition_variable::wait_for (
           unique_lock<mutex>& lock,
-          const ::std::chrono::duration<Rep_T, Period_T>& rel_time,
+          const std::chrono::duration<Rep_T, Period_T>& rel_time,
           Predicate_T pred)
       {
         return wait_until (lock, Native_clock::now () + rel_time,
-                           ::std::move (pred));
+                           std::move (pred));
       }
 
 #pragma GCC diagnostic pop
@@ -329,7 +329,7 @@ namespace os
         cv_
           { }, //
         mx_
-          { ::std::make_shared<mutex> () }
+          { std::make_shared<mutex> () }
     {
       ;
     }
@@ -340,7 +340,7 @@ namespace os
         cv_
           { attr }, //
         mx_
-          { ::std::make_shared<mutex> () }
+          { std::make_shared<mutex> () }
     {
       ;
     }
@@ -379,10 +379,10 @@ namespace os
       void
       condition_variable_any::wait (Lock_T& lock)
       {
-        ::std::shared_ptr<mutex> mx = mx_;
+        std::shared_ptr<mutex> mx = mx_;
         unique_lock<mutex> lk (*mx);
         lock.unlock ();
-        ::std::unique_ptr<Lock_T, __lock_external> lxx(&lock);
+        std::unique_ptr<Lock_T, __lock_external> lxx(&lock);
         lock_guard<unique_lock<mutex> > lx (lk, adopt_lock);
         cv_.wait (lk);
         // mx.unlock()
@@ -401,12 +401,12 @@ namespace os
       cv_status
       condition_variable_any::wait_until (
           Lock_T& lock,
-          const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time)
+          const std::chrono::time_point<Clock_T, Duration_T>& abs_time)
       {
-        ::std::shared_ptr<mutex> mx = mx_;
+        std::shared_ptr<mutex> mx = mx_;
         unique_lock<mutex> lk (*mx);
         lock.unlock ();
-        ::std::unique_ptr<Lock_T, __lock_external> lxx(&lock);
+        std::unique_ptr<Lock_T, __lock_external> lxx(&lock);
         lock_guard<unique_lock<mutex> > lx (lk, adopt_lock);
         return cv_.wait_until (lk, abs_time);
         // mx.unlock()
@@ -417,7 +417,7 @@ namespace os
       inline bool
       condition_variable_any::wait_until (
           Lock_T& lock,
-          const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time,
+          const std::chrono::time_point<Clock_T, Duration_T>& abs_time,
           Predicate_T pred)
       {
         while (!pred ())
@@ -435,7 +435,7 @@ namespace os
       inline cv_status
       condition_variable_any::wait_for (
           Lock_T& lock,
-          const ::std::chrono::duration<Rep_T, Period_T>& rel_time)
+          const std::chrono::duration<Rep_T, Period_T>& rel_time)
       {
         return wait_until (lock, Native_clock::now () + rel_time);
       }
@@ -444,11 +444,11 @@ namespace os
       inline bool
       condition_variable_any::wait_for (
           Lock_T& lock,
-          const ::std::chrono::duration<Rep_T, Period_T>& rel_time,
+          const std::chrono::duration<Rep_T, Period_T>& rel_time,
           Predicate_T pred)
       {
         return wait_until (lock, Native_clock::now () + rel_time,
-                           ::std::move (pred));
+                           std::move (pred));
       }
 
   // ------------------------------------------------------------------------

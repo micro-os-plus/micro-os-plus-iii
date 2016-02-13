@@ -1724,7 +1724,7 @@ namespace os
     }
 
     result_t
-    Message_queue::send (const char* msg, ::std::size_t nbytes,
+    Message_queue::send (const char* msg, std::size_t nbytes,
                          mqueue::priority_t mprio)
     {
       // TODO
@@ -1732,7 +1732,7 @@ namespace os
     }
 
     result_t
-    Message_queue::try_send (const char* msg, ::std::size_t nbytes,
+    Message_queue::try_send (const char* msg, std::size_t nbytes,
                              mqueue::priority_t mprio)
     {
       // TODO
@@ -1740,7 +1740,7 @@ namespace os
     }
 
     result_t
-    Message_queue::timed_send (const char* msg, ::std::size_t nbytes,
+    Message_queue::timed_send (const char* msg, std::size_t nbytes,
                                mqueue::priority_t mprio, systicks_t ticks)
     {
       // TODO
@@ -1748,7 +1748,7 @@ namespace os
     }
 
     result_t
-    Message_queue::receive (const char* msg, ::std::size_t nbytes,
+    Message_queue::receive (const char* msg, std::size_t nbytes,
                             mqueue::priority_t* mprio)
     {
       // TODO
@@ -1756,7 +1756,7 @@ namespace os
     }
 
     result_t
-    Message_queue::try_receive (const char* msg, ::std::size_t nbytes,
+    Message_queue::try_receive (const char* msg, std::size_t nbytes,
                                 mqueue::priority_t* mprio)
     {
       // TODO return result::event_message when message;
@@ -1764,7 +1764,7 @@ namespace os
     }
 
     result_t
-    Message_queue::timed_receive (const char* msg, ::std::size_t nbytes,
+    Message_queue::timed_receive (const char* msg, std::size_t nbytes,
                                   mqueue::priority_t* mprio, systicks_t ticks)
     {
       // TODO return result::event_message when message;
@@ -1785,7 +1785,7 @@ namespace os
 
       Prioritised_list::Prioritised_list ()
       {
-        for (::std::size_t i = 0; i < sizeof(array_) / sizeof(array_[0]); ++i)
+        for (std::size_t i = 0; i < sizeof(array_) / sizeof(array_[0]); ++i)
           {
             array_[i] = nullptr;
           }
@@ -1817,9 +1817,9 @@ namespace os
       {
         Thread* thread = nullptr;
         thread::priority_t prio = thread::priority::none;
-        ::std::size_t pos = 0;
+        std::size_t pos = 0;
 
-        for (::std::size_t i = 0; i < sizeof(array_) / sizeof(array_[0]); ++i)
+        for (std::size_t i = 0; i < sizeof(array_) / sizeof(array_[0]); ++i)
           {
             if (array_[i]->sched_prio () > prio)
               {
@@ -1829,7 +1829,7 @@ namespace os
               }
           }
 
-        for (::std::size_t i = pos;
+        for (std::size_t i = pos;
             i < (sizeof(array_) / sizeof(array_[0]) - 2); ++i)
           {
             array_[i] = array_[i + 1];
