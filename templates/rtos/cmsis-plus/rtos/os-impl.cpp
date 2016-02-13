@@ -17,11 +17,14 @@
  */
 
 #include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/diag/trace.h>
+
+// ----------------------------------------------------------------------------
 
 #include <cassert>
 #include <cerrno>
 
-//using namespace os::cmsis;
+// ----------------------------------------------------------------------------
 
 namespace os
 {

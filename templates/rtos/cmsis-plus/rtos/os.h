@@ -1491,16 +1491,14 @@ namespace os
       send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio);
 
       result_t
-      try_send (const char* msg, std::size_t nbytes,
-                mqueue::priority_t mprio);
+      try_send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio);
 
       result_t
-      timed_send (const char* msg, std::size_t nbytes,
-                  mqueue::priority_t mprio, systicks_t ticks);
+      timed_send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio,
+                  systicks_t ticks);
 
       result_t
-      receive (const char* msg, std::size_t nbytes,
-               mqueue::priority_t* mprio);
+      receive (const char* msg, std::size_t nbytes, mqueue::priority_t* mprio);
 
       result_t
       try_receive (const char* msg, std::size_t nbytes,

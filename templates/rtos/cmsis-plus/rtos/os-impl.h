@@ -2,7 +2,6 @@
  * This file is part of the µOS++ distribution.
  *   (https://github.com/micro-os-plus)
  * Copyright (c) 2016 Liviu Ionescu.
- * Copyright (c) 2013 ARM LIMITED
  *
  * µOS++ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,9 +26,7 @@
 
 // ----------------------------------------------------------------------------
 
-#include <cmsis-plus/diag/trace.h>
-
-#define OS_INTEGER_MAX_NUMBER_OF_THREADS 10
+#include <cmsis-plus/rtos/os-config.h>
 
 // ----------------------------------------------------------------------------
 
@@ -77,6 +74,7 @@ namespace os
         Thread* array_[OS_INTEGER_MAX_NUMBER_OF_THREADS];
         std::size_t count_;
       };
+
     // ----------------------------------------------------------------------
 
     } /* namespace impl */
