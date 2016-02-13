@@ -99,10 +99,11 @@
 #define osFeature_Wait         1 ///< osWait function: 1=available, 0=not available
 #define osFeature_SysTick      1 ///< osKernelSysTick functions: 1=available, 0=not available
 
+// Include the CMSIS++ C API definitions.
+#include <cmsis-plus/rtos/os-c-api.h>
+
 #include <stdint.h>
 #include <stddef.h>
-
-#include <cmsis-plus/rtos/os-impl.h>
 
 #ifdef  __cplusplus
 extern "C"
@@ -168,30 +169,9 @@ extern "C"
   typedef void
   (*os_ptimer) (void const *argument);
 
-// >>> the following data type definitions may shall adapted towards a specific RTOS
+  // >>> the following data type definitions shall be adapted towards a specific RTOS
 
-#define OS_PRIOTHREAD_SIZE_PTR (OS_INTEGER_MAX_NUMBER_OF_THREADS+1)
-
-#if __SIZEOF_POINTER__ == 4
-#define OS_THREAD_SIZE_PTRS  (7)
-#define OS_TIMER_SIZE_PTRS  (4)
-#define OS_MUTEX_SIZE_PTRS  (4)
-#define OS_SEMAPHORE_SIZE_PTRS  (3+OS_PRIOTHREAD_SIZE_PTR)
-#define OS_POOL_SIZE_PTRS  (4+OS_PRIOTHREAD_SIZE_PTR)
-#define OS_MESSAGEQ_SIZE_PTRS  (5+2*OS_PRIOTHREAD_SIZE_PTR)
-#define OS_MAILQ_SIZE_PTRS  (1)
-#elif __SIZEOF_POINTER__ == 8
-#define OS_THREAD_SIZE_PTRS  (6)
-#define OS_TIMER_SIZE_PTRS  (4)
-#define OS_MUTEX_SIZE_PTRS  (3)
-#define OS_SEMAPHORE_SIZE_PTRS  (2+OS_PRIOTHREAD_SIZE_PTR)
-#define OS_POOL_SIZE_PTRS  (3+OS_PRIOTHREAD_SIZE_PTR)
-#define OS_MESSAGEQ_SIZE_PTRS  (4+2*OS_PRIOTHREAD_SIZE_PTR)
-#define OS_MAILQ_SIZE_PTRS  (1)
-#else
-#error "Unsupported platform."
-#endif
-
+#if 0
   typedef struct os_thread_data
   {
     void* content[OS_THREAD_SIZE_PTRS];
@@ -209,6 +189,10 @@ extern "C"
   } osThreadAttr;
 
 #pragma GCC diagnostic pop
+#else
+  typedef os_thread_t osThread;
+  typedef os_thread_attr_t osThreadAttr;
+#endif
 
   typedef struct os_timer_data
   {

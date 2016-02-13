@@ -108,7 +108,8 @@ osThreadCreateEx (osThread* addr, const osThreadAttr* attr, os_pthread function,
                   const void* args)
 {
   Thread* thread = new (addr) Thread ((thread::Attributes&) *attr,
-                                      (thread::func_t) function, (void*) args);
+                                      (thread::func_t) function,
+                                      (thread::func_args_t) args);
   return reinterpret_cast<osThreadId> (thread);
 }
 
@@ -121,6 +122,7 @@ osThreadGetId (void)
 osStatus
 osThreadTerminate (osThreadId thread_id)
 {
+  // TODO: check if something needs to be done to terminate.
   (reinterpret_cast<Thread&> (thread_id)).~Thread ();
   return osOK;
 }

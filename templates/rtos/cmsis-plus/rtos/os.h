@@ -23,6 +23,22 @@
  *
  * The code is inspired by ARM CMSIS cmsis_os.h file, v1.02,
  * and tries to remain functionally close to the CMSIS specifications.
+ *
+ * Major improvements:
+ * - no more macros required to define objects
+ * - for applications that require it, allows fully static
+ *   memory allocations
+ * - very close to POSIX (IEEE Std 1003.1, 2013 Edition)
+ *   http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html
+ * - specifically designed as a convenient implementation for
+ *   C++ standard thread library (ISO/IEC 14882:2011)
+ * - improved usability, by defining both simple (using default)
+ *   and complex (using attributes) object constructors (feature
+ *   inspired by POSIX threads attributes)
+ * - improved readability with explicit three-fold waiting functions
+ *   (for example: lock(), try-lock(), timed-lock(), similar to POSIX threads)
+ * - versatile clocks added (Systick_clock, Realtime_clock)
+ * - standard POSIX errors definitions used
  */
 
 #ifndef CMSIS_PLUS_RTOS_OS_H_
@@ -30,7 +46,8 @@
 
 // ----------------------------------------------------------------------------
 
-// Include CMSIS++ OS implementation definitions.
+// Include the CMSIS++ OS implementation definitions. This might further
+// include os-config.h, for the application specific definitions.
 #include <cmsis-plus/rtos/os-impl.h>
 
 #include <cstdint>
@@ -127,7 +144,7 @@ namespace os
       /**
        * @brief Sleep a number of ticks.
        * @param [in] ticks the number of ticks to sleep.
-       * @retval result::etimedout The sleep lasted the entire duration.
+       * @retval ETIMEDOUT The sleep lasted the entire duration.
        * @retval result::eintr The sleep was interrupted.
        */
       static result_t
@@ -152,7 +169,7 @@ namespace os
       /**
        * @brief Sleep a number of seconds.
        * @param [in] secs the number of seconds to sleep.
-       * @retval result::etimedout The sleep lasted the entire duration.
+       * @retval ETIMEDOUT The sleep lasted the entire duration.
        * @retval result::eintr The sleep was interrupted.
        */
       static result_t
@@ -290,8 +307,8 @@ namespace os
        * @brief Clear thread flags.
        * @param [in] thread Reference to the thread.
        * @param [in] flags The flags, as OR-ed bit mask.
-       * @param [out] ret Pointer where to store previous flags; may be nullptr.
-       * @reval result::ok when successful.
+       * @param [out] out_flags Pointer where to store previous flags; may be nullptr.
+       * @reval result::ok The event flags were set.
        */
       result_t
       set (Thread& thread, event_flags_t flags, event_flags_t* out_flags);
@@ -300,8 +317,8 @@ namespace os
        * @brief Set thread flags.
        * @param [in] thread Reference to the thread.
        * @param [in] flags The signal flags, as OR-ed bit mask.
-       * @param [out] ret Pointer where to store previous flags, may be nullptr.
-       * @reval result::ok when successful.
+       * @param [out] out_flags Pointer where to store previous flags, may be nullptr.
+       * @reval result::ok The event flags were cleared.
        */
       result_t
       clear (Thread& thread, event_flags_t flags, event_flags_t* out_flags);
@@ -309,7 +326,7 @@ namespace os
       /**
        * @brief Wait for flags.
        * @param [in] flags The flags, as OR-ed bit mask.
-       * @param [out] ret Pointer where to store previous flags, may be nullptr.
+       * @param [out] out_flags Pointer where to store previous flags, may be nullptr.
        * @reval result::ok The signal condition occurred.
        */
       result_t
@@ -318,8 +335,9 @@ namespace os
       /**
        * @brief Wait for flags.
        * @param [in] flags The flags, as OR-ed bit mask.
-       * @param [out] ret Pointer where to store previous flags, may be nullptr.
-       * @reval result::ok The signal condition occurred.
+       * @param [out] out_flags Pointer where to store previous flags, may be nullptr.
+       * @retval result::ok The signal condition occurred.
+       * @retval EAGAIN The signal condition did not occur.
        */
       result_t
       try_wait (event_flags_t flags, event_flags_t* out_flags);
@@ -327,9 +345,9 @@ namespace os
       /**
        * @brief Wait for flags.
        * @param [in] flags The signal flags, as OR-ed bit mask.
-       * @param [out] ret Pointer where to store previous flags, may be nullptr.
+       * @param [out] out_flags Pointer where to store previous flags, may be nullptr.
        * @reval result::ok The signal condition occurred.
-       * @reval result::etimedout The signal condition did not occur during the entire timeout duration.
+       * @reval ETIMEDOUT The signal condition did not occur during the entire timeout duration.
        */
       result_t
       timed_wait (event_flags_t flags, event_flags_t* out_flags,
@@ -492,13 +510,13 @@ namespace os
       /**
        * @brief Create a new thread with default settings.
        */
-      Thread (thread::func_t function, void* args);
+      Thread (thread::func_t function, thread::func_args_t args);
 
       /**
        * @brief Create a new thread with custom settings.
        */
       Thread (const thread::Attributes& attr, thread::func_t function,
-              void* args);
+              thread::func_args_t args);
 
       // Prevent any copy or move.
       Thread (const Thread&) = delete;
@@ -544,7 +562,7 @@ namespace os
        * @return -
        */
       void
-      exit (void* value_ptr);
+      exit (void* exit_ptr);
 
       // Accessors & mutators.
 
@@ -747,7 +765,7 @@ namespace os
       /**
        * @brief Stop the timer.
        * @retval result::ok The timer has been stopped.
-       * @retval result::eagain The timer is not yet started.
+       * @retval EAGAIN The timer is not yet started.
        */
       result_t
       stop (void);
@@ -1213,7 +1231,7 @@ namespace os
       /**
        * @brief Try to lock  the semaphore.
        * @retval result::ok The calling process successfully performed the semaphore lock operation.
-       * @retval result::eagain The semaphore was already locked.
+       * @retval EAGAIN The semaphore was already locked.
        */
       result_t
       try_wait ();
@@ -1222,7 +1240,7 @@ namespace os
        * @brief Timed wait to lock the semaphore.
        * @param [in] ticks Number of ticks to wait.
        * @retval result::ok The calling process successfully performed the semaphore lock operation.
-       * @retval result::etimedout The semaphore could not be locked before the specified timeout expired.
+       * @retval ETIMEDOUT The semaphore could not be locked before the specified timeout expired.
        */
       result_t
       timed_wait (systicks_t ticks);
@@ -1305,6 +1323,10 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+    /**
+     * There is no equivalent of calloc(); to initialise memory, use:
+     * `memset (block, 0, pool.block_size ());`
+     */
     class Memory_pool : public Named_object
     {
     public:

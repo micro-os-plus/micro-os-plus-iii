@@ -376,7 +376,7 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Thread::Thread (thread::func_t function, void* args) :
+    Thread::Thread (thread::func_t function, thread::func_args_t args) :
         Thread
           { thread::initializer, function, args }
     {
@@ -406,7 +406,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     Thread::Thread (const thread::Attributes& attr, thread::func_t function,
-                    void* args) :
+                    thread::func_args_t args) :
         Named_object
           { attr.name () }
     {
