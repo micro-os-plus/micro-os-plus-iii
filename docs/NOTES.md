@@ -48,18 +48,18 @@ For example
 ```
 #include "cmsis_os.h"
  
-void Thread_1 (void const *arg);                           // function prototype for Thread_1
-osThreadDef (Thread_1, osPriorityNormal, 1, 0);            // define Thread_1
+void Thread_1 (void const *arg);                   // function prototype for Thread_1
+osThreadDef (Thread_1, osPriorityNormal, 1, 0);    // define Thread_1
  
 int main (void) {
   osThreadId id;
   
-  id = osThreadCreate (osThread (Thread_1), NULL);         // create the thread
-  if (id == NULL) {                                        // handle thread creation
+  id = osThreadCreate (osThread (Thread_1), NULL); // create the thread
+  if (id == NULL) {                                // handle thread creation
     // Failed to create a thread
   }
   
-  osThreadTerminate (id);                                  // stop the thread
+  osThreadTerminate (id);                          // stop the thread
 }
 ```
 
@@ -289,7 +289,8 @@ Suggestion:
 
 #### osSemaphoreWait() errors?
 
-`osSemaphoreWait()` returns the semaphore count, no errors. There is no way to differentiate timeouts or errors from normal returns.
+`osSemaphoreWait()` returns the semaphore count, no errors. There is no 
+way to differentiate timeouts or errors from normal returns.
 
 #### The single osSemaphoreWait() has three different functions
 
@@ -299,14 +300,44 @@ Suggestion:
 
 * add separate functions `wait()`, `try_wait()`, `timed_wait()`.
   
-  
+### Memory pools
+
+#### There is no simple way to wait for a block to become available
+
+The function `osPoolAlloc()` just return NULL if there are no more available
+blocks, but does not provide a way to wait for a block.
+
+This design seems fit for use with interrupt routines, where waiting
+is not an option, but makes things quite difficult when memory blocks
+are required by a thread.
+
+Suggestion:
+
+* define all three blocking and non-blocking calls
+
+```
+  alloc();
+  try_alloc();
+  timed_alloc();
+```
+
+#### Inconsistent definitions with osMailQueue
+
+Although `osMemoryPool` does not provide blocking allocator calls, the 
+related `osMailQueue` provides such calls, so memory can also be allocated 
+indirectly via mail queues.
+
 ### Message queues
 
 #### The data type used in `osMessageQDef()` example is wrong
 
-The current documentation [page](http://www.keil.com/pack/doc/CMSIS/RTOS/html/group___c_m_s_i_s___r_t_o_s___message.html) defines the `type` parameter as _data type of a single message element_, which for message queues should be either int or pointer.
+The current documentation 
+[page](http://www.keil.com/pack/doc/CMSIS/RTOS/html/group___c_m_s_i_s___r_t_o_s___message.html) 
+defines the `type` parameter as _data type of a single message element_, 
+which for message queues should be either int or pointer.
 
-However, the example in `osMessageCreate()` passes a structure, not a pointer to the structure.
+However, the example in `osMessageCreate()` passes a structure, 
+not a pointer to the structure.
 
 ```
 typedef struct {                                 // Message object structure
@@ -319,7 +350,8 @@ osMessageQDef(MsgBox, 16, T_MEAS);               // Define message queue
 ```
 
 In the RTX implementation of CMSIS RTOS this works because the data type
-is ignored by the `osMessageQDef()` macro, being replaced by an `uint32_t` (which, BTW, is not a portable way to store pointers):
+is ignored by the `osMessageQDef()` macro, being replaced by an 
+`uint32_t` (which, BTW, is not a portable way to store pointers):
 
 ```
 #define osMessageQDef(name, queue_sz, type)   \
@@ -330,21 +362,28 @@ const osMessageQDef_t os_messageQ_def_##name = \
 
 #### Non portable message type in `osMessagePut()`
 
-The parameter used to pass messages is `uint32_t info` even when a pointer is required.
+The parameter used to pass messages is `uint32_t info` even when a 
+pointer is required.
 
-In particular for 32-bits cores this can be fixed with casts, but for 64-bits platforms this is no longer possible.
+In particular for 32-bits cores this can be fixed with casts, but 
+for 64-bits platforms this is no longer possible.
 
-As a curious thing, internally RTX uses `void*` as message type, but, for unknown reasons, the CMSIS definition ended up with an integer instead of a pointer.
+As a curious thing, internally RTX uses `void*` as message type, but, 
+for unknown reasons, the CMSIS definition ended up with an integer instead of a pointer.
 
 #### Unused thread_id parameter in `osMessageQCreate()` prototype
 
-The parameter is defined as _Note: The parameter thread registers the receiving thread for a message and is needed for the general osWait function to deliver the message._
+The parameter is defined as _Note: The parameter thread registers the 
+receiving thread for a message and is needed for the general osWait 
+function to deliver the message._
 
 However both the RTX and the FreeRTOS implementations ignore this parameter.
 
 #### The single osMessagePut() has three different meanings
 
-Based on the `millisec` parameter, the function can wait indefinitely, try to wait or wait with timeout. However, when invoked form an ISR, this parameter must be 0.
+Based on the `millisec` parameter, the function can wait indefinitely, 
+try to wait or wait with timeout. However, when invoked form an ISR, 
+this parameter must be 0.
 
 This is confusing, and separate calls are prefered.
 
@@ -357,7 +396,12 @@ The explanation about thread id is listed under `osMessageQDef()` instead of
 
 #### Apparently redundant
 
-A mail queues seems to be a combination of a memory pool and a message queue, with very similar usage, which aparently makes it redundant.
+A mail queues seems to be a combination of a memory pool and a message 
+queue, with very similar usage, which makes it redundant.
+
+Actually, with carefully designed C++ objects, it was possible
+to implement both osMemoryPool and osMailQ with the same pool and queue
+objects.
 
 #### Unused thread_id parameter in `osMailQCreate()` prototype
 
@@ -365,7 +409,9 @@ Both the RTX and the FreeRTOS implementations ignore this parameter.
 
 #### The single osMailPut() has three different meanings
 
-Based on the `millisec` parameter, the function can wait indefinitely, try to wait or wait with timeout. However, when invoked form an ISR, this parameter must be 0.
+Based on the `millisec` parameter, the function can wait indefinitely, 
+try to wait or wait with timeout. However, when invoked form an ISR, 
+this parameter must be 0.
 
 This is confusing, and separate calls are prefered.
 
