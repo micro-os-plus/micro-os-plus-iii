@@ -16,14 +16,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cmsis-plus/std/thread>
+#include <cmsis-plus/iso/thread>
 #include <cstdlib>
 
 // ----------------------------------------------------------------------------
 
 namespace os
 {
-  namespace std
+  namespace estd
   {
     // ----------------------------------------------------------------------
 
@@ -127,7 +127,7 @@ namespace os
 
   // ------------------------------------------------------------------------
 
-  } /* namespace std */
+  } /* namespace estd */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------

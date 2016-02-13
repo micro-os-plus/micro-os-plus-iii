@@ -28,7 +28,7 @@
 
 namespace os
 {
-  namespace std
+  namespace estd
   {
     namespace chrono
     {
@@ -192,7 +192,7 @@ namespace os
         now () noexcept;
       };
     } /* namespace chrono */
-  } /* namespace std */
+  } /* namespace estd */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------
@@ -200,7 +200,7 @@ namespace os
 
 namespace os
 {
-  namespace std
+  namespace estd
   {
     namespace chrono
     {
@@ -247,7 +247,7 @@ constexpr      //
 
     }
 /* namespace chrono */
-} /* namespace std */
+} /* namespace estd */
 } /* namespace os */
 
 // Hello, Eclipse formatter?!

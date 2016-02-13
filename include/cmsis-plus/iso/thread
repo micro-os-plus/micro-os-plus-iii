@@ -32,7 +32,7 @@
 #if defined(TRACE)
 #include <cmsis-plus/diag/trace.h>
 #endif
-#include <cmsis-plus/std/chrono>
+#include <cmsis-plus/iso/chrono>
 
 #include <cstddef>
 #include <iostream>
@@ -43,7 +43,7 @@
 
 namespace os
 {
-  namespace std
+  namespace estd
   {
     // ======================================================================
 
@@ -214,7 +214,7 @@ namespace os
             const ::std::chrono::time_point<Clock_T, Duration_T>& abs_time);
     } /* namespace this_thread */
 
-  } /* namespace std */
+  } /* namespace estd */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------
@@ -222,7 +222,7 @@ namespace os
 
 namespace os
 {
-  namespace std
+  namespace estd
   {
     // ======================================================================
 
@@ -424,7 +424,7 @@ namespace os
             {
               // Round up to micros, in case of nanos.
               microseconds micros =
-              os::std::chrono::ceil<microseconds> (rel_time);
+              os::estd::chrono::ceil<microseconds> (rel_time);
 
               // Round up to ticks.
 #if 0
@@ -433,7 +433,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Waggregate-return"
 
               os::rtos::thread::sleep (
-                  (os::rtos::systicks_t) (os::std::chrono::ceil<
+                  (os::rtos::systicks_t) (os::estd::chrono::ceil<
                       systicks> (micros).count ()));
 #pragma GCC diagnostic pop
 
@@ -460,7 +460,7 @@ namespace os
 
           if (rel_time > duration<Rep_T, Period_T>::zero ())
             {
-              sleep_rep d = (sleep_rep) os::std::chrono::ceil<
+              sleep_rep d = (sleep_rep) os::estd::chrono::ceil<
                   typename Clock::duration> (rel_time).count ();
 
               Clock::sleep_for (d);
@@ -501,7 +501,7 @@ namespace os
           auto now = Clock::now ();
           while (now < abs_time)
             {
-              typename Clock::sleep_rep d = (os::std::chrono::ceil<
+              typename Clock::sleep_rep d = (os::estd::chrono::ceil<
                   typename Clock::sleep_duration> (abs_time - now)).count ();
               Clock::sleep_for (d);
               now = Clock::now ();
@@ -524,7 +524,7 @@ namespace os
           auto now = Clock::now ();
           while (now < abs_time)
             {
-              typename Clock::sleep_rep d = (os::std::chrono::ceil<
+              typename Clock::sleep_rep d = (os::estd::chrono::ceil<
                   typename Clock::sleep_duration> (abs_time - now)).count ();
               Clock::sleep_for (d);
               now = Clock::now ();
@@ -538,7 +538,7 @@ namespace os
 
   // ------------------------------------------------------------------------
 
-  } /* namespace std */
+  } /* namespace estd */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------

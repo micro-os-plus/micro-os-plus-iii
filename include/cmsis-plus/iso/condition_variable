@@ -31,7 +31,7 @@
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/diag/trace.h>
 
-#include <cmsis-plus/std/mutex>
+#include <cmsis-plus/iso/mutex>
 #include <memory>
 #include <chrono>
 
@@ -39,7 +39,7 @@
 
 namespace os
 {
-  namespace std
+  namespace estd
   {
     // ======================================================================
 
@@ -196,7 +196,7 @@ namespace os
 
     };
 
-  } /* namespace std */
+  } /* namespace estd */
 } /* namespace os */
 
 // ============================================================================
@@ -204,7 +204,7 @@ namespace os
 
 namespace os
 {
-  namespace std
+  namespace estd
   {
     // ======================================================================
 
@@ -297,7 +297,7 @@ namespace os
 
         Native_clock::time_point start_tp = Native_clock::now ();
 
-        rtos::systicks_t ticks = os::std::chrono::ceil<
+        rtos::systicks_t ticks = os::estd::chrono::ceil<
             ::std::chrono::duration<rtos::systicks_t,
                 typename Native_clock::period>> (rel_time).count ();
 
@@ -453,7 +453,7 @@ namespace os
 
   // ------------------------------------------------------------------------
 
-  } /* namespace std */
+  } /* namespace estd */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------

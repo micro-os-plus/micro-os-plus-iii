@@ -16,10 +16,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cmsis-plus/std/system_error>
 #include <cmsis-plus/diag/trace.h>
 #include <cmsis-plus/rtos/os.h>
-
+#include <cmsis-plus/iso/system_error>
 #include <cstdlib>
 #include <cstring>
 #if defined(__EXCEPTIONS)
@@ -30,7 +29,7 @@
 
 namespace os
 {
-  namespace std
+  namespace estd
   {
     // ======================================================================
 
@@ -116,7 +115,7 @@ namespace os
 
   // ------------------------------------------------------------------------
 
-  } /* namespace std */
+  } /* namespace estd */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------

@@ -16,13 +16,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cmsis-plus/std/chrono>
+#include <cmsis-plus/iso/chrono>
 
 // ----------------------------------------------------------------------------
 
 namespace os
 {
-  namespace std
+  namespace estd
   {
     namespace chrono
     {
@@ -118,7 +118,7 @@ namespace os
     // ----------------------------------------------------------------------
 
     } /* namespace chrono */
-  } /* namespace std */
+  } /* namespace estd */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------

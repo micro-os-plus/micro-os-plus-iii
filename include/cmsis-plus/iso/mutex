@@ -31,17 +31,17 @@
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/diag/trace.h>
 
-#include <cmsis-plus/std/thread>
-#include <cmsis-plus/std/system_error>
+#include <cmsis-plus/iso/thread>
+#include <cmsis-plus/iso/system_error>
 #include <cerrno>
-#include <cmsis-plus/std/chrono>
+#include <cmsis-plus/iso/chrono>
 #include <tuple>
 
 // ----------------------------------------------------------------------------
 
 namespace os
 {
-  namespace std
+  namespace estd
   {
     // ======================================================================
 
@@ -345,7 +345,7 @@ namespace os
       void
       call_once (once_flag& flag, Callable_T&& func, Args_T&&... args);
 
-  } /* namespace std */
+  } /* namespace estd */
 } /* namespace os */
 
 // ============================================================================
@@ -353,7 +353,7 @@ namespace os
 
 namespace os
 {
-  namespace std
+  namespace estd
   {
     // ======================================================================
 
@@ -420,7 +420,7 @@ namespace os
         os::rtos::systicks_t ticks = 0;
         if (rel_time > duration<Rep_T, Period_T>::zero ())
           {
-            ticks = (os::rtos::systicks_t) (os::std::chrono::ceil<
+            ticks = (os::rtos::systicks_t) (os::estd::chrono::ceil<
                 chrono::systicks> (rel_time).count ());
           }
 
@@ -477,7 +477,7 @@ namespace os
         os::rtos::systicks_t ticks = 0;
         if (rel_time > duration<Rep_T, Period_T>::zero ())
           {
-            ticks = (os::rtos::systicks_t) (os::std::chrono::ceil<
+            ticks = (os::rtos::systicks_t) (os::estd::chrono::ceil<
                 chrono::systicks> (rel_time).count ());
           }
 
@@ -935,7 +935,7 @@ namespace os
 
   // ------------------------------------------------------------------------
 
-  } /* namespace std */
+  } /* namespace estd */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------

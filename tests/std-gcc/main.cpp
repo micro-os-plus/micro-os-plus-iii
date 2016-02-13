@@ -16,15 +16,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cmsis-plus/std/thread>
-#include <cmsis-plus/std/chrono>
-#include <cmsis-plus/std/mutex>
-#include <cmsis-plus/std/condition_variable>
 #include <cmsis-plus/diag/trace.h>
 
 #include <cstdio>
 #include <iostream>
 #include <chrono>
+#include <cmsis-plus/iso/chrono>
+#include <cmsis-plus/iso/condition_variable>
+#include <cmsis-plus/iso/mutex>
+#include <cmsis-plus/iso/thread>
 //#include <atomic>
 
 using namespace os;
@@ -102,8 +102,8 @@ sleep_for_ticks (uint32_t)
 #endif
 
 using namespace ::std::chrono;
-using namespace os::std::chrono;
-using namespace os::std;
+using namespace os::estd::chrono;
+using namespace os::estd;
 using namespace os;
 
 int
@@ -174,10 +174,10 @@ main (int argc, char* argv[])
   auto tp = chrono::Systick_clock::now ();
   trace::printf ("Systick_clock::now() = %d ticks\n", tp);
 
-  auto tp2 = os::std::chrono::system_clock::now ();
+  auto tp2 = os::estd::chrono::system_clock::now ();
   trace::printf ("system_clock::now() = %ld us\n", tp2);
 
-  auto tp3 = os::std::chrono::high_resolution_clock::now ();
+  auto tp3 = os::estd::chrono::high_resolution_clock::now ();
   trace::printf ("high_resolution_clock::now() = %ld ns\n", tp3);
 
 #pragma GCC diagnostic pop
