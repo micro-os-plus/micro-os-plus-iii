@@ -80,24 +80,6 @@ namespace os
 
     // ----------------------------------------------------------------------
 
-    //  ==== Kernel Control Functions ====
-
-    namespace kernel
-    {
-      /**
-       * @brief Initialise RTOS kernel.
-       * @retval result::ok.
-       */
-      result_t
-      initialize (void);
-
-      bool
-      is_in_irq (void);
-
-    } /* namespace kernel */
-
-    // ----------------------------------------------------------------------
-
     class Systick_clock
     {
     public:
@@ -190,6 +172,16 @@ namespace os
     namespace scheduler
     {
       using status_t = bool;
+
+      /**
+       * @brief Initialise RTOS kernel.
+       * @retval result::ok.
+       */
+      result_t
+      initialize (void);
+
+      bool
+      is_in_irq (void);
 
       /**
        * @brief Start the RTOS kernel.

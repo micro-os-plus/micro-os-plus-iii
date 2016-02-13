@@ -36,36 +36,6 @@ namespace os
 
     // ======================================================================
 
-    namespace kernel
-    {
-      /**
-       * @details
-       * Create all RTOS internal objects and be ready to run.
-       *
-       * @warning Cannot be invoked from Interrupt Service Routines.
-       */
-      result_t
-      initialize (void)
-      {
-        // TODO
-        return result::ok;
-      }
-
-      /**
-       *
-       */
-      bool
-      is_in_irq (void)
-      {
-        // TODO
-
-        return false;
-      }
-
-    } /* namespace kernel */
-
-    // ======================================================================
-
     static Systick_clock::rep __systick_now = 12300;
 
     /**
@@ -145,6 +115,30 @@ namespace os
     namespace scheduler
     {
       status_t sched_running = false;
+
+      /**
+       * @details
+       * Create all RTOS internal objects and be ready to run.
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      result_t
+      initialize (void)
+      {
+        // TODO
+        return result::ok;
+      }
+
+      /**
+       *
+       */
+      bool
+      is_in_irq (void)
+      {
+        // TODO
+
+        return false;
+      }
 
       /**
        * @details
@@ -255,7 +249,7 @@ namespace os
       result_t
       clear (Thread& thread, event_flags_t flags, event_flags_t* out_flags)
       {
-        assert(!kernel::is_in_irq ());
+        assert(!scheduler::is_in_irq ());
 
         return result::ok;
       }
@@ -268,7 +262,7 @@ namespace os
       result_t
       wait (event_flags_t flags, event_flags_t* out_flags)
       {
-        assert(!kernel::is_in_irq ());
+        assert(!scheduler::is_in_irq ());
 
         return result::ok;
       }
@@ -293,7 +287,7 @@ namespace os
       timed_wait (event_flags_t flags, event_flags_t* out_flags,
                   systicks_t ticks)
       {
-        assert(!kernel::is_in_irq ());
+        assert(!scheduler::is_in_irq ());
 
         return result::ok;
       }
@@ -324,7 +318,7 @@ namespace os
       Thread&
       get (void)
       {
-        assert(!kernel::is_in_irq ());
+        assert(!scheduler::is_in_irq ());
 
         // TODO
         return no_thread;
@@ -339,7 +333,7 @@ namespace os
       result_t
       yield (void)
       {
-        assert(!kernel::is_in_irq ());
+        assert(!scheduler::is_in_irq ());
         // TODO
 
         return this_thread::get ().wakeup_reason ();
@@ -417,7 +411,7 @@ namespace os
           { attr.name () }
     {
       assert(function != nullptr);
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       // Get attributes from user structure.
       prio_ = attr.th_priority;
@@ -552,7 +546,7 @@ namespace os
     result_t
     Thread::join (void** exit_ptr)
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
@@ -579,7 +573,7 @@ namespace os
     result_t
     Thread::detach (void)
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
@@ -604,7 +598,7 @@ namespace os
     result_t
     Thread::cancel (void)
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
@@ -650,7 +644,7 @@ namespace os
     void
     Thread::exit (void* value_ptr)
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
@@ -698,7 +692,7 @@ namespace os
 
     {
       assert(function != nullptr);
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       type_ = attr.tm_type;
       func_ = function;
@@ -727,7 +721,7 @@ namespace os
     result_t
     Timer::start (systicks_t ticks)
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s(%d) @%p \n", __func__, ticks, this);
       // TODO
@@ -742,7 +736,7 @@ namespace os
     result_t
     Timer::stop (void)
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s() @%p \n", __func__, this);
       // TODO
@@ -794,7 +788,7 @@ namespace os
         protocol_ (attr.mx_protocol), //
         robustness_ (attr.mx_robustness) //
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       prio_ceiling_ = attr.mx_priority_ceiling;
       owner_ = nullptr;
@@ -858,7 +852,7 @@ namespace os
     result_t
     Mutex::lock (void)
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s() @%p \n", __func__, this);
       // TODO
@@ -899,7 +893,7 @@ namespace os
     result_t
     Mutex::try_lock (void)
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s() @%p \n", __func__, this);
       // TODO
@@ -939,7 +933,7 @@ namespace os
     result_t
     Mutex::timed_lock (systicks_t ticks)
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s(%d_ticks) @%p \n", __func__, ticks, this);
       // TODO
@@ -967,7 +961,7 @@ namespace os
     result_t
     Mutex::unlock (void)
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s() @%p \n", __func__, this);
       // TODO
@@ -986,7 +980,7 @@ namespace os
     result_t
     Mutex::get_prio_ceiling (thread::priority_t* prio_ceiling) const
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s() @%p \n", __func__, this);
       if (prio_ceiling != nullptr)
@@ -1018,7 +1012,7 @@ namespace os
     Mutex::set_prio_ceiling (thread::priority_t prio_ceiling,
                              thread::priority_t* old_prio_ceiling)
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s() @%p \n", __func__, this);
       // TODO
@@ -1051,7 +1045,7 @@ namespace os
     result_t
     Mutex::consistent (void)
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s() @%p \n", __func__, this);
       // TODO
@@ -1087,7 +1081,7 @@ namespace os
         Named_object
           { attr.name () }
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s() @%p \n", __func__, this);
     }
@@ -1139,7 +1133,7 @@ namespace os
     result_t
     Condition_variable::signal ()
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s() @%p \n", __func__, this);
       // TODO
@@ -1182,7 +1176,7 @@ namespace os
     result_t
     Condition_variable::broadcast ()
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s() @%p \n", __func__, this);
       // TODO
@@ -1204,7 +1198,7 @@ namespace os
     result_t
     Condition_variable::wait (Mutex* mutex)
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s() @%p \n", __func__, this);
       // TODO
@@ -1226,7 +1220,7 @@ namespace os
     result_t
     Condition_variable::timed_wait (Mutex* mutex, systicks_t ticks)
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s(%d_ticks) @%p \n", __func__, ticks, this);
       // TODO
@@ -1391,7 +1385,7 @@ namespace os
     result_t
     Semaphore::wait ()
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
@@ -1430,7 +1424,7 @@ namespace os
     result_t
     Semaphore::try_wait ()
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
@@ -1473,7 +1467,7 @@ namespace os
     result_t
     Semaphore::timed_wait (systicks_t ticks)
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s(%d_ticks) @%p %s\n", __func__, ticks, this, name ());
         {
@@ -1549,7 +1543,7 @@ namespace os
         Named_object
           { attr.name () }
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       pool_addr_ = attr.mp_pool_address;
       blocks_ = blocks;
@@ -1567,7 +1561,7 @@ namespace os
      */
     Memory_pool::~Memory_pool ()
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
@@ -1586,7 +1580,7 @@ namespace os
     void*
     Memory_pool::alloc (void)
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
@@ -1624,7 +1618,7 @@ namespace os
     void*
     Memory_pool::timed_alloc (systicks_t ticks)
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s(%d) @%p %s\n", __func__, ticks, this, name ());
 
@@ -1692,7 +1686,7 @@ namespace os
         msgs_ (msgs), //
         msg_size_bytes_ (msg_size_bytes)
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       queue_addr_ = attr.queue_address;
       queue_size_bytes_ = attr.queue_size_bytes;
@@ -1717,7 +1711,7 @@ namespace os
      */
     Message_queue::~Message_queue ()
     {
-      assert(!kernel::is_in_irq ());
+      assert(!scheduler::is_in_irq ());
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
@@ -1832,8 +1826,8 @@ namespace os
               }
           }
 
-        for (std::size_t i = pos;
-            i < (sizeof(array_) / sizeof(array_[0]) - 2); ++i)
+        for (std::size_t i = pos; i < (sizeof(array_) / sizeof(array_[0]) - 2);
+            ++i)
           {
             array_[i] = array_[i + 1];
           }

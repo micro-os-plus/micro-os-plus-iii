@@ -63,7 +63,7 @@ static_assert(sizeof(mqueue::Attributes) == sizeof(osMessageQAttr), "adjust size
 osStatus
 osKernelInitialize (void)
 {
-  return static_cast<osStatus> (kernel::initialize ());
+  return static_cast<osStatus> (scheduler::initialize ());
 }
 
 osStatus
