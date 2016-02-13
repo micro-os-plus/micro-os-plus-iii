@@ -982,7 +982,7 @@ namespace os
 
     // ======================================================================
 
-    namespace cond
+    namespace condvar
     {
 
       /**
@@ -1016,7 +1016,7 @@ namespace os
 
       extern const Attributes initializer;
 
-    } /* namespace cond */
+    } /* namespace condvar */
 
     // ======================================================================
 
@@ -1028,7 +1028,7 @@ namespace os
        * @brief Create and initialise a mutex.
        */
       Condition_variable ();
-      Condition_variable (const cond::Attributes& attr);
+      Condition_variable (const condvar::Attributes& attr);
 
       Condition_variable (const Condition_variable&) = delete;
       Condition_variable (Condition_variable&&) = delete;
@@ -1728,7 +1728,7 @@ namespace os
 
     // ======================================================================
 
-    namespace cond
+    namespace condvar
     {
       inline
       Attributes::Attributes (const char* name) :
@@ -1737,7 +1737,7 @@ namespace os
       {
         ;
       }
-    } /* namespace cond */
+    } /* namespace condvar */
 
     // ======================================================================
 

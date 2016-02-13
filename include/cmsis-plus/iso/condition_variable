@@ -78,7 +78,7 @@ namespace os
       condition_variable ();
 
       // Extension to ISO.
-      condition_variable (os::rtos::cond::Attributes& attr);
+      condition_variable (os::rtos::condvar::Attributes& attr);
 
       ~condition_variable ();
 
@@ -141,7 +141,7 @@ namespace os
     public:
 
       condition_variable_any ();
-      condition_variable_any (os::rtos::cond::Attributes& attr);
+      condition_variable_any (os::rtos::condvar::Attributes& attr);
 
       ~condition_variable_any ();
 
@@ -215,7 +215,7 @@ namespace os
     }
 
     inline
-    condition_variable::condition_variable (os::rtos::cond::Attributes& attr) :
+    condition_variable::condition_variable (os::rtos::condvar::Attributes& attr) :
         ncv_
           { attr }
     {
@@ -336,7 +336,7 @@ namespace os
 
     inline
     condition_variable_any::condition_variable_any (
-        os::rtos::cond::Attributes& attr) :
+        os::rtos::condvar::Attributes& attr) :
         cv_
           { attr }, //
         mx_

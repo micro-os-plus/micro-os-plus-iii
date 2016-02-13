@@ -1060,11 +1060,11 @@ namespace os
 
     // ======================================================================
 
-    namespace cond
+    namespace condvar
     {
       const Attributes initializer
         { nullptr };
-    } /* namespace cond */
+    } /* namespace condvar */
 
     /**
      * @details
@@ -1073,7 +1073,7 @@ namespace os
      */
     Condition_variable::Condition_variable () :
         Condition_variable
-          { cond::initializer }
+          { condvar::initializer }
     {
       ;
     }
@@ -1083,7 +1083,7 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Condition_variable::Condition_variable (const cond::Attributes& attr) :
+    Condition_variable::Condition_variable (const condvar::Attributes& attr) :
         Named_object
           { attr.name () }
     {
