@@ -445,7 +445,7 @@ namespace os
     Thread::~Thread ()
     {
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
-      scheduler::__register_thread (this);
+      scheduler::__unregister_thread (this);
     }
 
     /**
@@ -1693,7 +1693,7 @@ namespace os
       if (queue_addr_ != nullptr)
         {
           assert(queue_size_bytes_ > 0);
-          assert(queue_size_bytes_ >= msgs * msg_size_bytes);
+          assert(queue_size_bytes_ >= (std::size_t)(msgs * msg_size_bytes));
         }
       else
         {
