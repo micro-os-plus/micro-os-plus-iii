@@ -32,8 +32,8 @@ Even worse, not all creation parameters are available, neither
 in the `*Def` structure nor in the `*Create()` prototype (for example
 the location of the thread stack area, the semaphore max count, etc). 
 
-Neither the split between which parameters go to the `*Def` structure 
-and which go to the `*Create()` prototype is very obvious and 
+Neither the split between the parameters that go to the `*Def` structure 
+and those that go to the `*Create()` prototype is very obvious and 
 consecvent (as it is in POSIX threads).
 
 
@@ -414,6 +414,13 @@ try to wait or wait with timeout. However, when invoked form an ISR,
 this parameter must be 0.
 
 This is confusing, and separate calls are prefered.
+
+### Documentation
+
+* the notice _MUST REMAIN UNCHANGED_ applied to enums should be corrected
+to state that only the names must remain unchanged, there is no special
+reason for the actual values of the error codes, the priorities, 
+and other enums to be restricted.
 
 ## CMSIS Drivers 
 
