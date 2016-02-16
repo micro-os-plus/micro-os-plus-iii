@@ -434,8 +434,7 @@ namespace os
     template<class Lock_T, class Rep_T, class Period_T>
       inline cv_status
       condition_variable_any::wait_for (
-          Lock_T& lock,
-          const std::chrono::duration<Rep_T, Period_T>& rel_time)
+          Lock_T& lock, const std::chrono::duration<Rep_T, Period_T>& rel_time)
       {
         return wait_until (lock, Native_clock::now () + rel_time);
       }
@@ -443,8 +442,7 @@ namespace os
     template<class Lock_T, class Rep_T, class Period_T, class Predicate_T>
       inline bool
       condition_variable_any::wait_for (
-          Lock_T& lock,
-          const std::chrono::duration<Rep_T, Period_T>& rel_time,
+          Lock_T& lock, const std::chrono::duration<Rep_T, Period_T>& rel_time,
           Predicate_T pred)
       {
         return wait_until (lock, Native_clock::now () + rel_time,
