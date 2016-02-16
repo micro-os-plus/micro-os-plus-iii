@@ -126,7 +126,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
+						<entry excluding="cmsis-plus/rtos/cmsis_os.cpp" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="tests/gcc"/>
 					</sourceEntries>
 				</configuration>
@@ -269,7 +269,7 @@
 						</tool>
 					</fileInfo>
 					<sourceEntries>
-						<entry excluding="tests/std-gcc/trace.cpp|tests/std-gcc/trace-posix-stderr.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="src/cmsis-plus/rtos/cmsis_os.cpp|tests/std-gcc/trace.cpp|tests/std-gcc/trace-posix-stderr.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -343,7 +343,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
+						<entry excluding="cmsis-plus/rtos/cmsis_os.cpp" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="tests/gcc"/>
 					</sourceEntries>
 				</configuration>
@@ -400,8 +400,8 @@
 							<tool id="cdt.managedbuild.tool.gnu.assembler.macosx.base.1574554639" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.macosx.base">
 								<option id="gnu.both.asm.option.include.paths.873241479" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/cmsis-plus-xpack/templates/rtos}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/portable/diag-trace-xpack/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/cmsis-plus-xpack/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/cmsis-plus-xpack/tests/rtos-gcc}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.100037604" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 							</tool>
@@ -409,8 +409,8 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.base.1587798672" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.macosx.base">
 								<option id="gnu.cpp.compiler.option.include.paths.566313378" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/cmsis-plus-xpack/templates/rtos}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/portable/diag-trace-xpack/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/cmsis-plus-xpack/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/cmsis-plus-xpack/tests/rtos-gcc}&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.optimization.level.1594844899" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.size" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.debugging.level.2033756660" name="Debug Level" superClass="gnu.cpp.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
@@ -426,8 +426,8 @@
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.macosx.base.750575076" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.macosx.base">
 								<option id="gnu.c.compiler.option.include.paths.276000528" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/cmsis-plus-xpack/templates/rtos}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/portable/diag-trace-xpack/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/cmsis-plus-xpack/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/cmsis-plus-xpack/tests/rtos-gcc}&quot;"/>
 								</option>
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.62464945" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.c.optimization.level.size" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.2118761895" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
@@ -442,7 +442,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="rtos" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="templates"/>
+						<entry excluding="cmsis-plus/rtos/cmsis_os.cpp|cmsis-plus/drivers|cmsis-plus/iso|cmsis-plus/startup" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="templates/rtos"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="tests/rtos-gcc"/>
 					</sourceEntries>
@@ -503,7 +503,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/arm-cmsis-xpack/CMSIS/Driver/Include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/cmsis-plus-xpack/tests/std-gcc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/cmsis-plus-xpack/templates/rtos}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/portable/diag-trace-xpack/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/cmsis-plus-xpack/include}&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.639490752" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
@@ -515,7 +514,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/arm-cmsis-xpack/CMSIS/Driver/Include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/cmsis-plus-xpack/tests/std-gcc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/cmsis-plus-xpack/templates/rtos}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/portable/diag-trace-xpack/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/cmsis-plus-xpack/include}&quot;"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.optimization.level.609869804" name="Optimization Level" superClass="gnu.cpp.compiler.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
@@ -538,7 +536,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/arm-cmsis-xpack/CMSIS/Driver/Include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/cmsis-plus-xpack/tests/std-gcc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/cmsis-plus-xpack/templates/rtos}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/portable/diag-trace-xpack/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/cmsis-plus-xpack/include}&quot;"/>
 								</option>
 								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.option.optimization.level.1524767493" name="Optimization Level" superClass="gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
@@ -556,7 +553,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="cmsis-plus/startup" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
+						<entry excluding="cmsis-plus/rtos/cmsis_os.cpp|cmsis-plus/startup" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="templates/rtos"/>
 						<entry excluding="trace.cpp|tiny-syscalls.cpp" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="tests/std-gcc"/>
 					</sourceEntries>
@@ -647,7 +644,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/arm-cmsis-xpack/CMSIS/Driver/Include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/cmsis-plus-xpack/tests/std-gcc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/cmsis-plus-xpack/templates/rtos}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/portable/diag-trace-xpack/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/cmsis-plus-xpack/include}&quot;"/>
 								</option>
 								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.defs.961966061" name="Defined symbols (-D)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.defs" valueType="definedSymbols">
@@ -666,7 +662,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/arm-cmsis-xpack/CMSIS/Driver/Include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/cmsis-plus-xpack/tests/std-gcc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/cmsis-plus-xpack/templates/rtos}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/portable/diag-trace-xpack/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/cmsis-plus-xpack/include}&quot;"/>
 								</option>
 								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.defs.368899404" name="Defined symbols (-D)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.defs" useByScannerDiscovery="false" valueType="definedSymbols">
@@ -692,7 +687,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/arm-cmsis-xpack/CMSIS/Driver/Include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/cmsis-plus-xpack/tests/std-gcc}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/cmsis-plus-xpack/templates/rtos}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/portable/diag-trace-xpack/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/micro-os-plus-iii/ilg/arm/cmsis-plus-xpack/include}&quot;"/>
 								</option>
 								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.defs.1211680974" name="Defined symbols (-D)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.defs" useByScannerDiscovery="false" valueType="definedSymbols">
@@ -731,7 +725,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="cmsis-plus/startup/reset-hardware.c|cmsis-plus/startup/exception-handlers.c|cmsis-plus/startup/startup.c|cmsis-plus/startup/initialize-hardware.c" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
+						<entry excluding="cmsis-plus/rtos/cmsis_os.cpp|cmsis-plus/startup/reset-hardware.c|cmsis-plus/startup/exception-handlers.c|cmsis-plus/startup/startup.c|cmsis-plus/startup/initialize-hardware.c" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="templates/rtos"/>
 						<entry excluding="trace.cpp|trace-posix-stderr.cpp" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="tests/std-gcc"/>
 					</sourceEntries>

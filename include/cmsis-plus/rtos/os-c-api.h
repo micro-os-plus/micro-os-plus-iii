@@ -30,7 +30,8 @@
 
 // ----------------------------------------------------------------------------
 
-#include <cmsis-plus/rtos/os-impl.h>
+// Include the CMSIS++ C API structures definitions.
+#include <cmsis-plus/rtos/os-c-defs.h>
 
 #include <stdint.h>
 #include <stddef.h>
@@ -45,31 +46,7 @@ extern "C"
 
 // --------------------------------------------------------------------------
 
-#define OS_PRIOTHREAD_SIZE_PTR (OS_INTEGER_MAX_NUMBER_OF_THREADS+1)
-
-#if __SIZEOF_POINTER__ == 4
-#define OS_THREAD_SIZE_PTRS  (7)
-#define OS_TIMER_SIZE_PTRS  (4)
-#define OS_MUTEX_SIZE_PTRS  (4)
-#define OS_SEMAPHORE_SIZE_PTRS  (3+OS_PRIOTHREAD_SIZE_PTR)
-#define OS_POOL_SIZE_PTRS  (4+OS_PRIOTHREAD_SIZE_PTR)
-#define OS_MESSAGEQ_SIZE_PTRS  (5+2*OS_PRIOTHREAD_SIZE_PTR)
-#define OS_MAILQ_SIZE_PTRS  (1)
-#elif __SIZEOF_POINTER__ == 8
-#define OS_THREAD_SIZE_PTRS  (6)
-#define OS_TIMER_SIZE_PTRS  (4)
-#define OS_MUTEX_SIZE_PTRS  (3)
-#define OS_SEMAPHORE_SIZE_PTRS  (2+OS_PRIOTHREAD_SIZE_PTR)
-#define OS_POOL_SIZE_PTRS  (3+OS_PRIOTHREAD_SIZE_PTR)
-#define OS_MESSAGEQ_SIZE_PTRS  (4+2*OS_PRIOTHREAD_SIZE_PTR)
-#define OS_MAILQ_SIZE_PTRS  (1)
-#else
-#error "Unsupported platform."
-#endif
-
-// --------------------------------------------------------------------------
-
-  typedef uint32_t os_result_t;
+//typedef uint32_t os_result_t;
 
   enum
   {
@@ -92,32 +69,6 @@ extern "C"
 
   bool
   os_sched_is_running (void);
-
-  // --------------------------------------------------------------------------
-
-  typedef struct os_thread_s
-  {
-    void* content[OS_THREAD_SIZE_PTRS];
-  } os_thread_t;
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
-
-  typedef struct os_thread_attr_s
-  {
-    const char* name;
-    void* stack_address;
-    size_t stack_size_bytes;
-    uint8_t priority;
-  } os_thread_attr_t;
-
-#pragma GCC diagnostic pop
-
-  typedef void* os_thread_func_args_t;
-  typedef void*
-  (*os_thread_func_t) (os_thread_func_args_t args);
-
-  typedef uint8_t os_thread_prio_t;
 
   // --------------------------------------------------------------------------
 

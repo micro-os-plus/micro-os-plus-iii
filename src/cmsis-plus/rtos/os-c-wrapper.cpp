@@ -2,7 +2,6 @@
  * This file is part of the µOS++ distribution.
  *   (https://github.com/micro-os-plus)
  * Copyright (c) 2016 Liviu Ionescu.
- * Copyright (c) 2013 ARM LIMITED
  *
  * µOS++ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -21,15 +20,22 @@
  * This file is part of the CMSIS++ proposal, intended as a CMSIS
  * replacement for C++ applications.
  *
- * The code provides a CMSIS RTOS compliant C implementation using the
- * CMSIC++ RTOS definitions.
+ * The code provides an implementation of the C API for the CMSIS++
+ * and legacy CMSIS, using the CMSIC++ RTOS definitions.
  */
 
-#include <cmsis_os_ex.h>
 #include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/rtos/os-c-api.h>
+#include <cmsis-plus/diag/trace.h>
 
+// Note: The legacy header is included later, to avoid polluting the namespace.
+
+#include <cassert>
+#include <cerrno>
 #include <cstring>
 #include <new>
+
+// ----------------------------------------------------------------------------
 
 using namespace os::rtos;
 
@@ -38,26 +44,104 @@ using namespace os::rtos;
 // Validate C structs sizes (should match the C++ objects sizes).
 // TODO: validate individual members (size & offset).
 
-static_assert(sizeof(Thread) == sizeof(osThread), "adjust size of osThread");
-static_assert(sizeof(thread::Attributes) == sizeof(osThreadAttr), "adjust size of osThreadAttr");
+static_assert(sizeof(Thread) == sizeof(os_thread_t), "adjust os_thread_t size");
+static_assert(sizeof(thread::Attributes) == sizeof(os_thread_attr_t), "adjust os_thread_attr_t size");
 
-static_assert(sizeof(Timer) == sizeof(osTimer), "adjust size of osTimer");
-static_assert(sizeof(timer::Attributes) == sizeof(osTimerAttr), "adjust size of osTimerAttr");
+static_assert(sizeof(Timer) == sizeof(os_timer_t), "adjust size of os_timer_t");
+static_assert(sizeof(timer::Attributes) == sizeof(os_timer_attr_t), "adjust size of os_timer_attr_t");
 
-static_assert(sizeof(Mutex) == sizeof(osMutex), "adjust size of osMutex");
-static_assert(sizeof(mutex::Attributes) == sizeof(osMutexAttr), "adjust size of osMutexAttr");
+static_assert(sizeof(Mutex) == sizeof(os_mutex_t), "adjust size of os_mutex_t");
+static_assert(sizeof(mutex::Attributes) == sizeof(os_mutex_attr_t), "adjust size of os_mutex_attr_t");
 
-static_assert(sizeof(Semaphore) == sizeof(osSemaphore), "adjust size of osSemaphore");
-static_assert(sizeof(semaphore::Attributes) == sizeof(osSemaphoreAttr), "adjust size of osSemaphoreAttr");
+static_assert(sizeof(Semaphore) == sizeof(os_semaphore_t), "adjust size of os_semaphore_t");
+static_assert(sizeof(semaphore::Attributes) == sizeof(os_semaphore_attr_t), "adjust size of os_semaphore_attr_t");
 
-static_assert(sizeof(Memory_pool) == sizeof(osPool), "adjust size of osPool");
-static_assert(sizeof(mempool::Attributes) == sizeof(osPoolAttr), "adjust size of osPoolAttr");
+static_assert(sizeof(Memory_pool) == sizeof(os_mempool_t), "adjust size of os_mempool_t");
+static_assert(sizeof(mempool::Attributes) == sizeof(os_mempool_attr_t), "adjust size of os_mempool_attr_t");
 
-static_assert(sizeof(Message_queue) == sizeof(osMessageQ), "adjust size of osMessageQ");
-static_assert(sizeof(mqueue::Attributes) == sizeof(osMessageQAttr), "adjust size of osMessageQAttr");
+static_assert(sizeof(Message_queue) == sizeof(os_mqueue_t), "adjust size of os_mqueue_t");
+static_assert(sizeof(mqueue::Attributes) == sizeof(os_mqueue_attr_t), "adjust size of os_mqueue_attr_t");
 
 // ----------------------------------------------------------------------------
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+int
+__attribute__((weak))
+main (int argc, char* argv[])
+{
+  // Create a thread and call os_main()
+}
+
+#pragma GCC diagnostic pop
+
+// ----------------------------------------------------------------------------
+
+os_result_t
+os_sched_initialize (void)
+{
+  return static_cast<os_result_t> (scheduler::initialize ());
+}
+
+os_result_t
+os_sched_start (void)
+{
+  return static_cast<os_result_t> (scheduler::start ());
+}
+
+bool
+os_sched_is_running (void)
+{
+  return scheduler::is_running ();
+}
+
+// ----------------------------------------------------------------------------
+
+void
+os_thread_create (os_thread_t* thread, const os_thread_attr_t* attr,
+                  os_thread_func_t func, const os_thread_func_args_t args)
+{
+  new (thread) Thread ((thread::Attributes&) *attr, (thread::func_t) func,
+                       (thread::func_args_t) args);
+}
+
+void
+os_thread_exit (os_thread_t* thread, void* exit_ptr)
+{
+  (reinterpret_cast<Thread&> (thread)).exit (exit_ptr);
+}
+
+os_result_t
+os_thread_join (os_thread_t* thread, void** exit_ptr)
+{
+  return (reinterpret_cast<Thread&> (thread)).join (exit_ptr);
+}
+
+os_thread_prio_t
+os_thread_get_prio (os_thread_t* thread)
+{
+  return (reinterpret_cast<Thread&> (thread)).sched_prio ();
+}
+
+os_result_t
+os_thread_set_prio (os_thread_t* thread, os_thread_prio_t prio)
+{
+  return (reinterpret_cast<Thread&> (thread)).sched_prio (prio);
+}
+
+void
+os_thread_wakeup (os_thread_t* thread)
+{
+  return (reinterpret_cast<Thread&> (thread)).wakeup ();
+}
+
+// ****************************************************************************
+// ***** Legacy CMSIS RTOS implementation *****
+
+#include <cmsis_os.h>
+
+// ----------------------------------------------------------------------------
 //  ==== Kernel Control Functions ====
 
 osStatus
@@ -78,7 +162,7 @@ osKernelRunning (void)
   return scheduler::is_running ();
 }
 
-#if (defined (osFeature_SysTick)  &&  (osFeature_SysTick != 0))     // System Timer available
+#if (defined (osFeature_SysTick)  &&  (osFeature_SysTick != 0))
 
 uint32_t
 osKernelSysTick (void)
@@ -92,7 +176,6 @@ osKernelSysTick (void)
 #endif    // System Timer available
 
 // ----------------------------------------------------------------------------
-
 //  ==== Thread Management ====
 
 osThreadId
@@ -100,16 +183,6 @@ osThreadCreate (const osThreadDef_t* thread_def, void* args)
 {
   Thread* thread = new (thread_def->data) Thread (
       (thread::func_t) thread_def->pthread, args);
-  return reinterpret_cast<osThreadId> (thread);
-}
-
-osThreadId
-osThreadCreateEx (osThread* addr, const osThreadAttr* attr, os_pthread function,
-                  const void* args)
-{
-  Thread* thread = new (addr) Thread ((thread::Attributes&) *attr,
-                                      (thread::func_t) function,
-                                      (thread::func_args_t) args);
   return reinterpret_cast<osThreadId> (thread);
 }
 
@@ -150,7 +223,6 @@ osThreadGetPriority (osThreadId thread_id)
 }
 
 // ----------------------------------------------------------------------------
-
 //  ==== Generic Wait Functions ====
 
 osStatus
@@ -182,7 +254,6 @@ osWait (uint32_t millisec)
 #endif  // Generic Wait available
 
 // ----------------------------------------------------------------------------
-
 //  ==== Timer Management Functions ====
 
 osTimerId
@@ -194,15 +265,6 @@ osTimerCreate (const osTimerDef_t* timer_def, os_timer_type type, void* args)
 
   return reinterpret_cast<osTimerId> (new ((void*) &timer_def->data) Timer (
       attr, (timer::func_t) timer_def->ptimer, (timer::func_args_t) args));
-}
-
-osTimerId
-osTimerCreateEx (osTimer* addr, osTimerAttr* attr, os_ptimer function,
-                 void* args)
-{
-  return reinterpret_cast<osTimerId> (new ((void*) addr) Timer (
-      (timer::Attributes&) (*attr), (timer::func_t) function,
-      (timer::func_args_t) args));
 }
 
 osStatus
@@ -226,7 +288,6 @@ osTimerDelete (osTimerId timer_id)
 }
 
 // ----------------------------------------------------------------------------
-
 //  ==== Signal Management ====
 
 int32_t
@@ -288,13 +349,6 @@ osMutexCreate (const osMutexDef_t* mutex_def)
   return reinterpret_cast<osMutexId> (new ((void*) &mutex_def->data) Mutex ());
 }
 
-osMutexId
-osMutexCreateEx (osMutex* addr, const osMutexAttr* attr)
-{
-  return reinterpret_cast<osMutexId> (new ((void*) addr) Mutex (
-      (const mutex::Attributes&) *attr));
-}
-
 osStatus
 osMutexWait (osMutexId mutex_id, uint32_t millisec)
 {
@@ -350,13 +404,6 @@ osSemaphoreCreate (const osSemaphoreDef_t* semaphore_def, int32_t count)
       attr));
 }
 
-osSemaphoreId
-osSemaphoreCreateEx (osSemaphoreId addr, const osSemaphoreAttr* attr)
-{
-  return reinterpret_cast<osSemaphoreId> (new ((void*) addr) Semaphore (
-      (const semaphore::Attributes&) *attr));
-}
-
 int32_t
 osSemaphoreWait (osSemaphoreId semaphore_id, uint32_t millisec)
 {
@@ -395,7 +442,6 @@ osSemaphoreDelete (osSemaphoreId semaphore_id)
 #endif /* Semaphore available */
 
 // ----------------------------------------------------------------------------
-
 //  ==== Memory Pool Management Functions ====
 
 #if (defined (osFeature_Pool)  &&  (osFeature_Pool != 0))
@@ -408,15 +454,6 @@ osPoolCreate (const osPoolDef_t* pool_def)
   attr.mp_pool_address = pool_def->pool;
   return reinterpret_cast<osPoolId> (new ((void*) &pool_def->data) Memory_pool (
       (mempool::size_t) pool_def->pool_sz, (mempool::size_t) pool_def->item_sz));
-}
-
-osPoolId
-osPoolCreateEx (osPool* addr, const osPoolAttr* attr, size_t items,
-                size_t item_size_bytes)
-{
-  return reinterpret_cast<osPoolId> (new ((void*) addr) Memory_pool (
-      (mempool::Attributes&) *attr, (mempool::size_t) items,
-      (mempool::size_t) item_size_bytes));
 }
 
 void*
@@ -444,16 +481,9 @@ osPoolFree (osPoolId pool_id, void* block)
       block));
 }
 
-void
-osPoolDeleteEx (osPoolId pool_id)
-{
-  (reinterpret_cast<Memory_pool&> (pool_id)).~Memory_pool ();
-}
-
 #endif /* Memory Pool Management available */
 
 // ----------------------------------------------------------------------------
-
 //  ==== Message Queue Management Functions ====
 
 #if (defined (osFeature_MessageQ)  &&  (osFeature_MessageQ != 0))
@@ -462,11 +492,6 @@ osMessageQId
 osMessageCreate (const osMessageQDef_t* queue_def,
                  osThreadId thread_id __attribute__((unused)))
 {
-#if 0
-  return reinterpret_cast<osMessageQId> (new ((void*) &queue_def->data) Fixed_message_queue (
-          queue_def->name, queue_def->queue_sz, queue_def->mempool,
-          reinterpret_cast<Thread*> (thread_id)));
-#else
   mqueue::Attributes attr
     { queue_def->name };
   attr.queue_address = queue_def->queue;
@@ -475,16 +500,6 @@ osMessageCreate (const osMessageQDef_t* queue_def,
   return reinterpret_cast<osMessageQId> (new ((void*) &queue_def->data) Message_queue (
       attr, (mqueue::size_t) queue_def->items,
       (mqueue::size_t) queue_def->item_sz));
-#endif
-}
-
-osMessageQId
-osMessageCreateEx (osMessageQ* addr, const osMessageQAttr* attr, size_t items,
-                   size_t item_size)
-{
-  return reinterpret_cast<osMessageQId> (new ((void*) addr) Message_queue (
-      (mqueue::Attributes&) (*attr), (mqueue::size_t) items,
-      (mqueue::size_t) item_size));
 }
 
 osStatus
@@ -552,16 +567,9 @@ osMessageGet (osMessageQId queue_id, uint32_t millisec)
 
 #pragma GCC diagnostic pop
 
-void
-osMessageDeleteEx (osMessageQId queue_id)
-{
-  (reinterpret_cast<Message_queue&> (queue_id)).~Message_queue ();
-}
-
 #endif /* Message Queues available */
 
 // ----------------------------------------------------------------------------
-
 //  ==== Mail Queue Management Functions ====
 
 #if (defined (osFeature_MailQ)  &&  (osFeature_MailQ != 0))
@@ -681,13 +689,82 @@ osMailFree (osMailQId queue_id, void* mail)
   return osPoolFree (&(queue_id->pool), mail);
 }
 
+#endif /* Mail Queues available */
+
+// ----------------------------------------------------------------------------
+
+#if 0
+
+osThreadId
+osThreadCreateEx (osThread* addr, const osThreadAttr* attr, os_pthread function,
+    const void* args)
+  {
+    Thread* thread = new (addr) Thread ((thread::Attributes&) *attr,
+        (thread::func_t) function,
+        (thread::func_args_t) args);
+    return reinterpret_cast<osThreadId> (thread);
+  }
+
+osTimerId
+osTimerCreateEx (osTimer* addr, osTimerAttr* attr, os_ptimer function,
+    void* args)
+  {
+    return reinterpret_cast<osTimerId> (new ((void*) addr) Timer (
+            (timer::Attributes&) (*attr), (timer::func_t) function,
+            (timer::func_args_t) args));
+  }
+
+osMutexId
+osMutexCreateEx (osMutex* addr, const osMutexAttr* attr)
+  {
+    return reinterpret_cast<osMutexId> (new ((void*) addr) Mutex (
+            (const mutex::Attributes&) *attr));
+  }
+
+osSemaphoreId
+osSemaphoreCreateEx (osSemaphoreId addr, const osSemaphoreAttr* attr)
+  {
+    return reinterpret_cast<osSemaphoreId> (new ((void*) addr) Semaphore (
+            (const semaphore::Attributes&) *attr));
+  }
+
+osPoolId
+osPoolCreateEx (osPool* addr, const osPoolAttr* attr, size_t items,
+    size_t item_size_bytes)
+  {
+    return reinterpret_cast<osPoolId> (new ((void*) addr) Memory_pool (
+            (mempool::Attributes&) *attr, (mempool::size_t) items,
+            (mempool::size_t) item_size_bytes));
+  }
+
+void
+osPoolDeleteEx (osPoolId pool_id)
+  {
+    (reinterpret_cast<Memory_pool&> (pool_id)).~Memory_pool ();
+  }
+
+osMessageQId
+osMessageCreateEx (osMessageQ* addr, const osMessageQAttr* attr, size_t items,
+    size_t item_size)
+  {
+    return reinterpret_cast<osMessageQId> (new ((void*) addr) Message_queue (
+            (mqueue::Attributes&) (*attr), (mqueue::size_t) items,
+            (mqueue::size_t) item_size));
+  }
+
+void
+osMessageDeleteEx (osMessageQId queue_id)
+  {
+    (reinterpret_cast<Message_queue&> (queue_id)).~Message_queue ();
+  }
+
 void
 osMailDeleteEx (osMailQId queue_id)
-{
-  osPoolDeleteEx (&(queue_id->pool));
-  osMessageDeleteEx (&(queue_id->queue));
-}
+  {
+    osPoolDeleteEx (&(queue_id->pool));
+    osMessageDeleteEx (&(queue_id->queue));
+  }
 
-#endif /* Mail Queues available */
+#endif
 
 // ----------------------------------------------------------------------------

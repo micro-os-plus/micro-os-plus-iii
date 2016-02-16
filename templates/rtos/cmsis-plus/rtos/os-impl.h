@@ -35,8 +35,6 @@
 #include <cstdint>
 #include <cstddef>
 
-#include <cstddef>
-
 namespace os
 {
   namespace rtos

@@ -63,18 +63,21 @@ test1 (void)
       // Keil API.
 
       // Thread is static, but stack is dynamically allocated.
-      static osThreadDef(task_function, osPriorityNormal, 1, 0);
+      static osThreadDef(task_function, osPriorityNormal, 1, 0)
+      ;
+
       osThreadId th = osThreadCreate (osThread(task_function), &args);
 
-      osThreadGetPriority(th);
+      osThreadGetPriority (th);
       osThreadTerminate (th);
 
-      static osTimerDef(timer, timer_callback);
+      static osTimerDef(timer, timer_callback)
+      ;
       osTimerId tm = osTimerCreate (osTimer(timer), osTimerOnce, NULL);
       osTimerDelete (tm);
     }
 
-#if 1
+#if 0
     {
       // Extended API.
 
@@ -89,12 +92,12 @@ test1 (void)
       static uint8_t stack[300];
       const osThreadAttr attr =
         {
-        //
-            .name = "th2", //
-            .stack_addr = stack, //
-            .stack_size_bytes = sizeof(stack), //
-            .priority = osPriorityNormal //
-          };
+          //
+          .name = "th2",//
+          .stack_addr = stack,//
+          .stack_size_bytes = sizeof(stack),//
+          .priority = osPriorityNormal//
+        };
       static osThread th2;
       osThreadCreateEx (&th2, &attr, (os_pthread) task_function, &args);
 

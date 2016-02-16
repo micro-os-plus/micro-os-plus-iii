@@ -37,6 +37,7 @@
  *   inspired by POSIX threads attributes)
  * - improved readability with explicit three-fold waiting functions
  *   (for example: lock(), try-lock(), timed-lock(), similar to POSIX threads)
+ * - POSIX condition variable added
  * - versatile clocks added (Systick_clock, Realtime_clock)
  * - standard POSIX errors definitions used
  */
@@ -437,7 +438,7 @@ namespace os
             {
               //
           none = 0,
-          idle = 1, ///< priority: idle (lowest)
+          idle = 0x01, ///< priority: idle (lowest)
           low = 0x40, ///< priority: low
           below_normal = 0x60, ///< priority: below normal
           normal = 0x80, ///< priority: normal (default)
@@ -810,7 +811,7 @@ namespace os
           recursive = 2,
         };
 
-      using count_t = uint32_t;
+      using count_t = uint16_t;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -882,6 +883,9 @@ namespace os
     } /* namespace mutex */
 
     // ======================================================================
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
 
     class Mutex : public Named_object
     {
@@ -989,6 +993,8 @@ namespace os
       // Add more internal data.
 
     };
+
+#pragma GCC diagnostic pop
 
     // ======================================================================
 

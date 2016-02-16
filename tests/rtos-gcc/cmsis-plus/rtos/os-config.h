@@ -24,12 +24,6 @@
 #ifndef CMSIS_PLUS_RTOS_OS_CONFIG_H_
 #define CMSIS_PLUS_RTOS_OS_CONFIG_H_
 
-// ----------------------------------------------------------------------------
-
-#define OS_INTEGER_SYSTICK_FREQUENCY_HZ (1000)
-
-#define OS_INTEGER_MAX_NUMBER_OF_THREADS (10)
-
-// ----------------------------------------------------------------------------
+#include <cmsis-plus/rtos/os-config-template.h>
 
 #endif /* CMSIS_PLUS_RTOS_OS_CONFIG_H_ */

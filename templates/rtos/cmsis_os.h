@@ -77,6 +77,20 @@
  * context of the C++ version.
  */
 
+/*
+ * Calls from Interrupt Service Routines
+ *
+ * The following CMSIS-RTOS functions can be called both from threads and
+ * Interrupt Service Routines (ISR):
+ *
+ * - osKernelRunning
+ * - osSignalSet
+ * - osSemaphoreRelease
+ * - osPoolAlloc, osPoolCAlloc, osPoolFree
+ * - osMessagePut, osMessageGet
+ * - osMailAlloc, osMailCAlloc, osMailGet, osMailPut, osMailFree
+ */
+
 #ifndef _CMSIS_OS_H
 #define _CMSIS_OS_H
 
@@ -99,8 +113,8 @@
 #define osFeature_Wait         1 ///< osWait function: 1=available, 0=not available
 #define osFeature_SysTick      1 ///< osKernelSysTick functions: 1=available, 0=not available
 
-// Include the CMSIS++ C API definitions.
-#include <cmsis-plus/rtos/os-c-api.h>
+// Include the CMSIS++ C API structures definitions.
+#include <cmsis-plus/rtos/os-c-defs.h>
 
 #include <stdint.h>
 #include <stddef.h>
@@ -113,25 +127,25 @@ extern "C"
 // ==== Enumeration, structures, defines ====
 
 /// Priority used for thread control.
-/// @note MUST REMAIN UNCHANGED: @b osPriority shall be consistent in every CMSIS-RTOS.
+/// @note The names MUST REMAIN UNCHANGED: @b osPriority shall be consistent in every CMSIS-RTOS.
   typedef enum
   {
-    osPriorityIdle = -3, ///< priority: idle (lowest)
-    osPriorityLow = -2, ///< priority: low
-    osPriorityBelowNormal = -1, ///< priority: below normal
-    osPriorityNormal = 0, ///< priority: normal (default)
-    osPriorityAboveNormal = +1, ///< priority: above normal
-    osPriorityHigh = +2, ///< priority: high
-    osPriorityRealtime = +3, ///< priority: realtime (highest)
-    osPriorityError = 0x84 ///< system cannot determine priority or thread has illegal priority
+    osPriorityIdle = os_priority_idle, ///< priority: idle (lowest)
+    osPriorityLow = os_priority_low, ///< priority: low
+    osPriorityBelowNormal = os_priority_below_normal, ///< priority: below normal
+    osPriorityNormal = os_priority_normal, ///< priority: normal (default)
+    osPriorityAboveNormal = os_priority_above_normal, ///< priority: above normal
+    osPriorityHigh = os_priority_high, ///< priority: high
+    osPriorityRealtime = os_priority_realtime, ///< priority: realtime (highest)
+    osPriorityError = os_priority_error ///< system cannot determine priority or thread has illegal priority
   } osPriority;
 
   /// Timeout value.
-  /// @note MUST REMAIN UNCHANGED: @b osWaitForever shall be consistent in every CMSIS-RTOS.
+  /// @note The names MUST REMAIN UNCHANGED: @b osWaitForever shall be consistent in every CMSIS-RTOS.
 #define osWaitForever     0xFFFFFFFF ///< wait forever timeout value
 
   /// Status code values returned by CMSIS-RTOS functions.
-  /// @note MUST REMAIN UNCHANGED: @b osStatus shall be consistent in every CMSIS-RTOS.
+  /// @note The names MUST REMAIN UNCHANGED: @b osStatus shall be consistent in every CMSIS-RTOS.
   typedef enum
   {
     osOK = 0, ///< function completed; no error or event occurred.
@@ -152,11 +166,11 @@ extern "C"
   } osStatus;
 
   /// Timer type value for the timer definition.
-  /// @note MUST REMAIN UNCHANGED: @b os_timer_type shall be consistent in every CMSIS-RTOS.
+  /// @note The names MUST REMAIN UNCHANGED: @b os_timer_type shall be consistent in every CMSIS-RTOS.
   typedef enum
   {
-    osTimerOnce = 0, ///< one-shot timer
-    osTimerPeriodic = 1 ///< repeating timer
+    osTimerOnce = os_timer_once, ///< one-shot timer
+    osTimerPeriodic = os_timer_periodic ///< repeating timer
   } os_timer_type;
 
   /// Entry point of a thread.
@@ -169,112 +183,26 @@ extern "C"
   typedef void
   (*os_ptimer) (void const *argument);
 
-  // >>> the following data type definitions shall be adapted towards a specific RTOS
-
-#if 0
-  typedef struct os_thread_data
-  {
-    void* content[OS_THREAD_SIZE_PTRS];
-  } osThread;
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
-
-  typedef struct os_thread_attr
-  {
-    const char* name;
-    void* stack_addr;
-    size_t stack_size_bytes;
-    uint8_t priority;
-  } osThreadAttr;
-
-#pragma GCC diagnostic pop
-#else
+  // Redefine some CMSIS++ struct's to the legacy code.
   typedef os_thread_t osThread;
   typedef os_thread_attr_t osThreadAttr;
-#endif
 
-  typedef struct os_timer_data
-  {
-    void* content[OS_TIMER_SIZE_PTRS];
-  } osTimer;
+  typedef os_timer_t osTimer;
+  typedef os_timer_attr_t osTimerAttr;
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
+  typedef os_mutex_t osMutex;
+  typedef os_mutex_attr_t osMutexAttr;
 
-  typedef struct os_timer_attr
-  {
-    const char* name;
-    uint8_t type;
-  } osTimerAttr;
+  typedef os_semaphore_t osSemaphore;
+  typedef os_semaphore_attr_t osSemaphoreAttr;
 
-#pragma GCC diagnostic pop
+  typedef os_mempool_t osPool;
+  typedef os_mempool_attr_t osPoolAttr;
 
-  typedef struct os_mutex_data
-  {
-    void* content[OS_MUTEX_SIZE_PTRS];
-  } osMutex;
+  typedef os_mqueue_t osMessageQ;
+  typedef os_mqueue_attr_t osMessageQAttr;
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
-
-  typedef struct os_mutex_attr
-  {
-    const char* name;
-    uint8_t priority_ceiling;
-    uint8_t protocol;
-    uint8_t robustness;
-    uint8_t type;
-  } osMutexAttr;
-
-#pragma GCC diagnostic pop
-
-  typedef struct os_semaphore_data
-  {
-    void* content[OS_SEMAPHORE_SIZE_PTRS];
-  } osSemaphore;
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
-
-  typedef struct os_semaphore_attr
-  {
-    const char* name;
-    int16_t initial_count;
-    int16_t max_count;
-  } osSemaphoreAttr;
-
-#pragma GCC diagnostic pop
-
-  typedef struct os_pool_data
-  {
-    void* content[OS_POOL_SIZE_PTRS];
-  } osPool;
-
-  typedef struct os_pool_attr
-  {
-    const char* name;
-    void* pool_addr;
-    // size_t pool_size_bytes;
-  } osPoolAttr;
-
-  typedef struct os_messageQ_data
-  {
-    void* content[OS_MESSAGEQ_SIZE_PTRS];
-  } osMessageQ;
-
-  typedef struct os_messageQ_attr
-  {
-    const char* name;
-    void* queue_addr;
-    size_t queue_size_bytes;
-  } osMessageQAttr;
-
-  typedef struct os_mailQ_data
-  {
-    osPool pool;
-    osMessageQ queue;
-  } osMailQ;
+  typedef os_mail_queue_t osMailQ;
 
   /// Thread ID identifies the thread (pointer to a thread control block).
   /// @note CAN BE CHANGED: @b os_thread_cb is implementation specific in every CMSIS-RTOS.
@@ -457,9 +385,16 @@ extern "C"
 extern const osThreadDef_t os_thread_def_##name
 #else                            // define the object
 #define osThreadDef(name, priority, instances, stacksz)  \
-struct os_thread_data os_thread_data_##name; \
+osThread os_thread_data_##name; \
 const osThreadDef_t os_thread_def_##name = \
-{ "##name", (os_pthread)(name), (priority), /* (instances), */ (stacksz), &os_thread_data_##name }
+{ \
+    "##name", \
+    (os_pthread)(name), \
+    (priority), \
+    /* (instances), */ \
+    (stacksz), \
+    &os_thread_data_##name \
+}
 #endif
 
   /// Access a Thread definition.
@@ -542,9 +477,13 @@ const osThreadDef_t os_thread_def_##name = \
 extern const osTimerDef_t os_timer_def_##name
 #else                            // define the object
 #define osTimerDef(name, function)  \
-struct os_timer_data os_timer_data_##name; \
+osTimer os_timer_data_##name; \
 const osTimerDef_t os_timer_def_##name = \
-{ "##name", (os_ptimer)(function), &os_timer_data_##name }
+{ \
+    "##name", \
+    (os_ptimer)(function), \
+    &os_timer_data_##name \
+}
 #endif
 
   /// Access a Timer definition.
@@ -623,9 +562,12 @@ const osTimerDef_t os_timer_def_##name = \
 extern const osMutexDef_t os_mutex_def_##name
 #else                            // define the object
 #define osMutexDef(name)  \
-struct os_mutex_data os_mutex_data_##name; \
+osMutex os_mutex_data_##name; \
 const osMutexDef_t os_mutex_def_##name = \
-  { "##name", &os_mutex_data_##name }
+{ \
+    "##name", \
+    &os_mutex_data_##name \
+}
 #endif
 
   /// Access a Mutex definition.
@@ -677,9 +619,12 @@ const osMutexDef_t os_mutex_def_##name = \
 extern const osSemaphoreDef_t os_semaphore_def_##name
 #else                            // define the object
 #define osSemaphoreDef(name)  \
-struct os_semaphore_data os_semaphore_data_##name; \
+osSemaphore os_semaphore_data_##name; \
 const osSemaphoreDef_t os_semaphore_def_##name = \
-  { "##name", &os_semaphore_data_##name }
+{ \
+    "##name", \
+    &os_semaphore_data_##name \
+}
 #endif
 
   /// Access a Semaphore definition.
@@ -736,9 +681,19 @@ const osSemaphoreDef_t os_semaphore_def_##name = \
 extern const osPoolDef_t os_pool_def_##name
 #else                            // define the object
 #define osPoolDef(name, items, type)   \
-struct { struct os_pool_data data; type pool[items]; } os_pool_##name; \
+struct { \
+    osPool data; \
+    type pool[items]; \
+} os_pool_##name; \
 const osPoolDef_t os_pool_def_##name = \
-{ "##name", (items), sizeof(type), os_pool_##name.pool, sizeof(os_pool_##name.pool), &os_pool_##name.data }
+{ \
+    "##name", \
+    (items), \
+    sizeof(type), \
+    os_pool_##name.pool, \
+    sizeof(os_pool_##name.pool), \
+    &os_pool_##name.data \
+}
 #endif
 
   /// @brief Access a Memory Pool definition.
@@ -795,7 +750,7 @@ extern const osMessageQDef_t os_messageQ_def_##name
 #else                            // define the object
 #define osMessageQDef(name, items, type)   \
 struct { \
-    struct os_messageQ_data data; \
+    osMessageQ data; \
     void* queue[items]; \
 } os_messageQ_##name; \
 const osMessageQDef_t os_messageQ_def_##name = { \
@@ -858,7 +813,7 @@ extern const osMailQDef_t os_mailQ_def_##name
 #else                            // define the object
 #define osMailQDef(name, items, type) \
 struct { \
-    os_mailQ_data data; \
+    osMailQ data; \
     type pool[items]; \
     void* queue[items]; \
 } osmailQ_##name; \
@@ -931,18 +886,6 @@ const osMailQDef_t os_mailQ_def_##name = { \
   osMailFree (osMailQId queue_id, void* mail);
 
 #endif  // Mail Queues available
-
-// --------------------------------------------------------------------------
-// Calls from Interrupt Service Routines
-//
-// The following CMSIS-RTOS functions can be called from threads and Interrupt Service Routines (ISR):
-//
-// - osKernelRunning
-// - osSignalSet
-// - osSemaphoreRelease
-// - osPoolAlloc, osPoolCAlloc, osPoolFree
-// - osMessagePut, osMessageGet
-// - osMailAlloc, osMailCAlloc, osMailGet, osMailPut, osMailFree
 
 #ifdef  __cplusplus
 }
