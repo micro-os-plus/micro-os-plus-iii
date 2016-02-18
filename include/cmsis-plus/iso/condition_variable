@@ -301,7 +301,8 @@ namespace os
             std::chrono::duration<rtos::systicks_t,
                 typename Native_clock::period>> (rel_time).count ();
 
-        ncv_.timed_wait (lock.mutex ()->native_handle (), ticks);
+        ncv_.timed_wait ((rtos::Mutex &) (*(lock.mutex ()->native_handle ())),
+                         ticks);
 
         return
             (Native_clock::now () - start_tp) < rel_time ?

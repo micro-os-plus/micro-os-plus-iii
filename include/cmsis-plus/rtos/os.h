@@ -679,7 +679,10 @@ namespace os
       thread::func_t func_;
       thread::func_args_t func_args_;
       void* func_result_;
+
+      // FreeRTOS
       void* impl_;
+      void* impl_event_flags_;
 
       std::size_t stack_size_bytes_;
       thread::state_t state_;
@@ -974,16 +977,18 @@ namespace os
 
       /**
        * @brief Lock the mutex.
-       * @retval result::ok.
+       * @retval result::ok The mutex was locked.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval ENOTRECOVERABLE The mutex was not locked.
        */
       result_t
       lock (void);
 
       /**
        * @brief Try to lock the mutex.
-       * @retval result::ok.
+       * @retval result::ok The mutex was locked.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EAGAIN The mutex was not locked.
        */
       result_t
       try_lock (void);
@@ -991,39 +996,40 @@ namespace os
       /**
        * @brief Timed attempt to lock the mutex.
        * @param [in] ticks Number of ticks to wait.
-       * @retval result::ok.
+       * @retval result::ok The mutex was locked.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval ETIMEDOUT The mutex could not be locked before the specified timeout expired.
+       * @retval ENOTRECOVERABLE The mutex was not locked.
        */
       result_t
       timed_lock (systicks_t ticks);
 
       /**
        * @brief Unlock the mutex.
-       * @retval result::ok.
+       * @retval result::ok The mutex was unlocked.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval ENOTRECOVERABLE The mutex was not unlocked.
        */
       result_t
       unlock (void);
 
       /**
        * @brief Get the priority ceiling of a mutex.
-       * @param [out] prio_ceiling Pointer to location where to store the priority.
-       * @retval result::ok.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @return The priority ceiling.
        */
-      result_t
-      get_prio_ceiling (thread::priority_t* prio_ceiling) const;
+      thread::priority_t
+      prio_ceiling (void) const;
 
       /**
-       * @brief Set the priority ceiling of a mutex.
+       * @brief Change the priority ceiling of a mutex.
        * @param [in] prio_ceiling new priority.
        * @param [out] old_prio_ceiling pointer to location where to
        * store the previous priority; may be nullptr.
-       * @retval result::ok.
+       * @retval result::ok The priority was changed.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
-      set_prio_ceiling (thread::priority_t prio_ceiling,
+      prio_ceiling (thread::priority_t prio_ceiling,
                         thread::priority_t* old_prio_ceiling = nullptr);
 
       /**
@@ -1038,6 +1044,8 @@ namespace os
 
       // Can be updated in different contexts (interrupts or threads)
       Thread* volatile owner_;
+
+      void* impl_;
 
       // Can be updated in different contexts (interrupts or threads)
       volatile mutex::count_t count_;
@@ -1143,21 +1151,23 @@ namespace os
 
       /**
        * @brief Wait on a condition.
+       * @param [in] mutex Reference to the associated mutex.
        * @retval result::ok.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
-      wait (Mutex* mutex);
+      wait (Mutex& mutex);
 
-      // TODO: does it make sense to add a try_wait()?
+      // Neither in POSIX nor in ISO there is a try_wait().
 
       /**
        * @brief Wait on a condition with timeout.
+       * @param [in] mutex Reference to the associated mutex.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval result::ok.
        */
       result_t
-      timed_wait (Mutex* mutex, systicks_t ticks);
+      timed_wait (Mutex& mutex, systicks_t ticks);
 
     protected:
 
@@ -1318,14 +1328,6 @@ namespace os
        */
       result_t
       timed_wait (systicks_t ticks);
-
-      /**
-       * @brief Get the semaphore value.
-       * @param [out] value Pointer to integer where to store the value.
-       * @retval result::ok The value was returned.
-       */
-      result_t
-      get_value (semaphore::count_t* value);
 
       /**
        * @brief Get the semaphore value.
