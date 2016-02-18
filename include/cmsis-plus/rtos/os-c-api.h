@@ -95,6 +95,9 @@ extern "C"
   void
   os_systick_handler(void);
 
+  void
+  os_rtc_handler(void);
+
 // --------------------------------------------------------------------------
 
 #ifdef  __cplusplus

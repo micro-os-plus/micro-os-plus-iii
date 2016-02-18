@@ -30,6 +30,13 @@
 
 #define OS_INTEGER_MAX_NUMBER_OF_THREADS (10)
 
+// ----------------------------------------------------------------------
+
+typedef struct os_thread_user_storage_s
+{
+
+} os_thread_user_storage_t;
+
 // ----------------------------------------------------------------------------
 
 #endif /* CMSIS_PLUS_RTOS_OS_CONFIG_TEMPLATE_H_ */

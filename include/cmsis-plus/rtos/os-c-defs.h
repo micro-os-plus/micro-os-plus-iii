@@ -113,14 +113,15 @@ extern "C"
   {
     const char* name;
     void* stack_addr;
-    size_t stack_size_bytes;
     os_thread_func_t func;
     os_thread_func_args_t func_args;
     void* func_result_;
+    void* impl;
+    size_t stack_size_bytes;
     os_thread_state_t state;
     os_thread_prio_t prio;
     os_result_t wakeup_reason;
-    void* impl;
+    os_thread_user_storage_t user_storage;
   } os_thread_t;
 
 #pragma GCC diagnostic pop

@@ -47,21 +47,31 @@
 
 // ----------------------------------------------------------------------------
 
+#ifdef  __cplusplus
+
 // Include the CMSIS++ OS implementation definitions. This might further
 // include os-config.h, for the application specific definitions.
 #include <cmsis-plus/rtos/os-impl.h>
+
+#include <cmsis-plus/iso/system_error>
 
 #include <cstdint>
 #include <cstddef>
 
 // ----------------------------------------------------------------------------
 
-#ifdef  __cplusplus
+#ifdef NDEBUG           /* ANSI standard */
+#define os_assert_err(__e, __er) \
+  do { if (!(__e)) return __er; } while (false)
+#else
+#define os_assert_err(__e, __er) assert(__e)
+#endif
 
-#include <cstddef>
-
-#if !defined(OS_INTEGER_SYSTICK_FREQUENCY_HZ)
-#define OS_INTEGER_SYSTICK_FREQUENCY_HZ (1000)
+#ifdef NDEBUG           /* ANSI standard */
+#define os_assert_throw(__e, __er) \
+  do { if (!(__e)) os::estd::__throw_system_error(__er, #__e); } while (false)
+#else
+#define os_assert_throw(__e, __er) assert(__e)
 #endif
 
 namespace os
@@ -146,6 +156,7 @@ namespace os
        * @brief Sleep a number of ticks.
        * @param [in] ticks the number of ticks to sleep.
        * @retval ETIMEDOUT The sleep lasted the entire duration.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval result::eintr The sleep was interrupted.
        */
       static result_t
@@ -171,6 +182,7 @@ namespace os
        * @brief Sleep a number of seconds.
        * @param [in] secs the number of seconds to sleep.
        * @retval ETIMEDOUT The sleep lasted the entire duration.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval result::eintr The sleep was interrupted.
        */
       static result_t
@@ -197,6 +209,7 @@ namespace os
       /**
        * @brief Initialise the RTOS.
        * @retval result::ok.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       initialize (void);
@@ -212,6 +225,7 @@ namespace os
       /**
        * @brief Start the RTOS scheduler.
        * @retval result::ok.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       start (void);
@@ -325,7 +339,7 @@ namespace os
        * @param [in] thread Reference to the thread.
        * @param [in] flags The flags, as OR-ed bit mask.
        * @param [out] out_flags Pointer where to store previous flags; may be nullptr.
-       * @reval result::ok The event flags were set.
+       * @retval result::ok The event flags were set.
        */
       result_t
       set (Thread& thread, event_flags_t flags, event_flags_t* out_flags);
@@ -335,7 +349,8 @@ namespace os
        * @param [in] thread Reference to the thread.
        * @param [in] flags The signal flags, as OR-ed bit mask.
        * @param [out] out_flags Pointer where to store previous flags, may be nullptr.
-       * @reval result::ok The event flags were cleared.
+       * @retval result::ok The event flags were cleared.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       clear (Thread& thread, event_flags_t flags, event_flags_t* out_flags);
@@ -344,7 +359,8 @@ namespace os
        * @brief Wait for flags.
        * @param [in] flags The flags, as OR-ed bit mask.
        * @param [out] out_flags Pointer where to store previous flags, may be nullptr.
-       * @reval result::ok The signal condition occurred.
+       * @retval result::ok The signal condition occurred.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       wait (event_flags_t flags, event_flags_t* out_flags);
@@ -363,8 +379,9 @@ namespace os
        * @brief Wait for flags.
        * @param [in] flags The signal flags, as OR-ed bit mask.
        * @param [out] out_flags Pointer where to store previous flags, may be nullptr.
-       * @reval result::ok The signal condition occurred.
-       * @reval ETIMEDOUT The signal condition did not occur during the entire timeout duration.
+       * @retval result::ok The signal condition occurred.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval ETIMEDOUT The signal condition did not occur during the entire timeout duration.
        */
       result_t
       timed_wait (event_flags_t flags, event_flags_t* out_flags,
@@ -557,6 +574,7 @@ namespace os
       /**
        * @brief Cancel thread execution.
        * @retval result::ok.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       cancel (void);
@@ -564,6 +582,7 @@ namespace os
       /**
        * @brief Wait for thread termination.
        * @retval result::ok.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       join (void** exit_ptr = nullptr);
@@ -571,6 +590,7 @@ namespace os
       /**
        * @brief Detach a thread.
        * @retval result::ok.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       detach (void);
@@ -637,6 +657,13 @@ namespace os
       result_t
       wakeup_reason (void);
 
+      /**
+       * @brief Get user storage.
+       * @return The address of the thread user storage.
+       */
+      os_thread_user_storage_t*
+      user_storage (void);
+
 #if defined(TESTING)
       void
       __run_function (void);
@@ -649,20 +676,18 @@ namespace os
 
       // TODO: group them in a Stack object
       void* stack_addr_;
-      std::size_t stack_size_bytes_;
-
       thread::func_t func_;
-
       thread::func_args_t func_args_;
-
       void* func_result_;
+      void* impl_;
 
+      std::size_t stack_size_bytes_;
       thread::state_t state_;
       thread::priority_t prio_;
 
       result_t wakeup_reason_;
 
-      void* impl_;
+      os_thread_user_storage_t user_storage_;
 
       // Add other internal data
 
@@ -784,6 +809,7 @@ namespace os
        * @brief Start or restart the timer.
        * @param [in] ticks The timer period, in ticks.
        * @retval result::ok The timer has been started or restarted.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       start (systicks_t ticks);
@@ -791,6 +817,7 @@ namespace os
       /**
        * @brief Stop the timer.
        * @retval result::ok The timer has been stopped.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval EAGAIN The timer is not yet started.
        */
       result_t
@@ -948,6 +975,7 @@ namespace os
       /**
        * @brief Lock the mutex.
        * @retval result::ok.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       lock (void);
@@ -955,6 +983,7 @@ namespace os
       /**
        * @brief Try to lock the mutex.
        * @retval result::ok.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       try_lock (void);
@@ -963,6 +992,7 @@ namespace os
        * @brief Timed attempt to lock the mutex.
        * @param [in] ticks Number of ticks to wait.
        * @retval result::ok.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       timed_lock (systicks_t ticks);
@@ -970,6 +1000,7 @@ namespace os
       /**
        * @brief Unlock the mutex.
        * @retval result::ok.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       unlock (void);
@@ -978,6 +1009,7 @@ namespace os
        * @brief Get the priority ceiling of a mutex.
        * @param [out] prio_ceiling Pointer to location where to store the priority.
        * @retval result::ok.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       get_prio_ceiling (thread::priority_t* prio_ceiling) const;
@@ -988,6 +1020,7 @@ namespace os
        * @param [out] old_prio_ceiling pointer to location where to
        * store the previous priority; may be nullptr.
        * @retval result::ok.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       set_prio_ceiling (thread::priority_t prio_ceiling,
@@ -996,6 +1029,7 @@ namespace os
       /**
        * @brief Mark state protected by robust mutex as consistent.
        * @retval result::ok.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       consistent (void);
@@ -1094,6 +1128,7 @@ namespace os
       /**
        * @brief Signal a condition.
        * @retval result::ok.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       signal (void);
@@ -1101,6 +1136,7 @@ namespace os
       /**
        * @brief Broadcast a condition.
        * @retval result::ok.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       broadcast (void);
@@ -1108,12 +1144,16 @@ namespace os
       /**
        * @brief Wait on a condition.
        * @retval result::ok.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       wait (Mutex* mutex);
 
+      // TODO: does it make sense to add a try_wait()?
+
       /**
        * @brief Wait on a condition with timeout.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval result::ok.
        */
       result_t
@@ -1246,7 +1286,7 @@ namespace os
       /**
        * @brief Post (unlock) the semaphore.
        * @retval result::ok The semaphore was posted.
-       * @retval result::eoverflow The max count was exceeded.
+       * @retval EOVERFLOW The max count was exceeded.
        */
       result_t
       post (void);
@@ -1254,6 +1294,7 @@ namespace os
       /**
        * @brief Lock the semaphore, possibly waiting.
        * @retval result::ok The calling process successfully performed the semaphore lock operation.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval result::eintr A cancel interrupted this function.
        */
       result_t
@@ -1262,6 +1303,7 @@ namespace os
       /**
        * @brief Try to lock  the semaphore.
        * @retval result::ok The calling process successfully performed the semaphore lock operation.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval EAGAIN The semaphore was already locked.
        */
       result_t
@@ -1271,6 +1313,7 @@ namespace os
        * @brief Timed wait to lock the semaphore.
        * @param [in] ticks Number of ticks to wait.
        * @retval result::ok The calling process successfully performed the semaphore lock operation.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval ETIMEDOUT The semaphore could not be locked before the specified timeout expired.
        */
       result_t
@@ -1291,6 +1334,11 @@ namespace os
       semaphore::count_t
       value (void);
 
+      /**
+       * @brief Reset the semaphore.
+       * @retval result::ok The semaphore was reset.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       */
       result_t
       reset (void);
 
@@ -1442,6 +1490,11 @@ namespace os
       bool
       is_full (void);
 
+      /**
+       * @brief Reset the memory pool.
+       * @retval result::ok The memory pool was reset.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       */
       result_t
       reset (void);
 
@@ -1532,23 +1585,55 @@ namespace os
       bool
       operator== (const Message_queue& rhs) const;
 
+      /**
+       * @brief Send message to the queue.
+       * @retval result::ok The message was send.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       */
       result_t
       send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio);
 
+      /**
+       * @brief Try to send message to the queue.
+       * @retval result::ok The message was send.
+       * @retval EAGAIN The message could not be sent.
+       */
       result_t
       try_send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio);
 
+      /**
+       * @brief Send message to the queue with timeout.
+       * @retval result::ok The message was send.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval ETIMEDOUT The message could not be send before the specified timeout expired.
+       */
       result_t
       timed_send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio,
                   systicks_t ticks);
 
+      /**
+       * @brief Receive message from the queue.
+       * @retval result::ok The message was received.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       */
       result_t
       receive (const char* msg, std::size_t nbytes, mqueue::priority_t* mprio);
 
+      /**
+       * @brief Try to receive message from the queue.
+       * @retval result::ok The message was received.
+       * @retval EAGAIN The message could not be received.
+       */
       result_t
       try_receive (const char* msg, std::size_t nbytes,
                    mqueue::priority_t* mprio);
 
+      /**
+       * @brief Receive message from the queue with timeout.
+       * @retval result::ok The message was received.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval ETIMEDOUT The message could not be received before the specified timeout expired.
+       */
       result_t
       timed_receive (const char* msg, std::size_t nbytes,
                      mqueue::priority_t* mprio, systicks_t ticks);
@@ -1568,6 +1653,11 @@ namespace os
       bool
       is_full (void);
 
+      /**
+       * @brief Reset the message queue to initial state.
+       * @retval result::ok.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       */
       result_t
       reset (void);
 
@@ -1620,7 +1710,8 @@ namespace os
 
       /**
        * @details
-       * Check if the scheduler is
+       * Check if the scheduler is locked on the current task or
+       * is switching tasks from the ready list.
        */
       inline bool
       is_locked (void)
@@ -1724,6 +1815,21 @@ namespace os
     Thread::wakeup_reason (void)
     {
       return wakeup_reason_;
+    }
+
+    /**
+     * @details
+     * The user storage is a custom structure defined in os-config.h,
+     * which is added to each and every thread storage. Applications
+     * can store here any data.
+     *
+     * Inspired by (actually a generalisation of) FreeRTOS thread local
+     * storage, which proved useful when implementing CMSIS+ over FreeRTOS.
+     */
+    inline os_thread_user_storage_t*
+    Thread::user_storage (void)
+    {
+      return &user_storage_;
     }
 
     // ======================================================================
@@ -1984,6 +2090,12 @@ extern "C"
 
   void
   os_impl_systick_handler (void);
+
+  void
+  os_rtc_handler (void);
+
+  void
+  os_impl_rtc_handler (void);
 
   int
   os_main (int argc, char* argv[]);
