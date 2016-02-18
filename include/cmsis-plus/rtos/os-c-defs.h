@@ -55,14 +55,14 @@ extern "C"
 
   typedef uint32_t os_result_t;
 
+  typedef uint32_t os_systicks_t;
+
   typedef struct os_thread_list_s
   {
     void* content[OS_PRIOTHREAD_SIZE_PTR];
   } os_thread_list_t;
 
   // --------------------------------------------------------------------------
-
-  typedef uint8_t os_thread_prio_t;
 
 #define OS_PRIOTHREAD_SHIFT   (2)
 
@@ -98,6 +98,8 @@ extern "C"
 
   typedef uint8_t os_thread_state_t;
 
+  typedef uint8_t os_thread_prio_t;
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
@@ -117,6 +119,7 @@ extern "C"
     os_thread_func_args_t func_args;
     void* func_result_;
     void* impl;
+    void* impl_event_flags;
     size_t stack_size_bytes;
     os_thread_state_t state;
     os_thread_prio_t prio;
@@ -176,6 +179,7 @@ extern "C"
   {
     const char* name;
     void* owner;
+    void* impl;
     os_mutex_count_t count;
     os_thread_prio_t prio_ceiling;
     os_mutex_type_t type;
@@ -184,6 +188,18 @@ extern "C"
   } os_mutex_t;
 
 #pragma GCC diagnostic pop
+
+  // --------------------------------------------------------------------------
+
+  typedef struct os_condvar_attr_s
+  {
+    const char* name;
+  } os_condvar_attr_t;
+
+  typedef struct os_condvar_s
+  {
+    const char* name;
+  } os_condvar_t;
 
   // --------------------------------------------------------------------------
 
@@ -238,7 +254,7 @@ extern "C"
   // --------------------------------------------------------------------------
 
   typedef uint16_t os_mqueue_size_t;
-  typedef uint8_t os_mqueue_priority_t;
+  typedef uint8_t os_mqueue_prio_t;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -280,6 +296,5 @@ extern "C"
 #ifdef  __cplusplus
 }
 #endif
-
 
 #endif /* CMSIS_PLUS_RTOS_OS_C_STRUCTS_H_ */

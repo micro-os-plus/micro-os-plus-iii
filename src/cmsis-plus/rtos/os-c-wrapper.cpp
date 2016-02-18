@@ -53,6 +53,9 @@ static_assert(sizeof(timer::Attributes) == sizeof(os_timer_attr_t), "adjust size
 static_assert(sizeof(Mutex) == sizeof(os_mutex_t), "adjust size of os_mutex_t");
 static_assert(sizeof(mutex::Attributes) == sizeof(os_mutex_attr_t), "adjust size of os_mutex_attr_t");
 
+static_assert(sizeof(Condition_variable) == sizeof(os_condvar_t), "adjust size of os_condvar_t");
+static_assert(sizeof(condvar::Attributes) == sizeof(os_condvar_attr_t), "adjust size of os_condvar_attr_t");
+
 static_assert(sizeof(Semaphore) == sizeof(os_semaphore_t), "adjust size of os_semaphore_t");
 static_assert(sizeof(semaphore::Attributes) == sizeof(os_semaphore_attr_t), "adjust size of os_semaphore_attr_t");
 
@@ -61,7 +64,6 @@ static_assert(sizeof(mempool::Attributes) == sizeof(os_mempool_attr_t), "adjust 
 
 static_assert(sizeof(Message_queue) == sizeof(os_mqueue_t), "adjust size of os_mqueue_t");
 static_assert(sizeof(mqueue::Attributes) == sizeof(os_mqueue_attr_t), "adjust size of os_mqueue_attr_t");
-
 
 // ----------------------------------------------------------------------------
 
@@ -94,6 +96,12 @@ os_thread_create (os_thread_t* thread, const os_thread_attr_t* attr,
 }
 
 void
+os_thread_destroy (os_thread_t* thread)
+{
+  (reinterpret_cast<Thread&> (thread)).~Thread ();
+}
+
+void
 os_thread_exit (os_thread_t* thread, void* exit_ptr)
 {
   (reinterpret_cast<Thread&> (thread)).exit (exit_ptr);
@@ -123,6 +131,327 @@ os_thread_wakeup (os_thread_t* thread)
   return (reinterpret_cast<Thread&> (thread)).wakeup ();
 }
 
+// ----------------------------------------------------------------------------
+
+void
+os_mutex_create (os_mutex_t* mutex, const os_mutex_attr_t* attr)
+{
+  new (mutex) Mutex ((mutex::Attributes&) *attr);
+}
+
+void
+os_mutex_destroy (os_mutex_t* mutex)
+{
+  (reinterpret_cast<Mutex&> (mutex)).~Mutex ();
+}
+
+os_result_t
+os_mutex_lock (os_mutex_t* mutex)
+{
+  return (os_result_t) (reinterpret_cast<Mutex&> (mutex)).lock ();
+}
+
+os_result_t
+os_mutex_try_lock (os_mutex_t* mutex)
+{
+  return (os_result_t) (reinterpret_cast<Mutex&> (mutex)).try_lock ();
+}
+
+os_result_t
+os_mutex_timed_lock (os_mutex_t* mutex, os_systicks_t ticks)
+{
+  return (os_result_t) (reinterpret_cast<Mutex&> (mutex)).timed_lock (ticks);
+}
+
+os_result_t
+os_mutex_unlock (os_mutex_t* mutex)
+{
+  return (os_result_t) (reinterpret_cast<Mutex&> (mutex)).unlock ();
+}
+
+os_thread_prio_t
+os_get_mutex_prio_ceiling (os_mutex_t* mutex)
+{
+  return (os_thread_prio_t) (reinterpret_cast<Mutex&> (mutex)).prio_ceiling ();
+}
+
+os_result_t
+os_set_mutex_prio_ceiling (os_mutex_t* mutex, os_thread_prio_t prio_ceiling,
+                           os_thread_prio_t* old_prio_ceiling)
+{
+  return (os_result_t) (reinterpret_cast<Mutex&> (mutex)).prio_ceiling (
+      prio_ceiling, old_prio_ceiling);
+}
+
+// ----------------------------------------------------------------------------
+
+void
+os_condvar_create (os_condvar_t* condvar, os_condvar_attr_t* attr)
+{
+  new (condvar) Condition_variable ((condvar::Attributes&) *attr);
+}
+
+void
+os_condvar_destroy (os_condvar_t* condvar)
+{
+  (reinterpret_cast<Condition_variable&> (condvar)).~Condition_variable ();
+}
+
+os_result_t
+os_condvar_signal (os_condvar_t* condvar)
+{
+  return (os_result_t) (reinterpret_cast<Condition_variable&> (condvar)).signal ();
+}
+
+os_result_t
+os_condvar_broadcast (os_condvar_t* condvar)
+{
+  return (os_result_t) (reinterpret_cast<Condition_variable&> (condvar)).broadcast ();
+}
+
+os_result_t
+os_condvar_wait (os_condvar_t* condvar, os_mutex_t* mutex)
+{
+  return (os_result_t) (reinterpret_cast<Condition_variable&> (condvar)).wait (
+      (Mutex&) *mutex);
+}
+
+os_result_t
+os_condvar_timed_wait (os_condvar_t* condvar, os_mutex_t* mutex,
+                       os_systicks_t ticks)
+{
+  return (os_result_t) (reinterpret_cast<Condition_variable&> (condvar)).timed_wait (
+      (Mutex&) *mutex, ticks);
+}
+
+// ----------------------------------------------------------------------------
+
+void
+os_semaphore_create (os_semaphore_t* semaphore, os_semaphore_attr_t* attr)
+{
+  new (semaphore) Semaphore ((semaphore::Attributes&) *attr);
+}
+
+void
+os_semaphore_destroy (os_semaphore_t* semaphore)
+{
+  (reinterpret_cast<Semaphore&> (semaphore)).~Semaphore ();
+}
+
+os_result_t
+os_semaphore_post (os_semaphore_t* semaphore)
+{
+  return (os_result_t) (reinterpret_cast<Semaphore&> (semaphore)).post ();
+}
+
+os_result_t
+os_semaphore_wait (os_semaphore_t* semaphore)
+{
+  return (os_result_t) (reinterpret_cast<Semaphore&> (semaphore)).wait ();
+}
+
+os_result_t
+os_semaphore_try_wait (os_semaphore_t* semaphore)
+{
+  return (os_result_t) (reinterpret_cast<Semaphore&> (semaphore)).try_wait ();
+}
+
+os_result_t
+os_semaphore_timed_wait (os_semaphore_t* semaphore, os_systicks_t ticks)
+{
+  return (os_result_t) (reinterpret_cast<Semaphore&> (semaphore)).timed_wait (
+      ticks);
+}
+
+os_semaphore_count_t
+os_semaphore_get_value (os_semaphore_t* semaphore)
+{
+  return (os_semaphore_count_t) (reinterpret_cast<Semaphore&> (semaphore)).value ();
+}
+
+os_result_t
+os_semaphore_reset (os_semaphore_t* semaphore)
+{
+  return (os_result_t) (reinterpret_cast<Semaphore&> (semaphore)).reset ();
+}
+
+// ----------------------------------------------------------------------------
+
+void
+os_mempool_create (os_mempool_t* mempool, os_mempool_attr_t* attr,
+                   os_mempool_size_t blocks, os_mempool_size_t block_size_bytes)
+{
+  new (mempool) Memory_pool ((mempool::Attributes&) *attr, blocks,
+                             block_size_bytes);
+}
+
+void
+os_mempool_destroy (os_mempool_t* mempool)
+{
+  (reinterpret_cast<Memory_pool&> (mempool)).~Memory_pool ();
+}
+
+void*
+os_mempool_alloc (os_mempool_t* mempool)
+{
+  return (reinterpret_cast<Memory_pool&> (mempool)).alloc ();
+}
+
+void*
+os_mempool_try_alloc (os_mempool_t* mempool)
+{
+  return (reinterpret_cast<Memory_pool&> (mempool)).try_alloc ();
+}
+
+void*
+os_mempool_timed_alloc (os_mempool_t* mempool, os_systicks_t ticks)
+{
+  return (reinterpret_cast<Memory_pool&> (mempool)).timed_alloc (ticks);
+}
+
+os_result_t
+os_mempool_free (os_mempool_t* mempool, void* block)
+{
+  return (os_result_t) (reinterpret_cast<Memory_pool&> (mempool)).free (block);
+}
+
+size_t
+os_mempool_get_size (os_mempool_t* mempool)
+{
+  return (reinterpret_cast<Memory_pool&> (mempool)).size ();
+}
+
+size_t
+os_mempool_get_count (os_mempool_t* mempool)
+{
+  return (reinterpret_cast<Memory_pool&> (mempool)).count ();
+}
+
+size_t
+os_mempool_get_block_size (os_mempool_t* mempool)
+{
+  return (reinterpret_cast<Memory_pool&> (mempool)).block_size ();
+}
+
+bool
+os_mempool_is_empty (os_mempool_t* mempool)
+{
+  return (reinterpret_cast<Memory_pool&> (mempool)).is_empty ();
+}
+
+bool
+os_mempool_is_full (os_mempool_t* mempool)
+{
+  return (reinterpret_cast<Memory_pool&> (mempool)).is_full ();
+}
+
+os_result_t
+os_mempool_reset (os_mempool_t* mempool)
+{
+  return (os_result_t) (reinterpret_cast<Memory_pool&> (mempool)).reset ();
+}
+
+// --------------------------------------------------------------------------
+
+void
+os_mqueue_create (os_mqueue_t* mqueue, os_mqueue_attr_t* attr,
+                  os_mqueue_size_t msgs, os_mqueue_size_t msg_size_bytes)
+{
+  new (mqueue) Message_queue ((mqueue::Attributes&) *attr, msgs,
+                              msg_size_bytes);
+}
+
+void
+os_mqueue_destroy (os_mqueue_t* mqueue)
+{
+  (reinterpret_cast<Message_queue&> (mqueue)).~Message_queue ();
+}
+
+os_result_t
+os_mqueue_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
+                os_mqueue_prio_t mprio)
+{
+  return (os_result_t) (reinterpret_cast<Message_queue&> (mqueue)).send (msg,
+                                                                         nbytes,
+                                                                         mprio);
+}
+
+os_result_t
+os_mqueue_try_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
+                    os_mqueue_prio_t mprio)
+{
+  return (os_result_t) (reinterpret_cast<Message_queue&> (mqueue)).try_send (
+      msg, nbytes, mprio);
+}
+
+os_result_t
+os_mqueue_timed_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
+                      os_mqueue_prio_t mprio, os_systicks_t ticks)
+{
+  return (os_result_t) (reinterpret_cast<Message_queue&> (mqueue)).timed_send (
+      msg, nbytes, mprio, ticks);
+}
+
+os_result_t
+os_mqueue_receive (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
+                   os_mqueue_prio_t* mprio)
+{
+  return (os_result_t) (reinterpret_cast<Message_queue&> (mqueue)).receive (
+      msg, nbytes, mprio);
+}
+
+os_result_t
+os_mqueue_try_receive (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
+                       os_mqueue_prio_t* mprio)
+{
+  return (os_result_t) (reinterpret_cast<Message_queue&> (mqueue)).try_receive (
+      msg, nbytes, mprio);
+}
+
+os_result_t
+os_mqueue_timed_receive (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
+                         os_mqueue_prio_t* mprio, os_systicks_t ticks)
+{
+  return (os_result_t) (reinterpret_cast<Message_queue&> (mqueue)).timed_receive (
+      msg, nbytes, mprio, ticks);
+}
+
+size_t
+os_mqueue_get_length (os_mqueue_t* mqueue)
+{
+  return (reinterpret_cast<Message_queue&> (mqueue)).length ();
+}
+
+size_t
+os_mqueue_get_size (os_mqueue_t* mqueue)
+{
+  return (reinterpret_cast<Message_queue&> (mqueue)).size ();
+}
+
+size_t
+os_mqueue_get_msg_size (os_mqueue_t* mqueue)
+{
+  return (reinterpret_cast<Message_queue&> (mqueue)).msg_size ();
+}
+
+bool
+os_mqueue_get_is_empty (os_mqueue_t* mqueue)
+{
+  return (reinterpret_cast<Message_queue&> (mqueue)).is_empty ();
+}
+
+bool
+os_mqueue_get_is_full (os_mqueue_t* mqueue)
+{
+  return (reinterpret_cast<Message_queue&> (mqueue)).is_full ();
+}
+
+os_result_t
+os_mqueue_reset (os_mqueue_t* mqueue)
+{
+  return (os_result_t) (reinterpret_cast<Message_queue&> (mqueue)).reset ();
+}
+
 // ****************************************************************************
 // ***** Legacy CMSIS RTOS implementation *****
 
@@ -133,15 +462,15 @@ os_thread_wakeup (os_thread_t* thread)
 
 /**
  * @details
- * Initialize of the RTOS Kernel to allow peripheral setup and creation
+ * Initialise of the RTOS Kernel to allow peripheral setup and creation
  * of other RTOS objects with the functions:
  * - osThreadCreate : Create a thread function.
  * - osTimerCreate : Define attributes of the timer callback function.
- * - osMutexCreate : Define and initialize a mutex.
- * - osSemaphoreCreate : Define and initialize a semaphore.
- * - osPoolCreate : Define and initialize a fix-size memory pool.
- * - osMessageCreate : Define and initialize a message queue.
- * - osMailCreate : Define and initialize a mail queue with fix-size memory blocks.
+ * - osMutexCreate : Define and initialise a mutex.
+ * - osSemaphoreCreate : Define and initialise a semaphore.
+ * - osPoolCreate : Define and initialise a fix-size memory pool.
+ * - osMessageCreate : Define and initialise a message queue.
+ * - osMailCreate : Define and initialise a mail queue with fix-size memory blocks.
  *
  * The RTOS scheduler does not start thread switching until the function
  * osKernelStart is called.
@@ -458,9 +787,7 @@ osSemaphoreWait (osSemaphoreId semaphore_id, uint32_t millisec)
           Systick_clock::ticks_cast (millisec * 1000u));
     }
 
-  semaphore::count_t value;
-  (reinterpret_cast<Semaphore&> (semaphore_id)).get_value (&value);
-  return (int32_t) value;
+  return (int32_t) (reinterpret_cast<Semaphore&> (semaphore_id)).value ();
 }
 
 osStatus
