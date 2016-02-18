@@ -118,7 +118,7 @@ namespace os
     }
 
     void __attribute__((weak))
-    dumpArgs (int argc, char* argv[])
+    dump_args (int argc, char* argv[])
     {
       printf ("main(argc=%d, argv=[", argc);
       for (int i = 0; i < argc; ++i)
@@ -175,7 +175,7 @@ trace_puts (const char *s);
 int __attribute__((weak, alias("_ZN2os5trace7putcharEi")))
 trace_putchar (int c);
 
-void __attribute__((weak, alias("_ZN2os5trace8dumpArgsEiPPc")))
+void __attribute__((weak, alias("_ZN2os5trace9dump_argsEiPPc")))
 trace_dump_args (int argc, char* argv[]);
 
 #else
@@ -216,7 +216,7 @@ trace_putchar (int c)
 void
 trace_dump_args (int argc, char* argv[])
 {
-  trace::dumpArgs (argc, argv);
+  trace::dump_args (argc, argv);
 }
 
 #endif

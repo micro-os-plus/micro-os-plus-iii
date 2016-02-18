@@ -92,7 +92,7 @@ namespace os
     putchar (int c);
 
     void
-    dumpArgs (int argc, char* argv[]);
+    dump_args (int argc, char* argv[]);
 
   } /* namespace trace */
 } /* namespace os */
@@ -170,7 +170,7 @@ namespace os
             putchar (int c);
 
             inline void
-            dumpArgs (int argc, char* argv[]);
+            dump_args (int argc, char* argv[]);
 
             // ----------------------------------------------------------------
 
