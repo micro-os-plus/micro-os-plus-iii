@@ -422,6 +422,27 @@ to state that only the names must remain unchanged, there is no special
 reason for the actual values of the error codes, the priorities, 
 and other enums to be restricted.
 
+## RTX
+
+### Does not use CMSIS core headers
+
+As a significant prove that CMSIS CORE definitions are not generic enough,
+the Keil RTX does not use CMSIS CORE, but defines all system peripherals
+internally.
+
+### Does not use standard ISO C type definitions (like uint32_t)
+
+Although there are more than 15 years since the ISO C standard defined 
+how integer definitions should look like, the Keil RTX still prefers to
+ignore them and uses custom definitions like U8, U16, etc.
+
+## CMSIS CORE
+
+The split of core files by families (core\_cm0, core\_cm3...) is not only 
+redundant, since many definitions are the same, but olso makes use 
+of the common definitions (like SysTick, NVIC) imposible for generic
+applications.
+
 ## CMSIS Drivers 
 
 * uses non-reentrant callbacks
