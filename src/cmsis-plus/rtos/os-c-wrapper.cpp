@@ -33,7 +33,6 @@
 #include <cassert>
 #include <cerrno>
 #include <cstring>
-#include <cstdlib>
 #include <new>
 
 // ----------------------------------------------------------------------------
@@ -63,48 +62,6 @@ static_assert(sizeof(mempool::Attributes) == sizeof(os_mempool_attr_t), "adjust 
 static_assert(sizeof(Message_queue) == sizeof(os_mqueue_t), "adjust size of os_mqueue_t");
 static_assert(sizeof(mqueue::Attributes) == sizeof(os_mqueue_attr_t), "adjust size of os_mqueue_attr_t");
 
-// ----------------------------------------------------------------------------
-
-typedef int
-(*main_func_t) (int argc, char* argv[]);
-
-typedef struct
-{
-  main_func_t func;
-  int argc;
-  char** argv;
-} main_args_t;
-
-static void
-main_trampoline (main_args_t* args)
-{
-  std::exit (args->func (args->argc, args->argv));
-}
-
-int __attribute__((weak))
-main (int argc, char* argv[])
-{
-  using namespace os::rtos;
-
-  scheduler::initialize ();
-
-  static main_args_t args;
-  args.func = os_main;
-  args.argc = argc;
-  args.argv = argv;
-
-  // Necessarily static
-  static thread::Attributes attr
-    { "main" };
-  static Thread main_thread
-    { attr, (thread::func_t) main_trampoline, (thread::func_args_t) &args };
-
-  scheduler::start ();
-
-  main_thread.join ();
-
-  return 1;
-}
 
 // ----------------------------------------------------------------------------
 
