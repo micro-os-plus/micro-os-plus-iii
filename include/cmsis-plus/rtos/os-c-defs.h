@@ -38,6 +38,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
+#define OS_USE_CMSIS_PLUS
+
 // ----------------------------------------------------------------------------
 
 #ifdef  __cplusplus
@@ -62,16 +64,19 @@ extern "C"
 
   typedef uint8_t os_thread_prio_t;
 
+#define OS_PRIOTHREAD_SHIFT   (2)
+
   enum
   {
-    os_priority_idle = 0x01, ///< priority: idle (lowest)
-    os_priority_low = 0x40, ///< priority: low
-    os_priority_below_normal = 0x60, ///< priority: below normal
-    os_priority_normal = 0x80, ///< priority: normal (default)
-    os_priority_above_normal = 0xA0, ///< priority: above normal
-    os_priority_high = 0xC0, ///< priority: high
-    os_priority_realtime = 0xE0, ///< priority: realtime (highest)
-    os_priority_error = 0xFE ///< system cannot determine priority or thread has illegal priority
+    os_priority_error = 0, ///< system cannot determine priority or thread has illegal priority
+    os_priority_idle = 1, // lowest
+    os_priority_low = (2 << OS_PRIOTHREAD_SHIFT),
+    os_priority_below_normal = (3 << OS_PRIOTHREAD_SHIFT),
+    os_priority_normal = (4 << OS_PRIOTHREAD_SHIFT), // default
+    os_priority_above_normal = (5 << OS_PRIOTHREAD_SHIFT),
+    os_priority_high = (6 << OS_PRIOTHREAD_SHIFT),
+    os_priority_realtime = (7 << OS_PRIOTHREAD_SHIFT),
+    os_priority_highest = ((8 << OS_PRIOTHREAD_SHIFT) - 1),
   };
 
   enum
@@ -111,9 +116,11 @@ extern "C"
     size_t stack_size_bytes;
     os_thread_func_t func;
     os_thread_func_args_t func_args;
+    void* func_result_;
     os_thread_state_t state;
     os_thread_prio_t prio;
     os_result_t wakeup_reason;
+    void* impl;
   } os_thread_t;
 
 #pragma GCC diagnostic pop
@@ -272,5 +279,6 @@ extern "C"
 #ifdef  __cplusplus
 }
 #endif
+
 
 #endif /* CMSIS_PLUS_RTOS_OS_C_STRUCTS_H_ */

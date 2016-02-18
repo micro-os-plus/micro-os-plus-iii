@@ -191,30 +191,46 @@ namespace os
     {
       using status_t = bool;
 
+      extern status_t is_locked_;
+      extern bool is_started_;
+
       /**
-       * @brief Initialise RTOS kernel.
+       * @brief Initialise the RTOS.
        * @retval result::ok.
        */
       result_t
       initialize (void);
 
+      /**
+       * @brief Check if in ISR.
+       * @retval true Execution is in an interrupt service routine context.
+       * @retval false Execution is in a thread context.
+       */
       bool
-      is_in_irq (void);
+      is_in_isr (void);
 
       /**
-       * @brief Start the RTOS kernel.
+       * @brief Start the RTOS scheduler.
        * @retval result::ok.
        */
       result_t
       start (void);
 
       /**
-       * @brief Check if RTOS is running.
-       * @retval true The RTOS is running.
-       * @retval false The RTOS was not started.
+       * @brief Check if the scheduler was started.
+       * @retval true The scheduler was started.
+       * @retval false The scheduler was not started.
        */
       bool
-      is_running (void);
+      is_started (void);
+
+      /**
+       * @brief Check if the scheduler is locked.
+       * @retval true The scheduler is locked.
+       * @retval false The scheduler is running (not locked).
+       */
+      bool
+      is_locked (void);
 
       /**
        * @brief Lock the scheduler.
@@ -300,7 +316,7 @@ namespace os
 
     using event_flags_t = uint32_t;
 
-    // This might require further refinements.
+    // TODO: This might require further refinements.
 
     namespace flags
     {
@@ -369,17 +385,15 @@ namespace os
        * @return Reference to the current running thread.
        */
       Thread&
-      get (void);
+      thread (void);
 
-      // TODO: investigate if this can return void, and use a different
+      // TODO: update legacy CMSIS for void and use a different
       // mechanism for eintr.
 
       /**
        * @brief Yield CPU to next thread.
-       * @retval result::ok when successful.
-       * @retval result::eintr when interrupted.
        */
-      result_t
+      void
       yield (void);
 
       /**
@@ -433,20 +447,22 @@ namespace os
       // to the enumeration.
       namespace priority
       {
+        // This gives a range of 32 priorities,
+        constexpr uint32_t shift = 2;
+
         enum
           : priority_t
             {
               //
           none = 0,
-          idle = 0x01, ///< priority: idle (lowest)
-          low = 0x40, ///< priority: low
-          below_normal = 0x60, ///< priority: below normal
-          normal = 0x80, ///< priority: normal (default)
-          above_normal = 0xA0, ///< priority: above normal
-          high = 0xC0, ///< priority: high
-          realtime = 0xE0, ///< priority: realtime (highest)
-          // error = 0x84 ///< system cannot determine priority or thread has illegal priority
-          max = 0xFF
+          idle = 1, ///< priority: idle (lowest valid)
+          low = (2 << shift), ///< priority: low
+          below_normal = (3 << shift), ///< priority: below normal
+          normal = (4 << shift), ///< priority: normal (default)
+          above_normal = (5 << shift), ///< priority: above normal
+          high = (6 << shift), ///< priority: high
+          realtime = (7 << shift), ///< priority: realtime (highest)
+          highest = ((8 << shift) - 1)
         };
       } /* namespace priority */
 
@@ -455,7 +471,8 @@ namespace os
           inactive = 0, //
           ready = 1,//
           running = 2,//
-          waiting = 3//
+          waiting = 3,//
+          terminated = 4//
         };
 
 #pragma GCC diagnostic push
@@ -549,7 +566,7 @@ namespace os
        * @retval result::ok.
        */
       result_t
-      join (void** exit_ptr);
+      join (void** exit_ptr = nullptr);
 
       /**
        * @brief Detach a thread.
@@ -563,7 +580,7 @@ namespace os
        * @return -
        */
       void
-      exit (void* exit_ptr);
+      exit (void* exit_ptr = nullptr);
 
       // Accessors & mutators.
 
@@ -604,7 +621,7 @@ namespace os
       void
       wakeup (void);
 
-#if 1
+#if 0
       void
       wakeup (result_t reason);
 
@@ -625,6 +642,9 @@ namespace os
       __run_function (void);
 #endif
 
+      static void
+      trampoline (Thread* thread);
+
     protected:
 
       // TODO: group them in a Stack object
@@ -635,10 +655,15 @@ namespace os
 
       thread::func_args_t func_args_;
 
+      void* func_result_;
+
       thread::state_t state_;
       thread::priority_t prio_;
 
       result_t wakeup_reason_;
+
+      void* impl_;
+
       // Add other internal data
 
     };
@@ -1582,6 +1607,27 @@ namespace os
 
     namespace scheduler
     {
+      /**
+       * @details
+       * Check if the scheduler was started, i.e. if scheduler::start()
+       * was called.
+       */
+      inline bool
+      is_started (void)
+      {
+        return is_started_;
+      }
+
+      /**
+       * @details
+       * Check if the scheduler is
+       */
+      inline bool
+      is_locked (void)
+      {
+        return is_locked_;
+      }
+
       inline
       Critical_section::Critical_section () :
           status_ (lock ())
@@ -1719,7 +1765,7 @@ namespace os
       Attributes::Attributes (const char* name) :
           Named_object (name)
       {
-        mx_priority_ceiling = thread::priority::max;
+        mx_priority_ceiling = thread::priority::highest;
         mx_protocol = protocol::none;
         mx_robustness = robustness::stalled;
         mx_type = type::normal;
@@ -1928,6 +1974,20 @@ namespace os
 
   } /* namespace rtos */
 } /* namespace os */
+
+// ----------------------------------------------------------------------------
+
+extern "C"
+{
+  void
+  os_systick_handler (void);
+
+  void
+  os_impl_systick_handler (void);
+
+  int
+  os_main (int argc, char* argv[]);
+}
 
 // ----------------------------------------------------------------------------
 

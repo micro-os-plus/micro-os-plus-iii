@@ -55,9 +55,8 @@ extern "C"
 
   // --------------------------------------------------------------------------
 
-  // TODO: check if other portable solutions are available.
   int
-  os_main (int argc, char* argv);
+  os_main (int argc, char* argv[]);
 
   // --------------------------------------------------------------------------
 
@@ -68,7 +67,7 @@ extern "C"
   os_sched_start (void);
 
   bool
-  os_sched_is_running (void);
+  os_sched_is_started (void);
 
   // --------------------------------------------------------------------------
 
@@ -90,6 +89,11 @@ extern "C"
 
   void
   os_thread_wakeup (os_thread_t* thread);
+
+  // --------------------------------------------------------------------------
+
+  void
+  os_systick_handler(void);
 
 // --------------------------------------------------------------------------
 

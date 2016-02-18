@@ -33,6 +33,7 @@
 #include <cassert>
 #include <cerrno>
 #include <cstring>
+#include <cstdlib>
 #include <new>
 
 // ----------------------------------------------------------------------------
@@ -64,17 +65,46 @@ static_assert(sizeof(mqueue::Attributes) == sizeof(os_mqueue_attr_t), "adjust si
 
 // ----------------------------------------------------------------------------
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
+typedef int
+(*main_func_t) (int argc, char* argv[]);
 
-int
-__attribute__((weak))
-main (int argc, char* argv[])
+typedef struct
 {
-  // Create a thread and call os_main()
+  main_func_t func;
+  int argc;
+  char** argv;
+} main_args_t;
+
+static void
+main_trampoline (main_args_t* args)
+{
+  std::exit (args->func (args->argc, args->argv));
 }
 
-#pragma GCC diagnostic pop
+int __attribute__((weak))
+main (int argc, char* argv[])
+{
+  using namespace os::rtos;
+
+  scheduler::initialize ();
+
+  static main_args_t args;
+  args.func = os_main;
+  args.argc = argc;
+  args.argv = argv;
+
+  // Necessarily static
+  static thread::Attributes attr
+    { "main" };
+  static Thread main_thread
+    { attr, (thread::func_t) main_trampoline, (thread::func_args_t) &args };
+
+  scheduler::start ();
+
+  main_thread.join ();
+
+  return 1;
+}
 
 // ----------------------------------------------------------------------------
 
@@ -91,9 +121,9 @@ os_sched_start (void)
 }
 
 bool
-os_sched_is_running (void)
+os_sched_is_started (void)
 {
-  return scheduler::is_running ();
+  return scheduler::is_started ();
 }
 
 // ----------------------------------------------------------------------------
@@ -144,22 +174,61 @@ os_thread_wakeup (os_thread_t* thread)
 // ----------------------------------------------------------------------------
 //  ==== Kernel Control Functions ====
 
+/**
+ * @details
+ * Initialize of the RTOS Kernel to allow peripheral setup and creation
+ * of other RTOS objects with the functions:
+ * - osThreadCreate : Create a thread function.
+ * - osTimerCreate : Define attributes of the timer callback function.
+ * - osMutexCreate : Define and initialize a mutex.
+ * - osSemaphoreCreate : Define and initialize a semaphore.
+ * - osPoolCreate : Define and initialize a fix-size memory pool.
+ * - osMessageCreate : Define and initialize a message queue.
+ * - osMailCreate : Define and initialize a mail queue with fix-size memory blocks.
+ *
+ * The RTOS scheduler does not start thread switching until the function
+ * osKernelStart is called.
+ *
+ * @note In case that the RTOS Kernel starts thread execution with the
+ * function main the function osKernelInitialize stops thread
+ * switching. This allows you to setup the system to a defined
+ * state before thread switching is resumed with osKernelStart.
+ */
 osStatus
 osKernelInitialize (void)
 {
-  return static_cast<osStatus> (scheduler::initialize ());
+  if (scheduler::is_in_isr ())
+    {
+      return osErrorISR;
+    }
+  scheduler::initialize ();
+  return osOK;
 }
 
+/**
+ * @details
+ * Start the RTOS Kernel and begin thread switching.
+ *
+ * @note When the CMSIS-RTOS starts thread execution with the
+ * function main this function resumes thread switching.
+ * The main thread will continue executing after osKernelStart.
+ */
 osStatus
 osKernelStart (void)
 {
   return static_cast<osStatus> (scheduler::start ());
 }
 
+/**
+ * @details
+ * Identifies if the RTOS scheduler is started. For systems with the
+ * option to start the main function as a thread this allows
+ * you to identify that the RTOS scheduler is already running.
+ */
 int32_t
 osKernelRunning (void)
 {
-  return scheduler::is_running ();
+  return scheduler::is_started () ? 1 : 0;
 }
 
 #if (defined (osFeature_SysTick)  &&  (osFeature_SysTick != 0))
@@ -189,7 +258,7 @@ osThreadCreate (const osThreadDef_t* thread_def, void* args)
 osThreadId
 osThreadGetId (void)
 {
-  return reinterpret_cast<osThreadId> (&this_thread::get ());
+  return reinterpret_cast<osThreadId> (&this_thread::thread ());
 }
 
 osStatus
@@ -200,10 +269,21 @@ osThreadTerminate (osThreadId thread_id)
   return osOK;
 }
 
+/**
+ * @details Pass control to next thread that is in state @b READY.
+ *
+ */
 osStatus
 osThreadYield (void)
 {
-  return static_cast<osStatus> (this_thread::yield ());
+  if (scheduler::is_in_isr ())
+    {
+      return osErrorISR;
+    }
+
+  this_thread::yield ();
+
+  return osOK;
 }
 
 osStatus

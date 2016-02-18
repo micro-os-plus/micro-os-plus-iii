@@ -401,7 +401,7 @@ namespace os
       inline thread::id
       get_id () noexcept
       {
-        return thread::id (&os::rtos::this_thread::get ());
+        return thread::id (&os::rtos::this_thread::thread ());
       }
 
       // This implementation currently supports only short

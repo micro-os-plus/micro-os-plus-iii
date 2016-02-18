@@ -104,7 +104,7 @@
 #define osKernelSystemId "CMSIS++ V1.00" ///< RTOS identification string
 
 /// @note MUST REMAIN UNCHANGED: @b osFeature_xxx shall be consistent in every CMSIS-RTOS.
-#define osFeature_MainThread   1 ///< main thread      1=main can be thread, 0=not available
+#define osFeature_MainThread   0 ///< main thread      1=main can be thread, 0=not available
 #define osFeature_Pool         1 ///< Memory Pools:    1=available, 0=not available
 #define osFeature_MailQ        1 ///< Mail Queues:     1=available, 0=not available
 #define osFeature_MessageQ     1 ///< Message Queues:  1=available, 0=not available
@@ -334,21 +334,31 @@ extern "C"
 
 //  ==== Kernel Control Functions ====
 
-  /// Initialize the RTOS Kernel for creating objects.
-  /// @return status code that indicates the execution status of the function.
-  /// @note MUST REMAIN UNCHANGED: @b osKernelInitialize shall be consistent in every CMSIS-RTOS.
+  /**
+   * @brief Initialize the RTOS.
+   * @retval osOK The RTOS kernel was initialised.
+   * @retval osErrorISR The function cannot be invoked from Interrupt Service Routines.
+   *
+   * @note MUST REMAIN UNCHANGED: @b osKernelInitialize shall be consistent in every CMSIS-RTOS.
+   */
   osStatus
   osKernelInitialize (void);
 
-  /// Start the RTOS Kernel.
-  /// @return status code that indicates the execution status of the function.
-  /// @note MUST REMAIN UNCHANGED: @b osKernelStart shall be consistent in every CMSIS-RTOS.
+  /**
+   * Start the RTOS scheduler.
+   * @retval osOK The RTOS scheduler has been successfully started.
+   * @retval osErrorISR The function cannot be invoked from Interrupt Service Routines.
+   *
+   * @note MUST REMAIN UNCHANGED: @b osKernelStart shall be consistent in every CMSIS-RTOS.
+   */
   osStatus
   osKernelStart (void);
 
-  /// Check if the RTOS kernel is already started.
-  /// @note MUST REMAIN UNCHANGED: @b osKernelRunning shall be consistent in every CMSIS-RTOS.
-  /// @return 0 RTOS is not started, 1 RTOS is started.
+  /**
+   * @brief Check if the RTOS scheduler is started.
+   * @retval 0 The RTOS is not started.
+   * @retval 1 The RTOS is started.
+   */
   int32_t
   osKernelRunning (void);
 
@@ -425,9 +435,13 @@ const osThreadDef_t os_thread_def_##name = \
   osStatus
   osThreadTerminate (osThreadId thread_id);
 
-  /// Pass control to next thread that is in state @b READY.
-  /// @return status code that indicates the execution status of the function.
-  /// @note MUST REMAIN UNCHANGED: @b osThreadYield shall be consistent in every CMSIS-RTOS.
+  /*
+   * @brief Yield control.
+   * @retval osOK The function has been correctly executed.
+   * @retval osErrorISR The function cannot be called from interrupt service routines.
+   *
+   * @note MUST REMAIN UNCHANGED: @b osThreadYield shall be consistent in every CMSIS-RTOS.
+   */
   osStatus
   osThreadYield (void);
 
