@@ -479,7 +479,8 @@ namespace os
           above_normal = (5 << shift), ///< priority: above normal
           high = (6 << shift), ///< priority: high
           realtime = (7 << shift), ///< priority: realtime (highest)
-          highest = ((8 << shift) - 1)
+          highest = ((8 << shift) - 2),
+          error = ((8 << shift) - 1)
         };
       } /* namespace priority */
 

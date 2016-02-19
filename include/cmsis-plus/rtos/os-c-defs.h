@@ -68,7 +68,7 @@ extern "C"
 
   enum
   {
-    os_priority_error = 0, ///< system cannot determine priority or thread has illegal priority
+    os_priority_none = 0, // not defined
     os_priority_idle = 1, // lowest
     os_priority_low = (2 << OS_PRIOTHREAD_SHIFT),
     os_priority_below_normal = (3 << OS_PRIOTHREAD_SHIFT),
@@ -76,7 +76,8 @@ extern "C"
     os_priority_above_normal = (5 << OS_PRIOTHREAD_SHIFT),
     os_priority_high = (6 << OS_PRIOTHREAD_SHIFT),
     os_priority_realtime = (7 << OS_PRIOTHREAD_SHIFT),
-    os_priority_highest = ((8 << OS_PRIOTHREAD_SHIFT) - 1),
+    os_priority_highest = ((8 << OS_PRIOTHREAD_SHIFT) - 2),
+    os_priority_error = ((8 << OS_PRIOTHREAD_SHIFT) - 1)
   };
 
   enum

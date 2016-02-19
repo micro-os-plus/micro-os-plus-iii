@@ -682,7 +682,7 @@ osDelay (uint32_t millisec)
 
 /**
  * @details
- * Wait for any event of the type Signal, Message, Mail for a specified
+ * Wait for any event of the type signal, message, mail for a specified
  * time period in millisec. While the system waits, the thread that is
  * calling this function is put into the state WAITING. When millisec
  * is set to osWaitForever, the function will wait for an infinite time
@@ -956,7 +956,7 @@ osMutexDelete (osMutexId mutex_id)
 
 /**
  * @details
- * Create and initialise a Semaphore object that is used to manage
+ * Create and initialise a semaphore object that is used to manage
  * access to shared resources. The parameter count specifies
  * the number of available resources. The count value 1 creates
  * a binary semaphore.
@@ -990,7 +990,8 @@ osSemaphoreCreate (const osSemaphoreDef_t* semaphore_def, int32_t count)
  * - all other values specify a time in millisecond for a timeout.
  *
  * The return value indicates the number of available tokens (the
- * semaphore count value). If 0 is returned, then no semaphore was available.
+ * semaphore count value). If 0 is returned, then no semaphore was
+ * available.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
@@ -1441,81 +1442,5 @@ osMailFree (osMailQId queue_id, void* mail)
 }
 
 #endif /* Mail Queues available */
-
-// ----------------------------------------------------------------------------
-
-#if 0
-
-osThreadId
-osThreadCreateEx (osThread* addr, const osThreadAttr* attr, os_pthread function,
-    const void* args)
-  {
-    Thread* thread = new (addr) Thread ((thread::Attributes&) *attr,
-        (thread::func_t) function,
-        (thread::func_args_t) args);
-    return reinterpret_cast<osThreadId> (thread);
-  }
-
-osTimerId
-osTimerCreateEx (osTimer* addr, osTimerAttr* attr, os_ptimer function,
-    void* args)
-  {
-    return reinterpret_cast<osTimerId> (new ((void*) addr) Timer (
-            (timer::Attributes&) (*attr), (timer::func_t) function,
-            (timer::func_args_t) args));
-  }
-
-osMutexId
-osMutexCreateEx (osMutex* addr, const osMutexAttr* attr)
-  {
-    return reinterpret_cast<osMutexId> (new ((void*) addr) Mutex (
-            (const mutex::Attributes&) *attr));
-  }
-
-osSemaphoreId
-osSemaphoreCreateEx (osSemaphoreId addr, const osSemaphoreAttr* attr)
-  {
-    return reinterpret_cast<osSemaphoreId> (new ((void*) addr) Semaphore (
-            (const semaphore::Attributes&) *attr));
-  }
-
-osPoolId
-osPoolCreateEx (osPool* addr, const osPoolAttr* attr, size_t items,
-    size_t item_size_bytes)
-  {
-    return reinterpret_cast<osPoolId> (new ((void*) addr) Memory_pool (
-            (mempool::Attributes&) *attr, (mempool::size_t) items,
-            (mempool::size_t) item_size_bytes));
-  }
-
-void
-osPoolDeleteEx (osPoolId pool_id)
-  {
-    (reinterpret_cast<Memory_pool&> (pool_id)).~Memory_pool ();
-  }
-
-osMessageQId
-osMessageCreateEx (osMessageQ* addr, const osMessageQAttr* attr, size_t items,
-    size_t item_size)
-  {
-    return reinterpret_cast<osMessageQId> (new ((void*) addr) Message_queue (
-            (mqueue::Attributes&) (*attr), (mqueue::size_t) items,
-            (mqueue::size_t) item_size));
-  }
-
-void
-osMessageDeleteEx (osMessageQId queue_id)
-  {
-    (reinterpret_cast<Message_queue&> (queue_id)).~Message_queue ();
-  }
-
-void
-osMailDeleteEx (osMailQId queue_id)
-  {
-    osPoolDeleteEx (&(queue_id->pool));
-    osMessageDeleteEx (&(queue_id->queue));
-  }
-
-#endif
 
 // ----------------------------------------------------------------------------

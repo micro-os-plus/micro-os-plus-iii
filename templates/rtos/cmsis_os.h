@@ -435,7 +435,7 @@ extern "C"
    * for short timeouts in polling loops.
    *
    * @param         microsec     time value in microseconds.
-   * @return time value normalized to the @ref osKernelSysTickFrequency
+   * @return time value normalized to the @ref osKernelSysTickFrequency.
    */
 #define osKernelSysTickMicroSec(microsec) (((uint64_t)microsec * (osKernelSysTickFrequency)) / 1000000)
 
@@ -566,7 +566,7 @@ const osThreadDef_t os_thread_def_##name = \
 
   /**
    * @brief Time Delay.
-   * @param [in] millisec @ref CMSIS_RTOS_TimeOutValue "time delay" value
+   * @param [in] millisec @ref CMSIS_RTOS_TimeOutValue "time delay" value.
    * @retval osEventTimeout The time delay is executed.
    * @retval osErrorISR osDelay cannot be called from interrupt service routines.
    */
@@ -577,7 +577,7 @@ const osThreadDef_t os_thread_def_##name = \
 
   /**
    * @brief Wait for Signal, Message, Mail, or Timeout.
-   * @param [in] millisec @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out
+   * @param [in] millisec @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
    * @retval osEventSignal A signal event occurred and is returned.
    * @retval osEventMessage A message event occurred and is returned.
    * @retval osEventMail A mail event occurred and is returned.
@@ -711,7 +711,7 @@ const osTimerDef_t os_timer_def_##name = \
    * @param [in]     signals       wait until all specified signal flags set or 0 for any single signal flag.
    * @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
    * @retval osOK No signal received when the timeout value millisec was 0.
-   * @retval osEventTimeout Signal not occurred within timeout
+   * @retval osEventTimeout Signal not occurred within timeout.
    * @retval osEventSignal Signal occurred, value.signals contains the signal flags; these signal flags are cleared.
    * @retval osErrorValue The value signals is outside of the permitted range.
    * @retval osErrorISR osSignalWait cannot be called from interrupt service routines.
@@ -937,7 +937,7 @@ const osPoolDef_t os_pool_def_##name = \
 
   /**
    * @brief Access a Memory Pool definition.
-   * @param         name          name of the memory pool
+   * @param         name          name of the memory pool.
    *
    * @note CAN BE CHANGED: The parameter to @b osPool shall be consistent but the
    *       macro body is implementation specific in every CMSIS-RTOS.
@@ -1026,7 +1026,7 @@ const osMessageQDef_t os_messageQ_def_##name = { \
 
   /**
    * @brief Access a Message Queue.
-   * @param         name          name of the queue
+   * @param         name          name of the queue.
    *
    * @details
    * Access to the message queue definition for the function osMessageCreate.
@@ -1088,9 +1088,9 @@ const osMessageQDef_t os_messageQ_def_##name = { \
 
   /**
    * @brief Create a mail queue definition.
-   * @param         name          name of the queue
-   * @param         queue_sz      maximum number of messages in queue
-   * @param         type          data type of a single message element
+   * @param         name          name of the queue.
+   * @param         queue_sz      maximum number of messages in queue.
+   * @param         type          data type of a single message element.
    * @note CAN BE CHANGED: The parameter to @b osMailQDef shall be consistent but the
    *      macro body is implementation specific in every CMSIS-RTOS.
    */
@@ -1119,7 +1119,7 @@ const osMailQDef_t os_mailQ_def_##name = { \
 
   /**
    * @brief Access a mail queue definition.
-   * @param         name          name of the queue
+   * @param         name          name of the queue.
    *
    * @note CAN BE CHANGED: The parameter to @b osMailQ shall be consistent but the
    *       macro body is implementation specific in every CMSIS-RTOS.
@@ -1129,7 +1129,7 @@ const osMailQDef_t os_mailQ_def_##name = { \
 
   /**
    * @brief Create a mail queue.
-   * @param [in]     queue_def     reference to the mail queue definition obtain with @ref osMailQ
+   * @param [in]     queue_def     reference to the mail queue definition obtain with @ref osMailQ.
    * @param [in]     thread_id     thread ID (obtained by @ref osThreadCreate or @ref osThreadGetId) or NULL.
    * @return mail queue ID for reference by other functions or NULL in case of error.
    *
@@ -1142,7 +1142,7 @@ const osMailQDef_t os_mailQ_def_##name = { \
   /**
    * @brief Allocate a memory block from a mail.
    * @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
-   * @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out
+   * @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
    * @return pointer to memory block that can be filled with mail or NULL in case of error.
    *
    * @note MUST REMAIN UNCHANGED: @b osMailAlloc shall be consistent
@@ -1154,7 +1154,7 @@ const osMailQDef_t os_mailQ_def_##name = { \
   /**
    * @brief Allocate and clear a memory block from a mail.
    * @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
-   * @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out
+   * @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
    * @return pointer to memory block that can be filled with mail or NULL in case of error.
    *
    * @note MUST REMAIN UNCHANGED: @b osMailCAlloc shall be consistent
@@ -1180,8 +1180,8 @@ const osMailQDef_t os_mailQ_def_##name = { \
   /**
    * @brief Get a mail from a queue.
    * @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
-   * @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out
-   * @retval osOK No mail is available in the queue and no timeout was specified
+   * @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
+   * @retval osOK No mail is available in the queue and no timeout was specified.
    * @retval osEventTimeout No mail has arrived during the given timeout period.
    * @retval osEventMail Mail received, value.p contains the pointer to mail content.
    * @retval osErrorParameter A parameter is invalid or outside of a permitted range.
