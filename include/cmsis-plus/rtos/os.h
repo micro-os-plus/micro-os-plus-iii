@@ -1031,7 +1031,7 @@ namespace os
        */
       result_t
       prio_ceiling (thread::priority_t prio_ceiling,
-                        thread::priority_t* old_prio_ceiling = nullptr);
+                    thread::priority_t* old_prio_ceiling = nullptr);
 
       /**
        * @brief Mark state protected by robust mutex as consistent.
@@ -1306,7 +1306,7 @@ namespace os
        * @brief Lock the semaphore, possibly waiting.
        * @retval result::ok The calling process successfully performed the semaphore lock operation.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-       * @retval result::eintr A cancel interrupted this function.
+       * @retval EINTR The operation was interrupted.
        */
       result_t
       wait ();
@@ -1326,6 +1326,7 @@ namespace os
        * @retval result::ok The calling process successfully performed the semaphore lock operation.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval ETIMEDOUT The semaphore could not be locked before the specified timeout expired.
+       * @retval EINTR The operation was interrupted.
        */
       result_t
       timed_wait (systicks_t ticks);
@@ -1478,18 +1479,40 @@ namespace os
       result_t
       free (void* block);
 
+      /**
+       * @brief Get memory pool size.
+       * @return The max number of blocks in the pool.
+       */
       std::size_t
       size (void);
 
+      /**
+       * @brief Get blocks count.
+       * @return The number of blocks used from the queue.
+       */
       std::size_t
       count (void);
 
+      /**
+       * @brief Get block size.
+       * @return The block size, in bytes.
+       */
       std::size_t
       block_size (void);
 
+      /**
+       * @brief Check if the memory pool is empty.
+       * @retval true The memory pool has no allocated blocks.
+       * @retval false The memory pool has allocated blocks.
+       */
       bool
       is_empty (void);
 
+      /**
+       * @brief Check if the memory pool is full.
+       * @retval true All memory blocks are allocated.
+       * @retval false There are still memory blocks that can be allocated.
+       */
       bool
       is_full (void);
 
@@ -1561,6 +1584,11 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+    /**
+     *
+     * Compatible with POSIX message queues.
+     * http://pubs.opengroup.org/onlinepubs/9699919799/
+     */
     class Message_queue : public Named_object
     {
     public:
@@ -1590,25 +1618,46 @@ namespace os
 
       /**
        * @brief Send message to the queue.
-       * @retval result::ok The message was send.
+       * @param [in] msg The address of the message to enqueue.
+       * @param [in] nbytes The length of the message. Must be not higher than the value used when creating the queue.
+       * @param [in] mprio The message priority.
+       * @retval result::ok The message was enqueued.
+       * @retval EINVAL A parameter is invalid or outside of a permitted range.
+       * @retval EMSGSIZE The specified message length, nbytes, exceeds the message size attribute of the message queue.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval ENOTRECOVERABLE The message could not be enqueue.
+       * @retval EINTR The operation was interrupted.
        */
       result_t
       send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio);
 
       /**
        * @brief Try to send message to the queue.
-       * @retval result::ok The message was send.
-       * @retval EAGAIN The message could not be sent.
+       * @param [in] msg The address of the message to enqueue.
+       * @param [in] nbytes The length of the message. Must be not higher than the value used when creating the queue.
+       * @param [in] mprio The message priority.
+       * @retval result::ok The message was enqueued.
+       * @retval EAGAIN The specified message queue is full.
+       * @retval EINVAL A parameter is invalid or outside of a permitted range.
+       * @retval EMSGSIZE The specified message length, nbytes, exceeds the message size attribute of the message queue.
+       * @retval ENOTRECOVERABLE The message could not be enqueue (extension to POSIX).
        */
       result_t
       try_send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio);
 
       /**
        * @brief Send message to the queue with timeout.
-       * @retval result::ok The message was send.
+       * @param [in] msg The address of the message to enqueue.
+       * @param [in] nbytes The length of the message. Must be not higher than the value used when creating the queue.
+       * @param [in] mprio The message priority.
+       * @param [in] ticks The timeout duration, in SysTick ticks.
+       * @retval result::ok The message was enqueued.
+       * @retval EINVAL A parameter is invalid or outside of a permitted range.
+       * @retval EMSGSIZE The specified message length, nbytes, exceeds the message size attribute of the message queue.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-       * @retval ETIMEDOUT The message could not be send before the specified timeout expired.
+       * @retval ETIMEDOUT The timeout expired before the message could be added to the queue.
+       * @retval ENOTRECOVERABLE The message could not be enqueue (extension to POSIX).
+       * @retval EINTR The operation was interrupted.
        */
       result_t
       timed_send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio,
@@ -1616,48 +1665,89 @@ namespace os
 
       /**
        * @brief Receive message from the queue.
+       * @param [out] msg The address where to store the dequeued message.
+       * @param [in] nbytes The size of the destination buffer. Must be lower than the value used when creating the queue.
+       * @param [out] mprio The address where to store the message priority. May be nullptr.
        * @retval result::ok The message was received.
+       * @retval EINVAL A parameter is invalid or outside of a permitted range.
+       * @retval EMSGSIZE The specified message length, nbytes, is greater than the message size attribute of the message queue.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval ENOTRECOVERABLE The message could not be dequeued (extension to POSIX).
+       * @retval EBADMSG The implementation has detected a data corruption problem with the message.
+       * @retval EINTR The operation was interrupted.
        */
       result_t
-      receive (const char* msg, std::size_t nbytes, mqueue::priority_t* mprio);
+      receive (char* msg, std::size_t nbytes, mqueue::priority_t* mprio);
 
       /**
        * @brief Try to receive message from the queue.
+       * @param [out] msg The address where to store the dequeued message.
+       * @param [in] nbytes The size of the destination buffer. Must be lower than the value used when creating the queue.
+       * @param [out] mprio The address where to store the message priority. May be nullptr.
        * @retval result::ok The message was received.
-       * @retval EAGAIN The message could not be received.
+       * @retval EINVAL A parameter is invalid or outside of a permitted range.
+       * @retval EMSGSIZE The specified message length, nbytes, is greater than the message size attribute of the message queue.
+       * @retval ENOTRECOVERABLE The message could not be dequeued (extension to POSIX).
+       * @retval EBADMSG The implementation has detected a data corruption problem with the message.
+       * @retval EAGAIN The specified message queue is empty.
        */
       result_t
-      try_receive (const char* msg, std::size_t nbytes,
-                   mqueue::priority_t* mprio);
+      try_receive (char* msg, std::size_t nbytes, mqueue::priority_t* mprio);
 
       /**
        * @brief Receive message from the queue with timeout.
        * @retval result::ok The message was received.
+       * @retval EINVAL A parameter is invalid or outside of a permitted range.
+       * @retval EMSGSIZE The specified message length, nbytes, is greater than the message size attribute of the message queue.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-       * @retval ETIMEDOUT The message could not be received before the specified timeout expired.
+       * @retval ENOTRECOVERABLE The message could not be dequeued (extension to POSIX).
+       * @retval EBADMSG The implementation has detected a data corruption problem with the message.
+       * @retval EINTR The operation was interrupted.
+       * @retval ETIMEDOUT No message arrived on the queue before the specified timeout expired.
        */
       result_t
-      timed_receive (const char* msg, std::size_t nbytes,
-                     mqueue::priority_t* mprio, systicks_t ticks);
+      timed_receive (char* msg, std::size_t nbytes, mqueue::priority_t* mprio,
+                     systicks_t ticks);
 
-      std::size_t
-      length (void);
-
+      /**
+       * @brief Get queue size.
+       * @return The max number of messages that can be queued.
+       */
       std::size_t
       size (void);
 
+      /**
+       * @brief Get queue length.
+       * @return The number of messages in the queue.
+       */
+      std::size_t
+      length (void);
+
+      /**
+       * @brief Get message size.
+       * @return The message size, in bytes.
+       */
       std::size_t
       msg_size (void);
 
+      /**
+       * @brief Check if the queue is empty.
+       * @retval true The queue has no messages.
+       * @retval false The queue has some messages.
+       */
       bool
       is_empty (void);
 
+      /**
+       * @brief Check if the queue is full.
+       * @retval true The queue is full.
+       * @retval false The queue is not full.
+       */
       bool
       is_full (void);
 
       /**
-       * @brief Reset the message queue to initial state.
+       * @brief Reset the message queue.
        * @retval result::ok.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
@@ -1670,6 +1760,8 @@ namespace os
       impl::Prioritised_list receive_list_;
 
       void* queue_addr_;
+      void* impl_;
+
       std::size_t queue_size_bytes_;
 
       const mqueue::size_t msgs_;

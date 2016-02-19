@@ -274,6 +274,8 @@ extern "C"
     os_thread_list_t receive_list;
 
     void* queue_addr;
+    void* impl;
+
     size_t queue_size_bytes;
 
     os_mqueue_size_t msgs;
