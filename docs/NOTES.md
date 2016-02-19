@@ -66,7 +66,7 @@ int main (void) {
 Suggestion:
 
 Give up all these macros and use the POSIX approach, i.e. use
-attributes. When defults are enough, allow simple creations, with
+attributes. When defaults are enough, allow simple creations, with
 minimum arguments.
 
 ```
@@ -195,7 +195,7 @@ Suggestion:
 
 ### Missing osPoolDelete(), osMessageDelete(), osMailDelete()
 
-Some objects can be deleted, like threads and timers, other cannot, like pools and queues.
+Some objects can be deleted, like threads, timers and mutexes, but other cannot, like pools and queues.
 
 Suggestion:
 
@@ -385,6 +385,9 @@ Based on the `millisec` parameter, the function can wait indefinitely,
 try to wait or wait with timeout. However, when invoked form an ISR, 
 this parameter must be 0.
 
+Even worse, the function can be invoked from ISRs only with the value of the
+timeout set to 0;
+
 This is confusing, and separate calls are prefered.
 
 #### Misplaced thread definition in documentation
@@ -412,6 +415,9 @@ Both the RTX and the FreeRTOS implementations ignore this parameter.
 Based on the `millisec` parameter, the function can wait indefinitely, 
 try to wait or wait with timeout. However, when invoked form an ISR, 
 this parameter must be 0.
+
+Even worse, the function can be invoked from ISRs only with the value of the
+timeout set to 0;
 
 This is confusing, and separate calls are prefered.
 
