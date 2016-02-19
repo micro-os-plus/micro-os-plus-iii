@@ -393,7 +393,7 @@ os_mqueue_timed_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
 }
 
 os_result_t
-os_mqueue_receive (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
+os_mqueue_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
                    os_mqueue_prio_t* mprio)
 {
   return (os_result_t) (reinterpret_cast<Message_queue&> (mqueue)).receive (
@@ -401,7 +401,7 @@ os_mqueue_receive (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
 }
 
 os_result_t
-os_mqueue_try_receive (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
+os_mqueue_try_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
                        os_mqueue_prio_t* mprio)
 {
   return (os_result_t) (reinterpret_cast<Message_queue&> (mqueue)).try_receive (
@@ -409,7 +409,7 @@ os_mqueue_try_receive (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
 }
 
 os_result_t
-os_mqueue_timed_receive (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
+os_mqueue_timed_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
                          os_mqueue_prio_t* mprio, os_systicks_t ticks)
 {
   return (os_result_t) (reinterpret_cast<Message_queue&> (mqueue)).timed_receive (
@@ -1209,20 +1209,20 @@ osMessageGet (osMessageQId queue_id, uint32_t millisec)
   if (millisec == osWaitForever)
     {
       res = (reinterpret_cast<Message_queue&> (queue_id)).receive (
-          (const char*) &msg, sizeof(uint32_t), NULL);
+          (char*) &msg, sizeof(uint32_t), NULL);
       // result::event_message;
     }
   else if (millisec == 0)
     {
       res = (reinterpret_cast<Message_queue&> (queue_id)).try_receive (
-          (const char*) &msg, sizeof(uint32_t), NULL);
+          (char*) &msg, sizeof(uint32_t), NULL);
       // result::event_message when message;
       // result::ok when no meessage
     }
   else
     {
       res = (reinterpret_cast<Message_queue&> (queue_id)).timed_receive (
-          (const char*) &msg, sizeof(uint32_t), NULL,
+          (char*) &msg, sizeof(uint32_t), NULL,
           Systick_clock::ticks_cast (millisec * 1000u));
       // result::event_message when message;
       // result::event_timeout when timeout;
@@ -1404,17 +1404,17 @@ osMailGet (osMailQId queue_id, uint32_t millisec)
   if (millisec == osWaitForever)
     {
       res = (reinterpret_cast<Message_queue&> (queue_id)).receive (
-          (const char*) &msg, sizeof(void*), NULL);
+          (char*) &msg, sizeof(void*), NULL);
     }
   else if (millisec == 0)
     {
       res = (reinterpret_cast<Message_queue&> (queue_id)).try_receive (
-          (const char*) &msg, sizeof(void*), NULL);
+          (char*) &msg, sizeof(void*), NULL);
     }
   else
     {
       res = (reinterpret_cast<Message_queue&> (queue_id)).timed_receive (
-          (const char*) &msg, sizeof(void*), NULL,
+          (char*) &msg, sizeof(void*), NULL,
           Systick_clock::ticks_cast (millisec * 1000u));
     }
 

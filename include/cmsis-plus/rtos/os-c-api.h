@@ -227,15 +227,15 @@ extern "C"
                         os_mqueue_prio_t mprio, os_systicks_t ticks);
 
   os_result_t
-  os_mqueue_receive (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
+  os_mqueue_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
                      os_mqueue_prio_t* mprio);
 
   os_result_t
-  os_mqueue_try_receive (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
+  os_mqueue_try_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
                          os_mqueue_prio_t* mprio);
 
   os_result_t
-  os_mqueue_timed_receive (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
+  os_mqueue_timed_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
                            os_mqueue_prio_t* mprio, os_systicks_t ticks);
 
   size_t
