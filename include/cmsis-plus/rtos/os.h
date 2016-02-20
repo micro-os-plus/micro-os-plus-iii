@@ -640,7 +640,7 @@ namespace os
 #endif
 
       thread::state_t
-      state (void);
+      state (void) const;
 
       void
       wakeup (void);
@@ -655,11 +655,11 @@ namespace os
 #endif
 
       void*
-      function_args (void);
+      function_args (void) const;
 
       // Maybe make it a structure.
       result_t
-      wakeup_reason (void);
+      wakeup_reason (void) const;
 
       /**
        * @brief Get user storage.
@@ -1348,7 +1348,7 @@ namespace os
        * @return The semaphore value.
        */
       semaphore::count_t
-      value (void);
+      value (void) const;
 
       /**
        * @brief Reset the semaphore.
@@ -1382,6 +1382,8 @@ namespace os
     namespace mempool
     {
       using size_t = uint16_t;
+      constexpr size_t no_size = 0xFFFF;
+      constexpr size_t max_size = no_size - 1;
 
       /**
        * @brief Memory pool attributes.
@@ -1498,21 +1500,21 @@ namespace os
        * @return The max number of blocks in the pool.
        */
       std::size_t
-      capacity (void);
+      capacity (void) const;
 
       /**
        * @brief Get blocks count.
        * @return The number of blocks used from the queue.
        */
       std::size_t
-      count (void);
+      count (void) const;
 
       /**
        * @brief Get block size.
        * @return The block size, in bytes.
        */
       std::size_t
-      block_size (void);
+      block_size (void) const;
 
       /**
        * @brief Check if the memory pool is empty.
@@ -1520,7 +1522,7 @@ namespace os
        * @retval false The memory pool has allocated blocks.
        */
       bool
-      empty (void);
+      empty (void) const;
 
       /**
        * @brief Check if the memory pool is full.
@@ -1528,7 +1530,7 @@ namespace os
        * @retval false There are still memory blocks that can be allocated.
        */
       bool
-      full (void);
+      full (void) const;
 
       /**
        * @brief Reset the memory pool.
@@ -1543,10 +1545,12 @@ namespace os
       impl::Prioritised_list list_;
 
       void* pool_addr_;
-      mempool::size_t blocks_;
-      mempool::size_t block_size_bytes_;
+      const mempool::size_t blocks_;
+      const mempool::size_t block_size_bytes_;
 
-      mempool::size_t count_;
+      volatile mempool::size_t count_;
+
+      volatile mempool::size_t first_ix_;
 
       // Add more internal data.
     };
@@ -1728,21 +1732,21 @@ namespace os
        * @return The max number of messages that can be queued.
        */
       std::size_t
-      capacity (void);
+      capacity (void) const;
 
       /**
        * @brief Get queue length.
        * @return The number of messages in the queue.
        */
       std::size_t
-      length (void);
+      length (void) const;
 
       /**
        * @brief Get message size.
        * @return The message size, in bytes.
        */
       std::size_t
-      msg_size (void);
+      msg_size (void) const;
 
       /**
        * @brief Check if the queue is empty.
@@ -1750,7 +1754,7 @@ namespace os
        * @retval false The queue has some messages.
        */
       bool
-      empty (void);
+      empty (void) const;
 
       /**
        * @brief Check if the queue is full.
@@ -1758,7 +1762,7 @@ namespace os
        * @retval false The queue is not full.
        */
       bool
-      full (void);
+      full (void) const;
 
       /**
        * @brief Reset the message queue.
@@ -1909,19 +1913,19 @@ namespace os
     }
 
     inline thread::state_t
-    Thread::state (void)
+    Thread::state (void) const
     {
       return state_;
     }
 
     inline void*
-    Thread::function_args (void)
+    Thread::function_args (void) const
     {
       return func_args_;
     }
 
     inline result_t
-    Thread::wakeup_reason (void)
+    Thread::wakeup_reason (void) const
     {
       return wakeup_reason_;
     }
@@ -2069,7 +2073,7 @@ namespace os
      * If negative, it counts the waiting tasks.
      */
     inline semaphore::count_t
-    Semaphore::value (void)
+    Semaphore::value (void) const
     {
       return count_;
     }
@@ -2100,31 +2104,31 @@ namespace os
     }
 
     inline std::size_t
-    Memory_pool::capacity (void)
+    Memory_pool::capacity (void) const
     {
       return blocks_;
     }
 
     inline std::size_t
-    Memory_pool::block_size (void)
+    Memory_pool::block_size (void) const
     {
       return block_size_bytes_;
     }
 
     inline std::size_t
-    Memory_pool::count (void)
+    Memory_pool::count (void) const
     {
       return count_;
     }
 
     inline bool
-    Memory_pool::empty (void)
+    Memory_pool::empty (void) const
     {
       return (count () == 0);
     }
 
     inline bool
-    Memory_pool::full (void)
+    Memory_pool::full (void) const
     {
       return (count () == capacity ());
     }
@@ -2156,31 +2160,31 @@ namespace os
     }
 
     inline std::size_t
-    Message_queue::length (void)
+    Message_queue::length (void) const
     {
       return count_;
     }
 
     inline std::size_t
-    Message_queue::capacity (void)
+    Message_queue::capacity (void) const
     {
       return msgs_;
     }
 
     inline std::size_t
-    Message_queue::msg_size (void)
+    Message_queue::msg_size (void) const
     {
       return msg_size_bytes_;
     }
 
     inline bool
-    Message_queue::empty (void)
+    Message_queue::empty (void) const
     {
       return (length () == 0);
     }
 
     inline bool
-    Message_queue::full (void)
+    Message_queue::full (void) const
     {
       return (length () == capacity ());
     }
