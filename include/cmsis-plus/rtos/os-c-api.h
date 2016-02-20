@@ -188,7 +188,7 @@ extern "C"
   os_mempool_free (os_mempool_t* mempool, void* block);
 
   size_t
-  os_mempool_get_size (os_mempool_t* mempool);
+  os_mempool_get_capacity (os_mempool_t* mempool);
 
   size_t
   os_mempool_get_count (os_mempool_t* mempool);
@@ -242,16 +242,16 @@ extern "C"
   os_mqueue_get_length (os_mqueue_t* mqueue);
 
   size_t
-  os_mqueue_get_size (os_mqueue_t* mqueue);
+  os_mqueue_get_capacity (os_mqueue_t* mqueue);
 
   size_t
   os_mqueue_get_msg_size (os_mqueue_t* mqueue);
 
   bool
-  os_mqueue_get_is_empty (os_mqueue_t* mqueue);
+  os_mqueue_is_empty (os_mqueue_t* mqueue);
 
   bool
-  os_mqueue_get_is_full (os_mqueue_t* mqueue);
+  os_mqueue_is_full (os_mqueue_t* mqueue);
 
   os_result_t
   os_mqueue_reset (os_mqueue_t* mqueue);

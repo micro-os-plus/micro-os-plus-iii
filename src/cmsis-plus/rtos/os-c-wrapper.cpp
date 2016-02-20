@@ -316,9 +316,9 @@ os_mempool_free (os_mempool_t* mempool, void* block)
 }
 
 size_t
-os_mempool_get_size (os_mempool_t* mempool)
+os_mempool_get_capacity (os_mempool_t* mempool)
 {
-  return (reinterpret_cast<Memory_pool&> (mempool)).size ();
+  return (reinterpret_cast<Memory_pool&> (mempool)).capacity ();
 }
 
 size_t
@@ -336,13 +336,13 @@ os_mempool_get_block_size (os_mempool_t* mempool)
 bool
 os_mempool_is_empty (os_mempool_t* mempool)
 {
-  return (reinterpret_cast<Memory_pool&> (mempool)).is_empty ();
+  return (reinterpret_cast<Memory_pool&> (mempool)).empty ();
 }
 
 bool
 os_mempool_is_full (os_mempool_t* mempool)
 {
-  return (reinterpret_cast<Memory_pool&> (mempool)).is_full ();
+  return (reinterpret_cast<Memory_pool&> (mempool)).full ();
 }
 
 os_result_t
@@ -423,9 +423,9 @@ os_mqueue_get_length (os_mqueue_t* mqueue)
 }
 
 size_t
-os_mqueue_get_size (os_mqueue_t* mqueue)
+os_mqueue_get_capacity (os_mqueue_t* mqueue)
 {
-  return (reinterpret_cast<Message_queue&> (mqueue)).size ();
+  return (reinterpret_cast<Message_queue&> (mqueue)).capacity ();
 }
 
 size_t
@@ -435,15 +435,15 @@ os_mqueue_get_msg_size (os_mqueue_t* mqueue)
 }
 
 bool
-os_mqueue_get_is_empty (os_mqueue_t* mqueue)
+os_mqueue_is_empty (os_mqueue_t* mqueue)
 {
-  return (reinterpret_cast<Message_queue&> (mqueue)).is_empty ();
+  return (reinterpret_cast<Message_queue&> (mqueue)).empty ();
 }
 
 bool
-os_mqueue_get_is_full (os_mqueue_t* mqueue)
+os_mqueue_is_full (os_mqueue_t* mqueue)
 {
-  return (reinterpret_cast<Message_queue&> (mqueue)).is_full ();
+  return (reinterpret_cast<Message_queue&> (mqueue)).full ();
 }
 
 os_result_t

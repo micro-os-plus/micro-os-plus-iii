@@ -1494,11 +1494,11 @@ namespace os
       free (void* block);
 
       /**
-       * @brief Get memory pool size.
+       * @brief Get memory pool capacity.
        * @return The max number of blocks in the pool.
        */
       std::size_t
-      size (void);
+      capacity (void);
 
       /**
        * @brief Get blocks count.
@@ -1520,7 +1520,7 @@ namespace os
        * @retval false The memory pool has allocated blocks.
        */
       bool
-      is_empty (void);
+      empty (void);
 
       /**
        * @brief Check if the memory pool is full.
@@ -1528,7 +1528,7 @@ namespace os
        * @retval false There are still memory blocks that can be allocated.
        */
       bool
-      is_full (void);
+      full (void);
 
       /**
        * @brief Reset the memory pool.
@@ -1724,11 +1724,11 @@ namespace os
                      systicks_t ticks);
 
       /**
-       * @brief Get queue size.
+       * @brief Get queue capacity.
        * @return The max number of messages that can be queued.
        */
       std::size_t
-      size (void);
+      capacity (void);
 
       /**
        * @brief Get queue length.
@@ -1750,7 +1750,7 @@ namespace os
        * @retval false The queue has some messages.
        */
       bool
-      is_empty (void);
+      empty (void);
 
       /**
        * @brief Check if the queue is full.
@@ -1758,7 +1758,7 @@ namespace os
        * @retval false The queue is not full.
        */
       bool
-      is_full (void);
+      full (void);
 
       /**
        * @brief Reset the message queue.
@@ -2100,7 +2100,7 @@ namespace os
     }
 
     inline std::size_t
-    Memory_pool::size (void)
+    Memory_pool::capacity (void)
     {
       return blocks_;
     }
@@ -2118,15 +2118,15 @@ namespace os
     }
 
     inline bool
-    Memory_pool::is_empty (void)
+    Memory_pool::empty (void)
     {
       return (count () == 0);
     }
 
     inline bool
-    Memory_pool::is_full (void)
+    Memory_pool::full (void)
     {
-      return (count () == size ());
+      return (count () == capacity ());
     }
 
     // ======================================================================
@@ -2162,7 +2162,7 @@ namespace os
     }
 
     inline std::size_t
-    Message_queue::size (void)
+    Message_queue::capacity (void)
     {
       return msgs_;
     }
@@ -2174,15 +2174,15 @@ namespace os
     }
 
     inline bool
-    Message_queue::is_empty (void)
+    Message_queue::empty (void)
     {
       return (length () == 0);
     }
 
     inline bool
-    Message_queue::is_full (void)
+    Message_queue::full (void)
     {
-      return (length () == size ());
+      return (length () == capacity ());
     }
 
 // ------------------------------------------------------------------------
