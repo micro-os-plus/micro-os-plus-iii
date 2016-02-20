@@ -250,6 +250,9 @@ extern "C"
     os_mempool_size_t blocks;
     os_mempool_size_t block_size_bytes;
     os_mempool_size_t count;
+    void* first;
+    void* last;
+    uint8_t flags_;
   } os_mempool_t;
 
 #pragma GCC diagnostic pop

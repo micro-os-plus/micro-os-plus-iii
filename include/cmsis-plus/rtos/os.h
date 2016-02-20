@@ -417,6 +417,12 @@ namespace os
       yield (void);
 
       /**
+       * @brief Suspend the current thread.
+       */
+      void
+      suspend (void);
+
+      /**
        * @brief Check if wake-up due to timeout.
        * @retval true The previous sleep returned after the entire duration.
        * @retval false The previous sleep returned due to an event.
@@ -639,8 +645,12 @@ namespace os
       //void test_cancel(void);
 #endif
 
+      // TODO: study how to integrate signals and POSIX cancellation.
+      bool
+      interrupted (void);
+
       thread::state_t
-      state (void) const;
+      sched_state (void) const;
 
       void
       wakeup (void);
@@ -678,6 +688,14 @@ namespace os
 
     protected:
 
+      friend void
+      this_thread::suspend (void);
+
+      void
+      suspend (void);
+
+    protected:
+
       // TODO: group them in a Stack object
       void* stack_addr_;
       thread::func_t func_;
@@ -689,7 +707,7 @@ namespace os
       void* impl_event_flags_;
 
       std::size_t stack_size_bytes_;
-      thread::state_t state_;
+      thread::state_t sched_state_;
       thread::priority_t prio_;
 
       result_t wakeup_reason_;
@@ -1382,8 +1400,7 @@ namespace os
     namespace mempool
     {
       using size_t = uint16_t;
-      constexpr size_t no_size = 0xFFFF;
-      constexpr size_t max_size = no_size - 1;
+      constexpr size_t max_size = (0 - 1);
 
       /**
        * @brief Memory pool attributes.
@@ -1490,7 +1507,7 @@ namespace os
       /**
        * @brief Free the memory block.
        * @retval result::ok The memory block was released.
-       * @retval result::error_value The block does not belong to the memory pool.
+       * @retval EINVAL The block does not belong to the memory pool.
        */
       result_t
       free (void* block);
@@ -1542,16 +1559,31 @@ namespace os
 
     protected:
 
+      void*
+      try_first (void);
+
+    protected:
+
       impl::Prioritised_list list_;
 
-      void* pool_addr_;
+      char* pool_addr_;
       const mempool::size_t blocks_;
       const mempool::size_t block_size_bytes_;
 
       volatile mempool::size_t count_;
 
-      volatile mempool::size_t first_ix_;
+      // All accesses will be done inside a critical section,
+      // no need to make them volatile, they remain stable
+      // during the critical section.
+      void* first_;
+      void* last_;
 
+      uint8_t flags_;
+      enum
+        : uint8_t
+          {
+            flags_allocated = 1
+      };
       // Add more internal data.
     };
 
@@ -1913,9 +1945,9 @@ namespace os
     }
 
     inline thread::state_t
-    Thread::state (void) const
+    Thread::sched_state (void) const
     {
-      return state_;
+      return sched_state_;
     }
 
     inline void*
