@@ -61,8 +61,11 @@ namespace os
         Thread*
         get_top (void);
 
+        bool
+        empty(void);
+
         std::size_t
-        get_length ();
+        length ();
 
         // TODO add iterator begin(), end()
 
@@ -89,8 +92,14 @@ namespace os
     {
       // ----------------------------------------------------------------------
 
+      inline bool
+      Prioritised_list::empty(void)
+      {
+        return count_ == 0;
+      }
+
       inline std::size_t
-      Prioritised_list::get_length ()
+      Prioritised_list::length ()
       {
         return count_;
       }
