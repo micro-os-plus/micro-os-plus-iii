@@ -683,9 +683,6 @@ namespace os
       __run_function (void);
 #endif
 
-      static void
-      trampoline (Thread* thread);
-
     protected:
 
       friend void
@@ -693,6 +690,9 @@ namespace os
 
       void
       suspend (void);
+
+      static void
+      trampoline (Thread* thread);
 
     protected:
 
