@@ -49,6 +49,9 @@
 
 #ifdef  __cplusplus
 
+// We definitely use CMSIS++.
+#define OS_USE_CMSIS_PLUS
+
 // Include the CMSIS++ OS implementation definitions. This might further
 // include os-config.h, for the application specific definitions.
 #include <cmsis-plus/rtos/os-impl.h>
@@ -215,12 +218,12 @@ namespace os
       initialize (void);
 
       /**
-       * @brief Check if in ISR.
-       * @retval true Execution is in an interrupt service routine context.
+       * @brief Check if in handler mode.
+       * @retval true Execution is in an exception handler context.
        * @retval false Execution is in a thread context.
        */
       bool
-      is_in_isr (void);
+      in_handler_mode (void);
 
       /**
        * @brief Start the RTOS scheduler.

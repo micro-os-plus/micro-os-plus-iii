@@ -485,7 +485,7 @@ os_mqueue_reset (os_mqueue_t* mqueue)
 osStatus
 osKernelInitialize (void)
 {
-  if (scheduler::is_in_isr ())
+  if (scheduler::in_handler_mode ())
     {
       return osErrorISR;
     }
@@ -613,7 +613,7 @@ osThreadTerminate (osThreadId thread_id)
 osStatus
 osThreadYield (void)
 {
-  if (scheduler::is_in_isr ())
+  if (scheduler::in_handler_mode ())
     {
       return osErrorISR;
     }
