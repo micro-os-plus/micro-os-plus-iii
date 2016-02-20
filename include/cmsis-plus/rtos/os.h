@@ -1298,6 +1298,7 @@ namespace os
        * @brief Post (unlock) the semaphore.
        * @retval result::ok The semaphore was posted.
        * @retval EOVERFLOW The max count was exceeded.
+       * @retval ENOTRECOVERABLE The semaphore could not be posted (extension to POSIX).
        */
       result_t
       post (void);
@@ -1306,6 +1307,8 @@ namespace os
        * @brief Lock the semaphore, possibly waiting.
        * @retval result::ok The calling process successfully performed the semaphore lock operation.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval ENOTRECOVERABLE Semaphore wait failed (extension to POSIX).
+       * @retval EDEADLK A deadlock condition was detected.
        * @retval EINTR The operation was interrupted.
        */
       result_t
@@ -1316,6 +1319,9 @@ namespace os
        * @retval result::ok The calling process successfully performed the semaphore lock operation.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval EAGAIN The semaphore was already locked.
+       * @retval ENOTRECOVERABLE Semaphore wait failed (extension to POSIX).
+       * @retval EDEADLK A deadlock condition was detected.
+       * @retval EINTR The operation was interrupted.
        */
       result_t
       try_wait ();
@@ -1325,7 +1331,10 @@ namespace os
        * @param [in] ticks Number of ticks to wait.
        * @retval result::ok The calling process successfully performed the semaphore lock operation.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EINVAL Invalid timeout (POSIX limits the timeout to 1000 million ns)
        * @retval ETIMEDOUT The semaphore could not be locked before the specified timeout expired.
+       * @retval ENOTRECOVERABLE Semaphore wait failed (extension to POSIX).
+       * @retval EDEADLK A deadlock condition was detected.
        * @retval EINTR The operation was interrupted.
        */
       result_t
@@ -1349,6 +1358,8 @@ namespace os
     protected:
 
       impl::Prioritised_list list_;
+
+      void* impl_;
 
       const semaphore::count_t initial_count_;
 
@@ -1625,7 +1636,7 @@ namespace os
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
        * @retval EMSGSIZE The specified message length, nbytes, exceeds the message size attribute of the message queue.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-       * @retval ENOTRECOVERABLE The message could not be enqueue.
+       * @retval ENOTRECOVERABLE The message could not be enqueue (extension to POSIX).
        * @retval EINTR The operation was interrupted.
        */
       result_t

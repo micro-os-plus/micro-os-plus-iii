@@ -220,6 +220,7 @@ extern "C"
   {
     const char* name;
     os_thread_list_t list;
+    void* impl;
     os_semaphore_count_t initial_count;
     os_semaphore_count_t count;
     os_semaphore_count_t max_count;
