@@ -20,7 +20,7 @@
  * This file is part of the CMSIS++ proposal, intended as a CMSIS
  * replacement for C++ applications.
  *
- * The structures defined in this file are used both in the C API
+ * The structures declared in this file are used both in the C API
  * and in the legacy CMSIS API.
  *
  * Since there is no method to automatically sync them with the C++
@@ -28,8 +28,8 @@
  * the validation checks in os-c-wrapper.cpp will fail.
  */
 
-#ifndef CMSIS_PLUS_RTOS_OS_C_STRUCTS_H_
-#define CMSIS_PLUS_RTOS_OS_C_STRUCTS_H_
+#ifndef CMSIS_PLUS_RTOS_OS_C_DECLS_H_
+#define CMSIS_PLUS_RTOS_OS_C_DECLS_H_
 
 // ----------------------------------------------------------------------------
 
@@ -38,6 +38,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
+// We definitely use CMSIS++.
 #define OS_USE_CMSIS_PLUS
 
 // ----------------------------------------------------------------------------

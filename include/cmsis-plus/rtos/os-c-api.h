@@ -30,8 +30,8 @@
 
 // ----------------------------------------------------------------------------
 
-// Include the CMSIS++ C API structures definitions.
-#include <cmsis-plus/rtos/os-c-defs.h>
+// Include the CMSIS++ C API structures declarations.
+#include <cmsis-plus/rtos/os-c-decls.h>
 
 #include <stdint.h>
 #include <stddef.h>

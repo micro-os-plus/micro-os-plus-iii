@@ -113,8 +113,8 @@
 #define osFeature_Wait         1 ///< osWait function: 1=available, 0=not available
 #define osFeature_SysTick      1 ///< osKernelSysTick functions: 1=available, 0=not available
 
-// Include the CMSIS++ C API structures definitions.
-#include <cmsis-plus/rtos/os-c-defs.h>
+// Include the CMSIS++ C API structures declarations.
+#include <cmsis-plus/rtos/os-c-decls.h>
 
 #include <stdint.h>
 #include <stddef.h>
