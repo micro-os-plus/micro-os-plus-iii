@@ -277,7 +277,7 @@ namespace os
     void
     ByteCircularBuffer::dump (void)
     {
-      os::trace::printf ("%s @%p {buf=%p, size=%d, len=%d, hwm=%d, lwn=%d}\n",
+      os::cmsis::trace::printf ("%s @%p {buf=%p, size=%d, len=%d, hwm=%d, lwn=%d}\n",
                          __PRETTY_FUNCTION__, fBuf, fSize, fLen, fHighWaterMark,
                          fLowWaterMark);
     }
