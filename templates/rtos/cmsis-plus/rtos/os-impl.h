@@ -72,6 +72,11 @@ namespace os
 #endif
       protected:
 
+        void
+        remove (std::size_t pos);
+
+      protected:
+
         Thread* array_[OS_INTEGER_MAX_NUMBER_OF_THREADS];
         std::size_t count_;
       };
