@@ -66,7 +66,7 @@ namespace os
       Usart_wrapper::do_initialize ()
       {
         // Nothing more to do, due to the Keil non-reentrant callback,
-        // the Initialise() was called before.
+        // the Initialize() was called before.
         return ARM_DRIVER_OK;
       }
 
