@@ -791,6 +791,9 @@ __posix_readlink (const char* path, char* buf, size_t bufsize)
 
 #pragma GCC diagnostic pop
 
+// `initialise_monitor_handles()` is a newlib libgloss function used to prepare
+// the stdio files when using semihosting. Better keep the name the same.
+
 void
 initialise_monitor_handles (void)
 {
