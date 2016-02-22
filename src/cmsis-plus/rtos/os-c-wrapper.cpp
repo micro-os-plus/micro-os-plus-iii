@@ -455,7 +455,7 @@ os_mqueue_reset (os_mqueue_t* mqueue)
 // ****************************************************************************
 // ***** Legacy CMSIS RTOS implementation *****
 
-#include <cmsis_os.h>
+#include <cmsis-plus/legacy/cmsis_os.h>
 
 // ----------------------------------------------------------------------------
 //  ==== Kernel Control Functions ====
