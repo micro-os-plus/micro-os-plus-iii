@@ -32,7 +32,7 @@
  *   http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html
  * - specifically designed as a convenient implementation for
  *   C++ standard thread library (ISO/IEC 14882:2011)
- * - improved usability, by defining both simple (using default)
+ * - improved usability, by defining both simple (using defaults)
  *   and complex (using attributes) object constructors (feature
  *   inspired by POSIX threads attributes)
  * - improved readability with explicit three-fold waiting functions
@@ -40,6 +40,17 @@
  * - POSIX condition variable added
  * - versatile clocks added (Systick_clock, Realtime_clock)
  * - standard POSIX errors definitions used
+ */
+
+/*
+ * TODO:
+ * - make Thread virtual, to allow create_hook/delete_hook functionality
+ * - make most classes virtual, to allow post_hook functionality
+ * - event timestamps: add derived classes that capture the event timestamp
+ * - add object type in base class
+ * - add Wait_list in base class
+ * - add libc/newlib errno() function
+ * - add a separate Stack object
  */
 
 #ifndef CMSIS_PLUS_RTOS_OS_H_
@@ -99,8 +110,17 @@ namespace os
          */
         ok = 0,
 
-      // The rest of the errors are those defined by POSIX, in the
-      // <errno.h> header.
+      /*
+       * The rest of the errors are those defined by POSIX, in the
+       * <errno.h> header. Currently in use:
+       * - EPERM
+       * - EINVAL
+       * - EAGAIN
+       * - ENOTRECOVERABLE
+       * - EDEADLOCK
+       * - EMSGSIZE
+       */
+
       };
     } /* namespace result */
 
@@ -329,6 +349,7 @@ namespace os
       const critical::status_t status_;
     };
 
+#if 0
     // ----------------------------------------------------------------------
 
     using event_flags_t = uint32_t;
@@ -336,67 +357,83 @@ namespace os
     // TODO: This might require further refinements.
 
     namespace flags
-    {
-      /**
-       * @brief Clear thread flags.
-       * @param [in] thread Reference to the thread.
-       * @param [in] flags The flags, as OR-ed bit mask.
-       * @param [out] out_flags Pointer where to store previous flags; may be nullptr.
-       * @retval result::ok The event flags were set.
-       */
-      result_t
-      set (Thread& thread, event_flags_t flags, event_flags_t* out_flags);
+      {
+        /**
+         * @brief Clear thread flags.
+         * @param [in] thread Reference to the thread.
+         * @param [in] flags The flags, as OR-ed bit mask.
+         * @param [out] out_flags Pointer where to store previous flags; may be nullptr.
+         * @retval result::ok The event flags were set.
+         */
+        result_t
+        set (Thread& thread, event_flags_t flags, event_flags_t* out_flags);
 
-      /**
-       * @brief Set thread flags.
-       * @param [in] thread Reference to the thread.
-       * @param [in] flags The signal flags, as OR-ed bit mask.
-       * @param [out] out_flags Pointer where to store previous flags, may be nullptr.
-       * @retval result::ok The event flags were cleared.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-       */
-      result_t
-      clear (Thread& thread, event_flags_t flags, event_flags_t* out_flags);
+        /**
+         * @brief Set thread flags.
+         * @param [in] thread Reference to the thread.
+         * @param [in] flags The signal flags, as OR-ed bit mask.
+         * @param [out] out_flags Pointer where to store previous flags, may be nullptr.
+         * @retval result::ok The event flags were cleared.
+         * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+         */
+        result_t
+        clear (Thread& thread, event_flags_t flags, event_flags_t* out_flags);
 
-      /**
-       * @brief Wait for flags.
-       * @param [in] flags The flags, as OR-ed bit mask.
-       * @param [out] out_flags Pointer where to store previous flags, may be nullptr.
-       * @retval result::ok The signal condition occurred.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-       */
-      result_t
-      wait (event_flags_t flags, event_flags_t* out_flags);
+        /**
+         * @brief Wait for flags.
+         * @param [in] flags The flags, as OR-ed bit mask.
+         * @param [out] out_flags Pointer where to store previous flags, may be nullptr.
+         * @retval result::ok The signal condition occurred.
+         * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+         */
+        result_t
+        wait (event_flags_t flags, event_flags_t* out_flags);
 
-      /**
-       * @brief Wait for flags.
-       * @param [in] flags The flags, as OR-ed bit mask.
-       * @param [out] out_flags Pointer where to store previous flags, may be nullptr.
-       * @retval result::ok The signal condition occurred.
-       * @retval EAGAIN The signal condition did not occur.
-       */
-      result_t
-      try_wait (event_flags_t flags, event_flags_t* out_flags);
+        /**
+         * @brief Wait for flags.
+         * @param [in] flags The flags, as OR-ed bit mask.
+         * @param [out] out_flags Pointer where to store previous flags, may be nullptr.
+         * @retval result::ok The signal condition occurred.
+         * @retval EAGAIN The signal condition did not occur.
+         */
+        result_t
+        try_wait (event_flags_t flags, event_flags_t* out_flags);
 
-      /**
-       * @brief Wait for flags.
-       * @param [in] flags The signal flags, as OR-ed bit mask.
-       * @param [out] out_flags Pointer where to store previous flags, may be nullptr.
-       * @retval result::ok The signal condition occurred.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-       * @retval ETIMEDOUT The signal condition did not occur during the entire timeout duration.
-       */
-      result_t
-      timed_wait (event_flags_t flags, event_flags_t* out_flags,
-                  systicks_t ticks);
+        /**
+         * @brief Wait for flags.
+         * @param [in] flags The signal flags, as OR-ed bit mask.
+         * @param [out] out_flags Pointer where to store previous flags, may be nullptr.
+         * @retval result::ok The signal condition occurred.
+         * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+         * @retval ETIMEDOUT The signal condition did not occur during the entire timeout duration.
+         */
+        result_t
+        timed_wait (event_flags_t flags, event_flags_t* out_flags,
+            systicks_t ticks);
 
-    } /* namespace flags */
+      } /* namespace flags */
+#endif
 
     // ----------------------------------------------------------------------
 
     //  ==== Thread Management ====
 
     class Thread;
+    namespace thread
+    {
+      using sigset_t = uint32_t;
+
+      namespace sig
+      {
+        enum
+          : sigset_t
+            {
+              //
+          any = 0, //
+          all = 0xFFFFFFFF,
+        };
+      } /* namespace sig */
+    } /* namespace thread */
 
     namespace this_thread
     {
@@ -429,6 +466,46 @@ namespace os
        */
       bool
       is_timeout (void);
+
+      /**
+       * @brief Wait for signals.
+       * @param [in] mask The expected signals flags (OR-ed bit-mask); may be zero.
+       * @param [out] omask Pointer where to store the current signals; may be nullptr.
+       * @retval result::ok All expected signal flags are raised.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EINVAL The signal mask is outside of the permitted range.
+       * @retval EINTR The operation was interrupted.
+       * @retval ENOTRECOVERABLE Wait failed.
+       */
+      result_t
+      sig_wait (thread::sigset_t mask, thread::sigset_t* omask);
+
+      /**
+       * @brief Try to wait for signals.
+       * @param [in] mask The expected signals flags (OR-ed bit-mask); may be zero.
+       * @param [out] omask Pointer where to store the current signals; may be nullptr.
+       * @retval result::ok All expected signal flags are raised.
+       * @retval EINVAL The signal mask is outside of the permitted range.
+       * @retval EAGAIN The signal condition did not occur.
+       * @retval ENOTRECOVERABLE Wait failed.
+       */
+      result_t
+      try_sig_wait (thread::sigset_t mask, thread::sigset_t* omask);
+
+      /**
+       * @brief Timed wait for signals.
+       * @param [in] mask The expected signals flags (OR-ed bit-mask); may be zero.
+       * @param [out] omask Pointer where to store the current signals; may be nullptr.
+       * @retval result::ok All expected signals flags are raised.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval ETIMEDOUT The signal condition did not occur during the entire timeout duration.
+       * @retval EINVAL The signal mask is outside of the permitted range.
+       * @retval EINTR The operation was interrupted.
+       * @retval ENOTRECOVERABLE Wait failed.
+       */
+      result_t
+      timed_sig_wait (thread::sigset_t mask, thread::sigset_t* omask,
+                      systicks_t ticks);
 
     } /* namespace this_thread */
 
@@ -468,28 +545,32 @@ namespace os
        * Type of priorities used for thread control.
        */
       using priority_t = uint8_t;
+      using sigset_t = uint32_t;
 
       // Explicit namespace used because values are not restricted
       // to the enumeration.
       namespace priority
       {
-        // This gives a range of 32 priorities,
-        constexpr uint32_t shift = 2;
+        // This gives a basic range of 16 priorities, easily extensible
+        // to 32, 64, 128.
+        constexpr uint32_t shift = 0;
 
         enum
           : priority_t
             {
               //
-          none = 0,
-          idle = 1, ///< priority: idle (lowest valid)
+          none = 0, // undefined
+          idle = 1, ///< priority: idle, system reserved
+          lowest = 2, // lowest valid for user code
           low = (2 << shift), ///< priority: low
-          below_normal = (3 << shift), ///< priority: below normal
-          normal = (4 << shift), ///< priority: normal (default)
-          above_normal = (5 << shift), ///< priority: above normal
-          high = (6 << shift), ///< priority: high
-          realtime = (7 << shift), ///< priority: realtime (highest)
-          highest = ((8 << shift) - 2),
-          error = ((8 << shift) - 1)
+          below_normal = (4 << shift), ///< priority: below normal
+          normal = (6 << shift), ///< priority: normal (default)
+          above_normal = (8 << shift), ///< priority: above normal
+          high = (10 << shift), ///< priority: high
+          realtime = (12 << shift), ///< priority: realtime
+          highest = ((16 << shift) - 3), // highest valid for user code
+          isr = ((16 << shift) - 2), // ISR deferred task, system reserved
+          error = ((16 << shift) - 1) // error
         };
       } /* namespace priority */
 
@@ -652,6 +733,11 @@ namespace os
       thread::state_t
       sched_state (void) const;
 
+      /**
+       * @brief Wakeup the task.
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
       void
       wakeup (void);
 
@@ -678,21 +764,79 @@ namespace os
       os_thread_user_storage_t*
       user_storage (void);
 
-#if defined(TESTING)
-      void
-      __run_function (void);
-#endif
+      /**
+       * @brief Raise the thread signals.
+       * @param [in] mask The OR-ed signals to raise.
+       * @param [out] omask Optional pointer where to store the previous mask; may be nullptr.
+       * @retval result::ok The signals were raised.
+       * @retval EINVAL The mask is zero.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       */
+      thread::sigset_t
+      sig_raise (thread::sigset_t mask, thread::sigset_t* omask);
+
+      /**
+       * @brief Get/clear thread signals.
+       * @param [in] mask The OR-ed signals to get/clear.
+       * @param [in] clear If true, the selected bits are cleared after read. The default is true.
+       * @retval mask The selected bits from the current thread signal mask.
+       * @retval sig::error Cannot be invoked from an Interrupt Service Routine.
+       */
+      thread::sigset_t
+      sig_get (thread::sigset_t mask, bool clear = true);
+
+      /**
+       * @brief Clear thread signals.
+       * @param [in] mask The OR-ed signals to clear.
+       * @retval result::ok The signals were cleared.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EINVAL The mask is zero.
+       */
+      result_t
+      sig_clear (thread::sigset_t mask, thread::sigset_t* omask);
 
     protected:
 
       friend void
       this_thread::suspend (void);
 
+      /**
+       * @brief Suspend the current thread.
+       *
+       */
       void
       suspend (void);
 
+      /**
+       * @brief Invoke terminating thread function.
+       * @param [in] thread The static `this`.
+       */
       static void
-      trampoline (Thread* thread);
+      _invoke_with_exit (Thread* thread);
+
+      friend result_t
+      this_thread::sig_wait (thread::sigset_t mask, thread::sigset_t* omask);
+
+      result_t
+      sig_wait (thread::sigset_t mask, thread::sigset_t* omask);
+
+      friend result_t
+      this_thread::try_sig_wait (thread::sigset_t mask,
+                                 thread::sigset_t* omask);
+
+      result_t
+      try_sig_wait (thread::sigset_t mask, thread::sigset_t* omask);
+
+      friend result_t
+      this_thread::timed_sig_wait (thread::sigset_t mask,
+                                   thread::sigset_t* omask, systicks_t ticks);
+
+      result_t
+      timed_sig_wait (thread::sigset_t mask, thread::sigset_t* omask,
+                      systicks_t ticks);
+
+      result_t
+      _try_wait (thread::sigset_t mask, thread::sigset_t* omask);
 
     protected:
 
@@ -702,7 +846,7 @@ namespace os
       thread::func_args_t func_args_;
       void* func_result_;
 
-      // FreeRTOS
+      // Implementation
       void* impl_;
       void* impl_event_flags_;
 
@@ -711,6 +855,9 @@ namespace os
       thread::priority_t prio_;
 
       result_t wakeup_reason_;
+
+      // volatile, but used in critical sections.
+      thread::sigset_t sig_mask_;
 
       os_thread_user_storage_t user_storage_;
 
@@ -1927,8 +2074,45 @@ namespace os
     {
       using element_t = os::rtos::port::stack::element_t;
 
-    }
-    ;
+    } /* namespace stack */
+
+    namespace this_thread
+    {
+      /**
+       * @details
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      inline result_t
+      sig_wait (thread::sigset_t mask, thread::sigset_t* omask)
+      {
+        return this_thread::thread ().sig_wait (mask, omask);
+      }
+
+      /**
+       * @details
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      inline result_t
+      try_sig_wait (thread::sigset_t mask, thread::sigset_t* omask)
+      {
+        return this_thread::thread ().try_sig_wait (mask, omask);
+      }
+
+      /**
+       * @details
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      inline result_t
+      timed_sig_wait (thread::sigset_t mask, thread::sigset_t* omask,
+                      systicks_t ticks)
+      {
+        return this_thread::thread ().timed_sig_wait (mask, omask, ticks);
+      }
+
+    } /* namespace this_thread */
 
     namespace thread
     {
@@ -1940,7 +2124,7 @@ namespace os
         th_stack_size_bytes = 0;
         th_priority = thread::priority::normal;
       }
-    }
+    } /* namespace thread */
 
     /**
      * @details

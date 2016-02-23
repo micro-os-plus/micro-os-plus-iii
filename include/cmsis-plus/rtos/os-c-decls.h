@@ -65,19 +65,21 @@ extern "C"
 
   // --------------------------------------------------------------------------
 
-#define OS_PRIOTHREAD_SHIFT   (2)
+#define OS_PRIOTHREAD_SHIFT   (1)
 
   enum
   {
     os_priority_none = 0, // not defined
-    os_priority_idle = 1, // lowest
+    os_priority_idle = 1,
+    os_priority_lowest = 2, // lowest
     os_priority_low = (2 << OS_PRIOTHREAD_SHIFT),
-    os_priority_below_normal = (3 << OS_PRIOTHREAD_SHIFT),
-    os_priority_normal = (4 << OS_PRIOTHREAD_SHIFT), // default
-    os_priority_above_normal = (5 << OS_PRIOTHREAD_SHIFT),
-    os_priority_high = (6 << OS_PRIOTHREAD_SHIFT),
-    os_priority_realtime = (7 << OS_PRIOTHREAD_SHIFT),
-    os_priority_highest = ((8 << OS_PRIOTHREAD_SHIFT) - 2),
+    os_priority_below_normal = (4 << OS_PRIOTHREAD_SHIFT),
+    os_priority_normal = (6 << OS_PRIOTHREAD_SHIFT), // default
+    os_priority_above_normal = (8 << OS_PRIOTHREAD_SHIFT),
+    os_priority_high = (10 << OS_PRIOTHREAD_SHIFT),
+    os_priority_realtime = (12 << OS_PRIOTHREAD_SHIFT),
+    os_priority_highest = ((8 << OS_PRIOTHREAD_SHIFT) - 3),
+    os_priority_isr = ((8 << OS_PRIOTHREAD_SHIFT) - 2),
     os_priority_error = ((8 << OS_PRIOTHREAD_SHIFT) - 1)
   };
 
@@ -101,6 +103,8 @@ extern "C"
   typedef uint8_t os_thread_state_t;
 
   typedef uint8_t os_thread_prio_t;
+
+  typedef uint32_t os_thread_signals_t;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -126,6 +130,7 @@ extern "C"
     os_thread_state_t state;
     os_thread_prio_t prio;
     os_result_t wakeup_reason;
+    os_thread_signals_t signals;
     os_thread_user_storage_t user_storage;
   } os_thread_t;
 

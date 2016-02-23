@@ -784,10 +784,9 @@ osTimerDelete (osTimerId timer_id)
 int32_t
 osSignalSet (osThreadId thread_id, int32_t signals)
 {
-  int32_t ret;
-  flags::set ((Thread&) (*thread_id), (event_flags_t) signals,
-              (event_flags_t*) &ret);
-  return ret;
+  thread::sigset_t osig;
+  ((Thread*) (thread_id))->sig_raise ((thread::sigset_t) signals, &osig);
+  return (int32_t) osig;
 }
 
 /**
@@ -799,10 +798,15 @@ osSignalSet (osThreadId thread_id, int32_t signals)
 int32_t
 osSignalClear (osThreadId thread_id, int32_t signals)
 {
-  int32_t ret;
-  flags::clear ((Thread&) (*thread_id), (event_flags_t) signals,
-                (event_flags_t*) &ret);
-  return ret;
+  if (scheduler::in_handler_mode () || (signals == 0))
+    {
+      return 0x80000000;
+    }
+
+  thread::sigset_t sig;
+  ((Thread*) (thread_id))->sig_clear (signals, &sig);
+
+  return (int32_t) sig;
 }
 
 #pragma GCC diagnostic push
@@ -837,22 +841,65 @@ osSignalWait (int32_t signals, uint32_t millisec)
   result_t res;
   if (millisec == osWaitForever)
     {
-      res = flags::wait ((event_flags_t) signals,
-                         (event_flags_t*) &event.value.signals);
+      res = this_thread::sig_wait ((thread::sigset_t) signals,
+                                   (thread::sigset_t*) &event.value.signals);
+      if (res == EPERM)
+        {
+          event.status = osErrorISR;
+        }
+      else if (res == EINVAL)
+        {
+          event.status = osErrorValue;
+        }
+      else
+        {
+          event.status = osEventSignal;
+        }
     }
   else if (millisec == 0)
     {
-      res = flags::try_wait ((event_flags_t) signals,
-                             (event_flags_t*) &event.value.signals);
+      res = this_thread::try_sig_wait (
+          (thread::sigset_t) signals, (thread::sigset_t*) &event.value.signals);
+      if (res == EPERM)
+        {
+          event.status = osErrorISR;
+        }
+      else if (res == EINVAL)
+        {
+          event.status = osErrorValue;
+        }
+      else if (res == EAGAIN)
+        {
+          event.status = osOK;
+        }
+      else
+        {
+          event.status = osEventSignal;
+        }
     }
   else
     {
-      res = flags::timed_wait ((event_flags_t) signals,
-                               (event_flags_t*) &event.value.signals,
-                               Systick_clock::ticks_cast (millisec * 1000u));
+      res = this_thread::timed_sig_wait (
+          (thread::sigset_t) signals, (thread::sigset_t*) &event.value.signals,
+          Systick_clock::ticks_cast (millisec * 1000u));
+      if (res == EPERM)
+        {
+          event.status = osErrorISR;
+        }
+      else if (res == EINVAL)
+        {
+          event.status = osErrorValue;
+        }
+      else if (res == ETIMEDOUT)
+        {
+          event.status = osEventTimeout;
+        }
+      else
+        {
+          event.status = osEventSignal;
+        }
     }
-  // TODO: set osEventSignal, osEventTimeout
-  event.status = static_cast<osStatus> (res);
+
   return event;
 }
 
@@ -1209,7 +1256,8 @@ osMessageGet (osMessageQId queue_id, uint32_t millisec)
   if (millisec == osWaitForever)
     {
       res = (reinterpret_cast<Message_queue&> (queue_id)).receive (
-          (char*) &msg, sizeof(uint32_t), NULL);
+          (char*) &msg, sizeof(uint32_t),
+          NULL);
       // result::event_message;
     }
   else if (millisec == 0)
@@ -1404,7 +1452,8 @@ osMailGet (osMailQId queue_id, uint32_t millisec)
   if (millisec == osWaitForever)
     {
       res = (reinterpret_cast<Message_queue&> (queue_id)).receive (
-          (char*) &msg, sizeof(void*), NULL);
+          (char*) &msg, sizeof(void*),
+          NULL);
     }
   else if (millisec == 0)
     {

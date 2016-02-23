@@ -74,7 +74,7 @@
  * replacement for C++ applications.
  *
  * The code exposes a fully compliant ARM CMSIS API in the
- * context of the C++ version.
+ * context of the CMSIS++.
  */
 
 /*
