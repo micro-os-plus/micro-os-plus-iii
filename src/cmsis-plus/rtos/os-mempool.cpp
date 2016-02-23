@@ -223,6 +223,11 @@ namespace os
 
       bool queued = false;
 
+      if (ticks == 0)
+        {
+          ticks = 1;
+        }
+
       Systick_clock::rep start = Systick_clock::now ();
       for (;;)
         {
