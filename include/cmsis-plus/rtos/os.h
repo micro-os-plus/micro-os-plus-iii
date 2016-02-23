@@ -51,6 +51,9 @@
  * - add Wait_list in base class
  * - add libc/newlib errno() function
  * - add a separate Stack object
+ *
+ * Notes:
+ * - try_wait(), try_sig_wait() are probably not very inspired.
  */
 
 #ifndef CMSIS_PLUS_RTOS_OS_H_
@@ -349,71 +352,6 @@ namespace os
       const critical::status_t status_;
     };
 
-#if 0
-    // ----------------------------------------------------------------------
-
-    using event_flags_t = uint32_t;
-
-    // TODO: This might require further refinements.
-
-    namespace flags
-      {
-        /**
-         * @brief Clear thread flags.
-         * @param [in] thread Reference to the thread.
-         * @param [in] flags The flags, as OR-ed bit mask.
-         * @param [out] out_flags Pointer where to store previous flags; may be nullptr.
-         * @retval result::ok The event flags were set.
-         */
-        result_t
-        set (Thread& thread, event_flags_t flags, event_flags_t* out_flags);
-
-        /**
-         * @brief Set thread flags.
-         * @param [in] thread Reference to the thread.
-         * @param [in] flags The signal flags, as OR-ed bit mask.
-         * @param [out] out_flags Pointer where to store previous flags, may be nullptr.
-         * @retval result::ok The event flags were cleared.
-         * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-         */
-        result_t
-        clear (Thread& thread, event_flags_t flags, event_flags_t* out_flags);
-
-        /**
-         * @brief Wait for flags.
-         * @param [in] flags The flags, as OR-ed bit mask.
-         * @param [out] out_flags Pointer where to store previous flags, may be nullptr.
-         * @retval result::ok The signal condition occurred.
-         * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-         */
-        result_t
-        wait (event_flags_t flags, event_flags_t* out_flags);
-
-        /**
-         * @brief Wait for flags.
-         * @param [in] flags The flags, as OR-ed bit mask.
-         * @param [out] out_flags Pointer where to store previous flags, may be nullptr.
-         * @retval result::ok The signal condition occurred.
-         * @retval EAGAIN The signal condition did not occur.
-         */
-        result_t
-        try_wait (event_flags_t flags, event_flags_t* out_flags);
-
-        /**
-         * @brief Wait for flags.
-         * @param [in] flags The signal flags, as OR-ed bit mask.
-         * @param [out] out_flags Pointer where to store previous flags, may be nullptr.
-         * @retval result::ok The signal condition occurred.
-         * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-         * @retval ETIMEDOUT The signal condition did not occur during the entire timeout duration.
-         */
-        result_t
-        timed_wait (event_flags_t flags, event_flags_t* out_flags,
-            systicks_t ticks);
-
-      } /* namespace flags */
-#endif
-
     // ----------------------------------------------------------------------
 
     //  ==== Thread Management ====
@@ -429,7 +367,7 @@ namespace os
           : sigset_t
             {
               //
-          any = 0, //
+          any = 0,
           all = 0xFFFFFFFF,
         };
       } /* namespace sig */
@@ -773,11 +711,11 @@ namespace os
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       thread::sigset_t
-      sig_raise (thread::sigset_t mask, thread::sigset_t* omask);
+      sig_raise (thread::sigset_t mask, thread::sigset_t* oflags);
 
       /**
        * @brief Get/clear thread signals.
-       * @param [in] mask The OR-ed signals to get/clear.
+       * @param [in] mask The OR-ed signals to get/clear; may be zero.
        * @param [in] clear If true, the selected bits are cleared after read. The default is true.
        * @retval mask The selected bits from the current thread signal mask.
        * @retval sig::error Cannot be invoked from an Interrupt Service Routine.
@@ -793,7 +731,7 @@ namespace os
        * @retval EINVAL The mask is zero.
        */
       result_t
-      sig_clear (thread::sigset_t mask, thread::sigset_t* omask);
+      sig_clear (thread::sigset_t mask, thread::sigset_t* oflags);
 
     protected:
 
@@ -815,28 +753,28 @@ namespace os
       _invoke_with_exit (Thread* thread);
 
       friend result_t
-      this_thread::sig_wait (thread::sigset_t mask, thread::sigset_t* omask);
+      this_thread::sig_wait (thread::sigset_t mask, thread::sigset_t* oflags);
 
       result_t
-      sig_wait (thread::sigset_t mask, thread::sigset_t* omask);
+      sig_wait (thread::sigset_t mask, thread::sigset_t* oflags);
 
       friend result_t
       this_thread::try_sig_wait (thread::sigset_t mask,
-                                 thread::sigset_t* omask);
+                                 thread::sigset_t* oflags);
 
       result_t
-      try_sig_wait (thread::sigset_t mask, thread::sigset_t* omask);
+      try_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags);
 
       friend result_t
       this_thread::timed_sig_wait (thread::sigset_t mask,
-                                   thread::sigset_t* omask, systicks_t ticks);
+                                   thread::sigset_t* oflags, systicks_t ticks);
 
       result_t
-      timed_sig_wait (thread::sigset_t mask, thread::sigset_t* omask,
+      timed_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
                       systicks_t ticks);
 
       result_t
-      _try_wait (thread::sigset_t mask, thread::sigset_t* omask);
+      _try_wait (thread::sigset_t mask, thread::sigset_t* oflags);
 
     protected:
 
@@ -1812,7 +1750,7 @@ namespace os
       /**
        * @brief Compare memory queues.
        * @retval true The given memory queue is the same as this memory queue.
-       * @retval false The memory queus are different.
+       * @retval false The memory queues are different.
        */
       bool
       operator== (const Message_queue& rhs) const;
@@ -1970,6 +1908,119 @@ namespace os
 
       mqueue::size_t count_;
 
+    };
+
+#pragma GCC diagnostic pop
+
+    // ======================================================================
+
+    namespace evflags
+    {
+      using mask_t = uint32_t;
+      using mode_t = uint32_t;
+
+      namespace mode
+      {
+        enum
+          : mode_t
+            {
+              //
+          all = 1,
+          any = 2,
+          clear = 4
+        };
+      }
+      ;
+      /**
+       * @brief Event flags attributes.
+       */
+      class Attributes : public Named_object
+      {
+      public:
+
+        Attributes (const char* name);
+
+        Attributes (const Attributes&) = default;
+        Attributes (Attributes&&) = default;
+        Attributes&
+        operator= (const Attributes&) = default;
+        Attributes&
+        operator= (Attributes&&) = default;
+
+        /**
+         * @brief Delete the timer attributes.
+         */
+        ~Attributes () = default;
+
+      public:
+
+        // Public members, no accessors and mutators required.
+        // Warning: must match the type & order of the C file header.
+
+        // Add more attributes.
+      };
+
+      extern const Attributes initializer;
+
+    } /* namespace mqueue */
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+    class Event_flags : public Named_object
+    {
+    public:
+      Event_flags (void);
+      Event_flags (const evflags::Attributes&attr);
+
+      Event_flags (const Event_flags&) = delete;
+      Event_flags (Event_flags&&) = delete;
+      Event_flags&
+      operator= (const Event_flags&) = delete;
+      Event_flags&
+      operator= (Event_flags&&) = delete;
+
+      /**
+       * @brief Delete the event flags.
+       */
+      ~Event_flags ();
+
+      /**
+       * @brief Compare event flags.
+       * @retval true The given event flags is the same as this event flags.
+       * @retval false The event flags are different.
+       */
+      bool
+      operator== (const Event_flags& rhs) const;
+
+      result_t
+      wait (evflags::mask_t mask, evflags::mask_t* oflags,
+            evflags::mode_t mode);
+
+      result_t
+      try_wait (evflags::mask_t mask, evflags::mask_t* oflags,
+                evflags::mode_t mode);
+
+      result_t
+      timed_wait (evflags::mask_t mask, evflags::mask_t* oflags,
+                  evflags::mode_t mode, systicks_t ticks);
+
+      result_t
+      raise (evflags::mask_t mask, evflags::mask_t* oflags);
+
+      result_t
+      clear (evflags::mask_t mask, evflags::mask_t* oflags);
+
+      result_t
+      get (evflags::mask_t mask, evflags::mask_t* oflags, evflags::mode_t mode);
+
+      bool
+      waiting (void);
+
+    private:
+
+      port::Tasks_list list_;
+      evflags::mask_t flags_;
     };
 
 #pragma GCC diagnostic pop
