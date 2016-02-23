@@ -49,12 +49,12 @@
 
 #ifdef  __cplusplus
 
-// We definitely use CMSIS++.
+// We definitely use CMSIS++ ;-)
 #define OS_USE_CMSIS_PLUS
 
-// Include the CMSIS++ OS implementation definitions. This might further
+// Include the CMSIS++ OS implementation declarations. This might further
 // include os-config.h, for the application specific definitions.
-#include <cmsis-plus/rtos/os-impl.h>
+#include <cmsis-plus/rtos/port/os-decls.h>
 
 #include <cmsis-plus/iso/system_error>
 
@@ -834,6 +834,7 @@ namespace os
        * @brief Start or restart the timer.
        * @param [in] ticks The timer period, in ticks.
        * @retval result::ok The timer has been started or restarted.
+       * @retval ENOTRECOVERABLE Timer could not be started.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
@@ -844,6 +845,7 @@ namespace os
        * @retval result::ok The timer has been stopped.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval EAGAIN The timer is not yet started.
+       * @retval ENOTRECOVERABLE Timer could not be stopped.
        */
       result_t
       stop (void);
@@ -853,6 +855,8 @@ namespace os
       timer::func_t func_;
 
       timer::func_args_t func_args_;
+
+      void* impl_;
 
       timer::type_t type_;
 
@@ -1378,7 +1382,7 @@ namespace os
 
     protected:
 
-      impl::Prioritised_list list_;
+      port::Tasks_list list_;
 
       void* impl_;
 
@@ -1564,7 +1568,7 @@ namespace os
 
     protected:
 
-      impl::Prioritised_list list_;
+      port::Tasks_list list_;
 
       char* pool_addr_;
       const mempool::size_t blocks_;
@@ -1806,8 +1810,8 @@ namespace os
 
     private:
 
-      impl::Prioritised_list send_list_;
-      impl::Prioritised_list receive_list_;
+      port::Tasks_list send_list_;
+      port::Tasks_list receive_list_;
 
       void* queue_addr_;
       void* impl_;
@@ -1918,6 +1922,13 @@ namespace os
     }
 
     // ======================================================================
+
+    namespace stack
+    {
+      using element_t = os::rtos::port::stack::element_t;
+
+    }
+    ;
 
     namespace thread
     {

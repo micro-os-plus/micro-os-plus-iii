@@ -33,7 +33,7 @@
 
 // ----------------------------------------------------------------------------
 
-#include <cmsis-plus/rtos/os-config.h>
+#include <cmsis-plus/rtos/os-app-config.h>
 
 #include <stdint.h>
 #include <stddef.h>
@@ -153,6 +153,7 @@ extern "C"
     const char* name;
     os_time_func_t func;
     os_timer_func_args_t func_args;
+    void* impl;
     os_timer_type_t type;
   } os_timer_t;
 
