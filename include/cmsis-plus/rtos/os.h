@@ -1719,10 +1719,9 @@ namespace os
       volatile mempool::size_t count_;
 
       // All accesses will be done inside a critical section,
-      // no need to make them volatile, they remain stable
-      // during the critical section.
-      void* first_;
-      void* last_;
+      // the volatile may not be needed, the variable remains stable
+      // during the critical section and no loops wait for this variable.
+      void* volatile first_;
 
       uint8_t flags_;
       enum

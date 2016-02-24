@@ -105,7 +105,6 @@ namespace os
       *(void**) p = nullptr;
 
       first_ = pool_addr_; // Pointer to first block.
-      last_ = p; // Pointer to last block.
 
       count_ = 0; // No allocated blocks.
     }
@@ -297,26 +296,15 @@ namespace os
 
       Critical_section_irq cs; // ----- Critical section -----
 
-      // Perform a push_back() on the single linked FIFO list,
-      // i.e. add the block to the end of the list.
-      if (last_ != nullptr)
-        {
-          // Link the block after the current last.
-          *(void**) last_ = block;
-        }
+      // Perform a push_front() on the single linked LIFO list,
+      // i.e. add the block to the beginning of the list.
 
-      // Mark block as end of list.
-      *(void**) block = nullptr;
+      // Link previous list to this block; may be null, but it does
+      // not matter.
+      *(void**) block = first_;
 
-      // Now this block is the last one.
-      last_ = block;
-
-      // If the list was empty (all blocks were allocated, so no first),
-      // this block will be both the first and the last.
-      if (first_ == nullptr)
-        {
-          first_ = block;
-        }
+      // Now this block is the first one.
+      first_ = block;
 
       --count_;
 
