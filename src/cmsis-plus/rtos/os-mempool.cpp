@@ -311,7 +311,7 @@ namespace os
       if (!list_.empty ())
         {
           // Wake-up one thread, if any.
-          list_.top_prio_task ()->wakeup ();
+          list_.wakeup_one ();
         }
 
       return result::ok;

@@ -842,7 +842,8 @@ osSignalWait (int32_t signals, uint32_t millisec)
   if (millisec == osWaitForever)
     {
       res = this_thread::sig_wait ((thread::sigset_t) signals,
-                                   (thread::sigset_t*) &event.value.signals);
+                                   (thread::sigset_t*) &event.value.signals,
+                                   flags::mode::all || flags::mode::clear);
       if (res == EPERM)
         {
           event.status = osErrorISR;
@@ -858,8 +859,9 @@ osSignalWait (int32_t signals, uint32_t millisec)
     }
   else if (millisec == 0)
     {
-      res = this_thread::try_sig_wait (
-          (thread::sigset_t) signals, (thread::sigset_t*) &event.value.signals);
+      res = this_thread::try_sig_wait ((thread::sigset_t) signals,
+                                       (thread::sigset_t*) &event.value.signals,
+                                       flags::mode::all || flags::mode::clear);
       if (res == EPERM)
         {
           event.status = osErrorISR;
@@ -881,6 +883,7 @@ osSignalWait (int32_t signals, uint32_t millisec)
     {
       res = this_thread::timed_sig_wait (
           (thread::sigset_t) signals, (thread::sigset_t*) &event.value.signals,
+          flags::mode::all || flags::mode::clear,
           Systick_clock::ticks_cast (millisec * 1000u));
       if (res == EPERM)
         {

@@ -264,6 +264,24 @@ namespace os
 
     class Thread;
 
+    namespace flags
+    {
+      using mask_t = uint32_t;
+      using mode_t = uint32_t;
+
+      namespace mode
+      {
+        enum
+          : mode_t
+            {
+              //
+          all = 1,
+          any = 2,
+          clear = 4
+        };
+      } /* namespace mode */
+    } /* namespace flags */
+
     namespace thread
     {
       /**
@@ -300,7 +318,7 @@ namespace os
 
       using state_t = enum class state : uint8_t
         {
-          //
+          // The state is restricted to one of these values.
           inactive = 0,
           ready = 1,
           running = 2,
@@ -308,7 +326,7 @@ namespace os
           terminated = 4
         };
 
-      using sigset_t = uint32_t;
+      using sigset_t = flags::mask_t;
 
       namespace sig
       {
@@ -369,51 +387,59 @@ namespace os
       is_timeout (void);
 
       /**
-       * @brief Wait for signals.
-       * @param [in] mask The expected signals flags (OR-ed bit-mask);
+       * @brief Wait for signal flags.
+       * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
-       * @param [out] oflags Pointer where to store the current signals;
+       * @param [out] oflags Pointer where to store the current flags;
        *  may be nullptr.
-       * @retval result::ok All expected signal flags are raised.
+       * @param [in] mode Mode bits to select if either all or any flags
+       *  are expected, and if the flags should be cleared.
+       * @retval result::ok All expected flags are raised.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-       * @retval EINVAL The signal mask is outside of the permitted range.
+       * @retval EINVAL The mask is outside of the permitted range.
        * @retval EINTR The operation was interrupted.
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      sig_wait (thread::sigset_t mask, thread::sigset_t* oflags);
+      sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
+                flags::mode_t mode);
 
       /**
-       * @brief Try to wait for signals.
-       * @param [in] mask The expected signals flags (OR-ed bit-mask);
+       * @brief Try to wait for signal flags.
+       * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
-       * @param [out] oflags Pointer where to store the current signals;
+       * @param [out] oflags Pointer where to store the current flags;
        *  may be nullptr.
-       * @retval result::ok All expected signal flags are raised.
-       * @retval EINVAL The signal mask is outside of the permitted range.
-       * @retval EAGAIN The signal condition did not occur.
+       * @param [in] mode Mode bits to select if either all or any flags
+       *  are expected, and if the flags should be cleared.
+       * @retval result::ok All expected flags are raised.
+       * @retval EINVAL The mask is outside of the permitted range.
+       * @retval EAGAIN The expected condition did not occur.
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      try_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags);
+      try_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
+                    flags::mode_t mode);
 
       /**
-       * @brief Timed wait for signals.
-       * @param [in] mask The expected signals flags (OR-ed bit-mask);
+       * @brief Timed wait for signal flags.
+       * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
-       * @param [out] oflags Pointer where to store the current signals;
+       * @param [out] oflags Pointer where to store the current flags;
        *  may be nullptr.
-       * @retval result::ok All expected signals flags are raised.
+       * @param [in] mode Mode bits to select if either all or any flags
+       *  are expected, and if the flags should be cleared.
+       * @retval result::ok All expected flags are raised.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-       * @retval ETIMEDOUT The signal condition did not occur during the
+       * @retval ETIMEDOUT The expected condition did not occur during the
        *  entire timeout duration.
-       * @retval EINVAL The signal mask is outside of the permitted range.
+       * @retval EINVAL The mask is outside of the permitted range.
        * @retval EINTR The operation was interrupted.
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      timed_sig_wait (thread::sigset_t mask, thread::sigset_t* ooflagsmask,
-                      systicks_t ticks);
+      timed_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
+                      flags::mode_t mode, systicks_t ticks);
 
     } /* namespace this_thread */
 
@@ -626,11 +652,11 @@ namespace os
       user_storage (void);
 
       /**
-       * @brief Raise the thread signals.
-       * @param [in] mask The OR-ed signals to raise.
-       * @param [out] omask Optional pointer where to store the
-       *  previous mask; may be nullptr.
-       * @retval result::ok The signals were raised.
+       * @brief Raise thread signal flags.
+       * @param [in] mask The OR-ed flags to raise.
+       * @param [out] oflags Optional pointer where to store the
+       *  previous flags; may be nullptr.
+       * @retval result::ok The flags were raised.
        * @retval EINVAL The mask is zero.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
@@ -638,25 +664,26 @@ namespace os
       sig_raise (thread::sigset_t mask, thread::sigset_t* oflags);
 
       /**
-       * @brief Get/clear thread signals.
-       * @param [in] mask The OR-ed signals to get/clear; may be zero.
-       * @param [in] clear If true, the selected bits are cleared
-       *  after read. The default is true.
-       * @retval mask The selected bits from the current thread signal mask.
-       * @retval sig::error Cannot be invoked from an Interrupt Service Routine.
-       */
-      thread::sigset_t
-      sig_get (thread::sigset_t mask, bool clear = true);
-
-      /**
-       * @brief Clear thread signals.
-       * @param [in] mask The OR-ed signals to clear.
-       * @retval result::ok The signals were cleared.
+       * @brief Clear thread signal flags.
+       * @param [in] mask The OR-ed flags to clear.
+       * @retval result::ok The flags were cleared.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval EINVAL The mask is zero.
        */
       result_t
       sig_clear (thread::sigset_t mask, thread::sigset_t* oflags);
+
+      /**
+       * @brief Get/clear thread signal flags.
+       * @param [in] mask The OR-ed flags to get/clear; may be zero.
+       * @param [in] mode Mode bits to select if the flags should be
+       *  cleared (the other bits are ignored).
+       * @retval flags The selected bits from the current thread
+       *  signal flags mask.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       */
+      thread::sigset_t
+      sig_get (thread::sigset_t mask, flags::mode_t mode);
 
     protected:
 
@@ -688,28 +715,33 @@ namespace os
       _invoke_with_exit (Thread* thread);
 
       friend result_t
-      this_thread::sig_wait (thread::sigset_t mask, thread::sigset_t* oflags);
+      this_thread::sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
+                             flags::mode_t mode);
 
       result_t
-      sig_wait (thread::sigset_t mask, thread::sigset_t* oflags);
+      sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
+                flags::mode_t mode);
 
       friend result_t
       this_thread::try_sig_wait (thread::sigset_t mask,
-                                 thread::sigset_t* oflags);
+                                 thread::sigset_t* oflags, flags::mode_t mode);
 
       result_t
-      try_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags);
+      try_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
+                    flags::mode_t mode);
 
       friend result_t
       this_thread::timed_sig_wait (thread::sigset_t mask,
-                                   thread::sigset_t* oflags, systicks_t ticks);
+                                   thread::sigset_t* oflags, systicks_t ticks,
+                                   flags::mode_t mode);
 
       result_t
       timed_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                      systicks_t ticks);
+                      systicks_t ticks, flags::mode_t mode);
 
       result_t
-      _try_wait (thread::sigset_t mask, thread::sigset_t* oflags);
+      _try_wait (thread::sigset_t mask, thread::sigset_t* oflags,
+                 flags::mode_t mode);
 
     protected:
 
@@ -2006,21 +2038,7 @@ namespace os
 
     namespace evflags
     {
-      using mask_t = uint32_t;
-      using mode_t = uint32_t;
 
-      namespace mode
-      {
-        enum
-          : mode_t
-            {
-              //
-          all = 1,
-          any = 2,
-          clear = 4
-        };
-      }
-      ;
       /**
        * @brief Event flags attributes.
        */
@@ -2094,34 +2112,107 @@ namespace os
       bool
       operator== (const Event_flags& rhs) const;
 
+      /**
+       * @brief Wait for event flags.
+       * @param [in] mask The expected flags (OR-ed bit-mask);
+       *  may be zero.
+       * @param [out] oflags Pointer where to store the current flags;
+       *  may be nullptr.
+       * @param [in] mode Mode bits to select if either all or any flags
+       *  are expected, and if the flags should be cleared.
+       * @retval result::ok All expected flags are raised.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EINVAL The mask is outside of the permitted range.
+       * @retval EINTR The operation was interrupted.
+       * @retval ENOTRECOVERABLE Wait failed.
+       */
       result_t
-      wait (evflags::mask_t mask, evflags::mask_t* oflags,
-            evflags::mode_t mode);
+      wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
 
+      /**
+       * @brief Try to wait for event flags.
+       * @param [in] mask The expected flags (OR-ed bit-mask);
+       *  may be zero.
+       * @param [out] oflags Pointer where to store the current flags;
+       *  may be nullptr.
+       * @param [in] mode Mode bits to select if either all or any flags
+       *  are expected, and if the flags should be cleared.
+       * @retval result::ok All expected flags are raised.
+       * @retval EINVAL The mask is outside of the permitted range.
+       * @retval EAGAIN The expected condition did not occur.
+       * @retval ENOTRECOVERABLE Wait failed.
+       */
       result_t
-      try_wait (evflags::mask_t mask, evflags::mask_t* oflags,
-                evflags::mode_t mode);
+      try_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
 
+      /**
+       * @brief Timed wait for signal flags.
+       * @param [in] mask The expected flags (OR-ed bit-mask);
+       *  may be zero.
+       * @param [out] oflags Pointer where to store the current flags;
+       *  may be nullptr.
+       * @param [in] mode Mode bits to select if either all or any flags
+       *  are expected, and if the flags should be cleared.
+       * @retval result::ok All expected flags are raised.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval ETIMEDOUT The expected condition did not occur during the
+       *  entire timeout duration.
+       * @retval EINVAL The mask is outside of the permitted range.
+       * @retval EINTR The operation was interrupted.
+       * @retval ENOTRECOVERABLE Wait failed.
+       */
       result_t
-      timed_wait (evflags::mask_t mask, evflags::mask_t* oflags,
-                  evflags::mode_t mode, systicks_t ticks);
+      timed_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode,
+                  systicks_t ticks);
 
+      /**
+       * @brief Raise event flags.
+       * @param [in] mask The OR-ed flags to raise.
+       * @param [out] oflags Optional pointer where to store the
+       *  previous flags; may be nullptr.
+       * @retval result::ok The flags were raised.
+       * @retval EINVAL The mask is zero.
+       */
       result_t
-      raise (evflags::mask_t mask, evflags::mask_t* oflags);
+      raise (flags::mask_t mask, flags::mask_t* oflags);
 
+      /**
+       * @brief Clear event flags.
+       * @param [in] mask The OR-ed flags to clear.
+       * @retval result::ok The flags were cleared.
+       * @retval EINVAL The mask is zero.
+       */
       result_t
-      clear (evflags::mask_t mask, evflags::mask_t* oflags);
+      clear (flags::mask_t mask, flags::mask_t* oflags);
 
-      result_t
-      get (evflags::mask_t mask, evflags::mask_t* oflags, evflags::mode_t mode);
+      /**
+       * @brief Get/clear event flags.
+       * @param [in] mask The OR-ed flags to get/clear; may be zero.
+       * @param [in] mode Mode bits to select if the flags should be
+       *  cleared (the other bits are ignored).
+       * @retval flags The selected bits from the flags mask.
+       */
+      flags::mask_t
+      get (flags::mask_t mask, flags::mode_t mode);
 
+      /**
+       * @brief Check if some thread is waiting.
+       */
       bool
       waiting (void);
+
+    protected:
+
+      /*
+       * Internal function to check the flags condition.
+       */
+      result_t
+      _try_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
 
     private:
 
       port::Tasks_list list_;
-      evflags::mask_t flags_;
+      flags::mask_t flags_;
     };
 
 #pragma GCC diagnostic pop
@@ -2242,9 +2333,10 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline result_t
-      sig_wait (thread::sigset_t mask, thread::sigset_t* omask)
+      sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
+                flags::mode_t mode)
       {
-        return this_thread::thread ().sig_wait (mask, omask);
+        return this_thread::thread ().sig_wait (mask, oflags, mode);
       }
 
       /**
@@ -2253,9 +2345,10 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline result_t
-      try_sig_wait (thread::sigset_t mask, thread::sigset_t* omask)
+      try_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
+                    flags::mode_t mode)
       {
-        return this_thread::thread ().try_sig_wait (mask, omask);
+        return this_thread::thread ().try_sig_wait (mask, oflags, mode);
       }
 
       /**
@@ -2264,10 +2357,10 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline result_t
-      timed_sig_wait (thread::sigset_t mask, thread::sigset_t* omask,
-                      systicks_t ticks)
+      timed_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
+                      flags::mode_t mode, systicks_t ticks)
       {
-        return this_thread::thread ().timed_sig_wait (mask, omask, ticks);
+        return this_thread::thread ().timed_sig_wait (mask, oflags, mode, ticks);
       }
 
     } /* namespace this_thread */
@@ -2585,7 +2678,20 @@ namespace os
       return (length () == capacity ());
     }
 
-// ------------------------------------------------------------------------
+    // ========================================================================
+
+    namespace evflags
+    {
+      inline
+      Attributes::Attributes (const char* name) :
+          Named_object (name)
+      {
+        ;
+      }
+
+    } /* namespace evflags */
+
+  // ------------------------------------------------------------------------
 
   } /* namespace rtos */
 } /* namespace os */
