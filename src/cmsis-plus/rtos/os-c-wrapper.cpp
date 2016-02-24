@@ -82,10 +82,58 @@ os_sched_start (void)
 bool
 os_sched_is_started (void)
 {
-  return scheduler::is_started ();
+  return scheduler::started ();
+}
+
+bool
+os_sched_is_locked (void)
+{
+  return scheduler::locked ();
 }
 
 // ----------------------------------------------------------------------------
+
+void
+os_this_thread_suspend (void)
+{
+  return this_thread::suspend ();
+}
+
+void
+os_this_thread_exit (void* exit_ptr)
+{
+  this_thread::exit (exit_ptr);
+}
+
+os_result_t
+os_this_thread_sig_wait (os_thread_sigset_t mask, os_thread_sigset_t* oflags,
+                         os_flags_mode_t mode)
+{
+  return (os_result_t) this_thread::sig_wait (mask, oflags, mode);
+}
+
+os_result_t
+os_this_thread_try_sig_wait (os_thread_sigset_t mask,
+                             os_thread_sigset_t* oflags, os_flags_mode_t mode)
+{
+  return (os_result_t) this_thread::try_sig_wait (mask, oflags, mode);
+}
+
+os_result_t
+os_this_thread_timed_sig_wait (os_thread_sigset_t mask,
+                               os_thread_sigset_t* oflags, os_flags_mode_t mode,
+                               os_systicks_t ticks)
+{
+  return (os_result_t) this_thread::timed_sig_wait (mask, oflags, mode, ticks);
+}
+
+// ----------------------------------------------------------------------------
+
+void
+os_thread_attr_init (os_thread_attr_t* attr, const char* name)
+{
+  new (attr) thread::Attributes (name);
+}
 
 void
 os_thread_create (os_thread_t* thread, const os_thread_attr_t* attr,
@@ -101,28 +149,22 @@ os_thread_destroy (os_thread_t* thread)
   (reinterpret_cast<Thread&> (thread)).~Thread ();
 }
 
-void
-os_this_thread_exit (void* exit_ptr)
-{
-  this_thread::exit (exit_ptr);
-}
-
 os_result_t
 os_thread_join (os_thread_t* thread, void** exit_ptr)
 {
-  return (reinterpret_cast<Thread&> (thread)).join (exit_ptr);
+  return (os_result_t) (reinterpret_cast<Thread&> (thread)).join (exit_ptr);
 }
 
 os_thread_prio_t
 os_thread_get_prio (os_thread_t* thread)
 {
-  return (reinterpret_cast<Thread&> (thread)).sched_prio ();
+  return (os_thread_prio_t) (reinterpret_cast<Thread&> (thread)).sched_prio ();
 }
 
 os_result_t
 os_thread_set_prio (os_thread_t* thread, os_thread_prio_t prio)
 {
-  return (reinterpret_cast<Thread&> (thread)).sched_prio (prio);
+  return (os_result_t) (reinterpret_cast<Thread&> (thread)).sched_prio (prio);
 }
 
 void
@@ -131,7 +173,112 @@ os_thread_wakeup (os_thread_t* thread)
   return (reinterpret_cast<Thread&> (thread)).wakeup ();
 }
 
+os_thread_user_storage_t*
+os_thread_get_user_storage (os_thread_t* thread)
+{
+  return (reinterpret_cast<Thread&> (thread)).user_storage ();
+}
+
+os_result_t
+os_thread_sig_raise (os_thread_t* thread, os_thread_sigset_t mask,
+                     os_thread_sigset_t* oflags)
+{
+  return (os_result_t) (reinterpret_cast<Thread&> (thread)).sig_raise (mask,
+                                                                       oflags);
+}
+
+os_result_t
+os_thread_sig_clear (os_thread_t* thread, os_thread_sigset_t mask,
+                     os_thread_sigset_t* oflags)
+{
+  return (os_result_t) (reinterpret_cast<Thread&> (thread)).sig_clear (mask,
+                                                                       oflags);
+}
+
+os_thread_sigset_t
+os_thread_sig_get (os_thread_t* thread, os_thread_sigset_t mask,
+                   os_flags_mode_t mode)
+{
+  return (os_thread_sigset_t) (reinterpret_cast<Thread&> (thread)).sig_get (
+      mask, mode);
+}
+
 // ----------------------------------------------------------------------------
+
+os_systick_clock_rep_t
+os_systick_clock_now (void)
+{
+  return (os_systick_clock_rep_t) Systick_clock::now ();
+}
+
+os_systick_clock_rep_t
+os_systick_clock_now_details (os_systick_clock_current_t* details)
+{
+  return (os_systick_clock_rep_t) Systick_clock::now (
+      (Systick_clock::current_t*) details);
+}
+
+os_result_t
+os_systick_clock_sleep_for (os_systick_clock_sleep_rep_t ticks)
+{
+  return (os_result_t) Systick_clock::sleep_for (ticks);
+}
+
+// os_systick_sleep_rep_t
+
+os_realtime_clock_rep_t
+os_realtime_clock_now (void)
+{
+  return (os_realtime_clock_rep_t) Realtime_clock::now ();
+}
+
+os_result_t
+os_realtime_clock_sleep_for (os_realtime_clock_sleep_rep_t secs)
+{
+  return (os_result_t) Realtime_clock::sleep_for (secs);
+}
+
+// ----------------------------------------------------------------------------
+
+void
+os_timer_attr_init (os_timer_attr_t* attr, const char* name)
+{
+  new (attr) timer::Attributes (name);
+}
+
+void
+os_timer_create (os_timer_t* timer, const os_timer_attr_t* attr,
+                 os_timer_func_t func, os_timer_func_args_t args)
+{
+  new (timer) Timer ((timer::Attributes&) *attr, (timer::func_t) func,
+                     (timer::func_args_t) args);
+}
+
+void
+os_timer_destroy (os_timer_t* timer)
+{
+  (reinterpret_cast<Timer&> (timer)).~Timer ();
+}
+
+os_result_t
+os_timer_start (os_timer_t* timer, os_systicks_t ticks)
+{
+  return (os_result_t) (reinterpret_cast<Timer&> (timer)).start (ticks);
+}
+
+os_result_t
+os_timer_stop (os_timer_t* timer)
+{
+  return (os_result_t) (reinterpret_cast<Timer&> (timer)).stop ();
+}
+
+// ----------------------------------------------------------------------------
+
+void
+os_mutex_attr_init (os_mutex_attr_t* attr, const char* name)
+{
+  new (attr) mutex::Attributes (name);
+}
 
 void
 os_mutex_create (os_mutex_t* mutex, const os_mutex_attr_t* attr)
@@ -170,13 +317,13 @@ os_mutex_unlock (os_mutex_t* mutex)
 }
 
 os_thread_prio_t
-os_get_mutex_prio_ceiling (os_mutex_t* mutex)
+os_mutex_get_prio_ceiling (os_mutex_t* mutex)
 {
   return (os_thread_prio_t) (reinterpret_cast<Mutex&> (mutex)).prio_ceiling ();
 }
 
 os_result_t
-os_set_mutex_prio_ceiling (os_mutex_t* mutex, os_thread_prio_t prio_ceiling,
+os_mutex_set_prio_ceiling (os_mutex_t* mutex, os_thread_prio_t prio_ceiling,
                            os_thread_prio_t* old_prio_ceiling)
 {
   return (os_result_t) (reinterpret_cast<Mutex&> (mutex)).prio_ceiling (
@@ -184,6 +331,12 @@ os_set_mutex_prio_ceiling (os_mutex_t* mutex, os_thread_prio_t prio_ceiling,
 }
 
 // ----------------------------------------------------------------------------
+
+void
+os_condvar_attr_init (os_condvar_attr_t* attr, const char* name)
+{
+  new (attr) condvar::Attributes (name);
+}
 
 void
 os_condvar_create (os_condvar_t* condvar, os_condvar_attr_t* attr)
@@ -225,6 +378,12 @@ os_condvar_timed_wait (os_condvar_t* condvar, os_mutex_t* mutex,
 }
 
 // ----------------------------------------------------------------------------
+
+void
+os_semaphore_attr_init (os_semaphore_attr_t* attr, const char* name)
+{
+  new (attr) semaphore::Attributes (name);
+}
 
 void
 os_semaphore_create (os_semaphore_t* semaphore, os_semaphore_attr_t* attr)
@@ -276,6 +435,12 @@ os_semaphore_reset (os_semaphore_t* semaphore)
 }
 
 // ----------------------------------------------------------------------------
+
+void
+os_mempool_attr_init (os_mempool_attr_t* attr, const char* name)
+{
+  new (attr) mempool::Attributes (name);
+}
 
 void
 os_mempool_create (os_mempool_t* mempool, os_mempool_attr_t* attr,
@@ -352,6 +517,12 @@ os_mempool_reset (os_mempool_t* mempool)
 }
 
 // --------------------------------------------------------------------------
+
+void
+os_mqueue_attr_init (os_mqueue_attr_t* attr, const char* name)
+{
+  new (attr) mqueue::Attributes (name);
+}
 
 void
 os_mqueue_create (os_mqueue_t* mqueue, os_mqueue_attr_t* attr,
@@ -452,6 +623,82 @@ os_mqueue_reset (os_mqueue_t* mqueue)
   return (os_result_t) (reinterpret_cast<Message_queue&> (mqueue)).reset ();
 }
 
+// --------------------------------------------------------------------------
+
+void
+os_evflags_attr_init (os_evflags_attr_t* attr, const char* name)
+{
+  new (attr) evflags::Attributes (name);
+}
+
+void
+os_evflags_create (os_evflags_t* evflags, os_evflags_attr_t* attr)
+{
+  new (evflags) Event_flags ((evflags::Attributes&) *attr);
+}
+
+void
+os_evflags_destroy (os_evflags_t* evflags)
+{
+  (reinterpret_cast<Event_flags&> (evflags)).~Event_flags ();
+}
+
+os_result_t
+os_evflags_wait (os_evflags_t* evflags, os_flags_mask_t mask,
+                 os_flags_mask_t* oflags, os_flags_mode_t mode)
+{
+  return (os_result_t) (reinterpret_cast<Event_flags&> (evflags)).wait (mask,
+                                                                        oflags,
+                                                                        mode);
+}
+
+os_result_t
+os_evflags_try_wait (os_evflags_t* evflags, os_flags_mask_t mask,
+                     os_flags_mask_t* oflags, os_flags_mode_t mode)
+{
+  return (os_result_t) (reinterpret_cast<Event_flags&> (evflags)).try_wait (
+      mask, oflags, mode);
+}
+
+os_result_t
+os_evflags_timed_wait (os_evflags_t* evflags, os_flags_mask_t mask,
+                       os_flags_mask_t* oflags, os_flags_mode_t mode,
+                       os_systicks_t ticks)
+{
+  return (os_result_t) (reinterpret_cast<Event_flags&> (evflags)).timed_wait (
+      mask, oflags, mode, ticks);
+}
+
+os_result_t
+os_evflags_raise (os_evflags_t* evflags, os_flags_mask_t mask,
+                  os_flags_mask_t* oflags)
+{
+  return (os_result_t) (reinterpret_cast<Event_flags&> (evflags)).raise (mask,
+                                                                         oflags);
+}
+
+os_result_t
+os_evflags_clear (os_evflags_t* evflags, os_flags_mask_t mask,
+                  os_flags_mask_t* oflags)
+{
+  return (os_result_t) (reinterpret_cast<Event_flags&> (evflags)).clear (mask,
+                                                                         oflags);
+}
+
+os_flags_mask_t
+os_evflags_get (os_evflags_t* evflags, os_flags_mask_t mask,
+                os_flags_mode_t mode)
+{
+  return (os_flags_mask_t) (reinterpret_cast<Event_flags&> (evflags)).get (mask,
+                                                                           mode);
+}
+
+bool
+os_evflags_get_waiting (os_evflags_t* evflags)
+{
+  return (reinterpret_cast<Event_flags&> (evflags)).waiting ();
+}
+
 // ****************************************************************************
 // ***** Legacy CMSIS RTOS implementation *****
 
@@ -520,7 +767,7 @@ osKernelStart (void)
 int32_t
 osKernelRunning (void)
 {
-  return scheduler::is_started () ? 1 : 0;
+  return scheduler::started () ? 1 : 0;
 }
 
 #if (defined (osFeature_SysTick)  &&  (osFeature_SysTick != 0))
@@ -1461,7 +1708,8 @@ osMailGet (osMailQId queue_id, uint32_t millisec)
   else if (millisec == 0)
     {
       res = (reinterpret_cast<Message_queue&> (queue_id)).try_receive (
-          (char*) &msg, sizeof(void*), NULL);
+          (char*) &msg, sizeof(void*),
+          NULL);
     }
   else
     {

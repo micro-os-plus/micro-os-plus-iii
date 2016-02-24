@@ -67,7 +67,35 @@ extern "C"
   bool
   os_sched_is_started (void);
 
+  bool
+  os_sched_is_locked (void);
+
   // --------------------------------------------------------------------------
+
+  void
+  os_this_thread_suspend (void);
+
+  void
+  os_this_thread_exit (void* exit_ptr);
+
+  os_result_t
+  os_this_thread_sig_wait (os_thread_sigset_t mask, os_thread_sigset_t* oflags,
+                           os_flags_mode_t mode);
+
+  os_result_t
+  os_this_thread_try_sig_wait (os_thread_sigset_t mask,
+                               os_thread_sigset_t* oflags,
+                               os_flags_mode_t mode);
+
+  os_result_t
+  os_this_thread_timed_sig_wait (os_thread_sigset_t mask,
+                                 os_thread_sigset_t* oflags,
+                                 os_flags_mode_t mode, os_systicks_t ticks);
+
+  // --------------------------------------------------------------------------
+
+  void
+  os_thread_attr_init (os_thread_attr_t* attr, const char* name);
 
   void
   os_thread_create (os_thread_t* thread, const os_thread_attr_t* attr,
@@ -75,9 +103,6 @@ extern "C"
 
   void
   os_thread_destroy (os_thread_t* thread);
-
-  void
-  os_this_thread_exit (void* exit_ptr);
 
   os_result_t
   os_thread_join (os_thread_t* thread, void** exit_ptr);
@@ -91,7 +116,78 @@ extern "C"
   void
   os_thread_wakeup (os_thread_t* thread);
 
+  os_thread_user_storage_t*
+  os_thread_get_user_storage (os_thread_t* thread);
+
+  os_result_t
+  os_thread_sig_raise (os_thread_t* thread, os_thread_sigset_t mask,
+                       os_thread_sigset_t* oflags);
+
+  os_result_t
+  os_thread_sig_clear (os_thread_t* thread, os_thread_sigset_t mask,
+                       os_thread_sigset_t* oflags);
+
+  os_thread_sigset_t
+  os_thread_sig_get (os_thread_t* thread, os_thread_sigset_t mask,
+                     os_flags_mode_t mode);
+
   // --------------------------------------------------------------------------
+
+  os_systick_clock_rep_t
+  os_systick_clock_now (void);
+
+  os_systick_clock_rep_t
+  os_systick_clock_now_details (os_systick_clock_current_t* details);
+
+  os_result_t
+  os_systick_clock_sleep_for (os_systick_clock_sleep_rep_t ticks);
+
+  inline os_systicks_t
+  os_systick_clock_ticks_cast (uint32_t microsec)
+  {
+    // TODO: add some restrictions to match only numeric types
+    return (os_systicks_t) ((((microsec)
+        * ((uint32_t) OS_INTEGER_SYSTICK_FREQUENCY_HZ)) + (uint32_t) 999999ul)
+        / (uint32_t) 1000000ul);
+  }
+
+  inline os_systicks_t
+  os_systick_clock_ticks_cast_long (uint64_t microsec)
+  {
+    // TODO: add some restrictions to match only numeric types
+    return (os_systicks_t) ((((microsec)
+        * ((uint64_t) OS_INTEGER_SYSTICK_FREQUENCY_HZ)) + (uint64_t) 999999ul)
+        / (uint64_t) 1000000ul);
+  }
+
+  os_realtime_clock_rep_t
+  os_realtime_clock_now (void);
+
+  os_result_t
+  os_realtime_clock_sleep_for (os_realtime_clock_sleep_rep_t secs);
+
+  // --------------------------------------------------------------------------
+
+  void
+  os_timer_attr_init (os_timer_attr_t* attr, const char* name);
+
+  void
+  os_timer_create (os_timer_t* timer, const os_timer_attr_t* attr,
+                   os_timer_func_t func, os_timer_func_args_t args);
+
+  void
+  os_timer_destroy (os_timer_t* timer);
+
+  os_result_t
+  os_timer_start (os_timer_t* timer, os_systicks_t ticks);
+
+  os_result_t
+  os_timer_stop (os_timer_t* timer);
+
+  // --------------------------------------------------------------------------
+
+  void
+  os_mutex_attr_init (os_mutex_attr_t* attr, const char* name);
 
   void
   os_mutex_create (os_mutex_t* mutex, const os_mutex_attr_t* attr);
@@ -112,13 +208,16 @@ extern "C"
   os_mutex_unlock (os_mutex_t* mutex);
 
   os_thread_prio_t
-  os_get_mutex_prio_ceiling (os_mutex_t* mutex);
+  os_mutex_get_prio_ceiling (os_mutex_t* mutex);
 
   os_result_t
-  os_set_mutex_prio_ceiling (os_mutex_t* mutex, os_thread_prio_t prio_ceiling,
+  os_mutex_set_prio_ceiling (os_mutex_t* mutex, os_thread_prio_t prio_ceiling,
                              os_thread_prio_t* old_prio_ceiling);
 
   // --------------------------------------------------------------------------
+
+  void
+  os_condvar_attr_init (os_condvar_attr_t* attr, const char* name);
 
   void
   os_condvar_create (os_condvar_t* condvar, os_condvar_attr_t* attr);
@@ -140,6 +239,9 @@ extern "C"
                          os_systicks_t ticks);
 
   // --------------------------------------------------------------------------
+
+  void
+  os_semaphore_attr_init (os_semaphore_attr_t* attr, const char* name);
 
   void
   os_semaphore_create (os_semaphore_t* semaphore, os_semaphore_attr_t* attr);
@@ -166,6 +268,9 @@ extern "C"
   os_semaphore_reset (os_semaphore_t* semaphore);
 
   // --------------------------------------------------------------------------
+
+  void
+  os_mempool_attr_init (os_mempool_attr_t* attr, const char* name);
 
   void
   os_mempool_create (os_mempool_t* mempool, os_mempool_attr_t* attr,
@@ -206,6 +311,9 @@ extern "C"
   os_mempool_reset (os_mempool_t* mempool);
 
   // --------------------------------------------------------------------------
+
+  void
+  os_mqueue_attr_init (os_mqueue_attr_t* attr, const char* name);
 
   void
   os_mqueue_create (os_mqueue_t* mqueue, os_mqueue_attr_t* attr,
@@ -255,6 +363,45 @@ extern "C"
 
   os_result_t
   os_mqueue_reset (os_mqueue_t* mqueue);
+
+  // --------------------------------------------------------------------------
+
+  void
+  os_evflags_attr_init (os_evflags_attr_t* attr, const char* name);
+
+  void
+  os_evflags_create (os_evflags_t* evflags, os_evflags_attr_t* attr);
+
+  void
+  os_evflags_destroy (os_evflags_t* evflags);
+
+  os_result_t
+  os_evflags_wait (os_evflags_t* evflags, os_flags_mask_t mask,
+                   os_flags_mask_t* oflags, os_flags_mode_t mode);
+
+  os_result_t
+  os_evflags_try_wait (os_evflags_t* evflags, os_flags_mask_t mask,
+                       os_flags_mask_t* oflags, os_flags_mode_t mode);
+
+  os_result_t
+  os_evflags_timed_wait (os_evflags_t* evflags, os_flags_mask_t mask,
+                         os_flags_mask_t* oflags, os_flags_mode_t mode,
+                         os_systicks_t ticks);
+
+  os_result_t
+  os_evflags_raise (os_evflags_t* evflags, os_flags_mask_t mask,
+                    os_flags_mask_t* oflags);
+
+  os_result_t
+  os_evflags_clear (os_evflags_t* evflags, os_flags_mask_t mask,
+                    os_flags_mask_t* oflags);
+
+  os_flags_mask_t
+  os_evflags_get (os_evflags_t* evflags, os_flags_mask_t mask,
+                  os_flags_mode_t mode);
+
+  bool
+  os_evflags_get_waiting (os_evflags_t* evflags);
 
   // --------------------------------------------------------------------------
 

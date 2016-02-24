@@ -63,6 +63,9 @@ extern "C"
     void* content[OS_PRIOTHREAD_SIZE_PTR];
   } os_thread_list_t;
 
+  typedef uint32_t os_flags_mode_t;
+  typedef uint32_t os_flags_mask_t;
+
   // --------------------------------------------------------------------------
 
 #define OS_PRIOTHREAD_SHIFT   (1)
@@ -104,7 +107,7 @@ extern "C"
 
   typedef uint8_t os_thread_prio_t;
 
-  typedef uint32_t os_thread_signals_t;
+  typedef os_flags_mask_t os_thread_sigset_t;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -130,7 +133,7 @@ extern "C"
     os_thread_state_t state;
     os_thread_prio_t prio;
     os_result_t wakeup_reason;
-    os_thread_signals_t signals;
+    os_thread_sigset_t signals;
     os_thread_user_storage_t user_storage;
   } os_thread_t;
 
@@ -138,11 +141,39 @@ extern "C"
 
   // --------------------------------------------------------------------------
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+  typedef struct os_systick_clock_current_s
+  {
+    uint64_t ticks; // Count of SysTick ticks since core reset
+    uint32_t cycles; // Count of SysTick cycles since timer reload (24 bits)
+    uint32_t divisor; // SysTick reload value (24 bits)
+    uint32_t core_frequency_hz; // Core clock frequency Hz
+  } os_systick_clock_current_t;
+
+#pragma GCC diagnostic pop
+
+  typedef uint64_t os_systick_clock_rep_t;
+  typedef uint32_t os_systick_clock_sleep_rep_t;
+
+  typedef uint64_t os_realtime_clock_rep_t;
+  typedef uint32_t os_realtime_clock_sleep_rep_t;
+
+  // --------------------------------------------------------------------------
+
   typedef void* os_timer_func_args_t;
   typedef void
-  (*os_time_func_t) (os_timer_func_args_t args);
+  (*os_timer_func_t) (os_timer_func_args_t args);
 
   typedef uint8_t os_timer_type_t;
+
+  enum
+  {
+    //
+    os_timer_run_once = 0,
+    os_timer_run_periodic = 1
+  };
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -156,7 +187,7 @@ extern "C"
   typedef struct os_timer_s
   {
     const char* name;
-    os_time_func_t func;
+    os_timer_func_t func;
     os_timer_func_args_t func_args;
     void* impl;
     os_timer_type_t type;
@@ -170,6 +201,29 @@ extern "C"
   typedef uint8_t os_mutex_type_t;
   typedef uint8_t os_mutex_protocol_t;
   typedef uint8_t os_mutex_robustness_t;
+
+  enum
+  {
+    //
+    os_mutex_protocol_none = 0,
+    os_mutex_protocol_inherit = 1,
+    os_mutex_protocol_protect = 2
+  };
+
+  enum
+  {
+    //
+    os_mutex_robustness_stalled = 0,
+    os_mutex_robustness_robust = 1
+  };
+
+  enum
+  {
+    //
+    os_mutex_type_normal = 0,
+    os_mutex_type_errorcheck = 1,
+    os_mutex_type_recursive = 2,
+  };
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -293,6 +347,25 @@ extern "C"
 
     os_mqueue_size_t count;
   } os_mqueue_t;
+
+#pragma GCC diagnostic pop
+
+  // --------------------------------------------------------------------------
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+  typedef struct os_evflags_attr_s
+  {
+    const char* name;
+  } os_evflags_attr_t;
+
+  typedef struct os_evflags_s
+  {
+    const char* name;
+    os_thread_list_t list;
+    os_flags_mask_t flags;
+  } os_evflags_t;
 
 #pragma GCC diagnostic pop
 
