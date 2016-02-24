@@ -163,7 +163,7 @@ namespace os
        * @retval false The scheduler was not started.
        */
       bool
-      is_started (void);
+      started (void);
 
       /**
        * @brief Check if the scheduler is locked.
@@ -171,7 +171,7 @@ namespace os
        * @retval false The scheduler is running (not locked).
        */
       bool
-      is_locked (void);
+      locked (void);
 
       /**
        * @brief Lock the scheduler.
@@ -660,7 +660,7 @@ namespace os
        * @retval EINVAL The mask is zero.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
-      thread::sigset_t
+      result_t
       sig_raise (thread::sigset_t mask, thread::sigset_t* oflags);
 
       /**
@@ -853,7 +853,7 @@ namespace os
        * @brief Tell the absolute time now.
        * @return The number of seconds since 1 January 1970 00:00:00.
        */
-      static uint64_t
+      static rep
       now (void);
 
       /**
@@ -2038,7 +2038,6 @@ namespace os
 
     namespace evflags
     {
-
       /**
        * @brief Event flags attributes.
        */
@@ -2089,7 +2088,7 @@ namespace os
     public:
 
       Event_flags (void);
-      Event_flags (const evflags::Attributes&attr);
+      Event_flags (const evflags::Attributes& attr);
 
       Event_flags (const Event_flags&) = delete;
       Event_flags (Event_flags&&) = delete;
@@ -2241,7 +2240,7 @@ namespace os
        * was called.
        */
       inline bool
-      is_started (void)
+      started (void)
       {
         return is_started_;
       }
@@ -2252,7 +2251,7 @@ namespace os
        * is switching tasks from the ready list.
        */
       inline bool
-      is_locked (void)
+      locked (void)
       {
         return is_locked_;
       }
@@ -2279,11 +2278,11 @@ namespace os
      * ticks, using the SysTick frequency in Hz.
      */
     template<typename Rep_T>
-      constexpr uint32_t
+      constexpr systicks_t
       Systick_clock::ticks_cast (Rep_T microsec)
       {
         // TODO: add some restrictions to match only numeric types
-        return (uint32_t) ((((microsec) * ((Rep_T) frequency_hz))
+        return (systicks_t) ((((microsec) * ((Rep_T) frequency_hz))
             + (Rep_T) 999999ul) / (Rep_T) 1000000ul);
       }
 
