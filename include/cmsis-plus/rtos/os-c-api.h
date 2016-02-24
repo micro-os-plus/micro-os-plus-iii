@@ -77,7 +77,7 @@ extern "C"
   os_thread_destroy (os_thread_t* thread);
 
   void
-  os_thread_exit (os_thread_t* thread, void* exit_ptr);
+  os_this_thread_exit (void* exit_ptr);
 
   os_result_t
   os_thread_join (os_thread_t* thread, void** exit_ptr);

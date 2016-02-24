@@ -102,9 +102,9 @@ os_thread_destroy (os_thread_t* thread)
 }
 
 void
-os_thread_exit (os_thread_t* thread, void* exit_ptr)
+os_this_thread_exit (void* exit_ptr)
 {
-  (reinterpret_cast<Thread&> (thread)).exit (exit_ptr);
+  this_thread::exit (exit_ptr);
 }
 
 os_result_t
