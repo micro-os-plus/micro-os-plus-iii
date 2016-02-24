@@ -95,7 +95,7 @@ namespace os
 {
   namespace rtos
   {
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     /**
      * Type of status code values returned by CMSIS-RTOS functions.
@@ -127,103 +127,12 @@ namespace os
       };
     } /* namespace result */
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     using systicks_t = uint32_t;
     using duration_t = uint32_t;
 
-    // ----------------------------------------------------------------------
-
-    class Systick_clock
-    {
-    public:
-
-      static constexpr uint32_t frequency_hz = OS_INTEGER_SYSTICK_FREQUENCY_HZ;
-      using rep = uint64_t;
-      using sleep_rep = duration_t;
-
-      /**
-       * @brief Tell the current time.
-       * @return The number of SysTick ticks since startup.
-       */
-      static rep
-      now (void);
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
-
-      using current_t = struct current_s
-        {
-          uint64_t ticks; // Count of SysTick ticks since core reset
-          uint32_t cycles;// Count of SysTick cycles since timer reload (24 bits)
-          uint32_t divisor;// SysTick reload value (24 bits)
-          uint32_t core_frequency_hz;// Core clock frequency Hz
-        };
-
-#pragma GCC diagnostic pop
-
-      /**
-       * @brief Tell the current time.
-       * @return Accurate sampling of SysTick.
-       */
-      static rep
-      now (current_t* details);
-
-      /**
-       * @brief Convert microseconds to ticks.
-       * @param [in] micros The number of microseconds.
-       * @return The number of ticks.
-       */
-      template<typename Rep_T>
-        static constexpr uint32_t
-        ticks_cast (Rep_T microsec);
-
-      /**
-       * @brief Sleep a number of ticks.
-       * @param [in] ticks the number of ticks to sleep.
-       * @retval ETIMEDOUT The sleep lasted the entire duration.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-       * @retval result::eintr The sleep was interrupted.
-       */
-      static result_t
-      sleep_for (sleep_rep ticks);
-    };
-
-    class Realtime_clock
-    {
-    public:
-
-      static constexpr uint32_t frequency_hz = 1;
-      using rep = uint64_t;
-      using sleep_rep = duration_t;
-
-      /**
-       * @brief Tell the absolute time now.
-       * @return The number of seconds since 1 January 1970 00:00:00.
-       */
-      static uint64_t
-      now (void);
-
-      /**
-       * @brief Sleep a number of seconds.
-       * @param [in] secs the number of seconds to sleep.
-       * @retval ETIMEDOUT The sleep lasted the entire duration.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-       * @retval result::eintr The sleep was interrupted.
-       */
-      static result_t
-      sleep_for (sleep_rep secs);
-
-      // TODO: read hardware regs
-      // TODO: write hw regs
-
-      // TODO: write alarm (array)
-      // TODO: read alarm
-
-      // TODO: capabilities : nr. of alarms
-    };
-
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     namespace scheduler
     {
@@ -239,14 +148,6 @@ namespace os
        */
       result_t
       initialize (void);
-
-      /**
-       * @brief Check if in handler mode.
-       * @retval true Execution is in an exception handler context.
-       * @retval false Execution is in a thread context.
-       */
-      bool
-      in_handler_mode (void);
 
       /**
        * @brief Start the RTOS scheduler.
@@ -287,6 +188,16 @@ namespace os
       status_t
       unlock (status_t status);
 
+      /**
+       * @brief Check if in handler mode.
+       * @retval true Execution is in an exception handler context.
+       * @retval false Execution is in a thread context.
+       */
+      bool
+      in_handler_mode (void);
+
+      // ----------------------------------------------------------------------
+
       class Critical_section
       {
       public:
@@ -307,14 +218,9 @@ namespace os
         const status_t status_;
       };
 
-      // TODO: move them to implementation ThreadsRegistry
-      void
-      __register_thread (Thread* thread);
-
-      void
-      __unregister_thread (Thread* thread);
-
-    } /* namespace scheduler */
+    // ------------------------------------------------------------------------
+    }
+    /* namespace scheduler */
 
     // TODO: define all levels of critical sections
     // (kernel, real-time(level), complete)
@@ -357,8 +263,51 @@ namespace os
     //  ==== Thread Management ====
 
     class Thread;
+
     namespace thread
     {
+      /**
+       * Type of priorities used for thread control.
+       */
+      using priority_t = uint8_t;
+
+      // Explicit namespace used because values are not restricted
+      // to the enumeration.
+      namespace priority
+      {
+        // This gives a basic range of 16 priorities, easily extensible
+        // to 32, 64, 128.
+        constexpr uint32_t shift = 0;
+
+        enum
+          : priority_t
+            {
+              //
+          none = 0, // undefined
+          idle = 1, // system reserved for IDLE thread
+          lowest = 2, // lowest available for user code
+          low = (2 << shift),
+          below_normal = (4 << shift),
+          normal = (6 << shift), // default
+          above_normal = (8 << shift),
+          high = (10 << shift),
+          realtime = (12 << shift),
+          highest = ((16 << shift) - 3), // highest available for user code
+          isr = ((16 << shift) - 2), // system reserved for ISR deferred task
+          error = ((16 << shift) - 1) // error
+        };
+      } /* namespace priority */
+
+      using state_t = enum class state : uint8_t
+        {
+          //
+          inactive = 0,
+          ready = 1,
+          running = 2,
+          waiting = 3,
+          terminated = 4
+        };
+
       using sigset_t = uint32_t;
 
       namespace sig
@@ -371,7 +320,17 @@ namespace os
           all = 0xFFFFFFFF,
         };
       } /* namespace sig */
+
+      using func_args_t = void*;
+      using func_t = void* (*) (func_args_t args);
+
     } /* namespace thread */
+
+    namespace stack
+    {
+      using element_t = os::rtos::port::stack::element_t;
+
+    } /* namespace stack */
 
     namespace this_thread
     {
@@ -382,11 +341,8 @@ namespace os
       Thread&
       thread (void);
 
-      // TODO: update legacy CMSIS for void and use a different
-      // mechanism for eintr.
-
       /**
-       * @brief Yield CPU to next thread.
+       * @brief Yield CPU.
        */
       void
       yield (void);
@@ -398,6 +354,13 @@ namespace os
       suspend (void);
 
       /**
+       * @brief Terminate the current thread.
+       * @return -
+       */
+      void
+      exit (void* exit_ptr = nullptr);
+
+      /**
        * @brief Check if wake-up due to timeout.
        * @retval true The previous sleep returned after the entire duration.
        * @retval false The previous sleep returned due to an event.
@@ -407,8 +370,10 @@ namespace os
 
       /**
        * @brief Wait for signals.
-       * @param [in] mask The expected signals flags (OR-ed bit-mask); may be zero.
-       * @param [out] omask Pointer where to store the current signals; may be nullptr.
+       * @param [in] mask The expected signals flags (OR-ed bit-mask);
+       *  may be zero.
+       * @param [out] oflags Pointer where to store the current signals;
+       *  may be nullptr.
        * @retval result::ok All expected signal flags are raised.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval EINVAL The signal mask is outside of the permitted range.
@@ -416,38 +381,43 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      sig_wait (thread::sigset_t mask, thread::sigset_t* omask);
+      sig_wait (thread::sigset_t mask, thread::sigset_t* oflags);
 
       /**
        * @brief Try to wait for signals.
-       * @param [in] mask The expected signals flags (OR-ed bit-mask); may be zero.
-       * @param [out] omask Pointer where to store the current signals; may be nullptr.
+       * @param [in] mask The expected signals flags (OR-ed bit-mask);
+       *  may be zero.
+       * @param [out] oflags Pointer where to store the current signals;
+       *  may be nullptr.
        * @retval result::ok All expected signal flags are raised.
        * @retval EINVAL The signal mask is outside of the permitted range.
        * @retval EAGAIN The signal condition did not occur.
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      try_sig_wait (thread::sigset_t mask, thread::sigset_t* omask);
+      try_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags);
 
       /**
        * @brief Timed wait for signals.
-       * @param [in] mask The expected signals flags (OR-ed bit-mask); may be zero.
-       * @param [out] omask Pointer where to store the current signals; may be nullptr.
+       * @param [in] mask The expected signals flags (OR-ed bit-mask);
+       *  may be zero.
+       * @param [out] oflags Pointer where to store the current signals;
+       *  may be nullptr.
        * @retval result::ok All expected signals flags are raised.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-       * @retval ETIMEDOUT The signal condition did not occur during the entire timeout duration.
+       * @retval ETIMEDOUT The signal condition did not occur during the
+       *  entire timeout duration.
        * @retval EINVAL The signal mask is outside of the permitted range.
        * @retval EINTR The operation was interrupted.
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      timed_sig_wait (thread::sigset_t mask, thread::sigset_t* omask,
+      timed_sig_wait (thread::sigset_t mask, thread::sigset_t* ooflagsmask,
                       systicks_t ticks);
 
     } /* namespace this_thread */
 
-    // ======================================================================
+    // ========================================================================
 
     /**
      * @brief Base class for named objects.
@@ -475,51 +445,10 @@ namespace os
       const char* const name_;
     };
 
-    // ======================================================================
+    // ========================================================================
 
     namespace thread
     {
-      /**
-       * Type of priorities used for thread control.
-       */
-      using priority_t = uint8_t;
-      using sigset_t = uint32_t;
-
-      // Explicit namespace used because values are not restricted
-      // to the enumeration.
-      namespace priority
-      {
-        // This gives a basic range of 16 priorities, easily extensible
-        // to 32, 64, 128.
-        constexpr uint32_t shift = 0;
-
-        enum
-          : priority_t
-            {
-              //
-          none = 0, // undefined
-          idle = 1, ///< priority: idle, system reserved
-          lowest = 2, // lowest valid for user code
-          low = (2 << shift), ///< priority: low
-          below_normal = (4 << shift), ///< priority: below normal
-          normal = (6 << shift), ///< priority: normal (default)
-          above_normal = (8 << shift), ///< priority: above normal
-          high = (10 << shift), ///< priority: high
-          realtime = (12 << shift), ///< priority: realtime
-          highest = ((16 << shift) - 3), // highest valid for user code
-          isr = ((16 << shift) - 2), // ISR deferred task, system reserved
-          error = ((16 << shift) - 1) // error
-        };
-      } /* namespace priority */
-
-      using state_t = enum class state : uint8_t
-        {
-          inactive = 0, //
-          ready = 1,//
-          running = 2,//
-          waiting = 3,//
-          terminated = 4//
-        };
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -559,14 +488,21 @@ namespace os
 #pragma GCC diagnostic pop
 
       extern const Attributes initializer;
-
-      using func_args_t = void*;
-      using func_t = void* (*) (func_args_t args);
     }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+    /**
+     * @class Thread
+     * @brief POSIX thread.
+     * @details
+     * Supports terminating functions and a simplified version of
+     * signal flags.
+     *
+     * Compatible with POSIX threads:
+     * http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html
+     */
     class Thread : public Named_object
     {
     public:
@@ -624,19 +560,13 @@ namespace os
       result_t
       detach (void);
 
-      /**
-       * @brief Terminate thread.
-       * @return -
-       */
-      void
-      exit (void* exit_ptr = nullptr);
-
       // Accessors & mutators.
 
       /**
        * @brief Set dynamic scheduling priority.
        * @retval result::ok.
-       * @retval result::einval The value of prio is invalid for the scheduling policy of the
+       * @retval result::einval The value of prio is invalid for the
+       *  scheduling policy of the
        * specified thread.
        */
       result_t
@@ -672,28 +602,21 @@ namespace os
       sched_state (void) const;
 
       /**
-       * @brief Wakeup the task.
+       * @brief Wake-up the thread.
        *
        * @note Can be invoked from Interrupt Service Routines.
        */
       void
       wakeup (void);
 
-#if 0
-      void
-      wakeup (result_t reason);
-
-      //void
-      //wakeup (result_t reason, event_value_t value, event_object_t object);
-
-#endif
-
       void*
       function_args (void) const;
 
+#if 0
       // Maybe make it a structure.
       result_t
       wakeup_reason (void) const;
+#endif
 
       /**
        * @brief Get user storage.
@@ -705,7 +628,8 @@ namespace os
       /**
        * @brief Raise the thread signals.
        * @param [in] mask The OR-ed signals to raise.
-       * @param [out] omask Optional pointer where to store the previous mask; may be nullptr.
+       * @param [out] omask Optional pointer where to store the
+       *  previous mask; may be nullptr.
        * @retval result::ok The signals were raised.
        * @retval EINVAL The mask is zero.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
@@ -716,7 +640,8 @@ namespace os
       /**
        * @brief Get/clear thread signals.
        * @param [in] mask The OR-ed signals to get/clear; may be zero.
-       * @param [in] clear If true, the selected bits are cleared after read. The default is true.
+       * @param [in] clear If true, the selected bits are cleared
+       *  after read. The default is true.
        * @retval mask The selected bits from the current thread signal mask.
        * @retval sig::error Cannot be invoked from an Interrupt Service Routine.
        */
@@ -744,6 +669,16 @@ namespace os
        */
       void
       suspend (void);
+
+      friend void
+      this_thread::exit (void* exit_ptr);
+
+      /**
+       * @brief Terminate thread.
+       * @return -
+       */
+      void
+      exit (void* exit_ptr = nullptr);
 
       /**
        * @brief Invoke terminating thread function.
@@ -805,15 +740,125 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-    // ======================================================================
+    // ========================================================================
+
+    class Systick_clock
+    {
+    public:
+
+      static constexpr uint32_t frequency_hz = OS_INTEGER_SYSTICK_FREQUENCY_HZ;
+      using rep = uint64_t;
+      using sleep_rep = duration_t;
+
+      /**
+       * @brief Tell the current time.
+       * @return The number of SysTick ticks since startup.
+       */
+      static rep
+      now (void);
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+      /**
+       * @brief SysTick detailed timestamp.
+       *
+       * @details
+       * When an accurate timestamp is needed, the current SysTick
+       * counter can be sampled to get the count of CPU cycles inside
+       * the tick. For a 100 MHz clock, this is a 10 ns resolution.
+       *
+       * To simplify further processing of this timestamp, the
+       * structure also includes the CPU clock and the SysTick divider.
+       */
+      using current_t = struct current_s
+        {
+          uint64_t ticks; // Count of SysTick ticks since core reset
+          uint32_t cycles;// Count of SysTick cycles since timer reload (24 bits)
+          uint32_t divisor;// SysTick reload value (24 bits)
+          uint32_t core_frequency_hz;// Core clock frequency Hz
+        };
+
+#pragma GCC diagnostic pop
+
+      /**
+       * @brief Tell the current time.
+       * @return Accurate sampling of SysTick.
+       */
+      static rep
+      now (current_t* details);
+
+      /**
+       * @brief Convert microseconds to ticks.
+       * @tparam Rep_T Type of input, auto deduced (usually uint32_t or uin64_t)
+       * @param [in] micros The number of microseconds.
+       * @return The number of ticks.
+       */
+      template<typename Rep_T>
+        static constexpr uint32_t
+        ticks_cast (Rep_T microsec);
+
+      /**
+       * @brief Sleep a number of ticks.
+       * @param [in] ticks the number of ticks to sleep.
+       * @retval ETIMEDOUT The sleep lasted the entire duration.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EINTR The sleep was interrupted.
+       */
+      static result_t
+      sleep_for (sleep_rep ticks);
+    };
+
+    class Realtime_clock
+    {
+    public:
+
+      static constexpr uint32_t frequency_hz = 1;
+      using rep = uint64_t;
+      using sleep_rep = duration_t;
+
+      /**
+       * @brief Tell the absolute time now.
+       * @return The number of seconds since 1 January 1970 00:00:00.
+       */
+      static uint64_t
+      now (void);
+
+      /**
+       * @brief Sleep a number of seconds.
+       * @param [in] secs the number of seconds to sleep.
+       * @retval ETIMEDOUT The sleep lasted the entire duration.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EINTR The sleep was interrupted.
+       */
+      static result_t
+      sleep_for (sleep_rep secs);
+
+      // TODO: read hardware regs
+      // TODO: write hw regs
+
+      // TODO: write alarm (array)
+      // TODO: read alarm
+
+      // TODO: capabilities : nr. of alarms
+    };
+
+    // ==================--====================================================
 
     namespace timer
     {
-      /// Entry point of a timer call back function.
+      /**
+       * Timer call back function arguments.
+       */
       using func_args_t = void*;
+      /**
+       * Entry point of a timer call back function.
+       */
       using func_t = void (*) (func_args_t args);
 
-      /// Timer type value for the timer definition.
+      /**
+       * Timer run type.
+       */
       using type_t = enum class run : uint8_t
         {
           once = 0, //
@@ -855,7 +900,7 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-      extern const Attributes initializer;
+      extern const Attributes once_initializer;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -883,7 +928,6 @@ namespace os
 #pragma GCC diagnostic pop
 
       extern const Periodic_attributes periodic_initializer;
-
     }
 
 #pragma GCC diagnostic push
@@ -938,11 +982,8 @@ namespace os
     protected:
 
       timer::func_t func_;
-
       timer::func_args_t func_args_;
-
       void* impl_;
-
       timer::type_t type_;
 
       // Add more internal data.
@@ -950,30 +991,30 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-    // ======================================================================
+    // ========================================================================
 
     namespace mutex
     {
       using protocol_t = enum class protocol : uint8_t
         {
           //
-          none = 0,//
-          inherit = 1,//
+          none = 0,
+          inherit = 1,
           protect = 2
         };
 
       using robustness_t = enum class robustness : uint8_t
         {
           //
-          stalled = 0,//
-          robust = 1,//
+          stalled = 0,
+          robust = 1
         };
 
       using type_t = enum class type : uint8_t
         {
           //
-          normal = 0,//
-          errorcheck = 1,//
+          normal = 0,
+          errorcheck = 1,
           recursive = 2,
         };
 
@@ -1048,7 +1089,7 @@ namespace os
 
     } /* namespace mutex */
 
-    // ======================================================================
+    // ========================================================================
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -1058,11 +1099,11 @@ namespace os
     public:
 
       /**
-       * @brief Create and initialise a mutex with default attributes.
+       * @brief Create a mutex with default attributes.
        */
       Mutex ();
       /**
-       * @brief Create and initialise a mutex with custom attributes.
+       * @brief Create a mutex with custom attributes.
        */
       Mutex (const mutex::Attributes& attr);
 
@@ -1109,7 +1150,8 @@ namespace os
        * @param [in] ticks Number of ticks to wait.
        * @retval result::ok The mutex was locked.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-       * @retval ETIMEDOUT The mutex could not be locked before the specified timeout expired.
+       * @retval ETIMEDOUT The mutex could not be locked before the
+       *  specified timeout expired.
        * @retval ENOTRECOVERABLE The mutex was not locked.
        */
       result_t
@@ -1135,7 +1177,7 @@ namespace os
        * @brief Change the priority ceiling of a mutex.
        * @param [in] prio_ceiling new priority.
        * @param [out] old_prio_ceiling pointer to location where to
-       * store the previous priority; may be nullptr.
+       *  store the previous priority; may be nullptr.
        * @retval result::ok The priority was changed.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
@@ -1144,7 +1186,7 @@ namespace os
                     thread::priority_t* old_prio_ceiling = nullptr);
 
       /**
-       * @brief Mark state protected by robust mutex as consistent.
+       * @brief Mark mutex as consistent.
        * @retval result::ok.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
@@ -1153,14 +1195,15 @@ namespace os
 
     protected:
 
-      // Can be updated in different contexts (interrupts or threads)
+      // Can be updated in different thread contexts.
       Thread* volatile owner_;
 
       void* impl_;
 
-      // Can be updated in different contexts (interrupts or threads)
+      // Can be updated in different thread contexts.
       volatile mutex::count_t count_;
 
+      // Can be updated in different thread contexts.
       volatile thread::priority_t prio_ceiling_;
 
       // Constants set during construction.
@@ -1169,12 +1212,11 @@ namespace os
       const mutex::robustness_t robustness_; // stalled, robust
 
       // Add more internal data.
-
     };
 
 #pragma GCC diagnostic pop
 
-    // ======================================================================
+    // ========================================================================
 
     namespace condvar
     {
@@ -1212,14 +1254,14 @@ namespace os
 
     } /* namespace condvar */
 
-    // ======================================================================
+    // ========================================================================
 
     class Condition_variable : public Named_object
     {
     public:
 
       /**
-       * @brief Create and initialise a mutex.
+       * @brief Create a condition variable.
        */
       Condition_variable ();
       Condition_variable (const condvar::Attributes& attr);
@@ -1238,7 +1280,8 @@ namespace os
 
       /**
        * @brief Compare condition variables.
-       * @retval true The given condition variable is the same as this condition variable.
+       * @retval true The given condition variable is the same as
+       *  this condition variable.
        * @retval false The condition variables are different.
        */
       bool
@@ -1269,10 +1312,10 @@ namespace os
       result_t
       wait (Mutex& mutex);
 
-      // Neither in POSIX nor in ISO there is a try_wait().
+      // Neither POSIX nor ISO define a try_wait(), so... do we need one?
 
       /**
-       * @brief Wait on a condition with timeout.
+       * @brief Timed wait on a condition.
        * @param [in] mutex Reference to the associated mutex.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval result::ok.
@@ -1285,7 +1328,7 @@ namespace os
       // Add more internal data.
     };
 
-    // ======================================================================
+    // ========================================================================
 
     namespace semaphore
     {
@@ -1408,14 +1451,16 @@ namespace os
        * @brief Post (unlock) the semaphore.
        * @retval result::ok The semaphore was posted.
        * @retval EOVERFLOW The max count was exceeded.
-       * @retval ENOTRECOVERABLE The semaphore could not be posted (extension to POSIX).
+       * @retval ENOTRECOVERABLE The semaphore could not be posted
+       *  (extension to POSIX).
        */
       result_t
       post (void);
 
       /**
        * @brief Lock the semaphore, possibly waiting.
-       * @retval result::ok The calling process successfully performed the semaphore lock operation.
+       * @retval result::ok The calling process successfully
+       *  performed the semaphore lock operation.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval ENOTRECOVERABLE Semaphore wait failed (extension to POSIX).
        * @retval EDEADLK A deadlock condition was detected.
@@ -1426,7 +1471,8 @@ namespace os
 
       /**
        * @brief Try to lock  the semaphore.
-       * @retval result::ok The calling process successfully performed the semaphore lock operation.
+       * @retval result::ok The calling process successfully
+       *  performed the semaphore lock operation.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval EAGAIN The semaphore was already locked.
        * @retval ENOTRECOVERABLE Semaphore wait failed (extension to POSIX).
@@ -1439,10 +1485,13 @@ namespace os
       /**
        * @brief Timed wait to lock the semaphore.
        * @param [in] ticks Number of ticks to wait.
-       * @retval result::ok The calling process successfully performed the semaphore lock operation.
+       * @retval result::ok The calling process successfully
+       *  performed the semaphore lock operation.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-       * @retval EINVAL Invalid timeout (POSIX limits the timeout to 1000 million ns)
-       * @retval ETIMEDOUT The semaphore could not be locked before the specified timeout expired.
+       * @retval EINVAL Invalid timeout (POSIX limits the timeout
+       *  to 1000 million ns)
+       * @retval ETIMEDOUT The semaphore could not be locked before
+       *  the specified timeout expired.
        * @retval ENOTRECOVERABLE Semaphore wait failed (extension to POSIX).
        * @retval EDEADLK A deadlock condition was detected.
        * @retval EINTR The operation was interrupted.
@@ -1484,7 +1533,7 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-    // ======================================================================
+    // ========================================================================
 
     namespace mempool
     {
@@ -1529,7 +1578,15 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     /**
-     * There is no equivalent of calloc(); to initialise memory, use:
+     * @class Memory_pool
+     * @brief Synchronised memory pool.
+     * @details
+     * Manage a pool of same size blocks. Fast and deterministic allocation
+     * and dealocation behaviour, suitable for use even in ISRs.
+     *
+     * No POSIX similar functionality identified.
+     *
+     * @note There is no equivalent of calloc(); to initialise memory, use:
      * `memset (block, 0, pool.block_size ());`
      */
     class Memory_pool : public Named_object
@@ -1678,7 +1735,7 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-    // ======================================================================
+    // ========================================================================
 
     namespace mqueue
     {
@@ -1724,6 +1781,10 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     /**
+     * @class Message_queue
+     * @brief POSIX message queue.
+     * @details
+     * Priority based, fixed size FIFO.
      *
      * Compatible with POSIX message queues.
      * http://pubs.opengroup.org/onlinepubs/9699919799/
@@ -1731,6 +1792,12 @@ namespace os
     class Message_queue : public Named_object
     {
     public:
+
+      /**
+       * @brief Create a message queue.
+       * @param [in] msgs The number of messages.
+       * @param [in] msg_size_bytes The message size, in bytes.
+       */
       Message_queue (mqueue::size_t msgs, mqueue::size_t msg_size_bytes);
       Message_queue (const mqueue::Attributes&attr, mqueue::size_t msgs,
                      mqueue::size_t msg_size_bytes);
@@ -1758,13 +1825,16 @@ namespace os
       /**
        * @brief Send message to the queue.
        * @param [in] msg The address of the message to enqueue.
-       * @param [in] nbytes The length of the message. Must be not higher than the value used when creating the queue.
+       * @param [in] nbytes The length of the message. Must be not
+       *  higher than the value used when creating the queue.
        * @param [in] mprio The message priority.
        * @retval result::ok The message was enqueued.
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
-       * @retval EMSGSIZE The specified message length, nbytes, exceeds the message size attribute of the message queue.
+       * @retval EMSGSIZE The specified message length, nbytes,
+       *  exceeds the message size attribute of the message queue.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-       * @retval ENOTRECOVERABLE The message could not be enqueue (extension to POSIX).
+       * @retval ENOTRECOVERABLE The message could not be enqueue
+       *  (extension to POSIX).
        * @retval EINTR The operation was interrupted.
        */
       result_t
@@ -1773,13 +1843,16 @@ namespace os
       /**
        * @brief Try to send message to the queue.
        * @param [in] msg The address of the message to enqueue.
-       * @param [in] nbytes The length of the message. Must be not higher than the value used when creating the queue.
+       * @param [in] nbytes The length of the message. Must be not
+       *  higher than the value used when creating the queue.
        * @param [in] mprio The message priority.
        * @retval result::ok The message was enqueued.
        * @retval EAGAIN The specified message queue is full.
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
-       * @retval EMSGSIZE The specified message length, nbytes, exceeds the message size attribute of the message queue.
-       * @retval ENOTRECOVERABLE The message could not be enqueue (extension to POSIX).
+       * @retval EMSGSIZE The specified message length, nbytes,
+       *  exceeds the message size attribute of the message queue.
+       * @retval ENOTRECOVERABLE The message could not be enqueue
+       *  (extension to POSIX).
        */
       result_t
       try_send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio);
@@ -1787,15 +1860,19 @@ namespace os
       /**
        * @brief Send message to the queue with timeout.
        * @param [in] msg The address of the message to enqueue.
-       * @param [in] nbytes The length of the message. Must be not higher than the value used when creating the queue.
+       * @param [in] nbytes The length of the message. Must be not
+       *  higher than the value used when creating the queue.
        * @param [in] mprio The message priority.
        * @param [in] ticks The timeout duration, in SysTick ticks.
        * @retval result::ok The message was enqueued.
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
-       * @retval EMSGSIZE The specified message length, nbytes, exceeds the message size attribute of the message queue.
+       * @retval EMSGSIZE The specified message length, nbytes,
+       *  exceeds the message size attribute of the message queue.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-       * @retval ETIMEDOUT The timeout expired before the message could be added to the queue.
-       * @retval ENOTRECOVERABLE The message could not be enqueue (extension to POSIX).
+       * @retval ETIMEDOUT The timeout expired before the message
+       *  could be added to the queue.
+       * @retval ENOTRECOVERABLE The message could not be enqueue
+       *  (extension to POSIX).
        * @retval EINTR The operation was interrupted.
        */
       result_t
@@ -1805,14 +1882,19 @@ namespace os
       /**
        * @brief Receive message from the queue.
        * @param [out] msg The address where to store the dequeued message.
-       * @param [in] nbytes The size of the destination buffer. Must be lower than the value used when creating the queue.
-       * @param [out] mprio The address where to store the message priority. May be nullptr.
+       * @param [in] nbytes The size of the destination buffer. Must
+       *  be lower than the value used when creating the queue.
+       * @param [out] mprio The address where to store the message
+       *  priority. May be nullptr.
        * @retval result::ok The message was received.
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
-       * @retval EMSGSIZE The specified message length, nbytes, is greater than the message size attribute of the message queue.
+       * @retval EMSGSIZE The specified message length, nbytes, is
+       *  greater than the message size attribute of the message queue.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-       * @retval ENOTRECOVERABLE The message could not be dequeued (extension to POSIX).
-       * @retval EBADMSG The implementation has detected a data corruption problem with the message.
+       * @retval ENOTRECOVERABLE The message could not be dequeued
+       *  (extension to POSIX).
+       * @retval EBADMSG The implementation has detected a data corruption
+       *  problem with the message.
        * @retval EINTR The operation was interrupted.
        */
       result_t
@@ -1821,13 +1903,18 @@ namespace os
       /**
        * @brief Try to receive message from the queue.
        * @param [out] msg The address where to store the dequeued message.
-       * @param [in] nbytes The size of the destination buffer. Must be lower than the value used when creating the queue.
-       * @param [out] mprio The address where to store the message priority. May be nullptr.
+       * @param [in] nbytes The size of the destination buffer. Must
+       *  be lower than the value used when creating the queue.
+       * @param [out] mprio The address where to store the message
+       *  priority. May be nullptr.
        * @retval result::ok The message was received.
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
-       * @retval EMSGSIZE The specified message length, nbytes, is greater than the message size attribute of the message queue.
-       * @retval ENOTRECOVERABLE The message could not be dequeued (extension to POSIX).
-       * @retval EBADMSG The implementation has detected a data corruption problem with the message.
+       * @retval EMSGSIZE The specified message length, nbytes, is
+       *  greater than the message size attribute of the message queue.
+       * @retval ENOTRECOVERABLE The message could not be dequeued
+       *  (extension to POSIX).
+       * @retval EBADMSG The implementation has detected a data corruption
+       *  problem with the message.
        * @retval EAGAIN The specified message queue is empty.
        */
       result_t
@@ -1837,12 +1924,16 @@ namespace os
        * @brief Receive message from the queue with timeout.
        * @retval result::ok The message was received.
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
-       * @retval EMSGSIZE The specified message length, nbytes, is greater than the message size attribute of the message queue.
+       * @retval EMSGSIZE The specified message length, nbytes, is
+       *  greater than the message size attribute of the message queue.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-       * @retval ENOTRECOVERABLE The message could not be dequeued (extension to POSIX).
-       * @retval EBADMSG The implementation has detected a data corruption problem with the message.
+       * @retval ENOTRECOVERABLE The message could not be dequeued
+       *  (extension to POSIX).
+       * @retval EBADMSG The implementation has detected a data corruption
+       *  problem with the message.
        * @retval EINTR The operation was interrupted.
-       * @retval ETIMEDOUT No message arrived on the queue before the specified timeout expired.
+       * @retval ETIMEDOUT No message arrived on the queue before the
+       *  specified timeout expired.
        */
       result_t
       timed_receive (char* msg, std::size_t nbytes, mqueue::priority_t* mprio,
@@ -1912,7 +2003,7 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-    // ======================================================================
+    // ========================================================================
 
     namespace evflags
     {
@@ -1967,9 +2058,19 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+    /**
+     * @class Event_flags
+     * @brief Event flags.
+     * @details
+     * Synchronised set of flags that can be used to notify events
+     * between threads or between ISRs and threads.
+     *
+     * No POSIX similar functionality identified.
+     */
     class Event_flags : public Named_object
     {
     public:
+
       Event_flags (void);
       Event_flags (const evflags::Attributes&attr);
 
@@ -1987,7 +2088,8 @@ namespace os
 
       /**
        * @brief Compare event flags.
-       * @retval true The given event flags is the same as this event flags.
+       * @retval true The given event flags object is the same as this
+       *  event flags.
        * @retval false The event flags are different.
        */
       bool
@@ -2028,14 +2130,13 @@ namespace os
   } /* namespace rtos */
 } /* namespace os */
 
-// ============================================================================
-// Inline & template implementations.
+// ===== Inline & template implementations ====================================
 
 namespace os
 {
   namespace rtos
   {
-    // ======================================================================
+    // ========================================================================
 
     namespace kernel
     {
@@ -2096,7 +2197,7 @@ namespace os
             + (Rep_T) 999999ul) / (Rep_T) 1000000ul);
       }
 
-    // ======================================================================
+    // ========================================================================
 
     inline const char*
     Named_object::name (void) const
@@ -2104,7 +2205,7 @@ namespace os
       return name_;
     }
 
-    // ======================================================================
+    // ========================================================================
 
     inline
     Critical_section_irq::Critical_section_irq () :
@@ -2119,16 +2220,23 @@ namespace os
       critical::exit (status_);
     }
 
-    // ======================================================================
-
-    namespace stack
-    {
-      using element_t = os::rtos::port::stack::element_t;
-
-    } /* namespace stack */
+    // ========================================================================
 
     namespace this_thread
     {
+      /**
+       * @details
+       * Remove the current thread from the ready list and pass
+       * control to the next thread that is in \b READY state.
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      inline void
+      suspend (void)
+      {
+        this_thread::thread ().suspend ();
+      }
+
       /**
        * @details
        *
@@ -2202,20 +2310,23 @@ namespace os
       return func_args_;
     }
 
+#if 0
     inline result_t
     Thread::wakeup_reason (void) const
-    {
-      return wakeup_reason_;
-    }
+      {
+        return wakeup_reason_;
+      }
+#endif
 
     /**
      * @details
-     * The user storage is a custom structure defined in os-config.h,
+     * The user storage is a custom structure defined in os-app-config.h,
      * which is added to each and every thread storage. Applications
      * can store here any data.
      *
-     * Inspired by (actually a generalisation of) FreeRTOS thread local
-     * storage, which proved useful when implementing CMSIS+ over FreeRTOS.
+     * Inspired by (actually a generalisation of) µC-OS III task user
+     * registers and FreeRTOS thread local storage, which proved useful
+     * when implementing CMSIS+ over FreeRTOS.
      */
     inline os_thread_user_storage_t*
     Thread::user_storage (void)
@@ -2223,7 +2334,7 @@ namespace os
       return &user_storage_;
     }
 
-    // ======================================================================
+    // ========================================================================
 
     namespace timer
     {
@@ -2235,7 +2346,7 @@ namespace os
         this->tm_type = run::once;
       }
 
-      // ====================================================================
+      // ======================================================================
 
       inline
       Periodic_attributes::Periodic_attributes (const char* name) :
@@ -2246,15 +2357,19 @@ namespace os
       }
     } /* namespace timer */
 
-    // ======================================================================
+    // ========================================================================
 
+    /**
+     * @details
+     * Identical timers should have the same memory address.
+     */
     inline bool
     Timer::operator== (const Timer& rhs) const
     {
       return this == &rhs;
     }
 
-    // ======================================================================
+    // ========================================================================
 
     namespace mutex
     {
@@ -2277,7 +2392,7 @@ namespace os
 
     }
 
-    // ======================================================================
+    // ========================================================================
 
     /**
      * @details
@@ -2289,7 +2404,7 @@ namespace os
       return this == &rhs;
     }
 
-    // ======================================================================
+    // ========================================================================
 
     namespace condvar
     {
@@ -2302,15 +2417,19 @@ namespace os
       }
     } /* namespace condvar */
 
-    // ======================================================================
+    // ========================================================================
 
+    /**
+     * @details
+     * Identical condition variables should have the same memory address.
+     */
     inline bool
     Condition_variable::operator== (const Condition_variable& rhs) const
     {
       return this == &rhs;
     }
 
-    // ======================================================================
+    // ========================================================================
 
     namespace semaphore
     {
@@ -2333,7 +2452,7 @@ namespace os
 
     } /* namespace semaphore */
 
-    // ======================================================================
+    // ========================================================================
 
     /**
      * @details
@@ -2356,7 +2475,7 @@ namespace os
       return count_;
     }
 
-    // ======================================================================
+    // ========================================================================
 
     namespace mempool
     {
@@ -2369,7 +2488,7 @@ namespace os
 
     } /* namespace mempool */
 
-    // ======================================================================
+    // ========================================================================
 
     /**
      * @details
@@ -2411,7 +2530,7 @@ namespace os
       return (count () == capacity ());
     }
 
-    // ======================================================================
+    // ========================================================================
 
     namespace mqueue
     {
@@ -2425,11 +2544,11 @@ namespace os
 
     } /* namespace mqueue */
 
-    // ======================================================================
+    // ========================================================================
 
     /**
      * @details
-     * Identical message queue should have the same memory address.
+     * Identical message queues should have the same memory address.
      */
     inline bool
     Message_queue::operator== (const Message_queue& rhs) const
