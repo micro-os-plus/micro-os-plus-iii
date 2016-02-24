@@ -1706,7 +1706,7 @@ namespace os
     protected:
 
       void*
-      try_first (void);
+      _try_first (void);
 
     protected:
 

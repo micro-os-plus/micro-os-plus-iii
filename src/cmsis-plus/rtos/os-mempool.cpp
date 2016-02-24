@@ -127,7 +127,7 @@ namespace os
      * free list.
      */
     void*
-    Memory_pool::try_first (void)
+    Memory_pool::_try_first (void)
     {
       if (first_ != nullptr)
         {
@@ -161,7 +161,7 @@ namespace os
             {
               Critical_section_irq cs; // ----- Critical section -----
 
-              void* p = try_first ();
+              void* p = _try_first ();
               if (p != nullptr)
                 {
                   return p;
@@ -201,7 +201,7 @@ namespace os
     {
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
-      return try_first ();
+      return _try_first ();
     }
 
     /**
@@ -234,7 +234,7 @@ namespace os
             {
               Critical_section_irq cs; // ----- Critical section -----
 
-              void* p = try_first ();
+              void* p = _try_first ();
               if (p != nullptr)
                 {
                   return p;
