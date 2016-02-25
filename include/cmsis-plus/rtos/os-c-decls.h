@@ -285,7 +285,9 @@ extern "C"
   typedef struct os_semaphore_s
   {
     const char* name;
+#if !defined(OS_INCLUDE_PORT_RTOS_SEMAPHORE)
     os_thread_list_t list;
+#endif
 #if defined(OS_INCLUDE_PORT_RTOS_SEMAPHORE)
     os_semaphore_port_data_t port;
 #endif
@@ -312,8 +314,13 @@ extern "C"
   typedef struct os_mempool_s
   {
     const char* name;
+#if !defined(OS_INCLUDE_PORT_RTOS_MEMORY_POOL)
     os_thread_list_t list;
+#endif
     void* pool_addr;
+#if defined(OS_INCLUDE_PORT_RTOS_MEMORY_POOL)
+    os_mempool_port_data_t port;
+#endif
     os_mempool_size_t blocks;
     os_mempool_size_t block_size_bytes;
     os_mempool_size_t count;
@@ -341,10 +348,13 @@ extern "C"
   typedef struct os_mqueue_s
   {
     const char* name;
+#if !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
     os_thread_list_t send_list;
     os_thread_list_t receive_list;
+#endif
 
     void* queue_addr;
+
 #if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
     os_mqueue_port_data_t port;
 #endif
@@ -372,7 +382,14 @@ extern "C"
   typedef struct os_evflags_s
   {
     const char* name;
+#if !defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
     os_thread_list_t list;
+#endif
+
+#if defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
+    os_evflags_port_data_t port_;
+#endif
+
     os_flags_mask_t flags;
   } os_evflags_t;
 

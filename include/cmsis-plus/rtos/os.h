@@ -74,6 +74,7 @@
 
 #include <cstdint>
 #include <cstddef>
+#include <cerrno>
 
 // ----------------------------------------------------------------------------
 
@@ -519,6 +520,14 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+#if !defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE)
+    // Default empty user storage.
+    typedef struct os_thread_user_storage_s
+      {
+        ;
+      }os_thread_user_storage_t;
+#endif
+
     /**
      * @class Thread
      * @brief POSIX thread.
@@ -868,13 +877,8 @@ namespace os
       static result_t
       sleep_for (sleep_rep secs);
 
-      // TODO: read hardware regs
-      // TODO: write hw regs
-
-      // TODO: write alarm (array)
-      // TODO: read alarm
-
-      // TODO: capabilities : nr. of alarms
+      static result_t
+      initialize (void);
     };
 
     // ==================--====================================================
@@ -1558,7 +1562,9 @@ namespace os
 
     protected:
 
+#if !defined(OS_INCLUDE_PORT_RTOS_SEMAPHORE)
       port::Tasks_list list_;
+#endif
 
 #if defined(OS_INCLUDE_PORT_RTOS_SEMAPHORE)
       friend class port::Semaphore;
@@ -1755,9 +1761,16 @@ namespace os
 
     protected:
 
+#if !defined(OS_INCLUDE_PORT_RTOS_MEMORY_POOL)
       port::Tasks_list list_;
-
+#endif
       char* pool_addr_;
+
+#if defined(OS_INCLUDE_PORT_RTOS_MEMORY_POOL)
+      friend class port::Memory_pool;
+      os_mempool_port_data_t port_;
+#endif
+
       const mempool::size_t blocks_;
       const mempool::size_t block_size_bytes_;
 
@@ -2031,8 +2044,11 @@ namespace os
     protected:
 
       // Keep these in sync with the structure declarations in os-c-decl.h.
+#if !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
       port::Tasks_list send_list_;
       port::Tasks_list receive_list_;
+
+#endif
 
       void* queue_addr_;
 
@@ -2231,7 +2247,9 @@ namespace os
 
     protected:
 
+#if !defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
       port::Tasks_list list_;
+#endif
 
 #if defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
       friend class port::Event_flags;
@@ -2318,10 +2336,10 @@ namespace os
 #if 0
     inline
     Named_object::Named_object (const char* name) :
-        name_ (name != nullptr ? name : "-")
-    {
-      ;
-    }
+    name_ (name != nullptr ? name : "-")
+      {
+        ;
+      }
 #endif
 
     inline const char*
