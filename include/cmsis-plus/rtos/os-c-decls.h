@@ -34,6 +34,7 @@
 // ----------------------------------------------------------------------------
 
 #include <cmsis-plus/rtos/os-app-config.h>
+#include <cmsis-plus/rtos/port/os-c-decls.h>
 
 #include <stdint.h>
 #include <stddef.h>
@@ -189,7 +190,9 @@ extern "C"
     const char* name;
     os_timer_func_t func;
     os_timer_func_args_t func_args;
-    void* impl;
+#if defined(OS_INCLUDE_PORT_RTOS_TIMER)
+    os_timer_port_data_t port_;
+#endif
     os_timer_type_t type;
   } os_timer_t;
 
@@ -241,7 +244,9 @@ extern "C"
   {
     const char* name;
     void* owner;
-    void* impl;
+#if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
+    os_mutex_port_data_t port;
+#endif
     os_mutex_count_t count;
     os_thread_prio_t prio_ceiling;
     os_mutex_type_t type;
@@ -281,7 +286,9 @@ extern "C"
   {
     const char* name;
     os_thread_list_t list;
-    void* impl;
+#if defined(OS_INCLUDE_PORT_RTOS_SEMAPHORE)
+    os_semaphore_port_data_t port;
+#endif
     os_semaphore_count_t initial_count;
     os_semaphore_count_t count;
     os_semaphore_count_t max_count;
@@ -338,7 +345,9 @@ extern "C"
     os_thread_list_t receive_list;
 
     void* queue_addr;
-    void* impl;
+#if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+    os_mqueue_port_data_t port;
+#endif
 
     size_t queue_size_bytes;
 

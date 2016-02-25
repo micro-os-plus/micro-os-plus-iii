@@ -752,8 +752,10 @@ namespace os
       void* func_result_;
 
       // Implementation
-      void* impl_;
-      void* impl_event_flags_;
+#if defined(OS_INCLUDE_PORT_RTOS_THREAD)
+      friend class port::Thread;
+      os_thread_port_data_t port_;
+#endif
 
       std::size_t stack_size_bytes_;
       thread::state_t sched_state_;
@@ -1015,7 +1017,12 @@ namespace os
 
       timer::func_t func_;
       timer::func_args_t func_args_;
-      void* impl_;
+
+#if defined(OS_INCLUDE_PORT_RTOS_TIMER)
+      friend class port::Timer;
+      os_timer_port_data_t port_;
+#endif
+
       timer::type_t type_;
 
       // Add more internal data.
@@ -1230,7 +1237,10 @@ namespace os
       // Can be updated in different thread contexts.
       Thread* volatile owner_;
 
-      void* impl_;
+#if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
+      friend class port::Mutex;
+      os_mutex_port_data_t port_;
+#endif
 
       // Can be updated in different thread contexts.
       volatile mutex::count_t count_;
@@ -1550,7 +1560,10 @@ namespace os
 
       port::Tasks_list list_;
 
-      void* impl_;
+#if defined(OS_INCLUDE_PORT_RTOS_SEMAPHORE)
+      friend class port::Semaphore;
+      os_semaphore_port_data_t port_;
+#endif
 
       const semaphore::count_t initial_count_;
 
@@ -2015,13 +2028,18 @@ namespace os
       result_t
       reset (void);
 
-    private:
+    protected:
 
+      // Keep these in sync with the structure declarations in os-c-decl.h.
       port::Tasks_list send_list_;
       port::Tasks_list receive_list_;
 
       void* queue_addr_;
-      void* impl_;
+
+#if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+      friend class port::Message_queue;
+      os_mqueue_port_data_t port_;
+#endif
 
       std::size_t queue_size_bytes_;
 
@@ -2168,9 +2186,10 @@ namespace os
        * @brief Raise event flags.
        * @param [in] mask The OR-ed flags to raise.
        * @param [out] oflags Optional pointer where to store the
-       *  previous flags; may be nullptr.
+       *  new value of the flags; may be nullptr.
        * @retval result::ok The flags were raised.
        * @retval EINVAL The mask is zero.
+       * @retval ENOTRECOVERABLE Raise failed.
        */
       result_t
       raise (flags::mask_t mask, flags::mask_t* oflags);
@@ -2178,6 +2197,8 @@ namespace os
       /**
        * @brief Clear event flags.
        * @param [in] mask The OR-ed flags to clear.
+       * @param [out] oflags Optional pointer where to store the
+       *  previous value of the flags; may be nullptr.
        * @retval result::ok The flags were cleared.
        * @retval EINVAL The mask is zero.
        */
@@ -2208,9 +2229,15 @@ namespace os
       result_t
       _try_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
 
-    private:
+    protected:
 
       port::Tasks_list list_;
+
+#if defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
+      friend class port::Event_flags;
+      os_evflags_port_data_t port_;
+#endif
+
       flags::mask_t flags_;
     };
 
@@ -2287,6 +2314,15 @@ namespace os
       }
 
     // ========================================================================
+
+#if 0
+    inline
+    Named_object::Named_object (const char* name) :
+        name_ (name != nullptr ? name : "-")
+    {
+      ;
+    }
+#endif
 
     inline const char*
     Named_object::name (void) const
