@@ -27,6 +27,7 @@
 #include <cassert>
 #include <cerrno>
 #include <cstdlib>
+#include <new>
 
 // ----------------------------------------------------------------------------
 
