@@ -204,6 +204,22 @@ namespace os
 
     /**
      * @details
+     * Must be called only once, during inits.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    result_t
+    Realtime_clock::initialize (void)
+    {
+      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+
+      // TODO: Use the RTC driver to initialise the seconds to epoch.
+
+      return result::ok;
+    }
+
+    /**
+     * @details
      *
      * @note Can be invoked from Interrupt Service Routines.
      */
