@@ -601,7 +601,7 @@ namespace os
 
       /**
        * @brief Set dynamic scheduling priority.
-       * @retval result::ok.
+       * @retval result::ok The priority was set.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval EINVAL The value of prio is invalid for the
        *  scheduling policy of the specified thread.
