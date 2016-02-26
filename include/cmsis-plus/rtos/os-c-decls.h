@@ -69,7 +69,7 @@ extern "C"
 
   // --------------------------------------------------------------------------
 
-#define OS_PRIOTHREAD_SHIFT   (1)
+#define OS_PRIOTHREAD_SHIFT   (0)
 
   enum
   {
@@ -82,9 +82,9 @@ extern "C"
     os_priority_above_normal = (8 << OS_PRIOTHREAD_SHIFT),
     os_priority_high = (10 << OS_PRIOTHREAD_SHIFT),
     os_priority_realtime = (12 << OS_PRIOTHREAD_SHIFT),
-    os_priority_highest = ((8 << OS_PRIOTHREAD_SHIFT) - 3),
-    os_priority_isr = ((8 << OS_PRIOTHREAD_SHIFT) - 2),
-    os_priority_error = ((8 << OS_PRIOTHREAD_SHIFT) - 1)
+    os_priority_highest = ((16 << OS_PRIOTHREAD_SHIFT) - 3),
+    os_priority_isr = ((16 << OS_PRIOTHREAD_SHIFT) - 2),
+    os_priority_error = ((16 << OS_PRIOTHREAD_SHIFT) - 1)
   };
 
   enum
