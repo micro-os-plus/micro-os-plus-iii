@@ -73,6 +73,7 @@ extern "C"
 
   enum
   {
+    // Must be ordered, with none the first and error the last.
     os_priority_none = 0, // not defined
     os_priority_idle = 1,
     os_priority_lowest = 2, // lowest
