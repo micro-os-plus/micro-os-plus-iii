@@ -75,7 +75,7 @@ namespace os
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
-      assert(function != nullptr);
+      os_assert_throw(function != nullptr, EINVAL);
 
       type_ = attr.tm_type;
       func_ = function;

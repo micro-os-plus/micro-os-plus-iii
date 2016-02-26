@@ -831,6 +831,11 @@ osThreadCreate (const osThreadDef_t* thread_def, void* args)
       return nullptr;
     }
 
+  if (thread_def == nullptr)
+    {
+      return nullptr;
+    }
+
   thread::Attributes attr
     { thread_def->name };
   attr.th_priority = thread_def->tpriority;
@@ -865,6 +870,11 @@ osThreadCreate (const osThreadDef_t* thread_def, void* args)
 osThreadId
 osThreadGetId (void)
 {
+  if (scheduler::in_handler_mode ())
+    {
+      return nullptr;
+    }
+
   return reinterpret_cast<osThreadId> (&this_thread::thread ());
 }
 
@@ -885,6 +895,11 @@ osThreadTerminate (osThreadId thread_id)
   if (scheduler::in_handler_mode ())
     {
       return osErrorISR;
+    }
+
+  if (thread_id == nullptr)
+    {
+      return osErrorParameter;
     }
 
   thread::state_t state =
@@ -935,6 +950,11 @@ osThreadSetPriority (osThreadId thread_id, osPriority priority)
       return osErrorISR;
     }
 
+  if (thread_id == nullptr)
+    {
+      return osErrorParameter;
+    }
+
   thread::state_t state =
       (reinterpret_cast<Thread&> (*thread_id)).sched_state ();
   if (state == thread::state::undefined || state >= thread::state::destroyed)
@@ -942,9 +962,18 @@ osThreadSetPriority (osThreadId thread_id, osPriority priority)
       return osErrorResource;
     }
 
+  if (priority < osPriorityIdle || priority >= osPriorityError)
+    {
+      return osErrorValue;
+    }
+
   thread::priority_t prio = static_cast<thread::priority_t> (priority);
   result_t res = ((reinterpret_cast<Thread&> (*thread_id)).sched_prio (prio));
-  if (res == EINVAL)
+  if (res == result::ok)
+    {
+      return osOK;
+    }
+  else if (res == EINVAL)
     {
       return osErrorValue;
     }
@@ -965,6 +994,11 @@ osPriority
 osThreadGetPriority (osThreadId thread_id)
 {
   if (scheduler::in_handler_mode ())
+    {
+      return osPriorityError;
+    }
+
+  if (thread_id == nullptr)
     {
       return osPriorityError;
     }
@@ -998,8 +1032,8 @@ osDelay (uint32_t millisec)
       return osErrorISR;
     }
 
-  result_t res = static_cast<osStatus> (Systick_clock::sleep_for (
-      Systick_clock::ticks_cast (millisec * 1000u)));
+  result_t res = Systick_clock::sleep_for (
+      Systick_clock::ticks_cast (millisec * 1000u));
 
   if (res == ETIMEDOUT)
     {
@@ -1045,9 +1079,18 @@ osWait (uint32_t millisec)
     }
 
   result_t res = Systick_clock::sleep_for (
-      Systick_clock::ticks_cast (millisec));
+      Systick_clock::ticks_cast (millisec * 1000u));
+
   // TODO: return events
-  event.status = static_cast<osStatus> (res);
+  if (res == ETIMEDOUT)
+    {
+      event.status = osEventTimeout;
+    }
+  else
+    {
+      event.status = osErrorOS;
+    }
+
   return event;
 }
 
@@ -1074,11 +1117,16 @@ osTimerCreate (const osTimerDef_t* timer_def, os_timer_type type, void* args)
       return nullptr;
     }
 
+  if (timer_def == nullptr)
+    {
+      return nullptr;
+    }
+
   timer::Attributes attr
     { timer_def->name };
   attr.tm_type = (timer::type_t) type;
 
-  return reinterpret_cast<osTimerId> (new ((void*) &timer_def->data) Timer (
+  return reinterpret_cast<osTimerId> (new ((void*) timer_def->data) Timer (
       attr, (timer::func_t) timer_def->ptimer, (timer::func_args_t) args));
 }
 
@@ -1095,9 +1143,22 @@ osTimerStart (osTimerId timer_id, uint32_t millisec)
     {
       return osErrorISR;
     }
+  if (timer_id == nullptr)
+    {
+      return osErrorParameter;
+    }
 
-  return static_cast<osStatus> ((reinterpret_cast<Timer&> (*timer_id)).start (
-      Systick_clock::ticks_cast (millisec)));
+  result_t res = (reinterpret_cast<Timer&> (*timer_id)).start (
+      Systick_clock::ticks_cast (millisec * 1000u));
+
+  if (res == result::ok)
+    {
+      return osOK;
+    }
+  else
+    {
+      return osErrorOS;
+    }
 }
 
 /**
@@ -1112,8 +1173,25 @@ osTimerStop (osTimerId timer_id)
     {
       return osErrorISR;
     }
+  if (timer_id == nullptr)
+    {
+      return osErrorParameter;
+    }
 
-  return static_cast<osStatus> ((reinterpret_cast<Timer&> (*timer_id)).stop ());
+  result_t res = (reinterpret_cast<Timer&> (*timer_id)).stop ();
+  if (res == result::ok)
+    {
+      return osOK;
+    }
+  else if (res == EAGAIN)
+    {
+      return osErrorResource;
+    }
+  else
+    {
+      return osErrorOS;
+    }
+
 }
 
 /**
@@ -1128,6 +1206,10 @@ osTimerDelete (osTimerId timer_id)
   if (scheduler::in_handler_mode ())
     {
       return osErrorISR;
+    }
+  if (timer_id == nullptr)
+    {
+      return osErrorParameter;
     }
 
   (reinterpret_cast<Timer&> (*timer_id)).~Timer ();
@@ -1148,7 +1230,12 @@ osSignalSet (osThreadId thread_id, int32_t signals)
 {
   if (scheduler::in_handler_mode ())
     {
-      return osErrorISR;
+      return 0x80000000;
+    }
+
+  if (signals == (int32_t) 0x80000000)
+    {
+      return 0x80000000;
     }
 
   thread::sigset_t osig;

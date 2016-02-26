@@ -250,6 +250,11 @@ namespace os
      */
     Thread::~Thread ()
     {
+      if (sched_state_ == thread::state::destroyed)
+        {
+          return;
+        }
+
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
 #if defined(OS_INCLUDE_PORT_RTOS_THREAD)
@@ -372,8 +377,8 @@ namespace os
     Thread::sched_prio (thread::priority_t prio)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
-
-      assert(prio != thread::priority::none);
+      os_assert_err(prio < thread::priority::error, EINVAL);
+      os_assert_err(prio != thread::priority::none, EINVAL);
 
       trace::printf ("%s(%d) @%p %s\n", __func__, prio, this, name ());
 
@@ -555,7 +560,7 @@ namespace os
     void
     Thread::exit (void* value_ptr)
     {
-      os_assert_throw(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
@@ -580,11 +585,21 @@ namespace os
       // TODO
 
 #endif
+
     }
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     result_t
     Thread::kill (void)
     {
+      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+
       result_t res;
 
 #if defined(OS_INCLUDE_PORT_RTOS_THREAD)
@@ -614,6 +629,8 @@ namespace os
     Thread::sig_raise (thread::sigset_t mask, thread::sigset_t* oflags)
     {
       os_assert_err(mask != 0, EINVAL);
+
+      trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
 
       Critical_section_irq cs; // ----- Critical section -----
 
@@ -645,6 +662,8 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), sig::error);
 
+      trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
+
       Critical_section_irq cs; // ----- Critical section -----
 
       if (mask == 0)
@@ -674,6 +693,8 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(mask != 0, EINVAL);
+
+      trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
 
       Critical_section_irq cs; // ----- Critical section -----
 
@@ -757,6 +778,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+      trace::printf ("%s(0x%X, %d) @%p %s\n", __func__, mask, mode, this,
+                     name ());
+
       for (;;)
         {
             {
@@ -794,6 +818,9 @@ namespace os
                           flags::mode_t mode)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
+
+      trace::printf ("%s(0x%X, %d) @%p %s\n", __func__, mask, mode, this,
+                     name ());
 
       Critical_section_irq cs; // ----- Critical section -----
 
@@ -837,6 +864,9 @@ namespace os
                             flags::mode_t mode, systicks_t ticks)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
+
+      trace::printf ("%s(0x%X, %d, %d) @%p %s\n", __func__, mask, mode, ticks,
+                     this, name ());
 
       if (ticks == 0)
         {
