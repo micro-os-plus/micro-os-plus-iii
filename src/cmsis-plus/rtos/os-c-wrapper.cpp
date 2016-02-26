@@ -65,6 +65,20 @@ static_assert(sizeof(mempool::Attributes) == sizeof(os_mempool_attr_t), "adjust 
 static_assert(sizeof(Message_queue) == sizeof(os_mqueue_t), "adjust size of os_mqueue_t");
 static_assert(sizeof(mqueue::Attributes) == sizeof(os_mqueue_attr_t), "adjust size of os_mqueue_attr_t");
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wenum-compare"
+
+static_assert(os_priority_idle == thread::priority::idle, "adjust os_priority_idle");
+static_assert(os_priority_low == thread::priority::low, "adjust os_priority_low");
+static_assert(os_priority_below_normal == thread::priority::below_normal, "adjust os_priority_below_normal");
+static_assert(os_priority_normal == thread::priority::normal, "adjust os_priority_normal");
+static_assert(os_priority_above_normal == thread::priority::above_normal, "adjust os_priority_above_normal");
+static_assert(os_priority_high == thread::priority::high, "adjust os_priority_high");
+static_assert(os_priority_realtime == thread::priority::realtime, "adjust os_priority_realtime");
+static_assert(os_priority_error == thread::priority::error, "adjust os_priority_error");
+
+#pragma GCC diagnostic pop
+
 // ----------------------------------------------------------------------------
 
 os_result_t
@@ -146,60 +160,60 @@ os_thread_create (os_thread_t* thread, const os_thread_attr_t* attr,
 void
 os_thread_destroy (os_thread_t* thread)
 {
-  (reinterpret_cast<Thread&> (thread)).~Thread ();
+  (reinterpret_cast<Thread&> (*thread)).~Thread ();
 }
 
 os_result_t
 os_thread_join (os_thread_t* thread, void** exit_ptr)
 {
-  return (os_result_t) (reinterpret_cast<Thread&> (thread)).join (exit_ptr);
+  return (os_result_t) (reinterpret_cast<Thread&> (*thread)).join (exit_ptr);
 }
 
 os_thread_prio_t
 os_thread_get_prio (os_thread_t* thread)
 {
-  return (os_thread_prio_t) (reinterpret_cast<Thread&> (thread)).sched_prio ();
+  return (os_thread_prio_t) (reinterpret_cast<Thread&> (*thread)).sched_prio ();
 }
 
 os_result_t
 os_thread_set_prio (os_thread_t* thread, os_thread_prio_t prio)
 {
-  return (os_result_t) (reinterpret_cast<Thread&> (thread)).sched_prio (prio);
+  return (os_result_t) (reinterpret_cast<Thread&> (*thread)).sched_prio (prio);
 }
 
 void
 os_thread_wakeup (os_thread_t* thread)
 {
-  return (reinterpret_cast<Thread&> (thread)).wakeup ();
+  return (reinterpret_cast<Thread&> (*thread)).wakeup ();
 }
 
 os_thread_user_storage_t*
 os_thread_get_user_storage (os_thread_t* thread)
 {
-  return (reinterpret_cast<Thread&> (thread)).user_storage ();
+  return (reinterpret_cast<Thread&> (*thread)).user_storage ();
 }
 
 os_result_t
 os_thread_sig_raise (os_thread_t* thread, os_thread_sigset_t mask,
                      os_thread_sigset_t* oflags)
 {
-  return (os_result_t) (reinterpret_cast<Thread&> (thread)).sig_raise (mask,
-                                                                       oflags);
+  return (os_result_t) (reinterpret_cast<Thread&> (*thread)).sig_raise (mask,
+                                                                        oflags);
 }
 
 os_result_t
 os_thread_sig_clear (os_thread_t* thread, os_thread_sigset_t mask,
                      os_thread_sigset_t* oflags)
 {
-  return (os_result_t) (reinterpret_cast<Thread&> (thread)).sig_clear (mask,
-                                                                       oflags);
+  return (os_result_t) (reinterpret_cast<Thread&> (*thread)).sig_clear (mask,
+                                                                        oflags);
 }
 
 os_thread_sigset_t
 os_thread_sig_get (os_thread_t* thread, os_thread_sigset_t mask,
                    os_flags_mode_t mode)
 {
-  return (os_thread_sigset_t) (reinterpret_cast<Thread&> (thread)).sig_get (
+  return (os_thread_sigset_t) (reinterpret_cast<Thread&> (*thread)).sig_get (
       mask, mode);
 }
 
@@ -257,19 +271,19 @@ os_timer_create (os_timer_t* timer, const os_timer_attr_t* attr,
 void
 os_timer_destroy (os_timer_t* timer)
 {
-  (reinterpret_cast<Timer&> (timer)).~Timer ();
+  (reinterpret_cast<Timer&> (*timer)).~Timer ();
 }
 
 os_result_t
 os_timer_start (os_timer_t* timer, os_systicks_t ticks)
 {
-  return (os_result_t) (reinterpret_cast<Timer&> (timer)).start (ticks);
+  return (os_result_t) (reinterpret_cast<Timer&> (*timer)).start (ticks);
 }
 
 os_result_t
 os_timer_stop (os_timer_t* timer)
 {
-  return (os_result_t) (reinterpret_cast<Timer&> (timer)).stop ();
+  return (os_result_t) (reinterpret_cast<Timer&> (*timer)).stop ();
 }
 
 // ----------------------------------------------------------------------------
@@ -289,44 +303,44 @@ os_mutex_create (os_mutex_t* mutex, const os_mutex_attr_t* attr)
 void
 os_mutex_destroy (os_mutex_t* mutex)
 {
-  (reinterpret_cast<Mutex&> (mutex)).~Mutex ();
+  (reinterpret_cast<Mutex&> (*mutex)).~Mutex ();
 }
 
 os_result_t
 os_mutex_lock (os_mutex_t* mutex)
 {
-  return (os_result_t) (reinterpret_cast<Mutex&> (mutex)).lock ();
+  return (os_result_t) (reinterpret_cast<Mutex&> (*mutex)).lock ();
 }
 
 os_result_t
 os_mutex_try_lock (os_mutex_t* mutex)
 {
-  return (os_result_t) (reinterpret_cast<Mutex&> (mutex)).try_lock ();
+  return (os_result_t) (reinterpret_cast<Mutex&> (*mutex)).try_lock ();
 }
 
 os_result_t
 os_mutex_timed_lock (os_mutex_t* mutex, os_systicks_t ticks)
 {
-  return (os_result_t) (reinterpret_cast<Mutex&> (mutex)).timed_lock (ticks);
+  return (os_result_t) (reinterpret_cast<Mutex&> (*mutex)).timed_lock (ticks);
 }
 
 os_result_t
 os_mutex_unlock (os_mutex_t* mutex)
 {
-  return (os_result_t) (reinterpret_cast<Mutex&> (mutex)).unlock ();
+  return (os_result_t) (reinterpret_cast<Mutex&> (*mutex)).unlock ();
 }
 
 os_thread_prio_t
 os_mutex_get_prio_ceiling (os_mutex_t* mutex)
 {
-  return (os_thread_prio_t) (reinterpret_cast<Mutex&> (mutex)).prio_ceiling ();
+  return (os_thread_prio_t) (reinterpret_cast<Mutex&> (*mutex)).prio_ceiling ();
 }
 
 os_result_t
 os_mutex_set_prio_ceiling (os_mutex_t* mutex, os_thread_prio_t prio_ceiling,
                            os_thread_prio_t* old_prio_ceiling)
 {
-  return (os_result_t) (reinterpret_cast<Mutex&> (mutex)).prio_ceiling (
+  return (os_result_t) (reinterpret_cast<Mutex&> (*mutex)).prio_ceiling (
       prio_ceiling, old_prio_ceiling);
 }
 
@@ -347,25 +361,25 @@ os_condvar_create (os_condvar_t* condvar, os_condvar_attr_t* attr)
 void
 os_condvar_destroy (os_condvar_t* condvar)
 {
-  (reinterpret_cast<Condition_variable&> (condvar)).~Condition_variable ();
+  (reinterpret_cast<Condition_variable&> (*condvar)).~Condition_variable ();
 }
 
 os_result_t
 os_condvar_signal (os_condvar_t* condvar)
 {
-  return (os_result_t) (reinterpret_cast<Condition_variable&> (condvar)).signal ();
+  return (os_result_t) (reinterpret_cast<Condition_variable&> (*condvar)).signal ();
 }
 
 os_result_t
 os_condvar_broadcast (os_condvar_t* condvar)
 {
-  return (os_result_t) (reinterpret_cast<Condition_variable&> (condvar)).broadcast ();
+  return (os_result_t) (reinterpret_cast<Condition_variable&> (*condvar)).broadcast ();
 }
 
 os_result_t
 os_condvar_wait (os_condvar_t* condvar, os_mutex_t* mutex)
 {
-  return (os_result_t) (reinterpret_cast<Condition_variable&> (condvar)).wait (
+  return (os_result_t) (reinterpret_cast<Condition_variable&> (*condvar)).wait (
       (Mutex&) *mutex);
 }
 
@@ -373,7 +387,7 @@ os_result_t
 os_condvar_timed_wait (os_condvar_t* condvar, os_mutex_t* mutex,
                        os_systicks_t ticks)
 {
-  return (os_result_t) (reinterpret_cast<Condition_variable&> (condvar)).timed_wait (
+  return (os_result_t) (reinterpret_cast<Condition_variable&> (*condvar)).timed_wait (
       (Mutex&) *mutex, ticks);
 }
 
@@ -394,44 +408,44 @@ os_semaphore_create (os_semaphore_t* semaphore, os_semaphore_attr_t* attr)
 void
 os_semaphore_destroy (os_semaphore_t* semaphore)
 {
-  (reinterpret_cast<Semaphore&> (semaphore)).~Semaphore ();
+  (reinterpret_cast<Semaphore&> (*semaphore)).~Semaphore ();
 }
 
 os_result_t
 os_semaphore_post (os_semaphore_t* semaphore)
 {
-  return (os_result_t) (reinterpret_cast<Semaphore&> (semaphore)).post ();
+  return (os_result_t) (reinterpret_cast<Semaphore&> (*semaphore)).post ();
 }
 
 os_result_t
 os_semaphore_wait (os_semaphore_t* semaphore)
 {
-  return (os_result_t) (reinterpret_cast<Semaphore&> (semaphore)).wait ();
+  return (os_result_t) (reinterpret_cast<Semaphore&> (*semaphore)).wait ();
 }
 
 os_result_t
 os_semaphore_try_wait (os_semaphore_t* semaphore)
 {
-  return (os_result_t) (reinterpret_cast<Semaphore&> (semaphore)).try_wait ();
+  return (os_result_t) (reinterpret_cast<Semaphore&> (*semaphore)).try_wait ();
 }
 
 os_result_t
 os_semaphore_timed_wait (os_semaphore_t* semaphore, os_systicks_t ticks)
 {
-  return (os_result_t) (reinterpret_cast<Semaphore&> (semaphore)).timed_wait (
+  return (os_result_t) (reinterpret_cast<Semaphore&> (*semaphore)).timed_wait (
       ticks);
 }
 
 os_semaphore_count_t
 os_semaphore_get_value (os_semaphore_t* semaphore)
 {
-  return (os_semaphore_count_t) (reinterpret_cast<Semaphore&> (semaphore)).value ();
+  return (os_semaphore_count_t) (reinterpret_cast<Semaphore&> (*semaphore)).value ();
 }
 
 os_result_t
 os_semaphore_reset (os_semaphore_t* semaphore)
 {
-  return (os_result_t) (reinterpret_cast<Semaphore&> (semaphore)).reset ();
+  return (os_result_t) (reinterpret_cast<Semaphore&> (*semaphore)).reset ();
 }
 
 // ----------------------------------------------------------------------------
@@ -453,67 +467,67 @@ os_mempool_create (os_mempool_t* mempool, os_mempool_attr_t* attr,
 void
 os_mempool_destroy (os_mempool_t* mempool)
 {
-  (reinterpret_cast<Memory_pool&> (mempool)).~Memory_pool ();
+  (reinterpret_cast<Memory_pool&> (*mempool)).~Memory_pool ();
 }
 
 void*
 os_mempool_alloc (os_mempool_t* mempool)
 {
-  return (reinterpret_cast<Memory_pool&> (mempool)).alloc ();
+  return (reinterpret_cast<Memory_pool&> (*mempool)).alloc ();
 }
 
 void*
 os_mempool_try_alloc (os_mempool_t* mempool)
 {
-  return (reinterpret_cast<Memory_pool&> (mempool)).try_alloc ();
+  return (reinterpret_cast<Memory_pool&> (*mempool)).try_alloc ();
 }
 
 void*
 os_mempool_timed_alloc (os_mempool_t* mempool, os_systicks_t ticks)
 {
-  return (reinterpret_cast<Memory_pool&> (mempool)).timed_alloc (ticks);
+  return (reinterpret_cast<Memory_pool&> (*mempool)).timed_alloc (ticks);
 }
 
 os_result_t
 os_mempool_free (os_mempool_t* mempool, void* block)
 {
-  return (os_result_t) (reinterpret_cast<Memory_pool&> (mempool)).free (block);
+  return (os_result_t) (reinterpret_cast<Memory_pool&> (*mempool)).free (block);
 }
 
 size_t
 os_mempool_get_capacity (os_mempool_t* mempool)
 {
-  return (reinterpret_cast<Memory_pool&> (mempool)).capacity ();
+  return (reinterpret_cast<Memory_pool&> (*mempool)).capacity ();
 }
 
 size_t
 os_mempool_get_count (os_mempool_t* mempool)
 {
-  return (reinterpret_cast<Memory_pool&> (mempool)).count ();
+  return (reinterpret_cast<Memory_pool&> (*mempool)).count ();
 }
 
 size_t
 os_mempool_get_block_size (os_mempool_t* mempool)
 {
-  return (reinterpret_cast<Memory_pool&> (mempool)).block_size ();
+  return (reinterpret_cast<Memory_pool&> (*mempool)).block_size ();
 }
 
 bool
 os_mempool_is_empty (os_mempool_t* mempool)
 {
-  return (reinterpret_cast<Memory_pool&> (mempool)).empty ();
+  return (reinterpret_cast<Memory_pool&> (*mempool)).empty ();
 }
 
 bool
 os_mempool_is_full (os_mempool_t* mempool)
 {
-  return (reinterpret_cast<Memory_pool&> (mempool)).full ();
+  return (reinterpret_cast<Memory_pool&> (*mempool)).full ();
 }
 
 os_result_t
 os_mempool_reset (os_mempool_t* mempool)
 {
-  return (os_result_t) (reinterpret_cast<Memory_pool&> (mempool)).reset ();
+  return (os_result_t) (reinterpret_cast<Memory_pool&> (*mempool)).reset ();
 }
 
 // --------------------------------------------------------------------------
@@ -535,23 +549,22 @@ os_mqueue_create (os_mqueue_t* mqueue, os_mqueue_attr_t* attr,
 void
 os_mqueue_destroy (os_mqueue_t* mqueue)
 {
-  (reinterpret_cast<Message_queue&> (mqueue)).~Message_queue ();
+  (reinterpret_cast<Message_queue&> (*mqueue)).~Message_queue ();
 }
 
 os_result_t
 os_mqueue_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
                 os_mqueue_prio_t mprio)
 {
-  return (os_result_t) (reinterpret_cast<Message_queue&> (mqueue)).send (msg,
-                                                                         nbytes,
-                                                                         mprio);
+  return (os_result_t) (reinterpret_cast<Message_queue&> (*mqueue)).send (
+      msg, nbytes, mprio);
 }
 
 os_result_t
 os_mqueue_try_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
                     os_mqueue_prio_t mprio)
 {
-  return (os_result_t) (reinterpret_cast<Message_queue&> (mqueue)).try_send (
+  return (os_result_t) (reinterpret_cast<Message_queue&> (*mqueue)).try_send (
       msg, nbytes, mprio);
 }
 
@@ -559,7 +572,7 @@ os_result_t
 os_mqueue_timed_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
                       os_mqueue_prio_t mprio, os_systicks_t ticks)
 {
-  return (os_result_t) (reinterpret_cast<Message_queue&> (mqueue)).timed_send (
+  return (os_result_t) (reinterpret_cast<Message_queue&> (*mqueue)).timed_send (
       msg, nbytes, mprio, ticks);
 }
 
@@ -567,7 +580,7 @@ os_result_t
 os_mqueue_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
                    os_mqueue_prio_t* mprio)
 {
-  return (os_result_t) (reinterpret_cast<Message_queue&> (mqueue)).receive (
+  return (os_result_t) (reinterpret_cast<Message_queue&> (*mqueue)).receive (
       msg, nbytes, mprio);
 }
 
@@ -575,7 +588,7 @@ os_result_t
 os_mqueue_try_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
                        os_mqueue_prio_t* mprio)
 {
-  return (os_result_t) (reinterpret_cast<Message_queue&> (mqueue)).try_receive (
+  return (os_result_t) (reinterpret_cast<Message_queue&> (*mqueue)).try_receive (
       msg, nbytes, mprio);
 }
 
@@ -583,44 +596,44 @@ os_result_t
 os_mqueue_timed_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
                          os_mqueue_prio_t* mprio, os_systicks_t ticks)
 {
-  return (os_result_t) (reinterpret_cast<Message_queue&> (mqueue)).timed_receive (
+  return (os_result_t) (reinterpret_cast<Message_queue&> (*mqueue)).timed_receive (
       msg, nbytes, mprio, ticks);
 }
 
 size_t
 os_mqueue_get_length (os_mqueue_t* mqueue)
 {
-  return (reinterpret_cast<Message_queue&> (mqueue)).length ();
+  return (reinterpret_cast<Message_queue&> (*mqueue)).length ();
 }
 
 size_t
 os_mqueue_get_capacity (os_mqueue_t* mqueue)
 {
-  return (reinterpret_cast<Message_queue&> (mqueue)).capacity ();
+  return (reinterpret_cast<Message_queue&> (*mqueue)).capacity ();
 }
 
 size_t
 os_mqueue_get_msg_size (os_mqueue_t* mqueue)
 {
-  return (reinterpret_cast<Message_queue&> (mqueue)).msg_size ();
+  return (reinterpret_cast<Message_queue&> (*mqueue)).msg_size ();
 }
 
 bool
 os_mqueue_is_empty (os_mqueue_t* mqueue)
 {
-  return (reinterpret_cast<Message_queue&> (mqueue)).empty ();
+  return (reinterpret_cast<Message_queue&> (*mqueue)).empty ();
 }
 
 bool
 os_mqueue_is_full (os_mqueue_t* mqueue)
 {
-  return (reinterpret_cast<Message_queue&> (mqueue)).full ();
+  return (reinterpret_cast<Message_queue&> (*mqueue)).full ();
 }
 
 os_result_t
 os_mqueue_reset (os_mqueue_t* mqueue)
 {
-  return (os_result_t) (reinterpret_cast<Message_queue&> (mqueue)).reset ();
+  return (os_result_t) (reinterpret_cast<Message_queue&> (*mqueue)).reset ();
 }
 
 // --------------------------------------------------------------------------
@@ -640,23 +653,23 @@ os_evflags_create (os_evflags_t* evflags, os_evflags_attr_t* attr)
 void
 os_evflags_destroy (os_evflags_t* evflags)
 {
-  (reinterpret_cast<Event_flags&> (evflags)).~Event_flags ();
+  (reinterpret_cast<Event_flags&> (*evflags)).~Event_flags ();
 }
 
 os_result_t
 os_evflags_wait (os_evflags_t* evflags, os_flags_mask_t mask,
                  os_flags_mask_t* oflags, os_flags_mode_t mode)
 {
-  return (os_result_t) (reinterpret_cast<Event_flags&> (evflags)).wait (mask,
-                                                                        oflags,
-                                                                        mode);
+  return (os_result_t) (reinterpret_cast<Event_flags&> (*evflags)).wait (mask,
+                                                                         oflags,
+                                                                         mode);
 }
 
 os_result_t
 os_evflags_try_wait (os_evflags_t* evflags, os_flags_mask_t mask,
                      os_flags_mask_t* oflags, os_flags_mode_t mode)
 {
-  return (os_result_t) (reinterpret_cast<Event_flags&> (evflags)).try_wait (
+  return (os_result_t) (reinterpret_cast<Event_flags&> (*evflags)).try_wait (
       mask, oflags, mode);
 }
 
@@ -665,7 +678,7 @@ os_evflags_timed_wait (os_evflags_t* evflags, os_flags_mask_t mask,
                        os_flags_mask_t* oflags, os_flags_mode_t mode,
                        os_systicks_t ticks)
 {
-  return (os_result_t) (reinterpret_cast<Event_flags&> (evflags)).timed_wait (
+  return (os_result_t) (reinterpret_cast<Event_flags&> (*evflags)).timed_wait (
       mask, oflags, mode, ticks);
 }
 
@@ -673,30 +686,30 @@ os_result_t
 os_evflags_raise (os_evflags_t* evflags, os_flags_mask_t mask,
                   os_flags_mask_t* oflags)
 {
-  return (os_result_t) (reinterpret_cast<Event_flags&> (evflags)).raise (mask,
-                                                                         oflags);
+  return (os_result_t) (reinterpret_cast<Event_flags&> (*evflags)).raise (
+      mask, oflags);
 }
 
 os_result_t
 os_evflags_clear (os_evflags_t* evflags, os_flags_mask_t mask,
                   os_flags_mask_t* oflags)
 {
-  return (os_result_t) (reinterpret_cast<Event_flags&> (evflags)).clear (mask,
-                                                                         oflags);
+  return (os_result_t) (reinterpret_cast<Event_flags&> (*evflags)).clear (
+      mask, oflags);
 }
 
 os_flags_mask_t
 os_evflags_get (os_evflags_t* evflags, os_flags_mask_t mask,
                 os_flags_mode_t mode)
 {
-  return (os_flags_mask_t) (reinterpret_cast<Event_flags&> (evflags)).get (mask,
-                                                                           mode);
+  return (os_flags_mask_t) (reinterpret_cast<Event_flags&> (*evflags)).get (
+      mask, mode);
 }
 
 bool
 os_evflags_get_waiting (os_evflags_t* evflags)
 {
-  return (reinterpret_cast<Event_flags&> (evflags)).waiting ();
+  return (reinterpret_cast<Event_flags&> (*evflags)).waiting ();
 }
 
 // ****************************************************************************
@@ -813,8 +826,33 @@ osKernelSysTick (void)
 osThreadId
 osThreadCreate (const osThreadDef_t* thread_def, void* args)
 {
-  Thread* thread = new (thread_def->data) Thread (
-      (thread::func_t) thread_def->pthread, args);
+  if (scheduler::in_handler_mode ())
+    {
+      return nullptr;
+    }
+
+  thread::Attributes attr
+    { thread_def->name };
+  attr.th_priority = thread_def->tpriority;
+  attr.th_stack_size_bytes = thread_def->stacksize;
+
+  // Creating thread with invalid priority should fail (validator requirement).
+  if (thread_def->tpriority >= osPriorityError)
+    {
+      return nullptr;
+    }
+
+  uint32_t* pcount = thread_def->count;
+  if ((thread_def->instances > 1) && (*pcount >= thread_def->instances))
+    {
+      return nullptr;
+    }
+  Thread* thread = new (&thread_def->data[*pcount]) Thread (
+      attr, (thread::func_t) thread_def->pthread, args);
+  if (thread_def->instances > 1)
+    {
+      (*pcount)++;
+    }
   return reinterpret_cast<osThreadId> (thread);
 }
 
@@ -844,8 +882,21 @@ osThreadGetId (void)
 osStatus
 osThreadTerminate (osThreadId thread_id)
 {
-  // TODO: check if something needs to be done to terminate.
-  (reinterpret_cast<Thread&> (thread_id)).~Thread ();
+  if (scheduler::in_handler_mode ())
+    {
+      return osErrorISR;
+    }
+
+  thread::state_t state =
+      (reinterpret_cast<Thread&> (*thread_id)).sched_state ();
+  if (state == thread::state::undefined || state >= thread::state::destroyed)
+    {
+      return osErrorResource;
+    }
+
+  (reinterpret_cast<Thread&> (*thread_id)).kill ();
+
+  (reinterpret_cast<Thread&> (*thread_id)).~Thread ();
   return osOK;
 }
 
@@ -879,9 +930,28 @@ osThreadYield (void)
 osStatus
 osThreadSetPriority (osThreadId thread_id, osPriority priority)
 {
+  if (scheduler::in_handler_mode ())
+    {
+      return osErrorISR;
+    }
+
+  thread::state_t state =
+      (reinterpret_cast<Thread&> (*thread_id)).sched_state ();
+  if (state == thread::state::undefined || state >= thread::state::destroyed)
+    {
+      return osErrorResource;
+    }
+
   thread::priority_t prio = static_cast<thread::priority_t> (priority);
-  return static_cast<osStatus> ((reinterpret_cast<Thread&> (thread_id)).sched_prio (
-      prio));
+  result_t res = ((reinterpret_cast<Thread&> (*thread_id)).sched_prio (prio));
+  if (res == EINVAL)
+    {
+      return osErrorValue;
+    }
+  else
+    {
+      return osErrorOS;
+    }
 }
 
 /**
@@ -894,8 +964,13 @@ osThreadSetPriority (osThreadId thread_id, osPriority priority)
 osPriority
 osThreadGetPriority (osThreadId thread_id)
 {
+  if (scheduler::in_handler_mode ())
+    {
+      return osPriorityError;
+    }
+
   thread::priority_t prio =
-      (reinterpret_cast<Thread&> (thread_id)).sched_prio ();
+      (reinterpret_cast<Thread&> (*thread_id)).sched_prio ();
   return static_cast<osPriority> (prio);
 }
 
@@ -918,8 +993,22 @@ osThreadGetPriority (osThreadId thread_id)
 osStatus
 osDelay (uint32_t millisec)
 {
-  return static_cast<osStatus> (Systick_clock::sleep_for (
+  if (scheduler::in_handler_mode ())
+    {
+      return osErrorISR;
+    }
+
+  result_t res = static_cast<osStatus> (Systick_clock::sleep_for (
       Systick_clock::ticks_cast (millisec * 1000u)));
+
+  if (res == ETIMEDOUT)
+    {
+      return osEventTimeout;
+    }
+  else
+    {
+      return osErrorOS;
+    }
 }
 
 #if (defined (osFeature_Wait)  &&  (osFeature_Wait != 0))
@@ -949,6 +1038,12 @@ osWait (uint32_t millisec)
 {
   osEvent event;
 
+  if (scheduler::in_handler_mode ())
+    {
+      event.status = osErrorISR;
+      return event;
+    }
+
   result_t res = Systick_clock::sleep_for (
       Systick_clock::ticks_cast (millisec));
   // TODO: return events
@@ -974,6 +1069,11 @@ osWait (uint32_t millisec)
 osTimerId
 osTimerCreate (const osTimerDef_t* timer_def, os_timer_type type, void* args)
 {
+  if (scheduler::in_handler_mode ())
+    {
+      return nullptr;
+    }
+
   timer::Attributes attr
     { timer_def->name };
   attr.tm_type = (timer::type_t) type;
@@ -991,7 +1091,12 @@ osTimerCreate (const osTimerDef_t* timer_def, os_timer_type type, void* args)
 osStatus
 osTimerStart (osTimerId timer_id, uint32_t millisec)
 {
-  return static_cast<osStatus> ((reinterpret_cast<Timer&> (timer_id)).start (
+  if (scheduler::in_handler_mode ())
+    {
+      return osErrorISR;
+    }
+
+  return static_cast<osStatus> ((reinterpret_cast<Timer&> (*timer_id)).start (
       Systick_clock::ticks_cast (millisec)));
 }
 
@@ -1003,7 +1108,12 @@ osTimerStart (osTimerId timer_id, uint32_t millisec)
 osStatus
 osTimerStop (osTimerId timer_id)
 {
-  return static_cast<osStatus> ((reinterpret_cast<Timer&> (timer_id)).stop ());
+  if (scheduler::in_handler_mode ())
+    {
+      return osErrorISR;
+    }
+
+  return static_cast<osStatus> ((reinterpret_cast<Timer&> (*timer_id)).stop ());
 }
 
 /**
@@ -1015,7 +1125,12 @@ osTimerStop (osTimerId timer_id)
 osStatus
 osTimerDelete (osTimerId timer_id)
 {
-  (reinterpret_cast<Timer&> (timer_id)).~Timer ();
+  if (scheduler::in_handler_mode ())
+    {
+      return osErrorISR;
+    }
+
+  (reinterpret_cast<Timer&> (*timer_id)).~Timer ();
   return osOK;
 }
 
@@ -1031,6 +1146,11 @@ osTimerDelete (osTimerId timer_id)
 int32_t
 osSignalSet (osThreadId thread_id, int32_t signals)
 {
+  if (scheduler::in_handler_mode ())
+    {
+      return osErrorISR;
+    }
+
   thread::sigset_t osig;
   ((Thread*) (thread_id))->sig_raise ((thread::sigset_t) signals, &osig);
   return (int32_t) osig;
@@ -1085,6 +1205,12 @@ osEvent
 osSignalWait (int32_t signals, uint32_t millisec)
 {
   osEvent event;
+  if (scheduler::in_handler_mode ())
+    {
+      event.status = osErrorISR;
+      return event;
+    }
+
   result_t res;
   if (millisec == osWaitForever)
     {
@@ -1168,7 +1294,12 @@ osSignalWait (int32_t signals, uint32_t millisec)
 osMutexId
 osMutexCreate (const osMutexDef_t* mutex_def)
 {
-  return reinterpret_cast<osMutexId> (new ((void*) &mutex_def->data) Mutex ());
+  if (scheduler::in_handler_mode ())
+    {
+      return nullptr;
+    }
+
+  return reinterpret_cast<osMutexId> (new ((void*) mutex_def->data) Mutex ());
 }
 
 /**
@@ -1192,18 +1323,23 @@ osMutexCreate (const osMutexDef_t* mutex_def)
 osStatus
 osMutexWait (osMutexId mutex_id, uint32_t millisec)
 {
+  if (scheduler::in_handler_mode ())
+    {
+      return osErrorISR;
+    }
+
   result_t status;
   if (millisec == osWaitForever)
     {
-      status = (reinterpret_cast<Mutex&> (mutex_id)).lock ();
+      status = (reinterpret_cast<Mutex&> (*mutex_id)).lock ();
     }
   else if (millisec == 0)
     {
-      status = (reinterpret_cast<Mutex&> (mutex_id)).try_lock ();
+      status = (reinterpret_cast<Mutex&> (*mutex_id)).try_lock ();
     }
   else
     {
-      status = (reinterpret_cast<Mutex&> (mutex_id)).timed_lock (
+      status = (reinterpret_cast<Mutex&> (*mutex_id)).timed_lock (
           Systick_clock::ticks_cast (millisec * 1000u));
     }
 
@@ -1222,8 +1358,13 @@ osMutexWait (osMutexId mutex_id, uint32_t millisec)
 osStatus
 osMutexRelease (osMutexId mutex_id)
 {
+  if (scheduler::in_handler_mode ())
+    {
+      return osErrorISR;
+    }
+
   result_t status;
-  status = (reinterpret_cast<Mutex&> (mutex_id)).unlock ();
+  status = (reinterpret_cast<Mutex&> (*mutex_id)).unlock ();
 
   // TODO: return legacy code for POSIX codes
   return static_cast<osStatus> (status);
@@ -1241,7 +1382,12 @@ osMutexRelease (osMutexId mutex_id)
 osStatus
 osMutexDelete (osMutexId mutex_id)
 {
-  (reinterpret_cast<Mutex&> (mutex_id)).~Mutex ();
+  if (scheduler::in_handler_mode ())
+    {
+      return osErrorISR;
+    }
+
+  (reinterpret_cast<Mutex&> (*mutex_id)).~Mutex ();
   return osOK;
 }
 
@@ -1263,10 +1409,15 @@ osMutexDelete (osMutexId mutex_id)
 osSemaphoreId
 osSemaphoreCreate (const osSemaphoreDef_t* semaphore_def, int32_t count)
 {
+  if (scheduler::in_handler_mode ())
+    {
+      return nullptr;
+    }
+
   semaphore::Attributes attr
     { semaphore_def->name };
   attr.sm_initial_count = (semaphore::count_t) count;
-  return reinterpret_cast<osSemaphoreId> (new ((void*) &semaphore_def->data) Semaphore (
+  return reinterpret_cast<osSemaphoreId> (new ((void*) semaphore_def->data) Semaphore (
       attr));
 }
 
@@ -1295,21 +1446,26 @@ osSemaphoreCreate (const osSemaphoreDef_t* semaphore_def, int32_t count)
 int32_t
 osSemaphoreWait (osSemaphoreId semaphore_id, uint32_t millisec)
 {
+  if (scheduler::in_handler_mode ())
+    {
+      return osErrorISR;
+    }
+
   if (millisec == osWaitForever)
     {
-      (reinterpret_cast<Semaphore&> (semaphore_id)).wait ();
+      (reinterpret_cast<Semaphore&> (*semaphore_id)).wait ();
     }
   else if (millisec == 0)
     {
-      (reinterpret_cast<Semaphore&> (semaphore_id)).try_wait ();
+      (reinterpret_cast<Semaphore&> (*semaphore_id)).try_wait ();
     }
   else
     {
-      (reinterpret_cast<Semaphore&> (semaphore_id)).timed_wait (
+      (reinterpret_cast<Semaphore&> (*semaphore_id)).timed_wait (
           Systick_clock::ticks_cast (millisec * 1000u));
     }
 
-  return (int32_t) (reinterpret_cast<Semaphore&> (semaphore_id)).value ();
+  return (int32_t) (reinterpret_cast<Semaphore&> (*semaphore_id)).value ();
 }
 
 /**
@@ -1322,7 +1478,7 @@ osSemaphoreWait (osSemaphoreId semaphore_id, uint32_t millisec)
 osStatus
 osSemaphoreRelease (osSemaphoreId semaphore_id)
 {
-  return static_cast<osStatus> ((reinterpret_cast<Semaphore&> (semaphore_id)).post ());
+  return static_cast<osStatus> ((reinterpret_cast<Semaphore&> (*semaphore_id)).post ());
 }
 
 /**
@@ -1337,7 +1493,12 @@ osSemaphoreRelease (osSemaphoreId semaphore_id)
 osStatus
 osSemaphoreDelete (osSemaphoreId semaphore_id)
 {
-  (reinterpret_cast<Semaphore&> (semaphore_id)).~Semaphore ();
+  if (scheduler::in_handler_mode ())
+    {
+      return osErrorISR;
+    }
+
+  (reinterpret_cast<Semaphore&> (*semaphore_id)).~Semaphore ();
   return osOK;
 }
 
@@ -1357,11 +1518,17 @@ osSemaphoreDelete (osSemaphoreId semaphore_id)
 osPoolId
 osPoolCreate (const osPoolDef_t* pool_def)
 {
+  if (scheduler::in_handler_mode ())
+    {
+      return nullptr;
+    }
+
   mempool::Attributes attr
     { pool_def->name };
   attr.mp_pool_address = pool_def->pool;
-  return reinterpret_cast<osPoolId> (new ((void*) &pool_def->data) Memory_pool (
-      (mempool::size_t) pool_def->pool_sz, (mempool::size_t) pool_def->item_sz));
+  return reinterpret_cast<osPoolId> (new ((void*) pool_def->data) Memory_pool (
+      attr, (mempool::size_t) pool_def->items,
+      (mempool::size_t) pool_def->item_sz));
 }
 
 /**
@@ -1373,7 +1540,7 @@ osPoolCreate (const osPoolDef_t* pool_def)
 void*
 osPoolAlloc (osPoolId pool_id)
 {
-  return (reinterpret_cast<Memory_pool&> (pool_id)).try_alloc ();
+  return (reinterpret_cast<Memory_pool&> (*pool_id)).try_alloc ();
 }
 
 /**
@@ -1386,10 +1553,11 @@ void*
 osPoolCAlloc (osPoolId pool_id)
 {
   void* ret;
-  ret = (reinterpret_cast<Memory_pool&> (pool_id)).try_alloc ();
+  ret = (reinterpret_cast<Memory_pool&> (*pool_id)).try_alloc ();
   if (ret != nullptr)
     {
-      memset (ret, 0, (reinterpret_cast<Memory_pool&> (pool_id)).block_size ());
+      memset (ret, 0,
+              (reinterpret_cast<Memory_pool&> (*pool_id)).block_size ());
     }
   return ret;
 }
@@ -1403,7 +1571,7 @@ osPoolCAlloc (osPoolId pool_id)
 osStatus
 osPoolFree (osPoolId pool_id, void* block)
 {
-  return static_cast<osStatus> ((reinterpret_cast<Memory_pool&> (pool_id)).free (
+  return static_cast<osStatus> ((reinterpret_cast<Memory_pool&> (*pool_id)).free (
       block));
 }
 
@@ -1424,12 +1592,17 @@ osMessageQId
 osMessageCreate (const osMessageQDef_t* queue_def,
                  osThreadId thread_id __attribute__((unused)))
 {
+  if (scheduler::in_handler_mode ())
+    {
+      return nullptr;
+    }
+
   mqueue::Attributes attr
     { queue_def->name };
   attr.queue_address = queue_def->queue;
   attr.queue_size_bytes = queue_def->queue_sz;
 
-  return reinterpret_cast<osMessageQId> (new ((void*) &queue_def->data) Message_queue (
+  return reinterpret_cast<osMessageQId> (new ((void*) queue_def->data) Message_queue (
       attr, (mqueue::size_t) queue_def->items,
       (mqueue::size_t) queue_def->item_sz));
 }
@@ -1459,17 +1632,17 @@ osMessagePut (osMessageQId queue_id, uint32_t info, uint32_t millisec)
 #endif
   if (millisec == osWaitForever)
     {
-      return static_cast<osStatus> ((reinterpret_cast<Message_queue&> (queue_id)).send (
+      return static_cast<osStatus> ((reinterpret_cast<Message_queue&> (*queue_id)).send (
           (const char*) info, sizeof(uint32_t), 0));
     }
   else if (millisec == 0)
     {
-      return static_cast<osStatus> ((reinterpret_cast<Message_queue&> (queue_id)).try_send (
+      return static_cast<osStatus> ((reinterpret_cast<Message_queue&> (*queue_id)).try_send (
           (const char*) info, sizeof(uint32_t), 0));
     }
   else
     {
-      return static_cast<osStatus> ((reinterpret_cast<Message_queue&> (queue_id)).timed_send (
+      return static_cast<osStatus> ((reinterpret_cast<Message_queue&> (*queue_id)).timed_send (
           (const char*) info, sizeof(uint32_t), 0,
           Systick_clock::ticks_cast (millisec * 1000u)));
     }
@@ -1505,21 +1678,21 @@ osMessageGet (osMessageQId queue_id, uint32_t millisec)
   result_t res;
   if (millisec == osWaitForever)
     {
-      res = (reinterpret_cast<Message_queue&> (queue_id)).receive (
+      res = (reinterpret_cast<Message_queue&> (*queue_id)).receive (
           (char*) &msg, sizeof(uint32_t),
           NULL);
       // result::event_message;
     }
   else if (millisec == 0)
     {
-      res = (reinterpret_cast<Message_queue&> (queue_id)).try_receive (
+      res = (reinterpret_cast<Message_queue&> (*queue_id)).try_receive (
           (char*) &msg, sizeof(uint32_t), NULL);
       // result::event_message when message;
       // result::ok when no meessage
     }
   else
     {
-      res = (reinterpret_cast<Message_queue&> (queue_id)).timed_receive (
+      res = (reinterpret_cast<Message_queue&> (*queue_id)).timed_receive (
           (char*) &msg, sizeof(uint32_t), NULL,
           Systick_clock::ticks_cast (millisec * 1000u));
       // result::event_message when message;
@@ -1551,6 +1724,11 @@ osMailQId
 osMailCreate (const osMailQDef_t* queue_def,
               osThreadId thread_id __attribute__((unused)))
 {
+  if (scheduler::in_handler_mode ())
+    {
+      return nullptr;
+    }
+
   mempool::Attributes pool_attr
     { queue_def->name };
   pool_attr.mp_pool_address = queue_def->pool;
@@ -1601,15 +1779,15 @@ osMailAlloc (osMailQId queue_id, uint32_t millisec)
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
   if (millisec == osWaitForever)
     {
-      ret = (reinterpret_cast<Memory_pool&> (queue_id->pool)).alloc ();
+      ret = (reinterpret_cast<Memory_pool&> ((queue_id->pool))).alloc ();
     }
   else if (millisec == 0)
     {
-      ret = (reinterpret_cast<Memory_pool&> (queue_id->pool)).try_alloc ();
+      ret = (reinterpret_cast<Memory_pool&> ((queue_id->pool))).try_alloc ();
     }
   else
     {
-      ret = (reinterpret_cast<Memory_pool&> (queue_id->pool)).timed_alloc (
+      ret = (reinterpret_cast<Memory_pool&> ((queue_id->pool))).timed_alloc (
           Systick_clock::ticks_cast (millisec * 1000u));
     }
 #pragma GCC diagnostic pop
@@ -1701,19 +1879,19 @@ osMailGet (osMailQId queue_id, uint32_t millisec)
   result_t res;
   if (millisec == osWaitForever)
     {
-      res = (reinterpret_cast<Message_queue&> (queue_id)).receive (
+      res = (reinterpret_cast<Message_queue&> (*queue_id)).receive (
           (char*) &msg, sizeof(void*),
           NULL);
     }
   else if (millisec == 0)
     {
-      res = (reinterpret_cast<Message_queue&> (queue_id)).try_receive (
+      res = (reinterpret_cast<Message_queue&> (*queue_id)).try_receive (
           (char*) &msg, sizeof(void*),
           NULL);
     }
   else
     {
-      res = (reinterpret_cast<Message_queue&> (queue_id)).timed_receive (
+      res = (reinterpret_cast<Message_queue&> (*queue_id)).timed_receive (
           (char*) &msg, sizeof(void*), NULL,
           Systick_clock::ticks_cast (millisec * 1000u));
     }
