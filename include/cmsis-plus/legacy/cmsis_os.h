@@ -9,7 +9,7 @@
  *    Initial Proposal Phase
  * Version 0.03
  *    osKernelStart added, optional feature: main started as thread
- *    osSemaphores have standard behavior
+ *    osSemaphores have standard behaviour
  *    osTimerCreate does not start the timer, added osTimerStart
  *    osThreadPass is renamed to osThreadYield
  * Version 1.01
@@ -268,9 +268,10 @@ extern "C"
     const char* name;
     os_pthread pthread; ///< start address of thread function
     osPriority tpriority; ///< initial thread priority
-    // uint32_t instances; ///< maximum number of instances of that thread function
+    uint32_t instances; ///< maximum number of instances of that thread function
     uint32_t stacksize; ///< stack size requirements in bytes; 0 is default stack size
     osThread* data;
+    uint32_t* count;
   } osThreadDef_t;
 
 #pragma GCC diagnostic pop
@@ -463,15 +464,19 @@ extern "C"
 extern const osThreadDef_t os_thread_def_##name
 #else                            // define the object
 #define osThreadDef(name, priority, instances, stacksz)  \
-osThread os_thread_data_##name; \
+struct { \
+    osThread data[instances]; \
+    uint32_t count; \
+} os_thread_##name; \
 const osThreadDef_t os_thread_def_##name = \
 { \
-    "##name", \
+    #name, \
     (os_pthread)(name), \
     (priority), \
-    /* (instances), */ \
+    (instances), \
     (stacksz), \
-    &os_thread_data_##name \
+    &os_thread_##name.data[0], \
+    &os_thread_##name.count \
 }
 #endif
 
@@ -568,7 +573,7 @@ const osThreadDef_t os_thread_def_##name = \
    * @brief Time Delay.
    * @param [in] millisec @ref CMSIS_RTOS_TimeOutValue "time delay" value.
    * @retval osEventTimeout The time delay is executed.
-   * @retval osErrorISR osDelay cannot be called from interrupt service routines.
+   * @retval osErrorISR osDelay() cannot be called from interrupt service routines.
    */
   osStatus
   osDelay (uint32_t millisec);
@@ -582,7 +587,7 @@ const osThreadDef_t os_thread_def_##name = \
    * @retval osEventMessage A message event occurred and is returned.
    * @retval osEventMail A mail event occurred and is returned.
    * @retval osEventTimeout The time delay is executed.
-   * @retval osErrorISR osDelay cannot be called from interrupt service routines.
+   * @retval osErrorISR osWait() cannot be called from interrupt service routines.
    *
    * @note MUST REMAIN UNCHANGED: @b osWait shall be consistent in every CMSIS-RTOS.
    */
@@ -612,7 +617,7 @@ extern const osTimerDef_t os_timer_def_##name
 osTimer os_timer_data_##name; \
 const osTimerDef_t os_timer_def_##name = \
 { \
-    "##name", \
+    #name, \
     (os_ptimer)(function), \
     &os_timer_data_##name \
 }
@@ -741,7 +746,7 @@ extern const osMutexDef_t os_mutex_def_##name
 osMutex os_mutex_data_##name; \
 const osMutexDef_t os_mutex_def_##name = \
 { \
-    "##name", \
+    #name, \
     &os_mutex_data_##name \
 }
 #endif
@@ -833,7 +838,7 @@ extern const osSemaphoreDef_t os_semaphore_def_##name
 osSemaphore os_semaphore_data_##name; \
 const osSemaphoreDef_t os_semaphore_def_##name = \
 { \
-    "##name", \
+    #name, \
     &os_semaphore_data_##name \
 }
 #endif
@@ -926,7 +931,7 @@ struct { \
 } os_pool_##name; \
 const osPoolDef_t os_pool_def_##name = \
 { \
-    "##name", \
+    #name, \
     (items), \
     sizeof(type), \
     os_pool_##name.pool, \
@@ -1015,7 +1020,7 @@ struct { \
     void* queue[items]; \
 } os_messageQ_##name; \
 const osMessageQDef_t os_messageQ_def_##name = { \
-    "##name", \
+    #name, \
     (items), \
     sizeof (void*), \
     os_messageQ_##name.queue, \
@@ -1103,9 +1108,9 @@ struct { \
     osMailQ data; \
     type pool[items]; \
     void* queue[items]; \
-} osmailQ_##name; \
+} os_mailQ_##name; \
 const osMailQDef_t os_mailQ_def_##name = { \
-    "##name", \
+    #name, \
     (items), \
     sizeof (type), \
     sizeof (void*), \
@@ -1113,7 +1118,7 @@ const osMailQDef_t os_mailQ_def_##name = { \
     sizeof(os_mailQ_##name.pool), \
     os_mailQ_##name.queue, \
     sizeof(os_mailQ_##name.queue), \
-    &osmailQ_##name.data \
+    &os_mailQ_##name.data \
 }
 #endif
 
