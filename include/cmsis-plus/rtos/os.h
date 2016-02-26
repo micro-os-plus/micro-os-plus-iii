@@ -320,11 +320,13 @@ namespace os
       using state_t = enum class state : uint8_t
         {
           // The state is restricted to one of these values.
-          inactive = 0,
-          ready = 1,
-          running = 2,
-          waiting = 3,
-          terminated = 4
+          undefined = 0,// Used to catch uninitialised threads
+          inactive = 1,
+          ready = 2,
+          running = 3,
+          waiting = 4,
+          terminated = 5,// Test for here up for reuse
+          destroyed = 6
         };
 
       using sigset_t = flags::mask_t;
@@ -600,9 +602,9 @@ namespace os
       /**
        * @brief Set dynamic scheduling priority.
        * @retval result::ok.
-       * @retval result::einval The value of prio is invalid for the
-       *  scheduling policy of the
-       * specified thread.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EINVAL The value of prio is invalid for the
+       *  scheduling policy of the specified thread.
        */
       result_t
       sched_prio (thread::priority_t prio);
@@ -693,6 +695,12 @@ namespace os
        */
       thread::sigset_t
       sig_get (thread::sigset_t mask, flags::mode_t mode);
+
+      /**
+       * @brief Force thread termination.
+       */
+      result_t
+      kill (void);
 
     protected:
 
@@ -2753,6 +2761,9 @@ namespace os
 
 extern "C"
 {
+  int
+  os_main (int argc, char* argv[]);
+
   void
   os_systick_handler (void);
 
