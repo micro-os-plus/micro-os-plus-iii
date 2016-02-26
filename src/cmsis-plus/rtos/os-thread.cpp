@@ -207,6 +207,9 @@ namespace os
       assert(function != nullptr);
       assert(attr.th_priority != thread::priority::none);
 
+      // Prevent the new thread to execute before all members are set.
+      scheduler::Critical_section cs; // ----- Critical section -----
+
       // Get attributes from user structure.
       prio_ = attr.th_priority;
       stack_size_bytes_ = attr.th_stack_size_bytes;
@@ -217,11 +220,13 @@ namespace os
 
       sig_mask_ = 0;
 
-      trace::printf ("%s @%p %s\n", __func__, this, name ());
+      trace::printf ("%s @%p %s %d %d\n", __func__, this, name (), prio_,
+                     stack_size_bytes_);
 
 #if defined(OS_INCLUDE_PORT_RTOS_THREAD)
 
       port::Thread::create (this);
+      sched_state_ = thread::state::ready;
 
 #else
 
@@ -257,6 +262,8 @@ namespace os
       scheduler::__unregister_thread (this);
 
 #endif
+
+      sched_state_ = thread::state::destroyed;
     }
 
     void
@@ -552,6 +559,15 @@ namespace os
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
+      if (sched_state_ == thread::state::terminated)
+        {
+          trace::printf ("%s() @%p %s already terminated\n", __func__, this,
+                         name ());
+          return; // Already terminated
+        }
+
+      // If not the current thread, probably must suspend.
+
       func_result_ = value_ptr;
       sched_state_ = thread::state::terminated;
 
@@ -564,6 +580,26 @@ namespace os
       // TODO
 
 #endif
+    }
+
+    result_t
+    Thread::kill (void)
+    {
+      result_t res;
+
+#if defined(OS_INCLUDE_PORT_RTOS_THREAD)
+
+      res = port::Thread::kill (this);
+
+#else
+
+      // TODO
+      res = result::ok;
+
+#endif
+      sched_state_ = thread::state::inactive;
+
+      return res;
     }
 
     /**
