@@ -51,7 +51,7 @@ _exit (int code __attribute__((unused)))
 #if !defined(DEBUG)
   __reset_hardware();
 #else
-  __DEBUG_BKPT();
+  trace_dbg_bkpt();
 #endif
 
   // For just in case.

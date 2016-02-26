@@ -19,6 +19,7 @@
 #if defined(OS_USE_SEMIHOSTING)
 
 #include <cmsis-plus/arm/semihosting.h>
+#include <cmsis-plus/diag/trace.h>
 
 #include "posix-io/types.h"
 
@@ -1040,6 +1041,10 @@ __posix_readlink (const char* path, char* buf, size_t bufsize)
 void
 _exit (int status)
 {
+#if defined(DEBUG)
+  trace_dbg_bkpt();
+#endif
+
   /* There is only one SWI for both _exit and _kill. For _exit, call
    the SWI with the second argument set to -1, an invalid value for
    signum, so that the SWI handler can distinguish the two calls.

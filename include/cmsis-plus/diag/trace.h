@@ -54,6 +54,13 @@
 // This has the advantage that the trace calls do not need to be conditionally
 // compiled with #ifdef TRACE/#endif
 
+inline void
+__attribute__((always_inline))
+trace_dbg_bkpt (void)
+{
+  asm volatile ("bkpt 0");
+}
+
 #if defined(TRACE)
 
 #if defined(__cplusplus)
@@ -93,6 +100,15 @@ namespace os
 
     void
     dump_args (int argc, char* argv[]);
+
+    // ------------------------------------------------------------------------
+
+    inline void
+    __attribute__((always_inline))
+    dbg_bkpt (void)
+    {
+      trace_dbg_bkpt ();
+    }
 
   } /* namespace trace */
 } /* namespace os */
@@ -145,165 +161,165 @@ extern "C"
 
 namespace os
   {
-         namespace trace
+    namespace trace
+      {
+        // ----------------------------------------------------------------
+
+        inline void
+        initialize (void);
+
+        inline ssize_t
+        write (const void* buf, std::size_t nbyte);
+
+        // ----------------------------------------------------------------
+
+        inline int
+        printf (const char* format, ...);
+
+        inline int
+        vprintf (const char* format, std::va_list args);
+
+        inline int
+        puts (const char* s);
+
+        inline int
+        putchar (int c);
+
+        inline void
+        dump_args (int argc, char* argv[]);
+
+        // ----------------------------------------------------------------
+
+        inline void __attribute__((always_inline))
+        initialize (void)
           {
-            // ----------------------------------------------------------------
-
-            inline void
-            initialize (void);
-
-            inline ssize_t
-            write (const void* buf, std::size_t nbyte);
-
-            // ----------------------------------------------------------------
-
-            inline int
-            printf (const char* format, ...);
-
-            inline int
-            vprintf (const char* format, std::va_list args);
-
-            inline int
-            puts (const char* s);
-
-            inline int
-            putchar (int c);
-
-            inline void
-            dump_args (int argc, char* argv[]);
-
-            // ----------------------------------------------------------------
-
-            inline void __attribute__((always_inline))
-            initialize (void)
-              {
-              }
+          }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-            inline ssize_t __attribute__((always_inline))
-            write (const void* buf, std::size_t nbyte)
-              {
-                return (ssize_t)nbyte;
-              }
+        inline ssize_t __attribute__((always_inline))
+        write (const void* buf, std::size_t nbyte)
+          {
+            return (ssize_t)nbyte;
+          }
 
-            inline int __attribute__((always_inline))
-            printf (const char* format, ...)
-              {
-                return 0;
-              }
+        inline int __attribute__((always_inline))
+        printf (const char* format, ...)
+          {
+            return 0;
+          }
 
-            inline int __attribute__((always_inline))
-            vprintf (const char* format, std::va_list args)
-              {
-                return 0;
-              }
+        inline int __attribute__((always_inline))
+        vprintf (const char* format, std::va_list args)
+          {
+            return 0;
+          }
 
-            inline int __attribute__((always_inline))
-            puts (const char* s)
-              {
-                return 0;
-              }
+        inline int __attribute__((always_inline))
+        puts (const char* s)
+          {
+            return 0;
+          }
 
-            inline int __attribute__((always_inline))
-            putchar (int c)
-              {
-                return c;
-              }
+        inline int __attribute__((always_inline))
+        putchar (int c)
+          {
+            return c;
+          }
 
-            inline void __attribute__((always_inline))
-            dumpArgs (int argc, char* argv[])
-              {
-              }
+        inline void __attribute__((always_inline))
+        dumpArgs (int argc, char* argv[])
+          {
+          }
 
 #pragma GCC diagnostic pop
 
-          } /* namespace trace */
-      } /* namespace os */
+      } /* namespace trace */
+  } /* namespace os */
 
 #endif /* defined(__cplusplus) */
 
 #if defined(__cplusplus)
-    extern "C"
-      {
-#endif
-
-        inline void
-        __initialize_trace (void);
-
-        // Implementation dependent
-        inline ssize_t
-        trace_write (const void* buf, size_t nbyte);
-
-        inline int
-        trace_printf (const char* format, ...);
-
-        inline int
-        trace_vprintf (const char* format, va_list args);
-
-        inline int
-        trace_puts (const char* s);
-
-        inline int
-        trace_putchar (int c);
-
-        inline void
-        trace_dump_args (int argc, char* argv[]);
-
-#if defined(__cplusplus)
-      }
+extern "C"
+  {
 #endif
 
     inline void
-    __attribute__((always_inline))
-    __initialize_trace (void)
-      {
-      }
+    __initialize_trace (void);
+
+    // Implementation dependent
+    inline ssize_t
+    trace_write (const void* buf, size_t nbyte);
+
+    inline int
+    trace_printf (const char* format, ...);
+
+    inline int
+    trace_vprintf (const char* format, va_list args);
+
+    inline int
+    trace_puts (const char* s);
+
+    inline int
+    trace_putchar (int c);
+
+    inline void
+    trace_dump_args (int argc, char* argv[]);
+
+#if defined(__cplusplus)
+  }
+#endif
+
+inline void
+__attribute__((always_inline))
+__initialize_trace (void)
+  {
+  }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-    inline ssize_t
-    __attribute__((always_inline))
-    trace_write (const void* buf, size_t nbyte)
-      {
-        return (ssize_t)nbyte;
-      }
+inline ssize_t
+__attribute__((always_inline))
+trace_write (const void* buf, size_t nbyte)
+  {
+    return (ssize_t)nbyte;
+  }
 
-    inline int
-    __attribute__((always_inline))
-    trace_printf (const char* format, ...)
-      {
-        return 0;
-      }
+inline int
+__attribute__((always_inline))
+trace_printf (const char* format, ...)
+  {
+    return 0;
+  }
 
-    inline int
-    __attribute__((always_inline))
-    trace_vprintf (const char* format, va_list args)
-      {
-        return 0;
-      }
+inline int
+__attribute__((always_inline))
+trace_vprintf (const char* format, va_list args)
+  {
+    return 0;
+  }
 
-    inline int
-    __attribute__((always_inline))
-    trace_puts (const char* s)
-      {
-        return 0;
-      }
+inline int
+__attribute__((always_inline))
+trace_puts (const char* s)
+  {
+    return 0;
+  }
 
-    inline int
-    __attribute__((always_inline))
-    trace_putchar (int c)
-      {
-        return c;
-      }
+inline int
+__attribute__((always_inline))
+trace_putchar (int c)
+  {
+    return c;
+  }
 
-    inline void
-    __attribute__((always_inline))
-    trace_dump_args (int argc, char* argv[])
-      {
-      }
+inline void
+__attribute__((always_inline))
+trace_dump_args (int argc, char* argv[])
+  {
+  }
 
 #pragma GCC diagnostic pop
 
