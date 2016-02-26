@@ -14,6 +14,7 @@
 
 #include <cmsis-plus/iso/malloc.h>
 #include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/diag/trace.h>
 
 #include <cstdlib>
 
@@ -30,23 +31,18 @@ namespace os
     ///
     /// \note Synchronisation is provided by using a scheduler lock.
     void*
-    malloc(std::size_t size) noexcept
+    malloc (std::size_t size) noexcept
     {
       void* p;
         {
           // ----- Begin of critical section ----------------------------------
           scheduler::Critical_section cs;
 
-          p = ::malloc(size);
+          p = ::malloc (size);
           // ----- End of critical section ------------------------------------
         }
-#if defined(_DEBUG)
-      os::diag::trace.putString("os::core::malloc(");
-      os::diag::trace.putDec(size);
-      os::diag::trace.putString(") -> ");
-      os::diag::trace.putHex(p);
-      os::diag::trace.putNewLine();
-#endif
+      trace::printf ("%s(%d) %p\n", __func__, size, p);
+
       return p;
     }
 
@@ -59,19 +55,15 @@ namespace os
     ///
     /// \note Synchronisation is provided by using a scheduler lock.
     void
-    free(void *ptr) noexcept
+    free (void *ptr) noexcept
     {
-#if defined(_DEBUG)
-      os::diag::trace.putString("os::core::free(");
-      os::diag::trace.putHex(ptr);
-      os::diag::trace.putString(")");
-      os::diag::trace.putNewLine();
-#endif
+      trace::printf ("%s(%d) %p %s\n", __func__, ptr);
+
         {
           // ----- Begin of critical section ----------------------------------
           scheduler::Critical_section cs;
 
-          return ::free(ptr);
+          return ::free (ptr);
           // ----- End of critical section ------------------------------------
         }
     }
