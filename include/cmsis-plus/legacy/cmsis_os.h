@@ -614,12 +614,14 @@ const osThreadDef_t os_thread_def_##name = \
 extern const osTimerDef_t os_timer_def_##name
 #else                            // define the object
 #define osTimerDef(name, function)  \
-osTimer os_timer_data_##name; \
+struct { \
+    osTimer data; \
+} os_timer_##name; \
 const osTimerDef_t os_timer_def_##name = \
 { \
     #name, \
     (os_ptimer)(function), \
-    &os_timer_data_##name \
+    &os_timer_##name.data \
 }
 #endif
 
@@ -679,8 +681,8 @@ const osTimerDef_t os_timer_def_##name = \
    * @brief Delete the timer.
    * @param [in]     timer_id      timer ID obtained by @ref osTimerCreate.
    * @retval osOK The specified timer has been deleted.
-   * osErrorISR osTimerDelete cannot be called from interrupt service routines.
-   * osErrorParameter timer_id is incorrect.
+   * @retval osErrorISR osTimerDelete cannot be called from interrupt service routines.
+   * @retval osErrorParameter timer_id is incorrect.
    *
    * @note MUST REMAIN UNCHANGED: @b osTimerDelete shall be consistent in every CMSIS-RTOS.
    */
