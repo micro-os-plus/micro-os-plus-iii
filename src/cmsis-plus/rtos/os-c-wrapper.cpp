@@ -847,18 +847,24 @@ osThreadCreate (const osThreadDef_t* thread_def, void* args)
       return nullptr;
     }
 
-  uint32_t* pcount = thread_def->count;
-  if ((thread_def->instances > 1) && (*pcount >= thread_def->instances))
+  for (uint32_t i = 0; i < thread_def->instances; ++i)
     {
-      return nullptr;
+      Thread* th = (Thread*) &thread_def->data[i];
+      if (th->sched_state () == thread::state::undefined
+          || th->sched_state () == thread::state::terminated
+          || th->sched_state () == thread::state::destroyed)
+        {
+          if (attr.th_stack_size_bytes > 0)
+            {
+              attr.th_stack_address = &thread_def->stack[(i)
+                  * ((thread_def->stacksize + sizeof(uint64_t) - 1)
+                      / sizeof(uint64_t))];
+            }
+          new (th) Thread (attr, (thread::func_t) thread_def->pthread, args);
+          return reinterpret_cast<osThreadId> (th);
+        }
     }
-  Thread* thread = new (&thread_def->data[*pcount]) Thread (
-      attr, (thread::func_t) thread_def->pthread, args);
-  if (thread_def->instances > 1)
-    {
-      (*pcount)++;
-    }
-  return reinterpret_cast<osThreadId> (thread);
+  return nullptr;
 }
 
 /**
@@ -1385,8 +1391,13 @@ osMutexCreate (const osMutexDef_t* mutex_def)
     {
       return nullptr;
     }
+  if (mutex_def == nullptr)
+    {
+      return nullptr;
+    }
 
-  return reinterpret_cast<osMutexId> (new ((void*) mutex_def->data) Mutex ());
+  return reinterpret_cast<osMutexId> (new ((void*) mutex_def->data) Mutex (
+      mutex::recursive_initializer));
 }
 
 /**
@@ -1414,24 +1425,55 @@ osMutexWait (osMutexId mutex_id, uint32_t millisec)
     {
       return osErrorISR;
     }
+  if (mutex_id == nullptr)
+    {
+      return osErrorParameter;
+    }
 
-  result_t status;
+  result_t ret;
   if (millisec == osWaitForever)
     {
-      status = (reinterpret_cast<Mutex&> (*mutex_id)).lock ();
+      ret = (reinterpret_cast<Mutex&> (*mutex_id)).lock ();
+
+      if (ret == ENOTRECOVERABLE)
+        {
+          return osErrorResource;
+        }
+      else if (ret == result::ok)
+        {
+          return osOK;
+        }
+      else
+        {
+          return osErrorOS;
+        }
+
     }
   else if (millisec == 0)
     {
-      status = (reinterpret_cast<Mutex&> (*mutex_id)).try_lock ();
+      ret = (reinterpret_cast<Mutex&> (*mutex_id)).try_lock ();
     }
   else
     {
-      status = (reinterpret_cast<Mutex&> (*mutex_id)).timed_lock (
+      ret = (reinterpret_cast<Mutex&> (*mutex_id)).timed_lock (
           Systick_clock::ticks_cast (millisec * 1000u));
+
+      if (ret == ETIMEDOUT)
+        {
+          return osErrorTimeoutResource;
+        }
+      else if (ret == result::ok)
+        {
+          return osOK;
+        }
+      else
+        {
+          return osErrorOS;
+        }
     }
 
   // TODO: return legacy code for POSIX codes
-  return static_cast<osStatus> (status);
+  return static_cast<osStatus> (ret);
 }
 
 /**
@@ -1449,12 +1491,26 @@ osMutexRelease (osMutexId mutex_id)
     {
       return osErrorISR;
     }
+  if (mutex_id == nullptr)
+    {
+      return osErrorParameter;
+    }
 
-  result_t status;
-  status = (reinterpret_cast<Mutex&> (*mutex_id)).unlock ();
+  result_t res;
+  res = (reinterpret_cast<Mutex&> (*mutex_id)).unlock ();
 
-  // TODO: return legacy code for POSIX codes
-  return static_cast<osStatus> (status);
+  if (res == EPERM)
+    {
+      return osErrorResource;
+    }
+  else if (res == result::ok)
+    {
+      return osOK;
+    }
+  else
+    {
+      return osErrorOS;
+    }
 }
 
 /**
@@ -1472,6 +1528,10 @@ osMutexDelete (osMutexId mutex_id)
   if (scheduler::in_handler_mode ())
     {
       return osErrorISR;
+    }
+  if (mutex_id == nullptr)
+    {
+      return osErrorParameter;
     }
 
   (reinterpret_cast<Mutex&> (*mutex_id)).~Mutex ();
@@ -1500,10 +1560,20 @@ osSemaphoreCreate (const osSemaphoreDef_t* semaphore_def, int32_t count)
     {
       return nullptr;
     }
+  if (semaphore_def == nullptr)
+    {
+      return nullptr;
+    }
 
   semaphore::Attributes attr
     { semaphore_def->name };
   attr.sm_initial_count = (semaphore::count_t) count;
+  // The logic is very strange, the CMSIS expects both the max-count to be the
+  // same as count, and also to accept a count of 0, which leads to
+  // useless semaphores. We patch this behaviour in the wrapper, the main
+  // object uses a more realistic max_count.
+  attr.sm_max_count = (semaphore::count_t) (
+      count == 0 ? osFeature_Semaphore : count);
   return reinterpret_cast<osSemaphoreId> (new ((void*) semaphore_def->data) Semaphore (
       attr));
 }
@@ -1535,24 +1605,46 @@ osSemaphoreWait (osSemaphoreId semaphore_id, uint32_t millisec)
 {
   if (scheduler::in_handler_mode ())
     {
-      return osErrorISR;
+      return -1;
+    }
+  if (semaphore_id == nullptr)
+    {
+      return -1;
     }
 
+  result_t res;
   if (millisec == osWaitForever)
     {
-      (reinterpret_cast<Semaphore&> (*semaphore_id)).wait ();
+      res = (reinterpret_cast<Semaphore&> (*semaphore_id)).wait ();
     }
   else if (millisec == 0)
     {
-      (reinterpret_cast<Semaphore&> (*semaphore_id)).try_wait ();
+      res = (reinterpret_cast<Semaphore&> (*semaphore_id)).try_wait ();
+      if (res == EAGAIN)
+        {
+          return 0;
+        }
     }
   else
     {
-      (reinterpret_cast<Semaphore&> (*semaphore_id)).timed_wait (
+      res = (reinterpret_cast<Semaphore&> (*semaphore_id)).timed_wait (
           Systick_clock::ticks_cast (millisec * 1000u));
+      if (res == ETIMEDOUT)
+        {
+          return 0;
+        }
     }
 
-  return (int32_t) (reinterpret_cast<Semaphore&> (*semaphore_id)).value ();
+  if (res == 0)
+    {
+      int count =
+          (int32_t) (reinterpret_cast<Semaphore&> (*semaphore_id)).value ();
+      return count + 1;
+    }
+  else
+    {
+      return -1;
+    }
 }
 
 /**
@@ -1565,7 +1657,29 @@ osSemaphoreWait (osSemaphoreId semaphore_id, uint32_t millisec)
 osStatus
 osSemaphoreRelease (osSemaphoreId semaphore_id)
 {
-  return static_cast<osStatus> ((reinterpret_cast<Semaphore&> (*semaphore_id)).post ());
+  if (semaphore_id == nullptr)
+    {
+      return osErrorParameter;
+    }
+
+  if ((reinterpret_cast<Semaphore&> (*semaphore_id)).initial_value () == 0)
+    {
+      return osErrorResource;
+    }
+
+  result_t res = (reinterpret_cast<Semaphore&> (*semaphore_id)).post ();
+  if (res == EOVERFLOW)
+    {
+      return osErrorResource;
+    }
+  else if (res == result::ok)
+    {
+      return osOK;
+    }
+  else
+    {
+      return osErrorOS;
+    }
 }
 
 /**
@@ -1583,6 +1697,10 @@ osSemaphoreDelete (osSemaphoreId semaphore_id)
   if (scheduler::in_handler_mode ())
     {
       return osErrorISR;
+    }
+  if (semaphore_id == nullptr)
+    {
+      return osErrorParameter;
     }
 
   (reinterpret_cast<Semaphore&> (*semaphore_id)).~Semaphore ();
@@ -1610,6 +1728,11 @@ osPoolCreate (const osPoolDef_t* pool_def)
       return nullptr;
     }
 
+  if (pool_def == nullptr)
+    {
+      return nullptr;
+    }
+
   mempool::Attributes attr
     { pool_def->name };
   attr.mp_pool_address = pool_def->pool;
@@ -1627,6 +1750,10 @@ osPoolCreate (const osPoolDef_t* pool_def)
 void*
 osPoolAlloc (osPoolId pool_id)
 {
+  if (pool_id == nullptr)
+    {
+      return nullptr;
+    }
   return (reinterpret_cast<Memory_pool&> (*pool_id)).try_alloc ();
 }
 
@@ -1639,6 +1766,11 @@ osPoolAlloc (osPoolId pool_id)
 void*
 osPoolCAlloc (osPoolId pool_id)
 {
+  if (pool_id == nullptr)
+    {
+      return nullptr;
+    }
+
   void* ret;
   ret = (reinterpret_cast<Memory_pool&> (*pool_id)).try_alloc ();
   if (ret != nullptr)
@@ -1658,8 +1790,28 @@ osPoolCAlloc (osPoolId pool_id)
 osStatus
 osPoolFree (osPoolId pool_id, void* block)
 {
-  return static_cast<osStatus> ((reinterpret_cast<Memory_pool&> (*pool_id)).free (
-      block));
+  if (pool_id == nullptr)
+    {
+      return osErrorParameter;
+    }
+  if (block == nullptr)
+    {
+      return osErrorParameter;
+    }
+  result_t res;
+  res = (reinterpret_cast<Memory_pool&> (*pool_id)).free (block);
+  if (res == EINVAL)
+    {
+      return osErrorValue;
+    }
+  else if (res == result::ok)
+    {
+      return osOK;
+    }
+  else
+    {
+      return osErrorOS;
+    }
 }
 
 #endif /* Memory Pool Management available */
