@@ -444,6 +444,14 @@ namespace os
 #endif
     }
 
+    result_t
+    Mutex::reset (void)
+    {
+      // TODO wait list?
+      count_ = 0;
+      return result::ok;
+    }
+
   // ------------------------------------------------------------------------
 
 #pragma GCC diagnostic pop
