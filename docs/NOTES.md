@@ -428,6 +428,17 @@ to state that only the names must remain unchanged, there is no special
 reason for the actual values of the error codes, the priorities, 
 and other enums to be restricted.
 
+* the `osThreadDef()` does not explain that the parameter `instances` means that the macro reserves space for the given number of threads, and a single definition can be used to instantiate multiple threads att he same time.
+
+* the `osThreadDef()/osThreadCreate()` do not explain if it is possible to reuse a thread definition, and in what conditions; a terminated thread definition may be reused; if is given the definition of an active thread, `osThreadCreate()` should return NULL; if multiple instances are defined, they can be dinamically reused, as soon as one thread is terminated, its definition can be reused.
+ 
+* the `osSemaphoreWait()` is documented to return _the number of available tokens (the semaphore count value)_. If non zero, this number means the count value before the call, or the number of available tokens before taking one by the current call.
+
+In other words, for a semaphore initialised with 1 token, the first wait() acuires the token and returns 1; all subsequent non blocking waits return 0.
+
+POSIX defines explicit `sem_getvalue()`, which returns the instantaneous value of the counter; `sem_wait()` does not return the current value, like CMSIS.
+
+
 ## RTX
 
 ### Does not use CMSIS core headers
