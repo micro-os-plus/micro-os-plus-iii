@@ -46,6 +46,32 @@ Based on the standard definition of system clocks, to the initial SysTick
 clock (with ticks granularity) was added a new RTC based clock (with seconds
 granularity).
 
+## Clarify the behaviour of thread signal flags
+
+Use a simplified behaviours, inspired by POSIX, but without queues and handlers. 
+
+## Define the behaviour of Event Flags, similar to that of thread signal flags
+
+Add an Event_flags object.
+
+## Split the implementation code in separate objects
+
+Each object (thread, mutex, semaphore, etc) is defined in its separate file.
+
+## Define separate `port/os-inlines.h` 
+
+All port implementations are static inlines, included on demand in the object implementation files.
+
+## Implement for FreeRTOS
+
+Define each function in `port/os-inlines.h` using FreeRTOS primitives.
+
+## Use the Keil RTOS validator to make the implementation compliant
+
+- realise that osThreadDef() instances mean the macro should reserve space for multiple threads
+- realise that individual thread defs can be reused after thread terminates, even for multiple instances
+- add stack to thread definitions
+
  
 
 
