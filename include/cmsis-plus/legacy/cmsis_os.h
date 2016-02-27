@@ -271,7 +271,7 @@ extern "C"
     uint32_t instances; ///< maximum number of instances of that thread function
     uint32_t stacksize; ///< stack size requirements in bytes; 0 is default stack size
     osThread* data;
-    uint32_t* count;
+    uint64_t* stack; // align the stack at 8 bytes
   } osThreadDef_t;
 
 #pragma GCC diagnostic pop
@@ -466,7 +466,7 @@ extern const osThreadDef_t os_thread_def_##name
 #define osThreadDef(name, priority, instances, stacksz)  \
 struct { \
     osThread data[instances]; \
-    uint32_t count; \
+    uint64_t stack[(instances)*((stacksz+sizeof(uint64_t)-1)/sizeof(uint64_t))]; \
 } os_thread_##name; \
 const osThreadDef_t os_thread_def_##name = \
 { \
@@ -476,7 +476,7 @@ const osThreadDef_t os_thread_def_##name = \
     (instances), \
     (stacksz), \
     &os_thread_##name.data[0], \
-    &os_thread_##name.count \
+    &os_thread_##name.stack[0] \
 }
 #endif
 
