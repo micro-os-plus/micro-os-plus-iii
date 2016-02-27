@@ -82,6 +82,8 @@ namespace os
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
+      // The CMSIS validator requires the max_count to be equal to
+      // the initial count, which can be 0, but we patch it on the way.
       assert(max_count_ > 0);
       assert(attr.sm_initial_count <= max_count_);
 
@@ -177,7 +179,7 @@ namespace os
 #else
 
       Critical_section_irq cs; // ----- Critical section -----
-      if (count_ > this->max_count_)
+      if (count_ >= this->max_count_)
         {
           return EOVERFLOW;
         }
@@ -277,8 +279,6 @@ namespace os
     result_t
     Semaphore::try_wait ()
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
-
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
 #if defined(OS_INCLUDE_PORT_RTOS_SEMAPHORE)
