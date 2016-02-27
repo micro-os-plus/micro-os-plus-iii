@@ -17,6 +17,9 @@
  */
 
 #include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/diag/trace.h>
+
+#include "cmsis_device.h"
 
 #include <cstdlib>
 
@@ -52,7 +55,12 @@ namespace os
 int __attribute__((weak))
 main (int argc, char* argv[])
 {
+  using namespace os;
   using namespace os::rtos;
+
+  // At this stage the system clock should have already been configured
+  // at high speed.
+  trace::printf ("System clock: %u Hz\n", SystemCoreClock);
 
   scheduler::initialize ();
 
@@ -70,7 +78,7 @@ main (int argc, char* argv[])
   // interrupts, and some implementations (like FreeRTOS) are not
   // able to preserve this stack content.
 
-  static stack::element_t main_stack[256/sizeof(stack::element_t)];
+  static stack::element_t main_stack[256 / sizeof(stack::element_t)];
 
   static thread::Attributes attr
     { "main" };
