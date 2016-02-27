@@ -302,7 +302,7 @@ namespace os
           : priority_t
             {
               //
-          none = 0, // undefined
+          none = 0, // undefined, thread not initialised
           idle = 1, // system reserved for IDLE thread
           lowest = 2, // lowest available for user code
           low = (2 << shift),
@@ -1182,7 +1182,20 @@ namespace os
        * @brief Lock the mutex.
        * @retval result::ok The mutex was locked.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-       * @retval ENOTRECOVERABLE The mutex was not locked.
+       * @retval ENOTRECOVERABLE The state protected by the mutex is
+       *  not recoverable..
+       * @retval EAGAIN The mutex could not be acquired because the maximum
+       *  number of recursive locks for mutex has been exceeded.
+       * @retval EINVAL The mutex was created with the protocol
+       *  attribute having the value PTHREAD_PRIO_PROTECT and the
+       *  calling thread's priority is higher than the mutex's
+       *  current priority ceiling.
+       * @retval EOWNERDEAD The mutex is a robust mutex and the process
+       *  containing the previous owning thread terminated while holding
+       *  the mutex lock. The mutex lock shall be acquired by the calling
+       *  thread and it is up to the new owner to make the state consistent.
+       * @retval EDEADLK The mutex type is PTHREAD_MUTEX_ERRORCHECK and
+       *  the current thread already owns the mutex.
        */
       result_t
       lock (void);
@@ -1191,7 +1204,22 @@ namespace os
        * @brief Try to lock the mutex.
        * @retval result::ok The mutex was locked.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-       * @retval EAGAIN The mutex was not locked.
+       * @retval ENOTRECOVERABLE The state protected by the mutex is
+       *  not recoverable..
+       * @retval EAGAIN The mutex could not be acquired because the maximum
+       *  number of recursive locks for mutex has been exceeded.
+       * @retval EINVAL The mutex was created with the protocol
+       *  attribute having the value PTHREAD_PRIO_PROTECT and the
+       *  calling thread's priority is higher than the mutex's
+       *  current priority ceiling.
+       * @retval EOWNERDEAD The mutex is a robust mutex and the process
+       *  containing the previous owning thread terminated while holding
+       *  the mutex lock. The mutex lock shall be acquired by the calling
+       *  thread and it is up to the new owner to make the state consistent.
+       * @retval EDEADLK The mutex type is PTHREAD_MUTEX_ERRORCHECK and
+       *  the current thread already owns the mutex.
+       * @retval EBUSY The mutex could not be acquired because it was
+       *  already locked.
        */
       result_t
       try_lock (void);
@@ -1203,7 +1231,20 @@ namespace os
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval ETIMEDOUT The mutex could not be locked before the
        *  specified timeout expired.
-       * @retval ENOTRECOVERABLE The mutex was not locked.
+       * @retval ENOTRECOVERABLE The state protected by the mutex
+       *  is not recoverable.
+       * @retval EAGAIN The mutex could not be acquired because the
+       *  maximum number of recursive locks for mutex has been exceeded.
+       * @retval EDEADLK The mutex type is PTHREAD_MUTEX_ERRORCHECK
+       *  and the current thread already owns the mutex.
+       * @retval EINVAL The process or thread would have blocked, and
+       *  the abstime parameter specified a nanoseconds field value
+       *  less than zero or greater than or equal to 1000 million.
+       * @retval EOWNERDEAD The mutex is a robust mutex and the process
+       *  containing the previous owning thread terminated while holding
+       *  the mutex lock. The mutex lock shall be acquired by the
+       *  calling thread and it is up to the new owner to make the
+       *  state consistent.
        */
       result_t
       timed_lock (systicks_t ticks);
@@ -1211,7 +1252,10 @@ namespace os
       /**
        * @brief Unlock the mutex.
        * @retval result::ok The mutex was unlocked.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine;
+       *  the mutex type is PTHREAD_MUTEX_ERRORCHECK or
+       *  PTHREAD_MUTEX_RECURSIVE, or the mutex is a robust mutex,
+       *  and the current thread does not own the mutex.
        * @retval ENOTRECOVERABLE The mutex was not unlocked.
        */
       result_t
@@ -1240,9 +1284,17 @@ namespace os
        * @brief Mark mutex as consistent.
        * @retval result::ok.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EINVAL The mutex object referenced by mutex is not robust
+       *  or does not protect an inconsistent state.
        */
       result_t
       consistent (void);
+
+      Thread*
+      owner (void);
+
+      result_t
+      reset (void);
 
     protected:
 
@@ -1567,6 +1619,12 @@ namespace os
        */
       result_t
       reset (void);
+
+      semaphore::count_t
+      initial_value (void) const;
+
+      semaphore::count_t
+      max_value (void) const;
 
     protected:
 
@@ -2557,6 +2615,14 @@ namespace os
       return this == &rhs;
     }
 
+    inline Thread*
+    Mutex::owner (void)
+    {
+      return owner_;
+    }
+
+
+
     // ========================================================================
 
     namespace condvar
@@ -2626,6 +2692,18 @@ namespace os
     Semaphore::value (void) const
     {
       return count_;
+    }
+
+    inline semaphore::count_t
+    Semaphore::initial_value (void) const
+    {
+      return initial_count_;
+    }
+
+    inline semaphore::count_t
+    Semaphore::max_value (void) const
+    {
+      return max_count_;
     }
 
     // ========================================================================
