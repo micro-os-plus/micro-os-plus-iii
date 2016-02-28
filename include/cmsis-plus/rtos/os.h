@@ -1820,6 +1820,9 @@ namespace os
       result_t
       reset (void);
 
+      void*
+      pool(void);
+
     protected:
 
       void*
@@ -2760,6 +2763,13 @@ namespace os
     {
       return (count () == capacity ());
     }
+
+    inline       void*
+    Memory_pool::pool(void)
+    {
+      return pool_addr_;
+    }
+
 
     // ========================================================================
 
