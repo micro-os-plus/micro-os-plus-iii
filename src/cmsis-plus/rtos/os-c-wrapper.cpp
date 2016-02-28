@@ -1234,7 +1234,7 @@ osTimerDelete (osTimerId timer_id)
 int32_t
 osSignalSet (osThreadId thread_id, int32_t signals)
 {
-  if (scheduler::in_handler_mode ())
+  if (thread_id == nullptr)
     {
       return 0x80000000;
     }
@@ -1258,6 +1258,10 @@ osSignalSet (osThreadId thread_id, int32_t signals)
 int32_t
 osSignalClear (osThreadId thread_id, int32_t signals)
 {
+  if (thread_id == nullptr)
+    {
+      return 0x80000000;
+    }
   if (scheduler::in_handler_mode () || (signals == 0))
     {
       return 0x80000000;
@@ -1304,6 +1308,11 @@ osSignalWait (int32_t signals, uint32_t millisec)
       return event;
     }
 
+  if (signals & 0x80000000)
+    {
+      event.status = osErrorValue;
+      return event;
+    }
   result_t res;
   if (millisec == osWaitForever)
     {
