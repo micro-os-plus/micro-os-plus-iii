@@ -2148,15 +2148,23 @@ osMailAlloc (osMailQId queue_id, uint32_t millisec)
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
   if (millisec == osWaitForever)
     {
-      ret = (reinterpret_cast<Memory_pool&> ((queue_id->pool))).alloc ();
+      if (scheduler::in_handler_mode ())
+        {
+          return nullptr;
+        }
+      ret = (reinterpret_cast<Memory_pool&> (queue_id->pool)).alloc ();
     }
   else if (millisec == 0)
     {
-      ret = (reinterpret_cast<Memory_pool&> ((queue_id->pool))).try_alloc ();
+      ret = (reinterpret_cast<Memory_pool&> (queue_id->pool)).try_alloc ();
     }
   else
     {
-      ret = (reinterpret_cast<Memory_pool&> ((queue_id->pool))).timed_alloc (
+      if (scheduler::in_handler_mode ())
+        {
+          return nullptr;
+        }
+      ret = (reinterpret_cast<Memory_pool&> (queue_id->pool)).timed_alloc (
           Systick_clock::ticks_cast (millisec * 1000u));
     }
 #pragma GCC diagnostic pop
@@ -2194,9 +2202,8 @@ osMailCAlloc (osMailQId queue_id, uint32_t millisec)
     {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
-      memset (
-          ret, 0,
-          (reinterpret_cast<Memory_pool&> ((queue_id->pool))).block_size ());
+      memset (ret, 0,
+              (reinterpret_cast<Memory_pool&> (queue_id->pool)).block_size ());
 #pragma GCC diagnostic pop
     }
   return ret;
@@ -2216,12 +2223,25 @@ osMailPut (osMailQId queue_id, void* mail)
     {
       return osErrorParameter;
     }
+  if (mail == nullptr)
+    {
+      return osErrorValue;
+    }
+
+  // Validate pointer.
+  Memory_pool* pool = reinterpret_cast<Memory_pool*> (&queue_id->pool);
+  if (((char*) mail < (char*) (pool->pool ()))
+      || (((char*) mail)
+          >= ((char*) (pool->pool ()) + pool->capacity () * pool->block_size ())))
+    {
+      return osErrorValue;
+    }
 
   result_t res;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
-  res = (reinterpret_cast<Message_queue&> ((queue_id->queue))).try_send (
-      (const char*) mail, sizeof(void*), 0);
+  res = (reinterpret_cast<Message_queue&> (queue_id->queue)).try_send (
+      (const char*) &mail, sizeof(void*), 0);
 #pragma GCC diagnostic pop
   if (res == result::ok)
     {
@@ -2255,37 +2275,91 @@ osMailPut (osMailQId queue_id, void* mail)
  * @note Can be invoked from Interrupt Service Routines.
  */
 osEvent
-osMailGet (osMailQId queue_id, uint32_t millisec)
+osMailGet (osMailQId mail_id, uint32_t millisec)
 {
   osEvent event;
   result_t res;
+  if (mail_id == nullptr)
+    {
+      event.status = osErrorParameter;
+      return event;
+    }
   if (millisec == osWaitForever)
     {
-      res = (reinterpret_cast<Message_queue&> (*queue_id)).receive (
+      if (scheduler::in_handler_mode ())
+        {
+          event.status = osErrorParameter;
+          return event;
+        }
+      res = (reinterpret_cast<Message_queue&> ((mail_id->queue))).receive (
           (char*) &event.value.p, sizeof(void*),
           NULL);
       // osEventMail for ok,
+      if (res == result::ok)
+        {
+          event.status = osEventMail;
+        }
+      else if (res == EINVAL || res == EMSGSIZE)
+        {
+          event.status = osErrorParameter;
+        }
+      else
+        {
+          event.status = osErrorOS;
+        }
     }
   else if (millisec == 0)
     {
-      res = (reinterpret_cast<Message_queue&> (*queue_id)).try_receive (
+      res = (reinterpret_cast<Message_queue&> (mail_id->queue)).try_receive (
           (char*) &event.value.p, sizeof(void*),
           NULL);
       // osEventMail for ok,
+      if (res == result::ok)
+        {
+          event.status = osEventMail;
+        }
+      else if (res == EINVAL || res == EMSGSIZE)
+        {
+          event.status = osErrorParameter;
+        }
+      else if (res == EAGAIN)
+        {
+          event.status = osOK;
+        }
+      else
+        {
+          event.status = osErrorOS;
+        }
     }
   else
     {
-      res = (reinterpret_cast<Message_queue&> (*queue_id)).timed_receive (
+      if (scheduler::in_handler_mode ())
+        {
+          event.status = osErrorParameter;
+          return event;
+        }
+      res = (reinterpret_cast<Message_queue&> (mail_id->queue)).timed_receive (
           (char*) &event.value.p, sizeof(void*), NULL,
           Systick_clock::ticks_cast (millisec * 1000u));
       // osEventMail for ok, osEventTimeout
+      if (res == result::ok)
+        {
+          event.status = osEventMail;
+        }
+      else if (res == EINVAL || res == EMSGSIZE)
+        {
+          event.status = osErrorParameter;
+        }
+      else if (res == ETIMEDOUT)
+        {
+          event.status = osEventTimeout;
+        }
+      else
+        {
+          event.status = osErrorOS;
+        }
     }
 
-  event.status = static_cast<osStatus> (res);
-  if (event.status == osEventMessage)
-    {
-      event.status = osEventMail;
-    }
   return event;
 }
 
@@ -2298,9 +2372,18 @@ osMailGet (osMailQId queue_id, uint32_t millisec)
  * @note Can be invoked from Interrupt Service Routines.
  */
 osStatus
-osMailFree (osMailQId queue_id, void* mail)
+osMailFree (osMailQId mail_id, void* mail)
 {
-  return osPoolFree (&(queue_id->pool), mail);
+  if (mail_id == nullptr)
+    {
+      return osErrorParameter;
+    }
+  if (mail == nullptr)
+    {
+      return osErrorValue;
+    }
+
+  return osPoolFree (&(mail_id->pool), mail);
 }
 
 #endif /* Mail Queues available */
