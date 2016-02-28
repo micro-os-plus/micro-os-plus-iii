@@ -1472,7 +1472,6 @@ osMutexWait (osMutexId mutex_id, uint32_t millisec)
         }
     }
 
-  // TODO: return legacy code for POSIX codes
   return static_cast<osStatus> (ret);
 }
 
@@ -1836,6 +1835,11 @@ osMessageCreate (const osMessageQDef_t* queue_def,
       return nullptr;
     }
 
+  if (queue_def == nullptr)
+    {
+      return nullptr;
+    }
+
   mqueue::Attributes attr
     { queue_def->name };
   attr.queue_address = queue_def->queue;
@@ -1869,21 +1873,83 @@ osMessagePut (osMessageQId queue_id, uint32_t info, uint32_t millisec)
 #if defined ( __clang__ )
 #pragma clang diagnostic ignored "-Wint-to-pointer-cast"
 #endif
+
+  if (queue_id == nullptr)
+    {
+      return osErrorParameter;
+    }
+
+  result_t res;
   if (millisec == osWaitForever)
     {
-      return static_cast<osStatus> ((reinterpret_cast<Message_queue&> (*queue_id)).send (
-          (const char*) info, sizeof(uint32_t), 0));
+      if (scheduler::in_handler_mode ())
+        {
+          return osErrorParameter;
+        }
+      res = (reinterpret_cast<Message_queue&> (*queue_id)).send (
+          (const char*) &info, sizeof(uint32_t), 0);
+      // osOK, osErrorResource, osErrorParameter
+      if (res == result::ok)
+        {
+          return osOK;
+        }
+      else if (res == EINVAL || res == EMSGSIZE)
+        {
+          return osErrorParameter;
+        }
+      else
+        {
+          return osErrorResource;
+        }
     }
   else if (millisec == 0)
     {
-      return static_cast<osStatus> ((reinterpret_cast<Message_queue&> (*queue_id)).try_send (
-          (const char*) info, sizeof(uint32_t), 0));
+      res = (reinterpret_cast<Message_queue&> (*queue_id)).try_send (
+          (const char*) &info, sizeof(uint32_t), 0);
+      // osOK, osErrorResource, osErrorParameter
+      if (res == result::ok)
+        {
+          return osOK;
+        }
+      else if (res == EAGAIN)
+        {
+          return osErrorResource;
+        }
+      else if (res == EINVAL || res == EMSGSIZE)
+        {
+          return osErrorParameter;
+        }
+      else
+        {
+          return osErrorOS;
+        }
     }
   else
     {
-      return static_cast<osStatus> ((reinterpret_cast<Message_queue&> (*queue_id)).timed_send (
-          (const char*) info, sizeof(uint32_t), 0,
-          Systick_clock::ticks_cast (millisec * 1000u)));
+      if (scheduler::in_handler_mode ())
+        {
+          return osErrorParameter;
+        }
+      res = (reinterpret_cast<Message_queue&> (*queue_id)).timed_send (
+          (const char*) &info, sizeof(uint32_t), 0,
+          Systick_clock::ticks_cast (millisec * 1000u));
+      // osOK, osErrorTimeoutResource, osErrorParameter
+      if (res == result::ok)
+        {
+          return osOK;
+        }
+      else if (res == EINVAL || res == EMSGSIZE)
+        {
+          return osErrorParameter;
+        }
+      else if (res == ETIMEDOUT)
+        {
+          return osErrorTimeoutResource;
+        }
+      else
+        {
+          return osErrorOS;
+        }
     }
 #pragma GCC diagnostic pop
 }
@@ -1913,34 +1979,89 @@ osEvent
 osMessageGet (osMessageQId queue_id, uint32_t millisec)
 {
   osEvent event;
-  uint32_t msg;
   result_t res;
+  if (queue_id == nullptr)
+    {
+      event.status = osErrorParameter;
+      return event;
+    }
   if (millisec == osWaitForever)
     {
+      if (scheduler::in_handler_mode ())
+        {
+          event.status = osErrorParameter;
+          return event;
+        }
       res = (reinterpret_cast<Message_queue&> (*queue_id)).receive (
-          (char*) &msg, sizeof(uint32_t),
+          (char*) &event.value.v, sizeof(uint32_t),
           NULL);
       // result::event_message;
+      if (res == result::ok)
+        {
+          event.status = osEventMessage;
+        }
+      else if (res == EINVAL || res == EMSGSIZE)
+        {
+          event.status = osErrorParameter;
+        }
+      else
+        {
+          event.status = osErrorOS;
+        }
     }
   else if (millisec == 0)
     {
       res = (reinterpret_cast<Message_queue&> (*queue_id)).try_receive (
-          (char*) &msg, sizeof(uint32_t), NULL);
+          (char*) &event.value.v, sizeof(uint32_t), NULL);
       // result::event_message when message;
       // result::ok when no meessage
+      if (res == result::ok)
+        {
+          event.status = osEventMessage;
+        }
+      else if (res == EINVAL || res == EMSGSIZE)
+        {
+          event.status = osErrorParameter;
+        }
+      else if (res == EAGAIN)
+        {
+          event.status = osOK;
+        }
+      else
+        {
+          event.status = osErrorOS;
+        }
     }
   else
     {
+      if (scheduler::in_handler_mode ())
+        {
+          event.status = osErrorParameter;
+          return event;
+        }
       res = (reinterpret_cast<Message_queue&> (*queue_id)).timed_receive (
-          (char*) &msg, sizeof(uint32_t), NULL,
+          (char*) &event.value.v, sizeof(uint32_t), NULL,
           Systick_clock::ticks_cast (millisec * 1000u));
       // result::event_message when message;
       // result::event_timeout when timeout;
+      if (res == result::ok)
+        {
+          event.status = osEventMessage;
+        }
+      else if (res == EINVAL || res == EMSGSIZE)
+        {
+          event.status = osErrorParameter;
+        }
+      else if (res == ETIMEDOUT)
+        {
+          event.status = osEventTimeout;
+        }
+      else
+        {
+          event.status = osErrorOS;
+        }
     }
 
-  // TODO: be sure osEventMessage is returned when appropriate.
-  event.status = static_cast<osStatus> (res);
-  event.value.v = msg;
   return event;
 }
 
@@ -1967,12 +2088,16 @@ osMailCreate (const osMailQDef_t* queue_def,
     {
       return nullptr;
     }
+  if (queue_def == nullptr)
+    {
+      return nullptr;
+    }
 
   mempool::Attributes pool_attr
     { queue_def->name };
   pool_attr.mp_pool_address = queue_def->pool;
   new ((void*) &queue_def->data->pool) Memory_pool (
-      (mempool::size_t) queue_def->pool_sz,
+      pool_attr, (mempool::size_t) queue_def->items,
       (mempool::size_t) queue_def->pool_item_sz);
 
   mqueue::Attributes queue_attr
@@ -1983,7 +2108,7 @@ osMailCreate (const osMailQDef_t* queue_def,
       queue_attr, (mqueue::size_t) queue_def->items,
       (mqueue::size_t) queue_def->queue_item_sz);
 
-  return (osMailQId) (&queue_def->data);
+  return (osMailQId) (queue_def->data);
 }
 
 /**
@@ -2012,6 +2137,11 @@ osMailCreate (const osMailQDef_t* queue_def,
 void*
 osMailAlloc (osMailQId queue_id, uint32_t millisec)
 {
+  if (queue_id == nullptr)
+    {
+      return nullptr;
+    }
+
   void* ret = nullptr;
 
 #pragma GCC diagnostic push
@@ -2082,11 +2212,25 @@ osMailCAlloc (osMailQId queue_id, uint32_t millisec)
 osStatus
 osMailPut (osMailQId queue_id, void* mail)
 {
+  if (queue_id == nullptr)
+    {
+      return osErrorParameter;
+    }
+
+  result_t res;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
-  return static_cast<osStatus> ((reinterpret_cast<Message_queue&> ((queue_id->queue))).try_send (
-      (const char*) mail, sizeof(void*), 0));
+  res = (reinterpret_cast<Message_queue&> ((queue_id->queue))).try_send (
+      (const char*) mail, sizeof(void*), 0);
 #pragma GCC diagnostic pop
+  if (res == result::ok)
+    {
+      return osOK;
+    }
+  else
+    {
+      return osErrorOS;
+    }
 }
 
 #pragma GCC diagnostic push
@@ -2114,25 +2258,27 @@ osEvent
 osMailGet (osMailQId queue_id, uint32_t millisec)
 {
   osEvent event;
-  void* msg;
   result_t res;
   if (millisec == osWaitForever)
     {
       res = (reinterpret_cast<Message_queue&> (*queue_id)).receive (
-          (char*) &msg, sizeof(void*),
+          (char*) &event.value.p, sizeof(void*),
           NULL);
+      // osEventMail for ok,
     }
   else if (millisec == 0)
     {
       res = (reinterpret_cast<Message_queue&> (*queue_id)).try_receive (
-          (char*) &msg, sizeof(void*),
+          (char*) &event.value.p, sizeof(void*),
           NULL);
+      // osEventMail for ok,
     }
   else
     {
       res = (reinterpret_cast<Message_queue&> (*queue_id)).timed_receive (
-          (char*) &msg, sizeof(void*), NULL,
+          (char*) &event.value.p, sizeof(void*), NULL,
           Systick_clock::ticks_cast (millisec * 1000u));
+      // osEventMail for ok, osEventTimeout
     }
 
   event.status = static_cast<osStatus> (res);
@@ -2140,7 +2286,6 @@ osMailGet (osMailQId queue_id, uint32_t millisec)
     {
       event.status = osEventMail;
     }
-  event.value.p = msg;
   return event;
 }
 
