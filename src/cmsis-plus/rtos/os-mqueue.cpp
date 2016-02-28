@@ -158,7 +158,10 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes > msg_size_bytes_, EINVAL);
+      os_assert_err(nbytes >= msg_size_bytes_, EINVAL);
+
+      trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes, mprio,
+                     this, name ());
 
 #if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
 
@@ -203,7 +206,10 @@ namespace os
                              mqueue::priority_t mprio)
     {
       os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes > msg_size_bytes_, EINVAL);
+      os_assert_err(nbytes >= msg_size_bytes_, EINVAL);
+
+      trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes, mprio,
+                     this, name ());
 
 #if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
 
@@ -263,7 +269,10 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes > msg_size_bytes_, EINVAL);
+      os_assert_err(nbytes >= msg_size_bytes_, EINVAL);
+
+      trace::printf ("%s(%p,%d,%d,%d_ticks) @%p %s\n", __func__, msg, nbytes,
+                     mprio, ticks, this, name ());
 
       if (ticks == 0)
         {
@@ -320,7 +329,10 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes > msg_size_bytes_, EMSGSIZE);
+      os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
+
+      trace::printf ("%s(%p,%d) @%p %s\n", __func__, msg, nbytes, this,
+                     name ());
 
 #if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
 
@@ -365,7 +377,10 @@ namespace os
                                 mqueue::priority_t* mprio)
     {
       os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes > msg_size_bytes_, EMSGSIZE);
+      os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
+
+      trace::printf ("%s(%p,%d) @%p %s\n", __func__, msg, nbytes, this,
+                     name ());
 
 #if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
 
@@ -432,7 +447,10 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes > msg_size_bytes_, EMSGSIZE);
+      os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
+
+      trace::printf ("%s(%p,%d,%d_ticks) @%p %s\n", __func__, msg, nbytes,
+                     ticks, this, name ());
 
       if (ticks == 0)
         {
@@ -466,6 +484,8 @@ namespace os
     Message_queue::reset (void)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
+
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
 #if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
 
