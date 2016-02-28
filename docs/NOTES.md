@@ -395,6 +395,10 @@ This is confusing, and separate calls are prefered.
 The explanation about thread id is listed under `osMessageQDef()` instead of 
 `osMessageCreate()` (which generally ignores it, anyway).
 
+#### `osMessagePut()` inconsecvent error when called from ISR
+
+When called from ISR with a timeout different from 0, this function is expected to return `osErrorParameter`, not `osErrorISR` like most other function.
+
 ### Mail queues
 
 #### Apparently redundant
@@ -410,7 +414,7 @@ objects.
 
 Both the RTX and the FreeRTOS implementations ignore this parameter.
 
-#### The single osMailPut() has three different meanings
+#### The single `osMailPut()` has three different meanings
 
 Based on the `millisec` parameter, the function can wait indefinitely, 
 try to wait or wait with timeout. However, when invoked form an ISR, 
@@ -420,6 +424,10 @@ Even worse, the function can be invoked from ISRs only with the value of the
 timeout set to 0;
 
 This is confusing, and separate calls are prefered.
+
+#### `osMailPut()` inconsecvent error when called from ISR
+
+When called from ISR with a timeout different from 0, this function is expected to return `osErrorParameter`, not `osErrorISR` like most other function.
 
 ### Documentation
 
@@ -438,6 +446,7 @@ In other words, for a semaphore initialised with 1 token, the first wait() acuir
 
 POSIX defines explicit `sem_getvalue()`, which returns the instantaneous value of the counter; `sem_wait()` does not return the current value, like CMSIS.
 
+* it is not documented what `osMessagePut()` should return when called from ISR with timeout not zero; the validator expects osErrorParameter, but osErrorISR would be more appropriate.
 
 ## RTX
 
