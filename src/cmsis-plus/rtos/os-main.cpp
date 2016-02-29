@@ -78,7 +78,7 @@ main (int argc, char* argv[])
   // interrupts, and some implementations (like FreeRTOS) are not
   // able to preserve this stack content.
 
-  static stack::element_t main_stack[256 / sizeof(stack::element_t)];
+  static stack::element_t main_stack[OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES / sizeof(stack::element_t)];
 
   static thread::Attributes attr
     { "main" };
