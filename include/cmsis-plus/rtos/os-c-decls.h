@@ -129,8 +129,10 @@ extern "C"
     os_thread_func_t func;
     os_thread_func_args_t func_args;
     void* func_result_;
-    void* impl;
-    void* impl_event_flags;
+#if defined(OS_INCLUDE_PORT_RTOS_THREAD)
+    os_thread_port_data_t port_;
+#endif
+    void* joiner;
     size_t stack_size_bytes;
     os_thread_state_t state;
     os_thread_prio_t prio;
