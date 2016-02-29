@@ -146,6 +146,7 @@ namespace os
     void
     Thread::_invoke_with_exit (Thread* thread)
     {
+      trace::printf ("%s @%p %s\n", __func__, thread, thread->name ());
       thread->exit (thread->func_ (thread->func_args_));
     }
 
