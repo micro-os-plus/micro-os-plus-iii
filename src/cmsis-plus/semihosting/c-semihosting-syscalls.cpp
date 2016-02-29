@@ -1041,7 +1041,8 @@ __posix_readlink (const char* path, char* buf, size_t bufsize)
 void
 _exit (int status)
 {
-#if defined(DEBUG)
+#if defined(_DEBUG)
+  // Temporarily disable it, until QEMU fix.
   trace_dbg_bkpt();
 #endif
 
