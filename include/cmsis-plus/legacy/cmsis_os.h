@@ -465,8 +465,8 @@ extern const osThreadDef_t os_thread_def_##name
 #else                            // define the object
 #define osThreadDef(name, priority, instances, stacksz)  \
 struct { \
-    osThread data[instances]; \
     uint64_t stack[(instances)*((stacksz+sizeof(uint64_t)-1)/sizeof(uint64_t))]; \
+    osThread data[instances]; \
 } os_thread_##name; \
 const osThreadDef_t os_thread_def_##name = \
 { \
