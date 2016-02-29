@@ -220,6 +220,8 @@ namespace os
 
       sig_mask_ = 0;
 
+      joiner_ = nullptr;
+
       trace::printf ("%s @%p %s %d %d\n", __func__, this, name (), prio_,
                      stack_size_bytes_);
 
@@ -382,17 +384,22 @@ namespace os
 
       trace::printf ("%s(%d) @%p %s\n", __func__, prio, this, name ());
 
+      result_t res = result::ok;
+
 #if defined(OS_INCLUDE_PORT_RTOS_THREAD)
 
-      return port::Thread::sched_prio (this, prio);
+      res = port::Thread::sched_prio (this, prio);
 
 #else
 
       // TODO
       prio_ = prio;
-      return result::ok;
 
 #endif
+
+      this_thread::yield();
+
+      return res;
     }
 
     /**
@@ -428,19 +435,11 @@ namespace os
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
-#if defined(OS_INCLUDE_PORT_RTOS_THREAD)
-
-      result_t res = port::Thread::join (this);
-      if (res != result::ok)
+      while (sched_state_ != thread::state::terminated)
         {
-          return res;
+          joiner_ = this;
+          suspend ();
         }
-
-#else
-
-      // TODO
-
-#endif
 
       if (exit_ptr != nullptr)
         {
@@ -560,7 +559,7 @@ namespace os
     void
     Thread::exit (void* value_ptr)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      assert(!scheduler::in_handler_mode ());
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
@@ -571,21 +570,24 @@ namespace os
           return; // Already terminated
         }
 
-      // If not the current thread, probably must suspend.
-
       func_result_ = value_ptr;
       sched_state_ = thread::state::terminated;
+
+      if (joiner_ != nullptr)
+        {
+          joiner_->wakeup ();
+        }
 
 #if defined(OS_INCLUDE_PORT_RTOS_THREAD)
 
       port::Thread::exit (this);
+      // Does not return.
 
 #else
 
       // TODO
 
 #endif
-
     }
 
     /**
@@ -600,21 +602,32 @@ namespace os
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
-      result_t res;
+      if (sched_state_ == thread::state::terminated)
+        {
+          trace::printf ("%s() @%p %s already terminated\n", __func__, this,
+                         name ());
+          return result::ok; // Already terminated
+        }
 
 #if defined(OS_INCLUDE_PORT_RTOS_THREAD)
 
-      res = port::Thread::kill (this);
+      port::Thread::kill (this);
 
 #else
 
       // TODO
-      res = result::ok;
 
 #endif
-      sched_state_ = thread::state::inactive;
 
-      return res;
+      func_result_ = nullptr;
+      sched_state_ = thread::state::terminated;
+
+      if (joiner_ != nullptr)
+        {
+          joiner_->wakeup ();
+        }
+
+      return result::ok;
     }
 
     /**
@@ -660,7 +673,7 @@ namespace os
     thread::sigset_t
     Thread::sig_get (thread::sigset_t mask, flags::mode_t mode)
     {
-      os_assert_err(!scheduler::in_handler_mode (), sig::error);
+      os_assert_err(!scheduler::in_handler_mode (), thread::sig::all);
 
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
 
