@@ -887,40 +887,57 @@ namespace os
           ticks = 1;
         }
 
-      Systick_clock::rep start = Systick_clock::now ();
+        {
+          Critical_section_irq cs; // ----- Critical section -----
+
+          if (_try_wait (mask, oflags, mode) == result::ok)
+            {
+              return result::ok;
+            }
+        }
+
+      Systick_clock::rep prev = Systick_clock::now ();
+      Systick_clock::sleep_rep slept_ticks = 0;
+
+      result_t res = ENOTRECOVERABLE;
       for (;;)
         {
-          Systick_clock::sleep_rep slept_ticks;
-            {
-              Systick_clock::rep now = Systick_clock::now ();
-              slept_ticks = (Systick_clock::sleep_rep) (now - start);
-              trace::printf ("%s(0x%X, %d, %d)=%d @%p %s\n", __func__, mask,
-                             mode, ticks, slept_ticks, this, name ());
-            }
+          Systick_clock::wait (ticks - slept_ticks);
+
+          Systick_clock::rep now = Systick_clock::now ();
+          slept_ticks += (Systick_clock::sleep_rep) (now - prev);
+
             {
               Critical_section_irq cs; // ----- Critical section -----
 
               if (_try_wait (mask, oflags, mode) == result::ok)
                 {
-                  return result::ok;
+                  res = result::ok;
+                  break;
                 }
             }
 
-          Systick_clock::rep now = Systick_clock::now ();
-          slept_ticks = (Systick_clock::sleep_rep) (now - start);
           if (slept_ticks >= ticks)
             {
-              return ETIMEDOUT;
+              res = ETIMEDOUT;
+              break;
             }
-
-          Systick_clock::wait (ticks - slept_ticks);
 
           if (interrupted ())
             {
-              return EINTR;
+              res = EINTR;
+              break;
             }
+
+          prev = now;
         }
-      return ENOTRECOVERABLE;
+
+#if 1
+      trace::printf ("%s(0x%X, %d, %d)=%d @%p %s\n", __func__, mask, mode,
+                     ticks, slept_ticks, this, name ());
+#endif
+
+      return res;
     }
 
 // --------------------------------------------------------------------------
