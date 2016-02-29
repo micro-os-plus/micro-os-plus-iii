@@ -869,6 +869,8 @@ osThreadCreate (const osThreadDef_t* thread_def, void* args)
                       / sizeof(uint64_t))];
             }
           new (th) Thread (attr, (thread::func_t) thread_def->pthread, args);
+
+          this_thread::yield();
           return reinterpret_cast<osThreadId> (th);
         }
     }
