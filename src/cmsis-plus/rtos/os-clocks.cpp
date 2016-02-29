@@ -225,7 +225,7 @@ namespace os
           Systick_clock::rep now = Systick_clock::now ();
           Systick_clock::sleep_rep slept_ticks = (Systick_clock::sleep_rep) (now
               - prev);
-          if (slept_ticks >= ticks)
+          if (slept_ticks >= ticks_to_go)
             {
               return ETIMEDOUT;
             }
@@ -235,7 +235,7 @@ namespace os
               return EINTR;
             }
 
-          if (res != result::ok)
+          if (res != ETIMEDOUT)
             {
               return res;
             }
@@ -263,9 +263,7 @@ namespace os
 
       result_t res;
 
-      // Kludge
-      Systick_clock::sleep_rep t = t / 10;
-      res = _wait (t == 0 ? 1 : t);
+      res = _wait (ticks);
 
       if (this_thread::thread ().interrupted ())
         {
