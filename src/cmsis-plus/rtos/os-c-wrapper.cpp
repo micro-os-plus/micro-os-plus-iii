@@ -35,6 +35,8 @@
 #include <cstring>
 #include <new>
 
+// #include <cstdio>
+
 // ----------------------------------------------------------------------------
 
 using namespace os::rtos;
@@ -918,6 +920,7 @@ osThreadTerminate (osThreadId thread_id)
   (reinterpret_cast<Thread&> (*thread_id)).kill ();
 
   (reinterpret_cast<Thread&> (*thread_id)).~Thread ();
+
   return osOK;
 }
 
@@ -945,6 +948,8 @@ osThreadYield (void)
 /**
  * @details
  * Change the priority of a running thread.
+ * There is no need for an extra yield after it, if the priorities
+ * require, there is an implicit reschedule.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
@@ -975,6 +980,9 @@ osThreadSetPriority (osThreadId thread_id, osPriority priority)
 
   thread::priority_t prio = static_cast<thread::priority_t> (priority);
   result_t res = ((reinterpret_cast<Thread&> (*thread_id)).sched_prio (prio));
+
+  // A mandatory yield is needed here, must be done in the implementation.
+
   if (res == result::ok)
     {
       return osOK;
