@@ -397,7 +397,7 @@ namespace os
 
 #endif
 
-      this_thread::yield();
+      this_thread::yield ();
 
       return res;
     }
@@ -891,6 +891,12 @@ namespace os
         {
           Systick_clock::sleep_rep slept_ticks;
             {
+              Systick_clock::rep now = Systick_clock::now ();
+              slept_ticks = (Systick_clock::sleep_rep) (now - start);
+              trace::printf ("%s(0x%X, %d, %d)=%d @%p %s\n", __func__, mask,
+                             mode, ticks, slept_ticks, this, name ());
+            }
+            {
               Critical_section_irq cs; // ----- Critical section -----
 
               if (_try_wait (mask, oflags, mode) == result::ok)
@@ -906,7 +912,7 @@ namespace os
               return ETIMEDOUT;
             }
 
-          Systick_clock::sleep_for (ticks - slept_ticks);
+          Systick_clock::wait (ticks - slept_ticks);
 
           if (interrupted ())
             {

@@ -782,6 +782,11 @@ namespace os
 
     // ========================================================================
 
+    /**
+     * The SysTick clock should be a steady clock, i.e. the total
+     * count of ticks should be monotone ascending (in other words no
+     * adjustments to the past should be performed).
+     */
     class Systick_clock
     {
     public:
@@ -840,13 +845,30 @@ namespace os
 
       /**
        * @brief Sleep a number of ticks.
-       * @param [in] ticks the number of ticks to sleep.
+       * @param [in] ticks The number of ticks to sleep.
        * @retval ETIMEDOUT The sleep lasted the entire duration.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval EINTR The sleep was interrupted.
        */
       static result_t
       sleep_for (sleep_rep ticks);
+
+      /**
+       * @brief Wait for an event.
+       * @param [in] ticks The timeout in ticks.
+       * @retval result::ok An event occurred before the timeout.
+       * @retval ETIMEDOUT The wait lasted the entire duration.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EINTR The sleep was interrupted.
+       */
+      static result_t
+      wait (sleep_rep ticks);
+
+    protected:
+
+      static result_t
+      _wait (sleep_rep ticks);
+
     };
 
     class Realtime_clock
@@ -1810,7 +1832,7 @@ namespace os
       reset (void);
 
       void*
-      pool(void);
+      pool (void);
 
     protected:
 
@@ -2613,8 +2635,6 @@ namespace os
       return owner_;
     }
 
-
-
     // ========================================================================
 
     namespace condvar
@@ -2753,12 +2773,11 @@ namespace os
       return (count () == capacity ());
     }
 
-    inline       void*
-    Memory_pool::pool(void)
+    inline void*
+    Memory_pool::pool (void)
     {
       return pool_addr_;
     }
-
 
     // ========================================================================
 

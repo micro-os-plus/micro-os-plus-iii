@@ -261,7 +261,7 @@ namespace os
                 }
             }
 
-          Systick_clock::sleep_for (ticks - slept_ticks);
+          Systick_clock::wait (ticks - slept_ticks);
 
           if (this_thread::thread ().interrupted ())
             {

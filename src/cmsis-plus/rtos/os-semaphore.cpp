@@ -359,7 +359,7 @@ namespace os
           // Add current thread to the semaphore waiting list.
           list_.add (&this_thread::thread ());
         }
-      Systick_clock::sleep_for (ticks);
+      Systick_clock::wait (ticks);
 
       // TODO: return EINTR
       return ETIMEDOUT;

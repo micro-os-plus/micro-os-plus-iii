@@ -240,6 +240,12 @@ os_systick_clock_sleep_for (os_systick_clock_sleep_rep_t ticks)
   return (os_result_t) Systick_clock::sleep_for (ticks);
 }
 
+os_result_t
+os_systick_clock_wait (os_systick_clock_sleep_rep_t ticks)
+{
+  return (os_result_t) Systick_clock::wait (ticks);
+}
+
 // os_systick_sleep_rep_t
 
 os_realtime_clock_rep_t
@@ -1092,7 +1098,7 @@ osWait (uint32_t millisec)
       return event;
     }
 
-  result_t res = Systick_clock::sleep_for (
+  result_t res = Systick_clock::wait (
       Systick_clock::ticks_cast (millisec * 1000u));
 
   // TODO: return events

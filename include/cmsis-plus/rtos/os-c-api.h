@@ -142,6 +142,9 @@ extern "C"
   os_result_t
   os_systick_clock_sleep_for (os_systick_clock_sleep_rep_t ticks);
 
+  os_result_t
+  os_systick_clock_wait (os_systick_clock_sleep_rep_t ticks);
+
   inline os_systicks_t
   os_systick_clock_ticks_cast (uint32_t microsec)
   {
