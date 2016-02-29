@@ -78,20 +78,6 @@
 
 // ----------------------------------------------------------------------------
 
-#ifdef NDEBUG           /* ANSI standard */
-#define os_assert_err(__e, __er) \
-  do { if (!(__e)) return __er; } while (false)
-#else
-#define os_assert_err(__e, __er) assert(__e)
-#endif
-
-#ifdef NDEBUG           /* ANSI standard */
-#define os_assert_throw(__e, __er) \
-  do { if (!(__e)) os::estd::__throw_system_error(__er, #__e); } while (false)
-#else
-#define os_assert_throw(__e, __er) assert(__e)
-#endif
-
 namespace os
 {
   namespace rtos
@@ -691,13 +677,14 @@ namespace os
        *  cleared (the other bits are ignored).
        * @retval flags The selected bits from the current thread
        *  signal flags mask.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval sig::all Cannot be invoked from an Interrupt Service Routine.
        */
       thread::sigset_t
       sig_get (thread::sigset_t mask, flags::mode_t mode);
 
       /**
        * @brief Force thread termination.
+       * @retval result::ok The tread was terminated.
        */
       result_t
       kill (void);
@@ -773,6 +760,8 @@ namespace os
       friend class port::Thread;
       os_thread_port_data_t port_;
 #endif
+
+      Thread* joiner_;
 
       std::size_t stack_size_bytes_;
       thread::state_t sched_state_;
@@ -2867,6 +2856,32 @@ extern "C"
   int
   os_main (int argc, char* argv[]);
 }
+
+// ----------------------------------------------------------------------------
+
+#ifdef NDEBUG           /* ANSI standard */
+#define os_assert_err(__e, __er) \
+  do { if (!(__e)) return __er; } while (false)
+#else
+#define os_assert_err(__e, __er) assert(__e)
+#endif
+
+#ifdef NDEBUG           /* ANSI standard */
+#define os_assert_throw(__e, __er) \
+  do { if (!(__e)) os::estd::__throw_system_error(__er, #__e); } while (false)
+#else
+#define os_assert_throw(__e, __er) assert(__e)
+#endif
+
+// ----------------------------------------------------------------------------
+
+#if !defined(OS_INTEGER_SYSTICK_FREQUENCY_HZ)
+#define OS_INTEGER_SYSTICK_FREQUENCY_HZ                     (1000)
+#endif
+
+#if !defined(OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES)
+#define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES               (400)
+#endif
 
 // ----------------------------------------------------------------------------
 
