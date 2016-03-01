@@ -160,7 +160,7 @@ namespace os
       for (;;)
         {
             {
-              Critical_section_irq cs; // ----- Critical section -----
+              interrupts::Critical_section cs; // ----- Critical section -----
 
               void* p = _try_first ();
               if (p != nullptr)
@@ -233,7 +233,7 @@ namespace os
         {
           Systick_clock::sleep_rep slept_ticks;
             {
-              Critical_section_irq cs; // ----- Critical section -----
+              interrupts::Critical_section cs; // ----- Critical section -----
 
               void* p = _try_first ();
               if (p != nullptr)
@@ -295,7 +295,7 @@ namespace os
           return EINVAL;
         }
 
-      Critical_section_irq cs; // ----- Critical section -----
+      interrupts::Critical_section cs; // ----- Critical section -----
 
       // Perform a push_front() on the single linked LIFO list,
       // i.e. add the block to the beginning of the list.

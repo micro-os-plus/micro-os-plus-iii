@@ -170,9 +170,8 @@ namespace os
       /**
        * @brief Unlock the scheduler.
        * @param [in] status The new status of the scheduler.
-       * @return The previous status of the scheduler.
        */
-      status_t
+      void
       unlock (status_t status);
 
       /**
@@ -209,42 +208,51 @@ namespace os
     }
     /* namespace scheduler */
 
-    // TODO: define all levels of critical sections
-    // (kernel, real-time(level), complete)
-    namespace critical
+    namespace interrupts
     {
       using status_t = uint32_t;
 
-      // Enter an IRQ critical section
-      status_t
-      enter (void);
+      // TODO: define all levels of critical sections
+      // (kernel, real-time(level), complete)
 
-      // Exit an IRQ critical section
-      status_t
-      exit (status_t status);
+      // TODO: make template, parameter IRQ level
+
+      class Critical_section
+      {
+      public:
+
+        Critical_section ();
+
+        ~Critical_section ();
+
+        Critical_section (const Critical_section&) = delete;
+        Critical_section (Critical_section&&) = delete;
+        Critical_section&
+        operator= (const Critical_section&) = delete;
+        Critical_section&
+        operator= (Critical_section&&) = delete;
+
+        /**
+         * @brief Enter interrupts critical section.
+         * @return The current interrupts status register.
+         */
+        static status_t
+        enter (void);
+
+        /**
+         * @brief Exit interrupts critical section.
+         * @param status The value to restore the interrupts status register.
+         */
+        // Exit an IRQ critical section
+        static void
+        exit (status_t status);
+
+      protected:
+
+        const status_t status_;
+      };
+
     }
-
-    // TODO: make template, parameter IRQ level
-    class Critical_section_irq
-    {
-    public:
-
-      Critical_section_irq ();
-
-      ~Critical_section_irq ();
-
-      Critical_section_irq (const Critical_section_irq&) = delete;
-      Critical_section_irq (Critical_section_irq&&) = delete;
-      Critical_section_irq&
-      operator= (const Critical_section_irq&) = delete;
-      Critical_section_irq&
-      operator= (Critical_section_irq&&) = delete;
-
-    protected:
-
-      const critical::status_t status_;
-    };
-
     // ----------------------------------------------------------------------
 
     //  ==== Thread Management ====
@@ -746,6 +754,12 @@ namespace os
       result_t
       _try_wait (thread::sigset_t mask, thread::sigset_t* oflags,
                  flags::mode_t mode);
+
+      /**
+       * The actual destructor, also called from exit() and kill().
+       */
+      void
+      _destroy(void);
 
     protected:
 
@@ -2430,17 +2444,20 @@ namespace os
 
     // ========================================================================
 
-    inline
-    Critical_section_irq::Critical_section_irq () :
-        status_ (critical::enter ())
+    namespace interrupts
     {
-      ;
-    }
+      inline
+      Critical_section::Critical_section () :
+          status_ (enter ())
+      {
+        ;
+      }
 
-    inline
-    Critical_section_irq::~Critical_section_irq ()
-    {
-      critical::exit (status_);
+      inline
+      Critical_section::~Critical_section ()
+      {
+        exit (status_);
+      }
     }
 
     // ========================================================================
@@ -2494,6 +2511,12 @@ namespace os
                       flags::mode_t mode, systicks_t ticks)
       {
         return this_thread::thread ().timed_sig_wait (mask, oflags, mode, ticks);
+      }
+
+      inline void
+      exit(void* exit_ptr)
+      {
+        return this_thread::thread().exit(exit_ptr);
       }
 
     } /* namespace this_thread */

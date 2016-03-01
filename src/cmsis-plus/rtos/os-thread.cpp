@@ -88,6 +88,11 @@ namespace os
       {
         os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
+        if (!scheduler::started ())
+          {
+            return;
+          }
+
 #if defined(OS_INCLUDE_PORT_RTOS_THREAD)
 
         return port::this_thread::yield ();
@@ -244,6 +249,8 @@ namespace os
       scheduler::__register_thread (this);
 
 #endif
+
+      this_thread::yield ();
     }
 
     /**
@@ -253,6 +260,12 @@ namespace os
      */
     Thread::~Thread ()
     {
+      _destroy ();
+    }
+
+    void
+    Thread::_destroy (void)
+    {
       if (sched_state_ == thread::state::destroyed)
         {
           return;
@@ -260,9 +273,12 @@ namespace os
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
+      sched_state_ = thread::state::destroyed;
+
 #if defined(OS_INCLUDE_PORT_RTOS_THREAD)
 
       port::Thread::destroy (this);
+      // Does not return if the current thread.
 
 #else
 
@@ -270,8 +286,6 @@ namespace os
       scheduler::__unregister_thread (this);
 
 #endif
-
-      sched_state_ = thread::state::destroyed;
     }
 
     void
@@ -389,6 +403,7 @@ namespace os
 
 #if defined(OS_INCLUDE_PORT_RTOS_THREAD)
 
+      // The port must perform a context switch.
       res = port::Thread::sched_prio (this, prio);
 
 #else
@@ -396,9 +411,12 @@ namespace os
       // TODO
       prio_ = prio;
 
+      // Mandatory, the priority might have been raised, the
+      // task must be scheduled to run.
+      this_thread::yield ();
+
 #endif
 
-      this_thread::yield ();
 
       return res;
     }
@@ -436,7 +454,8 @@ namespace os
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
-      while (sched_state_ != thread::state::terminated)
+      while ((sched_state_ != thread::state::terminated)
+          && (sched_state_ != thread::state::destroyed))
         {
           joiner_ = this;
           suspend ();
@@ -579,16 +598,8 @@ namespace os
           joiner_->wakeup ();
         }
 
-#if defined(OS_INCLUDE_PORT_RTOS_THREAD)
-
-      port::Thread::exit (this);
+      _destroy ();
       // Does not return.
-
-#else
-
-      // TODO
-
-#endif
     }
 
     /**
@@ -603,22 +614,13 @@ namespace os
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
-      if (sched_state_ == thread::state::terminated)
+      if ((sched_state_ == thread::state::terminated)
+          || (sched_state_ == thread::state::destroyed))
         {
           trace::printf ("%s() @%p %s already terminated\n", __func__, this,
                          name ());
           return result::ok; // Already terminated
         }
-
-#if defined(OS_INCLUDE_PORT_RTOS_THREAD)
-
-      port::Thread::kill (this);
-
-#else
-
-      // TODO
-
-#endif
 
       func_result_ = nullptr;
       sched_state_ = thread::state::terminated;
@@ -627,6 +629,8 @@ namespace os
         {
           joiner_->wakeup ();
         }
+
+      _destroy ();
 
       return result::ok;
     }
@@ -646,7 +650,7 @@ namespace os
 
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
 
-      Critical_section_irq cs; // ----- Critical section -----
+      interrupts::Critical_section cs; // ----- Critical section -----
 
       if (oflags != nullptr)
         {
@@ -678,7 +682,7 @@ namespace os
 
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
 
-      Critical_section_irq cs; // ----- Critical section -----
+      interrupts::Critical_section cs; // ----- Critical section -----
 
       if (mask == 0)
         {
@@ -710,7 +714,7 @@ namespace os
 
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
 
-      Critical_section_irq cs; // ----- Critical section -----
+      interrupts::Critical_section cs; // ----- Critical section -----
 
       if (oflags != nullptr)
         {
@@ -795,13 +799,19 @@ namespace os
       trace::printf ("%s(0x%X, %d) @%p %s\n", __func__, mask, mode, this,
                      name ());
 
+      Systick_clock::rep prev = Systick_clock::now ();
+      Systick_clock::sleep_rep slept_ticks = 0;
       for (;;)
         {
             {
-              Critical_section_irq cs; // ----- Critical section -----
+              interrupts::Critical_section cs; // ----- Critical section -----
 
               if (_try_wait (mask, oflags, mode) == result::ok)
                 {
+                  slept_ticks =
+                      (Systick_clock::sleep_rep) (Systick_clock::now () - prev);
+                  trace::printf ("%s(0x%X, %d)=%d @%p %s\n", __func__, mask,
+                                 mode, slept_ticks, this, name ());
                   return result::ok;
                 }
             }
@@ -836,7 +846,7 @@ namespace os
       trace::printf ("%s(0x%X, %d) @%p %s\n", __func__, mask, mode, this,
                      name ());
 
-      Critical_section_irq cs; // ----- Critical section -----
+      interrupts::Critical_section cs; // ----- Critical section -----
 
       return _try_wait (mask, oflags, mode);
     }
@@ -888,7 +898,7 @@ namespace os
         }
 
         {
-          Critical_section_irq cs; // ----- Critical section -----
+          interrupts::Critical_section cs; // ----- Critical section -----
 
           if (_try_wait (mask, oflags, mode) == result::ok)
             {
@@ -908,7 +918,7 @@ namespace os
           slept_ticks += (Systick_clock::sleep_rep) (now - prev);
 
             {
-              Critical_section_irq cs; // ----- Critical section -----
+              interrupts::Critical_section cs; // ----- Critical section -----
 
               if (_try_wait (mask, oflags, mode) == result::ok)
                 {

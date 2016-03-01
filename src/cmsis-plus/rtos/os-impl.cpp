@@ -1339,7 +1339,7 @@ namespace os
     {
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
-      Critical_section_irq cs; // ---- Critical section
+      interrupts::Critical_section cs; // ----- Critical section
       if (count_ > this->max_count_)
         {
           return EOVERFLOW;
@@ -1390,7 +1390,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
         {
-          Critical_section_irq cs; // ---- Critical section
+          interrupts::Critical_section cs; // ----- Critical section
 
           --count_;
           if (count_ >= 0)
@@ -1429,7 +1429,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
         {
-          Critical_section_irq cs; // ---- Critical section
+          interrupts::Critical_section cs; // ----- Critical section
 
           if (count_ > 0)
             {
@@ -1471,7 +1471,7 @@ namespace os
 
       trace::printf ("%s(%d_ticks) @%p %s\n", __func__, ticks, this, name ());
         {
-          Critical_section_irq cs; // ---- Critical section
+          interrupts::Critical_section cs; // ----- Critical section
 
           --count_;
           if (count_ >= 0)
@@ -1490,7 +1490,7 @@ namespace os
     {
       if (value != nullptr)
         {
-          Critical_section_irq cs; // ---- Critical section
+          interrupts::Critical_section cs; // ----- Critical section
 
           *value = count_;
         }
@@ -1500,7 +1500,7 @@ namespace os
     result_t
     Semaphore::reset (void)
     {
-      Critical_section_irq cs; // ---- Critical section
+      interrupts::Critical_section cs; // ----- Critical section
 
       if (count_ < 0)
         {

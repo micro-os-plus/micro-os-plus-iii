@@ -106,6 +106,7 @@ namespace os
 
         status_t tmp = is_locked_;
         is_locked_ = true;
+
         return tmp;
       }
 
@@ -118,18 +119,14 @@ namespace os
        *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
-      status_t
+      void
       unlock (status_t status)
       {
         os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
-        status_t tmp = is_locked_;
-
         port::scheduler::unlock (status);
 
         is_locked_ = status;
-
-        return tmp;
       }
     } /* namespace scheduler */
 
@@ -155,22 +152,22 @@ namespace os
       } /* namespace scheduler */
 #endif
 
-    namespace critical
+    namespace interrupts
     {
       // Enter an IRQ critical section
       status_t
-      enter (void)
+      Critical_section::enter (void)
       {
-        return port::critical::enter();
+        return port::interrupts::Critical_section::enter ();
       }
 
       // Exit an IRQ critical section
-      status_t
-      exit (status_t status)
+      void
+      Critical_section::exit (status_t status)
       {
-        return port::critical::exit(status);
+        return port::interrupts::Critical_section::exit (status);
       }
-    }
+    } /* namespace interrupts */
 
     // ========================================================================
 

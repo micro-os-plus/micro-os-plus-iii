@@ -112,7 +112,7 @@ namespace os
     Systick_clock::rep
     Systick_clock::now (void)
     {
-      Critical_section_irq cs; // ---- Critical section -----
+      interrupts::Critical_section cs; // ----- Critical section -----
 
       // Prevent inconsistent values using the critical section.
       return __systick_now;
@@ -149,7 +149,7 @@ namespace os
       uint64_t ticks;
       uint32_t val;
         {
-          Critical_section_irq cs; // ----- Critical section -----
+          interrupts::Critical_section cs; // ----- Critical section -----
 
           // Sample ticks counter inside critical section.
           ticks = __systick_now;

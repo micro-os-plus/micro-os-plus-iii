@@ -67,6 +67,12 @@ extern "C"
   bool
   os_sched_is_started (void);
 
+  os_sched_status_t
+  os_sched_lock (void);
+
+  void
+  os_sched_unlock (os_sched_status_t status);
+
   bool
   os_sched_is_locked (void);
 

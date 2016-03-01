@@ -38,6 +38,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdbool.h>
 
 // We definitely use CMSIS++.
 #define OS_USE_CMSIS_PLUS
@@ -66,6 +67,10 @@ extern "C"
 
   typedef uint32_t os_flags_mode_t;
   typedef uint32_t os_flags_mask_t;
+
+  // --------------------------------------------------------------------------
+
+  typedef bool os_sched_status_t;
 
   // --------------------------------------------------------------------------
 

@@ -178,7 +178,7 @@ namespace os
 
 #else
 
-      Critical_section_irq cs; // ----- Critical section -----
+      interrupts::Critical_section cs; // ----- Critical section -----
       if (count_ >= this->max_count_)
         {
           return EOVERFLOW;
@@ -238,7 +238,7 @@ namespace os
 
 #else
         {
-          Critical_section_irq cs; // ----- Critical section ------
+          interrupts::Critical_section cs; // ----- Critical section ------
 
           --count_;
           if (count_ >= 0)
@@ -288,7 +288,7 @@ namespace os
 #else
 
         {
-          Critical_section_irq cs; // ----- Critical section -----
+          interrupts::Critical_section cs; // ----- Critical section -----
 
           if (count_ > 0)
             {
@@ -348,7 +348,7 @@ namespace os
 #else
 
         {
-          Critical_section_irq cs; // ----- Critical section -----
+          interrupts::Critical_section cs; // ----- Critical section -----
 
           --count_;
           if (count_ >= 0)
@@ -384,7 +384,7 @@ namespace os
 
 #else
 
-      Critical_section_irq cs; // ----- Critical section -----
+      interrupts::Critical_section cs; // ----- Critical section -----
 
       if (count_ < 0)
         {

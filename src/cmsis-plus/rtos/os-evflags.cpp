@@ -178,7 +178,7 @@ namespace os
       for (;;)
         {
             {
-              Critical_section_irq cs; // ----- Critical section -----
+              interrupts::Critical_section cs; // ----- Critical section -----
 
               if (_try_wait (mask, oflags, mode) == result::ok)
                 {
@@ -213,7 +213,7 @@ namespace os
     Event_flags::try_wait (flags::mask_t mask, flags::mask_t* oflags,
                            flags::mode_t mode)
     {
-      Critical_section_irq cs; // ----- Critical section -----
+      interrupts::Critical_section cs; // ----- Critical section -----
 
 #if defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
 
@@ -280,7 +280,7 @@ namespace os
         {
           Systick_clock::sleep_rep slept_ticks;
             {
-              Critical_section_irq cs; // ----- Critical section -----
+              interrupts::Critical_section cs; // ----- Critical section -----
 
               if (_try_wait (mask, oflags, mode) == result::ok)
                 {
@@ -326,7 +326,7 @@ namespace os
 
 #else
 
-      Critical_section_irq cs; // ----- Critical section -----
+      interrupts::Critical_section cs; // ----- Critical section -----
 
       flags_ |= mask;
 
@@ -362,7 +362,7 @@ namespace os
 
 #else
 
-      Critical_section_irq cs; // ----- Critical section -----
+      interrupts::Critical_section cs; // ----- Critical section -----
 
       if (oflags != nullptr)
         {
@@ -397,7 +397,7 @@ namespace os
 
 #else
 
-      Critical_section_irq cs; // ----- Critical section -----
+      interrupts::Critical_section cs; // ----- Critical section -----
 
       if (mask == 0)
         {
