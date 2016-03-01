@@ -101,6 +101,18 @@ os_sched_is_started (void)
   return scheduler::started ();
 }
 
+os_sched_status_t
+os_sched_lock (void)
+{
+  return scheduler::lock ();
+}
+
+void
+os_sched_unlock (os_sched_status_t status)
+{
+  scheduler::unlock(status);
+}
+
 bool
 os_sched_is_locked (void)
 {
@@ -757,6 +769,7 @@ osKernelInitialize (void)
     {
       return osErrorISR;
     }
+
   scheduler::initialize ();
   return osOK;
 }
@@ -810,7 +823,11 @@ uint32_t
 osKernelSysTick (void)
 {
   Systick_clock::current_t crt;
+
+  // Get the current SysTick timestamp, with full details, down to
+  // cpu cycles.
   Systick_clock::now (&crt);
+
   // Convert ticks to cycles.
   return static_cast<uint32_t> (crt.ticks) * crt.divisor + crt.cycles;
 }
@@ -822,7 +839,10 @@ osKernelSysTick (void)
 
 /**
  * @details
- * Start a thread function by adding it to the Active Threads list
+ * Find a free slot in the array of thread definitions and initialise
+ * the thread.
+ *
+ * Start the thread function by adding it to the Active Threads list
  * and set it to state READY. The thread function receives the argument
  * pointer as function argument when the function is started. When the
  * priority of the created thread function is higher than the current
@@ -855,6 +875,7 @@ osThreadCreate (const osThreadDef_t* thread_def, void* args)
       return nullptr;
     }
 
+  // Find a free slot in the tread definitions array.
   for (uint32_t i = 0; i < thread_def->instances; ++i)
     {
       Thread* th = (Thread*) &thread_def->data[i];
@@ -870,7 +891,7 @@ osThreadCreate (const osThreadDef_t* thread_def, void* args)
             }
           new (th) Thread (attr, (thread::func_t) thread_def->pthread, args);
 
-          this_thread::yield();
+          // No need to yield here, already done by constructor.
           return reinterpret_cast<osThreadId> (th);
         }
     }
@@ -920,14 +941,20 @@ osThreadTerminate (osThreadId thread_id)
 
   thread::state_t state =
       (reinterpret_cast<Thread&> (*thread_id)).sched_state ();
-  if (state == thread::state::undefined || state >= thread::state::destroyed)
+  if (state == thread::state::undefined)
     {
       return osErrorResource;
     }
 
-  (reinterpret_cast<Thread&> (*thread_id)).kill ();
-
-  (reinterpret_cast<Thread&> (*thread_id)).~Thread ();
+  if ((reinterpret_cast<Thread*> (thread_id)) == &this_thread::thread ())
+    {
+      this_thread::exit ();
+      /* NORETURN */
+    }
+  else
+    {
+      (reinterpret_cast<Thread&> (*thread_id)).kill ();
+    }
 
   return osOK;
 }
@@ -986,10 +1013,12 @@ osThreadSetPriority (osThreadId thread_id, osPriority priority)
       return osErrorValue;
     }
 
+  // Call C++ mutator.
   thread::priority_t prio = static_cast<thread::priority_t> (priority);
   result_t res = ((reinterpret_cast<Thread&> (*thread_id)).sched_prio (prio));
 
-  // A mandatory yield is needed here, must be done in the implementation.
+  // A mandatory yield is needed here, must be done
+  // by the implementation.
 
   if (res == result::ok)
     {
@@ -1025,6 +1054,7 @@ osThreadGetPriority (osThreadId thread_id)
       return osPriorityError;
     }
 
+  // Call C++ accessor.
   thread::priority_t prio =
       (reinterpret_cast<Thread&> (*thread_id)).sched_prio ();
   return static_cast<osPriority> (prio);
@@ -1126,8 +1156,8 @@ osWait (uint32_t millisec)
 /**
  * @details
  * Create a one-shot or periodic timer and associate it with a callback
- * function argument. The timer is in stopped until it is started with
- * osTimerStart.
+ * function argument. The timer is initially stopped and must be started with
+ * `osTimerStart()`.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
@@ -1165,6 +1195,7 @@ osTimerStart (osTimerId timer_id, uint32_t millisec)
     {
       return osErrorISR;
     }
+
   if (timer_id == nullptr)
     {
       return osErrorParameter;
@@ -1195,6 +1226,7 @@ osTimerStop (osTimerId timer_id)
     {
       return osErrorISR;
     }
+
   if (timer_id == nullptr)
     {
       return osErrorParameter;
@@ -1213,7 +1245,6 @@ osTimerStop (osTimerId timer_id)
     {
       return osErrorOS;
     }
-
 }
 
 /**
@@ -1229,6 +1260,7 @@ osTimerDelete (osTimerId timer_id)
     {
       return osErrorISR;
     }
+
   if (timer_id == nullptr)
     {
       return osErrorParameter;
@@ -1278,6 +1310,7 @@ osSignalClear (osThreadId thread_id, int32_t signals)
     {
       return 0x80000000;
     }
+
   if (scheduler::in_handler_mode () || (signals == 0))
     {
       return 0x80000000;
@@ -1318,6 +1351,7 @@ osEvent
 osSignalWait (int32_t signals, uint32_t millisec)
 {
   osEvent event;
+
   if (scheduler::in_handler_mode ())
     {
       event.status = osErrorISR;
@@ -1329,46 +1363,19 @@ osSignalWait (int32_t signals, uint32_t millisec)
       event.status = osErrorValue;
       return event;
     }
+
   result_t res;
   if (millisec == osWaitForever)
     {
       res = this_thread::sig_wait ((thread::sigset_t) signals,
                                    (thread::sigset_t*) &event.value.signals,
                                    flags::mode::all || flags::mode::clear);
-      if (res == EPERM)
-        {
-          event.status = osErrorISR;
-        }
-      else if (res == EINVAL)
-        {
-          event.status = osErrorValue;
-        }
-      else
-        {
-          event.status = osEventSignal;
-        }
     }
   else if (millisec == 0)
     {
       res = this_thread::try_sig_wait ((thread::sigset_t) signals,
                                        (thread::sigset_t*) &event.value.signals,
                                        flags::mode::all || flags::mode::clear);
-      if (res == EPERM)
-        {
-          event.status = osErrorISR;
-        }
-      else if (res == EINVAL)
-        {
-          event.status = osErrorValue;
-        }
-      else if (res == EAGAIN)
-        {
-          event.status = osOK;
-        }
-      else
-        {
-          event.status = osEventSignal;
-        }
     }
   else
     {
@@ -1376,22 +1383,31 @@ osSignalWait (int32_t signals, uint32_t millisec)
           (thread::sigset_t) signals, (thread::sigset_t*) &event.value.signals,
           flags::mode::all || flags::mode::clear,
           Systick_clock::ticks_cast (millisec * 1000u));
-      if (res == EPERM)
-        {
-          event.status = osErrorISR;
-        }
-      else if (res == EINVAL)
-        {
-          event.status = osErrorValue;
-        }
-      else if (res == ETIMEDOUT)
-        {
-          event.status = osEventTimeout;
-        }
-      else
-        {
-          event.status = osEventSignal;
-        }
+    }
+
+  if (res == result::ok)
+    {
+      event.status = osEventSignal;
+    }
+  else if (res == EAGAIN)
+    {
+      event.status = osOK; // Only for try_sig_wait().
+    }
+  else if (res == ETIMEDOUT)
+    {
+      event.status = osEventTimeout; // Only for timed_sig_wait().
+    }
+  else if (res == EPERM)
+    {
+      event.status = osErrorISR;
+    }
+  else if (res == EINVAL)
+    {
+      event.status = osErrorValue;
+    }
+  else
+    {
+      event.status = osErrorOS;
     }
 
   return event;
@@ -1416,6 +1432,7 @@ osMutexCreate (const osMutexDef_t* mutex_def)
     {
       return nullptr;
     }
+
   if (mutex_def == nullptr)
     {
       return nullptr;
@@ -1450,6 +1467,7 @@ osMutexWait (osMutexId mutex_id, uint32_t millisec)
     {
       return osErrorISR;
     }
+
   if (mutex_id == nullptr)
     {
       return osErrorParameter;
@@ -1459,20 +1477,7 @@ osMutexWait (osMutexId mutex_id, uint32_t millisec)
   if (millisec == osWaitForever)
     {
       ret = (reinterpret_cast<Mutex&> (*mutex_id)).lock ();
-
-      if (ret == ENOTRECOVERABLE)
-        {
-          return osErrorResource;
-        }
-      else if (ret == result::ok)
-        {
-          return osOK;
-        }
-      else
-        {
-          return osErrorOS;
-        }
-
+      // osErrorResource:
     }
   else if (millisec == 0)
     {
@@ -1482,19 +1487,35 @@ osMutexWait (osMutexId mutex_id, uint32_t millisec)
     {
       ret = (reinterpret_cast<Mutex&> (*mutex_id)).timed_lock (
           Systick_clock::ticks_cast (millisec * 1000u));
+      // osErrorTimeoutResource:
+    }
 
-      if (ret == ETIMEDOUT)
-        {
-          return osErrorTimeoutResource;
-        }
-      else if (ret == result::ok)
-        {
-          return osOK;
-        }
-      else
-        {
-          return osErrorOS;
-        }
+  if (ret == result::ok)
+    {
+      // osOK: the mutex has been obtained.
+      return osOK;
+    }
+  else if (ret == EAGAIN)
+    {
+      // The mutex could not be obtained when no timeout was specified.
+      // Only for try_lock().
+      return osErrorResource;
+    }
+  else if (ret == ENOTRECOVERABLE)
+    {
+      // The mutex could not be obtained when no timeout was specified.
+      // Only for lock().
+      return osErrorResource;
+    }
+  else if (ret == ETIMEDOUT)
+    {
+      // The mutex could not be obtained in the given time.
+      // Only for timed_lock().
+      return osErrorTimeoutResource;
+    }
+  else
+    {
+      return osErrorOS;
     }
 
   return static_cast<osStatus> (ret);
@@ -1515,6 +1536,7 @@ osMutexRelease (osMutexId mutex_id)
     {
       return osErrorISR;
     }
+
   if (mutex_id == nullptr)
     {
       return osErrorParameter;
@@ -1523,13 +1545,13 @@ osMutexRelease (osMutexId mutex_id)
   result_t res;
   res = (reinterpret_cast<Mutex&> (*mutex_id)).unlock ();
 
-  if (res == EPERM)
-    {
-      return osErrorResource;
-    }
-  else if (res == result::ok)
+  if (res == result::ok)
     {
       return osOK;
+    }
+  else if (res == EPERM)
+    {
+      return osErrorResource;
     }
   else
     {
@@ -1553,6 +1575,7 @@ osMutexDelete (osMutexId mutex_id)
     {
       return osErrorISR;
     }
+
   if (mutex_id == nullptr)
     {
       return osErrorParameter;
@@ -1584,6 +1607,7 @@ osSemaphoreCreate (const osSemaphoreDef_t* semaphore_def, int32_t count)
     {
       return nullptr;
     }
+
   if (semaphore_def == nullptr)
     {
       return nullptr;
@@ -1598,6 +1622,7 @@ osSemaphoreCreate (const osSemaphoreDef_t* semaphore_def, int32_t count)
   // object uses a more realistic max_count.
   attr.sm_max_count = (semaphore::count_t) (
       count == 0 ? osFeature_Semaphore : count);
+
   return reinterpret_cast<osSemaphoreId> (new ((void*) semaphore_def->data) Semaphore (
       attr));
 }
@@ -1631,6 +1656,7 @@ osSemaphoreWait (osSemaphoreId semaphore_id, uint32_t millisec)
     {
       return -1;
     }
+
   if (semaphore_id == nullptr)
     {
       return -1;
@@ -1692,13 +1718,14 @@ osSemaphoreRelease (osSemaphoreId semaphore_id)
     }
 
   result_t res = (reinterpret_cast<Semaphore&> (*semaphore_id)).post ();
-  if (res == EOVERFLOW)
-    {
-      return osErrorResource;
-    }
-  else if (res == result::ok)
+
+  if (res == result::ok)
     {
       return osOK;
+    }
+  else if (res == EOVERFLOW)
+    {
+      return osErrorResource;
     }
   else
     {
@@ -1722,6 +1749,7 @@ osSemaphoreDelete (osSemaphoreId semaphore_id)
     {
       return osErrorISR;
     }
+
   if (semaphore_id == nullptr)
     {
       return osErrorParameter;
@@ -1778,6 +1806,7 @@ osPoolAlloc (osPoolId pool_id)
     {
       return nullptr;
     }
+
   return (reinterpret_cast<Memory_pool&> (*pool_id)).try_alloc ();
 }
 
@@ -1802,6 +1831,7 @@ osPoolCAlloc (osPoolId pool_id)
       memset (ret, 0,
               (reinterpret_cast<Memory_pool&> (*pool_id)).block_size ());
     }
+
   return ret;
 }
 
@@ -1818,19 +1848,22 @@ osPoolFree (osPoolId pool_id, void* block)
     {
       return osErrorParameter;
     }
+
   if (block == nullptr)
     {
       return osErrorParameter;
     }
+
   result_t res;
   res = (reinterpret_cast<Memory_pool&> (*pool_id)).free (block);
-  if (res == EINVAL)
-    {
-      return osErrorValue;
-    }
-  else if (res == result::ok)
+
+  if (res == result::ok)
     {
       return osOK;
+    }
+  else if (res == EINVAL)
+    {
+      return osErrorValue;
     }
   else
     {
@@ -1914,40 +1947,12 @@ osMessagePut (osMessageQId queue_id, uint32_t info, uint32_t millisec)
       res = (reinterpret_cast<Message_queue&> (*queue_id)).send (
           (const char*) &info, sizeof(uint32_t), 0);
       // osOK, osErrorResource, osErrorParameter
-      if (res == result::ok)
-        {
-          return osOK;
-        }
-      else if (res == EINVAL || res == EMSGSIZE)
-        {
-          return osErrorParameter;
-        }
-      else
-        {
-          return osErrorResource;
-        }
     }
   else if (millisec == 0)
     {
       res = (reinterpret_cast<Message_queue&> (*queue_id)).try_send (
           (const char*) &info, sizeof(uint32_t), 0);
       // osOK, osErrorResource, osErrorParameter
-      if (res == result::ok)
-        {
-          return osOK;
-        }
-      else if (res == EAGAIN)
-        {
-          return osErrorResource;
-        }
-      else if (res == EINVAL || res == EMSGSIZE)
-        {
-          return osErrorParameter;
-        }
-      else
-        {
-          return osErrorOS;
-        }
     }
   else
     {
@@ -1959,23 +1964,33 @@ osMessagePut (osMessageQId queue_id, uint32_t info, uint32_t millisec)
           (const char*) &info, sizeof(uint32_t), 0,
           Systick_clock::ticks_cast (millisec * 1000u));
       // osOK, osErrorTimeoutResource, osErrorParameter
-      if (res == result::ok)
-        {
-          return osOK;
-        }
-      else if (res == EINVAL || res == EMSGSIZE)
-        {
-          return osErrorParameter;
-        }
-      else if (res == ETIMEDOUT)
-        {
-          return osErrorTimeoutResource;
-        }
-      else
-        {
-          return osErrorOS;
-        }
     }
+
+  if (res == result::ok)
+    {
+      // The message was put into the queue.
+      return osOK;
+    }
+  else if (res == EAGAIN)
+    {
+      // No memory in the queue was available
+      return osErrorResource;
+    }
+  else if (res == ETIMEDOUT)
+    {
+      // No memory in the queue was available during the given time limit.
+      return osErrorTimeoutResource;
+    }
+  else if (res == EINVAL || res == EMSGSIZE)
+    {
+      // A parameter is invalid or outside of a permitted range.
+      return osErrorParameter;
+    }
+  else
+    {
+      return osErrorOS;
+    }
+
 #pragma GCC diagnostic pop
 }
 
@@ -2005,11 +2020,13 @@ osMessageGet (osMessageQId queue_id, uint32_t millisec)
 {
   osEvent event;
   result_t res;
+
   if (queue_id == nullptr)
     {
       event.status = osErrorParameter;
       return event;
     }
+
   if (millisec == osWaitForever)
     {
       if (scheduler::in_handler_mode ())
@@ -2021,18 +2038,6 @@ osMessageGet (osMessageQId queue_id, uint32_t millisec)
           (char*) &event.value.v, sizeof(uint32_t),
           NULL);
       // result::event_message;
-      if (res == result::ok)
-        {
-          event.status = osEventMessage;
-        }
-      else if (res == EINVAL || res == EMSGSIZE)
-        {
-          event.status = osErrorParameter;
-        }
-      else
-        {
-          event.status = osErrorOS;
-        }
     }
   else if (millisec == 0)
     {
@@ -2040,22 +2045,6 @@ osMessageGet (osMessageQId queue_id, uint32_t millisec)
           (char*) &event.value.v, sizeof(uint32_t), NULL);
       // result::event_message when message;
       // result::ok when no meessage
-      if (res == result::ok)
-        {
-          event.status = osEventMessage;
-        }
-      else if (res == EINVAL || res == EMSGSIZE)
-        {
-          event.status = osErrorParameter;
-        }
-      else if (res == EAGAIN)
-        {
-          event.status = osOK;
-        }
-      else
-        {
-          event.status = osErrorOS;
-        }
     }
   else
     {
@@ -2069,22 +2058,31 @@ osMessageGet (osMessageQId queue_id, uint32_t millisec)
           Systick_clock::ticks_cast (millisec * 1000u));
       // result::event_message when message;
       // result::event_timeout when timeout;
-      if (res == result::ok)
-        {
-          event.status = osEventMessage;
-        }
-      else if (res == EINVAL || res == EMSGSIZE)
-        {
-          event.status = osErrorParameter;
-        }
-      else if (res == ETIMEDOUT)
-        {
-          event.status = osEventTimeout;
-        }
-      else
-        {
-          event.status = osErrorOS;
-        }
+    }
+
+  if (res == result::ok)
+    {
+      // Message received, value.p contains the pointer to message.
+      event.status = osEventMessage;
+    }
+  else if (res == ETIMEDOUT)
+    {
+      // No message has arrived during the given timeout period.
+      event.status = osEventTimeout;
+    }
+  else if (res == EINVAL || res == EMSGSIZE)
+    {
+      // A parameter is invalid or outside of a permitted range.
+      event.status = osErrorParameter;
+    }
+  else if (res == EAGAIN)
+    {
+      // No message is available in the queue and no timeout was specified.
+      event.status = osOK;
+    }
+  else
+    {
+      event.status = osErrorOS;
     }
 
   return event;
@@ -2113,6 +2111,7 @@ osMailCreate (const osMailQDef_t* queue_def,
     {
       return nullptr;
     }
+
   if (queue_def == nullptr)
     {
       return nullptr;
@@ -2280,6 +2279,7 @@ osMailPut (osMailQId queue_id, void* mail)
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
 
 /**
  * @details
@@ -2304,11 +2304,13 @@ osMailGet (osMailQId mail_id, uint32_t millisec)
 {
   osEvent event;
   result_t res;
+
   if (mail_id == nullptr)
     {
       event.status = osErrorParameter;
       return event;
     }
+
   if (millisec == osWaitForever)
     {
       if (scheduler::in_handler_mode ())
@@ -2320,18 +2322,6 @@ osMailGet (osMailQId mail_id, uint32_t millisec)
           (char*) &event.value.p, sizeof(void*),
           NULL);
       // osEventMail for ok,
-      if (res == result::ok)
-        {
-          event.status = osEventMail;
-        }
-      else if (res == EINVAL || res == EMSGSIZE)
-        {
-          event.status = osErrorParameter;
-        }
-      else
-        {
-          event.status = osErrorOS;
-        }
     }
   else if (millisec == 0)
     {
@@ -2339,22 +2329,6 @@ osMailGet (osMailQId mail_id, uint32_t millisec)
           (char*) &event.value.p, sizeof(void*),
           NULL);
       // osEventMail for ok,
-      if (res == result::ok)
-        {
-          event.status = osEventMail;
-        }
-      else if (res == EINVAL || res == EMSGSIZE)
-        {
-          event.status = osErrorParameter;
-        }
-      else if (res == EAGAIN)
-        {
-          event.status = osOK;
-        }
-      else
-        {
-          event.status = osErrorOS;
-        }
     }
   else
     {
@@ -2367,22 +2341,31 @@ osMailGet (osMailQId mail_id, uint32_t millisec)
           (char*) &event.value.p, sizeof(void*), NULL,
           Systick_clock::ticks_cast (millisec * 1000u));
       // osEventMail for ok, osEventTimeout
-      if (res == result::ok)
-        {
-          event.status = osEventMail;
-        }
-      else if (res == EINVAL || res == EMSGSIZE)
-        {
-          event.status = osErrorParameter;
-        }
-      else if (res == ETIMEDOUT)
-        {
-          event.status = osEventTimeout;
-        }
-      else
-        {
-          event.status = osErrorOS;
-        }
+    }
+
+  if (res == result::ok)
+    {
+      // Mail received, value.p contains the pointer to mail content.
+      event.status = osEventMail;
+    }
+  else if (res == EAGAIN)
+    {
+      // No mail is available in the queue and no timeout was specified.
+      event.status = osOK;
+    }
+  else if (res == EINVAL || res == EMSGSIZE)
+    {
+      // A parameter is invalid or outside of a permitted range.
+      event.status = osErrorParameter;
+    }
+  else if (res == ETIMEDOUT)
+    {
+      // No mail has arrived during the given timeout period.
+      event.status = osEventTimeout;
+    }
+  else
+    {
+      event.status = osErrorOS;
     }
 
   return event;
