@@ -204,9 +204,39 @@ namespace os
         const status_t status_;
       };
 
+      class Lock
+      {
+      public:
+
+        constexpr
+        Lock ();
+
+        ~Lock ();
+
+        Lock (const Lock&) = delete;
+        Lock (Lock&&) = delete;
+        Lock&
+        operator= (const Lock&) = delete;
+        Lock&
+        operator= (Lock&&) = delete;
+
+        void
+        lock (void);
+
+        bool
+        try_lock (void);
+
+        void
+        unlock (void);
+
+      protected:
+
+        status_t status_ = 0;
+
+      };
+
     // ------------------------------------------------------------------------
-    }
-    /* namespace scheduler */
+    } /* namespace scheduler */
 
     namespace interrupts
     {
@@ -250,6 +280,37 @@ namespace os
       protected:
 
         const status_t status_;
+      };
+
+      class Lock
+      {
+      public:
+
+        constexpr
+        Lock ();
+
+        ~Lock ();
+
+        Lock (const Lock&) = delete;
+        Lock (Lock&&) = delete;
+        Lock&
+        operator= (const Lock&) = delete;
+        Lock&
+        operator= (Lock&&) = delete;
+
+        void
+        lock (void);
+
+        bool
+        try_lock (void);
+
+        void
+        unlock (void);
+
+      protected:
+
+        status_t status_;
+
       };
 
     }
@@ -759,7 +820,7 @@ namespace os
        * The actual destructor, also called from exit() and kill().
        */
       void
-      _destroy(void);
+      _destroy (void);
 
     protected:
 
@@ -2366,11 +2427,6 @@ namespace os
   {
     // ========================================================================
 
-    namespace kernel
-    {
-      ;
-    } /* namespace kernel */
-
     namespace scheduler
     {
       /**
@@ -2408,8 +2464,39 @@ namespace os
         unlock (status_);
       }
 
-    }
-    /* namespace scheduler */
+      constexpr
+      Lock::Lock () :
+          status_ (0)
+      {
+        ;
+      }
+
+      inline
+      Lock::~Lock ()
+      {
+        ;
+      }
+
+      inline void
+      Lock::lock (void)
+      {
+        status_ = scheduler::lock ();
+      }
+
+      inline bool
+      Lock::try_lock (void)
+      {
+        status_ = scheduler::lock ();
+        return true;
+      }
+
+      inline void
+      Lock::unlock (void)
+      {
+        scheduler::unlock (status_);
+      }
+
+    } /* namespace scheduler */
 
     /**
      * @details
@@ -2458,6 +2545,39 @@ namespace os
       {
         exit (status_);
       }
+
+      constexpr
+      Lock::Lock () :
+          status_ (0)
+      {
+        ;
+      }
+
+      inline
+      Lock::~Lock ()
+      {
+        ;
+      }
+
+      inline void
+      Lock::lock (void)
+      {
+        status_ = Critical_section::enter ();
+      }
+
+      inline bool
+      Lock::try_lock (void)
+      {
+        status_ = Critical_section::enter ();
+        return true;
+      }
+
+      inline void
+      Lock::unlock (void)
+      {
+        Critical_section::exit (status_);
+      }
+
     }
 
     // ========================================================================
@@ -2514,9 +2634,9 @@ namespace os
       }
 
       inline void
-      exit(void* exit_ptr)
+      exit (void* exit_ptr)
       {
-        return this_thread::thread().exit(exit_ptr);
+        return this_thread::thread ().exit (exit_ptr);
       }
 
     } /* namespace this_thread */
