@@ -78,6 +78,14 @@ extern "C"
 
   // --------------------------------------------------------------------------
 
+  os_irq_status_t
+  os_irq_critical_enter (void);
+
+  void
+  os_irq_critical_exit (os_irq_status_t status);
+
+  // --------------------------------------------------------------------------
+
   void
   os_this_thread_suspend (void);
 

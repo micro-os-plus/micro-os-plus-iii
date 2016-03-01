@@ -110,13 +110,27 @@ os_sched_lock (void)
 void
 os_sched_unlock (os_sched_status_t status)
 {
-  scheduler::unlock(status);
+  scheduler::unlock (status);
 }
 
 bool
 os_sched_is_locked (void)
 {
   return scheduler::locked ();
+}
+
+// ----------------------------------------------------------------------------
+
+os_irq_status_t
+os_irq_critical_enter (void)
+{
+  return interrupts::Critical_section::enter();
+}
+
+void
+os_irq_critical_exit (os_irq_status_t status)
+{
+  interrupts::Critical_section::exit(status);
 }
 
 // ----------------------------------------------------------------------------
