@@ -164,6 +164,17 @@ operator delete (void* ptr) noexcept
     }
 }
 
+void
+__attribute__((weak))
+operator delete (void* ptr, std::size_t size __attribute__((unused))) noexcept
+{
+  if (ptr)
+    {
+      // Scheduler critical section used by free()
+      os::estd::free (ptr);
+    }
+}
+
 /// \details
 /// The deallocation function (3.7.4.2) called by the implementation
 /// to render the value of ptr invalid when the constructor invoked
@@ -188,6 +199,13 @@ operator delete (void* ptr, const std::nothrow_t&) noexcept
 void
 __attribute__((weak))
 operator delete[] (void* ptr) noexcept
+{
+  ::operator delete (ptr);
+}
+
+void
+__attribute__((weak))
+operator delete[] (void* ptr, std::size_t size __attribute__((unused))) noexcept
 {
   ::operator delete (ptr);
 }
