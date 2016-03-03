@@ -1,0 +1,110 @@
+# Doxyfile 1.8.11
+
+# This file describes the settings to be used by the documentation system
+# doxygen (www.doxygen.org) for a project.
+#
+# All text after a double hash (##) is considered a comment and is placed in
+# front of the TAG it is preceding.
+#
+# All text after a single hash (#) is considered a comment and will be ignored.
+# The format is:
+# TAG = value [value, ...]
+# For lists, items can also be appended using:
+# TAG += value [value, ...]
+# Values that contain spaces should be placed between quotes (\" \").
+
+#---------------------------------------------------------------------------
+# Project related configuration options
+#---------------------------------------------------------------------------
+
+## PROJECT_NAME = 
+PROJECT_NAME = "CMSIS++ reference"
+
+## PROJECT_NUMBER = 
+PROJECT_NUMBER = 0.1.1
+
+## PROJECT_BRIEF =
+PROJECT_BRIEF = "CMSIS++: A proposal for the next generation CMSIS, written in C++."
+
+## PROJECT_LOGO = 
+PROJECT_LOGO = logo.png
+
+## OUTPUT_DIRECTORY = 
+
+## INLINE_INHERITED_MEMB = NO
+INLINE_INHERITED_MEMB = YES
+
+## STRIP_FROM_PATH = 
+STRIP_FROM_PATH = \
+	"/Users/ilg/My Files/MacBookPro Projects/uOS/micro-os-plus-iii-tree.git/ilg/arm/cmsis-plus-xpack/"
+
+## EXTRACT_ALL = NO
+EXTRACT_ALL = YES
+
+## EXTRACT_PRIVATE = NO
+EXTRACT_PRIVATE = YES
+
+## EXTRACT_STATIC = NO
+EXTRACT_STATIC = YES
+
+## EXTRACT_ANON_NSPACES = NO
+EXTRACT_ANON_NSPACES = YES
+
+## INPUT = 
+INPUT = \
+	"../include/cmsis-plus/rtos" \
+	"../src/cmsis-plus/rtos" 
+
+## FILE_PATTERNS = 
+FILE_PATTERNS = *.h *.c *.cpp
+
+## RECURSIVE = NO
+RECURSIVE = YES
+
+## EXCLUDE =
+EXCLUDE = \
+	"../src/cmsis-plus/rtos/os-impl.cpp" 
+
+## SOURCE_BROWSER = NO
+SOURCE_BROWSER = YES
+
+## INLINE_SOURCES = NO
+INLINE_SOURCES = YES
+
+## REFERENCED_BY_RELATION = NO
+REFERENCED_BY_RELATION = YES
+
+## REFERENCES_RELATION = NO
+REFERENCES_RELATION = YES
+
+## GENERATE_LATEX = YES
+GENERATE_LATEX = NO
+
+ENABLE_PREPROCESSING = YES
+
+## MACRO_EXPANSION = NO
+MACRO_EXPANSION = YES
+
+## PREDEFINED = 
+PREDEFINED = \
+__DOXYGEN__ \
+__cplusplus \
+
+## CLASS_DIAGRAMS = YES
+CLASS_DIAGRAMS = NO
+
+## HTML_HEADER =
+HTML_HEADER = header.html
+
+## HTML_EXTRA_STYLESHEET =
+HTML_EXTRA_STYLESHEET = custom.css
+
+## HTML_DYNAMIC_SECTIONS  = NO
+HTML_DYNAMIC_SECTIONS = YES
+
+## GENERATE_TREEVIEW = NO
+GENERATE_TREEVIEW = YES
+
+## ENUM_VALUES_PER_LINE = 4
+ENUM_VALUES_PER_LINE = 1
+

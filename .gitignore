@@ -9,3 +9,4 @@ test-*/
 upload.tar.gz
 yotta_modules/
 yotta_targets/
+doxygen/html/

@@ -1,0 +1,63 @@
+/* Custom definition */
+
+body, table, div, p, dl {
+	font-family: Lucida Grande, Verdana, Geneva, Arial, sans-serif;
+	font-size: 10pt;
+	line-height: 17pt;
+}
+
+#projectname {
+	font-size: 280%;
+	font-family: Lucida Grande, Verdana, Geneva, Arial, sans-serif;
+	margin: 0px;
+	padding: 2px 0px;
+}
+
+#projectbrief {
+	font-size: 120%;
+	font-family: Lucida Grande, Verdana, Geneva, Arial, sans-serif;
+	margin: 0px;
+	padding: 0px;
+	padding-bottom: 3px;
+}
+
+#projectmotto {
+	font-size: 110%;
+	font-family: Georgia, Times New Roman, serif;
+	font-style: italic;
+	margin: 0px;
+	padding-top: 8px;
+	padding-right: 10px;
+	position:absolute;
+ 	top:0;
+ 	right:0;
+}
+
+/* for the template params */
+td.paramname {
+	color: #602020;
+	font-weight: bold;
+	white-space: nowrap;
+}
+
+dl {
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-left: 0px;
+}
+
+/* For the grouping headers */
+div.groupHeader {
+	font-size: 105%;
+	margin-left: 0px;
+}
+
+pre.fragment {
+	font-size: 13px;
+	margin-left: 0px;
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-bottom: 6px;
+	padding-top: 6px;
+}
