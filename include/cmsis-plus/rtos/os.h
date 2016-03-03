@@ -61,7 +61,7 @@
 
 // ----------------------------------------------------------------------------
 
-#ifdef  __cplusplus
+#if defined(__cplusplus)
 
 // We definitely use CMSIS++ ;-)
 #define OS_USE_CMSIS_PLUS
@@ -314,9 +314,8 @@ namespace os
       };
 
     }
-    // ----------------------------------------------------------------------
 
-    //  ==== Thread Management ====
+    // ----------------------------------------------------------------------
 
     class Thread;
 
@@ -487,6 +486,7 @@ namespace os
        *  may be nullptr.
        * @param [in] mode Mode bits to select if either all or any flags
        *  are expected, and if the flags should be cleared.
+       * @param ticks The number of ticks to wait.
        * @retval result::ok All expected flags are raised.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval ETIMEDOUT The expected condition did not occur during the
@@ -731,6 +731,8 @@ namespace os
 
       /**
        * @brief Clear thread signal flags.
+       * @param [out] oflags Optional pointer where to store the
+       *  previous flags; may be nullptr.
        * @param [in] mask The OR-ed flags to clear.
        * @retval result::ok The flags were cleared.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
@@ -911,7 +913,7 @@ namespace os
       /**
        * @brief Convert microseconds to ticks.
        * @tparam Rep_T Type of input, auto deduced (usually uint32_t or uin64_t)
-       * @param [in] micros The number of microseconds.
+       * @param [in] microsec The number of microseconds.
        * @return The number of ticks.
        */
       template<typename Rep_T>
@@ -1509,6 +1511,7 @@ namespace os
       /**
        * @brief Timed wait on a condition.
        * @param [in] mutex Reference to the associated mutex.
+       * @param [in] ticks Ticks to wait.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval result::ok.
        */
@@ -1798,16 +1801,16 @@ namespace os
 
       /**
        * @brief Create a memory pool with default attributes.
-       * @param [in] items The maximum number of items in the pool.
-       * @param [in] item_size_bytes The size of an item, in bytes.
+       * @param [in] blocks The maximum number of items in the pool.
+       * @param [in] block_size_bytes The size of an item, in bytes.
        */
       Memory_pool (mempool::size_t blocks, mempool::size_t block_size_bytes);
 
       /**
        * @brief Create a memory pool with custom attributes.
        * @param [in] attr Reference to attributes object.
-       * @param [in] items The maximum number of items in the pool.
-       * @param [in] item_size_bytes The size of an item, in bytes.
+       * @param [in] blocks The maximum number of items in the pool.
+       * @param [in] block_size_bytes The size of an item, in bytes.
        */
       Memory_pool (const mempool::Attributes& attr, mempool::size_t blocks,
                    mempool::size_t block_size_bytes);
@@ -2341,6 +2344,7 @@ namespace os
        *  may be nullptr.
        * @param [in] mode Mode bits to select if either all or any flags
        *  are expected, and if the flags should be cleared.
+       * @param [in] ticks Ticks to wait.
        * @retval result::ok All expected flags are raised.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval ETIMEDOUT The expected condition did not occur during the
