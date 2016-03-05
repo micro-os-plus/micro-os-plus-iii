@@ -18,7 +18,7 @@
 #---------------------------------------------------------------------------
 
 ## PROJECT_NAME = 
-PROJECT_NAME = "CMSIS++ reference"
+PROJECT_NAME = "CMSIS++ Reference"
 
 ## PROJECT_NUMBER = 
 PROJECT_NUMBER = 0.1.1
@@ -30,6 +30,7 @@ PROJECT_BRIEF = "CMSIS++: A proposal for the next generation CMSIS, written in C
 PROJECT_LOGO = logo.png
 
 ## OUTPUT_DIRECTORY = 
+OUTPUT_DIRECTORY = ../../../../../micro-os-plus.github.io-source.git/reference/cmsis-plus
 
 ## INLINE_INHERITED_MEMB = NO
 INLINE_INHERITED_MEMB = YES
@@ -52,18 +53,38 @@ EXTRACT_ANON_NSPACES = YES
 
 ## INPUT = 
 INPUT = \
-	"../include/cmsis-plus/rtos" \
-	"../src/cmsis-plus/rtos" 
+	"../include/cmsis-plus/" \
+	"../src/cmsis-plus/" \
+	"../include/cmsis-plus/iso/chrono" \
+	"../include/cmsis-plus/iso/condition_variable" \
+	"../include/cmsis-plus/iso/mutex" \
+	"../include/cmsis-plus/iso/system_error" \
+	"../include/cmsis-plus/iso/thread" \
 
 ## FILE_PATTERNS = 
-FILE_PATTERNS = *.h *.c *.cpp
+FILE_PATTERNS = *.h *.c *.cpp *.
+X=	chrono \
+	condition_variable \
+	mutex \
+	system_error \
+	thread \
+	
+## EXTENSION_MAPPING =
+EXTENSION_MAPPING = ".no_extension=C++"
 
 ## RECURSIVE = NO
 RECURSIVE = YES
 
 ## EXCLUDE =
 EXCLUDE = \
-	"../src/cmsis-plus/rtos/os-impl.cpp" 
+	"../src/cmsis-plus/rtos/os-impl.cpp" \
+	"../src/cmsis-plus/libcpp/chrono.cpp" \
+	"../src/cmsis-plus/libcpp/condition-variable.cpp" \
+	"../src/cmsis-plus/libcpp/mutex.cpp" \
+	"../src/cmsis-plus/libcpp/thread.cpp" \
+
+#INPUT_FILTER =
+INPUT_FILTER = "perl -p -e 's/__attribute__\s*[(]\s*[(].*?[)]\s*[)]//g'"
 
 ## SOURCE_BROWSER = NO
 SOURCE_BROWSER = YES
@@ -89,6 +110,8 @@ MACRO_EXPANSION = YES
 PREDEFINED = \
 __DOXYGEN__ \
 __cplusplus \
+TRACE \
+
 
 ## CLASS_DIAGRAMS = YES
 CLASS_DIAGRAMS = NO
@@ -101,6 +124,15 @@ HTML_EXTRA_STYLESHEET = custom.css
 
 ## HTML_DYNAMIC_SECTIONS  = NO
 HTML_DYNAMIC_SECTIONS = YES
+
+## HTML_COLORSTYLE_SAT = 100
+HTML_COLORSTYLE_SAT = 0
+
+## HTML_COLORSTYLE_GAMMA = 80
+HTML_COLORSTYLE_GAMMA = 50
+
+## DISABLE_INDEX = NO
+DISABLE_INDEX = NO
 
 ## GENERATE_TREEVIEW = NO
 GENERATE_TREEVIEW = YES
