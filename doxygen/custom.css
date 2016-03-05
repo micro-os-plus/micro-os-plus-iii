@@ -1,33 +1,43 @@
 /* Custom definition */
 
 body, table, div, p, dl {
-	font-family: Lucida Grande, Verdana, Geneva, Arial, sans-serif;
-	font-size: 10pt;
-	line-height: 17pt;
+	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
+	font-size: 16px; /* 10pt; */
+	line-height: 1.6; /* 17pt; */
+}
+
+#titlearea {
+	padding-top: 10px;
+	padding-bottom: 5px;
+}
+
+td#projectalign {
+	padding-left: 1em;
 }
 
 #projectname {
-	font-size: 280%;
-	font-family: Lucida Grande, Verdana, Geneva, Arial, sans-serif;
+	font-size: 36px;
+	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
+	font-weight: bold;
 	margin: 0px;
 	padding: 2px 0px;
 }
 
 #projectbrief {
-	font-size: 120%;
-	font-family: Lucida Grande, Verdana, Geneva, Arial, sans-serif;
+	font-size: 100%;
+	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
 	margin: 0px;
 	padding: 0px;
 	padding-bottom: 3px;
 }
 
 #projectmotto {
-	font-size: 110%;
+	font-size: 100%;
 	font-family: Georgia, Times New Roman, serif;
 	font-style: italic;
 	margin: 0px;
 	padding-top: 8px;
-	padding-right: 10px;
+	padding-right: 15px;
 	position:absolute;
  	top:0;
  	right:0;
@@ -35,7 +45,7 @@ body, table, div, p, dl {
 
 /* for the template params */
 td.paramname {
-	color: #602020;
+	color: black; /* #602020; */
 	font-weight: bold;
 	white-space: nowrap;
 }
@@ -60,4 +70,77 @@ pre.fragment {
 	padding-right: 10px;
 	padding-bottom: 6px;
 	padding-top: 6px;
+}
+
+h2.groupheader {
+	font-weight: bold;
+	font-size: 1.75em;
+	line-height: 1.225;
+	color: black;
+}
+
+.contents a:visited {
+	color: #4078c0;
+}
+
+a {
+	color: #4078c0;
+}
+
+.title {
+	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
+	font-weight: bold;
+	font-size: 1.75em;
+	line-height: 1.225;
+}
+
+#nav-tree .label {
+	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
+	font-size: 14px;
+}
+
+code {
+	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;	
+	background-color: rgba(0, 0, 0, 0.04);
+	border-radius: 3px;
+	padding: 0;
+	padding-top: 0.2em;
+	padding-bottom: 0.2em;
+}
+code:before, code:after {
+	letter-spacing: -0.2em;
+	content: "\00a0"
+}
+
+.params .paramname, .retval .paramname {
+	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;	
+	vertical-align: middle;
+	padding-right: 1em;
+}
+
+.params .paramdir {
+	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;	
+	vertical-align: middle;
+}
+
+div.line {
+	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;	
+}
+
+div.tabs {
+	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;	
+	font-size: 14px;
+}
+
+div.tabs2, div.tabs3 {
+	display: none;
+}
+
+.navpath li.navelem a {
+	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;	
+	font-size: 14px;
+}
+
+.mdescRight, .mdescLeft, .memtemplate, .memTemplParams {
+	color: black;
 }
