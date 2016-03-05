@@ -17,21 +17,27 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
+/**
+ * @file os.h
+ * @brief CMSIS++ RTOS definitions
+ * @details
+ *
  * This file is part of the CMSIS++ proposal, intended as a CMSIS
  * replacement for C++ applications.
  *
- * The code is inspired by ARM CMSIS cmsis_os.h file, v1.02,
+ * The code is inspired by ARM CMSIS `<cmsis_os.h>` file, v1.02,
  * and tries to remain functionally close to the CMSIS specifications.
+ *
+ * References are to C++ Standard ISO/IEC 14882:2011(E)
+ * Third edition (2011-09-01).
  *
  * Major improvements:
  * - no more macros required to define objects
- * - for applications that require it, allows fully static
- *   memory allocations
- * - very close to POSIX (IEEE Std 1003.1, 2013 Edition)
- *   http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html
- * - specifically designed as a convenient implementation for
+ * - allow static memory allocations for all objects
+ * - very close to POSIX ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html))
+ * - specifically designed to facilitate the implementation of
  *   C++ standard thread library (ISO/IEC 14882:2011)
+ * - standard POSIX errors definitions used
  * - improved usability, by defining both simple (using defaults)
  *   and complex (using attributes) object constructors (feature
  *   inspired by POSIX threads attributes)
@@ -39,7 +45,6 @@
  *   (for example: lock(), try-lock(), timed-lock(), similar to POSIX threads)
  * - POSIX condition variable added
  * - versatile clocks added (Systick_clock, Realtime_clock)
- * - standard POSIX errors definitions used
  */
 
 /*
@@ -63,7 +68,12 @@
 
 #if defined(__cplusplus)
 
-// We definitely use CMSIS++ ;-)
+/**
+ * @brief Inform that CMSIS++ is in use.
+ * @details
+ * Macro to inform including files that CMSIS++ RTOS
+ * definitions are available.
+ */
 #define OS_USE_CMSIS_PLUS
 
 // Include the CMSIS++ OS implementation declarations. This might further
@@ -78,59 +88,167 @@
 
 // ----------------------------------------------------------------------------
 
+/**
+ * @namespace os
+ * @brief System namespace.
+ */
 namespace os
 {
+  /**
+   * @brief RTOS namespace.
+   * @details
+   * The `os::rtos` namespace groups all RTOS specific declarations,
+   * either directly or via nested namespaces.
+   */
   namespace rtos
   {
     // ------------------------------------------------------------------------
 
     /**
-     * Type of status code values returned by CMSIS-RTOS functions.
+     * @brief Type of function results.
+     * @details
+     * For error processing reasons, most CMSIS++ RTOS functions
+     * return a numeric result, which, according to POSIX, is `0`
+     * (`result::ok`) when
+     * the call was successful or an error code otherwise.
      */
     using result_t = uint32_t;
 
+    /**
+     * @namespace os::rtos::result
+     * @brief RTOS returned values.
+     * @details Status code values returned by CMSIS++ RTOS functions.
+     *
+     * Except a few enumerated values, most of them are exactly those
+     * defined by POSIX, in the
+     * `<errno.h>` header, and are not redefined here.
+     *
+     * Currently in use are:
+     * - `EPERM` - Operation not permitted. An attempt was made to perform
+     * an operation limited to processes with appropriate privileges
+     * or to the owner of a file or other resource. In CMSIS++ this
+     * usually means that the call is not available in handler mode.
+     * - `EINVAL` - Invalid argument. Some invalid argument was supplied;
+     * - `EAGAIN` - Resource temporarily unavailable. This is a temporary
+     * condition and later calls to the same routine may complete normally.
+     * In CMSIS++ case, this usually means that a call to `try_xxx()`
+     * found the resource busy.
+     * - `ENOTRECOVERABLE` - State not recoverable. In CMSIS++ this
+     * usually means an unrecoverable error occurred.
+     * - `EDEADLOCK` - Resource deadlock would occur. An attempt was made
+     * to lock a system resource that would have resulted in a deadlock
+     * situation.
+     * - `EMSGSIZE` - Message too large. A message sent on a transport
+     * provider was larger than an internal message buffer or some other
+     * network limit, or inappropriate message buffer length.
+     * - `EBADMSG` - Bad message. The implementation has detected a
+     * corrupted message.
+     * - `EINTR` - Interrupted function call. In CMSIS++ this
+     * usually mens that a thread waiting for a message is waken
+     * before the event or the timeout occurred, at user request.
+     * - `ETIMEDOUT` - Operation timed out. The time limit associated
+     * with the operation was exceeded before the operation completed.
+     * - `EOWNERDEAD` - Previous owner died. The owner of a robust mutex
+     * terminated while holding the mutex lock.
+     *
+     * @par Example
+     *
+     * @code{.cpp}
+     * void
+     * func (void)
+     * {
+     *    Mutex mx;
+     *    ...
+     *    result_t res = mx.try_lock();
+     *    if (res == result::ok)
+     *      {
+     *        // All is well, mutex locked.
+     *      }
+     *    else if (res == EAGAIN)
+     *      {
+     *        // Mutex busy, try again later.
+     *      }
+     * }
+     * @endcode
+     *
+     */
     namespace result
     {
+      /**
+       * @brief Custom enumerated values.
+       * @details
+       * There are not many custom values returned by
+       * CMSIS++ RTOS functions, currently there is only one,
+       * `ok`, represented by `0`.
+       */
       enum
         : result_t
           {
-            //
-        /**
-         * Function completed; no error or event occurred.
-         */
-        ok = 0,
-
-      /*
-       * The rest of the errors are those defined by POSIX, in the
-       * <errno.h> header. Currently in use:
-       * - EPERM
-       * - EINVAL
-       * - EAGAIN
-       * - ENOTRECOVERABLE
-       * - EDEADLOCK
-       * - EMSGSIZE
-       */
+            /**
+             * Function completed; no errors or events occurred.
+             */
+            ok = 0,
 
       };
     } /* namespace result */
 
     // ------------------------------------------------------------------------
 
+    /**
+     * @brief Type of timer ticks.
+     * @details
+     * A numeric value intended to hold a number of SysTick ticks.
+     */
     using systicks_t = uint32_t;
+
+    /**
+     * @brief Type of a timer duration.
+     * @details
+     * A numeric value intended to hold a generic duration, either in ticks
+     * or in seconds.
+     */
     using duration_t = uint32_t;
 
     // ------------------------------------------------------------------------
 
+    /**
+     * @namespace os::rtos::scheduler
+     * @brief Scheduler namespace.
+     * @details
+     * The `os::rtos::scheduler` namespace groups scheduler types
+     * and functions.
+     */
     namespace scheduler
     {
+      /**
+       * @brief Type of scheduler status.
+       * @details
+       * Usually a boolean value telling if the scheduler is
+       * locked or not, but for recursive locks it might also be a
+       * numeric counter.
+       */
       using status_t = bool;
 
+      /**
+       * @brief The scheduler status.
+       * @details
+       * Modified by `lock()` and restored to previous value by `unlock()`.
+       */
       extern status_t is_locked_;
+
+      /**
+       * @brief Variable set to true after the scheduler is started.
+       * @details
+       * No further changes allowed, the scheduler cannot be stopped,
+       * in can be only locked.
+       */
       extern bool is_started_;
 
       /**
-       * @brief Initialise the RTOS.
-       * @retval result::ok.
+       * @brief Initialise the RTOS scheduler.
+       * @par Parameters
+       *  None
+       * @retval result::ok The scheduler was initialised.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
@@ -138,7 +256,9 @@ namespace os
 
       /**
        * @brief Start the RTOS scheduler.
-       * @retval result::ok.
+       * @par Parameters
+       *  None
+       * @retval result::ok The scheduler was started.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
@@ -146,6 +266,8 @@ namespace os
 
       /**
        * @brief Check if the scheduler was started.
+       * @par Parameters
+       *  None
        * @retval true The scheduler was started.
        * @retval false The scheduler was not started.
        */
@@ -154,6 +276,8 @@ namespace os
 
       /**
        * @brief Check if the scheduler is locked.
+       * @par Parameters
+       *  None
        * @retval true The scheduler is locked.
        * @retval false The scheduler is running (not locked).
        */
@@ -162,6 +286,8 @@ namespace os
 
       /**
        * @brief Lock the scheduler.
+       * @par Parameters
+       *  None
        * @return The previous status of the scheduler.
        */
       status_t
@@ -170,12 +296,15 @@ namespace os
       /**
        * @brief Unlock the scheduler.
        * @param [in] status The new status of the scheduler.
+       * @return  Nothing.
        */
       void
       unlock (status_t status);
 
       /**
-       * @brief Check if in handler mode.
+       * @brief Check if the CPU is in handler mode.
+       * @par Parameters
+       *  None
        * @retval true Execution is in an exception handler context.
        * @retval false Execution is in a thread context.
        */
@@ -184,62 +313,220 @@ namespace os
 
       // ----------------------------------------------------------------------
 
+      /**
+       * @class Critical_section
+       * @brief Scheduler critical section [RAII](https://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization) helper.
+       *
+       * @details
+       * Use this class to define a critical section
+       * protected to scheduler switches. The beginning of the
+       * critical section is exactly the place where this class is
+       * instantiated (the constructor will lock
+       * the scheduler). The end of the critical
+       * section is the end of the surrounding block (the destructor will
+       * unlock the scheduler).
+       *
+       * @note Can be nested as many times as required without problems,
+       * only the outer call will unlock the scheduler.
+       *
+       * @par Example
+       *
+       * @code{.cpp}
+       * void
+       * func(void)
+       * {
+       *    // Do something
+       *
+       *    {
+       *      scheduler::Critical_section cs;  // Critical section begins here.
+       *
+       *      // Inside the critical section.
+       *      // No scheduler switches will happen here.
+       *
+       *    } // Critical section ends here.
+       *
+       *    // Do something else.
+       * }
+       * @endcode
+       *
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @nosubgrouping
+       */
       class Critical_section
       {
       public:
 
+        /**
+         * @name Constructors/destructor
+         * @{
+         */
+
+        /**
+         *
+         * @par Parameters
+         *  None
+         */
         Critical_section ();
 
+        /**
+         * @cond ignore
+         */
         Critical_section (const Critical_section&) = delete;
         Critical_section (Critical_section&&) = delete;
         Critical_section&
         operator= (const Critical_section&) = delete;
         Critical_section&
         operator= (Critical_section&&) = delete;
+        /**
+         * @endcond
+         */
 
         ~Critical_section ();
 
+        /**
+         * @}
+         */
       protected:
 
+        /**
+         * @name Private member variables
+         * @{
+         */
+
+        /**
+         * @brief Variable to store the initial scheduler status.
+         * @details
+         * The variable is constant, after being set by the constructor no
+         * further changes are possible.
+         *
+         * The variable type usually is a `bool`, but a counter is also
+         * possible if the scheduler uses a recursive lock.
+         */
         const status_t status_;
+
+        /**
+         * @}
+         */
       };
 
+      /**
+       * @class Lock
+       * @brief Scheduler standard locker.
+       * @details Locker meeting the standard `Lockable` requirements (30.2.5.3).
+       *
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @nosubgrouping
+       */
       class Lock
       {
       public:
 
+        /**
+         * @name Constructors/destructor
+         * @{
+         */
+
+        /**
+         *
+         * @par Parameters
+         *  None
+         */
         constexpr
         Lock ();
 
         ~Lock ();
 
+        /**
+         * @cond ignore
+         */
         Lock (const Lock&) = delete;
         Lock (Lock&&) = delete;
         Lock&
         operator= (const Lock&) = delete;
         Lock&
         operator= (Lock&&) = delete;
+        /**
+         * @endcond
+         */
 
+        /**
+         * @}
+         * @name Public member functions
+         * @{
+         */
+
+        /**
+         *
+         * @par Parameters
+         *  None
+         * @return  Nothing.
+         */
         void
         lock (void);
 
+        /**
+         *
+         * @par Parameters
+         *  None
+         * @retval true The scheduler was locked.
+         */
         bool
         try_lock (void);
 
+        /**
+         *
+         * @par Parameters
+         *  None
+         * @return  Nothing.
+         */
         void
         unlock (void);
 
+        /**
+         * @}
+         */
+
       protected:
 
+        /**
+         * @name Private member variables
+         * @{
+         */
+
+        /**
+         * Variable to store the initial scheduler status.
+         *
+         * The variable type usually is a `bool`, but a counter is also
+         * possible if the scheduler uses a recursive lock.
+         */
         status_t status_ = 0;
 
+        /**
+         * @}
+         */
       };
 
     // ------------------------------------------------------------------------
     } /* namespace scheduler */
 
+    /**
+     * @namespace os::rtos::interrupts
+     * @brief Interrupts namespace.
+     * @details
+     * The os::rtos::interrupts namespace groups interrupts related
+     *  types and enumerations.
+     */
     namespace interrupts
     {
+      /**
+       * @brief Type of interrupts status.
+       * @details
+       * Usually an integer large enough to hold the CPU status register
+       * where the interrupt status is stored.
+       *
+       * It is used to temporarily store the CPU status register
+       * during critical sections.
+       */
       using status_t = uint32_t;
 
       // TODO: define all levels of critical sections
@@ -247,23 +534,86 @@ namespace os
 
       // TODO: make template, parameter IRQ level
 
+      /**
+       * @class Critical_section
+       * @brief Interrupts critical section [RAII](https://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization) helper.
+       *
+       * @details
+       * Use this class to define a critical section
+       * protected to interrupts service routines. The begining of the
+       * critical section is exactly the place where this class is
+       * instantiated (the constructor will disable interrupts below
+       * the scheduler priority). The end of the critical
+       * section is the end of the surrounding block (the destructor will
+       * enable the interrupts).
+       *
+       * @note Can be nested as many times as required without problems,
+       * only the outer call will re-enable the interrupts.
+       *
+       * @par Example
+       *
+       * @code{.cpp}
+       * void
+       * func(void)
+       * {
+       *    // Do something
+       *
+       *    {
+       *      interrupts::Critical_section cs;  // Critical section begins here.
+       *
+       *      // Inside the critical section.
+       *      // No scheduler switches will happen here.
+       *
+       *    } // Critical section ends here.
+       *
+       *    // Do something else.
+       * }
+       * @endcode
+       *
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @nosubgrouping
+       */
       class Critical_section
       {
       public:
 
+        /**
+         * @name Constructors/destructor
+         * @{
+         */
+
+        /**
+         *
+         * @par Parameters
+         *  None
+         */
         Critical_section ();
 
-        ~Critical_section ();
-
+        /**
+         * @cond ignore
+         */
         Critical_section (const Critical_section&) = delete;
         Critical_section (Critical_section&&) = delete;
         Critical_section&
         operator= (const Critical_section&) = delete;
         Critical_section&
         operator= (Critical_section&&) = delete;
+        /**
+         * @endcond
+         */
+
+        ~Critical_section ();
+
+        /**
+         * @}
+         * @name Public member functions
+         * @{
+         */
 
         /**
          * @brief Enter interrupts critical section.
+         * @par Parameters
+         *  None
          * @return The current interrupts status register.
          */
         static status_t
@@ -272,171 +622,433 @@ namespace os
         /**
          * @brief Exit interrupts critical section.
          * @param status The value to restore the interrupts status register.
+         * @return  Nothing.
          */
-        // Exit an IRQ critical section
         static void
         exit (status_t status);
 
+        /**
+         * @}
+         */
+
       protected:
 
+        /**
+         * @name Private member variables
+         * @{
+         */
+
+        /**
+         * Variable to store the initial interrupts status.
+         *
+         * The variable is constant, after being set by the constructor no
+         * further changes are possible.
+         *
+         * The variable type usually is an unsigned integer where
+         * the status register is saved.
+         */
         const status_t status_;
+
+        /**
+         * @}
+         */
       };
 
+      /**
+       * @class Lock
+       * @brief Interrupts standard locker.
+       * @details Locker meeting the standard `Lockable` requirements (30.2.5.3).
+       *
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @nosubgrouping
+       */
       class Lock
       {
       public:
 
+        /**
+         * @name Constructors/destructor
+         * @{
+         */
+
+        /**
+         * @par Parameters
+         *  None
+         *
+         */
         constexpr
         Lock ();
 
         ~Lock ();
 
+        /**
+         * @cond ignore
+         */
         Lock (const Lock&) = delete;
         Lock (Lock&&) = delete;
         Lock&
         operator= (const Lock&) = delete;
         Lock&
         operator= (Lock&&) = delete;
+        /**
+         * @endcond
+         */
 
+        /**
+         * @}
+         * @name Public member functions
+         * @{
+         */
+
+        /**
+         * @brief Lock the interrupts
+         * @par Parameters
+         *  None
+         * @return  Nothing.
+         */
         void
         lock (void);
 
+        /**
+         * @brief Try to lock the interrupts.
+         * @details
+         * Somehow redundant, since the lock will always succeed;
+         * but used to meet the Lockable requirements.
+         * @par Parameters
+         *  None
+         * @retval true The interrupts were locked.
+         */
         bool
         try_lock (void);
 
+        /**
+         * @brief Unlock the interrupts.
+         * @par Parameters
+         *  None
+         * @return  Nothing.
+         */
         void
         unlock (void);
 
+        /**
+         * @}
+         */
+
       protected:
 
+        /**
+         * @name Private member variables
+         * @{
+         */
+
+        /**
+         * Variable to store the initial interrupts status.
+         *
+         * The variable type usually is an unsigned integer where
+         * the status register is saved.
+         */
         status_t status_;
+
+        /**
+         * @}
+         */
 
       };
 
-    }
+    } /* namespace interrupts */
 
     // ----------------------------------------------------------------------
 
+    // Forward reference to Thread.
     class Thread;
 
+    /**
+     * @namespace os::rtos::flags
+     * @brief Generic flags namespace.
+     * @details
+     * The os::rtos::flags namespace groups event types and enumerations.
+     */
     namespace flags
     {
+      /**
+       * @brief Type of flags mask.
+       * @details
+       * An unsigned variable large enough to store all the flags, usually
+       * 32-bits wide.
+       *
+       * Both thread signal flags and event flags use this definition.
+       */
       using mask_t = uint32_t;
+      /**
+       * @brief Type of flags mode.
+       * @details
+       * An unsigned variable used to hold the mode bits passed to
+       * functions returning flags.
+       *
+       * Both thread signal flags and event flags use this definition.
+       */
       using mode_t = uint32_t;
 
+      /**
+       * @namespace os::rtos::flags::mode
+       * @brief Flags modes.
+       * @details
+       * Container for generic flags enumerations.
+       */
       namespace mode
       {
         enum
           : mode_t
             {
-              //
-          all = 1,
-          any = 2,
-          clear = 4
+              /**
+               * @brief Expect all flags set to return.
+               */
+              all = 1,
+
+              /**
+               * @brief Expect at least one flag set to return.
+               */
+              any = 2,
+
+              /**
+               * @brief Ask for flags to be cleared after read.
+               */
+              clear = 4
         };
       } /* namespace mode */
     } /* namespace flags */
 
+    /**
+     * @namespace os::rtos::thread
+     * @brief Thread namespace.
+     * @details
+     * The os::rtos::thread namespace groups thread types, enumerations,
+     * attributes and initialisers.
+     */
     namespace thread
     {
       /**
-       * Type of priorities used for thread control.
+       * @brief Type of thread priorities.
+       * @details
+       * A numeric value used to hold a thread priority, used for thread
+       * control, like scheduling and thread resume due to events;
+       * usually an unsigned 8-bits value.
+       *
+       * Higher values represent higher priorities.
        */
       using priority_t = uint8_t;
 
-      // Explicit namespace used because values are not restricted
-      // to the enumeration.
+      /**
+       * @namespace os::rtos::thread::priority
+       * @brief Thread priority namespace.
+       * @details
+       * The os::rtos::thread::priority namespace is a container for
+       * priorities not restricted to an enumeration.
+       */
       namespace priority
       {
-        // This gives a basic range of 16 priorities, easily extensible
-        // to 32, 64, 128.
+        /**
+         * @brief Priorities pre-scaler.
+         * @details
+         * Increasing this value widens the range of allowed
+         * priorities. It is recommended to keep it low to give the
+         * scheduler a chance to optimise accesses to the ready list
+         * with an array of priorities, which will require some
+         * pointers and counters for each priority level.
+         *
+         * The default value of 0 gives 16 priorities; increasing it to
+         * 1 gives 32 priorities, 2 gives 64 priorities, 3 gives 128
+         * priorities.
+         */
         constexpr uint32_t shift = 0;
 
         enum
           : priority_t
             {
-              //
-          none = 0, // undefined, thread not initialised
-          idle = 1, // system reserved for IDLE thread
-          lowest = 2, // lowest available for user code
-          low = (2 << shift),
-          below_normal = (4 << shift),
-          normal = (6 << shift), // default
-          above_normal = (8 << shift),
-          high = (10 << shift),
-          realtime = (12 << shift),
-          highest = ((16 << shift) - 3), // highest available for user code
-          isr = ((16 << shift) - 2), // system reserved for ISR deferred task
-          error = ((16 << shift) - 1) // error
+              /**
+               * Undefined, thread not initialised
+               */
+              none = 0,
+
+              /**
+               * System reserved for IDLE thread
+               */
+              idle = 1,
+
+              /**
+               * Lowest available for user code
+               */
+              lowest = 2,
+
+              low = (2 << shift),
+
+              below_normal = (4 << shift),
+
+              /**
+               * Default priority.
+               */
+              normal = (6 << shift),
+
+              above_normal = (8 << shift),
+
+              high = (10 << shift),
+
+              realtime = (12 << shift),
+
+              /**
+               * Highest available for user code
+               */
+              highest = ((16 << shift) - 3),
+
+              /**
+               * System reserved for ISR deferred task
+               */
+              isr = ((16 << shift) - 2),
+
+              /**
+               * Error.
+               */
+              error = ((16 << shift) - 1)
         };
       } /* namespace priority */
 
+      /**
+       * @brief Type of thread staate.
+       * @details
+       * An enumeration with the possible thread states. The enumeration
+       * is restricted to one of these values.
+       */
       using state_t = enum class state : uint8_t
         {
-          // The state is restricted to one of these values.
-          undefined = 0,// Used to catch uninitialised threads
+          /**
+           * @brief Used to catch uninitialised threads
+           */
+          undefined = 0,
           inactive = 1,
           ready = 2,
           running = 3,
           waiting = 4,
-          terminated = 5,// Test for here up for reuse
+          /**
+           * @brief Reuse possible if terminated or higher.
+           */
+          terminated = 5,      // Test for here up for reuse
           destroyed = 6
         };
 
+      /**
+       * @brief Type of signal set.
+       * @details
+       * An unsigned variable large enough to store all the signal flags,
+       * actually a reuse of the more generic flags mask type @ref flags::mask_t.
+       */
       using sigset_t = flags::mask_t;
 
+      /**
+       * @namespace os::rtos::thread::sig
+       * @brief Thread signals namespace.
+       * @details
+       * The os::rtos::thread::sig namespace is a container for
+       * signal flags masks, which cannot be restricted to an enumeration..
+       */
       namespace sig
       {
         enum
           : sigset_t
             {
-              //
-          any = 0,
-          all = 0xFFFFFFFF,
+              /**
+               * @brief Special signal mask to represent any flag.
+               */
+              any = 0,
+              /**
+               * Special signal mask to represent all flags.
+               */
+              all = 0xFFFFFFFF,
         };
       } /* namespace sig */
 
+      /**
+       * @brief Thread function arguments.
+       * @details
+       * Type of function arguments.
+       */
       using func_args_t = void*;
+
+      /**
+       * @brief Thread function.
+       * @details
+       * Type of thread function.
+       */
       using func_t = void* (*) (func_args_t args);
 
     } /* namespace thread */
 
+    /**
+     * @namespace os::rtos::stack
+     * @brief Stack namespace.
+     * @details
+     * The os::rtos::stack namespace groups declarations related to
+     * the thread stack.
+     */
     namespace stack
     {
+      /**
+       * @brief Type of a stack element.
+       * @details
+       * For alignment reasons, the stack is allocated in
+       * larger chunks, usually 8-bytes long on Cortex-M cores.
+       */
       using element_t = os::rtos::port::stack::element_t;
 
     } /* namespace stack */
 
+    /**
+     * @namespace os::rtos::this_thread
+     * @brief The current thread namespace.
+     * @details
+     * The os::rtos::this_thread namespace groups functions related to
+     * the current thread.
+     */
     namespace this_thread
     {
       /**
        * @brief Get current thread.
+       * @par Parameters
+       *  None
        * @return Reference to the current running thread.
        */
       Thread&
       thread (void);
 
       /**
-       * @brief Yield CPU.
+       * @brief Yield CPU to next thread.
+       * @par Parameters
+       *  None
+       * @return Nothing.
        */
       void
       yield (void);
 
       /**
        * @brief Suspend the current thread.
+       * @par Parameters
+       *  None
+       * @return Nothing.
        */
       void
       suspend (void);
 
       /**
        * @brief Terminate the current thread.
-       * @return -
+       * @param [in] exit_ptr Pointer to object to return. (Optional).
+       * @return Nothing.
        */
       void
       exit (void* exit_ptr = nullptr);
 
       /**
        * @brief Check if wake-up due to timeout.
+       * @par Parameters
+       *  None
        * @retval true The previous sleep returned after the entire duration.
        * @retval false The previous sleep returned due to an event.
        */
@@ -504,29 +1116,84 @@ namespace os
     // ========================================================================
 
     /**
+     * @class Named_object
      * @brief Base class for named objects.
+     *
+     * @details
+     * This class serves as a base class for all objects that have a
+     * name (most of the RTOS classes do have a name).
+     *
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @nosubgrouping
      */
     class Named_object
     {
     public:
 
+      /**
+       * @name Constructors/destructor
+       * @{
+       */
+
       Named_object (const char* name);
 
+      /**
+       * @cond ignore
+       */
       Named_object (const Named_object&) = default;
       Named_object (Named_object&&) = default;
       Named_object&
       operator= (const Named_object&) = default;
       Named_object&
       operator= (Named_object&&) = default;
+      /**
+       * @endcond
+       */
 
       ~Named_object () = default;
 
+      /**
+       * @}
+       * @name Public member functions
+       * @{
+       */
+
+      /**
+       * @brief Get name.
+       * @par Parameters
+       *  None.
+       * @return A null terminated string.
+       */
       const char*
       name (void) const;
 
+      /**
+       * @}
+       */
+
     protected:
 
+      /**
+       * @name Private member variables
+       * @{
+       */
+
+      /**
+       * @brief Pointer to name.
+       * @details
+       * To save space, the null terminated string passed to the
+       * constructor is not copied locally, instead the pointer is
+       * stored, so the
+       * caller must ensure that the pointer life cycle
+       * is at least as long as the object life cycle. A constant
+       * string (stored in flash) is preferred.
+       */
       const char* const name_;
+
+      /**
+       * @}
+       */
+
     };
 
     // ========================================================================
@@ -538,27 +1205,62 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
       /**
+       * @class Attributes
        * @brief Thread attributes.
+       * @details
+       * Allow to assign a name and custom attributes (like stack address,
+       * stack size, priority) to the thread.
+       *
+       * @par POSIX compatibility
+       *  Inspired by `pthread_attr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       *
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @nosubgrouping
        */
       class Attributes : public Named_object
       {
       public:
 
+        /**
+         * @name Constructors/destructor
+         * @{
+         */
+
+        /**
+         * @brief Create thread attributes.
+         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         */
         Attributes (const char* name);
 
+        /**
+         * @cond ignore
+         */
         Attributes (const Attributes&) = default;
         Attributes (Attributes&&) = default;
         Attributes&
         operator= (const Attributes&) = default;
         Attributes&
         operator= (Attributes&&) = default;
+        /**
+         * @endcond
+         */
 
         /**
-         * @brief Delete thread attributes.
+         * @brief Destroy thread attributes.
          */
         ~Attributes () = default;
 
+        /**
+         * @}
+         */
+
       public:
+
+        /**
+         * @name Public member variables
+         * @{
+         */
 
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
@@ -567,10 +1269,18 @@ namespace os
         priority_t th_priority;
 
         // Add more attributes.
+
+        /**
+         * @}
+         */
+
       };
 
 #pragma GCC diagnostic pop
 
+      /**
+       * @brief Default thread initialiser.
+       */
       extern const Attributes initializer;
     }
 
@@ -578,8 +1288,17 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
 #if !defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE)
-    // Default empty user storage.
-    typedef struct os_thread_user_storage_s
+    /**
+     * @brief Default empty thread user storage.
+     *
+     * If the application requires to store some additional data
+     * to each thread, redefine this structure in the `<os-app-conf.h>`
+     * file.
+     *
+     * To get the address of the user storage associated with a
+     * given thread, use @ref Thread::user_storage().
+     */
+    typedef struct
       {
         ;
       }os_thread_user_storage_t;
@@ -587,17 +1306,26 @@ namespace os
 
     /**
      * @class Thread
-     * @brief POSIX thread.
+     * @brief POSIX compliant thread.
      * @details
      * Supports terminating functions and a simplified version of
      * signal flags.
      *
-     * Compatible with POSIX threads:
-     * http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html
+     * @par POSIX compatibility
+     *  Inspired by `pthread_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  (IEEE Std 1003.1, 2013 Edition).
+     *
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @nosubgrouping
      */
     class Thread : public Named_object
     {
     public:
+
+      /**
+       * @name Constructors/destructor
+       * @{
+       */
 
       /**
        * @brief Create a new thread with default settings.
@@ -610,15 +1338,26 @@ namespace os
       Thread (const thread::Attributes& attr, thread::func_t function,
               thread::func_args_t args);
 
-      // Prevent any copy or move.
+      /**
+       * @cond ignore
+       */
       Thread (const Thread&) = delete;
       Thread (Thread&&) = delete;
       Thread&
       operator= (const Thread&) = delete;
       Thread&
       operator= (Thread&&) = delete;
+      /**
+       * @endcond
+       */
 
       ~Thread ();
+
+      /**
+       * @}
+       * @name Operators
+       * @{
+       */
 
       /**
        * @brief Compare threads.
@@ -629,8 +1368,16 @@ namespace os
       operator== (const Thread& rhs) const;
 
       /**
+       * @}
+       * @name Public member functions
+       * @{
+       */
+
+      /**
        * @brief Cancel thread execution.
-       * @retval result::ok.
+       * @par Parameters
+       *  None.
+       * @retval result::ok The cancel request was sent to the thread.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
@@ -638,7 +1385,7 @@ namespace os
 
       /**
        * @brief Wait for thread termination.
-       * @retval result::ok.
+       * @retval result::ok The thread was terminated.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
@@ -646,7 +1393,9 @@ namespace os
 
       /**
        * @brief Detach a thread.
-       * @retval result::ok.
+       * @par Parameters
+       *  None
+       * @retval result::ok The thread was detached.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
@@ -666,6 +1415,8 @@ namespace os
 
       /**
        * @brief Get the current scheduling priority.
+       * @par Parameters
+       *  None.
        * @return The thread priority.
        */
       thread::priority_t
@@ -687,20 +1438,42 @@ namespace os
 #endif
 
       // TODO: study how to integrate signals and POSIX cancellation.
+      /**
+       * @brief Check if interrupted.
+       * @par Parameters
+       *  None
+       * @retval true The thread was interrupted.
+       * @retval false The thread was not interrupted.
+       */
       bool
       interrupted (void);
 
+      /**
+       * @par Parameters
+       *  None
+       *
+       * @return
+       */
       thread::state_t
       sched_state (void) const;
 
       /**
        * @brief Wake-up the thread.
+       * @par Parameters
+       *  None
+       * @return  Nothing.
        *
        * @note Can be invoked from Interrupt Service Routines.
        */
       void
       wakeup (void);
 
+      /**
+       * @brief Get the thread function arguments.
+       * @par Parameters
+       *  None.
+       * @return Pointer to arguments.
+       */
       void*
       function_args (void) const;
 
@@ -712,6 +1485,8 @@ namespace os
 
       /**
        * @brief Get user storage.
+       * @par Parameters
+       *  None
        * @return The address of the thread user storage.
        */
       os_thread_user_storage_t*
@@ -755,29 +1530,61 @@ namespace os
 
       /**
        * @brief Force thread termination.
+       * @par Parameters
+       *  None
        * @retval result::ok The tread was terminated.
        */
       result_t
       kill (void);
 
+      /**
+       * @}
+       */
+
     protected:
+
+      /**
+       * @name Private friends
+       * @{
+       */
 
       friend void
       this_thread::suspend (void);
 
+      friend void
+      this_thread::exit (void* exit_ptr);
+
+      friend result_t
+      this_thread::sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
+                             flags::mode_t mode);
+
+      friend result_t
+      this_thread::try_sig_wait (thread::sigset_t mask,
+                                 thread::sigset_t* oflags, flags::mode_t mode);
+      friend result_t
+      this_thread::timed_sig_wait (thread::sigset_t mask,
+                                   thread::sigset_t* oflags, systicks_t ticks,
+                                   flags::mode_t mode);
+
+      /**
+       * @}
+       * @name Private member functions
+       * @{
+       */
+
       /**
        * @brief Suspend the current thread.
-       *
+       * @par Parameters
+       *  None
+       * @return  Nothing.
        */
       void
       suspend (void);
 
-      friend void
-      this_thread::exit (void* exit_ptr);
-
       /**
        * @brief Terminate thread.
-       * @return -
+       * @param [in] exit_ptr Pointer to object to return (optional).
+       * @return  Nothing.
        */
       void
       exit (void* exit_ptr = nullptr);
@@ -785,31 +1592,63 @@ namespace os
       /**
        * @brief Invoke terminating thread function.
        * @param [in] thread The static `this`.
+       * @return  Nothing.
        */
       static void
       _invoke_with_exit (Thread* thread);
 
-      friend result_t
-      this_thread::sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                             flags::mode_t mode);
-
+      /**
+       * @brief Wait for signal flags.
+       * @param [in] mask The expected flags (OR-ed bit-mask);
+       *  may be zero.
+       * @param [out] oflags Pointer where to store the current flags;
+       *  may be nullptr.
+       * @param [in] mode Mode bits to select if either all or any flags
+       *  are expected, and if the flags should be cleared.
+       * @retval result::ok All expected flags are raised.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EINVAL The mask is outside of the permitted range.
+       * @retval EINTR The operation was interrupted.
+       * @retval ENOTRECOVERABLE Wait failed.
+       */
       result_t
       sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
                 flags::mode_t mode);
 
-      friend result_t
-      this_thread::try_sig_wait (thread::sigset_t mask,
-                                 thread::sigset_t* oflags, flags::mode_t mode);
-
+      /**
+       * @brief Try to wait for signal flags.
+       * @param [in] mask The expected flags (OR-ed bit-mask);
+       *  may be zero.
+       * @param [out] oflags Pointer where to store the current flags;
+       *  may be nullptr.
+       * @param [in] mode Mode bits to select if either all or any flags
+       *  are expected, and if the flags should be cleared.
+       * @retval result::ok All expected flags are raised.
+       * @retval EINVAL The mask is outside of the permitted range.
+       * @retval EAGAIN The expected condition did not occur.
+       * @retval ENOTRECOVERABLE Wait failed.
+       */
       result_t
       try_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
                     flags::mode_t mode);
 
-      friend result_t
-      this_thread::timed_sig_wait (thread::sigset_t mask,
-                                   thread::sigset_t* oflags, systicks_t ticks,
-                                   flags::mode_t mode);
-
+      /**
+       * @brief Timed wait for signal flags.
+       * @param [in] mask The expected flags (OR-ed bit-mask);
+       *  may be zero.
+       * @param [out] oflags Pointer where to store the current flags;
+       *  may be nullptr.
+       * @param [in] mode Mode bits to select if either all or any flags
+       *  are expected, and if the flags should be cleared.
+       * @param ticks The number of ticks to wait.
+       * @retval result::ok All expected flags are raised.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval ETIMEDOUT The expected condition did not occur during the
+       *  entire timeout duration.
+       * @retval EINVAL The mask is outside of the permitted range.
+       * @retval EINTR The operation was interrupted.
+       * @retval ENOTRECOVERABLE Wait failed.
+       */
       result_t
       timed_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
                       systicks_t ticks, flags::mode_t mode);
@@ -819,12 +1658,24 @@ namespace os
                  flags::mode_t mode);
 
       /**
-       * The actual destructor, also called from exit() and kill().
+       * @brief The actual destructor, also called from exit() and kill().
+       * @par Parameters
+       *  None
+       * @return  Nothing.
        */
       void
       _destroy (void);
 
+      /**
+       * @}
+       */
+
     protected:
+
+      /**
+       * @name Private member variables
+       * @{
+       */
 
       // TODO: group them in a Stack object
       void* stack_addr_;
@@ -853,6 +1704,9 @@ namespace os
 
       // Add other internal data
 
+      /**
+       * @}
+       */
     };
 
 #pragma GCC diagnostic pop
@@ -860,24 +1714,69 @@ namespace os
     // ========================================================================
 
     /**
+     * @class Systick_clock
+     * @brief SysTick derived clock.
+     *
+     * @details
+     * This clock counts SysTick interrupts since startup.
+     *
      * The SysTick clock should be a steady clock, i.e. the total
      * count of ticks should be monotone ascending (in other words no
      * adjustments to the past should be performed).
+     *
+     * For Cortex-M implementations using the standard SysTick, this
+     * clock is able to provide accuracy at CPU cycle level, by
+     * sampling the SysTick internal counter. For a CPU clock of 100 MHz,
+     * this gives a 10 ns resolution, quite high for accurate timing.
+     *
+     * @par Example
+     *
+     * @code{.cpp}
+     * void
+     * func(void)
+     * {
+     *    // Do something
+     *
+     *    // Get the current ticks counter.
+     *    Systick_clock::rep ticks = Systick_clock::now();
+     *
+     *    // Put the current thread to sleep for a given number of ticks.
+     *    Systick_clock::sleep_for(7);
+     *
+     *    // Put the current thread to sleep for a given number of microseconds.
+     *    // For a 1000 Hz clock, the actual value is 4 ticks.
+     *    Systick_clock::sleep_for(Systick_clock::ticks_cast(3500));
+     *
+     *    // Do something else.
+     * }
+     * @endcode
+     *
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @nosubgrouping
      */
     class Systick_clock
     {
     public:
 
-      static constexpr uint32_t frequency_hz = OS_INTEGER_SYSTICK_FREQUENCY_HZ;
-      using rep = uint64_t;
-      using sleep_rep = duration_t;
+      /**
+       * @name Types and constants
+       * @{
+       */
 
       /**
-       * @brief Tell the current time.
-       * @return The number of SysTick ticks since startup.
+       * @brief SysTick frequency in Hz.
        */
-      static rep
-      now (void);
+      static constexpr uint32_t frequency_hz = OS_INTEGER_SYSTICK_FREQUENCY_HZ;
+
+      /**
+       * @brief Type of ticks counter.
+       */
+      using rep = uint64_t;
+
+      /**
+       * @brief Type of duration in ticks.
+       */
+      using sleep_rep = duration_t;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -888,24 +1787,55 @@ namespace os
        * @details
        * When an accurate timestamp is needed, the current SysTick
        * counter can be sampled to get the count of CPU cycles inside
-       * the tick. For a 100 MHz clock, this is a 10 ns resolution.
+       * the tick. For a 100 MHz clock, this gives a 10 ns resolution.
        *
        * To simplify further processing of this timestamp, the
        * structure also includes the CPU clock and the SysTick divider.
        */
-      using current_t = struct current_s
+      using current_t = struct
         {
-          uint64_t ticks; // Count of SysTick ticks since core reset
-          uint32_t cycles;// Count of SysTick cycles since timer reload (24 bits)
-          uint32_t divisor;// SysTick reload value (24 bits)
-          uint32_t core_frequency_hz;// Core clock frequency Hz
+          /**
+           * @brief Count of SysTick ticks since core reset.
+           */
+          uint64_t ticks;
+
+          /**
+           * @brief Count of SysTick cycles since timer reload (24 bits).
+           */
+          uint32_t cycles;
+
+          /**
+           * @brief SysTick reload value (24 bits).
+           */
+          uint32_t divisor;
+
+          /**
+           * @brief CPU clock frequency Hz.
+           */
+          uint32_t core_frequency_hz;
         };
 
 #pragma GCC diagnostic pop
 
       /**
+       * @}
+       * @name Public member functions
+       * @{
+       */
+
+      /**
        * @brief Tell the current time.
-       * @return Accurate sampling of SysTick.
+       * @par Parameters
+       *  None
+       * @return The number of SysTick ticks since startup.
+       */
+      static rep
+      now (void);
+
+      /**
+       * @brief Tell the detailed current time.
+       * @param [out] details Pointer to structure to store the clock details.
+       * @return The number of SysTick ticks since startup.
        */
       static rep
       now (current_t* details);
@@ -941,31 +1871,115 @@ namespace os
       static result_t
       wait (sleep_rep ticks);
 
+      /**
+       * @}
+       */
+
     protected:
 
+      /**
+       * @name Private member functions
+       * @{
+       */
+
+      /**
+       * @brief Internal wait.
+       * @param ticks
+       * @retval result::ok An event occurred before the timeout.
+       * @retval ETIMEDOUT The wait lasted the entire duration.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EINTR The sleep was interrupted.
+       */
       static result_t
       _wait (sleep_rep ticks);
 
+      /**
+       * @}
+       */
+
     };
 
+    /**
+     * @class Realtime_clock
+     * @brief Real time clock.
+     *
+     * @details
+     * This clock counts seconds since epoch or startup.
+     *
+     * The real time clock should be derived from a battery powered
+     * second counting RTC, initialised at startup with the number
+     * of seconds since the standard POSIX epoch (January 1st, 1970).
+     *
+     * As any usual clock, it might occasionally be adjusted to match
+     * a reference clock, so i cannot be a steady clock.
+     *
+     * For systems that do not have a hardware RTC, it can be derived from
+     * SysTick, but in this case it must be externally initialised with
+     * the epoch.
+     *
+     * @par Example
+     *
+     * @code{.cpp}
+     * void
+     * func(void)
+     * {
+     *    // Do something
+     *
+     *    // Get the current seconds counter.
+     *    Realtime_clock::rep seconds = Realtime_clock::now();
+     *
+     *    // Put the current thread to sleep for a given number of seconds.
+     *    Realtime_clock::sleep_for(7);
+     *
+     *    // Do something else.
+     * }
+     * @endcode
+     *
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @nosubgrouping
+     */
     class Realtime_clock
     {
     public:
 
+      /**
+       * @name Types and constants
+       * @{
+       */
+
+      /**
+       * @brief Real time clock frequency in Hz.
+       */
       static constexpr uint32_t frequency_hz = 1;
+
+      /**
+       * @brief Type of seconds counter.
+       */
       using rep = uint64_t;
+
+      /**
+       * @brief Type of duration in ticks.
+       */
       using sleep_rep = duration_t;
 
       /**
+       * @}
+       * @name Public member functions
+       * @{
+       */
+
+      /**
        * @brief Tell the absolute time now.
-       * @return The number of seconds since 1 January 1970 00:00:00.
+       * @par Parameters
+       *  None
+       * @return The number of seconds since January 1st, 1970 00:00:00.
        */
       static rep
       now (void);
 
       /**
        * @brief Sleep a number of seconds.
-       * @param [in] secs the number of seconds to sleep.
+       * @param [in] secs The number of seconds to sleep.
        * @retval ETIMEDOUT The sleep lasted the entire duration.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval EINTR The sleep was interrupted.
@@ -973,117 +1987,246 @@ namespace os
       static result_t
       sleep_for (sleep_rep secs);
 
+      /**
+       * @brief Initialise RTC.
+       * @par Parameters
+       *  None
+       * @retval result::ok   The real time clock was initialised.
+       * @retval ENOTRECOVERABLE Could not initialise real time clock.
+       */
       static result_t
       initialize (void);
+
+      /**
+       * @}
+       */
     };
 
     // ==================--====================================================
 
+    /**
+     * @namespace os::rtos::timer
+     * @brief User timer namespace.
+     * @details
+     * The os::rtos::timer namespace groups timer types, enumerations,
+     * attributes and initialisers.
+     */
     namespace timer
     {
       /**
-       * Timer call back function arguments.
+       * @brief Timer call back function arguments.
        */
       using func_args_t = void*;
+
       /**
-       * Entry point of a timer call back function.
+       * @brief Entry point of a timer call back function.
        */
       using func_t = void (*) (func_args_t args);
 
       /**
-       * Timer run type.
+       * @brief Timer run type.
        */
       using type_t = enum class run : uint8_t
         {
-          once = 0, //
-          periodic = 1//
+          /**
+           * @brief Run only once.
+           */
+          once = 0,
+
+          /**
+           * @brief Run periodically.
+           */
+          periodic = 1      //
         };
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
       /**
+       * @class Attributes
        * @brief Timer attributes.
+       * @details
+       * Allow to assign a name to the timer.
+       *
+       * @par POSIX compatibility
+       *  No POSIX similar functionality identified, but inspired by POSIX
+       *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       *
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @nosubgrouping
        */
       class Attributes : public Named_object
       {
       public:
 
+        /**
+         * @name Constructors/destructor
+         * @{
+         */
+
+        /**
+         * @brief Create timer attributes.
+         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         */
         Attributes (const char* name);
 
+        /**
+         * @cond ignore
+         */
         Attributes (const Attributes&) = default;
         Attributes (Attributes&&) = default;
         Attributes&
         operator= (const Attributes&) = default;
         Attributes&
         operator= (Attributes&&) = default;
+        /**
+         * @endcond
+         */
 
         /**
-         * @brief Delete timer attributes.
+         * @brief Destroy timer attributes.
          */
         ~Attributes () = default;
 
+        /**
+         * @}
+         */
+
       public:
+
+        /**
+         * @name Public member variables
+         * @{
+         */
 
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
+        /**
+         * @brief Timer type.
+         */
         type_t tm_type;
 
         // Add more attributes.
+
+        /**
+         * @}
+         */
       };
 
 #pragma GCC diagnostic pop
 
+      /**
+       * @brief Default one shot timer initialiser.
+       */
       extern const Attributes once_initializer;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+      /**
+       * @class Periodic_attributes
+       * @brief Periodic timer attributes.
+       * @details
+       * Allow to assign a name to the timer.
+       *
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @nosubgrouping
+       */
       class Periodic_attributes : public Attributes
       {
       public:
 
+        /**
+         * @name Constructors/destructor
+         * @{
+         */
+
+        /**
+         * @brief Create periodic timer attributes.
+         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         */
         Periodic_attributes (const char* name);
 
+        /**
+         * @cond ignore
+         */
         Periodic_attributes (const Periodic_attributes&) = default;
         Periodic_attributes (Periodic_attributes&&) = default;
         Periodic_attributes&
         operator= (const Periodic_attributes&) = default;
         Periodic_attributes&
         operator= (Periodic_attributes&&) = default;
+        /**
+         * @endcond
+         */
 
         /**
-         * @brief Delete timer attributes.
+         * @brief Destroy timer attributes.
          */
         ~Periodic_attributes () = default;
+
+        /**
+         * @}
+         */
 
       };
 
 #pragma GCC diagnostic pop
 
+      /**
+       * @brief Default periodic timer initialiser.
+       */
       extern const Periodic_attributes periodic_initializer;
     }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+    /**
+     * @class Timer
+     * @brief User timer.
+     *
+     * @par POSIX compatibility
+     *  No POSIX similar functionality identified.
+     *
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @nosubgrouping
+     */
     class Timer : public Named_object
     {
     public:
+
+      /**
+       * @name Constructors/destructor
+       * @{
+       */
 
       Timer (timer::func_t function, timer::func_args_t args);
 
       Timer (const timer::Attributes& attr, timer::func_t function,
              timer::func_args_t args);
 
+      /**
+       * @cond ignore
+       */
       Timer (const Timer&) = delete;
       Timer (Timer&&) = delete;
       Timer&
       operator= (const Timer&) = delete;
       Timer&
       operator= (Timer&&) = delete;
+      /**
+       * @endcond
+       */
 
       ~Timer ();
+
+      /**
+       * @}
+       * @name Operators
+       * @{
+       */
 
       /**
        * @brief Compare timers.
@@ -1092,6 +2235,12 @@ namespace os
        */
       bool
       operator== (const Timer& rhs) const;
+
+      /**
+       * @}
+       * @name Public member functions
+       * @{
+       */
 
       /**
        * @brief Start or restart the timer.
@@ -1105,6 +2254,8 @@ namespace os
 
       /**
        * @brief Stop the timer.
+       * @par Parameters
+       *  None
        * @retval result::ok The timer has been stopped.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval EAGAIN The timer is not yet started.
@@ -1113,7 +2264,16 @@ namespace os
       result_t
       stop (void);
 
+      /**
+       * @}
+       */
+
     protected:
+
+      /**
+       * @name Private member variables
+       * @{
+       */
 
       timer::func_t func_;
       timer::func_args_t func_args_;
@@ -1126,64 +2286,149 @@ namespace os
       timer::type_t type_;
 
       // Add more internal data.
+
+      /**
+       * @}
+       */
     };
 
 #pragma GCC diagnostic pop
 
     // ========================================================================
 
+    /**
+     * @namespace os::rtos::mutex
+     * @brief Mutex namespace.
+     * @details
+     * The os::rtos::mutex namespace groups mutex types, enumerations,
+     * attributes and initialisers.
+     */
     namespace mutex
     {
+      /**
+       * @brief Type of mutex protocol.
+       */
       using protocol_t = enum class protocol : uint8_t
         {
-          //
+          /**
+           * @brief Undefined value.
+           */
           none = 0,
+
+          /**
+           * @brief Inherit.
+           * @details
+           * TODO: add
+           */
           inherit = 1,
+
+          /**
+           * @brief Protect.
+           * @details
+           * TODO: add
+           */
           protect = 2
         };
 
+      /**
+       * @brief Type of mutex robustness.
+       */
       using robustness_t = enum class robustness : uint8_t
         {
-          //
+          /**
+           * @brief Normal robustness.
+           */
           stalled = 0,
+          /**
+           * @brief Enhanced robustness.
+           */
           robust = 1
         };
 
+      /**
+       * @brief Type of mutex behaviour.
+       */
       using type_t = enum class type : uint8_t
         {
-          //
+          /**
+           * @brief Normal mutex behaviour.
+           */
           normal = 0,
+          /**
+           * @brief Check mutex behaviour.
+           */
           errorcheck = 1,
+          /**
+           * @brief Recursive mutex behaviour.
+           */
           recursive = 2,
         };
 
+      /**
+       * @brief Type of mutex recursion counter.
+       */
       using count_t = uint16_t;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
       /**
+       * @class Attributes
        * @brief Mutex attributes.
+       * @details
+       * Allow to assign a name and custom attributes (like priority ceiling,
+       * robustness, etc) to the mutex.
+       *
+       * @par POSIX compatibility
+       *  Inspired by `pthread_mutexattr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       *
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @nosubgrouping
        */
       class Attributes : public Named_object
       {
       public:
 
+        /**
+         * @name Constructors/destructor
+         * @{
+         */
+
+        /**
+         * @brief Create mutex attributes.
+         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         */
         Attributes (const char* name);
 
+        /**
+         * @cond ignore
+         */
         Attributes (const Attributes&) = default;
         Attributes (Attributes&&) = default;
         Attributes&
         operator= (const Attributes&) = default;
         Attributes&
         operator= (Attributes&&) = default;
+        /**
+         * @endcond
+         */
 
         /**
-         * @brief Delete a mutex attributes.
+         * @brief Destroy a mutex attributes.
          */
         ~Attributes () = default;
 
+        /**
+         * @}
+         */
+
       public:
+
+        /**
+         * @name Public member variables
+         * @{
+         */
 
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
@@ -1193,37 +2438,79 @@ namespace os
         mutex::type_t mx_type;
 
         // Add more attributes.
+
+        /**
+         * @}
+         */
       };
 
 #pragma GCC diagnostic pop
 
+      /**
+       * @brief Default normal mutex initialiser.
+       */
       extern const Attributes normal_initializer;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+      /**
+       * @class Recursive_attributes
+       * @brief Recursive mutex attributes.
+       * @details
+       * Allow to assign a name and custom attributes (like priority ceiling,
+       * robustness, etc) to the mutex.
+       *
+       * @par POSIX compatibility
+       *  Inspired by `pthread_mutexattr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       *
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @nosubgrouping
+       */
       class Recursive_attributes : public Attributes
       {
       public:
 
+        /**
+         * @name Constructors/destructor
+         * @{
+         */
+
+        /**
+         * @brief Create recursive mutex attributes.
+         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         */
         Recursive_attributes (const char* name);
 
+        /**
+         * @cond ignore
+         */
         Recursive_attributes (const Recursive_attributes&) = default;
         Recursive_attributes (Recursive_attributes&&) = default;
         Recursive_attributes&
         operator= (const Recursive_attributes&) = default;
         Recursive_attributes&
         operator= (Recursive_attributes&&) = default;
+        /**
+         * @endcond
+         */
 
         /**
-         * @brief Delete a recursive mutex attributes.
+         * @brief Destroy a recursive mutex attributes.
          */
         ~Recursive_attributes () = default;
 
+        /**
+         * @}
+         */
       };
 
 #pragma GCC diagnostic pop
 
+      /**
+       * @brief Default recursive mutex initialiser.
+       */
       extern const Recursive_attributes recursive_initializer;
 
     } /* namespace mutex */
@@ -1233,12 +2520,30 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+    /**
+     * @class Mutex
+     * @brief POSIX compliant mutex.
+     *
+     * @par POSIX compatibility
+     *  Inspired by `pthread_mutex_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  (IEEE Std 1003.1, 2013 Edition).
+     *
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @nosubgrouping
+     */
     class Mutex : public Named_object
     {
     public:
 
       /**
+       * @name Constructors/destructor
+       * @{
+       */
+
+      /**
        * @brief Create a mutex with default attributes.
+       * @par Parameters
+       *  None
        */
       Mutex ();
       /**
@@ -1246,17 +2551,29 @@ namespace os
        */
       Mutex (const mutex::Attributes& attr);
 
+      /**
+       * @cond ignore
+       */
       Mutex (const Mutex&) = delete;
       Mutex (Mutex&&) = delete;
       Mutex&
       operator= (const Mutex&) = delete;
       Mutex&
       operator= (Mutex&&) = delete;
+      /**
+       * @endcond
+       */
 
       /**
-       * @brief Delete a mutex.
+       * @brief Destroy the mutex.
        */
       ~Mutex ();
+
+      /**
+       * @}
+       * @name Operators
+       * @{
+       */
 
       /**
        * @brief Compare mutexes.
@@ -1267,7 +2584,15 @@ namespace os
       operator== (const Mutex& rhs) const;
 
       /**
+       * @}
+       * @name Public member functions
+       * @{
+       */
+
+      /**
        * @brief Lock the mutex.
+       * @par Parameters
+       *  None
        * @retval result::ok The mutex was locked.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval ENOTRECOVERABLE The state protected by the mutex is
@@ -1290,6 +2615,8 @@ namespace os
 
       /**
        * @brief Try to lock the mutex.
+       * @par Parameters
+       *  None
        * @retval result::ok The mutex was locked.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval ENOTRECOVERABLE The state protected by the mutex is
@@ -1339,6 +2666,8 @@ namespace os
 
       /**
        * @brief Unlock the mutex.
+       * @par Parameters
+       *  None
        * @retval result::ok The mutex was unlocked.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine;
        *  the mutex type is PTHREAD_MUTEX_ERRORCHECK or
@@ -1351,6 +2680,8 @@ namespace os
 
       /**
        * @brief Get the priority ceiling of a mutex.
+       * @par Parameters
+       *  None
        * @return The priority ceiling.
        */
       thread::priority_t
@@ -1370,7 +2701,9 @@ namespace os
 
       /**
        * @brief Mark mutex as consistent.
-       * @retval result::ok.
+       * @par Parameters
+       *  None
+       * @retval result::ok The mutex was marked as consistent.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        * @retval EINVAL The mutex object referenced by mutex is not robust
        *  or does not protect an inconsistent state.
@@ -1378,13 +2711,34 @@ namespace os
       result_t
       consistent (void);
 
+      /**
+       *
+       * @par Parameters
+       *  None
+       * @return
+       */
       Thread*
       owner (void);
 
+      /**
+       *
+       * @par Parameters
+       *  None
+       * @return
+       */
       result_t
       reset (void);
 
+      /**
+       * @}
+       */
+
     protected:
+
+      /**
+       * @name Private member variables
+       * @{
+       */
 
       // Can be updated in different thread contexts.
       Thread* volatile owner_;
@@ -1406,71 +2760,155 @@ namespace os
       const mutex::robustness_t robustness_; // stalled, robust
 
       // Add more internal data.
+
+      /**
+       * @}
+       */
     };
 
 #pragma GCC diagnostic pop
 
     // ========================================================================
 
+    /**
+     * @namespace os::rtos::condvar
+     * @brief Condition variable namespace.
+     * @details
+     * The `os::rtos::condvar` namespace groups condition variable attributes
+     * and initialisers.
+     */
     namespace condvar
     {
 
       /**
+       * @class Attributes
        * @brief Condition variable attributes.
+       * @details
+       * Allow to assign a name to the condition variable.
+       *
+       * @par POSIX compatibility
+       *  Inspired by `pthread_condattr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       *
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @nosubgrouping
        */
       class Attributes : public Named_object
       {
       public:
 
+        /**
+         * @name Constructors/destructor
+         * @{
+         */
+
+        /**
+         * @brief Create condition variable attributes.
+         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         */
         Attributes (const char* name);
 
+        /**
+         * @cond ignore
+         */
         Attributes (const Attributes&) = default;
         Attributes (Attributes&&) = default;
         Attributes&
         operator= (const Attributes&) = default;
         Attributes&
         operator= (Attributes&&) = default;
+        /**
+         * @endcond
+         */
 
         /**
-         * @brief Delete a condition variable attributes.
+         * @brief Destroy condition variable attributes.
          */
         ~Attributes () = default;
 
+        /**
+         * @}
+         */
+
       public:
+
+        /**
+         * @name Public member variables
+         * @{
+         */
 
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
-
         // Add more attributes.
+        /**
+         * @}
+         */
       };
 
+      /**
+       * @brief Default condition variable initialiser.
+       */
       extern const Attributes initializer;
 
     } /* namespace condvar */
 
     // ========================================================================
 
+    /**
+     * @class Condition_variable
+     * @brief POSIX compliant condition variable.
+     *
+     * @par POSIX compatibility
+     *  Inspired by `pthread_cond_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  (IEEE Std 1003.1, 2013 Edition).
+     *
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @nosubgrouping
+     */
     class Condition_variable : public Named_object
     {
     public:
 
       /**
-       * @brief Create a condition variable.
+       * @name Constructors/destructor
+       * @{
+       */
+
+      /**
+       * @brief Create a default condition variable.
+       * @par Parameters
+       *  None
        */
       Condition_variable ();
+      /**
+       * @brief Create a custom condition variable.
+       * @param [in] attr Reference to attributes.
+       */
       Condition_variable (const condvar::Attributes& attr);
 
+      /**
+       * @cond ignore
+       */
       Condition_variable (const Condition_variable&) = delete;
       Condition_variable (Condition_variable&&) = delete;
       Condition_variable&
       operator= (const Condition_variable&) = delete;
       Condition_variable&
       operator= (Condition_variable&&) = delete;
+      /**
+       * @endcond
+       */
 
       /**
-       * @brief Delete a condition variable.
+       * @brief Destroy a condition variable.
        */
       ~Condition_variable ();
+
+      /**
+       * @}
+       * @name Operators
+       * @{
+       */
 
       /**
        * @brief Compare condition variables.
@@ -1482,25 +2920,35 @@ namespace os
       operator== (const Condition_variable& rhs) const;
 
       /**
-       * @brief Signal a condition.
-       * @retval result::ok.
+       * @}
+       * @name Public member functions
+       * @{
+       */
+
+      /**
+       * @brief Signal a condition variable variable.
+       * @par Parameters
+       *  None
+       * @retval result::ok The thread was signaled.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       signal (void);
 
       /**
-       * @brief Broadcast a condition.
-       * @retval result::ok.
+       * @brief Broadcast a condition variable.
+       * @par Parameters
+       *  None
+       * @retval result::ok All waiting threads signaled.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       broadcast (void);
 
       /**
-       * @brief Wait on a condition.
+       * @brief Wait on a condition variable.
        * @param [in] mutex Reference to the associated mutex.
-       * @retval result::ok.
+       * @retval result::ok The condition change was signaled.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
@@ -1509,83 +2957,203 @@ namespace os
       // Neither POSIX nor ISO define a try_wait(), so... do we need one?
 
       /**
-       * @brief Timed wait on a condition.
+       * @brief Timed wait on a condition variable.
        * @param [in] mutex Reference to the associated mutex.
        * @param [in] ticks Ticks to wait.
+       * @retval result::ok The condition change was signaled.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
-       * @retval result::ok.
        */
       result_t
       timed_wait (Mutex& mutex, systicks_t ticks);
 
+      /**
+       * @}
+       */
+
     protected:
 
+      /**
+       * @name Private member variables
+       * @{
+       */
+
       // Add more internal data.
+      /**
+       * @}
+       */
+
     };
 
     // ========================================================================
 
+    /**
+     * @namespace os::rtos::semaphore
+     * @brief Semaphore namespace.
+     * @details
+     * The os::rtos::semaphore namespace groups semaphore types,
+     * attributes and initialisers.
+     */
     namespace semaphore
     {
+      /**
+       * @brief Type of semaphore counter.
+       * @details
+       * A numeric value enough to hold the semaphore counter,
+       * usually a 16-bits signed value.
+       */
       using count_t = int16_t;
+
+      /**
+       * @brief Maximum semaphore value.
+       * @details
+       * Used to validate the semaphore initial count and max count.
+       */
       constexpr count_t max_count_value = 0x7FFF;
 
       /**
+       * @class Attributes
        * @brief Semaphore attributes.
+       * @details
+       * Allow to assign a name and custom attributes (like initial count,
+       * max count) to the semaphore.
+       *
+       * @par POSIX compatibility
+       *  No POSIX similar functionality identified, but inspired by POSIX
+       *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       *
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @nosubgrouping
        */
       class Attributes : public Named_object
       {
       public:
 
+        /**
+         * @name Constructors/destructor
+         * @{
+         */
+
+        /**
+         * @brief Create semaphore attributes.
+         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         */
         Attributes (const char* name);
 
+        /**
+         * @cond ignore
+         */
         Attributes (const Attributes&) = default;
         Attributes (Attributes&&) = default;
         Attributes&
         operator= (const Attributes&) = default;
         Attributes&
         operator= (Attributes&&) = default;
+        /**
+         * @endcond
+         */
 
         /**
-         * @brief Delete semaphore attributes.
+         * @brief Destroy semaphore attributes.
          */
         ~Attributes () = default;
 
+        /**
+         * @}
+         */
+
       public:
+
+        /**
+         * @name Public member variables
+         * @{
+         */
 
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
+        /**
+         * @brief Semaphore initial count.
+         * @details
+         * This values represents the number of resources initially
+         * available to the semaphore.
+         */
         count_t sm_initial_count;
 
+        /**
+         * @brief Semaphore max count.
+         * @details
+         * This values represents the maximum number of resources
+         * available to the semaphore.
+         */
         count_t sm_max_count;
 
         // Add more attributes.
+
+        /**
+         * @}
+         */
       };
 
+      /**
+       * @brief Default counting semaphore initialiser.
+       */
       extern const Attributes counting_initializer;
 
       /**
-       * @brief Semaphore attributes.
+       * @class Binary_attributes
+       * @brief Binary semaphore attributes.
+       * @details
+       * Allow to assign a name and custom attributes to the semaphore.
+       *
+       * @par POSIX compatibility
+       *  No POSIX similar functionality identified, but inspired by POSIX
+       *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       *
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @nosubgrouping
        */
       class Binary_attributes : public Attributes
       {
       public:
 
+        /**
+         * @name Constructors/destructor
+         * @{
+         */
+
+        /**
+         * @brief Create binary semaphore attributes.
+         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         */
         Binary_attributes (const char* name);
 
+        /**
+         * @cond ignore
+         */
         Binary_attributes (const Binary_attributes&) = default;
         Binary_attributes (Binary_attributes&&) = default;
         Binary_attributes&
         operator= (const Binary_attributes&) = default;
         Binary_attributes&
         operator= (Binary_attributes&&) = default;
+        /**
+         * @endcond
+         */
 
         /**
-         * @brief Delete semaphore attributes.
+         * @brief Destroy semaphore attributes.
          */
         ~Binary_attributes () = default;
+
+        /**
+         * @}
+         */
       };
 
+      /**
+       * @brief Default binary semaphore initialiser.
+       */
       extern const Binary_attributes binary_initializer;
 
     } /* namespace semaphore */
@@ -1595,7 +3163,7 @@ namespace os
 
     /**
      * @class Semaphore
-     * @brief POSIX semaphore.
+     * @brief POSIX compliant semaphore.
      * @details
      * Supports both counting and binary semaphores.
      *
@@ -1605,15 +3173,29 @@ namespace os
      * For inter-thread synchronisation, to avoid cases of priority
      * inversion, more suitable are mutexes.
      *
+     * @par POSIX compatibility
+     *  Inspired by `sem_t` from [<semaphore.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  (IEEE Std 1003.1, 2013 Edition).
+     *
      * Compatible with POSIX semaphores.
      * http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html
+     *
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @nosubgrouping
      */
     class Semaphore : public Named_object
     {
     public:
 
       /**
+       * @name Constructors/destructor
+       * @{
+       */
+
+      /**
        * @brief Create a default semaphore.
+       * @par Parameters
+       *  None
        */
       Semaphore ();
 
@@ -1622,17 +3204,29 @@ namespace os
        */
       Semaphore (const semaphore::Attributes& attr);
 
+      /**
+       * @cond ignore
+       */
       Semaphore (const Semaphore&) = delete;
       Semaphore (Semaphore&&) = delete;
       Semaphore&
       operator= (const Semaphore&) = delete;
       Semaphore&
       operator= (Semaphore&&) = delete;
+      /**
+       * @endcond
+       */
 
       /**
        * @brief Destroy the semaphore.
        */
       ~Semaphore ();
+
+      /**
+       * @}
+       * @name Operators
+       * @{
+       */
 
       /**
        * @brief Compare semaphores.
@@ -1643,7 +3237,15 @@ namespace os
       operator== (const Semaphore& rhs) const;
 
       /**
+       * @}
+       * @name Public member functions
+       * @{
+       */
+
+      /**
        * @brief Post (unlock) the semaphore.
+       * @par Parameters
+       *  None
        * @retval result::ok The semaphore was posted.
        * @retval EOVERFLOW The max count was exceeded.
        * @retval ENOTRECOVERABLE The semaphore could not be posted
@@ -1654,6 +3256,8 @@ namespace os
 
       /**
        * @brief Lock the semaphore, possibly waiting.
+       * @par Parameters
+       *  None
        * @retval result::ok The calling process successfully
        *  performed the semaphore lock operation.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
@@ -1662,10 +3266,12 @@ namespace os
        * @retval EINTR The operation was interrupted.
        */
       result_t
-      wait ();
+      wait (void);
 
       /**
        * @brief Try to lock  the semaphore.
+       * @par Parameters
+       *  None
        * @retval result::ok The calling process successfully
        *  performed the semaphore lock operation.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
@@ -1675,7 +3281,7 @@ namespace os
        * @retval EINTR The operation was interrupted.
        */
       result_t
-      try_wait ();
+      try_wait (void);
 
       /**
        * @brief Timed wait to lock the semaphore.
@@ -1696,6 +3302,8 @@ namespace os
 
       /**
        * @brief Get the semaphore value.
+       * @par Parameters
+       *  None
        * @return The semaphore value.
        */
       semaphore::count_t
@@ -1703,19 +3311,42 @@ namespace os
 
       /**
        * @brief Reset the semaphore.
+       * @par Parameters
+       *  None
        * @retval result::ok The semaphore was reset.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       reset (void);
 
+      /**
+       *
+       * @par Parameters
+       *  None
+       * @return
+       */
       semaphore::count_t
       initial_value (void) const;
 
+      /**
+       *
+       * @par Parameters
+       *  None
+       * @return
+       */
       semaphore::count_t
       max_value (void) const;
 
+      /**
+       * @}
+       */
+
     protected:
+
+      /**
+       * @name Private member variables
+       * @{
+       */
 
 #if !defined(OS_INCLUDE_PORT_RTOS_SEMAPHORE)
       port::Tasks_list list_;
@@ -1735,47 +3366,113 @@ namespace os
       const semaphore::count_t max_count_;
 
       // Add more internal data.
+
+      /**
+       * @}
+       */
     };
 
 #pragma GCC diagnostic pop
 
     // ========================================================================
 
+    /**
+     * @namespace os::rtos::mempool
+     * @brief Memory pool namespace.
+     * @details
+     * The os::rtos::mempool namespace groups memory pool attributes
+     * and initialisers.
+     */
     namespace mempool
     {
+      /**
+       * @brief Type of memory pool size.
+       * @details
+       * A numeric value that can hold the maximum size of the
+       * memory pool, usually a 16-bits unsigned value.
+       */
       using size_t = uint16_t;
+
+      /**
+       * @brief Maximum pool size.
+       * @details
+       * A constant numeric value used to validate the pool size.
+       */
       constexpr size_t max_size = (0 - 1);
 
       /**
+       * @class Attributes
        * @brief Memory pool attributes.
+       * @details
+       * Allow to assign a name and custom attributes (like a static
+       * address) to the memory pool.
+       *
+       * @par POSIX compatibility
+       *  No POSIX similar functionality identified, but inspired by POSIX
+       *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       *
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @nosubgrouping
        */
       class Attributes : public Named_object
       {
       public:
 
+        /**
+         * @name Constructors/destructor
+         * @{
+         */
+
+        /**
+         * @brief Create memory pool attributes.
+         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         */
         Attributes (const char* name);
 
+        /**
+         * @cond ignore
+         */
         Attributes (const Attributes&) = default;
         Attributes (Attributes&&) = default;
         Attributes&
         operator= (const Attributes&) = default;
         Attributes&
         operator= (Attributes&&) = default;
+        /**
+         * @endcond
+         */
 
         /**
-         * @brief Delete the memory pool attributes.
+         * @brief Destroy the memory pool attributes.
          */
         ~Attributes () = default;
 
+        /**
+         * @}
+         */
+
       public:
+
+        /**
+         * @name Public member variables
+         * @{
+         */
 
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
         void* mp_pool_address;
 
         // Add more attributes.
+
+        /**
+         * @}
+         */
       };
 
+      /**
+       * @brief Default memory pool initialiser.
+       */
       extern const Attributes initializer;
 
     } /* namespace mempool */
@@ -1790,14 +3487,25 @@ namespace os
      * Manage a pool of same size blocks. Fast and deterministic allocation
      * and dealocation behaviour, suitable for use even in ISRs.
      *
-     * No POSIX similar functionality identified.
+     * @par POSIX compatibility
+     *  No POSIX similar functionality identified.
      *
      * @note There is no equivalent of calloc(); to initialise memory, use:
-     * `memset (block, 0, pool.block_size ());`
+     * @code{.cpp}
+     * memset (block, 0, pool.block_size ());
+     * @endcode
+     *
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @nosubgrouping
      */
     class Memory_pool : public Named_object
     {
     public:
+
+      /**
+       * @name Constructors/destructor
+       * @{
+       */
 
       /**
        * @brief Create a memory pool with default attributes.
@@ -1815,17 +3523,29 @@ namespace os
       Memory_pool (const mempool::Attributes& attr, mempool::size_t blocks,
                    mempool::size_t block_size_bytes);
 
+      /**
+       * @cond ignore
+       */
       Memory_pool (const Memory_pool&) = delete;
       Memory_pool (Memory_pool&&) = delete;
       Memory_pool&
       operator= (const Memory_pool&) = delete;
       Memory_pool&
       operator= (Memory_pool&&) = delete;
+      /**
+       * @endcond
+       */
 
       /**
-       * @brief Delete the memory pool.
+       * @brief Destroy the memory pool.
        */
       ~Memory_pool ();
+
+      /**
+       * @}
+       * @name Operators
+       * @{
+       */
 
       /**
        * @brief Compare memory pools.
@@ -1836,7 +3556,15 @@ namespace os
       operator== (const Memory_pool& rhs) const;
 
       /**
+       * @}
+       * @name Public member functions
+       * @{
+       */
+
+      /**
        * @brief Allocate a memory block.
+       * @par Parameters
+       *  None
        * @return Pointer to memory block.
        */
       void*
@@ -1844,6 +3572,8 @@ namespace os
 
       /**
        * @brief Allocate a memory block.
+       * @par Parameters
+       *  None
        * @return Pointer to memory block, or `nullptr` if no memory available.
        */
       void*
@@ -1851,6 +3581,7 @@ namespace os
 
       /**
        * @brief Allocate a memory block.
+       * @param [in] ticks The number of SysTick tick to wait.
        * @return Pointer to memory block, or `nullptr` if timeout.
        */
       void*
@@ -1858,6 +3589,8 @@ namespace os
 
       /**
        * @brief Free the memory block.
+       * @par Parameters
+       *  None
        * @retval result::ok The memory block was released.
        * @retval EINVAL The block does not belong to the memory pool.
        */
@@ -1866,6 +3599,8 @@ namespace os
 
       /**
        * @brief Get memory pool capacity.
+       * @par Parameters
+       *  None
        * @return The max number of blocks in the pool.
        */
       std::size_t
@@ -1873,6 +3608,8 @@ namespace os
 
       /**
        * @brief Get blocks count.
+       * @par Parameters
+       *  None
        * @return The number of blocks used from the queue.
        */
       std::size_t
@@ -1880,6 +3617,8 @@ namespace os
 
       /**
        * @brief Get block size.
+       * @par Parameters
+       *  None
        * @return The block size, in bytes.
        */
       std::size_t
@@ -1887,6 +3626,8 @@ namespace os
 
       /**
        * @brief Check if the memory pool is empty.
+       * @par Parameters
+       *  None
        * @retval true The memory pool has no allocated blocks.
        * @retval false The memory pool has allocated blocks.
        */
@@ -1895,6 +3636,8 @@ namespace os
 
       /**
        * @brief Check if the memory pool is full.
+       * @par Parameters
+       *  None
        * @retval true All memory blocks are allocated.
        * @retval false There are still memory blocks that can be allocated.
        */
@@ -1903,21 +3646,51 @@ namespace os
 
       /**
        * @brief Reset the memory pool.
+       * @par Parameters
+       *  None
        * @retval result::ok The memory pool was reset.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       reset (void);
 
+      /**
+       *
+       * @par Parameters
+       *  None
+       */
       void*
       pool (void);
 
+      /**
+       * @}
+       */
+
     protected:
 
+      /**
+       * @name Private member functions
+       * @{
+       */
+
+      /**
+       *
+       * @par Parameters
+       *  None
+       */
       void*
       _try_first (void);
 
+      /**
+       * @}
+       */
+
     protected:
+
+      /**
+       * @name Private member variables
+       * @{
+       */
 
 #if !defined(OS_INCLUDE_PORT_RTOS_MEMORY_POOL)
       port::Tasks_list list_;
@@ -1946,39 +3719,99 @@ namespace os
             flags_allocated = 1
       };
       // Add more internal data.
+
+      /**
+       * @}
+       */
     };
 
 #pragma GCC diagnostic pop
 
     // ========================================================================
 
+    /**
+     * @namespace os::rtos::mqueue
+     * @brief Message queue namespace.
+     * @details
+     * The os::rtos::mqueue namespace groups message queue attributes
+     * and initialisers.
+     */
     namespace mqueue
     {
+      /**
+       * @brief Type of queue size.
+       * @details
+       * A numeric value to hold the message queue size, usually
+       * a 16-bits value.
+       */
       using size_t = uint16_t;
+
+      /**
+       * @brief Type of message priority.
+       * @details
+       * A numeric value to hold the message priority, which
+       * controls the order in which messages are added to the
+       * queue (higher values represent higher priorities).
+       */
       using priority_t = uint8_t;
 
       /**
+       * @class Attributes
        * @brief Message queue attributes.
+       * @details
+       * Allow to assign a name and custom attributes (like a static
+       * address) to the message queue.
+       *
+       * @par POSIX compatibility
+       *  Inspired by `mq_attr` from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       *
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @nosubgrouping
        */
       class Attributes : public Named_object
       {
       public:
 
+        /**
+         * @name Constructors/destructor
+         * @{
+         */
+
+        /**
+         * @brief Create message queue attributes.
+         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         */
         Attributes (const char* name);
 
+        /**
+         * @cond ignore
+         */
         Attributes (const Attributes&) = default;
         Attributes (Attributes&&) = default;
         Attributes&
         operator= (const Attributes&) = default;
         Attributes&
         operator= (Attributes&&) = default;
+        /**
+         * @endcond
+         */
 
         /**
-         * @brief Delete the timer attributes.
+         * @brief Destroy the message queue attributes.
          */
         ~Attributes () = default;
 
+        /**
+         * @}
+         */
+
       public:
+
+        /**
+         * @name Public member variables
+         * @{
+         */
 
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
@@ -1986,8 +3819,15 @@ namespace os
         std::size_t queue_size_bytes;
 
         // Add more attributes.
+
+        /**
+         * @}
+         */
       };
 
+      /**
+       * @brief Default message queue initialiser.
+       */
       extern const Attributes initializer;
 
     } /* namespace mqueue */
@@ -1997,16 +3837,25 @@ namespace os
 
     /**
      * @class Message_queue
-     * @brief POSIX message queue.
+     * @brief POSIX compliant message queue.
      * @details
      * Priority based, fixed size FIFO.
      *
-     * Compatible with POSIX message queues.
-     * http://pubs.opengroup.org/onlinepubs/9699919799/
+     * @par POSIX compatibility
+     *  Inspired by `mqd_t` from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+     *  (IEEE Std 1003.1, 2013 Edition).
+     *
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @nosubgrouping
      */
     class Message_queue : public Named_object
     {
     public:
+
+      /**
+       * @name Constructors/destructor
+       * @{
+       */
 
       /**
        * @brief Create a message queue.
@@ -2017,17 +3866,29 @@ namespace os
       Message_queue (const mqueue::Attributes&attr, mqueue::size_t msgs,
                      mqueue::size_t msg_size_bytes);
 
+      /**
+       * @cond ignore
+       */
       Message_queue (const Message_queue&) = delete;
       Message_queue (Message_queue&&) = delete;
       Message_queue&
       operator= (const Message_queue&) = delete;
       Message_queue&
       operator= (Message_queue&&) = delete;
+      /**
+       * @endcond
+       */
 
       /**
-       * @brief Delete the message queue.
+       * @brief Destroy the message queue.
        */
       ~Message_queue ();
+
+      /**
+       * @}
+       * @name Operators
+       * @{
+       */
 
       /**
        * @brief Compare memory queues.
@@ -2036,6 +3897,12 @@ namespace os
        */
       bool
       operator== (const Message_queue& rhs) const;
+
+      /**
+       * @}
+       * @name Public member functions
+       * @{
+       */
 
       /**
        * @brief Send message to the queue.
@@ -2156,6 +4023,8 @@ namespace os
 
       /**
        * @brief Get queue capacity.
+       * @par Parameters
+       *  None
        * @return The max number of messages that can be queued.
        */
       std::size_t
@@ -2163,6 +4032,8 @@ namespace os
 
       /**
        * @brief Get queue length.
+       * @par Parameters
+       *  None
        * @return The number of messages in the queue.
        */
       std::size_t
@@ -2170,6 +4041,8 @@ namespace os
 
       /**
        * @brief Get message size.
+       * @par Parameters
+       *  None
        * @return The message size, in bytes.
        */
       std::size_t
@@ -2177,6 +4050,8 @@ namespace os
 
       /**
        * @brief Check if the queue is empty.
+       * @par Parameters
+       *  None
        * @retval true The queue has no messages.
        * @retval false The queue has some messages.
        */
@@ -2185,6 +4060,8 @@ namespace os
 
       /**
        * @brief Check if the queue is full.
+       * @par Parameters
+       *  None
        * @retval true The queue is full.
        * @retval false The queue is not full.
        */
@@ -2193,13 +4070,24 @@ namespace os
 
       /**
        * @brief Reset the message queue.
-       * @retval result::ok.
+       * @par Parameters
+       *  None
+       * @retval result::ok The queue was reset.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
        */
       result_t
       reset (void);
 
+      /**
+       * @}
+       */
+
     protected:
+
+      /**
+       * @name Private member variables
+       * @{
+       */
 
       // Keep these in sync with the structure declarations in os-c-decl.h.
 #if !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
@@ -2222,43 +4110,93 @@ namespace os
 
       mqueue::size_t count_;
 
+      /**
+       * @}
+       */
     };
 
 #pragma GCC diagnostic pop
 
     // ========================================================================
 
+    /**
+     * @namespace os::rtos::evflags
+     * @brief Event flags namespace.
+     * @details
+     * The os::rtos::evflags namespace groups event flags attributes
+     * and initialisers.
+     */
     namespace evflags
     {
       /**
+       * @class Attributes
        * @brief Event flags attributes.
+       * @details
+       * Allow to assign a name to the event flags.
+       *
+       * @par POSIX compatibility
+       *  No POSIX similar functionality identified, but inspired by POSIX
+       *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       *
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @nosubgrouping
        */
       class Attributes : public Named_object
       {
       public:
 
+        /**
+         * @name Constructors/destructor
+         * @{
+         */
+
+        /**
+         * @brief Create event flags attributes.
+         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         */
         Attributes (const char* name);
 
+        /**
+         * @cond ignore
+         */
         Attributes (const Attributes&) = default;
         Attributes (Attributes&&) = default;
         Attributes&
         operator= (const Attributes&) = default;
         Attributes&
         operator= (Attributes&&) = default;
+        /**
+         * @endcond
+         */
 
         /**
-         * @brief Delete the timer attributes.
+         * @brief Destroy the event flags attributes.
          */
         ~Attributes () = default;
 
+        /**
+         * @}
+         */
+
       public:
+
+        /**
+         * @name Public member variables
+         * @{
+         */
 
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
-
         // Add more attributes.
+        /**
+         * @}
+         */
       };
 
+      /**
+       * @brief Default event flags initialiser.
+       */
       extern const Attributes initializer;
 
     } /* namespace mqueue */
@@ -2269,30 +4207,62 @@ namespace os
     /**
      * @class Event_flags
      * @brief Event flags.
+     *
      * @details
      * Synchronised set of flags that can be used to notify events
      * between threads or between ISRs and threads.
      *
-     * No POSIX similar functionality identified.
+     * @par POSIX compatibility
+     *  No POSIX similar functionality identified.
+     *
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @nosubgrouping
      */
     class Event_flags : public Named_object
     {
     public:
 
-      Event_flags (void);
+      /**
+       * @name Constructors/destructor
+       * @{
+       */
+
+      /**
+       * @brief Create default event flags.
+       * @par Parameters
+       *  None
+       */
+      Event_flags ();
+
+      /**
+       * @brief Create custom event flags.
+       * @param [in] attr Reference to custom attributes.
+       */
       Event_flags (const evflags::Attributes& attr);
 
+      /**
+       * @cond ignore
+       */
       Event_flags (const Event_flags&) = delete;
       Event_flags (Event_flags&&) = delete;
       Event_flags&
       operator= (const Event_flags&) = delete;
       Event_flags&
       operator= (Event_flags&&) = delete;
+      /**
+       * @endcond
+       */
 
       /**
-       * @brief Delete the event flags.
+       * @brief Destroy the event flags.
        */
       ~Event_flags ();
+
+      /**
+       * @}
+       * @name Operators
+       * @{
+       */
 
       /**
        * @brief Compare event flags.
@@ -2302,6 +4272,12 @@ namespace os
        */
       bool
       operator== (const Event_flags& rhs) const;
+
+      /**
+       * @}
+       * @name Public member functions
+       * @{
+       */
 
       /**
        * @brief Wait for event flags.
@@ -2385,26 +4361,58 @@ namespace os
        * @param [in] mask The OR-ed flags to get/clear; may be zero.
        * @param [in] mode Mode bits to select if the flags should be
        *  cleared (the other bits are ignored).
-       * @retval flags The selected bits from the flags mask.
+       * @return The selected bits from the flags mask.
        */
       flags::mask_t
       get (flags::mask_t mask, flags::mode_t mode);
 
       /**
        * @brief Check if some thread is waiting.
+       * @par Parameters
+       *  None
+       * @retval true There are threads waiting.
+       * @retval false There are no threads waiting.
        */
       bool
       waiting (void);
 
+      /**
+       * @}
+       */
+
     protected:
 
-      /*
-       * Internal function to check the flags condition.
+      /**
+       * @name Private member functions
+       * @{
+       */
+
+      /**
+       * @brief Internal function to check the flags condition.
+       * @param [in] mask The expected flags (OR-ed bit-mask);
+       *  may be zero.
+       * @param [out] oflags Pointer where to store the current flags;
+       *  may be nullptr.
+       * @param [in] mode Mode bits to select if either all or any flags
+       *  are expected, and if the flags should be cleared.
+       * @retval result::ok All expected flags are raised.
+       * @retval EINVAL The mask is outside of the permitted range.
+       * @retval EAGAIN The expected condition did not occur.
+       * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
       _try_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
 
+      /**
+       * @}
+       */
+
     protected:
+
+      /**
+       * @name Private member variables
+       * @{
+       */
 
 #if !defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
       port::Tasks_list list_;
@@ -2415,7 +4423,14 @@ namespace os
       os_evflags_port_data_t port_;
 #endif
 
+      /**
+       * @brief The event flags.
+       */
       flags::mask_t flags_;
+
+      /**
+       * @}
+       */
     };
 
 #pragma GCC diagnostic pop
@@ -2455,6 +4470,10 @@ namespace os
         return is_locked_;
       }
 
+      /**
+       * @details
+       * Lock the scheduler and remember the initial scheduler status.
+       */
       inline
       Critical_section::Critical_section () :
           status_ (lock ())
@@ -2462,6 +4481,11 @@ namespace os
         ;
       }
 
+      /**
+       * @details
+       * Restore the initial scheduler status and possibly unlock
+       * the scheduler.
+       */
       inline
       Critical_section::~Critical_section ()
       {
@@ -2527,6 +4551,10 @@ namespace os
       }
 #endif
 
+    /**
+     * All objects return a non-null string; anonymous objects
+     * return `"-"`.
+     */
     inline const char*
     Named_object::name (void) const
     {
@@ -3004,27 +5032,63 @@ namespace os
 
 extern "C"
 {
+  /**
+   * @brief Main thread.
+   * @param argc Count of arguments.
+   * @param argv Array of pointers to arguments.
+   * @retval 0 The proram terminated normally.
+   * @retval 1 The program terminated with an error.
+   *
+   * @details
+   * The standard `main()` creates a dedicated thread to run this function.
+   *
+   * The returned value is used in semihosted tests, to inform the
+   * host on the result of the test.
+   */
   int
   os_main (int argc, char* argv[]);
 
+  /**
+   * @brief SysTick interrupt handler.
+   * @details
+   * Must be called from the physical interrupt handler.
+   */
   void
   os_systick_handler (void);
 
+  /**
+   * @brief SysTick implementation hook.
+   * @details
+   * It is called from os_systick_handler() after the
+   * scheduler was started.
+   */
   void
   os_impl_systick_handler (void);
 
+  /**
+   * @brief RTC interrupt handler.
+   * @details
+   * Must be called from the physical RTC interrupt handler.
+   */
   void
   os_rtc_handler (void);
 
+  /**
+   * @brief RTC implementation hook.
+   */
   void
   os_impl_rtc_handler (void);
-
-  int
-  os_main (int argc, char* argv[]);
 }
 
 // ----------------------------------------------------------------------------
 
+/**
+ * @brief Assert or return an error.
+ * @details
+ * As required by the ANSI standards, if `NDEBUG` is defined,
+ * the assertion is disabled and if the condition is true, the
+ * given error code is returned.
+ */
 #ifdef NDEBUG           /* ANSI standard */
 #define os_assert_err(__e, __er) \
   do { if (!(__e)) return __er; } while (false)
@@ -3032,6 +5096,14 @@ extern "C"
 #define os_assert_err(__e, __er) assert(__e)
 #endif
 
+/**
+ * @brief Assert or throw a system error exception.
+ * @details
+ * As required by the ANSI standards, if `NDEBUG` is defined,
+ * the assertion is disabled and if the condition is true, a
+ * ssytem error exception is thrown (which is replaced by an
+ * `abort()` if exceptions are disabled).
+ */
 #ifdef NDEBUG           /* ANSI standard */
 #define os_assert_throw(__e, __er) \
   do { if (!(__e)) os::estd::__throw_system_error(__er, #__e); } while (false)
@@ -3042,10 +5114,20 @@ extern "C"
 // ----------------------------------------------------------------------------
 
 #if !defined(OS_INTEGER_SYSTICK_FREQUENCY_HZ)
+/**
+ * @brief Default definition for the SysTick frequency, in Hz.
+ * @details
+ * Redefine it in `<os-app-config.h>` to the actual value.
+ */
 #define OS_INTEGER_SYSTICK_FREQUENCY_HZ                     (1000)
 #endif
 
 #if !defined(OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES)
+/**
+ * @brief Default definition for the `main()` stack size, in bytes.
+ * @details
+ * Redefine it in `<os-app-config.h>` to the actual value.
+ */
 #define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES               (400)
 #endif
 
