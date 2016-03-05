@@ -63,6 +63,16 @@ div.groupHeader {
 	margin-left: 0px;
 }
 
+div.fragment {
+	font-size: 13px;
+	margin-left: 0px;
+	margin-bottom: 16px;
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-bottom: 10px;
+	padding-top: 6px;
+}
+
 pre.fragment {
 	font-size: 13px;
 	margin-left: 0px;
@@ -125,6 +135,7 @@ code:before, code:after {
 
 div.line {
 	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;	
+	line-height: 1.1;
 }
 
 div.tabs {
