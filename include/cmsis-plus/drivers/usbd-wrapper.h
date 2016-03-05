@@ -27,9 +27,9 @@ extern "C"
 {
   // Avoid to include <Driver_USBD.h>
   typedef void
-  (*ARM_USBD_SignalDeviceEvent_t) (uint32_t event); ///< Pointer to \ref ARM_USBD_SignalDeviceEvent : Signal USB Device Event.
+  (*ARM_USBD_SignalDeviceEvent_t) (uint32_t event); ///< Pointer to device event callback.
   typedef void
-  (*ARM_USBD_SignalEndpointEvent_t) (uint8_t ep_addr, uint32_t event); ///< Pointer to \ref ARM_USBD_SignalEndpointEvent : Signal USB Endpoint Event.
+  (*ARM_USBD_SignalEndpointEvent_t) (uint8_t ep_addr, uint32_t event); ///< Pointer to endpoint event callback.
 
   typedef struct _ARM_DRIVER_USBD const ARM_DRIVER_USBD;
 }

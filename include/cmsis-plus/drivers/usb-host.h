@@ -227,7 +227,8 @@ namespace os
 
         /**
          * @brief       Register port event callback.
-         * @param [in]  cb_event  Pointer to @ref ARM_USART_SignalEvent
+         * @param [in] cb_func  Pointer to callback function.
+         * @param [in] cb_object Pointer to object to be passed to the function.
          */
         void
         register_port_callback (host::signal_port_event_t cb_func,

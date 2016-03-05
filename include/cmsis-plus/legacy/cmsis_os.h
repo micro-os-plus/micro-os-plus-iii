@@ -495,15 +495,15 @@ const osThreadDef_t os_thread_def_##name = \
 
   /**
    * @brief Create a thread.
-   * @param [in]     thread_def    thread definition referenced with @ref osThread.
-   * @param [in]     argument      pointer that is passed to the thread function as start argument.
+   * @param [in]     thread_def    Thread definition referenced with @ref osThread.
+   * @param [in]     args      Pointer that is passed to the thread function as start argument.
    * @return thread ID for reference by other functions or NULL in case of error.
    *
    * @note MUST REMAIN UNCHANGED: @b osThreadCreate shall be consistent
    * in every CMSIS-RTOS.
    */
   osThreadId
-  osThreadCreate (const osThreadDef_t* thread_def, void* argument);
+  osThreadCreate (const osThreadDef_t* thread_def, void* args);
 
   /**
    * @brief Get the current thread.
@@ -571,7 +571,7 @@ const osThreadDef_t os_thread_def_##name = \
 
   /**
    * @brief Time Delay.
-   * @param [in] millisec @ref CMSIS_RTOS_TimeOutValue "time delay" value.
+   * @param [in] millisec Timeout value "time delay" value.
    * @retval osEventTimeout The time delay is executed.
    * @retval osErrorISR osDelay() cannot be called from interrupt service routines.
    */
@@ -582,7 +582,7 @@ const osThreadDef_t os_thread_def_##name = \
 
   /**
    * @brief Wait for Signal, Message, Mail, or Timeout.
-   * @param [in] millisec @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
+   * @param [in] millisec Timeout value or 0 in case of no time-out.
    * @retval osEventSignal A signal event occurred and is returned.
    * @retval osEventMessage A message event occurred and is returned.
    * @retval osEventMail A mail event occurred and is returned.
@@ -640,21 +640,21 @@ const osTimerDef_t os_timer_def_##name = \
 
   /**
    * @brief Create a timer.
-   * @param [in]     timer_def     timer object referenced with @ref osTimer.
-   * @param [in]     type          osTimerOnce for one-shot or osTimerPeriodic for periodic behavior.
-   * @param [in]     argument      argument to the timer call back function.
+   * @param [in] timer_def     Timer object referenced with @ref osTimer.
+   * @param [in] type          osTimerOnce for one-shot or osTimerPeriodic for periodic behavior.
+   * @param [in] args      Argument to the timer call back function.
    * @return timer ID for reference by other functions or NULL in case of error.
    *
    * @note MUST REMAIN UNCHANGED: @b osTimerCreate shall be consistent in every CMSIS-RTOS.
    */
   osTimerId
   osTimerCreate (const osTimerDef_t* timer_def, os_timer_type type,
-                 void* argument);
+                 void* args);
 
   /**
    * @brief Start the timer.
    * @param [in]     timer_id      timer ID obtained by @ref osTimerCreate.
-   * @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue "time delay" value of the timer.
+   * @param [in]     millisec      Timeout value "time delay" value of the timer.
    * @retval osOK The specified timer has been started or restarted.
    * @retval osErrorISR osTimerStart cannot be called from interrupt service routines.
    * @retval osErrorParameter timer_id is incorrect.
@@ -716,7 +716,7 @@ const osTimerDef_t os_timer_def_##name = \
   /**
    * @brief Wait for one or more Signal Flags to become signaled for the current @b RUNNING thread.
    * @param [in]     signals       wait until all specified signal flags set or 0 for any single signal flag.
-   * @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
+   * @param [in]     millisec      Timeout value or 0 in case of no time-out.
    * @retval osOK No signal received when the timeout value millisec was 0.
    * @retval osEventTimeout Signal not occurred within timeout.
    * @retval osEventSignal Signal occurred, value.signals contains the signal flags; these signal flags are cleared.
@@ -757,7 +757,7 @@ const osMutexDef_t os_mutex_def_##name = \
    * @brief Access a mutex.
    * @param         name          name of the mutex object.
    *
-   * @define
+   * @details
    * Provides osMutexCreate access to the mutex object definition.
    *
    * @note CAN BE CHANGED: The parameter to @b osMutex shall be consistent but the
@@ -780,7 +780,7 @@ const osMutexDef_t os_mutex_def_##name = \
   /**
    * @brief Wait for mutex.
    * @param [in]     mutex_id      mutex ID obtained by @ref osMutexCreate.
-   * @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
+   * @param [in]     millisec      Timeout value or 0 in case of no time-out.
    * @retval osOK The mutex has been obtain.
    * @retval osErrorTimeoutResource: the mutex could not be obtained in the given time.
    * @retval osErrorResource The mutex could not be obtained when no timeout was specified.
@@ -871,7 +871,7 @@ const osSemaphoreDef_t os_semaphore_def_##name = \
   /**
    * @brief Wait until a Semaphore token becomes available.
    * @param [in]     semaphore_id  semaphore object referenced with @ref osSemaphoreCreate.
-   * @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
+   * @param [in]     millisec      Timeout value or 0 in case of no time-out.
    * @return number of available tokens, or -1 in case of incorrect parameters.
    *
    * @note MUST REMAIN UNCHANGED: @b osSemaphoreWait shall be consistent
@@ -916,7 +916,7 @@ const osSemaphoreDef_t os_semaphore_def_##name = \
   /**
    * @brief Define a Memory Pool.
    * @param         name          name of the memory pool.
-   * @param         no            maximum number of blocks (objects) in the memory pool.
+   * @param         items            maximum number of blocks (objects) in the memory pool.
    * @param         type          data type of a single block (object).
    *
    * @note CAN BE CHANGED: The parameter to @b osPoolDef shall be consistent but the
@@ -1006,7 +1006,7 @@ const osPoolDef_t os_pool_def_##name = \
   /**
    * @brief Create a Message Queue Definition.
    * @param         name          name of the queue.
-   * @param         queue_sz      maximum number of messages in the queue.
+   * @param         items      maximum number of messages in the queue.
    * @param         type          data type of a single message element (for debugger).
    *
    * @note CAN BE CHANGED: The parameter to @b osMessageQDef shall be consistent but the
@@ -1060,7 +1060,7 @@ const osMessageQDef_t os_messageQ_def_##name = { \
    * @brief Put a message to a queue.
    * @param [in]     queue_id      message queue ID obtained with @ref osMessageCreate.
    * @param [in]     info          message information.
-   * @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
+   * @param [in]     millisec      Timeout value or 0 in case of no time-out.
    * @retval osOK The message is put into the queue.
    * @retval osErrorResource: no memory in the queue was available.
    * @retval osErrorTimeoutResource: no memory in the queue was available during the given time limit.
@@ -1075,7 +1075,7 @@ const osMessageQDef_t os_messageQ_def_##name = { \
   /**
    * @brief Get a message or Wait for a Message from a Queue.
    * @param [in]     queue_id      message queue ID obtained with @ref osMessageCreate.
-   * @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
+   * @param [in]     millisec      Timeout value or 0 in case of no time-out.
    * @retval osOK No message is available in the queue and no timeout was specified.
    * @retval osEventTimeout No message has arrived during the given timeout period.
    * @retval osEventMessage Message received, value.p contains the pointer to message.
@@ -1096,7 +1096,7 @@ const osMessageQDef_t os_messageQ_def_##name = { \
   /**
    * @brief Create a mail queue definition.
    * @param         name          name of the queue.
-   * @param         queue_sz      maximum number of messages in queue.
+   * @param         items      maximum number of messages in queue.
    * @param         type          data type of a single message element.
    * @note CAN BE CHANGED: The parameter to @b osMailQDef shall be consistent but the
    *      macro body is implementation specific in every CMSIS-RTOS.
@@ -1149,7 +1149,7 @@ const osMailQDef_t os_mailQ_def_##name = { \
   /**
    * @brief Allocate a memory block from a mail.
    * @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
-   * @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
+   * @param [in]     millisec      Timeout value or 0 in case of no time-out.
    * @return pointer to memory block that can be filled with mail or NULL in case of error.
    *
    * @note MUST REMAIN UNCHANGED: @b osMailAlloc shall be consistent
@@ -1161,7 +1161,7 @@ const osMailQDef_t os_mailQ_def_##name = { \
   /**
    * @brief Allocate and clear a memory block from a mail.
    * @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
-   * @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
+   * @param [in]     millisec      Timeout value or 0 in case of no time-out.
    * @return pointer to memory block that can be filled with mail or NULL in case of error.
    *
    * @note MUST REMAIN UNCHANGED: @b osMailCAlloc shall be consistent
@@ -1187,7 +1187,7 @@ const osMailQDef_t os_mailQ_def_##name = { \
   /**
    * @brief Get a mail from a queue.
    * @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
-   * @param [in]     millisec      @ref CMSIS_RTOS_TimeOutValue or 0 in case of no time-out.
+   * @param [in]     millisec      Timeout value or 0 in case of no time-out.
    * @retval osOK No mail is available in the queue and no timeout was specified.
    * @retval osEventTimeout No mail has arrived during the given timeout period.
    * @retval osEventMail Mail received, value.p contains the pointer to mail content.

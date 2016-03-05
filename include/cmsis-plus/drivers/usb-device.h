@@ -203,8 +203,9 @@ namespace os
 
         /**
          * @brief       Register device event callback.
-         * @param[in]   cb_event  Pointer to @ref ARM_USART_SignalEvent
-         * @return      @ref execution_status
+         * @param [in]   cb_func  Pointer to function.
+         * @param [in] cb_object Pointer to object passed to the function.
+         * @return      Execution status.
          */
         void
         register_device_callback (device::signal_device_event_t cb_func,
@@ -218,35 +219,35 @@ namespace os
 
         /**
          * @brief       Get driver capabilities
-         * @return      @ref ARM_USART_CAPABILITIES
+         * @return      Capabilities.
          */
         const device::Capabilities&
         get_capabilities (void) noexcept;
 
         /**
          * @brief       Connect USB Device.
-         * @return      @ref execution_status
+         * @return      Execution status.
          */
         return_t
         connect (void) noexcept;
 
         /**
          * @brief       Disconnect USB Device.
-         * @return      @ref execution_status
+         * @return      Execution status.
          */
         return_t
         disconnect (void) noexcept;
 
         /**
          * @brief       Get current USB Device Status.
-         * @return      Device State @ref ARM_USBD_STATE
+         * @return      Device State.
          */
         device::Status&
         get_status (void) noexcept;
 
         /**
          * @brief       Trigger USB Remote Wakeup.
-         * @return      @ref execution_status
+         * @return      Execution status.
          */
         return_t
         wakeup_remote (void) noexcept;
@@ -254,15 +255,15 @@ namespace os
         /**
          * @brief       Set USB Device Address.
          * @param [in]   dev_addr  Device Address
-         * @return      @ref execution_status
+         * @return      Execution status.
          */
         return_t
         configure_address (device_address_t dev_addr) noexcept;
 
         /**
          * @brief       Read setup packet received over Control Endpoint.
-         * @param [out]  setup  Pointer to buffer for setup packet
-         * @return      @ref execution_status
+         * @param [out]  buf  Pointer to buffer for setup packet
+         * @return      Execution status.
          */
         return_t
         read_setup_packet (uint8_t* buf) noexcept;
@@ -281,7 +282,7 @@ namespace os
          *                - ep_addr.7:    Direction
          * @param [in]   ep_type  Endpoint Type (ARM_USB_ENDPOINT_xxx)
          * @param [in]   ep_max_packet_size Endpoint Maximum Packet Size
-         * @return      @ref execution_status
+         * @return      Execution status.
          */
         return_t
         configure_endpoint (endpoint_t ep_addr, Endpoint_type ep_type,
@@ -292,7 +293,7 @@ namespace os
          * @param [in]   ep_addr  Endpoint Address
          *                - ep_addr.0..3: Address
          *                - ep_addr.7:    Direction
-         * @return      @ref execution_status
+         * @return      Execution status.
          */
         return_t
         unconfigure_endpoint (endpoint_t ep_addr) noexcept;
@@ -305,7 +306,7 @@ namespace os
          * @param [in]   stall  Operation
          *                - \b false Clear
          *                - \b true Set
-         * @return      @ref execution_status
+         * @return      Execution status.
          */
         return_t
         stall_endpoint (endpoint_t ep_addr, bool stall) noexcept;
@@ -317,7 +318,7 @@ namespace os
          *                - ep_addr.7:    Direction
          * @param [out]  data Pointer to buffer for data to read or with data to write
          * @param [in]   num  Number of data bytes to transfer
-         * @return      @ref execution_status
+         * @return      Execution status.
          */
         return_t
         transfer (endpoint_t ep_addr, uint8_t* data, std::size_t num) noexcept;
@@ -337,14 +338,14 @@ namespace os
          * @param [in]   ep_addr  Endpoint Address
          *                - ep_addr.0..3: Address
          *                - ep_addr.7:    Direction
-         * @return      @ref execution_status
+         * @return      Execution status.
          */
         return_t
         abort_transfer (endpoint_t ep_addr) noexcept;
 
         /**
          * @brief       Signal device events.
-         * @param [in]  event @ref USBD_dev_events
+         * @param [in]  event
          * @return      none
          */
         void
@@ -355,7 +356,7 @@ namespace os
          * @param[in]   ep_addr  Endpoint Address
          *                - ep_addr.0..3: Address
          *                - ep_addr.7:    Direction
-         * @param [in]  event @ref USBD_ep_events
+         * @param [in]  event
          * @return      none
          */
         void

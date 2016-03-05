@@ -164,7 +164,7 @@ namespace os
 
       /**
        * @brief       Get driver version.
-       * @return      @ref ARM_DRIVER_VERSION
+       * @return      Version.
        */
       const Version&
       get_version (void) noexcept;
@@ -172,7 +172,7 @@ namespace os
       /**
        * @brief       Power up/down device.
        * @param[in]   state  Power state
-       * @return      @ref execution_status
+       * @return      Execution status
        */
       return_t
       power (Power state) noexcept;

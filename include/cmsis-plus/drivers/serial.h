@@ -192,13 +192,13 @@ namespace os
         ///< Enable Continuous Break transmission
         enable_break = (0x17UL << CONFIG_Pos),
 
-        ///< Abort @ref Send
+        ///< Abort @ref Serial::send()
         abort_send = (0x18UL << CONFIG_Pos),
 
-        ///< Abort @ref Receive
+        ///< Abort @ref Serial::receive()
         abort_receive = (0x19UL << CONFIG_Pos),
 
-        ///< Abort @ref Transfer
+        ///< Abort @ref Serial::transfer()
         abort_transfer = (0x1AUL << CONFIG_Pos),
 
         ///< Disable Transmitter
@@ -457,10 +457,10 @@ namespace os
         ///< CTS Flow Control available
         bool flow_control_cts :1;
 
-        ///< Transmit completed event: @ref ARM_USART_EVENT_TX_COMPLETE
+        ///< Transmit completed event.
         bool event_tx_complete :1;
 
-        ///< Signal receive character timeout event: @ref ARM_USART_EVENT_RX_TIMEOUT
+        ///< Signal receive character timeout event.
         bool event_rx_timeout :1;
 
         ///< RTS Line: false=not available, true=available
@@ -481,16 +481,16 @@ namespace os
         ///< RI Line: false=not available, true=available
         bool ri :1;
 
-        ///< Signal CTS change event: @ref ARM_USART_EVENT_CTS
+        ///< Signal CTS change event.
         bool event_cts :1;
 
-        ///< Signal DSR change event: @ref ARM_USART_EVENT_DSR
+        ///< Signal DSR change event.
         bool event_dsr :1;
 
-        ///< Signal DCD change event: @ref ARM_USART_EVENT_DCD
+        ///< Signal DCD change event.
         bool event_dcd :1;
 
-        ///< Signal RI change event: @ref ARM_USART_EVENT_RI
+        ///< Signal RI change event.
         bool event_ri :1;
       };
 
@@ -527,8 +527,9 @@ namespace os
 
       /**
        * @brief       Register event callback.
-       * @param[in]   cb_event  Pointer to @ref ARM_USART_SignalEvent
-       * @return      @ref execution_status
+       * @param [in] cb_func  Pointer to function.
+       * @param [in] cb_object Pointer to object passed to function.
+       * @return      Execution status
        */
       void
       register_callback (signal_event_t cb_func,
@@ -537,36 +538,36 @@ namespace os
       // --------------------------------------------------------------------
 
       /**
-       * @brief       Get driver capabilities
-       * @return      @ref ARM_USART_CAPABILITIES
+       * @brief       Get driver capabilities.
+       * @return      Capabilities.
        */
       const serial::Capabilities&
       get_capabilities (void) noexcept;
 
       /**
        * @brief       Start the serial transmitter.
-       * @param[in]   data  Pointer to buffer with data to send to USART transmitter
-       * @param[in]   num   Number of data items to send
-       * @return      @ref execution_status
+       * @param [in] data  Pointer to buffer with data to send to USART transmitter.
+       * @param [in] num   Number of data items to send.
+       * @return      Execution status
        */
       return_t
       send (const void* data, std::size_t num) noexcept;
 
       /**
        * @brief       Start the serial receiver.
-       * @param[out]  data  Pointer to buffer for data to receive from USART receiver
-       * @param[in]   num   Number of data items to receive
-       * @return      @ref execution_status
+       * @param [out] data  Pointer to buffer for data to receive from USART receiver
+       * @param [in] num   Number of data items to receive
+       * @return      Execution status
        */
       return_t
       receive (void* data, std::size_t num) noexcept;
 
       /**
        * @brief       Start sending/receiving data to/from the serial transmitter/receiver.
-       * @param[in]   data_out  Pointer to buffer with data to send
-       * @param[out]  data_in   Pointer to buffer for data to receive
-       * @param[in]   num       Number of bytes to transfer
-       * @return      @ref execution_status
+       * @param [in] data_out  Pointer to buffer with data to send
+       * @param [out] data_in   Pointer to buffer for data to receive
+       * @param [in] num       Number of bytes to transfer
+       * @return      Execution status
        */
       return_t
       transfer (const void* data_out, void* data_in, std::size_t num) noexcept;
@@ -587,47 +588,46 @@ namespace os
 
       /**
        * @brief       Configure the serial interface.
-       * @param[in]   control  Operation
-       * @param[in]   arg      Argument of operation (optional)
-       * @return      common @ref execution_status and driver specific @ref usart_execution_status
+       * @param [in] cfg  Operation
+       * @param [in] arg      Argument of operation (optional)
+       * @return      Common execution status and driver specific usart_execution_status
        */
       return_t
       configure (serial::config_t cfg, serial::config_arg_t arg) noexcept;
 
       /**
        * @brief       Control the serial interface.
-       * @param[in]   control  Operation
-       * @param[in]   arg      Argument of operation (optional)
-       * @return      common @ref execution_status and driver specific @ref usart_execution_status
+       * @param [in] ctrl  Operation
+       * @return      Common execution status and driver specific usart_execution_status
        */
       return_t
       control (serial::control_t ctrl) noexcept;
 
       /**
        * @brief       Get serial port status.
-       * @return      Serial status @ref ARM_USART_STATUS
+       * @return      Serial status.
        */
       serial::Status&
       get_status (void) noexcept;
 
       /**
        * @brief       Configure serial modem lines.
-       * @param[in]   control  @ref ARM_USART_MODEM_CONTROL
-       * @return      @ref execution_status
+       * @param [in]   ctrl Control.
+       * @return      Execution status.
        */
       return_t
       control_modem_line (serial::Modem_control ctrl) noexcept;
 
       /**
        * @brief       Get serial modem lines state.
-       * @return      modem status @ref ARM_USART_MODEM_STATUS
+       * @return      Modem status.
        */
       serial::Modem_status&
       get_modem_status (void) noexcept;
 
       /**
        * @brief       Signal serial events.
-       * @param[in]   event  @ref USART_events notification mask
+       * @param [in]  event Event notification mask.
        * @return      none
        */
       void

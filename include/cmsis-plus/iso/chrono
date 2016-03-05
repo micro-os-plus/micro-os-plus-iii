@@ -208,7 +208,7 @@ namespace os
       // ====================================================================
 
       inline void
-      Systick_clock::sleep_for (uint32_t ticks)
+      Systick_clock::sleep_for (sleep_rep ticks)
       {
         rtos::Systick_clock::sleep_for (ticks);
       }
