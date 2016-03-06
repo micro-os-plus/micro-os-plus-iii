@@ -108,18 +108,21 @@ namespace os
      * @brief Type of function results.
      * @details
      * For error processing reasons, most CMSIS++ RTOS functions
-     * return a numeric result, which, according to POSIX, is `0`
-     * (`result::ok`) when
-     * the call was successful or an error code otherwise.
+     * return a numeric result, which, according to POSIX,
+     * when the call was successful, must be `0`
+     * (`result::ok`) or an error code defined in `<errno.h>` otherwise.
      */
     using result_t = uint32_t;
 
     /**
      * @namespace os::rtos::result
-     * @brief RTOS returned values.
-     * @details Status code values returned by CMSIS++ RTOS functions.
+     * @brief Values returned by RTOS functions.
+     * @details
+     * This namespace is dedicated to grouping all
+     * status code values returned by CMSIS++ RTOS functions.
      *
-     * Except a few enumerated values, most of them are exactly those
+     * However, CMSIS++ favours POSIX error codes, so,
+     * except a few enumerated values, most of them are exactly those
      * defined by POSIX, in the
      * `<errno.h>` header, and are not redefined here.
      *
@@ -180,6 +183,11 @@ namespace os
        * There are not many custom values returned by
        * CMSIS++ RTOS functions, currently there is only one,
        * `ok`, represented by `0`.
+       *
+       * If more custom codes will be needed and are not present in POSIX,
+       * this sis the place to add them. Just be sure their numeric values
+       * do not overlap POSIX values (check for a definition with the
+       * last allocated POSIX error number).
        */
       enum
         : result_t
@@ -350,19 +358,18 @@ namespace os
        * @endcode
        *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
-       * @nosubgrouping
        */
       class Critical_section
       {
       public:
 
         /**
-         * @name Constructors/destructor
+         * @name Constructors & Destructor
          * @{
          */
 
         /**
-         *
+         * @brief Enter a critical section.
          * @par Parameters
          *  None
          */
@@ -381,6 +388,9 @@ namespace os
          * @endcond
          */
 
+        /**
+         * @brief Exit a critical section.
+         */
         ~Critical_section ();
 
         /**
@@ -389,7 +399,7 @@ namespace os
       protected:
 
         /**
-         * @name Private member variables
+         * @name Private Member Variables
          * @{
          */
 
@@ -415,25 +425,27 @@ namespace os
        * @details Locker meeting the standard `Lockable` requirements (30.2.5.3).
        *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
-       * @nosubgrouping
        */
       class Lock
       {
       public:
 
         /**
-         * @name Constructors/destructor
+         * @name Constructors & Destructor
          * @{
          */
 
         /**
-         *
+         * @brief Create a lock.
          * @par Parameters
          *  None
          */
         constexpr
         Lock ();
 
+        /**
+         * @brief Destroy the lock.
+         */
         ~Lock ();
 
         /**
@@ -451,7 +463,7 @@ namespace os
 
         /**
          * @}
-         * @name Public member functions
+         * @name Public Member Functions
          * @{
          */
 
@@ -489,7 +501,7 @@ namespace os
       protected:
 
         /**
-         * @name Private member variables
+         * @name Private Member Variables
          * @{
          */
 
@@ -571,19 +583,18 @@ namespace os
        * @endcode
        *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
-       * @nosubgrouping
        */
       class Critical_section
       {
       public:
 
         /**
-         * @name Constructors/destructor
+         * @name Constructors & Destructor
          * @{
          */
 
         /**
-         *
+         * @brief Enter a critical section
          * @par Parameters
          *  None
          */
@@ -602,11 +613,14 @@ namespace os
          * @endcond
          */
 
+        /**
+         * @brief Exit a critical section.
+         */
         ~Critical_section ();
 
         /**
          * @}
-         * @name Public member functions
+         * @name Public Member Functions
          * @{
          */
 
@@ -634,7 +648,7 @@ namespace os
       protected:
 
         /**
-         * @name Private member variables
+         * @name Private Member Variables
          * @{
          */
 
@@ -660,25 +674,27 @@ namespace os
        * @details Locker meeting the standard `Lockable` requirements (30.2.5.3).
        *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
-       * @nosubgrouping
        */
       class Lock
       {
       public:
 
         /**
-         * @name Constructors/destructor
+         * @name Constructors & Destructor
          * @{
          */
 
         /**
+         * @brief Create a lock.
          * @par Parameters
          *  None
-         *
          */
         constexpr
         Lock ();
 
+        /**
+         * @brief Destroy the lock.
+         */
         ~Lock ();
 
         /**
@@ -696,7 +712,7 @@ namespace os
 
         /**
          * @}
-         * @name Public member functions
+         * @name Public Member Functions
          * @{
          */
 
@@ -737,7 +753,7 @@ namespace os
       protected:
 
         /**
-         * @name Private member variables
+         * @name Private Member Variables
          * @{
          */
 
@@ -1124,17 +1140,20 @@ namespace os
      * name (most of the RTOS classes do have a name).
      *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @nosubgrouping
      */
     class Named_object
     {
     public:
 
       /**
-       * @name Constructors/destructor
+       * @name Constructors & Destructor
        * @{
        */
 
+      /**
+       * @brief Create a named object.
+       * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+       */
       Named_object (const char* name);
 
       /**
@@ -1150,11 +1169,14 @@ namespace os
        * @endcond
        */
 
+      /**
+       * @brief Destroy the named object.
+       */
       ~Named_object () = default;
 
       /**
        * @}
-       * @name Public member functions
+       * @name Public Member Functions
        * @{
        */
 
@@ -1174,7 +1196,7 @@ namespace os
     protected:
 
       /**
-       * @name Private member variables
+       * @name Private Member Variables
        * @{
        */
 
@@ -1182,8 +1204,8 @@ namespace os
        * @brief Pointer to name.
        * @details
        * To save space, the null terminated string passed to the
-       * constructor is not copied locally, instead the pointer is
-       * stored, so the
+       * constructor is not copied locally. Instead, the pointer to
+       * the string is copied, so the
        * caller must ensure that the pointer life cycle
        * is at least as long as the object life cycle. A constant
        * string (stored in flash) is preferred.
@@ -1216,14 +1238,13 @@ namespace os
        *  (IEEE Std 1003.1, 2013 Edition).
        *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
-       * @nosubgrouping
        */
       class Attributes : public Named_object
       {
       public:
 
         /**
-         * @name Constructors/destructor
+         * @name Constructors & Destructor
          * @{
          */
 
@@ -1258,7 +1279,7 @@ namespace os
       public:
 
         /**
-         * @name Public member variables
+         * @name Public Member Variables
          * @{
          */
 
@@ -1316,24 +1337,28 @@ namespace os
      *  (IEEE Std 1003.1, 2013 Edition).
      *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @nosubgrouping
      */
     class Thread : public Named_object
     {
     public:
 
       /**
-       * @name Constructors/destructor
+       * @name Constructors & Destructor
        * @{
        */
 
       /**
-       * @brief Create a new thread with default settings.
+       * @brief Create a thread with default settings.
+       * @param [in] function Pointer to thread function.
+       * @param [in] args Pointer to arguments.
        */
       Thread (thread::func_t function, thread::func_args_t args);
 
       /**
-       * @brief Create a new thread with custom settings.
+       * @brief Create a thread with custom settings.
+       * @param [in] attr Reference to attributes.
+       * @param [in] function Pointer to thread function.
+       * @param [in] args Pointer to arguments.
        */
       Thread (const thread::Attributes& attr, thread::func_t function,
               thread::func_args_t args);
@@ -1351,6 +1376,9 @@ namespace os
        * @endcond
        */
 
+      /**
+       * @brief Destroy the thread.
+       */
       ~Thread ();
 
       /**
@@ -1369,7 +1397,7 @@ namespace os
 
       /**
        * @}
-       * @name Public member functions
+       * @name Public Member Functions
        * @{
        */
 
@@ -1449,10 +1477,10 @@ namespace os
       interrupted (void);
 
       /**
+       * @brief Get scheduler status of this thread.
        * @par Parameters
        *  None
-       *
-       * @return
+       * @return Thread scheduler state.
        */
       thread::state_t
       sched_state (void) const;
@@ -1544,7 +1572,7 @@ namespace os
     protected:
 
       /**
-       * @name Private friends
+       * @name Private Friends
        * @{
        */
 
@@ -1568,7 +1596,7 @@ namespace os
 
       /**
        * @}
-       * @name Private member functions
+       * @name Private Member Functions
        * @{
        */
 
@@ -1653,6 +1681,19 @@ namespace os
       timed_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
                       systicks_t ticks, flags::mode_t mode);
 
+      /**
+       * @brief Internal wait for signal.
+       * @param [in] mask The expected flags (OR-ed bit-mask);
+       *  may be zero.
+       * @param [out] oflags Pointer where to store the current flags;
+       *  may be nullptr.
+       * @param [in] mode Mode bits to select if either all or any flags
+       *  are expected, and if the flags should be cleared.
+       * @retval result::ok All expected flags are raised.
+       * @retval EINVAL The mask is outside of the permitted range.
+       * @retval EAGAIN The expected condition did not occur.
+       * @retval ENOTRECOVERABLE Wait failed.
+       */
       result_t
       _try_wait (thread::sigset_t mask, thread::sigset_t* oflags,
                  flags::mode_t mode);
@@ -1673,7 +1714,7 @@ namespace os
     protected:
 
       /**
-       * @name Private member variables
+       * @name Private Member Variables
        * @{
        */
 
@@ -1752,14 +1793,13 @@ namespace os
      * @endcode
      *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @nosubgrouping
      */
     class Systick_clock
     {
     public:
 
       /**
-       * @name Types and constants
+       * @name Types & Constants
        * @{
        */
 
@@ -1819,7 +1859,7 @@ namespace os
 
       /**
        * @}
-       * @name Public member functions
+       * @name Public Member Functions
        * @{
        */
 
@@ -1878,7 +1918,7 @@ namespace os
     protected:
 
       /**
-       * @name Private member functions
+       * @name Private Member Functions
        * @{
        */
 
@@ -1936,14 +1976,13 @@ namespace os
      * @endcode
      *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @nosubgrouping
      */
     class Realtime_clock
     {
     public:
 
       /**
-       * @name Types and constants
+       * @name Types & Constants
        * @{
        */
 
@@ -1958,13 +1997,13 @@ namespace os
       using rep = uint64_t;
 
       /**
-       * @brief Type of duration in ticks.
+       * @brief Type of duration in seconds.
        */
       using sleep_rep = duration_t;
 
       /**
        * @}
-       * @name Public member functions
+       * @name Public Member Functions
        * @{
        */
 
@@ -2054,14 +2093,13 @@ namespace os
        *  (IEEE Std 1003.1, 2013 Edition).
        *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
-       * @nosubgrouping
        */
       class Attributes : public Named_object
       {
       public:
 
         /**
-         * @name Constructors/destructor
+         * @name Constructors & Destructor
          * @{
          */
 
@@ -2096,7 +2134,7 @@ namespace os
       public:
 
         /**
-         * @name Public member variables
+         * @name Public Member Variables
          * @{
          */
 
@@ -2131,14 +2169,13 @@ namespace os
        * Allow to assign a name to the timer.
        *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
-       * @nosubgrouping
        */
       class Periodic_attributes : public Attributes
       {
       public:
 
         /**
-         * @name Constructors/destructor
+         * @name Constructors & Destructor
          * @{
          */
 
@@ -2186,24 +2223,36 @@ namespace os
     /**
      * @class Timer
      * @brief User timer.
+     * @details
+     * TODO
      *
      * @par POSIX compatibility
      *  No POSIX similar functionality identified.
      *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @nosubgrouping
      */
     class Timer : public Named_object
     {
     public:
 
       /**
-       * @name Constructors/destructor
+       * @name Constructors & Destructor
        * @{
        */
 
+      /**
+       * @brief Create a timer with default settings.
+       * @param [in] function Pointer to timer function.
+       * @param [in] args Pointer to arguments.
+       */
       Timer (timer::func_t function, timer::func_args_t args);
 
+      /**
+       * @brief Create a timer with custom settings.
+       * @param [in] attr Reference to attributes.
+       * @param [in] function Pointer to timer function.
+       * @param [in] args Pointer to arguments.
+       */
       Timer (const timer::Attributes& attr, timer::func_t function,
              timer::func_args_t args);
 
@@ -2220,6 +2269,9 @@ namespace os
        * @endcond
        */
 
+      /**
+       * @brief Destroy the timer.
+       */
       ~Timer ();
 
       /**
@@ -2238,7 +2290,7 @@ namespace os
 
       /**
        * @}
-       * @name Public member functions
+       * @name Public Member Functions
        * @{
        */
 
@@ -2271,7 +2323,7 @@ namespace os
     protected:
 
       /**
-       * @name Private member variables
+       * @name Private Member Variables
        * @{
        */
 
@@ -2384,14 +2436,13 @@ namespace os
        *  (IEEE Std 1003.1, 2013 Edition).
        *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
-       * @nosubgrouping
        */
       class Attributes : public Named_object
       {
       public:
 
         /**
-         * @name Constructors/destructor
+         * @name Constructors & Destructor
          * @{
          */
 
@@ -2426,7 +2477,7 @@ namespace os
       public:
 
         /**
-         * @name Public member variables
+         * @name Public Member Variables
          * @{
          */
 
@@ -2466,14 +2517,13 @@ namespace os
        *  (IEEE Std 1003.1, 2013 Edition).
        *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
-       * @nosubgrouping
        */
       class Recursive_attributes : public Attributes
       {
       public:
 
         /**
-         * @name Constructors/destructor
+         * @name Constructors & Destructor
          * @{
          */
 
@@ -2529,25 +2579,25 @@ namespace os
      *  (IEEE Std 1003.1, 2013 Edition).
      *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @nosubgrouping
      */
     class Mutex : public Named_object
     {
     public:
 
       /**
-       * @name Constructors/destructor
+       * @name Constructors & Destructor
        * @{
        */
 
       /**
-       * @brief Create a mutex with default attributes.
+       * @brief Create a mutex with default settings.
        * @par Parameters
        *  None
        */
       Mutex ();
       /**
-       * @brief Create a mutex with custom attributes.
+       * @brief Create a mutex with custom settings.
+       * @param [in] attr Reference to attributes.
        */
       Mutex (const mutex::Attributes& attr);
 
@@ -2585,7 +2635,7 @@ namespace os
 
       /**
        * @}
-       * @name Public member functions
+       * @name Public Member Functions
        * @{
        */
 
@@ -2712,19 +2762,19 @@ namespace os
       consistent (void);
 
       /**
-       *
+       * @brief Get owner thread.
        * @par Parameters
        *  None
-       * @return
+       * @return Pointer to thread or nullptr if not owned.
        */
       Thread*
       owner (void);
 
       /**
-       *
+       * @brief Reset mutex.
        * @par Parameters
        *  None
-       * @return
+       * @retval result::ok The mutex was reset.
        */
       result_t
       reset (void);
@@ -2736,7 +2786,7 @@ namespace os
     protected:
 
       /**
-       * @name Private member variables
+       * @name Private Member Variables
        * @{
        */
 
@@ -2791,14 +2841,13 @@ namespace os
        *  (IEEE Std 1003.1, 2013 Edition).
        *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
-       * @nosubgrouping
        */
       class Attributes : public Named_object
       {
       public:
 
         /**
-         * @name Constructors/destructor
+         * @name Constructors & Destructor
          * @{
          */
 
@@ -2833,7 +2882,7 @@ namespace os
       public:
 
         /**
-         * @name Public member variables
+         * @name Public Member Variables
          * @{
          */
 
@@ -2863,25 +2912,24 @@ namespace os
      *  (IEEE Std 1003.1, 2013 Edition).
      *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @nosubgrouping
      */
     class Condition_variable : public Named_object
     {
     public:
 
       /**
-       * @name Constructors/destructor
+       * @name Constructors & Destructor
        * @{
        */
 
       /**
-       * @brief Create a default condition variable.
+       * @brief Create a condition variable with default settings.
        * @par Parameters
        *  None
        */
       Condition_variable ();
       /**
-       * @brief Create a custom condition variable.
+       * @brief Create a condition variable with custom settings.
        * @param [in] attr Reference to attributes.
        */
       Condition_variable (const condvar::Attributes& attr);
@@ -2921,7 +2969,7 @@ namespace os
 
       /**
        * @}
-       * @name Public member functions
+       * @name Public Member Functions
        * @{
        */
 
@@ -2973,7 +3021,7 @@ namespace os
     protected:
 
       /**
-       * @name Private member variables
+       * @name Private Member Variables
        * @{
        */
 
@@ -3023,14 +3071,13 @@ namespace os
        *  (IEEE Std 1003.1, 2013 Edition).
        *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
-       * @nosubgrouping
        */
       class Attributes : public Named_object
       {
       public:
 
         /**
-         * @name Constructors/destructor
+         * @name Constructors & Destructor
          * @{
          */
 
@@ -3065,7 +3112,7 @@ namespace os
       public:
 
         /**
-         * @name Public member variables
+         * @name Public Member Variables
          * @{
          */
 
@@ -3111,14 +3158,13 @@ namespace os
        *  (IEEE Std 1003.1, 2013 Edition).
        *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
-       * @nosubgrouping
        */
       class Binary_attributes : public Attributes
       {
       public:
 
         /**
-         * @name Constructors/destructor
+         * @name Constructors & Destructor
          * @{
          */
 
@@ -3177,30 +3223,27 @@ namespace os
      *  Inspired by `sem_t` from [<semaphore.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
      *  (IEEE Std 1003.1, 2013 Edition).
      *
-     * Compatible with POSIX semaphores.
-     * http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html
-     *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @nosubgrouping
      */
     class Semaphore : public Named_object
     {
     public:
 
       /**
-       * @name Constructors/destructor
+       * @name Constructors & Destructor
        * @{
        */
 
       /**
-       * @brief Create a default semaphore.
+       * @brief Create a semaphore with default settings.
        * @par Parameters
        *  None
        */
       Semaphore ();
 
       /**
-       * @brief Create custom semaphore.
+       * @brief Create a semaphore with custom settings.
+       * @param [in] attr Reference to attributes.
        */
       Semaphore (const semaphore::Attributes& attr);
 
@@ -3238,7 +3281,7 @@ namespace os
 
       /**
        * @}
-       * @name Public member functions
+       * @name Public Member Functions
        * @{
        */
 
@@ -3320,19 +3363,19 @@ namespace os
       reset (void);
 
       /**
-       *
+       * @brief Get the semaphore initial value.
        * @par Parameters
        *  None
-       * @return
+       * @return The numeric value set from attributes.
        */
       semaphore::count_t
       initial_value (void) const;
 
       /**
-       *
+       * @brief Get the semaphore max value.
        * @par Parameters
        *  None
-       * @return
+       * @return The numeric value set from attributes.
        */
       semaphore::count_t
       max_value (void) const;
@@ -3344,7 +3387,7 @@ namespace os
     protected:
 
       /**
-       * @name Private member variables
+       * @name Private Member Variables
        * @{
        */
 
@@ -3407,20 +3450,56 @@ namespace os
        * Allow to assign a name and custom attributes (like a static
        * address) to the memory pool.
        *
+       * @par Example
+       *
+       * Define an array of structures and
+       * pass its address and size via the attributes.
+       *
+       * @code{.cpp}
+       * // Define the type of one pool block.
+       * typedef struct {
+       *   uint32_t length;
+       *   uint32_t width;
+       *   uint32_t height;
+       *   uint32_t weight;
+       * } properties_t;
+       *
+       * // Define the pool size.
+       * constexpr uint32_t pool_size = 10;
+       *
+       * // Allocate static storage for the pool.
+       * properties_t pool[pool_size];
+       *
+       * void
+       * func(void)
+       * {
+       *    // Do something
+       *
+       *    // Define pool attributes.
+       *    mempool::Attributes attr { "properties" };
+       *    attr.mp_pool_address = pool;
+       *    attr.mp_pool_size_bytes = sizeof(pool);
+       *
+       *    // Create the pool object.
+       *    Memory_pool mp { attr, pool_size, sizeof(properties_t) };
+       *
+       *    // Do something else.
+       * }
+       * @endcode
+       *
        * @par POSIX compatibility
        *  No POSIX similar functionality identified, but inspired by POSIX
        *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
        *  (IEEE Std 1003.1, 2013 Edition).
        *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
-       * @nosubgrouping
        */
       class Attributes : public Named_object
       {
       public:
 
         /**
-         * @name Constructors/destructor
+         * @name Constructors & Destructor
          * @{
          */
 
@@ -3455,13 +3534,21 @@ namespace os
       public:
 
         /**
-         * @name Public member variables
+         * @name Public Member Variables
          * @{
          */
 
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
+        /**
+         * @brief Memory pool address.
+         */
         void* mp_pool_address;
+
+        /**
+         * @brief Memory pool size.
+         */
+        size_t mp_pool_size_bytes;
 
         // Add more attributes.
 
@@ -3496,27 +3583,26 @@ namespace os
      * @endcode
      *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @nosubgrouping
      */
     class Memory_pool : public Named_object
     {
     public:
 
       /**
-       * @name Constructors/destructor
+       * @name Constructors & Destructor
        * @{
        */
 
       /**
-       * @brief Create a memory pool with default attributes.
+       * @brief Create a memory pool with default settings.
        * @param [in] blocks The maximum number of items in the pool.
        * @param [in] block_size_bytes The size of an item, in bytes.
        */
       Memory_pool (mempool::size_t blocks, mempool::size_t block_size_bytes);
 
       /**
-       * @brief Create a memory pool with custom attributes.
-       * @param [in] attr Reference to attributes object.
+       * @brief Create a memory pool with custom settings.
+       * @param [in] attr Reference to attributes.
        * @param [in] blocks The maximum number of items in the pool.
        * @param [in] block_size_bytes The size of an item, in bytes.
        */
@@ -3557,7 +3643,7 @@ namespace os
 
       /**
        * @}
-       * @name Public member functions
+       * @name Public Member Functions
        * @{
        */
 
@@ -3669,7 +3755,7 @@ namespace os
     protected:
 
       /**
-       * @name Private member functions
+       * @name Private Member Functions
        * @{
        */
 
@@ -3688,7 +3774,7 @@ namespace os
     protected:
 
       /**
-       * @name Private member variables
+       * @name Private Member Variables
        * @{
        */
 
@@ -3767,14 +3853,13 @@ namespace os
        *  (IEEE Std 1003.1, 2013 Edition).
        *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
-       * @nosubgrouping
        */
       class Attributes : public Named_object
       {
       public:
 
         /**
-         * @name Constructors/destructor
+         * @name Constructors & Destructor
          * @{
          */
 
@@ -3809,7 +3894,7 @@ namespace os
       public:
 
         /**
-         * @name Public member variables
+         * @name Public Member Variables
          * @{
          */
 
@@ -3846,23 +3931,29 @@ namespace os
      *  (IEEE Std 1003.1, 2013 Edition).
      *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @nosubgrouping
      */
     class Message_queue : public Named_object
     {
     public:
 
       /**
-       * @name Constructors/destructor
+       * @name Constructors & Destructor
        * @{
        */
 
       /**
-       * @brief Create a message queue.
+       * @brief Create a message queue with default settings.
        * @param [in] msgs The number of messages.
        * @param [in] msg_size_bytes The message size, in bytes.
        */
       Message_queue (mqueue::size_t msgs, mqueue::size_t msg_size_bytes);
+
+      /**
+       * @brief Create a message queue with custom settings.
+       * @param [in] attr Reference to attributes.
+       * @param [in] msgs The number of messages.
+       * @param [in] msg_size_bytes The message size, in bytes.
+       */
       Message_queue (const mqueue::Attributes&attr, mqueue::size_t msgs,
                      mqueue::size_t msg_size_bytes);
 
@@ -3900,12 +3991,12 @@ namespace os
 
       /**
        * @}
-       * @name Public member functions
+       * @name Public Member Functions
        * @{
        */
 
       /**
-       * @brief Send message to the queue.
+       * @brief Send a message to the queue.
        * @param [in] msg The address of the message to enqueue.
        * @param [in] nbytes The length of the message. Must be not
        *  higher than the value used when creating the queue.
@@ -3923,7 +4014,7 @@ namespace os
       send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio);
 
       /**
-       * @brief Try to send message to the queue.
+       * @brief Try to send a message to the queue.
        * @param [in] msg The address of the message to enqueue.
        * @param [in] nbytes The length of the message. Must be not
        *  higher than the value used when creating the queue.
@@ -3940,7 +4031,7 @@ namespace os
       try_send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio);
 
       /**
-       * @brief Send message to the queue with timeout.
+       * @brief Send a message to the queue with timeout.
        * @param [in] msg The address of the message to enqueue.
        * @param [in] nbytes The length of the message. Must be not
        *  higher than the value used when creating the queue.
@@ -3962,7 +4053,7 @@ namespace os
                   systicks_t ticks);
 
       /**
-       * @brief Receive message from the queue.
+       * @brief Receive a message from the queue.
        * @param [out] msg The address where to store the dequeued message.
        * @param [in] nbytes The size of the destination buffer. Must
        *  be lower than the value used when creating the queue.
@@ -3983,7 +4074,7 @@ namespace os
       receive (char* msg, std::size_t nbytes, mqueue::priority_t* mprio);
 
       /**
-       * @brief Try to receive message from the queue.
+       * @brief Try to receive a message from the queue.
        * @param [out] msg The address where to store the dequeued message.
        * @param [in] nbytes The size of the destination buffer. Must
        *  be lower than the value used when creating the queue.
@@ -4003,7 +4094,7 @@ namespace os
       try_receive (char* msg, std::size_t nbytes, mqueue::priority_t* mprio);
 
       /**
-       * @brief Receive message from the queue with timeout.
+       * @brief Receive a message from the queue with timeout.
        * @retval result::ok The message was received.
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
        * @retval EMSGSIZE The specified message length, nbytes, is
@@ -4085,7 +4176,7 @@ namespace os
     protected:
 
       /**
-       * @name Private member variables
+       * @name Private Member Variables
        * @{
        */
 
@@ -4140,14 +4231,13 @@ namespace os
        *  (IEEE Std 1003.1, 2013 Edition).
        *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
-       * @nosubgrouping
        */
       class Attributes : public Named_object
       {
       public:
 
         /**
-         * @name Constructors/destructor
+         * @name Constructors & Destructor
          * @{
          */
 
@@ -4182,7 +4272,7 @@ namespace os
       public:
 
         /**
-         * @name Public member variables
+         * @name Public Member Variables
          * @{
          */
 
@@ -4216,27 +4306,26 @@ namespace os
      *  No POSIX similar functionality identified.
      *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @nosubgrouping
      */
     class Event_flags : public Named_object
     {
     public:
 
       /**
-       * @name Constructors/destructor
+       * @name Constructors & Destructor
        * @{
        */
 
       /**
-       * @brief Create default event flags.
+       * @brief Create event flags with default attributes.
        * @par Parameters
        *  None
        */
       Event_flags ();
 
       /**
-       * @brief Create custom event flags.
-       * @param [in] attr Reference to custom attributes.
+       * @brief Create event flags with custom settings.
+       * @param [in] attr Reference to attributes.
        */
       Event_flags (const evflags::Attributes& attr);
 
@@ -4275,7 +4364,7 @@ namespace os
 
       /**
        * @}
-       * @name Public member functions
+       * @name Public Member Functions
        * @{
        */
 
@@ -4383,7 +4472,7 @@ namespace os
     protected:
 
       /**
-       * @name Private member functions
+       * @name Private Member Functions
        * @{
        */
 
@@ -4410,7 +4499,7 @@ namespace os
     protected:
 
       /**
-       * @name Private member variables
+       * @name Private Member Variables
        * @{
        */
 
