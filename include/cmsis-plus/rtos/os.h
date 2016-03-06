@@ -105,7 +105,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     /**
-     * @brief Type of function results.
+     * @brief Type of values returned by RTOS functions.
      * @details
      * For error processing reasons, most CMSIS++ RTOS functions
      * return a numeric result, which, according to POSIX,
@@ -185,15 +185,15 @@ namespace os
        * `ok`, represented by `0`.
        *
        * If more custom codes will be needed and are not present in POSIX,
-       * this sis the place to add them. Just be sure their numeric values
-       * do not overlap POSIX values (check for a definition with the
-       * last allocated POSIX error number).
+       * this is the place where to add them. Just be sure their numeric
+       * values do not overlap POSIX values (check for a definition with
+       * the last allocated POSIX error number).
        */
       enum
         : result_t
           {
             /**
-             * Function completed; no errors or events occurred.
+             * @brief Function completed; no errors or events occurred.
              */
             ok = 0,
 
@@ -203,16 +203,16 @@ namespace os
     // ------------------------------------------------------------------------
 
     /**
-     * @brief Type of timer ticks.
+     * @brief Type of variables holding timer ticks.
      * @details
-     * A numeric value intended to hold a number of SysTick ticks.
+     * A numeric type intended to hold a number of SysTick ticks.
      */
     using systicks_t = uint32_t;
 
     /**
-     * @brief Type of a timer duration.
+     * @brief Type of variables holding timer durations.
      * @details
-     * A numeric value intended to hold a generic duration, either in ticks
+     * A numeric type intended to hold a generic duration, either in ticks
      * or in seconds.
      */
     using duration_t = uint32_t;
@@ -229,9 +229,9 @@ namespace os
     namespace scheduler
     {
       /**
-       * @brief Type of scheduler status.
+       * @brief Type of a variable holding scheduler status codes.
        * @details
-       * Usually a boolean value telling if the scheduler is
+       * Usually a boolean telling if the scheduler is
        * locked or not, but for recursive locks it might also be a
        * numeric counter.
        */
@@ -240,7 +240,8 @@ namespace os
       /**
        * @brief The scheduler status.
        * @details
-       * Modified by `lock()` and restored to previous value by `unlock()`.
+       * Modified by @ref `lock()` and restored to previous value
+       * by @ref `unlock()`.
        */
       extern status_t is_locked_;
 
@@ -257,7 +258,7 @@ namespace os
        * @par Parameters
        *  None
        * @retval result::ok The scheduler was initialised.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
       result_t
       initialize (void);
@@ -267,7 +268,7 @@ namespace os
        * @par Parameters
        *  None
        * @retval result::ok The scheduler was started.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
       result_t
       start (void);
@@ -422,7 +423,8 @@ namespace os
       /**
        * @class Lock
        * @brief Scheduler standard locker.
-       * @details Locker meeting the standard `Lockable` requirements (30.2.5.3).
+       * @details
+       * Locker meeting the standard `Lockable` requirements (30.2.5.3).
        *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
@@ -468,7 +470,7 @@ namespace os
          */
 
         /**
-         *
+         * @brief Lock the scheduler.
          * @par Parameters
          *  None
          * @return  Nothing.
@@ -477,6 +479,10 @@ namespace os
         lock (void);
 
         /**
+         * @brief Try to lock the scheduler.
+         * @details
+         * Somehow redundant, since the lock will always succeed;
+         * but used to meet the Lockable requirements.
          *
          * @par Parameters
          *  None
@@ -486,7 +492,7 @@ namespace os
         try_lock (void);
 
         /**
-         *
+         * @brief Unlock the scheduler.
          * @par Parameters
          *  None
          * @return  Nothing.
@@ -506,8 +512,8 @@ namespace os
          */
 
         /**
-         * Variable to store the initial scheduler status.
-         *
+         * @brief Variable to store the initial scheduler status.
+         * @details
          * The variable type usually is a `bool`, but a counter is also
          * possible if the scheduler uses a recursive lock.
          */
@@ -531,7 +537,7 @@ namespace os
     namespace interrupts
     {
       /**
-       * @brief Type of interrupts status.
+       * @brief Type of a variable holding interrupts status.
        * @details
        * Usually an integer large enough to hold the CPU status register
        * where the interrupt status is stored.
@@ -594,7 +600,7 @@ namespace os
          */
 
         /**
-         * @brief Enter a critical section
+         * @brief Enter interrupts critical section.
          * @par Parameters
          *  None
          */
@@ -614,7 +620,7 @@ namespace os
          */
 
         /**
-         * @brief Exit a critical section.
+         * @brief Exit interrupts critical section.
          */
         ~Critical_section ();
 
@@ -653,8 +659,8 @@ namespace os
          */
 
         /**
-         * Variable to store the initial interrupts status.
-         *
+         * @brief Variable to store the initial interrupts status.
+         * @details
          * The variable is constant, after being set by the constructor no
          * further changes are possible.
          *
@@ -685,7 +691,7 @@ namespace os
          */
 
         /**
-         * @brief Create a lock.
+         * @brief Create an interrupts lock.
          * @par Parameters
          *  None
          */
@@ -693,7 +699,7 @@ namespace os
         Lock ();
 
         /**
-         * @brief Destroy the lock.
+         * @brief Destroy the interrupts lock.
          */
         ~Lock ();
 
@@ -717,7 +723,7 @@ namespace os
          */
 
         /**
-         * @brief Lock the interrupts
+         * @brief Lock the interrupts.
          * @par Parameters
          *  None
          * @return  Nothing.
@@ -758,8 +764,8 @@ namespace os
          */
 
         /**
-         * Variable to store the initial interrupts status.
-         *
+         * @brief Variable to store the initial interrupts status.
+         * @details
          * The variable type usually is an unsigned integer where
          * the status register is saved.
          */
@@ -787,18 +793,18 @@ namespace os
     namespace flags
     {
       /**
-       * @brief Type of flags mask.
+       * @brief Type of a variable holding a flags mask.
        * @details
-       * An unsigned variable large enough to store all the flags, usually
+       * An unsigned type large enough to store all the flags, usually
        * 32-bits wide.
        *
        * Both thread signal flags and event flags use this definition.
        */
       using mask_t = uint32_t;
       /**
-       * @brief Type of flags mode.
+       * @brief Type of a variable holding the flags mode.
        * @details
-       * An unsigned variable used to hold the mode bits passed to
+       * An unsigned type used to hold the mode bits passed to
        * functions returning flags.
        *
        * Both thread signal flags and event flags use this definition.
@@ -817,12 +823,12 @@ namespace os
           : mode_t
             {
               /**
-               * @brief Expect all flags set to return.
+               * @brief Return when all flags are set.
                */
               all = 1,
 
               /**
-               * @brief Expect at least one flag set to return.
+               * @brief Return when at least one flag is set.
                */
               any = 2,
 
@@ -844,11 +850,11 @@ namespace os
     namespace thread
     {
       /**
-       * @brief Type of thread priorities.
+       * @brief Type of a variable holding thread priorities.
        * @details
-       * A numeric value used to hold a thread priority, used for thread
-       * control, like scheduling and thread resume due to events;
-       * usually an unsigned 8-bits value.
+       * A numeric type used to hold thread priorities, affecting the thread
+       * behaviour, like scheduling and thread wakeup due to events;
+       * usually an unsigned 8-bits type.
        *
        * Higher values represent higher priorities.
        */
@@ -882,17 +888,17 @@ namespace os
           : priority_t
             {
               /**
-               * Undefined, thread not initialised
+               * Undefined, thread not initialised.
                */
               none = 0,
 
               /**
-               * System reserved for IDLE thread
+               * System reserved for IDLE thread.
                */
               idle = 1,
 
               /**
-               * Lowest available for user code
+               * Lowest available for user code.
                */
               lowest = 2,
 
@@ -912,12 +918,12 @@ namespace os
               realtime = (12 << shift),
 
               /**
-               * Highest available for user code
+               * Highest available for user code.
                */
               highest = ((16 << shift) - 3),
 
               /**
-               * System reserved for ISR deferred task
+               * System reserved for ISR deferred thread.
                */
               isr = ((16 << shift) - 2),
 
@@ -929,7 +935,7 @@ namespace os
       } /* namespace priority */
 
       /**
-       * @brief Type of thread staate.
+       * @brief Type of a variable holding the thread state.
        * @details
        * An enumeration with the possible thread states. The enumeration
        * is restricted to one of these values.
@@ -937,7 +943,7 @@ namespace os
       using state_t = enum class state : uint8_t
         {
           /**
-           * @brief Used to catch uninitialised threads
+           * @brief Used to catch uninitialised threads.
            */
           undefined = 0,
           inactive = 1,
@@ -952,10 +958,11 @@ namespace os
         };
 
       /**
-       * @brief Type of signal set.
+       * @brief Type of a variable holding a signal set.
        * @details
-       * An unsigned variable large enough to store all the signal flags,
-       * actually a reuse of the more generic flags mask type @ref flags::mask_t.
+       * An unsigned type large enough to store all the signal flags,
+       * actually a reuse of the more generic flags mask type
+       * @ref flags::mask_t.
        */
       using sigset_t = flags::mask_t;
 
@@ -985,14 +992,15 @@ namespace os
       /**
        * @brief Thread function arguments.
        * @details
-       * Type of function arguments.
+       * Type of thread function arguments.
        */
       using func_args_t = void*;
 
       /**
        * @brief Thread function.
        * @details
-       * Type of thread function.
+       * Type of thread functions. Useful to cast other similar types
+       * to silence the compiler warnings.
        */
       using func_t = void* (*) (func_args_t args);
 
@@ -1019,7 +1027,7 @@ namespace os
 
     /**
      * @namespace os::rtos::this_thread
-     * @brief The current thread namespace.
+     * @brief The current running thread namespace.
      * @details
      * The os::rtos::this_thread namespace groups functions related to
      * the current thread.
@@ -1027,7 +1035,7 @@ namespace os
     namespace this_thread
     {
       /**
-       * @brief Get current thread.
+       * @brief Get the current running thread.
        * @par Parameters
        *  None
        * @return Reference to the current running thread.
@@ -1036,7 +1044,7 @@ namespace os
       thread (void);
 
       /**
-       * @brief Yield CPU to next thread.
+       * @brief Yield execution to the next thread ready thread.
        * @par Parameters
        *  None
        * @return Nothing.
@@ -1045,7 +1053,7 @@ namespace os
       yield (void);
 
       /**
-       * @brief Suspend the current thread.
+       * @brief Suspend the current running thread.
        * @par Parameters
        *  None
        * @return Nothing.
@@ -1054,7 +1062,7 @@ namespace os
       suspend (void);
 
       /**
-       * @brief Terminate the current thread.
+       * @brief Terminate the current running thread.
        * @param [in] exit_ptr Pointer to object to return. (Optional).
        * @return Nothing.
        */
@@ -1062,7 +1070,7 @@ namespace os
       exit (void* exit_ptr = nullptr);
 
       /**
-       * @brief Check if wake-up due to timeout.
+       * @brief Check if the wake-up is due to a timeout.
        * @par Parameters
        *  None
        * @retval true The previous sleep returned after the entire duration.
@@ -1076,11 +1084,11 @@ namespace os
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
-       *  may be nullptr.
+       *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
        *  are expected, and if the flags should be cleared.
        * @retval result::ok All expected flags are raised.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINVAL The mask is outside of the permitted range.
        * @retval EINTR The operation was interrupted.
        * @retval ENOTRECOVERABLE Wait failed.
@@ -1094,7 +1102,7 @@ namespace os
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
-       *  may be nullptr.
+       *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
        *  are expected, and if the flags should be cleared.
        * @retval result::ok All expected flags are raised.
@@ -1111,12 +1119,12 @@ namespace os
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
-       *  may be nullptr.
+       *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
        *  are expected, and if the flags should be cleared.
        * @param ticks The number of ticks to wait.
        * @retval result::ok All expected flags are raised.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval ETIMEDOUT The expected condition did not occur during the
        *  entire timeout duration.
        * @retval EINVAL The mask is outside of the permitted range.
@@ -1152,7 +1160,7 @@ namespace os
 
       /**
        * @brief Create a named object.
-       * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+       * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
        */
       Named_object (const char* name);
 
@@ -1233,6 +1241,9 @@ namespace os
        * Allow to assign a name and custom attributes (like stack address,
        * stack size, priority) to the thread.
        *
+       * To simplify access, the member variables are public and do not
+       * require accessors or mutators.
+       *
        * @par POSIX compatibility
        *  Inspired by `pthread_attr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
        *  (IEEE Std 1003.1, 2013 Edition).
@@ -1250,7 +1261,7 @@ namespace os
 
         /**
          * @brief Create thread attributes.
-         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
         Attributes (const char* name);
 
@@ -1285,8 +1296,19 @@ namespace os
 
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
+        /**
+         * @brief Thread user stack address attribute.
+         */
         void* th_stack_address;
+
+        /**
+         * @brief Thread user stack size attribute.
+         */
         std::size_t th_stack_size_bytes;
+
+        /**
+         * @brief Thread priority attribute.
+         */
         priority_t th_priority;
 
         // Add more attributes.
@@ -1406,7 +1428,7 @@ namespace os
        * @par Parameters
        *  None.
        * @retval result::ok The cancel request was sent to the thread.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
       result_t
       cancel (void);
@@ -1414,7 +1436,7 @@ namespace os
       /**
        * @brief Wait for thread termination.
        * @retval result::ok The thread was terminated.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
       result_t
       join (void** exit_ptr = nullptr);
@@ -1424,7 +1446,7 @@ namespace os
        * @par Parameters
        *  None
        * @retval result::ok The thread was detached.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
       result_t
       detach (void);
@@ -1434,7 +1456,7 @@ namespace os
       /**
        * @brief Set dynamic scheduling priority.
        * @retval result::ok The priority was set.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINVAL The value of prio is invalid for the
        *  scheduling policy of the specified thread.
        */
@@ -1524,10 +1546,10 @@ namespace os
        * @brief Raise thread signal flags.
        * @param [in] mask The OR-ed flags to raise.
        * @param [out] oflags Optional pointer where to store the
-       *  previous flags; may be nullptr.
+       *  previous flags; may be `nullptr`.
        * @retval result::ok The flags were raised.
        * @retval EINVAL The mask is zero.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
       result_t
       sig_raise (thread::sigset_t mask, thread::sigset_t* oflags);
@@ -1535,10 +1557,10 @@ namespace os
       /**
        * @brief Clear thread signal flags.
        * @param [out] oflags Optional pointer where to store the
-       *  previous flags; may be nullptr.
+       *  previous flags; may be `nullptr`.
        * @param [in] mask The OR-ed flags to clear.
        * @retval result::ok The flags were cleared.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINVAL The mask is zero.
        */
       result_t
@@ -1551,7 +1573,7 @@ namespace os
        *  cleared (the other bits are ignored).
        * @retval flags The selected bits from the current thread
        *  signal flags mask.
-       * @retval sig::all Cannot be invoked from an Interrupt Service Routine.
+       * @retval sig::all Cannot be invoked from an Interrupt Service Routines.
        */
       thread::sigset_t
       sig_get (thread::sigset_t mask, flags::mode_t mode);
@@ -1601,7 +1623,7 @@ namespace os
        */
 
       /**
-       * @brief Suspend the current thread.
+       * @brief Suspend this thread.
        * @par Parameters
        *  None
        * @return  Nothing.
@@ -1610,7 +1632,7 @@ namespace os
       suspend (void);
 
       /**
-       * @brief Terminate thread.
+       * @brief Terminate thread by itself.
        * @param [in] exit_ptr Pointer to object to return (optional).
        * @return  Nothing.
        */
@@ -1630,11 +1652,11 @@ namespace os
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
-       *  may be nullptr.
+       *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
        *  are expected, and if the flags should be cleared.
        * @retval result::ok All expected flags are raised.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINVAL The mask is outside of the permitted range.
        * @retval EINTR The operation was interrupted.
        * @retval ENOTRECOVERABLE Wait failed.
@@ -1648,7 +1670,7 @@ namespace os
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
-       *  may be nullptr.
+       *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
        *  are expected, and if the flags should be cleared.
        * @retval result::ok All expected flags are raised.
@@ -1665,12 +1687,12 @@ namespace os
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
-       *  may be nullptr.
+       *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
        *  are expected, and if the flags should be cleared.
        * @param ticks The number of ticks to wait.
        * @retval result::ok All expected flags are raised.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval ETIMEDOUT The expected condition did not occur during the
        *  entire timeout duration.
        * @retval EINVAL The mask is outside of the permitted range.
@@ -1686,7 +1708,7 @@ namespace os
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
-       *  may be nullptr.
+       *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
        *  are expected, and if the flags should be cleared.
        * @retval result::ok All expected flags are raised.
@@ -1894,7 +1916,7 @@ namespace os
        * @brief Sleep a number of ticks.
        * @param [in] ticks The number of ticks to sleep.
        * @retval ETIMEDOUT The sleep lasted the entire duration.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINTR The sleep was interrupted.
        */
       static result_t
@@ -1905,7 +1927,7 @@ namespace os
        * @param [in] ticks The timeout in ticks.
        * @retval result::ok An event occurred before the timeout.
        * @retval ETIMEDOUT The wait lasted the entire duration.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINTR The sleep was interrupted.
        */
       static result_t
@@ -1927,7 +1949,7 @@ namespace os
        * @param ticks
        * @retval result::ok An event occurred before the timeout.
        * @retval ETIMEDOUT The wait lasted the entire duration.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINTR The sleep was interrupted.
        */
       static result_t
@@ -2020,7 +2042,7 @@ namespace os
        * @brief Sleep a number of seconds.
        * @param [in] secs The number of seconds to sleep.
        * @retval ETIMEDOUT The sleep lasted the entire duration.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINTR The sleep was interrupted.
        */
       static result_t
@@ -2087,6 +2109,9 @@ namespace os
        * @details
        * Allow to assign a name to the timer.
        *
+       * To simplify access, the member variables are public and do not
+       * require accessors or mutators.
+       *
        * @par POSIX compatibility
        *  No POSIX similar functionality identified, but inspired by POSIX
        *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
@@ -2105,7 +2130,7 @@ namespace os
 
         /**
          * @brief Create timer attributes.
-         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
         Attributes (const char* name);
 
@@ -2141,7 +2166,7 @@ namespace os
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
         /**
-         * @brief Timer type.
+         * @brief Timer type attribute.
          */
         type_t tm_type;
 
@@ -2181,7 +2206,7 @@ namespace os
 
         /**
          * @brief Create periodic timer attributes.
-         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
         Periodic_attributes (const char* name);
 
@@ -2299,7 +2324,7 @@ namespace os
        * @param [in] ticks The timer period, in ticks.
        * @retval result::ok The timer has been started or restarted.
        * @retval ENOTRECOVERABLE Timer could not be started.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
       result_t
       start (systicks_t ticks);
@@ -2309,7 +2334,7 @@ namespace os
        * @par Parameters
        *  None
        * @retval result::ok The timer has been stopped.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EAGAIN The timer is not yet started.
        * @retval ENOTRECOVERABLE Timer could not be stopped.
        */
@@ -2431,6 +2456,9 @@ namespace os
        * Allow to assign a name and custom attributes (like priority ceiling,
        * robustness, etc) to the mutex.
        *
+       * To simplify access, the member variables are public and do not
+       * require accessors or mutators.
+       *
        * @par POSIX compatibility
        *  Inspired by `pthread_mutexattr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
        *  (IEEE Std 1003.1, 2013 Edition).
@@ -2448,7 +2476,7 @@ namespace os
 
         /**
          * @brief Create mutex attributes.
-         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
         Attributes (const char* name);
 
@@ -2483,9 +2511,166 @@ namespace os
 
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
+        /**
+         * @brief Mutex priority ceiling.
+         * @details
+         * The @ref mx_priority_ceiling attribute defines the priority
+         * ceiling of initialised mutexes, which is the minimum priority
+         * level at which the critical section guarded by the mutex is
+         * executed. In order to avoid priority inversion, the priority
+         * ceiling of the mutex shall be set to a priority higher than
+         * or equal to the highest priority of all the threads that may
+         * lock that mutex. The values of @ref mx_priority_ceiling are
+         * within the maximum range of priorities defined under the
+         * SCHED_FIFO scheduling policy.
+         *
+         * @par POSIX compatibility
+         *  Inspired by `pthread_mutexattr_setprioceiling()` from
+         *  [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_getprioceiling.html)
+         *  (IEEE Std 1003.1, 2013 Edition).
+         */
         thread::priority_t mx_priority_ceiling;
+
+        /**
+         * @brief Mutex protocol attribute.
+         * @details
+         * @details
+         * The default value of the attribute shall be PTHREAD_PRIO_NONE.
+         *
+         * When a thread owns a mutex with the PTHREAD_PRIO_NONE
+         * protocol attribute, its priority and scheduling shall
+         * not be affected by its mutex ownership.
+         *
+         * When a thread is blocking higher priority threads
+         * because of owning one or more robust mutexes with the
+         * PTHREAD_PRIO_INHERIT protocol attribute, it shall execute
+         * at the higher of its priority or the priority of the highest
+         * priority thread waiting on any of the robust mutexes owned
+         * by this thread and initialised with this protocol.
+         *
+         * When a thread is blocking higher priority threads because
+         * of owning one or more non-robust mutexes with the
+         * PTHREAD_PRIO_INHERIT protocol attribute, it shall execute
+         * at the higher of its priority or the priority of the
+         * highest priority thread waiting on any of the non-robust
+         * mutexes owned by this thread and initialised with this protocol.
+         *
+         * When a thread owns one or more robust mutexes initialised
+         * with the PTHREAD_PRIO_PROTECT protocol, it shall execute
+         * at the higher of its priority or the highest of the priority
+         * ceilings of all the robust mutexes owned by this thread and
+         * initialised with this attribute, regardless of whether other
+         * threads are blocked on any of these robust mutexes or not.
+         *
+         * When a thread owns one or more non-robust mutexes initialised
+         * with the PTHREAD_PRIO_PROTECT protocol, it shall execute at
+         * the higher of its priority or the highest of the priority
+         * ceilings of all the non-robust mutexes owned by this thread
+         * and initialised with this attribute, regardless of whether
+         * other threads are blocked on any of these non-robust mutexes
+         * or not.
+         *
+         * While a thread is holding a mutex which has been initialised
+         * with the PTHREAD_PRIO_INHERIT or PTHREAD_PRIO_PROTECT protocol
+         * attributes, it shall not be subject to being moved to the tail
+         * of the scheduling queue at its priority in the event that its
+         * original priority is changed, such as by a call to
+         * sched_setparam(). Likewise, when a thread unlocks a mutex
+         * that has been initialised with the PTHREAD_PRIO_INHERIT or
+         * PTHREAD_PRIO_PROTECT protocol attributes, it shall not be
+         * subject to being moved to the tail of the scheduling queue
+         * at its priority in the event that its original priority is changed.
+         *
+         * If a thread simultaneously owns several mutexes initialised
+         * with different protocols, it shall execute at the highest of
+         * the priorities that it would have obtained by each of these
+         * protocols.
+         *
+         * When a thread makes a call to Mutex::lock(), the mutex
+         * was initialised with the protocol attribute having the
+         * value PTHREAD_PRIO_INHERIT, when the calling thread is
+         * blocked because the mutex is owned by another thread, that
+         * owner thread shall inherit the priority level of the calling
+         * thread as long as it continues to own the mutex. The
+         * implementation shall update its execution priority to
+         * the maximum of its assigned priority and all its
+         * inherited priorities. Furthermore, if this owner thread
+         * itself becomes blocked on another mutex with the protocol
+         * attribute having the value PTHREAD_PRIO_INHERIT, the same
+         * priority inheritance effect shall be propagated to this
+         * other owner thread, in a recursive manner.
+         *
+         * @par POSIX compatibility
+         *  Inspired by `pthread_mutexattr_setprotocol()` from
+         *  [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_getprotocol.html)
+         *  (IEEE Std 1003.1, 2013 Edition).
+         */
         mutex::protocol_t mx_protocol;
+
+        /**
+         * @brief Mutex protocol attribute.
+         * @details
+         *
+         * Valid values for robust include:
+         * - PTHREAD_MUTEX_STALLED
+         *
+         *   No special actions are taken if the owner of the mutex
+         *  is terminated while holding the mutex lock. This can
+         *  lead to deadlocks if no other thread can unlock the mutex.
+         *  This is the default value.
+         *
+         * - PTHREAD_MUTEX_ROBUST
+         *
+         *   If the process containing the owning thread of a robust
+         *   mutex terminates while holding the mutex lock, the next
+         *   thread that acquires the mutex shall be notified about
+         *   the termination by the return value [EOWNERDEAD] from
+         *   the locking function. If the owning thread of a robust
+         *   mutex terminates while holding the mutex lock, the next
+         *   thread that acquires the mutex may be notified about the
+         *   termination by the return value [EOWNERDEAD]. The notified
+         *   thread can then attempt to mark the state protected by
+         *   the mutex as consistent again by a call to
+         *   pthread_mutex_consistent(). After a subsequent
+         *   successful call to pthread_mutex_unlock(), the mutex
+         *   lock shall be released and can be used normally by
+         *   other threads. If the mutex is unlocked without a
+         *   call to pthread_mutex_consistent(), it shall be in a
+         *   permanently unusable state and all attempts to lock
+         *   the mutex shall fail with the error [ENOTRECOVERABLE].
+         *   The only permissible operation on such a mutex is
+         *   pthread_mutex_destroy().
+         *
+         * @par POSIX compatibility
+         *  Inspired by `pthread_mutexattr_setrobust()` from
+         *  [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_getrobust.html)
+         *  (IEEE Std 1003.1, 2013 Edition).
+         */
         mutex::robustness_t mx_robustness;
+
+        /**
+         * @brief Mutex type attribute.
+         * @details
+         * The default value of the type attribute is PTHREAD_MUTEX_DEFAULT.
+         *
+         * The type of mutex is contained in the type attribute of
+         * the mutex attributes. Valid mutex types include:
+         *
+         * - PTHREAD_MUTEX_NORMAL
+         * - PTHREAD_MUTEX_ERRORCHECK
+         * - PTHREAD_MUTEX_RECURSIVE
+         * - PTHREAD_MUTEX_DEFAULT
+         *
+         * The mutex type affects the behaviour of calls which lock
+         * and unlock the mutex. See @ref Mutex::lock() for details.
+         * An implementation may map PTHREAD_MUTEX_DEFAULT to one of
+         * the other mutex types.
+         *
+         * @par POSIX compatibility
+         *  Inspired by `pthread_mutexattr_settype()` from
+         *  [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_gettype.html)
+         *  (IEEE Std 1003.1, 2013 Edition).
+         */
         mutex::type_t mx_type;
 
         // Add more attributes.
@@ -2529,7 +2714,7 @@ namespace os
 
         /**
          * @brief Create recursive mutex attributes.
-         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
         Recursive_attributes (const char* name);
 
@@ -2644,7 +2829,7 @@ namespace os
        * @par Parameters
        *  None
        * @retval result::ok The mutex was locked.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval ENOTRECOVERABLE The state protected by the mutex is
        *  not recoverable..
        * @retval EAGAIN The mutex could not be acquired because the maximum
@@ -2668,7 +2853,7 @@ namespace os
        * @par Parameters
        *  None
        * @retval result::ok The mutex was locked.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval ENOTRECOVERABLE The state protected by the mutex is
        *  not recoverable..
        * @retval EAGAIN The mutex could not be acquired because the maximum
@@ -2693,7 +2878,7 @@ namespace os
        * @brief Timed attempt to lock the mutex.
        * @param [in] ticks Number of ticks to wait.
        * @retval result::ok The mutex was locked.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval ETIMEDOUT The mutex could not be locked before the
        *  specified timeout expired.
        * @retval ENOTRECOVERABLE The state protected by the mutex
@@ -2741,9 +2926,9 @@ namespace os
        * @brief Change the priority ceiling of a mutex.
        * @param [in] prio_ceiling new priority.
        * @param [out] old_prio_ceiling pointer to location where to
-       *  store the previous priority; may be nullptr.
+       *  store the previous priority; may be `nullptr`.
        * @retval result::ok The priority was changed.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
       result_t
       prio_ceiling (thread::priority_t prio_ceiling,
@@ -2754,7 +2939,7 @@ namespace os
        * @par Parameters
        *  None
        * @retval result::ok The mutex was marked as consistent.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINVAL The mutex object referenced by mutex is not robust
        *  or does not protect an inconsistent state.
        */
@@ -2765,7 +2950,7 @@ namespace os
        * @brief Get owner thread.
        * @par Parameters
        *  None
-       * @return Pointer to thread or nullptr if not owned.
+       * @return Pointer to thread or `nullptr` if not owned.
        */
       Thread*
       owner (void);
@@ -2853,7 +3038,7 @@ namespace os
 
         /**
          * @brief Create condition variable attributes.
-         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
         Attributes (const char* name);
 
@@ -2888,6 +3073,7 @@ namespace os
 
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
+        //
         // Add more attributes.
         /**
          * @}
@@ -2978,7 +3164,7 @@ namespace os
        * @par Parameters
        *  None
        * @retval result::ok The thread was signaled.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
       result_t
       signal (void);
@@ -2988,7 +3174,7 @@ namespace os
        * @par Parameters
        *  None
        * @retval result::ok All waiting threads signaled.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
       result_t
       broadcast (void);
@@ -2997,7 +3183,7 @@ namespace os
        * @brief Wait on a condition variable.
        * @param [in] mutex Reference to the associated mutex.
        * @retval result::ok The condition change was signaled.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
       result_t
       wait (Mutex& mutex);
@@ -3009,7 +3195,7 @@ namespace os
        * @param [in] mutex Reference to the associated mutex.
        * @param [in] ticks Ticks to wait.
        * @retval result::ok The condition change was signaled.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
       result_t
       timed_wait (Mutex& mutex, systicks_t ticks);
@@ -3065,6 +3251,9 @@ namespace os
        * Allow to assign a name and custom attributes (like initial count,
        * max count) to the semaphore.
        *
+       * To simplify access, the member variables are public and do not
+       * require accessors or mutators.
+       *
        * @par POSIX compatibility
        *  No POSIX similar functionality identified, but inspired by POSIX
        *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
@@ -3083,7 +3272,7 @@ namespace os
 
         /**
          * @brief Create semaphore attributes.
-         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
         Attributes (const char* name);
 
@@ -3170,7 +3359,7 @@ namespace os
 
         /**
          * @brief Create binary semaphore attributes.
-         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
         Binary_attributes (const char* name);
 
@@ -3303,7 +3492,7 @@ namespace os
        *  None
        * @retval result::ok The calling process successfully
        *  performed the semaphore lock operation.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval ENOTRECOVERABLE Semaphore wait failed (extension to POSIX).
        * @retval EDEADLK A deadlock condition was detected.
        * @retval EINTR The operation was interrupted.
@@ -3317,7 +3506,7 @@ namespace os
        *  None
        * @retval result::ok The calling process successfully
        *  performed the semaphore lock operation.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EAGAIN The semaphore was already locked.
        * @retval ENOTRECOVERABLE Semaphore wait failed (extension to POSIX).
        * @retval EDEADLK A deadlock condition was detected.
@@ -3331,7 +3520,7 @@ namespace os
        * @param [in] ticks Number of ticks to wait.
        * @retval result::ok The calling process successfully
        *  performed the semaphore lock operation.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINVAL Invalid timeout (POSIX limits the timeout
        *  to 1000 million ns)
        * @retval ETIMEDOUT The semaphore could not be locked before
@@ -3357,7 +3546,7 @@ namespace os
        * @par Parameters
        *  None
        * @retval result::ok The semaphore was reset.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
       result_t
       reset (void);
@@ -3450,6 +3639,9 @@ namespace os
        * Allow to assign a name and custom attributes (like a static
        * address) to the memory pool.
        *
+       * To simplify access, the member variables are public and do not
+       * require accessors or mutators.
+       *
        * @par Example
        *
        * Define an array of structures and
@@ -3505,7 +3697,7 @@ namespace os
 
         /**
          * @brief Create memory pool attributes.
-         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
         Attributes (const char* name);
 
@@ -3541,12 +3733,27 @@ namespace os
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
         /**
-         * @brief Memory pool address.
+         * @brief User defined memory pool address.
+         * @details
+         * Set this variable to a user defined memory area large enough
+         * to store the memory pool. Usually this is a statically
+         * allocated array of structures.
+         *
+         * The default value is `nullptr`, which means there is no
+         * user defined memory pool.
          */
         void* mp_pool_address;
 
         /**
-         * @brief Memory pool size.
+         * @brief User defined memory pool size.
+         * @details
+         * The memory pool size must match exactly the allocated size. It is
+         * used for validation; when the memory pool is initialised,
+         * this size must be large enough to accommodate the desired
+         * memory pool.
+         *
+         * If the @ref mp_pool_address is `nullptr`, this variable is not
+         * checked, but it is recommended to leave it zero.
          */
         size_t mp_pool_size_bytes;
 
@@ -3735,7 +3942,7 @@ namespace os
        * @par Parameters
        *  None
        * @retval result::ok The memory pool was reset.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
       result_t
       reset (void);
@@ -3760,9 +3967,10 @@ namespace os
        */
 
       /**
-       *
+       * @brief Internal function used to get the first linked block.
        * @par Parameters
        *  None
+       * @return Pointer to block or `nullptr` if no more blocks available.
        */
       void*
       _try_first (void);
@@ -3848,6 +4056,9 @@ namespace os
        * Allow to assign a name and custom attributes (like a static
        * address) to the message queue.
        *
+       * To simplify access, the member variables are public and do not
+       * require accessors or mutators.
+       *
        * @par POSIX compatibility
        *  Inspired by `mq_attr` from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
        *  (IEEE Std 1003.1, 2013 Edition).
@@ -3865,7 +4076,7 @@ namespace os
 
         /**
          * @brief Create message queue attributes.
-         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
         Attributes (const char* name);
 
@@ -3900,8 +4111,30 @@ namespace os
 
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
-        void* queue_address;
-        std::size_t queue_size_bytes;
+        /**
+         * @brief User defined message queue address.
+         * @details
+         * Set this variable to a user defined memory area large enough
+         * to store the message queue. Usually this is a statically
+         * allocated array of structures.
+         *
+         * The default value is `nullptr`, which means there is no
+         * user defined message queue.
+         */
+        void* mq_queue_address;
+
+        /**
+         * @brief User defined message queue size.
+         * @details
+         * The message queue size must match exactly the allocated size. It is
+         * used for validation; when the message queue is initialised,
+         * this size must be large enough to accommodate the desired
+         * message queue.
+         *
+         * If the @ref mq_queue_address is `nullptr`, this variable is not
+         * checked, but it is recommended to leave it zero.
+         */
+        std::size_t mq_queue_size_bytes;
 
         // Add more attributes.
 
@@ -4005,7 +4238,7 @@ namespace os
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
        * @retval EMSGSIZE The specified message length, nbytes,
        *  exceeds the message size attribute of the message queue.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval ENOTRECOVERABLE The message could not be enqueue
        *  (extension to POSIX).
        * @retval EINTR The operation was interrupted.
@@ -4041,7 +4274,7 @@ namespace os
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
        * @retval EMSGSIZE The specified message length, nbytes,
        *  exceeds the message size attribute of the message queue.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval ETIMEDOUT The timeout expired before the message
        *  could be added to the queue.
        * @retval ENOTRECOVERABLE The message could not be enqueue
@@ -4058,12 +4291,12 @@ namespace os
        * @param [in] nbytes The size of the destination buffer. Must
        *  be lower than the value used when creating the queue.
        * @param [out] mprio The address where to store the message
-       *  priority. May be nullptr.
+       *  priority. May be `nullptr`.
        * @retval result::ok The message was received.
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
        * @retval EMSGSIZE The specified message length, nbytes, is
        *  greater than the message size attribute of the message queue.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval ENOTRECOVERABLE The message could not be dequeued
        *  (extension to POSIX).
        * @retval EBADMSG The implementation has detected a data corruption
@@ -4079,7 +4312,7 @@ namespace os
        * @param [in] nbytes The size of the destination buffer. Must
        *  be lower than the value used when creating the queue.
        * @param [out] mprio The address where to store the message
-       *  priority. May be nullptr.
+       *  priority. May be `nullptr`.
        * @retval result::ok The message was received.
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
        * @retval EMSGSIZE The specified message length, nbytes, is
@@ -4099,7 +4332,7 @@ namespace os
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
        * @retval EMSGSIZE The specified message length, nbytes, is
        *  greater than the message size attribute of the message queue.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval ENOTRECOVERABLE The message could not be dequeued
        *  (extension to POSIX).
        * @retval EBADMSG The implementation has detected a data corruption
@@ -4164,7 +4397,7 @@ namespace os
        * @par Parameters
        *  None
        * @retval result::ok The queue was reset.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
       result_t
       reset (void);
@@ -4243,7 +4476,7 @@ namespace os
 
         /**
          * @brief Create event flags attributes.
-         * @param [in] name Null terminated name. If nullptr, "-" is assigned.
+         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
         Attributes (const char* name);
 
@@ -4278,6 +4511,7 @@ namespace os
 
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
+        //
         // Add more attributes.
         /**
          * @}
@@ -4373,11 +4607,11 @@ namespace os
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
-       *  may be nullptr.
+       *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
        *  are expected, and if the flags should be cleared.
        * @retval result::ok All expected flags are raised.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINVAL The mask is outside of the permitted range.
        * @retval EINTR The operation was interrupted.
        * @retval ENOTRECOVERABLE Wait failed.
@@ -4390,7 +4624,7 @@ namespace os
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
-       *  may be nullptr.
+       *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
        *  are expected, and if the flags should be cleared.
        * @retval result::ok All expected flags are raised.
@@ -4406,12 +4640,12 @@ namespace os
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
-       *  may be nullptr.
+       *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
        *  are expected, and if the flags should be cleared.
        * @param [in] ticks Ticks to wait.
        * @retval result::ok All expected flags are raised.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routine.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval ETIMEDOUT The expected condition did not occur during the
        *  entire timeout duration.
        * @retval EINVAL The mask is outside of the permitted range.
@@ -4426,7 +4660,7 @@ namespace os
        * @brief Raise event flags.
        * @param [in] mask The OR-ed flags to raise.
        * @param [out] oflags Optional pointer where to store the
-       *  new value of the flags; may be nullptr.
+       *  new value of the flags; may be `nullptr`.
        * @retval result::ok The flags were raised.
        * @retval EINVAL The mask is zero.
        * @retval ENOTRECOVERABLE Raise failed.
@@ -4438,7 +4672,7 @@ namespace os
        * @brief Clear event flags.
        * @param [in] mask The OR-ed flags to clear.
        * @param [out] oflags Optional pointer where to store the
-       *  previous value of the flags; may be nullptr.
+       *  previous value of the flags; may be `nullptr`.
        * @retval result::ok The flags were cleared.
        * @retval EINVAL The mask is zero.
        */
@@ -4481,7 +4715,7 @@ namespace os
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
-       *  may be nullptr.
+       *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
        *  are expected, and if the flags should be cleared.
        * @retval result::ok All expected flags are raised.
@@ -4550,8 +4784,8 @@ namespace os
 
       /**
        * @details
-       * Check if the scheduler is locked on the current task or
-       * is switching tasks from the ready list.
+       * Check if the scheduler is locked on the current thread or
+       * is switching threads from the ready list.
        */
       inline bool
       locked (void)
@@ -4617,7 +4851,7 @@ namespace os
 
     /**
      * @details
-     * Round up the microseconds value and convert to number of
+     * Round up the microseconds value and convert to a number of
      * ticks, using the SysTick frequency in Hz.
      */
     template<typename Rep_T>
@@ -4641,6 +4875,7 @@ namespace os
 #endif
 
     /**
+     * @details
      * All objects return a non-null string; anonymous objects
      * return `"-"`.
      */
@@ -4707,8 +4942,8 @@ namespace os
     {
       /**
        * @details
-       * Remove the current thread from the ready list and pass
-       * control to the next thread that is in \b READY state.
+       * Remove the current running thread from the ready list and pass
+       * control to the next thread that is in **READY** state.
        *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
@@ -4809,7 +5044,7 @@ namespace os
 
     /**
      * @details
-     * The user storage is a custom structure defined in os-app-config.h,
+     * The user storage is a custom structure defined in `<os-app-config.h>`,
      * which is added to each and every thread storage. Applications
      * can store here any data.
      *
@@ -4961,8 +5196,10 @@ namespace os
 
     /**
      * @details
-     * If positive, the semaphore value reflects the number of available resources.
-     * If negative, it counts the waiting tasks.
+     * If positive, the semaphore value reflects the number of
+     * available resources.
+     *
+     * If negative, it counts the waiting threads.
      */
     inline semaphore::count_t
     Semaphore::value (void) const
@@ -5148,7 +5385,7 @@ extern "C"
   /**
    * @brief SysTick implementation hook.
    * @details
-   * It is called from os_systick_handler() after the
+   * It is called from @ref `os_systick_handler()` after the
    * scheduler was started.
    */
   void
