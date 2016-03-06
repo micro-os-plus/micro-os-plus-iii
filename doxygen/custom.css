@@ -124,7 +124,7 @@ code:before, code:after {
 
 .params .paramname, .retval .paramname {
 	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;	
-	vertical-align: middle;
+	vertical-align: bottom;
 	padding-right: 1em;
 }
 
