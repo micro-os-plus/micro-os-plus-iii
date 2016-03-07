@@ -44,6 +44,13 @@
  *   (for example: lock(), try-lock(), timed-lock(), similar to POSIX threads)
  * - POSIX condition variable added
  * - versatile clocks added (Systick_clock, Realtime_clock)
+ *
+ * Differences from POSIX:
+ * - timeouts are relative, while in POSIX are absolute. Rationale:
+ * although internally it may be easier to compare absolute dates,
+ * it looked more convenient
+ * for the user to enter short durations instead of very large absolute
+ * times.
  */
 
 /*
@@ -57,7 +64,8 @@
  * - add a separate Stack object
  *
  * Notes:
- * - try_wait(), try_sig_wait() are probably not very inspired.
+ * - the try_wait(), try_sig_wait() names are probably not very inspired,
+ * but at least they are consistent in POSIX.
  */
 
 #ifndef CMSIS_PLUS_RTOS_OS_H_
