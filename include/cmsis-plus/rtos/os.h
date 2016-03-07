@@ -19,12 +19,12 @@
 
 /**
  * @file os.h
- * @brief CMSIS++ RTOS definitions
+ * @brief Single file CMSIS++ RTOS definitions.
  * @details
  * This file is part of the CMSIS++ proposal, intended as a CMSIS
  * replacement for C++ applications.
  *
- * The code is inspired by ARM CMSIS `<cmsis_os.h>` file, v1.02,
+ * The code was originally inspired by ARM CMSIS `<cmsis_os.h>` file, v1.02,
  * and tries to remain functionally close to the CMSIS specifications.
  *
  * References are to C++ Standard ISO/IEC 14882:2011(E)
@@ -68,7 +68,7 @@
 #if defined(__cplusplus)
 
 /**
- * @brief Inform that CMSIS++ is in use.
+ * @brief Tell the world that CMSIS++ is in use.
  * @details
  * Macro to inform including files that CMSIS++ RTOS
  * definitions are available.
@@ -278,7 +278,7 @@ namespace os
       locked (void);
 
       /**
-       * @brief Lock the scheduler.
+       * @brief %Lock the scheduler.
        * @par Parameters
        *  None
        * @return The previous status of the scheduler.
@@ -365,7 +365,7 @@ namespace os
       };
 
       /**
-       * @brief Scheduler standard locker.
+       * @brief %Scheduler standard locker.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
       class Lock
@@ -410,7 +410,7 @@ namespace os
          */
 
         /**
-         * @brief Lock the scheduler.
+         * @brief %Lock the scheduler.
          * @par Parameters
          *  None
          * @return  Nothing.
@@ -696,6 +696,9 @@ namespace os
        */
       namespace mode
       {
+        /**
+         * @brief Bits used to specify the flags mode.
+         */
         enum
           : mode_t
             {
@@ -718,7 +721,7 @@ namespace os
     } /* namespace flags */
 
     /**
-     * @brief Thread namespace.
+     * @brief %Thread namespace.
      */
     namespace thread
     {
@@ -734,7 +737,7 @@ namespace os
       using priority_t = uint8_t;
 
       /**
-       * @brief Thread priority namespace.
+       * @brief %Thread priority namespace.
        * @details
        * The os::rtos::thread::priority namespace is a container for
        * priorities not restricted to an enumeration.
@@ -756,53 +759,56 @@ namespace os
          */
         constexpr uint32_t shift = 0;
 
+        /**
+         * @brief Main priorities, intermediate values also possible.
+         */
         enum
           : priority_t
             {
               /**
                * Undefined, thread not initialised.
                */
-              none = 0,
+              none = 0,                     //!< none
 
-              /**
-               * System reserved for IDLE thread.
-               */
-              idle = 1,
+          /**
+           * System reserved for IDLE thread.
+           */
+          idle = 1,                     //!< idle
 
-              /**
-               * Lowest available for user code.
-               */
-              lowest = 2,
+          /**
+           * Lowest available for user code.
+           */
+          lowest = 2,                   //!< lowest
 
-              low = (2 << shift),
+          low = (2 << shift),           //!< low
 
-              below_normal = (4 << shift),
+          below_normal = (4 << shift),  //!< below_normal
 
-              /**
-               * Default priority.
-               */
-              normal = (6 << shift),
+          /**
+           * Default priority.
+           */
+          normal = (6 << shift),        //!< normal
 
-              above_normal = (8 << shift),
+          above_normal = (8 << shift),  //!< above_normal
 
-              high = (10 << shift),
+          high = (10 << shift),         //!< high
 
-              realtime = (12 << shift),
+          realtime = (12 << shift),     //!< realtime
 
-              /**
-               * Highest available for user code.
-               */
-              highest = ((16 << shift) - 3),
+          /**
+           * Highest available for user code.
+           */
+          highest = ((16 << shift) - 3),     //!< highest
 
-              /**
-               * System reserved for ISR deferred thread.
-               */
-              isr = ((16 << shift) - 2),
+          /**
+           * System reserved for ISR deferred thread.
+           */
+          isr = ((16 << shift) - 2),    //!< isr
 
-              /**
-               * Error.
-               */
-              error = ((16 << shift) - 1)
+          /**
+           * Error.
+           */
+          error = ((16 << shift) - 1)   //!< error
         };
       } /* namespace priority */
 
@@ -839,13 +845,16 @@ namespace os
       using sigset_t = flags::mask_t;
 
       /**
-       * @brief Thread signals namespace.
+       * @brief %Thread signals namespace.
        * @details
        * The os::rtos::thread::sig namespace is a container for
        * signal flags masks, which cannot be restricted to an enumeration..
        */
       namespace sig
       {
+        /**
+         * @brief Signal sets with special meaning.
+         */
         enum
           : sigset_t
             {
@@ -853,6 +862,7 @@ namespace os
                * @brief Special signal mask to represent any flag.
                */
               any = 0,
+
               /**
                * Special signal mask to represent all flags.
                */
@@ -2106,7 +2116,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @brief Mutex namespace.
+     * @brief %Mutex namespace.
      */
     namespace mutex
     {
@@ -2762,7 +2772,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @brief Semaphore namespace.
+     * @brief %Semaphore namespace.
      */
     namespace semaphore
     {
