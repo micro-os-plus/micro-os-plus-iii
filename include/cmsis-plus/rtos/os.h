@@ -215,6 +215,7 @@ namespace os
 
     /**
      * @brief Scheduler namespace.
+     * @ingroup cmsis-plus-rtos
      */
     namespace scheduler
     {
@@ -904,6 +905,7 @@ namespace os
 
     /**
      * @brief The current running thread namespace.
+     * @ingroup cmsis-plus-rtos
      */
     namespace this_thread
     {
@@ -1198,6 +1200,7 @@ namespace os
     /**
      * @brief POSIX compliant thread.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
      */
     class Thread : public Named_object
     {
@@ -1618,6 +1621,7 @@ namespace os
     /**
      * @brief SysTick derived clock.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
      */
     class Systick_clock
     {
@@ -1767,6 +1771,7 @@ namespace os
     /**
      * @brief Real time clock.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
      */
     class Realtime_clock
     {
@@ -1997,6 +2002,7 @@ namespace os
     /**
      * @brief User timer.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
      */
     class Timer : public Named_object
     {
@@ -2333,6 +2339,7 @@ namespace os
     /**
      * @brief POSIX compliant mutex.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
      */
     class Mutex : public Named_object
     {
@@ -2649,6 +2656,7 @@ namespace os
     /**
      * @brief POSIX compliant condition variable.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
      */
     class Condition_variable : public Named_object
     {
@@ -2918,6 +2926,7 @@ namespace os
     /**
      * @brief POSIX compliant semaphore.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
      */
     class Semaphore : public Named_object
     {
@@ -3218,6 +3227,7 @@ namespace os
     /**
      * @brief Synchronised memory pool.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
      */
     class Memory_pool : public Named_object
     {
@@ -3553,6 +3563,7 @@ namespace os
     /**
      * @brief POSIX compliant message queue.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
      */
     class Message_queue : public Named_object
     {
@@ -3907,6 +3918,7 @@ namespace os
     /**
      * @brief Event flags.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
      */
     class Event_flags : public Named_object
     {

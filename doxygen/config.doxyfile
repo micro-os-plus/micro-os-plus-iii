@@ -30,7 +30,7 @@ PROJECT_BRIEF = "CMSIS++: A proposal for the next generation CMSIS, written in C
 PROJECT_LOGO = logo.png
 
 ## OUTPUT_DIRECTORY = 
-OUTPUT_DIRECTORY = ../../../../../micro-os-plus.github.io-source.git/reference/cmsis-plus
+OUTPUT_DIRECTORY = ../../../../../micro-os-plus.github.io-source.git/reference/
 
 ## INLINE_INHERITED_MEMB = NO
 INLINE_INHERITED_MEMB = YES
@@ -53,6 +53,11 @@ EXTRACT_ANON_NSPACES = YES
 
 ## INPUT = 
 INPUT = \
+	"pages" \
+	"../include/cmsis-plus/rtos/os.h" \
+	"../src/cmsis-plus/rtos/" \
+	
+_INPUT = \
 	"../include/cmsis-plus/" \
 	"../src/cmsis-plus/" \
 	"../include/cmsis-plus/iso/chrono" \
@@ -62,7 +67,7 @@ INPUT = \
 	"../include/cmsis-plus/iso/thread" \
 
 ## FILE_PATTERNS = 
-FILE_PATTERNS = *.h *.c *.cpp *.
+FILE_PATTERNS = *.doxygen *.markdown *.h *.c *.cpp *.
 X=	chrono \
 	condition_variable \
 	mutex \
@@ -70,7 +75,7 @@ X=	chrono \
 	thread \
 	
 ## EXTENSION_MAPPING =
-EXTENSION_MAPPING = ".no_extension=C++"
+EXTENSION_MAPPING = "no_extension=C++"
 
 ## RECURSIVE = NO
 RECURSIVE = YES
@@ -86,20 +91,25 @@ EXCLUDE = \
 #INPUT_FILTER =
 INPUT_FILTER = "perl -p -e 's/__attribute__\s*[(]\s*[(].*?[)]\s*[)]//g'"
 
+## USE_MDFILE_AS_MAINPAGE =
+## USE_MDFILE_AS_MAINPAGE = main.markdown
+
 ## SOURCE_BROWSER = NO
 SOURCE_BROWSER = YES
 
 ## INLINE_SOURCES = NO
-INLINE_SOURCES = YES
+##? INLINE_SOURCES = YES
 
 ## REFERENCED_BY_RELATION = NO
-REFERENCED_BY_RELATION = YES
+##? REFERENCED_BY_RELATION = YES
 
 ## REFERENCES_RELATION = NO
-REFERENCES_RELATION = YES
+##? REFERENCES_RELATION = YES
 
 ## GENERATE_LATEX = YES
 GENERATE_LATEX = NO
+
+## REPEAT_BRIEF = YES
 
 ENABLE_PREPROCESSING = YES
 
@@ -115,6 +125,9 @@ TRACE \
 
 ## CLASS_DIAGRAMS = YES
 CLASS_DIAGRAMS = NO
+
+## LAYOUT_FILE =
+LAYOUT_FILE = DoxygenLayout.xml
 
 ## HTML_HEADER =
 HTML_HEADER = header.html
@@ -139,4 +152,17 @@ GENERATE_TREEVIEW = YES
 
 ## ENUM_VALUES_PER_LINE = 4
 ENUM_VALUES_PER_LINE = 1
+
+## SORT_BRIEF_DOCS = NO
+SORT_BRIEF_DOCS = YES
+
+## SORT_MEMBERS_CTORS_1ST = NO
+SORT_MEMBERS_CTORS_1ST = YES
+
+## HTML_OUTPUT = html
+HTML_OUTPUT = cmsis-plus
+
+## SUBGROUPING = YES
+## SUBGROUPING = NO
+
 
