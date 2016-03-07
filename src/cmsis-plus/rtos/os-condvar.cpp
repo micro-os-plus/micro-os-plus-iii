@@ -598,7 +598,7 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-      trace::printf ("%s(%d_ticks) @%p \n", __func__, ticks, this);
+      trace::printf ("%s(%d_ticks) @%p \n", __func__, timeout, this);
       // TODO
       return result::ok;
     }
