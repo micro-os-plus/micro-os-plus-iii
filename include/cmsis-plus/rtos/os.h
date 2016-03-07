@@ -1928,6 +1928,9 @@ namespace os
          */
         type_t tm_type;
 
+        //
+        // TODO: add clock ID.
+        //
         // Add more attributes.
 
         /**
@@ -2263,6 +2266,9 @@ namespace os
          */
         mutex::type_t mx_type;
 
+        //
+        // TODO: add clock ID.
+        //
         // Add more attributes.
 
         /**
@@ -2638,6 +2644,8 @@ namespace os
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
         //
+        // TODO: add clock ID.
+        //
         // Add more attributes.
         /**
          * @}
@@ -2671,11 +2679,26 @@ namespace os
        * @brief Create a condition variable with default settings.
        * @par Parameters
        *  None
+       * @par Errors
+       *  The constructor shall fail if:
+       *  - `EAGAIN` - The system lacked the necessary resources
+       *  (other than memory) to create the condition variable.
+       *  - `ENOMEM` - Insufficient memory exists to initialise
+       *  the condition variable.
+       *  The constructor shall not fail with an error code of `EINTR`.
        */
       Condition_variable ();
+
       /**
        * @brief Create a condition variable with custom settings.
        * @param [in] attr Reference to attributes.
+       * @par Errors
+       *  The constructor shall fail if:
+       *  - `EAGAIN` - The system lacked the necessary resources
+       *  (other than memory) to create the condition variable.
+       *  - `ENOMEM` - Insufficient memory exists to initialise
+       *  the condition variable.
+       *  The constructor shall not fail with an error code of `EINTR`.
        */
       Condition_variable (const condvar::Attributes& attr);
 
@@ -2719,45 +2742,72 @@ namespace os
        */
 
       /**
-       * @brief Signal a condition variable variable.
+       * @brief Notify one thread waiting for a condition variable.
        * @par Parameters
        *  None
        * @retval result::ok The thread was signaled.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @par Errors
+       *  The function shall not fail with an error code of `EINTR`.
        */
       result_t
       signal (void);
 
       /**
-       * @brief Broadcast a condition variable.
+       * @brief Notify all threads waiting for a condition variable.
        * @par Parameters
        *  None
        * @retval result::ok All waiting threads signaled.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @par Errors
+       *  The function shall not fail with an error code of `EINTR`.
        */
       result_t
       broadcast (void);
 
       /**
-       * @brief Wait on a condition variable.
+       * @brief Wait for a condition variable to be notified.
        * @param [in] mutex Reference to the associated mutex.
        * @retval result::ok The condition change was signaled.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines,
+       *  or the mutex type is `mutex::type::errorcheck` or the mutex
+       *  is a robust mutex, and the current thread does not own the mutex.
+       * @retval ENOTRECOVERABLE The state protected by the mutex is
+       *  not recoverable.
+       * @retval EOWNERDEAD The mutex is a robust mutex and the
+       *  process containing the previous owning thread terminated
+       *  while holding the mutex lock. The mutex lock shall be
+       *  acquired by the calling thread and it is up to the new
+       *  owner to make the state consistent.
+       * @par Errors
+       *  The function shall not fail with an error code of `EINTR`.
        */
       result_t
       wait (Mutex& mutex);
 
-      // Neither POSIX nor ISO define a try_wait(), so... do we need one?
+      // Neither POSIX nor ISO define a try_wait(), it makes no sense.
 
       /**
-       * @brief Timed wait on a condition variable.
+       * @brief Timed wait for a condition variable to be notified.
        * @param [in] mutex Reference to the associated mutex.
-       * @param [in] ticks Ticks to wait.
+       * @param [in] timeout Timeout to wait.
        * @retval result::ok The condition change was signaled.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines,
+       *  or the mutex type is `mutex::type::errorcheck` or the mutex
+       *  is a robust mutex, and the current thread does not own the mutex.
+       * @retval ENOTRECOVERABLE The state protected by the mutex is
+       *  not recoverable.
+       * @retval EOWNERDEAD The mutex is a robust mutex and the
+       *  process containing the previous owning thread terminated
+       *  while holding the mutex lock. The mutex lock shall be
+       *  acquired by the calling thread and it is up to the new
+       *  owner to make the state consistent.
+       * @retval ETIMEDOUT The timeout has passed.
+       * @par Errors
+       *  The function shall not fail with an error code of `EINTR`.
        */
       result_t
-      timed_wait (Mutex& mutex, systicks_t ticks);
+      timed_wait (Mutex& mutex, duration_t timeout);
 
       /**
        * @}
@@ -2859,6 +2909,9 @@ namespace os
          */
         count_t sm_max_count;
 
+        //
+        // TODO: add clock ID.
+        //
         // Add more attributes.
 
         /**
@@ -3205,6 +3258,9 @@ namespace os
          */
         std::size_t mp_pool_size_bytes;
 
+        //
+        // TODO: add clock ID.
+        //
         // Add more attributes.
 
         /**
@@ -3543,6 +3599,9 @@ namespace os
          */
         std::size_t mq_queue_size_bytes;
 
+        //
+        // TODO: add clock ID.
+        //
         // Add more attributes.
 
         /**
@@ -3898,6 +3957,8 @@ namespace os
 
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
+        //
+        // TODO: add clock ID.
         //
         // Add more attributes.
         /**
