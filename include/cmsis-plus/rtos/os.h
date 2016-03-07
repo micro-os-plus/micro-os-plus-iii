@@ -3123,6 +3123,9 @@ namespace os
        */
       constexpr size_t max_size = (0 - 1);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
       /**
        * @brief Memory pool attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
@@ -3181,7 +3184,7 @@ namespace os
         /**
          * @brief User defined memory pool size.
          */
-        size_t mp_pool_size_bytes;
+        std::size_t mp_pool_size_bytes;
 
         // Add more attributes.
 
@@ -3196,6 +3199,8 @@ namespace os
       extern const Attributes initializer;
 
     } /* namespace mempool */
+
+#pragma GCC diagnostic push
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -4650,8 +4655,8 @@ namespace os
       Attributes::Attributes (const char* name) :
           Named_object (name)
       {
-        queue_address = nullptr;
-        queue_size_bytes = 0;
+        mq_queue_address = nullptr;
+        mq_queue_size_bytes = 0;
       }
 
     } /* namespace mqueue */

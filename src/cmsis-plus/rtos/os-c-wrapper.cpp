@@ -1914,8 +1914,8 @@ osMessageCreate (const osMessageQDef_t* queue_def,
 
   mqueue::Attributes attr
     { queue_def->name };
-  attr.queue_address = queue_def->queue;
-  attr.queue_size_bytes = queue_def->queue_sz;
+  attr.mq_queue_address = queue_def->queue;
+  attr.mq_queue_size_bytes = queue_def->queue_sz;
 
   return reinterpret_cast<osMessageQId> (new ((void*) queue_def->data) Message_queue (
       attr, (mqueue::size_t) queue_def->items,
@@ -2140,8 +2140,8 @@ osMailCreate (const osMailQDef_t* queue_def,
 
   mqueue::Attributes queue_attr
     { queue_def->name };
-  queue_attr.queue_address = queue_def->queue;
-  queue_attr.queue_size_bytes = queue_def->queue_sz;
+  queue_attr.mq_queue_address = queue_def->queue;
+  queue_attr.mq_queue_size_bytes = queue_def->queue_sz;
   new ((void*) &queue_def->data->queue) Message_queue (
       queue_attr, (mqueue::size_t) queue_def->items,
       (mqueue::size_t) queue_def->queue_item_sz);

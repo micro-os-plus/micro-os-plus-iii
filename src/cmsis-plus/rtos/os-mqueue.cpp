@@ -122,8 +122,8 @@ namespace os
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
-      queue_addr_ = attr.queue_address;
-      queue_size_bytes_ = attr.queue_size_bytes;
+      queue_addr_ = attr.mq_queue_address;
+      queue_size_bytes_ = attr.mq_queue_size_bytes;
       if (queue_addr_ != nullptr)
         {
           os_assert_throw(queue_size_bytes_ > 0, EINVAL);

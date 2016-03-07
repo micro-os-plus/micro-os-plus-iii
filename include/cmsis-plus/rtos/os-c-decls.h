@@ -120,15 +120,15 @@ extern "C"
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
-  typedef struct os_thread_attr_s
+  typedef struct
   {
     const char* name;
-    void* stack_address;
-    size_t stack_size_bytes;
-    os_thread_prio_t priority;
+    void* th_stack_address;
+    size_t th_stack_size_bytes;
+    os_thread_prio_t th_priority;
   } os_thread_attr_t;
 
-  typedef struct os_thread_s
+  typedef struct
   {
     const char* name;
     void* stack_addr;
@@ -191,7 +191,7 @@ extern "C"
   typedef struct os_timer_attr_s
   {
     const char* name;
-    os_timer_type_t type;
+    os_timer_type_t tm_type;
   } os_timer_attr_t;
 
   typedef struct os_timer_s
@@ -243,10 +243,10 @@ extern "C"
   typedef struct os_mutex_attr_s
   {
     const char* name;
-    os_thread_prio_t priority_ceiling;
-    os_mutex_protocol_t protocol;
-    os_mutex_robustness_t robustness;
-    os_mutex_type_t type;
+    os_thread_prio_t mx_priority_ceiling;
+    os_mutex_protocol_t mx_protocol;
+    os_mutex_robustness_t mx_robustness;
+    os_mutex_type_t mx_type;
   } os_mutex_attr_t;
 
   typedef struct os_mutex_s
@@ -287,8 +287,8 @@ extern "C"
   typedef struct os_semaphore_attr_s
   {
     const char* name;
-    os_semaphore_count_t initial_count;
-    os_semaphore_count_t max_count;
+    os_semaphore_count_t sm_initial_count;
+    os_semaphore_count_t sm_max_count;
   } os_semaphore_attr_t;
 
   typedef struct os_semaphore_s
@@ -317,7 +317,8 @@ extern "C"
   typedef struct os_mempool_attr_s
   {
     const char* name;
-    void* pool_addr;
+    void* mp_pool_address;
+    size_t mp_pool_size_bytes;
   } os_mempool_attr_t;
 
   typedef struct os_mempool_s
