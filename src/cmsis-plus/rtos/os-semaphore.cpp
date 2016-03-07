@@ -36,8 +36,53 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
+    /**
+     * @details
+     * The os::rtos::semaphore namespace groups semaphore types,
+     * attributes and initialisers.
+     */
     namespace semaphore
     {
+      /**
+       * @class Attributes
+       * @details
+       * Allow to assign a name and custom attributes (like initial count,
+       * max count) to the semaphore.
+       *
+       * To simplify access, the member variables are public and do not
+       * require accessors or mutators.
+       *
+       * @par POSIX compatibility
+       *  No POSIX similar functionality identified, but inspired by POSIX
+       *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       */
+
+      /**
+       * @var count_t Attributes::sm_initial_count
+       * @details
+       * This values represents the number of resources initially
+       * available to the semaphore.
+       */
+
+      /**
+       * @var count_t Attributes::sm_max_count
+       * @details
+       * This values represents the maximum number of resources
+       * available to the semaphore.
+       */
+
+      /**
+       * @class Binary_attributes
+       * @details
+       * Allow to assign a name and custom attributes to the semaphore.
+       *
+       * @par POSIX compatibility
+       *  No POSIX similar functionality identified, but inspired by POSIX
+       *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       */
+
       const Attributes counting_initializer
         { nullptr };
 
@@ -47,6 +92,22 @@ namespace os
     } /* namespace semaphore */
 
     // ------------------------------------------------------------------------
+
+    /**
+     * @class Semaphore
+     * @details
+     * Supports both counting and binary semaphores.
+     *
+     * Semaphores should generally be used to synchronise with
+     * events occuring on interrupts.
+     *
+     * For inter-thread synchronisation, to avoid cases of priority
+     * inversion, more suitable are mutexes.
+     *
+     * @par POSIX compatibility
+     *  Inspired by `sem_t` from [<semaphore.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  (IEEE Std 1003.1, 2013 Edition).
+     */
 
     /**
      * @details
@@ -84,8 +145,8 @@ namespace os
 
       // The CMSIS validator requires the max_count to be equal to
       // the initial count, which can be 0, but we patch it on the way.
-      assert(max_count_ > 0);
-      assert(attr.sm_initial_count <= max_count_);
+      assert (max_count_ > 0);
+      assert (attr.sm_initial_count <= max_count_);
 
       count_ = attr.sm_initial_count;
 

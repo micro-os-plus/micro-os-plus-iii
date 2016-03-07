@@ -40,13 +40,39 @@ namespace os
 // TODO: remove it when fully implemented
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
+    /**
+     * @details
+     * The os::rtos::evflags namespace groups event flags attributes
+     * and initialisers.
+     */
     namespace evflags
     {
+      /**
+       * @class Attributes
+       * @details
+       * Allow to assign a name to the event flags.
+       *
+       * @par POSIX compatibility
+       *  No POSIX similar functionality identified, but inspired by POSIX
+       *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       */
+
       const Attributes initializer
         { nullptr };
     } /* namespace evflags */
 
     // ------------------------------------------------------------------------
+
+    /**
+     * @class Event_flags
+     * @details
+     * Synchronised set of flags that can be used to notify events
+     * between threads or between ISRs and threads.
+     *
+     * @par POSIX compatibility
+     *  No POSIX similar functionality identified.
+     */
 
     /**
      * @details
@@ -144,8 +170,8 @@ namespace os
 
     /**
      * @details
-     * If the mode::all bit is set, the function expects
-     * all given flags to be raised; otherwise, if the mode::any
+     * If the flags::mode::all bit is set, the function expects
+     * all given flags to be raised; otherwise, if the flags::mode::any
      * bit is set, the function expects any single flag to be raised.
      *
      * If the expected event flags are
@@ -158,7 +184,7 @@ namespace os
      * until any event flag is raised. In this case, if any event flags
      * are already raised, the function returns instantly.
      *
-     * If the mode::clear bit is set, the event flags that are
+     * If the flags::mode::clear bit is set, the event flags that are
      * returned are automatically cleared.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
@@ -200,8 +226,8 @@ namespace os
 
     /**
      * @details
-     * If the mode::all bit is set, the function expects
-     * all given flags to be raised; otherwise, if the mode::any
+     * If the flags::mode::all bit is set, the function expects
+     * all given flags to be raised; otherwise, if the flags::mode::any
      * bit is set, the function expects any single flag to be raised.
      *
      * The function does not blocks, if the expected event flags are
@@ -228,8 +254,8 @@ namespace os
 
     /**
      * @details
-     * If the mode::all bit is set, the function expects
-     * all given flags to be raised; otherwise, if the mode::any
+     * If the flags::mode::all bit is set, the function expects
+     * all given flags to be raised; otherwise, if the flags::mode::any
      * bit is set, the function expects any single flag to be raised.
      *
      * If the expected event flags are
@@ -253,7 +279,7 @@ namespace os
      * Under no circumstance shall the operation fail with a timeout
      * if the event flags are already raised.
      *
-     * If the mode::clear bit is set, the event flags that are
+     * If the flags::mode::clear bit is set, the event flags that are
      * returned are automatically cleared.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.

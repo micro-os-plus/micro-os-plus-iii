@@ -40,13 +40,40 @@ namespace os
 // TODO: remove it when fully implemented
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
+    /**
+     * @details
+     * The `os::rtos::condvar` namespace groups condition variable attributes
+     * and initialisers.
+     */
     namespace condvar
     {
+      /**
+       * @class Attributes
+       * @details
+       * Allow to assign a name to the condition variable.
+       *
+       * @par POSIX compatibility
+       *  Inspired by `pthread_condattr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       */
+
       const Attributes initializer
         { nullptr };
     } /* namespace condvar */
 
     // ------------------------------------------------------------------------
+
+    /**
+     * @class Condition_variable
+     * @details
+     * TODO
+     *
+     * @par POSIX compatibility
+     *  Inspired by `pthread_cond_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  (IEEE Std 1003.1, 2013 Edition).
+     *
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     */
 
     /**
      * @details
@@ -96,7 +123,7 @@ namespace os
      *
      * When each thread unblocked as a result of a
      * Condition_variable::signal() returns from its call to
-     * Condition_variable::wait() or Condition_variable::timedwait(),
+     * Condition_variable::wait() or Condition_variable::timed_wait(),
      * the thread shall own the mutex with which it called
      * Condition_variable::wait() or Condition_variable::timed_wait().
      * The thread(s) that are unblocked shall contend for

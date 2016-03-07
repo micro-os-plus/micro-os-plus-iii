@@ -105,6 +105,43 @@ namespace os
 // ======================================================================
 
     /**
+     * @class Systick_clock
+     * @details
+     * This clock counts SysTick interrupts since startup.
+     *
+     * The SysTick clock should be a steady clock, i.e. the total
+     * count of ticks should be monotone ascending (in other words no
+     * adjustments to the past should be performed).
+     *
+     * For Cortex-M implementations using the standard SysTick, this
+     * clock is able to provide accuracy at CPU cycle level, by
+     * sampling the SysTick internal counter. For a CPU clock of 100 MHz,
+     * this gives a 10 ns resolution, quite high for accurate timing.
+     *
+     * @par Example
+     *
+     * @code{.cpp}
+     * void
+     * func(void)
+     * {
+     *    // Do something
+     *
+     *    // Get the current ticks counter.
+     *    Systick_clock::rep ticks = Systick_clock::now();
+     *
+     *    // Put the current thread to sleep for a given number of ticks.
+     *    Systick_clock::sleep_for(7);
+     *
+     *    // Put the current thread to sleep for a given number of microseconds.
+     *    // For a 1000 Hz clock, the actual value is 4 ticks.
+     *    Systick_clock::sleep_for(Systick_clock::ticks_cast(3500));
+     *
+     *    // Do something else.
+     * }
+     * @endcode
+     */
+
+    /**
      * @details
      *
      * @note Can be invoked from Interrupt Service Routines.
@@ -132,7 +169,7 @@ namespace os
     Systick_clock::rep
     Systick_clock::now (current_t* details)
     {
-      assert(details != nullptr);
+      assert (details != nullptr);
 
       // The core frequency can be returned right away, since
       // is not expected to change during this call.
@@ -272,6 +309,41 @@ namespace os
 
       return res;
     }
+
+    /**
+     * @class Realtime_clock
+     * @details
+     * This clock counts seconds since epoch or startup.
+     *
+     * The real time clock should be derived from a battery powered
+     * second counting RTC, initialised at startup with the number
+     * of seconds since the standard POSIX epoch (January 1st, 1970).
+     *
+     * As any usual clock, it might occasionally be adjusted to match
+     * a reference clock, so i cannot be a steady clock.
+     *
+     * For systems that do not have a hardware RTC, it can be derived from
+     * SysTick, but in this case it must be externally initialised with
+     * the epoch.
+     *
+     * @par Example
+     *
+     * @code{.cpp}
+     * void
+     * func(void)
+     * {
+     *    // Do something
+     *
+     *    // Get the current seconds counter.
+     *    Realtime_clock::rep seconds = Realtime_clock::now();
+     *
+     *    // Put the current thread to sleep for a given number of seconds.
+     *    Realtime_clock::sleep_for(7);
+     *
+     *    // Do something else.
+     * }
+     * @endcode
+     */
 
     /**
      * @details

@@ -21,7 +21,6 @@
  * @file os.h
  * @brief CMSIS++ RTOS definitions
  * @details
- *
  * This file is part of the CMSIS++ proposal, intended as a CMSIS
  * replacement for C++ applications.
  *
@@ -89,16 +88,12 @@
 // ----------------------------------------------------------------------------
 
 /**
- * @namespace os
  * @brief System namespace.
  */
 namespace os
 {
   /**
    * @brief RTOS namespace.
-   * @details
-   * The `os::rtos` namespace groups all RTOS specific declarations,
-   * either directly or via nested namespaces.
    */
   namespace rtos
   {
@@ -115,7 +110,6 @@ namespace os
     using result_t = uint32_t;
 
     /**
-     * @namespace os::rtos::result
      * @brief Values returned by RTOS functions.
      * @details
      * This namespace is dedicated to grouping all
@@ -220,11 +214,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     /**
-     * @namespace os::rtos::scheduler
      * @brief Scheduler namespace.
-     * @details
-     * The `os::rtos::scheduler` namespace groups scheduler types
-     * and functions.
      */
     namespace scheduler
     {
@@ -239,17 +229,11 @@ namespace os
 
       /**
        * @brief The scheduler status.
-       * @details
-       * Modified by @ref `lock()` and restored to previous value
-       * by @ref `unlock()`.
        */
       extern status_t is_locked_;
 
       /**
        * @brief Variable set to true after the scheduler is started.
-       * @details
-       * No further changes allowed, the scheduler cannot be stopped,
-       * in can be only locked.
        */
       extern bool is_started_;
 
@@ -323,41 +307,7 @@ namespace os
       // ----------------------------------------------------------------------
 
       /**
-       * @class Critical_section
        * @brief Scheduler critical section [RAII](https://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization) helper.
-       *
-       * @details
-       * Use this class to define a critical section
-       * protected to scheduler switches. The beginning of the
-       * critical section is exactly the place where this class is
-       * instantiated (the constructor will lock
-       * the scheduler). The end of the critical
-       * section is the end of the surrounding block (the destructor will
-       * unlock the scheduler).
-       *
-       * @note Can be nested as many times as required without problems,
-       * only the outer call will unlock the scheduler.
-       *
-       * @par Example
-       *
-       * @code{.cpp}
-       * void
-       * func(void)
-       * {
-       *    // Do something
-       *
-       *    {
-       *      scheduler::Critical_section cs;  // Critical section begins here.
-       *
-       *      // Inside the critical section.
-       *      // No scheduler switches will happen here.
-       *
-       *    } // Critical section ends here.
-       *
-       *    // Do something else.
-       * }
-       * @endcode
-       *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
       class Critical_section
@@ -406,12 +356,6 @@ namespace os
 
         /**
          * @brief Variable to store the initial scheduler status.
-         * @details
-         * The variable is constant, after being set by the constructor no
-         * further changes are possible.
-         *
-         * The variable type usually is a `bool`, but a counter is also
-         * possible if the scheduler uses a recursive lock.
          */
         const status_t status_;
 
@@ -421,11 +365,7 @@ namespace os
       };
 
       /**
-       * @class Lock
        * @brief Scheduler standard locker.
-       * @details
-       * Locker meeting the standard `Lockable` requirements (30.2.5.3).
-       *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
       class Lock
@@ -480,10 +420,6 @@ namespace os
 
         /**
          * @brief Try to lock the scheduler.
-         * @details
-         * Somehow redundant, since the lock will always succeed;
-         * but used to meet the Lockable requirements.
-         *
          * @par Parameters
          *  None
          * @retval true The scheduler was locked.
@@ -513,9 +449,6 @@ namespace os
 
         /**
          * @brief Variable to store the initial scheduler status.
-         * @details
-         * The variable type usually is a `bool`, but a counter is also
-         * possible if the scheduler uses a recursive lock.
          */
         status_t status_ = 0;
 
@@ -528,11 +461,7 @@ namespace os
     } /* namespace scheduler */
 
     /**
-     * @namespace os::rtos::interrupts
      * @brief Interrupts namespace.
-     * @details
-     * The os::rtos::interrupts namespace groups interrupts related
-     *  types and enumerations.
      */
     namespace interrupts
     {
@@ -553,41 +482,7 @@ namespace os
       // TODO: make template, parameter IRQ level
 
       /**
-       * @class Critical_section
        * @brief Interrupts critical section [RAII](https://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization) helper.
-       *
-       * @details
-       * Use this class to define a critical section
-       * protected to interrupts service routines. The begining of the
-       * critical section is exactly the place where this class is
-       * instantiated (the constructor will disable interrupts below
-       * the scheduler priority). The end of the critical
-       * section is the end of the surrounding block (the destructor will
-       * enable the interrupts).
-       *
-       * @note Can be nested as many times as required without problems,
-       * only the outer call will re-enable the interrupts.
-       *
-       * @par Example
-       *
-       * @code{.cpp}
-       * void
-       * func(void)
-       * {
-       *    // Do something
-       *
-       *    {
-       *      interrupts::Critical_section cs;  // Critical section begins here.
-       *
-       *      // Inside the critical section.
-       *      // No scheduler switches will happen here.
-       *
-       *    } // Critical section ends here.
-       *
-       *    // Do something else.
-       * }
-       * @endcode
-       *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
       class Critical_section
@@ -660,12 +555,6 @@ namespace os
 
         /**
          * @brief Variable to store the initial interrupts status.
-         * @details
-         * The variable is constant, after being set by the constructor no
-         * further changes are possible.
-         *
-         * The variable type usually is an unsigned integer where
-         * the status register is saved.
          */
         const status_t status_;
 
@@ -675,10 +564,7 @@ namespace os
       };
 
       /**
-       * @class Lock
        * @brief Interrupts standard locker.
-       * @details Locker meeting the standard `Lockable` requirements (30.2.5.3).
-       *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
       class Lock
@@ -733,9 +619,6 @@ namespace os
 
         /**
          * @brief Try to lock the interrupts.
-         * @details
-         * Somehow redundant, since the lock will always succeed;
-         * but used to meet the Lockable requirements.
          * @par Parameters
          *  None
          * @retval true The interrupts were locked.
@@ -765,9 +648,6 @@ namespace os
 
         /**
          * @brief Variable to store the initial interrupts status.
-         * @details
-         * The variable type usually is an unsigned integer where
-         * the status register is saved.
          */
         status_t status_;
 
@@ -785,10 +665,7 @@ namespace os
     class Thread;
 
     /**
-     * @namespace os::rtos::flags
      * @brief Generic flags namespace.
-     * @details
-     * The os::rtos::flags namespace groups event types and enumerations.
      */
     namespace flags
     {
@@ -801,6 +678,7 @@ namespace os
        * Both thread signal flags and event flags use this definition.
        */
       using mask_t = uint32_t;
+
       /**
        * @brief Type of a variable holding the flags mode.
        * @details
@@ -812,7 +690,6 @@ namespace os
       using mode_t = uint32_t;
 
       /**
-       * @namespace os::rtos::flags::mode
        * @brief Flags modes.
        * @details
        * Container for generic flags enumerations.
@@ -841,11 +718,7 @@ namespace os
     } /* namespace flags */
 
     /**
-     * @namespace os::rtos::thread
      * @brief Thread namespace.
-     * @details
-     * The os::rtos::thread namespace groups thread types, enumerations,
-     * attributes and initialisers.
      */
     namespace thread
     {
@@ -861,7 +734,6 @@ namespace os
       using priority_t = uint8_t;
 
       /**
-       * @namespace os::rtos::thread::priority
        * @brief Thread priority namespace.
        * @details
        * The os::rtos::thread::priority namespace is a container for
@@ -967,7 +839,6 @@ namespace os
       using sigset_t = flags::mask_t;
 
       /**
-       * @namespace os::rtos::thread::sig
        * @brief Thread signals namespace.
        * @details
        * The os::rtos::thread::sig namespace is a container for
@@ -1007,11 +878,7 @@ namespace os
     } /* namespace thread */
 
     /**
-     * @namespace os::rtos::stack
      * @brief Stack namespace.
-     * @details
-     * The os::rtos::stack namespace groups declarations related to
-     * the thread stack.
      */
     namespace stack
     {
@@ -1026,11 +893,7 @@ namespace os
     } /* namespace stack */
 
     /**
-     * @namespace os::rtos::this_thread
      * @brief The current running thread namespace.
-     * @details
-     * The os::rtos::this_thread namespace groups functions related to
-     * the current thread.
      */
     namespace this_thread
     {
@@ -1140,13 +1003,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @class Named_object
      * @brief Base class for named objects.
-     *
-     * @details
-     * This class serves as a base class for all objects that have a
-     * name (most of the RTOS classes do have a name).
-     *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      */
     class Named_object
@@ -1210,13 +1067,6 @@ namespace os
 
       /**
        * @brief Pointer to name.
-       * @details
-       * To save space, the null terminated string passed to the
-       * constructor is not copied locally. Instead, the pointer to
-       * the string is copied, so the
-       * caller must ensure that the pointer life cycle
-       * is at least as long as the object life cycle. A constant
-       * string (stored in flash) is preferred.
        */
       const char* const name_;
 
@@ -1235,19 +1085,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
       /**
-       * @class Attributes
        * @brief Thread attributes.
-       * @details
-       * Allow to assign a name and custom attributes (like stack address,
-       * stack size, priority) to the thread.
-       *
-       * To simplify access, the member variables are public and do not
-       * require accessors or mutators.
-       *
-       * @par POSIX compatibility
-       *  Inspired by `pthread_attr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
-       *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
       class Attributes : public Named_object
@@ -1348,16 +1186,7 @@ namespace os
 #endif
 
     /**
-     * @class Thread
      * @brief POSIX compliant thread.
-     * @details
-     * Supports terminating functions and a simplified version of
-     * signal flags.
-     *
-     * @par POSIX compatibility
-     *  Inspired by `pthread_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  (IEEE Std 1003.1, 2013 Edition).
-     *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      */
     class Thread : public Named_object
@@ -1777,43 +1606,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @class Systick_clock
      * @brief SysTick derived clock.
-     *
-     * @details
-     * This clock counts SysTick interrupts since startup.
-     *
-     * The SysTick clock should be a steady clock, i.e. the total
-     * count of ticks should be monotone ascending (in other words no
-     * adjustments to the past should be performed).
-     *
-     * For Cortex-M implementations using the standard SysTick, this
-     * clock is able to provide accuracy at CPU cycle level, by
-     * sampling the SysTick internal counter. For a CPU clock of 100 MHz,
-     * this gives a 10 ns resolution, quite high for accurate timing.
-     *
-     * @par Example
-     *
-     * @code{.cpp}
-     * void
-     * func(void)
-     * {
-     *    // Do something
-     *
-     *    // Get the current ticks counter.
-     *    Systick_clock::rep ticks = Systick_clock::now();
-     *
-     *    // Put the current thread to sleep for a given number of ticks.
-     *    Systick_clock::sleep_for(7);
-     *
-     *    // Put the current thread to sleep for a given number of microseconds.
-     *    // For a 1000 Hz clock, the actual value is 4 ticks.
-     *    Systick_clock::sleep_for(Systick_clock::ticks_cast(3500));
-     *
-     *    // Do something else.
-     * }
-     * @endcode
-     *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      */
     class Systick_clock
@@ -1962,41 +1755,7 @@ namespace os
     };
 
     /**
-     * @class Realtime_clock
      * @brief Real time clock.
-     *
-     * @details
-     * This clock counts seconds since epoch or startup.
-     *
-     * The real time clock should be derived from a battery powered
-     * second counting RTC, initialised at startup with the number
-     * of seconds since the standard POSIX epoch (January 1st, 1970).
-     *
-     * As any usual clock, it might occasionally be adjusted to match
-     * a reference clock, so i cannot be a steady clock.
-     *
-     * For systems that do not have a hardware RTC, it can be derived from
-     * SysTick, but in this case it must be externally initialised with
-     * the epoch.
-     *
-     * @par Example
-     *
-     * @code{.cpp}
-     * void
-     * func(void)
-     * {
-     *    // Do something
-     *
-     *    // Get the current seconds counter.
-     *    Realtime_clock::rep seconds = Realtime_clock::now();
-     *
-     *    // Put the current thread to sleep for a given number of seconds.
-     *    Realtime_clock::sleep_for(7);
-     *
-     *    // Do something else.
-     * }
-     * @endcode
-     *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      */
     class Realtime_clock
@@ -2066,11 +1825,7 @@ namespace os
     // ==================--====================================================
 
     /**
-     * @namespace os::rtos::timer
      * @brief User timer namespace.
-     * @details
-     * The os::rtos::timer namespace groups timer types, enumerations,
-     * attributes and initialisers.
      */
     namespace timer
     {
@@ -2104,19 +1859,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
       /**
-       * @class Attributes
        * @brief Timer attributes.
-       * @details
-       * Allow to assign a name to the timer.
-       *
-       * To simplify access, the member variables are public and do not
-       * require accessors or mutators.
-       *
-       * @par POSIX compatibility
-       *  No POSIX similar functionality identified, but inspired by POSIX
-       *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
-       *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
       class Attributes : public Named_object
@@ -2188,11 +1931,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
       /**
-       * @class Periodic_attributes
        * @brief Periodic timer attributes.
-       * @details
-       * Allow to assign a name to the timer.
-       *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
       class Periodic_attributes : public Attributes
@@ -2246,14 +1985,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     /**
-     * @class Timer
      * @brief User timer.
-     * @details
-     * TODO
-     *
-     * @par POSIX compatibility
-     *  No POSIX similar functionality identified.
-     *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      */
     class Timer : public Named_object
@@ -2374,11 +2106,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @namespace os::rtos::mutex
      * @brief Mutex namespace.
-     * @details
-     * The os::rtos::mutex namespace groups mutex types, enumerations,
-     * attributes and initialisers.
      */
     namespace mutex
     {
@@ -2450,19 +2178,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
       /**
-       * @class Attributes
        * @brief Mutex attributes.
-       * @details
-       * Allow to assign a name and custom attributes (like priority ceiling,
-       * robustness, etc) to the mutex.
-       *
-       * To simplify access, the member variables are public and do not
-       * require accessors or mutators.
-       *
-       * @par POSIX compatibility
-       *  Inspired by `pthread_mutexattr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
-       *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
       class Attributes : public Named_object
@@ -2513,163 +2229,21 @@ namespace os
         // Warning: must match the type & order of the C file header.
         /**
          * @brief Mutex priority ceiling.
-         * @details
-         * The @ref mx_priority_ceiling attribute defines the priority
-         * ceiling of initialised mutexes, which is the minimum priority
-         * level at which the critical section guarded by the mutex is
-         * executed. In order to avoid priority inversion, the priority
-         * ceiling of the mutex shall be set to a priority higher than
-         * or equal to the highest priority of all the threads that may
-         * lock that mutex. The values of @ref mx_priority_ceiling are
-         * within the maximum range of priorities defined under the
-         * SCHED_FIFO scheduling policy.
-         *
-         * @par POSIX compatibility
-         *  Inspired by `pthread_mutexattr_setprioceiling()` from
-         *  [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_getprioceiling.html)
-         *  (IEEE Std 1003.1, 2013 Edition).
          */
         thread::priority_t mx_priority_ceiling;
 
         /**
          * @brief Mutex protocol attribute.
-         * @details
-         * @details
-         * The default value of the attribute shall be PTHREAD_PRIO_NONE.
-         *
-         * When a thread owns a mutex with the PTHREAD_PRIO_NONE
-         * protocol attribute, its priority and scheduling shall
-         * not be affected by its mutex ownership.
-         *
-         * When a thread is blocking higher priority threads
-         * because of owning one or more robust mutexes with the
-         * PTHREAD_PRIO_INHERIT protocol attribute, it shall execute
-         * at the higher of its priority or the priority of the highest
-         * priority thread waiting on any of the robust mutexes owned
-         * by this thread and initialised with this protocol.
-         *
-         * When a thread is blocking higher priority threads because
-         * of owning one or more non-robust mutexes with the
-         * PTHREAD_PRIO_INHERIT protocol attribute, it shall execute
-         * at the higher of its priority or the priority of the
-         * highest priority thread waiting on any of the non-robust
-         * mutexes owned by this thread and initialised with this protocol.
-         *
-         * When a thread owns one or more robust mutexes initialised
-         * with the PTHREAD_PRIO_PROTECT protocol, it shall execute
-         * at the higher of its priority or the highest of the priority
-         * ceilings of all the robust mutexes owned by this thread and
-         * initialised with this attribute, regardless of whether other
-         * threads are blocked on any of these robust mutexes or not.
-         *
-         * When a thread owns one or more non-robust mutexes initialised
-         * with the PTHREAD_PRIO_PROTECT protocol, it shall execute at
-         * the higher of its priority or the highest of the priority
-         * ceilings of all the non-robust mutexes owned by this thread
-         * and initialised with this attribute, regardless of whether
-         * other threads are blocked on any of these non-robust mutexes
-         * or not.
-         *
-         * While a thread is holding a mutex which has been initialised
-         * with the PTHREAD_PRIO_INHERIT or PTHREAD_PRIO_PROTECT protocol
-         * attributes, it shall not be subject to being moved to the tail
-         * of the scheduling queue at its priority in the event that its
-         * original priority is changed, such as by a call to
-         * sched_setparam(). Likewise, when a thread unlocks a mutex
-         * that has been initialised with the PTHREAD_PRIO_INHERIT or
-         * PTHREAD_PRIO_PROTECT protocol attributes, it shall not be
-         * subject to being moved to the tail of the scheduling queue
-         * at its priority in the event that its original priority is changed.
-         *
-         * If a thread simultaneously owns several mutexes initialised
-         * with different protocols, it shall execute at the highest of
-         * the priorities that it would have obtained by each of these
-         * protocols.
-         *
-         * When a thread makes a call to Mutex::lock(), the mutex
-         * was initialised with the protocol attribute having the
-         * value PTHREAD_PRIO_INHERIT, when the calling thread is
-         * blocked because the mutex is owned by another thread, that
-         * owner thread shall inherit the priority level of the calling
-         * thread as long as it continues to own the mutex. The
-         * implementation shall update its execution priority to
-         * the maximum of its assigned priority and all its
-         * inherited priorities. Furthermore, if this owner thread
-         * itself becomes blocked on another mutex with the protocol
-         * attribute having the value PTHREAD_PRIO_INHERIT, the same
-         * priority inheritance effect shall be propagated to this
-         * other owner thread, in a recursive manner.
-         *
-         * @par POSIX compatibility
-         *  Inspired by `pthread_mutexattr_setprotocol()` from
-         *  [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_getprotocol.html)
-         *  (IEEE Std 1003.1, 2013 Edition).
          */
         mutex::protocol_t mx_protocol;
 
         /**
          * @brief Mutex protocol attribute.
-         * @details
-         *
-         * Valid values for robust include:
-         * - PTHREAD_MUTEX_STALLED
-         *
-         *   No special actions are taken if the owner of the mutex
-         *  is terminated while holding the mutex lock. This can
-         *  lead to deadlocks if no other thread can unlock the mutex.
-         *  This is the default value.
-         *
-         * - PTHREAD_MUTEX_ROBUST
-         *
-         *   If the process containing the owning thread of a robust
-         *   mutex terminates while holding the mutex lock, the next
-         *   thread that acquires the mutex shall be notified about
-         *   the termination by the return value [EOWNERDEAD] from
-         *   the locking function. If the owning thread of a robust
-         *   mutex terminates while holding the mutex lock, the next
-         *   thread that acquires the mutex may be notified about the
-         *   termination by the return value [EOWNERDEAD]. The notified
-         *   thread can then attempt to mark the state protected by
-         *   the mutex as consistent again by a call to
-         *   pthread_mutex_consistent(). After a subsequent
-         *   successful call to pthread_mutex_unlock(), the mutex
-         *   lock shall be released and can be used normally by
-         *   other threads. If the mutex is unlocked without a
-         *   call to pthread_mutex_consistent(), it shall be in a
-         *   permanently unusable state and all attempts to lock
-         *   the mutex shall fail with the error [ENOTRECOVERABLE].
-         *   The only permissible operation on such a mutex is
-         *   pthread_mutex_destroy().
-         *
-         * @par POSIX compatibility
-         *  Inspired by `pthread_mutexattr_setrobust()` from
-         *  [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_getrobust.html)
-         *  (IEEE Std 1003.1, 2013 Edition).
          */
         mutex::robustness_t mx_robustness;
 
         /**
          * @brief Mutex type attribute.
-         * @details
-         * The default value of the type attribute is PTHREAD_MUTEX_DEFAULT.
-         *
-         * The type of mutex is contained in the type attribute of
-         * the mutex attributes. Valid mutex types include:
-         *
-         * - PTHREAD_MUTEX_NORMAL
-         * - PTHREAD_MUTEX_ERRORCHECK
-         * - PTHREAD_MUTEX_RECURSIVE
-         * - PTHREAD_MUTEX_DEFAULT
-         *
-         * The mutex type affects the behaviour of calls which lock
-         * and unlock the mutex. See @ref Mutex::lock() for details.
-         * An implementation may map PTHREAD_MUTEX_DEFAULT to one of
-         * the other mutex types.
-         *
-         * @par POSIX compatibility
-         *  Inspired by `pthread_mutexattr_settype()` from
-         *  [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_gettype.html)
-         *  (IEEE Std 1003.1, 2013 Edition).
          */
         mutex::type_t mx_type;
 
@@ -2691,16 +2265,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
       /**
-       * @class Recursive_attributes
        * @brief Recursive mutex attributes.
-       * @details
-       * Allow to assign a name and custom attributes (like priority ceiling,
-       * robustness, etc) to the mutex.
-       *
-       * @par POSIX compatibility
-       *  Inspired by `pthread_mutexattr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
-       *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
       class Recursive_attributes : public Attributes
@@ -2756,13 +2321,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     /**
-     * @class Mutex
      * @brief POSIX compliant mutex.
-     *
-     * @par POSIX compatibility
-     *  Inspired by `pthread_mutex_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  (IEEE Std 1003.1, 2013 Edition).
-     *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      */
     class Mutex : public Named_object
@@ -3006,25 +2565,13 @@ namespace os
     // ========================================================================
 
     /**
-     * @namespace os::rtos::condvar
      * @brief Condition variable namespace.
-     * @details
-     * The `os::rtos::condvar` namespace groups condition variable attributes
-     * and initialisers.
      */
     namespace condvar
     {
 
       /**
-       * @class Attributes
        * @brief Condition variable attributes.
-       * @details
-       * Allow to assign a name to the condition variable.
-       *
-       * @par POSIX compatibility
-       *  Inspired by `pthread_condattr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
-       *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
       class Attributes : public Named_object
@@ -3090,13 +2637,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @class Condition_variable
      * @brief POSIX compliant condition variable.
-     *
-     * @par POSIX compatibility
-     *  Inspired by `pthread_cond_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  (IEEE Std 1003.1, 2013 Edition).
-     *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      */
     class Condition_variable : public Named_object
@@ -3221,11 +2762,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @namespace os::rtos::semaphore
      * @brief Semaphore namespace.
-     * @details
-     * The os::rtos::semaphore namespace groups semaphore types,
-     * attributes and initialisers.
      */
     namespace semaphore
     {
@@ -3245,20 +2782,7 @@ namespace os
       constexpr count_t max_count_value = 0x7FFF;
 
       /**
-       * @class Attributes
        * @brief Semaphore attributes.
-       * @details
-       * Allow to assign a name and custom attributes (like initial count,
-       * max count) to the semaphore.
-       *
-       * To simplify access, the member variables are public and do not
-       * require accessors or mutators.
-       *
-       * @par POSIX compatibility
-       *  No POSIX similar functionality identified, but inspired by POSIX
-       *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
-       *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
       class Attributes : public Named_object
@@ -3309,17 +2833,11 @@ namespace os
         // Warning: must match the type & order of the C file header.
         /**
          * @brief Semaphore initial count.
-         * @details
-         * This values represents the number of resources initially
-         * available to the semaphore.
          */
         count_t sm_initial_count;
 
         /**
          * @brief Semaphore max count.
-         * @details
-         * This values represents the maximum number of resources
-         * available to the semaphore.
          */
         count_t sm_max_count;
 
@@ -3336,16 +2854,7 @@ namespace os
       extern const Attributes counting_initializer;
 
       /**
-       * @class Binary_attributes
        * @brief Binary semaphore attributes.
-       * @details
-       * Allow to assign a name and custom attributes to the semaphore.
-       *
-       * @par POSIX compatibility
-       *  No POSIX similar functionality identified, but inspired by POSIX
-       *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
-       *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
       class Binary_attributes : public Attributes
@@ -3397,21 +2906,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     /**
-     * @class Semaphore
      * @brief POSIX compliant semaphore.
-     * @details
-     * Supports both counting and binary semaphores.
-     *
-     * Semaphores should generally be used to synchronise with
-     * events occuring on interrupts.
-     *
-     * For inter-thread synchronisation, to avoid cases of priority
-     * inversion, more suitable are mutexes.
-     *
-     * @par POSIX compatibility
-     *  Inspired by `sem_t` from [<semaphore.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
-     *  (IEEE Std 1003.1, 2013 Edition).
-     *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      */
     class Semaphore : public Named_object
@@ -3609,11 +3104,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @namespace os::rtos::mempool
      * @brief Memory pool namespace.
-     * @details
-     * The os::rtos::mempool namespace groups memory pool attributes
-     * and initialisers.
      */
     namespace mempool
     {
@@ -3633,57 +3124,7 @@ namespace os
       constexpr size_t max_size = (0 - 1);
 
       /**
-       * @class Attributes
        * @brief Memory pool attributes.
-       * @details
-       * Allow to assign a name and custom attributes (like a static
-       * address) to the memory pool.
-       *
-       * To simplify access, the member variables are public and do not
-       * require accessors or mutators.
-       *
-       * @par Example
-       *
-       * Define an array of structures and
-       * pass its address and size via the attributes.
-       *
-       * @code{.cpp}
-       * // Define the type of one pool block.
-       * typedef struct {
-       *   uint32_t length;
-       *   uint32_t width;
-       *   uint32_t height;
-       *   uint32_t weight;
-       * } properties_t;
-       *
-       * // Define the pool size.
-       * constexpr uint32_t pool_size = 10;
-       *
-       * // Allocate static storage for the pool.
-       * properties_t pool[pool_size];
-       *
-       * void
-       * func(void)
-       * {
-       *    // Do something
-       *
-       *    // Define pool attributes.
-       *    mempool::Attributes attr { "properties" };
-       *    attr.mp_pool_address = pool;
-       *    attr.mp_pool_size_bytes = sizeof(pool);
-       *
-       *    // Create the pool object.
-       *    Memory_pool mp { attr, pool_size, sizeof(properties_t) };
-       *
-       *    // Do something else.
-       * }
-       * @endcode
-       *
-       * @par POSIX compatibility
-       *  No POSIX similar functionality identified, but inspired by POSIX
-       *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
-       *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
       class Attributes : public Named_object
@@ -3734,26 +3175,11 @@ namespace os
         // Warning: must match the type & order of the C file header.
         /**
          * @brief User defined memory pool address.
-         * @details
-         * Set this variable to a user defined memory area large enough
-         * to store the memory pool. Usually this is a statically
-         * allocated array of structures.
-         *
-         * The default value is `nullptr`, which means there is no
-         * user defined memory pool.
          */
         void* mp_pool_address;
 
         /**
          * @brief User defined memory pool size.
-         * @details
-         * The memory pool size must match exactly the allocated size. It is
-         * used for validation; when the memory pool is initialised,
-         * this size must be large enough to accommodate the desired
-         * memory pool.
-         *
-         * If the @ref mp_pool_address is `nullptr`, this variable is not
-         * checked, but it is recommended to leave it zero.
          */
         size_t mp_pool_size_bytes;
 
@@ -3775,20 +3201,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     /**
-     * @class Memory_pool
      * @brief Synchronised memory pool.
-     * @details
-     * Manage a pool of same size blocks. Fast and deterministic allocation
-     * and dealocation behaviour, suitable for use even in ISRs.
-     *
-     * @par POSIX compatibility
-     *  No POSIX similar functionality identified.
-     *
-     * @note There is no equivalent of calloc(); to initialise memory, use:
-     * @code{.cpp}
-     * memset (block, 0, pool.block_size ());
-     * @endcode
-     *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      */
     class Memory_pool : public Named_object
@@ -4024,11 +3437,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @namespace os::rtos::mqueue
      * @brief Message queue namespace.
-     * @details
-     * The os::rtos::mqueue namespace groups message queue attributes
-     * and initialisers.
      */
     namespace mqueue
     {
@@ -4050,19 +3459,7 @@ namespace os
       using priority_t = uint8_t;
 
       /**
-       * @class Attributes
        * @brief Message queue attributes.
-       * @details
-       * Allow to assign a name and custom attributes (like a static
-       * address) to the message queue.
-       *
-       * To simplify access, the member variables are public and do not
-       * require accessors or mutators.
-       *
-       * @par POSIX compatibility
-       *  Inspired by `mq_attr` from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
-       *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
       class Attributes : public Named_object
@@ -4113,26 +3510,11 @@ namespace os
         // Warning: must match the type & order of the C file header.
         /**
          * @brief User defined message queue address.
-         * @details
-         * Set this variable to a user defined memory area large enough
-         * to store the message queue. Usually this is a statically
-         * allocated array of structures.
-         *
-         * The default value is `nullptr`, which means there is no
-         * user defined message queue.
          */
         void* mq_queue_address;
 
         /**
          * @brief User defined message queue size.
-         * @details
-         * The message queue size must match exactly the allocated size. It is
-         * used for validation; when the message queue is initialised,
-         * this size must be large enough to accommodate the desired
-         * message queue.
-         *
-         * If the @ref mq_queue_address is `nullptr`, this variable is not
-         * checked, but it is recommended to leave it zero.
          */
         std::size_t mq_queue_size_bytes;
 
@@ -4154,15 +3536,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     /**
-     * @class Message_queue
      * @brief POSIX compliant message queue.
-     * @details
-     * Priority based, fixed size FIFO.
-     *
-     * @par POSIX compatibility
-     *  Inspired by `mqd_t` from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
-     *  (IEEE Std 1003.1, 2013 Edition).
-     *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      */
     class Message_queue : public Named_object
@@ -4444,25 +3818,12 @@ namespace os
     // ========================================================================
 
     /**
-     * @namespace os::rtos::evflags
      * @brief Event flags namespace.
-     * @details
-     * The os::rtos::evflags namespace groups event flags attributes
-     * and initialisers.
      */
     namespace evflags
     {
       /**
-       * @class Attributes
        * @brief Event flags attributes.
-       * @details
-       * Allow to assign a name to the event flags.
-       *
-       * @par POSIX compatibility
-       *  No POSIX similar functionality identified, but inspired by POSIX
-       *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
-       *
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
       class Attributes : public Named_object
@@ -4529,16 +3890,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     /**
-     * @class Event_flags
      * @brief Event flags.
-     *
-     * @details
-     * Synchronised set of flags that can be used to notify events
-     * between threads or between ISRs and threads.
-     *
-     * @par POSIX compatibility
-     *  No POSIX similar functionality identified.
-     *
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      */
     class Event_flags : public Named_object
@@ -4834,6 +4186,11 @@ namespace os
         status_ = scheduler::lock ();
       }
 
+      /**
+       * @details
+       * Somehow redundant, since the lock will always succeed;
+       * but used to meet the Lockable requirements.
+       */
       inline bool
       Lock::try_lock (void)
       {
@@ -4921,6 +4278,11 @@ namespace os
         status_ = Critical_section::enter ();
       }
 
+      /**
+       * @details
+       * Somehow redundant, since the lock will always succeed;
+       * but used to meet the Lockable requirements.
+       */
       inline bool
       Lock::try_lock (void)
       {
@@ -5385,7 +4747,7 @@ extern "C"
   /**
    * @brief SysTick implementation hook.
    * @details
-   * It is called from @ref `os_systick_handler()` after the
+   * It is called from `os_systick_handler()` after the
    * scheduler was started.
    */
   void

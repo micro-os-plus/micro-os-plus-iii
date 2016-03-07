@@ -40,16 +40,214 @@ namespace os
 // TODO: remove it when fully implemented
 //#pragma GCC diagnostic ignored "-Wunused-parameter"
 
+    /**
+     * @details
+     * The os::rtos::mutex namespace groups mutex types, enumerations,
+     * attributes and initialisers.
+     */
     namespace mutex
     {
+      /**
+       * @class Attributes
+       * @details
+       * Allow to assign a name and custom attributes (like priority ceiling,
+       * robustness, etc) to the mutex.
+       *
+       * To simplify access, the member variables are public and do not
+       * require accessors or mutators.
+       *
+       * @par POSIX compatibility
+       *  Inspired by `pthread_mutexattr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       */
+
+      /**
+       * @class Recursive_attributes
+       * @details
+       * Allow to assign a name and custom attributes (like priority ceiling,
+       * robustness, etc) to the mutex.
+       *
+       * @par POSIX compatibility
+       *  Inspired by `pthread_mutexattr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       */
+
+      /**
+       * @var thread::priority_t Attributes::mx_priority_ceiling
+       * @details
+       * The @ref mx_priority_ceiling attribute defines the priority
+       * ceiling of initialised mutexes, which is the minimum priority
+       * level at which the critical section guarded by the mutex is
+       * executed. In order to avoid priority inversion, the priority
+       * ceiling of the mutex shall be set to a priority higher than
+       * or equal to the highest priority of all the threads that may
+       * lock that mutex. The values of @ref mx_priority_ceiling are
+       * within the maximum range of priorities defined under the
+       * SCHED_FIFO scheduling policy.
+       *
+       * @par POSIX compatibility
+       *  Inspired by `pthread_mutexattr_setprioceiling()` from
+       *  [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_getprioceiling.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       */
+
+      /**
+       * @var mutex::protocol_t Attributes::mx_protocol
+       * @details
+       * The default value of the attribute shall be PTHREAD_PRIO_NONE.
+       *
+       * When a thread owns a mutex with the PTHREAD_PRIO_NONE
+       * protocol attribute, its priority and scheduling shall
+       * not be affected by its mutex ownership.
+       *
+       * When a thread is blocking higher priority threads
+       * because of owning one or more robust mutexes with the
+       * PTHREAD_PRIO_INHERIT protocol attribute, it shall execute
+       * at the higher of its priority or the priority of the highest
+       * priority thread waiting on any of the robust mutexes owned
+       * by this thread and initialised with this protocol.
+       *
+       * When a thread is blocking higher priority threads because
+       * of owning one or more non-robust mutexes with the
+       * PTHREAD_PRIO_INHERIT protocol attribute, it shall execute
+       * at the higher of its priority or the priority of the
+       * highest priority thread waiting on any of the non-robust
+       * mutexes owned by this thread and initialised with this protocol.
+       *
+       * When a thread owns one or more robust mutexes initialised
+       * with the PTHREAD_PRIO_PROTECT protocol, it shall execute
+       * at the higher of its priority or the highest of the priority
+       * ceilings of all the robust mutexes owned by this thread and
+       * initialised with this attribute, regardless of whether other
+       * threads are blocked on any of these robust mutexes or not.
+       *
+       * When a thread owns one or more non-robust mutexes initialised
+       * with the PTHREAD_PRIO_PROTECT protocol, it shall execute at
+       * the higher of its priority or the highest of the priority
+       * ceilings of all the non-robust mutexes owned by this thread
+       * and initialised with this attribute, regardless of whether
+       * other threads are blocked on any of these non-robust mutexes
+       * or not.
+       *
+       * While a thread is holding a mutex which has been initialised
+       * with the PTHREAD_PRIO_INHERIT or PTHREAD_PRIO_PROTECT protocol
+       * attributes, it shall not be subject to being moved to the tail
+       * of the scheduling queue at its priority in the event that its
+       * original priority is changed, such as by a call to
+       * sched_setparam(). Likewise, when a thread unlocks a mutex
+       * that has been initialised with the PTHREAD_PRIO_INHERIT or
+       * PTHREAD_PRIO_PROTECT protocol attributes, it shall not be
+       * subject to being moved to the tail of the scheduling queue
+       * at its priority in the event that its original priority is changed.
+       *
+       * If a thread simultaneously owns several mutexes initialised
+       * with different protocols, it shall execute at the highest of
+       * the priorities that it would have obtained by each of these
+       * protocols.
+       *
+       * When a thread makes a call to Mutex::lock(), the mutex
+       * was initialised with the protocol attribute having the
+       * value PTHREAD_PRIO_INHERIT, when the calling thread is
+       * blocked because the mutex is owned by another thread, that
+       * owner thread shall inherit the priority level of the calling
+       * thread as long as it continues to own the mutex. The
+       * implementation shall update its execution priority to
+       * the maximum of its assigned priority and all its
+       * inherited priorities. Furthermore, if this owner thread
+       * itself becomes blocked on another mutex with the protocol
+       * attribute having the value PTHREAD_PRIO_INHERIT, the same
+       * priority inheritance effect shall be propagated to this
+       * other owner thread, in a recursive manner.
+       *
+       * @par POSIX compatibility
+       *  Inspired by `pthread_mutexattr_setprotocol()` from
+       *  [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_getprotocol.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       */
+
+      /**
+       * @var mutex::robustness_t Attributes::mx_robustness
+       * @details
+       *
+       * Valid values for robust include:
+       * - PTHREAD_MUTEX_STALLED
+       *
+       *   No special actions are taken if the owner of the mutex
+       *  is terminated while holding the mutex lock. This can
+       *  lead to deadlocks if no other thread can unlock the mutex.
+       *  This is the default value.
+       *
+       * - PTHREAD_MUTEX_ROBUST
+       *
+       *   If the process containing the owning thread of a robust
+       *   mutex terminates while holding the mutex lock, the next
+       *   thread that acquires the mutex shall be notified about
+       *   the termination by the return value [EOWNERDEAD] from
+       *   the locking function. If the owning thread of a robust
+       *   mutex terminates while holding the mutex lock, the next
+       *   thread that acquires the mutex may be notified about the
+       *   termination by the return value [EOWNERDEAD]. The notified
+       *   thread can then attempt to mark the state protected by
+       *   the mutex as consistent again by a call to
+       *   pthread_mutex_consistent(). After a subsequent
+       *   successful call to pthread_mutex_unlock(), the mutex
+       *   lock shall be released and can be used normally by
+       *   other threads. If the mutex is unlocked without a
+       *   call to pthread_mutex_consistent(), it shall be in a
+       *   permanently unusable state and all attempts to lock
+       *   the mutex shall fail with the error [ENOTRECOVERABLE].
+       *   The only permissible operation on such a mutex is
+       *   pthread_mutex_destroy().
+       *
+       * @par POSIX compatibility
+       *  Inspired by `pthread_mutexattr_setrobust()` from
+       *  [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_getrobust.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       */
+
+      /**
+       * @var mutex::type_t Attributes::mx_type
+       * @details
+       * The default value of the type attribute is PTHREAD_MUTEX_DEFAULT.
+       *
+       * The type of mutex is contained in the type attribute of
+       * the mutex attributes. Valid mutex types include:
+       *
+       * - PTHREAD_MUTEX_NORMAL
+       * - PTHREAD_MUTEX_ERRORCHECK
+       * - PTHREAD_MUTEX_RECURSIVE
+       * - PTHREAD_MUTEX_DEFAULT
+       *
+       * The mutex type affects the behaviour of calls which lock
+       * and unlock the mutex. See @ref Mutex::lock() for details.
+       * An implementation may map PTHREAD_MUTEX_DEFAULT to one of
+       * the other mutex types.
+       *
+       * @par POSIX compatibility
+       *  Inspired by `pthread_mutexattr_settype()` from
+       *  [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_gettype.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       */
+
       const Attributes normal_initializer
         { nullptr };
 
       const Recursive_attributes recursive_initializer
         { nullptr };
+
     } /* namespace mutex */
 
     // ------------------------------------------------------------------------
+
+    /**
+     * @class Mutex
+     * @details
+     * TODO
+     *
+     * @par POSIX compatibility
+     *  Inspired by `pthread_mutex_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  (IEEE Std 1003.1, 2013 Edition).
+     */
 
     /**
      * @details
@@ -336,7 +534,7 @@ namespace os
     thread::priority_t
     Mutex::prio_ceiling (void) const
     {
-      assert(!scheduler::in_handler_mode ());
+      assert (!scheduler::in_handler_mode ());
 
       trace::printf ("%s() @%p \n", __func__, this);
 

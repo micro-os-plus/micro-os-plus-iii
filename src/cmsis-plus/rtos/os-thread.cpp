@@ -54,6 +54,21 @@ namespace os
       { nullptr, (thread::func_t) no_thread_func, nullptr};
 #endif
 
+    /**
+     * @details
+     * The os::rtos::stack namespace groups declarations related to
+     * the thread stack.
+     */
+    namespace stack
+    {
+
+    } /* namespace stack */
+
+    /**
+     * @details
+     * The os::rtos::this_thread namespace groups functions related to
+     * the current thread.
+     */
     namespace this_thread
     {
       /**
@@ -108,10 +123,30 @@ namespace os
 
     // ======================================================================
 
+    /**
+     * @details
+     * The os::rtos::thread namespace groups thread types, enumerations,
+     * attributes and initialisers.
+     */
     namespace thread
     {
+      /**
+       * @class Attributes
+       * @details
+       * Allow to assign a name and custom attributes (like stack address,
+       * stack size, priority) to the thread.
+       *
+       * To simplify access, the member variables are public and do not
+       * require accessors or mutators.
+       *
+       * @par POSIX compatibility
+       *  Inspired by `pthread_attr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       */
+
       const Attributes initializer
         { nullptr };
+
     } /* namespace thread */
 
 #if 0
@@ -141,6 +176,17 @@ namespace os
 #endif
 
     /**
+     * @class Thread
+     * @details
+     * Supports terminating functions and a simplified version of
+     * signal flags.
+     *
+     * @par POSIX compatibility
+     *  Inspired by `pthread_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  (IEEE Std 1003.1, 2013 Edition).
+     */
+
+    /**
      * @details
      * Same as in POSIX, thread functions can return, and the behaviour
      * should be as the thread called the exit() function.
@@ -158,16 +204,14 @@ namespace os
     /**
      * @details
      *
-     * Create a new thread, with default attributes.
-     *
-     * The thread is created executing function with args as its
-     * sole argument. If the start_routine returns, the effect
-     * shall be as if there was an implicit call to exit() using
+     * The thread is created executing _function_ with _args_ as its
+     * sole argument. If the function returns, the effect
+     * shall be as if there was an implicit call to `exit()` using
      * the return value of function as the exit status. Note that
-     * the thread in which main() was originally invoked differs
-     * from this. When it returns from main(), the effect shall
-     * be as if there was an implicit call to exit() using the
-     * return value of main() as the exit status.
+     * the thread in which `main()` was originally invoked differs
+     * from this. When it returns from `main()`, the effect shall
+     * be as if there was an implicit call to `exit()` using the
+     * return value of `main()` as the exit status.
      *
      * Compatible with pthread_create().
      * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html
@@ -184,19 +228,18 @@ namespace os
     /**
      * @details
      *
-     * Create a new thread, with attributes specified by attr.
-     * If attr is NULL, the default attributes shall be used.
-     * If the attributes specified by attr are modified later,
+     * Create a new thread, with attributes specified by _attr_.
+     * If the attributes specified by _attr_ are modified later,
      * the thread's attributes shall not be affected.
      *
-     * The thread is created executing function with args as its
-     * sole argument. If the start_routine returns, the effect
-     * shall be as if there was an implicit call to exit() using
+     * The thread is created executing _function_ with _args_ as its
+     * sole argument. If the function returns, the effect
+     * shall be as if there was an implicit call to `exit()` using
      * the return value of function as the exit status. Note that
-     * the thread in which main() was originally invoked differs
-     * from this. When it returns from main(), the effect shall
-     * be as if there was an implicit call to exit() using the
-     * return value of main() as the exit status.
+     * the thread in which `main()` was originally invoked differs
+     * from this. When it returns from `main()`, the effect shall
+     * be as if there was an implicit call to `exit()` using the
+     * return value of `main()` as the exit status.
      *
      * Compatible with pthread_create().
      * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html
@@ -210,8 +253,8 @@ namespace os
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
-      assert(function != nullptr);
-      assert(attr.th_priority != thread::priority::none);
+      assert (function != nullptr);
+      assert (attr.th_priority != thread::priority::none);
 
       // Prevent the new thread to execute before all members are set.
       scheduler::Critical_section cs; // ----- Critical section -----
@@ -383,10 +426,10 @@ namespace os
      *
      * If an implementation detects use of a thread ID after the end
      * of its lifetime, it is recommended that the function should
-     * fail and report an [ESRCH] error.
+     * fail and report an `ESRCH` error.
      *
-     * The pthread_setschedprio() function shall not return an error
-     * code of [EINTR].
+     * The sched_prio() function shall not return an error
+     * code of `EINTR`.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -416,7 +459,6 @@ namespace os
       this_thread::yield ();
 
 #endif
-
 
       return res;
     }
@@ -482,7 +524,7 @@ namespace os
      * pthread_detach()
      * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_detach.html
      *
-     * The detach() function shall not return an error code of [EINTR].
+     * The detach() function shall not return an error code of `EINTR`.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -516,10 +558,10 @@ namespace os
      * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cancel.html
      *
      *
-     * The cancel() function shall not return an error code of [EINTR].
+     * The cancel() function shall not return an error code of `EINTR`.
      * If an implementation detects use of a thread ID after the end
      * of its lifetime, it is recommended that the function should
-     * fail and report an [ESRCH] error.
+     * fail and report an `ESRCH` error.
      * error number is returned.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
@@ -554,7 +596,7 @@ namespace os
      * does not release any application visible process resources,
      * including, but not limited to, mutexes and file descriptors,
      * nor does it perform any process-level cleanup actions,
-     * including, but not limited to, calling any atexit() routines
+     * including, but not limited to, calling any `atexit()` routines
      * that may exist.
      * An implicit call to exit() is made when a thread other
      * than the thread in which main() was first invoked returns
@@ -577,9 +619,9 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     void
-    Thread::exit (void* value_ptr)
+    Thread::exit (void* exit_ptr)
     {
-      assert(!scheduler::in_handler_mode ());
+      assert (!scheduler::in_handler_mode ());
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
@@ -590,7 +632,7 @@ namespace os
           return; // Already terminated
         }
 
-      func_result_ = value_ptr;
+      func_result_ = exit_ptr;
       sched_state_ = thread::state::terminated;
 
       if (joiner_ != nullptr)
@@ -639,7 +681,7 @@ namespace os
      * @details
      * Set more bits in the thread current signal flags mask.
      * Use OR at bit-mask level.
-     * Wake-up the thread to evaluate the signal flagss.
+     * Wake-up the thread to evaluate the signal flags.
      *
      * @note Can be invoked from Interrupt Service Routines.
      */
@@ -771,8 +813,8 @@ namespace os
 
     /**
      * @details
-     * If the mode::all bit is set, the function expects
-     * all given flags to be raised; otherwise, if the mode::any
+     * If the flags::mode::all bit is set, the function expects
+     * all given flags to be raised; otherwise, if the flags::mode::any
      * bit is set, the function expects any single flag to be raised.
      *
      * If the expected signal flags are
@@ -785,7 +827,7 @@ namespace os
      * until any signal flag is raised. In this case, if any signal flags
      * are already raised, the function returns instantly.
      *
-     * If the mode::clear bit is set, the signal flags that are
+     * If the flags::mode::clear bit is set, the signal flags that are
      * returned are automatically cleared.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
@@ -828,12 +870,12 @@ namespace os
 
     /**
      * @details
-     * If the mode::all bit is set, the function expects
-     * all given flags to be raised; otherwise, if the mode::any
+     * If the flags::mode::all bit is set, the function expects
+     * all given flags to be raised; otherwise, if the flags::mode::any
      * bit is set, the function expects any single flag to be raised.
      *
      * The function does not blocks, if the expected signal flags are
-     * not raised, but returns EGAIN.
+     * not raised, but returns `EGAIN`.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -853,8 +895,8 @@ namespace os
 
     /**
      * @details
-     * If the mode::all bit is set, the function expects
-     * all given flags to be raised; otherwise, if the mode::any
+     * If the flags::mode::all bit is set, the function expects
+     * all given flags to be raised; otherwise, if the flags::mode::any
      * bit is set, the function expects any single flag to be raised.
      *
      * If the expected signal flags are
@@ -878,7 +920,7 @@ namespace os
      * Under no circumstance shall the operation fail with a timeout
      * if the signal flags are already raised.
      *
-     * If the mode::clear bit is set, the signal flags that are
+     * If the flags::mode::clear bit is set, the signal flags that are
      * returned are automatically cleared.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.

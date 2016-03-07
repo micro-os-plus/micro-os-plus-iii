@@ -36,14 +36,66 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
+    /**
+     * @details
+     * The os::rtos::mqueue namespace groups message queue attributes
+     * and initialisers.
+     */
     namespace mqueue
     {
+      /**
+       * @class Attributes
+       * @details
+       * Allow to assign a name and custom attributes (like a static
+       * address) to the message queue.
+       *
+       * To simplify access, the member variables are public and do not
+       * require accessors or mutators.
+       *
+       * @par POSIX compatibility
+       *  Inspired by `mq_attr` from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       */
+
+      /**
+       * @var void* Attributes::mq_queue_address
+       * @details
+       * Set this variable to a user defined memory area large enough
+       * to store the message queue. Usually this is a statically
+       * allocated array of structures.
+       *
+       * The default value is `nullptr`, which means there is no
+       * user defined message queue.
+       */
+
+      /**
+       * @var std::size_t Attributes::mq_queue_size_bytes
+       * @details
+       * The message queue size must match exactly the allocated size. It is
+       * used for validation; when the message queue is initialised,
+       * this size must be large enough to accommodate the desired
+       * message queue.
+       *
+       * If the @ref mq_queue_address is `nullptr`, this variable is not
+       * checked, but it is recommended to leave it zero.
+       */
+
       const Attributes initializer
         { nullptr };
 
     } /* namespace mqueue */
 
     // ------------------------------------------------------------------------
+
+    /**
+     * @class Message_queue
+     * @details
+     * Priority based, fixed size FIFO.
+     *
+     * @par POSIX compatibility
+     *  Inspired by `mqd_t` from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+     *  (IEEE Std 1003.1, 2013 Edition).
+     */
 
     /**
      *
@@ -76,7 +128,7 @@ namespace os
         {
           os_assert_throw(queue_size_bytes_ > 0, EINVAL);
           os_assert_throw(
-              queue_size_bytes_ >= (std::size_t )(msgs * msg_size_bytes),
+              queue_size_bytes_ >= (std::size_t) (msgs * msg_size_bytes),
               EINVAL);
         }
 

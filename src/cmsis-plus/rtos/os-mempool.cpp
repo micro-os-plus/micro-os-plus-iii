@@ -38,14 +38,109 @@ namespace os
 
     // ------------------------------------------------------------------------
 
+    /**
+     * @details
+     * The os::rtos::mempool namespace groups memory pool attributes
+     * and initialisers.
+     */
     namespace mempool
     {
+      /**
+       * @class Attributes
+       * @details
+       * Allow to assign a name and custom attributes (like a static
+       * address) to the memory pool.
+       *
+       * To simplify access, the member variables are public and do not
+       * require accessors or mutators.
+       *
+       * @par Example
+       *
+       * Define an array of structures and
+       * pass its address and size via the attributes.
+       *
+       * @code{.cpp}
+       * // Define the type of one pool block.
+       * typedef struct {
+       *   uint32_t length;
+       *   uint32_t width;
+       *   uint32_t height;
+       *   uint32_t weight;
+       * } properties_t;
+       *
+       * // Define the pool size.
+       * constexpr uint32_t pool_size = 10;
+       *
+       * // Allocate static storage for the pool.
+       * properties_t pool[pool_size];
+       *
+       * void
+       * func(void)
+       * {
+       *    // Do something
+       *
+       *    // Define pool attributes.
+       *    mempool::Attributes attr { "properties" };
+       *    attr.mp_pool_address = pool;
+       *    attr.mp_pool_size_bytes = sizeof(pool);
+       *
+       *    // Create the pool object.
+       *    Memory_pool mp { attr, pool_size, sizeof(properties_t) };
+       *
+       *    // Do something else.
+       * }
+       * @endcode
+       *
+       * @par POSIX compatibility
+       *  No POSIX similar functionality identified, but inspired by POSIX
+       *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       */
+
+      /**
+       * @var void* Attributes::mp_pool_address
+       * @details
+       * Set this variable to a user defined memory area large enough
+       * to store the memory pool. Usually this is a statically
+       * allocated array of structures.
+       *
+       * The default value is `nullptr`, which means there is no
+       * user defined memory pool.
+       */
+
+      /**
+       * @var size_t Attributes::mp_pool_size_bytes
+       * @details
+       * The memory pool size must match exactly the allocated size. It is
+       * used for validation; when the memory pool is initialised,
+       * this size must be large enough to accommodate the desired
+       * memory pool.
+       *
+       * If the @ref mp_pool_address is `nullptr`, this variable is not
+       * checked, but it is recommended to leave it zero.
+       */
+
       const Attributes initializer
         { nullptr };
 
     } /* namespace mempool */
 
     // ------------------------------------------------------------------------
+
+    /**
+     * @class Memory_pool
+     * @details
+     * Manage a pool of same size blocks. Fast and deterministic allocation
+     * and dealocation behaviour, suitable for use even in ISRs.
+     *
+     * @par POSIX compatibility
+     *  No POSIX similar functionality identified.
+     *
+     * @note There is no equivalent of calloc(); to initialise memory, use:
+     * @code{.cpp}
+     * memset (block, 0, pool.block_size ());
+     * @endcode
+     */
 
     /**
      *
@@ -76,10 +171,10 @@ namespace os
 
       pool_addr_ = (char*) attr.mp_pool_address;
 
-      assert(blocks_ > 0);
+      assert (blocks_ > 0);
       // Blocks must be large enough to store the index, used
       // to construct the list of free blocks.
-      assert(block_size_bytes_ >= sizeof(std::ptrdiff_t));
+      assert (block_size_bytes_ >= sizeof(std::ptrdiff_t));
 
       flags_ = 0;
 
@@ -90,6 +185,11 @@ namespace os
         {
           pool_addr_ = new (std::nothrow) char[blocks_ * block_size_bytes_];
           flags_ |= flags_allocated;
+        }
+      else
+        {
+          os_assert_throw(
+              attr.mp_pool_size_bytes >= (blocks_ * block_size_bytes_), ENOMEM);
         }
 
       os_assert_throw(pool_addr_ != nullptr, ENOMEM);

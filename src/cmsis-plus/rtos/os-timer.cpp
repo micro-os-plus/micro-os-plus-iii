@@ -42,13 +42,48 @@ namespace os
 // TODO: remove it when fully implemented
 //#pragma GCC diagnostic ignored "-Wunused-parameter"
 
+    /**
+     * @details
+     * The os::rtos::timer namespace groups timer types, enumerations,
+     * attributes and initialisers.
+     */
     namespace timer
     {
+      /**
+       * @class Attributes
+       * @details
+       * Allow to assign a name to the timer.
+       *
+       * To simplify access, the member variables are public and do not
+       * require accessors or mutators.
+       *
+       * @par POSIX compatibility
+       *  No POSIX similar functionality identified, but inspired by POSIX
+       *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  (IEEE Std 1003.1, 2013 Edition).
+       */
+
+      /**
+       * @class Periodic_attributes
+       * @details
+       * Allow to assign a name to the timer.
+       */
+
       const Attributes once_initializer
         { nullptr };
+
     } /* namespace timer */
 
     // ------------------------------------------------------------------------
+
+    /**
+     * @class Timer
+     * @details
+     * TODO
+     *
+     * @par POSIX compatibility
+     *  No POSIX similar functionality identified.
+     */
 
     /**
      * @details
