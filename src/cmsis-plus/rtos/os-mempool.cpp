@@ -133,13 +133,51 @@ namespace os
      * Manage a pool of same size blocks. Fast and deterministic allocation
      * and dealocation behaviour, suitable for use even in ISRs.
      *
+     * @par Example
+     *
+     * @code{.cpp}
+     * // Define the type of one pool block.
+     * typedef struct {
+     *   uint32_t length;
+     *   uint32_t width;
+     *   uint32_t height;
+     *   uint32_t weight;
+     * } properties_t;
+     *
+     * // Define the pool size.
+     * constexpr uint32_t pool_size = 10;
+     *
+     * // Create the pool object.
+     * Memory_pool mp { pool_size, sizeof(properties_t) };
+     *
+     * void
+     * func(void)
+     * {
+     *   // Do something
+     *
+     *   void* buf;
+     *
+     *   // Get one block from pool.
+     *   buf = mp.alloc();
+     *
+     *   // ... use the buffer
+     *
+     *   // Free the buffer.
+     *   mp.free(buf);
+     *
+     *   // Do something else.
+     * }
+     * @endcode
+     *
+     * @note There is no equivalent of calloc(); to initialise to
+     * zero a memory block, use:
+     * @code{.cpp}
+     * block = mp.alloc();
+     * memset (block, 0, mp.block_size ());
+     * @endcode
+     *
      * @par POSIX compatibility
      *  No POSIX similar functionality identified.
-     *
-     * @note There is no equivalent of calloc(); to initialise memory, use:
-     * @code{.cpp}
-     * memset (block, 0, pool.block_size ());
-     * @endcode
      */
 
     /**
@@ -211,6 +249,9 @@ namespace os
     }
 
     /**
+     * @details
+     * If the pool was dynamically allocated, it is automatically freed.
+     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     Memory_pool::~Memory_pool ()
@@ -242,9 +283,12 @@ namespace os
 
     /**
      * @details
-     * Allocate a fixed size memory block from the memory pool.
+     * Allocate a fixed size memory block from the memory pool. If there
+     * are no free blocks, the current task is added to the
+     * waiting list and will wait until one block is freed.
      *
-     * It uses a critical section to protect simultaneous access from
+     * The function uses a critical section to protect simultaneous
+     * access from
      * other threads or interrupts.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
@@ -290,7 +334,9 @@ namespace os
 
     /**
      * @details
-     * Allocate a fixed size memory block from the memory pool.
+     * Try to allocate a fixed size memory block from
+     * the memory pool, if available, return it, otherwise return
+     * `nullptr`.
      *
      * It uses a critical section to protect simultaneous access from
      * other threads or interrupts.
@@ -307,7 +353,10 @@ namespace os
 
     /**
      * @details
-     * Allocate a fixed size memory block from the memory pool.
+     * Allocate a fixed size memory block from the memory pool. If there
+     * are no free blocks, the current task is added to the
+     * waiting list and will wait until one block is freed or the
+     * timeout expired.
      *
      * It uses a critical section to protect simultaneous access from
      * other threads or interrupts.
@@ -375,8 +424,8 @@ namespace os
 
     /**
      * @details
-     * Return a memory block previously allocated by `alloc()` or
-     * `calloc()` back to the memory pool.
+     * Return a memory block previously allocated by `alloc()`
+     * back to the memory pool.
      *
      * It uses a critical section to protect simultaneous access from
      * other threads or interrupts.
@@ -420,7 +469,7 @@ namespace os
 
     /**
      * @details
-     * Reset the memory pool to initial state, all block are free.
+     * Reset the memory pool to the initial state, with all block free.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */

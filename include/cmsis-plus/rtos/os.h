@@ -3360,7 +3360,7 @@ namespace os
        * @brief Allocate a memory block.
        * @par Parameters
        *  None
-       * @return Pointer to memory block.
+       * @return Pointer to memory block, or `nullptr` if interrupted.
        */
       void*
       alloc (void);
@@ -3491,6 +3491,12 @@ namespace os
 #if !defined(OS_INCLUDE_PORT_RTOS_MEMORY_POOL)
       port::Tasks_list list_;
 #endif
+      /**
+       * @brief Memory address where the pool is located.
+       * @details
+       * If the pool was dynamically allocated, the `flags_allocated` bit
+       * will be set in `flags_` and the destructor will deallocate..
+       */
       char* pool_addr_;
 
 #if defined(OS_INCLUDE_PORT_RTOS_MEMORY_POOL)
@@ -3498,22 +3504,46 @@ namespace os
       os_mempool_port_data_t port_;
 #endif
 
+      /**
+       * @brief The number of blocks in the pool.
+       */
       const mempool::size_t blocks_;
+
+      /**
+       * @brief The size of a block, in bytes.
+       */
       const mempool::size_t block_size_bytes_;
 
+      /**
+       * @brief The current number of blocks allocated from the pool.
+       */
       volatile mempool::size_t count_;
 
       // All accesses will be done inside a critical section,
       // the volatile may not be needed, the variable remains stable
       // during the critical section and no loops wait for this variable.
+      /**
+       * @brief Pointer to the first free block, or nullptr.
+       */
       void* volatile first_;
 
+      /**
+       * @brief Internal status bits.
+       */
       uint8_t flags_;
+
+      /**
+       * @brief Internal bits.
+       */
       enum
         : uint8_t
           {
+            /**
+             * @brief Remember to free the allocated memory block.
+             */
             flags_allocated = 1
       };
+
       // Add more internal data.
 
       /**
@@ -4051,6 +4081,19 @@ namespace os
        */
 
       /**
+       * @brief Wait for all event flags.
+       * @param [in] mask The expected flags (OR-ed bit-mask);
+       *  may be zero.
+       * @retval result::ok All flags in the mask were raised.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @retval EINVAL The mask is outside of the permitted range.
+       * @retval EINTR The operation was interrupted.
+       * @retval ENOTRECOVERABLE Wait failed.
+       */
+      result_t
+      wait (flags::mask_t mask);
+
+      /**
        * @brief Wait for event flags.
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
@@ -4058,7 +4101,7 @@ namespace os
        *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
        *  are expected, and if the flags should be cleared.
-       * @retval result::ok All expected flags are raised.
+       * @retval result::ok All expected flags were raised.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINVAL The mask is outside of the permitted range.
        * @retval EINTR The operation was interrupted.
@@ -4068,6 +4111,18 @@ namespace os
       wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
 
       /**
+       * @brief Try to wait for all event flags.
+       * @param [in] mask The expected flags (OR-ed bit-mask);
+       *  may be zero.
+       * @retval result::ok All expected flags were raised.
+       * @retval EINVAL The mask is outside of the permitted range.
+       * @retval EAGAIN The expected condition did not occur.
+       * @retval ENOTRECOVERABLE Wait failed.
+       */
+      result_t
+      try_wait (flags::mask_t mask);
+
+      /**
        * @brief Try to wait for event flags.
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
@@ -4075,13 +4130,29 @@ namespace os
        *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
        *  are expected, and if the flags should be cleared.
-       * @retval result::ok All expected flags are raised.
+       * @retval result::ok All expected flags were raised.
        * @retval EINVAL The mask is outside of the permitted range.
        * @retval EAGAIN The expected condition did not occur.
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
       try_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
+
+      /**
+       * @brief Timed wait for all signal flags.
+       * @param [in] mask The expected flags (OR-ed bit-mask);
+       *  may be zero.
+       * @param [in] timeout Timeout to wait.
+       * @retval result::ok All expected flags are raised.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @retval ETIMEDOUT The expected condition did not occur during the
+       *  entire timeout duration.
+       * @retval EINVAL The mask is outside of the permitted range.
+       * @retval EINTR The operation was interrupted.
+       * @retval ENOTRECOVERABLE Wait failed.
+       */
+      result_t
+      timed_wait (flags::mask_t mask, duration_t timeout);
 
       /**
        * @brief Timed wait for signal flags.
@@ -4091,7 +4162,7 @@ namespace os
        *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
        *  are expected, and if the flags should be cleared.
-       * @param [in] ticks Ticks to wait.
+       * @param [in] timeout Timeout to wait.
        * @retval result::ok All expected flags are raised.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval ETIMEDOUT The expected condition did not occur during the
@@ -4102,7 +4173,7 @@ namespace os
        */
       result_t
       timed_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode,
-                  systicks_t ticks);
+                  duration_t timeout);
 
       /**
        * @brief Raise event flags.
@@ -4114,7 +4185,7 @@ namespace os
        * @retval ENOTRECOVERABLE Raise failed.
        */
       result_t
-      raise (flags::mask_t mask, flags::mask_t* oflags);
+      raise (flags::mask_t mask, flags::mask_t* oflags = nullptr);
 
       /**
        * @brief Clear event flags.
@@ -4125,7 +4196,7 @@ namespace os
        * @retval EINVAL The mask is zero.
        */
       result_t
-      clear (flags::mask_t mask, flags::mask_t* oflags);
+      clear (flags::mask_t mask, flags::mask_t* oflags = nullptr);
 
       /**
        * @brief Get/clear event flags.
@@ -4135,7 +4206,7 @@ namespace os
        * @return The selected bits from the flags mask.
        */
       flags::mask_t
-      get (flags::mask_t mask, flags::mode_t mode);
+      get (flags::mask_t mask, flags::mode_t mode = flags::mode::clear);
 
       /**
        * @brief Check if some thread is waiting.
@@ -4804,9 +4875,28 @@ namespace os
       {
         ;
       }
-
     } /* namespace evflags */
 
+    // ========================================================================
+
+    inline result_t
+    Event_flags::wait (flags::mask_t mask)
+    {
+      return wait (mask, nullptr, flags::mode::all | flags::mode::clear);
+    }
+
+    inline result_t
+    Event_flags::try_wait (flags::mask_t mask)
+    {
+      return try_wait (mask, nullptr, flags::mode::all | flags::mode::clear);
+    }
+
+    inline result_t
+    Event_flags::timed_wait (flags::mask_t mask, duration_t timeout)
+    {
+      return timed_wait (mask, nullptr, flags::mode::all | flags::mode::clear,
+                         timeout);
+    }
   // ------------------------------------------------------------------------
 
   } /* namespace rtos */

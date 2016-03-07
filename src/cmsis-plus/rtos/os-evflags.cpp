@@ -70,6 +70,43 @@ namespace os
      * Synchronised set of flags that can be used to notify events
      * between threads or between ISRs and threads.
      *
+     * @par Example
+     *
+     * @code{.cpp}
+     * Event_flags ev;
+     *
+     * void
+     * consumer(void)
+     * {
+     *   // Do something
+     *   for (; some_condition();)
+     *     {
+     *       ev.wait(0x3)
+     *       // ...
+     *       // Both flags were raised
+     *     }
+     *   // Do something else.
+     * }
+     *
+     * void
+     * producer1(void)
+     * {
+     *   // Do something
+     *   ev.raise(0x1);
+     *   // ...
+     *   // Do something else.
+     * }
+     *
+     * void
+     * producer2(void)
+     * {
+     *   // Do something
+     *   ev.raise(0x2);
+     *   // ...
+     *   // Do something else.
+     * }
+     * @endcode
+     *
      * @par POSIX compatibility
      *  No POSIX similar functionality identified.
      */
