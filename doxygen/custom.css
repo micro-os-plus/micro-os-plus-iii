@@ -152,6 +152,11 @@ div.tabs2, div.tabs3 {
 	font-size: 14px;
 }
 
+table.directory {
+	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;	
+	font-size: 14px;
+}
+
 .mdescRight, .mdescLeft, .memtemplate, .memTemplParams {
 	color: black;
 }
