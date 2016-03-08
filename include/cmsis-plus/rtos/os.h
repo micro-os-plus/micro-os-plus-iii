@@ -977,8 +977,8 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                flags::mode_t mode);
+      sig_wait (thread::sigset_t mask, thread::sigset_t* oflags = nullptr,
+                flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
       /**
        * @brief Try to wait for signal flags.
@@ -994,8 +994,8 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      try_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                    flags::mode_t mode);
+      try_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags = nullptr,
+                    flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
       /**
        * @brief Timed wait for signal flags.
@@ -1005,7 +1005,7 @@ namespace os
        *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
        *  are expected, and if the flags should be cleared.
-       * @param [in] timeout Timeout to wait, in clock units (ticks or seconds.
+       * @param [in] timeout Timeout to wait, in clock units (ticks or seconds).
        * @retval result::ok All expected flags are raised.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval ETIMEDOUT The expected condition did not occur during the
@@ -1015,8 +1015,10 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      timed_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                      flags::mode_t mode, duration_t timeout);
+      timed_sig_wait (
+          thread::sigset_t mask, duration_t timeout, thread::sigset_t* oflags =
+              nullptr,
+          flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
     } /* namespace this_thread */
 
@@ -1462,8 +1464,8 @@ namespace os
       this_thread::try_sig_wait (thread::sigset_t mask,
                                  thread::sigset_t* oflags, flags::mode_t mode);
       friend result_t
-      this_thread::timed_sig_wait (thread::sigset_t mask,
-                                   thread::sigset_t* oflags, duration_t timeout,
+      this_thread::timed_sig_wait (thread::sigset_t mask, duration_t timeout,
+                                   thread::sigset_t* oflags,
                                    flags::mode_t mode);
 
       /**
@@ -1540,7 +1542,7 @@ namespace os
        *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
        *  are expected, and if the flags should be cleared.
-       * @param [in] timeout Timeout to wait, in clock units (ticks or seconds.
+       * @param [in] timeout Timeout to wait, in clock units (ticks or seconds).
        * @retval result::ok All expected flags are raised.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval ETIMEDOUT The expected condition did not occur during the
@@ -1550,8 +1552,8 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      timed_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                      duration_t timeout, flags::mode_t mode);
+      timed_sig_wait (thread::sigset_t mask, duration_t timeout,
+                      thread::sigset_t* oflags, flags::mode_t mode);
 
       /**
        * @brief Internal wait for signal.
@@ -2080,7 +2082,7 @@ namespace os
 
       /**
        * @brief Start or restart the timer.
-       * @param [in] period Timer period, in clock units (ticks or seconds.
+       * @param [in] period Timer period, in clock units (ticks or seconds).
        * @retval result::ok The timer has been started or restarted.
        * @retval ENOTRECOVERABLE Timer could not be started.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
@@ -2466,7 +2468,7 @@ namespace os
 
       /**
        * @brief Timed attempt to lock the mutex.
-       * @param [in] timeout Timeout to wait, in clock units (ticks or seconds.
+       * @param [in] timeout Timeout to wait, in clock units (ticks or seconds).
        * @retval result::ok The mutex was locked.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval ETIMEDOUT The mutex could not be locked before the
@@ -3376,7 +3378,7 @@ namespace os
 
       /**
        * @brief Allocate a memory block with timeout.
-       * @param [in] timeout Timeout to wait, in clock units (ticks or seconds.
+       * @param [in] timeout Timeout to wait, in clock units (ticks or seconds).
        * @return Pointer to memory block, or `nullptr` if timeout.
        */
       void*
@@ -4106,19 +4108,6 @@ namespace os
        */
 
       /**
-       * @brief Wait for all event flags.
-       * @param [in] mask The expected flags (OR-ed bit-mask);
-       *  may be zero.
-       * @retval result::ok All flags in the mask were raised.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
-       * @retval EINVAL The mask is outside of the permitted range.
-       * @retval EINTR The operation was interrupted.
-       * @retval ENOTRECOVERABLE Wait failed.
-       */
-      result_t
-      wait (flags::mask_t mask);
-
-      /**
        * @brief Wait for event flags.
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
@@ -4133,19 +4122,8 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
-
-      /**
-       * @brief Try to wait for all event flags.
-       * @param [in] mask The expected flags (OR-ed bit-mask);
-       *  may be zero.
-       * @retval result::ok All expected flags were raised.
-       * @retval EINVAL The mask is outside of the permitted range.
-       * @retval EAGAIN The expected condition did not occur.
-       * @retval ENOTRECOVERABLE Wait failed.
-       */
-      result_t
-      try_wait (flags::mask_t mask);
+      wait (flags::mask_t mask, flags::mask_t* oflags,
+            flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
       /**
        * @brief Try to wait for event flags.
@@ -4161,23 +4139,8 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      try_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
-
-      /**
-       * @brief Timed wait for all signal flags.
-       * @param [in] mask The expected flags (OR-ed bit-mask);
-       *  may be zero.
-       * @param [in] timeout Timeout to wait.
-       * @retval result::ok All expected flags are raised.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
-       * @retval ETIMEDOUT The expected condition did not occur during the
-       *  entire timeout duration.
-       * @retval EINVAL The mask is outside of the permitted range.
-       * @retval EINTR The operation was interrupted.
-       * @retval ENOTRECOVERABLE Wait failed.
-       */
-      result_t
-      timed_wait (flags::mask_t mask, duration_t timeout);
+      try_wait (flags::mask_t mask, flags::mask_t* oflags = nullptr,
+                flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
       /**
        * @brief Timed wait for signal flags.
@@ -4197,8 +4160,9 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      timed_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode,
-                  duration_t timeout);
+      timed_wait (flags::mask_t mask, duration_t timeout,
+                  flags::mask_t* oflags = nullptr,
+                  flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
       /**
        * @brief Raise event flags.
@@ -4537,10 +4501,11 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline result_t
-      timed_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                      flags::mode_t mode, duration_t timeout)
+      timed_sig_wait (thread::sigset_t mask, duration_t timeout,
+                      thread::sigset_t* oflags, flags::mode_t mode)
       {
-        return this_thread::thread ().timed_sig_wait (mask, oflags, mode, timeout);
+        return this_thread::thread ().timed_sig_wait (mask, timeout, oflags,
+                                                      mode);
       }
 
       inline void
@@ -4953,28 +4918,7 @@ namespace os
       }
     } /* namespace evflags */
 
-    // ========================================================================
-
-    inline result_t
-    Event_flags::wait (flags::mask_t mask)
-    {
-      return wait (mask, nullptr, flags::mode::all | flags::mode::clear);
-    }
-
-    inline result_t
-    Event_flags::try_wait (flags::mask_t mask)
-    {
-      return try_wait (mask, nullptr, flags::mode::all | flags::mode::clear);
-    }
-
-    inline result_t
-    Event_flags::timed_wait (flags::mask_t mask, duration_t timeout)
-    {
-      return timed_wait (mask, nullptr, flags::mode::all | flags::mode::clear,
-                         timeout);
-    }
-  // ------------------------------------------------------------------------
-
+  // --------------------------------------------------------------------------
   } /* namespace rtos */
 } /* namespace os */
 

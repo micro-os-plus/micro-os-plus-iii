@@ -102,9 +102,9 @@ extern "C"
                                os_flags_mode_t mode);
 
   os_result_t
-  os_this_thread_timed_sig_wait (os_thread_sigset_t mask,
+  os_this_thread_timed_sig_wait (os_thread_sigset_t mask, os_systicks_t ticks,
                                  os_thread_sigset_t* oflags,
-                                 os_flags_mode_t mode, os_systicks_t ticks);
+                                 os_flags_mode_t mode);
 
   // --------------------------------------------------------------------------
 
@@ -402,8 +402,8 @@ extern "C"
 
   os_result_t
   os_evflags_timed_wait (os_evflags_t* evflags, os_flags_mask_t mask,
-                         os_flags_mask_t* oflags, os_flags_mode_t mode,
-                         os_systicks_t ticks);
+                         os_systicks_t ticks, os_flags_mask_t* oflags,
+                         os_flags_mode_t mode);
 
   os_result_t
   os_evflags_raise (os_evflags_t* evflags, os_flags_mask_t mask,

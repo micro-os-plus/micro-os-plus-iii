@@ -124,13 +124,13 @@ os_sched_is_locked (void)
 os_irq_status_t
 os_irq_critical_enter (void)
 {
-  return interrupts::Critical_section::enter();
+  return interrupts::Critical_section::enter ();
 }
 
 void
 os_irq_critical_exit (os_irq_status_t status)
 {
-  interrupts::Critical_section::exit(status);
+  interrupts::Critical_section::exit (status);
 }
 
 // ----------------------------------------------------------------------------
@@ -162,11 +162,10 @@ os_this_thread_try_sig_wait (os_thread_sigset_t mask,
 }
 
 os_result_t
-os_this_thread_timed_sig_wait (os_thread_sigset_t mask,
-                               os_thread_sigset_t* oflags, os_flags_mode_t mode,
-                               os_systicks_t ticks)
+os_this_thread_timed_sig_wait (os_thread_sigset_t mask, os_systicks_t ticks,
+                               os_thread_sigset_t* oflags, os_flags_mode_t mode)
 {
-  return (os_result_t) this_thread::timed_sig_wait (mask, oflags, mode, ticks);
+  return (os_result_t) this_thread::timed_sig_wait (mask, ticks, oflags, mode);
 }
 
 // ----------------------------------------------------------------------------
@@ -709,11 +708,11 @@ os_evflags_try_wait (os_evflags_t* evflags, os_flags_mask_t mask,
 
 os_result_t
 os_evflags_timed_wait (os_evflags_t* evflags, os_flags_mask_t mask,
-                       os_flags_mask_t* oflags, os_flags_mode_t mode,
-                       os_systicks_t ticks)
+                       os_systicks_t ticks, os_flags_mask_t* oflags,
+                       os_flags_mode_t mode)
 {
   return (os_result_t) (reinterpret_cast<Event_flags&> (*evflags)).timed_wait (
-      mask, oflags, mode, ticks);
+      mask, ticks, oflags, mode);
 }
 
 os_result_t
@@ -1394,9 +1393,10 @@ osSignalWait (int32_t signals, uint32_t millisec)
   else
     {
       res = this_thread::timed_sig_wait (
-          (thread::sigset_t) signals, (thread::sigset_t*) &event.value.signals,
-          flags::mode::all || flags::mode::clear,
-          Systick_clock::ticks_cast (millisec * 1000u));
+          (thread::sigset_t) signals,
+          Systick_clock::ticks_cast (millisec * 1000u),
+          (thread::sigset_t*) &event.value.signals,
+          flags::mode::all || flags::mode::clear);
     }
 
   if (res == result::ok)

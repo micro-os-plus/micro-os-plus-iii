@@ -79,7 +79,40 @@ namespace os
     /**
      * @class Timer
      * @details
-     * TODO
+     * The CMISIS++ timer schedules the execution of a user function after
+     * a programmable interval. If the timer is periodic, the function is
+     * rescheduled automatically until the timer is stopped.
+     *
+     * @par Example
+     *
+     * @code{.cpp}
+     * #include <cmsis-plus/rtos/os.h>
+     * #include <cstdlib>
+     *
+     * using namespace os::rtos;
+     *
+     * // Thread function.
+     * void
+     * func(void* args)
+     * {
+     *   // Do something.
+     *   ...
+     * }
+     *
+     * int
+     * os_main(int argc, char* argv[])
+     * {
+     *   // Create new thread, with function and no arguments.
+     *   Timer tm { func, nullptr };
+     *
+     *   // Schedule func() to be executed after 100 ticks.
+     *   tm.start(100);
+     *
+     *   // Do something.
+     *
+     *   return 0;
+     * }
+     * @endcode
      *
      * @par POSIX compatibility
      *  No POSIX similar functionality identified.
@@ -87,6 +120,9 @@ namespace os
 
     /**
      * @details
+     * The default timer is a single run timer which uses the
+     * `Systick_clock`; the period is expressed
+     * in scheduler ticks.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -109,7 +145,6 @@ namespace os
 
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
-
       os_assert_throw(function != nullptr, EINVAL);
 
       type_ = attr.tm_type;
@@ -131,6 +166,7 @@ namespace os
 
     /**
      * @details
+     * If the timer is running, it is automatically stopped.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -151,24 +187,25 @@ namespace os
 
     /**
      * @details
+     * If the period is 0, it is automatically adjusted to 1.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Timer::start (systicks_t ticks)
+    Timer::start (duration_t period)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-      trace::printf ("%s(%d) @%p \n", __func__, ticks, this);
+      trace::printf ("%s(%d) @%p \n", __func__, period, this);
 
-      if (ticks == 0)
+      if (period == 0)
         {
-          ticks = 1;
+          period = 1;
         }
 
 #if defined(OS_INCLUDE_PORT_RTOS_SEMAPHORE)
 
-      return port::Timer::start (this, ticks);
+      return port::Timer::start (this, period);
 
 #else
 
@@ -180,6 +217,10 @@ namespace os
 
     /**
      * @details
+     * Remove the timer from the clock schedule list, so that the next
+     * execution of the function is cancelled.
+     *
+     * A stopped timer can be restarted later with start()`.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */

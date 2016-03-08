@@ -322,8 +322,8 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Event_flags::timed_wait (flags::mask_t mask, flags::mask_t* oflags,
-                             flags::mode_t mode, systicks_t ticks)
+    Event_flags::timed_wait (flags::mask_t mask, systicks_t ticks,
+                             flags::mask_t* oflags, flags::mode_t mode)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
@@ -334,7 +334,7 @@ namespace os
 
 #if defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
 
-      return port::Event_flags::timed_wait (this, mask, oflags, mode, ticks);
+      return port::Event_flags::timed_wait (this, mask, ticks, oflags, mode);
 
 #else
 

@@ -149,41 +149,49 @@ namespace os
 
     } /* namespace thread */
 
-#if 0
-
-    static unsigned portBASE_TYPE
-    makeFreeRtosPriority (thread::priority_t priority)
-      {
-        unsigned portBASE_TYPE fr_prio = tskIDLE_PRIORITY;
-
-        fr_prio += (priority - thread::priority::idle);
-
-        return fr_prio;
-      }
-
-    static thread::priority_t
-    makeCmsisPriority (unsigned portBASE_TYPE priority)
-      {
-        thread::priority_t cm_prio = thread::priority::idle;
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wconversion"
-        cm_prio += (thread::priority_t) (priority - tskIDLE_PRIORITY);
-#pragma GCC diagnostic pop
-
-        return cm_prio;
-      }
-#endif
-
     /**
      * @class Thread
      * @details
-     * Supports terminating functions and a simplified version of
+     * CMSIS++ threads are inspired by POSIX threads and support
+     * functions that terminate and a simplified version of
      * signal flags.
      *
+     * @par Example
+     *
+     * @code{.cpp}
+     * #include <cmsis-plus/rtos/os.h>
+     * #include <cstdlib>
+     *
+     * using namespace os::rtos;
+     *
+     * // Thread function.
+     * void*
+     * func(void* args)
+     * {
+     *   // Do something.
+     *   ...
+     *   return nullptr;
+     * }
+     *
+     * int
+     * os_main(int argc, char* argv[])
+     * {
+     *   // Create new thread, with function and no arguments.
+     *   Thread th { func, nullptr };
+     *
+     *   // Do something.
+     *
+     *   // Wait for thread to terminate.
+     *   th.join();
+     *
+     *   return 0;
+     * }
+     * @endcode
+     *
      * @par POSIX compatibility
-     *  Inspired by `pthread_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  (IEEE Std 1003.1, 2013 Edition).
+     *  Inspired by `pthread_t`
+     *  from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
 
     /**
@@ -203,8 +211,10 @@ namespace os
 
     /**
      * @details
+     * Create a new thread, with dynamically allocated stack,
+     * of default size.
      *
-     * The thread is created executing _function_ with _args_ as its
+     * The thread is created to execute _function_ with _args_ as its
      * sole argument. If the function returns, the effect
      * shall be as if there was an implicit call to `exit()` using
      * the return value of function as the exit status. Note that
@@ -213,8 +223,10 @@ namespace os
      * be as if there was an implicit call to `exit()` using the
      * return value of `main()` as the exit status.
      *
-     * Compatible with pthread_create().
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_create()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -232,7 +244,7 @@ namespace os
      * If the attributes specified by _attr_ are modified later,
      * the thread's attributes shall not be affected.
      *
-     * The thread is created executing _function_ with _args_ as its
+     * The thread is created to execute _function_ with _args_ as its
      * sole argument. If the function returns, the effect
      * shall be as if there was an implicit call to `exit()` using
      * the return value of function as the exit status. Note that
@@ -241,8 +253,10 @@ namespace os
      * be as if there was an implicit call to `exit()` using the
      * return value of `main()` as the exit status.
      *
-     * Compatible with pthread_create().
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_create()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -298,6 +312,10 @@ namespace os
 
     /**
      * @details
+     * If the thread was created with dynamic stack, it is freed.
+     *
+     * @par POSIX compatibility
+     *  No POSIX similar functionality identified.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -331,6 +349,12 @@ namespace os
 #endif
     }
 
+    /**
+     * @details
+     *
+     * @par POSIX compatibility
+     *  Extension to standard, no POSIX similar functionality identified.
+     */
     void
     Thread::suspend (void)
     {
@@ -349,7 +373,10 @@ namespace os
 
     /**
      * @details
-     * Internal, no POSIX equivalent.
+     * Internal, used in the implementation of synchronisation objects.
+     *
+     * @par POSIX compatibility
+     *  Extension to standard, no POSIX similar functionality identified.
      *
      * @note Can be invoked from Interrupt Service Routines.
      */
@@ -392,7 +419,8 @@ namespace os
     /**
      * @details
      *
-     * No POSIX equivalent.
+     * @par POSIX compatibility
+     *  Extension to standard, no POSIX similar functionality identified.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -419,17 +447,19 @@ namespace os
     /**
      * @details
      * Set the scheduling priority for the thread to the value given
-     * by prio.
-     *
-     * pthread_setschedprio()
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_setschedprio.html
+     * by _prio_.
      *
      * If an implementation detects use of a thread ID after the end
      * of its lifetime, it is recommended that the function should
      * fail and report an `ESRCH` error.
      *
-     * The sched_prio() function shall not return an error
+     * The `sched_prio()` function shall not return an error
      * code of `EINTR`.
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_setschedprio()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_setschedprio.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -467,23 +497,26 @@ namespace os
      * @details
      * Suspend execution of the calling thread until the target thread
      * terminates, unless the target thread has already terminated.
-     * On return from a successful join() call with a non-NULL
-     * exit_ptr argument, the value passed to exit() by the
+     * On return from a successful `join()` call with a non-NULL
+     * _exit_ptr_ argument, the value passed to exit() by the
      * terminating thread shall be made available in the location
-     * referenced by exit_ptr. When a join() returns successfully,
+     * referenced by _exit_ptr_. When a `join()` returns successfully,
      * the target thread has been terminated. The results of
-     * multiple simultaneous calls to join() specifying the
+     * multiple simultaneous calls to `join()` specifying the
      * same target thread are undefined. If the thread calling
-     * join() is cancelled, then the target thread shall not be
+     * `join()` is cancelled, then the target thread shall not be
      * detached.
      *
-     * pthread_join()
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_join.html
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_join()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_join.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *
      *
      * The join() function may fail if:
      * [EDEADLK] A deadlock was detected.
      *
-     * The join() function shall not return an error code of [EINTR].
+     * The `join()` function shall not return an error code of [EINTR].
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -516,15 +549,17 @@ namespace os
      * @details
      * Indicate to the implementation that storage for the thread
      * thread can be reclaimed when that thread terminates. If
-     * thread has not terminated, detach() shall not cause it
+     * thread has not terminated, `detach()` shall not cause it
      * to terminate. The behaviour is undefined if the value
-     * specified by the thread argument to detach() does not
+     * specified by the thread argument to `detach()` does not
      * refer to a joinable thread.
      *
-     * pthread_detach()
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_detach.html
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_detach()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_detach.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
-     * The detach() function shall not return an error code of `EINTR`.
+     * The `detach()` function shall not return an error code of `EINTR`.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -554,15 +589,17 @@ namespace os
 
     /**
      * @details
-     * pthread_cancel()
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cancel.html
      *
-     *
-     * The cancel() function shall not return an error code of `EINTR`.
+     * The `cancel()` function shall not return an error code of `EINTR`.
      * If an implementation detects use of a thread ID after the end
      * of its lifetime, it is recommended that the function should
      * fail and report an `ESRCH` error.
      * error number is returned.
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_cancel()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cancel.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -585,7 +622,7 @@ namespace os
 
     /**
      * @details
-     * Terminate the calling thread and make the value value_ptr
+     * Terminate the calling thread and make the value _value_ptr_
      * available to any successful join with the terminating thread.
      * Any cancellation cleanup handlers that have been pushed and
      * not yet popped shall be popped in the reverse order that
@@ -603,18 +640,20 @@ namespace os
      * from the start routine that was used to create it.
      * The function's return value shall serve as the thread's
      * exit status.
-     * The behaviour of exit() is undefined if called from a
+     * The behaviour of `exit()` is undefined if called from a
      * cancellation cleanup handler or destructor function that
      * was invoked as a result of either an implicit or explicit
-     * call to exit().
+     * call to `exit()`.
      * After a thread has terminated, the result of access to
      * local (auto) variables of the thread is undefined.
      * Thus, references to local variables of the exiting
-     * thread should not be used for the exit() value_ptr
+     * thread should not be used for the `exit()` _value_ptr_
      * parameter value.
      *
-     * pthread_exit()
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_exit.html
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_exit()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_exit.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -646,6 +685,11 @@ namespace os
 
     /**
      * @details
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_kill()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_kill.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -926,17 +970,17 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Thread::timed_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                            flags::mode_t mode, systicks_t ticks)
+    Thread::timed_sig_wait (thread::sigset_t mask, duration_t timeout,
+                            thread::sigset_t* oflags, flags::mode_t mode)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-      trace::printf ("%s(0x%X, %d, %d) @%p %s\n", __func__, mask, mode, ticks,
+      trace::printf ("%s(0x%X, %d, %d) @%p %s\n", __func__, mask, mode, timeout,
                      this, name ());
 
-      if (ticks == 0)
+      if (timeout == 0)
         {
-          ticks = 1;
+          timeout = 1;
         }
 
         {
@@ -954,7 +998,7 @@ namespace os
       result_t res = ENOTRECOVERABLE;
       for (;;)
         {
-          Systick_clock::wait (ticks - slept_ticks);
+          Systick_clock::wait (timeout - slept_ticks);
 
           Systick_clock::rep now = Systick_clock::now ();
           slept_ticks += (Systick_clock::sleep_rep) (now - prev);
@@ -969,7 +1013,7 @@ namespace os
                 }
             }
 
-          if (slept_ticks >= ticks)
+          if (slept_ticks >= timeout)
             {
               res = ETIMEDOUT;
               break;
@@ -986,7 +1030,7 @@ namespace os
 
 #if 1
       trace::printf ("%s(0x%X, %d, %d)=%d @%p %s\n", __func__, mask, mode,
-                     ticks, slept_ticks, this, name ());
+                     timeout, slept_ticks, this, name ());
 #endif
 
       return res;
