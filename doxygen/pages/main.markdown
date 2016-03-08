@@ -9,7 +9,7 @@ For tutorials and general documentation, please use the main [project site](http
 
 ## Sections
 
-From a functinal point of view, the documentation pages can be grouped as:
+From a functional point of view, the documentation pages can be grouped as:
 
 * [CMSIS++ Core](group__cmsis-plus-core.html)
 * [CMSIS++ Startup](group__cmsis-plus-startup.html)

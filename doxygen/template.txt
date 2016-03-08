@@ -1,0 +1,167 @@
+
+	%Name - disable auto-link for Name
+	
+	
+    /**
+     * @brief
+     * @details
+     */
+     
+	/**
+	 * @par Parameters
+	 *	None
+	 */
+	
+	
+	/**
+	 * @return  Nothing.
+	 */
+
+	  /*
+       * @par Errors
+       *  The function shall not fail with an error code of `EINTR`.
+       */
+
+/**	
+ * @par Example
+ *
+ * @code{.cpp}
+ * void
+ * func(void)
+ * {
+ * ...
+ * }
+ * @endcode
+ */
+
+	/**
+	 * @cond ignore
+	 */
+	Attributes (const Attributes&) = default;
+	Attributes (Attributes&&) = default;
+	Attributes&
+	operator= (const Attributes&) = default;
+	Attributes&
+	operator= (Attributes&&) = default;
+	/**
+	 * @endcond
+	 */
+
+	/**
+	 * @cond ignore
+	 */
+    Event_flags (const Event_flags&) = delete;
+    Event_flags (Event_flags&&) = delete;
+    Event_flags&
+    operator= (const Event_flags&) = delete;
+    Event_flags&
+    operator= (Event_flags&&) = delete;
+	/**
+	 * @endcond
+	 */
+
+
+      /**
+       * @class Critical_section
+       * @brief Interrupts critical section RAII helper.
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       */
+
+      /**
+       * @class Critical_section
+       */
+       
+      // In implementation (*.cpp)
+      /**
+       * @details
+       * Use this class to define a critical section
+       *
+       * @note Can be nested as many times as required without problems,
+       * only the outer call will re-enable the interrupts.
+       *
+       * @par Example
+       *
+       * @code{.cpp}
+       * void
+       * func(void)
+       * {
+       *   // Do something
+       *   ...
+       *   // Do something else.
+       * }
+       * @endcode
+       *
+       *
+       * @par POSIX compatibility
+       *  Inspired by `pthread_cond_t` from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+       *
+       * @par POSIX compatibility
+       *  Inspired by [`pthread_cond_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cond_destroy.html)
+       *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+
+       *
+       * @par POSIX compatibility
+       *  No POSIX similar functionality identified, but inspired by POSIX
+       *  attributes used in [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+       *
+       * @par POSIX compatibility
+       *  No POSIX similar functionality identified.
+       *
+       * @par POSIX compatibility
+       *  Extension to standard, no POSIX similar functionality identified.
+       */
+   
+       /**
+         * @name Types & Constants
+         * @{
+         */
+         
+
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
+
+       /**
+         * @}
+         * @name Operators
+         * @{
+         */
+
+
+       /**
+         * @}
+         * @name Public Member Functions
+         * @{
+         */
+
+        /**
+         * @name Private Member Functions
+         * @{
+         */
+
+        /**
+         * @name Private Friends
+         * @{
+         */
+
+		// For attributes 
+       /**
+         * @name Public Member Variables
+         * @{
+         */
+
+
+        /**
+         * @name Private Member Variables
+         * @{
+         */
+	
+	    /**
+         * @}
+         */
+         
+	
