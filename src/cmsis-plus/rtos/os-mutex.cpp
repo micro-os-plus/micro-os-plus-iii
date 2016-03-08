@@ -57,8 +57,9 @@ namespace os
        * require accessors or mutators.
        *
        * @par POSIX compatibility
-       *  Inspired by `pthread_mutexattr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
+       *  Inspired by `pthread_mutexattr_t`
+       *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
        */
 
       /**
@@ -68,8 +69,9 @@ namespace os
        * robustness, etc) to the mutex.
        *
        * @par POSIX compatibility
-       *  Inspired by `pthread_mutexattr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
+       *  Inspired by `pthread_mutexattr_t`
+       *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
        */
 
       /**
@@ -86,9 +88,9 @@ namespace os
        * SCHED_FIFO scheduling policy.
        *
        * @par POSIX compatibility
-       *  Inspired by `pthread_mutexattr_setprioceiling()` from
-       *  [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_getprioceiling.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
+       *  Inspired by `pthread_mutexattr_setprioceiling()`
+       *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
        */
 
       /**
@@ -160,9 +162,9 @@ namespace os
        * other owner thread, in a recursive manner.
        *
        * @par POSIX compatibility
-       *  Inspired by `pthread_mutexattr_setprotocol()` from
-       *  [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_getprotocol.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
+       *  Inspired by `pthread_mutexattr_setprotocol()`
+       *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
        */
 
       /**
@@ -200,9 +202,9 @@ namespace os
        *   pthread_mutex_destroy().
        *
        * @par POSIX compatibility
-       *  Inspired by `pthread_mutexattr_setrobust()` from
-       *  [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_getrobust.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
+       *  Inspired by [`pthread_mutexattr_setrobust()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_setrobust.html)
+       *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
        */
 
       /**
@@ -224,9 +226,9 @@ namespace os
        * the other mutex types.
        *
        * @par POSIX compatibility
-       *  Inspired by `pthread_mutexattr_settype()` from
-       *  [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_gettype.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
+       *  Inspired by [`pthread_mutexattr_settype()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_settype.html)
+       *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
        */
 
       const Attributes normal_initializer
@@ -242,19 +244,113 @@ namespace os
     /**
      * @class Mutex
      * @details
-     * TODO
+     * A synchronisation object used to allow multiple threads to serialise
+     * their access to shared data. The name derives from the capability
+     * it provides; namely, **mutual-exclusion**. The thread that has locked
+     * a mutex becomes its owner and remains the owner until that same
+     * thread unlocks the mutex.
+     *
+     * @par Tradeoff Between Error Checks and Performance Supported
+     *
+     * Many error conditions that can occur are not required to be
+     * detected by the implementation in order to let implementations
+     * trade off performance versus degree of error checking according
+     * to the needs of their specific applications and execution
+     * environment. As a general rule, conditions caused by the
+     * system (such as insufficient memory) are required to be
+     * detected, but conditions caused by an erroneously coded
+     * application (such as failing to provide adequate synchronisation
+     * to prevent a mutex from being deleted while in use) are
+     * specified to result in undefined behaviour.
+     *
+     * A wide range of implementations is thus made possible. For
+     * example, an implementation intended for application debugging
+     * may implement all of the error checks, but an implementation
+     * running a single, provably correct application under very tight
+     * performance constraints in an embedded computer might implement
+     * minimal checks. An implementation might even be provided in two
+     * versions, similar to the options that compilers provide: a
+     * full-checking, but slower version; and a limited-checking, but
+     * faster version. To forbid this optionality would be a disservice
+     * to users.
+     *
+     * By carefully limiting the use of "undefined behaviour" only to
+     * things that an erroneous (badly coded) application might do,
+     * and by defining that resource-not-available errors are mandatory,
+     * POSIX ensures that a fully-conforming application is portable across
+     * the full range of implementations, while not forcing all
+     * implementations to add overhead to check for numerous things
+     * that a correct program never does. When the behaviour is
+     * undefined, no error number is specified to be returned on
+     * implementations that do detect the condition. This is because
+     * undefined behaviour means anything can happen, which includes
+     * returning with any value (which might happen to be a valid, but
+     * different, error number). However, since the error number might
+     * be useful to application developers when diagnosing problems
+     * during application development, a recommendation is made in
+     * rationale that implementors should return a particular error
+     * number if their implementation does detect the condition.
+     *
+     * @par Static Initialisers
+     *
+     * Providing for static initialisation of statically allocated
+     * synchronisation objects allows modules with private static
+     * synchronisation variables to avoid runtime initialisation
+     * tests and overhead. Furthermore, it simplifies the coding of
+     * self-initialising modules. Such modules are common in C
+     * libraries, where for various reasons the design calls for
+     * self-initialisation instead of requiring an explicit module
+     * initialisation function to be called. An example use of
+     * static initialisation:
+     *
+     * @code{.cpp}
+     * // Create a normal mutex. Same as using the default constructor.
+     * Mutex mx { normal_initializer };
+     *
+     * // Create a recursive mutex.
+     * Mutex rmx { recursive_initializer };
+     * @endcode
+     *
+     * @par Example
+     *
+     * @code{.cpp}
+     * // Protected resource.
+     * typedef struct {
+     *   int count;
+     * } res_t;
+     *
+     * res_t res;
+     *
+     * // Mutex to protect the resource.
+     * Mutex mx;
+     *
+     * void
+     * func(void)
+     * {
+     *   // Do something
+     *
+     *   mx.lock();
+     *   res.count++;
+     *   mx.unlock();
+     *
+     *   // Do something else.
+     * }
+     * @endcode
      *
      * @par POSIX compatibility
-     *  Inspired by `pthread_mutex_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  (IEEE Std 1003.1, 2013 Edition).
+     *  Inspired by `pthread_mutex_t`
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
 
     /**
      * @details
      * Initialise the mutex with default attributes.
      *
-     * pthread_mutex_init()
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_init.html
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_mutex_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_init.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -267,12 +363,14 @@ namespace os
 
     /**
      * @details
-     * Initialize the mutex with attributes specified by _attr_.
-     * Upon successful initialization, the state of the mutex becomes
-     * initialized and unlocked.
+     * Initialise the mutex with attributes specified by _attr_.
+     * Upon successful initialisation, the state of the mutex becomes
+     * initialised and unlocked.
      *
-     * pthread_mutex_init()
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_init.html
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_mutex_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_init.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -304,16 +402,16 @@ namespace os
 
     /**
      * @details
-     * Destroy the mutex object.
-     * It shall be safe to destroy an initialized mutex that is
+     * It shall be safe to destroy an initialised mutex that is
      * unlocked. Attempting to destroy a locked mutex or a mutex
      * that is referenced (for example, while being used in a
-     * pthread_cond_timedwait() or pthread_cond_wait()) by another
-     * thread results in undefined behavior.
-
+     * `timed_wait()` or `wait()`) by another
+     * thread results in undefined behaviour.
      *
-     * pthread_mutex_destroy()
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_init.html
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_mutex_destroy()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_destroy.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -340,16 +438,23 @@ namespace os
      * return with the mutex object referenced by mutex in the
      * locked state with the calling thread as its owner. If a
      * thread attempts to relock a mutex that it has already
-     * locked, Mutex::lock() shall behave as described in the
+     * locked, `lock()` shall behave as described in the
      * **Relock** column of the following table. If a thread
      * attempts to unlock a mutex that it has not locked or a
-     * mutex which is unlocked, Mutex::unlock() shall behave as
+     * mutex which is unlocked, `unlock()` shall behave as
      * described in the **Unlock When Not Owner** column of the
      * following table.
      *
-     * TODO: add table
+     * | %Mutex Type | Robustness | Relock    | Unlock When Not Owner |
+     * | -----------| ---------- | --------- | ----------------------|
+     * | normal     | non-robust | deadlock  | undefined behaviour   |
+     * | normal     | robust     | deadlock  | error                 |
+     * | errorcheck | either     | error     | error                 |
+     * | recursive  | either     | recursive | error                 |
+     * | default    | non-robust | undefined | undefined behaviour   |
+     * | default    | robust     | undefined | error                 |
      *
-     * Where the table indicates recursive behavior, the mutex
+     * Where the table indicates recursive behaviour, the mutex
      * shall maintain the concept of a lock count. When a thread
      * successfully acquires a mutex for the first time, the
      * lock count shall be set to one. Every time a thread
@@ -359,8 +464,10 @@ namespace os
      * count reaches zero, the mutex shall become available
      * for other threads to acquire.
      *
-     * pthread_mutex_lock()
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_lock.html
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_mutex_lock()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_lock.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -385,32 +492,34 @@ namespace os
 
     /**
      * @details
-     * Try to lock the mutex as Mutex::lock(), except that if the
+     * Try to lock the mutex as `lock()`, except that if the
      * mutex object referenced by mutex is currently locked (by
      * any thread, including the current thread), the call shall
-     * return immediately. If the mutex type is PTHREAD_MUTEX_RECURSIVE
+     * return immediately. If the mutex type is `mutex::type::recursive`
      * and the mutex is currently owned by the calling thread,
      * the mutex lock count shall be incremented by one and the
-     * Mutex::trylock() function shall immediately return success.
+     * `try_lock()` function shall immediately return success.
      *
      * If _mutex_ is a robust mutex and the process containing
      * the owning thread terminated while holding the mutex lock,
-     * a call to Mutex::lock() shall return the error value
-     * [EOWNERDEAD]. If _mutex_ is a robust mutex and the owning
+     * a call to `lock()` shall return the error value
+     * `EOWNERDEAD`. If _mutex_ is a robust mutex and the owning
      * thread terminated while holding the mutex lock, a call
-     * to Mutex::lock() may return the error value [EOWNERDEAD]
+     * to Mutex::lock() may return the error value `EOWNERDEAD`
      * even if the process in which the owning thread resides
      * has not terminated. In these cases, the mutex is locked
      * by the thread but the state it protects is marked as
      * inconsistent. The application should ensure that the
      * state is made consistent for reuse and when that is
-     * complete call Mutex::consistent(). If the application
+     * complete call `consistent()`. If the application
      * is unable to recover the state, it should unlock the
-     * mutex without a prior call to Mutex::consistent(), after
+     * mutex without a prior call to `consistent()`, after
      * which the mutex is marked permanently unusable.
      *
-     * pthread_mutex_trylock()
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_lock.html
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_mutex_trylock()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_trylock.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -437,7 +546,7 @@ namespace os
      * @details
      * Try to lock the mutex object referenced by mutex. If the mutex
      * is already locked, the calling thread shall block until the
-     * mutex becomes available as in the Mutex::lock() function. If the
+     * mutex becomes available as in the `lock()` function. If the
      * mutex cannot be locked without waiting for another thread to
      * unlock the mutex, this wait shall be terminated when the specified
      * timeout expires.
@@ -445,7 +554,7 @@ namespace os
      * The timeout shall expire after the number of time units (that
      * is when the value of that clock equals or exceeds (now()+duration).
      * The resolution of the timeout shall be the resolution of the
-     * clock on which it is based (the SysTick clock for CMSIS).
+     * clock on which it is based.
      *
      * Under no circumstance shall the function fail with a timeout
      * if the mutex can be locked immediately.
@@ -457,25 +566,27 @@ namespace os
      * adjusted as necessary to reflect the fact that this thread
      * is no longer among the threads waiting for the mutex.
      *
-     * pthread_mutex_timedlock()
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_timedlock.html
-     *
-     * Differences from the standard:
-     * - the timeout is not expressed as an absolute time point, but
-     * as a relative number of system ticks.
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_mutex_timedlock()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_timedlock.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  <br>Differences from the standard:
+     *  - the timeout is not expressed as an absolute time point, but
+     * as a relative number of timer ticks (by default, the SysTick
+     * clock for CMSIS).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Mutex::timed_lock (systicks_t ticks)
+    Mutex::timed_lock (duration_t timeout)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-      trace::printf ("%s(%d_ticks) @%p \n", __func__, ticks, this);
+      trace::printf ("%s(%d_ticks) @%p \n", __func__, timeout, this);
 
 #if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
 
-      return port::Mutex::timed_lock (this, ticks);
+      return port::Mutex::timed_lock (this, timeout);
 
 #else
 
@@ -490,16 +601,18 @@ namespace os
      * Release the mutex object referenced by _mutex_. The manner
      * in which a mutex is released is dependent upon the mutex's
      * type attribute. If there are threads blocked on the mutex
-     * object referenced by mutex when Mutex::unlock() is called,
+     * object referenced by mutex when `unlock()` is called,
      * resulting in the mutex becoming available, the scheduling
      * policy shall determine which thread shall acquire the mutex.
      *
-     * (In the case of PTHREAD_MUTEX_RECURSIVE mutexes, the mutex
+     * (In the case of `mutex::type::recursive` mutexes, the mutex
      * shall become available when the count reaches zero and the
      * calling thread no longer has any locks on this mutex.)
      *
-     * pthread_mutex_unlock()
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_lock.html
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_mutex_unlock()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_unlock.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -526,8 +639,10 @@ namespace os
      * @details
      * Return the current priority ceiling of the mutex.
      *
-     * pthread_mutex_getprioceiling()
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_getprioceiling.html
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_mutex_getprioceiling()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_getprioceiling.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -552,19 +667,21 @@ namespace os
 
     /**
      * @details
-     * Attempt to lock the mutex as if by a call to Mutex::lock(),
+     * Attempt to lock the mutex as if by a call to `lock()`,
      * except that the process of locking the mutex need not adhere
      * to the priority protect protocol. On acquiring the mutex
      * it shall change the mutex's priority ceiling and then
-     * release the mutex as if by a call to Mutex::unlock().
+     * release the mutex as if by a call to `unlock()`.
      * When the change is successful, the previous value of
      * the priority ceiling shall be returned in old_ceiling.
      *
-     * If Mutex::set_prio_ceiling() function fails, the mutex
+     * If `prio_ceiling()` function fails, the mutex
      * priority ceiling shall not be changed.
      *
-     * pthread_mutex_setprioceiling()
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_getprioceiling.html
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_mutex_setprioceiling()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_setprioceiling.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -603,23 +720,28 @@ namespace os
     /**
      * @details
      * If the robust mutex is in an inconsistent state, the
-     * Mutex::consistent() function can be used to mark the
+     * `consistent()` function can be used to mark the
      * state protected by the mutex referenced by mutex as
      * consistent again.
      *
      * If an owner of a robust mutex terminates while holding
      * the mutex, the mutex becomes inconsistent and the next
      * thread that acquires the mutex lock shall be notified
-     * of the state by the return value [EOWNERDEAD]. In this
+     * of the state by the return value `EOWNERDEAD`. In this
      * case, the mutex does not become normally usable again
      * until the state is marked consistent.
      *
      * If the thread which acquired the mutex lock with the
-     * return value [EOWNERDEAD] terminates before calling
-     * either Mutex::consistent() or Mutex::unlock(), the
+     * return value `EOWNERDEAD` terminates before calling
+     * either `consistent()` or `unlock()`, the
      * next thread that acquires the mutex lock shall be
      * notified about the state of the mutex by the return
-     * value [EOWNERDEAD].
+     * value `EOWNERDEAD`.
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_mutex_consistent()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_consistent.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -642,6 +764,11 @@ namespace os
 #endif
     }
 
+    /**
+     * @details
+     * @par POSIX compatibility
+     *  Extension to standard, no POSIX similar functionality identified.
+     */
     result_t
     Mutex::reset (void)
     {

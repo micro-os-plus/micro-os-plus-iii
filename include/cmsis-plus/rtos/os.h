@@ -1005,7 +1005,7 @@ namespace os
        *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
        *  are expected, and if the flags should be cleared.
-       * @param ticks The number of ticks to wait.
+       * @param [in] timeout Timeout to wait, in clock units (ticks or seconds.
        * @retval result::ok All expected flags are raised.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval ETIMEDOUT The expected condition did not occur during the
@@ -1016,7 +1016,7 @@ namespace os
        */
       result_t
       timed_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                      flags::mode_t mode, systicks_t ticks);
+                      flags::mode_t mode, duration_t timeout);
 
     } /* namespace this_thread */
 
@@ -1206,7 +1206,7 @@ namespace os
 #endif
 
     /**
-     * @brief POSIX compliant thread.
+     * @brief POSIX compliant **thread**.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
@@ -1463,7 +1463,7 @@ namespace os
                                  thread::sigset_t* oflags, flags::mode_t mode);
       friend result_t
       this_thread::timed_sig_wait (thread::sigset_t mask,
-                                   thread::sigset_t* oflags, systicks_t ticks,
+                                   thread::sigset_t* oflags, duration_t timeout,
                                    flags::mode_t mode);
 
       /**
@@ -1540,7 +1540,7 @@ namespace os
        *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
        *  are expected, and if the flags should be cleared.
-       * @param ticks The number of ticks to wait.
+       * @param [in] timeout Timeout to wait, in clock units (ticks or seconds.
        * @retval result::ok All expected flags are raised.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval ETIMEDOUT The expected condition did not occur during the
@@ -1551,7 +1551,7 @@ namespace os
        */
       result_t
       timed_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                      systicks_t ticks, flags::mode_t mode);
+                      duration_t timeout, flags::mode_t mode);
 
       /**
        * @brief Internal wait for signal.
@@ -1627,7 +1627,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @brief SysTick derived clock.
+     * @brief SysTick derived **clock**.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
@@ -1777,7 +1777,7 @@ namespace os
     };
 
     /**
-     * @brief Real time clock.
+     * @brief Real time **clock**.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
@@ -2011,7 +2011,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     /**
-     * @brief User timer.
+     * @brief User single-shot or periodic **timer**.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
@@ -2080,13 +2080,13 @@ namespace os
 
       /**
        * @brief Start or restart the timer.
-       * @param [in] ticks The timer period, in ticks.
+       * @param [in] period Timer period, in clock units (ticks or seconds.
        * @retval result::ok The timer has been started or restarted.
        * @retval ENOTRECOVERABLE Timer could not be started.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
       result_t
-      start (systicks_t ticks);
+      start (duration_t period);
 
       /**
        * @brief Stop the timer.
@@ -2351,7 +2351,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     /**
-     * @brief POSIX compliant mutex.
+     * @brief POSIX compliant **mutex**.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
@@ -2432,7 +2432,7 @@ namespace os
        *  containing the previous owning thread terminated while holding
        *  the mutex lock. The mutex lock shall be acquired by the calling
        *  thread and it is up to the new owner to make the state consistent.
-       * @retval EDEADLK The mutex type is PTHREAD_MUTEX_ERRORCHECK and
+       * @retval EDEADLK The mutex type is `mutex::type::errorcheck` and
        *  the current thread already owns the mutex.
        */
       result_t
@@ -2456,7 +2456,7 @@ namespace os
        *  containing the previous owning thread terminated while holding
        *  the mutex lock. The mutex lock shall be acquired by the calling
        *  thread and it is up to the new owner to make the state consistent.
-       * @retval EDEADLK The mutex type is PTHREAD_MUTEX_ERRORCHECK and
+       * @retval EDEADLK The mutex type is `mutex::type::errorcheck` and
        *  the current thread already owns the mutex.
        * @retval EBUSY The mutex could not be acquired because it was
        *  already locked.
@@ -2466,7 +2466,7 @@ namespace os
 
       /**
        * @brief Timed attempt to lock the mutex.
-       * @param [in] ticks Number of ticks to wait.
+       * @param [in] timeout Timeout to wait, in clock units (ticks or seconds.
        * @retval result::ok The mutex was locked.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval ETIMEDOUT The mutex could not be locked before the
@@ -2475,7 +2475,7 @@ namespace os
        *  is not recoverable.
        * @retval EAGAIN The mutex could not be acquired because the
        *  maximum number of recursive locks for mutex has been exceeded.
-       * @retval EDEADLK The mutex type is PTHREAD_MUTEX_ERRORCHECK
+       * @retval EDEADLK The mutex type is `mutex::type::errorcheck`
        *  and the current thread already owns the mutex.
        * @retval EINVAL The process or thread would have blocked, and
        *  the abstime parameter specified a nanoseconds field value
@@ -2487,7 +2487,7 @@ namespace os
        *  state consistent.
        */
       result_t
-      timed_lock (systicks_t ticks);
+      timed_lock (duration_t timeout);
 
       /**
        * @brief Unlock the mutex.
@@ -2495,8 +2495,8 @@ namespace os
        *  None
        * @retval result::ok The mutex was unlocked.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine;
-       *  the mutex type is PTHREAD_MUTEX_ERRORCHECK or
-       *  PTHREAD_MUTEX_RECURSIVE, or the mutex is a robust mutex,
+       *  the mutex type is `mutex::type::errorcheck` or
+       *  `mutex::type::recursive`, or the mutex is a robust mutex,
        *  and the current thread does not own the mutex.
        * @retval ENOTRECOVERABLE The mutex was not unlocked.
        */
@@ -2537,7 +2537,7 @@ namespace os
       consistent (void);
 
       /**
-       * @brief Get owner thread.
+       * @brief Get the thread that own the mutex.
        * @par Parameters
        *  None
        * @return Pointer to thread or `nullptr` if not owned.
@@ -2546,7 +2546,7 @@ namespace os
       owner (void);
 
       /**
-       * @brief Reset mutex.
+       * @brief Reset the mutex.
        * @par Parameters
        *  None
        * @retval result::ok The mutex was reset.
@@ -2670,7 +2670,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @brief POSIX compliant condition variable.
+     * @brief POSIX compliant **condition variable**.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
@@ -2985,7 +2985,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     /**
-     * @brief POSIX compliant semaphore.
+     * @brief POSIX compliant **semaphore**.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
@@ -3289,7 +3289,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     /**
-     * @brief Synchronised memory pool.
+     * @brief Synchronised **memory pool**.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
@@ -3376,11 +3376,11 @@ namespace os
 
       /**
        * @brief Allocate a memory block with timeout.
-       * @param [in] ticks The number of SysTick tick to wait.
+       * @param [in] timeout Timeout to wait, in clock units (ticks or seconds.
        * @return Pointer to memory block, or `nullptr` if timeout.
        */
       void*
-      timed_alloc (systicks_t ticks);
+      timed_alloc (duration_t timeout);
 
       /**
        * @brief Free the memory block.
@@ -3675,7 +3675,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     /**
-     * @brief POSIX compliant message queue.
+     * @brief POSIX compliant **message queue**.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
@@ -4040,7 +4040,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     /**
-     * @brief Event flags.
+     * @brief Synchronised **event flags**.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
@@ -4538,9 +4538,9 @@ namespace os
        */
       inline result_t
       timed_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                      flags::mode_t mode, systicks_t ticks)
+                      flags::mode_t mode, duration_t timeout)
       {
-        return this_thread::thread ().timed_sig_wait (mask, oflags, mode, ticks);
+        return this_thread::thread ().timed_sig_wait (mask, oflags, mode, timeout);
       }
 
       inline void
