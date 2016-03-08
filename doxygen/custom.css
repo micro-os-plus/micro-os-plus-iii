@@ -124,13 +124,13 @@ code:before, code:after {
 
 .params .paramname, .retval .paramname {
 	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;	
-	vertical-align: bottom;
+	vertical-align: top;
 	padding-right: 1em;
 }
 
 .params .paramdir {
 	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;	
-	vertical-align: middle;
+	vertical-align: top;
 }
 
 div.line {
