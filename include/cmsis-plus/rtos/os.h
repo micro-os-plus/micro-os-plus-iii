@@ -3076,7 +3076,7 @@ namespace os
       wait (void);
 
       /**
-       * @brief Try to lock  the semaphore.
+       * @brief Try to lock the semaphore.
        * @par Parameters
        *  None
        * @retval result::ok The calling process successfully
@@ -3375,7 +3375,7 @@ namespace os
       try_alloc (void);
 
       /**
-       * @brief Allocate a memory block.
+       * @brief Allocate a memory block with timeout.
        * @param [in] ticks The number of SysTick tick to wait.
        * @return Pointer to memory block, or `nullptr` if timeout.
        */
@@ -3568,6 +3568,8 @@ namespace os
        */
       using size_t = uint16_t;
 
+      constexpr size_t max_size = 0xFFFF;
+
       /**
        * @brief Type of message priority.
        * @details
@@ -3576,6 +3578,21 @@ namespace os
        * queue (higher values represent higher priorities).
        */
       using priority_t = uint8_t;
+
+      /**
+       * @brief Default message priority.
+       * @details
+       * Use this value with `send()` if no special priorities are required.
+       */
+      constexpr priority_t default_priority = 0;
+
+      /**
+       * @brief Maximum message priority.
+       * @details
+       * The maximum value allowed by the type, usually used for
+       * validation.
+       */
+      constexpr priority_t max_priority = 0xFF;
 
       /**
        * @brief Message queue attributes.
@@ -3766,7 +3783,7 @@ namespace os
        * @param [in] nbytes The length of the message. Must be not
        *  higher than the value used when creating the queue.
        * @param [in] mprio The message priority.
-       * @param [in] ticks The timeout duration, in SysTick ticks.
+       * @param [in] timeout The timeout duration.
        * @retval result::ok The message was enqueued.
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
        * @retval EMSGSIZE The specified message length, nbytes,
@@ -3780,7 +3797,7 @@ namespace os
        */
       result_t
       timed_send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio,
-                  systicks_t ticks);
+                  duration_t timeout);
 
       /**
        * @brief Receive a message from the queue.
@@ -3825,6 +3842,12 @@ namespace os
 
       /**
        * @brief Receive a message from the queue with timeout.
+       * @param [out] msg The address where to store the dequeued message.
+       * @param [in] nbytes The size of the destination buffer. Must
+       *  be lower than the value used when creating the queue.
+       * @param [out] mprio The address where to store the message
+       *  priority. May be `nullptr`.
+       * @param [in] timeout The timeout duration.
        * @retval result::ok The message was received.
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
        * @retval EMSGSIZE The specified message length, nbytes, is
@@ -3840,7 +3863,9 @@ namespace os
        */
       result_t
       timed_receive (char* msg, std::size_t nbytes, mqueue::priority_t* mprio,
-                     systicks_t ticks);
+                     duration_t timeout);
+
+      // TODO: check if some kind of peek() is useful.
 
       /**
        * @brief Get queue capacity.
@@ -4209,7 +4234,7 @@ namespace os
       get (flags::mask_t mask, flags::mode_t mode = flags::mode::clear);
 
       /**
-       * @brief Check if some thread is waiting.
+       * @brief Check if there are threads waiting.
        * @par Parameters
        *  None
        * @retval true There are threads waiting.
@@ -4757,6 +4782,7 @@ namespace os
           Named_object (name)
       {
         mp_pool_address = nullptr;
+        mp_pool_size_bytes = 0;
       }
 
     } /* namespace mempool */
@@ -4828,6 +4854,9 @@ namespace os
     /**
      * @details
      * Identical message queues should have the same memory address.
+     *
+     * @par POSIX compatibility
+     *  Extension to standard, no POSIX similar functionality identified.
      */
     inline bool
     Message_queue::operator== (const Message_queue& rhs) const
@@ -4835,30 +4864,55 @@ namespace os
       return this == &rhs;
     }
 
+    /**
+     * @details
+     * @par POSIX compatibility
+     *  Extension to standard, no POSIX similar functionality identified.
+     */
     inline std::size_t
     Message_queue::length (void) const
     {
       return count_;
     }
 
+    /**
+     * @details
+     * @par POSIX compatibility
+     *  Extension to standard, no POSIX similar functionality identified.
+     */
     inline std::size_t
     Message_queue::capacity (void) const
     {
       return msgs_;
     }
 
+    /**
+     * @details
+     * @par POSIX compatibility
+     *  Extension to standard, no POSIX similar functionality identified.
+     */
     inline std::size_t
     Message_queue::msg_size (void) const
     {
       return msg_size_bytes_;
     }
 
+    /**
+     * @details
+     * @par POSIX compatibility
+     *  Extension to standard, no POSIX similar functionality identified.
+     */
     inline bool
     Message_queue::empty (void) const
     {
       return (length () == 0);
     }
 
+    /**
+     * @details
+     * @par POSIX compatibility
+     *  Extension to standard, no POSIX similar functionality identified.
+     */
     inline bool
     Message_queue::full (void) const
     {

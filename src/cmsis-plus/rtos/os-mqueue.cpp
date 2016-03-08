@@ -53,8 +53,9 @@ namespace os
        * require accessors or mutators.
        *
        * @par POSIX compatibility
-       *  Inspired by `mq_attr` from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
+       *  Inspired by `mq_attr`
+       *  from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
        */
 
       /**
@@ -90,14 +91,62 @@ namespace os
     /**
      * @class Message_queue
      * @details
-     * Priority based, fixed size FIFO.
+     * POSIX message queues allow threads to exchange data in the form of
+     * messages. Messages are transferred to and from a queue using
+     * send() and receive(). Each message has an associated priority,
+     * and messages are always delivered to the receiving process
+     * highest priority first.
+     *
+     * @par Example
+     *
+     * @code{.cpp}
+     * // Define the message type.
+     * typedef struct {
+     *   uint32_t id;
+     * } msg_t;
+     *
+     * // Define the queue size.
+     * constexpr uint32_t queue_size = 5;
+     *
+     * Message_queue mq { queue_size, sizeof(msg_t) };
+     *
+     * void
+     * consumer(void)
+     * {
+     *   // Do something
+     *   msg_t msg;
+     *   for (; some_condition();)
+     *     {
+     *       mq.receive(&msg, sizeof(msg), nullptr);
+     *       // Process message
+     *       if (msg.id == 7)
+     *         {
+     *           // Something special
+     *         }
+      *     }
+     *   // Do something else.
+     * }
+     *
+     * void
+     * producer(void)
+     * {
+     *   // Do something
+     *   msg_t msg;
+     *   msg.id = 7;
+     *   mq.send(&msg, sizeof(msg), mqueue::default_priority);
+     *   // Do something else.
+     * }
+     * @endcode
      *
      * @par POSIX compatibility
-     *  Inspired by `mqd_t` from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
-     *  (IEEE Std 1003.1, 2013 Edition).
+     *  Inspired by `mqd_t`
+     *  from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
 
     /**
+     * @details
+     * The storage for the message queue is dynamically allocated.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -109,6 +158,9 @@ namespace os
     }
 
     /**
+     * @details
+     * If the attributes define a buffer, it is used, otherwise
+     * it is dynamically allocated.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -145,7 +197,7 @@ namespace os
 
       if (queue_addr_ == nullptr)
         {
-          // TODO: dynamically alloc queue (msgs * msg_size_bytes).
+          // TODO: dynamically allocate queue (msgs * msg_size_bytes).
         }
 
       // TODO
@@ -153,6 +205,9 @@ namespace os
     }
 
     /**
+     * @details
+     * If the storage for the message queue was dynamically allocated,
+     * it is deallocated.
      *
      */
     Message_queue::~Message_queue ()
@@ -175,23 +230,27 @@ namespace os
 
     /**
      * @details
-     * The send() function shall add the message pointed to by the argument
-     * msg to the message queue. The nbytes argument specifies the length
-     * of the message, in bytes, pointed to by msg. The value of nbytes
-     * shall be less than or equal to the msg_size_bytes parameter of the
-     * message queue object, or send() shall fail.
+     * The `Message_queue::send()` function shall add the message
+     * pointed to by the argument
+     * _msg_ to the message queue. The _nbytes_ argument specifies the length
+     * of the message, in bytes, pointed to by _msg_. The value of _nbytes_
+     * shall be less than or equal to the _msg_size_bytes_ parameter of the
+     * message queue object, or `send()` shall fail.
      *
-     * If the specified message queue is not full, send() shall behave
+     * If the specified message queue is not full, `send()`
+     * shall behave
      * as if the message is inserted into the message queue at the
-     * position indicated by the mprio argument. A message with a
-     * larger numeric value of mprio shall be inserted before messages
-     * with lower values of mprio. A message shall be inserted after
-     * other messages in the queue, if any, with equal mprio. The
-     * value of mprio shall be less than {MQ_PRIO_MAX}.
+     * position indicated by the _mprio_ argument. A message with a
+     * larger numeric value of _mprio_ shall be inserted before messages
+     * with lower values of _mprio_. A message shall be inserted after
+     * other messages in the queue, if any, with equal _mprio_. The
+     * value of _mprio_ shall be less than `mqueue::max_priority`.
      *
-     * If the specified message queue is full, send() shall block
+     * If the specified message queue is full, `send()`
+     * shall block
      * until space becomes available to enqueue the message, or
-     * until send() is cancelled/interrupted. If more than one
+     * until `send()` is cancelled/interrupted.
+     * If more than one
      * thread is waiting to send when space becomes available
      * in the message queue and the Priority Scheduling option is
      * supported, then the thread of the highest priority that has
@@ -199,8 +258,11 @@ namespace os
      * message. Otherwise, it is unspecified which waiting thread
      * is unblocked.
      *
-     * Compatible with POSIX `mq_send()` with O_NONBLOCK not set.
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_timedsend.html
+     * @par POSIX compatibility
+     *  Inspired by [`mq_send()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_send.html)
+     *  with `O_NONBLOCK` not set,
+     *  from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -231,25 +293,30 @@ namespace os
 
     /**
      * @details
-     * The send() function shall add the message pointed to by the argument
-     * msg to the message queue. The nbytes argument specifies the length
-     * of the message, in bytes, pointed to by msg. The value of nbytes
-     * shall be less than or equal to the msg_size_bytes parameter of the
-     * message queue object, or send() shall fail.
+     * The `Message_queue::try_send()` function shall try to add the message
+     * pointed to by the argument
+     * _msg_ to the message queue. The _nbytes_ argument specifies the length
+     * of the message, in bytes, pointed to by _msg_. The value of _nbytes_
+     * shall be less than or equal to the _msg_size_bytes_ parameter of the
+     * message queue object, or `try_send()` shall fail.
      *
-     * If the message queue is not full, send() shall behave
+     * If the message queue is not full, `try_send()`
+     * shall behave
      * as if the message is inserted into the message queue at the
-     * position indicated by the mprio argument. A message with a
-     * larger numeric value of mprio shall be inserted before messages
-     * with lower values of mprio. A message shall be inserted after
-     * other messages in the queue, if any, with equal mprio. The
-     * value of mprio shall be less than {MQ_PRIO_MAX}.
+     * position indicated by the _mprio_ argument. A message with a
+     * larger numeric value of _mprio_ shall be inserted before messages
+     * with lower values of _mprio_. A message shall be inserted after
+     * other messages in the queue, if any, with equal _mprio_. The
+     * value of _mprio_ shall be less than `mqueue::max_priority`.
      *
      * If the message queue is full, the message shall
-     * not be queued and try_send() shall return an error.
+     * not be queued and `try_send()` shall return an error.
      *
-     * Compatible with POSIX `mq_send()` with O_NONBLOCK set.
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_timedsend.html
+     * @par POSIX compatibility
+     *  Inspired by [`mq_send()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_send.html)
+     *  with `O_NONBLOCK` set,
+     *  from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @note Can be invoked from Interrupt Service Routines.
      */
@@ -279,61 +346,65 @@ namespace os
 
     /**
      * @details
-     * The send() function shall add the message pointed to by the argument
-     * msg to the message queue. The nbytes argument specifies the length
-     * of the message, in bytes, pointed to by msg. The value of nbytes
-     * shall be less than or equal to the msg_size_bytes attribute of the
-     * message queue object, or send() shall fail.
+     * The `Message_queue::timed_send()` function shall add the message
+     * pointed to by the argument
+     * _msg_ to the message queue. The _nbytes_ argument specifies the length
+     * of the message, in bytes, pointed to by _msg_. The value of _nbytes_
+     * shall be less than or equal to the _msg_size_bytes_ attribute of the
+     * message queue object, or `timed_send()` shall fail.
      *
-     * If the message queue is not full, send() shall behave
+     * If the message queue is not full, `timed_send()` shall behave
      * as if the message is inserted into the message queue at the
-     * position indicated by the mprio argument. A message with a
-     * larger numeric value of mprio shall be inserted before messages
-     * with lower values of mprio. A message shall be inserted after
-     * other messages in the queue, if any, with equal mprio. The
-     * value of mprio shall be less than {MQ_PRIO_MAX}.
+     * position indicated by the _mprio_ argument. A message with a
+     * larger numeric value of _mprio_ shall be inserted before messages
+     * with lower values of _mprio_. A message shall be inserted after
+     * other messages in the queue, if any, with equal _mprio_. The
+     * value of _mprio_ shall be less than `mqueue::max_priority`.
      *
      * If the message queue is full, the wait for sufficient
      * room in the queue shall be terminated when the specified timeout
      * expires.
      *
      * The timeout shall expire after the number of time units (that
-     * is when the value of that clock equals or exceeds (now()+duration).
+     * is when the value of that clock equals or exceeds (now()+timeout).
      * The resolution of the timeout shall be the resolution of the
-     * clock on which it is based (the SysTick clock for CMSIS).
+     * clock on which it is based.
      *
      * Under no circumstance shall the operation fail with a timeout
      * if there is sufficient room in the queue to add the message
      * immediately.
      *
-     * Compatible with POSIX `mq_timedsend()`.
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_timedsend.html
-     *
-     * Differences from the standard:
-     * - the timeout is not expressed as an absolute time point, but
-     * as a relative number of system ticks.
+     * @par POSIX compatibility
+     *  Inspired by [`mq_timedsend()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_timedsend.html)
+     *  with `O_NONBLOCK` not set,
+     *  from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  <br>Differences from the standard:
+     *  - the timeout is not expressed as an absolute time point, but
+     * as a relative number of timer ticks (by default, the SysTick
+     * clock for CMSIS).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
     Message_queue::timed_send (const char* msg, std::size_t nbytes,
-                               mqueue::priority_t mprio, systicks_t ticks)
+                               mqueue::priority_t mprio, duration_t timeout)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes >= msg_size_bytes_, EINVAL);
 
       trace::printf ("%s(%p,%d,%d,%d_ticks) @%p %s\n", __func__, msg, nbytes,
-                     mprio, ticks, this, name ());
+                     mprio, timeout, this, name ());
 
-      if (ticks == 0)
+      if (timeout == 0)
         {
-          ticks = 1;
+          timeout = 1;
         }
 
 #if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
 
-      return port::Message_queue::timed_send (this, msg, nbytes, mprio, ticks);
+      return port::Message_queue::timed_send (this, msg, nbytes, mprio, timeout);
 
 #else
 
@@ -347,31 +418,35 @@ namespace os
 
     /**
      * @details
-     * The receive() function shall receive the oldest of the highest
+     * The `Message_queue::receive()` function shall receive the oldest
+     * of the highest
      * priority message(s) from the message queue. If the size of the
-     * buffer in bytes, specified by the nbytes argument, is less than
-     * the msg_size_bytes attribute of the message queue, the function
+     * buffer in bytes, specified by the _nbytes_ argument, is less than
+     * the _msg_size_bytes_ attribute of the message queue, the function
      * shall fail and return an error. Otherwise, the selected message
      * shall be removed from the queue and copied to the buffer pointed
-     * to by the msg argument.
+     * to by the _msg_ argument.
      *
-     * If the value of nbytes is greater than {SSIZE_MAX}, the result
+     * If the value of _nbytes_ is greater than `mqueue::max_size`, the result
      * is implementation-defined.
      *
-     * If the argument mprio is not NULL, the priority of the selected
-     * message shall be stored in the location referenced by mprio.
+     * If the argument _mprio_ is not nullptr, the priority of the selected
+     * message shall be stored in the location referenced by _mprio_.
      *
-     * If the message queue is empty, receive() shall block
+     * If the message queue is empty, `receive()` shall block
      * until a message is enqueued on the message queue or until
-     * receive() is cancelled/interrupted. If more than one thread
+     * `receive()` is cancelled/interrupted. If more than one thread
      * is waiting to receive a message when a message arrives at
      * an empty queue and the Priority Scheduling option is supported,
      * then the thread of highest priority that has been waiting the
      * longest shall be selected to receive the message. Otherwise,
      * it is unspecified which waiting thread receives the message.
      *
-     * Compatible with POSIX `mq_receive()` with O_NONBLOCK not set.
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_receive.html#
+     * @par POSIX compatibility
+     *  Inspired by [`mq_receive()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_receive.html)
+     *  with `O_NONBLOCK` not set,
+     *  from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -382,6 +457,7 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
+      os_assert_err(nbytes >= mqueue::max_size, EMSGSIZE);
 
       trace::printf ("%s(%p,%d) @%p %s\n", __func__, msg, nbytes, this,
                      name ());
@@ -402,25 +478,29 @@ namespace os
 
     /**
      * @details
-     * The receive() function shall receive the oldest of the highest
+     * The `Message_queue::try_receive()` function shall try to receive the
+     * oldest of the highest
      * priority message(s) from the message queue. If the size of the
      * buffer in bytes, specified by the nbytes argument, is less than
-     * the msg_size_bytes attribute of the message queue, the function
+     * the _msg_size_bytes_ attribute of the message queue, the function
      * shall fail and return an error. Otherwise, the selected message
      * shall be removed from the queue and copied to the buffer pointed
-     * to by the msg argument.
+     * to by the _msg_ argument.
      *
-     * If the value of nbytes is greater than {SSIZE_MAX}, the result
+     * If the value of _nbytes_ is greater than `mqueue::max_size`, the result
      * is implementation-defined.
      *
-     * If the argument mprio is not NULL, the priority of the selected
-     * message shall be stored in the location referenced by mprio.
+     * If the argument _mprio_ is not nullptr, the priority of the selected
+     * message shall be stored in the location referenced by _mprio_.
      *
      * If the message queue is empty, no message shall be removed
-     * from the queue, and receive() shall return an error.
+     * from the queue, and `try_receive()` shall return an error.
      *
-     * Compatible with POSIX `mq_receive()` with O_NONBLOCK set.
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_receive.html#
+     * @par POSIX compatibility
+     *  Inspired by [`mq_receive()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_receive.html)
+     *  with `O_NONBLOCK` set,
+     *  from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @note Can be invoked from Interrupt Service Routines.
      */
@@ -430,6 +510,7 @@ namespace os
     {
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
+      os_assert_err(nbytes >= mqueue::max_size, EMSGSIZE);
 
       trace::printf ("%s(%p,%d) @%p %s\n", __func__, msg, nbytes, this,
                      name ());
@@ -449,47 +530,56 @@ namespace os
 
     /**
      * @details
-     * The receive() function shall receive the oldest of the highest
+     * The `Message_queue::timed_receive()` function shall receive the
+     * oldest of the highest
      * priority message(s) from the message queue. If the size of the
-     * buffer in bytes, specified by the nbytes argument, is less than
-     * the msg_size_bytes attribute of the message queue, the function
+     * buffer in bytes, specified by the _nbytes_ argument, is less than
+     * the _msg_size_bytes_ attribute of the message queue, the function
      * shall fail and return an error. Otherwise, the selected message
      * shall be removed from the queue and copied to the buffer pointed
-     * to by the msg argument.
+     * to by the _msg_ argument.
      *
-     * If the value of nbytes is greater than {SSIZE_MAX}, the result
+     * If the value of _nbytes_ is greater than `mqueue::max_size`, the result
      * is implementation-defined.
      *
-     * If the argument mprio is not NULL, the priority of the selected
-     * message shall be stored in the location referenced by mprio.
+     * If the argument _mprio_ is not nullptr, the priority of the selected
+     * message shall be stored in the location referenced by _mprio_.
      *
-     * If the message queue is empty, receive() shall block
+     * If the message queue is empty, `timed_receive()` shall block
      * until a message is enqueued on the message queue or until
-     * receive() is cancelled/interrupted. If more than one thread
+     * `timed_receive()` is cancelled/interrupted. If more than one thread
      * is waiting to receive a message when a message arrives at
      * an empty queue and the Priority Scheduling option is supported,
      * then the thread of highest priority that has been waiting the
      * longest shall be selected to receive the message. Otherwise,
      * it is unspecified which waiting thread receives the message.
      *
-     * The timed_receive() function shall receive the oldest of
+     * The `timed_receive()` function shall receive the oldest of
      * the highest priority messages from the message queue as described
-     * for the receive() function. However, if no message exists on the
+     * for the `receive()` function. However, if no message exists on the
      * queue to satisfy the receive, the wait for such a message shall
      * be terminated when the specified timeout expires.
      *
      * The timeout shall expire after the number of time units (that
      * is when the value of that clock equals or exceeds (now()+duration).
      * The resolution of the timeout shall be the resolution of the
-     * clock on which it is based (the SysTick clock for CMSIS).
+     * clock on which it is based.
      *
      * Under no circumstance shall the operation fail with a timeout
      * if a message can be removed from the message queue immediately.
-     * The validity of the abstime parameter need not be checked if a
-     * message can be removed from the message queue immediately.
      *
      * Compatible with POSIX `mq_receive()` with O_NONBLOCK set.
      * http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_receive.html#
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`mq_timedreceive()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_timedreceive.html)
+     *  with `O_NONBLOCK` not set,
+     *  from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  <br>Differences from the standard:
+     *  - the timeout is not expressed as an absolute time point, but
+     * as a relative number of timer ticks (by default, the SysTick
+     * clock for CMSIS).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -500,6 +590,7 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
+      os_assert_err(nbytes >= mqueue::max_size, EMSGSIZE);
 
       trace::printf ("%s(%p,%d,%d_ticks) @%p %s\n", __func__, msg, nbytes,
                      ticks, this, name ());
@@ -529,6 +620,9 @@ namespace os
      * @details
      * Clear both send and receive counter and return the queue to the
      * initial state.
+     *
+     * @par POSIX compatibility
+     *  Extension to standard, no POSIX similar functionality identified.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
