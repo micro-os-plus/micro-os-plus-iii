@@ -1,20 +1,20 @@
 /**
  @defgroup cmsis-plus-core CMSIS++ Core
- @brief The CMSIS++ Core summary page.
+ @brief  CMSIS++ Core summary page.
  @details
  TODO: add core definitions.
  */
 
 /**
  @defgroup cmsis-plus-rtos CMSIS++ RTOS API
- @brief The CMSIS++ RTOS API summary page.
+ @brief  CMSIS++ RTOS API summary page.
  @details
  This page groups together the main CMSIS++ RTOS API classes and namespaces. 
  */
 
 /**
  @defgroup cmsis-plus-iso CMSIS++ ISO Standard Threads
- @brief The CMSIS++ ISO Threads summary page.
+ @brief  CMSIS++ ISO Threads summary page.
  @details
  This page groups together the main CMSIS++ ISO Threads classes and namespaces.
 
@@ -24,22 +24,22 @@
 
 /**
  @defgroup cmsis-plus-drivers CMSIS++ Drivers
- @brief The CMSIS++ Drivers summary page.
+ @brief  CMSIS++ Drivers summary page.
  @details
  This page groups together the main CMSIS++ Driver classes. 
  */
 
 /**
  @defgroup cmsis-plus-diag CMSIS++ Diag
- @brief The CMSIS++ Diagnostic & Trace summary page.
+ @brief  CMSIS++ Diagnostic & Trace summary page.
  @details
  This page groups together the main classes providing support for 
-diagnostics. For example the `trace::printf()` functions are defined here.
+ diagnostics. For example the `trace::printf()` functions are defined here.
  */
 
 /**
  @defgroup cmsis-plus-posix-io CMSIS++ POSIX I/O
- @brief The CMSIS++ POSIX I/O summary page.
+ @brief  CMSIS++ POSIX I/O summary page.
  @details
  This page groups together the main classes providing support for standard
  POSIX I/O (uniform access to dtream devices, files, sockets).
