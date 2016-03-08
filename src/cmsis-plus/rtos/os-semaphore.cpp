@@ -54,8 +54,8 @@ namespace os
        *
        * @par POSIX compatibility
        *  No POSIX similar functionality identified, but inspired by POSIX
-       *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
+       *  attributes used in [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
        */
 
       /**
@@ -79,8 +79,8 @@ namespace os
        *
        * @par POSIX compatibility
        *  No POSIX similar functionality identified, but inspired by POSIX
-       *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
+       *  attributes used in [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
        */
 
       const Attributes counting_initializer
@@ -96,26 +96,44 @@ namespace os
     /**
      * @class Semaphore
      * @details
-     * Supports both counting and binary semaphores.
+     * Semaphores allow threads and interrupts to synchronise their actions.
      *
-     * Semaphores should generally be used to synchronise with
-     * events occuring on interrupts.
+     * A useful way to think of a semaphore as used in the real-world
+     * systems is as a record of how many units of a particular resource
+     * are available, coupled with operations to safely (i.e., without
+     * race conditions) adjust that record as units are required or
+     * become free, and, if necessary, wait until a unit of the resource
+     * becomes available. Semaphores are a useful tool in the prevention
+     * of race conditions; however, their use is by no means a guarantee
+     * that a program is free from these problems. Semaphores which allow
+     * an arbitrary resource count are called counting semaphores, while
+     * semaphores which are restricted to the values 0 and 1 (or
+     * locked/unlocked, unavailable/available) are called binary semaphores.
+     *
+     * Semaphores should generally be used to synchronise threads with
+     * events occurring on interrupts.
      *
      * For inter-thread synchronisation, to avoid cases of priority
      * inversion, more suitable are mutexes.
      *
      * @par POSIX compatibility
-     *  Inspired by `sem_t` from [<semaphore.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
-     *  (IEEE Std 1003.1, 2013 Edition).
+     *  Inspired by `sem_t`
+     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
 
     /**
      * @details
-     * Create and initialise a semaphore with default attributes.
-     * Initialise the semaphore with count=0 and no limit for count.
+     * Create and initialise a semaphore with default attributes
+     * (count=0 and no limit for count).
      *
      * Compatible with POSIX `sem_init()`.
      * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html#
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
+     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -128,10 +146,13 @@ namespace os
 
     /**
      * @details
-     * Create and initialise a semaphore with custom attributes.
+     * Create and initialise a semaphore with custom attributes
+     * (initial and max count from user defined attributes).
      *
-     * Compatible with POSIX `sem_init()`.
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html#
+     * @par POSIX compatibility
+     *  Inspired by [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
+     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -146,11 +167,10 @@ namespace os
       // The CMSIS validator requires the max_count to be equal to
       // the initial count, which can be 0, but we patch it on the way.
       assert (max_count_ > 0);
+      assert (attr.sm_initial_count >= 0);
       assert (attr.sm_initial_count <= max_count_);
 
       count_ = attr.sm_initial_count;
-
-      // TODO check if initial count can be negative, to validate.
 
       trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), count_,
                      max_count_);
@@ -173,8 +193,10 @@ namespace os
      * a semaphore upon which other threads are currently blocked
      * is undefined.
      *
-     * Compatible with POSIX `sem_destroy()`.
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_destroy.html
+     * @par POSIX compatibility
+     *  Inspired by [`sem_destroy()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_destroy.html)
+     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -195,7 +217,7 @@ namespace os
 
     /**
      * @details
-     * Performe a post operation on the semaphore, informing
+     * Perform a post operation on the semaphore, informing
      * the waiting consumers that one more resource is available.
      * The semaphore count is incremented, up to max_count.
      *
@@ -206,7 +228,7 @@ namespace os
      * If the count of the semaphore resulting from this operation
      * is zero, then one of the threads blocked waiting for the
      * semaphore shall be allowed to return successfully from its
-     * call to Semaphore::wait().
+     * call to `wait()`.
      *
      * If the Process Scheduling option is supported, the thread
      * to be unblocked shall be chosen in a manner appropriate to
@@ -221,8 +243,10 @@ namespace os
      * is unspecified. If the scheduling policy is SCHED_SPORADIC,
      * the semantics are as per SCHED_FIFO.
      *
-     * Compatible with POSIX `sem_post()`
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_post.html
+     * @par POSIX compatibility
+     *  Inspired by [`sem_post()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_post.html)
+     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @note Can be invoked from Interrupt Service Routines.
      *
@@ -273,14 +297,16 @@ namespace os
      * locks the semaphore or the call is interrupted by a signal.
      *
      * Upon successful return, the state of the semaphore shall
-     * be locked and shall remain locked until the post()
+     * be locked and shall remain locked until `the post()`
      * function is executed and returns successfully.
      *
      * The function is interruptible by the delivery of an external
      * event (signal, thread cancel, etc).
      *
-     * Compatible with POSIX `sem_wait()`.
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_wait.html
+     * @par POSIX compatibility
+     *  Inspired by [`sem_wait()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_wait.html)
+     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      *
@@ -327,11 +353,13 @@ namespace os
      * Otherwise, it shall not lock the semaphore.
      *
      * Upon successful return, the state of the semaphore shall
-     * be locked and shall remain locked until the post()
+     * be locked and shall remain locked until the `post()`
      * function is executed and returns successfully.
      *
-     * Compatible with POSIX `sem_trywait()`.
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_wait.html
+     * @par POSIX compatibility
+     *  Inspired by [`sem_trywait()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_trywait.html)
+     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @note Can be invoked from Interrupt Service Routines.
      *
@@ -375,36 +403,41 @@ namespace os
      * The timeout shall expire after the number of time units (that
      * is when the value of that clock equals or exceeds (now()+duration).
      * The resolution of the timeout shall be the resolution of the
-     * clock on which it is based (the SysTick clock for CMSIS).
+     * clock on which it is based.
      *
      * Under no circumstance shall the function fail with a timeout
      * if the semaphore can be locked immediately. The validity of
      * the timeout need not be checked if the semaphore can be
      * locked immediately.
      *
-     * Compatible with POSIX `sem_timedwait()`, except the time point
-     * is replaced with a duration.
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_timedwait.html
+     * @par POSIX compatibility
+     *  Inspired by [`sem_timedwait()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_timedwait.html)
+     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  <br>Differences from the standard:
+     *  - the timeout is not expressed as an absolute time point, but
+     * as a relative number of timer ticks (by default, the SysTick
+     * clock for CMSIS).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      *
      * @warning Applications using these functions may be subject to priority inversion.
      */
     result_t
-    Semaphore::timed_wait (systicks_t ticks)
+    Semaphore::timed_wait (systicks_t timeout)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-      trace::printf ("%s(%d_ticks) @%p %s\n", __func__, ticks, this, name ());
+      trace::printf ("%s(%d_ticks) @%p %s\n", __func__, timeout, this, name ());
 
-      if (ticks == 0)
+      if (timeout == 0)
         {
-          ticks = 1;
+          timeout = 1;
         }
 
 #if defined(OS_INCLUDE_PORT_RTOS_SEMAPHORE)
 
-      return port::Semaphore::timed_wait (this, ticks);
+      return port::Semaphore::timed_wait (this, timeout);
 
 #else
 
@@ -420,7 +453,7 @@ namespace os
           // Add current thread to the semaphore waiting list.
           list_.add (&this_thread::thread ());
         }
-      Systick_clock::wait (ticks);
+      Systick_clock::wait (timeout);
 
       // TODO: return EINTR
       return ETIMEDOUT;
@@ -430,7 +463,10 @@ namespace os
 
     /**
      * @details
-     * Set the counter to the initial value.
+     * Reset the counter to the initial value.
+     *
+     * @par POSIX compatibility
+     *  Extension to standard, no POSIX similar functionality identified.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */

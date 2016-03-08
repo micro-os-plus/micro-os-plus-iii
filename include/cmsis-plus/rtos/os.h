@@ -2908,12 +2908,12 @@ namespace os
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
         /**
-         * @brief Semaphore initial count.
+         * @brief %Semaphore initial count.
          */
         count_t sm_initial_count;
 
         /**
-         * @brief Semaphore max count.
+         * @brief %Semaphore max count.
          */
         count_t sm_max_count;
 
@@ -3092,7 +3092,7 @@ namespace os
 
       /**
        * @brief Timed wait to lock the semaphore.
-       * @param [in] ticks Number of ticks to wait.
+       * @param [in] timeout Timeout to wait.
        * @retval result::ok The calling process successfully
        *  performed the semaphore lock operation.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
@@ -3105,7 +3105,7 @@ namespace os
        * @retval EINTR The operation was interrupted.
        */
       result_t
-      timed_wait (systicks_t ticks);
+      timed_wait (duration_t timeout);
 
       /**
        * @brief Get the semaphore value.
@@ -4750,10 +4750,22 @@ namespace os
 
     /**
      * @details
-     * If positive, the semaphore value reflects the number of
-     * available resources.
+     * The `value()` function shall return the value of the semaphore
+     * without affecting the state of the semaphore. The value represents
+     * an actual semaphore value that occurred at some unspecified time
+     * during the call, but it need not be the actual value of the
+     * semaphore when it is returned to the calling process. This
+     * value reflects the number of available resources.
      *
-     * If negative, it counts the waiting threads.
+     * If the semaphore is locked, then the returned value shall either
+     * be set to zero or to a negative number whose absolute value
+     * represents the number of processes waiting for the semaphore
+     * at some unspecified time during the call.
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`sem_getvalue()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_getvalue.html)
+     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
     inline semaphore::count_t
     Semaphore::value (void) const
@@ -4761,12 +4773,22 @@ namespace os
       return count_;
     }
 
+    /**
+     * @details
+     * @par POSIX compatibility
+     *  Extension to standard, no POSIX similar functionality identified.
+     */
     inline semaphore::count_t
     Semaphore::initial_value (void) const
     {
       return initial_count_;
     }
 
+    /**
+     * @details
+     * @par POSIX compatibility
+     *  Extension to standard, no POSIX similar functionality identified.
+     */
     inline semaphore::count_t
     Semaphore::max_value (void) const
     {
