@@ -34,26 +34,9 @@
 
 // ----------------------------------------------------------------------------
 
-// The trace device is an independent output channel, intended for diagnostic
-// purposes.
-//
-// The API is simple, and mimics the standard C output calls:
-// - os::trace::printf()/trace_printf()
-// - os::trace::puts()/trace_puts()
-// - os::trace::putchar()/trace_putchar();
-//
-// The implementation is done in:
-// - os::trace::initialize()
-// - os::trace::write()
-// If these functions are not defined in another place, there are
-// weak definitions that simply discard the trace output.
-//
-// Trace support is enabled by adding the TRACE macro definition.
-//
-// When TRACE is not defined, all functions are inlined to empty bodies.
-// This has the advantage that the trace calls do not need to be conditionally
-// compiled with #ifdef TRACE/#endif
-
+/**
+ * @brief Insert a BKPT0 for debugger usage.
+ */
 inline void
 __attribute__((always_inline))
 trace_dbg_bkpt (void)
@@ -74,6 +57,32 @@ trace_dbg_bkpt (void)
 
 namespace os
 {
+  /**
+   * @brief Tracing support namespace.
+   * @ingroup cmsis-plus-diag
+   * @details
+   * The trace device is an independent output channel, intended
+   * for diagnostic purposes.
+   *
+   * The API is simple, and mimics the standard C output calls:
+   * - `os::trace::printf()` / `trace_printf()`
+   * - `os::trace::puts()` / `trace_puts()`
+   * - `os::trace::putchar()` / `trace_putchar()`
+   *
+   * The implementation is done in:
+   * - os::trace::initialize()
+   * - os::trace::write()
+   *
+   * If these functions are not defined in another place, there are
+   * weak definitions that simply discard the trace output.
+   *
+   * Trace support is enabled by adding the `TRACE` macro definition.
+   *
+   * When `TRACE` is not defined, all functions are inlined to empty bodies.
+   * This has the advantage that the trace calls do not need to be
+   * conditionally compiled with
+   * <tt> \#ifdef TRACE </tt> / <tt> \#endif </tt>
+   */
   namespace trace
   {
     // ----------------------------------------------------------------------
@@ -86,23 +95,62 @@ namespace os
 
     // ----------------------------------------------------------------------
 
+    /**
+     * @brief Write a formatted string to the trace device.
+     * @param [in] format A null terminate string with the format.
+     * @return A nonnegative number for success.
+     *
+     * @ingroup cmsis-plus-diag
+     */
     int
     printf (const char* format, ...);
 
+    /**
+     * @brief Write a formatted variable arguments list to the trace device.
+     * @param [in] format A null terminate string with the format.
+     * @param [in] args A variable arguments list.
+     * @return A nonnegative number for success.
+     *
+     * @ingroup cmsis-plus-diag
+     */
     int
     vprintf (const char* format, std::va_list args);
 
+    /**
+     * @brief Write the string and a line terminator to the trace device.
+     * @param s A null terminated string.
+     * @return A nonnegative number for success.
+     *
+     * @ingroup cmsis-plus-diag
+     */
     int
     puts (const char* s);
 
+    /**
+     * @brief Write the single character to the trace device.
+     * @param c A single byte character.
+     * @return The written character.
+     *
+     * @ingroup cmsis-plus-diag
+     */
     int
     putchar (int c);
 
+    /**
+     * @brief Write the argv[] array to the trace device.
+     * @param argc The number of argv[] strings.
+     * @param argv An array of pointer to args.
+     *
+     * @ingroup cmsis-plus-diag
+     */
     void
     dump_args (int argc, char* argv[]);
 
     // ------------------------------------------------------------------------
 
+    /**
+     * @brief Insert a BKPT0 for debugger usage.
+     */
     inline void
     __attribute__((always_inline))
     dbg_bkpt (void)

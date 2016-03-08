@@ -32,6 +32,7 @@ namespace os
   {
     namespace chrono
     {
+
       // ======================================================================
 
       template<typename T, typename = void>
@@ -39,16 +40,27 @@ namespace os
         {
         };
 
+      /**
+       * @cond ignore
+       */
+
       template<typename T>
         struct has_sleep_for<T,
             decltype(std::declval<T>().has_sleep_for, void())> : std::true_type
         {
         };
 
+      /**
+       * @endcond
+       */
+
+      /**
+       * @ingroup cmsis-plus-iso
+       * @{
+       */
+
       // ======================================================================
-
       // CMSIS++ SysTick clock.
-
       class Systick_clock
       {
       public:
@@ -191,6 +203,11 @@ namespace os
         static time_point
         now () noexcept;
       };
+
+    /**
+     * @}
+     */
+
     } /* namespace chrono */
   } /* namespace estd */
 } /* namespace os */

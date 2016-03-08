@@ -209,10 +209,10 @@ namespace os
 
       pool_addr_ = (char*) attr.mp_pool_address;
 
-      assert (blocks_ > 0);
+      assert(blocks_ > 0);
       // Blocks must be large enough to store the index, used
       // to construct the list of free blocks.
-      assert (block_size_bytes_ >= sizeof(std::ptrdiff_t));
+      assert(block_size_bytes_ >= sizeof(std::ptrdiff_t));
 
       flags_ = 0;
 
@@ -227,7 +227,9 @@ namespace os
       else
         {
           os_assert_throw(
-              attr.mp_pool_size_bytes >= (blocks_ * block_size_bytes_), ENOMEM);
+              attr.mp_pool_size_bytes
+                  >= ((std::size_t )(blocks_ * block_size_bytes_)),
+              ENOMEM);
         }
 
       os_assert_throw(pool_addr_ != nullptr, ENOMEM);

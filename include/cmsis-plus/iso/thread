@@ -45,8 +45,15 @@ namespace os
 {
   namespace estd
   {
-    // ======================================================================
+    /**
+     * @ingroup cmsis-plus-iso
+     * @{
+     */
 
+    // ======================================================================
+    /**
+     * @brief Standard thread.
+     */
     class thread
     {
     public:
@@ -191,27 +198,60 @@ namespace os
     operator<<(basic_ostream<charT, traits>& out, thread::id id);
 #endif
 
-    // ======================================================================
+    /**
+     * @}
+     */
 
+    // ======================================================================
+    /**
+     * @brief A namespace for functions applying to the current thread.
+     *
+     * @ingroup cmsis-plus-iso
+     */
     namespace this_thread
     {
 
+      /**
+       * @ingroup cmsis-plus-iso
+       * @{
+       */
+
+      /**
+       * @brief Return the **id** of the current running thread.
+       */
       thread::id
       get_id () noexcept;
 
+      /**
+       * @brief Yield the CPU to the next ready thread.
+       */
       void
       yield () noexcept;
 
-      // The extra Clock_T is an extension to the standard
+      /**
+       * @brief Sleep for a given duration.
+       * @param rel_time
+       * @details
+       * extra Clock_T is an extension to the standard
+       */
       template<typename Clock_T = chrono::Systick_clock, typename Rep_T,
           typename Period_T>
         constexpr void
         sleep_for (const std::chrono::duration<Rep_T, Period_T>& rel_time);
 
+      /**
+       * @brief Sleep until a given time point.
+       * @param abs_time
+       */
       template<typename Clock_T, typename Duration_T>
         void
         sleep_until (
             const std::chrono::time_point<Clock_T, Duration_T>& abs_time);
+
+    /**
+     * @}
+     */
+
     } /* namespace this_thread */
 
   } /* namespace estd */
@@ -337,7 +377,8 @@ namespace os
 
     template<typename Callable_T, typename T, typename ... Args_T>
       thread::thread (Callable_T&& f, Args_T&&... args) :
-          thread (os::rtos::thread::initializer, std::forward<Callable_T> (f),
+          thread (os::rtos::thread::initializer,
+                  std::forward < Callable_T > (f),
                   std::forward<Args_T>(args)...)
       {
         ;
@@ -346,7 +387,7 @@ namespace os
     template<typename Attr_T, typename T, typename Callable_T,
         typename ... Args_T>
       thread::thread (const Attr_T& attr, Callable_T&& f, Args_T&&... args) :
-          thread ((Attr_T&) attr, std::forward<Callable_T> (f),
+          thread ((Attr_T&) attr, std::forward < Callable_T > (f),
                   std::forward<Args_T>(args)...)
       {
         ;
@@ -369,8 +410,8 @@ namespace os
         // and deleting the object requires the type. It is passes as
         // template functions.
         Function_object* funct_obj = new Function_object (
-            std::bind (std::forward<Callable_T> (f),
-                         std::forward<Args_T>(args)...));
+            std::bind (std::forward < Callable_T > (f),
+                       std::forward<Args_T>(args)...));
 
         // The function to start the thread is a custom proxy that
         // knows how to get the variadic arguments.

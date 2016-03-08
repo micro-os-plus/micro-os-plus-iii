@@ -12,6 +12,7 @@ For tutorials and general documentation, please use the main [project site](http
 From a functinal point of view, the documentation pages can be grouped as:
 
 * [CMSIS++ Core](group__cmsis-plus-core.html)
+* [CMSIS++ Startup](group__cmsis-plus-startup.html)
 * [CMSIS++ RTOS API](group__cmsis-plus-rtos.html)
 * [CMSIS++ ISO Standard Threads](group__cmsis-plus-iso.html)
 * [CMSIS++ Drivers](group__cmsis-plus-drivers.html)

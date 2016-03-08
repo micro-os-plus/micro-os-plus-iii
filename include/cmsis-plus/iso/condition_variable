@@ -41,6 +41,11 @@ namespace os
 {
   namespace estd
   {
+    /**
+     * @ingroup cmsis-plus-iso
+     * @{
+     */
+
     // ======================================================================
 
     /**
@@ -195,6 +200,10 @@ namespace os
       using Native_clock = chrono::Systick_clock;
 
     };
+
+    /**
+     * @}
+     */
 
   } /* namespace estd */
 } /* namespace os */

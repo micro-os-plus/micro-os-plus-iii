@@ -43,8 +43,12 @@ namespace os
 {
   namespace estd
   {
-    // ======================================================================
+    /**
+     * @ingroup cmsis-plus-iso
+     * @{
+     */
 
+    // ======================================================================
     class mutex
     {
     private:
@@ -344,6 +348,10 @@ namespace os
     template<typename Callable_T, typename ...Args_T>
       void
       call_once (once_flag& flag, Callable_T&& func, Args_T&&... args);
+
+  /**
+   * @}
+   */
 
   } /* namespace estd */
 } /* namespace os */
@@ -921,7 +929,7 @@ namespace os
       call_once (once_flag& flag, Callable_T&& func, Args_T&&... args)
       {
         typedef std::tuple<Callable_T&&, Args_T&&...> Tuple;
-        Tuple tuple (std::forward<Callable_T> (func),
+        Tuple tuple (std::forward < Callable_T > (func),
                      std::forward<Args_T>(args)...);
         // TODO: implement
 #if TO_IMPLEMENT

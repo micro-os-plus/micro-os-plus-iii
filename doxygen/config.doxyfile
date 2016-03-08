@@ -54,10 +54,6 @@ EXTRACT_ANON_NSPACES = YES
 ## INPUT = 
 INPUT = \
 	"pages" \
-	"../include/cmsis-plus/rtos/os.h" \
-	"../src/cmsis-plus/rtos/" \
-	
-_INPUT = \
 	"../include/cmsis-plus/" \
 	"../src/cmsis-plus/" \
 	"../include/cmsis-plus/iso/chrono" \
@@ -65,6 +61,13 @@ _INPUT = \
 	"../include/cmsis-plus/iso/mutex" \
 	"../include/cmsis-plus/iso/system_error" \
 	"../include/cmsis-plus/iso/thread" \
+
+## test
+_INPUT = \
+	"pages" \
+	"../include/cmsis-plus/rtos/os.h" \
+	"../src/cmsis-plus/rtos/" \
+	
 
 ## FILE_PATTERNS = 
 FILE_PATTERNS = *.doxygen *.markdown *.h *.c *.cpp *.

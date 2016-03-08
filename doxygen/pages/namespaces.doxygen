@@ -16,35 +16,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CMSIS_PLUS_ISO_MALLOC_H_
-#define CMSIS_PLUS_ISO_MALLOC_H_
-
-#include <cstddef>
-
-// ----------------------------------------------------------------------------
-
-namespace os
-{
-  namespace estd
-  {
-    /**
-     * @ingroup cmsis-plus-iso
-     * @{
-     */
-
-    void*
-    malloc (std::size_t size) noexcept;
-
-    void
-    free (void *ptr) noexcept;
-
-  /**
-   * @}
-   */
-
-  } /* namespace estd */
-} /* namespace os */
-
-// ----------------------------------------------------------------------------
-
-#endif /* CMSIS_PLUS_ISO_MALLOC_H_ */
+/**
+ @namespace os::estd
+ @brief Embedded **std** namespace.
+ @ingroup cmsis-plus-iso
+ */
