@@ -756,17 +756,19 @@ namespace os
         /**
          * @brief Priorities pre-scaler.
          * @details
-         * Increasing this value widens the range of allowed
+         * Decreasing this value narrows the range of allowed
          * priorities. It is recommended to keep it low to give the
          * scheduler a chance to optimise accesses to the ready list
          * with an array of priorities, which will require some
          * pointers and counters for each priority level.
          *
-         * The default value of 0 gives 16 priorities; increasing it to
+         * The default value of 4 gives the full range of 256 priorities;
+         * 0 gives 16 priorities,
          * 1 gives 32 priorities, 2 gives 64 priorities, 3 gives 128
          * priorities.
+         * @ingroup cmsis-plus-rtos
          */
-        constexpr uint32_t shift = 0;
+        constexpr uint32_t shift = 4;
 
         /**
          * @brief Main priorities, intermediate values also possible.
@@ -777,47 +779,47 @@ namespace os
               /**
                * Undefined, thread not initialised.
                */
-              none = 0,                     //!< none
+              none = 0,
 
-          /**
-           * System reserved for IDLE thread.
-           */
-          idle = 1,                     //!< idle
+              /**
+               * System reserved for the IDLE thread.
+               */
+              idle = 1,
 
-          /**
-           * Lowest available for user code.
-           */
-          lowest = 2,                   //!< lowest
+              /**
+               * Lowest available for user code.
+               */
+              lowest = 2,
 
-          low = (2 << shift),           //!< low
+              low = (2 << shift),
 
-          below_normal = (4 << shift),  //!< below_normal
+              below_normal = (4 << shift),
 
-          /**
-           * Default priority.
-           */
-          normal = (6 << shift),        //!< normal
+              /**
+               * Default priority.
+               */
+              normal = (6 << shift),
 
-          above_normal = (8 << shift),  //!< above_normal
+              above_normal = (8 << shift),
 
-          high = (10 << shift),         //!< high
+              high = (10 << shift),
 
-          realtime = (12 << shift),     //!< realtime
+              realtime = (12 << shift),
 
-          /**
-           * Highest available for user code.
-           */
-          highest = ((16 << shift) - 3),     //!< highest
+              /**
+               * Highest available for user code.
+               */
+              highest = ((16 << shift) - 3),
 
-          /**
-           * System reserved for ISR deferred thread.
-           */
-          isr = ((16 << shift) - 2),    //!< isr
+              /**
+               * System reserved for the ISR deferred thread.
+               */
+              isr = ((16 << shift) - 2),
 
-          /**
-           * Error.
-           */
-          error = ((16 << shift) - 1)   //!< error
+              /**
+               * Error.
+               */
+              error = ((16 << shift) - 1)
         };
       } /* namespace priority */
 

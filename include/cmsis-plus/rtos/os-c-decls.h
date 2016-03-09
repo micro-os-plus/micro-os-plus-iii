@@ -52,7 +52,7 @@ extern "C"
 
   // --------------------------------------------------------------------------
 
-#define OS_PRIOTHREAD_SIZE_PTR (OS_INTEGER_MAX_NUMBER_OF_THREADS+1)
+#define OS_THREAD_PRIO_SIZE_PTR (OS_INTEGER_MAX_NUMBER_OF_THREADS+1)
 
   // --------------------------------------------------------------------------
 
@@ -62,7 +62,7 @@ extern "C"
 
   typedef struct os_thread_list_s
   {
-    void* content[OS_PRIOTHREAD_SIZE_PTR];
+    void* content[OS_THREAD_PRIO_SIZE_PTR];
   } os_thread_list_t;
 
   typedef uint32_t os_flags_mode_t;
@@ -75,7 +75,7 @@ extern "C"
 
   // --------------------------------------------------------------------------
 
-#define OS_PRIOTHREAD_SHIFT   (0)
+#define OS_THREAD_PRIO_SHIFT   (4)
 
   enum
   {
@@ -83,15 +83,15 @@ extern "C"
     os_priority_none = 0, // not defined
     os_priority_idle = 1,
     os_priority_lowest = 2, // lowest
-    os_priority_low = (2 << OS_PRIOTHREAD_SHIFT),
-    os_priority_below_normal = (4 << OS_PRIOTHREAD_SHIFT),
-    os_priority_normal = (6 << OS_PRIOTHREAD_SHIFT), // default
-    os_priority_above_normal = (8 << OS_PRIOTHREAD_SHIFT),
-    os_priority_high = (10 << OS_PRIOTHREAD_SHIFT),
-    os_priority_realtime = (12 << OS_PRIOTHREAD_SHIFT),
-    os_priority_highest = ((16 << OS_PRIOTHREAD_SHIFT) - 3),
-    os_priority_isr = ((16 << OS_PRIOTHREAD_SHIFT) - 2),
-    os_priority_error = ((16 << OS_PRIOTHREAD_SHIFT) - 1)
+    os_priority_low = (2 << OS_THREAD_PRIO_SHIFT),
+    os_priority_below_normal = (4 << OS_THREAD_PRIO_SHIFT),
+    os_priority_normal = (6 << OS_THREAD_PRIO_SHIFT), // default
+    os_priority_above_normal = (8 << OS_THREAD_PRIO_SHIFT),
+    os_priority_high = (10 << OS_THREAD_PRIO_SHIFT),
+    os_priority_realtime = (12 << OS_THREAD_PRIO_SHIFT),
+    os_priority_highest = ((16 << OS_THREAD_PRIO_SHIFT) - 3),
+    os_priority_isr = ((16 << OS_THREAD_PRIO_SHIFT) - 2),
+    os_priority_error = ((16 << OS_THREAD_PRIO_SHIFT) - 1)
   };
 
   enum
