@@ -35,7 +35,7 @@
  @defgroup cmsis-plus-rtos CMSIS++ RTOS API
  @brief  CMSIS++ RTOS API summary page.
  @details
- This page groups together the main CMSIS++ RTOS API classes and namespaces. 
+ This page groups the main CMSIS++ RTOS API classes and namespaces. 
  */
 
 /**
@@ -44,7 +44,7 @@
  @details
 
  @par Standards
- This page groups together the main CMSIS++ ISO Threads classes and namespaces.
+ This page groups the main CMSIS++ ISO Threads classes and namespaces.
 
  These definitions provide implementations for the classes defined in 
  the **C++ Standard ISO/IEC 14882:2011(E) Third edition (2011-09-01)**.
@@ -54,7 +54,7 @@
  @defgroup cmsis-plus-drivers CMSIS++ Drivers
  @brief  CMSIS++ Drivers summary page.
  @details
- This page groups together the main CMSIS++ Driver classes. 
+ This page groups the main CMSIS++ Driver classes. 
 
  TODO: add content
  */
@@ -63,7 +63,7 @@
  @defgroup cmsis-plus-diag CMSIS++ Diag
  @brief  CMSIS++ Diagnostic & Trace summary page.
  @details
- This page groups together the main classes providing support for 
+ This page groups the main classes providing support for 
  diagnostics. For example the `trace::printf()` functions are defined here.
  */
 
@@ -71,7 +71,7 @@
  @defgroup cmsis-plus-posix-io CMSIS++ POSIX I/O
  @brief  CMSIS++ POSIX I/O summary page.
  @details
- This page groups together the main classes providing support for standard
+ This page groups the main classes providing support for standard
  POSIX I/O (uniform access to dtream devices, files, sockets).
 
  TODO: add content
