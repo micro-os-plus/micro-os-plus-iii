@@ -42,10 +42,9 @@
  @defgroup cmsis-plus-iso CMSIS++ ISO Standard Threads
  @brief  CMSIS++ ISO Threads summary page.
  @details
+This page groups the main CMSIS++ ISO Threads classes and namespaces.
 
  @par Standards
- This page groups the main CMSIS++ ISO Threads classes and namespaces.
-
  These definitions provide implementations for the classes defined in 
  the **C++ Standard ISO/IEC 14882:2011(E) Third edition (2011-09-01)**.
  */

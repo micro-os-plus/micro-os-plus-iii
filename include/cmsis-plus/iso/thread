@@ -431,7 +431,6 @@ namespace os
     namespace this_thread
     {
 
-      /// yield
       inline void
       __attribute__((always_inline))
       yield () noexcept

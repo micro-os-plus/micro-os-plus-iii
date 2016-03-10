@@ -2,8 +2,8 @@
 
 body, table, div, p, dl {
 	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
-	font-size: 16px; /* 10pt; */
-	line-height: 1.6; /* 17pt; */
+	font-size: 15px; /* 16px; /* 10pt; */
+	line-height: 1.5; /* 1.6; /* 17pt; */
 }
 
 #titlearea {
@@ -64,7 +64,7 @@ div.groupHeader {
 }
 
 div.fragment {
-	font-size: 13px;
+	font-size: 80%; /* 13px; */
 	margin-left: 0px;
 	margin-bottom: 16px;
 	padding-left: 10px;
@@ -74,7 +74,7 @@ div.fragment {
 }
 
 pre.fragment {
-	font-size: 13px;
+	font-size: 80%; /* 13px; */
 	margin-left: 0px;
 	padding-left: 10px;
 	padding-right: 10px;
@@ -84,7 +84,7 @@ pre.fragment {
 
 h2.groupheader {
 	font-weight: bold;
-	font-size: 1.75em;
+	font-size: 150%; /* 1.75em; */
 	line-height: 1.225;
 	color: black;
 }
@@ -100,13 +100,13 @@ a {
 .title {
 	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
 	font-weight: bold;
-	font-size: 1.75em;
+	font-size: 150%; /* 1.75em; */
 	line-height: 1.225;
 }
 
 #nav-tree .label {
 	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
-	font-size: 14px;
+	font-size: 85%; /* 14px; */
 }
 
 code {
@@ -134,13 +134,14 @@ code:before, code:after {
 }
 
 div.line {
-	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;	
-	line-height: 1.1;
+	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+	font-size: 14px; /* <- absolute */	
+	line-height: 1.2;
 }
 
 div.tabs {
 	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;	
-	font-size: 14px;
+	font-size: 90%; /* 14px; */
 }
 
 div.tabs2, div.tabs3 {
@@ -149,14 +150,44 @@ div.tabs2, div.tabs3 {
 
 .navpath li.navelem a {
 	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;	
-	font-size: 14px;
+	font-size: 90%; /* 14px; */
 }
 
 table.directory {
 	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;	
-	font-size: 14px;
+	font-size: 90%; /* 14px; */
+	line-height: 1.2;
+}
+
+.directory td.desc {
+	padding-bottom: 3px;
 }
 
 .mdescRight, .mdescLeft, .memtemplate, .memTemplParams {
 	color: black;
+}
+
+a.el {
+	font-weight: normal;	
+}
+
+table.memname td {
+	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+	line-height: 1.1;
+}
+
+.memname {
+	font-weight: normal;
+}
+
+td.memItemLeft, td.memItemRight, td.memname, td.fieldname, td.paramtype, 
+td.paramname, td.entry, td.memTemplItemLeft, 
+td.memTemplItemRight { 
+	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+	font-size: 95%;
+}
+
+td.memTemplParams, div.memtemplate { 
+	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
+	font-size: 85%;
 }
