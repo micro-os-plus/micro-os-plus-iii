@@ -81,17 +81,17 @@ extern "C"
   {
     // Must be ordered, with none the first and error the last.
     os_priority_none = 0, // not defined
-    os_priority_idle = 1,
-    os_priority_lowest = 2, // lowest
+    os_priority_idle = (1 << OS_THREAD_PRIO_SHIFT),
+    os_priority_lowest = (2 << OS_THREAD_PRIO_SHIFT), // lowest
     os_priority_low = (2 << OS_THREAD_PRIO_SHIFT),
     os_priority_below_normal = (4 << OS_THREAD_PRIO_SHIFT),
     os_priority_normal = (6 << OS_THREAD_PRIO_SHIFT), // default
     os_priority_above_normal = (8 << OS_THREAD_PRIO_SHIFT),
     os_priority_high = (10 << OS_THREAD_PRIO_SHIFT),
     os_priority_realtime = (12 << OS_THREAD_PRIO_SHIFT),
-    os_priority_highest = ((16 << OS_THREAD_PRIO_SHIFT) - 3),
-    os_priority_isr = ((16 << OS_THREAD_PRIO_SHIFT) - 2),
-    os_priority_error = ((16 << OS_THREAD_PRIO_SHIFT) - 1)
+    os_priority_highest = (((13 + 1) << OS_THREAD_PRIO_SHIFT) - 1),
+    os_priority_isr = (((14 + 1) << OS_THREAD_PRIO_SHIFT) - 1),
+    os_priority_error = (((15 + 1) << OS_THREAD_PRIO_SHIFT) - 1)
   };
 
   enum
@@ -104,7 +104,8 @@ extern "C"
 
   enum
   {
-    os_timer_once = 0, os_timer_periodic = 1
+    os_timer_once = 0, //
+    os_timer_periodic = 1
   };
 
   typedef void* os_thread_func_args_t;
@@ -180,7 +181,7 @@ extern "C"
 
   enum
   {
-    //
+//
     os_timer_run_once = 0,
     os_timer_run_periodic = 1
   };
@@ -216,7 +217,7 @@ extern "C"
 
   enum
   {
-    //
+//
     os_mutex_protocol_none = 0,
     os_mutex_protocol_inherit = 1,
     os_mutex_protocol_protect = 2
@@ -224,14 +225,14 @@ extern "C"
 
   enum
   {
-    //
+//
     os_mutex_robustness_stalled = 0,
     os_mutex_robustness_robust = 1
   };
 
   enum
   {
-    //
+//
     os_mutex_type_normal = 0,
     os_mutex_type_errorcheck = 1,
     os_mutex_type_recursive = 2,

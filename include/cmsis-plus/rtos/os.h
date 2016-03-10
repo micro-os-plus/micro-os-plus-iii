@@ -775,7 +775,7 @@ namespace os
          * priorities.
          * @ingroup cmsis-plus-rtos
          */
-        constexpr uint32_t shift = 4;
+        constexpr uint32_t range = 4;
 
         /**
          * @brief Main priorities, intermediate values also possible.
@@ -792,42 +792,42 @@ namespace os
               /**
                * System reserved for the IDLE thread.
                */
-              idle = 1,
+              idle = (1 << range),
 
               /**
                * Lowest available for user code.
                */
-              lowest = 2,
+              lowest = (2 << range),
 
-              low = (2 << shift),
+              low = (2 << range),
 
-              below_normal = (4 << shift),
+              below_normal = (4 << range),
 
               /**
                * Default priority.
                */
-              normal = (6 << shift),
+              normal = (6 << range),
 
-              above_normal = (8 << shift),
+              above_normal = (8 << range),
 
-              high = (10 << shift),
+              high = (10 << range),
 
-              realtime = (12 << shift),
+              realtime = (12 << range),
 
               /**
                * Highest available for user code.
                */
-              highest = ((16 << shift) - 3),
+              highest = (((13 + 1) << range) - 1),
 
               /**
                * System reserved for the ISR deferred thread.
                */
-              isr = ((16 << shift) - 2),
+              isr = (((14 + 1) << range) - 1),
 
               /**
                * Error.
                */
-              error = ((16 << shift) - 1)
+              error = (((15 + 1) << range) - 1)
         };
       } /* namespace priority */
 
