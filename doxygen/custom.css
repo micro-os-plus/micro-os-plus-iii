@@ -168,7 +168,7 @@ table.directory {
 }
 
 a.el {
-	font-weight: normal;	
+	/* font-weight: normal;	*/
 }
 
 table.memname td {
@@ -177,7 +177,7 @@ table.memname td {
 }
 
 .memname {
-	font-weight: normal;
+	/* font-weight: normal; */
 }
 
 td.memItemLeft, td.memItemRight, td.memname, td.fieldname, td.paramtype, 
