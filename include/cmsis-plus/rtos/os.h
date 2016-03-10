@@ -675,6 +675,7 @@ namespace os
 
     /**
      * @brief Generic flags namespace.
+     * @ingroup cmsis-plus-rtos
      */
     namespace flags
     {
@@ -685,6 +686,7 @@ namespace os
        * 32-bits wide.
        *
        * Both thread signal flags and event flags use this definition.
+       * @ingroup cmsis-plus-rtos
        */
       using mask_t = uint32_t;
 
@@ -695,6 +697,7 @@ namespace os
        * functions returning flags.
        *
        * Both thread signal flags and event flags use this definition.
+       * @ingroup cmsis-plus-rtos
        */
       using mode_t = uint32_t;
 
@@ -702,11 +705,13 @@ namespace os
        * @brief Flags modes.
        * @details
        * Container for generic flags enumerations.
+       * @ingroup cmsis-plus-rtos
        */
       namespace mode
       {
         /**
          * @brief Bits used to specify the flags mode.
+         * @ingroup cmsis-plus-rtos
          */
         enum
           : mode_t
@@ -742,6 +747,7 @@ namespace os
        * usually an unsigned 8-bits type.
        *
        * Higher values represent higher priorities.
+       * @ingroup cmsis-plus-rtos
        */
       using priority_t = uint8_t;
 
@@ -750,6 +756,7 @@ namespace os
        * @details
        * The os::rtos::thread::priority namespace is a container for
        * priorities not restricted to an enumeration.
+       * @ingroup cmsis-plus-rtos
        */
       namespace priority
       {
@@ -772,6 +779,7 @@ namespace os
 
         /**
          * @brief Main priorities, intermediate values also possible.
+         * @ingroup cmsis-plus-rtos
          */
         enum
           : priority_t
