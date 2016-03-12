@@ -457,7 +457,7 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
-      os_assert_err(nbytes >= mqueue::max_size, EMSGSIZE);
+      os_assert_err(nbytes <= mqueue::max_size, EMSGSIZE);
 
       trace::printf ("%s(%p,%d) @%p %s\n", __func__, msg, nbytes, this,
                      name ());
@@ -510,7 +510,7 @@ namespace os
     {
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
-      os_assert_err(nbytes >= mqueue::max_size, EMSGSIZE);
+      os_assert_err(nbytes <= mqueue::max_size, EMSGSIZE);
 
       trace::printf ("%s(%p,%d) @%p %s\n", __func__, msg, nbytes, this,
                      name ());
@@ -590,7 +590,7 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
-      os_assert_err(nbytes >= mqueue::max_size, EMSGSIZE);
+      os_assert_err(nbytes <= mqueue::max_size, EMSGSIZE);
 
       trace::printf ("%s(%p,%d,%d_ticks) @%p %s\n", __func__, msg, nbytes,
                      ticks, this, name ());
