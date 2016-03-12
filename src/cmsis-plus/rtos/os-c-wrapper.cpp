@@ -1802,6 +1802,7 @@ osPoolCreate (const osPoolDef_t* pool_def)
   mempool::Attributes attr
     { pool_def->name };
   attr.mp_pool_address = pool_def->pool;
+  attr.mp_pool_size_bytes = pool_def->pool_sz;
   return reinterpret_cast<osPoolId> (new ((void*) pool_def->data) Memory_pool (
       attr, (mempool::size_t) pool_def->items,
       (mempool::size_t) pool_def->item_sz));
@@ -2134,6 +2135,7 @@ osMailCreate (const osMailQDef_t* queue_def,
   mempool::Attributes pool_attr
     { queue_def->name };
   pool_attr.mp_pool_address = queue_def->pool;
+  pool_attr.mp_pool_size_bytes = queue_def->pool_sz;
   new ((void*) &queue_def->data->pool) Memory_pool (
       pool_attr, (mempool::size_t) queue_def->items,
       (mempool::size_t) queue_def->pool_item_sz);
