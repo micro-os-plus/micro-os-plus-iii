@@ -41,11 +41,7 @@
 #include <string.h>
 #include <errno.h>
 
-#if DEBUG
 #include <assert.h>
-#else
-#define assert(x) ((void)0)
-#endif
 
 #ifndef MAX
 #define MAX(a,b) ((a) >= (b) ? (a) : (b))
@@ -240,7 +236,7 @@ _sbrk (ptrdiff_t incr);
 #define DEFINE_CALLOC
 #define DEFINE_REALLOC
 #define DEFINE_MALLINFO
-//#define DEFINE_MALLOC_STATS
+#define DEFINE_MALLOC_STATS
 #define DEFINE_MALLOC_USABLE_SIZE
 #define DEFINE_MEMALIGN
 #define DEFINE_MALLOPT
@@ -658,24 +654,26 @@ _mallinfo_r (void* impure __attribute__((unused)))
 #endif /* DEFINE_MALLINFO */
 
 #ifdef DEFINE_MALLOC_STATS
-void nano_malloc_stats(RONEARG)
-  {
-    nano_mallinfo(RONECALL);
-    fiprintf(stderr, "max system bytes = %10u\n",
-        current_mallinfo.arena);
-    fiprintf(stderr, "system bytes     = %10u\n",
-        current_mallinfo.arena);
-    fiprintf(stderr, "in use bytes     = %10u\n",
-        current_mallinfo.uordblks);
-  }
+void nano_malloc_stats (RONEARG)
+{
+  nano_mallinfo (RONECALL);
+  fiprintf (stderr, "max system bytes = %10u\n",
+  current_mallinfo.arena);
+  fiprintf (stderr, "system bytes     = %10u\n",
+  current_mallinfo.arena);
+  fiprintf (stderr, "in use bytes     = %10u\n",
+  current_mallinfo.uordblks);
+}
 
 // [ILG]
-void _malloc_stats_r(void*);
+void
+_malloc_stats_r (void*);
 
-void _malloc_stats_r(void* impure __attribute__((unused)))
-  {
-    return nano_malloc_stats();
-  }
+void
+_malloc_stats_r (void* impure __attribute__((unused)))
+{
+  return nano_malloc_stats ();
+}
 // -----
 
 #endif /* DEFINE_MALLOC_STATS */
