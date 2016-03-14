@@ -449,8 +449,8 @@ __posix_write (int fildes, const void* buf, size_t nbyte)
 
   pfd->pos += nbyte - res;
 
-  // We wrote 0 bytes?
-  // Retrieve errno just in case.
+  // Did we write 0 bytes?
+  // Retrieve errno for just in case.
   if ((nbyte - res) == 0)
     {
       return __semihosting_error (0);
@@ -1038,8 +1038,8 @@ __posix_readlink (const char* path, char* buf, size_t bufsize)
 
 // ----------------------------------------------------------------------------
 
-void
-_exit (int status)
+extern "C" void
+_Exit (int status)
 {
 #if defined(_DEBUG)
   // Temporarily disable it, until QEMU fix.
@@ -1054,6 +1054,9 @@ _exit (int status)
   report_exception (
       status == 0 ? ADP_Stopped_ApplicationExit : ADP_Stopped_RunTimeError);
 }
+
+extern "C" void __attribute__((alias ("_Exit")))
+_exit (int status);
 
 // ----------------------------------------------------------------------------
 
