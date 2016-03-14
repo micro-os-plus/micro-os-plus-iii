@@ -19,6 +19,7 @@
 #include <cmsis-plus/diag/trace.h>
 
 #include <stdint.h>
+#include <stdlib.h>
 #include <sys/types.h>
 
 // ----------------------------------------------------------------------------
@@ -82,17 +83,8 @@ extern unsigned int __bss_regions_array_end;
 extern void
 __initialize_args (int*, char***);
 
-// main() is the entry point for newlib based applications.
-// By default, there are no arguments, but this can be customised
-// by redefining __initialize_args(), which is done when the
-// semihosting configurations are used.
 extern int
 main (int argc, char* argv[]);
-
-// The implementation for the exit routine; for embedded
-// applications, a system reset will be performed.
-extern void __attribute__((noreturn))
-_exit (int);
 
 // ----------------------------------------------------------------------------
 
@@ -179,7 +171,7 @@ __run_init_array (void)
 }
 
 // Run all the cleanup routines (mainly static destructors).
-inline void __attribute__((always_inline))
+void
 __run_fini_array (void)
 {
   int count;
@@ -192,7 +184,7 @@ __run_fini_array (void)
   // If you need to run the code in the .fini section, please use
   // the startup files, since this requires the code in crti.o and crtn.o
   // to add the function prologue/epilogue.
-  //_fini(); // DO NOT ENABE THIS!
+  //_fini(); // DO NOT ENABLE THIS!
 }
 
 #if defined(DEBUG) && (OS_INCLUDE_STARTUP_GUARD_CHECKS)
@@ -323,15 +315,8 @@ _start (void)
   // Call the main entry point, and save the exit code.
   int code = main (argc, argv);
 
-  // Run the C++ static destructors.
-  __run_fini_array ();
-
-  _exit (code);
-
-  // Should never reach this, _exit() should have already
-  // performed a reset.
-  for (;;)
-    ;
+  // Also run the C++ static destructors.
+  exit (code);
   /* NOTREACHED */
 }
 
