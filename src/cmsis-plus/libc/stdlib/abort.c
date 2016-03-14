@@ -21,17 +21,12 @@
 
 // ----------------------------------------------------------------------------
 
-extern void __attribute__((noreturn))
-_exit (int code);
-
-// ----------------------------------------------------------------------------
-
 void __attribute__((weak,noreturn))
 abort (void)
 {
   trace_puts ("abort(), exiting...");
 
-  _exit (1);
+  _Exit (1);
   /* NOTREACHED */
 }
 
