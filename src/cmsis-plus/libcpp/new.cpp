@@ -32,10 +32,56 @@
  * @brief Global synchronised new/delete definitions.
  */
 
+#if defined(__ARM_EABI__)
+
 #include <cstddef>
 #include <cstdlib>
 #include <new>
 #include <cmsis-plus/iso/malloc.h>
+
+const std::nothrow_t std::nothrow = std::nothrow_t
+  { };
+
+using std::new_handler;
+namespace
+{
+  /**
+   * @brief The current new handler.
+   * @details
+   * The initial new_handler is a null pointer.
+   */
+  new_handler __new_handler;
+}
+
+/**
+ * @brief Establishes the function designated by handler as the current new_handler.
+ * @param handler
+ * @return The previous handler.
+ * @details
+ * The initial new_handler is a null pointer.
+ */
+new_handler
+std::set_new_handler (new_handler handler) noexcept
+{
+  new_handler prev_handler;
+
+  // TODO: add scheduler lock
+  prev_handler = __new_handler;
+  __new_handler = handler;
+
+  return prev_handler;
+}
+
+new_handler
+std::get_new_handler () noexcept
+{
+  new_handler handler;
+
+  // TODO: add scheduler lock
+  handler = __new_handler;
+
+  return handler;
+}
 
 /**
  * @details
@@ -65,22 +111,24 @@ operator new (std::size_t size) noexcept
 
   void* p;
 
-  // Synchronisation primitives used by estd::malloc
+  // Synchronisation primitives already used by estd::malloc,
+  // no need to use them again here.
   while ((p = os::estd::malloc (size)) == 0)
     {
-#if 0
-// If malloc fails and there is a new_handler,
-// call it to try free up memory.
-//    std::new_handler nh = std::get_new_handler();
-//    if (nh)
-//    nh();
-//    else
-#endif
+      // If malloc() fails and there is a new_handler,
+      // call it to try free up memory.
+      if (__new_handler)
+        {
+          __new_handler ();
+        }
+      else
+        {
 #if defined(__EXCEPTIONS)
-      throw std::bad_alloc();
+          throw std::bad_alloc();
 #else
-      break;
+          break;
 #endif
+        }
     }
   return p;
 }
@@ -260,3 +308,5 @@ operator delete[] (void* ptr, const std::nothrow_t&) noexcept
 {
   ::operator delete[] (ptr);
 }
+
+#endif /* defined(__ARM_EABI__) */
