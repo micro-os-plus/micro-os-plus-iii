@@ -46,7 +46,10 @@
 #define MAX(a,b) ((a) >= (b) ? (a) : (b))
 #endif
 
-#define _SBRK_R(X) _sbrk_r(X)
+// [ILG]
+#define _SBRK_R(X) _sbrk(X)
+//#define _SBRK_R(X) _sbrk_r(X)
+// -----
 
 #ifdef INTERNAL_NEWLIB
 
@@ -79,8 +82,16 @@
 
 #else /* ! INTERNAL_NEWLIB */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
 #define RARG
-#define RONEARG
+
+// [ILG]
+#define RONEARG void
+//#define RONEARG
+
 #define RCALL
 #define RONECALL
 #define MALLOC_LOCK
@@ -102,9 +113,16 @@
 #endif /* ! INTERNAL_NEWLIB */
 
 /* Redefine names to avoid conflict with user names */
+// [ILG]
+#if 1
+#define free_list __os_malloc_free_list
+#define sbrk_start __os_malloc_sbrk_start
+#define current_mallinfo __os_malloc_current_mallinfo
+#else
 #define free_list __malloc_free_list
 #define sbrk_start __malloc_sbrk_start
 #define current_mallinfo __malloc_current_mallinfo
+#endif
 
 #define ALIGN_TO(size, align) \
     (((size) + (align) -1L) & ~((align) -1L))
@@ -194,6 +212,24 @@ static inline chunk * get_chunk_from_ptr(void * ptr)
     return c;
 }
 
+// [ILG]
+extern void*
+_sbrk (ptrdiff_t incr);
+
+#define DEFINE_MALLOC
+#define DEFINE_FREE
+#define DEFINE_CFREE
+#define DEFINE_CALLOC
+#define DEFINE_REALLOC
+#define DEFINE_MALLINFO
+//#define DEFINE_MALLOC_STATS
+#define DEFINE_MALLOC_USABLE_SIZE
+#define DEFINE_MEMALIGN
+#define DEFINE_MALLOPT
+#define DEFINE_VALLOC
+#define DEFINE_PVALLOC
+// -----
+
 #ifdef DEFINE_MALLOC
 /* List list header of free blocks */
 chunk * free_list = NULL;
@@ -213,7 +249,9 @@ static void* sbrk_aligned(RARG malloc_size_t s)
 
     if (sbrk_start == NULL) sbrk_start = _SBRK_R(RCALL 0);
 
-    p = _SBRK_R(RCALL s);
+    // [ILG]
+    p = (char*)_SBRK_R(RCALL (ptrdiff_t)s);
+    // p = _SBRK_R(RCALL s);
 
     /* sbrk returns -1 if fail to allocate */
     if (p == (void *)-1)
@@ -265,7 +303,9 @@ void * nano_malloc(RARG malloc_size_t s)
         int rem = r->size - alloc_size;
         if (rem >= 0)
         {
-            if (rem >= MALLOC_MINCHUNK)
+            // [ILG]
+            if (((size_t)rem) >= MALLOC_MINCHUNK)
+            // if (rem >= MALLOC_MINCHUNK)
             {
                 /* Find a chunk that much larger than required size, break
                 * it into two chunks and return the second one */
@@ -321,6 +361,19 @@ void * nano_malloc(RARG malloc_size_t s)
     assert(align_ptr + size <= (char *)r + alloc_size);
     return align_ptr;
 }
+
+#if 1
+// [ILG]
+void * _malloc_r(void*, malloc_size_t s);
+
+void * _malloc_r(void* reent __attribute__((unused)),
+                 malloc_size_t s)
+{
+  return nano_malloc(s);
+}
+#endif
+// -----
+
 #endif /* DEFINE_MALLOC */
 
 #ifdef DEFINE_FREE
@@ -423,6 +476,16 @@ void nano_free (RARG void * free_p)
     }
     MALLOC_UNLOCK;
 }
+
+// [ILG]
+void _free_r (void*, void * free_p);
+
+void _free_r (void* impure __attribute__((unused)), void * free_p)
+{
+  return nano_free(free_p);
+}
+// -----
+
 #endif /* DEFINE_FREE */
 
 #ifdef DEFINE_CFREE
@@ -430,6 +493,16 @@ void nano_cfree(RARG void * ptr)
 {
     nano_free(RCALL ptr);
 }
+
+// [ILG]
+void _cfree_r(void*, void * ptr);
+
+void _cfree_r(void* impure __attribute__((unused)), void * ptr)
+{
+  return nano_free(ptr);
+}
+// -----
+
 #endif /* DEFINE_CFREE */
 
 #ifdef DEFINE_CALLOC
@@ -441,6 +514,14 @@ void * nano_calloc(RARG malloc_size_t n, malloc_size_t elem)
     if (mem != NULL) memset(mem, 0, n * elem);
     return mem;
 }
+
+void * _calloc_r(void*, malloc_size_t n, malloc_size_t elem);
+void * _calloc_r(void* impure __attribute__((unused)),
+                   malloc_size_t n, malloc_size_t elem)
+{
+  return nano_calloc(n, elem);
+}
+
 #endif /* DEFINE_CALLOC */
 
 #ifdef DEFINE_REALLOC
@@ -449,7 +530,8 @@ void * nano_calloc(RARG malloc_size_t n, malloc_size_t elem)
 void * nano_realloc(RARG void * ptr, malloc_size_t size)
 {
     void * mem;
-    chunk * p_to_realloc;
+    // [ILG]
+    // chunk * p_to_realloc;
 
     if (ptr == NULL) return nano_malloc(RCALL size);
 
@@ -472,6 +554,15 @@ void * nano_realloc(RARG void * ptr, malloc_size_t size)
     }
     return mem;
 }
+
+// [ILG]
+void * _realloc_r(void*, void * ptr, malloc_size_t size);
+void * _realloc_r(void* impure __attribute__((unused)),
+                  void * ptr, malloc_size_t size)
+{
+  return nano_realloc(ptr, size);
+}
+
 #endif /* DEFINE_REALLOC */
 
 #ifdef DEFINE_MALLINFO
@@ -506,6 +597,16 @@ struct mallinfo nano_mallinfo(RONEARG)
     MALLOC_UNLOCK;
     return current_mallinfo;
 }
+
+// [ILG]
+struct mallinfo _mallinfo_r(void*);
+
+struct mallinfo _mallinfo_r(void* impure __attribute__((unused)))
+{
+  return nano_mallinfo();
+}
+// -----
+
 #endif /* DEFINE_MALLINFO */
 
 #ifdef DEFINE_MALLOC_STATS
@@ -519,6 +620,16 @@ void nano_malloc_stats(RONEARG)
     fiprintf(stderr, "in use bytes     = %10u\n",
              current_mallinfo.uordblks);
 }
+
+// [ILG]
+void _malloc_stats_r(void*);
+
+void _malloc_stats_r(void* impure __attribute__((unused)))
+{
+  return nano_malloc_stats();
+}
+// -----
+
 #endif /* DEFINE_MALLOC_STATS */
 
 #ifdef DEFINE_MALLOC_USABLE_SIZE
@@ -535,6 +646,17 @@ malloc_size_t nano_malloc_usable_size(RARG void * ptr)
     }
     return c->size - CHUNK_OFFSET;
 }
+
+// [ILG]
+malloc_size_t _malloc_usable_size_r(void*, void * ptr);
+
+malloc_size_t _malloc_usable_size_r(void* reent __attribute__((unused)),
+                                    void * ptr)
+{
+  return nano_malloc_usable_size(ptr);
+}
+// -----
+
 #endif /* DEFINE_MALLOC_USABLE_SIZE */
 
 #ifdef DEFINE_MEMALIGN
@@ -605,13 +727,38 @@ void * nano_memalign(RARG size_t align, size_t s)
     }
     return aligned_p;
 }
+
+// [ILG]
+void * _memalign_r(void*, size_t align, size_t s);
+
+void * _memalign_r(void* impure __attribute__((unused)),
+                   size_t align, size_t s)
+{
+  return nano_memalign(align, s);
+}
+// -----
+
 #endif /* DEFINE_MEMALIGN */
 
 #ifdef DEFINE_MALLOPT
-int nano_mallopt(RARG int parameter_number, int parameter_value)
+int nano_mallopt(RARG int parameter_number __attribute__((unused)),
+                      int parameter_value __attribute__((unused)))
 {
     return 0;
 }
+
+// [ILG]
+int _mallopt_r(void*, int parameter_number __attribute__((unused)),
+                      int parameter_value __attribute__((unused)));
+
+int _mallopt_r(void* impure __attribute__((unused)),
+                      int parameter_number __attribute__((unused)),
+                      int parameter_value __attribute__((unused)))
+{
+  return 0;
+}
+// -----
+
 #endif /* DEFINE_MALLOPT */
 
 #ifdef DEFINE_VALLOC
@@ -619,6 +766,16 @@ void * nano_valloc(RARG size_t s)
 {
     return nano_memalign(RCALL MALLOC_PAGE_ALIGN, s);
 }
+
+// [ILG]
+void * _valloc_r(void*, size_t s);
+
+void * _valloc_r(void* impure __attribute__((unused)), size_t s)
+{
+  return nano_memalign(MALLOC_PAGE_ALIGN, s);
+}
+// -----
+
 #endif /* DEFINE_VALLOC */
 
 #ifdef DEFINE_PVALLOC
@@ -626,4 +783,17 @@ void * nano_pvalloc(RARG size_t s)
 {
     return nano_valloc(RCALL ALIGN_TO(s, MALLOC_PAGE_ALIGN));
 }
+
+// [ILG]
+void * _pvalloc_r(void*, size_t s);
+
+void * _pvalloc_r(void* impure __attribute__((unused)), size_t s)
+{
+    return nano_valloc(RCALL ALIGN_TO(s, MALLOC_PAGE_ALIGN));
+}
+// -----
+
 #endif /* DEFINE_PVALLOC */
+
+#pragma GCC diagnostic pop
+
