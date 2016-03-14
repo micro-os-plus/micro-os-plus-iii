@@ -893,7 +893,6 @@ osThreadCreate (const osThreadDef_t* thread_def, void* args)
     {
       Thread* th = (Thread*) &thread_def->data[i];
       if (th->sched_state () == thread::state::undefined
-          || th->sched_state () == thread::state::terminated
           || th->sched_state () == thread::state::destroyed)
         {
           if (attr.th_stack_size_bytes > 0)
