@@ -217,7 +217,7 @@ extern "C"
 
   enum
   {
-//
+    //
     os_mutex_protocol_none = 0,
     os_mutex_protocol_inherit = 1,
     os_mutex_protocol_protect = 2
@@ -225,14 +225,14 @@ extern "C"
 
   enum
   {
-//
+    //
     os_mutex_robustness_stalled = 0,
     os_mutex_robustness_robust = 1
   };
 
   enum
   {
-//
+    //
     os_mutex_type_normal = 0,
     os_mutex_type_errorcheck = 1,
     os_mutex_type_recursive = 2,
@@ -343,8 +343,10 @@ extern "C"
 
   // --------------------------------------------------------------------------
 
-  typedef uint16_t os_mqueue_size_t;
+  typedef uint8_t os_mqueue_size_t;
+  typedef uint16_t os_mqueue_msg_size_t;
   typedef uint8_t os_mqueue_prio_t;
+  typedef os_mqueue_size_t os_mqueue_index_t;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -362,6 +364,10 @@ extern "C"
 #if !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
     os_thread_list_t send_list;
     os_thread_list_t receive_list;
+    os_mqueue_index_t* prev_array;
+    os_mqueue_index_t* next_array;
+    os_mqueue_prio_t* prio_array;
+    void* first_free;
 #endif
 
     void* queue_addr;
@@ -372,10 +378,14 @@ extern "C"
 
     size_t queue_size_bytes;
 
+    os_mqueue_msg_size_t msg_size_bytes;
     os_mqueue_size_t msgs;
-    os_mqueue_size_t msg_size_bytes;
 
     os_mqueue_size_t count;
+#if !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+    os_mqueue_index_t head;
+#endif
+    uint8_t flags_;
   } os_mqueue_t;
 
 #pragma GCC diagnostic pop

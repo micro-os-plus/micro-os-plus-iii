@@ -3481,6 +3481,14 @@ namespace os
        */
 
       /**
+       * @brief Internal initialisation.
+       * @par Parameters
+       *  None
+       */
+      void
+      _init (void);
+
+      /**
        * @brief Internal function used to get the first linked block.
        * @par Parameters
        *  None
@@ -3576,11 +3584,20 @@ namespace os
        * @brief Type of queue size.
        * @details
        * A numeric value to hold the message queue size, usually
-       * a 16-bits value.
+       * an 8-bits value, possibly a 16-bits value if longer
+       * queues are needed.
        */
-      using size_t = uint16_t;
+      using size_t = uint8_t;
 
-      constexpr size_t max_size = 0xFFFF;
+      constexpr size_t max_size = 0xFF;
+
+      using msg_size_t = uint16_t;
+
+      constexpr msg_size_t max_msg_size = 0xFFFF;
+
+      using index_t = size_t;
+
+      constexpr index_t no_index = max_size;
 
       /**
        * @brief Type of message priority.
@@ -3705,7 +3722,7 @@ namespace os
        * @param [in] msgs The number of messages.
        * @param [in] msg_size_bytes The message size, in bytes.
        */
-      Message_queue (mqueue::size_t msgs, mqueue::size_t msg_size_bytes);
+      Message_queue (mqueue::size_t msgs, mqueue::msg_size_t msg_size_bytes);
 
       /**
        * @brief Create a message queue with custom settings.
@@ -3714,7 +3731,7 @@ namespace os
        * @param [in] msg_size_bytes The message size, in bytes.
        */
       Message_queue (const mqueue::Attributes&attr, mqueue::size_t msgs,
-                     mqueue::size_t msg_size_bytes);
+                     mqueue::msg_size_t msg_size_bytes);
 
       /**
        * @cond ignore
@@ -3943,6 +3960,35 @@ namespace os
     protected:
 
       /**
+       * @name Private Member Functions
+       * @{
+       */
+
+      /**
+       * @brief Internal initialisation.
+       * @par Parameters
+       *  None
+       */
+      void
+      _init (void);
+
+#if !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+
+      bool
+      _try_send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio);
+
+      bool
+      _try_receive (char* msg, std::size_t nbytes, mqueue::priority_t* mprio);
+
+#endif /* !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE) */
+
+      /**
+       * @}
+       */
+
+    protected:
+
+      /**
        * @name Private Member Variables
        * @{
        */
@@ -3952,7 +3998,23 @@ namespace os
       port::Tasks_list send_list_;
       port::Tasks_list receive_list_;
 
-#endif
+      // To save space, the double linked list is built
+      // using short indexes, not pointers.
+      volatile mqueue::index_t* prev_array_;
+      volatile mqueue::index_t* next_array_;
+      volatile mqueue::priority_t* prio_array_;
+
+      /**
+       * @brief Pointer to the first free message, or `nullptr`.
+       * @details
+       * The free messages are in a single linked list, and
+       * the allocation strategy is LIFO, messages freed by `receive()`
+       * are added to the beginning, and messages requested by `send()`
+       * are allocated also from the beginning, so only a pointer to
+       * the beginning is required.
+       */
+      void* volatile first_free_;
+#endif /* !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE) */
 
       void* queue_addr_;
 
@@ -3963,10 +4025,30 @@ namespace os
 
       std::size_t queue_size_bytes_;
 
+      const mqueue::msg_size_t msg_size_bytes_;
       const mqueue::size_t msgs_;
-      const mqueue::size_t msg_size_bytes_;
-
       mqueue::size_t count_;
+
+#if !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+      mqueue::index_t head_;
+#endif /* !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE) */
+
+      /**
+       * @brief Internal status bits.
+       */
+      uint8_t flags_;
+
+      /**
+       * @brief Internal bits.
+       */
+      enum
+        : uint8_t
+          {
+            /**
+             * @brief Remember to free the allocated memory block.
+             */
+            flags_allocated = 1
+      };
 
       /**
        * @}
@@ -4471,7 +4553,15 @@ namespace os
       /**
        * @details
        * Remove the current running thread from the ready list and pass
-       * control to the next thread that is in **READY** state.
+       * control to the next thread that is in **READY** state. The
+       * thread will not be automatically rescheduled, it requires
+       * some other tread or interrupt service routine to add it
+       * back to the READY state (via `Thread::wakeup()`).
+       *
+       * This is different from `yield()` which automatically
+       * reschedules the current thread before passing control to
+       * the next thread (which might be the same if no other
+       * threads with at least the same priority are ready).
        *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */

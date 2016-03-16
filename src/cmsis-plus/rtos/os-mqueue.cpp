@@ -27,6 +27,8 @@
 #include <cassert>
 #include <cerrno>
 #include <cstdlib>
+#include <cstring>
+#include <new>
 
 // ----------------------------------------------------------------------------
 
@@ -123,7 +125,7 @@ namespace os
      *         {
      *           // Something special
      *         }
-      *     }
+     *     }
      *   // Do something else.
      * }
      *
@@ -151,7 +153,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     Message_queue::Message_queue (mqueue::size_t msgs,
-                                  mqueue::size_t msg_size_bytes) :
+                                  mqueue::msg_size_t msg_size_bytes) :
         Message_queue (mqueue::initializer, msgs, msg_size_bytes)
     {
       ;
@@ -166,41 +168,63 @@ namespace os
      */
     Message_queue::Message_queue (const mqueue::Attributes&attr,
                                   mqueue::size_t msgs,
-                                  mqueue::size_t msg_size_bytes) :
+                                  mqueue::msg_size_t msg_size_bytes) :
         Named_object
           { attr.name () }, //
-        msgs_ (msgs), //
-        msg_size_bytes_ (msg_size_bytes)
+        msg_size_bytes_ (msg_size_bytes), //
+        msgs_ (msgs)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
       queue_addr_ = attr.mq_queue_address;
       queue_size_bytes_ = attr.mq_queue_size_bytes;
+#if !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+      std::size_t storage_size = msgs
+          * (msg_size_bytes + 2 * sizeof(mqueue::index_t)
+              + sizeof(mqueue::priority_t));
+#endif
       if (queue_addr_ != nullptr)
         {
           os_assert_throw(queue_size_bytes_ > 0, EINVAL);
+#if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
           os_assert_throw(
               queue_size_bytes_ >= (std::size_t) (msgs * msg_size_bytes),
               EINVAL);
+#else
+          os_assert_throw(queue_size_bytes_ >= storage_size, EINVAL);
+#endif
         }
-
-      count_ = 0;
 
       trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), msgs_,
                      msg_size_bytes_);
 
 #if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
 
+      count_ = 0;
       port::Message_queue::create (this);
 
 #else
 
+      head_ = mqueue::no_index;
+
+      // The array of prev indexes follows immediately after the content array.
+      prev_array_ = (mqueue::index_t*) ((char*) queue_addr_
+          + msgs * msg_size_bytes);
+      // The array of next indexes follows immediately the prev array.
+      next_array_ = (mqueue::index_t*) ((char*) prev_array_
+          + msgs * sizeof(mqueue::index_t));
+      // The array of priorities follows immediately the next array.
+      prio_array_ = (mqueue::priority_t*) ((char*) next_array_
+          + msgs * sizeof(mqueue::index_t));
+
       if (queue_addr_ == nullptr)
         {
-          // TODO: dynamically allocate queue (msgs * msg_size_bytes).
+          // Dynamically allocate queue and the arrays.
+          queue_addr_ = new (std::nothrow) char[storage_size];
+          flags_ |= flags_allocated;
         }
 
-      // TODO
+      _init ();
 #endif
     }
 
@@ -220,10 +244,139 @@ namespace os
 
 #else
 
-      // TODO: Free dynamically allocated structures.
+      if (flags_ | flags_allocated)
+        {
+          delete[] ((char*) queue_addr_);
+        }
 
 #endif
     }
+
+    void
+    Message_queue::_init (void)
+    {
+      count_ = 0;
+
+#if !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+
+      // Construct a linked list of blocks. Store the pointer at
+      // the beginning of each block. Each block
+      // will hold the address of the next free block,
+      // or `nullptr` at the end.
+      char* p = (char*) queue_addr_;
+      for (std::size_t i = 1; i < msgs_; ++i)
+        {
+          *(void**) p = (p + msg_size_bytes_);
+          p += msg_size_bytes_;
+        }
+      *(void**) p = nullptr;
+
+      first_free_ = queue_addr_; // Pointer to first block.
+
+      head_ = mqueue::no_index;
+
+      if (!send_list_.empty ())
+        {
+          // Wake-up all threads, if any.
+          send_list_.wakeup_all ();
+
+          send_list_.clear ();
+        }
+
+      if (!receive_list_.empty ())
+        {
+          // Wake-up all threads, if any.
+          receive_list_.wakeup_all ();
+
+          receive_list_.clear ();
+        }
+
+#endif /* !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE) */
+
+    }
+
+#if !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+
+    bool
+    Message_queue::_try_send (const char* msg, std::size_t nbytes,
+                              mqueue::priority_t mprio)
+    {
+      if (first_free_ == nullptr)
+        {
+          // No available space to send the message.
+          return false;
+        }
+
+      // Get the address where the message will be copied.
+      // This is the first free memory block.
+      char* p = (char*) first_free_;
+
+      // Update to next free, if any (the last one has nullptr).
+      first_free_ = *(void**) first_free_;
+
+      // Copy message to queue storage.
+      std::memcpy (p, msg, nbytes);
+      if (nbytes < msg_size_bytes_)
+        {
+          // Fill in the remaining space with 0x00.
+          std::memset (p + nbytes, 0x00, msg_size_bytes_ - nbytes);
+        }
+
+      // Using the address, compute the index in the array.
+      std::size_t msg_ix = (p - (char*) queue_addr_) / msg_size_bytes_;
+      prio_array_[msg_ix] = mprio;
+
+      if (head_ == mqueue::no_index)
+        {
+          // No other message in the queue, enlist this one
+          // as head, with links to itself.
+          head_ = (mqueue::index_t) msg_ix;
+          prev_array_[msg_ix] = (mqueue::index_t) msg_ix;
+          next_array_[msg_ix] = (mqueue::index_t) msg_ix;
+        }
+      else
+        {
+          std::size_t ix;
+          // Arrange to insert between head and tail.
+          ix = prev_array_[head_];
+          // Check if the priority is higher than the head priority.
+          if (mprio > prio_array_[head_])
+            {
+              // Having the highest priority, the new message
+              // becomes the new head.
+              head_ = (mqueue::index_t) msg_ix;
+            }
+          else
+            {
+              // If not higher than the head, try to insert at the tail,
+              // but advance up until the same priority is found.
+              while ((mprio > prio_array_[ix]))
+                {
+                  ix = prev_array_[ix];
+                }
+            }
+          prev_array_[msg_ix] = (mqueue::index_t) ix;
+          next_array_[msg_ix] = next_array_[ix];
+
+          // Break the chain and insert the new index.
+          std::size_t tmp_ix = next_array_[ix];
+          next_array_[ix] = (mqueue::index_t) msg_ix;
+          prev_array_[tmp_ix] = (mqueue::index_t) msg_ix;
+        }
+
+      // One more message added to the queue.
+      ++count_;
+
+      if (!receive_list_.empty ())
+        {
+          // Wake-up one thread, if any.
+          receive_list_.wakeup_one ();
+        }
+
+      return true;
+    }
+
+#endif /* !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE) */
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -272,7 +425,7 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes >= msg_size_bytes_, EINVAL);
+      os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
 
       trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes, mprio,
                      this, name ());
@@ -283,10 +436,37 @@ namespace os
 
 #else
 
-      // TODO
+      Thread& crt_thread = this_thread::thread ();
 
-      ++count_;
-      return result::ok;
+      bool queued = false;
+      for (;;)
+        {
+            {
+              scheduler::Critical_section cs; // ----- Critical section -----
+
+              if (_try_send (msg, nbytes, mprio))
+                {
+                  return result::ok;
+                }
+
+              if (!queued)
+                {
+                  // Add this thread to the waiting list.
+                  // Will be removed by free().
+                  send_list_.add (&crt_thread);
+                  queued = true;
+                }
+            }
+          this_thread::suspend ();
+
+          if (crt_thread.interrupted ())
+            {
+              return EINTR;
+            }
+        }
+
+      /* NOTREACHED */
+      return ENOTRECOVERABLE;
 
 #endif
     }
@@ -325,7 +505,7 @@ namespace os
                              mqueue::priority_t mprio)
     {
       os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes >= msg_size_bytes_, EINVAL);
+      os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
 
       trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes, mprio,
                      this, name ());
@@ -336,10 +516,14 @@ namespace os
 
 #else
 
-      // TODO
-
-      ++count_;
-      return result::ok;
+      if (_try_send (msg, nbytes, mprio))
+        {
+          return result::ok;
+        }
+      else
+        {
+          return EAGAIN;
+        }
 
 #endif
     }
@@ -374,6 +558,8 @@ namespace os
      * if there is sufficient room in the queue to add the message
      * immediately.
      *
+     * If there is not sufficient room in the queue, the
+     *
      * @par POSIX compatibility
      *  Inspired by [`mq_timedsend()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_timedsend.html)
      *  with `O_NONBLOCK` not set,
@@ -392,7 +578,7 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes >= msg_size_bytes_, EINVAL);
+      os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
 
       trace::printf ("%s(%p,%d,%d,%d_ticks) @%p %s\n", __func__, msg, nbytes,
                      mprio, timeout, this, name ());
@@ -408,13 +594,111 @@ namespace os
 
 #else
 
-      // TODO
+      Thread& crt_thread = this_thread::thread ();
 
-      ++count_;
-      return result::ok;
+      bool queued = false;
+
+      Systick_clock::rep start = Systick_clock::now ();
+      for (;;)
+        {
+          Systick_clock::sleep_rep slept_ticks;
+            {
+              scheduler::Critical_section cs; // ----- Critical section -----
+
+              if (_try_send (msg, nbytes, mprio))
+                {
+                  return result::ok;
+                }
+
+              Systick_clock::rep now = Systick_clock::now ();
+              slept_ticks = (Systick_clock::sleep_rep) (now - start);
+              if (slept_ticks >= timeout)
+                {
+                  if (queued)
+                    {
+                      send_list_.remove (&crt_thread);
+                    }
+                  return ETIMEDOUT;
+                }
+
+              if (!queued)
+                {
+                  // Add this thread to the waiting list.
+                  // Will be removed by receive().
+                  send_list_.add (&crt_thread);
+                  queued = true;
+                }
+            }
+
+          Systick_clock::wait (timeout - slept_ticks);
+
+          if (crt_thread.interrupted ())
+            {
+              return EINTR;
+            }
+        }
+
+      /* NOTREACHED */
+      return ENOTRECOVERABLE;
 
 #endif
     }
+
+#if !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+
+    bool
+    Message_queue::_try_receive (char* msg, std::size_t nbytes,
+                                 mqueue::priority_t* mprio)
+    {
+      if (head_ == mqueue::no_index)
+        {
+          return false;
+        }
+
+      char* p = (char*) queue_addr_ + head_ * msg_size_bytes_;
+      memcpy (msg, p, nbytes);
+      if (mprio != nullptr)
+        {
+          *mprio = prio_array_[head_];
+        }
+
+      if (count_ > 1)
+        {
+          // Remove the current element from the list.
+          prev_array_[next_array_[head_]] = prev_array_[head_];
+          next_array_[prev_array_[head_]] = next_array_[head_];
+
+          // Next becomes the new head.
+          head_ = next_array_[head_];
+        }
+      else
+        {
+          // If there was only one, the list is empty now.
+          head_ = mqueue::no_index;
+        }
+
+      // Perform a push_front() on the single linked LIFO list,
+      // i.e. add the block to the beginning of the list.
+
+      // Link previous list to this block; may be null, but it does
+      // not matter.
+      *(void**) p = first_free_;
+
+      // Now this block is the first one.
+      first_free_ = p;
+
+      --count_;
+
+      if (!send_list_.empty ())
+        {
+          // Wake-up one thread, if any.
+          send_list_.wakeup_one ();
+        }
+
+      return true;
+    }
+
+#endif /* !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE) */
 
     /**
      * @details
@@ -468,10 +752,37 @@ namespace os
 
 #else
 
-      // TODO
+      Thread& crt_thread = this_thread::thread ();
 
-      --count_;
-      return result::ok;
+      bool queued = false;
+      for (;;)
+        {
+            {
+              scheduler::Critical_section cs; // ----- Critical section -----
+
+              if (_try_receive (msg, nbytes, mprio))
+                {
+                  return result::ok;
+                }
+
+              if (!queued)
+                {
+                  // Add this thread to the waiting list.
+                  // Will be removed by send().
+                  receive_list_.add (&crt_thread);
+                  queued = true;
+                }
+            }
+          this_thread::suspend ();
+
+          if (crt_thread.interrupted ())
+            {
+              return EINTR;
+            }
+        }
+
+      /* NOTREACHED */
+      return ENOTRECOVERABLE;
 
 #endif
     }
@@ -521,9 +832,14 @@ namespace os
 
 #else
 
-      // TODO
-      --count_;
-      return result::ok;
+      if (_try_receive (msg, nbytes, mprio))
+        {
+          return result::ok;
+        }
+      else
+        {
+          return EAGAIN;
+        }
 
 #endif
     }
@@ -585,7 +901,7 @@ namespace os
      */
     result_t
     Message_queue::timed_receive (char* msg, std::size_t nbytes,
-                                  mqueue::priority_t* mprio, systicks_t ticks)
+                                  mqueue::priority_t* mprio, systicks_t timeout)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
@@ -593,23 +909,66 @@ namespace os
       os_assert_err(nbytes <= mqueue::max_size, EMSGSIZE);
 
       trace::printf ("%s(%p,%d,%d_ticks) @%p %s\n", __func__, msg, nbytes,
-                     ticks, this, name ());
+                     timeout, this, name ());
 
-      if (ticks == 0)
+      if (timeout == 0)
         {
-          ticks = 1;
+          timeout = 1;
         }
 
 #if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
 
       return port::Message_queue::timed_receive (this, msg, nbytes, mprio,
-                                                 ticks);
+          timeout);
 
 #else
 
-      // TODO
-      --count_;
-      return result::ok;
+      Thread& crt_thread = this_thread::thread ();
+
+      bool queued = false;
+
+      Systick_clock::rep start = Systick_clock::now ();
+      for (;;)
+        {
+          Systick_clock::sleep_rep slept_ticks;
+            {
+              scheduler::Critical_section cs; // ----- Critical section -----
+
+              if (_try_receive (msg, nbytes, mprio))
+                {
+                  return result::ok;
+                }
+
+              Systick_clock::rep now = Systick_clock::now ();
+              slept_ticks = (Systick_clock::sleep_rep) (now - start);
+              if (slept_ticks >= timeout)
+                {
+                  if (queued)
+                    {
+                      receive_list_.remove (&crt_thread);
+                    }
+                  return ETIMEDOUT;
+                }
+
+              if (!queued)
+                {
+                  // Add this thread to the waiting list.
+                  // Will be removed by send().
+                  receive_list_.add (&crt_thread);
+                  queued = true;
+                }
+            }
+
+          Systick_clock::wait (timeout - slept_ticks);
+
+          if (crt_thread.interrupted ())
+            {
+              return EINTR;
+            }
+        }
+
+      /* NOTREACHED */
+      return ENOTRECOVERABLE;
 
 #endif
     }
@@ -639,8 +998,9 @@ namespace os
 
 #else
 
-      // TODO
-      count_ = 0;
+      scheduler::Critical_section cs; // ----- Critical section -----
+
+      _init ();
       return result::ok;
 
 #endif

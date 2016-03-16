@@ -929,15 +929,17 @@ extern const osPoolDef_t os_pool_def_##name
 #define osPoolDef(name, items, type)   \
 struct { \
     osPool data; \
-    type pool[items]; \
+    struct { \
+      type pool[items]; \
+    } storage; \
 } os_pool_##name; \
 const osPoolDef_t os_pool_def_##name = \
 { \
     #name, \
     (items), \
     sizeof(type), \
-    os_pool_##name.pool, \
-    sizeof(os_pool_##name.pool), \
+    &os_pool_##name.storage, \
+    sizeof(os_pool_##name.storage), \
     &os_pool_##name.data \
 }
 #endif
@@ -1019,14 +1021,18 @@ extern const osMessageQDef_t os_messageQ_def_##name
 #define osMessageQDef(name, items, type)   \
 struct { \
     osMessageQ data; \
-    void* queue[items]; \
+    struct { \
+      void* queue[items]; \
+      os_mqueue_index_t links[2 * items]; \
+      os_mqueue_prio_t prios[items]; \
+    } storage; \
 } os_messageQ_##name; \
 const osMessageQDef_t os_messageQ_def_##name = { \
     #name, \
     (items), \
     sizeof (void*), \
-    os_messageQ_##name.queue, \
-    sizeof(os_messageQ_##name.queue), \
+    &os_messageQ_##name.storage, \
+    sizeof(os_messageQ_##name.storage), \
     &os_messageQ_##name.data \
 }
 #endif
@@ -1108,18 +1114,24 @@ extern const osMailQDef_t os_mailQ_def_##name
 #define osMailQDef(name, items, type) \
 struct { \
     osMailQ data; \
-    type pool[items]; \
-    void* queue[items]; \
+    struct { \
+      type pool[items]; \
+    } pool_storage; \
+    struct { \
+      void* queue[items]; \
+      os_mqueue_index_t links[2 * items]; \
+      os_mqueue_prio_t prios[items]; \
+    } queue_storage; \
 } os_mailQ_##name; \
 const osMailQDef_t os_mailQ_def_##name = { \
     #name, \
     (items), \
     sizeof (type), \
     sizeof (void*), \
-    os_mailQ_##name.pool, \
-    sizeof(os_mailQ_##name.pool), \
-    os_mailQ_##name.queue, \
-    sizeof(os_mailQ_##name.queue), \
+    &os_mailQ_##name.pool_storage, \
+    sizeof(os_mailQ_##name.pool_storage), \
+    &os_mailQ_##name.queue_storage, \
+    sizeof(os_mailQ_##name.queue_storage), \
     &os_mailQ_##name.data \
 }
 #endif
