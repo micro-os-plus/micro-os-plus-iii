@@ -363,8 +363,12 @@ namespace os
     // ========================================================================
 
 #if !defined(__DOXYGEN__)
+
     namespace port
     {
+
+      // This is a temporary solution, for testing purposes.
+      // A proper list will be implemented later.
 
       Tasks_list::Tasks_list ()
       {
@@ -392,6 +396,15 @@ namespace os
         assert(thread != nullptr);
         assert(count_ < (sizeof(array_) / sizeof(array_[0]) + 1));
 
+        for (std::size_t i = 0; i < count_; ++i)
+          {
+            if (array_[i] == thread)
+              {
+                // Already in the list.
+                break;
+              }
+          }
+        // Add to the end.
         array_[count_++] = thread;
       }
 
