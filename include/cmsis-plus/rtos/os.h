@@ -4323,7 +4323,7 @@ namespace os
        * @retval EAGAIN The expected condition did not occur.
        * @retval ENOTRECOVERABLE Wait failed.
        */
-      result_t
+      bool
       _try_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
 
       /**

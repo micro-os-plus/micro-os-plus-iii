@@ -168,7 +168,7 @@ namespace os
 #endif
     }
 
-    result_t
+    bool
     Event_flags::_try_wait (flags::mask_t mask, flags::mask_t* oflags,
                             flags::mode_t mode)
     {
@@ -183,7 +183,7 @@ namespace os
                 }
               // Clear desired signals.
               flags_ &= ~mask;
-              return result::ok;
+              return true;
             }
         }
       else if ((mask == 0) || ((mode & flags::mode::any) != 0))
@@ -198,11 +198,11 @@ namespace os
                 }
               // Since we returned them all, also clear them all.
               flags_ = 0;
-              return result::ok;
+              return true;
             }
         }
 
-      return EAGAIN;
+      return false;
     }
 
     /**
@@ -238,24 +238,37 @@ namespace os
 
 #else
 
+      Thread& crt_thread = this_thread::thread ();
+
+      bool queued = false;
       for (;;)
         {
             {
               interrupts::Critical_section cs; // ----- Critical section -----
 
-              if (_try_wait (mask, oflags, mode) == result::ok)
+              if (_try_wait (mask, oflags, mode))
                 {
                   return result::ok;
+                }
+
+              if (!queued)
+                {
+                  // Add this thread to the waiting list.
+                  // Will be removed by free().
+                  list_.add (&crt_thread);
+                  queued = true;
                 }
             }
 
           this_thread::suspend ();
 
-          if (this_thread::thread ().interrupted ())
+          if (crt_thread.interrupted ())
             {
               return EINTR;
             }
         }
+
+      /* NOTREACHED */
       return ENOTRECOVERABLE;
 
 #endif
@@ -276,7 +289,6 @@ namespace os
     Event_flags::try_wait (flags::mask_t mask, flags::mask_t* oflags,
                            flags::mode_t mode)
     {
-      interrupts::Critical_section cs; // ----- Critical section -----
 
 #if defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
 
@@ -284,7 +296,16 @@ namespace os
 
 #else
 
-      return _try_wait (mask, oflags, mode);
+      interrupts::Critical_section cs; // ----- Critical section -----
+
+      if (_try_wait (mask, oflags, mode))
+        {
+          return result::ok;
+        }
+      else
+        {
+          return EAGAIN;
+        }
 
 #endif
     }
@@ -322,21 +343,25 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Event_flags::timed_wait (flags::mask_t mask, systicks_t ticks,
+    Event_flags::timed_wait (flags::mask_t mask, systicks_t timeout,
                              flags::mask_t* oflags, flags::mode_t mode)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
-      if (ticks == 0)
+      if (timeout == 0)
         {
-          ticks = 1;
+          timeout = 1;
         }
 
 #if defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
 
-      return port::Event_flags::timed_wait (this, mask, ticks, oflags, mode);
+      return port::Event_flags::timed_wait (this, mask, timeout, oflags, mode);
 
 #else
+
+      Thread& crt_thread = this_thread::thread ();
+
+      bool queued = false;
 
       Systick_clock::rep start = Systick_clock::now ();
       for (;;)
@@ -345,26 +370,40 @@ namespace os
             {
               interrupts::Critical_section cs; // ----- Critical section -----
 
-              if (_try_wait (mask, oflags, mode) == result::ok)
+              if (_try_wait (mask, oflags, mode))
                 {
                   return result::ok;
                 }
+
+              Systick_clock::rep now = Systick_clock::now ();
+              slept_ticks = (Systick_clock::sleep_rep) (now - start);
+              if (slept_ticks >= timeout)
+                {
+                  if (queued)
+                    {
+                      list_.remove (&crt_thread);
+                    }
+                  return ETIMEDOUT;
+                }
+
+              if (!queued)
+                {
+                  // Add this thread to the waiting list.
+                  // Will be removed by receive().
+                  list_.add (&crt_thread);
+                  queued = true;
+                }
             }
 
-          Systick_clock::rep now = Systick_clock::now ();
-          slept_ticks = (Systick_clock::sleep_rep) (now - start);
-          if (slept_ticks >= ticks)
-            {
-              return ETIMEDOUT;
-            }
+          Systick_clock::wait (timeout - slept_ticks);
 
-          Systick_clock::wait (ticks - slept_ticks);
-
-          if (this_thread::thread ().interrupted ())
+          if (crt_thread.interrupted ())
             {
               return EINTR;
             }
         }
+
+      /* NOTREACHED */
       return ENOTRECOVERABLE;
 
 #endif
