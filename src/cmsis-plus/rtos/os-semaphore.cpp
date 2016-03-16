@@ -166,9 +166,9 @@ namespace os
 
       // The CMSIS validator requires the max_count to be equal to
       // the initial count, which can be 0, but we patch it on the way.
-      assert (max_count_ > 0);
-      assert (attr.sm_initial_count >= 0);
-      assert (attr.sm_initial_count <= max_count_);
+      assert(max_count_ > 0);
+      assert(attr.sm_initial_count >= 0);
+      assert(attr.sm_initial_count <= max_count_);
 
       count_ = attr.sm_initial_count;
 
@@ -181,7 +181,7 @@ namespace os
 
 #else
 
-      // TODO
+      _init ();
 
 #endif
     }
@@ -213,6 +213,25 @@ namespace os
       // TODO
 
 #endif
+    }
+
+    void
+    Semaphore::_init (void)
+    {
+
+      count_ = initial_count_;
+
+#if !defined(OS_INCLUDE_PORT_RTOS_SEMAPHORE)
+
+      if (!list_.empty ())
+        {
+          // Wake-up all threads, if any.
+          list_.wakeup_all ();
+
+          list_.clear ();
+        }
+
+#endif /* !defined(OS_INCLUDE_PORT_RTOS_SEMAPHORE) */
     }
 
     /**
@@ -264,6 +283,7 @@ namespace os
 #else
 
       interrupts::Critical_section cs; // ----- Critical section -----
+
       if (count_ >= this->max_count_)
         {
           return EOVERFLOW;
@@ -271,12 +291,12 @@ namespace os
 
       ++count_;
 
-      if (count_ == 0)
+      if (count_ == 1)
         {
           // Wakeup one thread
-          if (list_.get_length () > 0)
+          if (!list_.empty ())
             {
-              list_.get_top ()->wakeup ();
+              list_.wakeup_one ();
             }
         }
       return result::ok;
@@ -324,23 +344,33 @@ namespace os
       return port::Semaphore::wait (this);
 
 #else
+      Thread& crt_thread = this_thread::thread ();
+
+      for (;;)
         {
-          interrupts::Critical_section cs; // ----- Critical section ------
-
-          --count_;
-          if (count_ >= 0)
             {
-              return result::ok;
+              interrupts::Critical_section cs; // ----- Critical section -----
+
+              if (count_ > 0)
+                {
+                  --count_;
+                  return result::ok;
+                }
+
+              // Add this thread to the waiting list.
+              // Will be removed by post().
+              list_.add (&crt_thread);
             }
+          this_thread::suspend ();
 
-          // Add current thread to the semaphore waiting  list
-          list_.add (&this_thread::thread ());
-          // `count_` is negative.
+          if (crt_thread.interrupted ())
+            {
+              return EINTR;
+            }
         }
-      this_thread::yield ();
 
-      // Return EINTR?
-      return result::ok;
+      /* NOTREACHED */
+      return ENOTRECOVERABLE;
 
 #endif
     }
@@ -376,18 +406,16 @@ namespace os
 
 #else
 
+      interrupts::Critical_section cs; // ----- Critical section -----
+
+      if (count_ > 0)
         {
-          interrupts::Critical_section cs; // ----- Critical section -----
-
-          if (count_ > 0)
-            {
-              --count_;
-              return result::ok;
-            }
-
-          // Count may be 0 or negative
-          return EAGAIN;
+          --count_;
+          return result::ok;
         }
+
+      // Count may be 0.
+      return EAGAIN;
 
 #endif
     }
@@ -441,23 +469,73 @@ namespace os
 
 #else
 
+      Thread& crt_thread = this_thread::thread ();
+
+      Systick_clock::rep start = Systick_clock::now ();
+      for (;;)
         {
-          interrupts::Critical_section cs; // ----- Critical section -----
-
-          --count_;
-          if (count_ >= 0)
+          Systick_clock::sleep_rep slept_ticks;
             {
-              return result::ok;
+              interrupts::Critical_section cs; // ----- Critical section -----
+
+              if (count_ > 0)
+                {
+                  --count_;
+                  return result::ok;
+                }
+
+              Systick_clock::rep now = Systick_clock::now ();
+              slept_ticks = (Systick_clock::sleep_rep) (now - start);
+              if (slept_ticks >= timeout)
+                {
+                  list_.remove (&crt_thread);
+                  return ETIMEDOUT;
+                }
+
+              // Add this thread to the waiting list.
+              // Will be removed by post().
+              list_.add (&crt_thread);
             }
+          Systick_clock::wait (timeout - slept_ticks);
 
-          // Add current thread to the semaphore waiting list.
-          list_.add (&this_thread::thread ());
+          if (crt_thread.interrupted ())
+            {
+              return EINTR;
+            }
         }
-      Systick_clock::wait (timeout);
 
-      // TODO: return EINTR
-      return ETIMEDOUT;
+      /* NOTREACHED */
+      return ENOTRECOVERABLE;
 
+#endif
+    }
+
+    /**
+     * @details
+     * The `value()` function shall return the value of the semaphore
+     * without affecting the state of the semaphore. The value represents
+     * an actual semaphore value that occurred at some unspecified time
+     * during the call, but it need not be the actual value of the
+     * semaphore when it is returned to the calling process. This
+     * value reflects the number of available resources.
+     *
+     * If the semaphore is locked, then the returned value shall either
+     * be set to zero or to a negative number whose absolute value
+     * represents the number of processes waiting for the semaphore
+     * at some unspecified time during the call.
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`sem_getvalue()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_getvalue.html)
+     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     */
+    semaphore::count_t
+    Semaphore::value (void) const
+    {
+#if !defined(OS_INCLUDE_PORT_RTOS_SEMAPHORE)
+      return (count_ > 0) ? count_ : (semaphore::count_t) (-list_.length ());
+#else
+      return count_;
 #endif
     }
 
@@ -483,13 +561,7 @@ namespace os
 
       interrupts::Critical_section cs; // ----- Critical section -----
 
-      if (count_ < 0)
-        {
-          // There are waiting tasks
-          return EAGAIN;
-        }
-
-      count_ = initial_count_;
+      _init ();
       return result::ok;
 
 #endif

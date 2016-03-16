@@ -3163,6 +3163,25 @@ namespace os
     protected:
 
       /**
+       * @name Private Member Functions
+       * @{
+       */
+
+      /**
+       * @brief Internal initialisation.
+       * @par Parameters
+       *  None
+       */
+      void
+      _init (void);
+
+      /**
+       * @}
+       */
+
+    protected:
+
+      /**
        * @name Private Member Variables
        * @{
        */
@@ -4811,31 +4830,6 @@ namespace os
     Semaphore::operator== (const Semaphore& rhs) const
     {
       return this == &rhs;
-    }
-
-    /**
-     * @details
-     * The `value()` function shall return the value of the semaphore
-     * without affecting the state of the semaphore. The value represents
-     * an actual semaphore value that occurred at some unspecified time
-     * during the call, but it need not be the actual value of the
-     * semaphore when it is returned to the calling process. This
-     * value reflects the number of available resources.
-     *
-     * If the semaphore is locked, then the returned value shall either
-     * be set to zero or to a negative number whose absolute value
-     * represents the number of processes waiting for the semaphore
-     * at some unspecified time during the call.
-     *
-     * @par POSIX compatibility
-     *  Inspired by [`sem_getvalue()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_getvalue.html)
-     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-     */
-    inline semaphore::count_t
-    Semaphore::value (void) const
-    {
-      return count_;
     }
 
     /**
