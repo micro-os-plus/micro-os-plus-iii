@@ -442,7 +442,7 @@ namespace os
       for (;;)
         {
             {
-              scheduler::Critical_section cs; // ----- Critical section -----
+              interrupts::Critical_section cs; // ----- Critical section -----
 
               if (_try_send (msg, nbytes, mprio))
                 {
@@ -515,6 +515,8 @@ namespace os
       return port::Message_queue::try_send (this, msg, nbytes, mprio);
 
 #else
+
+      interrupts::Critical_section cs; // ----- Critical section -----
 
       if (_try_send (msg, nbytes, mprio))
         {
@@ -603,7 +605,7 @@ namespace os
         {
           Systick_clock::sleep_rep slept_ticks;
             {
-              scheduler::Critical_section cs; // ----- Critical section -----
+              interrupts::Critical_section cs; // ----- Critical section -----
 
               if (_try_send (msg, nbytes, mprio))
                 {
@@ -758,7 +760,7 @@ namespace os
       for (;;)
         {
             {
-              scheduler::Critical_section cs; // ----- Critical section -----
+              interrupts::Critical_section cs; // ----- Critical section -----
 
               if (_try_receive (msg, nbytes, mprio))
                 {
@@ -831,6 +833,8 @@ namespace os
       return port::Message_queue::try_receive (this, msg, nbytes, mprio);
 
 #else
+
+      interrupts::Critical_section cs; // ----- Critical section -----
 
       if (_try_receive (msg, nbytes, mprio))
         {
@@ -932,7 +936,7 @@ namespace os
         {
           Systick_clock::sleep_rep slept_ticks;
             {
-              scheduler::Critical_section cs; // ----- Critical section -----
+              interrupts::Critical_section cs; // ----- Critical section -----
 
               if (_try_receive (msg, nbytes, mprio))
                 {
@@ -998,7 +1002,7 @@ namespace os
 
 #else
 
-      scheduler::Critical_section cs; // ----- Critical section -----
+      interrupts::Critical_section cs; // ----- Critical section -----
 
       _init ();
       return result::ok;
