@@ -368,11 +368,7 @@ namespace os
 
       Tasks_list::Tasks_list ()
       {
-        for (std::size_t i = 0; i < sizeof(array_) / sizeof(array_[0]); ++i)
-          {
-            array_[i] = nullptr;
-          }
-        count_ = 0;
+        _init ();
       }
 
       Tasks_list::~Tasks_list ()
@@ -381,10 +377,20 @@ namespace os
       }
 
       void
+      Tasks_list::_init (void)
+      {
+        for (std::size_t i = 0; i < sizeof(array_) / sizeof(array_[0]); ++i)
+          {
+            array_[i] = nullptr;
+          }
+        count_ = 0;
+      }
+
+      void
       Tasks_list::add (rtos::Thread* thread)
       {
-        assert (thread != nullptr);
-        assert (count_ < (sizeof(array_) / sizeof(array_[0]) + 1));
+        assert(thread != nullptr);
+        assert(count_ < (sizeof(array_) / sizeof(array_[0]) + 1));
 
         array_[count_++] = thread;
       }
@@ -425,7 +431,7 @@ namespace os
 
         for (std::size_t i = 0; i < sizeof(array_) / sizeof(array_[0]); ++i)
           {
-            if (array_[i]->sched_prio () > prio)
+            if ((array_[i] != nullptr) && (array_[i]->sched_prio () > prio))
               {
                 prio = array_[i]->sched_prio ();
                 thread = array_[i];
@@ -450,9 +456,18 @@ namespace os
       {
         for (std::size_t i = 0; i < sizeof(array_) / sizeof(array_[0]); ++i)
           {
-            array_[i]->wakeup ();
+            if (array_[i] != nullptr)
+              {
+                array_[i]->wakeup ();
+              }
           }
         count_ = 0;
+      }
+
+      void
+      Tasks_list::clear ()
+      {
+        _init ();
       }
 
     } /* namespace port */
