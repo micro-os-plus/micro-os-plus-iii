@@ -313,7 +313,6 @@ namespace os
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
-      bool queued = false;
       for (;;)
         {
             {
@@ -325,13 +324,9 @@ namespace os
                   return p;
                 }
 
-              if (!queued)
-                {
-                  // Add this thread to the waiting list.
-                  // Will be removed by free().
-                  list_.add (&this_thread::thread ());
-                  queued = true;
-                }
+              // Add this thread to the waiting list.
+              // Will be removed by free().
+              list_.add (&this_thread::thread ());
             }
           this_thread::suspend ();
 
@@ -361,6 +356,8 @@ namespace os
     {
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
+      interrupts::Critical_section cs; // ----- Critical section -----
+
       return _try_first ();
     }
 
@@ -388,8 +385,6 @@ namespace os
           ticks = 1;
         }
 
-      bool queued = false;
-
       Systick_clock::rep start = Systick_clock::now ();
       for (;;)
         {
@@ -407,20 +402,13 @@ namespace os
               slept_ticks = (Systick_clock::sleep_rep) (now - start);
               if (slept_ticks >= ticks)
                 {
-                  if (queued)
-                    {
-                      list_.remove (&this_thread::thread ());
-                    }
+                  list_.remove (&this_thread::thread ());
                   return nullptr;
                 }
 
-              if (!queued)
-                {
-                  // Add this thread to the waiting list.
-                  // Will be removed by free() or if timeout occurs.
-                  list_.add (&this_thread::thread ());
-                  queued = true;
-                }
+              // Add this thread to the waiting list.
+              // Will be removed by free() or if timeout occurs.
+              list_.add (&this_thread::thread ());
             }
 
           Systick_clock::wait (ticks - slept_ticks);

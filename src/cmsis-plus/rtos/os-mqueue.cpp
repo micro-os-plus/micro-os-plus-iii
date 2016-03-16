@@ -438,7 +438,6 @@ namespace os
 
       Thread& crt_thread = this_thread::thread ();
 
-      bool queued = false;
       for (;;)
         {
             {
@@ -449,13 +448,9 @@ namespace os
                   return result::ok;
                 }
 
-              if (!queued)
-                {
-                  // Add this thread to the waiting list.
-                  // Will be removed by free().
-                  send_list_.add (&crt_thread);
-                  queued = true;
-                }
+              // Add this thread to the waiting list.
+              // Will be removed by free().
+              send_list_.add (&crt_thread);
             }
           this_thread::suspend ();
 
@@ -598,8 +593,6 @@ namespace os
 
       Thread& crt_thread = this_thread::thread ();
 
-      bool queued = false;
-
       Systick_clock::rep start = Systick_clock::now ();
       for (;;)
         {
@@ -616,20 +609,13 @@ namespace os
               slept_ticks = (Systick_clock::sleep_rep) (now - start);
               if (slept_ticks >= timeout)
                 {
-                  if (queued)
-                    {
-                      send_list_.remove (&crt_thread);
-                    }
+                  send_list_.remove (&crt_thread);
                   return ETIMEDOUT;
                 }
 
-              if (!queued)
-                {
-                  // Add this thread to the waiting list.
-                  // Will be removed by receive().
-                  send_list_.add (&crt_thread);
-                  queued = true;
-                }
+              // Add this thread to the waiting list.
+              // Will be removed by receive().
+              send_list_.add (&crt_thread);
             }
 
           Systick_clock::wait (timeout - slept_ticks);
@@ -756,7 +742,6 @@ namespace os
 
       Thread& crt_thread = this_thread::thread ();
 
-      bool queued = false;
       for (;;)
         {
             {
@@ -767,13 +752,9 @@ namespace os
                   return result::ok;
                 }
 
-              if (!queued)
-                {
-                  // Add this thread to the waiting list.
-                  // Will be removed by send().
-                  receive_list_.add (&crt_thread);
-                  queued = true;
-                }
+              // Add this thread to the waiting list.
+              // Will be removed by send().
+              receive_list_.add (&crt_thread);
             }
           this_thread::suspend ();
 
@@ -929,8 +910,6 @@ namespace os
 
       Thread& crt_thread = this_thread::thread ();
 
-      bool queued = false;
-
       Systick_clock::rep start = Systick_clock::now ();
       for (;;)
         {
@@ -947,20 +926,13 @@ namespace os
               slept_ticks = (Systick_clock::sleep_rep) (now - start);
               if (slept_ticks >= timeout)
                 {
-                  if (queued)
-                    {
-                      receive_list_.remove (&crt_thread);
-                    }
+                  receive_list_.remove (&crt_thread);
                   return ETIMEDOUT;
                 }
 
-              if (!queued)
-                {
-                  // Add this thread to the waiting list.
-                  // Will be removed by send().
-                  receive_list_.add (&crt_thread);
-                  queued = true;
-                }
+              // Add this thread to the waiting list.
+              // Will be removed by send().
+              receive_list_.add (&crt_thread);
             }
 
           Systick_clock::wait (timeout - slept_ticks);
