@@ -234,6 +234,17 @@ namespace os
 
       os_assert_throw(pool_addr_ != nullptr, ENOMEM);
 
+      _init ();
+    }
+
+    /**
+     * @details
+     * Construct the linked list of blocks and initialise the
+     * internal pointers and counters.
+     */
+    void
+    Memory_pool::_init (void)
+    {
       // Construct a linked list of blocks. Store the pointer at
       // the beginning of each block. Each block
       // will hold the address of the next free block, or nullptr at the end.
@@ -372,12 +383,12 @@ namespace os
 
       trace::printf ("%s(%d) @%p %s\n", __func__, ticks, this, name ());
 
-      bool queued = false;
-
       if (ticks == 0)
         {
           ticks = 1;
         }
+
+      bool queued = false;
 
       Systick_clock::rep start = Systick_clock::now ();
       for (;;)
@@ -471,7 +482,9 @@ namespace os
 
     /**
      * @details
-     * Reset the memory pool to the initial state, with all block free.
+     * Reset the memory pool to the initial state, with all blocks free.
+     *
+     *
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -483,6 +496,19 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
       // TODO
+
+      interrupts::Critical_section cs; // ----- Critical section -----
+
+      _init ();
+
+      if (!list_.empty ())
+        {
+          // Wake-up all threads, if any.
+          list_.wakeup_all ();
+
+          list_.clear ();
+        }
+
       return result::ok;
     }
 
