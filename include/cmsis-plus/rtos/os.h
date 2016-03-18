@@ -2155,12 +2155,12 @@ namespace os
       using protocol_t = enum class protocol : uint8_t
         {
           /**
-           * @brief Undefined value.
+           * @brief Priority and scheduling not affected by mutex ownership.
            */
           none = 0,
 
           /**
-           * @brief Inherit.
+           * @brief Inherit from highest priority thread.
            * @details
            * TODO: add
            */
@@ -2206,6 +2206,8 @@ namespace os
            * @brief Recursive mutex behaviour.
            */
           recursive = 2,
+
+          _default = normal,
         };
 
       /**
@@ -2285,6 +2287,11 @@ namespace os
          * @brief Mutex type attribute.
          */
         mutex::type_t mx_type;
+
+        /**
+         * @brief Mutex maximum recursive count.
+         */
+        mutex::count_t mx_max_count;
 
         //
         // TODO: add clock ID.
@@ -2549,7 +2556,7 @@ namespace os
       consistent (void);
 
       /**
-       * @brief Get the thread that own the mutex.
+       * @brief Get the thread that owns the mutex.
        * @par Parameters
        *  None
        * @return Pointer to thread or `nullptr` if not owned.
@@ -2573,12 +2580,45 @@ namespace os
     protected:
 
       /**
+       * @name Private Member Functions
+       * @{
+       */
+
+      /**
+       * @brief Internal initialisation.
+       * @par Parameters
+       *  None
+       */
+      void
+      _init (void);
+
+      /**
+       * @brief Internal function used to lock the mutex.
+       * @par Parameters
+       *  None
+       * @retval true The mutex was locked.
+       * @retval false The mutex was not locked.
+       */
+      result_t
+      _try_lock (Thread* crt_thread);
+
+      /**
+       * @}
+       */
+
+    protected:
+
+      /**
        * @name Private Member Variables
        * @{
        */
 
       // Can be updated in different thread contexts.
       Thread* volatile owner_;
+
+#if !defined(OS_INCLUDE_PORT_RTOS_MUTEX)
+      port::Tasks_list list_;
+#endif
 
 #if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
       friend class port::Mutex;
@@ -2590,11 +2630,13 @@ namespace os
 
       // Can be updated in different thread contexts.
       volatile thread::priority_t prio_ceiling_;
+      volatile thread::priority_t owner_prio_;
 
       // Constants set during construction.
       const mutex::type_t type_; // normal, errorcheck, recursive
       const mutex::protocol_t protocol_; // none, inherit, protect
       const mutex::robustness_t robustness_; // stalled, robust
+      const mutex::count_t max_count_;
 
       // Add more internal data.
 

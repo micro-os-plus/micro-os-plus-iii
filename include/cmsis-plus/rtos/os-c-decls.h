@@ -236,6 +236,7 @@ extern "C"
     os_mutex_type_normal = 0,
     os_mutex_type_errorcheck = 1,
     os_mutex_type_recursive = 2,
+    os_mutex_type_default = os_mutex_type_normal,
   };
 
 #pragma GCC diagnostic push
@@ -248,20 +249,26 @@ extern "C"
     os_mutex_protocol_t mx_protocol;
     os_mutex_robustness_t mx_robustness;
     os_mutex_type_t mx_type;
+    os_mutex_count_t mx_max_count;
   } os_mutex_attr_t;
 
   typedef struct os_mutex_s
   {
     const char* name;
     void* owner;
+#if !defined(OS_INCLUDE_PORT_RTOS_MUTEX)
+    os_thread_list_t list;
+#endif
 #if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
     os_mutex_port_data_t port;
 #endif
     os_mutex_count_t count;
     os_thread_prio_t prio_ceiling;
+    os_thread_prio_t owner_prio;
     os_mutex_type_t type;
     os_mutex_protocol_t protocol;
     os_mutex_robustness_t robustness;
+    os_mutex_count_t max_count;
   } os_mutex_t;
 
 #pragma GCC diagnostic pop

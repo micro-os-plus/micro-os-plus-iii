@@ -36,10 +36,6 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-#pragma GCC diagnostic push
-// TODO: remove it when fully implemented
-//#pragma GCC diagnostic ignored "-Wunused-parameter"
-
     /**
      * @details
      * The os::rtos::mutex namespace groups mutex types, enumerations,
@@ -96,60 +92,61 @@ namespace os
       /**
        * @var mutex::protocol_t Attributes::mx_protocol
        * @details
-       * The default value of the attribute shall be PTHREAD_PRIO_NONE.
+       * The default value of the attribute shall be `mutex::protocol::none`.
        *
-       * When a thread owns a mutex with the PTHREAD_PRIO_NONE
+       * When a thread owns a mutex with the `mutex::protocol::none`
        * protocol attribute, its priority and scheduling shall
        * not be affected by its mutex ownership.
        *
        * When a thread is blocking higher priority threads
        * because of owning one or more robust mutexes with the
-       * PTHREAD_PRIO_INHERIT protocol attribute, it shall execute
+       * `mutex::protocol::inherit` protocol attribute, it shall execute
        * at the higher of its priority or the priority of the highest
        * priority thread waiting on any of the robust mutexes owned
        * by this thread and initialised with this protocol.
        *
        * When a thread is blocking higher priority threads because
        * of owning one or more non-robust mutexes with the
-       * PTHREAD_PRIO_INHERIT protocol attribute, it shall execute
+       * `mutex::protocol::inherit` protocol attribute, it shall execute
        * at the higher of its priority or the priority of the
        * highest priority thread waiting on any of the non-robust
        * mutexes owned by this thread and initialised with this protocol.
        *
        * When a thread owns one or more robust mutexes initialised
-       * with the PTHREAD_PRIO_PROTECT protocol, it shall execute
+       * with the `mutex::protocol::protect` protocol, it shall execute
        * at the higher of its priority or the highest of the priority
        * ceilings of all the robust mutexes owned by this thread and
        * initialised with this attribute, regardless of whether other
        * threads are blocked on any of these robust mutexes or not.
        *
        * When a thread owns one or more non-robust mutexes initialised
-       * with the PTHREAD_PRIO_PROTECT protocol, it shall execute at
+       * with the `mutex::protocol::protect` protocol, it shall execute at
        * the higher of its priority or the highest of the priority
        * ceilings of all the non-robust mutexes owned by this thread
        * and initialised with this attribute, regardless of whether
        * other threads are blocked on any of these non-robust mutexes
        * or not.
        *
-       * While a thread is holding a mutex which has been initialised
-       * with the PTHREAD_PRIO_INHERIT or PTHREAD_PRIO_PROTECT protocol
+       * While a thread is holding a mutex which has been initialised with
+       * the `mutex::protocol::inherit` or `mutex::protocol::protect` protocol
        * attributes, it shall not be subject to being moved to the tail
        * of the scheduling queue at its priority in the event that its
        * original priority is changed, such as by a call to
        * sched_setparam(). Likewise, when a thread unlocks a mutex
-       * that has been initialised with the PTHREAD_PRIO_INHERIT or
-       * PTHREAD_PRIO_PROTECT protocol attributes, it shall not be
+       * that has been initialised with the `mutex::protocol::inherit` or
+       * `mutex::protocol::protect` protocol attributes, it shall not be
        * subject to being moved to the tail of the scheduling queue
        * at its priority in the event that its original priority is changed.
+       * (TODO)
        *
        * If a thread simultaneously owns several mutexes initialised
        * with different protocols, it shall execute at the highest of
        * the priorities that it would have obtained by each of these
        * protocols.
        *
-       * When a thread makes a call to Mutex::lock(), the mutex
+       * When a thread makes a call to `Mutex::lock()`, the mutex
        * was initialised with the protocol attribute having the
-       * value PTHREAD_PRIO_INHERIT, when the calling thread is
+       * value `mutex::protocol::inherit`, when the calling thread is
        * blocked because the mutex is owned by another thread, that
        * owner thread shall inherit the priority level of the calling
        * thread as long as it continues to own the mutex. The
@@ -157,7 +154,7 @@ namespace os
        * the maximum of its assigned priority and all its
        * inherited priorities. Furthermore, if this owner thread
        * itself becomes blocked on another mutex with the protocol
-       * attribute having the value PTHREAD_PRIO_INHERIT, the same
+       * attribute having the value `mutex::protocol::inherit`, the same
        * priority inheritance effect shall be propagated to this
        * other owner thread, in a recursive manner.
        *
@@ -172,34 +169,35 @@ namespace os
        * @details
        *
        * Valid values for robust include:
-       * - PTHREAD_MUTEX_STALLED
+       *
+       * - `mutex::robustness::stalled`
        *
        *   No special actions are taken if the owner of the mutex
        *  is terminated while holding the mutex lock. This can
        *  lead to deadlocks if no other thread can unlock the mutex.
        *  This is the default value.
        *
-       * - PTHREAD_MUTEX_ROBUST
+       * - `mutex::robustness::robust`
        *
        *   If the process containing the owning thread of a robust
        *   mutex terminates while holding the mutex lock, the next
        *   thread that acquires the mutex shall be notified about
-       *   the termination by the return value [EOWNERDEAD] from
+       *   the termination by the return value `EOWNERDEAD` from
        *   the locking function. If the owning thread of a robust
        *   mutex terminates while holding the mutex lock, the next
        *   thread that acquires the mutex may be notified about the
-       *   termination by the return value [EOWNERDEAD]. The notified
+       *   termination by the return value `EOWNERDEAD`. The notified
        *   thread can then attempt to mark the state protected by
        *   the mutex as consistent again by a call to
-       *   pthread_mutex_consistent(). After a subsequent
-       *   successful call to pthread_mutex_unlock(), the mutex
+       *   `Mutex::consistent()`. After a subsequent
+       *   successful call `Mutex::unlock()`, the mutex
        *   lock shall be released and can be used normally by
        *   other threads. If the mutex is unlocked without a
-       *   call to pthread_mutex_consistent(), it shall be in a
+       *   call to `Mutex::consistent()`, it shall be in a
        *   permanently unusable state and all attempts to lock
-       *   the mutex shall fail with the error [ENOTRECOVERABLE].
+       *   the mutex shall fail with the error `ENOTRECOVERABLE`.
        *   The only permissible operation on such a mutex is
-       *   pthread_mutex_destroy().
+       *   `Mutex::destroy()`.
        *
        * @par POSIX compatibility
        *  Inspired by [`pthread_mutexattr_setrobust()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_setrobust.html)
@@ -210,19 +208,19 @@ namespace os
       /**
        * @var mutex::type_t Attributes::mx_type
        * @details
-       * The default value of the type attribute is PTHREAD_MUTEX_DEFAULT.
+       * The default value of the type attribute is `mutex::type::_default`.
        *
        * The type of mutex is contained in the type attribute of
        * the mutex attributes. Valid mutex types include:
        *
-       * - PTHREAD_MUTEX_NORMAL
-       * - PTHREAD_MUTEX_ERRORCHECK
-       * - PTHREAD_MUTEX_RECURSIVE
-       * - PTHREAD_MUTEX_DEFAULT
+       * - `mutex::type::normal`
+       * - `mutex::type::errorcheck`
+       * - `mutex::type::recursive`
+       * - `mutex::type::_default`
        *
        * The mutex type affects the behaviour of calls which lock
-       * and unlock the mutex. See @ref Mutex::lock() for details.
-       * An implementation may map PTHREAD_MUTEX_DEFAULT to one of
+       * and unlock the mutex. See @ref `Mutex::lock()` for details.
+       * An implementation may map `mutex::type::_default` to one of
        * the other mutex types.
        *
        * @par POSIX compatibility
@@ -379,7 +377,9 @@ namespace os
           { attr.name () }, //
         type_ (attr.mx_type), //
         protocol_ (attr.mx_protocol), //
-        robustness_ (attr.mx_robustness) //
+        robustness_ (attr.mx_robustness), //
+        max_count_ (
+            (attr.mx_type == mutex::type::recursive) ? attr.mx_max_count : 1)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
@@ -387,15 +387,16 @@ namespace os
       owner_ = nullptr;
       count_ = 0;
 
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
 #if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
 
+      count_ = 0;
       port::Mutex::create (this);
 
 #else
 
-      // TODO
+      _init ();
 
 #endif
     }
@@ -417,7 +418,7 @@ namespace os
      */
     Mutex::~Mutex ()
     {
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
 #if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
 
@@ -425,9 +426,88 @@ namespace os
 
 #else
 
-      // TODO
+      if (owner_ != nullptr)
+        {
+          // os_assert_throw(owner_ == nullptr, ENOTRECOVERABLE);
+        }
 
 #endif
+    }
+
+    void
+    Mutex::_init (void)
+    {
+      count_ = 0;
+
+#if !defined(OS_INCLUDE_PORT_RTOS_MUTEX)
+
+      if (!list_.empty ())
+        {
+          // Wake-up all threads, if any.
+          list_.wakeup_all ();
+
+          list_.clear ();
+        }
+
+#endif
+    }
+
+    result_t
+    Mutex::_try_lock (Thread* crt_thread)
+    {
+      if (owner_ == nullptr)
+        {
+          owner_ = crt_thread;
+          count_ = 1;
+
+          if (protocol_ == mutex::protocol::inherit)
+            {
+              // Save owner priority, in case a temporary boost
+              // will be later applied.
+              owner_prio_ = owner_->sched_prio ();
+            }
+          else if (protocol_ == mutex::protocol::protect)
+            {
+              // Save owner priority and boost priority.
+              owner_prio_ = owner_->sched_prio ();
+              if (prio_ceiling_ > owner_prio_)
+                {
+                  owner_->sched_prio (prio_ceiling_);
+                }
+            }
+          return result::ok;
+        }
+
+      if (owner_ == crt_thread)
+        {
+          if (type_ == mutex::type::recursive)
+            {
+              if (count_ == max_count_)
+                {
+                  return EAGAIN;
+                }
+              ++count_;
+              return result::ok;
+            }
+          else if (type_ == mutex::type::errorcheck)
+            {
+              return EDEADLK;
+            }
+        }
+
+      if (protocol_ == mutex::protocol::inherit)
+        {
+          thread::priority_t prio = crt_thread->sched_prio ();
+          if ((prio > owner_->sched_prio ()))
+            {
+              // Boost owner priority.
+              owner_->sched_prio (prio);
+            }
+        }
+
+      return EBUSY;
+
+      // TODO: EINVAL, EOWNERDEAD
     }
 
     /**
@@ -446,13 +526,13 @@ namespace os
      * following table.
      *
      * | %Mutex Type | Robustness | Relock    | Unlock When Not Owner |
-     * | -----------| ---------- | --------- | ----------------------|
-     * | normal     | non-robust | deadlock  | undefined behaviour   |
-     * | normal     | robust     | deadlock  | error                 |
-     * | errorcheck | either     | error     | error                 |
-     * | recursive  | either     | recursive | error                 |
-     * | default    | non-robust | undefined | undefined behaviour   |
-     * | default    | robust     | undefined | error                 |
+     * | ------------| ---------- | --------- | ----------------------|
+     * | normal      | non-robust | deadlock  | undefined behaviour   |
+     * | normal      | robust     | deadlock  | error                 |
+     * | errorcheck  | either     | error     | error                 |
+     * | recursive   | either     | recursive | error                 |
+     * | default     | non-robust | undefined | undefined behaviour   |
+     * | default     | robust     | undefined | error                 |
      *
      * Where the table indicates recursive behaviour, the mutex
      * shall maintain the concept of a lock count. When a thread
@@ -476,7 +556,7 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
 #if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
 
@@ -484,8 +564,33 @@ namespace os
 
 #else
 
-      // TODO
-      return result::ok;
+      Thread& crt_thread = this_thread::thread ();
+
+      for (;;)
+        {
+            {
+              scheduler::Critical_section cs; // ----- Critical section -----
+
+              result_t res = _try_lock (&crt_thread);
+              if (res != EBUSY)
+                {
+                  return res;
+                }
+
+              // Add this thread to the waiting list.
+              // Will be removed by free().
+              list_.add (&crt_thread);
+            }
+          this_thread::suspend ();
+
+          if (crt_thread.interrupted ())
+            {
+              return EINTR;
+            }
+        }
+
+      /* NOTREACHED */
+      return ENOTRECOVERABLE;
 
 #endif
     }
@@ -502,10 +607,10 @@ namespace os
      *
      * If _mutex_ is a robust mutex and the process containing
      * the owning thread terminated while holding the mutex lock,
-     * a call to `lock()` shall return the error value
+     * a call to `try_lock()` shall return the error value
      * `EOWNERDEAD`. If _mutex_ is a robust mutex and the owning
      * thread terminated while holding the mutex lock, a call
-     * to Mutex::lock() may return the error value `EOWNERDEAD`
+     * to `try_lock()` may return the error value `EOWNERDEAD`
      * even if the process in which the owning thread resides
      * has not terminated. In these cases, the mutex is locked
      * by the thread but the state it protects is marked as
@@ -528,7 +633,7 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
 #if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
 
@@ -536,8 +641,10 @@ namespace os
 
 #else
 
-      // TODO
-      return result::ok;
+      scheduler::Critical_section cs; // ----- Critical section -----
+
+      Thread& crt_thread = this_thread::thread ();
+      return _try_lock (&crt_thread);
 
 #endif
     }
@@ -582,7 +689,7 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-      trace::printf ("%s(%d_ticks) @%p \n", __func__, timeout, this);
+      trace::printf ("%s(%d_ticks) @%p %s\n", __func__, timeout, this, name ());
 
 #if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
 
@@ -590,8 +697,44 @@ namespace os
 
 #else
 
-      // TODO
-      return result::ok;
+      Thread& crt_thread = this_thread::thread ();
+
+      Systick_clock::rep start = Systick_clock::now ();
+      for (;;)
+        {
+          Systick_clock::sleep_rep slept_ticks;
+            {
+              scheduler::Critical_section cs; // ----- Critical section -----
+
+              result_t res = _try_lock (&crt_thread);
+              if (res != EBUSY)
+                {
+                  return res;
+                }
+
+              Systick_clock::rep now = Systick_clock::now ();
+              slept_ticks = (Systick_clock::sleep_rep) (now - start);
+              if (slept_ticks >= timeout)
+                {
+                  list_.remove (&crt_thread);
+                  return ETIMEDOUT;
+                }
+
+              // Add this thread to the waiting list.
+              // Will be removed by receive().
+              list_.add (&crt_thread);
+            }
+
+          Systick_clock::wait (timeout - slept_ticks);
+
+          if (crt_thread.interrupted ())
+            {
+              return EINTR;
+            }
+        }
+
+      /* NOTREACHED */
+      return ENOTRECOVERABLE;
 
 #endif
     }
@@ -621,7 +764,7 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
 #if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
 
@@ -629,8 +772,43 @@ namespace os
 
 #else
 
-      // TODO
-      return result::ok;
+      scheduler::Critical_section cs; // ----- Critical section -----
+
+      Thread* crt_thread = &this_thread::thread ();
+
+      if (owner_ == crt_thread)
+        {
+          if ((type_ == mutex::type::recursive) && (count_ > 1))
+            {
+              --count_;
+              return result::ok;
+            }
+
+          count_ = 0;
+          if (!list_.empty ())
+            {
+              // Wake-up one thread, if any.
+              list_.wakeup_one ();
+            }
+
+          if ((protocol_ == mutex::protocol::inherit)
+              || (protocol_ == mutex::protocol::protect))
+            {
+              owner_->sched_prio (owner_prio_);
+            }
+
+          owner_ = nullptr;
+          return result::ok;
+        }
+
+      // Not owner, or not locked.
+      if (type_ == mutex::type::errorcheck || type_ == mutex::type::recursive
+          || robustness_ == mutex::robustness::robust)
+        {
+          return EPERM;
+        }
+
+      return ENOTRECOVERABLE;
 
 #endif
     }
@@ -649,9 +827,9 @@ namespace os
     thread::priority_t
     Mutex::prio_ceiling (void) const
     {
-      assert (!scheduler::in_handler_mode ());
+      assert(!scheduler::in_handler_mode ());
 
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
 #if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
 
@@ -659,7 +837,6 @@ namespace os
 
 #else
 
-      // TODO
       return prio_ceiling_;
 
 #endif
@@ -691,7 +868,7 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
 #if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
 
@@ -750,7 +927,7 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
 #if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
 
@@ -766,20 +943,26 @@ namespace os
 
     /**
      * @details
+     * Return the mutex to initial unlocked state. If there were threads
+     * waiting for this mutex, wakeup all, then clear the waiting list.
+     *
      * @par POSIX compatibility
      *  Extension to standard, no POSIX similar functionality identified.
      */
     result_t
     Mutex::reset (void)
     {
-      // TODO wait list?
-      count_ = 0;
+      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+
+      scheduler::Critical_section cs; // ----- Critical section -----
+
+      _init ();
       return result::ok;
     }
 
   // ------------------------------------------------------------------------
-
-#pragma GCC diagnostic pop
 
   } /* namespace rtos */
 } /* namespace os */

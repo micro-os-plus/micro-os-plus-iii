@@ -1451,8 +1451,12 @@ osMutexCreate (const osMutexDef_t* mutex_def)
       return nullptr;
     }
 
-  return reinterpret_cast<osMutexId> (new ((void*) mutex_def->data) Mutex (
-      mutex::recursive_initializer));
+  mutex::Attributes attr
+    { mutex_def->name };
+  attr.mx_type = mutex::type::recursive;
+  attr.mx_protocol = mutex::protocol::inherit;
+
+  return reinterpret_cast<osMutexId> (new ((void*) mutex_def->data) Mutex (attr));
 }
 
 /**
@@ -1562,7 +1566,7 @@ osMutexRelease (osMutexId mutex_id)
     {
       return osOK;
     }
-  else if (res == EPERM)
+  else if ((res == EPERM) || (res == ENOTRECOVERABLE))
     {
       return osErrorResource;
     }
