@@ -4784,7 +4784,7 @@ namespace os
         mx_priority_ceiling = thread::priority::highest;
         mx_protocol = protocol::none;
         mx_robustness = robustness::stalled;
-        mx_type = type::normal;
+        mx_type = type::_default;
       }
 
       inline

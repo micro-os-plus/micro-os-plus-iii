@@ -396,6 +396,8 @@ namespace os
 
 #else
 
+      // Robust mutexes not yet supported.
+      os_assert_throw(robustness_ != mutex::robustness::robust, ENOTSUP);
       _init ();
 
 #endif
@@ -428,7 +430,7 @@ namespace os
 
       if (owner_ != nullptr)
         {
-          // os_assert_throw(owner_ == nullptr, ENOTRECOVERABLE);
+          os_assert_throw(owner_ == nullptr, ENOTRECOVERABLE);
         }
 
 #endif
@@ -475,6 +477,7 @@ namespace os
                   owner_->sched_prio (prio_ceiling_);
                 }
             }
+          trace::printf ("mutex @%p %s locked by %p %s\n", this, name (), crt_thread, crt_thread->name());
           return result::ok;
         }
 
@@ -487,6 +490,7 @@ namespace os
                   return EAGAIN;
                 }
               ++count_;
+              trace::printf ("mutex @%p %s incr %d by %p %s\n", this, name (), count_, crt_thread, crt_thread->name());
               return result::ok;
             }
           else if (type_ == mutex::type::errorcheck)
@@ -781,6 +785,7 @@ namespace os
           if ((type_ == mutex::type::recursive) && (count_ > 1))
             {
               --count_;
+              trace::printf ("mutex @%p %s decr %d\n", this, name (), count_);
               return result::ok;
             }
 
@@ -797,6 +802,7 @@ namespace os
               owner_->sched_prio (owner_prio_);
             }
 
+          trace::printf ("mutex @%p %s unlocked\n", this, name ());
           owner_ = nullptr;
           return result::ok;
         }
@@ -879,15 +885,19 @@ namespace os
       thread::priority_t prio;
         {
           // TODO: lock() must not adhere to the priority protocol.
-          lock ();
-          prio = prio_ceiling_;
-          prio_ceiling_ = prio_ceiling;
-          unlock ();
-        }
+          result_t res = lock ();
 
-      if (old_prio_ceiling != nullptr)
-        {
-          *old_prio_ceiling = prio;
+          prio = prio_ceiling_;
+          if (res == result::ok)
+            {
+              prio_ceiling_ = prio_ceiling;
+              unlock ();
+            }
+
+          if (old_prio_ceiling != nullptr)
+            {
+              *old_prio_ceiling = prio;
+            }
         }
       return result::ok;
 
