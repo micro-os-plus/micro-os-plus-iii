@@ -88,8 +88,8 @@ namespace os
      * @par Cancellation and Condition Wait
      *
      * A condition wait, whether timed or not, is a cancellation
-     * point. That is, the functions `Condition_variable::wait()`
-     * or `Condition_variable::wait()` are points where a pending
+     * point. That is, the functions `wait()`
+     * or `timed_wait()` are points where a pending
      * (or concurrent) cancellation request is noticed. The reason
      * for this is that an indefinite wait is possible at these
      * points-whatever event is being waited for, even if the
@@ -211,14 +211,14 @@ namespace os
 
     /**
      * @details
-     * This constructor shall initialise the condition variable
+     * This constructor shall initialise the condition variable object
      * with default settings.
-     * The effect shall be equivalent to creating a condition variable
+     * The effect shall be equivalent to creating a condition variable object
      * referring to the attributes in `condvar::initializer`.
-     * Upon successful initialisation, the state of the condition
-     * variable shall become initialised.
+     * Upon successful initialisation, the state of the
+     * condition variable object shall become initialised.
      *
-     * Only the condition itself may be used for performing
+     * Only the condition variable object itself may be used for performing
      * synchronisation. It is not allowed to make copies of
      * condition variable objects.
      *
@@ -238,20 +238,23 @@ namespace os
 
     /**
      * @details
-     * This constructor shall initialise the condition variable
+     * This constructor shall initialise the condition variable object
      * with attributes referenced by _attr_.
-     * Upon successful initialisation, the state of the condition
-     * variable shall become initialised.
+     * If the attributes specified by _attr_ are modified later,
+     * the condition variable attributes shall not be affected.
      *
-     * Only the condition itself may be used for performing
+     * Upon successful initialisation, the state of the
+     * condition variable object shall become initialised.
+     *
+     * Only the condition variable object itself may be used for performing
      * synchronisation. It is not allowed to make copies of
      * condition variable objects.
      *
      * In cases where default condition variable attributes are
      * appropriate, the variable `condvar::initializer` can be used to
      * initialise condition variables.
-     * The effect shall be equivalent to creating condition variables with
-     * the default constructor.
+     * The effect shall be equivalent to creating a condition variables
+     * object with the default constructor.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      *
@@ -271,13 +274,13 @@ namespace os
 
     /**
      * @details
-     * This destructor shall destroy the condition variable; the object
+     * This destructor shall destroy the condition variable object; the object
      * becomes, in effect, uninitialised. An implementation may cause
      * the destructor to set the object to an invalid value.
      *
-     * It shall be safe to destroy an initialised condition variable
+     * It shall be safe to destroy an initialised condition variable object
      * upon which no threads are currently blocked. Attempting to
-     * destroy a condition variable upon which other threads are
+     * destroy a condition variable object upon which other threads are
      * currently blocked results in undefined behaviour.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
@@ -299,24 +302,24 @@ namespace os
      * on the specified condition variable.
      *
      * When each thread unblocked as a result of a
-     * `Condition_variable::signal()` returns from its call to
-     * `Condition_variable::wait()` or `Condition_variable::timed_wait()`,
+     * `signal()` returns from its call to
+     * `wait()` or `timed_wait()`,
      * the thread shall own the mutex with which it called
-     * `Condition_variable::wait()` or `Condition_variable::timed_wait()`.
+     * `wait()` or `timed_wait()`.
      * The thread(s) that are unblocked shall contend for
      * the mutex according to the scheduling policy (if applicable),
      * and as if each had called `Mutex::lock()`.
      *
-     * `Condition_variable::signal()` may be called by a thread
+     * `signal()` may be called by a thread
      * whether or not it currently owns the mutex that threads
-     * calling `Condition_variable::wait()` or
-     * `Condition_variable::timed_wait()` have associated with
+     * calling `wait()` or
+     * `timed_wait()` have associated with
      * the condition variable during their waits; however,
      * if predictable scheduling behaviour is required, then
      * that mutex shall be locked by the thread calling
-     * `Condition_variable::broadcast()`.
+     * `broadcast()`.
      *
-     * The `Condition_variable::signal()` function shall
+     * The `signal()` function shall
      * have no effect if there are no threads currently
      * blocked on this condition variable.
      *
@@ -347,39 +350,39 @@ namespace os
      * threads are unblocked.
      *
      * When each thread unblocked as a result of a
-     * `Condition_variable::broadcast()` returns from its call to
-     * `Condition_variable::wait()` or `Condition_variable::timed_wait()`,
+     * `broadcast()` returns from its call to
+     * `wait()` or `timed_wait()`,
      * the thread shall own the mutex with which it called
-     * `Condition_variable::wait()` or `Condition_variable::timed_wait()`.
+     * `wait()` or `timed_wait()`.
      * The thread(s) that are unblocked shall contend for
      * the mutex according to the scheduling policy (if applicable),
      * and as if each had called `Mutex::lock()`.
      *
-     * `Condition_variable::broadcast()` may be called by a thread
+     * `broadcast()` may be called by a thread
      * whether or not it currently owns the mutex that threads
-     * calling `Condition_variable::wait()` or
-     * `Condition_variable::timed_wait()` have associated with
+     * calling `wait()` or
+     * `timed_wait()` have associated with
      * the condition variable during their waits; however,
      * if predictable scheduling behaviour is required, then
      * that mutex shall be locked by the thread calling
-     * `Condition_variable::broadcast()`.
+     * `broadcast()`.
      *
-     * The `Condition_variable::broadcast()` function shall
+     * The `broadcast()` function shall
      * have no effect if there are no threads currently
      * blocked on this condition variable.
      *
      * @par Application usage
-     * The `Condition_variable::broadcast()` function is used whenever
+     * The `broadcast()` function is used whenever
      * the shared-variable state has been changed in a way that more
      * than one thread can proceed with its task. Consider a single
      * producer/multiple consumer problem, where the producer can
      * insert multiple items on a list that is accessed one item at
      * a time by the consumers. By calling the
-     * `Condition_variable::broadcast()` function, the producer would
+     * `broadcast()` function, the producer would
      * notify all consumers that might be waiting, and thereby the
      * application would receive more throughput on a multi-processor.
-     * In addition, `Condition_variable::broadcast()` makes it easier
-     * to implement a read-write lock. The `Condition_variable::broadcast()`
+     * In addition, `broadcast()` makes it easier
+     * to implement a read-write lock. The `broadcast()`
      * function is needed in order to wake up all waiting readers when
      * a writer releases its lock. Finally, the two-phase commit
      * algorithm can use this broadcast function to notify all
@@ -416,8 +419,8 @@ namespace os
      * by another thread to the mutex and then the condition variable".
      * That is, if another thread is able to acquire the mutex
      * after the about-to-block thread has released it, then a
-     * subsequent call to `Condition_variable::broadcast()` or
-     * `Condition_variable::signal()` in that thread shall behave
+     * subsequent call to `broadcast()` or
+     * `signal()` in that thread shall behave
      * as if it were issued after the about-to-block thread has blocked.
      *
      * Upon successful return, the mutex shall have been locked and
@@ -430,22 +433,22 @@ namespace os
      * predicate involving shared variables associated with each
      * condition wait that is true if the thread should proceed.
      * Spurious wakeups from the
-     * `Condition_variable::wait()` functions may occur. Since
+     * `wait()` functions may occur. Since
      * the return from
-     * `Condition_variable::wait()` does not imply anything about
+     * `wait()` does not imply anything about
      * the value of this predicate, the predicate should be
      * re-evaluated upon such return.
      *
      * When a thread waits on a condition variable, having specified
      * a particular mutex to either the
-     * the `Condition_variable::wait()` operation, a dynamic
+     * the `wait()` operation, a dynamic
      * binding is formed between that mutex and condition variable
      * that remains in effect as long as at least one thread is
      * blocked on the condition variable. During this time, the
      * effect of an attempt by any thread to wait on that condition
      * variable using a different mutex is undefined. Once all
      * waiting threads have been unblocked (as by the
-     * `Condition_variable::broadcast()` operation), the next wait
+     * `broadcast()` operation), the next wait
      * operation on that condition variable shall form a new
      * dynamic binding with the mutex specified by that wait
      * operation. Even though the dynamic binding between
@@ -464,15 +467,15 @@ namespace os
      * first cancellation cleanup handler. The effect is as if
      * the thread were unblocked, allowed to execute up to the
      * point of returning from the call to
-     * `Condition_variable::wait()`, but at that point notices
+     * `wait()`, but at that point notices
      * the cancellation request and instead of returning to the
      * caller of
-     * `Condition_variable::wait()`, starts the thread cancellation
+     * `wait()`, starts the thread cancellation
      * activities, which includes calling cancellation cleanup handlers.
      *
      * A thread that has been unblocked because it has been cancelled
      * while blocked in a call to
-     * `Condition_variable::wait()` shall not consume any condition
+     * `wait()` shall not consume any condition
      * signal that may be directed concurrently at the condition
      * variable if there are other threads blocked on the condition
      * variable.
@@ -508,8 +511,8 @@ namespace os
      * by another thread to the mutex and then the condition variable".
      * That is, if another thread is able to acquire the mutex
      * after the about-to-block thread has released it, then a
-     * subsequent call to `Condition_variable::broadcast()` or
-     * `Condition_variable::signal()` in that thread shall behave
+     * subsequent call to `broadcast()` or
+     * `signal()` in that thread shall behave
      * as if it were issued after the about-to-block thread has blocked.
      *
      * Upon successful return, the mutex shall have been locked and
@@ -521,15 +524,15 @@ namespace os
      * When using condition variables there is always a Boolean
      * predicate involving shared variables associated with each
      * condition wait that is true if the thread should proceed.
-     * Spurious wakeups from the `Condition_variable::timed_wait()`
+     * Spurious wakeups from the `timed_wait()`
      * functions may occur. Since
-     * the return from `Condition_variable::timed_wait()`
+     * the return from `timed_wait()`
      * does not imply anything about
      * the value of this predicate, the predicate should be
      * re-evaluated upon such return.
      *
      * When a thread waits on a condition variable, having specified
-     * a particular mutex to either the `Condition_variable::timed_wait()`
+     * a particular mutex to either the `timed_wait()`
      * operation, a dynamic
      * binding is formed between that mutex and condition variable
      * that remains in effect as long as at least one thread is
@@ -537,7 +540,7 @@ namespace os
      * effect of an attempt by any thread to wait on that condition
      * variable using a different mutex is undefined. Once all
      * waiting threads have been unblocked (as by the
-     * `Condition_variable::broadcast()` operation), the next wait
+     * `broadcast()` operation), the next wait
      * operation on that condition variable shall form a new
      * dynamic binding with the mutex specified by that wait
      * operation. Even though the dynamic binding between
@@ -556,32 +559,32 @@ namespace os
      * first cancellation cleanup handler. The effect is as if
      * the thread were unblocked, allowed to execute up to the
      * point of returning from the call to
-     * `Condition_variable::timed_wait()`, but at that point notices
+     * `timed_wait()`, but at that point notices
      * the cancellation request and instead of returning to the
-     * caller of `Condition_variable::timed_wait()` or
-     * `Condition_variable::wait()`, starts the thread cancellation
+     * caller of `timed_wait()` or
+     * `wait()`, starts the thread cancellation
      * activities, which includes calling cancellation cleanup handlers.
      *
      * A thread that has been unblocked because it has been cancelled
-     * while blocked in a call to `Condition_variable::timed_wait()`
+     * while blocked in a call to `timed_wait()`
      * shall not consume any condition
      * signal that may be directed concurrently at the condition
      * variable if there are other threads blocked on the condition
      * variable.
      *
-     * The `Condition_variable::timed_wait()` function shall be
-     * equivalent to `Condition_variable::wait()`, except that an
+     * The `timed_wait()` function shall be
+     * equivalent to `wait()`, except that an
      * error is returned if the timeout specified by _timeout_
      * passes (that is, system time equals or exceeds now() + timeout) before
      * the condition cond is signalled or broadcasted. When such timeouts occur,
-     * `Condition_variable::timed_wait()` shall nonetheless release
+     * `timed_wait()` shall nonetheless release
      * and re-acquire the mutex referenced by _mutex_, and may consume
      * a condition signal directed concurrently at the condition variable.
      *
      * The condition variable shall have a clock attribute which
      * specifies the clock that shall be used to measure the time
      * specified by the _ticks_ argument. The
-     * `Condition_variable::timed_wait()` function is also a
+     * `timed_wait()` function is also a
      * cancellation point.
      * The resolution of the timeout shall be the resolution of the
      * clock on which it is based (by default the SysTick clock for CMSIS).

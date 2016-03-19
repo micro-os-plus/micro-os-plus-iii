@@ -124,8 +124,17 @@ namespace os
 
     /**
      * @details
-     * Create and initialise a semaphore with default attributes
-     * (count=0 and no limit for count).
+     * This constructor shall initialise the semaphore object
+     * with default settings.
+     * The effect shall be equivalent to creating a semaphore object
+     * referring to the attributes in `semaphore::counting_initializer`.
+     * Upon successful initialisation, the state of the
+     * semaphore object shall become initialised.
+     * The initial count is set to zero and there is no upper limit.
+     *
+     * Only the semaphore object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * semaphore objects.
      *
      * Compatible with POSIX `sem_init()`.
      * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html#
@@ -146,8 +155,23 @@ namespace os
 
     /**
      * @details
-     * Create and initialise a semaphore with custom attributes
-     * (initial and max count from user defined attributes).
+     * This constructor shall initialise the semaphore object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the semaphore attributes shall not be affected.
+     * Upon successful initialisation, the state of the
+     * semaphore object shall become initialised.
+     *
+     * Only the semaphore object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * semaphore objects.
+     *
+     * In cases where default semaphore attributes are
+     * appropriate, the variables `semaphore::binary_initializer`
+     * or `semaphore::counting_initializer` can be used to
+     * initialise semaphores.
+     * The effect shall be equivalent to creating a semaphore
+     * object with the default constructor.
      *
      * @par POSIX compatibility
      *  Inspired by [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
@@ -188,6 +212,10 @@ namespace os
 
     /**
      * @details
+     * This destructor shall destroy the semaphore object; the object
+     * becomes, in effect, uninitialised. An implementation may cause
+     * the destructor to set the object to an invalid value.
+     *
      * It is safe to destroy an initialised semaphore upon which
      * no threads are currently blocked. The effect of destroying
      * a semaphore upon which other threads are currently blocked

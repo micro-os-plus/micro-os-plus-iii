@@ -120,6 +120,17 @@ namespace os
 
     /**
      * @details
+     * This constructor shall initialise the timer object
+     * with default settings.
+     * The effect shall be equivalent to creating a timer object
+     * referring to the attributes in `timer::once_initializer`.
+     * Upon successful initialisation, the state of the
+     * timer object shall become initialised.
+     *
+     * Only the timer object itself may be used for running
+     * the function. It is not allowed to make copies of
+     * timer objects.
+     *
      * The default timer is a single run timer which uses the
      * `Systick_clock`; the period is expressed
      * in scheduler ticks.
@@ -135,6 +146,24 @@ namespace os
 
     /**
      * @details
+     * This constructor shall initialise the timer object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the timer attributes shall not be affected.
+     *
+     * Upon successful initialisation, the state of the
+     * timer object shall become initialised.
+     *
+     * Only the timer object itself may be used for running
+     * the function. It is not allowed to make copies of
+     * timer objects.
+     *
+     * In cases where default condition variable attributes are
+     * appropriate, the variables `timer::once_initializer`
+     * or `timer::periodic_initializer` can be used to
+     * initialise timers.
+     * The effect shall be equivalent to creating a timer
+     * object with the simple constructor.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -166,7 +195,11 @@ namespace os
 
     /**
      * @details
-     * If the timer is running, it is automatically stopped.
+     * This destructor shall destroy the timer object; the object
+     * becomes, in effect, uninitialised. An implementation may cause
+     * the destructor to set the object to an invalid value.
+     *
+     * If the timer is running, it must be automatically stopped.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */

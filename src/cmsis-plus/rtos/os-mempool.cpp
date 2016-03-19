@@ -178,9 +178,22 @@ namespace os
      *
      * @par POSIX compatibility
      *  No POSIX similar functionality identified.
+     *  Current functionality inspired by ARM CMSIS, with extensions.
      */
 
     /**
+     * This constructor shall initialise the memory pool object
+     * with the given number of blocks and default settings.
+     * The effect shall be equivalent to creating a memory pool object
+     * referring to the attributes in `mempool::initializer`.
+     * Upon successful initialisation, the state of the memory
+     * pool shall become initialised, with all blocks available.
+     *
+     * Only the memory pool itself may be used for allocations.
+     * It is not allowed to make copies of
+     * condition variable objects.
+     *
+     * For default memory pool objects, the storage is dynamically allocated.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -193,6 +206,25 @@ namespace os
     }
 
     /**
+     * This constructor shall initialise the memory pool object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the memory pool attributes shall not be affected.
+     * Upon successful initialisation, the state of the memory pool
+     * variable shall become initialised.
+     *
+     * Only the memory pool itself may be used for allocations.
+     * It is not allowed to make copies of
+     * condition variable objects.
+     *
+     * In cases where default memory pool attributes are
+     * appropriate, the variable `mempool::initializer` can be used to
+     * initialise condition variables.
+     * The effect shall be equivalent to creating a memory pool object with
+     * the simple constructor.
+     *
+     * If the attributes define a storage area, it is used, otherwise
+     * it is dynamically allocated.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -239,6 +271,31 @@ namespace os
 
     /**
      * @details
+     * This destructor shall destroy the memory pool object; the object
+     * becomes, in effect, uninitialised. An implementation may cause
+     * the destructor to set the object to an invalid value.
+     *
+     * It shall be safe to destroy an initialised memory pool object
+     * upon which no threads are currently blocked. Attempting to
+     * destroy a memory pool object upon which other threads are
+     * currently blocked results in undefined behaviour.
+     *
+     * If the storage for the memory pool was dynamically allocated,
+     * it is deallocated.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    Memory_pool::~Memory_pool ()
+    {
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+
+      if (flags_ | flags_allocated)
+        {
+          delete[] (pool_addr_);
+        }
+    }
+
+    /*
      * Construct the linked list of blocks and initialise the
      * internal pointers and counters.
      */
@@ -259,22 +316,6 @@ namespace os
       first_ = pool_addr_; // Pointer to first block.
 
       count_ = 0; // No allocated blocks.
-    }
-
-    /**
-     * @details
-     * If the pool was dynamically allocated, it is automatically freed.
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    Memory_pool::~Memory_pool ()
-    {
-      trace::printf ("%s() @%p %s\n", __func__, this, name ());
-
-      if (flags_ | flags_allocated)
-        {
-          delete[] (pool_addr_);
-        }
     }
 
     /*

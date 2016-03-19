@@ -148,7 +148,18 @@ namespace os
 
     /**
      * @details
-     * The storage for the message queue is dynamically allocated.
+     * This constructor shall initialise the message queue object
+     * with the given number of messages and default settings.
+     * The effect shall be equivalent to creating a message queue object
+     * referring to the attributes in `mqueue::initializer`.
+     * Upon successful initialisation, the state of the message queue
+     * object shall become initialised, with no messages in the queue.
+     *
+     * Only the message queue object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * message queue objects.
+     *
+     * For default message queue objects, the storage is dynamically allocated.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -161,7 +172,24 @@ namespace os
 
     /**
      * @details
-     * If the attributes define a buffer, it is used, otherwise
+     * This constructor shall initialise the message queue object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the memory pool attributes shall not be affected.
+     * Upon successful initialisation, the state of the
+     * message queue object shall become initialised.
+     *
+     * Only the message queue itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * message queue objects.
+     *
+     * In cases where default message queue attributes are
+     * appropriate, the variable `mqueue::initializer` can be used to
+     * initialise message queue.
+     * The effect shall be equivalent to creating a message queue
+     * object with the simple constructor.
+     *
+     * If the attributes define a storage area, it is used, otherwise
      * it is dynamically allocated.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
@@ -230,6 +258,15 @@ namespace os
 
     /**
      * @details
+     * This destructor shall destroy the message queue object; the object
+     * becomes, in effect, uninitialised. An implementation may cause
+     * the destructor to set the object to an invalid value.
+     *
+     * It shall be safe to destroy an initialised message queue object
+     * upon which no threads are currently blocked. Attempting to
+     * destroy a message queue object upon which other threads are
+     * currently blocked results in undefined behaviour.
+     *
      * If the storage for the message queue was dynamically allocated,
      * it is deallocated.
      *

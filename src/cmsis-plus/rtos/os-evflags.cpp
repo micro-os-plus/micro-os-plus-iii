@@ -113,6 +113,16 @@ namespace os
 
     /**
      * @details
+     * This constructor shall initialise the event flags object
+     * with default settings.
+     * The effect shall be equivalent to creating an event flags object
+     * referring to the attributes in `evflags::initializer`.
+     * Upon successful initialisation, the state of the event
+     * flags object shall become initialised, with all flags cleared.
+     *
+     * Only the event flags object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * event flags objects.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -125,6 +135,22 @@ namespace os
 
     /**
      * @details
+     * This constructor shall initialise the event flags object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the event flags attributes shall not be affected.
+     * Upon successful initialisation, the state of the event
+     * flags object shall become initialised, with all flags cleared.
+     *
+     * Only the event flags object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * event flags objects.
+     *
+     * In cases where default event flags attributes are
+     * appropriate, the variable `evflags::initializer` can be used to
+     * initialise event flags.
+     * The effect shall be equivalent to creating an event flags object with
+     * the default constructor.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -150,6 +176,14 @@ namespace os
 
     /**
      * @details
+     * This destructor shall destroy the event flags object; the object
+     * becomes, in effect, uninitialised. An implementation may cause
+     * the destructor to set the object to an invalid value.
+     *
+     * It shall be safe to destroy an initialised event flags object
+     * upon which no threads are currently blocked. Attempting to
+     * destroy an event flags object upon which other threads are
+     * currently blocked results in undefined behaviour.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -207,8 +241,8 @@ namespace os
 
     /**
      * @details
-     * If the flags::mode::all bit is set, the function expects
-     * all given flags to be raised; otherwise, if the flags::mode::any
+     * If the `flags::mode::all` bit is set, the function expects
+     * all requested flags to be raised; otherwise, if the `flags::mode::any`
      * bit is set, the function expects any single flag to be raised.
      *
      * If the expected event flags are
@@ -277,7 +311,7 @@ namespace os
     /**
      * @details
      * If the flags::mode::all bit is set, the function expects
-     * all given flags to be raised; otherwise, if the flags::mode::any
+     * all requested flags to be raised; otherwise, if the flags::mode::any
      * bit is set, the function expects any single flag to be raised.
      *
      * The function does not blocks, if the expected event flags are
@@ -313,7 +347,7 @@ namespace os
     /**
      * @details
      * If the flags::mode::all bit is set, the function expects
-     * all given flags to be raised; otherwise, if the flags::mode::any
+     * all requested flags to be raised; otherwise, if the flags::mode::any
      * bit is set, the function expects any single flag to be raised.
      *
      * If the expected event flags are

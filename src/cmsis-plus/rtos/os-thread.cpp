@@ -211,8 +211,17 @@ namespace os
 
     /**
      * @details
-     * Create a new thread, with dynamically allocated stack,
-     * of default size.
+     * This constructor shall initialise the thread object
+     * with default settings.
+     * The effect shall be equivalent to creating a thread object
+     * referring to the attributes in `thread::initializer`.
+     * Upon successful initialisation, the state of the
+     * thread object shall become initialised, and the thread is
+     * added to the ready list.
+     *
+     * Only the thread object itself may be used for running the
+     * function. It is not allowed to make copies of
+     * condition variable objects.
      *
      * The thread is created to execute _function_ with _args_ as its
      * sole argument. If the function returns, the effect
@@ -222,6 +231,10 @@ namespace os
      * from this. When it returns from `main()`, the effect shall
      * be as if there was an implicit call to `exit()` using the
      * return value of `main()` as the exit status.
+     *
+     *
+     * For default thread objects, the stack is dynamically allocated,
+     * using the default size.
      *
      * @par POSIX compatibility
      *  Inspired by [`pthread_create()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html)
@@ -239,10 +252,23 @@ namespace os
 
     /**
      * @details
-     *
-     * Create a new thread, with attributes specified by _attr_.
+     * This constructor shall initialise the thread object
+     * with attributes referenced by _attr_.
      * If the attributes specified by _attr_ are modified later,
-     * the thread's attributes shall not be affected.
+     * the thread attributes shall not be affected.
+     * Upon successful initialisation, the state of the
+     * thread object shall become initialised, and the thread is
+     * added to the ready list.
+     *
+     * Only the thread object itself may be used for running the
+     * function. It is not allowed to make copies of
+     * thread objects.
+     *
+     * In cases where default thread attributes are
+     * appropriate, the variable `thread::initializer` can be used to
+     * initialise threads.
+     * The effect shall be equivalent to creating a thread
+     * object with the default constructor.
      *
      * The thread is created to execute _function_ with _args_ as its
      * sole argument. If the function returns, the effect
@@ -267,8 +293,8 @@ namespace os
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
-      assert (function != nullptr);
-      assert (attr.th_priority != thread::priority::none);
+      assert(function != nullptr);
+      assert(attr.th_priority != thread::priority::none);
 
       // Prevent the new thread to execute before all members are set.
       scheduler::Critical_section cs; // ----- Critical section -----
@@ -312,6 +338,10 @@ namespace os
 
     /**
      * @details
+     * This destructor shall destroy the thread object; the object
+     * becomes, in effect, uninitialised. An implementation may cause
+     * the destructor to set the object to an invalid value.
+     *
      * If the thread was created with dynamic stack, it is freed.
      *
      * @par POSIX compatibility
@@ -660,7 +690,7 @@ namespace os
     void
     Thread::exit (void* exit_ptr)
     {
-      assert (!scheduler::in_handler_mode ());
+      assert(!scheduler::in_handler_mode ());
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 

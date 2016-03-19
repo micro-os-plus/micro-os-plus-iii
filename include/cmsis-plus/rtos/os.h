@@ -4296,7 +4296,7 @@ namespace os
                 flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
       /**
-       * @brief Timed wait for signal flags.
+       * @brief Timed wait for event flags.
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
@@ -4341,7 +4341,7 @@ namespace os
       clear (flags::mask_t mask, flags::mask_t* oflags = nullptr);
 
       /**
-       * @brief Get/clear event flags.
+       * @brief Get (and possibly clear) event flags.
        * @param [in] mask The OR-ed flags to get/clear; may be zero.
        * @param [in] mode Mode bits to select if the flags should be
        *  cleared (the other bits are ignored).

@@ -219,7 +219,7 @@ namespace os
        * - `mutex::type::_default`
        *
        * The mutex type affects the behaviour of calls which lock
-       * and unlock the mutex. See @ref `Mutex::lock()` for details.
+       * and unlock the mutex. See `Mutex::lock()` for details.
        * An implementation may map `mutex::type::_default` to one of
        * the other mutex types.
        *
@@ -343,7 +343,16 @@ namespace os
 
     /**
      * @details
-     * Initialise the mutex with default attributes.
+     * This constructor shall initialise the mutex object
+     * with default settings.
+     * The effect shall be equivalent to creating a mutex object
+     * referring to the attributes in `mutex::normal_initializer`.
+     * Upon successful initialisation, the state of the
+     * mutex object shall become initialised, unlocked.
+     *
+     * Only the mutex object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * mutex objects.
      *
      * @par POSIX compatibility
      *  Inspired by [`pthread_mutex_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_init.html)
@@ -361,9 +370,23 @@ namespace os
 
     /**
      * @details
-     * Initialise the mutex with attributes specified by _attr_.
-     * Upon successful initialisation, the state of the mutex becomes
-     * initialised and unlocked.
+     * This constructor shall initialise the mutex object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the mutex attributes shall not be affected.
+     * Upon successful initialisation, the state of the
+     * mutex object shall become initialised.
+     *
+     * Only the mutex object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * condition variable objects.
+     *
+     * In cases where default mutex attributes are
+     * appropriate, the variables `mutex::normal_initializer`
+     * or `mutex::recursive_initializer` can be used to
+     * initialise mutex objects.
+     * The effect shall be equivalent to creating a mutex
+     * object with the default constructor.
      *
      * @par POSIX compatibility
      *  Inspired by [`pthread_mutex_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_init.html)
@@ -405,6 +428,10 @@ namespace os
 
     /**
      * @details
+     * This destructor shall destroy the mutex object; the object
+     * becomes, in effect, uninitialised. An implementation may cause
+     * the destructor to set the object to an invalid value.
+     *
      * It shall be safe to destroy an initialised mutex that is
      * unlocked. Attempting to destroy a locked mutex or a mutex
      * that is referenced (for example, while being used in a
@@ -477,7 +504,8 @@ namespace os
                   owner_->sched_prio (prio_ceiling_);
                 }
             }
-          trace::printf ("mutex @%p %s locked by %p %s\n", this, name (), crt_thread, crt_thread->name());
+          trace::printf ("mutex @%p %s locked by %p %s\n", this, name (),
+                         crt_thread, crt_thread->name ());
           return result::ok;
         }
 
@@ -490,7 +518,8 @@ namespace os
                   return EAGAIN;
                 }
               ++count_;
-              trace::printf ("mutex @%p %s incr %d by %p %s\n", this, name (), count_, crt_thread, crt_thread->name());
+              trace::printf ("mutex @%p %s incr %d by %p %s\n", this, name (),
+                             count_, crt_thread, crt_thread->name ());
               return result::ok;
             }
           else if (type_ == mutex::type::errorcheck)
