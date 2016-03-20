@@ -752,7 +752,7 @@ namespace os
       using priority_t = uint8_t;
 
       /**
-       * @brief %Thread priority namespace.
+       * @brief %Thread priorities namespace.
        * @details
        * The os::rtos::thread::priority namespace is a container for
        * priorities not restricted to an enumeration.
@@ -922,7 +922,7 @@ namespace os
     } /* namespace stack */
 
     /**
-     * @brief The current running thread namespace.
+     * @brief A convenience namespace to access the current running thread.
      * @ingroup cmsis-plus-rtos
      */
     namespace this_thread
@@ -3190,7 +3190,7 @@ namespace os
       initial_value (void) const;
 
       /**
-       * @brief Get the semaphore max value.
+       * @brief Get the semaphore count max value.
        * @par Parameters
        *  None
        * @return The numeric value set from attributes.
@@ -3216,6 +3216,9 @@ namespace os
        */
       void
       _init (void);
+
+      bool
+      _try_wait (void);
 
       /**
        * @}

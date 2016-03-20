@@ -206,6 +206,8 @@ namespace os
     Event_flags::_try_wait (flags::mask_t mask, flags::mask_t* oflags,
                             flags::mode_t mode)
     {
+      interrupts::Critical_section cs; // ----- Critical section -----
+
       if ((mask != 0) && ((mode & flags::mode::all) != 0))
         {
           // Only if all desires signals are raised we're done.
@@ -278,13 +280,13 @@ namespace os
 
       for (;;)
         {
+          if (_try_wait (mask, oflags, mode))
+            {
+              return result::ok;
+            }
+
             {
               interrupts::Critical_section cs; // ----- Critical section -----
-
-              if (_try_wait (mask, oflags, mode))
-                {
-                  return result::ok;
-                }
 
               // Add this thread to the event flags waiting list.
               // It is removed immediately after suspend.
@@ -292,8 +294,10 @@ namespace os
             }
 
           this_thread::suspend ();
+
             {
               interrupts::Critical_section cs; // ----- Critical section -----
+
               list_.remove (node);
             }
 
@@ -330,8 +334,6 @@ namespace os
       return port::Event_flags::try_wait (this, mask, oflags, mode);
 
 #else
-
-      interrupts::Critical_section cs; // ----- Critical section -----
 
       if (_try_wait (mask, oflags, mode))
         {
@@ -402,20 +404,21 @@ namespace os
       for (;;)
         {
           Systick_clock::sleep_rep slept_ticks;
+
+          if (_try_wait (mask, oflags, mode))
+            {
+              return result::ok;
+            }
+
+          Systick_clock::rep now = Systick_clock::now ();
+          slept_ticks = (Systick_clock::sleep_rep) (now - start);
+          if (slept_ticks >= timeout)
+            {
+              return ETIMEDOUT;
+            }
+
             {
               interrupts::Critical_section cs; // ----- Critical section -----
-
-              if (_try_wait (mask, oflags, mode))
-                {
-                  return result::ok;
-                }
-
-              Systick_clock::rep now = Systick_clock::now ();
-              slept_ticks = (Systick_clock::sleep_rep) (now - start);
-              if (slept_ticks >= timeout)
-                {
-                  return ETIMEDOUT;
-                }
 
               // Add this thread to the event flags waiting list.
               // It is removed immediately after wait.
@@ -426,6 +429,7 @@ namespace os
 
             {
               interrupts::Critical_section cs; // ----- Critical section -----
+
               list_.remove (node);
             }
 
@@ -459,18 +463,23 @@ namespace os
       return port::Event_flags::raise (this, mask, oflags);
 
 #else
-
-      interrupts::Critical_section cs; // ----- Critical section -----
-
-      flags_ |= mask;
-
-      if (oflags != nullptr)
         {
-          *oflags = flags_;
+          interrupts::Critical_section cs; // ----- Critical section -----
+
+          flags_ |= mask;
+
+          if (oflags != nullptr)
+            {
+              *oflags = flags_;
+            }
         }
 
-      // Wake-up all threads, if any.
-      list_.wakeup_all ();
+        {
+          interrupts::Critical_section cs; // ----- Critical section -----
+
+          // Wake-up all threads, if any.
+          list_.wakeup_all ();
+        }
 
       return result::ok;
 

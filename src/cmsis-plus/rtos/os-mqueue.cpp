@@ -338,74 +338,84 @@ namespace os
     Message_queue::_try_send (const char* msg, std::size_t nbytes,
                               mqueue::priority_t mprio)
     {
-      if (first_free_ == nullptr)
+      char* dest;
+
         {
-          // No available space to send the message.
-          return false;
-        }
+          interrupts::Critical_section cs; // ----- Critical section -----
 
-      // Get the address where the message will be copied.
-      // This is the first free memory block.
-      char* p = (char*) first_free_;
-
-      // Update to next free, if any (the last one has nullptr).
-      first_free_ = *(void**) first_free_;
-
-      // Copy message to queue storage.
-      std::memcpy (p, msg, nbytes);
-      if (nbytes < msg_size_bytes_)
-        {
-          // Fill in the remaining space with 0x00.
-          std::memset (p + nbytes, 0x00, msg_size_bytes_ - nbytes);
-        }
-
-      // Using the address, compute the index in the array.
-      std::size_t msg_ix = (p - (char*) queue_addr_) / msg_size_bytes_;
-      prio_array_[msg_ix] = mprio;
-
-      if (head_ == mqueue::no_index)
-        {
-          // No other message in the queue, enlist this one
-          // as head, with links to itself.
-          head_ = (mqueue::index_t) msg_ix;
-          prev_array_[msg_ix] = (mqueue::index_t) msg_ix;
-          next_array_[msg_ix] = (mqueue::index_t) msg_ix;
-        }
-      else
-        {
-          std::size_t ix;
-          // Arrange to insert between head and tail.
-          ix = prev_array_[head_];
-          // Check if the priority is higher than the head priority.
-          if (mprio > prio_array_[head_])
+          if (first_free_ == nullptr)
             {
-              // Having the highest priority, the new message
-              // becomes the new head.
+              // No available space to send the message.
+              return false;
+            }
+
+          // Get the address where the message will be copied.
+          // This is the first free memory block.
+          dest = (char*) first_free_;
+
+          // Update to next free, if any (the last one has nullptr).
+          first_free_ = *(void**) first_free_;
+
+          // Using the address, compute the index in the array.
+          std::size_t msg_ix = (dest - (char*) queue_addr_) / msg_size_bytes_;
+          prio_array_[msg_ix] = mprio;
+
+          if (head_ == mqueue::no_index)
+            {
+              // No other message in the queue, enlist this one
+              // as head, with links to itself.
               head_ = (mqueue::index_t) msg_ix;
+              prev_array_[msg_ix] = (mqueue::index_t) msg_ix;
+              next_array_[msg_ix] = (mqueue::index_t) msg_ix;
             }
           else
             {
-              // If not higher than the head, try to insert at the tail,
-              // but advance up until the same priority is found.
-              while ((mprio > prio_array_[ix]))
+              std::size_t ix;
+              // Arrange to insert between head and tail.
+              ix = prev_array_[head_];
+              // Check if the priority is higher than the head priority.
+              if (mprio > prio_array_[head_])
                 {
-                  ix = prev_array_[ix];
+                  // Having the highest priority, the new message
+                  // becomes the new head.
+                  head_ = (mqueue::index_t) msg_ix;
                 }
-            }
-          prev_array_[msg_ix] = (mqueue::index_t) ix;
-          next_array_[msg_ix] = next_array_[ix];
+              else
+                {
+                  // If not higher than the head, try to insert at the tail,
+                  // but advance up until the same priority is found.
+                  while ((mprio > prio_array_[ix]))
+                    {
+                      ix = prev_array_[ix];
+                    }
+                }
+              prev_array_[msg_ix] = (mqueue::index_t) ix;
+              next_array_[msg_ix] = next_array_[ix];
 
-          // Break the chain and insert the new index.
-          std::size_t tmp_ix = next_array_[ix];
-          next_array_[ix] = (mqueue::index_t) msg_ix;
-          prev_array_[tmp_ix] = (mqueue::index_t) msg_ix;
+              // Break the chain and insert the new index.
+              std::size_t tmp_ix = next_array_[ix];
+              next_array_[ix] = (mqueue::index_t) msg_ix;
+              prev_array_[tmp_ix] = (mqueue::index_t) msg_ix;
+            }
+
+          // One more message added to the queue.
+          ++count_;
         }
 
-      // One more message added to the queue.
-      ++count_;
+      // Copy message from user buffer to queue storage.
+      std::memcpy (dest, msg, nbytes);
+      if (nbytes < msg_size_bytes_)
+        {
+          // Fill in the remaining space with 0x00.
+          std::memset (dest + nbytes, 0x00, msg_size_bytes_ - nbytes);
+        }
 
-      // Wake-up one thread, if any.
-      receive_list_.wakeup_one ();
+        {
+          interrupts::Critical_section cs; // ----- Critical section -----
+
+          // Wake-up one thread, if any.
+          receive_list_.wakeup_one ();
+        }
 
       return true;
     }
@@ -476,21 +486,25 @@ namespace os
 
       for (;;)
         {
+
+          if (_try_send (msg, nbytes, mprio))
+            {
+              return result::ok;
+            }
+
             {
               interrupts::Critical_section cs; // ----- Critical section -----
-
-              if (_try_send (msg, nbytes, mprio))
-                {
-                  return result::ok;
-                }
 
               // Add this thread to the message queue send waiting list.
               // It is removed immediately after suspend.
               send_list_.add (node);
             }
+
           this_thread::suspend ();
+
             {
               interrupts::Critical_section cs; // ----- Critical section -----
+
               send_list_.remove (node);
             }
 
@@ -550,8 +564,6 @@ namespace os
       return port::Message_queue::try_send (this, msg, nbytes, mprio);
 
 #else
-
-      interrupts::Critical_section cs; // ----- Critical section -----
 
       if (_try_send (msg, nbytes, mprio))
         {
@@ -639,20 +651,21 @@ namespace os
       for (;;)
         {
           Systick_clock::sleep_rep slept_ticks;
+
+          if (_try_send (msg, nbytes, mprio))
+            {
+              return result::ok;
+            }
+
+          Systick_clock::rep now = Systick_clock::now ();
+          slept_ticks = (Systick_clock::sleep_rep) (now - start);
+          if (slept_ticks >= timeout)
+            {
+              return ETIMEDOUT;
+            }
+
             {
               interrupts::Critical_section cs; // ----- Critical section -----
-
-              if (_try_send (msg, nbytes, mprio))
-                {
-                  return result::ok;
-                }
-
-              Systick_clock::rep now = Systick_clock::now ();
-              slept_ticks = (Systick_clock::sleep_rep) (now - start);
-              if (slept_ticks >= timeout)
-                {
-                  return ETIMEDOUT;
-                }
 
               // Add this thread to the message queue send waiting list.
               // It is removed immediately after wait.
@@ -660,8 +673,10 @@ namespace os
             }
 
           Systick_clock::wait (timeout - slept_ticks);
+
             {
               interrupts::Critical_section cs; // ----- Critical section -----
+
               send_list_.remove (node);
             }
 
@@ -683,47 +698,63 @@ namespace os
     Message_queue::_try_receive (char* msg, std::size_t nbytes,
                                  mqueue::priority_t* mprio)
     {
-      if (head_ == mqueue::no_index)
+      char* src;
+
         {
-          return false;
+          interrupts::Critical_section cs; // ----- Critical section -----
+
+          if (head_ == mqueue::no_index)
+            {
+              return false;
+            }
+
+          src = (char*) queue_addr_ + head_ * msg_size_bytes_;
         }
 
-      char* p = (char*) queue_addr_ + head_ * msg_size_bytes_;
-      memcpy (msg, p, nbytes);
+      // Copy message from queue to user buffer.
+      memcpy (msg, src, nbytes);
       if (mprio != nullptr)
         {
           *mprio = prio_array_[head_];
         }
 
-      if (count_ > 1)
         {
-          // Remove the current element from the list.
-          prev_array_[next_array_[head_]] = prev_array_[head_];
-          next_array_[prev_array_[head_]] = next_array_[head_];
+          interrupts::Critical_section cs; // ----- Critical section -----
 
-          // Next becomes the new head.
-          head_ = next_array_[head_];
+          if (count_ > 1)
+            {
+              // Remove the current element from the list.
+              prev_array_[next_array_[head_]] = prev_array_[head_];
+              next_array_[prev_array_[head_]] = next_array_[head_];
+
+              // Next becomes the new head.
+              head_ = next_array_[head_];
+            }
+          else
+            {
+              // If there was only one, the list is empty now.
+              head_ = mqueue::no_index;
+            }
+
+          // Perform a push_front() on the single linked LIFO list,
+          // i.e. add the block to the beginning of the list.
+
+          // Link previous list to this block; may be null, but it does
+          // not matter.
+          *(void**) src = first_free_;
+
+          // Now this block is the first one.
+          first_free_ = src;
+
+          --count_;
         }
-      else
+
         {
-          // If there was only one, the list is empty now.
-          head_ = mqueue::no_index;
+          interrupts::Critical_section cs; // ----- Critical section -----
+
+          // Wake-up one thread, if any.
+          send_list_.wakeup_one ();
         }
-
-      // Perform a push_front() on the single linked LIFO list,
-      // i.e. add the block to the beginning of the list.
-
-      // Link previous list to this block; may be null, but it does
-      // not matter.
-      *(void**) p = first_free_;
-
-      // Now this block is the first one.
-      first_free_ = p;
-
-      --count_;
-
-      // Wake-up one thread, if any.
-      send_list_.wakeup_one ();
 
       return true;
     }
@@ -788,21 +819,25 @@ namespace os
 
       for (;;)
         {
+
+          if (_try_receive (msg, nbytes, mprio))
+            {
+              return result::ok;
+            }
+
             {
               interrupts::Critical_section cs; // ----- Critical section -----
-
-              if (_try_receive (msg, nbytes, mprio))
-                {
-                  return result::ok;
-                }
 
               // Add this thread to the message queue receive waiting list.
               // It is removed immediately after suspend.
               receive_list_.add (node);
             }
+
           this_thread::suspend ();
+
             {
               interrupts::Critical_section cs; // ----- Critical section -----
+
               receive_list_.remove (node);
             }
 
@@ -862,8 +897,6 @@ namespace os
       return port::Message_queue::try_receive (this, msg, nbytes, mprio);
 
 #else
-
-      interrupts::Critical_section cs; // ----- Critical section -----
 
       if (_try_receive (msg, nbytes, mprio))
         {
@@ -964,20 +997,21 @@ namespace os
       for (;;)
         {
           Systick_clock::sleep_rep slept_ticks;
+
+          if (_try_receive (msg, nbytes, mprio))
+            {
+              return result::ok;
+            }
+
+          Systick_clock::rep now = Systick_clock::now ();
+          slept_ticks = (Systick_clock::sleep_rep) (now - start);
+          if (slept_ticks >= timeout)
+            {
+              return ETIMEDOUT;
+            }
+
             {
               interrupts::Critical_section cs; // ----- Critical section -----
-
-              if (_try_receive (msg, nbytes, mprio))
-                {
-                  return result::ok;
-                }
-
-              Systick_clock::rep now = Systick_clock::now ();
-              slept_ticks = (Systick_clock::sleep_rep) (now - start);
-              if (slept_ticks >= timeout)
-                {
-                  return ETIMEDOUT;
-                }
 
               // Add this thread to the message queue receive waiting list.
               // It is removed immediately after wait.
@@ -985,8 +1019,10 @@ namespace os
             }
 
           Systick_clock::wait (timeout - slept_ticks);
+
             {
               interrupts::Critical_section cs; // ----- Critical section -----
+
               receive_list_.remove (node);
             }
 

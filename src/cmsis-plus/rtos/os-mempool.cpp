@@ -325,6 +325,8 @@ namespace os
     void*
     Memory_pool::_try_first (void)
     {
+      interrupts::Critical_section cs; // ----- Critical section -----
+
       if (first_ != nullptr)
         {
           void* p = (void*) first_;
@@ -332,6 +334,7 @@ namespace os
           ++count_;
           return p;
         }
+
       return nullptr;
     }
 
@@ -360,22 +363,26 @@ namespace os
 
       for (;;)
         {
+
+          void* p = _try_first ();
+          if (p != nullptr)
+            {
+              return p;
+            }
+
             {
               interrupts::Critical_section cs; // ----- Critical section -----
-
-              void* p = _try_first ();
-              if (p != nullptr)
-                {
-                  return p;
-                }
 
               // Add this thread to the memory pool waiting list.
               // It is removed immediately after suspend.
               list_.add (node);
             }
+
           this_thread::suspend ();
+
             {
               interrupts::Critical_section cs; // ----- Critical section -----
+
               list_.remove (node);
             }
 
@@ -404,8 +411,6 @@ namespace os
     Memory_pool::try_alloc (void)
     {
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
-
-      interrupts::Critical_section cs; // ----- Critical section -----
 
       return _try_first ();
     }
@@ -442,21 +447,22 @@ namespace os
       for (;;)
         {
           Systick_clock::sleep_rep slept_ticks;
+
+          void* p = _try_first ();
+          if (p != nullptr)
+            {
+              return p;
+            }
+
+          Systick_clock::rep now = Systick_clock::now ();
+          slept_ticks = (Systick_clock::sleep_rep) (now - start);
+          if (slept_ticks >= ticks)
+            {
+              return nullptr;
+            }
+
             {
               interrupts::Critical_section cs; // ----- Critical section -----
-
-              void* p = _try_first ();
-              if (p != nullptr)
-                {
-                  return p;
-                }
-
-              Systick_clock::rep now = Systick_clock::now ();
-              slept_ticks = (Systick_clock::sleep_rep) (now - start);
-              if (slept_ticks >= ticks)
-                {
-                  return nullptr;
-                }
 
               // Add this thread to the memory pool waiting list.
               // It is removed immediately after wait.
@@ -464,6 +470,12 @@ namespace os
             }
 
           Systick_clock::wait (ticks - slept_ticks);
+
+            {
+              interrupts::Critical_section cs; // ----- Critical section -----
+
+              list_.remove (node);
+            }
 
           if (this_thread::thread ().interrupted ())
             {
@@ -497,22 +509,28 @@ namespace os
           return EINVAL;
         }
 
-      interrupts::Critical_section cs; // ----- Critical section -----
+        {
+          interrupts::Critical_section cs; // ----- Critical section -----
 
-      // Perform a push_front() on the single linked LIFO list,
-      // i.e. add the block to the beginning of the list.
+          // Perform a push_front() on the single linked LIFO list,
+          // i.e. add the block to the beginning of the list.
 
-      // Link previous list to this block; may be null, but it does
-      // not matter.
-      *(void**) block = first_;
+          // Link previous list to this block; may be null, but it does
+          // not matter.
+          *(void**) block = first_;
 
-      // Now this block is the first one.
-      first_ = block;
+          // Now this block is the first one.
+          first_ = block;
 
-      --count_;
+          --count_;
+        }
 
-      // Wake-up one thread, if any.
-      list_.wakeup_one ();
+        {
+          interrupts::Critical_section cs; // ----- Critical section -----
+
+          // Wake-up one thread, if any.
+          list_.wakeup_one ();
+        }
 
       return result::ok;
     }
@@ -520,8 +538,6 @@ namespace os
     /**
      * @details
      * Reset the memory pool to the initial state, with all blocks free.
-     *
-     *
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -532,16 +548,20 @@ namespace os
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
-      // TODO
+        {
+          interrupts::Critical_section cs; // ----- Critical section -----
 
-      interrupts::Critical_section cs; // ----- Critical section -----
+          _init ();
+        }
 
-      _init ();
+        {
+          interrupts::Critical_section cs; // ----- Critical section -----
 
-      // Wake-up all threads, if any.
-      list_.wakeup_all ();
+          // Wake-up all threads, if any.
+          list_.wakeup_all ();
 
-      list_.clear ();
+          list_.clear ();
+        }
 
       return result::ok;
     }

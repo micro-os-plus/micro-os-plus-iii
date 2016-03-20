@@ -481,11 +481,22 @@ namespace os
     result_t
     Mutex::_try_lock (Thread* crt_thread)
     {
-      if (owner_ == nullptr)
-        {
-          owner_ = crt_thread;
-          count_ = 1;
+      Thread* saved_owner;
 
+        {
+          scheduler::Critical_section cs; // ----- Critical section -----
+
+          saved_owner = owner_;
+          if (owner_ == nullptr)
+            {
+              owner_ = crt_thread;
+              count_ = 1;
+            }
+          // Short critical section ends here.
+        }
+
+      if (saved_owner == nullptr)
+        {
           if (protocol_ == mutex::protocol::inherit)
             {
               // Save owner priority, in case a temporary boost
@@ -506,7 +517,7 @@ namespace os
           return result::ok;
         }
 
-      if (owner_ == crt_thread)
+      if (saved_owner == crt_thread)
         {
           if (type_ == mutex::type::recursive)
             {
@@ -601,21 +612,25 @@ namespace os
       for (;;)
         {
             {
-              scheduler::Critical_section cs; // ----- Critical section -----
-
               result_t res = _try_lock (&crt_thread);
               if (res != EBUSY)
                 {
                   return res;
                 }
 
-              // Add this thread to the mutex waiting list.
-              // It is removed immediately after suspend.
-              list_.add (node);
+                {
+                  scheduler::Critical_section cs; // ----- Critical section -----
+
+                  // Add this thread to the mutex waiting list.
+                  // It is removed immediately after suspend.
+                  list_.add (node);
+                }
             }
           this_thread::suspend ();
+
             {
               scheduler::Critical_section cs; // ----- Critical section -----
+
               list_.remove (node);
             }
 
@@ -677,9 +692,8 @@ namespace os
 
 #else
 
-      scheduler::Critical_section cs; // ----- Critical section -----
-
       Thread& crt_thread = this_thread::thread ();
+
       return _try_lock (&crt_thread);
 
 #endif
@@ -742,8 +756,6 @@ namespace os
         {
           Systick_clock::sleep_rep slept_ticks;
             {
-              scheduler::Critical_section cs; // ----- Critical section -----
-
               result_t res = _try_lock (&crt_thread);
               if (res != EBUSY)
                 {
@@ -757,14 +769,20 @@ namespace os
                   return ETIMEDOUT;
                 }
 
-              // Add this thread to the mutex waiting list.
-              // It is removed immediately after wait.
-              list_.add (node);
+                {
+                  scheduler::Critical_section cs; // ----- Critical section -----
+
+                  // Add this thread to the mutex waiting list.
+                  // It is removed immediately after wait.
+                  list_.add (node);
+                }
             }
 
           Systick_clock::wait (timeout - slept_ticks);
+
             {
               scheduler::Critical_section cs; // ----- Critical section -----
+
               list_.remove (node);
             }
 
@@ -826,9 +844,6 @@ namespace os
               return result::ok;
             }
 
-          count_ = 0;
-          list_.wakeup_one ();
-
           if ((protocol_ == mutex::protocol::inherit)
               || (protocol_ == mutex::protocol::protect))
             {
@@ -836,7 +851,11 @@ namespace os
             }
 
           trace::printf ("mutex @%p %s unlocked\n", this, name ());
+
+          count_ = 0;
+          list_.wakeup_one ();
           owner_ = nullptr;
+
           return result::ok;
         }
 

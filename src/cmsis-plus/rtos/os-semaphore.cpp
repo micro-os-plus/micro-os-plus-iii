@@ -310,23 +310,42 @@ namespace os
 
 #else
 
-      interrupts::Critical_section cs; // ----- Critical section -----
-
-      if (count_ >= this->max_count_)
         {
-          return EOVERFLOW;
+          interrupts::Critical_section cs; // ----- Critical section -----
+
+          if (count_ >= this->max_count_)
+            {
+              return EOVERFLOW;
+            }
+
+          ++count_;
         }
 
-      ++count_;
-
-      if (count_ == 1)
         {
+          interrupts::Critical_section cs; // ----- Critical section -----
+
           // Wakeup one thread.
           list_.wakeup_one ();
         }
+
       return result::ok;
 
 #endif
+    }
+
+    bool
+    Semaphore::_try_wait (void)
+    {
+      interrupts::Critical_section cs; // ----- Critical section -----
+
+      if (count_ > 0)
+        {
+          --count_;
+          return true;
+        }
+
+      // Count may be 0.
+      return false;
     }
 
     /**
@@ -375,22 +394,24 @@ namespace os
 
       for (;;)
         {
+          if (_try_wait ())
+            {
+              return result::ok;
+            }
+
             {
               interrupts::Critical_section cs; // ----- Critical section -----
-
-              if (count_ > 0)
-                {
-                  --count_;
-                  return result::ok;
-                }
 
               // Add this thread to the semaphore waiting list.
               // It is removed immediately after suspend.
               list_.add (node);
             }
+
           this_thread::suspend ();
+
             {
               interrupts::Critical_section cs; // ----- Critical section -----
+
               list_.remove (node);
             }
 
@@ -437,16 +458,14 @@ namespace os
 
 #else
 
-      interrupts::Critical_section cs; // ----- Critical section -----
-
-      if (count_ > 0)
+      if (_try_wait ())
         {
-          --count_;
           return result::ok;
         }
-
-      // Count may be 0.
-      return EAGAIN;
+      else
+        {
+          return EAGAIN;
+        }
 
 #endif
     }
@@ -508,29 +527,32 @@ namespace os
       for (;;)
         {
           Systick_clock::sleep_rep slept_ticks;
+
+          if (_try_wait ())
+            {
+              return result::ok;
+            }
+
+          Systick_clock::rep now = Systick_clock::now ();
+          slept_ticks = (Systick_clock::sleep_rep) (now - start);
+          if (slept_ticks >= timeout)
+            {
+              return ETIMEDOUT;
+            }
+
             {
               interrupts::Critical_section cs; // ----- Critical section -----
-
-              if (count_ > 0)
-                {
-                  --count_;
-                  return result::ok;
-                }
-
-              Systick_clock::rep now = Systick_clock::now ();
-              slept_ticks = (Systick_clock::sleep_rep) (now - start);
-              if (slept_ticks >= timeout)
-                {
-                  return ETIMEDOUT;
-                }
 
               // Add this thread to the semaphore waiting list.
               // It is removed immediately after wait.
               list_.add (node);
             }
+
           Systick_clock::wait (timeout - slept_ticks);
+
             {
               interrupts::Critical_section cs; // ----- Critical section -----
+
               list_.remove (node);
             }
 
