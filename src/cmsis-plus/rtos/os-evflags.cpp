@@ -273,8 +273,9 @@ namespace os
 #else
 
       Thread& crt_thread = this_thread::thread ();
+      DoubleListNodeThread node
+        { crt_thread };
 
-      bool queued = false;
       for (;;)
         {
             {
@@ -285,16 +286,16 @@ namespace os
                   return result::ok;
                 }
 
-              if (!queued)
-                {
-                  // Add this thread to the waiting list.
-                  // Will be removed by free().
-                  list_.add (&crt_thread);
-                  queued = true;
-                }
+              // Add this thread to the event flags waiting list.
+              // It is removed immediately after suspend.
+              list_.add (node);
             }
 
           this_thread::suspend ();
+            {
+              interrupts::Critical_section cs; // ----- Critical section -----
+              list_.remove (node);
+            }
 
           if (crt_thread.interrupted ())
             {
@@ -394,8 +395,8 @@ namespace os
 #else
 
       Thread& crt_thread = this_thread::thread ();
-
-      bool queued = false;
+      DoubleListNodeThread node
+        { crt_thread };
 
       Systick_clock::rep start = Systick_clock::now ();
       for (;;)
@@ -413,23 +414,20 @@ namespace os
               slept_ticks = (Systick_clock::sleep_rep) (now - start);
               if (slept_ticks >= timeout)
                 {
-                  if (queued)
-                    {
-                      list_.remove (&crt_thread);
-                    }
                   return ETIMEDOUT;
                 }
 
-              if (!queued)
-                {
-                  // Add this thread to the waiting list.
-                  // Will be removed by receive().
-                  list_.add (&crt_thread);
-                  queued = true;
-                }
+              // Add this thread to the event flags waiting list.
+              // It is removed immediately after wait.
+              list_.add (node);
             }
 
           Systick_clock::wait (timeout - slept_ticks);
+
+            {
+              interrupts::Critical_section cs; // ----- Critical section -----
+              list_.remove (node);
+            }
 
           if (crt_thread.interrupted ())
             {
@@ -471,11 +469,8 @@ namespace os
           *oflags = flags_;
         }
 
-      if (!list_.empty ())
-        {
-          // Wake-up all threads, if any.
-          list_.wakeup_all ();
-        }
+      // Wake-up all threads, if any.
+      list_.wakeup_all ();
 
       return result::ok;
 

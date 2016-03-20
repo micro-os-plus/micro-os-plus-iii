@@ -169,7 +169,7 @@ namespace os
     Systick_clock::rep
     Systick_clock::now (current_t* details)
     {
-      assert (details != nullptr);
+      assert(details != nullptr);
 
       // The core frequency can be returned right away, since
       // is not expected to change during this call.

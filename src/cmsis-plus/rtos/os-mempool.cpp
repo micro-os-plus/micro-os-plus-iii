@@ -354,6 +354,10 @@ namespace os
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
+      Thread* crt_thread = &this_thread::thread ();
+      DoubleListNodeThread node
+        { *crt_thread };
+
       for (;;)
         {
             {
@@ -365,11 +369,15 @@ namespace os
                   return p;
                 }
 
-              // Add this thread to the waiting list.
-              // Will be removed by free().
-              list_.add (&this_thread::thread ());
+              // Add this thread to the memory pool waiting list.
+              // It is removed immediately after suspend.
+              list_.add (node);
             }
           this_thread::suspend ();
+            {
+              interrupts::Critical_section cs; // ----- Critical section -----
+              list_.remove (node);
+            }
 
           if (this_thread::thread ().interrupted ())
             {
@@ -426,6 +434,10 @@ namespace os
           ticks = 1;
         }
 
+      Thread& crt_thread = this_thread::thread ();
+      DoubleListNodeThread node
+        { crt_thread };
+
       Systick_clock::rep start = Systick_clock::now ();
       for (;;)
         {
@@ -443,13 +455,12 @@ namespace os
               slept_ticks = (Systick_clock::sleep_rep) (now - start);
               if (slept_ticks >= ticks)
                 {
-                  list_.remove (&this_thread::thread ());
                   return nullptr;
                 }
 
-              // Add this thread to the waiting list.
-              // Will be removed by free() or if timeout occurs.
-              list_.add (&this_thread::thread ());
+              // Add this thread to the memory pool waiting list.
+              // It is removed immediately after wait.
+              list_.add (node);
             }
 
           Systick_clock::wait (ticks - slept_ticks);
@@ -500,11 +511,8 @@ namespace os
 
       --count_;
 
-      if (!list_.empty ())
-        {
-          // Wake-up one thread, if any.
-          list_.wakeup_one ();
-        }
+      // Wake-up one thread, if any.
+      list_.wakeup_one ();
 
       return result::ok;
     }
@@ -530,13 +538,10 @@ namespace os
 
       _init ();
 
-      if (!list_.empty ())
-        {
-          // Wake-up all threads, if any.
-          list_.wakeup_all ();
+      // Wake-up all threads, if any.
+      list_.wakeup_all ();
 
-          list_.clear ();
-        }
+      list_.clear ();
 
       return result::ok;
     }

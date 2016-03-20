@@ -404,11 +404,8 @@ namespace os
       // One more message added to the queue.
       ++count_;
 
-      if (!receive_list_.empty ())
-        {
-          // Wake-up one thread, if any.
-          receive_list_.wakeup_one ();
-        }
+      // Wake-up one thread, if any.
+      receive_list_.wakeup_one ();
 
       return true;
     }
@@ -474,6 +471,8 @@ namespace os
 #else
 
       Thread& crt_thread = this_thread::thread ();
+      DoubleListNodeThread node
+        { crt_thread };
 
       for (;;)
         {
@@ -485,11 +484,15 @@ namespace os
                   return result::ok;
                 }
 
-              // Add this thread to the waiting list.
-              // Will be removed by free().
-              send_list_.add (&crt_thread);
+              // Add this thread to the message queue send waiting list.
+              // It is removed immediately after suspend.
+              send_list_.add (node);
             }
           this_thread::suspend ();
+            {
+              interrupts::Critical_section cs; // ----- Critical section -----
+              send_list_.remove (node);
+            }
 
           if (crt_thread.interrupted ())
             {
@@ -629,6 +632,8 @@ namespace os
 #else
 
       Thread& crt_thread = this_thread::thread ();
+      DoubleListNodeThread node
+        { crt_thread };
 
       Systick_clock::rep start = Systick_clock::now ();
       for (;;)
@@ -646,16 +651,19 @@ namespace os
               slept_ticks = (Systick_clock::sleep_rep) (now - start);
               if (slept_ticks >= timeout)
                 {
-                  send_list_.remove (&crt_thread);
                   return ETIMEDOUT;
                 }
 
-              // Add this thread to the waiting list.
-              // Will be removed by receive().
-              send_list_.add (&crt_thread);
+              // Add this thread to the message queue send waiting list.
+              // It is removed immediately after wait.
+              send_list_.add (node);
             }
 
           Systick_clock::wait (timeout - slept_ticks);
+            {
+              interrupts::Critical_section cs; // ----- Critical section -----
+              send_list_.remove (node);
+            }
 
           if (crt_thread.interrupted ())
             {
@@ -714,11 +722,8 @@ namespace os
 
       --count_;
 
-      if (!send_list_.empty ())
-        {
-          // Wake-up one thread, if any.
-          send_list_.wakeup_one ();
-        }
+      // Wake-up one thread, if any.
+      send_list_.wakeup_one ();
 
       return true;
     }
@@ -778,6 +783,8 @@ namespace os
 #else
 
       Thread& crt_thread = this_thread::thread ();
+      DoubleListNodeThread node
+        { crt_thread };
 
       for (;;)
         {
@@ -789,11 +796,15 @@ namespace os
                   return result::ok;
                 }
 
-              // Add this thread to the waiting list.
-              // Will be removed by send().
-              receive_list_.add (&crt_thread);
+              // Add this thread to the message queue receive waiting list.
+              // It is removed immediately after suspend.
+              receive_list_.add (node);
             }
           this_thread::suspend ();
+            {
+              interrupts::Critical_section cs; // ----- Critical section -----
+              receive_list_.remove (node);
+            }
 
           if (crt_thread.interrupted ())
             {
@@ -946,6 +957,8 @@ namespace os
 #else
 
       Thread& crt_thread = this_thread::thread ();
+      DoubleListNodeThread node
+        { crt_thread };
 
       Systick_clock::rep start = Systick_clock::now ();
       for (;;)
@@ -963,16 +976,19 @@ namespace os
               slept_ticks = (Systick_clock::sleep_rep) (now - start);
               if (slept_ticks >= timeout)
                 {
-                  receive_list_.remove (&crt_thread);
                   return ETIMEDOUT;
                 }
 
-              // Add this thread to the waiting list.
-              // Will be removed by send().
-              receive_list_.add (&crt_thread);
+              // Add this thread to the message queue receive waiting list.
+              // It is removed immediately after wait.
+              receive_list_.add (node);
             }
 
           Systick_clock::wait (timeout - slept_ticks);
+            {
+              interrupts::Critical_section cs; // ----- Critical section -----
+              receive_list_.remove (node);
+            }
 
           if (crt_thread.interrupted ())
             {

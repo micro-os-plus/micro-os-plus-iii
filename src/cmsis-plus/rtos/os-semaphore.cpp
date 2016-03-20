@@ -321,11 +321,8 @@ namespace os
 
       if (count_ == 1)
         {
-          // Wakeup one thread
-          if (!list_.empty ())
-            {
-              list_.wakeup_one ();
-            }
+          // Wakeup one thread.
+          list_.wakeup_one ();
         }
       return result::ok;
 
@@ -373,6 +370,8 @@ namespace os
 
 #else
       Thread& crt_thread = this_thread::thread ();
+      DoubleListNodeThread node
+        { crt_thread };
 
       for (;;)
         {
@@ -385,11 +384,15 @@ namespace os
                   return result::ok;
                 }
 
-              // Add this thread to the waiting list.
-              // Will be removed by post().
-              list_.add (&crt_thread);
+              // Add this thread to the semaphore waiting list.
+              // It is removed immediately after suspend.
+              list_.add (node);
             }
           this_thread::suspend ();
+            {
+              interrupts::Critical_section cs; // ----- Critical section -----
+              list_.remove (node);
+            }
 
           if (crt_thread.interrupted ())
             {
@@ -498,6 +501,8 @@ namespace os
 #else
 
       Thread& crt_thread = this_thread::thread ();
+      DoubleListNodeThread node
+        { crt_thread };
 
       Systick_clock::rep start = Systick_clock::now ();
       for (;;)
@@ -516,15 +521,18 @@ namespace os
               slept_ticks = (Systick_clock::sleep_rep) (now - start);
               if (slept_ticks >= timeout)
                 {
-                  list_.remove (&crt_thread);
                   return ETIMEDOUT;
                 }
 
-              // Add this thread to the waiting list.
-              // Will be removed by post().
-              list_.add (&crt_thread);
+              // Add this thread to the semaphore waiting list.
+              // It is removed immediately after wait.
+              list_.add (node);
             }
           Systick_clock::wait (timeout - slept_ticks);
+            {
+              interrupts::Critical_section cs; // ----- Critical section -----
+              list_.remove (node);
+            }
 
           if (crt_thread.interrupted ())
             {

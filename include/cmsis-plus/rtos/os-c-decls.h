@@ -60,10 +60,11 @@ extern "C"
 
   typedef uint32_t os_systicks_t;
 
-  typedef struct os_thread_list_s
+  typedef struct os_threads_waiting_list_s
   {
-    void* content[OS_THREAD_PRIO_SIZE_PTR];
-  } os_thread_list_t;
+    void* head;
+    size_t count;
+  } os_threads_waiting_list_t;
 
   typedef uint32_t os_flags_mode_t;
   typedef uint32_t os_flags_mask_t;
@@ -257,7 +258,7 @@ extern "C"
     const char* name;
     void* owner;
 #if !defined(OS_INCLUDE_PORT_RTOS_MUTEX)
-    os_thread_list_t list;
+    os_threads_waiting_list_t list2;
 #endif
 #if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
     os_mutex_port_data_t port;
@@ -303,7 +304,7 @@ extern "C"
   {
     const char* name;
 #if !defined(OS_INCLUDE_PORT_RTOS_SEMAPHORE)
-    os_thread_list_t list;
+    os_threads_waiting_list_t list2;
 #endif
 #if defined(OS_INCLUDE_PORT_RTOS_SEMAPHORE)
     os_semaphore_port_data_t port;
@@ -333,7 +334,7 @@ extern "C"
   {
     const char* name;
 #if !defined(OS_INCLUDE_PORT_RTOS_MEMORY_POOL)
-    os_thread_list_t list;
+    os_threads_waiting_list_t list2;
 #endif
     void* pool_addr;
 #if defined(OS_INCLUDE_PORT_RTOS_MEMORY_POOL)
@@ -369,8 +370,8 @@ extern "C"
   {
     const char* name;
 #if !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
-    os_thread_list_t send_list;
-    os_thread_list_t receive_list;
+    os_threads_waiting_list_t send_list2;
+    os_threads_waiting_list_t receive_list2;
     os_mqueue_index_t* prev_array;
     os_mqueue_index_t* next_array;
     os_mqueue_prio_t* prio_array;
@@ -411,7 +412,7 @@ extern "C"
   {
     const char* name;
 #if !defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
-    os_thread_list_t list;
+    os_threads_waiting_list_t list2;
 #endif
 
 #if defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)

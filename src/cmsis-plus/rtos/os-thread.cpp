@@ -459,19 +459,8 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), thread::priority::error);
 
-      trace::printf ("%s() @%p %s\n", __func__, this, name ());
-
-#if defined(OS_INCLUDE_PORT_RTOS_THREAD)
-
-      return port::Thread::sched_prio (this);
-
-#else
-
-      // TODO
+      // trace::printf ("%s() @%p %s\n", __func__, this, name ());
       return prio_;
-
-#endif
-
     }
 
     /**
@@ -502,6 +491,8 @@ namespace os
 
       trace::printf ("%s(%d) @%p %s\n", __func__, prio, this, name ());
 
+      prio_ = prio;
+
       result_t res = result::ok;
 
 #if defined(OS_INCLUDE_PORT_RTOS_THREAD)
@@ -510,9 +501,6 @@ namespace os
       res = port::Thread::sched_prio (this, prio);
 
 #else
-
-      // TODO
-      prio_ = prio;
 
       // Mandatory, the priority might have been raised, the
       // task must be scheduled to run.

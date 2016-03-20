@@ -2617,7 +2617,7 @@ namespace os
       Thread* volatile owner_;
 
 #if !defined(OS_INCLUDE_PORT_RTOS_MUTEX)
-      port::Tasks_list list_;
+      port::Waiting_threads_list list_;
 #endif
 
 #if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
@@ -3229,7 +3229,7 @@ namespace os
        */
 
 #if !defined(OS_INCLUDE_PORT_RTOS_SEMAPHORE)
-      port::Tasks_list list_;
+      port::Waiting_threads_list list_;
 #endif
 
 #if defined(OS_INCLUDE_PORT_RTOS_SEMAPHORE)
@@ -3570,7 +3570,7 @@ namespace os
        */
 
 #if !defined(OS_INCLUDE_PORT_RTOS_MEMORY_POOL)
-      port::Tasks_list list_;
+      port::Waiting_threads_list list_;
 #endif
       /**
        * @brief Memory address where the pool is located.
@@ -4056,8 +4056,8 @@ namespace os
 
       // Keep these in sync with the structure declarations in os-c-decl.h.
 #if !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
-      port::Tasks_list send_list_;
-      port::Tasks_list receive_list_;
+      port::Waiting_threads_list send_list_;
+      port::Waiting_threads_list receive_list_;
 
       // To save space, the double linked list is built
       // using short indexes, not pointers.
@@ -4399,7 +4399,7 @@ namespace os
        */
 
 #if !defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
-      port::Tasks_list list_;
+      port::Waiting_threads_list list_;
 #endif
 
 #if defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
