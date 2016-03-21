@@ -351,7 +351,12 @@ namespace os
      */
     Thread::~Thread ()
     {
-      _destroy ();
+      // Prevent the main thread to destroy itself while running
+      // the exit cleanup code.
+      if (this != &this_thread::thread())
+        {
+          _destroy ();
+        }
     }
 
     void

@@ -31,6 +31,8 @@ namespace os
   {
     namespace thread
     {
+      // ----------------------------------------------------------------------
+
       using main_func_t = int (*) (int argc, char* argv[]);
 
       using main_args_t = struct
@@ -40,11 +42,15 @@ namespace os
           char** argv;
         };
 
+      // ----------------------------------------------------------------------
+
       static void
-      main_trampoline (main_args_t* args)
+      _main_trampoline (main_args_t* args)
       {
         std::exit (args->func (args->argc, args->argv));
       }
+
+    // ------------------------------------------------------------------------
 
     } /* namespace thread */
   } /* namespace rtos */
@@ -90,11 +96,14 @@ main (int argc, char* argv[])
   attr.th_stack_size_bytes = sizeof(main_stack);
 
   static Thread main_thread
-    { attr, (thread::func_t) thread::main_trampoline,
+    { attr, (thread::func_t) thread::_main_trampoline,
         (thread::func_args_t) &args };
 
   scheduler::start ();
 
+  // Some (most?) embedded schedulers do not return after start(),
+  // but on POSIX synthetic platforms they do,
+  // so wait for the main thread to terminate.
   main_thread.join ();
 
   return 0;
