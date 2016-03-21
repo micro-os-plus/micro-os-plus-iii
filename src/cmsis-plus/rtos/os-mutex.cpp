@@ -612,27 +612,20 @@ namespace os
 
       for (;;)
         {
+
+          result_t res = _try_lock (&crt_thread);
+          if (res != EBUSY)
             {
-              result_t res = _try_lock (&crt_thread);
-              if (res != EBUSY)
-                {
-                  return res;
-                }
-
-                {
-                  scheduler::Critical_section cs; // ----- Critical section -----
-
-                  // Add this thread to the mutex waiting list.
-                  // It is removed immediately after suspend.
-                  list_.add (node);
-                }
+              return res;
             }
-          this_thread::suspend ();
 
             {
-              scheduler::Critical_section cs; // ----- Critical section -----
+              // Add this thread to the mutex waiting list.
+              // It is removed when this block ends (after suspend()).
+              Waiting_threads_list_guard<scheduler::Critical_section> lg
+                { list_, node };
 
-              list_.remove (node);
+              this_thread::suspend ();
             }
 
           if (crt_thread.interrupted ())
@@ -759,35 +752,27 @@ namespace os
       for (;;)
         {
           Systick_clock::sleep_rep slept_ticks;
+
+          result_t res = _try_lock (&crt_thread);
+          if (res != EBUSY)
             {
-              result_t res = _try_lock (&crt_thread);
-              if (res != EBUSY)
-                {
-                  return res;
-                }
-
-              Systick_clock::rep now = Systick_clock::now ();
-              slept_ticks = (Systick_clock::sleep_rep) (now - start);
-              if (slept_ticks >= timeout)
-                {
-                  return ETIMEDOUT;
-                }
-
-                {
-                  scheduler::Critical_section cs; // ----- Critical section -----
-
-                  // Add this thread to the mutex waiting list.
-                  // It is removed immediately after wait.
-                  list_.add (node);
-                }
+              return res;
             }
 
-          Systick_clock::wait (timeout - slept_ticks);
+          Systick_clock::rep now = Systick_clock::now ();
+          slept_ticks = (Systick_clock::sleep_rep) (now - start);
+          if (slept_ticks >= timeout)
+            {
+              return ETIMEDOUT;
+            }
 
             {
-              scheduler::Critical_section cs; // ----- Critical section -----
+              // Add this thread to the mutex waiting list.
+              // It is removed when this block ends (after wait()).
+              Waiting_threads_list_guard<scheduler::Critical_section> lg
+                { list_, node };
 
-              list_.remove (node);
+              Systick_clock::wait (timeout - slept_ticks);
             }
 
           if (crt_thread.interrupted ())

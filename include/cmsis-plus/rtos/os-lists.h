@@ -68,6 +68,8 @@ namespace os
       DoubleListLinks* next;
     };
 
+    // ========================================================================
+
     /**
      * @brief Template for a double linked list node, with reference to payload.
      */
@@ -98,10 +100,14 @@ namespace os
         Payload& node;
       };
 
+    // ========================================================================
+
     /**
      * @brief A double linked list node, with reference to threads.
      */
     using DoubleListNodeThread = DoubleListNodeRef<Thread>;
+
+    // ========================================================================
 
     /**
      * @brief Double linked circular list of threads.
@@ -200,6 +206,28 @@ namespace os
       std::size_t count_;
     };
 
+    // ========================================================================
+
+    template<typename CS_T, typename List_T, typename Node_T>
+      class ListGuard
+      {
+      public:
+        using Critical_section = CS_T;
+        using List = List_T;
+        using Node = Node_T;
+
+        ListGuard (List& list, Node& node);
+        ~ListGuard ();
+
+      protected:
+
+         List& list_;
+         Node& node_;
+      };
+
+    template<typename CS_T>
+      using Waiting_threads_list_guard = ListGuard<CS_T, Waiting_threads_list, DoubleListNodeThread>;
+
   // --------------------------------------------------------------------------
 
   } /* namespace rtos */
@@ -254,6 +282,25 @@ namespace os
     {
       return count_;
     }
+
+    // ----------------------------------------------------------------------
+
+    template<typename CS_T, typename List_T, typename Node_T>
+      ListGuard<CS_T, List_T, Node_T>::ListGuard (List& list, Node& node) :
+          list_ (list), node_ (node)
+      {
+        Critical_section cs;
+
+        list.add (node);
+      }
+
+    template<typename CS_T, typename List_T, typename Node_T>
+      ListGuard<CS_T, List_T, Node_T>::~ListGuard ()
+      {
+        Critical_section cs;
+
+        list_.remove (node_);
+      }
 
   // ----------------------------------------------------------------------
 

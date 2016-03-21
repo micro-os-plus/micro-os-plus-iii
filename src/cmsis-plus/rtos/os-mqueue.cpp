@@ -493,19 +493,12 @@ namespace os
             }
 
             {
-              interrupts::Critical_section cs; // ----- Critical section -----
-
               // Add this thread to the message queue send waiting list.
-              // It is removed immediately after suspend.
-              send_list_.add (node);
-            }
+              // It is removed when this block ends (after suspend()).
+              Waiting_threads_list_guard<interrupts::Critical_section> lg
+                { send_list_, node };
 
-          this_thread::suspend ();
-
-            {
-              interrupts::Critical_section cs; // ----- Critical section -----
-
-              send_list_.remove (node);
+              this_thread::suspend ();
             }
 
           if (crt_thread.interrupted ())
@@ -665,19 +658,12 @@ namespace os
             }
 
             {
-              interrupts::Critical_section cs; // ----- Critical section -----
-
               // Add this thread to the message queue send waiting list.
-              // It is removed immediately after wait.
-              send_list_.add (node);
-            }
+              // It is removed when this block ends (after wait()).
+              Waiting_threads_list_guard<interrupts::Critical_section> lg
+                { send_list_, node };
 
-          Systick_clock::wait (timeout - slept_ticks);
-
-            {
-              interrupts::Critical_section cs; // ----- Critical section -----
-
-              send_list_.remove (node);
+              Systick_clock::wait (timeout - slept_ticks);
             }
 
           if (crt_thread.interrupted ())
@@ -826,19 +812,12 @@ namespace os
             }
 
             {
-              interrupts::Critical_section cs; // ----- Critical section -----
-
               // Add this thread to the message queue receive waiting list.
-              // It is removed immediately after suspend.
-              receive_list_.add (node);
-            }
+              // It is removed when this block ends (after suspend()).
+              Waiting_threads_list_guard<interrupts::Critical_section> lg
+                { receive_list_, node };
 
-          this_thread::suspend ();
-
-            {
-              interrupts::Critical_section cs; // ----- Critical section -----
-
-              receive_list_.remove (node);
+              this_thread::suspend ();
             }
 
           if (crt_thread.interrupted ())
@@ -1011,19 +990,12 @@ namespace os
             }
 
             {
-              interrupts::Critical_section cs; // ----- Critical section -----
-
               // Add this thread to the message queue receive waiting list.
-              // It is removed immediately after wait.
-              receive_list_.add (node);
-            }
+              // It is removed when this block ends (after wait()).
+              Waiting_threads_list_guard<interrupts::Critical_section> lg
+                { receive_list_, node };
 
-          Systick_clock::wait (timeout - slept_ticks);
-
-            {
-              interrupts::Critical_section cs; // ----- Critical section -----
-
-              receive_list_.remove (node);
+              Systick_clock::wait (timeout - slept_ticks);
             }
 
           if (crt_thread.interrupted ())

@@ -371,19 +371,12 @@ namespace os
             }
 
             {
-              interrupts::Critical_section cs; // ----- Critical section -----
-
               // Add this thread to the memory pool waiting list.
-              // It is removed immediately after suspend.
-              list_.add (node);
-            }
+              // It is removed when this block ends (after suspend()).
+              Waiting_threads_list_guard<interrupts::Critical_section> lg
+                { list_, node };
 
-          this_thread::suspend ();
-
-            {
-              interrupts::Critical_section cs; // ----- Critical section -----
-
-              list_.remove (node);
+              this_thread::suspend ();
             }
 
           if (this_thread::thread ().interrupted ())
@@ -462,19 +455,12 @@ namespace os
             }
 
             {
-              interrupts::Critical_section cs; // ----- Critical section -----
-
               // Add this thread to the memory pool waiting list.
-              // It is removed immediately after wait.
-              list_.add (node);
-            }
+              // It is removed when this block ends (after wait()).
+              Waiting_threads_list_guard<interrupts::Critical_section> lg
+                { list_, node };
 
-          Systick_clock::wait (ticks - slept_ticks);
-
-            {
-              interrupts::Critical_section cs; // ----- Critical section -----
-
-              list_.remove (node);
+              Systick_clock::wait (ticks - slept_ticks);
             }
 
           if (this_thread::thread ().interrupted ())
