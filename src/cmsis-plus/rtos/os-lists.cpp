@@ -26,17 +26,60 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
+    /**
+     * @class Waiting_threads_list
+     * @details
+     * There are at least two strategies:
+     * - keep the list ordered by priorities and have the top node
+     *  easily accessible the head
+     * - preserve the insertion order and perform a full list traversal
+     *  to determine the top node.
+     *
+     *  The first strategy requires a partial list traverse with each
+     * insert, to find the place to insert the node, but makes
+     * retrieving the top priority node trivial, by a single access
+     * to the list head.
+     *
+     *  The second strategy might minimise the overall processing
+     * time, but always requires a full list traversal to determine
+     * the top priority node.
+     *
+     * On the other hand, typical waiting lists contain only one
+     * element, and in this case there is no distinction. Mutex
+     * objects occasionally might have two entries (and rarely more).
+     * Condition variables might also have several waiting threads,
+     * the number is usually small. In these cases, the distinction
+     * between the two strategies is also minimal.
+     *
+     * In the rare cases when the waiting list is large, the first
+     * strategy favours top node retrieval, possibly
+     * improving the response time, and is thus preferred.
+     *
+     */
+
+    /**
+     * @details
+     * The initial list status is empty.
+     */
     Waiting_threads_list::Waiting_threads_list ()
     {
       clear ();
     }
 
+    /**
+     * @details
+     * There must be no nodes in the list.
+     */
     Waiting_threads_list::~Waiting_threads_list ()
     {
       assert(head_ == nullptr);
       assert(count_ == 0);
     }
 
+    /**
+     * @details
+     * Reset the count and clear the head pointer.
+     */
     void
     Waiting_threads_list::clear (void)
     {
@@ -44,6 +87,15 @@ namespace os
       count_ = 0;
     }
 
+    /**
+     * @details
+     * Based on priority, the node is inserted at the end of the list,
+     * at the beginning of the list, or in the middle of the list, which
+     * requires a partial list traversal (done from the end).
+     *
+     * If the list is empty, the new node is added with references to
+     * itself, to satisfy the circular double link list requirements.
+     */
     void
     Waiting_threads_list::add (DoubleListNodeThread& node)
     {
@@ -59,8 +111,29 @@ namespace os
         }
       else
         {
-          // Insert at the end of the list.
+          thread::priority_t prio = node.node.sched_prio();
+
           DoubleListLinks* after = (head_->prev);
+
+          if (prio <= ((DoubleListNodeThread*)(head_->next))->node.sched_prio())
+            {
+              // Insert at the end of the list.
+            }
+          else if (prio > ((DoubleListNodeThread*)(head_))->node.sched_prio())
+            {
+              // Insert at the beginning of the list
+              // and update the new head.
+              head_ = &node;
+            }
+          else {
+              // Insert in the middle of the list.
+              // The loop is guaranteed to terminate and the
+              // weight is small, sched_prio() is only an accessor.
+              while (prio > ((DoubleListNodeThread*)(after))->node.sched_prio())
+                {
+                  after = after->prev;
+                }
+          }
 
           // Make the new node point to its neighbours.
           node.prev = after;
@@ -74,20 +147,32 @@ namespace os
         }
     }
 
+    /**
+     * If the list has more than one node, update the neighbours to
+     * point to each other, skipping the node.
+     *
+     * For lists with only one node, simply clear the list.
+     *
+     * For more robustness, to prevent unexpected accesses,
+     * the links in the removed node are nullified.
+     */
     void
     Waiting_threads_list::remove (DoubleListNodeThread& node)
     {
       if (count_ > 1)
         {
+          // Make neighbours point to each other.
           node.prev->next = node.next;
           node.next->prev = node.prev;
+
           --count_;
         }
       else if (count_ == 1)
         {
-          count_ = 0;
-          head_ = nullptr;
+          clear();
         }
+
+      // Nullify both pointers in the removed node.
       node.prev = nullptr;
       node.next = nullptr;
     }
@@ -95,35 +180,25 @@ namespace os
     void
     Waiting_threads_list::wakeup_one (void)
     {
+      // If the list is empty, silently return.
       if (head_ == nullptr)
         {
           return;
         }
 
-      DoubleListNodeThread* max_prio = head_;
-
-      DoubleListNodeThread* crt;
-      for (crt = head_; crt->next != head_;
-          crt = (DoubleListNodeThread*) crt->next)
-        {
-          if (crt->node.sched_prio () > max_prio->node.sched_prio ())
-            {
-              // Remember the oldest with the highest priority.
-              max_prio = crt;
-            }
-        }
-
-      max_prio->node.wakeup ();
+      head_->node.wakeup ();
     }
 
     void
     Waiting_threads_list::wakeup_all (void)
     {
+      // If the list is empty, silently return.
       if (head_ == nullptr)
         {
           return;
         }
 
+      // Traverse the entire list.
       DoubleListNodeThread* crt;
       for (crt = head_; crt->next != head_;
           crt = (DoubleListNodeThread*) crt->next)

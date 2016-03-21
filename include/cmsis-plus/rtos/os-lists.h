@@ -40,6 +40,9 @@ namespace os
 
     // ========================================================================
 
+    /**
+     * @brief The core of a double linked list, pointers to next and previous.
+     */
     class DoubleListLinks
     {
     public:
@@ -65,6 +68,9 @@ namespace os
       DoubleListLinks* next;
     };
 
+    /**
+     * @brief Template for a double linked list node, with reference to payload.
+     */
     template<typename P_T>
       class DoubleListNodeRef : public DoubleListLinks
       {
@@ -92,14 +98,26 @@ namespace os
         Payload& node;
       };
 
+    /**
+     * @brief A double linked list node, with reference to threads.
+     */
     using DoubleListNodeThread = DoubleListNodeRef<Thread>;
 
-    // Simple collection of threads, ordered by priorities.
+    /**
+     * @brief Double linked circular list of threads.
+     */
     class Waiting_threads_list
     {
     public:
 
+      /**
+       * Create a list.
+       */
       Waiting_threads_list ();
+
+      /**
+       * Destroy the list.
+       */
       ~Waiting_threads_list ();
 
       /**
@@ -115,24 +133,50 @@ namespace os
        * @endcond
        */
 
+      /**
+       * @brief Add a new thread node to the list.
+       * @param node Reference to a list node containing the thread reference.
+       */
       void
       add (DoubleListNodeThread& node);
 
+      /**
+       * @brief Remove the node from the list.
+       * @param node Reference to the list node to remove from the list.
+       */
       void
       remove (DoubleListNodeThread& node);
 
+      /**
+       * @brief Wake-up one task (the oldest with the highest priority)
+       */
       void
       wakeup_one (void);
 
+      /**
+       * @brief Wake-up all tasks in the list.
+       */
       void
       wakeup_all (void);
 
+      /**
+       * @brief Clear the list.
+       */
       void
       clear (void);
 
+      /**
+       * @brief Check if the list is empty.
+       * @retval true The list has no nodes.
+       * @retval false The list has at least one node.
+       */
       bool
       empty (void) const;
 
+      /**
+       * @brief Get the number of nodes in the list.
+       * @return A non negative integer with the number of nodes.
+       */
       std::size_t
       length (void) const;
 
@@ -140,12 +184,19 @@ namespace os
 
     protected:
 
-      void
-      remove (std::size_t pos);
-
-    protected:
-
+      /**
+       * @brief Pointer to the list first node.
+       * @details
+       * For empty lists, this value is 'nullptr'.
+       */
       DoubleListNodeThread* head_;
+
+      /**
+       * @brief Count of nodes in the list.
+       * @details
+       * A non negative integer, updated with each insertion/removal, to
+       * reflect the actual number of nodes in the list.
+       */
       std::size_t count_;
     };
 
