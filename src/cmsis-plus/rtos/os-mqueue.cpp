@@ -281,6 +281,9 @@ namespace os
 
 #else
 
+      assert(send_list_.empty());
+      assert(receive_list_.empty());
+
       if (flags_ | flags_allocated)
         {
           delete[] ((char*) queue_addr_);

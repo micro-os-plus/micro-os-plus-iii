@@ -455,10 +455,8 @@ namespace os
 
 #else
 
-      if (owner_ != nullptr)
-        {
-          os_assert_throw(owner_ == nullptr, ENOTRECOVERABLE);
-        }
+      assert(owner_ == nullptr);
+      assert(list_.empty());
 
 #endif
     }

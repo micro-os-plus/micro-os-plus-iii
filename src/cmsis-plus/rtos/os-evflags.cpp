@@ -197,7 +197,7 @@ namespace os
 
 #else
 
-      ;
+      assert(list_.empty());
 
 #endif
     }

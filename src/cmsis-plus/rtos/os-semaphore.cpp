@@ -238,7 +238,7 @@ namespace os
 
 #else
 
-      // TODO
+      assert(list_.empty());
 
 #endif
     }

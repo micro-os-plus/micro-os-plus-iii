@@ -289,6 +289,8 @@ namespace os
     {
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
+      assert(list_.empty());
+
       if (flags_ | flags_allocated)
         {
           delete[] (pool_addr_);

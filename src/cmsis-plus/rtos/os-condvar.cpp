@@ -293,7 +293,8 @@ namespace os
     Condition_variable::~Condition_variable ()
     {
       trace::printf ("%s() @%p \n", __func__, this);
-      // TODO
+
+      assert(list_.empty());
     }
 
     /**
@@ -502,7 +503,9 @@ namespace os
       DoubleListNodeThread node
         { crt_thread };
 
-      result res;
+      // TODO: validate
+
+      result_t res;
       res = mutex.unlock ();
 
       if (res != result::ok)
@@ -632,8 +635,9 @@ namespace os
       DoubleListNodeThread node
         { crt_thread };
 
-      result res;
+      // TODO: validate
 
+      result_t res;
       res = mutex.unlock ();
 
       if (res != result::ok)
