@@ -597,7 +597,8 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+      trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
+                     &this_thread::thread (), this_thread::thread ().name ());
 
 #if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
 
@@ -684,7 +685,8 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+      trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
+                     &this_thread::thread (), this_thread::thread ().name ());
 
 #if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
 
@@ -739,7 +741,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-      trace::printf ("%s(%d_ticks) @%p %s\n", __func__, timeout, this, name ());
+      trace::printf ("%s(%d_ticks) @%p %s by %p %s\n", __func__, timeout, this,
+                     name (), &this_thread::thread (),
+                     this_thread::thread ().name ());
 
 #if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
 
@@ -823,7 +827,8 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+      trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
+                     &this_thread::thread (), this_thread::thread ().name ());
 
 #if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
 
