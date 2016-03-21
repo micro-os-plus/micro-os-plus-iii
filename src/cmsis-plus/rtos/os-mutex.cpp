@@ -848,9 +848,9 @@ namespace os
 
           trace::printf ("mutex @%p %s unlocked\n", this, name ());
 
-          count_ = 0;
           list_.wakeup_one ();
           owner_ = nullptr;
+          count_ = 0;
 
           return result::ok;
         }

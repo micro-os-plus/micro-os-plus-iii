@@ -521,12 +521,8 @@ namespace os
           --count_;
         }
 
-        {
-          interrupts::Critical_section cs; // ----- Critical section -----
-
-          // Wake-up one thread, if any.
-          list_.wakeup_one ();
-        }
+      // Wake-up one thread, if any.
+      list_.wakeup_one ();
 
       return result::ok;
     }

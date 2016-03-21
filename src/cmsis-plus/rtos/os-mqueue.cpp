@@ -413,12 +413,8 @@ namespace os
           std::memset (dest + nbytes, 0x00, msg_size_bytes_ - nbytes);
         }
 
-        {
-          interrupts::Critical_section cs; // ----- Critical section -----
-
-          // Wake-up one thread, if any.
-          receive_list_.wakeup_one ();
-        }
+      // Wake-up one thread, if any.
+      receive_list_.wakeup_one ();
 
       return true;
     }
@@ -746,12 +742,8 @@ namespace os
           --count_;
         }
 
-        {
-          interrupts::Critical_section cs; // ----- Critical section -----
-
-          // Wake-up one thread, if any.
-          send_list_.wakeup_one ();
-        }
+      // Wake-up one thread, if any.
+      send_list_.wakeup_one ();
 
       return true;
     }

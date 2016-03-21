@@ -195,7 +195,7 @@ namespace os
        * @details
        * For empty lists, this value is 'nullptr'.
        */
-      DoubleListNodeThread* head_;
+      DoubleListNodeThread* volatile head_;
 
       /**
        * @brief Count of nodes in the list.
@@ -203,7 +203,7 @@ namespace os
        * A non negative integer, updated with each insertion/removal, to
        * reflect the actual number of nodes in the list.
        */
-      std::size_t count_;
+      std::size_t volatile count_;
     };
 
     // ========================================================================

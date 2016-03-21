@@ -111,29 +111,32 @@ namespace os
         }
       else
         {
-          thread::priority_t prio = node.node.sched_prio();
+          thread::priority_t prio = node.node.sched_prio ();
 
           DoubleListLinks* after = (head_->prev);
 
-          if (prio <= ((DoubleListNodeThread*)(head_->next))->node.sched_prio())
+          if (prio
+              <= ((DoubleListNodeThread*) (head_->next))->node.sched_prio ())
             {
               // Insert at the end of the list.
             }
-          else if (prio > ((DoubleListNodeThread*)(head_))->node.sched_prio())
+          else if (prio > ((DoubleListNodeThread*) (head_))->node.sched_prio ())
             {
               // Insert at the beginning of the list
               // and update the new head.
               head_ = &node;
             }
-          else {
+          else
+            {
               // Insert in the middle of the list.
               // The loop is guaranteed to terminate and the
               // weight is small, sched_prio() is only an accessor.
-              while (prio > ((DoubleListNodeThread*)(after))->node.sched_prio())
+              while (prio
+                  > ((DoubleListNodeThread*) (after))->node.sched_prio ())
                 {
                   after = after->prev;
                 }
-          }
+            }
 
           // Make the new node point to its neighbours.
           node.prev = after;
@@ -159,8 +162,20 @@ namespace os
     void
     Waiting_threads_list::remove (DoubleListNodeThread& node)
     {
+      // Check if not already removed.
+      if (node.next == nullptr)
+        {
+          return;
+        }
+
       if (count_ > 1)
         {
+          if (head_ == &node)
+            {
+              // Move head to next node.
+              head_ = (DoubleListNodeThread*) node.next;
+            }
+
           // Make neighbours point to each other.
           node.prev->next = node.next;
           node.next->prev = node.prev;
@@ -169,7 +184,7 @@ namespace os
         }
       else if (count_ == 1)
         {
-          clear();
+          clear ();
         }
 
       // Nullify both pointers in the removed node.
@@ -180,6 +195,8 @@ namespace os
     void
     Waiting_threads_list::wakeup_one (void)
     {
+      interrupts::Critical_section cs; // ----- Critical section -----
+
       // If the list is empty, silently return.
       if (head_ == nullptr)
         {
@@ -187,23 +204,15 @@ namespace os
         }
 
       head_->node.wakeup ();
+      remove (*head_);
     }
 
     void
     Waiting_threads_list::wakeup_all (void)
     {
-      // If the list is empty, silently return.
-      if (head_ == nullptr)
+      while (head_ != nullptr)
         {
-          return;
-        }
-
-      // Traverse the entire list.
-      DoubleListNodeThread* crt;
-      for (crt = head_; crt->next != head_;
-          crt = (DoubleListNodeThread*) crt->next)
-        {
-          crt->node.wakeup ();
+          wakeup_one ();
         }
     }
 
