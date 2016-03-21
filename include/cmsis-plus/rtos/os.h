@@ -2747,6 +2747,7 @@ namespace os
        *  (other than memory) to create the condition variable.
        *  - `ENOMEM` - Insufficient memory exists to initialise
        *  the condition variable.
+       * @par
        *  The constructor shall not fail with an error code of `EINTR`.
        */
       Condition_variable ();
@@ -2760,6 +2761,7 @@ namespace os
        *  (other than memory) to create the condition variable.
        *  - `ENOMEM` - Insufficient memory exists to initialise
        *  the condition variable.
+       * @par
        *  The constructor shall not fail with an error code of `EINTR`.
        */
       Condition_variable (const condvar::Attributes& attr);
@@ -2881,6 +2883,10 @@ namespace os
        * @name Private Member Variables
        * @{
        */
+
+#if !defined(OS_INCLUDE_PORT_RTOS_CONDITION_VARIABLE)
+      port::Waiting_threads_list list_;
+#endif
 
       // Add more internal data.
       /**

@@ -317,7 +317,7 @@ namespace os
      * the condition variable during their waits; however,
      * if predictable scheduling behaviour is required, then
      * that mutex shall be locked by the thread calling
-     * `broadcast()`.
+     * `signal()`.
      *
      * The `signal()` function shall
      * have no effect if there are no threads currently
@@ -336,7 +336,9 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
       trace::printf ("%s() @%p \n", __func__, this);
-      // TODO
+
+      list_.wakeup_one ();
+
       return result::ok;
     }
 
@@ -401,7 +403,9 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
       trace::printf ("%s() @%p \n", __func__, this);
-      // TODO
+
+      list_.wakeup_all ();
+
       return result::ok;
     }
 
@@ -493,8 +497,29 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
       trace::printf ("%s() @%p \n", __func__, this);
-      // TODO
-      return result::ok;
+
+      Thread& crt_thread = this_thread::thread ();
+      DoubleListNodeThread node
+        { crt_thread };
+
+      result res;
+      res = mutex.unlock ();
+
+      if (res != result::ok)
+        {
+          return res;
+        }
+
+        {
+          // Add this thread to the condition variable waiting list.
+          // It is removed when this block ends (after lock()).
+          Waiting_threads_list_guard<scheduler::Critical_section> lg
+            { list_, node };
+
+          res = mutex.lock ();
+        }
+
+      return res;
     }
 
     /**
@@ -602,8 +627,30 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
       trace::printf ("%s(%d_ticks) @%p \n", __func__, timeout, this);
-      // TODO
-      return result::ok;
+
+      Thread& crt_thread = this_thread::thread ();
+      DoubleListNodeThread node
+        { crt_thread };
+
+      result res;
+
+      res = mutex.unlock ();
+
+      if (res != result::ok)
+        {
+          return res;
+        }
+
+        {
+          // Add this thread to the condition variable waiting list.
+          // It is removed when this block ends (after timed_lock()).
+          Waiting_threads_list_guard<scheduler::Critical_section> lg
+            { list_, node };
+
+          res = mutex.timed_lock (timeout);
+        }
+
+      return res;
     }
 
   // --------------------------------------------------------------------------
