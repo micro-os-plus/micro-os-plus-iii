@@ -2215,6 +2215,8 @@ namespace os
        */
       using count_t = uint16_t;
 
+      constexpr count_t max_count = 0xFFFF;
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
@@ -4794,6 +4796,7 @@ namespace os
         mx_protocol = protocol::none;
         mx_robustness = robustness::stalled;
         mx_type = type::_default;
+        mx_max_count = max_count;
       }
 
       inline
