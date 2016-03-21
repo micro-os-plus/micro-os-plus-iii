@@ -389,6 +389,10 @@ namespace os
 
 #else
       Thread& crt_thread = this_thread::thread ();
+
+      // Prepare a list node pointing to the current thread.
+      // Do not worry for being on stack, it is temporarily linked to the
+      // list and guaranteed to be removed before this function returns.
       DoubleListNodeThread node
         { crt_thread };
 
@@ -513,6 +517,10 @@ namespace os
 #else
 
       Thread& crt_thread = this_thread::thread ();
+
+      // Prepare a list node pointing to the current thread.
+      // Do not worry for being on stack, it is temporarily linked to the
+      // list and guaranteed to be removed before this function returns.
       DoubleListNodeThread node
         { crt_thread };
 
