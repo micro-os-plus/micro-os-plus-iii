@@ -192,25 +192,31 @@ namespace os
       node.next = nullptr;
     }
 
+    /**
+     * @details
+     * Atomically get the top thread from the list, remove the node
+     * and wake-up the thread.
+     */
     void
     Waiting_threads_list::wakeup_one (void)
     {
       interrupts::Critical_section cs; // ----- Critical section -----
 
       // If the list is empty, silently return.
-      if (head_ == nullptr)
+      if (empty())
         {
           return;
         }
 
-      head_->node.wakeup ();
+      Thread& thread = head_->node;
       remove (*head_);
+      thread.wakeup ();
     }
 
     void
     Waiting_threads_list::wakeup_all (void)
     {
-      while (head_ != nullptr)
+      while (!empty())
         {
           wakeup_one ();
         }
