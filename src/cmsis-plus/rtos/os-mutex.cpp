@@ -412,7 +412,7 @@ namespace os
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
-#if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
+#if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
       count_ = 0;
       port::Mutex::create (this);
@@ -449,7 +449,7 @@ namespace os
     {
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
-#if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
+#if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
       port::Mutex::destroy (this);
 
@@ -466,7 +466,7 @@ namespace os
     {
       count_ = 0;
 
-#if !defined(OS_INCLUDE_PORT_RTOS_MUTEX)
+#if !defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
       // Wake-up all threads, if any.
       list_.wakeup_all ();
@@ -598,7 +598,7 @@ namespace os
       trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
                      &this_thread::thread (), this_thread::thread ().name ());
 
-#if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
+#if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
       return port::Mutex::lock (this);
 
@@ -683,7 +683,7 @@ namespace os
       trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
                      &this_thread::thread (), this_thread::thread ().name ());
 
-#if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
+#if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
       return port::Mutex::try_lock (this);
 
@@ -740,7 +740,7 @@ namespace os
                      name (), &this_thread::thread (),
                      this_thread::thread ().name ());
 
-#if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
+#if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
       return port::Mutex::timed_lock (this, timeout);
 
@@ -821,7 +821,7 @@ namespace os
       trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
                      &this_thread::thread (), this_thread::thread ().name ());
 
-#if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
+#if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
       return port::Mutex::unlock (this);
 
@@ -885,7 +885,7 @@ namespace os
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
-#if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
+#if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
       return port::Mutex::prio_ceiling (this);
 
@@ -924,7 +924,7 @@ namespace os
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
-#if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
+#if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
       return port::Mutex::prio_ceiling (this, prio_ceiling, old_prio_ceiling);
 
@@ -987,7 +987,7 @@ namespace os
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
-#if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
+#if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
       return port::Mutex::consistent (this);
 

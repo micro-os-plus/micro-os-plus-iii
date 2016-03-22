@@ -206,7 +206,7 @@ namespace os
 
       queue_addr_ = attr.mq_queue_address;
       queue_size_bytes_ = attr.mq_queue_size_bytes;
-#if !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
       std::size_t storage_size = msgs
           * (msg_size_bytes + 2 * sizeof(mqueue::index_t)
               + sizeof(mqueue::priority_t));
@@ -214,7 +214,7 @@ namespace os
       if (queue_addr_ != nullptr)
         {
           os_assert_throw(queue_size_bytes_ > 0, EINVAL);
-#if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
           os_assert_throw(
               queue_size_bytes_ >= (std::size_t) (msgs * msg_size_bytes),
               EINVAL);
@@ -226,7 +226,7 @@ namespace os
       trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), msgs_,
                      msg_size_bytes_);
 
-#if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
       count_ = 0;
       port::Message_queue::create (this);
@@ -275,7 +275,7 @@ namespace os
     {
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
-#if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
       port::Message_queue::destroy (this);
 
@@ -297,7 +297,7 @@ namespace os
     {
       count_ = 0;
 
-#if !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
       // Construct a linked list of blocks. Store the pointer at
       // the beginning of each block. Each block
@@ -331,11 +331,11 @@ namespace os
           receive_list_.clear ();
         }
 
-#endif /* !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE) */
+#endif /* !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE) */
 
     }
 
-#if !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
     bool
     Message_queue::_try_send (const char* msg, std::size_t nbytes,
@@ -419,7 +419,7 @@ namespace os
       return true;
     }
 
-#endif /* !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE) */
+#endif /* !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE) */
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -473,7 +473,7 @@ namespace os
       trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes, mprio,
                      this, name ());
 
-#if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
       return port::Message_queue::send (this, msg, nbytes, mprio);
 
@@ -555,7 +555,7 @@ namespace os
       trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes, mprio,
                      this, name ());
 
-#if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
       return port::Message_queue::try_send (this, msg, nbytes, mprio);
 
@@ -633,7 +633,7 @@ namespace os
           timeout = 1;
         }
 
-#if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
       return port::Message_queue::timed_send (this, msg, nbytes, mprio, timeout);
 
@@ -685,7 +685,7 @@ namespace os
 #endif
     }
 
-#if !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
     bool
     Message_queue::_try_receive (char* msg, std::size_t nbytes,
@@ -748,7 +748,7 @@ namespace os
       return true;
     }
 
-#endif /* !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE) */
+#endif /* !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE) */
 
     /**
      * @details
@@ -796,7 +796,7 @@ namespace os
       trace::printf ("%s(%p,%d) @%p %s\n", __func__, msg, nbytes, this,
                      name ());
 
-#if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
       return port::Message_queue::receive (this, msg, nbytes, mprio);
 
@@ -878,7 +878,7 @@ namespace os
       trace::printf ("%s(%p,%d) @%p %s\n", __func__, msg, nbytes, this,
                      name ());
 
-#if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
       return port::Message_queue::try_receive (this, msg, nbytes, mprio);
 
@@ -968,7 +968,7 @@ namespace os
           timeout = 1;
         }
 
-#if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
       return port::Message_queue::timed_receive (this, msg, nbytes, mprio,
           timeout);
@@ -1040,7 +1040,7 @@ namespace os
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
-#if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
       return port::Message_queue::reset (this);
 

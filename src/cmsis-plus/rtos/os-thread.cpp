@@ -81,7 +81,7 @@ namespace os
       {
         os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
-#if defined(OS_INCLUDE_PORT_RTOS_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
         return port::this_thread::thread ();
 
@@ -108,7 +108,7 @@ namespace os
             return;
           }
 
-#if defined(OS_INCLUDE_PORT_RTOS_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
         return port::this_thread::yield ();
 
@@ -314,7 +314,7 @@ namespace os
       trace::printf ("%s @%p %s %d %d\n", __func__, this, name (), prio_,
                      stack_size_bytes_);
 
-#if defined(OS_INCLUDE_PORT_RTOS_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
       port::Thread::create (this);
       sched_state_ = thread::state::ready;
@@ -371,7 +371,7 @@ namespace os
 
       sched_state_ = thread::state::destroyed;
 
-#if defined(OS_INCLUDE_PORT_RTOS_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
       port::Thread::destroy (this);
       // Does not return if the current thread.
@@ -395,7 +395,7 @@ namespace os
     {
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
-#if defined(OS_INCLUDE_PORT_RTOS_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
       port::Thread::sleep (this);
 
@@ -421,7 +421,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
       wakeup_reason_ = result::ok;
 
-#if defined(OS_INCLUDE_PORT_RTOS_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
       port::Thread::wakeup (this);
 
@@ -500,7 +500,7 @@ namespace os
 
       result_t res = result::ok;
 
-#if defined(OS_INCLUDE_PORT_RTOS_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
       // The port must perform a context switch.
       res = port::Thread::sched_prio (this, prio);
@@ -593,7 +593,7 @@ namespace os
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
-#if defined(OS_INCLUDE_PORT_RTOS_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
       result_t res = port::Thread::detach (this);
       if (res != result::ok)

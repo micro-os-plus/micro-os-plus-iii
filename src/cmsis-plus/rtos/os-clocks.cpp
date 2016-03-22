@@ -226,7 +226,7 @@ namespace os
 
       result_t res;
 
-#if defined(OS_INCLUDE_PORT_RTOS_SYSTICK_CLOCK_SLEEP_FOR)
+#if defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
       res = port::Systick_clock::wait (ticks);
 #else
       // TODO

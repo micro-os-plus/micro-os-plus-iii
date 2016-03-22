@@ -162,7 +162,7 @@ namespace os
 
       trace::printf ("%s() @%p \n", __func__, this);
 
-#if defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
+#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
       port::Event_flags::create (this);
 
@@ -191,7 +191,7 @@ namespace os
     {
       trace::printf ("%s() @%p \n", __func__, this);
 
-#if defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
+#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
       port::Event_flags::destroy (this);
 
@@ -268,7 +268,7 @@ namespace os
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
-#if defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
+#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
       return port::Event_flags::wait (this, mask, oflags, mode);
 
@@ -326,7 +326,7 @@ namespace os
                            flags::mode_t mode)
     {
 
-#if defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
+#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
       return port::Event_flags::try_wait (this, mask, oflags, mode);
 
@@ -387,7 +387,7 @@ namespace os
           timeout = 1;
         }
 
-#if defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
+#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
       return port::Event_flags::timed_wait (this, mask, timeout, oflags, mode);
 
@@ -452,7 +452,7 @@ namespace os
     {
       os_assert_err(mask != 0, EINVAL);
 
-#if defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
+#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
       return port::Event_flags::raise (this, mask, oflags);
 
@@ -490,7 +490,7 @@ namespace os
     {
       os_assert_err(mask != 0, EINVAL);
 
-#if defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
+#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
       return port::Event_flags::clear (this, mask, oflags);
 
@@ -525,7 +525,7 @@ namespace os
     flags::mask_t
     Event_flags::get (flags::mask_t mask, flags::mode_t mode)
     {
-#if defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
+#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
       return port::Event_flags::get (this, mask, mode);
 
@@ -560,7 +560,7 @@ namespace os
     bool
     Event_flags::waiting (void)
     {
-#if defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
+#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
       return port::Event_flags::waiting (this);
 

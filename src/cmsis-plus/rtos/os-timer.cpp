@@ -182,7 +182,7 @@ namespace os
 
       trace::printf ("%s() @%p \n", __func__, this);
 
-#if defined(OS_INCLUDE_PORT_RTOS_TIMER)
+#if defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
       port::Timer::create (this, function, args);
 
@@ -207,7 +207,7 @@ namespace os
     {
       trace::printf ("%s() @%p \n", __func__, this);
 
-#if defined(OS_INCLUDE_PORT_RTOS_TIMER)
+#if defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
       port::Timer::destroy (this);
 
@@ -236,7 +236,7 @@ namespace os
           period = 1;
         }
 
-#if defined(OS_INCLUDE_PORT_RTOS_TIMER)
+#if defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
       return port::Timer::start (this, period);
 
@@ -264,7 +264,7 @@ namespace os
 
       trace::printf ("%s() @%p \n", __func__, this);
 
-#if defined(OS_INCLUDE_PORT_RTOS_TIMER)
+#if defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
       return port::Timer::stop (this);
 

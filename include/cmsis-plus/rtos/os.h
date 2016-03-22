@@ -1609,7 +1609,7 @@ namespace os
       void* func_result_;
 
       // Implementation
-#if defined(OS_INCLUDE_PORT_RTOS_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
       friend class port::Thread;
       os_thread_port_data_t port_;
 #endif
@@ -2126,7 +2126,7 @@ namespace os
       timer::func_t func_;
       timer::func_args_t func_args_;
 
-#if defined(OS_INCLUDE_PORT_RTOS_TIMER)
+#if defined(OS_INCLUDE_RTOS_PORT_TIMER)
       friend class port::Timer;
       os_timer_port_data_t port_;
 #endif
@@ -2618,11 +2618,11 @@ namespace os
       // Can be updated in different thread contexts.
       Thread* volatile owner_;
 
-#if !defined(OS_INCLUDE_PORT_RTOS_MUTEX)
+#if !defined(OS_INCLUDE_RTOS_PORT_MUTEX)
       port::Waiting_threads_list list_;
 #endif
 
-#if defined(OS_INCLUDE_PORT_RTOS_MUTEX)
+#if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
       friend class port::Mutex;
       os_mutex_port_data_t port_;
 #endif
@@ -2886,7 +2886,7 @@ namespace os
        * @{
        */
 
-#if !defined(OS_INCLUDE_PORT_RTOS_CONDITION_VARIABLE)
+#if !defined(OS_INCLUDE_RTOS_PORT_CONDITION_VARIABLE)
       port::Waiting_threads_list list_;
 #endif
 
@@ -3239,11 +3239,11 @@ namespace os
        * @{
        */
 
-#if !defined(OS_INCLUDE_PORT_RTOS_SEMAPHORE)
+#if !defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
       port::Waiting_threads_list list_;
 #endif
 
-#if defined(OS_INCLUDE_PORT_RTOS_SEMAPHORE)
+#if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
       friend class port::Semaphore;
       os_semaphore_port_data_t port_;
 #endif
@@ -3580,7 +3580,7 @@ namespace os
        * @{
        */
 
-#if !defined(OS_INCLUDE_PORT_RTOS_MEMORY_POOL)
+#if !defined(OS_INCLUDE_RTOS_PORT_MEMORY_POOL)
       port::Waiting_threads_list list_;
 #endif
       /**
@@ -3591,7 +3591,7 @@ namespace os
        */
       char* pool_addr_;
 
-#if defined(OS_INCLUDE_PORT_RTOS_MEMORY_POOL)
+#if defined(OS_INCLUDE_RTOS_PORT_MEMORY_POOL)
       friend class port::Memory_pool;
       os_mempool_port_data_t port_;
 #endif
@@ -4044,7 +4044,7 @@ namespace os
       void
       _init (void);
 
-#if !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
       bool
       _try_send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio);
@@ -4052,7 +4052,7 @@ namespace os
       bool
       _try_receive (char* msg, std::size_t nbytes, mqueue::priority_t* mprio);
 
-#endif /* !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE) */
+#endif /* !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE) */
 
       /**
        * @}
@@ -4066,7 +4066,7 @@ namespace os
        */
 
       // Keep these in sync with the structure declarations in os-c-decl.h.
-#if !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
       port::Waiting_threads_list send_list_;
       port::Waiting_threads_list receive_list_;
 
@@ -4086,11 +4086,11 @@ namespace os
        * the beginning is required.
        */
       void* volatile first_free_;
-#endif /* !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE) */
+#endif /* !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE) */
 
       void* queue_addr_;
 
-#if defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
       friend class port::Message_queue;
       os_mqueue_port_data_t port_;
 #endif
@@ -4101,9 +4101,9 @@ namespace os
       const mqueue::size_t msgs_;
       mqueue::size_t count_;
 
-#if !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE)
+#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
       mqueue::index_t head_;
-#endif /* !defined(OS_INCLUDE_PORT_RTOS_MESSAGE_QUEUE) */
+#endif /* !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE) */
 
       /**
        * @brief Internal status bits.
@@ -4409,11 +4409,11 @@ namespace os
        * @{
        */
 
-#if !defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
+#if !defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
       port::Waiting_threads_list list_;
 #endif
 
-#if defined(OS_INCLUDE_PORT_RTOS_EVENT_FLAGS)
+#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
       friend class port::Event_flags;
       os_evflags_port_data_t port_;
 #endif
