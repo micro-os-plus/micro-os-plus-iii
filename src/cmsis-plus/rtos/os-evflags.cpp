@@ -295,7 +295,7 @@ namespace os
               Waiting_threads_list_guard<interrupts::Critical_section> lg
                 { list_, node };
 
-              this_thread::suspend ();
+              this_thread::sleep ();
             }
 
           if (crt_thread.interrupted ())

@@ -391,13 +391,13 @@ namespace os
      *  Extension to standard, no POSIX similar functionality identified.
      */
     void
-    Thread::suspend (void)
+    Thread::_sleep (void)
     {
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
 #if defined(OS_INCLUDE_PORT_RTOS_THREAD)
 
-      port::Thread::suspend (this);
+      port::Thread::sleep (this);
 
 #else
 
@@ -556,7 +556,7 @@ namespace os
           && (sched_state_ != thread::state::destroyed))
         {
           joiner_ = this;
-          suspend ();
+          _sleep ();
         }
 
       if (exit_ptr != nullptr)
@@ -925,7 +925,7 @@ namespace os
                 }
             }
 
-          suspend ();
+          _sleep ();
 
           if (interrupted ())
             {

@@ -136,9 +136,9 @@ os_irq_critical_exit (os_irq_status_t status)
 // ----------------------------------------------------------------------------
 
 void
-os_this_thread_suspend (void)
+os_this_thread_sleep (void)
 {
-  return this_thread::suspend ();
+  return this_thread::sleep ();
 }
 
 void

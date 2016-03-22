@@ -87,7 +87,7 @@ extern "C"
   // --------------------------------------------------------------------------
 
   void
-  os_this_thread_suspend (void);
+  os_this_thread_sleep (void);
 
   void
   os_this_thread_exit (void* exit_ptr);

@@ -952,7 +952,7 @@ namespace os
        * @return Nothing.
        */
       void
-      suspend (void);
+      sleep (void);
 
       /**
        * @brief Terminate the current running thread.
@@ -1461,7 +1461,7 @@ namespace os
        */
 
       friend void
-      this_thread::suspend (void);
+      this_thread::sleep (void);
 
       friend void
       this_thread::exit (void* exit_ptr);
@@ -1491,7 +1491,7 @@ namespace os
        * @return  Nothing.
        */
       void
-      suspend (void);
+      _sleep (void);
 
       /**
        * @brief Terminate thread by itself.
@@ -4638,9 +4638,9 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline void
-      suspend (void)
+      sleep (void)
       {
-        this_thread::thread ().suspend ();
+        this_thread::thread ()._sleep ();
       }
 
       /**
