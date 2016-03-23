@@ -42,9 +42,9 @@ namespace os
       // ====================================================================
 
       Systick_clock::time_point
-      Systick_clock::now () noexcept
+      systick_clock.now () noexcept
       {
-        const auto ticks = rtos::Systick_clock::now ();
+        const auto ticks = rtos::systick_clock.now ();
         return time_point
           { duration
             { ticks } };
@@ -68,7 +68,7 @@ namespace os
       system_clock::time_point
       system_clock::now () noexcept
       {
-        const auto ticks = rtos::Systick_clock::now ();
+        const auto ticks = rtos::systick_clock.now ();
         return time_point
           { duration
             { systicks
@@ -97,7 +97,7 @@ namespace os
       high_resolution_clock::now () noexcept
       {
         rtos::Systick_clock::current_t systick;
-        rtos::Systick_clock::now (&systick);
+        rtos::systick_clock.now (&systick);
 
         // The duration is the sum of SysTick ticks plus the current
         // count of CPU cycles (computed from the SysTick counter).

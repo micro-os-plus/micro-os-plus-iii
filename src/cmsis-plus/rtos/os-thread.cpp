@@ -353,7 +353,7 @@ namespace os
     {
       // Prevent the main thread to destroy itself while running
       // the exit cleanup code.
-      if (this != &this_thread::thread())
+      if (this != &this_thread::thread ())
         {
           _destroy ();
         }
@@ -908,8 +908,8 @@ namespace os
       trace::printf ("%s(0x%X, %d) @%p %s\n", __func__, mask, mode, this,
                      name ());
 
-      Systick_clock::rep prev = Systick_clock::now ();
-      Systick_clock::sleep_rep slept_ticks = 0;
+      clock::timestamp_t prev = systick_clock.now ();
+      clock::duration_t slept_ticks = 0;
       for (;;)
         {
             {
@@ -918,7 +918,7 @@ namespace os
               if (_try_wait (mask, oflags, mode) == result::ok)
                 {
                   slept_ticks =
-                      (Systick_clock::sleep_rep) (Systick_clock::now () - prev);
+                      (clock::duration_t) (systick_clock.now () - prev);
                   trace::printf ("%s(0x%X, %d)=%d @%p %s\n", __func__, mask,
                                  mode, slept_ticks, this, name ());
                   return result::ok;
@@ -993,7 +993,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Thread::timed_sig_wait (thread::sigset_t mask, duration_t timeout,
+    Thread::timed_sig_wait (thread::sigset_t mask, clock::duration_t timeout,
                             thread::sigset_t* oflags, flags::mode_t mode)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
@@ -1015,16 +1015,16 @@ namespace os
             }
         }
 
-      Systick_clock::rep prev = Systick_clock::now ();
-      Systick_clock::sleep_rep slept_ticks = 0;
+      clock::timestamp_t prev = systick_clock.now ();
+      clock::duration_t slept_ticks = 0;
 
       result_t res = ENOTRECOVERABLE;
       for (;;)
         {
-          Systick_clock::wait (timeout - slept_ticks);
+          systick_clock.wait_for (timeout - slept_ticks);
 
-          Systick_clock::rep now = Systick_clock::now ();
-          slept_ticks += (Systick_clock::sleep_rep) (now - prev);
+          clock::timestamp_t now = systick_clock.now ();
+          slept_ticks += (clock::duration_t) (now - prev);
 
             {
               interrupts::Critical_section cs; // ----- Critical section -----

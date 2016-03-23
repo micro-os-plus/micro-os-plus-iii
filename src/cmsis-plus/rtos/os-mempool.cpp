@@ -241,10 +241,10 @@ namespace os
 
       pool_addr_ = (char*) attr.mp_pool_address;
 
-      assert(blocks_ > 0);
+      assert (blocks_ > 0);
       // Blocks must be large enough to store the index, used
       // to construct the list of free blocks.
-      assert(block_size_bytes_ >= sizeof(std::ptrdiff_t));
+      assert (block_size_bytes_ >= sizeof(std::ptrdiff_t));
 
       flags_ = 0;
 
@@ -260,7 +260,7 @@ namespace os
         {
           os_assert_throw(
               attr.mp_pool_size_bytes
-                  >= ((std::size_t )(blocks_ * block_size_bytes_)),
+                  >= ((std::size_t) (blocks_ * block_size_bytes_)),
               ENOMEM);
         }
 
@@ -289,7 +289,7 @@ namespace os
     {
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
-      assert(list_.empty());
+      assert (list_.empty ());
 
       if (flags_ | flags_allocated)
         {
@@ -427,15 +427,15 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     void*
-    Memory_pool::timed_alloc (systicks_t ticks)
+    Memory_pool::timed_alloc (clock::duration_t timeout)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
-      trace::printf ("%s(%d) @%p %s\n", __func__, ticks, this, name ());
+      trace::printf ("%s(%d) @%p %s\n", __func__, timeout, this, name ());
 
-      if (ticks == 0)
+      if (timeout == 0)
         {
-          ticks = 1;
+          timeout = 1;
         }
 
       Thread& crt_thread = this_thread::thread ();
@@ -446,10 +446,10 @@ namespace os
       DoubleListNodeThread node
         { crt_thread };
 
-      Systick_clock::rep start = Systick_clock::now ();
+      clock::timestamp_t start = systick_clock.now ();
       for (;;)
         {
-          Systick_clock::sleep_rep slept_ticks;
+          clock::duration_t slept_ticks;
 
           void* p = _try_first ();
           if (p != nullptr)
@@ -457,9 +457,9 @@ namespace os
               return p;
             }
 
-          Systick_clock::rep now = Systick_clock::now ();
-          slept_ticks = (Systick_clock::sleep_rep) (now - start);
-          if (slept_ticks >= ticks)
+          clock::timestamp_t now = systick_clock.now ();
+          slept_ticks = (clock::duration_t) (now - start);
+          if (slept_ticks >= timeout)
             {
               return nullptr;
             }
@@ -470,7 +470,7 @@ namespace os
               Waiting_threads_list_guard<interrupts::Critical_section> lg
                 { list_, node };
 
-              Systick_clock::wait (ticks - slept_ticks);
+              systick_clock.wait_for (timeout - slept_ticks);
             }
 
           if (this_thread::thread ().interrupted ())

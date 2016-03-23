@@ -246,43 +246,43 @@ os_thread_sig_get (os_thread_t* thread, os_thread_sigset_t mask,
 
 // ----------------------------------------------------------------------------
 
-os_systick_clock_rep_t
+os_clock_timestamp_t
 os_systick_clock_now (void)
 {
-  return (os_systick_clock_rep_t) Systick_clock::now ();
+  return (os_clock_timestamp_t) systick_clock.now ();
 }
 
-os_systick_clock_rep_t
+os_clock_timestamp_t
 os_systick_clock_now_details (os_systick_clock_current_t* details)
 {
-  return (os_systick_clock_rep_t) Systick_clock::now (
+  return (os_clock_timestamp_t) systick_clock.now (
       (Systick_clock::current_t*) details);
 }
 
 os_result_t
-os_systick_clock_sleep_for (os_systick_clock_sleep_rep_t ticks)
+os_systick_clock_sleep_for (os_clock_duration_t ticks)
 {
-  return (os_result_t) Systick_clock::sleep_for (ticks);
+  return (os_result_t) systick_clock.sleep_for (ticks);
 }
 
 os_result_t
-os_systick_clock_wait (os_systick_clock_sleep_rep_t ticks)
+os_systick_clock_wait (os_clock_duration_t ticks)
 {
-  return (os_result_t) Systick_clock::wait (ticks);
+  return (os_result_t) systick_clock.wait_for (ticks);
 }
 
 // os_systick_sleep_rep_t
 
-os_realtime_clock_rep_t
+os_clock_timestamp_t
 os_realtime_clock_now (void)
 {
-  return (os_realtime_clock_rep_t) Realtime_clock::now ();
+  return (os_clock_timestamp_t) realtime_clock.now ();
 }
 
 os_result_t
-os_realtime_clock_sleep_for (os_realtime_clock_sleep_rep_t secs)
+os_realtime_clock_sleep_for (os_clock_duration_t secs)
 {
-  return (os_result_t) Realtime_clock::sleep_for (secs);
+  return (os_result_t) realtime_clock.sleep_for (secs);
 }
 
 // ----------------------------------------------------------------------------
@@ -839,7 +839,7 @@ osKernelSysTick (void)
 
   // Get the current SysTick timestamp, with full details, down to
   // cpu cycles.
-  Systick_clock::now (&crt);
+  systick_clock.now (&crt);
 
   // Convert ticks to cycles.
   return static_cast<uint32_t> (crt.ticks) * crt.divisor + crt.cycles;
@@ -1096,7 +1096,7 @@ osDelay (uint32_t millisec)
       return osErrorISR;
     }
 
-  result_t res = Systick_clock::sleep_for (
+  result_t res = systick_clock.sleep_for (
       Systick_clock::ticks_cast (millisec * 1000u));
 
   if (res == ETIMEDOUT)
@@ -1142,7 +1142,7 @@ osWait (uint32_t millisec)
       return event;
     }
 
-  result_t res = Systick_clock::wait (
+  result_t res = systick_clock.wait_for (
       Systick_clock::ticks_cast (millisec * 1000u));
 
   // TODO: return events

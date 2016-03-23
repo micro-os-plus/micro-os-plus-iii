@@ -205,19 +205,38 @@ namespace os
     // ------------------------------------------------------------------------
 
     /**
-     * @brief Type of variables holding timer ticks.
-     * @details
-     * A numeric type intended to hold a number of SysTick ticks.
+     * @brief %Clock namespace.
+     * @ingroup cmsis-plus-rtos
      */
-    using systicks_t = uint32_t;
+    namespace clock
+    {
 
-    /**
-     * @brief Type of variables holding timer durations.
-     * @details
-     * A numeric type intended to hold a generic duration, either in ticks
-     * or in seconds.
-     */
-    using duration_t = uint32_t;
+      /**
+       * @brief Type of variables holding timer ticks.
+       * @details
+       * A numeric type intended to hold a number of SysTick ticks.
+       */
+      using systicks_t = uint32_t;
+
+      /**
+       * @brief Type of variables holding timer durations.
+       * @details
+       * A numeric type intended to hold a generic duration, either in ticks
+       * or in seconds.
+       */
+      using duration_t = uint32_t;
+
+      /**
+       * @brief Type of variables holding time stamps.
+       * @details
+       * A numeric type intended to hold a generic timestamp, either in ticks
+       * or in seconds.
+       */
+      using timestamp_t = uint64_t;
+
+      using offset_t = int64_t;
+
+    }
 
     // ------------------------------------------------------------------------
 
@@ -1026,8 +1045,8 @@ namespace os
        */
       result_t
       timed_sig_wait (
-          thread::sigset_t mask, duration_t timeout, thread::sigset_t* oflags =
-              nullptr,
+          thread::sigset_t mask, clock::duration_t timeout,
+          thread::sigset_t* oflags = nullptr,
           flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
     } /* namespace this_thread */
@@ -1474,7 +1493,8 @@ namespace os
       this_thread::try_sig_wait (thread::sigset_t mask,
                                  thread::sigset_t* oflags, flags::mode_t mode);
       friend result_t
-      this_thread::timed_sig_wait (thread::sigset_t mask, duration_t timeout,
+      this_thread::timed_sig_wait (thread::sigset_t mask,
+                                   clock::duration_t timeout,
                                    thread::sigset_t* oflags,
                                    flags::mode_t mode);
 
@@ -1562,7 +1582,7 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      timed_sig_wait (thread::sigset_t mask, duration_t timeout,
+      timed_sig_wait (thread::sigset_t mask, clock::duration_t timeout,
                       thread::sigset_t* oflags, flags::mode_t mode);
 
       /**
@@ -1638,12 +1658,115 @@ namespace os
 
     // ========================================================================
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+    class Clock
+    {
+    public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+      Clock ();
+
+      /**
+       * @cond ignore
+       */
+      Clock (const Clock&) = delete;
+      Clock (Clock&&) = delete;
+      Clock&
+      operator= (const Clock&) = delete;
+      Clock&
+      operator= (Clock&&) = delete;
+      /**
+       * @endcond
+       */
+
+      virtual
+      ~Clock ();
+
+      /**
+       * @}
+       * @name Public Member Functions
+       * @{
+       */
+
+      void
+      start (void);
+
+      /**
+       * @brief Tell the current time.
+       * @par Parameters
+       *  None
+       * @return The clock specific timestamp.
+       */
+      clock::timestamp_t
+      now (void);
+
+      /**
+       * @brief Sleep for a duration.
+       * @param [in] duration The number of ticks or seconds to sleep.
+       * @retval ETIMEDOUT The sleep lasted the entire duration.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @retval EINTR The sleep was interrupted.
+       */
+      result_t
+      sleep_for (clock::duration_t duration);
+
+      result_t
+      sleep_until (clock::timestamp_t timestamp);
+
+      /**
+       * @brief Timed wait for an event.
+       * @param [in] duration The timeout in clock units.
+       * @retval result::ok An event occurred before the timeout.
+       * @retval ETIMEDOUT The wait lasted the entire duration.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @retval EINTR The sleep was interrupted.
+       */
+      result_t
+      wait_for (clock::duration_t duration);
+
+      void
+      interrupt_service_routine (void);
+
+      /**
+       * @}
+       */
+
+    protected:
+
+      virtual result_t
+      _wait (clock::duration_t duration) = 0;
+
+      // friend void os_systick_handler(void);
+
+      /**
+       * @name Private Member Variables
+       * @{
+       */
+
+      clock::timestamp_t volatile steady_count_;
+      clock::offset_t volatile offset_;
+
+      /**
+       * @}
+       */
+    };
+
+#pragma GCC diagnostic pop
+
+    // ========================================================================
+
     /**
      * @brief SysTick derived **clock**.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
-    class Systick_clock
+    class Systick_clock : public Clock
     {
     public:
 
@@ -1656,16 +1779,6 @@ namespace os
        * @brief SysTick frequency in Hz.
        */
       static constexpr uint32_t frequency_hz = OS_INTEGER_SYSTICK_FREQUENCY_HZ;
-
-      /**
-       * @brief Type of ticks counter.
-       */
-      using rep = uint64_t;
-
-      /**
-       * @brief Type of duration in ticks.
-       */
-      using sleep_rep = duration_t;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -1686,7 +1799,7 @@ namespace os
           /**
            * @brief Count of SysTick ticks since core reset.
            */
-          uint64_t ticks;
+          clock::timestamp_t ticks;
 
           /**
            * @brief Count of SysTick cycles since timer reload (24 bits).
@@ -1707,26 +1820,43 @@ namespace os
 #pragma GCC diagnostic pop
 
       /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+      Systick_clock ();
+
+      /**
+       * @cond ignore
+       */
+      Systick_clock (const Systick_clock&) = delete;
+      Systick_clock (Systick_clock&&) = delete;
+      Systick_clock&
+      operator= (const Systick_clock&) = delete;
+      Systick_clock&
+      operator= (Systick_clock&&) = delete;
+      /**
+       * @endcond
+       */
+
+      virtual
+      ~Systick_clock ();
+
+      /**
        * @}
        * @name Public Member Functions
        * @{
        */
 
-      /**
-       * @brief Tell the current time.
-       * @par Parameters
-       *  None
-       * @return The number of SysTick ticks since startup.
-       */
-      static rep
-      now (void);
+      // Enable name lookup in base class (tricky!).
+      using Clock::now;
 
       /**
        * @brief Tell the detailed current time.
        * @param [out] details Pointer to structure to store the clock details.
        * @return The number of SysTick ticks since startup.
        */
-      static rep
+      clock::timestamp_t
       now (current_t* details);
 
       /**
@@ -1739,26 +1869,8 @@ namespace os
         static constexpr uint32_t
         ticks_cast (Rep_T microsec);
 
-      /**
-       * @brief Sleep a number of ticks.
-       * @param [in] ticks The number of ticks to sleep.
-       * @retval ETIMEDOUT The sleep lasted the entire duration.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
-       * @retval EINTR The sleep was interrupted.
-       */
-      static result_t
-      sleep_for (sleep_rep ticks);
-
-      /**
-       * @brief Wait for an event.
-       * @param [in] ticks The timeout in ticks.
-       * @retval result::ok An event occurred before the timeout.
-       * @retval ETIMEDOUT The wait lasted the entire duration.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
-       * @retval EINTR The sleep was interrupted.
-       */
-      static result_t
-      wait (sleep_rep ticks);
+      void
+      interrupt_service_routine (void);
 
       /**
        * @}
@@ -1779,8 +1891,8 @@ namespace os
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINTR The sleep was interrupted.
        */
-      static result_t
-      _wait (sleep_rep ticks);
+      virtual result_t
+      _wait (clock::duration_t ticks) override;
 
       /**
        * @}
@@ -1788,12 +1900,16 @@ namespace os
 
     };
 
+    extern Systick_clock systick_clock;
+
+    // ========================================================================
+
     /**
      * @brief Real time **clock**.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
-    class Realtime_clock
+    class Realtime_clock : public Clock
     {
     public:
 
@@ -1808,14 +1924,27 @@ namespace os
       static constexpr uint32_t frequency_hz = 1;
 
       /**
-       * @brief Type of seconds counter.
+       * @name Constructors & Destructor
+       * @{
        */
-      using rep = uint64_t;
+
+      Realtime_clock ();
 
       /**
-       * @brief Type of duration in seconds.
+       * @cond ignore
        */
-      using sleep_rep = duration_t;
+      Realtime_clock (const Realtime_clock&) = delete;
+      Realtime_clock (Realtime_clock&&) = delete;
+      Realtime_clock&
+      operator= (const Realtime_clock&) = delete;
+      Realtime_clock&
+      operator= (Realtime_clock&&) = delete;
+      /**
+       * @endcond
+       */
+
+      virtual
+      ~Realtime_clock ();
 
       /**
        * @}
@@ -1823,24 +1952,8 @@ namespace os
        * @{
        */
 
-      /**
-       * @brief Tell the absolute time now.
-       * @par Parameters
-       *  None
-       * @return The number of seconds since January 1st, 1970 00:00:00.
-       */
-      static rep
-      now (void);
-
-      /**
-       * @brief Sleep a number of seconds.
-       * @param [in] secs The number of seconds to sleep.
-       * @retval ETIMEDOUT The sleep lasted the entire duration.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
-       * @retval EINTR The sleep was interrupted.
-       */
-      static result_t
-      sleep_for (sleep_rep secs);
+      // Enable name lookup in base class (tricky!).
+      using Clock::now;
 
       /**
        * @brief Initialise RTC.
@@ -1849,13 +1962,26 @@ namespace os
        * @retval result::ok   The real time clock was initialised.
        * @retval ENOTRECOVERABLE Could not initialise real time clock.
        */
-      static result_t
-      initialize (void);
+      result_t
+      start (void);
+
+      /**
+       * @brief Internal wait.
+       * @param secs
+       * @retval result::ok An event occurred before the timeout.
+       * @retval ETIMEDOUT The wait lasted the entire duration.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @retval EINTR The sleep was interrupted.
+       */
+      virtual result_t
+      _wait (clock::duration_t secs) override;
 
       /**
        * @}
        */
     };
+
+    extern Realtime_clock realtime_clock;
 
     // ==================--====================================================
 
@@ -2098,7 +2224,7 @@ namespace os
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
       result_t
-      start (duration_t period);
+      start (clock::duration_t period);
 
       /**
        * @brief Stop the timer.
@@ -2508,7 +2634,7 @@ namespace os
        *  state consistent.
        */
       result_t
-      timed_lock (duration_t timeout);
+      timed_lock (clock::duration_t timeout);
 
       /**
        * @brief Unlock the mutex.
@@ -2873,7 +2999,7 @@ namespace os
        *  The function shall not fail with an error code of `EINTR`.
        */
       result_t
-      timed_wait (Mutex& mutex, duration_t timeout);
+      timed_wait (Mutex& mutex, clock::duration_t timeout);
 
       /**
        * @}
@@ -3167,7 +3293,7 @@ namespace os
        * @retval EINTR The operation was interrupted.
        */
       result_t
-      timed_wait (duration_t timeout);
+      timed_wait (clock::duration_t timeout);
 
       /**
        * @brief Get the semaphore value.
@@ -3464,7 +3590,7 @@ namespace os
        * @return Pointer to memory block, or `nullptr` if timeout.
        */
       void*
-      timed_alloc (duration_t timeout);
+      timed_alloc (clock::duration_t timeout);
 
       /**
        * @brief Free the memory block.
@@ -3898,7 +4024,7 @@ namespace os
        */
       result_t
       timed_send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio,
-                  duration_t timeout);
+                  clock::duration_t timeout);
 
       /**
        * @brief Receive a message from the queue.
@@ -3964,7 +4090,7 @@ namespace os
        */
       result_t
       timed_receive (char* msg, std::size_t nbytes, mqueue::priority_t* mprio,
-                     duration_t timeout);
+                     clock::duration_t timeout);
 
       // TODO: check if some kind of peek() is useful.
 
@@ -4324,7 +4450,7 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      timed_wait (flags::mask_t mask, duration_t timeout,
+      timed_wait (flags::mask_t mask, clock::duration_t timeout,
                   flags::mask_t* oflags = nullptr,
                   flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
@@ -4532,11 +4658,11 @@ namespace os
      * ticks, using the SysTick frequency in Hz.
      */
     template<typename Rep_T>
-      constexpr systicks_t
+      constexpr clock::systicks_t
       Systick_clock::ticks_cast (Rep_T microsec)
       {
         // TODO: add some restrictions to match only numeric types
-        return (systicks_t) ((((microsec) * ((Rep_T) frequency_hz))
+        return (clock::systicks_t) ((((microsec) * ((Rep_T) frequency_hz))
             + (Rep_T) 999999ul) / (Rep_T) 1000000ul);
       }
 
@@ -4673,7 +4799,7 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline result_t
-      timed_sig_wait (thread::sigset_t mask, duration_t timeout,
+      timed_sig_wait (thread::sigset_t mask, clock::duration_t timeout,
                       thread::sigset_t* oflags, flags::mode_t mode)
       {
         return this_thread::thread ().timed_sig_wait (mask, timeout, oflags,
@@ -5074,6 +5200,7 @@ namespace os
 
 extern "C"
 {
+
   /**
    * @brief Main thread.
    * @param argc Count of arguments.
@@ -5090,36 +5217,6 @@ extern "C"
   int
   os_main (int argc, char* argv[]);
 
-  /**
-   * @brief SysTick interrupt handler.
-   * @details
-   * Must be called from the physical interrupt handler.
-   */
-  void
-  os_systick_handler (void);
-
-  /**
-   * @brief SysTick implementation hook.
-   * @details
-   * It is called from `os_systick_handler()` after the
-   * scheduler was started.
-   */
-  void
-  os_impl_systick_handler (void);
-
-  /**
-   * @brief RTC interrupt handler.
-   * @details
-   * Must be called from the physical RTC interrupt handler.
-   */
-  void
-  os_rtc_handler (void);
-
-  /**
-   * @brief RTC implementation hook.
-   */
-  void
-  os_impl_rtc_handler (void);
 }
 
 // ----------------------------------------------------------------------------

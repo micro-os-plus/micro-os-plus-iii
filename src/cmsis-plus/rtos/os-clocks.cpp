@@ -30,18 +30,6 @@
 
 // ----------------------------------------------------------------------------
 
-namespace os
-{
-  namespace rtos
-  {
-    static Systick_clock::rep __systick_now;
-    static Realtime_clock::rep __rtc_now;
-
-  } /* namespace rtos */
-} /* namespace os */
-
-// ----------------------------------------------------------------------------
-
 void
 os_systick_handler (void)
 {
@@ -50,20 +38,9 @@ os_systick_handler (void)
   // Prevent scheduler actions before starting it.
   if (scheduler::started ())
     {
-      os_impl_systick_handler ();
+      os_port_systick_handler ();
     }
-  __systick_now++;
-
-#if !defined(OS_INCLUDE_REALTIME_CLOCK_DRIVER)
-  static uint32_t ticks = Systick_clock::frequency_hz;
-
-  if (--ticks == 0)
-    {
-      ticks = Systick_clock::frequency_hz;
-
-      os_rtc_handler ();
-    }
-#endif
+  os::rtos::systick_clock.interrupt_service_routine ();
 }
 
 void
@@ -74,19 +51,19 @@ os_rtc_handler (void)
   // Prevent scheduler actions before starting it.
   if (scheduler::started ())
     {
-      os_impl_rtc_handler ();
+      os_port_rtc_handler ();
     }
-  ++__rtc_now;
+  os::rtos::realtime_clock.interrupt_service_routine ();
 }
 
 void __attribute__((weak))
-os_impl_systick_handler (void)
+os_port_systick_handler (void)
 {
   // TODO
 }
 
 void __attribute__((weak))
-os_impl_rtc_handler (void)
+os_port_rtc_handler (void)
 {
   // TODO
 }
@@ -100,9 +77,110 @@ namespace os
 
 #pragma GCC diagnostic push
 // TODO: remove it when fully implemented
-//#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 
-// ======================================================================
+    Clock::Clock ()
+    {
+      steady_count_ = 0;
+      offset_ = 0;
+    }
+
+    Clock::~Clock ()
+    {
+      ;
+    }
+
+    void
+    Clock::start (void)
+    {
+      ;
+    }
+
+    /**
+     * @details
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
+    clock::timestamp_t
+    Clock::now (void)
+    {
+      interrupts::Critical_section cs; // ----- Critical section -----
+
+      // Prevent inconsistent values using the critical section.
+      return steady_count_ + offset_;
+    }
+
+    result_t
+    Clock::sleep_for (clock::duration_t duration)
+    {
+      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+
+      trace::printf ("%s(%d_ticks)\n", __func__, duration);
+
+      clock::timestamp_t prev = systick_clock.now ();
+      clock::duration_t ticks_to_go = duration;
+      for (;;)
+        {
+          result_t res;
+
+          res = _wait (ticks_to_go);
+
+          clock::timestamp_t now = systick_clock.now ();
+          clock::duration_t slept_ticks = (clock::duration_t) (now - prev);
+          if (slept_ticks >= ticks_to_go)
+            {
+              return ETIMEDOUT;
+            }
+
+          if (this_thread::thread ().interrupted ())
+            {
+              return EINTR;
+            }
+
+          if (res != ETIMEDOUT)
+            {
+              return res;
+            }
+
+          prev = now;
+          ticks_to_go -= slept_ticks;
+        }
+      return ENOTRECOVERABLE;
+    }
+
+    result_t
+    Clock::sleep_until (clock::timestamp_t timestamp)
+    {
+      // TODO
+      return result::ok;
+    }
+
+    result_t
+    Clock::wait_for (clock::duration_t duration)
+    {
+      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+
+      trace::printf ("%s(%d_ticks)\n", __func__, duration);
+
+      result_t res;
+
+      res = _wait (duration);
+
+      if (this_thread::thread ().interrupted ())
+        {
+          return EINTR;
+        }
+
+      return res;
+    }
+
+    void
+    Clock::interrupt_service_routine (void)
+    {
+      ++steady_count_;
+    }
+
+    // ======================================================================
 
     /**
      * @class Systick_clock
@@ -127,33 +205,36 @@ namespace os
      *    // Do something
      *
      *    // Get the current ticks counter.
-     *    Systick_clock::rep ticks = Systick_clock::now();
+     *    clock::timestamp_t ticks = systick_clock.now();
      *
      *    // Put the current thread to sleep for a given number of ticks.
-     *    Systick_clock::sleep_for(7);
+     *    systick_clock.sleep_for(7);
      *
      *    // Put the current thread to sleep for a given number of microseconds.
      *    // For a 1000 Hz clock, the actual value is 4 ticks.
-     *    Systick_clock::sleep_for(Systick_clock::ticks_cast(3500));
+     *    systick_clock.sleep_for(Systick_clock::ticks_cast(3500));
      *
      *    // Do something else.
      * }
      * @endcode
      */
 
-    /**
-     * @details
-     *
-     * @note Can be invoked from Interrupt Service Routines.
-     */
-    Systick_clock::rep
-    Systick_clock::now (void)
-    {
-      interrupts::Critical_section cs; // ----- Critical section -----
+    // ----------------------------------------------------------------------
+    Systick_clock systick_clock;
 
-      // Prevent inconsistent values using the critical section.
-      return __systick_now;
+    // ----------------------------------------------------------------------
+
+    Systick_clock::Systick_clock ()
+    {
+      ;
     }
+
+    Systick_clock::~Systick_clock ()
+    {
+      ;
+    }
+
+    // ----------------------------------------------------------------------
 
     /**
      * @details
@@ -166,7 +247,7 @@ namespace os
      *
      * @note Can be invoked from Interrupt Service Routines.
      */
-    Systick_clock::rep
+    clock::timestamp_t
     Systick_clock::now (current_t* details)
     {
       assert(details != nullptr);
@@ -189,7 +270,7 @@ namespace os
           interrupts::Critical_section cs; // ----- Critical section -----
 
           // Sample ticks counter inside critical section.
-          ticks = __systick_now;
+          ticks = steady_count_;
 
           // Initial sample of the decrementing counter.
           // Might happen before the event, will be used as such.
@@ -217,7 +298,7 @@ namespace os
     }
 
     result_t
-    Systick_clock::_wait (Systick_clock::sleep_rep ticks)
+    Systick_clock::_wait (clock::duration_t ticks)
     {
       if (ticks == 0)
         {
@@ -235,6 +316,7 @@ namespace os
       return res;
     }
 
+#if 0
     /**
      * @details
      * Put the current thread to sleep until the given number of
@@ -245,43 +327,43 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Systick_clock::sleep_for (Systick_clock::sleep_rep ticks)
-    {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+    Systick_clock::sleep_for (clock::duration_t ticks)
+      {
+        os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-      trace::printf ("%s(%d_ticks)\n", __func__, ticks);
+        trace::printf ("%s(%d_ticks)\n", __func__, ticks);
 
-      Systick_clock::rep prev = Systick_clock::now ();
-      Systick_clock::sleep_rep ticks_to_go = ticks;
-      for (;;)
-        {
-          result_t res;
+        clock::timestamp_t prev = systick_clock.now ();
+        clock::duration_t ticks_to_go = ticks;
+        for (;;)
+          {
+            result_t res;
 
-          res = _wait (ticks_to_go);
+            res = _wait (ticks_to_go);
 
-          Systick_clock::rep now = Systick_clock::now ();
-          Systick_clock::sleep_rep slept_ticks = (Systick_clock::sleep_rep) (now
-              - prev);
-          if (slept_ticks >= ticks_to_go)
-            {
-              return ETIMEDOUT;
-            }
+            clock::timestamp_t now = systick_clock.now ();
+            clock::duration_t slept_ticks = (clock::duration_t) (now
+                - prev);
+            if (slept_ticks >= ticks_to_go)
+              {
+                return ETIMEDOUT;
+              }
 
-          if (this_thread::thread ().interrupted ())
-            {
-              return EINTR;
-            }
+            if (this_thread::thread ().interrupted ())
+              {
+                return EINTR;
+              }
 
-          if (res != ETIMEDOUT)
-            {
-              return res;
-            }
+            if (res != ETIMEDOUT)
+              {
+                return res;
+              }
 
-          prev = now;
-          ticks_to_go -= slept_ticks;
-        }
-      return ENOTRECOVERABLE;
-    }
+            prev = now;
+            ticks_to_go -= slept_ticks;
+          }
+        return ENOTRECOVERABLE;
+      }
 
     /**
      * @details
@@ -292,23 +374,47 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Systick_clock::wait (Systick_clock::sleep_rep ticks)
+    Systick_clock::wait (clock::duration_t ticks)
+      {
+        os_assert_err(!scheduler::in_handler_mode (), EPERM);
+
+        trace::printf ("%s(%d_ticks)\n", __func__, ticks);
+
+        result_t res;
+
+        res = _wait (ticks);
+
+        if (this_thread::thread ().interrupted ())
+          {
+            return EINTR;
+          }
+
+        return res;
+      }
+#endif
+
+    void
+    Systick_clock::interrupt_service_routine (void)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      Clock::interrupt_service_routine ();
 
-      trace::printf ("%s(%d_ticks)\n", __func__, ticks);
+#if !defined(OS_INCLUDE_RTOS_REALTIME_CLOCK_DRIVER)
 
-      result_t res;
+      // TODO: simulate an RTC driver.
+      static uint32_t ticks = Systick_clock::frequency_hz;
 
-      res = _wait (ticks);
-
-      if (this_thread::thread ().interrupted ())
+      if (--ticks == 0)
         {
-          return EINTR;
+          ticks = Systick_clock::frequency_hz;
+
+          os_rtc_handler ();
         }
 
-      return res;
+#endif
+
     }
+
+    // ======================================================================
 
     /**
      * @class Realtime_clock
@@ -335,15 +441,32 @@ namespace os
      *    // Do something
      *
      *    // Get the current seconds counter.
-     *    Realtime_clock::rep seconds = Realtime_clock::now();
+     *    clock::timestamp_t seconds = realtime_clock.now();
      *
      *    // Put the current thread to sleep for a given number of seconds.
-     *    Realtime_clock::sleep_for(7);
+     *    realtime_clock.sleep_for(7);
      *
      *    // Do something else.
      * }
      * @endcode
      */
+
+    // ----------------------------------------------------------------------
+    Realtime_clock realtime_clock;
+
+    // ----------------------------------------------------------------------
+
+    Realtime_clock::Realtime_clock ()
+    {
+      ;
+    }
+
+    Realtime_clock::~Realtime_clock ()
+    {
+      ;
+    }
+
+    // ----------------------------------------------------------------------
 
     /**
      * @details
@@ -352,7 +475,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Realtime_clock::initialize (void)
+    Realtime_clock::start (void)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -361,6 +484,7 @@ namespace os
       return result::ok;
     }
 
+#if 0
     /**
      * @details
      *
@@ -368,9 +492,9 @@ namespace os
      */
     Realtime_clock::rep
     Realtime_clock::now (void)
-    {
-      return __rtc_now;
-    }
+      {
+        return __rtc_now;
+      }
 
     /**
      * @details
@@ -382,15 +506,24 @@ namespace os
      */
     result_t
     Realtime_clock::sleep_for (Realtime_clock::sleep_rep secs)
+      {
+        os_assert_err(!scheduler::in_handler_mode (), EPERM);
+
+        trace::printf ("Realtime_clock::sleep_for(%ds)\n", secs);
+
+        // TODO
+        __rtc_now += secs;
+        return result::ok;
+      }
+#endif
+
+    result_t
+    Realtime_clock::_wait (clock::duration_t secs)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
-
-      trace::printf ("Realtime_clock::sleep_for(%ds)\n", secs);
-
-      // TODO
-      __rtc_now += secs;
       return result::ok;
     }
+
+  // ----------------------------------------------------------------------
 
 #pragma GCC diagnostic pop
 

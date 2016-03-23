@@ -147,17 +147,17 @@ extern "C"
 
   // --------------------------------------------------------------------------
 
-  os_systick_clock_rep_t
+  os_clock_timestamp_t
   os_systick_clock_now (void);
 
-  os_systick_clock_rep_t
+  os_clock_timestamp_t
   os_systick_clock_now_details (os_systick_clock_current_t* details);
 
   os_result_t
-  os_systick_clock_sleep_for (os_systick_clock_sleep_rep_t ticks);
+  os_systick_clock_sleep_for (os_clock_duration_t ticks);
 
   os_result_t
-  os_systick_clock_wait (os_systick_clock_sleep_rep_t ticks);
+  os_systick_clock_wait (os_clock_duration_t ticks);
 
   inline os_systicks_t
   os_systick_clock_ticks_cast (uint32_t microsec)
@@ -177,11 +177,11 @@ extern "C"
         / (uint64_t) 1000000ul);
   }
 
-  os_realtime_clock_rep_t
+  os_clock_timestamp_t
   os_realtime_clock_now (void);
 
   os_result_t
-  os_realtime_clock_sleep_for (os_realtime_clock_sleep_rep_t secs);
+  os_realtime_clock_sleep_for (os_clock_duration_t secs);
 
   // --------------------------------------------------------------------------
 

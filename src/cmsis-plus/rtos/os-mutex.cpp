@@ -732,7 +732,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Mutex::timed_lock (duration_t timeout)
+    Mutex::timed_lock (clock::duration_t timeout)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -754,10 +754,10 @@ namespace os
       DoubleListNodeThread node
         { crt_thread };
 
-      Systick_clock::rep start = Systick_clock::now ();
+      clock::timestamp_t start = systick_clock.now ();
       for (;;)
         {
-          Systick_clock::sleep_rep slept_ticks;
+          clock::duration_t slept_ticks;
 
           result_t res = _try_lock (&crt_thread);
           if (res != EBUSY)
@@ -765,8 +765,8 @@ namespace os
               return res;
             }
 
-          Systick_clock::rep now = Systick_clock::now ();
-          slept_ticks = (Systick_clock::sleep_rep) (now - start);
+          clock::timestamp_t now = systick_clock.now ();
+          slept_ticks = (clock::duration_t) (now - start);
           if (slept_ticks >= timeout)
             {
               return ETIMEDOUT;
@@ -778,7 +778,7 @@ namespace os
               Waiting_threads_list_guard<scheduler::Critical_section> lg
                 { list_, node };
 
-              Systick_clock::wait (timeout - slept_ticks);
+              systick_clock.wait_for (timeout - slept_ticks);
             }
 
           if (crt_thread.interrupted ())

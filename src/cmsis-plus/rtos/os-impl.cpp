@@ -36,14 +36,14 @@ namespace os
 
     // ======================================================================
 
-    static Systick_clock::rep __systick_now = 12300;
+    static clock::timestamp_t __systick_now = 12300;
 
     /**
      * @details
      *
      * @note Can be invoked from Interrupt Service Routines.
      */
-    Systick_clock::rep
+    clock::timestamp_t
     Systick_clock::now (void)
     {
       return __systick_now;
@@ -54,7 +54,7 @@ namespace os
      *
      * @note Can be invoked from Interrupt Service Routines.
      */
-    Systick_clock::rep
+    clock::timestamp_t
     Systick_clock::now (current_t* details)
     {
       assert(details != nullptr);
@@ -76,9 +76,9 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Systick_clock::sleep_for (Systick_clock::sleep_rep ticks)
+    systick_clock.sleep_for (clock::duration_t ticks)
     {
-      trace::printf ("Systick_clock::sleep_for(%d_ticks)\n", ticks);
+      trace::printf ("systick_clock.sleep_for(%d_ticks)\n", ticks);
       __systick_now += ticks;
       return result::ok;
     }
@@ -1482,7 +1482,7 @@ namespace os
           // Add current thread to the semaphore waiting list.
           list_.add (&this_thread::get ());
         }
-      return Systick_clock::sleep_for (ticks);
+      return systick_clock.sleep_for (ticks);
     }
 
     result_t

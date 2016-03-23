@@ -225,7 +225,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Timer::start (duration_t period)
+    Timer::start (clock::duration_t period)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 

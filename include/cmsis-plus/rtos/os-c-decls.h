@@ -52,9 +52,9 @@ extern "C"
 
   // --------------------------------------------------------------------------
 
-#define OS_THREAD_PRIO_SIZE_PTR (OS_INTEGER_MAX_NUMBER_OF_THREADS+1)
+// #define OS_THREAD_PRIO_SIZE_PTR (OS_INTEGER_MAX_NUMBER_OF_THREADS+1)
 
-  // --------------------------------------------------------------------------
+// --------------------------------------------------------------------------
 
   typedef uint32_t os_result_t;
 
@@ -166,11 +166,9 @@ extern "C"
 
 #pragma GCC diagnostic pop
 
-  typedef uint64_t os_systick_clock_rep_t;
-  typedef uint32_t os_systick_clock_sleep_rep_t;
 
-  typedef uint64_t os_realtime_clock_rep_t;
-  typedef uint32_t os_realtime_clock_sleep_rep_t;
+  typedef uint64_t os_clock_timestamp_t;
+  typedef uint32_t os_clock_duration_t;
 
   // --------------------------------------------------------------------------
 
@@ -434,6 +432,39 @@ extern "C"
     os_mempool_t pool;
     os_mqueue_t queue;
   } os_mail_queue_t;
+
+  // ----------------------------------------------------------------------------
+
+  /**
+   * @brief SysTick interrupt handler.
+   * @details
+   * Must be called from the physical interrupt handler.
+   */
+  void
+  os_systick_handler (void);
+
+  /**
+   * @brief SysTick implementation hook.
+   * @details
+   * It is called from `os_systick_handler()` after the
+   * scheduler was started.
+   */
+  void
+  os_port_systick_handler (void);
+
+  /**
+   * @brief RTC interrupt handler.
+   * @details
+   * Must be called from the physical RTC interrupt handler.
+   */
+  void
+  os_rtc_handler (void);
+
+  /**
+   * @brief RTC implementation hook.
+   */
+  void
+  os_port_rtc_handler (void);
 
 // ----------------------------------------------------------------------------
 

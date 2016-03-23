@@ -629,7 +629,7 @@ namespace os
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
     result_t
-    Condition_variable::timed_wait (Mutex& mutex, duration_t timeout)
+    Condition_variable::timed_wait (Mutex& mutex, clock::duration_t timeout)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 

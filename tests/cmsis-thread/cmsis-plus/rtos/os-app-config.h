@@ -26,13 +26,10 @@
 
 #define OS_INTEGER_SYSTICK_FREQUENCY_HZ (1000)
 
-#define OS_INTEGER_MAX_NUMBER_OF_THREADS (10)
-
-
 // With 4 bits NVIC, there are 16 levels, 0 = highest, 15 = lowest
 
 // Disable all interrupts from 15 to 4, keep 3-2-1 enabled
-#define OS_INTEGER_CRITICAL_SECTION_INTERRUPT_PRIORITY (4)
+#define OS_INTEGER_RTOS_CRITICAL_SECTION_INTERRUPT_PRIORITY (4)
 
 // ----------------------------------------------------------------------
 
