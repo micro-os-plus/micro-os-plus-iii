@@ -32,6 +32,17 @@
 
 #include <sys/types.h>
 
+#if defined(__cplusplus)
+
+// This is a very annoying issue, some very old libraries still
+// define putchar() as a macro. This is abusive, since it prevents
+// the use of putchar() in other name spaces.
+#if defined(putchar)
+#undef putchar
+#endif
+
+#endif
+
 // ----------------------------------------------------------------------------
 
 /**
@@ -47,13 +58,6 @@ trace_dbg_bkpt (void)
 #if defined(TRACE)
 
 #if defined(__cplusplus)
-
-// This is a very annoying issue, some very old libraries still
-// define putchar() as a macro. This is abusive, since it prevents
-// the use of putchar() in other name spaces.
-#if defined(putchar)
-#undef putchar
-#endif
 
 namespace os
 {

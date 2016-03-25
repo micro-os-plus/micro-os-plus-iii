@@ -17,7 +17,9 @@
  */
 
 #include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/rtos/os-lists.h>
+// #include <cmsis-plus/rtos/os-lists.h>
+
+// Better be the last, to undef putchar()
 #include <cmsis-plus/diag/trace.h>
 
 namespace os
@@ -200,25 +202,126 @@ namespace os
     void
     Waiting_threads_list::wakeup_one (void)
     {
-      interrupts::Critical_section cs; // ----- Critical section -----
-
-      // If the list is empty, silently return.
-      if (empty())
+      Thread* thread;
         {
-          return;
-        }
+          interrupts::Critical_section cs; // ----- Critical section -----
 
-      Thread& thread = head_->node;
-      remove (*head_);
-      thread.wakeup ();
+          // If the list is empty, silently return.
+          if (empty ())
+            {
+              return;
+            }
+
+          thread = &head_->node;
+          remove (*head_);
+        }
+      thread->wakeup ();
     }
 
     void
     Waiting_threads_list::wakeup_all (void)
     {
-      while (!empty())
+      while (!empty ())
         {
           wakeup_one ();
+        }
+    }
+
+    // ------------------------------------------------------------------------
+
+    Clock_threads_list::Clock_threads_list ()
+    {
+      ;
+    }
+
+    Clock_threads_list::~Clock_threads_list ()
+    {
+      ;
+    }
+
+    void
+    Clock_threads_list::add (DoubleListNodeClock& node)
+    {
+      if (head_ == nullptr)
+        {
+          // Make the node point to itself, to satisfy the double
+          // linked circular list.
+          node.prev = &node;
+          node.next = &node;
+
+          trace::printf ("%s() %ld \n", __func__, node.timestamp);
+
+          head_ = &node;
+          count_ = 1;
+        }
+      else
+        {
+          clock::timestamp_t timestamp = node.timestamp;
+
+          DoubleListLinks* after = (head_->prev);
+
+          if (timestamp >= ((DoubleListNodeClock*) (after))->timestamp)
+            {
+              // Insert at the end of the list.
+            }
+          else if (timestamp < ((DoubleListNodeClock*) (head_))->timestamp)
+            {
+              // Insert at the beginning of the list
+              // and update the new head.
+              head_ = &node;
+            }
+          else
+            {
+              // Insert in the middle of the list.
+              // The loop is guaranteed to terminate.
+              while (timestamp < ((DoubleListNodeClock*) (after))->timestamp)
+                {
+                  after = after->prev;
+                }
+            }
+
+          trace::printf ("%s() %ld after %ld \n", __func__,
+                         (uint32_t) timestamp,
+                         (uint32_t) ((DoubleListNodeClock*) after)->timestamp);
+
+          // Make the new node point to its neighbours.
+          node.prev = after;
+          node.next = after->next;
+
+          // Make the neighbours point to the node. The order is important.
+          after->next->prev = &node;
+          after->next = &node;
+
+          ++count_;
+        }
+
+    }
+
+    void
+    Clock_threads_list::check_wakeup (clock::timestamp_t now)
+    {
+      // Multiple threads can wait for the same time stamp, so
+      // iterate until a future node is identified.
+      for (; !empty ();)
+        {
+          clock::timestamp_t head_ts = head ()->timestamp;
+          if (now >= head_ts)
+            {
+              trace::printf ("%s() %ld \n", __func__, systick_clock.now ());
+              thread::state_t state = head ()->node.sched_state ();
+              if (state != thread::state::destroyed)
+                {
+                  wakeup_one ();
+                }
+              else
+                {
+                  remove (*head ());
+                }
+            }
+          else
+            {
+              break;
+            }
         }
     }
 

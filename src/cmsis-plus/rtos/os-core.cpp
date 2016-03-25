@@ -16,17 +16,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/diag/trace.h>
+#include <cassert>
 
-#include <cmsis-plus/rtos/port/os-decls.h>
+#include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/rtos/port/os-inlines.h>
 
-// ----------------------------------------------------------------------------
-
-#include <cassert>
-#include <cerrno>
-#include <cstdlib>
+// Better be the last, to undef putchar()
+#include <cmsis-plus/diag/trace.h>
 
 // ----------------------------------------------------------------------------
 

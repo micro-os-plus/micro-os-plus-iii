@@ -16,18 +16,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/diag/trace.h>
+#include <cassert>
+#include <new>
 
-#include <cmsis-plus/rtos/port/os-decls.h>
+#include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/rtos/port/os-inlines.h>
 
-// ----------------------------------------------------------------------------
-
-#include <cassert>
-#include <cerrno>
-#include <cstdlib>
-#include <new>
+// Better be the last, to undef putchar()
+#include <cmsis-plus/diag/trace.h>
 
 // ----------------------------------------------------------------------------
 
@@ -241,10 +237,10 @@ namespace os
 
       pool_addr_ = (char*) attr.mp_pool_address;
 
-      assert (blocks_ > 0);
+      assert(blocks_ > 0);
       // Blocks must be large enough to store the index, used
       // to construct the list of free blocks.
-      assert (block_size_bytes_ >= sizeof(std::ptrdiff_t));
+      assert(block_size_bytes_ >= sizeof(std::ptrdiff_t));
 
       flags_ = 0;
 
@@ -260,7 +256,7 @@ namespace os
         {
           os_assert_throw(
               attr.mp_pool_size_bytes
-                  >= ((std::size_t) (blocks_ * block_size_bytes_)),
+                  >= ((std::size_t ) (blocks_ * block_size_bytes_)),
               ENOMEM);
         }
 
@@ -289,7 +285,7 @@ namespace os
     {
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
-      assert (list_.empty ());
+      assert(list_.empty ());
 
       if (flags_ | flags_allocated)
         {

@@ -166,7 +166,6 @@ extern "C"
 
 #pragma GCC diagnostic pop
 
-
   typedef uint64_t os_clock_timestamp_t;
   typedef uint32_t os_clock_duration_t;
 

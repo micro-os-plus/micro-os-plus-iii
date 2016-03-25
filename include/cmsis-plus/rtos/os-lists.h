@@ -73,11 +73,11 @@ namespace os
     /**
      * @brief Template for a double linked list node, with reference to payload.
      */
-    template<typename P_T>
+    template<typename Payload_T>
       class DoubleListNodeRef : public DoubleListLinks
       {
       public:
-        using Payload = P_T;
+        using Payload = Payload_T;
 
         DoubleListNodeRef (Payload& node);
         ~DoubleListNodeRef ();
@@ -208,6 +208,84 @@ namespace os
 
     // ========================================================================
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+    /**
+     * @brief A double linked list node for clock waiting lists.
+     */
+    class DoubleListNodeClock : public DoubleListNodeThread
+    {
+    public:
+
+      DoubleListNodeClock (Thread& thread, clock::timestamp_t timestamp);
+      ~DoubleListNodeClock ();
+
+      /**
+       * @cond ignore
+       */
+      DoubleListNodeClock (const DoubleListNodeClock&) = delete;
+      DoubleListNodeClock (DoubleListNodeClock&&) = delete;
+      DoubleListNodeClock&
+      operator= (const DoubleListNodeClock&) = delete;
+      DoubleListNodeClock&
+      operator= (DoubleListNodeClock&&) = delete;
+      /**
+       * @endcond
+       */
+
+    public:
+
+      clock::timestamp_t timestamp;
+    };
+
+#pragma GCC diagnostic pop
+
+    class Clock_threads_list : public Waiting_threads_list
+    {
+    public:
+      /**
+       * Create a list.
+       */
+      Clock_threads_list ();
+
+      /**
+       * @cond ignore
+       */
+      Clock_threads_list (const Clock_threads_list&) = delete;
+      Clock_threads_list (Clock_threads_list&&) = delete;
+      Clock_threads_list&
+      operator= (const Clock_threads_list&) = delete;
+      Clock_threads_list&
+      operator= (Clock_threads_list&&) = delete;
+      /**
+       * @endcond
+       */
+
+      /**
+       * Destroy the list.
+       */
+      ~Clock_threads_list ();
+
+      /**
+       * @brief Add a new thread node to the list.
+       * @param node Reference to a list node containing the thread reference.
+       */
+      void
+      add (DoubleListNodeClock& node);
+
+      DoubleListNodeClock*
+      head (void);
+
+      void
+      check_wakeup (clock::timestamp_t timestamp);
+
+    protected:
+
+    };
+
+    // ========================================================================
+
     template<typename CS_T, typename List_T, typename Node_T>
       class ListGuard
       {
@@ -221,12 +299,15 @@ namespace os
 
       protected:
 
-         List& list_;
-         Node& node_;
+        List& list_;
+        Node& node_;
       };
 
     template<typename CS_T>
       using Waiting_threads_list_guard = ListGuard<CS_T, Waiting_threads_list, DoubleListNodeThread>;
+
+    template<typename CS_T>
+      using Clock_threads_list_guard = ListGuard<CS_T, Clock_threads_list, DoubleListNodeClock>;
 
   // --------------------------------------------------------------------------
 
@@ -256,18 +337,36 @@ namespace os
 
     // ----------------------------------------------------------------------
 
-    template<typename P_T>
-      DoubleListNodeRef<P_T>::DoubleListNodeRef (Payload& payload) :
+    template<typename Payload_T>
+      DoubleListNodeRef<Payload_T>::DoubleListNodeRef (Payload& payload) :
           node (payload)
       {
         ;
       }
 
-    template<typename P_T>
-      DoubleListNodeRef<P_T>::~DoubleListNodeRef ()
+    template<typename Payload_T>
+      DoubleListNodeRef<Payload_T>::~DoubleListNodeRef ()
       {
         ;
       }
+
+    // ----------------------------------------------------------------------
+
+    inline
+    DoubleListNodeClock::DoubleListNodeClock (Thread& thread,
+                                              clock::timestamp_t ts) :
+        DoubleListNodeThread
+          { thread }, //
+        timestamp (ts)
+    {
+
+    }
+
+    inline
+    DoubleListNodeClock::~DoubleListNodeClock ()
+    {
+      ;
+    }
 
     // ----------------------------------------------------------------------
 
@@ -281,6 +380,12 @@ namespace os
     Waiting_threads_list::length (void) const
     {
       return count_;
+    }
+
+    inline DoubleListNodeClock*
+    Clock_threads_list::head (void)
+    {
+      return (DoubleListNodeClock*) head_;
     }
 
     // ----------------------------------------------------------------------

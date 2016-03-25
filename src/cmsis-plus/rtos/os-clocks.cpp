@@ -16,17 +16,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/diag/trace.h>
+#include <cassert>
 
-#include <cmsis-plus/rtos/port/os-decls.h>
+#include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/rtos/port/os-inlines.h>
 
-// ----------------------------------------------------------------------------
-
-#include <cassert>
-#include <cerrno>
-#include <cstdlib>
+// Better be the last, to undef putchar()
+#include <cmsis-plus/diag/trace.h>
 
 // ----------------------------------------------------------------------------
 
@@ -177,7 +173,43 @@ namespace os
     void
     Clock::interrupt_service_routine (void)
     {
+      trace::putchar('.');
+
       ++steady_count_;
+
+#if !defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
+      sleep_for_list_.check_wakeup(steady_count_);
+      sleep_until_list_.check_wakeup(steady_count_+offset_);
+#endif
+
+#if 0
+      if (sleep_count_ > 1)
+        {
+          --sleep_count_;
+        }
+      else if (sleep_count_ == 1)
+        {
+          sleep_count_ = 0;
+
+          sleep_for_list_.wakeup_one ();
+        }
+
+      if (!sleep_for_list_.empty ())
+        {
+
+          for (;;)
+            {
+              clock::timestamp_t head_ts = sleep_for_list_.head ()->timestamp;
+              if (head_ts > steady_count_)
+                {
+                  sleep_count_ = (clock::duration_t) (head_ts - steady_count_);
+                  break;
+                }
+              sleep_for_list_.wakeup_one ();
+            }
+        }
+#endif
+
     }
 
     // ======================================================================
@@ -300,17 +332,38 @@ namespace os
     result_t
     Systick_clock::_wait (clock::duration_t ticks)
     {
+      result_t res;
+
+#if defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
       if (ticks == 0)
         {
           ticks = 1;
         }
 
-      result_t res;
-
-#if defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
       res = port::Systick_clock::wait (ticks);
 #else
-      // TODO
+      Thread& crt_thread = this_thread::thread ();
+
+      // Prepare a list node pointing to the current thread.
+      // Do not worry for being on stack, it is temporarily linked to the
+      // list and guaranteed to be removed before this function returns.
+      DoubleListNodeClock node
+        { crt_thread, steady_count_+ticks};
+
+        {
+          // Add this thread to the clock waiting list.
+          // It is removed when this block ends (after sleep()).
+          Clock_threads_list_guard<interrupts::Critical_section> lg
+            { sleep_for_list_, node};
+
+          this_thread::sleep ();
+        }
+
+      if (crt_thread.interrupted ())
+        {
+          return EINTR;
+        }
+
       res = result::ok;
 #endif
       return res;

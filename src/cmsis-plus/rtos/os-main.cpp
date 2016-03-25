@@ -16,12 +16,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cstdlib>
+
 #include <cmsis-plus/rtos/os.h>
+
+// Better be the last, to undef putchar()
 #include <cmsis-plus/diag/trace.h>
 
 #include "cmsis_device.h"
-
-#include <cstdlib>
 
 // ----------------------------------------------------------------------------
 
