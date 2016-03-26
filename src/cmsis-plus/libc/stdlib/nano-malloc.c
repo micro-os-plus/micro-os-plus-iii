@@ -35,13 +35,14 @@
 
 #if defined(__ARM_EABI__)
 
-#include <cmsis-plus/diag/trace.h>
-
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <stdlib.h>
 
 #include <assert.h>
+
+#include <cmsis-plus/diag/trace.h>
 
 #ifndef MAX
 #define MAX(a,b) ((a) >= (b) ? (a) : (b))
@@ -251,7 +252,8 @@ chunk * free_list = NULL;
 /* Starting point of memory allocated from system */
 char * sbrk_start = NULL;
 
-/** Function sbrk_aligned
+/*
+ * Function sbrk_aligned
  * Algorithm:
  *   Use sbrk() to obtain more memory and ensure it is CHUNK_ALIGN aligned
  *   Optimise for the case that it is already aligned - only ask for extra
@@ -286,7 +288,8 @@ sbrk_aligned (RARG malloc_size_t s)
   return align_p;
 }
 
-/** Function nano_malloc
+/*
+ * Function nano_malloc
  * Algorithm:
  *   Walk through the free list to find the first match. If fails to find
  *   one, call sbrk to allocate a new chunk.
@@ -388,10 +391,7 @@ nano_malloc (RARG malloc_size_t s)
 #if 1
 // [ILG]
 void *
-_malloc_r (void*, malloc_size_t s);
-
-void *
-_malloc_r (void* reent __attribute__((unused)), malloc_size_t s)
+_malloc_r (struct _reent * reent __attribute__((unused)), size_t s)
 {
   return nano_malloc (s);
 }
@@ -403,7 +403,8 @@ _malloc_r (void* reent __attribute__((unused)), malloc_size_t s)
 #ifdef DEFINE_FREE
 #define MALLOC_CHECK_DOUBLE_FREE
 
-/** Function nano_free
+/**
+ * Function nano_free
  * Implementation of libc free.
  * Algorithm:
  *  Maintain a global free chunk single link list, headed by global
@@ -506,10 +507,7 @@ void nano_free (RARG void * free_p)
 
 // [ILG]
 void
-_free_r (void*, void * free_p);
-
-void
-_free_r (void* impure __attribute__((unused)), void * free_p)
+_free_r (struct _reent * impure __attribute__((unused)), void* free_p)
 {
   return nano_free (free_p);
 }
@@ -525,10 +523,10 @@ void nano_cfree (RARG void * ptr)
 
 // [ILG]
 void
-_cfree_r (void*, void * ptr);
+_cfree_r (void*, void* ptr);
 
 void
-_cfree_r (void* impure __attribute__((unused)), void * ptr)
+_cfree_r (void* impure __attribute__((unused)), void* ptr)
 {
   return nano_free (ptr);
 }
@@ -549,10 +547,8 @@ nano_calloc (RARG malloc_size_t n, malloc_size_t elem)
 }
 
 void *
-_calloc_r (void*, malloc_size_t n, malloc_size_t elem);
-void *
-_calloc_r (void* impure __attribute__((unused)), malloc_size_t n,
-           malloc_size_t elem)
+_calloc_r (struct _reent * impure __attribute__((unused)), size_t n,
+           size_t elem)
 {
   return nano_calloc (n, elem);
 }
@@ -594,10 +590,8 @@ nano_realloc (RARG void * ptr, malloc_size_t size)
 
 // [ILG]
 void *
-_realloc_r (void*, void * ptr, malloc_size_t size);
-void *
-_realloc_r (void* impure __attribute__((unused)), void * ptr,
-            malloc_size_t size)
+_realloc_r (struct _reent * impure __attribute__((unused)), void* ptr,
+            size_t size)
 {
   return nano_realloc (ptr, size);
 }
