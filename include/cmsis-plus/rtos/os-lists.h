@@ -43,127 +43,131 @@ namespace os
     /**
      * @brief The core of a double linked list, pointers to next and previous.
      */
-    class DoubleListLinks
+    class Double_list_links
     {
     public:
-      DoubleListLinks ();
-      ~DoubleListLinks ();
+      Double_list_links ();
+      ~Double_list_links ();
 
       /**
        * @cond ignore
        */
-      DoubleListLinks (const DoubleListLinks&) = delete;
-      DoubleListLinks (DoubleListLinks&&) = delete;
-      DoubleListLinks&
-      operator= (const DoubleListLinks&) = delete;
-      DoubleListLinks&
-      operator= (DoubleListLinks&&) = delete;
+      Double_list_links (const Double_list_links&) = delete;
+      Double_list_links (Double_list_links&&) = delete;
+      Double_list_links&
+      operator= (const Double_list_links&) = delete;
+      Double_list_links&
+      operator= (Double_list_links&&) = delete;
       /**
        * @endcond
        */
 
     public:
 
-      DoubleListLinks* prev;
-      DoubleListLinks* next;
+      Double_list_links* prev;
+      Double_list_links* next;
     };
 
     // ========================================================================
 
     /**
-     * @brief Template for a double linked list node, with reference to payload.
+     * @brief Template for a double linked list node, with payload.
      */
     template<typename Payload_T>
-      class DoubleListNodeRef : public DoubleListLinks
+      class Double_list_node : public Double_list_links
       {
       public:
         using Payload = Payload_T;
 
-        DoubleListNodeRef (Payload& node);
-        ~DoubleListNodeRef ();
+        Double_list_node (Payload payload);
+        ~Double_list_node ();
 
         /**
          * @cond ignore
          */
-        DoubleListNodeRef (const DoubleListNodeRef&) = delete;
-        DoubleListNodeRef (DoubleListNodeRef&&) = delete;
-        DoubleListNodeRef&
-        operator= (const DoubleListNodeRef&) = delete;
-        DoubleListNodeRef&
-        operator= (DoubleListNodeRef&&) = delete;
+        Double_list_node (const Double_list_node&) = delete;
+        Double_list_node (Double_list_node&&) = delete;
+        Double_list_node&
+        operator= (const Double_list_node&) = delete;
+        Double_list_node&
+        operator= (Double_list_node&&) = delete;
         /**
          * @endcond
          */
 
       public:
 
-        Payload& node;
+        Payload node;
       };
 
     // ========================================================================
 
+    struct Thread_node
+    {
+      Thread* thread;
+    };
+
+    /**
+     * @brief A double linked list node, referencing a thread.
+     */
+    using Double_list_node_thread = Double_list_node<Thread_node>;
+
+    // ========================================================================
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+    struct Clock_node
+    {
+      clock::timestamp_t timestamp;
+      Thread* thread;
+    };
+
+#pragma GCC diagnostic pop
+
     /**
      * @brief A double linked list node, with reference to threads.
      */
-    using DoubleListNodeThread = DoubleListNodeRef<Thread>;
+    using Double_list_node_clock = Double_list_node<Clock_node>;
 
     // ========================================================================
 
     /**
      * @brief Double linked circular list of threads.
      */
-    class Waiting_threads_list
+    class Double_list
     {
     public:
 
       /**
        * Create a list.
        */
-      Waiting_threads_list ();
+      Double_list ();
 
       /**
        * Destroy the list.
        */
-      ~Waiting_threads_list ();
+      ~Double_list ();
 
       /**
        * @cond ignore
        */
-      Waiting_threads_list (const Waiting_threads_list&) = delete;
-      Waiting_threads_list (Waiting_threads_list&&) = delete;
-      Waiting_threads_list&
-      operator= (const Waiting_threads_list&) = delete;
-      Waiting_threads_list&
-      operator= (Waiting_threads_list&&) = delete;
+      Double_list (const Double_list&) = delete;
+      Double_list (Double_list&&) = delete;
+      Double_list&
+      operator= (const Double_list&) = delete;
+      Double_list&
+      operator= (Double_list&&) = delete;
       /**
        * @endcond
        */
-
-      /**
-       * @brief Add a new thread node to the list.
-       * @param node Reference to a list node containing the thread reference.
-       */
-      void
-      add (DoubleListNodeThread& node);
 
       /**
        * @brief Remove the node from the list.
        * @param node Reference to the list node to remove from the list.
        */
       void
-      remove (DoubleListNodeThread& node);
-
-      /**
-       * @brief Wake-up one task (the oldest with the highest priority)
-       */
-      void
-      wakeup_one (void);
-
-      /**
-       * @brief Wake-up all tasks in the list.
-       */
-      void
-      wakeup_all (void);
+      remove (Double_list_links& node);
 
       /**
        * @brief Clear the list.
@@ -195,7 +199,7 @@ namespace os
        * @details
        * For empty lists, this value is 'nullptr'.
        */
-      DoubleListNodeThread* volatile head_;
+      Double_list_links* volatile head_;
 
       /**
        * @brief Count of nodes in the list.
@@ -208,40 +212,67 @@ namespace os
 
     // ========================================================================
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
-
     /**
-     * @brief A double linked list node for clock waiting lists.
+     * @brief Double linked circular list of threads.
      */
-    class DoubleListNodeClock : public DoubleListNodeThread
+    class Waiting_threads_list : public Double_list
     {
     public:
 
-      DoubleListNodeClock (Thread& thread, clock::timestamp_t timestamp);
-      ~DoubleListNodeClock ();
+      /**
+       * Create a list.
+       */
+      Waiting_threads_list ();
+
+      /**
+       * Destroy the list.
+       */
+      ~Waiting_threads_list ();
 
       /**
        * @cond ignore
        */
-      DoubleListNodeClock (const DoubleListNodeClock&) = delete;
-      DoubleListNodeClock (DoubleListNodeClock&&) = delete;
-      DoubleListNodeClock&
-      operator= (const DoubleListNodeClock&) = delete;
-      DoubleListNodeClock&
-      operator= (DoubleListNodeClock&&) = delete;
+      Waiting_threads_list (const Waiting_threads_list&) = delete;
+      Waiting_threads_list (Waiting_threads_list&&) = delete;
+      Waiting_threads_list&
+      operator= (const Waiting_threads_list&) = delete;
+      Waiting_threads_list&
+      operator= (Waiting_threads_list&&) = delete;
       /**
        * @endcond
        */
 
-    public:
+      /**
+       * @brief Add a new thread node to the list.
+       * @param node Reference to a list node containing the thread reference.
+       */
+      void
+      add (Double_list_node_thread& node);
 
-      clock::timestamp_t timestamp;
+      Double_list_node_thread*
+      head (void);
+
+      /**
+       * @brief Wake-up one task (the oldest with the highest priority)
+       */
+      void
+      wakeup_one (void);
+
+      /**
+       * @brief Wake-up all tasks in the list.
+       */
+      void
+      wakeup_all (void);
+
+      // TODO add iterator begin(), end()
+
+    protected:
+
     };
 
-#pragma GCC diagnostic pop
+    // ========================================================================
 
-    class Clock_threads_list : public Waiting_threads_list
+    class Clock_threads_list : public Double_list
     {
     public:
       /**
@@ -272,13 +303,25 @@ namespace os
        * @param node Reference to a list node containing the thread reference.
        */
       void
-      add (DoubleListNodeClock& node);
+      add (Double_list_node_clock& node);
 
-      DoubleListNodeClock*
+      Double_list_node_clock*
       head (void);
 
       void
       check_wakeup (clock::timestamp_t timestamp);
+
+      /**
+       * @brief Wake-up one task (the oldest with the highest priority)
+       */
+      void
+      wakeup_one (void);
+
+      /**
+       * @brief Wake-up all tasks in the list.
+       */
+      void
+      wakeup_all (void);
 
     protected:
 
@@ -304,10 +347,12 @@ namespace os
       };
 
     template<typename CS_T>
-      using Waiting_threads_list_guard = ListGuard<CS_T, Waiting_threads_list, DoubleListNodeThread>;
+      using Waiting_threads_list_guard =
+      ListGuard<CS_T, Waiting_threads_list, Double_list_node_thread>;
 
     template<typename CS_T>
-      using Clock_threads_list_guard = ListGuard<CS_T, Clock_threads_list, DoubleListNodeClock>;
+      using Clock_threads_list_guard =
+      ListGuard<CS_T, Clock_threads_list, Double_list_node_clock>;
 
   // --------------------------------------------------------------------------
 
@@ -320,77 +365,103 @@ namespace os
 {
   namespace rtos
   {
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
     inline
-    DoubleListLinks::DoubleListLinks ()
+    Double_list_links::Double_list_links ()
     {
       prev = nullptr;
       next = nullptr;
     }
 
     inline
-    DoubleListLinks::~DoubleListLinks ()
+    Double_list_links::~Double_list_links ()
     {
       ;
     }
 
-    // ----------------------------------------------------------------------
+    // ========================================================================
 
     template<typename Payload_T>
-      DoubleListNodeRef<Payload_T>::DoubleListNodeRef (Payload& payload) :
-          node (payload)
+      inline
+      Double_list_node<Payload_T>::Double_list_node (Payload payload)
+      {
+        this->node = payload;
+      }
+
+    template<typename Payload_T>
+      inline
+      Double_list_node<Payload_T>::~Double_list_node ()
       {
         ;
       }
 
-    template<typename Payload_T>
-      DoubleListNodeRef<Payload_T>::~DoubleListNodeRef ()
-      {
-        ;
-      }
-
-    // ----------------------------------------------------------------------
-
-    inline
-    DoubleListNodeClock::DoubleListNodeClock (Thread& thread,
-                                              clock::timestamp_t ts) :
-        DoubleListNodeThread
-          { thread }, //
-        timestamp (ts)
-    {
-
-    }
-
-    inline
-    DoubleListNodeClock::~DoubleListNodeClock ()
-    {
-      ;
-    }
-
-    // ----------------------------------------------------------------------
+    // ========================================================================
 
     inline bool
-    Waiting_threads_list::empty (void) const
+    Double_list::empty (void) const
     {
       return count_ == 0;
     }
 
     inline std::size_t
-    Waiting_threads_list::length (void) const
+    Double_list::length (void) const
     {
       return count_;
     }
 
-    inline DoubleListNodeClock*
-    Clock_threads_list::head (void)
+    // ========================================================================
+
+    /**
+     * @details
+     * The initial list status is empty.
+     */
+    inline
+    Waiting_threads_list::Waiting_threads_list ()
     {
-      return (DoubleListNodeClock*) head_;
+      ;
     }
 
-    // ----------------------------------------------------------------------
+    /**
+     * @details
+     * There must be no nodes in the list.
+     */
+    inline
+    Waiting_threads_list::~Waiting_threads_list ()
+    {
+      ;
+    }
+
+    inline Double_list_node_thread*
+    Waiting_threads_list::head (void)
+    {
+      return (Double_list_node_thread*) head_;
+    }
+
+    // ========================================================================
+
+    inline
+    Clock_threads_list::Clock_threads_list ()
+    {
+      ;
+    }
+
+    inline
+    Clock_threads_list::~Clock_threads_list ()
+    {
+      ;
+    }
+
+    inline Double_list_node_clock*
+    Clock_threads_list::head (void)
+    {
+      return (Double_list_node_clock*) head_;
+    }
+
+    // ========================================================================
 
     template<typename CS_T, typename List_T, typename Node_T>
+      inline
       ListGuard<CS_T, List_T, Node_T>::ListGuard (List& list, Node& node) :
           list_ (list), node_ (node)
       {
@@ -400,6 +471,7 @@ namespace os
       }
 
     template<typename CS_T, typename List_T, typename Node_T>
+      inline
       ListGuard<CS_T, List_T, Node_T>::~ListGuard ()
       {
         Critical_section cs;

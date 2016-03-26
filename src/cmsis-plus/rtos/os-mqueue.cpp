@@ -481,8 +481,10 @@ namespace os
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      DoubleListNodeThread node
-        { crt_thread };
+      Double_list_node_thread node
+        {
+          { &crt_thread } //
+        };
 
       for (;;)
         {
@@ -642,8 +644,10 @@ namespace os
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      DoubleListNodeThread node
-        { crt_thread };
+      Double_list_node_thread node
+        {
+          { &crt_thread } //
+        };
 
       clock::timestamp_t start = systick_clock.now ();
       for (;;)
@@ -805,8 +809,10 @@ namespace os
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      DoubleListNodeThread node
-        { crt_thread };
+      Double_list_node_thread node
+        {
+          { &crt_thread } //
+        };
 
       for (;;)
         {
@@ -979,8 +985,10 @@ namespace os
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      DoubleListNodeThread node
-        { crt_thread };
+      Double_list_node_thread node
+        {
+          { &crt_thread } //
+        };
 
       clock::timestamp_t start = systick_clock.now ();
       for (;;)
