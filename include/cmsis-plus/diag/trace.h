@@ -25,9 +25,11 @@
 #include <cstdint>
 #include <cstddef>
 #include <cstdarg>
+#include <cstdlib>
 #else
 #include <stdint.h>
 #include <stdarg.h>
+#include <stdlib.h>
 #endif
 
 #include <sys/types.h>
