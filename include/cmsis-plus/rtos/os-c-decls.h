@@ -141,6 +141,8 @@ extern "C"
     os_thread_port_data_t port_;
 #endif
     void* joiner;
+    void* waiting_node;
+    void* clock_node;
     size_t stack_size_bytes;
     os_thread_state_t state;
     os_thread_prio_t prio;

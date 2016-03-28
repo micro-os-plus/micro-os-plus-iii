@@ -348,15 +348,14 @@ namespace os
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
       Double_list_node_clock node
-        {
-          { steady_count_ + ticks, &crt_thread } //
-        };
+        { sleep_for_list_,
+          { steady_count_ + ticks, clock_node_type::timeout, &crt_thread } };
 
         {
           // Add this thread to the clock waiting list.
           // It is removed when this block ends (after sleep()).
           Clock_threads_list_guard<interrupts::Critical_section> lg
-            { sleep_for_list_, node };
+            { node };
 
           this_thread::sleep ();
         }

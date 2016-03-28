@@ -197,6 +197,17 @@ namespace os
 
           ++count_;
         }
+
+      n.node.thread->waiting_node_ = &n;
+    }
+
+    void
+    Waiting_threads_list::remove (Double_list_node_thread& n)
+    {
+      trace::printf ("%s() waiting \n", __func__);
+
+      n.node.thread->waiting_node_ = nullptr;
+      Double_list::remove (n);
     }
 
     /**
@@ -218,7 +229,7 @@ namespace os
             }
 
           thread = head ()->node.thread;
-          remove (*head_);
+          remove (*head ());
         }
       assert(thread != nullptr);
 
@@ -307,6 +318,16 @@ namespace os
 
         }
 
+      ((Thread*) (n.node.object))->clock_node_ = &n;
+    }
+
+    void
+    Clock_threads_list::remove (Double_list_node_clock& n)
+    {
+      trace::printf ("%s() timeout \n", __func__);
+
+      ((Thread*) (n.node.object))->clock_node_ = nullptr;
+      Double_list::remove (n);
     }
 
     void
@@ -344,7 +365,7 @@ namespace os
               return;
             }
 
-          thread = head ()->node.thread;
+          thread = (Thread*) (head ()->node.object);
           remove (*head ());
         }
       if (thread == nullptr)

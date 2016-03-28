@@ -306,6 +306,7 @@ namespace os
       sig_mask_ = 0;
 
       joiner_ = nullptr;
+      waiting_node_ = nullptr;
 
       trace::printf ("%s @%p %s %d %d\n", __func__, this, name (), prio_,
                      stack_size_bytes_);
@@ -725,6 +726,19 @@ namespace os
           trace::printf ("%s() @%p %s already terminated\n", __func__, this,
                          name ());
           return result::ok; // Already terminated
+        }
+
+      // If the thread is waiting on an event, remove it from the list.
+      if (waiting_node_ != nullptr)
+        {
+          ((Waiting_threads_list&) (waiting_node_->list)).remove (
+              *waiting_node_);
+        }
+
+      // If the thread is waiting on a timeout, remove it from the list.
+      if (clock_node_ != nullptr)
+        {
+          ((Clock_threads_list&) (clock_node_->list)).remove (*clock_node_);
         }
 
       func_result_ = nullptr;

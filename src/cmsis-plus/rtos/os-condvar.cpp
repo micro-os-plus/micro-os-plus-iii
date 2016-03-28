@@ -290,7 +290,7 @@ namespace os
     {
       trace::printf ("%s() @%p \n", __func__, this);
 
-      assert(list_.empty());
+      assert(list_.empty ());
     }
 
     /**
@@ -501,9 +501,8 @@ namespace os
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
       Double_list_node_thread node
-        {
-          { &crt_thread } //
-        };
+        { list_,
+          { &crt_thread } };
 
       // TODO: validate
 
@@ -519,7 +518,7 @@ namespace os
           // Add this thread to the condition variable waiting list.
           // It is removed when this block ends (after lock()).
           Waiting_threads_list_guard<scheduler::Critical_section> lg
-            { list_, node };
+            { node };
 
           res = mutex.lock ();
         }
@@ -639,9 +638,8 @@ namespace os
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
       Double_list_node_thread node
-        {
-          { &crt_thread } //
-        };
+        { list_,
+          { &crt_thread } };
 
       // TODO: validate
 
@@ -657,7 +655,7 @@ namespace os
           // Add this thread to the condition variable waiting list.
           // It is removed when this block ends (after timed_lock()).
           Waiting_threads_list_guard<scheduler::Critical_section> lg
-            { list_, node };
+            { node };
 
           res = mutex.timed_lock (timeout);
         }

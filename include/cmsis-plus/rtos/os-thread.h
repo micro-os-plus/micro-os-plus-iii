@@ -517,6 +517,9 @@ namespace os
                                    thread::sigset_t* oflags,
                                    flags::mode_t mode);
 
+      friend class Waiting_threads_list;
+      friend class Clock_threads_list;
+
       /**
        * @}
        * @name Private Member Functions
@@ -654,11 +657,14 @@ namespace os
 #endif
 
       Thread* joiner_;
+      Double_list_node_thread* waiting_node_;
+      Double_list_node_clock* clock_node_;
 
       std::size_t stack_size_bytes_;
       thread::state_t sched_state_;
       thread::priority_t prio_;
 
+      // TODO: needed?
       result_t wakeup_reason_;
 
       // volatile, but used in critical sections.

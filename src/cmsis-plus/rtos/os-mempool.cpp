@@ -361,9 +361,8 @@ namespace os
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
       Double_list_node_thread node
-        {
-          { &crt_thread } //
-        };
+        { list_,
+          { &crt_thread } };
 
       for (;;)
         {
@@ -378,7 +377,7 @@ namespace os
               // Add this thread to the memory pool waiting list.
               // It is removed when this block ends (after suspend()).
               Waiting_threads_list_guard<interrupts::Critical_section> lg
-                { list_, node };
+                { node };
 
               this_thread::sleep ();
             }
@@ -442,9 +441,8 @@ namespace os
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
       Double_list_node_thread node
-        {
-          { &crt_thread } //
-        };
+        { list_,
+          { &crt_thread } };
 
       clock::timestamp_t start = systick_clock.now ();
       for (;;)
@@ -468,7 +466,7 @@ namespace os
               // Add this thread to the memory pool waiting list.
               // It is removed when this block ends (after wait()).
               Waiting_threads_list_guard<interrupts::Critical_section> lg
-                { list_, node };
+                { node };
 
               systick_clock.wait_for (timeout - slept_ticks);
             }
