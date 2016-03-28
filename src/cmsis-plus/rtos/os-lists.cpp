@@ -174,6 +174,7 @@ namespace os
               // Insert at the beginning of the list
               // and update the new head.
               head_ = &n;
+              trace::printf ("%s() head \n", __func__);
             }
           else
             {
@@ -219,7 +220,17 @@ namespace os
           thread = head ()->node.thread;
           remove (*head_);
         }
-      thread->wakeup ();
+      assert(thread != nullptr);
+
+      thread::state_t state = thread->sched_state ();
+      if (state != thread::state::destroyed)
+        {
+          thread->wakeup ();
+        }
+      else
+        {
+          trace::printf ("%s() gone \n", __func__);
+        }
     }
 
     void
@@ -243,7 +254,7 @@ namespace os
           n.prev = &n;
           n.next = &n;
 
-          trace::printf ("%s() %ld \n", __func__, n.node.timestamp);
+          trace::printf ("%s() %u \n", __func__, (uint32_t) n.node.timestamp);
 
           head_ = &n;
           count_ = 1;
@@ -264,6 +275,7 @@ namespace os
               // Insert at the beginning of the list
               // and update the new head.
               head_ = &n;
+              trace::printf ("%s() head \n", __func__);
             }
           else
             {
@@ -275,10 +287,16 @@ namespace os
                 }
             }
 
-          trace::printf ("%s() %ld after %ld \n", __func__,
-                         (uint32_t) timestamp,
-                         (uint32_t) after->node.timestamp);
+          ++count_;
 
+          trace::printf ("%s() %u after %u #%d\n", __func__,
+                         (uint32_t) timestamp, (uint32_t) after->node.timestamp,
+                         count_);
+
+          if (after->node.timestamp == 0)
+            {
+              trace::printf ("zero \n");
+            }
           // Make the new node point to its neighbours.
           n.prev = after;
           n.next = after->next;
@@ -287,7 +305,6 @@ namespace os
           after->next->prev = &n;
           after->next = &n;
 
-          ++count_;
         }
 
     }
@@ -303,16 +320,9 @@ namespace os
               ((Double_list_node_clock*) head_)->node.timestamp;
           if (now >= head_ts)
             {
-              trace::printf ("%s() %ld \n", __func__, systick_clock.now ());
-              thread::state_t state = head ()->node.thread->sched_state ();
-              if (state != thread::state::destroyed)
-                {
-                  wakeup_one ();
-                }
-              else
-                {
-                  remove (*head_);
-                }
+              trace::printf ("%s() %u \n", __func__,
+                             (uint32_t) systick_clock.now ());
+              wakeup_one ();
             }
           else
             {
@@ -337,7 +347,19 @@ namespace os
           thread = head ()->node.thread;
           remove (*head ());
         }
-      thread->wakeup ();
+      if (thread == nullptr)
+        assert(thread != nullptr);
+
+      thread::state_t state = thread->sched_state ();
+      if (state != thread::state::destroyed)
+        {
+          thread->wakeup ();
+        }
+      else
+        {
+          trace::printf ("%s() gone \n", __func__);
+        }
+
     }
 
     void
