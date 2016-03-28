@@ -178,8 +178,8 @@ namespace os
       ++steady_count_;
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
-      sleep_for_list_.check_wakeup(steady_count_);
-      sleep_until_list_.check_wakeup(steady_count_+offset_);
+      sleep_for_list_.check_wakeup (steady_count_);
+      sleep_until_list_.check_wakeup (steady_count_ + offset_);
 #endif
 
 #if 0
@@ -347,14 +347,16 @@ namespace os
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      DoubleListNodeClock node
-        { crt_thread, steady_count_+ticks};
+      Double_list_node_clock node
+        {
+          { steady_count_ + ticks, &crt_thread } //
+        };
 
         {
           // Add this thread to the clock waiting list.
           // It is removed when this block ends (after sleep()).
           Clock_threads_list_guard<interrupts::Critical_section> lg
-            { sleep_for_list_, node};
+            { sleep_for_list_, node };
 
           this_thread::sleep ();
         }
@@ -364,7 +366,7 @@ namespace os
           return EINTR;
         }
 
-      res = result::ok;
+      res = ETIMEDOUT;
 #endif
       return res;
     }
@@ -573,7 +575,7 @@ namespace os
     result_t
     Realtime_clock::_wait (clock::duration_t secs)
     {
-      return result::ok;
+      return ETIMEDOUT;
     }
 
   // ----------------------------------------------------------------------
