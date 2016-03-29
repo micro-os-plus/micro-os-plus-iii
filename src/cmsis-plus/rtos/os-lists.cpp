@@ -160,16 +160,16 @@ namespace os
         }
       else
         {
-          thread::priority_t prio = n.node.thread->sched_prio ();
+          thread::priority_t prio = n.thread.sched_prio ();
 
           Double_list_node_thread* after =
               (Double_list_node_thread*) (head_->prev);
 
-          if (prio <= after->node.thread->sched_prio ())
+          if (prio <= after->thread.sched_prio ())
             {
               // Insert at the end of the list.
             }
-          else if (prio > head ()->node.thread->sched_prio ())
+          else if (prio > head ()->thread.sched_prio ())
             {
               // Insert at the beginning of the list
               // and update the new head.
@@ -181,7 +181,7 @@ namespace os
               // Insert in the middle of the list.
               // The loop is guaranteed to terminate and the
               // weight is small, sched_prio() is only an accessor.
-              while (prio > after->node.thread->sched_prio ())
+              while (prio > after->thread.sched_prio ())
                 {
                   after = (Double_list_node_thread*) after->prev;
                 }
@@ -198,7 +198,6 @@ namespace os
           ++count_;
         }
 
-      n.node.thread->waiting_node_ = &n;
     }
 
     void
@@ -206,7 +205,6 @@ namespace os
     {
       trace::printf ("%s() waiting \n", __func__);
 
-      n.node.thread->waiting_node_ = nullptr;
       Double_list::remove (n);
     }
 
@@ -228,7 +226,7 @@ namespace os
               return;
             }
 
-          thread = head ()->node.thread;
+          thread = &(head ()->thread);
           remove (*head ());
         }
       assert(thread != nullptr);
@@ -255,8 +253,24 @@ namespace os
 
     // ========================================================================
 
+    Double_list_node_timestamp::Double_list_node_timestamp (
+        Double_list& lst, clock::timestamp_t ts) :
+        Double_list_links
+          { lst }, //
+        timestamp (ts)
+    {
+      ;
+    }
+
+    Double_list_node_timestamp::~Double_list_node_timestamp ()
+    {
+      ;
+    }
+
+    // ========================================================================
+
     void
-    Clock_threads_list::add (Double_list_node_clock& n)
+    Clock_timestamps_list::add (Double_list_node_timestamp& n)
     {
       if (head_ == nullptr)
         {
@@ -265,23 +279,23 @@ namespace os
           n.prev = &n;
           n.next = &n;
 
-          trace::printf ("%s() %u \n", __func__, (uint32_t) n.node.timestamp);
+          trace::printf ("%s() %u \n", __func__, (uint32_t) n.timestamp);
 
           head_ = &n;
           count_ = 1;
         }
       else
         {
-          clock::timestamp_t timestamp = n.node.timestamp;
+          clock::timestamp_t timestamp = n.timestamp;
 
           Double_list_node_clock* after =
               (Double_list_node_clock*) (head_->prev);
 
-          if (timestamp >= after->node.timestamp)
+          if (timestamp >= after->timestamp)
             {
               // Insert at the end of the list.
             }
-          else if (timestamp < head ()->node.timestamp)
+          else if (timestamp < head ()->timestamp)
             {
               // Insert at the beginning of the list
               // and update the new head.
@@ -292,7 +306,7 @@ namespace os
             {
               // Insert in the middle of the list.
               // The loop is guaranteed to terminate.
-              while (timestamp < after->node.timestamp)
+              while (timestamp < after->timestamp)
                 {
                   after = (Double_list_node_clock*) (after->prev);
                 }
@@ -301,10 +315,10 @@ namespace os
           ++count_;
 
           trace::printf ("%s() %u after %u #%d\n", __func__,
-                         (uint32_t) timestamp, (uint32_t) after->node.timestamp,
+                         (uint32_t) timestamp, (uint32_t) after->timestamp,
                          count_);
 
-          if (after->node.timestamp == 0)
+          if (after->timestamp == 0)
             {
               trace::printf ("zero \n");
             }
@@ -315,35 +329,31 @@ namespace os
           // Make the neighbours point to the node. The order is important.
           after->next->prev = &n;
           after->next = &n;
-
         }
-
-      ((Thread*) (n.node.object))->clock_node_ = &n;
     }
 
     void
-    Clock_threads_list::remove (Double_list_node_clock& n)
+    Clock_timestamps_list::remove (Double_list_node_timestamp& n)
     {
       trace::printf ("%s() timeout \n", __func__);
 
-      ((Thread*) (n.node.object))->clock_node_ = nullptr;
       Double_list::remove (n);
     }
 
     void
-    Clock_threads_list::check_wakeup (clock::timestamp_t now)
+    Clock_timestamps_list::check_wakeup (clock::timestamp_t now)
     {
       // Multiple threads can wait for the same time stamp, so
       // iterate until a future node is identified.
       for (; !empty ();)
         {
           clock::timestamp_t head_ts =
-              ((Double_list_node_clock*) head_)->node.timestamp;
+              ((Double_list_node_clock*) head_)->timestamp;
           if (now >= head_ts)
             {
               trace::printf ("%s() %u \n", __func__,
                              (uint32_t) systick_clock.now ());
-              wakeup_one ();
+              head ()->action ();
             }
           else
             {
@@ -353,7 +363,7 @@ namespace os
     }
 
     void
-    Clock_threads_list::wakeup_one (void)
+    Clock_timestamps_list::wakeup_one (void)
     {
       Thread* thread;
         {
@@ -365,11 +375,11 @@ namespace os
               return;
             }
 
-          thread = (Thread*) (head ()->node.object);
-          remove (*head ());
+          thread = &(((Double_list_node_clock*) head ())->thread);
+          remove (*((Double_list_node_clock*) head ()));
         }
-      if (thread == nullptr)
-        assert(thread != nullptr);
+
+      assert(thread != nullptr);
 
       thread::state_t state = thread->sched_state ();
       if (state != thread::state::destroyed)
@@ -384,7 +394,7 @@ namespace os
     }
 
     void
-    Clock_threads_list::wakeup_all (void)
+    Clock_timestamps_list::wakeup_all (void)
     {
       while (!empty ())
         {

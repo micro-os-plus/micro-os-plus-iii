@@ -38,6 +38,43 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+    class Double_list_node_clock : public Double_list_node_timestamp
+    {
+    public:
+
+      Double_list_node_clock (Double_list& lst, clock::timestamp_t ts,
+                              Thread& th);
+
+      /**
+       * @cond ignore
+       */
+      Double_list_node_clock (const Double_list_node_clock&) = delete;
+      Double_list_node_clock (Double_list_node_clock&&) = delete;
+      Double_list_node_clock&
+      operator= (const Double_list_node_clock&) = delete;
+      Double_list_node_clock&
+      operator= (Double_list_node_clock&&) = delete;
+      /**
+       * @endcond
+       */
+
+      ~Double_list_node_clock ();
+
+      virtual void
+      action (void) override;
+
+    public:
+
+      Thread& thread;
+    };
+
+#pragma GCC diagnostic pop
+
+    // ========================================================================
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
     class Clock
     {
     public:
@@ -83,6 +120,9 @@ namespace os
       clock::timestamp_t
       now (void);
 
+      clock::timestamp_t
+      steady_now (void);
+
       /**
        * @brief Sleep for a duration.
        * @param [in] duration The number of ticks or seconds to sleep.
@@ -110,6 +150,11 @@ namespace os
       void
       interrupt_service_routine (void);
 
+#if !defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
+      Clock_timestamps_list&
+      steady_list (void);
+#endif
+
       /**
        * @}
        */
@@ -119,17 +164,15 @@ namespace os
       virtual result_t
       _wait (clock::duration_t duration) = 0;
 
-      // friend void os_systick_handler(void);
-
       /**
        * @name Private Member Variables
        * @{
        */
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
-      port::Clock_threads_list sleep_for_list_;
+      Clock_timestamps_list sleep_for_list_;
       clock::duration_t volatile sleep_count_;
-      port::Clock_threads_list sleep_until_list_;
+      Clock_timestamps_list sleep_until_list_;
 #endif
 
       clock::timestamp_t volatile steady_count_;
@@ -375,6 +418,21 @@ namespace os
 {
   namespace rtos
   {
+
+
+    // ========================================================================
+
+#if !defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
+
+    inline Clock_timestamps_list&
+    Clock::steady_list (void)
+    {
+      return sleep_for_list_;
+    }
+
+#endif
+
+    // ========================================================================
 
     /**
      * @details

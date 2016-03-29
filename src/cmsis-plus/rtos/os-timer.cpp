@@ -112,6 +112,35 @@ namespace os
      *  No POSIX similar functionality identified.
      */
 
+    // ========================================================================
+#if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
+
+    Double_list_node_timer::Double_list_node_timer (Double_list& lst,
+                                                    clock::timestamp_t ts,
+                                                    Timer& tm) :
+        Double_list_node_timestamp
+          { lst, ts }, //
+        timer (tm)
+    {
+      ;
+    }
+
+    Double_list_node_timer::~Double_list_node_timer ()
+    {
+      ;
+    }
+
+    void
+    Double_list_node_timer::action (void)
+    {
+      ((Clock_timestamps_list&) list).remove (*this);
+      timer.interrupt_service_routine ();
+    }
+
+#endif
+
+    // ========================================================================
+
     /**
      * @details
      * This constructor shall initialise the timer object
@@ -164,8 +193,11 @@ namespace os
     Timer::Timer (const timer::Attributes& attr, timer::func_t function,
                   timer::func_args_t args) :
         Named_object
-          { attr.name () }
-
+          { attr.name () } //
+#if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
+          , timer_node_
+            { systick_clock.steady_list (), 0, *this }
+#endif
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
       os_assert_throw(function != nullptr, EINVAL);
@@ -182,9 +214,10 @@ namespace os
 
 #else
 
-      // TODO
+      period_ = 0;
 
 #endif
+      state_ = timer::state::initialized;
     }
 
     /**
@@ -207,9 +240,17 @@ namespace os
 
 #else
 
-      // TODO
+        {
+          interrupts::Critical_section cs; // ----- Critical section -----
+
+          if (state_ == timer::state::running)
+            {
+              ((Clock_timestamps_list&) timer_node_.list).remove (timer_node_);
+            }
+        }
 
 #endif
+      state_ = timer::state::destroyed;
     }
 
     /**
@@ -230,16 +271,32 @@ namespace os
           period = 1;
         }
 
+      result_t res;
+
 #if defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
-      return port::Timer::start (this, period);
+      res = port::Timer::start (this, period);
 
 #else
 
-      // TODO
-      return result::ok;
+      period_ = period;
+
+      // TODO: If started, stop.
+      timer_node_.timestamp = systick_clock.steady_now () + period;
+
+        {
+          interrupts::Critical_section cs; // ----- Critical section -----
+          ((Clock_timestamps_list&) timer_node_.list).add (timer_node_);
+        }
+      res = result::ok;
 
 #endif
+
+      if (res == result::ok)
+        {
+          state_ = timer::state::running;
+        }
+      return res;
     }
 
     /**
@@ -258,17 +315,56 @@ namespace os
 
       trace::printf ("%s() @%p \n", __func__, this);
 
+      if (state_ != timer::state::running)
+        {
+          return EAGAIN;
+        }
+
+      result_t res;
+
 #if defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
-      return port::Timer::stop (this);
+      res = port::Timer::stop (this);
 
 #else
 
-      // TODO
-      return result::ok;
+        {
+          interrupts::Critical_section cs; // ----- Critical section -----
+          ((Clock_timestamps_list&) timer_node_.list).remove (timer_node_);
+        }
+      res = result::ok;
 
 #endif
+
+      state_ = timer::state::stopped;
+      return res;
     }
+
+#if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
+
+    void
+    Timer::interrupt_service_routine (void)
+    {
+
+      if (type_ == timer::run::periodic)
+        {
+          timer_node_.timestamp += period_;
+
+          // No need for critical section in ISR.
+          ((Clock_timestamps_list&) timer_node_.list).add (timer_node_);
+        }
+      else
+        {
+          state_ = timer::state::completed;
+        }
+
+      trace::puts (name ());
+
+      // Call the user function.
+      func_ (func_args_);
+    }
+
+#endif
 
   // ------------------------------------------------------------------------
 

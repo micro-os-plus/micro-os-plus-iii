@@ -516,6 +516,20 @@ namespace os
            */
           periodic = 1      //
         };
+
+      using state_t = enum class state : uint8_t
+        {
+          /**
+           * @brief Used to catch uninitialised threads.
+           */
+          undefined = 0,
+          initialized = 1,
+          running = 2,
+          completed = 3,
+          stopped = 4,
+          destroyed = 5
+        };
+
     }
 
     // ========================================================================

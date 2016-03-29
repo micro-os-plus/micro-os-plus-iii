@@ -71,6 +71,31 @@ namespace os
   namespace rtos
   {
 
+    // ========================================================================
+
+    Double_list_node_clock::Double_list_node_clock (Double_list& lst,
+                                                    clock::timestamp_t ts,
+                                                    Thread& th) :
+        Double_list_node_timestamp
+          { lst, ts }, //
+        thread (th)
+    {
+      ;
+    }
+
+    Double_list_node_clock::~Double_list_node_clock ()
+    {
+      ;
+    }
+
+    void
+    Double_list_node_clock::action (void)
+    {
+      ((Clock_timestamps_list&)list).wakeup_one();
+    }
+
+    // ========================================================================
+
 #pragma GCC diagnostic push
 // TODO: remove it when fully implemented
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -104,6 +129,15 @@ namespace os
 
       // Prevent inconsistent values using the critical section.
       return steady_count_ + offset_;
+    }
+
+    clock::timestamp_t
+    Clock::steady_now (void)
+    {
+      interrupts::Critical_section cs; // ----- Critical section -----
+
+      // Prevent inconsistent values using the critical section.
+      return steady_count_;
     }
 
     result_t
@@ -348,13 +382,12 @@ namespace os
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
       Double_list_node_clock node
-        { sleep_for_list_,
-          { steady_count_ + ticks, clock_node_type::timeout, &crt_thread } };
+        { sleep_for_list_, steady_count_ + ticks, crt_thread };
 
         {
           // Add this thread to the clock waiting list.
           // It is removed when this block ends (after sleep()).
-          Clock_threads_list_guard<interrupts::Critical_section> lg
+          Clock_timestamps_list_guard<interrupts::Critical_section> lg
             { node };
 
           this_thread::sleep ();

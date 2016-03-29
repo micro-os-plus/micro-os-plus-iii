@@ -166,6 +166,45 @@ namespace os
       extern const Periodic_attributes periodic_initializer;
     }
 
+    // ========================================================================
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+    class Double_list_node_timer : public Double_list_node_timestamp
+    {
+    public:
+
+      Double_list_node_timer (Double_list& lst, clock::timestamp_t ts,
+                              Timer& tm);
+
+      /**
+       * @cond ignore
+       */
+      Double_list_node_timer (const Double_list_node_timer&) = delete;
+      Double_list_node_timer (Double_list_node_timer&&) = delete;
+      Double_list_node_timer&
+      operator= (const Double_list_node_timer&) = delete;
+      Double_list_node_timer&
+      operator= (Double_list_node_timer&&) = delete;
+      /**
+       * @endcond
+       */
+
+      ~Double_list_node_timer ();
+
+      virtual void
+      action (void) override;
+
+    public:
+
+      Timer& timer;
+    };
+
+#pragma GCC diagnostic pop
+
+    // ========================================================================
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
@@ -265,6 +304,17 @@ namespace os
 
     protected:
 
+      friend class Double_list_node_timer;
+
+#if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
+
+      void
+      interrupt_service_routine(void);
+
+#endif
+
+    protected:
+
       /**
        * @name Private Member Variables
        * @{
@@ -273,12 +323,18 @@ namespace os
       timer::func_t func_;
       timer::func_args_t func_args_;
 
+#if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
+      Double_list_node_timer timer_node_;
+      clock::duration_t period_;
+#endif
+
 #if defined(OS_INCLUDE_RTOS_PORT_TIMER)
       friend class port::Timer;
       os_timer_port_data_t port_;
 #endif
 
       timer::type_t type_;
+      timer::state_t state_;
 
       // Add more internal data.
 

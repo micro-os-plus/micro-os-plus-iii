@@ -738,7 +738,7 @@ namespace os
       // If the thread is waiting on a timeout, remove it from the list.
       if (clock_node_ != nullptr)
         {
-          ((Clock_threads_list&) (clock_node_->list)).remove (*clock_node_);
+          ((Clock_timestamps_list&) (clock_node_->list)).remove (*clock_node_);
         }
 
       func_result_ = nullptr;

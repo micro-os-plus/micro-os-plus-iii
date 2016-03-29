@@ -178,6 +178,7 @@ extern "C"
   (*os_timer_func_t) (os_timer_func_args_t args);
 
   typedef uint8_t os_timer_type_t;
+  typedef uint8_t os_timer_state_t;
 
   enum
   {
@@ -195,15 +196,29 @@ extern "C"
     os_timer_type_t tm_type;
   } os_timer_attr_t;
 
+  typedef struct
+  {
+    void* next;
+    void* prev;
+    void* list;
+    os_clock_timestamp_t timestamp;
+    void* timer;
+  } os_clock_node_t;
+
   typedef struct os_timer_s
   {
     const char* name;
     os_timer_func_t func;
     os_timer_func_args_t func_args;
+#if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
+    os_clock_node_t clock_node;
+    os_clock_duration_t period;
+#endif
 #if defined(OS_INCLUDE_RTOS_PORT_TIMER)
     os_timer_port_data_t port_;
 #endif
     os_timer_type_t type;
+    os_timer_state_t state;
   } os_timer_t;
 
 #pragma GCC diagnostic pop

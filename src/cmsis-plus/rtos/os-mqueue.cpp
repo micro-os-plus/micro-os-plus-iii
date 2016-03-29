@@ -482,8 +482,7 @@ namespace os
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
       Double_list_node_thread node
-        { send_list_,
-          { &crt_thread } };
+        { send_list_, crt_thread };
 
       for (;;)
         {
@@ -644,8 +643,7 @@ namespace os
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
       Double_list_node_thread node
-        { send_list_,
-          { &crt_thread } };
+        { send_list_, crt_thread };
 
       clock::timestamp_t start = systick_clock.now ();
       for (;;)
@@ -808,8 +806,7 @@ namespace os
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
       Double_list_node_thread node
-        { receive_list_,
-          { &crt_thread } };
+        { receive_list_, crt_thread };
 
       for (;;)
         {
@@ -983,8 +980,7 @@ namespace os
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
       Double_list_node_thread node
-        { receive_list_,
-          { &crt_thread } };
+        { receive_list_, crt_thread };
 
       clock::timestamp_t start = systick_clock.now ();
       for (;;)

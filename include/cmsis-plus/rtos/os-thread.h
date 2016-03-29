@@ -518,7 +518,13 @@ namespace os
                                    flags::mode_t mode);
 
       friend class Waiting_threads_list;
-      friend class Clock_threads_list;
+      friend class Clock_timestamps_list;
+
+      template<typename CS_T, typename List_T, typename Node_T>
+        friend class ClockListGuard;
+
+      template<typename CS_T, typename List_T, typename Node_T>
+        friend class ThreadListGuard;
 
       /**
        * @}
