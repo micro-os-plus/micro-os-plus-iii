@@ -171,43 +171,6 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
-    class Double_list_node_timer : public Double_list_node_timestamp
-    {
-    public:
-
-      Double_list_node_timer (Double_list& lst, clock::timestamp_t ts,
-                              Timer& tm);
-
-      /**
-       * @cond ignore
-       */
-      Double_list_node_timer (const Double_list_node_timer&) = delete;
-      Double_list_node_timer (Double_list_node_timer&&) = delete;
-      Double_list_node_timer&
-      operator= (const Double_list_node_timer&) = delete;
-      Double_list_node_timer&
-      operator= (Double_list_node_timer&&) = delete;
-      /**
-       * @endcond
-       */
-
-      ~Double_list_node_timer ();
-
-      virtual void
-      action (void) override;
-
-    public:
-
-      Timer& timer;
-    };
-
-#pragma GCC diagnostic pop
-
-    // ========================================================================
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
-
     /**
      * @brief User single-shot or periodic **timer**.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
@@ -309,7 +272,7 @@ namespace os
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
       void
-      interrupt_service_routine(void);
+      interrupt_service_routine (void);
 
 #endif
 

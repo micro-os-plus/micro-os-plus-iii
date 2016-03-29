@@ -44,13 +44,18 @@ namespace os
     // ========================================================================
 
     /**
-     * @brief The core of a double linked list, pointers to next and previous.
+     * @brief The core of a double linked list, pointers to next,
+     * previous and list.
      */
     class Double_list_links
     {
     public:
+
+      /**
+       * @brief Create the node with a reference to the list.
+       * @param lst Reference to the list.
+       */
       Double_list_links (Double_list& lst);
-      ~Double_list_links ();
 
       /**
        * @cond ignore
@@ -65,6 +70,14 @@ namespace os
        * @endcond
        */
 
+      /**
+       * @brief Destroy the node.
+       */
+      ~Double_list_links ();
+
+      void
+      remove (void);
+
     public:
 
       Double_list_links* prev;
@@ -78,62 +91,18 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     /**
-     * @brief Template for a double linked list node, with payload.
-     */
-    template<typename Payload_T>
-      class Double_list_node : public Double_list_links
-      {
-      public:
-        using Payload = Payload_T;
-
-        Double_list_node (Double_list& lst, Payload payload);
-        ~Double_list_node ();
-
-        /**
-         * @cond ignore
-         */
-        Double_list_node (const Double_list_node&) = delete;
-        Double_list_node (Double_list_node&&) = delete;
-        Double_list_node&
-        operator= (const Double_list_node&) = delete;
-        Double_list_node&
-        operator= (Double_list_node&&) = delete;
-        /**
-         * @endcond
-         */
-
-      public:
-
-        Payload node;
-      };
-
-#pragma GCC diagnostic pop
-
-    // ========================================================================
-
-    struct thread_node_s
-    {
-      Thread* thread;
-    };
-
-    /**
-     * @brief A double linked list node, referencing a thread.
-     */
-    using Double_list_node_thread_ = Double_list_node<thread_node_s>;
-
-    // ========================================================================
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
-
-    /**
-     * @brief A double linked list node, with thread reference.
+     * @brief Double linked list node, with thread reference.
      */
     class Double_list_node_thread : public Double_list_links
     {
     public:
+
+      /**
+       * @brief Create a node with references to the list and thread.
+       * @param lst Reference to the list.
+       * @param th Reference to the thread.
+       */
       Double_list_node_thread (Double_list& lst, Thread& th);
-      ~Double_list_node_thread ();
 
       /**
        * @cond ignore
@@ -148,12 +117,18 @@ namespace os
        * @endcond
        */
 
+      /**
+       * @brief Destroy the node.
+       */
+      ~Double_list_node_thread ();
+
     public:
 
       Thread& thread;
     };
 
 #pragma GCC diagnostic pop
+
     // ========================================================================
 
     using clock_node_type_t = enum class clock_node_type
@@ -166,10 +141,18 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+    /**
+     * @brief Double linked list node, with timestamp.
+     */
     class Double_list_node_timestamp : public Double_list_links
     {
     public:
 
+      /**
+       * @brief Create a node with a reference to the list and a timestamp.
+       * @param lst Reference to the list.
+       * @param ts Timestamp.
+       */
       Double_list_node_timestamp (Double_list& lst, clock::timestamp_t ts);
 
       /**
@@ -185,9 +168,15 @@ namespace os
        * @endcond
        */
 
+      /**
+       * @brief Destroy the node.
+       */
       virtual
       ~Double_list_node_timestamp ();
 
+      /**
+       * @brief Action performed when the timestamp is reached.
+       */
       virtual void
       action (void) = 0;
 
@@ -200,8 +189,111 @@ namespace os
 
     // ========================================================================
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
     /**
-     * @brief Double linked circular list of threads.
+     * @brief Double linked list node, with timestamp and thread.
+     */
+    class Double_list_node_clock : public Double_list_node_timestamp
+    {
+    public:
+
+      /**
+       * @brief Create a clock timeout node.
+       * @param lst Reference to the list.
+       * @param ts Timestamp.
+       * @param th Reference to thread.
+       */
+      Double_list_node_clock (Double_list& lst, clock::timestamp_t ts,
+                              Thread& th);
+
+      /**
+       * @cond ignore
+       */
+      Double_list_node_clock (const Double_list_node_clock&) = delete;
+      Double_list_node_clock (Double_list_node_clock&&) = delete;
+      Double_list_node_clock&
+      operator= (const Double_list_node_clock&) = delete;
+      Double_list_node_clock&
+      operator= (Double_list_node_clock&&) = delete;
+      /**
+       * @endcond
+       */
+
+      /**
+       * @brief Destroy the node.
+       */
+      virtual
+      ~Double_list_node_clock ();
+
+      virtual void
+      action (void) override;
+
+    public:
+
+      Thread& thread;
+    };
+
+#pragma GCC diagnostic pop
+
+    // ========================================================================
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+    /**
+     * @brief Double linked list node, with timestamp and timer.
+     */
+    class Double_list_node_timer : public Double_list_node_timestamp
+    {
+    public:
+
+      /**
+       * @brief Create a clock timer node.
+       * @param lst Reference to the list.
+       * @param ts Timestamp.
+       * @param tm Reference to timer.
+       */
+      Double_list_node_timer (Double_list& lst, clock::timestamp_t ts,
+                              Timer& tm);
+
+      /**
+       * @cond ignore
+       */
+      Double_list_node_timer (const Double_list_node_timer&) = delete;
+      Double_list_node_timer (Double_list_node_timer&&) = delete;
+      Double_list_node_timer&
+      operator= (const Double_list_node_timer&) = delete;
+      Double_list_node_timer&
+      operator= (Double_list_node_timer&&) = delete;
+      /**
+       * @endcond
+       */
+
+      /**
+       * @brief Destroy the node.
+       */
+      virtual
+      ~Double_list_node_timer ();
+
+      /**
+       * @brief Action to perform when the timestamp is reached.
+       */
+      virtual void
+      action (void) override;
+
+    public:
+
+      Timer& timer;
+    };
+
+#pragma GCC diagnostic pop
+
+    // ========================================================================
+
+    /**
+     * @brief Circular double linked list of nodes.
      */
     class Double_list
     {
@@ -211,11 +303,6 @@ namespace os
        * Create a list.
        */
       Double_list ();
-
-      /**
-       * Destroy the list.
-       */
-      ~Double_list ();
 
       /**
        * @cond ignore
@@ -229,6 +316,11 @@ namespace os
       /**
        * @endcond
        */
+
+      /**
+       * Destroy the list.
+       */
+      ~Double_list ();
 
       /**
        * @brief Clear the list.
@@ -252,8 +344,6 @@ namespace os
       length (void) const;
 
       // TODO add iterator begin(), end()
-
-    protected:
 
       /**
        * @brief Remove the node from the list.
@@ -283,14 +373,14 @@ namespace os
     // ========================================================================
 
     /**
-     * @brief Double linked circular list of threads.
+     * @brief Ordered double linked circular list of threads.
      */
     class Waiting_threads_list : public Double_list
     {
     public:
 
       /**
-       * Create a list.
+       * Create a list of waiting threads.
        */
       Waiting_threads_list ();
 
@@ -314,25 +404,26 @@ namespace os
 
       /**
        * @brief Add a new thread node to the list.
-       * @param node Reference to a list node containing the thread reference.
+       * @param node Reference to a list node.
        */
       void
       add (Double_list_node_thread& node);
 
-      void
-      remove (Double_list_node_thread& node);
-
+      /**
+       * @brief Get list head.
+       * @return Casted pointer.
+       */
       Double_list_node_thread*
       head (void);
 
       /**
-       * @brief Wake-up one task (the oldest with the highest priority)
+       * @brief Wake-up one thread (the oldest with the highest priority)
        */
       void
       wakeup_one (void);
 
       /**
-       * @brief Wake-up all tasks in the list.
+       * @brief Wake-up all threads in the list.
        */
       void
       wakeup_all (void);
@@ -341,15 +432,20 @@ namespace os
 
     protected:
 
+      // None.
+
     };
 
     // ========================================================================
 
+    /**
+     * @brief Ordered double linked circular list of timestamp nodes.
+     */
     class Clock_timestamps_list : public Double_list
     {
     public:
       /**
-       * Create a list.
+       * @brief Create a list clock timestamps.
        */
       Clock_timestamps_list ();
 
@@ -367,39 +463,34 @@ namespace os
        */
 
       /**
-       * Destroy the list.
+       * @brief Destroy the list.
        */
       ~Clock_timestamps_list ();
 
       /**
        * @brief Add a new thread node to the list.
-       * @param node Reference to a list node containing the thread reference.
+       * @param node Reference to a list node.
        */
       void
       add (Double_list_node_timestamp& node);
 
-      void
-      remove (Double_list_node_timestamp& node);
-
+      /**
+       * @brief Get list head.
+       * @return Casted pointer.
+       */
       Double_list_node_timestamp*
       head (void);
 
-      void
-      check_wakeup (clock::timestamp_t timestamp);
-
       /**
-       * @brief Wake-up one task (the oldest with the highest priority)
+       * @brief Check list timestamps.
+       * @param now The current clock timestamp.
        */
       void
-      wakeup_one (void);
-
-      /**
-       * @brief Wake-up all tasks in the list.
-       */
-      void
-      wakeup_all (void);
+      check_timestamp (clock::timestamp_t now);
 
     protected:
+
+      // None.
 
     };
 
@@ -495,28 +586,10 @@ namespace os
 
     // ========================================================================
 
-    template<typename Payload_T>
-      inline
-      Double_list_node<Payload_T>::Double_list_node (Double_list& lst,
-                                                     Payload payload) :
-          Double_list_links (lst)
-      {
-        this->node = payload;
-      }
-
-    template<typename Payload_T>
-      inline
-      Double_list_node<Payload_T>::~Double_list_node ()
-      {
-        ;
-      }
-
-// ========================================================================
-
     inline bool
     Double_list::empty (void) const
     {
-      return count_ == 0;
+      return (head_ == nullptr);
     }
 
     inline std::size_t

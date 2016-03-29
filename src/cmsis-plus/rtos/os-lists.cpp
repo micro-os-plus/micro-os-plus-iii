@@ -44,8 +44,8 @@ namespace os
      */
     Double_list::~Double_list ()
     {
-      assert(head_ == nullptr);
-      assert(count_ == 0);
+      assert (head_ == nullptr);
+      assert (count_ == 0);
     }
 
     /**
@@ -70,25 +70,25 @@ namespace os
      * the links in the removed node are nullified.
      */
     void
-    Double_list::remove (Double_list_links& n)
+    Double_list::remove (Double_list_links& node)
     {
       // Check if not already removed.
-      if (n.next == nullptr)
+      if (node.next == nullptr)
         {
           return;
         }
 
       if (count_ > 1)
         {
-          if (head_ == &n)
+          if (head_ == &node)
             {
               // Move head to next node.
-              head_ = (Double_list_links*) n.next;
+              head_ = (Double_list_links*) node.next;
             }
 
           // Make neighbours point to each other.
-          n.prev->next = n.next;
-          n.next->prev = n.prev;
+          node.prev->next = node.next;
+          node.next->prev = node.prev;
 
           --count_;
         }
@@ -98,8 +98,8 @@ namespace os
         }
 
       // Nullify both pointers in the removed node.
-      n.prev = nullptr;
-      n.next = nullptr;
+      node.prev = nullptr;
+      node.next = nullptr;
     }
 
     // ========================================================================
@@ -113,12 +113,12 @@ namespace os
      * - preserve the insertion order and perform a full list traversal
      *  to determine the top node.
      *
-     *  The first strategy requires a partial list traverse with each
+     * The first strategy requires a partial list traverse with each
      * insert, to find the place to insert the node, but makes
      * retrieving the top priority node trivial, by a single access
      * to the list head.
      *
-     *  The second strategy might minimise the overall processing
+     * The second strategy might minimise the overall processing
      * time, but always requires a full list traversal to determine
      * the top priority node.
      *
@@ -146,21 +146,21 @@ namespace os
      * itself, to satisfy the circular double linked list requirements.
      */
     void
-    Waiting_threads_list::add (Double_list_node_thread& n)
+    Waiting_threads_list::add (Double_list_node_thread& node)
     {
       if (head_ == nullptr)
         {
           // Make the n point to itself, to satisfy the double
           // linked circular list.
-          n.prev = &n;
-          n.next = &n;
+          node.prev = &node;
+          node.next = &node;
 
-          head_ = &n;
+          head_ = &node;
           count_ = 1;
         }
       else
         {
-          thread::priority_t prio = n.thread.sched_prio ();
+          thread::priority_t prio = node.thread.sched_prio ();
 
           Double_list_node_thread* after =
               (Double_list_node_thread*) (head_->prev);
@@ -173,7 +173,7 @@ namespace os
             {
               // Insert at the beginning of the list
               // and update the new head.
-              head_ = &n;
+              head_ = &node;
               trace::printf ("%s() head \n", __func__);
             }
           else
@@ -188,24 +188,15 @@ namespace os
             }
 
           // Make the new node point to its neighbours.
-          n.prev = after;
-          n.next = after->next;
+          node.prev = after;
+          node.next = after->next;
 
           // Make the neighbours point to the n. The order is important.
-          after->next->prev = &n;
-          after->next = &n;
+          after->next->prev = &node;
+          after->next = &node;
 
           ++count_;
         }
-
-    }
-
-    void
-    Waiting_threads_list::remove (Double_list_node_thread& n)
-    {
-      trace::printf ("%s() waiting \n", __func__);
-
-      Double_list::remove (n);
     }
 
     /**
@@ -229,7 +220,7 @@ namespace os
           thread = &(head ()->thread);
           remove (*head ());
         }
-      assert(thread != nullptr);
+      assert (thread != nullptr);
 
       thread::state_t state = thread->sched_state ();
       if (state != thread::state::destroyed)
@@ -269,24 +260,106 @@ namespace os
 
     // ========================================================================
 
+    Double_list_node_clock::Double_list_node_clock (Double_list& lst,
+                                                    clock::timestamp_t ts,
+                                                    Thread& th) :
+        Double_list_node_timestamp
+          { lst, ts }, //
+        thread (th)
+    {
+      ;
+    }
+
+    Double_list_node_clock::~Double_list_node_clock ()
+    {
+      ;
+    }
+
     void
-    Clock_timestamps_list::add (Double_list_node_timestamp& n)
+    Double_list_node_clock::action (void)
+    {
+      // ((Clock_timestamps_list&) list).wakeup_one ();
+
+      Thread* th = &this->thread;
+      ((Clock_timestamps_list&) list).remove (*this);
+
+      thread::state_t state = th->sched_state ();
+      if (state != thread::state::destroyed)
+        {
+          th->wakeup ();
+        }
+      else
+        {
+          trace::printf ("%s() gone \n", __func__);
+        }
+    }
+
+    // ========================================================================
+
+#if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
+
+    Double_list_node_timer::Double_list_node_timer (Double_list& lst,
+        clock::timestamp_t ts,
+        Timer& tm) :
+    Double_list_node_timestamp
+      { lst, ts}, //
+    timer (tm)
+      {
+        ;
+      }
+
+    Double_list_node_timer::~Double_list_node_timer ()
+      {
+        ;
+      }
+
+    /**
+     * @details
+     * Remove the node from the list and perform the timer actions.
+     */
+    void
+    Double_list_node_timer::action (void)
+      {
+        ((Clock_timestamps_list&) list).remove (*this);
+        timer.interrupt_service_routine ();
+      }
+
+#endif
+
+    // ========================================================================
+
+    /**
+     * @details
+     * The list is kept in ascending timestamp order.
+     *
+     * Based on timestamp, the node is inserted
+     * - at the end of the list,
+     * - at the beginning of the list,
+     * - in the middle of the list, which
+     * requires a partial list traversal (done from the end).
+     *
+     * If the list is empty, the new node is added with references to
+     * itself, to satisfy the circular double linked list requirements.
+     *
+     */
+    void
+    Clock_timestamps_list::add (Double_list_node_timestamp& node)
     {
       if (head_ == nullptr)
         {
           // Make the node point to itself, to satisfy the double
           // linked circular list.
-          n.prev = &n;
-          n.next = &n;
+          node.prev = &node;
+          node.next = &node;
 
-          trace::printf ("%s() %u \n", __func__, (uint32_t) n.timestamp);
+          trace::printf ("%s() %u \n", __func__, (uint32_t) node.timestamp);
 
-          head_ = &n;
+          head_ = &node;
           count_ = 1;
         }
       else
         {
-          clock::timestamp_t timestamp = n.timestamp;
+          clock::timestamp_t timestamp = node.timestamp;
 
           Double_list_node_clock* after =
               (Double_list_node_clock*) (head_->prev);
@@ -299,7 +372,7 @@ namespace os
             {
               // Insert at the beginning of the list
               // and update the new head.
-              head_ = &n;
+              head_ = &node;
               trace::printf ("%s() head \n", __func__);
             }
           else
@@ -318,33 +391,31 @@ namespace os
                          (uint32_t) timestamp, (uint32_t) after->timestamp,
                          count_);
 
-          if (after->timestamp == 0)
-            {
-              trace::printf ("zero \n");
-            }
+          assert (after->timestamp != 0);
+
           // Make the new node point to its neighbours.
-          n.prev = after;
-          n.next = after->next;
+          node.prev = after;
+          node.next = after->next;
 
           // Make the neighbours point to the node. The order is important.
-          after->next->prev = &n;
-          after->next = &n;
+          after->next->prev = &node;
+          after->next = &node;
         }
     }
 
+    /**
+     * @details
+     * With the list ordered, check if the list head timestamp was
+     * reached and run the node action.
+     *
+     * Repeat for all nodes that have overdue timestamps.
+     *
+     */
     void
-    Clock_timestamps_list::remove (Double_list_node_timestamp& n)
-    {
-      trace::printf ("%s() timeout \n", __func__);
-
-      Double_list::remove (n);
-    }
-
-    void
-    Clock_timestamps_list::check_wakeup (clock::timestamp_t now)
+    Clock_timestamps_list::check_timestamp (clock::timestamp_t now)
     {
       // Multiple threads can wait for the same time stamp, so
-      // iterate until a future node is identified.
+      // iterate until a node with future timestamp is identified.
       for (; !empty ();)
         {
           clock::timestamp_t head_ts =
@@ -359,46 +430,6 @@ namespace os
             {
               break;
             }
-        }
-    }
-
-    void
-    Clock_timestamps_list::wakeup_one (void)
-    {
-      Thread* thread;
-        {
-          interrupts::Critical_section cs; // ----- Critical section -----
-
-          // If the list is empty, silently return.
-          if (empty ())
-            {
-              return;
-            }
-
-          thread = &(((Double_list_node_clock*) head ())->thread);
-          remove (*((Double_list_node_clock*) head ()));
-        }
-
-      assert(thread != nullptr);
-
-      thread::state_t state = thread->sched_state ();
-      if (state != thread::state::destroyed)
-        {
-          thread->wakeup ();
-        }
-      else
-        {
-          trace::printf ("%s() gone \n", __func__);
-        }
-
-    }
-
-    void
-    Clock_timestamps_list::wakeup_all (void)
-    {
-      while (!empty ())
-        {
-          wakeup_one ();
         }
     }
 

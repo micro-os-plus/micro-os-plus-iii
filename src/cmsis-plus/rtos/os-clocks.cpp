@@ -73,29 +73,6 @@ namespace os
 
     // ========================================================================
 
-    Double_list_node_clock::Double_list_node_clock (Double_list& lst,
-                                                    clock::timestamp_t ts,
-                                                    Thread& th) :
-        Double_list_node_timestamp
-          { lst, ts }, //
-        thread (th)
-    {
-      ;
-    }
-
-    Double_list_node_clock::~Double_list_node_clock ()
-    {
-      ;
-    }
-
-    void
-    Double_list_node_clock::action (void)
-    {
-      ((Clock_timestamps_list&)list).wakeup_one();
-    }
-
-    // ========================================================================
-
 #pragma GCC diagnostic push
 // TODO: remove it when fully implemented
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -212,8 +189,8 @@ namespace os
       ++steady_count_;
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
-      sleep_for_list_.check_wakeup (steady_count_);
-      sleep_until_list_.check_wakeup (steady_count_ + offset_);
+      sleep_for_list_.check_timestamp (steady_count_);
+      sleep_until_list_.check_timestamp (steady_count_ + offset_);
 #endif
 
 #if 0

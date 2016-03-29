@@ -113,34 +113,6 @@ namespace os
      */
 
     // ========================================================================
-#if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
-
-    Double_list_node_timer::Double_list_node_timer (Double_list& lst,
-                                                    clock::timestamp_t ts,
-                                                    Timer& tm) :
-        Double_list_node_timestamp
-          { lst, ts }, //
-        timer (tm)
-    {
-      ;
-    }
-
-    Double_list_node_timer::~Double_list_node_timer ()
-    {
-      ;
-    }
-
-    void
-    Double_list_node_timer::action (void)
-    {
-      ((Clock_timestamps_list&) list).remove (*this);
-      timer.interrupt_service_routine ();
-    }
-
-#endif
-
-    // ========================================================================
-
     /**
      * @details
      * This constructor shall initialise the timer object

@@ -38,43 +38,6 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
-    class Double_list_node_clock : public Double_list_node_timestamp
-    {
-    public:
-
-      Double_list_node_clock (Double_list& lst, clock::timestamp_t ts,
-                              Thread& th);
-
-      /**
-       * @cond ignore
-       */
-      Double_list_node_clock (const Double_list_node_clock&) = delete;
-      Double_list_node_clock (Double_list_node_clock&&) = delete;
-      Double_list_node_clock&
-      operator= (const Double_list_node_clock&) = delete;
-      Double_list_node_clock&
-      operator= (Double_list_node_clock&&) = delete;
-      /**
-       * @endcond
-       */
-
-      ~Double_list_node_clock ();
-
-      virtual void
-      action (void) override;
-
-    public:
-
-      Thread& thread;
-    };
-
-#pragma GCC diagnostic pop
-
-    // ========================================================================
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
-
     class Clock
     {
     public:
@@ -418,7 +381,6 @@ namespace os
 {
   namespace rtos
   {
-
 
     // ========================================================================
 
