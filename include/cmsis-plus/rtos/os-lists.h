@@ -3,17 +3,26 @@
  *   (https://github.com/micro-os-plus)
  * Copyright (c) 2016 Liviu Ionescu.
  *
- * µOS++ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation, version 3.
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom
+ * the Software is furnished to do so, subject to the following
+ * conditions:
  *
- * µOS++ is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
  */
 
 /*
@@ -497,15 +506,15 @@ namespace os
     // ========================================================================
 
     template<typename CS_T, typename List_T, typename Node_T>
-      class ThreadListGuard
+      class Thread_list_guard
       {
       public:
         using Critical_section = CS_T;
         using List = List_T;
         using Node = Node_T;
 
-        ThreadListGuard (Node& node);
-        ~ThreadListGuard ();
+        Thread_list_guard (Node& node);
+        ~Thread_list_guard ();
 
       protected:
 
@@ -514,20 +523,20 @@ namespace os
 
     template<typename CS_T>
       using Waiting_threads_list_guard =
-      ThreadListGuard<CS_T, Waiting_threads_list, Double_list_node_thread>;
+      Thread_list_guard<CS_T, Waiting_threads_list, Double_list_node_thread>;
 
     // ========================================================================
 
     template<typename CS_T, typename List_T, typename Node_T>
-      class ClockListGuard
+      class Clock_list_guard
       {
       public:
         using Critical_section = CS_T;
         using List = List_T;
         using Node = Node_T;
 
-        ClockListGuard (Node& node);
-        ~ClockListGuard ();
+        Clock_list_guard (Node& node);
+        ~Clock_list_guard ();
 
       protected:
 
@@ -536,7 +545,7 @@ namespace os
 
     template<typename CS_T>
       using Clock_timestamps_list_guard =
-      ClockListGuard<CS_T, Clock_timestamps_list, Double_list_node_clock>;
+      Clock_list_guard<CS_T, Clock_timestamps_list, Double_list_node_clock>;
 
   // --------------------------------------------------------------------------
 
@@ -650,7 +659,7 @@ namespace os
 
     template<typename CS_T, typename List_T, typename Node_T>
       inline
-      ThreadListGuard<CS_T, List_T, Node_T>::ThreadListGuard (Node& node) :
+      Thread_list_guard<CS_T, List_T, Node_T>::Thread_list_guard (Node& node) :
           node_ (node)
       {
         Critical_section cs;
@@ -661,7 +670,7 @@ namespace os
 
     template<typename CS_T, typename List_T, typename Node_T>
       inline
-      ThreadListGuard<CS_T, List_T, Node_T>::~ThreadListGuard ()
+      Thread_list_guard<CS_T, List_T, Node_T>::~Thread_list_guard ()
       {
         Critical_section cs;
 
@@ -673,7 +682,7 @@ namespace os
 
     template<typename CS_T, typename List_T, typename Node_T>
       inline
-      ClockListGuard<CS_T, List_T, Node_T>::ClockListGuard (Node& node) :
+      Clock_list_guard<CS_T, List_T, Node_T>::Clock_list_guard (Node& node) :
           node_ (node)
       {
         Critical_section cs;
@@ -684,7 +693,7 @@ namespace os
 
     template<typename CS_T, typename List_T, typename Node_T>
       inline
-      ClockListGuard<CS_T, List_T, Node_T>::~ClockListGuard ()
+      Clock_list_guard<CS_T, List_T, Node_T>::~Clock_list_guard ()
       {
         Critical_section cs;
 

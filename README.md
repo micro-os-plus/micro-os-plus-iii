@@ -47,7 +47,7 @@ An xPack with CMSIS++, a C++ version of CMSIS.
 
 ## License
 
-* [spdx](http://spdx.org/licenses/): LGPL-3.0
+* [spdx](http://spdx.org/licenses/): MIT
 
 --- 
 ## Purpose
