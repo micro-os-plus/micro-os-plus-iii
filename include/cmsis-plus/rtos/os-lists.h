@@ -47,8 +47,8 @@ namespace os
   {
     class Thread;
     class Double_list;
-    class Double_list_node_clock;
-    class Double_list_node_timer;
+    class Timeout_thread_node;
+    class Timer_node;
 
     // ========================================================================
 
@@ -59,6 +59,11 @@ namespace os
     class Double_list_links
     {
     public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
       /**
        * @brief Create the node with a reference to the list.
@@ -84,14 +89,25 @@ namespace os
        */
       ~Double_list_links ();
 
-      void
-      remove (void);
+      /**
+       * @}
+       */
 
     public:
+
+      /**
+       * @name Public Member Variables
+       * @{
+       */
 
       Double_list_links* prev;
       Double_list_links* next;
       Double_list& list;
+
+      /**
+       * @}
+       */
+
     };
 
     // ========================================================================
@@ -102,26 +118,31 @@ namespace os
     /**
      * @brief Double linked list node, with thread reference.
      */
-    class Double_list_node_thread : public Double_list_links
+    class Waiting_thread_node : public Double_list_links
     {
     public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
       /**
        * @brief Create a node with references to the list and thread.
        * @param lst Reference to the list.
        * @param th Reference to the thread.
        */
-      Double_list_node_thread (Double_list& lst, Thread& th);
+      Waiting_thread_node (Double_list& lst, Thread& th);
 
       /**
        * @cond ignore
        */
-      Double_list_node_thread (const Double_list_node_thread&) = delete;
-      Double_list_node_thread (Double_list_node_thread&&) = delete;
-      Double_list_node_thread&
-      operator= (const Double_list_node_thread&) = delete;
-      Double_list_node_thread&
-      operator= (Double_list_node_thread&&) = delete;
+      Waiting_thread_node (const Waiting_thread_node&) = delete;
+      Waiting_thread_node (Waiting_thread_node&&) = delete;
+      Waiting_thread_node&
+      operator= (const Waiting_thread_node&) = delete;
+      Waiting_thread_node&
+      operator= (Waiting_thread_node&&) = delete;
       /**
        * @endcond
        */
@@ -129,23 +150,29 @@ namespace os
       /**
        * @brief Destroy the node.
        */
-      ~Double_list_node_thread ();
+      ~Waiting_thread_node ();
+
+      /**
+       * @}
+       */
 
     public:
 
+      /**
+       * @name Public Member Variables
+       * @{
+       */
+
       Thread& thread;
+
+      /**
+       * @}
+       */
     };
 
 #pragma GCC diagnostic pop
 
     // ========================================================================
-
-    using clock_node_type_t = enum class clock_node_type
-    : uint32_t
-      { //
-        timeout = 1,
-        timer = 2
-      };
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -153,26 +180,31 @@ namespace os
     /**
      * @brief Double linked list node, with timestamp.
      */
-    class Double_list_node_timestamp : public Double_list_links
+    class Timestamp_node : public Double_list_links
     {
     public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
       /**
        * @brief Create a node with a reference to the list and a timestamp.
        * @param lst Reference to the list.
        * @param ts Timestamp.
        */
-      Double_list_node_timestamp (Double_list& lst, clock::timestamp_t ts);
+      Timestamp_node (Double_list& lst, clock::timestamp_t ts);
 
       /**
        * @cond ignore
        */
-      Double_list_node_timestamp (const Double_list_node_timestamp&) = delete;
-      Double_list_node_timestamp (Double_list_node_timestamp&&) = delete;
-      Double_list_node_timestamp&
-      operator= (const Double_list_node_timestamp&) = delete;
-      Double_list_node_timestamp&
-      operator= (Double_list_node_timestamp&&) = delete;
+      Timestamp_node (const Timestamp_node&) = delete;
+      Timestamp_node (Timestamp_node&&) = delete;
+      Timestamp_node&
+      operator= (const Timestamp_node&) = delete;
+      Timestamp_node&
+      operator= (Timestamp_node&&) = delete;
       /**
        * @endcond
        */
@@ -181,7 +213,18 @@ namespace os
        * @brief Destroy the node.
        */
       virtual
-      ~Double_list_node_timestamp ();
+      ~Timestamp_node ();
+
+      /**
+       * @}
+       */
+
+    public:
+
+      /**
+       * @name Public Member Functions
+       * @{
+       */
 
       /**
        * @brief Action performed when the timestamp is reached.
@@ -189,9 +232,23 @@ namespace os
       virtual void
       action (void) = 0;
 
+      /**
+       * @}
+       */
+
     public:
 
+      /**
+       * @name Public Member Variables
+       * @{
+       */
+
       clock::timestamp_t timestamp;
+
+      /**
+       * @}
+       */
+
     };
 
 #pragma GCC diagnostic pop
@@ -204,9 +261,14 @@ namespace os
     /**
      * @brief Double linked list node, with timestamp and thread.
      */
-    class Double_list_node_clock : public Double_list_node_timestamp
+    class Timeout_thread_node : public Timestamp_node
     {
     public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
       /**
        * @brief Create a clock timeout node.
@@ -214,18 +276,17 @@ namespace os
        * @param ts Timestamp.
        * @param th Reference to thread.
        */
-      Double_list_node_clock (Double_list& lst, clock::timestamp_t ts,
-                              Thread& th);
+      Timeout_thread_node (Double_list& lst, clock::timestamp_t ts, Thread& th);
 
       /**
        * @cond ignore
        */
-      Double_list_node_clock (const Double_list_node_clock&) = delete;
-      Double_list_node_clock (Double_list_node_clock&&) = delete;
-      Double_list_node_clock&
-      operator= (const Double_list_node_clock&) = delete;
-      Double_list_node_clock&
-      operator= (Double_list_node_clock&&) = delete;
+      Timeout_thread_node (const Timeout_thread_node&) = delete;
+      Timeout_thread_node (Timeout_thread_node&&) = delete;
+      Timeout_thread_node&
+      operator= (const Timeout_thread_node&) = delete;
+      Timeout_thread_node&
+      operator= (Timeout_thread_node&&) = delete;
       /**
        * @endcond
        */
@@ -234,14 +295,38 @@ namespace os
        * @brief Destroy the node.
        */
       virtual
-      ~Double_list_node_clock ();
+      ~Timeout_thread_node ();
+
+      /**
+       * @}
+       */
+
+    public:
+
+      /**
+       * @name Public Member Functions
+       * @{
+       */
 
       virtual void
       action (void) override;
 
+      /**
+       * @}
+       */
+
     public:
 
+      /**
+       * @name Public Member Variables
+       * @{
+       */
+
       Thread& thread;
+
+      /**
+       * @}
+       */
     };
 
 #pragma GCC diagnostic pop
@@ -254,9 +339,14 @@ namespace os
     /**
      * @brief Double linked list node, with timestamp and timer.
      */
-    class Double_list_node_timer : public Double_list_node_timestamp
+    class Timer_node : public Timestamp_node
     {
     public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
       /**
        * @brief Create a clock timer node.
@@ -264,18 +354,17 @@ namespace os
        * @param ts Timestamp.
        * @param tm Reference to timer.
        */
-      Double_list_node_timer (Double_list& lst, clock::timestamp_t ts,
-                              Timer& tm);
+      Timer_node (Double_list& lst, clock::timestamp_t ts, Timer& tm);
 
       /**
        * @cond ignore
        */
-      Double_list_node_timer (const Double_list_node_timer&) = delete;
-      Double_list_node_timer (Double_list_node_timer&&) = delete;
-      Double_list_node_timer&
-      operator= (const Double_list_node_timer&) = delete;
-      Double_list_node_timer&
-      operator= (Double_list_node_timer&&) = delete;
+      Timer_node (const Timer_node&) = delete;
+      Timer_node (Timer_node&&) = delete;
+      Timer_node&
+      operator= (const Timer_node&) = delete;
+      Timer_node&
+      operator= (Timer_node&&) = delete;
       /**
        * @endcond
        */
@@ -284,7 +373,18 @@ namespace os
        * @brief Destroy the node.
        */
       virtual
-      ~Double_list_node_timer ();
+      ~Timer_node ();
+
+      /**
+       * @}
+       */
+
+    public:
+
+      /**
+       * @name Public Member Functions
+       * @{
+       */
 
       /**
        * @brief Action to perform when the timestamp is reached.
@@ -292,9 +392,22 @@ namespace os
       virtual void
       action (void) override;
 
+      /**
+       * @}
+       */
+
     public:
 
+      /**
+       * @name Public Member Variables
+       * @{
+       */
+
       Timer& timer;
+
+      /**
+       * @}
+       */
     };
 
 #pragma GCC diagnostic pop
@@ -307,6 +420,11 @@ namespace os
     class Double_list
     {
     public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
       /**
        * Create a list.
@@ -330,6 +448,17 @@ namespace os
        * Destroy the list.
        */
       ~Double_list ();
+
+      /**
+       * @}
+       */
+
+    public:
+
+      /**
+       * @name Public Member Functions
+       * @{
+       */
 
       /**
        * @brief Clear the list.
@@ -361,7 +490,16 @@ namespace os
       void
       remove (Double_list_links& node);
 
+      /**
+       * @}
+       */
+
     protected:
+
+      /**
+       * @name Private Member Variables
+       * @{
+       */
 
       /**
        * @brief Pointer to the list first node.
@@ -377,6 +515,10 @@ namespace os
        * reflect the actual number of nodes in the list.
        */
       std::size_t volatile count_;
+
+      /**
+       * @}
+       */
     };
 
     // ========================================================================
@@ -389,14 +531,14 @@ namespace os
     public:
 
       /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+      /**
        * Create a list of waiting threads.
        */
       Waiting_threads_list ();
-
-      /**
-       * Destroy the list.
-       */
-      ~Waiting_threads_list ();
 
       /**
        * @cond ignore
@@ -412,17 +554,33 @@ namespace os
        */
 
       /**
+       * Destroy the list.
+       */
+      ~Waiting_threads_list ();
+
+      /**
+       * @}
+       */
+
+    public:
+
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+      /**
        * @brief Add a new thread node to the list.
        * @param node Reference to a list node.
        */
       void
-      add (Double_list_node_thread& node);
+      add (Waiting_thread_node& node);
 
       /**
        * @brief Get list head.
        * @return Casted pointer.
        */
-      Double_list_node_thread*
+      Waiting_thread_node*
       head (void);
 
       /**
@@ -439,10 +597,21 @@ namespace os
 
       // TODO add iterator begin(), end()
 
+      /**
+       * @}
+       */
+
     protected:
 
-      // None.
+      /**
+       * @name Private Member Variables
+       * @{
+       */
 
+      // None.
+      /**
+       * @}
+       */
     };
 
     // ========================================================================
@@ -453,6 +622,12 @@ namespace os
     class Clock_timestamps_list : public Double_list
     {
     public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
       /**
        * @brief Create a list clock timestamps.
        */
@@ -477,17 +652,28 @@ namespace os
       ~Clock_timestamps_list ();
 
       /**
+       * @}
+       */
+
+    public:
+
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+      /**
        * @brief Add a new thread node to the list.
        * @param node Reference to a list node.
        */
       void
-      add (Double_list_node_timestamp& node);
+      add (Timestamp_node& node);
 
       /**
        * @brief Get list head.
        * @return Casted pointer.
        */
-      Double_list_node_timestamp*
+      Timestamp_node*
       head (void);
 
       /**
@@ -497,10 +683,21 @@ namespace os
       void
       check_timestamp (clock::timestamp_t now);
 
+      /**
+       * @}
+       */
+
     protected:
 
-      // None.
+      /**
+       * @name Private Member Variables
+       * @{
+       */
 
+      // None.
+      /**
+       * @}
+       */
     };
 
     // ========================================================================
@@ -509,21 +706,54 @@ namespace os
       class Thread_list_guard
       {
       public:
+
         using Critical_section = CS_T;
         using List = List_T;
         using Node = Node_T;
 
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
+
         Thread_list_guard (Node& node);
+
+        /**
+         * @cond ignore
+         */
+        Thread_list_guard (const Thread_list_guard&) = delete;
+        Thread_list_guard (Thread_list_guard&&) = delete;
+        Thread_list_guard&
+        operator= (const Thread_list_guard&) = delete;
+        Thread_list_guard&
+        operator= (Thread_list_guard&&) = delete;
+        /**
+         * @endcond
+         */
+
         ~Thread_list_guard ();
+
+        /**
+         * @}
+         */
 
       protected:
 
+        /**
+         * @name Private Member Variables
+         * @{
+         */
+
         Node& node_;
+
+        /**
+         * @}
+         */
       };
 
     template<typename CS_T>
       using Waiting_threads_list_guard =
-      Thread_list_guard<CS_T, Waiting_threads_list, Double_list_node_thread>;
+      Thread_list_guard<CS_T, Waiting_threads_list, Waiting_thread_node>;
 
     // ========================================================================
 
@@ -531,12 +761,36 @@ namespace os
       class Clock_list_guard
       {
       public:
+
         using Critical_section = CS_T;
         using List = List_T;
         using Node = Node_T;
 
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
+
         Clock_list_guard (Node& node);
+
+        /**
+         * @cond ignore
+         */
+        Clock_list_guard (const Clock_list_guard&) = delete;
+        Clock_list_guard (Clock_list_guard&&) = delete;
+        Clock_list_guard&
+        operator= (const Clock_list_guard&) = delete;
+        Clock_list_guard&
+        operator= (Clock_list_guard&&) = delete;
+        /**
+         * @endcond
+         */
+
         ~Clock_list_guard ();
+
+        /**
+         * @}
+         */
 
       protected:
 
@@ -545,12 +799,11 @@ namespace os
 
     template<typename CS_T>
       using Clock_timestamps_list_guard =
-      Clock_list_guard<CS_T, Clock_timestamps_list, Double_list_node_clock>;
+      Clock_list_guard<CS_T, Clock_timestamps_list, Timeout_thread_node>;
 
   // --------------------------------------------------------------------------
 
-  }
-/* namespace rtos */
+  } /* namespace rtos */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------
@@ -578,8 +831,7 @@ namespace os
     // ========================================================================
 
     inline
-    Double_list_node_thread::Double_list_node_thread (Double_list& lst,
-                                                      Thread& th) :
+    Waiting_thread_node::Waiting_thread_node (Double_list& lst, Thread& th) :
         Double_list_links
           { lst }, //
         thread (th)
@@ -588,7 +840,7 @@ namespace os
     }
 
     inline
-    Double_list_node_thread::~Double_list_node_thread ()
+    Waiting_thread_node::~Waiting_thread_node ()
     {
       ;
     }
@@ -629,10 +881,10 @@ namespace os
       ;
     }
 
-    inline Double_list_node_thread*
+    inline Waiting_thread_node*
     Waiting_threads_list::head (void)
     {
-      return (Double_list_node_thread*) head_;
+      return (Waiting_thread_node*) head_;
     }
 
     // ========================================================================
@@ -649,10 +901,10 @@ namespace os
       ;
     }
 
-    inline Double_list_node_timestamp*
+    inline Timestamp_node*
     Clock_timestamps_list::head (void)
     {
-      return (Double_list_node_timestamp*) head_;
+      return (Timestamp_node*) head_;
     }
 
     // ========================================================================

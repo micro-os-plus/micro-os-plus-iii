@@ -672,8 +672,8 @@ namespace os
 #endif
 
       Thread* joiner_;
-      Double_list_node_thread* waiting_node_;
-      Double_list_node_clock* clock_node_;
+      Waiting_thread_node* waiting_node_;
+      Timeout_thread_node* clock_node_;
 
       std::size_t stack_size_bytes_;
       thread::state_t sched_state_;

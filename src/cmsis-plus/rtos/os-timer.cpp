@@ -329,6 +329,7 @@ namespace os
 
       if (type_ == timer::run::periodic)
         {
+          // Re-arm the timer for the next period.
           timer_node_.timestamp += period_;
 
           // No need for critical section in ISR.

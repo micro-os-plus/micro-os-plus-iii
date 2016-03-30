@@ -276,7 +276,7 @@ namespace os
 
     protected:
 
-      friend class Double_list_node_timer;
+      friend class Timer_node;
 
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
@@ -297,7 +297,7 @@ namespace os
 
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
       Clock& clock_;
-      Double_list_node_timer timer_node_;
+      Timer_node timer_node_;
       clock::duration_t period_;
 #endif
 

@@ -53,6 +53,7 @@
  *   (for example: lock(), try-lock(), timed-lock(), similar to POSIX threads)
  * - POSIX condition variable added
  * - versatile clocks added (Systick_clock, Realtime_clock)
+ * - all object can wait using either Systick or Realtime_clock
  *
  * Differences from POSIX:
  * - timeouts are relative, while in POSIX are absolute. Rationale:

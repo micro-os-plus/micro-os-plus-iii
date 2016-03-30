@@ -372,7 +372,7 @@ namespace os
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      Double_list_node_thread node
+      Waiting_thread_node node
         { list_, crt_thread };
 
       for (;;)
@@ -451,7 +451,7 @@ namespace os
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      Double_list_node_thread node
+      Waiting_thread_node node
         { list_, crt_thread };
 
       clock::timestamp_t start = clock_.steady_now ();

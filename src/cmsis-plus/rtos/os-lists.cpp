@@ -91,7 +91,7 @@ namespace os
         {
           if (head_ == &node)
             {
-              // Move head to next node.
+              // Move head to next node, this one will vanish.
               head_ = (Double_list_links*) node.next;
             }
 
@@ -155,11 +155,11 @@ namespace os
      * itself, to satisfy the circular double linked list requirements.
      */
     void
-    Waiting_threads_list::add (Double_list_node_thread& node)
+    Waiting_threads_list::add (Waiting_thread_node& node)
     {
       if (head_ == nullptr)
         {
-          // Make the n point to itself, to satisfy the double
+          // Make the node point to itself, to satisfy the double
           // linked circular list.
           node.prev = &node;
           node.next = &node;
@@ -171,8 +171,8 @@ namespace os
         {
           thread::priority_t prio = node.thread.sched_prio ();
 
-          Double_list_node_thread* after =
-              (Double_list_node_thread*) (head_->prev);
+          Waiting_thread_node* after =
+              (Waiting_thread_node*) (head_->prev);
 
           if (prio <= after->thread.sched_prio ())
             {
@@ -192,7 +192,7 @@ namespace os
               // weight is small, sched_prio() is only an accessor.
               while (prio > after->thread.sched_prio ())
                 {
-                  after = (Double_list_node_thread*) after->prev;
+                  after = (Waiting_thread_node*) after->prev;
                 }
             }
 
@@ -226,6 +226,8 @@ namespace os
               return;
             }
 
+          // The top priority is to remove the entry from the list
+          // so that subsequent wakeups to address different threads.
           thread = &(head ()->thread);
           remove (*head ());
         }
@@ -253,7 +255,7 @@ namespace os
 
     // ========================================================================
 
-    Double_list_node_timestamp::Double_list_node_timestamp (
+    Timestamp_node::Timestamp_node (
         Double_list& lst, clock::timestamp_t ts) :
         Double_list_links
           { lst }, //
@@ -262,30 +264,30 @@ namespace os
       ;
     }
 
-    Double_list_node_timestamp::~Double_list_node_timestamp ()
+    Timestamp_node::~Timestamp_node ()
     {
       ;
     }
 
     // ========================================================================
 
-    Double_list_node_clock::Double_list_node_clock (Double_list& lst,
+    Timeout_thread_node::Timeout_thread_node (Double_list& lst,
                                                     clock::timestamp_t ts,
                                                     Thread& th) :
-        Double_list_node_timestamp
+        Timestamp_node
           { lst, ts }, //
         thread (th)
     {
       ;
     }
 
-    Double_list_node_clock::~Double_list_node_clock ()
+    Timeout_thread_node::~Timeout_thread_node ()
     {
       ;
     }
 
     void
-    Double_list_node_clock::action (void)
+    Timeout_thread_node::action (void)
     {
       // ((Clock_timestamps_list&) list).wakeup_one ();
 
@@ -307,17 +309,17 @@ namespace os
 
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
-    Double_list_node_timer::Double_list_node_timer (Double_list& lst,
+    Timer_node::Timer_node (Double_list& lst,
                                                     clock::timestamp_t ts,
                                                     Timer& tm) :
-        Double_list_node_timestamp
+        Timestamp_node
           { lst, ts }, //
         timer (tm)
     {
       ;
     }
 
-    Double_list_node_timer::~Double_list_node_timer ()
+    Timer_node::~Timer_node ()
     {
       ;
     }
@@ -327,7 +329,7 @@ namespace os
      * Remove the node from the list and perform the timer actions.
      */
     void
-    Double_list_node_timer::action (void)
+    Timer_node::action (void)
     {
       ((Clock_timestamps_list&) list).remove (*this);
       timer.interrupt_service_routine ();
@@ -352,7 +354,7 @@ namespace os
      *
      */
     void
-    Clock_timestamps_list::add (Double_list_node_timestamp& node)
+    Clock_timestamps_list::add (Timestamp_node& node)
     {
       if (head_ == nullptr)
         {
@@ -370,8 +372,8 @@ namespace os
         {
           clock::timestamp_t timestamp = node.timestamp;
 
-          Double_list_node_clock* after =
-              (Double_list_node_clock*) (head_->prev);
+          Timeout_thread_node* after =
+              (Timeout_thread_node*) (head_->prev);
 
           if (timestamp >= after->timestamp)
             {
@@ -390,7 +392,7 @@ namespace os
               // The loop is guaranteed to terminate.
               while (timestamp < after->timestamp)
                 {
-                  after = (Double_list_node_clock*) (after->prev);
+                  after = (Timeout_thread_node*) (after->prev);
                 }
             }
 
@@ -428,7 +430,7 @@ namespace os
       for (; !empty ();)
         {
           clock::timestamp_t head_ts =
-              ((Double_list_node_clock*) head_)->timestamp;
+              ((Timeout_thread_node*) head_)->timestamp;
           if (now >= head_ts)
             {
               trace::printf ("%s() %u \n", __func__,
