@@ -150,7 +150,7 @@ namespace os
               return EINTR;
             }
 
-          if (res != ETIMEDOUT)
+          if (res != result::ok)
             {
               return res;
             }
@@ -170,8 +170,8 @@ namespace os
           result_t res;
           res = _wait_until (timestamp, adjusted_list_);
 
-          clock::timestamp_t n = now ();
-          if (n >= timestamp)
+          clock::timestamp_t nw = now ();
+          if (nw >= timestamp)
             {
               return ETIMEDOUT;
             }
@@ -181,7 +181,7 @@ namespace os
               return EINTR;
             }
 
-          if (res != ETIMEDOUT)
+          if (res != result::ok)
             {
               return res;
             }
@@ -200,6 +200,12 @@ namespace os
 
       result_t res;
       res = _wait_until (timestamp, steady_list_);
+
+      clock::timestamp_t nw = steady_now ();
+      if (nw >= timestamp)
+        {
+          return ETIMEDOUT;
+        }
 
       if (this_thread::thread ().interrupted ())
         {
@@ -269,15 +275,10 @@ namespace os
           Clock_timestamps_list_guard<interrupts::Critical_section> lg
             { node };
 
-          this_thread::sleep ();
+          this_thread::wait ();
         }
 
-      if (crt_thread.interrupted ())
-        {
-          return EINTR;
-        }
-
-      return ETIMEDOUT;
+      return result::ok;
     }
 
     // ======================================================================
@@ -411,7 +412,7 @@ namespace os
             return result::ok;
           }
         clock::duration_t ticks = timestamp - now;
-        res = port::Systick_clock::wait (ticks);
+        res = port::Systick_clock::wait_for (ticks);
         return res;
       }
 

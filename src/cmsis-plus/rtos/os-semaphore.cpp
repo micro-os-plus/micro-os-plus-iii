@@ -262,7 +262,7 @@ namespace os
       if (!list_.empty ())
         {
           // Wake-up all threads, if any.
-          list_.wakeup_all ();
+          list_.resume_all ();
 
           list_.clear ();
         }
@@ -329,8 +329,8 @@ namespace os
           ++count_;
         }
 
-      // Wakeup one thread.
-      list_.wakeup_one ();
+      // Wake-up one thread.
+      list_.resume_one ();
 
       return result::ok;
 
@@ -418,7 +418,7 @@ namespace os
               Waiting_threads_list_guard<interrupts::Critical_section> lg
                 { node };
 
-              this_thread::sleep ();
+              this_thread::wait ();
             }
 
           if (crt_thread.interrupted ())

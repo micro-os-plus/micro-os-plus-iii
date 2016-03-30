@@ -171,8 +171,7 @@ namespace os
         {
           thread::priority_t prio = node.thread.sched_prio ();
 
-          Waiting_thread_node* after =
-              (Waiting_thread_node*) (head_->prev);
+          Waiting_thread_node* after = (Waiting_thread_node*) (head_->prev);
 
           if (prio <= after->thread.sched_prio ())
             {
@@ -214,7 +213,7 @@ namespace os
      * and wake-up the thread.
      */
     void
-    Waiting_threads_list::wakeup_one (void)
+    Waiting_threads_list::resume_one (void)
     {
       Thread* thread;
         {
@@ -236,7 +235,7 @@ namespace os
       thread::state_t state = thread->sched_state ();
       if (state != thread::state::destroyed)
         {
-          thread->wakeup ();
+          thread->resume ();
         }
       else
         {
@@ -245,18 +244,17 @@ namespace os
     }
 
     void
-    Waiting_threads_list::wakeup_all (void)
+    Waiting_threads_list::resume_all (void)
     {
       while (!empty ())
         {
-          wakeup_one ();
+          resume_one ();
         }
     }
 
     // ========================================================================
 
-    Timestamp_node::Timestamp_node (
-        Double_list& lst, clock::timestamp_t ts) :
+    Timestamp_node::Timestamp_node (Double_list& lst, clock::timestamp_t ts) :
         Double_list_links
           { lst }, //
         timestamp (ts)
@@ -272,8 +270,7 @@ namespace os
     // ========================================================================
 
     Timeout_thread_node::Timeout_thread_node (Double_list& lst,
-                                                    clock::timestamp_t ts,
-                                                    Thread& th) :
+                                              clock::timestamp_t ts, Thread& th) :
         Timestamp_node
           { lst, ts }, //
         thread (th)
@@ -289,19 +286,13 @@ namespace os
     void
     Timeout_thread_node::action (void)
     {
-      // ((Clock_timestamps_list&) list).wakeup_one ();
-
       Thread* th = &this->thread;
       ((Clock_timestamps_list&) list).remove (*this);
 
       thread::state_t state = th->sched_state ();
       if (state != thread::state::destroyed)
         {
-          th->wakeup ();
-        }
-      else
-        {
-          trace::printf ("%s() gone \n", __func__);
+          th->resume ();
         }
     }
 
@@ -309,9 +300,7 @@ namespace os
 
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
-    Timer_node::Timer_node (Double_list& lst,
-                                                    clock::timestamp_t ts,
-                                                    Timer& tm) :
+    Timer_node::Timer_node (Double_list& lst, clock::timestamp_t ts, Timer& tm) :
         Timestamp_node
           { lst, ts }, //
         timer (tm)
@@ -341,9 +330,9 @@ namespace os
 
     /**
      * @details
-     * The list is kept in ascending timestamp order.
+     * The list is kept in ascending time stamp order.
      *
-     * Based on timestamp, the node is inserted
+     * Based on time stamp, the node is inserted
      * - at the end of the list,
      * - at the beginning of the list,
      * - in the middle of the list, which
@@ -372,8 +361,7 @@ namespace os
         {
           clock::timestamp_t timestamp = node.timestamp;
 
-          Timeout_thread_node* after =
-              (Timeout_thread_node*) (head_->prev);
+          Timeout_thread_node* after = (Timeout_thread_node*) (head_->prev);
 
           if (timestamp >= after->timestamp)
             {
@@ -416,21 +404,19 @@ namespace os
 
     /**
      * @details
-     * With the list ordered, check if the list head timestamp was
+     * With the list ordered, check if the list head time stamp was
      * reached and run the node action.
      *
-     * Repeat for all nodes that have overdue timestamps.
-     *
+     * Repeat for all nodes that have overdue time stamps.
      */
     void
     Clock_timestamps_list::check_timestamp (clock::timestamp_t now)
     {
       // Multiple threads can wait for the same time stamp, so
-      // iterate until a node with future timestamp is identified.
+      // iterate until a node with future time stamp is identified.
       for (; !empty ();)
         {
-          clock::timestamp_t head_ts =
-              ((Timeout_thread_node*) head_)->timestamp;
+          clock::timestamp_t head_ts = ((Timeout_thread_node*) head_)->timestamp;
           if (now >= head_ts)
             {
               trace::printf ("%s() %u \n", __func__,

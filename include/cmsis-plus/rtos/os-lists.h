@@ -610,13 +610,13 @@ namespace os
        * @brief Wake-up one thread (the oldest with the highest priority)
        */
       void
-      wakeup_one (void);
+      resume_one (void);
 
       /**
        * @brief Wake-up all threads in the list.
        */
       void
-      wakeup_all (void);
+      resume_all (void);
 
       // TODO add iterator begin(), end()
 

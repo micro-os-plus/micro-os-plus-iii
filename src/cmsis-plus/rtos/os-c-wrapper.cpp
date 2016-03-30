@@ -145,9 +145,9 @@ os_irq_critical_exit (os_irq_status_t status)
 // ----------------------------------------------------------------------------
 
 void
-os_this_thread_sleep (void)
+os_this_thread_wait (void)
 {
-  return this_thread::sleep ();
+  return this_thread::wait ();
 }
 
 void
@@ -219,9 +219,9 @@ os_thread_set_prio (os_thread_t* thread, os_thread_prio_t prio)
 }
 
 void
-os_thread_wakeup (os_thread_t* thread)
+os_thread_resume (os_thread_t* thread)
 {
-  return (reinterpret_cast<Thread&> (*thread)).wakeup ();
+  return (reinterpret_cast<Thread&> (*thread)).resume ();
 }
 
 os_thread_user_storage_t*

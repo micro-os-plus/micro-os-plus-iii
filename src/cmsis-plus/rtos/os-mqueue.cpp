@@ -327,7 +327,7 @@ namespace os
       if (!send_list_.empty ())
         {
           // Wake-up all threads, if any.
-          send_list_.wakeup_all ();
+          send_list_.resume_all ();
 
           send_list_.clear ();
         }
@@ -335,7 +335,7 @@ namespace os
       if (!receive_list_.empty ())
         {
           // Wake-up all threads, if any.
-          receive_list_.wakeup_all ();
+          receive_list_.resume_all ();
 
           receive_list_.clear ();
         }
@@ -423,7 +423,7 @@ namespace os
         }
 
       // Wake-up one thread, if any.
-      receive_list_.wakeup_one ();
+      receive_list_.resume_one ();
 
       return true;
     }
@@ -510,7 +510,7 @@ namespace os
               Waiting_threads_list_guard<interrupts::Critical_section> lg
                 { node };
 
-              this_thread::sleep ();
+              this_thread::wait ();
             }
 
           if (crt_thread.interrupted ())
@@ -753,7 +753,7 @@ namespace os
         }
 
       // Wake-up one thread, if any.
-      send_list_.wakeup_one ();
+      send_list_.resume_one ();
 
       return true;
     }
@@ -834,7 +834,7 @@ namespace os
               Waiting_threads_list_guard<interrupts::Critical_section> lg
                 { node };
 
-              this_thread::sleep ();
+              this_thread::wait ();
             }
 
           if (crt_thread.interrupted ())

@@ -96,7 +96,7 @@ extern "C"
   // --------------------------------------------------------------------------
 
   void
-  os_this_thread_sleep (void);
+  os_this_thread_wait (void);
 
   void
   os_this_thread_exit (void* exit_ptr);
@@ -138,7 +138,7 @@ extern "C"
   os_thread_set_prio (os_thread_t* thread, os_thread_prio_t prio);
 
   void
-  os_thread_wakeup (os_thread_t* thread);
+  os_thread_resume (os_thread_t* thread);
 
   os_thread_user_storage_t*
   os_thread_get_user_storage (os_thread_t* thread);

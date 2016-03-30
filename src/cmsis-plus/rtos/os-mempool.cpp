@@ -390,7 +390,7 @@ namespace os
               Waiting_threads_list_guard<interrupts::Critical_section> lg
                 { node };
 
-              this_thread::sleep ();
+              this_thread::wait ();
             }
 
           if (this_thread::thread ().interrupted ())
@@ -530,7 +530,7 @@ namespace os
         }
 
       // Wake-up one thread, if any.
-      list_.wakeup_one ();
+      list_.resume_one ();
 
       return result::ok;
     }
@@ -558,7 +558,7 @@ namespace os
           interrupts::Critical_section cs; // ----- Critical section -----
 
           // Wake-up all threads, if any.
-          list_.wakeup_all ();
+          list_.resume_all ();
 
           list_.clear ();
         }

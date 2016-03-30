@@ -344,7 +344,7 @@ namespace os
 
       trace::printf ("%s() @%p \n", __func__, this);
 
-      list_.wakeup_one ();
+      list_.resume_one ();
 
       return result::ok;
     }
@@ -411,7 +411,7 @@ namespace os
 
       trace::printf ("%s() @%p \n", __func__, this);
 
-      list_.wakeup_all ();
+      list_.resume_all ();
 
       return result::ok;
     }

@@ -478,7 +478,7 @@ namespace os
 #if !defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
       // Wake-up all threads, if any.
-      list_.wakeup_all ();
+      list_.resume_all ();
 
       list_.clear ();
 
@@ -636,7 +636,7 @@ namespace os
               Waiting_threads_list_guard<scheduler::Critical_section> lg
                 { node };
 
-              this_thread::sleep ();
+              this_thread::wait ();
             }
 
           if (crt_thread.interrupted ())
@@ -857,7 +857,7 @@ namespace os
 
           trace::printf ("mutex @%p %s unlocked\n", this, name ());
 
-          list_.wakeup_one ();
+          list_.resume_one ();
           owner_ = nullptr;
           count_ = 0;
 

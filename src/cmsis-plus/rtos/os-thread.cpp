@@ -397,13 +397,13 @@ namespace os
      *  Extension to standard, no POSIX similar functionality identified.
      */
     void
-    Thread::_sleep (void)
+    Thread::_wait (void)
     {
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
-      port::Thread::sleep (this);
+      port::Thread::wait (this);
 
 #else
 
@@ -422,14 +422,13 @@ namespace os
      * @note Can be invoked from Interrupt Service Routines.
      */
     void
-    Thread::wakeup (void)
+    Thread::resume (void)
     {
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
-      wakeup_reason_ = result::ok;
 
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
-      port::Thread::wakeup (this);
+      port::Thread::resume (this);
 
 #else
 
@@ -437,25 +436,6 @@ namespace os
 
 #endif
     }
-
-#if 0
-    /**
-     * @details
-     * Internal, no POSIX equivalent, used to notify timeouts or cancels.
-     *
-     * @note Can be invoked from Interrupt Service Routines.
-     */
-    void
-    Thread::wakeup (result_t reason)
-      {
-        assert(reason == EINTR || reason == ETIMEDOUT);
-
-        trace::printf ("%s(&d) @%p %s \n", __func__, reason, this, name ());
-        wakeup_reason_ = reason;
-
-        // TODO
-      }
-#endif
 
     /**
      * @details
@@ -562,7 +542,7 @@ namespace os
           && (sched_state_ != thread::state::destroyed))
         {
           joiner_ = this;
-          _sleep ();
+          _wait ();
         }
 
       if (exit_ptr != nullptr)
@@ -705,7 +685,7 @@ namespace os
 
       if (joiner_ != nullptr)
         {
-          joiner_->wakeup ();
+          joiner_->resume ();
         }
 
       _destroy ();
@@ -755,7 +735,7 @@ namespace os
 
       if (joiner_ != nullptr)
         {
-          joiner_->wakeup ();
+          joiner_->resume ();
         }
 
       _destroy ();
@@ -787,7 +767,7 @@ namespace os
 
       sig_mask_ |= mask;
 
-      wakeup ();
+      this->resume ();
 
       return result::ok;
     }
@@ -944,7 +924,7 @@ namespace os
                 }
             }
 
-          _sleep ();
+          _wait ();
 
           if (interrupted ())
             {

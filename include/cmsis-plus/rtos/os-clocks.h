@@ -102,7 +102,8 @@ namespace os
 
       /**
        * @brief Sleep for a duration.
-       * @param [in] duration The number of ticks or seconds to sleep.
+       * @param [in] duration The number of clock units
+       *  (ticks or seconds) to sleep.
        * @retval ETIMEDOUT The sleep lasted the entire duration.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINTR The sleep was interrupted.
@@ -110,6 +111,13 @@ namespace os
       result_t
       sleep_for (clock::duration_t duration);
 
+      /**
+       * @brief Sleep until a timestamp.
+       * @param [in] timestamp The absolute moment in time, in clock units.
+       * @retval ETIMEDOUT The sleep lasted the entire duration.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @retval EINTR The sleep was interrupted.
+       */
       result_t
       sleep_until (clock::timestamp_t timestamp);
 
@@ -138,6 +146,13 @@ namespace os
 
     protected:
 
+      /**
+       * @brief Queue timestamp and wait for it.
+       * @param timestamp The absolute moment in time, in clock units.
+       * @param list Reference to the clock list.
+       * @retval result::ok The wait was performed.
+       * @retval ENOTRECOVERABLE The wait failed.
+       */
       virtual result_t
       _wait_until (clock::timestamp_t timestamp, Clock_timestamps_list& list);
 

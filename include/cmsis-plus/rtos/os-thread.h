@@ -65,13 +65,13 @@ namespace os
       yield (void);
 
       /**
-       * @brief Suspend the current running thread.
+       * @brief Suspend the current running thread to wait for an event.
        * @par Parameters
        *  None
        * @return Nothing.
        */
       void
-      sleep (void);
+      wait (void);
 
       /**
        * @brief Terminate the current running thread.
@@ -422,7 +422,7 @@ namespace os
       sched_state (void) const;
 
       /**
-       * @brief Wake-up the thread.
+       * @brief Resume the thread.
        * @par Parameters
        *  None
        * @return  Nothing.
@@ -430,7 +430,7 @@ namespace os
        * @note Can be invoked from Interrupt Service Routines.
        */
       void
-      wakeup (void);
+      resume (void);
 
       /**
        * @brief Get the thread function arguments.
@@ -513,7 +513,7 @@ namespace os
        */
 
       friend void
-      this_thread::sleep (void);
+      this_thread::wait (void);
 
       friend void
       this_thread::exit (void* exit_ptr);
@@ -552,13 +552,13 @@ namespace os
        */
 
       /**
-       * @brief Suspend this thread.
+       * @brief Suspend this thread and wait for an event.
        * @par Parameters
        *  None
        * @return  Nothing.
        */
       void
-      _sleep (void);
+      _wait (void);
 
       /**
        * @brief Terminate thread by itself.
@@ -689,9 +689,6 @@ namespace os
       thread::state_t sched_state_;
       thread::priority_t prio_;
 
-      // TODO: needed?
-      result_t wakeup_reason_;
-
       // volatile, but used in critical sections.
       thread::sigset_t sig_mask_;
 
@@ -720,7 +717,7 @@ namespace os
       /**
        * @details
        * Remove the current running thread from the ready list and pass
-       * control to the next thread that is in **READY** state. The
+       * control to the next ready thread. The
        * thread will not be automatically rescheduled, it requires
        * some other tread or interrupt service routine to add it
        * back to the READY state (via `Thread::wakeup()`).
@@ -733,9 +730,9 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline void
-      sleep (void)
+      wait (void)
       {
-        this_thread::thread ()._sleep ();
+        this_thread::thread ()._wait ();
       }
 
       /**
