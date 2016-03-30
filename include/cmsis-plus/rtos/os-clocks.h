@@ -110,14 +110,14 @@ namespace os
 
       /**
        * @brief Timed wait for an event.
-       * @param [in] duration The timeout in clock units.
+       * @param [in] timeout The timeout in clock units.
        * @retval result::ok An event occurred before the timeout.
        * @retval ETIMEDOUT The wait lasted the entire duration.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINTR The sleep was interrupted.
        */
       result_t
-      wait_for (clock::duration_t duration);
+      wait_for (clock::duration_t timeout);
 
       void
       interrupt_service_routine (void);
@@ -134,7 +134,7 @@ namespace os
     protected:
 
       virtual result_t
-      _wait (clock::duration_t duration) = 0;
+      _wait_until (clock::timestamp_t timestamp, Clock_timestamps_list& list);
 
       /**
        * @name Private Member Variables
@@ -142,12 +142,19 @@ namespace os
        */
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
-      Clock_timestamps_list sleep_for_list_;
+      Clock_timestamps_list steady_list_;
       clock::duration_t volatile sleep_count_;
-      Clock_timestamps_list sleep_until_list_;
+      Clock_timestamps_list adjusted_list_;
 #endif
 
+      /**
+       * @brief Monotone ascending count.
+       */
       clock::timestamp_t volatile steady_count_;
+
+      /**
+       * @brief Adjustable offset to epoch.
+       */
       clock::offset_t volatile offset_;
 
       /**
@@ -281,16 +288,22 @@ namespace os
        * @{
        */
 
+#if defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
+
       /**
        * @brief Internal wait.
-       * @param ticks
+       * @param timestamp
+       * @param list
        * @retval result::ok An event occurred before the timeout.
        * @retval ETIMEDOUT The wait lasted the entire duration.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINTR The sleep was interrupted.
        */
       virtual result_t
-      _wait (clock::duration_t ticks) override;
+      _wait_until (clock::timestamp_t timestamp,
+          Clock_timestamps_list& list);
+
+#endif
 
       /**
        * @}
@@ -363,16 +376,21 @@ namespace os
       result_t
       start (void);
 
+#if defined(OS_INCLUDE_RTOS_PORT_REALTIME_CLOCK_SLEEP_FOR)
+
       /**
        * @brief Internal wait.
-       * @param secs
+       * @param timestamp
+       * @param list
        * @retval result::ok An event occurred before the timeout.
        * @retval ETIMEDOUT The wait lasted the entire duration.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINTR The sleep was interrupted.
        */
       virtual result_t
-      _wait (clock::duration_t secs) override;
+      _wait_until (clock::timestamp_t timestamp, Clock_timestamps_list& list);
+
+#endif
 
       /**
        * @}
@@ -397,9 +415,9 @@ namespace os
 
     inline Clock_timestamps_list&
     Clock::steady_list (void)
-      {
-        return sleep_for_list_;
-      }
+    {
+      return steady_list_;
+    }
 
 #endif
 

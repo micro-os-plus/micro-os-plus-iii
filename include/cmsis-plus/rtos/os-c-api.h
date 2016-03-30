@@ -111,7 +111,8 @@ extern "C"
                                os_flags_mode_t mode);
 
   os_result_t
-  os_this_thread_timed_sig_wait (os_thread_sigset_t mask, os_systicks_t ticks,
+  os_this_thread_timed_sig_wait (os_thread_sigset_t mask,
+                                 os_clock_duration_t timeout,
                                  os_thread_sigset_t* oflags,
                                  os_flags_mode_t mode);
 
@@ -163,25 +164,25 @@ extern "C"
   os_systick_clock_now_details (os_systick_clock_current_t* details);
 
   os_result_t
-  os_systick_clock_sleep_for (os_clock_duration_t ticks);
+  os_systick_clock_sleep_for (os_clock_duration_t timeout);
 
   os_result_t
-  os_systick_clock_wait (os_clock_duration_t ticks);
+  os_systick_clock_wait (os_clock_duration_t timeout);
 
-  inline os_systicks_t
+  inline os_clock_duration_t
   os_systick_clock_ticks_cast (uint32_t microsec)
   {
     // TODO: add some restrictions to match only numeric types
-    return (os_systicks_t) ((((microsec)
+    return (os_clock_duration_t) ((((microsec)
         * ((uint32_t) OS_INTEGER_SYSTICK_FREQUENCY_HZ)) + (uint32_t) 999999ul)
         / (uint32_t) 1000000ul);
   }
 
-  inline os_systicks_t
+  inline os_clock_duration_t
   os_systick_clock_ticks_cast_long (uint64_t microsec)
   {
     // TODO: add some restrictions to match only numeric types
-    return (os_systicks_t) ((((microsec)
+    return (os_clock_duration_t) ((((microsec)
         * ((uint64_t) OS_INTEGER_SYSTICK_FREQUENCY_HZ)) + (uint64_t) 999999ul)
         / (uint64_t) 1000000ul);
   }
@@ -205,7 +206,7 @@ extern "C"
   os_timer_destroy (os_timer_t* timer);
 
   os_result_t
-  os_timer_start (os_timer_t* timer, os_systicks_t ticks);
+  os_timer_start (os_timer_t* timer, os_clock_duration_t timeout);
 
   os_result_t
   os_timer_stop (os_timer_t* timer);
@@ -228,7 +229,7 @@ extern "C"
   os_mutex_try_lock (os_mutex_t* mutex);
 
   os_result_t
-  os_mutex_timed_lock (os_mutex_t* mutex, os_systicks_t ticks);
+  os_mutex_timed_lock (os_mutex_t* mutex, os_clock_duration_t timeout);
 
   os_result_t
   os_mutex_unlock (os_mutex_t* mutex);
@@ -262,7 +263,7 @@ extern "C"
 
   os_result_t
   os_condvar_timed_wait (os_condvar_t* condvar, os_mutex_t* mutex,
-                         os_systicks_t ticks);
+                         os_clock_duration_t timeout);
 
   // --------------------------------------------------------------------------
 
@@ -285,7 +286,8 @@ extern "C"
   os_semaphore_try_wait (os_semaphore_t* semaphore);
 
   os_result_t
-  os_semaphore_timed_wait (os_semaphore_t* semaphore, os_systicks_t ticks);
+  os_semaphore_timed_wait (os_semaphore_t* semaphore,
+                           os_clock_duration_t timeout);
 
   os_semaphore_count_t
   os_semaphore_get_value (os_semaphore_t* semaphore);
@@ -313,7 +315,7 @@ extern "C"
   os_mempool_try_alloc (os_mempool_t* mempool);
 
   void*
-  os_mempool_timed_alloc (os_mempool_t* mempool, os_systicks_t ticks);
+  os_mempool_timed_alloc (os_mempool_t* mempool, os_clock_duration_t timeout);
 
   os_result_t
   os_mempool_free (os_mempool_t* mempool, void* block);
@@ -358,7 +360,7 @@ extern "C"
 
   os_result_t
   os_mqueue_timed_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
-                        os_mqueue_prio_t mprio, os_systicks_t ticks);
+                        os_mqueue_prio_t mprio, os_clock_duration_t timeout);
 
   os_result_t
   os_mqueue_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
@@ -370,7 +372,8 @@ extern "C"
 
   os_result_t
   os_mqueue_timed_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
-                           os_mqueue_prio_t* mprio, os_systicks_t ticks);
+                           os_mqueue_prio_t* mprio,
+                           os_clock_duration_t timeout);
 
   size_t
   os_mqueue_get_length (os_mqueue_t* mqueue);
@@ -411,7 +414,7 @@ extern "C"
 
   os_result_t
   os_evflags_timed_wait (os_evflags_t* evflags, os_flags_mask_t mask,
-                         os_systicks_t ticks, os_flags_mask_t* oflags,
+                         os_clock_duration_t timeout, os_flags_mask_t* oflags,
                          os_flags_mode_t mode);
 
   os_result_t

@@ -188,8 +188,11 @@ namespace os
     Semaphore::Semaphore (const semaphore::Attributes& attr) :
         Named_object
           { attr.name () }, //
-        initial_count_ (attr.sm_initial_count), //
-        max_count_ (attr.sm_max_count)
+#if !defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
+            clock_ (attr.clock != nullptr ? *attr.clock : systick_clock),
+#endif
+            initial_count_ (attr.sm_initial_count), //
+            max_count_ (attr.sm_max_count)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
@@ -389,6 +392,11 @@ namespace os
       return port::Semaphore::wait (this);
 
 #else
+      if (_try_wait ())
+        {
+          return result::ok;
+        }
+
       Thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
@@ -406,7 +414,7 @@ namespace os
 
             {
               // Add this thread to the semaphore waiting list.
-              // It is removed when this block ends (after suspend()).
+              // It is removed when this block ends (after sleep()).
               Waiting_threads_list_guard<interrupts::Critical_section> lg
                 { node };
 
@@ -506,16 +514,25 @@ namespace os
 
       trace::printf ("%s(%d_ticks) @%p %s\n", __func__, timeout, this, name ());
 
+#if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
+
       if (timeout == 0)
         {
           timeout = 1;
         }
-
-#if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
-
       return port::Semaphore::timed_wait (this, timeout);
 
 #else
+
+      if (_try_wait ())
+        {
+          return result::ok;
+        }
+
+      if (timeout == 0)
+        {
+          timeout = 1;
+        }
 
       Thread& crt_thread = this_thread::thread ();
 
@@ -525,19 +542,17 @@ namespace os
       Double_list_node_thread node
         { list_, crt_thread };
 
-      clock::timestamp_t start = systick_clock.now ();
+      clock::timestamp_t start = clock_.steady_now ();
       for (;;)
         {
-          clock::duration_t slept_ticks;
-
           if (_try_wait ())
             {
               return result::ok;
             }
 
-          clock::timestamp_t now = systick_clock.now ();
-          slept_ticks = (clock::duration_t) (now - start);
-          if (slept_ticks >= timeout)
+          clock::timestamp_t now = clock_.steady_now ();
+          clock::duration_t spent = (clock::duration_t) (now - start);
+          if (spent >= timeout)
             {
               return ETIMEDOUT;
             }
@@ -548,7 +563,7 @@ namespace os
               Waiting_threads_list_guard<interrupts::Critical_section> lg
                 { node };
 
-              systick_clock.wait_for (timeout - slept_ticks);
+              clock_.wait_for (timeout - spent);
             }
 
           if (crt_thread.interrupted ())

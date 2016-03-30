@@ -53,7 +53,7 @@ namespace os
        * @brief %Timer attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Attributes : public Named_object
+      class Attributes : public Clocked_attribute
       {
       public:
 
@@ -296,6 +296,7 @@ namespace os
       timer::func_args_t func_args_;
 
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
+      Clock& clock_;
       Double_list_node_timer timer_node_;
       clock::duration_t period_;
 #endif
@@ -330,7 +331,7 @@ namespace os
     {
       inline
       Attributes::Attributes (const char* name) :
-          Named_object
+          Clocked_attribute
             { name }
       {
         this->tm_type = run::once;

@@ -62,6 +62,21 @@ namespace os
    */
   namespace rtos
   {
+    // ========================================================================
+
+    // Forward references.
+    class Clock;
+    class Condition_variable;
+    class Event_flags;
+    class Memory_pool;
+    class Message_queue;
+    class Mutex;
+    class Realtime_clock;
+    class Semaphore;
+    class Systick_clock;
+    class Thread;
+    class Timer;
+
     // ------------------------------------------------------------------------
 
     /**
@@ -809,19 +824,72 @@ namespace os
        * @}
        */
     };
+
     // ========================================================================
 
-    // Forward references.
-    class Condition_variable;
-    class Event_flags;
-    class Memory_pool;
-    class Message_queue;
-    class Mutex;
-    class Realtime_clock;
-    class Semaphore;
-    class Systick_clock;
-    class Thread;
-    class Timer;
+    /**
+     * @brief Base class for named objects.
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     */
+    class Clocked_attribute : public Named_object
+    {
+    public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+      /**
+       * @brief Create a named object.
+       * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
+       */
+      Clocked_attribute (const char* name);
+
+      /**
+       * @cond ignore
+       */
+      Clocked_attribute (const Clocked_attribute&) = default;
+      Clocked_attribute (Clocked_attribute&&) = default;
+      Clocked_attribute&
+      operator= (const Clocked_attribute&) = default;
+      Clocked_attribute&
+      operator= (Clocked_attribute&&) = default;
+      /**
+       * @endcond
+       */
+
+      /**
+       * @brief Destroy the named object.
+       */
+      ~Clocked_attribute () = default;
+
+      /**
+       * @}
+       * @name Public Member Variables
+       * @{
+       */
+
+      /**
+       * @brief Pointer to clock.
+       */
+      Clock* clock;
+
+      /**
+       * @}
+       */
+
+    protected:
+
+      /**
+       * @name Private Member Variables
+       * @{
+       */
+
+      /**
+       * @}
+       */
+    };
 
   // ========================================================================
   } /* namespace rtos */
@@ -844,6 +912,14 @@ namespace os
     Named_object::name (void) const
     {
       return name_;
+    }
+
+    inline
+    Clocked_attribute::Clocked_attribute (const char* name) :
+        Named_object
+          { name }
+    {
+      clock = nullptr;
     }
 
   // ========================================================================

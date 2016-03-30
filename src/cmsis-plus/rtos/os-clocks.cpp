@@ -133,17 +133,14 @@ namespace os
 
       trace::printf ("%s(%d_ticks)\n", __func__, duration);
 
-      clock::timestamp_t prev = systick_clock.now ();
-      clock::duration_t ticks_to_go = duration;
+      clock::timestamp_t timestamp = steady_now () + duration;
       for (;;)
         {
           result_t res;
+          res = _wait_until (timestamp, steady_list_);
 
-          res = _wait (ticks_to_go);
-
-          clock::timestamp_t now = systick_clock.now ();
-          clock::duration_t slept_ticks = (clock::duration_t) (now - prev);
-          if (slept_ticks >= ticks_to_go)
+          clock::timestamp_t n = steady_now ();
+          if (n >= timestamp)
             {
               return ETIMEDOUT;
             }
@@ -157,9 +154,6 @@ namespace os
             {
               return res;
             }
-
-          prev = now;
-          ticks_to_go -= slept_ticks;
         }
       return ENOTRECOVERABLE;
     }
@@ -167,20 +161,45 @@ namespace os
     result_t
     Clock::sleep_until (clock::timestamp_t timestamp)
     {
-      // TODO
-      return result::ok;
+      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+
+      trace::printf ("%s()\n", __func__);
+
+      for (;;)
+        {
+          result_t res;
+          res = _wait_until (timestamp, adjusted_list_);
+
+          clock::timestamp_t n = now ();
+          if (n >= timestamp)
+            {
+              return ETIMEDOUT;
+            }
+
+          if (this_thread::thread ().interrupted ())
+            {
+              return EINTR;
+            }
+
+          if (res != ETIMEDOUT)
+            {
+              return res;
+            }
+        }
+      return ENOTRECOVERABLE;
     }
 
     result_t
-    Clock::wait_for (clock::duration_t duration)
+    Clock::wait_for (clock::duration_t timeout)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-      trace::printf ("%s(%d_ticks)\n", __func__, duration);
+      trace::printf ("%s(%d_ticks)\n", __func__, timeout);
+
+      clock::timestamp_t timestamp = steady_now () + timeout;
 
       result_t res;
-
-      res = _wait (duration);
+      res = _wait_until (timestamp, steady_list_);
 
       if (this_thread::thread ().interrupted ())
         {
@@ -198,8 +217,8 @@ namespace os
       ++steady_count_;
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
-      sleep_for_list_.check_timestamp (steady_count_);
-      sleep_until_list_.check_timestamp (steady_count_ + offset_);
+      steady_list_.check_timestamp (steady_count_);
+      adjusted_list_.check_timestamp (steady_count_ + offset_);
 #endif
 
 #if 0
@@ -211,25 +230,54 @@ namespace os
         {
           sleep_count_ = 0;
 
-          sleep_for_list_.wakeup_one ();
+          steady_list_.wakeup_one ();
         }
 
-      if (!sleep_for_list_.empty ())
+      if (!steady_list_.empty ())
         {
 
           for (;;)
             {
-              clock::timestamp_t head_ts = sleep_for_list_.head ()->timestamp;
+              clock::timestamp_t head_ts = steady_list_.head ()->timestamp;
               if (head_ts > steady_count_)
                 {
                   sleep_count_ = (clock::duration_t) (head_ts - steady_count_);
                   break;
                 }
-              sleep_for_list_.wakeup_one ();
+              steady_list_.wakeup_one ();
             }
         }
 #endif
 
+    }
+
+    result_t
+    Clock::_wait_until (clock::timestamp_t timestamp,
+                        Clock_timestamps_list& list)
+    {
+      Thread& crt_thread = this_thread::thread ();
+
+      // Prepare a list node pointing to the current thread.
+      // Do not worry for being on stack, it is temporarily linked to the
+      // list and guaranteed to be removed before this function returns.
+      Double_list_node_clock node
+        { list, timestamp, crt_thread };
+
+        {
+          // Add this thread to the clock waiting list.
+          // It is removed when this block ends (after sleep()).
+          Clock_timestamps_list_guard<interrupts::Critical_section> lg
+            { node };
+
+          this_thread::sleep ();
+        }
+
+      if (crt_thread.interrupted ())
+        {
+          return EINTR;
+        }
+
+      return ETIMEDOUT;
     }
 
     // ======================================================================
@@ -349,45 +397,25 @@ namespace os
       return ticks;
     }
 
-    result_t
-    Systick_clock::_wait (clock::duration_t ticks)
-    {
-      result_t res;
-
 #if defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
-      if (ticks == 0)
-        {
-          ticks = 1;
-        }
 
-      res = port::Systick_clock::wait (ticks);
-#else
-      Thread& crt_thread = this_thread::thread ();
+    result_t
+    Systick_clock::_wait_until (clock::timestamp_t timestamp,
+        Clock_timestamps_list& list)
+      {
+        result_t res;
 
-      // Prepare a list node pointing to the current thread.
-      // Do not worry for being on stack, it is temporarily linked to the
-      // list and guaranteed to be removed before this function returns.
-      Double_list_node_clock node
-        { sleep_for_list_, steady_count_ + ticks, crt_thread };
+        clock::timestamp_t now = now();
+        if (now >= timestamp)
+          {
+            return result::ok;
+          }
+        clock::duration_t ticks = timestamp - now;
+        res = port::Systick_clock::wait (ticks);
+        return res;
+      }
 
-        {
-          // Add this thread to the clock waiting list.
-          // It is removed when this block ends (after sleep()).
-          Clock_timestamps_list_guard<interrupts::Critical_section> lg
-            { node };
-
-          this_thread::sleep ();
-        }
-
-      if (crt_thread.interrupted ())
-        {
-          return EINTR;
-        }
-
-      res = ETIMEDOUT;
 #endif
-      return res;
-    }
 
 #if 0
     /**
@@ -558,47 +586,17 @@ namespace os
     }
 
 #if 0
-    /**
-     * @details
-     *
-     * @note Can be invoked from Interrupt Service Routines.
-     */
-    Realtime_clock::rep
-    Realtime_clock::now (void)
-      {
-        return __rtc_now;
-      }
-
-    /**
-     * @details
-     * Put the current thread to sleep, until the next n-th
-     * RTC second occurs. Depending when the call is issued, the
-     * first second counted may be very short.
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    result_t
-    Realtime_clock::sleep_for (Realtime_clock::sleep_rep secs)
-      {
-        os_assert_err(!scheduler::in_handler_mode (), EPERM);
-
-        trace::printf ("Realtime_clock::sleep_for(%ds)\n", secs);
-
-        // TODO
-        __rtc_now += secs;
-        return result::ok;
-      }
-#endif
-
-    result_t
-    Realtime_clock::_wait (clock::duration_t secs)
+  result_t
+  Realtime_clock::_wait (clock::duration_t secs)
     {
       return ETIMEDOUT;
     }
+#endif
 
   // ----------------------------------------------------------------------
 
 #pragma GCC diagnostic pop
 
-  } /* namespace rtos */
+}
+/* namespace rtos */
 } /* namespace os */

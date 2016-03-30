@@ -50,7 +50,7 @@ namespace os
        * @brief %Semaphore attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Attributes : public Named_object
+      class Attributes : public Clocked_attribute
       {
       public:
 
@@ -371,7 +371,8 @@ namespace os
        */
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
-      port::Waiting_threads_list list_;
+      Waiting_threads_list list_;
+      Clock& clock_;
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
@@ -411,7 +412,7 @@ namespace os
     {
       inline
       Attributes::Attributes (const char* name) :
-          Named_object
+          Clocked_attribute
             { name }
       {
         sm_initial_count = 0;

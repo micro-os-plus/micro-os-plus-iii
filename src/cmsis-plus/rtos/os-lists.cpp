@@ -53,8 +53,8 @@ namespace os
      */
     Double_list::~Double_list ()
     {
-      assert (head_ == nullptr);
-      assert (count_ == 0);
+      assert(head_ == nullptr);
+      assert(count_ == 0);
     }
 
     /**
@@ -229,7 +229,7 @@ namespace os
           thread = &(head ()->thread);
           remove (*head ());
         }
-      assert (thread != nullptr);
+      assert(thread != nullptr);
 
       thread::state_t state = thread->sched_state ();
       if (state != thread::state::destroyed)
@@ -308,19 +308,19 @@ namespace os
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
     Double_list_node_timer::Double_list_node_timer (Double_list& lst,
-        clock::timestamp_t ts,
-        Timer& tm) :
-    Double_list_node_timestamp
-      { lst, ts}, //
-    timer (tm)
-      {
-        ;
-      }
+                                                    clock::timestamp_t ts,
+                                                    Timer& tm) :
+        Double_list_node_timestamp
+          { lst, ts }, //
+        timer (tm)
+    {
+      ;
+    }
 
     Double_list_node_timer::~Double_list_node_timer ()
-      {
-        ;
-      }
+    {
+      ;
+    }
 
     /**
      * @details
@@ -328,10 +328,10 @@ namespace os
      */
     void
     Double_list_node_timer::action (void)
-      {
-        ((Clock_timestamps_list&) list).remove (*this);
-        timer.interrupt_service_routine ();
-      }
+    {
+      ((Clock_timestamps_list&) list).remove (*this);
+      timer.interrupt_service_routine ();
+    }
 
 #endif
 
@@ -400,7 +400,7 @@ namespace os
                          (uint32_t) timestamp, (uint32_t) after->timestamp,
                          count_);
 
-          assert (after->timestamp != 0);
+          assert(after->timestamp != 0);
 
           // Make the new node point to its neighbours.
           node.prev = after;

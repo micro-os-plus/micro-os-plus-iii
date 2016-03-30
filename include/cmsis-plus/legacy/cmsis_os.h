@@ -657,8 +657,7 @@ const osTimerDef_t os_timer_def_##name = \
    * @note MUST REMAIN UNCHANGED: @b osTimerCreate shall be consistent in every CMSIS-RTOS.
    */
   osTimerId
-  osTimerCreate (const osTimerDef_t* timer_def, os_timer_type type,
-                 void* args);
+  osTimerCreate (const osTimerDef_t* timer_def, os_timer_type type, void* args);
 
   /**
    * @brief Start the timer.

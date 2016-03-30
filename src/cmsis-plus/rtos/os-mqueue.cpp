@@ -205,8 +205,11 @@ namespace os
                                   mqueue::msg_size_t msg_size_bytes) :
         Named_object
           { attr.name () }, //
-        msg_size_bytes_ (msg_size_bytes), //
-        msgs_ (msgs)
+#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+            clock_ (attr.clock != nullptr ? *attr.clock : systick_clock),
+#endif
+            msg_size_bytes_ (msg_size_bytes), //
+            msgs_ (msgs)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
@@ -503,7 +506,7 @@ namespace os
 
             {
               // Add this thread to the message queue send waiting list.
-              // It is removed when this block ends (after suspend()).
+              // It is removed when this block ends (after sleep()).
               Waiting_threads_list_guard<interrupts::Critical_section> lg
                 { node };
 
@@ -654,30 +657,30 @@ namespace os
       Double_list_node_thread node
         { send_list_, crt_thread };
 
-      clock::timestamp_t start = systick_clock.now ();
+      clock::timestamp_t start = clock_.steady_now ();
       for (;;)
         {
-          clock::duration_t slept_ticks;
+          clock::duration_t spent;
 
           if (_try_send (msg, nbytes, mprio))
             {
               return result::ok;
             }
 
-          clock::timestamp_t now = systick_clock.now ();
-          slept_ticks = (clock::duration_t) (now - start);
-          if (slept_ticks >= timeout)
+          clock::timestamp_t now = clock_.steady_now ();
+          spent = (clock::duration_t) (now - start);
+          if (spent >= timeout)
             {
               return ETIMEDOUT;
             }
 
             {
               // Add this thread to the message queue send waiting list.
-              // It is removed when this block ends (after wait()).
+              // It is removed when this block ends (after wait_for()).
               Waiting_threads_list_guard<interrupts::Critical_section> lg
                 { node };
 
-              systick_clock.wait_for (timeout - slept_ticks);
+              clock_.wait_for (timeout - spent);
             }
 
           if (crt_thread.interrupted ())
@@ -827,7 +830,7 @@ namespace os
 
             {
               // Add this thread to the message queue receive waiting list.
-              // It is removed when this block ends (after suspend()).
+              // It is removed when this block ends (after sleep()).
               Waiting_threads_list_guard<interrupts::Critical_section> lg
                 { node };
 
@@ -991,30 +994,30 @@ namespace os
       Double_list_node_thread node
         { receive_list_, crt_thread };
 
-      clock::timestamp_t start = systick_clock.now ();
+      clock::timestamp_t start = clock_.steady_now ();
       for (;;)
         {
-          clock::duration_t slept_ticks;
+          clock::duration_t spent;
 
           if (_try_receive (msg, nbytes, mprio))
             {
               return result::ok;
             }
 
-          clock::timestamp_t now = systick_clock.now ();
-          slept_ticks = (clock::duration_t) (now - start);
-          if (slept_ticks >= timeout)
+          clock::timestamp_t now = clock_.steady_now ();
+          spent = (clock::duration_t) (now - start);
+          if (spent >= timeout)
             {
               return ETIMEDOUT;
             }
 
             {
               // Add this thread to the message queue receive waiting list.
-              // It is removed when this block ends (after wait()).
+              // It is removed when this block ends (after wait_for()).
               Waiting_threads_list_guard<interrupts::Critical_section> lg
                 { node };
 
-              systick_clock.wait_for (timeout - slept_ticks);
+              clock_.wait_for (timeout - spent);
             }
 
           if (crt_thread.interrupted ())

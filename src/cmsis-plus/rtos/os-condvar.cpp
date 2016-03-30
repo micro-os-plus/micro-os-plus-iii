@@ -271,6 +271,7 @@ namespace os
     Condition_variable::Condition_variable (const condvar::Attributes& attr) :
         Named_object
           { attr.name () }
+    // , clock_ (attr.clock != nullptr ? *attr.clock : systick_clock)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 

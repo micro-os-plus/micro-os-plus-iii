@@ -50,7 +50,7 @@ namespace os
        * @brief Message queue attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Attributes : public Named_object
+      class Attributes : public Clocked_attribute
       {
       public:
 
@@ -422,6 +422,7 @@ namespace os
 #if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
       port::Waiting_threads_list send_list_;
       port::Waiting_threads_list receive_list_;
+      Clock& clock_;
 
       // To save space, the double linked list is built
       // using short indexes, not pointers.
@@ -495,7 +496,7 @@ namespace os
     {
       inline
       Attributes::Attributes (const char* name) :
-          Named_object (name)
+          Clocked_attribute (name)
       {
         mq_queue_address = nullptr;
         mq_queue_size_bytes = 0;

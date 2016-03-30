@@ -53,7 +53,7 @@ namespace os
        * @brief %Mutex attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Attributes : public Named_object
+      class Attributes : public Clocked_attribute
       {
       public:
 
@@ -450,7 +450,8 @@ namespace os
       Thread* volatile owner_;
 
 #if !defined(OS_INCLUDE_RTOS_PORT_MUTEX)
-      port::Waiting_threads_list list_;
+      Waiting_threads_list list_;
+      Clock& clock_;
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
@@ -495,7 +496,7 @@ namespace os
     {
       inline
       Attributes::Attributes (const char* name) :
-          Named_object (name)
+          Clocked_attribute (name)
       {
         mx_priority_ceiling = thread::priority::highest;
         mx_protocol = protocol::none;

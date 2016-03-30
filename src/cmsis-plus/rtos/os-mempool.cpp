@@ -238,8 +238,11 @@ namespace os
                               mempool::size_t block_size_bytes) :
         Named_object
           { attr.name () }, //
-        blocks_ (blocks), //
-        block_size_bytes_ (block_size_bytes)
+#if !defined(OS_INCLUDE_RTOS_PORT_MEMORY_POOL)
+            clock_ (attr.clock != nullptr ? *attr.clock : systick_clock),
+#endif
+            blocks_ (blocks), //
+            block_size_bytes_ (block_size_bytes)
 
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
@@ -383,7 +386,7 @@ namespace os
 
             {
               // Add this thread to the memory pool waiting list.
-              // It is removed when this block ends (after suspend()).
+              // It is removed when this block ends (after sleep()).
               Waiting_threads_list_guard<interrupts::Critical_section> lg
                 { node };
 
@@ -451,10 +454,10 @@ namespace os
       Double_list_node_thread node
         { list_, crt_thread };
 
-      clock::timestamp_t start = systick_clock.now ();
+      clock::timestamp_t start = clock_.steady_now ();
       for (;;)
         {
-          clock::duration_t slept_ticks;
+          clock::duration_t spent;
 
           void* p = _try_first ();
           if (p != nullptr)
@@ -462,20 +465,20 @@ namespace os
               return p;
             }
 
-          clock::timestamp_t now = systick_clock.now ();
-          slept_ticks = (clock::duration_t) (now - start);
-          if (slept_ticks >= timeout)
+          clock::timestamp_t now = clock_.steady_now ();
+          spent = (clock::duration_t) (now - start);
+          if (spent >= timeout)
             {
               return nullptr;
             }
 
             {
               // Add this thread to the memory pool waiting list.
-              // It is removed when this block ends (after wait()).
+              // It is removed when this block ends (after wait_for()).
               Waiting_threads_list_guard<interrupts::Critical_section> lg
                 { node };
 
-              systick_clock.wait_for (timeout - slept_ticks);
+              clock_.wait_for (timeout - spent);
             }
 
           if (this_thread::thread ().interrupted ())

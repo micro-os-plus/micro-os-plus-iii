@@ -95,13 +95,13 @@ static_assert(os_priority_error == thread::priority::error, "adjust os_priority_
 os_result_t
 os_sched_initialize (void)
 {
-  return static_cast<os_result_t> (scheduler::initialize ());
+  return (os_result_t) scheduler::initialize ();
 }
 
 os_result_t
 os_sched_start (void)
 {
-  return static_cast<os_result_t> (scheduler::start ());
+  return (os_result_t) scheduler::start ();
 }
 
 bool
@@ -171,10 +171,11 @@ os_this_thread_try_sig_wait (os_thread_sigset_t mask,
 }
 
 os_result_t
-os_this_thread_timed_sig_wait (os_thread_sigset_t mask, os_systicks_t ticks,
+os_this_thread_timed_sig_wait (os_thread_sigset_t mask,
+                               os_clock_duration_t timeout,
                                os_thread_sigset_t* oflags, os_flags_mode_t mode)
 {
-  return (os_result_t) this_thread::timed_sig_wait (mask, ticks, oflags, mode);
+  return (os_result_t) this_thread::timed_sig_wait (mask, timeout, oflags, mode);
 }
 
 // ----------------------------------------------------------------------------
@@ -269,15 +270,15 @@ os_systick_clock_now_details (os_systick_clock_current_t* details)
 }
 
 os_result_t
-os_systick_clock_sleep_for (os_clock_duration_t ticks)
+os_systick_clock_sleep_for (os_clock_duration_t timeout)
 {
-  return (os_result_t) systick_clock.sleep_for (ticks);
+  return (os_result_t) systick_clock.sleep_for (timeout);
 }
 
 os_result_t
-os_systick_clock_wait (os_clock_duration_t ticks)
+os_systick_clock_wait (os_clock_duration_t timeout)
 {
-  return (os_result_t) systick_clock.wait_for (ticks);
+  return (os_result_t) systick_clock.wait_for (timeout);
 }
 
 // os_systick_sleep_rep_t
@@ -317,9 +318,9 @@ os_timer_destroy (os_timer_t* timer)
 }
 
 os_result_t
-os_timer_start (os_timer_t* timer, os_systicks_t ticks)
+os_timer_start (os_timer_t* timer, os_clock_duration_t timeout)
 {
-  return (os_result_t) (reinterpret_cast<Timer&> (*timer)).start (ticks);
+  return (os_result_t) (reinterpret_cast<Timer&> (*timer)).start (timeout);
 }
 
 os_result_t
@@ -361,9 +362,9 @@ os_mutex_try_lock (os_mutex_t* mutex)
 }
 
 os_result_t
-os_mutex_timed_lock (os_mutex_t* mutex, os_systicks_t ticks)
+os_mutex_timed_lock (os_mutex_t* mutex, os_clock_duration_t timeout)
 {
-  return (os_result_t) (reinterpret_cast<Mutex&> (*mutex)).timed_lock (ticks);
+  return (os_result_t) (reinterpret_cast<Mutex&> (*mutex)).timed_lock (timeout);
 }
 
 os_result_t
@@ -427,10 +428,10 @@ os_condvar_wait (os_condvar_t* condvar, os_mutex_t* mutex)
 
 os_result_t
 os_condvar_timed_wait (os_condvar_t* condvar, os_mutex_t* mutex,
-                       os_systicks_t ticks)
+                       os_clock_duration_t timeout)
 {
   return (os_result_t) (reinterpret_cast<Condition_variable&> (*condvar)).timed_wait (
-      (Mutex&) *mutex, ticks);
+      (Mutex&) *mutex, timeout);
 }
 
 // ----------------------------------------------------------------------------
@@ -472,10 +473,10 @@ os_semaphore_try_wait (os_semaphore_t* semaphore)
 }
 
 os_result_t
-os_semaphore_timed_wait (os_semaphore_t* semaphore, os_systicks_t ticks)
+os_semaphore_timed_wait (os_semaphore_t* semaphore, os_clock_duration_t timeout)
 {
   return (os_result_t) (reinterpret_cast<Semaphore&> (*semaphore)).timed_wait (
-      ticks);
+      timeout);
 }
 
 os_semaphore_count_t
@@ -525,9 +526,9 @@ os_mempool_try_alloc (os_mempool_t* mempool)
 }
 
 void*
-os_mempool_timed_alloc (os_mempool_t* mempool, os_systicks_t ticks)
+os_mempool_timed_alloc (os_mempool_t* mempool, os_clock_duration_t timeout)
 {
-  return (reinterpret_cast<Memory_pool&> (*mempool)).timed_alloc (ticks);
+  return (reinterpret_cast<Memory_pool&> (*mempool)).timed_alloc (timeout);
 }
 
 os_result_t
@@ -612,10 +613,10 @@ os_mqueue_try_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
 
 os_result_t
 os_mqueue_timed_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
-                      os_mqueue_prio_t mprio, os_systicks_t ticks)
+                      os_mqueue_prio_t mprio, os_clock_duration_t timeout)
 {
   return (os_result_t) (reinterpret_cast<Message_queue&> (*mqueue)).timed_send (
-      msg, nbytes, mprio, ticks);
+      msg, nbytes, mprio, timeout);
 }
 
 os_result_t
@@ -636,10 +637,10 @@ os_mqueue_try_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
 
 os_result_t
 os_mqueue_timed_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
-                         os_mqueue_prio_t* mprio, os_systicks_t ticks)
+                         os_mqueue_prio_t* mprio, os_clock_duration_t timeout)
 {
   return (os_result_t) (reinterpret_cast<Message_queue&> (*mqueue)).timed_receive (
-      msg, nbytes, mprio, ticks);
+      msg, nbytes, mprio, timeout);
 }
 
 size_t
@@ -717,11 +718,11 @@ os_evflags_try_wait (os_evflags_t* evflags, os_flags_mask_t mask,
 
 os_result_t
 os_evflags_timed_wait (os_evflags_t* evflags, os_flags_mask_t mask,
-                       os_systicks_t ticks, os_flags_mask_t* oflags,
+                       os_clock_duration_t timeout, os_flags_mask_t* oflags,
                        os_flags_mode_t mode)
 {
   return (os_result_t) (reinterpret_cast<Event_flags&> (*evflags)).timed_wait (
-      mask, ticks, oflags, mode);
+      mask, timeout, oflags, mode);
 }
 
 os_result_t

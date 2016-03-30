@@ -67,8 +67,6 @@ extern "C"
 
   typedef uint32_t os_result_t;
 
-  typedef uint32_t os_systicks_t;
-
   typedef struct os_threads_waiting_list_s
   {
     void* head;
@@ -123,9 +121,7 @@ extern "C"
   (*os_thread_func_t) (os_thread_func_args_t args);
 
   typedef uint8_t os_thread_state_t;
-
   typedef uint8_t os_thread_prio_t;
-
   typedef os_flags_mask_t os_thread_sigset_t;
 
 #pragma GCC diagnostic push
@@ -179,6 +175,10 @@ extern "C"
 
   typedef uint64_t os_clock_timestamp_t;
   typedef uint32_t os_clock_duration_t;
+  typedef struct
+  {
+    ;
+  } os_clock_t;
 
   // --------------------------------------------------------------------------
 
@@ -191,7 +191,7 @@ extern "C"
 
   enum
   {
-//
+    //
     os_timer_run_once = 0,
     os_timer_run_periodic = 1
   };
@@ -202,6 +202,7 @@ extern "C"
   typedef struct os_timer_attr_s
   {
     const char* name;
+    os_clock_t* clock;
     os_timer_type_t tm_type;
   } os_timer_attr_t;
 
@@ -220,6 +221,7 @@ extern "C"
     os_timer_func_t func;
     os_timer_func_args_t func_args;
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
+    os_clock_t* clock;
     os_clock_node_t clock_node;
     os_clock_duration_t period;
 #endif
@@ -269,6 +271,7 @@ extern "C"
   typedef struct os_mutex_attr_s
   {
     const char* name;
+    os_clock_t* clock;
     os_thread_prio_t mx_priority_ceiling;
     os_mutex_protocol_t mx_protocol;
     os_mutex_robustness_t mx_robustness;
@@ -282,6 +285,7 @@ extern "C"
     void* owner;
 #if !defined(OS_INCLUDE_RTOS_PORT_MUTEX)
     os_threads_waiting_list_t list;
+    os_clock_t* clock;
 #endif
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
     os_mutex_port_data_t port;
@@ -302,6 +306,7 @@ extern "C"
   typedef struct os_condvar_attr_s
   {
     const char* name;
+    os_clock_t* clock;
   } os_condvar_attr_t;
 
   typedef struct os_condvar_s
@@ -309,6 +314,7 @@ extern "C"
     const char* name;
 #if !defined(OS_INCLUDE_RTOS_PORT_CONDITION_VARIABLE)
     os_threads_waiting_list_t list;
+    // os_clock_t* clock;
 #endif
   } os_condvar_t;
 
@@ -322,6 +328,7 @@ extern "C"
   typedef struct os_semaphore_attr_s
   {
     const char* name;
+    os_clock_t* clock;
     os_semaphore_count_t sm_initial_count;
     os_semaphore_count_t sm_max_count;
   } os_semaphore_attr_t;
@@ -331,6 +338,7 @@ extern "C"
     const char* name;
 #if !defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
     os_threads_waiting_list_t list;
+    os_clock_t* clock;
 #endif
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
     os_semaphore_port_data_t port;
@@ -352,6 +360,7 @@ extern "C"
   typedef struct os_mempool_attr_s
   {
     const char* name;
+    os_clock_t* clock;
     void* mp_pool_address;
     size_t mp_pool_size_bytes;
   } os_mempool_attr_t;
@@ -361,6 +370,7 @@ extern "C"
     const char* name;
 #if !defined(OS_INCLUDE_RTOS_PORT_MEMORY_POOL)
     os_threads_waiting_list_t list;
+    os_clock_t* clock;
 #endif
     void* pool_addr;
 #if defined(OS_INCLUDE_RTOS_PORT_MEMORY_POOL)
@@ -388,6 +398,7 @@ extern "C"
   typedef struct os_mqueue_attr_s
   {
     const char* name;
+    os_clock_t* clock;
     void* queue_addr;
     size_t queue_size_bytes;
   } os_mqueue_attr_t;
@@ -398,6 +409,7 @@ extern "C"
 #if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
     os_threads_waiting_list_t send_list;
     os_threads_waiting_list_t receive_list;
+    os_clock_t* clock;
     os_mqueue_index_t* prev_array;
     os_mqueue_index_t* next_array;
     os_mqueue_prio_t* prio_array;
@@ -432,6 +444,7 @@ extern "C"
   typedef struct os_evflags_attr_s
   {
     const char* name;
+    os_clock_t* clock;
   } os_evflags_attr_t;
 
   typedef struct os_evflags_s
@@ -439,6 +452,7 @@ extern "C"
     const char* name;
 #if !defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
     os_threads_waiting_list_t list;
+    os_clock_t* clock;
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
@@ -458,7 +472,7 @@ extern "C"
     os_mqueue_t queue;
   } os_mail_queue_t;
 
-  // ----------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
   /**
    * @brief SysTick interrupt handler.

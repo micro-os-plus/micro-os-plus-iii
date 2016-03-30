@@ -50,7 +50,7 @@ namespace os
        * @brief Condition variable attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Attributes : public Named_object
+      class Attributes : public Clocked_attribute
       {
       public:
 
@@ -276,7 +276,8 @@ namespace os
        */
 
 #if !defined(OS_INCLUDE_RTOS_PORT_CONDITION_VARIABLE)
-      port::Waiting_threads_list list_;
+      Waiting_threads_list list_;
+      // Clock& clock_;
 #endif
 
       // Add more internal data.
@@ -299,7 +300,7 @@ namespace os
     {
       inline
       Attributes::Attributes (const char* name) :
-          Named_object
+          Clocked_attribute
             { name }
       {
         ;

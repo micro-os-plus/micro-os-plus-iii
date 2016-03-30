@@ -176,8 +176,8 @@ namespace os
         Named_object
           { attr.name () } //
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
-          , timer_node_
-            { systick_clock.steady_list (), 0, *this }
+          , clock_ (attr.clock != nullptr ? *attr.clock : systick_clock), timer_node_
+            { clock_.steady_list (), 0, *this }
 #endif
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
@@ -263,7 +263,7 @@ namespace os
       period_ = period;
 
       // TODO: If started, stop.
-      timer_node_.timestamp = systick_clock.steady_now () + period;
+      timer_node_.timestamp = clock_.steady_now () + period;
 
         {
           interrupts::Critical_section cs; // ----- Critical section -----
