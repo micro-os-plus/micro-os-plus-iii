@@ -192,7 +192,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     /**
-     * @brief Double linked list node, with timestamp.
+     * @brief Double linked list node, with time stamp.
      */
     class Timestamp_node : public Double_list_links
     {
@@ -204,9 +204,9 @@ namespace os
        */
 
       /**
-       * @brief Create a node with a reference to the list and a timestamp.
+       * @brief Create a node with a reference to the list and a time stamp.
        * @param lst Reference to the list.
-       * @param ts Timestamp.
+       * @param ts Time stamp.
        */
       Timestamp_node (Double_list& lst, clock::timestamp_t ts);
 
@@ -241,7 +241,10 @@ namespace os
        */
 
       /**
-       * @brief Action performed when the timestamp is reached.
+       * @brief Action to perform when the time stamp is reached.
+       * @par Parameters
+       *  None.
+       * @return Nothing.
        */
       virtual void
       action (void) = 0;
@@ -258,7 +261,7 @@ namespace os
        */
 
       /**
-       * @brief Timestamp when the next action will be performed.
+       * @brief Time stamp when the next action will be performed.
        */
       clock::timestamp_t timestamp;
 
@@ -276,7 +279,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     /**
-     * @brief Double linked list node, with timestamp and thread.
+     * @brief Double linked list node, with time stamp and thread.
      */
     class Timeout_thread_node : public Timestamp_node
     {
@@ -289,9 +292,9 @@ namespace os
 
       /**
        * @brief Create a clock timeout node.
-       * @param lst Reference to the list.
-       * @param ts Timestamp.
-       * @param th Reference to thread.
+       * @param [in] lst Reference to the list.
+       * @param [in] ts Time stamp.
+       * @param [in] th Reference to thread.
        */
       Timeout_thread_node (Double_list& lst, clock::timestamp_t ts, Thread& th);
 
@@ -325,6 +328,12 @@ namespace os
        * @{
        */
 
+      /**
+       * @brief Action to perform when the time stamp is reached.
+       * @par Parameters
+       *  None.
+       * @return Nothing.
+       */
       virtual void
       action (void) override;
 
@@ -357,7 +366,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     /**
-     * @brief Double linked list node, with timestamp and timer.
+     * @brief Double linked list node, with time stamp and timer.
      */
     class Timer_node : public Timestamp_node
     {
@@ -370,9 +379,9 @@ namespace os
 
       /**
        * @brief Create a clock timer node.
-       * @param lst Reference to the list.
-       * @param ts Timestamp.
-       * @param tm Reference to timer.
+       * @param [in] lst Reference to the list.
+       * @param [in] ts Time stamp.
+       * @param [in] tm Reference to timer.
        */
       Timer_node (Double_list& lst, clock::timestamp_t ts, Timer& tm);
 
@@ -407,7 +416,10 @@ namespace os
        */
 
       /**
-       * @brief Action to perform when the timestamp is reached.
+       * @brief Action to perform when the time stamp is reached.
+       * @par Parameters
+       *  None.
+       * @return Nothing.
        */
       virtual void
       action (void) override;
@@ -450,7 +462,7 @@ namespace os
        */
 
       /**
-       * Create a list.
+       * @brief Create a list.
        */
       Double_list ();
 
@@ -468,7 +480,7 @@ namespace os
        */
 
       /**
-       * Destroy the list.
+       * @brief Destroy the list.
        */
       ~Double_list ();
 
@@ -485,12 +497,17 @@ namespace os
 
       /**
        * @brief Clear the list.
+       * @par Parameters
+       *  None.
+       * @return Nothing.
        */
       void
       clear (void);
 
       /**
        * @brief Check if the list is empty.
+       * @par Parameters
+       *  None.
        * @retval true The list has no nodes.
        * @retval false The list has at least one node.
        */
@@ -499,6 +516,8 @@ namespace os
 
       /**
        * @brief Get the number of nodes in the list.
+       * @par Parameters
+       *  None.
        * @return A non negative integer with the number of nodes.
        */
       std::size_t
@@ -508,7 +527,8 @@ namespace os
 
       /**
        * @brief Remove the node from the list.
-       * @param node Reference to the list node to remove from the list.
+       * @param [in] node Reference to the list node to remove from the list.
+       * @return Nothing.
        */
       void
       remove (Double_list_links& node);
@@ -559,7 +579,7 @@ namespace os
        */
 
       /**
-       * Create a list of waiting threads.
+       * @brief Create a list of waiting threads.
        */
       Waiting_threads_list ();
 
@@ -577,7 +597,7 @@ namespace os
        */
 
       /**
-       * Destroy the list.
+       * @brief Destroy the list.
        */
       ~Waiting_threads_list ();
 
@@ -594,13 +614,16 @@ namespace os
 
       /**
        * @brief Add a new thread node to the list.
-       * @param node Reference to a list node.
+       * @param [in] node Reference to a list node.
+       * @return Nothing.
        */
       void
       add (Waiting_thread_node& node);
 
       /**
        * @brief Get list head.
+       * @par Parameters
+       *  None.
        * @return Casted pointer.
        */
       Waiting_thread_node*
@@ -608,12 +631,18 @@ namespace os
 
       /**
        * @brief Wake-up one thread (the oldest with the highest priority)
+       * @par Parameters
+       *  None.
+       * @return Nothing.
        */
       void
       resume_one (void);
 
       /**
        * @brief Wake-up all threads in the list.
+       * @par Parameters
+       *  None.
+       * @return Nothing.
        */
       void
       resume_all (void);
@@ -640,7 +669,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @brief Ordered double linked circular list of timestamp nodes.
+     * @brief Ordered double linked circular list of time stamp nodes.
      */
     class Clock_timestamps_list : public Double_list
     {
@@ -652,7 +681,7 @@ namespace os
        */
 
       /**
-       * @brief Create a list clock timestamps.
+       * @brief Create a list of clock time stamps.
        */
       Clock_timestamps_list ();
 
@@ -687,21 +716,25 @@ namespace os
 
       /**
        * @brief Add a new thread node to the list.
-       * @param node Reference to a list node.
+       * @param [in] node Reference to a list node.
+       * @return Nothing.
        */
       void
       add (Timestamp_node& node);
 
       /**
        * @brief Get list head.
+       * @par Parameters
+       *  None.
        * @return Casted pointer.
        */
       Timestamp_node*
       head (void);
 
       /**
-       * @brief Check list timestamps.
-       * @param now The current clock timestamp.
+       * @brief Check list time stamps.
+       * @param [in] now The current clock time stamp.
+       * @return Nothing.
        */
       void
       check_timestamp (clock::timestamp_t now);
@@ -725,6 +758,9 @@ namespace os
 
     // ========================================================================
 
+    /**
+     * @brief RAII list guard.
+     */
     template<typename CS_T, typename List_T, typename Node_T>
       class Thread_list_guard
       {
@@ -750,6 +786,10 @@ namespace os
          * @{
          */
 
+        /**
+         * @brief RAII add node to the list.
+         * @param node Reference to node.
+         */
         Thread_list_guard (Node& node);
 
         /**
@@ -765,6 +805,9 @@ namespace os
          * @endcond
          */
 
+        /**
+         * @brief RAII remove node from the list.
+         */
         ~Thread_list_guard ();
 
         /**
@@ -778,6 +821,9 @@ namespace os
          * @{
          */
 
+        /**
+         * @brief Reference to node.
+         */
         Node& node_;
 
         /**
@@ -791,6 +837,9 @@ namespace os
 
     // ========================================================================
 
+    /**
+     * @brief RAII list guard.
+     */
     template<typename CS_T, typename List_T, typename Node_T>
       class Clock_list_guard
       {
@@ -816,6 +865,10 @@ namespace os
          * @{
          */
 
+        /**
+         * @brief RAII add node to the list.
+         * @param node Reference to node.
+         */
         Clock_list_guard (Node& node);
 
         /**
@@ -831,6 +884,9 @@ namespace os
          * @endcond
          */
 
+        /**
+         * @brief RAII remove node from the list.
+         */
         ~Clock_list_guard ();
 
         /**
@@ -839,6 +895,9 @@ namespace os
 
       protected:
 
+        /**
+         * @brief Reference to node.
+         */
         Node& node_;
       };
 

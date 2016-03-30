@@ -47,6 +47,9 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+    /**
+     * @brief Generic clock.
+     */
     class Clock
     {
     public:
@@ -320,8 +323,7 @@ namespace os
        * @retval EINTR The sleep was interrupted.
        */
       virtual result_t
-      _wait_until (clock::timestamp_t timestamp,
-          Clock_timestamps_list& list);
+      _wait_until (clock::timestamp_t timestamp, Clock_timestamps_list& list);
 
 #endif
 
@@ -435,9 +437,9 @@ namespace os
 
     inline Clock_timestamps_list&
     Clock::steady_list (void)
-    {
-      return steady_list_;
-    }
+      {
+        return steady_list_;
+      }
 
 #endif
 

@@ -218,41 +218,13 @@ namespace os
     void
     Clock::interrupt_service_routine (void)
     {
-      trace::putchar('.');
+      trace::putchar ('.');
 
       ++steady_count_;
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
       steady_list_.check_timestamp (steady_count_);
       adjusted_list_.check_timestamp (steady_count_ + offset_);
-#endif
-
-#if 0
-      if (sleep_count_ > 1)
-        {
-          --sleep_count_;
-        }
-      else if (sleep_count_ == 1)
-        {
-          sleep_count_ = 0;
-
-          steady_list_.wakeup_one ();
-        }
-
-      if (!steady_list_.empty ())
-        {
-
-          for (;;)
-            {
-              clock::timestamp_t head_ts = steady_list_.head ()->timestamp;
-              if (head_ts > steady_count_)
-                {
-                  sleep_count_ = (clock::duration_t) (head_ts - steady_count_);
-                  break;
-                }
-              steady_list_.wakeup_one ();
-            }
-        }
 #endif
 
     }
@@ -281,7 +253,7 @@ namespace os
       return result::ok;
     }
 
-    // ======================================================================
+    // ========================================================================
 
     /**
      * @class Systick_clock
@@ -320,10 +292,13 @@ namespace os
      * @endcode
      */
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    /**
+     * @brief Instance of the SysTick clock.
+     */
     Systick_clock systick_clock;
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     Systick_clock::Systick_clock ()
     {
@@ -335,7 +310,7 @@ namespace os
       ;
     }
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     /**
      * @details
@@ -351,7 +326,7 @@ namespace os
     clock::timestamp_t
     Systick_clock::now (current_t* details)
     {
-      assert(details != nullptr);
+      assert (details != nullptr);
 
       // The core frequency can be returned right away, since
       // is not expected to change during this call.
@@ -402,19 +377,19 @@ namespace os
 
     result_t
     Systick_clock::_wait_until (clock::timestamp_t timestamp,
-        Clock_timestamps_list& list)
-      {
-        result_t res;
+                                Clock_timestamps_list& list)
+    {
+      result_t res;
 
-        clock::timestamp_t now = now();
-        if (now >= timestamp)
-          {
-            return result::ok;
-          }
-        clock::duration_t ticks = timestamp - now;
-        res = port::Systick_clock::wait_for (ticks);
-        return res;
-      }
+      clock::timestamp_t now = now ();
+      if (now >= timestamp)
+        {
+          return result::ok;
+        }
+      clock::duration_t ticks = timestamp - now;
+      res = port::Systick_clock::wait_for (ticks);
+      return res;
+    }
 
 #endif
 
@@ -516,7 +491,7 @@ namespace os
 
     }
 
-    // ======================================================================
+    // ========================================================================
 
     /**
      * @class Realtime_clock
@@ -553,10 +528,13 @@ namespace os
      * @endcode
      */
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
+    /**
+     * @brief Instance of the Real Time clock.
+     */
     Realtime_clock realtime_clock;
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     Realtime_clock::Realtime_clock ()
     {
@@ -568,7 +546,7 @@ namespace os
       ;
     }
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     /**
      * @details
@@ -594,7 +572,7 @@ namespace os
     }
 #endif
 
-  // ----------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
 #pragma GCC diagnostic pop
 
