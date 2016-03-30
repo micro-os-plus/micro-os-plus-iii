@@ -328,6 +328,11 @@ namespace os
 
       /**
        * @}
+       */
+
+    public:
+
+      /**
        * @name Public Member Functions
        * @{
        */
@@ -537,6 +542,11 @@ namespace os
 
       /**
        * @}
+       */
+
+    protected:
+
+      /**
        * @name Private Member Functions
        * @{
        */
@@ -556,7 +566,7 @@ namespace os
        * @return  Nothing.
        */
       void
-      exit (void* exit_ptr = nullptr);
+      _exit (void* exit_ptr = nullptr);
 
       /**
        * @brief Invoke terminating thread function.
@@ -581,8 +591,8 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                flags::mode_t mode);
+      _sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
+                 flags::mode_t mode);
 
       /**
        * @brief Try to wait for signal flags.
@@ -598,8 +608,8 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      try_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                    flags::mode_t mode);
+      _try_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
+                     flags::mode_t mode);
 
       /**
        * @brief Timed wait for signal flags.
@@ -619,8 +629,8 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      timed_sig_wait (thread::sigset_t mask, clock::duration_t timeout,
-                      thread::sigset_t* oflags, flags::mode_t mode);
+      _timed_sig_wait (thread::sigset_t mask, clock::duration_t timeout,
+                       thread::sigset_t* oflags, flags::mode_t mode);
 
       /**
        * @brief Internal wait for signal.
@@ -737,7 +747,7 @@ namespace os
       sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
                 flags::mode_t mode)
       {
-        return this_thread::thread ().sig_wait (mask, oflags, mode);
+        return this_thread::thread ()._sig_wait (mask, oflags, mode);
       }
 
       /**
@@ -749,7 +759,7 @@ namespace os
       try_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
                     flags::mode_t mode)
       {
-        return this_thread::thread ().try_sig_wait (mask, oflags, mode);
+        return this_thread::thread ()._try_sig_wait (mask, oflags, mode);
       }
 
       /**
@@ -761,14 +771,14 @@ namespace os
       timed_sig_wait (thread::sigset_t mask, clock::duration_t timeout,
                       thread::sigset_t* oflags, flags::mode_t mode)
       {
-        return this_thread::thread ().timed_sig_wait (mask, timeout, oflags,
-                                                      mode);
+        return this_thread::thread ()._timed_sig_wait (mask, timeout, oflags,
+                                                       mode);
       }
 
       inline void
       exit (void* exit_ptr)
       {
-        return this_thread::thread ().exit (exit_ptr);
+        return this_thread::thread ()._exit (exit_ptr);
       }
 
     } /* namespace this_thread */

@@ -211,7 +211,7 @@ namespace os
     Thread::_invoke_with_exit (Thread* thread)
     {
       trace::printf ("%s @%p %s\n", __func__, thread, thread->name ());
-      thread->exit (thread->func_ (thread->func_args_));
+      thread->_exit (thread->func_ (thread->func_args_));
     }
 
     /**
@@ -669,7 +669,7 @@ namespace os
      * from the start routine that was used to create it.
      * The function's return value shall serve as the thread's
      * exit status.
-     * The behaviour of `exit()` is undefined if called from a
+     * The behaviour of `_exit()` is undefined if called from a
      * cancellation cleanup handler or destructor function that
      * was invoked as a result of either an implicit or explicit
      * call to `exit()`.
@@ -687,7 +687,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     void
-    Thread::exit (void* exit_ptr)
+    Thread::_exit (void* exit_ptr)
     {
       assert(!scheduler::in_handler_mode ());
 
@@ -919,8 +919,8 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Thread::sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                      flags::mode_t mode)
+    Thread::_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
+                       flags::mode_t mode)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -966,8 +966,8 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Thread::try_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                          flags::mode_t mode)
+    Thread::_try_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
+                           flags::mode_t mode)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -1012,8 +1012,8 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Thread::timed_sig_wait (thread::sigset_t mask, clock::duration_t timeout,
-                            thread::sigset_t* oflags, flags::mode_t mode)
+    Thread::_timed_sig_wait (thread::sigset_t mask, clock::duration_t timeout,
+                             thread::sigset_t* oflags, flags::mode_t mode)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
