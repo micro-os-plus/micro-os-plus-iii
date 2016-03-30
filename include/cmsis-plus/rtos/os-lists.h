@@ -100,8 +100,19 @@ namespace os
        * @{
        */
 
+      /**
+       * @brief Pointer to previous node.
+       */
       Double_list_links* prev;
+
+      /**
+       * @brief Pointer to next node.
+       */
       Double_list_links* next;
+
+      /**
+       * @brief Reference to list linking this node.
+       */
       Double_list& list;
 
       /**
@@ -163,6 +174,9 @@ namespace os
        * @{
        */
 
+      /**
+       * @brief Reference to waiting thread.
+       */
       Thread& thread;
 
       /**
@@ -243,6 +257,9 @@ namespace os
        * @{
        */
 
+      /**
+       * @brief Timestamp when the next action will be performed.
+       */
       clock::timestamp_t timestamp;
 
       /**
@@ -322,6 +339,9 @@ namespace os
        * @{
        */
 
+      /**
+       * @brief Reference to thread who initiated the timeout.
+       */
       Thread& thread;
 
       /**
@@ -403,6 +423,9 @@ namespace os
        * @{
        */
 
+      /**
+       * @brief Reference to waiting timer.
+       */
       Timer& timer;
 
       /**
@@ -707,9 +730,20 @@ namespace os
       {
       public:
 
+        /**
+         * @name Public Types
+         * @{
+         */
+
         using Critical_section = CS_T;
         using List = List_T;
         using Node = Node_T;
+
+        /**
+         * @}
+         */
+
+      public:
 
         /**
          * @name Constructors & Destructor
@@ -762,9 +796,20 @@ namespace os
       {
       public:
 
+        /**
+         * @name Public Types
+         * @{
+         */
+
         using Critical_section = CS_T;
         using List = List_T;
         using Node = Node_T;
+
+        /**
+         * @}
+         */
+
+      public:
 
         /**
          * @name Constructors & Destructor

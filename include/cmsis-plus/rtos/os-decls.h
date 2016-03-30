@@ -791,6 +791,11 @@ namespace os
 
       /**
        * @}
+       */
+
+    public:
+
+      /**
        * @name Public Member Functions
        * @{
        */

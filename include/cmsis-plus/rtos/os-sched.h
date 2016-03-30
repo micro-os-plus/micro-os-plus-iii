@@ -163,6 +163,7 @@ namespace os
         /**
          * @}
          */
+
       protected:
 
         /**
@@ -204,11 +205,6 @@ namespace os
         Lock ();
 
         /**
-         * @brief Destroy the lock.
-         */
-        ~Lock ();
-
-        /**
          * @cond ignore
          */
         Lock (const Lock&) = delete;
@@ -222,7 +218,17 @@ namespace os
          */
 
         /**
+         * @brief Destroy the lock.
+         */
+        ~Lock ();
+
+        /**
          * @}
+         */
+
+      public:
+
+        /**
          * @name Public Member Functions
          * @{
          */
@@ -327,6 +333,11 @@ namespace os
 
         /**
          * @}
+         */
+
+      public:
+
+        /**
          * @name Public Member Functions
          * @{
          */
@@ -412,6 +423,11 @@ namespace os
 
         /**
          * @}
+         */
+
+      public:
+
+        /**
          * @name Public Member Functions
          * @{
          */

@@ -244,6 +244,11 @@ namespace os
 
       /**
        * @}
+       */
+
+    public:
+
+      /**
        * @name Public Member Functions
        * @{
        */
@@ -276,7 +281,23 @@ namespace os
 
     protected:
 
+      /**
+       * @name Private Friends
+       * @{
+       */
+
       friend class Timer_node;
+
+      /**
+       * @}
+       */
+
+    protected:
+
+      /**
+       * @name Private Member Functions
+       * @{
+       */
 
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
@@ -284,6 +305,10 @@ namespace os
       interrupt_service_routine (void);
 
 #endif
+
+      /**
+       * @}
+       */
 
     protected:
 
