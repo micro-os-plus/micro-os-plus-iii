@@ -326,7 +326,7 @@ namespace os
     clock::timestamp_t
     Systick_clock::now (current_t* details)
     {
-      assert (details != nullptr);
+      assert(details != nullptr);
 
       // The core frequency can be returned right away, since
       // is not expected to change during this call.
@@ -381,93 +381,16 @@ namespace os
     {
       result_t res;
 
-      clock::timestamp_t now = now ();
-      if (now >= timestamp)
+      clock::timestamp_t nw = now ();
+      if (nw >= timestamp)
         {
           return result::ok;
         }
-      clock::duration_t ticks = timestamp - now;
+      clock::duration_t ticks = ((clock::duration_t) (timestamp - nw));
       res = port::Systick_clock::wait_for (ticks);
       return res;
     }
 
-#endif
-
-#if 0
-    /**
-     * @details
-     * Put the current thread to sleep until the given number of
-     * SysTick cycles are counted. The first tick counted does
-     * not represent a full SysTick clock period, but only the remaining
-     * part in the current period, which might be almost nothing.
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    result_t
-    Systick_clock::sleep_for (clock::duration_t ticks)
-      {
-        os_assert_err(!scheduler::in_handler_mode (), EPERM);
-
-        trace::printf ("%s(%d_ticks)\n", __func__, ticks);
-
-        clock::timestamp_t prev = systick_clock.now ();
-        clock::duration_t ticks_to_go = ticks;
-        for (;;)
-          {
-            result_t res;
-
-            res = _wait (ticks_to_go);
-
-            clock::timestamp_t now = systick_clock.now ();
-            clock::duration_t slept_ticks = (clock::duration_t) (now
-                - prev);
-            if (slept_ticks >= ticks_to_go)
-              {
-                return ETIMEDOUT;
-              }
-
-            if (this_thread::thread ().interrupted ())
-              {
-                return EINTR;
-              }
-
-            if (res != ETIMEDOUT)
-              {
-                return res;
-              }
-
-            prev = now;
-            ticks_to_go -= slept_ticks;
-          }
-        return ENOTRECOVERABLE;
-      }
-
-    /**
-     * @details
-     * Put the current thread to sleep until a resume(). If the
-     * resume() does not occur until the next n-th
-     * SysTick, the wait() returns with a timeout.
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    result_t
-    Systick_clock::wait (clock::duration_t ticks)
-      {
-        os_assert_err(!scheduler::in_handler_mode (), EPERM);
-
-        trace::printf ("%s(%d_ticks)\n", __func__, ticks);
-
-        result_t res;
-
-        res = _wait (ticks);
-
-        if (this_thread::thread ().interrupted ())
-          {
-            return EINTR;
-          }
-
-        return res;
-      }
 #endif
 
     void
@@ -564,18 +487,10 @@ namespace os
       return result::ok;
     }
 
-#if 0
-  result_t
-  Realtime_clock::_wait (clock::duration_t secs)
-    {
-      return ETIMEDOUT;
-    }
-#endif
-
   // --------------------------------------------------------------------------
 
 #pragma GCC diagnostic pop
 
-}
+  }
 /* namespace rtos */
 } /* namespace os */

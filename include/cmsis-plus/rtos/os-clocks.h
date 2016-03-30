@@ -164,7 +164,7 @@ namespace os
        * @{
        */
 
-#if !defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
+#if !defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR___)
       Clock_timestamps_list steady_list_;
       clock::duration_t volatile sleep_count_;
       Clock_timestamps_list adjusted_list_;
