@@ -317,6 +317,8 @@ namespace os
       joiner_ = nullptr;
       waiting_node_ = nullptr;
 
+      acquired_mutexes_ = 0;
+
       trace::printf ("%s @%p %s %d %d\n", __func__, this, name (), prio_,
                      stack_size_bytes_);
 
@@ -374,6 +376,8 @@ namespace os
         }
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+
+      assert(acquired_mutexes_ == 0);
 
       sched_state_ = thread::state::destroyed;
 

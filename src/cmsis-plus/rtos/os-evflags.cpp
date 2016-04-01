@@ -282,6 +282,11 @@ namespace os
 
 #else
 
+      if (_try_wait (mask, oflags, mode))
+        {
+          return result::ok;
+        }
+
       Thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
@@ -292,11 +297,6 @@ namespace os
 
       for (;;)
         {
-          if (_try_wait (mask, oflags, mode))
-            {
-              return result::ok;
-            }
-
             {
               // Add this thread to the event flags waiting list.
               // It is removed when this block ends (after sleep()).
@@ -309,6 +309,11 @@ namespace os
           if (crt_thread.interrupted ())
             {
               return EINTR;
+            }
+
+          if (_try_wait (mask, oflags, mode))
+            {
+              return result::ok;
             }
         }
 
@@ -390,16 +395,21 @@ namespace os
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
+
       if (timeout == 0)
         {
           timeout = 1;
         }
 
-#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
-
       return port::Event_flags::timed_wait (this, mask, timeout, oflags, mode);
 
 #else
+
+      if (_try_wait (mask, oflags, mode))
+        {
+          return result::ok;
+        }
 
       Thread& crt_thread = this_thread::thread ();
 
@@ -410,22 +420,9 @@ namespace os
         { list_, crt_thread };
 
       clock::timestamp_t start = clock_.steady_now ();
+      clock::duration_t spent = 0;
       for (;;)
         {
-          clock::duration_t spent;
-
-          if (_try_wait (mask, oflags, mode))
-            {
-              return result::ok;
-            }
-
-          clock::timestamp_t now = clock_.steady_now ();
-          spent = (clock::duration_t) (now - start);
-          if (spent >= timeout)
-            {
-              return ETIMEDOUT;
-            }
-
             {
               // Add this thread to the event flags waiting list.
               // It is removed when this block ends (after wait_for()).
@@ -438,6 +435,18 @@ namespace os
           if (crt_thread.interrupted ())
             {
               return EINTR;
+            }
+
+          if (_try_wait (mask, oflags, mode))
+            {
+              return result::ok;
+            }
+
+          clock::timestamp_t now = clock_.steady_now ();
+          spent = (clock::duration_t) (now - start);
+          if (spent >= timeout)
+            {
+              return ETIMEDOUT;
             }
         }
 

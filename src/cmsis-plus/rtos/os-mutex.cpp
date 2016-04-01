@@ -498,6 +498,7 @@ namespace os
             {
               owner_ = crt_thread;
               count_ = 1;
+              ++(crt_thread->acquired_mutexes_);
             }
           // Short critical section ends here.
         }
@@ -615,6 +616,12 @@ namespace os
 
       Thread& crt_thread = this_thread::thread ();
 
+      result_t res = _try_lock (&crt_thread);
+      if (res != EBUSY)
+        {
+          return res;
+        }
+
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
@@ -623,13 +630,6 @@ namespace os
 
       for (;;)
         {
-
-          result_t res = _try_lock (&crt_thread);
-          if (res != EBUSY)
-            {
-              return res;
-            }
-
             {
               // Add this thread to the mutex waiting list.
               // It is removed when this block ends (after sleep()).
@@ -642,6 +642,12 @@ namespace os
           if (crt_thread.interrupted ())
             {
               return EINTR;
+            }
+
+          res = _try_lock (&crt_thread);
+          if (res != EBUSY)
+            {
+              return res;
             }
         }
 
@@ -757,6 +763,12 @@ namespace os
 
       Thread& crt_thread = this_thread::thread ();
 
+      result_t res = _try_lock (&crt_thread);
+      if (res != EBUSY)
+        {
+          return res;
+        }
+
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
@@ -764,23 +776,9 @@ namespace os
         { list_, crt_thread };
 
       clock::timestamp_t start = clock_.steady_now ();
+      clock::duration_t spent = 0;
       for (;;)
         {
-          clock::duration_t spent;
-
-          result_t res = _try_lock (&crt_thread);
-          if (res != EBUSY)
-            {
-              return res;
-            }
-
-          clock::timestamp_t now = clock_.steady_now ();
-          spent = (clock::duration_t) (now - start);
-          if (spent >= timeout)
-            {
-              return ETIMEDOUT;
-            }
-
             {
               // Add this thread to the mutex waiting list.
               // It is removed when this block ends (after wait_for()).
@@ -793,6 +791,19 @@ namespace os
           if (crt_thread.interrupted ())
             {
               return EINTR;
+            }
+
+          res = _try_lock (&crt_thread);
+          if (res != EBUSY)
+            {
+              return res;
+            }
+
+          clock::timestamp_t now = clock_.steady_now ();
+          spent = (clock::duration_t) (now - start);
+          if (spent >= timeout)
+            {
+              return ETIMEDOUT;
             }
         }
 
@@ -858,6 +869,7 @@ namespace os
           trace::printf ("mutex @%p %s unlocked\n", this, name ());
 
           list_.resume_one ();
+          --(owner_->acquired_mutexes_);
           owner_ = nullptr;
           count_ = 0;
 

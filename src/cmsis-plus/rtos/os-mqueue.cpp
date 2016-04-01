@@ -488,6 +488,11 @@ namespace os
 
 #else
 
+      if (_try_send (msg, nbytes, mprio))
+        {
+          return result::ok;
+        }
+
       Thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
@@ -498,12 +503,6 @@ namespace os
 
       for (;;)
         {
-
-          if (_try_send (msg, nbytes, mprio))
-            {
-              return result::ok;
-            }
-
             {
               // Add this thread to the message queue send waiting list.
               // It is removed when this block ends (after sleep()).
@@ -516,6 +515,11 @@ namespace os
           if (crt_thread.interrupted ())
             {
               return EINTR;
+            }
+
+          if (_try_send (msg, nbytes, mprio))
+            {
+              return result::ok;
             }
         }
 
@@ -638,16 +642,21 @@ namespace os
       trace::printf ("%s(%p,%d,%d,%d_ticks) @%p %s\n", __func__, msg, nbytes,
                      mprio, timeout, this, name ());
 
+#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+
       if (timeout == 0)
         {
           timeout = 1;
         }
 
-#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
-
       return port::Message_queue::timed_send (this, msg, nbytes, mprio, timeout);
 
 #else
+
+      if (_try_send (msg, nbytes, mprio))
+        {
+          return result::ok;
+        }
 
       Thread& crt_thread = this_thread::thread ();
 
@@ -658,22 +667,9 @@ namespace os
         { send_list_, crt_thread };
 
       clock::timestamp_t start = clock_.steady_now ();
+      clock::duration_t spent = 0;
       for (;;)
         {
-          clock::duration_t spent;
-
-          if (_try_send (msg, nbytes, mprio))
-            {
-              return result::ok;
-            }
-
-          clock::timestamp_t now = clock_.steady_now ();
-          spent = (clock::duration_t) (now - start);
-          if (spent >= timeout)
-            {
-              return ETIMEDOUT;
-            }
-
             {
               // Add this thread to the message queue send waiting list.
               // It is removed when this block ends (after wait_for()).
@@ -686,6 +682,18 @@ namespace os
           if (crt_thread.interrupted ())
             {
               return EINTR;
+            }
+
+          if (_try_send (msg, nbytes, mprio))
+            {
+              return result::ok;
+            }
+
+          clock::timestamp_t now = clock_.steady_now ();
+          spent = (clock::duration_t) (now - start);
+          if (spent >= timeout)
+            {
+              return ETIMEDOUT;
             }
         }
 
@@ -812,6 +820,11 @@ namespace os
 
 #else
 
+      if (_try_receive (msg, nbytes, mprio))
+        {
+          return result::ok;
+        }
+
       Thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
@@ -822,12 +835,6 @@ namespace os
 
       for (;;)
         {
-
-          if (_try_receive (msg, nbytes, mprio))
-            {
-              return result::ok;
-            }
-
             {
               // Add this thread to the message queue receive waiting list.
               // It is removed when this block ends (after sleep()).
@@ -840,6 +847,11 @@ namespace os
           if (crt_thread.interrupted ())
             {
               return EINTR;
+            }
+
+          if (_try_receive (msg, nbytes, mprio))
+            {
+              return result::ok;
             }
         }
 
@@ -974,17 +986,22 @@ namespace os
       trace::printf ("%s(%p,%d,%d_ticks) @%p %s\n", __func__, msg, nbytes,
                      timeout, this, name ());
 
+#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+
       if (timeout == 0)
         {
           timeout = 1;
         }
 
-#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
-
       return port::Message_queue::timed_receive (this, msg, nbytes, mprio,
           timeout);
 
 #else
+
+      if (_try_receive (msg, nbytes, mprio))
+        {
+          return result::ok;
+        }
 
       Thread& crt_thread = this_thread::thread ();
 
@@ -995,22 +1012,9 @@ namespace os
         { receive_list_, crt_thread };
 
       clock::timestamp_t start = clock_.steady_now ();
+      clock::duration_t spent = 0;
       for (;;)
         {
-          clock::duration_t spent;
-
-          if (_try_receive (msg, nbytes, mprio))
-            {
-              return result::ok;
-            }
-
-          clock::timestamp_t now = clock_.steady_now ();
-          spent = (clock::duration_t) (now - start);
-          if (spent >= timeout)
-            {
-              return ETIMEDOUT;
-            }
-
             {
               // Add this thread to the message queue receive waiting list.
               // It is removed when this block ends (after wait_for()).
@@ -1023,6 +1027,18 @@ namespace os
           if (crt_thread.interrupted ())
             {
               return EINTR;
+            }
+
+          if (_try_receive (msg, nbytes, mprio))
+            {
+              return result::ok;
+            }
+
+          clock::timestamp_t now = clock_.steady_now ();
+          spent = (clock::duration_t) (now - start);
+          if (spent >= timeout)
+            {
+              return ETIMEDOUT;
             }
         }
 

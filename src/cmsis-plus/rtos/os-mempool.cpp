@@ -367,6 +367,12 @@ namespace os
 
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
+      void* p = _try_first ();
+      if (p != nullptr)
+        {
+          return p;
+        }
+
       Thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
@@ -377,13 +383,6 @@ namespace os
 
       for (;;)
         {
-
-          void* p = _try_first ();
-          if (p != nullptr)
-            {
-              return p;
-            }
-
             {
               // Add this thread to the memory pool waiting list.
               // It is removed when this block ends (after sleep()).
@@ -396,6 +395,12 @@ namespace os
           if (this_thread::thread ().interrupted ())
             {
               return nullptr;
+            }
+
+          p = _try_first ();
+          if (p != nullptr)
+            {
+              return p;
             }
         }
 
@@ -441,9 +446,10 @@ namespace os
 
       trace::printf ("%s(%d) @%p %s\n", __func__, timeout, this, name ());
 
-      if (timeout == 0)
+      void* p = _try_first ();
+      if (p != nullptr)
         {
-          timeout = 1;
+          return p;
         }
 
       Thread& crt_thread = this_thread::thread ();
@@ -455,23 +461,9 @@ namespace os
         { list_, crt_thread };
 
       clock::timestamp_t start = clock_.steady_now ();
+      clock::duration_t spent = 0;
       for (;;)
         {
-          clock::duration_t spent;
-
-          void* p = _try_first ();
-          if (p != nullptr)
-            {
-              return p;
-            }
-
-          clock::timestamp_t now = clock_.steady_now ();
-          spent = (clock::duration_t) (now - start);
-          if (spent >= timeout)
-            {
-              return nullptr;
-            }
-
             {
               // Add this thread to the memory pool waiting list.
               // It is removed when this block ends (after wait_for()).
@@ -482,6 +474,19 @@ namespace os
             }
 
           if (this_thread::thread ().interrupted ())
+            {
+              return nullptr;
+            }
+
+          p = _try_first ();
+          if (p != nullptr)
+            {
+              return p;
+            }
+
+          clock::timestamp_t now = clock_.steady_now ();
+          spent = (clock::duration_t) (now - start);
+          if (spent >= timeout)
             {
               return nullptr;
             }

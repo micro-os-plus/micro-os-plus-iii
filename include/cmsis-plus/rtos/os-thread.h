@@ -512,6 +512,8 @@ namespace os
        * @{
        */
 
+      friend class Mutex;
+
       friend void
       this_thread::wait (void);
 
@@ -686,6 +688,7 @@ namespace os
       Timeout_thread_node* clock_node_;
 
       std::size_t stack_size_bytes_;
+      std::size_t acquired_mutexes_;
       thread::state_t sched_state_;
       thread::priority_t prio_;
 

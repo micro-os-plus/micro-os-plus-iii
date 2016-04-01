@@ -407,11 +407,6 @@ namespace os
 
       for (;;)
         {
-          if (_try_wait ())
-            {
-              return result::ok;
-            }
-
             {
               // Add this thread to the semaphore waiting list.
               // It is removed when this block ends (after sleep()).
@@ -424,6 +419,11 @@ namespace os
           if (crt_thread.interrupted ())
             {
               return EINTR;
+            }
+
+          if (_try_wait ())
+            {
+              return result::ok;
             }
         }
 
@@ -529,11 +529,6 @@ namespace os
           return result::ok;
         }
 
-      if (timeout == 0)
-        {
-          timeout = 1;
-        }
-
       Thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
@@ -543,20 +538,9 @@ namespace os
         { list_, crt_thread };
 
       clock::timestamp_t start = clock_.steady_now ();
+      clock::duration_t spent = 0;
       for (;;)
         {
-          if (_try_wait ())
-            {
-              return result::ok;
-            }
-
-          clock::timestamp_t now = clock_.steady_now ();
-          clock::duration_t spent = (clock::duration_t) (now - start);
-          if (spent >= timeout)
-            {
-              return ETIMEDOUT;
-            }
-
             {
               // Add this thread to the semaphore waiting list.
               // It is removed when this block ends (after wait()).
@@ -569,6 +553,18 @@ namespace os
           if (crt_thread.interrupted ())
             {
               return EINTR;
+            }
+
+          if (_try_wait ())
+            {
+              return result::ok;
+            }
+
+          clock::timestamp_t now = clock_.steady_now ();
+          spent = (clock::duration_t) (now - start);
+          if (spent >= timeout)
+            {
+              return ETIMEDOUT;
             }
         }
 
