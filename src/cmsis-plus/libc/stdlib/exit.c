@@ -86,7 +86,7 @@ __reset_hardware(void);
 void __attribute__((weak, noreturn))
 _Exit (int code __attribute__((unused)))
 {
-  trace_puts ("%s()", __func__);
+  trace_printf ("%s()", __func__);
 #if !defined(DEBUG)
   __reset_hardware();
 #else
