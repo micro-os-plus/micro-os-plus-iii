@@ -61,10 +61,6 @@ extern "C"
 
   // --------------------------------------------------------------------------
 
-// #define OS_THREAD_PRIO_SIZE_PTR (OS_INTEGER_MAX_NUMBER_OF_THREADS+1)
-
-// --------------------------------------------------------------------------
-
   typedef uint32_t os_result_t;
 
   typedef struct os_threads_waiting_list_s
@@ -123,6 +119,13 @@ extern "C"
   typedef uint8_t os_thread_state_t;
   typedef uint8_t os_thread_prio_t;
   typedef os_flags_mask_t os_thread_sigset_t;
+
+#if !defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE) && !defined(__cplusplus)
+  typedef struct
+  {
+    ;
+  } os_thread_user_storage_t;
+#endif
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
