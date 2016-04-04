@@ -419,7 +419,9 @@ namespace os
       owner_ = nullptr;
       count_ = 0;
 
+#if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
@@ -456,7 +458,9 @@ namespace os
      */
     Mutex::~Mutex ()
     {
+#if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
@@ -520,8 +524,10 @@ namespace os
                   owner_->sched_prio (prio_ceiling_);
                 }
             }
+#if defined(OS_TRACE_RTOS_MUTEX)
           trace::printf ("mutex @%p %s locked by %p %s\n", this, name (),
-                         crt_thread, crt_thread->name ());
+              crt_thread, crt_thread->name ());
+#endif
           return result::ok;
         }
 
@@ -534,8 +540,10 @@ namespace os
                   return EAGAIN;
                 }
               ++count_;
+#if defined(OS_TRACE_RTOS_MUTEX)
               trace::printf ("mutex @%p %s incr %d by %p %s\n", this, name (),
-                             count_, crt_thread, crt_thread->name ());
+                  count_, crt_thread, crt_thread->name ());
+#endif
               return result::ok;
             }
           else if (type_ == mutex::type::errorcheck)
@@ -605,8 +613,10 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
-                     &this_thread::thread (), this_thread::thread ().name ());
+          &this_thread::thread (), this_thread::thread ().name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
@@ -695,8 +705,10 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
-                     &this_thread::thread (), this_thread::thread ().name ());
+          &this_thread::thread (), this_thread::thread ().name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
@@ -751,9 +763,11 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s(%d_ticks) @%p %s by %p %s\n", __func__, timeout, this,
-                     name (), &this_thread::thread (),
-                     this_thread::thread ().name ());
+          name (), &this_thread::thread (),
+          this_thread::thread ().name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
@@ -838,8 +852,10 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
-                     &this_thread::thread (), this_thread::thread ().name ());
+          &this_thread::thread (), this_thread::thread ().name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
@@ -856,7 +872,9 @@ namespace os
           if ((type_ == mutex::type::recursive) && (count_ > 1))
             {
               --count_;
+#if defined(OS_TRACE_RTOS_MUTEX)
               trace::printf ("mutex @%p %s decr %d\n", this, name (), count_);
+#endif
               return result::ok;
             }
 
@@ -866,7 +884,9 @@ namespace os
               owner_->sched_prio (owner_prio_);
             }
 
+#if defined(OS_TRACE_RTOS_MUTEX)
           trace::printf ("mutex @%p %s unlocked\n", this, name ());
+#endif
 
           list_.resume_one ();
           --(owner_->acquired_mutexes_);
@@ -904,7 +924,9 @@ namespace os
     {
       assert(!scheduler::in_handler_mode ());
 
+#if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
@@ -943,7 +965,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
@@ -1006,7 +1030,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
@@ -1033,7 +1059,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
       scheduler::Critical_section cs; // ----- Critical section -----
 

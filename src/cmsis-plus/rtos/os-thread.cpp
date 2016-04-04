@@ -41,24 +41,6 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-#pragma GCC diagnostic push
-// TODO: remove it when fully implemented
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
-#if 0
-    void*
-    no_thread_func (void* args);
-
-    void*
-    no_thread_func (void* args)
-      {
-        return nullptr;
-      }
-
-    Thread no_thread
-      { nullptr, (thread::func_t) no_thread_func, nullptr};
-#endif
-
     /**
      * @details
      * The os::rtos::stack namespace groups declarations related to
@@ -210,7 +192,9 @@ namespace os
     void
     Thread::_invoke_with_exit (Thread* thread)
     {
+#if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s @%p %s\n", __func__, thread, thread->name ());
+#endif
       thread->_exit (thread->func_ (thread->func_args_));
     }
 
@@ -319,8 +303,13 @@ namespace os
 
       acquired_mutexes_ = 0;
 
+      clock_node_ = nullptr;
+      func_result_ = nullptr;
+
+#if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s @%p %s %d %d\n", __func__, this, name (), prio_,
-                     stack_size_bytes_);
+          stack_size_bytes_);
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
@@ -359,6 +348,9 @@ namespace os
      */
     Thread::~Thread ()
     {
+#if defined(OS_TRACE_RTOS_THREAD)
+      trace::printf ("%s @%p %s \n", __func__, this, name ());
+#endif
       // Prevent the main thread to destroy itself while running
       // the exit cleanup code.
       if (this != &this_thread::thread ())
@@ -375,7 +367,9 @@ namespace os
           return;
         }
 
+#if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
       assert(acquired_mutexes_ == 0);
 
@@ -403,7 +397,9 @@ namespace os
     void
     Thread::_wait (void)
     {
+#if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
@@ -428,7 +424,9 @@ namespace os
     void
     Thread::resume (void)
     {
+#if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
@@ -484,7 +482,9 @@ namespace os
       os_assert_err(prio < thread::priority::error, EINVAL);
       os_assert_err(prio != thread::priority::none, EINVAL);
 
+#if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s(%d) @%p %s\n", __func__, prio, this, name ());
+#endif
 
       prio_ = prio;
 
@@ -540,7 +540,9 @@ namespace os
 
       // TODO: Must fail if current thread
 
+#if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
       while ((sched_state_ != thread::state::terminated)
           && (sched_state_ != thread::state::destroyed))
@@ -553,7 +555,9 @@ namespace os
         {
           *exit_ptr = func_result_;
         }
+#if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s joined\n", __func__, this, name ());
+#endif
 
       return result::ok;
     }
@@ -581,7 +585,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
@@ -621,7 +627,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
       // TODO
       return result::ok;
@@ -675,12 +683,16 @@ namespace os
     {
       assert(!scheduler::in_handler_mode ());
 
+#if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
       if (sched_state_ == thread::state::terminated)
         {
+#if defined(OS_TRACE_RTOS_THREAD)
           trace::printf ("%s() @%p %s already terminated\n", __func__, this,
-                         name ());
+              name ());
+#endif
           return; // Already terminated
         }
 
@@ -711,13 +723,17 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
       if ((sched_state_ == thread::state::terminated)
           || (sched_state_ == thread::state::destroyed))
         {
+#if defined(OS_TRACE_RTOS_THREAD)
           trace::printf ("%s() @%p %s already terminated\n", __func__, this,
-                         name ());
+              name ());
+#endif
           return result::ok; // Already terminated
         }
 
@@ -760,7 +776,9 @@ namespace os
     {
       os_assert_err(mask != 0, EINVAL);
 
+#if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
+#endif
 
       interrupts::Critical_section cs; // ----- Critical section -----
 
@@ -792,7 +810,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), thread::sig::all);
 
+#if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
+#endif
 
       interrupts::Critical_section cs; // ----- Critical section -----
 
@@ -824,7 +844,9 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(mask != 0, EINVAL);
 
+#if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
+#endif
 
       interrupts::Critical_section cs; // ----- Critical section -----
 
@@ -908,11 +930,15 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s(0x%X, %d) @%p %s\n", __func__, mask, mode, this,
-                     name ());
+          name ());
+#endif
 
+#if defined(OS_TRACE_RTOS_THREAD)
       clock::timestamp_t prev = systick_clock.now ();
       clock::duration_t slept_ticks = 0;
+#endif
       for (;;)
         {
             {
@@ -920,10 +946,12 @@ namespace os
 
               if (_try_wait (mask, oflags, mode) == result::ok)
                 {
+#if defined(OS_TRACE_RTOS_THREAD)
                   slept_ticks =
                       (clock::duration_t) (systick_clock.now () - prev);
                   trace::printf ("%s(0x%X, %d)=%d @%p %s\n", __func__, mask,
-                                 mode, slept_ticks, this, name ());
+                      mode, slept_ticks, this, name ());
+#endif
                   return result::ok;
                 }
             }
@@ -955,8 +983,10 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s(0x%X, %d) @%p %s\n", __func__, mask, mode, this,
-                     name ());
+          name ());
+#endif
 
       interrupts::Critical_section cs; // ----- Critical section -----
 
@@ -1001,8 +1031,10 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s(0x%X, %d, %d) @%p %s\n", __func__, mask, mode, timeout,
-                     this, name ());
+          this, name ());
+#endif
 
       if (timeout == 0)
         {
@@ -1054,9 +1086,9 @@ namespace os
           prev = now;
         }
 
-#if 1
+#if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s(0x%X, %d, %d)=%d @%p %s\n", __func__, mask, mode,
-                     timeout, slept_ticks, this, name ());
+          timeout, slept_ticks, this, name ());
 #endif
 
       return res;

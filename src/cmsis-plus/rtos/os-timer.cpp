@@ -41,10 +41,6 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-#pragma GCC diagnostic push
-// TODO: remove it when fully implemented
-//#pragma GCC diagnostic ignored "-Wunused-parameter"
-
     /**
      * @details
      * The os::rtos::timer namespace groups timer types, enumerations,
@@ -187,7 +183,9 @@ namespace os
       func_ = function;
       func_args_ = args;
 
+#if defined(OS_TRACE_RTOS_TIMER)
       trace::printf ("%s() @%p \n", __func__, this);
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
@@ -213,7 +211,9 @@ namespace os
      */
     Timer::~Timer ()
     {
+#if defined(OS_TRACE_RTOS_TIMER)
       trace::printf ("%s() @%p \n", __func__, this);
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
@@ -245,7 +245,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_TIMER)
       trace::printf ("%s(%d) @%p \n", __func__, period, this);
+#endif
 
       if (period == 0)
         {
@@ -294,7 +296,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_TIMER)
       trace::printf ("%s() @%p \n", __func__, this);
+#endif
 
       if (state_ != timer::state::running)
         {
@@ -340,7 +344,9 @@ namespace os
           state_ = timer::state::completed;
         }
 
+#if defined(OS_INCLUDE_RTOS_PORT_TIMER)
       trace::puts (name ());
+#endif
 
       // Call the user function.
       func_ (func_args_);
@@ -349,8 +355,6 @@ namespace os
 #endif
 
   // ------------------------------------------------------------------------
-
-#pragma GCC diagnostic pop
 
   } /* namespace rtos */
 } /* namespace os */

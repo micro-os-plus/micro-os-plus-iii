@@ -232,8 +232,10 @@ namespace os
 #endif
         }
 
+#if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), msgs_,
-                     msg_size_bytes_);
+          msg_size_bytes_);
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
@@ -282,7 +284,9 @@ namespace os
      */
     Message_queue::~Message_queue ()
     {
+#if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
@@ -479,8 +483,10 @@ namespace os
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
 
+#if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes, mprio,
-                     this, name ());
+          this, name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
@@ -565,8 +571,10 @@ namespace os
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
 
+#if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes, mprio,
-                     this, name ());
+          this, name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
@@ -639,8 +647,10 @@ namespace os
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
 
+#if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d,%d,%d_ticks) @%p %s\n", __func__, msg, nbytes,
-                     mprio, timeout, this, name ());
+          mprio, timeout, this, name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
@@ -811,8 +821,10 @@ namespace os
       os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
       os_assert_err(nbytes <= mqueue::max_size, EMSGSIZE);
 
+#if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d) @%p %s\n", __func__, msg, nbytes, this,
-                     name ());
+          name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
@@ -897,8 +909,10 @@ namespace os
       os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
       os_assert_err(nbytes <= mqueue::max_size, EMSGSIZE);
 
+#if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d) @%p %s\n", __func__, msg, nbytes, this,
-                     name ());
+          name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
@@ -983,8 +997,10 @@ namespace os
       os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
       os_assert_err(nbytes <= mqueue::max_size, EMSGSIZE);
 
+#if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d,%d_ticks) @%p %s\n", __func__, msg, nbytes,
-                     timeout, this, name ());
+          timeout, this, name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
@@ -1065,7 +1081,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 

@@ -204,8 +204,10 @@ namespace os
 
       count_ = attr.sm_initial_count;
 
+#if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), count_,
-                     max_count_);
+          max_count_);
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
 
@@ -238,7 +240,9 @@ namespace os
      */
     Semaphore::~Semaphore ()
     {
+#if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
 
@@ -310,7 +314,9 @@ namespace os
     result_t
     Semaphore::post (void)
     {
+#if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
 
@@ -385,7 +391,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
 
@@ -456,7 +464,9 @@ namespace os
     result_t
     Semaphore::try_wait ()
     {
+#if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
 
@@ -512,7 +522,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s(%d_ticks) @%p %s\n", __func__, timeout, this, name ());
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
 

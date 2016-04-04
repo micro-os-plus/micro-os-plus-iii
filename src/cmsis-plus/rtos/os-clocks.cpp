@@ -82,10 +82,6 @@ namespace os
 
     // ========================================================================
 
-#pragma GCC diagnostic push
-// TODO: remove it when fully implemented
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
     Clock::Clock ()
     {
       steady_count_ = 0;
@@ -131,7 +127,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_CLOCKS)
       trace::printf ("%s(%d_ticks)\n", __func__, duration);
+#endif
 
       clock::timestamp_t timestamp = steady_now () + duration;
       for (;;)
@@ -163,7 +161,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_CLOCKS)
       trace::printf ("%s()\n", __func__);
+#endif
 
       for (;;)
         {
@@ -194,7 +194,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_CLOCKS)
       trace::printf ("%s(%d_ticks)\n", __func__, timeout);
+#endif
 
       clock::timestamp_t timestamp = steady_now () + timeout;
 
@@ -218,7 +220,9 @@ namespace os
     void
     Clock::interrupt_service_routine (void)
     {
-      trace::putchar ('.');
+#if defined(OS_TRACE_RTOS_CLOCKS)
+      // trace::putchar ('.');
+#endif
 
       ++steady_count_;
 
@@ -377,19 +381,19 @@ namespace os
 
     result_t
     Systick_clock::_wait_until (clock::timestamp_t timestamp,
-                                Clock_timestamps_list& list)
-    {
-      result_t res;
+        Clock_timestamps_list& list)
+      {
+        result_t res;
 
-      clock::timestamp_t nw = now ();
-      if (nw >= timestamp)
-        {
-          return result::ok;
-        }
-      clock::duration_t ticks = ((clock::duration_t) (timestamp - nw));
-      res = port::Systick_clock::wait_for (ticks);
-      return res;
-    }
+        clock::timestamp_t nw = now ();
+        if (nw >= timestamp)
+          {
+            return result::ok;
+          }
+        clock::duration_t ticks = ((clock::duration_t) (timestamp - nw));
+        res = port::Systick_clock::wait_for (ticks);
+        return res;
+      }
 
 #endif
 
@@ -488,8 +492,6 @@ namespace os
     }
 
   // --------------------------------------------------------------------------
-
-#pragma GCC diagnostic pop
 
   }
 /* namespace rtos */

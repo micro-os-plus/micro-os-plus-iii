@@ -45,10 +45,6 @@ namespace os
   namespace rtos
   {
 
-#pragma GCC diagnostic push
-// TODO: remove it when fully implemented
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
     /**
      * @details
      * The `os::rtos::scheduler` namespace groups scheduler types
@@ -366,8 +362,6 @@ namespace os
 #endif
 
   // ==========================================================================
-
-#pragma GCC diagnostic pop
 
   } /* namespace rtos */
 } /* namespace os */

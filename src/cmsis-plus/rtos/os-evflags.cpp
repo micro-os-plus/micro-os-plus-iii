@@ -41,10 +41,6 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-#pragma GCC diagnostic push
-// TODO: remove it when fully implemented
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
     /**
      * @details
      * The os::rtos::evflags namespace groups event flags attributes
@@ -168,7 +164,9 @@ namespace os
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s() @%p \n", __func__, this);
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
@@ -176,7 +174,7 @@ namespace os
 
 #else
 
-      ;
+      flags_ = 0;
 
 #endif
 
@@ -197,7 +195,9 @@ namespace os
      */
     Event_flags::~Event_flags ()
     {
+#if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s() @%p \n", __func__, this);
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
@@ -276,6 +276,10 @@ namespace os
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_EVFLAGS)
+      trace::printf ("%s() @%p %X \n", __func__, this, mask);
+#endif
+
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
       return port::Event_flags::wait (this, mask, oflags, mode);
@@ -338,6 +342,9 @@ namespace os
     Event_flags::try_wait (flags::mask_t mask, flags::mask_t* oflags,
                            flags::mode_t mode)
     {
+#if defined(OS_TRACE_RTOS_EVFLAGS)
+      trace::printf ("%s() @%p %X \n", __func__, this, mask);
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
@@ -394,6 +401,10 @@ namespace os
                              flags::mask_t* oflags, flags::mode_t mode)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
+
+#if defined(OS_TRACE_RTOS_EVFLAGS)
+      trace::printf ("%s() @%p %X \n", __func__, this, mask);
+#endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
@@ -542,6 +553,10 @@ namespace os
     flags::mask_t
     Event_flags::get (flags::mask_t mask, flags::mode_t mode)
     {
+#if defined(OS_TRACE_RTOS_EVFLAGS)
+      trace::printf ("%s() @%p %0X \n", __func__, this, mask);
+#endif
+
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
       return port::Event_flags::get (this, mask, mode);
@@ -589,8 +604,6 @@ namespace os
     }
 
 // --------------------------------------------------------------------------
-
-#pragma GCC diagnostic pop
 
   } /* namespace rtos */
 } /* namespace os */

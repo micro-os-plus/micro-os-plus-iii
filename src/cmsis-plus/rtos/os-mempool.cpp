@@ -256,8 +256,10 @@ namespace os
 
       flags_ = 0;
 
+#if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), blocks_,
-                     block_size_bytes_);
+          block_size_bytes_);
+#endif
 
       if (pool_addr_ == nullptr)
         {
@@ -295,7 +297,9 @@ namespace os
      */
     Memory_pool::~Memory_pool ()
     {
+#if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
       assert(list_.empty ());
 
@@ -365,7 +369,9 @@ namespace os
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
       void* p = _try_first ();
       if (p != nullptr)
@@ -422,7 +428,9 @@ namespace os
     void*
     Memory_pool::try_alloc (void)
     {
+#if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
       return _try_first ();
     }
@@ -444,7 +452,9 @@ namespace os
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s(%d) @%p %s\n", __func__, timeout, this, name ());
+#endif
 
       void* p = _try_first ();
       if (p != nullptr)
@@ -509,7 +519,9 @@ namespace os
     result_t
     Memory_pool::free (void* block)
     {
+#if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
       // Validate pointer.
       if ((block < pool_addr_)
@@ -551,7 +563,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
 
         {
           interrupts::Critical_section cs; // ----- Critical section -----

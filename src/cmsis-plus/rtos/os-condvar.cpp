@@ -41,10 +41,6 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-#pragma GCC diagnostic push
-// TODO: remove it when fully implemented
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
     /**
      * @details
      * The `os::rtos::condvar` namespace groups condition variable attributes
@@ -275,7 +271,9 @@ namespace os
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s() @%p \n", __func__, this);
+#endif
     }
 
     /**
@@ -298,7 +296,9 @@ namespace os
      */
     Condition_variable::~Condition_variable ()
     {
+#if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s() @%p \n", __func__, this);
+#endif
 
       assert(list_.empty ());
     }
@@ -342,7 +342,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s() @%p \n", __func__, this);
+#endif
 
       list_.resume_one ();
 
@@ -409,7 +411,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s() @%p \n", __func__, this);
+#endif
 
       list_.resume_all ();
 
@@ -503,7 +507,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s() @%p \n", __func__, this);
+#endif
 
       Thread& crt_thread = this_thread::thread ();
 
@@ -639,7 +645,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s(%d_ticks) @%p \n", __func__, timeout, this);
+#endif
 
       Thread& crt_thread = this_thread::thread ();
 
@@ -672,8 +680,6 @@ namespace os
     }
 
   // --------------------------------------------------------------------------
-
-#pragma GCC diagnostic pop
 
   } /* namespace rtos */
 } /* namespace os */

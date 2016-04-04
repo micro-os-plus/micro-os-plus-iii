@@ -182,7 +182,9 @@ namespace os
               // Insert at the beginning of the list
               // and update the new head.
               head_ = &node;
+#if defined(OS_TRACE_RTOS_LISTS)
               trace::printf ("%s() head \n", __func__);
+#endif
             }
           else
             {
@@ -239,7 +241,9 @@ namespace os
         }
       else
         {
+#if defined(OS_TRACE_RTOS_LISTS)
           trace::printf ("%s() gone \n", __func__);
+#endif
         }
     }
 
@@ -352,7 +356,9 @@ namespace os
           node.prev = &node;
           node.next = &node;
 
+#if defined(OS_TRACE_RTOS_LISTS)
           trace::printf ("%s() %u \n", __func__, (uint32_t) node.timestamp);
+#endif
 
           head_ = &node;
           count_ = 1;
@@ -372,7 +378,9 @@ namespace os
               // Insert at the beginning of the list
               // and update the new head.
               head_ = &node;
+#if defined(OS_TRACE_RTOS_LISTS)
               trace::printf ("%s() head \n", __func__);
+#endif
             }
           else
             {
@@ -386,9 +394,11 @@ namespace os
 
           ++count_;
 
+#if defined(OS_TRACE_RTOS_LISTS)
           trace::printf ("%s() %u after %u #%d\n", __func__,
-                         (uint32_t) timestamp, (uint32_t) after->timestamp,
-                         count_);
+              (uint32_t) timestamp, (uint32_t) after->timestamp,
+              count_);
+#endif
 
           assert(after->timestamp != 0);
 
@@ -419,8 +429,10 @@ namespace os
           clock::timestamp_t head_ts = ((Timeout_thread_node*) head_)->timestamp;
           if (now >= head_ts)
             {
+#if defined(OS_TRACE_RTOS_LISTS)
               trace::printf ("%s() %u \n", __func__,
-                             (uint32_t) systick_clock.now ());
+                  (uint32_t) systick_clock.now ());
+#endif
               head ()->action ();
             }
           else
