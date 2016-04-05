@@ -70,7 +70,7 @@ namespace os
 // ----------------------------------------------------------------------------
 
 /**
- * @brief Default implementaion of main().
+ * @brief Default implementation of main().
  */
 int __attribute__((weak))
 main (int argc, char* argv[])
