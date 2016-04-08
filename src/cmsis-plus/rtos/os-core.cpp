@@ -211,6 +211,67 @@ namespace os
 
     } /* namespace scheduler */
 
+    namespace scheduler
+    {
+
+      void
+      _link_node (Waiting_thread_node& node)
+      {
+        // Remove this thread from the ready list, if there.
+        port::this_thread::prepare_suspend ();
+
+        // Add this thread to the node waiting list.
+        ((Waiting_threads_list&) (node.list)).add (node);
+        node.thread.waiting_node_ = &node;
+      }
+
+      void
+      _unlink_node (Waiting_thread_node& node)
+      {
+          {
+            interrupts::Critical_section ics; // ----- Critical section -----
+
+            // Remove the thread from the node waiting list,
+            // if not already removed.
+            node.thread.waiting_node_ = nullptr;
+            node.list.remove (node);
+          }
+      }
+
+      void
+      _link_node (Waiting_thread_node& node, Timeout_thread_node& timeout_node)
+      {
+        // Remove this thread from the ready list, if there.
+        port::this_thread::prepare_suspend ();
+
+        // Add this thread to the node waiting list.
+        ((Waiting_threads_list&) (node.list)).add (node);
+        node.thread.waiting_node_ = &node;
+
+        // Add this thread to the clock timeout list.
+        ((Clock_timestamps_list&) (timeout_node.list)).add (timeout_node);
+        timeout_node.thread.clock_node_ = &timeout_node;
+      }
+
+      void
+      _unlink_node (Waiting_thread_node& node,
+                    Timeout_thread_node& timeout_node)
+      {
+        interrupts::Critical_section ics; // ----- Critical section -----
+
+        // Remove the thread from the clock timeout list,
+        // if not already removed by the timer.
+        timeout_node.thread.clock_node_ = nullptr;
+        timeout_node.list.remove (timeout_node);
+
+        // Remove the thread from the node waiting list,
+        // if not already removed.
+        node.thread.waiting_node_ = nullptr;
+        node.list.remove (node);
+      }
+
+    } /* namespace this_thread */
+
 #if 0
     namespace scheduler
       {

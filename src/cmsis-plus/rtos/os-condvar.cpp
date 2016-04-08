@@ -531,11 +531,15 @@ namespace os
 
         {
           // Add this thread to the condition variable waiting list.
-          // It is removed when this block ends (after lock()).
-          Waiting_threads_list_guard<scheduler::Critical_section> lg
-            { node };
+          ((Waiting_threads_list&) (node.list)).add (node);
+          node.thread.waiting_node_ = &node;
 
           res = mutex.lock ();
+
+          // Remove the thread from the node waiting list,
+          // if not already removed.
+          node.thread.waiting_node_ = nullptr;
+          node.list.remove (node);
         }
 
       return res;
@@ -669,11 +673,15 @@ namespace os
 
         {
           // Add this thread to the condition variable waiting list.
-          // It is removed when this block ends (after timed_lock()).
-          Waiting_threads_list_guard<scheduler::Critical_section> lg
-            { node };
+          ((Waiting_threads_list&) (node.list)).add (node);
+          node.thread.waiting_node_ = &node;
 
           res = mutex.timed_lock (timeout);
+
+          // Remove the thread from the node waiting list,
+          // if not already removed.
+          node.thread.waiting_node_ = nullptr;
+          node.list.remove (node);
         }
 
       return res;

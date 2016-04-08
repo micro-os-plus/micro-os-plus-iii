@@ -492,42 +492,6 @@ namespace os
 
 #else
 
-#if 0
-      if (_try_send (msg, nbytes, mprio))
-        {
-          return result::ok;
-        }
-
-      Thread& crt_thread = this_thread::thread ();
-
-      // Prepare a list node pointing to the current thread.
-      // Do not worry for being on stack, it is temporarily linked to the
-      // list and guaranteed to be removed before this function returns.
-      Waiting_thread_node node
-        { send_list_, crt_thread};
-
-      for (;;)
-        {
-            {
-              // Add this thread to the message queue send waiting list.
-              // It is removed when this block ends (after sleep()).
-              Waiting_threads_list_guard<interrupts::Critical_section> lg
-                { node};
-
-              this_thread::wait ();
-            }
-
-          if (crt_thread.interrupted ())
-            {
-              return EINTR;
-            }
-
-          if (_try_send (msg, nbytes, mprio))
-            {
-              return result::ok;
-            }
-        }
-#else
         {
           interrupts::Critical_section ics; // ----- Critical section -----
 
@@ -555,24 +519,15 @@ namespace os
                   return result::ok;
                 }
 
-              // Remove this thread from the ready list, if there.
-              port::this_thread::prepare_suspend ();
-
               // Add this thread to the message queue send waiting list.
-              send_list_.add (node);
-              crt_thread.waiting_node_ = &node;
+              scheduler::_link_node (node);
             }
 
           port::scheduler::reschedule ();
 
-            {
-              interrupts::Critical_section ics; // ----- Critical section -----
-
-              // Remove the thread from the message queue send waiting list,
-              // if not already removed by receive().
-              crt_thread.waiting_node_ = nullptr;
-              send_list_.remove (node);
-            }
+          // Remove the thread from the message queue send waiting list,
+          // if not already removed by receive().
+          scheduler::_unlink_node (node);
 
           if (crt_thread.interrupted ())
             {
@@ -580,7 +535,6 @@ namespace os
             }
         }
 
-#endif
       /* NOTREACHED */
       return ENOTRECOVERABLE;
 
@@ -753,33 +707,17 @@ namespace os
                   return result::ok;
                 }
 
-              // Remove this thread from the ready list, if there.
-              port::this_thread::prepare_suspend ();
-
-              // Add this thread to the semaphore waiting list.
-              send_list_.add (node);
-              crt_thread.waiting_node_ = &node;
-
-              // Add this thread to the clock timeout list.
-              clock_list.add (timeout_node);
-              crt_thread.clock_node_ = &timeout_node;
+              // Add this thread to the semaphore waiting list,
+              // and the clock timeout list.
+              scheduler::_link_node (node, timeout_node);
             }
 
           port::scheduler::reschedule ();
 
-            {
-              interrupts::Critical_section ics; // ----- Critical section -----
-
-              // Remove the thread from the clock timeout list,
-              // if not already removed by the timer.
-              crt_thread.clock_node_ = nullptr;
-              clock_list.remove (timeout_node);
-
-              // Remove the thread from the message queue send waiting list,
-              // if not already removed by receive().
-              crt_thread.waiting_node_ = nullptr;
-              send_list_.remove (node);
-            }
+          // Remove the thread from the message queue send waiting list,
+          // if not already removed by receive() and from the clock timeout list,
+          // if not already removed by the timer.
+          scheduler::_unlink_node (node, timeout_node);
 
           if (crt_thread.interrupted ())
             {
@@ -943,24 +881,15 @@ namespace os
                   return result::ok;
                 }
 
-              // Remove this thread from the ready list, if there.
-              port::this_thread::prepare_suspend ();
-
               // Add this thread to the message queue receive waiting list.
-              receive_list_.add (node);
-              crt_thread.waiting_node_ = &node;
+              scheduler::_link_node (node);
             }
 
           port::scheduler::reschedule ();
 
-            {
-              interrupts::Critical_section ics; // ----- Critical section -----
-
-              // Remove the thread from the message queue receive waiting list,
-              // if not already removed by send().
-              crt_thread.waiting_node_ = nullptr;
-              receive_list_.remove (node);
-            }
+          // Remove the thread from the message queue receive waiting list,
+          // if not already removed by send().
+          scheduler::_unlink_node (node);
 
           if (crt_thread.interrupted ())
             {
@@ -1153,33 +1082,17 @@ namespace os
                   return result::ok;
                 }
 
-              // Remove this thread from the ready list, if there.
-              port::this_thread::prepare_suspend ();
-
-              // Add this thread to the message queue receive waiting list.
-              receive_list_.add (node);
-              crt_thread.waiting_node_ = &node;
-
-              // Add this thread to the clock timeout list.
-              clock_list.add (timeout_node);
-              crt_thread.clock_node_ = &timeout_node;
+              // Add this thread to the message queue receive waiting list,
+              // and the clock timeout list.
+              scheduler::_link_node (node, timeout_node);
             }
 
           port::scheduler::reschedule ();
 
-            {
-              interrupts::Critical_section ics; // ----- Critical section -----
-
-              // Remove the thread from the clock timeout list,
-              // if not already removed by the timer.
-              crt_thread.clock_node_ = nullptr;
-              clock_list.remove (timeout_node);
-
-              // Remove the thread from the semaphore waiting list,
-              // if not already removed by send().
-              crt_thread.waiting_node_ = nullptr;
-              receive_list_.remove (node);
-            }
+          // Remove the thread from the semaphore waiting list,
+          // if not already removed by send()and from the clock
+          // timeout list, if not already removed by the timer.
+          scheduler::_unlink_node (node, timeout_node);
 
           if (crt_thread.interrupted ())
             {

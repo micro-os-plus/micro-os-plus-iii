@@ -311,12 +311,8 @@ namespace os
                   return result::ok;
                 }
 
-              // Remove this thread from the ready list, if there.
-              port::this_thread::prepare_suspend ();
-
               // Add this thread to the event flags waiting list.
-              list_.add (node);
-              crt_thread.waiting_node_ = &node;
+              scheduler::_link_node (node);
             }
 
           port::scheduler::reschedule ();
@@ -326,8 +322,7 @@ namespace os
 
               // Remove the thread from the event flags waiting list,
               // if not already removed by raise().
-              crt_thread.waiting_node_ = nullptr;
-              list_.remove (node);
+              scheduler::_unlink_node (node);
             }
 
           if (crt_thread.interrupted ())
@@ -470,33 +465,17 @@ namespace os
                   return result::ok;
                 }
 
-              // Remove this thread from the ready list, if there.
-              port::this_thread::prepare_suspend ();
-
-              // Add this thread to the event flags waiting list.
-              list_.add (node);
-              crt_thread.waiting_node_ = &node;
-
-              // Add this thread to the clock timeout list.
-              clock_list.add (timeout_node);
-              crt_thread.clock_node_ = &timeout_node;
+              // Add this thread to the event flags waiting list,
+              // and the clock timeout list.
+              scheduler::_link_node (node, timeout_node);
             }
 
           port::scheduler::reschedule ();
 
-            {
-              interrupts::Critical_section ics; // ----- Critical section -----
-
-              // Remove the thread from the clock timeout list,
-              // if not already removed by the timer.
-              crt_thread.clock_node_ = nullptr;
-              clock_list.remove (timeout_node);
-
-              // Remove the thread from the event flags waiting list,
-              // if not already removed by raise().
-              crt_thread.waiting_node_ = nullptr;
-              list_.remove (node);
-            }
+          // Remove the thread from the event flags waiting list,
+          // if not already removed by raise() and from the clock
+          // timeout list, if not already removed by the timer.
+          scheduler::_unlink_node (node, timeout_node);
 
           if (crt_thread.interrupted ())
             {

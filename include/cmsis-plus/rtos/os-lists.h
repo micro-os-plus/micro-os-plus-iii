@@ -756,154 +756,24 @@ namespace os
        */
     };
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
-    /**
-     * @brief RAII list guard.
-     */
-    template<typename CS_T, typename List_T, typename Node_T>
-      class Thread_list_guard
-      {
-      public:
+    namespace scheduler
+    {
+      void
+      _link_node (Waiting_thread_node& node);
 
-        /**
-         * @name Public Types
-         * @{
-         */
+      void
+      _unlink_node (Waiting_thread_node& node);
 
-        using Critical_section = CS_T;
-        using List = List_T;
-        using Node = Node_T;
+      void
+      _link_node (Waiting_thread_node& node, Timeout_thread_node& timeout_node);
 
-        /**
-         * @}
-         */
+      void
+      _unlink_node (Waiting_thread_node& node,
+                    Timeout_thread_node& timeout_node);
 
-      public:
-
-        /**
-         * @name Constructors & Destructor
-         * @{
-         */
-
-        /**
-         * @brief RAII add node to the list.
-         * @param node Reference to node.
-         */
-        Thread_list_guard (Node& node);
-
-        /**
-         * @cond ignore
-         */
-        Thread_list_guard (const Thread_list_guard&) = delete;
-        Thread_list_guard (Thread_list_guard&&) = delete;
-        Thread_list_guard&
-        operator= (const Thread_list_guard&) = delete;
-        Thread_list_guard&
-        operator= (Thread_list_guard&&) = delete;
-        /**
-         * @endcond
-         */
-
-        /**
-         * @brief RAII remove node from the list.
-         */
-        ~Thread_list_guard ();
-
-        /**
-         * @}
-         */
-
-      protected:
-
-        /**
-         * @name Private Member Variables
-         * @{
-         */
-
-        /**
-         * @brief Reference to node.
-         */
-        Node& node_;
-
-        /**
-         * @}
-         */
-      };
-
-    template<typename CS_T>
-      using Waiting_threads_list_guard =
-      Thread_list_guard<CS_T, Waiting_threads_list, Waiting_thread_node>;
-
-    // ========================================================================
-
-    /**
-     * @brief RAII list guard.
-     */
-    template<typename CS_T, typename List_T, typename Node_T>
-      class Clock_list_guard
-      {
-      public:
-
-        /**
-         * @name Public Types
-         * @{
-         */
-
-        using Critical_section = CS_T;
-        using List = List_T;
-        using Node = Node_T;
-
-        /**
-         * @}
-         */
-
-      public:
-
-        /**
-         * @name Constructors & Destructor
-         * @{
-         */
-
-        /**
-         * @brief RAII add node to the list.
-         * @param node Reference to node.
-         */
-        Clock_list_guard (Node& node);
-
-        /**
-         * @cond ignore
-         */
-        Clock_list_guard (const Clock_list_guard&) = delete;
-        Clock_list_guard (Clock_list_guard&&) = delete;
-        Clock_list_guard&
-        operator= (const Clock_list_guard&) = delete;
-        Clock_list_guard&
-        operator= (Clock_list_guard&&) = delete;
-        /**
-         * @endcond
-         */
-
-        /**
-         * @brief RAII remove node from the list.
-         */
-        ~Clock_list_guard ();
-
-        /**
-         * @}
-         */
-
-      protected:
-
-        /**
-         * @brief Reference to node.
-         */
-        Node& node_;
-      };
-
-    template<typename CS_T>
-      using Clock_timestamps_list_guard =
-      Clock_list_guard<CS_T, Clock_timestamps_list, Timeout_thread_node>;
+    } /* namespace this_thread */
 
   // --------------------------------------------------------------------------
 
@@ -1011,52 +881,7 @@ namespace os
       return (Timestamp_node*) head_;
     }
 
-    // ========================================================================
-
-    template<typename CS_T, typename List_T, typename Node_T>
-      inline
-      Thread_list_guard<CS_T, List_T, Node_T>::Thread_list_guard (Node& node) :
-          node_ (node)
-      {
-        Critical_section cs;
-
-        ((List&) node.list).add (node);
-        node.thread.waiting_node_ = &node;
-      }
-
-    template<typename CS_T, typename List_T, typename Node_T>
-      inline
-      Thread_list_guard<CS_T, List_T, Node_T>::~Thread_list_guard ()
-      {
-        Critical_section cs;
-
-        node_.thread.waiting_node_ = nullptr;
-        ((List&) node_.list).remove (node_);
-      }
-
-    // ========================================================================
-
-    template<typename CS_T, typename List_T, typename Node_T>
-      inline
-      Clock_list_guard<CS_T, List_T, Node_T>::Clock_list_guard (Node& node) :
-          node_ (node)
-      {
-        Critical_section cs;
-
-        ((List&) node.list).add (node);
-        node.thread.clock_node_ = &node;
-      }
-
-    template<typename CS_T, typename List_T, typename Node_T>
-      inline
-      Clock_list_guard<CS_T, List_T, Node_T>::~Clock_list_guard ()
-      {
-        Critical_section cs;
-
-        node_.thread.clock_node_ = nullptr;
-        ((List&) node_.list).remove (node_);
-      }
-  // ----------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
   } /* namespace rtos */
 } /* namespace os */

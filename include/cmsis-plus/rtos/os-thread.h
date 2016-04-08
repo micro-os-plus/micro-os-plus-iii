@@ -516,20 +516,25 @@ namespace os
                                    thread::sigset_t* oflags,
                                    flags::mode_t mode);
 
+      friend void
+      scheduler::_link_node (Waiting_thread_node& node);
+
+      friend void
+      scheduler::_unlink_node (Waiting_thread_node& node);
+
+      friend void
+      scheduler::_link_node (Waiting_thread_node& node,
+                             Timeout_thread_node& timeout_node);
+
+      friend void
+      scheduler::_unlink_node (Waiting_thread_node& node,
+                               Timeout_thread_node& timeout_node);
+
       friend class Waiting_threads_list;
       friend class Clock_timestamps_list;
 
       friend class Clock;
-      friend class Semaphore;
-      friend class Message_queue;
-      friend class Event_flags;
-      friend class Memory_pool;
-
-      template<typename CS_T, typename List_T, typename Node_T>
-        friend class Clock_list_guard;
-
-      template<typename CS_T, typename List_T, typename Node_T>
-        friend class Thread_list_guard;
+      friend class Condition_variable;
 
       /**
        * @}
