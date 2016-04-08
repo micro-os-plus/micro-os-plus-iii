@@ -258,7 +258,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), blocks_,
-          block_size_bytes_);
+                     block_size_bytes_);
 #endif
 
       if (pool_addr_ == nullptr)
@@ -339,8 +339,6 @@ namespace os
     void*
     Memory_pool::_try_first (void)
     {
-      interrupts::Critical_section cs; // ----- Critical section -----
-
       if (first_ != nullptr)
         {
           void* p = (void*) first_;
@@ -373,10 +371,18 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      void* p = _try_first ();
-      if (p != nullptr)
+      void* p;
+
+      // Extra test before entering the loop, with its inherent weight.
+      // Trade size for speed.
         {
-          return p;
+          interrupts::Critical_section ics; // ----- Critical section -----
+
+          p = _try_first ();
+          if (p != nullptr)
+            {
+              return p;
+            }
         }
 
       Thread& crt_thread = this_thread::thread ();
@@ -390,23 +396,36 @@ namespace os
       for (;;)
         {
             {
-              // Add this thread to the memory pool waiting list.
-              // It is removed when this block ends (after sleep()).
-              Waiting_threads_list_guard<interrupts::Critical_section> lg
-                { node };
+              interrupts::Critical_section ics; // ----- Critical section -----
 
-              this_thread::wait ();
+              p = _try_first ();
+              if (p != nullptr)
+                {
+                  return p;
+                }
+
+              // Remove this thread from the ready list, if there.
+              port::this_thread::prepare_suspend ();
+
+              // Add this thread to the memory pool waiting list.
+              list_.add (node);
+              crt_thread.waiting_node_ = &node;
+            }
+
+          port::scheduler::reschedule ();
+
+            {
+              interrupts::Critical_section ics; // ----- Critical section -----
+
+              // Remove the thread from the memory pool waiting list,
+              // if not already removed by free().
+              crt_thread.waiting_node_ = nullptr;
+              list_.remove (node);
             }
 
           if (this_thread::thread ().interrupted ())
             {
               return nullptr;
-            }
-
-          p = _try_first ();
-          if (p != nullptr)
-            {
-              return p;
             }
         }
 
@@ -432,6 +451,8 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      interrupts::Critical_section ics; // ----- Critical section -----
+
       return _try_first ();
     }
 
@@ -456,10 +477,18 @@ namespace os
       trace::printf ("%s(%d) @%p %s\n", __func__, timeout, this, name ());
 #endif
 
-      void* p = _try_first ();
-      if (p != nullptr)
+      void* p;
+
+      // Extra test before entering the loop, with its inherent weight.
+      // Trade size for speed.
         {
-          return p;
+          interrupts::Critical_section ics; // ----- Critical section -----
+
+          p = _try_first ();
+          if (p != nullptr)
+            {
+              return p;
+            }
         }
 
       Thread& crt_thread = this_thread::thread ();
@@ -470,17 +499,50 @@ namespace os
       Waiting_thread_node node
         { list_, crt_thread };
 
-      clock::timestamp_t start = clock_.steady_now ();
-      clock::duration_t spent = 0;
+      Clock_timestamps_list& clock_list = clock_.steady_list ();
+      clock::timestamp_t timeout_timestamp = clock_.steady_now () + timeout;
+
+      // Prepare a timeout node pointing to the current thread.
+      Timeout_thread_node timeout_node
+        { clock_list, timeout_timestamp, crt_thread };
+
       for (;;)
         {
             {
-              // Add this thread to the memory pool waiting list.
-              // It is removed when this block ends (after wait_for()).
-              Waiting_threads_list_guard<interrupts::Critical_section> lg
-                { node };
+              interrupts::Critical_section ics; // ----- Critical section -----
 
-              clock_.wait_for (timeout - spent);
+              p = _try_first ();
+              if (p != nullptr)
+                {
+                  return p;
+                }
+
+              // Remove this thread from the ready list, if there.
+              port::this_thread::prepare_suspend ();
+
+              // Add this thread to the memory pool waiting list.
+              list_.add (node);
+              crt_thread.waiting_node_ = &node;
+
+              // Add this thread to the clock timeout list.
+              clock_list.add (timeout_node);
+              crt_thread.clock_node_ = &timeout_node;
+            }
+
+          port::scheduler::reschedule ();
+
+            {
+              interrupts::Critical_section ics; // ----- Critical section -----
+
+              // Remove the thread from the clock timeout list,
+              // if not already removed by the timer.
+              crt_thread.clock_node_ = nullptr;
+              clock_list.remove (timeout_node);
+
+              // Remove the thread from the semaphore waiting list,
+              // if not already removed by free().
+              crt_thread.waiting_node_ = nullptr;
+              list_.remove (node);
             }
 
           if (this_thread::thread ().interrupted ())
@@ -488,15 +550,7 @@ namespace os
               return nullptr;
             }
 
-          p = _try_first ();
-          if (p != nullptr)
-            {
-              return p;
-            }
-
-          clock::timestamp_t now = clock_.steady_now ();
-          spent = (clock::duration_t) (now - start);
-          if (spent >= timeout)
+          if (clock_.steady_now () >= timeout_timestamp)
             {
               return nullptr;
             }
@@ -531,7 +585,7 @@ namespace os
         }
 
         {
-          interrupts::Critical_section cs; // ----- Critical section -----
+          interrupts::Critical_section ics; // ----- Critical section -----
 
           // Perform a push_front() on the single linked LIFO list,
           // i.e. add the block to the beginning of the list.
@@ -568,13 +622,13 @@ namespace os
 #endif
 
         {
-          interrupts::Critical_section cs; // ----- Critical section -----
+          interrupts::Critical_section ics; // ----- Critical section -----
 
           _init ();
         }
 
         {
-          interrupts::Critical_section cs; // ----- Critical section -----
+          interrupts::Critical_section ics; // ----- Critical section -----
 
           // Wake-up all threads, if any.
           list_.resume_all ();

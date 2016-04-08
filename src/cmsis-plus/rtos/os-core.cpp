@@ -263,7 +263,7 @@ namespace os
        *    // Do something
        *
        *    {
-       *      interrupts::Critical_section cs;  // Critical section begins here.
+       *      interrupts::Critical_section ics;  // Critical section begins here.
        *
        *      // Inside the critical section.
        *      // No scheduler switches will happen here.

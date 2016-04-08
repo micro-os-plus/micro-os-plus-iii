@@ -308,7 +308,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s @%p %s %d %d\n", __func__, this, name (), prio_,
-          stack_size_bytes_);
+                     stack_size_bytes_);
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
@@ -403,7 +403,13 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
-      port::Thread::wait (this);
+        {
+          interrupts::Critical_section ics; // ----- Critical section -----
+
+          // Remove this thread from the ready list, if there.
+          port::this_thread::prepare_suspend ();
+        }
+      port::scheduler::reschedule ();
 
 #else
 
@@ -691,7 +697,7 @@ namespace os
         {
 #if defined(OS_TRACE_RTOS_THREAD)
           trace::printf ("%s() @%p %s already terminated\n", __func__, this,
-              name ());
+                         name ());
 #endif
           return; // Already terminated
         }
@@ -732,7 +738,7 @@ namespace os
         {
 #if defined(OS_TRACE_RTOS_THREAD)
           trace::printf ("%s() @%p %s already terminated\n", __func__, this,
-              name ());
+                         name ());
 #endif
           return result::ok; // Already terminated
         }
@@ -780,7 +786,7 @@ namespace os
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
 #endif
 
-      interrupts::Critical_section cs; // ----- Critical section -----
+      interrupts::Critical_section ics; // ----- Critical section -----
 
       if (oflags != nullptr)
         {
@@ -814,7 +820,7 @@ namespace os
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
 #endif
 
-      interrupts::Critical_section cs; // ----- Critical section -----
+      interrupts::Critical_section ics; // ----- Critical section -----
 
       if (mask == 0)
         {
@@ -848,7 +854,7 @@ namespace os
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
 #endif
 
-      interrupts::Critical_section cs; // ----- Critical section -----
+      interrupts::Critical_section ics; // ----- Critical section -----
 
       if (oflags != nullptr)
         {
@@ -932,7 +938,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s(0x%X, %d) @%p %s\n", __func__, mask, mode, this,
-          name ());
+                     name ());
 #endif
 
 #if defined(OS_TRACE_RTOS_THREAD)
@@ -942,7 +948,7 @@ namespace os
       for (;;)
         {
             {
-              interrupts::Critical_section cs; // ----- Critical section -----
+              interrupts::Critical_section ics; // ----- Critical section -----
 
               if (_try_wait (mask, oflags, mode) == result::ok)
                 {
@@ -950,7 +956,7 @@ namespace os
                   slept_ticks =
                       (clock::duration_t) (systick_clock.now () - prev);
                   trace::printf ("%s(0x%X, %d)=%d @%p %s\n", __func__, mask,
-                      mode, slept_ticks, this, name ());
+                                 mode, slept_ticks, this, name ());
 #endif
                   return result::ok;
                 }
@@ -985,10 +991,10 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s(0x%X, %d) @%p %s\n", __func__, mask, mode, this,
-          name ());
+                     name ());
 #endif
 
-      interrupts::Critical_section cs; // ----- Critical section -----
+      interrupts::Critical_section ics; // ----- Critical section -----
 
       return _try_wait (mask, oflags, mode);
     }
@@ -1033,7 +1039,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s(0x%X, %d, %d) @%p %s\n", __func__, mask, mode, timeout,
-          this, name ());
+                     this, name ());
 #endif
 
       if (timeout == 0)
@@ -1042,7 +1048,7 @@ namespace os
         }
 
         {
-          interrupts::Critical_section cs; // ----- Critical section -----
+          interrupts::Critical_section ics; // ----- Critical section -----
 
           if (_try_wait (mask, oflags, mode) == result::ok)
             {
@@ -1062,7 +1068,7 @@ namespace os
           slept_ticks += (clock::duration_t) (now - prev);
 
             {
-              interrupts::Critical_section cs; // ----- Critical section -----
+              interrupts::Critical_section ics; // ----- Critical section -----
 
               if (_try_wait (mask, oflags, mode) == result::ok)
                 {
@@ -1088,13 +1094,13 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s(0x%X, %d, %d)=%d @%p %s\n", __func__, mask, mode,
-          timeout, slept_ticks, this, name ());
+                     timeout, slept_ticks, this, name ());
 #endif
 
       return res;
     }
 
-// --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
 #pragma GCC diagnostic pop
 

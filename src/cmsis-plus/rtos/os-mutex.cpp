@@ -494,17 +494,12 @@ namespace os
     {
       Thread* saved_owner;
 
+      saved_owner = owner_;
+      if (owner_ == nullptr)
         {
-          scheduler::Critical_section cs; // ----- Critical section -----
-
-          saved_owner = owner_;
-          if (owner_ == nullptr)
-            {
-              owner_ = crt_thread;
-              count_ = 1;
-              ++(crt_thread->acquired_mutexes_);
-            }
-          // Short critical section ends here.
+          owner_ = crt_thread;
+          count_ = 1;
+          ++(crt_thread->acquired_mutexes_);
         }
 
       if (saved_owner == nullptr)
@@ -526,7 +521,7 @@ namespace os
             }
 #if defined(OS_TRACE_RTOS_MUTEX)
           trace::printf ("mutex @%p %s locked by %p %s\n", this, name (),
-              crt_thread, crt_thread->name ());
+                         crt_thread, crt_thread->name ());
 #endif
           return result::ok;
         }
@@ -542,7 +537,7 @@ namespace os
               ++count_;
 #if defined(OS_TRACE_RTOS_MUTEX)
               trace::printf ("mutex @%p %s incr %d by %p %s\n", this, name (),
-                  count_, crt_thread, crt_thread->name ());
+                             count_, crt_thread, crt_thread->name ());
 #endif
               return result::ok;
             }
@@ -615,7 +610,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
-          &this_thread::thread (), this_thread::thread ().name ());
+                     &this_thread::thread (), this_thread::thread ().name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
@@ -626,10 +621,15 @@ namespace os
 
       Thread& crt_thread = this_thread::thread ();
 
-      result_t res = _try_lock (&crt_thread);
-      if (res != EBUSY)
+      result_t res;
         {
-          return res;
+          scheduler::Critical_section cs; // ----- Critical section -----
+
+          res = _try_lock (&crt_thread);
+          if (res != EBUSY)
+            {
+              return res;
+            }
         }
 
       // Prepare a list node pointing to the current thread.
@@ -641,23 +641,40 @@ namespace os
       for (;;)
         {
             {
-              // Add this thread to the mutex waiting list.
-              // It is removed when this block ends (after sleep()).
-              Waiting_threads_list_guard<scheduler::Critical_section> lg
-                { node };
+              scheduler::Critical_section cs; // ----- Critical section -----
 
-              this_thread::wait ();
+              res = _try_lock (&crt_thread);
+              if (res != EBUSY)
+                {
+                  return res;
+                }
+
+                {
+                  interrupts::Critical_section ics; // ----- Critical section -----
+
+                  // Remove this thread from the ready list, if there.
+                  port::this_thread::prepare_suspend ();
+
+                  // Add this thread to the mutex waiting list.
+                  list_.add (node);
+                  crt_thread.waiting_node_ = &node;
+                }
+            }
+
+          port::scheduler::reschedule ();
+
+            {
+              interrupts::Critical_section ics; // ----- Critical section -----
+
+              // Remove the thread from the semaphore waiting list,
+              // if not already removed by unlock().
+              crt_thread.waiting_node_ = nullptr;
+              list_.remove (node);
             }
 
           if (crt_thread.interrupted ())
             {
               return EINTR;
-            }
-
-          res = _try_lock (&crt_thread);
-          if (res != EBUSY)
-            {
-              return res;
             }
         }
 
@@ -707,7 +724,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
-          &this_thread::thread (), this_thread::thread ().name ());
+                     &this_thread::thread (), this_thread::thread ().name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
@@ -717,6 +734,8 @@ namespace os
 #else
 
       Thread& crt_thread = this_thread::thread ();
+
+      scheduler::Critical_section cs; // ----- Critical section -----
 
       return _try_lock (&crt_thread);
 
@@ -765,8 +784,8 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s(%d_ticks) @%p %s by %p %s\n", __func__, timeout, this,
-          name (), &this_thread::thread (),
-          this_thread::thread ().name ());
+                     name (), &this_thread::thread (),
+                     this_thread::thread ().name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
@@ -777,10 +796,18 @@ namespace os
 
       Thread& crt_thread = this_thread::thread ();
 
-      result_t res = _try_lock (&crt_thread);
-      if (res != EBUSY)
+      result_t res;
+
+      // Extra test before entering the loop, with its inherent weight.
+      // Trade size for speed.
         {
-          return res;
+          scheduler::Critical_section cs; // ----- Critical section -----
+
+          res = _try_lock (&crt_thread);
+          if (res != EBUSY)
+            {
+              return res;
+            }
         }
 
       // Prepare a list node pointing to the current thread.
@@ -789,17 +816,54 @@ namespace os
       Waiting_thread_node node
         { list_, crt_thread };
 
-      clock::timestamp_t start = clock_.steady_now ();
-      clock::duration_t spent = 0;
+      Clock_timestamps_list& clock_list = clock_.steady_list ();
+      clock::timestamp_t timeout_timestamp = clock_.steady_now () + timeout;
+
+      // Prepare a timeout node pointing to the current thread.
+      Timeout_thread_node timeout_node
+        { clock_list, timeout_timestamp, crt_thread };
+
       for (;;)
         {
             {
-              // Add this thread to the mutex waiting list.
-              // It is removed when this block ends (after wait_for()).
-              Waiting_threads_list_guard<scheduler::Critical_section> lg
-                { node };
+              scheduler::Critical_section cs; // ----- Critical section -----
 
-              clock_.wait_for (timeout - spent);
+              res = _try_lock (&crt_thread);
+              if (res != EBUSY)
+                {
+                  return res;
+                }
+
+                {
+                  interrupts::Critical_section ics; // ----- Critical section -----
+
+                  // Remove this thread from the ready list, if there.
+                  port::this_thread::prepare_suspend ();
+
+                  // Add this thread to the mutex waiting list.
+                  list_.add (node);
+                  crt_thread.waiting_node_ = &node;
+
+                  // Add this thread to the clock timeout list.
+                  clock_list.add (timeout_node);
+                  crt_thread.clock_node_ = &timeout_node;
+                }
+            }
+
+          port::scheduler::reschedule ();
+
+            {
+              interrupts::Critical_section ics; // ----- Critical section -----
+
+              // Remove the thread from the clock timeout list,
+              // if not already removed by the timer.
+              crt_thread.clock_node_ = nullptr;
+              clock_list.remove (timeout_node);
+
+              // Remove the thread from the semaphore waiting list,
+              // if not already removed by unlock().
+              crt_thread.waiting_node_ = nullptr;
+              list_.remove (node);
             }
 
           if (crt_thread.interrupted ())
@@ -807,15 +871,7 @@ namespace os
               return EINTR;
             }
 
-          res = _try_lock (&crt_thread);
-          if (res != EBUSY)
-            {
-              return res;
-            }
-
-          clock::timestamp_t now = clock_.steady_now ();
-          spent = (clock::duration_t) (now - start);
-          if (spent >= timeout)
+          if (clock_.steady_now () >= timeout_timestamp)
             {
               return ETIMEDOUT;
             }
@@ -854,7 +910,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
-          &this_thread::thread (), this_thread::thread ().name ());
+                     &this_thread::thread (), this_thread::thread ().name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)

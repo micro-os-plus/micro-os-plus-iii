@@ -222,7 +222,7 @@ namespace os
 #else
 
         {
-          interrupts::Critical_section cs; // ----- Critical section -----
+          interrupts::Critical_section ics; // ----- Critical section -----
 
           if (state_ == timer::state::running)
             {
@@ -268,7 +268,7 @@ namespace os
       timer_node_.timestamp = clock_.steady_now () + period;
 
         {
-          interrupts::Critical_section cs; // ----- Critical section -----
+          interrupts::Critical_section ics; // ----- Critical section -----
           ((Clock_timestamps_list&) timer_node_.list).add (timer_node_);
         }
       res = result::ok;
@@ -314,7 +314,8 @@ namespace os
 #else
 
         {
-          interrupts::Critical_section cs; // ----- Critical section -----
+          interrupts::Critical_section ics; // ----- Critical section -----
+
           ((Clock_timestamps_list&) timer_node_.list).remove (timer_node_);
         }
       res = result::ok;

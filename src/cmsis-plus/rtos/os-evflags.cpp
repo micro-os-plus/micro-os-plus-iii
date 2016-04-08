@@ -214,8 +214,6 @@ namespace os
     Event_flags::_try_wait (flags::mask_t mask, flags::mask_t* oflags,
                             flags::mode_t mode)
     {
-      interrupts::Critical_section cs; // ----- Critical section -----
-
       if ((mask != 0) && ((mode & flags::mode::all) != 0))
         {
           // Only if all desires signals are raised we're done.
@@ -286,9 +284,13 @@ namespace os
 
 #else
 
-      if (_try_wait (mask, oflags, mode))
         {
-          return result::ok;
+          interrupts::Critical_section ics; // ----- Critical section -----
+
+          if (_try_wait (mask, oflags, mode))
+            {
+              return result::ok;
+            }
         }
 
       Thread& crt_thread = this_thread::thread ();
@@ -302,22 +304,35 @@ namespace os
       for (;;)
         {
             {
-              // Add this thread to the event flags waiting list.
-              // It is removed when this block ends (after sleep()).
-              Waiting_threads_list_guard<interrupts::Critical_section> lg
-                { node };
+              interrupts::Critical_section ics; // ----- Critical section -----
 
-              this_thread::wait ();
+              if (_try_wait (mask, oflags, mode))
+                {
+                  return result::ok;
+                }
+
+              // Remove this thread from the ready list, if there.
+              port::this_thread::prepare_suspend ();
+
+              // Add this thread to the event flags waiting list.
+              list_.add (node);
+              crt_thread.waiting_node_ = &node;
+            }
+
+          port::scheduler::reschedule ();
+
+            {
+              interrupts::Critical_section ics; // ----- Critical section -----
+
+              // Remove the thread from the event flags waiting list,
+              // if not already removed by raise().
+              crt_thread.waiting_node_ = nullptr;
+              list_.remove (node);
             }
 
           if (crt_thread.interrupted ())
             {
               return EINTR;
-            }
-
-          if (_try_wait (mask, oflags, mode))
-            {
-              return result::ok;
             }
         }
 
@@ -351,6 +366,8 @@ namespace os
       return port::Event_flags::try_wait (this, mask, oflags, mode);
 
 #else
+
+      interrupts::Critical_section ics; // ----- Critical section -----
 
       if (_try_wait (mask, oflags, mode))
         {
@@ -417,9 +434,15 @@ namespace os
 
 #else
 
-      if (_try_wait (mask, oflags, mode))
+      // Extra test before entering the loop, with its inherent weight.
+      // Trade size for speed.
         {
-          return result::ok;
+          interrupts::Critical_section ics; // ----- Critical section -----
+
+          if (_try_wait (mask, oflags, mode))
+            {
+              return result::ok;
+            }
         }
 
       Thread& crt_thread = this_thread::thread ();
@@ -430,17 +453,49 @@ namespace os
       Waiting_thread_node node
         { list_, crt_thread };
 
-      clock::timestamp_t start = clock_.steady_now ();
-      clock::duration_t spent = 0;
+      Clock_timestamps_list& clock_list = clock_.steady_list ();
+      clock::timestamp_t timeout_timestamp = clock_.steady_now () + timeout;
+
+      // Prepare a timeout node pointing to the current thread.
+      Timeout_thread_node timeout_node
+        { clock_list, timeout_timestamp, crt_thread };
+
       for (;;)
         {
             {
-              // Add this thread to the event flags waiting list.
-              // It is removed when this block ends (after wait_for()).
-              Waiting_threads_list_guard<interrupts::Critical_section> lg
-                { node };
+              interrupts::Critical_section ics; // ----- Critical section -----
 
-              clock_.wait_for (timeout - spent);
+              if (_try_wait (mask, oflags, mode))
+                {
+                  return result::ok;
+                }
+
+              // Remove this thread from the ready list, if there.
+              port::this_thread::prepare_suspend ();
+
+              // Add this thread to the event flags waiting list.
+              list_.add (node);
+              crt_thread.waiting_node_ = &node;
+
+              // Add this thread to the clock timeout list.
+              clock_list.add (timeout_node);
+              crt_thread.clock_node_ = &timeout_node;
+            }
+
+          port::scheduler::reschedule ();
+
+            {
+              interrupts::Critical_section ics; // ----- Critical section -----
+
+              // Remove the thread from the clock timeout list,
+              // if not already removed by the timer.
+              crt_thread.clock_node_ = nullptr;
+              clock_list.remove (timeout_node);
+
+              // Remove the thread from the event flags waiting list,
+              // if not already removed by raise().
+              crt_thread.waiting_node_ = nullptr;
+              list_.remove (node);
             }
 
           if (crt_thread.interrupted ())
@@ -448,14 +503,7 @@ namespace os
               return EINTR;
             }
 
-          if (_try_wait (mask, oflags, mode))
-            {
-              return result::ok;
-            }
-
-          clock::timestamp_t now = clock_.steady_now ();
-          spent = (clock::duration_t) (now - start);
-          if (spent >= timeout)
+          if (clock_.steady_now () >= timeout_timestamp)
             {
               return ETIMEDOUT;
             }
@@ -486,7 +534,7 @@ namespace os
 
 #else
         {
-          interrupts::Critical_section cs; // ----- Critical section -----
+          interrupts::Critical_section ics; // ----- Critical section -----
 
           flags_ |= mask;
 
@@ -497,7 +545,7 @@ namespace os
         }
 
         {
-          interrupts::Critical_section cs; // ----- Critical section -----
+          interrupts::Critical_section ics; // ----- Critical section -----
 
           // Wake-up all threads, if any.
           list_.resume_all ();
@@ -524,7 +572,7 @@ namespace os
 
 #else
 
-      interrupts::Critical_section cs; // ----- Critical section -----
+      interrupts::Critical_section ics; // ----- Critical section -----
 
       if (oflags != nullptr)
         {
@@ -563,7 +611,7 @@ namespace os
 
 #else
 
-      interrupts::Critical_section cs; // ----- Critical section -----
+      interrupts::Critical_section ics; // ----- Critical section -----
 
       if (mask == 0)
         {

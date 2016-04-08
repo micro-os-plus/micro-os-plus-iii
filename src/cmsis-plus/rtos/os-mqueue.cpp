@@ -234,7 +234,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), msgs_,
-          msg_size_bytes_);
+                     msg_size_bytes_);
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
@@ -357,8 +357,6 @@ namespace os
       char* dest;
 
         {
-          interrupts::Critical_section cs; // ----- Critical section -----
-
           if (first_free_ == nullptr)
             {
               // No available space to send the message.
@@ -485,7 +483,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes, mprio,
-          this, name ());
+                     this, name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
@@ -494,6 +492,7 @@ namespace os
 
 #else
 
+#if 0
       if (_try_send (msg, nbytes, mprio))
         {
           return result::ok;
@@ -505,7 +504,7 @@ namespace os
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
       Waiting_thread_node node
-        { send_list_, crt_thread };
+        { send_list_, crt_thread};
 
       for (;;)
         {
@@ -513,7 +512,7 @@ namespace os
               // Add this thread to the message queue send waiting list.
               // It is removed when this block ends (after sleep()).
               Waiting_threads_list_guard<interrupts::Critical_section> lg
-                { node };
+                { node};
 
               this_thread::wait ();
             }
@@ -528,7 +527,60 @@ namespace os
               return result::ok;
             }
         }
+#else
+        {
+          interrupts::Critical_section ics; // ----- Critical section -----
 
+          if (_try_send (msg, nbytes, mprio))
+            {
+              return result::ok;
+            }
+        }
+
+      Thread& crt_thread = this_thread::thread ();
+
+      // Prepare a list node pointing to the current thread.
+      // Do not worry for being on stack, it is temporarily linked to the
+      // list and guaranteed to be removed before this function returns.
+      Waiting_thread_node node
+        { send_list_, crt_thread };
+
+      for (;;)
+        {
+            {
+              interrupts::Critical_section ics; // ----- Critical section -----
+
+              if (_try_send (msg, nbytes, mprio))
+                {
+                  return result::ok;
+                }
+
+              // Remove this thread from the ready list, if there.
+              port::this_thread::prepare_suspend ();
+
+              // Add this thread to the message queue send waiting list.
+              send_list_.add (node);
+              crt_thread.waiting_node_ = &node;
+            }
+
+          port::scheduler::reschedule ();
+
+            {
+              interrupts::Critical_section ics; // ----- Critical section -----
+
+              // Remove the thread from the message queue send waiting list,
+              // if not already removed by receive().
+              crt_thread.waiting_node_ = nullptr;
+              send_list_.remove (node);
+            }
+
+          if (crt_thread.interrupted ())
+            {
+              return EINTR;
+            }
+        }
+
+#endif
       /* NOTREACHED */
       return ENOTRECOVERABLE;
 
@@ -573,7 +625,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes, mprio,
-          this, name ());
+                     this, name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
@@ -581,6 +633,7 @@ namespace os
       return port::Message_queue::try_send (this, msg, nbytes, mprio);
 
 #else
+      interrupts::Critical_section ics; // ----- Critical section -----
 
       if (_try_send (msg, nbytes, mprio))
         {
@@ -649,7 +702,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d,%d,%d_ticks) @%p %s\n", __func__, msg, nbytes,
-          mprio, timeout, this, name ());
+                     mprio, timeout, this, name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
@@ -663,9 +716,15 @@ namespace os
 
 #else
 
-      if (_try_send (msg, nbytes, mprio))
+      // Extra test before entering the loop, with its inherent weight.
+      // Trade size for speed.
         {
-          return result::ok;
+          interrupts::Critical_section ics; // ----- Critical section -----
+
+          if (_try_send (msg, nbytes, mprio))
+            {
+              return result::ok;
+            }
         }
 
       Thread& crt_thread = this_thread::thread ();
@@ -676,17 +735,50 @@ namespace os
       Waiting_thread_node node
         { send_list_, crt_thread };
 
-      clock::timestamp_t start = clock_.steady_now ();
-      clock::duration_t spent = 0;
+      Clock_timestamps_list& clock_list = clock_.steady_list ();
+
+      clock::timestamp_t timeout_timestamp = clock_.steady_now () + timeout;
+
+      // Prepare a timeout node pointing to the current thread.
+      Timeout_thread_node timeout_node
+        { clock_list, timeout_timestamp, crt_thread };
+
       for (;;)
         {
             {
-              // Add this thread to the message queue send waiting list.
-              // It is removed when this block ends (after wait_for()).
-              Waiting_threads_list_guard<interrupts::Critical_section> lg
-                { node };
+              interrupts::Critical_section ics; // ----- Critical section -----
 
-              clock_.wait_for (timeout - spent);
+              if (_try_send (msg, nbytes, mprio))
+                {
+                  return result::ok;
+                }
+
+              // Remove this thread from the ready list, if there.
+              port::this_thread::prepare_suspend ();
+
+              // Add this thread to the semaphore waiting list.
+              send_list_.add (node);
+              crt_thread.waiting_node_ = &node;
+
+              // Add this thread to the clock timeout list.
+              clock_list.add (timeout_node);
+              crt_thread.clock_node_ = &timeout_node;
+            }
+
+          port::scheduler::reschedule ();
+
+            {
+              interrupts::Critical_section ics; // ----- Critical section -----
+
+              // Remove the thread from the clock timeout list,
+              // if not already removed by the timer.
+              crt_thread.clock_node_ = nullptr;
+              clock_list.remove (timeout_node);
+
+              // Remove the thread from the message queue send waiting list,
+              // if not already removed by receive().
+              crt_thread.waiting_node_ = nullptr;
+              send_list_.remove (node);
             }
 
           if (crt_thread.interrupted ())
@@ -694,14 +786,7 @@ namespace os
               return EINTR;
             }
 
-          if (_try_send (msg, nbytes, mprio))
-            {
-              return result::ok;
-            }
-
-          clock::timestamp_t now = clock_.steady_now ();
-          spent = (clock::duration_t) (now - start);
-          if (spent >= timeout)
+          if (clock_.steady_now () >= timeout_timestamp)
             {
               return ETIMEDOUT;
             }
@@ -722,8 +807,6 @@ namespace os
       char* src;
 
         {
-          interrupts::Critical_section cs; // ----- Critical section -----
-
           if (head_ == mqueue::no_index)
             {
               return false;
@@ -740,7 +823,7 @@ namespace os
         }
 
         {
-          interrupts::Critical_section cs; // ----- Critical section -----
+          interrupts::Critical_section ics; // ----- Critical section -----
 
           if (count_ > 1)
             {
@@ -823,7 +906,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d) @%p %s\n", __func__, msg, nbytes, this,
-          name ());
+                     name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
@@ -832,9 +915,14 @@ namespace os
 
 #else
 
-      if (_try_receive (msg, nbytes, mprio))
+      // Extra test before entering the loop, with its inherent weight.
+      // Trade size for speed.
         {
-          return result::ok;
+          interrupts::Critical_section ics; // ----- Critical section -----
+          if (_try_receive (msg, nbytes, mprio))
+            {
+              return result::ok;
+            }
         }
 
       Thread& crt_thread = this_thread::thread ();
@@ -848,22 +936,35 @@ namespace os
       for (;;)
         {
             {
-              // Add this thread to the message queue receive waiting list.
-              // It is removed when this block ends (after sleep()).
-              Waiting_threads_list_guard<interrupts::Critical_section> lg
-                { node };
+              interrupts::Critical_section ics; // ----- Critical section -----
 
-              this_thread::wait ();
+              if (_try_receive (msg, nbytes, mprio))
+                {
+                  return result::ok;
+                }
+
+              // Remove this thread from the ready list, if there.
+              port::this_thread::prepare_suspend ();
+
+              // Add this thread to the message queue receive waiting list.
+              receive_list_.add (node);
+              crt_thread.waiting_node_ = &node;
+            }
+
+          port::scheduler::reschedule ();
+
+            {
+              interrupts::Critical_section ics; // ----- Critical section -----
+
+              // Remove the thread from the message queue receive waiting list,
+              // if not already removed by send().
+              crt_thread.waiting_node_ = nullptr;
+              receive_list_.remove (node);
             }
 
           if (crt_thread.interrupted ())
             {
               return EINTR;
-            }
-
-          if (_try_receive (msg, nbytes, mprio))
-            {
-              return result::ok;
             }
         }
 
@@ -911,7 +1012,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d) @%p %s\n", __func__, msg, nbytes, this,
-          name ());
+                     name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
@@ -919,6 +1020,8 @@ namespace os
       return port::Message_queue::try_receive (this, msg, nbytes, mprio);
 
 #else
+
+      interrupts::Critical_section ics; // ----- Critical section -----
 
       if (_try_receive (msg, nbytes, mprio))
         {
@@ -999,7 +1102,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d,%d_ticks) @%p %s\n", __func__, msg, nbytes,
-          timeout, this, name ());
+                     timeout, this, name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
@@ -1014,9 +1117,15 @@ namespace os
 
 #else
 
-      if (_try_receive (msg, nbytes, mprio))
+      // Extra test before entering the loop, with its inherent weight.
+      // Trade size for speed.
         {
-          return result::ok;
+          interrupts::Critical_section ics; // ----- Critical section -----
+
+          if (_try_receive (msg, nbytes, mprio))
+            {
+              return result::ok;
+            }
         }
 
       Thread& crt_thread = this_thread::thread ();
@@ -1027,17 +1136,49 @@ namespace os
       Waiting_thread_node node
         { receive_list_, crt_thread };
 
-      clock::timestamp_t start = clock_.steady_now ();
-      clock::duration_t spent = 0;
+      Clock_timestamps_list& clock_list = clock_.steady_list ();
+      clock::timestamp_t timeout_timestamp = clock_.steady_now () + timeout;
+
+      // Prepare a timeout node pointing to the current thread.
+      Timeout_thread_node timeout_node
+        { clock_list, timeout_timestamp, crt_thread };
+
       for (;;)
         {
             {
-              // Add this thread to the message queue receive waiting list.
-              // It is removed when this block ends (after wait_for()).
-              Waiting_threads_list_guard<interrupts::Critical_section> lg
-                { node };
+              interrupts::Critical_section ics; // ----- Critical section -----
 
-              clock_.wait_for (timeout - spent);
+              if (_try_receive (msg, nbytes, mprio))
+                {
+                  return result::ok;
+                }
+
+              // Remove this thread from the ready list, if there.
+              port::this_thread::prepare_suspend ();
+
+              // Add this thread to the message queue receive waiting list.
+              receive_list_.add (node);
+              crt_thread.waiting_node_ = &node;
+
+              // Add this thread to the clock timeout list.
+              clock_list.add (timeout_node);
+              crt_thread.clock_node_ = &timeout_node;
+            }
+
+          port::scheduler::reschedule ();
+
+            {
+              interrupts::Critical_section ics; // ----- Critical section -----
+
+              // Remove the thread from the clock timeout list,
+              // if not already removed by the timer.
+              crt_thread.clock_node_ = nullptr;
+              clock_list.remove (timeout_node);
+
+              // Remove the thread from the semaphore waiting list,
+              // if not already removed by send().
+              crt_thread.waiting_node_ = nullptr;
+              receive_list_.remove (node);
             }
 
           if (crt_thread.interrupted ())
@@ -1050,9 +1191,7 @@ namespace os
               return result::ok;
             }
 
-          clock::timestamp_t now = clock_.steady_now ();
-          spent = (clock::duration_t) (now - start);
-          if (spent >= timeout)
+          if (clock_.steady_now () >= timeout_timestamp)
             {
               return ETIMEDOUT;
             }
@@ -1091,7 +1230,7 @@ namespace os
 
 #else
 
-      interrupts::Critical_section cs; // ----- Critical section -----
+      interrupts::Critical_section ics; // ----- Critical section -----
 
       _init ();
       return result::ok;

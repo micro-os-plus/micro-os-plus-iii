@@ -519,6 +519,12 @@ namespace os
       friend class Waiting_threads_list;
       friend class Clock_timestamps_list;
 
+      friend class Clock;
+      friend class Semaphore;
+      friend class Message_queue;
+      friend class Event_flags;
+      friend class Memory_pool;
+
       template<typename CS_T, typename List_T, typename Node_T>
         friend class Clock_list_guard;
 

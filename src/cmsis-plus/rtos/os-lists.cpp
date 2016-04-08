@@ -219,7 +219,7 @@ namespace os
     {
       Thread* thread;
         {
-          interrupts::Critical_section cs; // ----- Critical section -----
+          interrupts::Critical_section ics; // ----- Critical section -----
 
           // If the list is empty, silently return.
           if (empty ())
@@ -396,8 +396,8 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_LISTS)
           trace::printf ("%s() %u after %u #%d\n", __func__,
-              (uint32_t) timestamp, (uint32_t) after->timestamp,
-              count_);
+                         (uint32_t) timestamp, (uint32_t) after->timestamp,
+                         count_);
 #endif
 
           assert(after->timestamp != 0);
@@ -431,7 +431,7 @@ namespace os
             {
 #if defined(OS_TRACE_RTOS_LISTS)
               trace::printf ("%s() %u \n", __func__,
-                  (uint32_t) systick_clock.now ());
+                             (uint32_t) systick_clock.now ());
 #endif
               head ()->action ();
             }

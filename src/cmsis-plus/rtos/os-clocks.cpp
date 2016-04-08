@@ -107,7 +107,7 @@ namespace os
     clock::timestamp_t
     Clock::now (void)
     {
-      interrupts::Critical_section cs; // ----- Critical section -----
+      interrupts::Critical_section ics; // ----- Critical section -----
 
       // Prevent inconsistent values using the critical section.
       return steady_count_ + offset_;
@@ -116,7 +116,7 @@ namespace os
     clock::timestamp_t
     Clock::steady_now (void)
     {
-      interrupts::Critical_section cs; // ----- Critical section -----
+      interrupts::Critical_section ics; // ----- Critical section -----
 
       // Prevent inconsistent values using the critical section.
       return steady_count_;
@@ -246,12 +246,25 @@ namespace os
         { list, timestamp, crt_thread };
 
         {
-          // Add this thread to the clock waiting list.
-          // It is removed when this block ends (after sleep()).
-          Clock_timestamps_list_guard<interrupts::Critical_section> lg
-            { node };
+          interrupts::Critical_section ics;
 
-          this_thread::wait ();
+          // Remove this thread from the ready list, if there.
+          port::this_thread::prepare_suspend ();
+
+          // Add this thread to the clock waiting list.
+          list.add (node);
+          crt_thread.clock_node_ = &node;
+        }
+
+      port::scheduler::reschedule ();
+
+        {
+          interrupts::Critical_section ics;
+
+          // Remove the thread from the clock timeout list,
+          // if not already removed by the timer.
+          crt_thread.clock_node_ = nullptr;
+          list.remove (node);
         }
 
       return result::ok;
@@ -347,7 +360,7 @@ namespace os
       uint64_t ticks;
       uint32_t val;
         {
-          interrupts::Critical_section cs; // ----- Critical section -----
+          interrupts::Critical_section ics; // ----- Critical section -----
 
           // Sample ticks counter inside critical section.
           ticks = steady_count_;

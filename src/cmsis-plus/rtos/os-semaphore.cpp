@@ -206,7 +206,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), count_,
-          max_count_);
+                     max_count_);
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
@@ -325,7 +325,7 @@ namespace os
 #else
 
         {
-          interrupts::Critical_section cs; // ----- Critical section -----
+          interrupts::Critical_section ics; // ----- Critical section -----
 
           if (count_ >= this->max_count_)
             {
@@ -346,8 +346,6 @@ namespace os
     bool
     Semaphore::_try_wait (void)
     {
-      interrupts::Critical_section cs; // ----- Critical section -----
-
       if (count_ > 0)
         {
           --count_;
@@ -400,9 +398,16 @@ namespace os
       return port::Semaphore::wait (this);
 
 #else
-      if (_try_wait ())
+
+      // Extra test before entering the loop, with its inherent weight.
+      // Trade size for speed.
         {
-          return result::ok;
+          interrupts::Critical_section ics; // ----- Critical section -----
+
+          if (_try_wait ())
+            {
+              return result::ok;
+            }
         }
 
       Thread& crt_thread = this_thread::thread ();
@@ -416,22 +421,38 @@ namespace os
       for (;;)
         {
             {
-              // Add this thread to the semaphore waiting list.
-              // It is removed when this block ends (after sleep()).
-              Waiting_threads_list_guard<interrupts::Critical_section> lg
-                { node };
+              interrupts::Critical_section ics; // ----- Critical section -----
 
-              this_thread::wait ();
+              if (_try_wait ())
+                {
+                  return result::ok;
+                }
+
+              // Remove this thread from the ready list, if there.
+              port::this_thread::prepare_suspend ();
+
+              // Add this thread to the semaphore waiting list.
+              list_.add (node);
+              crt_thread.waiting_node_ = &node;
+            }
+
+          // No problem if post() occurs here, the thread
+          // will be added to the ready list and removed from the
+          // semaphore list.
+          port::scheduler::reschedule ();
+
+            {
+              interrupts::Critical_section ics; // ----- Critical section -----
+
+              // Remove the thread from the semaphore waiting list,
+              // if not already removed by post().
+              crt_thread.waiting_node_ = nullptr;
+              list_.remove (node);
             }
 
           if (crt_thread.interrupted ())
             {
               return EINTR;
-            }
-
-          if (_try_wait ())
-            {
-              return result::ok;
             }
         }
 
@@ -473,6 +494,8 @@ namespace os
       return port::Semaphore::try_wait (this);
 
 #else
+
+      interrupts::Critical_section ics; // ----- Critical section -----
 
       if (_try_wait ())
         {
@@ -536,9 +559,15 @@ namespace os
 
 #else
 
-      if (_try_wait ())
+      // Extra test before entering the loop, with its inherent weight.
+      // Trade size for speed.
         {
-          return result::ok;
+          interrupts::Critical_section ics; // ----- Critical section -----
+
+          if (_try_wait ())
+            {
+              return result::ok;
+            }
         }
 
       Thread& crt_thread = this_thread::thread ();
@@ -549,17 +578,49 @@ namespace os
       Waiting_thread_node node
         { list_, crt_thread };
 
-      clock::timestamp_t start = clock_.steady_now ();
-      clock::duration_t spent = 0;
+      Clock_timestamps_list& clock_list = clock_.steady_list ();
+      clock::timestamp_t timeout_timestamp = clock_.steady_now () + timeout;
+
+      // Prepare a timeout node pointing to the current thread.
+      Timeout_thread_node timeout_node
+        { clock_list, timeout_timestamp, crt_thread };
+
       for (;;)
         {
             {
-              // Add this thread to the semaphore waiting list.
-              // It is removed when this block ends (after wait()).
-              Waiting_threads_list_guard<interrupts::Critical_section> lg
-                { node };
+              interrupts::Critical_section ics; // ----- Critical section -----
 
-              clock_.wait_for (timeout - spent);
+              if (_try_wait ())
+                {
+                  return result::ok;
+                }
+
+              // Remove this thread from the ready list, if there.
+              port::this_thread::prepare_suspend ();
+
+              // Add this thread to the semaphore waiting list.
+              list_.add (node);
+              crt_thread.waiting_node_ = &node;
+
+              // Add this thread to the clock timeout list.
+              clock_list.add (timeout_node);
+              crt_thread.clock_node_ = &timeout_node;
+            }
+
+          port::scheduler::reschedule ();
+
+            {
+              interrupts::Critical_section ics; // ----- Critical section -----
+
+              // Remove the thread from the clock timeout list,
+              // if not already removed by the timer.
+              crt_thread.clock_node_ = nullptr;
+              clock_list.remove (timeout_node);
+
+              // Remove the thread from the semaphore waiting list,
+              // if not already removed by post().
+              crt_thread.waiting_node_ = nullptr;
+              list_.remove (node);
             }
 
           if (crt_thread.interrupted ())
@@ -567,14 +628,7 @@ namespace os
               return EINTR;
             }
 
-          if (_try_wait ())
-            {
-              return result::ok;
-            }
-
-          clock::timestamp_t now = clock_.steady_now ();
-          spent = (clock::duration_t) (now - start);
-          if (spent >= timeout)
+          if (clock_.steady_now () >= timeout_timestamp)
             {
               return ETIMEDOUT;
             }
@@ -635,7 +689,7 @@ namespace os
 
 #else
 
-      interrupts::Critical_section cs; // ----- Critical section -----
+      interrupts::Critical_section ics; // ----- Critical section -----
 
       _init ();
       return result::ok;
