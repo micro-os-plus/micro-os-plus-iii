@@ -138,10 +138,8 @@ namespace os
       void
       interrupt_service_routine (void);
 
-#if !defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
       Clock_timestamps_list&
       steady_list (void);
-#endif
 
       /**
        * @}
@@ -164,11 +162,9 @@ namespace os
        * @{
        */
 
-#if !defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR___)
       Clock_timestamps_list steady_list_;
       clock::duration_t volatile sleep_count_;
       Clock_timestamps_list adjusted_list_;
-#endif
 
       /**
        * @brief Monotone ascending count.
@@ -433,15 +429,11 @@ namespace os
 
     // ========================================================================
 
-#if !defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
-
     inline Clock_timestamps_list&
     Clock::steady_list (void)
-      {
-        return steady_list_;
-      }
-
-#endif
+    {
+      return steady_list_;
+    }
 
     // ========================================================================
 

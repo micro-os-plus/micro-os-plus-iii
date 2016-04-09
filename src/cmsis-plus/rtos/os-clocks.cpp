@@ -226,11 +226,8 @@ namespace os
 
       ++steady_count_;
 
-#if !defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
       steady_list_.check_timestamp (steady_count_);
       adjusted_list_.check_timestamp (steady_count_ + offset_);
-#endif
-
     }
 
     result_t
@@ -394,7 +391,7 @@ namespace os
 
     result_t
     Systick_clock::_wait_until (clock::timestamp_t timestamp,
-        Clock_timestamps_list& list)
+        Clock_timestamps_list& list __attribute__((unused)))
       {
         result_t res;
 
