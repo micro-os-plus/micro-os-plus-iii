@@ -472,7 +472,21 @@ extern "C"
 #define osThreadDef(name, priority, instances, stacksz)  \
 extern const osThreadDef_t os_thread_def_##name
 #else                            // define the object
-#define osThreadDef(name, priority, instances, stacksz)  \
+#define osThreadAllocatedDef(name, priority, instances, stacksz)  \
+struct { \
+    osThread data[instances]; \
+} os_thread_##name; \
+const osThreadDef_t os_thread_def_##name = \
+{ \
+    #name, \
+    (os_pthread)(name), \
+    (priority), \
+    (instances), \
+    (stacksz), \
+    &os_thread_##name.data[0], \
+    0 \
+}
+#define osThreadStaticDef(name, priority, instances, stacksz)  \
 struct { \
     uint64_t stack[(instances)*((stacksz+sizeof(uint64_t)-1)/sizeof(uint64_t))]; \
     osThread data[instances]; \
@@ -487,6 +501,11 @@ const osThreadDef_t os_thread_def_##name = \
     &os_thread_##name.data[0], \
     &os_thread_##name.stack[0] \
 }
+#if defined(osObjectsStatic)
+#define osThreadDef(name, priority, instances, stacksz)  osThreadStaticDef(name, priority, instances, stacksz)
+#else
+#define osThreadDef(name, priority, instances, stacksz)  osThreadAllocatedDef(name, priority, instances, stacksz)
+#endif
 #endif
 
   /**
@@ -934,7 +953,20 @@ const osSemaphoreDef_t os_semaphore_def_##name = \
 #define osPoolDef(name, no, type)   \
 extern const osPoolDef_t os_pool_def_##name
 #else                            // define the object
-#define osPoolDef(name, items, type)   \
+#define osPoolAllocatedDef(name, items, type)   \
+struct { \
+    osPool data; \
+} os_pool_##name; \
+const osPoolDef_t os_pool_def_##name = \
+{ \
+    #name, \
+    (items), \
+    sizeof(type), \
+    0, \
+    0, \
+    &os_pool_##name.data \
+}
+#define osPoolStaticDef(name, items, type)   \
 struct { \
     osPool data; \
     struct { \
@@ -950,6 +982,11 @@ const osPoolDef_t os_pool_def_##name = \
     sizeof(os_pool_##name.storage), \
     &os_pool_##name.data \
 }
+#if defined(osObjectsStatic)
+#define osPoolDef(name, items, type) osPoolStaticDef(name, items, type)
+#else
+#define osPoolDef(name, items, type) osPoolAllocatedDef(name, items, type)
+#endif
 #endif
 
   /**
@@ -1026,7 +1063,19 @@ const osPoolDef_t os_pool_def_##name = \
 #define osMessageQDef(name, queue_sz, type)   \
 extern const osMessageQDef_t os_messageQ_def_##name
 #else                            // define the object
-#define osMessageQDef(name, items, type)   \
+#define osMessageQAllocatedDef(name, items, type)   \
+struct { \
+    osMessageQ data; \
+} os_messageQ_##name; \
+const osMessageQDef_t os_messageQ_def_##name = { \
+    #name, \
+    (items), \
+    sizeof (void*), \
+    0, \
+    0, \
+    &os_messageQ_##name.data \
+}
+#define osMessageQStaticDef(name, items, type)   \
 struct { \
     osMessageQ data; \
     struct { \
@@ -1043,6 +1092,12 @@ const osMessageQDef_t os_messageQ_def_##name = { \
     sizeof(os_messageQ_##name.storage), \
     &os_messageQ_##name.data \
 }
+
+#if defined(osObjectsStatic)
+#define osMessageQDef(name, items, type) osMessageQStaticDef(name, items, type)
+#else
+#define osMessageQDef(name, items, type) osMessageQAllocatedDef(name, items, type)
+#endif
 #endif
 
   /**
@@ -1119,7 +1174,30 @@ const osMessageQDef_t os_messageQ_def_##name = { \
 #define osMailQDef(name, queue_sz, type) \
 extern const osMailQDef_t os_mailQ_def_##name
 #else                            // define the object
-#define osMailQDef(name, items, type) \
+#define osMailQAllocatedDef(name, items, type) \
+struct { \
+    osMailQ data; \
+    struct { \
+      type pool[items]; \
+    } pool_storage; \
+    struct { \
+      void* queue[items]; \
+      os_mqueue_index_t links[2 * items]; \
+      os_mqueue_prio_t prios[items]; \
+    } queue_storage; \
+} os_mailQ_##name; \
+const osMailQDef_t os_mailQ_def_##name = { \
+    #name, \
+    (items), \
+    sizeof (type), \
+    sizeof (void*), \
+    0, \
+    0, \
+    0, \
+    0, \
+    &os_mailQ_##name.data \
+}
+#define osMailQStaticDef(name, items, type) \
 struct { \
     osMailQ data; \
     struct { \
@@ -1142,6 +1220,11 @@ const osMailQDef_t os_mailQ_def_##name = { \
     sizeof(os_mailQ_##name.queue_storage), \
     &os_mailQ_##name.data \
 }
+#if defined(osObjectsStatic)
+#define osMailQDef(name, items, type) osMailQStaticDef(name, items, type)
+#else
+#define osMailQDef(name, items, type) osMailQAllocatedDef(name, items, type)
+#endif
 #endif
 
   /**
