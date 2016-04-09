@@ -246,6 +246,15 @@ namespace os
 
       head_ = mqueue::no_index;
 
+      if (queue_addr_ == nullptr)
+        {
+          // Dynamically allocate queue and the arrays.
+          queue_addr_ = new (std::nothrow) char[storage_size];
+          flags_ |= flags_allocated;
+        }
+
+      os_assert_throw(queue_addr_ != nullptr, ENOMEM);
+
       // The array of prev indexes follows immediately after the content array.
       prev_array_ = (mqueue::index_t*) ((char*) queue_addr_
           + msgs * msg_size_bytes);
@@ -255,13 +264,6 @@ namespace os
       // The array of priorities follows immediately the next array.
       prio_array_ = (mqueue::priority_t*) ((char*) next_array_
           + msgs * sizeof(mqueue::index_t));
-
-      if (queue_addr_ == nullptr)
-        {
-          // Dynamically allocate queue and the arrays.
-          queue_addr_ = new (std::nothrow) char[storage_size];
-          flags_ |= flags_allocated;
-        }
 
       _init ();
 #endif
