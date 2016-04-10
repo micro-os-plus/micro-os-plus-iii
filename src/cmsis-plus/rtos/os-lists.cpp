@@ -47,7 +47,7 @@ namespace os
      * the links in the removed node are nullified.
      */
     void
-    Double_list_links0::unlink (void)
+    Double_list_links::unlink (void)
     {
       // Check if not already removed.
       if (next == nullptr)
@@ -226,9 +226,7 @@ namespace os
 
     // ========================================================================
 
-    Timestamp_node::Timestamp_node (Double_list& lst, clock::timestamp_t ts) :
-        Double_list_links
-          { lst }, //
+    Timestamp_node::Timestamp_node (clock::timestamp_t ts) :
         timestamp (ts)
     {
       ;
@@ -241,10 +239,9 @@ namespace os
 
     // ========================================================================
 
-    Timeout_thread_node::Timeout_thread_node (Double_list& lst,
-                                              clock::timestamp_t ts, Thread& th) :
+    Timeout_thread_node::Timeout_thread_node (clock::timestamp_t ts, Thread& th) :
         Timestamp_node
-          { lst, ts }, //
+          { ts }, //
         thread (th)
     {
       ;
@@ -272,9 +269,9 @@ namespace os
 
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
-    Timer_node::Timer_node (Double_list& lst, clock::timestamp_t ts, Timer& tm) :
+    Timer_node::Timer_node (clock::timestamp_t ts, Timer& tm) :
         Timestamp_node
-          { lst, ts }, //
+          { ts }, //
         timer (tm)
     {
       ;

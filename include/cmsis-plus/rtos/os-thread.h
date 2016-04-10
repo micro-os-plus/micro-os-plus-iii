@@ -517,13 +517,16 @@ namespace os
                                    flags::mode_t mode);
 
       friend void
-      scheduler::_link_node (Waiting_thread_node& node);
+      scheduler::_link_node (Waiting_threads_list& list,
+                             Waiting_thread_node& node);
 
       friend void
       scheduler::_unlink_node (Waiting_thread_node& node);
 
       friend void
-      scheduler::_link_node (Waiting_thread_node& node,
+      scheduler::_link_node (Waiting_threads_list& list,
+                             Waiting_thread_node& node,
+                             Clock_timestamps_list& timeout_list,
                              Timeout_thread_node& timeout_node);
 
       friend void

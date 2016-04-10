@@ -240,7 +240,7 @@ namespace os
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
       Timeout_thread_node node
-        { list, timestamp, crt_thread };
+        { timestamp, crt_thread };
 
         {
           interrupts::Critical_section ics;

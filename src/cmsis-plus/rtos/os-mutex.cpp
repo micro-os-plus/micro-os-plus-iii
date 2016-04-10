@@ -636,7 +636,7 @@ namespace os
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
       Waiting_thread_node node
-        { list_, crt_thread };
+        { crt_thread };
 
       for (;;)
         {
@@ -653,7 +653,7 @@ namespace os
                   interrupts::Critical_section ics; // ----- Critical section -----
 
                   // Add this thread to the mutex waiting list.
-                  scheduler::_link_node (node);
+                  scheduler::_link_node (list_, node);
                 }
             }
 
@@ -805,14 +805,14 @@ namespace os
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
       Waiting_thread_node node
-        { list_, crt_thread };
+        { crt_thread };
 
       Clock_timestamps_list& clock_list = clock_.steady_list ();
       clock::timestamp_t timeout_timestamp = clock_.steady_now () + timeout;
 
       // Prepare a timeout node pointing to the current thread.
       Timeout_thread_node timeout_node
-        { clock_list, timeout_timestamp, crt_thread };
+        { timeout_timestamp, crt_thread };
 
       for (;;)
         {
@@ -830,7 +830,7 @@ namespace os
 
                   // Add this thread to the mutex waiting list,
                   // and the clock timeout list.
-                  scheduler::_link_node (node, timeout_node);
+                  scheduler::_link_node (list_, node, clock_list, timeout_node);
                 }
             }
 

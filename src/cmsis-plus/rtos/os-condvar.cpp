@@ -517,7 +517,7 @@ namespace os
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
       Waiting_thread_node node
-        { list_, crt_thread };
+        { crt_thread };
 
       // TODO: validate
 
@@ -531,7 +531,7 @@ namespace os
 
         {
           // Add this thread to the condition variable waiting list.
-          ((Waiting_threads_list&) (node.list)).link (node);
+          list_.link (node);
           node.thread.waiting_node_ = &node;
 
           res = mutex.lock ();
@@ -659,7 +659,7 @@ namespace os
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
       Waiting_thread_node node
-        { list_, crt_thread };
+        { crt_thread };
 
       // TODO: validate
 
@@ -673,7 +673,7 @@ namespace os
 
         {
           // Add this thread to the condition variable waiting list.
-          ((Waiting_threads_list&) (node.list)).link (node);
+          list_.link (node);
           node.thread.waiting_node_ = &node;
 
           res = mutex.timed_lock (timeout);

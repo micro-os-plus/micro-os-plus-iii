@@ -52,88 +52,11 @@ namespace os
 
     // ========================================================================
 
-    class Double_list_links0
-    {
-    public:
-
-      /**
-       * @name Constructors & Destructor
-       * @{
-       */
-
-      /**
-       * @brief Create the node with a reference to the list.
-       * @param lst Reference to the list.
-       */
-      Double_list_links0 ();
-
-      /**
-       * @cond ignore
-       */
-      Double_list_links0 (const Double_list_links0&) = delete;
-      Double_list_links0 (Double_list_links0&&) = delete;
-      Double_list_links0&
-      operator= (const Double_list_links0&) = delete;
-      Double_list_links0&
-      operator= (Double_list_links0&&) = delete;
-      /**
-       * @endcond
-       */
-
-      /**
-       * @brief Destroy the node.
-       */
-      ~Double_list_links0 ();
-
-      /**
-       * @}
-       */
-
-      /**
-       * @name Public Member Functions
-       * @{
-       */
-
-      /**
-       * @brief Remove the node from the list.
-       * @param [in] node Reference to the list node to remove from the list.
-       * @return Nothing.
-       */
-      void
-      unlink (void);
-
-      /**
-       * @}
-       */
-
-    public:
-
-      /**
-       * @name Public Member Variables
-       * @{
-       */
-
-      /**
-       * @brief Pointer to previous node.
-       */
-      volatile Double_list_links0* volatile prev;
-
-      /**
-       * @brief Pointer to next node.
-       */
-      volatile Double_list_links0* volatile next;
-
-      /**
-       * @}
-       */
-
-    };
-
     /**
      * @brief The core of a double linked list, pointers to next,
-     * previous and list.
+     * previous.
      */
-    class Double_list_links : public Double_list_links0
+    class Double_list_links
     {
     public:
 
@@ -143,10 +66,9 @@ namespace os
        */
 
       /**
-       * @brief Create the node with a reference to the list.
-       * @param lst Reference to the list.
+       * @brief Create the list node.
        */
-      Double_list_links (Double_list& lst);
+      Double_list_links ();
 
       /**
        * @cond ignore
@@ -170,6 +92,22 @@ namespace os
        * @}
        */
 
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+      /**
+       * @brief Remove the node from the list.
+       * @return Nothing.
+       */
+      void
+      unlink (void);
+
+      /**
+       * @}
+       */
+
     public:
 
       /**
@@ -178,9 +116,14 @@ namespace os
        */
 
       /**
-       * @brief Reference to list linking this node.
+       * @brief Pointer to previous node.
        */
-      Double_list& list;
+      volatile Double_list_links* volatile prev;
+
+      /**
+       * @brief Pointer to next node.
+       */
+      volatile Double_list_links* volatile next;
 
       /**
        * @}
@@ -206,11 +149,10 @@ namespace os
        */
 
       /**
-       * @brief Create a node with references to the list and thread.
-       * @param lst Reference to the list.
+       * @brief Create a node with references to the thread.
        * @param th Reference to the thread.
        */
-      Waiting_thread_node (Double_list& lst, Thread& th);
+      Waiting_thread_node (Thread& th);
 
       /**
        * @cond ignore
@@ -271,11 +213,10 @@ namespace os
        */
 
       /**
-       * @brief Create a node with a reference to the list and a time stamp.
-       * @param lst Reference to the list.
+       * @brief Create a node with a time stamp.
        * @param ts Time stamp.
        */
-      Timestamp_node (Double_list& lst, clock::timestamp_t ts);
+      Timestamp_node (clock::timestamp_t ts);
 
       /**
        * @cond ignore
@@ -359,11 +300,10 @@ namespace os
 
       /**
        * @brief Create a clock timeout node.
-       * @param [in] lst Reference to the list.
        * @param [in] ts Time stamp.
        * @param [in] th Reference to thread.
        */
-      Timeout_thread_node (Double_list& lst, clock::timestamp_t ts, Thread& th);
+      Timeout_thread_node (clock::timestamp_t ts, Thread& th);
 
       /**
        * @cond ignore
@@ -446,11 +386,10 @@ namespace os
 
       /**
        * @brief Create a clock timer node.
-       * @param [in] lst Reference to the list.
        * @param [in] ts Time stamp.
        * @param [in] tm Reference to timer.
        */
-      Timer_node (Double_list& lst, clock::timestamp_t ts, Timer& tm);
+      Timer_node (clock::timestamp_t ts, Timer& tm);
 
       /**
        * @cond ignore
@@ -589,7 +528,7 @@ namespace os
        *  None.
        * @return Pointer to head node.
        */
-      Double_list_links0*
+      Double_list_links*
       head (void);
       /**
        * @}
@@ -607,7 +546,7 @@ namespace os
        * @details
        * To simplify processing, the list always has a node.
        */
-      Double_list_links0 volatile head_;
+      Double_list_links volatile head_;
 
       /**
        * @}
@@ -811,13 +750,15 @@ namespace os
     namespace scheduler
     {
       void
-      _link_node (Waiting_thread_node& node);
+      _link_node (Waiting_threads_list& list, Waiting_thread_node& node);
 
       void
       _unlink_node (Waiting_thread_node& node);
 
       void
-      _link_node (Waiting_thread_node& node, Timeout_thread_node& timeout_node);
+      _link_node (Waiting_threads_list& list, Waiting_thread_node& node,
+                  Clock_timestamps_list& timeout_list,
+                  Timeout_thread_node& timeout_node);
 
       void
       _unlink_node (Waiting_thread_node& node,
@@ -839,24 +780,10 @@ namespace os
     // ========================================================================
 
     inline
-    Double_list_links0::Double_list_links0 ()
+    Double_list_links::Double_list_links ()
     {
       prev = nullptr;
       next = nullptr;
-    }
-
-    inline
-    Double_list_links0::~Double_list_links0 ()
-    {
-      ;
-    }
-    // ========================================================================
-
-    inline
-    Double_list_links::Double_list_links (Double_list& lst) :
-        list (lst)
-    {
-      ;
     }
 
     inline
@@ -868,9 +795,7 @@ namespace os
     // ========================================================================
 
     inline
-    Waiting_thread_node::Waiting_thread_node (Double_list& lst, Thread& th) :
-        Double_list_links
-          { lst }, //
+    Waiting_thread_node::Waiting_thread_node (Thread& th) :
         thread (th)
     {
       ;
@@ -891,10 +816,10 @@ namespace os
       return (head_.next == &head_);
     }
 
-    inline Double_list_links0*
+    inline Double_list_links*
     Double_list::head (void)
     {
-      return (Double_list_links0*) head_.next;
+      return (Double_list_links*) head_.next;
     }
 
     // ========================================================================

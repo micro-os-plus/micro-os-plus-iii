@@ -215,13 +215,13 @@ namespace os
     {
 
       void
-      _link_node (Waiting_thread_node& node)
+      _link_node (Waiting_threads_list& list, Waiting_thread_node& node)
       {
         // Remove this thread from the ready list, if there.
         port::this_thread::prepare_suspend ();
 
         // Add this thread to the node waiting list.
-        ((Waiting_threads_list&) (node.list)).link (node);
+        list.link (node);
         node.thread.waiting_node_ = &node;
       }
 
@@ -239,17 +239,19 @@ namespace os
       }
 
       void
-      _link_node (Waiting_thread_node& node, Timeout_thread_node& timeout_node)
+      _link_node (Waiting_threads_list& list, Waiting_thread_node& node,
+                  Clock_timestamps_list& timeout_list,
+                  Timeout_thread_node& timeout_node)
       {
         // Remove this thread from the ready list, if there.
         port::this_thread::prepare_suspend ();
 
         // Add this thread to the node waiting list.
-        ((Waiting_threads_list&) (node.list)).link (node);
+        list.link (node);
         node.thread.waiting_node_ = &node;
 
         // Add this thread to the clock timeout list.
-        ((Clock_timestamps_list&) (timeout_node.list)).link (timeout_node);
+        timeout_list.link (timeout_node);
         timeout_node.thread.clock_node_ = &timeout_node;
       }
 
