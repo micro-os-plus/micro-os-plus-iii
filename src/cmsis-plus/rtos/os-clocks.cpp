@@ -249,7 +249,7 @@ namespace os
           port::this_thread::prepare_suspend ();
 
           // Add this thread to the clock waiting list.
-          list.add (node);
+          list.link (node);
           crt_thread.clock_node_ = &node;
         }
 
@@ -261,7 +261,7 @@ namespace os
           // Remove the thread from the clock timeout list,
           // if not already removed by the timer.
           crt_thread.clock_node_ = nullptr;
-          list.remove (node);
+          node.unlink ();
         }
 
       return result::ok;

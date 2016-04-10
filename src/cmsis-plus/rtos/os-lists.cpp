@@ -40,6 +40,34 @@ namespace os
 
     /**
      * @details
+     * Update the neighbours to
+     * point to each other, skipping the node.
+     *
+     * For more robustness, to prevent unexpected accesses,
+     * the links in the removed node are nullified.
+     */
+    void
+    Double_list_links0::unlink (void)
+    {
+      // Check if not already removed.
+      if (next == nullptr)
+        {
+          return;
+        }
+
+      // Make neighbours point to each other.
+      prev->next = next;
+      next->prev = prev;
+
+      // Nullify both pointers in the removed node.
+      prev = nullptr;
+      next = nullptr;
+    }
+
+    // ========================================================================
+
+    /**
+     * @details
      * The initial list status is empty.
      */
     Double_list::Double_list ()
@@ -65,34 +93,6 @@ namespace os
     {
       head_.next = &head_;
       head_.prev = &head_;
-    }
-
-    /**
-     * @details
-     * If the list has more than one node, update the neighbours to
-     * point to each other, skipping the node.
-     *
-     * For lists with only one node, simply clear the list.
-     *
-     * For more robustness, to prevent unexpected accesses,
-     * the links in the removed node are nullified.
-     */
-    void
-    Double_list::remove (Double_list_links& node)
-    {
-      // Check if not already removed.
-      if (node.next == nullptr)
-        {
-          return;
-        }
-
-      // Make neighbours point to each other.
-      node.prev->next = node.next;
-      node.next->prev = node.prev;
-
-      // Nullify both pointers in the removed node.
-      node.prev = nullptr;
-      node.next = nullptr;
     }
 
     // ========================================================================
@@ -139,7 +139,7 @@ namespace os
      * itself, to satisfy the circular double linked list requirements.
      */
     void
-    Waiting_threads_list::add (Waiting_thread_node& node)
+    Waiting_threads_list::link (Waiting_thread_node& node)
     {
       thread::priority_t prio = node.thread.sched_prio ();
 
@@ -198,7 +198,7 @@ namespace os
           // The top priority is to remove the entry from the list
           // so that subsequent wakeups to address different threads.
           thread = &(head ()->thread);
-          remove (*head ());
+          head ()->unlink ();
         }
       assert(thread != nullptr);
 
@@ -259,7 +259,7 @@ namespace os
     Timeout_thread_node::action (void)
     {
       Thread* th = &this->thread;
-      ((Clock_timestamps_list&) list).remove (*this);
+      this->unlink ();
 
       thread::state_t state = th->sched_state ();
       if (state != thread::state::destroyed)
@@ -292,7 +292,7 @@ namespace os
     void
     Timer_node::action (void)
     {
-      ((Clock_timestamps_list&) list).remove (*this);
+      this->unlink ();
       timer.interrupt_service_routine ();
     }
 
@@ -315,7 +315,7 @@ namespace os
      *
      */
     void
-    Clock_timestamps_list::add (Timestamp_node& node)
+    Clock_timestamps_list::link (Timestamp_node& node)
     {
       clock::timestamp_t timestamp = node.timestamp;
 

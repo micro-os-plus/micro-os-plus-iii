@@ -226,7 +226,7 @@ namespace os
 
           if (state_ == timer::state::running)
             {
-              ((Clock_timestamps_list&) timer_node_.list).remove (timer_node_);
+              timer_node_.unlink ();
             }
         }
 
@@ -269,7 +269,7 @@ namespace os
 
         {
           interrupts::Critical_section ics; // ----- Critical section -----
-          ((Clock_timestamps_list&) timer_node_.list).add (timer_node_);
+          ((Clock_timestamps_list&) timer_node_.list).link (timer_node_);
         }
       res = result::ok;
 
@@ -316,7 +316,7 @@ namespace os
         {
           interrupts::Critical_section ics; // ----- Critical section -----
 
-          ((Clock_timestamps_list&) timer_node_.list).remove (timer_node_);
+          timer_node_.unlink ();
         }
       res = result::ok;
 
@@ -338,7 +338,7 @@ namespace os
           timer_node_.timestamp += period_;
 
           // No need for critical section in ISR.
-          ((Clock_timestamps_list&) timer_node_.list).add (timer_node_);
+          ((Clock_timestamps_list&) timer_node_.list).link (timer_node_);
         }
       else
         {

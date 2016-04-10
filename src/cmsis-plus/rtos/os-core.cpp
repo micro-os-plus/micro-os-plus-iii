@@ -221,7 +221,7 @@ namespace os
         port::this_thread::prepare_suspend ();
 
         // Add this thread to the node waiting list.
-        ((Waiting_threads_list&) (node.list)).add (node);
+        ((Waiting_threads_list&) (node.list)).link (node);
         node.thread.waiting_node_ = &node;
       }
 
@@ -234,7 +234,7 @@ namespace os
             // Remove the thread from the node waiting list,
             // if not already removed.
             node.thread.waiting_node_ = nullptr;
-            node.list.remove (node);
+            node.unlink ();
           }
       }
 
@@ -245,11 +245,11 @@ namespace os
         port::this_thread::prepare_suspend ();
 
         // Add this thread to the node waiting list.
-        ((Waiting_threads_list&) (node.list)).add (node);
+        ((Waiting_threads_list&) (node.list)).link (node);
         node.thread.waiting_node_ = &node;
 
         // Add this thread to the clock timeout list.
-        ((Clock_timestamps_list&) (timeout_node.list)).add (timeout_node);
+        ((Clock_timestamps_list&) (timeout_node.list)).link (timeout_node);
         timeout_node.thread.clock_node_ = &timeout_node;
       }
 
@@ -262,12 +262,12 @@ namespace os
         // Remove the thread from the clock timeout list,
         // if not already removed by the timer.
         timeout_node.thread.clock_node_ = nullptr;
-        timeout_node.list.remove (timeout_node);
+        timeout_node.unlink ();
 
         // Remove the thread from the node waiting list,
         // if not already removed.
         node.thread.waiting_node_ = nullptr;
-        node.list.remove (node);
+        node.unlink ();
       }
 
     } /* namespace this_thread */

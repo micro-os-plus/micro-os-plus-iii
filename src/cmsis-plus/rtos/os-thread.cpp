@@ -746,14 +746,13 @@ namespace os
       // If the thread is waiting on an event, remove it from the list.
       if (waiting_node_ != nullptr)
         {
-          ((Waiting_threads_list&) (waiting_node_->list)).remove (
-              *waiting_node_);
+          waiting_node_->unlink ();
         }
 
       // If the thread is waiting on a timeout, remove it from the list.
       if (clock_node_ != nullptr)
         {
-          ((Clock_timestamps_list&) (clock_node_->list)).remove (*clock_node_);
+          clock_node_->unlink ();
         }
 
       func_result_ = nullptr;

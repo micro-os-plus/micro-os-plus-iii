@@ -89,6 +89,23 @@ namespace os
        * @}
        */
 
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+      /**
+       * @brief Remove the node from the list.
+       * @param [in] node Reference to the list node to remove from the list.
+       * @return Nothing.
+       */
+      void
+      unlink (void);
+
+      /**
+       * @}
+       */
+
     public:
 
       /**
@@ -567,14 +584,6 @@ namespace os
       // TODO add iterator begin(), end()
 
       /**
-       * @brief Remove the node from the list.
-       * @param [in] node Reference to the list node to remove from the list.
-       * @return Nothing.
-       */
-      void
-      remove (Double_list_links& node);
-
-      /**
        * @brief Get list head.
        * @par Parameters
        *  None.
@@ -659,7 +668,7 @@ namespace os
        * @return Nothing.
        */
       void
-      add (Waiting_thread_node& node);
+      link (Waiting_thread_node& node);
 
       /**
        * @brief Get list head.
@@ -761,7 +770,7 @@ namespace os
        * @return Nothing.
        */
       void
-      add (Timestamp_node& node);
+      link (Timestamp_node& node);
 
       /**
        * @brief Get list head.
