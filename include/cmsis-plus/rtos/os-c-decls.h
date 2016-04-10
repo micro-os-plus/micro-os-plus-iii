@@ -65,8 +65,8 @@ extern "C"
 
   typedef struct os_threads_waiting_list_s
   {
-    void* head;
-    size_t count;
+    void* next;
+    void* prev;
   } os_threads_waiting_list_t;
 
   typedef uint32_t os_flags_mode_t;
@@ -122,9 +122,9 @@ extern "C"
 
 #if !defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE) && !defined(__cplusplus)
   typedef struct
-  {
-    ;
-  } os_thread_user_storage_t;
+    {
+      ;
+    }os_thread_user_storage_t;
 #endif
 
 #pragma GCC diagnostic push

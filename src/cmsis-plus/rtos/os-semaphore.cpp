@@ -635,7 +635,7 @@ namespace os
     Semaphore::value (void) const
     {
 #if !defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
-      return (count_ > 0) ? count_ : (semaphore::count_t) (-list_.length ());
+      return (count_ > 0) ? count_ : 0;
 #else
       return count_;
 #endif

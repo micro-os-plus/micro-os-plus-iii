@@ -272,7 +272,7 @@ _start (void)
       || (__data_end_guard != DATA_END_GUARD_VALUE))
     {
       for (;;)
-        ;
+      ;
     }
 #endif
 
@@ -300,7 +300,7 @@ _start (void)
   if ((__bss_begin_guard != 0) || (__bss_end_guard != 0))
     {
       for (;;)
-        ;
+      ;
     }
 #endif
 
@@ -310,7 +310,7 @@ _start (void)
 
   // Initialise the trace output device. From this moment on,
   // trace_printf() calls are available (including in static constructors).
-  __initialize_trace();
+  __initialize_trace ();
 
   // Get the argc/argv (useful in semihosting configurations).
   int argc;
@@ -356,31 +356,31 @@ initialise_monitor_handles (void);
 
 void __attribute__((weak))
 __initialize_args (int* p_argc, char*** p_argv)
-{
-  // By the time we reach this, the data and bss should have been initialised.
+  {
+    // By the time we reach this, the data and bss should have been initialised.
 
-  // The strings pointed to by the argv array shall be modifiable by the
-  // program, and retain their last-stored values between program startup
-  // and program termination. (static, no const)
-  static char name[] = "";
+    // The strings pointed to by the argv array shall be modifiable by the
+    // program, and retain their last-stored values between program startup
+    // and program termination. (static, no const)
+    static char name[] = "";
 
-  // The string pointed to by argv[0] represents the program name;
-  // argv[0][0] shall be the null character if the program name is not
-  // available from the host environment. argv[argc] shall be a null pointer.
-  // (static, no const)
-  static char* argv[2] =
-    { name, NULL };
+    // The string pointed to by argv[0] represents the program name;
+    // argv[0][0] shall be the null character if the program name is not
+    // available from the host environment. argv[argc] shall be a null pointer.
+    // (static, no const)
+    static char* argv[2] =
+      { name, NULL};
 
-  *p_argc = 1;
-  *p_argv = &argv[0];
+    *p_argc = 1;
+    *p_argv = &argv[0];
 
 #if __STDC_HOSTED__ != 0
-  // temporary here
-  initialise_monitor_handles ();
+    // temporary here
+    initialise_monitor_handles ();
 #endif
 
-  return;
-}
+    return;
+  }
 
 #pragma GCC diagnostic pop
 

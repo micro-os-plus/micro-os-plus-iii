@@ -53,8 +53,7 @@ namespace os
      */
     Double_list::~Double_list ()
     {
-      assert(head_ == nullptr);
-      assert(count_ == 0);
+      assert(empty ());
     }
 
     /**
@@ -64,8 +63,8 @@ namespace os
     void
     Double_list::clear (void)
     {
-      head_ = nullptr;
-      count_ = 0;
+      head_.next = &head_;
+      head_.prev = &head_;
     }
 
     /**
@@ -87,24 +86,9 @@ namespace os
           return;
         }
 
-      if (count_ > 1)
-        {
-          if (head_ == &node)
-            {
-              // Move head to next node, this one will vanish.
-              head_ = (Double_list_links*) node.next;
-            }
-
-          // Make neighbours point to each other.
-          node.prev->next = node.next;
-          node.next->prev = node.prev;
-
-          --count_;
-        }
-      else if (count_ == 1)
-        {
-          clear ();
-        }
+      // Make neighbours point to each other.
+      node.prev->next = node.next;
+      node.next->prev = node.prev;
 
       // Nullify both pointers in the removed node.
       node.prev = nullptr;
@@ -157,56 +141,40 @@ namespace os
     void
     Waiting_threads_list::add (Waiting_thread_node& node)
     {
-      if (head_ == nullptr)
-        {
-          // Make the node point to itself, to satisfy the double
-          // linked circular list.
-          node.prev = &node;
-          node.next = &node;
+      thread::priority_t prio = node.thread.sched_prio ();
 
-          head_ = &node;
-          count_ = 1;
+      Waiting_thread_node* after = (Waiting_thread_node*) (head_.prev);
+
+      if (empty () || (prio <= after->thread.sched_prio ()))
+        {
+          // Insert at the end of the list.
+        }
+      else if (prio > head ()->thread.sched_prio ())
+        {
+          // Insert at the beginning of the list
+          after = (Waiting_thread_node*) (&head_);
+#if defined(OS_TRACE_RTOS_LISTS)
+          trace::printf ("%s() head \n", __func__);
+#endif
         }
       else
         {
-          thread::priority_t prio = node.thread.sched_prio ();
-
-          Waiting_thread_node* after = (Waiting_thread_node*) (head_->prev);
-
-          if (prio <= after->thread.sched_prio ())
+          // Insert in the middle of the list.
+          // The loop is guaranteed to terminate, not hit the head and
+          // the weight is small, sched_prio() is only an accessor.
+          while (prio > after->thread.sched_prio ())
             {
-              // Insert at the end of the list.
+              after = (Waiting_thread_node*) after->prev;
             }
-          else if (prio > head ()->thread.sched_prio ())
-            {
-              // Insert at the beginning of the list
-              // and update the new head.
-              head_ = &node;
-#if defined(OS_TRACE_RTOS_LISTS)
-              trace::printf ("%s() head \n", __func__);
-#endif
-            }
-          else
-            {
-              // Insert in the middle of the list.
-              // The loop is guaranteed to terminate and the
-              // weight is small, sched_prio() is only an accessor.
-              while (prio > after->thread.sched_prio ())
-                {
-                  after = (Waiting_thread_node*) after->prev;
-                }
-            }
-
-          // Make the new node point to its neighbours.
-          node.prev = after;
-          node.next = after->next;
-
-          // Make the neighbours point to the n. The order is important.
-          after->next->prev = &node;
-          after->next = &node;
-
-          ++count_;
         }
+
+      // Make the new node point to its neighbours.
+      node.prev = after;
+      node.next = after->next;
+
+      // Make the neighbours point to the n. The order is important.
+      after->next->prev = &node;
+      after->next = &node;
     }
 
     /**
@@ -349,67 +317,45 @@ namespace os
     void
     Clock_timestamps_list::add (Timestamp_node& node)
     {
-      if (head_ == nullptr)
+      clock::timestamp_t timestamp = node.timestamp;
+
+      Timeout_thread_node* after = (Timeout_thread_node*) (head_.prev);
+
+      if (empty () || (timestamp >= after->timestamp))
         {
-          // Make the node point to itself, to satisfy the double
-          // linked circular list.
-          node.prev = &node;
-          node.next = &node;
-
+          // Insert at the end of the list.
+        }
+      else if (timestamp < head ()->timestamp)
+        {
+          // Insert at the beginning of the list
+          // and update the new head.
+          after = (Timeout_thread_node*) (&head_);
 #if defined(OS_TRACE_RTOS_LISTS)
-          trace::printf ("%s() %u \n", __func__, (uint32_t) node.timestamp);
+          trace::printf ("%s() head \n", __func__);
 #endif
-
-          head_ = &node;
-          count_ = 1;
         }
       else
         {
-          clock::timestamp_t timestamp = node.timestamp;
-
-          Timeout_thread_node* after = (Timeout_thread_node*) (head_->prev);
-
-          if (timestamp >= after->timestamp)
+          // Insert in the middle of the list.
+          // The loop is guaranteed to terminate.
+          while (timestamp < after->timestamp)
             {
-              // Insert at the end of the list.
+              after = (Timeout_thread_node*) (after->prev);
             }
-          else if (timestamp < head ()->timestamp)
-            {
-              // Insert at the beginning of the list
-              // and update the new head.
-              head_ = &node;
-#if defined(OS_TRACE_RTOS_LISTS)
-              trace::printf ("%s() head \n", __func__);
-#endif
-            }
-          else
-            {
-              // Insert in the middle of the list.
-              // The loop is guaranteed to terminate.
-              while (timestamp < after->timestamp)
-                {
-                  after = (Timeout_thread_node*) (after->prev);
-                }
-            }
-
-          ++count_;
-
-#if defined(OS_TRACE_RTOS_LISTS)
-          trace::printf ("%s() %u after %u #%d\n", __func__,
-                         (uint32_t) timestamp, (uint32_t) after->timestamp,
-                         count_);
-#endif
-
-          assert(after->timestamp != 0);
-
-          // Make the new node point to its neighbours.
-          node.prev = after;
-          node.next = after->next;
-
-          // Make the neighbours point to the node. The order is important.
-          after->next->prev = &node;
-          after->next = &node;
         }
+
+#if defined(OS_TRACE_RTOS_LISTS)
+      trace::printf ("%s() %u after %u #%d\n", __func__, (uint32_t) timestamp,
+                     (uint32_t) after->timestamp);
+#endif
+
+      // Make the new node point to its neighbours.
+      node.prev = after;
+      node.next = after->next;
+
+      // Make the neighbours point to the node. The order is important.
+      after->next->prev = &node;
+      after->next = &node;
     }
 
     /**
@@ -422,11 +368,17 @@ namespace os
     void
     Clock_timestamps_list::check_timestamp (clock::timestamp_t now)
     {
+      if (head_.next == nullptr)
+        {
+          // This happens before the constructors are executed.
+          return;
+        }
+
       // Multiple threads can wait for the same time stamp, so
       // iterate until a node with future time stamp is identified.
       for (; !empty ();)
         {
-          clock::timestamp_t head_ts = ((Timeout_thread_node*) head_)->timestamp;
+          clock::timestamp_t head_ts = head ()->timestamp;
           if (now >= head_ts)
             {
 #if defined(OS_TRACE_RTOS_LISTS)

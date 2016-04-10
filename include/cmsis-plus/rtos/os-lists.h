@@ -52,11 +52,71 @@ namespace os
 
     // ========================================================================
 
+    class Double_list_links0
+    {
+    public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+      /**
+       * @brief Create the node with a reference to the list.
+       * @param lst Reference to the list.
+       */
+      Double_list_links0 ();
+
+      /**
+       * @cond ignore
+       */
+      Double_list_links0 (const Double_list_links0&) = delete;
+      Double_list_links0 (Double_list_links0&&) = delete;
+      Double_list_links0&
+      operator= (const Double_list_links0&) = delete;
+      Double_list_links0&
+      operator= (Double_list_links0&&) = delete;
+      /**
+       * @endcond
+       */
+
+      /**
+       * @brief Destroy the node.
+       */
+      ~Double_list_links0 ();
+
+      /**
+       * @}
+       */
+
+    public:
+
+      /**
+       * @name Public Member Variables
+       * @{
+       */
+
+      /**
+       * @brief Pointer to previous node.
+       */
+      volatile Double_list_links0* volatile prev;
+
+      /**
+       * @brief Pointer to next node.
+       */
+      volatile Double_list_links0* volatile next;
+
+      /**
+       * @}
+       */
+
+    };
+
     /**
      * @brief The core of a double linked list, pointers to next,
      * previous and list.
      */
-    class Double_list_links
+    class Double_list_links : public Double_list_links0
     {
     public:
 
@@ -99,16 +159,6 @@ namespace os
        * @name Public Member Variables
        * @{
        */
-
-      /**
-       * @brief Pointer to previous node.
-       */
-      Double_list_links* prev;
-
-      /**
-       * @brief Pointer to next node.
-       */
-      Double_list_links* next;
 
       /**
        * @brief Reference to list linking this node.
@@ -514,15 +564,6 @@ namespace os
       bool
       empty (void) const;
 
-      /**
-       * @brief Get the number of nodes in the list.
-       * @par Parameters
-       *  None.
-       * @return A non negative integer with the number of nodes.
-       */
-      std::size_t
-      length (void) const;
-
       // TODO add iterator begin(), end()
 
       /**
@@ -533,6 +574,14 @@ namespace os
       void
       remove (Double_list_links& node);
 
+      /**
+       * @brief Get list head.
+       * @par Parameters
+       *  None.
+       * @return Pointer to head node.
+       */
+      Double_list_links0*
+      head (void);
       /**
        * @}
        */
@@ -545,19 +594,11 @@ namespace os
        */
 
       /**
-       * @brief Pointer to the list first node.
+       * @brief A list node used to point to head and tail.
        * @details
-       * For empty lists, this value is 'nullptr'.
+       * To simplify processing, the list always has a node.
        */
-      Double_list_links* volatile head_;
-
-      /**
-       * @brief Count of nodes in the list.
-       * @details
-       * A non negative integer, updated with each insertion/removal, to
-       * reflect the actual number of nodes in the list.
-       */
-      std::size_t volatile count_;
+      Double_list_links0 volatile head_;
 
       /**
        * @}
@@ -624,7 +665,7 @@ namespace os
        * @brief Get list head.
        * @par Parameters
        *  None.
-       * @return Casted pointer.
+       * @return Casted pointer to head node.
        */
       Waiting_thread_node*
       head (void);
@@ -726,7 +767,7 @@ namespace os
        * @brief Get list head.
        * @par Parameters
        *  None.
-       * @return Casted pointer.
+       * @return Casted pointer to head node.
        */
       Timestamp_node*
       head (void);
@@ -789,11 +830,24 @@ namespace os
     // ========================================================================
 
     inline
-    Double_list_links::Double_list_links (Double_list& lst) :
-        list (lst)
+    Double_list_links0::Double_list_links0 ()
     {
       prev = nullptr;
       next = nullptr;
+    }
+
+    inline
+    Double_list_links0::~Double_list_links0 ()
+    {
+      ;
+    }
+    // ========================================================================
+
+    inline
+    Double_list_links::Double_list_links (Double_list& lst) :
+        list (lst)
+    {
+      ;
     }
 
     inline
@@ -824,13 +878,14 @@ namespace os
     inline bool
     Double_list::empty (void) const
     {
-      return (head_ == nullptr);
+      // If it point to itself, it is empty.
+      return (head_.next == &head_);
     }
 
-    inline std::size_t
-    Double_list::length (void) const
+    inline Double_list_links0*
+    Double_list::head (void)
     {
-      return count_;
+      return (Double_list_links0*) head_.next;
     }
 
     // ========================================================================
@@ -858,7 +913,7 @@ namespace os
     inline Waiting_thread_node*
     Waiting_threads_list::head (void)
     {
-      return (Waiting_thread_node*) head_;
+      return (Waiting_thread_node*) Double_list::head ();
     }
 
     // ========================================================================
@@ -878,7 +933,7 @@ namespace os
     inline Timestamp_node*
     Clock_timestamps_list::head (void)
     {
-      return (Timestamp_node*) head_;
+      return (Timestamp_node*) Double_list::head ();
     }
 
   // --------------------------------------------------------------------------
