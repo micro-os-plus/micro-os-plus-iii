@@ -292,7 +292,7 @@ namespace os
           }
 
         inline void __attribute__((always_inline))
-        dumpArgs (int argc, char* argv[])
+        dump_args (int argc, char* argv[])
           {
           }
 
