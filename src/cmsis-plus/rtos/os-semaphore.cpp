@@ -192,7 +192,9 @@ namespace os
             clock_ (attr.clock != nullptr ? *attr.clock : systick_clock),
 #endif
             initial_count_ (attr.sm_initial_count), //
-            max_count_ (attr.sm_max_count)
+            max_count_ (
+                attr.sm_max_count ?
+                    attr.sm_max_count : semaphore::max_count_value)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
