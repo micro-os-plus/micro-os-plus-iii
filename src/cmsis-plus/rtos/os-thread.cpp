@@ -1041,11 +1041,6 @@ namespace os
                      this, name ());
 #endif
 
-      if (timeout == 0)
-        {
-          timeout = 1;
-        }
-
         {
           interrupts::Critical_section ics; // ----- Critical section -----
 
@@ -1055,17 +1050,21 @@ namespace os
             }
         }
 
-      clock::timestamp_t prev = systick_clock.now ();
-      clock::duration_t slept_ticks = 0;
+      Clock& clock = systick_clock;
+      Clock_timestamps_list& clock_list = clock.steady_list ();
+      clock::timestamp_t timeout_timestamp = clock.steady_now () + timeout;
+
+#if defined(OS_TRACE_RTOS_THREAD)
+      clock::timestamp_t begin_timestamp = clock.steady_now ();
+#endif
+
+      // Prepare a timeout node pointing to the current thread.
+      Timeout_thread_node timeout_node
+        { timeout_timestamp, *this };
 
       result_t res = ENOTRECOVERABLE;
       for (;;)
         {
-          systick_clock.wait_for (timeout - slept_ticks);
-
-          clock::timestamp_t now = systick_clock.now ();
-          slept_ticks += (clock::duration_t) (now - prev);
-
             {
               interrupts::Critical_section ics; // ----- Critical section -----
 
@@ -1074,12 +1073,24 @@ namespace os
                   res = result::ok;
                   break;
                 }
+
+              // Remove this thread from the ready list, if there.
+              port::this_thread::prepare_suspend ();
+
+              // Add this thread to the clock timeout list.
+              clock_list.link (timeout_node);
+              timeout_node.thread.clock_node_ = &timeout_node;
             }
 
-          if (slept_ticks >= timeout)
+          port::scheduler::reschedule ();
+
             {
-              res = ETIMEDOUT;
-              break;
+              interrupts::Critical_section ics; // ----- Critical section -----
+
+              // Remove the thread from the clock timeout list,
+              // if not already removed by the timer.
+              timeout_node.thread.clock_node_ = nullptr;
+              timeout_node.unlink ();
             }
 
           if (interrupted ())
@@ -1088,10 +1099,15 @@ namespace os
               break;
             }
 
-          prev = now;
+          if (clock.steady_now () >= timeout_timestamp)
+            {
+              res = ETIMEDOUT;
+              break;
+            }
         }
 
 #if defined(OS_TRACE_RTOS_THREAD)
+      clock::duration_t slept_ticks = clock.steady_now () - begin_timestamp;
       trace::printf ("%s(0x%X, %d, %d)=%d @%p %s\n", __func__, mask, mode,
                      timeout, slept_ticks, this, name ());
 #endif
