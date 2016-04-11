@@ -539,10 +539,6 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
 
-      if (timeout == 0)
-        {
-          timeout = 1;
-        }
       return port::Semaphore::timed_wait (this, timeout);
 
 #else

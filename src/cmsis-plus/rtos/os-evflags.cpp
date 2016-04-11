@@ -420,11 +420,6 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
-      if (timeout == 0)
-        {
-          timeout = 1;
-        }
-
       return port::Event_flags::timed_wait (this, mask, timeout, oflags, mode);
 
 #else

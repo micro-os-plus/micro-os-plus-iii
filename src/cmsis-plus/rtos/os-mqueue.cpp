@@ -663,11 +663,6 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
-      if (timeout == 0)
-        {
-          timeout = 1;
-        }
-
       return port::Message_queue::timed_send (this, msg, nbytes, mprio, timeout);
 
 #else
@@ -1038,11 +1033,6 @@ namespace os
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
-
-      if (timeout == 0)
-        {
-          timeout = 1;
-        }
 
       return port::Message_queue::timed_receive (this, msg, nbytes, mprio,
           timeout);
