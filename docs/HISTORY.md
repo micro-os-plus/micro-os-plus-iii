@@ -72,7 +72,29 @@ Define each function in `port/os-inlines.h` using FreeRTOS primitives.
 - realise that individual thread defs can be reused after thread terminates, even for multiple instances
 - add stack to thread definitions
 
- 
+## Implement the portable synchronisation objects
+
+All synchronisation objects were implemented. To be noted the waiting lists, 
+which have their nodes allocated on each waiting thread stack.
+
+## Preliminary definition for the scheduler API
+
+Based on the experience with the FreeRTOS port, it looks safer to split `suspend()` into
+`prepare_suspend()` and `reschedule()`, and call the first one in a critical
+region together with linking the thread to the waiting lists.
+
+## Write a stress test for the semaphore implementation
+
+The test uses a hardware timer to generate interrupts at various rates, and
+the ISR stores a word into an array and notifies a semaphore. The thread 
+waits for the semaphore and checks the presence of the value in the array.
+
+It is a more automated (and much faster) version of the copy/paste test using 
+the usart input to a monitor.
+
+
+
+
 
 
 
