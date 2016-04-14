@@ -269,6 +269,7 @@ namespace os
 
         {
           interrupts::Critical_section ics; // ----- Critical section -----
+
           clock_.steady_list ().link (timer_node_);
         }
       res = result::ok;

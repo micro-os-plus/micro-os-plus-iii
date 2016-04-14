@@ -120,14 +120,20 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       status_t
-      lock (void)
+      lock (status_t status)
       {
         os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
-        port::scheduler::lock ();
+        status_t tmp;
 
-        status_t tmp = is_locked_;
-        is_locked_ = true;
+          {
+            interrupts::Critical_section ics;
+
+            tmp = is_locked_;
+            is_locked_ = status;
+          }
+
+        port::scheduler::lock (is_locked_);
 
         return tmp;
       }
@@ -146,9 +152,10 @@ namespace os
       {
         os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
-        port::scheduler::unlock (status);
-
         is_locked_ = status;
+
+        port::scheduler::lock (is_locked_);
+
       }
 
     /**
@@ -360,6 +367,20 @@ namespace os
       Critical_section::exit (status_t status)
       {
         return port::interrupts::Critical_section::exit (status);
+      }
+
+      // Enter an IRQ uncritical section
+      status_t
+      Uncritical_section::enter (void)
+      {
+        return port::interrupts::Uncritical_section::enter ();
+      }
+
+      // Exit an IRQ uncritical section
+      void
+      Uncritical_section::exit (status_t status)
+      {
+        return port::interrupts::Uncritical_section::exit (status);
       }
 
     /**

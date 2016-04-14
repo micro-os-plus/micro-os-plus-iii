@@ -285,51 +285,54 @@ namespace os
       assert(function != nullptr);
       assert(attr.th_priority != thread::priority::none);
 
-      // Prevent the new thread to execute before all members are set.
-      scheduler::Critical_section cs; // ----- Critical section -----
+        {
+          // Prevent the new thread to execute before all members are set.
+          scheduler::Critical_section cs; // ----- Critical section -----
 
-      // Get attributes from user structure.
-      prio_ = attr.th_priority;
-      stack_size_bytes_ = attr.th_stack_size_bytes;
-      stack_addr_ = attr.th_stack_address;
+          // Get attributes from user structure.
+          prio_ = attr.th_priority;
+          stack_size_bytes_ = attr.th_stack_size_bytes;
+          stack_addr_ = attr.th_stack_address;
 
-      func_ = function;
-      func_args_ = args;
+          func_ = function;
+          func_args_ = args;
 
-      sig_mask_ = 0;
+          sig_mask_ = 0;
 
-      joiner_ = nullptr;
-      waiting_node_ = nullptr;
+          joiner_ = nullptr;
+          waiting_node_ = nullptr;
 
-      acquired_mutexes_ = 0;
+          acquired_mutexes_ = 0;
 
-      clock_node_ = nullptr;
-      func_result_ = nullptr;
+          clock_node_ = nullptr;
+          func_result_ = nullptr;
 
 #if defined(OS_TRACE_RTOS_THREAD)
-      trace::printf ("%s @%p %s %d %d\n", __func__, this, name (), prio_,
-                     stack_size_bytes_);
+          trace::printf ("%s @%p %s %d %d\n", __func__, this, name (), prio_,
+                         stack_size_bytes_);
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
-      port::Thread::create (this);
-      sched_state_ = thread::state::ready;
+          port::Thread::create (this);
+          sched_state_ = thread::state::ready;
 
 #else
 
-      // TODO: check min size
-      // TODO: align stack
-      if (stack_addr_ == nullptr)
-        {
-          // TODO: alloc default stack size
-        }
-      state_ = thread::state::inactive;
+          // TODO: check min size
+          // TODO: align stack
+          if (stack_addr_ == nullptr)
+            {
+              // TODO: alloc default stack size
+            }
+          state_ = thread::state::inactive;
 
-      scheduler::__register_thread (this);
+          scheduler::__register_thread (this);
 
 #endif
+        }
 
+      // For just in case the new thread has higher priority.
       this_thread::yield ();
     }
 
@@ -1107,7 +1110,8 @@ namespace os
         }
 
 #if defined(OS_TRACE_RTOS_THREAD)
-      clock::duration_t slept_ticks = clock.steady_now () - begin_timestamp;
+      clock::duration_t slept_ticks = (clock::duration_t) (clock.steady_now ()
+          - begin_timestamp);
       trace::printf ("%s(0x%X, %d, %d)=%d @%p %s\n", __func__, mask, mode,
                      timeout, slept_ticks, this, name ());
 #endif

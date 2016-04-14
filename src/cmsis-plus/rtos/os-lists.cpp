@@ -342,8 +342,7 @@ namespace os
         }
 
 #if defined(OS_TRACE_RTOS_LISTS)
-      trace::printf ("%s() %u after %u #%d\n", __func__, (uint32_t) timestamp,
-                     (uint32_t) after->timestamp);
+      trace::printf ("%s() %u\n", __func__, (uint32_t) timestamp);
 #endif
 
       // Make the new node point to its neighbours.

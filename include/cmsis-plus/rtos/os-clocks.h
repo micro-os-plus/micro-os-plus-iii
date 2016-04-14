@@ -385,11 +385,11 @@ namespace os
       using Clock::now;
 
       /**
-       * @brief Initialise RTC.
+       * @brief Initialise and make the RTC tick.
        * @par Parameters
        *  None
-       * @retval result::ok   The real time clock was initialised.
-       * @retval ENOTRECOVERABLE Could not initialise real time clock.
+       * @retval result::ok   The real time clock was started.
+       * @retval ENOTRECOVERABLE Could not start real time clock.
        */
       result_t
       start (void);

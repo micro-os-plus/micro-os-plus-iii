@@ -502,6 +502,9 @@ namespace os
           ++(crt_thread->acquired_mutexes_);
         }
 
+      // ----- Enter uncritical section -----
+      scheduler::Uncritical_section ucs;
+
       if (saved_owner == nullptr)
         {
           if (protocol_ == mutex::protocol::inherit)

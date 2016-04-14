@@ -584,7 +584,7 @@ namespace os
               // Add this thread to the semaphore waiting list,
               // and the clock timeout list.
               scheduler::_link_node (list_, node, clock_list, timeout_node);
-            }
+           }
 
           port::scheduler::reschedule ();
 

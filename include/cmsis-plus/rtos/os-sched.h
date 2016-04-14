@@ -95,16 +95,15 @@ namespace os
 
       /**
        * @brief %Lock the scheduler.
-       * @par Parameters
-       *  None
+       * @param [in] status The new status of the scheduler (true for locked).
        * @return The previous status of the scheduler.
        */
       status_t
-      lock (void);
+      lock (status_t status = true);
 
       /**
        * @brief Unlock the scheduler.
-       * @param [in] status The new status of the scheduler.
+       * @param [in] status The new status of the scheduler (false for unlocked).
        * @return  Nothing.
        */
       void
@@ -159,6 +158,67 @@ namespace os
          * @brief Exit a critical section.
          */
         ~Critical_section ();
+
+        /**
+         * @}
+         */
+
+      protected:
+
+        /**
+         * @name Private Member Variables
+         * @{
+         */
+
+        /**
+         * @brief Variable to store the initial scheduler status.
+         */
+        const status_t status_;
+
+        /**
+         * @}
+         */
+      };
+
+      // ======================================================================
+
+      /**
+       * @brief Scheduler uncritical section [RAII](https://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization) helper.
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       */
+      class Uncritical_section
+      {
+      public:
+
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
+
+        /**
+         * @brief Enter a critical section.
+         * @par Parameters
+         *  None
+         */
+        Uncritical_section ();
+
+        /**
+         * @cond ignore
+         */
+        Uncritical_section (const Uncritical_section&) = delete;
+        Uncritical_section (Uncritical_section&&) = delete;
+        Uncritical_section&
+        operator= (const Uncritical_section&) = delete;
+        Uncritical_section&
+        operator= (Uncritical_section&&) = delete;
+        /**
+         * @endcond
+         */
+
+        /**
+         * @brief Exit a critical section.
+         */
+        ~Uncritical_section ();
 
         /**
          * @}
@@ -383,6 +443,95 @@ namespace os
       // ======================================================================
 
       /**
+       * @brief Interrupts critical section [RAII](https://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization) helper.
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       */
+      class Uncritical_section
+      {
+      public:
+
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
+
+        /**
+         * @brief Enter interrupts critical section.
+         * @par Parameters
+         *  None
+         */
+        Uncritical_section ();
+
+        /**
+         * @cond ignore
+         */
+        Uncritical_section (const Uncritical_section&) = delete;
+        Uncritical_section (Uncritical_section&&) = delete;
+        Uncritical_section&
+        operator= (const Uncritical_section&) = delete;
+        Uncritical_section&
+        operator= (Uncritical_section&&) = delete;
+        /**
+         * @endcond
+         */
+
+        /**
+         * @brief Exit interrupts critical section.
+         */
+        ~Uncritical_section ();
+
+        /**
+         * @}
+         */
+
+      public:
+
+        /**
+         * @name Public Member Functions
+         * @{
+         */
+
+        /**
+         * @brief Enter interrupts critical section.
+         * @par Parameters
+         *  None
+         * @return The current interrupts status register.
+         */
+        static status_t
+        enter (void);
+
+        /**
+         * @brief Exit interrupts critical section.
+         * @param status The value to restore the interrupts status register.
+         * @return  Nothing.
+         */
+        static void
+        exit (status_t status);
+
+        /**
+         * @}
+         */
+
+      protected:
+
+        /**
+         * @name Private Member Variables
+         * @{
+         */
+
+        /**
+         * @brief Variable to store the initial interrupts status.
+         */
+        const status_t status_;
+
+        /**
+         * @}
+         */
+      };
+
+      // ======================================================================
+
+      /**
        * @brief Interrupts standard locker.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
@@ -538,6 +687,28 @@ namespace os
         unlock (status_);
       }
 
+      /**
+       * @details
+       * Lock the scheduler and remember the initial scheduler status.
+       */
+      inline
+      Uncritical_section::Uncritical_section () :
+          status_ (lock (false))
+      {
+        ;
+      }
+
+      /**
+       * @details
+       * Restore the initial scheduler status and possibly unlock
+       * the scheduler.
+       */
+      inline
+      Uncritical_section::~Uncritical_section ()
+      {
+        unlock (status_);
+      }
+
       constexpr
       Lock::Lock () :
           status_ (0)
@@ -590,6 +761,19 @@ namespace os
 
       inline
       Critical_section::~Critical_section ()
+      {
+        exit (status_);
+      }
+
+      inline
+      Uncritical_section::Uncritical_section () :
+          status_ (enter ())
+      {
+        ;
+      }
+
+      inline
+      Uncritical_section::~Uncritical_section ()
       {
         exit (status_);
       }
