@@ -77,7 +77,7 @@ extern "C"
   os_sched_is_started (void);
 
   os_sched_status_t
-  os_sched_lock (void);
+  os_sched_lock (os_sched_status_t status);
 
   void
   os_sched_unlock (os_sched_status_t status);
@@ -92,6 +92,14 @@ extern "C"
 
   void
   os_irq_critical_exit (os_irq_status_t status);
+
+  // --------------------------------------------------------------------------
+
+  os_irq_status_t
+  os_irq_uncritical_enter (void);
+
+  void
+  os_irq_uncritical_exit (os_irq_status_t status);
 
   // --------------------------------------------------------------------------
 
@@ -156,6 +164,8 @@ extern "C"
                      os_flags_mode_t mode);
 
   // --------------------------------------------------------------------------
+
+  // TODO: when C++ specs are final, update for non-static objects.
 
   os_clock_timestamp_t
   os_systick_clock_now (void);
@@ -241,6 +251,15 @@ extern "C"
   os_mutex_set_prio_ceiling (os_mutex_t* mutex, os_thread_prio_t prio_ceiling,
                              os_thread_prio_t* old_prio_ceiling);
 
+  os_result_t
+  os_mutex_mark_consistent (os_mutex_t* mutex);
+
+  os_thread_t*
+  os_mutex_get_owner (os_mutex_t* mutex);
+
+  os_result_t
+  os_mutex_reset (os_mutex_t* mutex);
+
   // --------------------------------------------------------------------------
 
   void
@@ -295,6 +314,12 @@ extern "C"
   os_result_t
   os_semaphore_reset (os_semaphore_t* semaphore);
 
+  os_semaphore_count_t
+  os_semaphore_get_initial_value (os_semaphore_t* semaphore);
+
+  os_semaphore_count_t
+  os_semaphore_get_max_value (os_semaphore_t* semaphore);
+
   // --------------------------------------------------------------------------
 
   void
@@ -338,6 +363,9 @@ extern "C"
   os_result_t
   os_mempool_reset (os_mempool_t* mempool);
 
+  void*
+  os_mempool_get_pool (os_mempool_t* mempool);
+
   // --------------------------------------------------------------------------
 
   void
@@ -376,10 +404,10 @@ extern "C"
                            os_clock_duration_t timeout);
 
   size_t
-  os_mqueue_get_length (os_mqueue_t* mqueue);
+  os_mqueue_get_capacity (os_mqueue_t* mqueue);
 
   size_t
-  os_mqueue_get_capacity (os_mqueue_t* mqueue);
+  os_mqueue_get_length (os_mqueue_t* mqueue);
 
   size_t
   os_mqueue_get_msg_size (os_mqueue_t* mqueue);
@@ -433,6 +461,9 @@ extern "C"
   os_evflags_get_waiting (os_evflags_t* evflags);
 
   // --------------------------------------------------------------------------
+
+  // Internal functions, to be defined by the user.
+  // (not to be called directly).
 
   void
   os_systick_handler (void);

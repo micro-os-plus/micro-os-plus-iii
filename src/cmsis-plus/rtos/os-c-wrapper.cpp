@@ -111,9 +111,9 @@ os_sched_is_started (void)
 }
 
 os_sched_status_t
-os_sched_lock (void)
+os_sched_lock (os_sched_status_t status)
 {
-  return scheduler::lock ();
+  return scheduler::lock (status);
 }
 
 void
@@ -140,6 +140,20 @@ void
 os_irq_critical_exit (os_irq_status_t status)
 {
   interrupts::Critical_section::exit (status);
+}
+
+// ----------------------------------------------------------------------------
+
+os_irq_status_t
+os_irq_uncritical_enter (void)
+{
+  return interrupts::Uncritical_section::enter ();
+}
+
+void
+os_irq_uncritical_exit (os_irq_status_t status)
+{
+  interrupts::Uncritical_section::exit (status);
 }
 
 // ----------------------------------------------------------------------------
@@ -387,6 +401,24 @@ os_mutex_set_prio_ceiling (os_mutex_t* mutex, os_thread_prio_t prio_ceiling,
       prio_ceiling, old_prio_ceiling);
 }
 
+os_result_t
+os_mutex_mark_consistent (os_mutex_t* mutex)
+{
+  return (os_result_t) (reinterpret_cast<Mutex&> (*mutex)).consistent ();
+}
+
+os_thread_t*
+os_mutex_get_owner (os_mutex_t* mutex)
+{
+  return (os_thread_t*) (reinterpret_cast<Mutex&> (*mutex)).owner ();
+}
+
+os_result_t
+os_mutex_reset (os_mutex_t* mutex)
+{
+  return (os_result_t) (reinterpret_cast<Mutex&> (*mutex)).reset ();
+}
+
 // ----------------------------------------------------------------------------
 
 void
@@ -491,6 +523,18 @@ os_semaphore_reset (os_semaphore_t* semaphore)
   return (os_result_t) (reinterpret_cast<Semaphore&> (*semaphore)).reset ();
 }
 
+os_semaphore_count_t
+os_semaphore_get_initial_value (os_semaphore_t* semaphore)
+{
+  return (os_semaphore_count_t) (reinterpret_cast<Semaphore&> (*semaphore)).initial_value ();
+}
+
+os_semaphore_count_t
+os_semaphore_get_max_value (os_semaphore_t* semaphore)
+{
+  return (os_semaphore_count_t) (reinterpret_cast<Semaphore&> (*semaphore)).max_value ();
+}
+
 // ----------------------------------------------------------------------------
 
 void
@@ -571,6 +615,12 @@ os_result_t
 os_mempool_reset (os_mempool_t* mempool)
 {
   return (os_result_t) (reinterpret_cast<Memory_pool&> (*mempool)).reset ();
+}
+
+void*
+os_mempool_get_pool (os_mempool_t* mempool)
+{
+  return (void*) (reinterpret_cast<Memory_pool&> (*mempool)).pool ();
 }
 
 // --------------------------------------------------------------------------
