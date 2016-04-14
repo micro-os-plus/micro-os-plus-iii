@@ -302,7 +302,7 @@ namespace os
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
       void
-      interrupt_service_routine (void);
+      _interrupt_service_routine (void);
 
 #endif
 

@@ -330,7 +330,7 @@ namespace os
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
     void
-    Timer::interrupt_service_routine (void)
+    Timer::_interrupt_service_routine (void)
     {
 
       if (type_ == timer::run::periodic)

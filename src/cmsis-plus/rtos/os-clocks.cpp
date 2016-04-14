@@ -45,7 +45,7 @@ os_systick_handler (void)
     {
       os_port_systick_handler ();
     }
-  os::rtos::systick_clock.interrupt_service_routine ();
+  os::rtos::systick_clock._interrupt_service_routine ();
 }
 
 void
@@ -58,7 +58,7 @@ os_rtc_handler (void)
     {
       os_port_rtc_handler ();
     }
-  os::rtos::realtime_clock.interrupt_service_routine ();
+  os::rtos::realtime_clock._interrupt_service_routine ();
 }
 
 void __attribute__((weak))
@@ -218,7 +218,7 @@ namespace os
     }
 
     void
-    Clock::interrupt_service_routine (void)
+    Clock::_interrupt_service_routine (void)
     {
 #if defined(OS_TRACE_RTOS_CLOCKS)
       // trace::putchar ('.');
@@ -408,9 +408,9 @@ namespace os
 #endif
 
     void
-    Systick_clock::interrupt_service_routine (void)
+    Systick_clock::_interrupt_service_routine (void)
     {
-      Clock::interrupt_service_routine ();
+      Clock::_interrupt_service_routine ();
 
 #if !defined(OS_INCLUDE_RTOS_REALTIME_CLOCK_DRIVER)
 

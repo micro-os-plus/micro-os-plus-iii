@@ -290,7 +290,7 @@ namespace os
     Timer_node::action (void)
     {
       this->unlink ();
-      timer.interrupt_service_routine ();
+      timer._interrupt_service_routine ();
     }
 
 #endif

@@ -136,7 +136,7 @@ namespace os
       wait_for (clock::duration_t timeout);
 
       void
-      interrupt_service_routine (void);
+      _interrupt_service_routine (void);
 
       Clock_timestamps_list&
       steady_list (void);
@@ -294,7 +294,7 @@ namespace os
         ticks_cast (Rep_T microsec);
 
       void
-      interrupt_service_routine (void);
+      _interrupt_service_routine (void);
 
       /**
        * @}
