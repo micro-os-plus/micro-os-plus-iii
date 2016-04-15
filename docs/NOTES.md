@@ -655,8 +655,146 @@ const osMailQDef_t os_mailQ_def_##name = { \
 }
 ```
 
----
+### CMSIS 5
 
+#### CMSIS RTOS API v2: Move deprecated definitions to a separate file (#75)
+
+Browsing through the proposal for the new `cmsis_os.h`, I noticed that perhaps more than half of it is now deprecated and requires the presence of the `osCMSIS_API_V1` macro.
+
+Advanced editors like Eclipse can show the unused lines as grey, but it is still difficult to read such a file.
+
+Suggestion:
+
+* move all deprecated definitions to a separate file, and explicitly mark them as 'Not recommended for new designs'
+
+
+
+#### CMSIS RTOS API v2: Avoid mandatory dynamic allocation for all objects inadequate due to fragmentation (#76)
+
+The first major change I noticed in RTOS API v2 reads:
+
+```
+OS object's resources dynamically allocated rather than statically:
+- added: osXxxxNew functions which replace osXxxxCreate
+- removed: osXxxxCreate functions, osXxxxDef_t structures
+```
+
+Implementing this requires either a set of statically configured pools for each object type (separate pools for threads, mutexes, semaphores, pools, queues, mailboxes, flags, etc), which is highly discouraged, or the use of a true dynamic allocator, which is inacceptable for many applications due to fragmentation.
+
+[CMSIS++](http://micro-os-plus.github.io/cmsis-plus/) gives the user full control of the location where the objects are allocated, similar to C++, in other words objects can be statically allocated in the BSS, on the thread stack or on the heap (with a dynamic allocator like malloc()).
+
+Suggestion:
+
+* add a first parameter to the object creation function, with a pointer to a structure where the object will be emplaced; if this pointer is null, the object will be allocated dynamically using an implementation specific allocator.
+
+#### CMSIS RTOS API v2: Avoid adding further macros for the attributes (#77)
+
+I noticed that, probably inspired by CMSIS++, you added attributes to control the creation of new objects. This is actually the POSIX approach, and I think it is ok.
+
+However you also added lots of macros to initialise these attributes, and this is not really POSIX, and not really a good idea.
+
+The major POSIX argument for using attributes, is that they can be easily extended in future versions, without breaking compatibility with existing versions.
+
+For this to work, POSIX has functions that initialise the attributes to convenient defaults, then each attribute is set/get, in a single line, with a specialised setter/getter. In POSIX, adding a new parameter requires only adding a new setter/getter, which does not break compatibility.
+
+In CMSIS RTOS API v2 you use macros with lots of arguments, which may be compact, but if in a future version you'll need to add a new argument, you'll have to either extend the macro, or set the attribute manually in the structure, which is inconsistent.
+
+In [CMSIS++](http://micro-os-plus.github.io/cmsis-plus/) all attribute objects are initialised with a similar looking constructor, with a single argument (the object name). All other attributes are consistently set by directly manipulating the structure members.
+
+For example, in the compatibility wrapper, the implementation of `osThreadCreate()` includes:
+
+```
+  thread::Attributes attr
+    { thread_def->name };
+  attr.th_priority = thread_def->tpriority;
+  attr.th_stack_size_bytes = thread_def->stacksize;
+  ...
+  new (th) Thread (attr, (thread::func_t) thread_def->pthread, args);
+```
+
+Suggestion:
+
+* use a consistent, similar loooking, macro to initialise all objects with default values and explictly set structure members for each attribute.
+
+#### CMSIS RTOS API v2: When using attributes, avoid unnecessary creation parameters (#78)
+
+One of the POSIX goals when designing the attributes mechanism was to remove all non-mandatory parameters in object creation functions.
+
+For example, when creating a thread, the user function and the arguments are mandatory, but the priority, stack size and other such details can have defaults and were moved to attributes.
+
+[CMSIS++](http://micro-os-plus.github.io/cmsis-plus/) strictly follows this principle.
+
+The RTOS API v2 design does not, and inconsistently messes attributes with non-mandatory parameters, for example:
+
+- the semaphore creation `osSemaphoreNew()` requires `max_count` and `initial_count`, although there are reasonable defaults for both of them (max_int and 0, for example)
+- the `osMemoryPoolNew()`, `osMessageQueueNew()` and `osMailQueueNew()` functions require `memory`, although it shouldn't be mandatory, since the storage can be dynamically allocated (also see the more specific #???)
+
+Suggestion:
+
+* move non-mandatory parameters to attributes
+
+
+#### CMSIS RTOS API v2: Inconsistent memory allocation for object and object storage (#79)
+
+For memory pools, message queues and mail queues, the proposed APIs assumes mandatory dynamic allocation for the objects themselves, but also expect user allocated buffers for the pools and/or queues.
+
+This is inconsistent; if dynamic application is appropriate for the application, it should also be possible to automatically allocate the pools/queues storage, with minimum user intervention.
+
+In [CMSIS++](http://micro-os-plus.github.io/cmsis-plus/), all objects requiring storage can be configured with user provided buffers, but these buffers are passed as pointer + size via the creation attributes.
+
+Suggestion:
+
+* move the non-mandatory `memory` parameter to attributes; if not specified, dynamically allocate the required storage. (this is a more specific version of #78). For validation purposes, also add a `storage_size` attribute, to be sure the desired storage fits the user provided buffer.
+
+
+#### CMSIS RTOS API v2: Fix inconsistent type naming convention (#80)
+
+This is a recuring problem, that seems to affect all CMSIS components, not only RTOS, and, if I remember right, I already reported, but apparently without effect.
+
+In the current `cmsis_os.h` I can read the following types:
+
+* `osThreadState`
+* `os_timer_type`
+* `osThreadAttr_t`
+
+In other words you freely mess camel case names with underscores, with or without the standard `_t` suffix.
+
+Even worse, types are not consisten even inside a single definition (the struct name uses one naming convention and the typedef another naming convention):
+
+```
+typedef struct os_mutex_attr {
+  const char                 *name;    
+  uint32_t               attr_bits;    
+  uint32_t                reserved;    
+} osMutexAttr_t;
+
+```
+
+In my oppinion your general naming convention, not only the type naming convention, is problematic, but the issue here is not which naming convention you choose (this may turn into a religious war), but once you choose it, stick to it consistently.
+
+[CMSIS++](http://micro-os-plus.github.io/cmsis-plus/) uses the lower case naming convention, also adopted by POSIX and by the ISO C/C++ standards, with types suffixed by `_t`. User class names may have the initial character in uppercase.
+
+Suggestion
+
+* make the type naming convention uniform, preferably using the POSIX convention, with lower case and the `_t` suffix.
+
+
+#### CMSIS RTOS API v2: osEventFlagsWait()/osThreadFlagsWait() return type inconsistent with other blocking calls (#81)
+
+Most blocking calls return a status code, usually ok or timeout.
+
+It is not clear how you can differentiate the ok from timeout, in case of the flags functions, but it is inconsistent.
+
+In [CMSIS++](http://micro-os-plus.github.io/cmsis-plus/), all blocking functions return a consistent status code, and the output flags are passed via a pointer parameter.
+
+http://micro-os-plus.github.io/reference/cmsis-plus/classos_1_1rtos_1_1_event__flags.html
+
+Suggestion:
+
+- change the return type to a status code and add a pointer parameter for the output flags
+
+
+---
 
 
 ### Documentation
