@@ -2,7 +2,15 @@
 
 These are some issues related to the current CMSIS APIs, with suggestions based on solutions used in CMSIS++.
 
-## CMSIS RTOS API: Suggestions and comments
+## CMSIS RTOS API: Criticism, comments and CMSIS++ suggestions
+
+### For the impatient
+
+If you ever had to do with CMSIS RTOS API and did not enjoy it, or if you felt it like a straitjacket compared to your native RTOS, well, rest assured, your're not alone. The good news is that your experience matters and you can help improve CMSIS RTOS API. Go to [GitHub Issues](https://github.com/ARM-software/CMSIS/issues/64) and comment the existing issues, or open new ones.
+
+
+
+## The long story
 
 ### Thumbs up ARM for the CMSIS RTOS idea! 
 
@@ -10,31 +18,85 @@ First of all I have to confess that I was a big supporter of the general idea of
 
 ### Some CMSIS APIs considerations
 
-From my point of view, the main problem with the CMSIS APIs (including the CMSIS RTOS API) is that they seem not
-designed by a C++ programmer; please note that I did not ask for C++ APIs, the plain C APIs can be perfectly fine, I just prefered them to be designed by someone who thinks in C++, not in C (and as such knows how to avoid the usual mess that unstructured C programs bring, especially in the embedded world).
+From my point of view, the main problems with the CMSIS RTOS API are:
+
+- no POSIX compliance
+- not C++ friendly.
+
+Please note that I did not ask for C++ APIs, the plain C APIs should be perfectly fine, I just prefered tha APIs to be designed by someone who thinks in C++, not in C (and as such knows how to avoid the usual mess that unstructured C programs bring, especially in the embedded world); unfortunately ARM seems to have no C++ specialists in their design teams.
 
 ### The CMSIS++ proposal
 
-Given this situation, and seeing that ARM has no plans for a C++ redesign, I started to think of [CMSIS++](http://micro-os-plus.github.io/cmsis-plus/), as a proposal for a future generation of CMSIS.
+Given this situation, and seeing that ARM had no plans for a C++ redesign, I started to think of [CMSIS++](http://micro-os-plus.github.io/cmsis-plus/), as a C++ POSIX compliant proposal for a future generation of CMSIS.
  
 ### Some CMSIS RTOS API issues
 
-The initial attempt was to simply rewrite the original RTOS API in C++. However, while working on this, I encountered so many problems, and noticed so many differences from the POSIX and ISO C/C++ specs, that at a certain point I realised that I need to move the focus on POSIX, not CMSIS, otherwise this approach will not work.
+The initial attempt in CMSIS++ was to simply rewrite the original RTOS API in C++. However, while starting to walk this path, I encountered so many problems, and noticed so many differences from the POSIX and ISO C/C++ specs, that at a certain point I realised that the current design is broken beyound repair, and a reset is required, otherwise this approach will never work. 
+
+Restarting from scratch, the focus moved from CMSIS to POSIX and ISO.
 
 During the design and development phases, I kept a log of issues that I identified and addressed in the CMSIS++ proposal.
 
 Some were difficulties in understanding the CMSIS RTOS API, due to documentation issues, some are functional issues that make using the original API not very convenient, and some are suggestions for missing features.
 
 
-The functional issues are:
+The POSIX compliance issues are:
 
-- ...
+Use POSIX error codes (#65)
+Use explicit separate calls for different waiting functions, like lock(), try\_lock(), timed\_wait() (#45)
+Add normal (non-recursive) mutex (#53)
+Add a mechanism to wait for a thread to terminate (#50)
+For message queues, make the message size user configurable (#70)
+For message queues, add message priorities (#72)
+Make osSemaphoreWait() return errors, not counts (#56)
+Deprecate or remove the unused thread_id parameter in osMessageQCreate()/osMailQCreate() prototypes (#61)
+
+Other functional issues are:
+
+Avoid the heavy use of macros (to define objects and to refer to them) (#36)
+Do not mandate the use of a dynamic allocator (for stack, queues, etc) (#37)
+Add support for critical regions (interrupts & scheduler) (#38)
+Avoid mixing time durations (in milliseconds) with timer counts in ticks (#39)
+Add a separate RTC system clock (#40)
+Add os_main() to make the use of a main thread explicit (#41)
+Add support for a synchronised public memory allocator (#42)
+Avoid returning agregates (like osEvent) (#43)
+Extend the range for osKernelSysTick() (#44)
+Make the scheme to assign names to objects more consecvent (#46)
+Add missing destructor functions to all objects (#47)
+Extend the range of priority levels (#49)
+Add a mechanism to enumerate all registered threads (#51)
+Allow to explicitly define the semaphore max count (#55)
+Add a method to wait for a memory pool block to become available (#57)
+Fix non-portable message type in osMessagePut() (#60)
+Fix osMessagePut()/osMailPut() inconsistent error when called from ISR (#62)
+Mail queues, as separate objects, are redundant (#63)
+Add typedefs for all different types used in prototypes (#66)
+For all objects, add reset functions to return the object to initial status (#67)
+For mutex, add a method to get the owner thread (#68)
+For memory pools, add more accessors to get pool status (#69)
+For message queues, add more accessors to get queue status (#71)
+
 
 The documentation issues are:
 
-- ...
+Explain that thread functions can return (#48)
+Explain the mutex behaviour (recursive vs normal) (#52)
+Clarify the specs for binary vs counting semaphores (#54)
+Fix the data type used in osMessageQDef() example (#58)
+Fix misplaced thread id parameter for message queue (#59)
 
-Note: These issues refer to the current public release of CMSIS RTOS API, not to the recently announced CMSIS 5 development version.
+
+### CMSIS RTOS API v2
+
+Somehow acknowledging the initial design problems, ARM announced working on CMSIS RTOS API v2. To my surprise, ARM seems to have deprecated the initial macro based object creation mechanism (probably one of the most annoying features of the RTOS API v1).
+
+ARM also gave up returning aggregate objects, extended the priorities range, added explicit normal/recursive mutex objects, renamed some objects and generally kept very few features from the initial specification, so a design reset seems possible.
+
+However, based on the CMSIS++ experience, there are still more design decisions required to bring the new RTOS v2 closer to POSIX and ISO, for example using the POSIX error codes, using the POSIX explicit separate calls for different waiting functions (like `lock()`, `try_lock()`, `timed_wait()`), etc.
+
+
+----
 
 
 ### Final personal thoughts
