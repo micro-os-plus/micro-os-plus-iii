@@ -106,10 +106,11 @@ namespace os
      * or to the owner of a file or other resource. In CMSIS++ this
      * usually means that the call is not available in handler mode.
      * - `EINVAL` - Invalid argument. Some invalid argument was supplied;
-     * - `EAGAIN` - Resource temporarily unavailable. This is a temporary
-     * condition and later calls to the same routine may complete normally.
+     * - `EWOULDBLOCK` - Operation would block.
      * In CMSIS++ case, this usually means that a call to `try_xxx()`
      * found the resource busy.
+     * - `EAGAIN` - Resource temporarily unavailable. This is a temporary
+     * condition and later calls to the same routine may complete normally.
      * - `ENOTRECOVERABLE` - State not recoverable. In CMSIS++ this
      * usually means an unrecoverable error occurred.
      * - `EDEADLOCK` - Resource deadlock would occur. An attempt was made
@@ -141,7 +142,7 @@ namespace os
      *      {
      *        // All is well, mutex locked.
      *      }
-     *    else if (res == EAGAIN)
+     *    else if (res == EWOULDBLOCK)
      *      {
      *        // Mutex busy, try again later.
      *      }

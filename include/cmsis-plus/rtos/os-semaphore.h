@@ -252,7 +252,7 @@ namespace os
        * @par Parameters
        *  None
        * @retval result::ok The semaphore was posted.
-       * @retval EOVERFLOW The max count was exceeded.
+       * @retval EAGAIN The max count was exceeded.
        * @retval ENOTRECOVERABLE The semaphore could not be posted
        *  (extension to POSIX).
        */
@@ -280,7 +280,7 @@ namespace os
        * @retval result::ok The calling process successfully
        *  performed the semaphore lock operation.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
-       * @retval EAGAIN The semaphore was already locked.
+       * @retval EWOULDBLOCK The semaphore was already locked.
        * @retval ENOTRECOVERABLE Semaphore wait failed (extension to POSIX).
        * @retval EDEADLK A deadlock condition was detected.
        * @retval EINTR The operation was interrupted.

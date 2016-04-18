@@ -315,7 +315,7 @@ namespace os
        *  thread and it is up to the new owner to make the state consistent.
        * @retval EDEADLK The mutex type is `mutex::type::errorcheck` and
        *  the current thread already owns the mutex.
-       * @retval EBUSY The mutex could not be acquired because it was
+       * @retval EWOULDBLOCK The mutex could not be acquired because it was
        *  already locked.
        */
       result_t

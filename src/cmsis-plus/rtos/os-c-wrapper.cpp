@@ -1462,7 +1462,7 @@ osSignalWait (int32_t signals, uint32_t millisec)
     {
       event.status = osEventSignal;
     }
-  else if (res == EAGAIN)
+  else if (res == EWOULDBLOCK)
     {
       event.status = osOK; // Only for try_sig_wait().
     }
@@ -1572,7 +1572,7 @@ osMutexWait (osMutexId mutex_id, uint32_t millisec)
       // osOK: the mutex has been obtained.
       return osOK;
     }
-  else if (ret == EAGAIN)
+  else if (ret == EWOULDBLOCK)
     {
       // The mutex could not be obtained when no timeout was specified.
       // Only for try_lock().
@@ -1747,7 +1747,7 @@ osSemaphoreWait (osSemaphoreId semaphore_id, uint32_t millisec)
   else if (millisec == 0)
     {
       res = (reinterpret_cast<Semaphore&> (*semaphore_id)).try_wait ();
-      if (res == EAGAIN)
+      if (res == EWOULDBLOCK)
         {
           return 0;
         }
@@ -1800,7 +1800,7 @@ osSemaphoreRelease (osSemaphoreId semaphore_id)
     {
       return osOK;
     }
-  else if (res == EOVERFLOW)
+  else if (res == EAGAIN)
     {
       return osErrorResource;
     }
@@ -2049,7 +2049,7 @@ osMessagePut (osMessageQId queue_id, uint32_t info, uint32_t millisec)
       // The message was put into the queue.
       return osOK;
     }
-  else if (res == EAGAIN)
+  else if (res == EWOULDBLOCK)
     {
       // No memory in the queue was available
       return osErrorResource;
@@ -2153,7 +2153,7 @@ osMessageGet (osMessageQId queue_id, uint32_t millisec)
       // A parameter is invalid or outside of a permitted range.
       event.status = osErrorParameter;
     }
-  else if (res == EAGAIN)
+  else if (res == EWOULDBLOCK)
     {
       // No message is available in the queue and no timeout was specified.
       event.status = osOK;
@@ -2427,7 +2427,7 @@ osMailGet (osMailQId mail_id, uint32_t millisec)
       // Mail received, value.p contains the pointer to mail content.
       event.status = osEventMail;
     }
-  else if (res == EAGAIN)
+  else if (res == EWOULDBLOCK)
     {
       // No mail is available in the queue and no timeout was specified.
       event.status = osOK;

@@ -331,7 +331,7 @@ namespace os
 
           if (count_ >= this->max_count_)
             {
-              return EOVERFLOW;
+              return EAGAIN;
             }
 
           ++count_;
@@ -493,7 +493,7 @@ namespace os
         }
       else
         {
-          return EAGAIN;
+          return EWOULDBLOCK;
         }
 
 #endif
@@ -525,6 +525,7 @@ namespace os
      *  - the timeout is not expressed as an absolute time point, but
      * as a relative number of timer ticks (by default, the SysTick
      * clock for CMSIS).
+     *  - for consistency reasons, EWOULDBLOCK is used, instead of EAGAIN
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      *
@@ -584,7 +585,7 @@ namespace os
               // Add this thread to the semaphore waiting list,
               // and the clock timeout list.
               scheduler::_link_node (list_, node, clock_list, timeout_node);
-           }
+            }
 
           port::scheduler::reschedule ();
 

@@ -216,7 +216,7 @@ namespace os
        *  are expected, and if the flags should be cleared.
        * @retval result::ok All expected flags were raised.
        * @retval EINVAL The mask is outside of the permitted range.
-       * @retval EAGAIN The expected condition did not occur.
+       * @retval EWOULDBLOCK The expected condition did not occur.
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
@@ -309,7 +309,7 @@ namespace os
        *  are expected, and if the flags should be cleared.
        * @retval result::ok All expected flags are raised.
        * @retval EINVAL The mask is outside of the permitted range.
-       * @retval EAGAIN The expected condition did not occur.
+       * @retval EWOULDBLOCK The expected condition did not occur.
        * @retval ENOTRECOVERABLE Wait failed.
        */
       bool

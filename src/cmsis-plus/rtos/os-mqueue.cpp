@@ -572,6 +572,8 @@ namespace os
      *  with `O_NONBLOCK` set,
      *  from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  <br>Differences from the standard:
+     *  - for consistency reasons, EWOULDBLOCK is used, instead of EAGAIN
      *
      * @note Can be invoked from Interrupt Service Routines.
      */
@@ -600,7 +602,7 @@ namespace os
         }
       else
         {
-          return EAGAIN;
+          return EWOULDBLOCK;
         }
 
 #endif
@@ -935,6 +937,8 @@ namespace os
      *  with `O_NONBLOCK` set,
      *  from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  <br>Differences from the standard:
+     *  - for consistency reasons, EWOULDBLOCK is used, instead of EAGAIN
      *
      * @note Can be invoked from Interrupt Service Routines.
      */
@@ -965,7 +969,7 @@ namespace os
         }
       else
         {
-          return EAGAIN;
+          return EWOULDBLOCK;
         }
 
 #endif

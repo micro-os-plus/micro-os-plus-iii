@@ -908,7 +908,7 @@ namespace os
             }
         }
 
-      return EAGAIN;
+      return EWOULDBLOCK;
     }
 
     /**

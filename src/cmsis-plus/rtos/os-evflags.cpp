@@ -370,7 +370,7 @@ namespace os
         }
       else
         {
-          return EAGAIN;
+          return EWOULDBLOCK;
         }
 
 #endif

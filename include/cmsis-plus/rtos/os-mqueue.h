@@ -226,7 +226,7 @@ namespace os
        *  higher than the value used when creating the queue.
        * @param [in] mprio The message priority.
        * @retval result::ok The message was enqueued.
-       * @retval EAGAIN The specified message queue is full.
+       * @retval EWOULDBLOCK The specified message queue is full.
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
        * @retval EMSGSIZE The specified message length, nbytes,
        *  exceeds the message size attribute of the message queue.
@@ -294,7 +294,7 @@ namespace os
        *  (extension to POSIX).
        * @retval EBADMSG The implementation has detected a data corruption
        *  problem with the message.
-       * @retval EAGAIN The specified message queue is empty.
+       * @retval EWOULDBLOCK The specified message queue is empty.
        */
       result_t
       try_receive (char* msg, std::size_t nbytes, mqueue::priority_t* mprio);

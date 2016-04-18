@@ -560,7 +560,7 @@ namespace os
             }
         }
 
-      return EBUSY;
+      return EWOULDBLOCK;
 
       // TODO: EINVAL, EOWNERDEAD
     }
@@ -629,7 +629,7 @@ namespace os
           scheduler::Critical_section cs; // ----- Critical section -----
 
           res = _try_lock (&crt_thread);
-          if (res != EBUSY)
+          if (res != EWOULDBLOCK)
             {
               return res;
             }
@@ -647,7 +647,7 @@ namespace os
               scheduler::Critical_section cs; // ----- Critical section -----
 
               res = _try_lock (&crt_thread);
-              if (res != EBUSY)
+              if (res != EWOULDBLOCK)
                 {
                   return res;
                 }
@@ -708,6 +708,8 @@ namespace os
      *  Inspired by [`pthread_mutex_trylock()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_trylock.html)
      *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  <br>Differences from the standard:
+     *  - for consistency reasons, EWOULDBLOCK is used, instead of EBUSY
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -798,7 +800,7 @@ namespace os
           scheduler::Critical_section cs; // ----- Critical section -----
 
           res = _try_lock (&crt_thread);
-          if (res != EBUSY)
+          if (res != EWOULDBLOCK)
             {
               return res;
             }
@@ -823,7 +825,7 @@ namespace os
               scheduler::Critical_section cs; // ----- Critical section -----
 
               res = _try_lock (&crt_thread);
-              if (res != EBUSY)
+              if (res != EWOULDBLOCK)
                 {
                   return res;
                 }
