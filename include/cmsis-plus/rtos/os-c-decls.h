@@ -63,11 +63,18 @@ extern "C"
 
   typedef uint32_t os_result_t;
 
-  typedef struct os_threads_waiting_list_s
+  typedef struct os_double_list_links_s
   {
     void* next;
     void* prev;
-  } os_threads_waiting_list_t;
+  } os_double_list_links_t;
+
+  typedef os_double_list_links_t os_threads_waiting_list_t;
+
+  typedef struct os_thread_children_list_s
+  {
+    os_double_list_links_t links;
+  } os_thread_children_list_t;
 
   typedef uint32_t os_flags_mode_t;
   typedef uint32_t os_flags_mask_t;
@@ -148,6 +155,9 @@ extern "C"
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
     os_thread_port_data_t port_;
 #endif
+    void* parent;
+    os_thread_children_list_t children;
+    os_double_list_links_t child_links;
     void* joiner;
     void* waiting_node;
     void* clock_node;

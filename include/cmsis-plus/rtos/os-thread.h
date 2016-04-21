@@ -149,6 +149,9 @@ namespace os
           thread::sigset_t* oflags = nullptr,
           flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
+      Thread*
+      _thread (void);
+
     } /* namespace this_thread */
 
     // ========================================================================
@@ -533,6 +536,7 @@ namespace os
       scheduler::_unlink_node (Waiting_thread_node& node,
                                Timeout_thread_node& timeout_node);
 
+      friend class Thread_children_list;
       friend class Waiting_threads_list;
       friend class Clock_timestamps_list;
 
@@ -679,6 +683,10 @@ namespace os
       friend class port::Thread;
       os_thread_port_data_t port_;
 #endif
+
+      Thread* parent_;
+      Thread_children_list children_;
+      Double_list_links child_links_;
 
       Thread* joiner_;
       Waiting_thread_node* waiting_node_;

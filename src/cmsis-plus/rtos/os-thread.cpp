@@ -58,6 +58,24 @@ namespace os
      */
     namespace this_thread
     {
+
+      Thread*
+      _thread (void)
+      {
+        Thread* th;
+
+#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
+
+        th = port::this_thread::thread ();
+
+#else
+
+        // TODO
+
+#endif
+        return th;
+      }
+
       /**
        * @details
        *
@@ -68,15 +86,12 @@ namespace os
       {
         os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
-#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
+        Thread* th;
 
-        return port::this_thread::thread ();
+        th = _thread ();
 
-#else
-
-        // TODO
-
-#endif
+        assert(th != nullptr);
+        return (*th);
       }
 
       /**
@@ -307,6 +322,16 @@ namespace os
           clock_node_ = nullptr;
           func_result_ = nullptr;
 
+          parent_ = this_thread::_thread ();
+          if (parent_ != nullptr)
+            {
+              parent_->children_.link (*this);
+            }
+          else
+            {
+              // TODO: link to top (detached) threads.
+            }
+
 #if defined(OS_TRACE_RTOS_THREAD)
           trace::printf ("%s @%p %s %d %d\n", __func__, this, name (), prio_,
                          stack_size_bytes_);
@@ -354,6 +379,7 @@ namespace os
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s @%p %s \n", __func__, this, name ());
 #endif
+
       // Prevent the main thread to destroy itself while running
       // the exit cleanup code.
       if (this != &this_thread::thread ())
@@ -373,6 +399,9 @@ namespace os
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
+
+      child_links_.unlink ();
+      assert(children_.empty ());
 
       assert(acquired_mutexes_ == 0);
 
