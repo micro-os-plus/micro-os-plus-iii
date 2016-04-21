@@ -329,7 +329,7 @@ namespace os
             }
           else
             {
-              // TODO: link to top (detached) threads.
+              scheduler::top_threads_list_.link (*this);
             }
 
 #if defined(OS_TRACE_RTOS_THREAD)
@@ -402,6 +402,7 @@ namespace os
 
       child_links_.unlink ();
       assert(children_.empty ());
+      parent_ = nullptr;
 
       assert(acquired_mutexes_ == 0);
 
@@ -413,9 +414,6 @@ namespace os
       // Does not return if the current thread.
 
 #else
-
-      // TODO
-      scheduler::__unregister_thread (this);
 
 #endif
     }

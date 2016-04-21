@@ -536,6 +536,7 @@ namespace os
       scheduler::_unlink_node (Waiting_thread_node& node,
                                Timeout_thread_node& timeout_node);
 
+      friend class Top_threads_list;
       friend class Thread_children_list;
       friend class Waiting_threads_list;
       friend class Clock_timestamps_list;
@@ -684,12 +685,22 @@ namespace os
       os_thread_port_data_t port_;
 #endif
 
+      // Pointer to parent, or null for top/detached thread.
       Thread* parent_;
+
+      // List of children threads.
       Thread_children_list children_;
+
+      // Intrusive node used to link this thread to parent list.
       Double_list_links child_links_;
 
+      // Thread waiting to join.
       Thread* joiner_;
+
+      // Pointer to waiting node (stored on stack)
       Waiting_thread_node* waiting_node_;
+
+      // Pointer to timeout node (stored on stack)
       Timeout_thread_node* clock_node_;
 
       std::size_t stack_size_bytes_;

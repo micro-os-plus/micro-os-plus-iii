@@ -54,6 +54,11 @@ namespace os
       extern bool is_started_;
 
       /**
+       * @brief Head of the list with all top level and detached threads.
+       */
+      extern Top_threads_list top_threads_list_;
+
+      /**
        * @brief Initialise the RTOS scheduler.
        * @par Parameters
        *  None

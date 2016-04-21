@@ -61,10 +61,18 @@ namespace os
 
       /**
        * @details
-       * Modified by `lock()` and restored to previous value
+       * Modified by `lock()` and restored to the previous value
        * by `unlock()`.
        */
       status_t is_locked_ = false;
+
+      /**
+       * @details
+       * This special list is set to empty during BSS initialisation,
+       * since it must be available to register the very first statically
+       * allocated thread.
+       */
+      Top_threads_list top_threads_list_;
 
       /**
        * @details
