@@ -989,6 +989,10 @@ namespace os
   {
     // ========================================================================
 
+    // Code analysis may trigger:
+    // "Member 'prev' was not initialized in constructor"
+    // "Member 'next' was not initialized in constructor"
+
     inline
     Static_double_list_links::Static_double_list_links ()
     {

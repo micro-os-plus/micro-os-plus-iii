@@ -131,6 +131,12 @@ namespace os
     void
     Top_threads_list::link (Thread& thread)
     {
+      if (head_.prev == nullptr)
+        {
+          // If this is the first time, initialise the pointers to self.
+          clear ();
+        }
+
       // Add thread intrusive node at the end of the list.
       insert_after (thread.child_links_, (Double_list_links*) head_.prev);
     }
