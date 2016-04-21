@@ -554,7 +554,80 @@ namespace os
     };
 
     // ========================================================================
+    /**
+     * @brief Ordered double linked circular list of threads.
+     */
+    class Thread_children_list : public Double_list
+    {
+    public:
 
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+      /**
+       * @brief Create a list of waiting threads.
+       */
+      Thread_children_list ();
+
+      /**
+       * @cond ignore
+       */
+      Thread_children_list (const Thread_children_list&) = delete;
+      Thread_children_list (Thread_children_list&&) = delete;
+      Thread_children_list&
+      operator= (const Thread_children_list&) = delete;
+      Thread_children_list&
+      operator= (Thread_children_list&&) = delete;
+      /**
+       * @endcond
+       */
+
+      /**
+       * @brief Destroy the list.
+       */
+      ~Thread_children_list ();
+
+      /**
+       * @}
+       */
+
+    public:
+
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+      /**
+       * @brief Add a new thread node to the list.
+       * @param [in] node Reference to a list node.
+       * @return Nothing.
+       */
+      void
+      link (Thread& thread);
+
+      // TODO add iterator begin(), end()
+
+      /**
+       * @}
+       */
+
+    protected:
+
+      /**
+       * @name Private Member Variables
+       * @{
+       */
+
+      // None.
+      /**
+       * @}
+       */
+    };
+
+    // ========================================================================
     /**
      * @brief Ordered double linked circular list of threads.
      */
@@ -820,6 +893,28 @@ namespace os
     Double_list::head (void)
     {
       return (Double_list_links*) head_.next;
+    }
+
+    // ========================================================================
+
+    /**
+     * @details
+     * The initial list status is empty.
+     */
+    inline
+    Thread_children_list::Thread_children_list ()
+    {
+      ;
+    }
+
+    /**
+     * @details
+     * There must be no nodes in the list.
+     */
+    inline
+    Thread_children_list::~Thread_children_list ()
+    {
+      ;
     }
 
     // ========================================================================

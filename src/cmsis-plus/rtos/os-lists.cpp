@@ -97,6 +97,24 @@ namespace os
 
     // ========================================================================
 
+    void
+    Thread_children_list::link (Thread& thread)
+    {
+      Double_list_links* after = (Double_list_links*) head_.prev;
+
+      Double_list_links& node = thread.child_links_;
+
+      // Make the new node point to its neighbours.
+      node.prev = after;
+      node.next = after->next;
+
+      // Make the neighbours point to the n. The order is important.
+      after->next->prev = &node;
+      after->next = &node;
+    }
+
+    // ========================================================================
+
     /**
      * @class Waiting_threads_list
      * @details
