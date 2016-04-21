@@ -39,6 +39,19 @@ namespace os
     // ========================================================================
 
     /**
+     * @class Static_double_list_links
+     * @details
+     * This is the simplest list node, used as base class for other
+     * list nodes and as storage for Static_double_list,
+     * that must be available for any statically constructed
+     * objects while still avoiding the 'static initialisation order fiasco'.
+     *
+     * The idea is to design the object in such a way as to benefit
+     * from the standard BSS initialisation, in other words take `nullptr`
+     * as starting values.
+     */
+
+    /**
      * @details
      * Update the neighbours to
      * point to each other, skipping the node.
@@ -47,7 +60,7 @@ namespace os
      * the links in the removed node are nullified.
      */
     void
-    Double_list_links::unlink (void)
+    Static_double_list_links::unlink (void)
     {
       // Check if not already removed.
       if (next == nullptr)
@@ -62,6 +75,35 @@ namespace os
       // Nullify both pointers in the removed node.
       prev = nullptr;
       next = nullptr;
+    }
+
+    // ========================================================================
+
+    /**
+     * @class Static_double_list
+     * @details
+     * This is the simplest list, used as base class for scheduler
+     * lists that must be available for any statically constructed
+     * thread while still avoiding the 'static initialisation order fiasco'.
+     *
+     * The idea is to design the object in such a way as to benefit
+     * from the standard BSS initialisation, in other words take `nullptr`
+     * as starting values.
+     *
+     * This has the downside of requiring additional tests before
+     * adding new nodes to the list, to create the initial self
+     * links, and when checking if the list is empty.
+     */
+
+    /**
+     * @details
+     * Initialise the mandatory node with links to itself.
+     */
+    void
+    Static_double_list::clear (void)
+    {
+      head_.next = &head_;
+      head_.prev = &head_;
     }
 
     // ========================================================================
@@ -84,15 +126,13 @@ namespace os
       assert(empty ());
     }
 
-    /**
-     * @details
-     * Reset the count and clear the head pointer.
-     */
+    // ========================================================================
+
     void
-    Double_list::clear (void)
+    Top_threads_list::link (Thread& thread)
     {
-      head_.next = &head_;
-      head_.prev = &head_;
+      // Add thread intrusive node at the end of the list.
+      insert_after (thread.child_links_, (Double_list_links*) head_.prev);
     }
 
     // ========================================================================
@@ -100,17 +140,8 @@ namespace os
     void
     Thread_children_list::link (Thread& thread)
     {
-      Double_list_links* after = (Double_list_links*) head_.prev;
-
-      Double_list_links& node = thread.child_links_;
-
-      // Make the new node point to its neighbours.
-      node.prev = after;
-      node.next = after->next;
-
-      // Make the neighbours point to the n. The order is important.
-      after->next->prev = &node;
-      after->next = &node;
+      // Add thread intrusive node at the end of the list.
+      insert_after (thread.child_links_, (Double_list_links*) head_.prev);
     }
 
     // ========================================================================
@@ -186,13 +217,7 @@ namespace os
             }
         }
 
-      // Make the new node point to its neighbours.
-      node.prev = after;
-      node.next = after->next;
-
-      // Make the neighbours point to the n. The order is important.
-      after->next->prev = &node;
-      after->next = &node;
+      insert_after (node, after);
     }
 
     /**

@@ -53,10 +53,10 @@ namespace os
     // ========================================================================
 
     /**
-     * @brief The core of a double linked list, pointers to next,
-     * previous.
+     * @brief Statically allocated core of a double linked list,
+     * pointers to next, previous.
      */
-    class Double_list_links
+    class Static_double_list_links
     {
     public:
 
@@ -66,19 +66,19 @@ namespace os
        */
 
       /**
-       * @brief Create the list node.
+       * @brief Create a list node (BSS initialised).
        */
-      Double_list_links ();
+      Static_double_list_links ();
 
       /**
        * @cond ignore
        */
-      Double_list_links (const Double_list_links&) = delete;
-      Double_list_links (Double_list_links&&) = delete;
-      Double_list_links&
-      operator= (const Double_list_links&) = delete;
-      Double_list_links&
-      operator= (Double_list_links&&) = delete;
+      Static_double_list_links (const Static_double_list_links&) = delete;
+      Static_double_list_links (Static_double_list_links&&) = delete;
+      Static_double_list_links&
+      operator= (const Static_double_list_links&) = delete;
+      Static_double_list_links&
+      operator= (Static_double_list_links&&) = delete;
       /**
        * @endcond
        */
@@ -86,7 +86,7 @@ namespace os
       /**
        * @brief Destroy the node.
        */
-      ~Double_list_links ();
+      ~Static_double_list_links ();
 
       /**
        * @}
@@ -118,12 +118,56 @@ namespace os
       /**
        * @brief Pointer to previous node.
        */
-      volatile Double_list_links* volatile prev;
+      volatile Static_double_list_links* volatile prev;
 
       /**
        * @brief Pointer to next node.
        */
-      volatile Double_list_links* volatile next;
+      volatile Static_double_list_links* volatile next;
+
+      /**
+       * @}
+       */
+
+    };
+
+    // ========================================================================
+
+    /**
+     * @brief The core of a double linked list, pointers to next,
+     * previous.
+     */
+    class Double_list_links : public Static_double_list_links
+    {
+    public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+      /**
+       * @brief Create a list node (explicitly set to nullptr).
+       */
+      Double_list_links ();
+
+      /**
+       * @cond ignore
+       */
+      Double_list_links (const Double_list_links&) = delete;
+      Double_list_links (Double_list_links&&) = delete;
+      Double_list_links&
+      operator= (const Double_list_links&) = delete;
+      Double_list_links&
+      operator= (Double_list_links&&) = delete;
+      /**
+       * @endcond
+       */
+
+      /**
+       * @brief Destroy the node.
+       */
+      ~Double_list_links ();
 
       /**
        * @}
@@ -456,9 +500,130 @@ namespace os
     // ========================================================================
 
     /**
+     * @brief Statically allocated circular double linked list of nodes.
+     */
+    class Static_double_list
+    {
+    public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+      /**
+       * @brief Create a list.
+       */
+      Static_double_list ();
+
+      /**
+       * @cond ignore
+       */
+      Static_double_list (const Static_double_list&) = delete;
+      Static_double_list (Static_double_list&&) = delete;
+      Static_double_list&
+      operator= (const Static_double_list&) = delete;
+      Static_double_list&
+      operator= (Static_double_list&&) = delete;
+      /**
+       * @endcond
+       */
+
+      /**
+       * @brief Destroy the list.
+       */
+      ~Static_double_list ();
+
+      /**
+       * @}
+       */
+
+    public:
+
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+      /**
+       * @brief Clear the list.
+       * @par Parameters
+       *  None.
+       * @return Nothing.
+       */
+      void
+      clear (void);
+
+      /**
+       * @brief Check if the list is empty.
+       * @par Parameters
+       *  None.
+       * @retval true The list has no nodes.
+       * @retval false The list has at least one node.
+       */
+      bool
+      empty (void) const;
+
+      // TODO add iterator begin(), end()
+
+      /**
+       * @brief Get the list head.
+       * @par Parameters
+       *  None.
+       * @return Pointer to head node.
+       */
+      Static_double_list_links*
+      head (void);
+      /**
+       * @}
+       */
+
+    protected:
+
+      /**
+       * @name Private Member Functions
+       * @{
+       */
+
+      /**
+       * @brief Insert a new node after existing node.
+       * @param node Reference to node to insert.
+       * @param after Reference to existing node.
+       * @return Nothing.
+       */
+      void
+      insert_after (Static_double_list_links& node,
+                    Static_double_list_links* after);
+
+      /**
+       * @}
+       */
+
+    protected:
+
+      /**
+       * @name Private Member Variables
+       * @{
+       */
+
+      /**
+       * @brief A list node used to point to head and tail.
+       * @details
+       * To simplify processing, the list always has a node.
+       */
+      Static_double_list_links volatile head_;
+
+      /**
+       * @}
+       */
+    };
+
+    // ========================================================================
+
+    /**
      * @brief Circular double linked list of nodes.
      */
-    class Double_list
+    class Double_list : public Static_double_list
     {
     public:
 
@@ -494,6 +659,49 @@ namespace os
        * @}
        */
 
+    };
+
+    // ========================================================================
+
+    /**
+     * @brief List of top level threads.
+     */
+    class Top_threads_list : public Static_double_list
+    {
+    public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+      /**
+       * @brief Create a list of waiting threads.
+       */
+      Top_threads_list ();
+
+      /**
+       * @cond ignore
+       */
+      Top_threads_list (const Top_threads_list&) = delete;
+      Top_threads_list (Top_threads_list&&) = delete;
+      Top_threads_list&
+      operator= (const Top_threads_list&) = delete;
+      Top_threads_list&
+      operator= (Top_threads_list&&) = delete;
+      /**
+       * @endcond
+       */
+
+      /**
+       * @brief Destroy the list.
+       */
+      ~Top_threads_list ();
+
+      /**
+       * @}
+       */
+
     public:
 
       /**
@@ -502,51 +710,14 @@ namespace os
        */
 
       /**
-       * @brief Clear the list.
-       * @par Parameters
-       *  None.
+       * @brief Add a new thread node to the list.
+       * @param [in] node Reference to a list node.
        * @return Nothing.
        */
       void
-      clear (void);
-
-      /**
-       * @brief Check if the list is empty.
-       * @par Parameters
-       *  None.
-       * @retval true The list has no nodes.
-       * @retval false The list has at least one node.
-       */
-      bool
-      empty (void) const;
+      link (Thread& thread);
 
       // TODO add iterator begin(), end()
-
-      /**
-       * @brief Get list head.
-       * @par Parameters
-       *  None.
-       * @return Pointer to head node.
-       */
-      Double_list_links*
-      head (void);
-      /**
-       * @}
-       */
-
-    protected:
-
-      /**
-       * @name Private Member Variables
-       * @{
-       */
-
-      /**
-       * @brief A list node used to point to head and tail.
-       * @details
-       * To simplify processing, the list always has a node.
-       */
-      Double_list_links volatile head_;
 
       /**
        * @}
@@ -554,8 +725,9 @@ namespace os
     };
 
     // ========================================================================
+
     /**
-     * @brief Ordered double linked circular list of threads.
+     * @brief List of children threads.
      */
     class Thread_children_list : public Double_list
     {
@@ -613,23 +785,12 @@ namespace os
       /**
        * @}
        */
-
-    protected:
-
-      /**
-       * @name Private Member Variables
-       * @{
-       */
-
-      // None.
-      /**
-       * @}
-       */
     };
 
     // ========================================================================
+
     /**
-     * @brief Ordered double linked circular list of threads.
+     * @brief Priority ordered list of threads.
      */
     class Waiting_threads_list : public Double_list
     {
@@ -714,24 +875,12 @@ namespace os
       /**
        * @}
        */
-
-    protected:
-
-      /**
-       * @name Private Member Variables
-       * @{
-       */
-
-      // None.
-      /**
-       * @}
-       */
     };
 
     // ========================================================================
 
     /**
-     * @brief Ordered double linked circular list of time stamp nodes.
+     * @brief Ordered list of time stamp nodes.
      */
     class Clock_timestamps_list : public Double_list
     {
@@ -804,18 +953,6 @@ namespace os
       /**
        * @}
        */
-
-    protected:
-
-      /**
-       * @name Private Member Variables
-       * @{
-       */
-
-      // None.
-      /**
-       * @}
-       */
     };
 
     // ------------------------------------------------------------------------
@@ -853,6 +990,20 @@ namespace os
     // ========================================================================
 
     inline
+    Static_double_list_links::Static_double_list_links ()
+    {
+      ;
+    }
+
+    inline
+    Static_double_list_links::~Static_double_list_links ()
+    {
+      ;
+    }
+
+    // ========================================================================
+
+    inline
     Double_list_links::Double_list_links ()
     {
       prev = nullptr;
@@ -882,17 +1033,69 @@ namespace os
 
     // ========================================================================
 
-    inline bool
-    Double_list::empty (void) const
+    /**
+     * @details
+     * The initial list status is empty by having the pointers null.
+     */
+    inline
+    Static_double_list::Static_double_list ()
     {
-      // If it point to itself, it is empty.
-      return (head_.next == &head_);
+      // By all means, do not add any code here.
+      // The contructor was not `default` to benefit from inline.
     }
 
-    inline Double_list_links*
-    Double_list::head (void)
+    /**
+     * @details
+     * There must be no nodes in the list.
+     */
+    inline
+    Static_double_list::~Static_double_list ()
+    {
+      ;
+    }
+
+    inline bool
+    Static_double_list::empty (void) const
+    {
+      // If it point to itself, it is empty.
+      return (head_.next == &head_) || (head_.next == nullptr);
+    }
+
+    inline Static_double_list_links*
+    Static_double_list::head (void)
     {
       return (Double_list_links*) head_.next;
+    }
+
+    inline void
+    Static_double_list::insert_after (Static_double_list_links& node,
+                                      Static_double_list_links* after)
+    {
+      // Make the new node point to its neighbours.
+      node.prev = after;
+      node.next = after->next;
+
+      // Make the neighbours point to the node. The order is important.
+      after->next->prev = &node;
+      after->next = &node;
+    }
+
+    // ========================================================================
+
+    /**
+     * @details
+     * The initial list status is empty.
+     */
+    inline
+    Top_threads_list::Top_threads_list ()
+    {
+      ;
+    }
+
+    inline
+    Top_threads_list::~Top_threads_list ()
+    {
+      ;
     }
 
     // ========================================================================
@@ -907,10 +1110,6 @@ namespace os
       ;
     }
 
-    /**
-     * @details
-     * There must be no nodes in the list.
-     */
     inline
     Thread_children_list::~Thread_children_list ()
     {
@@ -929,10 +1128,6 @@ namespace os
       ;
     }
 
-    /**
-     * @details
-     * There must be no nodes in the list.
-     */
     inline
     Waiting_threads_list::~Waiting_threads_list ()
     {
