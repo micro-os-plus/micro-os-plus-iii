@@ -33,6 +33,8 @@
 // Better be the last, to undef putchar()
 #include <cmsis-plus/diag/trace.h>
 
+using namespace os;
+
 // ----------------------------------------------------------------------------
 
 void
@@ -58,6 +60,7 @@ os_rtc_handler (void)
     {
       os_port_rtc_handler ();
     }
+  trace::putchar ('!');
   os::rtos::realtime_clock._interrupt_service_routine ();
 }
 
@@ -342,6 +345,7 @@ namespace os
     {
       assert(details != nullptr);
 
+#if defined(__ARM_EABI__)
       // The core frequency can be returned right away, since
       // is not expected to change during this call.
       details->core_frequency_hz = SystemCoreClock;
@@ -385,6 +389,18 @@ namespace os
       details->ticks = ticks;
 
       return ticks;
+#elif defined(__APPLE__)
+
+      details->core_frequency_hz = 1000000000; // Very fast!
+      details->divisor = 1;
+      details->cycles = 0;
+      details->ticks = steady_count_;
+
+      return steady_count_;
+
+#else
+#error
+#endif
     }
 
 #if defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
