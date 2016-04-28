@@ -929,6 +929,10 @@ namespace os
           owner_ = nullptr;
           count_ = 0;
 
+          scheduler::Uncritical_section cs; // ----- Uncritical section -----
+
+          port::this_thread::yield ();
+
           return result::ok;
         }
 

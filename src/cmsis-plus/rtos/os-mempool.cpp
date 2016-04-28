@@ -578,6 +578,11 @@ namespace os
       // Wake-up one thread, if any.
       list_.resume_one ();
 
+      if (!scheduler::in_handler_mode ())
+        {
+          port::this_thread::yield ();
+        }
+
       return result::ok;
     }
 

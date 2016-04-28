@@ -525,6 +525,11 @@ namespace os
           list_.resume_all ();
         }
 
+      if (!scheduler::in_handler_mode ())
+        {
+          port::this_thread::yield ();
+        }
+
       return result::ok;
 
 #endif
