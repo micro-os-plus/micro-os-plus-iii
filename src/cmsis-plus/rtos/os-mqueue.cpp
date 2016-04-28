@@ -430,6 +430,12 @@ namespace os
 
           // Wake-up one thread, if any.
           receive_list_.resume_one ();
+
+          if (!scheduler::in_handler_mode ())
+            {
+              port::this_thread::yield ();
+            }
+
           // ----- Exit uncritical section ------------------------------------
         }
       return true;
@@ -484,7 +490,7 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
+      os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes, mprio,
@@ -582,7 +588,7 @@ namespace os
                              mqueue::priority_t mprio)
     {
       os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
+      os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes, mprio,
@@ -659,7 +665,7 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
+      os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d,%d,%d_ticks) @%p %s\n", __func__, msg, nbytes,
@@ -847,7 +853,7 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
+      os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
       os_assert_err(nbytes <= mqueue::max_size, EMSGSIZE);
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
@@ -947,7 +953,7 @@ namespace os
                                 mqueue::priority_t* mprio)
     {
       os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
+      os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
       os_assert_err(nbytes <= mqueue::max_size, EMSGSIZE);
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
@@ -1037,7 +1043,7 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes >= msg_size_bytes_, EMSGSIZE);
+      os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
       os_assert_err(nbytes <= mqueue::max_size, EMSGSIZE);
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
