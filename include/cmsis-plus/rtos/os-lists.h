@@ -790,6 +790,87 @@ namespace os
     // ========================================================================
 
     /**
+     * @brief Priority ordered list of threads waiting too run.
+     */
+    class Ready_threads_list : public Static_double_list
+    {
+    public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+      /**
+       * @brief Create a list of waiting threads.
+       */
+      Ready_threads_list ();
+
+      /**
+       * @cond ignore
+       */
+      Ready_threads_list (const Ready_threads_list&) = delete;
+      Ready_threads_list (Ready_threads_list&&) = delete;
+      Ready_threads_list&
+      operator= (const Ready_threads_list&) = delete;
+      Ready_threads_list&
+      operator= (Ready_threads_list&&) = delete;
+      /**
+       * @endcond
+       */
+
+      /**
+       * @brief Destroy the list.
+       */
+      ~Ready_threads_list ();
+
+      /**
+       * @}
+       */
+
+    public:
+
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+      /**
+       * @brief Add a new thread node to the list.
+       * @param [in] node Reference to a list node.
+       * @return Nothing.
+       */
+      void
+      link (Waiting_thread_node& node);
+
+      /**
+       * @brief Get list head.
+       * @par Parameters
+       *  None.
+       * @return Casted pointer to head node.
+       */
+      Waiting_thread_node*
+      head (void);
+
+      /**
+       * @brief Remove top node from the list.
+       * @par Parameters
+       *  None.
+       * @return Pointer to thread.
+       */
+      Thread*
+      remove_top (void);
+
+      // TODO add iterator begin(), end()
+
+      /**
+       * @}
+       */
+    };
+
+    // ========================================================================
+
+    /**
      * @brief Priority ordered list of threads.
      */
     class Waiting_threads_list : public Double_list
@@ -1071,6 +1152,7 @@ namespace os
       return (Double_list_links*) head_.next;
     }
 
+#if 0
     inline void
     Static_double_list::insert_after (Static_double_list_links& node,
                                       Static_double_list_links* after)
@@ -1083,6 +1165,7 @@ namespace os
       after->next->prev = &node;
       after->next = &node;
     }
+#endif
 
     // ========================================================================
 
@@ -1118,6 +1201,30 @@ namespace os
     Thread_children_list::~Thread_children_list ()
     {
       ;
+    }
+
+    // ========================================================================
+
+    /**
+     * @details
+     * The initial list status is empty.
+     */
+    inline
+    Ready_threads_list::Ready_threads_list ()
+    {
+      ;
+    }
+
+    inline
+    Ready_threads_list::~Ready_threads_list ()
+    {
+      ;
+    }
+
+    inline Waiting_thread_node*
+    Ready_threads_list::head (void)
+    {
+      return (Waiting_thread_node*) Static_double_list::head ();
     }
 
     // ========================================================================

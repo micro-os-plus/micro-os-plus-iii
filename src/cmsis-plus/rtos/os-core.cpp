@@ -74,6 +74,11 @@ namespace os
        */
       Top_threads_list top_threads_list_;
 
+#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+      Thread* current_thread_;
+      Ready_threads_list ready_threads_list_;
+#endif
+
       /**
        * @details
        * Create all RTOS internal objects and be ready to run.
@@ -85,9 +90,23 @@ namespace os
       {
         os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
+
         trace::printf ("%s() \n", __func__);
 
         return port::scheduler::initialize ();
+
+#else
+
+        port::scheduler::initialize ();
+
+        // A newline.
+        trace::puts (" ");
+
+        scheduler::_create_idle ();
+
+        return result::ok;
+#endif
       }
 
       /**
@@ -116,6 +135,8 @@ namespace os
 
         is_started_ = true;
         is_locked_ = false;
+
+        port::Systick_clock::start ();
 
         return port::scheduler::start ();
       }
@@ -374,7 +395,7 @@ namespace os
       void
       Critical_section::exit (status_t status)
       {
-        return port::interrupts::Critical_section::exit (status);
+        port::interrupts::Critical_section::exit (status);
       }
 
       // Enter an IRQ uncritical section
@@ -388,7 +409,7 @@ namespace os
       void
       Uncritical_section::exit (status_t status)
       {
-        return port::interrupts::Uncritical_section::exit (status);
+        port::interrupts::Uncritical_section::exit (status);
       }
 
     /**

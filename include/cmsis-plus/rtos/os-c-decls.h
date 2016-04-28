@@ -76,6 +76,12 @@ extern "C"
     os_double_list_links_t links;
   } os_thread_children_list_t;
 
+  typedef struct os_waiting_thread_node_s
+  {
+    os_double_list_links_t links;
+    void* thread;
+  } os_waiting_thread_node_t;
+
   typedef uint32_t os_flags_mode_t;
   typedef uint32_t os_flags_mask_t;
 
@@ -137,6 +143,17 @@ extern "C"
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+    typedef struct
+    {
+      os_thread_func_t func;
+      os_thread_func_args_t func_args;
+      void* stack_addr;
+      size_t stack_size_bytes;
+#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+      os_port_thread_context_t port;
+#endif
+    } os_thread_context_t;
+
   typedef struct
   {
     const char* name;
@@ -148,12 +165,11 @@ extern "C"
   typedef struct
   {
     const char* name;
-    void* stack_addr;
-    os_thread_func_t func;
-    os_thread_func_args_t func_args;
     void* func_result_;
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
-    os_thread_port_data_t port_;
+    os_thread_port_data_t port;
+#else
+    os_waiting_thread_node_t ready_node;
 #endif
     void* parent;
     os_thread_children_list_t children;
@@ -162,11 +178,11 @@ extern "C"
     void* waiting_node;
     void* clock_node;
     size_t acquired_mutexes;
-    size_t stack_size_bytes;
     os_thread_state_t state;
     os_thread_prio_t prio;
     os_thread_sigset_t signals;
     os_thread_user_storage_t user_storage;
+    os_thread_context_t context;
   } os_thread_t;
 
 #pragma GCC diagnostic pop
@@ -190,7 +206,7 @@ extern "C"
   typedef uint32_t os_clock_duration_t;
   typedef struct
   {
-    ;
+    char dummy;
   } os_clock_t;
 
   // --------------------------------------------------------------------------

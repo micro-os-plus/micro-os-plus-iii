@@ -65,8 +65,16 @@ namespace os
       // Check if not already removed.
       if (next == nullptr)
         {
+          assert(prev == nullptr);
+#if defined(OS_TRACE_RTOS_LISTS)
+          trace::printf ("%s() %p nop\n", __func__, this);
+#endif
           return;
         }
+
+#if defined(OS_TRACE_RTOS_LISTS)
+      trace::printf ("%s() %p \n", __func__, this);
+#endif
 
       // Make neighbours point to each other.
       prev->next = next;
@@ -106,6 +114,21 @@ namespace os
       head_.prev = &head_;
     }
 
+    void
+    Static_double_list::insert_after (Static_double_list_links& node,
+                                      Static_double_list_links* after)
+    {
+      trace::printf ("%s() n=%p after %p\n", __func__, &node, after);
+
+      // Make the new node point to its neighbours.
+      node.prev = after;
+      node.next = after->next;
+
+      // Make the neighbours point to the node. The order is important.
+      after->next->prev = &node;
+      after->next = &node;
+    }
+
     // ========================================================================
 
     /**
@@ -133,7 +156,7 @@ namespace os
     {
       if (head_.prev == nullptr)
         {
-          // If this is the first time, initialise the pointers to self.
+          // If this is the first time, initialise the list to empty.
           clear ();
         }
 
@@ -148,6 +171,74 @@ namespace os
     {
       // Add thread intrusive node at the end of the list.
       insert_after (thread.child_links_, (Double_list_links*) head_.prev);
+    }
+
+    // ========================================================================
+
+    void
+    Ready_threads_list::link (Waiting_thread_node& node)
+    {
+      if (head_.prev == nullptr)
+        {
+          // If this is the first time, initialise the list to empty.
+          clear ();
+        }
+
+      thread::priority_t prio = node.thread.prio_;
+
+      Waiting_thread_node* after = (Waiting_thread_node*) (head_.prev);
+
+      if (empty () || (prio <= after->thread.prio_))
+        {
+          // Insert at the end of the list.
+        }
+      else if (prio > head ()->thread.prio_)
+        {
+          // Insert at the beginning of the list
+          after = (Waiting_thread_node*) (&head_);
+#if defined(OS_TRACE_RTOS_LISTS)
+          trace::printf ("ready %s() head \n", __func__);
+#endif
+        }
+      else
+        {
+          // Insert in the middle of the list.
+          // The loop is guaranteed to terminate, not hit the head and
+          // the weight is small, sched_prio() is only an accessor.
+          while (prio > after->thread.prio_)
+            {
+              after = (Waiting_thread_node*) after->prev;
+            }
+        }
+
+      trace::printf ("ready %s() %p %s\n", __func__, &node.thread,
+                     node.thread.name ());
+
+      insert_after (node, after);
+
+      node.thread.sched_state_ = thread::state::ready;
+    }
+
+    /**
+     * @details
+     * Must be called in a critical section.
+     */
+    Thread*
+    Ready_threads_list::remove_top (void)
+    {
+      assert(!empty ());
+
+      Thread* thread = &(head ()->thread);
+
+      trace::printf ("ready %s() %p %s\n", __func__, thread, thread->name ());
+
+      head ()->unlink ();
+
+      assert(thread != nullptr);
+
+      // Maybe this should not be here, but for now it is safer.
+      thread->sched_state_ = thread::state::running;
+      return thread;
     }
 
     // ========================================================================

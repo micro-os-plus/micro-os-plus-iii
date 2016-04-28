@@ -70,7 +70,7 @@ namespace os
 
 #else
 
-        // TODO
+        th = scheduler::current_thread_;
 
 #endif
         return th;
@@ -110,15 +110,7 @@ namespace os
             return;
           }
 
-#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
-
         return port::this_thread::yield ();
-
-#else
-
-        // TODO
-
-#endif
       }
 
     } /* namespace this_thread */
@@ -294,11 +286,23 @@ namespace os
                     thread::func_args_t args) :
         Named_object
           { attr.name () }
+#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+            , ready_node_
+              { *this }
+#endif
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
       assert(function != nullptr);
       assert(attr.th_priority != thread::priority::none);
+
+      context_.stack_size_bytes_ = attr.th_stack_size_bytes;
+      context_.stack_bottom_ = attr.th_stack_address;
+
+#if defined(OS_TRACE_RTOS_THREAD)
+      trace::printf ("%s @%p %s %d %d\n", __func__, this, name (), prio_,
+                     context_.stack_size_bytes_);
+#endif
 
         {
           // Prevent the new thread to execute before all members are set.
@@ -306,11 +310,10 @@ namespace os
 
           // Get attributes from user structure.
           prio_ = attr.th_priority;
-          stack_size_bytes_ = attr.th_stack_size_bytes;
-          stack_addr_ = attr.th_stack_address;
 
           func_ = function;
           func_args_ = args;
+          func_result_ = nullptr;
 
           sig_mask_ = 0;
 
@@ -320,7 +323,6 @@ namespace os
           acquired_mutexes_ = 0;
 
           clock_node_ = nullptr;
-          func_result_ = nullptr;
 
           parent_ = this_thread::_thread ();
           if (parent_ != nullptr)
@@ -332,11 +334,6 @@ namespace os
               scheduler::top_threads_list_.link (*this);
             }
 
-#if defined(OS_TRACE_RTOS_THREAD)
-          trace::printf ("%s @%p %s %d %d\n", __func__, this, name (), prio_,
-                         stack_size_bytes_);
-#endif
-
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
           port::Thread::create (this);
@@ -346,15 +343,20 @@ namespace os
 
           // TODO: check min size
           // TODO: align stack
-          if (stack_addr_ == nullptr)
+          if (context_.stack_bottom_ == nullptr)
             {
               // TODO: alloc default stack size
             }
-          state_ = thread::state::inactive;
 
-          scheduler::__register_thread (this);
+          // Create context
+          port::thread::Context::create (&context_, (void*) _invoke_with_exit,
+                                         this);
+
+          // Allow for next resume()
+          resume ();
 
 #endif
+
         }
 
       // For just in case the new thread has higher priority.
@@ -400,6 +402,8 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      ready_node_.unlink ();
+
       child_links_.unlink ();
       assert(children_.empty ());
       parent_ = nullptr;
@@ -415,6 +419,20 @@ namespace os
 
 #else
 
+      // port::Thread::clean (this);
+
+      // Pass control to the next thread.
+      // If current, skip saving current context.
+      if (this != scheduler::current_thread_)
+        {
+          this_thread::yield ();
+        }
+      else
+        {
+          port::scheduler::reschedule (false);
+        }
+
+      assert(true);
 #endif
     }
 
@@ -431,8 +449,6 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
-
         {
           interrupts::Critical_section ics; // ----- Critical section -----
 
@@ -441,11 +457,6 @@ namespace os
         }
       port::scheduler::reschedule ();
 
-#else
-
-      // TODO
-
-#endif
     }
 
     /**
@@ -461,18 +472,26 @@ namespace os
     Thread::resume (void)
     {
 #if defined(OS_TRACE_RTOS_THREAD)
-      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+      trace::printf ("%s() @%p %s %d\n", __func__, this, name (), prio_);
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
       port::Thread::resume (this);
 
+      sched_state_ = thread::state::ready;
+
 #else
 
-      // TODO
+      interrupts::Critical_section ics; // ----- Critical section -----
+      if (ready_node_.next == nullptr)
+        {
+          scheduler::ready_threads_list_.link (ready_node_);
+          // Ready state set in above link().
+        }
 
 #endif
+
     }
 
     /**
@@ -532,6 +551,16 @@ namespace os
       res = port::Thread::sched_prio (this, prio);
 
 #else
+
+      if (sched_state_ == thread::state::ready)
+        {
+          interrupts::Critical_section ics; // ----- Critical section -----
+
+          // Remove from initial location and reinsert according
+          // to new priority.
+          ready_node_.unlink ();
+          scheduler::ready_threads_list_.link (ready_node_);
+        }
 
       // Mandatory, the priority might have been raised, the
       // task must be scheduled to run.
@@ -772,6 +801,13 @@ namespace os
 #endif
           return result::ok; // Already terminated
         }
+
+#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+        {
+          interrupts::Critical_section ics; // ----- Critical section -----
+          ready_node_.unlink ();
+        }
+#endif
 
       // If the thread is waiting on an event, remove it from the list.
       if (waiting_node_ != nullptr)
@@ -1147,8 +1183,6 @@ namespace os
     }
 
   // --------------------------------------------------------------------------
-
-#pragma GCC diagnostic pop
 
   } /* namespace rtos */
 } /* namespace os */

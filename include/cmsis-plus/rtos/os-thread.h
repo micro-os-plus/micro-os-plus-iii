@@ -243,6 +243,55 @@ namespace os
        * @brief Default thread initialiser.
        */
       extern const Attributes initializer;
+
+      class Context
+      {
+      public:
+
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
+
+        /**
+         * @brief Create a thread context.
+         */
+        Context ();
+
+        /**
+         * @cond ignore
+         */
+        Context (const Context&) = delete;
+        Context (Context&&) = delete;
+        Context&
+        operator= (const Context&) = delete;
+        Context&
+        operator= (Context&&) = delete;
+        /**
+         * @endcond
+         */
+
+        /**
+         * @brief Destroy context.
+         */
+        ~Context () = default;
+
+      protected:
+
+        friend class rtos::Thread;
+        friend class port::thread::Context;
+
+        void* stack_bottom_;
+        std::size_t stack_size_bytes_;
+
+      public:
+        // TODO: make protected
+
+#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+        port::thread::context_t port_;
+#endif
+
+      };
     }
 
     // ========================================================================
@@ -487,6 +536,9 @@ namespace os
       result_t
       kill (void);
 
+      thread::Context*
+      context (void);
+
       /**
        * @}
        */
@@ -536,6 +588,10 @@ namespace os
       scheduler::_unlink_node (Waiting_thread_node& node,
                                Timeout_thread_node& timeout_node);
 
+      friend void
+      port::scheduler::reschedule (bool save);
+
+      friend class Ready_threads_list;
       friend class Top_threads_list;
       friend class Thread_children_list;
       friend class Waiting_threads_list;
@@ -673,8 +729,6 @@ namespace os
        * @{
        */
 
-      // TODO: group them in a Stack object
-      void* stack_addr_;
       thread::func_t func_;
       thread::func_args_t func_args_;
       void* func_result_;
@@ -683,6 +737,9 @@ namespace os
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
       friend class port::Thread;
       os_thread_port_data_t port_;
+#else
+      // TODO move it to stack or make it fully intrusive with computed offset.
+      Waiting_thread_node ready_node_;
 #endif
 
       // Pointer to parent, or null for top/detached thread.
@@ -703,7 +760,6 @@ namespace os
       // Pointer to timeout node (stored on stack)
       Timeout_thread_node* clock_node_;
 
-      std::size_t stack_size_bytes_;
       std::size_t acquired_mutexes_;
       thread::state_t sched_state_;
       thread::priority_t prio_;
@@ -714,6 +770,10 @@ namespace os
       os_thread_user_storage_t user_storage_;
 
       // Add other internal data
+
+      // Must be the last one!
+      thread::Context context_;
+
 
       /**
        * @}
@@ -801,6 +861,8 @@ namespace os
 
     namespace thread
     {
+      // ======================================================================
+
       inline
       Attributes::Attributes (const char* name) :
           Named_object (name)
@@ -809,6 +871,16 @@ namespace os
         th_stack_size_bytes = 0;
         th_priority = thread::priority::normal;
       }
+
+      // ======================================================================
+
+      inline
+      Context::Context ()
+      {
+        stack_bottom_ = nullptr;
+        stack_size_bytes_ = 0;
+      }
+
     } /* namespace thread */
 
     /**
@@ -858,6 +930,12 @@ namespace os
     Thread::user_storage (void)
     {
       return &user_storage_;
+    }
+
+    inline thread::Context*
+    Thread::context (void)
+    {
+      return &context_;
     }
 
   } /* namespace rtos */

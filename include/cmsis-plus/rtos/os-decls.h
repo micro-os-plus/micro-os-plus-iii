@@ -247,7 +247,7 @@ namespace os
        * It is used to temporarily store the CPU status register
        * during critical sections.
        */
-      using status_t = uint32_t;
+      using status_t = port::interrupts::status_t;
 
     } /* namespace interrupts */
 
@@ -971,7 +971,7 @@ extern "C"
    */
   typedef struct
   {
-    ;
+    char dummy;
   } os_thread_user_storage_t;
 #endif
 }
@@ -1026,8 +1026,21 @@ extern "C"
  * @brief Default definition for the `main()` stack size, in bytes.
  * @details
  * Redefine it in `<os-app-config.h>` to the actual value.
+ *
+ * @note Ignored for synthetic platforms.
  */
 #define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES               (400)
+#endif
+
+#if !defined(OS_INTEGER_RTOS_IDLE_STACK_SIZE_BYTES)
+/**
+ * @brief Default definition for the idle thread stack size, in bytes.
+ * @details
+ * Redefine it in `<os-app-config.h>` to the actual value.
+ *
+ * @note Ignored for synthetic platforms.
+ */
+#define OS_INTEGER_RTOS_IDLE_STACK_SIZE_BYTES               (400)
 #endif
 
 #endif /* __cplusplus */

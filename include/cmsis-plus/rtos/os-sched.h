@@ -58,6 +58,11 @@ namespace os
        */
       extern Top_threads_list top_threads_list_;
 
+#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+      extern Thread* current_thread_;
+      extern Ready_threads_list ready_threads_list_;
+#endif
+
       /**
        * @brief Initialise the RTOS scheduler.
        * @par Parameters
@@ -123,6 +128,9 @@ namespace os
        */
       bool
       in_handler_mode (void);
+
+      void
+      _create_idle (void);
 
       // ======================================================================
 
