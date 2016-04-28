@@ -32,6 +32,7 @@
 #include <cstring>
 #if defined(__EXCEPTIONS)
 #include <string>
+#include <system_error>
 #endif
 
 // ----------------------------------------------------------------------------
@@ -86,7 +87,7 @@ namespace os
       message (int i) const
       {
 #if defined(DEBUG)
-        return std::string (rtos::kernel::strerror ((rtos::status_t) i));
+        return std::string (strerror (i));
 #else
         return std::string ("");
 #endif
