@@ -65,6 +65,12 @@ extern "C"
     return __posix_fstat (fildes, buf);
   }
 
+  pid_t __attribute__((weak))
+  _getpid_r (void* ptr)
+  {
+    return __posix_getpid ();
+  }
+
   int __attribute__((weak))
   _gettimeofday_r (void* ptr, struct timeval* ptimeval, void* ptimezone)
   {
