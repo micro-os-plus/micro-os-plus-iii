@@ -2,7 +2,6 @@
  * This file is part of the µOS++ distribution.
  *   (https://github.com/micro-os-plus)
  * Copyright (c) 2016 Liviu Ionescu.
- * Copyright (c) 2013 ARM LIMITED
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -24,6 +23,11 @@
  * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
+ */
+
+/*
+ * The initial CMSIS++ RTOS API was inspired by CMSIS RTOS API v1.x,
+ * Copyright (c) 2013 ARM LIMITED.
  */
 
 #ifndef CMSIS_PLUS_RTOS_OS_CLOCKS_H_

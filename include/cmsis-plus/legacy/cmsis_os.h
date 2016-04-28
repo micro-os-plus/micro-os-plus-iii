@@ -54,7 +54,6 @@
  * This file is part of the µOS++ distribution.
  *   (https://github.com/micro-os-plus)
  * Copyright (c) 2016 Liviu Ionescu.
- * Copyright (c) 2013 ARM LIMITED
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
