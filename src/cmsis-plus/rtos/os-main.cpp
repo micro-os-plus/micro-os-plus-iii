@@ -28,11 +28,14 @@
 #include <cstdlib>
 
 #include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/rtos/port/os-inlines.h>
 
 // Better be the last, to undef putchar()
 #include <cmsis-plus/diag/trace.h>
 
+#if defined(__ARM_EABI__)
 #include "cmsis_device.h"
+#endif
 
 // ----------------------------------------------------------------------------
 
@@ -72,15 +75,37 @@ namespace os
 /**
  * @brief Default implementation of main().
  */
-int __attribute__((weak))
+int
+#if !defined(__APPLE__)
+__attribute__((weak))
+#endif
 main (int argc, char* argv[])
 {
   using namespace os;
   using namespace os::rtos;
 
+  // TODO: make version configurable.
+  trace::printf ("µOS++ v6.1.1 / CMSIS++ RTOS API v0.1.1.\n");
+  trace::printf ("Copyright (c) 2016 Liviu Ionescu.\n");
+
+  port::scheduler::greeting ();
+
   // At this stage the system clock should have already been configured
   // at high speed.
+#if defined(__ARM_EABI__)
   trace::printf ("System clock: %u Hz\n", SystemCoreClock);
+#endif
+
+  trace::printf ("Scheduler frequency: %d ticks/sec\n",
+                 rtos::Systick_clock::frequency_hz);
+
+  trace::printf ("Built with " __VERSION__);
+#if defined(__EXCEPTIONS)
+  trace::printf (", with exceptions");
+#else
+  trace::printf(", no exceptions");
+#endif
+  trace::puts (".");
 
   scheduler::initialize ();
 
