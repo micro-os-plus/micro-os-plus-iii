@@ -35,6 +35,8 @@
 
 // ----------------------------------------------------------------------------
 
+#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+
 namespace os
 {
   namespace rtos
@@ -82,3 +84,5 @@ namespace os
     } /* namespace scheduler */
   } /* namespace rtos */
 } /* namespace os */
+
+#endif
