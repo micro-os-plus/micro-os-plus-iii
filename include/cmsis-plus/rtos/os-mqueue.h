@@ -429,8 +429,8 @@ namespace os
 
       // Keep these in sync with the structure declarations in os-c-decl.h.
 #if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
-      port::Waiting_threads_list send_list_;
-      port::Waiting_threads_list receive_list_;
+      Waiting_threads_list send_list_;
+      Waiting_threads_list receive_list_;
       Clock& clock_;
 
       // To save space, the double linked list is built

@@ -351,7 +351,7 @@ namespace os
        */
 
 #if !defined(OS_INCLUDE_RTOS_PORT_MEMORY_POOL)
-      port::Waiting_threads_list list_;
+      Waiting_threads_list list_;
       Clock& clock_;
 #endif
       /**
