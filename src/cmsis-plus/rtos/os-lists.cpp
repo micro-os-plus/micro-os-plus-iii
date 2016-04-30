@@ -118,7 +118,13 @@ namespace os
     Static_double_list::insert_after (Static_double_list_links& node,
                                       Static_double_list_links* after)
     {
+#if defined(OS_TRACE_RTOS_LISTS)
       trace::printf ("%s() n=%p after %p\n", __func__, &node, after);
+#endif
+
+      assert(node.prev == nullptr);
+      assert(node.next == nullptr);
+      assert(after->next != nullptr);
 
       // Make the new node point to its neighbours.
       node.prev = after;
@@ -211,8 +217,10 @@ namespace os
             }
         }
 
+#if defined(OS_TRACE_RTOS_LISTS)
       trace::printf ("ready %s() %p %s\n", __func__, &node.thread,
                      node.thread.name ());
+#endif
 
       insert_after (node, after);
 
@@ -230,7 +238,9 @@ namespace os
 
       Thread* thread = &(head ()->thread);
 
+#if defined(OS_TRACE_RTOS_LISTS)
       trace::printf ("ready %s() %p %s\n", __func__, thread, thread->name ());
+#endif
 
       head ()->unlink ();
 
@@ -300,7 +310,7 @@ namespace os
           // Insert at the beginning of the list
           after = (Waiting_thread_node*) (&head_);
 #if defined(OS_TRACE_RTOS_LISTS)
-          trace::printf ("%s() head \n", __func__);
+          trace::printf ("wait %s() head \n", __func__);
 #endif
         }
       else
@@ -313,6 +323,11 @@ namespace os
               after = (Waiting_thread_node*) after->prev;
             }
         }
+
+#if defined(OS_TRACE_RTOS_LISTS)
+      trace::printf ("wait %s() %p %s\n", __func__, &node.thread,
+                     node.thread.name ());
+#endif
 
       insert_after (node, after);
     }
@@ -468,7 +483,7 @@ namespace os
           // and update the new head.
           after = (Timeout_thread_node*) (&head_);
 #if defined(OS_TRACE_RTOS_LISTS)
-          trace::printf ("%s() head \n", __func__);
+          trace::printf ("clock %s() head \n", __func__);
 #endif
         }
       else
@@ -482,9 +497,10 @@ namespace os
         }
 
 #if defined(OS_TRACE_RTOS_LISTS)
-      trace::printf ("%s() %u\n", __func__, (uint32_t) timestamp);
+      trace::printf ("clock %s() %u\n", __func__, (uint32_t) timestamp);
 #endif
 
+#if 0
       // Make the new node point to its neighbours.
       node.prev = after;
       node.next = after->next;
@@ -492,6 +508,9 @@ namespace os
       // Make the neighbours point to the node. The order is important.
       after->next->prev = &node;
       after->next = &node;
+#else
+      insert_after (node, after);
+#endif
     }
 
     /**
