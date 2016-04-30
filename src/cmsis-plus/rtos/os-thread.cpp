@@ -296,12 +296,12 @@ namespace os
       assert(function != nullptr);
       assert(attr.th_priority != thread::priority::none);
 
-      context_.stack_size_bytes_ = attr.th_stack_size_bytes;
-      context_.stack_bottom_ = attr.th_stack_address;
+      context_.stack_.size_bytes_ = attr.th_stack_size_bytes;
+      context_.stack_.bottom_address_ = attr.th_stack_address;
 
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s @%p %s %d %d\n", __func__, this, name (), prio_,
-                     context_.stack_size_bytes_);
+                     context_.stack_.size_bytes_);
 #endif
 
         {
@@ -343,7 +343,7 @@ namespace os
 
           // TODO: check min size
           // TODO: align stack
-          if (context_.stack_bottom_ == nullptr)
+          if (context_.stack_.bottom () == nullptr)
             {
               // TODO: alloc default stack size
             }
@@ -386,55 +386,65 @@ namespace os
       // the exit cleanup code.
       if (this != &this_thread::thread ())
         {
-          _destroy ();
+          kill ();
         }
     }
 
+#if 0
     void
     Thread::_destroy (void)
-    {
-      if (sched_state_ == thread::state::destroyed)
-        {
-          return;
-        }
+      {
 
 #if defined(OS_TRACE_RTOS_THREAD)
-      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+        trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      ready_node_.unlink ();
+          {
+            interrupts::Critical_section ics; // ----- Critical section -----
 
-      child_links_.unlink ();
-      assert(children_.empty ());
-      parent_ = nullptr;
+            if (sched_state_ == thread::state::destroyed)
+              {
+                return;
+              }
 
-      assert(acquired_mutexes_ == 0);
+#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+            ready_node_.unlink ();
+#endif
 
-      sched_state_ = thread::state::destroyed;
+            child_links_.unlink ();
+            assert(children_.empty ());
+            parent_ = nullptr;
+
+            assert(acquired_mutexes_ == 0);
+
+            sched_state_ = thread::state::destroyed;
+            trace::puts (">");
+          }
 
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
-      port::Thread::destroy (this);
-      // Does not return if the current thread.
+        port::Thread::destroy (this);
+        // Does not return if the current thread.
 
 #else
 
-      // port::Thread::clean (this);
+        // port::Thread::clean (this);
 
-      // Pass control to the next thread.
-      // If current, skip saving current context.
-      if (this != scheduler::current_thread_)
-        {
-          this_thread::yield ();
-        }
-      else
-        {
-          port::scheduler::reschedule (false);
-        }
+        // Pass control to the next thread.
+        // If current, skip saving current context.
+        if (this != scheduler::current_thread_)
+          {
+            this_thread::yield ();
+          }
+        else
+          {
+            port::scheduler::reschedule (false);
+          }
 
-      assert(true);
+        assert(true);
 #endif
-    }
+      }
+#endif
 
     /**
      * @details
@@ -477,17 +487,23 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
-      port::Thread::resume (this);
+        {
+          interrupts::Critical_section ics; // ----- Critical section -----
 
-      sched_state_ = thread::state::ready;
+          sched_state_ = thread::state::ready;
+          port::Thread::resume (this);
+        }
 
 #else
 
-      interrupts::Critical_section ics; // ----- Critical section -----
-      if (ready_node_.next == nullptr)
         {
-          scheduler::ready_threads_list_.link (ready_node_);
-          // Ready state set in above link().
+          interrupts::Critical_section ics; // ----- Critical section -----
+
+          if (ready_node_.next == nullptr)
+            {
+              scheduler::ready_threads_list_.link (ready_node_);
+              // Ready state set in above link().
+            }
         }
 
 #endif
@@ -752,24 +768,48 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      if (sched_state_ == thread::state::terminated)
         {
-#if defined(OS_TRACE_RTOS_THREAD)
-          trace::printf ("%s() @%p %s already terminated\n", __func__, this,
-                         name ());
+          scheduler::Critical_section scs; // ----- Critical section -----
+
+            {
+              interrupts::Critical_section ics; // ----- Critical section -----
+
+#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+              ready_node_.unlink ();
 #endif
-          return; // Already terminated
+
+              child_links_.unlink ();
+            }
+
+          assert(children_.empty ());
+          parent_ = nullptr;
+
+          assert(acquired_mutexes_ == 0);
+
+          sched_state_ = thread::state::destroyed;
+
+          func_result_ = exit_ptr;
+
+          if (joiner_ != nullptr)
+            {
+              joiner_->resume ();
+            }
         }
 
-      func_result_ = exit_ptr;
-      sched_state_ = thread::state::terminated;
+#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
-      if (joiner_ != nullptr)
-        {
-          joiner_->resume ();
-        }
+      port::Thread::destroy_this (this);
+      // Does not return if the current thread.
 
-      _destroy ();
+#else
+
+      // TODO: add to funeral list
+
+      port::scheduler::reschedule (false);
+      assert(true);
+      for (;;)
+        ;
+#endif
       // Does not return.
     }
 
@@ -792,44 +832,72 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      if ((sched_state_ == thread::state::terminated)
-          || (sched_state_ == thread::state::destroyed))
         {
+          scheduler::Critical_section scs; // ----- Critical section -----
+
+          if (sched_state_ == thread::state::destroyed)
+            {
 #if defined(OS_TRACE_RTOS_THREAD)
-          trace::printf ("%s() @%p %s already terminated\n", __func__, this,
-                         name ());
+              trace::printf ("%s() @%p %s already gone\n", __func__, this,
+                             name ());
 #endif
-          return result::ok; // Already terminated
-        }
+              return result::ok; // Already exited itself
+            }
+
+          if (sched_state_ == thread::state::terminated)
+            {
+              // TODO remove thread from the funeral list and kill it here.
+            }
+
+            {
+              interrupts::Critical_section ics; // ----- Critical section -----
 
 #if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
-        {
-          interrupts::Critical_section ics; // ----- Critical section -----
-          ready_node_.unlink ();
-        }
+              ready_node_.unlink ();
 #endif
 
-      // If the thread is waiting on an event, remove it from the list.
-      if (waiting_node_ != nullptr)
-        {
-          waiting_node_->unlink ();
+              // If the thread is waiting on an event, remove it from the list.
+              if (waiting_node_ != nullptr)
+                {
+                  waiting_node_->unlink ();
+                }
+
+              // If the thread is waiting on a timeout, remove it from the list.
+              if (clock_node_ != nullptr)
+                {
+                  clock_node_->unlink ();
+                }
+
+              child_links_.unlink ();
+            }
+
+          assert(children_.empty ());
+          parent_ = nullptr;
+
+          assert(acquired_mutexes_ == 0);
+
+#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
+
+          port::Thread::destroy_other (this);
+
+#else
+
+          port::Thread::clean (this);
+
+#endif
+
+          sched_state_ = thread::state::destroyed;
+          func_result_ = nullptr;
+
+          // All funeral services completed, the thread is gone.
+          if (joiner_ != nullptr)
+            {
+              joiner_->resume ();
+
+              port::this_thread::yield ();
+            }
+          // ----- End of critical section -----
         }
-
-      // If the thread is waiting on a timeout, remove it from the list.
-      if (clock_node_ != nullptr)
-        {
-          clock_node_->unlink ();
-        }
-
-      func_result_ = nullptr;
-      sched_state_ = thread::state::terminated;
-
-      if (joiner_ != nullptr)
-        {
-          joiner_->resume ();
-        }
-
-      _destroy ();
 
       return result::ok;
     }
@@ -861,6 +929,11 @@ namespace os
       sig_mask_ |= mask;
 
       this->resume ();
+
+      if (!scheduler::in_handler_mode ())
+        {
+          port::this_thread::yield ();
+        }
 
       return result::ok;
     }

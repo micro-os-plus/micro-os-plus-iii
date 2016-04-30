@@ -83,6 +83,7 @@ namespace os
        * @return Nothing.
        */
       void
+      __attribute__((noreturn))
       exit (void* exit_ptr = nullptr);
 
       /**
@@ -248,6 +249,86 @@ namespace os
        */
       extern const Attributes initializer;
 
+      // ======================================================================
+
+      class Stack
+      {
+      public:
+
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
+
+        /**
+         * @brief Create a thread stack.
+         */
+        Stack ();
+
+        /**
+         * @cond ignore
+         */
+        Stack (const Stack&) = delete;
+        Stack (Stack&&) = delete;
+        Stack&
+        operator= (const Stack&) = delete;
+        Stack&
+        operator= (Stack&&) = delete;
+        /**
+         * @endcond
+         */
+
+        /**
+         * @brief Destroy context.
+         */
+        ~Stack () = default;
+
+        /**
+         * @}
+         */
+
+      public:
+
+        /**
+         * @name Public Member Functions
+         * @{
+         */
+
+        /**
+         * @brief Get the stack lowest reserved address.
+         * @par Parameters
+         *  None
+         * @return  The address of the stack reserved area.
+         */
+        void*
+        bottom (void);
+
+        /**
+         * @brief Get the stack size.
+         * @par Parameters
+         *  None
+         * @return  The stack size in bytes.
+         */
+        std::size_t
+        size (void);
+
+        /**
+         * @}
+         */
+
+      protected:
+
+        friend class rtos::Thread;
+
+        void* bottom_address_;
+        std::size_t size_bytes_;
+
+      public:
+        // TODO: make protected
+
+      };
+      // ======================================================================
+
       class Context
       {
       public:
@@ -280,20 +361,69 @@ namespace os
          */
         ~Context () = default;
 
-      protected:
-
-        friend class rtos::Thread;
-        friend class port::thread::Context;
-
-        void* stack_bottom_;
-        std::size_t stack_size_bytes_;
+        /**
+         * @}
+         */
 
       public:
-        // TODO: make protected
+
+        /**
+         * @name Public Member Functions
+         * @{
+         */
+
+        Stack&
+        stack (void);
+
+        /**
+         * @}
+         */
+
+      protected:
+
+        /**
+         * @name Private Friends
+         * @{
+         */
+
+        friend class rtos::Thread;
+        friend class rtos::port::Thread;
+        friend result_t
+        port::scheduler::start (void);
+        friend void
+        port::scheduler::reschedule (bool save);
 
 #if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
-        port::thread::context_t port_;
+        friend class port::thread::Context;
 #endif
+        /**
+         * @}
+         */
+
+      protected:
+
+        /**
+         * @name Private Member Variables
+         * @{
+         */
+
+        /**
+         * @brief Stack object.
+         */
+        Stack stack_;
+
+#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+
+        /**
+         * @brief Non-portable context data.
+         */
+        port::thread::context_t port_;
+
+#endif
+
+        /**
+         * @}
+         */
 
       };
     }
@@ -540,7 +670,7 @@ namespace os
       result_t
       kill (void);
 
-      thread::Context*
+      thread::Context&
       context (void);
 
       /**
@@ -630,6 +760,7 @@ namespace os
        * @return  Nothing.
        */
       void
+      __attribute__((noreturn))
       _exit (void* exit_ptr = nullptr);
 
       /**
@@ -764,12 +895,11 @@ namespace os
       // Pointer to timeout node (stored on stack)
       Timeout_thread_node* clock_node_;
 
-      std::size_t acquired_mutexes_;
-      thread::state_t sched_state_;
-      thread::priority_t prio_;
+      std::size_t volatile acquired_mutexes_;
+      thread::state_t volatile sched_state_;
+      thread::priority_t volatile prio_;
 
-      // volatile, but used in critical sections.
-      thread::sigset_t sig_mask_;
+      thread::sigset_t volatile sig_mask_;
 
       os_thread_user_storage_t user_storage_;
 
@@ -777,7 +907,6 @@ namespace os
 
       // Must be the last one!
       thread::Context context_;
-
 
       /**
        * @}
@@ -858,7 +987,7 @@ namespace os
       inline void
       exit (void* exit_ptr)
       {
-        return this_thread::thread ()._exit (exit_ptr);
+        this_thread::thread ()._exit (exit_ptr);
       }
 
     } /* namespace this_thread */
@@ -879,10 +1008,36 @@ namespace os
       // ======================================================================
 
       inline
+      Stack::Stack ()
+      {
+        bottom_address_ = nullptr;
+        size_bytes_ = 0;
+      }
+
+      inline void*
+      Stack::bottom (void)
+      {
+        return bottom_address_;
+      }
+
+      inline std::size_t
+      Stack::size (void)
+      {
+        return size_bytes_;
+      }
+
+      // ======================================================================
+
+      inline
       Context::Context ()
       {
-        stack_bottom_ = nullptr;
-        stack_size_bytes_ = 0;
+        ;
+      }
+
+      inline Stack&
+      Context::stack ()
+      {
+        return stack_;
       }
 
     } /* namespace thread */
@@ -936,10 +1091,10 @@ namespace os
       return &user_storage_;
     }
 
-    inline thread::Context*
+    inline thread::Context&
     Thread::context (void)
     {
-      return &context_;
+      return context_;
     }
 
   } /* namespace rtos */
