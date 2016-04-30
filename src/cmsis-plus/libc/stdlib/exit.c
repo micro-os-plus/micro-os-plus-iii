@@ -48,6 +48,7 @@
  * deleted (wishful thinking, not implemented).
  */
 void
+__attribute__ ((noreturn))
 exit(int code)
 {
   // Call the cleanup functions enrolled with atexit().
