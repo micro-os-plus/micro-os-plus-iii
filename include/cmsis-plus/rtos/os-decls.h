@@ -81,6 +81,10 @@ namespace os
     class Thread;
     class Timer;
 
+    class Waiting_threads_list;
+    class Clock_threads_list;
+    class Waiting_threads_list3;
+
     // ------------------------------------------------------------------------
 
     /**
@@ -901,7 +905,7 @@ namespace os
        */
     };
 
-  // ========================================================================
+  // ==========================================================================
   } /* namespace rtos */
 } /* namespace os */
 
@@ -932,7 +936,37 @@ namespace os
       clock = nullptr;
     }
 
-  // ========================================================================
+  // ==========================================================================
+  } /* namespace rtos */
+} /* namespace os */
+
+// ===== Port related definitions =============================================
+
+namespace os
+{
+  namespace rtos
+  {
+    namespace port
+    {
+      class Thread;
+      class Timer;
+      class Mutex;
+      class Condition_variable;
+      class Semaphore;
+      class Memory_pool;
+      class Message_queue;
+      class Event_flags;
+
+      namespace scheduler
+      {
+        result_t
+        start (void);
+
+        void
+        reschedule (bool save);
+
+      } /* namespace scheduler */
+    } /* namespace port */
   } /* namespace rtos */
 } /* namespace os */
 
