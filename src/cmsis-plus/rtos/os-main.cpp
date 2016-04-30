@@ -47,21 +47,26 @@ namespace os
     {
       // ----------------------------------------------------------------------
 
-      using main_func_t = int (*) (int argc, char* argv[]);
+      // Since the native threads have a single argument, and it is better to
+      // avoid C++11 tuples and function objects, there is no other simple
+      // way than to pack the args in a structure and use it by the
+      // trampoline to invoke the os_main().
 
       using main_args_t = struct
         {
-          main_func_t func;
           int argc;
           char** argv;
         };
 
+      static main_args_t main_args;
+
       // ----------------------------------------------------------------------
 
       static void
-      _main_trampoline (main_args_t* args)
+      _main_trampoline (void)
       {
-        std::exit (args->func (args->argc, args->argv));
+        int status = os_main (main_args.argc, main_args.argv);
+        std::exit (status);
       }
 
     // ------------------------------------------------------------------------
@@ -93,10 +98,10 @@ main (int argc, char* argv[])
   // At this stage the system clock should have already been configured
   // at high speed.
 #if defined(__ARM_EABI__)
-  trace::printf ("System clock: %u Hz\n", SystemCoreClock);
+  trace::printf ("System clock: %u Hz.\n", SystemCoreClock);
 #endif
 
-  trace::printf ("Scheduler frequency: %d ticks/sec\n",
+  trace::printf ("Scheduler frequency: %d ticks/sec.\n",
                  rtos::Systick_clock::frequency_hz);
 
   trace::printf ("Built with " __VERSION__);
@@ -109,15 +114,9 @@ main (int argc, char* argv[])
 
   scheduler::initialize ();
 
-  // Since the native threads have a single argument, and we prefer to
-  // avoid C++11 tuples and function objects, there is no other simple
-  // way than to pack the 3 args in a structure and pass it via the
-  // trampoline to invoke the os_main().
-
-  static thread::main_args_t args;
-  args.func = os_main;
-  args.argc = argc;
-  args.argv = argv;
+  // Store the parameters in the static structure, to be used by os_main().
+  thread::main_args.argc = argc;
+  thread::main_args.argv = argv;
 
   // Necessarily static, the initial stack will be used for the
   // interrupts, and some implementations (like FreeRTOS) are not
@@ -132,8 +131,7 @@ main (int argc, char* argv[])
   attr.th_stack_size_bytes = sizeof(main_stack);
 
   static Thread main_thread
-    { attr, (thread::func_t) thread::_main_trampoline,
-        (thread::func_args_t) &args };
+    { attr, (thread::func_t) thread::_main_trampoline, nullptr };
 
   scheduler::start ();
 
