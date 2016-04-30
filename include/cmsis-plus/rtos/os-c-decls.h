@@ -136,7 +136,7 @@ extern "C"
 #if !defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE) && !defined(__cplusplus)
   typedef struct
     {
-      ;
+      char dummy;
     }os_thread_user_storage_t;
 #endif
 
@@ -145,8 +145,6 @@ extern "C"
 
     typedef struct
     {
-      os_thread_func_t func;
-      os_thread_func_args_t func_args;
       void* stack_addr;
       size_t stack_size_bytes;
 #if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
@@ -165,6 +163,8 @@ extern "C"
   typedef struct
   {
     const char* name;
+    os_thread_func_t func;
+    os_thread_func_args_t func_args;
     void* func_result_;
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
     os_thread_port_data_t port;
