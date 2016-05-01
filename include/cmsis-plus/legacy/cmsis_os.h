@@ -99,8 +99,8 @@
  * - osMailAlloc, osMailCAlloc, osMailGet, osMailPut, osMailFree
  */
 
-#ifndef _CMSIS_OS_H
-#define _CMSIS_OS_H
+#ifndef CMSIS_OS_H_
+#define CMSIS_OS_H_
 
 /// @note MUST REMAIN UNCHANGED: @b osCMSIS identifies the CMSIS-RTOS API version.
 #define osCMSIS           0x00010002 ///< API version (main [31:16] .sub [15:0])
@@ -1321,4 +1321,4 @@ const osMailQDef_t os_mailQ_def_##name = { \
 }
 #endif
 
-#endif  // _CMSIS_OS_H
+#endif  /* CMSIS_OS_H_ */
