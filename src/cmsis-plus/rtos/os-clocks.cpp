@@ -110,10 +110,13 @@ namespace os
     clock::timestamp_t
     Clock::now (void)
     {
+      // Prevent inconsistent values.
       interrupts::Critical_section ics; // ----- Critical section -----
 
-      // Prevent inconsistent values using the critical section.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
       return steady_count_ + offset_;
+#pragma GCC diagnostic pop
     }
 
     clock::timestamp_t
@@ -230,7 +233,11 @@ namespace os
       ++steady_count_;
 
       steady_list_.check_timestamp (steady_count_);
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
       adjusted_list_.check_timestamp (steady_count_ + offset_);
+#pragma GCC diagnostic pop
     }
 
     result_t
