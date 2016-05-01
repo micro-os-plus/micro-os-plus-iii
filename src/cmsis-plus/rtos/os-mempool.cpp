@@ -27,6 +27,7 @@
 
 #include <cassert>
 #include <new>
+#include <memory>
 
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/rtos/port/os-inlines.h>
@@ -242,17 +243,27 @@ namespace os
             clock_ (attr.clock != nullptr ? *attr.clock : systick_clock),
 #endif
             blocks_ (blocks), //
-            block_size_bytes_ (block_size_bytes)
-
+            // Adjust block size to multiple of pointer.
+            // Blocks must be large enough to store a pointer, used
+            // to construct the list of free blocks.
+            block_size_bytes_ (
+                ((mempool::size_t) (block_size_bytes + __SIZEOF_POINTER__ - 1))
+                    & ((mempool::size_t) (~(__SIZEOF_POINTER__ - 1))))
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
-
-      pool_addr_ = (char*) attr.mp_pool_address;
-
       assert(blocks_ > 0);
-      // Blocks must be large enough to store the index, used
-      // to construct the list of free blocks.
-      assert(block_size_bytes_ >= sizeof(std::ptrdiff_t));
+
+      // Blocks must be pointer aligned.
+#if 0
+      pool_addr_ = (char*) attr.mp_pool_address;
+      pool_addr_ += (__SIZEOF_POINTER__ - 1);
+      pool_addr_ &= ~(__SIZEOF_POINTER__ - 1);
+#else
+      void* p = attr.mp_pool_address;
+      std::size_t sz = attr.mp_pool_size_bytes;
+      pool_addr_ = (char*) std::align (__SIZEOF_POINTER__,
+                                       blocks_ * block_size_bytes_, p, sz);
+#endif
 
       flags_ = 0;
 
@@ -263,6 +274,7 @@ namespace os
 
       if (pool_addr_ == nullptr)
         {
+          // TODO: use custom allocator
           pool_addr_ = new (std::nothrow) char[blocks_ * block_size_bytes_];
           flags_ |= flags_allocated;
         }
@@ -322,10 +334,17 @@ namespace os
       char* p = pool_addr_;
       for (std::size_t i = 1; i < blocks_; ++i)
         {
-          *(void**) p = (p + block_size_bytes_);
-          p += block_size_bytes_;
+          // Compute the address of the next block;
+          char* pn = p + block_size_bytes_;
+
+          // Make this block point to the next one.
+          *((void**) (void*) p) = pn;
+          // Advance pointer
+          p = pn;
         }
-      *(void**) p = nullptr;
+
+      // Mark end of list.
+      *((void**) (void*) p) = nullptr;
 
       first_ = pool_addr_; // Pointer to first block.
 
@@ -421,7 +440,6 @@ namespace os
         }
 
       /* NOTREACHED */
-      return nullptr;
     }
 
     /**
@@ -532,7 +550,6 @@ namespace os
         }
 
       /* NOTREACHED */
-      return nullptr;
     }
 
     /**

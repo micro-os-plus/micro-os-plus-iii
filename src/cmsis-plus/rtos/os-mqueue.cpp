@@ -321,10 +321,17 @@ namespace os
       char* p = (char*) queue_addr_;
       for (std::size_t i = 1; i < msgs_; ++i)
         {
-          *(void**) p = (p + msg_size_bytes_);
-          p += msg_size_bytes_;
+          // Compute the address of the next block;
+          char* pn = p + msg_size_bytes_;
+
+          // Make this block point to the next one.
+          *((void**) (void*) p) = pn;
+          // Advance pointer
+          p = pn;
         }
-      *(void**) p = nullptr;
+
+      // Mark end of list.
+      *((void**) (void*) p) = nullptr;
 
       first_free_ = queue_addr_; // Pointer to first block.
 
@@ -372,7 +379,8 @@ namespace os
       first_free_ = *(void**) first_free_;
 
       // Using the address, compute the index in the array.
-      std::size_t msg_ix = (dest - (char*) queue_addr_) / msg_size_bytes_;
+      std::size_t msg_ix = ((std::size_t) (dest - (char*) queue_addr_)
+          / msg_size_bytes_);
       prio_array_[msg_ix] = mprio;
 
       if (head_ == mqueue::no_index)
@@ -797,7 +805,7 @@ namespace os
 
           // Link previous list to this block; may be null, but it does
           // not matter.
-          *(void**) src = first_free_;
+          *((void**) (void*) src) = first_free_;
 
           // Now this block is the first one.
           first_free_ = src;
