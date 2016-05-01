@@ -29,7 +29,9 @@
 
 // ----------------------------------------------------------------------------
 
+#if defined(__ARM_ARCH_7M__)
 extern unsigned int __vectors_start;
+#endif
 
 // Forward declarations.
 
