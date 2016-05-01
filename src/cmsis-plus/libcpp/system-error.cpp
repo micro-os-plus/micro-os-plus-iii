@@ -50,52 +50,61 @@ namespace os
     struct system_error_category : public std::error_category
     {
       virtual const char*
-      name () const noexcept
-      {
-        return "system";
-      }
+      name () const noexcept;
+
+      virtual std::string
+      message (int i) const;
+
+    };
+
+    const char*
+    system_error_category::name () const noexcept
+    {
+      return "system";
+    }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-      virtual std::string
-      message (int i) const
-      {
+    std::string
+    system_error_category::message (int i) const
+    {
 #if defined(DEBUG)
-        return std::string (strerror (i));
+      return std::string (strerror (i));
 #else
-        return std::string ("");
+      return std::string ("");
 #endif
-      }
-
-#pragma GCC diagnostic pop
-
-    };
+    }
 
     struct cmsis_error_category : public std::error_category
     {
       virtual const char*
-      name () const noexcept
-      {
-        return "cmsis";
-      }
+      name () const noexcept;
+
+      virtual std::string
+      message (int i) const;
+    };
+
+    const char*
+    cmsis_error_category::name () const noexcept
+    {
+      return "cmsis";
+    }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-      virtual std::string
-      message (int i) const
-      {
+    std::string
+    cmsis_error_category::message (int i) const
+    {
 #if defined(DEBUG)
-        return std::string (strerror (i));
+      return std::string (strerror (i));
 #else
-        return std::string ("");
+      return std::string ("");
 #endif
-      }
+    }
 
 #pragma GCC diagnostic pop
-
-    };
 
 #endif
 
@@ -103,8 +112,8 @@ namespace os
     __throw_system_error (int ev, const char* what_arg)
     {
 #if defined(__EXCEPTIONS)
-      throw std::system_error (
-          std::error_code (ev, system_error_category ()), what_arg);
+      throw std::system_error (std::error_code (ev, system_error_category ()),
+                               what_arg);
 #else
       trace_printf ("system_error(%d, %s)\n", ev, what_arg);
       std::abort ();
@@ -115,8 +124,8 @@ namespace os
     __throw_cmsis_error (int ev, const char* what_arg)
     {
 #if defined(__EXCEPTIONS)
-      throw std::system_error (
-          std::error_code (ev, cmsis_error_category ()), what_arg);
+      throw std::system_error (std::error_code (ev, cmsis_error_category ()),
+                               what_arg);
 #else
       trace_printf ("system_error(%d, %s)\n", ev, what_arg);
       std::abort ();
