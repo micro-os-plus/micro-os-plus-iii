@@ -1356,12 +1356,12 @@ osSignalSet (osThreadId thread_id, int32_t signals)
 {
   if (thread_id == nullptr)
     {
-      return 0x80000000;
+      return (int32_t) 0x80000000;
     }
 
   if (signals == (int32_t) 0x80000000)
     {
-      return 0x80000000;
+      return (int32_t) 0x80000000;
     }
 
   thread::sigset_t osig;
@@ -1380,16 +1380,16 @@ osSignalClear (osThreadId thread_id, int32_t signals)
 {
   if (thread_id == nullptr)
     {
-      return 0x80000000;
+      return (int32_t) 0x80000000;
     }
 
   if (scheduler::in_handler_mode () || (signals == 0))
     {
-      return 0x80000000;
+      return (int32_t) 0x80000000;
     }
 
   thread::sigset_t sig;
-  ((Thread*) (thread_id))->sig_clear (signals, &sig);
+  ((Thread*) (thread_id))->sig_clear ((thread::sigset_t) signals, &sig);
 
   return (int32_t) sig;
 }
@@ -1430,7 +1430,7 @@ osSignalWait (int32_t signals, uint32_t millisec)
       return event;
     }
 
-  if (signals & 0x80000000)
+  if ((uint32_t) signals & 0x80000000)
     {
       event.status = osErrorValue;
       return event;
@@ -1440,22 +1440,19 @@ osSignalWait (int32_t signals, uint32_t millisec)
   if (millisec == osWaitForever)
     {
       res = this_thread::sig_wait ((thread::sigset_t) signals,
-                                   (thread::sigset_t*) &event.value.signals,
-                                   flags::mode::all || flags::mode::clear);
+                                   (thread::sigset_t*) &event.value.signals);
     }
   else if (millisec == 0)
     {
-      res = this_thread::try_sig_wait ((thread::sigset_t) signals,
-                                       (thread::sigset_t*) &event.value.signals,
-                                       flags::mode::all || flags::mode::clear);
+      res = this_thread::try_sig_wait (
+          (thread::sigset_t) signals, (thread::sigset_t*) &event.value.signals);
     }
   else
     {
       res = this_thread::timed_sig_wait (
           (thread::sigset_t) signals,
           Systick_clock::ticks_cast (millisec * 1000u),
-          (thread::sigset_t*) &event.value.signals,
-          flags::mode::all || flags::mode::clear);
+          (thread::sigset_t*) &event.value.signals);
     }
 
   if (res == result::ok)
@@ -1595,7 +1592,7 @@ osMutexWait (osMutexId mutex_id, uint32_t millisec)
       return osErrorOS;
     }
 
-  return static_cast<osStatus> (ret);
+  /* NOTREACHED */
 }
 
 /**
