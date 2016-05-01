@@ -36,7 +36,7 @@
 
 namespace __gnu_cxx
 {
-  void __attribute__((noreturn))
+  [[noreturn]] void
   __verbose_terminate_handler ();
 
   void
@@ -52,7 +52,7 @@ namespace __gnu_cxx
 
 extern "C"
 {
-  void __attribute__((noreturn))
+  [[noreturn]] void
   __cxa_pure_virtual ();
 
   void

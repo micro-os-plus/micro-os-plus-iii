@@ -82,8 +82,7 @@ namespace os
        * @param [in] exit_ptr Pointer to object to return. (Optional).
        * @return Nothing.
        */
-      void
-      __attribute__((noreturn))
+      [[noreturn]] void
       exit (void* exit_ptr = nullptr);
 
       /**
@@ -759,8 +758,7 @@ namespace os
        * @param [in] exit_ptr Pointer to object to return (optional).
        * @return  Nothing.
        */
-      void
-      __attribute__((noreturn))
+      [[noreturn]] void
       _exit (void* exit_ptr = nullptr);
 
       /**

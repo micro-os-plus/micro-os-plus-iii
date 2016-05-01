@@ -1047,8 +1047,7 @@ __posix_readlink (const char* path, char* buf, size_t bufsize)
 
 // ----------------------------------------------------------------------------
 
-extern "C" void
-__attribute__ ((noreturn))
+extern "C" [[noreturn]] void
 _Exit (int status)
 {
 #if defined(_DEBUG)
