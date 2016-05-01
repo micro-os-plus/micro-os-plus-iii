@@ -50,11 +50,11 @@ namespace os
 
     // ----------------------------------------------------------------------
 
-    void
+    [[noreturn]] void
     __throw_system_error (int ev, const char* what_arg);
 
 #if 1
-    void
+    [[noreturn]] void
     __throw_cmsis_error (int ev, const char* what_arg);
 #endif
   // ------------------------------------------------------------------------

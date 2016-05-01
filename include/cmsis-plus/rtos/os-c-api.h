@@ -111,6 +111,7 @@ extern "C"
   os_this_thread_wait (void);
 
   void
+  __attribute__((noreturn))
   os_this_thread_exit (void* exit_ptr);
 
   os_result_t

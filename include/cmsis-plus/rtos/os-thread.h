@@ -768,7 +768,7 @@ namespace os
        * @param [in] thread The static `this`.
        * @return  Nothing.
        */
-      static void
+      [[noreturn]] static void
       _invoke_with_exit (Thread* thread);
 
       /**

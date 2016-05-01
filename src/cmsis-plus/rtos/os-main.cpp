@@ -62,7 +62,7 @@ namespace os
 
       // ----------------------------------------------------------------------
 
-      static void
+      [[noreturn]] static void
       _main_trampoline (void)
       {
         int status = os_main (main_args.argc, main_args.argv);
