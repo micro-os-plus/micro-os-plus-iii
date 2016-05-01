@@ -605,7 +605,7 @@ namespace os
        * @details
        * A constant numeric value used to validate the pool size.
        */
-      constexpr size_t max_size = (0 - 1);
+      constexpr size_t max_size = (size_t)(0 - 1);
     } /* namespace mempool */
 
     // ========================================================================
