@@ -50,6 +50,9 @@ namespace os
 
       // ========================================================================
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
       /**
        * @brief %Semaphore attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
@@ -120,12 +123,17 @@ namespace os
          */
       };
 
+#pragma GCC diagnostic pop
+
       /**
        * @brief Default counting semaphore initialiser.
        */
       extern const Attributes counting_initializer;
 
       // ======================================================================
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
 
       /**
        * @brief Binary semaphore attributes.
@@ -168,6 +176,8 @@ namespace os
          * @}
          */
       };
+
+#pragma GCC diagnostic pop
 
       /**
        * @brief Default binary semaphore initialiser.
