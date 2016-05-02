@@ -167,7 +167,8 @@ namespace os
         }
 
       // Add thread intrusive node at the end of the list.
-      insert_after (thread.child_links_, (Double_list_links*) head_.prev);
+      insert_after (thread.child_links_,
+                    const_cast<Static_double_list_links *> (tail ()));
     }
 
     // ========================================================================
@@ -176,7 +177,8 @@ namespace os
     Thread_children_list::link (Thread& thread)
     {
       // Add thread intrusive node at the end of the list.
-      insert_after (thread.child_links_, (Double_list_links*) head_.prev);
+      insert_after (thread.child_links_,
+                    const_cast<Static_double_list_links*> (tail ()));
     }
 
     // ========================================================================
@@ -192,7 +194,8 @@ namespace os
 
       thread::priority_t prio = node.thread.prio_;
 
-      Waiting_thread_node* after = (Waiting_thread_node*) (head_.prev);
+      Waiting_thread_node* after =
+          static_cast<Waiting_thread_node*> (const_cast<Static_double_list_links *> (tail ()));
 
       if (empty () || (prio <= after->thread.prio_))
         {
@@ -201,7 +204,8 @@ namespace os
       else if (prio > head ()->thread.prio_)
         {
           // Insert at the beginning of the list
-          after = (Waiting_thread_node*) (&head_);
+          after =
+              static_cast<Waiting_thread_node*> (const_cast<Static_double_list_links *> (&head_));
 #if defined(OS_TRACE_RTOS_LISTS)
           trace::printf ("ready %s() head \n", __func__);
 #endif
@@ -213,7 +217,8 @@ namespace os
           // the weight is small, sched_prio() is only an accessor.
           while (prio > after->thread.prio_)
             {
-              after = (Waiting_thread_node*) after->prev;
+              after =
+                  static_cast<Waiting_thread_node*> (const_cast<Static_double_list_links *> (after->prev));
             }
         }
 
@@ -242,7 +247,7 @@ namespace os
       trace::printf ("ready %s() %p %s\n", __func__, thread, thread->name ());
 #endif
 
-      head ()->unlink ();
+      const_cast<Waiting_thread_node*> (head ())->unlink ();
 
       assert(thread != nullptr);
 
@@ -299,7 +304,8 @@ namespace os
     {
       thread::priority_t prio = node.thread.sched_prio ();
 
-      Waiting_thread_node* after = (Waiting_thread_node*) (head_.prev);
+      Waiting_thread_node* after =
+          static_cast<Waiting_thread_node*> (const_cast<Static_double_list_links *> (tail ()));
 
       if (empty () || (prio <= after->thread.sched_prio ()))
         {
@@ -308,7 +314,8 @@ namespace os
       else if (prio > head ()->thread.sched_prio ())
         {
           // Insert at the beginning of the list
-          after = (Waiting_thread_node*) (&head_);
+          after =
+              static_cast<Waiting_thread_node*> (const_cast<Static_double_list_links *> (&head_));
 #if defined(OS_TRACE_RTOS_LISTS)
           trace::printf ("wait %s() head \n", __func__);
 #endif
@@ -320,7 +327,8 @@ namespace os
           // the weight is small, sched_prio() is only an accessor.
           while (prio > after->thread.sched_prio ())
             {
-              after = (Waiting_thread_node*) after->prev;
+              after =
+                  static_cast<Waiting_thread_node*> (const_cast<Static_double_list_links *> (after->prev));
             }
         }
 
@@ -353,7 +361,7 @@ namespace os
           // The top priority is to remove the entry from the list
           // so that subsequent wakeups to address different threads.
           thread = &(head ()->thread);
-          head ()->unlink ();
+          const_cast<Waiting_thread_node*> (head ())->unlink ();
         }
       assert(thread != nullptr);
 
@@ -471,7 +479,8 @@ namespace os
     {
       clock::timestamp_t timestamp = node.timestamp;
 
-      Timeout_thread_node* after = (Timeout_thread_node*) (head_.prev);
+      Timeout_thread_node* after =
+          static_cast<Timeout_thread_node*> (const_cast<Static_double_list_links *> (tail ()));
 
       if (empty () || (timestamp >= after->timestamp))
         {
@@ -481,7 +490,8 @@ namespace os
         {
           // Insert at the beginning of the list
           // and update the new head.
-          after = (Timeout_thread_node*) (&head_);
+          after =
+              static_cast<Timeout_thread_node*> (const_cast<Static_double_list_links *> (&head_));
 #if defined(OS_TRACE_RTOS_LISTS)
           trace::printf ("clock %s() head \n", __func__);
 #endif
@@ -492,12 +502,14 @@ namespace os
           // The loop is guaranteed to terminate.
           while (timestamp < after->timestamp)
             {
-              after = (Timeout_thread_node*) (after->prev);
+              after =
+                  static_cast<Timeout_thread_node*> (const_cast<Static_double_list_links *> (after->prev));
             }
         }
 
 #if defined(OS_TRACE_RTOS_LISTS)
-      trace::printf ("clock %s() %u\n", __func__, (uint32_t) timestamp);
+      trace::printf ("clock %s() %u\n", __func__,
+                     static_cast<uint32_t> (timestamp));
 #endif
 
 #if 0
@@ -538,9 +550,9 @@ namespace os
             {
 #if defined(OS_TRACE_RTOS_LISTS)
               trace::printf ("%s() %u \n", __func__,
-                             (uint32_t) systick_clock.now ());
+                             static_cast<uint32_t> (systick_clock.now ()));
 #endif
-              head ()->action ();
+              const_cast<Timestamp_node*> (head ())->action ();
             }
           else
             {

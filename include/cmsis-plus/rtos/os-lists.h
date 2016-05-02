@@ -572,8 +572,18 @@ namespace os
        *  None.
        * @return Pointer to head node.
        */
-      Static_double_list_links*
+      volatile Static_double_list_links*
       head (void);
+
+      /**
+       * @brief Get the list tail.
+       * @par Parameters
+       *  None.
+       * @return Pointer to tail node.
+       */
+      volatile Static_double_list_links*
+      tail (void);
+
       /**
        * @}
        */
@@ -849,7 +859,7 @@ namespace os
        *  None.
        * @return Casted pointer to head node.
        */
-      Waiting_thread_node*
+      volatile Waiting_thread_node*
       head (void);
 
       /**
@@ -930,7 +940,7 @@ namespace os
        *  None.
        * @return Casted pointer to head node.
        */
-      Waiting_thread_node*
+      volatile Waiting_thread_node*
       head (void);
 
       /**
@@ -1020,7 +1030,7 @@ namespace os
        *  None.
        * @return Casted pointer to head node.
        */
-      Timestamp_node*
+      volatile Timestamp_node*
       head (void);
 
       /**
@@ -1146,25 +1156,31 @@ namespace os
       return (head_.next == &head_) || (head_.next == nullptr);
     }
 
-    inline Static_double_list_links*
+    inline volatile Static_double_list_links*
     Static_double_list::head (void)
     {
-      return (Double_list_links*) head_.next;
+      return static_cast<volatile Static_double_list_links*> (head_.next);
+    }
+
+    inline volatile Static_double_list_links*
+    Static_double_list::tail (void)
+    {
+      return static_cast<volatile Static_double_list_links*> (head_.prev);
     }
 
 #if 0
     inline void
     Static_double_list::insert_after (Static_double_list_links& node,
-                                      Static_double_list_links* after)
-    {
-      // Make the new node point to its neighbours.
-      node.prev = after;
-      node.next = after->next;
+        Static_double_list_links* after)
+      {
+        // Make the new node point to its neighbours.
+        node.prev = after;
+        node.next = after->next;
 
-      // Make the neighbours point to the node. The order is important.
-      after->next->prev = &node;
-      after->next = &node;
-    }
+        // Make the neighbours point to the node. The order is important.
+        after->next->prev = &node;
+        after->next = &node;
+      }
 #endif
 
     // ========================================================================
@@ -1221,10 +1237,10 @@ namespace os
       ;
     }
 
-    inline Waiting_thread_node*
+    inline volatile Waiting_thread_node*
     Ready_threads_list::head (void)
     {
-      return (Waiting_thread_node*) Static_double_list::head ();
+      return static_cast<volatile Waiting_thread_node*> (Static_double_list::head ());
     }
 
     // ========================================================================
@@ -1245,10 +1261,10 @@ namespace os
       ;
     }
 
-    inline Waiting_thread_node*
+    inline volatile Waiting_thread_node*
     Waiting_threads_list::head (void)
     {
-      return (Waiting_thread_node*) Double_list::head ();
+      return static_cast<volatile Waiting_thread_node*> (Double_list::head ());
     }
 
     // ========================================================================
@@ -1265,10 +1281,10 @@ namespace os
       ;
     }
 
-    inline Timestamp_node*
+    inline volatile Timestamp_node*
     Clock_timestamps_list::head (void)
     {
-      return (Timestamp_node*) Double_list::head ();
+      return static_cast<volatile Timestamp_node*> (Double_list::head ());
     }
 
   // --------------------------------------------------------------------------
