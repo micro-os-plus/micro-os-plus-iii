@@ -72,11 +72,23 @@ namespace os
        * since it must be available to register the very first statically
        * allocated thread.
        */
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#endif
       Top_threads_list top_threads_list_;
+#pragma GCC diagnostic pop
 
 #if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
       Thread* current_thread_;
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#endif
       Ready_threads_list ready_threads_list_;
+#pragma GCC diagnostic pop
 #endif
 
       /**
