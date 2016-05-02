@@ -70,6 +70,7 @@ namespace os
          * @brief Create semaphore attributes.
          * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
+        constexpr
         Attributes (const char* name);
 
         /**
@@ -93,6 +94,11 @@ namespace os
         /**
          * @}
          */
+
+      protected:
+
+        constexpr
+        Attributes (const char* name, count_t max_count);
 
       public:
 
@@ -152,6 +158,7 @@ namespace os
          * @brief Create binary semaphore attributes.
          * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
+        constexpr
         Binary_attributes (const char* name);
 
         /**
@@ -429,21 +436,36 @@ namespace os
   {
     namespace semaphore
     {
-      inline
+      // ======================================================================
+
+      constexpr
       Attributes::Attributes (const char* name) :
           Clocked_attribute
-            { name }
+            { name }, //
+          sm_initial_count (0), //
+          sm_max_count (max_count_value)
       {
-        sm_initial_count = 0;
-        sm_max_count = max_count_value;
+        ;
       }
 
-      inline
-      Binary_attributes::Binary_attributes (const char* name) :
-          Attributes (name)
+      constexpr
+      Attributes::Attributes (const char* name, count_t max_count) :
+          Clocked_attribute
+            { name }, //
+          sm_initial_count (0), //
+          sm_max_count (max_count)
       {
-        sm_initial_count = 0;
-        sm_max_count = 1;
+        ;
+      }
+
+      // ======================================================================
+
+      constexpr
+      Binary_attributes::Binary_attributes (const char* name) :
+          Attributes
+            { name, 1 } // Use the protected constructor.
+      {
+        ;
       }
 
     } /* namespace semaphore */

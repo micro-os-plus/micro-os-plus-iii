@@ -70,6 +70,7 @@ namespace os
          * @brief Create timer attributes.
          * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
+        constexpr
         Attributes (const char* name);
 
         /**
@@ -145,6 +146,7 @@ namespace os
          * @brief Create periodic timer attributes.
          * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
+        constexpr
         Periodic_attributes (const char* name);
 
         /**
@@ -358,22 +360,23 @@ namespace os
   {
     namespace timer
     {
-      inline
+      constexpr
       Attributes::Attributes (const char* name) :
           Clocked_attribute
-            { name }
+            { name }, //
+          tm_type (run::once)
       {
-        this->tm_type = run::once;
+        ;
       }
 
       // ======================================================================
 
-      inline
+      constexpr
       Periodic_attributes::Periodic_attributes (const char* name) :
           Attributes
             { name }
       {
-        this->tm_type = run::periodic;
+        tm_type = run::periodic;
       }
 
     } /* namespace timer */

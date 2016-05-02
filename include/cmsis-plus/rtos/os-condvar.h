@@ -62,6 +62,7 @@ namespace os
          * @brief Create condition variable attributes.
          * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
+        constexpr
         Attributes (const char* name);
 
         /**
@@ -302,7 +303,7 @@ namespace os
   {
     namespace condvar
     {
-      inline
+      constexpr
       Attributes::Attributes (const char* name) :
           Clocked_attribute
             { name }

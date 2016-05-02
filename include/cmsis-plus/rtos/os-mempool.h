@@ -70,6 +70,7 @@ namespace os
          * @brief Create memory pool attributes.
          * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
+        constexpr
         Attributes (const char* name);
 
         /**
@@ -427,12 +428,14 @@ namespace os
   {
     namespace mempool
     {
-      inline
+      constexpr
       Attributes::Attributes (const char* name) :
-          Clocked_attribute (name)
+          Clocked_attribute
+            { name }, //
+          mp_pool_address (nullptr), //
+          mp_pool_size_bytes (0)
       {
-        mp_pool_address = nullptr;
-        mp_pool_size_bytes = 0;
+        ;
       }
 
     } /* namespace mempool */

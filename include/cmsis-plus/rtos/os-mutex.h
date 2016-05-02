@@ -70,6 +70,7 @@ namespace os
          * @brief Create mutex attributes.
          * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
+        constexpr
         Attributes (const char* name);
 
         /**
@@ -93,6 +94,11 @@ namespace os
         /**
          * @}
          */
+
+      protected:
+
+        constexpr
+        Attributes (const char* name, mutex::type_t type);
 
       public:
 
@@ -167,6 +173,7 @@ namespace os
          * @brief Create recursive mutex attributes.
          * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
+        constexpr
         Recursive_attributes (const char* name);
 
         /**
@@ -503,22 +510,43 @@ namespace os
   {
     namespace mutex
     {
-      inline
+
+      // ======================================================================
+
+      constexpr
       Attributes::Attributes (const char* name) :
-          Clocked_attribute (name)
+          Clocked_attribute
+            { name }, //
+          mx_priority_ceiling (thread::priority::highest), //
+          mx_protocol (protocol::none), //
+          mx_robustness (robustness::stalled), //
+          mx_type (type::_default), //
+          mx_max_count (max_count)
       {
-        mx_priority_ceiling = thread::priority::highest;
-        mx_protocol = protocol::none;
-        mx_robustness = robustness::stalled;
-        mx_type = type::_default;
-        mx_max_count = max_count;
+        ;
       }
 
-      inline
-      Recursive_attributes::Recursive_attributes (const char* name) :
-          Attributes (name)
+      constexpr
+      Attributes::Attributes (const char* name, mutex::type_t type) :
+          Clocked_attribute
+            { name }, //
+          mx_priority_ceiling (thread::priority::highest), //
+          mx_protocol (protocol::none), //
+          mx_robustness (robustness::stalled), //
+          mx_type (type), //
+          mx_max_count (max_count)
       {
-        mx_type = type::recursive;
+        ;
+      }
+
+      // ======================================================================
+
+      constexpr
+      Recursive_attributes::Recursive_attributes (const char* name) :
+          Attributes
+            { name, type::recursive } // Use the protected constructor.
+      {
+        ;
       }
 
     }

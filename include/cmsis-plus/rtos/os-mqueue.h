@@ -67,6 +67,7 @@ namespace os
          * @brief Create message queue attributes.
          * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
+        constexpr
         Attributes (const char* name);
 
         /**
@@ -503,12 +504,15 @@ namespace os
   {
     namespace mqueue
     {
-      inline
+      constexpr
       Attributes::Attributes (const char* name) :
-          Clocked_attribute (name)
+          Clocked_attribute
+            { name }, //
+          mq_queue_address (nullptr), //
+          mq_queue_size_bytes (0)
+
       {
-        mq_queue_address = nullptr;
-        mq_queue_size_bytes = 0;
+        ;
       }
 
     } /* namespace mqueue */

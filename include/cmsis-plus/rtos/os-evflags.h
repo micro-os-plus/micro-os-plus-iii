@@ -62,6 +62,7 @@ namespace os
          * @brief Create event flags attributes.
          * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
+        constexpr
         Attributes (const char* name);
 
         /**
@@ -358,9 +359,10 @@ namespace os
   {
     namespace evflags
     {
-      inline
+      constexpr
       Attributes::Attributes (const char* name) :
-          Clocked_attribute (name)
+          Clocked_attribute
+            { name }
       {
         ;
       }

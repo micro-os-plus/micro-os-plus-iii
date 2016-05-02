@@ -185,6 +185,7 @@ namespace os
          * @brief Create thread attributes.
          * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
+        constexpr
         Attributes (const char* name);
 
         /**
@@ -758,7 +759,8 @@ namespace os
        * @param [in] exit_ptr Pointer to object to return (optional).
        * @return  Nothing.
        */
-      [[noreturn]] void
+      [[noreturn]]
+      void
       _exit (void* exit_ptr = nullptr);
 
       /**
@@ -766,7 +768,8 @@ namespace os
        * @param [in] thread The static `this`.
        * @return  Nothing.
        */
-      [[noreturn]] static void
+      [[noreturn]]
+      static void
       _invoke_with_exit (Thread* thread);
 
       /**
@@ -994,13 +997,15 @@ namespace os
     {
       // ======================================================================
 
-      inline
+      constexpr
       Attributes::Attributes (const char* name) :
-          Named_object (name)
+          Named_object
+            { name }, //
+          th_stack_address (nullptr), //
+          th_stack_size_bytes (0), //
+          th_priority (thread::priority::normal)
       {
-        th_stack_address = nullptr;
-        th_stack_size_bytes = 0;
-        th_priority = thread::priority::normal;
+        ;
       }
 
       // ======================================================================

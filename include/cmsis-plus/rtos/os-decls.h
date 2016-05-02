@@ -778,6 +778,7 @@ namespace os
        * @brief Create a named object.
        * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
        */
+      constexpr
       Named_object (const char* name);
 
       /**
@@ -858,6 +859,7 @@ namespace os
        * @brief Create a named object.
        * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
        */
+      constexpr
       Clocked_attribute (const char* name);
 
       /**
@@ -919,6 +921,21 @@ namespace os
 
     /**
      * @details
+     * To save space, instead of copying the null terminated string
+     * locally, the pointer to the string
+     * is copied, so the caller must ensure that the pointer
+     * life cycle is at least as long as the object life cycle.
+     * A constant string (stored in flash) is preferred.
+     */
+    constexpr
+    Named_object::Named_object (const char* name) :
+        name_ (name != nullptr ? name : "-")
+    {
+      ;
+    }
+
+    /**
+     * @details
      * All objects return a non-null string; anonymous objects
      * return `"-"`.
      */
@@ -928,12 +945,13 @@ namespace os
       return name_;
     }
 
-    inline
+    constexpr
     Clocked_attribute::Clocked_attribute (const char* name) :
         Named_object
-          { name }
+          { name }, //
+        clock (nullptr)
     {
-      clock = nullptr;
+      ;
     }
 
   // ==========================================================================
