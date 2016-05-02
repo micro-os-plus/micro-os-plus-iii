@@ -573,7 +573,7 @@ namespace os
        * @return Pointer to head node.
        */
       volatile Static_double_list_links*
-      head (void);
+      head (void) const;
 
       /**
        * @brief Get the list tail.
@@ -582,7 +582,7 @@ namespace os
        * @return Pointer to tail node.
        */
       volatile Static_double_list_links*
-      tail (void);
+      tail (void) const;
 
       /**
        * @}
@@ -860,7 +860,7 @@ namespace os
        * @return Casted pointer to head node.
        */
       volatile Waiting_thread_node*
-      head (void);
+      head (void) const;
 
       /**
        * @brief Remove top node from the list.
@@ -941,7 +941,7 @@ namespace os
        * @return Casted pointer to head node.
        */
       volatile Waiting_thread_node*
-      head (void);
+      head (void) const;
 
       /**
        * @brief Wake-up one thread (the oldest with the highest priority)
@@ -1031,7 +1031,7 @@ namespace os
        * @return Casted pointer to head node.
        */
       volatile Timestamp_node*
-      head (void);
+      head (void) const;
 
       /**
        * @brief Check list time stamps.
@@ -1157,13 +1157,13 @@ namespace os
     }
 
     inline volatile Static_double_list_links*
-    Static_double_list::head (void)
+    Static_double_list::head (void) const
     {
       return static_cast<volatile Static_double_list_links*> (head_.next);
     }
 
     inline volatile Static_double_list_links*
-    Static_double_list::tail (void)
+    Static_double_list::tail (void) const
     {
       return static_cast<volatile Static_double_list_links*> (head_.prev);
     }
@@ -1238,7 +1238,7 @@ namespace os
     }
 
     inline volatile Waiting_thread_node*
-    Ready_threads_list::head (void)
+    Ready_threads_list::head (void) const
     {
       return static_cast<volatile Waiting_thread_node*> (Static_double_list::head ());
     }
@@ -1262,7 +1262,7 @@ namespace os
     }
 
     inline volatile Waiting_thread_node*
-    Waiting_threads_list::head (void)
+    Waiting_threads_list::head (void) const
     {
       return static_cast<volatile Waiting_thread_node*> (Double_list::head ());
     }
@@ -1282,7 +1282,7 @@ namespace os
     }
 
     inline volatile Timestamp_node*
-    Clock_timestamps_list::head (void)
+    Clock_timestamps_list::head (void) const
     {
       return static_cast<volatile Timestamp_node*> (Double_list::head ());
     }
