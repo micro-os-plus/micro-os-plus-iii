@@ -172,7 +172,7 @@ namespace os
        * @brief %Thread attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Attributes : public Named_object
+      class Attributes : public Named_attributes
       {
       public:
 
@@ -999,7 +999,7 @@ namespace os
 
       constexpr
       Attributes::Attributes (const char* name) :
-          Named_object
+          Named_attributes
             { name }, //
           th_stack_address (nullptr), //
           th_stack_size_bytes (0), //

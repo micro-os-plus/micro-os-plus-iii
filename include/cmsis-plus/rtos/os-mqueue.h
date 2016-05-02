@@ -54,7 +54,7 @@ namespace os
        * @brief Message queue attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Attributes : public Clocked_attribute
+      class Attributes : public Clocked_attributes
       {
       public:
 
@@ -506,7 +506,7 @@ namespace os
     {
       constexpr
       Attributes::Attributes (const char* name) :
-          Clocked_attribute
+          Clocked_attributes
             { name }, //
           mq_queue_address (nullptr), //
           mq_queue_size_bytes (0)

@@ -57,7 +57,7 @@ namespace os
        * @brief %Timer attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Attributes : public Clocked_attribute
+      class Attributes : public Clocked_attributes
       {
       public:
 
@@ -362,7 +362,7 @@ namespace os
     {
       constexpr
       Attributes::Attributes (const char* name) :
-          Clocked_attribute
+          Clocked_attributes
             { name }, //
           tm_type (run::once)
       {

@@ -778,7 +778,6 @@ namespace os
        * @brief Create a named object.
        * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
        */
-      constexpr
       Named_object (const char* name);
 
       /**
@@ -843,10 +842,90 @@ namespace os
     // ========================================================================
 
     /**
+     * @brief Base class for named attributes.
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     */
+    class Named_attributes
+    {
+    public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+      /**
+       * @brief Create a named attributes object.
+       * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
+       */
+      constexpr
+      Named_attributes (const char* name);
+
+      /**
+       * @cond ignore
+       */
+      Named_attributes (const Named_attributes&) = default;
+      Named_attributes (Named_attributes&&) = default;
+      Named_attributes&
+      operator= (const Named_attributes&) = default;
+      Named_attributes&
+      operator= (Named_attributes&&) = default;
+      /**
+       * @endcond
+       */
+
+      /**
+       * @brief Destroy the named object.
+       */
+      ~Named_attributes () = default;
+
+      /**
+       * @}
+       */
+
+    public:
+
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+      /**
+       * @brief Get name.
+       * @par Parameters
+       *  None.
+       * @return A null terminated string.
+       */
+      const char*
+      name (void) const;
+
+      /**
+       * @}
+       */
+
+    protected:
+
+      /**
+       * @name Private Member Variables
+       * @{
+       */
+
+      /**
+       * @brief Pointer to name.
+       */
+      const char* const name_;
+
+      /**
+       * @}
+       */
+    };
+    // ========================================================================
+
+    /**
      * @brief Base class for named objects.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      */
-    class Clocked_attribute : public Named_object
+    class Clocked_attributes : public Named_attributes
     {
     public:
 
@@ -860,17 +939,17 @@ namespace os
        * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
        */
       constexpr
-      Clocked_attribute (const char* name);
+      Clocked_attributes (const char* name);
 
       /**
        * @cond ignore
        */
-      Clocked_attribute (const Clocked_attribute&) = default;
-      Clocked_attribute (Clocked_attribute&&) = default;
-      Clocked_attribute&
-      operator= (const Clocked_attribute&) = default;
-      Clocked_attribute&
-      operator= (Clocked_attribute&&) = default;
+      Clocked_attributes (const Clocked_attributes&) = default;
+      Clocked_attributes (Clocked_attributes&&) = default;
+      Clocked_attributes&
+      operator= (const Clocked_attributes&) = default;
+      Clocked_attributes&
+      operator= (Clocked_attributes&&) = default;
       /**
        * @endcond
        */
@@ -878,7 +957,7 @@ namespace os
       /**
        * @brief Destroy the named object.
        */
-      ~Clocked_attribute () = default;
+      ~Clocked_attributes () = default;
 
       /**
        * @}
@@ -921,6 +1000,19 @@ namespace os
 
     /**
      * @details
+     * All objects return a non-null string; anonymous objects
+     * return `"-"`.
+     */
+    inline const char*
+    Named_object::name (void) const
+    {
+      return name_;
+    }
+
+    // ========================================================================
+
+    /**
+     * @details
      * To save space, instead of copying the null terminated string
      * locally, the pointer to the string
      * is copied, so the caller must ensure that the pointer
@@ -928,7 +1020,7 @@ namespace os
      * A constant string (stored in flash) is preferred.
      */
     constexpr
-    Named_object::Named_object (const char* name) :
+    Named_attributes::Named_attributes (const char* name) :
         name_ (name != nullptr ? name : "-")
     {
       ;
@@ -940,14 +1032,16 @@ namespace os
      * return `"-"`.
      */
     inline const char*
-    Named_object::name (void) const
+    Named_attributes::name (void) const
     {
       return name_;
     }
 
+    // ========================================================================
+
     constexpr
-    Clocked_attribute::Clocked_attribute (const char* name) :
-        Named_object
+    Clocked_attributes::Clocked_attributes (const char* name) :
+        Named_attributes
           { name }, //
         clock (nullptr)
     {

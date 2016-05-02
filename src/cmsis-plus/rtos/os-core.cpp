@@ -450,25 +450,41 @@ namespace os
 
     } /* namespace flags */
 
-  // ==========================================================================
+    // ==========================================================================
 
-  /**
-   * @class Named_object
-   * @details
-   * This class serves as a base class for all objects that have a
-   * name (most of the RTOS classes do have a name).
-   */
+    /**
+     * @class Named_object
+     * @details
+     * This class serves as a base class for all objects that have a
+     * name (most of the RTOS classes do have a name).
+     *
+     * Attributes use a separate constexpr object.
+     */
 
-  /**
-   * @var const char* const Named_object::name_
-   * @details
-   * To save space, the null terminated string passed to the
-   * constructor is not copied locally. Instead, the pointer to
-   * the string is copied, so the
-   * caller must ensure that the pointer life cycle
-   * is at least as long as the object life cycle. A constant
-   * string (stored in flash) is preferred.
-   */
+    /**
+     * @var const char* const Named_object::name_
+     * @details
+     * To save space, the null terminated string passed to the
+     * constructor is not copied locally. Instead, the pointer to
+     * the string is copied, so the
+     * caller must ensure that the pointer life cycle
+     * is at least as long as the object life cycle. A constant
+     * string (stored in flash) is preferred.
+     */
+
+    /**
+     * @details
+     * To save space, instead of copying the null terminated string
+     * locally, the pointer to the string
+     * is copied, so the caller must ensure that the pointer
+     * life cycle is at least as long as the object life cycle.
+     * A constant string (stored in flash) is preferred.
+     */
+    Named_object::Named_object (const char* name) :
+        name_ (name != nullptr ? name : "-")
+    {
+      ;
+    }
 
   // ==========================================================================
   } /* namespace rtos */

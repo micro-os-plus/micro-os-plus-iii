@@ -57,7 +57,7 @@ namespace os
        * @brief Memory pool attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Attributes : public Clocked_attribute
+      class Attributes : public Clocked_attributes
       {
       public:
 
@@ -430,7 +430,7 @@ namespace os
     {
       constexpr
       Attributes::Attributes (const char* name) :
-          Clocked_attribute
+          Clocked_attributes
             { name }, //
           mp_pool_address (nullptr), //
           mp_pool_size_bytes (0)

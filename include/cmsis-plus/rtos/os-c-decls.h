@@ -143,14 +143,14 @@ extern "C"
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
-    typedef struct
-    {
-      void* stack_addr;
-      size_t stack_size_bytes;
+  typedef struct
+  {
+    void* stack_addr;
+    size_t stack_size_bytes;
 #if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
-      os_port_thread_context_t port;
+    os_port_thread_context_t port;
 #endif
-    } os_thread_context_t;
+  } os_thread_context_t;
 
   typedef struct
   {
