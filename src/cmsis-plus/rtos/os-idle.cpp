@@ -65,8 +65,13 @@ namespace os
         // go below the idle priority.
         attr.th_priority = thread::priority::idle - 1;
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#endif
         static Thread idle_thread
           { attr, _idle_func, nullptr };
+#pragma GCC diagnostic pop
       }
 
       void*

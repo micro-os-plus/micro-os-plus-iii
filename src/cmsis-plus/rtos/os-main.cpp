@@ -130,8 +130,13 @@ main (int argc, char* argv[])
   attr.th_stack_address = main_stack;
   attr.th_stack_size_bytes = sizeof(main_stack);
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#endif
   static Thread main_thread
     { attr, reinterpret_cast<thread::func_t> (thread::_main_trampoline), nullptr };
+#pragma GCC diagnostic pop
 
   scheduler::start ();
 
