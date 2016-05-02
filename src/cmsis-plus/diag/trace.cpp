@@ -85,7 +85,10 @@ namespace os
       // (although the nano version is no longer very heavy).
 
       // Print to the local buffer
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-nonliteral"
       int ret = ::vsnprintf (buf, sizeof(buf), format, args);
+#pragma GCC diagnostic pop
       if (ret > 0)
         {
           // Transfer the buffer to the device.
