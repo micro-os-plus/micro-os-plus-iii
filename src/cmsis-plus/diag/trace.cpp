@@ -58,7 +58,7 @@ namespace os
     ssize_t __attribute__((weak))
     write (const void* buf __attribute__((unused)), std::size_t nbyte)
     {
-      return (ssize_t) nbyte;
+      return static_cast<ssize_t> (nbyte);
     }
 
     // ----------------------------------------------------------------------
@@ -92,7 +92,7 @@ namespace os
       if (ret > 0)
         {
           // Transfer the buffer to the device.
-          ret = (int) write (buf, (size_t) ret);
+          ret = static_cast<int> (write (buf, static_cast<size_t> (ret)));
         }
       return ret;
     }
@@ -100,10 +100,10 @@ namespace os
     int __attribute__((weak))
     puts (const char* s)
     {
-      int ret = (int) write (s, strlen (s));
+      int ret = static_cast<int> (write (s, strlen (s)));
       if (ret > 0)
         {
-          ret = (int) write ("\n", 1); // Add a line terminator
+          ret = static_cast<int> (write ("\n", 1)); // Add a line terminator
         }
       if (ret > 0)
         {
@@ -118,7 +118,7 @@ namespace os
     int __attribute__((weak))
     putchar (int c)
     {
-      int ret = (int) write ((const char*) &c, 1);
+      int ret = static_cast<int> (write (reinterpret_cast<const char*> (&c), 1));
       if (ret > 0)
         {
           return c;
