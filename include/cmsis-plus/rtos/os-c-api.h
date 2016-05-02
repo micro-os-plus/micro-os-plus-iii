@@ -184,6 +184,9 @@ extern "C"
   os_result_t
   os_systick_clock_wait (os_clock_duration_t timeout);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+
   inline os_clock_duration_t
   os_systick_clock_ticks_cast (uint32_t microsec)
   {
@@ -201,6 +204,8 @@ extern "C"
         * ((uint64_t) OS_INTEGER_SYSTICK_FREQUENCY_HZ)) + (uint64_t) 999999ul)
         / (uint64_t) 1000000ul);
   }
+
+#pragma GCC diagnostic pop
 
   os_clock_timestamp_t
   os_realtime_clock_now (void);

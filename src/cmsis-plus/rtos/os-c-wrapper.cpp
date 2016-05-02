@@ -90,6 +90,9 @@ static_assert(os_priority_error == thread::priority::error, "adjust os_priority_
 
 #pragma GCC diagnostic pop
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+
 // ----------------------------------------------------------------------------
 
 os_result_t
@@ -2473,3 +2476,5 @@ osMailFree (osMailQId mail_id, void* mail)
 #endif /* Mail Queues available */
 
 // ----------------------------------------------------------------------------
+
+#pragma GCC diagnostic pop

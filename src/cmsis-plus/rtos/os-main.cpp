@@ -131,7 +131,7 @@ main (int argc, char* argv[])
   attr.th_stack_size_bytes = sizeof(main_stack);
 
   static Thread main_thread
-    { attr, (thread::func_t) thread::_main_trampoline, nullptr };
+    { attr, reinterpret_cast<thread::func_t> (thread::_main_trampoline), nullptr };
 
   scheduler::start ();
 

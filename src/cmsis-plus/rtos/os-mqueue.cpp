@@ -256,14 +256,17 @@ namespace os
       os_assert_throw(queue_addr_ != nullptr, ENOMEM);
 
       // The array of prev indexes follows immediately after the content array.
-      prev_array_ = (mqueue::index_t*) ((char*) queue_addr_
-          + msgs * msg_size_bytes);
+      prev_array_ =
+          reinterpret_cast<mqueue::index_t*> (static_cast<char*> (queue_addr_)
+              + msgs * msg_size_bytes);
       // The array of next indexes follows immediately the prev array.
-      next_array_ = (mqueue::index_t*) ((char*) prev_array_
-          + msgs * sizeof(mqueue::index_t));
+      next_array_ =
+          reinterpret_cast<mqueue::index_t*> (reinterpret_cast<char*> (const_cast<mqueue::index_t*> (prev_array_))
+              + msgs * sizeof(mqueue::index_t));
       // The array of priorities follows immediately the next array.
-      prio_array_ = (mqueue::priority_t*) ((char*) next_array_
-          + msgs * sizeof(mqueue::index_t));
+      prio_array_ =
+          reinterpret_cast<mqueue::priority_t*> (reinterpret_cast<char*> (const_cast<mqueue::index_t*> (next_array_))
+              + msgs * sizeof(mqueue::index_t));
 
       _init ();
 #endif
@@ -301,7 +304,7 @@ namespace os
 
       if (flags_ | flags_allocated)
         {
-          delete[] ((char*) queue_addr_);
+          delete[] (static_cast<char*> (queue_addr_));
         }
 
 #endif
@@ -318,20 +321,20 @@ namespace os
       // the beginning of each block. Each block
       // will hold the address of the next free block,
       // or `nullptr` at the end.
-      char* p = (char*) queue_addr_;
+      char* p = static_cast<char*> (queue_addr_);
       for (std::size_t i = 1; i < msgs_; ++i)
         {
           // Compute the address of the next block;
           char* pn = p + msg_size_bytes_;
 
           // Make this block point to the next one.
-          *((void**) (void*) p) = pn;
+          *(static_cast<void**> (static_cast<void*> (p))) = pn;
           // Advance pointer
           p = pn;
         }
 
       // Mark end of list.
-      *((void**) (void*) p) = nullptr;
+      *(static_cast<void**> (static_cast<void*> (p))) = nullptr;
 
       first_free_ = queue_addr_; // Pointer to first block.
 
@@ -373,23 +376,23 @@ namespace os
 
       // Get the address where the message will be copied.
       // This is the first free memory block.
-      dest = (char*) first_free_;
+      dest = static_cast<char*> (first_free_);
 
       // Update to next free, if any (the last one has nullptr).
-      first_free_ = *(void**) first_free_;
+      first_free_ = *(static_cast<void**> (first_free_));
 
       // Using the address, compute the index in the array.
-      std::size_t msg_ix = ((std::size_t) (dest - (char*) queue_addr_)
-          / msg_size_bytes_);
+      std::size_t msg_ix = (static_cast<std::size_t> (dest
+          - static_cast<char*> (queue_addr_)) / msg_size_bytes_);
       prio_array_[msg_ix] = mprio;
 
       if (head_ == mqueue::no_index)
         {
           // No other message in the queue, enlist this one
           // as head, with links to itself.
-          head_ = (mqueue::index_t) msg_ix;
-          prev_array_[msg_ix] = (mqueue::index_t) msg_ix;
-          next_array_[msg_ix] = (mqueue::index_t) msg_ix;
+          head_ = static_cast<mqueue::index_t> (msg_ix);
+          prev_array_[msg_ix] = static_cast<mqueue::index_t> (msg_ix);
+          next_array_[msg_ix] = static_cast<mqueue::index_t> (msg_ix);
         }
       else
         {
@@ -401,7 +404,7 @@ namespace os
             {
               // Having the highest priority, the new message
               // becomes the new head.
-              head_ = (mqueue::index_t) msg_ix;
+              head_ = static_cast<mqueue::index_t> (msg_ix);
             }
           else
             {
@@ -412,13 +415,13 @@ namespace os
                   ix = prev_array_[ix];
                 }
             }
-          prev_array_[msg_ix] = (mqueue::index_t) ix;
+          prev_array_[msg_ix] = static_cast<mqueue::index_t> (ix);
           next_array_[msg_ix] = next_array_[ix];
 
           // Break the chain and insert the new index.
           std::size_t tmp_ix = next_array_[ix];
-          next_array_[ix] = (mqueue::index_t) msg_ix;
-          prev_array_[tmp_ix] = (mqueue::index_t) msg_ix;
+          next_array_[ix] = static_cast<mqueue::index_t> (msg_ix);
+          prev_array_[tmp_ix] = static_cast<mqueue::index_t> (msg_ix);
         }
 
       // One more message added to the queue.
@@ -767,7 +770,7 @@ namespace os
               return false;
             }
 
-          src = (char*) queue_addr_ + head_ * msg_size_bytes_;
+          src = static_cast<char*> (queue_addr_) + head_ * msg_size_bytes_;
         }
 
         {
@@ -805,7 +808,7 @@ namespace os
 
           // Link previous list to this block; may be null, but it does
           // not matter.
-          *((void**) (void*) src) = first_free_;
+          *(static_cast<void**> (static_cast<void*> (src))) = first_free_;
 
           // Now this block is the first one.
           first_free_ = src;

@@ -451,8 +451,9 @@ namespace os
       Systick_clock::ticks_cast (Rep_T microsec)
       {
         // TODO: add some restrictions to match only numeric types
-        return (clock::systicks_t) ((((microsec) * ((Rep_T) frequency_hz))
-            + (Rep_T) 999999ul) / (Rep_T) 1000000ul);
+        return static_cast<clock::systicks_t> ((((microsec)
+            * (static_cast<Rep_T> (frequency_hz)))
+            + static_cast<Rep_T> (999999ul)) / static_cast<Rep_T> (1000000ul));
       }
 
   } /* namespace rtos */

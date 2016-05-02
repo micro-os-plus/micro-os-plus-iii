@@ -247,8 +247,9 @@ namespace os
             // Blocks must be large enough to store a pointer, used
             // to construct the list of free blocks.
             block_size_bytes_ (
-                ((mempool::size_t) (block_size_bytes + __SIZEOF_POINTER__ - 1))
-                    & ((mempool::size_t) (~(__SIZEOF_POINTER__ - 1))))
+                (static_cast<mempool::size_t> (block_size_bytes
+                    + __SIZEOF_POINTER__ - 1))
+                    & (static_cast<mempool::size_t> (~(__SIZEOF_POINTER__ - 1))))
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
       assert(blocks_ > 0);
@@ -261,8 +262,9 @@ namespace os
 #else
       void* p = attr.mp_pool_address;
       std::size_t sz = attr.mp_pool_size_bytes;
-      pool_addr_ = (char*) std::align (__SIZEOF_POINTER__,
-                                       blocks_ * block_size_bytes_, p, sz);
+      pool_addr_ = static_cast<char*> (std::align (__SIZEOF_POINTER__,
+                                                   blocks_ * block_size_bytes_,
+                                                   p, sz));
 #endif
 
       flags_ = 0;
@@ -282,7 +284,7 @@ namespace os
         {
           os_assert_throw(
               attr.mp_pool_size_bytes
-                  >= ((std::size_t ) (blocks_ * block_size_bytes_)),
+                  >= (static_cast<std::size_t> (blocks_ * block_size_bytes_)),
               ENOMEM);
         }
 
@@ -338,13 +340,13 @@ namespace os
           char* pn = p + block_size_bytes_;
 
           // Make this block point to the next one.
-          *((void**) (void*) p) = pn;
+          *(static_cast<void**> (static_cast<void*> (p))) = pn;
           // Advance pointer
           p = pn;
         }
 
       // Mark end of list.
-      *((void**) (void*) p) = nullptr;
+      *(static_cast<void**> (static_cast<void*> (p))) = nullptr;
 
       first_ = pool_addr_; // Pointer to first block.
 
@@ -360,8 +362,8 @@ namespace os
     {
       if (first_ != nullptr)
         {
-          void* p = (void*) first_;
-          first_ = *(void**) first_;
+          void* p = static_cast<void*> (first_);
+          first_ = *(static_cast<void**> (first_));
           ++count_;
           return p;
         }
@@ -584,7 +586,7 @@ namespace os
 
           // Link previous list to this block; may be null, but it does
           // not matter.
-          *(void**) block = first_;
+          *(static_cast<void**> (block)) = first_;
 
           // Now this block is the first one.
           first_ = block;

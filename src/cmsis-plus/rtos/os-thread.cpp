@@ -349,8 +349,8 @@ namespace os
             }
 
           // Create context
-          port::thread::Context::create (&context_, (void*) _invoke_with_exit,
-                                         this);
+          port::thread::Context::create (
+              &context_, reinterpret_cast<void*> (_invoke_with_exit), this);
 
           // Allow for next resume()
           resume ();
@@ -1092,7 +1092,8 @@ namespace os
                 {
 #if defined(OS_TRACE_RTOS_THREAD)
                   slept_ticks =
-                      (clock::duration_t) (systick_clock.now () - prev);
+                      static_cast<clock::duration_t> (systick_clock.now ()
+                          - prev);
                   trace::printf ("%s(0x%X, %d)=%d @%p %s\n", __func__, mask,
                                  mode, slept_ticks, this, name ());
 #endif
@@ -1246,8 +1247,8 @@ namespace os
         }
 
 #if defined(OS_TRACE_RTOS_THREAD)
-      clock::duration_t slept_ticks = (clock::duration_t) (clock.steady_now ()
-          - begin_timestamp);
+      clock::duration_t slept_ticks =
+          static_cast<clock::duration_t> (clock.steady_now () - begin_timestamp);
       trace::printf ("%s(0x%X, %d, %d)=%d @%p %s\n", __func__, mask, mode,
                      timeout, slept_ticks, this, name ());
 #endif

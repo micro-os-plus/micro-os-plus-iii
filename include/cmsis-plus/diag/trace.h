@@ -266,7 +266,7 @@ namespace os
         inline ssize_t __attribute__((always_inline))
         write (const void* buf, std::size_t nbyte)
           {
-            return (ssize_t)nbyte;
+            return static_cast<ssize_t> (nbyte);
           }
 
         inline int __attribute__((always_inline))
@@ -340,17 +340,23 @@ inline void
 __attribute__((always_inline))
 __initialize_trace (void)
   {
+    ;
   }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+
 inline ssize_t
 __attribute__((always_inline))
 trace_write (const void* buf, size_t nbyte)
   {
-    return (ssize_t)nbyte;
+    return (ssize_t) (nbyte);
   }
+
+#pragma GCC diagnostic pop
 
 inline int
 __attribute__((always_inline))
