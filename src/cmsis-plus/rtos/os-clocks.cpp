@@ -320,7 +320,14 @@ namespace os
     /**
      * @brief Instance of the SysTick clock.
      */
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#endif
     Systick_clock systick_clock;
+#pragma GCC diagnostic pop
 
     // ------------------------------------------------------------------------
 
@@ -492,7 +499,13 @@ namespace os
     /**
      * @brief Instance of the Real Time clock.
      */
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#endif
     Realtime_clock realtime_clock;
+#pragma GCC diagnostic pop
 
     // ------------------------------------------------------------------------
 
