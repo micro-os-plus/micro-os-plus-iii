@@ -468,6 +468,9 @@ namespace os
   } /* namespace rtos */
 } /* namespace os */
 
+int*
+__error (void);
+
 /**
  * @brief Per-thread error support.
  * @details
@@ -476,7 +479,8 @@ namespace os
  * thread.
  * @return Pointer to per-thread errno value.
  */
-int* __error(void)
+int*
+__error (void)
 {
-  return os::rtos::this_thread::error();
+  return os::rtos::this_thread::error ();
 }
