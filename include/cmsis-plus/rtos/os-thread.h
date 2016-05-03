@@ -153,6 +153,9 @@ namespace os
           thread::sigset_t* oflags = nullptr,
           flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
+      int*
+      error(void);
+
       Thread*
       _thread (void);
 
@@ -705,6 +708,9 @@ namespace os
                                    thread::sigset_t* oflags,
                                    flags::mode_t mode);
 
+      friend int*
+      this_thread::error(void);
+
       friend void
       scheduler::_link_node (Waiting_threads_list& list,
                              Waiting_thread_node& node);
@@ -854,6 +860,9 @@ namespace os
       void
       _destroy (void);
 
+      int*
+      _error(void);
+
       /**
        * @}
        */
@@ -864,6 +873,8 @@ namespace os
        * @name Private Member Variables
        * @{
        */
+
+      int errno_;
 
       thread::func_t func_;
       thread::func_args_t func_args_;
@@ -991,6 +1002,12 @@ namespace os
         this_thread::thread ()._exit (exit_ptr);
       }
 
+      inline int*
+      error(void)
+      {
+        return this_thread::thread ()._error();
+      }
+
     } /* namespace this_thread */
 
     namespace thread
@@ -1098,6 +1115,12 @@ namespace os
     Thread::context (void)
     {
       return context_;
+    }
+
+    inline int*
+    Thread::_error(void)
+    {
+      return &errno_;
     }
 
   } /* namespace rtos */

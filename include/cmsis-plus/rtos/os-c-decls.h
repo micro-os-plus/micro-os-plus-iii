@@ -163,6 +163,7 @@ extern "C"
   typedef struct
   {
     const char* name;
+    int errno_; // Prevent the macro to expand (for example with a prefix).
     os_thread_func_t func;
     os_thread_func_args_t func_args;
     void* func_result_;

@@ -322,28 +322,6 @@ namespace os
 
     } /* namespace this_thread */
 
-#if 0
-    namespace scheduler
-      {
-
-        void
-        __register_thread (Thread* thread)
-          {
-            // TODO
-#if defined(TESTING)
-            thread->__run_function ();
-#endif
-          }
-
-        void
-        __unregister_thread (Thread* thread)
-          {
-            return;
-          }
-
-      } /* namespace scheduler */
-#endif
-
     /**
      * @details
      * The os::rtos::interrupts namespace groups interrupts related
@@ -489,3 +467,16 @@ namespace os
   // ==========================================================================
   } /* namespace rtos */
 } /* namespace os */
+
+/**
+ * @brief Per-thread error support.
+ * @details
+ * Standard C libraries define `errno` as macro to a function returning
+ * a pointer. This function returns such a pointer, specific to each
+ * thread.
+ * @return Pointer to per-thread errno value.
+ */
+int* __error(void)
+{
+  return os::rtos::this_thread::error();
+}
