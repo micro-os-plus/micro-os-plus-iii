@@ -88,7 +88,7 @@ extern "C"
   // --------------------------------------------------------------------------
 
   typedef bool os_sched_status_t;
-  typedef uint32_t os_irq_status_t;
+  typedef os_port_irq_status_t os_irq_status_t;
 
   // --------------------------------------------------------------------------
 
