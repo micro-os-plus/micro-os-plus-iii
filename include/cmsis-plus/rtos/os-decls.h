@@ -85,6 +85,11 @@ namespace os
     class Clock_threads_list;
     class Waiting_threads_list3;
 
+    namespace thread
+    {
+      class Context;
+    }
+
     // ------------------------------------------------------------------------
 
     /**
@@ -502,10 +507,18 @@ namespace os
       /**
        * @brief Type of a stack element.
        * @details
+       * The stack is organised as platform words
+       * (usually 4-bytes long on Cortex-M cores).
+       */
+      using element_t = os::rtos::port::stack::element_t;
+
+      /**
+       * @brief Type of a stack allocation element.
+       * @details
        * For alignment reasons, the stack is allocated in
        * larger chunks, usually 8-bytes long on Cortex-M cores.
        */
-      using element_t = os::rtos::port::stack::element_t;
+      using allocation_element_t = os::rtos::port::stack::allocation_element_t;
 
     } /* namespace stack */
 
@@ -1069,15 +1082,166 @@ namespace os
       class Message_queue;
       class Event_flags;
 
+      namespace stack
+      {
+      } /* namespace stack */
+
+      namespace interrupts
+      {
+
+        // ====================================================================
+
+        class Critical_section
+        {
+        public:
+
+          Critical_section () = delete;
+
+          // Enter an IRQ critical section
+          static rtos::interrupts::status_t
+          enter (void);
+
+          // Exit an IRQ critical section
+          static void
+          exit (rtos::interrupts::status_t status);
+
+        };
+
+        // ====================================================================
+
+        class Uncritical_section
+        {
+        public:
+
+          Uncritical_section () = delete;
+
+          // Enter an IRQ uncritical section
+          static rtos::interrupts::status_t
+          enter (void);
+
+          // Exit an IRQ uncritical section
+          static void
+          exit (rtos::interrupts::status_t status);
+
+        };
+
+      } /* namespace interrupts */
+
       namespace scheduler
       {
+
+        void
+        greeting (void);
+
+        result_t
+        initialize (void);
+
         result_t
         start (void);
 
+        bool
+        in_handler_mode (void);
+
         void
-        reschedule (bool save);
+        lock (rtos::scheduler::status_t status);
+
+        void
+        reschedule (bool save = true);
+
+        void
+        get_next_context (void);
+
+        void
+        _wait_for_interrupt (void);
 
       } /* namespace scheduler */
+
+      namespace this_thread
+      {
+
+        void
+        prepare_suspend (void);
+
+        void
+        yield (void);
+
+      } /* namespace this_thread */
+
+      namespace thread
+      {
+
+        // ====================================================================
+
+        class Context
+        {
+        public:
+
+          // Used to avoid a complex casts below,
+          // that might confuse the Eclipse formatter.
+          typedef void
+          (*func_t) (void);
+
+          static void
+          create (rtos::thread::Context* context, void* func, void* args);
+
+        };
+
+      } /* namespace thread */
+
+      // ======================================================================
+
+      class Thread
+      {
+      public:
+
+        Thread () = delete;
+
+        static void
+        clean (rtos::Thread* thread);
+
+#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
+
+        static void
+        create (rtos::Thread* obj);
+
+        [[noreturn]]
+        static void
+        destroy_this (rtos::Thread* obj);
+
+        static void
+        destroy_other (rtos::Thread* obj);
+
+        static void
+        resume (rtos::Thread* obj);
+
+        static rtos::thread::priority_t
+        sched_prio (rtos::Thread* obj);
+
+        static result_t
+        sched_prio (rtos::Thread* obj, rtos::thread::priority_t prio);
+
+        static result_t
+        detach (rtos::Thread* obj);
+
+#endif
+
+      };
+
+      // ======================================================================
+
+      class Systick_clock
+      {
+      public:
+
+        Systick_clock () = delete;
+
+        static void
+        start (void);
+
+        static result_t
+        wait_for (rtos::clock::duration_t ticks);
+      };
+
     } /* namespace port */
   } /* namespace rtos */
 } /* namespace os */
