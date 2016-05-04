@@ -52,8 +52,8 @@ namespace os
       void
       _create_idle (void)
       {
-        static stack::element_t idle_stack[OS_INTEGER_RTOS_IDLE_STACK_SIZE_BYTES
-            / sizeof(stack::element_t)];
+        static stack::allocation_element_t idle_stack[OS_INTEGER_RTOS_IDLE_STACK_SIZE_BYTES
+            / sizeof(stack::allocation_element_t)];
 
         static thread::Attributes attr
           { "idle" };

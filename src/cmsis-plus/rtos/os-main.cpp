@@ -89,14 +89,14 @@ main (int argc, char* argv[])
   using namespace os;
   using namespace os::rtos;
 
-  // TODO: make version configurable.
+  // TODO: make versions configurable.
   trace::printf ("µOS++ v6.1.1 / CMSIS++ RTOS API v0.1.1.\n");
   trace::printf ("Copyright (c) 2016 Liviu Ionescu.\n");
 
   port::scheduler::greeting ();
 
   // At this stage the system clock should have already been configured
-  // at high speed.
+  // at high speed by __initialise_hardware().
 #if defined(__ARM_EABI__)
   trace::printf ("System clock: %u Hz.\n", SystemCoreClock);
 #endif
@@ -104,7 +104,12 @@ main (int argc, char* argv[])
   trace::printf ("Scheduler frequency: %d ticks/sec.\n",
                  rtos::Systick_clock::frequency_hz);
 
-  trace::printf ("Built with " __VERSION__);
+#if defined(__clang__)
+  trace::printf ("Built with clang " __VERSION__);
+#else
+  trace::printf ("Built with GCC " __VERSION__);
+#endif
+
 #if defined(__EXCEPTIONS)
   trace::printf (", with exceptions");
 #else
@@ -122,8 +127,8 @@ main (int argc, char* argv[])
   // interrupts, and some implementations (like FreeRTOS) are not
   // able to preserve this stack content.
 
-  static stack::element_t main_stack[OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES
-      / sizeof(stack::element_t)];
+  static stack::allocation_element_t main_stack[OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES
+      / sizeof(stack::allocation_element_t)];
 
   static thread::Attributes attr
     { "main" };
