@@ -48,7 +48,7 @@ namespace os
     namespace this_thread
     {
 
-      // ========================================================================
+      // ======================================================================
 
       /**
        * @brief Get the current running thread.
@@ -154,7 +154,7 @@ namespace os
           flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
       int*
-      error(void);
+      error (void);
 
       Thread*
       _thread (void);
@@ -303,7 +303,7 @@ namespace os
          *  None
          * @return  The address of the stack reserved area.
          */
-        void*
+        stack::element_t*
         bottom (void);
 
         /**
@@ -323,7 +323,7 @@ namespace os
 
         friend class rtos::Thread;
 
-        void* bottom_address_;
+        stack::element_t* bottom_address_;
         std::size_t size_bytes_;
 
       public:
@@ -397,7 +397,12 @@ namespace os
         port::scheduler::reschedule (bool save);
 
 #if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+
         friend class port::thread::Context;
+
+        friend void
+        port::scheduler::get_next_context (void);
+
 #endif
         /**
          * @}
@@ -709,7 +714,7 @@ namespace os
                                    flags::mode_t mode);
 
       friend int*
-      this_thread::error(void);
+      this_thread::error (void);
 
       friend void
       scheduler::_link_node (Waiting_threads_list& list,
@@ -861,7 +866,7 @@ namespace os
       _destroy (void);
 
       int*
-      _error(void);
+      _error (void);
 
       /**
        * @}
@@ -1003,9 +1008,9 @@ namespace os
       }
 
       inline int*
-      error(void)
+      error (void)
       {
-        return this_thread::thread ()._error();
+        return this_thread::thread ()._error ();
       }
 
     } /* namespace this_thread */
@@ -1034,7 +1039,7 @@ namespace os
         size_bytes_ = 0;
       }
 
-      inline void*
+      inline stack::element_t*
       Stack::bottom (void)
       {
         return bottom_address_;
@@ -1118,7 +1123,7 @@ namespace os
     }
 
     inline int*
-    Thread::_error(void)
+    Thread::_error (void)
     {
       return &errno_;
     }
