@@ -150,6 +150,14 @@ namespace os
 
         port::Systick_clock::start ();
 
+#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+
+        // Determine the next thread.
+        scheduler::current_thread_ =
+            scheduler::ready_threads_list_.remove_top ();
+
+#endif
+
         return port::scheduler::start ();
       }
 
