@@ -297,7 +297,8 @@ namespace os
       assert(attr.th_priority != thread::priority::none);
 
       context_.stack_.size_bytes_ = attr.th_stack_size_bytes;
-      context_.stack_.bottom_address_ = attr.th_stack_address;
+      context_.stack_.bottom_address_ =
+          static_cast<stack::element_t*> (attr.th_stack_address);
 
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s @%p %s %d %d\n", __func__, this, name (), prio_,
