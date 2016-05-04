@@ -95,6 +95,11 @@ namespace os
          * @}
          */
 
+      protected:
+
+        constexpr
+        Attributes (const char* name, type_t type);
+
       public:
 
         /**
@@ -360,6 +365,8 @@ namespace os
   {
     namespace timer
     {
+      // ======================================================================
+
       constexpr
       Attributes::Attributes (const char* name) :
           Clocked_attributes
@@ -369,14 +376,23 @@ namespace os
         ;
       }
 
+      constexpr
+      Attributes::Attributes (const char* name, type_t type) :
+          Clocked_attributes
+            { name }, //
+          tm_type (type)
+      {
+        ;
+      }
+
       // ======================================================================
 
       constexpr
       Periodic_attributes::Periodic_attributes (const char* name) :
           Attributes
-            { name }
+            { name, run::periodic }
       {
-        tm_type = run::periodic;
+        ;
       }
 
     } /* namespace timer */
