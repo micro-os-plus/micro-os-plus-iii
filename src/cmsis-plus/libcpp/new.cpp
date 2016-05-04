@@ -251,6 +251,12 @@ operator delete (void* ptr) noexcept
     }
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wc++14-compat"
+
+void
+operator delete (void* ptr, std::size_t size) noexcept;
+
 void
 __attribute__((weak))
 operator delete (void* ptr, std::size_t size __attribute__((unused))) noexcept
@@ -261,6 +267,8 @@ operator delete (void* ptr, std::size_t size __attribute__((unused))) noexcept
       os::estd::free (ptr);
     }
 }
+
+#pragma GCC diagnostic push
 
 /**
  * @details
@@ -294,12 +302,20 @@ operator delete[] (void* ptr) noexcept
   ::operator delete (ptr);
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wc++14-compat"
+
+void
+operator delete[] (void* ptr, std::size_t size) noexcept;
+
 void
 __attribute__((weak))
 operator delete[] (void* ptr, std::size_t size __attribute__((unused))) noexcept
 {
   ::operator delete (ptr);
 }
+
+#pragma GCC diagnostic push
 
 /**
  * @details
