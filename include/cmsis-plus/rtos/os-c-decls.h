@@ -178,6 +178,7 @@ extern "C"
     void* joiner;
     void* waiting_node;
     void* clock_node;
+    void* allocted_stack_address;
     size_t acquired_mutexes;
     os_thread_state_t state;
     os_thread_prio_t prio;
@@ -403,6 +404,7 @@ extern "C"
     os_clock_t* clock;
 #endif
     void* pool_addr;
+    void* allocated_pool_addr;
 #if defined(OS_INCLUDE_RTOS_PORT_MEMORY_POOL)
     os_mempool_port_data_t port;
 #endif
@@ -410,7 +412,6 @@ extern "C"
     os_mempool_size_t block_size_bytes;
     os_mempool_size_t count;
     void* first;
-    uint8_t flags_;
   } os_mempool_t;
 
 #pragma GCC diagnostic pop
@@ -447,6 +448,7 @@ extern "C"
 #endif
 
     void* queue_addr;
+    void* allocated_queue_addr;
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
     os_mqueue_port_data_t port;
@@ -461,7 +463,6 @@ extern "C"
 #if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
     os_mqueue_index_t head;
 #endif
-    uint8_t flags_;
   } os_mqueue_t;
 
 #pragma GCC diagnostic pop

@@ -453,6 +453,7 @@ namespace os
 #endif /* !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE) */
 
       void* queue_addr_;
+      char* allocated_queue_addr_;
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
       friend class port::Message_queue;
@@ -468,23 +469,6 @@ namespace os
 #if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
       mqueue::index_t head_;
 #endif /* !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE) */
-
-      /**
-       * @brief Internal status bits.
-       */
-      uint8_t flags_;
-
-      /**
-       * @brief Internal bits.
-       */
-      enum
-        : uint8_t
-          {
-            /**
-             * @brief Remember to free the allocated memory block.
-             */
-            flags_allocated = 1
-      };
 
       /**
        * @}

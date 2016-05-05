@@ -267,8 +267,6 @@ namespace os
                                                    p, sz));
 #endif
 
-      flags_ = 0;
-
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), blocks_,
                      block_size_bytes_);
@@ -277,11 +275,15 @@ namespace os
       if (pool_addr_ == nullptr)
         {
           // TODO: use custom allocator
-          pool_addr_ = new (std::nothrow) char[blocks_ * block_size_bytes_];
-          flags_ |= flags_allocated;
+          allocated_pool_addr_ = new (std::nothrow) char[blocks_
+              * block_size_bytes_];
+          pool_addr_ = allocated_pool_addr_;
+          // TODO: should we care with alignment?
         }
       else
         {
+          allocated_pool_addr_ = nullptr;
+
           os_assert_throw(
               attr.mp_pool_size_bytes
                   >= (static_cast<std::size_t> (blocks_ * block_size_bytes_)),
@@ -317,10 +319,7 @@ namespace os
 
       assert(list_.empty ());
 
-      if (flags_ | flags_allocated)
-        {
-          delete[] (pool_addr_);
-        }
+      delete[] (allocated_pool_addr_);
     }
 
     /*
@@ -333,7 +332,7 @@ namespace os
       // Construct a linked list of blocks. Store the pointer at
       // the beginning of each block. Each block
       // will hold the address of the next free block, or nullptr at the end.
-      char* p = pool_addr_;
+      char* p = static_cast<char*> (pool_addr_);
       for (std::size_t i = 1; i < blocks_; ++i)
         {
           // Compute the address of the next block;
@@ -573,7 +572,8 @@ namespace os
 
       // Validate pointer.
       if ((block < pool_addr_)
-          || (block >= (pool_addr_ + blocks_ * block_size_bytes_)))
+          || (block
+              >= (static_cast<char*> (pool_addr_) + blocks_ * block_size_bytes_)))
         {
           return EINVAL;
         }

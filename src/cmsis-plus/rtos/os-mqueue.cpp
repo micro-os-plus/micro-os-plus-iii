@@ -249,8 +249,12 @@ namespace os
       if (queue_addr_ == nullptr)
         {
           // Dynamically allocate queue and the arrays.
-          queue_addr_ = new (std::nothrow) char[storage_size];
-          flags_ |= flags_allocated;
+          allocated_queue_addr_ = new (std::nothrow) char[storage_size];
+          queue_addr_ = allocated_queue_addr_;
+        }
+      else
+        {
+          allocated_queue_addr_ = nullptr;
         }
 
       os_assert_throw(queue_addr_ != nullptr, ENOMEM);
@@ -302,10 +306,7 @@ namespace os
       assert(send_list_.empty ());
       assert(receive_list_.empty ());
 
-      if (flags_ | flags_allocated)
-        {
-          delete[] (static_cast<char*> (queue_addr_));
-        }
+      delete[] (allocated_queue_addr_);
 
 #endif
     }

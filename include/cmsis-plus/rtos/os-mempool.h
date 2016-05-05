@@ -361,7 +361,8 @@ namespace os
        * If the pool was dynamically allocated, the `flags_allocated` bit
        * will be set in `flags_` and the destructor will deallocate..
        */
-      char* pool_addr_;
+      void* pool_addr_;
+      char* allocated_pool_addr_;
 
 #if defined(OS_INCLUDE_RTOS_PORT_MEMORY_POOL)
       friend class port::Memory_pool;
@@ -390,25 +391,6 @@ namespace os
        * @brief Pointer to the first free block, or nullptr.
        */
       void* volatile first_;
-
-      /**
-       * @brief Internal status bits.
-       */
-      uint8_t flags_;
-
-      /**
-       * @brief Internal bits.
-       */
-      enum
-        : uint8_t
-          {
-            /**
-             * @brief Remember to free the allocated memory block.
-             */
-            flags_allocated = 1
-      };
-
-      // Add more internal data.
 
       /**
        * @}
