@@ -319,6 +319,51 @@ namespace os
          * @}
          */
 
+      public:
+
+        /**
+         * @name Public Static Member Functions
+         * @{
+         */
+
+        /**
+         * @brief Get the min stack size.
+         * @par Parameters
+         *  None
+         * @return  The min stack size in bytes.
+         */
+        static std::size_t
+        min_size (void);
+
+        /**
+         * @brief Set the min stack size.
+         * @param [in] size_bytes Minimum stack size in bytes.
+         * @return Nothing.
+         */
+        static void
+        min_size (std::size_t size_bytes);
+
+        /**
+         * @brief Get the default stack size.
+         * @par Parameters
+         *  None
+         * @return  The default stack size in bytes.
+         */
+        static std::size_t
+        default_size (void);
+
+        /**
+         * @brief Set the default stack size.
+         * @param [in] size_bytes Default stack size in bytes.
+         * @return Nothing.
+         */
+        static void
+        default_size (std::size_t size_bytes);
+
+        /**
+         * @}
+         */
+
       protected:
 
         friend class rtos::Thread;
@@ -326,8 +371,8 @@ namespace os
         stack::element_t* bottom_address_;
         std::size_t size_bytes_;
 
-      public:
-        // TODO: make protected
+        static std::size_t min_size_bytes_;
+        static std::size_t default_size_bytes_;
 
       };
       // ======================================================================
@@ -912,6 +957,8 @@ namespace os
       // Pointer to timeout node (stored on stack)
       Timeout_thread_node* clock_node_;
 
+      stack::element_t* allocated_stack_address_;
+
       std::size_t volatile acquired_mutexes_;
       thread::state_t volatile sched_state_;
       thread::priority_t volatile prio_;
@@ -1050,6 +1097,34 @@ namespace os
       {
         return size_bytes_;
       }
+
+      inline std::size_t
+      Stack::min_size (void)
+      {
+        return min_size_bytes_;
+      }
+
+      inline void
+      Stack::min_size (std::size_t size_bytes)
+      {
+        min_size_bytes_ = size_bytes;
+      }
+
+      inline std::size_t
+      Stack::default_size (void)
+      {
+        return default_size_bytes_;
+      }
+
+      inline void
+      Stack::default_size (std::size_t size_bytes)
+      {
+        assert(size_bytes != 0);
+        assert(size_bytes >= min_size_bytes_);
+
+        default_size_bytes_ = size_bytes;
+      }
+
 
       // ======================================================================
 

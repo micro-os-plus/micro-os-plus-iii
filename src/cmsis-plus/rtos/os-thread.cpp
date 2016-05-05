@@ -26,6 +26,8 @@
  */
 
 #include <cassert>
+#include <new>
+#include <memory>
 
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/rtos/port/os-inlines.h>
@@ -124,6 +126,10 @@ namespace os
      */
     namespace thread
     {
+      std::size_t Stack::min_size_bytes_ = port::stack::min_size_bytes;
+
+      std::size_t Stack::default_size_bytes_ = port::stack::default_size_bytes;
+
       /**
        * @class Attributes
        * @details
@@ -342,14 +348,47 @@ namespace os
 
 #else
 
-          // TODO: check min size
-          // TODO: align stack
-          if (context_.stack_.bottom () == nullptr)
+#if defined(__APPLE__)
+          // On synthetic platforms ignore small user stacks and force
+          // the reallocation of default stacks.
+          if (context_.stack_.size_bytes_ < thread::Stack::min_size ())
             {
-              // TODO: alloc default stack size
+              context_.stack_.size_bytes_ = 0;
+              context_.stack_.bottom_address_ = nullptr;
+            }
+#endif
+
+          if (context_.stack_.size_bytes_ == 0)
+            {
+              context_.stack_.size_bytes_ = thread::Stack::default_size ();
             }
 
-          // Create context
+          os_assert_throw(
+              context_.stack_.size_bytes_ >= thread::Stack::min_size (),
+              EINVAL);
+
+          if (context_.stack_.bottom_address_ == nullptr)
+            {
+              allocated_stack_address_ =
+                  new (std::nothrow) stack::element_t[context_.stack_.size_bytes_
+                      / sizeof(stack::element_t)];
+              context_.stack_.bottom_address_ = allocated_stack_address_;
+            }
+          else
+            {
+              allocated_stack_address_ = nullptr;
+            }
+
+          // Align the bottom of the stack.
+          void* p = context_.stack_.bottom_address_;
+          context_.stack_.bottom_address_ =
+              static_cast<stack::element_t*> (std::align (
+                  sizeof(stack::element_t), thread::Stack::min_size (), p,
+                  context_.stack_.size_bytes_));
+
+          os_assert_throw(context_.stack_.bottom_address_ != nullptr, ENOMEM);
+
+          // Create the context.
           port::thread::Context::create (
               &context_, reinterpret_cast<void*> (_invoke_with_exit), this);
 
@@ -804,7 +843,8 @@ namespace os
 
 #else
 
-      // TODO: add to funeral list
+      // TODO: add to funeral list;
+      // there do a  `delete[] (allocated_stack_address_);`
 
       port::scheduler::reschedule (false);
       assert(true);
@@ -876,6 +916,8 @@ namespace os
           parent_ = nullptr;
 
           assert(acquired_mutexes_ == 0);
+
+          delete[] (allocated_stack_address_);
 
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
