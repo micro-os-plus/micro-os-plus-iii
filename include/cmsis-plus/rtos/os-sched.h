@@ -448,7 +448,7 @@ namespace os
          */
 
         /**
-         * @brief Variable to store the initial interrupts status.
+         * @brief Variable to store the interrupts status.
          */
         const status_t status_;
 
@@ -537,7 +537,7 @@ namespace os
          */
 
         /**
-         * @brief Variable to store the initial interrupts status.
+         * @brief Variable to store the interrupts status.
          */
         const status_t status_;
 
@@ -637,7 +637,7 @@ namespace os
          */
 
         /**
-         * @brief Variable to store the initial interrupts status.
+         * @brief Variable to store the interrupts status.
          */
         status_t status_;
 
@@ -728,7 +728,7 @@ namespace os
 
       constexpr
       Lock::Lock () :
-          status_ (0)
+          status_ (scheduler::init_status)
       {
         ;
       }
@@ -797,7 +797,7 @@ namespace os
 
       constexpr
       Lock::Lock () :
-          status_ (0)
+          status_ (port::interrupts::init_status)
       {
         ;
       }

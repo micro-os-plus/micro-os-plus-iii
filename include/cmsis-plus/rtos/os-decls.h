@@ -244,6 +244,8 @@ namespace os
        */
       using status_t = bool;
 
+      constexpr status_t init_status = false;
+
     } /* namespace scheduler */
 
     /**
