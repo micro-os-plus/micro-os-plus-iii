@@ -152,9 +152,13 @@ namespace os
 
 #if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
-        // Determine the next thread.
-        scheduler::current_thread_ =
-            scheduler::ready_threads_list_.remove_top ();
+          {
+            interrupts::Critical_section ics;
+
+            // Determine the next thread.
+            scheduler::current_thread_ =
+                scheduler::ready_threads_list_.remove_top ();
+          }
 
 #endif
 
