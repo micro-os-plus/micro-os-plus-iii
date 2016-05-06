@@ -46,9 +46,6 @@ namespace os
 
       // ======================================================================
 
-      void*
-      _idle_func (thread::func_args_t args);
-
       void
       _create_idle (void)
       {
@@ -77,10 +74,28 @@ namespace os
       void*
       _idle_func (thread::func_args_t args __attribute__((unused)))
       {
+#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
         while (true)
           {
+            while (!scheduler::terminated_threads_list_.empty ())
+              {
+                Waiting_thread_node* node;
+                  {
+                    interrupts::Critical_section ics; // ----- Critical section -----
+                    node =
+                        const_cast<Waiting_thread_node*> (scheduler::terminated_threads_list_.head ());
+                    node->unlink ();
+                  }
+                trace::printf ("%s() destroying %p %s ***********\n", __func__,
+                               &(node->thread), node->thread.name ());
+
+                node->thread._destroy();
+
+                this_thread::yield ();
+              }
+#endif /* !defined(OS_INCLUDE_RTOS_PORT_THREAD) */
+
             port::scheduler::_wait_for_interrupt ();
-            // TODO: cleanup destroyed threads.
             this_thread::yield ();
           }
       }

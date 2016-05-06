@@ -65,6 +65,7 @@ namespace os
 #if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
       extern Thread* current_thread_;
       extern Ready_threads_list ready_threads_list_;
+      extern Terminated_threads_list terminated_threads_list_;
 #endif
 
       /**

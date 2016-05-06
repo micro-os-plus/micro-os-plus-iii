@@ -501,6 +501,12 @@ namespace os
 
     } /* namespace thread */
 
+    namespace scheduler
+    {
+      void*
+      _idle_func (thread::func_args_t args);
+    }
+
     /**
      * @brief Stack namespace.
      */
@@ -1197,9 +1203,6 @@ namespace os
       public:
 
         Thread () = delete;
-
-        static void
-        clean (rtos::Thread* thread);
 
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 

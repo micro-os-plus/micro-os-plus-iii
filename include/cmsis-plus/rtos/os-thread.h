@@ -781,6 +781,9 @@ namespace os
       friend void
       port::scheduler::reschedule (bool save);
 
+      friend void*
+      scheduler::_idle_func (thread::func_args_t args);
+
       friend class Ready_threads_list;
       friend class Top_threads_list;
       friend class Thread_children_list;
@@ -1124,7 +1127,6 @@ namespace os
 
         default_size_bytes_ = size_bytes;
       }
-
 
       // ======================================================================
 

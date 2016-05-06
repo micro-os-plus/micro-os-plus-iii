@@ -88,6 +88,7 @@ namespace os
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #endif
       Ready_threads_list ready_threads_list_;
+      Terminated_threads_list terminated_threads_list_;
 #pragma GCC diagnostic pop
 #endif
 

@@ -430,62 +430,6 @@ namespace os
         }
     }
 
-#if 0
-    void
-    Thread::_destroy (void)
-      {
-
-#if defined(OS_TRACE_RTOS_THREAD)
-        trace::printf ("%s() @%p %s\n", __func__, this, name ());
-#endif
-
-          {
-            interrupts::Critical_section ics; // ----- Critical section -----
-
-            if (sched_state_ == thread::state::destroyed)
-              {
-                return;
-              }
-
-#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
-            ready_node_.unlink ();
-#endif
-
-            child_links_.unlink ();
-            assert(children_.empty ());
-            parent_ = nullptr;
-
-            assert(acquired_mutexes_ == 0);
-
-            sched_state_ = thread::state::destroyed;
-            trace::puts (">");
-          }
-
-#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
-
-        port::Thread::destroy (this);
-        // Does not return if the current thread.
-
-#else
-
-        // port::Thread::clean (this);
-
-        // Pass control to the next thread.
-        // If current, skip saving current context.
-        if (this != scheduler::current_thread_)
-          {
-            this_thread::yield ();
-          }
-        else
-          {
-            port::scheduler::reschedule (false);
-          }
-
-        assert(true);
-#endif
-      }
-#endif
-
     /**
      * @details
      *
@@ -826,14 +770,18 @@ namespace os
 
           assert(acquired_mutexes_ == 0);
 
-          sched_state_ = thread::state::destroyed;
+          sched_state_ = thread::state::terminated;
 
           func_result_ = exit_ptr;
+
+#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
+          sched_state_ = thread::state::destroyed;
 
           if (joiner_ != nullptr)
             {
               joiner_->resume ();
             }
+#endif
         }
 
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
@@ -843,8 +791,12 @@ namespace os
 
 #else
 
-      // TODO: add to funeral list;
-      // there do a  `delete[] allocated_stack_address_;`
+        {
+          interrupts::Critical_section ics; // ----- Critical section -----
+
+          // Add to a list of threads to be destroyed by the idle thread.
+          scheduler::terminated_threads_list_.link (ready_node_);
+        }
 
       port::scheduler::reschedule (false);
       assert(true);
@@ -852,6 +804,23 @@ namespace os
         ;
 #endif
       // Does not return.
+    }
+
+    void
+    Thread::_destroy (void)
+    {
+#if defined(OS_TRACE_RTOS_THREAD)
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
+
+      delete[] allocated_stack_address_;
+
+      sched_state_ = thread::state::destroyed;
+
+      if (joiner_ != nullptr)
+        {
+          joiner_->resume ();
+        }
     }
 
     /**
@@ -922,10 +891,6 @@ namespace os
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
           port::Thread::destroy_other (this);
-
-#else
-
-          port::Thread::clean (this);
 
 #endif
 
