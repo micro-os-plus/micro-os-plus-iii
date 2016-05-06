@@ -103,6 +103,8 @@ main (int argc, char* argv[])
 
   trace::printf ("Scheduler frequency: %d ticks/sec.\n",
                  rtos::Systick_clock::frequency_hz);
+  trace::printf ("Default stack size: %d bytes.\n",
+                 thread::Stack::default_size ());
 
 #if defined(__clang__)
   trace::printf ("Built with clang " __VERSION__);
