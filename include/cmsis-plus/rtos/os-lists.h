@@ -1046,6 +1046,78 @@ namespace os
        */
     };
 
+    // ========================================================================
+
+    /**
+     * @brief Unordered list of threads.
+     */
+    class Terminated_threads_list : public Static_double_list
+    {
+    public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+      /**
+       * @brief Create a list of waiting threads.
+       */
+      Terminated_threads_list ();
+
+      /**
+       * @cond ignore
+       */
+      Terminated_threads_list (const Terminated_threads_list&) = delete;
+      Terminated_threads_list (Terminated_threads_list&&) = delete;
+      Terminated_threads_list&
+      operator= (const Terminated_threads_list&) = delete;
+      Terminated_threads_list&
+      operator= (Terminated_threads_list&&) = delete;
+      /**
+       * @endcond
+       */
+
+      /**
+       * @brief Destroy the list.
+       */
+      ~Terminated_threads_list ();
+
+      /**
+       * @}
+       */
+
+    public:
+
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+      /**
+       * @brief Add a new thread node to the list.
+       * @param [in] node Reference to a list node.
+       * @return Nothing.
+       */
+      void
+      link (Waiting_thread_node& node);
+
+      /**
+       * @brief Get list head.
+       * @par Parameters
+       *  None.
+       * @return Casted pointer to head node.
+       */
+      volatile Waiting_thread_node*
+      head (void) const;
+
+      // TODO add iterator begin(), end()
+
+      /**
+       * @}
+       */
+    };
+
     // ------------------------------------------------------------------------
 
     namespace scheduler
@@ -1285,6 +1357,30 @@ namespace os
     Clock_timestamps_list::head (void) const
     {
       return static_cast<volatile Timestamp_node*> (Double_list::head ());
+    }
+
+    // ========================================================================
+
+    /**
+     * @details
+     * The initial list status is empty.
+     */
+    inline
+    Terminated_threads_list::Terminated_threads_list ()
+    {
+      ;
+    }
+
+    inline
+    Terminated_threads_list::~Terminated_threads_list ()
+    {
+      ;
+    }
+
+    inline volatile Waiting_thread_node*
+    Terminated_threads_list::head (void) const
+    {
+      return static_cast<volatile Waiting_thread_node*> (Static_double_list::head ());
     }
 
   // --------------------------------------------------------------------------

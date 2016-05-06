@@ -296,8 +296,9 @@ namespace os
      * - in the middle of the list, which
      * requires a partial list traversal (done from the end).
      *
-     * If the list is empty, the new node is added with references to
-     * itself, to satisfy the circular double linked list requirements.
+     * To satisfy the circular double linked list requirements,
+     * an empty list still contains the head node with references
+     * to itself.
      */
     void
     Waiting_threads_list::link (Waiting_thread_node& node)
@@ -470,9 +471,9 @@ namespace os
      * - in the middle of the list, which
      * requires a partial list traversal (done from the end).
      *
-     * If the list is empty, the new node is added with references to
-     * itself, to satisfy the circular double linked list requirements.
-     *
+     * To satisfy the circular double linked list requirements,
+     * an empty list still contains the head node with references
+     * to itself.
      */
     void
     Clock_timestamps_list::link (Timestamp_node& node)
@@ -559,6 +560,28 @@ namespace os
               break;
             }
         }
+    }
+
+    // ========================================================================
+
+    void
+    Terminated_threads_list::link (Waiting_thread_node& node)
+    {
+      if (head_.prev == nullptr)
+        {
+          // If this is the first time, initialise the list to empty.
+          clear ();
+        }
+
+      Waiting_thread_node* after =
+          static_cast<Waiting_thread_node*> (const_cast<Static_double_list_links *> (tail ()));
+
+#if defined(OS_TRACE_RTOS_LISTS)
+      trace::printf ("terminated %s() %p %s\n", __func__, &node.thread,
+                     node.thread.name ());
+#endif
+
+      insert_after (node, after);
     }
 
   // ----------------------------------------------------------------------
