@@ -306,7 +306,7 @@ namespace os
       assert(send_list_.empty ());
       assert(receive_list_.empty ());
 
-      delete[] (allocated_queue_addr_);
+      delete[] allocated_queue_addr_;
 
 #endif
     }

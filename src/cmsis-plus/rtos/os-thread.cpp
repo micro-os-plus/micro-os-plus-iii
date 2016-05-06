@@ -844,7 +844,7 @@ namespace os
 #else
 
       // TODO: add to funeral list;
-      // there do a  `delete[] (allocated_stack_address_);`
+      // there do a  `delete[] allocated_stack_address_;`
 
       port::scheduler::reschedule (false);
       assert(true);
@@ -917,7 +917,7 @@ namespace os
 
           assert(acquired_mutexes_ == 0);
 
-          delete[] (allocated_stack_address_);
+          delete[] allocated_stack_address_;
 
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 

@@ -319,7 +319,7 @@ namespace os
 
       assert(list_.empty ());
 
-      delete[] (allocated_pool_addr_);
+      delete[] allocated_pool_addr_;
     }
 
     /*
