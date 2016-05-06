@@ -40,6 +40,22 @@ _start (void);
 // ----------------------------------------------------------------------------
 // Default exception handlers. Override the ones here by defining your own
 // handler routines in your application code.
+// 0x00 stack
+// 0x04 Reset
+// 0x08 NMI
+// 0x0C HardFault
+// 0x10 MemManage
+// 0x14 BusFault
+// 0x18 UsageFault
+// 0x1C 0
+// 0x20 0
+// 0x24 0
+// 0x28 0
+// 0x2C SVC
+// 0x30 DebugMon
+// 0x34 0
+// 0x38 PendSV
+// 0x3C SysTick
 // ----------------------------------------------------------------------------
 
 #if defined(DEBUG)
