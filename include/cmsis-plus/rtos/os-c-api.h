@@ -74,7 +74,8 @@ extern "C"
   os_result_t
   os_sched_initialize (void);
 
-  os_result_t
+  void
+  __attribute__((noreturn))
   os_sched_start (void);
 
   bool

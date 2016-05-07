@@ -101,10 +101,10 @@ os_sched_initialize (void)
   return (os_result_t) scheduler::initialize ();
 }
 
-os_result_t
+void
 os_sched_start (void)
 {
-  return (os_result_t) scheduler::start ();
+  scheduler::start ();
 }
 
 bool
@@ -863,7 +863,8 @@ osKernelInitialize (void)
 osStatus
 osKernelStart (void)
 {
-  return static_cast<osStatus> (scheduler::start ());
+  scheduler::start ();
+  // In CMSIS++ this does not return.
 }
 
 /**
@@ -1024,7 +1025,7 @@ osThreadTerminate (osThreadId thread_id)
   if ((reinterpret_cast<Thread*> (thread_id)) == &this_thread::thread ())
     {
       this_thread::exit ();
-      /* NORETURN */
+      /* NOTREACHED */
     }
   else
     {

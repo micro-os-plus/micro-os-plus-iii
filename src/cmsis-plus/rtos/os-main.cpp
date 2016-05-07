@@ -115,7 +115,7 @@ main (int argc, char* argv[])
 #if defined(__EXCEPTIONS)
   trace::printf (", with exceptions");
 #else
-  trace::printf(", no exceptions");
+  trace::printf (", no exceptions");
 #endif
   trace::puts (".");
 
@@ -137,6 +137,7 @@ main (int argc, char* argv[])
   attr.th_stack_address = main_stack;
   attr.th_stack_size_bytes = sizeof(main_stack);
 
+  // Warning: the destructor is registered with atexit()!
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
@@ -147,12 +148,7 @@ main (int argc, char* argv[])
 
   scheduler::start ();
 
-  // Some (most?) embedded schedulers do not return after start(),
-  // but on POSIX synthetic platforms they do,
-  // so wait for the main thread to terminate.
-  main_thread.join ();
-
-  return 0;
+  /* NOTREACHED */
 }
 
 // ----------------------------------------------------------------------------

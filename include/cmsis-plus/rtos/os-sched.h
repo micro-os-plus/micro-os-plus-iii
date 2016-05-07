@@ -82,10 +82,9 @@ namespace os
        * @brief Start the RTOS scheduler.
        * @par Parameters
        *  None
-       * @retval result::ok The scheduler was started.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @return Nothing.
        */
-      result_t
+      [[noreturn]] void
       start (void);
 
       /**

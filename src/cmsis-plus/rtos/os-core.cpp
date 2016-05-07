@@ -103,18 +103,17 @@ namespace os
       {
         os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
-
+#if defined(OS_TRACE_RTOS_SCHEDULER)
         trace::printf ("%s() \n", __func__);
+#endif
+
+#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
         return port::scheduler::initialize ();
 
 #else
 
         port::scheduler::initialize ();
-
-        // A newline.
-        trace::puts (" ");
 
         scheduler::_create_idle ();
 
@@ -139,31 +138,21 @@ namespace os
        *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
-      result_t
+      [[noreturn]] void
       start (void)
       {
-        os_assert_err(!scheduler::in_handler_mode (), EPERM);
+        os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
+#if defined(OS_TRACE_RTOS_SCHEDULER)
         trace::printf ("%s() \n", __func__);
+#endif
 
         is_started_ = true;
         is_locked_ = false;
 
         port::Systick_clock::start ();
 
-#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
-
-          {
-            interrupts::Critical_section ics;
-
-            // Determine the next thread.
-            scheduler::current_thread_ =
-                scheduler::ready_threads_list_.remove_top ();
-          }
-
-#endif
-
-        return port::scheduler::start ();
+        port::scheduler::start ();
       }
 
       /**

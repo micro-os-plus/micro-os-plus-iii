@@ -1144,7 +1144,7 @@ namespace os
         result_t
         initialize (void);
 
-        result_t
+        [[noreturn]] void
         start (void);
 
         bool
@@ -1338,28 +1338,6 @@ extern "C"
  * Redefine it in `<os-app-config.h>` to the actual value.
  */
 #define OS_INTEGER_SYSTICK_FREQUENCY_HZ                     (1000)
-#endif
-
-#if !defined(OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES)
-/**
- * @brief Default definition for the `main()` stack size, in bytes.
- * @details
- * Redefine it in `<os-app-config.h>` to the actual value.
- *
- * @note Ignored for synthetic platforms.
- */
-#define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES               (400)
-#endif
-
-#if !defined(OS_INTEGER_RTOS_IDLE_STACK_SIZE_BYTES)
-/**
- * @brief Default definition for the idle thread stack size, in bytes.
- * @details
- * Redefine it in `<os-app-config.h>` to the actual value.
- *
- * @note Ignored for synthetic platforms.
- */
-#define OS_INTEGER_RTOS_IDLE_STACK_SIZE_BYTES               (400)
 #endif
 
 #endif /* __cplusplus */

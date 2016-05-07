@@ -436,7 +436,7 @@ namespace os
 
         friend class rtos::Thread;
         friend class rtos::port::Thread;
-        friend result_t
+        friend void
         port::scheduler::start (void);
         friend void
         port::scheduler::reschedule (bool save);
