@@ -64,7 +64,7 @@ namespace os
           p = ::malloc (size);
           // ----- End of critical section ------------------------------------
         }
-      trace::printf ("%s(%d) %p\n", __func__, size, p);
+      // trace::printf ("%s(%d) %p\n", __func__, size, p);
 
       return p;
     }
@@ -83,7 +83,7 @@ namespace os
     void
     free (void *ptr) noexcept
     {
-      trace::printf ("%s(%d) %p %s\n", __func__, ptr);
+      // trace::printf ("%s(%p)\n", __func__, ptr);
 
         {
           // ----- Begin of critical section ----------------------------------
