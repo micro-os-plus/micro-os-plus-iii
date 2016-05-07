@@ -42,12 +42,16 @@ os_systick_handler (void)
 {
   using namespace os::rtos;
 
+  interrupts::Critical_section ics;
+
   // Prevent scheduler actions before starting it.
   if (scheduler::started ())
     {
       os_port_systick_handler ();
     }
+  // trace::putchar ('.');
   os::rtos::systick_clock._interrupt_service_routine ();
+  // trace::putchar (',');
 }
 
 void
@@ -55,12 +59,16 @@ os_rtc_handler (void)
 {
   using namespace os::rtos;
 
+  interrupts::Critical_section ics;
+
   // Prevent scheduler actions before starting it.
   if (scheduler::started ())
     {
       os_port_rtc_handler ();
     }
+#if defined(OS_TRACE_RTOS_RTC_TICK)
   trace::putchar ('!');
+#endif
   os::rtos::realtime_clock._interrupt_service_routine ();
 }
 
