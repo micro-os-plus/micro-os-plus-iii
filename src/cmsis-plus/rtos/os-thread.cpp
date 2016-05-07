@@ -112,7 +112,15 @@ namespace os
             return;
           }
 
-        return port::this_thread::yield ();
+#if defined(OS_TRACE_RTOS_THREAD_CONTEXT)
+        trace::printf ("%s() leave %s\n", __func__, _thread ()->name ());
+#endif
+
+        port::this_thread::yield ();
+
+#if defined(OS_TRACE_RTOS_THREAD_CONTEXT)
+        trace::printf ("%s() in %s\n", __func__, _thread ()->name ());
+#endif
       }
 
     } /* namespace this_thread */
@@ -308,7 +316,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s @%p %s %d %d\n", __func__, this, name (), prio_,
-                     context_.stack_.size_bytes_);
+          context_.stack_.size_bytes_);
 #endif
 
         {
@@ -440,7 +448,7 @@ namespace os
     Thread::_wait (void)
     {
 #if defined(OS_TRACE_RTOS_THREAD)
-      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+      //trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
         {
@@ -465,7 +473,7 @@ namespace os
     void
     Thread::resume (void)
     {
-#if defined(OS_TRACE_RTOS_THREAD)
+#if defined(OS_TRACE_RTOS_THREAD_CONTEXT)
       trace::printf ("%s() @%p %s %d\n", __func__, this, name (), prio_);
 #endif
 
@@ -849,7 +857,7 @@ namespace os
             {
 #if defined(OS_TRACE_RTOS_THREAD)
               trace::printf ("%s() @%p %s already gone\n", __func__, this,
-                             name ());
+                  name ());
 #endif
               return result::ok; // Already exited itself
             }
@@ -923,7 +931,7 @@ namespace os
     {
       os_assert_err(mask != 0, EINVAL);
 
-#if defined(OS_TRACE_RTOS_THREAD)
+#if defined(OS_TRACE_RTOS_THREAD_SIG)
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
 #endif
 
@@ -962,7 +970,7 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), thread::sig::all);
 
-#if defined(OS_TRACE_RTOS_THREAD)
+#if defined(OS_TRACE_RTOS_THREAD_SIG)
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
 #endif
 
@@ -996,7 +1004,7 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(mask != 0, EINVAL);
 
-#if defined(OS_TRACE_RTOS_THREAD)
+#if defined(OS_TRACE_RTOS_THREAD_SIG)
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
 #endif
 
@@ -1082,12 +1090,12 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-#if defined(OS_TRACE_RTOS_THREAD)
+#if defined(OS_TRACE_RTOS_THREAD_SIG)
       trace::printf ("%s(0x%X, %d) @%p %s\n", __func__, mask, mode, this,
-                     name ());
+          name ());
 #endif
 
-#if defined(OS_TRACE_RTOS_THREAD)
+#if defined(OS_TRACE_RTOS_THREAD_SIG)
       clock::timestamp_t prev = systick_clock.now ();
       clock::duration_t slept_ticks = 0;
 #endif
@@ -1098,12 +1106,12 @@ namespace os
 
               if (_try_wait (mask, oflags, mode) == result::ok)
                 {
-#if defined(OS_TRACE_RTOS_THREAD)
+#if defined(OS_TRACE_RTOS_THREAD_SIG)
                   slept_ticks =
-                      static_cast<clock::duration_t> (systick_clock.now ()
-                          - prev);
+                  static_cast<clock::duration_t> (systick_clock.now ()
+                      - prev);
                   trace::printf ("%s(0x%X, %d)=%d @%p %s\n", __func__, mask,
-                                 mode, slept_ticks, this, name ());
+                      mode, slept_ticks, this, name ());
 #endif
                   return result::ok;
                 }
@@ -1136,9 +1144,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-#if defined(OS_TRACE_RTOS_THREAD)
+#if defined(OS_TRACE_RTOS_THREAD_SIG)
       trace::printf ("%s(0x%X, %d) @%p %s\n", __func__, mask, mode, this,
-                     name ());
+          name ());
 #endif
 
       interrupts::Critical_section ics; // ----- Critical section -----
@@ -1184,9 +1192,9 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-#if defined(OS_TRACE_RTOS_THREAD)
+#if defined(OS_TRACE_RTOS_THREAD_SIG)
       trace::printf ("%s(0x%X, %d, %d) @%p %s\n", __func__, mask, mode, timeout,
-                     this, name ());
+          this, name ());
 #endif
 
         {
@@ -1202,7 +1210,7 @@ namespace os
       Clock_timestamps_list& clock_list = clock.steady_list ();
       clock::timestamp_t timeout_timestamp = clock.steady_now () + timeout;
 
-#if defined(OS_TRACE_RTOS_THREAD)
+#if defined(OS_TRACE_RTOS_THREAD_SIG)
       clock::timestamp_t begin_timestamp = clock.steady_now ();
 #endif
 
@@ -1254,11 +1262,11 @@ namespace os
             }
         }
 
-#if defined(OS_TRACE_RTOS_THREAD)
+#if defined(OS_TRACE_RTOS_THREAD_SIG)
       clock::duration_t slept_ticks =
-          static_cast<clock::duration_t> (clock.steady_now () - begin_timestamp);
+      static_cast<clock::duration_t> (clock.steady_now () - begin_timestamp);
       trace::printf ("%s(0x%X, %d, %d)=%d @%p %s\n", __func__, mask, mode,
-                     timeout, slept_ticks, this, name ());
+          timeout, slept_ticks, this, name ());
 #endif
 
       return res;
