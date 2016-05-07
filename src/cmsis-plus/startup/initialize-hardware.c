@@ -62,6 +62,8 @@ __initialize_hardware_early (void)
   // Set VTOR to the actual address, provided by the linker script.
   // Override the manual, possibly wrong, SystemInit() setting.
   SCB->VTOR = (uint32_t) (&__vectors_start);
+  // Ensure all subsequence instructions use the new configuration.
+  __DSB ();
 #endif
 
   // The current version of SystemInit() leaves the value of the clock
@@ -78,8 +80,11 @@ __initialize_hardware_early (void)
   // Enable the Cortex-M4 FPU only when -mfloat-abi=hard.
   // Code taken from Section 7.1, Cortex-M4 TRM (DDI0439C)
 
-  // Set bits 20-23 to enable CP10 and CP11 coprocessor
+  // Set bits 20-23 to enable CP10 and CP11 coprocessor.
   SCB->CPACR |= (0xF << 20);
+
+  // Lazy save.
+  FPU->FPCCR |= FPU_FPCCR_ASPEN_Msk | FPU_FPCCR_LSPEN_Msk;
 
 #endif // (__VFP_FP__) && !(__SOFTFP__)
 
