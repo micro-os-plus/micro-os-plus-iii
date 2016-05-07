@@ -328,7 +328,7 @@ nano_malloc (RARG malloc_size_t s)
   char * ptr, *align_ptr;
   int offset;
 
-  trace_printf ("%s(%d)\n", __func__, s);
+  // trace_printf ("%s(%d)\n", __func__, s);
 
   malloc_size_t alloc_size;
 
@@ -340,7 +340,7 @@ nano_malloc (RARG malloc_size_t s)
   if (alloc_size >= MAX_ALLOC_SIZE || alloc_size < s)
     {
       RERRNO = ENOMEM;
-      trace_printf ("%s()=0\n", __func__);
+      trace_printf ("%s(%d)=0\n", __func__, s);
       return NULL;
     }
 
@@ -393,7 +393,7 @@ nano_malloc (RARG malloc_size_t s)
         {
           RERRNO = ENOMEM;
           MALLOC_UNLOCK;
-          trace_printf ("%s()=0\n", __func__);
+          trace_printf ("%s(%d)=0\n", __func__, s);
           return NULL;
         }
       r->size = alloc_size;
@@ -411,7 +411,9 @@ nano_malloc (RARG malloc_size_t s)
     }
 
   // assert(align_ptr + size <= (char *)r + alloc_size);
-  trace_printf ("%s()=%p\n", __func__, align_ptr);
+#if defined(OS_TRACE_LIBC_MALLOC)
+  trace_printf ("%s(%d)=%p,%d\n", __func__, s, align_ptr, alloc_size);
+#endif
   return align_ptr;
 }
 
@@ -445,12 +447,17 @@ void nano_free (RARG void * free_p)
   chunk * p_to_free;
   chunk * p, *q;
 
-  trace_printf ("%s(%p)\n", __func__, free_p);
-
   if (free_p == NULL)
-    return;
+    {
+      trace_printf ("%s(%p) nop\n", __func__, free_p);
+      return;
+    }
 
   p_to_free = get_chunk_from_ptr (free_p);
+
+#if defined(OS_TRACE_LIBC_MALLOC)
+  trace_printf ("%s(%p,%d)\n", __func__, free_p, p_to_free->size);
+#endif
 
   MALLOC_LOCK;
   if (free_list == NULL)
