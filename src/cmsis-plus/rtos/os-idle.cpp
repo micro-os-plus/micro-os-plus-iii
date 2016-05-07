@@ -62,6 +62,7 @@ namespace os
         // go below the idle priority.
         attr.th_priority = thread::priority::idle - 1;
 
+        // Warning: the destructor is registered with atexit()!
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
@@ -74,9 +75,9 @@ namespace os
       void*
       _idle_func (thread::func_args_t args __attribute__((unused)))
       {
-#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
         while (true)
           {
+#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
             while (!scheduler::terminated_threads_list_.empty ())
               {
                 Waiting_thread_node* node;
@@ -86,10 +87,7 @@ namespace os
                         const_cast<Waiting_thread_node*> (scheduler::terminated_threads_list_.head ());
                     node->unlink ();
                   }
-                trace::printf ("%s() destroying %p %s ***********\n", __func__,
-                               &(node->thread), node->thread.name ());
-
-                node->thread._destroy();
+                node->thread._destroy ();
 
                 this_thread::yield ();
               }
