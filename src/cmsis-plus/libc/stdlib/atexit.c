@@ -67,7 +67,9 @@
 int
 atexit (exit_func_t fn)
 {
+#if defined(OS_TRACE_LIBC_ATEXIT)
   trace_printf ("%s(%p)\n", __func__, fn);
+#endif
 
   return __register_exitproc (__et_atexit, fn, NULL, NULL);
 }
@@ -75,7 +77,9 @@ atexit (exit_func_t fn)
 // ----------------------------------------------------------------------------
 
 #if !defined(OS_INTEGER_ATEXIT_ARRAY_SIZE)
-#define OS_INTEGER_ATEXIT_ARRAY_SIZE (1)
+// Due to an odd behaviour, destructors for main and idle are
+// called via atexit().
+#define OS_INTEGER_ATEXIT_ARRAY_SIZE (3)
 #endif
 
 /**
