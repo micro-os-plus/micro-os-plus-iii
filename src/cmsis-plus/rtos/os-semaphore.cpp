@@ -335,15 +335,14 @@ namespace os
             }
 
           ++count_;
+#if defined(OS_TRACE_RTOS_SEMAPHORE)
+          trace::printf ("%s() @%p %s count %d\n", __func__, this, name (),
+                         count_);
+#endif
         }
 
       // Wake-up one thread.
       list_.resume_one ();
-
-      if (!scheduler::in_handler_mode ())
-        {
-          port::this_thread::yield ();
-        }
 
       return result::ok;
 
@@ -356,10 +355,17 @@ namespace os
       if (count_ > 0)
         {
           --count_;
+#if defined(OS_TRACE_RTOS_SEMAPHORE)
+          trace::printf ("%s() @%p %s count %d\n", __func__, this, name (),
+                         count_);
+#endif
           return true;
         }
 
       // Count may be 0.
+#if defined(OS_TRACE_RTOS_SEMAPHORE)
+      trace::printf ("%s() @%p %s false\n", __func__, this, name ());
+#endif
       return false;
     }
 
@@ -437,6 +443,7 @@ namespace os
 
               // Add this thread to the semaphore waiting list.
               scheduler::_link_node (list_, node);
+              // state::waiting set in above link().
             }
 
           port::scheduler::reschedule ();
@@ -542,7 +549,7 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
-      trace::printf ("%s(%d_ticks) @%p %s\n", __func__, timeout, this, name ());
+      trace::printf ("%s(%d) @%p %s\n", __func__, timeout, this, name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
@@ -590,6 +597,7 @@ namespace os
               // Add this thread to the semaphore waiting list,
               // and the clock timeout list.
               scheduler::_link_node (list_, node, clock_list, timeout_node);
+              // state::waiting set in above link().
             }
 
           port::scheduler::reschedule ();

@@ -443,11 +443,6 @@ namespace os
           // Wake-up one thread, if any.
           receive_list_.resume_one ();
 
-          if (!scheduler::in_handler_mode ())
-            {
-              port::this_thread::yield ();
-            }
-
           // ----- Exit uncritical section ------------------------------------
         }
       return true;
@@ -544,6 +539,7 @@ namespace os
 
               // Add this thread to the message queue send waiting list.
               scheduler::_link_node (send_list_, node);
+              // state::waiting set in above link().
             }
 
           port::scheduler::reschedule ();
@@ -731,6 +727,7 @@ namespace os
               // and the clock timeout list.
               scheduler::_link_node (send_list_, node, clock_list,
                                      timeout_node);
+              // state::waiting set in above link().
             }
 
           port::scheduler::reschedule ();
@@ -772,6 +769,10 @@ namespace os
             }
 
           src = static_cast<char*> (queue_addr_) + head_ * msg_size_bytes_;
+#if defined(OS_TRACE_RTOS_MQUEUE_)
+          trace::printf ("%s(%p,%d) @%p %s src %p %p\n", __func__, msg, nbytes,
+              this, name (), src, first_free_);
+#endif
         }
 
         {
@@ -910,6 +911,7 @@ namespace os
 
               // Add this thread to the message queue receive waiting list.
               scheduler::_link_node (receive_list_, node);
+              // state::waiting set in above link().
             }
 
           port::scheduler::reschedule ();
@@ -1110,6 +1112,7 @@ namespace os
               // and the clock timeout list.
               scheduler::_link_node (receive_list_, node, clock_list,
                                      timeout_node);
+              // state::waiting set in above link().
             }
 
           port::scheduler::reschedule ();

@@ -313,6 +313,7 @@ namespace os
 
               // Add this thread to the event flags waiting list.
               scheduler::_link_node (list_, node);
+              // state::waiting set in above link().
             }
 
           port::scheduler::reschedule ();
@@ -463,6 +464,7 @@ namespace os
               // Add this thread to the event flags waiting list,
               // and the clock timeout list.
               scheduler::_link_node (list_, node, clock_list, timeout_node);
+              // state::waiting set in above link().
             }
 
           port::scheduler::reschedule ();
@@ -523,11 +525,6 @@ namespace os
 
           // Wake-up all threads, if any.
           list_.resume_all ();
-        }
-
-      if (!scheduler::in_handler_mode ())
-        {
-          port::this_thread::yield ();
         }
 
       return result::ok;

@@ -426,6 +426,7 @@ namespace os
 
               // Add this thread to the memory pool waiting list.
               scheduler::_link_node (list_, node);
+              // state::waiting set in above link().
             }
 
           port::scheduler::reschedule ();
@@ -530,6 +531,7 @@ namespace os
               // Add this thread to the memory pool waiting list,
               // and the clock timeout list.
               scheduler::_link_node (list_, node, clock_list, timeout_node);
+              // state::waiting set in above link().
             }
 
           port::scheduler::reschedule ();
@@ -596,11 +598,6 @@ namespace os
 
       // Wake-up one thread, if any.
       list_.resume_one ();
-
-      if (!scheduler::in_handler_mode ())
-        {
-          port::this_thread::yield ();
-        }
 
       return result::ok;
     }
