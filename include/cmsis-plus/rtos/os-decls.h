@@ -1156,8 +1156,8 @@ namespace os
         void
         reschedule (void);
 
-        void
-        get_next_context (void);
+        rtos::stack::element_t*
+        switch_stacks (rtos::stack::element_t* sp);
 
         void
         _wait_for_interrupt (void);

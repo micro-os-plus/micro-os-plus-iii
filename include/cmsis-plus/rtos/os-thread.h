@@ -445,8 +445,8 @@ namespace os
 
         friend class port::thread::Context;
 
-        friend void
-        port::scheduler::get_next_context (void);
+        friend stack::element_t*
+        port::scheduler::switch_stacks (stack::element_t* sp);
 
 #endif
         /**
@@ -781,8 +781,8 @@ namespace os
       friend void
       port::scheduler::reschedule (void);
 
-      friend void
-      port::scheduler::get_next_context (void);
+      friend stack::element_t*
+      port::scheduler::switch_stacks (stack::element_t* sp);
 
       friend void*
       scheduler::_idle_func (thread::func_args_t args);
