@@ -63,7 +63,7 @@ namespace os
       extern Top_threads_list top_threads_list_;
 
 #if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
-      extern Thread* current_thread_;
+      extern Thread* volatile current_thread_;
       extern Ready_threads_list ready_threads_list_;
       extern Terminated_threads_list terminated_threads_list_;
 #endif
