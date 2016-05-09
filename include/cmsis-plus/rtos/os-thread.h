@@ -439,7 +439,7 @@ namespace os
         friend void
         port::scheduler::start (void);
         friend void
-        port::scheduler::reschedule (bool save);
+        port::scheduler::reschedule ();
 
 #if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
@@ -779,7 +779,10 @@ namespace os
                                Timeout_thread_node& timeout_node);
 
       friend void
-      port::scheduler::reschedule (bool save);
+      port::scheduler::reschedule (void);
+
+      friend void
+      port::scheduler::get_next_context (void);
 
       friend void*
       scheduler::_idle_func (thread::func_args_t args);
@@ -927,6 +930,11 @@ namespace os
        * @{
        */
 
+#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+      // TODO: make it fully intrusive with computed offset.
+      Waiting_thread_node ready_node_;
+#endif
+
       int errno_;
 
       thread::func_t func_;
@@ -937,9 +945,6 @@ namespace os
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
       friend class port::Thread;
       os_thread_port_data_t port_;
-#else
-      // TODO move it to stack or make it fully intrusive with computed offset.
-      Waiting_thread_node ready_node_;
 #endif
 
       // Pointer to parent, or null for top/detached thread.

@@ -163,14 +163,15 @@ extern "C"
   typedef struct
   {
     const char* name;
+#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+    os_waiting_thread_node_t ready_node;
+#endif
     int errno_; // Prevent the macro to expand (for example with a prefix).
     os_thread_func_t func;
     os_thread_func_args_t func_args;
     void* func_result_;
 #if defined(OS_INCLUDE_RTOS_PORT_THREAD)
     os_thread_port_data_t port;
-#else
-    os_waiting_thread_node_t ready_node;
 #endif
     void* parent;
     os_thread_children_list_t children;

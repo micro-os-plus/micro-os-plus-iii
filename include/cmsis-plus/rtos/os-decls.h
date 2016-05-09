@@ -1154,7 +1154,7 @@ namespace os
         lock (rtos::scheduler::status_t status);
 
         void
-        reschedule (bool save = true);
+        reschedule (void);
 
         void
         get_next_context (void);
