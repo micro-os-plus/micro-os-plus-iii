@@ -49,9 +49,13 @@ os_systick_handler (void)
     {
       os_port_systick_handler ();
     }
-  // trace::putchar ('.');
+#if defined(OS_TRACE_RTOS_SYSTICK_TICK)
+  trace::putchar ('.');
+#endif
   os::rtos::systick_clock._interrupt_service_routine ();
-  // trace::putchar (',');
+#if defined(OS_TRACE_RTOS_SYSTICK_TICK)
+  trace::putchar (',');
+#endif
 }
 
 void
@@ -269,6 +273,7 @@ namespace os
           // Add this thread to the clock waiting list.
           list.link (node);
           crt_thread.clock_node_ = &node;
+          crt_thread.sched_state_ = thread::state::waiting;
         }
 
       port::scheduler::reschedule ();
