@@ -143,6 +143,9 @@ namespace os
      */
     Double_list::Double_list ()
     {
+#if defined(OS_TRACE_RTOS_LISTS_CONSTRUCT)
+      trace::printf ("%s() %p \n", __func__, this);
+#endif
       clear ();
     }
 
@@ -152,6 +155,9 @@ namespace os
      */
     Double_list::~Double_list ()
     {
+#if defined(OS_TRACE_RTOS_LISTS_CONSTRUCT)
+      trace::printf ("%s() %p \n", __func__, this);
+#endif
       assert(empty ());
     }
 
@@ -393,12 +399,16 @@ namespace os
     Timestamp_node::Timestamp_node (clock::timestamp_t ts) :
         timestamp (ts)
     {
-      ;
+#if defined(OS_TRACE_RTOS_LISTS_CONSTRUCT)
+      trace::printf ("%s() %p \n", __func__, this);
+#endif
     }
 
     Timestamp_node::~Timestamp_node ()
     {
-      ;
+#if defined(OS_TRACE_RTOS_LISTS_CONSTRUCT)
+      trace::printf ("%s() %p \n", __func__, this);
+#endif
     }
 
     // ========================================================================
@@ -408,12 +418,16 @@ namespace os
           { ts }, //
         thread (th)
     {
-      ;
+#if defined(OS_TRACE_RTOS_LISTS_CONSTRUCT)
+      trace::printf ("%s() %p \n", __func__, this);
+#endif
     }
 
     Timeout_thread_node::~Timeout_thread_node ()
     {
-      ;
+#if defined(OS_TRACE_RTOS_LISTS_CONSTRUCT)
+      trace::printf ("%s() %p \n", __func__, this);
+#endif
     }
 
     void
@@ -438,12 +452,16 @@ namespace os
           { ts }, //
         timer (tm)
     {
-      ;
+#if defined(OS_TRACE_RTOS_LISTS_CONSTRUCT)
+      trace::printf ("%s() %p \n", __func__, this);
+#endif
     }
 
     Timer_node::~Timer_node ()
     {
-      ;
+#if defined(OS_TRACE_RTOS_LISTS_CONSTRUCT)
+      trace::printf ("%s() %p \n", __func__, this);
+#endif
     }
 
     /**
