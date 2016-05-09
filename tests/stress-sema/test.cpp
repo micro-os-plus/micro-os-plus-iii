@@ -16,14 +16,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/diag/trace.h>
 
-#include "cmsis_device.h"
+#include <cstring>
+#include <cmsis_device.h>
 
 #include <test.h>
 
-#include <cstring>
+#include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/diag/trace.h>
 
 using namespace os;
 using namespace os::rtos;
@@ -34,6 +34,9 @@ sema (uint32_t divisor);
 int
 run_tests ()
 {
+#if 0
+  sema (tmr.in_clk_hz ()/20);
+#else
   int i = 1;
   for (;; i *= 2)
     {
@@ -59,14 +62,16 @@ run_tests ()
 
       sema ((uint32_t)period);
     }
+#endif
 
   trace::puts("\nDone.");
   return 0;
 }
 
 constexpr std::size_t max_count = 1000;
-uint16_t buf[max_count + 10];
-uint16_t cnt;
+//constexpr std::size_t max_count = 200;
+uint16_t volatile buf[max_count + 10];
+uint16_t volatile cnt;
 
 Semaphore sem;
 
@@ -75,7 +80,9 @@ sema_cb (void)
 {
   buf[cnt] = cnt;
   ++cnt;
+#if 1
   sem.post ();
+#endif
   trace_putchar ('+');
 
   if (cnt == max_count)
@@ -85,10 +92,10 @@ sema_cb (void)
 }
 
 void
-sema (uint32_t period)
+sema (uint32_t cycles)
 {
   // Clear buffer
-  memset (buf, 0, sizeof(buf));
+  memset ((void*)buf, 0, sizeof(buf));
 
   cnt = 0;
 
@@ -96,16 +103,20 @@ sema (uint32_t period)
 
   tim_callback = sema_cb;
 
-  trace::printf ("\nP=%06d/%08d ", period, tmr.in_clk_hz ()/period);
+  trace::printf ("\n%07d cy %07d Hz \n", cycles, tmr.in_clk_hz ()/cycles);
 
-  tmr.start (period);
+  tmr.start (cycles);
 
+#if 1
   uint32_t i;
   for (i = 0; i < max_count; ++i)
     {
-      sem.timed_wait (100);
+      sem.timed_wait (rtos::Systick_clock::frequency_hz);
       trace_putchar ('-');
       assert(buf[i] == i);
     }
-
+#else
+  while (cnt < max_count)
+    ;
+#endif
 }
