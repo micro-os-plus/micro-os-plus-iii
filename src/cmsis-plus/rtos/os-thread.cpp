@@ -109,17 +109,28 @@ namespace os
 
         if (!scheduler::started ())
           {
+#if defined(OS_TRACE_RTOS_THREAD_CONTEXT)
+            trace::printf ("%s() nop %s \n", __func__, _thread ()->name ());
+#endif
             return;
           }
 
 #if defined(OS_TRACE_RTOS_THREAD_CONTEXT)
-        trace::printf ("%s() leave %s\n", __func__, _thread ()->name ());
+        trace::printf ("%s() from %s\n", __func__, _thread ()->name ());
 #endif
+
+#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
 
         port::this_thread::yield ();
 
+#else
+
+        port::scheduler::reschedule ();
+
+#endif
+
 #if defined(OS_TRACE_RTOS_THREAD_CONTEXT)
-        trace::printf ("%s() in %s\n", __func__, _thread ()->name ());
+        trace::printf ("%s() to %s\n", __func__, _thread ()->name ());
 #endif
       }
 
@@ -316,7 +327,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s @%p %s %d %d\n", __func__, this, name (), prio_,
-          context_.stack_.size_bytes_);
+                     context_.stack_.size_bytes_);
 #endif
 
         {
@@ -340,7 +351,7 @@ namespace os
           clock_node_ = nullptr;
 
           parent_ = this_thread::_thread ();
-          if (parent_ != nullptr)
+          if (scheduler::started () && (parent_ != nullptr))
             {
               parent_->children_.link (*this);
             }
@@ -400,13 +411,12 @@ namespace os
           port::thread::Context::create (
               &context_, reinterpret_cast<void*> (_invoke_with_exit), this);
 
-          // Allow for next resume()
+          // Add to ready list, but do not yield yet.
           resume ();
 
 #endif
 
         }
-
       // For just in case the new thread has higher priority.
       this_thread::yield ();
     }
@@ -456,6 +466,8 @@ namespace os
 
           // Remove this thread from the ready list, if there.
           port::this_thread::prepare_suspend ();
+
+          sched_state_ = thread::state::waiting;
         }
       port::scheduler::reschedule ();
 
@@ -494,9 +506,11 @@ namespace os
           if (ready_node_.next == nullptr)
             {
               scheduler::ready_threads_list_.link (ready_node_);
-              // Ready state set in above link().
+              // state::ready set in above link().
             }
         }
+
+      port::scheduler::reschedule ();
 
 #endif
 
@@ -806,7 +820,7 @@ namespace os
           scheduler::terminated_threads_list_.link (ready_node_);
         }
 
-      port::scheduler::reschedule (false);
+      port::scheduler::reschedule ();
       assert(true);
       for (;;)
         ;
@@ -857,7 +871,7 @@ namespace os
             {
 #if defined(OS_TRACE_RTOS_THREAD)
               trace::printf ("%s() @%p %s already gone\n", __func__, this,
-                  name ());
+                             name ());
 #endif
               return result::ok; // Already exited itself
             }
@@ -909,8 +923,6 @@ namespace os
           if (joiner_ != nullptr)
             {
               joiner_->resume ();
-
-              port::this_thread::yield ();
             }
           // ----- End of critical section -----
         }
@@ -945,11 +957,6 @@ namespace os
       sig_mask_ |= mask;
 
       this->resume ();
-
-      if (!scheduler::in_handler_mode ())
-        {
-          port::this_thread::yield ();
-        }
 
       return result::ok;
     }
@@ -1092,7 +1099,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
       trace::printf ("%s(0x%X, %d) @%p %s\n", __func__, mask, mode, this,
-          name ());
+                     name ());
 #endif
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
@@ -1108,10 +1115,10 @@ namespace os
                 {
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
                   slept_ticks =
-                  static_cast<clock::duration_t> (systick_clock.now ()
-                      - prev);
+                      static_cast<clock::duration_t> (systick_clock.now ()
+                          - prev);
                   trace::printf ("%s(0x%X, %d)=%d @%p %s\n", __func__, mask,
-                      mode, slept_ticks, this, name ());
+                                 mode, slept_ticks, this, name ());
 #endif
                   return result::ok;
                 }
@@ -1146,7 +1153,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
       trace::printf ("%s(0x%X, %d) @%p %s\n", __func__, mask, mode, this,
-          name ());
+                     name ());
 #endif
 
       interrupts::Critical_section ics; // ----- Critical section -----
@@ -1194,7 +1201,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
       trace::printf ("%s(0x%X, %d, %d) @%p %s\n", __func__, mask, mode, timeout,
-          this, name ());
+                     this, name ());
 #endif
 
         {
@@ -1236,6 +1243,8 @@ namespace os
               // Add this thread to the clock timeout list.
               clock_list.link (timeout_node);
               timeout_node.thread.clock_node_ = &timeout_node;
+
+              sched_state_ = thread::state::waiting;
             }
 
           port::scheduler::reschedule ();
@@ -1264,9 +1273,9 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
       clock::duration_t slept_ticks =
-      static_cast<clock::duration_t> (clock.steady_now () - begin_timestamp);
+          static_cast<clock::duration_t> (clock.steady_now () - begin_timestamp);
       trace::printf ("%s(0x%X, %d, %d)=%d @%p %s\n", __func__, mask, mode,
-          timeout, slept_ticks, this, name ());
+                     timeout, slept_ticks, this, name ());
 #endif
 
       return res;
