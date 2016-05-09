@@ -42,8 +42,6 @@ os_systick_handler (void)
 {
   using namespace os::rtos;
 
-  interrupts::Critical_section ics;
-
   // Prevent scheduler actions before starting it.
   if (scheduler::started ())
     {
@@ -62,8 +60,6 @@ void
 os_rtc_handler (void)
 {
   using namespace os::rtos;
-
-  interrupts::Critical_section ics;
 
   // Prevent scheduler actions before starting it.
   if (scheduler::started ())
@@ -242,7 +238,10 @@ namespace os
       // trace::putchar ('.');
 #endif
 
-      ++steady_count_;
+        {
+          interrupts::Critical_section ics; // ----- Critical section -----
+          ++steady_count_;
+        }
 
       steady_list_.check_timestamp (steady_count_);
 
@@ -265,7 +264,7 @@ namespace os
         { timestamp, crt_thread };
 
         {
-          interrupts::Critical_section ics;
+          interrupts::Critical_section ics; // ----- Critical section -----
 
           // Remove this thread from the ready list, if there.
           port::this_thread::prepare_suspend ();
@@ -279,7 +278,7 @@ namespace os
       port::scheduler::reschedule ();
 
         {
-          interrupts::Critical_section ics;
+          interrupts::Critical_section ics; // ----- Critical section -----
 
           // Remove the thread from the clock timeout list,
           // if not already removed by the timer.

@@ -430,6 +430,7 @@ namespace os
 #endif
     }
 
+    // Must be called in a critical section.
     void
     Timeout_thread_node::action (void)
     {
@@ -562,8 +563,14 @@ namespace os
 
       // Multiple threads can wait for the same time stamp, so
       // iterate until a node with future time stamp is identified.
-      for (; !empty ();)
+      for (;;)
         {
+          interrupts::Critical_section ics; // ----- Critical section -----
+
+          if (empty ())
+            {
+              break;
+            }
           clock::timestamp_t head_ts = head ()->timestamp;
           if (now >= head_ts)
             {
