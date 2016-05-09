@@ -119,6 +119,16 @@ main (int argc, char* argv[])
 #endif
   trace::puts (".");
 
+#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+  // Initialise the current thread with a very simple fake
+  // thread that at least has a name, so trace messages
+  // will not fail with exceptions when printing identity.
+  const char* const fake_thread = "none";
+  rtos::Thread* pth = (rtos::Thread*) &fake_thread;
+
+  rtos::scheduler::current_thread_ = pth;
+#endif
+
   scheduler::initialize ();
 
   // Store the parameters in the static structure, to be used by os_main().
