@@ -171,7 +171,7 @@ namespace os
      */
     Message_queue::Message_queue (mqueue::size_t msgs,
                                   mqueue::msg_size_t msg_size_bytes) :
-        Message_queue (mqueue::initializer, msgs, msg_size_bytes)
+        Message_queue (mqueue::initializer, msgs, msg_size_bytes, nullptr, 0)
     {
       ;
     }
@@ -203,6 +203,17 @@ namespace os
     Message_queue::Message_queue (const mqueue::Attributes&attr,
                                   mqueue::size_t msgs,
                                   mqueue::msg_size_t msg_size_bytes) :
+        Message_queue (attr, msgs, msg_size_bytes, nullptr, 0)
+    {
+      ;
+    }
+
+    // Protected internal constructor.
+    Message_queue::Message_queue (const mqueue::Attributes&attr,
+                                  mqueue::size_t msgs,
+                                  mqueue::msg_size_t msg_size_bytes,
+                                  void* queue_address,
+                                  std::size_t queue_size_bytes) :
         Named_object
           { attr.name () }, //
 #if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
@@ -213,8 +224,10 @@ namespace os
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
-      queue_addr_ = attr.mq_queue_address;
-      queue_size_bytes_ = attr.mq_queue_size_bytes;
+      queue_addr_ = queue_address ? queue_address : attr.mq_queue_address;
+      queue_size_bytes_ =
+          queue_address ? queue_size_bytes : attr.mq_queue_size_bytes;
+
 #if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
       std::size_t storage_size = msgs
           * (msg_size_bytes + 2 * sizeof(mqueue::index_t)
@@ -234,7 +247,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), msgs_,
-                     msg_size_bytes_);
+          msg_size_bytes_);
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
@@ -501,7 +514,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes, mprio,
-                     this, name ());
+          this, name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
@@ -600,7 +613,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes, mprio,
-                     this, name ());
+          this, name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
@@ -677,7 +690,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d,%d,%d_ticks) @%p %s\n", __func__, msg, nbytes,
-                     mprio, timeout, this, name ());
+          mprio, timeout, this, name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
@@ -871,7 +884,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d) @%p %s\n", __func__, msg, nbytes, this,
-                     name ());
+          name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
@@ -972,7 +985,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d) @%p %s\n", __func__, msg, nbytes, this,
-                     name ());
+          name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
@@ -1062,7 +1075,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d,%d_ticks) @%p %s\n", __func__, msg, nbytes,
-                     timeout, this, name ());
+          timeout, this, name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
