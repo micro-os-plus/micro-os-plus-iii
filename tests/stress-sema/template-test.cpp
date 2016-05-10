@@ -34,7 +34,7 @@ typedef struct my_msg_s
 int
 run_template_tests (void)
 {
-
+#if 1
   // Define two messages.
 
   my_msg_t msg_out
@@ -45,29 +45,59 @@ run_template_tests (void)
   // --------------------------------------------------------------------------
 
   // Classic usage; message size and cast to char* must be supplied manually.
-  Message_queue cq
-    { 7, sizeof(my_msg_t) };
+    {
+      Message_queue cq
+        { 3, sizeof(my_msg_t) };
 
-  cq.send ((char*) &msg_out, sizeof(my_msg_t));
+      cq.send ((char*) &msg_out, sizeof(my_msg_t));
+    }
 
   // --------------------------------------------------------------------------
 
   // Template usage; message size and cast are supplied automatically.
 
-  // Define a custom queue type parametrised with the message type.
+  // Define a custom queue type parametrised with the
+  // message type.
   using My_queue = TMessage_queue<my_msg_t>;
 
-  My_queue q
-    { 7 };
+    {
+      My_queue q
+        { 7 };
 
-  q.send (&msg_out);
-  q.receive (&msg_in);
+      q.send (&msg_out);
+      q.receive (&msg_in);
 
-  q.try_send (&msg_out);
-  q.try_receive (&msg_in);
+      q.try_send (&msg_out);
+      q.try_receive (&msg_in);
 
-  q.timed_send (&msg_out, 1);
-  q.timed_receive (&msg_in, 1);
+      q.timed_send (&msg_out, 1);
+      q.timed_receive (&msg_in, 1);
+    }
+
+  // --------------------------------------------------------------------------
+
+  // Allocated template usage; message size and cast are supplied automatically.
+
+  // Define a custom queue type parametrised with the
+  // message type and queue size.
+  using My_alloc_queue = TAllocated_message_queue<my_msg_t, 4>;
+
+    {
+      // The space for the queue is allocated inside the queue
+      // object, in this case on the stack.
+      My_alloc_queue aq;
+
+      aq.send (&msg_out);
+      aq.receive (&msg_in);
+
+      aq.try_send (&msg_out);
+      aq.try_receive (&msg_in);
+
+      aq.timed_send (&msg_out, 1);
+      aq.timed_receive (&msg_in, 1);
+    }
+
+#endif
 
   trace::puts ("\nDone.");
   return 0;

@@ -82,6 +82,8 @@
 #define OS_TRACE_LIBC_ATEXIT
 #endif
 
+//#define OS_TRACE_RTOS_MQUEUE
+//#define OS_TRACE_LIBC_MALLOC
 #define OS_TRACE_RTOS_RTC_TICK
 //#define OS_TRACE_RTOS_SYSTICK_TICK
 
