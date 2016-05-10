@@ -85,12 +85,33 @@ region together with linking the thread to the waiting lists.
 
 ## Write a stress test for the semaphore implementation
 
-The test uses a hardware timer to generate interrupts at various rates, and
+April 2016 - The test uses a hardware timer to generate interrupts at various rates, and
 the ISR stores a word into an array and notifies a semaphore. The thread 
 waits for the semaphore and checks the presence of the value in the array.
 
 It is a more automated (and much faster) version of the copy/paste test using 
 the usart input to a monitor.
+
+## Implement a 64-bits cooperative scheduler on OS X
+
+April 2016 - A cooperative scheduler, based on POSIX makecontext()/swapcontext() was written for OS X and is fully functional, passing the ARM CMSIS RTOS validator.
+
+It is part of the synthetic/posix-arch-xpack.
+
+## Implement the Cortex-M scheduler
+
+May 2016 - A full preemptive scheduler for Cortex-M3/4 is fully functional. It passes the ARM CMSIS RTOS validator and the semaphore stress test.
+
+The core context switching routine is written in C++, with two inlined insertions in asm(), used to save/restore the registers.
+
+The scheduler is part of the portable/micro-os-plus-xpack.
+
+It does not come from nowhere, it is heavily based on the experience with the previous µOS++ versions.
+
+
+
+
+
 
 
 
