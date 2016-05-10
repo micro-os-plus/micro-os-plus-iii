@@ -63,7 +63,7 @@ exit(int code)
 #if defined(DEBUG)
   trace_dbg_bkpt();
 #endif
-  for (;;)
+  while (1)
     ;
   /* NOTREACHED */
 }
