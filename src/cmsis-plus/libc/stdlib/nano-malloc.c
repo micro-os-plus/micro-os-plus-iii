@@ -411,7 +411,7 @@ nano_malloc (RARG malloc_size_t s)
     }
 
   // assert(align_ptr + size <= (char *)r + alloc_size);
-#if defined(OS_TRACE_LIBC_MALLOC)
+#if defined(OS_TRACE_LIBC_MALLOC__)
   trace_printf ("%s(%d)=%p,%d\n", __func__, s, align_ptr, alloc_size);
 #endif
   return align_ptr;
@@ -455,7 +455,7 @@ void nano_free (RARG void * free_p)
 
   p_to_free = get_chunk_from_ptr (free_p);
 
-#if defined(OS_TRACE_LIBC_MALLOC)
+#if defined(OS_TRACE_LIBC_MALLOC__)
   trace_printf ("%s(%p,%d)\n", __func__, free_p, p_to_free->size);
 #endif
 
