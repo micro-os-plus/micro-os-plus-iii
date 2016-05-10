@@ -442,6 +442,7 @@ namespace os
         }
 
       /* NOTREACHED */
+      return nullptr;
     }
 
     /**
@@ -553,6 +554,7 @@ namespace os
         }
 
       /* NOTREACHED */
+      return nullptr;
     }
 
     /**
