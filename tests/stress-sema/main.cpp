@@ -37,6 +37,9 @@ using namespace os;
 RNG_HandleTypeDef hrng;
 
 int
+run_template_tests (void);
+
+int
 os_main (int argc, char* argv[])
 {
   trace::dump_args (argc, argv);
@@ -55,6 +58,8 @@ os_main (int argc, char* argv[])
   trace::printf ("\nSeed=%u\n", seed);
 
   srand (seed);
+
+  run_template_tests();
 
   return run_tests ();
 }
