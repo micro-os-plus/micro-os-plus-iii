@@ -668,8 +668,8 @@ namespace os
      */
     result_t
     Message_queue::timed_send (const char* msg, std::size_t nbytes,
-                               mqueue::priority_t mprio,
-                               clock::duration_t timeout)
+                               clock::duration_t timeout,
+                               mqueue::priority_t mprio)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
@@ -682,7 +682,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
-      return port::Message_queue::timed_send (this, msg, nbytes, mprio, timeout);
+      return port::Message_queue::timed_send (this, msg, nbytes, timeout, mprio);
 
 #else
 
@@ -1052,8 +1052,8 @@ namespace os
      */
     result_t
     Message_queue::timed_receive (char* msg, std::size_t nbytes,
-                                  mqueue::priority_t* mprio,
-                                  clock::duration_t timeout)
+                                  clock::duration_t timeout,
+                                  mqueue::priority_t* mprio)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
@@ -1067,8 +1067,8 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
-      return port::Message_queue::timed_receive (this, msg, nbytes, mprio,
-          timeout);
+      return port::Message_queue::timed_receive (this, msg, nbytes,
+          timeout, mprio);
 
 #else
 

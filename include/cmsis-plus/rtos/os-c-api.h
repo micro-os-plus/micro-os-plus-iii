@@ -188,19 +188,19 @@ extern "C"
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 
-  inline os_clock_duration_t
+  inline __attribute__((always_inline))
+     os_clock_duration_t
   os_systick_clock_ticks_cast (uint32_t microsec)
   {
-    // TODO: add some restrictions to match only numeric types
     return (os_clock_duration_t) ((((microsec)
         * ((uint32_t) OS_INTEGER_SYSTICK_FREQUENCY_HZ)) + (uint32_t) 999999ul)
         / (uint32_t) 1000000ul);
   }
 
-  inline os_clock_duration_t
+  inline __attribute__((always_inline))
+     os_clock_duration_t
   os_systick_clock_ticks_cast_long (uint64_t microsec)
   {
-    // TODO: add some restrictions to match only numeric types
     return (os_clock_duration_t) ((((microsec)
         * ((uint64_t) OS_INTEGER_SYSTICK_FREQUENCY_HZ)) + (uint64_t) 999999ul)
         / (uint64_t) 1000000ul);
@@ -399,7 +399,7 @@ extern "C"
 
   os_result_t
   os_mqueue_timed_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
-                        os_mqueue_prio_t mprio, os_clock_duration_t timeout);
+                        os_clock_duration_t timeout, os_mqueue_prio_t mprio);
 
   os_result_t
   os_mqueue_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
@@ -411,8 +411,8 @@ extern "C"
 
   os_result_t
   os_mqueue_timed_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
-                           os_mqueue_prio_t* mprio,
-                           os_clock_duration_t timeout);
+                           os_clock_duration_t timeout,
+                           os_mqueue_prio_t* mprio);
 
   size_t
   os_mqueue_get_capacity (os_mqueue_t* mqueue);

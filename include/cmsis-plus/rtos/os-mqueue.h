@@ -211,7 +211,7 @@ namespace os
        * @param [in] msg The address of the message to enqueue.
        * @param [in] nbytes The length of the message. Must be not
        *  higher than the value used when creating the queue.
-       * @param [in] mprio The message priority.
+       * @param [in] mprio The message priority. The default is 0.
        * @retval result::ok The message was enqueued.
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
        * @retval EMSGSIZE The specified message length, nbytes,
@@ -222,14 +222,15 @@ namespace os
        * @retval EINTR The operation was interrupted.
        */
       result_t
-      send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio);
+      send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio =
+                mqueue::default_priority);
 
       /**
        * @brief Try to send a message to the queue.
        * @param [in] msg The address of the message to enqueue.
        * @param [in] nbytes The length of the message. Must be not
        *  higher than the value used when creating the queue.
-       * @param [in] mprio The message priority.
+       * @param [in] mprio The message priority. The default is 0.
        * @retval result::ok The message was enqueued.
        * @retval EWOULDBLOCK The specified message queue is full.
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
@@ -239,15 +240,16 @@ namespace os
        *  (extension to POSIX).
        */
       result_t
-      try_send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio);
+      try_send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio =
+                    mqueue::default_priority);
 
       /**
        * @brief Send a message to the queue with timeout.
        * @param [in] msg The address of the message to enqueue.
        * @param [in] nbytes The length of the message. Must be not
        *  higher than the value used when creating the queue.
-       * @param [in] mprio The message priority.
        * @param [in] timeout The timeout duration.
+       * @param [in] mprio The message priority. The default is 0.
        * @retval result::ok The message was enqueued.
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
        * @retval EMSGSIZE The specified message length, nbytes,
@@ -260,8 +262,9 @@ namespace os
        * @retval EINTR The operation was interrupted.
        */
       result_t
-      timed_send (const char* msg, std::size_t nbytes, mqueue::priority_t mprio,
-                  clock::duration_t timeout);
+      timed_send (const char* msg, std::size_t nbytes,
+                  clock::duration_t timeout, mqueue::priority_t mprio =
+                      mqueue::default_priority);
 
       /**
        * @brief Receive a message from the queue.
@@ -269,7 +272,7 @@ namespace os
        * @param [in] nbytes The size of the destination buffer. Must
        *  be lower than the value used when creating the queue.
        * @param [out] mprio The address where to store the message
-       *  priority. May be `nullptr`.
+       *  priority. The default is `nullptr`.
        * @retval result::ok The message was received.
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
        * @retval EMSGSIZE The specified message length, nbytes, is
@@ -282,7 +285,8 @@ namespace os
        * @retval EINTR The operation was interrupted.
        */
       result_t
-      receive (char* msg, std::size_t nbytes, mqueue::priority_t* mprio);
+      receive (char* msg, std::size_t nbytes, mqueue::priority_t* mprio =
+                   nullptr);
 
       /**
        * @brief Try to receive a message from the queue.
@@ -290,7 +294,7 @@ namespace os
        * @param [in] nbytes The size of the destination buffer. Must
        *  be lower than the value used when creating the queue.
        * @param [out] mprio The address where to store the message
-       *  priority. May be `nullptr`.
+       *  priority. The default is `nullptr`.
        * @retval result::ok The message was received.
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
        * @retval EMSGSIZE The specified message length, nbytes, is
@@ -302,16 +306,17 @@ namespace os
        * @retval EWOULDBLOCK The specified message queue is empty.
        */
       result_t
-      try_receive (char* msg, std::size_t nbytes, mqueue::priority_t* mprio);
+      try_receive (char* msg, std::size_t nbytes, mqueue::priority_t* mprio =
+                       nullptr);
 
       /**
        * @brief Receive a message from the queue with timeout.
        * @param [out] msg The address where to store the dequeued message.
        * @param [in] nbytes The size of the destination buffer. Must
        *  be lower than the value used when creating the queue.
-       * @param [out] mprio The address where to store the message
-       *  priority. May be `nullptr`.
        * @param [in] timeout The timeout duration.
+       * @param [out] mprio The address where to store the message
+       *  priority. The default is `nullptr`.
        * @retval result::ok The message was received.
        * @retval EINVAL A parameter is invalid or outside of a permitted range.
        * @retval EMSGSIZE The specified message length, nbytes, is
@@ -326,8 +331,8 @@ namespace os
        *  specified timeout expired.
        */
       result_t
-      timed_receive (char* msg, std::size_t nbytes, mqueue::priority_t* mprio,
-                     clock::duration_t timeout);
+      timed_receive (char* msg, std::size_t nbytes, clock::duration_t timeout,
+                     mqueue::priority_t* mprio = nullptr);
 
       // TODO: check if some kind of peek() is useful.
 

@@ -666,10 +666,10 @@ os_mqueue_try_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
 
 os_result_t
 os_mqueue_timed_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
-                      os_mqueue_prio_t mprio, os_clock_duration_t timeout)
+                      os_clock_duration_t timeout, os_mqueue_prio_t mprio)
 {
   return (os_result_t) (reinterpret_cast<Message_queue&> (*mqueue)).timed_send (
-      msg, nbytes, mprio, timeout);
+      msg, nbytes, timeout, mprio);
 }
 
 os_result_t
@@ -690,10 +690,10 @@ os_mqueue_try_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
 
 os_result_t
 os_mqueue_timed_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
-                         os_mqueue_prio_t* mprio, os_clock_duration_t timeout)
+                         os_clock_duration_t timeout, os_mqueue_prio_t* mprio)
 {
   return (os_result_t) (reinterpret_cast<Message_queue&> (*mqueue)).timed_receive (
-      msg, nbytes, mprio, timeout);
+      msg, nbytes, timeout, mprio);
 }
 
 size_t
@@ -2040,8 +2040,8 @@ osMessagePut (osMessageQId queue_id, uint32_t info, uint32_t millisec)
           return osErrorParameter;
         }
       res = (reinterpret_cast<Message_queue&> (*queue_id)).timed_send (
-          (const char*) &info, sizeof(uint32_t), 0,
-          Systick_clock::ticks_cast (millisec * 1000u));
+          (const char*) &info, sizeof(uint32_t),
+          Systick_clock::ticks_cast (millisec * 1000u), 0);
       // osOK, osErrorTimeoutResource, osErrorParameter
     }
 
@@ -2133,8 +2133,8 @@ osMessageGet (osMessageQId queue_id, uint32_t millisec)
           return event;
         }
       res = (reinterpret_cast<Message_queue&> (*queue_id)).timed_receive (
-          (char*) &event.value.v, sizeof(uint32_t), NULL,
-          Systick_clock::ticks_cast (millisec * 1000u));
+          (char*) &event.value.v, sizeof(uint32_t),
+          Systick_clock::ticks_cast (millisec * 1000u), NULL);
       // result::event_message when message;
       // result::event_timeout when timeout;
     }
@@ -2418,8 +2418,8 @@ osMailGet (osMailQId mail_id, uint32_t millisec)
           return event;
         }
       res = (reinterpret_cast<Message_queue&> (mail_id->queue)).timed_receive (
-          (char*) &event.value.p, sizeof(void*), NULL,
-          Systick_clock::ticks_cast (millisec * 1000u));
+          (char*) &event.value.p, sizeof(void*),
+          Systick_clock::ticks_cast (millisec * 1000u), NULL);
       // osEventMail for ok, osEventTimeout
     }
 
