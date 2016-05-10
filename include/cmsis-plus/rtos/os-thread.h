@@ -441,7 +441,7 @@ namespace os
         friend void
         port::scheduler::reschedule ();
 
-#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
         friend class port::thread::Context;
 
@@ -465,7 +465,7 @@ namespace os
          */
         Stack stack_;
 
-#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
         /**
          * @brief Non-portable context data.
@@ -930,7 +930,7 @@ namespace os
        * @{
        */
 
-#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
       // TODO: make it fully intrusive with computed offset.
       Waiting_thread_node ready_node_;
 #endif
@@ -942,7 +942,7 @@ namespace os
       void* func_result_;
 
       // Implementation
-#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
       friend class port::Thread;
       os_thread_port_data_t port_;
 #endif

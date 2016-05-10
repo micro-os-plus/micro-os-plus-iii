@@ -66,7 +66,7 @@ namespace os
       {
         Thread* th;
 
-#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
         th = port::this_thread::thread ();
 
@@ -119,7 +119,7 @@ namespace os
         trace::printf ("%s() from %s\n", __func__, _thread ()->name ());
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
         port::this_thread::yield ();
 
@@ -311,7 +311,7 @@ namespace os
                     thread::func_args_t args) :
         Named_object
           { attr.name () }
-#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
             , ready_node_
               { *this }
 #endif
@@ -360,7 +360,7 @@ namespace os
               scheduler::top_threads_list_.link (*this);
             }
 
-#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
           port::Thread::create (this);
           sched_state_ = thread::state::ready;
@@ -489,7 +489,7 @@ namespace os
       trace::printf ("%s() @%p %s %d\n", __func__, this, name (), prio_);
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
         {
           interrupts::Critical_section ics; // ----- Critical section -----
@@ -567,7 +567,7 @@ namespace os
 
       result_t res = result::ok;
 
-#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
       // The port must perform a context switch.
       res = port::Thread::sched_prio (this, prio);
@@ -676,7 +676,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
       result_t res = port::Thread::detach (this);
       if (res != result::ok)
@@ -780,7 +780,7 @@ namespace os
             {
               interrupts::Critical_section ics; // ----- Critical section -----
 
-#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
               ready_node_.unlink ();
 #endif
 
@@ -796,7 +796,7 @@ namespace os
 
           func_result_ = exit_ptr;
 
-#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
           sched_state_ = thread::state::destroyed;
 
           if (joiner_ != nullptr)
@@ -806,7 +806,7 @@ namespace os
 #endif
         }
 
-#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
       port::Thread::destroy_this (this);
       // Does not return if the current thread.
@@ -884,7 +884,7 @@ namespace os
             {
               interrupts::Critical_section ics; // ----- Critical section -----
 
-#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
               ready_node_.unlink ();
 #endif
 
@@ -910,7 +910,7 @@ namespace os
 
           delete[] allocated_stack_address_;
 
-#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
           port::Thread::destroy_other (this);
 

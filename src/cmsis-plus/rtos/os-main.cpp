@@ -119,7 +119,7 @@ main (int argc, char* argv[])
 #endif
   trace::puts (".");
 
-#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
   // Initialise the current thread with a very simple fake
   // thread that at least has a name, so trace messages
   // will not fail with exceptions when printing identity.

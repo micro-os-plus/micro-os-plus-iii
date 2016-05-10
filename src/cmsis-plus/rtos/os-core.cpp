@@ -80,7 +80,7 @@ namespace os
       Top_threads_list top_threads_list_;
 #pragma GCC diagnostic pop
 
-#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
       Thread* volatile current_thread_;
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -107,7 +107,7 @@ namespace os
         trace::printf ("%s() \n", __func__);
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
         return port::scheduler::initialize ();
 

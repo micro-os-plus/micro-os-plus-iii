@@ -35,7 +35,7 @@
 
 // ----------------------------------------------------------------------------
 
-#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
 namespace os
 {
@@ -77,7 +77,7 @@ namespace os
       {
         while (true)
           {
-#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
             while (!scheduler::terminated_threads_list_.empty ())
               {
                 Waiting_thread_node* node;
@@ -91,7 +91,7 @@ namespace os
 
                 this_thread::yield ();
               }
-#endif /* !defined(OS_INCLUDE_RTOS_PORT_THREAD) */
+#endif /* !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER) */
 
             port::scheduler::_wait_for_interrupt ();
             this_thread::yield ();
