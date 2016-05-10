@@ -243,7 +243,7 @@ namespace os
      * Must be called in a critical section.
      */
     Thread*
-    Ready_threads_list::remove_top (void)
+    Ready_threads_list::unlink_head (void)
     {
       assert(!empty ());
 

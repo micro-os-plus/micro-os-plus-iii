@@ -863,13 +863,13 @@ namespace os
       head (void) const;
 
       /**
-       * @brief Remove top node from the list.
+       * @brief Remove the top node from the list.
        * @par Parameters
        *  None.
        * @return Pointer to thread.
        */
       Thread*
-      remove_top (void);
+      unlink_head (void);
 
       // TODO add iterator begin(), end()
 
