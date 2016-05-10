@@ -1093,7 +1093,7 @@ typedef struct
 } CommandLineBlock;
 
 void
-__initialize_args (int* p_argc, char*** p_argv)
+os_initialize_args (int* p_argc, char*** p_argv)
 {
   // Array of chars to receive the command line from the host.
   static char args_buf[ARGS_BUF_ARRAY_SIZE];

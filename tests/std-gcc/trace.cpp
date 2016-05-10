@@ -146,7 +146,7 @@ namespace os
 // in a different translation units (and usually they are).
 
 void __attribute__((weak))
-__initialize_trace (void)
+os_initialize_trace (void)
 {
   os::trace::initialize ();
 }

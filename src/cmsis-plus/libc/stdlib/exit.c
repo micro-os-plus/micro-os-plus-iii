@@ -55,7 +55,7 @@ exit(int code)
   __call_exitprocs (code, NULL);
 
   // Run the C++ static destructors.
-  __run_fini_array ();
+  os_run_fini_array ();
 
   _Exit (code);
 

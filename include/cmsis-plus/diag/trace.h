@@ -192,7 +192,7 @@ extern "C"
    * Called from startup.
    */
   void
-  __initialize_trace (void);
+  os_initialize_trace (void);
 
   ssize_t
   trace_write (const void* buf, size_t nbyte);
@@ -311,7 +311,7 @@ extern "C"
 #endif
 
     inline void
-    __initialize_trace (void);
+    os_initialize_trace (void);
 
     // Implementation dependent
     inline ssize_t
@@ -338,7 +338,7 @@ extern "C"
 
 inline void
 __attribute__((always_inline))
-__initialize_trace (void)
+os_initialize_trace (void)
   {
     ;
   }

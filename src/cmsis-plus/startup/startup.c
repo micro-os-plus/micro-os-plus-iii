@@ -90,7 +90,7 @@ extern unsigned int __bss_regions_array_end;
 #endif
 
 extern void
-__initialize_args (int*, char***);
+os_initialize_args (int*, char***);
 
 extern int
 main (int argc, char* argv[]);
@@ -102,46 +102,53 @@ main (int argc, char* argv[]);
 void
 _start (void);
 
+static void
+os_initialize_data (unsigned int* from, unsigned int* region_begin,
+                    unsigned int* region_end);
+
+static void
+os_initialize_bss (unsigned int* region_begin, unsigned int* region_end);
+
+static void
+os_run_init_array (void);
+
+// Not static since it is called from exit()
 void
-__initialize_data (unsigned int* from, unsigned int* region_begin,
-                   unsigned int* region_end);
+os_run_fini_array (void);
 
 void
-__initialize_bss (unsigned int* region_begin, unsigned int* region_end);
+os_initialize_hardware_early (void);
 
 void
-__run_init_array (void);
-
-void
-__run_fini_array (void);
-
-void
-__initialize_hardware_early (void);
-
-void
-__initialize_hardware (void);
+os_initialize_hardware (void);
 
 // ----------------------------------------------------------------------------
 
-inline void __attribute__((always_inline))
-__initialize_data (unsigned int* from, unsigned int* region_begin,
-                   unsigned int* region_end)
+inline __attribute__((always_inline))
+void
+os_initialize_data (unsigned int* from, unsigned int* region_begin,
+                    unsigned int* region_end)
 {
   // Iterate and copy word by word.
   // It is assumed that the pointers are word aligned.
   unsigned int *p = region_begin;
   while (p < region_end)
-    *p++ = *from++;
+    {
+      *p++ = *from++;
+    }
 }
 
-inline void __attribute__((always_inline))
-__initialize_bss (unsigned int* region_begin, unsigned int* region_end)
+inline __attribute__((always_inline))
+void
+os_initialize_bss (unsigned int* region_begin, unsigned int* region_end)
 {
   // Iterate and clear word by word.
   // It is assumed that the pointers are word aligned.
   unsigned int *p = region_begin;
   while (p < region_end)
-    *p++ = 0;
+    {
+      *p++ = 0;
+    }
 }
 
 // These magic symbols are provided by the linker.
@@ -159,15 +166,18 @@ extern void
 (*__fini_array_end[]) (void) __attribute__((weak));
 
 // Iterate over all the preinit/init routines (mainly static constructors).
-inline void __attribute__((always_inline))
-__run_init_array (void)
+inline __attribute__((always_inline))
+void
+os_run_init_array (void)
 {
   int count;
   int i;
 
   count = __preinit_array_end - __preinit_array_start;
   for (i = 0; i < count; i++)
-    __preinit_array_start[i] ();
+    {
+      __preinit_array_start[i] ();
+    }
 
   // If you need to run the code in the .init section, please use
   // the startup files, since this requires the code in crti.o and crtn.o
@@ -176,19 +186,23 @@ __run_init_array (void)
 
   count = __init_array_end - __init_array_start;
   for (i = 0; i < count; i++)
-    __init_array_start[i] ();
+    {
+      __init_array_start[i] ();
+    }
 }
 
 // Run all the cleanup routines (mainly static destructors).
 void
-__run_fini_array (void)
+os_run_fini_array (void)
 {
   int count;
   int i;
 
   count = __fini_array_end - __fini_array_start;
   for (i = count; i > 0; i--)
-    __fini_array_start[i - 1] ();
+    {
+      __fini_array_start[i - 1] ();
+    }
 
   // If you need to run the code in the .fini section, please use
   // the startup files, since this requires the code in crti.o and crtn.o
@@ -223,10 +237,11 @@ __data_end_guard = DATA_END_GUARD_VALUE;
 // This is the place where Cortex-M core will go immediately after reset,
 // via a call or jump from the Reset_Handler.
 //
-// For the call to work, and for the call to __initialize_hardware_early()
+// For the call to work, and for the call to os_initialize_hardware_early()
 // to work, the reset stack must point to a valid internal RAM area.
 
-void __attribute__ ((section(".after_vectors"),noreturn,weak))
+void
+__attribute__ ((section(".after_vectors"),noreturn,weak))
 _start (void)
 {
 
@@ -239,7 +254,7 @@ _start (void)
   // Also useful on platform with external RAM, that need to be
   // initialised before filling the BSS section.
 
-  __initialize_hardware_early ();
+  os_initialize_hardware_early ();
 
   // Use Old Style DATA and BSS section initialisation,
   // that will manage a single BSS sections.
@@ -251,7 +266,7 @@ _start (void)
 
 #if !defined(OS_INCLUDE_STARTUP_INIT_MULTIPLE_RAM_SECTIONS)
   // Copy the DATA segment from Flash to RAM (inlined).
-  __initialize_data (&_sidata, &_sdata, &_edata);
+  os_initialize_data (&_sidata, &_sdata, &_edata);
 #else
 
   // Copy the data sections from flash to SRAM.
@@ -262,7 +277,7 @@ _start (void)
       unsigned int* region_begin = (unsigned int *) (*p++);
       unsigned int* region_end = (unsigned int *) (*p++);
 
-      __initialize_data (from, region_begin, region_end);
+      os_initialize_data (from, region_begin, region_end);
     }
 
 #endif
@@ -271,8 +286,8 @@ _start (void)
   if ((__data_begin_guard != DATA_BEGIN_GUARD_VALUE)
       || (__data_end_guard != DATA_END_GUARD_VALUE))
     {
-      for (;;)
-      ;
+      while (1)
+        ;
     }
 #endif
 
@@ -283,7 +298,7 @@ _start (void)
 
 #if !defined(OS_INCLUDE_STARTUP_INIT_MULTIPLE_RAM_SECTIONS)
   // Zero fill the BSS section (inlined).
-  __initialize_bss (&__bss_start__, &__bss_end__);
+  os_initialize_bss (&__bss_start__, &__bss_end__);
 #else
 
   // Zero fill all bss segments
@@ -292,34 +307,34 @@ _start (void)
     {
       unsigned int* region_begin = (unsigned int*) (*p++);
       unsigned int* region_end = (unsigned int*) (*p++);
-      __initialize_bss (region_begin, region_end);
+      os_initialize_bss (region_begin, region_end);
     }
 #endif
 
 #if defined(DEBUG) && (OS_INCLUDE_STARTUP_GUARD_CHECKS)
   if ((__bss_begin_guard != 0) || (__bss_end_guard != 0))
     {
-      for (;;)
-      ;
+      while (1)
+        ;
     }
 #endif
 
   // Hook to continue the initialisations. Usually compute and store the
   // clock frequency in the global CMSIS variable, cleared above.
-  __initialize_hardware ();
+  os_initialize_hardware ();
 
   // Initialise the trace output device. From this moment on,
   // trace_printf() calls are available (including in static constructors).
-  __initialize_trace ();
+  os_initialize_trace ();
 
   // Get the argc/argv (useful in semihosting configurations).
   int argc;
   char** argv;
-  __initialize_args (&argc, &argv);
+  os_initialize_args (&argc, &argv);
 
   // Call the standard library initialisation (mandatory for C++ to
   // execute the constructors for the static objects).
-  __run_init_array ();
+  os_run_init_array ();
 
   // Call the main entry point, and save the exit code.
   int code = main (argc, argv);
@@ -333,7 +348,7 @@ _start (void)
 
 #if !defined(OS_USE_SEMIHOSTING)
 
-// Semihosting uses a more elaborate version of __initialize_args()
+// Semihosting uses a more elaborate version of os_initialize_args()
 // to parse args received from host.
 
 // `initialise_monitor_handles()` is a newlib libgloss function used to prepare
@@ -355,7 +370,7 @@ initialise_monitor_handles (void);
 // You can redefine it to fetch some args from a non-volatile memory.
 
 void __attribute__((weak))
-__initialize_args (int* p_argc, char*** p_argv)
+os_initialize_args (int* p_argc, char*** p_argv)
   {
     // By the time we reach this, the data and bss should have been initialised.
 

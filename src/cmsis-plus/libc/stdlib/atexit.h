@@ -48,4 +48,4 @@ extern int
 __register_exitproc (int, exit_func_t fn, void*, void*);
 
 extern void
-__run_fini_array (void);
+os_run_fini_array (void);
