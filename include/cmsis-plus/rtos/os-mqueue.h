@@ -480,6 +480,183 @@ namespace os
        */
     };
 
+    // ========================================================================
+
+    template<typename T>
+      class TMessage_queue : public Message_queue
+      {
+      public:
+
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
+
+        /**
+         * @brief Create a typed message queue with default settings.
+         * @param [in] msgs The number of messages.
+         */
+        TMessage_queue (mqueue::size_t msgs);
+
+        /**
+         * @brief Create a typed message queue with custom settings.
+         * @param [in] attr Reference to attributes.
+         * @param [in] msgs The number of messages.
+         * @param [in] msg_size_bytes The message size, in bytes.
+         */
+        TMessage_queue (const mqueue::Attributes&attr, mqueue::size_t msgs);
+
+        /**
+         * @cond ignore
+         */
+        TMessage_queue (const TMessage_queue&) = delete;
+        TMessage_queue (TMessage_queue&&) = delete;
+        TMessage_queue&
+        operator= (const TMessage_queue&) = delete;
+        TMessage_queue&
+        operator= (TMessage_queue&&) = delete;
+        /**
+         * @endcond
+         */
+
+        /**
+         * @brief Destroy the typed message queue.
+         */
+        ~TMessage_queue ();
+
+        /**
+         * @}
+         */
+
+      public:
+
+        /**
+         * @name Public Member Functions
+         * @{
+         */
+
+        /**
+         * @brief Send a typed message to the queue.
+         * @param [in] msg The address of the message to enqueue.
+         * @param [in] mprio The message priority. The default is 0.
+         * @retval result::ok The message was enqueued.
+         * @retval EINVAL A parameter is invalid or outside of a permitted range.
+         * @retval EMSGSIZE The specified message length, nbytes,
+         *  exceeds the message size attribute of the message queue.
+         * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+         * @retval ENOTRECOVERABLE The message could not be enqueue
+         *  (extension to POSIX).
+         * @retval EINTR The operation was interrupted.
+         */
+        result_t
+        send (const T* msg,
+              mqueue::priority_t mprio = mqueue::default_priority);
+
+        /**
+         * @brief Try to send a typed message to the queue.
+         * @param [in] msg The address of the message to enqueue.
+         *  higher than the value used when creating the queue.
+         * @param [in] mprio The message priority. The default is 0.
+         * @retval result::ok The message was enqueued.
+         * @retval EWOULDBLOCK The specified message queue is full.
+         * @retval EINVAL A parameter is invalid or outside of a permitted range.
+         * @retval EMSGSIZE The specified message length, nbytes,
+         *  exceeds the message size attribute of the message queue.
+         * @retval ENOTRECOVERABLE The message could not be enqueue
+         *  (extension to POSIX).
+         */
+        result_t
+        try_send (const T* msg, mqueue::priority_t mprio =
+                      mqueue::default_priority);
+
+        /**
+         * @brief Send a typed message to the queue with timeout.
+         * @param [in] msg The address of the message to enqueue.
+         * @param [in] timeout The timeout duration.
+         * @param [in] mprio The message priority. The default is 0.
+         * @retval result::ok The message was enqueued.
+         * @retval EINVAL A parameter is invalid or outside of a permitted range.
+         * @retval EMSGSIZE The specified message length, nbytes,
+         *  exceeds the message size attribute of the message queue.
+         * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+         * @retval ETIMEDOUT The timeout expired before the message
+         *  could be added to the queue.
+         * @retval ENOTRECOVERABLE The message could not be enqueue
+         *  (extension to POSIX).
+         * @retval EINTR The operation was interrupted.
+         */
+        result_t
+        timed_send (const T* msg, clock::duration_t timeout,
+                    mqueue::priority_t mprio = mqueue::default_priority);
+
+        /**
+         * @brief Receive a typed message from the queue.
+         * @param [out] msg The address where to store the dequeued message.
+         * @param [out] mprio The address where to store the message
+         *  priority. The default is `nullptr`.
+         * @retval result::ok The message was received.
+         * @retval EINVAL A parameter is invalid or outside of a permitted range.
+         * @retval EMSGSIZE The specified message length, nbytes, is
+         *  greater than the message size attribute of the message queue.
+         * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+         * @retval ENOTRECOVERABLE The message could not be dequeued
+         *  (extension to POSIX).
+         * @retval EBADMSG The implementation has detected a data corruption
+         *  problem with the message.
+         * @retval EINTR The operation was interrupted.
+         */
+        result_t
+        receive (T* msg, mqueue::priority_t* mprio = nullptr);
+
+        /**
+         * @brief Try to receive a typed message from the queue.
+         * @param [out] msg The address where to store the dequeued message.
+         * @param [in] nbytes The size of the destination buffer. Must
+         *  be lower than the value used when creating the queue.
+         * @param [out] mprio The address where to store the message
+         *  priority. The default is `nullptr`.
+         * @retval result::ok The message was received.
+         * @retval EINVAL A parameter is invalid or outside of a permitted range.
+         * @retval EMSGSIZE The specified message length, nbytes, is
+         *  greater than the message size attribute of the message queue.
+         * @retval ENOTRECOVERABLE The message could not be dequeued
+         *  (extension to POSIX).
+         * @retval EBADMSG The implementation has detected a data corruption
+         *  problem with the message.
+         * @retval EWOULDBLOCK The specified message queue is empty.
+         */
+        result_t
+        try_receive (T* msg, mqueue::priority_t* mprio = nullptr);
+
+        /**
+         * @brief Receive a typed message from the queue with timeout.
+         * @param [out] msg The address where to store the dequeued message.
+         * @param [in] timeout The timeout duration.
+         * @param [out] mprio The address where to store the message
+         *  priority. The default is `nullptr`.
+         * @retval result::ok The message was received.
+         * @retval EINVAL A parameter is invalid or outside of a permitted range.
+         * @retval EMSGSIZE The specified message length, nbytes, is
+         *  greater than the message size attribute of the message queue.
+         * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+         * @retval ENOTRECOVERABLE The message could not be dequeued
+         *  (extension to POSIX).
+         * @retval EBADMSG The implementation has detected a data corruption
+         *  problem with the message.
+         * @retval EINTR The operation was interrupted.
+         * @retval ETIMEDOUT No message arrived on the queue before the
+         *  specified timeout expired.
+         */
+        result_t
+        timed_receive (T* msg, clock::duration_t timeout,
+                       mqueue::priority_t* mprio = nullptr);
+
+        /**
+         * @}
+         */
+
+      };
+
 #pragma GCC diagnostic pop
 
   } /* namespace rtos */
@@ -575,6 +752,90 @@ namespace os
     {
       return (length () == capacity ());
     }
+
+    // ========================================================================
+
+    template<typename T>
+      inline __attribute__((always_inline))
+      TMessage_queue<T>::TMessage_queue (mqueue::size_t msgs) :
+          Message_queue (msgs, sizeof(T))
+      {
+        ;
+      }
+
+    template<typename T>
+      inline
+      __attribute__((always_inline))
+      TMessage_queue<T>::TMessage_queue (const mqueue::Attributes&attr,
+                                         mqueue::size_t msgs) :
+          Message_queue (attr, msgs, sizeof(T))
+      {
+        ;
+      }
+
+    template<typename T>
+      inline
+      __attribute__((always_inline))
+      TMessage_queue<T>::~TMessage_queue ()
+      {
+        ;
+      }
+
+    template<typename T>
+      inline result_t
+      __attribute__((always_inline))
+      TMessage_queue<T>::send (const T* msg, mqueue::priority_t mprio)
+      {
+        return Message_queue::send (reinterpret_cast<const char*> (msg),
+                                    sizeof(T), mprio);
+      }
+
+    template<typename T>
+      inline result_t
+      __attribute__((always_inline))
+      TMessage_queue<T>::try_send (const T* msg, mqueue::priority_t mprio)
+      {
+        return Message_queue::try_send (reinterpret_cast<const char*> (msg),
+                                        sizeof(T), mprio);
+      }
+
+    template<typename T>
+      inline result_t
+      __attribute__((always_inline))
+      TMessage_queue<T>::timed_send (const T* msg, clock::duration_t timeout,
+                                     mqueue::priority_t mprio)
+      {
+        return Message_queue::timed_send (reinterpret_cast<const char*> (msg),
+                                          sizeof(T), timeout, mprio);
+      }
+
+    template<typename T>
+      inline result_t
+      __attribute__((always_inline))
+      TMessage_queue<T>::receive (T* msg, mqueue::priority_t* mprio)
+      {
+        return Message_queue::receive (reinterpret_cast<char*> (msg), sizeof(T),
+                                       mprio);
+      }
+
+    template<typename T>
+      inline result_t
+      __attribute__((always_inline))
+      TMessage_queue<T>::try_receive (T* msg, mqueue::priority_t* mprio)
+      {
+        return Message_queue::try_receive (reinterpret_cast<char*> (msg),
+                                           sizeof(T), mprio);
+      }
+
+    template<typename T>
+      inline result_t
+      __attribute__((always_inline))
+      TMessage_queue<T>::timed_receive (T* msg, clock::duration_t timeout,
+                                        mqueue::priority_t* mprio)
+      {
+        return Message_queue::timed_receive (reinterpret_cast<char*> (msg),
+                                             sizeof(T), timeout, mprio);
+      }
 
   } /* namespace rtos */
 } /* namespace os */
