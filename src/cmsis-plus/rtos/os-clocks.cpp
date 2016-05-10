@@ -34,6 +34,7 @@
 #include <cmsis-plus/diag/trace.h>
 
 using namespace os;
+using namespace os::rtos;
 
 // ----------------------------------------------------------------------------
 
@@ -42,15 +43,18 @@ os_systick_handler (void)
 {
   using namespace os::rtos;
 
+#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
   // Prevent scheduler actions before starting it.
   if (scheduler::started ())
     {
-      os_port_systick_handler ();
+      port::Systick_clock::_interrupt_service_routine();
     }
+#endif
+
 #if defined(OS_TRACE_RTOS_SYSTICK_TICK)
   trace::putchar ('.');
 #endif
-  os::rtos::systick_clock._interrupt_service_routine ();
+  systick_clock._interrupt_service_routine ();
 #if defined(OS_TRACE_RTOS_SYSTICK_TICK)
   trace::putchar (',');
 #endif
@@ -59,29 +63,19 @@ os_systick_handler (void)
 void
 os_rtc_handler (void)
 {
-  using namespace os::rtos;
 
+#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
   // Prevent scheduler actions before starting it.
   if (scheduler::started ())
     {
-      os_port_rtc_handler ();
+      port::Realtime_clock::_interrupt_service_routine();
     }
+#endif
+
 #if defined(OS_TRACE_RTOS_RTC_TICK)
   trace::putchar ('!');
 #endif
-  os::rtos::realtime_clock._interrupt_service_routine ();
-}
-
-void __attribute__((weak))
-os_port_systick_handler (void)
-{
-  // TODO
-}
-
-void __attribute__((weak))
-os_port_rtc_handler (void)
-{
-  // TODO
+  realtime_clock._interrupt_service_routine ();
 }
 
 // ----------------------------------------------------------------------------

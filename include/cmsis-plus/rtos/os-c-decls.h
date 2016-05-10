@@ -147,7 +147,7 @@ extern "C"
   {
     void* stack_addr;
     size_t stack_size_bytes;
-#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
     os_port_thread_context_t port;
 #endif
   } os_thread_context_t;
@@ -163,14 +163,14 @@ extern "C"
   typedef struct
   {
     const char* name;
-#if !defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
     os_waiting_thread_node_t ready_node;
 #endif
     int errno_; // Prevent the macro to expand (for example with a prefix).
     os_thread_func_t func;
     os_thread_func_args_t func_args;
     void* func_result_;
-#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
     os_thread_port_data_t port;
 #endif
     void* parent;
@@ -515,15 +515,6 @@ extern "C"
   os_systick_handler (void);
 
   /**
-   * @brief SysTick implementation hook.
-   * @details
-   * It is called from `os_systick_handler()` after the
-   * scheduler was started.
-   */
-  void
-  os_port_systick_handler (void);
-
-  /**
    * @brief RTC interrupt handler.
    * @details
    * Must be called from the physical RTC interrupt handler.
@@ -531,11 +522,6 @@ extern "C"
   void
   os_rtc_handler (void);
 
-  /**
-   * @brief RTC implementation hook.
-   */
-  void
-  os_port_rtc_handler (void);
 
 // ----------------------------------------------------------------------------
 

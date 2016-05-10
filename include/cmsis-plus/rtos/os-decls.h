@@ -1204,7 +1204,7 @@ namespace os
 
         Thread () = delete;
 
-#if defined(OS_INCLUDE_RTOS_PORT_THREAD)
+#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
         static void
         create (rtos::Thread* obj);
@@ -1245,6 +1245,33 @@ namespace os
 
         static result_t
         wait_for (rtos::clock::duration_t ticks);
+
+        /**
+         * @brief SysTick implementation hook.
+         * @details
+         * It is called from `os_systick_handler()` after the
+         * scheduler was started.
+         */
+        static void
+        _interrupt_service_routine (void);
+
+      };
+
+      class Realtime_clock
+      {
+      public:
+
+        Realtime_clock () = delete;
+
+        /**
+         * @brief RTC implementation hook.
+         * @details
+         * It is called from `os_systick_handler()` after the
+         * scheduler was started.
+         */
+        static void
+        _interrupt_service_routine (void);
+
       };
 
     } /* namespace port */
