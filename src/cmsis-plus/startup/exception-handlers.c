@@ -120,8 +120,8 @@ NMI_Handler (void)
 // (See Joseph Yiu's book).
 
 void
-dump_exception_stack (ExceptionStackFrame* frame, uint32_t cfsr, uint32_t mmfar,
-                      uint32_t bfar, uint32_t lr)
+dump_exception_stack (exception_stack_frame_t* frame, uint32_t cfsr,
+                      uint32_t mmfar, uint32_t bfar, uint32_t lr)
 {
   trace_printf ("Stack frame:\n");
   trace_printf (" R0   = %08X\n", frame->r0);
@@ -155,7 +155,7 @@ dump_exception_stack (ExceptionStackFrame* frame, uint32_t cfsr, uint32_t mmfar,
 #if defined(__ARM_ARCH_6M__)
 
 void
-dump_exception_stack (ExceptionStackFrame* frame, uint32_t lr)
+dump_exception_stack (exception_stack_frame_t* frame, uint32_t lr)
   {
     trace_printf ("Stack frame:\n");
     trace_printf (" R0  = %08X\n", frame->r0);
@@ -178,10 +178,12 @@ dump_exception_stack (ExceptionStackFrame* frame, uint32_t lr)
 
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
 
-#if defined(OS_USE_SEMIHOSTING) || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT) || defined(OS_USE_TRACE_SEMIHOSTING_DEBUG)
+#if defined(OS_USE_SEMIHOSTING) \
+  || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT) \
+  || defined(OS_USE_TRACE_SEMIHOSTING_DEBUG)
 
 int
-is_semihosting (ExceptionStackFrame* frame, uint16_t opCode);
+is_semihosting (exception_stack_frame_t* frame, uint16_t opCode);
 
 /**
  * This function provides the minimum functionality to make a semihosting program execute even without the debugger present.
@@ -190,13 +192,15 @@ is_semihosting (ExceptionStackFrame* frame, uint16_t opCode);
  * @return 1 if the instruction was a valid semihosting call; 0 otherwise.
  */
 int
-is_semihosting (ExceptionStackFrame* frame, uint16_t opCode)
+is_semihosting (exception_stack_frame_t* frame, uint16_t opCode)
 {
   uint16_t* pw = (uint16_t*) frame->pc;
   if (*pw == opCode)
     {
       uint32_t r0 = frame->r0;
-#if defined(OS_DEBUG_SEMIHOSTING_FAULTS) || defined(OS_USE_SEMIHOSTING) || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT)
+#if defined(OS_DEBUG_SEMIHOSTING_FAULTS) \
+  || defined(OS_USE_SEMIHOSTING) \
+  || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT)
       uint32_t r1 = frame->r1;
 #endif
 #if defined(OS_USE_SEMIHOSTING) || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT)
@@ -223,15 +227,18 @@ is_semihosting (ExceptionStackFrame* frame, uint16_t opCode)
         case SEMIHOSTING_SYS_TICKFREQ:
         case SEMIHOSTING_SYS_TMPNAM:
         case SEMIHOSTING_SYS_ISTTY:
-          frame->r0 = (uint32_t) -1; // the call is not successful or not supported
+          // The call is not successful or not supported.
+          frame->r0 = (uint32_t) -1;
           break;
 
         case SEMIHOSTING_SYS_CLOSE:
-          frame->r0 = 0; // call is successful
+          // The call is successful.
+          frame->r0 = 0;
           break;
 
         case SEMIHOSTING_SYS_ERRNO:
-          frame->r0 = 0; // the value of the C library errno variable.
+          // Should be the value of the C library errno variable.
+          frame->r0 = 0;
           break;
 
         case SEMIHOSTING_SYS_HEAPINFO:
@@ -242,7 +249,8 @@ is_semihosting (ExceptionStackFrame* frame, uint16_t opCode)
           break;
 
         case SEMIHOSTING_SYS_ISERROR:
-          frame->r0 = 0; // 0 if the status word is not an error indication
+          // 0 if the status word is not an error indication.
+          frame->r0 = 0;
           break;
 
         case SEMIHOSTING_SYS_READ:
@@ -252,11 +260,13 @@ is_semihosting (ExceptionStackFrame* frame, uint16_t opCode)
           break;
 
         case SEMIHOSTING_SYS_READC:
-          frame->r0 = '\0';            // the byte read from the console.
+          // The byte read from the console.
+          frame->r0 = '\0';
           break;
 
         case SEMIHOSTING_SYS_TIME:
-          frame->r0 = 0;   // the number of seconds since 00:00 January 1, 1970.
+          // The number of seconds since 00:00 January 1, 1970.
+          frame->r0 = 0;
           break;
 
         case SEMIHOSTING_ReportException:
@@ -293,7 +303,8 @@ is_semihosting (ExceptionStackFrame* frame, uint16_t opCode)
                   break;
                 }
             }
-          frame->r0 = (uint32_t) -1; // the call is not successful or not supported
+          // The call is not successful or not supported.
+          frame->r0 = (uint32_t) -1;
           break;
 
         case SEMIHOSTING_SYS_WRITE:
@@ -317,7 +328,9 @@ is_semihosting (ExceptionStackFrame* frame, uint16_t opCode)
 
 #endif // defined(OS_USE_SEMIHOSTING) || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT)
 
-#if defined(OS_USE_SEMIHOSTING) || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT) || defined(OS_USE_TRACE_SEMIHOSTING_DEBUG)
+#if defined(OS_USE_SEMIHOSTING) \
+  || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT) \
+  || defined(OS_USE_TRACE_SEMIHOSTING_DEBUG)
 
         case SEMIHOSTING_SYS_WRITEC:
 #if defined(OS_DEBUG_SEMIHOSTING_FAULTS)
@@ -356,8 +369,8 @@ is_semihosting (ExceptionStackFrame* frame, uint16_t opCode)
 #endif
 
 // Hard Fault handler wrapper in assembly.
-// It extracts the location of stack frame and passes it to handler
-// in C as a pointer. We also pass the LR value as second
+// Extract the location of the stack frame and pass it to the C
+// handler as a pointer. Also pass the LR value as second
 // parameter.
 // (Based on Joseph Yiu's, The Definitive Guide to ARM Cortex-M3 and
 // Cortex-M4 Processors, Third Edition, Chap. 12.8, page 402).
@@ -381,7 +394,7 @@ HardFault_Handler (void)
 }
 
 void __attribute__ ((section(".after_vectors"),weak,used))
-HardFault_Handler_C (ExceptionStackFrame* frame __attribute__((unused)),
+HardFault_Handler_C (exception_stack_frame_t* frame __attribute__((unused)),
                      uint32_t lr __attribute__((unused)))
 {
 #if defined(TRACE)
@@ -390,7 +403,9 @@ HardFault_Handler_C (ExceptionStackFrame* frame __attribute__((unused)),
   uint32_t cfsr = SCB->CFSR; // Configurable Fault Status Registers
 #endif
 
-#if defined(OS_USE_SEMIHOSTING) || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT) || defined(OS_USE_TRACE_SEMIHOSTING_DEBUG)
+#if defined(OS_USE_SEMIHOSTING) \
+  || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT) \
+  || defined(OS_USE_TRACE_SEMIHOSTING_DEBUG)
 
   // If the BKPT instruction is executed with C_DEBUGEN == 0 and MON_EN == 0,
   // it will cause the processor to enter a HardFault exception, with DEBUGEVT
@@ -460,7 +475,7 @@ HardFault_Handler (void)
   }
 
 void __attribute__ ((section(".after_vectors"),weak,used))
-HardFault_Handler_C (ExceptionStackFrame* frame __attribute__((unused)),
+HardFault_Handler_C (exception_stack_frame_t* frame __attribute__((unused)),
     uint32_t lr __attribute__((unused)))
   {
     // There is no semihosting support for Cortex-M0, since on ARMv6-M
@@ -513,7 +528,7 @@ BusFault_Handler (void)
 }
 
 void __attribute__ ((section(".after_vectors"),weak,used))
-BusFault_Handler_C (ExceptionStackFrame* frame __attribute__((unused)),
+BusFault_Handler_C (exception_stack_frame_t* frame __attribute__((unused)),
                     uint32_t lr __attribute__((unused)))
 {
 #if defined(TRACE)
@@ -552,7 +567,7 @@ UsageFault_Handler (void)
 }
 
 void __attribute__ ((section(".after_vectors"),weak,used))
-UsageFault_Handler_C (ExceptionStackFrame* frame __attribute__((unused)),
+UsageFault_Handler_C (exception_stack_frame_t* frame __attribute__((unused)),
                       uint32_t lr __attribute__((unused)))
 {
 #if defined(TRACE)

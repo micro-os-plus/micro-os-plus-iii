@@ -76,7 +76,7 @@ extern "C"
   SysTick_Handler (void);
 
   // Exception Stack Frame for the Cortex-M3 and Cortex-M4 processor.
-  typedef struct
+  typedef struct exception_stack_frame_s
   {
     uint32_t r0;
     uint32_t r1;
@@ -89,30 +89,30 @@ extern "C"
 #if  defined(__ARM_ARCH_7EM__)
     uint32_t s[16];
 #endif
-  } ExceptionStackFrame;
+  } exception_stack_frame_t;
 
 #if defined(TRACE)
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
   void
-  dump_exception_stack (ExceptionStackFrame* frame, uint32_t cfsr, uint32_t mmfar,
-      uint32_t bfar, uint32_t lr);
+  dump_exception_stack (exception_stack_frame_t* frame, uint32_t cfsr,
+                        uint32_t mmfar, uint32_t bfar, uint32_t lr);
 #endif // defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
 #if defined(__ARM_ARCH_6M__)
   void
-  dump_exception_stack (ExceptionStackFrame* frame, uint32_t lr);
+  dump_exception_stack (exception_stack_frame_t* frame, uint32_t lr);
 #endif // defined(__ARM_ARCH_6M__)
 #endif // defined(TRACE)
 
   void
-  HardFault_Handler_C (ExceptionStackFrame* frame, uint32_t lr);
+  HardFault_Handler_C (exception_stack_frame_t* frame, uint32_t lr);
 
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
 
   void
-  UsageFault_Handler_C (ExceptionStackFrame* frame, uint32_t lr);
+  UsageFault_Handler_C (exception_stack_frame_t* frame, uint32_t lr);
 
   void
-  BusFault_Handler_C (ExceptionStackFrame* frame, uint32_t lr);
+  BusFault_Handler_C (exception_stack_frame_t* frame, uint32_t lr);
 
 #endif // defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
 
