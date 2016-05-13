@@ -433,6 +433,7 @@ extern "C"
     os_clock_t* clock;
     void* queue_addr;
     size_t queue_size_bytes;
+    void* allocator;
   } os_mqueue_attr_t;
 
   typedef struct os_mqueue_s
@@ -450,12 +451,14 @@ extern "C"
 
     void* queue_addr;
     void* allocated_queue_addr;
+    void* allocator;
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
     os_mqueue_port_data_t port;
 #endif
 
     size_t queue_size_bytes;
+    size_t allocated_queue_size_elements;
 
     os_mqueue_msg_size_t msg_size_bytes;
     os_mqueue_size_t msgs;
