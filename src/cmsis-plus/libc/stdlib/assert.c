@@ -28,6 +28,9 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <unistd.h>
+#include <string.h>
+#include <stdio.h>
 
 #include <cmsis-plus/diag/trace.h>
 
@@ -40,6 +43,8 @@ __assert_func (const char* file, int line, const char* func,
 {
   // Not atomic, but otherwise the entire string might get too long,
   // and temporary buffer used by trace_printf() will overflow.
+#if defined(TRACE)
+
   trace_printf ("assertion \"%s\" failed\n", failedexpr);
   trace_printf ("file: \"%s\"\n", file);
   trace_printf ("line: %d\n", line);
@@ -47,6 +52,17 @@ __assert_func (const char* file, int line, const char* func,
     {
       trace_printf ("function: %s\n", func);
     }
+
+#elif defined(OS_USE_SEMIHOSTING)
+
+  printf ("assertion \"%s\" failed\n", failedexpr);
+  printf ("file: \"%s\"\n", file);
+  printf ("line: %d\n", line);
+  if (func != NULL)
+    {
+      printf ("function: %s\n", func);
+    }
+#endif
 
   abort ();
   /* NOTREACHED */
@@ -73,7 +89,16 @@ void
 __attribute__((noreturn))
 assert_failed (uint8_t* file, uint32_t line)
 {
+#if defined(TRACE)
+
   trace_printf ("assert_param() failed: file \"%s\", line %d\n", file, line);
+
+#elif defined(OS_USE_SEMIHOSTING)
+
+  printf ("assert_param() failed: file \"%s\", line %d\n", file, (int)line);
+
+#endif
+
   abort ();
   /* NOTREACHED */
 }
