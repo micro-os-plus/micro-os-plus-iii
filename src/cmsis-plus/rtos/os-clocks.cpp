@@ -73,7 +73,7 @@ os_rtc_handler (void)
 #endif
 
 #if defined(OS_TRACE_RTOS_RTC_TICK)
-  trace::putchar ('!');
+  trace_putchar ('!');
 #endif
   realtime_clock._interrupt_service_routine ();
 }
