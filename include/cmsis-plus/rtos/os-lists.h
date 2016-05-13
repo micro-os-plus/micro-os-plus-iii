@@ -784,7 +784,7 @@ namespace os
 
       /**
        * @brief Add a new thread node to the list.
-       * @param [in] node Reference to a list node.
+       * @param [in] thread Reference to a list node.
        * @return Nothing.
        */
       void
