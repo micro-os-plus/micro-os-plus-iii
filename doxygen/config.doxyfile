@@ -63,19 +63,19 @@ INPUT = \
 	"../include/cmsis-plus/iso/thread" \
 
 ## test
-_INPUT = \
-	"pages" \
-	"../include/cmsis-plus/rtos/os.h" \
-	"../src/cmsis-plus/rtos/" \
+## _INPUT = \
+##	"pages" \
+##	"../include/cmsis-plus/rtos/os.h" \
+##	"../src/cmsis-plus/rtos/" \
 	
 
 ## FILE_PATTERNS = 
 FILE_PATTERNS = *.doxygen *.markdown *.h *.c *.cpp *.
-X=	chrono \
-	condition_variable \
-	mutex \
-	system_error \
-	thread \
+## X=	chrono \
+##	condition_variable \
+##	mutex \
+##	system_error \
+##	thread \
 	
 ## EXTENSION_MAPPING =
 EXTENSION_MAPPING = "no_extension=C++"
