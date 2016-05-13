@@ -372,13 +372,20 @@ namespace os
 
     /**
      * @details
-     * Allocate a fixed size memory block from the memory pool. If there
-     * are no free blocks, the current task is added to the
-     * waiting list and will wait until one block is freed.
+     * The `Memory_pool::alloc()` function shall allocate a
+     * fixed size memory block from the memory pool.
      *
-     * The function uses a critical section to protect simultaneous
-     * access from
-     * other threads or interrupts.
+     * If the memory pool is empty, `alloc()` shall block
+     * until a block is freed or until
+     * `alloc()` is cancelled/interrupted. If more than one thread
+     * is waiting to allocate a block, when a block is freed
+     * and the Priority Scheduling option is supported,
+     * then the thread of highest priority that has been waiting the
+     * longest shall be selected to allocate the block. Otherwise,
+     * it is unspecified which waiting thread allocates the block.
+     *
+     * This function uses a critical section to protect against simultaneous
+     * access from other threads or interrupts.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -442,7 +449,6 @@ namespace os
         }
 
       /* NOTREACHED */
-      return nullptr;
     }
 
     /**
@@ -451,8 +457,14 @@ namespace os
      * the memory pool, if available, return it, otherwise return
      * `nullptr`.
      *
-     * It uses a critical section to protect simultaneous access from
-     * other threads or interrupts.
+     * The `Memory_pool::timed_alloc()` function shall try to allocate a
+     * fixed size memory block from the memory pool.
+     *
+     * If the memory pool is empty, `timed_alloc()` shall
+     * immediately return 'nullptr'.
+     *
+     * This function uses a critical section to protect against simultaneous
+     * access from other threads or interrupts.
      *
      * @note Can be invoked from Interrupt Service Routines.
      */
@@ -470,13 +482,42 @@ namespace os
 
     /**
      * @details
-     * Allocate a fixed size memory block from the memory pool. If there
-     * are no free blocks, the current task is added to the
-     * waiting list and will wait until one block is freed or the
-     * timeout expired.
      *
-     * It uses a critical section to protect simultaneous access from
-     * other threads or interrupts.
+     * The `Memory_pool::timed_alloc()` function shall allocate a
+     * fixed size memory block from the memory pool.
+     *
+     * If the memory pool is empty, `timed_alloc()` shall block
+     * until a block is freed or until
+     * `timed_alloc()` is cancelled/interrupted. If more than one thread
+     * is waiting to allocate a block, when a block is freed
+     * and the Priority Scheduling option is supported,
+     * then the thread of highest priority that has been waiting the
+     * longest shall be selected to allocate the block. Otherwise,
+     * it is unspecified which waiting thread allocates the block.
+     *
+     * The `timed_alloc()` function shall allocate any of the
+     * available blocks, regardless of their age and the order they
+     * were freed. However, if no blocks are available, the wait for
+     * such a block shall
+     * be terminated when the specified timeout expires.
+     *
+     * The timeout shall expire after the number of time units (that
+     * is when the value of that clock equals or exceeds (now()+duration).
+     * The resolution of the timeout shall be the resolution of the
+     * clock on which it is based.
+     *
+     * Under no circumstance shall the operation fail with a timeout
+     * if a block can be allocated from the memory pool immediately.
+     * The validity of
+     * the timeout need not be checked if the block can be
+     * allocated immediately.
+     *
+     * The clock used for timeouts can be specified via the `clock`
+     * attribute. By default, the clock derived from the scheduler
+     * timer is used, and the durations are expressed in ticks.
+     *
+     * This function uses a critical section to protect against simultaneous
+     * access from other threads or interrupts.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -554,7 +595,6 @@ namespace os
         }
 
       /* NOTREACHED */
-      return nullptr;
     }
 
     /**
