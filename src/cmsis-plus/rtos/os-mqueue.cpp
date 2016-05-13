@@ -97,13 +97,25 @@ namespace os
     // ------------------------------------------------------------------------
 
     /**
-     * @class Message_queue
+     * @class Message_queue_allocated
      * @details
      * POSIX message queues allow threads to exchange data in the form of
      * messages. Messages are transferred to and from a queue using
      * send() and receive(). Each message has an associated priority,
      * and messages are always delivered to the receiving process
      * highest priority first.
+     *
+     * Usually the storage for the message queue is allocated dynamically,
+     * using a standard C++11 allocator. By default, this is the
+     * `std::allocator()`, which uses `::%new()` and `::%delete()`,
+     * both protected for multi-threaded usage.
+     *
+     * For special cases, the storage can be allocated outside the
+     * class and specified via the `mq_queue_address` and
+     * `mq_queue_size_bytes` attributes.
+     *
+     * A representative instance of this template is `Message_queue`,
+     * which is also used in the C API.
      *
      * @par Example
      *
@@ -116,6 +128,7 @@ namespace os
      * // Define the queue size.
      * constexpr uint32_t queue_size = 5;
      *
+     * // The queue storage is allocated dynamically on the heap.
      * Message_queue mq { queue_size, sizeof(msg_t) };
      *
      * void
@@ -125,7 +138,7 @@ namespace os
      *   msg_t msg;
      *   for (; some_condition();)
      *     {
-     *       mq.receive(&msg, sizeof(msg), nullptr);
+     *       mq.receive(&msg, sizeof(msg));
      *       // Process message
      *       if (msg.id == 7)
      *         {
@@ -153,85 +166,151 @@ namespace os
      */
 
     /**
+     * @class Message_queue_typed
      * @details
-     * This constructor shall initialise the message queue object
-     * with the given number of messages and default settings.
-     * The effect shall be equivalent to creating a message queue object
-     * referring to the attributes in `mqueue::initializer`.
-     * Upon successful initialisation, the state of the message queue
-     * object shall become initialised, with no messages in the queue.
+     * If the message is defined as a type (usually an aggregate), it is
+     * possible to automate even further the use of message queues,
+     * by using the `Message_queue_typed` template, which automatically
+     * provides message sizes.
      *
-     * Only the message queue object itself may be used for performing
-     * synchronisation. It is not allowed to make copies of
-     * message queue objects.
+     * @par Example
      *
-     * For default message queue objects, the storage is dynamically allocated.
+     * @code{.cpp}
+     * // Define the message type.
+     * typedef struct {
+     *   uint32_t id;
+     * } msg_t;
      *
-     * @warning Cannot be invoked from Interrupt Service Routines.
+     * // Define the queue size.
+     * constexpr uint32_t queue_size = 5;
+     *
+     * // The queue storage is allocated dynamically on the heap.
+     * Message_queue_typed<msg_t> mq { queue_size };
+     *
+     * void
+     * consumer(void)
+     * {
+     *   // Do something
+     *   msg_t msg;
+     *   for (; some_condition();)
+     *     {
+     *       mq.receive(&msg);
+     *       // Process message
+     *       if (msg.id == 7)
+     *         {
+     *           // Something special
+     *         }
+     *     }
+     *   // Do something else.
+     * }
+     *
+     * void
+     * producer(void)
+     * {
+     *   // Do something
+     *   msg_t msg;
+     *   msg.id = 7;
+     *   mq.send(&msg);
+     *   // Do something else.
+     * }
+     * @endcode
      */
-    Message_queue::Message_queue (mqueue::size_t msgs,
-                                  mqueue::msg_size_t msg_size_bytes) :
-        Message_queue (mqueue::initializer, msgs, msg_size_bytes, nullptr, 0)
-    {
-      ;
-    }
 
+    // ------------------------------------------------------------------------
     /**
+     * @class Message_queue_static
      * @details
-     * This constructor shall initialise the message queue object
-     * with attributes referenced by _attr_.
-     * If the attributes specified by _attr_ are modified later,
-     * the memory pool attributes shall not be affected.
-     * Upon successful initialisation, the state of the
-     * message queue object shall become initialised.
+     * If the queue size is known at compile time and the queue is used
+     * for the entire application life cycle, it might be preferred to allocate
+     * the queue storage statically inside the queue instance.
      *
-     * Only the message queue itself may be used for performing
-     * synchronisation. It is not allowed to make copies of
-     * message queue objects.
+     * For convenience, `Message_queue_static` are also typed, so
+     * the message size is handled automatically.
      *
-     * In cases where default message queue attributes are
-     * appropriate, the variable `mqueue::initializer` can be used to
-     * initialise message queue.
-     * The effect shall be equivalent to creating a message queue
-     * object with the simple constructor.
+     * @par Example
      *
-     * If the attributes define a storage area, it is used, otherwise
-     * it is dynamically allocated.
+     * @code{.cpp}
+     * // Define the message type.
+     * typedef struct {
+     *   uint32_t id;
+     * } msg_t;
      *
-     * @warning Cannot be invoked from Interrupt Service Routines.
+     * // Define the queue size.
+     * constexpr uint32_t queue_size = 5;
+     *
+     * // The queue storage is allocated statically inside this instance.
+     * Message_queue_static<msg_t, queue_size> mq;
+     *
+     * void
+     * consumer(void)
+     * {
+     *   // Do something
+     *   msg_t msg;
+     *   for (; some_condition();)
+     *     {
+     *       mq.receive(&msg);
+     *       // Process message
+     *       if (msg.id == 7)
+     *         {
+     *           // Something special
+     *         }
+     *     }
+     *   // Do something else.
+     * }
+     *
+     * void
+     * producer(void)
+     * {
+     *   // Do something
+     *   msg_t msg;
+     *   msg.id = 7;
+     *   mq.send(&msg);
+     *   // Do something else.
+     * }
+     * @endcode
      */
-    Message_queue::Message_queue (const mqueue::Attributes&attr,
-                                  mqueue::size_t msgs,
-                                  mqueue::msg_size_t msg_size_bytes) :
-        Message_queue (attr, msgs, msg_size_bytes, nullptr, 0)
+
+    // ------------------------------------------------------------------------
+    // Protected internal constructor.
+    Message_queue_base::Message_queue_base ()
     {
-      ;
+#if defined(OS_TRACE_RTOS_MQUEUE)
+      trace::printf ("%s() @%p\n", __func__, this);
+#endif
     }
 
-    // Protected internal constructor.
-    Message_queue::Message_queue (const mqueue::Attributes&attr,
-                                  mqueue::size_t msgs,
-                                  mqueue::msg_size_t msg_size_bytes,
-                                  void* queue_address,
-                                  std::size_t queue_size_bytes) :
-        Named_object
-          { attr.name () }, //
-#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
-            clock_ (attr.clock != nullptr ? *attr.clock : systick_clock),
+    Message_queue_base::Message_queue_base (const char* name) :
+        Named_object (name)
+    {
+#if defined(OS_TRACE_RTOS_MQUEUE)
+      trace::printf ("%s() @%p %s\n", __func__, this, name);
 #endif
-            msg_size_bytes_ (msg_size_bytes), //
-            msgs_ (msgs)
+    }
+
+    void
+    Message_queue_base::_construct (const mqueue::Attributes& attr,
+                                    mqueue::size_t msgs,
+                                    mqueue::msg_size_t msg_size_bytes,
+                                    void* queue_address,
+                                    std::size_t queue_size_bytes)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
-      queue_addr_ = queue_address ? queue_address : attr.mq_queue_address;
+#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+      clock_ = attr.clock != nullptr ? attr.clock : &systick_clock;
+#endif
+      msg_size_bytes_ = msg_size_bytes;
+      msgs_ = msgs;
+
+      // Prefer the user provided storage, if any.
+      queue_addr_ =
+          attr.mq_queue_address ? attr.mq_queue_address : queue_address;
       queue_size_bytes_ =
-          queue_address ? queue_size_bytes : attr.mq_queue_size_bytes;
+          attr.mq_queue_address ? attr.mq_queue_size_bytes : queue_size_bytes;
 
 #if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
-      std::size_t storage_size = msgs
-          * (msg_size_bytes + 2 * sizeof(mqueue::index_t)
-              + sizeof(mqueue::priority_t));
+      std::size_t storage_size = mqueue::compute_allocated_size_bytes<void*> (
+          msgs, msg_size_bytes);
 #endif
       if (queue_addr_ != nullptr)
         {
@@ -246,8 +325,8 @@ namespace os
         }
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), msgs_,
-          msg_size_bytes_);
+      trace::printf ("%s() @%p %s %d %d %p %d\n", __func__, this, name (),
+          msgs_, msg_size_bytes_, queue_addr_, queue_size_bytes_);
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
@@ -258,17 +337,6 @@ namespace os
 #else
 
       head_ = mqueue::no_index;
-
-      if (queue_addr_ == nullptr)
-        {
-          // Dynamically allocate queue and the arrays.
-          allocated_queue_addr_ = new (std::nothrow) char[storage_size];
-          queue_addr_ = allocated_queue_addr_;
-        }
-      else
-        {
-          allocated_queue_addr_ = nullptr;
-        }
 
       os_assert_throw(queue_addr_ != nullptr, ENOMEM);
 
@@ -304,7 +372,7 @@ namespace os
      * it is deallocated.
      *
      */
-    Message_queue::~Message_queue ()
+    Message_queue_base::~Message_queue_base ()
     {
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -319,13 +387,13 @@ namespace os
       assert(send_list_.empty ());
       assert(receive_list_.empty ());
 
-      delete[] allocated_queue_addr_;
+      // delete[] allocated_queue_addr_;
 
 #endif
     }
 
     void
-    Message_queue::_init (void)
+    Message_queue_base::_init (void)
     {
       count_ = 0;
 
@@ -377,11 +445,9 @@ namespace os
 #if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
     bool
-    Message_queue::_try_send (const char* msg, std::size_t nbytes,
-                              mqueue::priority_t mprio)
+    Message_queue_base::_try_send (const void* msg, std::size_t nbytes,
+                                   mqueue::priority_t mprio)
     {
-      char* dest;
-
       if (first_free_ == nullptr)
         {
           // No available space to send the message.
@@ -390,7 +456,7 @@ namespace os
 
       // Get the address where the message will be copied.
       // This is the first free memory block.
-      dest = static_cast<char*> (first_free_);
+      char* dest = static_cast<char*> (first_free_);
 
       // Update to next free, if any (the last one has nullptr).
       first_free_ = *(static_cast<void**> (first_free_));
@@ -468,7 +534,7 @@ namespace os
 
     /**
      * @details
-     * The `Message_queue::send()` function shall add the message
+     * The `Message_queue_base::send()` function shall add the message
      * pointed to by the argument
      * _msg_ to the message queue. The _nbytes_ argument specifies the length
      * of the message, in bytes, pointed to by _msg_. The value of _nbytes_
@@ -505,8 +571,8 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Message_queue::send (const char* msg, std::size_t nbytes,
-                         mqueue::priority_t mprio)
+    Message_queue_base::send (const void* msg, std::size_t nbytes,
+                              mqueue::priority_t mprio)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
@@ -575,7 +641,7 @@ namespace os
 
     /**
      * @details
-     * The `Message_queue::try_send()` function shall try to add the message
+     * The `Message_queue_base::try_send()` function shall try to add the message
      * pointed to by the argument
      * _msg_ to the message queue. The _nbytes_ argument specifies the length
      * of the message, in bytes, pointed to by _msg_. The value of _nbytes_
@@ -605,8 +671,8 @@ namespace os
      * @note Can be invoked from Interrupt Service Routines.
      */
     result_t
-    Message_queue::try_send (const char* msg, std::size_t nbytes,
-                             mqueue::priority_t mprio)
+    Message_queue_base::try_send (const void* msg, std::size_t nbytes,
+                                  mqueue::priority_t mprio)
     {
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
@@ -637,7 +703,7 @@ namespace os
 
     /**
      * @details
-     * The `Message_queue::timed_send()` function shall add the message
+     * The `Message_queue_base::timed_send()` function shall add the message
      * pointed to by the argument
      * _msg_ to the message queue. The _nbytes_ argument specifies the length
      * of the message, in bytes, pointed to by _msg_. The value of _nbytes_
@@ -665,6 +731,10 @@ namespace os
      * if there is sufficient room in the queue to add the message
      * immediately.
      *
+     * The clock used for timeouts can be specified via the `clock`
+     * attribute. By default, the clock derived from the scheduler
+     * timer is used, and the durations are expressed in ticks.
+     *
      * If there is not sufficient room in the queue, the
      *
      * @par POSIX compatibility
@@ -680,16 +750,16 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Message_queue::timed_send (const char* msg, std::size_t nbytes,
-                               clock::duration_t timeout,
-                               mqueue::priority_t mprio)
+    Message_queue_base::timed_send (const void* msg, std::size_t nbytes,
+                                    clock::duration_t timeout,
+                                    mqueue::priority_t mprio)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s(%p,%d,%d,%d_ticks) @%p %s\n", __func__, msg, nbytes,
+      trace::printf ("%s(%p,%d,%d,%d) @%p %s\n", __func__, msg, nbytes,
           mprio, timeout, this, name ());
 #endif
 
@@ -718,9 +788,9 @@ namespace os
       Waiting_thread_node node
         { crt_thread };
 
-      Clock_timestamps_list& clock_list = clock_.steady_list ();
+      Clock_timestamps_list& clock_list = clock_->steady_list ();
 
-      clock::timestamp_t timeout_timestamp = clock_.steady_now () + timeout;
+      clock::timestamp_t timeout_timestamp = clock_->steady_now () + timeout;
 
       // Prepare a timeout node pointing to the current thread.
       Timeout_thread_node timeout_node
@@ -755,7 +825,7 @@ namespace os
               return EINTR;
             }
 
-          if (clock_.steady_now () >= timeout_timestamp)
+          if (clock_->steady_now () >= timeout_timestamp)
             {
               return ETIMEDOUT;
             }
@@ -770,23 +840,20 @@ namespace os
 #if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
     bool
-    Message_queue::_try_receive (char* msg, std::size_t nbytes,
-                                 mqueue::priority_t* mprio)
+    Message_queue_base::_try_receive (void* msg, std::size_t nbytes,
+                                      mqueue::priority_t* mprio)
     {
-      char* src;
 
+      if (head_ == mqueue::no_index)
         {
-          if (head_ == mqueue::no_index)
-            {
-              return false;
-            }
-
-          src = static_cast<char*> (queue_addr_) + head_ * msg_size_bytes_;
-#if defined(OS_TRACE_RTOS_MQUEUE_)
-          trace::printf ("%s(%p,%d) @%p %s src %p %p\n", __func__, msg, nbytes,
-              this, name (), src, first_free_);
-#endif
+          return false;
         }
+
+      char* src = static_cast<char*> (queue_addr_) + head_ * msg_size_bytes_;
+#if defined(OS_TRACE_RTOS_MQUEUE_)
+      trace::printf ("%s(%p,%d) @%p %s src %p %p\n", __func__, msg, nbytes,
+          this, name (), src, first_free_);
+#endif
 
         {
           // ----- Enter uncritical section -----
@@ -841,7 +908,7 @@ namespace os
 
     /**
      * @details
-     * The `Message_queue::receive()` function shall receive the oldest
+     * The `Message_queue_base::receive()` function shall receive the oldest
      * of the highest
      * priority message(s) from the message queue. If the size of the
      * buffer in bytes, specified by the _nbytes_ argument, is less than
@@ -874,8 +941,8 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Message_queue::receive (char* msg, std::size_t nbytes,
-                            mqueue::priority_t* mprio)
+    Message_queue_base::receive (void* msg, std::size_t nbytes,
+                                 mqueue::priority_t* mprio)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
@@ -947,7 +1014,7 @@ namespace os
 
     /**
      * @details
-     * The `Message_queue::try_receive()` function shall try to receive the
+     * The `Message_queue_base::try_receive()` function shall try to receive the
      * oldest of the highest
      * priority message(s) from the message queue. If the size of the
      * buffer in bytes, specified by the nbytes argument, is less than
@@ -976,8 +1043,8 @@ namespace os
      * @note Can be invoked from Interrupt Service Routines.
      */
     result_t
-    Message_queue::try_receive (char* msg, std::size_t nbytes,
-                                mqueue::priority_t* mprio)
+    Message_queue_base::try_receive (void* msg, std::size_t nbytes,
+                                     mqueue::priority_t* mprio)
     {
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
@@ -1010,7 +1077,7 @@ namespace os
 
     /**
      * @details
-     * The `Message_queue::timed_receive()` function shall receive the
+     * The `Message_queue_base::timed_receive()` function shall receive the
      * oldest of the highest
      * priority message(s) from the message queue. If the size of the
      * buffer in bytes, specified by the _nbytes_ argument, is less than
@@ -1048,6 +1115,10 @@ namespace os
      * Under no circumstance shall the operation fail with a timeout
      * if a message can be removed from the message queue immediately.
      *
+     * The clock used for timeouts can be specified via the `clock`
+     * attribute. By default, the clock derived from the scheduler
+     * timer is used, and the durations are expressed in ticks.
+     *
      * Compatible with POSIX `mq_receive()` with O_NONBLOCK set.
      * http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_receive.html#
      *
@@ -1064,9 +1135,9 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Message_queue::timed_receive (char* msg, std::size_t nbytes,
-                                  clock::duration_t timeout,
-                                  mqueue::priority_t* mprio)
+    Message_queue_base::timed_receive (void* msg, std::size_t nbytes,
+                                       clock::duration_t timeout,
+                                       mqueue::priority_t* mprio)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
@@ -1074,7 +1145,7 @@ namespace os
       os_assert_err(nbytes <= mqueue::max_size, EMSGSIZE);
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s(%p,%d,%d_ticks) @%p %s\n", __func__, msg, nbytes,
+      trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes,
           timeout, this, name ());
 #endif
 
@@ -1104,8 +1175,8 @@ namespace os
       Waiting_thread_node node
         { crt_thread };
 
-      Clock_timestamps_list& clock_list = clock_.steady_list ();
-      clock::timestamp_t timeout_timestamp = clock_.steady_now () + timeout;
+      Clock_timestamps_list& clock_list = clock_->steady_list ();
+      clock::timestamp_t timeout_timestamp = clock_->steady_now () + timeout;
 
       // Prepare a timeout node pointing to the current thread.
       Timeout_thread_node timeout_node
@@ -1145,7 +1216,7 @@ namespace os
               return result::ok;
             }
 
-          if (clock_.steady_now () >= timeout_timestamp)
+          if (clock_->steady_now () >= timeout_timestamp)
             {
               return ETIMEDOUT;
             }
@@ -1170,7 +1241,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Message_queue::reset (void)
+    Message_queue_base::reset (void)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
