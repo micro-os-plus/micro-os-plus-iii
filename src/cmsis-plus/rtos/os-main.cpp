@@ -123,8 +123,9 @@ main (int argc, char* argv[])
   // Initialise the current thread with a very simple fake
   // thread that at least has a name, so trace messages
   // will not fail with exceptions when printing identity.
-  const char* const fake_thread = "none";
-  rtos::Thread* pth = (rtos::Thread*) &fake_thread;
+  Named_object fake_thread
+    { "none" };
+  rtos::Thread* pth = reinterpret_cast<rtos::Thread*> (&fake_thread);
 
   rtos::scheduler::current_thread_ = pth;
 #endif
