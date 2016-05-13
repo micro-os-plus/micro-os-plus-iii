@@ -89,7 +89,7 @@ namespace os
       static constexpr std::size_t max_align = alignof(std::max_align_t);
 
       virtual
-      ~memory_resource () = default;
+      ~memory_resource ();
 
       void*
       allocate (std::size_t bytes, std::size_t alignment = max_align);

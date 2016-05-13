@@ -91,7 +91,7 @@ namespace
                  std::size_t alignment __attribute__((unused)))
     {
 #if defined(__EXCEPTIONS)
-      throw std::bad_alloc();
+      throw std::bad_alloc ();
 #else
       std::abort ();
 #endif
@@ -114,8 +114,16 @@ namespace
 
   // --------------------------------------------------------------------------
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#endif
+
   static new_delete_memory_resource new_delete_res;
   static null_memory_resource null_res;
+
+#pragma GCC diagnostic pop
 
   // --------------------------------------------------------------------------
 
@@ -131,14 +139,21 @@ namespace os
     {
       // ----------------------------------------------------------------------
 
+      memory_resource::~memory_resource ()
+      {
+        ;
+      }
+
+      // ----------------------------------------------------------------------
+
       memory_resource*
-      new_delete_resource (void)
+      new_delete_resource (void) noexcept
       {
         return &new_delete_res;
       }
 
       memory_resource*
-      null_memory_resource (void)
+      null_memory_resource (void) noexcept
       {
         return &null_res;
       }
@@ -146,7 +161,7 @@ namespace os
       // ----------------------------------------------------------------------
 
       memory_resource*
-      set_default_resource (memory_resource* r)
+      set_default_resource (memory_resource* r) noexcept
       {
         memory_resource* old = default_resource;
         default_resource = r;
@@ -155,7 +170,7 @@ namespace os
       }
 
       memory_resource*
-      get_default_resource (void)
+      get_default_resource (void) noexcept
       {
         return default_resource;
       }

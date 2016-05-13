@@ -99,7 +99,7 @@ namespace os
         static constexpr std::size_t max_align = alignof(std::max_align_t);
 
         virtual
-        ~memory_resource () = default;
+        ~memory_resource ();
 
         void*
         allocate (std::size_t bytes, std::size_t alignment = max_align);
@@ -197,6 +197,8 @@ namespace os
         return do_is_equal (other);
       }
 
+      // ======================================================================
+
       template<typename T>
         polymorphic_allocator<T>::polymorphic_allocator () noexcept :
         res_(get_default_resource())
@@ -241,7 +243,7 @@ namespace os
         inline void
         polymorphic_allocator<T>::deallocate (value_type* p, std::size_t bytes) noexcept
         {
-          assert(bytes <= max_size());
+          assert(bytes <= max_size ());
           res_->deallocate (p, bytes * sizeof(value_type), alignof(value_type));
         }
 
