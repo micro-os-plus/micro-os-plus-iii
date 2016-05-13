@@ -64,6 +64,7 @@ namespace os
        */
       const Attributes initializer
         { nullptr };
+
     } /* namespace condvar */
 
     // ------------------------------------------------------------------------
