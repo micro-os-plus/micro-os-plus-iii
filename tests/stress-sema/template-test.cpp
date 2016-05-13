@@ -58,7 +58,7 @@ run_template_tests (void)
 
   // Define a custom queue type parametrised with the
   // message type.
-  using My_queue = TMessage_queue<my_msg_t>;
+  using My_queue = Message_queue_typed<my_msg_t>;
 
     {
       My_queue q
@@ -79,22 +79,22 @@ run_template_tests (void)
   // Allocated template usage; message size and cast are supplied automatically.
 
   // Define a custom queue type parametrised with the
-  // message type and queue size.
-  using My_alloc_queue = TAllocated_message_queue<my_msg_t, 4>;
+  // message type and the queue size.
+  using My_static_queue = Message_queue_static<my_msg_t, 4>;
 
     {
       // The space for the queue is allocated inside the queue
       // object, in this case on the stack.
-      My_alloc_queue aq;
+      My_static_queue sq;
 
-      aq.send (&msg_out);
-      aq.receive (&msg_in);
+      sq.send (&msg_out);
+      sq.receive (&msg_in);
 
-      aq.try_send (&msg_out);
-      aq.try_receive (&msg_in);
+      sq.try_send (&msg_out);
+      sq.try_receive (&msg_in);
 
-      aq.timed_send (&msg_out, 1);
-      aq.timed_receive (&msg_in, 1);
+      sq.timed_send (&msg_out, 1);
+      sq.timed_receive (&msg_in, 1);
     }
 
 #endif

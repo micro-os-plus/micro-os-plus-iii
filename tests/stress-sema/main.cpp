@@ -25,10 +25,10 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include <stm32f4xx_hal.h>
+
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/diag/trace.h>
-
-#include <stm32f4xx_hal.h>
 
 #include <test.h>
 
@@ -59,7 +59,7 @@ os_main (int argc, char* argv[])
 
   srand (seed);
 
-  run_template_tests();
+  run_template_tests ();
 
   return run_tests ();
 }
@@ -68,73 +68,73 @@ Hw_timer tmr;
 
 void
 Hw_timer::start (uint32_t period)
-{
+  {
+
   __TIM2_CLK_ENABLE()
-  ;
+    ;
 
-  th.Instance = TIM2;
-  th.Init.Prescaler = 1;
-  th.Init.CounterMode = TIM_COUNTERMODE_DOWN;
-  th.Init.Period = period;
-  th.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+    th.Instance = TIM2;
+    th.Init.Prescaler = 1;
+    th.Init.CounterMode = TIM_COUNTERMODE_DOWN;
+    th.Init.Period = period;
+    th.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 
-  HAL_TIM_Base_Init (&th);
-  HAL_TIM_Base_Start_IT (&th);
-}
+    HAL_TIM_Base_Init (&th);
+    HAL_TIM_Base_Start_IT (&th);
+  }
 
 void
 Hw_timer::stop ()
-{
-  HAL_TIM_Base_Stop_IT (&th);
-  HAL_TIM_Base_DeInit (&th);
-}
+  {
+    HAL_TIM_Base_Stop_IT (&th);
+    HAL_TIM_Base_DeInit (&th);
+  }
 
 uint32_t
 Hw_timer::in_clk_hz (void)
-{
-  return SystemCoreClock / 4;
-}
+  {
+    return SystemCoreClock / 4;
+  }
 
 void
 (*tim_callback) (void);
 
 extern "C"
-{
-  void
-  HAL_TIMEx_BreakCallback (TIM_HandleTypeDef *htim);
-  void
-  HAL_TIMEx_CommutationCallback (TIM_HandleTypeDef *htim);
-  void
-  HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim);
-}
+  {
+    void
+    HAL_TIMEx_BreakCallback (TIM_HandleTypeDef *htim);
+    void
+    HAL_TIMEx_CommutationCallback (TIM_HandleTypeDef *htim);
+    void
+    HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim);
+  }
 
 void
 HAL_TIMEx_BreakCallback (TIM_HandleTypeDef *htim __attribute__((unused)))
-{
-}
+  {
+  }
 
 void
 HAL_TIMEx_CommutationCallback (TIM_HandleTypeDef *htim __attribute__((unused)))
-{
-}
+  {
+  }
 
 void
 HAL_TIM_PeriodElapsedCallback (TIM_HandleTypeDef *htim __attribute__((unused)))
-{
-  if (tim_callback != nullptr)
-    {
-      tim_callback ();
-    }
-}
+  {
+    if (tim_callback != nullptr)
+      {
+        tim_callback ();
+      }
+  }
 
 extern "C" void
 TIM2_IRQHandler ();
 
 void
 TIM2_IRQHandler ()
-{
-  HAL_TIM_IRQHandler (&tmr.th);
-}
+  {
+    HAL_TIM_IRQHandler (&tmr.th);
+  }
 
 //------------------
-
