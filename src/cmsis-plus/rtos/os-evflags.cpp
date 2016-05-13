@@ -402,7 +402,13 @@ namespace os
      * clock on which it is based (the SysTick clock for CMSIS).
      *
      * Under no circumstance shall the operation fail with a timeout
-     * if the event flags are already raised.
+     * if the event flags are already raised. The validity of
+     * the timeout need not be checked if the expected flags
+     * are already raised and the call can return immediately.
+     *
+     * The clock used for timeouts can be specified via the `clock`
+     * attribute. By default, the clock derived from the scheduler
+     * timer is used, and the durations are expressed in ticks.
      *
      * If the flags::mode::clear bit is set, the event flags that are
      * returned are automatically cleared.

@@ -529,6 +529,10 @@ namespace os
      * the timeout need not be checked if the semaphore can be
      * locked immediately.
      *
+     * The clock used for timeouts can be specified via the `clock`
+     * attribute. By default, the clock derived from the scheduler
+     * timer is used, and the durations are expressed in ticks.
+     *
      * @par POSIX compatibility
      *  Inspired by [`sem_timedwait()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_timedwait.html)
      *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)

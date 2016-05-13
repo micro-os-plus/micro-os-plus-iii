@@ -754,7 +754,13 @@ namespace os
      * clock on which it is based.
      *
      * Under no circumstance shall the function fail with a timeout
-     * if the mutex can be locked immediately.
+     * if the mutex can be locked immediately. The validity of
+     * the timeout need not be checked if the mutex can be
+     * locked immediately.
+     *
+     * The clock used for timeouts can be specified via the `clock`
+     * attribute. By default, the clock derived from the scheduler
+     * timer is used, and the durations are expressed in ticks.
      *
      * As a consequence of the priority inheritance rules (for
      * mutexes initialized with the PRIO_INHERIT protocol),

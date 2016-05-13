@@ -73,7 +73,7 @@ namespace os
     class Condition_variable;
     class Event_flags;
     class Memory_pool;
-    class Message_queue;
+    // class Message_queue;
     class Mutex;
     class Realtime_clock;
     class Semaphore;
@@ -536,12 +536,14 @@ namespace os
      */
     namespace this_thread
     {
+
     }
 
     // ========================================================================
 
     /**
      * @brief User timer namespace.
+     * @ingroup cmsis-plus-rtos
      */
     namespace timer
     {
@@ -794,6 +796,8 @@ namespace os
        * @name Constructors & Destructor
        * @{
        */
+
+      Named_object ();
 
       /**
        * @brief Create a named object.

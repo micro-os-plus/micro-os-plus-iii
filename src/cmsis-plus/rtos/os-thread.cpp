@@ -171,7 +171,7 @@ namespace os
     /**
      * @class Thread
      * @details
-     * CMSIS++ threads are inspired by POSIX threads and support
+     * CMSIS++ threads are inspired by POSIX threads; they support
      * functions that terminate and a simplified version of
      * signal flags.
      *
@@ -702,6 +702,9 @@ namespace os
      * fail and report an `ESRCH` error.
      * error number is returned.
      *
+     * @todo Implement it properly (thread interruption is not yet
+     * fully implemented).
+     *
      * @par POSIX compatibility
      *  Inspired by [`pthread_cancel()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cancel.html)
      *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
@@ -728,43 +731,6 @@ namespace os
       return false;
     }
 
-    /**
-     * @details
-     * Terminate the calling thread and make the value _value_ptr_
-     * available to any successful join with the terminating thread.
-     * Any cancellation cleanup handlers that have been pushed and
-     * not yet popped shall be popped in the reverse order that
-     * they were pushed and then executed. After all cancellation
-     * cleanup handlers have been executed, if the thread has any
-     * thread-specific data, appropriate destructor functions
-     * shall be called in an unspecified order. Thread termination
-     * does not release any application visible process resources,
-     * including, but not limited to, mutexes and file descriptors,
-     * nor does it perform any process-level cleanup actions,
-     * including, but not limited to, calling any `atexit()` routines
-     * that may exist.
-     * An implicit call to exit() is made when a thread other
-     * than the thread in which main() was first invoked returns
-     * from the start routine that was used to create it.
-     * The function's return value shall serve as the thread's
-     * exit status.
-     * The behaviour of `_exit()` is undefined if called from a
-     * cancellation cleanup handler or destructor function that
-     * was invoked as a result of either an implicit or explicit
-     * call to `exit()`.
-     * After a thread has terminated, the result of access to
-     * local (auto) variables of the thread is undefined.
-     * Thus, references to local variables of the exiting
-     * thread should not be used for the `exit()` _value_ptr_
-     * parameter value.
-     *
-     * @par POSIX compatibility
-     *  Inspired by [`pthread_exit()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_exit.html)
-     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
     void
     Thread::_exit (void* exit_ptr)
     {
@@ -1070,27 +1036,6 @@ namespace os
       return EWOULDBLOCK;
     }
 
-    /**
-     * @details
-     * If the flags::mode::all bit is set, the function expects
-     * all given flags to be raised; otherwise, if the flags::mode::any
-     * bit is set, the function expects any single flag to be raised.
-     *
-     * If the expected signal flags are
-     * raised, the function returns instantly.
-     *
-     * Otherwise suspend the execution of the current thread until all/any
-     * specified signal flags are raised.
-     *
-     * When the parameter mask is 0, the thread is suspended
-     * until any signal flag is raised. In this case, if any signal flags
-     * are already raised, the function returns instantly.
-     *
-     * If the flags::mode::clear bit is set, the signal flags that are
-     * returned are automatically cleared.
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
     result_t
     Thread::_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
                        flags::mode_t mode)
@@ -1134,17 +1079,6 @@ namespace os
       return ENOTRECOVERABLE;
     }
 
-    /**
-     * @details
-     * If the flags::mode::all bit is set, the function expects
-     * all given flags to be raised; otherwise, if the flags::mode::any
-     * bit is set, the function expects any single flag to be raised.
-     *
-     * The function does not blocks, if the expected signal flags are
-     * not raised, but returns `EGAIN`.
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
     result_t
     Thread::_try_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
                            flags::mode_t mode)
@@ -1161,38 +1095,6 @@ namespace os
       return _try_wait (mask, oflags, mode);
     }
 
-    /**
-     * @details
-     * If the flags::mode::all bit is set, the function expects
-     * all given flags to be raised; otherwise, if the flags::mode::any
-     * bit is set, the function expects any single flag to be raised.
-     *
-     * If the expected signal flags are
-     * raised, the function returns instantly.
-     *
-     * Otherwise suspend the execution of the thread until all/any
-     * specified signal flags are raised.
-     *
-     * When the parameter mask is 0, the thread is suspended
-     * until any event flag is raised. In this case, if any signal flags
-     * are already raised, the function returns instantly.
-     *
-     * The wait shall be terminated when the specified timeout
-     * expires.
-     *
-     * The timeout shall expire after the number of time units (that
-     * is when the value of that clock equals or exceeds (now()+duration).
-     * The resolution of the timeout shall be the resolution of the
-     * clock on which it is based (the SysTick clock for CMSIS).
-     *
-     * Under no circumstance shall the operation fail with a timeout
-     * if the signal flags are already raised.
-     *
-     * If the flags::mode::clear bit is set, the signal flags that are
-     * returned are automatically cleared.
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
     result_t
     Thread::_timed_sig_wait (thread::sigset_t mask, clock::duration_t timeout,
                              thread::sigset_t* oflags, flags::mode_t mode)
