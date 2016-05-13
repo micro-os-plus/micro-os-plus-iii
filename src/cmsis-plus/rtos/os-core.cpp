@@ -456,6 +456,12 @@ namespace os
      * string (stored in flash) is preferred.
      */
 
+    Named_object::Named_object () :
+        name_ ("-")
+    {
+      ;
+    }
+
     /**
      * @details
      * To save space, instead of copying the null terminated string
