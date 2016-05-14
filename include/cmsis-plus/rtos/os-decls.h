@@ -85,10 +85,19 @@ namespace os
     class Clock_threads_list;
     class Waiting_threads_list3;
 
+    namespace memory
+    {
+      template<typename T>
+        class new_delete_allocator;
+
+      template<typename T>
+        class polymorphic_allocator;
+    } /* namespace memory */
+
     namespace thread
     {
       class Context;
-    }
+    } /* namespace thread */
 
     // ------------------------------------------------------------------------
 
@@ -1325,6 +1334,10 @@ extern "C"
   } os_thread_user_storage_t;
 #endif
 }
+
+// ----------------------------------------------------------------------------
+
+#include <cmsis-plus/rtos/os-types.h>
 
 // ----------------------------------------------------------------------------
 

@@ -55,6 +55,35 @@ namespace os
 
       // ======================================================================
 
+      template<typename T>
+        class new_delete_allocator
+        {
+        public:
+
+          typedef T value_type;
+
+          new_delete_allocator () noexcept = default;
+          new_delete_allocator (new_delete_allocator const & a) = default;
+
+          template<typename U>
+            new_delete_allocator (new_delete_allocator<U> const & other)
+                noexcept;
+
+          new_delete_allocator&
+          operator= (new_delete_allocator const & a) = default;
+
+          value_type*
+          allocate (std::size_t size);
+
+          void
+          deallocate (value_type* p, std::size_t bytes) noexcept;
+
+          std::size_t
+          max_size (void) const noexcept;
+        };
+
+      // ======================================================================
+
       class memory_resource;
 
       bool
@@ -89,7 +118,7 @@ namespace os
       memory_resource*
       get_default_resource (void) noexcept;
 
-      // ========================================================================
+      // ======================================================================
 
       class memory_resource
       {
@@ -177,6 +206,34 @@ namespace os
   {
     namespace memory
     {
+
+      // ======================================================================
+
+      template<typename T>
+        template<typename U>
+          inline
+          new_delete_allocator<T>::new_delete_allocator (
+              new_delete_allocator<U> const & other) noexcept
+          {
+            ;
+          }
+
+      template<typename T>
+        inline typename new_delete_allocator<T>::value_type*
+        new_delete_allocator<T>::allocate (std::size_t bytes)
+        {
+          return static_cast<value_type*> (::operator new (bytes));
+        }
+
+      template<typename T>
+        inline void
+        new_delete_allocator<T>::deallocate (
+            value_type* p, std::size_t bytes __attribute__((unused))) noexcept
+        {
+          ::operator delete (p);
+        }
+
+      // ======================================================================
 
       inline void*
       memory_resource::allocate (std::size_t bytes, std::size_t align)
