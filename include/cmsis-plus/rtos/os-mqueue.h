@@ -544,7 +544,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
-    template<typename Allocator = memory::polymorphic_allocator<void*>>
+    template<typename Allocator = memory::allocator<void*>>
       class Message_queue_allocated : public Message_queue_base
       {
       public:
@@ -613,7 +613,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
-    template<typename T, typename Allocator = memory::polymorphic_allocator<
+    template<typename T, typename Allocator = memory::allocator<
         void*>>
       class Message_queue_typed : public Message_queue_allocated<Allocator>
       {
