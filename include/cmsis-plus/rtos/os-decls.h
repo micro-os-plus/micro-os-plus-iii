@@ -654,7 +654,11 @@ namespace os
        * an 8-bits value, possibly a 16-bits value if longer
        * queues are needed.
        */
+#if defined(OS_BOOL_RTOS_MESSAGE_QUEUE_SIZE_16BITS)
+      using size_t = uint16_t;
+#else
       using size_t = uint8_t;
+#endif
 
       constexpr size_t max_size = 0xFF;
 
