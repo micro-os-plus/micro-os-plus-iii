@@ -175,10 +175,10 @@ namespace os
           operator= (polymorphic_allocator const & a) = default;
 
           value_type*
-          allocate (std::size_t size);
+          allocate (std::size_t n);
 
           void
-          deallocate (value_type* p, std::size_t bytes) noexcept;
+          deallocate (value_type* p, std::size_t n) noexcept;
 
           std::size_t
           max_size (void) const noexcept;
@@ -220,15 +220,16 @@ namespace os
 
       template<typename T>
         inline typename new_delete_allocator<T>::value_type*
-        new_delete_allocator<T>::allocate (std::size_t bytes)
+        new_delete_allocator<T>::allocate (std::size_t n)
         {
-          return static_cast<value_type*> (::operator new (bytes));
+          return static_cast<value_type*> (::operator new (
+              n * sizeof(value_type)));
         }
 
       template<typename T>
         inline void
         new_delete_allocator<T>::deallocate (
-            value_type* p, std::size_t bytes __attribute__((unused))) noexcept
+            value_type* p, std::size_t n __attribute__((unused))) noexcept
         {
           ::operator delete (p);
         }
@@ -283,9 +284,9 @@ namespace os
 
       template<typename T>
         inline typename polymorphic_allocator<T>::value_type*
-        polymorphic_allocator<T>::allocate (std::size_t bytes)
+        polymorphic_allocator<T>::allocate (std::size_t n)
         {
-          if (bytes > max_size ())
+          if (n > max_size ())
             {
               estd::__throw_system_error (
                   EINVAL, "polymorphic_allocator<T>::allocate(size_t n)"
@@ -293,15 +294,15 @@ namespace os
             }
 
           return static_cast<value_type*> (res_->allocate (
-              bytes * sizeof(value_type), alignof(value_type)));
+              n * sizeof(value_type), alignof(value_type)));
         }
 
       template<typename T>
         inline void
-        polymorphic_allocator<T>::deallocate (value_type* p, std::size_t bytes) noexcept
+        polymorphic_allocator<T>::deallocate (value_type* p, std::size_t n) noexcept
         {
-          assert(bytes <= max_size ());
-          res_->deallocate (p, bytes * sizeof(value_type), alignof(value_type));
+          assert(n <= max_size ());
+          res_->deallocate (p, n * sizeof(value_type), alignof(value_type));
         }
 
       template<typename T>
