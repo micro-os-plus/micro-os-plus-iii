@@ -598,12 +598,63 @@ namespace os
 
       };
 
+    // ========================================================================
+
     /**
      * @brief Instance of the POSIX compliant **message queue** template
      * using the standard allocator.
      * @ingroup cmsis-plus-rtos
      */
-    using Message_queue = Message_queue_allocated<>;
+    class Message_queue : public Message_queue_allocated<>
+    {
+    public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+      /**
+       * @brief Create a message queue with default settings.
+       * @param [in] msgs The number of messages.
+       * @param [in] msg_size_bytes The message size, in bytes.
+       */
+      Message_queue (mqueue::size_t msgs, mqueue::msg_size_t msg_size_bytes);
+
+      /**
+       * @brief Create a message queue with custom settings.
+       * @param [in] attr Reference to attributes.
+       * @param [in] msgs The number of messages.
+       * @param [in] msg_size_bytes The message size, in bytes.
+       */
+      Message_queue (const mqueue::Attributes& attr, mqueue::size_t msgs,
+                     mqueue::msg_size_t msg_size_bytes);
+
+      /**
+       * @cond ignore
+       */
+    public:
+
+      Message_queue (const Message_queue&) = delete;
+      Message_queue (Message_queue&&) = delete;
+      Message_queue&
+      operator= (const Message_queue&) = delete;
+      Message_queue&
+      operator= (Message_queue&&) = delete;
+      /**
+       * @endcond
+       */
+
+      /**
+       * @brief Destroy the message queue.
+       */
+      ~Message_queue ();
+
+      /**
+       * @}
+       */
+
+    };
 
     // ========================================================================
 
@@ -613,8 +664,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
-    template<typename T, typename Allocator = memory::allocator<
-        void*>>
+    template<typename T, typename Allocator = memory::allocator<void*>>
       class Message_queue_typed : public Message_queue_allocated<Allocator>
       {
       public:
@@ -1231,6 +1281,46 @@ namespace os
                 allocated_queue_size_elements_);
           }
       }
+
+    // ========================================================================
+
+    /**
+     * @details
+     * This constructor shall initialise the message queue object
+     * with the given number of messages and default settings.
+     * The effect shall be equivalent to creating a message queue object
+     * referring to the attributes in `mqueue::initializer`.
+     * Upon successful initialisation, the state of the message queue
+     * object shall become initialised, with no messages in the queue.
+     *
+     * Only the message queue object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * message queue objects.
+     *
+     * For default message queue objects, the storage is dynamically
+     * allocated using the RTOS specific allocator
+     * (`rtos::memory::allocator`).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    inline
+    Message_queue::Message_queue (mqueue::size_t msgs,
+                                  mqueue::msg_size_t msg_size_bytes) :
+        Message_queue_allocated (msgs, msg_size_bytes)
+    {
+      ;
+    }
+
+    /**
+     * @details
+     * Deallocate memory using the RTOS specific allocator
+     * (`rtos::memory::allocator`).
+     */
+    inline
+    Message_queue::~Message_queue ()
+    {
+      ;
+    }
 
     // ========================================================================
 
