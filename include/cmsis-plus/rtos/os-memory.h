@@ -213,7 +213,7 @@ namespace os
         template<typename U>
           inline
           new_delete_allocator<T>::new_delete_allocator (
-              new_delete_allocator<U> const & other) noexcept
+              new_delete_allocator<U> const & other __attribute__((unused))) noexcept
           {
             ;
           }

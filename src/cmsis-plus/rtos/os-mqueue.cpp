@@ -105,17 +105,89 @@ namespace os
      * and messages are always delivered to the receiving process
      * highest priority first.
      *
-     * Usually the storage for the message queue is allocated dynamically,
+     * The storage for the message queue is allocated dynamically,
      * using a standard C++11 allocator. By default, this is the
-     * `std::allocator()`, which uses `::%new()` and `::%delete()`,
-     * both protected for multi-threaded usage.
+     * RTOS specific allocator (`os::memory::allocator`).
      *
      * For special cases, the storage can be allocated outside the
      * class and specified via the `mq_queue_address` and
      * `mq_queue_size_bytes` attributes.
      *
      * A representative instance of this template is `Message_queue`,
-     * which is also used in the C API.
+     * which is also used by the C API.
+     *
+     * @par Example
+     *
+     * @code{.cpp}
+     * // Define the message type.
+     * typedef struct {
+     *   uint32_t id;
+     * } msg_t;
+     *
+     * // Define the queue size.
+     * constexpr uint32_t queue_size = 5;
+     *
+     * // User defined allocator.
+     * template<typename T>
+     *   class my_allocator;
+     *
+     * // The queue storage is allocated dynamically on the heap.
+     * Message_queue_allocated<my_allocator<void*>> mq { queue_size, sizeof(msg_t) };
+     *
+     * void
+     * consumer(void)
+     * {
+     *   // Do something
+     *   msg_t msg;
+     *   for (; some_condition();)
+     *     {
+     *       mq.receive(&msg, sizeof(msg));
+     *       // Process message
+     *       if (msg.id == 7)
+     *         {
+     *           // Something special
+     *         }
+     *     }
+     *   // Do something else.
+     * }
+     *
+     * void
+     * producer(void)
+     * {
+     *   // Do something
+     *   msg_t msg;
+     *   msg.id = 7;
+     *   mq.send(&msg, sizeof(msg), mqueue::default_priority);
+     *   // Do something else.
+     * }
+     * @endcode
+     *
+     * @par POSIX compatibility
+     *  Inspired by `mqd_t`
+     *  from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     */
+
+    /**
+     * @class Message_queue
+     * @details
+     * POSIX message queues allow threads to exchange data in the form of
+     * messages. Messages are transferred to and from a queue using
+     * send() and receive(). Each message has an associated priority,
+     * and messages are always delivered to the receiving process
+     * highest priority first.
+     *
+     * The storage for the message queue is allocated dynamically,
+     * using the
+     * RTOS specific allocator (`os::memory::allocator`).
+     *
+     * For special cases, the storage can be allocated outside the
+     * class and specified via the `mq_queue_address` and
+     * `mq_queue_size_bytes` attributes.
+     *
+     * Message_queue is a representative instance of the
+     * Message_queue_allocated template;
+     * it is also used by the C API.
      *
      * @par Example
      *
@@ -302,11 +374,25 @@ namespace os
       msg_size_bytes_ = msg_size_bytes;
       msgs_ = msgs;
 
-      // Prefer the user provided storage, if any.
-      queue_addr_ =
-          attr.mq_queue_address ? attr.mq_queue_address : queue_address;
-      queue_size_bytes_ =
-          attr.mq_queue_address ? attr.mq_queue_size_bytes : queue_size_bytes;
+      // If the storage is given explicitly, override attributes.
+      if (queue_address != nullptr)
+        {
+          // The attributes should not define any storage in this case.
+          assert(attr.mq_queue_address == nullptr);
+
+          queue_addr_ = queue_address;
+          queue_size_bytes_ = queue_size_bytes;
+        }
+      else
+        {
+          queue_addr_ = attr.mq_queue_address;
+          queue_size_bytes_ = attr.mq_queue_size_bytes;
+        }
+
+#if defined(OS_TRACE_RTOS_MQUEUE)
+      trace::printf ("%s() @%p %s %d %d %p %d\n", __func__, this, name (),
+                     msgs_, msg_size_bytes_, queue_addr_, queue_size_bytes_);
+#endif
 
 #if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
       std::size_t storage_size = mqueue::compute_allocated_size_bytes<void*> (
@@ -324,11 +410,6 @@ namespace os
 #endif
         }
 
-#if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s() @%p %s %d %d %p %d\n", __func__, this, name (),
-          msgs_, msg_size_bytes_, queue_addr_, queue_size_bytes_);
-#endif
-
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
       count_ = 0;
@@ -343,7 +424,9 @@ namespace os
       // The array of prev indexes follows immediately after the content array.
       prev_array_ =
           reinterpret_cast<mqueue::index_t*> (static_cast<char*> (queue_addr_)
-              + msgs * msg_size_bytes);
+              + msgs
+                  * ((msg_size_bytes + (sizeof(void*) - 1))
+                      & ~(sizeof(void*) - 1)));
       // The array of next indexes follows immediately the prev array.
       next_array_ =
           reinterpret_cast<mqueue::index_t*> (reinterpret_cast<char*> (const_cast<mqueue::index_t*> (prev_array_))
@@ -352,6 +435,14 @@ namespace os
       prio_array_ =
           reinterpret_cast<mqueue::priority_t*> (reinterpret_cast<char*> (const_cast<mqueue::index_t*> (next_array_))
               + msgs * sizeof(mqueue::index_t));
+
+      char* p __attribute__((unused))
+          =
+          reinterpret_cast<char*> (reinterpret_cast<char*> (const_cast<mqueue::priority_t*> (prio_array_))
+              + msgs * sizeof(mqueue::priority_t));
+
+      assert(
+          p - static_cast<char*> (queue_addr_) <= static_cast<ptrdiff_t> (queue_size_bytes_));
 
       _init ();
 #endif
@@ -534,7 +625,7 @@ namespace os
 
     /**
      * @details
-     * The `Message_queue_base::send()` function shall add the message
+     * The `send()` function shall add the message
      * pointed to by the argument
      * _msg_ to the message queue. The _nbytes_ argument specifies the length
      * of the message, in bytes, pointed to by _msg_. The value of _nbytes_
@@ -580,7 +671,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes, mprio,
-          this, name ());
+                     this, name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
@@ -641,7 +732,7 @@ namespace os
 
     /**
      * @details
-     * The `Message_queue_base::try_send()` function shall try to add the message
+     * The `try_send()` function shall try to add the message
      * pointed to by the argument
      * _msg_ to the message queue. The _nbytes_ argument specifies the length
      * of the message, in bytes, pointed to by _msg_. The value of _nbytes_
@@ -679,7 +770,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes, mprio,
-          this, name ());
+                     this, name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
@@ -703,7 +794,7 @@ namespace os
 
     /**
      * @details
-     * The `Message_queue_base::timed_send()` function shall add the message
+     * The `timed_send()` function shall add the message
      * pointed to by the argument
      * _msg_ to the message queue. The _nbytes_ argument specifies the length
      * of the message, in bytes, pointed to by _msg_. The value of _nbytes_
@@ -759,8 +850,8 @@ namespace os
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s(%p,%d,%d,%d) @%p %s\n", __func__, msg, nbytes,
-          mprio, timeout, this, name ());
+      trace::printf ("%s(%p,%d,%d,%d) @%p %s\n", __func__, msg, nbytes, mprio,
+                     timeout, this, name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
@@ -908,7 +999,7 @@ namespace os
 
     /**
      * @details
-     * The `Message_queue_base::receive()` function shall receive the oldest
+     * The `receive()` function shall receive the oldest
      * of the highest
      * priority message(s) from the message queue. If the size of the
      * buffer in bytes, specified by the _nbytes_ argument, is less than
@@ -951,7 +1042,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d) @%p %s\n", __func__, msg, nbytes, this,
-          name ());
+                     name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
@@ -1014,7 +1105,7 @@ namespace os
 
     /**
      * @details
-     * The `Message_queue_base::try_receive()` function shall try to receive the
+     * The `try_receive()` function shall try to receive the
      * oldest of the highest
      * priority message(s) from the message queue. If the size of the
      * buffer in bytes, specified by the nbytes argument, is less than
@@ -1052,7 +1143,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d) @%p %s\n", __func__, msg, nbytes, this,
-          name ());
+                     name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
@@ -1077,7 +1168,7 @@ namespace os
 
     /**
      * @details
-     * The `Message_queue_base::timed_receive()` function shall receive the
+     * The `timed_receive()` function shall receive the
      * oldest of the highest
      * priority message(s) from the message queue. If the size of the
      * buffer in bytes, specified by the _nbytes_ argument, is less than
@@ -1145,8 +1236,8 @@ namespace os
       os_assert_err(nbytes <= mqueue::max_size, EMSGSIZE);
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes,
-          timeout, this, name ());
+      trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes, timeout,
+                     this, name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)

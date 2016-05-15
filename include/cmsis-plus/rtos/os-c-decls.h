@@ -143,7 +143,7 @@ extern "C"
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
-  typedef struct
+  typedef struct os_thread_context_s
   {
     void* stack_addr;
     size_t stack_size_bytes;
@@ -152,7 +152,7 @@ extern "C"
 #endif
   } os_thread_context_t;
 
-  typedef struct
+  typedef struct os_thread_attr_s
   {
     const char* name;
     void* th_stack_address;
@@ -160,7 +160,7 @@ extern "C"
     os_thread_prio_t th_priority;
   } os_thread_attr_t;
 
-  typedef struct
+  typedef struct os_thread_s
   {
     const char* name;
 #if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
@@ -238,7 +238,7 @@ extern "C"
     os_timer_type_t tm_type;
   } os_timer_attr_t;
 
-  typedef struct
+  typedef struct os_clock_node_s
   {
     void* next;
     void* prev;
@@ -433,7 +433,6 @@ extern "C"
     os_clock_t* clock;
     void* queue_addr;
     size_t queue_size_bytes;
-    void* allocator;
   } os_mqueue_attr_t;
 
   typedef struct os_mqueue_s
