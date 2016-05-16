@@ -450,7 +450,7 @@ namespace os
 #if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
       /**
-       * @brief Internal function used to enqueue the message, if possible.
+       * @brief Internal function used to enqueue a message, if possible.
        * @param [in] msg The address of the message to enqueue.
        * @param [in] nbytes The length of the message. Must be not
        *  higher than the value used when creating the queue.
@@ -1353,84 +1353,6 @@ namespace os
      * synchronisation. It is not allowed to make copies of
      * message queue objects.
      *
-     * For default message queue objects, the storage is dynamically
-     * allocated using the RTOS specific allocator
-     * (`rtos::memory::allocator`).
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    inline
-    Message_queue::Message_queue (mqueue::size_t msgs,
-                                  mqueue::msg_size_t msg_size_bytes) :
-        Message_queue_allocated (msgs, msg_size_bytes)
-    {
-      ;
-    }
-
-    /**
-     * @details
-     * This constructor shall initialise the message queue object
-     * with attributes referenced by _attr_.
-     * If the attributes specified by _attr_ are modified later,
-     * the memory pool attributes shall not be affected.
-     * Upon successful initialisation, the state of the
-     * message queue object shall become initialised.
-     *
-     * Only the message queue itself may be used for performing
-     * synchronisation. It is not allowed to make copies of
-     * message queue objects.
-     *
-     * In cases where default message queue attributes are
-     * appropriate, the variable `mqueue::initializer` can be used to
-     * initialise message queue.
-     * The effect shall be equivalent to creating a message queue
-     * object with the simple constructor.
-     *
-     * If the attributes define a storage area (via `mq_queue_address` and
-     * `mq_queue_size_bytes`), that storage is used, otherwise
-     * the storage is dynamically allocated.
-     *
-     * For these message queue objects, the storage is dynamically
-     * allocated using the RTOS specific allocator
-     * (`rtos::memory::allocator`).
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    inline
-    Message_queue::Message_queue (const mqueue::Attributes& attr,
-                                  mqueue::size_t msgs,
-                                  mqueue::msg_size_t msg_size_bytes) :
-        Message_queue_allocated (attr, msgs, msg_size_bytes)
-    {
-      ;
-    }
-
-    /**
-     * @details
-     * Deallocate memory using the RTOS specific allocator
-     * (`rtos::memory::allocator`).
-     */
-    inline
-    Message_queue::~Message_queue ()
-    {
-      ;
-    }
-
-    // ========================================================================
-
-    /**
-     * @details
-     * This constructor shall initialise the message queue object
-     * with the given number of messages and default settings.
-     * The effect shall be equivalent to creating a message queue object
-     * referring to the attributes in `mqueue::initializer`.
-     * Upon successful initialisation, the state of the message queue
-     * object shall become initialised, with no messages in the queue.
-     *
-     * Only the message queue object itself may be used for performing
-     * synchronisation. It is not allowed to make copies of
-     * message queue objects.
-     *
      * For default message queue objects, the storage shall be dynamically
      * allocated using the default allocator.
      *
@@ -1625,7 +1547,6 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     template<typename T, std::size_t N>
-      inline
       Message_queue_static<T, N>::Message_queue_static ()
       {
         _construct (mqueue::initializer, msgs, sizeof(T), &arena_,
@@ -1667,7 +1588,6 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     template<typename T, std::size_t N>
-      inline
       Message_queue_static<T, N>::Message_queue_static (
           const mqueue::Attributes& attr) :
           Message_queue_base (attr.name ())
