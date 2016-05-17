@@ -342,6 +342,7 @@ namespace os
           func_result_ = nullptr;
 
           sig_mask_ = 0;
+          interrupted_ = false;
 
           joiner_ = nullptr;
           waiting_node_ = nullptr;
@@ -634,8 +635,8 @@ namespace os
       while ((sched_state_ != thread::state::terminated)
           && (sched_state_ != thread::state::destroyed))
         {
-          joiner_ = this;
-          _wait ();
+          joiner_ = this_thread::_thread();
+          this_thread::_thread()->_wait ();
         }
 
       if (exit_ptr != nullptr)
@@ -725,11 +726,6 @@ namespace os
       return result::ok;
     }
 
-    bool
-    Thread::interrupted (void)
-    {
-      return false;
-    }
 
     void
     Thread::_exit (void* exit_ptr)
