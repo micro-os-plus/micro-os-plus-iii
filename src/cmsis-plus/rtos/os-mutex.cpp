@@ -669,6 +669,10 @@ namespace os
 
           if (crt_thread.interrupted ())
             {
+#if defined(OS_TRACE_RTOS_MUTEX)
+              trace::printf ("%s() @%p %s interrupted\n", __func__, this,
+                             name ());
+#endif
               return EINTR;
             }
         }
@@ -856,6 +860,10 @@ namespace os
 
           if (crt_thread.interrupted ())
             {
+#if defined(OS_TRACE_RTOS_MUTEX)
+              trace::printf ("%s() @%p %s interrupted\n", __func__, this,
+                             name ());
+#endif
               return EINTR;
             }
 
