@@ -66,6 +66,7 @@ namespace os
       _main_trampoline (void)
       {
         int status = os_main (main_args.argc, main_args.argv);
+        trace::printf ("%s() status = %d\n", __func__, status);
         std::exit (status);
       }
 
