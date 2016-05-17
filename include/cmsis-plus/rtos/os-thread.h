@@ -634,6 +634,9 @@ namespace os
       bool
       interrupted (void);
 
+      bool
+      interrupt (bool interrupt = true);
+
       /**
        * @brief Get scheduler status of this thread.
        * @par Parameters
@@ -972,6 +975,7 @@ namespace os
       thread::priority_t volatile prio_;
 
       thread::sigset_t volatile sig_mask_;
+      bool volatile interrupted_;
 
       os_thread_user_storage_t user_storage_;
 
@@ -1215,8 +1219,8 @@ namespace os
       inline void
       Stack::default_size (std::size_t size_bytes)
       {
-        assert (size_bytes != 0);
-        assert (size_bytes >= min_size_bytes_);
+        assert(size_bytes != 0);
+        assert(size_bytes >= min_size_bytes_);
 
         default_size_bytes_ = size_bytes;
       }
@@ -1260,6 +1264,20 @@ namespace os
     Thread::function_args (void) const
     {
       return func_args_;
+    }
+
+    inline bool
+    Thread::interrupt (bool interrupt)
+    {
+      bool tmp = interrupted_;
+      interrupted_ = interrupt;
+      return tmp;
+    }
+
+    inline bool
+    Thread::interrupted (void)
+    {
+      return interrupted_;
     }
 
 #if 0

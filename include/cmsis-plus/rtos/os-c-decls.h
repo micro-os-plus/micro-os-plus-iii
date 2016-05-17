@@ -185,6 +185,7 @@ extern "C"
     os_thread_prio_t prio;
     os_thread_sigset_t signals;
     os_thread_user_storage_t user_storage;
+    bool interrupted;
     os_thread_context_t context;
   } os_thread_t;
 
