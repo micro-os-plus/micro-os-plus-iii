@@ -407,9 +407,12 @@ extern "C"
 #endif
     void* pool_addr;
     void* allocated_pool_addr;
+    void* allocator;
 #if defined(OS_INCLUDE_RTOS_PORT_MEMORY_POOL)
     os_mempool_port_data_t port;
 #endif
+    size_t pool_size_bytes;
+    size_t allocated_pool_size_elements_;
     os_mempool_size_t blocks;
     os_mempool_size_t block_size_bytes;
     os_mempool_size_t count;
