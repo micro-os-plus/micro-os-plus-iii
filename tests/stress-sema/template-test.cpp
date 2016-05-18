@@ -19,6 +19,8 @@
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/diag/trace.h>
 
+#include <cstdio>
+
 using namespace os;
 using namespace os::rtos;
 
@@ -37,9 +39,30 @@ typedef struct my_blk_s
   const char* s;
 } my_blk_t;
 
+void*
+func (void* args);
+
+void*
+func (void* args __attribute__((unused)))
+{
+  printf ("%s\n", __func__);
+
+  return nullptr;
+}
+
 int
 run_template_tests (void)
 {
+  using my_thread = Thread_allocated<memory::new_delete_allocator<stack::allocation_element_t>>;
+
+    {
+      my_thread th
+        { func, nullptr };
+    }
+
+  static Thread_static<> ths
+    { func, nullptr };
+
 #if 1
   // Define two messages.
 
