@@ -41,8 +41,6 @@
  * @brief Global synchronised new/delete definitions.
  */
 
-#if defined(__ARM_EABI__)
-
 #include <cstddef>
 #include <cstdlib>
 #include <new>
@@ -108,7 +106,7 @@ std::get_new_handler () noexcept
 void *
 __attribute__((weak))
 #if defined(__EXCEPTIONS) || defined(__DOXYGEN__)
-operator new(std::size_t size) throw(std::bad_alloc)
+operator new (std::size_t size) noexcept(false)
 #else
 operator new (std::size_t size) noexcept
 #endif
@@ -133,7 +131,7 @@ operator new (std::size_t size) noexcept
       else
         {
 #if defined(__EXCEPTIONS)
-          throw std::bad_alloc();
+          throw std::bad_alloc ();
 #else
           break;
 #endif
@@ -165,7 +163,7 @@ operator new (std::size_t size, const std::nothrow_t&) noexcept
 #if defined(__EXCEPTIONS)
   try
     {
-      p = ::operator new(size);
+      p = ::operator new (size);
     }
   catch (...)
     {
@@ -188,7 +186,7 @@ operator new (std::size_t size, const std::nothrow_t&) noexcept
 void*
 __attribute__((weak))
 #if defined(__EXCEPTIONS) || defined(__DOXYGEN__)
-operator new[](std::size_t size) throw(std::bad_alloc)
+operator new[] (std::size_t size) noexcept(false)
 #else
 operator new[] (std::size_t size) noexcept
 #endif
@@ -213,7 +211,7 @@ operator new[] (std::size_t size, const std::nothrow_t&) noexcept
 #if defined(__EXCEPTIONS)
   try
     {
-      p = ::operator new[](size);
+      p = ::operator new[] (size);
     }
   catch (...)
     {
@@ -333,5 +331,3 @@ operator delete[] (void* ptr, const std::nothrow_t&) noexcept
 {
   ::operator delete[] (ptr);
 }
-
-#endif /* defined(__ARM_EABI__) */
