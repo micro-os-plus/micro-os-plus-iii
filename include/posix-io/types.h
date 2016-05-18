@@ -280,7 +280,7 @@ extern "C"
   // --------------------------------------------------------------------------
 
   void
-  __initialize_args (int* p_argc, char*** p_argv);
+  os_initialize_args (int* p_argc, char*** p_argv);
 
 #ifdef __cplusplus
 }
