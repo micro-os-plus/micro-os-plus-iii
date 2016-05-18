@@ -84,6 +84,7 @@
 
 #if defined(DEBUG)
 #define OS_TRACE_RTOS_MQUEUE
+#define OS_TRACE_RTOS_MEMPOOL
 #define OS_TRACE_LIBC_MALLOC
 #endif
 #define OS_TRACE_RTOS_RTC_TICK
