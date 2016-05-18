@@ -460,10 +460,6 @@ namespace os
      * upon which no threads are currently blocked. Attempting to
      * destroy a message queue object upon which other threads are
      * currently blocked results in undefined behaviour.
-     *
-     * If the storage for the message queue was dynamically allocated,
-     * it is deallocated.
-     *
      */
     Message_queue_base::~Message_queue_base ()
     {
@@ -479,8 +475,6 @@ namespace os
 
       assert(send_list_.empty ());
       assert(receive_list_.empty ());
-
-      // delete[] allocated_queue_addr_;
 
 #endif
     }
@@ -621,9 +615,6 @@ namespace os
     }
 
 #endif /* !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE) */
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 
     /**
      * @details
@@ -1321,8 +1312,6 @@ namespace os
 #endif
     }
 
-#pragma GCC diagnostic pop
-
     /**
      * @details
      * Clear both send and receive counter and return the queue to the
@@ -1405,10 +1394,7 @@ namespace os
      *
      * If the attributes define a storage area (via `mq_queue_address` and
      * `mq_queue_size_bytes`), that storage is used, otherwise
-     * the storage is dynamically allocated.
-     *
-     * For these message queue objects, the storage is dynamically
-     * allocated using the RTOS specific allocator
+     * the storage is dynamically allocated using the RTOS specific allocator
      * (`rtos::memory::allocator`).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
@@ -1423,8 +1409,17 @@ namespace os
 
     /**
      * @details
-     * Deallocate memory using the RTOS specific allocator
-     * (`rtos::memory::allocator`).
+     * This destructor shall destroy the message queue object; the object
+     * becomes, in effect, uninitialised. An implementation may cause
+     * the destructor to set the object to an invalid value.
+     *
+     * It shall be safe to destroy an initialised message queue object
+     * upon which no threads are currently blocked. Attempting to
+     * destroy a message queue object upon which other threads are
+     * currently blocked results in undefined behaviour.
+     *
+     * If the storage for the message queue was dynamically allocated,
+     * it is deallocated using the same allocator.
      */
     Message_queue::~Message_queue ()
     {
