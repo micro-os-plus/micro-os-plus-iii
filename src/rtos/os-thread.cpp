@@ -230,6 +230,17 @@ namespace os
       thread->_exit (thread->func_ (thread->func_args_));
     }
 
+    Thread::Thread ()
+    {
+      ;
+    }
+
+    Thread::Thread (const char* name) :
+        Named_object (name)
+    {
+      ;
+    }
+
     /**
      * @details
      * This constructor shall initialise the thread object
@@ -253,9 +264,8 @@ namespace os
      * be as if there was an implicit call to `exit()` using the
      * return value of `main()` as the exit status.
      *
-     *
      * For default thread objects, the stack is dynamically allocated,
-     * using the default size.
+     * using the RTOS specific allocator (`rtos::memory::allocator`).
      *
      * @par POSIX compatibility
      *  Inspired by [`pthread_create()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html)
@@ -264,11 +274,24 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Thread::Thread (thread::func_t function, thread::func_args_t args) :
-        Thread
-          { thread::initializer, function, args }
+    Thread::Thread (thread::func_t function, thread::func_args_t args,
+                    const Allocator& allocator)
     {
-      ;
+#if defined(OS_TRACE_RTOS_THREAD)
+      trace::printf ("%s @%p %s\n", __func__, this, name ());
+#endif
+      using Allocator = memory::allocator<stack::allocation_element_t>;
+      allocator_ = &allocator;
+
+      allocated_stack_size_elements_ = thread::Stack::default_size ()
+          / sizeof(stack::allocation_element_t);
+      allocated_stack_address_ =
+          reinterpret_cast<stack::element_t*> (const_cast<Allocator&> (allocator).allocate (
+              allocated_stack_size_elements_));
+
+      _construct (
+          thread::initializer, function, args, allocated_stack_address_,
+          allocated_stack_size_elements_ * sizeof(stack::allocation_element_t));
     }
 
     /**
@@ -300,6 +323,11 @@ namespace os
      * be as if there was an implicit call to `exit()` using the
      * return value of `main()` as the exit status.
      *
+     * If the attributes define a stack area (via `th_stack_address` and
+     * `th_stack_size_bytes`), that stack is used, otherwise
+     * the stack is dynamically allocated using the RTOS specific allocator
+     * (`rtos::memory::allocator`).
+     *
      * @par POSIX compatibility
      *  Inspired by [`pthread_create()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html)
      *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
@@ -308,26 +336,81 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     Thread::Thread (const thread::Attributes& attr, thread::func_t function,
-                    thread::func_args_t args) :
+                    thread::func_args_t args, const Allocator& allocator) :
         Named_object
           { attr.name () }
-#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
-            , ready_node_
-              { *this }
+    {
+#if defined(OS_TRACE_RTOS_THREAD)
+      trace::printf ("%s @%p %s\n", __func__, this, name ());
 #endif
+      if (attr.th_stack_address != nullptr
+          && attr.th_stack_size_bytes > thread::Stack::min_size ())
+        {
+          _construct (attr, function, args, nullptr, 0);
+        }
+      else
+        {
+          using Allocator = memory::allocator<stack::allocation_element_t>;
+          allocator_ = &allocator;
+
+          if (attr.th_stack_size_bytes > thread::Stack::min_size ())
+            {
+              allocated_stack_size_elements_ = attr.th_stack_size_bytes
+                  / sizeof(stack::allocation_element_t);
+            }
+          else
+            {
+              allocated_stack_size_elements_ = thread::Stack::default_size ()
+                  / sizeof(stack::allocation_element_t);
+            }
+          allocated_stack_address_ =
+              reinterpret_cast<stack::element_t*> (const_cast<Allocator&> (allocator).allocate (
+                  allocated_stack_size_elements_));
+
+          _construct (
+              attr,
+              function,
+              args,
+              allocated_stack_address_,
+              allocated_stack_size_elements_
+                  * sizeof(stack::allocation_element_t));
+        }
+    }
+
+    void
+    Thread::_construct (const thread::Attributes& attr, thread::func_t function,
+                        thread::func_args_t args, void* stack_address,
+                        std::size_t stack_size_bytes)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
       assert(function != nullptr);
       assert(attr.th_priority != thread::priority::none);
 
-      context_.stack_.size_bytes_ = attr.th_stack_size_bytes;
-      context_.stack_.bottom_address_ =
-          static_cast<stack::element_t*> (attr.th_stack_address);
+      clock_ = attr.clock != nullptr ? attr.clock : &systick_clock;
+
+      if (stack_address != nullptr)
+        {
+          // The attributes should not define any storage in this case.
+          if (attr.th_stack_size_bytes > thread::Stack::min_size ())
+            {
+              assert(attr.th_stack_address == nullptr);
+            }
+
+          context_.stack_.size_bytes_ = stack_size_bytes;
+          context_.stack_.bottom_address_ =
+              static_cast<stack::element_t*> (stack_address);
+        }
+      else
+        {
+          context_.stack_.size_bytes_ = attr.th_stack_size_bytes;
+          context_.stack_.bottom_address_ =
+              static_cast<stack::element_t*> (attr.th_stack_address);
+        }
 
 #if defined(OS_TRACE_RTOS_THREAD)
-      trace::printf ("%s @%p %s %d %d\n", __func__, this, name (), prio_,
-                     context_.stack_.size_bytes_);
+      trace::printf ("%s @%p %s p%d %d\n", __func__, this, name (),
+                     attr.th_priority, context_.stack_.size_bytes_);
 #endif
 
         {
@@ -339,17 +422,6 @@ namespace os
 
           func_ = function;
           func_args_ = args;
-          func_result_ = nullptr;
-
-          sig_mask_ = 0;
-          interrupted_ = false;
-
-          joiner_ = nullptr;
-          waiting_node_ = nullptr;
-
-          acquired_mutexes_ = 0;
-
-          clock_node_ = nullptr;
 
           parent_ = this_thread::_thread ();
           if (scheduler::started () && (parent_ != nullptr))
@@ -367,37 +439,6 @@ namespace os
           sched_state_ = thread::state::ready;
 
 #else
-
-#if defined(__APPLE__)
-          // On synthetic platforms ignore small user stacks and force
-          // the reallocation of default stacks.
-          if (context_.stack_.size_bytes_ < thread::Stack::min_size ())
-            {
-              context_.stack_.size_bytes_ = 0;
-              context_.stack_.bottom_address_ = nullptr;
-            }
-#endif
-
-          if (context_.stack_.size_bytes_ == 0)
-            {
-              context_.stack_.size_bytes_ = thread::Stack::default_size ();
-            }
-
-          os_assert_throw(
-              context_.stack_.size_bytes_ >= thread::Stack::min_size (),
-              EINVAL);
-
-          if (context_.stack_.bottom_address_ == nullptr)
-            {
-              allocated_stack_address_ =
-                  new (std::nothrow) stack::element_t[context_.stack_.size_bytes_
-                      / sizeof(stack::element_t)];
-              context_.stack_.bottom_address_ = allocated_stack_address_;
-            }
-          else
-            {
-              allocated_stack_address_ = nullptr;
-            }
 
           // Align the bottom of the stack.
           void* p = context_.stack_.bottom_address_;
@@ -428,7 +469,8 @@ namespace os
      * becomes, in effect, uninitialised. An implementation may cause
      * the destructor to set the object to an invalid value.
      *
-     * If the thread was created with dynamic stack, it is freed.
+     * If the stack was dynamically allocated, it is deallocated
+     * using the same allocator.
      *
      * @par POSIX compatibility
      *  No POSIX similar functionality identified.
@@ -635,8 +677,8 @@ namespace os
       while ((sched_state_ != thread::state::terminated)
           && (sched_state_ != thread::state::destroyed))
         {
-          joiner_ = this_thread::_thread();
-          this_thread::_thread()->_wait ();
+          joiner_ = this_thread::_thread ();
+          this_thread::_thread ()->_wait ();
         }
 
       if (exit_ptr != nullptr)
@@ -722,10 +764,9 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      // TODO
+      // TODO: implement according to POSIX specs.
       return result::ok;
     }
-
 
     void
     Thread::_exit (void* exit_ptr)
@@ -784,7 +825,7 @@ namespace os
 
       port::scheduler::reschedule ();
       assert(true);
-      for (;;)
+      while (true)
         ;
 #endif
       // Does not return.
@@ -797,7 +838,14 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      delete[] allocated_stack_address_;
+      if (allocated_stack_address_ != nullptr)
+        {
+          typedef typename std::allocator_traits<Allocator>::pointer pointer;
+
+          static_cast<Allocator*> (const_cast<void*> (allocator_))->deallocate (
+              reinterpret_cast<pointer> (allocated_stack_address_),
+              allocated_stack_size_elements_);
+        }
 
       sched_state_ = thread::state::destroyed;
 
@@ -1044,7 +1092,7 @@ namespace os
 #endif
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
-      clock::timestamp_t prev = systick_clock.now ();
+      clock::timestamp_t prev = clock_->now ();
       clock::duration_t slept_ticks = 0;
 #endif
       for (;;)
@@ -1055,9 +1103,8 @@ namespace os
               if (_try_wait (mask, oflags, mode) == result::ok)
                 {
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
-                  slept_ticks =
-                      static_cast<clock::duration_t> (systick_clock.now ()
-                          - prev);
+                  slept_ticks = static_cast<clock::duration_t> (clock_->now ()
+                      - prev);
                   trace::printf ("%s(0x%X, %d)=%d @%p %s\n", __func__, mask,
                                  mode, slept_ticks, this, name ());
 #endif
@@ -1111,12 +1158,11 @@ namespace os
             }
         }
 
-      Clock& clock = systick_clock;
-      Clock_timestamps_list& clock_list = clock.steady_list ();
-      clock::timestamp_t timeout_timestamp = clock.steady_now () + timeout;
+      Clock_timestamps_list& clock_list = clock_->steady_list ();
+      clock::timestamp_t timeout_timestamp = clock_->steady_now () + timeout;
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
-      clock::timestamp_t begin_timestamp = clock.steady_now ();
+      clock::timestamp_t begin_timestamp = clock_->steady_now ();
 #endif
 
       // Prepare a timeout node pointing to the current thread.
@@ -1162,7 +1208,7 @@ namespace os
               break;
             }
 
-          if (clock.steady_now () >= timeout_timestamp)
+          if (clock_->steady_now () >= timeout_timestamp)
             {
               res = ETIMEDOUT;
               break;
@@ -1171,7 +1217,8 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
       clock::duration_t slept_ticks =
-          static_cast<clock::duration_t> (clock.steady_now () - begin_timestamp);
+          static_cast<clock::duration_t> (clock_->steady_now ()
+              - begin_timestamp);
       trace::printf ("%s(0x%X, %d, %d)=%d @%p %s\n", __func__, mask, mode,
                      timeout, slept_ticks, this, name ());
 #endif
