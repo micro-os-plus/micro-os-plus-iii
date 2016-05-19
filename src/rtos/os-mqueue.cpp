@@ -361,7 +361,7 @@ namespace os
 
     /**
      * @details
-     * This constructor shall initialise the message queue object
+     * This constructor shall initialise a message queue object
      * with the given number of messages and default settings.
      * The effect shall be equivalent to creating a message queue object
      * referring to the attributes in `mqueue::initializer`.
@@ -380,10 +380,40 @@ namespace os
      */
     Message_queue::Message_queue (mqueue::size_t msgs,
                                   mqueue::msg_size_t msg_size_bytes,
-                                  const Allocator& allocator)
+                                  const Allocator& allocator) :
+        Message_queue
+          { nullptr, msgs, msg_size_bytes, allocator }
+    {
+      ;
+    }
+
+    /**
+     * @details
+     * This constructor shall initialise a named message queue object
+     * with the given number of messages and default settings.
+     * The effect shall be equivalent to creating a message queue object
+     * referring to the attributes in `mqueue::initializer`.
+     * Upon successful initialisation, the state of the message queue
+     * object shall become initialised, with no messages in the queue.
+     *
+     * Only the message queue object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * message queue objects.
+     *
+     * For default message queue objects, the storage is dynamically
+     * allocated using the RTOS specific allocator
+     * (`rtos::memory::allocator`).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    Message_queue::Message_queue (const char* name, mqueue::size_t msgs,
+                                  mqueue::msg_size_t msg_size_bytes,
+                                  const Allocator& allocator) :
+        Named_object
+          { name }
     {
 #if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), msgs,
+      trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (), msgs,
                      msg_size_bytes);
 #endif
       allocator_ = &allocator;
@@ -407,7 +437,7 @@ namespace os
 
     /**
      * @details
-     * This constructor shall initialise the message queue object
+     * This constructor shall initialise a message queue object
      * with attributes referenced by _attr_.
      * If the attributes specified by _attr_ are modified later,
      * the memory pool attributes shall not be affected.
@@ -435,10 +465,48 @@ namespace os
                                   mqueue::size_t msgs,
                                   mqueue::msg_size_t msg_size_bytes,
                                   const Allocator& allocator) :
-        Named_object (attr.name ())
+        Message_queue
+          { nullptr, attr, msgs, msg_size_bytes, allocator }
+    {
+      ;
+    }
+
+    /**
+     * @details
+     * This constructor shall initialise a named message queue object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the memory pool attributes shall not be affected.
+     * Upon successful initialisation, the state of the
+     * message queue object shall become initialised.
+     *
+     * Only the message queue itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * message queue objects.
+     *
+     * In cases where default message queue attributes are
+     * appropriate, the variable `mqueue::initializer` can be used to
+     * initialise message queue.
+     * The effect shall be equivalent to creating a message queue
+     * object with the simple constructor.
+     *
+     * If the attributes define a storage area (via `mq_queue_address` and
+     * `mq_queue_size_bytes`), that storage is used, otherwise
+     * the storage is dynamically allocated using the RTOS specific allocator
+     * (`rtos::memory::allocator`).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    Message_queue::Message_queue (const char* name,
+                                  const mqueue::Attributes& attr,
+                                  mqueue::size_t msgs,
+                                  mqueue::msg_size_t msg_size_bytes,
+                                  const Allocator& allocator) :
+        Named_object
+          { name != nullptr ? name : attr.name () }
     {
 #if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), msgs,
+      trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (), msgs,
                      msg_size_bytes);
 #endif
 

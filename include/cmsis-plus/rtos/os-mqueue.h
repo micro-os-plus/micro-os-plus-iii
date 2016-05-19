@@ -190,6 +190,17 @@ namespace os
                      const Allocator& allocator = Allocator ());
 
       /**
+       * @brief Create a named message queue with default settings.
+       * @param [in] name Pointer to name.
+       * @param [in] msgs The number of messages.
+       * @param [in] msg_size_bytes The message size, in bytes.
+       * @param [in] allocator Reference to allocator. Default a local temporary instance.
+       */
+      Message_queue (const char* name, mqueue::size_t msgs,
+                     mqueue::msg_size_t msg_size_bytes,
+                     const Allocator& allocator = Allocator ());
+
+      /**
        * @brief Create a message queue with custom settings.
        * @param [in] attr Reference to attributes.
        * @param [in] msgs The number of messages.
@@ -198,6 +209,18 @@ namespace os
        */
       Message_queue (const mqueue::Attributes& attr, mqueue::size_t msgs,
                      mqueue::msg_size_t msg_size_bytes,
+                     const Allocator& allocator = Allocator ());
+
+      /**
+       * @brief Create a named message queue with custom settings.
+       * @param [in] name Pointer to name.
+       * @param [in] attr Reference to attributes.
+       * @param [in] msgs The number of messages.
+       * @param [in] msg_size_bytes The message size, in bytes.
+       * @param [in] allocator Reference to allocator. Default a local temporary instance.
+       */
+      Message_queue (const char* name, const mqueue::Attributes& attr,
+                     mqueue::size_t msgs, mqueue::msg_size_t msg_size_bytes,
                      const Allocator& allocator = Allocator ());
 
     protected:
@@ -644,6 +667,17 @@ namespace os
                                  const Allocator& allocator = Allocator ());
 
         /**
+         * @brief Create a named message queue with default settings.
+         * @param [in] name Pointer to name.
+         * @param [in] msgs The number of messages.
+         * @param [in] msg_size_bytes The message size, in bytes.
+         * @param [in] allocator Reference to allocator. Default a local temporary instance.
+         */
+        Message_queue_allocated (const char* name, mqueue::size_t msgs,
+                                 mqueue::msg_size_t msg_size_bytes,
+                                 const Allocator& allocator = Allocator ());
+
+        /**
          * @brief Create a message queue with custom settings.
          * @param [in] attr Reference to attributes.
          * @param [in] msgs The number of messages.
@@ -651,6 +685,20 @@ namespace os
          * @param [in] allocator Reference to allocator. Default a local temporary instance.
          */
         Message_queue_allocated (const mqueue::Attributes& attr,
+                                 mqueue::size_t msgs,
+                                 mqueue::msg_size_t msg_size_bytes,
+                                 const Allocator& allocator = Allocator ());
+
+        /**
+         * @brief Create a named message queue with custom settings.
+         * @param [in] name Pointer to name.
+         * @param [in] attr Reference to attributes.
+         * @param [in] msgs The number of messages.
+         * @param [in] msg_size_bytes The message size, in bytes.
+         * @param [in] allocator Reference to allocator. Default a local temporary instance.
+         */
+        Message_queue_allocated (const char* name,
+                                 const mqueue::Attributes& attr,
                                  mqueue::size_t msgs,
                                  mqueue::msg_size_t msg_size_bytes,
                                  const Allocator& allocator = Allocator ());
@@ -712,12 +760,32 @@ namespace os
                                  Allocator ());
 
         /**
+         * @brief Create a named typed message queue with default settings.
+         * @param [in] name Pointer to name.
+         * @param [in] msgs The number of messages.
+         * @param [in] allocator Reference to allocator. Default a local temporary instance.
+         */
+        Message_queue_typed (const char* name, mqueue::size_t msgs,
+                             const Allocator& allocator = Allocator ());
+
+        /**
          * @brief Create a typed message queue with custom settings.
          * @param [in] attr Reference to attributes.
          * @param [in] msgs The number of messages.
          * @param [in] allocator Reference to allocator. Default a local temporary instance.
          */
         Message_queue_typed (const mqueue::Attributes& attr,
+                             mqueue::size_t msgs, const Allocator& allocator =
+                                 Allocator ());
+
+        /**
+         * @brief Create a named typed message queue with custom settings.
+         * @param [in] name Pointer to name.
+         * @param [in] attr Reference to attributes.
+         * @param [in] msgs The number of messages.
+         * @param [in] allocator Reference to allocator. Default a local temporary instance.
+         */
+        Message_queue_typed (const char* name, const mqueue::Attributes& attr,
                              mqueue::size_t msgs, const Allocator& allocator =
                                  Allocator ());
 
@@ -899,10 +967,23 @@ namespace os
         Message_queue_static ();
 
         /**
+         * @brief Create a named typed message queue with default settings.
+         * @param [in] name Pointer to name.
+         */
+        Message_queue_static (const char* name);
+
+        /**
          * @brief Create a typed message queue with custom settings.
          * @param [in] attr Reference to attributes.
          */
         Message_queue_static (const mqueue::Attributes& attr);
+
+        /**
+         * @brief Create a named typed message queue with custom settings.
+         * @param [in] name Pointer to name.
+         * @param [in] attr Reference to attributes.
+         */
+        Message_queue_static (const char* name, const mqueue::Attributes& attr);
 
         /**
          * @cond ignore
@@ -1175,7 +1256,37 @@ namespace os
 
     /**
      * @details
-     * This constructor shall initialise the message queue object
+     * This constructor shall initialise a message queue object
+     * with the given number of messages and default settings.
+     * The effect shall be equivalent to creating a message queue object
+     * referring to the attributes in `mqueue::initializer`.
+     * Upon successful initialisation, the state of the message queue
+     * object shall become initialised, with no messages in the queue.
+     *
+     * Only the message queue object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * message queue objects.
+     *
+     * For default message queue objects, the storage is dynamically
+     * allocated using the RTOS specific allocator
+     * (`rtos::memory::allocator`).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    template<typename Allocator>
+      inline
+      Message_queue_allocated<Allocator>::Message_queue_allocated (
+          mqueue::size_t msgs, mqueue::msg_size_t msg_size_bytes,
+          const Allocator& allocator) :
+          Message_queue_allocated
+            { nullptr, msgs, msg_size_bytes, allocator }
+      {
+        ;
+      }
+
+    /**
+     * @details
+     * This constructor shall initialise a named message queue object
      * with the given number of messages and default settings.
      * The effect shall be equivalent to creating a message queue object
      * referring to the attributes in `mqueue::initializer`.
@@ -1194,20 +1305,22 @@ namespace os
      */
     template<typename Allocator>
       Message_queue_allocated<Allocator>::Message_queue_allocated (
-          mqueue::size_t msgs, mqueue::msg_size_t msg_size_bytes,
-          const Allocator& allocator)
+          const char* name, mqueue::size_t msgs,
+          mqueue::msg_size_t msg_size_bytes, const Allocator& allocator) :
+          Message_queue
+            { name }
       {
 #if defined(OS_TRACE_RTOS_MQUEUE)
-        trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), msgs,
-                       msg_size_bytes);
+        trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (),
+                       msgs, msg_size_bytes);
 #endif
+
+        allocator_ = &allocator;
 
         allocated_queue_size_elements_ = (mqueue::compute_allocated_size_bytes<
             typename Allocator::value_type> (msgs, msg_size_bytes)
             + sizeof(typename Allocator::value_type) - 1)
             / sizeof(typename Allocator::value_type);
-
-        allocator_ = &allocator;
 
         allocated_queue_addr_ = const_cast<Allocator&> (allocator).allocate (
             allocated_queue_size_elements_);
@@ -1223,7 +1336,44 @@ namespace os
 
     /**
      * @details
-     * This constructor shall initialise the message queue object
+     * This constructor shall initialise a message queue object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the memory pool attributes shall not be affected.
+     * Upon successful initialisation, the state of the
+     * message queue object shall become initialised.
+     *
+     * Only the message queue itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * message queue objects.
+     *
+     * In cases where default message queue attributes are
+     * appropriate, the variable `mqueue::initializer` can be used to
+     * initialise message queue.
+     * The effect shall be equivalent to creating a message queue
+     * object with the simple constructor.
+     *
+     * If the attributes define a storage area (via `mq_queue_address` and
+     * `mq_queue_size_bytes`), that storage is used, otherwise
+     * the storage is dynamically allocated using the RTOS specific allocator
+     * (`rtos::memory::allocator`).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    template<typename Allocator>
+      inline
+      Message_queue_allocated<Allocator>::Message_queue_allocated (
+          const mqueue::Attributes& attr, mqueue::size_t msgs,
+          mqueue::msg_size_t msg_size_bytes, const Allocator& allocator) :
+          Message_queue_allocated
+            { nullptr, attr, msgs, msg_size_bytes, allocator }
+      {
+        ;
+      }
+
+    /**
+     * @details
+     * This constructor shall initialise a named message queue object
      * with attributes referenced by _attr_.
      * If the attributes specified by _attr_ are modified later,
      * the memory pool attributes shall not be affected.
@@ -1249,13 +1399,14 @@ namespace os
      */
     template<typename Allocator>
       Message_queue_allocated<Allocator>::Message_queue_allocated (
-          const mqueue::Attributes& attr, mqueue::size_t msgs,
+          const char* name, const mqueue::Attributes& attr, mqueue::size_t msgs,
           mqueue::msg_size_t msg_size_bytes, const Allocator& allocator) :
-          Message_queue (attr.name ())
+          Message_queue
+            { name != nullptr ? name : attr.name () }
       {
 #if defined(OS_TRACE_RTOS_MQUEUE)
-        trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), msgs,
-                       msg_size_bytes);
+        trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (),
+                       msgs, msg_size_bytes);
 #endif
 
         if (attr.mq_queue_address != nullptr)
@@ -1265,6 +1416,8 @@ namespace os
           }
         else
           {
+            allocator_ = &allocator;
+
             // If no user storage was provided via attributes,
             // allocate it dynamically via the allocator.
             allocated_queue_size_elements_ =
@@ -1272,8 +1425,6 @@ namespace os
                     typename Allocator::value_type> (msgs, msg_size_bytes)
                     + sizeof(typename Allocator::value_type) - 1)
                     / sizeof(typename Allocator::value_type);
-
-            allocator_ = &allocator;
 
             allocated_queue_addr_ =
                 const_cast<Allocator&> (allocator).allocate (
@@ -1291,7 +1442,7 @@ namespace os
 
     /**
      * @details
-     * This destructor shall destroy the message queue object; the object
+     * This destructor shall destroy a message queue object; the object
      * becomes, in effect, uninitialised. An implementation may cause
      * the destructor to set the object to an invalid value.
      *
@@ -1325,7 +1476,7 @@ namespace os
 
     /**
      * @details
-     * This constructor shall initialise the message queue object
+     * This constructor shall initialise a message queue object
      * with the given number of messages and default settings.
      * The effect shall be equivalent to creating a message queue object
      * referring to the attributes in `mqueue::initializer`.
@@ -1357,7 +1508,39 @@ namespace os
 
     /**
      * @details
-     * This constructor shall initialise the message queue object
+     * This constructor shall initialise a named message queue object
+     * with the given number of messages and default settings.
+     * The effect shall be equivalent to creating a message queue object
+     * referring to the attributes in `mqueue::initializer`.
+     * Upon successful initialisation, the state of the message queue
+     * object shall become initialised, with no messages in the queue.
+     *
+     * Only the message queue object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * message queue objects.
+     *
+     * For default message queue objects, the storage is dynamically
+     * allocated using the RTOS specific allocator
+     * (`rtos::memory::allocator`).
+     *
+     * Implemented as a wrapper over the parent constructor, automatically
+     * passing the message size.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    template<typename T, typename Allocator>
+      inline
+      Message_queue_typed<T, Allocator>::Message_queue_typed (
+          const char* name, mqueue::size_t msgs, const Allocator& allocator) :
+          Message_queue_allocated<Allocator> (name, msgs, sizeof(value_type),
+                                              allocator)
+      {
+        ;
+      }
+
+    /**
+     * @details
+     * This constructor shall initialise a message queue object
      * with attributes referenced by _attr_.
      * If the attributes specified by _attr_ are modified later,
      * the memory pool attributes shall not be affected.
@@ -1389,15 +1572,55 @@ namespace os
       Message_queue_typed<T, Allocator>::Message_queue_typed (
           const mqueue::Attributes& attr, mqueue::size_t msgs,
           const Allocator& allocator) :
-          Message_queue_allocated<Allocator> (attr, msgs, sizeof(value_type),
-                                              allocator)
+          Message_queue_allocated<Allocator>
+            { attr, msgs, sizeof(value_type), allocator }
       {
         ;
       }
 
     /**
      * @details
-     * This destructor shall destroy the message queue object; the object
+     * This constructor shall initialise a named message queue object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the memory pool attributes shall not be affected.
+     * Upon successful initialisation, the state of the
+     * message queue object shall become initialised.
+     *
+     * Only the message queue itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * message queue objects.
+     *
+     * In cases where default message queue attributes are
+     * appropriate, the variable `mqueue::initializer` can be used to
+     * initialise message queue.
+     * The effect shall be equivalent to creating a message queue
+     * object with the simple constructor.
+     *
+     * If the attributes define a storage area (via `mq_queue_address` and
+     * `mq_queue_size_bytes`), that storage is used, otherwise
+     * the storage is dynamically allocated using the RTOS specific allocator
+     * (`rtos::memory::allocator`).
+     *
+     * Implemented as a wrapper over the parent constructor, automatically
+     * passing the message size.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    template<typename T, typename Allocator>
+      inline
+      Message_queue_typed<T, Allocator>::Message_queue_typed (
+          const char* name, const mqueue::Attributes& attr, mqueue::size_t msgs,
+          const Allocator& allocator) :
+          Message_queue_allocated<Allocator>
+            { name, attr, msgs, sizeof(value_type), allocator }
+      {
+        ;
+      }
+
+    /**
+     * @details
+     * This destructor shall destroy a message queue object; the object
      * becomes, in effect, uninitialised. An implementation may cause
      * the destructor to set the object to an invalid value.
      *
@@ -1519,7 +1742,7 @@ namespace os
 
     /**
      * @details
-     * This constructor shall initialise the message queue object
+     * This constructor shall initialise a message queue object
      * with the given number of messages and default settings.
      * The effect shall be equivalent to creating a message queue object
      * referring to the attributes in `mqueue::initializer`.
@@ -1552,7 +1775,86 @@ namespace os
 
     /**
      * @details
-     * This constructor shall initialise the message queue object
+     * This constructor shall initialise a named message queue object
+     * with the given number of messages and default settings.
+     * The effect shall be equivalent to creating a message queue object
+     * referring to the attributes in `mqueue::initializer`.
+     * Upon successful initialisation, the state of the message queue
+     * object shall become initialised, with no messages in the queue.
+     *
+     * Only the message queue object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * message queue objects.
+     *
+     * The storage shall be statically allocated inside the
+     * message queue object instance.
+     *
+     * @note These objects are better instantiated as global static
+     * objects. When instantiated on the thread stack, the stack
+     * should be sized accordingly, including not only the
+     * given number of messages, but also the internal lists overhead.
+     *
+     * Implemented as a wrapper over the parent constructor, automatically
+     * passing the message size and the storage details.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    template<typename T, std::size_t N>
+      Message_queue_static<T, N>::Message_queue_static (const char* name) :
+          Message_queue
+            { name }
+      {
+        _construct (mqueue::initializer, msgs, sizeof(value_type), &arena_,
+                    sizeof(arena_));
+      }
+
+    /**
+     * @details
+     * This constructor shall initialise a message queue object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the memory pool attributes shall not be affected.
+     * Upon successful initialisation, the state of the
+     * message queue object shall become initialised.
+     *
+     * Only the message queue itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * message queue objects.
+     *
+     * In cases where default message queue attributes are
+     * appropriate, the variable `mqueue::initializer` can be used to
+     * initialise message queue.
+     * The effect shall be equivalent to creating a message queue
+     * object with the simple constructor.
+     *
+     * The storage shall be statically allocated inside the
+     * message queue object instance.
+     *
+     * Passing a storage via the attributes is not allowed
+     * and might trigger an assert.
+     *
+     * @note These objects are better instantiated as global static
+     * objects. When instantiated on the thread stack, the stack
+     * should be sized accordingly, including the internal lists overhead.
+     *
+     * Implemented as a wrapper over the parent constructor, automatically
+     * passing the message size and the storage details.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    template<typename T, std::size_t N>
+      inline
+      Message_queue_static<T, N>::Message_queue_static (
+          const mqueue::Attributes& attr) :
+          Message_queue_static
+            { nullptr, attr }
+      {
+        ;
+      }
+
+    /**
+     * @details
+     * This constructor shall initialise a named message queue object
      * with attributes referenced by _attr_.
      * If the attributes specified by _attr_ are modified later,
      * the memory pool attributes shall not be affected.
@@ -1586,8 +1888,8 @@ namespace os
      */
     template<typename T, std::size_t N>
       Message_queue_static<T, N>::Message_queue_static (
-          const mqueue::Attributes& attr) :
-          Message_queue (attr.name ())
+          const char* name, const mqueue::Attributes& attr) :
+          Message_queue (name != nullptr ? name : attr.name ())
       {
         _construct (attr, msgs, sizeof(value_type), &arena_, sizeof(arena_));
       }

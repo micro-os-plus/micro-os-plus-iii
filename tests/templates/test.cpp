@@ -91,10 +91,16 @@ run_tests (void)
 
   // Classic usage; message size and cast to char* must be supplied manually.
     {
-      Message_queue cq
+      Message_queue cq1
         { 3, sizeof(my_msg_t) };
 
-      cq.send ((char*) &msg_out, sizeof(my_msg_t));
+      cq1.send ((char*) &msg_out, sizeof(my_msg_t));
+
+      Message_queue cq2
+        { "cq2", 3, sizeof(my_msg_t) };
+
+      cq2.send ((char*) &msg_out, sizeof(my_msg_t));
+
     }
 
   // --------------------------------------------------------------------------
@@ -106,17 +112,24 @@ run_tests (void)
   using My_queue = Message_queue_typed<my_msg_t>;
 
     {
-      My_queue q
+      My_queue tq1
         { 7 };
 
-      q.send (&msg_out);
-      q.receive (&msg_in);
+      tq1.send (&msg_out);
+      tq1.receive (&msg_in);
 
-      q.try_send (&msg_out);
-      q.try_receive (&msg_in);
+      tq1.try_send (&msg_out);
+      tq1.try_receive (&msg_in);
 
-      q.timed_send (&msg_out, 1);
-      q.timed_receive (&msg_in, 1);
+      tq1.timed_send (&msg_out, 1);
+      tq1.timed_receive (&msg_in, 1);
+
+      My_queue tq2
+        { "tq2", 7 };
+
+      tq2.send (&msg_out);
+      tq2.receive (&msg_in);
+
     }
 
   // --------------------------------------------------------------------------
@@ -130,16 +143,23 @@ run_tests (void)
     {
       // The space for the queue is allocated inside the queue
       // object, in this case on the stack.
-      My_static_queue sq;
+      My_static_queue sq1;
 
-      sq.send (&msg_out);
-      sq.receive (&msg_in);
+      sq1.send (&msg_out);
+      sq1.receive (&msg_in);
 
-      sq.try_send (&msg_out);
-      sq.try_receive (&msg_in);
+      sq1.try_send (&msg_out);
+      sq1.try_receive (&msg_in);
 
-      sq.timed_send (&msg_out, 1);
-      sq.timed_receive (&msg_in, 1);
+      sq1.timed_send (&msg_out, 1);
+      sq1.timed_receive (&msg_in, 1);
+
+      My_static_queue sq2
+        { "sq2" };
+
+      sq2.send (&msg_out);
+      sq2.receive (&msg_in);
+
     }
 
   // ==========================================================================
