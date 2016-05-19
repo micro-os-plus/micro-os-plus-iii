@@ -92,7 +92,7 @@ namespace os
 
         th = _thread ();
 
-        assert (th != nullptr);
+        assert(th != nullptr);
         return (*th);
       }
 
@@ -387,8 +387,8 @@ namespace os
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
-      assert (function != nullptr);
-      assert (attr.th_priority != thread::priority::none);
+      assert(function != nullptr);
+      assert(attr.th_priority != thread::priority::none);
 
       clock_ = attr.clock != nullptr ? attr.clock : &systick_clock;
 
@@ -397,7 +397,7 @@ namespace os
           // The attributes should not define any storage in this case.
           if (attr.th_stack_size_bytes > thread::Stack::min_size ())
             {
-              assert (attr.th_stack_address == nullptr);
+              assert(attr.th_stack_address == nullptr);
             }
 
           context_.stack_.size_bytes_ = stack_size_bytes;
@@ -774,7 +774,7 @@ namespace os
     void
     Thread::_exit (void* exit_ptr)
     {
-      assert (!scheduler::in_handler_mode ());
+      assert(!scheduler::in_handler_mode ());
 
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -793,10 +793,10 @@ namespace os
               child_links_.unlink ();
             }
 
-          assert (children_.empty ());
+          assert(children_.empty ());
           parent_ = nullptr;
 
-          assert (acquired_mutexes_ == 0);
+          assert(acquired_mutexes_ == 0);
 
           sched_state_ = thread::state::terminated;
 
@@ -827,7 +827,7 @@ namespace os
         }
 
       port::scheduler::reschedule ();
-      assert (true);
+      assert(true);
       while (true)
         ;
 #endif
@@ -916,10 +916,10 @@ namespace os
               child_links_.unlink ();
             }
 
-          assert (children_.empty ());
+          assert(children_.empty ());
           parent_ = nullptr;
 
-          assert (acquired_mutexes_ == 0);
+          assert(acquired_mutexes_ == 0);
 
           delete[] allocated_stack_address_;
 

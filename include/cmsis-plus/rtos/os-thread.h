@@ -490,7 +490,8 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     /**
-     * @brief POSIX compliant **thread**.
+     * @brief POSIX compliant **thread**, using the
+     * default RTOS allocator.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
@@ -1384,8 +1385,8 @@ namespace os
       inline void
       Stack::default_size (std::size_t size_bytes)
       {
-        assert (size_bytes != 0);
-        assert (size_bytes >= min_size_bytes_);
+        assert(size_bytes != 0);
+        assert(size_bytes >= min_size_bytes_);
 
         default_size_bytes_ = size_bytes;
       }
