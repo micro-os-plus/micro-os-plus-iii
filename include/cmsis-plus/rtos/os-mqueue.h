@@ -164,33 +164,58 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     /**
-     * @brief Base class for POSIX compliant **message queue**.
+     * @brief POSIX compliant **message queue**, using the
+     * default RTOS allocator.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
      */
-    class Message_queue_base : public Named_object
+    class Message_queue : public Named_object
     {
-    protected:
+    public:
+
+      using Allocator = memory::allocator<stack::allocation_element_t>;
 
       /**
        * @name Constructors & Destructor
        * @{
        */
 
-      // Internal constructors, used from templates.
-      Message_queue_base ();
-      Message_queue_base (const char* name);
+      /**
+       * @brief Create a message queue with default settings.
+       * @param [in] msgs The number of messages.
+       * @param [in] msg_size_bytes The message size, in bytes.
+       */
+      Message_queue (mqueue::size_t msgs, mqueue::msg_size_t msg_size_bytes,
+                     const Allocator& allocator = Allocator ());
 
-    public:
+      /**
+       * @brief Create a message queue with custom settings.
+       * @param [in] attr Reference to attributes.
+       * @param [in] msgs The number of messages.
+       * @param [in] msg_size_bytes The message size, in bytes.
+       */
+      Message_queue (const mqueue::Attributes& attr, mqueue::size_t msgs,
+                     mqueue::msg_size_t msg_size_bytes,
+                     const Allocator& allocator = Allocator ());
+
+    protected:
 
       /**
        * @cond ignore
        */
-      Message_queue_base (const Message_queue_base&) = delete;
-      Message_queue_base (Message_queue_base&&) = delete;
-      Message_queue_base&
-      operator= (const Message_queue_base&) = delete;
-      Message_queue_base&
-      operator= (Message_queue_base&&) = delete;
+
+      // Internal constructors, used from templates.
+      Message_queue ();
+      Message_queue (const char* name);
+
+    public:
+
+      Message_queue (const Message_queue&) = delete;
+      Message_queue (Message_queue&&) = delete;
+      Message_queue&
+      operator= (const Message_queue&) = delete;
+      Message_queue&
+      operator= (Message_queue&&) = delete;
       /**
        * @endcond
        */
@@ -198,7 +223,8 @@ namespace os
       /**
        * @brief Destroy the message queue.
        */
-      ~Message_queue_base ();
+      virtual
+      ~Message_queue ();
 
       /**
        * @}
@@ -215,7 +241,7 @@ namespace os
        * @retval false The memory queues are different.
        */
       bool
-      operator== (const Message_queue_base& rhs) const;
+      operator== (const Message_queue& rhs) const;
 
       /**
        * @}
@@ -547,7 +573,7 @@ namespace os
       const void* allocator_ = nullptr;
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
-      friend class port::Message_queue_base;
+      friend class port::Message_queue;
       os_mqueue_port_data_t port_;
 #endif
 
@@ -594,7 +620,7 @@ namespace os
      * @ingroup cmsis-plus-rtos
      */
     template<typename Allocator = memory::allocator<void*>>
-      class Message_queue_allocated : public Message_queue_base
+      class Message_queue_allocated : public Message_queue
       {
       public:
 
@@ -652,67 +678,6 @@ namespace os
          */
 
       };
-
-    // ========================================================================
-
-    /**
-     * @brief POSIX compliant **message queue**; instance of the
-     * Message_queue_allocated template, using the default RTOS allocator.
-     * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
-     */
-    class Message_queue : public Message_queue_allocated<>
-    {
-    public:
-
-      using allocator_type = Message_queue_allocated::allocator_type;
-
-      /**
-       * @name Constructors & Destructor
-       * @{
-       */
-
-      /**
-       * @brief Create a message queue with default settings.
-       * @param [in] msgs The number of messages.
-       * @param [in] msg_size_bytes The message size, in bytes.
-       */
-      Message_queue (mqueue::size_t msgs, mqueue::msg_size_t msg_size_bytes);
-
-      /**
-       * @brief Create a message queue with custom settings.
-       * @param [in] attr Reference to attributes.
-       * @param [in] msgs The number of messages.
-       * @param [in] msg_size_bytes The message size, in bytes.
-       */
-      Message_queue (const mqueue::Attributes& attr, mqueue::size_t msgs,
-                     mqueue::msg_size_t msg_size_bytes);
-
-      /**
-       * @cond ignore
-       */
-    public:
-
-      Message_queue (const Message_queue&) = delete;
-      Message_queue (Message_queue&&) = delete;
-      Message_queue&
-      operator= (const Message_queue&) = delete;
-      Message_queue&
-      operator= (Message_queue&&) = delete;
-      /**
-       * @endcond
-       */
-
-      /**
-       * @brief Destroy the message queue.
-       */
-      ~Message_queue ();
-
-      /**
-       * @}
-       */
-
-    };
 
     // ========================================================================
 
@@ -912,7 +877,7 @@ namespace os
      * @ingroup cmsis-plus-rtos
      */
     template<typename T, std::size_t N>
-      class Message_queue_static : public Message_queue_base
+      class Message_queue_static : public Message_queue
       {
       public:
 
@@ -1141,7 +1106,7 @@ namespace os
      *  Extension to standard, no POSIX similar functionality identified.
      */
     inline bool
-    Message_queue_base::operator== (const Message_queue_base& rhs) const
+    Message_queue::operator== (const Message_queue& rhs) const
     {
       return this == &rhs;
     }
@@ -1152,7 +1117,7 @@ namespace os
      *  Extension to standard, no POSIX similar functionality identified.
      */
     inline std::size_t
-    Message_queue_base::length (void) const
+    Message_queue::length (void) const
     {
       return count_;
     }
@@ -1163,7 +1128,7 @@ namespace os
      *  Extension to standard, no POSIX similar functionality identified.
      */
     inline std::size_t
-    Message_queue_base::capacity (void) const
+    Message_queue::capacity (void) const
     {
       return msgs_;
     }
@@ -1174,7 +1139,7 @@ namespace os
      *  Extension to standard, no POSIX similar functionality identified.
      */
     inline std::size_t
-    Message_queue_base::msg_size (void) const
+    Message_queue::msg_size (void) const
     {
       return msg_size_bytes_;
     }
@@ -1185,7 +1150,7 @@ namespace os
      *  Extension to standard, no POSIX similar functionality identified.
      */
     inline bool
-    Message_queue_base::empty (void) const
+    Message_queue::empty (void) const
     {
       return (length () == 0);
     }
@@ -1196,7 +1161,7 @@ namespace os
      *  Extension to standard, no POSIX similar functionality identified.
      */
     inline bool
-    Message_queue_base::full (void) const
+    Message_queue::full (void) const
     {
       return (length () == capacity ());
     }
@@ -1281,7 +1246,7 @@ namespace os
       Message_queue_allocated<Allocator>::Message_queue_allocated (
           const mqueue::Attributes& attr, mqueue::size_t msgs,
           mqueue::msg_size_t msg_size_bytes, const Allocator& allocator) :
-          Message_queue_base (attr.name ())
+          Message_queue (attr.name ())
       {
 #if defined(OS_TRACE_RTOS_MQUEUE)
         trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), msgs,
@@ -1451,7 +1416,7 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue_base::send().
+     * @see Message_queue::send().
      */
     template<typename T, typename Allocator>
       inline result_t
@@ -1467,7 +1432,7 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue_base::try_send().
+     * @see Message_queue::try_send().
      */
     template<typename T, typename Allocator>
       inline result_t
@@ -1483,7 +1448,7 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue_base::timed_send().
+     * @see Message_queue::timed_send().
      */
     template<typename T, typename Allocator>
       inline result_t
@@ -1501,7 +1466,7 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue_base::receive().
+     * @see Message_queue::receive().
      */
     template<typename T, typename Allocator>
       inline result_t
@@ -1517,7 +1482,7 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue_base::try_receive().
+     * @see Message_queue::try_receive().
      */
     template<typename T, typename Allocator>
       inline result_t
@@ -1533,7 +1498,7 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue_base::timed_receive().
+     * @see Message_queue::timed_receive().
      */
     template<typename T, typename Allocator>
       inline result_t
@@ -1616,7 +1581,7 @@ namespace os
     template<typename T, std::size_t N>
       Message_queue_static<T, N>::Message_queue_static (
           const mqueue::Attributes& attr) :
-          Message_queue_base (attr.name ())
+          Message_queue (attr.name ())
       {
         _construct (attr, msgs, sizeof(value_type), &arena_, sizeof(arena_));
       }
@@ -1646,15 +1611,15 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue_base::send().
+     * @see Message_queue::send().
      */
     template<typename T, std::size_t N>
       inline result_t
       Message_queue_static<T, N>::send (const value_type* msg,
                                         mqueue::priority_t mprio)
       {
-        return Message_queue_base::send (reinterpret_cast<const char*> (msg),
-                                         sizeof(value_type), mprio);
+        return Message_queue::send (reinterpret_cast<const char*> (msg),
+                                    sizeof(value_type), mprio);
       }
 
     /**
@@ -1662,15 +1627,15 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue_base::try_send().
+     * @see Message_queue::try_send().
      */
     template<typename T, std::size_t N>
       inline result_t
       Message_queue_static<T, N>::try_send (const value_type* msg,
                                             mqueue::priority_t mprio)
       {
-        return Message_queue_base::try_send (
-            reinterpret_cast<const char*> (msg), sizeof(value_type), mprio);
+        return Message_queue::try_send (reinterpret_cast<const char*> (msg),
+                                        sizeof(value_type), mprio);
       }
 
     /**
@@ -1678,7 +1643,7 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue_base::timed_send().
+     * @see Message_queue::timed_send().
      */
     template<typename T, std::size_t N>
       inline result_t
@@ -1686,9 +1651,8 @@ namespace os
                                               clock::duration_t timeout,
                                               mqueue::priority_t mprio)
       {
-        return Message_queue_base::timed_send (
-            reinterpret_cast<const char*> (msg), sizeof(value_type), timeout,
-            mprio);
+        return Message_queue::timed_send (reinterpret_cast<const char*> (msg),
+                                          sizeof(value_type), timeout, mprio);
       }
 
     /**
@@ -1696,15 +1660,15 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue_base::receive().
+     * @see Message_queue::receive().
      */
     template<typename T, std::size_t N>
       inline result_t
       Message_queue_static<T, N>::receive (value_type* msg,
                                            mqueue::priority_t* mprio)
       {
-        return Message_queue_base::receive (reinterpret_cast<char*> (msg),
-                                            sizeof(value_type), mprio);
+        return Message_queue::receive (reinterpret_cast<char*> (msg),
+                                       sizeof(value_type), mprio);
       }
 
     /**
@@ -1712,15 +1676,15 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue_base::try_receive().
+     * @see Message_queue::try_receive().
      */
     template<typename T, std::size_t N>
       inline result_t
       Message_queue_static<T, N>::try_receive (value_type* msg,
                                                mqueue::priority_t* mprio)
       {
-        return Message_queue_base::try_receive (reinterpret_cast<char*> (msg),
-                                                sizeof(value_type), mprio);
+        return Message_queue::try_receive (reinterpret_cast<char*> (msg),
+                                           sizeof(value_type), mprio);
       }
 
     /**
@@ -1728,7 +1692,7 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue_base::timed_receive().
+     * @see Message_queue::timed_receive().
      */
     template<typename T, std::size_t N>
       inline result_t
@@ -1736,9 +1700,8 @@ namespace os
                                                  clock::duration_t timeout,
                                                  mqueue::priority_t* mprio)
       {
-        return Message_queue_base::timed_receive (reinterpret_cast<char*> (msg),
-                                                  sizeof(value_type), timeout,
-                                                  mprio);
+        return Message_queue::timed_receive (reinterpret_cast<char*> (msg),
+                                             sizeof(value_type), timeout, mprio);
       }
 
   } /* namespace rtos */

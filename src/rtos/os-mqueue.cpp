@@ -344,14 +344,14 @@ namespace os
 
     // ------------------------------------------------------------------------
     // Protected internal constructor.
-    Message_queue_base::Message_queue_base ()
+    Message_queue::Message_queue ()
     {
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s() @%p\n", __func__, this);
 #endif
     }
 
-    Message_queue_base::Message_queue_base (const char* name) :
+    Message_queue::Message_queue (const char* name) :
         Named_object (name)
     {
 #if defined(OS_TRACE_RTOS_MQUEUE)
@@ -359,12 +359,125 @@ namespace os
 #endif
     }
 
+    /**
+     * @details
+     * This constructor shall initialise the message queue object
+     * with the given number of messages and default settings.
+     * The effect shall be equivalent to creating a message queue object
+     * referring to the attributes in `mqueue::initializer`.
+     * Upon successful initialisation, the state of the message queue
+     * object shall become initialised, with no messages in the queue.
+     *
+     * Only the message queue object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * message queue objects.
+     *
+     * For default message queue objects, the storage is dynamically
+     * allocated using the RTOS specific allocator
+     * (`rtos::memory::allocator`).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    Message_queue::Message_queue (mqueue::size_t msgs,
+                                  mqueue::msg_size_t msg_size_bytes,
+                                  const Allocator& allocator)
+    {
+#if defined(OS_TRACE_RTOS_MQUEUE)
+      trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), msgs,
+                     msg_size_bytes);
+#endif
+      allocator_ = &allocator;
+
+      allocated_queue_size_elements_ = (mqueue::compute_allocated_size_bytes<
+          typename Allocator::value_type> (msgs, msg_size_bytes)
+          + sizeof(typename Allocator::value_type) - 1)
+          / sizeof(typename Allocator::value_type);
+
+      allocated_queue_addr_ = const_cast<Allocator&> (allocator).allocate (
+          allocated_queue_size_elements_);
+
+      _construct (
+          mqueue::initializer,
+          msgs,
+          msg_size_bytes,
+          allocated_queue_addr_,
+          allocated_queue_size_elements_
+              * sizeof(typename Allocator::value_type));
+    }
+
+    /**
+     * @details
+     * This constructor shall initialise the message queue object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the memory pool attributes shall not be affected.
+     * Upon successful initialisation, the state of the
+     * message queue object shall become initialised.
+     *
+     * Only the message queue itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * message queue objects.
+     *
+     * In cases where default message queue attributes are
+     * appropriate, the variable `mqueue::initializer` can be used to
+     * initialise message queue.
+     * The effect shall be equivalent to creating a message queue
+     * object with the simple constructor.
+     *
+     * If the attributes define a storage area (via `mq_queue_address` and
+     * `mq_queue_size_bytes`), that storage is used, otherwise
+     * the storage is dynamically allocated using the RTOS specific allocator
+     * (`rtos::memory::allocator`).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    Message_queue::Message_queue (const mqueue::Attributes& attr,
+                                  mqueue::size_t msgs,
+                                  mqueue::msg_size_t msg_size_bytes,
+                                  const Allocator& allocator) :
+        Named_object (attr.name ())
+    {
+#if defined(OS_TRACE_RTOS_MQUEUE)
+      trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), msgs,
+                     msg_size_bytes);
+#endif
+
+      if (attr.mq_queue_address != nullptr)
+        {
+          // Do not use any allocator at all.
+          _construct (attr, msgs, msg_size_bytes, nullptr, 0);
+        }
+      else
+        {
+          allocator_ = &allocator;
+
+          // If no user storage was provided via attributes,
+          // allocate it dynamically via the allocator.
+          allocated_queue_size_elements_ =
+              (mqueue::compute_allocated_size_bytes<
+                  typename Allocator::value_type> (msgs, msg_size_bytes)
+                  + sizeof(typename Allocator::value_type) - 1)
+                  / sizeof(typename Allocator::value_type);
+
+          allocated_queue_addr_ = const_cast<Allocator&> (allocator).allocate (
+              allocated_queue_size_elements_);
+
+          _construct (
+              attr,
+              msgs,
+              msg_size_bytes,
+              allocated_queue_addr_,
+              allocated_queue_size_elements_
+                  * sizeof(typename Allocator::value_type));
+        }
+    }
+
     void
-    Message_queue_base::_construct (const mqueue::Attributes& attr,
-                                    mqueue::size_t msgs,
-                                    mqueue::msg_size_t msg_size_bytes,
-                                    void* queue_address,
-                                    std::size_t queue_size_bytes)
+    Message_queue::_construct (const mqueue::Attributes& attr,
+                               mqueue::size_t msgs,
+                               mqueue::msg_size_t msg_size_bytes,
+                               void* queue_address,
+                               std::size_t queue_size_bytes)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
@@ -378,7 +491,7 @@ namespace os
       if (queue_address != nullptr)
         {
           // The attributes should not define any storage in this case.
-          assert (attr.mq_queue_address == nullptr);
+          assert(attr.mq_queue_address == nullptr);
 
           queue_addr_ = queue_address;
           queue_size_bytes_ = queue_size_bytes;
@@ -441,7 +554,7 @@ namespace os
           reinterpret_cast<char*> (reinterpret_cast<char*> (const_cast<mqueue::priority_t*> (prio_array_))
               + msgs * sizeof(mqueue::priority_t));
 
-      assert (
+      assert(
           p - static_cast<char*> (queue_addr_)
               <= static_cast<ptrdiff_t> (queue_size_bytes_));
 #endif
@@ -460,8 +573,11 @@ namespace os
      * upon which no threads are currently blocked. Attempting to
      * destroy a message queue object upon which other threads are
      * currently blocked results in undefined behaviour.
+     *
+     * If the storage for the message queue was dynamically allocated,
+     * it is deallocated using the same allocator.
      */
-    Message_queue_base::~Message_queue_base ()
+    Message_queue::~Message_queue ()
     {
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -473,14 +589,23 @@ namespace os
 
 #else
 
-      assert (send_list_.empty ());
-      assert (receive_list_.empty ());
+      assert(send_list_.empty ());
+      assert(receive_list_.empty ());
+
+      if (allocated_queue_addr_ != nullptr)
+        {
+          typedef typename std::allocator_traits<Allocator>::pointer pointer;
+
+          static_cast<Allocator*> (const_cast<void*> (allocator_))->deallocate (
+              reinterpret_cast<pointer> (allocated_queue_addr_),
+              allocated_queue_size_elements_);
+        }
 
 #endif
     }
 
     void
-    Message_queue_base::_init (void)
+    Message_queue::_init (void)
     {
       count_ = 0;
 
@@ -532,8 +657,8 @@ namespace os
 #if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
     bool
-    Message_queue_base::_try_send (const void* msg, std::size_t nbytes,
-                                   mqueue::priority_t mprio)
+    Message_queue::_try_send (const void* msg, std::size_t nbytes,
+                              mqueue::priority_t mprio)
     {
       if (first_free_ == nullptr)
         {
@@ -655,8 +780,8 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Message_queue_base::send (const void* msg, std::size_t nbytes,
-                              mqueue::priority_t mprio)
+    Message_queue::send (const void* msg, std::size_t nbytes,
+                         mqueue::priority_t mprio)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
@@ -755,8 +880,8 @@ namespace os
      * @note Can be invoked from Interrupt Service Routines.
      */
     result_t
-    Message_queue_base::try_send (const void* msg, std::size_t nbytes,
-                                  mqueue::priority_t mprio)
+    Message_queue::try_send (const void* msg, std::size_t nbytes,
+                             mqueue::priority_t mprio)
     {
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
@@ -834,9 +959,9 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Message_queue_base::timed_send (const void* msg, std::size_t nbytes,
-                                    clock::duration_t timeout,
-                                    mqueue::priority_t mprio)
+    Message_queue::timed_send (const void* msg, std::size_t nbytes,
+                               clock::duration_t timeout,
+                               mqueue::priority_t mprio)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
@@ -924,8 +1049,8 @@ namespace os
 #if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
     bool
-    Message_queue_base::_try_receive (void* msg, std::size_t nbytes,
-                                      mqueue::priority_t* mprio)
+    Message_queue::_try_receive (void* msg, std::size_t nbytes,
+                                 mqueue::priority_t* mprio)
     {
 
       if (head_ == mqueue::no_index)
@@ -1025,8 +1150,8 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Message_queue_base::receive (void* msg, std::size_t nbytes,
-                                 mqueue::priority_t* mprio)
+    Message_queue::receive (void* msg, std::size_t nbytes,
+                            mqueue::priority_t* mprio)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
@@ -1127,8 +1252,8 @@ namespace os
      * @note Can be invoked from Interrupt Service Routines.
      */
     result_t
-    Message_queue_base::try_receive (void* msg, std::size_t nbytes,
-                                     mqueue::priority_t* mprio)
+    Message_queue::try_receive (void* msg, std::size_t nbytes,
+                                mqueue::priority_t* mprio)
     {
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
@@ -1219,9 +1344,9 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Message_queue_base::timed_receive (void* msg, std::size_t nbytes,
-                                       clock::duration_t timeout,
-                                       mqueue::priority_t* mprio)
+    Message_queue::timed_receive (void* msg, std::size_t nbytes,
+                                  clock::duration_t timeout,
+                                  mqueue::priority_t* mprio)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
@@ -1323,7 +1448,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Message_queue_base::reset (void)
+    Message_queue::reset (void)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -1343,87 +1468,6 @@ namespace os
       return result::ok;
 
 #endif
-    }
-
-    // ========================================================================
-
-    /**
-     * @details
-     * This constructor shall initialise the message queue object
-     * with the given number of messages and default settings.
-     * The effect shall be equivalent to creating a message queue object
-     * referring to the attributes in `mqueue::initializer`.
-     * Upon successful initialisation, the state of the message queue
-     * object shall become initialised, with no messages in the queue.
-     *
-     * Only the message queue object itself may be used for performing
-     * synchronisation. It is not allowed to make copies of
-     * message queue objects.
-     *
-     * For default message queue objects, the storage is dynamically
-     * allocated using the RTOS specific allocator
-     * (`rtos::memory::allocator`).
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    Message_queue::Message_queue (mqueue::size_t msgs,
-                                  mqueue::msg_size_t msg_size_bytes) :
-        Message_queue_allocated (msgs, msg_size_bytes)
-    {
-      ;
-    }
-
-    /**
-     * @details
-     * This constructor shall initialise the message queue object
-     * with attributes referenced by _attr_.
-     * If the attributes specified by _attr_ are modified later,
-     * the memory pool attributes shall not be affected.
-     * Upon successful initialisation, the state of the
-     * message queue object shall become initialised.
-     *
-     * Only the message queue itself may be used for performing
-     * synchronisation. It is not allowed to make copies of
-     * message queue objects.
-     *
-     * In cases where default message queue attributes are
-     * appropriate, the variable `mqueue::initializer` can be used to
-     * initialise message queue.
-     * The effect shall be equivalent to creating a message queue
-     * object with the simple constructor.
-     *
-     * If the attributes define a storage area (via `mq_queue_address` and
-     * `mq_queue_size_bytes`), that storage is used, otherwise
-     * the storage is dynamically allocated using the RTOS specific allocator
-     * (`rtos::memory::allocator`).
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    Message_queue::Message_queue (const mqueue::Attributes& attr,
-                                  mqueue::size_t msgs,
-                                  mqueue::msg_size_t msg_size_bytes) :
-        Message_queue_allocated (attr, msgs, msg_size_bytes)
-    {
-      ;
-    }
-
-    /**
-     * @details
-     * This destructor shall destroy the message queue object; the object
-     * becomes, in effect, uninitialised. An implementation may cause
-     * the destructor to set the object to an invalid value.
-     *
-     * It shall be safe to destroy an initialised message queue object
-     * upon which no threads are currently blocked. Attempting to
-     * destroy a message queue object upon which other threads are
-     * currently blocked results in undefined behaviour.
-     *
-     * If the storage for the message queue was dynamically allocated,
-     * it is deallocated using the same allocator.
-     */
-    Message_queue::~Message_queue ()
-    {
-      ;
     }
 
   // --------------------------------------------------------------------------
