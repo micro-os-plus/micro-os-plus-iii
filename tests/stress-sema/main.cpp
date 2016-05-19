@@ -37,9 +37,6 @@ using namespace os;
 RNG_HandleTypeDef hrng;
 
 int
-run_template_tests (void);
-
-int
 os_main (int argc, char* argv[])
 {
   trace::dump_args (argc, argv);
@@ -47,15 +44,12 @@ os_main (int argc, char* argv[])
   HAL_NVIC_SetPriority (TIM2_IRQn, 10, 0);
   HAL_NVIC_EnableIRQ (TIM2_IRQn);
 
-  __HAL_RCC_RNG_CLK_ENABLE()
-  ;
+  __HAL_RCC_RNG_CLK_ENABLE ();
 
   hrng.Instance = RNG;
   HAL_RNG_Init (&hrng);
 
   uint32_t seed;
-
-  run_template_tests ();
 
   int status;
   for (int i = 0;; ++i)
@@ -81,8 +75,7 @@ void
 Hw_timer::start (uint32_t period)
 {
 
-  __TIM2_CLK_ENABLE()
-  ;
+  __TIM2_CLK_ENABLE ();
 
   th.Instance = TIM2;
   th.Init.Prescaler = 1;
