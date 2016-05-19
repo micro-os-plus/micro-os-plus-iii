@@ -42,7 +42,7 @@ func (void* args);
 void*
 func (void* args __attribute__((unused)))
 {
-  printf ("%s\n", __func__);
+  trace::printf ("%s\n", __func__);
 
   return nullptr;
 }
@@ -50,17 +50,36 @@ func (void* args __attribute__((unused)))
 int
 run_tests (void)
 {
-#if 1
+  // ==========================================================================
+
+  // Regular threads.
+  Thread th1
+    { func, nullptr };
+  Thread th2
+    { "th2", func, nullptr };
+
+  // --------------------------------------------------------------------------
+
   using my_thread = Thread_allocated<memory::new_delete_allocator<stack::allocation_element_t>>;
 
+  // Allocated threads.
     {
-      my_thread th
+      my_thread tha1
         { func, nullptr };
+      my_thread tha2
+        { "tha2", func, nullptr };
     }
 
-  static Thread_static<> ths
+  // --------------------------------------------------------------------------
+
+  // Statically allocated threads.
+  static Thread_static<> ths1
     { func, nullptr };
-#endif
+  static Thread_static<> ths2
+    { "ths2", func, nullptr };
+
+  // ==========================================================================
+
   // Define two messages.
 
   my_msg_t msg_out
@@ -69,7 +88,7 @@ run_tests (void)
   my_msg_t msg_in;
 
   // --------------------------------------------------------------------------
-#if 1
+
   // Classic usage; message size and cast to char* must be supplied manually.
     {
       Message_queue cq
@@ -101,7 +120,7 @@ run_tests (void)
     }
 
   // --------------------------------------------------------------------------
-#endif
+
   // Allocated template usage; message size and cast are supplied automatically.
 
   // Define a custom queue type parametrised with the
@@ -124,7 +143,7 @@ run_tests (void)
     }
 
   // ==========================================================================
-#if 1
+
   my_blk_t* blk;
 
   // Classic usage; block size and cast to char* must be supplied manually.
@@ -187,7 +206,7 @@ run_tests (void)
       sp.free (blk);
     }
 
-#endif
+  // ==========================================================================
 
   trace::puts ("\nDone.");
   return 0;
