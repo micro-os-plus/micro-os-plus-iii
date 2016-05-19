@@ -184,6 +184,7 @@ namespace os
        * @brief Create a message queue with default settings.
        * @param [in] msgs The number of messages.
        * @param [in] msg_size_bytes The message size, in bytes.
+       * @param [in] allocator Reference to allocator. Default a local temporary instance.
        */
       Message_queue (mqueue::size_t msgs, mqueue::msg_size_t msg_size_bytes,
                      const Allocator& allocator = Allocator ());
@@ -193,6 +194,7 @@ namespace os
        * @param [in] attr Reference to attributes.
        * @param [in] msgs The number of messages.
        * @param [in] msg_size_bytes The message size, in bytes.
+       * @param [in] allocator Reference to allocator. Default a local temporary instance.
        */
       Message_queue (const mqueue::Attributes& attr, mqueue::size_t msgs,
                      mqueue::msg_size_t msg_size_bytes,
@@ -671,6 +673,7 @@ namespace os
         /**
          * @brief Destroy the message queue.
          */
+        virtual
         ~Message_queue_allocated ();
 
         /**
@@ -734,6 +737,7 @@ namespace os
         /**
          * @brief Destroy the typed message queue.
          */
+        virtual
         ~Message_queue_typed ();
 
         /**
@@ -916,6 +920,7 @@ namespace os
         /**
          * @brief Destroy the typed message queue.
          */
+        virtual
         ~Message_queue_static ();
 
         /**
@@ -1311,6 +1316,8 @@ namespace os
             static_cast<Allocator*> (const_cast<void*> (allocator_))->deallocate (
                 static_cast<pointer> (allocated_queue_addr_),
                 allocated_queue_size_elements_);
+
+            allocated_queue_addr_ = nullptr;
           }
       }
 
@@ -1405,7 +1412,6 @@ namespace os
      * Implemented as a wrapper over the parent destructor.
      */
     template<typename T, typename Allocator>
-      inline
       Message_queue_typed<T, Allocator>::~Message_queue_typed ()
       {
         ;
@@ -1600,7 +1606,6 @@ namespace os
      * Implemented as a wrapper over the parent destructor.
      */
     template<typename T, std::size_t N>
-      inline
       Message_queue_static<T, N>::~Message_queue_static ()
       {
         ;

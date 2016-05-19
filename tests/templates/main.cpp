@@ -43,5 +43,4 @@ os_main (int argc, char* argv[])
   return run_tests ();
 }
 
-
 //------------------
