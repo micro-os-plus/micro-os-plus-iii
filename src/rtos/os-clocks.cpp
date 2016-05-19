@@ -363,7 +363,7 @@ namespace os
     clock::timestamp_t
     Systick_clock::now (current_t* details)
     {
-      assert(details != nullptr);
+      assert (details != nullptr);
 
 #if defined(__ARM_EABI__)
       // The core frequency can be returned right away, since
@@ -409,7 +409,7 @@ namespace os
       details->ticks = ticks;
 
       return ticks;
-#elif defined(__APPLE__)
+#elif defined(__APPLE__) || defined(__linux__)
 
       details->core_frequency_hz = 1000000000; // Very fast!
       details->divisor = 1;
