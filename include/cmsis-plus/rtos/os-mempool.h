@@ -189,6 +189,17 @@ namespace os
                    const Allocator& allocator = Allocator ());
 
       /**
+       * @brief Create a named memory pool with default settings.
+       * @param [in] name Pointer to name.
+       * @param [in] blocks The maximum number of items in the pool.
+       * @param [in] block_size_bytes The size of an item, in bytes.
+       * @param [in] allocator Reference to allocator. Default a local temporary instance.
+       */
+      Memory_pool (const char* name, mempool::size_t blocks,
+                   mempool::size_t block_size_bytes,
+                   const Allocator& allocator = Allocator ());
+
+      /**
        * @brief Create a memory pool with custom settings.
        * @param [in] attr Reference to attributes.
        * @param [in] blocks The maximum number of items in the pool.
@@ -197,6 +208,17 @@ namespace os
        */
       Memory_pool (const mempool::Attributes& attr, mempool::size_t blocks,
                    mempool::size_t block_size_bytes,
+                   const Allocator& allocator = Allocator ());
+      /**
+       * @brief Create a named memory pool with custom settings.
+       * @param [in] name Pointer to name.
+       * @param [in] attr Reference to attributes.
+       * @param [in] blocks The maximum number of items in the pool.
+       * @param [in] block_size_bytes The size of an item, in bytes.
+       * @param [in] allocator Reference to allocator. Default a local temporary instance.
+       */
+      Memory_pool (const char* name, const mempool::Attributes& attr,
+                   mempool::size_t blocks, mempool::size_t block_size_bytes,
                    const Allocator& allocator = Allocator ());
 
       /**
@@ -507,6 +529,17 @@ namespace os
                                const Allocator& allocator = Allocator ());
 
         /**
+         * @brief Create a named memory pool with default settings.
+         * @param [in] name Pointer to name.
+         * @param [in] blocks The maximum number of items in the pool.
+         * @param [in] block_size_bytes The size of an item, in bytes.
+         * @param [in] allocator Reference to allocator. Default a local temporary instance.
+         */
+        Memory_pool_allocated (const char* name, mempool::size_t blocks,
+                               mempool::size_t block_size_bytes,
+                               const Allocator& allocator = Allocator ());
+
+        /**
          * @brief Create a memory pool with custom settings.
          * @param [in] attr Reference to attributes.
          * @param [in] blocks The maximum number of items in the pool.
@@ -514,6 +547,20 @@ namespace os
          * @param [in] allocator Reference to allocator. Default a local temporary instance.
          */
         Memory_pool_allocated (const mempool::Attributes& attr,
+                               mempool::size_t blocks,
+                               mempool::size_t block_size_bytes,
+                               const Allocator& allocator = Allocator ());
+
+        /**
+         * @brief Create a named memory pool with custom settings.
+         * @param [in] name Pointer to name.
+         * @param [in] attr Reference to attributes.
+         * @param [in] blocks The maximum number of items in the pool.
+         * @param [in] block_size_bytes The size of an item, in bytes.
+         * @param [in] allocator Reference to allocator. Default a local temporary instance.
+         */
+        Memory_pool_allocated (const char* name,
+                               const mempool::Attributes& attr,
                                mempool::size_t blocks,
                                mempool::size_t block_size_bytes,
                                const Allocator& allocator = Allocator ());
@@ -573,12 +620,32 @@ namespace os
                                Allocator ());
 
         /**
+         * @brief Create a named memory pool with default settings.
+         * @param [in] name Pointer to name.
+         * @param [in] blocks The maximum number of items in the pool.
+         * @param [in] allocator Reference to allocator. Default a local temporary instance.
+         */
+        Memory_pool_typed (const char* name, mempool::size_t blocks,
+                           const Allocator& allocator = Allocator ());
+
+        /**
          * @brief Create a memory pool with custom settings.
          * @param [in] attr Reference to attributes.
          * @param [in] blocks The maximum number of items in the pool.
          * @param [in] allocator Reference to allocator. Default a local temporary instance.
          */
         Memory_pool_typed (const mempool::Attributes& attr,
+                           mempool::size_t blocks, const Allocator& allocator =
+                               Allocator ());
+
+        /**
+         * @brief Create a named memory pool with custom settings.
+         * @param [in] name Pointer to name.
+         * @param [in] attr Reference to attributes.
+         * @param [in] blocks The maximum number of items in the pool.
+         * @param [in] allocator Reference to allocator. Default a local temporary instance.
+         */
+        Memory_pool_typed (const char* name, const mempool::Attributes& attr,
                            mempool::size_t blocks, const Allocator& allocator =
                                Allocator ());
 
@@ -681,10 +748,23 @@ namespace os
         Memory_pool_static ();
 
         /**
+         * @brief Create a named memory pool with default settings.
+         * @param [in] name Pointer to name.
+         */
+        Memory_pool_static (const char* name);
+
+        /**
          * @brief Create a memory pool with custom settings.
          * @param [in] attr Reference to attributes.
          */
         Memory_pool_static (const mempool::Attributes& attr);
+
+        /**
+         * @brief Create a named memory pool with custom settings.
+         * @param [in] name Pointer to name.
+         * @param [in] attr Reference to attributes.
+         */
+        Memory_pool_static (const char* name, const mempool::Attributes& attr);
 
         /**
          * @cond ignore
@@ -853,7 +933,37 @@ namespace os
     // ========================================================================
 
     /**
-     * This constructor shall initialise the memory pool object
+     * This constructor shall initialise a memory pool object
+     * with the given number of blocks and default settings.
+     * The effect shall be equivalent to creating a memory pool object
+     * referring to the attributes in `mempool::initializer`.
+     * Upon successful initialisation, the state of the memory
+     * pool shall become initialised, with all blocks available.
+     *
+     * Only the memory pool itself may be used for allocations.
+     * It is not allowed to make copies of
+     * condition variable objects.
+     *
+     * For default memory pool objects, the storage is dynamically
+     * allocated using the RTOS specific allocator
+     * (`rtos::memory::allocator`).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+
+    template<typename Allocator>
+      inline
+      Memory_pool_allocated<Allocator>::Memory_pool_allocated (
+          mempool::size_t blocks, mempool::size_t block_size_bytes,
+          const Allocator& allocator) :
+          Memory_pool_allocated
+            { nullptr, blocks, block_size_bytes, allocator }
+      {
+        ;
+      }
+
+    /**
+     * This constructor shall initialise a named memory pool object
      * with the given number of blocks and default settings.
      * The effect shall be equivalent to creating a memory pool object
      * referring to the attributes in `mempool::initializer`.
@@ -873,12 +983,14 @@ namespace os
 
     template<typename Allocator>
       Memory_pool_allocated<Allocator>::Memory_pool_allocated (
-          mempool::size_t blocks, mempool::size_t block_size_bytes,
-          const Allocator& allocator)
+          const char* name, mempool::size_t blocks,
+          mempool::size_t block_size_bytes, const Allocator& allocator) :
+          Memory_pool
+            { name }
       {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
-        trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), blocks,
-                       block_size_bytes);
+        trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (),
+                       blocks, block_size_bytes);
 #endif
 
         allocator_ = &allocator;
@@ -901,7 +1013,43 @@ namespace os
       }
 
     /**
-     * This constructor shall initialise the memory pool object
+     * This constructor shall initialise a memory pool object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the memory pool attributes shall not be affected.
+     * Upon successful initialisation, the state of the memory pool
+     * variable shall become initialised.
+     *
+     * Only the memory pool itself may be used for allocations.
+     * It is not allowed to make copies of
+     * condition variable objects.
+     *
+     * In cases where default memory pool attributes are
+     * appropriate, the variable `mempool::initializer` can be used to
+     * initialise condition variables.
+     * The effect shall be equivalent to creating a memory pool object with
+     * the simple constructor.
+     *
+     * If the attributes define a storage area (via `mp_pool_address` and
+     * `mp_pool_size_bytes`), that storage is used, otherwise
+     * the storage is dynamically allocated using the RTOS specific allocator
+     * (`rtos::memory::allocator`).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    template<typename Allocator>
+      inline
+      Memory_pool_allocated<Allocator>::Memory_pool_allocated (
+          const mempool::Attributes& attr, mempool::size_t blocks,
+          mempool::size_t block_size_bytes, const Allocator& allocator) :
+          Memory_pool_allocated
+            { nullptr, attr, blocks, block_size_bytes, allocator }
+      {
+        ;
+      }
+
+    /**
+     * This constructor shall initialise a named memory pool object
      * with attributes referenced by _attr_.
      * If the attributes specified by _attr_ are modified later,
      * the memory pool attributes shall not be affected.
@@ -927,12 +1075,15 @@ namespace os
      */
     template<typename Allocator>
       Memory_pool_allocated<Allocator>::Memory_pool_allocated (
-          const mempool::Attributes& attr, mempool::size_t blocks,
-          mempool::size_t block_size_bytes, const Allocator& allocator)
+          const char* name, const mempool::Attributes& attr,
+          mempool::size_t blocks, mempool::size_t block_size_bytes,
+          const Allocator& allocator) :
+          Memory_pool
+            { name != nullptr ? name : attr.name () }
       {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
-        trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), blocks,
-                       block_size_bytes);
+        trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (),
+                       blocks, block_size_bytes);
 #endif
         if (attr.mp_pool_address != nullptr)
           {
@@ -966,7 +1117,7 @@ namespace os
 
     /**
      * @details
-     * This destructor shall destroy the memory pool object; the object
+     * This destructor shall destroy a memory pool object; the object
      * becomes, in effect, uninitialised. An implementation may cause
      * the destructor to set the object to an invalid value.
      *
@@ -1001,7 +1152,7 @@ namespace os
     // ========================================================================
 
     /**
-     * This constructor shall initialise the memory pool object
+     * This constructor shall initialise a memory pool object
      * with the given number of blocks and default settings.
      * The effect shall be equivalent to creating a memory pool object
      * referring to the attributes in `mempool::initializer`.
@@ -1031,7 +1182,37 @@ namespace os
       }
 
     /**
-     * This constructor shall initialise the memory pool object
+     * This constructor shall initialise a named memory pool object
+     * with the given number of blocks and default settings.
+     * The effect shall be equivalent to creating a memory pool object
+     * referring to the attributes in `mempool::initializer`.
+     * Upon successful initialisation, the state of the memory
+     * pool shall become initialised, with all blocks available.
+     *
+     * Only the memory pool itself may be used for allocations.
+     * It is not allowed to make copies of
+     * condition variable objects.
+     *
+     * For default memory pool objects, the storage is dynamically
+     * allocated using the RTOS specific allocator
+     * (`rtos::memory::allocator`).
+     *
+     * Implemented as a wrapper over the parent constructor, automatically
+     * passing the block size.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    template<typename T, typename Allocator>
+      inline
+      Memory_pool_typed<T, Allocator>::Memory_pool_typed (
+          const char* name, mempool::size_t blocks, const Allocator& allocator) :
+          Memory_pool_allocated<Allocator> (name, blocks, sizeof(T), allocator)
+      {
+        ;
+      }
+
+    /**
+     * This constructor shall initialise a memory pool object
      * with attributes referenced by _attr_.
      * If the attributes specified by _attr_ are modified later,
      * the memory pool attributes shall not be affected.
@@ -1069,8 +1250,47 @@ namespace os
       }
 
     /**
+     * This constructor shall initialise a named memory pool object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the memory pool attributes shall not be affected.
+     * Upon successful initialisation, the state of the memory pool
+     * variable shall become initialised.
+     *
+     * Only the memory pool itself may be used for allocations.
+     * It is not allowed to make copies of
+     * condition variable objects.
+     *
+     * In cases where default memory pool attributes are
+     * appropriate, the variable `mempool::initializer` can be used to
+     * initialise condition variables.
+     * The effect shall be equivalent to creating a memory pool object with
+     * the simple constructor.
+     *
+     * If the attributes define a storage area (via `mp_pool_address` and
+     * `mp_pool_size_bytes`), that storage is used, otherwise
+     * the storage is dynamically allocated using the RTOS specific allocator
+     * (`rtos::memory::allocator`).
+     *
+     * Implemented as a wrapper over the parent constructor, automatically
+     * passing the message size.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    template<typename T, typename Allocator>
+      inline
+      Memory_pool_typed<T, Allocator>::Memory_pool_typed (
+          const char* name, const mempool::Attributes& attr,
+          mempool::size_t blocks, const Allocator& allocator) :
+          Memory_pool_allocated<Allocator> (name, attr, blocks, sizeof(T),
+                                            allocator)
+      {
+        ;
+      }
+
+    /**
      * @details
-     * This destructor shall destroy the memory pool object; the object
+     * This destructor shall destroy a memory pool object; the object
      * becomes, in effect, uninitialised. An implementation may cause
      * the destructor to set the object to an invalid value.
      *
@@ -1152,7 +1372,7 @@ namespace os
     // ========================================================================
 
     /**
-     * This constructor shall initialise the memory pool object
+     * This constructor shall initialise a memory pool object
      * with the given number of blocks and default settings.
      * The effect shall be equivalent to creating a memory pool object
      * referring to the attributes in `mempool::initializer`.
@@ -1179,7 +1399,36 @@ namespace os
       }
 
     /**
-     * This constructor shall initialise the memory pool object
+     * This constructor shall initialise a named memory pool object
+     * with the given number of blocks and default settings.
+     * The effect shall be equivalent to creating a memory pool object
+     * referring to the attributes in `mempool::initializer`.
+     * Upon successful initialisation, the state of the memory
+     * pool shall become initialised, with all blocks available.
+     *
+     * Only the memory pool itself may be used for allocations.
+     * It is not allowed to make copies of
+     * condition variable objects.
+     *
+     * The storage shall be statically allocated inside the
+     * memory pool object instance.
+     *
+     * Implemented as a wrapper over the parent constructor, automatically
+     * passing the block size and the storage details.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    template<typename T, std::size_t N>
+      Memory_pool_static<T, N>::Memory_pool_static (const char* name) :
+          Memory_pool
+            { name }
+      {
+        _construct (mempool::initializer, blocks, sizeof(T), &arena_,
+                    sizeof(arena_));
+      }
+
+    /**
+     * This constructor shall initialise a memory pool object
      * with attributes referenced by _attr_.
      * If the attributes specified by _attr_ are modified later,
      * the memory pool attributes shall not be affected.
@@ -1207,7 +1456,43 @@ namespace os
     template<typename T, std::size_t N>
       Memory_pool_static<T, N>::Memory_pool_static (
           const mempool::Attributes& attr) :
-          Memory_pool (attr.name ())
+          Memory_pool
+            { attr.name () }
+      {
+        _construct (attr, blocks, sizeof(T), &arena_, sizeof(arena_));
+      }
+
+    /**
+     * This constructor shall initialise a named memory pool object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the memory pool attributes shall not be affected.
+     * Upon successful initialisation, the state of the memory pool
+     * variable shall become initialised.
+     *
+     * Only the memory pool itself may be used for allocations.
+     * It is not allowed to make copies of
+     * condition variable objects.
+     *
+     * In cases where default memory pool attributes are
+     * appropriate, the variable `mempool::initializer` can be used to
+     * initialise condition variables.
+     * The effect shall be equivalent to creating a memory pool object with
+     * the simple constructor.
+     *
+     * The storage shall be statically allocated inside the
+     * memory pool object instance.
+     *
+     * Implemented as a wrapper over the parent constructor, automatically
+     * passing the message size and the storage details.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    template<typename T, std::size_t N>
+      Memory_pool_static<T, N>::Memory_pool_static (
+          const char* name, const mempool::Attributes& attr) :
+          Memory_pool
+            { name != nullptr ? name : attr.name () }
       {
         _construct (attr, blocks, sizeof(T), &arena_, sizeof(arena_));
       }

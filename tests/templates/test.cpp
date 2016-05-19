@@ -64,19 +64,19 @@ run_tests (void)
 
   // Allocated threads.
     {
-      my_thread tha1
+      my_thread ath1
         { func, nullptr };
-      my_thread tha2
-        { "tha2", func, nullptr };
+      my_thread ath2
+        { "ath2", func, nullptr };
     }
 
   // --------------------------------------------------------------------------
 
   // Statically allocated threads.
-  static Thread_static<> ths1
+  static Thread_static<> sth1
     { func, nullptr };
-  static Thread_static<> ths2
-    { "ths2", func, nullptr };
+  static Thread_static<> sth2
+    { "sth2", func, nullptr };
 
   // ==========================================================================
 
@@ -168,17 +168,24 @@ run_tests (void)
 
   // Classic usage; block size and cast to char* must be supplied manually.
     {
-      Memory_pool cp
+      Memory_pool cp1
         { 3, sizeof(my_blk_t) };
 
-      blk = static_cast<my_blk_t*> (cp.alloc ());
-      cp.free (blk);
+      blk = static_cast<my_blk_t*> (cp1.alloc ());
+      cp1.free (blk);
 
-      blk = static_cast<my_blk_t*> (cp.try_alloc ());
-      cp.free (blk);
+      blk = static_cast<my_blk_t*> (cp1.try_alloc ());
+      cp1.free (blk);
 
-      blk = static_cast<my_blk_t*> (cp.timed_alloc (1));
-      cp.free (blk);
+      blk = static_cast<my_blk_t*> (cp1.timed_alloc (1));
+      cp1.free (blk);
+
+      Memory_pool cp2
+        { "cp2", 3, sizeof(my_blk_t) };
+
+      blk = static_cast<my_blk_t*> (cp2.alloc ());
+      cp2.free (blk);
+
     }
 
   // --------------------------------------------------------------------------
@@ -190,17 +197,24 @@ run_tests (void)
   using My_pool = Memory_pool_typed<my_blk_t>;
 
     {
-      My_pool p
+      My_pool tp1
         { 7 };
 
-      blk = p.alloc ();
-      p.free (blk);
+      blk = tp1.alloc ();
+      tp1.free (blk);
 
-      blk = p.try_alloc ();
-      p.free (blk);
+      blk = tp1.try_alloc ();
+      tp1.free (blk);
 
-      blk = p.timed_alloc (1);
-      p.free (blk);
+      blk = tp1.timed_alloc (1);
+      tp1.free (blk);
+
+      My_pool tp2
+        { "tp2", 7 };
+
+      blk = tp2.alloc ();
+      tp2.free (blk);
+
     }
 
   // --------------------------------------------------------------------------
@@ -214,16 +228,23 @@ run_tests (void)
     {
       // The space for the pool is allocated inside the pool
       // object, in this case on the stack.
-      My_static_pool sp;
+      My_static_pool sp1;
 
-      blk = sp.alloc ();
-      sp.free (blk);
+      blk = sp1.alloc ();
+      sp1.free (blk);
 
-      blk = sp.try_alloc ();
-      sp.free (blk);
+      blk = sp1.try_alloc ();
+      sp1.free (blk);
 
-      blk = sp.timed_alloc (1);
-      sp.free (blk);
+      blk = sp1.timed_alloc (1);
+      sp1.free (blk);
+
+      My_static_pool sp2
+        { "sp2" };
+
+      blk = sp2.alloc ();
+      sp2.free (blk);
+
     }
 
   // ==========================================================================

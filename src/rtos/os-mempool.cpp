@@ -192,20 +192,21 @@ namespace os
     Memory_pool::Memory_pool ()
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
-      trace::printf ("%s() @%p\n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
     }
 
     Memory_pool::Memory_pool (const char* name) :
-        Named_object (name)
+        Named_object
+          { name }
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
-      trace::printf ("%s() @%p %s\n", __func__, this, name);
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
     }
 
     /**
-     * This constructor shall initialise the memory pool object
+     * This constructor shall initialise a memory pool object
      * with the given number of blocks and default settings.
      * The effect shall be equivalent to creating a memory pool object
      * referring to the attributes in `mempool::initializer`.
@@ -224,11 +225,40 @@ namespace os
      */
     Memory_pool::Memory_pool (mempool::size_t blocks,
                               mempool::size_t block_size_bytes,
-                              const Allocator& allocator)
+                              const Allocator& allocator) :
+        Memory_pool
+          { nullptr, blocks, block_size_bytes, allocator }
+    {
+      ;
+    }
+
+    /**
+     * This constructor shall initialise a named memory pool object
+     * with the given number of blocks and default settings.
+     * The effect shall be equivalent to creating a memory pool object
+     * referring to the attributes in `mempool::initializer`.
+     * Upon successful initialisation, the state of the memory
+     * pool shall become initialised, with all blocks available.
+     *
+     * Only the memory pool itself may be used for allocations.
+     * It is not allowed to make copies of
+     * condition variable objects.
+     *
+     * For default memory pool objects, the storage is dynamically
+     * allocated using the RTOS specific allocator
+     * (`rtos::memory::allocator`).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    Memory_pool::Memory_pool (const char* name, mempool::size_t blocks,
+                              mempool::size_t block_size_bytes,
+                              const Allocator& allocator) :
+        Named_object
+          { name }
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
-      trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), blocks,
-                     block_size_bytes);
+      trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (),
+                     blocks, block_size_bytes);
 #endif
       allocator_ = &allocator;
 
@@ -250,7 +280,7 @@ namespace os
     }
 
     /**
-     * This constructor shall initialise the memory pool object
+     * This constructor shall initialise a memory pool object
      * with attributes referenced by _attr_.
      * If the attributes specified by _attr_ are modified later,
      * the memory pool attributes shall not be affected.
@@ -278,11 +308,47 @@ namespace os
                               mempool::size_t blocks,
                               mempool::size_t block_size_bytes,
                               const Allocator& allocator) :
-        Named_object (attr.name ())
+        Memory_pool
+          { nullptr, attr, blocks, block_size_bytes, allocator }
+    {
+      ;
+    }
+
+    /**
+     * This constructor shall initialise a named memory pool object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the memory pool attributes shall not be affected.
+     * Upon successful initialisation, the state of the memory pool
+     * variable shall become initialised.
+     *
+     * Only the memory pool itself may be used for allocations.
+     * It is not allowed to make copies of
+     * condition variable objects.
+     *
+     * In cases where default memory pool attributes are
+     * appropriate, the variable `mempool::initializer` can be used to
+     * initialise condition variables.
+     * The effect shall be equivalent to creating a memory pool object with
+     * the simple constructor.
+     *
+     * If the attributes define a storage area (via `mp_pool_address` and
+     * `mp_pool_size_bytes`), that storage is used, otherwise
+     * the storage is dynamically allocated using the RTOS specific allocator
+     * (`rtos::memory::allocator`).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    Memory_pool::Memory_pool (const char* name, const mempool::Attributes& attr,
+                              mempool::size_t blocks,
+                              mempool::size_t block_size_bytes,
+                              const Allocator& allocator) :
+        Named_object
+          { name != nullptr ? name : attr.name () }
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
-      trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), blocks,
-                     block_size_bytes);
+      trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (),
+                     blocks, block_size_bytes);
 #endif
       if (attr.mp_pool_address != nullptr)
         {
