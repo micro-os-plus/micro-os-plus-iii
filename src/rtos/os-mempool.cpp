@@ -189,14 +189,14 @@ namespace os
 
     // ------------------------------------------------------------------------
     // Protected internal constructor.
-    Memory_pool_base::Memory_pool_base ()
+    Memory_pool::Memory_pool ()
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p\n", __func__, this);
 #endif
     }
 
-    Memory_pool_base::Memory_pool_base (const char* name) :
+    Memory_pool::Memory_pool (const char* name) :
         Named_object (name)
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
@@ -204,12 +204,121 @@ namespace os
 #endif
     }
 
+    /**
+     * This constructor shall initialise the memory pool object
+     * with the given number of blocks and default settings.
+     * The effect shall be equivalent to creating a memory pool object
+     * referring to the attributes in `mempool::initializer`.
+     * Upon successful initialisation, the state of the memory
+     * pool shall become initialised, with all blocks available.
+     *
+     * Only the memory pool itself may be used for allocations.
+     * It is not allowed to make copies of
+     * condition variable objects.
+     *
+     * For default memory pool objects, the storage is dynamically
+     * allocated using the RTOS specific allocator
+     * (`rtos::memory::allocator`).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    Memory_pool::Memory_pool (mempool::size_t blocks,
+                              mempool::size_t block_size_bytes,
+                              const Allocator& allocator)
+    {
+#if defined(OS_TRACE_RTOS_MEMPOOL)
+      trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), blocks,
+                     block_size_bytes);
+#endif
+      allocator_ = &allocator;
+
+      allocated_pool_size_elements_ = (mempool::compute_allocated_size_bytes<
+          typename Allocator::value_type> (blocks, block_size_bytes)
+          + sizeof(typename Allocator::value_type) - 1)
+          / sizeof(typename Allocator::value_type);
+
+      allocated_pool_addr_ = const_cast<Allocator&> (allocator).allocate (
+          allocated_pool_size_elements_);
+
+      _construct (
+          mempool::initializer,
+          blocks,
+          block_size_bytes,
+          allocated_pool_addr_,
+          allocated_pool_size_elements_
+              * sizeof(typename Allocator::value_type));
+    }
+
+    /**
+     * This constructor shall initialise the memory pool object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the memory pool attributes shall not be affected.
+     * Upon successful initialisation, the state of the memory pool
+     * variable shall become initialised.
+     *
+     * Only the memory pool itself may be used for allocations.
+     * It is not allowed to make copies of
+     * condition variable objects.
+     *
+     * In cases where default memory pool attributes are
+     * appropriate, the variable `mempool::initializer` can be used to
+     * initialise condition variables.
+     * The effect shall be equivalent to creating a memory pool object with
+     * the simple constructor.
+     *
+     * If the attributes define a storage area (via `mp_pool_address` and
+     * `mp_pool_size_bytes`), that storage is used, otherwise
+     * the storage is dynamically allocated using the RTOS specific allocator
+     * (`rtos::memory::allocator`).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    Memory_pool::Memory_pool (const mempool::Attributes& attr,
+                              mempool::size_t blocks,
+                              mempool::size_t block_size_bytes,
+                              const Allocator& allocator) :
+        Named_object (attr.name ())
+    {
+#if defined(OS_TRACE_RTOS_MEMPOOL)
+      trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), blocks,
+                     block_size_bytes);
+#endif
+      if (attr.mp_pool_address != nullptr)
+        {
+          // Do not use any allocator at all.
+          _construct (attr, blocks, block_size_bytes, nullptr, 0);
+        }
+      else
+        {
+          allocator_ = &allocator;
+
+          // If no user storage was provided via attributes,
+          // allocate it dynamically via the allocator.
+          allocated_pool_size_elements_ =
+              (mempool::compute_allocated_size_bytes<
+                  typename Allocator::value_type> (blocks, block_size_bytes)
+                  + sizeof(typename Allocator::value_type) - 1)
+                  / sizeof(typename Allocator::value_type);
+
+          allocated_pool_addr_ = const_cast<Allocator&> (allocator).allocate (
+              allocated_pool_size_elements_);
+
+          _construct (
+              attr,
+              blocks,
+              block_size_bytes,
+              allocated_pool_addr_,
+              allocated_pool_size_elements_
+                  * sizeof(typename Allocator::value_type));
+        }
+    }
+
     void
-    Memory_pool_base::_construct (const mempool::Attributes& attr,
-                                  mempool::size_t blocks,
-                                  mempool::size_t block_size_bytes,
-                                  void* pool_address,
-                                  std::size_t pool_size_bytes)
+    Memory_pool::_construct (const mempool::Attributes& attr,
+                             mempool::size_t blocks,
+                             mempool::size_t block_size_bytes,
+                             void* pool_address, std::size_t pool_size_bytes)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
@@ -218,7 +327,7 @@ namespace os
 #endif
 
       blocks_ = blocks;
-      assert (blocks_ > 0);
+      assert(blocks_ > 0);
 
       // Adjust block size to multiple of pointer.
       // Blocks must be large enough to store a pointer, used
@@ -231,7 +340,7 @@ namespace os
       if (pool_address != nullptr)
         {
           // The attributes should not define any storage in this case.
-          assert (attr.mp_pool_address == nullptr);
+          assert(attr.mp_pool_address == nullptr);
 
           pool_addr_ = pool_address;
           pool_size_bytes_ = pool_size_bytes;
@@ -280,15 +389,27 @@ namespace os
      * destroy a memory pool object upon which other threads are
      * currently blocked results in undefined behaviour.
      *
+     * If the storage for the memory pool was dynamically allocated,
+     * it is deallocated using the same allocator.
+     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Memory_pool_base::~Memory_pool_base ()
+    Memory_pool::~Memory_pool ()
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      assert (list_.empty ());
+      assert(list_.empty ());
+
+      typedef typename std::allocator_traits<Allocator>::pointer pointer;
+
+      if (allocated_pool_addr_ != nullptr)
+        {
+          static_cast<Allocator*> (const_cast<void*> (allocator_))->deallocate (
+              static_cast<pointer> (allocated_pool_addr_),
+              allocated_pool_size_elements_);
+        }
     }
 
     /*
@@ -296,7 +417,7 @@ namespace os
      * internal pointers and counters.
      */
     void
-    Memory_pool_base::_init (void)
+    Memory_pool::_init (void)
     {
       // Construct a linked list of blocks. Store the pointer at
       // the beginning of each block. Each block
@@ -326,7 +447,7 @@ namespace os
      * free list.
      */
     void*
-    Memory_pool_base::_try_first (void)
+    Memory_pool::_try_first (void)
     {
       if (first_ != nullptr)
         {
@@ -359,7 +480,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     void*
-    Memory_pool_base::alloc (void)
+    Memory_pool::alloc (void)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
@@ -438,7 +559,7 @@ namespace os
      * @note Can be invoked from Interrupt Service Routines.
      */
     void*
-    Memory_pool_base::try_alloc (void)
+    Memory_pool::try_alloc (void)
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -491,7 +612,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     void*
-    Memory_pool_base::timed_alloc (clock::duration_t timeout)
+    Memory_pool::timed_alloc (clock::duration_t timeout)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
@@ -577,7 +698,7 @@ namespace os
      * @note Can be invoked from Interrupt Service Routines.
      */
     result_t
-    Memory_pool_base::free (void* block)
+    Memory_pool::free (void* block)
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -620,7 +741,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Memory_pool_base::reset (void)
+    Memory_pool::reset (void)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -644,89 +765,6 @@ namespace os
         }
 
       return result::ok;
-    }
-
-    // ========================================================================
-
-    /**
-     * This constructor shall initialise the memory pool object
-     * with the given number of blocks and default settings.
-     * The effect shall be equivalent to creating a memory pool object
-     * referring to the attributes in `mempool::initializer`.
-     * Upon successful initialisation, the state of the memory
-     * pool shall become initialised, with all blocks available.
-     *
-     * Only the memory pool itself may be used for allocations.
-     * It is not allowed to make copies of
-     * condition variable objects.
-     *
-     * For default memory pool objects, the storage is dynamically
-     * allocated using the RTOS specific allocator
-     * (`rtos::memory::allocator`).
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    Memory_pool::Memory_pool (mempool::size_t blocks,
-                              mempool::size_t block_size_bytes) :
-        Memory_pool_allocated
-          { blocks, block_size_bytes }
-    {
-      ;
-    }
-
-    /**
-     * This constructor shall initialise the memory pool object
-     * with attributes referenced by _attr_.
-     * If the attributes specified by _attr_ are modified later,
-     * the memory pool attributes shall not be affected.
-     * Upon successful initialisation, the state of the memory pool
-     * variable shall become initialised.
-     *
-     * Only the memory pool itself may be used for allocations.
-     * It is not allowed to make copies of
-     * condition variable objects.
-     *
-     * In cases where default memory pool attributes are
-     * appropriate, the variable `mempool::initializer` can be used to
-     * initialise condition variables.
-     * The effect shall be equivalent to creating a memory pool object with
-     * the simple constructor.
-     *
-     * If the attributes define a storage area (via `mp_pool_address` and
-     * `mp_pool_size_bytes`), that storage is used, otherwise
-     * the storage is dynamically allocated using the RTOS specific allocator
-     * (`rtos::memory::allocator`).
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    Memory_pool::Memory_pool (const mempool::Attributes& attr,
-                              mempool::size_t blocks,
-                              mempool::size_t block_size_bytes) :
-        Memory_pool_allocated
-          { attr, blocks, block_size_bytes }
-    {
-      ;
-    }
-
-    /**
-     * @details
-     * This destructor shall destroy the memory pool object; the object
-     * becomes, in effect, uninitialised. An implementation may cause
-     * the destructor to set the object to an invalid value.
-     *
-     * It shall be safe to destroy an initialised memory pool object
-     * upon which no threads are currently blocked. Attempting to
-     * destroy a memory pool object upon which other threads are
-     * currently blocked results in undefined behaviour.
-     *
-     * If the storage for the memory pool was dynamically allocated,
-     * it is deallocated using the same allocator.
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    Memory_pool::~Memory_pool ()
-    {
-      ;
     }
 
   // --------------------------------------------------------------------------

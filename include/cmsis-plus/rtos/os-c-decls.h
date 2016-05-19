@@ -402,6 +402,7 @@ extern "C"
   typedef struct os_mempool_s
   {
     const char* name;
+    void* vtbl;
 #if !defined(OS_INCLUDE_RTOS_PORT_MEMORY_POOL)
     os_threads_waiting_list_t list;
     void* clock;
