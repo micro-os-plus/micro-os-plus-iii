@@ -134,9 +134,11 @@ namespace os
         class Arena
         {
         public:
-          T queue[msgs * msg_size_bytes / sizeof(T)];
-          T links[(2 * msgs) * sizeof(mqueue::index_t) / sizeof(T)];
-          T prios[msgs * sizeof(mqueue::priority_t) / sizeof(T)];
+          T queue[(msgs * msg_size_bytes + sizeof(T) - 1) / sizeof(T)];
+          T links[((2 * msgs) * sizeof(mqueue::index_t) + sizeof(T) - 1)
+              / sizeof(T)];
+          T prios[(msgs * sizeof(mqueue::priority_t) + sizeof(T) - 1)
+              / sizeof(T)];
         };
 
       template<typename T>
@@ -1230,8 +1232,9 @@ namespace os
                        msg_size_bytes);
 #endif
 
-        allocated_queue_size_elements_ = mqueue::compute_allocated_size_bytes<
+        allocated_queue_size_elements_ = (mqueue::compute_allocated_size_bytes<
             typename Allocator::value_type> (msgs, msg_size_bytes)
+            + sizeof(typename Allocator::value_type) - 1)
             / sizeof(typename Allocator::value_type);
 
         allocator_ = &allocator;
@@ -1295,8 +1298,9 @@ namespace os
             // If no user storage was provided via attributes,
             // allocate it dynamically via the allocator.
             allocated_queue_size_elements_ =
-                mqueue::compute_allocated_size_bytes<
+                (mqueue::compute_allocated_size_bytes<
                     typename Allocator::value_type> (msgs, msg_size_bytes)
+                    + sizeof(typename Allocator::value_type) - 1)
                     / sizeof(typename Allocator::value_type);
 
             allocator_ = &allocator;

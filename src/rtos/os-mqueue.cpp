@@ -378,7 +378,7 @@ namespace os
       if (queue_address != nullptr)
         {
           // The attributes should not define any storage in this case.
-          assert(attr.mq_queue_address == nullptr);
+          assert (attr.mq_queue_address == nullptr);
 
           queue_addr_ = queue_address;
           queue_size_bytes_ = queue_size_bytes;
@@ -441,7 +441,7 @@ namespace os
           reinterpret_cast<char*> (reinterpret_cast<char*> (const_cast<mqueue::priority_t*> (prio_array_))
               + msgs * sizeof(mqueue::priority_t));
 
-      assert(
+      assert (
           p - static_cast<char*> (queue_addr_)
               <= static_cast<ptrdiff_t> (queue_size_bytes_));
 #endif
@@ -473,8 +473,8 @@ namespace os
 
 #else
 
-      assert(send_list_.empty ());
-      assert(receive_list_.empty ());
+      assert (send_list_.empty ());
+      assert (receive_list_.empty ());
 
 #endif
     }

@@ -140,7 +140,7 @@ namespace os
         class Arena
         {
         public:
-          T pool[blocks * block_size_bytes / sizeof(T)];
+          T pool[(blocks * block_size_bytes + sizeof(T) - 1) / sizeof(T)];
         };
 
       template<typename T>
@@ -923,8 +923,9 @@ namespace os
                        block_size_bytes);
 #endif
 
-        allocated_pool_size_elements_ = mempool::compute_allocated_size_bytes<
+        allocated_pool_size_elements_ = (mempool::compute_allocated_size_bytes<
             typename Allocator::value_type> (blocks, block_size_bytes)
+            + sizeof(typename Allocator::value_type) - 1)
             / sizeof(typename Allocator::value_type);
 
         allocator_ = &allocator;
@@ -985,8 +986,9 @@ namespace os
             // If no user storage was provided via attributes,
             // allocate it dynamically via the allocator.
             allocated_pool_size_elements_ =
-                mempool::compute_allocated_size_bytes<
+                (mempool::compute_allocated_size_bytes<
                     typename Allocator::value_type> (blocks, block_size_bytes)
+                    + sizeof(typename Allocator::value_type) - 1)
                     / sizeof(typename Allocator::value_type);
 
             allocator_ = &allocator;

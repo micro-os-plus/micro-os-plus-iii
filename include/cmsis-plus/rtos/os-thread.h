@@ -1005,7 +1005,8 @@ namespace os
       thread::state_t volatile sched_state_ = thread::state::undefined;
       thread::priority_t volatile prio_ = thread::priority::none;
 
-      thread::sigset_t volatile sig_mask_ = 0;bool volatile interrupted_ = false;
+      thread::sigset_t volatile sig_mask_ = 0;
+      bool volatile interrupted_ = false;
 
       os_thread_user_storage_t user_storage_;
 
@@ -1147,7 +1148,8 @@ namespace os
 
       private:
 
-        stack::allocation_element_t stack_[stack_size_bytes
+        stack::allocation_element_t stack_[(stack_size_bytes
+            + sizeof(stack::allocation_element_t) - 1)
             / sizeof(stack::allocation_element_t)];
       };
 
@@ -1382,8 +1384,8 @@ namespace os
       inline void
       Stack::default_size (std::size_t size_bytes)
       {
-        assert(size_bytes != 0);
-        assert(size_bytes >= min_size_bytes_);
+        assert (size_bytes != 0);
+        assert (size_bytes >= min_size_bytes_);
 
         default_size_bytes_ = size_bytes;
       }
@@ -1527,7 +1529,8 @@ namespace os
 
         allocator_ = &allocator;
 
-        allocated_stack_size_elements_ = thread::Stack::default_size ()
+        allocated_stack_size_elements_ = (thread::Stack::default_size ()
+            + sizeof(typename Allocator::value_type) - 1)
             / sizeof(typename Allocator::value_type);
         allocated_stack_address_ =
             reinterpret_cast<stack::element_t*> (const_cast<Allocator&> (allocator).allocate (
@@ -1604,12 +1607,14 @@ namespace os
 
             if (attr.th_stack_size_bytes > thread::Stack::min_size ())
               {
-                allocated_stack_size_elements_ = attr.th_stack_size_bytes
+                allocated_stack_size_elements_ = (attr.th_stack_size_bytes
+                    + sizeof(typename Allocator::value_type) - 1)
                     / sizeof(typename Allocator::value_type);
               }
             else
               {
-                allocated_stack_size_elements_ = thread::Stack::default_size ()
+                allocated_stack_size_elements_ = (thread::Stack::default_size ()
+                    + sizeof(typename Allocator::value_type) - 1)
                     / sizeof(typename Allocator::value_type);
               }
             allocated_stack_address_ =

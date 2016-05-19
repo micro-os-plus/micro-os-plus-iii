@@ -218,7 +218,7 @@ namespace os
 #endif
 
       blocks_ = blocks;
-      assert(blocks_ > 0);
+      assert (blocks_ > 0);
 
       // Adjust block size to multiple of pointer.
       // Blocks must be large enough to store a pointer, used
@@ -231,7 +231,7 @@ namespace os
       if (pool_address != nullptr)
         {
           // The attributes should not define any storage in this case.
-          assert(attr.mp_pool_address == nullptr);
+          assert (attr.mp_pool_address == nullptr);
 
           pool_addr_ = pool_address;
           pool_size_bytes_ = pool_size_bytes;
@@ -288,7 +288,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      assert(list_.empty ());
+      assert (list_.empty ());
     }
 
     /*
