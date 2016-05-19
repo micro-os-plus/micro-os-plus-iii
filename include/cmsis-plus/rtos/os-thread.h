@@ -1708,7 +1708,7 @@ namespace os
       Thread_allocated<Allocator>::Thread_allocated (
           const thread::Attributes& attr, thread::func_t function,
           thread::func_args_t args, const Allocator& allocator) :
-          Thread
+          Thread_allocated
             { nullptr, attr, function, args, allocator }
       {
         ;

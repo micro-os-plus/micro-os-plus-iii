@@ -232,13 +232,18 @@ namespace os
 
     Thread::Thread ()
     {
-      ;
+#if defined(OS_TRACE_RTOS_THREAD)
+      trace::printf ("%s @%p %s\n", __func__, this, this->name ());
+#endif
     }
 
     Thread::Thread (const char* name) :
-        Named_object (name)
+        Named_object
+          { name }
     {
-      ;
+#if defined(OS_TRACE_RTOS_THREAD)
+      trace::printf ("%s @%p %s\n", __func__, this, this->name ());
+#endif
     }
 
     /**
