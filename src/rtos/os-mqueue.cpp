@@ -347,7 +347,7 @@ namespace os
     Message_queue::Message_queue ()
     {
 #if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s() @%p\n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
     }
 
@@ -355,7 +355,7 @@ namespace os
         Named_object (name)
     {
 #if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s() @%p %s\n", __func__, this, name);
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
     }
 
