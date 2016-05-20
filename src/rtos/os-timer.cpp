@@ -120,7 +120,7 @@ namespace os
     // ========================================================================
     /**
      * @details
-     * This constructor shall initialise the timer object
+     * This constructor shall initialise a timer object
      * with default settings.
      * The effect shall be equivalent to creating a timer object
      * referring to the attributes in `timer::once_initializer`.
@@ -139,14 +139,41 @@ namespace os
      */
     Timer::Timer (timer::func_t function, timer::func_args_t args) :
         Timer
-          { timer::once_initializer, function, args }
+          { nullptr, timer::once_initializer, function, args }
     {
       ;
     }
 
     /**
      * @details
-     * This constructor shall initialise the timer object
+     * This constructor shall initialise a named timer object
+     * with default settings.
+     * The effect shall be equivalent to creating a timer object
+     * referring to the attributes in `timer::once_initializer`.
+     * Upon successful initialisation, the state of the
+     * timer object shall become initialised.
+     *
+     * Only the timer object itself may be used for running
+     * the function. It is not allowed to make copies of
+     * timer objects.
+     *
+     * The default timer is a single run timer which uses the
+     * `Systick_clock`; the period is expressed
+     * in scheduler ticks.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    Timer::Timer (const char* name, timer::func_t function,
+                  timer::func_args_t args) :
+        Timer
+          { name, timer::once_initializer, function, args }
+    {
+      ;
+    }
+
+    /**
+     * @details
+     * This constructor shall initialise a timer object
      * with attributes referenced by _attr_.
      * If the attributes specified by _attr_ are modified later,
      * the timer attributes shall not be affected.
@@ -169,12 +196,39 @@ namespace os
      */
     Timer::Timer (const timer::Attributes& attr, timer::func_t function,
                   timer::func_args_t args) :
+        Timer
+          { nullptr, attr, function, args }
+    {
+      ;
+    }
+
+    /**
+     * @details
+     * This constructor shall initialise a named timer object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the timer attributes shall not be affected.
+     *
+     * Upon successful initialisation, the state of the
+     * timer object shall become initialised.
+     *
+     * Only the timer object itself may be used for running
+     * the function. It is not allowed to make copies of
+     * timer objects.
+     *
+     * In cases where default condition variable attributes are
+     * appropriate, the variables `timer::once_initializer`
+     * or `timer::periodic_initializer` can be used to
+     * initialise timers.
+     * The effect shall be equivalent to creating a timer
+     * object with the simple constructor.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    Timer::Timer (const char* name, const timer::Attributes& attr,
+                  timer::func_t function, timer::func_args_t args) :
         Named_object
-          { attr.name () } //
-#if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
-          , clock_ (attr.clock != nullptr ? *attr.clock : systick_clock), timer_node_
-            { 0, *this }
-#endif
+          { name != nullptr ? name : attr.name () }
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
       os_assert_throw(function != nullptr, EINVAL);
@@ -184,7 +238,11 @@ namespace os
       func_args_ = args;
 
 #if defined(OS_TRACE_RTOS_TIMER)
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
+#endif
+
+#if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
+      clock_ = attr.clock != nullptr ? attr.clock : &systick_clock;
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_TIMER)
@@ -212,7 +270,7 @@ namespace os
     Timer::~Timer ()
     {
 #if defined(OS_TRACE_RTOS_TIMER)
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_TIMER)
@@ -246,7 +304,7 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_TIMER)
-      trace::printf ("%s(%d) @%p \n", __func__, period, this);
+      trace::printf ("%s(%d) @%p %s\n", __func__, period, this, name ());
 #endif
 
       if (period == 0)
@@ -264,13 +322,15 @@ namespace os
 
       period_ = period;
 
-      // TODO: If started, stop.
-      timer_node_.timestamp = clock_.steady_now () + period;
+      timer_node_.timestamp = clock_->steady_now () + period;
 
         {
           interrupts::Critical_section ics; // ----- Critical section -----
 
-          clock_.steady_list ().link (timer_node_);
+          // If started, stop.
+          timer_node_.unlink ();
+
+          clock_->steady_list ().link (timer_node_);
         }
       res = result::ok;
 
@@ -298,7 +358,7 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_TIMER)
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
       if (state_ != timer::state::running)
@@ -339,7 +399,7 @@ namespace os
           timer_node_.timestamp += period_;
 
           // No need for critical section in ISR.
-          clock_.steady_list ().link (timer_node_);
+          clock_->steady_list ().link (timer_node_);
         }
       else
         {

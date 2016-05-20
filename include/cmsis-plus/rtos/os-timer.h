@@ -112,11 +112,8 @@ namespace os
         /**
          * @brief Timer type attribute.
          */
-        type_t tm_type;
+        type_t tm_type = run::once;
 
-        //
-        // TODO: add clock ID.
-        //
         // Add more attributes.
 
         /**
@@ -213,6 +210,14 @@ namespace os
       Timer (timer::func_t function, timer::func_args_t args);
 
       /**
+       * @brief Create a named timer with default settings.
+       * @param [in] name Pointer to name.
+       * @param [in] function Pointer to timer function.
+       * @param [in] args Pointer to arguments.
+       */
+      Timer (const char* name, timer::func_t function, timer::func_args_t args);
+
+      /**
        * @brief Create a timer with custom settings.
        * @param [in] attr Reference to attributes.
        * @param [in] function Pointer to timer function.
@@ -220,6 +225,16 @@ namespace os
        */
       Timer (const timer::Attributes& attr, timer::func_t function,
              timer::func_args_t args);
+
+      /**
+       * @brief Create a named timer with custom settings.
+       * @param [in] name Pointer to name.
+       * @param [in] attr Reference to attributes.
+       * @param [in] function Pointer to timer function.
+       * @param [in] args Pointer to arguments.
+       */
+      Timer (const char* name, const timer::Attributes& attr,
+             timer::func_t function, timer::func_args_t args);
 
       /**
        * @cond ignore
@@ -241,6 +256,9 @@ namespace os
 
       /**
        * @}
+       */
+
+      /*
        * @name Operators
        * @{
        */
@@ -332,8 +350,9 @@ namespace os
       timer::func_args_t func_args_;
 
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
-      Clock& clock_;
-      Timer_node timer_node_;
+      Clock* clock_;
+      Timer_node timer_node_
+        { 0, *this };
       clock::duration_t period_;
 #endif
 
@@ -370,8 +389,7 @@ namespace os
       constexpr
       Attributes::Attributes (const char* name) :
           Clocked_attributes
-            { name }, //
-          tm_type (run::once)
+            { name }
       {
         ;
       }

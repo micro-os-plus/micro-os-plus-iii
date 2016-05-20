@@ -47,6 +47,12 @@ func (void* args __attribute__((unused)))
   return nullptr;
 }
 
+void
+tmfunc (void* args __attribute__((unused)))
+{
+  trace::printf ("%s\n", __func__);
+}
+
 int
 run_tests (void)
 {
@@ -304,6 +310,24 @@ run_tests (void)
       Semaphore sp2
         { "sp2" };
       sp2.post ();
+    }
+
+  // ==========================================================================
+
+    {
+      Timer tm1
+        { tmfunc, nullptr };
+      tm1.start (1);
+
+      systick_clock.sleep_for (2);
+      tm1.stop ();
+
+      Timer tm2
+        { "tm2", tmfunc, nullptr };
+      tm2.start (1);
+
+      systick_clock.sleep_for (2);
+      tm2.stop ();
     }
 
   // ==========================================================================
