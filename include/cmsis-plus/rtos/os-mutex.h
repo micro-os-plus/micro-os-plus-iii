@@ -112,27 +112,27 @@ namespace os
         /**
          * @brief Mutex priority ceiling.
          */
-        thread::priority_t mx_priority_ceiling;
+        thread::priority_t mx_priority_ceiling = thread::priority::highest;
 
         /**
          * @brief Mutex protocol attribute.
          */
-        mutex::protocol_t mx_protocol;
+        mutex::protocol_t mx_protocol = protocol::none;
 
         /**
          * @brief Mutex protocol attribute.
          */
-        mutex::robustness_t mx_robustness;
+        mutex::robustness_t mx_robustness = robustness::stalled;
 
         /**
          * @brief Mutex type attribute.
          */
-        mutex::type_t mx_type;
+        mutex::type_t mx_type = type::_default;
 
         /**
          * @brief Mutex maximum recursive count.
          */
-        mutex::count_t mx_max_count;
+        mutex::count_t mx_max_count = max_count;
 
         //
         // TODO: add clock ID.
@@ -233,11 +233,25 @@ namespace os
        *  None
        */
       Mutex ();
+
+      /**
+       * @brief Create a named mutex with default settings.
+       * @param [in] name Pointer to name.
+       */
+      Mutex (const char* name);
+
       /**
        * @brief Create a mutex with custom settings.
        * @param [in] attr Reference to attributes.
        */
       Mutex (const mutex::Attributes& attr);
+
+      /**
+       * @brief Create a named mutex with custom settings.
+       * @param [in] name Pointer to name.
+       * @param [in] attr Reference to attributes.
+       */
+      Mutex (const char* name, const mutex::Attributes& attr);
 
       /**
        * @cond ignore
@@ -463,11 +477,11 @@ namespace os
        */
 
       // Can be updated in different thread contexts.
-      Thread* volatile owner_;
+      Thread* volatile owner_ = nullptr;
 
 #if !defined(OS_INCLUDE_RTOS_PORT_MUTEX)
       Waiting_threads_list list_;
-      Clock& clock_;
+      Clock* clock_ = nullptr;
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
@@ -476,11 +490,11 @@ namespace os
 #endif
 
       // Can be updated in different thread contexts.
-      volatile mutex::count_t count_;
+      volatile mutex::count_t count_ = 0;
 
       // Can be updated in different thread contexts.
-      volatile thread::priority_t prio_ceiling_;
-      volatile thread::priority_t owner_prio_;
+      volatile thread::priority_t prio_ceiling_ = thread::priority::highest;
+      volatile thread::priority_t owner_prio_ = 0;
 
       // Constants set during construction.
       const mutex::type_t type_; // normal, errorcheck, recursive
@@ -516,12 +530,7 @@ namespace os
       constexpr
       Attributes::Attributes (const char* name) :
           Clocked_attributes
-            { name }, //
-          mx_priority_ceiling (thread::priority::highest), //
-          mx_protocol (protocol::none), //
-          mx_robustness (robustness::stalled), //
-          mx_type (type::_default), //
-          mx_max_count (max_count)
+            { name }
       {
         ;
       }
@@ -530,11 +539,7 @@ namespace os
       Attributes::Attributes (const char* name, mutex::type_t type) :
           Clocked_attributes
             { name }, //
-          mx_priority_ceiling (thread::priority::highest), //
-          mx_protocol (protocol::none), //
-          mx_robustness (robustness::stalled), //
-          mx_type (type), //
-          mx_max_count (max_count)
+          mx_type (type)
       {
         ;
       }

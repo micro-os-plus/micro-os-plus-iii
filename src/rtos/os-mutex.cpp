@@ -348,7 +348,7 @@ namespace os
 
     /**
      * @details
-     * This constructor shall initialise the mutex object
+     * This constructor shall initialise a mutex object
      * with default settings.
      * The effect shall be equivalent to creating a mutex object
      * referring to the attributes in `mutex::normal_initializer`.
@@ -368,14 +368,41 @@ namespace os
      */
     Mutex::Mutex () :
         Mutex
-          { mutex::normal_initializer }
+          { nullptr, mutex::normal_initializer }
     {
       ;
     }
 
     /**
      * @details
-     * This constructor shall initialise the mutex object
+     * This constructor shall initialise a named mutex object
+     * with default settings.
+     * The effect shall be equivalent to creating a mutex object
+     * referring to the attributes in `mutex::normal_initializer`.
+     * Upon successful initialisation, the state of the
+     * mutex object shall become initialised, unlocked.
+     *
+     * Only the mutex object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * mutex objects.
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_mutex_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_init.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    Mutex::Mutex (const char* name) :
+        Mutex
+          { name, mutex::normal_initializer }
+    {
+      ;
+    }
+
+    /**
+     * @details
+     * This constructor shall initialise a mutex object
      * with attributes referenced by _attr_.
      * If the attributes specified by _attr_ are modified later,
      * the mutex attributes shall not be affected.
@@ -401,27 +428,59 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     Mutex::Mutex (const mutex::Attributes& attr) :
+        Mutex
+          { nullptr, attr }
+    {
+      ;
+    }
+
+    /**
+     * @details
+     * This constructor shall initialise a mutex object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the mutex attributes shall not be affected.
+     * Upon successful initialisation, the state of the
+     * mutex object shall become initialised.
+     *
+     * Only the mutex object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * condition variable objects.
+     *
+     * In cases where default mutex attributes are
+     * appropriate, the variables `mutex::normal_initializer`
+     * or `mutex::recursive_initializer` can be used to
+     * initialise mutex objects.
+     * The effect shall be equivalent to creating a mutex
+     * object with the default constructor.
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_mutex_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_init.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    Mutex::Mutex (const char* name, const mutex::Attributes& attr) :
         Named_object
-          { attr.name () }, //
-#if !defined(OS_INCLUDE_RTOS_PORT_MUTEX)
-            clock_ (attr.clock != nullptr ? *attr.clock : systick_clock),
-#endif
-            type_ (attr.mx_type), //
-            protocol_ (attr.mx_protocol), //
-            robustness_ (attr.mx_robustness), //
-            max_count_ (
-                (attr.mx_type == mutex::type::recursive) ?
-                    attr.mx_max_count : 1)
+          { name != nullptr ? name : attr.name () }, //
+        type_ (attr.mx_type), //
+        protocol_ (attr.mx_protocol), //
+        robustness_ (attr.mx_robustness), //
+        max_count_ (
+            (attr.mx_type == mutex::type::recursive) ? attr.mx_max_count : 1)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
-      prio_ceiling_ = attr.mx_priority_ceiling;
-      owner_ = nullptr;
-      count_ = 0;
-
 #if defined(OS_TRACE_RTOS_MUTEX)
-      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
+
+#if !defined(OS_INCLUDE_RTOS_PORT_MUTEX)
+      clock_ = attr.clock != nullptr ? attr.clock : &systick_clock;
+#endif
+
+      prio_ceiling_ = attr.mx_priority_ceiling;
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
@@ -432,6 +491,7 @@ namespace os
 
       // Robust mutexes not yet fully supported.
       os_assert_throw(robustness_ != mutex::robustness::robust, ENOTSUP);
+
       _init ();
 
 #endif
@@ -468,8 +528,8 @@ namespace os
 
 #else
 
-      assert(owner_ == nullptr);
-      assert(list_.empty ());
+      assert (owner_ == nullptr);
+      assert (list_.empty ());
 
 #endif
     }
@@ -523,8 +583,8 @@ namespace os
                 }
             }
 #if defined(OS_TRACE_RTOS_MUTEX)
-          trace::printf ("mutex @%p %s locked by %p %s\n", this, name (),
-                         crt_thread, crt_thread->name ());
+          trace::printf ("%s() @%p %s locked by %p %s\n", __func__, this,
+                         name (), crt_thread, crt_thread->name ());
 #endif
           return result::ok;
         }
@@ -539,8 +599,8 @@ namespace os
                 }
               ++count_;
 #if defined(OS_TRACE_RTOS_MUTEX)
-              trace::printf ("mutex @%p %s incr %d by %p %s\n", this, name (),
-                             count_, crt_thread, crt_thread->name ());
+              trace::printf ("%s() @%p %s incr %d by %p %s\n", __func__, this,
+                             name (), count_, crt_thread, crt_thread->name ());
 #endif
               return result::ok;
             }
@@ -790,7 +850,7 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_MUTEX)
-      trace::printf ("%s(%d_ticks) @%p %s by %p %s\n", __func__, timeout, this,
+      trace::printf ("%s(%d) @%p %s by %p %s\n", __func__, timeout, this,
                      name (), &this_thread::thread (),
                      this_thread::thread ().name ());
 #endif
@@ -823,8 +883,8 @@ namespace os
       Waiting_thread_node node
         { crt_thread };
 
-      Clock_timestamps_list& clock_list = clock_.steady_list ();
-      clock::timestamp_t timeout_timestamp = clock_.steady_now () + timeout;
+      Clock_timestamps_list& clock_list = clock_->steady_list ();
+      clock::timestamp_t timeout_timestamp = clock_->steady_now () + timeout;
 
       // Prepare a timeout node pointing to the current thread.
       Timeout_thread_node timeout_node
@@ -867,7 +927,7 @@ namespace os
               return EINTR;
             }
 
-          if (clock_.steady_now () >= timeout_timestamp)
+          if (clock_->steady_now () >= timeout_timestamp)
             {
               return ETIMEDOUT;
             }
@@ -925,7 +985,8 @@ namespace os
             {
               --count_;
 #if defined(OS_TRACE_RTOS_MUTEX)
-              trace::printf ("mutex @%p %s decr %d\n", this, name (), count_);
+              trace::printf ("%s() @%p %s decr %d\n", __func__, this, name (),
+                             count_);
 #endif
               return result::ok;
             }
@@ -937,7 +998,7 @@ namespace os
             }
 
 #if defined(OS_TRACE_RTOS_MUTEX)
-          trace::printf ("mutex @%p %s unlocked\n", this, name ());
+          trace::printf ("%s() @%p %s unlocked\n", __func__, this, name ());
 #endif
 
           list_.resume_one ();
@@ -974,7 +1035,7 @@ namespace os
     thread::priority_t
     Mutex::prio_ceiling (void) const
     {
-      assert(!scheduler::in_handler_mode ());
+      assert (!scheduler::in_handler_mode ());
 
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -1092,7 +1153,7 @@ namespace os
 
 #else
 
-      // TODO
+      // TODO: update status to be consistent (?)
       return result::ok;
 
 #endif
