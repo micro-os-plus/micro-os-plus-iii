@@ -80,7 +80,7 @@ namespace os
     class semaphore;
     class Systick_clock;
     class Thread;
-    class Timer;
+    class timer;
 
     class Waiting_threads_list;
     class Clock_threads_list;
@@ -552,55 +552,6 @@ namespace os
     // ========================================================================
 
     /**
-     * @brief User timer namespace.
-     * @ingroup cmsis-plus-rtos
-     */
-    namespace timer
-    {
-      /**
-       * @brief Timer call back function arguments.
-       */
-      using func_args_t = void*;
-
-      /**
-       * @brief Entry point of a timer call back function.
-       */
-      using func_t = void (*) (func_args_t args);
-
-      /**
-       * @brief Timer run type.
-       */
-      using type_t = enum class run : uint8_t
-        {
-          /**
-           * @brief Run only once.
-           */
-          once = 0,
-
-          /**
-           * @brief Run periodically.
-           */
-          periodic = 1      //
-        };
-
-      using state_t = enum class state : uint8_t
-        {
-          /**
-           * @brief Used to catch uninitialised threads.
-           */
-          undefined = 0,
-          initialized = 1,
-          running = 2,
-          completed = 3,
-          stopped = 4,
-          destroyed = 5
-        };
-
-    }
-
-    // ========================================================================
-
-    /**
      * @brief Condition variable namespace.
      */
     namespace condvar
@@ -1011,7 +962,7 @@ namespace os
     namespace port
     {
       class Thread;
-      class Timer;
+      class timer;
       class mutex;
 
       class Condition_variable;

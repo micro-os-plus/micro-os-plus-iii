@@ -48,7 +48,7 @@ namespace os
     class Thread;
     class Double_list;
     class Timeout_thread_node;
-    class Timer_node;
+    class timer_node;
 
     // ========================================================================
 
@@ -419,7 +419,7 @@ namespace os
     /**
      * @brief Double linked list node, with time stamp and timer.
      */
-    class Timer_node : public Timestamp_node
+    class timer_node : public Timestamp_node
     {
     public:
 
@@ -433,17 +433,17 @@ namespace os
        * @param [in] ts Time stamp.
        * @param [in] tm Reference to timer.
        */
-      Timer_node (clock::timestamp_t ts, Timer& tm);
+      timer_node (clock::timestamp_t ts, timer& tm);
 
       /**
        * @cond ignore
        */
-      Timer_node (const Timer_node&) = delete;
-      Timer_node (Timer_node&&) = delete;
-      Timer_node&
-      operator= (const Timer_node&) = delete;
-      Timer_node&
-      operator= (Timer_node&&) = delete;
+      timer_node (const timer_node&) = delete;
+      timer_node (timer_node&&) = delete;
+      timer_node&
+      operator= (const timer_node&) = delete;
+      timer_node&
+      operator= (timer_node&&) = delete;
       /**
        * @endcond
        */
@@ -452,7 +452,7 @@ namespace os
        * @brief Destroy the node.
        */
       virtual
-      ~Timer_node ();
+      ~timer_node ();
 
       /**
        * @}
@@ -488,7 +488,7 @@ namespace os
       /**
        * @brief Reference to waiting timer.
        */
-      Timer& timer;
+      timer& tmr;
 
       /**
        * @}

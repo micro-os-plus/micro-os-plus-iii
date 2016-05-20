@@ -45,19 +45,66 @@ namespace os
 {
   namespace rtos
   {
-    namespace timer
-    {
-
-      // ========================================================================
+    // ========================================================================
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
+
+    /**
+     * @brief User single-shot or periodic **timer**.
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
+     */
+    class timer : public named_object
+    {
+    public:
+
+      /**
+       * @brief Timer call back function arguments.
+       */
+      using func_args_t = void*;
+
+      /**
+       * @brief Entry point of a timer call back function.
+       */
+      using func_t = void (*) (func_args_t args);
+
+      /**
+       * @brief Timer run type.
+       */
+      using type_t = enum class run : uint8_t
+        {
+          /**
+           * @brief Run only once.
+           */
+          once = 0,
+
+          /**
+           * @brief Run periodically.
+           */
+          periodic = 1      //
+        };
+
+      using state_t = enum class state : uint8_t
+        {
+          /**
+           * @brief Used to catch uninitialised threads.
+           */
+          undefined = 0,
+          initialized = 1,
+          running = 2,
+          completed = 3,
+          stopped = 4,
+          destroyed = 5
+        };
+
+      // ======================================================================
 
       /**
        * @brief %Timer attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Attributes : public clocked_attributes
+      class attributes : public clocked_attributes
       {
       public:
 
@@ -71,17 +118,17 @@ namespace os
          * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
         constexpr
-        Attributes (const char* name);
+        attributes (const char* name);
 
         /**
          * @cond ignore
          */
-        Attributes (const Attributes&) = default;
-        Attributes (Attributes&&) = default;
-        Attributes&
-        operator= (const Attributes&) = default;
-        Attributes&
-        operator= (Attributes&&) = default;
+        attributes (const attributes&) = default;
+        attributes (attributes&&) = default;
+        attributes&
+        operator= (const attributes&) = default;
+        attributes&
+        operator= (attributes&&) = default;
         /**
          * @endcond
          */
@@ -89,7 +136,7 @@ namespace os
         /**
          * @brief Destroy timer attributes.
          */
-        ~Attributes () = default;
+        ~attributes () = default;
 
         /**
          * @}
@@ -98,7 +145,7 @@ namespace os
       protected:
 
         constexpr
-        Attributes (const char* name, type_t type);
+        attributes (const char* name, type_t type);
 
       public:
 
@@ -121,21 +168,16 @@ namespace os
          */
       };
 
-#pragma GCC diagnostic pop
-
       /**
        * @brief Default one shot timer initialiser.
        */
-      extern const Attributes once_initializer;
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
+      static const attributes once_initializer;
 
       /**
        * @brief Periodic timer attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Periodic_attributes : public Attributes
+      class periodic_attributes : public attributes
       {
       public:
 
@@ -149,17 +191,17 @@ namespace os
          * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
         constexpr
-        Periodic_attributes (const char* name);
+        periodic_attributes (const char* name);
 
         /**
          * @cond ignore
          */
-        Periodic_attributes (const Periodic_attributes&) = default;
-        Periodic_attributes (Periodic_attributes&&) = default;
-        Periodic_attributes&
-        operator= (const Periodic_attributes&) = default;
-        Periodic_attributes&
-        operator= (Periodic_attributes&&) = default;
+        periodic_attributes (const periodic_attributes&) = default;
+        periodic_attributes (periodic_attributes&&) = default;
+        periodic_attributes&
+        operator= (const periodic_attributes&) = default;
+        periodic_attributes&
+        operator= (periodic_attributes&&) = default;
         /**
          * @endcond
          */
@@ -167,7 +209,7 @@ namespace os
         /**
          * @brief Destroy timer attributes.
          */
-        ~Periodic_attributes () = default;
+        ~periodic_attributes () = default;
 
         /**
          * @}
@@ -175,27 +217,10 @@ namespace os
 
       };
 
-#pragma GCC diagnostic pop
-
       /**
        * @brief Default periodic timer initialiser.
        */
-      extern const Periodic_attributes periodic_initializer;
-    }
-
-    // ========================================================================
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
-
-    /**
-     * @brief User single-shot or periodic **timer**.
-     * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
-     */
-    class Timer : public named_object
-    {
-    public:
+      static const periodic_attributes periodic_initializer;
 
       /**
        * @name Constructors & Destructor
@@ -207,7 +232,7 @@ namespace os
        * @param [in] function Pointer to timer function.
        * @param [in] args Pointer to arguments.
        */
-      Timer (timer::func_t function, timer::func_args_t args);
+      timer (func_t function, func_args_t args);
 
       /**
        * @brief Create a named timer with default settings.
@@ -215,7 +240,7 @@ namespace os
        * @param [in] function Pointer to timer function.
        * @param [in] args Pointer to arguments.
        */
-      Timer (const char* name, timer::func_t function, timer::func_args_t args);
+      timer (const char* name, func_t function, func_args_t args);
 
       /**
        * @brief Create a timer with custom settings.
@@ -223,8 +248,7 @@ namespace os
        * @param [in] function Pointer to timer function.
        * @param [in] args Pointer to arguments.
        */
-      Timer (const timer::Attributes& attr, timer::func_t function,
-             timer::func_args_t args);
+      timer (const attributes& attr, func_t function, func_args_t args);
 
       /**
        * @brief Create a named timer with custom settings.
@@ -233,18 +257,18 @@ namespace os
        * @param [in] function Pointer to timer function.
        * @param [in] args Pointer to arguments.
        */
-      Timer (const char* name, const timer::Attributes& attr,
-             timer::func_t function, timer::func_args_t args);
+      timer (const char* name, const attributes& attr, func_t function,
+             func_args_t args);
 
       /**
        * @cond ignore
        */
-      Timer (const Timer&) = delete;
-      Timer (Timer&&) = delete;
-      Timer&
-      operator= (const Timer&) = delete;
-      Timer&
-      operator= (Timer&&) = delete;
+      timer (const timer&) = delete;
+      timer (timer&&) = delete;
+      timer&
+      operator= (const timer&) = delete;
+      timer&
+      operator= (timer&&) = delete;
       /**
        * @endcond
        */
@@ -252,7 +276,7 @@ namespace os
       /**
        * @brief Destroy the timer.
        */
-      ~Timer ();
+      ~timer ();
 
       /**
        * @}
@@ -269,7 +293,7 @@ namespace os
        * @retval false The timers are different.
        */
       bool
-      operator== (const Timer& rhs) const;
+      operator== (const timer& rhs) const;
 
       /**
        * @}
@@ -315,7 +339,7 @@ namespace os
        * @{
        */
 
-      friend class Timer_node;
+      friend class timer_node;
 
       /**
        * @}
@@ -346,23 +370,23 @@ namespace os
        * @{
        */
 
-      timer::func_t func_;
-      timer::func_args_t func_args_;
+      func_t func_;
+      func_args_t func_args_;
 
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
-      Clock* clock_;
-      Timer_node timer_node_
+      Clock* clock_ = nullptr;
+      timer_node timer_node_
         { 0, *this };
-      clock::duration_t period_;
+      clock::duration_t period_ = 0;
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_TIMER)
-      friend class port::Timer;
+      friend class port::timer;
       os_timer_port_data_t port_;
 #endif
 
-      timer::type_t type_;
-      timer::state_t state_;
+      type_t type_ = run::once;
+      state_t state_ = state::undefined;
 
       // Add more internal data.
 
@@ -382,47 +406,41 @@ namespace os
 {
   namespace rtos
   {
-    namespace timer
+    // ========================================================================
+
+    constexpr
+    timer::attributes::attributes (const char* name) :
+        clocked_attributes
+          { name }
     {
-      // ======================================================================
+      ;
+    }
 
-      constexpr
-      Attributes::Attributes (const char* name) :
-          clocked_attributes
-            { name }
-      {
-        ;
-      }
-
-      constexpr
-      Attributes::Attributes (const char* name, type_t type) :
-          clocked_attributes
-            { name }, //
-          tm_type (type)
-      {
-        ;
-      }
-
-      // ======================================================================
-
-      constexpr
-      Periodic_attributes::Periodic_attributes (const char* name) :
-          Attributes
-            { name, run::periodic }
-      {
-        ;
-      }
-
-    } /* namespace timer */
+    constexpr
+    timer::attributes::attributes (const char* name, type_t type) :
+        clocked_attributes
+          { name }, //
+        tm_type (type)
+    {
+      ;
+    }
 
     // ========================================================================
+
+    constexpr
+    timer::periodic_attributes::periodic_attributes (const char* name) :
+        attributes
+          { name, run::periodic }
+    {
+      ;
+    }
 
     /**
      * @details
      * Identical timers should have the same memory address.
      */
     inline bool
-    Timer::operator== (const Timer& rhs) const
+    timer::operator== (const timer& rhs) const
     {
       return this == &rhs;
     }

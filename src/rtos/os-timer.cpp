@@ -42,41 +42,35 @@ namespace os
     // ------------------------------------------------------------------------
 
     /**
+     * @class attributes
      * @details
-     * The os::rtos::timer namespace groups timer types, enumerations,
-     * attributes and initialisers.
+     * Allow to assign a name to the timer.
+     *
+     * To simplify access, the member variables are public and do not
+     * require accessors or mutators.
+     *
+     * @par POSIX compatibility
+     *  No POSIX similar functionality identified, but inspired by POSIX
+     *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  (IEEE Std 1003.1, 2013 Edition).
      */
-    namespace timer
-    {
-      /**
-       * @class Attributes
-       * @details
-       * Allow to assign a name to the timer.
-       *
-       * To simplify access, the member variables are public and do not
-       * require accessors or mutators.
-       *
-       * @par POSIX compatibility
-       *  No POSIX similar functionality identified, but inspired by POSIX
-       *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
-       */
 
-      /**
-       * @class Periodic_attributes
-       * @details
-       * Allow to assign a name to the timer.
-       */
+    const timer::attributes timer::once_initializer
+      { nullptr };
 
-      const Attributes once_initializer
-        { nullptr };
+    /**
+     * @class periodic_attributes
+     * @details
+     * Allow to assign a name to the timer.
+     */
 
-    } /* namespace timer */
+    const timer::periodic_attributes timer::periodic_initializer
+      { nullptr };
 
     // ------------------------------------------------------------------------
 
     /**
-     * @class Timer
+     * @class timer
      * @details
      * The CMISIS++ timer schedules the execution of a user function after
      * a programmable interval. If the timer is periodic, the function is
@@ -102,7 +96,7 @@ namespace os
      * os_main(int argc, char* argv[])
      * {
      *   // Create new thread, with function and no arguments.
-     *   Timer tm { func, nullptr };
+     *   timer tm { func, nullptr };
      *
      *   // Schedule func() to be executed after 100 ticks.
      *   tm.start(100);
@@ -137,9 +131,9 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Timer::Timer (timer::func_t function, timer::func_args_t args) :
-        Timer
-          { nullptr, timer::once_initializer, function, args }
+    timer::timer (func_t function, func_args_t args) :
+        timer
+          { nullptr, once_initializer, function, args }
     {
       ;
     }
@@ -163,10 +157,9 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Timer::Timer (const char* name, timer::func_t function,
-                  timer::func_args_t args) :
-        Timer
-          { name, timer::once_initializer, function, args }
+    timer::timer (const char* name, func_t function, func_args_t args) :
+        timer
+          { name, once_initializer, function, args }
     {
       ;
     }
@@ -194,9 +187,8 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Timer::Timer (const timer::Attributes& attr, timer::func_t function,
-                  timer::func_args_t args) :
-        Timer
+    timer::timer (const attributes& attr, func_t function, func_args_t args) :
+        timer
           { nullptr, attr, function, args }
     {
       ;
@@ -225,8 +217,8 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Timer::Timer (const char* name, const timer::Attributes& attr,
-                  timer::func_t function, timer::func_args_t args) :
+    timer::timer (const char* name, const attributes& attr, func_t function,
+                  func_args_t args) :
         named_object
           { name, attr.name () }
     {
@@ -247,14 +239,14 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
-      port::Timer::create (this, function, args);
+      port::timer::create (this, function, args);
 
 #else
 
       period_ = 0;
 
 #endif
-      state_ = timer::state::initialized;
+      state_ = state::initialized;
     }
 
     /**
@@ -267,7 +259,7 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Timer::~Timer ()
+    timer::~timer ()
     {
 #if defined(OS_TRACE_RTOS_TIMER)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -275,21 +267,21 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
-      port::Timer::destroy (this);
+      port::timer::destroy (this);
 
 #else
 
         {
           interrupts::Critical_section ics; // ----- Critical section -----
 
-          if (state_ == timer::state::running)
+          if (state_ == state::running)
             {
               timer_node_.unlink ();
             }
         }
 
 #endif
-      state_ = timer::state::destroyed;
+      state_ = state::destroyed;
     }
 
     /**
@@ -299,7 +291,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Timer::start (clock::duration_t period)
+    timer::start (clock::duration_t period)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -316,7 +308,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
-      res = port::Timer::start (this, period);
+      res = port::timer::start (this, period);
 
 #else
 
@@ -338,7 +330,7 @@ namespace os
 
       if (res == result::ok)
         {
-          state_ = timer::state::running;
+          state_ = state::running;
         }
       return res;
     }
@@ -353,7 +345,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Timer::stop (void)
+    timer::stop (void)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -361,7 +353,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      if (state_ != timer::state::running)
+      if (state_ != state::running)
         {
           return EAGAIN;
         }
@@ -370,7 +362,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
-      res = port::Timer::stop (this);
+      res = port::timer::stop (this);
 
 #else
 
@@ -383,17 +375,17 @@ namespace os
 
 #endif
 
-      state_ = timer::state::stopped;
+      state_ = state::stopped;
       return res;
     }
 
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
     void
-    Timer::_interrupt_service_routine (void)
+    timer::_interrupt_service_routine (void)
     {
 
-      if (type_ == timer::run::periodic)
+      if (type_ == run::periodic)
         {
           // Re-arm the timer for the next period.
           timer_node_.timestamp += period_;
@@ -403,7 +395,7 @@ namespace os
         }
       else
         {
-          state_ = timer::state::completed;
+          state_ = state::completed;
         }
 
 #if defined(OS_INCLUDE_RTOS_PORT_TIMER)
@@ -416,7 +408,7 @@ namespace os
 
 #endif
 
-  // ------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
   } /* namespace rtos */
 } /* namespace os */

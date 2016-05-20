@@ -58,8 +58,8 @@ using namespace os::rtos;
 static_assert(sizeof(Thread) == sizeof(os_thread_t), "adjust os_thread_t size");
 static_assert(sizeof(thread::Attributes) == sizeof(os_thread_attr_t), "adjust os_thread_attr_t size");
 
-static_assert(sizeof(Timer) == sizeof(os_timer_t), "adjust size of os_timer_t");
-static_assert(sizeof(timer::Attributes) == sizeof(os_timer_attr_t), "adjust size of os_timer_attr_t");
+static_assert(sizeof(timer) == sizeof(os_timer_t), "adjust size of os_timer_t");
+static_assert(sizeof(timer::attributes) == sizeof(os_timer_attr_t), "adjust size of os_timer_attr_t");
 
 static_assert(sizeof(mutex) == sizeof(os_mutex_t), "adjust size of os_mutex_t");
 static_assert(sizeof(mutex::attributes) == sizeof(os_mutex_attr_t), "adjust size of os_mutex_attr_t");
@@ -317,33 +317,33 @@ os_realtime_clock_sleep_for (os_clock_duration_t secs)
 void
 os_timer_attr_init (os_timer_attr_t* attr, const char* name)
 {
-  new (attr) timer::Attributes (name);
+  new (attr) timer::attributes (name);
 }
 
 void
 os_timer_create (os_timer_t* timer, const os_timer_attr_t* attr,
                  os_timer_func_t func, os_timer_func_args_t args)
 {
-  new (timer) Timer ((timer::Attributes&) *attr, (timer::func_t) func,
-                     (timer::func_args_t) args);
+  new (timer) class timer ((timer::attributes&) *attr, (timer::func_t) func,
+                           (timer::func_args_t) args);
 }
 
 void
 os_timer_destroy (os_timer_t* timer)
 {
-  (reinterpret_cast<Timer&> (*timer)).~Timer ();
+  (reinterpret_cast<class timer&> (*timer)).~timer ();
 }
 
 os_result_t
 os_timer_start (os_timer_t* timer, os_clock_duration_t timeout)
 {
-  return (os_result_t) (reinterpret_cast<Timer&> (*timer)).start (timeout);
+  return (os_result_t) (reinterpret_cast<class timer&> (*timer)).start (timeout);
 }
 
 os_result_t
 os_timer_stop (os_timer_t* timer)
 {
-  return (os_result_t) (reinterpret_cast<Timer&> (*timer)).stop ();
+  return (os_result_t) (reinterpret_cast<class timer&> (*timer)).stop ();
 }
 
 // ----------------------------------------------------------------------------
@@ -1251,11 +1251,11 @@ osTimerCreate (const osTimerDef_t* timer_def, os_timer_type type, void* args)
       return nullptr;
     }
 
-  timer::Attributes attr
+  timer::attributes attr
     { timer_def->name };
   attr.tm_type = (timer::type_t) type;
 
-  return reinterpret_cast<osTimerId> (new ((void*) timer_def->data) Timer (
+  return reinterpret_cast<osTimerId> (new ((void*) timer_def->data) timer (
       attr, (timer::func_t) timer_def->ptimer, (timer::func_args_t) args));
 }
 
@@ -1278,7 +1278,7 @@ osTimerStart (osTimerId timer_id, uint32_t millisec)
       return osErrorParameter;
     }
 
-  result_t res = (reinterpret_cast<Timer&> (*timer_id)).start (
+  result_t res = (reinterpret_cast<class timer&> (*timer_id)).start (
       Systick_clock::ticks_cast (millisec * 1000u));
 
   if (res == result::ok)
@@ -1309,7 +1309,7 @@ osTimerStop (osTimerId timer_id)
       return osErrorParameter;
     }
 
-  result_t res = (reinterpret_cast<Timer&> (*timer_id)).stop ();
+  result_t res = (reinterpret_cast<class timer&> (*timer_id)).stop ();
   if (res == result::ok)
     {
       return osOK;
@@ -1343,7 +1343,7 @@ osTimerDelete (osTimerId timer_id)
       return osErrorParameter;
     }
 
-  (reinterpret_cast<Timer&> (*timer_id)).~Timer ();
+  (reinterpret_cast<class timer&> (*timer_id)).~timer ();
   return osOK;
 }
 
@@ -1791,7 +1791,8 @@ osSemaphoreRelease (osSemaphoreId semaphore_id)
       return osErrorParameter;
     }
 
-  if ((reinterpret_cast<class semaphore&> (*semaphore_id)).initial_value () == 0)
+  if ((reinterpret_cast<class semaphore&> (*semaphore_id)).initial_value ()
+      == 0)
     {
       return osErrorResource;
     }

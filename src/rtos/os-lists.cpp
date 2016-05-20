@@ -448,17 +448,17 @@ namespace os
 
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
-    Timer_node::Timer_node (clock::timestamp_t ts, Timer& tm) :
+    timer_node::timer_node (clock::timestamp_t ts, timer& tm) :
         Timestamp_node
           { ts }, //
-        timer (tm)
+        tmr (tm)
     {
 #if defined(OS_TRACE_RTOS_LISTS_CONSTRUCT)
       trace::printf ("%s() %p \n", __func__, this);
 #endif
     }
 
-    Timer_node::~Timer_node ()
+    timer_node::~timer_node ()
     {
 #if defined(OS_TRACE_RTOS_LISTS_CONSTRUCT)
       trace::printf ("%s() %p \n", __func__, this);
@@ -470,10 +470,10 @@ namespace os
      * Remove the node from the list and perform the timer actions.
      */
     void
-    Timer_node::action (void)
+    timer_node::action (void)
     {
       this->unlink ();
-      timer._interrupt_service_routine ();
+      tmr._interrupt_service_routine ();
     }
 
 #endif
