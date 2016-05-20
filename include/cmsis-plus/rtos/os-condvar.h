@@ -144,6 +144,20 @@ namespace os
       Condition_variable ();
 
       /**
+       * @brief Create a named condition variable with default settings.
+       * @param [in] name Pointer to name.
+       * @par Errors
+       *  The constructor shall fail if:
+       *  - `EAGAIN` - The system lacked the necessary resources
+       *  (other than memory) to create the condition variable.
+       *  - `ENOMEM` - Insufficient memory exists to initialise
+       *  the condition variable.
+       * @par
+       *  The constructor shall not fail with an error code of `EINTR`.
+       */
+      Condition_variable (const char* name);
+
+      /**
        * @brief Create a condition variable with custom settings.
        * @param [in] attr Reference to attributes.
        * @par Errors
@@ -156,6 +170,21 @@ namespace os
        *  The constructor shall not fail with an error code of `EINTR`.
        */
       Condition_variable (const condvar::Attributes& attr);
+
+      /**
+       * @brief Create a named condition variable with custom settings.
+       * @param [in] name Pointer to name.
+       * @param [in] attr Reference to attributes.
+       * @par Errors
+       *  The constructor shall fail if:
+       *  - `EAGAIN` - The system lacked the necessary resources
+       *  (other than memory) to create the condition variable.
+       *  - `ENOMEM` - Insufficient memory exists to initialise
+       *  the condition variable.
+       * @par
+       *  The constructor shall not fail with an error code of `EINTR`.
+       */
+      Condition_variable (const char* name, const condvar::Attributes& attr);
 
       /**
        * @cond ignore

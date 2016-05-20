@@ -213,7 +213,7 @@ namespace os
 
     /**
      * @details
-     * This constructor shall initialise the condition variable object
+     * This constructor shall initialise a condition variable object
      * with default settings.
      * The effect shall be equivalent to creating a condition variable object
      * referring to the attributes in `condvar::initializer`.
@@ -233,14 +233,41 @@ namespace os
      */
     Condition_variable::Condition_variable () :
         Condition_variable
-          { condvar::initializer }
+          { nullptr, condvar::initializer }
     {
       ;
     }
 
     /**
      * @details
-     * This constructor shall initialise the condition variable object
+     * This constructor shall initialise a named condition variable object
+     * with default settings.
+     * The effect shall be equivalent to creating a condition variable object
+     * referring to the attributes in `condvar::initializer`.
+     * Upon successful initialisation, the state of the
+     * condition variable object shall become initialised.
+     *
+     * Only the condition variable object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * condition variable objects.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_cond_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cond_destroy.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     */
+    Condition_variable::Condition_variable (const char* name) :
+        Condition_variable
+          { name, condvar::initializer }
+    {
+      ;
+    }
+
+    /**
+     * @details
+     * This constructor shall initialise a condition variable object
      * with attributes referenced by _attr_.
      * If the attributes specified by _attr_ are modified later,
      * the condition variable attributes shall not be affected.
@@ -266,14 +293,48 @@ namespace os
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
     Condition_variable::Condition_variable (const condvar::Attributes& attr) :
+        Condition_variable
+          { nullptr, attr }
+    {
+      ;
+    }
+
+    /**
+     * @details
+     * This constructor shall initialise a named condition variable object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the condition variable attributes shall not be affected.
+     *
+     * Upon successful initialisation, the state of the
+     * condition variable object shall become initialised.
+     *
+     * Only the condition variable object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * condition variable objects.
+     *
+     * In cases where default condition variable attributes are
+     * appropriate, the variable `condvar::initializer` can be used to
+     * initialise condition variables.
+     * The effect shall be equivalent to creating a condition variables
+     * object with the default constructor.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_cond_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cond_destroy.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     */
+    Condition_variable::Condition_variable (const char* name,
+                                            const condvar::Attributes& attr) :
         Named_object
-          { attr.name () }
-    // , clock_ (attr.clock != nullptr ? *attr.clock : systick_clock)
+          { name != nullptr ? name : attr.name () }
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_CONDVAR)
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
     }
 
@@ -298,10 +359,10 @@ namespace os
     Condition_variable::~Condition_variable ()
     {
 #if defined(OS_TRACE_RTOS_CONDVAR)
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      assert(list_.empty ());
+      assert (list_.empty ());
     }
 
     /**
@@ -344,7 +405,7 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_CONDVAR)
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
       list_.resume_one ();
@@ -413,7 +474,7 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_CONDVAR)
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
       list_.resume_all ();
@@ -509,7 +570,7 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_CONDVAR)
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
       Thread& crt_thread = this_thread::thread ();
@@ -651,7 +712,7 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_CONDVAR)
-      trace::printf ("%s(%d_ticks) @%p \n", __func__, timeout, this);
+      trace::printf ("%s(%d) @%p %s\n", __func__, timeout, this, name ());
 #endif
 
       Thread& crt_thread = this_thread::thread ();
