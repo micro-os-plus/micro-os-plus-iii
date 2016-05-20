@@ -463,7 +463,7 @@ namespace os
      */
     Mutex::Mutex (const char* name, const mutex::Attributes& attr) :
         Named_object
-          { name != nullptr ? name : attr.name () }, //
+          { name, attr.name () }, //
         type_ (attr.mx_type), //
         protocol_ (attr.mx_protocol), //
         robustness_ (attr.mx_robustness), //
@@ -528,8 +528,8 @@ namespace os
 
 #else
 
-      assert (owner_ == nullptr);
-      assert (list_.empty ());
+      assert(owner_ == nullptr);
+      assert(list_.empty ());
 
 #endif
     }
@@ -1035,7 +1035,7 @@ namespace os
     thread::priority_t
     Mutex::prio_ceiling (void) const
     {
-      assert (!scheduler::in_handler_mode ());
+      assert(!scheduler::in_handler_mode ());
 
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());

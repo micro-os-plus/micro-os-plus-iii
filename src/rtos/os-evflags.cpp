@@ -207,7 +207,7 @@ namespace os
      */
     Event_flags::Event_flags (const char* name, const evflags::Attributes& attr) :
         Named_object
-          { name != nullptr ? name : attr.name () }
+          { name, attr.name () }
 #if !defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
             , clock_ (attr.clock != nullptr ? *attr.clock : systick_clock)
 #endif

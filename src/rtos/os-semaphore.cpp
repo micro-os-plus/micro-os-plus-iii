@@ -252,7 +252,7 @@ namespace os
      */
     Semaphore::Semaphore (const char* name, const semaphore::Attributes& attr) :
         Named_object
-          { name != nullptr ? name : attr.name () }, //
+          { name, attr.name () }, //
         initial_count_ (attr.sm_initial_count), //
         max_count_ (
             attr.sm_max_count ? attr.sm_max_count : semaphore::max_count_value)

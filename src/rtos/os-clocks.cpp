@@ -363,7 +363,7 @@ namespace os
     clock::timestamp_t
     Systick_clock::now (current_t* details)
     {
-      assert (details != nullptr);
+      assert(details != nullptr);
 
 #if defined(__ARM_EABI__)
       // The core frequency can be returned right away, since

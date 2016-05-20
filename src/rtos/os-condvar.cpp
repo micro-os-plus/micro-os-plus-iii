@@ -329,7 +329,7 @@ namespace os
     Condition_variable::Condition_variable (const char* name,
                                             const condvar::Attributes& attr) :
         Named_object
-          { name != nullptr ? name : attr.name () }
+          { name, attr.name () }
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
@@ -362,7 +362,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      assert (list_.empty ());
+      assert(list_.empty ());
     }
 
     /**

@@ -228,7 +228,7 @@ namespace os
     Timer::Timer (const char* name, const timer::Attributes& attr,
                   timer::func_t function, timer::func_args_t args) :
         Named_object
-          { name != nullptr ? name : attr.name () }
+          { name, attr.name () }
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
       os_assert_throw(function != nullptr, EINVAL);

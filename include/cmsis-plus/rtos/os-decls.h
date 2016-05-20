@@ -814,9 +814,19 @@ namespace os
 
       /**
        * @brief Create a named object.
-       * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
+       * @param [in] name Null terminated name. If `nullptr`,
+       * "-" is assigned.
        */
       Named_object (const char* name);
+
+      /**
+       * @brief Create a named object.
+       * @param [in] given_name Null terminated name. If `nullptr`,
+       * attr_name is used.
+       * @param [in] attr_name Null terminated name. If `nullptr`,
+       * "-" is assigned.
+       */
+      Named_object (const char* given_name, const char* attr_name);
 
       /**
        * @cond ignore

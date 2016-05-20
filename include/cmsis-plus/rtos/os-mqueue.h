@@ -232,6 +232,7 @@ namespace os
       // Internal constructors, used from templates.
       Message_queue ();
       Message_queue (const char* name);
+      Message_queue (const char* given_name, const char* attr_name);
 
     public:
 
@@ -1402,7 +1403,7 @@ namespace os
           const char* name, const mqueue::Attributes& attr, mqueue::size_t msgs,
           mqueue::msg_size_t msg_size_bytes, const Allocator& allocator) :
           Message_queue
-            { name != nullptr ? name : attr.name () }
+            { name, attr.name () }
       {
 #if defined(OS_TRACE_RTOS_MQUEUE)
         trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (),
@@ -1889,7 +1890,7 @@ namespace os
     template<typename T, std::size_t N>
       Message_queue_static<T, N>::Message_queue_static (
           const char* name, const mqueue::Attributes& attr) :
-          Message_queue (name != nullptr ? name : attr.name ())
+          Message_queue (name, attr.name ())
       {
         _construct (attr, msgs, sizeof(value_type), &arena_, sizeof(arena_));
       }

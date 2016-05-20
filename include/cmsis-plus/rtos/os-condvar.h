@@ -206,6 +206,9 @@ namespace os
 
       /**
        * @}
+       */
+
+      /*
        * @name Operators
        * @{
        */

@@ -205,6 +205,15 @@ namespace os
 #endif
     }
 
+    Memory_pool::Memory_pool (const char* given_name, const char* attr_name) :
+        Named_object
+          { given_name, attr_name }
+    {
+#if defined(OS_TRACE_RTOS_MEMPOOL)
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
+#endif
+    }
+
     /**
      * This constructor shall initialise a memory pool object
      * with the given number of blocks and default settings.
@@ -344,7 +353,7 @@ namespace os
                               mempool::size_t block_size_bytes,
                               const Allocator& allocator) :
         Named_object
-          { name != nullptr ? name : attr.name () }
+          { name, attr.name () }
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (),

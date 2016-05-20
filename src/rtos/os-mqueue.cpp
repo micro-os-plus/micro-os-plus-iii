@@ -352,7 +352,17 @@ namespace os
     }
 
     Message_queue::Message_queue (const char* name) :
-        Named_object (name)
+        Named_object
+          { name }
+    {
+#if defined(OS_TRACE_RTOS_MQUEUE)
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
+#endif
+    }
+
+    Message_queue::Message_queue (const char* given_name, const char* attr_name) :
+        Named_object
+          { given_name, attr_name }
     {
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
@@ -503,7 +513,7 @@ namespace os
                                   mqueue::msg_size_t msg_size_bytes,
                                   const Allocator& allocator) :
         Named_object
-          { name != nullptr ? name : attr.name () }
+          { name, attr.name () }
     {
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (), msgs,

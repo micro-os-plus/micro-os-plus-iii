@@ -246,6 +246,15 @@ namespace os
 #endif
     }
 
+    Thread::Thread (const char* given_name, const char* attr_name) :
+        Named_object
+          { given_name, attr_name }
+    {
+#if defined(OS_TRACE_RTOS_THREAD)
+      trace::printf ("%s @%p %s\n", __func__, this, this->name ());
+#endif
+    }
+
     /**
      * @details
      * This constructor shall initialise an unnamed thread object
@@ -435,7 +444,7 @@ namespace os
                     thread::func_t function, thread::func_args_t args,
                     const Allocator& allocator) :
         Named_object
-          { name != nullptr ? name : attr.name () }
+          { name, attr.name () }
     {
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s @%p %s\n", __func__, this, this->name ());

@@ -230,6 +230,9 @@ namespace os
       // Internal constructors, used from templates.
       Memory_pool ();
       Memory_pool (const char* name);
+      Memory_pool (const char* given_name, const char* attr_name);
+
+    public:
 
       Memory_pool (const Memory_pool&) = delete;
       Memory_pool (Memory_pool&&) = delete;
@@ -1079,7 +1082,7 @@ namespace os
           mempool::size_t blocks, mempool::size_t block_size_bytes,
           const Allocator& allocator) :
           Memory_pool
-            { name != nullptr ? name : attr.name () }
+            { name, attr.name () }
       {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
         trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (),
@@ -1492,7 +1495,7 @@ namespace os
       Memory_pool_static<T, N>::Memory_pool_static (
           const char* name, const mempool::Attributes& attr) :
           Memory_pool
-            { name != nullptr ? name : attr.name () }
+            { name, attr.name () }
       {
         _construct (attr, blocks, sizeof(T), &arena_, sizeof(arena_));
       }

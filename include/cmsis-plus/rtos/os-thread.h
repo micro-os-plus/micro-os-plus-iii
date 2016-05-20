@@ -551,6 +551,15 @@ namespace os
       /**
        * @cond ignore
        */
+    protected:
+
+      // Internal constructors, used from templates.
+      Thread ();
+      Thread (const char* name);
+      Thread (const char* given_name, const char* attr_name);
+
+    public:
+
       Thread (const Thread&) = delete;
       Thread (Thread&&) = delete;
       Thread&
@@ -839,9 +848,6 @@ namespace os
        * @name Private Member Functions
        * @{
        */
-
-      Thread ();
-      Thread (const char* name);
 
       /**
        * @brief Internal function used during thread construction.
@@ -1593,7 +1599,7 @@ namespace os
       Thread_allocated<Allocator>::Thread_allocated (thread::func_t function,
                                                      thread::func_args_t args,
                                                      const Allocator& allocator) :
-          Thread
+          Thread_allocated
             { nullptr, function, args, allocator }
       {
         ;
@@ -1761,7 +1767,7 @@ namespace os
           thread::func_t function, thread::func_args_t args,
           const Allocator& allocator) :
           Thread
-            { name != nullptr ? name : attr.name () }
+            { name, attr.name () }
       {
 #if defined(OS_TRACE_RTOS_THREAD)
         trace::printf ("%s @%p %s\n", __func__, this, this->name ());
@@ -2060,7 +2066,7 @@ namespace os
                                        thread::func_t function,
                                        thread::func_args_t args) :
           Thread
-            { name != nullptr ? name : attr.name () }
+            { name, attr.name () }
       {
 #if defined(OS_TRACE_RTOS_THREAD)
         trace::printf ("%s @%p %s\n", __func__, this, this->name ());

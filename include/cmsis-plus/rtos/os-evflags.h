@@ -177,6 +177,9 @@ namespace os
 
       /**
        * @}
+       */
+
+      /*
        * @name Operators
        * @{
        */
