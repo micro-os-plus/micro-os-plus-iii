@@ -45,19 +45,95 @@ namespace os
 {
   namespace rtos
   {
-    namespace mutex
-    {
-
-      // ======================================================================
+    // ========================================================================
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
+
+    /**
+     * @brief POSIX compliant **mutex**.
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
+     */
+    class mutex : public named_object
+    {
+    public:
+
+      /**
+       * @brief Type of mutex protocol.
+       */
+      using protocol_t = enum class protocol : uint8_t
+        {
+          /**
+           * @brief Priority and scheduling not affected by mutex ownership.
+           */
+          none = 0,
+
+          /**
+           * @brief Inherit from highest priority thread.
+           * @details
+           * TODO: add
+           */
+          inherit = 1,
+
+          /**
+           * @brief Protect.
+           * @details
+           * TODO: add
+           */
+          protect = 2
+        };
+
+      /**
+       * @brief Type of mutex robustness.
+       */
+      using robustness_t = enum class robustness : uint8_t
+        {
+          /**
+           * @brief Normal robustness.
+           */
+          stalled = 0,
+          /**
+           * @brief Enhanced robustness.
+           */
+          robust = 1
+        };
+
+      /**
+       * @brief Type of mutex behaviour.
+       */
+      using type_t = enum class type : uint8_t
+        {
+          /**
+           * @brief Normal mutex behaviour.
+           */
+          normal = 0,
+          /**
+           * @brief Check mutex behaviour.
+           */
+          errorcheck = 1,
+          /**
+           * @brief Recursive mutex behaviour.
+           */
+          recursive = 2,
+
+          _default = normal,
+        };
+
+      /**
+       * @brief Type of mutex recursion counter.
+       */
+      using count_t = uint16_t;
+
+      static constexpr count_t max_count = 0xFFFF;
+
+      // ======================================================================
 
       /**
        * @brief %Mutex attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Attributes : public Clocked_attributes
+      class attributes : public clocked_attributes
       {
       public:
 
@@ -71,17 +147,17 @@ namespace os
          * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
         constexpr
-        Attributes (const char* name);
+        attributes (const char* name);
 
         /**
          * @cond ignore
          */
-        Attributes (const Attributes&) = default;
-        Attributes (Attributes&&) = default;
-        Attributes&
-        operator= (const Attributes&) = default;
-        Attributes&
-        operator= (Attributes&&) = default;
+        attributes (const attributes&) = default;
+        attributes (attributes&&) = default;
+        attributes&
+        operator= (const attributes&) = default;
+        attributes&
+        operator= (attributes&&) = default;
         /**
          * @endcond
          */
@@ -89,7 +165,7 @@ namespace os
         /**
          * @brief Destroy a mutex attributes.
          */
-        ~Attributes () = default;
+        ~attributes () = default;
 
         /**
          * @}
@@ -98,7 +174,7 @@ namespace os
       protected:
 
         constexpr
-        Attributes (const char* name, mutex::type_t type);
+        attributes (const char* name, type_t type);
 
       public:
 
@@ -117,22 +193,22 @@ namespace os
         /**
          * @brief Mutex protocol attribute.
          */
-        mutex::protocol_t mx_protocol = protocol::none;
+        protocol_t mx_protocol = protocol::none;
 
         /**
          * @brief Mutex protocol attribute.
          */
-        mutex::robustness_t mx_robustness = robustness::stalled;
+        robustness_t mx_robustness = robustness::stalled;
 
         /**
          * @brief Mutex type attribute.
          */
-        mutex::type_t mx_type = type::_default;
+        type_t mx_type = type::_default;
 
         /**
          * @brief Mutex maximum recursive count.
          */
-        mutex::count_t mx_max_count = max_count;
+        count_t mx_max_count = max_count;
 
         //
         // TODO: add clock ID.
@@ -144,23 +220,18 @@ namespace os
          */
       };
 
-#pragma GCC diagnostic pop
-
       /**
        * @brief Default normal mutex initialiser.
        */
-      extern const Attributes normal_initializer;
+      static const attributes normal_initializer;
 
       // ======================================================================
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
 
       /**
        * @brief Recursive mutex attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Recursive_attributes : public Attributes
+      class recursive_attributes : public attributes
       {
       public:
 
@@ -174,17 +245,17 @@ namespace os
          * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
         constexpr
-        Recursive_attributes (const char* name);
+        recursive_attributes (const char* name);
 
         /**
          * @cond ignore
          */
-        Recursive_attributes (const Recursive_attributes&) = default;
-        Recursive_attributes (Recursive_attributes&&) = default;
-        Recursive_attributes&
-        operator= (const Recursive_attributes&) = default;
-        Recursive_attributes&
-        operator= (Recursive_attributes&&) = default;
+        recursive_attributes (const recursive_attributes&) = default;
+        recursive_attributes (recursive_attributes&&) = default;
+        recursive_attributes&
+        operator= (const recursive_attributes&) = default;
+        recursive_attributes&
+        operator= (recursive_attributes&&) = default;
         /**
          * @endcond
          */
@@ -192,35 +263,17 @@ namespace os
         /**
          * @brief Destroy a recursive mutex attributes.
          */
-        ~Recursive_attributes () = default;
+        ~recursive_attributes () = default;
 
         /**
          * @}
          */
       };
 
-#pragma GCC diagnostic pop
-
       /**
        * @brief Default recursive mutex initialiser.
        */
-      extern const Recursive_attributes recursive_initializer;
-
-    } /* namespace mutex */
-
-    // ========================================================================
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
-
-    /**
-     * @brief POSIX compliant **mutex**.
-     * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
-     */
-    class Mutex : public Named_object
-    {
-    public:
+      static const recursive_attributes recursive_initializer;
 
       /**
        * @name Constructors & Destructor
@@ -232,36 +285,36 @@ namespace os
        * @par Parameters
        *  None
        */
-      Mutex ();
+      mutex ();
 
       /**
        * @brief Create a named mutex with default settings.
        * @param [in] name Pointer to name.
        */
-      Mutex (const char* name);
+      mutex (const char* name);
 
       /**
        * @brief Create a mutex with custom settings.
        * @param [in] attr Reference to attributes.
        */
-      Mutex (const mutex::Attributes& attr);
+      mutex (const attributes& attr);
 
       /**
        * @brief Create a named mutex with custom settings.
        * @param [in] name Pointer to name.
        * @param [in] attr Reference to attributes.
        */
-      Mutex (const char* name, const mutex::Attributes& attr);
+      mutex (const char* name, const attributes& attr);
 
       /**
        * @cond ignore
        */
-      Mutex (const Mutex&) = delete;
-      Mutex (Mutex&&) = delete;
-      Mutex&
-      operator= (const Mutex&) = delete;
-      Mutex&
-      operator= (Mutex&&) = delete;
+      mutex (const mutex&) = delete;
+      mutex (mutex&&) = delete;
+      mutex&
+      operator= (const mutex&) = delete;
+      mutex&
+      operator= (mutex&&) = delete;
       /**
        * @endcond
        */
@@ -269,10 +322,13 @@ namespace os
       /**
        * @brief Destroy the mutex.
        */
-      ~Mutex ();
+      ~mutex ();
 
       /**
        * @}
+       */
+
+      /*
        * @name Operators
        * @{
        */
@@ -283,7 +339,7 @@ namespace os
        * @retval false The mutexes are different.
        */
       bool
-      operator== (const Mutex& rhs) const;
+      operator== (const mutex& rhs) const;
 
       /**
        * @}
@@ -490,17 +546,17 @@ namespace os
 #endif
 
       // Can be updated in different thread contexts.
-      volatile mutex::count_t count_ = 0;
+      volatile count_t count_ = 0;
 
       // Can be updated in different thread contexts.
       volatile thread::priority_t prio_ceiling_ = thread::priority::highest;
       volatile thread::priority_t owner_prio_ = 0;
 
       // Constants set during construction.
-      const mutex::type_t type_; // normal, errorcheck, recursive
-      const mutex::protocol_t protocol_; // none, inherit, protect
-      const mutex::robustness_t robustness_; // stalled, robust
-      const mutex::count_t max_count_;
+      const type_t type_; // normal, errorcheck, recursive
+      const protocol_t protocol_; // none, inherit, protect
+      const robustness_t robustness_; // stalled, robust
+      const count_t max_count_;
 
       // Add more internal data.
 
@@ -511,7 +567,7 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-  // ========================================================================
+  // ==========================================================================
 
   } /* namespace rtos */
 } /* namespace os */
@@ -522,38 +578,34 @@ namespace os
 {
   namespace rtos
   {
-    namespace mutex
+
+    // ========================================================================
+
+    constexpr
+    mutex::attributes::attributes (const char* name) :
+        clocked_attributes
+          { name }
     {
+      ;
+    }
 
-      // ======================================================================
+    constexpr
+    mutex::attributes::attributes (const char* name, type_t type) :
+        clocked_attributes
+          { name }, //
+        mx_type (type)
+    {
+      ;
+    }
 
-      constexpr
-      Attributes::Attributes (const char* name) :
-          Clocked_attributes
-            { name }
-      {
-        ;
-      }
+    // ========================================================================
 
-      constexpr
-      Attributes::Attributes (const char* name, mutex::type_t type) :
-          Clocked_attributes
-            { name }, //
-          mx_type (type)
-      {
-        ;
-      }
-
-      // ======================================================================
-
-      constexpr
-      Recursive_attributes::Recursive_attributes (const char* name) :
-          Attributes
-            { name, type::recursive } // Use the protected constructor.
-      {
-        ;
-      }
-
+    constexpr
+    mutex::recursive_attributes::recursive_attributes (const char* name) :
+        attributes
+          { name, type::recursive } // Use the protected constructor.
+    {
+      ;
     }
 
     // ========================================================================
@@ -563,13 +615,13 @@ namespace os
      * Identical mutexes should have the same memory address.
      */
     inline bool
-    Mutex::operator== (const Mutex& rhs) const
+    mutex::operator== (const mutex& rhs) const
     {
       return this == &rhs;
     }
 
     inline Thread*
-    Mutex::owner (void)
+    mutex::owner (void)
     {
       return owner_;
     }

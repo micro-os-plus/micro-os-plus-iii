@@ -70,7 +70,7 @@ namespace os
         __throw_system_error (EPERM,
                               "condition_variable::wait: mutex not locked");
       rtos::result_t res = ncv_.wait (
-          (rtos::Mutex&) (*(lk.mutex ()->native_handle ())));
+          (rtos::mutex&) (*(lk.mutex ()->native_handle ())));
       if (res != rtos::result::ok)
         __throw_cmsis_error ((int) res, "condition_variable wait failed");
     }

@@ -49,7 +49,7 @@ namespace os
        * @brief Event flags attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Attributes : public Clocked_attributes
+      class Attributes : public clocked_attributes
       {
       public:
 
@@ -122,7 +122,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
-    class Event_flags : public Named_object
+    class Event_flags : public named_object
     {
     public:
 
@@ -377,7 +377,7 @@ namespace os
     {
       constexpr
       Attributes::Attributes (const char* name) :
-          Clocked_attributes
+          clocked_attributes
             { name }
       {
         ;

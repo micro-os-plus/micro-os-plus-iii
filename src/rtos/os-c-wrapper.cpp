@@ -61,8 +61,8 @@ static_assert(sizeof(thread::Attributes) == sizeof(os_thread_attr_t), "adjust os
 static_assert(sizeof(Timer) == sizeof(os_timer_t), "adjust size of os_timer_t");
 static_assert(sizeof(timer::Attributes) == sizeof(os_timer_attr_t), "adjust size of os_timer_attr_t");
 
-static_assert(sizeof(Mutex) == sizeof(os_mutex_t), "adjust size of os_mutex_t");
-static_assert(sizeof(mutex::Attributes) == sizeof(os_mutex_attr_t), "adjust size of os_mutex_attr_t");
+static_assert(sizeof(mutex) == sizeof(os_mutex_t), "adjust size of os_mutex_t");
+static_assert(sizeof(mutex::attributes) == sizeof(os_mutex_attr_t), "adjust size of os_mutex_attr_t");
 
 static_assert(sizeof(Condition_variable) == sizeof(os_condvar_t), "adjust size of os_condvar_t");
 static_assert(sizeof(condvar::Attributes) == sizeof(os_condvar_attr_t), "adjust size of os_condvar_attr_t");
@@ -351,75 +351,76 @@ os_timer_stop (os_timer_t* timer)
 void
 os_mutex_attr_init (os_mutex_attr_t* attr, const char* name)
 {
-  new (attr) mutex::Attributes (name);
+  new (attr) mutex::attributes (name);
 }
 
 void
 os_mutex_create (os_mutex_t* mutex, const os_mutex_attr_t* attr)
 {
-  new (mutex) Mutex ((mutex::Attributes&) *attr);
+  new (mutex) class mutex ((mutex::attributes&) *attr);
 }
 
 void
 os_mutex_destroy (os_mutex_t* mutex)
 {
-  (reinterpret_cast<Mutex&> (*mutex)).~Mutex ();
+  (reinterpret_cast<class mutex&> (*mutex)).~mutex ();
 }
 
 os_result_t
 os_mutex_lock (os_mutex_t* mutex)
 {
-  return (os_result_t) (reinterpret_cast<Mutex&> (*mutex)).lock ();
+  return (os_result_t) (reinterpret_cast<class mutex&> (*mutex)).lock ();
 }
 
 os_result_t
 os_mutex_try_lock (os_mutex_t* mutex)
 {
-  return (os_result_t) (reinterpret_cast<Mutex&> (*mutex)).try_lock ();
+  return (os_result_t) (reinterpret_cast<class mutex&> (*mutex)).try_lock ();
 }
 
 os_result_t
 os_mutex_timed_lock (os_mutex_t* mutex, os_clock_duration_t timeout)
 {
-  return (os_result_t) (reinterpret_cast<Mutex&> (*mutex)).timed_lock (timeout);
+  return (os_result_t) (reinterpret_cast<class mutex&> (*mutex)).timed_lock (
+      timeout);
 }
 
 os_result_t
 os_mutex_unlock (os_mutex_t* mutex)
 {
-  return (os_result_t) (reinterpret_cast<Mutex&> (*mutex)).unlock ();
+  return (os_result_t) (reinterpret_cast<class mutex&> (*mutex)).unlock ();
 }
 
 os_thread_prio_t
 os_mutex_get_prio_ceiling (os_mutex_t* mutex)
 {
-  return (os_thread_prio_t) (reinterpret_cast<Mutex&> (*mutex)).prio_ceiling ();
+  return (os_thread_prio_t) (reinterpret_cast<class mutex&> (*mutex)).prio_ceiling ();
 }
 
 os_result_t
 os_mutex_set_prio_ceiling (os_mutex_t* mutex, os_thread_prio_t prio_ceiling,
                            os_thread_prio_t* old_prio_ceiling)
 {
-  return (os_result_t) (reinterpret_cast<Mutex&> (*mutex)).prio_ceiling (
+  return (os_result_t) (reinterpret_cast<class mutex&> (*mutex)).prio_ceiling (
       prio_ceiling, old_prio_ceiling);
 }
 
 os_result_t
 os_mutex_mark_consistent (os_mutex_t* mutex)
 {
-  return (os_result_t) (reinterpret_cast<Mutex&> (*mutex)).consistent ();
+  return (os_result_t) (reinterpret_cast<class mutex&> (*mutex)).consistent ();
 }
 
 os_thread_t*
 os_mutex_get_owner (os_mutex_t* mutex)
 {
-  return (os_thread_t*) (reinterpret_cast<Mutex&> (*mutex)).owner ();
+  return (os_thread_t*) (reinterpret_cast<class mutex&> (*mutex)).owner ();
 }
 
 os_result_t
 os_mutex_reset (os_mutex_t* mutex)
 {
-  return (os_result_t) (reinterpret_cast<Mutex&> (*mutex)).reset ();
+  return (os_result_t) (reinterpret_cast<class mutex&> (*mutex)).reset ();
 }
 
 // ----------------------------------------------------------------------------
@@ -458,7 +459,7 @@ os_result_t
 os_condvar_wait (os_condvar_t* condvar, os_mutex_t* mutex)
 {
   return (os_result_t) (reinterpret_cast<Condition_variable&> (*condvar)).wait (
-      (Mutex&) *mutex);
+      reinterpret_cast<class mutex&> (*mutex));
 }
 
 os_result_t
@@ -466,7 +467,7 @@ os_condvar_timed_wait (os_condvar_t* condvar, os_mutex_t* mutex,
                        os_clock_duration_t timeout)
 {
   return (os_result_t) (reinterpret_cast<Condition_variable&> (*condvar)).timed_wait (
-      (Mutex&) *mutex, timeout);
+      reinterpret_cast<class mutex&> (*mutex), timeout);
 }
 
 // ----------------------------------------------------------------------------
@@ -1512,18 +1513,18 @@ osMutexCreate (const osMutexDef_t* mutex_def)
       return nullptr;
     }
 
-  mutex::Attributes attr
+  mutex::attributes attr
     { mutex_def->name };
   attr.mx_type = mutex::type::recursive;
   attr.mx_protocol = mutex::protocol::inherit;
 
-  return reinterpret_cast<osMutexId> (new ((void*) mutex_def->data) Mutex (attr));
+  return reinterpret_cast<osMutexId> (new ((void*) mutex_def->data) mutex (attr));
 }
 
 /**
  * @details
- * Wait until a Mutex becomes available. If no other thread has
- * obtained the Mutex, the function instantly returns and blocks
+ * Wait until a mutex becomes available. If no other thread has
+ * obtained the mutex, the function instantly returns and blocks
  * the mutex object.
  *
  * The argument millisec specifies how long the system waits for
@@ -1554,16 +1555,16 @@ osMutexWait (osMutexId mutex_id, uint32_t millisec)
   result_t ret;
   if (millisec == osWaitForever)
     {
-      ret = (reinterpret_cast<Mutex&> (*mutex_id)).lock ();
+      ret = (reinterpret_cast<class mutex&> (*mutex_id)).lock ();
       // osErrorResource:
     }
   else if (millisec == 0)
     {
-      ret = (reinterpret_cast<Mutex&> (*mutex_id)).try_lock ();
+      ret = (reinterpret_cast<class mutex&> (*mutex_id)).try_lock ();
     }
   else
     {
-      ret = (reinterpret_cast<Mutex&> (*mutex_id)).timed_lock (
+      ret = (reinterpret_cast<class mutex&> (*mutex_id)).timed_lock (
           Systick_clock::ticks_cast (millisec * 1000u));
       // osErrorTimeoutResource:
     }
@@ -1601,7 +1602,7 @@ osMutexWait (osMutexId mutex_id, uint32_t millisec)
 
 /**
  * @details
- * Release a Mutex that was obtained with osMutexWait. Other
+ * Release a mutex that was obtained with osMutexWait. Other
  * threads that currently wait for the same mutex will be now
  * put into the state READY.
  *
@@ -1621,7 +1622,7 @@ osMutexRelease (osMutexId mutex_id)
     }
 
   result_t res;
-  res = (reinterpret_cast<Mutex&> (*mutex_id)).unlock ();
+  res = (reinterpret_cast<class mutex&> (*mutex_id)).unlock ();
 
   if (res == result::ok)
     {
@@ -1659,7 +1660,7 @@ osMutexDelete (osMutexId mutex_id)
       return osErrorParameter;
     }
 
-  (reinterpret_cast<Mutex&> (*mutex_id)).~Mutex ();
+  (reinterpret_cast<class mutex&> (*mutex_id)).~mutex ();
   return osOK;
 }
 

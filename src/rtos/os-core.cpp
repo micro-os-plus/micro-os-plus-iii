@@ -437,7 +437,7 @@ namespace os
     // ==========================================================================
 
     /**
-     * @class Named_object
+     * @class named_object
      * @details
      * This class serves as a base class for all objects that have a
      * name (most of the RTOS classes do have a name).
@@ -446,7 +446,7 @@ namespace os
      */
 
     /**
-     * @var const char* const Named_object::name_
+     * @var const char* const named_object::name_
      * @details
      * To save space, the null terminated string passed to the
      * constructor is not copied locally. Instead, the pointer to
@@ -456,7 +456,7 @@ namespace os
      * string (stored in flash) is preferred.
      */
 
-    Named_object::Named_object () :
+    named_object::named_object () :
         name_ ("-")
     {
       ;
@@ -473,7 +473,7 @@ namespace os
      * life cycle is at least as long as the object life cycle.
      * A constant string (stored in flash) is preferred.
      */
-    Named_object::Named_object (const char* name) :
+    named_object::named_object (const char* name) :
         name_ (name != nullptr ? name : "-")
     {
       ;
@@ -490,7 +490,7 @@ namespace os
      * life cycle is at least as long as the object life cycle.
      * A constant string (stored in flash) is preferred.
      */
-    Named_object::Named_object (const char* given_name, const char* attr_name) :
+    named_object::named_object (const char* given_name, const char* attr_name) :
         name_ (
             given_name != nullptr ?
                 given_name : (attr_name != nullptr ? attr_name : "-"))

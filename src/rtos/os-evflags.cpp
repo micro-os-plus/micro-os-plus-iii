@@ -206,7 +206,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     Event_flags::Event_flags (const char* name, const evflags::Attributes& attr) :
-        Named_object
+        named_object
           { name, attr.name () }
 #if !defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
             , clock_ (attr.clock != nullptr ? *attr.clock : systick_clock)

@@ -56,7 +56,6 @@ namespace os
      */
 
     // ======================================================================
-
     /**
      * Condition variables provide synchronization primitives used
      * to block a thread until notified by some other thread that
@@ -210,9 +209,9 @@ namespace os
 
     };
 
-    /**
-     * @}
-     */
+  /**
+   * @}
+   */
 
   } /* namespace estd */
 } /* namespace os */
@@ -319,7 +318,7 @@ namespace os
             std::chrono::duration<rtos::systicks_t,
                 typename Native_clock::period>> (rel_time).count ();
 
-        ncv_.timed_wait ((rtos::Mutex &) (*(lock.mutex ()->native_handle ())),
+        ncv_.timed_wait ((rtos::mutex &) (*(lock.mutex ()->native_handle ())),
                          ticks);
 
         return

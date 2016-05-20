@@ -178,7 +178,7 @@ namespace os
        * @brief %Thread attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Attributes : public Clocked_attributes
+      class Attributes : public clocked_attributes
       {
       public:
 
@@ -495,7 +495,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
-    class Thread : public Named_object
+    class Thread : public named_object
     {
     public:
 
@@ -779,7 +779,7 @@ namespace os
        * @{
        */
 
-      friend class Mutex;
+      friend class mutex;
 
       friend void
       this_thread::wait (void);
@@ -1416,7 +1416,7 @@ namespace os
 
       constexpr
       Attributes::Attributes (const char* name) :
-          Clocked_attributes
+          clocked_attributes
             { name }
       {
         ;

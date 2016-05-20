@@ -251,7 +251,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     Semaphore::Semaphore (const char* name, const semaphore::Attributes& attr) :
-        Named_object
+        named_object
           { name, attr.name () }, //
         initial_count_ (attr.sm_initial_count), //
         max_count_ (

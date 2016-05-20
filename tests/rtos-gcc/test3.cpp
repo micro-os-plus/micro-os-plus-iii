@@ -93,7 +93,7 @@ namespace _3
       }
 
       {
-        rtos::Mutex mx1;
+        rtos::mutex mx1;
 
         mx1.lock ();
 
@@ -111,10 +111,10 @@ namespace _3
 
         mx1.set_prio_ceiling (88);
 
-        rtos::Mutex mx2
+        rtos::mutex mx2
           { rtos::mutex::normal_initializer };
 
-        rtos::Mutex mx3
+        rtos::mutex mx3
           { rtos::mutex::recursive_initializer };
 
         rtos::mutex::Attributes attr4
@@ -124,7 +124,7 @@ namespace _3
         attr4.mx_robustness = (rtos::mutex::robustness::robust);
         attr4.mx_type = (rtos::mutex::type::recursive);
 
-        rtos::Mutex mx4
+        rtos::mutex mx4
           { attr4 };
       }
 

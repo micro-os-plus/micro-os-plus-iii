@@ -42,210 +42,201 @@ namespace os
     // ------------------------------------------------------------------------
 
     /**
+     * @class attributes
      * @details
-     * The os::rtos::mutex namespace groups mutex types, enumerations,
-     * attributes and initialisers.
+     * Allow to assign a name and custom attributes (like priority ceiling,
+     * robustness, etc) to the mutex.
+     *
+     * To simplify access, the member variables are public and do not
+     * require accessors or mutators.
+     *
+     * @par POSIX compatibility
+     *  Inspired by `pthread_mutexattr_t`
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
-    namespace mutex
-    {
-      /**
-       * @class Attributes
-       * @details
-       * Allow to assign a name and custom attributes (like priority ceiling,
-       * robustness, etc) to the mutex.
-       *
-       * To simplify access, the member variables are public and do not
-       * require accessors or mutators.
-       *
-       * @par POSIX compatibility
-       *  Inspired by `pthread_mutexattr_t`
-       *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-       */
 
-      /**
-       * @class Recursive_attributes
-       * @details
-       * Allow to assign a name and custom attributes (like priority ceiling,
-       * robustness, etc) to the mutex.
-       *
-       * @par POSIX compatibility
-       *  Inspired by `pthread_mutexattr_t`
-       *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-       */
+    /**
+     * @class recursive_attributes
+     * @details
+     * Allow to assign a name and custom attributes (like priority ceiling,
+     * robustness, etc) to the mutex.
+     *
+     * @par POSIX compatibility
+     *  Inspired by `pthread_mutexattr_t`
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     */
 
-      /**
-       * @var thread::priority_t Attributes::mx_priority_ceiling
-       * @details
-       * The @ref mx_priority_ceiling attribute defines the priority
-       * ceiling of initialised mutexes, which is the minimum priority
-       * level at which the critical section guarded by the mutex is
-       * executed. In order to avoid priority inversion, the priority
-       * ceiling of the mutex shall be set to a priority higher than
-       * or equal to the highest priority of all the threads that may
-       * lock that mutex. The values of @ref mx_priority_ceiling are
-       * within the maximum range of priorities defined under the
-       * SCHED_FIFO scheduling policy.
-       *
-       * @par POSIX compatibility
-       *  Inspired by `pthread_mutexattr_setprioceiling()`
-       *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-       */
+    /**
+     * @var thread::priority_t attributes::mx_priority_ceiling
+     * @details
+     * The @ref mx_priority_ceiling attribute defines the priority
+     * ceiling of initialised mutexes, which is the minimum priority
+     * level at which the critical section guarded by the mutex is
+     * executed. In order to avoid priority inversion, the priority
+     * ceiling of the mutex shall be set to a priority higher than
+     * or equal to the highest priority of all the threads that may
+     * lock that mutex. The values of @ref mx_priority_ceiling are
+     * within the maximum range of priorities defined under the
+     * SCHED_FIFO scheduling policy.
+     *
+     * @par POSIX compatibility
+     *  Inspired by `pthread_mutexattr_setprioceiling()`
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     */
 
-      /**
-       * @var mutex::protocol_t Attributes::mx_protocol
-       * @details
-       * The default value of the attribute shall be `mutex::protocol::none`.
-       *
-       * When a thread owns a mutex with the `mutex::protocol::none`
-       * protocol attribute, its priority and scheduling shall
-       * not be affected by its mutex ownership.
-       *
-       * When a thread is blocking higher priority threads
-       * because of owning one or more robust mutexes with the
-       * `mutex::protocol::inherit` protocol attribute, it shall execute
-       * at the higher of its priority or the priority of the highest
-       * priority thread waiting on any of the robust mutexes owned
-       * by this thread and initialised with this protocol.
-       *
-       * When a thread is blocking higher priority threads because
-       * of owning one or more non-robust mutexes with the
-       * `mutex::protocol::inherit` protocol attribute, it shall execute
-       * at the higher of its priority or the priority of the
-       * highest priority thread waiting on any of the non-robust
-       * mutexes owned by this thread and initialised with this protocol.
-       *
-       * When a thread owns one or more robust mutexes initialised
-       * with the `mutex::protocol::protect` protocol, it shall execute
-       * at the higher of its priority or the highest of the priority
-       * ceilings of all the robust mutexes owned by this thread and
-       * initialised with this attribute, regardless of whether other
-       * threads are blocked on any of these robust mutexes or not.
-       *
-       * When a thread owns one or more non-robust mutexes initialised
-       * with the `mutex::protocol::protect` protocol, it shall execute at
-       * the higher of its priority or the highest of the priority
-       * ceilings of all the non-robust mutexes owned by this thread
-       * and initialised with this attribute, regardless of whether
-       * other threads are blocked on any of these non-robust mutexes
-       * or not.
-       *
-       * While a thread is holding a mutex which has been initialised with
-       * the `mutex::protocol::inherit` or `mutex::protocol::protect` protocol
-       * attributes, it shall not be subject to being moved to the tail
-       * of the scheduling queue at its priority in the event that its
-       * original priority is changed, such as by a call to
-       * sched_setparam(). Likewise, when a thread unlocks a mutex
-       * that has been initialised with the `mutex::protocol::inherit` or
-       * `mutex::protocol::protect` protocol attributes, it shall not be
-       * subject to being moved to the tail of the scheduling queue
-       * at its priority in the event that its original priority is changed.
-       * (TODO)
-       *
-       * If a thread simultaneously owns several mutexes initialised
-       * with different protocols, it shall execute at the highest of
-       * the priorities that it would have obtained by each of these
-       * protocols.
-       *
-       * When a thread makes a call to `Mutex::lock()`, the mutex
-       * was initialised with the protocol attribute having the
-       * value `mutex::protocol::inherit`, when the calling thread is
-       * blocked because the mutex is owned by another thread, that
-       * owner thread shall inherit the priority level of the calling
-       * thread as long as it continues to own the mutex. The
-       * implementation shall update its execution priority to
-       * the maximum of its assigned priority and all its
-       * inherited priorities. Furthermore, if this owner thread
-       * itself becomes blocked on another mutex with the protocol
-       * attribute having the value `mutex::protocol::inherit`, the same
-       * priority inheritance effect shall be propagated to this
-       * other owner thread, in a recursive manner.
-       *
-       * @par POSIX compatibility
-       *  Inspired by `pthread_mutexattr_setprotocol()`
-       *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-       */
+    /**
+     * @var mutex::protocol_t attributes::mx_protocol
+     * @details
+     * The default value of the attribute shall be `mutex::protocol::none`.
+     *
+     * When a thread owns a mutex with the `mutex::protocol::none`
+     * protocol attribute, its priority and scheduling shall
+     * not be affected by its mutex ownership.
+     *
+     * When a thread is blocking higher priority threads
+     * because of owning one or more robust mutexes with the
+     * `mutex::protocol::inherit` protocol attribute, it shall execute
+     * at the higher of its priority or the priority of the highest
+     * priority thread waiting on any of the robust mutexes owned
+     * by this thread and initialised with this protocol.
+     *
+     * When a thread is blocking higher priority threads because
+     * of owning one or more non-robust mutexes with the
+     * `mutex::protocol::inherit` protocol attribute, it shall execute
+     * at the higher of its priority or the priority of the
+     * highest priority thread waiting on any of the non-robust
+     * mutexes owned by this thread and initialised with this protocol.
+     *
+     * When a thread owns one or more robust mutexes initialised
+     * with the `mutex::protocol::protect` protocol, it shall execute
+     * at the higher of its priority or the highest of the priority
+     * ceilings of all the robust mutexes owned by this thread and
+     * initialised with this attribute, regardless of whether other
+     * threads are blocked on any of these robust mutexes or not.
+     *
+     * When a thread owns one or more non-robust mutexes initialised
+     * with the `mutex::protocol::protect` protocol, it shall execute at
+     * the higher of its priority or the highest of the priority
+     * ceilings of all the non-robust mutexes owned by this thread
+     * and initialised with this attribute, regardless of whether
+     * other threads are blocked on any of these non-robust mutexes
+     * or not.
+     *
+     * While a thread is holding a mutex which has been initialised with
+     * the `mutex::protocol::inherit` or `mutex::protocol::protect` protocol
+     * attributes, it shall not be subject to being moved to the tail
+     * of the scheduling queue at its priority in the event that its
+     * original priority is changed, such as by a call to
+     * sched_setparam(). Likewise, when a thread unlocks a mutex
+     * that has been initialised with the `mutex::protocol::inherit` or
+     * `mutex::protocol::protect` protocol attributes, it shall not be
+     * subject to being moved to the tail of the scheduling queue
+     * at its priority in the event that its original priority is changed.
+     * (TODO)
+     *
+     * If a thread simultaneously owns several mutexes initialised
+     * with different protocols, it shall execute at the highest of
+     * the priorities that it would have obtained by each of these
+     * protocols.
+     *
+     * When a thread makes a call to `mutex::lock()`, the mutex
+     * was initialised with the protocol attribute having the
+     * value `mutex::protocol::inherit`, when the calling thread is
+     * blocked because the mutex is owned by another thread, that
+     * owner thread shall inherit the priority level of the calling
+     * thread as long as it continues to own the mutex. The
+     * implementation shall update its execution priority to
+     * the maximum of its assigned priority and all its
+     * inherited priorities. Furthermore, if this owner thread
+     * itself becomes blocked on another mutex with the protocol
+     * attribute having the value `mutex::protocol::inherit`, the same
+     * priority inheritance effect shall be propagated to this
+     * other owner thread, in a recursive manner.
+     *
+     * @par POSIX compatibility
+     *  Inspired by `pthread_mutexattr_setprotocol()`
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     */
 
-      /**
-       * @var mutex::robustness_t Attributes::mx_robustness
-       * @details
-       *
-       * Valid values for robust include:
-       *
-       * - `mutex::robustness::stalled`
-       *
-       *   No special actions are taken if the owner of the mutex
-       *  is terminated while holding the mutex lock. This can
-       *  lead to deadlocks if no other thread can unlock the mutex.
-       *  This is the default value.
-       *
-       * - `mutex::robustness::robust`
-       *
-       *   If the process containing the owning thread of a robust
-       *   mutex terminates while holding the mutex lock, the next
-       *   thread that acquires the mutex shall be notified about
-       *   the termination by the return value `EOWNERDEAD` from
-       *   the locking function. If the owning thread of a robust
-       *   mutex terminates while holding the mutex lock, the next
-       *   thread that acquires the mutex may be notified about the
-       *   termination by the return value `EOWNERDEAD`. The notified
-       *   thread can then attempt to mark the state protected by
-       *   the mutex as consistent again by a call to
-       *   `Mutex::consistent()`. After a subsequent
-       *   successful call `Mutex::unlock()`, the mutex
-       *   lock shall be released and can be used normally by
-       *   other threads. If the mutex is unlocked without a
-       *   call to `Mutex::consistent()`, it shall be in a
-       *   permanently unusable state and all attempts to lock
-       *   the mutex shall fail with the error `ENOTRECOVERABLE`.
-       *   The only permissible operation on such a mutex is
-       *   `Mutex::destroy()`.
-       *
-       * @par POSIX compatibility
-       *  Inspired by [`pthread_mutexattr_setrobust()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_setrobust.html)
-       *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-       */
+    /**
+     * @var mutex::robustness_t attributes::mx_robustness
+     * @details
+     *
+     * Valid values for robust include:
+     *
+     * - `mutex::robustness::stalled`
+     *
+     *   No special actions are taken if the owner of the mutex
+     *  is terminated while holding the mutex lock. This can
+     *  lead to deadlocks if no other thread can unlock the mutex.
+     *  This is the default value.
+     *
+     * - `mutex::robustness::robust`
+     *
+     *   If the process containing the owning thread of a robust
+     *   mutex terminates while holding the mutex lock, the next
+     *   thread that acquires the mutex shall be notified about
+     *   the termination by the return value `EOWNERDEAD` from
+     *   the locking function. If the owning thread of a robust
+     *   mutex terminates while holding the mutex lock, the next
+     *   thread that acquires the mutex may be notified about the
+     *   termination by the return value `EOWNERDEAD`. The notified
+     *   thread can then attempt to mark the state protected by
+     *   the mutex as consistent again by a call to
+     *   `mutex::consistent()`. After a subsequent
+     *   successful call `mutex::unlock()`, the mutex
+     *   lock shall be released and can be used normally by
+     *   other threads. If the mutex is unlocked without a
+     *   call to `mutex::consistent()`, it shall be in a
+     *   permanently unusable state and all attempts to lock
+     *   the mutex shall fail with the error `ENOTRECOVERABLE`.
+     *   The only permissible operation on such a mutex is
+     *   `mutex::destroy()`.
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_mutexattr_setrobust()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_setrobust.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     */
 
-      /**
-       * @var mutex::type_t Attributes::mx_type
-       * @details
-       * The default value of the type attribute is `mutex::type::_default`.
-       *
-       * The type of mutex is contained in the type attribute of
-       * the mutex attributes. Valid mutex types include:
-       *
-       * - `mutex::type::normal`
-       * - `mutex::type::errorcheck`
-       * - `mutex::type::recursive`
-       * - `mutex::type::_default`
-       *
-       * The mutex type affects the behaviour of calls which lock
-       * and unlock the mutex. See `Mutex::lock()` for details.
-       * An implementation may map `mutex::type::_default` to one of
-       * the other mutex types.
-       *
-       * @par POSIX compatibility
-       *  Inspired by [`pthread_mutexattr_settype()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_settype.html)
-       *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-       */
+    /**
+     * @var mutex::type_t attributes::mx_type
+     * @details
+     * The default value of the type attribute is `mutex::type::_default`.
+     *
+     * The type of mutex is contained in the type attribute of
+     * the mutex attributes. Valid mutex types include:
+     *
+     * - `mutex::type::normal`
+     * - `mutex::type::errorcheck`
+     * - `mutex::type::recursive`
+     * - `mutex::type::_default`
+     *
+     * The mutex type affects the behaviour of calls which lock
+     * and unlock the mutex. See `mutex::lock()` for details.
+     * An implementation may map `mutex::type::_default` to one of
+     * the other mutex types.
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_mutexattr_settype()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_settype.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     */
 
-      const Attributes normal_initializer
-        { nullptr };
+    const mutex::attributes mutex::normal_initializer
+      { nullptr };
 
-      const Recursive_attributes recursive_initializer
-        { nullptr };
-
-    } /* namespace mutex */
+    const mutex::recursive_attributes mutex::recursive_initializer
+      { nullptr };
 
     // ------------------------------------------------------------------------
 
     /**
-     * @class Mutex
+     * @class mutex
      * @details
      * A synchronisation object used to allow multiple threads to serialise
      * their access to shared data. The name derives from the capability
@@ -308,10 +299,10 @@ namespace os
      *
      * @code{.cpp}
      * // Create a normal mutex. Same as using the default constructor.
-     * Mutex mx { normal_initializer };
+     * mutex mx { normal_initializer };
      *
      * // Create a recursive mutex.
-     * Mutex rmx { recursive_initializer };
+     * mutex rmx { recursive_initializer };
      * @endcode
      *
      * @par Example
@@ -325,7 +316,7 @@ namespace os
      * res_t res;
      *
      * // Mutex to protect the resource.
-     * Mutex mx;
+     * mutex mx;
      *
      * void
      * func(void)
@@ -366,9 +357,9 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Mutex::Mutex () :
-        Mutex
-          { nullptr, mutex::normal_initializer }
+    mutex::mutex () :
+        mutex
+          { nullptr, normal_initializer }
     {
       ;
     }
@@ -393,9 +384,9 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Mutex::Mutex (const char* name) :
-        Mutex
-          { name, mutex::normal_initializer }
+    mutex::mutex (const char* name) :
+        mutex
+          { name, normal_initializer }
     {
       ;
     }
@@ -427,8 +418,8 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Mutex::Mutex (const mutex::Attributes& attr) :
-        Mutex
+    mutex::mutex (const attributes& attr) :
+        mutex
           { nullptr, attr }
     {
       ;
@@ -461,14 +452,13 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Mutex::Mutex (const char* name, const mutex::Attributes& attr) :
-        Named_object
+    mutex::mutex (const char* name, const attributes& attr) :
+        named_object
           { name, attr.name () }, //
         type_ (attr.mx_type), //
         protocol_ (attr.mx_protocol), //
         robustness_ (attr.mx_robustness), //
-        max_count_ (
-            (attr.mx_type == mutex::type::recursive) ? attr.mx_max_count : 1)
+        max_count_ ((attr.mx_type == type::recursive) ? attr.mx_max_count : 1)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
@@ -485,12 +475,12 @@ namespace os
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
       count_ = 0;
-      port::Mutex::create (this);
+      port::mutex::create (this);
 
 #else
 
       // Robust mutexes not yet fully supported.
-      os_assert_throw(robustness_ != mutex::robustness::robust, ENOTSUP);
+      os_assert_throw(robustness_ != robustness::robust, ENOTSUP);
 
       _init ();
 
@@ -516,7 +506,7 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Mutex::~Mutex ()
+    mutex::~mutex ()
     {
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -524,7 +514,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
-      port::Mutex::destroy (this);
+      port::mutex::destroy (this);
 
 #else
 
@@ -535,7 +525,7 @@ namespace os
     }
 
     void
-    Mutex::_init (void)
+    mutex::_init (void)
     {
       count_ = 0;
 
@@ -550,7 +540,7 @@ namespace os
     }
 
     result_t
-    Mutex::_try_lock (Thread* crt_thread)
+    mutex::_try_lock (Thread* crt_thread)
     {
       Thread* saved_owner;
 
@@ -567,13 +557,13 @@ namespace os
 
       if (saved_owner == nullptr)
         {
-          if (protocol_ == mutex::protocol::inherit)
+          if (protocol_ == protocol::inherit)
             {
               // Save owner priority, in case a temporary boost
               // will be later applied.
               owner_prio_ = owner_->sched_prio ();
             }
-          else if (protocol_ == mutex::protocol::protect)
+          else if (protocol_ == protocol::protect)
             {
               // Save owner priority and boost priority.
               owner_prio_ = owner_->sched_prio ();
@@ -591,7 +581,7 @@ namespace os
 
       if (saved_owner == crt_thread)
         {
-          if (type_ == mutex::type::recursive)
+          if (type_ == type::recursive)
             {
               if (count_ == max_count_)
                 {
@@ -604,13 +594,13 @@ namespace os
 #endif
               return result::ok;
             }
-          else if (type_ == mutex::type::errorcheck)
+          else if (type_ == type::errorcheck)
             {
               return EDEADLK;
             }
         }
 
-      if (protocol_ == mutex::protocol::inherit)
+      if (protocol_ == protocol::inherit)
         {
           thread::priority_t prio = crt_thread->sched_prio ();
           if ((prio > owner_->sched_prio ()))
@@ -667,7 +657,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Mutex::lock (void)
+    mutex::lock (void)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -678,7 +668,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
-      return port::Mutex::lock (this);
+      return port::mutex::lock (this);
 
 #else
 
@@ -779,7 +769,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Mutex::try_lock (void)
+    mutex::try_lock (void)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -790,7 +780,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
-      return port::Mutex::try_lock (this);
+      return port::mutex::try_lock (this);
 
 #else
 
@@ -845,7 +835,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Mutex::timed_lock (clock::duration_t timeout)
+    mutex::timed_lock (clock::duration_t timeout)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -857,7 +847,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
-      return port::Mutex::timed_lock (this, timeout);
+      return port::mutex::timed_lock (this, timeout);
 
 #else
 
@@ -960,7 +950,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Mutex::unlock (void)
+    mutex::unlock (void)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -971,7 +961,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
-      return port::Mutex::unlock (this);
+      return port::mutex::unlock (this);
 
 #else
 
@@ -981,7 +971,7 @@ namespace os
 
       if (owner_ == crt_thread)
         {
-          if ((type_ == mutex::type::recursive) && (count_ > 1))
+          if ((type_ == type::recursive) && (count_ > 1))
             {
               --count_;
 #if defined(OS_TRACE_RTOS_MUTEX)
@@ -991,8 +981,8 @@ namespace os
               return result::ok;
             }
 
-          if ((protocol_ == mutex::protocol::inherit)
-              || (protocol_ == mutex::protocol::protect))
+          if ((protocol_ == protocol::inherit)
+              || (protocol_ == protocol::protect))
             {
               owner_->sched_prio (owner_prio_);
             }
@@ -1010,8 +1000,8 @@ namespace os
         }
 
       // Not owner, or not locked.
-      if (type_ == mutex::type::errorcheck || type_ == mutex::type::recursive
-          || robustness_ == mutex::robustness::robust)
+      if (type_ == type::errorcheck || type_ == type::recursive
+          || robustness_ == robustness::robust)
         {
           return EPERM;
         }
@@ -1033,7 +1023,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     thread::priority_t
-    Mutex::prio_ceiling (void) const
+    mutex::prio_ceiling (void) const
     {
       assert(!scheduler::in_handler_mode ());
 
@@ -1043,7 +1033,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
-      return port::Mutex::prio_ceiling (this);
+      return port::mutex::prio_ceiling (this);
 
 #else
 
@@ -1073,7 +1063,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Mutex::prio_ceiling (thread::priority_t prio_ceiling,
+    mutex::prio_ceiling (thread::priority_t prio_ceiling,
                          thread::priority_t* old_prio_ceiling)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
@@ -1084,7 +1074,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
-      return port::Mutex::prio_ceiling (this, prio_ceiling, old_prio_ceiling);
+      return port::mutex::prio_ceiling (this, prio_ceiling, old_prio_ceiling);
 
 #else
 
@@ -1139,7 +1129,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Mutex::consistent (void)
+    mutex::consistent (void)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -1149,7 +1139,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
 
-      return port::Mutex::consistent (this);
+      return port::mutex::consistent (this);
 
 #else
 
@@ -1168,7 +1158,7 @@ namespace os
      *  Extension to standard, no POSIX similar functionality identified.
      */
     result_t
-    Mutex::reset (void)
+    mutex::reset (void)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -1182,7 +1172,7 @@ namespace os
       return result::ok;
     }
 
-  // ------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
   } /* namespace rtos */
 } /* namespace os */

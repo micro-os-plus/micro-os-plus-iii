@@ -49,7 +49,7 @@ namespace os
        * @brief Condition variable attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Attributes : public Clocked_attributes
+      class Attributes : public clocked_attributes
       {
       public:
 
@@ -119,7 +119,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
-    class Condition_variable : public Named_object
+    class Condition_variable : public named_object
     {
     public:
 
@@ -275,7 +275,7 @@ namespace os
        *  The function shall not fail with an error code of `EINTR`.
        */
       result_t
-      wait (Mutex& mutex);
+      wait (mutex& mutex);
 
       // Neither POSIX nor ISO define a try_wait(), it makes no sense.
 
@@ -299,7 +299,7 @@ namespace os
        *  The function shall not fail with an error code of `EINTR`.
        */
       result_t
-      timed_wait (Mutex& mutex, clock::duration_t timeout);
+      timed_wait (mutex& mutex, clock::duration_t timeout);
 
       /**
        * @}
@@ -337,7 +337,7 @@ namespace os
     {
       constexpr
       Attributes::Attributes (const char* name) :
-          Clocked_attributes
+          clocked_attributes
             { name }
       {
         ;

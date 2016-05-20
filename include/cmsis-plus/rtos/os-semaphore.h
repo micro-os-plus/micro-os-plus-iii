@@ -57,7 +57,7 @@ namespace os
        * @brief %Semaphore attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Attributes : public Clocked_attributes
+      class Attributes : public clocked_attributes
       {
       public:
 
@@ -200,7 +200,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
-    class Semaphore : public Named_object
+    class Semaphore : public named_object
     {
     public:
 
@@ -450,7 +450,7 @@ namespace os
 
       constexpr
       Attributes::Attributes (const char* name) :
-          Clocked_attributes
+          clocked_attributes
             { name }
       {
         ;
@@ -458,7 +458,7 @@ namespace os
 
       constexpr
       Attributes::Attributes (const char* name, count_t max_count) :
-          Clocked_attributes
+          clocked_attributes
             { name }, //
           sm_max_count (max_count)
       {

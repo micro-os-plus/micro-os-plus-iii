@@ -61,7 +61,7 @@ namespace os
        * @brief Memory pool attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Attributes : public Clocked_attributes
+      class Attributes : public clocked_attributes
       {
       public:
 
@@ -168,7 +168,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
-    class Memory_pool : public Named_object
+    class Memory_pool : public named_object
     {
     public:
 
@@ -877,7 +877,7 @@ namespace os
     {
       constexpr
       Attributes::Attributes (const char* name) :
-          Clocked_attributes
+          clocked_attributes
             { name }
       {
         ;

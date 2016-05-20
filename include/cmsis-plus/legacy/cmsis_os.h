@@ -757,7 +757,7 @@ const osTimerDef_t os_timer_def_##name = \
 //  ==== Mutex Management ====
 
   /**
-   * @brief Define a Mutex.
+   * @brief Define a mutex.
    * @param         name          name of the mutex object.
    *
    * @details

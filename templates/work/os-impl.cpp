@@ -352,7 +352,7 @@ namespace os
 
     // ======================================================================
 
-    Named_object::Named_object (const char* name) :
+    named_object::named_object (const char* name) :
         name_ (name != nullptr ? name : "-")
     {
       ;
@@ -416,7 +416,7 @@ namespace os
      */
     Thread::Thread (const thread::Attributes& attr, thread::func_t function,
                     thread::func_args_t args) :
-        Named_object
+        named_object
           { attr.name () }
     {
       assert(function != nullptr);
@@ -696,7 +696,7 @@ namespace os
      */
     Timer::Timer (const timer::Attributes& attr, timer::func_t function,
                   timer::func_args_t args) :
-        Named_object
+        named_object
           { attr.name () }
 
     {
@@ -791,7 +791,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     Mutex::Mutex (const mutex::Attributes& attr) :
-        Named_object
+        named_object
           { attr.name () }, //
         type_ (attr.mx_type), //
         protocol_ (attr.mx_protocol), //
@@ -1087,7 +1087,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     Condition_variable::Condition_variable (const condvar::Attributes& attr) :
-        Named_object
+        named_object
           { attr.name () }
     {
       assert(!scheduler::is_in_irq ());
@@ -1275,7 +1275,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     Semaphore::Semaphore (const semaphore::Attributes& attr) :
-        Named_object
+        named_object
           { attr.name () }, //
         initial_count_ (attr.sm_initial_count), //
         max_count_ (attr.sm_max_count)
@@ -1549,7 +1549,7 @@ namespace os
     Memory_pool::Memory_pool (const mempool::Attributes& attr,
                               mempool::size_t blocks,
                               mempool::size_t block_size_bytes) :
-        Named_object
+        named_object
           { attr.name () }
     {
       assert(!scheduler::is_in_irq ());
@@ -1690,7 +1690,7 @@ namespace os
     Message_queue::Message_queue (const mqueue::Attributes&attr,
                                   mqueue::size_t msgs,
                                   mqueue::size_t msg_size_bytes) :
-        Named_object
+        named_object
           { attr.name () }, //
         msgs_ (msgs), //
         msg_size_bytes_ (msg_size_bytes)

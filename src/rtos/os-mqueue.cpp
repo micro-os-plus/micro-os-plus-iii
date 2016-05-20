@@ -352,7 +352,7 @@ namespace os
     }
 
     Message_queue::Message_queue (const char* name) :
-        Named_object
+        named_object
           { name }
     {
 #if defined(OS_TRACE_RTOS_MQUEUE)
@@ -361,7 +361,7 @@ namespace os
     }
 
     Message_queue::Message_queue (const char* given_name, const char* attr_name) :
-        Named_object
+        named_object
           { given_name, attr_name }
     {
 #if defined(OS_TRACE_RTOS_MQUEUE)
@@ -419,7 +419,7 @@ namespace os
     Message_queue::Message_queue (const char* name, mqueue::size_t msgs,
                                   mqueue::msg_size_t msg_size_bytes,
                                   const Allocator& allocator) :
-        Named_object
+        named_object
           { name }
     {
 #if defined(OS_TRACE_RTOS_MQUEUE)
@@ -512,7 +512,7 @@ namespace os
                                   mqueue::size_t msgs,
                                   mqueue::msg_size_t msg_size_bytes,
                                   const Allocator& allocator) :
-        Named_object
+        named_object
           { name, attr.name () }
     {
 #if defined(OS_TRACE_RTOS_MQUEUE)

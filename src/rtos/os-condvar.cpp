@@ -168,7 +168,7 @@ namespace os
      * @par Example
      *
      * @code{.cpp}
-     * Mutex mx;
+     * mutex mx;
      * Condition_variable cv;
      *
      * void
@@ -328,7 +328,7 @@ namespace os
      */
     Condition_variable::Condition_variable (const char* name,
                                             const condvar::Attributes& attr) :
-        Named_object
+        named_object
           { name, attr.name () }
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
@@ -377,7 +377,7 @@ namespace os
      * `wait()` or `timed_wait()`.
      * The thread(s) that are unblocked shall contend for
      * the mutex according to the scheduling policy (if applicable),
-     * and as if each had called `Mutex::lock()`.
+     * and as if each had called `mutex::lock()`.
      *
      * `signal()` may be called by a thread
      * whether or not it currently owns the mutex that threads
@@ -429,7 +429,7 @@ namespace os
      * `wait()` or `timed_wait()`.
      * The thread(s) that are unblocked shall contend for
      * the mutex according to the scheduling policy (if applicable),
-     * and as if each had called `Mutex::lock()`.
+     * and as if each had called `mutex::lock()`.
      *
      * `broadcast()` may be called by a thread
      * whether or not it currently owns the mutex that threads
@@ -565,7 +565,7 @@ namespace os
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
     result_t
-    Condition_variable::wait (Mutex& mutex)
+    Condition_variable::wait (mutex& mutex)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -707,7 +707,7 @@ namespace os
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
     result_t
-    Condition_variable::timed_wait (Mutex& mutex, clock::duration_t timeout)
+    Condition_variable::timed_wait (mutex& mutex, clock::duration_t timeout)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 

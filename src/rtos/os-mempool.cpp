@@ -197,7 +197,7 @@ namespace os
     }
 
     Memory_pool::Memory_pool (const char* name) :
-        Named_object
+        named_object
           { name }
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
@@ -206,7 +206,7 @@ namespace os
     }
 
     Memory_pool::Memory_pool (const char* given_name, const char* attr_name) :
-        Named_object
+        named_object
           { given_name, attr_name }
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
@@ -262,7 +262,7 @@ namespace os
     Memory_pool::Memory_pool (const char* name, mempool::size_t blocks,
                               mempool::size_t block_size_bytes,
                               const Allocator& allocator) :
-        Named_object
+        named_object
           { name }
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
@@ -352,7 +352,7 @@ namespace os
                               mempool::size_t blocks,
                               mempool::size_t block_size_bytes,
                               const Allocator& allocator) :
-        Named_object
+        named_object
           { name, attr.name () }
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)

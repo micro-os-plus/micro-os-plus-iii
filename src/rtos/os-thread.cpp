@@ -238,7 +238,7 @@ namespace os
     }
 
     Thread::Thread (const char* name) :
-        Named_object
+        named_object
           { name }
     {
 #if defined(OS_TRACE_RTOS_THREAD)
@@ -247,7 +247,7 @@ namespace os
     }
 
     Thread::Thread (const char* given_name, const char* attr_name) :
-        Named_object
+        named_object
           { given_name, attr_name }
     {
 #if defined(OS_TRACE_RTOS_THREAD)
@@ -330,7 +330,7 @@ namespace os
      */
     Thread::Thread (const char* name, thread::func_t function,
                     thread::func_args_t args, const Allocator& allocator) :
-        Named_object (name)
+        named_object (name)
     {
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s @%p %s\n", __func__, this, this->name ());
@@ -443,7 +443,7 @@ namespace os
     Thread::Thread (const char* name, const thread::Attributes& attr,
                     thread::func_t function, thread::func_args_t args,
                     const Allocator& allocator) :
-        Named_object
+        named_object
           { name, attr.name () }
     {
 #if defined(OS_TRACE_RTOS_THREAD)

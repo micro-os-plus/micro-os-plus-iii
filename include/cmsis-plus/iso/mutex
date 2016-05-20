@@ -62,7 +62,7 @@ namespace os
     {
     private:
 
-      using native_type = os::rtos::Mutex;
+      using native_type = os::rtos::mutex;
 
     public:
 
@@ -103,7 +103,7 @@ namespace os
     {
     private:
 
-      using native_type = os::rtos::Mutex;
+      using native_type = os::rtos::mutex;
 
     public:
 
@@ -437,8 +437,8 @@ namespace os
         os::rtos::systicks_t ticks = 0;
         if (rel_time > duration<Rep_T, Period_T>::zero ())
           {
-            ticks = (os::rtos::systicks_t) (os::estd::chrono::ceil<
-                chrono::systicks> (rel_time).count ());
+            ticks = (os::rtos::systicks_t) (
+                os::estd::chrono::ceil<chrono::systicks> (rel_time).count ());
           }
 
         rtos::result_t res;
@@ -494,8 +494,8 @@ namespace os
         os::rtos::systicks_t ticks = 0;
         if (rel_time > duration<Rep_T, Period_T>::zero ())
           {
-            ticks = (os::rtos::systicks_t) (os::estd::chrono::ceil<
-                chrono::systicks> (rel_time).count ());
+            ticks = (os::rtos::systicks_t) (
+                os::estd::chrono::ceil<chrono::systicks> (rel_time).count ());
           }
 
         rtos::result_t res;
@@ -938,7 +938,7 @@ namespace os
       call_once (once_flag& flag, Callable_T&& func, Args_T&&... args)
       {
         typedef std::tuple<Callable_T&&, Args_T&&...> Tuple;
-        Tuple tuple (std::forward < Callable_T > (func),
+        Tuple tuple (std::forward<Callable_T> (func),
                      std::forward<Args_T>(args)...);
         // TODO: implement
 #if TO_IMPLEMENT

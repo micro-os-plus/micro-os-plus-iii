@@ -34,7 +34,7 @@ using namespace os::rtos;
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
 
-Mutex mx;
+mutex mx;
 
 #pragma GCC diagnostic pop
 

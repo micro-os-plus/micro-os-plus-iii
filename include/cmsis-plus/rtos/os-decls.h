@@ -69,12 +69,13 @@ namespace os
     // ========================================================================
 
     // Forward references.
+    class named_object;
     class Clock;
     class Condition_variable;
     class Event_flags;
     class Memory_pool;
-    // class Message_queue;
-    class Mutex;
+    class Message_queue;
+    class mutex;
     class Realtime_clock;
     class Semaphore;
     class Systick_clock;
@@ -157,7 +158,7 @@ namespace os
      * void
      * func (void)
      * {
-     *    Mutex mx;
+     *    mutex mx;
      *    ...
      *    result_t res = mx.try_lock();
      *    if (res == result::ok)
@@ -699,81 +700,6 @@ namespace os
     // ========================================================================
 
     /**
-     * @brief %Mutex namespace.
-     */
-    namespace mutex
-    {
-      /**
-       * @brief Type of mutex protocol.
-       */
-      using protocol_t = enum class protocol : uint8_t
-        {
-          /**
-           * @brief Priority and scheduling not affected by mutex ownership.
-           */
-          none = 0,
-
-          /**
-           * @brief Inherit from highest priority thread.
-           * @details
-           * TODO: add
-           */
-          inherit = 1,
-
-          /**
-           * @brief Protect.
-           * @details
-           * TODO: add
-           */
-          protect = 2
-        };
-
-      /**
-       * @brief Type of mutex robustness.
-       */
-      using robustness_t = enum class robustness : uint8_t
-        {
-          /**
-           * @brief Normal robustness.
-           */
-          stalled = 0,
-          /**
-           * @brief Enhanced robustness.
-           */
-          robust = 1
-        };
-
-      /**
-       * @brief Type of mutex behaviour.
-       */
-      using type_t = enum class type : uint8_t
-        {
-          /**
-           * @brief Normal mutex behaviour.
-           */
-          normal = 0,
-          /**
-           * @brief Check mutex behaviour.
-           */
-          errorcheck = 1,
-          /**
-           * @brief Recursive mutex behaviour.
-           */
-          recursive = 2,
-
-          _default = normal,
-        };
-
-      /**
-       * @brief Type of mutex recursion counter.
-       */
-      using count_t = uint16_t;
-
-      constexpr count_t max_count = 0xFFFF;
-
-    } /* namespace mutex */
-
-    /**
      * @brief %Semaphore namespace.
      */
     namespace semaphore
@@ -801,7 +727,7 @@ namespace os
      * @brief Base class for named objects.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      */
-    class Named_object
+    class named_object
     {
     public:
 
@@ -810,14 +736,14 @@ namespace os
        * @{
        */
 
-      Named_object ();
+      named_object ();
 
       /**
        * @brief Create a named object.
        * @param [in] name Null terminated name. If `nullptr`,
        * "-" is assigned.
        */
-      Named_object (const char* name);
+      named_object (const char* name);
 
       /**
        * @brief Create a named object.
@@ -826,17 +752,17 @@ namespace os
        * @param [in] attr_name Null terminated name. If `nullptr`,
        * "-" is assigned.
        */
-      Named_object (const char* given_name, const char* attr_name);
+      named_object (const char* given_name, const char* attr_name);
 
       /**
        * @cond ignore
        */
-      Named_object (const Named_object&) = default;
-      Named_object (Named_object&&) = default;
-      Named_object&
-      operator= (const Named_object&) = default;
-      Named_object&
-      operator= (Named_object&&) = default;
+      named_object (const named_object&) = default;
+      named_object (named_object&&) = default;
+      named_object&
+      operator= (const named_object&) = default;
+      named_object&
+      operator= (named_object&&) = default;
       /**
        * @endcond
        */
@@ -844,7 +770,7 @@ namespace os
       /**
        * @brief Destroy the named object.
        */
-      ~Named_object () = default;
+      ~named_object () = default;
 
       /**
        * @}
@@ -893,7 +819,7 @@ namespace os
      * @brief Base class for named attributes.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      */
-    class Named_attributes
+    class named_attributes
     {
     public:
 
@@ -907,17 +833,17 @@ namespace os
        * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
        */
       constexpr
-      Named_attributes (const char* name);
+      named_attributes (const char* name);
 
       /**
        * @cond ignore
        */
-      Named_attributes (const Named_attributes&) = default;
-      Named_attributes (Named_attributes&&) = default;
-      Named_attributes&
-      operator= (const Named_attributes&) = default;
-      Named_attributes&
-      operator= (Named_attributes&&) = default;
+      named_attributes (const named_attributes&) = default;
+      named_attributes (named_attributes&&) = default;
+      named_attributes&
+      operator= (const named_attributes&) = default;
+      named_attributes&
+      operator= (named_attributes&&) = default;
       /**
        * @endcond
        */
@@ -925,7 +851,7 @@ namespace os
       /**
        * @brief Destroy the named object.
        */
-      ~Named_attributes () = default;
+      ~named_attributes () = default;
 
       /**
        * @}
@@ -973,7 +899,7 @@ namespace os
      * @brief Base class for named objects.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      */
-    class Clocked_attributes : public Named_attributes
+    class clocked_attributes : public named_attributes
     {
     public:
 
@@ -987,17 +913,17 @@ namespace os
        * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
        */
       constexpr
-      Clocked_attributes (const char* name);
+      clocked_attributes (const char* name);
 
       /**
        * @cond ignore
        */
-      Clocked_attributes (const Clocked_attributes&) = default;
-      Clocked_attributes (Clocked_attributes&&) = default;
-      Clocked_attributes&
-      operator= (const Clocked_attributes&) = default;
-      Clocked_attributes&
-      operator= (Clocked_attributes&&) = default;
+      clocked_attributes (const clocked_attributes&) = default;
+      clocked_attributes (clocked_attributes&&) = default;
+      clocked_attributes&
+      operator= (const clocked_attributes&) = default;
+      clocked_attributes&
+      operator= (clocked_attributes&&) = default;
       /**
        * @endcond
        */
@@ -1005,7 +931,7 @@ namespace os
       /**
        * @brief Destroy the named object.
        */
-      ~Clocked_attributes () = default;
+      ~clocked_attributes () = default;
 
       /**
        * @}
@@ -1052,7 +978,7 @@ namespace os
      * return `"-"`.
      */
     inline const char*
-    Named_object::name (void) const
+    named_object::name (void) const
     {
       return name_;
     }
@@ -1068,7 +994,7 @@ namespace os
      * A constant string (stored in flash) is preferred.
      */
     constexpr
-    Named_attributes::Named_attributes (const char* name) :
+    named_attributes::named_attributes (const char* name) :
         name_ (name != nullptr ? name : "-")
     {
       ;
@@ -1080,7 +1006,7 @@ namespace os
      * return `"-"`.
      */
     inline const char*
-    Named_attributes::name (void) const
+    named_attributes::name (void) const
     {
       return name_;
     }
@@ -1088,8 +1014,8 @@ namespace os
     // ========================================================================
 
     constexpr
-    Clocked_attributes::Clocked_attributes (const char* name) :
-        Named_attributes
+    clocked_attributes::clocked_attributes (const char* name) :
+        named_attributes
           { name }, //
         clock (nullptr)
     {
@@ -1111,6 +1037,7 @@ namespace os
       class Thread;
       class Timer;
       class Mutex;
+
       class Condition_variable;
       class Semaphore;
       class Memory_pool;
