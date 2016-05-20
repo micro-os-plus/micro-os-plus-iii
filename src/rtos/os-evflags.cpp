@@ -114,7 +114,7 @@ namespace os
 
     /**
      * @details
-     * This constructor shall initialise the event flags object
+     * This constructor shall initialise an event flags object
      * with default settings.
      * The effect shall be equivalent to creating an event flags object
      * referring to the attributes in `evflags::initializer`.
@@ -129,14 +129,36 @@ namespace os
      */
     Event_flags::Event_flags () :
         Event_flags
-          { evflags::initializer }
+          { nullptr, evflags::initializer }
     {
       ;
     }
 
     /**
      * @details
-     * This constructor shall initialise the event flags object
+     * This constructor shall initialise a named event flags object
+     * with default settings.
+     * The effect shall be equivalent to creating an event flags object
+     * referring to the attributes in `evflags::initializer`.
+     * Upon successful initialisation, the state of the event
+     * flags object shall become initialised, with all flags cleared.
+     *
+     * Only the event flags object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * event flags objects.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    Event_flags::Event_flags (const char* name) :
+        Event_flags
+          { name, evflags::initializer }
+    {
+      ;
+    }
+
+    /**
+     * @details
+     * This constructor shall initialise an event flags object
      * with attributes referenced by _attr_.
      * If the attributes specified by _attr_ are modified later,
      * the event flags attributes shall not be affected.
@@ -156,8 +178,36 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     Event_flags::Event_flags (const evflags::Attributes& attr) :
+        Event_flags
+          { nullptr, attr }
+    {
+      ;
+    }
+
+    /**
+     * @details
+     * This constructor shall initialise an event flags object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the event flags attributes shall not be affected.
+     * Upon successful initialisation, the state of the event
+     * flags object shall become initialised, with all flags cleared.
+     *
+     * Only the event flags object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * event flags objects.
+     *
+     * In cases where default event flags attributes are
+     * appropriate, the variable `evflags::initializer` can be used to
+     * initialise event flags.
+     * The effect shall be equivalent to creating an event flags object with
+     * the default constructor.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    Event_flags::Event_flags (const char* name, const evflags::Attributes& attr) :
         Named_object
-          { attr.name () }
+          { name != nullptr ? name : attr.name () }
 #if !defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
             , clock_ (attr.clock != nullptr ? *attr.clock : systick_clock)
 #endif
@@ -165,7 +215,7 @@ namespace os
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_EVFLAGS)
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
@@ -196,7 +246,7 @@ namespace os
     Event_flags::~Event_flags ()
     {
 #if defined(OS_TRACE_RTOS_EVFLAGS)
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
@@ -275,7 +325,7 @@ namespace os
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_EVFLAGS)
-      trace::printf ("%s() @%p %X \n", __func__, this, mask);
+      trace::printf ("%s() @%p %s 0x%X \n", __func__, this, name (), mask);
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
@@ -354,7 +404,7 @@ namespace os
                            flags::mode_t mode)
     {
 #if defined(OS_TRACE_RTOS_EVFLAGS)
-      trace::printf ("%s() @%p %X \n", __func__, this, mask);
+      trace::printf ("%s() @%p %s 0x%X \n", __func__, this, name (), mask);
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
@@ -422,7 +472,7 @@ namespace os
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_EVFLAGS)
-      trace::printf ("%s() @%p %X \n", __func__, this, mask);
+      trace::printf ("%s() @%p %s 0x%X \n", __func__, this, name (), mask);
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
@@ -510,6 +560,10 @@ namespace os
     {
       os_assert_err(mask != 0, EINVAL);
 
+#if defined(OS_TRACE_RTOS_EVFLAGS)
+      trace::printf ("%s() @%p %s 0x%X \n", __func__, this, name (), mask);
+#endif
+
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
       return port::Event_flags::raise (this, mask, oflags);
@@ -548,6 +602,10 @@ namespace os
     {
       os_assert_err(mask != 0, EINVAL);
 
+#if defined(OS_TRACE_RTOS_EVFLAGS)
+      trace::printf ("%s() @%p %s 0x%X \n", __func__, this, name (), mask);
+#endif
+
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
       return port::Event_flags::clear (this, mask, oflags);
@@ -584,7 +642,7 @@ namespace os
     Event_flags::get (flags::mask_t mask, flags::mode_t mode)
     {
 #if defined(OS_TRACE_RTOS_EVFLAGS)
-      trace::printf ("%s() @%p %0X \n", __func__, this, mask);
+      trace::printf ("%s() @%p %s 0x%X \n", __func__, this, name (), mask);
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)

@@ -139,10 +139,23 @@ namespace os
       Event_flags ();
 
       /**
+       * @brief Create named event flags with default attributes.
+       * @param [in] name Pointer to name.
+       */
+      Event_flags (const char* name);
+
+      /**
        * @brief Create event flags with custom settings.
        * @param [in] attr Reference to attributes.
        */
       Event_flags (const evflags::Attributes& attr);
+
+      /**
+       * @brief Create named event flags with custom settings.
+       * @param [in] name Pointer to name.
+       * @param [in] attr Reference to attributes.
+       */
+      Event_flags (const char* name, const evflags::Attributes& attr);
 
       /**
        * @cond ignore

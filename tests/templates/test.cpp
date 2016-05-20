@@ -52,11 +52,16 @@ run_tests (void)
 {
   // ==========================================================================
 
-  // Regular threads.
-  Thread th1
-    { func, nullptr };
-  Thread th2
-    { "th2", func, nullptr };
+    {
+      // Regular threads.
+      Thread th1
+        { func, nullptr };
+      Thread th2
+        { "th2", func, nullptr };
+
+      th1.join ();
+      th2.join ();
+    }
 
   // --------------------------------------------------------------------------
 
@@ -68,15 +73,23 @@ run_tests (void)
         { func, nullptr };
       my_thread ath2
         { "ath2", func, nullptr };
+
+      ath1.join ();
+      ath2.join ();
     }
 
   // --------------------------------------------------------------------------
 
-  // Statically allocated threads.
-  static Thread_static<> sth1
-    { func, nullptr };
-  static Thread_static<> sth2
-    { "sth2", func, nullptr };
+    {
+      // Statically allocated threads.
+      static Thread_static<> sth1
+        { func, nullptr };
+      static Thread_static<> sth2
+        { "sth2", func, nullptr };
+
+      sth1.join ();
+      sth2.join ();
+    }
 
   // ==========================================================================
 
@@ -249,12 +262,25 @@ run_tests (void)
 
   // ==========================================================================
 
-  Condition_variable cv1;
-  cv1.signal ();
+    {
+      Condition_variable cv1;
+      cv1.signal ();
 
-  Condition_variable cv2
-    { "cv2" };
-  cv2.signal ();
+      Condition_variable cv2
+        { "cv2" };
+      cv2.signal ();
+    }
+
+  // ==========================================================================
+
+    {
+      Event_flags ev1;
+      ev1.clear (1);
+
+      Event_flags ev2
+        { "ev2" };
+      ev2.clear (1);
+    }
 
   // ==========================================================================
 
