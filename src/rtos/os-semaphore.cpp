@@ -129,7 +129,7 @@ namespace os
 
     /**
      * @details
-     * This constructor shall initialise the semaphore object
+     * This constructor shall initialise a semaphore object
      * with default settings.
      * The effect shall be equivalent to creating a semaphore object
      * referring to the attributes in `semaphore::counting_initializer`.
@@ -153,14 +153,45 @@ namespace os
      */
     Semaphore::Semaphore () :
         Semaphore
-          { semaphore::counting_initializer }
+          { nullptr, semaphore::counting_initializer }
     {
       ;
     }
 
     /**
      * @details
-     * This constructor shall initialise the semaphore object
+     * This constructor shall initialise a named semaphore object
+     * with default settings.
+     * The effect shall be equivalent to creating a semaphore object
+     * referring to the attributes in `semaphore::counting_initializer`.
+     * Upon successful initialisation, the state of the
+     * semaphore object shall become initialised.
+     * The initial count is set to zero and there is no upper limit.
+     *
+     * Only the semaphore object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * semaphore objects.
+     *
+     * Compatible with POSIX `sem_init()`.
+     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html#
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
+     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    Semaphore::Semaphore (const char* name) :
+        Semaphore
+          { name, semaphore::counting_initializer }
+    {
+      ;
+    }
+
+    /**
+     * @details
+     * This constructor shall initialise a semaphore object
      * with attributes referenced by _attr_.
      * If the attributes specified by _attr_ are modified later,
      * the semaphore attributes shall not be affected.
@@ -186,15 +217,45 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     Semaphore::Semaphore (const semaphore::Attributes& attr) :
+        Semaphore
+          { nullptr, attr }
+    {
+      ;
+    }
+
+    /**
+     * @details
+     * This constructor shall initialise a named semaphore object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the semaphore attributes shall not be affected.
+     * Upon successful initialisation, the state of the
+     * semaphore object shall become initialised.
+     *
+     * Only the semaphore object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * semaphore objects.
+     *
+     * In cases where default semaphore attributes are
+     * appropriate, the variables `semaphore::binary_initializer`
+     * or `semaphore::counting_initializer` can be used to
+     * initialise semaphores.
+     * The effect shall be equivalent to creating a semaphore
+     * object with the default constructor.
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
+     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    Semaphore::Semaphore (const char* name, const semaphore::Attributes& attr) :
         Named_object
-          { attr.name () }, //
-#if !defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
-            clock_ (attr.clock != nullptr ? *attr.clock : systick_clock),
-#endif
-            initial_count_ (attr.sm_initial_count), //
-            max_count_ (
-                attr.sm_max_count ?
-                    attr.sm_max_count : semaphore::max_count_value)
+          { name != nullptr ? name : attr.name () }, //
+        initial_count_ (attr.sm_initial_count), //
+        max_count_ (
+            attr.sm_max_count ? attr.sm_max_count : semaphore::max_count_value)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
@@ -207,8 +268,12 @@ namespace os
       count_ = attr.sm_initial_count;
 
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
-      trace::printf ("%s() @%p %s %d %d\n", __func__, this, name (), count_,
-                     max_count_);
+      trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (),
+                     count_, max_count_);
+#endif
+
+#if !defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
+      clock_ = attr.clock != nullptr ? attr.clock : &systick_clock;
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
@@ -581,8 +646,8 @@ namespace os
       Waiting_thread_node node
         { crt_thread };
 
-      Clock_timestamps_list& clock_list = clock_.steady_list ();
-      clock::timestamp_t timeout_timestamp = clock_.steady_now () + timeout;
+      Clock_timestamps_list& clock_list = clock_->steady_list ();
+      clock::timestamp_t timeout_timestamp = clock_->steady_now () + timeout;
 
       // Prepare a timeout node pointing to the current thread.
       Timeout_thread_node timeout_node
@@ -616,7 +681,7 @@ namespace os
               return EINTR;
             }
 
-          if (clock_.steady_now () >= timeout_timestamp)
+          if (clock_->steady_now () >= timeout_timestamp)
             {
               return ETIMEDOUT;
             }

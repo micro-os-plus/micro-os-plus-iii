@@ -112,16 +112,13 @@ namespace os
         /**
          * @brief %Semaphore initial count.
          */
-        count_t sm_initial_count;
+        count_t sm_initial_count = 0;
 
         /**
          * @brief %Semaphore max count.
          */
-        count_t sm_max_count;
+        count_t sm_max_count = max_count_value;
 
-        //
-        // TODO: add clock ID.
-        //
         // Add more attributes.
 
         /**
@@ -220,10 +217,23 @@ namespace os
       Semaphore ();
 
       /**
+       * @brief Create a named semaphore with default settings.
+       * @par Parameters
+       *  None
+       */
+      Semaphore (const char* name);
+
+      /**
        * @brief Create a semaphore with custom settings.
        * @param [in] attr Reference to attributes.
        */
       Semaphore (const semaphore::Attributes& attr);
+
+      /**
+       * @brief Create a named semaphore with custom settings.
+       * @param [in] attr Reference to attributes.
+       */
+      Semaphore (const char* name, const semaphore::Attributes& attr);
 
       /**
        * @cond ignore
@@ -398,7 +408,7 @@ namespace os
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
       Waiting_threads_list list_;
-      Clock& clock_;
+      Clock* clock_ = nullptr;
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
@@ -409,10 +419,10 @@ namespace os
       const semaphore::count_t initial_count_;
 
       // Can be updated in different contexts (interrupts or threads)
-      volatile semaphore::count_t count_;
+      volatile semaphore::count_t count_ = 0;
 
       // Constant set during construction.
-      const semaphore::count_t max_count_;
+      const semaphore::count_t max_count_ = semaphore::max_count_value;
 
       // Add more internal data.
 
@@ -441,9 +451,7 @@ namespace os
       constexpr
       Attributes::Attributes (const char* name) :
           Clocked_attributes
-            { name }, //
-          sm_initial_count (0), //
-          sm_max_count (max_count_value)
+            { name }
       {
         ;
       }
@@ -452,7 +460,6 @@ namespace os
       Attributes::Attributes (const char* name, count_t max_count) :
           Clocked_attributes
             { name }, //
-          sm_initial_count (0), //
           sm_max_count (max_count)
       {
         ;
