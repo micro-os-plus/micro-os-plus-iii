@@ -67,8 +67,8 @@ static_assert(sizeof(mutex::attributes) == sizeof(os_mutex_attr_t), "adjust size
 static_assert(sizeof(Condition_variable) == sizeof(os_condvar_t), "adjust size of os_condvar_t");
 static_assert(sizeof(condvar::Attributes) == sizeof(os_condvar_attr_t), "adjust size of os_condvar_attr_t");
 
-static_assert(sizeof(Semaphore) == sizeof(os_semaphore_t), "adjust size of os_semaphore_t");
-static_assert(sizeof(semaphore::Attributes) == sizeof(os_semaphore_attr_t), "adjust size of os_semaphore_attr_t");
+static_assert(sizeof(semaphore) == sizeof(os_semaphore_t), "adjust size of os_semaphore_t");
+static_assert(sizeof(semaphore::attributes) == sizeof(os_semaphore_attr_t), "adjust size of os_semaphore_attr_t");
 
 static_assert(sizeof(Memory_pool) == sizeof(os_mempool_t), "adjust size of os_mempool_t");
 static_assert(sizeof(mempool::Attributes) == sizeof(os_mempool_attr_t), "adjust size of os_mempool_attr_t");
@@ -475,68 +475,68 @@ os_condvar_timed_wait (os_condvar_t* condvar, os_mutex_t* mutex,
 void
 os_semaphore_attr_init (os_semaphore_attr_t* attr, const char* name)
 {
-  new (attr) semaphore::Attributes (name);
+  new (attr) semaphore::attributes (name);
 }
 
 void
 os_semaphore_create (os_semaphore_t* semaphore, os_semaphore_attr_t* attr)
 {
-  new (semaphore) Semaphore ((semaphore::Attributes&) *attr);
+  new (semaphore) class semaphore ((semaphore::attributes&) *attr);
 }
 
 void
 os_semaphore_destroy (os_semaphore_t* semaphore)
 {
-  (reinterpret_cast<Semaphore&> (*semaphore)).~Semaphore ();
+  (reinterpret_cast<class semaphore&> (*semaphore)).~semaphore ();
 }
 
 os_result_t
 os_semaphore_post (os_semaphore_t* semaphore)
 {
-  return (os_result_t) (reinterpret_cast<Semaphore&> (*semaphore)).post ();
+  return (os_result_t) (reinterpret_cast<class semaphore&> (*semaphore)).post ();
 }
 
 os_result_t
 os_semaphore_wait (os_semaphore_t* semaphore)
 {
-  return (os_result_t) (reinterpret_cast<Semaphore&> (*semaphore)).wait ();
+  return (os_result_t) (reinterpret_cast<class semaphore&> (*semaphore)).wait ();
 }
 
 os_result_t
 os_semaphore_try_wait (os_semaphore_t* semaphore)
 {
-  return (os_result_t) (reinterpret_cast<Semaphore&> (*semaphore)).try_wait ();
+  return (os_result_t) (reinterpret_cast<class semaphore&> (*semaphore)).try_wait ();
 }
 
 os_result_t
 os_semaphore_timed_wait (os_semaphore_t* semaphore, os_clock_duration_t timeout)
 {
-  return (os_result_t) (reinterpret_cast<Semaphore&> (*semaphore)).timed_wait (
+  return (os_result_t) (reinterpret_cast<class semaphore&> (*semaphore)).timed_wait (
       timeout);
 }
 
 os_semaphore_count_t
 os_semaphore_get_value (os_semaphore_t* semaphore)
 {
-  return (os_semaphore_count_t) (reinterpret_cast<Semaphore&> (*semaphore)).value ();
+  return (os_semaphore_count_t) (reinterpret_cast<class semaphore&> (*semaphore)).value ();
 }
 
 os_result_t
 os_semaphore_reset (os_semaphore_t* semaphore)
 {
-  return (os_result_t) (reinterpret_cast<Semaphore&> (*semaphore)).reset ();
+  return (os_result_t) (reinterpret_cast<class semaphore&> (*semaphore)).reset ();
 }
 
 os_semaphore_count_t
 os_semaphore_get_initial_value (os_semaphore_t* semaphore)
 {
-  return (os_semaphore_count_t) (reinterpret_cast<Semaphore&> (*semaphore)).initial_value ();
+  return (os_semaphore_count_t) (reinterpret_cast<class semaphore&> (*semaphore)).initial_value ();
 }
 
 os_semaphore_count_t
 os_semaphore_get_max_value (os_semaphore_t* semaphore)
 {
-  return (os_semaphore_count_t) (reinterpret_cast<Semaphore&> (*semaphore)).max_value ();
+  return (os_semaphore_count_t) (reinterpret_cast<class semaphore&> (*semaphore)).max_value ();
 }
 
 // ----------------------------------------------------------------------------
@@ -1692,7 +1692,7 @@ osSemaphoreCreate (const osSemaphoreDef_t* semaphore_def, int32_t count)
       return nullptr;
     }
 
-  semaphore::Attributes attr
+  semaphore::attributes attr
     { semaphore_def->name };
   attr.sm_initial_count = (semaphore::count_t) count;
   // The logic is very strange, the CMSIS expects both the max-count to be the
@@ -1702,24 +1702,24 @@ osSemaphoreCreate (const osSemaphoreDef_t* semaphore_def, int32_t count)
   attr.sm_max_count = (semaphore::count_t) (
       count == 0 ? osFeature_Semaphore : count);
 
-  return reinterpret_cast<osSemaphoreId> (new ((void*) semaphore_def->data) Semaphore (
+  return reinterpret_cast<osSemaphoreId> (new ((void*) semaphore_def->data) semaphore (
       attr));
 }
 
 /**
  * @details
- * Wait until a Semaphore token becomes available. When no Semaphore
+ * Wait until a semaphore token becomes available. When no semaphore
  * token is available, the function waits for the time specified with
  * the parameter millisec.
  *
  * The argument millisec specifies how long the system waits for a
- * Semaphore token to become available. While the system waits the
+ * semaphore token to become available. While the system waits the
  * thread that is calling this function is put into the state WAITING.
  * The millisec timeout can have the following values:
  *
  * - when millisec is 0, the function returns instantly.
  * - when millisec is set to osWaitForever the function will wait
- * for an infinite time until the Semaphore token becomes available.
+ * for an infinite time until the semaphore token becomes available.
  * - all other values specify a time in millisecond for a timeout.
  *
  * The return value indicates the number of available tokens (the
@@ -1744,11 +1744,11 @@ osSemaphoreWait (osSemaphoreId semaphore_id, uint32_t millisec)
   result_t res;
   if (millisec == osWaitForever)
     {
-      res = (reinterpret_cast<Semaphore&> (*semaphore_id)).wait ();
+      res = (reinterpret_cast<class semaphore&> (*semaphore_id)).wait ();
     }
   else if (millisec == 0)
     {
-      res = (reinterpret_cast<Semaphore&> (*semaphore_id)).try_wait ();
+      res = (reinterpret_cast<class semaphore&> (*semaphore_id)).try_wait ();
       if (res == EWOULDBLOCK)
         {
           return 0;
@@ -1756,7 +1756,7 @@ osSemaphoreWait (osSemaphoreId semaphore_id, uint32_t millisec)
     }
   else
     {
-      res = (reinterpret_cast<Semaphore&> (*semaphore_id)).timed_wait (
+      res = (reinterpret_cast<class semaphore&> (*semaphore_id)).timed_wait (
           Systick_clock::ticks_cast (millisec * 1000u));
       if (res == ETIMEDOUT)
         {
@@ -1767,7 +1767,7 @@ osSemaphoreWait (osSemaphoreId semaphore_id, uint32_t millisec)
   if (res == 0)
     {
       int count =
-          (int32_t) (reinterpret_cast<Semaphore&> (*semaphore_id)).value ();
+          (int32_t) (reinterpret_cast<class semaphore&> (*semaphore_id)).value ();
       return count + 1;
     }
   else
@@ -1778,7 +1778,7 @@ osSemaphoreWait (osSemaphoreId semaphore_id, uint32_t millisec)
 
 /**
  * @details
- * Release a Semaphore token. This increments the count of
+ * Release a semaphore token. This increments the count of
  * available semaphore tokens.
  *
  * @note Can be invoked from Interrupt Service Routines.
@@ -1791,12 +1791,12 @@ osSemaphoreRelease (osSemaphoreId semaphore_id)
       return osErrorParameter;
     }
 
-  if ((reinterpret_cast<Semaphore&> (*semaphore_id)).initial_value () == 0)
+  if ((reinterpret_cast<class semaphore&> (*semaphore_id)).initial_value () == 0)
     {
       return osErrorResource;
     }
 
-  result_t res = (reinterpret_cast<Semaphore&> (*semaphore_id)).post ();
+  result_t res = (reinterpret_cast<class semaphore&> (*semaphore_id)).post ();
 
   if (res == result::ok)
     {
@@ -1814,9 +1814,9 @@ osSemaphoreRelease (osSemaphoreId semaphore_id)
 
 /**
  * @details
- * Delete a Semaphore object. The function releases internal memory
- * obtained for Semaphore handling. After this call the semaphore_id
- * is no longer valid and cannot be used. The Semaphore may be created
+ * Delete a semaphore object. The function releases internal memory
+ * obtained for semaphore handling. After this call the semaphore_id
+ * is no longer valid and cannot be used. The semaphore may be created
  * again using the function osSemaphoreCreate.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
@@ -1834,7 +1834,7 @@ osSemaphoreDelete (osSemaphoreId semaphore_id)
       return osErrorParameter;
     }
 
-  (reinterpret_cast<Semaphore&> (*semaphore_id)).~Semaphore ();
+  (reinterpret_cast<class semaphore&> (*semaphore_id)).~semaphore ();
   return osOK;
 }
 

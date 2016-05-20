@@ -46,60 +46,56 @@ namespace os
      * The os::rtos::semaphore namespace groups semaphore types,
      * attributes and initialisers.
      */
-    namespace semaphore
-    {
-      /**
-       * @class Attributes
-       * @details
-       * Allow to assign a name and custom attributes (like initial count,
-       * max count) to the semaphore.
-       *
-       * To simplify access, the member variables are public and do not
-       * require accessors or mutators.
-       *
-       * @par POSIX compatibility
-       *  No POSIX similar functionality identified, but inspired by POSIX
-       *  attributes used in [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-       */
+    /**
+     * @class attributes
+     * @details
+     * Allow to assign a name and custom attributes (like initial count,
+     * max count) to the semaphore.
+     *
+     * To simplify access, the member variables are public and do not
+     * require accessors or mutators.
+     *
+     * @par POSIX compatibility
+     *  No POSIX similar functionality identified, but inspired by POSIX
+     *  attributes used in [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     */
 
-      /**
-       * @var count_t Attributes::sm_initial_count
-       * @details
-       * This values represents the number of resources initially
-       * available to the semaphore.
-       */
+    /**
+     * @var count_t attributes::sm_initial_count
+     * @details
+     * This values represents the number of resources initially
+     * available to the semaphore.
+     */
 
-      /**
-       * @var count_t Attributes::sm_max_count
-       * @details
-       * This values represents the maximum number of resources
-       * available to the semaphore.
-       */
+    /**
+     * @var count_t attributes::sm_max_count
+     * @details
+     * This values represents the maximum number of resources
+     * available to the semaphore.
+     */
 
-      /**
-       * @class Binary_attributes
-       * @details
-       * Allow to assign a name and custom attributes to the semaphore.
-       *
-       * @par POSIX compatibility
-       *  No POSIX similar functionality identified, but inspired by POSIX
-       *  attributes used in [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-       */
+    /**
+     * @class binary_attributes
+     * @details
+     * Allow to assign a name and custom attributes to the semaphore.
+     *
+     * @par POSIX compatibility
+     *  No POSIX similar functionality identified, but inspired by POSIX
+     *  attributes used in [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     */
 
-      const Attributes counting_initializer
-        { nullptr };
+    const semaphore::attributes semaphore::counting_initializer
+      { nullptr };
 
-      const Binary_attributes binary_initializer
-        { nullptr };
-
-    } /* namespace semaphore */
+    const semaphore::binary_attributes semaphore::binary_initializer
+      { nullptr };
 
     // ------------------------------------------------------------------------
 
     /**
-     * @class Semaphore
+     * @class semaphore
      * @details
      * Semaphores allow threads and interrupts to synchronise their actions.
      *
@@ -151,9 +147,9 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Semaphore::Semaphore () :
-        Semaphore
-          { nullptr, semaphore::counting_initializer }
+    semaphore::semaphore () :
+        semaphore
+          { nullptr, counting_initializer }
     {
       ;
     }
@@ -182,9 +178,9 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Semaphore::Semaphore (const char* name) :
-        Semaphore
-          { name, semaphore::counting_initializer }
+    semaphore::semaphore (const char* name) :
+        semaphore
+          { name, counting_initializer }
     {
       ;
     }
@@ -216,8 +212,8 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Semaphore::Semaphore (const semaphore::Attributes& attr) :
-        Semaphore
+    semaphore::semaphore (const attributes& attr) :
+        semaphore
           { nullptr, attr }
     {
       ;
@@ -250,12 +246,11 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Semaphore::Semaphore (const char* name, const semaphore::Attributes& attr) :
+    semaphore::semaphore (const char* name, const attributes& attr) :
         named_object
           { name, attr.name () }, //
         initial_count_ (attr.sm_initial_count), //
-        max_count_ (
-            attr.sm_max_count ? attr.sm_max_count : semaphore::max_count_value)
+        max_count_ (attr.sm_max_count ? attr.sm_max_count : max_count_value)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
@@ -278,7 +273,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
 
-      port::Semaphore::create (this);
+      port::semaphore::create (this);
 
 #else
 
@@ -305,7 +300,7 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Semaphore::~Semaphore ()
+    semaphore::~semaphore ()
     {
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -313,7 +308,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
 
-      port::Semaphore::destroy (this);
+      port::semaphore::destroy (this);
 
 #else
 
@@ -323,7 +318,7 @@ namespace os
     }
 
     void
-    Semaphore::_init (void)
+    semaphore::_init (void)
     {
 
       count_ = initial_count_;
@@ -379,7 +374,7 @@ namespace os
      * @warning Applications using these functions may be subject to priority inversion.
      */
     result_t
-    Semaphore::post (void)
+    semaphore::post (void)
     {
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -387,7 +382,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
 
-      return port::Semaphore::post (this);
+      return port::semaphore::post (this);
 
 #else
 
@@ -415,7 +410,7 @@ namespace os
     }
 
     bool
-    Semaphore::_try_wait (void)
+    semaphore::_try_wait (void)
     {
       if (count_ > 0)
         {
@@ -463,7 +458,7 @@ namespace os
      * @warning Applications using these functions may be subject to priority inversion.
      */
     result_t
-    Semaphore::wait ()
+    semaphore::wait ()
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -473,7 +468,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
 
-      return port::Semaphore::wait (this);
+      return port::semaphore::wait (this);
 
 #else
 
@@ -550,7 +545,7 @@ namespace os
      * @warning Applications using these functions may be subject to priority inversion.
      */
     result_t
-    Semaphore::try_wait ()
+    semaphore::try_wait ()
     {
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -558,7 +553,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
 
-      return port::Semaphore::try_wait (this);
+      return port::semaphore::try_wait (this);
 
 #else
 
@@ -580,7 +575,7 @@ namespace os
      * @details
      * Try to perform a lock operation; if the semaphore cannot be
      * locked without waiting for another process or thread to
-     * unlock the semaphore by performing a Semaphore::post()
+     * unlock the semaphore by performing a semaphore::post()
      * function, this wait shall be terminated when the specified
      * timeout expires.
      *
@@ -613,7 +608,7 @@ namespace os
      * @warning Applications using these functions may be subject to priority inversion.
      */
     result_t
-    Semaphore::timed_wait (clock::duration_t timeout)
+    semaphore::timed_wait (clock::duration_t timeout)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -623,7 +618,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
 
-      return port::Semaphore::timed_wait (this, timeout);
+      return port::semaphore::timed_wait (this, timeout);
 
 #else
 
@@ -713,7 +708,7 @@ namespace os
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
     semaphore::count_t
-    Semaphore::value (void) const
+    semaphore::value (void) const
     {
 #if !defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
       return (count_ > 0) ? count_ : 0;
@@ -732,13 +727,13 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Semaphore::reset (void)
+    semaphore::reset (void)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
 
-      return port::Semaphore::reset (this);
+      return port::semaphore::reset (this);
 
 #else
 

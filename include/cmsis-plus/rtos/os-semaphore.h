@@ -45,19 +45,42 @@ namespace os
 {
   namespace rtos
   {
-    namespace semaphore
-    {
-
-      // ========================================================================
+    // ========================================================================
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
+
+    /**
+     * @brief POSIX compliant **semaphore**.
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
+     */
+    class semaphore : public named_object
+    {
+    public:
+
+      /**
+       * @brief Type of semaphore counter.
+       * @details
+       * A numeric value enough to hold the semaphore counter,
+       * usually a 16-bits signed value.
+       */
+      using count_t = int16_t;
+
+      /**
+       * @brief Maximum semaphore value.
+       * @details
+       * Used to validate the semaphore initial count and max count.
+       */
+      static constexpr count_t max_count_value = 0x7FFF;
+
+      // ======================================================================
 
       /**
        * @brief %Semaphore attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Attributes : public clocked_attributes
+      class attributes : public clocked_attributes
       {
       public:
 
@@ -71,17 +94,17 @@ namespace os
          * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
         constexpr
-        Attributes (const char* name);
+        attributes (const char* name);
 
         /**
          * @cond ignore
          */
-        Attributes (const Attributes&) = default;
-        Attributes (Attributes&&) = default;
-        Attributes&
-        operator= (const Attributes&) = default;
-        Attributes&
-        operator= (Attributes&&) = default;
+        attributes (const attributes&) = default;
+        attributes (attributes&&) = default;
+        attributes&
+        operator= (const attributes&) = default;
+        attributes&
+        operator= (attributes&&) = default;
         /**
          * @endcond
          */
@@ -89,7 +112,7 @@ namespace os
         /**
          * @brief Destroy semaphore attributes.
          */
-        ~Attributes () = default;
+        ~attributes () = default;
 
         /**
          * @}
@@ -98,7 +121,7 @@ namespace os
       protected:
 
         constexpr
-        Attributes (const char* name, count_t max_count);
+        attributes (const char* name, count_t max_count);
 
       public:
 
@@ -126,23 +149,18 @@ namespace os
          */
       };
 
-#pragma GCC diagnostic pop
-
       /**
        * @brief Default counting semaphore initialiser.
        */
-      extern const Attributes counting_initializer;
+      static const attributes counting_initializer;
 
       // ======================================================================
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
 
       /**
        * @brief Binary semaphore attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Binary_attributes : public Attributes
+      class binary_attributes : public attributes
       {
       public:
 
@@ -156,17 +174,17 @@ namespace os
          * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
         constexpr
-        Binary_attributes (const char* name);
+        binary_attributes (const char* name);
 
         /**
          * @cond ignore
          */
-        Binary_attributes (const Binary_attributes&) = default;
-        Binary_attributes (Binary_attributes&&) = default;
-        Binary_attributes&
-        operator= (const Binary_attributes&) = default;
-        Binary_attributes&
-        operator= (Binary_attributes&&) = default;
+        binary_attributes (const binary_attributes&) = default;
+        binary_attributes (binary_attributes&&) = default;
+        binary_attributes&
+        operator= (const binary_attributes&) = default;
+        binary_attributes&
+        operator= (binary_attributes&&) = default;
         /**
          * @endcond
          */
@@ -174,35 +192,17 @@ namespace os
         /**
          * @brief Destroy semaphore attributes.
          */
-        ~Binary_attributes () = default;
+        ~binary_attributes () = default;
 
         /**
          * @}
          */
       };
 
-#pragma GCC diagnostic pop
-
       /**
        * @brief Default binary semaphore initialiser.
        */
-      extern const Binary_attributes binary_initializer;
-
-    } /* namespace semaphore */
-
-    // ========================================================================
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
-
-    /**
-     * @brief POSIX compliant **semaphore**.
-     * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
-     */
-    class Semaphore : public named_object
-    {
-    public:
+      static const binary_attributes binary_initializer;
 
       /**
        * @name Constructors & Destructor
@@ -214,36 +214,36 @@ namespace os
        * @par Parameters
        *  None
        */
-      Semaphore ();
+      semaphore ();
 
       /**
        * @brief Create a named semaphore with default settings.
        * @param [in] name Pointer to name.
        */
-      Semaphore (const char* name);
+      semaphore (const char* name);
 
       /**
        * @brief Create a semaphore with custom settings.
        * @param [in] attr Reference to attributes.
        */
-      Semaphore (const semaphore::Attributes& attr);
+      semaphore (const attributes& attr);
 
       /**
        * @brief Create a named semaphore with custom settings.
        * @param [in] name Pointer to name.
        * @param [in] attr Reference to attributes.
        */
-      Semaphore (const char* name, const semaphore::Attributes& attr);
+      semaphore (const char* name, const attributes& attr);
 
       /**
        * @cond ignore
        */
-      Semaphore (const Semaphore&) = delete;
-      Semaphore (Semaphore&&) = delete;
-      Semaphore&
-      operator= (const Semaphore&) = delete;
-      Semaphore&
-      operator= (Semaphore&&) = delete;
+      semaphore (const semaphore&) = delete;
+      semaphore (semaphore&&) = delete;
+      semaphore&
+      operator= (const semaphore&) = delete;
+      semaphore&
+      operator= (semaphore&&) = delete;
       /**
        * @endcond
        */
@@ -251,10 +251,13 @@ namespace os
       /**
        * @brief Destroy the semaphore.
        */
-      ~Semaphore ();
+      ~semaphore ();
 
       /**
        * @}
+       */
+
+      /*
        * @name Operators
        * @{
        */
@@ -265,7 +268,7 @@ namespace os
        * @retval false The semaphores are different.
        */
       bool
-      operator== (const Semaphore& rhs) const;
+      operator== (const semaphore& rhs) const;
 
       /**
        * @}
@@ -342,7 +345,7 @@ namespace os
        *  None
        * @return The semaphore value.
        */
-      semaphore::count_t
+      count_t
       value (void) const;
 
       /**
@@ -361,7 +364,7 @@ namespace os
        *  None
        * @return The numeric value set from attributes.
        */
-      semaphore::count_t
+      count_t
       initial_value (void) const;
 
       /**
@@ -370,7 +373,7 @@ namespace os
        *  None
        * @return The numeric value set from attributes.
        */
-      semaphore::count_t
+      count_t
       max_value (void) const;
 
       /**
@@ -416,13 +419,13 @@ namespace os
       os_semaphore_port_data_t port_;
 #endif
 
-      const semaphore::count_t initial_count_;
+      const count_t initial_count_;
 
       // Can be updated in different contexts (interrupts or threads)
-      volatile semaphore::count_t count_ = 0;
+      volatile count_t count_ = 0;
 
       // Constant set during construction.
-      const semaphore::count_t max_count_ = semaphore::max_count_value;
+      const count_t max_count_ = max_count_value;
 
       // Add more internal data.
 
@@ -433,7 +436,7 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-  // ========================================================================
+  // ==========================================================================
 
   } /* namespace rtos */
 } /* namespace os */
@@ -444,38 +447,34 @@ namespace os
 {
   namespace rtos
   {
-    namespace semaphore
+    // ========================================================================
+
+    constexpr
+    semaphore::attributes::attributes (const char* name) :
+        clocked_attributes
+          { name }
     {
-      // ======================================================================
+      ;
+    }
 
-      constexpr
-      Attributes::Attributes (const char* name) :
-          clocked_attributes
-            { name }
-      {
-        ;
-      }
+    constexpr
+    semaphore::attributes::attributes (const char* name, count_t max_count) :
+        clocked_attributes
+          { name }, //
+        sm_max_count (max_count)
+    {
+      ;
+    }
 
-      constexpr
-      Attributes::Attributes (const char* name, count_t max_count) :
-          clocked_attributes
-            { name }, //
-          sm_max_count (max_count)
-      {
-        ;
-      }
+    // ========================================================================
 
-      // ======================================================================
-
-      constexpr
-      Binary_attributes::Binary_attributes (const char* name) :
-          Attributes
-            { name, 1 } // Use the protected constructor.
-      {
-        ;
-      }
-
-    } /* namespace semaphore */
+    constexpr
+    semaphore::binary_attributes::binary_attributes (const char* name) :
+        attributes
+          { name, 1 } // Use the protected constructor.
+    {
+      ;
+    }
 
     // ========================================================================
 
@@ -484,7 +483,7 @@ namespace os
      * Identical semaphores should have the same memory address.
      */
     inline bool
-    Semaphore::operator== (const Semaphore& rhs) const
+    semaphore::operator== (const semaphore& rhs) const
     {
       return this == &rhs;
     }
@@ -495,7 +494,7 @@ namespace os
      *  Extension to standard, no POSIX similar functionality identified.
      */
     inline semaphore::count_t
-    Semaphore::initial_value (void) const
+    semaphore::initial_value (void) const
     {
       return initial_count_;
     }
@@ -506,7 +505,7 @@ namespace os
      *  Extension to standard, no POSIX similar functionality identified.
      */
     inline semaphore::count_t
-    Semaphore::max_value (void) const
+    semaphore::max_value (void) const
     {
       return max_count_;
     }

@@ -77,7 +77,7 @@ namespace os
     class Message_queue;
     class mutex;
     class Realtime_clock;
-    class Semaphore;
+    class semaphore;
     class Systick_clock;
     class Thread;
     class Timer;
@@ -700,30 +700,6 @@ namespace os
     // ========================================================================
 
     /**
-     * @brief %Semaphore namespace.
-     */
-    namespace semaphore
-    {
-      /**
-       * @brief Type of semaphore counter.
-       * @details
-       * A numeric value enough to hold the semaphore counter,
-       * usually a 16-bits signed value.
-       */
-      using count_t = int16_t;
-
-      /**
-       * @brief Maximum semaphore value.
-       * @details
-       * Used to validate the semaphore initial count and max count.
-       */
-      constexpr count_t max_count_value = 0x7FFF;
-
-    } /* namespace semaphore */
-
-    // ========================================================================
-
-    /**
      * @brief Base class for named objects.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      */
@@ -1036,10 +1012,10 @@ namespace os
     {
       class Thread;
       class Timer;
-      class Mutex;
+      class mutex;
 
       class Condition_variable;
-      class Semaphore;
+      class semaphore;
       class Memory_pool;
       class Message_queue;
       class Event_flags;
