@@ -397,8 +397,8 @@ namespace os
        * @param [in] attr Reference to attributes.
        * @param [in] blocks The maximum number of items in the pool.
        * @param [in] block_size_bytes The size of an item, in bytes.
-       * @param [in] queue_address Pointer to queue storage.
-       * @param [in] queue_size_bytes Size of queue storage.
+       * @param [in] pool_address Pointer to queue storage.
+       * @param [in] pool_size_bytes Size of queue storage.
        */
       void
       _construct (const mempool::Attributes& attr, mempool::size_t blocks,

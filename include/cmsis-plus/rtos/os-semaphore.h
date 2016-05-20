@@ -218,8 +218,7 @@ namespace os
 
       /**
        * @brief Create a named semaphore with default settings.
-       * @par Parameters
-       *  None
+       * @param [in] name Pointer to name.
        */
       Semaphore (const char* name);
 
@@ -231,6 +230,7 @@ namespace os
 
       /**
        * @brief Create a named semaphore with custom settings.
+       * @param [in] name Pointer to name.
        * @param [in] attr Reference to attributes.
        */
       Semaphore (const char* name, const semaphore::Attributes& attr);

@@ -1075,6 +1075,7 @@ namespace os
          * @brief Create a thread with default settings.
          * @param [in] function Pointer to thread function.
          * @param [in] args Pointer to arguments.
+         * @param [in] allocator Reference to allocator. Default a local temporary instance.
          */
         Thread_allocated (thread::func_t function, thread::func_args_t args,
                           const Allocator& allocator = Allocator ());
@@ -1084,6 +1085,7 @@ namespace os
          * @param [in] name Pointer to name.
          * @param [in] function Pointer to thread function.
          * @param [in] args Pointer to arguments.
+         * @param [in] allocator Reference to allocator. Default a local temporary instance.
          */
         Thread_allocated (const char* name, thread::func_t function,
                           thread::func_args_t args, const Allocator& allocator =
@@ -1094,6 +1096,7 @@ namespace os
          * @param [in] attr Reference to attributes.
          * @param [in] function Pointer to thread function.
          * @param [in] args Pointer to arguments.
+         * @param [in] allocator Reference to allocator. Default a local temporary instance.
          */
         Thread_allocated (const thread::Attributes& attr,
                           thread::func_t function, thread::func_args_t args,
@@ -1105,6 +1108,7 @@ namespace os
          * @param [in] attr Reference to attributes.
          * @param [in] function Pointer to thread function.
          * @param [in] args Pointer to arguments.
+         * @param [in] allocator Reference to allocator. Default a local temporary instance.
          */
         Thread_allocated (const char* name, const thread::Attributes& attr,
                           thread::func_t function, thread::func_args_t args,
