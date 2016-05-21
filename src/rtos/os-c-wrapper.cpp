@@ -738,26 +738,26 @@ os_mqueue_reset (os_mqueue_t* mqueue)
 void
 os_evflags_attr_init (os_evflags_attr_t* attr, const char* name)
 {
-  new (attr) evflags::Attributes (name);
+  new (attr) event_flags::attributes (name);
 }
 
 void
 os_evflags_create (os_evflags_t* evflags, os_evflags_attr_t* attr)
 {
-  new (evflags) Event_flags ((evflags::Attributes&) *attr);
+  new (evflags) event_flags ((event_flags::attributes&) *attr);
 }
 
 void
 os_evflags_destroy (os_evflags_t* evflags)
 {
-  (reinterpret_cast<Event_flags&> (*evflags)).~Event_flags ();
+  (reinterpret_cast<event_flags&> (*evflags)).~event_flags ();
 }
 
 os_result_t
 os_evflags_wait (os_evflags_t* evflags, os_flags_mask_t mask,
                  os_flags_mask_t* oflags, os_flags_mode_t mode)
 {
-  return (os_result_t) (reinterpret_cast<Event_flags&> (*evflags)).wait (mask,
+  return (os_result_t) (reinterpret_cast<event_flags&> (*evflags)).wait (mask,
                                                                          oflags,
                                                                          mode);
 }
@@ -766,7 +766,7 @@ os_result_t
 os_evflags_try_wait (os_evflags_t* evflags, os_flags_mask_t mask,
                      os_flags_mask_t* oflags, os_flags_mode_t mode)
 {
-  return (os_result_t) (reinterpret_cast<Event_flags&> (*evflags)).try_wait (
+  return (os_result_t) (reinterpret_cast<event_flags&> (*evflags)).try_wait (
       mask, oflags, mode);
 }
 
@@ -775,7 +775,7 @@ os_evflags_timed_wait (os_evflags_t* evflags, os_flags_mask_t mask,
                        os_clock_duration_t timeout, os_flags_mask_t* oflags,
                        os_flags_mode_t mode)
 {
-  return (os_result_t) (reinterpret_cast<Event_flags&> (*evflags)).timed_wait (
+  return (os_result_t) (reinterpret_cast<event_flags&> (*evflags)).timed_wait (
       mask, timeout, oflags, mode);
 }
 
@@ -783,7 +783,7 @@ os_result_t
 os_evflags_raise (os_evflags_t* evflags, os_flags_mask_t mask,
                   os_flags_mask_t* oflags)
 {
-  return (os_result_t) (reinterpret_cast<Event_flags&> (*evflags)).raise (
+  return (os_result_t) (reinterpret_cast<event_flags&> (*evflags)).raise (
       mask, oflags);
 }
 
@@ -791,7 +791,7 @@ os_result_t
 os_evflags_clear (os_evflags_t* evflags, os_flags_mask_t mask,
                   os_flags_mask_t* oflags)
 {
-  return (os_result_t) (reinterpret_cast<Event_flags&> (*evflags)).clear (
+  return (os_result_t) (reinterpret_cast<event_flags&> (*evflags)).clear (
       mask, oflags);
 }
 
@@ -799,14 +799,14 @@ os_flags_mask_t
 os_evflags_get (os_evflags_t* evflags, os_flags_mask_t mask,
                 os_flags_mode_t mode)
 {
-  return (os_flags_mask_t) (reinterpret_cast<Event_flags&> (*evflags)).get (
+  return (os_flags_mask_t) (reinterpret_cast<event_flags&> (*evflags)).get (
       mask, mode);
 }
 
 bool
 os_evflags_get_waiting (os_evflags_t* evflags)
 {
-  return (reinterpret_cast<Event_flags&> (*evflags)).waiting ();
+  return (reinterpret_cast<event_flags&> (*evflags)).waiting ();
 }
 
 // ****************************************************************************

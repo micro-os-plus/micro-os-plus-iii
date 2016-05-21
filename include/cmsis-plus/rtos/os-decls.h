@@ -72,7 +72,7 @@ namespace os
     class named_object;
     class Clock;
     class condition_variable;
-    class Event_flags;
+    class event_flags;
     class Memory_pool;
     class Message_queue;
     class mutex;
@@ -552,16 +552,6 @@ namespace os
     // ========================================================================
 
     /**
-     * @brief Event flags namespace.
-     */
-    namespace evflags
-    {
-
-    }
-
-    // ========================================================================
-
-    /**
      * @brief Memory pool namespace.
      */
     namespace mempool
@@ -959,7 +949,7 @@ namespace os
       class semaphore;
       class Memory_pool;
       class Message_queue;
-      class Event_flags;
+      class event_flags;
 
       namespace stack
       {

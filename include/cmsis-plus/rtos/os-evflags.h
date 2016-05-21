@@ -40,8 +40,20 @@ namespace os
 {
   namespace rtos
   {
-    namespace evflags
+
+    // ========================================================================
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+    /**
+     * @brief Synchronised **event flags**.
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
+     */
+    class event_flags : public named_object
     {
+    public:
 
       // ======================================================================
 
@@ -49,7 +61,7 @@ namespace os
        * @brief Event flags attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Attributes : public clocked_attributes
+      class attributes : public clocked_attributes
       {
       public:
 
@@ -63,17 +75,17 @@ namespace os
          * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
         constexpr
-        Attributes (const char* name);
+        attributes (const char* name);
 
         /**
          * @cond ignore
          */
-        Attributes (const Attributes&) = default;
-        Attributes (Attributes&&) = default;
-        Attributes&
-        operator= (const Attributes&) = default;
-        Attributes&
-        operator= (Attributes&&) = default;
+        attributes (const attributes&) = default;
+        attributes (attributes&&) = default;
+        attributes&
+        operator= (const attributes&) = default;
+        attributes&
+        operator= (attributes&&) = default;
         /**
          * @endcond
          */
@@ -81,7 +93,7 @@ namespace os
         /**
          * @brief Destroy the event flags attributes.
          */
-        ~Attributes () = default;
+        ~attributes () = default;
 
         /**
          * @}
@@ -96,9 +108,6 @@ namespace os
 
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
-        //
-        // TODO: add clock ID.
-        //
         // Add more attributes.
         /**
          * @}
@@ -108,23 +117,7 @@ namespace os
       /**
        * @brief Default event flags initialiser.
        */
-      extern const Attributes initializer;
-
-    } /* namespace mqueue */
-
-    // ========================================================================
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
-
-    /**
-     * @brief Synchronised **event flags**.
-     * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
-     */
-    class Event_flags : public named_object
-    {
-    public:
+      static const attributes initializer;
 
       /**
        * @name Constructors & Destructor
@@ -136,36 +129,36 @@ namespace os
        * @par Parameters
        *  None
        */
-      Event_flags ();
+      event_flags ();
 
       /**
        * @brief Create named event flags with default attributes.
        * @param [in] name Pointer to name.
        */
-      Event_flags (const char* name);
+      event_flags (const char* name);
 
       /**
        * @brief Create event flags with custom settings.
        * @param [in] attr Reference to attributes.
        */
-      Event_flags (const evflags::Attributes& attr);
+      event_flags (const attributes& attr);
 
       /**
        * @brief Create named event flags with custom settings.
        * @param [in] name Pointer to name.
        * @param [in] attr Reference to attributes.
        */
-      Event_flags (const char* name, const evflags::Attributes& attr);
+      event_flags (const char* name, const attributes& attr);
 
       /**
        * @cond ignore
        */
-      Event_flags (const Event_flags&) = delete;
-      Event_flags (Event_flags&&) = delete;
-      Event_flags&
-      operator= (const Event_flags&) = delete;
-      Event_flags&
-      operator= (Event_flags&&) = delete;
+      event_flags (const event_flags&) = delete;
+      event_flags (event_flags&&) = delete;
+      event_flags&
+      operator= (const event_flags&) = delete;
+      event_flags&
+      operator= (event_flags&&) = delete;
       /**
        * @endcond
        */
@@ -173,7 +166,7 @@ namespace os
       /**
        * @brief Destroy the event flags.
        */
-      ~Event_flags ();
+      ~event_flags ();
 
       /**
        * @}
@@ -191,7 +184,7 @@ namespace os
        * @retval false The event flags are different.
        */
       bool
-      operator== (const Event_flags& rhs) const;
+      operator== (const event_flags& rhs) const;
 
       /**
        * @}
@@ -348,7 +341,7 @@ namespace os
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
-      friend class port::Event_flags;
+      friend class port::event_flags;
       os_evflags_port_data_t port_;
 #endif
 
@@ -373,16 +366,13 @@ namespace os
 {
   namespace rtos
   {
-    namespace evflags
+    constexpr
+    event_flags::attributes::attributes (const char* name) :
+        clocked_attributes
+          { name }
     {
-      constexpr
-      Attributes::Attributes (const char* name) :
-          clocked_attributes
-            { name }
-      {
-        ;
-      }
-    } /* namespace evflags */
+      ;
+    }
 
   } /* namespace rtos */
 } /* namespace os */

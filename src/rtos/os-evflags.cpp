@@ -41,15 +41,8 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    /**
-     * @details
-     * The os::rtos::evflags namespace groups event flags attributes
-     * and initialisers.
-     */
-    namespace evflags
-    {
       /**
-       * @class Attributes
+       * @class attributes
        * @details
        * Allow to assign a name to the event flags.
        *
@@ -59,14 +52,13 @@ namespace os
        *  (IEEE Std 1003.1, 2013 Edition).
        */
 
-      const Attributes initializer
+      const event_flags::attributes event_flags::initializer
         { nullptr };
-    } /* namespace evflags */
 
     // ------------------------------------------------------------------------
 
     /**
-     * @class Event_flags
+     * @class event_flags
      * @details
      * Synchronised set of flags that can be used to notify events
      * between threads or between ISRs and threads.
@@ -74,7 +66,7 @@ namespace os
      * @par Example
      *
      * @code{.cpp}
-     * Event_flags ev;
+     * event_flags ev;
      *
      * void
      * consumer(void)
@@ -117,7 +109,7 @@ namespace os
      * This constructor shall initialise an event flags object
      * with default settings.
      * The effect shall be equivalent to creating an event flags object
-     * referring to the attributes in `evflags::initializer`.
+     * referring to the attributes in `event_flags::initializer`.
      * Upon successful initialisation, the state of the event
      * flags object shall become initialised, with all flags cleared.
      *
@@ -127,9 +119,9 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Event_flags::Event_flags () :
-        Event_flags
-          { nullptr, evflags::initializer }
+    event_flags::event_flags () :
+        event_flags
+          { nullptr, initializer }
     {
       ;
     }
@@ -139,7 +131,7 @@ namespace os
      * This constructor shall initialise a named event flags object
      * with default settings.
      * The effect shall be equivalent to creating an event flags object
-     * referring to the attributes in `evflags::initializer`.
+     * referring to the attributes in `event_flags::initializer`.
      * Upon successful initialisation, the state of the event
      * flags object shall become initialised, with all flags cleared.
      *
@@ -149,9 +141,9 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Event_flags::Event_flags (const char* name) :
-        Event_flags
-          { name, evflags::initializer }
+    event_flags::event_flags (const char* name) :
+        event_flags
+          { name, initializer }
     {
       ;
     }
@@ -170,15 +162,15 @@ namespace os
      * event flags objects.
      *
      * In cases where default event flags attributes are
-     * appropriate, the variable `evflags::initializer` can be used to
+     * appropriate, the variable `event_flags::initializer` can be used to
      * initialise event flags.
      * The effect shall be equivalent to creating an event flags object with
      * the default constructor.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Event_flags::Event_flags (const evflags::Attributes& attr) :
-        Event_flags
+    event_flags::event_flags (const attributes& attr) :
+        event_flags
           { nullptr, attr }
     {
       ;
@@ -198,14 +190,14 @@ namespace os
      * event flags objects.
      *
      * In cases where default event flags attributes are
-     * appropriate, the variable `evflags::initializer` can be used to
+     * appropriate, the variable `event_flags::initializer` can be used to
      * initialise event flags.
      * The effect shall be equivalent to creating an event flags object with
      * the default constructor.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Event_flags::Event_flags (const char* name, const evflags::Attributes& attr) :
+    event_flags::event_flags (const char* name, const attributes& attr) :
         named_object
           { name, attr.name () }
 #if !defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
@@ -220,7 +212,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
-      port::Event_flags::create (this);
+      port::event_flags::create (this);
 
 #else
 
@@ -243,7 +235,7 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Event_flags::~Event_flags ()
+    event_flags::~event_flags ()
     {
 #if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -251,7 +243,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
-      port::Event_flags::destroy (this);
+      port::event_flags::destroy (this);
 
 #else
 
@@ -261,7 +253,7 @@ namespace os
     }
 
     bool
-    Event_flags::_try_wait (flags::mask_t mask, flags::mask_t* oflags,
+    event_flags::_try_wait (flags::mask_t mask, flags::mask_t* oflags,
                             flags::mode_t mode)
     {
       if ((mask != 0) && ((mode & flags::mode::all) != 0))
@@ -319,7 +311,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Event_flags::wait (flags::mask_t mask, flags::mask_t* oflags,
+    event_flags::wait (flags::mask_t mask, flags::mask_t* oflags,
                        flags::mode_t mode)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
@@ -330,7 +322,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
-      return port::Event_flags::wait (this, mask, oflags, mode);
+      return port::event_flags::wait (this, mask, oflags, mode);
 
 #else
 
@@ -400,7 +392,7 @@ namespace os
      * @note Can be invoked from Interrupt Service Routines.
      */
     result_t
-    Event_flags::try_wait (flags::mask_t mask, flags::mask_t* oflags,
+    event_flags::try_wait (flags::mask_t mask, flags::mask_t* oflags,
                            flags::mode_t mode)
     {
 #if defined(OS_TRACE_RTOS_EVFLAGS)
@@ -409,7 +401,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
-      return port::Event_flags::try_wait (this, mask, oflags, mode);
+      return port::event_flags::try_wait (this, mask, oflags, mode);
 
 #else
 
@@ -466,7 +458,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Event_flags::timed_wait (flags::mask_t mask, clock::duration_t timeout,
+    event_flags::timed_wait (flags::mask_t mask, clock::duration_t timeout,
                              flags::mask_t* oflags, flags::mode_t mode)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
@@ -477,7 +469,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
-      return port::Event_flags::timed_wait (this, mask, timeout, oflags, mode);
+      return port::event_flags::timed_wait (this, mask, timeout, oflags, mode);
 
 #else
 
@@ -556,7 +548,7 @@ namespace os
      * @note Can be invoked from Interrupt Service Routines.
      */
     result_t
-    Event_flags::raise (flags::mask_t mask, flags::mask_t* oflags)
+    event_flags::raise (flags::mask_t mask, flags::mask_t* oflags)
     {
       os_assert_err(mask != 0, EINVAL);
 
@@ -566,7 +558,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
-      return port::Event_flags::raise (this, mask, oflags);
+      return port::event_flags::raise (this, mask, oflags);
 
 #else
         {
@@ -598,7 +590,7 @@ namespace os
      * @note Can be invoked from Interrupt Service Routines.
      */
     result_t
-    Event_flags::clear (flags::mask_t mask, flags::mask_t* oflags)
+    event_flags::clear (flags::mask_t mask, flags::mask_t* oflags)
     {
       os_assert_err(mask != 0, EINVAL);
 
@@ -608,7 +600,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
-      return port::Event_flags::clear (this, mask, oflags);
+      return port::event_flags::clear (this, mask, oflags);
 
 #else
 
@@ -639,7 +631,7 @@ namespace os
      * @note Can be invoked from Interrupt Service Routines.
      */
     flags::mask_t
-    Event_flags::get (flags::mask_t mask, flags::mode_t mode)
+    event_flags::get (flags::mask_t mask, flags::mode_t mode)
     {
 #if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s() @%p %s 0x%X \n", __func__, this, name (), mask);
@@ -647,7 +639,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
-      return port::Event_flags::get (this, mask, mode);
+      return port::event_flags::get (this, mask, mode);
 
 #else
 
@@ -678,11 +670,11 @@ namespace os
      * @note Can be invoked from Interrupt Service Routines.
      */
     bool
-    Event_flags::waiting (void)
+    event_flags::waiting (void)
     {
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
-      return port::Event_flags::waiting (this);
+      return port::event_flags::waiting (this);
 
 #else
 
