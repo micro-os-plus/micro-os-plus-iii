@@ -74,7 +74,7 @@ namespace os
     class condition_variable;
     class event_flags;
     class memory_pool;
-    class Message_queue;
+    class message_queue;
     class mutex;
     class Realtime_clock;
     class semaphore;
@@ -551,60 +551,6 @@ namespace os
 
     // ========================================================================
 
-    /**
-     * @brief Message queue namespace.
-     */
-    namespace mqueue
-    {
-      /**
-       * @brief Type of queue size.
-       * @details
-       * A numeric value to hold the message queue size, usually
-       * an 8-bits value, possibly a 16-bits value if longer
-       * queues are needed.
-       */
-#if defined(OS_BOOL_RTOS_MESSAGE_QUEUE_SIZE_16BITS)
-      using size_t = uint16_t;
-#else
-      using size_t = uint8_t;
-#endif
-
-      constexpr size_t max_size = 0xFF;
-
-      using msg_size_t = uint16_t;
-
-      constexpr msg_size_t max_msg_size = 0xFFFF;
-
-      using index_t = size_t;
-
-      constexpr index_t no_index = max_size;
-
-      /**
-       * @brief Type of message priority.
-       * @details
-       * A numeric value to hold the message priority, which
-       * controls the order in which messages are added to the
-       * queue (higher values represent higher priorities).
-       */
-      using priority_t = uint8_t;
-
-      /**
-       * @brief Default message priority.
-       * @details
-       * Use this value with `send()` if no special priorities are required.
-       */
-      constexpr priority_t default_priority = 0;
-
-      /**
-       * @brief Maximum message priority.
-       * @details
-       * The maximum value allowed by the type, usually used for
-       * validation.
-       */
-      constexpr priority_t max_priority = 0xFF;
-
-    } /* namespace mqueue */
-
     // ========================================================================
 
     /**
@@ -925,7 +871,7 @@ namespace os
       class Condition_variable;
       class semaphore;
       class memory_pool;
-      class Message_queue;
+      class message_queue;
       class event_flags;
 
       namespace stack

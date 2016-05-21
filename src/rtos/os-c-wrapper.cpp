@@ -73,8 +73,8 @@ static_assert(sizeof(semaphore::attributes) == sizeof(os_semaphore_attr_t), "adj
 static_assert(sizeof(memory_pool) == sizeof(os_mempool_t), "adjust size of os_mempool_t");
 static_assert(sizeof(memory_pool::attributes) == sizeof(os_mempool_attr_t), "adjust size of os_mempool_attr_t");
 
-static_assert(sizeof(Message_queue) == sizeof(os_mqueue_t), "adjust size of os_mqueue_t");
-static_assert(sizeof(mqueue::Attributes) == sizeof(os_mqueue_attr_t), "adjust size of os_mqueue_attr_t");
+static_assert(sizeof(message_queue) == sizeof(os_mqueue_t), "adjust size of os_mqueue_t");
+static_assert(sizeof(message_queue::attributes) == sizeof(os_mqueue_attr_t), "adjust size of os_mqueue_attr_t");
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wenum-compare"
@@ -632,28 +632,28 @@ os_mempool_get_pool (os_mempool_t* mempool)
 void
 os_mqueue_attr_init (os_mqueue_attr_t* attr, const char* name)
 {
-  new (attr) mqueue::Attributes (name);
+  new (attr) message_queue::attributes (name);
 }
 
 void
 os_mqueue_create (os_mqueue_t* mqueue, os_mqueue_attr_t* attr,
                   os_mqueue_size_t msgs, os_mqueue_size_t msg_size_bytes)
 {
-  new (mqueue) Message_queue ((mqueue::Attributes&) *attr, msgs,
+  new (mqueue) message_queue ((message_queue::attributes&) *attr, msgs,
                               msg_size_bytes);
 }
 
 void
 os_mqueue_destroy (os_mqueue_t* mqueue)
 {
-  (reinterpret_cast<Message_queue&> (*mqueue)).~Message_queue ();
+  (reinterpret_cast<message_queue&> (*mqueue)).~message_queue ();
 }
 
 os_result_t
 os_mqueue_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
                 os_mqueue_prio_t mprio)
 {
-  return (os_result_t) (reinterpret_cast<Message_queue&> (*mqueue)).send (
+  return (os_result_t) (reinterpret_cast<message_queue&> (*mqueue)).send (
       msg, nbytes, mprio);
 }
 
@@ -661,7 +661,7 @@ os_result_t
 os_mqueue_try_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
                     os_mqueue_prio_t mprio)
 {
-  return (os_result_t) (reinterpret_cast<Message_queue&> (*mqueue)).try_send (
+  return (os_result_t) (reinterpret_cast<message_queue&> (*mqueue)).try_send (
       msg, nbytes, mprio);
 }
 
@@ -669,7 +669,7 @@ os_result_t
 os_mqueue_timed_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
                       os_clock_duration_t timeout, os_mqueue_prio_t mprio)
 {
-  return (os_result_t) (reinterpret_cast<Message_queue&> (*mqueue)).timed_send (
+  return (os_result_t) (reinterpret_cast<message_queue&> (*mqueue)).timed_send (
       msg, nbytes, timeout, mprio);
 }
 
@@ -677,7 +677,7 @@ os_result_t
 os_mqueue_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
                    os_mqueue_prio_t* mprio)
 {
-  return (os_result_t) (reinterpret_cast<Message_queue&> (*mqueue)).receive (
+  return (os_result_t) (reinterpret_cast<message_queue&> (*mqueue)).receive (
       msg, nbytes, mprio);
 }
 
@@ -685,7 +685,7 @@ os_result_t
 os_mqueue_try_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
                        os_mqueue_prio_t* mprio)
 {
-  return (os_result_t) (reinterpret_cast<Message_queue&> (*mqueue)).try_receive (
+  return (os_result_t) (reinterpret_cast<message_queue&> (*mqueue)).try_receive (
       msg, nbytes, mprio);
 }
 
@@ -693,44 +693,44 @@ os_result_t
 os_mqueue_timed_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
                          os_clock_duration_t timeout, os_mqueue_prio_t* mprio)
 {
-  return (os_result_t) (reinterpret_cast<Message_queue&> (*mqueue)).timed_receive (
+  return (os_result_t) (reinterpret_cast<message_queue&> (*mqueue)).timed_receive (
       msg, nbytes, timeout, mprio);
 }
 
 size_t
 os_mqueue_get_length (os_mqueue_t* mqueue)
 {
-  return (reinterpret_cast<Message_queue&> (*mqueue)).length ();
+  return (reinterpret_cast<message_queue&> (*mqueue)).length ();
 }
 
 size_t
 os_mqueue_get_capacity (os_mqueue_t* mqueue)
 {
-  return (reinterpret_cast<Message_queue&> (*mqueue)).capacity ();
+  return (reinterpret_cast<message_queue&> (*mqueue)).capacity ();
 }
 
 size_t
 os_mqueue_get_msg_size (os_mqueue_t* mqueue)
 {
-  return (reinterpret_cast<Message_queue&> (*mqueue)).msg_size ();
+  return (reinterpret_cast<message_queue&> (*mqueue)).msg_size ();
 }
 
 bool
 os_mqueue_is_empty (os_mqueue_t* mqueue)
 {
-  return (reinterpret_cast<Message_queue&> (*mqueue)).empty ();
+  return (reinterpret_cast<message_queue&> (*mqueue)).empty ();
 }
 
 bool
 os_mqueue_is_full (os_mqueue_t* mqueue)
 {
-  return (reinterpret_cast<Message_queue&> (*mqueue)).full ();
+  return (reinterpret_cast<message_queue&> (*mqueue)).full ();
 }
 
 os_result_t
 os_mqueue_reset (os_mqueue_t* mqueue)
 {
-  return (os_result_t) (reinterpret_cast<Message_queue&> (*mqueue)).reset ();
+  return (os_result_t) (reinterpret_cast<message_queue&> (*mqueue)).reset ();
 }
 
 // --------------------------------------------------------------------------
@@ -1979,14 +1979,14 @@ osMessageCreate (const osMessageQDef_t* queue_def,
       return nullptr;
     }
 
-  mqueue::Attributes attr
+  message_queue::attributes attr
     { queue_def->name };
   attr.mq_queue_address = queue_def->queue;
   attr.mq_queue_size_bytes = queue_def->queue_sz;
 
-  return reinterpret_cast<osMessageQId> (new ((void*) queue_def->data) Message_queue (
-      attr, (mqueue::size_t) queue_def->items,
-      (mqueue::size_t) queue_def->item_sz));
+  return reinterpret_cast<osMessageQId> (new ((void*) queue_def->data) message_queue (
+      attr, (message_queue::size_t) queue_def->items,
+      (message_queue::size_t) queue_def->item_sz));
 }
 
 /**
@@ -2025,13 +2025,13 @@ osMessagePut (osMessageQId queue_id, uint32_t info, uint32_t millisec)
         {
           return osErrorParameter;
         }
-      res = (reinterpret_cast<Message_queue&> (*queue_id)).send (
+      res = (reinterpret_cast<message_queue&> (*queue_id)).send (
           (const char*) &info, sizeof(uint32_t), 0);
       // osOK, osErrorResource, osErrorParameter
     }
   else if (millisec == 0)
     {
-      res = (reinterpret_cast<Message_queue&> (*queue_id)).try_send (
+      res = (reinterpret_cast<message_queue&> (*queue_id)).try_send (
           (const char*) &info, sizeof(uint32_t), 0);
       // osOK, osErrorResource, osErrorParameter
     }
@@ -2041,7 +2041,7 @@ osMessagePut (osMessageQId queue_id, uint32_t info, uint32_t millisec)
         {
           return osErrorParameter;
         }
-      res = (reinterpret_cast<Message_queue&> (*queue_id)).timed_send (
+      res = (reinterpret_cast<message_queue&> (*queue_id)).timed_send (
           (const char*) &info, sizeof(uint32_t),
           Systick_clock::ticks_cast (millisec * 1000u), 0);
       // osOK, osErrorTimeoutResource, osErrorParameter
@@ -2115,14 +2115,14 @@ osMessageGet (osMessageQId queue_id, uint32_t millisec)
           event.status = osErrorParameter;
           return event;
         }
-      res = (reinterpret_cast<Message_queue&> (*queue_id)).receive (
+      res = (reinterpret_cast<message_queue&> (*queue_id)).receive (
           (char*) &event.value.v, sizeof(uint32_t),
           NULL);
       // result::event_message;
     }
   else if (millisec == 0)
     {
-      res = (reinterpret_cast<Message_queue&> (*queue_id)).try_receive (
+      res = (reinterpret_cast<message_queue&> (*queue_id)).try_receive (
           (char*) &event.value.v, sizeof(uint32_t), NULL);
       // result::event_message when message;
       // result::ok when no meessage
@@ -2134,7 +2134,7 @@ osMessageGet (osMessageQId queue_id, uint32_t millisec)
           event.status = osErrorParameter;
           return event;
         }
-      res = (reinterpret_cast<Message_queue&> (*queue_id)).timed_receive (
+      res = (reinterpret_cast<message_queue&> (*queue_id)).timed_receive (
           (char*) &event.value.v, sizeof(uint32_t),
           Systick_clock::ticks_cast (millisec * 1000u), NULL);
       // result::event_message when message;
@@ -2206,13 +2206,13 @@ osMailCreate (const osMailQDef_t* queue_def,
       pool_attr, (memory_pool::size_t) queue_def->items,
       (memory_pool::size_t) queue_def->pool_item_sz);
 
-  mqueue::Attributes queue_attr
+  message_queue::attributes queue_attr
     { queue_def->name };
   queue_attr.mq_queue_address = queue_def->queue;
   queue_attr.mq_queue_size_bytes = queue_def->queue_sz;
-  new ((void*) &queue_def->data->queue) Message_queue (
-      queue_attr, (mqueue::size_t) queue_def->items,
-      (mqueue::size_t) queue_def->queue_item_sz);
+  new ((void*) &queue_def->data->queue) message_queue (
+      queue_attr, (message_queue::size_t) queue_def->items,
+      (message_queue::size_t) queue_def->queue_item_sz);
 
   return (osMailQId) (queue_def->data);
 }
@@ -2346,7 +2346,7 @@ osMailPut (osMailQId queue_id, void* mail)
   result_t res;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
-  res = (reinterpret_cast<Message_queue&> (queue_id->queue)).try_send (
+  res = (reinterpret_cast<message_queue&> (queue_id->queue)).try_send (
       (const char*) &mail, sizeof(void*), 0);
 #pragma GCC diagnostic pop
   if (res == result::ok)
@@ -2400,14 +2400,14 @@ osMailGet (osMailQId mail_id, uint32_t millisec)
           event.status = osErrorParameter;
           return event;
         }
-      res = (reinterpret_cast<Message_queue&> ((mail_id->queue))).receive (
+      res = (reinterpret_cast<message_queue&> ((mail_id->queue))).receive (
           (char*) &event.value.p, sizeof(void*),
           NULL);
       // osEventMail for ok,
     }
   else if (millisec == 0)
     {
-      res = (reinterpret_cast<Message_queue&> (mail_id->queue)).try_receive (
+      res = (reinterpret_cast<message_queue&> (mail_id->queue)).try_receive (
           (char*) &event.value.p, sizeof(void*),
           NULL);
       // osEventMail for ok,
@@ -2419,7 +2419,7 @@ osMailGet (osMailQId mail_id, uint32_t millisec)
           event.status = osErrorParameter;
           return event;
         }
-      res = (reinterpret_cast<Message_queue&> (mail_id->queue)).timed_receive (
+      res = (reinterpret_cast<message_queue&> (mail_id->queue)).timed_receive (
           (char*) &event.value.p, sizeof(void*),
           Systick_clock::ticks_cast (millisec * 1000u), NULL);
       // osEventMail for ok, osEventTimeout

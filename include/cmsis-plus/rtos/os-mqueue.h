@@ -49,8 +49,70 @@ namespace os
 {
   namespace rtos
   {
-    namespace mqueue
+
+// ========================================================================
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+    /**
+     * @brief POSIX compliant **message queue**, using the
+     * default RTOS allocator.
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
+     */
+    class message_queue : public named_object
     {
+    public:
+
+      // ======================================================================
+
+      /**
+       * @brief Type of queue size.
+       * @details
+       * A numeric value to hold the message queue size, usually
+       * an 8-bits value, possibly a 16-bits value if longer
+       * queues are needed.
+       */
+#if defined(OS_BOOL_RTOS_MESSAGE_QUEUE_SIZE_16BITS)
+      using size_t = uint16_t;
+#else
+      using size_t = uint8_t;
+#endif
+
+      static constexpr size_t max_size = 0xFF;
+
+      using msg_size_t = uint16_t;
+
+      static constexpr msg_size_t max_msg_size = 0xFFFF;
+
+      using index_t = size_t;
+
+      static constexpr index_t no_index = max_size;
+
+      /**
+       * @brief Type of message priority.
+       * @details
+       * A numeric value to hold the message priority, which
+       * controls the order in which messages are added to the
+       * queue (higher values represent higher priorities).
+       */
+      using priority_t = uint8_t;
+
+      /**
+       * @brief Default message priority.
+       * @details
+       * Use this value with `send()` if no special priorities are required.
+       */
+      static constexpr priority_t default_priority = 0;
+
+      /**
+       * @brief Maximum message priority.
+       * @details
+       * The maximum value allowed by the type, usually used for
+       * validation.
+       */
+      static constexpr priority_t max_priority = 0xFF;
 
       // ======================================================================
 
@@ -58,7 +120,7 @@ namespace os
        * @brief Message queue attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Attributes : public clocked_attributes
+      class attributes : public clocked_attributes
       {
       public:
 
@@ -72,17 +134,17 @@ namespace os
          * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
         constexpr
-        Attributes (const char* name);
+        attributes (const char* name);
 
         /**
          * @cond ignore
          */
-        Attributes (const Attributes&) = default;
-        Attributes (Attributes&&) = default;
-        Attributes&
-        operator= (const Attributes&) = default;
-        Attributes&
-        operator= (Attributes&&) = default;
+        attributes (const attributes&) = default;
+        attributes (attributes&&) = default;
+        attributes&
+        operator= (const attributes&) = default;
+        attributes&
+        operator= (attributes&&) = default;
         /**
          * @endcond
          */
@@ -90,7 +152,7 @@ namespace os
         /**
          * @brief Destroy the message queue attributes.
          */
-        ~Attributes () = default;
+        ~attributes () = default;
 
         /**
          * @}
@@ -125,7 +187,7 @@ namespace os
       /**
        * @brief Default message queue initialiser.
        */
-      extern const Attributes initializer;
+      static const attributes initializer;
 
       // Storage for a message queue. Each message is stored in an element
       // extended to a multiple of pointers. The lists are kept in two arrays
@@ -135,10 +197,8 @@ namespace os
         {
         public:
           T queue[(msgs * msg_size_bytes + sizeof(T) - 1) / sizeof(T)];
-          T links[((2 * msgs) * sizeof(mqueue::index_t) + sizeof(T) - 1)
-              / sizeof(T)];
-          T prios[(msgs * sizeof(mqueue::priority_t) + sizeof(T) - 1)
-              / sizeof(T)];
+          T links[((2 * msgs) * sizeof(index_t) + sizeof(T) - 1) / sizeof(T)];
+          T prios[(msgs * sizeof(priority_t) + sizeof(T) - 1) / sizeof(T)];
         };
 
       template<typename T>
@@ -149,31 +209,16 @@ namespace os
           // Align each message
           return (msgs * ((msg_size_bytes + (sizeof(T) - 1)) & ~(sizeof(T) - 1)))
           // Align the indices array
-              + ((2 * msgs * sizeof(mqueue::index_t) + (sizeof(T) - 1))
+              + ((2 * msgs * sizeof(index_t) + (sizeof(T) - 1))
                   & ~(sizeof(T) - 1))
               // Align the priority array
-              + ((msgs * sizeof(mqueue::priority_t) + (sizeof(T) - 1))
+              + ((msgs * sizeof(priority_t) + (sizeof(T) - 1))
                   & ~(sizeof(T) - 1));
         }
 
-    } /* namespace mqueue */
-
-// ========================================================================
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
-
-    /**
-     * @brief POSIX compliant **message queue**, using the
-     * default RTOS allocator.
-     * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
-     */
-    class Message_queue : public named_object
-    {
-    public:
-
       using Allocator = memory::allocator<stack::allocation_element_t>;
+
+      // ======================================================================
 
       /**
        * @name Constructors & Destructor
@@ -184,9 +229,10 @@ namespace os
        * @brief Create a message queue with default settings.
        * @param [in] msgs The number of messages.
        * @param [in] msg_size_bytes The message size, in bytes.
-       * @param [in] allocator Reference to allocator. Default a local temporary instance.
+       * @param [in] allocator Reference to allocator. Default a
+       * local temporary instance.
        */
-      Message_queue (mqueue::size_t msgs, mqueue::msg_size_t msg_size_bytes,
+      message_queue (size_t msgs, msg_size_t msg_size_bytes,
                      const Allocator& allocator = Allocator ());
 
       /**
@@ -194,10 +240,10 @@ namespace os
        * @param [in] name Pointer to name.
        * @param [in] msgs The number of messages.
        * @param [in] msg_size_bytes The message size, in bytes.
-       * @param [in] allocator Reference to allocator. Default a local temporary instance.
+       * @param [in] allocator Reference to allocator. Default a
+       * local temporary instance.
        */
-      Message_queue (const char* name, mqueue::size_t msgs,
-                     mqueue::msg_size_t msg_size_bytes,
+      message_queue (const char* name, size_t msgs, msg_size_t msg_size_bytes,
                      const Allocator& allocator = Allocator ());
 
       /**
@@ -205,11 +251,12 @@ namespace os
        * @param [in] attr Reference to attributes.
        * @param [in] msgs The number of messages.
        * @param [in] msg_size_bytes The message size, in bytes.
-       * @param [in] allocator Reference to allocator. Default a local temporary instance.
+       * @param [in] allocator Reference to allocator. Default a
+       * local temporary instance.
        */
-      Message_queue (const mqueue::Attributes& attr, mqueue::size_t msgs,
-                     mqueue::msg_size_t msg_size_bytes,
-                     const Allocator& allocator = Allocator ());
+      message_queue (const attributes& attr, size_t msgs,
+                     msg_size_t msg_size_bytes, const Allocator& allocator =
+                         Allocator ());
 
       /**
        * @brief Create a named message queue with custom settings.
@@ -217,11 +264,12 @@ namespace os
        * @param [in] attr Reference to attributes.
        * @param [in] msgs The number of messages.
        * @param [in] msg_size_bytes The message size, in bytes.
-       * @param [in] allocator Reference to allocator. Default a local temporary instance.
+       * @param [in] allocator Reference to allocator. Default a
+       * local temporary instance.
        */
-      Message_queue (const char* name, const mqueue::Attributes& attr,
-                     mqueue::size_t msgs, mqueue::msg_size_t msg_size_bytes,
-                     const Allocator& allocator = Allocator ());
+      message_queue (const char* name, const attributes& attr, size_t msgs,
+                     msg_size_t msg_size_bytes, const Allocator& allocator =
+                         Allocator ());
 
     protected:
 
@@ -230,18 +278,18 @@ namespace os
        */
 
       // Internal constructors, used from templates.
-      Message_queue ();
-      Message_queue (const char* name);
-      Message_queue (const char* given_name, const char* attr_name);
+      message_queue ();
+      message_queue (const char* name);
+      message_queue (const char* given_name, const char* attr_name);
 
     public:
 
-      Message_queue (const Message_queue&) = delete;
-      Message_queue (Message_queue&&) = delete;
-      Message_queue&
-      operator= (const Message_queue&) = delete;
-      Message_queue&
-      operator= (Message_queue&&) = delete;
+      message_queue (const message_queue&) = delete;
+      message_queue (message_queue&&) = delete;
+      message_queue&
+      operator= (const message_queue&) = delete;
+      message_queue&
+      operator= (message_queue&&) = delete;
       /**
        * @endcond
        */
@@ -250,7 +298,7 @@ namespace os
        * @brief Destroy the message queue.
        */
       virtual
-      ~Message_queue ();
+      ~message_queue ();
 
       /**
        * @}
@@ -267,7 +315,7 @@ namespace os
        * @retval false The memory queues are different.
        */
       bool
-      operator== (const Message_queue& rhs) const;
+      operator== (const message_queue& rhs) const;
 
       /**
        * @}
@@ -296,8 +344,8 @@ namespace os
        * @retval EINTR The operation was interrupted.
        */
       result_t
-      send (const void* msg, std::size_t nbytes, mqueue::priority_t mprio =
-                mqueue::default_priority);
+      send (const void* msg, std::size_t nbytes, priority_t mprio =
+                default_priority);
 
       /**
        * @brief Try to send a message to the queue.
@@ -314,8 +362,8 @@ namespace os
        *  (extension to POSIX).
        */
       result_t
-      try_send (const void* msg, std::size_t nbytes, mqueue::priority_t mprio =
-                    mqueue::default_priority);
+      try_send (const void* msg, std::size_t nbytes, priority_t mprio =
+                    default_priority);
 
       /**
        * @brief Send a message to the queue with timeout.
@@ -337,8 +385,8 @@ namespace os
        */
       result_t
       timed_send (const void* msg, std::size_t nbytes,
-                  clock::duration_t timeout, mqueue::priority_t mprio =
-                      mqueue::default_priority);
+                  clock::duration_t timeout,
+                  priority_t mprio = default_priority);
 
       /**
        * @brief Receive a message from the queue.
@@ -359,8 +407,7 @@ namespace os
        * @retval EINTR The operation was interrupted.
        */
       result_t
-      receive (void* msg, std::size_t nbytes, mqueue::priority_t* mprio =
-                   nullptr);
+      receive (void* msg, std::size_t nbytes, priority_t* mprio = nullptr);
 
       /**
        * @brief Try to receive a message from the queue.
@@ -380,8 +427,7 @@ namespace os
        * @retval EWOULDBLOCK The specified message queue is empty.
        */
       result_t
-      try_receive (void* msg, std::size_t nbytes, mqueue::priority_t* mprio =
-                       nullptr);
+      try_receive (void* msg, std::size_t nbytes, priority_t* mprio = nullptr);
 
       /**
        * @brief Receive a message from the queue with timeout.
@@ -406,7 +452,7 @@ namespace os
        */
       result_t
       timed_receive (void* msg, std::size_t nbytes, clock::duration_t timeout,
-                     mqueue::priority_t* mprio = nullptr);
+                     priority_t* mprio = nullptr);
 
       // TODO: check if some kind of peek() is useful.
 
@@ -488,8 +534,8 @@ namespace os
        * @return Nothing.
        */
       void
-      _construct (const mqueue::Attributes& attr, mqueue::size_t msgs,
-                  mqueue::msg_size_t msg_size_bytes, void* queue_address,
+      _construct (const attributes& attr, size_t msgs,
+                  msg_size_t msg_size_bytes, void* queue_address,
                   std::size_t queue_size_bytes);
 
       /**
@@ -513,7 +559,7 @@ namespace os
        * @retval false The message queue is full.
        */
       bool
-      _try_send (const void* msg, std::size_t nbytes, mqueue::priority_t mprio);
+      _try_send (const void* msg, std::size_t nbytes, priority_t mprio);
 
       /**
        * @brief Internal function used to dequeue a message, if available.
@@ -526,7 +572,7 @@ namespace os
        * @retval false There are not messages in the queue.
        */
       bool
-      _try_receive (void* msg, std::size_t nbytes, mqueue::priority_t* mprio);
+      _try_receive (void* msg, std::size_t nbytes, priority_t* mprio);
 
 #endif /* !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE) */
 
@@ -561,15 +607,15 @@ namespace os
       /**
        * @brief Pointer to array with indices to previous nodes.
        */
-      volatile mqueue::index_t* prev_array_ = nullptr;
+      volatile index_t* prev_array_ = nullptr;
       /**
        * @brief Pointer to array with indices to next nodes.
        */
-      volatile mqueue::index_t* next_array_ = nullptr;
+      volatile index_t* next_array_ = nullptr;
       /**
        * @brief Pointer to array of priorities.
        */
-      volatile mqueue::priority_t* prio_array_ = nullptr;
+      volatile priority_t* prio_array_ = nullptr;
 
       /**
        * @brief Pointer to the first free message, or `nullptr`.
@@ -599,7 +645,7 @@ namespace os
       const void* allocator_ = nullptr;
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
-      friend class port::Message_queue;
+      friend class port::message_queue;
       os_mqueue_port_data_t port_;
 #endif
 
@@ -616,21 +662,21 @@ namespace os
       /**
        * @brief Message size (aligned to size of pointer)
        */
-      mqueue::msg_size_t msg_size_bytes_ = 0;
+      msg_size_t msg_size_bytes_ = 0;
       /**
        * @brief Max number of messages.
        */
-      mqueue::size_t msgs_ = 0;
+      size_t msgs_ = 0;
       /**
        * @brief Current number of messages in the queue.
        */
-      mqueue::size_t count_ = 0;
+      size_t count_ = 0;
 
 #if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
       /**
        * @brief Index of the first message in the queue.
        */
-      mqueue::index_t head_ = 0;
+      index_t head_ = 0;
 #endif /* !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE) */
 
       /**
@@ -646,7 +692,7 @@ namespace os
      * @ingroup cmsis-plus-rtos
      */
     template<typename Allocator = memory::allocator<void*>>
-      class Message_queue_allocated : public Message_queue
+      class message_queue_allocated : public message_queue
       {
       public:
 
@@ -661,10 +707,10 @@ namespace os
          * @brief Create a message queue with default settings.
          * @param [in] msgs The number of messages.
          * @param [in] msg_size_bytes The message size, in bytes.
-         * @param [in] allocator Reference to allocator. Default a local temporary instance.
+         * @param [in] allocator Reference to allocator. Default a
+         * local temporary instance.
          */
-        Message_queue_allocated (mqueue::size_t msgs,
-                                 mqueue::msg_size_t msg_size_bytes,
+        message_queue_allocated (size_t msgs, msg_size_t msg_size_bytes,
                                  const Allocator& allocator = Allocator ());
 
         /**
@@ -672,10 +718,11 @@ namespace os
          * @param [in] name Pointer to name.
          * @param [in] msgs The number of messages.
          * @param [in] msg_size_bytes The message size, in bytes.
-         * @param [in] allocator Reference to allocator. Default a local temporary instance.
+         * @param [in] allocator Reference to allocator. Default a
+         * local temporary instance.
          */
-        Message_queue_allocated (const char* name, mqueue::size_t msgs,
-                                 mqueue::msg_size_t msg_size_bytes,
+        message_queue_allocated (const char* name, size_t msgs,
+                                 msg_size_t msg_size_bytes,
                                  const Allocator& allocator = Allocator ());
 
         /**
@@ -683,11 +730,11 @@ namespace os
          * @param [in] attr Reference to attributes.
          * @param [in] msgs The number of messages.
          * @param [in] msg_size_bytes The message size, in bytes.
-         * @param [in] allocator Reference to allocator. Default a local temporary instance.
+         * @param [in] allocator Reference to allocator. Default a
+         * local temporary instance.
          */
-        Message_queue_allocated (const mqueue::Attributes& attr,
-                                 mqueue::size_t msgs,
-                                 mqueue::msg_size_t msg_size_bytes,
+        message_queue_allocated (const attributes& attr, size_t msgs,
+                                 msg_size_t msg_size_bytes,
                                  const Allocator& allocator = Allocator ());
 
         /**
@@ -696,12 +743,11 @@ namespace os
          * @param [in] attr Reference to attributes.
          * @param [in] msgs The number of messages.
          * @param [in] msg_size_bytes The message size, in bytes.
-         * @param [in] allocator Reference to allocator. Default a local temporary instance.
+         * @param [in] allocator Reference to allocator. Default a
+         * local temporary instance.
          */
-        Message_queue_allocated (const char* name,
-                                 const mqueue::Attributes& attr,
-                                 mqueue::size_t msgs,
-                                 mqueue::msg_size_t msg_size_bytes,
+        message_queue_allocated (const char* name, const attributes& attr,
+                                 size_t msgs, msg_size_t msg_size_bytes,
                                  const Allocator& allocator = Allocator ());
 
         /**
@@ -709,12 +755,12 @@ namespace os
          */
       public:
 
-        Message_queue_allocated (const Message_queue_allocated&) = delete;
-        Message_queue_allocated (Message_queue_allocated&&) = delete;
-        Message_queue_allocated&
-        operator= (const Message_queue_allocated&) = delete;
-        Message_queue_allocated&
-        operator= (Message_queue_allocated&&) = delete;
+        message_queue_allocated (const message_queue_allocated&) = delete;
+        message_queue_allocated (message_queue_allocated&&) = delete;
+        message_queue_allocated&
+        operator= (const message_queue_allocated&) = delete;
+        message_queue_allocated&
+        operator= (message_queue_allocated&&) = delete;
         /**
          * @endcond
          */
@@ -723,7 +769,7 @@ namespace os
          * @brief Destroy the message queue.
          */
         virtual
-        ~Message_queue_allocated ();
+        ~message_queue_allocated ();
 
         /**
          * @}
@@ -740,7 +786,7 @@ namespace os
      * @ingroup cmsis-plus-rtos
      */
     template<typename T, typename Allocator = memory::allocator<void*>>
-      class Message_queue_typed : public Message_queue_allocated<Allocator>
+      class message_queue_typed : public message_queue_allocated<Allocator>
       {
       public:
 
@@ -755,50 +801,53 @@ namespace os
         /**
          * @brief Create a typed message queue with default settings.
          * @param [in] msgs The number of messages.
-         * @param [in] allocator Reference to allocator. Default a local temporary instance.
+         * @param [in] allocator Reference to allocator. Default a
+         * local temporary instance.
          */
-        Message_queue_typed (mqueue::size_t msgs, const Allocator& allocator =
+        message_queue_typed (size_t msgs, const Allocator& allocator =
                                  Allocator ());
 
         /**
          * @brief Create a named typed message queue with default settings.
          * @param [in] name Pointer to name.
          * @param [in] msgs The number of messages.
-         * @param [in] allocator Reference to allocator. Default a local temporary instance.
+         * @param [in] allocator Reference to allocator. Default a
+         * local temporary instance.
          */
-        Message_queue_typed (const char* name, mqueue::size_t msgs,
+        message_queue_typed (const char* name, size_t msgs,
                              const Allocator& allocator = Allocator ());
 
         /**
          * @brief Create a typed message queue with custom settings.
          * @param [in] attr Reference to attributes.
          * @param [in] msgs The number of messages.
-         * @param [in] allocator Reference to allocator. Default a local temporary instance.
+         * @param [in] allocator Reference to allocator. Default a
+         * local temporary instance.
          */
-        Message_queue_typed (const mqueue::Attributes& attr,
-                             mqueue::size_t msgs, const Allocator& allocator =
-                                 Allocator ());
+        message_queue_typed (const message_queue::attributes& attr, size_t msgs,
+                             const Allocator& allocator = Allocator ());
 
         /**
          * @brief Create a named typed message queue with custom settings.
          * @param [in] name Pointer to name.
          * @param [in] attr Reference to attributes.
          * @param [in] msgs The number of messages.
-         * @param [in] allocator Reference to allocator. Default a local temporary instance.
+         * @param [in] allocator Reference to allocator. Default a
+         * local temporary instance.
          */
-        Message_queue_typed (const char* name, const mqueue::Attributes& attr,
-                             mqueue::size_t msgs, const Allocator& allocator =
-                                 Allocator ());
+        message_queue_typed (const char* name,
+                             const message_queue::attributes& attr, size_t msgs,
+                             const Allocator& allocator = Allocator ());
 
         /**
          * @cond ignore
          */
-        Message_queue_typed (const Message_queue_typed&) = delete;
-        Message_queue_typed (Message_queue_typed&&) = delete;
-        Message_queue_typed&
-        operator= (const Message_queue_typed&) = delete;
-        Message_queue_typed&
-        operator= (Message_queue_typed&&) = delete;
+        message_queue_typed (const message_queue_typed&) = delete;
+        message_queue_typed (message_queue_typed&&) = delete;
+        message_queue_typed&
+        operator= (const message_queue_typed&) = delete;
+        message_queue_typed&
+        operator= (message_queue_typed&&) = delete;
         /**
          * @endcond
          */
@@ -807,7 +856,7 @@ namespace os
          * @brief Destroy the typed message queue.
          */
         virtual
-        ~Message_queue_typed ();
+        ~message_queue_typed ();
 
         /**
          * @}
@@ -834,8 +883,8 @@ namespace os
          * @retval EINTR The operation was interrupted.
          */
         result_t
-        send (const value_type* msg, mqueue::priority_t mprio =
-                  mqueue::default_priority);
+        send (const value_type* msg, message_queue::priority_t mprio =
+                  message_queue::default_priority);
 
         /**
          * @brief Try to send a typed message to the queue.
@@ -851,8 +900,8 @@ namespace os
          *  (extension to POSIX).
          */
         result_t
-        try_send (const value_type* msg, mqueue::priority_t mprio =
-                      mqueue::default_priority);
+        try_send (const value_type* msg, message_queue::priority_t mprio =
+                      message_queue::default_priority);
 
         /**
          * @brief Send a typed message to the queue with timeout.
@@ -872,7 +921,8 @@ namespace os
          */
         result_t
         timed_send (const value_type* msg, clock::duration_t timeout,
-                    mqueue::priority_t mprio = mqueue::default_priority);
+                    message_queue::priority_t mprio =
+                        message_queue::default_priority);
 
         /**
          * @brief Receive a typed message from the queue.
@@ -891,7 +941,7 @@ namespace os
          * @retval EINTR The operation was interrupted.
          */
         result_t
-        receive (value_type* msg, mqueue::priority_t* mprio = nullptr);
+        receive (value_type* msg, message_queue::priority_t* mprio = nullptr);
 
         /**
          * @brief Try to receive a typed message from the queue.
@@ -910,7 +960,8 @@ namespace os
          * @retval EWOULDBLOCK The specified message queue is empty.
          */
         result_t
-        try_receive (value_type* msg, mqueue::priority_t* mprio = nullptr);
+        try_receive (value_type* msg,
+                     message_queue::priority_t* mprio = nullptr);
 
         /**
          * @brief Receive a typed message from the queue with timeout.
@@ -933,7 +984,7 @@ namespace os
          */
         result_t
         timed_receive (value_type* msg, clock::duration_t timeout,
-                       mqueue::priority_t* mprio = nullptr);
+                       message_queue::priority_t* mprio = nullptr);
 
         /**
          * @}
@@ -950,7 +1001,7 @@ namespace os
      * @ingroup cmsis-plus-rtos
      */
     template<typename T, std::size_t N>
-      class Message_queue_static : public Message_queue
+      class message_queue_static : public message_queue
       {
       public:
 
@@ -965,36 +1016,36 @@ namespace os
         /**
          * @brief Create a typed message queue with default settings.
          */
-        Message_queue_static ();
+        message_queue_static ();
 
         /**
          * @brief Create a named typed message queue with default settings.
          * @param [in] name Pointer to name.
          */
-        Message_queue_static (const char* name);
+        message_queue_static (const char* name);
 
         /**
          * @brief Create a typed message queue with custom settings.
          * @param [in] attr Reference to attributes.
          */
-        Message_queue_static (const mqueue::Attributes& attr);
+        message_queue_static (const attributes& attr);
 
         /**
          * @brief Create a named typed message queue with custom settings.
          * @param [in] name Pointer to name.
          * @param [in] attr Reference to attributes.
          */
-        Message_queue_static (const char* name, const mqueue::Attributes& attr);
+        message_queue_static (const char* name, const attributes& attr);
 
         /**
          * @cond ignore
          */
-        Message_queue_static (const Message_queue_static&) = delete;
-        Message_queue_static (Message_queue_static&&) = delete;
-        Message_queue_static&
-        operator= (const Message_queue_static&) = delete;
-        Message_queue_static&
-        operator= (Message_queue_static&&) = delete;
+        message_queue_static (const message_queue_static&) = delete;
+        message_queue_static (message_queue_static&&) = delete;
+        message_queue_static&
+        operator= (const message_queue_static&) = delete;
+        message_queue_static&
+        operator= (message_queue_static&&) = delete;
         /**
          * @endcond
          */
@@ -1003,7 +1054,7 @@ namespace os
          * @brief Destroy the typed message queue.
          */
         virtual
-        ~Message_queue_static ();
+        ~message_queue_static ();
 
         /**
          * @}
@@ -1030,8 +1081,7 @@ namespace os
          * @retval EINTR The operation was interrupted.
          */
         result_t
-        send (const value_type* msg, mqueue::priority_t mprio =
-                  mqueue::default_priority);
+        send (const value_type* msg, priority_t mprio = default_priority);
 
         /**
          * @brief Try to send a typed message to the queue.
@@ -1047,8 +1097,7 @@ namespace os
          *  (extension to POSIX).
          */
         result_t
-        try_send (const value_type* msg, mqueue::priority_t mprio =
-                      mqueue::default_priority);
+        try_send (const value_type* msg, priority_t mprio = default_priority);
 
         /**
          * @brief Send a typed message to the queue with timeout.
@@ -1068,7 +1117,7 @@ namespace os
          */
         result_t
         timed_send (const value_type* msg, clock::duration_t timeout,
-                    mqueue::priority_t mprio = mqueue::default_priority);
+                    priority_t mprio = default_priority);
 
         /**
          * @brief Receive a typed message from the queue.
@@ -1087,7 +1136,7 @@ namespace os
          * @retval EINTR The operation was interrupted.
          */
         result_t
-        receive (value_type* msg, mqueue::priority_t* mprio = nullptr);
+        receive (value_type* msg, priority_t* mprio = nullptr);
 
         /**
          * @brief Try to receive a typed message from the queue.
@@ -1106,7 +1155,7 @@ namespace os
          * @retval EWOULDBLOCK The specified message queue is empty.
          */
         result_t
-        try_receive (value_type* msg, mqueue::priority_t* mprio = nullptr);
+        try_receive (value_type* msg, priority_t* mprio = nullptr);
 
         /**
          * @brief Receive a typed message from the queue with timeout.
@@ -1129,7 +1178,7 @@ namespace os
          */
         result_t
         timed_receive (value_type* msg, clock::duration_t timeout,
-                       mqueue::priority_t* mprio = nullptr);
+                       priority_t* mprio = nullptr);
 
         /**
          * @}
@@ -1151,7 +1200,7 @@ namespace os
          * For performance reasons, the individual components are
          * aligned as pointers.
          */
-        mqueue::Arena<void*, msgs, sizeof(value_type)> arena_;
+        Arena<void*, msgs, sizeof(value_type)> arena_;
 
         /**
          * @}
@@ -1171,17 +1220,13 @@ namespace os
 {
   namespace rtos
   {
-    namespace mqueue
+    constexpr
+    message_queue::attributes::attributes (const char* name) :
+        clocked_attributes
+          { name }
     {
-      constexpr
-      Attributes::Attributes (const char* name) :
-          clocked_attributes
-            { name }
-      {
-        ;
-      }
-
-    } /* namespace mqueue */
+      ;
+    }
 
     // ========================================================================
 
@@ -1193,7 +1238,7 @@ namespace os
      *  Extension to standard, no POSIX similar functionality identified.
      */
     inline bool
-    Message_queue::operator== (const Message_queue& rhs) const
+    message_queue::operator== (const message_queue& rhs) const
     {
       return this == &rhs;
     }
@@ -1204,7 +1249,7 @@ namespace os
      *  Extension to standard, no POSIX similar functionality identified.
      */
     inline std::size_t
-    Message_queue::length (void) const
+    message_queue::length (void) const
     {
       return count_;
     }
@@ -1215,7 +1260,7 @@ namespace os
      *  Extension to standard, no POSIX similar functionality identified.
      */
     inline std::size_t
-    Message_queue::capacity (void) const
+    message_queue::capacity (void) const
     {
       return msgs_;
     }
@@ -1226,7 +1271,7 @@ namespace os
      *  Extension to standard, no POSIX similar functionality identified.
      */
     inline std::size_t
-    Message_queue::msg_size (void) const
+    message_queue::msg_size (void) const
     {
       return msg_size_bytes_;
     }
@@ -1237,7 +1282,7 @@ namespace os
      *  Extension to standard, no POSIX similar functionality identified.
      */
     inline bool
-    Message_queue::empty (void) const
+    message_queue::empty (void) const
     {
       return (length () == 0);
     }
@@ -1248,7 +1293,7 @@ namespace os
      *  Extension to standard, no POSIX similar functionality identified.
      */
     inline bool
-    Message_queue::full (void) const
+    message_queue::full (void) const
     {
       return (length () == capacity ());
     }
@@ -1260,7 +1305,7 @@ namespace os
      * This constructor shall initialise a message queue object
      * with the given number of messages and default settings.
      * The effect shall be equivalent to creating a message queue object
-     * referring to the attributes in `mqueue::initializer`.
+     * referring to the attributes in `message_queue::initializer`.
      * Upon successful initialisation, the state of the message queue
      * object shall become initialised, with no messages in the queue.
      *
@@ -1276,10 +1321,9 @@ namespace os
      */
     template<typename Allocator>
       inline
-      Message_queue_allocated<Allocator>::Message_queue_allocated (
-          mqueue::size_t msgs, mqueue::msg_size_t msg_size_bytes,
-          const Allocator& allocator) :
-          Message_queue_allocated
+      message_queue_allocated<Allocator>::message_queue_allocated (
+          size_t msgs, msg_size_t msg_size_bytes, const Allocator& allocator) :
+          message_queue_allocated
             { nullptr, msgs, msg_size_bytes, allocator }
       {
         ;
@@ -1290,7 +1334,7 @@ namespace os
      * This constructor shall initialise a named message queue object
      * with the given number of messages and default settings.
      * The effect shall be equivalent to creating a message queue object
-     * referring to the attributes in `mqueue::initializer`.
+     * referring to the attributes in `message_queue::initializer`.
      * Upon successful initialisation, the state of the message queue
      * object shall become initialised, with no messages in the queue.
      *
@@ -1305,10 +1349,10 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     template<typename Allocator>
-      Message_queue_allocated<Allocator>::Message_queue_allocated (
-          const char* name, mqueue::size_t msgs,
-          mqueue::msg_size_t msg_size_bytes, const Allocator& allocator) :
-          Message_queue
+      message_queue_allocated<Allocator>::message_queue_allocated (
+          const char* name, size_t msgs, msg_size_t msg_size_bytes,
+          const Allocator& allocator) :
+          message_queue
             { name }
       {
 #if defined(OS_TRACE_RTOS_MQUEUE)
@@ -1318,7 +1362,7 @@ namespace os
 
         allocator_ = &allocator;
 
-        allocated_queue_size_elements_ = (mqueue::compute_allocated_size_bytes<
+        allocated_queue_size_elements_ = (compute_allocated_size_bytes<
             typename Allocator::value_type> (msgs, msg_size_bytes)
             + sizeof(typename Allocator::value_type) - 1)
             / sizeof(typename Allocator::value_type);
@@ -1327,7 +1371,7 @@ namespace os
             allocated_queue_size_elements_);
 
         _construct (
-            mqueue::initializer,
+            initializer,
             msgs,
             msg_size_bytes,
             allocated_queue_addr_,
@@ -1349,7 +1393,7 @@ namespace os
      * message queue objects.
      *
      * In cases where default message queue attributes are
-     * appropriate, the variable `mqueue::initializer` can be used to
+     * appropriate, the variable `message_queue::initializer` can be used to
      * initialise message queue.
      * The effect shall be equivalent to creating a message queue
      * object with the simple constructor.
@@ -1363,10 +1407,10 @@ namespace os
      */
     template<typename Allocator>
       inline
-      Message_queue_allocated<Allocator>::Message_queue_allocated (
-          const mqueue::Attributes& attr, mqueue::size_t msgs,
-          mqueue::msg_size_t msg_size_bytes, const Allocator& allocator) :
-          Message_queue_allocated
+      message_queue_allocated<Allocator>::message_queue_allocated (
+          const attributes& attr, size_t msgs, msg_size_t msg_size_bytes,
+          const Allocator& allocator) :
+          message_queue_allocated
             { nullptr, attr, msgs, msg_size_bytes, allocator }
       {
         ;
@@ -1386,7 +1430,7 @@ namespace os
      * message queue objects.
      *
      * In cases where default message queue attributes are
-     * appropriate, the variable `mqueue::initializer` can be used to
+     * appropriate, the variable `message_queue::initializer` can be used to
      * initialise message queue.
      * The effect shall be equivalent to creating a message queue
      * object with the simple constructor.
@@ -1399,10 +1443,10 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     template<typename Allocator>
-      Message_queue_allocated<Allocator>::Message_queue_allocated (
-          const char* name, const mqueue::Attributes& attr, mqueue::size_t msgs,
-          mqueue::msg_size_t msg_size_bytes, const Allocator& allocator) :
-          Message_queue
+      message_queue_allocated<Allocator>::message_queue_allocated (
+          const char* name, const attributes& attr, size_t msgs,
+          msg_size_t msg_size_bytes, const Allocator& allocator) :
+          message_queue
             { name, attr.name () }
       {
 #if defined(OS_TRACE_RTOS_MQUEUE)
@@ -1421,11 +1465,10 @@ namespace os
 
             // If no user storage was provided via attributes,
             // allocate it dynamically via the allocator.
-            allocated_queue_size_elements_ =
-                (mqueue::compute_allocated_size_bytes<
-                    typename Allocator::value_type> (msgs, msg_size_bytes)
-                    + sizeof(typename Allocator::value_type) - 1)
-                    / sizeof(typename Allocator::value_type);
+            allocated_queue_size_elements_ = (compute_allocated_size_bytes<
+                typename Allocator::value_type> (msgs, msg_size_bytes)
+                + sizeof(typename Allocator::value_type) - 1)
+                / sizeof(typename Allocator::value_type);
 
             allocated_queue_addr_ =
                 const_cast<Allocator&> (allocator).allocate (
@@ -1456,7 +1499,7 @@ namespace os
      * it is deallocated using the same allocator.
      */
     template<typename Allocator>
-      Message_queue_allocated<Allocator>::~Message_queue_allocated ()
+      message_queue_allocated<Allocator>::~message_queue_allocated ()
       {
 #if defined(OS_TRACE_RTOS_MQUEUE)
         trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -1480,7 +1523,7 @@ namespace os
      * This constructor shall initialise a message queue object
      * with the given number of messages and default settings.
      * The effect shall be equivalent to creating a message queue object
-     * referring to the attributes in `mqueue::initializer`.
+     * referring to the attributes in `message_queue::initializer`.
      * Upon successful initialisation, the state of the message queue
      * object shall become initialised, with no messages in the queue.
      *
@@ -1499,9 +1542,9 @@ namespace os
      */
     template<typename T, typename Allocator>
       inline
-      Message_queue_typed<T, Allocator>::Message_queue_typed (
-          mqueue::size_t msgs, const Allocator& allocator) :
-          Message_queue_allocated<Allocator> (msgs, sizeof(value_type),
+      message_queue_typed<T, Allocator>::message_queue_typed (
+          size_t msgs, const Allocator& allocator) :
+          message_queue_allocated<Allocator> (msgs, sizeof(value_type),
                                               allocator)
       {
         ;
@@ -1512,7 +1555,7 @@ namespace os
      * This constructor shall initialise a named message queue object
      * with the given number of messages and default settings.
      * The effect shall be equivalent to creating a message queue object
-     * referring to the attributes in `mqueue::initializer`.
+     * referring to the attributes in `message_queue::initializer`.
      * Upon successful initialisation, the state of the message queue
      * object shall become initialised, with no messages in the queue.
      *
@@ -1531,9 +1574,9 @@ namespace os
      */
     template<typename T, typename Allocator>
       inline
-      Message_queue_typed<T, Allocator>::Message_queue_typed (
-          const char* name, mqueue::size_t msgs, const Allocator& allocator) :
-          Message_queue_allocated<Allocator> (name, msgs, sizeof(value_type),
+      message_queue_typed<T, Allocator>::message_queue_typed (
+          const char* name, size_t msgs, const Allocator& allocator) :
+          message_queue_allocated<Allocator> (name, msgs, sizeof(value_type),
                                               allocator)
       {
         ;
@@ -1553,7 +1596,7 @@ namespace os
      * message queue objects.
      *
      * In cases where default message queue attributes are
-     * appropriate, the variable `mqueue::initializer` can be used to
+     * appropriate, the variable `message_queue::initializer` can be used to
      * initialise message queue.
      * The effect shall be equivalent to creating a message queue
      * object with the simple constructor.
@@ -1570,10 +1613,10 @@ namespace os
      */
     template<typename T, typename Allocator>
       inline
-      Message_queue_typed<T, Allocator>::Message_queue_typed (
-          const mqueue::Attributes& attr, mqueue::size_t msgs,
+      message_queue_typed<T, Allocator>::message_queue_typed (
+          const message_queue::attributes& attr, size_t msgs,
           const Allocator& allocator) :
-          Message_queue_allocated<Allocator>
+          message_queue_allocated<Allocator>
             { attr, msgs, sizeof(value_type), allocator }
       {
         ;
@@ -1593,7 +1636,7 @@ namespace os
      * message queue objects.
      *
      * In cases where default message queue attributes are
-     * appropriate, the variable `mqueue::initializer` can be used to
+     * appropriate, the variable `message_queue::initializer` can be used to
      * initialise message queue.
      * The effect shall be equivalent to creating a message queue
      * object with the simple constructor.
@@ -1610,10 +1653,10 @@ namespace os
      */
     template<typename T, typename Allocator>
       inline
-      Message_queue_typed<T, Allocator>::Message_queue_typed (
-          const char* name, const mqueue::Attributes& attr, mqueue::size_t msgs,
+      message_queue_typed<T, Allocator>::message_queue_typed (
+          const char* name, const message_queue::attributes& attr, size_t msgs,
           const Allocator& allocator) :
-          Message_queue_allocated<Allocator>
+          message_queue_allocated<Allocator>
             { name, attr, msgs, sizeof(value_type), allocator }
       {
         ;
@@ -1636,7 +1679,7 @@ namespace os
      * Implemented as a wrapper over the parent destructor.
      */
     template<typename T, typename Allocator>
-      Message_queue_typed<T, Allocator>::~Message_queue_typed ()
+      message_queue_typed<T, Allocator>::~message_queue_typed ()
       {
         ;
       }
@@ -1646,14 +1689,14 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue::send().
+     * @see message_queue::send().
      */
     template<typename T, typename Allocator>
       inline result_t
-      Message_queue_typed<T, Allocator>::send (const value_type* msg,
-                                               mqueue::priority_t mprio)
+      message_queue_typed<T, Allocator>::send (const value_type* msg,
+                                               message_queue::priority_t mprio)
       {
-        return Message_queue_allocated<Allocator>::send (
+        return message_queue_allocated<Allocator>::send (
             reinterpret_cast<const char*> (msg), sizeof(value_type), mprio);
       }
 
@@ -1662,14 +1705,14 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue::try_send().
+     * @see message_queue::try_send().
      */
     template<typename T, typename Allocator>
       inline result_t
-      Message_queue_typed<T, Allocator>::try_send (const value_type* msg,
-                                                   mqueue::priority_t mprio)
+      message_queue_typed<T, Allocator>::try_send (
+          const value_type* msg, message_queue::priority_t mprio)
       {
-        return Message_queue_allocated<Allocator>::try_send (
+        return message_queue_allocated<Allocator>::try_send (
             reinterpret_cast<const char*> (msg), sizeof(value_type), mprio);
       }
 
@@ -1678,15 +1721,15 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue::timed_send().
+     * @see message_queue::timed_send().
      */
     template<typename T, typename Allocator>
       inline result_t
-      Message_queue_typed<T, Allocator>::timed_send (const value_type* msg,
-                                                     clock::duration_t timeout,
-                                                     mqueue::priority_t mprio)
+      message_queue_typed<T, Allocator>::timed_send (
+          const value_type* msg, clock::duration_t timeout,
+          message_queue::priority_t mprio)
       {
-        return Message_queue_allocated<Allocator>::timed_send (
+        return message_queue_allocated<Allocator>::timed_send (
             reinterpret_cast<const char*> (msg), sizeof(value_type), timeout,
             mprio);
       }
@@ -1696,14 +1739,14 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue::receive().
+     * @see message_queue::receive().
      */
     template<typename T, typename Allocator>
       inline result_t
-      Message_queue_typed<T, Allocator>::receive (value_type* msg,
-                                                  mqueue::priority_t* mprio)
+      message_queue_typed<T, Allocator>::receive (
+          value_type* msg, message_queue::priority_t* mprio)
       {
-        return Message_queue_allocated<Allocator>::receive (
+        return message_queue_allocated<Allocator>::receive (
             reinterpret_cast<char*> (msg), sizeof(value_type), mprio);
       }
 
@@ -1712,14 +1755,14 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue::try_receive().
+     * @see message_queue::try_receive().
      */
     template<typename T, typename Allocator>
       inline result_t
-      Message_queue_typed<T, Allocator>::try_receive (value_type* msg,
-                                                      mqueue::priority_t* mprio)
+      message_queue_typed<T, Allocator>::try_receive (
+          value_type* msg, message_queue::priority_t* mprio)
       {
-        return Message_queue_allocated<Allocator>::try_receive (
+        return message_queue_allocated<Allocator>::try_receive (
             reinterpret_cast<char*> (msg), sizeof(value_type), mprio);
       }
 
@@ -1728,14 +1771,15 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue::timed_receive().
+     * @see message_queue::timed_receive().
      */
     template<typename T, typename Allocator>
       inline result_t
-      Message_queue_typed<T, Allocator>::timed_receive (
-          value_type* msg, clock::duration_t timeout, mqueue::priority_t* mprio)
+      message_queue_typed<T, Allocator>::timed_receive (
+          value_type* msg, clock::duration_t timeout,
+          message_queue::priority_t* mprio)
       {
-        return Message_queue_allocated<Allocator>::timed_receive (
+        return message_queue_allocated<Allocator>::timed_receive (
             reinterpret_cast<char*> (msg), sizeof(value_type), timeout, mprio);
       }
 
@@ -1746,7 +1790,7 @@ namespace os
      * This constructor shall initialise a message queue object
      * with the given number of messages and default settings.
      * The effect shall be equivalent to creating a message queue object
-     * referring to the attributes in `mqueue::initializer`.
+     * referring to the attributes in `message_queue::initializer`.
      * Upon successful initialisation, the state of the message queue
      * object shall become initialised, with no messages in the queue.
      *
@@ -1768,9 +1812,9 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     template<typename T, std::size_t N>
-      Message_queue_static<T, N>::Message_queue_static ()
+      message_queue_static<T, N>::message_queue_static ()
       {
-        _construct (mqueue::initializer, msgs, sizeof(value_type), &arena_,
+        _construct (initializer, msgs, sizeof(value_type), &arena_,
                     sizeof(arena_));
       }
 
@@ -1779,7 +1823,7 @@ namespace os
      * This constructor shall initialise a named message queue object
      * with the given number of messages and default settings.
      * The effect shall be equivalent to creating a message queue object
-     * referring to the attributes in `mqueue::initializer`.
+     * referring to the attributes in `message_queue::initializer`.
      * Upon successful initialisation, the state of the message queue
      * object shall become initialised, with no messages in the queue.
      *
@@ -1801,11 +1845,11 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     template<typename T, std::size_t N>
-      Message_queue_static<T, N>::Message_queue_static (const char* name) :
-          Message_queue
+      message_queue_static<T, N>::message_queue_static (const char* name) :
+          message_queue
             { name }
       {
-        _construct (mqueue::initializer, msgs, sizeof(value_type), &arena_,
+        _construct (initializer, msgs, sizeof(value_type), &arena_,
                     sizeof(arena_));
       }
 
@@ -1823,7 +1867,7 @@ namespace os
      * message queue objects.
      *
      * In cases where default message queue attributes are
-     * appropriate, the variable `mqueue::initializer` can be used to
+     * appropriate, the variable `message_queue::initializer` can be used to
      * initialise message queue.
      * The effect shall be equivalent to creating a message queue
      * object with the simple constructor.
@@ -1845,9 +1889,8 @@ namespace os
      */
     template<typename T, std::size_t N>
       inline
-      Message_queue_static<T, N>::Message_queue_static (
-          const mqueue::Attributes& attr) :
-          Message_queue_static
+      message_queue_static<T, N>::message_queue_static (const attributes& attr) :
+          message_queue_static
             { nullptr, attr }
       {
         ;
@@ -1867,7 +1910,7 @@ namespace os
      * message queue objects.
      *
      * In cases where default message queue attributes are
-     * appropriate, the variable `mqueue::initializer` can be used to
+     * appropriate, the variable `message_queue::initializer` can be used to
      * initialise message queue.
      * The effect shall be equivalent to creating a message queue
      * object with the simple constructor.
@@ -1888,9 +1931,9 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     template<typename T, std::size_t N>
-      Message_queue_static<T, N>::Message_queue_static (
-          const char* name, const mqueue::Attributes& attr) :
-          Message_queue (name, attr.name ())
+      message_queue_static<T, N>::message_queue_static (const char* name,
+                                                        const attributes& attr) :
+          message_queue (name, attr.name ())
       {
         _construct (attr, msgs, sizeof(value_type), &arena_, sizeof(arena_));
       }
@@ -1909,7 +1952,7 @@ namespace os
      * Implemented as a wrapper over the parent destructor.
      */
     template<typename T, std::size_t N>
-      Message_queue_static<T, N>::~Message_queue_static ()
+      message_queue_static<T, N>::~message_queue_static ()
       {
         ;
       }
@@ -1919,14 +1962,13 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue::send().
+     * @see message_queue::send().
      */
     template<typename T, std::size_t N>
       inline result_t
-      Message_queue_static<T, N>::send (const value_type* msg,
-                                        mqueue::priority_t mprio)
+      message_queue_static<T, N>::send (const value_type* msg, priority_t mprio)
       {
-        return Message_queue::send (reinterpret_cast<const char*> (msg),
+        return message_queue::send (reinterpret_cast<const char*> (msg),
                                     sizeof(value_type), mprio);
       }
 
@@ -1935,14 +1977,14 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue::try_send().
+     * @see message_queue::try_send().
      */
     template<typename T, std::size_t N>
       inline result_t
-      Message_queue_static<T, N>::try_send (const value_type* msg,
-                                            mqueue::priority_t mprio)
+      message_queue_static<T, N>::try_send (const value_type* msg,
+                                            priority_t mprio)
       {
-        return Message_queue::try_send (reinterpret_cast<const char*> (msg),
+        return message_queue::try_send (reinterpret_cast<const char*> (msg),
                                         sizeof(value_type), mprio);
       }
 
@@ -1951,15 +1993,15 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue::timed_send().
+     * @see message_queue::timed_send().
      */
     template<typename T, std::size_t N>
       inline result_t
-      Message_queue_static<T, N>::timed_send (const value_type* msg,
+      message_queue_static<T, N>::timed_send (const value_type* msg,
                                               clock::duration_t timeout,
-                                              mqueue::priority_t mprio)
+                                              priority_t mprio)
       {
-        return Message_queue::timed_send (reinterpret_cast<const char*> (msg),
+        return message_queue::timed_send (reinterpret_cast<const char*> (msg),
                                           sizeof(value_type), timeout, mprio);
       }
 
@@ -1968,14 +2010,13 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue::receive().
+     * @see message_queue::receive().
      */
     template<typename T, std::size_t N>
       inline result_t
-      Message_queue_static<T, N>::receive (value_type* msg,
-                                           mqueue::priority_t* mprio)
+      message_queue_static<T, N>::receive (value_type* msg, priority_t* mprio)
       {
-        return Message_queue::receive (reinterpret_cast<char*> (msg),
+        return message_queue::receive (reinterpret_cast<char*> (msg),
                                        sizeof(value_type), mprio);
       }
 
@@ -1984,14 +2025,14 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue::try_receive().
+     * @see message_queue::try_receive().
      */
     template<typename T, std::size_t N>
       inline result_t
-      Message_queue_static<T, N>::try_receive (value_type* msg,
-                                               mqueue::priority_t* mprio)
+      message_queue_static<T, N>::try_receive (value_type* msg,
+                                               priority_t* mprio)
       {
-        return Message_queue::try_receive (reinterpret_cast<char*> (msg),
+        return message_queue::try_receive (reinterpret_cast<char*> (msg),
                                            sizeof(value_type), mprio);
       }
 
@@ -2000,15 +2041,15 @@ namespace os
      * Wrapper over the parent method, automatically
      * passing the message size.
      *
-     * @see Message_queue::timed_receive().
+     * @see message_queue::timed_receive().
      */
     template<typename T, std::size_t N>
       inline result_t
-      Message_queue_static<T, N>::timed_receive (value_type* msg,
+      message_queue_static<T, N>::timed_receive (value_type* msg,
                                                  clock::duration_t timeout,
-                                                 mqueue::priority_t* mprio)
+                                                 priority_t* mprio)
       {
-        return Message_queue::timed_receive (reinterpret_cast<char*> (msg),
+        return message_queue::timed_receive (reinterpret_cast<char*> (msg),
                                              sizeof(value_type), timeout, mprio);
       }
 
