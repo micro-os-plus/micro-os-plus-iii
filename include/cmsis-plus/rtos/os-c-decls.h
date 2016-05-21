@@ -166,8 +166,8 @@ extern "C"
 
   typedef struct os_thread_s
   {
-    const char* name;
     void* vtbl;
+    const char* name;
 #if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
     os_waiting_thread_node_t ready_node;
 #endif
@@ -401,8 +401,8 @@ extern "C"
 
   typedef struct os_mempool_s
   {
-    const char* name;
     void* vtbl;
+    const char* name;
 #if !defined(OS_INCLUDE_RTOS_PORT_MEMORY_POOL)
     os_threads_waiting_list_t list;
     void* clock;
@@ -443,8 +443,8 @@ extern "C"
 
   typedef struct os_mqueue_s
   {
-    const char* name;
     void* vtbl;
+    const char* name;
 #if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
     os_threads_waiting_list_t send_list;
     os_threads_waiting_list_t receive_list;
