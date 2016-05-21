@@ -70,8 +70,8 @@ static_assert(sizeof(condition_variable::attributes) == sizeof(os_condvar_attr_t
 static_assert(sizeof(semaphore) == sizeof(os_semaphore_t), "adjust size of os_semaphore_t");
 static_assert(sizeof(semaphore::attributes) == sizeof(os_semaphore_attr_t), "adjust size of os_semaphore_attr_t");
 
-static_assert(sizeof(Memory_pool) == sizeof(os_mempool_t), "adjust size of os_mempool_t");
-static_assert(sizeof(mempool::Attributes) == sizeof(os_mempool_attr_t), "adjust size of os_mempool_attr_t");
+static_assert(sizeof(memory_pool) == sizeof(os_mempool_t), "adjust size of os_mempool_t");
+static_assert(sizeof(memory_pool::attributes) == sizeof(os_mempool_attr_t), "adjust size of os_mempool_attr_t");
 
 static_assert(sizeof(Message_queue) == sizeof(os_mqueue_t), "adjust size of os_mqueue_t");
 static_assert(sizeof(mqueue::Attributes) == sizeof(os_mqueue_attr_t), "adjust size of os_mqueue_attr_t");
@@ -544,87 +544,87 @@ os_semaphore_get_max_value (os_semaphore_t* semaphore)
 void
 os_mempool_attr_init (os_mempool_attr_t* attr, const char* name)
 {
-  new (attr) mempool::Attributes (name);
+  new (attr) memory_pool::attributes (name);
 }
 
 void
 os_mempool_create (os_mempool_t* mempool, os_mempool_attr_t* attr,
                    os_mempool_size_t blocks, os_mempool_size_t block_size_bytes)
 {
-  new (mempool) Memory_pool ((mempool::Attributes&) *attr, blocks,
+  new (mempool) memory_pool ((memory_pool::attributes&) *attr, blocks,
                              block_size_bytes);
 }
 
 void
 os_mempool_destroy (os_mempool_t* mempool)
 {
-  (reinterpret_cast<Memory_pool&> (*mempool)).~Memory_pool ();
+  (reinterpret_cast<memory_pool&> (*mempool)).~memory_pool ();
 }
 
 void*
 os_mempool_alloc (os_mempool_t* mempool)
 {
-  return (reinterpret_cast<Memory_pool&> (*mempool)).alloc ();
+  return (reinterpret_cast<memory_pool&> (*mempool)).alloc ();
 }
 
 void*
 os_mempool_try_alloc (os_mempool_t* mempool)
 {
-  return (reinterpret_cast<Memory_pool&> (*mempool)).try_alloc ();
+  return (reinterpret_cast<memory_pool&> (*mempool)).try_alloc ();
 }
 
 void*
 os_mempool_timed_alloc (os_mempool_t* mempool, os_clock_duration_t timeout)
 {
-  return (reinterpret_cast<Memory_pool&> (*mempool)).timed_alloc (timeout);
+  return (reinterpret_cast<memory_pool&> (*mempool)).timed_alloc (timeout);
 }
 
 os_result_t
 os_mempool_free (os_mempool_t* mempool, void* block)
 {
-  return (os_result_t) (reinterpret_cast<Memory_pool&> (*mempool)).free (block);
+  return (os_result_t) (reinterpret_cast<memory_pool&> (*mempool)).free (block);
 }
 
 size_t
 os_mempool_get_capacity (os_mempool_t* mempool)
 {
-  return (reinterpret_cast<Memory_pool&> (*mempool)).capacity ();
+  return (reinterpret_cast<memory_pool&> (*mempool)).capacity ();
 }
 
 size_t
 os_mempool_get_count (os_mempool_t* mempool)
 {
-  return (reinterpret_cast<Memory_pool&> (*mempool)).count ();
+  return (reinterpret_cast<memory_pool&> (*mempool)).count ();
 }
 
 size_t
 os_mempool_get_block_size (os_mempool_t* mempool)
 {
-  return (reinterpret_cast<Memory_pool&> (*mempool)).block_size ();
+  return (reinterpret_cast<memory_pool&> (*mempool)).block_size ();
 }
 
 bool
 os_mempool_is_empty (os_mempool_t* mempool)
 {
-  return (reinterpret_cast<Memory_pool&> (*mempool)).empty ();
+  return (reinterpret_cast<memory_pool&> (*mempool)).empty ();
 }
 
 bool
 os_mempool_is_full (os_mempool_t* mempool)
 {
-  return (reinterpret_cast<Memory_pool&> (*mempool)).full ();
+  return (reinterpret_cast<memory_pool&> (*mempool)).full ();
 }
 
 os_result_t
 os_mempool_reset (os_mempool_t* mempool)
 {
-  return (os_result_t) (reinterpret_cast<Memory_pool&> (*mempool)).reset ();
+  return (os_result_t) (reinterpret_cast<memory_pool&> (*mempool)).reset ();
 }
 
 void*
 os_mempool_get_pool (os_mempool_t* mempool)
 {
-  return (void*) (reinterpret_cast<Memory_pool&> (*mempool)).pool ();
+  return (void*) (reinterpret_cast<memory_pool&> (*mempool)).pool ();
 }
 
 // --------------------------------------------------------------------------
@@ -1865,13 +1865,13 @@ osPoolCreate (const osPoolDef_t* pool_def)
       return nullptr;
     }
 
-  mempool::Attributes attr
+  memory_pool::attributes attr
     { pool_def->name };
   attr.mp_pool_address = pool_def->pool;
   attr.mp_pool_size_bytes = pool_def->pool_sz;
-  return reinterpret_cast<osPoolId> (new ((void*) pool_def->data) Memory_pool (
-      attr, (mempool::size_t) pool_def->items,
-      (mempool::size_t) pool_def->item_sz));
+  return reinterpret_cast<osPoolId> (new ((void*) pool_def->data) memory_pool (
+      attr, (memory_pool::size_t) pool_def->items,
+      (memory_pool::size_t) pool_def->item_sz));
 }
 
 /**
@@ -1888,7 +1888,7 @@ osPoolAlloc (osPoolId pool_id)
       return nullptr;
     }
 
-  return (reinterpret_cast<Memory_pool&> (*pool_id)).try_alloc ();
+  return (reinterpret_cast<memory_pool&> (*pool_id)).try_alloc ();
 }
 
 /**
@@ -1906,11 +1906,11 @@ osPoolCAlloc (osPoolId pool_id)
     }
 
   void* ret;
-  ret = (reinterpret_cast<Memory_pool&> (*pool_id)).try_alloc ();
+  ret = (reinterpret_cast<memory_pool&> (*pool_id)).try_alloc ();
   if (ret != nullptr)
     {
       memset (ret, 0,
-              (reinterpret_cast<Memory_pool&> (*pool_id)).block_size ());
+              (reinterpret_cast<memory_pool&> (*pool_id)).block_size ());
     }
 
   return ret;
@@ -1936,7 +1936,7 @@ osPoolFree (osPoolId pool_id, void* block)
     }
 
   result_t res;
-  res = (reinterpret_cast<Memory_pool&> (*pool_id)).free (block);
+  res = (reinterpret_cast<memory_pool&> (*pool_id)).free (block);
 
   if (res == result::ok)
     {
@@ -2198,13 +2198,13 @@ osMailCreate (const osMailQDef_t* queue_def,
       return nullptr;
     }
 
-  mempool::Attributes pool_attr
+  memory_pool::attributes pool_attr
     { queue_def->name };
   pool_attr.mp_pool_address = queue_def->pool;
   pool_attr.mp_pool_size_bytes = queue_def->pool_sz;
-  new ((void*) &queue_def->data->pool) Memory_pool (
-      pool_attr, (mempool::size_t) queue_def->items,
-      (mempool::size_t) queue_def->pool_item_sz);
+  new ((void*) &queue_def->data->pool) memory_pool (
+      pool_attr, (memory_pool::size_t) queue_def->items,
+      (memory_pool::size_t) queue_def->pool_item_sz);
 
   mqueue::Attributes queue_attr
     { queue_def->name };
@@ -2258,11 +2258,11 @@ osMailAlloc (osMailQId queue_id, uint32_t millisec)
         {
           return nullptr;
         }
-      ret = (reinterpret_cast<Memory_pool&> (queue_id->pool)).alloc ();
+      ret = (reinterpret_cast<memory_pool&> (queue_id->pool)).alloc ();
     }
   else if (millisec == 0)
     {
-      ret = (reinterpret_cast<Memory_pool&> (queue_id->pool)).try_alloc ();
+      ret = (reinterpret_cast<memory_pool&> (queue_id->pool)).try_alloc ();
     }
   else
     {
@@ -2270,7 +2270,7 @@ osMailAlloc (osMailQId queue_id, uint32_t millisec)
         {
           return nullptr;
         }
-      ret = (reinterpret_cast<Memory_pool&> (queue_id->pool)).timed_alloc (
+      ret = (reinterpret_cast<memory_pool&> (queue_id->pool)).timed_alloc (
           Systick_clock::ticks_cast (millisec * 1000u));
     }
 #pragma GCC diagnostic pop
@@ -2309,7 +2309,7 @@ osMailCAlloc (osMailQId queue_id, uint32_t millisec)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
       memset (ret, 0,
-              (reinterpret_cast<Memory_pool&> (queue_id->pool)).block_size ());
+              (reinterpret_cast<memory_pool&> (queue_id->pool)).block_size ());
 #pragma GCC diagnostic pop
     }
   return ret;
@@ -2335,7 +2335,7 @@ osMailPut (osMailQId queue_id, void* mail)
     }
 
   // Validate pointer.
-  Memory_pool* pool = reinterpret_cast<Memory_pool*> (&queue_id->pool);
+  memory_pool* pool = reinterpret_cast<memory_pool*> (&queue_id->pool);
   if (((char*) mail < (char*) (pool->pool ()))
       || (((char*) mail)
           >= ((char*) (pool->pool ()) + pool->capacity () * pool->block_size ())))

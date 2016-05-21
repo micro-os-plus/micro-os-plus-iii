@@ -45,96 +45,87 @@ namespace os
     // ------------------------------------------------------------------------
 
     /**
+     * @class attributes
      * @details
-     * The os::rtos::mempool namespace groups memory pool attributes
-     * and initialisers.
+     * Allow to assign a name and custom attributes (like a static
+     * address) to the memory pool.
+     *
+     * To simplify access, the member variables are public and do not
+     * require accessors or mutators.
+     *
+     * @par Example
+     *
+     * Define an array of structures and
+     * pass its address and size via the attributes.
+     *
+     * @code{.cpp}
+     * // Define the type of one pool block.
+     * typedef struct {
+     *   uint32_t length;
+     *   uint32_t width;
+     *   uint32_t height;
+     *   uint32_t weight;
+     * } properties_t;
+     *
+     * // Define the pool size.
+     * constexpr uint32_t pool_size = 10;
+     *
+     * // Allocate static storage for the pool.
+     * properties_t pool[pool_size];
+     *
+     * void
+     * func(void)
+     * {
+     *    // Do something
+     *
+     *    // Define pool attributes.
+     *    memory_pool::attributes attr { "properties" };
+     *    attr.mp_pool_address = pool;
+     *    attr.mp_pool_size_bytes = sizeof(pool);
+     *
+     *    // Create the pool object.
+     *    memory_pool mp { attr, pool_size, sizeof(properties_t) };
+     *
+     *    // Do something else.
+     * }
+     * @endcode
+     *
+     * @par POSIX compatibility
+     *  No POSIX similar functionality identified, but inspired by POSIX
+     *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  (IEEE Std 1003.1, 2013 Edition).
      */
-    namespace mempool
-    {
-      /**
-       * @class Attributes
-       * @details
-       * Allow to assign a name and custom attributes (like a static
-       * address) to the memory pool.
-       *
-       * To simplify access, the member variables are public and do not
-       * require accessors or mutators.
-       *
-       * @par Example
-       *
-       * Define an array of structures and
-       * pass its address and size via the attributes.
-       *
-       * @code{.cpp}
-       * // Define the type of one pool block.
-       * typedef struct {
-       *   uint32_t length;
-       *   uint32_t width;
-       *   uint32_t height;
-       *   uint32_t weight;
-       * } properties_t;
-       *
-       * // Define the pool size.
-       * constexpr uint32_t pool_size = 10;
-       *
-       * // Allocate static storage for the pool.
-       * properties_t pool[pool_size];
-       *
-       * void
-       * func(void)
-       * {
-       *    // Do something
-       *
-       *    // Define pool attributes.
-       *    mempool::Attributes attr { "properties" };
-       *    attr.mp_pool_address = pool;
-       *    attr.mp_pool_size_bytes = sizeof(pool);
-       *
-       *    // Create the pool object.
-       *    Memory_pool mp { attr, pool_size, sizeof(properties_t) };
-       *
-       *    // Do something else.
-       * }
-       * @endcode
-       *
-       * @par POSIX compatibility
-       *  No POSIX similar functionality identified, but inspired by POSIX
-       *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
-       */
 
-      /**
-       * @var void* Attributes::mp_pool_address
-       * @details
-       * Set this variable to a user defined memory area large enough
-       * to store the memory pool. Usually this is a statically
-       * allocated array of structures.
-       *
-       * The default value is `nullptr`, which means there is no
-       * user defined memory pool.
-       */
+    /**
+     * @var void* attributes::mp_pool_address
+     * @details
+     * Set this variable to a user defined memory area large enough
+     * to store the memory pool. Usually this is a statically
+     * allocated array of structures.
+     *
+     * The default value is `nullptr`, which means there is no
+     * user defined memory pool.
+     */
 
-      /**
-       * @var size_t Attributes::mp_pool_size_bytes
-       * @details
-       * The memory pool size must match exactly the allocated size. It is
-       * used for validation; when the memory pool is initialised,
-       * this size must be large enough to accommodate the desired
-       * memory pool.
-       *
-       * If the @ref mp_pool_address is `nullptr`, this variable is not
-       * checked, but it is recommended to leave it zero.
-       */
+    /**
+     * @var size_t attributes::mp_pool_size_bytes
+     * @details
+     * The memory pool size must match exactly the allocated size. It is
+     * used for validation; when the memory pool is initialised,
+     * this size must be large enough to accommodate the desired
+     * memory pool.
+     *
+     * If the @ref mp_pool_address is `nullptr`, this variable is not
+     * checked, but it is recommended to leave it zero.
+     */
 
-      const Attributes initializer
-        { nullptr };
-
-    } /* namespace mempool */
+    const memory_pool::attributes memory_pool::initializer
+      { nullptr };
 
     // ------------------------------------------------------------------------
 
     /**
-     * @class Memory_pool
+     * @class memory_pool
      * @details
      * Manage a pool of same size blocks. Fast and deterministic allocation
      * and dealocation behaviour, suitable for use even in ISRs.
@@ -154,7 +145,7 @@ namespace os
      * constexpr uint32_t pool_size = 10;
      *
      * // Create the pool object.
-     * Memory_pool mp { pool_size, sizeof(properties_t) };
+     * memory_pool mp { pool_size, sizeof(properties_t) };
      *
      * void
      * func(void)
@@ -189,14 +180,14 @@ namespace os
 
     // ------------------------------------------------------------------------
     // Protected internal constructor.
-    Memory_pool::Memory_pool ()
+    memory_pool::memory_pool ()
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
     }
 
-    Memory_pool::Memory_pool (const char* name) :
+    memory_pool::memory_pool (const char* name) :
         named_object
           { name }
     {
@@ -205,7 +196,7 @@ namespace os
 #endif
     }
 
-    Memory_pool::Memory_pool (const char* given_name, const char* attr_name) :
+    memory_pool::memory_pool (const char* given_name, const char* attr_name) :
         named_object
           { given_name, attr_name }
     {
@@ -218,7 +209,7 @@ namespace os
      * This constructor shall initialise a memory pool object
      * with the given number of blocks and default settings.
      * The effect shall be equivalent to creating a memory pool object
-     * referring to the attributes in `mempool::initializer`.
+     * referring to the attributes in `memory_pool::initializer`.
      * Upon successful initialisation, the state of the memory
      * pool shall become initialised, with all blocks available.
      *
@@ -232,10 +223,9 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Memory_pool::Memory_pool (mempool::size_t blocks,
-                              mempool::size_t block_size_bytes,
+    memory_pool::memory_pool (size_t blocks, size_t block_size_bytes,
                               const Allocator& allocator) :
-        Memory_pool
+        memory_pool
           { nullptr, blocks, block_size_bytes, allocator }
     {
       ;
@@ -245,7 +235,7 @@ namespace os
      * This constructor shall initialise a named memory pool object
      * with the given number of blocks and default settings.
      * The effect shall be equivalent to creating a memory pool object
-     * referring to the attributes in `mempool::initializer`.
+     * referring to the attributes in `memory_pool::initializer`.
      * Upon successful initialisation, the state of the memory
      * pool shall become initialised, with all blocks available.
      *
@@ -259,8 +249,8 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Memory_pool::Memory_pool (const char* name, mempool::size_t blocks,
-                              mempool::size_t block_size_bytes,
+    memory_pool::memory_pool (const char* name, size_t blocks,
+                              size_t block_size_bytes,
                               const Allocator& allocator) :
         named_object
           { name }
@@ -271,7 +261,7 @@ namespace os
 #endif
       allocator_ = &allocator;
 
-      allocated_pool_size_elements_ = (mempool::compute_allocated_size_bytes<
+      allocated_pool_size_elements_ = (compute_allocated_size_bytes<
           typename Allocator::value_type> (blocks, block_size_bytes)
           + sizeof(typename Allocator::value_type) - 1)
           / sizeof(typename Allocator::value_type);
@@ -280,7 +270,7 @@ namespace os
           allocated_pool_size_elements_);
 
       _construct (
-          mempool::initializer,
+          initializer,
           blocks,
           block_size_bytes,
           allocated_pool_addr_,
@@ -301,7 +291,7 @@ namespace os
      * condition variable objects.
      *
      * In cases where default memory pool attributes are
-     * appropriate, the variable `mempool::initializer` can be used to
+     * appropriate, the variable `memory_pool::initializer` can be used to
      * initialise condition variables.
      * The effect shall be equivalent to creating a memory pool object with
      * the simple constructor.
@@ -313,11 +303,10 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Memory_pool::Memory_pool (const mempool::Attributes& attr,
-                              mempool::size_t blocks,
-                              mempool::size_t block_size_bytes,
+    memory_pool::memory_pool (const attributes& attr, size_t blocks,
+                              size_t block_size_bytes,
                               const Allocator& allocator) :
-        Memory_pool
+        memory_pool
           { nullptr, attr, blocks, block_size_bytes, allocator }
     {
       ;
@@ -336,7 +325,7 @@ namespace os
      * condition variable objects.
      *
      * In cases where default memory pool attributes are
-     * appropriate, the variable `mempool::initializer` can be used to
+     * appropriate, the variable `memory_pool::initializer` can be used to
      * initialise condition variables.
      * The effect shall be equivalent to creating a memory pool object with
      * the simple constructor.
@@ -348,9 +337,8 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Memory_pool::Memory_pool (const char* name, const mempool::Attributes& attr,
-                              mempool::size_t blocks,
-                              mempool::size_t block_size_bytes,
+    memory_pool::memory_pool (const char* name, const attributes& attr,
+                              size_t blocks, size_t block_size_bytes,
                               const Allocator& allocator) :
         named_object
           { name, attr.name () }
@@ -370,11 +358,10 @@ namespace os
 
           // If no user storage was provided via attributes,
           // allocate it dynamically via the allocator.
-          allocated_pool_size_elements_ =
-              (mempool::compute_allocated_size_bytes<
-                  typename Allocator::value_type> (blocks, block_size_bytes)
-                  + sizeof(typename Allocator::value_type) - 1)
-                  / sizeof(typename Allocator::value_type);
+          allocated_pool_size_elements_ = (compute_allocated_size_bytes<
+              typename Allocator::value_type> (blocks, block_size_bytes)
+              + sizeof(typename Allocator::value_type) - 1)
+              / sizeof(typename Allocator::value_type);
 
           allocated_pool_addr_ = const_cast<Allocator&> (allocator).allocate (
               allocated_pool_size_elements_);
@@ -390,10 +377,9 @@ namespace os
     }
 
     void
-    Memory_pool::_construct (const mempool::Attributes& attr,
-                             mempool::size_t blocks,
-                             mempool::size_t block_size_bytes,
-                             void* pool_address, std::size_t pool_size_bytes)
+    memory_pool::_construct (const attributes& attr, size_t blocks,
+                             size_t block_size_bytes, void* pool_address,
+                             std::size_t pool_size_bytes)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
@@ -407,9 +393,9 @@ namespace os
       // Adjust block size to multiple of pointer.
       // Blocks must be large enough to store a pointer, used
       // to construct the list of free blocks.
-      block_size_bytes_ = (static_cast<mempool::size_t> (block_size_bytes
+      block_size_bytes_ = (static_cast<size_t> (block_size_bytes
           + __SIZEOF_POINTER__ - 1))
-          & (static_cast<mempool::size_t> (~(__SIZEOF_POINTER__ - 1)));
+          & (static_cast<size_t> (~(__SIZEOF_POINTER__ - 1)));
 
       // If the storage is given explicitly, override attributes.
       if (pool_address != nullptr)
@@ -438,7 +424,7 @@ namespace os
                      blocks_, block_size_bytes_, pool_addr_, pool_size_bytes_);
 #endif
 
-      std::size_t storage_size = mempool::compute_allocated_size_bytes<void*> (
+      std::size_t storage_size = compute_allocated_size_bytes<void*> (
           blocks_, block_size_bytes_);
 
       if (pool_addr_ != nullptr)
@@ -469,7 +455,7 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Memory_pool::~Memory_pool ()
+    memory_pool::~memory_pool ()
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -492,7 +478,7 @@ namespace os
      * internal pointers and counters.
      */
     void
-    Memory_pool::_init (void)
+    memory_pool::_init (void)
     {
       // Construct a linked list of blocks. Store the pointer at
       // the beginning of each block. Each block
@@ -522,7 +508,7 @@ namespace os
      * free list.
      */
     void*
-    Memory_pool::_try_first (void)
+    memory_pool::_try_first (void)
     {
       if (first_ != nullptr)
         {
@@ -555,7 +541,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     void*
-    Memory_pool::alloc (void)
+    memory_pool::alloc (void)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
@@ -634,7 +620,7 @@ namespace os
      * @note Can be invoked from Interrupt Service Routines.
      */
     void*
-    Memory_pool::try_alloc (void)
+    memory_pool::try_alloc (void)
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -687,7 +673,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     void*
-    Memory_pool::timed_alloc (clock::duration_t timeout)
+    memory_pool::timed_alloc (clock::duration_t timeout)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
@@ -773,7 +759,7 @@ namespace os
      * @note Can be invoked from Interrupt Service Routines.
      */
     result_t
-    Memory_pool::free (void* block)
+    memory_pool::free (void* block)
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -816,7 +802,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Memory_pool::reset (void)
+    memory_pool::reset (void)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 

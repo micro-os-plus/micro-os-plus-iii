@@ -73,7 +73,7 @@ namespace os
     class Clock;
     class condition_variable;
     class event_flags;
-    class Memory_pool;
+    class memory_pool;
     class Message_queue;
     class mutex;
     class Realtime_clock;
@@ -552,29 +552,6 @@ namespace os
     // ========================================================================
 
     /**
-     * @brief Memory pool namespace.
-     */
-    namespace mempool
-    {
-      /**
-       * @brief Type of memory pool size.
-       * @details
-       * A numeric value that can hold the maximum size of the
-       * memory pool, usually a 16-bits unsigned value.
-       */
-      using size_t = uint16_t;
-
-      /**
-       * @brief Maximum pool size.
-       * @details
-       * A constant numeric value used to validate the pool size.
-       */
-      constexpr size_t max_size = static_cast<size_t> (0 - 1);
-    } /* namespace mempool */
-
-    // ========================================================================
-
-    /**
      * @brief Message queue namespace.
      */
     namespace mqueue
@@ -947,7 +924,7 @@ namespace os
 
       class Condition_variable;
       class semaphore;
-      class Memory_pool;
+      class memory_pool;
       class Message_queue;
       class event_flags;
 
