@@ -40,8 +40,17 @@ namespace os
 {
   namespace rtos
   {
-    namespace condvar
+
+    // ========================================================================
+
+    /**
+     * @brief POSIX compliant **condition variable**.
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
+     */
+    class condition_variable : public named_object
     {
+    public:
 
       // ======================================================================
 
@@ -49,7 +58,7 @@ namespace os
        * @brief Condition variable attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Attributes : public clocked_attributes
+      class attributes : public clocked_attributes
       {
       public:
 
@@ -63,17 +72,17 @@ namespace os
          * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
          */
         constexpr
-        Attributes (const char* name);
+        attributes (const char* name);
 
         /**
          * @cond ignore
          */
-        Attributes (const Attributes&) = default;
-        Attributes (Attributes&&) = default;
-        Attributes&
-        operator= (const Attributes&) = default;
-        Attributes&
-        operator= (Attributes&&) = default;
+        attributes (const attributes&) = default;
+        attributes (attributes&&) = default;
+        attributes&
+        operator= (const attributes&) = default;
+        attributes&
+        operator= (attributes&&) = default;
         /**
          * @endcond
          */
@@ -81,7 +90,7 @@ namespace os
         /**
          * @brief Destroy condition variable attributes.
          */
-        ~Attributes () = default;
+        ~attributes () = default;
 
         /**
          * @}
@@ -96,9 +105,6 @@ namespace os
 
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
-        //
-        // TODO: add clock ID.
-        //
         // Add more attributes.
         /**
          * @}
@@ -108,20 +114,9 @@ namespace os
       /**
        * @brief Default condition variable initialiser.
        */
-      extern const Attributes initializer;
+      static const attributes initializer;
 
-    } /* namespace condvar */
-
-    // ========================================================================
-
-    /**
-     * @brief POSIX compliant **condition variable**.
-     * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
-     */
-    class Condition_variable : public named_object
-    {
-    public:
+      // ======================================================================
 
       /**
        * @name Constructors & Destructor
@@ -141,7 +136,7 @@ namespace os
        * @par
        *  The constructor shall not fail with an error code of `EINTR`.
        */
-      Condition_variable ();
+      condition_variable ();
 
       /**
        * @brief Create a named condition variable with default settings.
@@ -155,7 +150,7 @@ namespace os
        * @par
        *  The constructor shall not fail with an error code of `EINTR`.
        */
-      Condition_variable (const char* name);
+      condition_variable (const char* name);
 
       /**
        * @brief Create a condition variable with custom settings.
@@ -169,7 +164,7 @@ namespace os
        * @par
        *  The constructor shall not fail with an error code of `EINTR`.
        */
-      Condition_variable (const condvar::Attributes& attr);
+      condition_variable (const attributes& attr);
 
       /**
        * @brief Create a named condition variable with custom settings.
@@ -184,17 +179,17 @@ namespace os
        * @par
        *  The constructor shall not fail with an error code of `EINTR`.
        */
-      Condition_variable (const char* name, const condvar::Attributes& attr);
+      condition_variable (const char* name, const attributes& attr);
 
       /**
        * @cond ignore
        */
-      Condition_variable (const Condition_variable&) = delete;
-      Condition_variable (Condition_variable&&) = delete;
-      Condition_variable&
-      operator= (const Condition_variable&) = delete;
-      Condition_variable&
-      operator= (Condition_variable&&) = delete;
+      condition_variable (const condition_variable&) = delete;
+      condition_variable (condition_variable&&) = delete;
+      condition_variable&
+      operator= (const condition_variable&) = delete;
+      condition_variable&
+      operator= (condition_variable&&) = delete;
       /**
        * @endcond
        */
@@ -202,7 +197,7 @@ namespace os
       /**
        * @brief Destroy a condition variable.
        */
-      ~Condition_variable ();
+      ~condition_variable ();
 
       /**
        * @}
@@ -220,7 +215,7 @@ namespace os
        * @retval false The condition variables are different.
        */
       bool
-      operator== (const Condition_variable& rhs) const;
+      operator== (const condition_variable& rhs) const;
 
       /**
        * @}
@@ -237,7 +232,7 @@ namespace os
        * @brief Notify one thread waiting for a condition variable.
        * @par Parameters
        *  None
-       * @retval result::ok The thread was signaled.
+       * @retval result::ok The thread was signalled.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @par Errors
        *  The function shall not fail with an error code of `EINTR`.
@@ -249,7 +244,7 @@ namespace os
        * @brief Notify all threads waiting for a condition variable.
        * @par Parameters
        *  None
-       * @retval result::ok All waiting threads signaled.
+       * @retval result::ok All waiting threads signalled.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @par Errors
        *  The function shall not fail with an error code of `EINTR`.
@@ -260,7 +255,7 @@ namespace os
       /**
        * @brief Wait for a condition variable to be notified.
        * @param [in] mutex Reference to the associated mutex.
-       * @retval result::ok The condition change was signaled.
+       * @retval result::ok The condition change was signalled.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines,
        *  or the mutex type is `mutex::type::errorcheck` or the mutex
        *  is a robust mutex, and the current thread does not own the mutex.
@@ -283,7 +278,7 @@ namespace os
        * @brief Timed wait for a condition variable to be notified.
        * @param [in] mutex Reference to the associated mutex.
        * @param [in] timeout Timeout to wait.
-       * @retval result::ok The condition change was signaled.
+       * @retval result::ok The condition change was signalled.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines,
        *  or the mutex type is `mutex::type::errorcheck` or the mutex
        *  is a robust mutex, and the current thread does not own the mutex.
@@ -333,16 +328,13 @@ namespace os
 {
   namespace rtos
   {
-    namespace condvar
+    constexpr
+    condition_variable::attributes::attributes (const char* name) :
+        clocked_attributes
+          { name }
     {
-      constexpr
-      Attributes::Attributes (const char* name) :
-          clocked_attributes
-            { name }
-      {
-        ;
-      }
-    } /* namespace condvar */
+      ;
+    }
 
     // ========================================================================
 
@@ -351,7 +343,7 @@ namespace os
      * Identical condition variables should have the same memory address.
      */
     inline bool
-    Condition_variable::operator== (const Condition_variable& rhs) const
+    condition_variable::operator== (const condition_variable& rhs) const
     {
       return this == &rhs;
     }

@@ -42,35 +42,26 @@ namespace os
     // ------------------------------------------------------------------------
 
     /**
+     * @class attributes
      * @details
-     * The `os::rtos::condvar` namespace groups condition variable attributes
-     * and initialisers.
+     * Allow to assign a name to the condition variable.
+     *
+     * @par POSIX compatibility
+     *  Inspired by `pthread_condattr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  (IEEE Std 1003.1, 2013 Edition).
      */
-    namespace condvar
-    {
-      /**
-       * @class Attributes
-       * @details
-       * Allow to assign a name to the condition variable.
-       *
-       * @par POSIX compatibility
-       *  Inspired by `pthread_condattr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
-       */
 
-      /**
-       * @details
-       * This variable is used by the default constructor.
-       */
-      const Attributes initializer
-        { nullptr };
-
-    } /* namespace condvar */
+    /**
+     * @details
+     * This variable is used by the default constructor.
+     */
+    const condition_variable::attributes condition_variable::initializer
+      { nullptr };
 
     // ------------------------------------------------------------------------
 
     /**
-     * @class Condition_variable
+     * @class condition_variable
      * @details
      * A condition variable is a synchronisation object which allows a thread
      * to suspend execution, repeatedly, until some associated predicate
@@ -169,7 +160,7 @@ namespace os
      *
      * @code{.cpp}
      * mutex mx;
-     * Condition_variable cv;
+     * condition_variable cv;
      *
      * void
      * consumer(void)
@@ -216,7 +207,7 @@ namespace os
      * This constructor shall initialise a condition variable object
      * with default settings.
      * The effect shall be equivalent to creating a condition variable object
-     * referring to the attributes in `condvar::initializer`.
+     * referring to the attributes in `condition_variable::initializer`.
      * Upon successful initialisation, the state of the
      * condition variable object shall become initialised.
      *
@@ -231,9 +222,9 @@ namespace os
      *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
-    Condition_variable::Condition_variable () :
-        Condition_variable
-          { nullptr, condvar::initializer }
+    condition_variable::condition_variable () :
+        condition_variable
+          { nullptr, initializer }
     {
       ;
     }
@@ -243,7 +234,7 @@ namespace os
      * This constructor shall initialise a named condition variable object
      * with default settings.
      * The effect shall be equivalent to creating a condition variable object
-     * referring to the attributes in `condvar::initializer`.
+     * referring to the attributes in `condition_variable::initializer`.
      * Upon successful initialisation, the state of the
      * condition variable object shall become initialised.
      *
@@ -258,9 +249,9 @@ namespace os
      *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
-    Condition_variable::Condition_variable (const char* name) :
-        Condition_variable
-          { name, condvar::initializer }
+    condition_variable::condition_variable (const char* name) :
+        condition_variable
+          { name, initializer }
     {
       ;
     }
@@ -280,8 +271,8 @@ namespace os
      * condition variable objects.
      *
      * In cases where default condition variable attributes are
-     * appropriate, the variable `condvar::initializer` can be used to
-     * initialise condition variables.
+     * appropriate, the variable `condition_variable::initializer`
+     * can be used to initialise condition variables.
      * The effect shall be equivalent to creating a condition variables
      * object with the default constructor.
      *
@@ -292,8 +283,8 @@ namespace os
      *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
-    Condition_variable::Condition_variable (const condvar::Attributes& attr) :
-        Condition_variable
+    condition_variable::condition_variable (const attributes& attr) :
+        condition_variable
           { nullptr, attr }
     {
       ;
@@ -314,8 +305,8 @@ namespace os
      * condition variable objects.
      *
      * In cases where default condition variable attributes are
-     * appropriate, the variable `condvar::initializer` can be used to
-     * initialise condition variables.
+     * appropriate, the variable `condition_variable::initializer`
+     * can be used to initialise condition variables.
      * The effect shall be equivalent to creating a condition variables
      * object with the default constructor.
      *
@@ -326,8 +317,8 @@ namespace os
      *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
-    Condition_variable::Condition_variable (const char* name,
-                                            const condvar::Attributes& attr) :
+    condition_variable::condition_variable (const char* name,
+                                            const attributes& attr) :
         named_object
           { name, attr.name () }
     {
@@ -356,7 +347,7 @@ namespace os
      *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
-    Condition_variable::~Condition_variable ()
+    condition_variable::~condition_variable ()
     {
 #if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -400,7 +391,7 @@ namespace os
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
     result_t
-    Condition_variable::signal ()
+    condition_variable::signal ()
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -469,7 +460,7 @@ namespace os
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
     result_t
-    Condition_variable::broadcast ()
+    condition_variable::broadcast ()
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -565,7 +556,7 @@ namespace os
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
     result_t
-    Condition_variable::wait (mutex& mutex)
+    condition_variable::wait (mutex& mutex)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -707,7 +698,7 @@ namespace os
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
     result_t
-    Condition_variable::timed_wait (mutex& mutex, clock::duration_t timeout)
+    condition_variable::timed_wait (mutex& mutex, clock::duration_t timeout)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 

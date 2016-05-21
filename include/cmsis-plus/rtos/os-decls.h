@@ -71,7 +71,7 @@ namespace os
     // Forward references.
     class named_object;
     class Clock;
-    class Condition_variable;
+    class condition_variable;
     class Event_flags;
     class Memory_pool;
     class Message_queue;
@@ -545,16 +545,6 @@ namespace os
      * @ingroup cmsis-plus-rtos
      */
     namespace this_thread
-    {
-
-    }
-
-    // ========================================================================
-
-    /**
-     * @brief Condition variable namespace.
-     */
-    namespace condvar
     {
 
     }

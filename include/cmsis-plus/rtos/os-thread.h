@@ -836,7 +836,7 @@ namespace os
       friend class Clock_timestamps_list;
 
       friend class Clock;
-      friend class Condition_variable;
+      friend class condition_variable;
 
       /**
        * @}

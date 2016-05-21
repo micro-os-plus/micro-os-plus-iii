@@ -64,8 +64,8 @@ static_assert(sizeof(timer::attributes) == sizeof(os_timer_attr_t), "adjust size
 static_assert(sizeof(mutex) == sizeof(os_mutex_t), "adjust size of os_mutex_t");
 static_assert(sizeof(mutex::attributes) == sizeof(os_mutex_attr_t), "adjust size of os_mutex_attr_t");
 
-static_assert(sizeof(Condition_variable) == sizeof(os_condvar_t), "adjust size of os_condvar_t");
-static_assert(sizeof(condvar::Attributes) == sizeof(os_condvar_attr_t), "adjust size of os_condvar_attr_t");
+static_assert(sizeof(condition_variable) == sizeof(os_condvar_t), "adjust size of os_condvar_t");
+static_assert(sizeof(condition_variable::attributes) == sizeof(os_condvar_attr_t), "adjust size of os_condvar_attr_t");
 
 static_assert(sizeof(semaphore) == sizeof(os_semaphore_t), "adjust size of os_semaphore_t");
 static_assert(sizeof(semaphore::attributes) == sizeof(os_semaphore_attr_t), "adjust size of os_semaphore_attr_t");
@@ -428,37 +428,37 @@ os_mutex_reset (os_mutex_t* mutex)
 void
 os_condvar_attr_init (os_condvar_attr_t* attr, const char* name)
 {
-  new (attr) condvar::Attributes (name);
+  new (attr) condition_variable::attributes (name);
 }
 
 void
 os_condvar_create (os_condvar_t* condvar, os_condvar_attr_t* attr)
 {
-  new (condvar) Condition_variable ((condvar::Attributes&) *attr);
+  new (condvar) condition_variable ((condition_variable::attributes&) *attr);
 }
 
 void
 os_condvar_destroy (os_condvar_t* condvar)
 {
-  (reinterpret_cast<Condition_variable&> (*condvar)).~Condition_variable ();
+  (reinterpret_cast<condition_variable&> (*condvar)).~condition_variable ();
 }
 
 os_result_t
 os_condvar_signal (os_condvar_t* condvar)
 {
-  return (os_result_t) (reinterpret_cast<Condition_variable&> (*condvar)).signal ();
+  return (os_result_t) (reinterpret_cast<condition_variable&> (*condvar)).signal ();
 }
 
 os_result_t
 os_condvar_broadcast (os_condvar_t* condvar)
 {
-  return (os_result_t) (reinterpret_cast<Condition_variable&> (*condvar)).broadcast ();
+  return (os_result_t) (reinterpret_cast<condition_variable&> (*condvar)).broadcast ();
 }
 
 os_result_t
 os_condvar_wait (os_condvar_t* condvar, os_mutex_t* mutex)
 {
-  return (os_result_t) (reinterpret_cast<Condition_variable&> (*condvar)).wait (
+  return (os_result_t) (reinterpret_cast<condition_variable&> (*condvar)).wait (
       reinterpret_cast<class mutex&> (*mutex));
 }
 
@@ -466,7 +466,7 @@ os_result_t
 os_condvar_timed_wait (os_condvar_t* condvar, os_mutex_t* mutex,
                        os_clock_duration_t timeout)
 {
-  return (os_result_t) (reinterpret_cast<Condition_variable&> (*condvar)).timed_wait (
+  return (os_result_t) (reinterpret_cast<condition_variable&> (*condvar)).timed_wait (
       reinterpret_cast<class mutex&> (*mutex), timeout);
 }
 
@@ -1496,7 +1496,7 @@ osSignalWait (int32_t signals, uint32_t millisec)
 
 /**
  * @details
- * Create and initialize a mutex object.
+ * Create and initialise a mutex object.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
