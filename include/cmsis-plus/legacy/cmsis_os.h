@@ -315,6 +315,9 @@ extern "C"
     osSemaphore* data;
   } osSemaphoreDef_t;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
   /**
    * @brief Definition structure for memory block allocation.
    * @note CAN BE CHANGED: @b os_pool_def is implementation specific in every CMSIS-RTOS.
@@ -380,6 +383,8 @@ extern "C"
       osMessageQId message_id; ///< message id obtained by @ref osMessageCreate
     } def; ///< event definition
   } osEvent;
+
+#pragma GCC diagnostic pop
 
 //  ==== Kernel Control Functions ====
 

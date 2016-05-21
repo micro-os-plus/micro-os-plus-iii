@@ -52,11 +52,14 @@ namespace os
       // way than to pack the args in a structure and use it by the
       // trampoline to invoke the os_main().
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
       using main_args_t = struct
         {
           int argc;
           char** argv;
         };
+#pragma GCC diagnostic pop
 
       static main_args_t main_args;
 
