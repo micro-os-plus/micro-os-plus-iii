@@ -150,7 +150,7 @@ namespace os
         /**
          * @}
          */
-      };
+      }; /* class attributes */
 
       /**
        * @brief Default memory pool initialiser.
@@ -182,7 +182,7 @@ namespace os
       /**
        * @brief Default allocator.
        */
-      using Allocator = memory::allocator<stack::allocation_element_t>;
+      using Allocator = memory::allocator<thread::stack::allocation_element_t>;
 
       /**
        * @name Constructors & Destructor

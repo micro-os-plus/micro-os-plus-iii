@@ -218,7 +218,7 @@ namespace os
         /**
          * @}
          */
-      };
+      }; /* class attributes */
 
       /**
        * @brief Default normal mutex initialiser.
@@ -268,7 +268,7 @@ namespace os
         /**
          * @}
          */
-      };
+      }; /* class recursive_attributes */
 
       /**
        * @brief Default recursive mutex initialiser.
@@ -480,7 +480,7 @@ namespace os
        *  None
        * @return Pointer to thread or `nullptr` if not owned.
        */
-      Thread*
+      thread*
       owner (void);
 
       /**
@@ -519,7 +519,7 @@ namespace os
        * @retval false The mutex was not locked.
        */
       result_t
-      _try_lock (Thread* crt_thread);
+      _try_lock (thread* crt_thread);
 
       /**
        * @}
@@ -533,7 +533,7 @@ namespace os
        */
 
       // Can be updated in different thread contexts.
-      Thread* volatile owner_ = nullptr;
+      thread* volatile owner_ = nullptr;
 
 #if !defined(OS_INCLUDE_RTOS_PORT_MUTEX)
       Waiting_threads_list list_;
@@ -620,7 +620,7 @@ namespace os
       return this == &rhs;
     }
 
-    inline Thread*
+    inline thread*
     mutex::owner (void)
     {
       return owner_;

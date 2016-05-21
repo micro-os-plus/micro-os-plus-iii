@@ -868,7 +868,7 @@ namespace os
             }
         }
 
-      Thread& crt_thread = this_thread::thread ();
+      thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
@@ -1047,7 +1047,7 @@ namespace os
             }
         }
 
-      Thread& crt_thread = this_thread::thread ();
+      thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
@@ -1237,7 +1237,7 @@ namespace os
             }
         }
 
-      Thread& crt_thread = this_thread::thread ();
+      thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
@@ -1432,7 +1432,7 @@ namespace os
             }
         }
 
-      Thread& crt_thread = this_thread::thread ();
+      thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the

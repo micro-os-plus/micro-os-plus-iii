@@ -79,7 +79,7 @@ namespace os
     class Realtime_clock;
     class semaphore;
     class Systick_clock;
-    class Thread;
+    class thread;
     class timer;
 
     class Waiting_threads_list;
@@ -94,11 +94,6 @@ namespace os
       template<typename T>
         class polymorphic_allocator;
     } /* namespace memory */
-
-    namespace thread
-    {
-      class Context;
-    } /* namespace thread */
 
     // ------------------------------------------------------------------------
 
@@ -340,216 +335,12 @@ namespace os
     } /* namespace flags */
 
     /**
-     * @brief %Thread namespace.
-     */
-    namespace thread
-    {
-      /**
-       * @brief Type of a variable holding thread priorities.
-       * @details
-       * A numeric type used to hold thread priorities, affecting the thread
-       * behaviour, like scheduling and thread wakeup due to events;
-       * usually an unsigned 8-bits type.
-       *
-       * Higher values represent higher priorities.
-       * @ingroup cmsis-plus-rtos
-       */
-      using priority_t = uint8_t;
-
-      /**
-       * @brief %Thread priorities namespace.
-       * @details
-       * The os::rtos::thread::priority namespace is a container for
-       * priorities not restricted to an enumeration.
-       * @ingroup cmsis-plus-rtos
-       */
-      namespace priority
-      {
-        /**
-         * @brief Priorities pre-scaler.
-         * @details
-         * Decreasing this value narrows the range of allowed
-         * priorities. It is recommended to keep it low to give the
-         * scheduler a chance to optimise accesses to the ready list
-         * with an array of priorities, which will require some
-         * pointers and counters for each priority level.
-         *
-         * The default value of 4 gives the full range of 256 priorities;
-         * 0 gives 16 priorities,
-         * 1 gives 32 priorities, 2 gives 64 priorities, 3 gives 128
-         * priorities.
-         * @ingroup cmsis-plus-rtos
-         */
-        constexpr uint32_t range = 4;
-
-        /**
-         * @brief Main priorities, intermediate values also possible.
-         * @ingroup cmsis-plus-rtos
-         */
-        enum
-          : priority_t
-            {
-              /**
-               * Undefined, thread not initialised.
-               */
-              none = 0,
-
-              /**
-               * System reserved for the IDLE thread.
-               */
-              idle = (1 << range),
-
-              /**
-               * Lowest available for user code.
-               */
-              lowest = (2 << range),
-
-              low = (2 << range),
-
-              below_normal = (4 << range),
-
-              /**
-               * Default priority.
-               */
-              normal = (6 << range),
-
-              above_normal = (8 << range),
-
-              high = (10 << range),
-
-              realtime = (12 << range),
-
-              /**
-               * Highest available for user code.
-               */
-              highest = (((13 + 1) << range) - 1),
-
-              /**
-               * System reserved for the ISR deferred thread.
-               */
-              isr = (((14 + 1) << range) - 1),
-
-              /**
-               * Error.
-               */
-              error = (((15 + 1) << range) - 1)
-        };
-      } /* namespace priority */
-
-      /**
-       * @brief Type of a variable holding the thread state.
-       * @details
-       * An enumeration with the possible thread states. The enumeration
-       * is restricted to one of these values.
-       */
-      using state_t = enum class state : uint8_t
-        {
-          /**
-           * @brief Used to catch uninitialised threads.
-           */
-          undefined = 0,
-          inactive = 1,
-          ready = 2,
-          running = 3,
-          waiting = 4,
-          /**
-           * @brief Reuse possible if terminated or higher.
-           */
-          terminated = 5,      // Test for here up for reuse
-          destroyed = 6
-        };
-
-      /**
-       * @brief Type of a variable holding a signal set.
-       * @details
-       * An unsigned type large enough to store all the signal flags,
-       * actually a reuse of the more generic flags mask type
-       * @ref flags::mask_t.
-       */
-      using sigset_t = flags::mask_t;
-
-      /**
-       * @brief %Thread signals namespace.
-       * @details
-       * The os::rtos::thread::sig namespace is a container for
-       * signal flags masks, which cannot be restricted to an enumeration..
-       */
-      namespace sig
-      {
-        /**
-         * @brief Signal sets with special meaning.
-         */
-        enum
-          : sigset_t
-            {
-              /**
-               * @brief Special signal mask to represent any flag.
-               */
-              any = 0,
-
-              /**
-               * Special signal mask to represent all flags.
-               */
-              all = 0xFFFFFFFF,
-        };
-      } /* namespace sig */
-
-      /**
-       * @brief Thread function arguments.
-       * @details
-       * Type of thread function arguments.
-       */
-      using func_args_t = void*;
-
-      /**
-       * @brief Thread function.
-       * @details
-       * Type of thread functions. Useful to cast other similar types
-       * to silence the compiler warnings.
-       */
-      using func_t = void* (*) (func_args_t args);
-
-    } /* namespace thread */
-
-    namespace scheduler
-    {
-      void*
-      _idle_func (thread::func_args_t args);
-    }
-
-    /**
-     * @brief Stack namespace.
-     */
-    namespace stack
-    {
-      /**
-       * @brief Type of a stack element.
-       * @details
-       * The stack is organised as platform words
-       * (usually 4-bytes long on Cortex-M cores).
-       */
-      using element_t = os::rtos::port::stack::element_t;
-
-      /**
-       * @brief Type of a stack allocation element.
-       * @details
-       * For alignment reasons, the stack is allocated in
-       * larger chunks, usually 8-bytes long on Cortex-M cores.
-       */
-      using allocation_element_t = os::rtos::port::stack::allocation_element_t;
-
-    } /* namespace stack */
-
-    /**
      * @brief A convenience namespace to access the current running thread.
      * @ingroup cmsis-plus-rtos
      */
     namespace this_thread
     {
-
     }
-
-    // ========================================================================
 
     // ========================================================================
 
@@ -864,19 +655,15 @@ namespace os
   {
     namespace port
     {
-      class Thread;
+      class thread;
       class timer;
       class mutex;
 
-      class Condition_variable;
+      class condition_variable;
       class semaphore;
       class memory_pool;
       class message_queue;
       class event_flags;
-
-      namespace stack
-      {
-      } /* namespace stack */
 
       namespace interrupts
       {
@@ -940,8 +727,8 @@ namespace os
         void
         reschedule (void);
 
-        rtos::stack::element_t*
-        switch_stacks (rtos::stack::element_t* sp);
+        stack::element_t*
+        switch_stacks (stack::element_t* sp);
 
         void
         _wait_for_interrupt (void);
@@ -959,58 +746,55 @@ namespace os
 
       } /* namespace this_thread */
 
-      namespace thread
-      {
+      // ====================================================================
 
-        // ====================================================================
-
-        class Context
-        {
-        public:
-
-          // Used to avoid a complex casts below,
-          // that might confuse the Eclipse formatter.
-          typedef void
-          (*func_t) (void);
-
-          static void
-          create (rtos::thread::Context* context, void* func, void* args);
-
-        };
-
-      } /* namespace thread */
-
-      // ======================================================================
-
-      class Thread
+      class context
       {
       public:
 
-        Thread () = delete;
+        context () = delete;
+
+        // Used to avoid a complex casts below,
+        // that might confuse the Eclipse formatter.
+        typedef void
+        (*func_t) (void);
+
+        static void
+        create (void* context, void* func, void* args);
+
+      };
+
+      // ======================================================================
+
+      class thread
+      {
+      public:
+
+        thread () = delete;
 
 #if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
         static void
-        create (rtos::Thread* obj);
+        create (rtos::thread* obj);
 
         [[noreturn]]
         static void
-        destroy_this (rtos::Thread* obj);
+        destroy_this (rtos::thread* obj);
 
         static void
-        destroy_other (rtos::Thread* obj);
+        destroy_other (rtos::thread* obj);
 
         static void
-        resume (rtos::Thread* obj);
+        resume (rtos::thread* obj);
 
         static rtos::thread::priority_t
-        sched_prio (rtos::Thread* obj);
+        sched_prio (rtos::thread* obj);
 
         static result_t
-        sched_prio (rtos::Thread* obj, rtos::thread::priority_t prio);
+        sched_prio (rtos::thread* obj, rtos::thread::priority_t prio);
 
         static result_t
-        detach (rtos::Thread* obj);
+        detach (rtos::thread* obj);
 
 #endif
 
@@ -1097,7 +881,7 @@ extern "C"
    * file.
    *
    * To get the address of the user storage associated with a
-   * given thread, use Thread::user_storage().
+   * given thread, use thread::user_storage().
    */
   typedef struct
   {

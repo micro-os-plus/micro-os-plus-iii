@@ -48,218 +48,250 @@ namespace os
 {
   namespace rtos
   {
+    // ------------------------------------------------------------------------
+
+    // Forward definitions required by thread friends.
     namespace this_thread
     {
-
-      // ======================================================================
-
-      /**
-       * @brief Get the current running thread.
-       * @par Parameters
-       *  None
-       * @return Reference to the current running thread.
-       */
-      Thread&
-      thread (void);
-
-      /**
-       * @brief Yield execution to the next ready thread.
-       * @par Parameters
-       *  None
-       * @return Nothing.
-       */
-      void
-      yield (void);
-
-      /**
-       * @brief Suspend the current running thread to wait for an event.
-       * @par Parameters
-       *  None
-       * @return Nothing.
-       */
       void
       wait (void);
 
-      /**
-       * @brief Terminate the current running thread.
-       * @param [in] exit_ptr Pointer to object to return. (Optional).
-       * @return Nothing.
-       */
       [[noreturn]] void
-      exit (void* exit_ptr = nullptr);
+      exit (void* exit_ptr);
 
-      /**
-       * @brief Check if the wake-up is due to a timeout.
-       * @par Parameters
-       *  None
-       * @retval true The previous sleep returned after the entire duration.
-       * @retval false The previous sleep returned due to an event.
-       */
-      bool
-      is_timeout (void);
-
-      /**
-       * @brief Wait for signal flags.
-       * @param [in] mask The expected flags (OR-ed bit-mask);
-       *  may be zero.
-       * @param [out] oflags Pointer where to store the current flags;
-       *  may be `nullptr`.
-       * @param [in] mode Mode bits to select if either all or any flags
-       *  are expected, and if the flags should be cleared.
-       * @retval result::ok All expected flags are raised.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
-       * @retval EINVAL The mask is outside of the permitted range.
-       * @retval EINTR The operation was interrupted.
-       * @retval ENOTRECOVERABLE Wait failed.
-       */
       result_t
-      sig_wait (thread::sigset_t mask, thread::sigset_t* oflags = nullptr,
-                flags::mode_t mode = flags::mode::all | flags::mode::clear);
+      sig_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
 
-      /**
-       * @brief Try to wait for signal flags.
-       * @param [in] mask The expected flags (OR-ed bit-mask);
-       *  may be zero.
-       * @param [out] oflags Pointer where to store the current flags;
-       *  may be `nullptr`.
-       * @param [in] mode Mode bits to select if either all or any flags
-       *  are expected, and if the flags should be cleared.
-       * @retval result::ok All expected flags are raised.
-       * @retval EINVAL The mask is outside of the permitted range.
-       * @retval EWOULDBLOCK The expected condition did not occur.
-       * @retval ENOTRECOVERABLE Wait failed.
-       */
       result_t
-      try_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags = nullptr,
-                    flags::mode_t mode = flags::mode::all | flags::mode::clear);
-
-      /**
-       * @brief Timed wait for signal flags.
-       * @param [in] mask The expected flags (OR-ed bit-mask);
-       *  may be zero.
-       * @param [out] oflags Pointer where to store the current flags;
-       *  may be `nullptr`.
-       * @param [in] mode Mode bits to select if either all or any flags
-       *  are expected, and if the flags should be cleared.
-       * @param [in] timeout Timeout to wait, in clock units (ticks or seconds).
-       * @retval result::ok All expected flags are raised.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
-       * @retval ETIMEDOUT The expected condition did not occur during the
-       *  entire timeout duration.
-       * @retval EINVAL The mask is outside of the permitted range.
-       * @retval EINTR The operation was interrupted.
-       * @retval ENOTRECOVERABLE Wait failed.
-       */
+      try_sig_wait (flags::mask_t mask, flags::mask_t* oflags,
+                    flags::mode_t mode);
       result_t
-      timed_sig_wait (
-          thread::sigset_t mask, clock::duration_t timeout,
-          thread::sigset_t* oflags = nullptr,
-          flags::mode_t mode = flags::mode::all | flags::mode::clear);
+      timed_sig_wait (flags::mask_t mask, clock::duration_t timeout,
+                      flags::mask_t* oflags, flags::mode_t mode);
 
       int*
       error (void);
-
-      Thread*
-      _thread (void);
-
     } /* namespace this_thread */
 
-    // ========================================================================
-
-    namespace thread
+    namespace
     {
+      // Anonymous definition required for the next forward definition.
+      using func_args_t = void*;
+    }
 
-      // ======================================================================
+    // Forward definitions required by thread friends.
+    namespace scheduler
+    {
+      void*
+      _idle_func (func_args_t args);
+    } /* namespace scheduler */
+
+    // ========================================================================
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
-      /**
-       * @brief %Thread attributes.
-       * @headerfile os.h <cmsis-plus/rtos/os.h>
-       */
-      class Attributes : public clocked_attributes
-      {
-      public:
-
-        /**
-         * @name Constructors & Destructor
-         * @{
-         */
-
-        /**
-         * @brief Create thread attributes.
-         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
-         */
-        constexpr
-        Attributes (const char* name);
-
-        /**
-         * @cond ignore
-         */
-        Attributes (const Attributes&) = default;
-        Attributes (Attributes&&) = default;
-        Attributes&
-        operator= (const Attributes&) = default;
-        Attributes&
-        operator= (Attributes&&) = default;
-        /**
-         * @endcond
-         */
-
-        /**
-         * @brief Destroy thread attributes.
-         */
-        ~Attributes () = default;
-
-        /**
-         * @}
-         */
-
-      public:
-
-        /**
-         * @name Public Member Variables
-         * @{
-         */
-
-        // Public members, no accessors and mutators required.
-        // Warning: must match the type & order of the C file header.
-        /**
-         * @brief Thread user stack address attribute.
-         */
-        void* th_stack_address = 0;
-
-        /**
-         * @brief Thread user stack size attribute.
-         */
-        std::size_t th_stack_size_bytes = 0;
-
-        /**
-         * @brief Thread priority attribute.
-         */
-        priority_t th_priority = thread::priority::normal;
-
-        // Add more attributes.
-
-        /**
-         * @}
-         */
-
-      };
-
-#pragma GCC diagnostic pop
-
-      /**
-       * @brief Default thread initialiser.
-       */
-      extern const Attributes initializer;
+    /**
+     * @brief POSIX compliant **thread**, using the
+     * default RTOS allocator.
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
+     */
+    class thread : public named_object
+    {
+    public:
 
       // ======================================================================
 
-      class Stack
+      /**
+       * @brief Type of a variable holding thread priorities.
+       * @details
+       * A numeric type used to hold thread priorities, affecting the thread
+       * behaviour, like scheduling and thread wakeup due to events;
+       * usually an unsigned 8-bits type.
+       *
+       * Higher values represent higher priorities.
+       * @ingroup cmsis-plus-rtos
+       */
+      using priority_t = uint8_t;
+
+      /**
+       * @brief Thread priorities.
+       * @details
+       * The os::rtos::thread::priority definition is a container for
+       * priorities not restricted to an enumeration.
+       * @ingroup cmsis-plus-rtos
+       */
+      struct priority
+      {
+        /**
+         * @brief Priorities pre-scaler.
+         * @details
+         * Decreasing this value narrows the range of allowed
+         * priorities. It is recommended to keep it low to give the
+         * scheduler a chance to optimise accesses to the ready list
+         * with an array of priorities, which will require some
+         * pointers and counters for each priority level.
+         *
+         * The default value of 4 gives the full range of 256 priorities;
+         * 0 gives 16 priorities,
+         * 1 gives 32 priorities, 2 gives 64 priorities, 3 gives 128
+         * priorities.
+         * @ingroup cmsis-plus-rtos
+         */
+        static constexpr uint32_t range = 4;
+
+        /**
+         * @brief Main priorities, intermediate values also possible.
+         * @ingroup cmsis-plus-rtos
+         */
+        enum
+          : priority_t
+            {
+              /**
+               * Undefined, thread not initialised.
+               */
+              none = 0,
+
+              /**
+               * System reserved for the IDLE thread.
+               */
+              idle = (1 << range),
+
+              /**
+               * Lowest available for user code.
+               */
+              lowest = (2 << range),
+
+              low = (2 << range),
+
+              below_normal = (4 << range),
+
+              /**
+               * Default priority.
+               */
+              normal = (6 << range),
+
+              above_normal = (8 << range),
+
+              high = (10 << range),
+
+              realtime = (12 << range),
+
+              /**
+               * Highest available for user code.
+               */
+              highest = (((13 + 1) << range) - 1),
+
+              /**
+               * System reserved for the ISR deferred thread.
+               */
+              isr = (((14 + 1) << range) - 1),
+
+              /**
+               * Error.
+               */
+              error = (((15 + 1) << range) - 1)
+        };
+      }; /* struct priority */
+
+      /**
+       * @brief Type of a variable holding the thread state.
+       * @details
+       * An enumeration with the possible thread states. The enumeration
+       * is restricted to one of these values.
+       */
+      enum class state
+        : uint8_t
+          {
+            /**
+             * @brief Used to catch uninitialised threads.
+             */
+            undefined = 0, //
+        inactive = 1, //
+        ready = 2, //
+        running = 3, //
+        waiting = 4, //
+        /**
+         * @brief Reuse possible if terminated or higher.
+         */
+        terminated = 5,      // Test for here up for reuse
+        destroyed = 6
+      }; /* enum class state */
+
+      using state_t = enum state;
+
+      /**
+       * @brief Type of a variable holding a signal set.
+       * @details
+       * An unsigned type large enough to store all the signal flags,
+       * actually a reuse of the more generic flags mask type
+       * @ref flags::mask_t.
+       */
+      using sigset_t = flags::mask_t;
+
+      /**
+       * @brief %Thread signals namespace.
+       * @details
+       * The os::rtos::thread::sig namespace is a container for
+       * signal flags masks, which cannot be restricted to an enumeration..
+       */
+      struct sig
+      {
+        /**
+         * @brief Signal sets with special meaning.
+         */
+        enum
+          : sigset_t
+            {
+              /**
+               * @brief Special signal mask to represent any flag.
+               */
+              any = 0,
+
+              /**
+               * Special signal mask to represent all flags.
+               */
+              all = 0xFFFFFFFF,
+        };
+      }; /* struct sig */
+
+      /**
+       * @brief Thread function arguments.
+       * @details
+       * Type of thread function arguments.
+       */
+      using func_args_t = func_args_t;
+
+      /**
+       * @brief Thread function.
+       * @details
+       * Type of thread functions. Useful to cast other similar types
+       * to silence the compiler warnings.
+       */
+      using func_t = void* (*) (func_args_t args);
+
+      // ======================================================================
+
+      class stack
       {
       public:
+
+        /**
+         * @brief Type of a stack element.
+         * @details
+         * The stack is organised as platform words
+         * (usually 4-bytes long on Cortex-M cores).
+         */
+        using element_t = os::rtos::port::stack::element_t;
+
+        /**
+         * @brief Type of a stack allocation element.
+         * @details
+         * For alignment reasons, the stack is allocated in
+         * larger chunks, usually 8-bytes long on Cortex-M cores.
+         */
+        using allocation_element_t = os::rtos::port::stack::allocation_element_t;
 
         /**
          * @name Constructors & Destructor
@@ -269,25 +301,25 @@ namespace os
         /**
          * @brief Create a thread stack.
          */
-        Stack ();
+        stack ();
 
         /**
          * @cond ignore
          */
-        Stack (const Stack&) = delete;
-        Stack (Stack&&) = delete;
-        Stack&
-        operator= (const Stack&) = delete;
-        Stack&
-        operator= (Stack&&) = delete;
+        stack (const stack&) = delete;
+        stack (stack&&) = delete;
+        stack&
+        operator= (const stack&) = delete;
+        stack&
+        operator= (stack&&) = delete;
         /**
          * @endcond
          */
 
         /**
-         * @brief Destroy context.
+         * @brief Destroy stack.
          */
-        ~Stack () = default;
+        ~stack () = default;
 
         /**
          * @}
@@ -369,7 +401,7 @@ namespace os
 
       protected:
 
-        friend class rtos::Thread;
+        friend class rtos::thread;
 
         stack::element_t* bottom_address_;
         std::size_t size_bytes_;
@@ -377,10 +409,10 @@ namespace os
         static std::size_t min_size_bytes_;
         static std::size_t default_size_bytes_;
 
-      };
-      // ======================================================================
+      }; /* class stack */
 
-      class Context
+      // ======================================================================
+      class context
       {
       public:
 
@@ -392,17 +424,17 @@ namespace os
         /**
          * @brief Create a thread context.
          */
-        Context ();
+        context ();
 
         /**
          * @cond ignore
          */
-        Context (const Context&) = delete;
-        Context (Context&&) = delete;
-        Context&
-        operator= (const Context&) = delete;
-        Context&
-        operator= (Context&&) = delete;
+        context (const context&) = delete;
+        context (context&&) = delete;
+        context&
+        operator= (const context&) = delete;
+        context&
+        operator= (context&&) = delete;
         /**
          * @endcond
          */
@@ -410,7 +442,7 @@ namespace os
         /**
          * @brief Destroy context.
          */
-        ~Context () = default;
+        ~context () = default;
 
         /**
          * @}
@@ -423,7 +455,7 @@ namespace os
          * @{
          */
 
-        Stack&
+        thread::stack&
         stack (void);
 
         /**
@@ -437,8 +469,8 @@ namespace os
          * @{
          */
 
-        friend class rtos::Thread;
-        friend class rtos::port::Thread;
+        friend class rtos::thread;
+        friend class rtos::port::thread;
         friend void
         port::scheduler::start (void);
         friend void
@@ -446,10 +478,10 @@ namespace os
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
-        friend class port::thread::Context;
+        friend class port::context;
 
-        friend stack::element_t*
-        port::scheduler::switch_stacks (stack::element_t* sp);
+        friend port::stack::element_t*
+        port::scheduler::switch_stacks (port::stack::element_t* sp);
 
 #endif
         /**
@@ -466,14 +498,14 @@ namespace os
         /**
          * @brief Stack object.
          */
-        Stack stack_;
+        thread::stack stack_;
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
         /**
          * @brief Non-portable context data.
          */
-        port::thread::context_t port_;
+        port::thread_context_t port_;
 
 #endif
 
@@ -481,23 +513,94 @@ namespace os
          * @}
          */
 
-      };
-    }
+      }; /* class context */
 
-    // ========================================================================
-
+      // ======================================================================
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
-    /**
-     * @brief POSIX compliant **thread**, using the
-     * default RTOS allocator.
-     * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
-     */
-    class Thread : public named_object
-    {
-    public:
+      /**
+       * @brief %Thread attributes.
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       */
+      class attributes : public clocked_attributes
+      {
+      public:
+
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
+
+        /**
+         * @brief Create thread attributes.
+         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
+         */
+        constexpr
+        attributes (const char* name);
+
+        /**
+         * @cond ignore
+         */
+        attributes (const attributes&) = default;
+        attributes (attributes&&) = default;
+        attributes&
+        operator= (const attributes&) = default;
+        attributes&
+        operator= (attributes&&) = default;
+        /**
+         * @endcond
+         */
+
+        /**
+         * @brief Destroy thread attributes.
+         */
+        ~attributes () = default;
+
+        /**
+         * @}
+         */
+
+      public:
+
+        /**
+         * @name Public Member Variables
+         * @{
+         */
+
+        // Public members, no accessors and mutators required.
+        // Warning: must match the type & order of the C file header.
+        /**
+         * @brief Thread user stack address attribute.
+         */
+        void* th_stack_address = 0;
+
+        /**
+         * @brief Thread user stack size attribute.
+         */
+        std::size_t th_stack_size_bytes = 0;
+
+        /**
+         * @brief Thread priority attribute.
+         */
+        priority_t th_priority = priority::normal;
+
+        // Add more attributes.
+
+        /**
+         * @}
+         */
+
+      }; /* class attributes */
+
+#pragma GCC diagnostic pop
+
+      /**
+       * @brief Default thread initialiser.
+       */
+      static const attributes initializer;
+
+      // ======================================================================
 
       using Allocator = memory::allocator<stack::allocation_element_t>;
 
@@ -509,44 +612,41 @@ namespace os
       /**
        * @brief Create a thread with default settings.
        * @param [in] function Pointer to thread function.
-       * @param [in] args Pointer to arguments.
+       * @param [in] args Pointer to thread function arguments.
        * @param [in] allocator Reference to allocator. Default a local temporary instance.
        */
-      Thread (thread::func_t function, thread::func_args_t args,
-              const Allocator& allocator = Allocator ());
+      thread (func_t function, func_args_t args, const Allocator& allocator =
+                  Allocator ());
 
       /**
        * @brief Create a named thread with default settings.
        * @param [in] name Pointer to name.
        * @param [in] function Pointer to thread function.
-       * @param [in] args Pointer to arguments.
+       * @param [in] args Pointer to thread function arguments.
        * @param [in] allocator Reference to allocator. Default a local temporary instance.
        */
-      Thread (const char* name, thread::func_t function,
-              thread::func_args_t args, const Allocator& allocator =
-                  Allocator ());
+      thread (const char* name, func_t function, func_args_t args,
+              const Allocator& allocator = Allocator ());
 
       /**
        * @brief Create a thread with custom settings.
        * @param [in] attr Reference to attributes.
        * @param [in] function Pointer to thread function.
-       * @param [in] args Pointer to arguments.
+       * @param [in] args Pointer to thread function arguments.
        * @param [in] allocator Reference to allocator. Default a local temporary instance.
        */
-      Thread (const thread::Attributes& attr, thread::func_t function,
-              thread::func_args_t args, const Allocator& allocator =
-                  Allocator ());
+      thread (const attributes& attr, func_t function, func_args_t args,
+              const Allocator& allocator = Allocator ());
       /**
        * @brief Create a named thread with custom settings.
        * @param [in] name Pointer to name.
        * @param [in] attr Reference to attributes.
        * @param [in] function Pointer to thread function.
-       * @param [in] args Pointer to arguments.
+       * @param [in] args Pointer to thread function arguments.
        * @param [in] allocator Reference to allocator. Default a local temporary instance.
        */
-      Thread (const char* name, const thread::Attributes& attr,
-              thread::func_t function, thread::func_args_t args,
-              const Allocator& allocator = Allocator ());
+      thread (const char* name, const attributes& attr, func_t function,
+              func_args_t args, const Allocator& allocator = Allocator ());
 
       /**
        * @cond ignore
@@ -554,18 +654,18 @@ namespace os
     protected:
 
       // Internal constructors, used from templates.
-      Thread ();
-      Thread (const char* name);
-      Thread (const char* given_name, const char* attr_name);
+      thread ();
+      thread (const char* name);
+      thread (const char* given_name, const char* attr_name);
 
     public:
 
-      Thread (const Thread&) = delete;
-      Thread (Thread&&) = delete;
-      Thread&
-      operator= (const Thread&) = delete;
-      Thread&
-      operator= (Thread&&) = delete;
+      thread (const thread&) = delete;
+      thread (thread&&) = delete;
+      thread&
+      operator= (const thread&) = delete;
+      thread&
+      operator= (thread&&) = delete;
       /**
        * @endcond
        */
@@ -574,7 +674,7 @@ namespace os
        * @brief Destroy the thread.
        */
       virtual
-      ~Thread ();
+      ~thread ();
 
       /**
        * @}
@@ -591,7 +691,7 @@ namespace os
        * @retval false The threads are different.
        */
       bool
-      operator== (const Thread& rhs) const;
+      operator== (const thread& rhs) const;
 
       /**
        * @}
@@ -642,7 +742,7 @@ namespace os
        *  scheduling policy of the specified thread.
        */
       result_t
-      sched_prio (thread::priority_t prio);
+      sched_prio (priority_t prio);
 
       /**
        * @brief Get the current scheduling priority.
@@ -650,7 +750,7 @@ namespace os
        *  None.
        * @return The thread priority.
        */
-      thread::priority_t
+      priority_t
       sched_prio (void);
 
 #if 0
@@ -688,7 +788,7 @@ namespace os
        *  None
        * @return Thread scheduler state.
        */
-      thread::state_t
+      state_t
       sched_state (void) const;
 
       /**
@@ -730,7 +830,7 @@ namespace os
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
       result_t
-      sig_raise (thread::sigset_t mask, thread::sigset_t* oflags);
+      sig_raise (sigset_t mask, sigset_t* oflags);
 
       /**
        * @brief Clear thread signal flags.
@@ -742,7 +842,7 @@ namespace os
        * @retval EINVAL The mask is zero.
        */
       result_t
-      sig_clear (thread::sigset_t mask, thread::sigset_t* oflags);
+      sig_clear (sigset_t mask, sigset_t* oflags);
 
       /**
        * @brief Get/clear thread signal flags.
@@ -753,8 +853,8 @@ namespace os
        *  signal flags mask.
        * @retval sig::all Cannot be invoked from an Interrupt Service Routines.
        */
-      thread::sigset_t
-      sig_get (thread::sigset_t mask, flags::mode_t mode);
+      sigset_t
+      sig_get (sigset_t mask, flags::mode_t mode);
 
       /**
        * @brief Force thread termination.
@@ -764,9 +864,6 @@ namespace os
        */
       result_t
       kill (void);
-
-      thread::Context&
-      context (void);
 
       /**
        * @}
@@ -788,18 +885,15 @@ namespace os
       this_thread::exit (void* exit_ptr);
 
       friend result_t
-      this_thread::sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
+      this_thread::sig_wait (sigset_t mask, sigset_t* oflags,
                              flags::mode_t mode);
 
       friend result_t
-      this_thread::try_sig_wait (thread::sigset_t mask,
-                                 thread::sigset_t* oflags, flags::mode_t mode);
+      this_thread::try_sig_wait (sigset_t mask, sigset_t* oflags,
+                                 flags::mode_t mode);
       friend result_t
-      this_thread::timed_sig_wait (thread::sigset_t mask,
-                                   clock::duration_t timeout,
-                                   thread::sigset_t* oflags,
-                                   flags::mode_t mode);
-
+      this_thread::timed_sig_wait (sigset_t mask, clock::duration_t timeout,
+                                   sigset_t* oflags, flags::mode_t mode);
       friend int*
       this_thread::error (void);
 
@@ -823,8 +917,11 @@ namespace os
       friend void
       port::scheduler::reschedule (void);
 
-      friend stack::element_t*
-      port::scheduler::switch_stacks (stack::element_t* sp);
+      friend void
+      port::scheduler::start (void);
+
+      friend port::stack::element_t*
+      port::scheduler::switch_stacks (port::stack::element_t* sp);
 
       friend void*
       scheduler::_idle_func (thread::func_args_t args);
@@ -853,14 +950,13 @@ namespace os
        * @brief Internal function used during thread construction.
        * @param [in] attr Reference to attributes.
        * @param [in] function Pointer to thread function.
-       * @param [in] args Pointer to arguments.
+       * @param [in] args Pointer to thread function arguments.
        * @param [in] stack_address Pointer to stack storage or nullptr.
        * @param [in] stack_size_bytes Size of stack storage or 0.
        */
       void
-      _construct (const thread::Attributes& attr, thread::func_t function,
-                  thread::func_args_t args, void* stack_address,
-                  std::size_t stack_size_bytes);
+      _construct (const attributes& attr, func_t function, func_args_t args,
+                  void* stack_address, std::size_t stack_size_bytes);
 
       /**
        * @brief Suspend this thread and wait for an event.
@@ -887,7 +983,7 @@ namespace os
        */
       [[noreturn]]
       static void
-      _invoke_with_exit (Thread* thread);
+      _invoke_with_exit (thread* thread);
 
       /**
        * @brief Wait for signal flags.
@@ -904,8 +1000,7 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      _sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                 flags::mode_t mode);
+      _sig_wait (sigset_t mask, sigset_t* oflags, flags::mode_t mode);
 
       /**
        * @brief Try to wait for signal flags.
@@ -921,8 +1016,7 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      _try_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                     flags::mode_t mode);
+      _try_sig_wait (sigset_t mask, sigset_t* oflags, flags::mode_t mode);
 
       /**
        * @brief Timed wait for signal flags.
@@ -942,8 +1036,8 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      _timed_sig_wait (thread::sigset_t mask, clock::duration_t timeout,
-                       thread::sigset_t* oflags, flags::mode_t mode);
+      _timed_sig_wait (sigset_t mask, clock::duration_t timeout,
+                       sigset_t* oflags, flags::mode_t mode);
 
       /**
        * @brief Internal wait for signal.
@@ -959,8 +1053,7 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      _try_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                 flags::mode_t mode);
+      _try_wait (sigset_t mask, sigset_t* oflags, flags::mode_t mode);
 
       /**
        * @brief The actual destructor, also called from exit() and kill().
@@ -993,18 +1086,18 @@ namespace os
 
       int errno_ = 0;
 
-      thread::func_t func_ = nullptr;
-      thread::func_args_t func_args_ = nullptr;
+      func_t func_ = nullptr;
+      func_args_t func_args_ = nullptr;
       void* func_result_ = nullptr;
 
       // Implementation
 #if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
-      friend class port::Thread;
+      friend class port::thread;
       os_thread_port_data_t port_;
 #endif
 
       // Pointer to parent, or null for top/detached thread.
-      Thread* parent_ = nullptr;
+      thread* parent_ = nullptr;
 
       // List of children threads.
       Thread_children_list children_;
@@ -1013,7 +1106,7 @@ namespace os
       Double_list_links child_links_;
 
       // Thread waiting to join.
-      Thread* joiner_ = nullptr;
+      thread* joiner_ = nullptr;
 
       // Pointer to waiting node (stored on stack)
       Waiting_thread_node* waiting_node_ = nullptr;
@@ -1036,23 +1129,24 @@ namespace os
       std::size_t allocated_stack_size_elements_ = 0;
 
       std::size_t volatile acquired_mutexes_ = 0;
-      thread::state_t volatile sched_state_ = thread::state::undefined;
-      thread::priority_t volatile prio_ = thread::priority::none;
+      state_t volatile sched_state_ = state::undefined;
+      priority_t volatile prio_ = priority::none;
 
-      thread::sigset_t volatile sig_mask_ = 0;
+      sigset_t volatile sig_mask_ = 0;
       bool volatile interrupted_ = false;
 
       os_thread_user_storage_t user_storage_;
 
       // Add other internal data
 
-      // Must be the last one!
-      thread::Context context_;
+      // Better be the last one!
+      thread::context context_;
 
       /**
        * @}
        */
     };
+    /* class thread */
 
     /**
      * @brief Template of a POSIX compliant **thread** with allocator.
@@ -1060,7 +1154,7 @@ namespace os
      * @ingroup cmsis-plus-rtos
      */
     template<typename Allocator = memory::allocator<void*>>
-      class Thread_allocated : public Thread
+      class thread_allocated : public thread
       {
       public:
 
@@ -1074,55 +1168,58 @@ namespace os
         /**
          * @brief Create a thread with default settings.
          * @param [in] function Pointer to thread function.
-         * @param [in] args Pointer to arguments.
-         * @param [in] allocator Reference to allocator. Default a local temporary instance.
+         * @param [in] args Pointer to thread function arguments.
+         * @param [in] allocator Reference to allocator. Default a
+         * local temporary instance.
          */
-        Thread_allocated (thread::func_t function, thread::func_args_t args,
+        thread_allocated (func_t function, func_args_t args,
                           const Allocator& allocator = Allocator ());
 
         /**
          * @brief Create a named thread with default settings.
          * @param [in] name Pointer to name.
          * @param [in] function Pointer to thread function.
-         * @param [in] args Pointer to arguments.
-         * @param [in] allocator Reference to allocator. Default a local temporary instance.
+         * @param [in] args Pointer to thread function arguments.
+         * @param [in] allocator Reference to allocator. Default a
+         * local temporary instance.
          */
-        Thread_allocated (const char* name, thread::func_t function,
-                          thread::func_args_t args, const Allocator& allocator =
-                              Allocator ());
+        thread_allocated (const char* name, func_t function, func_args_t args,
+                          const Allocator& allocator = Allocator ());
 
         /**
          * @brief Create a thread with custom settings.
          * @param [in] attr Reference to attributes.
          * @param [in] function Pointer to thread function.
-         * @param [in] args Pointer to arguments.
-         * @param [in] allocator Reference to allocator. Default a local temporary instance.
+         * @param [in] args Pointer to thread function arguments.
+         * @param [in] allocator Reference to allocator. Default a
+         * local temporary instance.
          */
-        Thread_allocated (const thread::Attributes& attr,
-                          thread::func_t function, thread::func_args_t args,
-                          const Allocator& allocator = Allocator ());
+        thread_allocated (const attributes& attr, func_t function,
+                          func_args_t args, const Allocator& allocator =
+                              Allocator ());
 
         /**
          * @brief Create a named thread with custom settings.
          * @param [in] name Pointer to name.
          * @param [in] attr Reference to attributes.
          * @param [in] function Pointer to thread function.
-         * @param [in] args Pointer to arguments.
-         * @param [in] allocator Reference to allocator. Default a local temporary instance.
+         * @param [in] args Pointer to thread function arguments.
+         * @param [in] allocator Reference to allocator. Default a
+         * local temporary instance.
          */
-        Thread_allocated (const char* name, const thread::Attributes& attr,
-                          thread::func_t function, thread::func_args_t args,
+        thread_allocated (const char* name, const attributes& attr,
+                          func_t function, func_args_t args,
                           const Allocator& allocator = Allocator ());
 
         /**
          * @cond ignore
          */
-        Thread_allocated (const Thread_allocated&) = delete;
-        Thread_allocated (Thread_allocated&&) = delete;
-        Thread_allocated&
-        operator= (const Thread_allocated&) = delete;
-        Thread_allocated&
-        operator= (Thread_allocated&&) = delete;
+        thread_allocated (const thread_allocated&) = delete;
+        thread_allocated (thread_allocated&&) = delete;
+        thread_allocated&
+        operator= (const thread_allocated&) = delete;
+        thread_allocated&
+        operator= (thread_allocated&&) = delete;
         /**
          * @endcond
          */
@@ -1131,7 +1228,7 @@ namespace os
          * @brief Destroy the thread.
          */
         virtual
-        ~Thread_allocated ();
+        ~thread_allocated ();
 
         /**
          * @}
@@ -1157,7 +1254,7 @@ namespace os
      * @ingroup cmsis-plus-rtos
      */
     template<std::size_t N = port::stack::default_size_bytes>
-      class Thread_static : public Thread
+      class thread_static : public thread
       {
       public:
 
@@ -1171,47 +1268,46 @@ namespace os
         /**
          * @brief Create a thread with default settings.
          * @param [in] function Pointer to thread function.
-         * @param [in] args Pointer to arguments.
+         * @param [in] args Pointer to thread function arguments.
          */
-        Thread_static (thread::func_t function, thread::func_args_t args);
+        thread_static (func_t function, func_args_t args);
 
         /**
          * @brief Create a named thread with default settings.
          * @param [in] name Pointer to name.
          * @param [in] function Pointer to thread function.
-         * @param [in] args Pointer to arguments.
+         * @param [in] args Pointer to thread function arguments.
          */
-        Thread_static (const char* name, thread::func_t function,
-                       thread::func_args_t args);
+        thread_static (const char* name, func_t function, func_args_t args);
 
         /**
          * @brief Create a thread with custom settings.
          * @param [in] attr Reference to attributes.
          * @param [in] function Pointer to thread function.
-         * @param [in] args Pointer to arguments.
+         * @param [in] args Pointer to thread function arguments.
          */
-        Thread_static (const thread::Attributes& attr, thread::func_t function,
-                       thread::func_args_t args);
+        thread_static (const attributes& attr, func_t function,
+                       func_args_t args);
 
         /**
          * @brief Create a named thread with custom settings.
          * @param [in] name Pointer to name.
          * @param [in] attr Reference to attributes.
          * @param [in] function Pointer to thread function.
-         * @param [in] args Pointer to arguments.
+         * @param [in] args Pointer to thread function arguments.
          */
-        Thread_static (const char* name, const thread::Attributes& attr,
-                       thread::func_t function, thread::func_args_t args);
+        thread_static (const char* name, const attributes& attr,
+                       func_t function, func_args_t args);
 
         /**
          * @cond ignore
          */
-        Thread_static (const Thread_static&) = delete;
-        Thread_static (Thread_static&&) = delete;
-        Thread_static&
-        operator= (const Thread_static&) = delete;
-        Thread_static&
-        operator= (Thread_static&&) = delete;
+        thread_static (const thread_static&) = delete;
+        thread_static (thread_static&&) = delete;
+        thread_static&
+        operator= (const thread_static&) = delete;
+        thread_static&
+        operator= (thread_static&&) = delete;
         /**
          * @endcond
          */
@@ -1220,7 +1316,7 @@ namespace os
          * @brief Destroy the thread.
          */
         virtual
-        ~Thread_static ();
+        ~thread_static ();
 
         /**
          * @}
@@ -1234,6 +1330,121 @@ namespace os
       };
 
 #pragma GCC diagnostic pop
+
+    namespace this_thread
+    {
+
+      // ======================================================================
+
+      /**
+       * @brief Get the current running thread.
+       * @par Parameters
+       *  None
+       * @return Reference to the current running thread.
+       */
+      thread&
+      thread (void);
+
+      /**
+       * @brief Yield execution to the next ready thread.
+       * @par Parameters
+       *  None
+       * @return Nothing.
+       */
+      void
+      yield (void);
+
+      /**
+       * @brief Suspend the current running thread to wait for an event.
+       * @par Parameters
+       *  None
+       * @return Nothing.
+       */
+      void
+      wait (void);
+
+      /**
+       * @brief Terminate the current running thread.
+       * @param [in] exit_ptr Pointer to object to return. (Optional).
+       * @return Nothing.
+       */
+      [[noreturn]] void
+      exit (void* exit_ptr = nullptr);
+
+      /**
+       * @brief Check if the wake-up is due to a timeout.
+       * @par Parameters
+       *  None
+       * @retval true The previous sleep returned after the entire duration.
+       * @retval false The previous sleep returned due to an event.
+       */
+      bool
+      is_timeout (void);
+
+      /**
+       * @brief Wait for signal flags.
+       * @param [in] mask The expected flags (OR-ed bit-mask);
+       *  may be zero.
+       * @param [out] oflags Pointer where to store the current flags;
+       *  may be `nullptr`.
+       * @param [in] mode Mode bits to select if either all or any flags
+       *  are expected, and if the flags should be cleared.
+       * @retval result::ok All expected flags are raised.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @retval EINVAL The mask is outside of the permitted range.
+       * @retval EINTR The operation was interrupted.
+       * @retval ENOTRECOVERABLE Wait failed.
+       */
+      result_t
+      sig_wait (sigset_t mask, sigset_t* oflags = nullptr,
+                flags::mode_t mode = flags::mode::all | flags::mode::clear);
+
+      /**
+       * @brief Try to wait for signal flags.
+       * @param [in] mask The expected flags (OR-ed bit-mask);
+       *  may be zero.
+       * @param [out] oflags Pointer where to store the current flags;
+       *  may be `nullptr`.
+       * @param [in] mode Mode bits to select if either all or any flags
+       *  are expected, and if the flags should be cleared.
+       * @retval result::ok All expected flags are raised.
+       * @retval EINVAL The mask is outside of the permitted range.
+       * @retval EWOULDBLOCK The expected condition did not occur.
+       * @retval ENOTRECOVERABLE Wait failed.
+       */
+      result_t
+      try_sig_wait (sigset_t mask, sigset_t* oflags = nullptr,
+                    flags::mode_t mode = flags::mode::all | flags::mode::clear);
+
+      /**
+       * @brief Timed wait for signal flags.
+       * @param [in] mask The expected flags (OR-ed bit-mask);
+       *  may be zero.
+       * @param [out] oflags Pointer where to store the current flags;
+       *  may be `nullptr`.
+       * @param [in] mode Mode bits to select if either all or any flags
+       *  are expected, and if the flags should be cleared.
+       * @param [in] timeout Timeout to wait, in clock units (ticks or seconds).
+       * @retval result::ok All expected flags are raised.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @retval ETIMEDOUT The expected condition did not occur during the
+       *  entire timeout duration.
+       * @retval EINVAL The mask is outside of the permitted range.
+       * @retval EINTR The operation was interrupted.
+       * @retval ENOTRECOVERABLE Wait failed.
+       */
+      result_t
+      timed_sig_wait (
+          sigset_t mask, clock::duration_t timeout, sigset_t* oflags = nullptr,
+          flags::mode_t mode = flags::mode::all | flags::mode::clear);
+
+      int*
+      error (void);
+
+      rtos::thread*
+      _thread (void);
+
+    } /* namespace this_thread */
 
   } /* namespace rtos */
 } /* namespace os */
@@ -1252,7 +1463,7 @@ namespace os
        * control to the next ready thread. The
        * thread will not be automatically rescheduled, it requires
        * some other tread or interrupt service routine to add it
-       * back to the READY state (via `Thread::wakeup()`).
+       * back to the READY state (via `thread::resume()`).
        *
        * This is different from `yield()` which automatically
        * reschedules the current thread before passing control to
@@ -1289,8 +1500,7 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline result_t
-      sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                flags::mode_t mode)
+      sig_wait (sigset_t mask, sigset_t* oflags, flags::mode_t mode)
       {
         return this_thread::thread ()._sig_wait (mask, oflags, mode);
       }
@@ -1307,8 +1517,7 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline result_t
-      try_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                    flags::mode_t mode)
+      try_sig_wait (sigset_t mask, sigset_t* oflags, flags::mode_t mode)
       {
         return this_thread::thread ()._try_sig_wait (mask, oflags, mode);
       }
@@ -1352,8 +1561,8 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline result_t
-      timed_sig_wait (thread::sigset_t mask, clock::duration_t timeout,
-                      thread::sigset_t* oflags, flags::mode_t mode)
+      timed_sig_wait (sigset_t mask, clock::duration_t timeout,
+                      sigset_t* oflags, flags::mode_t mode)
       {
         return this_thread::thread ()._timed_sig_wait (mask, timeout, oflags,
                                                        mode);
@@ -1410,81 +1619,75 @@ namespace os
 
     } /* namespace this_thread */
 
-    namespace thread
+    constexpr
+    thread::attributes::attributes (const char* name) :
+        clocked_attributes
+          { name }
     {
-      // ======================================================================
+      ;
+    }
 
-      constexpr
-      Attributes::Attributes (const char* name) :
-          clocked_attributes
-            { name }
-      {
-        ;
-      }
+    // ======================================================================
 
-      // ======================================================================
+    inline
+    thread::stack::stack ()
+    {
+      bottom_address_ = nullptr;
+      size_bytes_ = 0;
+    }
 
-      inline
-      Stack::Stack ()
-      {
-        bottom_address_ = nullptr;
-        size_bytes_ = 0;
-      }
+    inline thread::stack::element_t*
+    thread::stack::bottom (void)
+    {
+      return bottom_address_;
+    }
 
-      inline stack::element_t*
-      Stack::bottom (void)
-      {
-        return bottom_address_;
-      }
+    inline std::size_t
+    thread::stack::size (void)
+    {
+      return size_bytes_;
+    }
 
-      inline std::size_t
-      Stack::size (void)
-      {
-        return size_bytes_;
-      }
+    inline std::size_t
+    thread::stack::min_size (void)
+    {
+      return min_size_bytes_;
+    }
 
-      inline std::size_t
-      Stack::min_size (void)
-      {
-        return min_size_bytes_;
-      }
+    inline void
+    thread::stack::min_size (std::size_t size_bytes)
+    {
+      min_size_bytes_ = size_bytes;
+    }
 
-      inline void
-      Stack::min_size (std::size_t size_bytes)
-      {
-        min_size_bytes_ = size_bytes;
-      }
+    inline std::size_t
+    thread::stack::default_size (void)
+    {
+      return default_size_bytes_;
+    }
 
-      inline std::size_t
-      Stack::default_size (void)
-      {
-        return default_size_bytes_;
-      }
+    inline void
+    thread::stack::default_size (std::size_t size_bytes)
+    {
+      assert(size_bytes != 0);
+      assert(size_bytes >= min_size_bytes_);
 
-      inline void
-      Stack::default_size (std::size_t size_bytes)
-      {
-        assert(size_bytes != 0);
-        assert(size_bytes >= min_size_bytes_);
+      default_size_bytes_ = size_bytes;
+    }
 
-        default_size_bytes_ = size_bytes;
-      }
+    // ========================================================================
 
-      // ======================================================================
+    inline
+    thread::context::context ()
+    {
+      ;
+    }
 
-      inline
-      Context::Context ()
-      {
-        ;
-      }
-
-      inline Stack&
-      Context::stack ()
-      {
-        return stack_;
-      }
-
-    } /* namespace thread */
+    inline thread::stack&
+    thread::context::stack ()
+    {
+      return stack_;
+    }
 
     // ========================================================================
 
@@ -1496,25 +1699,25 @@ namespace os
      * http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_equal.html
      */
     inline bool
-    Thread::operator== (const Thread& rhs) const
+    thread::operator== (const thread& rhs) const
     {
       return this == &rhs;
     }
 
     inline thread::state_t
-    Thread::sched_state (void) const
+    thread::sched_state (void) const
     {
       return sched_state_;
     }
 
     inline void*
-    Thread::function_args (void) const
+    thread::function_args (void) const
     {
       return func_args_;
     }
 
     inline bool
-    Thread::interrupt (bool interrupt)
+    thread::interrupt (bool interrupt)
     {
       bool tmp = interrupted_;
       interrupted_ = interrupt;
@@ -1522,18 +1725,10 @@ namespace os
     }
 
     inline bool
-    Thread::interrupted (void)
+    thread::interrupted (void)
     {
       return interrupted_;
     }
-
-#if 0
-    inline result_t
-    Thread::wakeup_reason (void) const
-      {
-        return wakeup_reason_;
-      }
-#endif
 
     /**
      * @details
@@ -1546,19 +1741,13 @@ namespace os
      * when implementing CMSIS+ over FreeRTOS.
      */
     inline os_thread_user_storage_t*
-    Thread::user_storage (void)
+    thread::user_storage (void)
     {
       return &user_storage_;
     }
 
-    inline thread::Context&
-    Thread::context (void)
-    {
-      return context_;
-    }
-
     inline int*
-    Thread::_error (void)
+    thread::_error (void)
     {
       return &errno_;
     }
@@ -1589,7 +1778,7 @@ namespace os
      * return value of `main()` as the exit status.
      *
      * For default thread objects, the stack is dynamically allocated,
-     * using the given allocator (defualt `rtos::memory::allocator`).
+     * using the given allocator (default `rtos::memory::allocator`).
      *
      * @par POSIX compatibility
      *  Inspired by [`pthread_create()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html)
@@ -1600,10 +1789,10 @@ namespace os
      */
     template<typename Allocator>
       inline
-      Thread_allocated<Allocator>::Thread_allocated (thread::func_t function,
-                                                     thread::func_args_t args,
+      thread_allocated<Allocator>::thread_allocated (func_t function,
+                                                     func_args_t args,
                                                      const Allocator& allocator) :
-          Thread_allocated
+          thread_allocated
             { nullptr, function, args, allocator }
       {
         ;
@@ -1633,7 +1822,7 @@ namespace os
      * return value of `main()` as the exit status.
      *
      * For default thread objects, the stack is dynamically allocated,
-     * using the given allocator (defualt `rtos::memory::allocator`).
+     * using the given allocator (default `rtos::memory::allocator`).
      *
      * @par POSIX compatibility
      *  Inspired by [`pthread_create()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html)
@@ -1643,11 +1832,11 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     template<typename Allocator>
-      Thread_allocated<Allocator>::Thread_allocated (const char* name,
-                                                     thread::func_t function,
-                                                     thread::func_args_t args,
+      thread_allocated<Allocator>::thread_allocated (const char* name,
+                                                     func_t function,
+                                                     func_args_t args,
                                                      const Allocator& allocator) :
-          Thread
+          thread
             { name }
       {
 #if defined(OS_TRACE_RTOS_THREAD)
@@ -1656,7 +1845,7 @@ namespace os
 
         allocator_ = &allocator;
 
-        allocated_stack_size_elements_ = (thread::Stack::default_size ()
+        allocated_stack_size_elements_ = (stack::default_size ()
             + sizeof(typename Allocator::value_type) - 1)
             / sizeof(typename Allocator::value_type);
         allocated_stack_address_ =
@@ -1664,7 +1853,7 @@ namespace os
                 allocated_stack_size_elements_));
 
         _construct (
-            thread::initializer,
+            initializer,
             function,
             args,
             allocated_stack_address_,
@@ -1715,10 +1904,11 @@ namespace os
      */
     template<typename Allocator>
       inline
-      Thread_allocated<Allocator>::Thread_allocated (
-          const thread::Attributes& attr, thread::func_t function,
-          thread::func_args_t args, const Allocator& allocator) :
-          Thread_allocated
+      thread_allocated<Allocator>::thread_allocated (const attributes& attr,
+                                                     func_t function,
+                                                     func_args_t args,
+                                                     const Allocator& allocator) :
+          thread_allocated
             { nullptr, attr, function, args, allocator }
       {
         ;
@@ -1766,18 +1956,19 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     template<typename Allocator>
-      Thread_allocated<Allocator>::Thread_allocated (
-          const char* name, const thread::Attributes& attr,
-          thread::func_t function, thread::func_args_t args,
-          const Allocator& allocator) :
-          Thread
+      thread_allocated<Allocator>::thread_allocated (const char* name,
+                                                     const attributes& attr,
+                                                     func_t function,
+                                                     func_args_t args,
+                                                     const Allocator& allocator) :
+          thread
             { name, attr.name () }
       {
 #if defined(OS_TRACE_RTOS_THREAD)
         trace::printf ("%s @%p %s\n", __func__, this, this->name ());
 #endif
         if (attr.th_stack_address != nullptr
-            && attr.th_stack_size_bytes > thread::Stack::min_size ())
+            && attr.th_stack_size_bytes > stack::min_size ())
           {
             _construct (attr, function, args, nullptr, 0);
           }
@@ -1785,7 +1976,7 @@ namespace os
           {
             allocator_ = &allocator;
 
-            if (attr.th_stack_size_bytes > thread::Stack::min_size ())
+            if (attr.th_stack_size_bytes > stack::min_size ())
               {
                 allocated_stack_size_elements_ = (attr.th_stack_size_bytes
                     + sizeof(typename Allocator::value_type) - 1)
@@ -1793,7 +1984,7 @@ namespace os
               }
             else
               {
-                allocated_stack_size_elements_ = (thread::Stack::default_size ()
+                allocated_stack_size_elements_ = (stack::default_size ()
                     + sizeof(typename Allocator::value_type) - 1)
                     / sizeof(typename Allocator::value_type);
               }
@@ -1813,10 +2004,10 @@ namespace os
 
     template<typename Allocator>
       void
-      Thread_allocated<Allocator>::_destroy (void)
+      thread_allocated<Allocator>::_destroy (void)
       {
 #if defined(OS_TRACE_RTOS_THREAD)
-        trace::printf ("Thread_allocated::%s() @%p %s\n", __func__, this,
+        trace::printf ("thread_allocated::%s() @%p %s\n", __func__, this,
                        name ());
 #endif
 
@@ -1831,7 +2022,7 @@ namespace os
             allocated_stack_address_ = nullptr;
           }
 
-        Thread::_destroy ();
+        thread::_destroy ();
       }
 
     /**
@@ -1848,7 +2039,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     template<typename Allocator>
-      Thread_allocated<Allocator>::~Thread_allocated ()
+      thread_allocated<Allocator>::~thread_allocated ()
       {
 #if defined(OS_TRACE_RTOS_THREAD)
         trace::printf ("%s @%p %s\n", __func__, this, name ());
@@ -1899,9 +2090,8 @@ namespace os
      */
     template<std::size_t N>
       inline
-      Thread_static<N>::Thread_static (thread::func_t function,
-                                       thread::func_args_t args) :
-          Thread_static<N>
+      thread_static<N>::thread_static (func_t function, func_args_t args) :
+          thread_static<N>
             { nullptr, function, args }
       {
         ;
@@ -1948,17 +2138,15 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     template<std::size_t N>
-      Thread_static<N>::Thread_static (const char* name,
-                                       thread::func_t function,
-                                       thread::func_args_t args) :
-          Thread
+      thread_static<N>::thread_static (const char* name, func_t function,
+                                       func_args_t args) :
+          thread
             { name }
       {
 #if defined(OS_TRACE_RTOS_THREAD)
         trace::printf ("%s @%p %s\n", __func__, this, this->name ());
 #endif
-        _construct (thread::initializer, function, args, &stack_,
-                    stack_size_bytes);
+        _construct (initializer, function, args, &stack_, stack_size_bytes);
       }
 
     /**
@@ -2009,10 +2197,9 @@ namespace os
      */
     template<std::size_t N>
       inline
-      Thread_static<N>::Thread_static (const thread::Attributes& attr,
-                                       thread::func_t function,
-                                       thread::func_args_t args) :
-          Thread_static<N>
+      thread_static<N>::thread_static (const attributes& attr, func_t function,
+                                       func_args_t args) :
+          thread_static<N>
             { nullptr, attr, function, args }
       {
         ;
@@ -2065,11 +2252,9 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     template<std::size_t N>
-      Thread_static<N>::Thread_static (const char* name,
-                                       const thread::Attributes& attr,
-                                       thread::func_t function,
-                                       thread::func_args_t args) :
-          Thread
+      thread_static<N>::thread_static (const char* name, const attributes& attr,
+                                       func_t function, func_args_t args) :
+          thread
             { name, attr.name () }
       {
 #if defined(OS_TRACE_RTOS_THREAD)
@@ -2091,7 +2276,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     template<std::size_t N>
-      Thread_static<N>::~Thread_static ()
+      thread_static<N>::~thread_static ()
       {
 #if defined(OS_TRACE_RTOS_THREAD)
         trace::printf ("%s @%p %s\n", __func__, this, name ());

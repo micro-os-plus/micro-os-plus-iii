@@ -540,9 +540,9 @@ namespace os
     }
 
     result_t
-    mutex::_try_lock (Thread* crt_thread)
+    mutex::_try_lock (thread* crt_thread)
     {
-      Thread* saved_owner;
+      thread* saved_owner;
 
       saved_owner = owner_;
       if (owner_ == nullptr)
@@ -672,7 +672,7 @@ namespace os
 
 #else
 
-      Thread& crt_thread = this_thread::thread ();
+      thread& crt_thread = this_thread::thread ();
 
       result_t res;
         {
@@ -784,7 +784,7 @@ namespace os
 
 #else
 
-      Thread& crt_thread = this_thread::thread ();
+      thread& crt_thread = this_thread::thread ();
 
       scheduler::Critical_section cs; // ----- Critical section -----
 
@@ -851,7 +851,7 @@ namespace os
 
 #else
 
-      Thread& crt_thread = this_thread::thread ();
+      thread& crt_thread = this_thread::thread ();
 
       result_t res;
 
@@ -965,7 +965,7 @@ namespace os
 
 #else
 
-      Thread* crt_thread = &this_thread::thread ();
+      thread* crt_thread = &this_thread::thread ();
 
       scheduler::Critical_section cs; // ----- Critical section -----
 

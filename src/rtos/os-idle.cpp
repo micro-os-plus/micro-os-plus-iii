@@ -49,10 +49,10 @@ namespace os
       void
       _create_idle (void)
       {
-        static stack::allocation_element_t idle_stack[OS_INTEGER_RTOS_IDLE_STACK_SIZE_BYTES
-            / sizeof(stack::allocation_element_t)];
+        static thread::stack::allocation_element_t idle_stack[OS_INTEGER_RTOS_IDLE_STACK_SIZE_BYTES
+            / sizeof(thread::stack::allocation_element_t)];
 
-        static thread::Attributes attr
+        static thread::attributes attr
           { "idle" };
         attr.th_stack_address = idle_stack;
         attr.th_stack_size_bytes = sizeof(idle_stack);
@@ -67,7 +67,7 @@ namespace os
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #endif
-        static Thread idle_thread
+        static thread idle_thread
           { attr, _idle_func, nullptr };
 #pragma GCC diagnostic pop
       }

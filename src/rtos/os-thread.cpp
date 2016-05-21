@@ -43,133 +43,32 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
+    std::size_t thread::stack::min_size_bytes_ = port::stack::min_size_bytes;
+
+    std::size_t thread::stack::default_size_bytes_ =
+        port::stack::default_size_bytes;
+
+    // ========================================================================
+
     /**
+     * @class attributes
      * @details
-     * The os::rtos::stack namespace groups declarations related to
-     * the thread stack.
+     * Allow to assign a name and custom attributes (like stack address,
+     * stack size, priority) to the thread.
+     *
+     * To simplify access, the member variables are public and do not
+     * require accessors or mutators.
+     *
+     * @par POSIX compatibility
+     *  Inspired by `pthread_attr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  (IEEE Std 1003.1, 2013 Edition).
      */
-    namespace stack
-    {
 
-    } /* namespace stack */
+    const thread::attributes thread::initializer
+      { nullptr };
 
     /**
-     * @details
-     * The os::rtos::this_thread namespace groups functions related to
-     * the current thread.
-     */
-    namespace this_thread
-    {
-
-      Thread*
-      _thread (void)
-      {
-        Thread* th;
-
-#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
-
-        th = port::this_thread::thread ();
-
-#else
-
-        th = scheduler::current_thread_;
-
-#endif
-        return th;
-      }
-
-      /**
-       * @details
-       *
-       * @warning Cannot be invoked from Interrupt Service Routines.
-       */
-      Thread&
-      thread (void)
-      {
-        os_assert_throw(!scheduler::in_handler_mode (), EPERM);
-
-        Thread* th;
-
-        th = _thread ();
-
-        assert(th != nullptr);
-        return (*th);
-      }
-
-      /**
-       * @details
-       * Pass control to next thread that is in \b READY state.
-       *
-       * @warning Cannot be invoked from Interrupt Service Routines.
-       */
-      void
-      yield (void)
-      {
-        os_assert_throw(!scheduler::in_handler_mode (), EPERM);
-
-        if (!scheduler::started ())
-          {
-#if defined(OS_TRACE_RTOS_THREAD_CONTEXT)
-            trace::printf ("%s() nop %s \n", __func__, _thread ()->name ());
-#endif
-            return;
-          }
-
-#if defined(OS_TRACE_RTOS_THREAD_CONTEXT)
-        trace::printf ("%s() from %s\n", __func__, _thread ()->name ());
-#endif
-
-#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
-
-        port::this_thread::yield ();
-
-#else
-
-        port::scheduler::reschedule ();
-
-#endif
-
-#if defined(OS_TRACE_RTOS_THREAD_CONTEXT)
-        trace::printf ("%s() to %s\n", __func__, _thread ()->name ());
-#endif
-      }
-
-    } /* namespace this_thread */
-
-    // ======================================================================
-
-    /**
-     * @details
-     * The os::rtos::thread namespace groups thread types, enumerations,
-     * attributes and initialisers.
-     */
-    namespace thread
-    {
-      std::size_t Stack::min_size_bytes_ = port::stack::min_size_bytes;
-
-      std::size_t Stack::default_size_bytes_ = port::stack::default_size_bytes;
-
-      /**
-       * @class Attributes
-       * @details
-       * Allow to assign a name and custom attributes (like stack address,
-       * stack size, priority) to the thread.
-       *
-       * To simplify access, the member variables are public and do not
-       * require accessors or mutators.
-       *
-       * @par POSIX compatibility
-       *  Inspired by `pthread_attr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
-       */
-
-      const Attributes initializer
-        { nullptr };
-
-    } /* namespace thread */
-
-    /**
-     * @class Thread
+     * @class thread
      * @details
      * CMSIS++ threads are inspired by POSIX threads; they support
      * functions that terminate and a simplified version of
@@ -196,7 +95,7 @@ namespace os
      * os_main(int argc, char* argv[])
      * {
      *   // Create new thread, with function and no arguments.
-     *   Thread th { func, nullptr };
+     *   thread th { func, nullptr };
      *
      *   // Do something.
      *
@@ -222,7 +121,7 @@ namespace os
      * and explicitly invoke exit().
      */
     void
-    Thread::_invoke_with_exit (Thread* thread)
+    thread::_invoke_with_exit (thread* thread)
     {
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s @%p %s\n", __func__, thread, thread->name ());
@@ -230,14 +129,14 @@ namespace os
       thread->_exit (thread->func_ (thread->func_args_));
     }
 
-    Thread::Thread ()
+    thread::thread ()
     {
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s @%p %s\n", __func__, this, this->name ());
 #endif
     }
 
-    Thread::Thread (const char* name) :
+    thread::thread (const char* name) :
         named_object
           { name }
     {
@@ -246,7 +145,7 @@ namespace os
 #endif
     }
 
-    Thread::Thread (const char* given_name, const char* attr_name) :
+    thread::thread (const char* given_name, const char* attr_name) :
         named_object
           { given_name, attr_name }
     {
@@ -288,9 +187,9 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Thread::Thread (thread::func_t function, thread::func_args_t args,
+    thread::thread (func_t function, func_args_t args,
                     const Allocator& allocator) :
-        Thread (nullptr, function, args, allocator)
+        thread (nullptr, function, args, allocator)
     {
       ;
     }
@@ -328,8 +227,8 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Thread::Thread (const char* name, thread::func_t function,
-                    thread::func_args_t args, const Allocator& allocator) :
+    thread::thread (const char* name, func_t function, func_args_t args,
+                    const Allocator& allocator) :
         named_object (name)
     {
 #if defined(OS_TRACE_RTOS_THREAD)
@@ -338,7 +237,7 @@ namespace os
       using Allocator = memory::allocator<stack::allocation_element_t>;
       allocator_ = &allocator;
 
-      allocated_stack_size_elements_ = (thread::Stack::default_size ()
+      allocated_stack_size_elements_ = (stack::default_size ()
           + sizeof(stack::allocation_element_t) - 1)
           / sizeof(stack::allocation_element_t);
       allocated_stack_address_ =
@@ -346,7 +245,7 @@ namespace os
               allocated_stack_size_elements_));
 
       _construct (
-          thread::initializer, function, args, allocated_stack_address_,
+          initializer, function, args, allocated_stack_address_,
           allocated_stack_size_elements_ * sizeof(stack::allocation_element_t));
     }
 
@@ -391,9 +290,9 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Thread::Thread (const thread::Attributes& attr, thread::func_t function,
-                    thread::func_args_t args, const Allocator& allocator) :
-        Thread
+    thread::thread (const attributes& attr, func_t function, func_args_t args,
+                    const Allocator& allocator) :
+        thread
           { nullptr, attr, function, args, allocator }
     {
       ;
@@ -440,9 +339,8 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Thread::Thread (const char* name, const thread::Attributes& attr,
-                    thread::func_t function, thread::func_args_t args,
-                    const Allocator& allocator) :
+    thread::thread (const char* name, const attributes& attr, func_t function,
+                    func_args_t args, const Allocator& allocator) :
         named_object
           { name, attr.name () }
     {
@@ -450,7 +348,7 @@ namespace os
       trace::printf ("%s @%p %s\n", __func__, this, this->name ());
 #endif
       if (attr.th_stack_address != nullptr
-          && attr.th_stack_size_bytes > thread::Stack::min_size ())
+          && attr.th_stack_size_bytes > stack::min_size ())
         {
           _construct (attr, function, args, nullptr, 0);
         }
@@ -459,7 +357,7 @@ namespace os
           using Allocator = memory::allocator<stack::allocation_element_t>;
           allocator_ = &allocator;
 
-          if (attr.th_stack_size_bytes > thread::Stack::min_size ())
+          if (attr.th_stack_size_bytes > stack::min_size ())
             {
               allocated_stack_size_elements_ = (attr.th_stack_size_bytes
                   + sizeof(stack::allocation_element_t) - 1)
@@ -467,7 +365,7 @@ namespace os
             }
           else
             {
-              allocated_stack_size_elements_ = (thread::Stack::default_size ()
+              allocated_stack_size_elements_ = (stack::default_size ()
                   + sizeof(stack::allocation_element_t) - 1)
                   / sizeof(stack::allocation_element_t);
             }
@@ -486,21 +384,21 @@ namespace os
     }
 
     void
-    Thread::_construct (const thread::Attributes& attr, thread::func_t function,
-                        thread::func_args_t args, void* stack_address,
+    thread::_construct (const attributes& attr, func_t function,
+                        func_args_t args, void* stack_address,
                         std::size_t stack_size_bytes)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
       assert(function != nullptr);
-      assert(attr.th_priority != thread::priority::none);
+      assert(attr.th_priority != priority::none);
 
       clock_ = attr.clock != nullptr ? attr.clock : &systick_clock;
 
       if (stack_address != nullptr)
         {
           // The attributes should not define any storage in this case.
-          if (attr.th_stack_size_bytes > thread::Stack::min_size ())
+          if (attr.th_stack_size_bytes > stack::min_size ())
             {
               assert(attr.th_stack_address == nullptr);
             }
@@ -543,8 +441,8 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
-          port::Thread::create (this);
-          sched_state_ = thread::state::ready;
+          port::thread::create (this);
+          sched_state_ = state::ready;
 
 #else
 
@@ -552,14 +450,15 @@ namespace os
           void* p = context_.stack_.bottom_address_;
           context_.stack_.bottom_address_ =
               static_cast<stack::element_t*> (std::align (
-                  sizeof(stack::element_t), thread::Stack::min_size (), p,
+                  sizeof(stack::element_t), stack::min_size (), p,
                   context_.stack_.size_bytes_));
 
           os_assert_throw(context_.stack_.bottom_address_ != nullptr, ENOMEM);
 
           // Create the context.
-          port::thread::Context::create (
-              &context_, reinterpret_cast<void*> (_invoke_with_exit), this);
+          port::context::create (&context_,
+                                 reinterpret_cast<void*> (_invoke_with_exit),
+                                 this);
 
           // Add to ready list, but do not yield yet.
           resume ();
@@ -585,7 +484,7 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    Thread::~Thread ()
+    thread::~thread ()
     {
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s @%p %s \n", __func__, this, name ());
@@ -606,7 +505,7 @@ namespace os
      *  Extension to standard, no POSIX similar functionality identified.
      */
     void
-    Thread::_wait (void)
+    thread::_wait (void)
     {
 #if defined(OS_TRACE_RTOS_THREAD)
       //trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -618,7 +517,7 @@ namespace os
           // Remove this thread from the ready list, if there.
           port::this_thread::prepare_suspend ();
 
-          sched_state_ = thread::state::waiting;
+          sched_state_ = state::waiting;
         }
       port::scheduler::reschedule ();
 
@@ -634,7 +533,7 @@ namespace os
      * @note Can be invoked from Interrupt Service Routines.
      */
     void
-    Thread::resume (void)
+    thread::resume (void)
     {
 #if defined(OS_TRACE_RTOS_THREAD_CONTEXT)
       trace::printf ("%s() @%p %s %d\n", __func__, this, name (), prio_);
@@ -645,8 +544,8 @@ namespace os
         {
           interrupts::Critical_section ics; // ----- Critical section -----
 
-          sched_state_ = thread::state::ready;
-          port::Thread::resume (this);
+          sched_state_ = state::ready;
+          port::thread::resume (this);
         }
 
 #else
@@ -676,9 +575,9 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     thread::priority_t
-    Thread::sched_prio (void)
+    thread::sched_prio (void)
     {
-      os_assert_err(!scheduler::in_handler_mode (), thread::priority::error);
+      os_assert_err(!scheduler::in_handler_mode (), priority::error);
 
       // trace::printf ("%s() @%p %s\n", __func__, this, name ());
       return prio_;
@@ -704,11 +603,11 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Thread::sched_prio (thread::priority_t prio)
+    thread::sched_prio (priority_t prio)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
-      os_assert_err(prio < thread::priority::error, EINVAL);
-      os_assert_err(prio != thread::priority::none, EINVAL);
+      os_assert_err(prio < priority::error, EINVAL);
+      os_assert_err(prio != priority::none, EINVAL);
 
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s(%d) @%p %s\n", __func__, prio, this, name ());
@@ -721,11 +620,11 @@ namespace os
 #if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
       // The port must perform a context switch.
-      res = port::Thread::sched_prio (this, prio);
+      res = port::thread::sched_prio (this, prio);
 
 #else
 
-      if (sched_state_ == thread::state::ready)
+      if (sched_state_ == state::ready)
         {
           interrupts::Critical_section ics; // ----- Critical section -----
 
@@ -772,7 +671,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Thread::join (void** exit_ptr)
+    thread::join (void** exit_ptr)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -782,8 +681,8 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      while ((sched_state_ != thread::state::terminated)
-          && (sched_state_ != thread::state::destroyed))
+      while ((sched_state_ != state::terminated)
+          && (sched_state_ != state::destroyed))
         {
           joiner_ = this_thread::_thread ();
           this_thread::_thread ()->_wait ();
@@ -819,7 +718,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Thread::detach (void)
+    thread::detach (void)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -829,7 +728,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
-      result_t res = port::Thread::detach (this);
+      result_t res = port::thread::detach (this);
       if (res != result::ok)
         {
           return res;
@@ -864,7 +763,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Thread::cancel (void)
+    thread::cancel (void)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -877,7 +776,7 @@ namespace os
     }
 
     void
-    Thread::_exit (void* exit_ptr)
+    thread::_exit (void* exit_ptr)
     {
       assert(!scheduler::in_handler_mode ());
 
@@ -903,12 +802,12 @@ namespace os
 
           assert(acquired_mutexes_ == 0);
 
-          sched_state_ = thread::state::terminated;
+          sched_state_ = state::terminated;
 
           func_result_ = exit_ptr;
 
 #if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
-          sched_state_ = thread::state::destroyed;
+          sched_state_ = state::destroyed;
 
           if (joiner_ != nullptr)
             {
@@ -919,7 +818,7 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
-      port::Thread::destroy_this (this);
+      port::thread::destroy_this (this);
       // Does not return if the current thread.
 
 #else
@@ -940,7 +839,7 @@ namespace os
     }
 
     void
-    Thread::_destroy (void)
+    thread::_destroy (void)
     {
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -955,7 +854,7 @@ namespace os
               allocated_stack_size_elements_);
         }
 
-      sched_state_ = thread::state::destroyed;
+      sched_state_ = state::destroyed;
 
       if (joiner_ != nullptr)
         {
@@ -974,7 +873,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Thread::kill (void)
+    thread::kill (void)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -985,7 +884,7 @@ namespace os
         {
           scheduler::Critical_section scs; // ----- Critical section -----
 
-          if (sched_state_ == thread::state::destroyed)
+          if (sched_state_ == state::destroyed)
             {
 #if defined(OS_TRACE_RTOS_THREAD)
               trace::printf ("%s() @%p %s already gone\n", __func__, this,
@@ -994,7 +893,7 @@ namespace os
               return result::ok; // Already exited itself
             }
 
-          if (sched_state_ == thread::state::terminated)
+          if (sched_state_ == state::terminated)
             {
               // TODO remove thread from the funeral list and kill it here.
             }
@@ -1030,11 +929,11 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
-          port::Thread::destroy_other (this);
+          port::thread::destroy_other (this);
 
 #endif
 
-          sched_state_ = thread::state::destroyed;
+          sched_state_ = state::destroyed;
           func_result_ = nullptr;
 
           // All funeral services completed, the thread is gone.
@@ -1057,7 +956,7 @@ namespace os
      * @note Can be invoked from Interrupt Service Routines.
      */
     result_t
-    Thread::sig_raise (thread::sigset_t mask, thread::sigset_t* oflags)
+    thread::sig_raise (sigset_t mask, sigset_t* oflags)
     {
       os_assert_err(mask != 0, EINVAL);
 
@@ -1091,9 +990,9 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     thread::sigset_t
-    Thread::sig_get (thread::sigset_t mask, flags::mode_t mode)
+    thread::sig_get (sigset_t mask, flags::mode_t mode)
     {
-      os_assert_err(!scheduler::in_handler_mode (), thread::sig::all);
+      os_assert_err(!scheduler::in_handler_mode (), sig::all);
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
@@ -1107,7 +1006,7 @@ namespace os
           return sig_mask_;
         }
 
-      thread::sigset_t ret = sig_mask_ & mask;
+      sigset_t ret = sig_mask_ & mask;
       if ((mode & flags::mode::clear) != 0)
         {
           // Clear the selected bits; leave the rest untouched.
@@ -1124,7 +1023,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Thread::sig_clear (thread::sigset_t mask, thread::sigset_t* oflags)
+    thread::sig_clear (sigset_t mask, sigset_t* oflags)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
       os_assert_err(mask != 0, EINVAL);
@@ -1152,8 +1051,7 @@ namespace os
      * Internal function used to test if the desired signal flags are raised.
      */
     result_t
-    Thread::_try_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                       flags::mode_t mode)
+    thread::_try_wait (sigset_t mask, sigset_t* oflags, flags::mode_t mode)
     {
       if ((mask != 0) && ((mode & flags::mode::all) != 0))
         {
@@ -1189,8 +1087,7 @@ namespace os
     }
 
     result_t
-    Thread::_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                       flags::mode_t mode)
+    thread::_sig_wait (sigset_t mask, sigset_t* oflags, flags::mode_t mode)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -1231,8 +1128,7 @@ namespace os
     }
 
     result_t
-    Thread::_try_sig_wait (thread::sigset_t mask, thread::sigset_t* oflags,
-                           flags::mode_t mode)
+    thread::_try_sig_wait (sigset_t mask, sigset_t* oflags, flags::mode_t mode)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -1247,8 +1143,8 @@ namespace os
     }
 
     result_t
-    Thread::_timed_sig_wait (thread::sigset_t mask, clock::duration_t timeout,
-                             thread::sigset_t* oflags, flags::mode_t mode)
+    thread::_timed_sig_wait (sigset_t mask, clock::duration_t timeout,
+                             sigset_t* oflags, flags::mode_t mode)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -1296,7 +1192,7 @@ namespace os
               clock_list.link (timeout_node);
               timeout_node.thread.clock_node_ = &timeout_node;
 
-              sched_state_ = thread::state::waiting;
+              sched_state_ = state::waiting;
             }
 
           port::scheduler::reschedule ();
@@ -1333,6 +1229,91 @@ namespace os
 
       return res;
     }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * @details
+     * The os::rtos::this_thread namespace groups functions related to
+     * the current thread.
+     */
+    namespace this_thread
+    {
+
+      rtos::thread*
+      _thread (void)
+      {
+        rtos::thread* th;
+
+#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+
+        th = port::this_thread::thread ();
+
+#else
+
+        th = scheduler::current_thread_;
+
+#endif
+        return th;
+      }
+
+      /**
+       * @details
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      rtos::thread&
+      thread (void)
+      {
+        os_assert_throw(!scheduler::in_handler_mode (), EPERM);
+
+        rtos::thread* th;
+
+        th = _thread ();
+
+        assert(th != nullptr);
+        return (*th);
+      }
+
+      /**
+       * @details
+       * Pass control to next thread that is in \b READY state.
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      void
+      yield (void)
+      {
+        os_assert_throw(!scheduler::in_handler_mode (), EPERM);
+
+        if (!scheduler::started ())
+          {
+#if defined(OS_TRACE_RTOS_THREAD_CONTEXT)
+            trace::printf ("%s() nop %s \n", __func__, _thread ()->name ());
+#endif
+            return;
+          }
+
+#if defined(OS_TRACE_RTOS_THREAD_CONTEXT)
+        trace::printf ("%s() from %s\n", __func__, _thread ()->name ());
+#endif
+
+#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+
+        port::this_thread::yield ();
+
+#else
+
+        port::scheduler::reschedule ();
+
+#endif
+
+#if defined(OS_TRACE_RTOS_THREAD_CONTEXT)
+        trace::printf ("%s() to %s\n", __func__, _thread ()->name ());
+#endif
+      }
+
+    } /* namespace this_thread */
 
   // --------------------------------------------------------------------------
 

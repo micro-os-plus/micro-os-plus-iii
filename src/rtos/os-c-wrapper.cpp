@@ -48,6 +48,7 @@
 
 // ----------------------------------------------------------------------------
 
+using namespace os;
 using namespace os::rtos;
 
 // ----------------------------------------------------------------------------
@@ -55,8 +56,8 @@ using namespace os::rtos;
 // Validate C structs sizes (should match the C++ objects sizes).
 // TODO: validate individual members (size & offset).
 
-static_assert(sizeof(Thread) == sizeof(os_thread_t), "adjust os_thread_t size");
-static_assert(sizeof(thread::Attributes) == sizeof(os_thread_attr_t), "adjust os_thread_attr_t size");
+static_assert(sizeof(thread) == sizeof(os_thread_t), "adjust os_thread_t size");
+static_assert(sizeof(thread::attributes) == sizeof(os_thread_attr_t), "adjust os_thread_attr_t size");
 
 static_assert(sizeof(timer) == sizeof(os_timer_t), "adjust size of os_timer_t");
 static_assert(sizeof(timer::attributes) == sizeof(os_timer_attr_t), "adjust size of os_timer_attr_t");
@@ -200,74 +201,76 @@ os_this_thread_timed_sig_wait (os_thread_sigset_t mask,
 void
 os_thread_attr_init (os_thread_attr_t* attr, const char* name)
 {
-  new (attr) thread::Attributes (name);
+  new (attr) thread::attributes (name);
 }
 
 void
 os_thread_create (os_thread_t* thread, const os_thread_attr_t* attr,
                   os_thread_func_t func, const os_thread_func_args_t args)
 {
-  new (thread) Thread ((thread::Attributes&) *attr, (thread::func_t) func,
-                       (thread::func_args_t) args);
+  new (thread) rtos::thread ((thread::attributes&) *attr, (thread::func_t) func,
+                             (thread::func_args_t) args);
 }
 
 void
 os_thread_destroy (os_thread_t* thread)
 {
-  (reinterpret_cast<Thread&> (*thread)).~Thread ();
+  (reinterpret_cast<rtos::thread&> (*thread)).~thread ();
 }
 
 os_result_t
 os_thread_join (os_thread_t* thread, void** exit_ptr)
 {
-  return (os_result_t) (reinterpret_cast<Thread&> (*thread)).join (exit_ptr);
+  return (os_result_t) (reinterpret_cast<rtos::thread&> (*thread)).join (
+      exit_ptr);
 }
 
 os_thread_prio_t
 os_thread_get_prio (os_thread_t* thread)
 {
-  return (os_thread_prio_t) (reinterpret_cast<Thread&> (*thread)).sched_prio ();
+  return (os_thread_prio_t) (reinterpret_cast<rtos::thread&> (*thread)).sched_prio ();
 }
 
 os_result_t
 os_thread_set_prio (os_thread_t* thread, os_thread_prio_t prio)
 {
-  return (os_result_t) (reinterpret_cast<Thread&> (*thread)).sched_prio (prio);
+  return (os_result_t) (reinterpret_cast<rtos::thread&> (*thread)).sched_prio (
+      prio);
 }
 
 void
 os_thread_resume (os_thread_t* thread)
 {
-  return (reinterpret_cast<Thread&> (*thread)).resume ();
+  return (reinterpret_cast<rtos::thread&> (*thread)).resume ();
 }
 
 os_thread_user_storage_t*
 os_thread_get_user_storage (os_thread_t* thread)
 {
-  return (reinterpret_cast<Thread&> (*thread)).user_storage ();
+  return (reinterpret_cast<rtos::thread&> (*thread)).user_storage ();
 }
 
 os_result_t
 os_thread_sig_raise (os_thread_t* thread, os_thread_sigset_t mask,
                      os_thread_sigset_t* oflags)
 {
-  return (os_result_t) (reinterpret_cast<Thread&> (*thread)).sig_raise (mask,
-                                                                        oflags);
+  return (os_result_t) (reinterpret_cast<rtos::thread&> (*thread)).sig_raise (
+      mask, oflags);
 }
 
 os_result_t
 os_thread_sig_clear (os_thread_t* thread, os_thread_sigset_t mask,
                      os_thread_sigset_t* oflags)
 {
-  return (os_result_t) (reinterpret_cast<Thread&> (*thread)).sig_clear (mask,
-                                                                        oflags);
+  return (os_result_t) (reinterpret_cast<rtos::thread&> (*thread)).sig_clear (
+      mask, oflags);
 }
 
 os_thread_sigset_t
 os_thread_sig_get (os_thread_t* thread, os_thread_sigset_t mask,
                    os_flags_mode_t mode)
 {
-  return (os_thread_sigset_t) (reinterpret_cast<Thread&> (*thread)).sig_get (
+  return (os_thread_sigset_t) (reinterpret_cast<rtos::thread&> (*thread)).sig_get (
       mask, mode);
 }
 
@@ -324,26 +327,26 @@ void
 os_timer_create (os_timer_t* timer, const os_timer_attr_t* attr,
                  os_timer_func_t func, os_timer_func_args_t args)
 {
-  new (timer) class timer ((timer::attributes&) *attr, (timer::func_t) func,
+  new (timer) rtos::timer ((timer::attributes&) *attr, (timer::func_t) func,
                            (timer::func_args_t) args);
 }
 
 void
 os_timer_destroy (os_timer_t* timer)
 {
-  (reinterpret_cast<class timer&> (*timer)).~timer ();
+  (reinterpret_cast<rtos::timer&> (*timer)).~timer ();
 }
 
 os_result_t
 os_timer_start (os_timer_t* timer, os_clock_duration_t timeout)
 {
-  return (os_result_t) (reinterpret_cast<class timer&> (*timer)).start (timeout);
+  return (os_result_t) (reinterpret_cast<rtos::timer&> (*timer)).start (timeout);
 }
 
 os_result_t
 os_timer_stop (os_timer_t* timer)
 {
-  return (os_result_t) (reinterpret_cast<class timer&> (*timer)).stop ();
+  return (os_result_t) (reinterpret_cast<rtos::timer&> (*timer)).stop ();
 }
 
 // ----------------------------------------------------------------------------
@@ -357,70 +360,70 @@ os_mutex_attr_init (os_mutex_attr_t* attr, const char* name)
 void
 os_mutex_create (os_mutex_t* mutex, const os_mutex_attr_t* attr)
 {
-  new (mutex) class mutex ((mutex::attributes&) *attr);
+  new (mutex) rtos::mutex ((mutex::attributes&) *attr);
 }
 
 void
 os_mutex_destroy (os_mutex_t* mutex)
 {
-  (reinterpret_cast<class mutex&> (*mutex)).~mutex ();
+  (reinterpret_cast<rtos::mutex&> (*mutex)).~mutex ();
 }
 
 os_result_t
 os_mutex_lock (os_mutex_t* mutex)
 {
-  return (os_result_t) (reinterpret_cast<class mutex&> (*mutex)).lock ();
+  return (os_result_t) (reinterpret_cast<rtos::mutex&> (*mutex)).lock ();
 }
 
 os_result_t
 os_mutex_try_lock (os_mutex_t* mutex)
 {
-  return (os_result_t) (reinterpret_cast<class mutex&> (*mutex)).try_lock ();
+  return (os_result_t) (reinterpret_cast<rtos::mutex&> (*mutex)).try_lock ();
 }
 
 os_result_t
 os_mutex_timed_lock (os_mutex_t* mutex, os_clock_duration_t timeout)
 {
-  return (os_result_t) (reinterpret_cast<class mutex&> (*mutex)).timed_lock (
+  return (os_result_t) (reinterpret_cast<rtos::mutex&> (*mutex)).timed_lock (
       timeout);
 }
 
 os_result_t
 os_mutex_unlock (os_mutex_t* mutex)
 {
-  return (os_result_t) (reinterpret_cast<class mutex&> (*mutex)).unlock ();
+  return (os_result_t) (reinterpret_cast<rtos::mutex&> (*mutex)).unlock ();
 }
 
 os_thread_prio_t
 os_mutex_get_prio_ceiling (os_mutex_t* mutex)
 {
-  return (os_thread_prio_t) (reinterpret_cast<class mutex&> (*mutex)).prio_ceiling ();
+  return (os_thread_prio_t) (reinterpret_cast<rtos::mutex&> (*mutex)).prio_ceiling ();
 }
 
 os_result_t
 os_mutex_set_prio_ceiling (os_mutex_t* mutex, os_thread_prio_t prio_ceiling,
                            os_thread_prio_t* old_prio_ceiling)
 {
-  return (os_result_t) (reinterpret_cast<class mutex&> (*mutex)).prio_ceiling (
+  return (os_result_t) (reinterpret_cast<rtos::mutex&> (*mutex)).prio_ceiling (
       prio_ceiling, old_prio_ceiling);
 }
 
 os_result_t
 os_mutex_mark_consistent (os_mutex_t* mutex)
 {
-  return (os_result_t) (reinterpret_cast<class mutex&> (*mutex)).consistent ();
+  return (os_result_t) (reinterpret_cast<rtos::mutex&> (*mutex)).consistent ();
 }
 
 os_thread_t*
 os_mutex_get_owner (os_mutex_t* mutex)
 {
-  return (os_thread_t*) (reinterpret_cast<class mutex&> (*mutex)).owner ();
+  return (os_thread_t*) (reinterpret_cast<rtos::mutex&> (*mutex)).owner ();
 }
 
 os_result_t
 os_mutex_reset (os_mutex_t* mutex)
 {
-  return (os_result_t) (reinterpret_cast<class mutex&> (*mutex)).reset ();
+  return (os_result_t) (reinterpret_cast<rtos::mutex&> (*mutex)).reset ();
 }
 
 // ----------------------------------------------------------------------------
@@ -459,7 +462,7 @@ os_result_t
 os_condvar_wait (os_condvar_t* condvar, os_mutex_t* mutex)
 {
   return (os_result_t) (reinterpret_cast<condition_variable&> (*condvar)).wait (
-      reinterpret_cast<class mutex&> (*mutex));
+      reinterpret_cast<rtos::mutex&> (*mutex));
 }
 
 os_result_t
@@ -467,7 +470,7 @@ os_condvar_timed_wait (os_condvar_t* condvar, os_mutex_t* mutex,
                        os_clock_duration_t timeout)
 {
   return (os_result_t) (reinterpret_cast<condition_variable&> (*condvar)).timed_wait (
-      reinterpret_cast<class mutex&> (*mutex), timeout);
+      reinterpret_cast<rtos::mutex&> (*mutex), timeout);
 }
 
 // ----------------------------------------------------------------------------
@@ -481,62 +484,62 @@ os_semaphore_attr_init (os_semaphore_attr_t* attr, const char* name)
 void
 os_semaphore_create (os_semaphore_t* semaphore, os_semaphore_attr_t* attr)
 {
-  new (semaphore) class semaphore ((semaphore::attributes&) *attr);
+  new (semaphore) rtos::semaphore ((semaphore::attributes&) *attr);
 }
 
 void
 os_semaphore_destroy (os_semaphore_t* semaphore)
 {
-  (reinterpret_cast<class semaphore&> (*semaphore)).~semaphore ();
+  (reinterpret_cast<rtos::semaphore&> (*semaphore)).~semaphore ();
 }
 
 os_result_t
 os_semaphore_post (os_semaphore_t* semaphore)
 {
-  return (os_result_t) (reinterpret_cast<class semaphore&> (*semaphore)).post ();
+  return (os_result_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).post ();
 }
 
 os_result_t
 os_semaphore_wait (os_semaphore_t* semaphore)
 {
-  return (os_result_t) (reinterpret_cast<class semaphore&> (*semaphore)).wait ();
+  return (os_result_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).wait ();
 }
 
 os_result_t
 os_semaphore_try_wait (os_semaphore_t* semaphore)
 {
-  return (os_result_t) (reinterpret_cast<class semaphore&> (*semaphore)).try_wait ();
+  return (os_result_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).try_wait ();
 }
 
 os_result_t
 os_semaphore_timed_wait (os_semaphore_t* semaphore, os_clock_duration_t timeout)
 {
-  return (os_result_t) (reinterpret_cast<class semaphore&> (*semaphore)).timed_wait (
+  return (os_result_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).timed_wait (
       timeout);
 }
 
 os_semaphore_count_t
 os_semaphore_get_value (os_semaphore_t* semaphore)
 {
-  return (os_semaphore_count_t) (reinterpret_cast<class semaphore&> (*semaphore)).value ();
+  return (os_semaphore_count_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).value ();
 }
 
 os_result_t
 os_semaphore_reset (os_semaphore_t* semaphore)
 {
-  return (os_result_t) (reinterpret_cast<class semaphore&> (*semaphore)).reset ();
+  return (os_result_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).reset ();
 }
 
 os_semaphore_count_t
 os_semaphore_get_initial_value (os_semaphore_t* semaphore)
 {
-  return (os_semaphore_count_t) (reinterpret_cast<class semaphore&> (*semaphore)).initial_value ();
+  return (os_semaphore_count_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).initial_value ();
 }
 
 os_semaphore_count_t
 os_semaphore_get_max_value (os_semaphore_t* semaphore)
 {
-  return (os_semaphore_count_t) (reinterpret_cast<class semaphore&> (*semaphore)).max_value ();
+  return (os_semaphore_count_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).max_value ();
 }
 
 // ----------------------------------------------------------------------------
@@ -942,7 +945,7 @@ osThreadCreate (const osThreadDef_t* thread_def, void* args)
       return nullptr;
     }
 
-  thread::Attributes attr
+  thread::attributes attr
     { thread_def->name };
   attr.th_priority = thread_def->tpriority;
   attr.th_stack_size_bytes = thread_def->stacksize;
@@ -956,7 +959,7 @@ osThreadCreate (const osThreadDef_t* thread_def, void* args)
   // Find a free slot in the tread definitions array.
   for (uint32_t i = 0; i < thread_def->instances; ++i)
     {
-      Thread* th = (Thread*) &thread_def->data[i];
+      thread* th = (thread*) &thread_def->data[i];
       if (th->sched_state () == thread::state::undefined
           || th->sched_state () == thread::state::destroyed)
         {
@@ -966,7 +969,7 @@ osThreadCreate (const osThreadDef_t* thread_def, void* args)
                   * ((thread_def->stacksize + sizeof(uint64_t) - 1)
                       / sizeof(uint64_t))];
             }
-          new (th) Thread (attr, (thread::func_t) thread_def->pthread, args);
+          new (th) thread (attr, (thread::func_t) thread_def->pthread, args);
 
           // No need to yield here, already done by constructor.
           return reinterpret_cast<osThreadId> (th);
@@ -1017,20 +1020,20 @@ osThreadTerminate (osThreadId thread_id)
     }
 
   thread::state_t state =
-      (reinterpret_cast<Thread&> (*thread_id)).sched_state ();
+      (reinterpret_cast<rtos::thread&> (*thread_id)).sched_state ();
   if (state == thread::state::undefined)
     {
       return osErrorResource;
     }
 
-  if ((reinterpret_cast<Thread*> (thread_id)) == &this_thread::thread ())
+  if ((reinterpret_cast<thread*> (thread_id)) == &this_thread::thread ())
     {
       this_thread::exit ();
       /* NOTREACHED */
     }
   else
     {
-      (reinterpret_cast<Thread&> (*thread_id)).kill ();
+      (reinterpret_cast<rtos::thread&> (*thread_id)).kill ();
     }
 
   return osOK;
@@ -1079,7 +1082,7 @@ osThreadSetPriority (osThreadId thread_id, osPriority priority)
     }
 
   thread::state_t state =
-      (reinterpret_cast<Thread&> (*thread_id)).sched_state ();
+      (reinterpret_cast<rtos::thread&> (*thread_id)).sched_state ();
   if (state == thread::state::undefined || state >= thread::state::destroyed)
     {
       return osErrorResource;
@@ -1092,7 +1095,8 @@ osThreadSetPriority (osThreadId thread_id, osPriority priority)
 
   // Call C++ mutator.
   thread::priority_t prio = static_cast<thread::priority_t> (priority);
-  result_t res = ((reinterpret_cast<Thread&> (*thread_id)).sched_prio (prio));
+  result_t res = ((reinterpret_cast<rtos::thread&> (*thread_id)).sched_prio (
+      prio));
 
   // A mandatory yield is needed here, must be done
   // by the implementation.
@@ -1133,7 +1137,7 @@ osThreadGetPriority (osThreadId thread_id)
 
   // Call C++ accessor.
   thread::priority_t prio =
-      (reinterpret_cast<Thread&> (*thread_id)).sched_prio ();
+      (reinterpret_cast<rtos::thread&> (*thread_id)).sched_prio ();
   return static_cast<osPriority> (prio);
 }
 
@@ -1278,7 +1282,7 @@ osTimerStart (osTimerId timer_id, uint32_t millisec)
       return osErrorParameter;
     }
 
-  result_t res = (reinterpret_cast<class timer&> (*timer_id)).start (
+  result_t res = (reinterpret_cast<rtos::timer&> (*timer_id)).start (
       Systick_clock::ticks_cast (millisec * 1000u));
 
   if (res == result::ok)
@@ -1309,7 +1313,7 @@ osTimerStop (osTimerId timer_id)
       return osErrorParameter;
     }
 
-  result_t res = (reinterpret_cast<class timer&> (*timer_id)).stop ();
+  result_t res = (reinterpret_cast<rtos::timer&> (*timer_id)).stop ();
   if (res == result::ok)
     {
       return osOK;
@@ -1343,7 +1347,7 @@ osTimerDelete (osTimerId timer_id)
       return osErrorParameter;
     }
 
-  (reinterpret_cast<class timer&> (*timer_id)).~timer ();
+  (reinterpret_cast<rtos::timer&> (*timer_id)).~timer ();
   return osOK;
 }
 
@@ -1370,7 +1374,7 @@ osSignalSet (osThreadId thread_id, int32_t signals)
     }
 
   thread::sigset_t osig;
-  ((Thread*) (thread_id))->sig_raise ((thread::sigset_t) signals, &osig);
+  ((thread*) (thread_id))->sig_raise ((thread::sigset_t) signals, &osig);
   return (int32_t) osig;
 }
 
@@ -1394,7 +1398,7 @@ osSignalClear (osThreadId thread_id, int32_t signals)
     }
 
   thread::sigset_t sig;
-  ((Thread*) (thread_id))->sig_clear ((thread::sigset_t) signals, &sig);
+  ((thread*) (thread_id))->sig_clear ((thread::sigset_t) signals, &sig);
 
   return (int32_t) sig;
 }
@@ -1555,16 +1559,16 @@ osMutexWait (osMutexId mutex_id, uint32_t millisec)
   result_t ret;
   if (millisec == osWaitForever)
     {
-      ret = (reinterpret_cast<class mutex&> (*mutex_id)).lock ();
+      ret = (reinterpret_cast<rtos::mutex&> (*mutex_id)).lock ();
       // osErrorResource:
     }
   else if (millisec == 0)
     {
-      ret = (reinterpret_cast<class mutex&> (*mutex_id)).try_lock ();
+      ret = (reinterpret_cast<rtos::mutex&> (*mutex_id)).try_lock ();
     }
   else
     {
-      ret = (reinterpret_cast<class mutex&> (*mutex_id)).timed_lock (
+      ret = (reinterpret_cast<rtos::mutex&> (*mutex_id)).timed_lock (
           Systick_clock::ticks_cast (millisec * 1000u));
       // osErrorTimeoutResource:
     }
@@ -1622,7 +1626,7 @@ osMutexRelease (osMutexId mutex_id)
     }
 
   result_t res;
-  res = (reinterpret_cast<class mutex&> (*mutex_id)).unlock ();
+  res = (reinterpret_cast<rtos::mutex&> (*mutex_id)).unlock ();
 
   if (res == result::ok)
     {
@@ -1660,7 +1664,7 @@ osMutexDelete (osMutexId mutex_id)
       return osErrorParameter;
     }
 
-  (reinterpret_cast<class mutex&> (*mutex_id)).~mutex ();
+  (reinterpret_cast<rtos::mutex&> (*mutex_id)).~mutex ();
   return osOK;
 }
 
@@ -1744,11 +1748,11 @@ osSemaphoreWait (osSemaphoreId semaphore_id, uint32_t millisec)
   result_t res;
   if (millisec == osWaitForever)
     {
-      res = (reinterpret_cast<class semaphore&> (*semaphore_id)).wait ();
+      res = (reinterpret_cast<rtos::semaphore&> (*semaphore_id)).wait ();
     }
   else if (millisec == 0)
     {
-      res = (reinterpret_cast<class semaphore&> (*semaphore_id)).try_wait ();
+      res = (reinterpret_cast<rtos::semaphore&> (*semaphore_id)).try_wait ();
       if (res == EWOULDBLOCK)
         {
           return 0;
@@ -1756,7 +1760,7 @@ osSemaphoreWait (osSemaphoreId semaphore_id, uint32_t millisec)
     }
   else
     {
-      res = (reinterpret_cast<class semaphore&> (*semaphore_id)).timed_wait (
+      res = (reinterpret_cast<rtos::semaphore&> (*semaphore_id)).timed_wait (
           Systick_clock::ticks_cast (millisec * 1000u));
       if (res == ETIMEDOUT)
         {
@@ -1767,7 +1771,7 @@ osSemaphoreWait (osSemaphoreId semaphore_id, uint32_t millisec)
   if (res == 0)
     {
       int count =
-          (int32_t) (reinterpret_cast<class semaphore&> (*semaphore_id)).value ();
+          (int32_t) (reinterpret_cast<rtos::semaphore&> (*semaphore_id)).value ();
       return count + 1;
     }
   else
@@ -1791,13 +1795,13 @@ osSemaphoreRelease (osSemaphoreId semaphore_id)
       return osErrorParameter;
     }
 
-  if ((reinterpret_cast<class semaphore&> (*semaphore_id)).initial_value ()
+  if ((reinterpret_cast<rtos::semaphore&> (*semaphore_id)).initial_value ()
       == 0)
     {
       return osErrorResource;
     }
 
-  result_t res = (reinterpret_cast<class semaphore&> (*semaphore_id)).post ();
+  result_t res = (reinterpret_cast<rtos::semaphore&> (*semaphore_id)).post ();
 
   if (res == result::ok)
     {
@@ -1835,7 +1839,7 @@ osSemaphoreDelete (osSemaphoreId semaphore_id)
       return osErrorParameter;
     }
 
-  (reinterpret_cast<class semaphore&> (*semaphore_id)).~semaphore ();
+  (reinterpret_cast<rtos::semaphore&> (*semaphore_id)).~semaphore ();
   return osOK;
 }
 

@@ -41,19 +41,19 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-      /**
-       * @class attributes
-       * @details
-       * Allow to assign a name to the event flags.
-       *
-       * @par POSIX compatibility
-       *  No POSIX similar functionality identified, but inspired by POSIX
-       *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  (IEEE Std 1003.1, 2013 Edition).
-       */
+    /**
+     * @class attributes
+     * @details
+     * Allow to assign a name to the event flags.
+     *
+     * @par POSIX compatibility
+     *  No POSIX similar functionality identified, but inspired by POSIX
+     *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  (IEEE Std 1003.1, 2013 Edition).
+     */
 
-      const event_flags::attributes event_flags::initializer
-        { nullptr };
+    const event_flags::attributes event_flags::initializer
+      { nullptr };
 
     // ------------------------------------------------------------------------
 
@@ -335,7 +335,7 @@ namespace os
             }
         }
 
-      Thread& crt_thread = this_thread::thread ();
+      thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
@@ -484,7 +484,7 @@ namespace os
             }
         }
 
-      Thread& crt_thread = this_thread::thread ();
+      thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the

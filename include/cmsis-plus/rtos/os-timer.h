@@ -166,7 +166,7 @@ namespace os
         /**
          * @}
          */
-      };
+      }; /* class attributes */
 
       /**
        * @brief Default one shot timer initialiser.
@@ -215,7 +215,7 @@ namespace os
          * @}
          */
 
-      };
+      }; /* class periodic_attributes */
 
       /**
        * @brief Default periodic timer initialiser.

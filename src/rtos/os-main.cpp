@@ -39,45 +39,39 @@
 
 // ----------------------------------------------------------------------------
 
-namespace os
+namespace
 {
-  namespace rtos
-  {
-    namespace thread
-    {
-      // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
 
-      // Since the native threads have a single argument, and it is better to
-      // avoid C++11 tuples and function objects, there is no other simple
-      // way than to pack the args in a structure and use it by the
-      // trampoline to invoke the os_main().
+  // Since the native threads have a single argument, and it is better to
+  // avoid C++11 tuples and function objects, there is no other simple
+  // way than to pack the args in a structure and use it by the
+  // trampoline to invoke the os_main().
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
-      using main_args_t = struct
-        {
-          int argc;
-          char** argv;
-        };
+  using main_args_t = struct
+    {
+      int argc;
+      char** argv;
+    };
 #pragma GCC diagnostic pop
 
-      static main_args_t main_args;
+  static main_args_t main_args;
 
-      // ----------------------------------------------------------------------
+  // ----------------------------------------------------------------------
 
-      [[noreturn]] static void
-      _main_trampoline (void)
-      {
-        int status = os_main (main_args.argc, main_args.argv);
-        trace::printf ("%s() status = %d\n", __func__, status);
-        std::exit (status);
-      }
+  [[noreturn]] static void
+  _main_trampoline (void)
+  {
+    int status = os_main (main_args.argc, main_args.argv);
+    os::trace::printf ("%s() status = %d\n", __func__, status);
+    std::exit (status);
+  }
 
-    // ------------------------------------------------------------------------
+// ------------------------------------------------------------------------
 
-    } /* namespace thread */
-  } /* namespace rtos */
-} /* namespace os */
+} /* namespace  */
 
 // ----------------------------------------------------------------------------
 
@@ -108,7 +102,7 @@ main (int argc, char* argv[])
   trace::printf ("Scheduler frequency: %d ticks/sec.\n",
                  rtos::Systick_clock::frequency_hz);
   trace::printf ("Default stack size: %d bytes.\n",
-                 thread::Stack::default_size ());
+                 thread::stack::default_size ());
 
 #if defined(__clang__)
   trace::printf ("Built with clang " __VERSION__);
@@ -129,7 +123,7 @@ main (int argc, char* argv[])
   // will not fail with exceptions when printing identity.
   os_thread_t fake_thread;
   fake_thread.name = "none";
-  rtos::Thread* pth = reinterpret_cast<rtos::Thread*> (&fake_thread);
+  rtos::thread* pth = reinterpret_cast<rtos::thread*> (&fake_thread);
 
   rtos::scheduler::current_thread_ = pth;
 #endif
@@ -137,17 +131,17 @@ main (int argc, char* argv[])
   scheduler::initialize ();
 
   // Store the parameters in the static structure, to be used by os_main().
-  thread::main_args.argc = argc;
-  thread::main_args.argv = argv;
+  main_args.argc = argc;
+  main_args.argv = argv;
 
   // Necessarily static, the initial stack will be used for the
   // interrupts, and some implementations (like FreeRTOS) are not
   // able to preserve this stack content.
 
-  static stack::allocation_element_t main_stack[OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES
-      / sizeof(stack::allocation_element_t)];
+  static thread::stack::allocation_element_t main_stack[OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES
+      / sizeof(thread::stack::allocation_element_t)];
 
-  static thread::Attributes attr
+  static thread::attributes attr
     { "main" };
   attr.th_stack_address = main_stack;
   attr.th_stack_size_bytes = sizeof(main_stack);
@@ -157,8 +151,8 @@ main (int argc, char* argv[])
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #endif
-  static Thread main_thread
-    { attr, reinterpret_cast<thread::func_t> (thread::_main_trampoline), nullptr };
+  static thread main_thread
+    { attr, reinterpret_cast<thread::func_t> (_main_trampoline), nullptr };
 #pragma GCC diagnostic pop
 
   scheduler::start ();

@@ -182,7 +182,7 @@ namespace os
         /**
          * @}
          */
-      };
+      }; /* class attributes */
 
       /**
        * @brief Default message queue initialiser.
@@ -216,7 +216,7 @@ namespace os
                   & ~(sizeof(T) - 1));
         }
 
-      using Allocator = memory::allocator<stack::allocation_element_t>;
+      using Allocator = memory::allocator<thread::stack::allocation_element_t>;
 
       // ======================================================================
 

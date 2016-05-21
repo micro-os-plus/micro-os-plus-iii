@@ -45,7 +45,7 @@ namespace os
 {
   namespace rtos
   {
-    class Thread;
+    class thread;
     class Double_list;
     class Timeout_thread_node;
     class timer_node;
@@ -196,7 +196,7 @@ namespace os
        * @brief Create a node with references to the thread.
        * @param th Reference to the thread.
        */
-      Waiting_thread_node (Thread& th);
+      Waiting_thread_node (thread& th);
 
       /**
        * @cond ignore
@@ -230,7 +230,7 @@ namespace os
       /**
        * @brief Reference to waiting thread.
        */
-      Thread& thread;
+      rtos::thread& thread;
 
       /**
        * @}
@@ -347,7 +347,7 @@ namespace os
        * @param [in] ts Time stamp.
        * @param [in] th Reference to thread.
        */
-      Timeout_thread_node (clock::timestamp_t ts, Thread& th);
+      Timeout_thread_node (clock::timestamp_t ts, thread& th);
 
       /**
        * @cond ignore
@@ -402,7 +402,7 @@ namespace os
       /**
        * @brief Reference to thread who initiated the timeout.
        */
-      Thread& thread;
+      rtos::thread& thread;
 
       /**
        * @}
@@ -725,7 +725,7 @@ namespace os
        * @return Nothing.
        */
       void
-      link (Thread& thread);
+      link (thread& thread);
 
       // TODO add iterator begin(), end()
 
@@ -788,7 +788,7 @@ namespace os
        * @return Nothing.
        */
       void
-      link (Thread& thread);
+      link (thread& thread);
 
       // TODO add iterator begin(), end()
 
@@ -868,7 +868,7 @@ namespace os
        *  None.
        * @return Pointer to thread.
        */
-      Thread*
+      thread*
       unlink_head (void);
 
       // TODO add iterator begin(), end()
@@ -1186,7 +1186,7 @@ namespace os
     // ========================================================================
 
     inline
-    Waiting_thread_node::Waiting_thread_node (Thread& th) :
+    Waiting_thread_node::Waiting_thread_node (rtos::thread& th) :
         thread (th)
     {
       ;

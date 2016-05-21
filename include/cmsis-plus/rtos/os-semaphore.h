@@ -147,7 +147,7 @@ namespace os
         /**
          * @}
          */
-      };
+      }; /* class attributes */
 
       /**
        * @brief Default counting semaphore initialiser.
@@ -197,7 +197,7 @@ namespace os
         /**
          * @}
          */
-      };
+      }; /* class binary_attributes */
 
       /**
        * @brief Default binary semaphore initialiser.

@@ -249,7 +249,7 @@ namespace os
     Clock::_wait_until (clock::timestamp_t timestamp,
                         Clock_timestamps_list& list)
     {
-      Thread& crt_thread = this_thread::thread ();
+      thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the

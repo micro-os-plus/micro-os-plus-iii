@@ -81,7 +81,7 @@ namespace os
 #pragma GCC diagnostic pop
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
-      Thread* volatile current_thread_;
+      thread* volatile current_thread_;
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wglobal-constructors"

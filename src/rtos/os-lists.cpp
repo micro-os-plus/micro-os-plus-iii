@@ -164,7 +164,7 @@ namespace os
     // ========================================================================
 
     void
-    Top_threads_list::link (Thread& thread)
+    Top_threads_list::link (thread& thread)
     {
       if (head_.prev == nullptr)
         {
@@ -180,7 +180,7 @@ namespace os
     // ========================================================================
 
     void
-    Thread_children_list::link (Thread& thread)
+    Thread_children_list::link (thread& thread)
     {
       // Add thread intrusive node at the end of the list.
       insert_after (thread.child_links_,
@@ -242,12 +242,12 @@ namespace os
      * @details
      * Must be called in a critical section.
      */
-    Thread*
+    thread*
     Ready_threads_list::unlink_head (void)
     {
       assert(!empty ());
 
-      Thread* thread = &(head ()->thread);
+      thread* thread = &(head ()->thread);
 
 #if defined(OS_TRACE_RTOS_LISTS)
       trace::printf ("ready %s() %p %s\n", __func__, thread, thread->name ());
@@ -355,7 +355,7 @@ namespace os
     void
     Waiting_threads_list::resume_one (void)
     {
-      Thread* thread;
+      thread* thread;
         {
           interrupts::Critical_section ics; // ----- Critical section -----
 
@@ -413,7 +413,8 @@ namespace os
 
     // ========================================================================
 
-    Timeout_thread_node::Timeout_thread_node (clock::timestamp_t ts, Thread& th) :
+    Timeout_thread_node::Timeout_thread_node (clock::timestamp_t ts,
+                                              rtos::thread& th) :
         Timestamp_node
           { ts }, //
         thread (th)
@@ -434,7 +435,7 @@ namespace os
     void
     Timeout_thread_node::action (void)
     {
-      Thread* th = &this->thread;
+      rtos::thread* th = &this->thread;
       this->unlink ();
 
       thread::state_t state = th->sched_state ();
