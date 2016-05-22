@@ -39,7 +39,7 @@ run_tests ()
   int i = 1;
   for (;; i *= 2)
     {
-      uint32_t period = tmr.in_clk_hz () / rtos::Systick_clock::frequency_hz
+      uint32_t period = tmr.in_clk_hz () / rtos::clock_systick::frequency_hz
           / i;
       if (period < 10)
         {
@@ -52,7 +52,7 @@ run_tests ()
   puts ("\n\nRandom");
 
   uint32_t from = 10;
-  uint32_t to = tmr.in_clk_hz () / rtos::Systick_clock::frequency_hz / 32;
+  uint32_t to = tmr.in_clk_hz () / rtos::clock_systick::frequency_hz / 32;
 
   for (i = 0; i < 100; ++i)
     {
@@ -74,7 +74,7 @@ uint32_t volatile cnt;
 uint32_t volatile delayed;
 uint32_t volatile max_delayed;
 
-Semaphore sem;
+semaphore sem;
 
 static void
 sema_cb (void)
@@ -116,7 +116,7 @@ sema (uint32_t cycles)
   uint32_t i;
   for (i = 0; i < max_count; ++i)
     {
-      assert(sem.timed_wait (rtos::Systick_clock::frequency_hz) == result::ok);
+      assert(sem.timed_wait (rtos::clock_systick::frequency_hz) == result::ok);
       trace_putchar ('-');
       assert(buf[i] == i);
       delayed++;
