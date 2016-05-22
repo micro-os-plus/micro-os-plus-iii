@@ -77,14 +77,14 @@ namespace os
     namespace
     {
       // Anonymous definition required for the next forward definition.
-      using func_args_t = void*;
+      using _func_args_t = void*;
     }
 
     // Forward definitions required by thread friends.
     namespace scheduler
     {
       void*
-      _idle_func (func_args_t args);
+      _idle_func (_func_args_t args);
     } /* namespace scheduler */
 
     // ========================================================================
@@ -262,7 +262,7 @@ namespace os
        * @details
        * Type of thread function arguments.
        */
-      using func_args_t = func_args_t;
+      using func_args_t = _func_args_t;
 
       /**
        * @brief Thread function.

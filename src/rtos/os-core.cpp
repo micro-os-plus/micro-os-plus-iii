@@ -272,9 +272,9 @@ namespace os
 
         // Add this thread to the node waiting list.
         list.link (node);
-        node.thread.waiting_node_ = &node;
+        node.thread_.waiting_node_ = &node;
 
-        node.thread.sched_state_ = thread::state::waiting;
+        node.thread_.sched_state_ = thread::state::waiting;
       }
 
       void
@@ -285,7 +285,7 @@ namespace os
 
             // Remove the thread from the node waiting list,
             // if not already removed.
-            node.thread.waiting_node_ = nullptr;
+            node.thread_.waiting_node_ = nullptr;
             node.unlink ();
           }
       }
@@ -300,9 +300,9 @@ namespace os
 
         // Add this thread to the node waiting list.
         list.link (node);
-        node.thread.waiting_node_ = &node;
+        node.thread_.waiting_node_ = &node;
 
-        node.thread.sched_state_ = thread::state::waiting;
+        node.thread_.sched_state_ = thread::state::waiting;
 
         // Add this thread to the clock timeout list.
         timeout_list.link (timeout_node);
@@ -322,7 +322,7 @@ namespace os
 
         // Remove the thread from the node waiting list,
         // if not already removed.
-        node.thread.waiting_node_ = nullptr;
+        node.thread_.waiting_node_ = nullptr;
         node.unlink ();
       }
 

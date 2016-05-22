@@ -87,7 +87,7 @@ namespace os
                         const_cast<waiting_thread_node*> (scheduler::terminated_threads_list_.head ());
                     node->unlink ();
                   }
-                node->thread._destroy ();
+                node->thread_._destroy ();
 
                 this_thread::yield ();
               }

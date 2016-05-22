@@ -585,13 +585,13 @@ namespace os
         {
           // Add this thread to the condition variable waiting list.
           list_.link (node);
-          node.thread.waiting_node_ = &node;
+          node.thread_.waiting_node_ = &node;
 
           res = mutex.lock ();
 
           // Remove the thread from the node waiting list,
           // if not already removed.
-          node.thread.waiting_node_ = nullptr;
+          node.thread_.waiting_node_ = nullptr;
           node.unlink ();
         }
 
@@ -727,13 +727,13 @@ namespace os
         {
           // Add this thread to the condition variable waiting list.
           list_.link (node);
-          node.thread.waiting_node_ = &node;
+          node.thread_.waiting_node_ = &node;
 
           res = mutex.timed_lock (timeout);
 
           // Remove the thread from the node waiting list,
           // if not already removed.
-          node.thread.waiting_node_ = nullptr;
+          node.thread_.waiting_node_ = nullptr;
           node.unlink ();
         }
 

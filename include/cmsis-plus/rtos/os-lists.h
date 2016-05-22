@@ -230,7 +230,7 @@ namespace os
       /**
        * @brief Reference to waiting thread.
        */
-      rtos::thread& thread;
+      rtos::thread& thread_;
 
       /**
        * @}
@@ -1187,7 +1187,7 @@ namespace os
 
     inline
     waiting_thread_node::waiting_thread_node (rtos::thread& th) :
-        thread (th)
+        thread_ (th)
     {
       ;
     }

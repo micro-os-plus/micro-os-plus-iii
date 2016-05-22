@@ -198,16 +198,16 @@ namespace os
           clear ();
         }
 
-      thread::priority_t prio = node.thread.prio_;
+      thread::priority_t prio = node.thread_.prio_;
 
       waiting_thread_node* after =
           static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (tail ()));
 
-      if (empty () || (prio <= after->thread.prio_))
+      if (empty () || (prio <= after->thread_.prio_))
         {
           // Insert at the end of the list.
         }
-      else if (prio > head ()->thread.prio_)
+      else if (prio > head ()->thread_.prio_)
         {
           // Insert at the beginning of the list
           after =
@@ -221,7 +221,7 @@ namespace os
           // Insert in the middle of the list.
           // The loop is guaranteed to terminate, not hit the head and
           // the weight is small, sched_prio() is only an accessor.
-          while (prio > after->thread.prio_)
+          while (prio > after->thread_.prio_)
             {
               after =
                   static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (after->prev));
@@ -229,13 +229,13 @@ namespace os
         }
 
 #if defined(OS_TRACE_RTOS_LISTS)
-      trace::printf ("ready %s() %p %s\n", __func__, &node.thread,
-                     node.thread.name ());
+      trace::printf ("ready %s() %p %s\n", __func__, &node.thread_,
+                     node.thread_.name ());
 #endif
 
       insert_after (node, after);
 
-      node.thread.sched_state_ = thread::state::ready;
+      node.thread_.sched_state_ = thread::state::ready;
     }
 
     /**
@@ -247,7 +247,7 @@ namespace os
     {
       assert(!empty ());
 
-      thread* thread = &(head ()->thread);
+      thread* thread = &(head ()->thread_);
 
 #if defined(OS_TRACE_RTOS_LISTS)
       trace::printf ("ready %s() %p %s\n", __func__, thread, thread->name ());
@@ -309,16 +309,16 @@ namespace os
     void
     waiting_threads_list::link (waiting_thread_node& node)
     {
-      thread::priority_t prio = node.thread.sched_prio ();
+      thread::priority_t prio = node.thread_.sched_prio ();
 
       waiting_thread_node* after =
           static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (tail ()));
 
-      if (empty () || (prio <= after->thread.sched_prio ()))
+      if (empty () || (prio <= after->thread_.sched_prio ()))
         {
           // Insert at the end of the list.
         }
-      else if (prio > head ()->thread.sched_prio ())
+      else if (prio > head ()->thread_.sched_prio ())
         {
           // Insert at the beginning of the list
           after =
@@ -332,7 +332,7 @@ namespace os
           // Insert in the middle of the list.
           // The loop is guaranteed to terminate, not hit the head and
           // the weight is small, sched_prio() is only an accessor.
-          while (prio > after->thread.sched_prio ())
+          while (prio > after->thread_.sched_prio ())
             {
               after =
                   static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (after->prev));
@@ -340,8 +340,8 @@ namespace os
         }
 
 #if defined(OS_TRACE_RTOS_LISTS)
-      trace::printf ("wait %s() %p %s\n", __func__, &node.thread,
-                     node.thread.name ());
+      trace::printf ("wait %s() %p %s\n", __func__, &node.thread_,
+                     node.thread_.name ());
 #endif
 
       insert_after (node, after);
@@ -367,7 +367,7 @@ namespace os
 
           // The top priority is to remove the entry from the list
           // so that subsequent wakeups to address different threads.
-          thread = &(head ()->thread);
+          thread = &(head ()->thread_);
           const_cast<waiting_thread_node*> (head ())->unlink ();
         }
       assert(thread != nullptr);
@@ -603,8 +603,8 @@ namespace os
           static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (tail ()));
 
 #if defined(OS_TRACE_RTOS_LISTS)
-      trace::printf ("terminated %s() %p %s\n", __func__, &node.thread,
-                     node.thread.name ());
+      trace::printf ("terminated %s() %p %s\n", __func__, &node.thread_,
+                     node.thread_.name ());
 #endif
 
       insert_after (node, after);

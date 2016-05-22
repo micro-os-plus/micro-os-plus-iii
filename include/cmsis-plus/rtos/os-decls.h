@@ -530,7 +530,7 @@ namespace os
       /**
        * @brief Pointer to clock.
        */
-      clock* clock;
+      rtos::clock* clock;
 
       /**
        * @}
