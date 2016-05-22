@@ -137,13 +137,13 @@ os_sched_is_locked (void)
 os_irq_status_t
 os_irq_critical_enter (void)
 {
-  return interrupts::Critical_section::enter ();
+  return interrupts::critical_section::enter ();
 }
 
 void
 os_irq_critical_exit (os_irq_status_t status)
 {
-  interrupts::Critical_section::exit (status);
+  interrupts::critical_section::exit (status);
 }
 
 // ----------------------------------------------------------------------------
@@ -151,13 +151,13 @@ os_irq_critical_exit (os_irq_status_t status)
 os_irq_status_t
 os_irq_uncritical_enter (void)
 {
-  return interrupts::Uncritical_section::enter ();
+  return interrupts::uncritical_section::enter ();
 }
 
 void
 os_irq_uncritical_exit (os_irq_status_t status)
 {
-  interrupts::Uncritical_section::exit (status);
+  interrupts::uncritical_section::exit (status);
 }
 
 // ----------------------------------------------------------------------------

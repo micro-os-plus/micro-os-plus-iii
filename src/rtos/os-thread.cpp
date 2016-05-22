@@ -421,7 +421,7 @@ namespace os
 
         {
           // Prevent the new thread to execute before all members are set.
-          scheduler::Critical_section cs; // ----- Critical section -----
+          scheduler::critical_section cs; // ----- Critical section -----
 
           // Get attributes from user structure.
           prio_ = attr.th_priority;
@@ -512,7 +512,7 @@ namespace os
 #endif
 
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           // Remove this thread from the ready list, if there.
           port::this_thread::prepare_suspend ();
@@ -542,7 +542,7 @@ namespace os
 #if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           sched_state_ = state::ready;
           port::thread::resume (this);
@@ -551,7 +551,7 @@ namespace os
 #else
 
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           if (ready_node_.next == nullptr)
             {
@@ -626,7 +626,7 @@ namespace os
 
       if (sched_state_ == state::ready)
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           // Remove from initial location and reinsert according
           // to new priority.
@@ -785,10 +785,10 @@ namespace os
 #endif
 
         {
-          scheduler::Critical_section scs; // ----- Critical section -----
+          scheduler::critical_section scs; // ----- Critical section -----
 
             {
-              interrupts::Critical_section ics; // ----- Critical section -----
+              interrupts::critical_section ics; // ----- Critical section -----
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
               ready_node_.unlink ();
@@ -824,7 +824,7 @@ namespace os
 #else
 
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           // Add to a list of threads to be destroyed by the idle thread.
           scheduler::terminated_threads_list_.link (ready_node_);
@@ -882,7 +882,7 @@ namespace os
 #endif
 
         {
-          scheduler::Critical_section scs; // ----- Critical section -----
+          scheduler::critical_section scs; // ----- Critical section -----
 
           if (sched_state_ == state::destroyed)
             {
@@ -899,7 +899,7 @@ namespace os
             }
 
             {
-              interrupts::Critical_section ics; // ----- Critical section -----
+              interrupts::critical_section ics; // ----- Critical section -----
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
               ready_node_.unlink ();
@@ -964,7 +964,7 @@ namespace os
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
 #endif
 
-      interrupts::Critical_section ics; // ----- Critical section -----
+      interrupts::critical_section ics; // ----- Critical section -----
 
       if (oflags != nullptr)
         {
@@ -998,7 +998,7 @@ namespace os
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
 #endif
 
-      interrupts::Critical_section ics; // ----- Critical section -----
+      interrupts::critical_section ics; // ----- Critical section -----
 
       if (mask == 0)
         {
@@ -1032,7 +1032,7 @@ namespace os
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
 #endif
 
-      interrupts::Critical_section ics; // ----- Critical section -----
+      interrupts::critical_section ics; // ----- Critical section -----
 
       if (oflags != nullptr)
         {
@@ -1103,7 +1103,7 @@ namespace os
       for (;;)
         {
             {
-              interrupts::Critical_section ics; // ----- Critical section -----
+              interrupts::critical_section ics; // ----- Critical section -----
 
               if (_try_wait (mask, oflags, mode) == result::ok)
                 {
@@ -1137,7 +1137,7 @@ namespace os
                      name ());
 #endif
 
-      interrupts::Critical_section ics; // ----- Critical section -----
+      interrupts::critical_section ics; // ----- Critical section -----
 
       return _try_wait (mask, oflags, mode);
     }
@@ -1154,7 +1154,7 @@ namespace os
 #endif
 
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           if (_try_wait (mask, oflags, mode) == result::ok)
             {
@@ -1177,7 +1177,7 @@ namespace os
       for (;;)
         {
             {
-              interrupts::Critical_section ics; // ----- Critical section -----
+              interrupts::critical_section ics; // ----- Critical section -----
 
               if (_try_wait (mask, oflags, mode) == result::ok)
                 {
@@ -1198,7 +1198,7 @@ namespace os
           port::scheduler::reschedule ();
 
             {
-              interrupts::Critical_section ics; // ----- Critical section -----
+              interrupts::critical_section ics; // ----- Critical section -----
 
               // Remove the thread from the clock timeout list,
               // if not already removed by the timer.

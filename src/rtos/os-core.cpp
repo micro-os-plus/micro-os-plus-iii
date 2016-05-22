@@ -170,7 +170,7 @@ namespace os
         status_t tmp;
 
           {
-            interrupts::Critical_section ics;
+            interrupts::critical_section ics;
 
             tmp = is_locked_;
             is_locked_ = status;
@@ -202,7 +202,7 @@ namespace os
       }
 
     /**
-     * @class Critical_section
+     * @class critical_section
      * @details
      * Use this class to define a critical section
      * protected to scheduler switches. The beginning of the
@@ -224,7 +224,7 @@ namespace os
      *    // Do something
      *
      *    {
-     *      scheduler::Critical_section cs;  // Critical section begins here.
+     *      scheduler::critical_section cs;  // Critical section begins here.
      *
      *      // Inside the critical section.
      *      // No scheduler switches will happen here.
@@ -237,7 +237,7 @@ namespace os
      */
 
     /**
-     * @var const status_t Critical_section::status_
+     * @var const status_t critical_section::status_
      * @details
      * The variable is constant, after being set by the constructor no
      * further changes are possible.
@@ -281,7 +281,7 @@ namespace os
       _unlink_node (waiting_thread_node& node)
       {
           {
-            interrupts::Critical_section ics; // ----- Critical section -----
+            interrupts::critical_section ics; // ----- Critical section -----
 
             // Remove the thread from the node waiting list,
             // if not already removed.
@@ -313,7 +313,7 @@ namespace os
       _unlink_node (waiting_thread_node& node,
                     timeout_thread_node& timeout_node)
       {
-        interrupts::Critical_section ics; // ----- Critical section -----
+        interrupts::critical_section ics; // ----- Critical section -----
 
         // Remove the thread from the clock timeout list,
         // if not already removed by the timer.
@@ -336,7 +336,7 @@ namespace os
     namespace interrupts
     {
       /**
-       * @class Critical_section
+       * @class critical_section
        * @details
        * Use this class to define a critical section
        * protected to interrupts service routines. The begining of the
@@ -358,7 +358,7 @@ namespace os
        *    // Do something
        *
        *    {
-       *      interrupts::Critical_section ics;  // Critical section begins here.
+       *      interrupts::critical_section ics;  // Critical section begins here.
        *
        *      // Inside the critical section.
        *      // No scheduler switches will happen here.
@@ -371,7 +371,7 @@ namespace os
        */
 
       /**
-       * @var const status_t Critical_section::status_
+       * @var const status_t critical_section::status_
        * @details
        * The variable is constant, after being set by the constructor no
        * further changes are possible.
@@ -382,30 +382,30 @@ namespace os
 
       // Enter an IRQ critical section
       status_t
-      Critical_section::enter (void)
+      critical_section::enter (void)
       {
-        return port::interrupts::Critical_section::enter ();
+        return port::interrupts::critical_section::enter ();
       }
 
       // Exit an IRQ critical section
       void
-      Critical_section::exit (status_t status)
+      critical_section::exit (status_t status)
       {
-        port::interrupts::Critical_section::exit (status);
+        port::interrupts::critical_section::exit (status);
       }
 
       // Enter an IRQ uncritical section
       status_t
-      Uncritical_section::enter (void)
+      uncritical_section::enter (void)
       {
-        return port::interrupts::Uncritical_section::enter ();
+        return port::interrupts::uncritical_section::enter ();
       }
 
       // Exit an IRQ uncritical section
       void
-      Uncritical_section::exit (status_t status)
+      uncritical_section::exit (status_t status)
       {
-        port::interrupts::Uncritical_section::exit (status);
+        port::interrupts::uncritical_section::exit (status);
       }
 
     /**

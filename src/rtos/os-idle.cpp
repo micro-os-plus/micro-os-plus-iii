@@ -82,7 +82,7 @@ namespace os
               {
                 waiting_thread_node* node;
                   {
-                    interrupts::Critical_section ics; // ----- Critical section -----
+                    interrupts::critical_section ics; // ----- Critical section -----
                     node =
                         const_cast<waiting_thread_node*> (scheduler::terminated_threads_list_.head ());
                     node->unlink ();

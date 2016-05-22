@@ -553,7 +553,7 @@ namespace os
         }
 
       // ----- Enter uncritical section -----
-      scheduler::Uncritical_section ucs;
+      scheduler::uncritical_section ucs;
 
       if (saved_owner == nullptr)
         {
@@ -676,7 +676,7 @@ namespace os
 
       result_t res;
         {
-          scheduler::Critical_section cs; // ----- Critical section -----
+          scheduler::critical_section cs; // ----- Critical section -----
 
           res = _try_lock (&crt_thread);
           if (res != EWOULDBLOCK)
@@ -694,7 +694,7 @@ namespace os
       for (;;)
         {
             {
-              scheduler::Critical_section cs; // ----- Critical section -----
+              scheduler::critical_section cs; // ----- Critical section -----
 
               res = _try_lock (&crt_thread);
               if (res != EWOULDBLOCK)
@@ -703,7 +703,7 @@ namespace os
                 }
 
                 {
-                  interrupts::Critical_section ics; // ----- Critical section -----
+                  interrupts::critical_section ics; // ----- Critical section -----
 
                   // Add this thread to the mutex waiting list.
                   scheduler::_link_node (list_, node);
@@ -786,7 +786,7 @@ namespace os
 
       thread& crt_thread = this_thread::thread ();
 
-      scheduler::Critical_section cs; // ----- Critical section -----
+      scheduler::critical_section cs; // ----- Critical section -----
 
       return _try_lock (&crt_thread);
 
@@ -858,7 +858,7 @@ namespace os
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
         {
-          scheduler::Critical_section cs; // ----- Critical section -----
+          scheduler::critical_section cs; // ----- Critical section -----
 
           res = _try_lock (&crt_thread);
           if (res != EWOULDBLOCK)
@@ -883,7 +883,7 @@ namespace os
       for (;;)
         {
             {
-              scheduler::Critical_section cs; // ----- Critical section -----
+              scheduler::critical_section cs; // ----- Critical section -----
 
               res = _try_lock (&crt_thread);
               if (res != EWOULDBLOCK)
@@ -892,7 +892,7 @@ namespace os
                 }
 
                 {
-                  interrupts::Critical_section ics; // ----- Critical section -----
+                  interrupts::critical_section ics; // ----- Critical section -----
 
                   // Add this thread to the mutex waiting list,
                   // and the clock timeout list.
@@ -967,7 +967,7 @@ namespace os
 
       thread* crt_thread = &this_thread::thread ();
 
-      scheduler::Critical_section cs; // ----- Critical section -----
+      scheduler::critical_section cs; // ----- Critical section -----
 
       if (owner_ == crt_thread)
         {
@@ -1166,7 +1166,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      scheduler::Critical_section cs; // ----- Critical section -----
+      scheduler::critical_section cs; // ----- Critical section -----
 
       _init ();
       return result::ok;

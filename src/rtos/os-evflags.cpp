@@ -328,7 +328,7 @@ namespace os
 #else
 
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           if (_try_wait (mask, oflags, mode))
             {
@@ -347,7 +347,7 @@ namespace os
       for (;;)
         {
             {
-              interrupts::Critical_section ics; // ----- Critical section -----
+              interrupts::critical_section ics; // ----- Critical section -----
 
               if (_try_wait (mask, oflags, mode))
                 {
@@ -362,7 +362,7 @@ namespace os
           port::scheduler::reschedule ();
 
             {
-              interrupts::Critical_section ics; // ----- Critical section -----
+              interrupts::critical_section ics; // ----- Critical section -----
 
               // Remove the thread from the event flags waiting list,
               // if not already removed by raise().
@@ -406,7 +406,7 @@ namespace os
 
 #else
 
-      interrupts::Critical_section ics; // ----- Critical section -----
+      interrupts::critical_section ics; // ----- Critical section -----
 
       if (_try_wait (mask, oflags, mode))
         {
@@ -477,7 +477,7 @@ namespace os
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           if (_try_wait (mask, oflags, mode))
             {
@@ -503,7 +503,7 @@ namespace os
       for (;;)
         {
             {
-              interrupts::Critical_section ics; // ----- Critical section -----
+              interrupts::critical_section ics; // ----- Critical section -----
 
               if (_try_wait (mask, oflags, mode))
                 {
@@ -563,7 +563,7 @@ namespace os
 
 #else
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           flags_ |= mask;
 
@@ -574,7 +574,7 @@ namespace os
         }
 
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           // Wake-up all threads, if any.
           list_.resume_all ();
@@ -605,7 +605,7 @@ namespace os
 
 #else
 
-      interrupts::Critical_section ics; // ----- Critical section -----
+      interrupts::critical_section ics; // ----- Critical section -----
 
       if (oflags != nullptr)
         {
@@ -644,7 +644,7 @@ namespace os
 
 #else
 
-      interrupts::Critical_section ics; // ----- Critical section -----
+      interrupts::critical_section ics; // ----- Critical section -----
 
       if (mask == 0)
         {

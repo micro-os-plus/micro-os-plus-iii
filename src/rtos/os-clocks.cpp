@@ -113,7 +113,7 @@ namespace os
     clock::now (void)
     {
       // Prevent inconsistent values.
-      interrupts::Critical_section ics; // ----- Critical section -----
+      interrupts::critical_section ics; // ----- Critical section -----
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-conversion"
@@ -124,7 +124,7 @@ namespace os
     clock::timestamp_t
     clock::steady_now (void)
     {
-      interrupts::Critical_section ics; // ----- Critical section -----
+      interrupts::critical_section ics; // ----- Critical section -----
 
       // Prevent inconsistent values using the critical section.
       return steady_count_;
@@ -233,7 +233,7 @@ namespace os
 #endif
 
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
           ++steady_count_;
         }
 
@@ -258,7 +258,7 @@ namespace os
         { timestamp, crt_thread };
 
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           // Remove this thread from the ready list, if there.
           port::this_thread::prepare_suspend ();
@@ -272,7 +272,7 @@ namespace os
       port::scheduler::reschedule ();
 
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           // Remove the thread from the clock timeout list,
           // if not already removed by the timer.
@@ -381,7 +381,7 @@ namespace os
       uint64_t ticks;
       uint32_t val;
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           // Sample ticks counter inside critical section.
           ticks = steady_count_;

@@ -272,7 +272,7 @@ namespace os
 #else
 
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           if (state_ == state::running)
             {
@@ -317,7 +317,7 @@ namespace os
       timer_node_.timestamp = clock_->steady_now () + period;
 
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           // If started, stop.
           timer_node_.unlink ();
@@ -367,7 +367,7 @@ namespace os
 #else
 
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           timer_node_.unlink ();
         }

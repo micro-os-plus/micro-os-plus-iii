@@ -140,8 +140,10 @@ extern "C"
     }os_thread_user_storage_t;
 #endif
 
-    typedef uint64_t os_clock_timestamp_t;
-    typedef uint32_t os_clock_duration_t;
+  //
+
+  typedef uint64_t os_clock_timestamp_t;
+  typedef uint32_t os_clock_duration_t;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"

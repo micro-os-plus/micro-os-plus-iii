@@ -658,11 +658,11 @@ namespace os
 
         // ====================================================================
 
-        class Critical_section
+        class critical_section
         {
         public:
 
-          Critical_section () = delete;
+          critical_section () = delete;
 
           // Enter an IRQ critical section
           static rtos::interrupts::status_t
@@ -676,11 +676,11 @@ namespace os
 
         // ====================================================================
 
-        class Uncritical_section
+        class uncritical_section
         {
         public:
 
-          Uncritical_section () = delete;
+          uncritical_section () = delete;
 
           // Enter an IRQ uncritical section
           static rtos::interrupts::status_t

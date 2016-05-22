@@ -554,7 +554,7 @@ namespace os
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           p = _try_first ();
           if (p != nullptr)
@@ -574,7 +574,7 @@ namespace os
       for (;;)
         {
             {
-              interrupts::Critical_section ics; // ----- Critical section -----
+              interrupts::critical_section ics; // ----- Critical section -----
 
               p = _try_first ();
               if (p != nullptr)
@@ -626,7 +626,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      interrupts::Critical_section ics; // ----- Critical section -----
+      interrupts::critical_section ics; // ----- Critical section -----
 
       return _try_first ();
     }
@@ -686,7 +686,7 @@ namespace os
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           p = _try_first ();
           if (p != nullptr)
@@ -713,7 +713,7 @@ namespace os
       for (;;)
         {
             {
-              interrupts::Critical_section ics; // ----- Critical section -----
+              interrupts::critical_section ics; // ----- Critical section -----
 
               p = _try_first ();
               if (p != nullptr)
@@ -774,7 +774,7 @@ namespace os
         }
 
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           // Perform a push_front() on the single linked LIFO list,
           // i.e. add the block to the beginning of the list.
@@ -811,13 +811,13 @@ namespace os
 #endif
 
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           _init ();
         }
 
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           // Wake-up all threads, if any.
           list_.resume_all ();

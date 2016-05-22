@@ -59,7 +59,7 @@ namespace os
       void* p;
         {
           // ----- Begin of critical section ----------------------------------
-          scheduler::Critical_section cs;
+          scheduler::critical_section cs;
 
           p = ::malloc (size);
           // ----- End of critical section ------------------------------------
@@ -91,7 +91,7 @@ namespace os
 
         {
           // ----- Begin of critical section ----------------------------------
-          scheduler::Critical_section cs;
+          scheduler::critical_section cs;
 
           return ::free (ptr);
           // ----- End of critical section ------------------------------------

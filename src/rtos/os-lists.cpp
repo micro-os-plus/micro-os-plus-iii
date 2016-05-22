@@ -357,7 +357,7 @@ namespace os
     {
       thread* thread;
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           // If the list is empty, silently return.
           if (empty ())
@@ -566,7 +566,7 @@ namespace os
       // iterate until a node with future time stamp is identified.
       for (;;)
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           if (empty ())
             {

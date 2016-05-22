@@ -142,7 +142,7 @@ namespace os
        * @brief Scheduler critical section [RAII](https://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization) helper.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Critical_section
+      class critical_section
       {
       public:
 
@@ -156,17 +156,17 @@ namespace os
          * @par Parameters
          *  None
          */
-        Critical_section ();
+        critical_section ();
 
         /**
          * @cond ignore
          */
-        Critical_section (const Critical_section&) = delete;
-        Critical_section (Critical_section&&) = delete;
-        Critical_section&
-        operator= (const Critical_section&) = delete;
-        Critical_section&
-        operator= (Critical_section&&) = delete;
+        critical_section (const critical_section&) = delete;
+        critical_section (critical_section&&) = delete;
+        critical_section&
+        operator= (const critical_section&) = delete;
+        critical_section&
+        operator= (critical_section&&) = delete;
         /**
          * @endcond
          */
@@ -174,7 +174,7 @@ namespace os
         /**
          * @brief Exit a critical section.
          */
-        ~Critical_section ();
+        ~critical_section ();
 
         /**
          * @}
@@ -203,7 +203,7 @@ namespace os
        * @brief Scheduler uncritical section [RAII](https://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization) helper.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Uncritical_section
+      class uncritical_section
       {
       public:
 
@@ -217,17 +217,17 @@ namespace os
          * @par Parameters
          *  None
          */
-        Uncritical_section ();
+        uncritical_section ();
 
         /**
          * @cond ignore
          */
-        Uncritical_section (const Uncritical_section&) = delete;
-        Uncritical_section (Uncritical_section&&) = delete;
-        Uncritical_section&
-        operator= (const Uncritical_section&) = delete;
-        Uncritical_section&
-        operator= (Uncritical_section&&) = delete;
+        uncritical_section (const uncritical_section&) = delete;
+        uncritical_section (uncritical_section&&) = delete;
+        uncritical_section&
+        operator= (const uncritical_section&) = delete;
+        uncritical_section&
+        operator= (uncritical_section&&) = delete;
         /**
          * @endcond
          */
@@ -235,7 +235,7 @@ namespace os
         /**
          * @brief Exit a critical section.
          */
-        ~Uncritical_section ();
+        ~uncritical_section ();
 
         /**
          * @}
@@ -264,7 +264,7 @@ namespace os
        * @brief %Scheduler standard locker.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Lock
+      class lockable
       {
       public:
 
@@ -279,17 +279,17 @@ namespace os
          *  None
          */
         constexpr
-        Lock ();
+        lockable ();
 
         /**
          * @cond ignore
          */
-        Lock (const Lock&) = delete;
-        Lock (Lock&&) = delete;
-        Lock&
-        operator= (const Lock&) = delete;
-        Lock&
-        operator= (Lock&&) = delete;
+        lockable (const lockable&) = delete;
+        lockable (lockable&&) = delete;
+        lockable&
+        operator= (const lockable&) = delete;
+        lockable&
+        operator= (lockable&&) = delete;
         /**
          * @endcond
          */
@@ -297,7 +297,7 @@ namespace os
         /**
          * @brief Destroy the lock.
          */
-        ~Lock ();
+        ~lockable ();
 
         /**
          * @}
@@ -374,7 +374,7 @@ namespace os
        * @brief Interrupts critical section [RAII](https://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization) helper.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Critical_section
+      class critical_section
       {
       public:
 
@@ -388,17 +388,17 @@ namespace os
          * @par Parameters
          *  None
          */
-        Critical_section ();
+        critical_section ();
 
         /**
          * @cond ignore
          */
-        Critical_section (const Critical_section&) = delete;
-        Critical_section (Critical_section&&) = delete;
-        Critical_section&
-        operator= (const Critical_section&) = delete;
-        Critical_section&
-        operator= (Critical_section&&) = delete;
+        critical_section (const critical_section&) = delete;
+        critical_section (critical_section&&) = delete;
+        critical_section&
+        operator= (const critical_section&) = delete;
+        critical_section&
+        operator= (critical_section&&) = delete;
         /**
          * @endcond
          */
@@ -406,7 +406,7 @@ namespace os
         /**
          * @brief Exit interrupts critical section.
          */
-        ~Critical_section ();
+        ~critical_section ();
 
         /**
          * @}
@@ -463,7 +463,7 @@ namespace os
        * @brief Interrupts critical section [RAII](https://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization) helper.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Uncritical_section
+      class uncritical_section
       {
       public:
 
@@ -477,17 +477,17 @@ namespace os
          * @par Parameters
          *  None
          */
-        Uncritical_section ();
+        uncritical_section ();
 
         /**
          * @cond ignore
          */
-        Uncritical_section (const Uncritical_section&) = delete;
-        Uncritical_section (Uncritical_section&&) = delete;
-        Uncritical_section&
-        operator= (const Uncritical_section&) = delete;
-        Uncritical_section&
-        operator= (Uncritical_section&&) = delete;
+        uncritical_section (const uncritical_section&) = delete;
+        uncritical_section (uncritical_section&&) = delete;
+        uncritical_section&
+        operator= (const uncritical_section&) = delete;
+        uncritical_section&
+        operator= (uncritical_section&&) = delete;
         /**
          * @endcond
          */
@@ -495,7 +495,7 @@ namespace os
         /**
          * @brief Exit interrupts critical section.
          */
-        ~Uncritical_section ();
+        ~uncritical_section ();
 
         /**
          * @}
@@ -552,7 +552,7 @@ namespace os
        * @brief Interrupts standard locker.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class Lock
+      class lockable
       {
       public:
 
@@ -567,22 +567,22 @@ namespace os
          *  None
          */
         constexpr
-        Lock ();
+        lockable ();
 
         /**
          * @brief Destroy the interrupts lock.
          */
-        ~Lock ();
+        ~lockable ();
 
         /**
          * @cond ignore
          */
-        Lock (const Lock&) = delete;
-        Lock (Lock&&) = delete;
-        Lock&
-        operator= (const Lock&) = delete;
-        Lock&
-        operator= (Lock&&) = delete;
+        lockable (const lockable&) = delete;
+        lockable (lockable&&) = delete;
+        lockable&
+        operator= (const lockable&) = delete;
+        lockable&
+        operator= (lockable&&) = delete;
         /**
          * @endcond
          */
@@ -687,7 +687,7 @@ namespace os
        * Lock the scheduler and remember the initial scheduler status.
        */
       inline
-      Critical_section::Critical_section () :
+      critical_section::critical_section () :
           status_ (lock ())
       {
         ;
@@ -699,7 +699,7 @@ namespace os
        * the scheduler.
        */
       inline
-      Critical_section::~Critical_section ()
+      critical_section::~critical_section ()
       {
         unlock (status_);
       }
@@ -709,7 +709,7 @@ namespace os
        * Lock the scheduler and remember the initial scheduler status.
        */
       inline
-      Uncritical_section::Uncritical_section () :
+      uncritical_section::uncritical_section () :
           status_ (lock (false))
       {
         ;
@@ -721,26 +721,26 @@ namespace os
        * the scheduler.
        */
       inline
-      Uncritical_section::~Uncritical_section ()
+      uncritical_section::~uncritical_section ()
       {
         unlock (status_);
       }
 
       constexpr
-      Lock::Lock () :
+      lockable::lockable () :
           status_ (scheduler::init_status)
       {
         ;
       }
 
       inline
-      Lock::~Lock ()
+      lockable::~lockable ()
       {
         ;
       }
 
       inline void
-      Lock::lock (void)
+      lockable::lock (void)
       {
         status_ = scheduler::lock ();
       }
@@ -748,17 +748,17 @@ namespace os
       /**
        * @details
        * Somehow redundant, since the lock will always succeed;
-       * but used to meet the Lockable requirements.
+       * but used to meet the lockableable requirements.
        */
       inline bool
-      Lock::try_lock (void)
+      lockable::try_lock (void)
       {
         status_ = scheduler::lock ();
         return true;
       }
 
       inline void
-      Lock::unlock (void)
+      lockable::unlock (void)
       {
         scheduler::unlock (status_);
       }
@@ -770,48 +770,48 @@ namespace os
     namespace interrupts
     {
       inline
-      Critical_section::Critical_section () :
+      critical_section::critical_section () :
           status_ (enter ())
       {
         ;
       }
 
       inline
-      Critical_section::~Critical_section ()
+      critical_section::~critical_section ()
       {
         exit (status_);
       }
 
       inline
-      Uncritical_section::Uncritical_section () :
+      uncritical_section::uncritical_section () :
           status_ (enter ())
       {
         ;
       }
 
       inline
-      Uncritical_section::~Uncritical_section ()
+      uncritical_section::~uncritical_section ()
       {
         exit (status_);
       }
 
       constexpr
-      Lock::Lock () :
+      lockable::lockable () :
           status_ (port::interrupts::init_status)
       {
         ;
       }
 
       inline
-      Lock::~Lock ()
+      lockable::~lockable ()
       {
         ;
       }
 
       inline void
-      Lock::lock (void)
+      lockable::lock (void)
       {
-        status_ = Critical_section::enter ();
+        status_ = critical_section::enter ();
       }
 
       /**
@@ -820,16 +820,16 @@ namespace os
        * but used to meet the Lockable requirements.
        */
       inline bool
-      Lock::try_lock (void)
+      lockable::try_lock (void)
       {
-        status_ = Critical_section::enter ();
+        status_ = critical_section::enter ();
         return true;
       }
 
       inline void
-      Lock::unlock (void)
+      lockable::unlock (void)
       {
-        Critical_section::exit (status_);
+        critical_section::exit (status_);
       }
 
     }

@@ -188,8 +188,8 @@ extern "C"
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 
-  inline __attribute__((always_inline))
-     os_clock_duration_t
+  inline os_clock_duration_t
+  __attribute__((always_inline))
   os_systick_clock_ticks_cast (uint32_t microsec)
   {
     return (os_clock_duration_t) ((((microsec)
@@ -197,8 +197,8 @@ extern "C"
         / (uint32_t) 1000000ul);
   }
 
-  inline __attribute__((always_inline))
-     os_clock_duration_t
+  inline os_clock_duration_t
+  __attribute__((always_inline))
   os_systick_clock_ticks_cast_long (uint64_t microsec)
   {
     return (os_clock_duration_t) ((((microsec)

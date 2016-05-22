@@ -783,7 +783,7 @@ namespace os
 
         {
           // ----- Enter uncritical section -----------------------------------
-          interrupts::Uncritical_section iucs;
+          interrupts::uncritical_section iucs;
 
           // Copy message from user buffer to queue storage.
           std::memcpy (dest, msg, nbytes);
@@ -860,7 +860,7 @@ namespace os
 #else
 
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           if (_try_send (msg, nbytes, mprio))
             {
@@ -879,7 +879,7 @@ namespace os
       for (;;)
         {
             {
-              interrupts::Critical_section ics; // ----- Critical section -----
+              interrupts::critical_section ics; // ----- Critical section -----
 
               if (_try_send (msg, nbytes, mprio))
                 {
@@ -957,7 +957,7 @@ namespace os
       return port::message_queue::try_send (this, msg, nbytes, mprio);
 
 #else
-      interrupts::Critical_section ics; // ----- Critical section -----
+      interrupts::critical_section ics; // ----- Critical section -----
 
       if (_try_send (msg, nbytes, mprio))
         {
@@ -1039,7 +1039,7 @@ namespace os
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           if (_try_send (msg, nbytes, mprio))
             {
@@ -1066,7 +1066,7 @@ namespace os
       for (;;)
         {
             {
-              interrupts::Critical_section ics; // ----- Critical section -----
+              interrupts::critical_section ics; // ----- Critical section -----
 
               if (_try_send (msg, nbytes, mprio))
                 {
@@ -1124,7 +1124,7 @@ namespace os
 
         {
           // ----- Enter uncritical section -----
-          interrupts::Uncritical_section iucs;
+          interrupts::uncritical_section iucs;
 
           // Copy message from queue to user buffer.
           memcpy (msg, src, nbytes);
@@ -1229,7 +1229,7 @@ namespace os
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           if (_try_receive (msg, nbytes, mprio))
             {
@@ -1248,7 +1248,7 @@ namespace os
       for (;;)
         {
             {
-              interrupts::Critical_section ics; // ----- Critical section -----
+              interrupts::critical_section ics; // ----- Critical section -----
 
               if (_try_receive (msg, nbytes, mprio))
                 {
@@ -1327,7 +1327,7 @@ namespace os
 
 #else
 
-      interrupts::Critical_section ics; // ----- Critical section -----
+      interrupts::critical_section ics; // ----- Critical section -----
 
       if (_try_receive (msg, nbytes, mprio))
         {
@@ -1424,7 +1424,7 @@ namespace os
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           if (_try_receive (msg, nbytes, mprio))
             {
@@ -1450,7 +1450,7 @@ namespace os
       for (;;)
         {
             {
-              interrupts::Critical_section ics; // ----- Critical section -----
+              interrupts::critical_section ics; // ----- Critical section -----
 
               if (_try_receive (msg, nbytes, mprio))
                 {
@@ -1518,7 +1518,7 @@ namespace os
 
 #else
 
-      interrupts::Critical_section ics; // ----- Critical section -----
+      interrupts::critical_section ics; // ----- Critical section -----
 
       _init ();
       return result::ok;

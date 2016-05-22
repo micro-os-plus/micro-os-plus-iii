@@ -387,7 +387,7 @@ namespace os
 #else
 
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           if (count_ >= this->max_count_)
             {
@@ -475,7 +475,7 @@ namespace os
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           if (_try_wait ())
             {
@@ -494,7 +494,7 @@ namespace os
       for (;;)
         {
             {
-              interrupts::Critical_section ics; // ----- Critical section -----
+              interrupts::critical_section ics; // ----- Critical section -----
 
               if (_try_wait ())
                 {
@@ -557,7 +557,7 @@ namespace os
 
 #else
 
-      interrupts::Critical_section ics; // ----- Critical section -----
+      interrupts::critical_section ics; // ----- Critical section -----
 
       if (_try_wait ())
         {
@@ -625,7 +625,7 @@ namespace os
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
         {
-          interrupts::Critical_section ics; // ----- Critical section -----
+          interrupts::critical_section ics; // ----- Critical section -----
 
           if (_try_wait ())
             {
@@ -651,7 +651,7 @@ namespace os
       for (;;)
         {
             {
-              interrupts::Critical_section ics; // ----- Critical section -----
+              interrupts::critical_section ics; // ----- Critical section -----
 
               if (_try_wait ())
                 {
@@ -737,7 +737,7 @@ namespace os
 
 #else
 
-      interrupts::Critical_section ics; // ----- Critical section -----
+      interrupts::critical_section ics; // ----- Critical section -----
 
       _init ();
       return result::ok;
