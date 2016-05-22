@@ -103,7 +103,7 @@ mutex_test::object_main (void)
       busy_wait (nbusy);
 
       // simulate a period of waiting for an external event
-      systick.sleep_for (nsleep);
+      sysclock.sleep_for (nsleep);
       ticks_ += nsleep;
 
       mx.lock ();
@@ -117,7 +117,7 @@ mutex_test::object_main (void)
           busy_wait (nbusy);
 
           // simulate a period of waiting for an external event
-          systick.sleep_for (nsleep);
+          sysclock.sleep_for (nsleep);
           ticks_ += nsleep;
 
           accumulated_count_++;
@@ -184,7 +184,7 @@ periodic::object_main (void)
   while (true)
     {
       //realtime_clock.sleep_for (5);
-      systick.sleep_for (5000);
+      sysclock.sleep_for (5000);
       t += 5;
 
         {

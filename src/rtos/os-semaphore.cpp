@@ -268,7 +268,7 @@ namespace os
 #endif
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
-      clock_ = attr.clock != nullptr ? attr.clock : &systick;
+      clock_ = attr.clock != nullptr ? attr.clock : &sysclock;
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)

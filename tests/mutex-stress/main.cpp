@@ -44,14 +44,14 @@ void
 busy_wait (unsigned int micros)
 {
   clock_systick::current_t t;
-  systick.now (&t);
+  sysclock.now (&t);
   uint64_t until_cycles = t.ticks * t.divisor + t.cycles
       + t.core_frequency_hz * micros / 1000000;
 
   uint64_t now_cycles;
   do
     {
-      systick.now (&t);
+      sysclock.now (&t);
       now_cycles = static_cast<uint64_t> (t.ticks * t.divisor + t.cycles);
     }
   while (now_cycles < until_cycles);

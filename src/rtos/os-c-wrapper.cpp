@@ -279,26 +279,26 @@ os_thread_sig_get (os_thread_t* thread, os_thread_sigset_t mask,
 os_clock_timestamp_t
 os_systick_clock_now (void)
 {
-  return (os_clock_timestamp_t) systick.now ();
+  return (os_clock_timestamp_t) sysclock.now ();
 }
 
 os_clock_timestamp_t
 os_systick_clock_now_details (os_systick_clock_current_t* details)
 {
-  return (os_clock_timestamp_t) systick.now (
+  return (os_clock_timestamp_t) sysclock.now (
       (clock_systick::current_t*) details);
 }
 
 os_result_t
 os_systick_clock_sleep_for (os_clock_duration_t timeout)
 {
-  return (os_result_t) systick.sleep_for (timeout);
+  return (os_result_t) sysclock.sleep_for (timeout);
 }
 
 os_result_t
 os_systick_clock_wait (os_clock_duration_t timeout)
 {
-  return (os_result_t) systick.wait_for (timeout);
+  return (os_result_t) sysclock.wait_for (timeout);
 }
 
 // os_systick_sleep_rep_t
@@ -306,13 +306,13 @@ os_systick_clock_wait (os_clock_duration_t timeout)
 os_clock_timestamp_t
 os_realtime_clock_now (void)
 {
-  return (os_clock_timestamp_t) rtc.now ();
+  return (os_clock_timestamp_t) rtclock.now ();
 }
 
 os_result_t
 os_realtime_clock_sleep_for (os_clock_duration_t secs)
 {
-  return (os_result_t) rtc.sleep_for (secs);
+  return (os_result_t) rtclock.sleep_for (secs);
 }
 
 // ----------------------------------------------------------------------------
@@ -907,7 +907,7 @@ osKernelSysTick (void)
 
   // Get the current SysTick timestamp, with full details, down to
   // cpu cycles.
-  systick.now (&crt);
+  sysclock.now (&crt);
 
   // Convert ticks to cycles.
   return static_cast<uint32_t> (crt.ticks) * crt.divisor + crt.cycles;
@@ -1165,7 +1165,8 @@ osDelay (uint32_t millisec)
       return osErrorISR;
     }
 
-  result_t res = systick.sleep_for (systick.ticks_cast (millisec * 1000u));
+  result_t res = sysclock.sleep_for (
+      clock_systick::ticks_cast (millisec * 1000u));
 
   if (res == ETIMEDOUT)
     {
@@ -1210,7 +1211,8 @@ osWait (uint32_t millisec)
       return event;
     }
 
-  result_t res = systick.wait_for (systick.ticks_cast (millisec * 1000u));
+  result_t res = sysclock.wait_for (
+      clock_systick::ticks_cast (millisec * 1000u));
 
   // TODO: return events
   if (res == ETIMEDOUT)
@@ -1281,7 +1283,7 @@ osTimerStart (osTimerId timer_id, uint32_t millisec)
     }
 
   result_t res = (reinterpret_cast<rtos::timer&> (*timer_id)).start (
-      systick.ticks_cast (millisec * 1000u));
+      clock_systick::ticks_cast (millisec * 1000u));
 
   if (res == result::ok)
     {
@@ -1457,7 +1459,8 @@ osSignalWait (int32_t signals, uint32_t millisec)
   else
     {
       res = this_thread::timed_sig_wait (
-          (thread::sigset_t) signals, systick.ticks_cast (millisec * 1000u),
+          (thread::sigset_t) signals,
+          clock_systick::ticks_cast (millisec * 1000u),
           (thread::sigset_t*) &event.value.signals);
     }
 
@@ -1566,7 +1569,7 @@ osMutexWait (osMutexId mutex_id, uint32_t millisec)
   else
     {
       ret = (reinterpret_cast<rtos::mutex&> (*mutex_id)).timed_lock (
-          systick.ticks_cast (millisec * 1000u));
+          clock_systick::ticks_cast (millisec * 1000u));
       // osErrorTimeoutResource:
     }
 
@@ -1758,7 +1761,7 @@ osSemaphoreWait (osSemaphoreId semaphore_id, uint32_t millisec)
   else
     {
       res = (reinterpret_cast<rtos::semaphore&> (*semaphore_id)).timed_wait (
-          systick.ticks_cast (millisec * 1000u));
+          clock_systick::ticks_cast (millisec * 1000u));
       if (res == ETIMEDOUT)
         {
           return 0;
@@ -2044,7 +2047,7 @@ osMessagePut (osMessageQId queue_id, uint32_t info, uint32_t millisec)
         }
       res = (reinterpret_cast<message_queue&> (*queue_id)).timed_send (
           (const char*) &info, sizeof(uint32_t),
-          systick.ticks_cast (millisec * 1000u), 0);
+          clock_systick::ticks_cast (millisec * 1000u), 0);
       // osOK, osErrorTimeoutResource, osErrorParameter
     }
 
@@ -2137,7 +2140,7 @@ osMessageGet (osMessageQId queue_id, uint32_t millisec)
         }
       res = (reinterpret_cast<message_queue&> (*queue_id)).timed_receive (
           (char*) &event.value.v, sizeof(uint32_t),
-          systick.ticks_cast (millisec * 1000u), NULL);
+          clock_systick::ticks_cast (millisec * 1000u), NULL);
       // result::event_message when message;
       // result::event_timeout when timeout;
     }
@@ -2272,7 +2275,7 @@ osMailAlloc (osMailQId queue_id, uint32_t millisec)
           return nullptr;
         }
       ret = (reinterpret_cast<memory_pool&> (queue_id->pool)).timed_alloc (
-          systick.ticks_cast (millisec * 1000u));
+          clock_systick::ticks_cast (millisec * 1000u));
     }
 #pragma GCC diagnostic pop
   return ret;

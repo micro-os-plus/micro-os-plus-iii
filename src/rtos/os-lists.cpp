@@ -577,7 +577,7 @@ namespace os
             {
 #if defined(OS_TRACE_RTOS_LISTS)
               trace::printf ("%s() %u \n", __func__,
-                             static_cast<uint32_t> (systick.now ()));
+                             static_cast<uint32_t> (sysclock.now ()));
 #endif
               const_cast<timestamp_node*> (head ())->action ();
             }

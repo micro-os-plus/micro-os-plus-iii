@@ -544,7 +544,7 @@ namespace os
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
 #if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
-      clock_ = attr.clock != nullptr ? attr.clock : &systick;
+      clock_ = attr.clock != nullptr ? attr.clock : &sysclock;
 #endif
       msg_size_bytes_ = msg_size_bytes;
       msgs_ = msgs;

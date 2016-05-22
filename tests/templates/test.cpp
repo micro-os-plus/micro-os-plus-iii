@@ -319,14 +319,14 @@ run_tests (void)
         { tmfunc, nullptr };
       tm1.start (1);
 
-      systick.sleep_for (2);
+      sysclock.sleep_for (2);
       tm1.stop ();
 
       timer tm2
         { "tm2", tmfunc, nullptr };
       tm2.start (1);
 
-      systick.sleep_for (2);
+      sysclock.sleep_for (2);
       tm2.stop ();
     }
 

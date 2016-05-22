@@ -54,7 +54,7 @@ os_systick_handler (void)
 #if defined(OS_TRACE_RTOS_SYSTICK_TICK)
   trace::putchar ('.');
 #endif
-  systick._interrupt_service_routine ();
+  sysclock._interrupt_service_routine ();
 #if defined(OS_TRACE_RTOS_SYSTICK_TICK)
   trace::putchar (',');
 #endif
@@ -75,7 +75,7 @@ os_rtc_handler (void)
 #if defined(OS_TRACE_RTOS_RTC_TICK)
   trace_putchar ('!');
 #endif
-  rtc._interrupt_service_routine ();
+  rtclock._interrupt_service_routine ();
 }
 
 // ----------------------------------------------------------------------------
@@ -131,7 +131,7 @@ namespace os
     }
 
     result_t
-    clock::sleep_for (clock::duration_t duration)
+    clock::sleep_for (duration_t duration)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -145,7 +145,7 @@ namespace os
           result_t res;
           res = _wait_until (timestamp, steady_list_);
 
-          clock::timestamp_t n = steady_now ();
+          timestamp_t n = steady_now ();
           if (n >= timestamp)
             {
               return ETIMEDOUT;
@@ -165,7 +165,7 @@ namespace os
     }
 
     result_t
-    clock::sleep_until (clock::timestamp_t timestamp)
+    clock::sleep_until (timestamp_t timestamp)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -178,7 +178,7 @@ namespace os
           result_t res;
           res = _wait_until (timestamp, adjusted_list_);
 
-          clock::timestamp_t nw = now ();
+          timestamp_t nw = now ();
           if (nw >= timestamp)
             {
               return ETIMEDOUT;
@@ -198,7 +198,7 @@ namespace os
     }
 
     result_t
-    clock::wait_for (clock::duration_t timeout)
+    clock::wait_for (duration_t timeout)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -211,7 +211,7 @@ namespace os
       result_t res;
       res = _wait_until (timestamp, steady_list_);
 
-      clock::timestamp_t nw = steady_now ();
+      timestamp_t nw = steady_now ();
       if (nw >= timestamp)
         {
           return ETIMEDOUT;
@@ -246,8 +246,7 @@ namespace os
     }
 
     result_t
-    clock::_wait_until (clock::timestamp_t timestamp,
-                        clock_timestamps_list& list)
+    clock::_wait_until (timestamp_t timestamp, clock_timestamps_list& list)
     {
       thread& crt_thread = this_thread::thread ();
 
@@ -332,7 +331,7 @@ namespace os
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #endif
-    clock_systick systick;
+    clock_systick sysclock;
 #pragma GCC diagnostic pop
 
     // ------------------------------------------------------------------------
@@ -426,17 +425,17 @@ namespace os
 #if defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
 
     result_t
-    clock_systick::_wait_until (clock::timestamp_t timestamp,
+    clock_systick::_wait_until (timestamp_t timestamp,
         clock_timestamps_list& list __attribute__((unused)))
       {
         result_t res;
 
-        clock::timestamp_t nw = now ();
+        timestamp_t nw = now ();
         if (nw >= timestamp)
           {
             return result::ok;
           }
-        clock::duration_t ticks = ((clock::duration_t) (timestamp - nw));
+        duration_t ticks = ((duration_t) (timestamp - nw));
         res = port::clock_systick::wait_for (ticks);
         return res;
       }
@@ -510,7 +509,7 @@ namespace os
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #endif
-    clock_rtc rtc;
+    clock_rtc rtclock;
 #pragma GCC diagnostic pop
 
     // ------------------------------------------------------------------------

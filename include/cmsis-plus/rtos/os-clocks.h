@@ -119,10 +119,10 @@ namespace os
        *  None
        * @return The clock specific timestamp.
        */
-      clock::timestamp_t
+      timestamp_t
       now (void);
 
-      clock::timestamp_t
+      timestamp_t
       steady_now (void);
 
       /**
@@ -134,7 +134,7 @@ namespace os
        * @retval EINTR The sleep was interrupted.
        */
       result_t
-      sleep_for (clock::duration_t duration);
+      sleep_for (duration_t duration);
 
       /**
        * @brief Sleep until an absolute timestamp.
@@ -144,7 +144,7 @@ namespace os
        * @retval EINTR The sleep was interrupted.
        */
       result_t
-      sleep_until (clock::timestamp_t timestamp);
+      sleep_until (timestamp_t timestamp);
 
       /**
        * @brief Timed wait for an event.
@@ -155,7 +155,7 @@ namespace os
        * @retval EINTR The sleep was interrupted.
        */
       result_t
-      wait_for (clock::duration_t timeout);
+      wait_for (duration_t timeout);
 
       void
       _interrupt_service_routine (void);
@@ -177,7 +177,7 @@ namespace os
        * @retval ENOTRECOVERABLE The wait failed.
        */
       virtual result_t
-      _wait_until (clock::timestamp_t timestamp, clock_timestamps_list& list);
+      _wait_until (timestamp_t timestamp, clock_timestamps_list& list);
 
       /**
        * @name Private Member Variables
@@ -185,18 +185,18 @@ namespace os
        */
 
       clock_timestamps_list steady_list_;
-      clock::duration_t volatile sleep_count_;
+      duration_t volatile sleep_count_;
       clock_timestamps_list adjusted_list_;
 
       /**
        * @brief Monotone ascending count.
        */
-      clock::timestamp_t volatile steady_count_;
+      timestamp_t volatile steady_count_;
 
       /**
        * @brief Adjustable offset to epoch.
        */
-      clock::offset_t volatile offset_;
+      offset_t volatile offset_;
 
       /**
        * @}
@@ -245,7 +245,7 @@ namespace os
           /**
            * @brief Count of SysTick ticks since core reset.
            */
-          clock::timestamp_t ticks;
+          timestamp_t ticks;
 
           /**
            * @brief Count of SysTick cycles since timer reload (24 bits).
@@ -302,7 +302,7 @@ namespace os
        * @param [out] details Pointer to structure to store the clock details.
        * @return The number of SysTick ticks since startup.
        */
-      clock::timestamp_t
+      timestamp_t
       now (current_t* details);
 
       /**
@@ -341,7 +341,7 @@ namespace os
        * @retval EINTR The sleep was interrupted.
        */
       virtual result_t
-      _wait_until (clock::timestamp_t timestamp, clock_timestamps_list& list);
+      _wait_until (timestamp_t timestamp, clock_timestamps_list& list);
 
 #endif
 
@@ -351,7 +351,7 @@ namespace os
 
     };
 
-    extern clock_systick systick;
+    extern clock_systick sysclock;
 
     // ========================================================================
 
@@ -428,7 +428,7 @@ namespace os
        * @retval EINTR The sleep was interrupted.
        */
       virtual result_t
-      _wait_until (clock::timestamp_t timestamp, clock_timestamps_list& list);
+      _wait_until (timestamp_t timestamp, clock_timestamps_list& list);
 
 #endif
 
@@ -437,7 +437,7 @@ namespace os
        */
     };
 
-    extern clock_rtc rtc;
+    extern clock_rtc rtclock;
 
   } /* namespace rtos */
 } /* namespace os */
