@@ -925,7 +925,7 @@ namespace os
       port::scheduler::switch_stacks (port::stack::element_t* sp);
 
       friend void*
-      scheduler::_idle_func (thread::func_args_t args);
+      scheduler::_idle_func (func_args_t args);
 
       friend class ready_threads_list;
       friend class top_threads_list;
@@ -1141,7 +1141,7 @@ namespace os
       // Add other internal data
 
       // Better be the last one!
-      thread::context context_;
+      context context_;
 
       /**
        * @}
