@@ -38,6 +38,7 @@
 #if defined(__cplusplus)
 
 #include <cmsis-plus/rtos/os-decls.h>
+#include <cmsis-plus/rtos/os-clocks.h>
 
 // Better be the last, to undef putchar()
 #include <cmsis-plus/diag/trace.h>
@@ -932,7 +933,7 @@ namespace os
       friend class Waiting_threads_list;
       friend class Clock_timestamps_list;
 
-      friend class Clock;
+      friend class clock;
       friend class condition_variable;
 
       /**
@@ -1117,7 +1118,7 @@ namespace os
       /**
        * @brief Pointer to clock to be used for timeouts.
        */
-      Clock* clock_ = nullptr;
+      clock* clock_ = nullptr;
 
       /**
        * @brief Pointer to allocator.

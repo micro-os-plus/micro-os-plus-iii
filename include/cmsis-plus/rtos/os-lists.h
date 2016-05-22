@@ -260,7 +260,7 @@ namespace os
        * @brief Create a node with a time stamp.
        * @param ts Time stamp.
        */
-      Timestamp_node (clock::timestamp_t ts);
+      Timestamp_node (port::clock::timestamp_t ts);
 
       /**
        * @cond ignore
@@ -315,7 +315,7 @@ namespace os
       /**
        * @brief Time stamp when the next action will be performed.
        */
-      clock::timestamp_t timestamp;
+      port::clock::timestamp_t timestamp;
 
       /**
        * @}
@@ -347,7 +347,7 @@ namespace os
        * @param [in] ts Time stamp.
        * @param [in] th Reference to thread.
        */
-      Timeout_thread_node (clock::timestamp_t ts, thread& th);
+      Timeout_thread_node (port::clock::timestamp_t ts, thread& th);
 
       /**
        * @cond ignore
@@ -433,7 +433,7 @@ namespace os
        * @param [in] ts Time stamp.
        * @param [in] tm Reference to timer.
        */
-      timer_node (clock::timestamp_t ts, timer& tm);
+      timer_node (port::clock::timestamp_t ts, timer& tm);
 
       /**
        * @cond ignore
@@ -1039,7 +1039,7 @@ namespace os
        * @return Nothing.
        */
       void
-      check_timestamp (clock::timestamp_t now);
+      check_timestamp (port::clock::timestamp_t now);
 
       /**
        * @}

@@ -411,7 +411,7 @@ namespace os
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
       Waiting_threads_list list_;
-      Clock* clock_ = nullptr;
+      clock* clock_ = nullptr;
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)

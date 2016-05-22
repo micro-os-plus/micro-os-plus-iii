@@ -234,7 +234,7 @@ namespace os
 #endif
 
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
-      clock_ = attr.clock != nullptr ? attr.clock : &systick_clock;
+      clock_ = attr.clock != nullptr ? attr.clock : &systick;
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_TIMER)

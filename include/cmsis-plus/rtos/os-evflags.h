@@ -337,7 +337,7 @@ namespace os
 
 #if !defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
       Waiting_threads_list list_;
-      Clock& clock_;
+      clock* clock_;
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)

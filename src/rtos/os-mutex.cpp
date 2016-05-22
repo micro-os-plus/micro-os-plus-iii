@@ -467,7 +467,7 @@ namespace os
 #endif
 
 #if !defined(OS_INCLUDE_RTOS_PORT_MUTEX)
-      clock_ = attr.clock != nullptr ? attr.clock : &systick_clock;
+      clock_ = attr.clock != nullptr ? attr.clock : &systick;
 #endif
 
       prio_ceiling_ = attr.mx_priority_ceiling;

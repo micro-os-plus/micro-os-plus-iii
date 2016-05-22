@@ -54,32 +54,50 @@ namespace os
     /**
      * @brief Generic clock.
      */
-    class Clock
+    class clock
     {
     public:
+
+      /**
+       * @brief Type of variables holding timer durations.
+       * @details
+       * A numeric type intended to hold a generic duration, either in ticks
+       * or in seconds.
+       */
+      using duration_t = port::clock::duration_t;
+
+      /**
+       * @brief Type of variables holding time stamps.
+       * @details
+       * A numeric type intended to hold a generic timestamp, either in ticks
+       * or in seconds.
+       */
+      using timestamp_t = port::clock::timestamp_t;
+
+      using offset_t = port::clock::offset_t;
 
       /**
        * @name Constructors & Destructor
        * @{
        */
 
-      Clock ();
+      clock ();
 
       /**
        * @cond ignore
        */
-      Clock (const Clock&) = delete;
-      Clock (Clock&&) = delete;
-      Clock&
-      operator= (const Clock&) = delete;
-      Clock&
-      operator= (Clock&&) = delete;
+      clock (const clock&) = delete;
+      clock (clock&&) = delete;
+      clock&
+      operator= (const clock&) = delete;
+      clock&
+      operator= (clock&&) = delete;
       /**
        * @endcond
        */
 
       virtual
-      ~Clock ();
+      ~clock ();
 
       /**
        * @}
@@ -119,7 +137,7 @@ namespace os
       sleep_for (clock::duration_t duration);
 
       /**
-       * @brief Sleep until a timestamp.
+       * @brief Sleep until an absolute timestamp.
        * @param [in] timestamp The absolute moment in time, in clock units.
        * @retval ETIMEDOUT The sleep lasted the entire duration.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
@@ -194,7 +212,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
-    class Systick_clock : public Clock
+    class clock_systick : public clock
     {
     public:
 
@@ -252,23 +270,23 @@ namespace os
        * @{
        */
 
-      Systick_clock ();
+      clock_systick ();
 
       /**
        * @cond ignore
        */
-      Systick_clock (const Systick_clock&) = delete;
-      Systick_clock (Systick_clock&&) = delete;
-      Systick_clock&
-      operator= (const Systick_clock&) = delete;
-      Systick_clock&
-      operator= (Systick_clock&&) = delete;
+      clock_systick (const clock_systick&) = delete;
+      clock_systick (clock_systick&&) = delete;
+      clock_systick&
+      operator= (const clock_systick&) = delete;
+      clock_systick&
+      operator= (clock_systick&&) = delete;
       /**
        * @endcond
        */
 
       virtual
-      ~Systick_clock ();
+      ~clock_systick ();
 
       /**
        * @}
@@ -277,7 +295,7 @@ namespace os
        */
 
       // Enable name lookup in base class (tricky!).
-      using Clock::now;
+      using clock::now;
 
       /**
        * @brief Tell the detailed current time.
@@ -333,7 +351,7 @@ namespace os
 
     };
 
-    extern Systick_clock systick_clock;
+    extern clock_systick systick;
 
     // ========================================================================
 
@@ -342,7 +360,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
-    class Realtime_clock : public Clock
+    class clock_rtc : public clock
     {
     public:
 
@@ -361,23 +379,23 @@ namespace os
        * @{
        */
 
-      Realtime_clock ();
+      clock_rtc ();
 
       /**
        * @cond ignore
        */
-      Realtime_clock (const Realtime_clock&) = delete;
-      Realtime_clock (Realtime_clock&&) = delete;
-      Realtime_clock&
-      operator= (const Realtime_clock&) = delete;
-      Realtime_clock&
-      operator= (Realtime_clock&&) = delete;
+      clock_rtc (const clock_rtc&) = delete;
+      clock_rtc (clock_rtc&&) = delete;
+      clock_rtc&
+      operator= (const clock_rtc&) = delete;
+      clock_rtc&
+      operator= (clock_rtc&&) = delete;
       /**
        * @endcond
        */
 
       virtual
-      ~Realtime_clock ();
+      ~clock_rtc ();
 
       /**
        * @}
@@ -386,7 +404,7 @@ namespace os
        */
 
       // Enable name lookup in base class (tricky!).
-      using Clock::now;
+      using clock::now;
 
       /**
        * @brief Initialise and make the RTC tick.
@@ -419,7 +437,7 @@ namespace os
        */
     };
 
-    extern Realtime_clock realtime_clock;
+    extern clock_rtc rtc;
 
   } /* namespace rtos */
 } /* namespace os */
@@ -434,7 +452,7 @@ namespace os
     // ========================================================================
 
     inline Clock_timestamps_list&
-    Clock::steady_list (void)
+    clock::steady_list (void)
     {
       return steady_list_;
     }
@@ -447,11 +465,11 @@ namespace os
      * ticks, using the SysTick frequency in Hz.
      */
     template<typename Rep_T>
-      constexpr clock::systicks_t
-      Systick_clock::ticks_cast (Rep_T microsec)
+      constexpr clock::duration_t
+      clock_systick::ticks_cast (Rep_T microsec)
       {
         // TODO: add some restrictions to match only numeric types
-        return static_cast<clock::systicks_t> ((((microsec)
+        return static_cast<clock::duration_t> ((((microsec)
             * (static_cast<Rep_T> (frequency_hz)))
             + static_cast<Rep_T> (999999ul)) / static_cast<Rep_T> (1000000ul));
       }

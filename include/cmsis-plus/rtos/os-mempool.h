@@ -454,7 +454,7 @@ namespace os
       /**
        * @brief Pointer to clock to be used for timeouts.
        */
-      Clock* clock_ = nullptr;
+      clock* clock_ = nullptr;
 #endif
       /**
        * @brief The static address where the pool is stored

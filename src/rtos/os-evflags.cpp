@@ -200,14 +200,15 @@ namespace os
     event_flags::event_flags (const char* name, const attributes& attr) :
         named_object
           { name, attr.name () }
-#if !defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
-            , clock_ (attr.clock != nullptr ? *attr.clock : systick_clock)
-#endif
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
+#endif
+
+#if !defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
+      clock_ = attr.clock != nullptr ? attr.clock : &systick;
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
@@ -492,8 +493,8 @@ namespace os
       Waiting_thread_node node
         { crt_thread };
 
-      Clock_timestamps_list& clock_list = clock_.steady_list ();
-      clock::timestamp_t timeout_timestamp = clock_.steady_now () + timeout;
+      Clock_timestamps_list& clock_list = clock_->steady_list ();
+      clock::timestamp_t timeout_timestamp = clock_->steady_now () + timeout;
 
       // Prepare a timeout node pointing to the current thread.
       Timeout_thread_node timeout_node
@@ -527,7 +528,7 @@ namespace os
               return EINTR;
             }
 
-          if (clock_.steady_now () >= timeout_timestamp)
+          if (clock_->steady_now () >= timeout_timestamp)
             {
               return ETIMEDOUT;
             }

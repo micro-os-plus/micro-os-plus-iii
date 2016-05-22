@@ -100,7 +100,7 @@ main (int argc, char* argv[])
 #endif
 
   trace::printf ("Scheduler frequency: %d ticks/sec.\n",
-                 rtos::Systick_clock::frequency_hz);
+                 rtos::clock_systick::frequency_hz);
   trace::printf ("Default stack size: %d bytes.\n",
                  thread::stack::default_size ());
 

@@ -600,7 +600,7 @@ namespace os
       /**
        * @brief Pointer to clock to be used for timeouts.
        */
-      Clock* clock_ = nullptr;
+      clock* clock_ = nullptr;
 
       // To save space, the double linked list is built
       // using short indexes, not pointers.

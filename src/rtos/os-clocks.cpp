@@ -47,14 +47,14 @@ os_systick_handler (void)
   // Prevent scheduler actions before starting it.
   if (scheduler::started ())
     {
-      port::Systick_clock::_interrupt_service_routine();
+      port::clock_systick::_interrupt_service_routine();
     }
 #endif
 
 #if defined(OS_TRACE_RTOS_SYSTICK_TICK)
   trace::putchar ('.');
 #endif
-  systick_clock._interrupt_service_routine ();
+  systick._interrupt_service_routine ();
 #if defined(OS_TRACE_RTOS_SYSTICK_TICK)
   trace::putchar (',');
 #endif
@@ -68,14 +68,14 @@ os_rtc_handler (void)
   // Prevent scheduler actions before starting it.
   if (scheduler::started ())
     {
-      port::Realtime_clock::_interrupt_service_routine();
+      port::clock_rtc::_interrupt_service_routine();
     }
 #endif
 
 #if defined(OS_TRACE_RTOS_RTC_TICK)
   trace_putchar ('!');
 #endif
-  realtime_clock._interrupt_service_routine ();
+  rtc._interrupt_service_routine ();
 }
 
 // ----------------------------------------------------------------------------
@@ -87,19 +87,19 @@ namespace os
 
     // ========================================================================
 
-    Clock::Clock ()
+    clock::clock ()
     {
       steady_count_ = 0;
       offset_ = 0;
     }
 
-    Clock::~Clock ()
+    clock::~clock ()
     {
       ;
     }
 
     void
-    Clock::start (void)
+    clock::start (void)
     {
       ;
     }
@@ -110,7 +110,7 @@ namespace os
      * @note Can be invoked from Interrupt Service Routines.
      */
     clock::timestamp_t
-    Clock::now (void)
+    clock::now (void)
     {
       // Prevent inconsistent values.
       interrupts::Critical_section ics; // ----- Critical section -----
@@ -122,7 +122,7 @@ namespace os
     }
 
     clock::timestamp_t
-    Clock::steady_now (void)
+    clock::steady_now (void)
     {
       interrupts::Critical_section ics; // ----- Critical section -----
 
@@ -131,7 +131,7 @@ namespace os
     }
 
     result_t
-    Clock::sleep_for (clock::duration_t duration)
+    clock::sleep_for (clock::duration_t duration)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -165,7 +165,7 @@ namespace os
     }
 
     result_t
-    Clock::sleep_until (clock::timestamp_t timestamp)
+    clock::sleep_until (clock::timestamp_t timestamp)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -198,7 +198,7 @@ namespace os
     }
 
     result_t
-    Clock::wait_for (clock::duration_t timeout)
+    clock::wait_for (clock::duration_t timeout)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -226,7 +226,7 @@ namespace os
     }
 
     void
-    Clock::_interrupt_service_routine (void)
+    clock::_interrupt_service_routine (void)
     {
 #if defined(OS_TRACE_RTOS_CLOCKS)
       // trace::putchar ('.');
@@ -246,7 +246,7 @@ namespace os
     }
 
     result_t
-    Clock::_wait_until (clock::timestamp_t timestamp,
+    clock::_wait_until (clock::timestamp_t timestamp,
                         Clock_timestamps_list& list)
     {
       thread& crt_thread = this_thread::thread ();
@@ -286,7 +286,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @class Systick_clock
+     * @class clock_systick
      * @details
      * This clock counts SysTick interrupts since startup.
      *
@@ -315,7 +315,7 @@ namespace os
      *
      *    // Put the current thread to sleep for a given number of microseconds.
      *    // For a 1000 Hz clock, the actual value is 4 ticks.
-     *    systick_clock.sleep_for(Systick_clock::ticks_cast(3500));
+     *    systick_clock.sleep_for(clock_systick::ticks_cast(3500));
      *
      *    // Do something else.
      * }
@@ -332,17 +332,17 @@ namespace os
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #endif
-    Systick_clock systick_clock;
+    clock_systick systick;
 #pragma GCC diagnostic pop
 
     // ------------------------------------------------------------------------
 
-    Systick_clock::Systick_clock ()
+    clock_systick::clock_systick ()
     {
       ;
     }
 
-    Systick_clock::~Systick_clock ()
+    clock_systick::~clock_systick ()
     {
       ;
     }
@@ -361,7 +361,7 @@ namespace os
      * @note Can be invoked from Interrupt Service Routines.
      */
     clock::timestamp_t
-    Systick_clock::now (current_t* details)
+    clock_systick::now (current_t* details)
     {
       assert(details != nullptr);
 
@@ -426,7 +426,7 @@ namespace os
 #if defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
 
     result_t
-    Systick_clock::_wait_until (clock::timestamp_t timestamp,
+    clock_systick::_wait_until (clock::timestamp_t timestamp,
         Clock_timestamps_list& list __attribute__((unused)))
       {
         result_t res;
@@ -437,25 +437,25 @@ namespace os
             return result::ok;
           }
         clock::duration_t ticks = ((clock::duration_t) (timestamp - nw));
-        res = port::Systick_clock::wait_for (ticks);
+        res = port::clock_systick::wait_for (ticks);
         return res;
       }
 
 #endif
 
     void
-    Systick_clock::_interrupt_service_routine (void)
+    clock_systick::_interrupt_service_routine (void)
     {
-      Clock::_interrupt_service_routine ();
+      clock::_interrupt_service_routine ();
 
 #if !defined(OS_INCLUDE_RTOS_REALTIME_CLOCK_DRIVER)
 
       // TODO: simulate an RTC driver.
-      static uint32_t ticks = Systick_clock::frequency_hz;
+      static uint32_t ticks = clock_systick::frequency_hz;
 
       if (--ticks == 0)
         {
-          ticks = Systick_clock::frequency_hz;
+          ticks = clock_systick::frequency_hz;
 
           os_rtc_handler ();
         }
@@ -467,7 +467,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @class Realtime_clock
+     * @class clock_rtc
      * @details
      * This clock counts seconds since epoch or startup.
      *
@@ -491,10 +491,10 @@ namespace os
      *    // Do something
      *
      *    // Get the current seconds counter.
-     *    clock::timestamp_t seconds = realtime_clock.now();
+     *    clock::timestamp_t seconds = rtc.now();
      *
      *    // Put the current thread to sleep for a given number of seconds.
-     *    realtime_clock.sleep_for(7);
+     *    rtc.sleep_for(7);
      *
      *    // Do something else.
      * }
@@ -510,17 +510,17 @@ namespace os
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #endif
-    Realtime_clock realtime_clock;
+    clock_rtc rtc;
 #pragma GCC diagnostic pop
 
     // ------------------------------------------------------------------------
 
-    Realtime_clock::Realtime_clock ()
+    clock_rtc::clock_rtc ()
     {
       ;
     }
 
-    Realtime_clock::~Realtime_clock ()
+    clock_rtc::~clock_rtc ()
     {
       ;
     }
@@ -534,7 +534,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    Realtime_clock::start (void)
+    clock_rtc::start (void)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 

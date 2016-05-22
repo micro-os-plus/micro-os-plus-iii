@@ -70,7 +70,7 @@ namespace os
 
     // Forward references.
     class named_object;
-    class Clock;
+    class clock;
     class condition_variable;
     class event_flags;
     class memory_pool;
@@ -85,6 +85,7 @@ namespace os
     class Waiting_threads_list;
     class Clock_threads_list;
     class Waiting_threads_list3;
+    class Clock_timestamps_list;
 
     namespace memory
     {
@@ -194,40 +195,6 @@ namespace os
     } /* namespace result */
 
     // ------------------------------------------------------------------------
-
-    /**
-     * @brief %Clock namespace.
-     * @ingroup cmsis-plus-rtos
-     */
-    namespace clock
-    {
-
-      /**
-       * @brief Type of variables holding timer ticks.
-       * @details
-       * A numeric type intended to hold a number of SysTick ticks.
-       */
-      using systicks_t = uint32_t;
-
-      /**
-       * @brief Type of variables holding timer durations.
-       * @details
-       * A numeric type intended to hold a generic duration, either in ticks
-       * or in seconds.
-       */
-      using duration_t = uint32_t;
-
-      /**
-       * @brief Type of variables holding time stamps.
-       * @details
-       * A numeric type intended to hold a generic timestamp, either in ticks
-       * or in seconds.
-       */
-      using timestamp_t = uint64_t;
-
-      using offset_t = int64_t;
-
-    }
 
     //using DoubleListNodeClock = DoubleListNodeTimestamp<clock::timestamp_t>;
     //using Waiting_threads_list3 = Waiting_threads_list2<DoubleListNodeClock>;
@@ -563,7 +530,7 @@ namespace os
       /**
        * @brief Pointer to clock.
        */
-      Clock* clock;
+      clock* clock;
 
       /**
        * @}
@@ -665,6 +632,27 @@ namespace os
       class message_queue;
       class event_flags;
 
+      namespace clock
+      {
+        /**
+         * @brief Type of variables holding timer durations.
+         * @details
+         * A numeric type intended to hold a generic duration, either in ticks
+         * or in seconds.
+         */
+        using duration_t = uint32_t;
+
+        /**
+         * @brief Type of variables holding time stamps.
+         * @details
+         * A numeric type intended to hold a generic timestamp, either in ticks
+         * or in seconds.
+         */
+        using timestamp_t = uint64_t;
+
+        using offset_t = int64_t;
+      } /* namespace clock */
+
       namespace interrupts
       {
 
@@ -763,9 +751,9 @@ namespace os
         create (void* context, void* func, void* args);
 
       };
+      /* class context */
 
       // ======================================================================
-
       class thread
       {
       public:
@@ -799,9 +787,9 @@ namespace os
 #endif
 
       };
+      /* class thread */
 
       // ======================================================================
-
       class Systick_clock
       {
       public:
@@ -812,7 +800,7 @@ namespace os
         start (void);
 
         static result_t
-        wait_for (rtos::clock::duration_t ticks);
+        wait_for (clock::duration_t ticks);
 
         /**
          * @brief SysTick implementation hook.

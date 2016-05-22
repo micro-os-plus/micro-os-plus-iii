@@ -393,7 +393,7 @@ namespace os
       assert(function != nullptr);
       assert(attr.th_priority != priority::none);
 
-      clock_ = attr.clock != nullptr ? attr.clock : &systick_clock;
+      clock_ = attr.clock != nullptr ? attr.clock : &systick;
 
       if (stack_address != nullptr)
         {

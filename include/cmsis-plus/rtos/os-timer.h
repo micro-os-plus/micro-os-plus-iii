@@ -374,7 +374,7 @@ namespace os
       func_args_t func_args_;
 
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
-      Clock* clock_ = nullptr;
+      clock* clock_ = nullptr;
       timer_node timer_node_
         { 0, *this };
       clock::duration_t period_ = 0;
