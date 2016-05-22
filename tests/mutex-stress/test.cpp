@@ -42,6 +42,9 @@ mutex mx;
 
 class periodic;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
 class mutex_test
 {
 public:
@@ -51,7 +54,7 @@ public:
   void*
   object_main (void);
 
-  Thread&
+  rtos::thread&
   thread (void)
   {
     return th_;
@@ -70,9 +73,11 @@ protected:
   unsigned int accumulated_count_ = 0;
   unsigned int count_ = 0;
 
-  thread::Attributes attr_;
-  Thread th_;
+  thread::attributes attr_;
+  rtos::thread th_;
 };
+
+#pragma GCC diagnostic pop
 
 mutex_test::mutex_test (const char* name) :
     attr_
@@ -98,7 +103,7 @@ mutex_test::object_main (void)
       busy_wait (nbusy);
 
       // simulate a period of waiting for an external event
-      systick_clock.sleep_for (nsleep);
+      systick.sleep_for (nsleep);
       ticks_ += nsleep;
 
       mx.lock ();
@@ -112,7 +117,7 @@ mutex_test::object_main (void)
           busy_wait (nbusy);
 
           // simulate a period of waiting for an external event
-          systick_clock.sleep_for (nsleep);
+          systick.sleep_for (nsleep);
           ticks_ += nsleep;
 
           accumulated_count_++;
@@ -134,6 +139,9 @@ mutex_test* mt[10];
 
 // ----------------------------------------------------------------------------
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
 class periodic
 {
 public:
@@ -142,7 +150,7 @@ public:
   void*
   object_main (void);
 
-  Thread&
+  rtos::thread&
   thread (void)
   {
     return th_;
@@ -150,9 +158,11 @@ public:
 
 protected:
   unsigned int seconds_;
-  thread::Attributes attr_;
-  Thread th_;
+  thread::attributes attr_;
+  rtos::thread th_;
 };
+
+#pragma GCC diagnostic pop
 
 periodic::periodic (unsigned int seconds) :
     seconds_ (seconds), //
@@ -174,13 +184,13 @@ periodic::object_main (void)
   while (true)
     {
       //realtime_clock.sleep_for (5);
-      systick_clock.sleep_for (5000);
+      systick.sleep_for (5000);
       t += 5;
 
         {
-          scheduler::Critical_section scs;
+          scheduler::critical_section scs;
 
-          printf ("[%3u] ", t);
+          printf ("[%3us] ", t);
 
           unsigned int sum = 0;
           for (auto m : mt)

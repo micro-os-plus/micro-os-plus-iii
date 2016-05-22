@@ -60,9 +60,9 @@ run_tests (void)
 
     {
       // Regular threads.
-      Thread th1
+      thread th1
         { func, nullptr };
-      Thread th2
+      thread th2
         { "th2", func, nullptr };
 
       th1.join ();
@@ -71,7 +71,7 @@ run_tests (void)
 
   // --------------------------------------------------------------------------
 
-  using my_thread = Thread_allocated<memory::new_delete_allocator<stack::allocation_element_t>>;
+  using my_thread = thread_allocated<memory::new_delete_allocator<thread::stack::allocation_element_t>>;
 
   // Allocated threads.
     {
@@ -88,9 +88,9 @@ run_tests (void)
 
     {
       // Statically allocated threads.
-      static Thread_static<> sth1
+      static thread_static<> sth1
         { func, nullptr };
-      static Thread_static<> sth2
+      static thread_static<> sth2
         { "sth2", func, nullptr };
 
       sth1.join ();
@@ -110,12 +110,12 @@ run_tests (void)
 
   // Classic usage; message size and cast to char* must be supplied manually.
     {
-      Message_queue cq1
+      message_queue cq1
         { 3, sizeof(my_msg_t) };
 
       cq1.send ((char*) &msg_out, sizeof(my_msg_t));
 
-      Message_queue cq2
+      message_queue cq2
         { "cq2", 3, sizeof(my_msg_t) };
 
       cq2.send ((char*) &msg_out, sizeof(my_msg_t));
@@ -128,7 +128,7 @@ run_tests (void)
 
   // Define a custom queue type parametrised with the
   // message type.
-  using My_queue = Message_queue_typed<my_msg_t>;
+  using My_queue = message_queue_typed<my_msg_t>;
 
     {
       My_queue tq1
@@ -157,7 +157,7 @@ run_tests (void)
 
   // Define a custom queue type parametrised with the
   // message type and the queue size.
-  using My_static_queue = Message_queue_static<my_msg_t, 4>;
+  using My_static_queue = message_queue_static<my_msg_t, 4>;
 
     {
       // The space for the queue is allocated inside the queue
@@ -187,7 +187,7 @@ run_tests (void)
 
   // Classic usage; block size and cast to char* must be supplied manually.
     {
-      Memory_pool cp1
+      memory_pool cp1
         { 3, sizeof(my_blk_t) };
 
       blk = static_cast<my_blk_t*> (cp1.alloc ());
@@ -199,7 +199,7 @@ run_tests (void)
       blk = static_cast<my_blk_t*> (cp1.timed_alloc (1));
       cp1.free (blk);
 
-      Memory_pool cp2
+      memory_pool cp2
         { "cp2", 3, sizeof(my_blk_t) };
 
       blk = static_cast<my_blk_t*> (cp2.alloc ());
@@ -213,7 +213,7 @@ run_tests (void)
 
   // Define a custom queue type parametrised with the
   // message type.
-  using My_pool = Memory_pool_typed<my_blk_t>;
+  using My_pool = memory_pool_typed<my_blk_t>;
 
     {
       My_pool tp1
@@ -242,7 +242,7 @@ run_tests (void)
 
   // Define a custom pool type parametrised with the
   // block type and the pool size.
-  using My_static_pool = Memory_pool_static<my_blk_t, 4>;
+  using My_static_pool = memory_pool_static<my_blk_t, 4>;
 
     {
       // The space for the pool is allocated inside the pool
@@ -269,10 +269,10 @@ run_tests (void)
   // ==========================================================================
 
     {
-      Condition_variable cv1;
+      condition_variable cv1;
       cv1.signal ();
 
-      Condition_variable cv2
+      condition_variable cv2
         { "cv2" };
       cv2.signal ();
     }
@@ -280,10 +280,10 @@ run_tests (void)
   // ==========================================================================
 
     {
-      Event_flags ev1;
+      event_flags ev1;
       ev1.clear (1);
 
-      Event_flags ev2
+      event_flags ev2
         { "ev2" };
       ev2.clear (1);
     }
@@ -291,11 +291,11 @@ run_tests (void)
   // ==========================================================================
 
     {
-      Mutex mx1;
+      mutex mx1;
       mx1.lock ();
       mx1.unlock ();
 
-      Mutex mx2
+      mutex mx2
         { "mx2" };
       mx2.lock ();
       mx2.unlock ();
@@ -304,10 +304,10 @@ run_tests (void)
   // ==========================================================================
 
     {
-      Semaphore sp1;
+      semaphore sp1;
       sp1.post ();
 
-      Semaphore sp2
+      semaphore sp2
         { "sp2" };
       sp2.post ();
     }
@@ -315,18 +315,18 @@ run_tests (void)
   // ==========================================================================
 
     {
-      Timer tm1
+      timer tm1
         { tmfunc, nullptr };
       tm1.start (1);
 
-      systick_clock.sleep_for (2);
+      systick.sleep_for (2);
       tm1.stop ();
 
-      Timer tm2
+      timer tm2
         { "tm2", tmfunc, nullptr };
       tm2.start (1);
 
-      systick_clock.sleep_for (2);
+      systick.sleep_for (2);
       tm2.stop ();
     }
 
