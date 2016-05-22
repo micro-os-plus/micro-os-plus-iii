@@ -899,21 +899,21 @@ namespace os
       this_thread::error (void);
 
       friend void
-      scheduler::_link_node (Waiting_threads_list& list,
-                             Waiting_thread_node& node);
+      scheduler::_link_node (waiting_threads_list& list,
+                             waiting_thread_node& node);
 
       friend void
-      scheduler::_unlink_node (Waiting_thread_node& node);
+      scheduler::_unlink_node (waiting_thread_node& node);
 
       friend void
-      scheduler::_link_node (Waiting_threads_list& list,
-                             Waiting_thread_node& node,
-                             Clock_timestamps_list& timeout_list,
-                             Timeout_thread_node& timeout_node);
+      scheduler::_link_node (waiting_threads_list& list,
+                             waiting_thread_node& node,
+                             clock_timestamps_list& timeout_list,
+                             timeout_thread_node& timeout_node);
 
       friend void
-      scheduler::_unlink_node (Waiting_thread_node& node,
-                               Timeout_thread_node& timeout_node);
+      scheduler::_unlink_node (waiting_thread_node& node,
+                               timeout_thread_node& timeout_node);
 
       friend void
       port::scheduler::reschedule (void);
@@ -927,11 +927,11 @@ namespace os
       friend void*
       scheduler::_idle_func (thread::func_args_t args);
 
-      friend class Ready_threads_list;
-      friend class Top_threads_list;
-      friend class Thread_children_list;
-      friend class Waiting_threads_list;
-      friend class Clock_timestamps_list;
+      friend class ready_threads_list;
+      friend class top_threads_list;
+      friend class thread_children_list;
+      friend class waiting_threads_list;
+      friend class clock_timestamps_list;
 
       friend class clock;
       friend class condition_variable;
@@ -1081,7 +1081,7 @@ namespace os
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
       // TODO: make it fully intrusive with computed offset.
-      Waiting_thread_node ready_node_
+      waiting_thread_node ready_node_
         { *this };
 #endif
 
@@ -1101,19 +1101,19 @@ namespace os
       thread* parent_ = nullptr;
 
       // List of children threads.
-      Thread_children_list children_;
+      thread_children_list children_;
 
       // Intrusive node used to link this thread to parent list.
-      Double_list_links child_links_;
+      double_list_links child_links_;
 
       // Thread waiting to join.
       thread* joiner_ = nullptr;
 
       // Pointer to waiting node (stored on stack)
-      Waiting_thread_node* waiting_node_ = nullptr;
+      waiting_thread_node* waiting_node_ = nullptr;
 
       // Pointer to timeout node (stored on stack)
-      Timeout_thread_node* clock_node_ = nullptr;
+      timeout_thread_node* clock_node_ = nullptr;
 
       /**
        * @brief Pointer to clock to be used for timeouts.

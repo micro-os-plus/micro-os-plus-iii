@@ -77,7 +77,7 @@ namespace os
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #endif
-      Top_threads_list top_threads_list_;
+      top_threads_list top_threads_list_;
 #pragma GCC diagnostic pop
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
@@ -87,8 +87,8 @@ namespace os
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #endif
-      Ready_threads_list ready_threads_list_;
-      Terminated_threads_list terminated_threads_list_;
+      ready_threads_list ready_threads_list_;
+      terminated_threads_list terminated_threads_list_;
 #pragma GCC diagnostic pop
 #endif
 
@@ -265,7 +265,7 @@ namespace os
     {
 
       void
-      _link_node (Waiting_threads_list& list, Waiting_thread_node& node)
+      _link_node (waiting_threads_list& list, waiting_thread_node& node)
       {
         // Remove this thread from the ready list, if there.
         port::this_thread::prepare_suspend ();
@@ -278,7 +278,7 @@ namespace os
       }
 
       void
-      _unlink_node (Waiting_thread_node& node)
+      _unlink_node (waiting_thread_node& node)
       {
           {
             interrupts::Critical_section ics; // ----- Critical section -----
@@ -291,9 +291,9 @@ namespace os
       }
 
       void
-      _link_node (Waiting_threads_list& list, Waiting_thread_node& node,
-                  Clock_timestamps_list& timeout_list,
-                  Timeout_thread_node& timeout_node)
+      _link_node (waiting_threads_list& list, waiting_thread_node& node,
+                  clock_timestamps_list& timeout_list,
+                  timeout_thread_node& timeout_node)
       {
         // Remove this thread from the ready list, if there.
         port::this_thread::prepare_suspend ();
@@ -310,8 +310,8 @@ namespace os
       }
 
       void
-      _unlink_node (Waiting_thread_node& node,
-                    Timeout_thread_node& timeout_node)
+      _unlink_node (waiting_thread_node& node,
+                    timeout_thread_node& timeout_node)
       {
         interrupts::Critical_section ics; // ----- Critical section -----
 

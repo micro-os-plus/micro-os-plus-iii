@@ -46,8 +46,8 @@ namespace os
   namespace rtos
   {
     class thread;
-    class Double_list;
-    class Timeout_thread_node;
+    class double_list;
+    class timeout_thread_node;
     class timer_node;
 
     // ========================================================================
@@ -56,7 +56,7 @@ namespace os
      * @brief Statically allocated core of a double linked list,
      * pointers to next, previous.
      */
-    class Static_double_list_links
+    class static_double_list_links
     {
     public:
 
@@ -68,17 +68,17 @@ namespace os
       /**
        * @brief Create a list node (BSS initialised).
        */
-      Static_double_list_links ();
+      static_double_list_links ();
 
       /**
        * @cond ignore
        */
-      Static_double_list_links (const Static_double_list_links&) = delete;
-      Static_double_list_links (Static_double_list_links&&) = delete;
-      Static_double_list_links&
-      operator= (const Static_double_list_links&) = delete;
-      Static_double_list_links&
-      operator= (Static_double_list_links&&) = delete;
+      static_double_list_links (const static_double_list_links&) = delete;
+      static_double_list_links (static_double_list_links&&) = delete;
+      static_double_list_links&
+      operator= (const static_double_list_links&) = delete;
+      static_double_list_links&
+      operator= (static_double_list_links&&) = delete;
       /**
        * @endcond
        */
@@ -86,7 +86,7 @@ namespace os
       /**
        * @brief Destroy the node.
        */
-      ~Static_double_list_links ();
+      ~static_double_list_links ();
 
       /**
        * @}
@@ -118,12 +118,12 @@ namespace os
       /**
        * @brief Pointer to previous node.
        */
-      volatile Static_double_list_links* volatile prev;
+      volatile static_double_list_links* volatile prev;
 
       /**
        * @brief Pointer to next node.
        */
-      volatile Static_double_list_links* volatile next;
+      volatile static_double_list_links* volatile next;
 
       /**
        * @}
@@ -137,7 +137,7 @@ namespace os
      * @brief The core of a double linked list, pointers to next,
      * previous.
      */
-    class Double_list_links : public Static_double_list_links
+    class double_list_links : public static_double_list_links
     {
     public:
 
@@ -149,17 +149,17 @@ namespace os
       /**
        * @brief Create a list node (explicitly set to nullptr).
        */
-      Double_list_links ();
+      double_list_links ();
 
       /**
        * @cond ignore
        */
-      Double_list_links (const Double_list_links&) = delete;
-      Double_list_links (Double_list_links&&) = delete;
-      Double_list_links&
-      operator= (const Double_list_links&) = delete;
-      Double_list_links&
-      operator= (Double_list_links&&) = delete;
+      double_list_links (const double_list_links&) = delete;
+      double_list_links (double_list_links&&) = delete;
+      double_list_links&
+      operator= (const double_list_links&) = delete;
+      double_list_links&
+      operator= (double_list_links&&) = delete;
       /**
        * @endcond
        */
@@ -167,7 +167,7 @@ namespace os
       /**
        * @brief Destroy the node.
        */
-      ~Double_list_links ();
+      ~double_list_links ();
 
       /**
        * @}
@@ -183,7 +183,7 @@ namespace os
     /**
      * @brief Double linked list node, with thread reference.
      */
-    class Waiting_thread_node : public Double_list_links
+    class waiting_thread_node : public double_list_links
     {
     public:
 
@@ -196,17 +196,17 @@ namespace os
        * @brief Create a node with references to the thread.
        * @param th Reference to the thread.
        */
-      Waiting_thread_node (thread& th);
+      waiting_thread_node (thread& th);
 
       /**
        * @cond ignore
        */
-      Waiting_thread_node (const Waiting_thread_node&) = delete;
-      Waiting_thread_node (Waiting_thread_node&&) = delete;
-      Waiting_thread_node&
-      operator= (const Waiting_thread_node&) = delete;
-      Waiting_thread_node&
-      operator= (Waiting_thread_node&&) = delete;
+      waiting_thread_node (const waiting_thread_node&) = delete;
+      waiting_thread_node (waiting_thread_node&&) = delete;
+      waiting_thread_node&
+      operator= (const waiting_thread_node&) = delete;
+      waiting_thread_node&
+      operator= (waiting_thread_node&&) = delete;
       /**
        * @endcond
        */
@@ -214,7 +214,7 @@ namespace os
       /**
        * @brief Destroy the node.
        */
-      ~Waiting_thread_node ();
+      ~waiting_thread_node ();
 
       /**
        * @}
@@ -247,7 +247,7 @@ namespace os
     /**
      * @brief Double linked list node, with time stamp.
      */
-    class Timestamp_node : public Double_list_links
+    class timestamp_node : public double_list_links
     {
     public:
 
@@ -260,17 +260,17 @@ namespace os
        * @brief Create a node with a time stamp.
        * @param ts Time stamp.
        */
-      Timestamp_node (port::clock::timestamp_t ts);
+      timestamp_node (port::clock::timestamp_t ts);
 
       /**
        * @cond ignore
        */
-      Timestamp_node (const Timestamp_node&) = delete;
-      Timestamp_node (Timestamp_node&&) = delete;
-      Timestamp_node&
-      operator= (const Timestamp_node&) = delete;
-      Timestamp_node&
-      operator= (Timestamp_node&&) = delete;
+      timestamp_node (const timestamp_node&) = delete;
+      timestamp_node (timestamp_node&&) = delete;
+      timestamp_node&
+      operator= (const timestamp_node&) = delete;
+      timestamp_node&
+      operator= (timestamp_node&&) = delete;
       /**
        * @endcond
        */
@@ -279,7 +279,7 @@ namespace os
        * @brief Destroy the node.
        */
       virtual
-      ~Timestamp_node ();
+      ~timestamp_node ();
 
       /**
        * @}
@@ -333,7 +333,7 @@ namespace os
     /**
      * @brief Double linked list node, with time stamp and thread.
      */
-    class Timeout_thread_node : public Timestamp_node
+    class timeout_thread_node : public timestamp_node
     {
     public:
 
@@ -347,17 +347,17 @@ namespace os
        * @param [in] ts Time stamp.
        * @param [in] th Reference to thread.
        */
-      Timeout_thread_node (port::clock::timestamp_t ts, thread& th);
+      timeout_thread_node (port::clock::timestamp_t ts, thread& th);
 
       /**
        * @cond ignore
        */
-      Timeout_thread_node (const Timeout_thread_node&) = delete;
-      Timeout_thread_node (Timeout_thread_node&&) = delete;
-      Timeout_thread_node&
-      operator= (const Timeout_thread_node&) = delete;
-      Timeout_thread_node&
-      operator= (Timeout_thread_node&&) = delete;
+      timeout_thread_node (const timeout_thread_node&) = delete;
+      timeout_thread_node (timeout_thread_node&&) = delete;
+      timeout_thread_node&
+      operator= (const timeout_thread_node&) = delete;
+      timeout_thread_node&
+      operator= (timeout_thread_node&&) = delete;
       /**
        * @endcond
        */
@@ -366,7 +366,7 @@ namespace os
        * @brief Destroy the node.
        */
       virtual
-      ~Timeout_thread_node ();
+      ~timeout_thread_node ();
 
       /**
        * @}
@@ -419,7 +419,7 @@ namespace os
     /**
      * @brief Double linked list node, with time stamp and timer.
      */
-    class timer_node : public Timestamp_node
+    class timer_node : public timestamp_node
     {
     public:
 
@@ -502,7 +502,7 @@ namespace os
     /**
      * @brief Statically allocated circular double linked list of nodes.
      */
-    class Static_double_list
+    class static_double_list
     {
     public:
 
@@ -514,17 +514,17 @@ namespace os
       /**
        * @brief Create a list.
        */
-      Static_double_list ();
+      static_double_list ();
 
       /**
        * @cond ignore
        */
-      Static_double_list (const Static_double_list&) = delete;
-      Static_double_list (Static_double_list&&) = delete;
-      Static_double_list&
-      operator= (const Static_double_list&) = delete;
-      Static_double_list&
-      operator= (Static_double_list&&) = delete;
+      static_double_list (const static_double_list&) = delete;
+      static_double_list (static_double_list&&) = delete;
+      static_double_list&
+      operator= (const static_double_list&) = delete;
+      static_double_list&
+      operator= (static_double_list&&) = delete;
       /**
        * @endcond
        */
@@ -532,7 +532,7 @@ namespace os
       /**
        * @brief Destroy the list.
        */
-      ~Static_double_list ();
+      ~static_double_list ();
 
       /**
        * @}
@@ -572,7 +572,7 @@ namespace os
        *  None.
        * @return Pointer to head node.
        */
-      volatile Static_double_list_links*
+      volatile static_double_list_links*
       head (void) const;
 
       /**
@@ -581,7 +581,7 @@ namespace os
        *  None.
        * @return Pointer to tail node.
        */
-      volatile Static_double_list_links*
+      volatile static_double_list_links*
       tail (void) const;
 
       /**
@@ -602,8 +602,8 @@ namespace os
        * @return Nothing.
        */
       void
-      insert_after (Static_double_list_links& node,
-                    Static_double_list_links* after);
+      insert_after (static_double_list_links& node,
+                    static_double_list_links* after);
 
       /**
        * @}
@@ -621,7 +621,7 @@ namespace os
        * @details
        * To simplify processing, the list always has a node.
        */
-      Static_double_list_links volatile head_;
+      static_double_list_links volatile head_;
 
       /**
        * @}
@@ -633,7 +633,7 @@ namespace os
     /**
      * @brief Circular double linked list of nodes.
      */
-    class Double_list : public Static_double_list
+    class double_list : public static_double_list
     {
     public:
 
@@ -645,17 +645,17 @@ namespace os
       /**
        * @brief Create a list.
        */
-      Double_list ();
+      double_list ();
 
       /**
        * @cond ignore
        */
-      Double_list (const Double_list&) = delete;
-      Double_list (Double_list&&) = delete;
-      Double_list&
-      operator= (const Double_list&) = delete;
-      Double_list&
-      operator= (Double_list&&) = delete;
+      double_list (const double_list&) = delete;
+      double_list (double_list&&) = delete;
+      double_list&
+      operator= (const double_list&) = delete;
+      double_list&
+      operator= (double_list&&) = delete;
       /**
        * @endcond
        */
@@ -663,7 +663,7 @@ namespace os
       /**
        * @brief Destroy the list.
        */
-      ~Double_list ();
+      ~double_list ();
 
       /**
        * @}
@@ -676,7 +676,7 @@ namespace os
     /**
      * @brief List of top level threads.
      */
-    class Top_threads_list : public Static_double_list
+    class top_threads_list : public static_double_list
     {
     public:
 
@@ -688,17 +688,17 @@ namespace os
       /**
        * @brief Create a list of waiting threads.
        */
-      Top_threads_list ();
+      top_threads_list ();
 
       /**
        * @cond ignore
        */
-      Top_threads_list (const Top_threads_list&) = delete;
-      Top_threads_list (Top_threads_list&&) = delete;
-      Top_threads_list&
-      operator= (const Top_threads_list&) = delete;
-      Top_threads_list&
-      operator= (Top_threads_list&&) = delete;
+      top_threads_list (const top_threads_list&) = delete;
+      top_threads_list (top_threads_list&&) = delete;
+      top_threads_list&
+      operator= (const top_threads_list&) = delete;
+      top_threads_list&
+      operator= (top_threads_list&&) = delete;
       /**
        * @endcond
        */
@@ -706,7 +706,7 @@ namespace os
       /**
        * @brief Destroy the list.
        */
-      ~Top_threads_list ();
+      ~top_threads_list ();
 
       /**
        * @}
@@ -739,7 +739,7 @@ namespace os
     /**
      * @brief List of children threads.
      */
-    class Thread_children_list : public Double_list
+    class thread_children_list : public double_list
     {
     public:
 
@@ -751,17 +751,17 @@ namespace os
       /**
        * @brief Create a list of waiting threads.
        */
-      Thread_children_list ();
+      thread_children_list ();
 
       /**
        * @cond ignore
        */
-      Thread_children_list (const Thread_children_list&) = delete;
-      Thread_children_list (Thread_children_list&&) = delete;
-      Thread_children_list&
-      operator= (const Thread_children_list&) = delete;
-      Thread_children_list&
-      operator= (Thread_children_list&&) = delete;
+      thread_children_list (const thread_children_list&) = delete;
+      thread_children_list (thread_children_list&&) = delete;
+      thread_children_list&
+      operator= (const thread_children_list&) = delete;
+      thread_children_list&
+      operator= (thread_children_list&&) = delete;
       /**
        * @endcond
        */
@@ -769,7 +769,7 @@ namespace os
       /**
        * @brief Destroy the list.
        */
-      ~Thread_children_list ();
+      ~thread_children_list ();
 
       /**
        * @}
@@ -802,7 +802,7 @@ namespace os
     /**
      * @brief Priority ordered list of threads waiting too run.
      */
-    class Ready_threads_list : public Static_double_list
+    class ready_threads_list : public static_double_list
     {
     public:
 
@@ -814,17 +814,17 @@ namespace os
       /**
        * @brief Create a list of waiting threads.
        */
-      Ready_threads_list ();
+      ready_threads_list ();
 
       /**
        * @cond ignore
        */
-      Ready_threads_list (const Ready_threads_list&) = delete;
-      Ready_threads_list (Ready_threads_list&&) = delete;
-      Ready_threads_list&
-      operator= (const Ready_threads_list&) = delete;
-      Ready_threads_list&
-      operator= (Ready_threads_list&&) = delete;
+      ready_threads_list (const ready_threads_list&) = delete;
+      ready_threads_list (ready_threads_list&&) = delete;
+      ready_threads_list&
+      operator= (const ready_threads_list&) = delete;
+      ready_threads_list&
+      operator= (ready_threads_list&&) = delete;
       /**
        * @endcond
        */
@@ -832,7 +832,7 @@ namespace os
       /**
        * @brief Destroy the list.
        */
-      ~Ready_threads_list ();
+      ~ready_threads_list ();
 
       /**
        * @}
@@ -851,7 +851,7 @@ namespace os
        * @return Nothing.
        */
       void
-      link (Waiting_thread_node& node);
+      link (waiting_thread_node& node);
 
       /**
        * @brief Get list head.
@@ -859,7 +859,7 @@ namespace os
        *  None.
        * @return Casted pointer to head node.
        */
-      volatile Waiting_thread_node*
+      volatile waiting_thread_node*
       head (void) const;
 
       /**
@@ -883,7 +883,7 @@ namespace os
     /**
      * @brief Priority ordered list of threads.
      */
-    class Waiting_threads_list : public Double_list
+    class waiting_threads_list : public double_list
     {
     public:
 
@@ -895,17 +895,17 @@ namespace os
       /**
        * @brief Create a list of waiting threads.
        */
-      Waiting_threads_list ();
+      waiting_threads_list ();
 
       /**
        * @cond ignore
        */
-      Waiting_threads_list (const Waiting_threads_list&) = delete;
-      Waiting_threads_list (Waiting_threads_list&&) = delete;
-      Waiting_threads_list&
-      operator= (const Waiting_threads_list&) = delete;
-      Waiting_threads_list&
-      operator= (Waiting_threads_list&&) = delete;
+      waiting_threads_list (const waiting_threads_list&) = delete;
+      waiting_threads_list (waiting_threads_list&&) = delete;
+      waiting_threads_list&
+      operator= (const waiting_threads_list&) = delete;
+      waiting_threads_list&
+      operator= (waiting_threads_list&&) = delete;
       /**
        * @endcond
        */
@@ -913,7 +913,7 @@ namespace os
       /**
        * @brief Destroy the list.
        */
-      ~Waiting_threads_list ();
+      ~waiting_threads_list ();
 
       /**
        * @}
@@ -932,7 +932,7 @@ namespace os
        * @return Nothing.
        */
       void
-      link (Waiting_thread_node& node);
+      link (waiting_thread_node& node);
 
       /**
        * @brief Get list head.
@@ -940,7 +940,7 @@ namespace os
        *  None.
        * @return Casted pointer to head node.
        */
-      volatile Waiting_thread_node*
+      volatile waiting_thread_node*
       head (void) const;
 
       /**
@@ -973,7 +973,7 @@ namespace os
     /**
      * @brief Ordered list of time stamp nodes.
      */
-    class Clock_timestamps_list : public Double_list
+    class clock_timestamps_list : public double_list
     {
     public:
 
@@ -985,17 +985,17 @@ namespace os
       /**
        * @brief Create a list of clock time stamps.
        */
-      Clock_timestamps_list ();
+      clock_timestamps_list ();
 
       /**
        * @cond ignore
        */
-      Clock_timestamps_list (const Clock_timestamps_list&) = delete;
-      Clock_timestamps_list (Clock_timestamps_list&&) = delete;
-      Clock_timestamps_list&
-      operator= (const Clock_timestamps_list&) = delete;
-      Clock_timestamps_list&
-      operator= (Clock_timestamps_list&&) = delete;
+      clock_timestamps_list (const clock_timestamps_list&) = delete;
+      clock_timestamps_list (clock_timestamps_list&&) = delete;
+      clock_timestamps_list&
+      operator= (const clock_timestamps_list&) = delete;
+      clock_timestamps_list&
+      operator= (clock_timestamps_list&&) = delete;
       /**
        * @endcond
        */
@@ -1003,7 +1003,7 @@ namespace os
       /**
        * @brief Destroy the list.
        */
-      ~Clock_timestamps_list ();
+      ~clock_timestamps_list ();
 
       /**
        * @}
@@ -1022,7 +1022,7 @@ namespace os
        * @return Nothing.
        */
       void
-      link (Timestamp_node& node);
+      link (timestamp_node& node);
 
       /**
        * @brief Get list head.
@@ -1030,7 +1030,7 @@ namespace os
        *  None.
        * @return Casted pointer to head node.
        */
-      volatile Timestamp_node*
+      volatile timestamp_node*
       head (void) const;
 
       /**
@@ -1051,7 +1051,7 @@ namespace os
     /**
      * @brief Unordered list of threads.
      */
-    class Terminated_threads_list : public Static_double_list
+    class terminated_threads_list : public static_double_list
     {
     public:
 
@@ -1063,17 +1063,17 @@ namespace os
       /**
        * @brief Create a list of waiting threads.
        */
-      Terminated_threads_list ();
+      terminated_threads_list ();
 
       /**
        * @cond ignore
        */
-      Terminated_threads_list (const Terminated_threads_list&) = delete;
-      Terminated_threads_list (Terminated_threads_list&&) = delete;
-      Terminated_threads_list&
-      operator= (const Terminated_threads_list&) = delete;
-      Terminated_threads_list&
-      operator= (Terminated_threads_list&&) = delete;
+      terminated_threads_list (const terminated_threads_list&) = delete;
+      terminated_threads_list (terminated_threads_list&&) = delete;
+      terminated_threads_list&
+      operator= (const terminated_threads_list&) = delete;
+      terminated_threads_list&
+      operator= (terminated_threads_list&&) = delete;
       /**
        * @endcond
        */
@@ -1081,7 +1081,7 @@ namespace os
       /**
        * @brief Destroy the list.
        */
-      ~Terminated_threads_list ();
+      ~terminated_threads_list ();
 
       /**
        * @}
@@ -1100,7 +1100,7 @@ namespace os
        * @return Nothing.
        */
       void
-      link (Waiting_thread_node& node);
+      link (waiting_thread_node& node);
 
       /**
        * @brief Get list head.
@@ -1108,7 +1108,7 @@ namespace os
        *  None.
        * @return Casted pointer to head node.
        */
-      volatile Waiting_thread_node*
+      volatile waiting_thread_node*
       head (void) const;
 
       // TODO add iterator begin(), end()
@@ -1123,19 +1123,19 @@ namespace os
     namespace scheduler
     {
       void
-      _link_node (Waiting_threads_list& list, Waiting_thread_node& node);
+      _link_node (waiting_threads_list& list, waiting_thread_node& node);
 
       void
-      _unlink_node (Waiting_thread_node& node);
+      _unlink_node (waiting_thread_node& node);
 
       void
-      _link_node (Waiting_threads_list& list, Waiting_thread_node& node,
-                  Clock_timestamps_list& timeout_list,
-                  Timeout_thread_node& timeout_node);
+      _link_node (waiting_threads_list& list, waiting_thread_node& node,
+                  clock_timestamps_list& timeout_list,
+                  timeout_thread_node& timeout_node);
 
       void
-      _unlink_node (Waiting_thread_node& node,
-                    Timeout_thread_node& timeout_node);
+      _unlink_node (waiting_thread_node& node,
+                    timeout_thread_node& timeout_node);
 
     } /* namespace this_thread */
 
@@ -1157,13 +1157,13 @@ namespace os
     // "Member 'next' was not initialized in constructor"
 
     inline
-    Static_double_list_links::Static_double_list_links ()
+    static_double_list_links::static_double_list_links ()
     {
       ;
     }
 
     inline
-    Static_double_list_links::~Static_double_list_links ()
+    static_double_list_links::~static_double_list_links ()
     {
       ;
     }
@@ -1171,14 +1171,14 @@ namespace os
     // ========================================================================
 
     inline
-    Double_list_links::Double_list_links ()
+    double_list_links::double_list_links ()
     {
       prev = nullptr;
       next = nullptr;
     }
 
     inline
-    Double_list_links::~Double_list_links ()
+    double_list_links::~double_list_links ()
     {
       ;
     }
@@ -1186,14 +1186,14 @@ namespace os
     // ========================================================================
 
     inline
-    Waiting_thread_node::Waiting_thread_node (rtos::thread& th) :
+    waiting_thread_node::waiting_thread_node (rtos::thread& th) :
         thread (th)
     {
       ;
     }
 
     inline
-    Waiting_thread_node::~Waiting_thread_node ()
+    waiting_thread_node::~waiting_thread_node ()
     {
       ;
     }
@@ -1205,7 +1205,7 @@ namespace os
      * The initial list status is empty by having the pointers null.
      */
     inline
-    Static_double_list::Static_double_list ()
+    static_double_list::static_double_list ()
     {
       // By all means, do not add any code here.
       // The contructor was not `default` to benefit from inline.
@@ -1216,34 +1216,34 @@ namespace os
      * There must be no nodes in the list.
      */
     inline
-    Static_double_list::~Static_double_list ()
+    static_double_list::~static_double_list ()
     {
       ;
     }
 
     inline bool
-    Static_double_list::empty (void) const
+    static_double_list::empty (void) const
     {
       // If it point to itself, it is empty.
       return (head_.next == &head_) || (head_.next == nullptr);
     }
 
-    inline volatile Static_double_list_links*
-    Static_double_list::head (void) const
+    inline volatile static_double_list_links*
+    static_double_list::head (void) const
     {
-      return static_cast<volatile Static_double_list_links*> (head_.next);
+      return static_cast<volatile static_double_list_links*> (head_.next);
     }
 
-    inline volatile Static_double_list_links*
-    Static_double_list::tail (void) const
+    inline volatile static_double_list_links*
+    static_double_list::tail (void) const
     {
-      return static_cast<volatile Static_double_list_links*> (head_.prev);
+      return static_cast<volatile static_double_list_links*> (head_.prev);
     }
 
 #if 0
     inline void
-    Static_double_list::insert_after (Static_double_list_links& node,
-        Static_double_list_links* after)
+    static_double_list::insert_after (static_double_list_links& node,
+        static_double_list_links* after)
       {
         // Make the new node point to its neighbours.
         node.prev = after;
@@ -1262,13 +1262,13 @@ namespace os
      * The initial list status is empty.
      */
     inline
-    Top_threads_list::Top_threads_list ()
+    top_threads_list::top_threads_list ()
     {
       ;
     }
 
     inline
-    Top_threads_list::~Top_threads_list ()
+    top_threads_list::~top_threads_list ()
     {
       ;
     }
@@ -1280,13 +1280,13 @@ namespace os
      * The initial list status is empty.
      */
     inline
-    Thread_children_list::Thread_children_list ()
+    thread_children_list::thread_children_list ()
     {
       ;
     }
 
     inline
-    Thread_children_list::~Thread_children_list ()
+    thread_children_list::~thread_children_list ()
     {
       ;
     }
@@ -1298,21 +1298,21 @@ namespace os
      * The initial list status is empty.
      */
     inline
-    Ready_threads_list::Ready_threads_list ()
+    ready_threads_list::ready_threads_list ()
     {
       ;
     }
 
     inline
-    Ready_threads_list::~Ready_threads_list ()
+    ready_threads_list::~ready_threads_list ()
     {
       ;
     }
 
-    inline volatile Waiting_thread_node*
-    Ready_threads_list::head (void) const
+    inline volatile waiting_thread_node*
+    ready_threads_list::head (void) const
     {
-      return static_cast<volatile Waiting_thread_node*> (Static_double_list::head ());
+      return static_cast<volatile waiting_thread_node*> (static_double_list::head ());
     }
 
     // ========================================================================
@@ -1322,41 +1322,41 @@ namespace os
      * The initial list status is empty.
      */
     inline
-    Waiting_threads_list::Waiting_threads_list ()
+    waiting_threads_list::waiting_threads_list ()
     {
       ;
     }
 
     inline
-    Waiting_threads_list::~Waiting_threads_list ()
+    waiting_threads_list::~waiting_threads_list ()
     {
       ;
     }
 
-    inline volatile Waiting_thread_node*
-    Waiting_threads_list::head (void) const
+    inline volatile waiting_thread_node*
+    waiting_threads_list::head (void) const
     {
-      return static_cast<volatile Waiting_thread_node*> (Double_list::head ());
+      return static_cast<volatile waiting_thread_node*> (double_list::head ());
     }
 
     // ========================================================================
 
     inline
-    Clock_timestamps_list::Clock_timestamps_list ()
+    clock_timestamps_list::clock_timestamps_list ()
     {
       ;
     }
 
     inline
-    Clock_timestamps_list::~Clock_timestamps_list ()
+    clock_timestamps_list::~clock_timestamps_list ()
     {
       ;
     }
 
-    inline volatile Timestamp_node*
-    Clock_timestamps_list::head (void) const
+    inline volatile timestamp_node*
+    clock_timestamps_list::head (void) const
     {
-      return static_cast<volatile Timestamp_node*> (Double_list::head ());
+      return static_cast<volatile timestamp_node*> (double_list::head ());
     }
 
     // ========================================================================
@@ -1366,21 +1366,21 @@ namespace os
      * The initial list status is empty.
      */
     inline
-    Terminated_threads_list::Terminated_threads_list ()
+    terminated_threads_list::terminated_threads_list ()
     {
       ;
     }
 
     inline
-    Terminated_threads_list::~Terminated_threads_list ()
+    terminated_threads_list::~terminated_threads_list ()
     {
       ;
     }
 
-    inline volatile Waiting_thread_node*
-    Terminated_threads_list::head (void) const
+    inline volatile waiting_thread_node*
+    terminated_threads_list::head (void) const
     {
-      return static_cast<volatile Waiting_thread_node*> (Static_double_list::head ());
+      return static_cast<volatile waiting_thread_node*> (static_double_list::head ());
     }
 
   // --------------------------------------------------------------------------

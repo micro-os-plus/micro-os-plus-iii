@@ -410,7 +410,7 @@ namespace os
        */
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
-      Waiting_threads_list list_;
+      waiting_threads_list list_;
       clock* clock_ = nullptr;
 #endif
 

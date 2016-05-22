@@ -247,14 +247,14 @@ namespace os
 
     result_t
     clock::_wait_until (clock::timestamp_t timestamp,
-                        Clock_timestamps_list& list)
+                        clock_timestamps_list& list)
     {
       thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      Timeout_thread_node node
+      timeout_thread_node node
         { timestamp, crt_thread };
 
         {
@@ -427,7 +427,7 @@ namespace os
 
     result_t
     clock_systick::_wait_until (clock::timestamp_t timestamp,
-        Clock_timestamps_list& list __attribute__((unused)))
+        clock_timestamps_list& list __attribute__((unused)))
       {
         result_t res;
 

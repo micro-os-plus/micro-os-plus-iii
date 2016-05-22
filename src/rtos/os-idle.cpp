@@ -80,11 +80,11 @@ namespace os
 #if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
             while (!scheduler::terminated_threads_list_.empty ())
               {
-                Waiting_thread_node* node;
+                waiting_thread_node* node;
                   {
                     interrupts::Critical_section ics; // ----- Critical section -----
                     node =
-                        const_cast<Waiting_thread_node*> (scheduler::terminated_threads_list_.head ());
+                        const_cast<waiting_thread_node*> (scheduler::terminated_threads_list_.head ());
                     node->unlink ();
                   }
                 node->thread._destroy ();

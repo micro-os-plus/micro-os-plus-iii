@@ -39,10 +39,10 @@ namespace os
     // ========================================================================
 
     /**
-     * @class Static_double_list_links
+     * @class static_double_list_links
      * @details
      * This is the simplest list node, used as base class for other
-     * list nodes and as storage for Static_double_list,
+     * list nodes and as storage for static_double_list,
      * that must be available for any statically constructed
      * objects while still avoiding the 'static initialisation order fiasco'.
      *
@@ -60,7 +60,7 @@ namespace os
      * the links in the removed node are nullified.
      */
     void
-    Static_double_list_links::unlink (void)
+    static_double_list_links::unlink (void)
     {
       // Check if not already removed.
       if (next == nullptr)
@@ -88,7 +88,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @class Static_double_list
+     * @class static_double_list
      * @details
      * This is the simplest list, used as base class for scheduler
      * lists that must be available for any statically constructed
@@ -108,15 +108,15 @@ namespace os
      * Initialise the mandatory node with links to itself.
      */
     void
-    Static_double_list::clear (void)
+    static_double_list::clear (void)
     {
       head_.next = &head_;
       head_.prev = &head_;
     }
 
     void
-    Static_double_list::insert_after (Static_double_list_links& node,
-                                      Static_double_list_links* after)
+    static_double_list::insert_after (static_double_list_links& node,
+                                      static_double_list_links* after)
     {
 #if defined(OS_TRACE_RTOS_LISTS)
       trace::printf ("%s() n=%p after %p\n", __func__, &node, after);
@@ -141,7 +141,7 @@ namespace os
      * @details
      * The initial list status is empty.
      */
-    Double_list::Double_list ()
+    double_list::double_list ()
     {
 #if defined(OS_TRACE_RTOS_LISTS_CONSTRUCT)
       trace::printf ("%s() %p \n", __func__, this);
@@ -153,7 +153,7 @@ namespace os
      * @details
      * There must be no nodes in the list.
      */
-    Double_list::~Double_list ()
+    double_list::~double_list ()
     {
 #if defined(OS_TRACE_RTOS_LISTS_CONSTRUCT)
       trace::printf ("%s() %p \n", __func__, this);
@@ -164,7 +164,7 @@ namespace os
     // ========================================================================
 
     void
-    Top_threads_list::link (thread& thread)
+    top_threads_list::link (thread& thread)
     {
       if (head_.prev == nullptr)
         {
@@ -174,23 +174,23 @@ namespace os
 
       // Add thread intrusive node at the end of the list.
       insert_after (thread.child_links_,
-                    const_cast<Static_double_list_links *> (tail ()));
+                    const_cast<static_double_list_links *> (tail ()));
     }
 
     // ========================================================================
 
     void
-    Thread_children_list::link (thread& thread)
+    thread_children_list::link (thread& thread)
     {
       // Add thread intrusive node at the end of the list.
       insert_after (thread.child_links_,
-                    const_cast<Static_double_list_links*> (tail ()));
+                    const_cast<static_double_list_links*> (tail ()));
     }
 
     // ========================================================================
 
     void
-    Ready_threads_list::link (Waiting_thread_node& node)
+    ready_threads_list::link (waiting_thread_node& node)
     {
       if (head_.prev == nullptr)
         {
@@ -200,8 +200,8 @@ namespace os
 
       thread::priority_t prio = node.thread.prio_;
 
-      Waiting_thread_node* after =
-          static_cast<Waiting_thread_node*> (const_cast<Static_double_list_links *> (tail ()));
+      waiting_thread_node* after =
+          static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (tail ()));
 
       if (empty () || (prio <= after->thread.prio_))
         {
@@ -211,7 +211,7 @@ namespace os
         {
           // Insert at the beginning of the list
           after =
-              static_cast<Waiting_thread_node*> (const_cast<Static_double_list_links *> (&head_));
+              static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (&head_));
 #if defined(OS_TRACE_RTOS_LISTS)
           trace::printf ("ready %s() head \n", __func__);
 #endif
@@ -224,7 +224,7 @@ namespace os
           while (prio > after->thread.prio_)
             {
               after =
-                  static_cast<Waiting_thread_node*> (const_cast<Static_double_list_links *> (after->prev));
+                  static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (after->prev));
             }
         }
 
@@ -243,7 +243,7 @@ namespace os
      * Must be called in a critical section.
      */
     thread*
-    Ready_threads_list::unlink_head (void)
+    ready_threads_list::unlink_head (void)
     {
       assert(!empty ());
 
@@ -253,7 +253,7 @@ namespace os
       trace::printf ("ready %s() %p %s\n", __func__, thread, thread->name ());
 #endif
 
-      const_cast<Waiting_thread_node*> (head ())->unlink ();
+      const_cast<waiting_thread_node*> (head ())->unlink ();
 
       assert(thread != nullptr);
 
@@ -265,7 +265,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @class Waiting_threads_list
+     * @class waiting_threads_list
      * @details
      * There are at least two strategies:
      * - keep the list ordered by priorities and have the top node
@@ -307,12 +307,12 @@ namespace os
      * to itself.
      */
     void
-    Waiting_threads_list::link (Waiting_thread_node& node)
+    waiting_threads_list::link (waiting_thread_node& node)
     {
       thread::priority_t prio = node.thread.sched_prio ();
 
-      Waiting_thread_node* after =
-          static_cast<Waiting_thread_node*> (const_cast<Static_double_list_links *> (tail ()));
+      waiting_thread_node* after =
+          static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (tail ()));
 
       if (empty () || (prio <= after->thread.sched_prio ()))
         {
@@ -322,7 +322,7 @@ namespace os
         {
           // Insert at the beginning of the list
           after =
-              static_cast<Waiting_thread_node*> (const_cast<Static_double_list_links *> (&head_));
+              static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (&head_));
 #if defined(OS_TRACE_RTOS_LISTS)
           trace::printf ("wait %s() head \n", __func__);
 #endif
@@ -335,7 +335,7 @@ namespace os
           while (prio > after->thread.sched_prio ())
             {
               after =
-                  static_cast<Waiting_thread_node*> (const_cast<Static_double_list_links *> (after->prev));
+                  static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (after->prev));
             }
         }
 
@@ -353,7 +353,7 @@ namespace os
      * and wake-up the thread.
      */
     void
-    Waiting_threads_list::resume_one (void)
+    waiting_threads_list::resume_one (void)
     {
       thread* thread;
         {
@@ -368,7 +368,7 @@ namespace os
           // The top priority is to remove the entry from the list
           // so that subsequent wakeups to address different threads.
           thread = &(head ()->thread);
-          const_cast<Waiting_thread_node*> (head ())->unlink ();
+          const_cast<waiting_thread_node*> (head ())->unlink ();
         }
       assert(thread != nullptr);
 
@@ -386,7 +386,7 @@ namespace os
     }
 
     void
-    Waiting_threads_list::resume_all (void)
+    waiting_threads_list::resume_all (void)
     {
       while (!empty ())
         {
@@ -396,7 +396,7 @@ namespace os
 
     // ========================================================================
 
-    Timestamp_node::Timestamp_node (clock::timestamp_t ts) :
+    timestamp_node::timestamp_node (clock::timestamp_t ts) :
         timestamp (ts)
     {
 #if defined(OS_TRACE_RTOS_LISTS_CONSTRUCT)
@@ -404,7 +404,7 @@ namespace os
 #endif
     }
 
-    Timestamp_node::~Timestamp_node ()
+    timestamp_node::~timestamp_node ()
     {
 #if defined(OS_TRACE_RTOS_LISTS_CONSTRUCT)
       trace::printf ("%s() %p \n", __func__, this);
@@ -413,9 +413,9 @@ namespace os
 
     // ========================================================================
 
-    Timeout_thread_node::Timeout_thread_node (clock::timestamp_t ts,
+    timeout_thread_node::timeout_thread_node (clock::timestamp_t ts,
                                               rtos::thread& th) :
-        Timestamp_node
+        timestamp_node
           { ts }, //
         thread (th)
     {
@@ -424,7 +424,7 @@ namespace os
 #endif
     }
 
-    Timeout_thread_node::~Timeout_thread_node ()
+    timeout_thread_node::~timeout_thread_node ()
     {
 #if defined(OS_TRACE_RTOS_LISTS_CONSTRUCT)
       trace::printf ("%s() %p \n", __func__, this);
@@ -433,7 +433,7 @@ namespace os
 
     // Must be called in a critical section.
     void
-    Timeout_thread_node::action (void)
+    timeout_thread_node::action (void)
     {
       rtos::thread* th = &this->thread;
       this->unlink ();
@@ -450,7 +450,7 @@ namespace os
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
     timer_node::timer_node (clock::timestamp_t ts, timer& tm) :
-        Timestamp_node
+        timestamp_node
           { ts }, //
         tmr (tm)
     {
@@ -496,12 +496,12 @@ namespace os
      * to itself.
      */
     void
-    Clock_timestamps_list::link (Timestamp_node& node)
+    clock_timestamps_list::link (timestamp_node& node)
     {
       clock::timestamp_t timestamp = node.timestamp;
 
-      Timeout_thread_node* after =
-          static_cast<Timeout_thread_node*> (const_cast<Static_double_list_links *> (tail ()));
+      timeout_thread_node* after =
+          static_cast<timeout_thread_node*> (const_cast<static_double_list_links *> (tail ()));
 
       if (empty () || (timestamp >= after->timestamp))
         {
@@ -512,7 +512,7 @@ namespace os
           // Insert at the beginning of the list
           // and update the new head.
           after =
-              static_cast<Timeout_thread_node*> (const_cast<Static_double_list_links *> (&head_));
+              static_cast<timeout_thread_node*> (const_cast<static_double_list_links *> (&head_));
 #if defined(OS_TRACE_RTOS_LISTS)
           trace::printf ("clock %s() head \n", __func__);
 #endif
@@ -524,7 +524,7 @@ namespace os
           while (timestamp < after->timestamp)
             {
               after =
-                  static_cast<Timeout_thread_node*> (const_cast<Static_double_list_links *> (after->prev));
+                  static_cast<timeout_thread_node*> (const_cast<static_double_list_links *> (after->prev));
             }
         }
 
@@ -554,7 +554,7 @@ namespace os
      * Repeat for all nodes that have overdue time stamps.
      */
     void
-    Clock_timestamps_list::check_timestamp (clock::timestamp_t now)
+    clock_timestamps_list::check_timestamp (clock::timestamp_t now)
     {
       if (head_.next == nullptr)
         {
@@ -579,7 +579,7 @@ namespace os
               trace::printf ("%s() %u \n", __func__,
                              static_cast<uint32_t> (systick.now ()));
 #endif
-              const_cast<Timestamp_node*> (head ())->action ();
+              const_cast<timestamp_node*> (head ())->action ();
             }
           else
             {
@@ -591,7 +591,7 @@ namespace os
     // ========================================================================
 
     void
-    Terminated_threads_list::link (Waiting_thread_node& node)
+    terminated_threads_list::link (waiting_thread_node& node)
     {
       if (head_.prev == nullptr)
         {
@@ -599,8 +599,8 @@ namespace os
           clear ();
         }
 
-      Waiting_thread_node* after =
-          static_cast<Waiting_thread_node*> (const_cast<Static_double_list_links *> (tail ()));
+      waiting_thread_node* after =
+          static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (tail ()));
 
 #if defined(OS_TRACE_RTOS_LISTS)
       trace::printf ("terminated %s() %p %s\n", __func__, &node.thread,

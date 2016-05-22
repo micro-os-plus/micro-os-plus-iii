@@ -60,12 +60,12 @@ namespace os
       /**
        * @brief Head of the list with all top level and detached threads.
        */
-      extern Top_threads_list top_threads_list_;
+      extern top_threads_list top_threads_list_;
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
       extern thread* volatile current_thread_;
-      extern Ready_threads_list ready_threads_list_;
-      extern Terminated_threads_list terminated_threads_list_;
+      extern ready_threads_list ready_threads_list_;
+      extern terminated_threads_list terminated_threads_list_;
 #endif
 
       /**

@@ -450,7 +450,7 @@ namespace os
       /**
        * @brief List of threads waiting to alloc.
        */
-      Waiting_threads_list list_;
+      waiting_threads_list list_;
       /**
        * @brief Pointer to clock to be used for timeouts.
        */

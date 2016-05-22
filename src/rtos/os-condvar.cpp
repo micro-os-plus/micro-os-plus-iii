@@ -569,7 +569,7 @@ namespace os
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      Waiting_thread_node node
+      waiting_thread_node node
         { crt_thread };
 
       // TODO: validate
@@ -711,7 +711,7 @@ namespace os
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      Waiting_thread_node node
+      waiting_thread_node node
         { crt_thread };
 
       // TODO: validate

@@ -160,7 +160,7 @@ namespace os
       void
       _interrupt_service_routine (void);
 
-      Clock_timestamps_list&
+      clock_timestamps_list&
       steady_list (void);
 
       /**
@@ -177,16 +177,16 @@ namespace os
        * @retval ENOTRECOVERABLE The wait failed.
        */
       virtual result_t
-      _wait_until (clock::timestamp_t timestamp, Clock_timestamps_list& list);
+      _wait_until (clock::timestamp_t timestamp, clock_timestamps_list& list);
 
       /**
        * @name Private Member Variables
        * @{
        */
 
-      Clock_timestamps_list steady_list_;
+      clock_timestamps_list steady_list_;
       clock::duration_t volatile sleep_count_;
-      Clock_timestamps_list adjusted_list_;
+      clock_timestamps_list adjusted_list_;
 
       /**
        * @brief Monotone ascending count.
@@ -341,7 +341,7 @@ namespace os
        * @retval EINTR The sleep was interrupted.
        */
       virtual result_t
-      _wait_until (clock::timestamp_t timestamp, Clock_timestamps_list& list);
+      _wait_until (clock::timestamp_t timestamp, clock_timestamps_list& list);
 
 #endif
 
@@ -428,7 +428,7 @@ namespace os
        * @retval EINTR The sleep was interrupted.
        */
       virtual result_t
-      _wait_until (clock::timestamp_t timestamp, Clock_timestamps_list& list);
+      _wait_until (clock::timestamp_t timestamp, clock_timestamps_list& list);
 
 #endif
 
@@ -451,7 +451,7 @@ namespace os
 
     // ========================================================================
 
-    inline Clock_timestamps_list&
+    inline clock_timestamps_list&
     clock::steady_list (void)
     {
       return steady_list_;

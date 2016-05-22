@@ -536,7 +536,7 @@ namespace os
       thread* volatile owner_ = nullptr;
 
 #if !defined(OS_INCLUDE_RTOS_PORT_MUTEX)
-      Waiting_threads_list list_;
+      waiting_threads_list list_;
       clock* clock_ = nullptr;
 #endif
 

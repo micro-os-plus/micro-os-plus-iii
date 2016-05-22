@@ -76,16 +76,16 @@ namespace os
     class memory_pool;
     class message_queue;
     class mutex;
-    class Realtime_clock;
+    class clock_rtc;
     class semaphore;
-    class Systick_clock;
+    class clock_systick;
     class thread;
     class timer;
 
-    class Waiting_threads_list;
-    class Clock_threads_list;
-    class Waiting_threads_list3;
-    class Clock_timestamps_list;
+    class waiting_threads_list;
+    class clock_threads_list;
+    class waiting_threads_list3;
+    class clock_timestamps_list;
 
     namespace memory
     {

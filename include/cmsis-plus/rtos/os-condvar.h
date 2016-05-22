@@ -308,7 +308,7 @@ namespace os
        */
 
 #if !defined(OS_INCLUDE_RTOS_PORT_CONDITION_VARIABLE)
-      Waiting_threads_list list_;
+      waiting_threads_list list_;
       // Clock& clock_;
 #endif
 

@@ -1162,7 +1162,7 @@ namespace os
             }
         }
 
-      Clock_timestamps_list& clock_list = clock_->steady_list ();
+      clock_timestamps_list& clock_list = clock_->steady_list ();
       clock::timestamp_t timeout_timestamp = clock_->steady_now () + timeout;
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
@@ -1170,7 +1170,7 @@ namespace os
 #endif
 
       // Prepare a timeout node pointing to the current thread.
-      Timeout_thread_node timeout_node
+      timeout_thread_node timeout_node
         { timeout_timestamp, *this };
 
       result_t res = ENOTRECOVERABLE;
