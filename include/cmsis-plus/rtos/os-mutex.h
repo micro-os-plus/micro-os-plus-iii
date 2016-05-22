@@ -541,7 +541,7 @@ namespace os
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
-      friend class port::Mutex;
+      friend class port::mutex;
       os_mutex_port_data_t port_;
 #endif
 

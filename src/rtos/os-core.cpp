@@ -150,7 +150,7 @@ namespace os
         is_started_ = true;
         is_locked_ = false;
 
-        port::Systick_clock::start ();
+        port::clock_systick::start ();
 
         port::scheduler::start ();
       }

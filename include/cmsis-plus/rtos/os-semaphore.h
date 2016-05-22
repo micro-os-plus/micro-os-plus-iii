@@ -415,7 +415,7 @@ namespace os
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
-      friend class port::Semaphore;
+      friend class port::semaphore;
       os_semaphore_port_data_t port_;
 #endif
 

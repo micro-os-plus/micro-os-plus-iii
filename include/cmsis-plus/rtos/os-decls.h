@@ -790,11 +790,11 @@ namespace os
       /* class thread */
 
       // ======================================================================
-      class Systick_clock
+      class clock_systick
       {
       public:
 
-        Systick_clock () = delete;
+        clock_systick () = delete;
 
         static void
         start (void);
@@ -813,11 +813,11 @@ namespace os
 
       };
 
-      class Realtime_clock
+      class clock_rtc
       {
       public:
 
-        Realtime_clock () = delete;
+        clock_rtc () = delete;
 
         /**
          * @brief RTC implementation hook.
