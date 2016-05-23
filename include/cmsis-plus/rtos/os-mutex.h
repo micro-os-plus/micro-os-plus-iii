@@ -144,10 +144,11 @@ namespace os
 
         /**
          * @brief Create mutex attributes.
-         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
+         * @par Parameters
+         *  None
          */
         constexpr
-        attributes (const char* name);
+        attributes ();
 
         /**
          * @cond ignore
@@ -174,7 +175,7 @@ namespace os
       protected:
 
         constexpr
-        attributes (const char* name, type_t type);
+        attributes (type_t type);
 
       public:
 
@@ -242,10 +243,11 @@ namespace os
 
         /**
          * @brief Create recursive mutex attributes.
-         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
+         * @par Parameters
+         *  None
          */
         constexpr
-        recursive_attributes (const char* name);
+        recursive_attributes ();
 
         /**
          * @cond ignore
@@ -281,26 +283,13 @@ namespace os
        */
 
       /**
-       * @brief Create a mutex with default settings.
-       * @par Parameters
-       *  None
-       */
-      mutex ();
-
-      /**
-       * @brief Create a named mutex with default settings.
-       * @param [in] name Pointer to name.
-       */
-      mutex (const char* name);
-
-      /**
-       * @brief Create a mutex with custom settings.
+       * @brief Create a mutex.
        * @param [in] attr Reference to attributes.
        */
       mutex (const attributes& attr);
 
       /**
-       * @brief Create a named mutex with custom settings.
+       * @brief Create a named mutex.
        * @param [in] name Pointer to name.
        * @param [in] attr Reference to attributes.
        */
@@ -582,17 +571,13 @@ namespace os
     // ========================================================================
 
     constexpr
-    mutex::attributes::attributes (const char* name) :
-        clocked_attributes
-          { name }
+    mutex::attributes::attributes ()
     {
       ;
     }
 
     constexpr
-    mutex::attributes::attributes (const char* name, type_t type) :
-        clocked_attributes
-          { name }, //
+    mutex::attributes::attributes (type_t type) :
         mx_type (type)
     {
       ;
@@ -601,9 +586,9 @@ namespace os
     // ========================================================================
 
     constexpr
-    mutex::recursive_attributes::recursive_attributes (const char* name) :
+    mutex::recursive_attributes::recursive_attributes () :
         attributes
-          { name, type::recursive } // Use the protected constructor.
+          { type::recursive } // Use the protected constructor.
     {
       ;
     }

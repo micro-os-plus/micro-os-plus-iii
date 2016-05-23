@@ -100,10 +100,11 @@ namespace os
 
         /**
          * @brief Create memory pool attributes.
-         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
+         * @par Parameters
+         *  None
          */
         constexpr
-        attributes (const char* name);
+        attributes ();
 
         /**
          * @cond ignore
@@ -191,50 +192,29 @@ namespace os
        */
 
       /**
-       * @brief Create a memory pool with default settings.
+       * @brief Create a memory pool.
        * @param [in] blocks The maximum number of items in the pool.
        * @param [in] block_size_bytes The size of an item, in bytes.
+       * @param [in] attr Reference to attributes.
        * @param [in] allocator Reference to allocator. Default a
        * local temporary instance.
        */
       memory_pool (std::size_t blocks, std::size_t block_size_bytes,
+                   const attributes& attr = initializer,
                    const Allocator& allocator = Allocator ());
-
       /**
-       * @brief Create a named memory pool with default settings.
+       * @brief Create a named memory pool.
        * @param [in] name Pointer to name.
        * @param [in] blocks The maximum number of items in the pool.
        * @param [in] block_size_bytes The size of an item, in bytes.
+       * @param [in] attr Reference to attributes.
        * @param [in] allocator Reference to allocator. Default a
        * local temporary instance.
        */
       memory_pool (const char* name, std::size_t blocks,
-                   std::size_t block_size_bytes, const Allocator& allocator =
-                       Allocator ());
-
-      /**
-       * @brief Create a memory pool with custom settings.
-       * @param [in] attr Reference to attributes.
-       * @param [in] blocks The maximum number of items in the pool.
-       * @param [in] block_size_bytes The size of an item, in bytes.
-       * @param [in] allocator Reference to allocator. Default a
-       * local temporary instance.
-       */
-      memory_pool (const attributes& attr, std::size_t blocks,
-                   std::size_t block_size_bytes, const Allocator& allocator =
-                       Allocator ());
-      /**
-       * @brief Create a named memory pool with custom settings.
-       * @param [in] name Pointer to name.
-       * @param [in] attr Reference to attributes.
-       * @param [in] blocks The maximum number of items in the pool.
-       * @param [in] block_size_bytes The size of an item, in bytes.
-       * @param [in] allocator Reference to allocator. Default a
-       * local temporary instance.
-       */
-      memory_pool (const char* name, const attributes& attr, std::size_t blocks,
-                   std::size_t block_size_bytes, const Allocator& allocator =
-                       Allocator ());
+                   std::size_t block_size_bytes, const attributes& attr =
+                       initializer,
+                   const Allocator& allocator = Allocator ());
 
       /**
        * @cond ignore
@@ -245,7 +225,6 @@ namespace os
       // Internal constructors, used from templates.
       memory_pool ();
       memory_pool (const char* name);
-      memory_pool (const char* given_name, const char* attr_name);
 
     public:
 
@@ -891,9 +870,7 @@ namespace os
   namespace rtos
   {
     constexpr
-    memory_pool::attributes::attributes (const char* name) :
-        clocked_attributes
-          { name }
+    memory_pool::attributes::attributes ()
     {
       ;
     }
@@ -1094,7 +1071,7 @@ namespace os
           const char* name, const attributes& attr, std::size_t blocks,
           std::size_t block_size_bytes, const Allocator& allocator) :
           memory_pool
-            { name, attr.name () }
+            { name }
       {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
         trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (),
@@ -1466,9 +1443,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     template<typename T, std::size_t N>
-      memory_pool_static<T, N>::memory_pool_static (const attributes& attr) :
-          memory_pool
-            { attr.name () }
+      memory_pool_static<T, N>::memory_pool_static (const attributes& attr)
       {
         _construct (attr, blocks, sizeof(T), &arena_, sizeof(arena_));
       }
@@ -1503,7 +1478,7 @@ namespace os
       memory_pool_static<T, N>::memory_pool_static (const char* name,
                                                     const attributes& attr) :
           memory_pool
-            { name, attr.name () }
+            { name }
       {
         _construct (attr, blocks, sizeof(T), &arena_, sizeof(arena_));
       }

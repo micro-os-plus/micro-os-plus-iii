@@ -456,8 +456,7 @@ namespace os
      * string (stored in flash) is preferred.
      */
 
-    named_object::named_object () :
-        name_ ("-")
+    named_object::named_object ()
     {
       ;
     }
@@ -475,25 +474,6 @@ namespace os
      */
     named_object::named_object (const char* name) :
         name_ (name != nullptr ? name : "-")
-    {
-      ;
-    }
-
-    /**
-     * @details
-     * Prefer the given name, then the attribute name, otherwise
-     * default to '-'.
-     *
-     * To save space, instead of copying the null terminated string
-     * locally, the pointer to the string
-     * is copied, so the caller must ensure that the pointer
-     * life cycle is at least as long as the object life cycle.
-     * A constant string (stored in flash) is preferred.
-     */
-    named_object::named_object (const char* given_name, const char* attr_name) :
-        name_ (
-            given_name != nullptr ?
-                given_name : (attr_name != nullptr ? attr_name : "-"))
     {
       ;
     }

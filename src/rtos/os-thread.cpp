@@ -64,8 +64,7 @@ namespace os
      *  (IEEE Std 1003.1, 2013 Edition).
      */
 
-    const thread::attributes thread::initializer
-      { nullptr };
+    const thread::attributes thread::initializer;
 
     /**
      * @class thread
@@ -145,28 +144,25 @@ namespace os
 #endif
     }
 
-    thread::thread (const char* given_name, const char* attr_name) :
-        named_object
-          { given_name, attr_name }
-    {
-#if defined(OS_TRACE_RTOS_THREAD)
-      trace::printf ("%s @%p %s\n", __func__, this, this->name ());
-#endif
-    }
-
     /**
      * @details
-     * This constructor shall initialise an unnamed thread object
-     * with default settings.
-     * The effect shall be equivalent to creating a thread object
-     * referring to the attributes in `thread::initializer`.
+     * This constructor shall initialise a thread object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the thread attributes shall not be affected.
      * Upon successful initialisation, the state of the
      * thread object shall become initialised, and the thread is
      * added to the ready list.
      *
      * Only the thread object itself may be used for running the
      * function. It is not allowed to make copies of
-     * condition variable objects.
+     * thread objects.
+     *
+     * In cases where default thread attributes are
+     * appropriate, the variable `thread::initializer` can be used to
+     * initialise threads.
+     * The effect shall be equivalent to creating a thread
+     * object with the default constructor.
      *
      * The thread is created to execute _function_ with _args_ as its
      * sole argument. If the function returns, the effect
@@ -177,8 +173,10 @@ namespace os
      * be as if there was an implicit call to `exit()` using the
      * return value of `main()` as the exit status.
      *
-     * For default thread objects, the stack is dynamically allocated,
-     * using the RTOS specific allocator (`rtos::memory::allocator`).
+     * If the attributes define a stack area (via `th_stack_address` and
+     * `th_stack_size_bytes`), that stack is used, otherwise
+     * the stack is dynamically allocated using the RTOS specific allocator
+     * (`rtos::memory::allocator`).
      *
      * @par POSIX compatibility
      *  Inspired by [`pthread_create()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html)
@@ -187,9 +185,10 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    thread::thread (func_t function, func_args_t args,
+    thread::thread (func_t function, func_args_t args, const attributes& attr,
                     const Allocator& allocator) :
-        thread (nullptr, function, args, allocator)
+        thread
+          { nullptr, function, args, attr, allocator }
     {
       ;
     }
@@ -197,16 +196,22 @@ namespace os
     /**
      * @details
      * This constructor shall initialise a named thread object
-     * with default settings.
-     * The effect shall be equivalent to creating a thread object
-     * referring to the attributes in `thread::initializer`.
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the thread attributes shall not be affected.
      * Upon successful initialisation, the state of the
      * thread object shall become initialised, and the thread is
      * added to the ready list.
      *
      * Only the thread object itself may be used for running the
      * function. It is not allowed to make copies of
-     * condition variable objects.
+     * thread objects.
+     *
+     * In cases where default thread attributes are
+     * appropriate, the variable `thread::initializer` can be used to
+     * initialise threads.
+     * The effect shall be equivalent to creating a thread
+     * object with the default constructor.
      *
      * The thread is created to execute _function_ with _args_ as its
      * sole argument. If the function returns, the effect
@@ -217,8 +222,10 @@ namespace os
      * be as if there was an implicit call to `exit()` using the
      * return value of `main()` as the exit status.
      *
-     * For default thread objects, the stack is dynamically allocated,
-     * using the RTOS specific allocator (`rtos::memory::allocator`).
+     * If the attributes define a stack area (via `th_stack_address` and
+     * `th_stack_size_bytes`), that stack is used, otherwise
+     * the stack is dynamically allocated using the RTOS specific allocator
+     * (`rtos::memory::allocator`).
      *
      * @par POSIX compatibility
      *  Inspired by [`pthread_create()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html)
@@ -228,125 +235,14 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     thread::thread (const char* name, func_t function, func_args_t args,
-                    const Allocator& allocator) :
-        named_object (name)
-    {
-#if defined(OS_TRACE_RTOS_THREAD)
-      trace::printf ("%s @%p %s\n", __func__, this, this->name ());
-#endif
-      using Allocator = memory::allocator<stack::allocation_element_t>;
-      allocator_ = &allocator;
-
-      allocated_stack_size_elements_ = (stack::default_size ()
-          + sizeof(stack::allocation_element_t) - 1)
-          / sizeof(stack::allocation_element_t);
-      allocated_stack_address_ =
-          reinterpret_cast<stack::element_t*> (const_cast<Allocator&> (allocator).allocate (
-              allocated_stack_size_elements_));
-
-      _construct (
-          initializer, function, args, allocated_stack_address_,
-          allocated_stack_size_elements_ * sizeof(stack::allocation_element_t));
-    }
-
-    /**
-     * @details
-     * This constructor shall initialise the thread object
-     * with attributes referenced by _attr_.
-     * If the attributes specified by _attr_ are modified later,
-     * the thread attributes shall not be affected.
-     * Upon successful initialisation, the state of the
-     * thread object shall become initialised, and the thread is
-     * added to the ready list.
-     *
-     * Only the thread object itself may be used for running the
-     * function. It is not allowed to make copies of
-     * thread objects.
-     *
-     * In cases where default thread attributes are
-     * appropriate, the variable `thread::initializer` can be used to
-     * initialise threads.
-     * The effect shall be equivalent to creating a thread
-     * object with the default constructor.
-     *
-     * The thread is created to execute _function_ with _args_ as its
-     * sole argument. If the function returns, the effect
-     * shall be as if there was an implicit call to `exit()` using
-     * the return value of function as the exit status. Note that
-     * the thread in which `main()` was originally invoked differs
-     * from this. When it returns from `main()`, the effect shall
-     * be as if there was an implicit call to `exit()` using the
-     * return value of `main()` as the exit status.
-     *
-     * If the attributes define a stack area (via `th_stack_address` and
-     * `th_stack_size_bytes`), that stack is used, otherwise
-     * the stack is dynamically allocated using the RTOS specific allocator
-     * (`rtos::memory::allocator`).
-     *
-     * @par POSIX compatibility
-     *  Inspired by [`pthread_create()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html)
-     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    thread::thread (const attributes& attr, func_t function, func_args_t args,
-                    const Allocator& allocator) :
-        thread
-          { nullptr, attr, function, args, allocator }
-    {
-      ;
-    }
-
-    /**
-     * @details
-     * This constructor shall initialise a named thread object
-     * with attributes referenced by _attr_.
-     * If the attributes specified by _attr_ are modified later,
-     * the thread attributes shall not be affected.
-     * Upon successful initialisation, the state of the
-     * thread object shall become initialised, and the thread is
-     * added to the ready list.
-     *
-     * Only the thread object itself may be used for running the
-     * function. It is not allowed to make copies of
-     * thread objects.
-     *
-     * In cases where default thread attributes are
-     * appropriate, the variable `thread::initializer` can be used to
-     * initialise threads.
-     * The effect shall be equivalent to creating a thread
-     * object with the default constructor.
-     *
-     * The thread is created to execute _function_ with _args_ as its
-     * sole argument. If the function returns, the effect
-     * shall be as if there was an implicit call to `exit()` using
-     * the return value of function as the exit status. Note that
-     * the thread in which `main()` was originally invoked differs
-     * from this. When it returns from `main()`, the effect shall
-     * be as if there was an implicit call to `exit()` using the
-     * return value of `main()` as the exit status.
-     *
-     * If the attributes define a stack area (via `th_stack_address` and
-     * `th_stack_size_bytes`), that stack is used, otherwise
-     * the stack is dynamically allocated using the RTOS specific allocator
-     * (`rtos::memory::allocator`).
-     *
-     * @par POSIX compatibility
-     *  Inspired by [`pthread_create()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html)
-     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    thread::thread (const char* name, const attributes& attr, func_t function,
-                    func_args_t args, const Allocator& allocator) :
+                    const attributes& attr, const Allocator& allocator) :
         named_object
-          { name, attr.name () }
+          { name }
     {
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s @%p %s\n", __func__, this, this->name ());
 #endif
+
       if (attr.th_stack_address != nullptr
           && attr.th_stack_size_bytes > stack::min_size ())
         {
@@ -641,62 +537,6 @@ namespace os
 #endif
 
       return res;
-    }
-
-    /**
-     * @details
-     * Suspend execution of the calling thread until the target thread
-     * terminates, unless the target thread has already terminated.
-     * On return from a successful `join()` call with a non-NULL
-     * _exit_ptr_ argument, the value passed to exit() by the
-     * terminating thread shall be made available in the location
-     * referenced by _exit_ptr_. When a `join()` returns successfully,
-     * the target thread has been terminated. The results of
-     * multiple simultaneous calls to `join()` specifying the
-     * same target thread are undefined. If the thread calling
-     * `join()` is cancelled, then the target thread shall not be
-     * detached.
-     *
-     * @par POSIX compatibility
-     *  Inspired by [`pthread_join()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_join.html)
-     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-     *
-     *
-     * The join() function may fail if:
-     * [EDEADLK] A deadlock was detected.
-     *
-     * The `join()` function shall not return an error code of [EINTR].
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    result_t
-    thread::join (void** exit_ptr)
-    {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
-
-      // TODO: Must fail if current thread
-
-#if defined(OS_TRACE_RTOS_THREAD)
-      trace::printf ("%s() @%p %s\n", __func__, this, name ());
-#endif
-
-      while ((sched_state_ != state::terminated)
-          && (sched_state_ != state::destroyed))
-        {
-          joiner_ = this_thread::_thread ();
-          this_thread::_thread ()->_wait ();
-        }
-
-      if (exit_ptr != nullptr)
-        {
-          *exit_ptr = func_result_;
-        }
-#if defined(OS_TRACE_RTOS_THREAD)
-      trace::printf ("%s() @%p %s joined\n", __func__, this, name ());
-#endif
-
-      return result::ok;
     }
 
     /**
@@ -1311,6 +1151,66 @@ namespace os
 #if defined(OS_TRACE_RTOS_THREAD_CONTEXT)
         trace::printf ("%s() to %s\n", __func__, _thread ()->name ());
 #endif
+      }
+
+      /**
+       * @details
+       * Suspend execution of the calling thread until the target thread
+       * terminates, unless the target thread has already terminated.
+       * On return from a successful `join()` call with a non-NULL
+       * _exit_ptr_ argument, the value passed to exit() by the
+       * terminating thread shall be made available in the location
+       * referenced by _exit_ptr_. When a `join()` returns successfully,
+       * the target thread has been terminated. The results of
+       * multiple simultaneous calls to `join()` specifying the
+       * same target thread are undefined. If the thread calling
+       * `join()` is cancelled, then the target thread shall not be
+       * detached.
+       *
+       * @par POSIX compatibility
+       *  Inspired by [`pthread_join()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_join.html)
+       *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+       *
+       *
+       * The join() function may fail if:
+       * [EDEADLK] A deadlock was detected.
+       *
+       * The `join()` function shall not return an error code of [EINTR].
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+
+      result_t
+      join (rtos::thread& thread, void** exit_ptr)
+      {
+        os_assert_err(!scheduler::in_handler_mode (), EPERM);
+
+        // Fail if current thread
+        assert(&thread != this_thread::_thread ());
+
+#if defined(OS_TRACE_RTOS_THREAD)
+        trace::printf ("%s() @%p %s\n", __func__, &thread, thread.name ());
+#endif
+
+        while ((thread.sched_state_ != thread::state::terminated)
+            && (thread.sched_state_ != thread::state::destroyed))
+          {
+            thread.joiner_ = this_thread::_thread ();
+            this_thread::_thread ()->_wait ();
+          }
+
+#if defined(OS_TRACE_RTOS_THREAD)
+        trace::printf ("%s() @%p %s joined\n", __func__, &thread,
+                       thread.name ());
+#endif
+
+        if (exit_ptr != nullptr)
+          {
+            *exit_ptr = thread.func_result_;
+          }
+
+        return result::ok;
       }
 
     } /* namespace this_thread */

@@ -86,11 +86,9 @@ namespace os
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
 
-    const semaphore::attributes semaphore::counting_initializer
-      { nullptr };
+    const semaphore::attributes semaphore::counting_initializer;
 
-    const semaphore::binary_attributes semaphore::binary_initializer
-      { nullptr };
+    const semaphore::binary_attributes semaphore::binary_initializer;
 
     // ------------------------------------------------------------------------
 
@@ -122,68 +120,6 @@ namespace os
      *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
-
-    /**
-     * @details
-     * This constructor shall initialise a semaphore object
-     * with default settings.
-     * The effect shall be equivalent to creating a semaphore object
-     * referring to the attributes in `semaphore::counting_initializer`.
-     * Upon successful initialisation, the state of the
-     * semaphore object shall become initialised.
-     * The initial count is set to zero and there is no upper limit.
-     *
-     * Only the semaphore object itself may be used for performing
-     * synchronisation. It is not allowed to make copies of
-     * semaphore objects.
-     *
-     * Compatible with POSIX `sem_init()`.
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html#
-     *
-     * @par POSIX compatibility
-     *  Inspired by [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
-     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    semaphore::semaphore () :
-        semaphore
-          { nullptr, counting_initializer }
-    {
-      ;
-    }
-
-    /**
-     * @details
-     * This constructor shall initialise a named semaphore object
-     * with default settings.
-     * The effect shall be equivalent to creating a semaphore object
-     * referring to the attributes in `semaphore::counting_initializer`.
-     * Upon successful initialisation, the state of the
-     * semaphore object shall become initialised.
-     * The initial count is set to zero and there is no upper limit.
-     *
-     * Only the semaphore object itself may be used for performing
-     * synchronisation. It is not allowed to make copies of
-     * semaphore objects.
-     *
-     * Compatible with POSIX `sem_init()`.
-     * http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html#
-     *
-     * @par POSIX compatibility
-     *  Inspired by [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
-     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    semaphore::semaphore (const char* name) :
-        semaphore
-          { name, counting_initializer }
-    {
-      ;
-    }
 
     /**
      * @details
@@ -248,7 +184,7 @@ namespace os
      */
     semaphore::semaphore (const char* name, const attributes& attr) :
         named_object
-          { name, attr.name () }, //
+          { name }, //
         initial_count_ (attr.sm_initial_count), //
         max_count_ (attr.sm_max_count ? attr.sm_max_count : max_count_value)
     {

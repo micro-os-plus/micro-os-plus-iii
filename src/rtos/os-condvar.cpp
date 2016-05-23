@@ -55,8 +55,7 @@ namespace os
      * @details
      * This variable is used by the default constructor.
      */
-    const condition_variable::attributes condition_variable::initializer
-      { nullptr };
+    const condition_variable::attributes condition_variable::initializer;
 
     // ------------------------------------------------------------------------
 
@@ -205,60 +204,6 @@ namespace os
     /**
      * @details
      * This constructor shall initialise a condition variable object
-     * with default settings.
-     * The effect shall be equivalent to creating a condition variable object
-     * referring to the attributes in `condition_variable::initializer`.
-     * Upon successful initialisation, the state of the
-     * condition variable object shall become initialised.
-     *
-     * Only the condition variable object itself may be used for performing
-     * synchronisation. It is not allowed to make copies of
-     * condition variable objects.
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     *
-     * @par POSIX compatibility
-     *  Inspired by [`pthread_cond_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cond_destroy.html)
-     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-     */
-    condition_variable::condition_variable () :
-        condition_variable
-          { nullptr, initializer }
-    {
-      ;
-    }
-
-    /**
-     * @details
-     * This constructor shall initialise a named condition variable object
-     * with default settings.
-     * The effect shall be equivalent to creating a condition variable object
-     * referring to the attributes in `condition_variable::initializer`.
-     * Upon successful initialisation, the state of the
-     * condition variable object shall become initialised.
-     *
-     * Only the condition variable object itself may be used for performing
-     * synchronisation. It is not allowed to make copies of
-     * condition variable objects.
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     *
-     * @par POSIX compatibility
-     *  Inspired by [`pthread_cond_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cond_destroy.html)
-     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-     */
-    condition_variable::condition_variable (const char* name) :
-        condition_variable
-          { name, initializer }
-    {
-      ;
-    }
-
-    /**
-     * @details
-     * This constructor shall initialise a condition variable object
      * with attributes referenced by _attr_.
      * If the attributes specified by _attr_ are modified later,
      * the condition variable attributes shall not be affected.
@@ -317,16 +262,17 @@ namespace os
      *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
-    condition_variable::condition_variable (const char* name,
-                                            const attributes& attr) :
+    condition_variable::condition_variable (
+        const char* name, const attributes& attr __attribute__((unused))) :
         named_object
-          { name, attr.name () }
+          { name }
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
+
     }
 
     /**

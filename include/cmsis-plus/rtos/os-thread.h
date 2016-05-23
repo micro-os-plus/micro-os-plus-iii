@@ -61,6 +61,9 @@ namespace os
       exit (void* exit_ptr);
 
       result_t
+      join (rtos::thread& thread, void** exit_ptr);
+
+      result_t
       sig_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
 
       result_t
@@ -202,25 +205,23 @@ namespace os
        * An enumeration with the possible thread states. The enumeration
        * is restricted to one of these values.
        */
-      enum class state
-        : uint8_t
-          {
-            /**
-             * @brief Used to catch uninitialised threads.
-             */
-            undefined = 0, //
-        inactive = 1, //
-        ready = 2, //
-        running = 3, //
-        waiting = 4, //
-        /**
-         * @brief Reuse possible if terminated or higher.
-         */
-        terminated = 5,      // Test for here up for reuse
-        destroyed = 6
-      }; /* enum class state */
-
-      using state_t = enum state;
+      using state_t = enum class state
+      : uint8_t
+        {
+          /**
+           * @brief Used to catch uninitialised threads.
+           */
+          undefined = 0, //
+          inactive = 1,//
+          ready = 2,//
+          running = 3,//
+          waiting = 4,//
+          /**
+           * @brief Reuse possible if terminated or higher.
+           */
+          terminated = 5,      // Test for here up for reuse
+          destroyed = 6
+        }; /* enum class state */
 
       /**
        * @brief Type of a variable holding a signal set.
@@ -535,10 +536,11 @@ namespace os
 
         /**
          * @brief Create thread attributes.
-         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
+         * @par Parameters
+         *  None
          */
         constexpr
-        attributes (const char* name);
+        attributes ();
 
         /**
          * @cond ignore
@@ -611,43 +613,27 @@ namespace os
        */
 
       /**
-       * @brief Create a thread with default settings.
+       * @brief Create a thread.
        * @param [in] function Pointer to thread function.
        * @param [in] args Pointer to thread function arguments.
+       * @param [in] attr Reference to attributes.
        * @param [in] allocator Reference to allocator. Default a local temporary instance.
        */
-      thread (func_t function, func_args_t args, const Allocator& allocator =
-                  Allocator ());
+      thread (func_t function, func_args_t args, const attributes& attr =
+                  initializer,
+              const Allocator& allocator = Allocator ());
 
       /**
-       * @brief Create a named thread with default settings.
+       * @brief Create a named thread.
        * @param [in] name Pointer to name.
        * @param [in] function Pointer to thread function.
        * @param [in] args Pointer to thread function arguments.
+       * @param [in] attr Reference to attributes.
        * @param [in] allocator Reference to allocator. Default a local temporary instance.
        */
       thread (const char* name, func_t function, func_args_t args,
-              const Allocator& allocator = Allocator ());
-
-      /**
-       * @brief Create a thread with custom settings.
-       * @param [in] attr Reference to attributes.
-       * @param [in] function Pointer to thread function.
-       * @param [in] args Pointer to thread function arguments.
-       * @param [in] allocator Reference to allocator. Default a local temporary instance.
-       */
-      thread (const attributes& attr, func_t function, func_args_t args,
-              const Allocator& allocator = Allocator ());
-      /**
-       * @brief Create a named thread with custom settings.
-       * @param [in] name Pointer to name.
-       * @param [in] attr Reference to attributes.
-       * @param [in] function Pointer to thread function.
-       * @param [in] args Pointer to thread function arguments.
-       * @param [in] allocator Reference to allocator. Default a local temporary instance.
-       */
-      thread (const char* name, const attributes& attr, func_t function,
-              func_args_t args, const Allocator& allocator = Allocator ());
+              const attributes& attr = initializer, const Allocator& allocator =
+                  Allocator ());
 
       /**
        * @cond ignore
@@ -657,7 +643,6 @@ namespace os
       // Internal constructors, used from templates.
       thread ();
       thread (const char* name);
-      thread (const char* given_name, const char* attr_name);
 
     public:
 
@@ -714,14 +699,6 @@ namespace os
        */
       result_t
       cancel (void);
-
-      /**
-       * @brief Wait for thread termination.
-       * @retval result::ok The thread was terminated.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
-       */
-      result_t
-      join (void** exit_ptr = nullptr);
 
       /**
        * @brief Detach a thread.
@@ -884,6 +861,9 @@ namespace os
 
       friend void
       this_thread::exit (void* exit_ptr);
+
+      friend result_t
+      this_thread::join (rtos::thread& thread, void** exit_ptr);
 
       friend result_t
       this_thread::sig_wait (sigset_t mask, sigset_t* oflags,
@@ -1373,6 +1353,16 @@ namespace os
       exit (void* exit_ptr = nullptr);
 
       /**
+       * @brief Wait for thread termination.
+       * @param [in] thread Reference to terminating thread.
+       * @param [in] exit_ptr Pointer to object to return. (Optional).
+       * @retval result::ok The thread was terminated.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       */
+      result_t
+      join (rtos::thread& thread, void** exit_ptr = nullptr);
+
+      /**
        * @brief Check if the wake-up is due to a timeout.
        * @par Parameters
        *  None
@@ -1621,9 +1611,7 @@ namespace os
     } /* namespace this_thread */
 
     constexpr
-    thread::attributes::attributes (const char* name) :
-        clocked_attributes
-          { name }
+    thread::attributes::attributes ()
     {
       ;
     }
@@ -1963,7 +1951,7 @@ namespace os
                                                      func_args_t args,
                                                      const Allocator& allocator) :
           thread
-            { name, attr.name () }
+            { name }
       {
 #if defined(OS_TRACE_RTOS_THREAD)
         trace::printf ("%s @%p %s\n", __func__, this, this->name ());
@@ -2256,7 +2244,7 @@ namespace os
       thread_static<N>::thread_static (const char* name, const attributes& attr,
                                        func_t function, func_args_t args) :
           thread
-            { name, attr.name () }
+            { name }
       {
 #if defined(OS_TRACE_RTOS_THREAD)
         trace::printf ("%s @%p %s\n", __func__, this, this->name ());

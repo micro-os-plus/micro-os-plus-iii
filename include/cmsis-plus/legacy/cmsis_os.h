@@ -1243,7 +1243,7 @@ const osMailQDef_t os_mailQ_def_##name = { \
 
   /**
    * @brief Create a mail queue.
-   * @param [in]     queue_def     reference to the mail queue definition obtain with @ref osMailQ.
+   * @param [in]     mail_def     reference to the mail queue definition obtain with @ref osMailQ.
    * @param [in]     thread_id     thread ID (obtained by @ref osThreadCreate or @ref osThreadGetId) or NULL.
    * @return mail queue ID for reference by other functions or NULL in case of error.
    *
@@ -1251,11 +1251,11 @@ const osMailQDef_t os_mailQ_def_##name = { \
    * in every CMSIS-RTOS.
    */
   osMailQId
-  osMailCreate (const osMailQDef_t* queue_def, osThreadId thread_id);
+  osMailCreate (const osMailQDef_t* mail_def, osThreadId thread_id);
 
   /**
    * @brief Allocate a memory block from a mail.
-   * @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
+   * @param [in]     mail_id      mail queue ID obtained with @ref osMailCreate.
    * @param [in]     millisec      Timeout value or 0 in case of no time-out.
    * @return pointer to memory block that can be filled with mail or NULL in case of error.
    *
@@ -1263,11 +1263,11 @@ const osMailQDef_t os_mailQ_def_##name = { \
    * in every CMSIS-RTOS.
    */
   void*
-  osMailAlloc (osMailQId queue_id, uint32_t millisec);
+  osMailAlloc (osMailQId mail_id, uint32_t millisec);
 
   /**
    * @brief Allocate and clear a memory block from a mail.
-   * @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
+   * @param [in]     mail_id      mail queue ID obtained with @ref osMailCreate.
    * @param [in]     millisec      Timeout value or 0 in case of no time-out.
    * @return pointer to memory block that can be filled with mail or NULL in case of error.
    *
@@ -1275,11 +1275,11 @@ const osMailQDef_t os_mailQ_def_##name = { \
    * in every CMSIS-RTOS.
    */
   void*
-  osMailCAlloc (osMailQId queue_id, uint32_t millisec);
+  osMailCAlloc (osMailQId mail_id, uint32_t millisec);
 
   /**
    * @brief Put a mail to a queue.
-   * @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
+   * @param [in]     mail_id      mail queue ID obtained with @ref osMailCreate.
    * @param [in]     mail          memory block previously allocated with @ref osMailAlloc or @ref osMailCAlloc.
    * @retval osOK The message is put into the queue.
    * @retval osErrorValue Mail was previously not allocated as memory slot.
@@ -1289,11 +1289,11 @@ const osMailQDef_t os_mailQ_def_##name = { \
    * every CMSIS-RTOS.
    */
   osStatus
-  osMailPut (osMailQId queue_id, void* mail);
+  osMailPut (osMailQId mail_id, void* mail);
 
   /**
    * @brief Get a mail from a queue.
-   * @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
+   * @param [in]     mail_id      mail queue ID obtained with @ref osMailCreate.
    * @param [in]     millisec      Timeout value or 0 in case of no time-out.
    * @retval osOK No mail is available in the queue and no timeout was specified.
    * @retval osEventTimeout No mail has arrived during the given timeout period.
@@ -1304,11 +1304,11 @@ const osMailQDef_t os_mailQ_def_##name = { \
    * in every CMSIS-RTOS.
    */
   osEvent
-  osMailGet (osMailQId queue_id, uint32_t millisec);
+  osMailGet (osMailQId mail_id, uint32_t millisec);
 
   /**
    * @brief Free a memory block from a mail.
-   * @param [in]     queue_id      mail queue ID obtained with @ref osMailCreate.
+   * @param [in]     mail_id      mail queue ID obtained with @ref osMailCreate.
    * @param [in]     mail          pointer to the memory block that was obtained with @ref osMailGet.
    * @retval osOK The mail block is released.
    * @retval osErrorValue Mail block does not belong to the mail queue pool.
@@ -1318,7 +1318,7 @@ const osMailQDef_t os_mailQ_def_##name = { \
    * every CMSIS-RTOS.
    */
   osStatus
-  osMailFree (osMailQId queue_id, void* mail);
+  osMailFree (osMailQId mail_id, void* mail);
 
 #endif  // Mail Queues available
 

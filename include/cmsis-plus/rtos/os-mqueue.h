@@ -131,10 +131,11 @@ namespace os
 
         /**
          * @brief Create message queue attributes.
-         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
+         * @par Parameters
+         *  None
          */
         constexpr
-        attributes (const char* name);
+        attributes ();
 
         /**
          * @cond ignore
@@ -226,51 +227,30 @@ namespace os
        */
 
       /**
-       * @brief Create a message queue with default settings.
+       * @brief Create a message queue.
        * @param [in] msgs The number of messages.
        * @param [in] msg_size_bytes The message size, in bytes.
+       * @param [in] attr Reference to attributes.
        * @param [in] allocator Reference to allocator. Default a
        * local temporary instance.
        */
       message_queue (std::size_t msgs, std::size_t msg_size_bytes,
+                     const attributes& attr = initializer,
                      const Allocator& allocator = Allocator ());
 
       /**
-       * @brief Create a named message queue with default settings.
+       * @brief Create a named message queue.
        * @param [in] name Pointer to name.
        * @param [in] msgs The number of messages.
        * @param [in] msg_size_bytes The message size, in bytes.
+       * @param [in] attr Reference to attributes.
        * @param [in] allocator Reference to allocator. Default a
        * local temporary instance.
        */
       message_queue (const char* name, std::size_t msgs,
-                     std::size_t msg_size_bytes, const Allocator& allocator =
-                         Allocator ());
-
-      /**
-       * @brief Create a message queue with custom settings.
-       * @param [in] attr Reference to attributes.
-       * @param [in] msgs The number of messages.
-       * @param [in] msg_size_bytes The message size, in bytes.
-       * @param [in] allocator Reference to allocator. Default a
-       * local temporary instance.
-       */
-      message_queue (const attributes& attr, std::size_t msgs,
-                     std::size_t msg_size_bytes, const Allocator& allocator =
-                         Allocator ());
-
-      /**
-       * @brief Create a named message queue with custom settings.
-       * @param [in] name Pointer to name.
-       * @param [in] attr Reference to attributes.
-       * @param [in] msgs The number of messages.
-       * @param [in] msg_size_bytes The message size, in bytes.
-       * @param [in] allocator Reference to allocator. Default a
-       * local temporary instance.
-       */
-      message_queue (const char* name, const attributes& attr, std::size_t msgs,
-                     std::size_t msg_size_bytes, const Allocator& allocator =
-                         Allocator ());
+                     std::size_t msg_size_bytes, const attributes& attr =
+                         initializer,
+                     const Allocator& allocator = Allocator ());
 
     protected:
 
@@ -281,7 +261,6 @@ namespace os
       // Internal constructors, used from templates.
       message_queue ();
       message_queue (const char* name);
-      message_queue (const char* given_name, const char* attr_name);
 
     public:
 
@@ -1224,9 +1203,7 @@ namespace os
   namespace rtos
   {
     constexpr
-    message_queue::attributes::attributes (const char* name) :
-        clocked_attributes
-          { name }
+    message_queue::attributes::attributes ()
     {
       ;
     }
@@ -1451,7 +1428,7 @@ namespace os
           const char* name, const attributes& attr, std::size_t msgs,
           std::size_t msg_size_bytes, const Allocator& allocator) :
           message_queue
-            { name, attr.name () }
+            { name }
       {
 #if defined(OS_TRACE_RTOS_MQUEUE)
         trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (),
@@ -1937,7 +1914,7 @@ namespace os
     template<typename T, std::size_t N>
       message_queue_static<T, N>::message_queue_static (const char* name,
                                                         const attributes& attr) :
-          message_queue (name, attr.name ())
+          message_queue (name)
       {
         _construct (attr, msgs, sizeof(value_type), &arena_, sizeof(arena_));
       }

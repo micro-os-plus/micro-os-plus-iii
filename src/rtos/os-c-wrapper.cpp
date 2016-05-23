@@ -177,6 +177,14 @@ os_this_thread_exit (void* exit_ptr)
 }
 
 os_result_t
+os_this_thread_join (os_thread_t* thread, void** exit_ptr)
+{
+  assert(thread != nullptr);
+  return (os_result_t) this_thread::join (
+      reinterpret_cast<rtos::thread&> (*thread), exit_ptr);
+}
+
+os_result_t
 os_this_thread_sig_wait (os_thread_sigset_t mask, os_thread_sigset_t* oflags,
                          os_flags_mode_t mode)
 {
@@ -201,48 +209,52 @@ os_this_thread_timed_sig_wait (os_thread_sigset_t mask,
 // ----------------------------------------------------------------------------
 
 void
-os_thread_attr_init (os_thread_attr_t* attr, const char* name)
+os_thread_attr_init (os_thread_attr_t* attr)
 {
-  new (attr) thread::attributes (name);
+  assert(attr != nullptr);
+  new (attr) thread::attributes ();
 }
 
 void
-os_thread_create (os_thread_t* thread, const char* name,
-                  const os_thread_attr_t* attr, os_thread_func_t func,
-                  const os_thread_func_args_t args)
+os_thread_create (os_thread_t* thread, const char* name, os_thread_func_t func,
+                  const os_thread_func_args_t args,
+                  const os_thread_attr_t* attr)
 {
-  new (thread) rtos::thread (name, (thread::attributes&) *attr,
-                             (thread::func_t) func, (thread::func_args_t) args);
+  assert(thread != nullptr);
+  if (attr == nullptr)
+    {
+      attr = (const os_thread_attr_t*) &thread::initializer;
+    }
+  new (thread) rtos::thread (name, (thread::func_t) func,
+                             (thread::func_args_t) args,
+                             (thread::attributes&) *attr);
 }
 
 void
 os_thread_destroy (os_thread_t* thread)
 {
+  assert(thread != nullptr);
   (reinterpret_cast<rtos::thread&> (*thread)).~thread ();
 }
 
 const char*
 os_thread_get_name (os_thread_t* thread)
 {
+  assert(thread != nullptr);
   return (reinterpret_cast<rtos::thread&> (*thread)).name ();
-}
-
-os_result_t
-os_thread_join (os_thread_t* thread, void** exit_ptr)
-{
-  return (os_result_t) (reinterpret_cast<rtos::thread&> (*thread)).join (
-      exit_ptr);
 }
 
 os_thread_prio_t
 os_thread_get_prio (os_thread_t* thread)
 {
+  assert(thread != nullptr);
   return (os_thread_prio_t) (reinterpret_cast<rtos::thread&> (*thread)).sched_prio ();
 }
 
 os_result_t
 os_thread_set_prio (os_thread_t* thread, os_thread_prio_t prio)
 {
+  assert(thread != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::thread&> (*thread)).sched_prio (
       prio);
 }
@@ -250,12 +262,14 @@ os_thread_set_prio (os_thread_t* thread, os_thread_prio_t prio)
 void
 os_thread_resume (os_thread_t* thread)
 {
+  assert(thread != nullptr);
   return (reinterpret_cast<rtos::thread&> (*thread)).resume ();
 }
 
 os_thread_user_storage_t*
 os_thread_get_user_storage (os_thread_t* thread)
 {
+  assert(thread != nullptr);
   return (reinterpret_cast<rtos::thread&> (*thread)).user_storage ();
 }
 
@@ -263,6 +277,7 @@ os_result_t
 os_thread_sig_raise (os_thread_t* thread, os_thread_sigset_t mask,
                      os_thread_sigset_t* oflags)
 {
+  assert(thread != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::thread&> (*thread)).sig_raise (
       mask, oflags);
 }
@@ -271,6 +286,7 @@ os_result_t
 os_thread_sig_clear (os_thread_t* thread, os_thread_sigset_t mask,
                      os_thread_sigset_t* oflags)
 {
+  assert(thread != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::thread&> (*thread)).sig_clear (
       mask, oflags);
 }
@@ -279,6 +295,7 @@ os_thread_sigset_t
 os_thread_sig_get (os_thread_t* thread, os_thread_sigset_t mask,
                    os_flags_mode_t mode)
 {
+  assert(thread != nullptr);
   return (os_thread_sigset_t) (reinterpret_cast<rtos::thread&> (*thread)).sig_get (
       mask, mode);
 }
@@ -288,24 +305,28 @@ os_thread_sig_get (os_thread_t* thread, os_thread_sigset_t mask,
 const char*
 os_clock_name (os_clock_t* clock)
 {
+  assert(clock != nullptr);
   return (reinterpret_cast<rtos::clock&> (*clock)).name ();
 }
 
 os_clock_timestamp_t
 os_clock_now (os_clock_t* clock)
 {
+  assert(clock != nullptr);
   return (os_clock_timestamp_t) (reinterpret_cast<rtos::clock&> (*clock)).now ();
 }
 
 os_clock_timestamp_t
 os_clock_steady_now (os_clock_t* clock)
 {
+  assert(clock != nullptr);
   return (os_clock_timestamp_t) (reinterpret_cast<rtos::clock&> (*clock)).steady_now ();
 }
 
 os_result_t
 os_clock_sleep_for (os_clock_t* clock, os_clock_duration_t timeout)
 {
+  assert(clock != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::clock&> (*clock)).sleep_for (
       timeout);
 }
@@ -313,6 +334,7 @@ os_clock_sleep_for (os_clock_t* clock, os_clock_duration_t timeout)
 os_result_t
 os_clock_sleep_until (os_clock_t* clock, os_clock_timestamp_t timestamp)
 {
+  assert(clock != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::clock&> (*clock)).sleep_until (
       timestamp);
 }
@@ -320,6 +342,7 @@ os_clock_sleep_until (os_clock_t* clock, os_clock_timestamp_t timestamp)
 os_result_t
 os_clock_wait_for (os_clock_t* clock, os_clock_duration_t timeout)
 {
+  assert(clock != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::clock&> (*clock)).wait_for (
       timeout);
 }
@@ -348,86 +371,107 @@ os_sysclock_now_details (os_sysclock_current_t* details)
 // ----------------------------------------------------------------------------
 
 void
-os_timer_attr_init (os_timer_attr_t* attr, const char* name)
+os_timer_attr_init (os_timer_attr_t* attr)
 {
-  new (attr) timer::attributes (name);
+  assert(attr != nullptr);
+  new (attr) timer::attributes ();
 }
 
 void
-os_timer_create (os_timer_t* timer, const char* name,
-                 const os_timer_attr_t* attr, os_timer_func_t func,
-                 os_timer_func_args_t args)
+os_timer_create (os_timer_t* timer, const char* name, os_timer_func_t func,
+                 os_timer_func_args_t args, const os_timer_attr_t* attr)
 {
-  new (timer) rtos::timer (name, (timer::attributes&) *attr,
-                           (timer::func_t) func, (timer::func_args_t) args);
+  assert(timer != nullptr);
+  if (attr == nullptr)
+    {
+      attr = (const os_timer_attr_t*) &timer::periodic_initializer;
+    }
+  new (timer) rtos::timer (name, (timer::func_t) func,
+                           (timer::func_args_t) args,
+                           (timer::attributes&) *attr);
 }
 
 void
 os_timer_destroy (os_timer_t* timer)
 {
+  assert(timer != nullptr);
   (reinterpret_cast<rtos::timer&> (*timer)).~timer ();
 }
 
 const char*
 os_timer_get_name (os_timer_t* timer)
 {
+  assert(timer != nullptr);
   return (reinterpret_cast<rtos::timer&> (*timer)).name ();
 }
 
 os_result_t
 os_timer_start (os_timer_t* timer, os_clock_duration_t timeout)
 {
+  assert(timer != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::timer&> (*timer)).start (timeout);
 }
 
 os_result_t
 os_timer_stop (os_timer_t* timer)
 {
+  assert(timer != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::timer&> (*timer)).stop ();
 }
 
 // ----------------------------------------------------------------------------
 
 void
-os_mutex_attr_init (os_mutex_attr_t* attr, const char* name)
+os_mutex_attr_init (os_mutex_attr_t* attr)
 {
-  new (attr) mutex::attributes (name);
+  assert(attr != nullptr);
+  new (attr) mutex::attributes ();
 }
 
 void
 os_mutex_create (os_mutex_t* mutex, const char* name,
                  const os_mutex_attr_t* attr)
 {
+  assert(mutex != nullptr);
+  if (attr == nullptr)
+    {
+      attr = (const os_mutex_attr_t*) &mutex::normal_initializer;
+    }
   new (mutex) rtos::mutex (name, (mutex::attributes&) *attr);
 }
 
 void
 os_mutex_destroy (os_mutex_t* mutex)
 {
+  assert(mutex != nullptr);
   (reinterpret_cast<rtos::mutex&> (*mutex)).~mutex ();
 }
 
 const char*
 os_mutex_get_name (os_mutex_t* mutex)
 {
+  assert(mutex != nullptr);
   return (reinterpret_cast<rtos::mutex&> (*mutex)).name ();
 }
 
 os_result_t
 os_mutex_lock (os_mutex_t* mutex)
 {
+  assert(mutex != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::mutex&> (*mutex)).lock ();
 }
 
 os_result_t
 os_mutex_try_lock (os_mutex_t* mutex)
 {
+  assert(mutex != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::mutex&> (*mutex)).try_lock ();
 }
 
 os_result_t
 os_mutex_timed_lock (os_mutex_t* mutex, os_clock_duration_t timeout)
 {
+  assert(mutex != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::mutex&> (*mutex)).timed_lock (
       timeout);
 }
@@ -435,12 +479,14 @@ os_mutex_timed_lock (os_mutex_t* mutex, os_clock_duration_t timeout)
 os_result_t
 os_mutex_unlock (os_mutex_t* mutex)
 {
+  assert(mutex != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::mutex&> (*mutex)).unlock ();
 }
 
 os_thread_prio_t
 os_mutex_get_prio_ceiling (os_mutex_t* mutex)
 {
+  assert(mutex != nullptr);
   return (os_thread_prio_t) (reinterpret_cast<rtos::mutex&> (*mutex)).prio_ceiling ();
 }
 
@@ -448,6 +494,7 @@ os_result_t
 os_mutex_set_prio_ceiling (os_mutex_t* mutex, os_thread_prio_t prio_ceiling,
                            os_thread_prio_t* old_prio_ceiling)
 {
+  assert(mutex != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::mutex&> (*mutex)).prio_ceiling (
       prio_ceiling, old_prio_ceiling);
 }
@@ -455,33 +502,42 @@ os_mutex_set_prio_ceiling (os_mutex_t* mutex, os_thread_prio_t prio_ceiling,
 os_result_t
 os_mutex_mark_consistent (os_mutex_t* mutex)
 {
+  assert(mutex != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::mutex&> (*mutex)).consistent ();
 }
 
 os_thread_t*
 os_mutex_get_owner (os_mutex_t* mutex)
 {
+  assert(mutex != nullptr);
   return (os_thread_t*) (reinterpret_cast<rtos::mutex&> (*mutex)).owner ();
 }
 
 os_result_t
 os_mutex_reset (os_mutex_t* mutex)
 {
+  assert(mutex != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::mutex&> (*mutex)).reset ();
 }
 
 // ----------------------------------------------------------------------------
 
 void
-os_condvar_attr_init (os_condvar_attr_t* attr, const char* name)
+os_condvar_attr_init (os_condvar_attr_t* attr)
 {
-  new (attr) condition_variable::attributes (name);
+  assert(attr != nullptr);
+  new (attr) condition_variable::attributes ();
 }
 
 void
 os_condvar_create (os_condvar_t* condvar, const char* name,
-                   os_condvar_attr_t* attr)
+                   const os_condvar_attr_t* attr)
 {
+  assert(condvar != nullptr);
+  if (attr == nullptr)
+    {
+      attr = (const os_condvar_attr_t*) &condition_variable::initializer;
+    }
   new (condvar) condition_variable (name,
                                     (condition_variable::attributes&) *attr);
 }
@@ -489,30 +545,35 @@ os_condvar_create (os_condvar_t* condvar, const char* name,
 void
 os_condvar_destroy (os_condvar_t* condvar)
 {
+  assert(condvar != nullptr);
   (reinterpret_cast<condition_variable&> (*condvar)).~condition_variable ();
 }
 
 const char*
 os_condvar_get_name (os_condvar_t* condvar)
 {
+  assert(condvar != nullptr);
   return (reinterpret_cast<condition_variable&> (*condvar)).name ();
 }
 
 os_result_t
 os_condvar_signal (os_condvar_t* condvar)
 {
+  assert(condvar != nullptr);
   return (os_result_t) (reinterpret_cast<condition_variable&> (*condvar)).signal ();
 }
 
 os_result_t
 os_condvar_broadcast (os_condvar_t* condvar)
 {
+  assert(condvar != nullptr);
   return (os_result_t) (reinterpret_cast<condition_variable&> (*condvar)).broadcast ();
 }
 
 os_result_t
 os_condvar_wait (os_condvar_t* condvar, os_mutex_t* mutex)
 {
+  assert(condvar != nullptr);
   return (os_result_t) (reinterpret_cast<condition_variable&> (*condvar)).wait (
       reinterpret_cast<rtos::mutex&> (*mutex));
 }
@@ -521,6 +582,7 @@ os_result_t
 os_condvar_timed_wait (os_condvar_t* condvar, os_mutex_t* mutex,
                        os_clock_duration_t timeout)
 {
+  assert(condvar != nullptr);
   return (os_result_t) (reinterpret_cast<condition_variable&> (*condvar)).timed_wait (
       reinterpret_cast<rtos::mutex&> (*mutex), timeout);
 }
@@ -528,51 +590,63 @@ os_condvar_timed_wait (os_condvar_t* condvar, os_mutex_t* mutex,
 // ----------------------------------------------------------------------------
 
 void
-os_semaphore_attr_init (os_semaphore_attr_t* attr, const char* name)
+os_semaphore_attr_init (os_semaphore_attr_t* attr)
 {
-  new (attr) semaphore::attributes (name);
+  assert(attr != nullptr);
+  new (attr) semaphore::attributes ();
 }
 
 void
 os_semaphore_create (os_semaphore_t* semaphore, const char* name,
-                     os_semaphore_attr_t* attr)
+                     const os_semaphore_attr_t* attr)
 {
+  assert(semaphore != nullptr);
+  if (attr == nullptr)
+    {
+      attr = (const os_semaphore_attr_t*) &semaphore::counting_initializer;
+    }
   new (semaphore) rtos::semaphore (name, (semaphore::attributes&) *attr);
 }
 
 void
 os_semaphore_destroy (os_semaphore_t* semaphore)
 {
+  assert(semaphore != nullptr);
   (reinterpret_cast<rtos::semaphore&> (*semaphore)).~semaphore ();
 }
 
 const char*
 os_semaphore_get_name (os_semaphore_t* semaphore)
 {
+  assert(semaphore != nullptr);
   return (reinterpret_cast<rtos::semaphore&> (*semaphore)).name ();
 }
 
 os_result_t
 os_semaphore_post (os_semaphore_t* semaphore)
 {
+  assert(semaphore != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).post ();
 }
 
 os_result_t
 os_semaphore_wait (os_semaphore_t* semaphore)
 {
+  assert(semaphore != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).wait ();
 }
 
 os_result_t
 os_semaphore_try_wait (os_semaphore_t* semaphore)
 {
+  assert(semaphore != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).try_wait ();
 }
 
 os_result_t
 os_semaphore_timed_wait (os_semaphore_t* semaphore, os_clock_duration_t timeout)
 {
+  assert(semaphore != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).timed_wait (
       timeout);
 }
@@ -580,147 +654,177 @@ os_semaphore_timed_wait (os_semaphore_t* semaphore, os_clock_duration_t timeout)
 os_semaphore_count_t
 os_semaphore_get_value (os_semaphore_t* semaphore)
 {
+  assert(semaphore != nullptr);
   return (os_semaphore_count_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).value ();
 }
 
 os_result_t
 os_semaphore_reset (os_semaphore_t* semaphore)
 {
+  assert(semaphore != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).reset ();
 }
 
 os_semaphore_count_t
 os_semaphore_get_initial_value (os_semaphore_t* semaphore)
 {
+  assert(semaphore != nullptr);
   return (os_semaphore_count_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).initial_value ();
 }
 
 os_semaphore_count_t
 os_semaphore_get_max_value (os_semaphore_t* semaphore)
 {
+  assert(semaphore != nullptr);
   return (os_semaphore_count_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).max_value ();
 }
 
 // ----------------------------------------------------------------------------
 
 void
-os_mempool_attr_init (os_mempool_attr_t* attr, const char* name)
+os_mempool_attr_init (os_mempool_attr_t* attr)
 {
-  new (attr) memory_pool::attributes (name);
+  assert(attr != nullptr);
+  new (attr) memory_pool::attributes ();
 }
 
 void
-os_mempool_create (os_mempool_t* mempool, const char* name,
-                   os_mempool_attr_t* attr, size_t blocks,
-                   size_t block_size_bytes)
+os_mempool_create (os_mempool_t* mempool, const char* name, size_t blocks,
+                   size_t block_size_bytes, const os_mempool_attr_t* attr)
 {
-  new (mempool) memory_pool (name, (memory_pool::attributes&) *attr, blocks,
-                             block_size_bytes);
+  assert(mempool != nullptr);
+  if (attr == nullptr)
+    {
+      attr = (const os_mempool_attr_t*) &memory_pool::initializer;
+    }
+  new (mempool) memory_pool (name, blocks, block_size_bytes,
+                             (memory_pool::attributes&) *attr);
 }
 
 void
 os_mempool_destroy (os_mempool_t* mempool)
 {
+  assert(mempool != nullptr);
   (reinterpret_cast<memory_pool&> (*mempool)).~memory_pool ();
 }
 
 const char*
 os_mempool_get_name (os_mempool_t* mempool)
 {
+  assert(mempool != nullptr);
   return (reinterpret_cast<memory_pool&> (*mempool)).name ();
 }
 
 void*
 os_mempool_alloc (os_mempool_t* mempool)
 {
+  assert(mempool != nullptr);
   return (reinterpret_cast<memory_pool&> (*mempool)).alloc ();
 }
 
 void*
 os_mempool_try_alloc (os_mempool_t* mempool)
 {
+  assert(mempool != nullptr);
   return (reinterpret_cast<memory_pool&> (*mempool)).try_alloc ();
 }
 
 void*
 os_mempool_timed_alloc (os_mempool_t* mempool, os_clock_duration_t timeout)
 {
+  assert(mempool != nullptr);
   return (reinterpret_cast<memory_pool&> (*mempool)).timed_alloc (timeout);
 }
 
 os_result_t
 os_mempool_free (os_mempool_t* mempool, void* block)
 {
+  assert(mempool != nullptr);
   return (os_result_t) (reinterpret_cast<memory_pool&> (*mempool)).free (block);
 }
 
 size_t
 os_mempool_get_capacity (os_mempool_t* mempool)
 {
+  assert(mempool != nullptr);
   return (reinterpret_cast<memory_pool&> (*mempool)).capacity ();
 }
 
 size_t
 os_mempool_get_count (os_mempool_t* mempool)
 {
+  assert(mempool != nullptr);
   return (reinterpret_cast<memory_pool&> (*mempool)).count ();
 }
 
 size_t
 os_mempool_get_block_size (os_mempool_t* mempool)
 {
+  assert(mempool != nullptr);
   return (reinterpret_cast<memory_pool&> (*mempool)).block_size ();
 }
 
 bool
 os_mempool_is_empty (os_mempool_t* mempool)
 {
+  assert(mempool != nullptr);
   return (reinterpret_cast<memory_pool&> (*mempool)).empty ();
 }
 
 bool
 os_mempool_is_full (os_mempool_t* mempool)
 {
+  assert(mempool != nullptr);
   return (reinterpret_cast<memory_pool&> (*mempool)).full ();
 }
 
 os_result_t
 os_mempool_reset (os_mempool_t* mempool)
 {
+  assert(mempool != nullptr);
   return (os_result_t) (reinterpret_cast<memory_pool&> (*mempool)).reset ();
 }
 
 void*
 os_mempool_get_pool (os_mempool_t* mempool)
 {
+  assert(mempool != nullptr);
   return (void*) (reinterpret_cast<memory_pool&> (*mempool)).pool ();
 }
 
 // --------------------------------------------------------------------------
 
 void
-os_mqueue_attr_init (os_mqueue_attr_t* attr, const char* name)
+os_mqueue_attr_init (os_mqueue_attr_t* attr)
 {
-  new (attr) message_queue::attributes (name);
+  assert(attr != nullptr);
+  new (attr) message_queue::attributes ();
 }
 
 void
-os_mqueue_create (os_mqueue_t* mqueue, const char* name, os_mqueue_attr_t* attr,
-                  size_t msgs, size_t msg_size_bytes)
+os_mqueue_create (os_mqueue_t* mqueue, const char* name, size_t msgs,
+                  size_t msg_size_bytes, const os_mqueue_attr_t* attr)
 {
-  new (mqueue) message_queue (name, (message_queue::attributes&) *attr, msgs,
-                              msg_size_bytes);
+  assert(mqueue != nullptr);
+  if (attr == nullptr)
+    {
+      attr = (const os_mqueue_attr_t*) &message_queue::initializer;
+    }
+  new (mqueue) message_queue (name, msgs, msg_size_bytes,
+                              (message_queue::attributes&) *attr);
 }
 
 void
 os_mqueue_destroy (os_mqueue_t* mqueue)
 {
+  assert(mqueue != nullptr);
   (reinterpret_cast<message_queue&> (*mqueue)).~message_queue ();
 }
 
 const char*
 os_mqueue_get_name (os_mqueue_t* mqueue)
 {
+  assert(mqueue != nullptr);
   return (reinterpret_cast<message_queue&> (*mqueue)).name ();
 }
 
@@ -728,6 +832,7 @@ os_result_t
 os_mqueue_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
                 os_mqueue_prio_t mprio)
 {
+  assert(mqueue != nullptr);
   return (os_result_t) (reinterpret_cast<message_queue&> (*mqueue)).send (
       msg, nbytes, mprio);
 }
@@ -736,6 +841,7 @@ os_result_t
 os_mqueue_try_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
                     os_mqueue_prio_t mprio)
 {
+  assert(mqueue != nullptr);
   return (os_result_t) (reinterpret_cast<message_queue&> (*mqueue)).try_send (
       msg, nbytes, mprio);
 }
@@ -744,6 +850,7 @@ os_result_t
 os_mqueue_timed_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
                       os_clock_duration_t timeout, os_mqueue_prio_t mprio)
 {
+  assert(mqueue != nullptr);
   return (os_result_t) (reinterpret_cast<message_queue&> (*mqueue)).timed_send (
       msg, nbytes, timeout, mprio);
 }
@@ -752,6 +859,7 @@ os_result_t
 os_mqueue_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
                    os_mqueue_prio_t* mprio)
 {
+  assert(mqueue != nullptr);
   return (os_result_t) (reinterpret_cast<message_queue&> (*mqueue)).receive (
       msg, nbytes, mprio);
 }
@@ -760,6 +868,7 @@ os_result_t
 os_mqueue_try_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
                        os_mqueue_prio_t* mprio)
 {
+  assert(mqueue != nullptr);
   return (os_result_t) (reinterpret_cast<message_queue&> (*mqueue)).try_receive (
       msg, nbytes, mprio);
 }
@@ -768,6 +877,7 @@ os_result_t
 os_mqueue_timed_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
                          os_clock_duration_t timeout, os_mqueue_prio_t* mprio)
 {
+  assert(mqueue != nullptr);
   return (os_result_t) (reinterpret_cast<message_queue&> (*mqueue)).timed_receive (
       msg, nbytes, timeout, mprio);
 }
@@ -775,63 +885,77 @@ os_mqueue_timed_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
 size_t
 os_mqueue_get_length (os_mqueue_t* mqueue)
 {
+  assert(mqueue != nullptr);
   return (reinterpret_cast<message_queue&> (*mqueue)).length ();
 }
 
 size_t
 os_mqueue_get_capacity (os_mqueue_t* mqueue)
 {
+  assert(mqueue != nullptr);
   return (reinterpret_cast<message_queue&> (*mqueue)).capacity ();
 }
 
 size_t
 os_mqueue_get_msg_size (os_mqueue_t* mqueue)
 {
+  assert(mqueue != nullptr);
   return (reinterpret_cast<message_queue&> (*mqueue)).msg_size ();
 }
 
 bool
 os_mqueue_is_empty (os_mqueue_t* mqueue)
 {
+  assert(mqueue != nullptr);
   return (reinterpret_cast<message_queue&> (*mqueue)).empty ();
 }
 
 bool
 os_mqueue_is_full (os_mqueue_t* mqueue)
 {
+  assert(mqueue != nullptr);
   return (reinterpret_cast<message_queue&> (*mqueue)).full ();
 }
 
 os_result_t
 os_mqueue_reset (os_mqueue_t* mqueue)
 {
+  assert(mqueue != nullptr);
   return (os_result_t) (reinterpret_cast<message_queue&> (*mqueue)).reset ();
 }
 
 // --------------------------------------------------------------------------
 
 void
-os_evflags_attr_init (os_evflags_attr_t* attr, const char* name)
+os_evflags_attr_init (os_evflags_attr_t* attr)
 {
-  new (attr) event_flags::attributes (name);
+  assert(attr != nullptr);
+  new (attr) event_flags::attributes ();
 }
 
 void
 os_evflags_create (os_evflags_t* evflags, const char* name,
-                   os_evflags_attr_t* attr)
+                   const os_evflags_attr_t* attr)
 {
+  assert(evflags != nullptr);
+  if (attr == nullptr)
+    {
+      attr = (const os_evflags_attr_t*) &event_flags::initializer;
+    }
   new (evflags) event_flags (name, (event_flags::attributes&) *attr);
 }
 
 void
 os_evflags_destroy (os_evflags_t* evflags)
 {
+  assert(evflags != nullptr);
   (reinterpret_cast<event_flags&> (*evflags)).~event_flags ();
 }
 
 const char*
 os_evflags_get_name (os_evflags_t* evflags)
 {
+  assert(evflags != nullptr);
   return (reinterpret_cast<event_flags&> (*evflags)).name ();
 }
 
@@ -839,6 +963,7 @@ os_result_t
 os_evflags_wait (os_evflags_t* evflags, os_flags_mask_t mask,
                  os_flags_mask_t* oflags, os_flags_mode_t mode)
 {
+  assert(evflags != nullptr);
   return (os_result_t) (reinterpret_cast<event_flags&> (*evflags)).wait (mask,
                                                                          oflags,
                                                                          mode);
@@ -848,6 +973,7 @@ os_result_t
 os_evflags_try_wait (os_evflags_t* evflags, os_flags_mask_t mask,
                      os_flags_mask_t* oflags, os_flags_mode_t mode)
 {
+  assert(evflags != nullptr);
   return (os_result_t) (reinterpret_cast<event_flags&> (*evflags)).try_wait (
       mask, oflags, mode);
 }
@@ -857,6 +983,7 @@ os_evflags_timed_wait (os_evflags_t* evflags, os_flags_mask_t mask,
                        os_clock_duration_t timeout, os_flags_mask_t* oflags,
                        os_flags_mode_t mode)
 {
+  assert(evflags != nullptr);
   return (os_result_t) (reinterpret_cast<event_flags&> (*evflags)).timed_wait (
       mask, timeout, oflags, mode);
 }
@@ -865,6 +992,7 @@ os_result_t
 os_evflags_raise (os_evflags_t* evflags, os_flags_mask_t mask,
                   os_flags_mask_t* oflags)
 {
+  assert(evflags != nullptr);
   return (os_result_t) (reinterpret_cast<event_flags&> (*evflags)).raise (
       mask, oflags);
 }
@@ -873,6 +1001,7 @@ os_result_t
 os_evflags_clear (os_evflags_t* evflags, os_flags_mask_t mask,
                   os_flags_mask_t* oflags)
 {
+  assert(evflags != nullptr);
   return (os_result_t) (reinterpret_cast<event_flags&> (*evflags)).clear (
       mask, oflags);
 }
@@ -881,6 +1010,7 @@ os_flags_mask_t
 os_evflags_get (os_evflags_t* evflags, os_flags_mask_t mask,
                 os_flags_mode_t mode)
 {
+  assert(evflags != nullptr);
   return (os_flags_mask_t) (reinterpret_cast<event_flags&> (*evflags)).get (
       mask, mode);
 }
@@ -888,6 +1018,7 @@ os_evflags_get (os_evflags_t* evflags, os_flags_mask_t mask,
 bool
 os_evflags_get_waiting (os_evflags_t* evflags)
 {
+  assert(evflags != nullptr);
   return (reinterpret_cast<event_flags&> (*evflags)).waiting ();
 }
 
@@ -1024,8 +1155,7 @@ osThreadCreate (const osThreadDef_t* thread_def, void* args)
       return nullptr;
     }
 
-  thread::attributes attr
-    { thread_def->name };
+  thread::attributes attr;
   attr.th_priority = thread_def->tpriority;
   attr.th_stack_size_bytes = thread_def->stacksize;
 
@@ -1048,7 +1178,8 @@ osThreadCreate (const osThreadDef_t* thread_def, void* args)
                   * ((thread_def->stacksize + sizeof(uint64_t) - 1)
                       / sizeof(uint64_t))];
             }
-          new (th) thread (attr, (thread::func_t) thread_def->pthread, args);
+          new (th) thread (thread_def->name,
+                           (thread::func_t) thread_def->pthread, args, attr);
 
           // No need to yield here, already done by constructor.
           return reinterpret_cast<osThreadId> (th);
@@ -1334,12 +1465,12 @@ osTimerCreate (const osTimerDef_t* timer_def, os_timer_type type, void* args)
       return nullptr;
     }
 
-  timer::attributes attr
-    { timer_def->name };
+  timer::attributes attr;
   attr.tm_type = (timer::type_t) type;
 
   return reinterpret_cast<osTimerId> (new ((void*) timer_def->data) timer (
-      attr, (timer::func_t) timer_def->ptimer, (timer::func_args_t) args));
+      timer_def->name, (timer::func_t) timer_def->ptimer,
+      (timer::func_args_t) args, attr));
 }
 
 /**
@@ -1596,12 +1727,12 @@ osMutexCreate (const osMutexDef_t* mutex_def)
       return nullptr;
     }
 
-  mutex::attributes attr
-    { mutex_def->name };
+  mutex::attributes attr;
   attr.mx_type = mutex::type::recursive;
   attr.mx_protocol = mutex::protocol::inherit;
 
-  return reinterpret_cast<osMutexId> (new ((void*) mutex_def->data) mutex (attr));
+  return reinterpret_cast<osMutexId> (new ((void*) mutex_def->data) mutex (
+      mutex_def->name, attr));
 }
 
 /**
@@ -1775,8 +1906,7 @@ osSemaphoreCreate (const osSemaphoreDef_t* semaphore_def, int32_t count)
       return nullptr;
     }
 
-  semaphore::attributes attr
-    { semaphore_def->name };
+  semaphore::attributes attr;
   attr.sm_initial_count = (semaphore::count_t) count;
   // The logic is very strange, the CMSIS expects both the max-count to be the
   // same as count, and also to accept a count of 0, which leads to
@@ -1786,7 +1916,7 @@ osSemaphoreCreate (const osSemaphoreDef_t* semaphore_def, int32_t count)
       count == 0 ? osFeature_Semaphore : count);
 
   return reinterpret_cast<osSemaphoreId> (new ((void*) semaphore_def->data) semaphore (
-      attr));
+      semaphore_def->name, attr));
 }
 
 /**
@@ -1948,12 +2078,12 @@ osPoolCreate (const osPoolDef_t* pool_def)
       return nullptr;
     }
 
-  memory_pool::attributes attr
-    { pool_def->name };
+  memory_pool::attributes attr;
   attr.mp_pool_address = pool_def->pool;
   attr.mp_pool_size_bytes = pool_def->pool_sz;
   return reinterpret_cast<osPoolId> (new ((void*) pool_def->data) memory_pool (
-      attr, (std::size_t) pool_def->items, (std::size_t) pool_def->item_sz));
+      pool_def->name, (std::size_t) pool_def->items,
+      (std::size_t) pool_def->item_sz, attr));
 }
 
 /**
@@ -2061,13 +2191,13 @@ osMessageCreate (const osMessageQDef_t* queue_def,
       return nullptr;
     }
 
-  message_queue::attributes attr
-    { queue_def->name };
+  message_queue::attributes attr;
   attr.mq_queue_address = queue_def->queue;
   attr.mq_queue_size_bytes = queue_def->queue_sz;
 
   return reinterpret_cast<osMessageQId> (new ((void*) queue_def->data) message_queue (
-      attr, (std::size_t) queue_def->items, (std::size_t) queue_def->item_sz));
+      queue_def->name, (std::size_t) queue_def->items,
+      (std::size_t) queue_def->item_sz, attr));
 }
 
 /**
@@ -2266,7 +2396,7 @@ osMessageGet (osMessageQId queue_id, uint32_t millisec)
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
 osMailQId
-osMailCreate (const osMailQDef_t* queue_def,
+osMailCreate (const osMailQDef_t* mail_def,
               osThreadId thread_id __attribute__((unused)))
 {
   if (scheduler::in_handler_mode ())
@@ -2274,28 +2404,26 @@ osMailCreate (const osMailQDef_t* queue_def,
       return nullptr;
     }
 
-  if (queue_def == nullptr)
+  if (mail_def == nullptr)
     {
       return nullptr;
     }
 
-  memory_pool::attributes pool_attr
-    { queue_def->name };
-  pool_attr.mp_pool_address = queue_def->pool;
-  pool_attr.mp_pool_size_bytes = queue_def->pool_sz;
-  new ((void*) &queue_def->data->pool) memory_pool (
-      pool_attr, (std::size_t) queue_def->items,
-      (std::size_t) queue_def->pool_item_sz);
+  memory_pool::attributes pool_attr;
+  pool_attr.mp_pool_address = mail_def->pool;
+  pool_attr.mp_pool_size_bytes = mail_def->pool_sz;
+  new ((void*) &mail_def->data->pool) memory_pool (
+      mail_def->name, (std::size_t) mail_def->items,
+      (std::size_t) mail_def->pool_item_sz, pool_attr);
 
-  message_queue::attributes queue_attr
-    { queue_def->name };
-  queue_attr.mq_queue_address = queue_def->queue;
-  queue_attr.mq_queue_size_bytes = queue_def->queue_sz;
-  new ((void*) &queue_def->data->queue) message_queue (
-      queue_attr, (std::size_t) queue_def->items,
-      (std::size_t) queue_def->queue_item_sz);
+  message_queue::attributes queue_attr;
+  queue_attr.mq_queue_address = mail_def->queue;
+  queue_attr.mq_queue_size_bytes = mail_def->queue_sz;
+  new ((void*) &mail_def->data->queue) message_queue (
+      mail_def->name, (std::size_t) mail_def->items,
+      (std::size_t) mail_def->queue_item_sz, queue_attr);
 
-  return (osMailQId) (queue_def->data);
+  return (osMailQId) (mail_def->data);
 }
 
 /**
@@ -2322,9 +2450,9 @@ osMailCreate (const osMailQDef_t* queue_def,
  * @note Can be invoked from Interrupt Service Routines.
  */
 void*
-osMailAlloc (osMailQId queue_id, uint32_t millisec)
+osMailAlloc (osMailQId mail_id, uint32_t millisec)
 {
-  if (queue_id == nullptr)
+  if (mail_id == nullptr)
     {
       return nullptr;
     }
@@ -2339,11 +2467,11 @@ osMailAlloc (osMailQId queue_id, uint32_t millisec)
         {
           return nullptr;
         }
-      ret = (reinterpret_cast<memory_pool&> (queue_id->pool)).alloc ();
+      ret = (reinterpret_cast<memory_pool&> (mail_id->pool)).alloc ();
     }
   else if (millisec == 0)
     {
-      ret = (reinterpret_cast<memory_pool&> (queue_id->pool)).try_alloc ();
+      ret = (reinterpret_cast<memory_pool&> (mail_id->pool)).try_alloc ();
     }
   else
     {
@@ -2351,7 +2479,7 @@ osMailAlloc (osMailQId queue_id, uint32_t millisec)
         {
           return nullptr;
         }
-      ret = (reinterpret_cast<memory_pool&> (queue_id->pool)).timed_alloc (
+      ret = (reinterpret_cast<memory_pool&> (mail_id->pool)).timed_alloc (
           clock_systick::ticks_cast (millisec * 1000u));
     }
 #pragma GCC diagnostic pop
@@ -2382,15 +2510,15 @@ osMailAlloc (osMailQId queue_id, uint32_t millisec)
  * @note Can be invoked from Interrupt Service Routines.
  */
 void*
-osMailCAlloc (osMailQId queue_id, uint32_t millisec)
+osMailCAlloc (osMailQId mail_id, uint32_t millisec)
 {
-  void* ret = osMailAlloc (queue_id, millisec);
+  void* ret = osMailAlloc (mail_id, millisec);
   if (ret != nullptr)
     {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
       memset (ret, 0,
-              (reinterpret_cast<memory_pool&> (queue_id->pool)).block_size ());
+              (reinterpret_cast<memory_pool&> (mail_id->pool)).block_size ());
 #pragma GCC diagnostic pop
     }
   return ret;
@@ -2404,9 +2532,9 @@ osMailCAlloc (osMailQId queue_id, uint32_t millisec)
  * @note Can be invoked from Interrupt Service Routines.
  */
 osStatus
-osMailPut (osMailQId queue_id, void* mail)
+osMailPut (osMailQId mail_id, void* mail)
 {
-  if (queue_id == nullptr)
+  if (mail_id == nullptr)
     {
       return osErrorParameter;
     }
@@ -2416,7 +2544,7 @@ osMailPut (osMailQId queue_id, void* mail)
     }
 
   // Validate pointer.
-  memory_pool* pool = reinterpret_cast<memory_pool*> (&queue_id->pool);
+  memory_pool* pool = reinterpret_cast<memory_pool*> (&mail_id->pool);
   if (((char*) mail < (char*) (pool->pool ()))
       || (((char*) mail)
           >= ((char*) (pool->pool ()) + pool->capacity () * pool->block_size ())))
@@ -2427,7 +2555,7 @@ osMailPut (osMailQId queue_id, void* mail)
   result_t res;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
-  res = (reinterpret_cast<message_queue&> (queue_id->queue)).try_send (
+  res = (reinterpret_cast<message_queue&> (mail_id->queue)).try_send (
       (const char*) &mail, sizeof(void*), 0);
 #pragma GCC diagnostic pop
   if (res == result::ok)

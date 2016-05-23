@@ -82,8 +82,7 @@ namespace os
      * checked, but it is recommended to leave it zero.
      */
 
-    const message_queue::attributes message_queue::initializer
-      { nullptr };
+    const message_queue::attributes message_queue::initializer;
 
     // ------------------------------------------------------------------------
 
@@ -351,38 +350,37 @@ namespace os
 #endif
     }
 
-    message_queue::message_queue (const char* given_name, const char* attr_name) :
-        named_object
-          { given_name, attr_name }
-    {
-#if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
-#endif
-    }
-
     /**
      * @details
      * This constructor shall initialise a message queue object
-     * with the given number of messages and default settings.
-     * The effect shall be equivalent to creating a message queue object
-     * referring to the attributes in `message_queue::initializer`.
-     * Upon successful initialisation, the state of the message queue
-     * object shall become initialised, with no messages in the queue.
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the memory pool attributes shall not be affected.
+     * Upon successful initialisation, the state of the
+     * message queue object shall become initialised.
      *
-     * Only the message queue object itself may be used for performing
+     * Only the message queue itself may be used for performing
      * synchronisation. It is not allowed to make copies of
      * message queue objects.
      *
-     * For default message queue objects, the storage is dynamically
-     * allocated using the RTOS specific allocator
+     * In cases where default message queue attributes are
+     * appropriate, the variable `message_queue::initializer` can be used to
+     * initialise message queue.
+     * The effect shall be equivalent to creating a message queue
+     * object with the simple constructor.
+     *
+     * If the attributes define a storage area (via `mq_queue_address` and
+     * `mq_queue_size_bytes`), that storage is used, otherwise
+     * the storage is dynamically allocated using the RTOS specific allocator
      * (`rtos::memory::allocator`).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     message_queue::message_queue (std::size_t msgs, std::size_t msg_size_bytes,
+                                  const attributes& attr,
                                   const Allocator& allocator) :
         message_queue
-          { nullptr, msgs, msg_size_bytes, allocator }
+          { nullptr, msgs, msg_size_bytes, attr, allocator }
     {
       ;
     }
@@ -390,117 +388,35 @@ namespace os
     /**
      * @details
      * This constructor shall initialise a named message queue object
-     * with the given number of messages and default settings.
-     * The effect shall be equivalent to creating a message queue object
-     * referring to the attributes in `message_queue::initializer`.
-     * Upon successful initialisation, the state of the message queue
-     * object shall become initialised, with no messages in the queue.
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the memory pool attributes shall not be affected.
+     * Upon successful initialisation, the state of the
+     * message queue object shall become initialised.
      *
-     * Only the message queue object itself may be used for performing
+     * Only the message queue itself may be used for performing
      * synchronisation. It is not allowed to make copies of
      * message queue objects.
      *
-     * For default message queue objects, the storage is dynamically
-     * allocated using the RTOS specific allocator
+     * In cases where default message queue attributes are
+     * appropriate, the variable `message_queue::initializer` can be used to
+     * initialise message queue.
+     * The effect shall be equivalent to creating a message queue
+     * object with the simple constructor.
+     *
+     * If the attributes define a storage area (via `mq_queue_address` and
+     * `mq_queue_size_bytes`), that storage is used, otherwise
+     * the storage is dynamically allocated using the RTOS specific allocator
      * (`rtos::memory::allocator`).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     message_queue::message_queue (const char* name, std::size_t msgs,
                                   std::size_t msg_size_bytes,
+                                  const attributes& attr,
                                   const Allocator& allocator) :
         named_object
           { name }
-    {
-#if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (), msgs,
-                     msg_size_bytes);
-#endif
-      allocator_ = &allocator;
-
-      allocated_queue_size_elements_ = (compute_allocated_size_bytes<
-          typename Allocator::value_type> (msgs, msg_size_bytes)
-          + sizeof(typename Allocator::value_type) - 1)
-          / sizeof(typename Allocator::value_type);
-
-      allocated_queue_addr_ = const_cast<Allocator&> (allocator).allocate (
-          allocated_queue_size_elements_);
-
-      _construct (
-          initializer,
-          msgs,
-          msg_size_bytes,
-          allocated_queue_addr_,
-          allocated_queue_size_elements_
-              * sizeof(typename Allocator::value_type));
-    }
-
-    /**
-     * @details
-     * This constructor shall initialise a message queue object
-     * with attributes referenced by _attr_.
-     * If the attributes specified by _attr_ are modified later,
-     * the memory pool attributes shall not be affected.
-     * Upon successful initialisation, the state of the
-     * message queue object shall become initialised.
-     *
-     * Only the message queue itself may be used for performing
-     * synchronisation. It is not allowed to make copies of
-     * message queue objects.
-     *
-     * In cases where default message queue attributes are
-     * appropriate, the variable `message_queue::initializer` can be used to
-     * initialise message queue.
-     * The effect shall be equivalent to creating a message queue
-     * object with the simple constructor.
-     *
-     * If the attributes define a storage area (via `mq_queue_address` and
-     * `mq_queue_size_bytes`), that storage is used, otherwise
-     * the storage is dynamically allocated using the RTOS specific allocator
-     * (`rtos::memory::allocator`).
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    message_queue::message_queue (const attributes& attr, std::size_t msgs,
-                                  std::size_t msg_size_bytes,
-                                  const Allocator& allocator) :
-        message_queue
-          { nullptr, attr, msgs, msg_size_bytes, allocator }
-    {
-      ;
-    }
-
-    /**
-     * @details
-     * This constructor shall initialise a named message queue object
-     * with attributes referenced by _attr_.
-     * If the attributes specified by _attr_ are modified later,
-     * the memory pool attributes shall not be affected.
-     * Upon successful initialisation, the state of the
-     * message queue object shall become initialised.
-     *
-     * Only the message queue itself may be used for performing
-     * synchronisation. It is not allowed to make copies of
-     * message queue objects.
-     *
-     * In cases where default message queue attributes are
-     * appropriate, the variable `message_queue::initializer` can be used to
-     * initialise message queue.
-     * The effect shall be equivalent to creating a message queue
-     * object with the simple constructor.
-     *
-     * If the attributes define a storage area (via `mq_queue_address` and
-     * `mq_queue_size_bytes`), that storage is used, otherwise
-     * the storage is dynamically allocated using the RTOS specific allocator
-     * (`rtos::memory::allocator`).
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    message_queue::message_queue (const char* name, const attributes& attr,
-                                  std::size_t msgs, std::size_t msg_size_bytes,
-                                  const Allocator& allocator) :
-        named_object
-          { name, attr.name () }
     {
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (), msgs,

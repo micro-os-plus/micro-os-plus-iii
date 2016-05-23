@@ -43,7 +43,7 @@
 // ----------------------------------------------------------------------------
 
 #include <cmsis-plus/rtos/os-app-config.h>
-#include <cmsis-plus/rtos/port/os-c-decls.h>
+#include <cmsis-plus/rtos/port/os-decls.h>
 
 #include <stdint.h>
 #include <stddef.h>
@@ -165,7 +165,6 @@ extern "C"
 
   typedef struct os_thread_attr_s
   {
-    const char* name;
     void* clock;
     void* th_stack_address;
     size_t th_stack_size_bytes;
@@ -255,7 +254,6 @@ extern "C"
 
   typedef struct os_timer_attr_s
   {
-    const char* name;
     void* clock;
     os_timer_type_t tm_type;
   } os_timer_attr_t;
@@ -324,7 +322,6 @@ extern "C"
 
   typedef struct os_mutex_attr_s
   {
-    const char* name;
     void* clock;
     os_thread_prio_t mx_priority_ceiling;
     os_mutex_protocol_t mx_protocol;
@@ -359,7 +356,6 @@ extern "C"
 
   typedef struct os_condvar_attr_s
   {
-    const char* name;
     void* clock;
   } os_condvar_attr_t;
 
@@ -381,7 +377,6 @@ extern "C"
 
   typedef struct os_semaphore_attr_s
   {
-    const char* name;
     void* clock;
     os_semaphore_count_t sm_initial_count;
     os_semaphore_count_t sm_max_count;
@@ -413,7 +408,6 @@ extern "C"
 
   typedef struct os_mempool_attr_s
   {
-    const char* name;
     void* clock;
     void* mp_pool_address;
     size_t mp_pool_size_bytes;
@@ -455,7 +449,6 @@ extern "C"
 
   typedef struct os_mqueue_attr_s
   {
-    const char* name;
     void* clock;
     void* queue_addr;
     size_t queue_size_bytes;
@@ -504,7 +497,6 @@ extern "C"
 
   typedef struct os_evflags_attr_s
   {
-    const char* name;
     void* clock;
   } os_evflags_attr_t;
 

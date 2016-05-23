@@ -73,17 +73,14 @@ protected:
   unsigned int accumulated_count_ = 0;
   unsigned int count_ = 0;
 
-  thread::attributes attr_;
   rtos::thread th_;
 };
 
 #pragma GCC diagnostic pop
 
 mutex_test::mutex_test (const char* name) :
-    attr_
-      { name }, //
     th_
-      { attr_, [](void* attr)-> void*
+      { name, [](void* attr)-> void*
         { return static_cast<mutex_test*> (attr)->object_main ();}, this }
 {
   trace::printf ("%s @%p %s\n", __func__, this, name);
@@ -158,7 +155,6 @@ public:
 
 protected:
   unsigned int seconds_;
-  thread::attributes attr_;
   rtos::thread th_;
 };
 
@@ -166,10 +162,8 @@ protected:
 
 periodic::periodic (unsigned int seconds) :
     seconds_ (seconds), //
-    attr_
-      { "P" }, //
     th_
-      { attr_, [](void* attr)-> void*
+      { "P", [](void* attr)-> void*
         { return static_cast<periodic*> (attr)->object_main ();}, this }
 {
   trace::printf ("%s @%p\n", __func__, this);
@@ -239,7 +233,7 @@ periodic::object_main (void)
   for (auto m : mt)
     {
       m->thread ().interrupt ();
-      m->thread ().join ();
+      this_thread::join (m->thread ());
     }
   return nullptr;
 }
@@ -276,7 +270,7 @@ run_tests (unsigned int seconds)
   periodic pm
     { seconds };
 
-  pm.thread ().join ();
+  this_thread::join (pm.thread ());
 
   puts ("Done.");
   return 0;

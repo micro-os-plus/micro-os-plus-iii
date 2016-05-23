@@ -36,5 +36,4 @@ run_tests (unsigned int seconds);
 void
 busy_wait (unsigned int micros);
 
-
 #endif /* TEST_H_ */

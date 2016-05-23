@@ -52,8 +52,7 @@ namespace os
      *  (IEEE Std 1003.1, 2013 Edition).
      */
 
-    const event_flags::attributes event_flags::initializer
-      { nullptr };
+    const event_flags::attributes event_flags::initializer;
 
     // ------------------------------------------------------------------------
 
@@ -107,50 +106,6 @@ namespace os
     /**
      * @details
      * This constructor shall initialise an event flags object
-     * with default settings.
-     * The effect shall be equivalent to creating an event flags object
-     * referring to the attributes in `event_flags::initializer`.
-     * Upon successful initialisation, the state of the event
-     * flags object shall become initialised, with all flags cleared.
-     *
-     * Only the event flags object itself may be used for performing
-     * synchronisation. It is not allowed to make copies of
-     * event flags objects.
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    event_flags::event_flags () :
-        event_flags
-          { nullptr, initializer }
-    {
-      ;
-    }
-
-    /**
-     * @details
-     * This constructor shall initialise a named event flags object
-     * with default settings.
-     * The effect shall be equivalent to creating an event flags object
-     * referring to the attributes in `event_flags::initializer`.
-     * Upon successful initialisation, the state of the event
-     * flags object shall become initialised, with all flags cleared.
-     *
-     * Only the event flags object itself may be used for performing
-     * synchronisation. It is not allowed to make copies of
-     * event flags objects.
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    event_flags::event_flags (const char* name) :
-        event_flags
-          { name, initializer }
-    {
-      ;
-    }
-
-    /**
-     * @details
-     * This constructor shall initialise an event flags object
      * with attributes referenced by _attr_.
      * If the attributes specified by _attr_ are modified later,
      * the event flags attributes shall not be affected.
@@ -178,7 +133,7 @@ namespace os
 
     /**
      * @details
-     * This constructor shall initialise an event flags object
+     * This constructor shall initialise a named event flags object
      * with attributes referenced by _attr_.
      * If the attributes specified by _attr_ are modified later,
      * the event flags attributes shall not be affected.
@@ -199,7 +154,7 @@ namespace os
      */
     event_flags::event_flags (const char* name, const attributes& attr) :
         named_object
-          { name, attr.name () }
+          { name }
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 

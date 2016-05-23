@@ -115,10 +115,11 @@ namespace os
 
         /**
          * @brief Create timer attributes.
-         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
+         * @par Parameters
+         *  None
          */
         constexpr
-        attributes (const char* name);
+        attributes ();
 
         /**
          * @cond ignore
@@ -145,7 +146,7 @@ namespace os
       protected:
 
         constexpr
-        attributes (const char* name, type_t type);
+        attributes (type_t type);
 
       public:
 
@@ -188,10 +189,11 @@ namespace os
 
         /**
          * @brief Create periodic timer attributes.
-         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
+         * @par Parameters
+         *  None
          */
         constexpr
-        periodic_attributes (const char* name);
+        periodic_attributes ();
 
         /**
          * @cond ignore
@@ -228,37 +230,23 @@ namespace os
        */
 
       /**
-       * @brief Create a timer with default settings.
+       * @brief Create a timer.
        * @param [in] function Pointer to timer function.
-       * @param [in] args Pointer to arguments.
+       * @param [in] args Pointer to timer function arguments.
+       * @param [in] attr Reference to attributes.
        */
-      timer (func_t function, func_args_t args);
+      timer (func_t function, func_args_t args, const attributes& attr =
+                 periodic_initializer);
 
       /**
-       * @brief Create a named timer with default settings.
+       * @brief Create a named timer.
        * @param [in] name Pointer to name.
        * @param [in] function Pointer to timer function.
-       * @param [in] args Pointer to arguments.
-       */
-      timer (const char* name, func_t function, func_args_t args);
-
-      /**
-       * @brief Create a timer with custom settings.
+       * @param [in] args Pointer to timer function arguments.
        * @param [in] attr Reference to attributes.
-       * @param [in] function Pointer to timer function.
-       * @param [in] args Pointer to arguments.
        */
-      timer (const attributes& attr, func_t function, func_args_t args);
-
-      /**
-       * @brief Create a named timer with custom settings.
-       * @param [in] name Pointer to name.
-       * @param [in] attr Reference to attributes.
-       * @param [in] function Pointer to timer function.
-       * @param [in] args Pointer to arguments.
-       */
-      timer (const char* name, const attributes& attr, func_t function,
-             func_args_t args);
+      timer (const char* name, func_t function, func_args_t args,
+             const attributes& attr = periodic_initializer);
 
       /**
        * @cond ignore
@@ -409,17 +397,13 @@ namespace os
     // ========================================================================
 
     constexpr
-    timer::attributes::attributes (const char* name) :
-        clocked_attributes
-          { name }
+    timer::attributes::attributes ()
     {
       ;
     }
 
     constexpr
-    timer::attributes::attributes (const char* name, type_t type) :
-        clocked_attributes
-          { name }, //
+    timer::attributes::attributes (type_t type) :
         tm_type (type)
     {
       ;
@@ -428,9 +412,9 @@ namespace os
     // ========================================================================
 
     constexpr
-    timer::periodic_attributes::periodic_attributes (const char* name) :
+    timer::periodic_attributes::periodic_attributes () :
         attributes
-          { name, run::periodic }
+          { run::periodic }
     {
       ;
     }

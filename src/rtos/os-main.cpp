@@ -141,8 +141,7 @@ main (int argc, char* argv[])
   static thread::stack::allocation_element_t main_stack[OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES
       / sizeof(thread::stack::allocation_element_t)];
 
-  static thread::attributes attr
-    { "main" };
+  static thread::attributes attr;
   attr.th_stack_address = main_stack;
   attr.th_stack_size_bytes = sizeof(main_stack);
 
@@ -152,7 +151,7 @@ main (int argc, char* argv[])
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #endif
   static thread main_thread
-    { attr, reinterpret_cast<thread::func_t> (_main_trampoline), nullptr };
+    { "main", reinterpret_cast<thread::func_t> (_main_trampoline), nullptr, attr };
 #pragma GCC diagnostic pop
 
   scheduler::start ();

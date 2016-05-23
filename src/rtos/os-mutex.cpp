@@ -227,11 +227,9 @@ namespace os
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
 
-    const mutex::attributes mutex::normal_initializer
-      { nullptr };
+    const mutex::attributes mutex::normal_initializer;
 
-    const mutex::recursive_attributes mutex::recursive_initializer
-      { nullptr };
+    const mutex::recursive_attributes mutex::recursive_initializer;
 
     // ------------------------------------------------------------------------
 
@@ -340,60 +338,6 @@ namespace os
     /**
      * @details
      * This constructor shall initialise a mutex object
-     * with default settings.
-     * The effect shall be equivalent to creating a mutex object
-     * referring to the attributes in `mutex::normal_initializer`.
-     * Upon successful initialisation, the state of the
-     * mutex object shall become initialised, unlocked.
-     *
-     * Only the mutex object itself may be used for performing
-     * synchronisation. It is not allowed to make copies of
-     * mutex objects.
-     *
-     * @par POSIX compatibility
-     *  Inspired by [`pthread_mutex_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_init.html)
-     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    mutex::mutex () :
-        mutex
-          { nullptr, normal_initializer }
-    {
-      ;
-    }
-
-    /**
-     * @details
-     * This constructor shall initialise a named mutex object
-     * with default settings.
-     * The effect shall be equivalent to creating a mutex object
-     * referring to the attributes in `mutex::normal_initializer`.
-     * Upon successful initialisation, the state of the
-     * mutex object shall become initialised, unlocked.
-     *
-     * Only the mutex object itself may be used for performing
-     * synchronisation. It is not allowed to make copies of
-     * mutex objects.
-     *
-     * @par POSIX compatibility
-     *  Inspired by [`pthread_mutex_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_init.html)
-     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    mutex::mutex (const char* name) :
-        mutex
-          { name, normal_initializer }
-    {
-      ;
-    }
-
-    /**
-     * @details
-     * This constructor shall initialise a mutex object
      * with attributes referenced by _attr_.
      * If the attributes specified by _attr_ are modified later,
      * the mutex attributes shall not be affected.
@@ -454,7 +398,7 @@ namespace os
      */
     mutex::mutex (const char* name, const attributes& attr) :
         named_object
-          { name, attr.name () }, //
+          { name }, //
         type_ (attr.mx_type), //
         protocol_ (attr.mx_protocol), //
         robustness_ (attr.mx_robustness), //

@@ -116,6 +116,9 @@ extern "C"
   os_this_thread_exit (void* exit_ptr);
 
   os_result_t
+  os_this_thread_join (os_thread_t* thread, void** exit_ptr);
+
+  os_result_t
   os_this_thread_sig_wait (os_thread_sigset_t mask, os_thread_sigset_t* oflags,
                            os_flags_mode_t mode);
 
@@ -133,21 +136,18 @@ extern "C"
   // --------------------------------------------------------------------------
 
   void
-  os_thread_attr_init (os_thread_attr_t* attr, const char* name);
+  os_thread_attr_init (os_thread_attr_t* attr);
 
   void
   os_thread_create (os_thread_t* thread, const char* name,
-                    const os_thread_attr_t* attr, os_thread_func_t func,
-                    const os_thread_func_args_t args);
+                    os_thread_func_t func, const os_thread_func_args_t args,
+                    const os_thread_attr_t* attr);
 
   void
   os_thread_destroy (os_thread_t* thread);
 
   const char*
   os_thread_get_name (os_thread_t* thread);
-
-  os_result_t
-  os_thread_join (os_thread_t* thread, void** exit_ptr);
 
   os_thread_prio_t
   os_thread_get_prio (os_thread_t* thread);
@@ -230,12 +230,11 @@ extern "C"
   // --------------------------------------------------------------------------
 
   void
-  os_timer_attr_init (os_timer_attr_t* attr, const char* name);
+  os_timer_attr_init (os_timer_attr_t* attr);
 
   void
-  os_timer_create (os_timer_t* timer, const char* name,
-                   const os_timer_attr_t* attr, os_timer_func_t func,
-                   os_timer_func_args_t args);
+  os_timer_create (os_timer_t* timer, const char* name, os_timer_func_t func,
+                   os_timer_func_args_t args, const os_timer_attr_t* attr);
 
   void
   os_timer_destroy (os_timer_t* timer);
@@ -252,7 +251,7 @@ extern "C"
   // --------------------------------------------------------------------------
 
   void
-  os_mutex_attr_init (os_mutex_attr_t* attr, const char* name);
+  os_mutex_attr_init (os_mutex_attr_t* attr);
 
   void
   os_mutex_create (os_mutex_t* mutex, const char* name,
@@ -295,11 +294,11 @@ extern "C"
   // --------------------------------------------------------------------------
 
   void
-  os_condvar_attr_init (os_condvar_attr_t* attr, const char* name);
+  os_condvar_attr_init (os_condvar_attr_t* attr);
 
   void
   os_condvar_create (os_condvar_t* condvar, const char* name,
-                     os_condvar_attr_t* attr);
+                     const os_condvar_attr_t* attr);
 
   void
   os_condvar_destroy (os_condvar_t* condvar);
@@ -323,11 +322,11 @@ extern "C"
   // --------------------------------------------------------------------------
 
   void
-  os_semaphore_attr_init (os_semaphore_attr_t* attr, const char* name);
+  os_semaphore_attr_init (os_semaphore_attr_t* attr);
 
   void
   os_semaphore_create (os_semaphore_t* semaphore, const char* name,
-                       os_semaphore_attr_t* attr);
+                       const os_semaphore_attr_t* attr);
 
   void
   os_semaphore_destroy (os_semaphore_t* semaphore);
@@ -363,12 +362,11 @@ extern "C"
   // --------------------------------------------------------------------------
 
   void
-  os_mempool_attr_init (os_mempool_attr_t* attr, const char* name);
+  os_mempool_attr_init (os_mempool_attr_t* attr);
 
   void
-  os_mempool_create (os_mempool_t* mempool, const char* name,
-                     os_mempool_attr_t* attr, size_t blocks,
-                     size_t block_size_bytes);
+  os_mempool_create (os_mempool_t* mempool, const char* name, size_t blocks,
+                     size_t block_size_bytes, const os_mempool_attr_t* attr);
 
   void
   os_mempool_destroy (os_mempool_t* mempool);
@@ -412,11 +410,11 @@ extern "C"
   // --------------------------------------------------------------------------
 
   void
-  os_mqueue_attr_init (os_mqueue_attr_t* attr, const char* name);
+  os_mqueue_attr_init (os_mqueue_attr_t* attr);
 
   void
-  os_mqueue_create (os_mqueue_t* mqueue, const char* name,
-                    os_mqueue_attr_t* attr, size_t msgs, size_t msg_size_bytes);
+  os_mqueue_create (os_mqueue_t* mqueue, const char* name, size_t msgs,
+                    size_t msg_size_bytes, const os_mqueue_attr_t* attr);
 
   void
   os_mqueue_destroy (os_mqueue_t* mqueue);
@@ -470,11 +468,11 @@ extern "C"
   // --------------------------------------------------------------------------
 
   void
-  os_evflags_attr_init (os_evflags_attr_t* attr, const char* name);
+  os_evflags_attr_init (os_evflags_attr_t* attr);
 
   void
   os_evflags_create (os_evflags_t* evflags, const char* name,
-                     os_evflags_attr_t* attr);
+                     const os_evflags_attr_t* attr);
 
   void
   os_evflags_destroy (os_evflags_t* evflags);

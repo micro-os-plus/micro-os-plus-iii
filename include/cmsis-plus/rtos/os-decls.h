@@ -35,8 +35,6 @@
 
 // ----------------------------------------------------------------------------
 
-#if defined(__cplusplus)
-
 /**
  * @brief Tell the world that CMSIS++ is in use.
  * @details
@@ -45,16 +43,18 @@
  */
 #define OS_USE_CMSIS_PLUS
 
-#include <cstdint>
-#include <cstddef>
-#include <cerrno>
-
 // Include the application specific definitions.
 #include <cmsis-plus/rtos/os-app-config.h>
 // Include the non-portable portable types, enums and constants declarations.
 #include <cmsis-plus/rtos/port/os-decls.h>
 
 // ----------------------------------------------------------------------------
+
+#if defined(__cplusplus)
+
+#include <cstdint>
+#include <cstddef>
+#include <cerrno>
 
 /**
  * @brief System namespace.
@@ -334,15 +334,6 @@ namespace os
       named_object (const char* name);
 
       /**
-       * @brief Create a named object.
-       * @param [in] given_name Null terminated name. If `nullptr`,
-       * attr_name is used.
-       * @param [in] attr_name Null terminated name. If `nullptr`,
-       * "-" is assigned.
-       */
-      named_object (const char* given_name, const char* attr_name);
-
-      /**
        * @cond ignore
        */
       named_object (const named_object&) = default;
@@ -394,7 +385,7 @@ namespace os
       /**
        * @brief Pointer to name.
        */
-      const char* const name_;
+      const char* const name_ = "-";
 
       /**
        * @}
@@ -404,90 +395,10 @@ namespace os
     // ========================================================================
 
     /**
-     * @brief Base class for named attributes.
+     * @brief Base class for attributes.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      */
-    class named_attributes
-    {
-    public:
-
-      /**
-       * @name Constructors & Destructor
-       * @{
-       */
-
-      /**
-       * @brief Create a named attributes object.
-       * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
-       */
-      constexpr
-      named_attributes (const char* name);
-
-      /**
-       * @cond ignore
-       */
-      named_attributes (const named_attributes&) = default;
-      named_attributes (named_attributes&&) = default;
-      named_attributes&
-      operator= (const named_attributes&) = default;
-      named_attributes&
-      operator= (named_attributes&&) = default;
-      /**
-       * @endcond
-       */
-
-      /**
-       * @brief Destroy the named object.
-       */
-      ~named_attributes () = default;
-
-      /**
-       * @}
-       */
-
-    public:
-
-      /**
-       * @name Public Member Functions
-       * @{
-       */
-
-      /**
-       * @brief Get name.
-       * @par Parameters
-       *  None.
-       * @return A null terminated string.
-       */
-      const char*
-      name (void) const;
-
-      /**
-       * @}
-       */
-
-    protected:
-
-      /**
-       * @name Private Member Variables
-       * @{
-       */
-
-      /**
-       * @brief Pointer to name.
-       */
-      const char* const name_;
-
-      /**
-       * @}
-       */
-    };
-    // ========================================================================
-
-    /**
-     * @brief Base class for named objects.
-     * @headerfile os.h <cmsis-plus/rtos/os.h>
-     */
-    class clocked_attributes : public named_attributes
+    class clocked_attributes
     {
     public:
 
@@ -498,10 +409,11 @@ namespace os
 
       /**
        * @brief Create a named object.
-       * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
+       * @par Parameters
+       *  None.
        */
       constexpr
-      clocked_attributes (const char* name);
+      clocked_attributes ();
 
       /**
        * @cond ignore
@@ -530,7 +442,7 @@ namespace os
       /**
        * @brief Pointer to clock.
        */
-      rtos::clock* clock;
+      rtos::clock* clock = nullptr;
 
       /**
        * @}
@@ -573,39 +485,8 @@ namespace os
 
     // ========================================================================
 
-    /**
-     * @details
-     * To save space, instead of copying the null terminated string
-     * locally, the pointer to the string
-     * is copied, so the caller must ensure that the pointer
-     * life cycle is at least as long as the object life cycle.
-     * A constant string (stored in flash) is preferred.
-     */
     constexpr
-    named_attributes::named_attributes (const char* name) :
-        name_ (name != nullptr ? name : "-")
-    {
-      ;
-    }
-
-    /**
-     * @details
-     * All objects return a non-null string; anonymous objects
-     * return `"-"`.
-     */
-    inline const char*
-    named_attributes::name (void) const
-    {
-      return name_;
-    }
-
-    // ========================================================================
-
-    constexpr
-    clocked_attributes::clocked_attributes (const char* name) :
-        named_attributes
-          { name }, //
-        clock (nullptr)
+    clocked_attributes::clocked_attributes ()
     {
       ;
     }

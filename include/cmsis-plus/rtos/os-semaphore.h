@@ -91,10 +91,11 @@ namespace os
 
         /**
          * @brief Create semaphore attributes.
-         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
+         * @par Parameters
+         *  None
          */
         constexpr
-        attributes (const char* name);
+        attributes ();
 
         /**
          * @cond ignore
@@ -121,7 +122,7 @@ namespace os
       protected:
 
         constexpr
-        attributes (const char* name, count_t max_count);
+        attributes (count_t max_count);
 
       public:
 
@@ -171,10 +172,11 @@ namespace os
 
         /**
          * @brief Create binary semaphore attributes.
-         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
+         * @par Parameters
+         *  None
          */
         constexpr
-        binary_attributes (const char* name);
+        binary_attributes ();
 
         /**
          * @cond ignore
@@ -210,26 +212,13 @@ namespace os
        */
 
       /**
-       * @brief Create a semaphore with default settings.
-       * @par Parameters
-       *  None
-       */
-      semaphore ();
-
-      /**
-       * @brief Create a named semaphore with default settings.
-       * @param [in] name Pointer to name.
-       */
-      semaphore (const char* name);
-
-      /**
-       * @brief Create a semaphore with custom settings.
+       * @brief Create a semaphore.
        * @param [in] attr Reference to attributes.
        */
       semaphore (const attributes& attr);
 
       /**
-       * @brief Create a named semaphore with custom settings.
+       * @brief Create a named semaphore.
        * @param [in] name Pointer to name.
        * @param [in] attr Reference to attributes.
        */
@@ -450,17 +439,13 @@ namespace os
     // ========================================================================
 
     constexpr
-    semaphore::attributes::attributes (const char* name) :
-        clocked_attributes
-          { name }
+    semaphore::attributes::attributes ()
     {
       ;
     }
 
     constexpr
-    semaphore::attributes::attributes (const char* name, count_t max_count) :
-        clocked_attributes
-          { name }, //
+    semaphore::attributes::attributes (count_t max_count) :
         sm_max_count (max_count)
     {
       ;
@@ -469,9 +454,9 @@ namespace os
     // ========================================================================
 
     constexpr
-    semaphore::binary_attributes::binary_attributes (const char* name) :
+    semaphore::binary_attributes::binary_attributes () :
         attributes
-          { name, 1 } // Use the protected constructor.
+          { 1 } // Use the protected constructor.
     {
       ;
     }

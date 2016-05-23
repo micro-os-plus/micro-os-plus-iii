@@ -69,10 +69,11 @@ namespace os
 
         /**
          * @brief Create condition variable attributes.
-         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
+         * @par Parameters
+         *  None
          */
         constexpr
-        attributes (const char* name);
+        attributes ();
 
         /**
          * @cond ignore
@@ -124,36 +125,7 @@ namespace os
        */
 
       /**
-       * @brief Create a condition variable with default settings.
-       * @par Parameters
-       *  None
-       * @par Errors
-       *  The constructor shall fail if:
-       *  - `EAGAIN` - The system lacked the necessary resources
-       *  (other than memory) to create the condition variable.
-       *  - `ENOMEM` - Insufficient memory exists to initialise
-       *  the condition variable.
-       * @par
-       *  The constructor shall not fail with an error code of `EINTR`.
-       */
-      condition_variable ();
-
-      /**
-       * @brief Create a named condition variable with default settings.
-       * @param [in] name Pointer to name.
-       * @par Errors
-       *  The constructor shall fail if:
-       *  - `EAGAIN` - The system lacked the necessary resources
-       *  (other than memory) to create the condition variable.
-       *  - `ENOMEM` - Insufficient memory exists to initialise
-       *  the condition variable.
-       * @par
-       *  The constructor shall not fail with an error code of `EINTR`.
-       */
-      condition_variable (const char* name);
-
-      /**
-       * @brief Create a condition variable with custom settings.
+       * @brief Create a condition variable.
        * @param [in] attr Reference to attributes.
        * @par Errors
        *  The constructor shall fail if:
@@ -164,10 +136,10 @@ namespace os
        * @par
        *  The constructor shall not fail with an error code of `EINTR`.
        */
-      condition_variable (const attributes& attr);
+      condition_variable (const attributes& attr = initializer);
 
       /**
-       * @brief Create a named condition variable with custom settings.
+       * @brief Create a named condition variable.
        * @param [in] name Pointer to name.
        * @param [in] attr Reference to attributes.
        * @par Errors
@@ -179,7 +151,8 @@ namespace os
        * @par
        *  The constructor shall not fail with an error code of `EINTR`.
        */
-      condition_variable (const char* name, const attributes& attr);
+      condition_variable (const char* name,
+                          const attributes& attr = initializer);
 
       /**
        * @cond ignore
@@ -329,9 +302,7 @@ namespace os
   namespace rtos
   {
     constexpr
-    condition_variable::attributes::attributes (const char* name) :
-        clocked_attributes
-          { name }
+    condition_variable::attributes::attributes ()
     {
       ;
     }

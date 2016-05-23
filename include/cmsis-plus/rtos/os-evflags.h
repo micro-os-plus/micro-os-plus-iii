@@ -72,10 +72,11 @@ namespace os
 
         /**
          * @brief Create event flags attributes.
-         * @param [in] name Null terminated name. If `nullptr`, "-" is assigned.
+         * @par Parameters
+         *  None
          */
         constexpr
-        attributes (const char* name);
+        attributes ();
 
         /**
          * @cond ignore
@@ -125,30 +126,17 @@ namespace os
        */
 
       /**
-       * @brief Create event flags with default attributes.
-       * @par Parameters
-       *  None
-       */
-      event_flags ();
-
-      /**
-       * @brief Create named event flags with default attributes.
-       * @param [in] name Pointer to name.
-       */
-      event_flags (const char* name);
-
-      /**
-       * @brief Create event flags with custom settings.
+       * @brief Create event flags.
        * @param [in] attr Reference to attributes.
        */
-      event_flags (const attributes& attr);
+      event_flags (const attributes& attr = initializer);
 
       /**
-       * @brief Create named event flags with custom settings.
+       * @brief Create named event flags.
        * @param [in] name Pointer to name.
        * @param [in] attr Reference to attributes.
        */
-      event_flags (const char* name, const attributes& attr);
+      event_flags (const char* name, const attributes& attr = initializer);
 
       /**
        * @cond ignore
@@ -367,9 +355,7 @@ namespace os
   namespace rtos
   {
     constexpr
-    event_flags::attributes::attributes (const char* name) :
-        clocked_attributes
-          { name }
+    event_flags::attributes::attributes ()
     {
       ;
     }

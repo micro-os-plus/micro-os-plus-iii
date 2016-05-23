@@ -55,8 +55,7 @@ namespace os
      *  (IEEE Std 1003.1, 2013 Edition).
      */
 
-    const timer::attributes timer::once_initializer
-      { nullptr };
+    const timer::attributes timer::once_initializer;
 
     /**
      * @class periodic_attributes
@@ -64,8 +63,7 @@ namespace os
      * Allow to assign a name to the timer.
      */
 
-    const timer::periodic_attributes timer::periodic_initializer
-      { nullptr };
+    const timer::periodic_attributes timer::periodic_initializer;
 
     // ------------------------------------------------------------------------
 
@@ -115,58 +113,6 @@ namespace os
     /**
      * @details
      * This constructor shall initialise a timer object
-     * with default settings.
-     * The effect shall be equivalent to creating a timer object
-     * referring to the attributes in `timer::once_initializer`.
-     * Upon successful initialisation, the state of the
-     * timer object shall become initialised.
-     *
-     * Only the timer object itself may be used for running
-     * the function. It is not allowed to make copies of
-     * timer objects.
-     *
-     * The default timer is a single run timer which uses the
-     * `Systick_clock`; the period is expressed
-     * in scheduler ticks.
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    timer::timer (func_t function, func_args_t args) :
-        timer
-          { nullptr, once_initializer, function, args }
-    {
-      ;
-    }
-
-    /**
-     * @details
-     * This constructor shall initialise a named timer object
-     * with default settings.
-     * The effect shall be equivalent to creating a timer object
-     * referring to the attributes in `timer::once_initializer`.
-     * Upon successful initialisation, the state of the
-     * timer object shall become initialised.
-     *
-     * Only the timer object itself may be used for running
-     * the function. It is not allowed to make copies of
-     * timer objects.
-     *
-     * The default timer is a single run timer which uses the
-     * `Systick_clock`; the period is expressed
-     * in scheduler ticks.
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    timer::timer (const char* name, func_t function, func_args_t args) :
-        timer
-          { name, once_initializer, function, args }
-    {
-      ;
-    }
-
-    /**
-     * @details
-     * This constructor shall initialise a timer object
      * with attributes referenced by _attr_.
      * If the attributes specified by _attr_ are modified later,
      * the timer attributes shall not be affected.
@@ -187,9 +133,9 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    timer::timer (const attributes& attr, func_t function, func_args_t args) :
+    timer::timer (func_t function, func_args_t args, const attributes& attr) :
         timer
-          { nullptr, attr, function, args }
+          { nullptr, function, args, attr }
     {
       ;
     }
@@ -217,10 +163,10 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    timer::timer (const char* name, const attributes& attr, func_t function,
-                  func_args_t args) :
+    timer::timer (const char* name, func_t function, func_args_t args,
+                  const attributes& attr) :
         named_object
-          { name, attr.name () }
+          { name }
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
       os_assert_throw(function != nullptr, EINVAL);
