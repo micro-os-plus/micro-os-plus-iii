@@ -65,8 +65,8 @@ extern "C"
 
   typedef struct os_double_list_links_s
   {
-    void* next;
     void* prev;
+    void* next;
   } os_double_list_links_t;
 
   typedef os_double_list_links_t os_threads_waiting_list_t;
@@ -84,6 +84,11 @@ extern "C"
 
   typedef uint32_t os_flags_mode_t;
   typedef uint32_t os_flags_mask_t;
+
+  typedef struct os_clock_timestamps_list_s
+  {
+    os_double_list_links_t links;
+  } os_clock_timestamps_list_t;
 
   // --------------------------------------------------------------------------
 
@@ -142,8 +147,9 @@ extern "C"
 
   //
 
-  typedef uint64_t os_clock_timestamp_t;
-  typedef uint32_t os_clock_duration_t;
+  typedef os_port_clock_timestamp_t os_clock_timestamp_t;
+  typedef os_port_clock_duration_t os_clock_duration_t;
+  typedef os_port_clock_offset_t os_clock_offset_t;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -206,13 +212,25 @@ extern "C"
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
-  typedef struct os_systick_clock_current_s
+  typedef struct os_clock_s
+  {
+    void* vtbl;
+    const char* name;
+    os_clock_timestamps_list_t steady_list;
+    os_clock_duration_t sleep_count;
+    os_clock_timestamps_list_t adjusted_list;
+    os_clock_timestamp_t steady_count;
+    os_clock_offset_t offset;
+
+  } os_clock_t;
+
+  typedef struct os_sysclock_current_s
   {
     uint64_t ticks; // Count of SysTick ticks since core reset
     uint32_t cycles; // Count of SysTick cycles since timer reload (24 bits)
     uint32_t divisor; // SysTick reload value (24 bits)
     uint32_t core_frequency_hz; // Core clock frequency Hz
-  } os_systick_clock_current_t;
+  } os_sysclock_current_t;
 
 #pragma GCC diagnostic pop
 

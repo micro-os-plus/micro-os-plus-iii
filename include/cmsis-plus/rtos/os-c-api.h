@@ -136,11 +136,15 @@ extern "C"
   os_thread_attr_init (os_thread_attr_t* attr, const char* name);
 
   void
-  os_thread_create (os_thread_t* thread, const os_thread_attr_t* attr,
-                    os_thread_func_t func, const os_thread_func_args_t args);
+  os_thread_create (os_thread_t* thread, const char* name,
+                    const os_thread_attr_t* attr, os_thread_func_t func,
+                    const os_thread_func_args_t args);
 
   void
   os_thread_destroy (os_thread_t* thread);
+
+  const char*
+  os_thread_get_name (os_thread_t* thread);
 
   os_result_t
   os_thread_join (os_thread_t* thread, void** exit_ptr);
@@ -171,48 +175,57 @@ extern "C"
 
   // --------------------------------------------------------------------------
 
-  // TODO: when C++ specs are final, update for non-static objects.
+  const char*
+  os_clock_name (os_clock_t* clock);
 
   os_clock_timestamp_t
-  os_systick_clock_now (void);
+  os_clock_now (os_clock_t* clock);
 
   os_clock_timestamp_t
-  os_systick_clock_now_details (os_systick_clock_current_t* details);
+  os_clock_steady_now (os_clock_t* clock);
 
   os_result_t
-  os_systick_clock_sleep_for (os_clock_duration_t timeout);
+  os_clock_sleep_for (os_clock_t* clock, os_clock_duration_t timeout);
 
   os_result_t
-  os_systick_clock_wait (os_clock_duration_t timeout);
+  os_clock_sleep_until (os_clock_t* clock, os_clock_timestamp_t timestamp);
+
+  os_result_t
+  os_clock_wait_for (os_clock_t* clock, os_clock_duration_t timeout);
+
+  os_clock_t*
+  os_clock_get_sysclock (void);
+
+  os_clock_t*
+  os_clock_get_rtclock (void);
+
+  // --------------------------------------------------------------------------
+
+  os_clock_timestamp_t
+  os_sysclock_now_details (os_sysclock_current_t* details);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 
   inline os_clock_duration_t
   __attribute__((always_inline))
-  os_systick_clock_ticks_cast (uint32_t microsec)
+  os_sysclock_ticks_cast (uint32_t microsec)
   {
     return (os_clock_duration_t) ((((microsec)
-        * ((uint32_t) OS_INTEGER_SYSTICK_FREQUENCY_HZ)) + (uint32_t) 999999ul)
-        / (uint32_t) 1000000ul);
+        * ((uint32_t) OS_INTEGER_SYSTICK_FREQUENCY_HZ)) + (uint32_t) 1000000ul
+        - 1) / (uint32_t) 1000000ul);
   }
 
   inline os_clock_duration_t
   __attribute__((always_inline))
-  os_systick_clock_ticks_cast_long (uint64_t microsec)
+  os_sysclock_ticks_cast_long (uint64_t microsec)
   {
     return (os_clock_duration_t) ((((microsec)
-        * ((uint64_t) OS_INTEGER_SYSTICK_FREQUENCY_HZ)) + (uint64_t) 999999ul)
-        / (uint64_t) 1000000ul);
+        * ((uint64_t) OS_INTEGER_SYSTICK_FREQUENCY_HZ)) + (uint64_t) 1000000ul
+        - 1) / (uint64_t) 1000000ul);
   }
 
 #pragma GCC diagnostic pop
-
-  os_clock_timestamp_t
-  os_realtime_clock_now (void);
-
-  os_result_t
-  os_realtime_clock_sleep_for (os_clock_duration_t secs);
 
   // --------------------------------------------------------------------------
 
@@ -220,11 +233,15 @@ extern "C"
   os_timer_attr_init (os_timer_attr_t* attr, const char* name);
 
   void
-  os_timer_create (os_timer_t* timer, const os_timer_attr_t* attr,
-                   os_timer_func_t func, os_timer_func_args_t args);
+  os_timer_create (os_timer_t* timer, const char* name,
+                   const os_timer_attr_t* attr, os_timer_func_t func,
+                   os_timer_func_args_t args);
 
   void
   os_timer_destroy (os_timer_t* timer);
+
+  const char*
+  os_timer_get_name (os_timer_t* timer);
 
   os_result_t
   os_timer_start (os_timer_t* timer, os_clock_duration_t timeout);
@@ -238,10 +255,14 @@ extern "C"
   os_mutex_attr_init (os_mutex_attr_t* attr, const char* name);
 
   void
-  os_mutex_create (os_mutex_t* mutex, const os_mutex_attr_t* attr);
+  os_mutex_create (os_mutex_t* mutex, const char* name,
+                   const os_mutex_attr_t* attr);
 
   void
   os_mutex_destroy (os_mutex_t* mutex);
+
+  const char*
+  os_mutex_get_name (os_mutex_t* mutex);
 
   os_result_t
   os_mutex_lock (os_mutex_t* mutex);
@@ -277,10 +298,14 @@ extern "C"
   os_condvar_attr_init (os_condvar_attr_t* attr, const char* name);
 
   void
-  os_condvar_create (os_condvar_t* condvar, os_condvar_attr_t* attr);
+  os_condvar_create (os_condvar_t* condvar, const char* name,
+                     os_condvar_attr_t* attr);
 
   void
   os_condvar_destroy (os_condvar_t* condvar);
+
+  const char*
+  os_condvar_get_name (os_condvar_t* condvar);
 
   os_result_t
   os_condvar_signal (os_condvar_t* condvar);
@@ -301,10 +326,14 @@ extern "C"
   os_semaphore_attr_init (os_semaphore_attr_t* attr, const char* name);
 
   void
-  os_semaphore_create (os_semaphore_t* semaphore, os_semaphore_attr_t* attr);
+  os_semaphore_create (os_semaphore_t* semaphore, const char* name,
+                       os_semaphore_attr_t* attr);
 
   void
   os_semaphore_destroy (os_semaphore_t* semaphore);
+
+  const char*
+  os_semaphore_get_name (os_semaphore_t* semaphore);
 
   os_result_t
   os_semaphore_post (os_semaphore_t* semaphore);
@@ -337,12 +366,15 @@ extern "C"
   os_mempool_attr_init (os_mempool_attr_t* attr, const char* name);
 
   void
-  os_mempool_create (os_mempool_t* mempool, os_mempool_attr_t* attr,
-                     os_mempool_size_t blocks,
-                     os_mempool_size_t block_size_bytes);
+  os_mempool_create (os_mempool_t* mempool, const char* name,
+                     os_mempool_attr_t* attr, size_t blocks,
+                     size_t block_size_bytes);
 
   void
   os_mempool_destroy (os_mempool_t* mempool);
+
+  const char*
+  os_mempool_get_name (os_mempool_t* mempool);
 
   void*
   os_mempool_alloc (os_mempool_t* mempool);
@@ -383,11 +415,14 @@ extern "C"
   os_mqueue_attr_init (os_mqueue_attr_t* attr, const char* name);
 
   void
-  os_mqueue_create (os_mqueue_t* mqueue, os_mqueue_attr_t* attr,
-                    os_mqueue_size_t msgs, os_mqueue_size_t msg_size_bytes);
+  os_mqueue_create (os_mqueue_t* mqueue, const char* name,
+                    os_mqueue_attr_t* attr, size_t msgs, size_t msg_size_bytes);
 
   void
   os_mqueue_destroy (os_mqueue_t* mqueue);
+
+  const char*
+  os_mqueue_get_name (os_mqueue_t* mqueue);
 
   os_result_t
   os_mqueue_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
@@ -438,10 +473,14 @@ extern "C"
   os_evflags_attr_init (os_evflags_attr_t* attr, const char* name);
 
   void
-  os_evflags_create (os_evflags_t* evflags, os_evflags_attr_t* attr);
+  os_evflags_create (os_evflags_t* evflags, const char* name,
+                     os_evflags_attr_t* attr);
 
   void
   os_evflags_destroy (os_evflags_t* evflags);
+
+  const char*
+  os_evflags_get_name (os_evflags_t* evflags);
 
   os_result_t
   os_evflags_wait (os_evflags_t* evflags, os_flags_mask_t mask,

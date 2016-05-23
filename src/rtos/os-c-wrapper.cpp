@@ -56,26 +56,28 @@ using namespace os::rtos;
 // Validate C structs sizes (should match the C++ objects sizes).
 // TODO: validate individual members (size & offset).
 
-static_assert(sizeof(thread) == sizeof(os_thread_t), "adjust os_thread_t size");
-static_assert(sizeof(thread::attributes) == sizeof(os_thread_attr_t), "adjust os_thread_attr_t size");
+static_assert(sizeof(rtos::clock) == sizeof(os_clock_t), "adjust os_clock_t size");
 
-static_assert(sizeof(timer) == sizeof(os_timer_t), "adjust size of os_timer_t");
-static_assert(sizeof(timer::attributes) == sizeof(os_timer_attr_t), "adjust size of os_timer_attr_t");
+static_assert(sizeof(rtos::thread) == sizeof(os_thread_t), "adjust os_thread_t size");
+static_assert(sizeof(rtos::thread::attributes) == sizeof(os_thread_attr_t), "adjust os_thread_attr_t size");
 
-static_assert(sizeof(mutex) == sizeof(os_mutex_t), "adjust size of os_mutex_t");
-static_assert(sizeof(mutex::attributes) == sizeof(os_mutex_attr_t), "adjust size of os_mutex_attr_t");
+static_assert(sizeof(rtos::timer) == sizeof(os_timer_t), "adjust size of os_timer_t");
+static_assert(sizeof(rtos::timer::attributes) == sizeof(os_timer_attr_t), "adjust size of os_timer_attr_t");
 
-static_assert(sizeof(condition_variable) == sizeof(os_condvar_t), "adjust size of os_condvar_t");
-static_assert(sizeof(condition_variable::attributes) == sizeof(os_condvar_attr_t), "adjust size of os_condvar_attr_t");
+static_assert(sizeof(rtos::mutex) == sizeof(os_mutex_t), "adjust size of os_mutex_t");
+static_assert(sizeof(rtos::mutex::attributes) == sizeof(os_mutex_attr_t), "adjust size of os_mutex_attr_t");
 
-static_assert(sizeof(semaphore) == sizeof(os_semaphore_t), "adjust size of os_semaphore_t");
-static_assert(sizeof(semaphore::attributes) == sizeof(os_semaphore_attr_t), "adjust size of os_semaphore_attr_t");
+static_assert(sizeof(rtos::condition_variable) == sizeof(os_condvar_t), "adjust size of os_condvar_t");
+static_assert(sizeof(rtos::condition_variable::attributes) == sizeof(os_condvar_attr_t), "adjust size of os_condvar_attr_t");
 
-static_assert(sizeof(memory_pool) == sizeof(os_mempool_t), "adjust size of os_mempool_t");
-static_assert(sizeof(memory_pool::attributes) == sizeof(os_mempool_attr_t), "adjust size of os_mempool_attr_t");
+static_assert(sizeof(rtos::semaphore) == sizeof(os_semaphore_t), "adjust size of os_semaphore_t");
+static_assert(sizeof(rtos::semaphore::attributes) == sizeof(os_semaphore_attr_t), "adjust size of os_semaphore_attr_t");
 
-static_assert(sizeof(message_queue) == sizeof(os_mqueue_t), "adjust size of os_mqueue_t");
-static_assert(sizeof(message_queue::attributes) == sizeof(os_mqueue_attr_t), "adjust size of os_mqueue_attr_t");
+static_assert(sizeof(rtos::memory_pool) == sizeof(os_mempool_t), "adjust size of os_mempool_t");
+static_assert(sizeof(rtos::memory_pool::attributes) == sizeof(os_mempool_attr_t), "adjust size of os_mempool_attr_t");
+
+static_assert(sizeof(rtos::message_queue) == sizeof(os_mqueue_t), "adjust size of os_mqueue_t");
+static_assert(sizeof(rtos::message_queue::attributes) == sizeof(os_mqueue_attr_t), "adjust size of os_mqueue_attr_t");
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wenum-compare"
@@ -205,17 +207,24 @@ os_thread_attr_init (os_thread_attr_t* attr, const char* name)
 }
 
 void
-os_thread_create (os_thread_t* thread, const os_thread_attr_t* attr,
-                  os_thread_func_t func, const os_thread_func_args_t args)
+os_thread_create (os_thread_t* thread, const char* name,
+                  const os_thread_attr_t* attr, os_thread_func_t func,
+                  const os_thread_func_args_t args)
 {
-  new (thread) rtos::thread ((thread::attributes&) *attr, (thread::func_t) func,
-                             (thread::func_args_t) args);
+  new (thread) rtos::thread (name, (thread::attributes&) *attr,
+                             (thread::func_t) func, (thread::func_args_t) args);
 }
 
 void
 os_thread_destroy (os_thread_t* thread)
 {
   (reinterpret_cast<rtos::thread&> (*thread)).~thread ();
+}
+
+const char*
+os_thread_get_name (os_thread_t* thread)
+{
+  return (reinterpret_cast<rtos::thread&> (*thread)).name ();
 }
 
 os_result_t
@@ -276,43 +285,64 @@ os_thread_sig_get (os_thread_t* thread, os_thread_sigset_t mask,
 
 // ----------------------------------------------------------------------------
 
-os_clock_timestamp_t
-os_systick_clock_now (void)
+const char*
+os_clock_name (os_clock_t* clock)
 {
-  return (os_clock_timestamp_t) sysclock.now ();
+  return (reinterpret_cast<rtos::clock&> (*clock)).name ();
 }
 
 os_clock_timestamp_t
-os_systick_clock_now_details (os_systick_clock_current_t* details)
+os_clock_now (os_clock_t* clock)
+{
+  return (os_clock_timestamp_t) (reinterpret_cast<rtos::clock&> (*clock)).now ();
+}
+
+os_clock_timestamp_t
+os_clock_steady_now (os_clock_t* clock)
+{
+  return (os_clock_timestamp_t) (reinterpret_cast<rtos::clock&> (*clock)).steady_now ();
+}
+
+os_result_t
+os_clock_sleep_for (os_clock_t* clock, os_clock_duration_t timeout)
+{
+  return (os_result_t) (reinterpret_cast<rtos::clock&> (*clock)).sleep_for (
+      timeout);
+}
+
+os_result_t
+os_clock_sleep_until (os_clock_t* clock, os_clock_timestamp_t timestamp)
+{
+  return (os_result_t) (reinterpret_cast<rtos::clock&> (*clock)).sleep_until (
+      timestamp);
+}
+
+os_result_t
+os_clock_wait_for (os_clock_t* clock, os_clock_duration_t timeout)
+{
+  return (os_result_t) (reinterpret_cast<rtos::clock&> (*clock)).wait_for (
+      timeout);
+}
+
+os_clock_t*
+os_clock_get_sysclock (void)
+{
+  return (os_clock_t*) &sysclock;
+}
+
+os_clock_t*
+os_clock_get_rtclock (void)
+{
+  return (os_clock_t*) &rtclock;
+}
+
+// ----------------------------------------------------------------------------
+
+os_clock_timestamp_t
+os_sysclock_now_details (os_sysclock_current_t* details)
 {
   return (os_clock_timestamp_t) sysclock.now (
       (clock_systick::current_t*) details);
-}
-
-os_result_t
-os_systick_clock_sleep_for (os_clock_duration_t timeout)
-{
-  return (os_result_t) sysclock.sleep_for (timeout);
-}
-
-os_result_t
-os_systick_clock_wait (os_clock_duration_t timeout)
-{
-  return (os_result_t) sysclock.wait_for (timeout);
-}
-
-// os_systick_sleep_rep_t
-
-os_clock_timestamp_t
-os_realtime_clock_now (void)
-{
-  return (os_clock_timestamp_t) rtclock.now ();
-}
-
-os_result_t
-os_realtime_clock_sleep_for (os_clock_duration_t secs)
-{
-  return (os_result_t) rtclock.sleep_for (secs);
 }
 
 // ----------------------------------------------------------------------------
@@ -324,17 +354,24 @@ os_timer_attr_init (os_timer_attr_t* attr, const char* name)
 }
 
 void
-os_timer_create (os_timer_t* timer, const os_timer_attr_t* attr,
-                 os_timer_func_t func, os_timer_func_args_t args)
+os_timer_create (os_timer_t* timer, const char* name,
+                 const os_timer_attr_t* attr, os_timer_func_t func,
+                 os_timer_func_args_t args)
 {
-  new (timer) rtos::timer ((timer::attributes&) *attr, (timer::func_t) func,
-                           (timer::func_args_t) args);
+  new (timer) rtos::timer (name, (timer::attributes&) *attr,
+                           (timer::func_t) func, (timer::func_args_t) args);
 }
 
 void
 os_timer_destroy (os_timer_t* timer)
 {
   (reinterpret_cast<rtos::timer&> (*timer)).~timer ();
+}
+
+const char*
+os_timer_get_name (os_timer_t* timer)
+{
+  return (reinterpret_cast<rtos::timer&> (*timer)).name ();
 }
 
 os_result_t
@@ -358,15 +395,22 @@ os_mutex_attr_init (os_mutex_attr_t* attr, const char* name)
 }
 
 void
-os_mutex_create (os_mutex_t* mutex, const os_mutex_attr_t* attr)
+os_mutex_create (os_mutex_t* mutex, const char* name,
+                 const os_mutex_attr_t* attr)
 {
-  new (mutex) rtos::mutex ((mutex::attributes&) *attr);
+  new (mutex) rtos::mutex (name, (mutex::attributes&) *attr);
 }
 
 void
 os_mutex_destroy (os_mutex_t* mutex)
 {
   (reinterpret_cast<rtos::mutex&> (*mutex)).~mutex ();
+}
+
+const char*
+os_mutex_get_name (os_mutex_t* mutex)
+{
+  return (reinterpret_cast<rtos::mutex&> (*mutex)).name ();
 }
 
 os_result_t
@@ -435,15 +479,23 @@ os_condvar_attr_init (os_condvar_attr_t* attr, const char* name)
 }
 
 void
-os_condvar_create (os_condvar_t* condvar, os_condvar_attr_t* attr)
+os_condvar_create (os_condvar_t* condvar, const char* name,
+                   os_condvar_attr_t* attr)
 {
-  new (condvar) condition_variable ((condition_variable::attributes&) *attr);
+  new (condvar) condition_variable (name,
+                                    (condition_variable::attributes&) *attr);
 }
 
 void
 os_condvar_destroy (os_condvar_t* condvar)
 {
   (reinterpret_cast<condition_variable&> (*condvar)).~condition_variable ();
+}
+
+const char*
+os_condvar_get_name (os_condvar_t* condvar)
+{
+  return (reinterpret_cast<condition_variable&> (*condvar)).name ();
 }
 
 os_result_t
@@ -482,15 +534,22 @@ os_semaphore_attr_init (os_semaphore_attr_t* attr, const char* name)
 }
 
 void
-os_semaphore_create (os_semaphore_t* semaphore, os_semaphore_attr_t* attr)
+os_semaphore_create (os_semaphore_t* semaphore, const char* name,
+                     os_semaphore_attr_t* attr)
 {
-  new (semaphore) rtos::semaphore ((semaphore::attributes&) *attr);
+  new (semaphore) rtos::semaphore (name, (semaphore::attributes&) *attr);
 }
 
 void
 os_semaphore_destroy (os_semaphore_t* semaphore)
 {
   (reinterpret_cast<rtos::semaphore&> (*semaphore)).~semaphore ();
+}
+
+const char*
+os_semaphore_get_name (os_semaphore_t* semaphore)
+{
+  return (reinterpret_cast<rtos::semaphore&> (*semaphore)).name ();
 }
 
 os_result_t
@@ -551,10 +610,11 @@ os_mempool_attr_init (os_mempool_attr_t* attr, const char* name)
 }
 
 void
-os_mempool_create (os_mempool_t* mempool, os_mempool_attr_t* attr,
-                   os_mempool_size_t blocks, os_mempool_size_t block_size_bytes)
+os_mempool_create (os_mempool_t* mempool, const char* name,
+                   os_mempool_attr_t* attr, size_t blocks,
+                   size_t block_size_bytes)
 {
-  new (mempool) memory_pool ((memory_pool::attributes&) *attr, blocks,
+  new (mempool) memory_pool (name, (memory_pool::attributes&) *attr, blocks,
                              block_size_bytes);
 }
 
@@ -562,6 +622,12 @@ void
 os_mempool_destroy (os_mempool_t* mempool)
 {
   (reinterpret_cast<memory_pool&> (*mempool)).~memory_pool ();
+}
+
+const char*
+os_mempool_get_name (os_mempool_t* mempool)
+{
+  return (reinterpret_cast<memory_pool&> (*mempool)).name ();
 }
 
 void*
@@ -639,10 +705,10 @@ os_mqueue_attr_init (os_mqueue_attr_t* attr, const char* name)
 }
 
 void
-os_mqueue_create (os_mqueue_t* mqueue, os_mqueue_attr_t* attr,
-                  os_mqueue_size_t msgs, os_mqueue_size_t msg_size_bytes)
+os_mqueue_create (os_mqueue_t* mqueue, const char* name, os_mqueue_attr_t* attr,
+                  size_t msgs, size_t msg_size_bytes)
 {
-  new (mqueue) message_queue ((message_queue::attributes&) *attr, msgs,
+  new (mqueue) message_queue (name, (message_queue::attributes&) *attr, msgs,
                               msg_size_bytes);
 }
 
@@ -650,6 +716,12 @@ void
 os_mqueue_destroy (os_mqueue_t* mqueue)
 {
   (reinterpret_cast<message_queue&> (*mqueue)).~message_queue ();
+}
+
+const char*
+os_mqueue_get_name (os_mqueue_t* mqueue)
+{
+  return (reinterpret_cast<message_queue&> (*mqueue)).name ();
 }
 
 os_result_t
@@ -745,15 +817,22 @@ os_evflags_attr_init (os_evflags_attr_t* attr, const char* name)
 }
 
 void
-os_evflags_create (os_evflags_t* evflags, os_evflags_attr_t* attr)
+os_evflags_create (os_evflags_t* evflags, const char* name,
+                   os_evflags_attr_t* attr)
 {
-  new (evflags) event_flags ((event_flags::attributes&) *attr);
+  new (evflags) event_flags (name, (event_flags::attributes&) *attr);
 }
 
 void
 os_evflags_destroy (os_evflags_t* evflags)
 {
   (reinterpret_cast<event_flags&> (*evflags)).~event_flags ();
+}
+
+const char*
+os_evflags_get_name (os_evflags_t* evflags)
+{
+  return (reinterpret_cast<event_flags&> (*evflags)).name ();
 }
 
 os_result_t
@@ -1874,8 +1953,7 @@ osPoolCreate (const osPoolDef_t* pool_def)
   attr.mp_pool_address = pool_def->pool;
   attr.mp_pool_size_bytes = pool_def->pool_sz;
   return reinterpret_cast<osPoolId> (new ((void*) pool_def->data) memory_pool (
-      attr, (memory_pool::size_t) pool_def->items,
-      (memory_pool::size_t) pool_def->item_sz));
+      attr, (std::size_t) pool_def->items, (std::size_t) pool_def->item_sz));
 }
 
 /**
@@ -1989,8 +2067,7 @@ osMessageCreate (const osMessageQDef_t* queue_def,
   attr.mq_queue_size_bytes = queue_def->queue_sz;
 
   return reinterpret_cast<osMessageQId> (new ((void*) queue_def->data) message_queue (
-      attr, (message_queue::size_t) queue_def->items,
-      (message_queue::size_t) queue_def->item_sz));
+      attr, (std::size_t) queue_def->items, (std::size_t) queue_def->item_sz));
 }
 
 /**
@@ -2207,16 +2284,16 @@ osMailCreate (const osMailQDef_t* queue_def,
   pool_attr.mp_pool_address = queue_def->pool;
   pool_attr.mp_pool_size_bytes = queue_def->pool_sz;
   new ((void*) &queue_def->data->pool) memory_pool (
-      pool_attr, (memory_pool::size_t) queue_def->items,
-      (memory_pool::size_t) queue_def->pool_item_sz);
+      pool_attr, (std::size_t) queue_def->items,
+      (std::size_t) queue_def->pool_item_sz);
 
   message_queue::attributes queue_attr
     { queue_def->name };
   queue_attr.mq_queue_address = queue_def->queue;
   queue_attr.mq_queue_size_bytes = queue_def->queue_sz;
   new ((void*) &queue_def->data->queue) message_queue (
-      queue_attr, (message_queue::size_t) queue_def->items,
-      (message_queue::size_t) queue_def->queue_item_sz);
+      queue_attr, (std::size_t) queue_def->items,
+      (std::size_t) queue_def->queue_item_sz);
 
   return (osMailQId) (queue_def->data);
 }
