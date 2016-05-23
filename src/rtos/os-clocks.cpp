@@ -87,7 +87,9 @@ namespace os
 
     // ========================================================================
 
-    clock::clock ()
+    clock::clock (const char* name) :
+        named_object
+          { name }
     {
       steady_count_ = 0;
       offset_ = 0;
@@ -336,7 +338,9 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    clock_systick::clock_systick ()
+    clock_systick::clock_systick () :
+        clock
+          { "sysclock" }
     {
       ;
     }
@@ -514,7 +518,9 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    clock_rtc::clock_rtc ()
+    clock_rtc::clock_rtc () :
+        clock
+          { "rtclock" }
     {
       ;
     }
@@ -544,6 +550,5 @@ namespace os
 
   // --------------------------------------------------------------------------
 
-  }
-/* namespace rtos */
+  } /* namespace rtos */
 } /* namespace os */

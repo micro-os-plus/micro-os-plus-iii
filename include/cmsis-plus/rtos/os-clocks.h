@@ -54,7 +54,7 @@ namespace os
     /**
      * @brief Generic clock.
      */
-    class clock
+    class clock : public named_object
     {
     public:
 
@@ -81,7 +81,15 @@ namespace os
        * @{
        */
 
-      clock ();
+    protected:
+
+      /**
+       * @brief Create a clock object (protected, use derived classes)
+       * @param [in] name Pointer to clock name.
+       */
+      clock (const char* name);
+
+    public:
 
       /**
        * @cond ignore
@@ -471,7 +479,8 @@ namespace os
         // TODO: add some restrictions to match only numeric types
         return static_cast<clock::duration_t> ((((microsec)
             * (static_cast<Rep_T> (frequency_hz)))
-            + static_cast<Rep_T> (999999ul)) / static_cast<Rep_T> (1000000ul));
+            + static_cast<Rep_T> (1000000ul) - 1)
+            / static_cast<Rep_T> (1000000ul));
       }
 
   } /* namespace rtos */
