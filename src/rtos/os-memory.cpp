@@ -55,15 +55,16 @@ namespace
   protected:
 
     virtual void*
-    do_allocate (size_t bytes, size_t alignment __attribute__((unused)))
+    do_allocate (std::size_t bytes,
+                 std::size_t alignment __attribute__((unused)))
     {
       // Ignore alignment for now.
       return ::operator new (bytes);
     }
 
     virtual void
-    do_deallocate (void * p, size_t bytes __attribute__((unused)),
-                   size_t alignment __attribute__((unused)))
+    do_deallocate (void * p, std::size_t bytes __attribute__((unused)),
+                   std::size_t alignment __attribute__((unused)))
     {
       // Ignore size and alignment for now.
       ::operator delete (p);

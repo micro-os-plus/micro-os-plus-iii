@@ -108,7 +108,7 @@ namespace os
      */
 
     /**
-     * @var size_t attributes::mp_pool_size_bytes
+     * @var memory_pool::size_t attributes::mp_pool_size_bytes
      * @details
      * The memory pool size must match exactly the allocated size. It is
      * used for validation; when the memory pool is initialised,
@@ -223,7 +223,7 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    memory_pool::memory_pool (size_t blocks, size_t block_size_bytes,
+    memory_pool::memory_pool (std::size_t blocks, std::size_t block_size_bytes,
                               const Allocator& allocator) :
         memory_pool
           { nullptr, blocks, block_size_bytes, allocator }
@@ -249,8 +249,8 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    memory_pool::memory_pool (const char* name, size_t blocks,
-                              size_t block_size_bytes,
+    memory_pool::memory_pool (const char* name, std::size_t blocks,
+                              std::size_t block_size_bytes,
                               const Allocator& allocator) :
         named_object
           { name }
@@ -303,8 +303,8 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    memory_pool::memory_pool (const attributes& attr, size_t blocks,
-                              size_t block_size_bytes,
+    memory_pool::memory_pool (const attributes& attr, std::size_t blocks,
+                              std::size_t block_size_bytes,
                               const Allocator& allocator) :
         memory_pool
           { nullptr, attr, blocks, block_size_bytes, allocator }
@@ -338,7 +338,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     memory_pool::memory_pool (const char* name, const attributes& attr,
-                              size_t blocks, size_t block_size_bytes,
+                              std::size_t blocks, std::size_t block_size_bytes,
                               const Allocator& allocator) :
         named_object
           { name, attr.name () }
@@ -377,8 +377,8 @@ namespace os
     }
 
     void
-    memory_pool::_construct (const attributes& attr, size_t blocks,
-                             size_t block_size_bytes, void* pool_address,
+    memory_pool::_construct (const attributes& attr, std::size_t blocks,
+                             std::size_t block_size_bytes, void* pool_address,
                              std::size_t pool_size_bytes)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
@@ -387,15 +387,16 @@ namespace os
       clock_ = attr.clock != nullptr ? attr.clock : &sysclock;
 #endif
 
-      blocks_ = blocks;
+      blocks_ = static_cast<memory_pool::size_t> (blocks);
+      assert(blocks_ == blocks);
       assert(blocks_ > 0);
 
       // Adjust block size to multiple of pointer.
       // Blocks must be large enough to store a pointer, used
       // to construct the list of free blocks.
-      block_size_bytes_ = (static_cast<size_t> (block_size_bytes
+      block_size_bytes_ = (static_cast<memory_pool::size_t> (block_size_bytes
           + __SIZEOF_POINTER__ - 1))
-          & (static_cast<size_t> (~(__SIZEOF_POINTER__ - 1)));
+          & (static_cast<memory_pool::size_t> (~(__SIZEOF_POINTER__ - 1)));
 
       // If the storage is given explicitly, override attributes.
       if (pool_address != nullptr)

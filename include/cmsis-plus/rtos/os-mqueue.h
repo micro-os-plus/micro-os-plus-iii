@@ -80,13 +80,13 @@ namespace os
       using size_t = uint8_t;
 #endif
 
-      static constexpr size_t max_size = 0xFF;
+      static constexpr message_queue::size_t max_size = 0xFF;
 
       using msg_size_t = uint16_t;
 
       static constexpr msg_size_t max_msg_size = 0xFFFF;
 
-      using index_t = size_t;
+      using index_t = message_queue::size_t;
 
       static constexpr index_t no_index = max_size;
 
@@ -232,7 +232,7 @@ namespace os
        * @param [in] allocator Reference to allocator. Default a
        * local temporary instance.
        */
-      message_queue (size_t msgs, msg_size_t msg_size_bytes,
+      message_queue (std::size_t msgs, std::size_t msg_size_bytes,
                      const Allocator& allocator = Allocator ());
 
       /**
@@ -243,8 +243,9 @@ namespace os
        * @param [in] allocator Reference to allocator. Default a
        * local temporary instance.
        */
-      message_queue (const char* name, size_t msgs, msg_size_t msg_size_bytes,
-                     const Allocator& allocator = Allocator ());
+      message_queue (const char* name, std::size_t msgs,
+                     std::size_t msg_size_bytes, const Allocator& allocator =
+                         Allocator ());
 
       /**
        * @brief Create a message queue with custom settings.
@@ -254,8 +255,8 @@ namespace os
        * @param [in] allocator Reference to allocator. Default a
        * local temporary instance.
        */
-      message_queue (const attributes& attr, size_t msgs,
-                     msg_size_t msg_size_bytes, const Allocator& allocator =
+      message_queue (const attributes& attr, std::size_t msgs,
+                     std::size_t msg_size_bytes, const Allocator& allocator =
                          Allocator ());
 
       /**
@@ -267,8 +268,8 @@ namespace os
        * @param [in] allocator Reference to allocator. Default a
        * local temporary instance.
        */
-      message_queue (const char* name, const attributes& attr, size_t msgs,
-                     msg_size_t msg_size_bytes, const Allocator& allocator =
+      message_queue (const char* name, const attributes& attr, std::size_t msgs,
+                     std::size_t msg_size_bytes, const Allocator& allocator =
                          Allocator ());
 
     protected:
@@ -534,8 +535,8 @@ namespace os
        * @return Nothing.
        */
       void
-      _construct (const attributes& attr, size_t msgs,
-                  msg_size_t msg_size_bytes, void* queue_address,
+      _construct (const attributes& attr, std::size_t msgs,
+                  std::size_t msg_size_bytes, void* queue_address,
                   std::size_t queue_size_bytes);
 
       /**
@@ -662,15 +663,15 @@ namespace os
       /**
        * @brief Message size (aligned to size of pointer)
        */
-      msg_size_t msg_size_bytes_ = 0;
+      message_queue::msg_size_t msg_size_bytes_ = 0;
       /**
        * @brief Max number of messages.
        */
-      size_t msgs_ = 0;
+      message_queue::size_t msgs_ = 0;
       /**
        * @brief Current number of messages in the queue.
        */
-      size_t count_ = 0;
+      message_queue::size_t count_ = 0;
 
 #if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
       /**
@@ -710,7 +711,7 @@ namespace os
          * @param [in] allocator Reference to allocator. Default a
          * local temporary instance.
          */
-        message_queue_allocated (size_t msgs, msg_size_t msg_size_bytes,
+        message_queue_allocated (std::size_t msgs, std::size_t msg_size_bytes,
                                  const Allocator& allocator = Allocator ());
 
         /**
@@ -721,8 +722,8 @@ namespace os
          * @param [in] allocator Reference to allocator. Default a
          * local temporary instance.
          */
-        message_queue_allocated (const char* name, size_t msgs,
-                                 msg_size_t msg_size_bytes,
+        message_queue_allocated (const char* name, std::size_t msgs,
+                                 std::size_t msg_size_bytes,
                                  const Allocator& allocator = Allocator ());
 
         /**
@@ -733,8 +734,8 @@ namespace os
          * @param [in] allocator Reference to allocator. Default a
          * local temporary instance.
          */
-        message_queue_allocated (const attributes& attr, size_t msgs,
-                                 msg_size_t msg_size_bytes,
+        message_queue_allocated (const attributes& attr, std::size_t msgs,
+                                 std::size_t msg_size_bytes,
                                  const Allocator& allocator = Allocator ());
 
         /**
@@ -747,7 +748,7 @@ namespace os
          * local temporary instance.
          */
         message_queue_allocated (const char* name, const attributes& attr,
-                                 size_t msgs, msg_size_t msg_size_bytes,
+                                 std::size_t msgs, std::size_t msg_size_bytes,
                                  const Allocator& allocator = Allocator ());
 
         /**
@@ -804,7 +805,7 @@ namespace os
          * @param [in] allocator Reference to allocator. Default a
          * local temporary instance.
          */
-        message_queue_typed (size_t msgs, const Allocator& allocator =
+        message_queue_typed (std::size_t msgs, const Allocator& allocator =
                                  Allocator ());
 
         /**
@@ -814,7 +815,7 @@ namespace os
          * @param [in] allocator Reference to allocator. Default a
          * local temporary instance.
          */
-        message_queue_typed (const char* name, size_t msgs,
+        message_queue_typed (const char* name, std::size_t msgs,
                              const Allocator& allocator = Allocator ());
 
         /**
@@ -824,8 +825,9 @@ namespace os
          * @param [in] allocator Reference to allocator. Default a
          * local temporary instance.
          */
-        message_queue_typed (const message_queue::attributes& attr, size_t msgs,
-                             const Allocator& allocator = Allocator ());
+        message_queue_typed (const message_queue::attributes& attr,
+                             std::size_t msgs, const Allocator& allocator =
+                                 Allocator ());
 
         /**
          * @brief Create a named typed message queue with custom settings.
@@ -836,8 +838,9 @@ namespace os
          * local temporary instance.
          */
         message_queue_typed (const char* name,
-                             const message_queue::attributes& attr, size_t msgs,
-                             const Allocator& allocator = Allocator ());
+                             const message_queue::attributes& attr,
+                             std::size_t msgs, const Allocator& allocator =
+                                 Allocator ());
 
         /**
          * @cond ignore
@@ -1322,7 +1325,8 @@ namespace os
     template<typename Allocator>
       inline
       message_queue_allocated<Allocator>::message_queue_allocated (
-          size_t msgs, msg_size_t msg_size_bytes, const Allocator& allocator) :
+          std::size_t msgs, std::size_t msg_size_bytes,
+          const Allocator& allocator) :
           message_queue_allocated
             { nullptr, msgs, msg_size_bytes, allocator }
       {
@@ -1350,7 +1354,7 @@ namespace os
      */
     template<typename Allocator>
       message_queue_allocated<Allocator>::message_queue_allocated (
-          const char* name, size_t msgs, msg_size_t msg_size_bytes,
+          const char* name, std::size_t msgs, std::size_t msg_size_bytes,
           const Allocator& allocator) :
           message_queue
             { name }
@@ -1408,7 +1412,7 @@ namespace os
     template<typename Allocator>
       inline
       message_queue_allocated<Allocator>::message_queue_allocated (
-          const attributes& attr, size_t msgs, msg_size_t msg_size_bytes,
+          const attributes& attr, std::size_t msgs, std::size_t msg_size_bytes,
           const Allocator& allocator) :
           message_queue_allocated
             { nullptr, attr, msgs, msg_size_bytes, allocator }
@@ -1444,8 +1448,8 @@ namespace os
      */
     template<typename Allocator>
       message_queue_allocated<Allocator>::message_queue_allocated (
-          const char* name, const attributes& attr, size_t msgs,
-          msg_size_t msg_size_bytes, const Allocator& allocator) :
+          const char* name, const attributes& attr, std::size_t msgs,
+          std::size_t msg_size_bytes, const Allocator& allocator) :
           message_queue
             { name, attr.name () }
       {
@@ -1543,7 +1547,7 @@ namespace os
     template<typename T, typename Allocator>
       inline
       message_queue_typed<T, Allocator>::message_queue_typed (
-          size_t msgs, const Allocator& allocator) :
+          std::size_t msgs, const Allocator& allocator) :
           message_queue_allocated<Allocator> (msgs, sizeof(value_type),
                                               allocator)
       {
@@ -1575,7 +1579,7 @@ namespace os
     template<typename T, typename Allocator>
       inline
       message_queue_typed<T, Allocator>::message_queue_typed (
-          const char* name, size_t msgs, const Allocator& allocator) :
+          const char* name, std::size_t msgs, const Allocator& allocator) :
           message_queue_allocated<Allocator> (name, msgs, sizeof(value_type),
                                               allocator)
       {
@@ -1614,7 +1618,7 @@ namespace os
     template<typename T, typename Allocator>
       inline
       message_queue_typed<T, Allocator>::message_queue_typed (
-          const message_queue::attributes& attr, size_t msgs,
+          const message_queue::attributes& attr, std::size_t msgs,
           const Allocator& allocator) :
           message_queue_allocated<Allocator>
             { attr, msgs, sizeof(value_type), allocator }
@@ -1654,8 +1658,8 @@ namespace os
     template<typename T, typename Allocator>
       inline
       message_queue_typed<T, Allocator>::message_queue_typed (
-          const char* name, const message_queue::attributes& attr, size_t msgs,
-          const Allocator& allocator) :
+          const char* name, const message_queue::attributes& attr,
+          std::size_t msgs, const Allocator& allocator) :
           message_queue_allocated<Allocator>
             { name, attr, msgs, sizeof(value_type), allocator }
       {

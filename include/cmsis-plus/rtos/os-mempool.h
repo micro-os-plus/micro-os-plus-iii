@@ -80,7 +80,8 @@ namespace os
        * @details
        * A constant numeric value used to validate the pool size.
        */
-      static constexpr size_t max_size = static_cast<size_t> (0 - 1);
+      static constexpr memory_pool::size_t max_size =
+          static_cast<memory_pool::size_t> (0 - 1);
 
       // ======================================================================
 
@@ -196,7 +197,7 @@ namespace os
        * @param [in] allocator Reference to allocator. Default a
        * local temporary instance.
        */
-      memory_pool (size_t blocks, size_t block_size_bytes,
+      memory_pool (std::size_t blocks, std::size_t block_size_bytes,
                    const Allocator& allocator = Allocator ());
 
       /**
@@ -207,8 +208,9 @@ namespace os
        * @param [in] allocator Reference to allocator. Default a
        * local temporary instance.
        */
-      memory_pool (const char* name, size_t blocks, size_t block_size_bytes,
-                   const Allocator& allocator = Allocator ());
+      memory_pool (const char* name, std::size_t blocks,
+                   std::size_t block_size_bytes, const Allocator& allocator =
+                       Allocator ());
 
       /**
        * @brief Create a memory pool with custom settings.
@@ -218,8 +220,8 @@ namespace os
        * @param [in] allocator Reference to allocator. Default a
        * local temporary instance.
        */
-      memory_pool (const attributes& attr, size_t blocks,
-                   size_t block_size_bytes, const Allocator& allocator =
+      memory_pool (const attributes& attr, std::size_t blocks,
+                   std::size_t block_size_bytes, const Allocator& allocator =
                        Allocator ());
       /**
        * @brief Create a named memory pool with custom settings.
@@ -230,8 +232,8 @@ namespace os
        * @param [in] allocator Reference to allocator. Default a
        * local temporary instance.
        */
-      memory_pool (const char* name, const attributes& attr, size_t blocks,
-                   size_t block_size_bytes, const Allocator& allocator =
+      memory_pool (const char* name, const attributes& attr, std::size_t blocks,
+                   std::size_t block_size_bytes, const Allocator& allocator =
                        Allocator ());
 
       /**
@@ -414,8 +416,8 @@ namespace os
        * @param [in] pool_size_bytes Size of queue storage.
        */
       void
-      _construct (const attributes& attr, size_t blocks,
-                  size_t block_size_bytes, void* pool_address,
+      _construct (const attributes& attr, std::size_t blocks,
+                  std::size_t block_size_bytes, void* pool_address,
                   std::size_t pool_size_bytes);
 
       /**
@@ -490,17 +492,17 @@ namespace os
       /**
        * @brief The number of blocks in the pool.
        */
-      size_t blocks_ = 0;
+      memory_pool::size_t blocks_ = 0;
 
       /**
        * @brief The size of a block, in bytes.
        */
-      size_t block_size_bytes_ = 0;
+      memory_pool::size_t block_size_bytes_ = 0;
 
       /**
        * @brief The current number of blocks allocated from the pool.
        */
-      volatile size_t count_ = 0;
+      volatile memory_pool::size_t count_ = 0;
 
       /**
        * @brief Pointer to the first free block, or nullptr.
@@ -538,7 +540,7 @@ namespace os
          * @param [in] allocator Reference to allocator. Default a
          * local temporary instance.
          */
-        memory_pool_allocated (size_t blocks, size_t block_size_bytes,
+        memory_pool_allocated (std::size_t blocks, std::size_t block_size_bytes,
                                const Allocator& allocator = Allocator ());
 
         /**
@@ -549,8 +551,8 @@ namespace os
          * @param [in] allocator Reference to allocator. Default a
          * local temporary instance.
          */
-        memory_pool_allocated (const char* name, size_t blocks,
-                               size_t block_size_bytes,
+        memory_pool_allocated (const char* name, std::size_t blocks,
+                               std::size_t block_size_bytes,
                                const Allocator& allocator = Allocator ());
 
         /**
@@ -561,8 +563,8 @@ namespace os
          * @param [in] allocator Reference to allocator. Default a
          * local temporary instance.
          */
-        memory_pool_allocated (const attributes& attr, size_t blocks,
-                               size_t block_size_bytes,
+        memory_pool_allocated (const attributes& attr, std::size_t blocks,
+                               std::size_t block_size_bytes,
                                const Allocator& allocator = Allocator ());
 
         /**
@@ -575,7 +577,7 @@ namespace os
          * local temporary instance.
          */
         memory_pool_allocated (const char* name, const attributes& attr,
-                               size_t blocks, size_t block_size_bytes,
+                               std::size_t blocks, std::size_t block_size_bytes,
                                const Allocator& allocator = Allocator ());
 
         /**
@@ -630,7 +632,7 @@ namespace os
          * @param [in] allocator Reference to allocator. Default a
          * local temporary instance.
          */
-        memory_pool_typed (size_t blocks, const Allocator& allocator =
+        memory_pool_typed (std::size_t blocks, const Allocator& allocator =
                                Allocator ());
 
         /**
@@ -640,7 +642,7 @@ namespace os
          * @param [in] allocator Reference to allocator. Default a
          * local temporary instance.
          */
-        memory_pool_typed (const char* name, size_t blocks,
+        memory_pool_typed (const char* name, std::size_t blocks,
                            const Allocator& allocator = Allocator ());
 
         /**
@@ -650,8 +652,9 @@ namespace os
          * @param [in] allocator Reference to allocator. Default a
          * local temporary instance.
          */
-        memory_pool_typed (const memory_pool::attributes& attr, size_t blocks,
-                           const Allocator& allocator = Allocator ());
+        memory_pool_typed (const memory_pool::attributes& attr,
+                           std::size_t blocks, const Allocator& allocator =
+                               Allocator ());
 
         /**
          * @brief Create a named memory pool with custom settings.
@@ -662,8 +665,9 @@ namespace os
          * local temporary instance.
          */
         memory_pool_typed (const char* name,
-                           const memory_pool::attributes& attr, size_t blocks,
-                           const Allocator& allocator = Allocator ());
+                           const memory_pool::attributes& attr,
+                           std::size_t blocks, const Allocator& allocator =
+                               Allocator ());
 
         /**
          * @cond ignore
@@ -966,7 +970,8 @@ namespace os
     template<typename Allocator>
       inline
       memory_pool_allocated<Allocator>::memory_pool_allocated (
-          size_t blocks, size_t block_size_bytes, const Allocator& allocator) :
+          std::size_t blocks, std::size_t block_size_bytes,
+          const Allocator& allocator) :
           memory_pool_allocated
             { nullptr, blocks, block_size_bytes, allocator }
       {
@@ -994,7 +999,7 @@ namespace os
 
     template<typename Allocator>
       memory_pool_allocated<Allocator>::memory_pool_allocated (
-          const char* name, size_t blocks, size_t block_size_bytes,
+          const char* name, std::size_t blocks, std::size_t block_size_bytes,
           const Allocator& allocator) :
           memory_pool
             { name }
@@ -1051,8 +1056,8 @@ namespace os
     template<typename Allocator>
       inline
       memory_pool_allocated<Allocator>::memory_pool_allocated (
-          const attributes& attr, size_t blocks, size_t block_size_bytes,
-          const Allocator& allocator) :
+          const attributes& attr, std::size_t blocks,
+          std::size_t block_size_bytes, const Allocator& allocator) :
           memory_pool_allocated
             { nullptr, attr, blocks, block_size_bytes, allocator }
       {
@@ -1086,8 +1091,8 @@ namespace os
      */
     template<typename Allocator>
       memory_pool_allocated<Allocator>::memory_pool_allocated (
-          const char* name, const attributes& attr, size_t blocks,
-          size_t block_size_bytes, const Allocator& allocator) :
+          const char* name, const attributes& attr, std::size_t blocks,
+          std::size_t block_size_bytes, const Allocator& allocator) :
           memory_pool
             { name, attr.name () }
       {
@@ -1184,7 +1189,7 @@ namespace os
     template<typename T, typename Allocator>
       inline
       memory_pool_typed<T, Allocator>::memory_pool_typed (
-          size_t blocks, const Allocator& allocator) :
+          std::size_t blocks, const Allocator& allocator) :
           memory_pool_allocated<Allocator> (blocks, sizeof(T), allocator)
       {
         ;
@@ -1214,7 +1219,7 @@ namespace os
     template<typename T, typename Allocator>
       inline
       memory_pool_typed<T, Allocator>::memory_pool_typed (
-          const char* name, size_t blocks, const Allocator& allocator) :
+          const char* name, std::size_t blocks, const Allocator& allocator) :
           memory_pool_allocated<Allocator> (name, blocks, sizeof(T), allocator)
       {
         ;
@@ -1251,7 +1256,7 @@ namespace os
     template<typename T, typename Allocator>
       inline
       memory_pool_typed<T, Allocator>::memory_pool_typed (
-          const memory_pool::attributes& attr, size_t blocks,
+          const memory_pool::attributes& attr, std::size_t blocks,
           const Allocator& allocator) :
           memory_pool_allocated<Allocator> (attr, blocks, sizeof(T), allocator)
       {
@@ -1289,8 +1294,8 @@ namespace os
     template<typename T, typename Allocator>
       inline
       memory_pool_typed<T, Allocator>::memory_pool_typed (
-          const char* name, const memory_pool::attributes& attr, size_t blocks,
-          const Allocator& allocator) :
+          const char* name, const memory_pool::attributes& attr,
+          std::size_t blocks, const Allocator& allocator) :
           memory_pool_allocated<Allocator> (name, attr, blocks, sizeof(T),
                                             allocator)
       {

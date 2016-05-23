@@ -379,7 +379,7 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    message_queue::message_queue (size_t msgs, msg_size_t msg_size_bytes,
+    message_queue::message_queue (std::size_t msgs, std::size_t msg_size_bytes,
                                   const Allocator& allocator) :
         message_queue
           { nullptr, msgs, msg_size_bytes, allocator }
@@ -406,8 +406,8 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    message_queue::message_queue (const char* name, size_t msgs,
-                                  msg_size_t msg_size_bytes,
+    message_queue::message_queue (const char* name, std::size_t msgs,
+                                  std::size_t msg_size_bytes,
                                   const Allocator& allocator) :
         named_object
           { name }
@@ -461,8 +461,8 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    message_queue::message_queue (const attributes& attr, size_t msgs,
-                                  msg_size_t msg_size_bytes,
+    message_queue::message_queue (const attributes& attr, std::size_t msgs,
+                                  std::size_t msg_size_bytes,
                                   const Allocator& allocator) :
         message_queue
           { nullptr, attr, msgs, msg_size_bytes, allocator }
@@ -497,7 +497,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     message_queue::message_queue (const char* name, const attributes& attr,
-                                  size_t msgs, msg_size_t msg_size_bytes,
+                                  std::size_t msgs, std::size_t msg_size_bytes,
                                   const Allocator& allocator) :
         named_object
           { name, attr.name () }
@@ -537,8 +537,8 @@ namespace os
     }
 
     void
-    message_queue::_construct (const attributes& attr, size_t msgs,
-                               msg_size_t msg_size_bytes, void* queue_address,
+    message_queue::_construct (const attributes& attr, std::size_t msgs,
+                               std::size_t msg_size_bytes, void* queue_address,
                                std::size_t queue_size_bytes)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
@@ -546,8 +546,13 @@ namespace os
 #if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
       clock_ = attr.clock != nullptr ? attr.clock : &sysclock;
 #endif
-      msg_size_bytes_ = msg_size_bytes;
-      msgs_ = msgs;
+      msg_size_bytes_ = static_cast<message_queue::msg_size_t> (msg_size_bytes);
+      assert(msg_size_bytes_ == msg_size_bytes);
+      assert(msg_size_bytes_ > 0);
+
+      msgs_ = static_cast<message_queue::size_t> (msgs);
+      assert(msgs_ == msgs);
+      assert(msgs > 0);
 
       // If the storage is given explicitly, override attributes.
       if (queue_address != nullptr)

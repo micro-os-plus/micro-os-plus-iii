@@ -289,7 +289,7 @@ namespace os
           if (n > max_size ())
             {
               estd::__throw_system_error (
-                  EINVAL, "polymorphic_allocator<T>::allocate(size_t n)"
+                  EINVAL, "polymorphic_allocator<T>::allocate(std::size_t n)"
                   " 'n' exceeds maximum supported size");
             }
 
