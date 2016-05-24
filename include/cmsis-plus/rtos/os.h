@@ -73,8 +73,6 @@
  * - event timestamps: add derived classes that capture the event timestamp
  * - add object type in base class
  * - add Wait_list in base class
- * - add libc/newlib errno() function
- * - add a separate Stack object
  *
  * Notes:
  * - the try_wait(), try_sig_wait() names are probably not very inspired,
