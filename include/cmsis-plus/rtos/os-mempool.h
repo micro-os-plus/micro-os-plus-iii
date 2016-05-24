@@ -147,7 +147,7 @@ namespace os
          */
         std::size_t mp_pool_size_bytes = 0;
 
-        // Add more attributes.
+        // Add more attributes here.
 
         /**
          * @}

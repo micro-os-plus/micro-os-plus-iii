@@ -143,7 +143,7 @@ namespace os
          */
         count_t sm_max_count = max_count_value;
 
-        // Add more attributes.
+        // Add more attributes here.
 
         /**
          * @}

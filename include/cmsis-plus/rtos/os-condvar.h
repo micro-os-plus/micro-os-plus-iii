@@ -106,7 +106,8 @@ namespace os
 
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
-        // Add more attributes.
+
+        // Add more attributes here.
         /**
          * @}
          */

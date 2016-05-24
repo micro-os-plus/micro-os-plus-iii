@@ -211,10 +211,7 @@ namespace os
          */
         count_t mx_max_count = max_count;
 
-        //
-        // TODO: add clock ID.
-        //
-        // Add more attributes.
+        // Add more attributes here.
 
         /**
          * @}

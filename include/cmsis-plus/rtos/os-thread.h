@@ -588,7 +588,7 @@ namespace os
          */
         priority_t th_priority = priority::normal;
 
-        // Add more attributes.
+        // Add more attributes here.
 
         /**
          * @}

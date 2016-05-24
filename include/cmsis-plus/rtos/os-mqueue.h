@@ -178,7 +178,7 @@ namespace os
          */
         std::size_t mq_queue_size_bytes = 0;
 
-        // Add more attributes.
+        // Add more attributes here.
 
         /**
          * @}
