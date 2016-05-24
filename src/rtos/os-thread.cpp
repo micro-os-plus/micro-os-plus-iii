@@ -576,7 +576,7 @@ namespace os
 
 #else
 
-      // TODO
+      // TODO: implement
 
 #endif
 
@@ -692,6 +692,8 @@ namespace os
           static_cast<Allocator*> (const_cast<void*> (allocator_))->deallocate (
               reinterpret_cast<pointer> (allocated_stack_address_),
               allocated_stack_size_elements_);
+
+          allocated_stack_address_ = nullptr;
         }
 
       sched_state_ = state::destroyed;
@@ -733,15 +735,11 @@ namespace os
               return result::ok; // Already exited itself
             }
 
-          if (sched_state_ == state::terminated)
-            {
-              // TODO remove thread from the funeral list and kill it here.
-            }
-
             {
               interrupts::critical_section ics; // ----- Critical section -----
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+              // Remove thread from the funeral list and kill it here.
               ready_node_.unlink ();
 #endif
 
@@ -765,22 +763,16 @@ namespace os
 
           assert(acquired_mutexes_ == 0);
 
-          delete[] allocated_stack_address_;
-
 #if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
           port::thread::destroy_other (this);
 
 #endif
 
-          sched_state_ = state::destroyed;
           func_result_ = nullptr;
 
-          // All funeral services completed, the thread is gone.
-          if (joiner_ != nullptr)
-            {
-              joiner_->resume ();
-            }
+          _destroy ();
+
           // ----- End of critical section -----
         }
 
