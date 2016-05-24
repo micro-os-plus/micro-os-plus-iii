@@ -108,6 +108,9 @@ extern "C"
 
   // --------------------------------------------------------------------------
 
+  os_thread_t*
+  os_this_thread (void);
+
   void
   os_this_thread_wait (void);
 
@@ -200,6 +203,21 @@ extern "C"
   os_clock_get_rtclock (void);
 
   // --------------------------------------------------------------------------
+
+  os_clock_timestamp_t
+  os_sysclock_now (void);
+
+  os_clock_timestamp_t
+  os_sysclock_steady_now (void);
+
+  os_result_t
+  os_sysclock_sleep_for (os_clock_duration_t timeout);
+
+  os_result_t
+  os_sysclock_sleep_until (os_clock_timestamp_t timestamp);
+
+  os_result_t
+  os_sysclock_wait_for (os_clock_duration_t timeout);
 
   os_clock_timestamp_t
   os_sysclock_now_details (os_sysclock_current_t* details);
@@ -423,27 +441,27 @@ extern "C"
   os_mqueue_get_name (os_mqueue_t* mqueue);
 
   os_result_t
-  os_mqueue_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
+  os_mqueue_send (os_mqueue_t* mqueue, const void* msg, size_t nbytes,
                   os_mqueue_prio_t mprio);
 
   os_result_t
-  os_mqueue_try_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
+  os_mqueue_try_send (os_mqueue_t* mqueue, const void* msg, size_t nbytes,
                       os_mqueue_prio_t mprio);
 
   os_result_t
-  os_mqueue_timed_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
+  os_mqueue_timed_send (os_mqueue_t* mqueue, const void* msg, size_t nbytes,
                         os_clock_duration_t timeout, os_mqueue_prio_t mprio);
 
   os_result_t
-  os_mqueue_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
+  os_mqueue_receive (os_mqueue_t* mqueue, void* msg, size_t nbytes,
                      os_mqueue_prio_t* mprio);
 
   os_result_t
-  os_mqueue_try_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
+  os_mqueue_try_receive (os_mqueue_t* mqueue, void* msg, size_t nbytes,
                          os_mqueue_prio_t* mprio);
 
   os_result_t
-  os_mqueue_timed_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
+  os_mqueue_timed_receive (os_mqueue_t* mqueue, void* msg, size_t nbytes,
                            os_clock_duration_t timeout,
                            os_mqueue_prio_t* mprio);
 
@@ -506,7 +524,7 @@ extern "C"
                   os_flags_mode_t mode);
 
   bool
-  os_evflags_get_waiting (os_evflags_t* evflags);
+  os_evflags_are_waiting (os_evflags_t* evflags);
 
   // --------------------------------------------------------------------------
 

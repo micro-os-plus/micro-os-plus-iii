@@ -185,6 +185,12 @@ os_irq_uncritical_exit (os_irq_status_t status)
 
 // ----------------------------------------------------------------------------
 
+os_thread_t*
+os_this_thread (void)
+{
+  return (os_thread_t*) &this_thread::thread ();
+}
+
 void
 os_this_thread_wait (void)
 {
@@ -382,6 +388,38 @@ os_clock_get_rtclock (void)
 
 // ----------------------------------------------------------------------------
 
+os_clock_timestamp_t
+os_sysclock_now (void)
+{
+  return (os_clock_timestamp_t) sysclock.now ();
+
+}
+
+os_clock_timestamp_t
+os_sysclock_steady_now (void)
+{
+  return (os_clock_timestamp_t) sysclock.steady_now ();
+}
+
+os_result_t
+os_sysclock_sleep_for (os_clock_duration_t timeout)
+{
+  return (os_result_t) sysclock.sleep_for (timeout);
+}
+
+os_result_t
+os_sysclock_sleep_until (os_clock_timestamp_t timestamp)
+{
+  return (os_result_t) sysclock.sleep_until (timestamp);
+}
+
+os_result_t
+os_sysclock_wait_for (os_clock_duration_t timeout)
+{
+  return (os_result_t) sysclock.wait_for (timeout);
+}
+
+// SysTick specific now() with details.
 os_clock_timestamp_t
 os_sysclock_now_details (os_sysclock_current_t* details)
 {
@@ -850,7 +888,7 @@ os_mqueue_get_name (os_mqueue_t* mqueue)
 }
 
 os_result_t
-os_mqueue_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
+os_mqueue_send (os_mqueue_t* mqueue, const void* msg, size_t nbytes,
                 os_mqueue_prio_t mprio)
 {
   assert(mqueue != nullptr);
@@ -859,7 +897,7 @@ os_mqueue_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
 }
 
 os_result_t
-os_mqueue_try_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
+os_mqueue_try_send (os_mqueue_t* mqueue, const void* msg, size_t nbytes,
                     os_mqueue_prio_t mprio)
 {
   assert(mqueue != nullptr);
@@ -868,7 +906,7 @@ os_mqueue_try_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
 }
 
 os_result_t
-os_mqueue_timed_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
+os_mqueue_timed_send (os_mqueue_t* mqueue, const void* msg, size_t nbytes,
                       os_clock_duration_t timeout, os_mqueue_prio_t mprio)
 {
   assert(mqueue != nullptr);
@@ -877,7 +915,7 @@ os_mqueue_timed_send (os_mqueue_t* mqueue, const char* msg, size_t nbytes,
 }
 
 os_result_t
-os_mqueue_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
+os_mqueue_receive (os_mqueue_t* mqueue, void* msg, size_t nbytes,
                    os_mqueue_prio_t* mprio)
 {
   assert(mqueue != nullptr);
@@ -886,7 +924,7 @@ os_mqueue_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
 }
 
 os_result_t
-os_mqueue_try_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
+os_mqueue_try_receive (os_mqueue_t* mqueue, void* msg, size_t nbytes,
                        os_mqueue_prio_t* mprio)
 {
   assert(mqueue != nullptr);
@@ -895,7 +933,7 @@ os_mqueue_try_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
 }
 
 os_result_t
-os_mqueue_timed_receive (os_mqueue_t* mqueue, char* msg, size_t nbytes,
+os_mqueue_timed_receive (os_mqueue_t* mqueue, void* msg, size_t nbytes,
                          os_clock_duration_t timeout, os_mqueue_prio_t* mprio)
 {
   assert(mqueue != nullptr);
@@ -1037,7 +1075,7 @@ os_evflags_get (os_evflags_t* evflags, os_flags_mask_t mask,
 }
 
 bool
-os_evflags_get_waiting (os_evflags_t* evflags)
+os_evflags_are_waiting (os_evflags_t* evflags)
 {
   assert(evflags != nullptr);
   return (reinterpret_cast<event_flags&> (*evflags)).waiting ();
