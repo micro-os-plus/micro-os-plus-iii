@@ -57,6 +57,9 @@ using namespace os::rtos;
 // Validate C structs sizes (should match the C++ objects sizes).
 // Validate offset of individual members (if needed, validate member size).
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Winvalid-offsetof"
+
 static_assert(sizeof(rtos::clock) == sizeof(os_clock_t), "adjust os_clock_t size");
 
 static_assert(sizeof(rtos::thread) == sizeof(os_thread_t), "adjust os_thread_t size");
@@ -94,6 +97,8 @@ static_assert(sizeof(rtos::message_queue) == sizeof(os_mqueue_t), "adjust size o
 static_assert(sizeof(rtos::message_queue::attributes) == sizeof(os_mqueue_attr_t), "adjust size of os_mqueue_attr_t");
 static_assert(offsetof(rtos::message_queue::attributes, mq_queue_address) == offsetof(os_mqueue_attr_t, mq_queue_addr), "adjust os_mqueue_attr_t members");
 static_assert(offsetof(rtos::message_queue::attributes, mq_queue_size_bytes) == offsetof(os_mqueue_attr_t, mq_queue_size_bytes), "adjust os_mqueue_attr_t members");
+
+#pragma GCC diagnostic pop
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wenum-compare"
