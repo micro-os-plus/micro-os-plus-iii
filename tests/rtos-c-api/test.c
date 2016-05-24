@@ -67,29 +67,42 @@ int
 run_tests (void)
 {
   const char* name;
+  bool flag;
 
   // ==========================================================================
 
   trace_printf ("\nScheduler.\n");
 
     {
-      assert(os_sched_is_started ());
+      flag = os_sched_is_started ();
+      assert(flag);
 
-      os_sched_status_t st;
-      st = os_sched_lock (true);
+      // ...
+        {
+          // Scheduler critical section
+          os_sched_status_t st;
+          st = os_sched_lock (true);
 
-      assert(os_sched_is_locked ());
+          // ...
+          flag = os_sched_is_locked ();
+          assert(flag);
 
-      os_sched_unlock (st);
+          // ...
+          os_sched_unlock (st);
+        }
 
-      assert(!os_sched_is_locked ());
+      // ...
+      flag = os_sched_is_locked ();
+      assert(!flag);
     }
 
     {
+      // Interrupts critical section
       os_irq_status_t st;
       st = os_irq_critical_enter ();
       // ...
         {
+          // Interrupts uncritical section
           os_irq_status_t st2;
           st2 = os_irq_uncritical_enter ();
           // ...
@@ -112,7 +125,7 @@ run_tests (void)
 
       os_sysclock_sleep_until (ts + 2);
 
-      // Return number of ticks since startup.
+      // Return the number of ticks since startup.
       ts = os_sysclock_steady_now ();
 
       // An event may resume the thread before the timeout expire.
@@ -124,7 +137,7 @@ run_tests (void)
   trace_printf ("\nThreads.\n");
 
     {
-      // Unnamed default thread.
+      // Unnamed default thread; stack dynamically allocated.
       os_thread_t th1;
       os_thread_create (&th1, NULL, func, NULL, NULL);
 
@@ -164,6 +177,20 @@ run_tests (void)
 
       // Restore main thread priority.
       os_thread_set_prio (os_this_thread (), os_priority_normal);
+    }
+
+  // ==========================================================================
+
+  trace_printf ("\nThread stack.\n");
+
+    {
+      size_t n;
+
+      n = os_thread_stack_get_default_size ();
+      os_thread_stack_set_default_size (n);
+
+      n = os_thread_stack_get_min_size ();
+      os_thread_stack_set_min_size (n);
     }
 
   // ==========================================================================
@@ -220,6 +247,7 @@ run_tests (void)
     }
 
     {
+      // Custom mutex, with RTC.
       os_mutex_attr_t amx2;
       os_mutex_attr_init (&amx2);
 
@@ -286,12 +314,17 @@ run_tests (void)
   my_blk_t* blk;
 
     {
-      // Simple pool.
+      // Simple pool, dynamically allocated.
       os_mempool_t p1;
       os_mempool_create (&p1, "p1", 3, sizeof(my_blk_t), NULL);
 
       blk = os_mempool_alloc (&p1);
+      os_mempool_free (&p1, blk);
 
+      blk = os_mempool_try_alloc (&p1);
+      os_mempool_free (&p1, blk);
+
+      blk = os_mempool_timed_alloc (&p1, 1);
       os_mempool_free (&p1, blk);
 
       os_mempool_destroy (&p1);
@@ -334,6 +367,7 @@ run_tests (void)
   // --------------------------------------------------------------------------
 
     {
+      // Simple queues, dynamically allocated.
       os_mqueue_t q1;
       os_mqueue_create (&q1, "q1", 3, sizeof(my_msg_t), NULL);
 
@@ -377,6 +411,7 @@ run_tests (void)
     }
 
     {
+      // Static queue.
       // TODO: add macro to compute size.
       static char queue[1000];
 
@@ -387,7 +422,7 @@ run_tests (void)
       aq2.clock = os_clock_get_rtclock ();
 
       os_mqueue_t q2;
-      os_mqueue_create (&q2, "q2", 3, sizeof(my_msg_t), NULL);
+      os_mqueue_create (&q2, "q2", 3, sizeof(my_msg_t), &aq2);
 
       os_mqueue_send (&q2, &msg_out, sizeof(msg_out), 0);
 

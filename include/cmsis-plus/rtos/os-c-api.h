@@ -178,6 +178,20 @@ extern "C"
 
   // --------------------------------------------------------------------------
 
+  size_t
+  os_thread_stack_get_default_size (void);
+
+  size_t
+  os_thread_stack_set_default_size (size_t size_bytes);
+
+  size_t
+  os_thread_stack_get_min_size (void);
+
+  size_t
+  os_thread_stack_set_min_size (size_t size_bytes);
+
+  // --------------------------------------------------------------------------
+
   const char*
   os_clock_name (os_clock_t* clock);
 

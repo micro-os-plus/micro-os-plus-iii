@@ -329,6 +329,32 @@ os_thread_sig_get (os_thread_t* thread, os_thread_sigset_t mask,
 
 // ----------------------------------------------------------------------------
 
+std::size_t
+os_thread_stack_get_default_size (void)
+{
+  return thread::stack::default_size ();
+}
+
+std::size_t
+os_thread_stack_set_default_size (std::size_t size_bytes)
+{
+  return thread::stack::default_size (size_bytes);
+}
+
+std::size_t
+os_thread_stack_get_min_size (void)
+{
+  return thread::stack::min_size ();
+}
+
+std::size_t
+os_thread_stack_set_min_size (std::size_t size_bytes)
+{
+  return thread::stack::min_size (size_bytes);
+}
+
+// ----------------------------------------------------------------------------
+
 const char*
 os_clock_name (os_clock_t* clock)
 {

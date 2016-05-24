@@ -375,9 +375,9 @@ namespace os
         /**
          * @brief Set the min stack size.
          * @param [in] size_bytes Minimum stack size in bytes.
-         * @return Nothing.
+         * @return  The previous value of the min stack size in bytes.
          */
-        static void
+        static std::size_t
         min_size (std::size_t size_bytes);
 
         /**
@@ -392,9 +392,9 @@ namespace os
         /**
          * @brief Set the default stack size.
          * @param [in] size_bytes Default stack size in bytes.
-         * @return Nothing.
+         * @return  The previous value of the default stack size in bytes.
          */
-        static void
+        static std::size_t
         default_size (std::size_t size_bytes);
 
         /**
@@ -1643,10 +1643,12 @@ namespace os
       return min_size_bytes_;
     }
 
-    inline void
+    inline std::size_t
     thread::stack::min_size (std::size_t size_bytes)
     {
+      std::size_t tmp = min_size_bytes_;
       min_size_bytes_ = size_bytes;
+      return tmp;
     }
 
     inline std::size_t
@@ -1655,13 +1657,15 @@ namespace os
       return default_size_bytes_;
     }
 
-    inline void
+    inline std::size_t
     thread::stack::default_size (std::size_t size_bytes)
     {
       assert(size_bytes != 0);
       assert(size_bytes >= min_size_bytes_);
 
+      std::size_t tmp = default_size_bytes_;
       default_size_bytes_ = size_bytes;
+      return tmp;
     }
 
     // ========================================================================
