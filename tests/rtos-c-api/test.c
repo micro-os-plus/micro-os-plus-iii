@@ -131,13 +131,17 @@ run_tests (void)
       name = os_thread_get_name (&th1);
 
       os_this_thread_join (&th1, NULL);
+    }
 
+    {
       // Named default threads.
       os_thread_t th2;
       os_thread_create (&th2, "th2", func, NULL, NULL);
 
       os_this_thread_join (&th2, NULL);
+    }
 
+    {
       // Custom thread with static stack and lower priority.
       static char stack[2 * OS_INTEGER_RTOS_DEFAULT_STACK_SIZE_BYTES];
 
@@ -151,7 +155,7 @@ run_tests (void)
       os_thread_create (&th3, "th3", func, NULL, &ath3);
 
       os_thread_prio_t prio;
-      prio = os_thread_get_prio (&th1);
+      prio = os_thread_get_prio (&th3);
 
       // Lower main thread priority to allow task to run.
       os_thread_set_prio (os_this_thread (), os_priority_below_normal);
@@ -309,6 +313,8 @@ run_tests (void)
       blk = os_mempool_alloc (&p2);
 
       os_mempool_free (&p2, blk);
+
+      os_mempool_reset (&p2);
 
       os_mempool_destroy (&p2);
     }
