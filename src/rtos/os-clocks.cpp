@@ -453,7 +453,7 @@ namespace os
 
 #if !defined(OS_INCLUDE_RTOS_REALTIME_CLOCK_DRIVER)
 
-      // TODO: simulate an RTC driver.
+      // Simulate an RTC driver.
       static uint32_t ticks = clock_systick::frequency_hz;
 
       if (--ticks == 0)
