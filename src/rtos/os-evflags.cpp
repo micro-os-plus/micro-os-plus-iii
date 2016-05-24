@@ -548,8 +548,6 @@ namespace os
     result_t
     event_flags::clear (flags::mask_t mask, flags::mask_t* oflags)
     {
-      os_assert_err(mask != 0, EINVAL);
-
 #if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s() @%p %s 0x%X \n", __func__, this, name (), mask);
 #endif
@@ -567,8 +565,16 @@ namespace os
           *oflags = flags_;
         }
 
-      // Clear the selected bits; leave the rest untouched.
-      flags_ &= ~mask;
+      if (mask == 0)
+        {
+          // Clear all flags.
+          flags_ = 0;
+        }
+      else
+        {
+          // Clear the selected bits; leave the rest untouched.
+          flags_ &= ~mask;
+        }
 
       return result::ok;
 

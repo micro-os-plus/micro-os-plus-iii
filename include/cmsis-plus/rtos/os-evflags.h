@@ -109,7 +109,6 @@ namespace os
 
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
-
         // Add more attributes here.
         /**
          * @}
@@ -257,7 +256,7 @@ namespace os
 
       /**
        * @brief Clear event flags.
-       * @param [in] mask The OR-ed flags to clear.
+       * @param [in] mask The OR-ed flags to clear. Zero means 'all'.
        * @param [out] oflags Optional pointer where to store the
        *  previous value of the flags; may be `nullptr`.
        * @retval result::ok The flags were cleared.

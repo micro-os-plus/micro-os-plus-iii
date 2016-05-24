@@ -858,7 +858,6 @@ namespace os
     thread::sig_clear (sigset_t mask, sigset_t* oflags)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
-      os_assert_err(mask != 0, EINVAL);
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
@@ -871,8 +870,16 @@ namespace os
           *oflags = sig_mask_;
         }
 
-      // Clear the selected bits; leave the rest untouched.
-      sig_mask_ &= ~mask;
+      if (mask == 0)
+        {
+          // Clear all flags.
+          sig_mask_ = 0;
+        }
+      else
+        {
+          // Clear the selected bits; leave the rest untouched.
+          sig_mask_ &= ~mask;
+        }
 
       return result::ok;
     }

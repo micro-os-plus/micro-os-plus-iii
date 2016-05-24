@@ -814,7 +814,7 @@ namespace os
        * @brief Clear thread signal flags.
        * @param [out] oflags Optional pointer where to store the
        *  previous flags; may be `nullptr`.
-       * @param [in] mask The OR-ed flags to clear.
+       * @param [in] mask The OR-ed flags to clear. Zero means 'all'
        * @retval result::ok The flags were cleared.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINVAL The mask is zero.
