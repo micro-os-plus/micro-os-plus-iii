@@ -42,6 +42,7 @@
 #include <cassert>
 #include <cerrno>
 #include <cstring>
+#include <cstddef>
 #include <new>
 
 // #include <cstdio>
@@ -54,30 +55,45 @@ using namespace os::rtos;
 // ----------------------------------------------------------------------------
 
 // Validate C structs sizes (should match the C++ objects sizes).
-// TODO: validate individual members (size & offset).
+// Validate offset of individual members (if needed, validate member size).
 
 static_assert(sizeof(rtos::clock) == sizeof(os_clock_t), "adjust os_clock_t size");
 
 static_assert(sizeof(rtos::thread) == sizeof(os_thread_t), "adjust os_thread_t size");
 static_assert(sizeof(rtos::thread::attributes) == sizeof(os_thread_attr_t), "adjust os_thread_attr_t size");
+static_assert(offsetof(rtos::thread::attributes, th_stack_address) == offsetof(os_thread_attr_t, th_stack_address), "adjust os_thread_attr_t members");
+static_assert(offsetof(rtos::thread::attributes, th_stack_size_bytes) == offsetof(os_thread_attr_t, th_stack_size_bytes), "adjust os_thread_attr_t members");
+static_assert(offsetof(rtos::thread::attributes, th_priority) == offsetof(os_thread_attr_t, th_priority), "adjust os_thread_attr_t members");
 
 static_assert(sizeof(rtos::timer) == sizeof(os_timer_t), "adjust size of os_timer_t");
 static_assert(sizeof(rtos::timer::attributes) == sizeof(os_timer_attr_t), "adjust size of os_timer_attr_t");
+static_assert(offsetof(rtos::timer::attributes, tm_type) == offsetof(os_timer_attr_t, tm_type), "adjust os_timer_attr_t members");
 
 static_assert(sizeof(rtos::mutex) == sizeof(os_mutex_t), "adjust size of os_mutex_t");
 static_assert(sizeof(rtos::mutex::attributes) == sizeof(os_mutex_attr_t), "adjust size of os_mutex_attr_t");
+static_assert(offsetof(rtos::mutex::attributes, mx_priority_ceiling) == offsetof(os_mutex_attr_t, mx_priority_ceiling), "adjust os_mutex_attr_t members");
+static_assert(offsetof(rtos::mutex::attributes, mx_protocol) == offsetof(os_mutex_attr_t, mx_protocol), "adjust os_mutex_attr_t members");
+static_assert(offsetof(rtos::mutex::attributes, mx_robustness) == offsetof(os_mutex_attr_t, mx_robustness), "adjust os_mutex_attr_t members");
+static_assert(offsetof(rtos::mutex::attributes, mx_type) == offsetof(os_mutex_attr_t, mx_type), "adjust os_mutex_attr_t members");
+static_assert(offsetof(rtos::mutex::attributes, mx_max_count) == offsetof(os_mutex_attr_t, mx_max_count), "adjust os_mutex_attr_t members");
 
 static_assert(sizeof(rtos::condition_variable) == sizeof(os_condvar_t), "adjust size of os_condvar_t");
 static_assert(sizeof(rtos::condition_variable::attributes) == sizeof(os_condvar_attr_t), "adjust size of os_condvar_attr_t");
 
 static_assert(sizeof(rtos::semaphore) == sizeof(os_semaphore_t), "adjust size of os_semaphore_t");
 static_assert(sizeof(rtos::semaphore::attributes) == sizeof(os_semaphore_attr_t), "adjust size of os_semaphore_attr_t");
+static_assert(offsetof(rtos::semaphore::attributes, sm_initial_count) == offsetof(os_semaphore_attr_t, sm_initial_count), "adjust os_semaphore_attr_t members");
+static_assert(offsetof(rtos::semaphore::attributes, sm_max_count) == offsetof(os_semaphore_attr_t, sm_max_count), "adjust os_semaphore_attr_t members");
 
 static_assert(sizeof(rtos::memory_pool) == sizeof(os_mempool_t), "adjust size of os_mempool_t");
 static_assert(sizeof(rtos::memory_pool::attributes) == sizeof(os_mempool_attr_t), "adjust size of os_mempool_attr_t");
+static_assert(offsetof(rtos::memory_pool::attributes, mp_pool_address) == offsetof(os_mempool_attr_t, mp_pool_address), "adjust os_mempool_attr_t members");
+static_assert(offsetof(rtos::memory_pool::attributes, mp_pool_size_bytes) == offsetof(os_mempool_attr_t, mp_pool_size_bytes), "adjust os_mempool_attr_t members");
 
 static_assert(sizeof(rtos::message_queue) == sizeof(os_mqueue_t), "adjust size of os_mqueue_t");
 static_assert(sizeof(rtos::message_queue::attributes) == sizeof(os_mqueue_attr_t), "adjust size of os_mqueue_attr_t");
+static_assert(offsetof(rtos::message_queue::attributes, mq_queue_address) == offsetof(os_mqueue_attr_t, mq_queue_addr), "adjust os_mqueue_attr_t members");
+static_assert(offsetof(rtos::message_queue::attributes, mq_queue_size_bytes) == offsetof(os_mqueue_attr_t, mq_queue_size_bytes), "adjust os_mqueue_attr_t members");
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wenum-compare"
