@@ -44,6 +44,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <new>
+#include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/iso/malloc.h>
 
 const std::nothrow_t std::nothrow = std::nothrow_t
@@ -72,7 +73,9 @@ std::set_new_handler (new_handler handler) noexcept
 {
   new_handler prev_handler;
 
-  // TODO: add scheduler lock
+  // Use scheduler lock to synchronise access to the handler.
+  os::rtos::scheduler::critical_section scs;
+
   prev_handler = __new_handler;
   __new_handler = handler;
 
@@ -84,7 +87,9 @@ std::get_new_handler () noexcept
 {
   new_handler handler;
 
-  // TODO: add scheduler lock
+  // Use scheduler lock to synchronise access to the handler.
+  os::rtos::scheduler::critical_section scs;
+
   handler = __new_handler;
 
   return handler;
