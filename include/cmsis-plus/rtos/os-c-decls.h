@@ -85,6 +85,13 @@ extern "C"
   typedef uint32_t os_flags_mode_t;
   typedef uint32_t os_flags_mask_t;
 
+  enum
+  {
+    os_flags_mode_all = 1, //
+    os_flags_mode_any = 2, //
+    os_flags_mode_clear = 4, //
+  };
+
   typedef struct os_clock_timestamps_list_s
   {
     os_double_list_links_t links;
