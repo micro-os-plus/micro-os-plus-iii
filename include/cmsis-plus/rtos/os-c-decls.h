@@ -450,8 +450,8 @@ extern "C"
   typedef struct os_mqueue_attr_s
   {
     void* clock;
-    void* queue_addr;
-    size_t queue_size_bytes;
+    void* mq_queue_addr;
+    size_t mq_queue_size_bytes;
   } os_mqueue_attr_t;
 
   typedef struct os_mqueue_s
