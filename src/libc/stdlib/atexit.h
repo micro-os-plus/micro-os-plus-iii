@@ -31,21 +31,30 @@
  *  Common definitions for atexit-like routines
  */
 
-enum __atexit_types
+#if defined(__cplusplus)
+extern "C"
 {
-  __et_atexit, //
-  __et_onexit, //
-  __et_cxa
-};
+#endif
 
-extern void
-__call_exitprocs (int, void*);
+  enum __atexit_types
+  {
+    __et_atexit, //
+    __et_onexit, //
+    __et_cxa
+  };
 
-typedef void
-(*exit_func_t) (void);
+  extern void
+  __call_exitprocs (int, void*);
 
-extern int
-__register_exitproc (int, exit_func_t fn, void*, void*);
+  typedef void
+  (*exit_func_t) (void);
 
-extern void
-os_run_fini_array (void);
+  extern int
+  __register_exitproc (int, exit_func_t fn, void*, void*);
+
+  extern void
+  os_run_fini_array (void);
+
+#if defined(__cplusplus)
+}
+#endif
