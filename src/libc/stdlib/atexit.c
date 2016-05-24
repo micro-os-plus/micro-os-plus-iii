@@ -27,6 +27,7 @@
 
 #if defined(__ARM_EABI__)
 
+#include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/diag/trace.h>
 
 #include <stdlib.h>
@@ -124,7 +125,9 @@ __register_exitproc (int type, exit_func_t fn,
     }
 #endif
 
-  // TODO: use scheduler lock to snchronise access to array.
+  // Use scheduler lock to synchronise access to the array.
+  os::rtos::scheduler::critical_section scs;
+
   __atexit_functions[__atexit_count++] = fn;
   return 0;
 }
