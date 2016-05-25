@@ -55,7 +55,7 @@ EXTRACT_ANON_NSPACES = YES
 INPUT = \
 	"pages" \
 	"../include/cmsis-plus/" \
-	"../src/cmsis-plus/" \
+	"../src/" \
 	"../include/cmsis-plus/iso/chrono" \
 	"../include/cmsis-plus/iso/condition_variable" \
 	"../include/cmsis-plus/iso/mutex" \
