@@ -41,17 +41,36 @@
 
 
 /**
- @defgroup cmsis-plus-rtos CMSIS++ RTOS API
- @brief  CMSIS++ RTOS API summary page.
+ @defgroup cmsis-plus-rtos CMSIS++ RTOS C++ API
+ @brief  CMSIS++ RTOS C++ API summary page.
  @details
- This page groups the main CMSIS++ RTOS API classes and namespaces. 
+ The C++ API is the main interface to the CMSIS++ RTOS, and is the native
+ interface used for the implementation.
+
+ The API is composed of a series of classes, subclasses, types and  
+ several namespaces.
+
+ To use the C++ API, include the `<cmsis-plus/rtos/os.h>` header.
+
+ */
+
+/**
+ @defgroup cmsis-plus-rtos-c CMSIS++ RTOS C API
+ @brief  CMSIS++ RTOS C API summary page.
+ @details
+ The C API maps most of the basic C++ functionality to C programmers.
+ Usually the overhead is minimal, one function call. The object pointer
+ is passsed as the first parameter. The names are prefixed with a unique
+ string inspired by the namespace qualifier.
+
+ To use the C API, include the `<cmsis-plus/rtos/os-c-api.h>` header.
  */
 
 /**
  @defgroup cmsis-plus-iso CMSIS++ ISO Standard Threads
  @brief  CMSIS++ ISO Threads summary page.
  @details
-This page groups the main CMSIS++ ISO Threads classes and namespaces.
+ This page groups the main CMSIS++ ISO Threads classes and namespaces.
 
  @par Standards
  These definitions provide implementations for the classes defined in 
