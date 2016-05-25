@@ -47,53 +47,58 @@
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/iso/malloc.h>
 
-const std::nothrow_t std::nothrow = std::nothrow_t
-  { };
-
-using std::new_handler;
 namespace
 {
   /**
    * @brief The current new handler.
    * @details
+   * The initial new_handler is a null pointer, initialised as
+   * part of the .bss section.
+   */
+  std::new_handler __new_handler;
+}
+
+namespace std
+{
+
+  const nothrow_t nothrow = nothrow_t
+    { };
+
+  /**
+   * @brief Establishes the function designated by handler as the current new_handler.
+   * @param handler
+   * @return The previous handler.
+   * @details
    * The initial new_handler is a null pointer.
    */
-  new_handler __new_handler;
-}
+  new_handler
+  set_new_handler (new_handler handler) noexcept
+  {
+    new_handler prev_handler;
 
-/**
- * @brief Establishes the function designated by handler as the current new_handler.
- * @param handler
- * @return The previous handler.
- * @details
- * The initial new_handler is a null pointer.
- */
-new_handler
-std::set_new_handler (new_handler handler) noexcept
-{
-  new_handler prev_handler;
+    // Use scheduler lock to synchronise access to the handler.
+    os::rtos::scheduler::critical_section scs;
 
-  // Use scheduler lock to synchronise access to the handler.
-  os::rtos::scheduler::critical_section scs;
+    prev_handler = __new_handler;
+    __new_handler = handler;
 
-  prev_handler = __new_handler;
-  __new_handler = handler;
+    return prev_handler;
+  }
 
-  return prev_handler;
-}
+  new_handler
+  get_new_handler () noexcept
+  {
+    new_handler handler;
 
-new_handler
-std::get_new_handler () noexcept
-{
-  new_handler handler;
+    // Use scheduler lock to synchronise access to the handler.
+    os::rtos::scheduler::critical_section scs;
 
-  // Use scheduler lock to synchronise access to the handler.
-  os::rtos::scheduler::critical_section scs;
+    handler = __new_handler;
 
-  handler = __new_handler;
+    return handler;
+  }
 
-  return handler;
-}
+} /* namespace std */
 
 /**
  * @details
