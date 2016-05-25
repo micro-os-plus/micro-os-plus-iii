@@ -60,7 +60,7 @@ namespace os
     public:
 
       /**
-       * @brief Type of semaphore counter.
+       * @brief Type of semaphore counter storage.
        * @details
        * A numeric value enough to hold the semaphore counter,
        * usually a 16-bits signed value.
@@ -77,7 +77,7 @@ namespace os
       // ======================================================================
 
       /**
-       * @brief %Semaphore attributes.
+       * @brief Semaphore attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
       class attributes : public clocked_attributes
@@ -90,7 +90,7 @@ namespace os
          */
 
         /**
-         * @brief Create semaphore attributes.
+         * @brief Create a semaphore attributes object.
          * @par Parameters
          *  None
          */
@@ -100,29 +100,33 @@ namespace os
         /**
          * @cond ignore
          */
+
+      protected:
+
+        constexpr
+        attributes (count_t max_count);
+
+      public:
+
         attributes (const attributes&) = default;
         attributes (attributes&&) = default;
         attributes&
         operator= (const attributes&) = default;
         attributes&
         operator= (attributes&&) = default;
+
         /**
          * @endcond
          */
 
         /**
-         * @brief Destroy semaphore attributes.
+         * @brief Destroy the semaphore attributes object.
          */
         ~attributes () = default;
 
         /**
          * @}
          */
-
-      protected:
-
-        constexpr
-        attributes (count_t max_count);
 
       public:
 
@@ -134,12 +138,12 @@ namespace os
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
         /**
-         * @brief %Semaphore initial count.
+         * @brief Semaphore initial count.
          */
         count_t sm_initial_count = 0;
 
         /**
-         * @brief %Semaphore max count.
+         * @brief Semaphore max count.
          */
         count_t sm_max_count = max_count_value;
 
@@ -148,6 +152,7 @@ namespace os
         /**
          * @}
          */
+
       }; /* class attributes */
 
       /**
@@ -171,7 +176,7 @@ namespace os
          */
 
         /**
-         * @brief Create binary semaphore attributes.
+         * @brief Create a binary semaphore attributes object.
          * @par Parameters
          *  None
          */
@@ -181,24 +186,27 @@ namespace os
         /**
          * @cond ignore
          */
+
         binary_attributes (const binary_attributes&) = default;
         binary_attributes (binary_attributes&&) = default;
         binary_attributes&
         operator= (const binary_attributes&) = default;
         binary_attributes&
         operator= (binary_attributes&&) = default;
+
         /**
          * @endcond
          */
 
         /**
-         * @brief Destroy semaphore attributes.
+         * @brief Destroy the semaphore attributes object.
          */
         ~binary_attributes () = default;
 
         /**
          * @}
          */
+
       }; /* class binary_attributes */
 
       /**
@@ -212,33 +220,36 @@ namespace os
        */
 
       /**
-       * @brief Create a semaphore.
+       * @brief Create a semaphore object.
        * @param [in] attr Reference to attributes.
        */
-      semaphore (const attributes& attr);
+      semaphore (const attributes& attr = counting_initializer);
 
       /**
-       * @brief Create a named semaphore.
+       * @brief Create a named semaphore object.
        * @param [in] name Pointer to name.
        * @param [in] attr Reference to attributes.
        */
-      semaphore (const char* name, const attributes& attr);
+      semaphore (const char* name,
+                 const attributes& attr = counting_initializer);
 
       /**
        * @cond ignore
        */
+
       semaphore (const semaphore&) = delete;
       semaphore (semaphore&&) = delete;
       semaphore&
       operator= (const semaphore&) = delete;
       semaphore&
       operator= (semaphore&&) = delete;
+
       /**
        * @endcond
        */
 
       /**
-       * @brief Destroy the semaphore.
+       * @brief Destroy the semaphore object.
        */
       ~semaphore ();
 
@@ -377,6 +388,10 @@ namespace os
        */
 
       /**
+       * @cond ignore
+       */
+
+      /**
        * @brief Internal initialisation.
        * @par Parameters
        *  None
@@ -388,6 +403,10 @@ namespace os
       _try_wait (void);
 
       /**
+       * @endcond
+       */
+
+      /**
        * @}
        */
 
@@ -396,6 +415,10 @@ namespace os
       /**
        * @name Private Member Variables
        * @{
+       */
+
+      /**
+       * @cond ignore
        */
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
@@ -419,8 +442,13 @@ namespace os
       // Add more internal data.
 
       /**
+       * @endcond
+       */
+
+      /**
        * @}
        */
+
     };
 
 #pragma GCC diagnostic pop

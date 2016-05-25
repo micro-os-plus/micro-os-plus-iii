@@ -42,7 +42,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     /**
-     * @class attributes
+     * @class event_flags::attributes
      * @details
      * Allow to assign a name to the event flags.
      *
@@ -52,6 +52,10 @@ namespace os
      *  (IEEE Std 1003.1, 2013 Edition).
      */
 
+    /**
+     * @details
+     * This variable is used by the default constructor.
+     */
     const event_flags::attributes event_flags::initializer;
 
     // ------------------------------------------------------------------------
@@ -208,6 +212,10 @@ namespace os
 #endif
     }
 
+    /**
+     * @cond ignore
+     */
+
     bool
     event_flags::_try_wait (flags::mask_t mask, flags::mask_t* oflags,
                             flags::mode_t mode)
@@ -244,6 +252,10 @@ namespace os
 
       return false;
     }
+
+    /**
+     * @endcond
+     */
 
     /**
      * @details
@@ -645,7 +657,7 @@ namespace os
 #endif
     }
 
-// --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
   } /* namespace rtos */
 } /* namespace os */

@@ -45,7 +45,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     /**
-     * @class attributes
+     * @class message_queue::attributes
      * @details
      * Allow to assign a name and custom attributes (like a static
      * address) to the message queue.
@@ -60,7 +60,7 @@ namespace os
      */
 
     /**
-     * @var void* attributes::mq_queue_address
+     * @var void* message_queue::attributes::mq_queue_address
      * @details
      * Set this variable to a user defined memory area large enough
      * to store the message queue. Usually this is a statically
@@ -71,7 +71,7 @@ namespace os
      */
 
     /**
-     * @var std::size_t attributes::mq_queue_size_bytes
+     * @var std::size_t message_queue::attributes::mq_queue_size_bytes
      * @details
      * The message queue size must match exactly the allocated size. It is
      * used for validation; when the message queue is initialised,
@@ -82,6 +82,10 @@ namespace os
      * checked, but it is recommended to leave it zero.
      */
 
+    /**
+     * @details
+     * This variable is used by the default constructor.
+     */
     const message_queue::attributes message_queue::initializer;
 
     // ------------------------------------------------------------------------
@@ -333,6 +337,10 @@ namespace os
      */
 
     // ------------------------------------------------------------------------
+    /**
+     * @cond ignore
+     */
+
     // Protected internal constructor.
     message_queue::message_queue ()
     {
@@ -349,6 +357,10 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
     }
+
+    /**
+     * @endcond
+     */
 
     /**
      * @details
@@ -426,7 +438,7 @@ namespace os
       if (attr.mq_queue_address != nullptr)
         {
           // Do not use any allocator at all.
-          _construct (attr, msgs, msg_size_bytes, nullptr, 0);
+          _construct (msgs, msg_size_bytes, attr, nullptr, 0);
         }
       else
         {
@@ -443,18 +455,63 @@ namespace os
               allocated_queue_size_elements_);
 
           _construct (
-              attr,
               msgs,
               msg_size_bytes,
+              attr,
               allocated_queue_addr_,
               allocated_queue_size_elements_
                   * sizeof(typename Allocator::value_type));
         }
     }
 
+    /**
+     * @details
+     * This destructor shall destroy the message queue object; the object
+     * becomes, in effect, uninitialised. An implementation may cause
+     * the destructor to set the object to an invalid value.
+     *
+     * It shall be safe to destroy an initialised message queue object
+     * upon which no threads are currently blocked. Attempting to
+     * destroy a message queue object upon which other threads are
+     * currently blocked results in undefined behaviour.
+     *
+     * If the storage for the message queue was dynamically allocated,
+     * it is deallocated using the same allocator.
+     */
+    message_queue::~message_queue ()
+    {
+#if defined(OS_TRACE_RTOS_MQUEUE)
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
+
+#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+
+      port::message_queue::destroy (this);
+
+#else
+
+      assert(send_list_.empty ());
+      assert(receive_list_.empty ());
+
+      if (allocated_queue_addr_ != nullptr)
+        {
+          typedef typename std::allocator_traits<Allocator>::pointer pointer;
+
+          static_cast<Allocator*> (const_cast<void*> (allocator_))->deallocate (
+              reinterpret_cast<pointer> (allocated_queue_addr_),
+              allocated_queue_size_elements_);
+        }
+
+#endif
+    }
+
+    /**
+     * @cond ignore
+     */
+
     void
-    message_queue::_construct (const attributes& attr, std::size_t msgs,
-                               std::size_t msg_size_bytes, void* queue_address,
+    message_queue::_construct (std::size_t msgs, std::size_t msg_size_bytes,
+                               const attributes& attr, void* queue_address,
                                std::size_t queue_size_bytes)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
@@ -543,47 +600,6 @@ namespace os
 #endif
 
       _init ();
-#endif
-    }
-
-    /**
-     * @details
-     * This destructor shall destroy the message queue object; the object
-     * becomes, in effect, uninitialised. An implementation may cause
-     * the destructor to set the object to an invalid value.
-     *
-     * It shall be safe to destroy an initialised message queue object
-     * upon which no threads are currently blocked. Attempting to
-     * destroy a message queue object upon which other threads are
-     * currently blocked results in undefined behaviour.
-     *
-     * If the storage for the message queue was dynamically allocated,
-     * it is deallocated using the same allocator.
-     */
-    message_queue::~message_queue ()
-    {
-#if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s() @%p %s\n", __func__, this, name ());
-#endif
-
-#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
-
-      port::message_queue::destroy (this);
-
-#else
-
-      assert(send_list_.empty ());
-      assert(receive_list_.empty ());
-
-      if (allocated_queue_addr_ != nullptr)
-        {
-          typedef typename std::allocator_traits<Allocator>::pointer pointer;
-
-          static_cast<Allocator*> (const_cast<void*> (allocator_))->deallocate (
-              reinterpret_cast<pointer> (allocated_queue_addr_),
-              allocated_queue_size_elements_);
-        }
-
 #endif
     }
 
@@ -723,6 +739,79 @@ namespace os
     }
 
 #endif /* !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE) */
+
+#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+
+    bool
+    message_queue::_try_receive (void* msg, std::size_t nbytes,
+                                 priority_t* mprio)
+    {
+
+      if (head_ == no_index)
+        {
+          return false;
+        }
+
+      char* src = static_cast<char*> (queue_addr_) + head_ * msg_size_bytes_;
+#if defined(OS_TRACE_RTOS_MQUEUE_)
+      trace::printf ("%s(%p,%d) @%p %s src %p %p\n", __func__, msg, nbytes,
+          this, name (), src, first_free_);
+#endif
+
+        {
+          // ----- Enter uncritical section -----
+          interrupts::uncritical_section iucs;
+
+          // Copy message from queue to user buffer.
+          memcpy (msg, src, nbytes);
+          if (mprio != nullptr)
+            {
+              *mprio = prio_array_[head_];
+            }
+
+          // ----- Exit uncritical section -----
+        }
+
+        {
+          if (count_ > 1)
+            {
+              // Remove the current element from the list.
+              prev_array_[next_array_[head_]] = prev_array_[head_];
+              next_array_[prev_array_[head_]] = next_array_[head_];
+
+              // Next becomes the new head.
+              head_ = next_array_[head_];
+            }
+          else
+            {
+              // If there was only one, the list is empty now.
+              head_ = no_index;
+            }
+
+          // Perform a push_front() on the single linked LIFO list,
+          // i.e. add the block to the beginning of the list.
+
+          // Link previous list to this block; may be null, but it does
+          // not matter.
+          *(static_cast<void**> (static_cast<void*> (src))) = first_free_;
+
+          // Now this block is the first one.
+          first_free_ = src;
+
+          --count_;
+        }
+
+      // Wake-up one thread, if any.
+      send_list_.resume_one ();
+
+      return true;
+    }
+
+#endif /* !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE) */
+
+    /**
+     * @endcond
+     */
 
     /**
      * @details
@@ -1024,75 +1113,6 @@ namespace os
 
 #endif
     }
-
-#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
-
-    bool
-    message_queue::_try_receive (void* msg, std::size_t nbytes,
-                                 priority_t* mprio)
-    {
-
-      if (head_ == no_index)
-        {
-          return false;
-        }
-
-      char* src = static_cast<char*> (queue_addr_) + head_ * msg_size_bytes_;
-#if defined(OS_TRACE_RTOS_MQUEUE_)
-      trace::printf ("%s(%p,%d) @%p %s src %p %p\n", __func__, msg, nbytes,
-          this, name (), src, first_free_);
-#endif
-
-        {
-          // ----- Enter uncritical section -----
-          interrupts::uncritical_section iucs;
-
-          // Copy message from queue to user buffer.
-          memcpy (msg, src, nbytes);
-          if (mprio != nullptr)
-            {
-              *mprio = prio_array_[head_];
-            }
-
-          // ----- Exit uncritical section -----
-        }
-
-        {
-          if (count_ > 1)
-            {
-              // Remove the current element from the list.
-              prev_array_[next_array_[head_]] = prev_array_[head_];
-              next_array_[prev_array_[head_]] = next_array_[head_];
-
-              // Next becomes the new head.
-              head_ = next_array_[head_];
-            }
-          else
-            {
-              // If there was only one, the list is empty now.
-              head_ = no_index;
-            }
-
-          // Perform a push_front() on the single linked LIFO list,
-          // i.e. add the block to the beginning of the list.
-
-          // Link previous list to this block; may be null, but it does
-          // not matter.
-          *(static_cast<void**> (static_cast<void*> (src))) = first_free_;
-
-          // Now this block is the first one.
-          first_free_ = src;
-
-          --count_;
-        }
-
-      // Wake-up one thread, if any.
-      send_list_.resume_one ();
-
-      return true;
-    }
-
-#endif /* !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE) */
 
     /**
      * @details

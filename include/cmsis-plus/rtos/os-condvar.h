@@ -68,7 +68,7 @@ namespace os
          */
 
         /**
-         * @brief Create condition variable attributes.
+         * @brief Create a condition variable attributes object.
          * @par Parameters
          *  None
          */
@@ -78,18 +78,20 @@ namespace os
         /**
          * @cond ignore
          */
+
         attributes (const attributes&) = default;
         attributes (attributes&&) = default;
         attributes&
         operator= (const attributes&) = default;
         attributes&
         operator= (attributes&&) = default;
+
         /**
          * @endcond
          */
 
         /**
-         * @brief Destroy condition variable attributes.
+         * @brief Destroy the condition variable attributes object.
          */
         ~attributes () = default;
 
@@ -106,11 +108,11 @@ namespace os
 
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
-
         // Add more attributes here.
         /**
          * @}
          */
+
       }; /* class attributes */
 
       /**
@@ -126,7 +128,7 @@ namespace os
        */
 
       /**
-       * @brief Create a condition variable.
+       * @brief Create a condition variable object.
        * @param [in] attr Reference to attributes.
        * @par Errors
        *  The constructor shall fail if:
@@ -140,7 +142,7 @@ namespace os
       condition_variable (const attributes& attr = initializer);
 
       /**
-       * @brief Create a named condition variable.
+       * @brief Create a named condition variable object.
        * @param [in] name Pointer to name.
        * @param [in] attr Reference to attributes.
        * @par Errors
@@ -158,18 +160,20 @@ namespace os
       /**
        * @cond ignore
        */
+
       condition_variable (const condition_variable&) = delete;
       condition_variable (condition_variable&&) = delete;
       condition_variable&
       operator= (const condition_variable&) = delete;
       condition_variable&
       operator= (condition_variable&&) = delete;
+
       /**
        * @endcond
        */
 
       /**
-       * @brief Destroy a condition variable.
+       * @brief Destroy the condition variable object.
        */
       ~condition_variable ();
 
@@ -281,10 +285,18 @@ namespace os
        * @{
        */
 
+      /**
+       * @cond ignore
+       */
+
 #if !defined(OS_INCLUDE_RTOS_PORT_CONDITION_VARIABLE)
       waiting_threads_list list_;
       // clock& clock_;
 #endif
+
+      /**
+       * @endcond
+       */
 
       // Add more internal data.
       /**

@@ -53,29 +53,50 @@ namespace os
 
     /**
      * @brief Generic clock.
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
      */
     class clock : public named_object
     {
     public:
 
+      // ----------------------------------------------------------------------
+
       /**
-       * @brief Type of variables holding timer durations.
+       * @name Types & Constants
+       * @{
+       */
+
+      /**
+       * @brief Type of variables holding clock durations.
        * @details
-       * A numeric type intended to hold a generic duration, either in ticks
+       * A numeric type intended to store a clock duration, either in ticks
        * or in seconds.
        */
       using duration_t = port::clock::duration_t;
 
       /**
-       * @brief Type of variables holding time stamps.
+       * @brief Type of variables holding clock time stamps.
        * @details
-       * A numeric type intended to hold a generic timestamp, either in ticks
+       * A numeric type intended to store a clock timestamp, either in ticks
        * or in seconds.
        */
       using timestamp_t = port::clock::timestamp_t;
 
+      /**
+       * @brief Type of variables holding clock offsets.
+       * @details
+       * A numeric type intended to store a clock offset
+       * (difference to epoch), either in ticks
+       * or in seconds.
+       */
       using offset_t = port::clock::offset_t;
 
+      /**
+       * @}
+       */
+
+      // ----------------------------------------------------------------------
       /**
        * @name Constructors & Destructor
        * @{
@@ -84,26 +105,31 @@ namespace os
     protected:
 
       /**
-       * @brief Create a clock object (protected, use derived classes)
+       * @cond ignore
+       */
+
+      /**
+       * @brief Create a clock object (protected, used in derived classes)
        * @param [in] name Pointer to clock name.
        */
       clock (const char* name);
 
     public:
 
-      /**
-       * @cond ignore
-       */
       clock (const clock&) = delete;
       clock (clock&&) = delete;
       clock&
       operator= (const clock&) = delete;
       clock&
       operator= (clock&&) = delete;
+
       /**
        * @endcond
        */
 
+      /**
+       * @brief Destroy the clock object.
+       */
       virtual
       ~clock ();
 
@@ -111,6 +137,7 @@ namespace os
        * @}
        */
 
+      // ----------------------------------------------------------------------
     public:
 
       /**
@@ -118,23 +145,37 @@ namespace os
        * @{
        */
 
+      /**
+       * @brief Start the clock.
+       * @par Parameters
+       *  None
+       * @par Returns
+       *  Nothing
+       */
       void
       start (void);
 
       /**
-       * @brief Tell the current time.
+       * @brief Tell the current time, possibly adjusted for epoch.
        * @par Parameters
        *  None
-       * @return The clock specific timestamp.
+       * @return The clock current timestamp (time units from startup
+       * plus the epoch offset).
        */
       timestamp_t
       now (void);
 
+      /**
+       * @brief Tell the current time since startup.
+       * @par Parameters
+       *  None
+       * @return The clock current timestamp (time units from startup).
+       */
       timestamp_t
       steady_now (void);
 
       /**
-       * @brief Sleep for a duration.
+       * @brief Sleep for a relative duration.
        * @param [in] duration The number of clock units
        *  (ticks or seconds) to sleep.
        * @retval ETIMEDOUT The sleep lasted the entire duration.
@@ -165,17 +206,35 @@ namespace os
       result_t
       wait_for (duration_t timeout);
 
-      void
-      _interrupt_service_routine (void);
+      offset_t
+      offset (void);
+
+      offset_t
+      offset (offset_t);
+
+      /**
+       * @cond ignore
+       */
 
       clock_timestamps_list&
       steady_list (void);
+
+      void
+      _interrupt_service_routine (void);
+
+      /**
+       * @endcond
+       */
 
       /**
        * @}
        */
 
     protected:
+
+      /**
+       * @cond ignore
+       */
 
       /**
        * @brief Queue timestamp and wait for it.
@@ -188,8 +247,17 @@ namespace os
       _wait_until (timestamp_t timestamp, clock_timestamps_list& list);
 
       /**
+       * @endcond
+       */
+
+      // ----------------------------------------------------------------------
+      /**
        * @name Private Member Variables
        * @{
+       */
+
+      /**
+       * @cond ignore
        */
 
       clock_timestamps_list steady_list_;
@@ -205,6 +273,10 @@ namespace os
        * @brief Adjustable offset to epoch.
        */
       offset_t volatile offset_;
+
+      /**
+       * @endcond
+       */
 
       /**
        * @}
@@ -274,10 +346,18 @@ namespace os
 #pragma GCC diagnostic pop
 
       /**
+       * @}
+       */
+
+      // ----------------------------------------------------------------------
+      /**
        * @name Constructors & Destructor
        * @{
        */
 
+      /**
+       * @brief Create a SysTick clock object.
+       */
       clock_systick ();
 
       /**
@@ -293,16 +373,25 @@ namespace os
        * @endcond
        */
 
+      /**
+       * @brief Destroy the SysTick clock object.
+       */
       virtual
       ~clock_systick ();
 
       /**
        * @}
+       */
+
+      // ----------------------------------------------------------------------
+      /*
        * @name Public Member Functions
        * @{
        */
 
       // Enable name lookup in base class (tricky!).
+      // Without it, the parent new() is not available in
+      // this derived class.
       using clock::now;
 
       /**
@@ -323,18 +412,31 @@ namespace os
         static constexpr uint32_t
         ticks_cast (Rep_T microsec);
 
+      /**
+       * @cond ignore
+       */
+
       void
       _interrupt_service_routine (void);
+
+      /**
+       * @endcond
+       */
 
       /**
        * @}
        */
 
+      // ----------------------------------------------------------------------
     protected:
 
       /**
        * @name Private Member Functions
        * @{
+       */
+
+      /**
+       * @cond ignore
        */
 
 #if defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
@@ -354,11 +456,20 @@ namespace os
 #endif
 
       /**
+       * @endcond
+       */
+
+      /**
        * @}
        */
 
     };
 
+    /**
+     * @brief The system clock.
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
+     */
     extern clock_systick sysclock;
 
     // ========================================================================
@@ -383,10 +494,18 @@ namespace os
       static constexpr uint32_t frequency_hz = 1;
 
       /**
+       * @}
+       */
+
+      // ----------------------------------------------------------------------
+      /**
        * @name Constructors & Destructor
        * @{
        */
 
+      /**
+       * @brief Create a real time clock object.
+       */
       clock_rtc ();
 
       /**
@@ -402,11 +521,18 @@ namespace os
        * @endcond
        */
 
+      /**
+       * @brief Destroy the real time clock object.
+       */
       virtual
       ~clock_rtc ();
 
       /**
        * @}
+       */
+
+      // ----------------------------------------------------------------------
+      /*
        * @name Public Member Functions
        * @{
        */
@@ -423,6 +549,14 @@ namespace os
        */
       result_t
       start (void);
+
+      /**
+       * @}
+       */
+
+      /**
+       * @cond ignore
+       */
 
 #if defined(OS_INCLUDE_RTOS_PORT_REALTIME_CLOCK_SLEEP_FOR)
 
@@ -441,10 +575,16 @@ namespace os
 #endif
 
       /**
-       * @}
+       * @endcond
        */
+
     };
 
+    /**
+     * @brief The real time clock.
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
+     */
     extern clock_rtc rtclock;
 
   } /* namespace rtos */
@@ -459,13 +599,42 @@ namespace os
 
     // ========================================================================
 
+    inline clock::offset_t
+    clock::offset (void)
+    {
+      return offset_;
+    }
+
+    inline clock::offset_t
+    clock::offset (offset_t offset)
+    {
+      interrupts::critical_section ics;
+
+      offset_t tmp;
+      tmp = offset_;
+      offset_ = offset;
+
+      return tmp;
+    }
+
+    /**
+     * @cond ignore
+     */
+
     inline clock_timestamps_list&
     clock::steady_list (void)
     {
       return steady_list_;
     }
 
+    /**
+     * @endcond
+     */
+
     // ========================================================================
+    /**
+     * @cond ignore
+     */
 
     /**
      * @details
@@ -482,6 +651,10 @@ namespace os
             + static_cast<Rep_T> (1000000ul) - 1)
             / static_cast<Rep_T> (1000000ul));
       }
+
+  /**
+   * @endcond
+   */
 
   } /* namespace rtos */
 } /* namespace os */

@@ -42,7 +42,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     /**
-     * @class attributes
+     * @class condition_variable::attributes
      * @details
      * Allow to assign a name to the condition variable.
      *

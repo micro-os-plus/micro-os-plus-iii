@@ -42,7 +42,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     /**
-     * @class attributes
+     * @class timer::attributes
      * @details
      * Allow to assign a name to the timer.
      *
@@ -55,6 +55,10 @@ namespace os
      *  (IEEE Std 1003.1, 2013 Edition).
      */
 
+    /**
+     * @details
+     * This variable can be used to create a single run timer.
+     */
     const timer::attributes timer::once_initializer;
 
     /**
@@ -63,6 +67,10 @@ namespace os
      * Allow to assign a name to the timer.
      */
 
+    /**
+     * @details
+     * This variable can be used to create a periodic timer.
+     */
     const timer::periodic_attributes timer::periodic_initializer;
 
     // ------------------------------------------------------------------------
@@ -327,6 +335,10 @@ namespace os
 
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
+    /**
+     * @cond ignore
+     */
+
     void
     timer::_interrupt_service_routine (void)
     {
@@ -351,6 +363,10 @@ namespace os
       // Call the user function.
       func_ (func_args_);
     }
+
+  /**
+   * @endcond
+   */
 
 #endif
 

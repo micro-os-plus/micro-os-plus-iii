@@ -85,6 +85,9 @@ namespace os
           periodic = 1      //
         };
 
+      /**
+       * @brief Timer state type.
+       */
       using state_t = enum class state : uint8_t
         {
           /**
@@ -101,7 +104,7 @@ namespace os
       // ======================================================================
 
       /**
-       * @brief %Timer attributes.
+       * @brief Timer attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
       class attributes : public clocked_attributes
@@ -114,7 +117,7 @@ namespace os
          */
 
         /**
-         * @brief Create timer attributes.
+         * @brief Create a timer attributes object.
          * @par Parameters
          *  None
          */
@@ -124,29 +127,33 @@ namespace os
         /**
          * @cond ignore
          */
+
+      protected:
+
+        constexpr
+        attributes (type_t type);
+
+      public:
+
         attributes (const attributes&) = default;
         attributes (attributes&&) = default;
         attributes&
         operator= (const attributes&) = default;
         attributes&
         operator= (attributes&&) = default;
+
         /**
          * @endcond
          */
 
         /**
-         * @brief Destroy timer attributes.
+         * @brief Destroy the timer attributes object.
          */
         ~attributes () = default;
 
         /**
          * @}
          */
-
-      protected:
-
-        constexpr
-        attributes (type_t type);
 
       public:
 
@@ -167,6 +174,7 @@ namespace os
         /**
          * @}
          */
+
       }; /* class attributes */
 
       /**
@@ -188,7 +196,7 @@ namespace os
          */
 
         /**
-         * @brief Create periodic timer attributes.
+         * @brief Create periodic timer attributes object.
          * @par Parameters
          *  None
          */
@@ -198,18 +206,20 @@ namespace os
         /**
          * @cond ignore
          */
+
         periodic_attributes (const periodic_attributes&) = default;
         periodic_attributes (periodic_attributes&&) = default;
         periodic_attributes&
         operator= (const periodic_attributes&) = default;
         periodic_attributes&
         operator= (periodic_attributes&&) = default;
+
         /**
          * @endcond
          */
 
         /**
-         * @brief Destroy timer attributes.
+         * @brief Destroy the periodic timer attributes object.
          */
         ~periodic_attributes () = default;
 
@@ -230,7 +240,7 @@ namespace os
        */
 
       /**
-       * @brief Create a timer.
+       * @brief Create a timer object.
        * @param [in] function Pointer to timer function.
        * @param [in] args Pointer to timer function arguments.
        * @param [in] attr Reference to attributes.
@@ -239,7 +249,7 @@ namespace os
                  periodic_initializer);
 
       /**
-       * @brief Create a named timer.
+       * @brief Create a named timer object.
        * @param [in] name Pointer to name.
        * @param [in] function Pointer to timer function.
        * @param [in] args Pointer to timer function arguments.
@@ -251,18 +261,20 @@ namespace os
       /**
        * @cond ignore
        */
+
       timer (const timer&) = delete;
       timer (timer&&) = delete;
       timer&
       operator= (const timer&) = delete;
       timer&
       operator= (timer&&) = delete;
+
       /**
        * @endcond
        */
 
       /**
-       * @brief Destroy the timer.
+       * @brief Destroy the timer object.
        */
       ~timer ();
 
@@ -327,7 +339,15 @@ namespace os
        * @{
        */
 
+      /**
+       * @cond ignore
+       */
+
       friend class timer_node;
+
+      /**
+       * @endcond
+       */
 
       /**
        * @}
@@ -340,12 +360,20 @@ namespace os
        * @{
        */
 
+      /**
+       * @cond ignore
+       */
+
 #if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
 
       void
       _interrupt_service_routine (void);
 
 #endif
+
+      /**
+       * @endcond
+       */
 
       /**
        * @}
@@ -356,6 +384,10 @@ namespace os
       /**
        * @name Private Member Variables
        * @{
+       */
+
+      /**
+       * @cond ignore
        */
 
       func_t func_;
@@ -379,8 +411,13 @@ namespace os
       // Add more internal data.
 
       /**
+       * @endcond
+       */
+
+      /**
        * @}
        */
+
     };
 
 #pragma GCC diagnostic pop

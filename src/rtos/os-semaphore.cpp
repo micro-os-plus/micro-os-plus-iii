@@ -46,8 +46,9 @@ namespace os
      * The os::rtos::semaphore namespace groups semaphore types,
      * attributes and initialisers.
      */
+
     /**
-     * @class attributes
+     * @class semaphore::attributes
      * @details
      * Allow to assign a name and custom attributes (like initial count,
      * max count) to the semaphore.
@@ -62,14 +63,14 @@ namespace os
      */
 
     /**
-     * @var count_t attributes::sm_initial_count
+     * @var semaphore::count_t semaphore::attributes::sm_initial_count
      * @details
      * This values represents the number of resources initially
      * available to the semaphore.
      */
 
     /**
-     * @var count_t attributes::sm_max_count
+     * @var semaphore::count_t semaphore::attributes::sm_max_count
      * @details
      * This values represents the maximum number of resources
      * available to the semaphore.
@@ -86,8 +87,16 @@ namespace os
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
 
+    /**
+     * @details
+     * This variable is used by the default constructor.
+     */
     const semaphore::attributes semaphore::counting_initializer;
 
+    /**
+     * @details
+     * This variable can be used to create a binary semaphore.
+     */
     const semaphore::binary_attributes semaphore::binary_initializer;
 
     // ------------------------------------------------------------------------
@@ -253,6 +262,10 @@ namespace os
 #endif
     }
 
+    /**
+     * @cond ignore
+     */
+
     void
     semaphore::_init (void)
     {
@@ -271,6 +284,30 @@ namespace os
 
 #endif /* !defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE) */
     }
+
+    bool
+    semaphore::_try_wait (void)
+    {
+      if (count_ > 0)
+        {
+          --count_;
+#if defined(OS_TRACE_RTOS_SEMAPHORE)
+          trace::printf ("%s() @%p %s count %d\n", __func__, this, name (),
+                         count_);
+#endif
+          return true;
+        }
+
+      // Count may be 0.
+#if defined(OS_TRACE_RTOS_SEMAPHORE)
+      trace::printf ("%s() @%p %s false\n", __func__, this, name ());
+#endif
+      return false;
+    }
+
+    /**
+     * @endcond
+     */
 
     /**
      * @details
@@ -343,26 +380,6 @@ namespace os
       return result::ok;
 
 #endif
-    }
-
-    bool
-    semaphore::_try_wait (void)
-    {
-      if (count_ > 0)
-        {
-          --count_;
-#if defined(OS_TRACE_RTOS_SEMAPHORE)
-          trace::printf ("%s() @%p %s count %d\n", __func__, this, name (),
-                         count_);
-#endif
-          return true;
-        }
-
-      // Count may be 0.
-#if defined(OS_TRACE_RTOS_SEMAPHORE)
-      trace::printf ("%s() @%p %s false\n", __func__, this, name ());
-#endif
-      return false;
     }
 
     /**

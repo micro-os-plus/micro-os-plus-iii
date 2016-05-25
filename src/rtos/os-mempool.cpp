@@ -45,7 +45,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     /**
-     * @class attributes
+     * @class memory_pool::attributes
      * @details
      * Allow to assign a name and custom attributes (like a static
      * address) to the memory pool.
@@ -97,7 +97,7 @@ namespace os
      */
 
     /**
-     * @var void* attributes::mp_pool_address
+     * @var void* memory_pool::attributes::mp_pool_address
      * @details
      * Set this variable to a user defined memory area large enough
      * to store the memory pool. Usually this is a statically
@@ -108,7 +108,7 @@ namespace os
      */
 
     /**
-     * @var memory_pool::size_t attributes::mp_pool_size_bytes
+     * @var memory_pool::size_t memory_pool::attributes::mp_pool_size_bytes
      * @details
      * The memory pool size must match exactly the allocated size. It is
      * used for validation; when the memory pool is initialised,
@@ -119,6 +119,10 @@ namespace os
      * checked, but it is recommended to leave it zero.
      */
 
+    /**
+     * @details
+     * This variable is used by the default constructor.
+     */
     const memory_pool::attributes memory_pool::initializer;
 
     // ------------------------------------------------------------------------
@@ -127,7 +131,7 @@ namespace os
      * @class memory_pool
      * @details
      * Manage a pool of same size blocks. Fast and deterministic allocation
-     * and dealocation behaviour, suitable for use even in ISRs.
+     * and deallocation behaviour, suitable for use even in ISRs.
      *
      * @par Example
      *
@@ -178,6 +182,10 @@ namespace os
      */
 
     // ------------------------------------------------------------------------
+    /**
+     * @cond ignore
+     */
+
     // Protected internal constructor.
     memory_pool::memory_pool ()
     {
@@ -194,6 +202,10 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
     }
+
+    /**
+     * @endcond
+     */
 
     /**
      * This constructor shall initialise a memory pool object
@@ -268,7 +280,7 @@ namespace os
       if (attr.mp_pool_address != nullptr)
         {
           // Do not use any allocator at all.
-          _construct (attr, blocks, block_size_bytes, nullptr, 0);
+          _construct (blocks, block_size_bytes, attr, nullptr, 0);
         }
       else
         {
@@ -285,18 +297,22 @@ namespace os
               allocated_pool_size_elements_);
 
           _construct (
-              attr,
               blocks,
               block_size_bytes,
+              attr,
               allocated_pool_addr_,
               allocated_pool_size_elements_
                   * sizeof(typename Allocator::value_type));
         }
     }
 
+    /**
+     * @cond ignore
+     */
+
     void
-    memory_pool::_construct (const attributes& attr, std::size_t blocks,
-                             std::size_t block_size_bytes, void* pool_address,
+    memory_pool::_construct (std::size_t blocks, std::size_t block_size_bytes,
+                             const attributes& attr, void* pool_address,
                              std::size_t pool_size_bytes)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
@@ -359,6 +375,10 @@ namespace os
     }
 
     /**
+     * @endcond
+     */
+
+    /**
      * @details
      * This destructor shall destroy the memory pool object; the object
      * becomes, in effect, uninitialised. An implementation may cause
@@ -391,6 +411,10 @@ namespace os
               allocated_pool_size_elements_);
         }
     }
+
+    /**
+     * @cond ignore
+     */
 
     /*
      * Construct the linked list of blocks and initialise the
@@ -439,6 +463,10 @@ namespace os
 
       return nullptr;
     }
+
+    /**
+     * @endcond
+     */
 
     /**
      * @details

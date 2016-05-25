@@ -48,6 +48,10 @@ namespace os
     namespace scheduler
     {
       /**
+       * @cond ignore
+       */
+
+      /**
        * @brief The scheduler status.
        */
       extern status_t is_locked_;
@@ -69,6 +73,10 @@ namespace os
 #endif
 
       /**
+       * @endcond
+       */
+
+      /**
        * @brief Initialise the RTOS scheduler.
        * @par Parameters
        *  None
@@ -82,7 +90,8 @@ namespace os
        * @brief Start the RTOS scheduler.
        * @par Parameters
        *  None
-       * @return Nothing.
+       * @par Returns
+       *  Nothing.
        */
       [[noreturn]] void
       start (void);
@@ -108,7 +117,7 @@ namespace os
       locked (void);
 
       /**
-       * @brief %Lock the scheduler.
+       * @brief Lock the scheduler.
        * @param [in] status The new status of the scheduler (true for locked).
        * @return The previous status of the scheduler.
        */
@@ -133,11 +142,18 @@ namespace os
       bool
       in_handler_mode (void);
 
+      /**
+       * @cond ignore
+       */
+
       void
       _create_idle (void);
 
-      // ======================================================================
+      /**
+       * @endcond
+       */
 
+      // ======================================================================
       /**
        * @brief Scheduler critical section [RAII](https://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization) helper.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
@@ -161,12 +177,14 @@ namespace os
         /**
          * @cond ignore
          */
+
         critical_section (const critical_section&) = delete;
         critical_section (critical_section&&) = delete;
         critical_section&
         operator= (const critical_section&) = delete;
         critical_section&
         operator= (critical_section&&) = delete;
+
         /**
          * @endcond
          */
@@ -188,9 +206,17 @@ namespace os
          */
 
         /**
+         * @cond ignore
+         */
+
+        /**
          * @brief Variable to store the initial scheduler status.
          */
         const status_t status_;
+
+        /**
+         * @endcond
+         */
 
         /**
          * @}
@@ -222,12 +248,14 @@ namespace os
         /**
          * @cond ignore
          */
+
         uncritical_section (const uncritical_section&) = delete;
         uncritical_section (uncritical_section&&) = delete;
         uncritical_section&
         operator= (const uncritical_section&) = delete;
         uncritical_section&
         operator= (uncritical_section&&) = delete;
+
         /**
          * @endcond
          */
@@ -249,9 +277,17 @@ namespace os
          */
 
         /**
+         * @cond ignore
+         */
+
+        /**
          * @brief Variable to store the initial scheduler status.
          */
         const status_t status_;
+
+        /**
+         * @endcond
+         */
 
         /**
          * @}
@@ -284,12 +320,14 @@ namespace os
         /**
          * @cond ignore
          */
+
         lockable (const lockable&) = delete;
         lockable (lockable&&) = delete;
         lockable&
         operator= (const lockable&) = delete;
         lockable&
         operator= (lockable&&) = delete;
+
         /**
          * @endcond
          */
@@ -349,9 +387,17 @@ namespace os
          */
 
         /**
+         * @cond ignore
+         */
+
+        /**
          * @brief Variable to store the initial scheduler status.
          */
         status_t status_ = 0;
+
+        /**
+         * @endcond
+         */
 
         /**
          * @}
@@ -393,12 +439,14 @@ namespace os
         /**
          * @cond ignore
          */
+
         critical_section (const critical_section&) = delete;
         critical_section (critical_section&&) = delete;
         critical_section&
         operator= (const critical_section&) = delete;
         critical_section&
         operator= (critical_section&&) = delete;
+
         /**
          * @endcond
          */
@@ -448,9 +496,17 @@ namespace os
          */
 
         /**
+         * @cond ignore
+         */
+
+        /**
          * @brief Variable to store the interrupts status.
          */
         const status_t status_;
+
+        /**
+         * @endcond
+         */
 
         /**
          * @}
@@ -473,7 +529,7 @@ namespace os
          */
 
         /**
-         * @brief Enter interrupts critical section.
+         * @brief Enter interrupts uncritical section.
          * @par Parameters
          *  None
          */
@@ -482,18 +538,20 @@ namespace os
         /**
          * @cond ignore
          */
+
         uncritical_section (const uncritical_section&) = delete;
         uncritical_section (uncritical_section&&) = delete;
         uncritical_section&
         operator= (const uncritical_section&) = delete;
         uncritical_section&
         operator= (uncritical_section&&) = delete;
+
         /**
          * @endcond
          */
 
         /**
-         * @brief Exit interrupts critical section.
+         * @brief Exit interrupts uncritical section.
          */
         ~uncritical_section ();
 
@@ -509,7 +567,7 @@ namespace os
          */
 
         /**
-         * @brief Enter interrupts critical section.
+         * @brief Enter interrupts uncritical section.
          * @par Parameters
          *  None
          * @return The current interrupts status register.
@@ -518,7 +576,7 @@ namespace os
         enter (void);
 
         /**
-         * @brief Exit interrupts critical section.
+         * @brief Exit interrupts uncritical section.
          * @param status The value to restore the interrupts status register.
          * @return  Nothing.
          */
@@ -537,9 +595,17 @@ namespace os
          */
 
         /**
+         * @cond ignore
+         */
+
+        /**
          * @brief Variable to store the interrupts status.
          */
         const status_t status_;
+
+        /**
+         * @endcond
+         */
 
         /**
          * @}
@@ -577,12 +643,14 @@ namespace os
         /**
          * @cond ignore
          */
+
         lockable (const lockable&) = delete;
         lockable (lockable&&) = delete;
         lockable&
         operator= (const lockable&) = delete;
         lockable&
         operator= (lockable&&) = delete;
+
         /**
          * @endcond
          */
@@ -637,9 +705,17 @@ namespace os
          */
 
         /**
+         * @cond ignore
+         */
+
+        /**
          * @brief Variable to store the interrupts status.
          */
         status_t status_;
+
+        /**
+         * @endcond
+         */
 
         /**
          * @}

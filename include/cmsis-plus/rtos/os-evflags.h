@@ -71,7 +71,7 @@ namespace os
          */
 
         /**
-         * @brief Create event flags attributes.
+         * @brief Create an event flags attributes object.
          * @par Parameters
          *  None
          */
@@ -81,18 +81,20 @@ namespace os
         /**
          * @cond ignore
          */
+
         attributes (const attributes&) = default;
         attributes (attributes&&) = default;
         attributes&
         operator= (const attributes&) = default;
         attributes&
         operator= (attributes&&) = default;
+
         /**
          * @endcond
          */
 
         /**
-         * @brief Destroy the event flags attributes.
+         * @brief Destroy the event flags attributes object.
          */
         ~attributes () = default;
 
@@ -113,6 +115,7 @@ namespace os
         /**
          * @}
          */
+
       }; /* class attributes */
 
       /**
@@ -126,13 +129,13 @@ namespace os
        */
 
       /**
-       * @brief Create event flags.
+       * @brief Create an event flags object.
        * @param [in] attr Reference to attributes.
        */
       event_flags (const attributes& attr = initializer);
 
       /**
-       * @brief Create named event flags.
+       * @brief Create a named event flags object.
        * @param [in] name Pointer to name.
        * @param [in] attr Reference to attributes.
        */
@@ -141,18 +144,20 @@ namespace os
       /**
        * @cond ignore
        */
+
       event_flags (const event_flags&) = delete;
       event_flags (event_flags&&) = delete;
       event_flags&
       operator= (const event_flags&) = delete;
       event_flags&
       operator= (event_flags&&) = delete;
+
       /**
        * @endcond
        */
 
       /**
-       * @brief Destroy the event flags.
+       * @brief Destroy the event flags object.
        */
       ~event_flags ();
 
@@ -297,6 +302,10 @@ namespace os
        */
 
       /**
+       * @cond ignore
+       */
+
+      /**
        * @brief Internal function to check the flags condition.
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
@@ -313,6 +322,10 @@ namespace os
       _try_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
 
       /**
+       * @endcond
+       */
+
+      /**
        * @}
        */
 
@@ -321,6 +334,10 @@ namespace os
       /**
        * @name Private Member Variables
        * @{
+       */
+
+      /**
+       * @cond ignore
        */
 
 #if !defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
@@ -339,8 +356,13 @@ namespace os
       flags::mask_t flags_;
 
       /**
+       * @endcond
+       */
+
+      /**
        * @}
        */
+
     };
 
 #pragma GCC diagnostic pop

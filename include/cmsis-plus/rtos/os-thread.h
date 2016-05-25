@@ -54,6 +54,10 @@ namespace os
     // Forward definitions required by thread friends.
     namespace this_thread
     {
+      /**
+       * @cond ignore
+       */
+
       void
       wait (void);
 
@@ -73,8 +77,17 @@ namespace os
       timed_sig_wait (flags::mask_t mask, clock::duration_t timeout,
                       flags::mask_t* oflags, flags::mode_t mode);
 
+      /**
+       * @endcond
+       */
+
+      /**
+       * @brief Implementation of the library `__error()` function.
+       * @return Pointer to thread specific `errno`.
+       */
       int*
       error (void);
+
     } /* namespace this_thread */
 
     namespace
@@ -86,8 +99,17 @@ namespace os
     // Forward definitions required by thread friends.
     namespace scheduler
     {
+      /**
+       * @cond ignore
+       */
+
       void*
       _idle_func (_func_args_t args);
+
+    /**
+     * @endcond
+     */
+
     } /* namespace scheduler */
 
     // ========================================================================
@@ -146,7 +168,7 @@ namespace os
         static constexpr uint32_t range = 4;
 
         /**
-         * @brief Main priorities, intermediate values also possible.
+         * @brief Thread priorities; intermediate values are also possible.
          * @ingroup cmsis-plus-rtos
          */
         enum
@@ -233,7 +255,7 @@ namespace os
       using sigset_t = flags::mask_t;
 
       /**
-       * @brief %Thread signals namespace.
+       * @brief Thread signals.
        * @details
        * The os::rtos::thread::sig namespace is a container for
        * signal flags masks, which cannot be restricted to an enumeration..
@@ -259,22 +281,27 @@ namespace os
       }; /* struct sig */
 
       /**
-       * @brief Thread function arguments.
+       * @brief Type of thread function arguments.
        * @details
-       * Type of thread function arguments.
+       * Useful to cast other similar types
+       * to silence possible compiler warnings.
        */
       using func_args_t = _func_args_t;
 
       /**
-       * @brief Thread function.
+       * @brief Type of thread function.
        * @details
-       * Type of thread functions. Useful to cast other similar types
-       * to silence the compiler warnings.
+       * Useful to cast other similar types
+       * to silence possible compiler warnings.
        */
       using func_t = void* (*) (func_args_t args);
 
       // ======================================================================
 
+      /**
+       * @brief Thread stack.
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       */
       class stack
       {
       public:
@@ -282,7 +309,7 @@ namespace os
         /**
          * @brief Type of a stack element.
          * @details
-         * The stack is organised as platform words
+         * The stack is organised as an array of platform words
          * (usually 4-bytes long on Cortex-M cores).
          */
         using element_t = os::rtos::port::stack::element_t;
@@ -301,25 +328,27 @@ namespace os
          */
 
         /**
-         * @brief Create a thread stack.
+         * @brief Create a thread stack object.
          */
         stack ();
 
         /**
          * @cond ignore
          */
+
         stack (const stack&) = delete;
         stack (stack&&) = delete;
         stack&
         operator= (const stack&) = delete;
         stack&
         operator= (stack&&) = delete;
+
         /**
          * @endcond
          */
 
         /**
-         * @brief Destroy stack.
+         * @brief Destroy the stack object.
          */
         ~stack () = default;
 
@@ -403,6 +432,10 @@ namespace os
 
       protected:
 
+        /**
+         * @cond ignore
+         */
+
         friend class rtos::thread;
 
         stack::element_t* bottom_address_;
@@ -411,9 +444,17 @@ namespace os
         static std::size_t min_size_bytes_;
         static std::size_t default_size_bytes_;
 
+        /**
+         * @endcond
+         */
+
       }; /* class stack */
 
       // ======================================================================
+      /**
+       * @brief Thread context.
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       */
       class context
       {
       public:
@@ -424,25 +465,27 @@ namespace os
          */
 
         /**
-         * @brief Create a thread context.
+         * @brief Create a thread context object.
          */
         context ();
 
         /**
          * @cond ignore
          */
+
         context (const context&) = delete;
         context (context&&) = delete;
         context&
         operator= (const context&) = delete;
         context&
         operator= (context&&) = delete;
+
         /**
          * @endcond
          */
 
         /**
-         * @brief Destroy context.
+         * @brief Destroy the context object.
          */
         ~context () = default;
 
@@ -471,6 +514,10 @@ namespace os
          * @{
          */
 
+        /**
+         * @cond ignore
+         */
+
         friend class rtos::thread;
         friend class rtos::port::thread;
         friend void
@@ -487,6 +534,10 @@ namespace os
 
 #endif
         /**
+         * @endcond
+         */
+
+        /**
          * @}
          */
 
@@ -495,6 +546,10 @@ namespace os
         /**
          * @name Private Member Variables
          * @{
+         */
+
+        /**
+         * @cond ignore
          */
 
         /**
@@ -512,6 +567,10 @@ namespace os
 #endif
 
         /**
+         * @endcond
+         */
+
+        /**
          * @}
          */
 
@@ -522,7 +581,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
       /**
-       * @brief %Thread attributes.
+       * @brief Thread attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
       class attributes : public clocked_attributes
@@ -535,7 +594,7 @@ namespace os
          */
 
         /**
-         * @brief Create thread attributes.
+         * @brief Create a thread attributes object.
          * @par Parameters
          *  None
          */
@@ -545,18 +604,20 @@ namespace os
         /**
          * @cond ignore
          */
+
         attributes (const attributes&) = default;
         attributes (attributes&&) = default;
         attributes&
         operator= (const attributes&) = default;
         attributes&
         operator= (attributes&&) = default;
+
         /**
          * @endcond
          */
 
         /**
-         * @brief Destroy thread attributes.
+         * @brief Destroy the thread attributes object.
          */
         ~attributes () = default;
 
@@ -574,12 +635,12 @@ namespace os
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
         /**
-         * @brief Thread user stack address attribute.
+         * @brief Address of the user defined storage for the memory pool stack.
          */
         void* th_stack_address = 0;
 
         /**
-         * @brief Thread user stack size attribute.
+         * @brief Size of the user defined storage for the memory pool stack.
          */
         std::size_t th_stack_size_bytes = 0;
 
@@ -605,6 +666,9 @@ namespace os
 
       // ======================================================================
 
+      /**
+       * @brief Default RTOS allocator.
+       */
       using Allocator = memory::allocator<stack::allocation_element_t>;
 
       /**
@@ -613,7 +677,7 @@ namespace os
        */
 
       /**
-       * @brief Create a thread.
+       * @brief Create a thread object.
        * @param [in] function Pointer to thread function.
        * @param [in] args Pointer to thread function arguments.
        * @param [in] attr Reference to attributes.
@@ -624,7 +688,7 @@ namespace os
               const Allocator& allocator = Allocator ());
 
       /**
-       * @brief Create a named thread.
+       * @brief Create a named thread object.
        * @param [in] name Pointer to name.
        * @param [in] function Pointer to thread function.
        * @param [in] args Pointer to thread function arguments.
@@ -652,12 +716,13 @@ namespace os
       operator= (const thread&) = delete;
       thread&
       operator= (thread&&) = delete;
+
       /**
        * @endcond
        */
 
       /**
-       * @brief Destroy the thread.
+       * @brief Destroy the thread object.
        */
       virtual
       ~thread ();
@@ -713,7 +778,7 @@ namespace os
       // Accessors & mutators.
 
       /**
-       * @brief Set dynamic scheduling priority.
+       * @brief Set the dynamic scheduling priority.
        * @retval result::ok The priority was set.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINVAL The value of prio is invalid for the
@@ -757,6 +822,11 @@ namespace os
       bool
       interrupted (void);
 
+      /**
+       * @brief Set the interrupt flag, possibly interrupting the thread.
+       * @param [in] interrupt Flag.
+       * @return The previous value of the interrupt flag.
+       */
       bool
       interrupt (bool interrupt = true);
 
@@ -854,6 +924,10 @@ namespace os
        * @{
        */
 
+      /**
+       * @cond ignore
+       */
+
       friend class mutex;
 
       friend void
@@ -917,6 +991,10 @@ namespace os
       friend class condition_variable;
 
       /**
+       * @endcond
+       */
+
+      /**
        * @}
        */
 
@@ -928,15 +1006,19 @@ namespace os
        */
 
       /**
+       * @cond ignore
+       */
+
+      /**
        * @brief Internal function used during thread construction.
-       * @param [in] attr Reference to attributes.
        * @param [in] function Pointer to thread function.
        * @param [in] args Pointer to thread function arguments.
+       * @param [in] attr Reference to attributes.
        * @param [in] stack_address Pointer to stack storage or nullptr.
        * @param [in] stack_size_bytes Size of stack storage or 0.
        */
       void
-      _construct (const attributes& attr, func_t function, func_args_t args,
+      _construct (func_t function, func_args_t args, const attributes& attr,
                   void* stack_address, std::size_t stack_size_bytes);
 
       /**
@@ -1045,8 +1127,9 @@ namespace os
       virtual void
       _destroy (void);
 
-      int*
-      _error (void);
+      /**
+       * @endcond
+       */
 
       /**
        * @}
@@ -1057,6 +1140,10 @@ namespace os
       /**
        * @name Private Member Variables
        * @{
+       */
+
+      /**
+       * @cond ignore
        */
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
@@ -1113,8 +1200,7 @@ namespace os
       state_t volatile sched_state_ = state::undefined;
       priority_t volatile prio_ = priority::none;
 
-      sigset_t volatile sig_mask_ = 0;
-      bool volatile interrupted_ = false;
+      sigset_t volatile sig_mask_ = 0;bool volatile interrupted_ = false;
 
       os_thread_user_storage_t user_storage_;
 
@@ -1122,6 +1208,10 @@ namespace os
 
       // Better be the last one!
       context context_;
+
+      /**
+       * @endcond
+       */
 
       /**
        * @}
@@ -1139,6 +1229,9 @@ namespace os
       {
       public:
 
+        /**
+         * @brief Standard allocator type definition.
+         */
         using allocator_type = Allocator;
 
         /**
@@ -1147,66 +1240,47 @@ namespace os
          */
 
         /**
-         * @brief Create a thread with default settings.
+         * @brief Create a thread object.
          * @param [in] function Pointer to thread function.
          * @param [in] args Pointer to thread function arguments.
+         * @param [in] attr Reference to attributes.
          * @param [in] allocator Reference to allocator. Default a
          * local temporary instance.
          */
         thread_allocated (func_t function, func_args_t args,
+                          const attributes& attr = initializer,
                           const Allocator& allocator = Allocator ());
 
         /**
-         * @brief Create a named thread with default settings.
+         * @brief Create a named thread object.
          * @param [in] name Pointer to name.
          * @param [in] function Pointer to thread function.
          * @param [in] args Pointer to thread function arguments.
+         * @param [in] attr Reference to attributes.
          * @param [in] allocator Reference to allocator. Default a
          * local temporary instance.
          */
         thread_allocated (const char* name, func_t function, func_args_t args,
-                          const Allocator& allocator = Allocator ());
-
-        /**
-         * @brief Create a thread with custom settings.
-         * @param [in] attr Reference to attributes.
-         * @param [in] function Pointer to thread function.
-         * @param [in] args Pointer to thread function arguments.
-         * @param [in] allocator Reference to allocator. Default a
-         * local temporary instance.
-         */
-        thread_allocated (const attributes& attr, func_t function,
-                          func_args_t args, const Allocator& allocator =
-                              Allocator ());
-
-        /**
-         * @brief Create a named thread with custom settings.
-         * @param [in] name Pointer to name.
-         * @param [in] attr Reference to attributes.
-         * @param [in] function Pointer to thread function.
-         * @param [in] args Pointer to thread function arguments.
-         * @param [in] allocator Reference to allocator. Default a
-         * local temporary instance.
-         */
-        thread_allocated (const char* name, const attributes& attr,
-                          func_t function, func_args_t args,
+                          const attributes& attr = initializer,
                           const Allocator& allocator = Allocator ());
 
         /**
          * @cond ignore
          */
+
         thread_allocated (const thread_allocated&) = delete;
         thread_allocated (thread_allocated&&) = delete;
         thread_allocated&
         operator= (const thread_allocated&) = delete;
         thread_allocated&
         operator= (thread_allocated&&) = delete;
+
         /**
          * @endcond
          */
 
         /**
-         * @brief Destroy the thread.
+         * @brief Destroy the thread object.
          */
         virtual
         ~thread_allocated ();
@@ -1220,8 +1294,16 @@ namespace os
          * @{
          */
 
+        /**
+         * @cond ignore
+         */
+
         virtual void
         _destroy (void) override;
+
+        /**
+         * @endcond
+         */
 
         /**
          * @}
@@ -1239,6 +1321,9 @@ namespace os
       {
       public:
 
+        /**
+         * @brief Local constant based on template definition.
+         */
         static const std::size_t stack_size_bytes = N;
 
         /**
@@ -1247,54 +1332,41 @@ namespace os
          */
 
         /**
-         * @brief Create a thread with default settings.
+         * @brief Create a thread object.
          * @param [in] function Pointer to thread function.
          * @param [in] args Pointer to thread function arguments.
+         * @param [in] attr Reference to attributes.
          */
-        thread_static (func_t function, func_args_t args);
+        thread_static (func_t function, func_args_t args,
+                       const attributes& attr = initializer);
 
         /**
-         * @brief Create a named thread with default settings.
+         * @brief Create a named thread object.
          * @param [in] name Pointer to name.
          * @param [in] function Pointer to thread function.
          * @param [in] args Pointer to thread function arguments.
-         */
-        thread_static (const char* name, func_t function, func_args_t args);
-
-        /**
-         * @brief Create a thread with custom settings.
          * @param [in] attr Reference to attributes.
-         * @param [in] function Pointer to thread function.
-         * @param [in] args Pointer to thread function arguments.
          */
-        thread_static (const attributes& attr, func_t function,
-                       func_args_t args);
-
-        /**
-         * @brief Create a named thread with custom settings.
-         * @param [in] name Pointer to name.
-         * @param [in] attr Reference to attributes.
-         * @param [in] function Pointer to thread function.
-         * @param [in] args Pointer to thread function arguments.
-         */
-        thread_static (const char* name, const attributes& attr,
-                       func_t function, func_args_t args);
+        thread_static (const char* name, func_t function, func_args_t args,
+                       const attributes& attr = initializer);
 
         /**
          * @cond ignore
          */
+
         thread_static (const thread_static&) = delete;
         thread_static (thread_static&&) = delete;
         thread_static&
         operator= (const thread_static&) = delete;
         thread_static&
         operator= (thread_static&&) = delete;
+
         /**
          * @endcond
          */
 
         /**
-         * @brief Destroy the thread.
+         * @brief Destroy the thread object.
          */
         virtual
         ~thread_static ();
@@ -1305,9 +1377,18 @@ namespace os
 
       private:
 
+        /**
+         * @cond ignore
+         */
+
         stack::allocation_element_t stack_[(stack_size_bytes
             + sizeof(stack::allocation_element_t) - 1)
             / sizeof(stack::allocation_element_t)];
+
+        /**
+         * @endcond
+         */
+
       };
 
 #pragma GCC diagnostic pop
@@ -1330,7 +1411,8 @@ namespace os
        * @brief Yield execution to the next ready thread.
        * @par Parameters
        *  None
-       * @return Nothing.
+       * @par Returns
+       *  Nothing.
        */
       void
       yield (void);
@@ -1339,7 +1421,8 @@ namespace os
        * @brief Suspend the current running thread to wait for an event.
        * @par Parameters
        *  None
-       * @return Nothing.
+       * @par Returns
+       *  Nothing.
        */
       void
       wait (void);
@@ -1347,7 +1430,8 @@ namespace os
       /**
        * @brief Terminate the current running thread.
        * @param [in] exit_ptr Pointer to object to return. (Optional).
-       * @return Nothing.
+       * @par Returns
+       *  Nothing.
        */
       [[noreturn]] void
       exit (void* exit_ptr = nullptr);
@@ -1429,11 +1513,16 @@ namespace os
           sigset_t mask, clock::duration_t timeout, sigset_t* oflags = nullptr,
           flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
-      int*
-      error (void);
+      /**
+       * @cond ignore
+       */
 
       rtos::thread*
       _thread (void);
+
+    /**
+     * @endcond
+     */
 
     } /* namespace this_thread */
 
@@ -1602,10 +1691,19 @@ namespace os
         this_thread::thread ()._exit (exit_ptr);
       }
 
+      /**
+       * @details
+       * The actual C library function, used by newlib,
+       * is in `os-core.cpp`.
+       *
+       * @see __error()
+       *
+       */
       inline int*
+      __attribute__ ((always_inline))
       error (void)
       {
-        return this_thread::thread ()._error ();
+        return &this_thread::thread ().errno_;
       }
 
     } /* namespace this_thread */
@@ -1710,14 +1808,6 @@ namespace os
     }
 
     inline bool
-    thread::interrupt (bool interrupt)
-    {
-      bool tmp = interrupted_;
-      interrupted_ = interrupt;
-      return tmp;
-    }
-
-    inline bool
     thread::interrupted (void)
     {
       return interrupted_;
@@ -1739,120 +1829,7 @@ namespace os
       return &user_storage_;
     }
 
-    inline int*
-    thread::_error (void)
-    {
-      return &errno_;
-    }
-
     // ========================================================================
-
-    /**
-     * @details
-     * This constructor shall initialise an unnamed thread object
-     * with default settings.
-     * The effect shall be equivalent to creating a thread object
-     * referring to the attributes in `thread::initializer`.
-     * Upon successful initialisation, the state of the
-     * thread object shall become initialised, and the thread is
-     * added to the ready list.
-     *
-     * Only the thread object itself may be used for running the
-     * function. It is not allowed to make copies of
-     * condition variable objects.
-     *
-     * The thread is created to execute _function_ with _args_ as its
-     * sole argument. If the function returns, the effect
-     * shall be as if there was an implicit call to `exit()` using
-     * the return value of function as the exit status. Note that
-     * the thread in which `main()` was originally invoked differs
-     * from this. When it returns from `main()`, the effect shall
-     * be as if there was an implicit call to `exit()` using the
-     * return value of `main()` as the exit status.
-     *
-     * For default thread objects, the stack is dynamically allocated,
-     * using the given allocator (default `rtos::memory::allocator`).
-     *
-     * @par POSIX compatibility
-     *  Inspired by [`pthread_create()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html)
-     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    template<typename Allocator>
-      inline
-      thread_allocated<Allocator>::thread_allocated (func_t function,
-                                                     func_args_t args,
-                                                     const Allocator& allocator) :
-          thread_allocated
-            { nullptr, function, args, allocator }
-      {
-        ;
-      }
-
-    /**
-     * @details
-     * This constructor shall initialise a named thread object
-     * with default settings.
-     * The effect shall be equivalent to creating a thread object
-     * referring to the attributes in `thread::initializer`.
-     * Upon successful initialisation, the state of the
-     * thread object shall become initialised, and the thread is
-     * added to the ready list.
-     *
-     * Only the thread object itself may be used for running the
-     * function. It is not allowed to make copies of
-     * condition variable objects.
-     *
-     * The thread is created to execute _function_ with _args_ as its
-     * sole argument. If the function returns, the effect
-     * shall be as if there was an implicit call to `exit()` using
-     * the return value of function as the exit status. Note that
-     * the thread in which `main()` was originally invoked differs
-     * from this. When it returns from `main()`, the effect shall
-     * be as if there was an implicit call to `exit()` using the
-     * return value of `main()` as the exit status.
-     *
-     * For default thread objects, the stack is dynamically allocated,
-     * using the given allocator (default `rtos::memory::allocator`).
-     *
-     * @par POSIX compatibility
-     *  Inspired by [`pthread_create()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html)
-     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    template<typename Allocator>
-      thread_allocated<Allocator>::thread_allocated (const char* name,
-                                                     func_t function,
-                                                     func_args_t args,
-                                                     const Allocator& allocator) :
-          thread
-            { name }
-      {
-#if defined(OS_TRACE_RTOS_THREAD)
-        trace::printf ("%s @%p %s\n", __func__, this, this->name ());
-#endif
-
-        allocator_ = &allocator;
-
-        allocated_stack_size_elements_ = (stack::default_size ()
-            + sizeof(typename Allocator::value_type) - 1)
-            / sizeof(typename Allocator::value_type);
-        allocated_stack_address_ =
-            reinterpret_cast<stack::element_t*> (const_cast<Allocator&> (allocator).allocate (
-                allocated_stack_size_elements_));
-
-        _construct (
-            initializer,
-            function,
-            args,
-            allocated_stack_address_,
-            allocated_stack_size_elements_
-                * sizeof(typename Allocator::value_type));
-      }
 
     /**
      * @details
@@ -1897,12 +1874,12 @@ namespace os
      */
     template<typename Allocator>
       inline
-      thread_allocated<Allocator>::thread_allocated (const attributes& attr,
-                                                     func_t function,
+      thread_allocated<Allocator>::thread_allocated (func_t function,
                                                      func_args_t args,
+                                                     const attributes& attr,
                                                      const Allocator& allocator) :
           thread_allocated
-            { nullptr, attr, function, args, allocator }
+            { nullptr, function, args, attr, allocator }
       {
         ;
       }
@@ -1950,9 +1927,9 @@ namespace os
      */
     template<typename Allocator>
       thread_allocated<Allocator>::thread_allocated (const char* name,
-                                                     const attributes& attr,
                                                      func_t function,
                                                      func_args_t args,
+                                                     const attributes& attr,
                                                      const Allocator& allocator) :
           thread
             { name }
@@ -1963,7 +1940,7 @@ namespace os
         if (attr.th_stack_address != nullptr
             && attr.th_stack_size_bytes > stack::min_size ())
           {
-            _construct (attr, function, args, nullptr, 0);
+            _construct (function, args, attr, nullptr, 0);
           }
         else
           {
@@ -1986,14 +1963,18 @@ namespace os
                     allocated_stack_size_elements_);
 
             _construct (
-                attr,
                 function,
                 args,
+                attr,
                 allocated_stack_address_,
                 allocated_stack_size_elements_
                     * sizeof(typename Allocator::value_type));
           }
       }
+
+    /**
+     * @cond ignore
+     */
 
     template<typename Allocator>
       void
@@ -2017,6 +1998,10 @@ namespace os
 
         thread::_destroy ();
       }
+
+    /**
+     * @endcond
+     */
 
     /**
      * @details
@@ -2044,16 +2029,22 @@ namespace os
     /**
      * @details
      * This constructor shall initialise a thread object
-     * with default settings.
-     * The effect shall be equivalent to creating a thread object
-     * referring to the attributes in `thread::initializer`.
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the thread attributes shall not be affected.
      * Upon successful initialisation, the state of the
      * thread object shall become initialised, and the thread is
      * added to the ready list.
      *
      * Only the thread object itself may be used for running the
      * function. It is not allowed to make copies of
-     * condition variable objects.
+     * thread objects.
+     *
+     * In cases where default thread attributes are
+     * appropriate, the variable `thread::initializer` can be used to
+     * initialise threads.
+     * The effect shall be equivalent to creating a thread
+     * object with the default constructor.
      *
      * The thread is created to execute _function_ with _args_ as its
      * sole argument. If the function returns, the effect
@@ -2083,9 +2074,10 @@ namespace os
      */
     template<std::size_t N>
       inline
-      thread_static<N>::thread_static (func_t function, func_args_t args) :
+      thread_static<N>::thread_static (func_t function, func_args_t args,
+                                       const attributes& attr) :
           thread_static<N>
-            { nullptr, function, args }
+            { nullptr, function, args, attr }
       {
         ;
       }
@@ -2093,16 +2085,22 @@ namespace os
     /**
      * @details
      * This constructor shall initialise a named thread object
-     * with default settings.
-     * The effect shall be equivalent to creating a thread object
-     * referring to the attributes in `thread::initializer`.
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the thread attributes shall not be affected.
      * Upon successful initialisation, the state of the
      * thread object shall become initialised, and the thread is
      * added to the ready list.
      *
      * Only the thread object itself may be used for running the
      * function. It is not allowed to make copies of
-     * condition variable objects.
+     * thread objects.
+     *
+     * In cases where default thread attributes are
+     * appropriate, the variable `thread::initializer` can be used to
+     * initialise threads.
+     * The effect shall be equivalent to creating a thread
+     * object with the default constructor.
      *
      * The thread is created to execute _function_ with _args_ as its
      * sole argument. If the function returns, the effect
@@ -2132,128 +2130,14 @@ namespace os
      */
     template<std::size_t N>
       thread_static<N>::thread_static (const char* name, func_t function,
-                                       func_args_t args) :
+                                       func_args_t args, const attributes& attr) :
           thread
             { name }
       {
 #if defined(OS_TRACE_RTOS_THREAD)
         trace::printf ("%s @%p %s\n", __func__, this, this->name ());
 #endif
-        _construct (initializer, function, args, &stack_, stack_size_bytes);
-      }
-
-    /**
-     * @details
-     * This constructor shall initialise a thread object
-     * with attributes referenced by _attr_.
-     * If the attributes specified by _attr_ are modified later,
-     * the thread attributes shall not be affected.
-     * Upon successful initialisation, the state of the
-     * thread object shall become initialised, and the thread is
-     * added to the ready list.
-     *
-     * Only the thread object itself may be used for running the
-     * function. It is not allowed to make copies of
-     * thread objects.
-     *
-     * In cases where default thread attributes are
-     * appropriate, the variable `thread::initializer` can be used to
-     * initialise threads.
-     * The effect shall be equivalent to creating a thread
-     * object with the default constructor.
-     *
-     * The thread is created to execute _function_ with _args_ as its
-     * sole argument. If the function returns, the effect
-     * shall be as if there was an implicit call to `exit()` using
-     * the return value of function as the exit status. Note that
-     * the thread in which `main()` was originally invoked differs
-     * from this. When it returns from `main()`, the effect shall
-     * be as if there was an implicit call to `exit()` using the
-     * return value of `main()` as the exit status.
-     *
-     * The storage shall be statically allocated inside the
-     * thread object instance.
-     *
-     * @note These objects are better instantiated as global static
-     * objects. When instantiated on the thread stack, the stack
-     * should be sized accordingly.
-     *
-     * Implemented as a wrapper over the parent constructor, automatically
-     * passing the stack size and address.
-     *
-     * @par POSIX compatibility
-     *  Inspired by [`pthread_create()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html)
-     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    template<std::size_t N>
-      inline
-      thread_static<N>::thread_static (const attributes& attr, func_t function,
-                                       func_args_t args) :
-          thread_static<N>
-            { nullptr, attr, function, args }
-      {
-        ;
-      }
-
-    /**
-     * @details
-     * This constructor shall initialise a named thread object
-     * with attributes referenced by _attr_.
-     * If the attributes specified by _attr_ are modified later,
-     * the thread attributes shall not be affected.
-     * Upon successful initialisation, the state of the
-     * thread object shall become initialised, and the thread is
-     * added to the ready list.
-     *
-     * Only the thread object itself may be used for running the
-     * function. It is not allowed to make copies of
-     * thread objects.
-     *
-     * In cases where default thread attributes are
-     * appropriate, the variable `thread::initializer` can be used to
-     * initialise threads.
-     * The effect shall be equivalent to creating a thread
-     * object with the default constructor.
-     *
-     * The thread is created to execute _function_ with _args_ as its
-     * sole argument. If the function returns, the effect
-     * shall be as if there was an implicit call to `exit()` using
-     * the return value of function as the exit status. Note that
-     * the thread in which `main()` was originally invoked differs
-     * from this. When it returns from `main()`, the effect shall
-     * be as if there was an implicit call to `exit()` using the
-     * return value of `main()` as the exit status.
-     *
-     * The storage shall be statically allocated inside the
-     * thread object instance.
-     *
-     * @note These objects are better instantiated as global static
-     * objects. When instantiated on the thread stack, the stack
-     * should be sized accordingly.
-     *
-     * Implemented as a wrapper over the parent constructor, automatically
-     * passing the stack size and address.
-     *
-     * @par POSIX compatibility
-     *  Inspired by [`pthread_create()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html)
-     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    template<std::size_t N>
-      thread_static<N>::thread_static (const char* name, const attributes& attr,
-                                       func_t function, func_args_t args) :
-          thread
-            { name }
-      {
-#if defined(OS_TRACE_RTOS_THREAD)
-        trace::printf ("%s @%p %s\n", __func__, this, this->name ());
-#endif
-        _construct (attr, function, args, &stack_,
+        _construct (function, args, attr, &stack_,
                     stack_size_bytes * sizeof(decltype(stack_[0])));
       }
 

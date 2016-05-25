@@ -143,7 +143,7 @@ namespace os
          */
 
         /**
-         * @brief Create mutex attributes.
+         * @brief Create a mutex attributes object.
          * @par Parameters
          *  None
          */
@@ -153,29 +153,33 @@ namespace os
         /**
          * @cond ignore
          */
+
+      protected:
+
+        constexpr
+        attributes (type_t type);
+
+      public:
+
         attributes (const attributes&) = default;
         attributes (attributes&&) = default;
         attributes&
         operator= (const attributes&) = default;
         attributes&
         operator= (attributes&&) = default;
+
         /**
          * @endcond
          */
 
         /**
-         * @brief Destroy a mutex attributes.
+         * @brief Destroy the mutex attributes object.
          */
         ~attributes () = default;
 
         /**
          * @}
          */
-
-      protected:
-
-        constexpr
-        attributes (type_t type);
 
       public:
 
@@ -216,6 +220,7 @@ namespace os
         /**
          * @}
          */
+
       }; /* class attributes */
 
       /**
@@ -239,7 +244,7 @@ namespace os
          */
 
         /**
-         * @brief Create recursive mutex attributes.
+         * @brief Create a recursive mutex attributes object.
          * @par Parameters
          *  None
          */
@@ -249,24 +254,27 @@ namespace os
         /**
          * @cond ignore
          */
+
         recursive_attributes (const recursive_attributes&) = default;
         recursive_attributes (recursive_attributes&&) = default;
         recursive_attributes&
         operator= (const recursive_attributes&) = default;
         recursive_attributes&
         operator= (recursive_attributes&&) = default;
+
         /**
          * @endcond
          */
 
         /**
-         * @brief Destroy a recursive mutex attributes.
+         * @brief Destroy the recursive mutex attributes object.
          */
         ~recursive_attributes () = default;
 
         /**
          * @}
          */
+
       }; /* class recursive_attributes */
 
       /**
@@ -280,33 +288,35 @@ namespace os
        */
 
       /**
-       * @brief Create a mutex.
+       * @brief Create a mutex object.
        * @param [in] attr Reference to attributes.
        */
-      mutex (const attributes& attr);
+      mutex (const attributes& attr = normal_initializer);
 
       /**
-       * @brief Create a named mutex.
+       * @brief Create a named mutex object.
        * @param [in] name Pointer to name.
        * @param [in] attr Reference to attributes.
        */
-      mutex (const char* name, const attributes& attr);
+      mutex (const char* name, const attributes& attr = normal_initializer);
 
       /**
        * @cond ignore
        */
+
       mutex (const mutex&) = delete;
       mutex (mutex&&) = delete;
       mutex&
       operator= (const mutex&) = delete;
       mutex&
       operator= (mutex&&) = delete;
+
       /**
        * @endcond
        */
 
       /**
-       * @brief Destroy the mutex.
+       * @brief Destroy the mutex object.
        */
       ~mutex ();
 
@@ -490,6 +500,10 @@ namespace os
        */
 
       /**
+       * @cond ignore
+       */
+
+      /**
        * @brief Internal initialisation.
        * @par Parameters
        *  None
@@ -508,6 +522,10 @@ namespace os
       _try_lock (thread* crt_thread);
 
       /**
+       * @endcond
+       */
+
+      /**
        * @}
        */
 
@@ -516,6 +534,10 @@ namespace os
       /**
        * @name Private Member Variables
        * @{
+       */
+
+      /**
+       * @cond ignore
        */
 
       // Can be updated in different thread contexts.
@@ -547,8 +569,13 @@ namespace os
       // Add more internal data.
 
       /**
+       * @endcond
+       */
+
+      /**
        * @}
        */
+
     };
 
 #pragma GCC diagnostic pop

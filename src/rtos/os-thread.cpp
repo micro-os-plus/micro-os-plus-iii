@@ -43,17 +43,24 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
+    /**
+     * @cond ignore
+     */
+
     std::size_t thread::stack::min_size_bytes_ = port::stack::min_size_bytes;
 
     std::size_t thread::stack::default_size_bytes_ =
         port::stack::default_size_bytes;
 
-    // ========================================================================
-
     /**
-     * @class attributes
+     * @endcond
+     */
+
+    // ========================================================================
+    /**
+     * @class thread::attributes
      * @details
-     * Allow to assign a name and custom attributes (like stack address,
+     * Allow to assign custom attributes (like stack address,
      * stack size, priority) to the thread.
      *
      * To simplify access, the member variables are public and do not
@@ -64,6 +71,36 @@ namespace os
      *  (IEEE Std 1003.1, 2013 Edition).
      */
 
+    /**
+     * @class thread::context
+     * @details
+     * The thread context includes the stack object and port
+     * specific structures.
+     *
+     * On some ports (like the Cortex-M) the thread context is
+     * stored on the stack and a pointer to the current location
+     * is kept in the context object.
+     *
+     * On other ports (like the synthetic POSIX port), the
+     * makecontext() functions create and manage large
+     * ucontex_t structures stored in the context object.
+     */
+
+    /**
+     * @class thread::stack
+     * @details
+     * This class does not contain the stack space itself, it is
+     * allocated outside, but stores the address and the size of
+     * the stack.
+     *
+     * It also manages the global variables storing the min and
+     * default stack sizes.
+     */
+
+    /**
+     * @details
+     * This variable is used by the default constructor.
+     */
     const thread::attributes thread::initializer;
 
     /**
@@ -99,7 +136,7 @@ namespace os
      *   // Do something.
      *
      *   // Wait for thread to terminate.
-     *   th.join();
+     *   this_thread::join(th);
      *
      *   return 0;
      * }
@@ -109,6 +146,10 @@ namespace os
      *  Inspired by `pthread_t`
      *  from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     */
+
+    /**
+     * @cond ignore
      */
 
     /**
@@ -143,6 +184,10 @@ namespace os
       trace::printf ("%s @%p %s\n", __func__, this, this->name ());
 #endif
     }
+
+    /**
+     * @endcond
+     */
 
     /**
      * @details
@@ -246,7 +291,7 @@ namespace os
       if (attr.th_stack_address != nullptr
           && attr.th_stack_size_bytes > stack::min_size ())
         {
-          _construct (attr, function, args, nullptr, 0);
+          _construct (function, args, attr, nullptr, 0);
         }
       else
         {
@@ -270,18 +315,22 @@ namespace os
                   allocated_stack_size_elements_));
 
           _construct (
-              attr,
               function,
               args,
+              attr,
               allocated_stack_address_,
               allocated_stack_size_elements_
                   * sizeof(stack::allocation_element_t));
         }
     }
 
+    /**
+     * @cond ignore
+     */
+
     void
-    thread::_construct (const attributes& attr, func_t function,
-                        func_args_t args, void* stack_address,
+    thread::_construct (func_t function, func_args_t args,
+                        const attributes& attr, void* stack_address,
                         std::size_t stack_size_bytes)
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
@@ -367,6 +416,10 @@ namespace os
     }
 
     /**
+     * @endcond
+     */
+
+    /**
      * @details
      * This destructor shall destroy the thread object; the object
      * becomes, in effect, uninitialised. An implementation may cause
@@ -392,31 +445,6 @@ namespace os
         {
           kill ();
         }
-    }
-
-    /**
-     * @details
-     *
-     * @par POSIX compatibility
-     *  Extension to standard, no POSIX similar functionality identified.
-     */
-    void
-    thread::_wait (void)
-    {
-#if defined(OS_TRACE_RTOS_THREAD)
-      //trace::printf ("%s() @%p %s\n", __func__, this, name ());
-#endif
-
-        {
-          interrupts::critical_section ics; // ----- Critical section -----
-
-          // Remove this thread from the ready list, if there.
-          port::this_thread::prepare_suspend ();
-
-          sched_state_ = state::waiting;
-        }
-      port::scheduler::reschedule ();
-
     }
 
     /**
@@ -615,6 +643,54 @@ namespace os
       return result::ok;
     }
 
+    /**
+     * @details
+     * If the interrupt flag is true, threads waiting for
+     * an event are notified immediately (actually as
+     * soon as the thread priority allows it to run).
+     *
+     * After the thread detects the interrupted condition, it
+     * must clear the interrupted flag.
+     */
+    bool
+    thread::interrupt (bool interrupt)
+    {
+      bool tmp = interrupted_;
+      interrupted_ = interrupt;
+
+      resume ();
+      return tmp;
+    }
+
+    /**
+     * @cond ignore
+     */
+
+    /**
+     * @details
+     *
+     * @par POSIX compatibility
+     *  Extension to standard, no POSIX similar functionality identified.
+     */
+    void
+    thread::_wait (void)
+    {
+#if defined(OS_TRACE_RTOS_THREAD)
+      //trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
+
+        {
+          interrupts::critical_section ics; // ----- Critical section -----
+
+          // Remove this thread from the ready list, if there.
+          port::this_thread::prepare_suspend ();
+
+          sched_state_ = state::waiting;
+        }
+      port::scheduler::reschedule ();
+
+    }
+
     void
     thread::_exit (void* exit_ptr)
     {
@@ -703,6 +779,10 @@ namespace os
           joiner_->resume ();
         }
     }
+
+    /**
+     * @endcond
+     */
 
     /**
      * @details
@@ -883,6 +963,10 @@ namespace os
 
       return result::ok;
     }
+
+    /**
+     * @cond ignore
+     */
 
     /**
      * @details
@@ -1069,8 +1153,11 @@ namespace os
       return res;
     }
 
-    // ------------------------------------------------------------------------
+    /**
+     * @endcond
+     */
 
+    // ------------------------------------------------------------------------
     /**
      * @details
      * The os::rtos::this_thread namespace groups functions related to
@@ -1078,6 +1165,10 @@ namespace os
      */
     namespace this_thread
     {
+
+      /**
+       * @cond ignore
+       */
 
       rtos::thread*
       _thread (void)
@@ -1095,6 +1186,10 @@ namespace os
 #endif
         return th;
       }
+
+      /**
+       * @endcond
+       */
 
       /**
        * @details

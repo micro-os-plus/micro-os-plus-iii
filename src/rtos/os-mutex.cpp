@@ -42,7 +42,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     /**
-     * @class attributes
+     * @class mutex::attributes
      * @details
      * Allow to assign a name and custom attributes (like priority ceiling,
      * robustness, etc) to the mutex.
@@ -57,7 +57,7 @@ namespace os
      */
 
     /**
-     * @class recursive_attributes
+     * @class mutex::recursive_attributes
      * @details
      * Allow to assign a name and custom attributes (like priority ceiling,
      * robustness, etc) to the mutex.
@@ -69,7 +69,7 @@ namespace os
      */
 
     /**
-     * @var thread::priority_t attributes::mx_priority_ceiling
+     * @var thread::priority_t mutex::attributes::mx_priority_ceiling
      * @details
      * The @ref mx_priority_ceiling attribute defines the priority
      * ceiling of initialised mutexes, which is the minimum priority
@@ -88,7 +88,7 @@ namespace os
      */
 
     /**
-     * @var mutex::protocol_t attributes::mx_protocol
+     * @var mutex::protocol_t mutex::attributes::mx_protocol
      * @details
      * The default value of the attribute shall be `mutex::protocol::none`.
      *
@@ -163,7 +163,7 @@ namespace os
      */
 
     /**
-     * @var mutex::robustness_t attributes::mx_robustness
+     * @var mutex::robustness_t mutex::attributes::mx_robustness
      * @details
      *
      * Valid values for robust include:
@@ -204,7 +204,7 @@ namespace os
      */
 
     /**
-     * @var mutex::type_t attributes::mx_type
+     * @var mutex::type_t mutex::attributes::mx_type
      * @details
      * The default value of the type attribute is `mutex::type::_default`.
      *
@@ -227,8 +227,16 @@ namespace os
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
 
+    /**
+     * @details
+     * This variable is used by the default constructor.
+     */
     const mutex::attributes mutex::normal_initializer;
 
+    /**
+     * @details
+     * This variable can be used to create a recursive mutex.
+     */
     const mutex::recursive_attributes mutex::recursive_initializer;
 
     // ------------------------------------------------------------------------
@@ -468,6 +476,10 @@ namespace os
 #endif
     }
 
+    /**
+     * @cond ignore
+     */
+
     void
     mutex::_init (void)
     {
@@ -558,6 +570,10 @@ namespace os
 
       // TODO: EINVAL, EOWNERDEAD
     }
+
+    /**
+     * @endcond
+     */
 
     /**
      * @details

@@ -73,12 +73,14 @@ namespace os
       /**
        * @cond ignore
        */
+
       static_double_list_links (const static_double_list_links&) = delete;
       static_double_list_links (static_double_list_links&&) = delete;
       static_double_list_links&
       operator= (const static_double_list_links&) = delete;
       static_double_list_links&
       operator= (static_double_list_links&&) = delete;
+
       /**
        * @endcond
        */
@@ -99,7 +101,8 @@ namespace os
 
       /**
        * @brief Remove the node from the list.
-       * @return Nothing.
+       * @par Returns
+       *  Nothing.
        */
       void
       unlink (void);
@@ -154,12 +157,14 @@ namespace os
       /**
        * @cond ignore
        */
+
       double_list_links (const double_list_links&) = delete;
       double_list_links (double_list_links&&) = delete;
       double_list_links&
       operator= (const double_list_links&) = delete;
       double_list_links&
       operator= (double_list_links&&) = delete;
+
       /**
        * @endcond
        */
@@ -201,12 +206,14 @@ namespace os
       /**
        * @cond ignore
        */
+
       waiting_thread_node (const waiting_thread_node&) = delete;
       waiting_thread_node (waiting_thread_node&&) = delete;
       waiting_thread_node&
       operator= (const waiting_thread_node&) = delete;
       waiting_thread_node&
       operator= (waiting_thread_node&&) = delete;
+
       /**
        * @endcond
        */
@@ -265,12 +272,14 @@ namespace os
       /**
        * @cond ignore
        */
+
       timestamp_node (const timestamp_node&) = delete;
       timestamp_node (timestamp_node&&) = delete;
       timestamp_node&
       operator= (const timestamp_node&) = delete;
       timestamp_node&
       operator= (timestamp_node&&) = delete;
+
       /**
        * @endcond
        */
@@ -296,7 +305,8 @@ namespace os
        * @brief Action to perform when the time stamp is reached.
        * @par Parameters
        *  None.
-       * @return Nothing.
+       * @par Returns
+       *  Nothing.
        */
       virtual void
       action (void) = 0;
@@ -352,12 +362,14 @@ namespace os
       /**
        * @cond ignore
        */
+
       timeout_thread_node (const timeout_thread_node&) = delete;
       timeout_thread_node (timeout_thread_node&&) = delete;
       timeout_thread_node&
       operator= (const timeout_thread_node&) = delete;
       timeout_thread_node&
       operator= (timeout_thread_node&&) = delete;
+
       /**
        * @endcond
        */
@@ -383,7 +395,8 @@ namespace os
        * @brief Action to perform when the time stamp is reached.
        * @par Parameters
        *  None.
-       * @return Nothing.
+       * @par Returns
+       *  Nothing.
        */
       virtual void
       action (void) override;
@@ -469,7 +482,8 @@ namespace os
        * @brief Action to perform when the time stamp is reached.
        * @par Parameters
        *  None.
-       * @return Nothing.
+       * @par Returns
+       *  Nothing.
        */
       virtual void
       action (void) override;
@@ -519,12 +533,14 @@ namespace os
       /**
        * @cond ignore
        */
+
       static_double_list (const static_double_list&) = delete;
       static_double_list (static_double_list&&) = delete;
       static_double_list&
       operator= (const static_double_list&) = delete;
       static_double_list&
       operator= (static_double_list&&) = delete;
+
       /**
        * @endcond
        */
@@ -549,7 +565,8 @@ namespace os
        * @brief Clear the list.
        * @par Parameters
        *  None.
-       * @return Nothing.
+       * @par Returns
+       *  Nothing.
        */
       void
       clear (void);
@@ -599,7 +616,8 @@ namespace os
        * @brief Insert a new node after existing node.
        * @param node Reference to node to insert.
        * @param after Reference to existing node.
-       * @return Nothing.
+       * @par Returns
+       *  Nothing.
        */
       void
       insert_after (static_double_list_links& node,
@@ -650,12 +668,14 @@ namespace os
       /**
        * @cond ignore
        */
+
       double_list (const double_list&) = delete;
       double_list (double_list&&) = delete;
       double_list&
       operator= (const double_list&) = delete;
       double_list&
       operator= (double_list&&) = delete;
+
       /**
        * @endcond
        */
@@ -693,12 +713,14 @@ namespace os
       /**
        * @cond ignore
        */
+
       top_threads_list (const top_threads_list&) = delete;
       top_threads_list (top_threads_list&&) = delete;
       top_threads_list&
       operator= (const top_threads_list&) = delete;
       top_threads_list&
       operator= (top_threads_list&&) = delete;
+
       /**
        * @endcond
        */
@@ -722,7 +744,8 @@ namespace os
       /**
        * @brief Add a new thread node to the list.
        * @param [in] thread Reference to a list node.
-       * @return Nothing.
+       * @par Returns
+       *  Nothing.
        */
       void
       link (thread& thread);
@@ -756,12 +779,14 @@ namespace os
       /**
        * @cond ignore
        */
+
       thread_children_list (const thread_children_list&) = delete;
       thread_children_list (thread_children_list&&) = delete;
       thread_children_list&
       operator= (const thread_children_list&) = delete;
       thread_children_list&
       operator= (thread_children_list&&) = delete;
+
       /**
        * @endcond
        */
@@ -785,7 +810,8 @@ namespace os
       /**
        * @brief Add a new thread node to the list.
        * @param [in] thread Reference to a list node.
-       * @return Nothing.
+       * @par Returns
+       *  Nothing.
        */
       void
       link (thread& thread);
@@ -819,12 +845,14 @@ namespace os
       /**
        * @cond ignore
        */
+
       ready_threads_list (const ready_threads_list&) = delete;
       ready_threads_list (ready_threads_list&&) = delete;
       ready_threads_list&
       operator= (const ready_threads_list&) = delete;
       ready_threads_list&
       operator= (ready_threads_list&&) = delete;
+
       /**
        * @endcond
        */
@@ -848,7 +876,8 @@ namespace os
       /**
        * @brief Add a new thread node to the list.
        * @param [in] node Reference to a list node.
-       * @return Nothing.
+       * @par Returns
+       *  Nothing.
        */
       void
       link (waiting_thread_node& node);
@@ -900,12 +929,14 @@ namespace os
       /**
        * @cond ignore
        */
+
       waiting_threads_list (const waiting_threads_list&) = delete;
       waiting_threads_list (waiting_threads_list&&) = delete;
       waiting_threads_list&
       operator= (const waiting_threads_list&) = delete;
       waiting_threads_list&
       operator= (waiting_threads_list&&) = delete;
+
       /**
        * @endcond
        */
@@ -929,7 +960,8 @@ namespace os
       /**
        * @brief Add a new thread node to the list.
        * @param [in] node Reference to a list node.
-       * @return Nothing.
+       * @par Returns
+       *  Nothing.
        */
       void
       link (waiting_thread_node& node);
@@ -947,7 +979,8 @@ namespace os
        * @brief Wake-up one thread (the oldest with the highest priority)
        * @par Parameters
        *  None.
-       * @return Nothing.
+       * @par Returns
+       *  Nothing.
        */
       void
       resume_one (void);
@@ -956,7 +989,8 @@ namespace os
        * @brief Wake-up all threads in the list.
        * @par Parameters
        *  None.
-       * @return Nothing.
+       * @par Returns
+       *  Nothing.
        */
       void
       resume_all (void);
@@ -990,12 +1024,14 @@ namespace os
       /**
        * @cond ignore
        */
+
       clock_timestamps_list (const clock_timestamps_list&) = delete;
       clock_timestamps_list (clock_timestamps_list&&) = delete;
       clock_timestamps_list&
       operator= (const clock_timestamps_list&) = delete;
       clock_timestamps_list&
       operator= (clock_timestamps_list&&) = delete;
+
       /**
        * @endcond
        */
@@ -1019,7 +1055,8 @@ namespace os
       /**
        * @brief Add a new thread node to the list.
        * @param [in] node Reference to a list node.
-       * @return Nothing.
+       * @par Returns
+       *  Nothing.
        */
       void
       link (timestamp_node& node);
@@ -1036,7 +1073,8 @@ namespace os
       /**
        * @brief Check list time stamps.
        * @param [in] now The current clock time stamp.
-       * @return Nothing.
+       * @par Returns
+       *  Nothing.
        */
       void
       check_timestamp (port::clock::timestamp_t now);
@@ -1068,12 +1106,14 @@ namespace os
       /**
        * @cond ignore
        */
+
       terminated_threads_list (const terminated_threads_list&) = delete;
       terminated_threads_list (terminated_threads_list&&) = delete;
       terminated_threads_list&
       operator= (const terminated_threads_list&) = delete;
       terminated_threads_list&
       operator= (terminated_threads_list&&) = delete;
+
       /**
        * @endcond
        */
@@ -1097,7 +1137,8 @@ namespace os
       /**
        * @brief Add a new thread node to the list.
        * @param [in] node Reference to a list node.
-       * @return Nothing.
+       * @par Returns
+       *  Nothing.
        */
       void
       link (waiting_thread_node& node);
@@ -1116,12 +1157,17 @@ namespace os
       /**
        * @}
        */
+
     };
 
     // ------------------------------------------------------------------------
 
     namespace scheduler
     {
+      /**
+       * @cond ignore
+       */
+
       void
       _link_node (waiting_threads_list& list, waiting_thread_node& node);
 
@@ -1136,6 +1182,10 @@ namespace os
       void
       _unlink_node (waiting_thread_node& node,
                     timeout_thread_node& timeout_node);
+
+    /**
+     * @endcond
+     */
 
     } /* namespace this_thread */
 

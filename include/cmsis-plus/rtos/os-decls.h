@@ -216,7 +216,15 @@ namespace os
        */
       using status_t = bool;
 
+      /**
+       * @cond ignore
+       */
+
       constexpr status_t init_status = false;
+
+    /**
+     * @endcond
+     */
 
     } /* namespace scheduler */
 
@@ -243,6 +251,8 @@ namespace os
     /**
      * @brief Generic flags namespace.
      * @ingroup cmsis-plus-rtos
+     * @details
+     * The os::rtos::flags namespace groups event types and enumerations.
      */
     namespace flags
     {
@@ -363,7 +373,7 @@ namespace os
        */
 
       /**
-       * @brief Get name.
+       * @brief Get object name.
        * @par Parameters
        *  None.
        * @return A null terminated string.
@@ -383,9 +393,17 @@ namespace os
        */
 
       /**
+       * @cond ignore
+       */
+
+      /**
        * @brief Pointer to name.
        */
       const char* const name_ = "-";
+
+      /**
+       * @endcond
+       */
 
       /**
        * @}
@@ -441,6 +459,8 @@ namespace os
 
       /**
        * @brief Pointer to clock.
+       * @details
+       * If `nullptr`, the default clock is the os::rtos::sysclock.
        */
       rtos::clock* clock = nullptr;
 
@@ -727,6 +747,8 @@ extern "C"
 
   /**
    * @brief Main thread.
+   * @headerfile os.h <cmsis-plus/rtos/os.h>
+   * @ingroup cmsis-plus-rtos
    * @param argc Count of arguments.
    * @param argv Array of pointers to arguments.
    * @retval 0 The proram terminated normally.

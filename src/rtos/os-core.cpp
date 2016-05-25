@@ -53,6 +53,10 @@ namespace os
     namespace scheduler
     {
       /**
+       * @cond ignore
+       */
+
+      /**
        * @details
        * No further changes allowed, the scheduler cannot be stopped,
        * in can be only locked.
@@ -66,17 +70,17 @@ namespace os
        */
       status_t is_locked_ = false;
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#endif
       /**
        * @details
        * This special list is set to empty during BSS initialisation,
        * since it must be available to register the very first statically
        * allocated thread.
        */
-#pragma GCC diagnostic push
-#if defined(__clang__)
-#pragma clang diagnostic ignored "-Wglobal-constructors"
-#pragma clang diagnostic ignored "-Wexit-time-destructors"
-#endif
       top_threads_list top_threads_list_;
 #pragma GCC diagnostic pop
 
@@ -91,6 +95,10 @@ namespace os
       terminated_threads_list terminated_threads_list_;
 #pragma GCC diagnostic pop
 #endif
+
+      /**
+       * @endcond
+       */
 
       /**
        * @details
@@ -224,7 +232,7 @@ namespace os
      *    // Do something
      *
      *    {
-     *      scheduler::critical_section cs;  // Critical section begins here.
+     *      scheduler::critical_section scs;  // Critical section begins here.
      *
      *      // Inside the critical section.
      *      // No scheduler switches will happen here.
@@ -236,7 +244,7 @@ namespace os
      * @endcode
      */
 
-    /**
+    /*
      * @var const status_t critical_section::status_
      * @details
      * The variable is constant, after being set by the constructor no
@@ -247,13 +255,13 @@ namespace os
      */
 
     /**
-     * @class Lock
+     * @class lockable
      * @details
      * Locker meeting the standard `Lockable` requirements (30.2.5.3).
      */
 
-    /**
-     * @var status_t Lock::status_
+    /*
+     * @var status_t lockable::status_
      * @details
      * The variable type usually is a `bool`, but a counter is also
      * possible if the scheduler uses a recursive lock.
@@ -263,6 +271,9 @@ namespace os
 
     namespace scheduler
     {
+      /**
+       * @cond ignore
+       */
 
       void
       _link_node (waiting_threads_list& list, waiting_thread_node& node)
@@ -326,6 +337,10 @@ namespace os
         node.unlink ();
       }
 
+    /**
+     * @endcond
+     */
+
     } /* namespace this_thread */
 
     /**
@@ -370,7 +385,7 @@ namespace os
        * @endcode
        */
 
-      /**
+      /*
        * @var const status_t critical_section::status_
        * @details
        * The variable is constant, after being set by the constructor no
@@ -409,13 +424,13 @@ namespace os
       }
 
     /**
-     * @class Lock
+     * @class lockable
      * @details
      * Locker meeting the standard `Lockable` requirements (30.2.5.3).
      */
 
-    /**
-     * @var status_t Lock::status_
+    /*
+     * @var status_t lockable::status_
      * @details
      * The variable type usually is an unsigned integer where
      * the status register is saved.
@@ -426,17 +441,6 @@ namespace os
     // ========================================================================
 
     /**
-     * @details
-     * The os::rtos::flags namespace groups event types and enumerations.
-     */
-    namespace flags
-    {
-
-    } /* namespace flags */
-
-    // ==========================================================================
-
-    /**
      * @class named_object
      * @details
      * This class serves as a base class for all objects that have a
@@ -445,7 +449,7 @@ namespace os
      * Attributes use a separate constexpr object.
      */
 
-    /**
+    /*
      * @var const char* const named_object::name_
      * @details
      * To save space, the null terminated string passed to the
@@ -456,6 +460,9 @@ namespace os
      * string (stored in flash) is preferred.
      */
 
+    /**
+     *
+     */
     named_object::named_object ()
     {
       ;
@@ -487,8 +494,9 @@ __error (void);
 
 /**
  * @brief Per-thread error support.
+ * @ingroup cmsis-plus-rtos
  * @details
- * Standard C libraries define `errno` as macro to a function returning
+ * Standard C libraries define `errno` as a macro to a function returning
  * a pointer. This function returns such a pointer, specific to each
  * thread.
  * @return Pointer to per-thread errno value.

@@ -536,16 +536,14 @@ extern "C"
 
   /**
    * @brief SysTick interrupt handler.
-   * @details
-   * Must be called from the physical interrupt handler.
+   * @ingroup cmsis-plus-rtos
    */
   void
   os_systick_handler (void);
 
   /**
    * @brief RTC interrupt handler.
-   * @details
-   * Must be called from the physical RTC interrupt handler.
+   * @ingroup cmsis-plus-rtos
    */
   void
   os_rtc_handler (void);

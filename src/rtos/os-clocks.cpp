@@ -38,6 +38,10 @@ using namespace os::rtos;
 
 // ----------------------------------------------------------------------------
 
+/**
+ * @details
+ * Must be called from the physical interrupt handler.
+ */
 void
 os_systick_handler (void)
 {
@@ -60,6 +64,10 @@ os_systick_handler (void)
 #endif
 }
 
+/**
+ * @details
+ * Must be called from the physical RTC interrupt handler.
+ */
 void
 os_rtc_handler (void)
 {
@@ -87,6 +95,16 @@ namespace os
 
     // ========================================================================
 
+    /**
+     * @class clock
+     * @details
+     * Used as base class for all clocks.
+     */
+
+    /**
+     * @cond ignore
+     */
+
     clock::clock (const char* name) :
         named_object
           { name }
@@ -95,11 +113,19 @@ namespace os
       offset_ = 0;
     }
 
+    /**
+     * @endcond
+     */
+
     clock::~clock ()
     {
       ;
     }
 
+    /**
+     * @details
+     * For system clocks it is called from the system startup code.
+     */
     void
     clock::start (void)
     {
@@ -227,6 +253,10 @@ namespace os
       return res;
     }
 
+    /**
+     * @cond ignore
+     */
+
     void
     clock::_interrupt_service_routine (void)
     {
@@ -284,8 +314,11 @@ namespace os
       return result::ok;
     }
 
-    // ========================================================================
+    /**
+     * @endcond
+     */
 
+    // ========================================================================
     /**
      * @class clock_systick
      * @details
@@ -309,14 +342,14 @@ namespace os
      *    // Do something
      *
      *    // Get the current ticks counter.
-     *    clock::timestamp_t ticks = systick_clock.now();
+     *    clock::timestamp_t ticks = sysclock.now();
      *
      *    // Put the current thread to sleep for a given number of ticks.
-     *    systick_clock.sleep_for(7);
+     *    sysclock.sleep_for(7);
      *
      *    // Put the current thread to sleep for a given number of microseconds.
      *    // For a 1000 Hz clock, the actual value is 4 ticks.
-     *    systick_clock.sleep_for(clock_systick::ticks_cast(3500));
+     *    sysclock.sleep_for(clock_systick::ticks_cast(3500));
      *
      *    // Do something else.
      * }
@@ -324,15 +357,14 @@ namespace os
      */
 
     // ------------------------------------------------------------------------
-    /**
-     * @brief Instance of the SysTick clock.
-     */
-
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #endif
+    /**
+     * @details Kind of singleton instance of the clock_systick class.
+     */
     clock_systick sysclock;
 #pragma GCC diagnostic pop
 
@@ -479,7 +511,7 @@ namespace os
      * of seconds since the standard POSIX epoch (January 1st, 1970).
      *
      * As any usual clock, it might occasionally be adjusted to match
-     * a reference clock, so i cannot be a steady clock.
+     * a reference clock, so it cannot be a steady clock.
      *
      * For systems that do not have a hardware RTC, it can be derived from
      * SysTick, but in this case it must be externally initialised with
@@ -494,10 +526,10 @@ namespace os
      *    // Do something
      *
      *    // Get the current seconds counter.
-     *    clock::timestamp_t seconds = rtc.now();
+     *    clock::timestamp_t seconds = rtclock.now();
      *
      *    // Put the current thread to sleep for a given number of seconds.
-     *    rtc.sleep_for(7);
+     *    rtclock.sleep_for(7);
      *
      *    // Do something else.
      * }
@@ -505,14 +537,14 @@ namespace os
      */
 
     // ------------------------------------------------------------------------
-    /**
-     * @brief Instance of the Real Time clock.
-     */
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #endif
+    /**
+     * @brief Kind of singleton instance of the clock_rtc class.
+     */
     clock_rtc rtclock;
 #pragma GCC diagnostic pop
 
