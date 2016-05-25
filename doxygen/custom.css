@@ -110,7 +110,7 @@ a {
 }
 
 code {
-	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;	
+	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
 	background-color: rgba(0, 0, 0, 0.04);
 	border-radius: 3px;
 	padding: 0;
@@ -123,24 +123,24 @@ code:before, code:after {
 }
 
 .params .paramname, .retval .paramname {
-	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;	
+	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
 	vertical-align: top;
 	padding-right: 1em;
 }
 
 .params .paramdir {
-	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;	
+	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
 	vertical-align: top;
 }
 
 div.line {
 	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
-	font-size: 14px; /* <- absolute */	
+	font-size: 14px; /* <- absolute */
 	line-height: 1.2;
 }
 
 div.tabs {
-	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;	
+	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
 	font-size: 90%; /* 14px; */
 }
 
@@ -149,12 +149,12 @@ div.tabs2, div.tabs3 {
 }
 
 .navpath li.navelem a {
-	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;	
+	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
 	font-size: 90%; /* 14px; */
 }
 
 table.directory {
-	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;	
+	font-family: "Helvetica Neue", Helvetica, "Segoe UI", Arial, freesans, sans-serif;
 	font-size: 90%; /* 14px; */
 	line-height: 1.2;
 }
@@ -180,14 +180,14 @@ table.memname td {
 	/* font-weight: normal; */
 }
 
-td.memItemLeft, td.memItemRight, td.memname, td.fieldname, td.paramtype, 
-td.paramname, td.entry, td.memTemplItemLeft, 
-td.memTemplItemRight { 
+td.memItemLeft, td.memItemRight, td.memname, td.fieldname, td.paramtype,
+td.paramname, td.entry, td.memTemplItemLeft,
+td.memTemplItemRight, div.textblock h3 {
 	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
 	font-size: 95%;
 }
 
-td.memTemplParams, div.memtemplate { 
+td.memTemplParams, div.memtemplate {
 	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
 	font-size: 85%;
 }
