@@ -57,86 +57,293 @@ extern "C"
 {
 #endif
 
-  // --------------------------------------------------------------------------
+  /**
+   * @addtogroup cmsis-plus-rtos-c
+   * @{
+   */
 
+  // --------------------------------------------------------------------------
+  /**
+   * @name Return codes
+   * @{
+   */
+
+  /**
+   * @brief Return codes, in addition to POSIX codes.
+   */
   enum
   {
     os_ok = 0, ///< function completed; no error or event occurred.
   };
 
-  // --------------------------------------------------------------------------
+  /**
+   * @}
+   */
 
+  // --------------------------------------------------------------------------
+  /**
+   * @name Main thread function
+   * @{
+   */
+
+  /**
+   * @brief Application entry point, running on the main thread context.
+   * @param argc Count of arguments.
+   * @param argv Array of string arguments.
+   * @return 0 for success, non-zero for error.
+   *
+   * @details
+   * If the application does not define a main() function but defines
+   * os_main(),
+   * the CMSIS++ RTOS will automatically provide a main() function
+   * that starts the main thread and calls os_main() within this context.
+   */
   int
   os_main (int argc, char* argv[]);
 
-  // --------------------------------------------------------------------------
+  /**
+   * @}
+   */
 
+  // --------------------------------------------------------------------------
+  /**
+   * @name Scheduler functions
+   * @{
+   */
+
+  /**
+   * @brief Initialise the RTOS scheduler.
+   * @par Parameters
+   *  None
+   * @retval os_ok The scheduler was initialised.
+   * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+   */
   os_result_t
   os_sched_initialize (void);
 
+  /**
+   * @brief Start the RTOS scheduler.
+   * @par Parameters
+   *  None
+   * @par Returns
+   *  Nothing.
+   */
   void
   __attribute__((noreturn))
   os_sched_start (void);
 
+  /**
+   * @brief Check if the scheduler was started.
+   * @par Parameters
+   *  None
+   * @retval true The scheduler was started.
+   * @retval false The scheduler was not started.
+   */
   bool
   os_sched_is_started (void);
 
+  /**
+   * @brief Lock the scheduler.
+   * @param [in] status The new status of the scheduler (true for locked).
+   * @return The previous status of the scheduler.
+   */
   os_sched_status_t
   os_sched_lock (os_sched_status_t status);
 
+  /**
+   * @brief Unlock the scheduler.
+   * @param [in] status The new status of the scheduler (false for unlocked).
+   * @par Returns
+   *  Nothing.
+   */
   void
   os_sched_unlock (os_sched_status_t status);
 
+  /**
+   * @brief Check if the scheduler is locked.
+   * @par Parameters
+   *  None
+   * @retval true The scheduler is locked.
+   * @retval false The scheduler is running (not locked).
+   */
   bool
   os_sched_is_locked (void);
 
-  // --------------------------------------------------------------------------
+  /**
+   * @}
+   */
 
+  // --------------------------------------------------------------------------
+  /**
+   * @name Interrupts functions
+   * @{
+   */
+
+  /**
+   * @brief Check if the CPU is in handler mode.
+   * @par Parameters
+   *  None
+   * @retval true Execution is in an exception handler context.
+   * @retval false Execution is in a thread context.
+   */
+  bool
+  os_irq_in_handler_mode (void);
+
+  /**
+   * @brief Enter interrupts critical section.
+   * @par Parameters
+   *  None
+   * @return The current interrupts status register.
+   */
   os_irq_status_t
   os_irq_critical_enter (void);
 
+  /**
+   * @brief Exit interrupts critical section.
+   * @param status The value to restore the interrupts status register.
+   * @par Returns
+   *  Nothing.
+   */
   void
   os_irq_critical_exit (os_irq_status_t status);
 
   // --------------------------------------------------------------------------
 
+  /**
+   * @brief Enter interrupts uncritical section.
+   * @par Parameters
+   *  None
+   * @return The current interrupts status register.
+   */
   os_irq_status_t
   os_irq_uncritical_enter (void);
 
+  /**
+   * @brief Exit interrupts uncritical section.
+   * @param status The value to restore the interrupts status register.
+   * @par Returns
+   *  Nothing.
+   */
   void
   os_irq_uncritical_exit (os_irq_status_t status);
 
-  // --------------------------------------------------------------------------
+  /**
+   * @}
+   */
 
+  // --------------------------------------------------------------------------
+  /**
+   * @name Current thread functions
+   * @{
+   */
+
+  /**
+   * @brief Get the current running thread.
+   * @par Parameters
+   *  None
+   * @return Pointer to the current running thread.
+   */
   os_thread_t*
   os_this_thread (void);
 
+  /**
+   * @brief Suspend the current running thread to wait for an event.
+   * @par Parameters
+   *  None
+   * @par Returns
+   *  Nothing.
+   */
   void
   os_this_thread_wait (void);
 
+  /**
+   * @brief Terminate the current running thread.
+   * @param [in] exit_ptr Pointer to object to return. (Optional).
+   * @par Returns
+   *  Nothing.
+   */
   void
   __attribute__((noreturn))
   os_this_thread_exit (void* exit_ptr);
 
+  /**
+   * @brief Wait for thread termination.
+   * @param [in] thread Reference to terminating thread.
+   * @param [in] exit_ptr Pointer to object to return. (Optional).
+   * @retval os_ok The thread was terminated.
+   * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+   */
   os_result_t
   os_this_thread_join (os_thread_t* thread, void** exit_ptr);
 
+  /**
+   * @brief Wait for signal flags.
+   * @param [in] mask The expected flags (OR-ed bit-mask);
+   *  may be zero.
+   * @param [out] oflags Pointer where to store the current flags;
+   *  may be `nullptr`.
+   * @param [in] mode Mode bits to select if either all or any flags
+   *  are expected, and if the flags should be cleared.
+   * @retval os_ok All expected flags are raised.
+   * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+   * @retval EINVAL The mask is outside of the permitted range.
+   * @retval EINTR The operation was interrupted.
+   * @retval ENOTRECOVERABLE Wait failed.
+   */
   os_result_t
   os_this_thread_sig_wait (os_thread_sigset_t mask, os_thread_sigset_t* oflags,
                            os_flags_mode_t mode);
 
+  /**
+   * @brief Try to wait for signal flags.
+   * @param [in] mask The expected flags (OR-ed bit-mask);
+   *  may be zero.
+   * @param [out] oflags Pointer where to store the current flags;
+   *  may be `nullptr`.
+   * @param [in] mode Mode bits to select if either all or any flags
+   *  are expected, and if the flags should be cleared.
+   * @retval os_ok All expected flags are raised.
+   * @retval EINVAL The mask is outside of the permitted range.
+   * @retval EWOULDBLOCK The expected condition did not occur.
+   * @retval ENOTRECOVERABLE Wait failed.
+   */
   os_result_t
   os_this_thread_try_sig_wait (os_thread_sigset_t mask,
                                os_thread_sigset_t* oflags,
                                os_flags_mode_t mode);
 
+  /**
+   * @brief Timed wait for signal flags.
+   * @param [in] mask The expected flags (OR-ed bit-mask);
+   *  may be zero.
+   * @param [out] oflags Pointer where to store the current flags;
+   *  may be `nullptr`.
+   * @param [in] mode Mode bits to select if either all or any flags
+   *  are expected, and if the flags should be cleared.
+   * @param [in] timeout Timeout to wait, in clock units (ticks or seconds).
+   * @retval os_ok All expected flags are raised.
+   * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+   * @retval ETIMEDOUT The expected condition did not occur during the
+   *  entire timeout duration.
+   * @retval EINVAL The mask is outside of the permitted range.
+   * @retval EINTR The operation was interrupted.
+   * @retval ENOTRECOVERABLE Wait failed.
+   */
   os_result_t
   os_this_thread_timed_sig_wait (os_thread_sigset_t mask,
                                  os_clock_duration_t timeout,
                                  os_thread_sigset_t* oflags,
                                  os_flags_mode_t mode);
 
+  /**
+   * @}
+   */
+
   // --------------------------------------------------------------------------
+  /**
+   * @name Thread functions
+   * @{
+   */
 
   void
   os_thread_attr_init (os_thread_attr_t* attr);
@@ -176,7 +383,15 @@ extern "C"
   os_thread_sig_get (os_thread_t* thread, os_thread_sigset_t mask,
                      os_flags_mode_t mode);
 
+  /**
+   * @}
+   */
+
   // --------------------------------------------------------------------------
+  /**
+   * @name Thread stack functions
+   * @{
+   */
 
   size_t
   os_thread_stack_get_default_size (void);
@@ -190,7 +405,15 @@ extern "C"
   size_t
   os_thread_stack_set_min_size (size_t size_bytes);
 
+  /**
+   * @}
+   */
+
   // --------------------------------------------------------------------------
+  /**
+   * @name Clock functions
+   * @{
+   */
 
   const char*
   os_clock_name (os_clock_t* clock);
@@ -202,13 +425,19 @@ extern "C"
   os_clock_steady_now (os_clock_t* clock);
 
   os_result_t
-  os_clock_sleep_for (os_clock_t* clock, os_clock_duration_t timeout);
+  os_clock_sleep_for (os_clock_t* clock, os_clock_duration_t duration);
 
   os_result_t
   os_clock_sleep_until (os_clock_t* clock, os_clock_timestamp_t timestamp);
 
   os_result_t
-  os_clock_wait_for (os_clock_t* clock, os_clock_duration_t timeout);
+  os_clock_wait_for (os_clock_t* clock, os_clock_duration_t duration);
+
+  os_clock_offset_t
+  os_clock_get_offset (os_clock_t* clock);
+
+  os_clock_offset_t
+  os_clock_set_offset (os_clock_t* clock, os_clock_offset_t offset);
 
   os_clock_t*
   os_clock_get_sysclock (void);
@@ -225,13 +454,13 @@ extern "C"
   os_sysclock_steady_now (void);
 
   os_result_t
-  os_sysclock_sleep_for (os_clock_duration_t timeout);
+  os_sysclock_sleep_for (os_clock_duration_t duration);
 
   os_result_t
   os_sysclock_sleep_until (os_clock_timestamp_t timestamp);
 
   os_result_t
-  os_sysclock_wait_for (os_clock_duration_t timeout);
+  os_sysclock_wait_for (os_clock_duration_t duration);
 
   os_clock_timestamp_t
   os_sysclock_now_details (os_sysclock_current_t* details);
@@ -259,7 +488,15 @@ extern "C"
 
 #pragma GCC diagnostic pop
 
+  /**
+   * @}
+   */
+
   // --------------------------------------------------------------------------
+  /**
+   * @name Timer functions
+   * @{
+   */
 
   void
   os_timer_attr_init (os_timer_attr_t* attr);
@@ -275,12 +512,20 @@ extern "C"
   os_timer_get_name (os_timer_t* timer);
 
   os_result_t
-  os_timer_start (os_timer_t* timer, os_clock_duration_t timeout);
+  os_timer_start (os_timer_t* timer, os_clock_duration_t duration);
 
   os_result_t
   os_timer_stop (os_timer_t* timer);
 
+  /**
+   * @}
+   */
+
   // --------------------------------------------------------------------------
+  /**
+   * @name Mutex functions
+   * @{
+   */
 
   void
   os_mutex_attr_init (os_mutex_attr_t* attr);
@@ -323,7 +568,15 @@ extern "C"
   os_result_t
   os_mutex_reset (os_mutex_t* mutex);
 
+  /**
+   * @}
+   */
+
   // --------------------------------------------------------------------------
+  /**
+   * @name Condition variable functions
+   * @{
+   */
 
   void
   os_condvar_attr_init (os_condvar_attr_t* attr);
@@ -351,7 +604,15 @@ extern "C"
   os_condvar_timed_wait (os_condvar_t* condvar, os_mutex_t* mutex,
                          os_clock_duration_t timeout);
 
+  /**
+   * @}
+   */
+
   // --------------------------------------------------------------------------
+  /**
+   * @name Semaphore functions
+   * @{
+   */
 
   void
   os_semaphore_attr_init (os_semaphore_attr_t* attr);
@@ -391,7 +652,15 @@ extern "C"
   os_semaphore_count_t
   os_semaphore_get_max_value (os_semaphore_t* semaphore);
 
+  /**
+   * @}
+   */
+
   // --------------------------------------------------------------------------
+  /**
+   * @name Memory pool functions
+   * @{
+   */
 
   void
   os_mempool_attr_init (os_mempool_attr_t* attr);
@@ -439,7 +708,15 @@ extern "C"
   void*
   os_mempool_get_pool (os_mempool_t* mempool);
 
+  /**
+   * @}
+   */
+
   // --------------------------------------------------------------------------
+  /**
+   * @name Message queue functions
+   * @{
+   */
 
   void
   os_mqueue_attr_init (os_mqueue_attr_t* attr);
@@ -497,7 +774,15 @@ extern "C"
   os_result_t
   os_mqueue_reset (os_mqueue_t* mqueue);
 
+  /**
+   * @}
+   */
+
   // --------------------------------------------------------------------------
+  /**
+   * @name Event flags functions
+   * @{
+   */
 
   void
   os_evflags_attr_init (os_evflags_attr_t* attr);
@@ -540,18 +825,32 @@ extern "C"
   bool
   os_evflags_are_waiting (os_evflags_t* evflags);
 
+  /**
+   * @}
+   */
+
   // --------------------------------------------------------------------------
+  /**
+   * @name Clock handlers
+   * @{
+   */
 
   // Internal functions, to be defined by the user.
   // (not to be called directly).
-
   void
   os_systick_handler (void);
 
   void
   os_rtc_handler (void);
 
+/**
+ * @}
+ */
+
 // --------------------------------------------------------------------------
+/**
+ * @}
+ */
 
 #ifdef  __cplusplus
 }

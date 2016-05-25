@@ -119,6 +119,10 @@ static_assert(os_priority_error == thread::priority::error, "adjust os_priority_
 
 // ----------------------------------------------------------------------------
 
+/**
+ * @details
+ * @see os::rtos::scheduler::initialize()
+ */
 os_result_t
 os_sched_initialize (void)
 {
@@ -377,11 +381,11 @@ os_clock_steady_now (os_clock_t* clock)
 }
 
 os_result_t
-os_clock_sleep_for (os_clock_t* clock, os_clock_duration_t timeout)
+os_clock_sleep_for (os_clock_t* clock, os_clock_duration_t duration)
 {
   assert(clock != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::clock&> (*clock)).sleep_for (
-      timeout);
+      duration);
 }
 
 os_result_t
@@ -393,11 +397,29 @@ os_clock_sleep_until (os_clock_t* clock, os_clock_timestamp_t timestamp)
 }
 
 os_result_t
-os_clock_wait_for (os_clock_t* clock, os_clock_duration_t timeout)
+os_clock_wait_for (os_clock_t* clock, os_clock_duration_t duration)
 {
   assert(clock != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::clock&> (*clock)).wait_for (
-      timeout);
+      duration);
+}
+
+os_clock_offset_t
+os_clock_get_offset (os_clock_t* clock)
+{
+  assert(clock != nullptr);
+  return (os_clock_offset_t) (reinterpret_cast<rtos::clock&> (*clock)).offset ();
+
+}
+
+os_clock_offset_t
+os_clock_set_offset (os_clock_t* clock, os_clock_offset_t offset)
+{
+  assert(clock != nullptr);
+  assert(clock != nullptr);
+  return (os_clock_offset_t) (reinterpret_cast<rtos::clock&> (*clock)).offset (
+      (clock::offset_t) offset);
+
 }
 
 os_clock_t*
@@ -418,7 +440,6 @@ os_clock_timestamp_t
 os_sysclock_now (void)
 {
   return (os_clock_timestamp_t) sysclock.now ();
-
 }
 
 os_clock_timestamp_t
@@ -428,9 +449,9 @@ os_sysclock_steady_now (void)
 }
 
 os_result_t
-os_sysclock_sleep_for (os_clock_duration_t timeout)
+os_sysclock_sleep_for (os_clock_duration_t duration)
 {
-  return (os_result_t) sysclock.sleep_for (timeout);
+  return (os_result_t) sysclock.sleep_for (duration);
 }
 
 os_result_t
@@ -440,9 +461,9 @@ os_sysclock_sleep_until (os_clock_timestamp_t timestamp)
 }
 
 os_result_t
-os_sysclock_wait_for (os_clock_duration_t timeout)
+os_sysclock_wait_for (os_clock_duration_t duration)
 {
-  return (os_result_t) sysclock.wait_for (timeout);
+  return (os_result_t) sysclock.wait_for (duration);
 }
 
 // SysTick specific now() with details.
