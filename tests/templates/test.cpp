@@ -65,8 +65,8 @@ run_tests (void)
       thread th2
         { "th2", func, nullptr };
 
-      th1.join ();
-      th2.join ();
+      this_thread::join (th1);
+      this_thread::join (th2);
     }
 
   // --------------------------------------------------------------------------
@@ -80,8 +80,8 @@ run_tests (void)
       my_thread ath2
         { "ath2", func, nullptr };
 
-      ath1.join ();
-      ath2.join ();
+      this_thread::join (ath1);
+      this_thread::join (ath2);
     }
 
   // --------------------------------------------------------------------------
@@ -93,8 +93,8 @@ run_tests (void)
       static thread_static<> sth2
         { "sth2", func, nullptr };
 
-      sth1.join ();
-      sth2.join ();
+      this_thread::join (sth1);
+      this_thread::join (sth2);
     }
 
   // ==========================================================================
