@@ -27,6 +27,8 @@
 
 #if defined(__ARM_EABI__)
 
+// ----------------------------------------------------------------------------
+
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/diag/trace.h>
 

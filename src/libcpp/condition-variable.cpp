@@ -25,6 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if defined(NOT_READY)
+
 #include <cmsis-plus/iso/condition_variable>
 #include <cmsis-plus/iso/system_error>
 #include <cstdlib>
@@ -93,3 +95,5 @@ namespace os
 } /* namespace os */
 
 // ----------------------------------------------------------------------------
+
+#endif /* defined(NOT_READY) */

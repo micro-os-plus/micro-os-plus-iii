@@ -27,6 +27,8 @@
 
 #if defined(__ARM_EABI__)
 
+// ----------------------------------------------------------------------------
+
 #include <cmsis-plus/diag/trace.h>
 
 #include <stdlib.h>
@@ -104,5 +106,7 @@ void __attribute__((weak, alias ("_Exit")))
 _exit (int status);
 
 #endif /* !defined(OS_USE_SEMIHOSTING) */
+
+// ----------------------------------------------------------------------------
 
 #endif /* defined(__ARM_EABI__) */

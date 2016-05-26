@@ -25,6 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if defined(NOT_READY)
+
 #include <cmsis-plus/iso/chrono>
 
 // ----------------------------------------------------------------------------
@@ -131,3 +133,5 @@ namespace os
 } /* namespace os */
 
 // ----------------------------------------------------------------------------
+
+#endif /* defined(NOT_READY) */

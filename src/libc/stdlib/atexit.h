@@ -25,6 +25,10 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if defined(__ARM_EABI__)
+
+// ----------------------------------------------------------------------------
+
 #define _LITE_EXIT
 
 /*
@@ -58,3 +62,8 @@ extern "C"
 #if defined(__cplusplus)
 }
 #endif
+
+// ----------------------------------------------------------------------------
+
+#endif /* defined(__ARM_EABI__) */
+

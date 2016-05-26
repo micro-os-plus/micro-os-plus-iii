@@ -62,6 +62,8 @@
 
 #if defined(__ARM_EABI__)
 
+// ----------------------------------------------------------------------------
+
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -882,5 +884,7 @@ _pvalloc_r (void* impure __attribute__((unused)), size_t s)
 #endif /* DEFINE_PVALLOC */
 
 #pragma GCC diagnostic pop
+
+// ----------------------------------------------------------------------------
 
 #endif /* defined(__ARM_EABI__) */

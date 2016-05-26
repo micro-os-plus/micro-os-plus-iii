@@ -25,6 +25,10 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if defined(__ARM_EABI__)
+
+// ----------------------------------------------------------------------------
+
 #if defined(OS_USE_SEMIHOSTING)
 
 #include <cmsis-plus/arm/semihosting.h>
@@ -1240,7 +1244,7 @@ initialise_monitor_handles (void)
 
 // ----------------------------------------------------------------------------
 
-#if defined(__ARM_EABI__) && (__STDC_HOSTED__ != 0)
+#if (__STDC_HOSTED__ != 0)
 
 // The aliases must be in the same compilation unit as the names
 // they alias.
@@ -1262,9 +1266,11 @@ initialise_monitor_handles (void)
 
 #endif
 
-#endif /* defined(__ARM_EABI__) && (__STDC_HOSTED__ != 0) */
-
-#endif /* #if defined(OS_USE_SEMIHOSTING) */
+#endif /* (__STDC_HOSTED__ != 0) */
+#endif /* defined(OS_USE_SEMIHOSTING) */
 
 // ----------------------------------------------------------------------------
+
+#endif /* defined(__ARM_EABI__) */
+
 

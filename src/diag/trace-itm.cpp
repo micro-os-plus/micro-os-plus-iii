@@ -25,6 +25,10 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if defined(__ARM_EABI__)
+
+// ----------------------------------------------------------------------------
+
 #if defined(TRACE)
 #if defined(OS_USE_TRACE_ITM)
 
@@ -112,4 +116,7 @@ namespace os
 #endif /* defined(TRACE) */
 
 // ----------------------------------------------------------------------------
+
+#endif /* defined(__ARM_EABI__) */
+
 

@@ -25,6 +25,10 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if defined(__ARM_EABI__)
+
+// ----------------------------------------------------------------------------
+
 #if defined(TRACE)
 #if defined(OS_USE_TRACE_SEMIHOSTING_DEBUG) || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT)
 
@@ -189,12 +193,15 @@ namespace os
 
 #endif /* defined(OS_USE_TRACE_SEMIHOSTING_STDOUT) */
 
-  }
-/* namespace trace */
+  } /* namespace trace */
 } /* namespace os */
 
 #endif /* defined(OS_USE_TRACE_SEMIHOSTING_DEBUG) || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT) */
 #endif /* defined(TRACE) */
+
+// ----------------------------------------------------------------------------
+
+#endif /* defined(__ARM_EABI__) */
 
 // ----------------------------------------------------------------------------
 

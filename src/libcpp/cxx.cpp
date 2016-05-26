@@ -25,6 +25,10 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if defined(__ARM_EABI__)
+
+// ----------------------------------------------------------------------------
+
 #include <cstdlib>
 #include <sys/types.h>
 #include <cmsis-plus/diag/trace.h>
@@ -70,3 +74,5 @@ extern "C"
 void *__dso_handle __attribute__ ((weak));
 
 // ----------------------------------------------------------------------------
+
+#endif /* defined(__ARM_EABI__) */

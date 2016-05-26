@@ -37,6 +37,22 @@
 // ----------------------------------------------------------------------------
 
 void
+__assert_func (const char* file, int line, const char* func,
+               const char* failedexpr);
+
+#if !defined(TRACE) && !defined(OS_USE_SEMIHOSTING)
+void
+__attribute__((noreturn))
+__assert_func (const char* file __attribute__((unused)),
+    int line __attribute__((unused)),
+    const char* func __attribute__((unused)),
+    const char* failedexpr __attribute__((unused)))
+  {
+    abort ();
+  }
+
+#else
+void
 __attribute__((noreturn))
 __assert_func (const char* file, int line, const char* func,
                const char* failedexpr)
@@ -63,10 +79,10 @@ __assert_func (const char* file, int line, const char* func,
       printf ("function: %s\n", func);
     }
 #endif
-
   abort ();
   /* NOTREACHED */
 }
+#endif
 
 // ----------------------------------------------------------------------------
 
@@ -88,20 +104,20 @@ assert_failed (uint8_t* file, uint32_t line);
 void
 __attribute__((noreturn))
 assert_failed (uint8_t* file, uint32_t line)
-{
+  {
 #if defined(TRACE)
 
-  trace_printf ("assert_param() failed: file \"%s\", line %d\n", file, line);
+    trace_printf ("assert_param() failed: file \"%s\", line %d\n", file, line);
 
 #elif defined(OS_USE_SEMIHOSTING)
 
-  printf ("assert_param() failed: file \"%s\", line %d\n", file, (int)line);
+    printf ("assert_param() failed: file \"%s\", line %d\n", file, (int)line);
 
 #endif
 
-  abort ();
-  /* NOTREACHED */
-}
+    abort ();
+    /* NOTREACHED */
+  }
 
 #endif /* defined(USE_FULL_ASSERT) */
 

@@ -25,6 +25,10 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if defined(__ARM_EABI__)
+
+// ----------------------------------------------------------------------------
+
 #include <cmsis_device.h>
 #include <cmsis-plus/arm/semihosting.h>
 #include <cmsis-plus/diag/trace.h>
@@ -649,3 +653,6 @@ SysTick_Handler (void)
 }
 
 // ----------------------------------------------------------------------------
+
+#endif /* defined(__ARM_EABI__) */
+

@@ -25,13 +25,15 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if defined(__ARM_EABI__)
+
+// ----------------------------------------------------------------------------
+
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <errno.h>
 #include <stddef.h>
-
-#if defined(__ARM_EABI__)
 
 // ----------------------------------------------------------------------------
 

@@ -25,6 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if defined(NOT_READY)
+
 #include <cerrno>
 #include <cmsis-plus/iso/mutex>
 
@@ -126,3 +128,5 @@ namespace os
 } /* namespace os */
 
 // ----------------------------------------------------------------------------
+
+#endif /* defined(NOT_READY) */

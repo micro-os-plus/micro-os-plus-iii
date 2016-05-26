@@ -25,6 +25,10 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if defined(__ARM_EABI__)
+
+// ----------------------------------------------------------------------------
+
 #include <stdlib.h>
 #include <cmsis-plus/diag/trace.h>
 
@@ -40,3 +44,6 @@ abort (void)
 }
 
 // ----------------------------------------------------------------------------
+
+#endif /* defined(__ARM_EABI__) */
+

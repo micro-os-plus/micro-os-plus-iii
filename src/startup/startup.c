@@ -25,6 +25,10 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if defined(__ARM_EABI__)
+
+// ----------------------------------------------------------------------------
+
 #include <cmsis-plus/diag/trace.h>
 
 #include <stdint.h>
@@ -402,3 +406,6 @@ os_initialize_args (int* p_argc, char*** p_argv)
 #endif /* !defined(OS_USE_SEMIHOSTING) */
 
 // ----------------------------------------------------------------------------
+
+#endif /* defined(__ARM_EABI__) */
+
