@@ -405,6 +405,11 @@ namespace os
                                  reinterpret_cast<void*> (_invoke_with_exit),
                                  this);
 
+          if (!scheduler::started ())
+            {
+              scheduler::current_thread_ = this;
+            }
+
           // Add to ready list, but do not yield yet.
           resume ();
 
@@ -444,6 +449,13 @@ namespace os
       if (this != &this_thread::thread ())
         {
           kill ();
+        }
+      else
+        {
+#if defined(OS_TRACE_RTOS_THREAD)
+          trace::printf ("%s @%p %s nop, cannot commit suicide\n", __func__,
+                         this, name ());
+#endif
         }
     }
 
