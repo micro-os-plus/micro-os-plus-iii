@@ -39,6 +39,13 @@
 
 // ----------------------------------------------------------------------------
 
+using namespace os;
+using namespace os::rtos;
+
+/**
+ * @cond ignore
+ */
+
 namespace
 {
   // --------------------------------------------------------------------------
@@ -65,7 +72,9 @@ namespace
   _main_trampoline (void)
   {
     int status = os_main (main_args.argc, main_args.argv);
-    os::trace::printf ("%s() status = %d\n", __func__, status);
+    os::trace::printf ("%s() exit = %d\n", __func__, status);
+    // Exit will run the atexit() and destructors, then
+    // terminate gracefully.
     std::exit (status);
   }
 
@@ -73,7 +82,16 @@ namespace
 
 } /* namespace  */
 
+/**
+ * @endcond
+ */
+
 // ----------------------------------------------------------------------------
+// Necessarily static, on Cortex-M the reset stack will be used
+// as MSP for the interrupts, so the current stack must be freed
+// and os_main() shall run on its own stack.
+using main_thread = thread_static<OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES>;
+static std::aligned_storage<sizeof(main_thread), alignof(main_thread)>::type os_main_thread;
 
 /**
  * @brief Default implementation of main().
@@ -84,11 +102,8 @@ __attribute__((weak))
 #endif
 main (int argc, char* argv[])
 {
-  using namespace os;
-  using namespace os::rtos;
-
   // TODO: make versions configurable.
-  trace::printf ("µOS++ v6.1.1 / CMSIS++ RTOS API v0.1.1.\n");
+  trace::printf ("\nµOS++ v6.1.1 / CMSIS++ RTOS API v0.1.1.\n");
   trace::printf ("Copyright (c) 2016 Liviu Ionescu.\n");
 
   port::scheduler::greeting ();
@@ -117,43 +132,22 @@ main (int argc, char* argv[])
 #endif
   trace::puts (".");
 
-#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
-  // Initialise the current thread with a very simple fake
-  // thread that at least has a name, so trace messages
-  // will not fail with exceptions when printing identity.
-  os_thread_t fake_thread;
-  fake_thread.name = "none";
-  rtos::thread* pth = reinterpret_cast<rtos::thread*> (&fake_thread);
-
-  rtos::scheduler::current_thread_ = pth;
-#endif
-
   scheduler::initialize ();
 
   // Store the parameters in the static structure, to be used by os_main().
   main_args.argc = argc;
   main_args.argv = argv;
 
-  // Necessarily static, the initial stack will be used for the
-  // interrupts, and some implementations (like FreeRTOS) are not
-  // able to preserve this stack content.
+  // Running the constructor manually has the additional advantage of
+  // not registering any destructor, and for main this is important,
+  // since the destructors are executed on its context, and it cannot
+  // destruct itself.
+  new (&os_main_thread) main_thread
+    { "main", reinterpret_cast<thread::func_t> (_main_trampoline), nullptr };
 
-  static thread::stack::allocation_element_t main_stack[OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES
-      / sizeof(thread::stack::allocation_element_t)];
-
-  static thread::attributes attr;
-  attr.th_stack_address = main_stack;
-  attr.th_stack_size_bytes = sizeof(main_stack);
-
-  // Warning: the destructor is registered with atexit()!
-#pragma GCC diagnostic push
-#if defined(__clang__)
-#pragma clang diagnostic ignored "-Wexit-time-destructors"
-#endif
-  static thread main_thread
-    { "main", reinterpret_cast<thread::func_t> (_main_trampoline), nullptr, attr };
-#pragma GCC diagnostic pop
-
+  // Execution will proceed to first registered thread, possibly
+  // "idle", which will immediately lower its priority,
+  // and at a certain moment will reach os_main().
   scheduler::start ();
 
   /* NOTREACHED */
