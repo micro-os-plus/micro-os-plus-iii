@@ -75,10 +75,10 @@ namespace os
       public:
 
         /// type of variable holding the tick counter
-        using rep = rtos::Systick_clock::rep;
-        using sleep_rep = rtos::Systick_clock::sleep_rep;
+        using rep = rtos::clock_systick::timestamp_t;
+        using sleep_rep = rtos::clock_systick::duration_t;
         /// std::ratio type representing the tick period of the clock, in seconds
-        using period = std::ratio<1, os::rtos::Systick_clock::frequency_hz>;
+        using period = std::ratio<1, os::rtos::clock_systick::frequency_hz>;
         /// basic duration type of clock
         using duration = std::chrono::duration<rep, period>;
         using sleep_duration = std::chrono::duration<sleep_rep, period>;
@@ -123,8 +123,8 @@ namespace os
       {
       public:
 
-        using rep = rtos::Realtime_clock::rep;
-        using sleep_rep = rtos::Realtime_clock::sleep_rep;
+        using rep = rtos::clock_rtc::timestamp_t;
+        using sleep_rep = rtos::clock_rtc::duration_t;
 
         /// std::ratio type representing the tick period of the clock, in seconds
         using period = std::ratio<1, 1>;
@@ -236,15 +236,15 @@ namespace os
       inline void
       Systick_clock::sleep_for (sleep_rep ticks)
       {
-        rtos::Systick_clock::sleep_for (ticks);
+        rtos::sysclock.sleep_for (ticks);
       }
 
       // ====================================================================
 
       inline void
-      Realtime_clock::sleep_for (uint32_t secs)
+      Realtime_clock::sleep_for (sleep_rep secs)
       {
-        rtos::Realtime_clock::sleep_for (secs);
+        rtos::rtclock.sleep_for (secs);
       }
 
       // ====================================================================

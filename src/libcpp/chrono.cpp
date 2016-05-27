@@ -25,8 +25,6 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#if defined(NOT_READY)
-
 #include <cmsis-plus/iso/chrono>
 
 // ----------------------------------------------------------------------------
@@ -45,7 +43,7 @@ namespace os
       // Number of seconds from epoch (1 January 1970 00:00:00 UTC)
       // when the system was started.
       // Must be set during startup by reading the RTC.
-      uint64_t startup_absolute_seconds;
+      // uint64_t startup_absolute_seconds;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
@@ -53,9 +51,9 @@ namespace os
       // ====================================================================
 
       Systick_clock::time_point
-      systick_clock.now () noexcept
+      Systick_clock::now () noexcept
       {
-        const auto ticks = rtos::systick_clock.now ();
+        const auto ticks = rtos::sysclock.now ();
         return time_point
           { duration
             { ticks } };
@@ -66,7 +64,7 @@ namespace os
       Realtime_clock::time_point
       Realtime_clock::now () noexcept
       {
-        const auto secs = rtos::Realtime_clock::now ();
+        const auto secs = rtos::rtclock.now ();
         return time_point
           { duration
             { secs } };
@@ -79,7 +77,7 @@ namespace os
       system_clock::time_point
       system_clock::now () noexcept
       {
-        const auto ticks = rtos::systick_clock.now ();
+        const auto ticks = rtos::sysclock.now ();
         return time_point
           { duration
             { systicks
@@ -92,8 +90,8 @@ namespace os
       system_clock::to_time_t (const time_point& t) noexcept
       {
         return time_t (
-            std::chrono::duration_cast<std::chrono::seconds> (
-                t.time_since_epoch ()).count ());
+            std::chrono::duration_cast < std::chrono::seconds
+                > (t.time_since_epoch ()).count ());
       }
 
       system_clock::time_point
@@ -107,8 +105,8 @@ namespace os
       high_resolution_clock::time_point
       high_resolution_clock::now () noexcept
       {
-        rtos::Systick_clock::current_t systick;
-        rtos::systick_clock.now (&systick);
+        rtos::clock_systick::current_t systick;
+        rtos::sysclock.now (&systick);
 
         // The duration is the sum of SysTick ticks plus the current
         // count of CPU cycles (computed from the SysTick counter).
@@ -133,5 +131,3 @@ namespace os
 } /* namespace os */
 
 // ----------------------------------------------------------------------------
-
-#endif /* defined(NOT_READY) */

@@ -82,7 +82,7 @@ namespace os
     {
     private:
 
-      using native_type = os::rtos::Condition_variable;
+      using native_type = os::rtos::condition_variable;
 
     public:
 
@@ -91,7 +91,7 @@ namespace os
       condition_variable ();
 
       // Extension to ISO.
-      condition_variable (os::rtos::condvar::Attributes& attr);
+      condition_variable (os::rtos::condition_variable::attributes& attr);
 
       ~condition_variable ();
 
@@ -154,7 +154,7 @@ namespace os
     public:
 
       condition_variable_any ();
-      condition_variable_any (os::rtos::condvar::Attributes& attr);
+      condition_variable_any (os::rtos::condition_variable::attributes& attr);
 
       ~condition_variable_any ();
 
@@ -232,7 +232,8 @@ namespace os
     }
 
     inline
-    condition_variable::condition_variable (os::rtos::condvar::Attributes& attr) :
+    condition_variable::condition_variable (
+        os::rtos::condition_variable::attributes& attr) :
         ncv_
           { attr }
     {
@@ -273,8 +274,8 @@ namespace os
 #else
         // Optimise to native (ticks). LLVM compares using the
         // original clock, which might be more accurate.
-        Native_clock::duration rel_time = std::chrono::duration_cast<
-            Native_clock::duration> (abs_time - Clock::now ());
+        Native_clock::duration rel_time = std::chrono::duration_cast
+            < Native_clock::duration > (abs_time - Clock::now ());
         return wait_for (lock, rel_time);
 #endif
       }
@@ -314,12 +315,12 @@ namespace os
 
         Native_clock::time_point start_tp = Native_clock::now ();
 
-        rtos::systicks_t ticks = os::estd::chrono::ceil<
-            std::chrono::duration<rtos::systicks_t,
+        rtos::clock::duration_t ticks = os::estd::chrono::ceil<
+            std::chrono::duration<rtos::clock::duration_t,
                 typename Native_clock::period>> (rel_time).count ();
 
-        ncv_.timed_wait ((rtos::mutex &) (*(lock.mutex ()->native_handle ())),
-                         ticks);
+        ncv_.timed_wait (
+            /*(rtos::mutex &)*/(*(lock.mutex ()->native_handle ())), ticks);
 
         return
             (Native_clock::now () - start_tp) < rel_time ?
@@ -354,7 +355,7 @@ namespace os
 
     inline
     condition_variable_any::condition_variable_any (
-        os::rtos::condvar::Attributes& attr) :
+        os::rtos::condition_variable::attributes& attr) :
         cv_
           { attr }, //
         mx_

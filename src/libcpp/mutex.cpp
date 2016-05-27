@@ -25,8 +25,6 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#if defined(NOT_READY)
-
 #include <cerrno>
 #include <cmsis-plus/iso/mutex>
 
@@ -47,7 +45,7 @@ namespace os
       res = nm_.lock ();
       if (res != rtos::result::ok)
         {
-          __throw_cmsis_error ((int) res, "mutex lock failed");
+          __throw_cmsis_error (static_cast<int> (res), "mutex lock failed");
         }
     }
 
@@ -65,8 +63,8 @@ namespace os
           return false;
         }
 
-      __throw_cmsis_error ((int) res, "mutex try_lock failed");
-      return false;
+      __throw_cmsis_error (static_cast<int> (res), "mutex try_lock failed");
+      // return false;
     }
 
     void
@@ -76,7 +74,7 @@ namespace os
       res = nm_.unlock ();
       if (res != rtos::result::ok)
         {
-          __throw_cmsis_error ((int) res, "mutex unlock failed");
+          __throw_cmsis_error (static_cast<int> (res), "mutex unlock failed");
         }
     }
 
@@ -89,7 +87,8 @@ namespace os
       res = nm_.lock ();
       if (res != rtos::result::ok)
         {
-          __throw_cmsis_error ((int) res, "recursive_mutex lock failed");
+          __throw_cmsis_error (static_cast<int> (res),
+                               "recursive_mutex lock failed");
         }
     }
 
@@ -107,8 +106,9 @@ namespace os
           return false;
         }
 
-      __throw_cmsis_error ((int) res, "recursive_mutex try_lock failed");
-      return false;
+      __throw_cmsis_error (static_cast<int> (res),
+                           "recursive_mutex try_lock failed");
+      //return false;
     }
 
     void
@@ -118,7 +118,8 @@ namespace os
       res = nm_.unlock ();
       if (res != rtos::result::ok)
         {
-          __throw_cmsis_error ((int) res, "recursive_mutex unlock failed");
+          __throw_cmsis_error (static_cast<int> (res),
+                               "recursive_mutex unlock failed");
         }
     }
 
@@ -128,5 +129,3 @@ namespace os
 } /* namespace os */
 
 // ----------------------------------------------------------------------------
-
-#endif /* defined(NOT_READY) */

@@ -72,7 +72,7 @@ namespace os
       mutex () noexcept;
 
       // Extension to ISO.
-      mutex (os::rtos::mutex::Attributes& attr) noexcept;
+      mutex (os::rtos::mutex::attributes& attr) noexcept;
 
       ~mutex () = default;
 
@@ -112,7 +112,7 @@ namespace os
       recursive_mutex ();
 
       // Extension to ISO.
-      recursive_mutex (os::rtos::mutex::Attributes& attr);
+      recursive_mutex (os::rtos::mutex::attributes& attr);
 
       ~recursive_mutex () = default;
 
@@ -146,7 +146,7 @@ namespace os
       timed_mutex () = default;
 
       // Extension to ISO.
-      timed_mutex (os::rtos::mutex::Attributes& attr);
+      timed_mutex (os::rtos::mutex::attributes& attr);
 
       ~timed_mutex () = default;
 
@@ -173,7 +173,7 @@ namespace os
       recursive_timed_mutex () = default;
 
       // Extension to ISO.
-      recursive_timed_mutex (os::rtos::mutex::Attributes& attr);
+      recursive_timed_mutex (os::rtos::mutex::attributes& attr);
 
       ~recursive_timed_mutex () = default;
 
@@ -381,7 +381,7 @@ namespace os
     }
 
     inline
-    mutex::mutex (os::rtos::mutex::Attributes& attr) noexcept :
+    mutex::mutex (os::rtos::mutex::attributes& attr) noexcept :
     nm_
       { attr}
       {
@@ -405,7 +405,7 @@ namespace os
     }
 
     inline
-    recursive_mutex::recursive_mutex (os::rtos::mutex::Attributes& attr) :
+    recursive_mutex::recursive_mutex (os::rtos::mutex::attributes& attr) :
         nm_
           { attr }
     {
@@ -421,7 +421,7 @@ namespace os
     // ======================================================================
 
     inline
-    timed_mutex::timed_mutex (os::rtos::mutex::Attributes& attr) :
+    timed_mutex::timed_mutex (os::rtos::mutex::attributes& attr) :
         mutex
           { attr }
     {
@@ -434,11 +434,12 @@ namespace os
           const std::chrono::duration<Rep_T, Period_T>& rel_time)
       {
         using namespace std::chrono;
-        os::rtos::systicks_t ticks = 0;
+        os::rtos::clock::duration_t ticks = 0;
         if (rel_time > duration<Rep_T, Period_T>::zero ())
           {
-            ticks = (os::rtos::systicks_t) (
-                os::estd::chrono::ceil<chrono::systicks> (rel_time).count ());
+            ticks =
+                static_cast<os::rtos::clock::duration_t> (os::estd::chrono::ceil<
+                    chrono::systicks> (rel_time).count ());
           }
 
         rtos::result_t res;
@@ -452,7 +453,8 @@ namespace os
             return false;
           }
 
-        __throw_system_error ((int) res, "timed_mutex try_lock failed");
+        __throw_system_error (static_cast<int> (res),
+                              "timed_mutex try_lock failed");
         return false;
       }
 
@@ -478,7 +480,7 @@ namespace os
 
     inline
     recursive_timed_mutex::recursive_timed_mutex (
-        os::rtos::mutex::Attributes& attr) :
+        os::rtos::mutex::attributes& attr) :
         recursive_mutex
           { attr }
     {
@@ -491,11 +493,12 @@ namespace os
           const std::chrono::duration<Rep_T, Period_T>& rel_time)
       {
         using namespace std::chrono;
-        os::rtos::systicks_t ticks = 0;
+        os::rtos::clock::duration_t ticks = 0;
         if (rel_time > duration<Rep_T, Period_T>::zero ())
           {
-            ticks = (os::rtos::systicks_t) (
-                os::estd::chrono::ceil<chrono::systicks> (rel_time).count ());
+            ticks =
+                static_cast<os::rtos::clock::duration_t> (os::estd::chrono::ceil<
+                    chrono::systicks> (rel_time).count ());
           }
 
         rtos::result_t res;
@@ -509,7 +512,8 @@ namespace os
             return false;
           }
 
-        __throw_system_error ((int) res, "timed_mutex try_lock failed");
+        __throw_system_error (static_cast<int> (res),
+                              "timed_mutex try_lock failed");
         return false;
       }
 
@@ -938,10 +942,10 @@ namespace os
       call_once (once_flag& flag, Callable_T&& func, Args_T&&... args)
       {
         typedef std::tuple<Callable_T&&, Args_T&&...> Tuple;
-        Tuple tuple (std::forward<Callable_T> (func),
+        Tuple tuple (std::forward < Callable_T > (func),
                      std::forward<Args_T>(args)...);
         // TODO: implement
-#if TO_IMPLEMENT
+#if defined(TO_IMPLEMENT)
         __call_once_param < Tuple > __p (tuple);
         __call_once (__flag.__state_, &__p, &__call_once_proxy<tuple>);
 #endif

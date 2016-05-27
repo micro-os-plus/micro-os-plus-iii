@@ -25,8 +25,6 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#if defined(NOT_READY)
-
 #include <cmsis-plus/iso/condition_variable>
 #include <cmsis-plus/iso/system_error>
 #include <cstdlib>
@@ -48,7 +46,7 @@ namespace os
       res = ncv_.signal ();
       if (res != rtos::result::ok)
         {
-          __throw_cmsis_error ((int) res,
+          __throw_cmsis_error (static_cast<int> (res),
                                "condition_variable::notify_one() failed");
         }
     }
@@ -60,7 +58,7 @@ namespace os
       res = ncv_.broadcast ();
       if (res != rtos::result::ok)
         {
-          __throw_cmsis_error ((int) res,
+          __throw_cmsis_error (static_cast<int> (res),
                                "condition_variable::notify_all() failed");
         }
     }
@@ -72,13 +70,15 @@ namespace os
         __throw_system_error (EPERM,
                               "condition_variable::wait: mutex not locked");
       rtos::result_t res = ncv_.wait (
-          (rtos::mutex&) (*(lk.mutex ()->native_handle ())));
+      /*(rtos::mutex&)*/(*(lk.mutex ()->native_handle ())));
       if (res != rtos::result::ok)
-        __throw_cmsis_error ((int) res, "condition_variable wait failed");
+        __throw_cmsis_error (static_cast<int> (res),
+                             "condition_variable wait failed");
     }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wmissing-noreturn"
 
     void
     notify_all_at_thread_exit (condition_variable& cond, unique_lock<mutex> lk)
@@ -96,4 +96,3 @@ namespace os
 
 // ----------------------------------------------------------------------------
 
-#endif /* defined(NOT_READY) */

@@ -67,7 +67,7 @@ namespace os
     {
     public:
 
-      using native_handle_type = os::rtos::Thread*;
+      using native_handle_type = os::rtos::thread*;
 
       class id
       {
@@ -76,6 +76,10 @@ namespace os
 
         explicit
         id (native_handle_type system_thread) noexcept;
+
+        id (const id&) = default;
+        id&
+        operator= (const id&) = default;
 
         ~id ();
 
@@ -99,32 +103,53 @@ namespace os
 
       thread () noexcept = default;
 
-      template<
-          typename Callable_T, //
-          typename = typename std::enable_if<
-              !std::is_same<Callable_T, std::nullptr_t>::value>::type,
+      template<typename Callable_T, //
           typename ... Args_T>
         explicit
         thread (Callable_T&& f, Args_T&&... args);
+
+#if 0
+      template<
+      typename Name_T, //
+      typename Callable_T,//
+      /*          typename = typename std::enable_if<
+       std::is_same<Name_T, char>::value>::type, */
+      typename ... Args_T,
+      typename Allocator>
+      explicit
+      thread (const Name_T* name, Callable_T&& f, Args_T&&... args, const rtos::thread::attributes& attr =
+          rtos::thread::initializer,
+          const Allocator& allocator = Allocator ());
+#endif
+
+#if 0
+      template<
+      typename Callable_T, //
+      typename = typename std::enable_if<
+      !std::is_same<Callable_T, std::nullptr_t>::value>::type,
+      typename ... Args_T>
+      explicit
+      thread (Callable_T&& f, Args_T&&... args);
 
       // CMSIS RTOS specific constructors (extension to the ISO standard),
       // used to create threads with POSIX custom attributes.
 
       template<
-          typename Attr_T, //
-          typename = typename std::enable_if<
-              std::is_same<Attr_T, os::rtos::thread::Attributes>::value>::type,
-          typename Callable_T, typename ... Args_T>
-        explicit
-        thread (Attr_T& attr, Callable_T&& f, Args_T&&... args);
+      typename Attr_T,//
+      typename = typename std::enable_if<
+      std::is_same<Attr_T, os::rtos::thread::attributes>::value>::type,
+      typename Callable_T, typename ... Args_T>
+      explicit
+      thread (Attr_T& attr, Callable_T&& f, Args_T&&... args);
 
       template<
-          typename Attr_T, //
-          typename = typename std::enable_if<
-              std::is_same<Attr_T, os::rtos::thread::Attributes>::value>::type,
-          typename Callable_T, typename ... Args_T>
-        explicit
-        thread (const Attr_T& attr, Callable_T&& f, Args_T&&... args);
+      typename Attr_T,//
+      typename = typename std::enable_if<
+      std::is_same<Attr_T, os::rtos::thread::attributes>::value>::type,
+      typename Callable_T, typename ... Args_T>
+      explicit
+      thread (const Attr_T& attr, Callable_T&& f, Args_T&&... args);
+#endif
 
       ~thread ();
 
@@ -365,7 +390,8 @@ namespace os
       {
         using Function_object = F_T;
 
-        Function_object* f = (Function_object*) func_obj;
+        const Function_object* f =
+            static_cast<const Function_object*> (func_obj);
         (*f) ();
       }
 
@@ -375,41 +401,80 @@ namespace os
       {
         using Function_object = F_T;
 
-        Function_object* f = (Function_object*) func_obj;
+        const Function_object* f =
+            static_cast<const Function_object*> (func_obj);
 
-        os::trace::printf ("%s\n", __PRETTY_FUNCTION__);
+        os::trace::printf ("%s()\n", __func__);
 
         // The delete now has the knowledge required to
         // correctly delete the object (i.e. the object size).
         delete f;
       }
 
+#if 0
     template<typename Callable_T, typename T, typename ... Args_T>
-      thread::thread (Callable_T&& f, Args_T&&... args) :
-          thread (os::rtos::thread::initializer,
-                  std::forward < Callable_T > (f),
-                  std::forward<Args_T>(args)...)
+    thread::thread (Callable_T&& f, Args_T&&... args) :
+    thread (os::rtos::thread::initializer,
+        std::forward < Callable_T > (f),
+        std::forward<Args_T>(args)...)
       {
         ;
       }
+#endif
 
+#if 0
     template<typename Attr_T, typename T, typename Callable_T,
-        typename ... Args_T>
-      thread::thread (const Attr_T& attr, Callable_T&& f, Args_T&&... args) :
-          thread ((Attr_T&) attr, std::forward < Callable_T > (f),
-                  std::forward<Args_T>(args)...)
+    typename ... Args_T>
+    thread::thread (const Attr_T& attr, Callable_T&& f, Args_T&&... args) :
+    thread ((Attr_T&) attr, std::forward < Callable_T > (f),
+        std::forward<Args_T>(args)...)
       {
         ;
       }
+#endif
 
+#if 0
     template<typename Attr_T, typename T, typename Callable_T,
-        typename ... Args_T>
+    typename ... Args_T>
 
-      thread::thread (Attr_T& attr, Callable_T&& f, Args_T&&... args)
+    thread::thread (Attr_T& attr, Callable_T&& f, Args_T&&... args)
       {
         // static_assert(std::is_same<Attr_T, os::rtos::thread::attr_t>::value, "first param must be thread_attr_t*");
 
         os::trace::printf ("%s(%p) @%p\n", __func__, &attr, this);
+
+        using Function_object = decltype(std::bind (std::forward<Callable_T> (f),
+                std::forward<Args_T>(args)...));
+
+        // Dynamic allocation! The size depends on the number of arguments.
+        // This creates a small problem, since both running the function
+        // and deleting the object requires the type. It is passes as
+        // template functions.
+        Function_object* funct_obj = new Function_object (
+            std::bind (std::forward < Callable_T > (f),
+                std::forward<Args_T>(args)...));
+
+        // The function to start the thread is a custom proxy that
+        // knows how to get the variadic arguments.
+        id_ = id
+          { new os::rtos::thread (
+                attr,
+                (os::rtos::thread::func_t) &run_function_object<Function_object>,
+                (void*) funct_obj)};
+
+        // The deleter, to be used during destruction.
+        function_object_deleter_ =
+        (function_object_deleter_t) &delete_function_object<Function_object>;
+      }
+#endif
+
+    template<typename Callable_T, typename ... Args_T>
+
+      thread::thread (Callable_T&& f, Args_T&&... args)
+      {
+        // static_assert(std::is_same<Attr_T, os::rtos::thread::attr_t>::value, "first param must be thread_attr_t*");
+
+        os::trace::printf ("%s() @%p\n", __func__, this);
 
         using Function_object = decltype(std::bind (std::forward<Callable_T> (f),
                 std::forward<Args_T>(args)...));
@@ -425,14 +490,15 @@ namespace os
         // The function to start the thread is a custom proxy that
         // knows how to get the variadic arguments.
         id_ = id
-          { new os::rtos::Thread (
-              attr,
-              (os::rtos::thread::func_t) &run_function_object<Function_object>,
-              (void*) funct_obj) };
+          { new os::rtos::thread (
+              reinterpret_cast<os::rtos::thread::func_t> (&run_function_object<
+                  Function_object> ),
+              reinterpret_cast<os::rtos::thread::func_args_t> (funct_obj)) };
 
         // The deleter, to be used during destruction.
         function_object_deleter_ =
-            (function_object_deleter_t) &delete_function_object<Function_object>;
+            reinterpret_cast<function_object_deleter_t> (&delete_function_object<
+                Function_object> );
       }
 
     // ======================================================================
@@ -509,8 +575,8 @@ namespace os
 
           if (rel_time > duration<Rep_T, Period_T>::zero ())
             {
-              sleep_rep d = (sleep_rep) os::estd::chrono::ceil<
-                  typename Clock::duration> (rel_time).count ();
+              sleep_rep d = static_cast<sleep_rep> (os::estd::chrono::ceil<
+                  typename Clock::duration> (rel_time).count ());
 
               Clock::sleep_for (d);
             }

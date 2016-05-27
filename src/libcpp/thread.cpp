@@ -25,8 +25,6 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#if defined(NOT_READY)
-
 #include <cmsis-plus/iso/thread>
 #include <cstdlib>
 
@@ -142,5 +140,3 @@ namespace os
 } /* namespace os */
 
 // ----------------------------------------------------------------------------
-
-#endif /* defined(NOT_READY) */
