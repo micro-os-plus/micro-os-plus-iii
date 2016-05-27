@@ -37,77 +37,65 @@
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
-namespace os
-{
-  namespace rtos
-  {
-    namespace scheduler
-    {
+using namespace os;
+using namespace os::rtos;
 
-      // ======================================================================
+/**
+ * @cond ignore
+ */
 
-      /**
-       * @cond ignore
-       */
-
-      void
-      _create_idle (void)
-      {
-        static thread::stack::allocation_element_t idle_stack[OS_INTEGER_RTOS_IDLE_STACK_SIZE_BYTES
-            / sizeof(thread::stack::allocation_element_t)];
-
-        static thread::attributes attr;
-        attr.th_stack_address = idle_stack;
-        attr.th_stack_size_bytes = sizeof(idle_stack);
-
-        // The CMSIS RTOS validator creates threads with `priority::idle`,
-        // so, to be sure that the system idle thread has the lowest priority,
-        // go below the idle priority.
-        attr.th_priority = thread::priority::idle - 1;
-
-        // Warning: the destructor is registered with atexit()!
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
-        static thread idle_thread
-          { "idle", _idle_func, nullptr, attr };
+static thread_static<OS_INTEGER_RTOS_IDLE_STACK_SIZE_BYTES> os_idle_thread
+  { "idle", os_idle, nullptr };
 #pragma GCC diagnostic pop
-      }
 
-      void*
-      _idle_func (thread::func_args_t args __attribute__((unused)))
-      {
-        while (true)
-          {
+void*
+os_idle (thread::func_args_t args __attribute__((unused)))
+{
+
+  // The thread was created with the default priority, and the
+  // idle thread must run with th lowest possible priority.
+
+#if defined(OS_BOOL_RTOS_THREAD_IDLE_PRIORITY_BELOW_IDLE)
+  // The CMSIS RTOS validator creates threads with `priority::idle`,
+  // so, to be sure that the system idle thread has the lowest priority,
+  // go one step below the idle priority.
+  this_thread::thread ().sched_prio (thread::priority::idle-1);
+#else
+  this_thread::thread ().sched_prio (thread::priority::idle);
+#endif
+
+  while (true)
+    {
 #if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
-            while (!scheduler::terminated_threads_list_.empty ())
-              {
-                waiting_thread_node* node;
-                  {
-                    interrupts::critical_section ics; // ----- Critical section -----
-                    node =
-                        const_cast<waiting_thread_node*> (scheduler::terminated_threads_list_.head ());
-                    node->unlink ();
-                  }
-                node->thread_._destroy ();
+      while (!scheduler::terminated_threads_list_.empty ())
+        {
+          waiting_thread_node* node;
+            {
+              interrupts::critical_section ics; // ----- Critical section -----
+              node =
+                  const_cast<waiting_thread_node*> (scheduler::terminated_threads_list_.head ());
+              node->unlink ();
+            }
+          node->thread_._destroy ();
 
-                this_thread::yield ();
-              }
+          this_thread::yield ();
+        }
 #endif /* !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER) */
 
-            port::scheduler::_wait_for_interrupt ();
-            this_thread::yield ();
-          }
-      }
+      port::scheduler::_wait_for_interrupt ();
+      this_thread::yield ();
+    }
+}
 
-    /**
-     * @endcond
-     */
+/**
+ * @endcond
+ */
 
-    // ------------------------------------------------------------------------
-    } /* namespace scheduler */
-  } /* namespace rtos */
-} /* namespace os */
-
+// ------------------------------------------------------------------------
 #endif

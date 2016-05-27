@@ -123,8 +123,6 @@ namespace os
 
         port::scheduler::initialize ();
 
-        scheduler::_create_idle ();
-
         return result::ok;
 #endif
       }

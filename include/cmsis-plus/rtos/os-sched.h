@@ -142,17 +142,6 @@ namespace os
       bool
       in_handler_mode (void);
 
-      /**
-       * @cond ignore
-       */
-
-      void
-      _create_idle (void);
-
-      /**
-       * @endcond
-       */
-
       // ======================================================================
       /**
        * @brief Scheduler critical section [RAII](https://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization) helper.
