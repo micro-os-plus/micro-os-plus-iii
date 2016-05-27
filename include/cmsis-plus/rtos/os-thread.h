@@ -45,6 +45,23 @@
 
 // ----------------------------------------------------------------------------
 
+/**
+ * @cond ignore
+ */
+
+namespace
+{
+  // Anonymous definition required for the next forward definition.
+  using _func_args_t = void*;
+}
+
+void*
+os_idle (_func_args_t args);
+
+/**
+ * @endcond
+ */
+
 namespace os
 {
   namespace rtos
@@ -90,25 +107,9 @@ namespace os
 
     } /* namespace this_thread */
 
-    namespace
-    {
-      // Anonymous definition required for the next forward definition.
-      using _func_args_t = void*;
-    }
-
     // Forward definitions required by thread friends.
     namespace scheduler
     {
-      /**
-       * @cond ignore
-       */
-
-      void*
-      _idle_func (_func_args_t args);
-
-    /**
-     * @endcond
-     */
 
     } /* namespace scheduler */
 
@@ -979,7 +980,7 @@ namespace os
       port::scheduler::switch_stacks (port::stack::element_t* sp);
 
       friend void*
-      scheduler::_idle_func (func_args_t args);
+      ::os_idle (func_args_t args);
 
       friend class ready_threads_list;
       friend class top_threads_list;
@@ -1200,7 +1201,8 @@ namespace os
       state_t volatile sched_state_ = state::undefined;
       priority_t volatile prio_ = priority::none;
 
-      sigset_t volatile sig_mask_ = 0;bool volatile interrupted_ = false;
+      sigset_t volatile sig_mask_ = 0;
+      bool volatile interrupted_ = false;
 
       os_thread_user_storage_t user_storage_;
 
@@ -2137,8 +2139,7 @@ namespace os
 #if defined(OS_TRACE_RTOS_THREAD)
         trace::printf ("%s @%p %s\n", __func__, this, this->name ());
 #endif
-        _construct (function, args, attr, &stack_,
-                    stack_size_bytes * sizeof(decltype(stack_[0])));
+        _construct (function, args, attr, &stack_, stack_size_bytes);
       }
 
     /**
