@@ -82,9 +82,6 @@ namespace os
       exit (void* exit_ptr);
 
       result_t
-      join (rtos::thread& thread, void** exit_ptr);
-
-      result_t
       sig_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
 
       result_t
@@ -776,6 +773,15 @@ namespace os
       result_t
       detach (void);
 
+      /**
+       * @brief Wait for thread termination.
+       * @param [in] exit_ptr Pointer to object to return. (Optional).
+       * @retval result::ok The thread was terminated.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       */
+      result_t
+      join (void** exit_ptr = nullptr);
+
       // Accessors & mutators.
 
       /**
@@ -936,9 +942,6 @@ namespace os
 
       friend void
       this_thread::exit (void* exit_ptr);
-
-      friend result_t
-      this_thread::join (rtos::thread& thread, void** exit_ptr);
 
       friend result_t
       this_thread::sig_wait (sigset_t mask, sigset_t* oflags,
@@ -1437,16 +1440,6 @@ namespace os
        */
       [[noreturn]] void
       exit (void* exit_ptr = nullptr);
-
-      /**
-       * @brief Wait for thread termination.
-       * @param [in] thread Reference to terminating thread.
-       * @param [in] exit_ptr Pointer to object to return. (Optional).
-       * @retval result::ok The thread was terminated.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
-       */
-      result_t
-      join (rtos::thread& thread, void** exit_ptr = nullptr);
 
       /**
        * @brief Check if the wake-up is due to a timeout.

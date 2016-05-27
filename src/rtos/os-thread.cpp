@@ -625,6 +625,65 @@ namespace os
 
     /**
      * @details
+     * Suspend execution of the calling thread until the target thread
+     * terminates, unless the target thread has already terminated.
+     * On return from a successful `join()` call with a non-NULL
+     * _exit_ptr_ argument, the value passed to exit() by the
+     * terminating thread shall be made available in the location
+     * referenced by _exit_ptr_. When a `join()` returns successfully,
+     * the target thread has been terminated. The results of
+     * multiple simultaneous calls to `join()` specifying the
+     * same target thread are undefined. If the thread calling
+     * `join()` is cancelled, then the target thread shall not be
+     * detached.
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`pthread_join()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_join.html)
+     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *
+     *
+     * The join() function may fail if:
+     * [EDEADLK] A deadlock was detected.
+     *
+     * The `join()` function shall not return an error code of [EINTR].
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+
+    result_t
+    thread::join (void** exit_ptr)
+    {
+      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+
+      // Fail if current thread
+      assert(this != this_thread::_thread ());
+
+#if defined(OS_TRACE_RTOS_THREAD)
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
+
+      while ((sched_state_ != state::terminated)
+          && (sched_state_ != state::destroyed))
+        {
+          joiner_ = this_thread::_thread ();
+          this_thread::_thread ()->_wait ();
+        }
+
+#if defined(OS_TRACE_RTOS_THREAD)
+      trace::printf ("%s() @%p %s joined\n", __func__, this, name ());
+#endif
+
+      if (exit_ptr != nullptr)
+        {
+          *exit_ptr = func_result_;
+        }
+
+      return result::ok;
+    }
+
+    /**
+     * @details
      *
      * The `cancel()` function shall not return an error code of `EINTR`.
      * If an implementation detects use of a thread ID after the end
@@ -1257,66 +1316,6 @@ namespace os
 #if defined(OS_TRACE_RTOS_THREAD_CONTEXT)
         trace::printf ("%s() to %s\n", __func__, _thread ()->name ());
 #endif
-      }
-
-      /**
-       * @details
-       * Suspend execution of the calling thread until the target thread
-       * terminates, unless the target thread has already terminated.
-       * On return from a successful `join()` call with a non-NULL
-       * _exit_ptr_ argument, the value passed to exit() by the
-       * terminating thread shall be made available in the location
-       * referenced by _exit_ptr_. When a `join()` returns successfully,
-       * the target thread has been terminated. The results of
-       * multiple simultaneous calls to `join()` specifying the
-       * same target thread are undefined. If the thread calling
-       * `join()` is cancelled, then the target thread shall not be
-       * detached.
-       *
-       * @par POSIX compatibility
-       *  Inspired by [`pthread_join()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_join.html)
-       *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-       *
-       *
-       * The join() function may fail if:
-       * [EDEADLK] A deadlock was detected.
-       *
-       * The `join()` function shall not return an error code of [EINTR].
-       *
-       * @warning Cannot be invoked from Interrupt Service Routines.
-       */
-
-      result_t
-      join (rtos::thread& thread, void** exit_ptr)
-      {
-        os_assert_err(!scheduler::in_handler_mode (), EPERM);
-
-        // Fail if current thread
-        assert(&thread != this_thread::_thread ());
-
-#if defined(OS_TRACE_RTOS_THREAD)
-        trace::printf ("%s() @%p %s\n", __func__, &thread, thread.name ());
-#endif
-
-        while ((thread.sched_state_ != thread::state::terminated)
-            && (thread.sched_state_ != thread::state::destroyed))
-          {
-            thread.joiner_ = this_thread::_thread ();
-            this_thread::_thread ()->_wait ();
-          }
-
-#if defined(OS_TRACE_RTOS_THREAD)
-        trace::printf ("%s() @%p %s joined\n", __func__, &thread,
-                       thread.name ());
-#endif
-
-        if (exit_ptr != nullptr)
-          {
-            *exit_ptr = thread.func_result_;
-          }
-
-        return result::ok;
       }
 
     } /* namespace this_thread */

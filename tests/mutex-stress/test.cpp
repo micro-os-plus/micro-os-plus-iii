@@ -233,7 +233,7 @@ periodic::object_main (void)
   for (auto m : mt)
     {
       m->thread ().interrupt ();
-      this_thread::join (m->thread ());
+      m->thread ().join ();
     }
   return nullptr;
 }
@@ -270,7 +270,7 @@ run_tests (unsigned int seconds)
   periodic pm
     { seconds };
 
-  this_thread::join (pm.thread ());
+  pm.thread ().join ();
 
   puts ("Done.");
   return 0;

@@ -208,14 +208,6 @@ os_this_thread_exit (void* exit_ptr)
 }
 
 os_result_t
-os_this_thread_join (os_thread_t* thread, void** exit_ptr)
-{
-  assert(thread != nullptr);
-  return (os_result_t) this_thread::join (
-      reinterpret_cast<rtos::thread&> (*thread), exit_ptr);
-}
-
-os_result_t
 os_this_thread_sig_wait (os_thread_sigset_t mask, os_thread_sigset_t* oflags,
                          os_flags_mode_t mode)
 {
@@ -288,6 +280,13 @@ os_thread_set_prio (os_thread_t* thread, os_thread_prio_t prio)
   assert(thread != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::thread&> (*thread)).sched_prio (
       prio);
+}
+
+os_result_t
+os_thread_join (os_thread_t* thread, void** exit_ptr)
+{
+  assert(thread != nullptr);
+  return (os_result_t) reinterpret_cast<rtos::thread&> (*thread).join (exit_ptr);
 }
 
 void

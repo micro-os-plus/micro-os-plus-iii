@@ -143,7 +143,7 @@ run_tests (void)
 
       name = os_thread_get_name (&th1);
 
-      os_this_thread_join (&th1, NULL);
+      os_thread_join (&th1, NULL);
     }
 
     {
@@ -151,7 +151,7 @@ run_tests (void)
       os_thread_t th2;
       os_thread_create (&th2, "th2", func, NULL, NULL);
 
-      os_this_thread_join (&th2, NULL);
+      os_thread_join (&th2, NULL);
     }
 
     {
@@ -173,7 +173,7 @@ run_tests (void)
       // Lower main thread priority to allow task to run.
       os_thread_set_prio (os_this_thread (), os_priority_below_normal);
 
-      os_this_thread_join (&th3, NULL);
+      os_thread_join (&th3, NULL);
 
       // Restore main thread priority.
       os_thread_set_prio (os_this_thread (), os_priority_normal);

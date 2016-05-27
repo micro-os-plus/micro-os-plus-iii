@@ -267,16 +267,6 @@ extern "C"
   os_this_thread_exit (void* exit_ptr);
 
   /**
-   * @brief Wait for thread termination.
-   * @param [in] thread Reference to terminating thread.
-   * @param [in] exit_ptr Pointer to object to return. (Optional).
-   * @retval os_ok The thread was terminated.
-   * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
-   */
-  os_result_t
-  os_this_thread_join (os_thread_t* thread, void** exit_ptr);
-
-  /**
    * @brief Wait for signal flags.
    * @param [in] mask The expected flags (OR-ed bit-mask);
    *  may be zero.
@@ -364,6 +354,16 @@ extern "C"
 
   os_result_t
   os_thread_set_prio (os_thread_t* thread, os_thread_prio_t prio);
+
+  /**
+   * @brief Wait for thread termination.
+   * @param [in] thread Pointer to terminating thread.
+   * @param [in] exit_ptr Pointer to object to return. (Optional).
+   * @retval os_ok The thread was terminated.
+   * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+   */
+  os_result_t
+  os_thread_join (os_thread_t* thread, void** exit_ptr);
 
   void
   os_thread_resume (os_thread_t* thread);
