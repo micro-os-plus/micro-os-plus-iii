@@ -140,6 +140,8 @@ void
 __call_exitprocs (int code __attribute__((unused)),
                   void* d __attribute__((unused)))
 {
+  trace_printf("%s()\n", __func__);
+
   // Call registered functions in reverse order.
   for (size_t i = __atexit_count; i > 0;)
     {

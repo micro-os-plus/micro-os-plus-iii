@@ -51,15 +51,17 @@
  */
 void
 __attribute__ ((noreturn))
-exit(int code)
+exit(int status)
 {
+  trace_printf("%s(%d)\n", __func__, status);
+
   // Call the cleanup functions enrolled with atexit().
-  __call_exitprocs (code, NULL);
+  __call_exitprocs (status, NULL);
 
   // Run the C++ static destructors.
   os_run_fini_array ();
 
-  _Exit (code);
+  _Exit (status);
 
   // Present here in case _exit() was reimplemented poorly and returns.
 #if defined(DEBUG)

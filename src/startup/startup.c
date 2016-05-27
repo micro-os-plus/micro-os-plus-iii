@@ -174,11 +174,10 @@ inline __attribute__((always_inline))
 void
 os_run_init_array (void)
 {
-  int count;
-  int i;
+  trace_printf("%s()\n", __func__);
 
-  count = __preinit_array_end - __preinit_array_start;
-  for (i = 0; i < count; i++)
+  int count = __preinit_array_end - __preinit_array_start;
+  for (int i = 0; i < count; i++)
     {
       __preinit_array_start[i] ();
     }
@@ -189,7 +188,7 @@ os_run_init_array (void)
   //_init(); // DO NOT ENABE THIS!
 
   count = __init_array_end - __init_array_start;
-  for (i = 0; i < count; i++)
+  for (int i = 0; i < count; i++)
     {
       __init_array_start[i] ();
     }
@@ -199,11 +198,10 @@ os_run_init_array (void)
 void
 os_run_fini_array (void)
 {
-  int count;
-  int i;
+  trace_printf("%s()\n", __func__);
 
-  count = __fini_array_end - __fini_array_start;
-  for (i = count; i > 0; i--)
+  int count = __fini_array_end - __fini_array_start;
+  for (int i = count; i > 0; i--)
     {
       __fini_array_start[i - 1] ();
     }

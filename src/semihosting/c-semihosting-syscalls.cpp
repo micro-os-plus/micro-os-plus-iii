@@ -1054,6 +1054,8 @@ __posix_readlink (const char* path, char* buf, size_t bufsize)
 extern "C" [[noreturn]] void
 _Exit (int status)
 {
+  trace_printf("%s(%d)\n", __func__, status);
+
 #if defined(_DEBUG)
   // Temporarily disable it, until QEMU fix.
   trace_dbg_bkpt();
