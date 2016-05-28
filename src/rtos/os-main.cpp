@@ -57,11 +57,13 @@ namespace
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
+
   using main_args_t = struct
     {
       int argc;
       char** argv;
     };
+
 #pragma GCC diagnostic pop
 
   static main_args_t main_args;
@@ -71,8 +73,10 @@ namespace
   [[noreturn]] static void
   _main_trampoline (void)
   {
+    trace::dump_args (main_args.argc, main_args.argv);
+
     int status = os_main (main_args.argc, main_args.argv);
-    os::trace::printf ("%s() exit = %d\n", __func__, status);
+    trace::printf ("%s() exit = %d\n", __func__, status);
     // Exit will run the atexit() and destructors, then
     // terminate gracefully.
     std::exit (status);
