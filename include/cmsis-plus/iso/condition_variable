@@ -55,7 +55,7 @@ namespace os
      * @{
      */
 
-    // ======================================================================
+    // ========================================================================
     /**
      * Condition variables provide synchronization primitives used
      * to block a thread until notified by some other thread that
@@ -142,7 +142,7 @@ namespace os
     protected:
 
       native_type ncv_;
-      using Native_clock = chrono::Systick_clock;
+      using Native_clock = chrono::systick_clock;
 
     };
 
@@ -205,7 +205,7 @@ namespace os
       condition_variable cv_;
       std::shared_ptr<mutex> mx_;
 
-      using Native_clock = chrono::Systick_clock;
+      using Native_clock = chrono::systick_clock;
 
     };
 
@@ -223,7 +223,7 @@ namespace os
 {
   namespace estd
   {
-    // ======================================================================
+    // ========================================================================
 
     inline
     condition_variable::condition_variable ()
@@ -264,7 +264,7 @@ namespace os
           const std::chrono::time_point<Clock_T, Duration_T>& abs_time)
       {
         using namespace std::chrono;
-        using Clock = Clock_T;
+        using clock = Clock_T;
 
 #if 0
         wait_for (lock, abs_time - Clock_T::now ());
@@ -274,8 +274,8 @@ namespace os
 #else
         // Optimise to native (ticks). LLVM compares using the
         // original clock, which might be more accurate.
-        Native_clock::duration rel_time = std::chrono::duration_cast
-            < Native_clock::duration > (abs_time - Clock::now ());
+        Native_clock::duration rel_time = std::chrono::duration_cast<
+            Native_clock::duration> (abs_time - clock::now ());
         return wait_for (lock, rel_time);
 #endif
       }
@@ -320,7 +320,8 @@ namespace os
                 typename Native_clock::period>> (rel_time).count ();
 
         ncv_.timed_wait (
-            /*(rtos::mutex &)*/(*(lock.mutex ()->native_handle ())), ticks);
+        /*(rtos::mutex &)*/(*(lock.mutex ()->native_handle ())),
+                         ticks);
 
         return
             (Native_clock::now () - start_tp) < rel_time ?
@@ -341,7 +342,7 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-    // ======================================================================
+    // ========================================================================
 
     inline
     condition_variable_any::condition_variable_any () :
@@ -468,7 +469,7 @@ namespace os
                            std::move (pred));
       }
 
-  // ------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
   } /* namespace estd */
 } /* namespace os */

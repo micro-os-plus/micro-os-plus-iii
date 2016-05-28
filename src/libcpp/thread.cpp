@@ -34,7 +34,7 @@ namespace os
 {
   namespace estd
   {
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     using namespace os;
 
@@ -49,7 +49,7 @@ namespace os
       if (joinable ())
         {
           trace::printf ("%s() @%p attempt to assign a running thread\n",
-                         __PRETTY_FUNCTION__, this);
+                         __func__, this);
           std::abort (); // in ISO it is std::terminate()
         }
       swap (t);
@@ -79,14 +79,14 @@ namespace os
       if (joinable ())
         {
           trace::printf ("%s() @%p attempt to destruct a running thread\n",
-                         __PRETTY_FUNCTION__, this);
+                         __func__, this);
           std::abort (); // in ISO it is std::terminate()
         }
 
       delete_system_thread ();
     }
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     void
     thread::swap (thread& t) noexcept
@@ -134,7 +134,7 @@ namespace os
 
     } /* namespace this_thread */
 
-  // ------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
   } /* namespace estd */
 } /* namespace os */

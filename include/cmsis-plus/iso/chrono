@@ -70,7 +70,7 @@ namespace os
 
       // ======================================================================
       // CMSIS++ SysTick clock.
-      class Systick_clock
+      class systick_clock
       {
       public:
 
@@ -83,7 +83,7 @@ namespace os
         using duration = std::chrono::duration<rep, period>;
         using sleep_duration = std::chrono::duration<sleep_rep, period>;
         /// basic time_point type of clock
-        using time_point = std::chrono::time_point<Systick_clock>;
+        using time_point = std::chrono::time_point<systick_clock>;
         static constexpr bool is_steady
           { true };
         static constexpr bool has_sleep_for
@@ -104,22 +104,22 @@ namespace os
       };
 
       // Define a duration type, to be used in timeout expressions.
-      using systicks = Systick_clock::duration;
+      using systicks = systick_clock::duration;
 
       //constexpr systicks
-      //operator "" systicks (Systick_clock::rep); // C++14
+      //operator "" systicks (Ssstick_clock::rep); // C++14
 
       constexpr systicks
       operator"" _ticks (unsigned long long t)
       {
-        return systicks (static_cast<Systick_clock::rep> (t));
+        return systicks (static_cast<systick_clock::rep> (t));
       }
 
       // ======================================================================
 
       // CMSIS++ RTC.
 
-      class Realtime_clock
+      class realtime_clock
       {
       public:
 
@@ -132,7 +132,7 @@ namespace os
         using duration = std::chrono::duration<rep, period>;
         using sleep_duration = std::chrono::duration<sleep_rep, period>;
 
-        using time_point = std::chrono::time_point<Realtime_clock>;
+        using time_point = std::chrono::time_point<realtime_clock>;
 
         // Non-monotonic, may be adjusted back in time.
         static constexpr const bool is_steady
@@ -147,7 +147,7 @@ namespace os
         // Extension to ISO
 
         static void
-        sleep_for (uint32_t);
+        sleep_for (sleep_rep);
 
         // Number of seconds from epoch (1 January 1970 00:00:00 UTC)
         // Must be initialised during startup with the value of now().
@@ -231,30 +231,29 @@ namespace os
     namespace chrono
     {
 
-      // ====================================================================
+      // ======================================================================
 
       inline void
-      Systick_clock::sleep_for (sleep_rep ticks)
+      systick_clock::sleep_for (sleep_rep ticks)
       {
         rtos::sysclock.sleep_for (ticks);
       }
 
-      // ====================================================================
+      // ======================================================================
 
       inline void
-      Realtime_clock::sleep_for (sleep_rep secs)
+      realtime_clock::sleep_for (sleep_rep secs)
       {
         rtos::rtclock.sleep_for (secs);
       }
 
-      // ====================================================================
+      // ======================================================================
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
 
       template<class _To, class Rep_T, class Period_T>
-constexpr      //
-      typename std::enable_if<
+constexpr      typename std::enable_if<
       std::chrono::__is_duration<_To>::value, _To>::type
       ceil (std::chrono::duration<Rep_T, Period_T> d)
         {
@@ -269,7 +268,7 @@ constexpr      //
 
 #pragma GCC diagnostic pop
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
     }
 /* namespace chrono */

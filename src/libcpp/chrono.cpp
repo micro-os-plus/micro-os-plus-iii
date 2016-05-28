@@ -36,7 +36,7 @@ namespace os
     namespace chrono
     {
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
       using namespace os;
 
@@ -48,10 +48,10 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
 
-      // ====================================================================
+      // ======================================================================
 
-      Systick_clock::time_point
-      Systick_clock::now () noexcept
+      systick_clock::time_point
+      systick_clock::now () noexcept
       {
         const auto ticks = rtos::sysclock.now ();
         return time_point
@@ -59,10 +59,10 @@ namespace os
             { ticks } };
       }
 
-      // ====================================================================
+      // ======================================================================
 
-      Realtime_clock::time_point
-      Realtime_clock::now () noexcept
+      realtime_clock::time_point
+      realtime_clock::now () noexcept
       {
         const auto secs = rtos::rtclock.now ();
         return time_point
@@ -70,7 +70,7 @@ namespace os
             { secs } };
       }
 
-      Realtime_clock::time_point Realtime_clock::startup_time_point;
+      realtime_clock::time_point realtime_clock::startup_time_point;
 
       // ======================================================================
 
@@ -81,7 +81,7 @@ namespace os
         return time_point
           { duration
             { systicks
-              { ticks } + Realtime_clock::startup_time_point.time_since_epoch () //
+              { ticks } + realtime_clock::startup_time_point.time_since_epoch () //
             } //
           };
       }
@@ -90,8 +90,8 @@ namespace os
       system_clock::to_time_t (const time_point& t) noexcept
       {
         return time_t (
-            std::chrono::duration_cast < std::chrono::seconds
-                > (t.time_since_epoch ()).count ());
+            std::chrono::duration_cast<std::chrono::seconds> (
+                t.time_since_epoch ()).count ());
       }
 
       system_clock::time_point
@@ -100,7 +100,7 @@ namespace os
         return system_clock::time_point (std::chrono::seconds (t));
       }
 
-      // ====================================================================
+      // ======================================================================
 
       high_resolution_clock::time_point
       high_resolution_clock::now () noexcept
@@ -118,13 +118,13 @@ namespace os
             { systicks
               { systick.ticks } + std::chrono::nanoseconds
               { systick.cycles * 1000000000ULL / systick.core_frequency_hz }
-                + Realtime_clock::startup_time_point.time_since_epoch () } //
+                + realtime_clock::startup_time_point.time_since_epoch () } //
           };
       }
 
 #pragma GCC diagnostic pop
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     } /* namespace chrono */
   } /* namespace estd */
