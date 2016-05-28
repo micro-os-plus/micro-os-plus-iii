@@ -366,6 +366,9 @@ namespace os
         delete f;
       }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
     template<typename Callable_T, typename ... Args_T>
 
       thread::thread (Callable_T&& f, Args_T&&... args)
@@ -398,6 +401,8 @@ namespace os
             reinterpret_cast<function_object_deleter_t> (&delete_function_object<
                 Function_object> );
       }
+
+#pragma GCC diagnostic pop
 
     // ========================================================================
 
@@ -462,6 +467,9 @@ namespace os
         }
 #endif
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
       template<typename Clock_T, class Rep_T, class Period_T>
         constexpr void
         sleep_for (const std::chrono::duration<Rep_T, Period_T>& rel_time)
@@ -479,6 +487,8 @@ namespace os
               clock::sleep_for (d);
             }
         }
+
+#pragma GCC diagnostic pop
 
       template<typename Clock_T, typename Duration_T>
         void

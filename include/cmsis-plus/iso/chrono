@@ -109,11 +109,16 @@ namespace os
       //constexpr systicks
       //operator "" systicks (Ssstick_clock::rep); // C++14
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
       constexpr systicks
       operator"" _ticks (unsigned long long t)
       {
         return systicks (static_cast<systick_clock::rep> (t));
       }
+
+#pragma GCC diagnostic pop
 
       // ======================================================================
 
