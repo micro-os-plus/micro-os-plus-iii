@@ -90,9 +90,6 @@ namespace os
 
       condition_variable ();
 
-      // Extension to ISO.
-      condition_variable (os::rtos::condition_variable::attributes& attr);
-
       ~condition_variable ();
 
       condition_variable (const condition_variable&) = delete;
@@ -154,7 +151,6 @@ namespace os
     public:
 
       condition_variable_any ();
-      condition_variable_any (os::rtos::condition_variable::attributes& attr);
 
       ~condition_variable_any ();
 
@@ -227,15 +223,6 @@ namespace os
 
     inline
     condition_variable::condition_variable ()
-    {
-      ;
-    }
-
-    inline
-    condition_variable::condition_variable (
-        os::rtos::condition_variable::attributes& attr) :
-        ncv_
-          { attr }
     {
       ;
     }
@@ -348,17 +335,6 @@ namespace os
     condition_variable_any::condition_variable_any () :
         cv_
           { }, //
-        mx_
-          { std::make_shared<mutex> () }
-    {
-      ;
-    }
-
-    inline
-    condition_variable_any::condition_variable_any (
-        os::rtos::condition_variable::attributes& attr) :
-        cv_
-          { attr }, //
         mx_
           { std::make_shared<mutex> () }
     {

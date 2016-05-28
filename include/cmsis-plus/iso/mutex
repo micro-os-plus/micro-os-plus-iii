@@ -71,9 +71,6 @@ namespace os
       /* constexpr in ISO */
       mutex () noexcept;
 
-      // Extension to ISO.
-      mutex (os::rtos::mutex::attributes& attr) noexcept;
-
       ~mutex () = default;
 
       mutex (const mutex&) = delete;
@@ -111,9 +108,6 @@ namespace os
 
       recursive_mutex ();
 
-      // Extension to ISO.
-      recursive_mutex (os::rtos::mutex::attributes& attr);
-
       ~recursive_mutex () = default;
 
       recursive_mutex (const recursive_mutex&) = delete;
@@ -145,9 +139,6 @@ namespace os
 
       timed_mutex () = default;
 
-      // Extension to ISO.
-      timed_mutex (os::rtos::mutex::attributes& attr);
-
       ~timed_mutex () = default;
 
       timed_mutex (const timed_mutex&) = delete;
@@ -171,9 +162,6 @@ namespace os
     public:
 
       recursive_timed_mutex () = default;
-
-      // Extension to ISO.
-      recursive_timed_mutex (os::rtos::mutex::attributes& attr);
 
       ~recursive_timed_mutex () = default;
 
@@ -380,14 +368,6 @@ namespace os
       ;
     }
 
-    inline
-    mutex::mutex (os::rtos::mutex::attributes& attr) noexcept :
-    nm_
-      { attr}
-      {
-        ;
-      }
-
     inline mutex::native_handle_type
     mutex::native_handle ()
     {
@@ -404,29 +384,13 @@ namespace os
       ;
     }
 
-    inline
-    recursive_mutex::recursive_mutex (os::rtos::mutex::attributes& attr) :
-        nm_
-          { attr }
-    {
-      ;
-    }
-
     inline recursive_mutex::native_handle_type
     recursive_mutex::native_handle ()
     {
       return &nm_;
     }
 
-    // ======================================================================
-
-    inline
-    timed_mutex::timed_mutex (os::rtos::mutex::attributes& attr) :
-        mutex
-          { attr }
-    {
-      ;
-    }
+    // ========================================================================
 
     template<typename Rep_T, typename Period_T>
       bool
@@ -476,16 +440,7 @@ namespace os
           }
       }
 
-    // ======================================================================
-
-    inline
-    recursive_timed_mutex::recursive_timed_mutex (
-        os::rtos::mutex::attributes& attr) :
-        recursive_mutex
-          { attr }
-    {
-      ;
-    }
+    // ========================================================================
 
     template<typename Rep_T, typename Period_T>
       bool
@@ -942,7 +897,7 @@ namespace os
       call_once (once_flag& flag, Callable_T&& func, Args_T&&... args)
       {
         typedef std::tuple<Callable_T&&, Args_T&&...> Tuple;
-        Tuple tuple (std::forward < Callable_T > (func),
+        Tuple tuple (std::forward<Callable_T> (func),
                      std::forward<Args_T>(args)...);
         // TODO: implement
 #if defined(TO_IMPLEMENT)
