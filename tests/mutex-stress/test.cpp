@@ -196,8 +196,8 @@ periodic::object_main (void)
               //os::core::timer::ticks_t ticks = pTask->getTicks();
               printf ("%s:%-4u ", m->thread ().name (), cnt);
             }
-          int average = (sum + ((sizeof(mt) / sizeof(mt[0])) / 2))
-              / (sizeof(mt) / sizeof(mt[0]));
+          int average = static_cast<int>((sum + ((sizeof(mt) / sizeof(mt[0])) / 2))
+              / (sizeof(mt) / sizeof(mt[0])));
 
           printf ("sum=%u, avg=%u", sum, average);
 
