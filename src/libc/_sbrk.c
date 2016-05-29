@@ -51,7 +51,7 @@ _sbrk (ptrdiff_t incr)
   extern char _Heap_Begin; // Defined by the linker.
   extern char _Heap_Limit; // Defined by the linker.
 
-  static char* current_heap_end; // STATIC!
+  static char* current_heap_end; // STATIC! Zero after BSS init.
   char* current_block_address;
 
   if (current_heap_end == 0)
