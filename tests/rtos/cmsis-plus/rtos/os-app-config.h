@@ -42,6 +42,10 @@
 // Disable all interrupts from 15 to 4, keep 3-2-1 enabled
 #define OS_INTEGER_RTOS_CRITICAL_SECTION_INTERRUPT_PRIORITY (4)
 
+#if defined(__ARM_EABI__)
+#define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES               (3000)
+#endif
+
 // ----------------------------------------------------------------------------
 
 // ----------------------------------------------------------------------------
