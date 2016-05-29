@@ -204,20 +204,20 @@ test_iso_api (bool extra)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
 
-          mx2.try_lock_until (chrono::system_clock::now () + 1000us);
-          mx2.unlock ();
-          mx2.try_lock_until (chrono::system_clock::now () + 1ms);
-          mx2.unlock ();
+          if (mx2.try_lock_until (chrono::system_clock::now () + 5000us))
+            mx2.unlock ();
+          if (mx2.try_lock_until (chrono::system_clock::now () + 5ms))
+            mx2.unlock ();
 
-          mx2.try_lock_until (chrono::systick_clock::now () + 1us);
-          mx2.unlock ();
-          mx2.try_lock_until (chrono::systick_clock::now () + 1ms);
-          mx2.unlock ();
+          if (mx2.try_lock_until (chrono::systick_clock::now () + 5us))
+            mx2.unlock ();
+          if (mx2.try_lock_until (chrono::systick_clock::now () + 5ms))
+            mx2.unlock ();
 
-          mx2.try_lock_until (chrono::realtime_clock::now () + 10ms);
-          mx2.unlock ();
-          mx2.try_lock_until (chrono::realtime_clock::now () + 100ms);
-          mx2.unlock ();
+          if (mx2.try_lock_until (chrono::realtime_clock::now () + 10ms))
+            mx2.unlock ();
+          if (mx2.try_lock_until (chrono::realtime_clock::now () + 100ms))
+            mx2.unlock ();
 
 #pragma GCC diagnostic pop
 
@@ -300,30 +300,41 @@ test_iso_api (bool extra)
   this_thread::sleep_for (5_ticks);
 
   auto tp = chrono::systick_clock::now ();
-  printf ("Systick_clock::now() = %u ticks\n",
-          static_cast<uint32_t> (tp.time_since_epoch ().count ()));
+  printf ("Systick_clock::now() = %lu ticks\n",
+          static_cast<unsigned long int> (tp.time_since_epoch ().count ()));
 
   auto tp2 = os::estd::chrono::system_clock::now ();
-  printf ("system_clock::now() = %u us\n",
-          static_cast<uint32_t> (tp2.time_since_epoch ().count ()));
+  printf ("system_clock::now() = %lu us\n",
+          static_cast<unsigned long int> (tp2.time_since_epoch ().count ()));
 
   auto tp3 = os::estd::chrono::high_resolution_clock::now ();
-  printf ("high_resolution_clock::now() = %u ns\n",
-          static_cast<uint32_t> (tp3.time_since_epoch ().count ()));
+  printf ("high_resolution_clock::now() = %lu ns\n",
+          static_cast<unsigned long int> (tp3.time_since_epoch ().count ()));
 
+  printf ("1\n");
   this_thread::sleep_for (5_ticks);
+  printf ("2\n");
   this_thread::sleep_for (5ms);
-  this_thread::sleep_for (5001us); // ticks
-  this_thread::sleep_for (5002000ns); // 3003 ticks
+  printf ("3\n");
+  this_thread::sleep_for (5001us); // 5 ticks
+  printf ("4\n");
+  this_thread::sleep_for (5002000ns); // 5 ticks
+  printf ("5\n");
 
-  this_thread::sleep_for (microseconds (1)); // 1 ticks
+  this_thread::sleep_for (microseconds (1)); // 1 tick
+  printf ("6\n");
   this_thread::sleep_for (nanoseconds (1)); // 1 tick
+  printf ("7\n");
 
   this_thread::sleep_for<chrono::systick_clock> (4_ticks);
+  printf ("8\n");
   this_thread::sleep_for<chrono::systick_clock> (4ms);
 
+  printf ("9\n");
   this_thread::sleep_for<chrono::realtime_clock> (1s);
+  printf ("0\n");
   this_thread::sleep_for<chrono::realtime_clock> (1001ms);
+  printf ("1\n");
 
   if (extra)
     {
@@ -342,16 +353,24 @@ test_iso_api (bool extra)
     }
 
   this_thread::sleep_until (chrono::system_clock::now () + 1000us);
+  printf ("2\n");
   this_thread::sleep_until (chrono::system_clock::now () + 1ms);
+  printf ("3\n");
 
   this_thread::sleep_until (chrono::systick_clock::now () + 1us);
+  printf ("4\n");
   this_thread::sleep_until (chrono::systick_clock::now () + 1ms);
+  printf ("5\n");
 
   this_thread::sleep_until (chrono::realtime_clock::now () + 10ms);
+  printf ("6\n");
   this_thread::sleep_until (chrono::realtime_clock::now () + 100ms);
+  printf ("7\n");
   this_thread::sleep_until (chrono::realtime_clock::now () + 1000ms);
 
+  printf ("8\n");
   this_thread::sleep_until (chrono::realtime_clock::now () + 1s);
+  printf ("9\n");
 
   if (extra)
     {
