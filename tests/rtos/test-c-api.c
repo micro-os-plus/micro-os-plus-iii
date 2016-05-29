@@ -152,6 +152,8 @@ test_c_api (void)
       name = os_thread_get_name (&th1);
 
       os_thread_join (&th1, NULL);
+
+      os_thread_destroy(&th1);
     }
 
     {
@@ -160,6 +162,8 @@ test_c_api (void)
       os_thread_create (&th2, "th2", func, NULL, NULL);
 
       os_thread_join (&th2, NULL);
+
+      os_thread_destroy(&th2);
     }
 
     {
@@ -186,6 +190,8 @@ test_c_api (void)
 
       // Restore main thread priority.
       os_thread_set_prio (os_this_thread (), os_priority_normal);
+
+      os_thread_destroy(&th3);
     }
 
   // ==========================================================================
@@ -210,7 +216,8 @@ test_c_api (void)
       os_timer_t tm1;
       os_timer_create (&tm1, "tm1", tmfunc, NULL, NULL);
 
-      os_timer_start (&tm1, 2);
+      os_sysclock_sleep_for (1); // Sync
+      os_timer_start (&tm1, 1);
 
       os_sysclock_sleep_for (2);
 
@@ -249,7 +256,9 @@ test_c_api (void)
 
       os_thread_t* th;
       th = os_mutex_get_owner (&mx1);
-      os_thread_get_name(th);
+      if (th != NULL){
+          os_thread_get_name (th);
+        }
 
       os_mutex_reset (&mx1);
 
