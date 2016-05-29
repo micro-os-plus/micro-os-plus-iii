@@ -39,8 +39,6 @@ RNG_HandleTypeDef hrng;
 int
 os_main (int argc, char* argv[])
 {
-  trace::dump_args (argc, argv);
-
   HAL_NVIC_SetPriority (TIM2_IRQn, 10, 0);
   HAL_NVIC_EnableIRQ (TIM2_IRQn);
 

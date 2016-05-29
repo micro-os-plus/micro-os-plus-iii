@@ -82,8 +82,6 @@ busy_wait (unsigned int micros)
 int
 os_main (int argc, char* argv[])
 {
-  trace::dump_args (argc, argv);
-
   unsigned int seconds = 30;
   if (argc > 1)
     {
