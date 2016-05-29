@@ -37,7 +37,7 @@ using namespace os;
 RNG_HandleTypeDef hrng;
 
 int
-os_main (int argc, char* argv[])
+os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
   HAL_NVIC_SetPriority (TIM2_IRQn, 10, 0);
   HAL_NVIC_EnableIRQ (TIM2_IRQn);
