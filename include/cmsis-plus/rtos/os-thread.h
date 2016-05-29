@@ -40,7 +40,6 @@
 #include <cmsis-plus/rtos/os-decls.h>
 #include <cmsis-plus/rtos/os-clocks.h>
 
-// Better be the last, to undef putchar()
 #include <cmsis-plus/diag/trace.h>
 
 // ----------------------------------------------------------------------------
@@ -1953,9 +1952,12 @@ namespace os
                     + sizeof(typename Allocator::value_type) - 1)
                     / sizeof(typename Allocator::value_type);
               }
-            allocated_stack_address_ =
-                const_cast<Allocator&> (allocator).allocate (
-                    allocated_stack_size_elements_);
+
+            // The reinterpret_cast<> is required since the allocator
+            // uses allocation_element_t, which is usually larger.
+            allocated_stack_address_ = reinterpret_cast<stack::element_t*>(
+                (const_cast<Allocator&> (allocator)).allocate (
+                    allocated_stack_size_elements_));
 
             _construct (
                 function,
