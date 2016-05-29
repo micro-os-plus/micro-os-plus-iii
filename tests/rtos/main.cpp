@@ -40,15 +40,27 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       "\nCMSIS++ RTOS simple test. Exercise as many functions as possible.\n");
 
   int ret = 0;
-  ret = test_cpp_api ();
+
+#if 1
+  if (ret == 0)
+    {
+      ret = test_cpp_api ();
+    }
+#endif
+
+#if 1
   if (ret == 0)
     {
       ret = test_c_api ();
     }
+#endif
+
+#if 1
   if (ret == 0)
     {
       ret = test_iso_api (false);
     }
+#endif
 
   return ret;
 }
