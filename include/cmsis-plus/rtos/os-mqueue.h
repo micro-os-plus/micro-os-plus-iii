@@ -40,7 +40,6 @@
 #include <cmsis-plus/rtos/os-decls.h>
 #include <cmsis-plus/rtos/os-memory.h>
 
-// Better be the last, to undef putchar()
 #include <cmsis-plus/diag/trace.h>
 
 // ----------------------------------------------------------------------------

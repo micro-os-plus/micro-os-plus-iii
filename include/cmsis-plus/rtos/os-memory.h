@@ -52,7 +52,6 @@ namespace os
   {
     namespace memory
     {
-
       // ======================================================================
 
       template<typename T>

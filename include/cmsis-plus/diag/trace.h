@@ -45,6 +45,9 @@
 
 #if defined(__cplusplus)
 
+// To be effective, <stdio.h> must be included *before* this patch.
+#include <stdio.h>
+
 // This is a very annoying issue, some very old libraries still
 // define putchar() as a macro. This is abusive, since it prevents
 // the use of putchar() in other name spaces.

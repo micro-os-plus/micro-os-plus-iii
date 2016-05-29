@@ -26,9 +26,7 @@
  */
 
 #include <cmsis-plus/rtos/os.h>
-// #include <cmsis-plus/rtos/os-lists.h>
 
-// Better be the last, to undef putchar()
 #include <cmsis-plus/diag/trace.h>
 
 namespace os
