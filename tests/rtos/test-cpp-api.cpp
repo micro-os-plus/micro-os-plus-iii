@@ -350,6 +350,7 @@ test_cpp_api (void)
     {
       timer tm1
         { tmfunc, nullptr };
+      sysclock.sleep_for (1); // Sync
       tm1.start (1);
 
       sysclock.sleep_for (2);
@@ -357,6 +358,7 @@ test_cpp_api (void)
 
       timer tm2
         { "tm2", tmfunc, nullptr };
+      sysclock.sleep_for (1); // Sync
       tm2.start (1);
 
       sysclock.sleep_for (2);
