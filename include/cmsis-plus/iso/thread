@@ -343,8 +343,9 @@ namespace os
       void
       thread::run_function_object (const void* func_obj)
       {
-        using Function_object = F_T;
+        os::trace::printf ("%s()\n", __PRETTY_FUNCTION__);
 
+        using Function_object = F_T;
         const Function_object* f =
             static_cast<const Function_object*> (func_obj);
         (*f) ();
@@ -354,12 +355,11 @@ namespace os
       void
       thread::delete_function_object (const void* func_obj)
       {
-        using Function_object = F_T;
+        os::trace::printf ("%s()\n", __PRETTY_FUNCTION__);
 
+        using Function_object = F_T;
         const Function_object* f =
             static_cast<const Function_object*> (func_obj);
-
-        os::trace::printf ("%s()\n", __func__);
 
         // The delete now has the knowledge required to
         // correctly delete the object (i.e. the object size).
@@ -370,12 +370,11 @@ namespace os
 #pragma GCC diagnostic ignored "-Waggregate-return"
 
     template<typename Callable_T, typename ... Args_T>
-
       thread::thread (Callable_T&& f, Args_T&&... args)
       {
         // static_assert(std::is_same<Attr_T, os::rtos::thread::attr_t>::value, "first param must be thread_attr_t*");
 
-        os::trace::printf ("%s() @%p\n", __func__, this);
+        os::trace::printf ("%s() @%p\n", __PRETTY_FUNCTION__, this);
 
         using Function_object = decltype(std::bind (std::forward<Callable_T> (f),
                 std::forward<Args_T>(args)...));
@@ -507,9 +506,10 @@ namespace os
               sleep_for (abs_time - now);
               now = clock::now ();
             }
-        }
 
 #pragma GCC diagnostic pop
+
+        }
 
       template<typename Duration_T>
         void
