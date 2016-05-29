@@ -65,7 +65,7 @@ namespace os
           // ----- End of critical section ------------------------------------
         }
 #if defined(OS_TRACE_LIBC_MALLOC)
-      trace::printf ("%s(%d) %p\n", __func__, size, p);
+      trace::printf ("estd::%s(%d)=%p\n", __func__, size, p);
 #endif
 
       return p;
@@ -86,7 +86,7 @@ namespace os
     free (void *ptr) noexcept
     {
 #if defined(OS_TRACE_LIBC_MALLOC)
-      trace::printf ("%s(%p)\n", __func__, ptr);
+      trace::printf ("estd::%s(%p)\n", __func__, ptr);
 #endif
 
         {
