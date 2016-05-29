@@ -230,7 +230,7 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_CLOCKS)
-      trace::printf ("%s(%d_ticks)\n", __func__, timeout);
+      trace::printf ("%s(%d)\n", __func__, timeout);
 #endif
 
       clock::timestamp_t timestamp = steady_now () + timeout;
