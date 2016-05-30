@@ -281,7 +281,7 @@ extern "C"
    * @retval ENOTRECOVERABLE Wait failed.
    */
   os_result_t
-  os_this_thread_sig_wait (os_thread_sigset_t mask, os_thread_sigset_t* oflags,
+  os_this_thread_sig_wait (os_flags_mask_t mask, os_flags_mask_t* oflags,
                            os_flags_mode_t mode);
 
   /**
@@ -298,8 +298,7 @@ extern "C"
    * @retval ENOTRECOVERABLE Wait failed.
    */
   os_result_t
-  os_this_thread_try_sig_wait (os_thread_sigset_t mask,
-                               os_thread_sigset_t* oflags,
+  os_this_thread_try_sig_wait (os_flags_mask_t mask, os_flags_mask_t* oflags,
                                os_flags_mode_t mode);
 
   /**
@@ -320,10 +319,9 @@ extern "C"
    * @retval ENOTRECOVERABLE Wait failed.
    */
   os_result_t
-  os_this_thread_timed_sig_wait (os_thread_sigset_t mask,
+  os_this_thread_timed_sig_wait (os_flags_mask_t mask,
                                  os_clock_duration_t timeout,
-                                 os_thread_sigset_t* oflags,
-                                 os_flags_mode_t mode);
+                                 os_flags_mask_t* oflags, os_flags_mode_t mode);
 
   /**
    * @}
@@ -372,15 +370,15 @@ extern "C"
   os_thread_get_user_storage (os_thread_t* thread);
 
   os_result_t
-  os_thread_sig_raise (os_thread_t* thread, os_thread_sigset_t mask,
-                       os_thread_sigset_t* oflags);
+  os_thread_sig_raise (os_thread_t* thread, os_flags_mask_t mask,
+                       os_flags_mask_t* oflags);
 
   os_result_t
-  os_thread_sig_clear (os_thread_t* thread, os_thread_sigset_t mask,
-                       os_thread_sigset_t* oflags);
+  os_thread_sig_clear (os_thread_t* thread, os_flags_mask_t mask,
+                       os_flags_mask_t* oflags);
 
-  os_thread_sigset_t
-  os_thread_sig_get (os_thread_t* thread, os_thread_sigset_t mask,
+  os_flags_mask_t
+  os_thread_sig_get (os_thread_t* thread, os_flags_mask_t mask,
                      os_flags_mode_t mode);
 
   /**

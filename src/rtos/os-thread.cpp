@@ -938,7 +938,7 @@ namespace os
      * @note Can be invoked from Interrupt Service Routines.
      */
     result_t
-    thread::sig_raise (sigset_t mask, sigset_t* oflags)
+    thread::sig_raise (flags::mask_t mask, flags::mask_t* oflags)
     {
       os_assert_err(mask != 0, EINVAL);
 
@@ -971,8 +971,8 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    thread::sigset_t
-    thread::sig_get (sigset_t mask, flags::mode_t mode)
+    flags::mask_t
+    thread::sig_get (flags::mask_t mask, flags::mode_t mode)
     {
       os_assert_err(!scheduler::in_handler_mode (), sig::all);
 
@@ -988,7 +988,7 @@ namespace os
           return sig_mask_;
         }
 
-      sigset_t ret = sig_mask_ & mask;
+      flags::mask_t ret = sig_mask_ & mask;
       if ((mode & flags::mode::clear) != 0)
         {
           // Clear the selected bits; leave the rest untouched.
@@ -1005,7 +1005,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    thread::sig_clear (sigset_t mask, sigset_t* oflags)
+    thread::sig_clear (flags::mask_t mask, flags::mask_t* oflags)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -1044,7 +1044,8 @@ namespace os
      * Internal function used to test if the desired signal flags are raised.
      */
     result_t
-    thread::_try_wait (sigset_t mask, sigset_t* oflags, flags::mode_t mode)
+    thread::_try_wait (flags::mask_t mask, flags::mask_t* oflags,
+                       flags::mode_t mode)
     {
       if ((mask != 0) && ((mode & flags::mode::all) != 0))
         {
@@ -1080,7 +1081,8 @@ namespace os
     }
 
     result_t
-    thread::_sig_wait (sigset_t mask, sigset_t* oflags, flags::mode_t mode)
+    thread::_sig_wait (flags::mask_t mask, flags::mask_t* oflags,
+                       flags::mode_t mode)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -1121,7 +1123,8 @@ namespace os
     }
 
     result_t
-    thread::_try_sig_wait (sigset_t mask, sigset_t* oflags, flags::mode_t mode)
+    thread::_try_sig_wait (flags::mask_t mask, flags::mask_t* oflags,
+                           flags::mode_t mode)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
@@ -1136,8 +1139,8 @@ namespace os
     }
 
     result_t
-    thread::_timed_sig_wait (sigset_t mask, clock::duration_t timeout,
-                             sigset_t* oflags, flags::mode_t mode)
+    thread::_timed_sig_wait (flags::mask_t mask, clock::duration_t timeout,
+                             flags::mask_t* oflags, flags::mode_t mode)
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 

@@ -143,7 +143,6 @@ extern "C"
 
   typedef uint8_t os_thread_state_t;
   typedef uint8_t os_thread_prio_t;
-  typedef os_flags_mask_t os_thread_sigset_t;
 
 #if !defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE) && !defined(__cplusplus)
   typedef struct
@@ -205,7 +204,7 @@ extern "C"
     size_t allocated_stack_size_elements;
     os_thread_state_t state;
     os_thread_prio_t prio;
-    os_thread_sigset_t signals;
+    os_flags_mask_t signals;
     os_thread_user_storage_t user_storage;
     bool interrupted;
     os_thread_context_t context;

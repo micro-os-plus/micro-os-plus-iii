@@ -208,23 +208,23 @@ os_this_thread_exit (void* exit_ptr)
 }
 
 os_result_t
-os_this_thread_sig_wait (os_thread_sigset_t mask, os_thread_sigset_t* oflags,
+os_this_thread_sig_wait (os_flags_mask_t mask, os_flags_mask_t* oflags,
                          os_flags_mode_t mode)
 {
   return (os_result_t) this_thread::sig_wait (mask, oflags, mode);
 }
 
 os_result_t
-os_this_thread_try_sig_wait (os_thread_sigset_t mask,
-                             os_thread_sigset_t* oflags, os_flags_mode_t mode)
+os_this_thread_try_sig_wait (os_flags_mask_t mask, os_flags_mask_t* oflags,
+                             os_flags_mode_t mode)
 {
   return (os_result_t) this_thread::try_sig_wait (mask, oflags, mode);
 }
 
 os_result_t
-os_this_thread_timed_sig_wait (os_thread_sigset_t mask,
+os_this_thread_timed_sig_wait (os_flags_mask_t mask,
                                os_clock_duration_t timeout,
-                               os_thread_sigset_t* oflags, os_flags_mode_t mode)
+                               os_flags_mask_t* oflags, os_flags_mode_t mode)
 {
   return (os_result_t) this_thread::timed_sig_wait (mask, timeout, oflags, mode);
 }
@@ -304,8 +304,8 @@ os_thread_get_user_storage (os_thread_t* thread)
 }
 
 os_result_t
-os_thread_sig_raise (os_thread_t* thread, os_thread_sigset_t mask,
-                     os_thread_sigset_t* oflags)
+os_thread_sig_raise (os_thread_t* thread, os_flags_mask_t mask,
+                     os_flags_mask_t* oflags)
 {
   assert(thread != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::thread&> (*thread)).sig_raise (
@@ -313,20 +313,20 @@ os_thread_sig_raise (os_thread_t* thread, os_thread_sigset_t mask,
 }
 
 os_result_t
-os_thread_sig_clear (os_thread_t* thread, os_thread_sigset_t mask,
-                     os_thread_sigset_t* oflags)
+os_thread_sig_clear (os_thread_t* thread, os_flags_mask_t mask,
+                     os_flags_mask_t* oflags)
 {
   assert(thread != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::thread&> (*thread)).sig_clear (
       mask, oflags);
 }
 
-os_thread_sigset_t
-os_thread_sig_get (os_thread_t* thread, os_thread_sigset_t mask,
+os_flags_mask_t
+os_thread_sig_get (os_thread_t* thread, os_flags_mask_t mask,
                    os_flags_mode_t mode)
 {
   assert(thread != nullptr);
-  return (os_thread_sigset_t) (reinterpret_cast<rtos::thread&> (*thread)).sig_get (
+  return (os_flags_mask_t) (reinterpret_cast<rtos::thread&> (*thread)).sig_get (
       mask, mode);
 }
 
@@ -1688,8 +1688,8 @@ osSignalSet (osThreadId thread_id, int32_t signals)
       return (int32_t) 0x80000000;
     }
 
-  thread::sigset_t osig;
-  ((thread*) (thread_id))->sig_raise ((thread::sigset_t) signals, &osig);
+  flags::mask_t osig;
+  ((thread*) (thread_id))->sig_raise ((flags::mask_t) signals, &osig);
   return (int32_t) osig;
 }
 
@@ -1712,8 +1712,8 @@ osSignalClear (osThreadId thread_id, int32_t signals)
       return (int32_t) 0x80000000;
     }
 
-  thread::sigset_t sig;
-  ((thread*) (thread_id))->sig_clear ((thread::sigset_t) signals, &sig);
+  flags::mask_t sig;
+  ((thread*) (thread_id))->sig_clear ((flags::mask_t) signals, &sig);
 
   return (int32_t) sig;
 }
@@ -1763,20 +1763,19 @@ osSignalWait (int32_t signals, uint32_t millisec)
   result_t res;
   if (millisec == osWaitForever)
     {
-      res = this_thread::sig_wait ((thread::sigset_t) signals,
-                                   (thread::sigset_t*) &event.value.signals);
+      res = this_thread::sig_wait ((flags::mask_t) signals,
+                                   (flags::mask_t*) &event.value.signals);
     }
   else if (millisec == 0)
     {
-      res = this_thread::try_sig_wait (
-          (thread::sigset_t) signals, (thread::sigset_t*) &event.value.signals);
+      res = this_thread::try_sig_wait ((flags::mask_t) signals,
+                                       (flags::mask_t*) &event.value.signals);
     }
   else
     {
       res = this_thread::timed_sig_wait (
-          (thread::sigset_t) signals,
-          clock_systick::ticks_cast (millisec * 1000u),
-          (thread::sigset_t*) &event.value.signals);
+          (flags::mask_t) signals, clock_systick::ticks_cast (millisec * 1000u),
+          (flags::mask_t*) &event.value.signals);
     }
 
   if (res == result::ok)

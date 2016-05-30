@@ -243,15 +243,6 @@ namespace os
         }; /* enum class state */
 
       /**
-       * @brief Type of a variable holding a signal set.
-       * @details
-       * An unsigned type large enough to store all the signal flags,
-       * actually a reuse of the more generic flags mask type
-       * @ref flags::mask_t.
-       */
-      using sigset_t = flags::mask_t;
-
-      /**
        * @brief Thread signals.
        * @details
        * The os::rtos::thread::sig namespace is a container for
@@ -263,7 +254,7 @@ namespace os
          * @brief Signal sets with special meaning.
          */
         enum
-          : sigset_t
+          : flags::mask_t
             {
               /**
                * @brief Special signal mask to represent any flag.
@@ -884,7 +875,7 @@ namespace os
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
       result_t
-      sig_raise (sigset_t mask, sigset_t* oflags);
+      sig_raise (flags::mask_t mask, flags::mask_t* oflags);
 
       /**
        * @brief Clear thread signal flags.
@@ -896,7 +887,7 @@ namespace os
        * @retval EINVAL The mask is zero.
        */
       result_t
-      sig_clear (sigset_t mask, sigset_t* oflags);
+      sig_clear (flags::mask_t mask, flags::mask_t* oflags);
 
       /**
        * @brief Get/clear thread signal flags.
@@ -907,8 +898,8 @@ namespace os
        *  signal flags mask.
        * @retval sig::all Cannot be invoked from an Interrupt Service Routines.
        */
-      sigset_t
-      sig_get (sigset_t mask, flags::mode_t mode);
+      flags::mask_t
+      sig_get (flags::mask_t mask, flags::mode_t mode);
 
       /**
        * @brief Force thread termination.
@@ -943,15 +934,16 @@ namespace os
       this_thread::exit (void* exit_ptr);
 
       friend result_t
-      this_thread::sig_wait (sigset_t mask, sigset_t* oflags,
+      this_thread::sig_wait (flags::mask_t mask, flags::mask_t* oflags,
                              flags::mode_t mode);
 
       friend result_t
-      this_thread::try_sig_wait (sigset_t mask, sigset_t* oflags,
+      this_thread::try_sig_wait (flags::mask_t mask, flags::mask_t* oflags,
                                  flags::mode_t mode);
       friend result_t
-      this_thread::timed_sig_wait (sigset_t mask, clock::duration_t timeout,
-                                   sigset_t* oflags, flags::mode_t mode);
+      this_thread::timed_sig_wait (flags::mask_t mask,
+                                   clock::duration_t timeout,
+                                   flags::mask_t* oflags, flags::mode_t mode);
       friend int*
       this_thread::error (void);
 
@@ -1066,7 +1058,7 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      _sig_wait (sigset_t mask, sigset_t* oflags, flags::mode_t mode);
+      _sig_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
 
       /**
        * @brief Try to wait for signal flags.
@@ -1082,7 +1074,8 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      _try_sig_wait (sigset_t mask, sigset_t* oflags, flags::mode_t mode);
+      _try_sig_wait (flags::mask_t mask, flags::mask_t* oflags,
+                     flags::mode_t mode);
 
       /**
        * @brief Timed wait for signal flags.
@@ -1102,8 +1095,8 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      _timed_sig_wait (sigset_t mask, clock::duration_t timeout,
-                       sigset_t* oflags, flags::mode_t mode);
+      _timed_sig_wait (flags::mask_t mask, clock::duration_t timeout,
+                       flags::mask_t* oflags, flags::mode_t mode);
 
       /**
        * @brief Internal wait for signal.
@@ -1119,7 +1112,7 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      _try_wait (sigset_t mask, sigset_t* oflags, flags::mode_t mode);
+      _try_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
 
       /**
        * @brief The actual destructor, also called from exit() and kill().
@@ -1203,7 +1196,7 @@ namespace os
       state_t volatile sched_state_ = state::undefined;
       priority_t volatile prio_ = priority::none;
 
-      sigset_t volatile sig_mask_ = 0;
+      flags::mask_t volatile sig_mask_ = 0;
       bool volatile interrupted_ = false;
 
       os_thread_user_storage_t user_storage_;
@@ -1465,7 +1458,7 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      sig_wait (sigset_t mask, sigset_t* oflags = nullptr,
+      sig_wait (flags::mask_t mask, flags::mask_t* oflags = nullptr,
                 flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
       /**
@@ -1482,7 +1475,7 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      try_sig_wait (sigset_t mask, sigset_t* oflags = nullptr,
+      try_sig_wait (flags::mask_t mask, flags::mask_t* oflags = nullptr,
                     flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
       /**
@@ -1504,7 +1497,8 @@ namespace os
        */
       result_t
       timed_sig_wait (
-          sigset_t mask, clock::duration_t timeout, sigset_t* oflags = nullptr,
+          flags::mask_t mask, clock::duration_t timeout, flags::mask_t* oflags =
+              nullptr,
           flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
       /**
@@ -1574,7 +1568,7 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline result_t
-      sig_wait (sigset_t mask, sigset_t* oflags, flags::mode_t mode)
+      sig_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode)
       {
         return this_thread::thread ()._sig_wait (mask, oflags, mode);
       }
@@ -1591,7 +1585,8 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline result_t
-      try_sig_wait (sigset_t mask, sigset_t* oflags, flags::mode_t mode)
+      try_sig_wait (flags::mask_t mask, flags::mask_t* oflags,
+                    flags::mode_t mode)
       {
         return this_thread::thread ()._try_sig_wait (mask, oflags, mode);
       }
@@ -1635,8 +1630,8 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline result_t
-      timed_sig_wait (sigset_t mask, clock::duration_t timeout,
-                      sigset_t* oflags, flags::mode_t mode)
+      timed_sig_wait (flags::mask_t mask, clock::duration_t timeout,
+                      flags::mask_t* oflags, flags::mode_t mode)
       {
         return this_thread::thread ()._timed_sig_wait (mask, timeout, oflags,
                                                        mode);
@@ -1955,8 +1950,8 @@ namespace os
 
             // The reinterpret_cast<> is required since the allocator
             // uses allocation_element_t, which is usually larger.
-            allocated_stack_address_ = reinterpret_cast<stack::element_t*>(
-                (const_cast<Allocator&> (allocator)).allocate (
+            allocated_stack_address_ =
+                reinterpret_cast<stack::element_t*> ((const_cast<Allocator&> (allocator)).allocate (
                     allocated_stack_size_elements_));
 
             _construct (
