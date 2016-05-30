@@ -310,6 +310,8 @@ namespace os
          */
         using allocation_element_t = os::rtos::port::stack::allocation_element_t;
 
+        static const element_t magic = os::rtos::port::stack::magic;
+
         /**
          * @name Constructors & Destructor
          * @{
@@ -352,6 +354,36 @@ namespace os
          */
 
         /**
+         * @brief Set the stack address and size.
+         * @param [in] address Bottom stack address.
+         * @param [in] size_bytes Reserved stack size, in bytes.
+         * @par Parameters
+         *  None
+         */
+        void
+        set (stack::element_t* address, std::size_t size_bytes);
+
+        /**
+         * @brief Align the pointers and initialise to a known pattern.
+         * @par Parameters
+         *  None
+         * @par Returns
+         *  Nothing
+         */
+        void
+        initialize (void);
+
+        /**
+         * @brief Check if first and last magic words are still there.
+         * @par Parameters
+         *  None
+         * @par Returns
+         *  Nothing
+         */
+        bool
+        check_magics (void);
+
+        /**
          * @brief Get the stack lowest reserved address.
          * @par Parameters
          *  None
@@ -359,6 +391,15 @@ namespace os
          */
         stack::element_t*
         bottom (void);
+
+        /**
+         * @brief Get the top stack address.
+         * @par Parameters
+         *  None
+         * @return The address after the last stack element.
+         */
+        stack::element_t*
+        top (void);
 
         /**
          * @brief Get the stack size.
@@ -1712,10 +1753,23 @@ namespace os
       size_bytes_ = 0;
     }
 
+    inline void
+    thread::stack::set (stack::element_t* address, std::size_t size_bytes)
+    {
+      bottom_address_ = address;
+      size_bytes_ = size_bytes;
+    }
+
     inline thread::stack::element_t*
     thread::stack::bottom (void)
     {
       return bottom_address_;
+    }
+
+    inline thread::stack::element_t*
+    thread::stack::top (void)
+    {
+      return bottom_address_ + (size_bytes_ / sizeof(element_t));
     }
 
     inline std::size_t

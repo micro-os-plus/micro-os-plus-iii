@@ -151,6 +151,64 @@ namespace os
      * @cond ignore
      */
 
+    void
+    thread::stack::initialize (void)
+    {
+      // Align the bottom of the stack.
+      void* pa = bottom_address_;
+      bottom_address_ = static_cast<stack::element_t*> (std::align (
+          sizeof(stack::allocation_element_t), stack::min_size (), pa,
+          size_bytes_));
+
+      // If there is not enough space for the minimal stack, fail.
+      os_assert_throw(bottom_address_ != nullptr, ENOMEM);
+
+      element_t* p = bottom_address_;
+      element_t* pend = top ();
+
+      // Initialise the entire stack with the magic word.
+      for (; p < pend; ++p)
+        {
+          *p = magic;
+        }
+
+      // Compute the actual size. The -1 is to leave space for the magic.
+      size_bytes_ = ((static_cast<std::size_t> (p - bottom_address_) - 1)
+          * sizeof(element_t));
+    }
+
+    bool
+    thread::stack::check_magics (void)
+    {
+      element_t* p = bottom_address_;
+      std::size_t count = 0;
+      while (*p == magic)
+        {
+          count += sizeof(element_t);
+          ++p;
+        }
+      if (count == 0)
+        {
+          trace::printf ("%s() bottom address\n", __func__);
+          return false;
+        }
+      else
+        {
+          trace::printf ("%s() %d/%d bytes available\n", __func__, count,
+                         size_bytes_);
+        }
+
+      p = bottom_address_ + (size_bytes_ / sizeof(element_t));
+
+      if (*p != magic)
+        {
+          trace::printf ("%s() top address\n", __func__);
+          return false;
+        }
+
+      return true;
+    }
+
     /**
      * @details
      * Same as in POSIX, thread functions can return, and the behaviour
@@ -347,15 +405,14 @@ namespace os
               assert(attr.th_stack_address == nullptr);
             }
 
-          context_.stack_.size_bytes_ = stack_size_bytes;
-          context_.stack_.bottom_address_ =
-              static_cast<stack::element_t*> (stack_address);
+          context_.stack_.set (static_cast<stack::element_t*> (stack_address),
+                               stack_size_bytes);
         }
       else
         {
-          context_.stack_.size_bytes_ = attr.th_stack_size_bytes;
-          context_.stack_.bottom_address_ =
-              static_cast<stack::element_t*> (attr.th_stack_address);
+          context_.stack_.set (
+              static_cast<stack::element_t*> (attr.th_stack_address),
+              attr.th_stack_size_bytes);
         }
 
 #if defined(OS_TRACE_RTOS_THREAD)
@@ -390,14 +447,7 @@ namespace os
 
 #else
 
-          // Align the bottom of the stack.
-          void* p = context_.stack_.bottom_address_;
-          context_.stack_.bottom_address_ =
-              static_cast<stack::element_t*> (std::align (
-                  sizeof(stack::element_t), stack::min_size (), p,
-                  context_.stack_.size_bytes_));
-
-          os_assert_throw(context_.stack_.bottom_address_ != nullptr, ENOMEM);
+          context_.stack_.initialize ();
 
           // Create the context.
           port::context::create (&context_,
@@ -829,6 +879,8 @@ namespace os
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
+
+      assert(context_.stack_.check_magics ());
 
       if (allocated_stack_address_ != nullptr)
         {
