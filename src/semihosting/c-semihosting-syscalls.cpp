@@ -34,10 +34,10 @@
 #include <cmsis-plus/arm/semihosting.h>
 #include <cmsis-plus/diag/trace.h>
 
-#include "posix-io/types.h"
+#include <cmsis-plus/posix-io/types.h>
 
-#include "posix/dirent.h"
-#include "posix/sys/socket.h"
+#include <cmsis-plus/posix/dirent.h>
+#include <cmsis-plus/posix/sys/socket.h>
 
 #include <cstring>
 
@@ -1257,14 +1257,14 @@ initialise_monitor_handles (void)
 // with the newlib reentrant code, redefine
 // some functions with _name(), others directly with name().
 
-#include "posix-io/newlib-aliases.h"
+#include <cmsis-plus/posix-io/newlib-aliases.h>
 
 #else
 
 // For regular embedded environment that use POSIX system calls,
 // redefine **all** functions without the '__posix_' prefix.
 
-#include "posix-io/standard-aliases.h"
+#include <cmsis-plus/posix-io/standard-aliases.h>
 
 #endif
 
