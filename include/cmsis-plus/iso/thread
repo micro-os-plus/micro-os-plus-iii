@@ -42,7 +42,6 @@
 #include <cmsis-plus/iso/chrono>
 
 #include <cstddef>
-#include <iostream>
 #include <type_traits>
 #include <functional>
 
