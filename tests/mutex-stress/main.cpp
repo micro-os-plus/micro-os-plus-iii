@@ -90,9 +90,9 @@ os_main (int argc, char* argv[])
 
   printf ("Mutex stress & uniformity test.\n");
 #if defined(__clang__)
-  printf ("Built with clang " __VERSION__);
+  printf ("Built with clang " __VERSION__ ".\n");
 #else
-  printf ("Built with GCC " __VERSION__);
+  printf ("Built with GCC " __VERSION__ ".\n");
 #endif
 
   uint32_t seed;

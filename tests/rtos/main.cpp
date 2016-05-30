@@ -39,9 +39,9 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   printf (
       "\nCMSIS++ RTOS simple APIs test.\n");
 #if defined(__clang__)
-  printf ("Built with clang " __VERSION__);
+  printf ("Built with clang " __VERSION__ ".\n");
 #else
-  printf ("Built with GCC " __VERSION__);
+  printf ("Built with GCC " __VERSION__ ".\n");
 #endif
 
   int ret = 0;
