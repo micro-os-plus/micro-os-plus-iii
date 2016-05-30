@@ -39,6 +39,13 @@ RNG_HandleTypeDef hrng;
 int
 os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
+  printf ("Semaphore stress test.\n");
+#if defined(__clang__)
+  printf ("Built with clang " __VERSION__);
+#else
+  printf ("Built with GCC " __VERSION__);
+#endif
+
   HAL_NVIC_SetPriority (TIM2_IRQn, 10, 0);
   HAL_NVIC_EnableIRQ (TIM2_IRQn);
 
