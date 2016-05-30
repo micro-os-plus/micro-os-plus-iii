@@ -27,8 +27,6 @@
 
 #include <cstdio>
 #include <cstdint>
-#include <iostream>
-#include <chrono>
 
 #include <cmsis-plus/iso/chrono>
 #include <cmsis-plus/iso/condition_variable>
@@ -41,8 +39,6 @@
 // ----------------------------------------------------------------------------
 
 static const char* test_name = "Test ISO C++ API";
-
-using namespace os;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
