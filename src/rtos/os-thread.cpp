@@ -662,8 +662,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      while ((sched_state_ != state::terminated)
-          && (sched_state_ != state::destroyed))
+      while (sched_state_ != state::destroyed)
         {
           joiner_ = this_thread::_thread ();
           this_thread::_thread ()->_wait ();
