@@ -153,7 +153,9 @@ test_c_api (void)
 
       os_thread_join (&th1, NULL);
 
-      os_thread_destroy(&th1);
+      // The destroy() is recommended, but not mandatory when using join().
+      // The test checks if join() fully destroys the thread.
+      // os_thread_destroy(&th1);
     }
 
     {
@@ -163,7 +165,7 @@ test_c_api (void)
 
       os_thread_join (&th2, NULL);
 
-      os_thread_destroy(&th2);
+      // os_thread_destroy(&th2);
     }
 
     {
@@ -191,7 +193,7 @@ test_c_api (void)
       // Restore main thread priority.
       os_thread_set_prio (os_this_thread (), os_priority_normal);
 
-      os_thread_destroy(&th3);
+      // os_thread_destroy(&th3);
     }
 
   // ==========================================================================
