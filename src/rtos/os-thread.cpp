@@ -163,7 +163,7 @@ namespace os
     thread::_invoke_with_exit (thread* thread)
     {
 #if defined(OS_TRACE_RTOS_THREAD)
-      trace::printf ("%s @%p %s\n", __func__, thread, thread->name ());
+      trace::printf ("%s() @%p %s\n", __func__, thread, thread->name ());
 #endif
       thread->_exit (thread->func_ (thread->func_args_));
     }
@@ -171,7 +171,7 @@ namespace os
     thread::thread ()
     {
 #if defined(OS_TRACE_RTOS_THREAD)
-      trace::printf ("%s @%p %s\n", __func__, this, this->name ());
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
     }
 
@@ -180,7 +180,7 @@ namespace os
           { name }
     {
 #if defined(OS_TRACE_RTOS_THREAD)
-      trace::printf ("%s @%p %s\n", __func__, this, this->name ());
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
     }
 
@@ -284,7 +284,7 @@ namespace os
           { name }
     {
 #if defined(OS_TRACE_RTOS_THREAD)
-      trace::printf ("%s @%p %s\n", __func__, this, this->name ());
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
 
       if (attr.th_stack_address != nullptr
@@ -359,7 +359,7 @@ namespace os
         }
 
 #if defined(OS_TRACE_RTOS_THREAD)
-      trace::printf ("%s @%p %s p%d %d\n", __func__, this, name (),
+      trace::printf ("%s() @%p %s p%d %d\n", __func__, this, name (),
                      attr.th_priority, context_.stack_.size_bytes_);
 #endif
 
@@ -440,7 +440,7 @@ namespace os
     thread::~thread ()
     {
 #if defined(OS_TRACE_RTOS_THREAD)
-      trace::printf ("%s @%p %s \n", __func__, this, name ());
+      trace::printf ("%s() @%p %s \n", __func__, this, name ());
 #endif
 
       // Prevent the main thread to destroy itself while running
@@ -452,7 +452,7 @@ namespace os
       else
         {
 #if defined(OS_TRACE_RTOS_THREAD)
-          trace::printf ("%s @%p %s nop, cannot commit suicide\n", __func__,
+          trace::printf ("%s() @%p %s nop, cannot commit suicide\n", __func__,
                          this, name ());
 #endif
         }
@@ -745,7 +745,7 @@ namespace os
     thread::_wait (void)
     {
 #if defined(OS_TRACE_RTOS_THREAD)
-      //trace::printf ("%s() @%p %s\n", __func__, this, name ());
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
         {
