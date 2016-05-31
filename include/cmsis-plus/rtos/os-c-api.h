@@ -464,7 +464,9 @@ extern "C"
   os_sysclock_now_details (os_sysclock_current_t* details);
 
 #pragma GCC diagnostic push
+#if defined(__cplusplus)
 #pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
 
   inline os_clock_duration_t
   __attribute__((always_inline))
