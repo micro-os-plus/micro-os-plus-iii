@@ -177,8 +177,14 @@ namespace os
           * sizeof(element_t));
     }
 
-    bool
-    thread::stack::check_magics (void)
+    /**
+     * @details
+     * Count the number of words where the magic is still there.
+     *
+     * @warning: For large stacks it may be an expensive operation.
+     */
+    std::size_t
+    thread::stack::available (void)
     {
       element_t* p = bottom_address_;
       std::size_t count = 0;
@@ -187,26 +193,8 @@ namespace os
           count += sizeof(element_t);
           ++p;
         }
-      if (count == 0)
-        {
-          trace::printf ("%s() bottom address\n", __func__);
-          return false;
-        }
-      else
-        {
-          trace::printf ("%s() %d/%d bytes available\n", __func__, count,
-                         size_bytes_);
-        }
 
-      p = bottom_address_ + (size_bytes_ / sizeof(element_t));
-
-      if (*p != magic)
-        {
-          trace::printf ("%s() top address\n", __func__);
-          return false;
-        }
-
-      return true;
+      return count;
     }
 
     /**
@@ -416,8 +404,9 @@ namespace os
         }
 
 #if defined(OS_TRACE_RTOS_THREAD)
-      trace::printf ("%s() @%p %s p%d %d\n", __func__, this, name (),
-                     attr.th_priority, context_.stack_.size_bytes_);
+      trace::printf ("%s() @%p %s p%d stack{%p,%d}\n", __func__, this, name (),
+                     attr.th_priority, context_.stack_.bottom_address_,
+                     context_.stack_.size_bytes_);
 #endif
 
         {
@@ -880,7 +869,14 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      assert(context_.stack_.check_magics ());
+      assert(context_.stack_.check_bottom_magic ());
+      assert(context_.stack_.check_top_magic ());
+
+#if defined(OS_TRACE_RTOS_THREAD)
+      trace::printf ("%s() @%p %s %d/%d stack bytes unused\n", __func__, this,
+                     name (), context_.stack_.available (),
+                     context_.stack_.size ());
+#endif
 
       if (allocated_stack_address_ != nullptr)
         {
@@ -1061,7 +1057,8 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
-      trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
+      trace::printf ("%s(0x%X) @%p %s 0x%X\n", __func__, mask, this, name (),
+                     sig_mask_);
 #endif
 
       interrupts::critical_section ics; // ----- Critical section -----
@@ -1138,8 +1135,8 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
-      trace::printf ("%s(0x%X, %d) @%p %s\n", __func__, mask, mode, this,
-                     name ());
+      trace::printf ("%s(0x%X, %d) @%p %s 0x%X\n", __func__, mask, mode, this,
+                     name (), sig_mask_);
 #endif
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
@@ -1156,8 +1153,9 @@ namespace os
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
                   slept_ticks = static_cast<clock::duration_t> (clock_->now ()
                       - prev);
-                  trace::printf ("%s(0x%X, %d)=%d @%p %s\n", __func__, mask,
-                                 mode, slept_ticks, this, name ());
+                  trace::printf ("%s(0x%X, %d)=%d @%p %s 0x%X\n", __func__,
+                                 mask, mode, slept_ticks, this, name (),
+                                 sig_mask_);
 #endif
                   return result::ok;
                 }
@@ -1180,8 +1178,8 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
-      trace::printf ("%s(0x%X, %d) @%p %s\n", __func__, mask, mode, this,
-                     name ());
+      trace::printf ("%s(0x%X, %d) @%p %s 0x%X\n", __func__, mask, mode, this,
+                     name (), sig_mask_);
 #endif
 
       interrupts::critical_section ics; // ----- Critical section -----
@@ -1196,8 +1194,8 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
-      trace::printf ("%s(0x%X, %d, %d) @%p %s\n", __func__, mask, mode, timeout,
-                     this, name ());
+      trace::printf ("%s(0x%X, %d, %d) @%p %s 0x%X\n", __func__, mask, mode,
+                     timeout, this, name (), sig_mask_);
 #endif
 
         {
@@ -1270,8 +1268,8 @@ namespace os
       clock::duration_t slept_ticks =
           static_cast<clock::duration_t> (clock_->steady_now ()
               - begin_timestamp);
-      trace::printf ("%s(0x%X, %d, %d)=%d @%p %s\n", __func__, mask, mode,
-                     timeout, slept_ticks, this, name ());
+      trace::printf ("%s(0x%X, %d, %d)=%d @%p %s 0x%X\n", __func__, mask, mode,
+                     timeout, slept_ticks, this, name (), sig_mask_);
 #endif
 
       return res;

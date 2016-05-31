@@ -374,16 +374,6 @@ namespace os
         initialize (void);
 
         /**
-         * @brief Check if first and last magic words are still there.
-         * @par Parameters
-         *  None
-         * @par Returns
-         *  Nothing
-         */
-        bool
-        check_magics (void);
-
-        /**
          * @brief Get the stack lowest reserved address.
          * @par Parameters
          *  None
@@ -409,6 +399,33 @@ namespace os
          */
         std::size_t
         size (void);
+
+        /**
+         * @brief Check if bottom magic word is still there.
+         * @par Parameters
+         *  None
+         * @par Returns
+         *  Nothing
+         */
+        bool
+        check_bottom_magic (void);
+
+        /**
+         * @brief Check if top magic word is still there.
+         * @par Parameters
+         *  None
+         * @par Returns
+         *  Nothing
+         */
+        bool
+        check_top_magic (void);
+
+        /**
+         * @brief Compute how much available stack remains.
+         * @return Number of available bytes.
+         */
+        std::size_t
+        available (void);
 
         /**
          * @}
@@ -1159,10 +1176,20 @@ namespace os
        * @brief The actual destructor, also called from exit() and kill().
        * @par Parameters
        *  None
-       * @return  Nothing.
+       * @par Returns
+       *  Nothing
        */
       virtual void
       _destroy (void);
+
+      /**
+       * @par Parameters
+       *  None
+       * @par Returns
+       *  Nothing
+       */
+      void
+      _relink_running(void);
 
       /**
        * @endcond
@@ -1778,6 +1805,18 @@ namespace os
       return size_bytes_;
     }
 
+    inline bool
+    thread::stack::check_bottom_magic (void)
+    {
+      return *bottom () == stack::magic;
+    }
+
+    inline bool
+    thread::stack::check_top_magic (void)
+    {
+      return *top () == stack::magic;
+    }
+
     inline std::size_t
     thread::stack::min_size (void)
     {
@@ -1871,6 +1910,27 @@ namespace os
     {
       return &user_storage_;
     }
+
+    inline void
+    thread::_relink_running(void)
+    {
+      if (sched_state_ == state::running)
+        {
+          // If the current thread is running, add it to the
+          // ready list, so that it will be resumed later.
+          waiting_thread_node& crt_node = ready_node_;
+          if (crt_node.next == nullptr)
+            {
+              rtos::scheduler::ready_threads_list_.link (crt_node);
+              // Ready state set in above link().
+            }
+
+          // Simple test to verify that the old thread
+          // did not overflow the stack.
+          assert(context_.stack_.check_bottom_magic ());
+        }
+    }
+
 
     // ========================================================================
 
