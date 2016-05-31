@@ -863,20 +863,32 @@ namespace os
     }
 
     void
+    thread::_check_stack (void)
+    {
+      if (context_.stack_.size () > 0)
+        {
+          assert(context_.stack_.check_bottom_magic ());
+          assert(context_.stack_.check_top_magic ());
+
+#if defined(OS_TRACE_RTOS_THREAD)
+          trace::printf ("%s() @%p %s %d/%d stack bytes unused\n", __func__,
+                         this, name (), context_.stack_.available (),
+                         context_.stack_.size ());
+#endif
+
+          // Clear stack to avoid further checks
+          context_.stack_.clear ();
+        }
+    }
+
+    void
     thread::_destroy (void)
     {
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      assert(context_.stack_.check_bottom_magic ());
-      assert(context_.stack_.check_top_magic ());
-
-#if defined(OS_TRACE_RTOS_THREAD)
-      trace::printf ("%s() @%p %s %d/%d stack bytes unused\n", __func__, this,
-                     name (), context_.stack_.available (),
-                     context_.stack_.size ());
-#endif
+      _check_stack ();
 
       if (allocated_stack_address_ != nullptr)
         {

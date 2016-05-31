@@ -354,6 +354,16 @@ namespace os
          */
 
         /**
+         * @brief Clear the stack pointer and size.
+         * @par Parameters
+         *  None
+         * @par Returns
+         *  Nothing
+         */
+        void
+        clear (void);
+
+        /**
          * @brief Set the stack address and size.
          * @param [in] address Bottom stack address.
          * @param [in] size_bytes Reserved stack size, in bytes.
@@ -1189,7 +1199,16 @@ namespace os
        *  Nothing
        */
       void
-      _relink_running(void);
+      _relink_running (void);
+
+      /**
+       * @par Parameters
+       *  None
+       * @par Returns
+       *  Nothing
+       */
+      void
+      _check_stack (void);
 
       /**
        * @endcond
@@ -1776,6 +1795,12 @@ namespace os
     inline
     thread::stack::stack ()
     {
+      clear ();
+    }
+
+    inline void
+    thread::stack::clear (void)
+    {
       bottom_address_ = nullptr;
       size_bytes_ = 0;
     }
@@ -1912,7 +1937,7 @@ namespace os
     }
 
     inline void
-    thread::_relink_running(void)
+    thread::_relink_running (void)
     {
       if (sched_state_ == state::running)
         {
@@ -1930,7 +1955,6 @@ namespace os
           assert(context_.stack_.check_bottom_magic ());
         }
     }
-
 
     // ========================================================================
 
@@ -2093,6 +2117,8 @@ namespace os
 
         if (allocated_stack_address_ != nullptr)
           {
+            _check_stack ();
+
             typedef typename std::allocator_traits<Allocator>::pointer pointer;
 
             static_cast<Allocator*> (const_cast<void*> (allocator_))->deallocate (
