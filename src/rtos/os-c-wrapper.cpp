@@ -534,6 +534,19 @@ os_mutex_attr_init (os_mutex_attr_t* attr)
 }
 
 void
+os_mutex_attr_init_recursive (os_mutex_attr_t* attr)
+{
+  assert(attr != nullptr);
+  new (attr) mutex::recursive_attributes ();
+}
+
+const os_mutex_attr_t*
+os_mutex_attr_get_recursive (void)
+{
+  return (const os_mutex_attr_t*) &mutex::recursive_initializer;
+}
+
+void
 os_mutex_create (os_mutex_t* mutex, const char* name,
                  const os_mutex_attr_t* attr)
 {
