@@ -979,6 +979,15 @@ namespace os
       kill (void);
 
       /**
+       * @brief Get the thread context stack.
+       * @par Parameters
+       *  None
+       * @return A reference to the context stack object.
+       */
+      thread::stack&
+      context_stack(void);
+
+      /**
        * @}
        */
 
@@ -1952,8 +1961,14 @@ namespace os
 
           // Simple test to verify that the old thread
           // did not overflow the stack.
-          assert(context_.stack_.check_bottom_magic ());
+          assert(context_stack().check_bottom_magic ());
         }
+    }
+
+    inline thread::stack&
+    thread::context_stack(void)
+    {
+      return context_.stack_;
     }
 
     // ========================================================================

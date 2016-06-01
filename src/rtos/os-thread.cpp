@@ -393,20 +393,20 @@ namespace os
               assert(attr.th_stack_address == nullptr);
             }
 
-          context_.stack_.set (static_cast<stack::element_t*> (stack_address),
+          context_stack().set (static_cast<stack::element_t*> (stack_address),
                                stack_size_bytes);
         }
       else
         {
-          context_.stack_.set (
+          context_stack().set (
               static_cast<stack::element_t*> (attr.th_stack_address),
               attr.th_stack_size_bytes);
         }
 
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s p%d stack{%p,%d}\n", __func__, this, name (),
-                     attr.th_priority, context_.stack_.bottom_address_,
-                     context_.stack_.size_bytes_);
+                     attr.th_priority, context_stack().bottom_address_,
+                     context_stack().size_bytes_);
 #endif
 
         {
@@ -436,7 +436,7 @@ namespace os
 
 #else
 
-          context_.stack_.initialize ();
+          context_stack().initialize ();
 
           // Create the context.
           port::context::create (&context_,
@@ -865,19 +865,19 @@ namespace os
     void
     thread::_check_stack (void)
     {
-      if (context_.stack_.size () > 0)
+      if (context_stack().size () > 0)
         {
-          assert(context_.stack_.check_bottom_magic ());
-          assert(context_.stack_.check_top_magic ());
+          assert(context_stack().check_bottom_magic ());
+          assert(context_stack().check_top_magic ());
 
 #if defined(OS_TRACE_RTOS_THREAD)
           trace::printf ("%s() @%p %s %d/%d stack bytes unused\n", __func__,
-                         this, name (), context_.stack_.available (),
-                         context_.stack_.size ());
+                         this, name (), context_stack().available (),
+                         context_stack().size ());
 #endif
 
           // Clear stack to avoid further checks
-          context_.stack_.clear ();
+          context_stack().clear ();
         }
     }
 
