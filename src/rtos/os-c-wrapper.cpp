@@ -483,6 +483,19 @@ os_timer_attr_init (os_timer_attr_t* attr)
 }
 
 void
+os_timer_attr_init_periodic (os_timer_attr_t* attr)
+{
+  assert(attr != nullptr);
+  new (attr) timer::periodic_attributes ();
+}
+
+const os_timer_attr_t*
+os_timer_attr_get_periodic (void)
+{
+  return (const os_timer_attr_t*) &timer::periodic_initializer;
+}
+
+void
 os_timer_create (os_timer_t* timer, const char* name, os_timer_func_t func,
                  os_timer_func_args_t args, const os_timer_attr_t* attr)
 {

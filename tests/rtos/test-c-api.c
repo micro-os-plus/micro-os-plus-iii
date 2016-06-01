@@ -231,6 +231,25 @@ test_c_api (void)
       os_timer_destroy (&tm1);
     }
 
+    {
+      // Periodic timer
+      os_timer_t tm2;
+      os_timer_create (&tm2, "tm2", tmfunc, NULL,
+                       os_timer_attr_get_periodic ());
+
+      os_sysclock_sleep_for (1); // Sync
+      os_timer_start (&tm2, 1);
+
+      os_sysclock_sleep_for (2);
+
+      os_timer_stop (&tm2);
+
+      name = os_timer_get_name (&tm2);
+      assert(strcmp (name, "tm2") == 0);
+
+      os_timer_destroy (&tm2);
+    }
+
   // ==========================================================================
 
   printf ("\n%s - Mutexes.\n", test_name);
@@ -284,6 +303,27 @@ test_c_api (void)
       os_mutex_create (&mx2, "mx2", &amx2);
 
       os_mutex_destroy (&mx2);
+    }
+
+    {
+      // Recursive mutex.
+      os_mutex_t mx3;
+      os_mutex_create (&mx3, "mx3", os_mutex_attr_get_recursive ());
+
+      os_mutex_destroy (&mx3);
+    }
+
+    {
+      // Custom recursive mutex, with RTC.
+      os_mutex_attr_t amx4;
+      os_mutex_attr_init_recursive (&amx4);
+
+      amx4.clock = os_clock_get_rtclock ();
+
+      os_mutex_t mx4;
+      os_mutex_create (&mx4, "mx4", &amx4);
+
+      os_mutex_destroy (&mx4);
     }
 
   // ==========================================================================
