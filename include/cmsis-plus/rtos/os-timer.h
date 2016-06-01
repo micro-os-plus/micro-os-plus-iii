@@ -246,7 +246,7 @@ namespace os
        * @param [in] attr Reference to attributes.
        */
       timer (func_t function, func_args_t args, const attributes& attr =
-                 periodic_initializer);
+                 once_initializer);
 
       /**
        * @brief Create a named timer object.
@@ -256,7 +256,7 @@ namespace os
        * @param [in] attr Reference to attributes.
        */
       timer (const char* name, func_t function, func_args_t args,
-             const attributes& attr = periodic_initializer);
+             const attributes& attr = once_initializer);
 
       /**
        * @cond ignore
