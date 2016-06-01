@@ -702,6 +702,19 @@ os_semaphore_attr_init (os_semaphore_attr_t* attr)
 }
 
 void
+os_semaphore_attr_init_binary (os_semaphore_attr_t* attr)
+{
+  assert(attr != nullptr);
+  new (attr) semaphore::binary_attributes ();
+}
+
+const os_semaphore_attr_t*
+os_semaphore_attr_get_binary (void)
+{
+  return (const os_semaphore_attr_t*) &semaphore::binary_initializer;
+}
+
+void
 os_semaphore_create (os_semaphore_t* semaphore, const char* name,
                      const os_semaphore_attr_t* attr)
 {

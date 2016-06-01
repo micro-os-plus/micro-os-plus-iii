@@ -618,6 +618,12 @@ extern "C"
   os_semaphore_attr_init (os_semaphore_attr_t* attr);
 
   void
+  os_semaphore_attr_init_binary (os_semaphore_attr_t* attr);
+
+  const os_semaphore_attr_t*
+  os_semaphore_attr_get_binary (void);
+
+  void
   os_semaphore_create (os_semaphore_t* semaphore, const char* name,
                        const os_semaphore_attr_t* attr);
 

@@ -258,7 +258,8 @@ test_c_api (void)
 
       os_thread_t* th;
       th = os_mutex_get_owner (&mx1);
-      if (th != NULL){
+      if (th != NULL)
+        {
           os_thread_get_name (th);
         }
 
@@ -290,6 +291,7 @@ test_c_api (void)
   printf ("\n%s - Semaphores.\n", test_name);
 
     {
+      // Default counting semaphore.
       os_semaphore_t sp1;
       os_semaphore_create (&sp1, "sp1", NULL);
 
@@ -326,6 +328,26 @@ test_c_api (void)
       os_semaphore_create (&sp2, "sp2", &asp2);
 
       os_semaphore_destroy (&sp2);
+    }
+
+    {
+      // Binary semaphore.
+      os_semaphore_t sp3;
+      os_semaphore_create (&sp3, "sp3", os_semaphore_attr_get_binary ());
+
+      os_semaphore_destroy (&sp3);
+    }
+
+    {
+      // Custom binary semaphore.
+      os_semaphore_attr_t asp4;
+      os_semaphore_attr_init_binary (&asp4);
+      asp4.clock = os_clock_get_rtclock ();
+
+      os_semaphore_t sp4;
+      os_semaphore_create (&sp4, "sp4", &asp4);
+
+      os_semaphore_destroy (&sp4);
     }
 
   // ==========================================================================
