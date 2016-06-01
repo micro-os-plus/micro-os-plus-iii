@@ -323,11 +323,20 @@ test_cpp_api (void)
       mutex mx1;
       mx1.lock ();
       mx1.unlock ();
+    }
 
+    {
       mutex mx2
         { "mx2" };
       mx2.lock ();
       mx2.unlock ();
+    }
+
+    {
+      mutex mx3
+        { "mx2", mutex::recursive_initializer };
+      mx3.lock ();
+      mx3.unlock ();
     }
 
   // ==========================================================================
@@ -335,12 +344,23 @@ test_cpp_api (void)
   printf ("\n%s - Semaphores.\n", test_name);
 
     {
+      // Counting semaphore.
       semaphore sp1;
       sp1.post ();
+    }
 
+    {
+      // Named counting semaphore.
       semaphore sp2
         { "sp2" };
       sp2.post ();
+    }
+
+    {
+      // Named binary semaphore.
+      semaphore sp3
+        { "sp3", semaphore::binary_initializer };
+      sp3.post ();
     }
 
   // ==========================================================================
@@ -348,6 +368,7 @@ test_cpp_api (void)
   printf ("\n%s - Timers.\n", test_name);
 
     {
+      // Single-shot timer.
       timer tm1
         { tmfunc, nullptr };
       sysclock.sleep_for (1); // Sync
@@ -355,7 +376,10 @@ test_cpp_api (void)
 
       sysclock.sleep_for (2);
       tm1.stop ();
+    }
 
+    {
+      // Named single-shot timer.
       timer tm2
         { "tm2", tmfunc, nullptr };
       sysclock.sleep_for (1); // Sync
@@ -363,6 +387,17 @@ test_cpp_api (void)
 
       sysclock.sleep_for (2);
       tm2.stop ();
+    }
+
+    {
+      // Named periodic timer.
+      timer tm3
+        { "tm3", tmfunc, nullptr, timer::periodic_initializer };
+      sysclock.sleep_for (1); // Sync
+      tm3.start (1);
+
+      sysclock.sleep_for (2);
+      tm3.stop ();
     }
 
   // ==========================================================================
