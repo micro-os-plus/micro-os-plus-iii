@@ -8,6 +8,7 @@ NOTICE.md
 Release/
 Thumbs.db
 build/
+doxygen/html/
 test-*/
 upload.tar.gz
 yotta_modules/

@@ -2,7 +2,7 @@
 	"$schema": "http://xcdl.github.io/schemas/xpack-1-1.json",
 	"name": "ilg-cmsis-plus",
 	"title": "CMSIS++",
-	"description": "An xPack with CMSIS++, a C++ version of CMSIS.",
+	"description": "An xPack with CMSIS++, a proposal for a future CMSIS, written in C++ and POSIX compliant.",
 	"xcdlFile": ".xcdl.json",
 	"repository": 
 	{
@@ -20,7 +20,11 @@
 		"arm",
 		"cmsis",
 		"cortex",
-		"c++"
+		"c++",
+		"rtos",
+		"drivers",
+		"scheduler",
+		"posix"
 	],
 
 	"homepage": "https://github.com/micro-os-plus/cmsis-plus",

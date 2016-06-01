@@ -1,12 +1,16 @@
 {
 	"name": "ilg-cmsis-plus",
-	"description": "An xPack with CMSIS++, a C++ version of CMSIS.",
+	"description": "An xPack with CMSIS++, a proposal for a future CMSIS, written in C++ and POSIX compliant.",
 	"version": "0.1.1",
 	"keywords": [
 		"arm",
 		"cmsis",
 		"cortex",
 		"c++",
+		"rtos",
+		"drivers",
+		"scheduler",
+		"posix",
 		"xpack",
 		"xcdl"
 	],
@@ -19,6 +23,6 @@
 	"bugs": {
 		"url": "http://www.element14.com/community/groups/gnu-arm-eclipse"
 	},
-	"license": "LGPL-3.0",
+	"license": "MIT",
 	"dependencies": {}
 }
