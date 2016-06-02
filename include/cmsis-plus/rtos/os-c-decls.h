@@ -192,8 +192,8 @@ extern "C"
     os_thread_port_data_t port;
 #endif
     void* parent;
-    os_thread_children_list_t children;
     os_double_list_links_t child_links;
+    os_thread_children_list_t children;
     void* joiner;
     void* waiting_node;
     void* clock_node;

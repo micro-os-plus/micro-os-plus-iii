@@ -985,7 +985,7 @@ namespace os
        * @return A reference to the context stack object.
        */
       thread::stack&
-      context_stack(void);
+      context_stack (void);
 
       /**
        * @}
@@ -1054,13 +1054,19 @@ namespace os
       ::os_idle (func_args_t args);
 
       friend class ready_threads_list;
-      friend class top_threads_list;
       friend class thread_children_list;
       friend class waiting_threads_list;
       friend class clock_timestamps_list;
 
       friend class clock;
       friend class condition_variable;
+
+#if 0
+      friend class top_threads_list;
+#else
+//      template<typename T, typename N, N T::* MP>
+//        friend class top_threads_list;
+#endif
 
       /**
        * @endcond
@@ -1259,11 +1265,18 @@ namespace os
       // Pointer to parent, or null for top/detached thread.
       thread* parent_ = nullptr;
 
-      // List of children threads.
-      thread_children_list children_;
+    public:
 
       // Intrusive node used to link this thread to parent list.
       double_list_links child_links_;
+
+      using threads_list = intrusive_list<thread, double_list_links, &thread::child_links_>;
+
+      // List of children threads. Force a clear.
+      threads_list children_
+        { true };
+
+    protected:
 
       // Thread waiting to join.
       thread* joiner_ = nullptr;
@@ -1953,7 +1966,7 @@ namespace os
           // If the current thread is running, add it to the
           // ready list, so that it will be resumed later.
           waiting_thread_node& crt_node = ready_node_;
-          if (crt_node.next == nullptr)
+          if (crt_node.next () == nullptr)
             {
               rtos::scheduler::ready_threads_list_.link (crt_node);
               // Ready state set in above link().
@@ -1961,12 +1974,12 @@ namespace os
 
           // Simple test to verify that the old thread
           // did not overflow the stack.
-          assert(context_stack().check_bottom_magic ());
+          assert(context_stack ().check_bottom_magic ());
         }
     }
 
     inline thread::stack&
-    thread::context_stack(void)
+    thread::context_stack (void)
     {
       return context_.stack_;
     }

@@ -393,20 +393,20 @@ namespace os
               assert(attr.th_stack_address == nullptr);
             }
 
-          context_stack().set (static_cast<stack::element_t*> (stack_address),
-                               stack_size_bytes);
+          context_stack ().set (static_cast<stack::element_t*> (stack_address),
+                                stack_size_bytes);
         }
       else
         {
-          context_stack().set (
+          context_stack ().set (
               static_cast<stack::element_t*> (attr.th_stack_address),
               attr.th_stack_size_bytes);
         }
 
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s p%d stack{%p,%d}\n", __func__, this, name (),
-                     attr.th_priority, context_stack().bottom_address_,
-                     context_stack().size_bytes_);
+                     attr.th_priority, context_stack ().bottom_address_,
+                     context_stack ().size_bytes_);
 #endif
 
         {
@@ -436,7 +436,7 @@ namespace os
 
 #else
 
-          context_stack().initialize ();
+          context_stack ().initialize ();
 
           // Create the context.
           port::context::create (&context_,
@@ -527,7 +527,7 @@ namespace os
         {
           interrupts::critical_section ics; // ----- Critical section -----
 
-          if (ready_node_.next == nullptr)
+          if (ready_node_.next () == nullptr)
             {
               scheduler::ready_threads_list_.link (ready_node_);
               // state::ready set in above link().
@@ -865,19 +865,19 @@ namespace os
     void
     thread::_check_stack (void)
     {
-      if (context_stack().size () > 0)
+      if (context_stack ().size () > 0)
         {
-          assert(context_stack().check_bottom_magic ());
-          assert(context_stack().check_top_magic ());
+          assert(context_stack ().check_bottom_magic ());
+          assert(context_stack ().check_top_magic ());
 
 #if defined(OS_TRACE_RTOS_THREAD)
           trace::printf ("%s() @%p %s %d/%d stack bytes unused\n", __func__,
-                         this, name (), context_stack().available (),
-                         context_stack().size ());
+                         this, name (), context_stack ().available (),
+                         context_stack ().size ());
 #endif
 
           // Clear stack to avoid further checks
-          context_stack().clear ();
+          context_stack ().clear ();
         }
     }
 

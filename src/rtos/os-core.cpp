@@ -80,7 +80,9 @@ namespace os
        * since it must be available to register the very first statically
        * allocated thread.
        */
-      top_threads_list top_threads_list_;
+      // top_threads_list top_threads_list_;
+      thread::threads_list top_threads_list_;
+
 #pragma GCC diagnostic pop
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
@@ -204,6 +206,19 @@ namespace os
 
         port::scheduler::lock (is_locked_);
 
+      }
+
+      thread::threads_list&
+      children_threads (thread* th)
+      {
+        if (th == nullptr)
+          {
+            return top_threads_list_;
+          }
+        else
+          {
+            return th->children_;
+          }
       }
 
     /**

@@ -19,6 +19,7 @@
 #include <cmsis-plus/rtos/os.h>
 
 #include <cstdio>
+#include <algorithm>
 
 #include <test-cpp-api.h>
 
@@ -66,9 +67,54 @@ tmfunc (void* args __attribute__((unused)))
   printf ("%s\n", __func__);
 }
 
+void
+iterate_threads (thread* th = nullptr, unsigned int depth = 0);
+
+static const char* thread_state[] =
+  { "undf", "inac", "rdy", "run", "wait", "term", "dead" };
+
+void
+iterate_threads (thread* th, unsigned int depth)
+{
+  for (auto&& p : scheduler::children_threads (th))
+    {
+      thread::stack& stk = p.context_stack ();
+      unsigned int used = static_cast<unsigned int> (stk.size ()
+          - stk.available ());
+      unsigned int used_proc = static_cast<unsigned int> (used * 100
+          / stk.size ());
+      unsigned int st = static_cast<unsigned int> (p.sched_state ());
+      printf ("%s, %u%% (%u/%u), %s \n", p.name (), used_proc, used,
+              static_cast<unsigned int> (stk.size ()), thread_state[st]);
+
+      iterate_threads (&p, depth + 1);
+    }
+}
+
 int
 test_cpp_api (void)
 {
+  // ==========================================================================
+
+#if 0
+  for (auto p = scheduler::top_threads_list2_.begin ();
+      p != scheduler::top_threads_list2_.end (); ++p)
+    {
+      printf ("%s\n", p->name ());
+    }
+#endif
+
+#if 1
+  printf ("\nThreads:\n");
+  iterate_threads ();
+#endif
+
+#if 0
+  std::for_each (scheduler::top_threads_list2_.begin (),
+      scheduler::top_threads_list2_.end (), [](thread &th)
+        { printf ("%s\n", th.name ());});
+#endif
+
   // ==========================================================================
 
   printf ("\n%s - Threads.\n", test_name);

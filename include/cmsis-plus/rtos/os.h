@@ -101,6 +101,24 @@
 #include <cmsis-plus/rtos/os-mqueue.h>
 #include <cmsis-plus/rtos/os-evflags.h>
 
+namespace os
+{
+  namespace rtos
+  {
+    namespace scheduler
+    {
+      /**
+       * @brief Head of the list with all top level and detached threads.
+       */
+      extern thread::threads_list top_threads_list_;
+
+      thread::threads_list&
+      children_threads (thread* th);
+
+    } /* namespace scheduler */
+  } /* namespace rtos */
+} /* namespace os */
+
 #endif /* __cplusplus */
 
 // ----------------------------------------------------------------------------

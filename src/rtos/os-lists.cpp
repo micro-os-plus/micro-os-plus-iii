@@ -61,9 +61,9 @@ namespace os
     static_double_list_links::unlink (void)
     {
       // Check if not already removed.
-      if (next == nullptr)
+      if (next_ == nullptr)
         {
-          assert(prev == nullptr);
+          assert(prev_ == nullptr);
 #if defined(OS_TRACE_RTOS_LISTS)
           trace::printf ("%s() %p nop\n", __func__, this);
 #endif
@@ -75,12 +75,12 @@ namespace os
 #endif
 
       // Make neighbours point to each other.
-      prev->next = next;
-      next->prev = prev;
+      prev_->next_ = next_;
+      next_->prev_ = prev_;
 
       // Nullify both pointers in the removed node.
-      prev = nullptr;
-      next = nullptr;
+      prev_ = nullptr;
+      next_ = nullptr;
     }
 
     // ========================================================================
@@ -108,8 +108,8 @@ namespace os
     void
     static_double_list::clear (void)
     {
-      head_.next = &head_;
-      head_.prev = &head_;
+      head_.next (const_cast<static_double_list_links*> (&head_));
+      head_.prev (const_cast<static_double_list_links*> (&head_));
     }
 
     void
@@ -120,17 +120,17 @@ namespace os
       trace::printf ("%s() n=%p after %p\n", __func__, &node, after);
 #endif
 
-      assert(node.prev == nullptr);
-      assert(node.next == nullptr);
-      assert(after->next != nullptr);
+      assert(node.prev () == nullptr);
+      assert(node.next () == nullptr);
+      assert(after->next () != nullptr);
 
       // Make the new node point to its neighbours.
-      node.prev = after;
-      node.next = after->next;
+      node.prev (after);
+      node.next (after->next ());
 
       // Make the neighbours point to the node. The order is important.
-      after->next->prev = &node;
-      after->next = &node;
+      after->next ()->prev (&node);
+      after->next (&node);
     }
 
     // ========================================================================
@@ -161,19 +161,21 @@ namespace os
 
     // ========================================================================
 
+#if 0
     void
     top_threads_list::link (thread& thread)
-    {
-      if (head_.prev == nullptr)
-        {
-          // If this is the first time, initialise the list to empty.
-          clear ();
-        }
+      {
+        if (head_.prev () == nullptr)
+          {
+            // If this is the first time, initialise the list to empty.
+            clear ();
+          }
 
-      // Add thread intrusive node at the end of the list.
-      insert_after (thread.child_links_,
-                    const_cast<static_double_list_links *> (tail ()));
-    }
+        // Add thread intrusive node at the end of the list.
+        insert_after (thread.child_links_,
+            const_cast<static_double_list_links *> (tail ()));
+      }
+#endif
 
     // ========================================================================
 
@@ -190,7 +192,7 @@ namespace os
     void
     ready_threads_list::link (waiting_thread_node& node)
     {
-      if (head_.prev == nullptr)
+      if (head_.prev () == nullptr)
         {
           // If this is the first time, initialise the list to empty.
           clear ();
@@ -222,7 +224,7 @@ namespace os
           while (prio > after->thread_.prio_)
             {
               after =
-                  static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (after->prev));
+                  static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (after->prev ()));
             }
         }
 
@@ -333,7 +335,7 @@ namespace os
           while (prio > after->thread_.sched_prio ())
             {
               after =
-                  static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (after->prev));
+                  static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (after->prev ()));
             }
         }
 
@@ -522,7 +524,7 @@ namespace os
           while (timestamp < after->timestamp)
             {
               after =
-                  static_cast<timeout_thread_node*> (const_cast<static_double_list_links *> (after->prev));
+                  static_cast<timeout_thread_node*> (const_cast<static_double_list_links *> (after->prev ()));
             }
         }
 
@@ -531,17 +533,7 @@ namespace os
                      static_cast<uint32_t> (timestamp));
 #endif
 
-#if 0
-      // Make the new node point to its neighbours.
-      node.prev = after;
-      node.next = after->next;
-
-      // Make the neighbours point to the node. The order is important.
-      after->next->prev = &node;
-      after->next = &node;
-#else
       insert_after (node, after);
-#endif
     }
 
     /**
@@ -554,7 +546,7 @@ namespace os
     void
     clock_timestamps_list::check_timestamp (clock::timestamp_t now)
     {
-      if (head_.next == nullptr)
+      if (head_.next () == nullptr)
         {
           // This happens before the constructors are executed.
           return;
@@ -591,7 +583,7 @@ namespace os
     void
     terminated_threads_list::link (waiting_thread_node& node)
     {
-      if (head_.prev == nullptr)
+      if (head_.prev () == nullptr)
         {
           // If this is the first time, initialise the list to empty.
           clear ();
