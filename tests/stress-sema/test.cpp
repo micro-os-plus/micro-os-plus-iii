@@ -30,12 +30,30 @@ using namespace os::rtos;
 static void
 sema (uint32_t divisor);
 
+void*
+sleep_stress (void* args);
+
+void*
+sleep_stress (void* args __attribute__((unused)))
+{
+  this_thread::thread().sched_prio(thread::priority::below_normal);
+
+  while (!this_thread::thread().interrupted())
+    {
+      sysclock.sleep_for (1);
+    }
+  return nullptr;
+}
+
 int
 run_tests ()
 {
 #if 0
   sema (tmr.in_clk_hz ()/20);
 #else
+
+  thread low { "low", sleep_stress, nullptr };
+
   int i = 1;
   for (;; i *= 2)
     {
