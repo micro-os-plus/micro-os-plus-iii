@@ -648,7 +648,8 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_CONDVAR)
-      trace::printf ("%s(%d) @%p %s\n", __func__, timeout, this, name ());
+      trace::printf ("%s(%u) @%p %s\n", __func__,
+                     static_cast<unsigned int> (timeout), this, name ());
 #endif
 
       thread& crt_thread = this_thread::thread ();

@@ -117,9 +117,9 @@ main (int argc, char* argv[])
   trace::printf ("System clock: %u Hz.\n", SystemCoreClock);
 #endif
 
-  trace::printf ("Scheduler frequency: %d ticks/sec.\n",
+  trace::printf ("Scheduler frequency: %u ticks/sec.\n",
                  rtos::clock_systick::frequency_hz);
-  trace::printf ("Default stack size: %d bytes.\n",
+  trace::printf ("Default stack size: %u bytes.\n",
                  thread::stack::default_size ());
 
 #if defined(__clang__)

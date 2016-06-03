@@ -404,7 +404,7 @@ namespace os
         }
 
 #if defined(OS_TRACE_RTOS_THREAD)
-      trace::printf ("%s() @%p %s p%d stack{%p,%d}\n", __func__, this, name (),
+      trace::printf ("%s() @%p %s p%u stack{%p,%u}\n", __func__, this, name (),
                      attr.th_priority, context_stack ().bottom_address_,
                      context_stack ().size_bytes_);
 #endif
@@ -510,7 +510,7 @@ namespace os
     thread::resume (void)
     {
 #if defined(OS_TRACE_RTOS_THREAD_CONTEXT)
-      trace::printf ("%s() @%p %s %d\n", __func__, this, name (), prio_);
+      trace::printf ("%s() @%p %s %u\n", __func__, this, name (), prio_);
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
@@ -584,7 +584,7 @@ namespace os
       os_assert_err(prio != priority::none, EINVAL);
 
 #if defined(OS_TRACE_RTOS_THREAD)
-      trace::printf ("%s(%d) @%p %s\n", __func__, prio, this, name ());
+      trace::printf ("%s(%u) @%p %s\n", __func__, prio, this, name ());
 #endif
 
       prio_ = prio;
@@ -871,7 +871,7 @@ namespace os
           assert(context_stack ().check_top_magic ());
 
 #if defined(OS_TRACE_RTOS_THREAD)
-          trace::printf ("%s() @%p %s %d/%d stack bytes unused\n", __func__,
+          trace::printf ("%s() @%p %s %u/%u stack bytes unused\n", __func__,
                          this, name (), context_stack ().available (),
                          context_stack ().size ());
 #endif
@@ -1147,7 +1147,7 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
-      trace::printf ("%s(0x%X, %d) @%p %s 0x%X\n", __func__, mask, mode, this,
+      trace::printf ("%s(0x%X, %u) @%p %s 0x%X\n", __func__, mask, mode, this,
                      name (), sig_mask_);
 #endif
 
@@ -1206,7 +1206,7 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
-      trace::printf ("%s(0x%X, %d, %d) @%p %s 0x%X\n", __func__, mask, mode,
+      trace::printf ("%s(0x%X, %u, %u) @%p %s 0x%X\n", __func__, mask, mode,
                      timeout, this, name (), sig_mask_);
 #endif
 
@@ -1280,8 +1280,9 @@ namespace os
       clock::duration_t slept_ticks =
           static_cast<clock::duration_t> (clock_->steady_now ()
               - begin_timestamp);
-      trace::printf ("%s(0x%X, %d, %d)=%d @%p %s 0x%X\n", __func__, mask, mode,
-                     timeout, slept_ticks, this, name (), sig_mask_);
+      trace::printf ("%s(0x%X, %u, %u)=%u @%p %s 0x%X\n", __func__, mask, mode,
+                     timeout, static_cast<unsigned int> (slept_ticks), this,
+                     name (), sig_mask_);
 #endif
 
       return res;

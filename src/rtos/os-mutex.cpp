@@ -544,7 +544,7 @@ namespace os
                 }
               ++count_;
 #if defined(OS_TRACE_RTOS_MUTEX)
-              trace::printf ("%s() @%p %s incr %d by %p %s\n", __func__, this,
+              trace::printf ("%s() @%p %s incr %u by %p %s\n", __func__, this,
                              name (), count_, crt_thread, crt_thread->name ());
 #endif
               return result::ok;
@@ -799,9 +799,9 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_MUTEX)
-      trace::printf ("%s(%d) @%p %s by %p %s\n", __func__, timeout, this,
-                     name (), &this_thread::thread (),
-                     this_thread::thread ().name ());
+      trace::printf ("%s(%u) @%p %s by %p %s\n", __func__,
+                     static_cast<unsigned int> (timeout), this, name (),
+                     &this_thread::thread (), this_thread::thread ().name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
@@ -934,7 +934,7 @@ namespace os
             {
               --count_;
 #if defined(OS_TRACE_RTOS_MUTEX)
-              trace::printf ("%s() @%p %s decr %d\n", __func__, this, name (),
+              trace::printf ("%s() @%p %s decr %u\n", __func__, this, name (),
                              count_);
 #endif
               return result::ok;

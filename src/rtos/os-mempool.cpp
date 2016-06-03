@@ -273,7 +273,7 @@ namespace os
           { name }
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
-      trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (),
+      trace::printf ("%s() @%p %s %u %u\n", __func__, this, this->name (),
                      blocks, block_size_bytes);
 #endif
       if (attr.mp_pool_address != nullptr)
@@ -354,7 +354,7 @@ namespace os
                                                    p, sz));
 
 #if defined(OS_TRACE_RTOS_MEMPOOL)
-      trace::printf ("%s() @%p %s %d %d %p %d\n", __func__, this, name (),
+      trace::printf ("%s() @%p %s %u %u %p %u\n", __func__, this, name (),
                      blocks_, block_size_bytes_, pool_addr_, pool_size_bytes_);
 #endif
 
@@ -624,7 +624,8 @@ namespace os
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_MEMPOOL)
-      trace::printf ("%s(%d) @%p %s\n", __func__, timeout, this, name ());
+      trace::printf ("%s(%u) @%p %s\n", __func__,
+                     static_cast<unsigned int> (timeout), this, name ());
 #endif
 
       void* p;

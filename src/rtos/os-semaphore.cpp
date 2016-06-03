@@ -207,7 +207,7 @@ namespace os
       count_ = attr.sm_initial_count;
 
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
-      trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (),
+      trace::printf ("%s() @%p %s %u %u\n", __func__, this, this->name (),
                      count_, max_count_);
 #endif
 
@@ -291,7 +291,7 @@ namespace os
         {
           --count_;
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
-          trace::printf ("%s() @%p %s count %d\n", __func__, this, name (),
+          trace::printf ("%s() @%p %s count %u\n", __func__, this, name (),
                          count_);
 #endif
           return true;
@@ -372,7 +372,7 @@ namespace os
 
           ++count_;
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
-          trace::printf ("%s() @%p %s count %d\n", __func__, this, name (),
+          trace::printf ("%s() @%p %s count %u\n", __func__, this, name (),
                          count_);
 #endif
         }
@@ -569,7 +569,8 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
-      trace::printf ("%s(%d) @%p %s\n", __func__, timeout, this, name ());
+      trace::printf ("%s(%u) @%p %s\n", __func__,
+                     static_cast<unsigned int> (timeout), this, name ());
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)

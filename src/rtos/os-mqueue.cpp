@@ -430,7 +430,7 @@ namespace os
           { name }
     {
 #if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (), msgs,
+      trace::printf ("%s() @%p %s %u %u\n", __func__, this, this->name (), msgs,
                      msg_size_bytes);
 #endif
 
@@ -542,7 +542,7 @@ namespace os
         }
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s() @%p %s %d %d %p %d\n", __func__, this, name (),
+      trace::printf ("%s() @%p %s %u %u %p %u\n", __func__, this, name (),
                      msgs_, msg_size_bytes_, queue_addr_, queue_size_bytes_);
 #endif
 
@@ -753,7 +753,7 @@ namespace os
 
       char* src = static_cast<char*> (queue_addr_) + head_ * msg_size_bytes_;
 #if defined(OS_TRACE_RTOS_MQUEUE_)
-      trace::printf ("%s(%p,%d) @%p %s src %p %p\n", __func__, msg, nbytes,
+      trace::printf ("%s(%p,%u) @%p %s src %p %p\n", __func__, msg, nbytes,
           this, name (), src, first_free_);
 #endif
 
@@ -957,7 +957,7 @@ namespace os
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes, mprio,
+      trace::printf ("%s(%p,%u,%u) @%p %s\n", __func__, msg, nbytes, mprio,
                      this, name ());
 #endif
 
@@ -1035,7 +1035,7 @@ namespace os
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s(%p,%d,%d,%d) @%p %s\n", __func__, msg, nbytes, mprio,
+      trace::printf ("%s(%p,%u,%u,%u) @%p %s\n", __func__, msg, nbytes, mprio,
                      timeout, this, name ());
 #endif
 
@@ -1156,7 +1156,7 @@ namespace os
       os_assert_err(nbytes <= max_size, EMSGSIZE);
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s(%p,%d) @%p %s\n", __func__, msg, nbytes, this,
+      trace::printf ("%s(%p,%u) @%p %s\n", __func__, msg, nbytes, this,
                      name ());
 #endif
 
@@ -1257,7 +1257,7 @@ namespace os
       os_assert_err(nbytes <= max_size, EMSGSIZE);
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s(%p,%d) @%p %s\n", __func__, msg, nbytes, this,
+      trace::printf ("%s(%p,%u) @%p %s\n", __func__, msg, nbytes, this,
                      name ());
 #endif
 
@@ -1350,7 +1350,7 @@ namespace os
       os_assert_err(nbytes <= max_size, EMSGSIZE);
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes, timeout,
+      trace::printf ("%s(%p,%u,%u) @%p %s\n", __func__, msg, nbytes, timeout,
                      this, name ());
 #endif
 

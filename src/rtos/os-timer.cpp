@@ -249,7 +249,8 @@ namespace os
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_TIMER)
-      trace::printf ("%s(%d) @%p %s\n", __func__, period, this, name ());
+      trace::printf ("%s(%u) @%p %s\n", __func__,
+                     static_cast<unsigned int> (period), this, name ());
 #endif
 
       if (period == 0)

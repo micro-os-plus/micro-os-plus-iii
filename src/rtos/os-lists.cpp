@@ -207,14 +207,14 @@ namespace os
         {
           // Insert at the end of the list.
 #if defined(OS_TRACE_RTOS_LISTS)
-          trace::printf ("ready %s() empty +%d\n", __func__, prio);
+          trace::printf ("ready %s() empty +%u\n", __func__, prio);
 #endif
         }
       else if (prio <= after->thread_.prio_)
         {
           // Insert at the end of the list.
 #if defined(OS_TRACE_RTOS_LISTS)
-          trace::printf ("ready %s() back %d +%d \n", __func__,
+          trace::printf ("ready %s() back %u +%u \n", __func__,
                          after->thread_.prio_, prio);
 #endif
         }
@@ -224,7 +224,7 @@ namespace os
           after =
               static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (&head_));
 #if defined(OS_TRACE_RTOS_LISTS)
-          trace::printf ("ready %s() front +%d %d \n", __func__, prio,
+          trace::printf ("ready %s() front +%u %u \n", __func__, prio,
                          head ()->thread_.prio_);
 #endif
         }
@@ -239,7 +239,7 @@ namespace os
                   static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (after->prev ()));
             }
 #if defined(OS_TRACE_RTOS_LISTS)
-          trace::printf ("ready %s() middle %d +%d \n", __func__,
+          trace::printf ("ready %s() middle %u +%u \n", __func__,
                          after->thread_.prio_, prio);
 #endif
         }
@@ -329,14 +329,14 @@ namespace os
         {
           // Insert at the end of the list.
 #if defined(OS_TRACE_RTOS_LISTS)
-          trace::printf ("wait %s() empty +%d\n", __func__, prio);
+          trace::printf ("wait %s() empty +%u\n", __func__, prio);
 #endif
         }
       else if (prio <= after->thread_.sched_prio ())
         {
           // Insert at the end of the list.
 #if defined(OS_TRACE_RTOS_LISTS)
-          trace::printf ("wait %s() back %d +%d \n", __func__,
+          trace::printf ("wait %s() back %u +%u \n", __func__,
                          after->thread_.prio_, prio);
 #endif
         }
@@ -346,7 +346,7 @@ namespace os
           after =
               static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (&head_));
 #if defined(OS_TRACE_RTOS_LISTS)
-          trace::printf ("wait %s() front +%d %d \n", __func__, prio,
+          trace::printf ("wait %s() front +%u %u \n", __func__, prio,
                          head ()->thread_.prio_);
 #endif
         }
@@ -361,7 +361,7 @@ namespace os
                   static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (after->prev ()));
             }
 #if defined(OS_TRACE_RTOS_LISTS)
-          trace::printf ("wait %s() middle %d +%d \n", __func__,
+          trace::printf ("wait %s() middle %u +%u \n", __func__,
                          after->thread_.prio_, prio);
 #endif
         }
