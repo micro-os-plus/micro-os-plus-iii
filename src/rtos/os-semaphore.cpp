@@ -348,11 +348,12 @@ namespace os
     result_t
     semaphore::post (void)
     {
+
+#if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
+
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
-
-#if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
 
       return port::semaphore::post (this);
 
@@ -363,6 +364,9 @@ namespace os
 
           if (count_ >= this->max_count_)
             {
+#if defined(OS_TRACE_RTOS_SEMAPHORE)
+              trace::printf ("%s() @%p %s EAGAIN\n", __func__, this, name ());
+#endif
               return EAGAIN;
             }
 
