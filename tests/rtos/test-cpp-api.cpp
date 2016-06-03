@@ -399,7 +399,18 @@ test_cpp_api (void)
       // Named counting semaphore.
       semaphore sp2
         { "sp2" };
+
       sp2.post ();
+      sp2.wait ();
+
+      sp2.post ();
+      sp2.try_wait ();
+
+      sp2.post ();
+      sp2.timed_wait (1);
+
+      sp2.post ();
+      sp2.timed_wait (0xFFFFFFFF);
     }
 
     {
