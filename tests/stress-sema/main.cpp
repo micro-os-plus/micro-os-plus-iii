@@ -39,7 +39,7 @@ RNG_HandleTypeDef hrng;
 int
 os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
-  printf ("Semaphore stress test.\n");
+  printf ("\nSemaphore stress test.\n");
 #if defined(__clang__)
   printf ("Built with clang " __VERSION__ ".\n");
 #else

@@ -88,7 +88,7 @@ os_main (int argc, char* argv[])
       seconds = static_cast<unsigned int> (atoi (argv[1]));
     }
 
-  printf ("Mutex stress & uniformity test.\n");
+  printf ("\nMutex stress & uniformity test.\n");
 #if defined(__clang__)
   printf ("Built with clang " __VERSION__ ".\n");
 #else
