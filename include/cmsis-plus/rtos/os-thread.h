@@ -1302,6 +1302,14 @@ namespace os
       std::size_t allocated_stack_size_elements_ = 0;
 
       std::size_t volatile acquired_mutexes_ = 0;
+
+      // The thread state is set:
+      // - running - in ready_threads_list::unlink_head()
+      // - ready - in ready_threads_list::link()
+      // - waiting - in clock::_wait_until(), scheduler::_link_node()
+      //              thread::_wait(), thread::_timed_sig_wait()
+      // - terminated - in state::_exit()
+      // - destroyed - in thread::_destroy()
       state_t volatile sched_state_ = state::undefined;
       priority_t volatile prio_ = priority::none;
 

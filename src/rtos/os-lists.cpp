@@ -268,7 +268,10 @@ namespace os
 
       assert(thread != nullptr);
 
-      // Maybe this should not be here, but for now it is safer.
+      // Unlinking is immediately followed by a context switch,
+      // so in order to guarantee that the thread is marked as
+      // running, it is saver to do it here.
+
       thread->sched_state_ = thread::state::running;
       return thread;
     }
