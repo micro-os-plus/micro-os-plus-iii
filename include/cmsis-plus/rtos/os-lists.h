@@ -90,6 +90,11 @@ namespace os
         using reference = U&;
 
         /**
+         * @brief Type of reference to the iterator internal pointer.
+         */
+        using iterator_pointer = N*;
+
+        /**
          * @brief Type of pointer difference.
          */
         using difference_type = ptrdiff_t;
@@ -155,10 +160,8 @@ namespace os
          * @}
          */
 
-      private:
-
         /**
-         * @name Private Member Functions
+         * @name Public Member Functions
          * @{
          */
 
@@ -169,9 +172,14 @@ namespace os
         pointer
         get_pointer (void) const;
 
+        iterator_pointer
+        get_iterator_pointer () const;
+
         /**
          * @}
          */
+
+      protected:
 
         /**
          * @name Private Member Variables
@@ -1481,6 +1489,13 @@ namespace os
         // intrusive node, by adjusting down the node address.
         return reinterpret_cast<pointer> (reinterpret_cast<difference_type> (node_)
             - offset);
+      }
+
+    template<typename T, typename N, N T::* MP, typename U>
+      inline typename intrusive_list_iterator<T, N, MP, U>::iterator_pointer
+      intrusive_list_iterator<T, N, MP, U>::get_iterator_pointer () const
+      {
+        return node_;
       }
 
     // ========================================================================
