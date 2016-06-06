@@ -71,11 +71,59 @@ tmfunc (void* args __attribute__((unused)))
 
 // ----------------------------------------------------------------------------
 
+void
+iterate_threads (os_thread_t* th, unsigned int depth);
+
+static const char* thread_state[] =
+  { "undf", "inac", "rdy", "run", "wait", "term", "dead" };
+
+void
+iterate_threads (os_thread_t* th, unsigned int depth)
+{
+  os_iterator_t it = os_children_threads_iter_begin (th);
+  os_iterator_t end = os_children_threads_iter_end (th);
+
+  while (it != end)
+    {
+      // Get the pointer to the thread from the iterator.
+      os_thread_t* p = os_children_threads_iter_get (it);
+
+      // Get the pointer to the stack object.
+      os_thread_stack_t* pst = os_thread_get_context_stack (p);
+
+      // Get stack size & used, in bytes.
+      unsigned int used = (unsigned int) (os_thread_stack_get_size (pst)
+          - os_thread_stack_get_available (pst));
+      unsigned int used_proc = (unsigned int) (used * 100
+          / os_thread_stack_get_size (pst));
+      unsigned int st = (unsigned int) (os_thread_get_sched_state (p));
+
+      printf ("%s, %u%% (%u/%u), %s \n", os_thread_get_name (p), used_proc,
+              used, (unsigned int) (os_thread_stack_get_size (pst)),
+              thread_state[st]);
+
+      // Go down one level.
+      iterate_threads (p, depth + 1);
+
+      // Increment the iterator to the next element in the list.
+      it = os_children_threads_iter_next (it);
+    }
+}
+
+// ----------------------------------------------------------------------------
+
 int
 test_c_api (void)
 {
   const char* name;
   bool flag;
+
+  // ==========================================================================
+
+#if 1
+  printf ("\nThreads:\n");
+  iterate_threads (NULL, 0);
+#endif
 
   // ==========================================================================
 
