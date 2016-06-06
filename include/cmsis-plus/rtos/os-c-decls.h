@@ -151,19 +151,32 @@ extern "C"
     }os_thread_user_storage_t;
 #endif
 
-  //
+  // --------------------------------------------------------------------------
 
+  // Define clock types based on port definitions.
   typedef os_port_clock_timestamp_t os_clock_timestamp_t;
   typedef os_port_clock_duration_t os_clock_duration_t;
   typedef os_port_clock_offset_t os_clock_offset_t;
 
+  // --------------------------------------------------------------------------
+
+  // Generic iterator, implemented as a pointer.
+  typedef void* os_iterator_t;
+
+  // --------------------------------------------------------------------------
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
-  typedef struct os_thread_context_s
+  typedef struct os_thread_stack_s
   {
     void* stack_addr;
     size_t stack_size_bytes;
+  } os_thread_stack_t;
+
+  typedef struct os_thread_context_s
+  {
+    os_thread_stack_t stack;
 #if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
     os_port_thread_context_t port;
 #endif
