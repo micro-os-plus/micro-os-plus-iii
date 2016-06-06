@@ -359,6 +359,8 @@ namespace os
 
 #else
 
+      assert(port::interrupts::is_priority_valid ());
+
         {
           interrupts::critical_section ics; // ----- Critical section -----
 
@@ -503,6 +505,8 @@ namespace os
     result_t
     semaphore::try_wait ()
     {
+      assert(port::interrupts::is_priority_valid ());
+
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif

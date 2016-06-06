@@ -572,6 +572,8 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      assert(port::interrupts::is_priority_valid ());
+
       interrupts::critical_section ics; // ----- Critical section -----
 
       return _try_first ();
@@ -711,6 +713,8 @@ namespace os
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
+
+      assert(port::interrupts::is_priority_valid ());
 
       // Validate pointer.
       if ((block < pool_addr_)

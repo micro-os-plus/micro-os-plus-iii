@@ -953,19 +953,21 @@ namespace os
     message_queue::try_send (const void* msg, std::size_t nbytes,
                              priority_t mprio)
     {
-      os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
-
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%u,%u) @%p %s\n", __func__, msg, nbytes, mprio,
                      this, name ());
 #endif
+
+      os_assert_err(msg != nullptr, EINVAL);
+      os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
       return port::message_queue::try_send (this, msg, nbytes, mprio);
 
 #else
+      assert(port::interrupts::is_priority_valid ());
+
       interrupts::critical_section ics; // ----- Critical section -----
 
       if (_try_send (msg, nbytes, mprio))
@@ -1252,20 +1254,22 @@ namespace os
     message_queue::try_receive (void* msg, std::size_t nbytes,
                                 priority_t* mprio)
     {
-      os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
-      os_assert_err(nbytes <= max_size, EMSGSIZE);
-
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%u) @%p %s\n", __func__, msg, nbytes, this,
                      name ());
 #endif
+
+      os_assert_err(msg != nullptr, EINVAL);
+      os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
+      os_assert_err(nbytes <= max_size, EMSGSIZE);
 
 #if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
       return port::message_queue::try_receive (this, msg, nbytes, mprio);
 
 #else
+
+      assert(port::interrupts::is_priority_valid ());
 
       interrupts::critical_section ics; // ----- Critical section -----
 

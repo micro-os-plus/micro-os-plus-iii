@@ -524,6 +524,8 @@ namespace os
 
 #else
 
+      assert(port::interrupts::is_priority_valid ());
+
         {
           interrupts::critical_section ics; // ----- Critical section -----
 
@@ -999,11 +1001,13 @@ namespace os
     result_t
     thread::sig_raise (flags::mask_t mask, flags::mask_t* oflags)
     {
-      os_assert_err(mask != 0, EINVAL);
-
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
 #endif
+
+      os_assert_err(mask != 0, EINVAL);
+
+      assert(port::interrupts::is_priority_valid ());
 
       interrupts::critical_section ics; // ----- Critical section -----
 

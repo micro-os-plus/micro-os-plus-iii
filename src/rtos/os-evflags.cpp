@@ -372,6 +372,8 @@ namespace os
 
 #else
 
+      assert(port::interrupts::is_priority_valid ());
+
       interrupts::critical_section ics; // ----- Critical section -----
 
       if (_try_wait (mask, oflags, mode))
@@ -517,17 +519,19 @@ namespace os
     result_t
     event_flags::raise (flags::mask_t mask, flags::mask_t* oflags)
     {
-      os_assert_err(mask != 0, EINVAL);
-
 #if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s() @%p %s 0x%X \n", __func__, this, name (), mask);
 #endif
+
+      os_assert_err(mask != 0, EINVAL);
 
 #if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
 
       return port::event_flags::raise (this, mask, oflags);
 
 #else
+      assert(port::interrupts::is_priority_valid ());
+
         {
           interrupts::critical_section ics; // ----- Critical section -----
 
@@ -650,6 +654,8 @@ namespace os
       return port::event_flags::waiting (this);
 
 #else
+
+      assert(port::interrupts::is_priority_valid ());
 
       return !list_.empty ();
 
