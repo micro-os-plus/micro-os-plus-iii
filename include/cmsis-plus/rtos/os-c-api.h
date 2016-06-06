@@ -366,9 +366,6 @@ extern "C"
   void
   os_thread_resume (os_thread_t* thread);
 
-  os_thread_user_storage_t*
-  os_thread_get_user_storage (os_thread_t* thread);
-
   os_result_t
   os_thread_sig_raise (os_thread_t* thread, os_flags_mask_t mask,
                        os_flags_mask_t* oflags);
@@ -380,6 +377,15 @@ extern "C"
   os_flags_mask_t
   os_thread_sig_get (os_thread_t* thread, os_flags_mask_t mask,
                      os_flags_mode_t mode);
+
+  os_thread_state_t
+  os_thread_get_sched_state (os_thread_t* thread);
+
+  os_thread_user_storage_t*
+  os_thread_get_user_storage (os_thread_t* thread);
+
+  os_thread_stack_t*
+  os_thread_get_context_stack (os_thread_t* thread);
 
   /**
    * @}
@@ -402,6 +408,34 @@ extern "C"
 
   size_t
   os_thread_stack_set_min_size (size_t size_bytes);
+
+  size_t
+  os_thread_stack_get_size (os_thread_stack_t* stack);
+
+  size_t
+  os_thread_stack_get_available (os_thread_stack_t* stack);
+
+  /**
+   * @}
+   */
+
+  // --------------------------------------------------------------------------
+  /**
+   * @name Thread children iterator functions
+   * @{
+   */
+
+  os_iterator_t
+  os_children_threads_iter_begin (os_thread_t* thread);
+
+  os_iterator_t
+  os_children_threads_iter_end (os_thread_t* thread);
+
+  os_thread_t*
+  os_children_threads_iter_get (os_iterator_t iterator);
+
+  os_iterator_t
+  os_children_threads_iter_next (os_iterator_t iterator);
 
   /**
    * @}

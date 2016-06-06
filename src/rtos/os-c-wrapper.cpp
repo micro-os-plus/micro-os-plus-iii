@@ -296,13 +296,6 @@ os_thread_resume (os_thread_t* thread)
   return (reinterpret_cast<rtos::thread&> (*thread)).resume ();
 }
 
-os_thread_user_storage_t*
-os_thread_get_user_storage (os_thread_t* thread)
-{
-  assert(thread != nullptr);
-  return (reinterpret_cast<rtos::thread&> (*thread)).user_storage ();
-}
-
 os_result_t
 os_thread_sig_raise (os_thread_t* thread, os_flags_mask_t mask,
                      os_flags_mask_t* oflags)
@@ -330,6 +323,27 @@ os_thread_sig_get (os_thread_t* thread, os_flags_mask_t mask,
       mask, mode);
 }
 
+os_thread_state_t
+os_thread_get_sched_state (os_thread_t* thread)
+{
+  assert(thread != nullptr);
+  return reinterpret_cast<os_thread_state_t> ((reinterpret_cast<rtos::thread&> (*thread)).sched_state ());
+}
+
+os_thread_user_storage_t*
+os_thread_get_user_storage (os_thread_t* thread)
+{
+  assert(thread != nullptr);
+  return (reinterpret_cast<rtos::thread&> (*thread)).user_storage ();
+}
+
+os_thread_stack_t*
+os_thread_get_context_stack (os_thread_t* thread)
+{
+  assert(thread != nullptr);
+  return reinterpret_cast<os_thread_stack_t*> (&(reinterpret_cast<rtos::thread&> (*thread)).context_stack ());
+}
+
 // ----------------------------------------------------------------------------
 
 std::size_t
@@ -354,6 +368,55 @@ std::size_t
 os_thread_stack_set_min_size (std::size_t size_bytes)
 {
   return thread::stack::min_size (size_bytes);
+}
+
+size_t
+os_thread_stack_get_size (os_thread_stack_t* stack)
+{
+  assert(stack != nullptr);
+  return (reinterpret_cast<rtos::thread::stack&> (*stack)).size ();
+}
+
+size_t
+os_thread_stack_get_available (os_thread_stack_t* stack)
+{
+  assert(stack != nullptr);
+  return (reinterpret_cast<rtos::thread::stack&> (*stack)).available ();
+}
+
+// ----------------------------------------------------------------------------
+
+os_iterator_t
+os_children_threads_iter_begin (os_thread_t* thread)
+{
+  return reinterpret_cast<os_iterator_t> (scheduler::children_threads (
+      reinterpret_cast<rtos::thread*> (thread)).begin ().get_iterator_pointer ());
+}
+
+os_iterator_t
+os_children_threads_iter_end (os_thread_t* thread)
+{
+  return reinterpret_cast<os_iterator_t> (scheduler::children_threads (
+      reinterpret_cast<rtos::thread*> (thread)).end ().get_iterator_pointer ());
+}
+
+os_thread_t*
+os_children_threads_iter_get (os_iterator_t iterator)
+{
+  // Construct a local iterator object based on the pointer.
+  thread::threads_list::iterator it
+    { reinterpret_cast<double_list_links*> (iterator) };
+  return reinterpret_cast<os_thread_t*> (&(*it));
+}
+
+os_iterator_t
+os_children_threads_iter_next (os_iterator_t iterator)
+{
+  thread::threads_list::iterator it
+    { reinterpret_cast<double_list_links*> (iterator) };
+  ++it;
+
+  return reinterpret_cast<os_iterator_t> (it.get_iterator_pointer ());
 }
 
 // ----------------------------------------------------------------------------
