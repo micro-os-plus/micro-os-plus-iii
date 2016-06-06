@@ -220,27 +220,33 @@ namespace os
 
       /**
        * @brief Type of a variable holding the thread state.
-       * @details
-       * An enumeration with the possible thread states. The enumeration
-       * is restricted to one of these values.
        */
-      using state_t = enum class state
-      : uint8_t
-        {
-          /**
-           * @brief Used to catch uninitialised threads.
-           */
-          undefined = 0, //
-          inactive = 1,//
-          ready = 2,//
-          running = 3,//
-          waiting = 4,//
+      using state_t = uint8_t;
+
+      struct state
+      {
+        /**
+         * @brief An enumeration with all possible thread states.
+         */
+        enum
+          : state_t
+            {
+              /**
+               * @brief Used to catch uninitialised threads.
+               */
+              undefined = 0, //
+          inactive = 1, //
+          ready = 2, //
+          running = 3, //
+          waiting = 4, //
           /**
            * @brief Reuse possible if terminated or higher.
            */
           terminated = 5,      // Test for here up for reuse
-          destroyed = 6
-        }; /* enum class state */
+          destroyed = 6      //!< destroyed
+        };
+        /* enum  */
+      }; /* struct state */
 
       /**
        * @brief Thread signals.
