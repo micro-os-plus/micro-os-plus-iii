@@ -172,6 +172,9 @@ namespace os
       status_t
       lock (status_t status)
       {
+#if defined(OS_TRACE_RTOS_SCHEDULER)
+        trace::printf ("%s(%d) \n", __func__, status);
+#endif
         os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
         status_t tmp;
@@ -183,7 +186,10 @@ namespace os
             is_locked_ = status;
           }
 
-        port::scheduler::lock (is_locked_);
+        if (tmp != status)
+          {
+            port::scheduler::lock (status);
+          }
 
         return tmp;
       }
@@ -200,12 +206,24 @@ namespace os
       void
       unlock (status_t status)
       {
+#if defined(OS_TRACE_RTOS_SCHEDULER)
+        trace::printf ("%s(%d) \n", __func__, status);
+#endif
         os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
-        is_locked_ = status;
+        status_t tmp;
 
-        port::scheduler::lock (is_locked_);
+          {
+            interrupts::critical_section ics;
 
+            tmp = is_locked_;
+            is_locked_ = status;
+          }
+
+        if (tmp != status)
+          {
+            port::scheduler::lock (status);
+          }
       }
 
       thread::threads_list&
