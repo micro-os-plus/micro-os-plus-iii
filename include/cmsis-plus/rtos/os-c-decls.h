@@ -201,9 +201,6 @@ extern "C"
     os_thread_func_t func;
     os_thread_func_args_t func_args;
     void* func_result_;
-#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
-    os_thread_port_data_t port;
-#endif
     void* parent;
     os_double_list_links_t child_links;
     os_thread_children_list_t children;
@@ -220,6 +217,9 @@ extern "C"
     os_flags_mask_t signals;
     os_thread_user_storage_t user_storage;
     bool interrupted;
+#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+    os_thread_port_data_t port;
+#endif
     os_thread_context_t context;
   } os_thread_t;
 

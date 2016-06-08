@@ -1067,13 +1067,6 @@ namespace os
       friend class clock;
       friend class condition_variable;
 
-#if 0
-      friend class top_threads_list;
-#else
-//      template<typename T, typename N, N T::* MP>
-//        friend class top_threads_list;
-#endif
-
       /**
        * @endcond
        */
@@ -1262,12 +1255,6 @@ namespace os
       func_args_t func_args_ = nullptr;
       void* func_result_ = nullptr;
 
-      // Implementation
-#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
-      friend class port::thread;
-      os_thread_port_data_t port_;
-#endif
-
       // Pointer to parent, or null for top/detached thread.
       thread* parent_ = nullptr;
 
@@ -1325,6 +1312,12 @@ namespace os
       os_thread_user_storage_t user_storage_;
 
       // Add other internal data
+
+      // Implementation
+#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+      friend class port::thread;
+      os_thread_port_data_t port_;
+#endif
 
       // Better be the last one!
       context context_;
@@ -1972,6 +1965,8 @@ namespace os
       return &user_storage_;
     }
 
+#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+
     inline void
     thread::_relink_running (void)
     {
@@ -1991,6 +1986,8 @@ namespace os
           assert(context_stack ().check_bottom_magic ());
         }
     }
+
+#endif
 
     inline thread::stack&
     thread::context_stack (void)
