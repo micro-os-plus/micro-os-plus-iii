@@ -96,5 +96,7 @@ os_idle (thread::func_args_t args __attribute__((unused)))
  * @endcond
  */
 
+#endif /* !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER) */
+
 // ------------------------------------------------------------------------
-#endif
+
