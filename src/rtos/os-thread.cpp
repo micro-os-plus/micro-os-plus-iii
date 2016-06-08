@@ -355,9 +355,17 @@ namespace os
                   + sizeof(stack::allocation_element_t) - 1)
                   / sizeof(stack::allocation_element_t);
             }
+
+#if defined(USE_FREERTOS)
+          // TODO: update to 9.x and use static allocated functions.
+          allocated_stack_size_elements_ = 32;
+#endif
+
           allocated_stack_address_ =
               reinterpret_cast<stack::element_t*> (const_cast<Allocator&> (allocator).allocate (
                   allocated_stack_size_elements_));
+
+          assert(allocated_stack_address_ != nullptr);
 
           _construct (
               function,
@@ -429,14 +437,14 @@ namespace os
               scheduler::top_threads_list_.link (*this);
             }
 
+          context_stack ().initialize ();
+
 #if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
           port::thread::create (this);
           sched_state_ = state::ready;
 
 #else
-
-          context_stack ().initialize ();
 
           // Create the context.
           port::context::create (&context_,

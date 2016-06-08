@@ -2131,6 +2131,8 @@ namespace os
                 reinterpret_cast<stack::element_t*> ((const_cast<Allocator&> (allocator)).allocate (
                     allocated_stack_size_elements_));
 
+            assert(allocated_stack_address_ != nullptr);
+
             _construct (
                 function,
                 args,
