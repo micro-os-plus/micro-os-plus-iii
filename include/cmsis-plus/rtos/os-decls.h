@@ -676,11 +676,14 @@ namespace os
         static void
         resume (rtos::thread* obj);
 
-        static rtos::thread::priority_t
+        // TODO: move it to port
+        using priority_t = uint8_t;
+
+        static priority_t
         sched_prio (rtos::thread* obj);
 
         static result_t
-        sched_prio (rtos::thread* obj, rtos::thread::priority_t prio);
+        sched_prio (rtos::thread* obj, priority_t prio);
 
         static result_t
         detach (rtos::thread* obj);
