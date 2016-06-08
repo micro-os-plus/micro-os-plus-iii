@@ -134,6 +134,9 @@ namespace os
       ;
     }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
     /**
      * @details
      * This constructor shall initialise a named event flags object
@@ -180,6 +183,8 @@ namespace os
 #endif
 
     }
+
+#pragma GCC diagnostic pop
 
     /**
      * @details
