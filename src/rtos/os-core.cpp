@@ -93,9 +93,16 @@ namespace os
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #endif
       ready_threads_list ready_threads_list_;
-      terminated_threads_list terminated_threads_list_;
 #pragma GCC diagnostic pop
 #endif
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#endif
+      terminated_threads_list terminated_threads_list_;
+#pragma GCC diagnostic pop
 
       /**
        * @endcond

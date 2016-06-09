@@ -194,9 +194,7 @@ extern "C"
   {
     void* vtbl;
     const char* name;
-#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
     os_waiting_thread_node_t ready_node;
-#endif
     int errno_; // Prevent the macro to expand (for example with a prefix).
     os_thread_func_t func;
     os_thread_func_args_t func_args;

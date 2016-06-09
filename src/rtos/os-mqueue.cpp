@@ -483,14 +483,12 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
-
-      port::message_queue::destroy (this);
-
-#else
+#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
 
       assert(send_list_.empty ());
       assert(receive_list_.empty ());
+
+#endif
 
       if (allocated_queue_addr_ != nullptr)
         {
@@ -500,6 +498,10 @@ namespace os
               reinterpret_cast<pointer> (allocated_queue_addr_),
               allocated_queue_size_elements_);
         }
+
+#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+
+      port::message_queue::destroy (this);
 
 #endif
     }

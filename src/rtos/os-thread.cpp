@@ -356,11 +356,6 @@ namespace os
                   / sizeof(stack::allocation_element_t);
             }
 
-#if defined(USE_FREERTOS)
-          // TODO: update to 9.x and use static allocated functions.
-          allocated_stack_size_elements_ = 32;
-#endif
-
           allocated_stack_address_ =
               reinterpret_cast<stack::element_t*> (const_cast<Allocator&> (allocator).allocate (
                   allocated_stack_size_elements_));
@@ -824,9 +819,7 @@ namespace os
             {
               interrupts::critical_section ics; // ----- Critical section -----
 
-#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
               ready_node_.unlink ();
-#endif
 
               child_links_.unlink ();
             }
@@ -840,17 +833,16 @@ namespace os
 
           func_result_ = exit_ptr;
 
-#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
-          sched_state_ = state::destroyed;
-
-          if (joiner_ != nullptr)
-            {
-              joiner_->resume ();
-            }
-#endif
         }
 
 #if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+
+        {
+          interrupts::critical_section ics; // ----- Critical section -----
+
+          // Add to a list of threads to be destroyed by the idle thread.
+          scheduler::terminated_threads_list_.link (ready_node_);
+        }
 
       port::thread::destroy_this (this);
       // Does not return if the current thread.
@@ -957,10 +949,8 @@ namespace os
             {
               interrupts::critical_section ics; // ----- Critical section -----
 
-#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
               // Remove thread from the funeral list and kill it here.
               ready_node_.unlink ();
-#endif
 
               // If the thread is waiting on an event, remove it from the list.
               if (waiting_node_ != nullptr)

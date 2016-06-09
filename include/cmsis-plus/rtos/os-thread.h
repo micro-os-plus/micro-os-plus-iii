@@ -1243,11 +1243,9 @@ namespace os
        * @cond ignore
        */
 
-#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
       // TODO: make it fully intrusive with computed offset.
       waiting_thread_node ready_node_
         { *this };
-#endif
 
       int errno_ = 0;
 

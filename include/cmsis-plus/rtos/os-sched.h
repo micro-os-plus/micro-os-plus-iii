@@ -64,8 +64,8 @@ namespace os
 #if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
       extern thread* volatile current_thread_;
       extern ready_threads_list ready_threads_list_;
-      extern terminated_threads_list terminated_threads_list_;
 #endif
+      extern terminated_threads_list terminated_threads_list_;
 
       /**
        * @endcond
