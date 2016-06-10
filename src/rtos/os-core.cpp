@@ -390,7 +390,24 @@ namespace os
         // so in case the handler is re-entered immediately,
         // the relink_running() will simply reschedule it,
         // otherwise the thread will be lost.
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES)
+
+        // Increment context switches, global and per-thread.
+        scheduler::statistics::context_switches_++;
+        scheduler::current_thread_->statistics_.context_switches_++;
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES) */
       }
+
+      namespace statistics
+      {
+#if defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES)
+
+        rtos::statistics::counter_t context_switches_;
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES) */
+      } /* namespace statistics */
 
     /**
      * @endcond

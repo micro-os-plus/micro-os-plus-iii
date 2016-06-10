@@ -393,6 +393,21 @@ namespace os
          */
       };
 
+      // ----------------------------------------------------------------------
+
+      namespace statistics
+      {
+#if defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES)
+
+        rtos::statistics::counter_t
+        context_switches (void);
+
+        extern rtos::statistics::counter_t context_switches_;
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES) */
+
+      } /* namespace statistics */
+
     } /* namespace scheduler */
 
     namespace interrupts
@@ -825,6 +840,19 @@ namespace os
       {
         scheduler::unlock (status_);
       }
+
+      namespace statistics
+      {
+#if defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES)
+
+        inline rtos::statistics::counter_t
+        context_switches (void)
+        {
+          return context_switches_;
+        }
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES) */
+      } /* namespace statistics */
 
     } /* namespace scheduler */
 

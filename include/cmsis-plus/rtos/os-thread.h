@@ -719,6 +719,81 @@ namespace os
 
       }; /* class attributes */
 
+#if defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES)
+
+      class statistics
+      {
+      public:
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
+
+        /**
+         * @brief Create a thread attributes object.
+         * @par Parameters
+         *  None
+         */
+
+        statistics () = default;
+
+        /**
+         * @cond ignore
+         */
+
+        statistics (const statistics&) = delete;
+        statistics (statistics&&) = delete;
+        statistics&
+        operator= (const statistics&) = delete;
+        statistics&
+        operator= (statistics&&) = delete;
+
+        /**
+         * @endcond
+         */
+
+        /**
+         * @brief Destroy the thread attributes object.
+         */
+        ~statistics () = default;
+
+        /**
+         * @}
+         */
+
+      public:
+
+        /**
+         * @name Public Member Functions
+         * @{
+         */
+
+        rtos::statistics::counter_t
+        context_switches (void);
+
+        /**
+         * @}
+         */
+
+      protected:
+
+        /**
+         * @cond ignore
+         */
+
+        friend void
+        rtos::scheduler::_switch_threads (void);
+
+        rtos::statistics::counter_t context_switches_ = 0;
+
+        /**
+         * @}
+         */
+
+      };
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES) */
+
 #pragma GCC diagnostic pop
 
       /**
@@ -993,6 +1068,13 @@ namespace os
       thread::stack&
       context_stack (void);
 
+#if defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES)
+
+      class thread::statistics&
+      statistics (void);
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES) */
+
       /**
        * @}
        */
@@ -1046,6 +1128,9 @@ namespace os
       friend void
       scheduler::_unlink_node (waiting_thread_node& node,
                                timeout_thread_node& timeout_node);
+
+      friend void
+      scheduler::_switch_threads (void);
 
       friend void
       port::scheduler::reschedule (void);
@@ -1308,6 +1393,12 @@ namespace os
       bool volatile interrupted_ = false;
 
       os_thread_user_storage_t user_storage_;
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES)
+
+      class statistics statistics_;
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES) */
 
       // Add other internal data
 
@@ -1916,6 +2007,18 @@ namespace os
 
     // ========================================================================
 
+#if defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES)
+
+    inline statistics::counter_t
+    thread::statistics::context_switches (void)
+    {
+      return context_switches_;
+    }
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES) */
+
+    // ========================================================================
+
     /**
      * @details
      * Identical threads should have the same memory address.
@@ -1992,6 +2095,16 @@ namespace os
     {
       return context_.stack_;
     }
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES)
+
+    inline class thread::statistics&
+    thread::statistics (void)
+    {
+      return statistics_;
+    }
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES) */
 
     // ========================================================================
 

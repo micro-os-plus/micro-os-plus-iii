@@ -229,6 +229,18 @@ namespace os
     } /* namespace scheduler */
 
     /**
+     * @brief Statistics namespace.
+     */
+    namespace statistics
+    {
+      /**
+       * @brief Type of counter for context switches.
+       */
+      using counter_t = uint64_t;
+
+    } /* namespace statistics */
+
+    /**
      * @brief Interrupts namespace.
      */
     namespace interrupts
