@@ -137,6 +137,11 @@ namespace os
       bool
       in_handler_mode (void);
 
+      // ----------------------------------------------------------------------
+
+      void
+      _switch_threads (void);
+
       // ======================================================================
       /**
        * @brief Scheduler critical section [RAII](https://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization) helper.
@@ -388,7 +393,6 @@ namespace os
          */
       };
 
-    // ------------------------------------------------------------------------
     } /* namespace scheduler */
 
     namespace interrupts
@@ -708,7 +712,6 @@ namespace os
       };
 
     } /* namespace interrupts */
-
   } /* namespace rtos */
 } /* namespace os */
 

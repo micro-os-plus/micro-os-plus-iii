@@ -374,11 +374,29 @@ namespace os
         node.unlink ();
       }
 
+      // ----------------------------------------------------------------------
+
+      void
+      _switch_threads (void)
+      {
+        // Normally the old running thread must be re-linked to ready.
+        scheduler::current_thread_->_relink_running ();
+
+        // The top of the ready list gives the next thread to run.
+        scheduler::current_thread_ =
+            scheduler::ready_threads_list_.unlink_head ();
+
+        // The new thread was marked as running in unlink_head(),
+        // so in case the handler is re-entered immediately,
+        // the relink_running() will simply reschedule it,
+        // otherwise the thread will be lost.
+      }
+
     /**
      * @endcond
      */
 
-    } /* namespace this_thread */
+    } /* namespace scheduler */
 
     /**
      * @details
