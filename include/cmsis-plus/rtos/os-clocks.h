@@ -152,7 +152,7 @@ namespace os
        * @par Returns
        *  Nothing
        */
-      void
+      virtual void
       start (void);
 
       /**
@@ -162,7 +162,7 @@ namespace os
        * @return The clock current timestamp (time units from startup
        * plus the epoch offset).
        */
-      timestamp_t
+      virtual timestamp_t
       now (void);
 
       /**
@@ -192,7 +192,7 @@ namespace os
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINTR The sleep was interrupted.
        */
-      result_t
+      virtual result_t
       sleep_until (timestamp_t timestamp);
 
       /**
@@ -206,10 +206,10 @@ namespace os
       result_t
       wait_for (duration_t timeout);
 
-      offset_t
+      virtual offset_t
       offset (void);
 
-      offset_t
+      virtual offset_t
       offset (offset_t);
 
       /**
@@ -220,7 +220,10 @@ namespace os
       steady_list (void);
 
       void
-      _interrupt_service_routine (void);
+      _increment_count (void);
+
+      void
+      _check_timestamps (void);
 
       /**
        * @endcond
@@ -261,18 +264,12 @@ namespace os
        */
 
       clock_timestamps_list steady_list_;
-      duration_t volatile sleep_count_;
-      clock_timestamps_list adjusted_list_;
+      duration_t volatile sleep_count_ = 0;
 
       /**
        * @brief Monotone ascending count.
        */
-      timestamp_t volatile steady_count_;
-
-      /**
-       * @brief Adjustable offset to epoch.
-       */
-      offset_t volatile offset_;
+      timestamp_t volatile steady_count_ = 0;
 
       /**
        * @endcond
@@ -284,6 +281,109 @@ namespace os
     };
 
 #pragma GCC diagnostic pop
+
+    // ========================================================================
+
+    class adjustable_clock : public clock
+    {
+      // ----------------------------------------------------------------------
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+    protected:
+
+      /**
+       * @cond ignore
+       */
+
+      /**
+       * @brief Create a clock object (protected, used in derived classes)
+       * @param [in] name Pointer to clock name.
+       */
+      adjustable_clock (const char* name);
+
+    public:
+
+      adjustable_clock (const adjustable_clock&) = delete;
+      adjustable_clock (adjustable_clock&&) = delete;
+      adjustable_clock&
+      operator= (const adjustable_clock&) = delete;
+      adjustable_clock&
+      operator= (adjustable_clock&&) = delete;
+
+      /**
+       * @endcond
+       */
+
+      /**
+       * @brief Destroy the clock object.
+       */
+      virtual
+      ~adjustable_clock ();
+
+      /**
+       * @}
+       */
+
+    public:
+
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+      /**
+       * @brief Tell the current time adjusted for epoch.
+       * @par Parameters
+       *  None
+       * @return The clock current timestamp (time units from startup
+       * plus the epoch offset).
+       */
+      virtual timestamp_t
+      now (void) override;
+
+      /**
+       * @brief Sleep until an absolute timestamp.
+       * @param [in] timestamp The absolute moment in time, in clock units.
+       * @retval ETIMEDOUT The sleep lasted the entire duration.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @retval EINTR The sleep was interrupted.
+       */
+      virtual result_t
+      sleep_until (timestamp_t timestamp) override;
+
+      virtual offset_t
+      offset (void) override;
+
+      virtual offset_t
+      offset (offset_t) override;
+
+      void
+      _check_timestamps (void);
+
+      /**
+       * @}
+       */
+
+    protected:
+
+      /**
+       * @cond ignore
+       */
+
+      /**
+       * @brief Adjustable offset, usually to epoch.
+       */
+      offset_t volatile offset_ = 0;
+
+      clock_timestamps_list adjusted_list_;
+
+      /**
+       * @}
+       */
+    };
 
     // ========================================================================
 
@@ -305,45 +405,6 @@ namespace os
        * @brief SysTick frequency in Hz.
        */
       static constexpr uint32_t frequency_hz = OS_INTEGER_SYSTICK_FREQUENCY_HZ;
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
-
-      /**
-       * @brief SysTick detailed timestamp.
-       *
-       * @details
-       * When an accurate timestamp is needed, the current SysTick
-       * counter can be sampled to get the count of CPU cycles inside
-       * the tick. For a 100 MHz clock, this gives a 10 ns resolution.
-       *
-       * To simplify further processing of this timestamp, the
-       * structure also includes the CPU clock and the SysTick divider.
-       */
-      using current_t = struct
-        {
-          /**
-           * @brief Count of SysTick ticks since core reset.
-           */
-          timestamp_t ticks;
-
-          /**
-           * @brief Count of SysTick cycles since timer reload (24 bits).
-           */
-          uint32_t cycles;
-
-          /**
-           * @brief SysTick reload value (24 bits).
-           */
-          uint32_t divisor;
-
-          /**
-           * @brief CPU clock frequency Hz.
-           */
-          uint32_t core_frequency_hz;
-        };
-
-#pragma GCC diagnostic pop
 
       /**
        * @}
@@ -389,19 +450,6 @@ namespace os
        * @{
        */
 
-      // Enable name lookup in base class (tricky!).
-      // Without it, the parent new() is not available in
-      // this derived class.
-      using clock::now;
-
-      /**
-       * @brief Tell the detailed current time.
-       * @param [out] details Pointer to structure to store the clock details.
-       * @return The number of SysTick ticks since startup.
-       */
-      timestamp_t
-      now (current_t* details);
-
       /**
        * @brief Convert microseconds to ticks.
        * @tparam Rep_T Type of input, auto deduced (usually uint32_t or uin64_t)
@@ -411,17 +459,6 @@ namespace os
       template<typename Rep_T>
         static constexpr uint32_t
         ticks_cast (Rep_T microsec);
-
-      /**
-       * @cond ignore
-       */
-
-      void
-      _interrupt_service_routine (void);
-
-      /**
-       * @endcond
-       */
 
       /**
        * @}
@@ -479,7 +516,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos
      */
-    class clock_rtc : public clock
+    class clock_rtc : public adjustable_clock
     {
     public:
 
@@ -537,9 +574,6 @@ namespace os
        * @{
        */
 
-      // Enable name lookup in base class (tricky!).
-      using clock::now;
-
       /**
        * @brief Initialise and make the RTC tick.
        * @par Parameters
@@ -547,8 +581,8 @@ namespace os
        * @retval result::ok   The real time clock was started.
        * @retval ENOTRECOVERABLE Could not start real time clock.
        */
-      result_t
-      start (void);
+      virtual void
+      start (void) override;
 
       /**
        * @}
@@ -587,6 +621,96 @@ namespace os
      */
     extern clock_rtc rtclock;
 
+    // ========================================================================
+
+    /**
+     * @brief High Resolution derived clock.
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
+     */
+    class clock_highres : public clock
+    {
+    public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+      /**
+       * @brief Create a SysTick clock object.
+       */
+      clock_highres ();
+
+      /**
+       * @cond ignore
+       */
+      clock_highres (const clock_highres&) = delete;
+      clock_highres (clock_highres&&) = delete;
+      clock_highres&
+      operator= (const clock_highres&) = delete;
+      clock_highres&
+      operator= (clock_highres&&) = delete;
+      /**
+       * @endcond
+       */
+
+      /**
+       * @brief Destroy the SysTick clock object.
+       */
+      virtual
+      ~clock_highres ();
+
+      /**
+       * @}
+       */
+
+      // ----------------------------------------------------------------------
+      /*
+       * @name Public Member Functions
+       * @{
+       */
+
+      /**
+       * @brief Tell the current time.
+       * @par Parameters
+       *  None
+       * @return The number of SysTick input clocks since startup.
+       */
+      virtual timestamp_t
+      now (void) override;
+
+      uint32_t
+      input_clock_frequency_hz (void);
+
+      void
+      _increment_count (void);
+
+      /**
+       * @}
+       */
+
+      // ----------------------------------------------------------------------
+    protected:
+
+      /**
+       * @name Private Member Functions
+       * @{
+       */
+
+      /**
+       * @}
+       */
+
+    };
+
+    /**
+     * @brief The high resolution clock instance.
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
+     */
+    extern clock_highres hrclock;
+
   } /* namespace rtos */
 } /* namespace os */
 
@@ -599,37 +723,63 @@ namespace os
 
     // ========================================================================
 
-    inline clock::offset_t
-    clock::offset (void)
-    {
-      return offset_;
-    }
-
-    inline clock::offset_t
-    clock::offset (offset_t offset)
-    {
-      interrupts::critical_section ics;
-
-      offset_t tmp;
-      tmp = offset_;
-      offset_ = offset;
-
-      return tmp;
-    }
-
     /**
      * @cond ignore
      */
 
+    inline
+    clock::clock (const char* name) :
+        named_object
+          { name }
+    {
+      ;
+    }
+
     inline clock_timestamps_list&
+    __attribute__((always_inline))
     clock::steady_list (void)
     {
       return steady_list_;
     }
 
+    inline void
+    __attribute__((always_inline))
+    clock::_increment_count (void)
+    {
+      // Increment the systick count by 1.
+      ++steady_count_;
+    }
+
+    inline void
+    __attribute__((always_inline))
+    clock::_check_timestamps (void)
+    {
+      steady_list_.check_timestamp (steady_count_);
+    }
+
     /**
      * @endcond
      */
+    // ========================================================================
+    inline
+    adjustable_clock::adjustable_clock (const char* name) :
+        clock
+          { name }
+    {
+      ;
+    }
+
+    inline void
+    __attribute__((always_inline))
+    adjustable_clock::_check_timestamps (void)
+    {
+      clock::_check_timestamps ();
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+      adjusted_list_.check_timestamp (steady_count_ + offset_);
+#pragma GCC diagnostic pop
+    }
 
     // ========================================================================
     /**
@@ -652,9 +802,26 @@ namespace os
             / static_cast<Rep_T> (1000000ul));
       }
 
-  /**
-   * @endcond
-   */
+    /**
+     * @endcond
+     */
+    // ========================================================================
+    inline void
+    __attribute__((always_inline))
+    clock_highres::_increment_count (void)
+    {
+      // Increment the highres count by SysTick divisor.
+      steady_count_ += port::clock_highres::cycles_per_tick ();
+    }
+
+    inline uint32_t
+    __attribute__((always_inline))
+    clock_highres::input_clock_frequency_hz (void)
+    {
+      return port::clock_highres::input_clock_frequency_hz ();
+    }
+
+  // ========================================================================
 
   } /* namespace rtos */
 } /* namespace os */

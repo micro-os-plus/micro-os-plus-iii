@@ -57,7 +57,30 @@ os_systick_handler (void)
 #if defined(OS_TRACE_RTOS_SYSTICK_TICK)
   trace::putchar ('.');
 #endif
-  sysclock._interrupt_service_routine ();
+
+    {
+      interrupts::critical_section ics; // ----- Critical section -----
+
+      sysclock._increment_count ();
+      hrclock._increment_count ();
+    }
+  sysclock._check_timestamps ();
+  hrclock._check_timestamps ();
+
+#if !defined(OS_INCLUDE_RTOS_REALTIME_CLOCK_DRIVER)
+
+  // Simulate an RTC driver.
+  static uint32_t ticks = clock_systick::frequency_hz;
+
+  if (--ticks == 0)
+    {
+      ticks = clock_systick::frequency_hz;
+
+      os_rtc_handler ();
+    }
+
+#endif
+
 #if defined(OS_TRACE_RTOS_SYSTICK_TICK)
   trace::putchar (',');
 #endif
@@ -82,7 +105,14 @@ os_rtc_handler (void)
 #if defined(OS_TRACE_RTOS_RTC_TICK)
   trace_putchar ('!');
 #endif
-  rtclock._interrupt_service_routine ();
+
+    {
+      interrupts::critical_section ics; // ----- Critical section -----
+
+      rtclock._increment_count ();
+    }
+
+  rtclock._check_timestamps ();
 }
 
 // ----------------------------------------------------------------------------
@@ -103,14 +133,6 @@ namespace os
     /**
      * @cond ignore
      */
-
-    clock::clock (const char* name) :
-        named_object
-          { name }
-    {
-      steady_count_ = 0;
-      offset_ = 0;
-    }
 
     /**
      * @endcond
@@ -142,10 +164,7 @@ namespace os
       // Prevent inconsistent values.
       interrupts::critical_section ics; // ----- Critical section -----
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wsign-conversion"
-      return steady_count_ + offset_;
-#pragma GCC diagnostic pop
+      return steady_count_;
     }
 
     clock::timestamp_t
@@ -204,7 +223,7 @@ namespace os
       for (;;)
         {
           result_t res;
-          res = _wait_until (timestamp, adjusted_list_);
+          res = _wait_until (timestamp, steady_list_);
 
           timestamp_t nw = now ();
           if (nw >= timestamp)
@@ -253,29 +272,21 @@ namespace os
       return res;
     }
 
+    clock::offset_t
+    clock::offset (void)
+    {
+      return 0;
+    }
+
+    clock::offset_t
+    clock::offset (offset_t offset __attribute__((unused)))
+    {
+      return 0;
+    }
+
     /**
      * @cond ignore
      */
-
-    void
-    clock::_interrupt_service_routine (void)
-    {
-#if defined(OS_TRACE_RTOS_CLOCKS)
-      // trace::putchar ('.');
-#endif
-
-        {
-          interrupts::critical_section ics; // ----- Critical section -----
-          ++steady_count_;
-        }
-
-      steady_list_.check_timestamp (steady_count_);
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wsign-conversion"
-      adjusted_list_.check_timestamp (steady_count_ + offset_);
-#pragma GCC diagnostic pop
-    }
 
     result_t
     clock::_wait_until (timestamp_t timestamp, clock_timestamps_list& list)
@@ -319,6 +330,81 @@ namespace os
      */
 
     // ========================================================================
+    adjustable_clock::~adjustable_clock ()
+    {
+      ;
+    }
+
+    /**
+     * @details
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
+    clock::timestamp_t
+    adjustable_clock::now (void)
+    {
+      // Prevent inconsistent values.
+      interrupts::critical_section ics; // ----- Critical section -----
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+      return steady_count_ + offset_;
+#pragma GCC diagnostic pop
+    }
+
+    result_t
+    adjustable_clock::sleep_until (timestamp_t timestamp)
+    {
+      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+
+#if defined(OS_TRACE_RTOS_CLOCKS)
+      trace::printf ("%s()\n", __func__);
+#endif
+
+      for (;;)
+        {
+          result_t res;
+          res = _wait_until (timestamp, adjusted_list_);
+
+          timestamp_t nw = now ();
+          if (nw >= timestamp)
+            {
+              return ETIMEDOUT;
+            }
+
+          if (this_thread::thread ().interrupted ())
+            {
+              return EINTR;
+            }
+
+          if (res != result::ok)
+            {
+              return res;
+            }
+        }
+      return ENOTRECOVERABLE;
+    }
+
+    clock::offset_t
+    adjustable_clock::offset (void)
+    {
+      return offset_;
+    }
+
+    clock::offset_t
+    adjustable_clock::offset (offset_t offset)
+    {
+      interrupts::critical_section ics;
+
+      offset_t tmp;
+      tmp = offset_;
+      offset_ = offset;
+
+      return tmp;
+    }
+
+    // ========================================================================
+
     /**
      * @class clock_systick
      * @details
@@ -384,80 +470,6 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    /**
-     * @details
-     * Return the very accurate current time, using the internal
-     * SysTick cycle counter, which, at 100 MHz and 1000 ticks/sec
-     * allows a 10 ns resolution.
-     *
-     * The function adjust for border conditions, when the SysTick
-     * counter is reloaded during the call.
-     *
-     * @note Can be invoked from Interrupt Service Routines.
-     */
-    clock::timestamp_t
-    clock_systick::now (current_t* details)
-    {
-      assert(details != nullptr);
-
-#if defined(__ARM_EABI__)
-      // The core frequency can be returned right away, since
-      // is not expected to change during this call.
-      details->core_frequency_hz = SystemCoreClock;
-
-      // The timer reload value, it is the divisor - 1.
-      uint32_t load = SysTick->LOAD;
-      // Can also be returned right away.
-      details->divisor = load + 1;
-
-      // The ticks and cycles must be read atomically, use a critical
-      // section and adjust for border condition, when the event
-      // came exactly after entering the critical section.
-      uint64_t ticks;
-      uint32_t val;
-        {
-          interrupts::critical_section ics; // ----- Critical section -----
-
-          // Sample ticks counter inside critical section.
-          ticks = steady_count_;
-
-          // Initial sample of the decrementing counter.
-          // Might happen before the event, will be used as such.
-          val = SysTick->VAL;
-
-          // Check overflow. If the exception is pending, it means the
-          // ticks counter was not yet updated, but the counter was reloaded.
-          if (SysTick->CTRL & SCB_ICSR_PENDSTSET_Msk)
-            {
-              // Sample the decrementing counter again to validate the
-              // initial sample.
-              uint32_t val_update = SysTick->VAL;
-              if (val_update > val)
-                {
-                  // The second sample is more accurate.
-                  val = val_update;
-                }
-              ticks++; // Adjust to next tick.
-            }
-        }
-      details->cycles = load - val;
-      details->ticks = ticks;
-
-      return ticks;
-#elif defined(__APPLE__) || defined(__linux__)
-
-      details->core_frequency_hz = 1000000000; // Very fast!
-      details->divisor = 1;
-      details->cycles = 0;
-      details->ticks = steady_count_;
-
-      return steady_count_;
-
-#else
-#error
-#endif
-    }
-
 #if defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
 
     result_t
@@ -477,27 +489,6 @@ namespace os
       }
 
 #endif
-
-    void
-    clock_systick::_interrupt_service_routine (void)
-    {
-      clock::_interrupt_service_routine ();
-
-#if !defined(OS_INCLUDE_RTOS_REALTIME_CLOCK_DRIVER)
-
-      // Simulate an RTC driver.
-      static uint32_t ticks = clock_systick::frequency_hz;
-
-      if (--ticks == 0)
-        {
-          ticks = clock_systick::frequency_hz;
-
-          os_rtc_handler ();
-        }
-
-#endif
-
-    }
 
     // ========================================================================
 
@@ -551,7 +542,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     clock_rtc::clock_rtc () :
-        clock
+        adjustable_clock
           { "rtclock" }
     {
       ;
@@ -570,14 +561,48 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    result_t
+    void
     clock_rtc::start (void)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      assert(!scheduler::in_handler_mode ());
 
       // TODO: Use the RTC driver to initialise the seconds to epoch.
+    }
 
-      return result::ok;
+    // ========================================================================
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#endif
+    /**
+     * @brief Kind of singleton instance of the clock_highres class.
+     */
+    clock_highres hrclock;
+#pragma GCC diagnostic pop
+
+    // ------------------------------------------------------------------------
+
+    clock_highres::clock_highres () :
+        clock
+          { "hrclock" }
+    {
+      ;
+    }
+
+    clock_highres::~clock_highres ()
+    {
+      ;
+    }
+
+    clock::timestamp_t
+    clock_highres::now (void)
+    {
+      // Prevent inconsistent values.
+      interrupts::critical_section ics; // ----- Critical section -----
+
+      return steady_count_ + port::clock_highres::cycles_since_tick ();
     }
 
   // --------------------------------------------------------------------------

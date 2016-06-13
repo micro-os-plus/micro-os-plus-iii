@@ -26,6 +26,7 @@
  */
 
 #include <cmsis-plus/iso/chrono>
+#include <cmsis-plus/rtos/port/os-inlines.h>
 
 // ----------------------------------------------------------------------------
 
@@ -105,19 +106,18 @@ namespace os
       high_resolution_clock::time_point
       high_resolution_clock::now () noexcept
       {
-        rtos::clock_systick::current_t systick;
-        rtos::sysclock.now (&systick);
+        auto cycles = rtos::hrclock.now ();
 
-        // The duration is the sum of SysTick ticks plus the current
+        // The duration is the number of sum of SysTick ticks plus the current
         // count of CPU cycles (computed from the SysTick counter).
         // Notice: a more exact solution would be to compute
         // ticks * divisor + cycles, but this severely reduces the
         // range of ticks.
         return time_point
           { duration
-            { systicks
-              { systick.ticks } + std::chrono::nanoseconds
-              { systick.cycles * 1000000000ULL / systick.core_frequency_hz }
+            { duration
+              { cycles * 1000000000ULL
+                  / rtos::hrclock.input_clock_frequency_hz () }
                 + realtime_clock::startup_time_point.time_since_epoch () } //
           };
       }

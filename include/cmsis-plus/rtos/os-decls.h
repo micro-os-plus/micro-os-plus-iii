@@ -746,6 +746,22 @@ namespace os
 
       };
 
+      class clock_highres
+      {
+      public:
+
+        clock_highres () = delete;
+
+        static uint32_t
+        cycles_per_tick (void);
+
+        static uint32_t
+        cycles_since_tick (void);
+
+        static uint32_t
+        input_clock_frequency_hz (void);
+      };
+
     } /* namespace port */
   } /* namespace rtos */
 } /* namespace os */

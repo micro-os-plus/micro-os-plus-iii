@@ -528,14 +528,6 @@ os_sysclock_wait_for (os_clock_duration_t duration)
   return (os_result_t) sysclock.wait_for (duration);
 }
 
-// SysTick specific now() with details.
-os_clock_timestamp_t
-os_sysclock_now_details (os_sysclock_current_t* details)
-{
-  return (os_clock_timestamp_t) sysclock.now (
-      (clock_systick::current_t*) details);
-}
-
 // ----------------------------------------------------------------------------
 
 void
@@ -1320,14 +1312,8 @@ osKernelRunning (void)
 uint32_t
 osKernelSysTick (void)
 {
-  clock_systick::current_t crt;
-
-  // Get the current SysTick timestamp, with full details, down to
-  // cpu cycles.
-  sysclock.now (&crt);
-
-  // Convert ticks to cycles.
-  return static_cast<uint32_t> (crt.ticks) * crt.divisor + crt.cycles;
+  // Get the current SysTick timestamp down to cpu cycles.
+  return static_cast<uint32_t> (hrclock.now ());
 }
 
 #endif    // System Timer available

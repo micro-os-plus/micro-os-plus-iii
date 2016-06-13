@@ -222,7 +222,7 @@ extern "C"
     os_thread_state_t state;
     os_thread_prio_t prio;
     os_flags_mask_t signals;
-    os_thread_user_storage_t user_storage;
+    os_thread_user_storage_t user_storage; //
     bool interrupted;
 #if defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES)
     os_thread_statistics_t statistics;
@@ -247,9 +247,7 @@ extern "C"
     const char* name;
     os_clock_timestamps_list_t steady_list;
     os_clock_duration_t sleep_count;
-    os_clock_timestamps_list_t adjusted_list;
     os_clock_timestamp_t steady_count;
-    os_clock_offset_t offset;
 
   } os_clock_t;
 
