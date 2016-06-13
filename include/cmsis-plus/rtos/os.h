@@ -101,6 +101,8 @@
 #include <cmsis-plus/rtos/os-mqueue.h>
 #include <cmsis-plus/rtos/os-evflags.h>
 
+#include <cmsis-plus/rtos/port/os-inlines.h>
+
 namespace os
 {
   namespace rtos
