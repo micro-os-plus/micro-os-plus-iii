@@ -757,6 +757,9 @@ namespace os
 
         clock_highres () = delete;
 
+        static void
+        start (void);
+
         static uint32_t
         cycles_per_tick (void);
 

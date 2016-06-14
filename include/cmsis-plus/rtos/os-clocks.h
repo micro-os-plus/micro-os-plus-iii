@@ -153,7 +153,7 @@ namespace os
        *  Nothing
        */
       virtual void
-      start (void);
+      start (void) = 0;
 
       /**
        * @brief Tell the current time, possibly adjusted for epoch.
@@ -450,6 +450,9 @@ namespace os
        * @{
        */
 
+      virtual void
+      start (void) override;
+
       /**
        * @brief Convert microseconds to ticks.
        * @tparam Rep_T Type of input, auto deduced (usually uint32_t or uin64_t)
@@ -670,6 +673,9 @@ namespace os
        * @name Public Member Functions
        * @{
        */
+
+      virtual void
+      start (void) override;
 
       /**
        * @brief Tell the current time.

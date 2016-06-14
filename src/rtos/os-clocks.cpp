@@ -468,6 +468,15 @@ namespace os
       ;
     }
 
+    void
+    clock_systick::start (void)
+    {
+#if defined(OS_TRACE_RTOS_CLOCKS)
+      trace::printf ("clock_systick::%s()\n", __func__);
+#endif
+      port::clock_systick::start ();
+    }
+
     // ------------------------------------------------------------------------
 
 #if defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
@@ -564,6 +573,9 @@ namespace os
     void
     clock_rtc::start (void)
     {
+#if defined(OS_TRACE_RTOS_CLOCKS)
+      trace::printf ("clock_rtc::%s()\n", __func__);
+#endif
       assert(!scheduler::in_handler_mode ());
 
       // TODO: Use the RTC driver to initialise the seconds to epoch.
@@ -594,6 +606,16 @@ namespace os
     clock_highres::~clock_highres ()
     {
       ;
+    }
+
+    void
+    clock_highres::start (void)
+    {
+#if defined(OS_TRACE_RTOS_CLOCKS)
+      trace::printf ("clock_highres::%s()\n", __func__);
+#endif
+
+      port::clock_highres::start ();
     }
 
     clock::timestamp_t

@@ -120,7 +120,7 @@ namespace os
         os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_SCHEDULER)
-        trace::printf ("%s() \n", __func__);
+        trace::printf ("scheduler::%s() \n", __func__);
 #endif
 
 #if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
@@ -158,7 +158,7 @@ namespace os
         os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_SCHEDULER)
-        trace::printf ("%s() \n", __func__);
+        trace::printf ("scheduler::%s() \n", __func__);
 #endif
 
         is_started_ = true;
@@ -177,7 +177,10 @@ namespace os
 
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
 
-        port::clock_systick::start ();
+        sysclock.start ();
+        hrclock.start ();
+
+        rtclock.start ();
 
         port::scheduler::start ();
       }
@@ -193,7 +196,7 @@ namespace os
       lock (status_t status)
       {
 #if defined(OS_TRACE_RTOS_SCHEDULER)
-        trace::printf ("%s(%d) \n", __func__, status);
+        trace::printf ("scheduler::%s(%d) \n", __func__, status);
 #endif
         os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
@@ -227,7 +230,7 @@ namespace os
       unlock (status_t status)
       {
 #if defined(OS_TRACE_RTOS_SCHEDULER)
-        trace::printf ("%s(%d) \n", __func__, status);
+        trace::printf ("scheduler::%s(%d) \n", __func__, status);
 #endif
         os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
