@@ -409,7 +409,7 @@ extern "C"
   os_thread_get_user_storage (os_thread_t* thread);
 
   os_thread_stack_t*
-  os_thread_get_context_stack (os_thread_t* thread);
+  os_thread_get_stack (os_thread_t* thread);
 
   /**
    * @}

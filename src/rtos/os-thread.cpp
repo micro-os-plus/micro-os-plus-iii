@@ -396,20 +396,19 @@ namespace os
               assert(attr.th_stack_address == nullptr);
             }
 
-          context_stack ().set (static_cast<stack::element_t*> (stack_address),
-                                stack_size_bytes);
+          stack ().set (static_cast<stack::element_t*> (stack_address),
+                        stack_size_bytes);
         }
       else
         {
-          context_stack ().set (
-              static_cast<stack::element_t*> (attr.th_stack_address),
-              attr.th_stack_size_bytes);
+          stack ().set (static_cast<stack::element_t*> (attr.th_stack_address),
+                        attr.th_stack_size_bytes);
         }
 
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s p%u stack{%p,%u}\n", __func__, this, name (),
-                     attr.th_priority, context_stack ().bottom_address_,
-                     context_stack ().size_bytes_);
+                     attr.th_priority, stack ().bottom_address_,
+                     stack ().size_bytes_);
 #endif
 
         {
@@ -432,7 +431,7 @@ namespace os
               scheduler::top_threads_list_.link (*this);
             }
 
-          context_stack ().initialize ();
+          stack ().initialize ();
 
 #if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
@@ -867,19 +866,19 @@ namespace os
     void
     thread::_check_stack (void)
     {
-      if (context_stack ().size () > 0)
+      if (stack ().size () > 0)
         {
-          assert(context_stack ().check_bottom_magic ());
-          assert(context_stack ().check_top_magic ());
+          assert(stack ().check_bottom_magic ());
+          assert(stack ().check_top_magic ());
 
 #if defined(OS_TRACE_RTOS_THREAD)
           trace::printf ("%s() @%p %s %u/%u stack bytes unused\n", __func__,
-                         this, name (), context_stack ().available (),
-                         context_stack ().size ());
+                         this, name (), stack ().available (),
+                         stack ().size ());
 #endif
 
           // Clear stack to avoid further checks
-          context_stack ().clear ();
+          stack ().clear ();
         }
     }
 

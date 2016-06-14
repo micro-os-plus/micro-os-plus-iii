@@ -80,7 +80,7 @@ iterate_threads (thread* th, unsigned int depth)
 {
   for (auto&& p : scheduler::children_threads (th))
     {
-      thread::stack& stk = p.context_stack ();
+      class thread::stack& stk = p.stack ();
       unsigned int used = static_cast<unsigned int> (stk.size ()
           - stk.available ());
       unsigned int used_proc = static_cast<unsigned int> (used * 100
@@ -90,8 +90,7 @@ iterate_threads (thread* th, unsigned int depth)
       statistics::counter_t thread_switches =
           p.statistics ().context_switches ();
 
-      statistics::duration_t thread_cpu_cycles =
-          p.statistics ().cpu_cycles ();
+      statistics::duration_t thread_cpu_cycles = p.statistics ().cpu_cycles ();
 
       printf ("%s, %u%% (%u/%u), %s, %u, %u \n", p.name (), used_proc, used,
               static_cast<unsigned int> (stk.size ()), thread_state[st],
@@ -119,7 +118,7 @@ test_cpp_api (void)
 
 #if 1
 #if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
-  sysclock.sleep_for(5);
+  sysclock.sleep_for (5);
   printf ("\nThreads:\n");
   iterate_threads ();
 #endif

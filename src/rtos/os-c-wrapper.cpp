@@ -358,10 +358,10 @@ os_thread_get_user_storage (os_thread_t* thread)
 }
 
 os_thread_stack_t*
-os_thread_get_context_stack (os_thread_t* thread)
+os_thread_get_stack (os_thread_t* thread)
 {
   assert(thread != nullptr);
-  return reinterpret_cast<os_thread_stack_t*> (&(reinterpret_cast<rtos::thread&> (*thread)).context_stack ());
+  return reinterpret_cast<os_thread_stack_t*> (&(reinterpret_cast<rtos::thread&> (*thread)).stack ());
 }
 
 // ----------------------------------------------------------------------------
@@ -394,14 +394,14 @@ size_t
 os_thread_stack_get_size (os_thread_stack_t* stack)
 {
   assert(stack != nullptr);
-  return (reinterpret_cast<rtos::thread::stack&> (*stack)).size ();
+  return (reinterpret_cast<class rtos::thread::stack&> (*stack)).size ();
 }
 
 size_t
 os_thread_stack_get_available (os_thread_stack_t* stack)
 {
   assert(stack != nullptr);
-  return (reinterpret_cast<rtos::thread::stack&> (*stack)).available ();
+  return (reinterpret_cast<class rtos::thread::stack&> (*stack)).available ();
 }
 
 // ----------------------------------------------------------------------------

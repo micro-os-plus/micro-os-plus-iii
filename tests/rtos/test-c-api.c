@@ -94,7 +94,7 @@ iterate_threads (os_thread_t* th, unsigned int depth)
       os_thread_t* p = os_children_threads_iter_get (it);
 
       // Get the pointer to the stack object.
-      os_thread_stack_t* pst = os_thread_get_context_stack (p);
+      os_thread_stack_t* pst = os_thread_get_stack (p);
 
       // Get stack size & used, in bytes.
       unsigned int used = (unsigned int) (os_thread_stack_get_size (pst)

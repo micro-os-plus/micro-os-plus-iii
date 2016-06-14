@@ -1083,8 +1083,8 @@ namespace os
        *  None
        * @return A reference to the context stack object.
        */
-      thread::stack&
-      context_stack (void);
+      class thread::stack&
+      stack (void);
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) \
   || defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
@@ -2018,7 +2018,7 @@ namespace os
       ;
     }
 
-    inline thread::stack&
+    inline class thread::stack&
     thread::context::stack ()
     {
       return stack_;
@@ -2113,14 +2113,14 @@ namespace os
 
           // Simple test to verify that the old thread
           // did not overflow the stack.
-          assert(context_stack ().check_bottom_magic ());
+          assert(stack ().check_bottom_magic ());
         }
     }
 
 #endif
 
-    inline thread::stack&
-    thread::context_stack (void)
+    inline class thread::stack&
+    thread::stack (void)
     {
       return context_.stack_;
     }
