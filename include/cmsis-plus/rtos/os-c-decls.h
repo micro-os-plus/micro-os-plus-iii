@@ -166,6 +166,7 @@ extern "C"
   // --------------------------------------------------------------------------
 
   typedef uint64_t os_statistics_counter_t;
+  typedef uint64_t os_statistics_duration_t;
 
   // --------------------------------------------------------------------------
 
@@ -186,10 +187,21 @@ extern "C"
 #endif
   } os_thread_context_t;
 
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) \
+  || defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
+
   typedef struct os_thread_statistics_s
   {
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
     os_statistics_counter_t context_switches;
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
+    os_statistics_duration_t cpu_cycles;
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
   } os_thread_statistics_t;
+
+#endif
 
   typedef struct os_thread_attr_s
   {
@@ -224,9 +236,11 @@ extern "C"
     os_flags_mask_t signals;
     os_thread_user_storage_t user_storage; //
     bool interrupted;
-#if defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES)
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) \
+  || defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
     os_thread_statistics_t statistics;
-#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES) */
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
 
 #if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
     os_thread_port_data_t port;

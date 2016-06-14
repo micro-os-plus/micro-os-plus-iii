@@ -159,6 +159,26 @@ os_sched_is_locked (void)
   return scheduler::locked ();
 }
 
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
+
+os_statistics_counter_t
+os_sched_stat_get_context_switches (void)
+{
+  return static_cast<os_statistics_counter_t> (scheduler::statistics::context_switches ());
+}
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
+
+os_statistics_duration_t
+os_sched_stat_get_cpu_cycles (void)
+{
+  return static_cast<os_statistics_duration_t> (scheduler::statistics::cpu_cycles ());
+}
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
+
 // ----------------------------------------------------------------------------
 
 os_irq_status_t
@@ -383,6 +403,30 @@ os_thread_stack_get_available (os_thread_stack_t* stack)
   assert(stack != nullptr);
   return (reinterpret_cast<rtos::thread::stack&> (*stack)).available ();
 }
+
+// ----------------------------------------------------------------------------
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
+
+os_statistics_counter_t
+os_thread_stat_get_context_switches (os_thread_t* thread)
+{
+  assert(thread != nullptr);
+  return static_cast<os_statistics_counter_t> ((reinterpret_cast<rtos::thread&> (*thread)).statistics ().context_switches ());
+}
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
+
+os_statistics_duration_t
+os_thread_stat_get_cpu_cycles (os_thread_t* thread)
+{
+  assert(thread != nullptr);
+  return static_cast<os_statistics_duration_t> ((reinterpret_cast<rtos::thread&> (*thread)).statistics ().cpu_cycles ());
+}
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
 
 // ----------------------------------------------------------------------------
 

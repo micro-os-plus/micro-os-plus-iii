@@ -175,6 +175,30 @@ extern "C"
 
   // --------------------------------------------------------------------------
   /**
+   * @name Scheduler statistics functions
+   * @{
+   */
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
+
+  os_statistics_counter_t
+  os_sched_stat_get_context_switches (void);
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
+
+  os_statistics_duration_t
+  os_sched_stat_get_cpu_cycles (void);
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
+
+  /**
+   * @}
+   */
+
+  // --------------------------------------------------------------------------
+  /**
    * @name Interrupts functions
    * @{
    */
@@ -414,6 +438,30 @@ extern "C"
 
   size_t
   os_thread_stack_get_available (os_thread_stack_t* stack);
+
+  /**
+   * @}
+   */
+
+  // --------------------------------------------------------------------------
+  /**
+   * @name Thread statistics functions
+   * @{
+   */
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
+
+  os_statistics_counter_t
+  os_thread_stat_get_context_switches (os_thread_t* thread);
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
+
+  os_statistics_duration_t
+  os_thread_stat_get_cpu_cycles (os_thread_t* thread);
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
 
   /**
    * @}

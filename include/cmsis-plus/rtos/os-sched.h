@@ -38,6 +38,7 @@
 #if defined(__cplusplus)
 
 #include <cmsis-plus/rtos/os-decls.h>
+#include <cmsis-plus/rtos/os-clocks.h>
 
 // ----------------------------------------------------------------------------
 
@@ -64,7 +65,8 @@ namespace os
 #if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
       extern thread* volatile current_thread_;
       extern ready_threads_list ready_threads_list_;
-#endif
+#endif /* !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER) */
+
       extern terminated_threads_list terminated_threads_list_;
 
       /**
@@ -397,14 +399,21 @@ namespace os
 
       namespace statistics
       {
-#if defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES)
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
 
         rtos::statistics::counter_t
         context_switches (void);
 
         extern rtos::statistics::counter_t context_switches_;
 
-#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES) */
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
+
+        extern clock::timestamp_t switch_timestamp_;
+        extern rtos::statistics::duration_t cpu_cycles_;
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
 
       } /* namespace statistics */
 
@@ -843,7 +852,7 @@ namespace os
 
       namespace statistics
       {
-#if defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES)
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
 
         inline rtos::statistics::counter_t
         context_switches (void)
@@ -851,7 +860,18 @@ namespace os
           return context_switches_;
         }
 
-#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES) */
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
+
+        inline rtos::statistics::duration_t
+        cpu_cycles (void)
+        {
+          return cpu_cycles_;
+        }
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
+
       } /* namespace statistics */
 
     } /* namespace scheduler */

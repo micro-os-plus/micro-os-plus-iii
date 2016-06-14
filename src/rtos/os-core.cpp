@@ -164,6 +164,19 @@ namespace os
         is_started_ = true;
         is_locked_ = false;
 
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
+
+        scheduler::statistics::context_switches_ = 0;
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
+
+        scheduler::statistics::cpu_cycles_ = 0;
+        scheduler::statistics::switch_timestamp_ = hrclock.now ();
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
+
         port::clock_systick::start ();
 
         port::scheduler::start ();
@@ -391,22 +404,51 @@ namespace os
         // the relink_running() will simply reschedule it,
         // otherwise the thread will be lost.
 
-#if defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES)
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
 
         // Increment context switches, global and per-thread.
         scheduler::statistics::context_switches_++;
         scheduler::current_thread_->statistics_.context_switches_++;
 
-#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES) */
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
+
+        // Get the high resolution timestamp.
+        clock::timestamp_t now = hrclock.now ();
+
+        // Compute duration since previous context switch.
+        // Assume scheduler is not disabled for very long.
+        rtos::statistics::duration_t delta =
+            static_cast<rtos::statistics::duration_t> (now
+                - scheduler::statistics::switch_timestamp_);
+
+        // Accumulate durations to scheduler total.
+        scheduler::statistics::cpu_cycles_ += delta;
+        // Accumulate durations to current thread.
+        scheduler::current_thread_->statistics_.cpu_cycles_ += delta;
+
+        scheduler::statistics::switch_timestamp_ = now;
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
+
       }
 
       namespace statistics
       {
-#if defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES)
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
 
         rtos::statistics::counter_t context_switches_;
 
-#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_CONTEXT_SWITCHES) */
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
+
+        clock::timestamp_t switch_timestamp_;
+        rtos::statistics::duration_t cpu_cycles_;
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
+
       } /* namespace statistics */
 
     /**

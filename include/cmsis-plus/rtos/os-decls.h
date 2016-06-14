@@ -238,6 +238,11 @@ namespace os
        */
       using counter_t = uint64_t;
 
+      /**
+       * @brief Type of duration in CPU cycles.
+       */
+      using duration_t = uint64_t;
+
     } /* namespace statistics */
 
     /**
