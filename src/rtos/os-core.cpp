@@ -164,6 +164,11 @@ namespace os
         is_started_ = true;
         is_locked_ = false;
 
+        sysclock.start ();
+        hrclock.start ();
+
+        rtclock.start ();
+
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
 
         scheduler::statistics::context_switches_ = 0;
@@ -176,11 +181,6 @@ namespace os
         scheduler::statistics::switch_timestamp_ = hrclock.now ();
 
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
-
-        sysclock.start ();
-        hrclock.start ();
-
-        rtclock.start ();
 
         port::scheduler::start ();
       }
