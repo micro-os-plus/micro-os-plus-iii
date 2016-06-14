@@ -467,78 +467,50 @@ namespace os
      */
     namespace interrupts
     {
-      /**
-       * @class critical_section
-       * @details
-       * Use this class to define a critical section
-       * protected to interrupts service routines. The begining of the
-       * critical section is exactly the place where this class is
-       * instantiated (the constructor will disable interrupts below
-       * the scheduler priority). The end of the critical
-       * section is the end of the surrounding block (the destructor will
-       * enable the interrupts).
-       *
-       * @note Can be nested as many times as required without problems,
-       * only the outer call will re-enable the interrupts.
-       *
-       * @par Example
-       *
-       * @code{.cpp}
-       * void
-       * func(void)
-       * {
-       *    // Do something
-       *
-       *    {
-       *      interrupts::critical_section ics;  // Critical section begins here.
-       *
-       *      // Inside the critical section.
-       *      // No scheduler switches will happen here.
-       *
-       *    } // Critical section ends here.
-       *
-       *    // Do something else.
-       * }
-       * @endcode
-       */
+    /**
+     * @class critical_section
+     * @details
+     * Use this class to define a critical section
+     * protected to interrupts service routines. The begining of the
+     * critical section is exactly the place where this class is
+     * instantiated (the constructor will disable interrupts below
+     * the scheduler priority). The end of the critical
+     * section is the end of the surrounding block (the destructor will
+     * enable the interrupts).
+     *
+     * @note Can be nested as many times as required without problems,
+     * only the outer call will re-enable the interrupts.
+     *
+     * @par Example
+     *
+     * @code{.cpp}
+     * void
+     * func(void)
+     * {
+     *    // Do something
+     *
+     *    {
+     *      interrupts::critical_section ics;  // Critical section begins here.
+     *
+     *      // Inside the critical section.
+     *      // No scheduler switches will happen here.
+     *
+     *    } // Critical section ends here.
+     *
+     *    // Do something else.
+     * }
+     * @endcode
+     */
 
-      /*
-       * @var const status_t critical_section::status_
-       * @details
-       * The variable is constant, after being set by the constructor no
-       * further changes are possible.
-       *
-       * The variable type usually is an unsigned integer where
-       * the status register is saved.
-       */
-
-      // Enter an IRQ critical section
-      status_t
-      critical_section::enter (void)
-      {
-        return port::interrupts::critical_section::enter ();
-      }
-
-      // Exit an IRQ critical section
-      void
-      critical_section::exit (status_t status)
-      {
-        port::interrupts::critical_section::exit (status);
-      }
-
-      // Enter an IRQ uncritical section
-      status_t
-      uncritical_section::enter (void)
-      {
-        return port::interrupts::uncritical_section::enter ();
-      }
-
-      // Exit an IRQ uncritical section
-      void
-      uncritical_section::exit (status_t status)
-      {
-        port::interrupts::uncritical_section::exit (status);
-      }
+    /*
+     * @var const status_t critical_section::status_
+     * @details
+     * The variable is constant, after being set by the constructor no
+     * further changes are possible.
+     *
+     * The variable type usually is an unsigned integer where
+     * the status register is saved.
+     */
 
     /**
      * @class lockable

@@ -881,6 +881,7 @@ namespace os
     namespace interrupts
     {
       inline
+      __attribute__((always_inline))
       critical_section::critical_section () :
           status_ (enter ())
       {
@@ -888,12 +889,31 @@ namespace os
       }
 
       inline
+      __attribute__((always_inline))
       critical_section::~critical_section ()
       {
         exit (status_);
       }
 
+      inline status_t
+      __attribute__((always_inline))
+      critical_section::enter (void)
+      {
+        return port::interrupts::critical_section::enter ();
+      }
+
+      // Exit an IRQ critical section
+      inline void
+      __attribute__((always_inline))
+      critical_section::exit (status_t status)
+      {
+        port::interrupts::critical_section::exit (status);
+      }
+
+      // ======================================================================
+
       inline
+      __attribute__((always_inline))
       uncritical_section::uncritical_section () :
           status_ (enter ())
       {
@@ -901,10 +921,29 @@ namespace os
       }
 
       inline
+      __attribute__((always_inline))
       uncritical_section::~uncritical_section ()
       {
         exit (status_);
       }
+
+      // Enter an IRQ uncritical section
+      inline status_t
+      __attribute__((always_inline))
+      uncritical_section::enter (void)
+      {
+        return port::interrupts::uncritical_section::enter ();
+      }
+
+      // Exit an IRQ uncritical section
+      inline void
+      __attribute__((always_inline))
+      uncritical_section::exit (status_t status)
+      {
+        port::interrupts::uncritical_section::exit (status);
+      }
+
+      // ======================================================================
 
       constexpr
       lockable::lockable () :
@@ -914,12 +953,14 @@ namespace os
       }
 
       inline
+      __attribute__((always_inline))
       lockable::~lockable ()
       {
         ;
       }
 
       inline void
+      __attribute__((always_inline))
       lockable::lock (void)
       {
         status_ = critical_section::enter ();
@@ -931,6 +972,7 @@ namespace os
        * but used to meet the Lockable requirements.
        */
       inline bool
+      __attribute__((always_inline))
       lockable::try_lock (void)
       {
         status_ = critical_section::enter ();
@@ -938,11 +980,13 @@ namespace os
       }
 
       inline void
+      __attribute__((always_inline))
       lockable::unlock (void)
       {
         critical_section::exit (status_);
       }
 
+    // ========================================================================
     }
 
   } /* namespace rtos */
