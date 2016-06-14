@@ -77,6 +77,11 @@ iterate_threads (os_thread_t* th, unsigned int depth);
 static const char* thread_state[] =
   { "undf", "inac", "rdy", "run", "wait", "term", "dead" };
 
+/*
+ * To compute thread percentages, use totals provided by:
+ * - os_sched_stat_get_context_switches();
+ * - os_sched_stat_get_cpu_cycles();
+ */
 void
 iterate_threads (os_thread_t* th, unsigned int depth)
 {
@@ -98,9 +103,16 @@ iterate_threads (os_thread_t* th, unsigned int depth)
           / os_thread_stack_get_size (pst));
       unsigned int st = (unsigned int) (os_thread_get_sched_state (p));
 
-      printf ("%s, %u%% (%u/%u), %s \n", os_thread_get_name (p), used_proc,
-              used, (unsigned int) (os_thread_stack_get_size (pst)),
-              thread_state[st]);
+      os_statistics_counter_t thread_switches =
+          os_thread_stat_get_context_switches (p);
+
+      os_statistics_duration_t thread_cpu_cycles =
+          os_thread_stat_get_cpu_cycles (p);
+
+      printf ("%s, %u%% (%u/%u), %s, %u, %u \n", os_thread_get_name (p),
+              used_proc, used, (unsigned int) (os_thread_stack_get_size (pst)),
+              thread_state[st], (unsigned int) thread_switches,
+              (unsigned int) thread_cpu_cycles);
 
       // Go down one level.
       iterate_threads (p, depth + 1);
@@ -115,13 +127,23 @@ iterate_threads (os_thread_t* th, unsigned int depth)
 int
 test_c_api (void)
 {
+#pragma GCC diagnostic push
+
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
+
   const char* name;
   bool flag;
+
+#pragma GCC diagnostic pop
 
   // ==========================================================================
 
 #if 1
   printf ("\nThreads:\n");
+
   iterate_threads (NULL, 0);
 #endif
 
@@ -518,10 +540,20 @@ test_c_api (void)
       os_mqueue_timed_receive (&q1, &msg_in, sizeof(msg_in), 1, NULL);
       assert(msg_in.i = 1);
 
-      const char* str = os_mqueue_get_name (&q1);
-      assert(strcmp (str, "q1") == 0);
+#pragma GCC diagnostic push
 
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
+
+      const char* str;
       size_t n;
+
+#pragma GCC diagnostic pop
+
+      str = os_mqueue_get_name (&q1);
+      assert(strcmp (str, "q1") == 0);
 
       n = os_mqueue_get_capacity (&q1);
       assert(n == 3);

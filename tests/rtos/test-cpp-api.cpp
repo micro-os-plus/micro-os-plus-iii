@@ -67,6 +67,8 @@ tmfunc (void* args __attribute__((unused)))
   printf ("%s\n", __func__);
 }
 
+#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+
 void
 iterate_threads (thread* th = nullptr, unsigned int depth = 0);
 
@@ -84,12 +86,23 @@ iterate_threads (thread* th, unsigned int depth)
       unsigned int used_proc = static_cast<unsigned int> (used * 100
           / stk.size ());
       unsigned int st = static_cast<unsigned int> (p.sched_state ());
-      printf ("%s, %u%% (%u/%u), %s \n", p.name (), used_proc, used,
-              static_cast<unsigned int> (stk.size ()), thread_state[st]);
+
+      statistics::counter_t thread_switches =
+          p.statistics ().context_switches ();
+
+      statistics::duration_t thread_cpu_cycles =
+          p.statistics ().cpu_cycles ();
+
+      printf ("%s, %u%% (%u/%u), %s, %u, %u \n", p.name (), used_proc, used,
+              static_cast<unsigned int> (stk.size ()), thread_state[st],
+              static_cast<unsigned int> (thread_switches),
+              static_cast<unsigned int> (thread_cpu_cycles));
 
       iterate_threads (&p, depth + 1);
     }
 }
+
+#endif
 
 int
 test_cpp_api (void)
@@ -105,8 +118,11 @@ test_cpp_api (void)
 #endif
 
 #if 1
+#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+  sysclock.sleep_for(5);
   printf ("\nThreads:\n");
   iterate_threads ();
+#endif
 #endif
 
 #if 0
