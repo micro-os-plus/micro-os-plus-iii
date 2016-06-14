@@ -43,16 +43,14 @@ using namespace os::rtos;
 void
 busy_wait (unsigned int micros)
 {
-  clock_systick::current_t t;
-  sysclock.now (&t);
-  uint64_t until_cycles = t.ticks * t.divisor + t.cycles
-      + t.core_frequency_hz * micros / 1000000;
+  clock::timestamp_t start = hrclock.now ();
+  clock::timestamp_t until_cycles = start
+      + hrclock.input_clock_frequency_hz() * micros / 1000000;
 
-  uint64_t now_cycles;
+  clock::timestamp_t now_cycles;
   do
     {
-      sysclock.now (&t);
-      now_cycles = static_cast<uint64_t> (t.ticks * t.divisor + t.cycles);
+      now_cycles = hrclock.now ();
     }
   while (now_cycles < until_cycles);
 }
