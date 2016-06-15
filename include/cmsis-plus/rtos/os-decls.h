@@ -267,7 +267,6 @@ namespace os
 
     /**
      * @brief Generic flags namespace.
-     * @ingroup cmsis-plus-rtos
      * @details
      * The os::rtos::flags namespace groups event types and enumerations.
      */
@@ -299,7 +298,6 @@ namespace os
        * @brief Flags modes.
        * @details
        * Container for generic flags enumerations.
-       * @ingroup cmsis-plus-rtos
        */
       namespace mode
       {
@@ -470,6 +468,9 @@ namespace os
 
       /**
        * @}
+       */
+
+      /**
        * @name Public Member Variables
        * @{
        */
