@@ -805,7 +805,7 @@ namespace os
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
 
         /**
-         * @}
+         * @endcond
          */
 
       };
@@ -2097,6 +2097,10 @@ namespace os
 
 #if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
 
+    /**
+     * @cond ignore
+     */
+
     inline void
     thread::_relink_running (void)
     {
@@ -2116,6 +2120,10 @@ namespace os
           assert(stack ().check_bottom_magic ());
         }
     }
+
+    /**
+     * @endcond
+     */
 
 #endif
 

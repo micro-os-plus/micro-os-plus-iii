@@ -206,15 +206,26 @@ namespace os
       result_t
       wait_for (duration_t timeout);
 
-      virtual offset_t
-      offset (void);
-
-      virtual offset_t
-      offset (offset_t);
-
       /**
        * @cond ignore
        */
+
+      /**
+       * @brief Get adjustment offset (placeholder).
+       * @par Parameters
+       *  None
+       * @return 0 for steady clocks.
+       */
+      virtual offset_t
+      offset (void);
+
+      /**
+       * @brief Set adjustment offset (placeholder)
+       * @param [in] value Ignored for steady clocks.
+       * @return 0 for steady clocks.
+       */
+      virtual offset_t
+      offset (offset_t value);
 
       clock_timestamps_list&
       steady_list (void);
@@ -284,6 +295,11 @@ namespace os
 
     // ========================================================================
 
+    /**
+     * @brief Adjustable (non-steady) clock.
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos
+     */
     class adjustable_clock : public clock
     {
       // ----------------------------------------------------------------------
@@ -354,11 +370,22 @@ namespace os
       virtual result_t
       sleep_until (timestamp_t timestamp) override;
 
+      /**
+       * @brief Get adjustment offset.
+       * @par Parameters
+       *  None
+       * @return Integer value representing the offset to epoch.
+       */
       virtual offset_t
       offset (void) override;
 
+      /**
+       * @brief Set adjustment offset.
+       * @param [in] value Integer representing the offset to epoch (positive).
+       * @return Integer value representing the previous offset to epoch.
+       */
       virtual offset_t
-      offset (offset_t) override;
+      offset (offset_t value) override;
 
       void
       _check_timestamps (void);
@@ -370,6 +397,11 @@ namespace os
     protected:
 
       /**
+       * @name Private Member Variables
+       * @{
+       */
+
+      /**
        * @cond ignore
        */
 
@@ -379,6 +411,10 @@ namespace os
       offset_t volatile offset_ = 0;
 
       clock_timestamps_list adjusted_list_;
+
+      /**
+       * @endcond
+       */
 
       /**
        * @}
@@ -445,7 +481,7 @@ namespace os
        */
 
       // ----------------------------------------------------------------------
-      /*
+      /**
        * @name Public Member Functions
        * @{
        */
@@ -572,7 +608,7 @@ namespace os
        */
 
       // ----------------------------------------------------------------------
-      /*
+      /**
        * @name Public Member Functions
        * @{
        */
@@ -669,7 +705,7 @@ namespace os
        */
 
       // ----------------------------------------------------------------------
-      /*
+      /**
        * @name Public Member Functions
        * @{
        */
@@ -766,7 +802,12 @@ namespace os
     /**
      * @endcond
      */
+
     // ========================================================================
+    /**
+     * @cond ignore
+     */
+
     inline
     adjustable_clock::adjustable_clock (const char* name) :
         clock
@@ -786,6 +827,10 @@ namespace os
       adjusted_list_.check_timestamp (steady_count_ + offset_);
 #pragma GCC diagnostic pop
     }
+
+    /**
+     * @endcond
+     */
 
     // ========================================================================
     /**

@@ -272,6 +272,10 @@ namespace os
       return res;
     }
 
+    /**
+     * @cond ignore
+     */
+
     clock::offset_t
     clock::offset (void)
     {
@@ -283,10 +287,6 @@ namespace os
     {
       return 0;
     }
-
-    /**
-     * @cond ignore
-     */
 
     result_t
     clock::_wait_until (timestamp_t timestamp, clock_timestamps_list& list)
@@ -392,13 +392,13 @@ namespace os
     }
 
     clock::offset_t
-    adjustable_clock::offset (offset_t offset)
+    adjustable_clock::offset (offset_t value)
     {
       interrupts::critical_section ics;
 
       offset_t tmp;
       tmp = offset_;
-      offset_ = offset;
+      offset_ = value;
 
       return tmp;
     }
