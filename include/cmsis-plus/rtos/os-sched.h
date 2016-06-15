@@ -397,21 +397,51 @@ namespace os
 
       // ----------------------------------------------------------------------
 
+      /**
+       * @brief Scheduler statistics.
+       */
       namespace statistics
       {
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
 
+        /**
+         * @brief Get the total number of context switches.
+         * @return Integer with the total number of context switches since scheduler start.
+         */
         rtos::statistics::counter_t
         context_switches (void);
 
+        /**
+         * @cond ignore
+         */
+
         extern rtos::statistics::counter_t context_switches_;
+
+        /**
+         * @endcond
+         */
 
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
 
+        /**
+         * @brief Get the total duration of all threads.
+         * @return Integer with the number of CPU cycles, possibly divided by some prescaller.
+         */
+        rtos::statistics::duration_t
+        cpu_cycles (void);
+
+        /**
+         * @cond ignore
+         */
+
         extern clock::timestamp_t switch_timestamp_;
         extern rtos::statistics::duration_t cpu_cycles_;
+
+        /**
+         * @endcond
+         */
 
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
 
@@ -854,6 +884,15 @@ namespace os
       {
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
 
+        /**
+         * @details
+         * This value can be used together with the corresponding
+         * thread function, to compute percentages.
+         *
+         * @note This function is available only when
+         * @ref OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES
+         * is defined.
+         */
         inline rtos::statistics::counter_t
         context_switches (void)
         {
@@ -864,6 +903,19 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
 
+        /**
+         * @details
+         * For Cortex-M ports, this value is usually derived from
+         * the clock that drives the SysTick, which most of the times
+         * is the system clock.
+         *
+         * This value can be used together with the corresponding
+         * thread function, to compute percentages.
+         *
+         * @note This function is available only when
+         * @ref OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES
+         * is defined.
+         */
         inline rtos::statistics::duration_t
         cpu_cycles (void)
         {
