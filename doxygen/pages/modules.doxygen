@@ -67,7 +67,7 @@
  */
 
 /**
- @defgroup cmsis-plus-iso CMSIS++ ISO Standard Threads
+ @defgroup cmsis-plus-iso CMSIS++ ISO Standard C++ Threads
  @brief  CMSIS++ ISO Threads summary page.
  @details
  This page groups the main CMSIS++ ISO Threads classes and namespaces.
@@ -104,3 +104,29 @@
  TODO: add content
  */
 
+/**
+ @defgroup cmsis-plus-app-config CMSIS++ App Config
+ @brief  CMSIS++ application configuration definitions.
+ @details
+ This page groups the preprocessor definitions used to configure
+ a CMSIS++ application.
+ */
+
+/**
+ @defgroup cmsis-plus-app-config-port Port components selections
+ @ingroup cmsis-plus-app-config
+ @brief  Definitions used to select various port components.
+ @details
+ This page groups the preprocessor definitions used to select
+ different components from a CMSIS++ port, like whether to use
+ the port scheduler or the CMSIS++ reference scheduler.
+ */
+
+/**
+ @defgroup cmsis-plus-app-config-trace Trace options
+ @ingroup cmsis-plus-app-config
+ @brief  Definitions used to configure the trace channel.
+ @details
+ This page groups the preprocessor definitions used to configure
+ the trace channel used to display debug messages.
+ */
