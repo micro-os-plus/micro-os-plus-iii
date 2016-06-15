@@ -433,7 +433,7 @@ namespace os
 
           stack ().initialize ();
 
-#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
           port::thread::create (this);
           sched_state_ = state::ready;
@@ -515,7 +515,7 @@ namespace os
       trace::printf ("%s() @%p %s %u\n", __func__, this, name (), prio_);
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
         {
           interrupts::critical_section ics; // ----- Critical section -----
@@ -595,7 +595,7 @@ namespace os
 
       result_t res = result::ok;
 
-#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
       // The port must perform a context switch.
       res = port::thread::sched_prio (this, prio);
@@ -648,7 +648,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
       result_t res = port::thread::detach (this);
       if (res != result::ok)
@@ -834,7 +834,7 @@ namespace os
 
         }
 
-#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
         {
           interrupts::critical_section ics; // ----- Critical section -----
@@ -971,7 +971,7 @@ namespace os
 
           assert(acquired_mutexes_ == 0);
 
-#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
           port::thread::destroy_other (this);
 
@@ -1311,7 +1311,7 @@ namespace os
       {
         rtos::thread* th;
 
-#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
         th = port::this_thread::thread ();
 
@@ -1368,7 +1368,7 @@ namespace os
         trace::printf ("%s() from %s\n", __func__, _thread ()->name ());
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
         port::this_thread::yield ();
 

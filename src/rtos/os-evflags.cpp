@@ -168,11 +168,11 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
 
-#if !defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
+#if !defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
       clock_ = attr.clock != nullptr ? attr.clock : &sysclock;
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
+#if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 
       port::event_flags::create (this);
 
@@ -205,7 +205,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
+#if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 
       port::event_flags::destroy (this);
 
@@ -292,7 +292,7 @@ namespace os
       trace::printf ("%s() @%p %s 0x%X \n", __func__, this, name (), mask);
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
+#if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 
       return port::event_flags::wait (this, mask, oflags, mode);
 
@@ -371,7 +371,7 @@ namespace os
       trace::printf ("%s() @%p %s 0x%X \n", __func__, this, name (), mask);
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
+#if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 
       return port::event_flags::try_wait (this, mask, oflags, mode);
 
@@ -441,7 +441,7 @@ namespace os
       trace::printf ("%s() @%p %s 0x%X \n", __func__, this, name (), mask);
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
+#if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 
       return port::event_flags::timed_wait (this, mask, timeout, oflags, mode);
 
@@ -530,7 +530,7 @@ namespace os
 
       os_assert_err(mask != 0, EINVAL);
 
-#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
+#if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 
       return port::event_flags::raise (this, mask, oflags);
 
@@ -572,7 +572,7 @@ namespace os
       trace::printf ("%s() @%p %s 0x%X \n", __func__, this, name (), mask);
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
+#if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 
       return port::event_flags::clear (this, mask, oflags);
 
@@ -619,7 +619,7 @@ namespace os
       trace::printf ("%s() @%p %s 0x%X \n", __func__, this, name (), mask);
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
+#if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 
       return port::event_flags::get (this, mask, mode);
 
@@ -654,7 +654,7 @@ namespace os
     bool
     event_flags::waiting (void)
     {
-#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
+#if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 
       return port::event_flags::waiting (this);
 

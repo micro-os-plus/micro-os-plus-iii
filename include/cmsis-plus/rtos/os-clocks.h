@@ -515,7 +515,7 @@ namespace os
        * @cond ignore
        */
 
-#if defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
+#if defined(OS_USE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
 
       /**
        * @brief Internal wait.
@@ -631,7 +631,7 @@ namespace os
        * @cond ignore
        */
 
-#if defined(OS_INCLUDE_RTOS_PORT_REALTIME_CLOCK_SLEEP_FOR)
+#if defined(OS_USE_RTOS_PORT_REALTIME_CLOCK_SLEEP_FOR)
 
       /**
        * @brief Internal wait.

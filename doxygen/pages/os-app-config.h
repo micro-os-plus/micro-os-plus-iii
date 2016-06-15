@@ -99,16 +99,16 @@
  * @{
  */
 
-#define OS_INCLUDE_RTOS_PORT_SCHEDULER (1)
+#define OS_USE_RTOS_PORT_SCHEDULER (1)
 
-#define OS_INCLUDE_RTOS_PORT_CONDITION_VARIABLE (1)
-#define OS_INCLUDE_RTOS_PORT_EVENT_FLAGS                    (1)
-#define OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE                  (1)
-#define OS_INCLUDE_RTOS_PORT_MUTEX                          (1)
-#define OS_INCLUDE_RTOS_PORT_SEMAPHORE                      (1)
-#define OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR        (1)
-#define OS_INCLUDE_RTOS_PORT_REALTIME_CLOCK_SLEEP_FOR       (1)
-#define OS_INCLUDE_RTOS_PORT_TIMER                          (1)
+#define OS_USE_RTOS_PORT_CONDITION_VARIABLE (1)
+#define OS_USE_RTOS_PORT_EVENT_FLAGS                    (1)
+#define OS_USE_RTOS_PORT_MESSAGE_QUEUE                  (1)
+#define OS_USE_RTOS_PORT_MUTEX                          (1)
+#define OS_USE_RTOS_PORT_SEMAPHORE                      (1)
+#define OS_USE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR        (1)
+#define OS_USE_RTOS_PORT_REALTIME_CLOCK_SLEEP_FOR       (1)
+#define OS_USE_RTOS_PORT_TIMER                          (1)
 
 /**
  * @} End of ingroup cmsis-plus-app-config-port

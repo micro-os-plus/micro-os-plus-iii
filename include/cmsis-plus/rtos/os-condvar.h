@@ -289,7 +289,7 @@ namespace os
        * @cond ignore
        */
 
-#if !defined(OS_INCLUDE_RTOS_PORT_CONDITION_VARIABLE)
+#if !defined(OS_USE_RTOS_PORT_CONDITION_VARIABLE)
       waiting_threads_list list_;
       // clock& clock_;
 #endif

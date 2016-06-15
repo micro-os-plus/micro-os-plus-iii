@@ -340,12 +340,12 @@ namespace os
        * @cond ignore
        */
 
-#if !defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
+#if !defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
       waiting_threads_list list_;
       clock* clock_;
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
+#if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
       friend class port::event_flags;
       os_evflags_port_data_t port_;
 #endif

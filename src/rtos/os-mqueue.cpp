@@ -483,7 +483,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
       assert(send_list_.empty ());
       assert(receive_list_.empty ());
@@ -499,7 +499,7 @@ namespace os
               allocated_queue_size_elements_);
         }
 
-#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
       port::message_queue::destroy (this);
 
@@ -517,7 +517,7 @@ namespace os
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
-#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
       clock_ = attr.clock != nullptr ? attr.clock : &sysclock;
 #endif
       msg_size_bytes_ = static_cast<message_queue::msg_size_t> (msg_size_bytes);
@@ -548,14 +548,14 @@ namespace os
                      msgs_, msg_size_bytes_, queue_addr_, queue_size_bytes_);
 #endif
 
-#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
       std::size_t storage_size = compute_allocated_size_bytes<void*> (
           msgs, msg_size_bytes);
 #endif
       if (queue_addr_ != nullptr)
         {
           os_assert_throw(queue_size_bytes_ > 0, EINVAL);
-#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
           os_assert_throw(
               queue_size_bytes_ >= (std::size_t) (msgs * msg_size_bytes),
               EINVAL);
@@ -564,7 +564,7 @@ namespace os
 #endif
         }
 
-#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
       count_ = 0;
       port::message_queue::create (this);
@@ -609,7 +609,7 @@ namespace os
     {
       count_ = 0;
 
-#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
       // Construct a linked list of blocks. Store the pointer at
       // the beginning of each block. Each block
@@ -650,11 +650,11 @@ namespace os
           receive_list_.clear ();
         }
 
-#endif /* !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE) */
+#endif /* !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE) */
 
     }
 
-#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
     bool
     message_queue::_try_send (const void* msg, std::size_t nbytes,
@@ -739,9 +739,9 @@ namespace os
       return true;
     }
 
-#endif /* !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE) */
+#endif /* !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE) */
 
-#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
     bool
     message_queue::_try_receive (void* msg, std::size_t nbytes,
@@ -808,7 +808,7 @@ namespace os
       return true;
     }
 
-#endif /* !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE) */
+#endif /* !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE) */
 
     /**
      * @endcond
@@ -864,7 +864,7 @@ namespace os
                      this, name ());
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
       return port::message_queue::send (this, msg, nbytes, mprio);
 
@@ -963,7 +963,7 @@ namespace os
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
 
-#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
       return port::message_queue::try_send (this, msg, nbytes, mprio);
 
@@ -1043,7 +1043,7 @@ namespace os
                      timeout, this, name ());
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
       return port::message_queue::timed_send (this, msg, nbytes, timeout, mprio);
 
@@ -1164,7 +1164,7 @@ namespace os
                      name ());
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
       return port::message_queue::receive (this, msg, nbytes, mprio);
 
@@ -1265,7 +1265,7 @@ namespace os
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
       os_assert_err(nbytes <= max_size, EMSGSIZE);
 
-#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
       return port::message_queue::try_receive (this, msg, nbytes, mprio);
 
@@ -1360,7 +1360,7 @@ namespace os
                      this, name ());
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
       return port::message_queue::timed_receive (this, msg, nbytes,
           timeout, mprio);
@@ -1458,7 +1458,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
       return port::message_queue::reset (this);
 

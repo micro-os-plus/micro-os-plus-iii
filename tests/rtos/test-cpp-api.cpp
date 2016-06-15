@@ -67,7 +67,7 @@ tmfunc (void* args __attribute__((unused)))
   printf ("%s\n", __func__);
 }
 
-#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if !defined(OS_USE_RTOS_PORT_SCHEDULER)
 
 void
 iterate_threads (thread* th = nullptr, unsigned int depth = 0);
@@ -117,7 +117,7 @@ test_cpp_api (void)
 #endif
 
 #if 1
-#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if !defined(OS_USE_RTOS_PORT_SCHEDULER)
   sysclock.sleep_for (5);
   printf ("\nThreads:\n");
   iterate_threads ();

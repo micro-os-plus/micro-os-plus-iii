@@ -316,7 +316,7 @@ namespace os
     {
       os_assert_throw(!scheduler::in_handler_mode (), EPERM);
 
-#if !defined(OS_INCLUDE_RTOS_PORT_MEMORY_POOL)
+#if !defined(OS_USE_RTOS_PORT_MEMORY_POOL)
       clock_ = attr.clock != nullptr ? attr.clock : &sysclock;
 #endif
 

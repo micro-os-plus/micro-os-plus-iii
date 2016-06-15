@@ -182,7 +182,7 @@ extern "C"
   typedef struct os_thread_context_s
   {
     os_thread_stack_t stack;
-#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if !defined(OS_USE_RTOS_PORT_SCHEDULER)
     os_port_thread_context_t port;
 #endif
   } os_thread_context_t;
@@ -242,7 +242,7 @@ extern "C"
     os_thread_statistics_t statistics;
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
 
-#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if defined(OS_USE_RTOS_PORT_SCHEDULER)
     os_thread_port_data_t port;
 #endif
     os_thread_context_t context;
@@ -314,12 +314,12 @@ extern "C"
     const char* name;
     os_timer_func_t func;
     os_timer_func_args_t func_args;
-#if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
+#if !defined(OS_USE_RTOS_PORT_TIMER)
     void* clock;
     os_clock_node_t clock_node;
     os_clock_duration_t period;
 #endif
-#if defined(OS_INCLUDE_RTOS_PORT_TIMER)
+#if defined(OS_USE_RTOS_PORT_TIMER)
     os_timer_port_data_t port_;
 #endif
     os_timer_type_t type;
@@ -376,11 +376,11 @@ extern "C"
   {
     const char* name;
     void* owner;
-#if !defined(OS_INCLUDE_RTOS_PORT_MUTEX)
+#if !defined(OS_USE_RTOS_PORT_MUTEX)
     os_threads_waiting_list_t list;
     void* clock;
 #endif
-#if defined(OS_INCLUDE_RTOS_PORT_MUTEX)
+#if defined(OS_USE_RTOS_PORT_MUTEX)
     os_mutex_port_data_t port;
 #endif
     os_mutex_count_t count;
@@ -404,7 +404,7 @@ extern "C"
   typedef struct os_condvar_s
   {
     const char* name;
-#if !defined(OS_INCLUDE_RTOS_PORT_CONDITION_VARIABLE)
+#if !defined(OS_USE_RTOS_PORT_CONDITION_VARIABLE)
     os_threads_waiting_list_t list;
     // void* clock;
 #endif
@@ -427,11 +427,11 @@ extern "C"
   typedef struct os_semaphore_s
   {
     const char* name;
-#if !defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
+#if !defined(OS_USE_RTOS_PORT_SEMAPHORE)
     os_threads_waiting_list_t list;
     void* clock;
 #endif
-#if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
+#if defined(OS_USE_RTOS_PORT_SEMAPHORE)
     os_semaphore_port_data_t port;
 #endif
     os_semaphore_count_t initial_count;
@@ -459,14 +459,14 @@ extern "C"
   {
     void* vtbl;
     const char* name;
-#if !defined(OS_INCLUDE_RTOS_PORT_MEMORY_POOL)
+#if !defined(OS_USE_RTOS_PORT_MEMORY_POOL)
     os_threads_waiting_list_t list;
     void* clock;
 #endif
     void* pool_addr;
     void* allocated_pool_addr;
     void* allocator;
-#if defined(OS_INCLUDE_RTOS_PORT_MEMORY_POOL)
+#if defined(OS_USE_RTOS_PORT_MEMORY_POOL)
     os_mempool_port_data_t port;
 #endif
     size_t pool_size_bytes;
@@ -500,7 +500,7 @@ extern "C"
   {
     void* vtbl;
     const char* name;
-#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
     os_threads_waiting_list_t send_list;
     os_threads_waiting_list_t receive_list;
     void* clock;
@@ -514,7 +514,7 @@ extern "C"
     void* allocated_queue_addr;
     void* allocator;
 
-#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
     os_mqueue_port_data_t port;
 #endif
 
@@ -525,7 +525,7 @@ extern "C"
     os_mqueue_size_t msgs;
 
     os_mqueue_size_t count;
-#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
     os_mqueue_index_t head;
 #endif
   } os_mqueue_t;
@@ -545,12 +545,12 @@ extern "C"
   typedef struct os_evflags_s
   {
     const char* name;
-#if !defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
+#if !defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
     os_threads_waiting_list_t list;
     void* clock;
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_EVENT_FLAGS)
+#if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
     os_evflags_port_data_t port_;
 #endif
 

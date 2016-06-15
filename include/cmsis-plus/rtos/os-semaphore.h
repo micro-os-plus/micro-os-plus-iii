@@ -421,12 +421,12 @@ namespace os
        * @cond ignore
        */
 
-#if !defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
+#if !defined(OS_USE_RTOS_PORT_SEMAPHORE)
       waiting_threads_list list_;
       clock* clock_ = nullptr;
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
+#if defined(OS_USE_RTOS_PORT_SEMAPHORE)
       friend class port::semaphore;
       os_semaphore_port_data_t port_;
 #endif

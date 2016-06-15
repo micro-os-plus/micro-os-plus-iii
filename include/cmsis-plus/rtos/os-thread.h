@@ -587,7 +587,7 @@ namespace os
         friend void
         port::scheduler::reschedule ();
 
-#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if !defined(OS_USE_RTOS_PORT_SCHEDULER)
 
         friend class port::context;
 
@@ -619,7 +619,7 @@ namespace os
          */
         thread::stack stack_;
 
-#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if !defined(OS_USE_RTOS_PORT_SCHEDULER)
 
         /**
          * @brief Non-portable context data.
@@ -1422,7 +1422,7 @@ namespace os
       // Add other internal data
 
       // Implementation
-#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if defined(OS_USE_RTOS_PORT_SCHEDULER)
       friend class port::thread;
       os_thread_port_data_t port_;
 #endif
@@ -2095,7 +2095,7 @@ namespace os
       return &user_storage_;
     }
 
-#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if !defined(OS_USE_RTOS_PORT_SCHEDULER)
 
     /**
      * @cond ignore

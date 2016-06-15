@@ -566,7 +566,7 @@ namespace os
       void
       _init (void);
 
-#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
       /**
        * @brief Internal function used to enqueue a message, if possible.
@@ -593,7 +593,7 @@ namespace os
       bool
       _try_receive (void* msg, std::size_t nbytes, priority_t* mprio);
 
-#endif /* !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE) */
+#endif /* !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE) */
 
       /**
        * @endcond
@@ -615,7 +615,7 @@ namespace os
        */
 
       // Keep these in sync with the structure declarations in os-c-decl.h.
-#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
       /**
        * @brief List of threads waiting to send.
        */
@@ -654,7 +654,7 @@ namespace os
        * the beginning is required.
        */
       void* volatile first_free_ = nullptr;
-#endif /* !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE) */
+#endif /* !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE) */
 
       /**
        * @brief The static address where the queue is stored
@@ -671,7 +671,7 @@ namespace os
        */
       const void* allocator_ = nullptr;
 
-#if defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
       friend class port::message_queue;
       os_mqueue_port_data_t port_;
 #endif
@@ -699,12 +699,12 @@ namespace os
        */
       message_queue::size_t count_ = 0;
 
-#if !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE)
+#if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
       /**
        * @brief Index of the first message in the queue.
        */
       index_t head_ = 0;
-#endif /* !defined(OS_INCLUDE_RTOS_PORT_MESSAGE_QUEUE) */
+#endif /* !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE) */
 
       /**
        * @endcond

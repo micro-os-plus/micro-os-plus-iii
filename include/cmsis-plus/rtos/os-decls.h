@@ -679,7 +679,7 @@ namespace os
 
         thread () = delete;
 
-#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
         static void
         create (rtos::thread* obj);

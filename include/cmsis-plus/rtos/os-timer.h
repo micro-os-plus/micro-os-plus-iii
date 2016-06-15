@@ -364,7 +364,7 @@ namespace os
        * @cond ignore
        */
 
-#if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
+#if !defined(OS_USE_RTOS_PORT_TIMER)
 
       void
       _interrupt_service_routine (void);
@@ -393,14 +393,14 @@ namespace os
       func_t func_;
       func_args_t func_args_;
 
-#if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
+#if !defined(OS_USE_RTOS_PORT_TIMER)
       clock* clock_ = nullptr;
       timer_node timer_node_
         { 0, *this };
       clock::duration_t period_ = 0;
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_TIMER)
+#if defined(OS_USE_RTOS_PORT_TIMER)
       friend class port::timer;
       os_timer_port_data_t port_;
 #endif

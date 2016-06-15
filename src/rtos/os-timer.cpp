@@ -186,11 +186,11 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
 
-#if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
+#if !defined(OS_USE_RTOS_PORT_TIMER)
       clock_ = attr.clock != nullptr ? attr.clock : &sysclock;
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_TIMER)
+#if defined(OS_USE_RTOS_PORT_TIMER)
 
       port::timer::create (this, function, args);
 
@@ -218,7 +218,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_TIMER)
+#if defined(OS_USE_RTOS_PORT_TIMER)
 
       port::timer::destroy (this);
 
@@ -260,7 +260,7 @@ namespace os
 
       result_t res;
 
-#if defined(OS_INCLUDE_RTOS_PORT_TIMER)
+#if defined(OS_USE_RTOS_PORT_TIMER)
 
       res = port::timer::start (this, period);
 
@@ -314,7 +314,7 @@ namespace os
 
       result_t res;
 
-#if defined(OS_INCLUDE_RTOS_PORT_TIMER)
+#if defined(OS_USE_RTOS_PORT_TIMER)
 
       res = port::timer::stop (this);
 
@@ -333,7 +333,7 @@ namespace os
       return res;
     }
 
-#if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
+#if !defined(OS_USE_RTOS_PORT_TIMER)
 
     /**
      * @cond ignore
@@ -356,7 +356,7 @@ namespace os
           state_ = state::completed;
         }
 
-#if defined(OS_INCLUDE_RTOS_PORT_TIMER)
+#if defined(OS_USE_RTOS_PORT_TIMER)
       trace::puts (name ());
 #endif
 

@@ -472,7 +472,7 @@ namespace os
 
     // ========================================================================
 
-#if !defined(OS_INCLUDE_RTOS_PORT_TIMER)
+#if !defined(OS_USE_RTOS_PORT_TIMER)
 
     timer_node::timer_node (clock::timestamp_t ts, timer& tm) :
         timestamp_node

@@ -62,10 +62,10 @@ namespace os
        */
       extern bool is_started_;
 
-#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if !defined(OS_USE_RTOS_PORT_SCHEDULER)
       extern thread* volatile current_thread_;
       extern ready_threads_list ready_threads_list_;
-#endif /* !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER) */
+#endif /* !defined(OS_USE_RTOS_PORT_SCHEDULER) */
 
       extern terminated_threads_list terminated_threads_list_;
 

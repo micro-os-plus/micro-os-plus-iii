@@ -452,7 +452,7 @@ namespace os
        * @cond ignore
        */
 
-#if !defined(OS_INCLUDE_RTOS_PORT_MEMORY_POOL)
+#if !defined(OS_USE_RTOS_PORT_MEMORY_POOL)
       /**
        * @brief List of threads waiting to alloc.
        */
@@ -478,7 +478,7 @@ namespace os
        */
       const void* allocator_ = nullptr;
 
-#if defined(OS_INCLUDE_RTOS_PORT_MEMORY_POOL)
+#if defined(OS_USE_RTOS_PORT_MEMORY_POOL)
       friend class port::memory_pool;
       os_mempool_port_data_t port_;
 #endif

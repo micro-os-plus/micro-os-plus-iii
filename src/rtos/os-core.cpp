@@ -85,7 +85,7 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-#if !defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if !defined(OS_USE_RTOS_PORT_SCHEDULER)
       thread* volatile current_thread_;
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -123,7 +123,7 @@ namespace os
         trace::printf ("scheduler::%s() \n", __func__);
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
         return port::scheduler::initialize ();
 

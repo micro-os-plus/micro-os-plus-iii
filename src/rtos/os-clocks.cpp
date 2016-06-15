@@ -46,7 +46,7 @@ os_systick_handler (void)
 {
   using namespace os::rtos;
 
-#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if defined(OS_USE_RTOS_PORT_SCHEDULER)
   // Prevent scheduler actions before starting it.
   if (scheduler::started ())
     {
@@ -94,7 +94,7 @@ void
 os_rtc_handler (void)
 {
 
-#if defined(OS_INCLUDE_RTOS_PORT_SCHEDULER)
+#if defined(OS_USE_RTOS_PORT_SCHEDULER)
   // Prevent scheduler actions before starting it.
   if (scheduler::started ())
     {
@@ -479,7 +479,7 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-#if defined(OS_INCLUDE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
+#if defined(OS_USE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
 
     result_t
     clock_systick::_wait_until (timestamp_t timestamp,

@@ -211,11 +211,11 @@ namespace os
                      count_, max_count_);
 #endif
 
-#if !defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
+#if !defined(OS_USE_RTOS_PORT_SEMAPHORE)
       clock_ = attr.clock != nullptr ? attr.clock : &sysclock;
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
+#if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
       port::semaphore::create (this);
 
@@ -250,7 +250,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
+#if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
       port::semaphore::destroy (this);
 
@@ -271,7 +271,7 @@ namespace os
 
       count_ = initial_count_;
 
-#if !defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
+#if !defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
       if (!list_.empty ())
         {
@@ -281,7 +281,7 @@ namespace os
           list_.clear ();
         }
 
-#endif /* !defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE) */
+#endif /* !defined(OS_USE_RTOS_PORT_SEMAPHORE) */
     }
 
     bool
@@ -349,7 +349,7 @@ namespace os
     semaphore::post (void)
     {
 
-#if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
+#if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -424,7 +424,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
+#if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
       return port::semaphore::wait (this);
 
@@ -511,7 +511,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
+#if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
       return port::semaphore::try_wait (this);
 
@@ -577,7 +577,7 @@ namespace os
                      static_cast<unsigned int> (timeout), this, name ());
 #endif
 
-#if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
+#if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
       return port::semaphore::timed_wait (this, timeout);
 
@@ -671,7 +671,7 @@ namespace os
     semaphore::count_t
     semaphore::value (void) const
     {
-#if !defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
+#if !defined(OS_USE_RTOS_PORT_SEMAPHORE)
       return (count_ > 0) ? count_ : 0;
 #else
       return count_;
@@ -692,7 +692,7 @@ namespace os
     {
       os_assert_err(!scheduler::in_handler_mode (), EPERM);
 
-#if defined(OS_INCLUDE_RTOS_PORT_SEMAPHORE)
+#if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
       return port::semaphore::reset (this);
 
