@@ -395,26 +395,6 @@ namespace os
       void
       _switch_threads (void)
       {
-        // Normally the old running thread must be re-linked to ready.
-        scheduler::current_thread_->_relink_running ();
-
-        // The top of the ready list gives the next thread to run.
-        scheduler::current_thread_ =
-            scheduler::ready_threads_list_.unlink_head ();
-
-        // The new thread was marked as running in unlink_head(),
-        // so in case the handler is re-entered immediately,
-        // the relink_running() will simply reschedule it,
-        // otherwise the thread will be lost.
-
-#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
-
-        // Increment context switches, global and per-thread.
-        scheduler::statistics::context_switches_++;
-        scheduler::current_thread_->statistics_.context_switches_++;
-
-#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
-
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
 
         // Get the high resolution timestamp.
@@ -428,12 +408,39 @@ namespace os
 
         // Accumulate durations to scheduler total.
         scheduler::statistics::cpu_cycles_ += delta;
-        // Accumulate durations to current thread.
+
+        // Accumulate durations to old thread.
         scheduler::current_thread_->statistics_.cpu_cycles_ += delta;
 
+        // Remember the timestamp for the next context switch.
         scheduler::statistics::switch_timestamp_ = now;
 
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
+
+        // Normally the old running thread must be re-linked to ready.
+        scheduler::current_thread_->_relink_running ();
+
+        // The top of the ready list gives the next thread to run.
+        scheduler::current_thread_ =
+            scheduler::ready_threads_list_.unlink_head ();
+
+        // ***** Pointer switched to new thread! *****
+
+        // The new thread was marked as running in unlink_head(),
+        // so in case the handler is re-entered immediately,
+        // the relink_running() will simply reschedule it,
+        // otherwise the thread will be lost.
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
+
+        // Increment global context switches.
+        scheduler::statistics::context_switches_++;
+
+        // Increment new thread context switches.
+        scheduler::current_thread_->statistics_.context_switches_++;
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
+
 
       }
 
