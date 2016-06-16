@@ -90,6 +90,8 @@
 
 #define OS_INTEGER_DIRENT_NAME_MAX  (256)
 
+#define OS_USE_NOT_WFI
+
 /**
  * @} End of ingroup cmsis-plus-app-config
  */
