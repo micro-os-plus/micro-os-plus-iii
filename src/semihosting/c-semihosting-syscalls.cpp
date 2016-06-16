@@ -1056,6 +1056,8 @@ _Exit (int status)
 {
   trace_printf("%s(%d)\n", __func__, status);
 
+  trace_flush();
+
 #if defined(_DEBUG)
   // Temporarily disable it, until QEMU fix.
   trace_dbg_bkpt();

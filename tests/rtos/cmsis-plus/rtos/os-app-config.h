@@ -45,8 +45,15 @@
 #endif
 
 #if defined(__ARM_EABI__)
+
 #define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES               (3000)
+
+
+#if defined(OS_USE_TRACE_SEGGER_RTT)
+#define OS_USE_NOT_WFI (1)
 #endif
+
+#endif /* defined(__ARM_EABI__) */
 
 #define OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES  (1)
 #define OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES        (1)

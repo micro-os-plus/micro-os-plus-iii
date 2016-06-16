@@ -61,6 +61,12 @@ namespace os
       return static_cast<ssize_t> (nbyte);
     }
 
+    void __attribute__((weak))
+    flush (void)
+    {
+      ;
+    }
+
     // ----------------------------------------------------------------------
 
     int __attribute__((weak))
@@ -164,6 +170,12 @@ ssize_t __attribute__((weak))
 trace_write (const void* buf, std::size_t nbyte)
 {
   return trace::write (buf, nbyte);
+}
+
+void __attribute__((weak))
+trace_flush (void)
+{
+  return trace::flush ();
 }
 
 // ----------------------------------------------------------------------------

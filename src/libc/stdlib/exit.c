@@ -92,6 +92,9 @@ void __attribute__((weak, noreturn))
 _Exit (int code __attribute__((unused)))
 {
   trace_printf ("%s()", __func__);
+
+  trace_flush();
+
 #if !defined(DEBUG)
   __reset_hardware();
 #else

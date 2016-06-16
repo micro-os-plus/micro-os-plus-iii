@@ -166,6 +166,16 @@ namespace os
     void
     dump_args (int argc, char* argv[]);
 
+    /**
+     * @brief Flush the output.
+     * @par Parameters
+     *  None.
+     * @par Returns
+     *  Nothing.
+     */
+    void
+    flush(void);
+
     // ------------------------------------------------------------------------
 
     /**
@@ -189,7 +199,7 @@ extern "C"
 #endif
 
   // ----- Implementation -----
-  // These two functions must be implemented for a specific trace channel.
+  // These functions must be implemented for a specific trace channel.
 
   /**
    * Called from startup.
@@ -199,6 +209,9 @@ extern "C"
 
   ssize_t
   trace_write (const void* buf, size_t nbyte);
+
+  void
+  trace_flush (void);
 
   // ----- Portable -----
 
@@ -273,6 +286,12 @@ namespace os
           }
 
         inline int __attribute__((always_inline))
+        flush (void)
+          {
+            ;
+          }
+
+        inline int __attribute__((always_inline))
         printf (const char* format, ...)
           {
             return 0;
@@ -320,6 +339,9 @@ extern "C"
     inline ssize_t
     trace_write (const void* buf, size_t nbyte);
 
+    inline void
+    trace_flush (void);
+
     inline int
     trace_printf (const char* format, ...);
 
@@ -357,6 +379,13 @@ __attribute__((always_inline))
 trace_write (const void* buf, size_t nbyte)
   {
     return (ssize_t) (nbyte);
+  }
+
+inline int
+__attribute__((always_inline))
+trace_flush (void)
+  {
+    ;
   }
 
 #pragma GCC diagnostic pop
