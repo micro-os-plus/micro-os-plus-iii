@@ -285,7 +285,7 @@ namespace os
             return static_cast<ssize_t> (nbyte);
           }
 
-        inline int __attribute__((always_inline))
+        inline void __attribute__((always_inline))
         flush (void)
           {
             ;
@@ -381,7 +381,7 @@ trace_write (const void* buf, size_t nbyte)
     return (ssize_t) (nbyte);
   }
 
-inline int
+inline void
 __attribute__((always_inline))
 trace_flush (void)
   {
