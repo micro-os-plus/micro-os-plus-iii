@@ -58,7 +58,7 @@ extern "C"
 #endif
 
   /**
-   * @addtogroup cmsis-plus-rtos-c
+   * @addtogroup cmsis-plus-rtos-c-core
    * @{
    */
 
@@ -88,15 +88,21 @@ extern "C"
 
   /**
    * @brief Application entry point, running on the main thread context.
+   * @ingroup cmsis-plus-rtos-c
+   * @headerfile os.h <cmsis-plus/rtos/os-c-api.h>
    * @param argc Count of arguments.
    * @param argv Array of string arguments.
-   * @return 0 for success, non-zero for error.
+   * @retval 0 The program terminated normally.
+   * @retval 1 The program terminated with an error.
    *
    * @details
    * If the application does not define a main() function but defines
    * os_main(),
    * the CMSIS++ RTOS will automatically provide a main() function
    * that starts the main thread and calls os_main() within this context.
+   *
+   * The returned value is used in semihosted tests, to inform the
+   * host on the result of the test.
    */
   int
   os_main (int argc, char* argv[]);
@@ -255,7 +261,16 @@ extern "C"
    * @}
    */
 
+  /**
+   * @}
+   */
+
   // --------------------------------------------------------------------------
+  /**
+   * @addtogroup cmsis-plus-rtos-c-thread
+   * @{
+   */
+
   /**
    * @name Current thread functions
    * @{
@@ -489,7 +504,16 @@ extern "C"
    * @}
    */
 
+  /**
+   * @}
+   */
+
   // --------------------------------------------------------------------------
+  /**
+   * @addtogroup cmsis-plus-rtos-c-clock
+   * @{
+   */
+
   /**
    * @name Clock functions
    * @{
@@ -542,9 +566,6 @@ extern "C"
   os_result_t
   os_sysclock_wait_for (os_clock_duration_t duration);
 
-  os_clock_timestamp_t
-  os_sysclock_now_details (os_sysclock_current_t* details);
-
 #pragma GCC diagnostic push
 #if defined(__cplusplus)
 #pragma GCC diagnostic ignored "-Wold-style-cast"
@@ -574,7 +595,16 @@ extern "C"
    * @}
    */
 
+  /**
+   * @}
+   */
+
   // --------------------------------------------------------------------------
+  /**
+   * @addtogroup cmsis-plus-rtos-c-timer
+   * @{
+   */
+
   /**
    * @name Timer functions
    * @{
@@ -609,7 +639,16 @@ extern "C"
    * @}
    */
 
+  /**
+   * @}
+   */
+
   // --------------------------------------------------------------------------
+  /**
+   * @addtogroup cmsis-plus-rtos-c-mutex
+   * @{
+   */
+
   /**
    * @name Mutex functions
    * @{
@@ -666,7 +705,16 @@ extern "C"
    * @}
    */
 
+  /**
+   * @}
+   */
+
   // --------------------------------------------------------------------------
+  /**
+   * @addtogroup cmsis-plus-rtos-c-condvar
+   * @{
+   */
+
   /**
    * @name Condition variable functions
    * @{
@@ -702,7 +750,16 @@ extern "C"
    * @}
    */
 
+  /**
+   * @}
+   */
+
   // --------------------------------------------------------------------------
+  /**
+   * @addtogroup cmsis-plus-rtos-c-semaphore
+   * @{
+   */
+
   /**
    * @name Semaphore functions
    * @{
@@ -756,7 +813,16 @@ extern "C"
    * @}
    */
 
+  /**
+   * @}
+   */
+
   // --------------------------------------------------------------------------
+  /**
+   * @addtogroup cmsis-plus-rtos-c-mempool
+   * @{
+   */
+
   /**
    * @name Memory pool functions
    * @{
@@ -812,7 +878,16 @@ extern "C"
    * @}
    */
 
+  /**
+   * @}
+   */
+
   // --------------------------------------------------------------------------
+  /**
+   * @addtogroup cmsis-plus-rtos-c-mqueue
+   * @{
+   */
+
   /**
    * @name Message queue functions
    * @{
@@ -878,7 +953,16 @@ extern "C"
    * @}
    */
 
+  /**
+   * @}
+   */
+
   // --------------------------------------------------------------------------
+  /**
+   * @addtogroup cmsis-plus-rtos-c-evflag
+   * @{
+   */
+
   /**
    * @name Event flags functions
    * @{
@@ -925,33 +1009,15 @@ extern "C"
   bool
   os_evflags_are_waiting (os_evflags_t* evflags);
 
-  /**
-   * @}
-   */
-
-  // --------------------------------------------------------------------------
-  /**
-   * @name Clock handlers
-   * @{
-   */
-
-  // Internal functions, to be defined by the user.
-  // (not to be called directly).
-  void
-  os_systick_handler (void);
-
-  void
-  os_rtc_handler (void);
+/**
+ * @}
+ */
 
 /**
  * @}
  */
 
 // --------------------------------------------------------------------------
-/**
- * @}
- */
-
 #ifdef  __cplusplus
 }
 #endif

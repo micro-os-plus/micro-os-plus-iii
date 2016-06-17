@@ -49,7 +49,7 @@ namespace os
     /**
      * @brief Synchronised **event flags**.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-evflag
      */
     class event_flags : public named_object
     {

@@ -58,7 +58,7 @@ namespace os
      * @brief POSIX compliant **message queue**, using the
      * default RTOS allocator.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-mqueue
      */
     class message_queue : public named_object
     {
@@ -721,7 +721,7 @@ namespace os
     /**
      * @brief Template of a POSIX compliant **message queue** with allocator.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-mqueue
      */
     template<typename Allocator = memory::allocator<void*>>
       class message_queue_allocated : public message_queue
@@ -799,7 +799,7 @@ namespace os
      * @brief Template of a POSIX compliant **message queue** with
      * message type and allocator.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-mqueue
      */
     template<typename T, typename Allocator = memory::allocator<void*>>
       class message_queue_typed : public message_queue_allocated<Allocator>
@@ -1006,7 +1006,7 @@ namespace os
      * @brief Template of a POSIX compliant **message queue** with
      * message type and local storage.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-mqueue
      */
     template<typename T, std::size_t N>
       class message_queue_static : public message_queue

@@ -53,7 +53,7 @@ namespace os
     /**
      * @brief POSIX compliant **semaphore**.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-semaphore
      */
     class semaphore : public named_object
     {

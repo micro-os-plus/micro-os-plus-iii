@@ -46,7 +46,7 @@ namespace os
     /**
      * @brief POSIX compliant **condition variable**.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-condvar
      */
     class condition_variable : public named_object
     {

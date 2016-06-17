@@ -53,7 +53,7 @@ namespace os
     /**
      * @brief POSIX compliant **mutex**.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-mutex
      */
     class mutex : public named_object
     {

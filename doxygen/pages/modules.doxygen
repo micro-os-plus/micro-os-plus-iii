@@ -39,6 +39,7 @@
  TODO: add startup definitions.
  */
 
+// ----------------------------------------------------------------------------
 
 /**
  @defgroup cmsis-plus-rtos CMSIS++ RTOS C++ API
@@ -55,6 +56,78 @@
  */
 
 /**
+ @defgroup cmsis-plus-rtos-core Core & scheduler
+ @ingroup cmsis-plus-rtos
+ @brief  C++ API scheduler definitions.
+ @details
+ */
+
+/**
+ @defgroup cmsis-plus-rtos-thread Threads
+ @ingroup cmsis-plus-rtos
+ @brief  C++ API threads definitions.
+ @details
+ */
+
+/**
+ @defgroup cmsis-plus-rtos-clock Clocks
+ @ingroup cmsis-plus-rtos
+ @brief  C++ API clocks definitions.
+ @details
+ */
+
+/**
+ @defgroup cmsis-plus-rtos-condvar Condition variables
+ @ingroup cmsis-plus-rtos
+ @brief  C++ API condition variables definitions.
+ @details
+ */
+
+/**
+ @defgroup cmsis-plus-rtos-evflag Event flags
+ @ingroup cmsis-plus-rtos
+ @brief  C++ API event flags definitions.
+ @details
+ */
+
+/**
+ @defgroup cmsis-plus-rtos-mempool Memory pools
+ @ingroup cmsis-plus-rtos
+ @brief  C++ API memory pools definitions.
+ @details
+ */
+
+/**
+ @defgroup cmsis-plus-rtos-mqueue Message queues
+ @ingroup cmsis-plus-rtos
+ @brief  C++ API message queues definitions.
+ @details
+ */
+
+/**
+ @defgroup cmsis-plus-rtos-mutex Mutexes
+ @ingroup cmsis-plus-rtos
+ @brief  C++ API mutexes definitions.
+ @details
+ */
+
+/**
+ @defgroup cmsis-plus-rtos-semaphore Semaphores
+ @ingroup cmsis-plus-rtos
+ @brief  C++ API semaphores definitions.
+ @details
+ */
+
+/**
+ @defgroup cmsis-plus-rtos-timer Timers
+ @ingroup cmsis-plus-rtos
+ @brief  C++ API timers definitions.
+ @details
+ */
+
+// ----------------------------------------------------------------------------
+
+/**
  @defgroup cmsis-plus-rtos-c CMSIS++ RTOS C API
  @brief  CMSIS++ RTOS C API summary page.
  @details
@@ -67,6 +140,160 @@
  */
 
 /**
+ @defgroup cmsis-plus-rtos-c-core Core & scheduler
+ @ingroup cmsis-plus-rtos-c
+ @brief  C API scheduler definitions.
+ @details
+ */
+
+/**
+ @defgroup cmsis-plus-rtos-c-thread Threads
+ @ingroup cmsis-plus-rtos-c
+ @brief  C API thread definitions.
+ @details
+
+ @see os::rtos::thread
+ */
+
+/**
+ @defgroup cmsis-plus-rtos-c-clock Clocks
+ @ingroup cmsis-plus-rtos-c
+ @brief  C API clocks definitions.
+ @details
+
+ @see os::rtos::clock
+ */
+
+/**
+ @defgroup cmsis-plus-rtos-c-condvar Condition variables
+ @ingroup cmsis-plus-rtos-c
+ @brief  C API condition variable definitions.
+ @details
+
+ @see os::rtos::condition_variable
+ */
+
+/**
+ @defgroup cmsis-plus-rtos-c-evflag Event flags
+ @ingroup cmsis-plus-rtos-c
+ @brief  C API event flags definitions.
+ @details
+
+ @see os::rtos::event_flags
+ */
+
+/**
+ @defgroup cmsis-plus-rtos-c-mempool Memory pools
+ @ingroup cmsis-plus-rtos-c
+ @brief  C API memory pool definitions.
+ @details
+
+ @see os::rtos::memory_pool
+ */
+
+/**
+ @defgroup cmsis-plus-rtos-c-mqueue Message queues
+ @ingroup cmsis-plus-rtos-c
+ @brief  C API message queue definitions.
+ @details
+
+ @see os::rtos::message_queue
+ */
+
+/**
+ @defgroup cmsis-plus-rtos-c-mutex Mutexes
+ @ingroup cmsis-plus-rtos-c
+ @brief  C API mutex definitions.
+ @details
+
+ @see os::rtos::mutex
+ */
+
+/**
+ @defgroup cmsis-plus-rtos-c-semaphore Semaphores
+ @ingroup cmsis-plus-rtos-c
+ @brief  C API semaphore definitions.
+ @details
+
+ @see os::rtos::semaphore
+
+ @par Examples
+
+ @code{.cpp}
+    {
+      // Default counting semaphore.
+      os_semaphore_t sp1;
+      os_semaphore_create (&sp1, "sp1", NULL);
+
+      os_semaphore_post (&sp1);
+      os_semaphore_wait (&sp1);
+
+      os_semaphore_post (&sp1);
+      os_semaphore_try_wait (&sp1);
+
+      os_semaphore_post (&sp1);
+      os_semaphore_timed_wait (&sp1, 1);
+
+      os_semaphore_get_value (&sp1);
+
+      os_semaphore_get_initial_value (&sp1);
+
+      os_semaphore_reset (&sp1);
+
+      name = os_semaphore_get_name (&sp1);
+
+      os_semaphore_destroy (&sp1);
+    }
+
+    {
+      // Custom semaphore.
+      os_semaphore_attr_t asp2;
+      os_semaphore_attr_init (&asp2);
+
+      asp2.sm_initial_count = 3;
+      asp2.sm_max_count = 7;
+      asp2.clock = os_clock_get_rtclock ();
+
+      os_semaphore_t sp2;
+      os_semaphore_create (&sp2, "sp2", &asp2);
+
+      os_semaphore_destroy (&sp2);
+    }
+
+    {
+      // Binary semaphore.
+      os_semaphore_t sp3;
+      os_semaphore_create (&sp3, "sp3", os_semaphore_attr_get_binary ());
+
+      os_semaphore_destroy (&sp3);
+    }
+
+    {
+      // Custom binary semaphore.
+      os_semaphore_attr_t asp4;
+      os_semaphore_attr_init_binary (&asp4);
+      asp4.clock = os_clock_get_rtclock ();
+
+      os_semaphore_t sp4;
+      os_semaphore_create (&sp4, "sp4", &asp4);
+
+      os_semaphore_destroy (&sp4);
+    }
+ @endcode
+ */
+
+/**
+ @defgroup cmsis-plus-rtos-c-timer Timers
+ @ingroup cmsis-plus-rtos-c
+ @brief  C API timer definitions.
+ @details
+
+ @see os::rtos::timer
+ */
+
+// ----------------------------------------------------------------------------
+
+/**
  @defgroup cmsis-plus-iso CMSIS++ ISO Standard C++ Threads
  @brief  CMSIS++ ISO Threads summary page.
  @details
@@ -77,6 +304,8 @@
  the **C++ Standard ISO/IEC 14882:2011(E) Third edition (2011-09-01)**.
  */
 
+// ----------------------------------------------------------------------------
+
 /**
  @defgroup cmsis-plus-drivers CMSIS++ Drivers
  @brief  CMSIS++ Drivers summary page.
@@ -86,6 +315,8 @@
  TODO: add content
  */
 
+// ----------------------------------------------------------------------------
+
 /**
  @defgroup cmsis-plus-diag CMSIS++ Diag
  @brief  CMSIS++ Diagnostic & Trace summary page.
@@ -93,6 +324,8 @@
  This page groups the main classes providing support for 
  diagnostics. For example the `trace::printf()` functions are defined here.
  */
+
+// ----------------------------------------------------------------------------
 
 /**
  @defgroup cmsis-plus-posix-io CMSIS++ POSIX I/O

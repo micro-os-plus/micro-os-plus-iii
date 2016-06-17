@@ -54,7 +54,7 @@ namespace os
     /**
      * @brief Generic clock.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-clock
      */
     class clock : public named_object
     {
@@ -298,7 +298,7 @@ namespace os
     /**
      * @brief Adjustable (non-steady) clock.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-clock
      */
     class adjustable_clock : public clock
     {
@@ -426,7 +426,7 @@ namespace os
     /**
      * @brief SysTick derived clock.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-clock
      */
     class clock_systick : public clock
     {
@@ -544,7 +544,7 @@ namespace os
     /**
      * @brief The system clock.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-clock
      */
     extern clock_systick sysclock;
 
@@ -553,7 +553,7 @@ namespace os
     /**
      * @brief Real time clock.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-clock
      */
     class clock_rtc : public adjustable_clock
     {
@@ -656,7 +656,7 @@ namespace os
     /**
      * @brief The real time clock.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-clock
      */
     extern clock_rtc rtclock;
 
@@ -665,7 +665,7 @@ namespace os
     /**
      * @brief High Resolution derived clock.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-clock
      */
     class clock_highres : public clock
     {
@@ -749,7 +749,7 @@ namespace os
     /**
      * @brief The high resolution clock instance.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-clock
      */
     extern clock_highres hrclock;
 

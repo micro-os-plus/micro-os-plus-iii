@@ -203,7 +203,7 @@ namespace os
 
     /**
      * @brief Scheduler namespace.
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-core
      */
     namespace scheduler
     {
@@ -230,6 +230,7 @@ namespace os
 
     /**
      * @brief Statistics namespace.
+     * @ingroup cmsis-plus-rtos-core
      */
     namespace statistics
     {
@@ -247,6 +248,7 @@ namespace os
 
     /**
      * @brief Interrupts namespace.
+     * @ingroup cmsis-plus-rtos-core
      */
     namespace interrupts
     {
@@ -267,6 +269,7 @@ namespace os
 
     /**
      * @brief Generic flags namespace.
+     * @ingroup cmsis-plus-rtos-core
      * @details
      * The os::rtos::flags namespace groups event types and enumerations.
      */
@@ -279,7 +282,6 @@ namespace os
        * 32-bits wide.
        *
        * Both thread signal flags and event flags use this definition.
-       * @ingroup cmsis-plus-rtos
        */
       using mask_t = uint32_t;
 
@@ -290,7 +292,6 @@ namespace os
        * functions returning flags.
        *
        * Both thread signal flags and event flags use this definition.
-       * @ingroup cmsis-plus-rtos
        */
       using mode_t = uint32_t;
 
@@ -303,7 +304,6 @@ namespace os
       {
         /**
          * @brief Bits used to specify the flags mode.
-         * @ingroup cmsis-plus-rtos
          */
         enum
           : mode_t
@@ -328,7 +328,7 @@ namespace os
 
     /**
      * @brief A convenience namespace to access the current running thread.
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-thread
      */
     namespace this_thread
     {
@@ -786,20 +786,9 @@ extern "C"
 {
 
   /**
-   * @brief Main thread.
-   * @headerfile os.h <cmsis-plus/rtos/os.h>
-   * @ingroup cmsis-plus-rtos
-   * @param argc Count of arguments.
-   * @param argv Array of pointers to arguments.
-   * @retval 0 The proram terminated normally.
-   * @retval 1 The program terminated with an error.
-   *
-   * @details
-   * The standard `main()` creates a dedicated thread to run this function.
-   *
-   * The returned value is used in semihosted tests, to inform the
-   * host on the result of the test.
+   * @cond ignore
    */
+
   int
   os_main (int argc, char* argv[]);
 
@@ -819,6 +808,11 @@ extern "C"
     char dummy;
   } os_thread_user_storage_t;
 #endif
+
+/**
+ * @endcond
+ */
+
 }
 
 // ----------------------------------------------------------------------------

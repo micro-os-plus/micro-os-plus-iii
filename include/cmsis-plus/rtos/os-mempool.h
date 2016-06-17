@@ -58,7 +58,7 @@ namespace os
      * @brief Synchronised **memory pool**, using the
      * default RTOS allocator.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-mempool
      */
     class memory_pool : public named_object
     {
@@ -528,7 +528,7 @@ namespace os
     /**
      * @brief Template of a synchronised **memory pool** with allocator.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-mempool
      */
     template<typename Allocator = memory::allocator<void*>>
       class memory_pool_allocated : public memory_pool
@@ -604,7 +604,7 @@ namespace os
      * @brief Template of a synchronised **memory pool** with
      * block type and allocator.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-mempool
      */
     template<typename T, typename Allocator = memory::allocator<void*>>
       class memory_pool_typed : public memory_pool_allocated<Allocator>
@@ -730,7 +730,7 @@ namespace os
      * @brief Template of a synchronised **memory pool** with
      * block type and local storage.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-mempool
      */
     template<typename T, std::size_t N>
       class memory_pool_static : public memory_pool

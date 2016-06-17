@@ -110,10 +110,23 @@ namespace os
     namespace scheduler
     {
       /**
+       * @cond ignore
+       */
+
+      /**
        * @brief Head of the list with all top level and detached threads.
        */
       extern thread::threads_list top_threads_list_;
 
+      /**
+       * @endcond
+       */
+
+      /**
+       * @brief Get the children threads.
+       * @param [in] th Pointer to thread or nullptr.
+       * @return Reference to children list.
+       */
       thread::threads_list&
       children_threads (thread* th);
 

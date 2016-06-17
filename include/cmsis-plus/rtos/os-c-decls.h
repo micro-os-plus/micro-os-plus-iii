@@ -59,9 +59,7 @@ extern "C"
 {
 #endif
 
-  // --------------------------------------------------------------------------
-
-  typedef uint32_t os_result_t;
+  // ==========================================================================
 
   typedef struct os_double_list_links_s
   {
@@ -82,6 +80,18 @@ extern "C"
     void* thread;
   } os_waiting_thread_node_t;
 
+  typedef struct os_clock_timestamps_list_s
+  {
+    os_double_list_links_t links;
+  } os_clock_timestamps_list_t;
+
+  /**
+   * @addtogroup cmsis-plus-rtos-c-core
+   * @{
+   */
+
+  typedef uint32_t os_result_t;
+
   typedef uint32_t os_flags_mode_t;
   typedef uint32_t os_flags_mask_t;
 
@@ -92,17 +102,37 @@ extern "C"
     os_flags_mode_clear = 4, //
   };
 
-  typedef struct os_clock_timestamps_list_s
-  {
-    os_double_list_links_t links;
-  } os_clock_timestamps_list_t;
-
   // --------------------------------------------------------------------------
 
   typedef bool os_sched_status_t;
   typedef os_port_irq_status_t os_irq_status_t;
 
   // --------------------------------------------------------------------------
+
+  // Define clock types based on port definitions.
+  typedef os_port_clock_timestamp_t os_clock_timestamp_t;
+  typedef os_port_clock_duration_t os_clock_duration_t;
+  typedef os_port_clock_offset_t os_clock_offset_t;
+
+  // --------------------------------------------------------------------------
+
+  // Generic iterator, implemented as a pointer.
+  typedef void* os_iterator_t;
+
+  // --------------------------------------------------------------------------
+
+  typedef uint64_t os_statistics_counter_t;
+  typedef uint64_t os_statistics_duration_t;
+
+  /**
+   * @}
+   */
+
+  // ==========================================================================
+  /**
+   * @addtogroup cmsis-plus-rtos-c-thread
+   * @{
+   */
 
 #define OS_THREAD_PRIO_SHIFT   (4)
 
@@ -150,23 +180,6 @@ extern "C"
       char dummy;
     }os_thread_user_storage_t;
 #endif
-
-  // --------------------------------------------------------------------------
-
-  // Define clock types based on port definitions.
-  typedef os_port_clock_timestamp_t os_clock_timestamp_t;
-  typedef os_port_clock_duration_t os_clock_duration_t;
-  typedef os_port_clock_offset_t os_clock_offset_t;
-
-  // --------------------------------------------------------------------------
-
-  // Generic iterator, implemented as a pointer.
-  typedef void* os_iterator_t;
-
-  // --------------------------------------------------------------------------
-
-  typedef uint64_t os_statistics_counter_t;
-  typedef uint64_t os_statistics_duration_t;
 
   // --------------------------------------------------------------------------
 
@@ -250,7 +263,15 @@ extern "C"
 
 #pragma GCC diagnostic pop
 
-  // --------------------------------------------------------------------------
+  /**
+   * @}
+   */
+
+  // ==========================================================================
+  /**
+   * @addtogroup cmsis-plus-rtos-c-clock
+   * @{
+   */
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -265,17 +286,17 @@ extern "C"
 
   } os_clock_t;
 
-  typedef struct os_sysclock_current_s
-  {
-    uint64_t ticks; // Count of SysTick ticks since core reset
-    uint32_t cycles; // Count of SysTick cycles since timer reload (24 bits)
-    uint32_t divisor; // SysTick reload value (24 bits)
-    uint32_t core_frequency_hz; // Core clock frequency Hz
-  } os_sysclock_current_t;
-
 #pragma GCC diagnostic pop
 
-  // --------------------------------------------------------------------------
+  /**
+   * @}
+   */
+
+  // ==========================================================================
+  /**
+   * @addtogroup cmsis-plus-rtos-c-timer
+   * @{
+   */
 
   typedef void* os_timer_func_args_t;
   typedef void
@@ -328,12 +349,20 @@ extern "C"
 
 #pragma GCC diagnostic pop
 
-  // --------------------------------------------------------------------------
+  /**
+   * @}
+   */
 
+  // ==========================================================================
   typedef int16_t os_mutex_count_t;
   typedef uint8_t os_mutex_type_t;
   typedef uint8_t os_mutex_protocol_t;
   typedef uint8_t os_mutex_robustness_t;
+
+  /**
+   * @addtogroup cmsis-plus-rtos-c-mutex
+   * @{
+   */
 
   enum
   {
@@ -394,7 +423,15 @@ extern "C"
 
 #pragma GCC diagnostic pop
 
-  // --------------------------------------------------------------------------
+  /**
+   * @}
+   */
+
+  // ==========================================================================
+  /**
+   * @addtogroup cmsis-plus-rtos-c-condvar
+   * @{
+   */
 
   typedef struct os_condvar_attr_s
   {
@@ -410,7 +447,15 @@ extern "C"
 #endif
   } os_condvar_t;
 
-  // --------------------------------------------------------------------------
+  /**
+   * @}
+   */
+
+  // ==========================================================================
+  /**
+   * @addtogroup cmsis-plus-rtos-c-semaphore
+   * @{
+   */
 
   typedef int16_t os_semaphore_count_t;
 
@@ -441,9 +486,17 @@ extern "C"
 
 #pragma GCC diagnostic pop
 
-  // --------------------------------------------------------------------------
+  /**
+   * @}
+   */
 
+  // ==========================================================================
   typedef uint16_t os_mempool_size_t;
+
+  /**
+   * @addtogroup cmsis-plus-rtos-c-mempool
+   * @{
+   */
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -479,12 +532,21 @@ extern "C"
 
 #pragma GCC diagnostic pop
 
-  // --------------------------------------------------------------------------
+  /**
+   * @}
+   */
 
+  // ==========================================================================
   typedef uint8_t os_mqueue_size_t;
   typedef uint16_t os_mqueue_msg_size_t;
-  typedef uint8_t os_mqueue_prio_t;
   typedef os_mqueue_size_t os_mqueue_index_t;
+
+  /**
+   * @addtogroup cmsis-plus-rtos-c-mqueue
+   * @{
+   */
+
+  typedef uint8_t os_mqueue_prio_t;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -532,7 +594,15 @@ extern "C"
 
 #pragma GCC diagnostic pop
 
-  // --------------------------------------------------------------------------
+  /**
+   * @}
+   */
+
+  // ==========================================================================
+  /**
+   * @addtogroup cmsis-plus-rtos-c-evflag
+   * @{
+   */
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -559,32 +629,50 @@ extern "C"
 
 #pragma GCC diagnostic pop
 
-  // --------------------------------------------------------------------------
+  /**
+   * @}
+   */
 
+  // ==========================================================================
   typedef struct os_mail_queue_s
   {
     os_mempool_t pool;
     os_mqueue_t queue;
   } os_mail_queue_t;
 
-  // --------------------------------------------------------------------------
+  // ==========================================================================
+
+  /**
+   * @addtogroup cmsis-plus-rtos-c-clock
+   * @{
+   */
+
+  /**
+   * @name Clock handlers
+   * @{
+   */
 
   /**
    * @brief SysTick interrupt handler.
-   * @ingroup cmsis-plus-rtos
    */
   void
   os_systick_handler (void);
 
   /**
    * @brief RTC interrupt handler.
-   * @ingroup cmsis-plus-rtos
    */
   void
   os_rtc_handler (void);
 
-// ----------------------------------------------------------------------------
+/**
+ * @}
+ */
 
+/**
+ * @}
+ */
+
+// ============================================================================
 #ifdef  __cplusplus
 }
 #endif

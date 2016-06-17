@@ -53,7 +53,7 @@ namespace os
     /**
      * @brief User single-shot or periodic **timer**.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-timer
      */
     class timer : public named_object
     {

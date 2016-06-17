@@ -48,6 +48,7 @@ namespace os
   {
     namespace scheduler
     {
+
       /**
        * @cond ignore
        */
@@ -141,8 +142,16 @@ namespace os
 
       // ----------------------------------------------------------------------
 
+      /**
+       * @cond ignore
+       */
+
       void
       _switch_threads (void);
+
+      /**
+       * @endcond
+       */
 
       // ======================================================================
       /**
@@ -446,7 +455,6 @@ namespace os
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
 
       } /* namespace statistics */
-
     } /* namespace scheduler */
 
     namespace interrupts
