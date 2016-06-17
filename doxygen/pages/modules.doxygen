@@ -108,18 +108,43 @@
  @defgroup cmsis-plus-app-config CMSIS++ App Config
  @brief  CMSIS++ application configuration definitions.
  @details
- This page groups the preprocessor definitions used to configure
- a CMSIS++ application.
+ Applications using CMSIS++ can be configured during 
+ build time using
+ several proprocessor definitions, grouped in a header file 
+ named `<cmsis-plus/os-app-config.h>`.
+
+ There are two kinds of definitions:
+
+ - definitions with values (`OS_INTEGER_*`, `OS_BOOL_*`, `OS_STRING_*`, ...);
+ for these definitions the value should be appropriate to be used 
+ in an expression of the given type; to avoid misunderstandings,
+ parenthesis are recommended;
+ - definitions without values (`OS_INCLUDE_*`, `OS_EXCLUDE_*`, `OS_USE_*`, 
+ `OS_TRACE_*`, ...); for these definitions only the presence should be tested;
+ the value, if present, should be completely ignored.
+ 
  */
 
 /**
- @defgroup cmsis-plus-app-config-port Port components selections
+ @defgroup cmsis-plus-app-config-cmdline Command line options
  @ingroup cmsis-plus-app-config
- @brief  Definitions used to select various port components.
+ @brief  Definitions passed via the compiler command line.
  @details
- This page groups the preprocessor definitions used to select
- different components from a CMSIS++ port, like whether to use
- the port scheduler or the CMSIS++ reference scheduler.
+ Major configuration options should be passed via the
+ compiler command line.
+
+ */
+
+/**
+ @defgroup cmsis-plus-app-config-port Select custom implementations
+ @ingroup cmsis-plus-app-config
+ @brief  Definitions used to select various custom port implementations.
+ @details
+ The CMSIS++ RTOS API can be configured to run on top of another
+ RTOS scheduler (like FreeRTOS). It is also possible to select
+ each synchronisation objects to use either the custom port objects or
+ the CMSIS++ reference C++ implementations.
+
  */
 
 /**
@@ -127,6 +152,6 @@
  @ingroup cmsis-plus-app-config
  @brief  Definitions used to configure the trace channel.
  @details
- This page groups the preprocessor definitions used to configure
- the trace channel used to display debug messages.
+ In addition to the global `TRACE` definition, it is possible to
+ enable individual groups of messages, using separate definitions.
  */

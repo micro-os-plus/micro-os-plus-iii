@@ -6,6 +6,52 @@
  */
 
 /**
+ * @ingroup cmsis-plus-app-config-cmdline
+ * @{
+ */
+
+/**
+ * @brief Enable debug support.
+ * @details
+ * This definition must always be used in **debug** configurations.
+ */
+#define DEBUG
+
+/**
+ * @brief Enable trace support.
+ * @details
+ * This definition can be used to enable trace support. Without
+ * this definition, all trace calls are inlined to empty statements.
+ *
+ * It is recommended to use `TRACE` in **debug** configurations.
+ */
+#define TRACE
+
+/**
+ * @brief Disable assert support.
+ * @details
+ * This is the standard ISO/ANSI definition used to
+ * disable all `assert()` statements. Without this definition
+ * all `assert()` statements are active, regardless of the presence
+ * or absence of the `DEBUG` definition.
+ *
+ * Assertions are a very valuable mechanism to detect out-of-range
+ * conditions, usually in debug configurations, but might add a
+ * significant overhead in code size, and a certain overhead in
+ * execution time.
+ *
+ * It is recommended to always use `NDEBUG` in **release**
+ * configurations.
+ */
+#define NDEBUG
+
+/**
+ * @} End of ingroup cmsis-plus-app-config-cmdline
+ */
+
+// ----------------------------------------------------------------------------
+
+/**
  * @ingroup cmsis-plus-app-config
  * @{
  */
@@ -67,15 +113,15 @@
  * @par Default
  * Disable. Do not include context switches statistics.
  */
-#define OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES (1)
+#define OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES
 
-#define OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE (1)
+#define OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE
 
-#define OS_BOOL_RTOS_MESSAGE_QUEUE_SIZE_16BITS
+#define OS_BOOL_RTOS_MESSAGE_QUEUE_SIZE_16BITS  (true)
 
-#define OS_BOOL_RTOS_THREAD_IDLE_PRIORITY_BELOW_IDLE
+#define OS_BOOL_RTOS_THREAD_IDLE_PRIORITY_BELOW_IDLE (true)
 
-#define OS_BOOL_RTOS_PORT_CONTEX_CREATE_ZERO_LR
+#define OS_BOOL_RTOS_PORT_CONTEX_CREATE_ZERO_LR (true)
 
 #define OS_INCLUDE_STANDARD_POSIX_FUNCTIONS
 #define OS_INCLUDE_NEWLIB_POSIX_FUNCTIONS
@@ -84,7 +130,7 @@
 
 #define OS_INCLUDE_STARTUP_INIT_MULTIPLE_RAM_SECTIONS
 
-#define OS_INCLUDE_STARTUP_GUARD_CHECKS (1)
+#define OS_INCLUDE_STARTUP_GUARD_CHECKS
 
 #define OS_INTEGER_ATEXIT_ARRAY_SIZE (3)
 
@@ -103,16 +149,50 @@
  * @{
  */
 
-#define OS_USE_RTOS_PORT_SCHEDULER (1)
+/**
+ * @brief Use a custom scheduler implementation.
+ * @details
+ * When using a CMSIS++ port that runs on top of another RTOS,
+ * this option disables the CMSIS++ reference
+ * scheduler and forwards all related calls to the custom
+ * implementation RTOS.
+ *
+ * The default is to use the CMSIS++ reference scheduler.
+ */
+#define OS_USE_RTOS_PORT_SCHEDULER
 
-#define OS_USE_RTOS_PORT_CONDITION_VARIABLE (1)
-#define OS_USE_RTOS_PORT_EVENT_FLAGS                    (1)
-#define OS_USE_RTOS_PORT_MESSAGE_QUEUE                  (1)
-#define OS_USE_RTOS_PORT_MUTEX                          (1)
-#define OS_USE_RTOS_PORT_SEMAPHORE                      (1)
-#define OS_USE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR        (1)
-#define OS_USE_RTOS_PORT_REALTIME_CLOCK_SLEEP_FOR       (1)
-#define OS_USE_RTOS_PORT_TIMER                          (1)
+/**
+ * @brief Use a custom condition variable implementation.
+ */
+#define OS_USE_RTOS_PORT_CONDITION_VARIABLE
+/**
+ * @brief Use a custom event flags implementation.
+ */
+#define OS_USE_RTOS_PORT_EVENT_FLAGS
+/**
+ * @brief Use a custom message queue implementation.
+ */
+#define OS_USE_RTOS_PORT_MESSAGE_QUEUE
+/**
+ * @brief Use a custom mutex implementation.
+ */
+#define OS_USE_RTOS_PORT_MUTEX
+/**
+ * @brief Use a custom semaphore implementation.
+ */
+#define OS_USE_RTOS_PORT_SEMAPHORE
+/**
+ * @brief Use a custom system tick sleep_for() implementation.
+ */
+#define OS_USE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR
+/**
+ * @brief Use a custom real time sleep_for() implementation.
+ */
+#define OS_USE_RTOS_PORT_REALTIME_CLOCK_SLEEP_FOR
+/**
+ * @brief Use a custom timer implementation.
+ */
+#define OS_USE_RTOS_PORT_TIMER
 
 /**
  * @} End of ingroup cmsis-plus-app-config-port
