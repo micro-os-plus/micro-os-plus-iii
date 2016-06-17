@@ -30,6 +30,9 @@
 // ----------------------------------------------------------------------------
 
 #if defined(TRACE)
+
+#include <cmsis-plus/os-app-config.h>
+
 #if defined(OS_USE_TRACE_SEMIHOSTING_DEBUG) || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT)
 
 #include <cmsis-plus/diag/trace.h>

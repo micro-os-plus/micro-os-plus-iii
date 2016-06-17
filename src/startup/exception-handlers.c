@@ -29,6 +29,8 @@
 
 // ----------------------------------------------------------------------------
 
+#include <cmsis-plus/os-app-config.h>
+
 #include <cmsis_device.h>
 #include <cmsis-plus/arm/semihosting.h>
 #include <cmsis-plus/diag/trace.h>

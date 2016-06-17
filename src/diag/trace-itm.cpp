@@ -30,6 +30,9 @@
 // ----------------------------------------------------------------------------
 
 #if defined(TRACE)
+
+#include <cmsis-plus/os-app-config.h>
+
 #if defined(OS_USE_TRACE_ITM)
 
 #include <cmsis-plus/diag/trace.h>

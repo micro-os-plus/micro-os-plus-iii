@@ -29,6 +29,8 @@
 
 // ----------------------------------------------------------------------------
 
+#include <cmsis-plus/os-app-config.h>
+
 #if defined(OS_USE_SEMIHOSTING)
 
 #include <cmsis-plus/arm/semihosting.h>

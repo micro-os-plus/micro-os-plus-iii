@@ -29,6 +29,8 @@
 
 // ----------------------------------------------------------------------------
 
+#include <cmsis-plus/os-app-config.h>
+
 #include <cmsis-plus/diag/trace.h>
 
 #include <stdint.h>
