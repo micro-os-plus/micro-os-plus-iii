@@ -191,3 +191,7 @@ td.memTemplParams, div.memtemplate {
 	font-family: Consolas, "Liberation Mono", Menlo, Courier, monospace;
 	font-size: 85%;
 }
+
+td.entry span.arrow {
+	height: inherit;
+}
