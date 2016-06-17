@@ -64,7 +64,7 @@
 // ----------------------------------------------------------------------------
 
 #if !defined(OS_INCLUDE_STARTUP_GUARD_CHECKS)
-#define OS_INCLUDE_STARTUP_GUARD_CHECKS (1)
+#define OS_BOOL_STARTUP_GUARD_CHECKS (true)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -214,7 +214,7 @@ os_run_fini_array (void)
   //_fini(); // DO NOT ENABLE THIS!
 }
 
-#if defined(DEBUG) && (OS_INCLUDE_STARTUP_GUARD_CHECKS)
+#if defined(DEBUG) && (OS_BOOL_STARTUP_GUARD_CHECKS)
 
 // These definitions are used to check if the routines used to
 // clear the BSS and to copy the initialised DATA perform correctly.
@@ -236,7 +236,7 @@ __data_begin_guard = DATA_BEGIN_GUARD_VALUE;
 static uint32_t volatile __attribute__ ((section(".data_end")))
 __data_end_guard = DATA_END_GUARD_VALUE;
 
-#endif // defined(DEBUG) && (OS_INCLUDE_STARTUP_GUARD_CHECKS)
+#endif // defined(DEBUG) && (OS_BOOL_STARTUP_GUARD_CHECKS)
 
 // This is the place where Cortex-M core will go immediately after reset,
 // via a call or jump from the Reset_Handler.
@@ -263,7 +263,7 @@ _start (void)
   // Use Old Style DATA and BSS section initialisation,
   // that will manage a single BSS sections.
 
-#if defined(DEBUG) && (OS_INCLUDE_STARTUP_GUARD_CHECKS)
+#if defined(DEBUG) && (OS_BOOL_STARTUP_GUARD_CHECKS)
   __data_begin_guard = DATA_GUARD_BAD_VALUE;
   __data_end_guard = DATA_GUARD_BAD_VALUE;
 #endif
@@ -286,7 +286,7 @@ _start (void)
 
 #endif
 
-#if defined(DEBUG) && (OS_INCLUDE_STARTUP_GUARD_CHECKS)
+#if defined(DEBUG) && (OS_BOOL_STARTUP_GUARD_CHECKS)
   if ((__data_begin_guard != DATA_BEGIN_GUARD_VALUE)
       || (__data_end_guard != DATA_END_GUARD_VALUE))
     {
@@ -295,7 +295,7 @@ _start (void)
     }
 #endif
 
-#if defined(DEBUG) && (OS_INCLUDE_STARTUP_GUARD_CHECKS)
+#if defined(DEBUG) && (OS_BOOL_STARTUP_GUARD_CHECKS)
   __bss_begin_guard = BSS_GUARD_BAD_VALUE;
   __bss_end_guard = BSS_GUARD_BAD_VALUE;
 #endif
@@ -315,7 +315,7 @@ _start (void)
     }
 #endif
 
-#if defined(DEBUG) && (OS_INCLUDE_STARTUP_GUARD_CHECKS)
+#if defined(DEBUG) && (OS_BOOL_STARTUP_GUARD_CHECKS)
   if ((__bss_begin_guard != 0) || (__bss_end_guard != 0))
     {
       while (1)
