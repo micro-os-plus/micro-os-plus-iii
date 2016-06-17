@@ -95,11 +95,11 @@ namespace os
        */
 
       /**
-       * @brief Implementation of the library `__error()` function.
+       * @brief Implementation of the library `__errno()` function.
        * @return Pointer to thread specific `errno`.
        */
       int*
-      error (void);
+      __errno (void);
 
     } /* namespace this_thread */
 
@@ -118,7 +118,7 @@ namespace os
      * @brief POSIX compliant **thread**, using the
      * default RTOS allocator.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-thread
      */
     class thread : public named_object
     {
@@ -134,7 +134,7 @@ namespace os
        * usually an unsigned 8-bits type.
        *
        * Higher values represent higher priorities.
-       * @ingroup cmsis-plus-rtos
+       * @ingroup cmsis-plus-rtos-thread
        */
       using priority_t = uint8_t;
 
@@ -143,7 +143,7 @@ namespace os
        * @details
        * The os::rtos::thread::priority definition is a container for
        * priorities not restricted to an enumeration.
-       * @ingroup cmsis-plus-rtos
+       * @ingroup cmsis-plus-rtos-thread
        */
       struct priority
       {
@@ -160,13 +160,12 @@ namespace os
          * 0 gives 16 priorities,
          * 1 gives 32 priorities, 2 gives 64 priorities, 3 gives 128
          * priorities.
-         * @ingroup cmsis-plus-rtos
          */
         static constexpr uint32_t range = 4;
 
         /**
          * @brief Thread priorities; intermediate values are also possible.
-         * @ingroup cmsis-plus-rtos
+         * @ingroup cmsis-plus-rtos-thread
          */
         enum
           : priority_t
@@ -1129,7 +1128,7 @@ namespace os
                                    clock::duration_t timeout,
                                    flags::mask_t* oflags, flags::mode_t mode);
       friend int*
-      this_thread::error (void);
+      this_thread::__errno (void);
 
       friend void
       scheduler::_link_node (waiting_threads_list& list,
@@ -1443,7 +1442,7 @@ namespace os
     /**
      * @brief Template of a POSIX compliant **thread** with allocator.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-thread
      */
     template<typename Allocator = memory::allocator<void*>>
       class thread_allocated : public thread
@@ -1535,7 +1534,7 @@ namespace os
     /**
      * @brief Template of a POSIX compliant **thread** with local stack.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
-     * @ingroup cmsis-plus-rtos
+     * @ingroup cmsis-plus-rtos-thread
      */
     template<std::size_t N = port::stack::default_size_bytes>
       class thread_static : public thread
@@ -1909,12 +1908,12 @@ namespace os
        * The actual C library function, used by newlib,
        * is in `os-core.cpp`.
        *
-       * @see __error()
+       * @see __errno()
        *
        */
       inline int*
       __attribute__ ((always_inline))
-      error (void)
+      __errno (void)
       {
         return &this_thread::thread ().errno_;
       }

@@ -249,6 +249,11 @@ namespace os
           }
       }
 
+      /**
+       * @details
+       * If the input pointer is nullptr, the function returns the
+       * list of top level threads.
+       */
       thread::threads_list&
       children_threads (thread* th)
       {
@@ -586,11 +591,16 @@ namespace os
 } /* namespace os */
 
 int*
-__error (void);
+__errno (void);
+
+/**
+ * @name errno getter/setter.
+ * @{
+ */
 
 /**
  * @brief Per-thread error support.
- * @ingroup cmsis-plus-rtos
+ * @ingroup cmsis-plus-rtos-c
  * @details
  * Standard C libraries define `errno` as a macro to a function returning
  * a pointer. This function returns such a pointer, specific to each
@@ -598,7 +608,11 @@ __error (void);
  * @return Pointer to per-thread errno value.
  */
 int*
-__error (void)
+__errno (void)
 {
-  return os::rtos::this_thread::error ();
+  return os::rtos::this_thread::__errno ();
 }
+
+/**
+ * @}
+ */
