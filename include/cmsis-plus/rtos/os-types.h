@@ -33,7 +33,7 @@
 #if defined(__cplusplus)
 
 // Include the application specific definitions.
-#include <cmsis-plus/rtos/os-app-config.h>
+#include <cmsis-plus/os-app-config.h>
 
 namespace os
 {

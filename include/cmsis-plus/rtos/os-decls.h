@@ -44,7 +44,7 @@
 #define OS_USE_CMSIS_PLUS
 
 // Include the application specific definitions.
-#include <cmsis-plus/rtos/os-app-config.h>
+#include <cmsis-plus/os-app-config.h>
 // Include the non-portable portable types, enums and constants declarations.
 #include <cmsis-plus/rtos/port/os-decls.h>
 

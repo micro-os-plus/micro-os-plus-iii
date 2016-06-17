@@ -42,7 +42,7 @@
 
 // ----------------------------------------------------------------------------
 
-#include <cmsis-plus/rtos/os-app-config.h>
+#include <cmsis-plus/os-app-config.h>
 #include <cmsis-plus/rtos/port/os-decls.h>
 
 #include <stdint.h>
