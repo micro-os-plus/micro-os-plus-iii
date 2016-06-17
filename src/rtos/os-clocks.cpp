@@ -54,7 +54,7 @@ os_systick_handler (void)
     }
 #endif
 
-#if defined(OS_TRACE_RTOS_SYSTICK_TICK)
+#if defined(OS_TRACE_RTOS_SYSCLOCK_TICK)
   trace::putchar ('.');
 #endif
 
@@ -81,7 +81,7 @@ os_systick_handler (void)
 
 #endif
 
-#if defined(OS_TRACE_RTOS_SYSTICK_TICK)
+#if defined(OS_TRACE_RTOS_SYSCLOCK_TICK)
   trace::putchar (',');
 #endif
 }

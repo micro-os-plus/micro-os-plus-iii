@@ -72,7 +72,7 @@
 #define OS_TRACE_RTOS_RTC_TICK
 #define OS_TRACE_RTOS_SCHEDULER
 #define OS_TRACE_RTOS_SEMAPHORE
-#define OS_TRACE_RTOS_SYSTICK_TICK
+#define OS_TRACE_RTOS_SYSCLOCK_TICK
 #define OS_TRACE_RTOS_THREAD
 #define OS_TRACE_RTOS_THREAD_CONTEXT
 #define OS_TRACE_RTOS_THREAD_SIG
@@ -89,7 +89,7 @@
 #define OS_TRACE_LIBC_MALLOC
 #endif
 #define OS_TRACE_RTOS_RTC_TICK
-//#define OS_TRACE_RTOS_SYSTICK_TICK
+//#define OS_TRACE_RTOS_SYSCLOCK_TICK
 
 // ----------------------------------------------------------------------------
 

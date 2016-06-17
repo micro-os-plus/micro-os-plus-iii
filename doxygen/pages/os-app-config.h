@@ -520,7 +520,7 @@
 /**
  * @brief Display a dot and a comma for each system clock tick.
  */
-#define OS_TRACE_RTOS_SYSTICK_TICK
+#define OS_TRACE_RTOS_SYSCLOCK_TICK
 /**
  * @brief Enable trace messages for RTOS thread functions.
  */

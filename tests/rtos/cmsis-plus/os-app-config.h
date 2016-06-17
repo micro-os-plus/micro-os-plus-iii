@@ -97,7 +97,7 @@
 #define OS_TRACE_LIBC_ATEXIT
 
 #if !defined(__ARM_EABI__) || defined(OS_USE_TRACE_SEGGER_RTT)
-#define OS_TRACE_RTOS_SYSTICK_TICK
+#define OS_TRACE_RTOS_SYSCLOCK_TICK
 #define OS_TRACE_RTOS_LISTS
 #define OS_TRACE_RTOS_THREAD_CONTEXT
 #endif
@@ -110,7 +110,7 @@
 #endif
 
 #define OS_TRACE_RTOS_RTC_TICK
-//#define OS_TRACE_RTOS_SYSTICK_TICK
+//#define OS_TRACE_RTOS_SYSCLOCK_TICK
 
 // ----------------------------------------------------------------------------
 
