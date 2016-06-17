@@ -211,7 +211,7 @@
  * @par Default
  *  False (the stack trace starts with the first function).
  */
-#define OS_BOOL_RTOS_PORT_CONTEX_CREATE_ZERO_LR (false)
+#define OS_BOOL_RTOS_PORT_CONTEXT_CREATE_ZERO_LR (false)
 
 /**
  * @brief Do not enter sleep in the idle thread.
