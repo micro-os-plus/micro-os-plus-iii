@@ -50,7 +50,7 @@
 
 
 #if defined(OS_USE_TRACE_SEGGER_RTT)
-#define OS_EXCLUDE_RTOS_IDLE_WFI (1)
+#define OS_EXCLUDE_RTOS_IDLE_SLEEP (1)
 #endif
 
 #endif /* defined(__ARM_EABI__) */

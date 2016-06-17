@@ -227,7 +227,7 @@
  * To prevent this, usually for the debug configurations,
  * it is possible to exclude the code that puts the device to sleep.
  */
-#define OS_EXCLUDE_RTOS_IDLE_WFI
+#define OS_EXCLUDE_RTOS_IDLE_SLEEP
 
 /**
  * @}
