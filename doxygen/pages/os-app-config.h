@@ -2,7 +2,13 @@
  * @file
  * @brief Application configuration file.
  * @details
- * Many details.
+ * The `<cmsis-plus/os-ap-config.h>` header file is used to configure
+ * all build
+ * options available for CMSIS++ applications.
+ *
+ * Each application should provide such a configuration file
+ * in the compiler include path, even if there are no
+ * specific definitions.
  */
 
 /**
@@ -46,28 +52,70 @@
 #define NDEBUG
 
 /**
- * @} End of ingroup cmsis-plus-app-config-cmdline
+ * @}
  */
 
 // ----------------------------------------------------------------------------
 
 /**
- * @ingroup cmsis-plus-app-config
+ * @ingroup cmsis-plus-app-config-rtos
  * @{
  */
 
 /**
- * @brief Scheduler frequency.
+ * @brief Define the scheduler frequency, in Hz.
+ * @par Default
+ * 1000.
  */
 #define OS_INTEGER_SYSTICK_FREQUENCY_HZ (1000)
 
 /**
- * @brief For Cortex-M[347], interrupt priority level.
+ * @brief For Cortex-M[347], define the interrupt priority level.
+ * @details
+ * Simple devices implement critical sections by disabling/enabling
+ * all interrupts. Cortex-M[347] devices can selectively disable
+ * interrupts up to a given priority (by using the BASEPRI register).
+ *
+ * When used, this option configures the critical sections to disable all
+ * interrupts with priorities up to the given value
+ * and keep enabled interrupts with higher priorities.
+ *
+ * @note
+ * Considering the confusing ARM priority scheme, this means priorities
+ * with a numeric value higher or equal the given value will be
+ * disabled and priorities with a numeric value lower thant he given
+ * value will remain enabled.
+ *
+ * @warning
+ * The number of different priority levels is vendor dependent. For example
+ * ST devices use 4 bits (0-15, with 15=lowest), but others may use
+ * 3 bits (0-7, with 7=lowest).
+ *
+ * If the application does not use high priority interrupts, it is
+ * recommend to do not use this option, and allow the system to
+ * implement the critical sections by completely disabling/enabling
+ * interrupts.
+ *
+ * If used, the recommended value is 3-4.
+ *
+ * @par Default
+ *   Use of interrupts priorities is disabled.
  */
 #define OS_INTEGER_RTOS_CRITICAL_SECTION_INTERRUPT_PRIORITY
 
+/**
+ * @brief Define the default thread stack size.
+ */
 #define OS_INTEGER_RTOS_DEFAULT_STACK_SIZE_BYTES
+
+/**
+ * @brief Define the **main** thread stack size.
+ */
 #define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES
+
+/**
+ * @brief Define the **idle** thread stack size.
+ */
 #define OS_INTEGER_RTOS_IDLE_STACK_SIZE_BYTES
 
 /**
@@ -115,32 +163,181 @@
  */
 #define OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES
 
+/**
+ * @brief Add a user defined storage to each thread.
+ */
 #define OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE
 
-#define OS_BOOL_RTOS_MESSAGE_QUEUE_SIZE_16BITS  (true)
+/**
+ * @brief Extend the message size to 16 bits.
+ * @details
+ * For embedded applications the message queues are
+ * optimised for small messages, up to 256 bytes.
+ *
+ * If larger messages are needed, this option extends the
+ * message size to 65536 bytes.
+ *
+ * @par Default
+ *  False (short messages).
+ */
+#define OS_BOOL_RTOS_MESSAGE_QUEUE_SIZE_16BITS  (false)
 
-#define OS_BOOL_RTOS_THREAD_IDLE_PRIORITY_BELOW_IDLE (true)
+/**
+ * @brief Push down the idle thread priority.
+ * @details
+ * Normally the applications should not create threads with
+ * the idle priority.
+ *
+ * However, some applications, like the ARM CMSIS RTOS validator,
+ * need to test the behaviour of idle threads. For such cases,
+ * to guarantee that the idle thread is the lowest priority
+ * thread, its priority can be lowered one additional step.
+ *
+ * @par Default
+ *  False (the idle thread has the idle priority).
+ */
+#define OS_BOOL_RTOS_THREAD_IDLE_PRIORITY_BELOW_IDLE (false)
 
-#define OS_BOOL_RTOS_PORT_CONTEX_CREATE_ZERO_LR (true)
+/**
+ * @brief Force the stack trace to start with a 0x0.
+ * @details
+ * This option has no functional consequences, it is only
+ * cosmetic, affecting how a debugger displays the stack trace.
+ *
+ * If your debugger has difficulties to properly display the
+ * thread stack trace, enable this option and the stack will
+ * always start with a 0x0.
+ *
+ * @par Default
+ *  False (the stack trace starts with the first function).
+ */
+#define OS_BOOL_RTOS_PORT_CONTEX_CREATE_ZERO_LR (false)
 
-#define OS_INCLUDE_STANDARD_POSIX_FUNCTIONS
-#define OS_INCLUDE_NEWLIB_POSIX_FUNCTIONS
-
-#define OS_INCLUDE_STARTUP_INIT_FP
-
-#define OS_INCLUDE_STARTUP_INIT_MULTIPLE_RAM_SECTIONS
-
-#define OS_BOOL_STARTUP_GUARD_CHECKS (true)
-
-#define OS_INTEGER_ATEXIT_ARRAY_SIZE (3)
-
-#define OS_INTEGER_DIRENT_NAME_MAX  (256)
-
+/**
+ * @brief Do not enter sleep in the idle thread.
+ * @details
+ * Very fast debuggers need direct access to a RAM buffer, which
+ * in turn need the clock that powers the bus where the RAM is
+ * connected to be permanently on.
+ *
+ * Unfortunately, most devices disable this clock when entering
+ * even the shallow sleep mode, disabling the debugger access to
+ * the device.
+ *
+ * To prevent this, usually for the debug configurations,
+ * it is possible to exclude the code that puts the device to sleep.
+ */
 #define OS_EXCLUDE_RTOS_IDLE_WFI
 
 /**
- * @} End of ingroup cmsis-plus-app-config
+ * @}
  */
+
+// ----------------------------------------------------------------------------
+
+/**
+ * @ingroup cmsis-plus-app-config-startup
+ * @{
+ */
+
+/**
+ * @brief Initialise multiple RAM sections.
+ */
+#define OS_INCLUDE_STARTUP_INIT_MULTIPLE_RAM_SECTIONS
+
+/**
+ * @brief Enable guard checks for .bss and .data sections.
+ * @details
+ * Sometimes mistakes in the liner script prevent the .bss area
+ * to be initialised to zero, and/or the .data area to be fully
+ * initialised with content from flash.
+ *
+ * To validate that the start-up properly initialised these areas,
+ * some guard words are defined at the begin/end of the .bss and
+ * .data areas, and are explicitly checked.
+ *
+ * @note This option is available only if DEBUG is also defined.
+ */
+#define OS_BOOL_STARTUP_GUARD_CHECKS (true)
+
+/**
+ * @brief Always initialise the hardware FPU.
+ */
+#define OS_INCLUDE_STARTUP_INIT_FP
+
+/**
+ * @brief Make the application a fully semihosted application.
+ * @details
+ * When writing test applications it is necessary to use some
+ * of the resources available from the host system (STDOUT/STDERR,
+ * file system, time, exit code, etc).
+ *
+ * This requires the entire behaviour of the system calls to be
+ * changed and most calls to be forwarded to the host. The
+ * application is transformed into a 'fully semihosted' application.
+ *
+ * One major difference from a regular embedded application is that
+ * a fully semihosted test application does not run in an endless
+ * loop, but terminates, and the test result must be passed back
+ * to the host system, via the exit code and optionally via a
+ * detailed status file.
+ */
+#define OS_USE_SEMIHOSTING
+
+/**
+ * @brief Define the maximum number of semihosting open files.
+ * @details
+ * The implementation of the semihosting file support requires
+ * an array of open files, to keep track of the host files.
+ *
+ * To simplify the implementation and avoid dynamic allocations, a static
+ * array is used. This option defines the size of this array.
+ *
+ * @par Default
+ *  20.
+ */
+#define OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES (20)
+
+/**
+ * @brief Include definitions for the standard POSIX system calls.
+ * @todo update after POSIX I/O is updated.
+ */
+#define OS_INCLUDE_STANDARD_POSIX_FUNCTIONS
+
+/**
+ * @brief Include definitions for the newlib system calls.
+ * @todo update after POSIX I/O is updated.
+ */
+#define OS_INCLUDE_NEWLIB_POSIX_FUNCTIONS
+
+/**
+ * @}
+ */
+
+// ----------------------------------------------------------------------------
+
+/**
+ * @ingroup cmsis-plus-app-config-lib
+ * @{
+ */
+
+/**
+ * @brief Define the size of the atexit() array.
+ * @details
+ * To simplify the implementation and avoid dynamic allocations, a static
+ * array is used. This option defines the size of this array.
+ */
+#define OS_INTEGER_ATEXIT_ARRAY_SIZE (3)
+
+/**
+ * @brief Define the maximum size of a directory name.
+ */
+#define OS_INTEGER_DIRENT_NAME_MAX  (256)
+
+/**
+ * @}
+ */
+
 
 // ----------------------------------------------------------------------------
 
@@ -195,7 +392,7 @@
 #define OS_USE_RTOS_PORT_TIMER
 
 /**
- * @} End of ingroup cmsis-plus-app-config-port
+ * @}
  */
 
 
@@ -206,40 +403,182 @@
  * @{
  */
 
+// TODO: add examples of output for each OS_TRACE_* option.
+
+/**
+ * @brief Forward trace messages via the ITM/SWO.
+ * @details
+ * ITM (Instrumentation Trace Macrocell) is one of the available ARM
+ * technologies intended to facilitate debugging, by providing a trace
+ * channel for printf()-like messages and various events.
+ *
+ * CMSIS++ is capable of forwarding the trace::printf() messages
+ * via the ITM, and, if available, this is the standard recommended
+ * trace channel.
+ *
+ * This option requires support from the debugger, to forward the
+ * SWO pin to a separate console.
+ *
+ * @see OS_INTEGER_TRACE_ITM_STIMULUS_PORT
+ */
 #define OS_USE_TRACE_ITM
-#define OS_INTEGER_TRACE_ITM_STIMULUS_PORT  (0)
 
+/**
+ * @brief Forward trace messages via the semihosting debug channel.
+ * @details
+ * The semihosting debug channel is a dedicated output channel,
+ * distinct from STDOUT and STDERR, intended for printf()-like messages.
+ *
+ * Traditionally the semihosting debug channel is quite slow,
+ * especially when used to output single bytes. To slightly improve
+ * performance, a small buffer is used internally (@ref
+ * OS_INTEGER_TRACE_SEMIHOSTING_TMP_ARRAY_SIZE).
+ *
+ * This option requires support from the debugger, to forward the
+ * semihosting channel to a separate console. Most of the
+ * debuggers require to explicitly enable semihosting
+ * for this option to be functional.
+ *
+ * @note The use of this option affects only the trace channel
+ * and does not transform the application into
+ * a fully semihosted application, in other words it does not
+ * change the behaviour of the other system calls, as does the
+ * use of @ref OS_USE_SEMIHOSTING.
+ *
+ * @see OS_INTEGER_TRACE_SEMIHOSTING_TMP_ARRAY_SIZE
+ */
 #define OS_USE_TRACE_SEMIHOSTING_DEBUG
-#define OS_USE_TRACE_SEMIHOSTING_STDOUT
-#define OS_INTEGER_TRACE_SEMIHOSTING_TMP_ARRAY_SIZE (16)
 
+/**
+ * @brief Forward trace messages via the semihosting output stream.
+ * @details
+ * The semihosting output channel is the same as STDOUT, and
+ * usually it is buffered, so characters may not be displayed
+ * immediately, but be delayed until the line ends.
+ *
+ * This option requires support from the debugger, to forward the
+ * semihosting channel to a separate console. Most of the
+ * debuggers require to explicitly enable semihosting
+ * for this option to be functional.
+ *
+ * @note The use of this option affects only the trace channel
+ * and does not transform the application into
+ * a fully semihosted application, in other words it does not
+ * change the behaviour of the other system calls, as does the
+ * use of @ref OS_USE_SEMIHOSTING.
+ */
+#define OS_USE_TRACE_SEMIHOSTING_STDOUT
+
+/**
+ * @brief Forward trace messages via the SEGGER RTT.
+ * @details
+ * SEGGER RTT (Real Time Terminal) is a very fast communication channel
+ * available for J-Link probes.
+ *
+ * CMSIS++ is capable of forwarding the trace::printf() messages
+ * via the RTT, and, if available, this is the fastest
+ * trace channel.
+ */
 #define OS_USE_TRACE_SEGGER_RTT
 
-#define OS_USE_SEMIHOSTING
-#define OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES (20)
-
+/**
+ * @brief Enable trace messages for RTOS clocks functions.
+ */
 #define OS_TRACE_RTOS_CLOCKS
+/**
+ * @brief Enable trace messages for RTOS condition variables functions.
+ */
 #define OS_TRACE_RTOS_CONDVAR
+/**
+ * @brief Enable trace messages for RTOS event flags functions.
+ */
 #define OS_TRACE_RTOS_EVFLAGS
+/**
+ * @brief Enable trace messages for RTOS memory pools functions.
+ */
 #define OS_TRACE_RTOS_MEMPOOL
+/**
+ * @brief Enable trace messages for RTOS message queues functions.
+ */
 #define OS_TRACE_RTOS_MQUEUE
+/**
+ * @brief Enable trace messages for RTOS mutex functions.
+ */
 #define OS_TRACE_RTOS_MUTEX
+/**
+ * @brief Display an exclamation mark for each RTC tick.
+ */
 #define OS_TRACE_RTOS_RTC_TICK
+/**
+ * @brief Enable trace messages for RTOS scheduler functions.
+ */
 #define OS_TRACE_RTOS_SCHEDULER
+/**
+ * @brief Enable trace messages for RTOS semaphore functions.
+ */
 #define OS_TRACE_RTOS_SEMAPHORE
+/**
+ * @brief Display a dot and a comma for each system clock tick.
+ */
 #define OS_TRACE_RTOS_SYSTICK_TICK
+/**
+ * @brief Enable trace messages for RTOS thread functions.
+ */
 #define OS_TRACE_RTOS_THREAD
+/**
+ * @brief Enable trace messages for RTOS thread context functions.
+ * @warning
+ * This option requires a fast trace channel, like SEGGER RTT or at least ITM.
+ */
 #define OS_TRACE_RTOS_THREAD_CONTEXT
+/**
+ * @brief Enable trace messages for RTOS thread signal functions.
+ */
 #define OS_TRACE_RTOS_THREAD_SIG
+/**
+ * @brief Enable trace messages for RTOS timer functions.
+ */
 #define OS_TRACE_RTOS_TIMER
 
+/**
+ * @brief Enable trace messages for RTOS list functions.
+ * @warning
+ * This option requires a fast trace channel, like SEGGER RTT or at least ITM.
+ */
 #define OS_TRACE_RTOS_LISTS
 
+/**
+ * @brief Enable trace messages for memory allocators.
+ */
 #define OS_TRACE_LIBC_MALLOC
+
+/**
+ * @brief Enable trace messages for the atexit() function.
+ */
 #define OS_TRACE_LIBC_ATEXIT
 
 /**
- * @} End of ingroup cmsis-plus-app-config-trace
+ * @brief Define the ITM stimulus port used for the trace messages.
+ * @details
+ * ITM provides 32 distinct stimulus ports for separate trace channels (0-31).
+ *
+ * @par Default
+ *  0 (zero).
+ */
+#define OS_INTEGER_TRACE_ITM_STIMULUS_PORT  (0)
+
+/**
+ * @brief Define the semihosting debug buffer size.
+ * @details The size of the internal buffer used to improve
+ * performance for the semihosting debug channel.
+ *
+ * @par Default
+ *  16.
+ */
+#define OS_INTEGER_TRACE_SEMIHOSTING_TMP_ARRAY_SIZE (16)
+
+/**
+ * @}
  */
 
 // ----------------------------------------------------------------------------

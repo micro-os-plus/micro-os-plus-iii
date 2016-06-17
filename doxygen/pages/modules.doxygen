@@ -104,6 +104,8 @@
  TODO: add content
  */
 
+// ----------------------------------------------------------------------------
+
 /**
  @defgroup cmsis-plus-app-config CMSIS++ App Config
  @brief  CMSIS++ application configuration definitions.
@@ -116,8 +118,8 @@
  There are two kinds of definitions:
 
  - definitions with values (`OS_INTEGER_*`, `OS_BOOL_*`, `OS_STRING_*`, ...);
- for these definitions the value should be appropriate to be used 
- in an expression of the given type; to avoid misunderstandings,
+ for these definitions the value should be used 
+ only in an expression of the given type; to avoid misunderstandings,
  parenthesis are recommended;
  - definitions without values (`OS_INCLUDE_*`, `OS_EXCLUDE_*`, `OS_USE_*`, 
  `OS_TRACE_*`, ...); for these definitions only the presence should be tested;
@@ -130,21 +132,31 @@
  @ingroup cmsis-plus-app-config
  @brief  Definitions passed via the compiler command line.
  @details
- Major configuration options should be passed via the
- compiler command line.
-
+ Most of the configuration options can be passed via the configuration file,
+ but this requires each source file to include the configuration files. 
+ However some options are too important to be missed and should be 
+ passed via the compiler command line.
  */
 
 /**
- @defgroup cmsis-plus-app-config-port Select custom implementations
+ @defgroup cmsis-plus-app-config-startup Start-up & general options
  @ingroup cmsis-plus-app-config
- @brief  Definitions used to select various custom port implementations.
+ @brief  Definitions used to configure the program start-up.
  @details
- The CMSIS++ RTOS API can be configured to run on top of another
- RTOS scheduler (like FreeRTOS). It is also possible to select
- each synchronisation objects to use either the custom port objects or
- the CMSIS++ reference C++ implementations.
+ */
 
+/**
+ @defgroup cmsis-plus-app-config-lib Library options
+ @ingroup cmsis-plus-app-config
+ @brief  Definitions used to configure various library options.
+ @details
+ */
+
+/**
+ @defgroup cmsis-plus-app-config-rtos RTOS options
+ @ingroup cmsis-plus-app-config
+ @brief  Definitions used to configure the RTOS.
+ @details
  */
 
 /**
@@ -155,3 +167,16 @@
  In addition to the global `TRACE` definition, it is possible to
  enable individual groups of messages, using separate definitions.
  */
+
+/**
+ @defgroup cmsis-plus-app-config-port Custom RTOS options
+ @ingroup cmsis-plus-app-config
+ @brief  Definitions used to select various custom RTOS port implementations.
+ @details
+ The CMSIS++ RTOS API can be configured to run on top of another
+ RTOS scheduler (like FreeRTOS). It is also possible to select
+ each synchronisation objects to use either the custom port objects or
+ the CMSIS++ reference C++ implementations.
+ */
+
+// ----------------------------------------------------------------------------
