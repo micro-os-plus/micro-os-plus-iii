@@ -432,7 +432,7 @@
  * Traditionally the semihosting debug channel is quite slow,
  * especially when used to output single bytes. To slightly improve
  * performance, a small buffer is used internally (@ref
- * OS_INTEGER_TRACE_SEMIHOSTING_TMP_ARRAY_SIZE).
+ * OS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE).
  *
  * This option requires support from the debugger, to forward the
  * semihosting channel to a separate console. Most of the
@@ -445,7 +445,7 @@
  * change the behaviour of the other system calls, as does the
  * use of @ref OS_USE_SEMIHOSTING.
  *
- * @see OS_INTEGER_TRACE_SEMIHOSTING_TMP_ARRAY_SIZE
+ * @see OS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE
  */
 #define OS_USE_TRACE_SEMIHOSTING_DEBUG
 
@@ -575,7 +575,7 @@
  * @par Default
  *  16.
  */
-#define OS_INTEGER_TRACE_SEMIHOSTING_TMP_ARRAY_SIZE (16)
+#define OS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE (16)
 
 /**
  * @}

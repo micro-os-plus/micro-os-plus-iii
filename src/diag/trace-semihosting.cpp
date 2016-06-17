@@ -89,8 +89,8 @@ namespace os
 
 #if defined(OS_USE_TRACE_SEMIHOSTING_DEBUG)
 
-#if !defined(OS_INTEGER_TRACE_SEMIHOSTING_TMP_ARRAY_SIZE)
-#define OS_INTEGER_TRACE_SEMIHOSTING_TMP_ARRAY_SIZE  (16)
+#if !defined(OS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE)
+#define OS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE  (16)
 #endif
 
       ssize_t
@@ -115,7 +115,7 @@ namespace os
             // If not, use a local buffer to speed things up.
             // For re-entrance, this bugger must be allocated on the stack,
             // so be cautious with the size.
-            char tmp[OS_INTEGER_TRACE_SEMIHOSTING_TMP_ARRAY_SIZE];
+            char tmp[OS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE];
             size_t togo = nbyte;
             while (togo > 0)
               {
