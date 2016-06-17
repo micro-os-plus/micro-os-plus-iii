@@ -327,7 +327,7 @@ _start (void)
 
   // Initialise the trace output device. From this moment on,
   // trace_printf() calls are available (including in static constructors).
-  os_initialize_trace ();
+  trace_initialize ();
 
   // Get the argc/argv (useful in semihosting configurations).
   int argc;

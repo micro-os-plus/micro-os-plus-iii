@@ -157,11 +157,11 @@ namespace os
 
 using namespace os;
 
-// These two cannot be aliased, since they might be defined
+// These cannot be aliased, since they might be defined
 // in a different translation units (and usually they are).
 
 void __attribute__((weak))
-os_initialize_trace (void)
+trace_initialize (void)
 {
   trace::initialize ();
 }
