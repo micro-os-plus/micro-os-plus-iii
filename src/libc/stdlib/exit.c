@@ -72,7 +72,7 @@ exit(int status)
   /* NOTREACHED */
 }
 
-#if !defined(OS_USE_SEMIHOSTING)
+#if !defined(OS_USE_SEMIHOSTING_SYSCALLS)
 
 #if !defined(DEBUG)
 extern void __attribute__((noreturn))
@@ -110,7 +110,7 @@ _Exit (int code __attribute__((unused)))
 void __attribute__((weak, alias ("_Exit")))
 _exit (int status);
 
-#endif /* !defined(OS_USE_SEMIHOSTING) */
+#endif /* !defined(OS_USE_SEMIHOSTING_SYSCALLS) */
 
 // ----------------------------------------------------------------------------
 

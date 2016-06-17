@@ -282,7 +282,7 @@
  * to the host system, via the exit code and optionally via a
  * detailed status file.
  */
-#define OS_USE_SEMIHOSTING
+#define OS_USE_SEMIHOSTING_SYSCALLS
 
 /**
  * @brief Define the maximum number of semihosting open files.
@@ -443,7 +443,7 @@
  * and does not transform the application into
  * a fully semihosted application, in other words it does not
  * change the behaviour of the other system calls, as does the
- * use of @ref OS_USE_SEMIHOSTING.
+ * use of @ref OS_USE_SEMIHOSTING_SYSCALLS.
  *
  * @see OS_INTEGER_TRACE_SEMIHOSTING_BUFF_ARRAY_SIZE
  */
@@ -465,7 +465,7 @@
  * and does not transform the application into
  * a fully semihosted application, in other words it does not
  * change the behaviour of the other system calls, as does the
- * use of @ref OS_USE_SEMIHOSTING.
+ * use of @ref OS_USE_SEMIHOSTING_SYSCALLS.
  */
 #define OS_USE_TRACE_SEMIHOSTING_STDOUT
 

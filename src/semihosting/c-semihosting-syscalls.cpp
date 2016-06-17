@@ -31,7 +31,7 @@
 
 #include <cmsis-plus/os-app-config.h>
 
-#if defined(OS_USE_SEMIHOSTING)
+#if defined(OS_USE_SEMIHOSTING_SYSCALLS)
 
 #include <cmsis-plus/arm/semihosting.h>
 #include <cmsis-plus/diag/trace.h>
@@ -1273,7 +1273,7 @@ initialise_monitor_handles (void)
 #endif
 
 #endif /* (__STDC_HOSTED__ != 0) */
-#endif /* defined(OS_USE_SEMIHOSTING) */
+#endif /* defined(OS_USE_SEMIHOSTING_SYSCALLS) */
 
 // ----------------------------------------------------------------------------
 

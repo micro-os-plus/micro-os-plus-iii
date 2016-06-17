@@ -350,7 +350,7 @@ _start (void)
 
 // ----------------------------------------------------------------------------
 
-#if !defined(OS_USE_SEMIHOSTING)
+#if !defined(OS_USE_SEMIHOSTING_SYSCALLS)
 
 // Semihosting uses a more elaborate version of os_initialize_args()
 // to parse args received from host.
@@ -403,7 +403,7 @@ os_initialize_args (int* p_argc, char*** p_argv)
 
 #pragma GCC diagnostic pop
 
-#endif /* !defined(OS_USE_SEMIHOSTING) */
+#endif /* !defined(OS_USE_SEMIHOSTING_SYSCALLS) */
 
 // ----------------------------------------------------------------------------
 

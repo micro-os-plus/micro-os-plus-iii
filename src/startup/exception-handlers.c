@@ -184,7 +184,7 @@ dump_exception_stack (exception_stack_frame_t* frame, uint32_t lr)
 
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
 
-#if defined(OS_USE_SEMIHOSTING) \
+#if defined(OS_USE_SEMIHOSTING_SYSCALLS) \
   || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT) \
   || defined(OS_USE_TRACE_SEMIHOSTING_DEBUG)
 
@@ -205,11 +205,11 @@ is_semihosting (exception_stack_frame_t* frame, uint16_t opCode)
     {
       uint32_t r0 = frame->r0;
 #if defined(OS_DEBUG_SEMIHOSTING_FAULTS) \
-  || defined(OS_USE_SEMIHOSTING) \
+  || defined(OS_USE_SEMIHOSTING_SYSCALLS) \
   || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT)
       uint32_t r1 = frame->r1;
 #endif
-#if defined(OS_USE_SEMIHOSTING) || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT)
+#if defined(OS_USE_SEMIHOSTING_SYSCALLS) || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT)
       uint32_t* blk = (uint32_t*) r1;
 #endif
 
@@ -220,7 +220,7 @@ is_semihosting (exception_stack_frame_t* frame, uint16_t opCode)
       switch (r0)
         {
 
-#if defined(OS_USE_SEMIHOSTING)
+#if defined(OS_USE_SEMIHOSTING_SYSCALLS)
 
         case SEMIHOSTING_SYS_CLOCK:
         case SEMIHOSTING_SYS_ELAPSED:
@@ -281,9 +281,9 @@ is_semihosting (exception_stack_frame_t* frame, uint16_t opCode)
           // Should not reach here
           return 0;
 
-#endif // defined(OS_USE_SEMIHOSTING)
+#endif // defined(OS_USE_SEMIHOSTING_SYSCALLS)
 
-#if defined(OS_USE_SEMIHOSTING) || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT)
+#if defined(OS_USE_SEMIHOSTING_SYSCALLS) || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT)
 
 #define HANDLER_STDIN   (1)
 #define HANDLER_STDOUT  (2)
@@ -332,9 +332,9 @@ is_semihosting (exception_stack_frame_t* frame, uint16_t opCode)
             }
           break;
 
-#endif // defined(OS_USE_SEMIHOSTING) || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT)
+#endif // defined(OS_USE_SEMIHOSTING_SYSCALLS) || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT)
 
-#if defined(OS_USE_SEMIHOSTING) \
+#if defined(OS_USE_SEMIHOSTING_SYSCALLS) \
   || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT) \
   || defined(OS_USE_TRACE_SEMIHOSTING_DEBUG)
 
@@ -409,7 +409,7 @@ HardFault_Handler_C (exception_stack_frame_t* frame __attribute__((unused)),
   uint32_t cfsr = SCB->CFSR; // Configurable Fault Status Registers
 #endif
 
-#if defined(OS_USE_SEMIHOSTING) \
+#if defined(OS_USE_SEMIHOSTING_SYSCALLS) \
   || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT) \
   || defined(OS_USE_TRACE_SEMIHOSTING_DEBUG)
 
