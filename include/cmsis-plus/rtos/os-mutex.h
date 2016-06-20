@@ -62,64 +62,79 @@ namespace os
       /**
        * @brief Type of mutex protocol.
        */
-      using protocol_t = enum class protocol : uint8_t
-        {
-          /**
-           * @brief Priority and scheduling not affected by mutex ownership.
-           */
-          none = 0,
+      using protocol_t = uint8_t;
+      struct protocol
+      {
+        enum
+          : protocol_t
+            {
+              /**
+               * @brief Priority and scheduling not affected by mutex ownership.
+               */
+              none = 0,
 
-          /**
-           * @brief Inherit from highest priority thread.
-           * @details
-           * TODO: add
-           */
-          inherit = 1,
+              /**
+               * @brief Inherit from highest priority thread.
+               * @details
+               * TODO: add
+               */
+              inherit = 1,
 
-          /**
-           * @brief Protect.
-           * @details
-           * TODO: add
-           */
-          protect = 2
+              /**
+               * @brief Protect.
+               * @details
+               * TODO: add
+               */
+              protect = 2
         };
+      };
 
       /**
        * @brief Type of mutex robustness.
        */
-      using robustness_t = enum class robustness : uint8_t
-        {
-          /**
-           * @brief Normal robustness.
-           */
-          stalled = 0,
-          /**
-           * @brief Enhanced robustness.
-           */
-          robust = 1
+      using robustness_t = uint8_t;
+
+      struct robustness
+      {
+        enum
+          : robustness_t
+            {
+              /**
+               * @brief Normal robustness.
+               */
+              stalled = 0,
+              /**
+               * @brief Enhanced robustness.
+               */
+              robust = 1
         };
+      };
 
       /**
        * @brief Type of mutex behaviour.
        */
-      using type_t = enum class type : uint8_t
-        {
-          /**
-           * @brief Normal mutex behaviour.
-           */
-          normal = 0,
-          /**
-           * @brief Check mutex behaviour.
-           */
-          errorcheck = 1,
-          /**
-           * @brief Recursive mutex behaviour.
-           */
-          recursive = 2,
+      using type_t = uint8_t;
+      struct type
+      {
+        enum
+          : type_t
+            {
+              /**
+               * @brief Normal mutex behaviour.
+               */
+              normal = 0,
+              /**
+               * @brief Check mutex behaviour.
+               */
+              errorcheck = 1,
+              /**
+               * @brief Recursive mutex behaviour.
+               */
+              recursive = 2,
 
-          _default = normal,
+              _default = normal,
         };
-
+      };
       /**
        * @brief Type of mutex recursion counter.
        */

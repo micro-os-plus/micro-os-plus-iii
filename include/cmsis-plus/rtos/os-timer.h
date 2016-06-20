@@ -72,34 +72,44 @@ namespace os
       /**
        * @brief Timer run type.
        */
-      using type_t = enum class run : uint8_t
-        {
-          /**
-           * @brief Run only once.
-           */
-          once = 0,
+      using type_t = uint8_t;
+      struct run
+      {
+        enum
+          : type_t
+            {
+              /**
+               * @brief Run only once.
+               */
+              once = 0,
 
-          /**
-           * @brief Run periodically.
-           */
-          periodic = 1      //
+              /**
+               * @brief Run periodically.
+               */
+              periodic = 1      //
         };
+      };
 
       /**
        * @brief Timer state type.
        */
-      using state_t = enum class state : uint8_t
-        {
-          /**
-           * @brief Used to catch uninitialised threads.
-           */
-          undefined = 0,
+      using state_t = uint8_t;
+      struct state
+      {
+        enum
+          : state_t
+            {
+              /**
+               * @brief Used to catch uninitialised threads.
+               */
+              undefined = 0,
           initialized = 1,
           running = 2,
           completed = 3,
           stopped = 4,
           destroyed = 5
         };
+      };
 
       // ======================================================================
 
