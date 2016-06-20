@@ -127,7 +127,7 @@ namespace os
       // ======================================================================
 
       /**
-       * @brief Type of a variable holding thread priorities.
+       * @brief Type of variables holding thread priorities.
        * @details
        * A numeric type used to hold thread priorities, affecting the thread
        * behaviour, like scheduling and thread wakeup due to events;
@@ -218,7 +218,7 @@ namespace os
       }; /* struct priority */
 
       /**
-       * @brief Type of a variable holding the thread state.
+       * @brief Type of variables holding the thread state.
        */
       using state_t = uint8_t;
 
@@ -241,8 +241,8 @@ namespace os
           /**
            * @brief Reuse possible if terminated or higher.
            */
-          terminated = 5,      // Test for here up for reuse
-          destroyed = 6      //!< destroyed
+          terminated = 5, //
+          destroyed = 6
         };
         /* enum  */
       }; /* struct state */
@@ -770,6 +770,11 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
 
+        /**
+         * @brief Get the number of thread context switches.
+         * @return A long integer with the number of times the thread
+         * was scheduled for execution.
+         */
         rtos::statistics::counter_t
         context_switches (void);
 
@@ -777,6 +782,10 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
 
+        /**
+         * @brief Get the thread execution time.
+         * @return A long integer with accumulated number of CPU cycles.
+         */
         rtos::statistics::duration_t
         cpu_cycles (void);
 
@@ -931,7 +940,7 @@ namespace os
 
       /**
        * @brief Wait for thread termination.
-       * @param [in] exit_ptr Pointer to object to return. (Optional).
+       * @param [in] exit_ptr Pointer to thread exit value. (Optional, may be nullptr).
        * @retval result::ok The thread was terminated.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
@@ -942,6 +951,7 @@ namespace os
 
       /**
        * @brief Set the dynamic scheduling priority.
+       * @param [in] prio New priority.
        * @retval result::ok The priority was set.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINVAL The value of prio is invalid for the
@@ -994,7 +1004,7 @@ namespace os
       interrupt (bool interrupt = true);
 
       /**
-       * @brief Get scheduler status of this thread.
+       * @brief Get thread scheduler state.
        * @par Parameters
        *  None
        * @return Thread scheduler state.
@@ -1007,8 +1017,6 @@ namespace os
        * @par Parameters
        *  None
        * @return  Nothing.
-       *
-       * @note Can be invoked from Interrupt Service Routines.
        */
       void
       resume (void);
@@ -1023,7 +1031,7 @@ namespace os
       function_args (void) const;
 
       /**
-       * @brief Get user storage.
+       * @brief Get the user storage.
        * @par Parameters
        *  None
        * @return The address of the thread user storage.
@@ -1045,9 +1053,9 @@ namespace os
 
       /**
        * @brief Clear thread signal flags.
+       * @param [in] mask The OR-ed flags to clear. Zero means 'all'
        * @param [out] oflags Optional pointer where to store the
        *  previous flags; may be `nullptr`.
-       * @param [in] mask The OR-ed flags to clear. Zero means 'all'
        * @retval result::ok The flags were cleared.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINVAL The mask is zero.
@@ -1443,6 +1451,8 @@ namespace os
      * @brief Template of a POSIX compliant **thread** with allocator.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-thread
+     *
+     * @tparam Allocator Standard allocator used to allocate the stack area.
      */
     template<typename Allocator = memory::allocator<void*>>
       class thread_allocated : public thread
@@ -1535,6 +1545,8 @@ namespace os
      * @brief Template of a POSIX compliant **thread** with local stack.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-thread
+     *
+     * @tparam N Size of statically allocated stack in bytes.
      */
     template<std::size_t N = port::stack::default_size_bytes>
       class thread_static : public thread
@@ -1649,13 +1661,15 @@ namespace os
 
       /**
        * @brief Terminate the current running thread.
-       * @param [in] exit_ptr Pointer to object to return. (Optional).
+       * @param [in] exit_ptr Pointer to object to return. (Optional,
+       * may be nullptr).
        * @par Returns
        *  Nothing.
        */
       [[noreturn]] void
       exit (void* exit_ptr = nullptr);
 
+#if 0
       /**
        * @brief Check if the wake-up is due to a timeout.
        * @par Parameters
@@ -1665,9 +1679,10 @@ namespace os
        */
       bool
       is_timeout (void);
+#endif
 
       /**
-       * @brief Wait for signal flags.
+       * @brief Wait for thread signal flags.
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
@@ -1685,7 +1700,7 @@ namespace os
                 flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
       /**
-       * @brief Try to wait for signal flags.
+       * @brief Try to wait for thread signal flags.
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
@@ -1702,7 +1717,7 @@ namespace os
                     flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
       /**
-       * @brief Timed wait for signal flags.
+       * @brief Timed wait for thread signal flags.
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
@@ -1928,12 +1943,22 @@ namespace os
 
     // ======================================================================
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     inline
     thread::stack::stack ()
     {
       clear ();
     }
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     inline void
     thread::stack::clear (void)
     {
@@ -1941,6 +1966,11 @@ namespace os
       size_bytes_ = 0;
     }
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     inline void
     thread::stack::set (stack::element_t* address, std::size_t size_bytes)
     {
@@ -1948,42 +1978,77 @@ namespace os
       size_bytes_ = size_bytes;
     }
 
+    /**
+     * @details
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
     inline thread::stack::element_t*
     thread::stack::bottom (void)
     {
       return bottom_address_;
     }
 
+    /**
+     * @details
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
     inline thread::stack::element_t*
     thread::stack::top (void)
     {
       return bottom_address_ + (size_bytes_ / sizeof(element_t));
     }
 
+    /**
+     * @details
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
     inline std::size_t
     thread::stack::size (void)
     {
       return size_bytes_;
     }
 
+    /**
+     * @details
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
     inline bool
     thread::stack::check_bottom_magic (void)
     {
       return *bottom () == stack::magic;
     }
 
+    /**
+     * @details
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
     inline bool
     thread::stack::check_top_magic (void)
     {
       return *top () == stack::magic;
     }
 
+    /**
+     * @details
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
     inline std::size_t
     thread::stack::min_size (void)
     {
       return min_size_bytes_;
     }
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     inline std::size_t
     thread::stack::min_size (std::size_t size_bytes)
     {
@@ -1992,12 +2057,22 @@ namespace os
       return tmp;
     }
 
+    /**
+     * @details
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
     inline std::size_t
     thread::stack::default_size (void)
     {
       return default_size_bytes_;
     }
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     inline std::size_t
     thread::stack::default_size (std::size_t size_bytes)
     {
@@ -2011,12 +2086,22 @@ namespace os
 
     // ========================================================================
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     inline
     thread::context::context ()
     {
       ;
     }
 
+    /**
+     * @details
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
     inline class thread::stack&
     thread::context::stack ()
     {
@@ -2027,6 +2112,20 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
 
+    /**
+     * @details
+     * Each time the scheduler performs a context switch, it increments
+     * the thread counter and the scheduler total counter.
+     *
+     * This value can be used together with the corresponding
+     * scheduler function, to compute percentages.
+     *
+     * @note This function is available only when
+     * @ref OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES
+     * is defined.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     inline statistics::counter_t
     thread::statistics::context_switches (void)
     {
@@ -2037,6 +2136,18 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
 
+    /**
+     * @details
+     *
+     * This value can be used together with the corresponding
+     * scheduler function, to compute percentages.
+     *
+     * @note This function is available only when
+     * @ref OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES
+     * is defined.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     inline rtos::statistics::duration_t
     thread::statistics::cpu_cycles (void)
     {
@@ -2060,18 +2171,33 @@ namespace os
       return this == &rhs;
     }
 
+    /**
+     * @details
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
     inline thread::state_t
     thread::sched_state (void) const
     {
       return sched_state_;
     }
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     inline void*
     thread::function_args (void) const
     {
       return func_args_;
     }
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     inline bool
     thread::interrupted (void)
     {
@@ -2087,6 +2213,9 @@ namespace os
      * Inspired by (actually a generalisation of) µC-OS III task user
      * registers and FreeRTOS thread local storage, which proved useful
      * when implementing CMSIS+ over FreeRTOS.
+     *
+     *
+     * @note Can be invoked from Interrupt Service Routines.
      */
     inline os_thread_user_storage_t*
     thread::user_storage (void)
@@ -2126,6 +2255,11 @@ namespace os
 
 #endif
 
+    /**
+     * @details
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
     inline class thread::stack&
     thread::stack (void)
     {
@@ -2134,6 +2268,11 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     inline class thread::statistics&
     thread::statistics (void)
     {

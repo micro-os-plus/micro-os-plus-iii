@@ -436,7 +436,8 @@ namespace os
 
         /**
          * @brief Get the total duration of all threads.
-         * @return Integer with the number of CPU cycles, possibly divided by some prescaller.
+         * @return Integer with the number of CPU cycles, possibly
+         * divided by some prescaller.
          */
         rtos::statistics::duration_t
         cpu_cycles (void);
@@ -448,9 +449,9 @@ namespace os
         extern clock::timestamp_t switch_timestamp_;
         extern rtos::statistics::duration_t cpu_cycles_;
 
-        /**
-         * @endcond
-         */
+      /**
+       * @endcond
+       */
 
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
 
@@ -480,7 +481,7 @@ namespace os
          */
 
         /**
-         * @brief Enter interrupts critical section.
+         * @brief Enter an interrupts critical section.
          * @par Parameters
          *  None
          */
@@ -502,7 +503,7 @@ namespace os
          */
 
         /**
-         * @brief Exit interrupts critical section.
+         * @brief Exit the interrupts critical section.
          */
         ~critical_section ();
 
@@ -518,7 +519,7 @@ namespace os
          */
 
         /**
-         * @brief Enter interrupts critical section.
+         * @brief Enter an interrupts critical section.
          * @par Parameters
          *  None
          * @return The current interrupts status register.
@@ -527,7 +528,7 @@ namespace os
         enter (void);
 
         /**
-         * @brief Exit interrupts critical section.
+         * @brief Exit the interrupts critical section.
          * @param status The value to restore the interrupts status register.
          * @return  Nothing.
          */
@@ -579,7 +580,7 @@ namespace os
          */
 
         /**
-         * @brief Enter interrupts uncritical section.
+         * @brief Enter an interrupts uncritical section.
          * @par Parameters
          *  None
          */
@@ -601,7 +602,7 @@ namespace os
          */
 
         /**
-         * @brief Exit interrupts uncritical section.
+         * @brief Exit the interrupts uncritical section.
          */
         ~uncritical_section ();
 
@@ -789,6 +790,8 @@ namespace os
        * @details
        * Check if the scheduler was started, i.e. if scheduler::start()
        * was called.
+       *
+       * @note Can be invoked from Interrupt Service Routines.
        */
       inline bool
       started (void)
@@ -800,6 +803,8 @@ namespace os
        * @details
        * Check if the scheduler is locked on the current thread or
        * is switching threads from the ready list.
+       *
+       * @note Can be invoked from Interrupt Service Routines.
        */
       inline bool
       locked (void)
@@ -810,6 +815,8 @@ namespace os
       /**
        * @details
        * Lock the scheduler and remember the initial scheduler status.
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline
       critical_section::critical_section () :
@@ -822,6 +829,8 @@ namespace os
        * @details
        * Restore the initial scheduler status and possibly unlock
        * the scheduler.
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline
       critical_section::~critical_section ()
@@ -832,6 +841,8 @@ namespace os
       /**
        * @details
        * Lock the scheduler and remember the initial scheduler status.
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline
       uncritical_section::uncritical_section () :
@@ -844,6 +855,8 @@ namespace os
        * @details
        * Restore the initial scheduler status and possibly unlock
        * the scheduler.
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline
       uncritical_section::~uncritical_section ()
@@ -851,6 +864,11 @@ namespace os
         unlock (status_);
       }
 
+      /**
+       * @details
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
       constexpr
       lockable::lockable () :
           status_ (scheduler::init_status)
@@ -858,12 +876,22 @@ namespace os
         ;
       }
 
+      /**
+       * @details
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
       inline
       lockable::~lockable ()
       {
         ;
       }
 
+      /**
+       * @details
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
       inline void
       lockable::lock (void)
       {
@@ -874,6 +902,8 @@ namespace os
        * @details
        * Somehow redundant, since the lock will always succeed;
        * but used to meet the lockableable requirements.
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline bool
       lockable::try_lock (void)
@@ -882,6 +912,11 @@ namespace os
         return true;
       }
 
+      /**
+       * @details
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
       inline void
       lockable::unlock (void)
       {
@@ -894,12 +929,17 @@ namespace os
 
         /**
          * @details
+         * Each time the scheduler performs a context switch, it increments
+         * the thread counter and the scheduler total counter.
+         *
          * This value can be used together with the corresponding
          * thread function, to compute percentages.
          *
          * @note This function is available only when
          * @ref OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES
          * is defined.
+         *
+         * @warning Cannot be invoked from Interrupt Service Routines.
          */
         inline rtos::statistics::counter_t
         context_switches (void)
@@ -923,6 +963,8 @@ namespace os
          * @note This function is available only when
          * @ref OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES
          * is defined.
+         *
+         * @warning Cannot be invoked from Interrupt Service Routines.
          */
         inline rtos::statistics::duration_t
         cpu_cycles (void)
@@ -940,6 +982,11 @@ namespace os
 
     namespace interrupts
     {
+      /**
+       * @details
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
       inline
       __attribute__((always_inline))
       critical_section::critical_section () :
@@ -948,6 +995,11 @@ namespace os
         ;
       }
 
+      /**
+       * @details
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
       inline
       __attribute__((always_inline))
       critical_section::~critical_section ()
@@ -955,6 +1007,11 @@ namespace os
         exit (status_);
       }
 
+      /**
+       * @details
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
       inline status_t
       __attribute__((always_inline))
       critical_section::enter (void)
@@ -962,7 +1019,11 @@ namespace os
         return port::interrupts::critical_section::enter ();
       }
 
-      // Exit an IRQ critical section
+      /**
+       * @details
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
       inline void
       __attribute__((always_inline))
       critical_section::exit (status_t status)
@@ -972,6 +1033,11 @@ namespace os
 
       // ======================================================================
 
+      /**
+       * @details
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
       inline
       __attribute__((always_inline))
       uncritical_section::uncritical_section () :
@@ -980,6 +1046,11 @@ namespace os
         ;
       }
 
+      /**
+       * @details
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
       inline
       __attribute__((always_inline))
       uncritical_section::~uncritical_section ()
@@ -987,7 +1058,11 @@ namespace os
         exit (status_);
       }
 
-      // Enter an IRQ uncritical section
+      /**
+       * @details
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
       inline status_t
       __attribute__((always_inline))
       uncritical_section::enter (void)
@@ -995,7 +1070,11 @@ namespace os
         return port::interrupts::uncritical_section::enter ();
       }
 
-      // Exit an IRQ uncritical section
+      /**
+       * @details
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
       inline void
       __attribute__((always_inline))
       uncritical_section::exit (status_t status)
@@ -1005,6 +1084,11 @@ namespace os
 
       // ======================================================================
 
+      /**
+       * @details
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
       constexpr
       lockable::lockable () :
           status_ (port::interrupts::init_status)
@@ -1012,6 +1096,11 @@ namespace os
         ;
       }
 
+      /**
+       * @details
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
       inline
       __attribute__((always_inline))
       lockable::~lockable ()
@@ -1019,6 +1108,11 @@ namespace os
         ;
       }
 
+      /**
+       * @details
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
       inline void
       __attribute__((always_inline))
       lockable::lock (void)
@@ -1030,6 +1124,8 @@ namespace os
        * @details
        * Somehow redundant, since the lock will always succeed;
        * but used to meet the Lockable requirements.
+       *
+       * @note Can be invoked from Interrupt Service Routines.
        */
       inline bool
       __attribute__((always_inline))
@@ -1039,6 +1135,11 @@ namespace os
         return true;
       }
 
+      /**
+       * @details
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
       inline void
       __attribute__((always_inline))
       lockable::unlock (void)

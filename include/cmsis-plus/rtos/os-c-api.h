@@ -73,7 +73,10 @@ extern "C"
    */
   enum
   {
-    os_ok = 0, ///< function completed; no error or event occurred.
+    /**
+     * @brief Function completed; no error or event occurred.
+     */
+    os_ok = 0,
   };
 
   /**
@@ -187,6 +190,10 @@ extern "C"
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
 
+  /**
+   * @brief Get the total number of context switches.
+   * @return Integer with the total number of context switches since scheduler start.
+   */
   os_statistics_counter_t
   os_sched_stat_get_context_switches (void);
 
@@ -194,6 +201,11 @@ extern "C"
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
 
+  /**
+   * @brief Get the total duration of all threads.
+   * @return Integer with the number of CPU cycles, possibly
+   * divided by some prescaller.
+   */
   os_statistics_duration_t
   os_sched_stat_get_cpu_cycles (void);
 
@@ -220,7 +232,7 @@ extern "C"
   os_irq_in_handler_mode (void);
 
   /**
-   * @brief Enter interrupts critical section.
+   * @brief Enter an interrupts critical section.
    * @par Parameters
    *  None
    * @return The current interrupts status register.
@@ -229,7 +241,7 @@ extern "C"
   os_irq_critical_enter (void);
 
   /**
-   * @brief Exit interrupts critical section.
+   * @brief Exit the interrupts critical section.
    * @param status The value to restore the interrupts status register.
    * @par Returns
    *  Nothing.
@@ -240,7 +252,7 @@ extern "C"
   // --------------------------------------------------------------------------
 
   /**
-   * @brief Enter interrupts uncritical section.
+   * @brief Enter an interrupts uncritical section.
    * @par Parameters
    *  None
    * @return The current interrupts status register.
@@ -249,7 +261,7 @@ extern "C"
   os_irq_uncritical_enter (void);
 
   /**
-   * @brief Exit interrupts uncritical section.
+   * @brief Exit the interrupts uncritical section.
    * @param status The value to restore the interrupts status register.
    * @par Returns
    *  Nothing.
@@ -280,7 +292,7 @@ extern "C"
    * @brief Get the current running thread.
    * @par Parameters
    *  None
-   * @return Pointer to the current running thread.
+   * @return Pointer to the current running thread object.
    */
   os_thread_t*
   os_this_thread (void);
@@ -297,7 +309,7 @@ extern "C"
 
   /**
    * @brief Terminate the current running thread.
-   * @param [in] exit_ptr Pointer to object to return. (Optional).
+   * @param [in] exit_ptr Pointer to object to return. (Optional, may be NULL).
    * @par Returns
    *  Nothing.
    */
@@ -306,7 +318,7 @@ extern "C"
   os_this_thread_exit (void* exit_ptr);
 
   /**
-   * @brief Wait for signal flags.
+   * @brief Wait for thread signal flags.
    * @param [in] mask The expected flags (OR-ed bit-mask);
    *  may be zero.
    * @param [out] oflags Pointer where to store the current flags;
@@ -324,7 +336,7 @@ extern "C"
                            os_flags_mode_t mode);
 
   /**
-   * @brief Try to wait for signal flags.
+   * @brief Try to wait for thread signal flags.
    * @param [in] mask The expected flags (OR-ed bit-mask);
    *  may be zero.
    * @param [out] oflags Pointer where to store the current flags;
@@ -341,7 +353,7 @@ extern "C"
                                os_flags_mode_t mode);
 
   /**
-   * @brief Timed wait for signal flags.
+   * @brief Timed wait for thread signal flags.
    * @param [in] mask The expected flags (OR-ed bit-mask);
    *  may be zero.
    * @param [out] oflags Pointer where to store the current flags;
@@ -372,57 +384,145 @@ extern "C"
    * @{
    */
 
+  /**
+   * @brief Initialise the thread attributes.
+   * @param [in] attr Pointer to thread attributes object.
+   * @par Returns
+   *  Nothing.
+   */
   void
   os_thread_attr_init (os_thread_attr_t* attr);
 
+  /**
+   * @brief Create a thread.
+   * @param [in] thread Pointer to thread object.
+   * @param [in] name Thread name (may be NULL).
+   * @param [in] func Pointer to thread function.
+   * @param [in] args Pointer to thread function arguments (may be NULL).
+   * @param [in] attr Pointer to thread attributes (may be NULL)
+   */
   void
   os_thread_create (os_thread_t* thread, const char* name,
                     os_thread_func_t func, const os_thread_func_args_t args,
                     const os_thread_attr_t* attr);
 
+  /**
+   * @brief Destroy the thread.
+   * @param [in] thread Pointer to thread object.
+   */
   void
   os_thread_destroy (os_thread_t* thread);
 
+  /**
+   * @brief Get the thread name.
+   * @param [in] thread Pointer to thread object.
+   * @return Null terminated string.
+   */
   const char*
   os_thread_get_name (os_thread_t* thread);
 
+  /**
+   * @brief Get the thread current scheduling priority.
+   * @param [in] thread Pointer to thread object.
+   * @return The thread priority.
+   */
   os_thread_prio_t
   os_thread_get_prio (os_thread_t* thread);
 
+  /**
+   * @brief Set the thread dynamic scheduling priority.
+   * @param [in] thread Pointer to thread object.
+   * @param [in] prio New priority.
+   * @retval os_ok The priority was set.
+   * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+   * @retval EINVAL The value of prio is invalid for the
+   *  scheduling policy of the specified thread.
+   */
   os_result_t
   os_thread_set_prio (os_thread_t* thread, os_thread_prio_t prio);
 
   /**
    * @brief Wait for thread termination.
-   * @param [in] thread Pointer to terminating thread.
-   * @param [in] exit_ptr Pointer to object to return. (Optional).
+   * @param [in] thread Pointer to terminating thread object.
+   * @param [in] exit_ptr Pointer to thread exit value. (may be NULL).
    * @retval os_ok The thread was terminated.
    * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
    */
   os_result_t
   os_thread_join (os_thread_t* thread, void** exit_ptr);
 
+  /**
+   * @brief Resume the thread.
+   * @param [in] thread Pointer to thread object.
+   * @par Returns
+   *  Nothing.
+   */
   void
   os_thread_resume (os_thread_t* thread);
 
+  /**
+   * @brief Raise thread signal flags.
+   * @param [in] thread Pointer to thread object.
+   * @param [in] mask The OR-ed flags to raise.
+   * @param [out] oflags Optional pointer where to store the
+   *  previous flags; may be `nullptr`.
+   * @retval os_ok The flags were raised.
+   * @retval EINVAL The mask is zero.
+   * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+   */
   os_result_t
   os_thread_sig_raise (os_thread_t* thread, os_flags_mask_t mask,
                        os_flags_mask_t* oflags);
 
+  /**
+   * @brief Clear thread signal flags.
+   * @param [in] thread Pointer to thread object.
+   * @param [in] mask The OR-ed flags to clear. Zero means 'all'
+   * @param [out] oflags Optional pointer where to store the
+   *  previous flags; may be `nullptr`.
+   * @retval result::ok The flags were cleared.
+   * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+   * @retval EINVAL The mask is zero.
+   */
   os_result_t
   os_thread_sig_clear (os_thread_t* thread, os_flags_mask_t mask,
                        os_flags_mask_t* oflags);
 
+  /**
+   * @brief Get/clear thread signal flags.
+   * @param [in] thread Pointer to thread object.
+   * @param [in] mask The OR-ed flags to get/clear; may be zero.
+   * @param [in] mode Mode bits to select if the flags should be
+   *  cleared (the other bits are ignored).
+   * @retval flags The selected bits from the current thread
+   *  signal flags mask.
+   * @retval sig::all Cannot be invoked from an Interrupt Service Routines.
+   */
   os_flags_mask_t
   os_thread_sig_get (os_thread_t* thread, os_flags_mask_t mask,
                      os_flags_mode_t mode);
 
+  /**
+   * @brief Get the thread scheduler state.
+   * @param [in] thread Pointer to thread object.
+   * @return Thread scheduler state.
+   */
   os_thread_state_t
   os_thread_get_sched_state (os_thread_t* thread);
 
+  /**
+   * @brief Get the thread user storage.
+   * @param [in] thread Pointer to thread object.
+   * @return The address of the thread user storage.
+   */
   os_thread_user_storage_t*
   os_thread_get_user_storage (os_thread_t* thread);
 
+  /**
+   * @brief Get the thread context stack.
+   * @param [in] thread Pointer to thread object.
+   * @return A pointer to the context stack object.
+   */
   os_thread_stack_t*
   os_thread_get_stack (os_thread_t* thread);
 
@@ -436,21 +536,53 @@ extern "C"
    * @{
    */
 
+  /**
+   * @brief Get the default stack size.
+   * @par Parameters
+   *  None
+   * @return  The default stack size in bytes.
+   */
   size_t
   os_thread_stack_get_default_size (void);
 
+  /**
+   * @brief Set the default stack size.
+   * @param [in] size_bytes Default stack size in bytes.
+   * @return  The previous value of the default stack size in bytes.
+   */
   size_t
   os_thread_stack_set_default_size (size_t size_bytes);
 
+  /**
+   * @brief Get the min stack size.
+   * @par Parameters
+   *  None
+   * @return  The min stack size in bytes.
+   */
   size_t
   os_thread_stack_get_min_size (void);
 
+  /**
+   * @brief Set the min stack size.
+   * @param [in] size_bytes Minimum stack size in bytes.
+   * @return  The previous value of the min stack size in bytes.
+   */
   size_t
   os_thread_stack_set_min_size (size_t size_bytes);
 
+  /**
+   * @brief Get the stack size.
+   * @param [in] stack Pointer to stack object.
+   * @return  The stack size in bytes.
+   */
   size_t
   os_thread_stack_get_size (os_thread_stack_t* stack);
 
+  /**
+   * @brief Compute how much available stack remains.
+   * @param [in] stack Pointer to stack object.
+   * @return Number of available bytes.
+   */
   size_t
   os_thread_stack_get_available (os_thread_stack_t* stack);
 
@@ -466,6 +598,11 @@ extern "C"
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
 
+  /**
+   * @brief Get the number of thread context switches.
+   * @return A long integer with the number of times the thread
+   * was scheduled for execution.
+   */
   os_statistics_counter_t
   os_thread_stat_get_context_switches (os_thread_t* thread);
 
@@ -473,6 +610,11 @@ extern "C"
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
 
+  /**
+   * @brief Get the thread execution time.
+   * @return A long integer with the accumulated number of CPU cycles,
+   * possibly divided by some prescaller.
+   */
   os_statistics_duration_t
   os_thread_stat_get_cpu_cycles (os_thread_t* thread);
 
@@ -488,15 +630,37 @@ extern "C"
    * @{
    */
 
+  /**
+   * @brief Get the beginning of the list of children threads.
+   * @param [in] thread Pointer to thread object or NULL for the
+   * list of top threads.
+   * @return An iterator positioned at the list begin.
+   */
   os_iterator_t
   os_children_threads_iter_begin (os_thread_t* thread);
 
+  /**
+   * @brief Get the end of the list of children threads.
+   * @param [in] thread Pointer to thread object or NULL for the
+   * list of top threads.
+   * @return An iterator positioned at the list end.
+   */
   os_iterator_t
   os_children_threads_iter_end (os_thread_t* thread);
 
+  /**
+   * @brief Get the thread from the current iterator position.
+   * @param [in] iterator An active iterator.
+   * @return The pointer to the thread object.
+   */
   os_thread_t*
   os_children_threads_iter_get (os_iterator_t iterator);
 
+  /**
+   * @brief Advance the iterator to the next position.
+   * @param [in] iterator An active iterator.
+   * @return An iterator positioned at the next list element.
+   */
   os_iterator_t
   os_children_threads_iter_next (os_iterator_t iterator);
 

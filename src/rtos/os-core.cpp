@@ -112,6 +112,8 @@ namespace os
        * @details
        * Create all RTOS internal objects and be ready to run.
        *
+       * Must be called only once, usually in main().
+       *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       result_t
@@ -445,7 +447,6 @@ namespace os
         scheduler::current_thread_->statistics_.context_switches_++;
 
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
-
 
       }
 

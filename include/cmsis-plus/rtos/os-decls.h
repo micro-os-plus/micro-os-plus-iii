@@ -196,11 +196,6 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    //using DoubleListNodeClock = DoubleListNodeTimestamp<clock::timestamp_t>;
-    //using Waiting_threads_list3 = Waiting_threads_list2<DoubleListNodeClock>;
-
-    // ------------------------------------------------------------------------
-
     /**
      * @brief Scheduler namespace.
      * @ingroup cmsis-plus-rtos-core
@@ -208,7 +203,7 @@ namespace os
     namespace scheduler
     {
       /**
-       * @brief Type of a variable holding scheduler status codes.
+       * @brief Type of variables holding scheduler status codes.
        * @details
        * Usually a boolean telling if the scheduler is
        * locked or not, but for recursive locks it might also be a
@@ -235,12 +230,12 @@ namespace os
     namespace statistics
     {
       /**
-       * @brief Type of counter for context switches.
+       * @brief Type of variables holding context switches counters.
        */
       using counter_t = uint64_t;
 
       /**
-       * @brief Type of duration in CPU cycles.
+       * @brief Type of variables holding durations in CPU cycles.
        */
       using duration_t = uint64_t;
 
@@ -253,12 +248,12 @@ namespace os
     namespace interrupts
     {
       /**
-       * @brief Type of a variable holding interrupts status.
+       * @brief Type of variables holding interrupts statu codes.
        * @details
        * Usually an integer large enough to hold the CPU status register
        * where the interrupt status is stored.
        *
-       * It is used to temporarily store the CPU status register
+       * Used to temporarily store the CPU status register
        * during critical sections.
        */
       using status_t = port::interrupts::status_t;
@@ -276,7 +271,7 @@ namespace os
     namespace flags
     {
       /**
-       * @brief Type of a variable holding a flags mask.
+       * @brief Type of variables holding flags masks.
        * @details
        * An unsigned type large enough to store all the flags, usually
        * 32-bits wide.
@@ -286,7 +281,7 @@ namespace os
       using mask_t = uint32_t;
 
       /**
-       * @brief Type of a variable holding the flags mode.
+       * @brief Type of variables holding flags modes.
        * @details
        * An unsigned type used to hold the mode bits passed to
        * functions returning flags.
@@ -303,7 +298,7 @@ namespace os
       namespace mode
       {
         /**
-         * @brief Bits used to specify the flags mode.
+         * @brief Bits used to specify the flags modes.
          */
         enum
           : mode_t
@@ -514,6 +509,8 @@ namespace os
      * @details
      * All objects return a non-null string; anonymous objects
      * return `"-"`.
+     *
+     * @note Can be invoked from Interrupt Service Routines.
      */
     inline const char*
     named_object::name (void) const
@@ -523,6 +520,11 @@ namespace os
 
     // ========================================================================
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     constexpr
     clocked_attributes::clocked_attributes ()
     {
@@ -557,7 +559,7 @@ namespace os
          * @brief Type of variables holding timer durations.
          * @details
          * A numeric type intended to hold a generic duration, either in ticks
-         * or in seconds.
+         * cycles or seconds.
          */
         using duration_t = uint32_t;
 
@@ -565,7 +567,7 @@ namespace os
          * @brief Type of variables holding time stamps.
          * @details
          * A numeric type intended to hold a generic timestamp, either in ticks
-         * or in seconds.
+         * cycles or seconds.
          */
         using timestamp_t = uint64_t;
 

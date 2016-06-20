@@ -178,10 +178,16 @@ namespace os
     }
 
     /**
+     * @endcond
+     */
+
+    /**
      * @details
      * Count the number of words where the magic is still there.
      *
      * @warning: For large stacks it may be an expensive operation.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
      */
     std::size_t
     thread::stack::available (void)
@@ -196,6 +202,10 @@ namespace os
 
       return count;
     }
+
+    /**
+     * @cond ignore
+     */
 
     /**
      * @details
@@ -763,6 +773,8 @@ namespace os
      *
      * After the thread detects the interrupted condition, it
      * must clear the interrupted flag.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
      */
     bool
     thread::interrupt (bool interrupt)

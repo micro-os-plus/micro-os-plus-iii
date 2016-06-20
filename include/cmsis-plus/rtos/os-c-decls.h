@@ -90,11 +90,47 @@ extern "C"
    * @{
    */
 
+  /**
+   * @brief Type of values returned by RTOS functions.
+   * @details
+   * For error processing reasons, most CMSIS++ RTOS functions
+   * return a numeric result, which, according to POSIX,
+   * when the call was successful, must be `0`
+   * (`os_ok`) or an error code defined in `<errno.h>` otherwise.
+   *
+   * @see os::rtos::result_t
+   */
   typedef uint32_t os_result_t;
 
+  /**
+   * @brief Type of variables holding flags modes.
+   * @details
+   * An unsigned type used to hold the mode bits passed to
+   * functions returning flags.
+   *
+   * Both thread signal flags and event flags use this definition.
+   *
+   * @see os::rtos::flags::mode_t
+   */
   typedef uint32_t os_flags_mode_t;
+
+  /**
+   * @brief Type of variables holding flags masks.
+   * @details
+   * An unsigned type large enough to store all the flags, usually
+   * 32-bits wide.
+   *
+   * Both thread signal flags and event flags use this definition.
+   *
+   * @see os::rtos::flags::mask_t
+   */
   typedef uint32_t os_flags_mask_t;
 
+  /**
+   * @brief Bits used to specify the flags modes.
+   *
+   * @see os::rtos::flags::mode
+   */
   enum
   {
     os_flags_mode_all = 1, //
@@ -104,24 +140,92 @@ extern "C"
 
   // --------------------------------------------------------------------------
 
+  /**
+   * @brief Type of variables holding scheduler status codes.
+   * @details
+   * Usually a boolean telling if the scheduler is
+   * locked or not, but for recursive locks it might also be a
+   * numeric counter.
+   *
+   * @see os::rtos::scheduler::status_t
+   */
   typedef bool os_sched_status_t;
+
+  /**
+   * @brief Type of variables holding interrupts status codes.
+   * @details
+   * Usually an integer large enough to hold the CPU status register
+   * where the interrupt status is stored.
+   *
+   * Used to temporarily store the CPU status register
+   * during critical sections.
+   *
+   * @see os::rtos::interrupts::status_t
+   */
   typedef os_port_irq_status_t os_irq_status_t;
 
   // --------------------------------------------------------------------------
 
   // Define clock types based on port definitions.
+
+  /**
+   * @brief Type of variables holding clock time stamps.
+   * @details
+   * A numeric type intended to store a clock timestamp, either in ticks
+   * cycles or seconds.
+   *
+   * @see os::rtos::clock::timestamp_t
+   */
   typedef os_port_clock_timestamp_t os_clock_timestamp_t;
+
+  /**
+   * @brief Type of variables holding clock durations.
+   * @details
+   * A numeric type intended to store a clock duration, either in ticks
+   * cycles, or seconds.
+   *
+   * @see os::rtos::clock::duration_t
+   */
   typedef os_port_clock_duration_t os_clock_duration_t;
+
+  /**
+   * @brief Type of variables holding clock offsets.
+   * @details
+   * A numeric type intended to store a clock offset
+   * (difference to epoch), either in ticks
+   * or in seconds.
+   *
+   * @see os::rtos::clock::duration_t
+   */
   typedef os_port_clock_offset_t os_clock_offset_t;
 
   // --------------------------------------------------------------------------
 
-  // Generic iterator, implemented as a pointer.
+  /**
+   * @brief Generic iterator, implemented as a pointer.
+   * @details
+   * To simplify things, the C implementation of iterators
+   * includes a single pointer to a C++ object. Internally,
+   * the functions
+   * used to iterate must cast this pointer properly, but this
+   * should be transparent for the user.
+   */
   typedef void* os_iterator_t;
 
   // --------------------------------------------------------------------------
 
+  /**
+   * @brief Type of variables holding context switches counters.
+   *
+   * @see os::rtos::statistics::counter_t
+   */
   typedef uint64_t os_statistics_counter_t;
+
+  /**
+   * @brief Type of variables holding durations in CPU cycles.
+   *
+   * @see os::rtos::statistics::duration_t
+   */
   typedef uint64_t os_statistics_duration_t;
 
   /**
@@ -129,16 +233,21 @@ extern "C"
    */
 
   // ==========================================================================
+#define OS_THREAD_PRIO_SHIFT   (4)
+
   /**
    * @addtogroup cmsis-plus-rtos-c-thread
    * @{
    */
 
-#define OS_THREAD_PRIO_SHIFT   (4)
-
+  /**
+   * @brief Thread priorities; intermediate values are also possible.
+   *
+   * @see os::rtos::thread::state
+   */
   enum
   {
-    // Must be ordered, with none the first and error the last.
+    // Ordered, with **none** as the first and **error** as the last.
     os_priority_none = 0, // not defined
     os_priority_idle = (1 << OS_THREAD_PRIO_SHIFT),
     os_priority_lowest = (2 << OS_THREAD_PRIO_SHIFT), // lowest
@@ -153,25 +262,61 @@ extern "C"
     os_priority_error = (((15 + 1) << OS_THREAD_PRIO_SHIFT) - 1)
   };
 
+  /**
+   * @brief An enumeration with all possible thread states.
+   *
+   * @see os::rtos::thread::state
+   */
   enum
   {
-    os_thread_inactive = 0,
-    os_thread_ready,
-    os_thread_running,
-    os_thread_waiting
+    os_thread_state_undefined = 0,
+    os_thread_state_inactive = 1,
+    os_thread_state_ready = 2,
+    os_thread_state_running = 3,
+    os_thread_state_waiting = 4,
+    os_thread_state_terminated = 5,
+    os_thread_state_destroyed = 6
   };
 
-  enum
-  {
-    os_timer_once = 0, //
-    os_timer_periodic = 1
-  };
-
+  /**
+   * @brief Type of thread function arguments.
+   * @details
+   * Useful to cast other similar types
+   * to silence possible compiler warnings.
+   *
+   * @see os::rtos::thread::func_args_t
+   */
   typedef void* os_thread_func_args_t;
+
+  /**
+   * @brief Type of thread function.
+   * @details
+   * Useful to cast other similar types
+   * to silence possible compiler warnings.
+   *
+   * @see os::rtos::thread::func_t
+   */
   typedef void*
   (*os_thread_func_t) (os_thread_func_args_t args);
 
+  /**
+   * @brief Type of variables holding the thread state.
+   *
+   * @see os::rtos::thread::state_t
+   */
   typedef uint8_t os_thread_state_t;
+
+  /**
+   * @brief Type of variables holding thread priorities.
+   * @details
+   * A numeric type used to hold thread priorities, affecting the thread
+   * behaviour, like scheduling and thread wakeup due to events;
+   * usually an unsigned 8-bits type.
+   *
+   * Higher values represent higher priorities.
+   *
+   * @see os::rtos::thread::priority_t
+   */
   typedef uint8_t os_thread_prio_t;
 
 #if !defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE) && !defined(__cplusplus)
@@ -186,25 +331,74 @@ extern "C"
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+  /**
+   * @brief Thread stack.
+   * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   * @details
+   * The members of this structure are hidden and should not
+   * be accessed directly, but through associated functions.
+   *
+   * @see os::rtos::thread::stack
+   */
   typedef struct os_thread_stack_s
   {
+    /**
+     * @cond ignore
+     */
+
     void* stack_addr;
     size_t stack_size_bytes;
+
+    /**
+     * @endcond
+     */
+
   } os_thread_stack_t;
 
+  /**
+   * @brief Thread context.
+   * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   * @details
+   * The members of this structure are hidden and should not
+   * be accessed directly, but through associated functions.
+   *
+   * @see os::rtos::thread::context
+   */
   typedef struct os_thread_context_s
   {
+    /**
+     * @cond ignore
+     */
+
     os_thread_stack_t stack;
 #if !defined(OS_USE_RTOS_PORT_SCHEDULER)
     os_port_thread_context_t port;
 #endif
+
+    /**
+     * @endcond
+     */
+
   } os_thread_context_t;
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) \
   || defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
 
+  /**
+   * @brief Thread statistics.
+   * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   * @details
+   * The members of this structure are hidden and should not
+   * be accessed directly, but through associated functions.
+   *
+   * @see os::rtos::thread::statistics
+   */
   typedef struct os_thread_statistics_s
   {
+    /**
+     * @cond ignore
+     */
+
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
     os_statistics_counter_t context_switches;
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
@@ -212,20 +406,68 @@ extern "C"
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
     os_statistics_duration_t cpu_cycles;
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
+
+    /**
+     * @endcond
+     */
+
   } os_thread_statistics_t;
 
 #endif
 
+  /**
+   * @brief Thread attributes.
+   * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   * @details
+   * Initialise this structure with os_thread_attr_init() and then
+   * set any of the individual members directly.
+   *
+   * @see os::rtos::thread::attributes
+   */
   typedef struct os_thread_attr_s
   {
+    /**
+     * @brief Pointer to clock object.
+     */
     void* clock;
+
+    /**
+     * @brief Pointer to user provided stack area.
+     */
     void* th_stack_address;
+
+    /**
+     * @brief Size of user provided stack area, in bytes.
+     */
     size_t th_stack_size_bytes;
+
+    /**
+     * @brief Thread initial priority.
+     */
     os_thread_prio_t th_priority;
+
   } os_thread_attr_t;
 
+  /**
+   * @brief Thread object storage.
+   * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   * @details
+   * This C structure has the same size as the C++ @ref Thread object.
+   *
+   * It must be initialised with os_thread_create() and later a pointer
+   * to it can be used to refer to the thread object in other functions.
+   *
+   * The members of this structure are hidden and should not
+   * be used directly, but only through specific functions.
+   *
+   * @see os::rtos::thread
+   */
   typedef struct os_thread_s
   {
+    /**
+     * @cond ignore
+     */
+
     void* vtbl;
     const char* name;
     os_waiting_thread_node_t ready_node;
@@ -259,6 +501,11 @@ extern "C"
     os_thread_port_data_t port;
 #endif
     os_thread_context_t context;
+
+    /**
+     * @endcond
+     */
+
   } os_thread_t;
 
 #pragma GCC diagnostic pop
@@ -293,10 +540,30 @@ extern "C"
    */
 
   // ==========================================================================
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+  typedef struct os_clock_node_s
+  {
+    void* next;
+    void* prev;
+    void* list;
+    os_clock_timestamp_t timestamp;
+    void* timer;
+  } os_clock_timer_node_t;
+
+#pragma GCC diagnostic pop
+
   /**
    * @addtogroup cmsis-plus-rtos-c-timer
    * @{
    */
+
+  enum
+  {
+    os_timer_once = 0, //
+    os_timer_periodic = 1
+  };
 
   typedef void* os_timer_func_args_t;
   typedef void
@@ -321,15 +588,6 @@ extern "C"
     os_timer_type_t tm_type;
   } os_timer_attr_t;
 
-  typedef struct os_clock_node_s
-  {
-    void* next;
-    void* prev;
-    void* list;
-    os_clock_timestamp_t timestamp;
-    void* timer;
-  } os_clock_node_t;
-
   typedef struct os_timer_s
   {
     const char* name;
@@ -337,7 +595,7 @@ extern "C"
     os_timer_func_args_t func_args;
 #if !defined(OS_USE_RTOS_PORT_TIMER)
     void* clock;
-    os_clock_node_t clock_node;
+    os_clock_timer_node_t clock_node;
     os_clock_duration_t period;
 #endif
 #if defined(OS_USE_RTOS_PORT_TIMER)
@@ -537,7 +795,12 @@ extern "C"
    */
 
   // ==========================================================================
+#if defined(OS_BOOL_RTOS_MESSAGE_QUEUE_SIZE_16BITS)
+  typedef uint16_t os_mqueue_size_t;
+#else
   typedef uint8_t os_mqueue_size_t;
+#endif
+
   typedef uint16_t os_mqueue_msg_size_t;
   typedef os_mqueue_size_t os_mqueue_index_t;
 
@@ -634,14 +897,6 @@ extern "C"
    */
 
   // ==========================================================================
-  typedef struct os_mail_queue_s
-  {
-    os_mempool_t pool;
-    os_mqueue_t queue;
-  } os_mail_queue_t;
-
-  // ==========================================================================
-
   /**
    * @addtogroup cmsis-plus-rtos-c-clock
    * @{
