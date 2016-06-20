@@ -19,3 +19,4 @@ From a functional point of view, the documentation pages can be grouped as:
 * [CMSIS++ Drivers](group__cmsis-plus-drivers.html)
 * [CMSIS++ Trace](group__cmsis-plus-trace.html)
 * [CMSIS++ POSIX I/O](group__cmsis-plus-posix-io.html)
+* [CMSIS++ App Config](group__cmsis-plus-app-config.html)

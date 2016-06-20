@@ -13,15 +13,15 @@
 # TAG += value [value, ...]
 # Values that contain spaces should be placed between quotes (\" \").
 
-#---------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 # Project related configuration options
-#---------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 ## PROJECT_NAME = 
 PROJECT_NAME = "CMSIS++ Reference"
 
 ## PROJECT_NUMBER = 
-PROJECT_NUMBER = 0.1.1
+PROJECT_NUMBER = 0.2.1
 
 ## PROJECT_BRIEF =
 PROJECT_BRIEF = "CMSIS++: A proposal for the next generation CMSIS, written in C++."
