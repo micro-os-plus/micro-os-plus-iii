@@ -505,6 +505,8 @@ namespace os
      * @details
      * @par POSIX compatibility
      *  Extension to standard, no POSIX similar functionality identified.
+     *
+     * @note Can be invoked from Interrupt Service Routines.
      */
     inline semaphore::count_t
     semaphore::initial_value (void) const
@@ -516,6 +518,8 @@ namespace os
      * @details
      * @par POSIX compatibility
      *  Extension to standard, no POSIX similar functionality identified.
+     *
+     * @note Can be invoked from Interrupt Service Routines.
      */
     inline semaphore::count_t
     semaphore::max_value (void) const

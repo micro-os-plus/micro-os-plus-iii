@@ -296,7 +296,7 @@ namespace os
       alloc (void);
 
       /**
-       * @brief Allocate a memory block.
+       * @brief Try to allocate a memory block.
        * @par Parameters
        *  None
        * @return Pointer to memory block, or `nullptr` if no memory available.
@@ -314,8 +314,7 @@ namespace os
 
       /**
        * @brief Free the memory block.
-       * @par Parameters
-       *  None
+       * @param [in] block Pointer to memory block to free.
        * @retval result::ok The memory block was released.
        * @retval EINVAL The block does not belong to the memory pool.
        */
@@ -890,36 +889,66 @@ namespace os
       return this == &rhs;
     }
 
+    /**
+     * @details
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
     inline std::size_t
     memory_pool::capacity (void) const
     {
       return blocks_;
     }
 
+    /**
+     * @details
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
     inline std::size_t
     memory_pool::block_size (void) const
     {
       return block_size_bytes_;
     }
 
+    /**
+     * @details
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
     inline std::size_t
     memory_pool::count (void) const
     {
       return count_;
     }
 
+    /**
+     * @details
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
     inline bool
     memory_pool::empty (void) const
     {
       return (count () == 0);
     }
 
+    /**
+     * @details
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
     inline bool
     memory_pool::full (void) const
     {
       return (count () == capacity ());
     }
 
+    /**
+     * @details
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
     inline void*
     memory_pool::pool (void)
     {

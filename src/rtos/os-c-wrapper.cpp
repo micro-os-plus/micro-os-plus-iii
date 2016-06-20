@@ -589,7 +589,7 @@ os_thread_get_name (os_thread_t* thread)
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
- * @see os::rtos::thread::sched_prio(void)
+ * @see os::rtos::thread::sched_prio()
  */
 os_thread_prio_t
 os_thread_get_prio (os_thread_t* thread)
@@ -722,7 +722,7 @@ os_thread_get_user_storage (os_thread_t* thread)
  *
  * @note Can be invoked from Interrupt Service Routines.
  *
- * @see os::rtos::thread::stack(void)
+ * @see os::rtos::thread::stack()
  */
 os_thread_stack_t*
 os_thread_get_stack (os_thread_t* thread)
@@ -738,7 +738,7 @@ os_thread_get_stack (os_thread_t* thread)
  *
  * @note Can be invoked from Interrupt Service Routines.
  *
- * @see os::rtos::thread::stack::default_size(void)
+ * @see os::rtos::thread::stack::default_size()
  */
 size_t
 os_thread_stack_get_default_size (void)
@@ -764,7 +764,7 @@ os_thread_stack_set_default_size (size_t size_bytes)
  *
  * @note Can be invoked from Interrupt Service Routines.
  *
- * @see os::rtos::thread::stack::min_size(void)
+ * @see os::rtos::thread::stack::min_size()
  */
 size_t
 os_thread_stack_get_min_size (void)
@@ -790,7 +790,7 @@ os_thread_stack_set_min_size (size_t size_bytes)
  *
  * @note Can be invoked from Interrupt Service Routines.
  *
- * @see os::rtos::thread::stack::size(void)
+ * @see os::rtos::thread::stack::size()
  */
 size_t
 os_thread_stack_get_size (os_thread_stack_t* stack)
@@ -804,7 +804,7 @@ os_thread_stack_get_size (os_thread_stack_t* stack)
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
- * @see os::rtos::thread::stack::available(void)
+ * @see os::rtos::thread::stack::available()
  */
 size_t
 os_thread_stack_get_available (os_thread_stack_t* stack)
@@ -822,7 +822,7 @@ os_thread_stack_get_available (os_thread_stack_t* stack)
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
- * @see os::rtos::thread::statistics::context_switches(void)
+ * @see os::rtos::thread::statistics::context_switches()
  */
 os_statistics_counter_t
 os_thread_stat_get_context_switches (os_thread_t* thread)
@@ -840,7 +840,7 @@ os_thread_stat_get_context_switches (os_thread_t* thread)
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
- * @see os::rtos::thread::statistics::cpu_cycles(void)
+ * @see os::rtos::thread::statistics::cpu_cycles()
  */
 os_statistics_duration_t
 os_thread_stat_get_cpu_cycles (os_thread_t* thread)
@@ -921,13 +921,27 @@ os_children_threads_iter_next (os_iterator_t iterator)
 
 // ----------------------------------------------------------------------------
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::clock::name()
+ */
 const char*
-os_clock_name (os_clock_t* clock)
+os_clock_get_name (os_clock_t* clock)
 {
   assert(clock != nullptr);
   return (reinterpret_cast<rtos::clock&> (*clock)).name ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::clock::now()
+ */
 os_clock_timestamp_t
 os_clock_now (os_clock_t* clock)
 {
@@ -935,13 +949,13 @@ os_clock_now (os_clock_t* clock)
   return (os_clock_timestamp_t) (reinterpret_cast<rtos::clock&> (*clock)).now ();
 }
 
-os_clock_timestamp_t
-os_clock_steady_now (os_clock_t* clock)
-{
-  assert(clock != nullptr);
-  return (os_clock_timestamp_t) (reinterpret_cast<rtos::clock&> (*clock)).steady_now ();
-}
-
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::clock::sleep_for()
+ */
 os_result_t
 os_clock_sleep_for (os_clock_t* clock, os_clock_duration_t duration)
 {
@@ -950,6 +964,13 @@ os_clock_sleep_for (os_clock_t* clock, os_clock_duration_t duration)
       duration);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::clock::sleep_until()
+ */
 os_result_t
 os_clock_sleep_until (os_clock_t* clock, os_clock_timestamp_t timestamp)
 {
@@ -958,14 +979,28 @@ os_clock_sleep_until (os_clock_t* clock, os_clock_timestamp_t timestamp)
       timestamp);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::clock::wait_for()
+ */
 os_result_t
-os_clock_wait_for (os_clock_t* clock, os_clock_duration_t duration)
+os_clock_wait_for (os_clock_t* clock, os_clock_duration_t timeout)
 {
   assert(clock != nullptr);
   return (os_result_t) (reinterpret_cast<rtos::clock&> (*clock)).wait_for (
-      duration);
+      timeout);
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::adjustable_clock::offset()
+ */
 os_clock_offset_t
 os_clock_get_offset (os_clock_t* clock)
 {
@@ -974,6 +1009,13 @@ os_clock_get_offset (os_clock_t* clock)
 
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::adjustable_clock::offset(offset_t)
+ */
 os_clock_offset_t
 os_clock_set_offset (os_clock_t* clock, os_clock_offset_t offset)
 {
@@ -984,12 +1026,22 @@ os_clock_set_offset (os_clock_t* clock, os_clock_offset_t offset)
 
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ */
 os_clock_t*
 os_clock_get_sysclock (void)
 {
   return (os_clock_t*) &sysclock;
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ */
 os_clock_t*
 os_clock_get_rtclock (void)
 {
@@ -998,38 +1050,67 @@ os_clock_get_rtclock (void)
 
 // ----------------------------------------------------------------------------
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::clock::now()
+ */
 os_clock_timestamp_t
 os_sysclock_now (void)
 {
   return (os_clock_timestamp_t) sysclock.now ();
 }
 
-os_clock_timestamp_t
-os_sysclock_steady_now (void)
-{
-  return (os_clock_timestamp_t) sysclock.steady_now ();
-}
-
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::clock::sleep_for()
+ */
 os_result_t
 os_sysclock_sleep_for (os_clock_duration_t duration)
 {
   return (os_result_t) sysclock.sleep_for (duration);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::clock::sleep_until()
+ */
 os_result_t
 os_sysclock_sleep_until (os_clock_timestamp_t timestamp)
 {
   return (os_result_t) sysclock.sleep_until (timestamp);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::clock::wait_for()
+ */
 os_result_t
-os_sysclock_wait_for (os_clock_duration_t duration)
+os_sysclock_wait_for (os_clock_duration_t timeout)
 {
-  return (os_result_t) sysclock.wait_for (duration);
+  return (os_result_t) sysclock.wait_for (timeout);
 }
 
 // ----------------------------------------------------------------------------
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::timer::attributes
+ */
 void
 os_timer_attr_init (os_timer_attr_t* attr)
 {
@@ -1037,6 +1118,13 @@ os_timer_attr_init (os_timer_attr_t* attr)
   new (attr) timer::attributes ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::timer::periodic_attributes
+ */
 void
 os_timer_attr_init_periodic (os_timer_attr_t* attr)
 {
@@ -1044,14 +1132,28 @@ os_timer_attr_init_periodic (os_timer_attr_t* attr)
   new (attr) timer::periodic_attributes ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::timer::periodic_initializer
+ */
 const os_timer_attr_t*
 os_timer_attr_get_periodic (void)
 {
   return (const os_timer_attr_t*) &timer::periodic_initializer;
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::timer
+ */
 void
-os_timer_create (os_timer_t* timer, const char* name, os_timer_func_t func,
+os_timer_create (os_timer_t* timer, const char* name, os_timer_func_t function,
                  os_timer_func_args_t args, const os_timer_attr_t* attr)
 {
   assert(timer != nullptr);
@@ -1059,11 +1161,18 @@ os_timer_create (os_timer_t* timer, const char* name, os_timer_func_t func,
     {
       attr = (const os_timer_attr_t*) &timer::periodic_initializer;
     }
-  new (timer) rtos::timer (name, (timer::func_t) func,
+  new (timer) rtos::timer (name, (timer::func_t) function,
                            (timer::func_args_t) args,
                            (timer::attributes&) *attr);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::timer
+ */
 void
 os_timer_destroy (os_timer_t* timer)
 {
@@ -1071,6 +1180,13 @@ os_timer_destroy (os_timer_t* timer)
   (reinterpret_cast<rtos::timer&> (*timer)).~timer ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::timer::name()
+ */
 const char*
 os_timer_get_name (os_timer_t* timer)
 {
@@ -1078,13 +1194,27 @@ os_timer_get_name (os_timer_t* timer)
   return (reinterpret_cast<rtos::timer&> (*timer)).name ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::timer::start()
+ */
 os_result_t
-os_timer_start (os_timer_t* timer, os_clock_duration_t timeout)
+os_timer_start (os_timer_t* timer, os_clock_duration_t period)
 {
   assert(timer != nullptr);
-  return (os_result_t) (reinterpret_cast<rtos::timer&> (*timer)).start (timeout);
+  return (os_result_t) (reinterpret_cast<rtos::timer&> (*timer)).start (period);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::timer::stop()
+ */
 os_result_t
 os_timer_stop (os_timer_t* timer)
 {
@@ -1094,6 +1224,13 @@ os_timer_stop (os_timer_t* timer)
 
 // ----------------------------------------------------------------------------
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::mutex::attributes
+ */
 void
 os_mutex_attr_init (os_mutex_attr_t* attr)
 {
@@ -1101,6 +1238,13 @@ os_mutex_attr_init (os_mutex_attr_t* attr)
   new (attr) mutex::attributes ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::mutex::recursive_attributes
+ */
 void
 os_mutex_attr_init_recursive (os_mutex_attr_t* attr)
 {
@@ -1108,12 +1252,26 @@ os_mutex_attr_init_recursive (os_mutex_attr_t* attr)
   new (attr) mutex::recursive_attributes ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::mutex::recursive_initializer
+ */
 const os_mutex_attr_t*
 os_mutex_attr_get_recursive (void)
 {
   return (const os_mutex_attr_t*) &mutex::recursive_initializer;
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::mutex
+ */
 void
 os_mutex_create (os_mutex_t* mutex, const char* name,
                  const os_mutex_attr_t* attr)
@@ -1126,6 +1284,13 @@ os_mutex_create (os_mutex_t* mutex, const char* name,
   new (mutex) rtos::mutex (name, (mutex::attributes&) *attr);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::mutex
+ */
 void
 os_mutex_destroy (os_mutex_t* mutex)
 {
@@ -1133,6 +1298,13 @@ os_mutex_destroy (os_mutex_t* mutex)
   (reinterpret_cast<rtos::mutex&> (*mutex)).~mutex ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::mutex::name()
+ */
 const char*
 os_mutex_get_name (os_mutex_t* mutex)
 {
@@ -1140,6 +1312,13 @@ os_mutex_get_name (os_mutex_t* mutex)
   return (reinterpret_cast<rtos::mutex&> (*mutex)).name ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::mutex::lock()
+ */
 os_result_t
 os_mutex_lock (os_mutex_t* mutex)
 {
@@ -1147,6 +1326,13 @@ os_mutex_lock (os_mutex_t* mutex)
   return (os_result_t) (reinterpret_cast<rtos::mutex&> (*mutex)).lock ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::mutex::try_lock()
+ */
 os_result_t
 os_mutex_try_lock (os_mutex_t* mutex)
 {
@@ -1154,6 +1340,13 @@ os_mutex_try_lock (os_mutex_t* mutex)
   return (os_result_t) (reinterpret_cast<rtos::mutex&> (*mutex)).try_lock ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::mutex::timed_lock()
+ */
 os_result_t
 os_mutex_timed_lock (os_mutex_t* mutex, os_clock_duration_t timeout)
 {
@@ -1162,6 +1355,13 @@ os_mutex_timed_lock (os_mutex_t* mutex, os_clock_duration_t timeout)
       timeout);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::mutex::unlock()
+ */
 os_result_t
 os_mutex_unlock (os_mutex_t* mutex)
 {
@@ -1169,6 +1369,13 @@ os_mutex_unlock (os_mutex_t* mutex)
   return (os_result_t) (reinterpret_cast<rtos::mutex&> (*mutex)).unlock ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::mutex::prio_ceiling()
+ */
 os_thread_prio_t
 os_mutex_get_prio_ceiling (os_mutex_t* mutex)
 {
@@ -1176,6 +1383,13 @@ os_mutex_get_prio_ceiling (os_mutex_t* mutex)
   return (os_thread_prio_t) (reinterpret_cast<rtos::mutex&> (*mutex)).prio_ceiling ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::mutex::prio_ceiling(thread::priority_t, thread::priority_t*)
+ */
 os_result_t
 os_mutex_set_prio_ceiling (os_mutex_t* mutex, os_thread_prio_t prio_ceiling,
                            os_thread_prio_t* old_prio_ceiling)
@@ -1185,6 +1399,13 @@ os_mutex_set_prio_ceiling (os_mutex_t* mutex, os_thread_prio_t prio_ceiling,
       prio_ceiling, old_prio_ceiling);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::mutex::consistent()
+ */
 os_result_t
 os_mutex_mark_consistent (os_mutex_t* mutex)
 {
@@ -1192,6 +1413,13 @@ os_mutex_mark_consistent (os_mutex_t* mutex)
   return (os_result_t) (reinterpret_cast<rtos::mutex&> (*mutex)).consistent ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::mutex::owner()
+ */
 os_thread_t*
 os_mutex_get_owner (os_mutex_t* mutex)
 {
@@ -1199,6 +1427,13 @@ os_mutex_get_owner (os_mutex_t* mutex)
   return (os_thread_t*) (reinterpret_cast<rtos::mutex&> (*mutex)).owner ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::mutex::reset()
+ */
 os_result_t
 os_mutex_reset (os_mutex_t* mutex)
 {
@@ -1208,6 +1443,13 @@ os_mutex_reset (os_mutex_t* mutex)
 
 // ----------------------------------------------------------------------------
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::condition_variable::attributes
+ */
 void
 os_condvar_attr_init (os_condvar_attr_t* attr)
 {
@@ -1215,6 +1457,13 @@ os_condvar_attr_init (os_condvar_attr_t* attr)
   new (attr) condition_variable::attributes ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::condition_variable
+ */
 void
 os_condvar_create (os_condvar_t* condvar, const char* name,
                    const os_condvar_attr_t* attr)
@@ -1228,6 +1477,13 @@ os_condvar_create (os_condvar_t* condvar, const char* name,
                                     (condition_variable::attributes&) *attr);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::condition_variable
+ */
 void
 os_condvar_destroy (os_condvar_t* condvar)
 {
@@ -1235,6 +1491,13 @@ os_condvar_destroy (os_condvar_t* condvar)
   (reinterpret_cast<condition_variable&> (*condvar)).~condition_variable ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::condition_variable::name()
+ */
 const char*
 os_condvar_get_name (os_condvar_t* condvar)
 {
@@ -1242,6 +1505,13 @@ os_condvar_get_name (os_condvar_t* condvar)
   return (reinterpret_cast<condition_variable&> (*condvar)).name ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::condition_variable::signal()
+ */
 os_result_t
 os_condvar_signal (os_condvar_t* condvar)
 {
@@ -1249,6 +1519,13 @@ os_condvar_signal (os_condvar_t* condvar)
   return (os_result_t) (reinterpret_cast<condition_variable&> (*condvar)).signal ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::condition_variable::broadcast()
+ */
 os_result_t
 os_condvar_broadcast (os_condvar_t* condvar)
 {
@@ -1256,6 +1533,13 @@ os_condvar_broadcast (os_condvar_t* condvar)
   return (os_result_t) (reinterpret_cast<condition_variable&> (*condvar)).broadcast ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::condition_variable::wait()
+ */
 os_result_t
 os_condvar_wait (os_condvar_t* condvar, os_mutex_t* mutex)
 {
@@ -1264,6 +1548,13 @@ os_condvar_wait (os_condvar_t* condvar, os_mutex_t* mutex)
       reinterpret_cast<rtos::mutex&> (*mutex));
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::condition_variable::timed_wait()
+ */
 os_result_t
 os_condvar_timed_wait (os_condvar_t* condvar, os_mutex_t* mutex,
                        os_clock_duration_t timeout)
@@ -1275,6 +1566,13 @@ os_condvar_timed_wait (os_condvar_t* condvar, os_mutex_t* mutex,
 
 // ----------------------------------------------------------------------------
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::semaphore::attributes
+ */
 void
 os_semaphore_attr_init (os_semaphore_attr_t* attr)
 {
@@ -1282,6 +1580,13 @@ os_semaphore_attr_init (os_semaphore_attr_t* attr)
   new (attr) semaphore::attributes ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::semaphore::binary_attributes
+ */
 void
 os_semaphore_attr_init_binary (os_semaphore_attr_t* attr)
 {
@@ -1289,12 +1594,26 @@ os_semaphore_attr_init_binary (os_semaphore_attr_t* attr)
   new (attr) semaphore::binary_attributes ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::semaphore::binary_initializer
+ */
 const os_semaphore_attr_t*
 os_semaphore_attr_get_binary (void)
 {
   return (const os_semaphore_attr_t*) &semaphore::binary_initializer;
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::semaphore
+ */
 void
 os_semaphore_create (os_semaphore_t* semaphore, const char* name,
                      const os_semaphore_attr_t* attr)
@@ -1307,6 +1626,13 @@ os_semaphore_create (os_semaphore_t* semaphore, const char* name,
   new (semaphore) rtos::semaphore (name, (semaphore::attributes&) *attr);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::semaphore
+ */
 void
 os_semaphore_destroy (os_semaphore_t* semaphore)
 {
@@ -1314,6 +1640,13 @@ os_semaphore_destroy (os_semaphore_t* semaphore)
   (reinterpret_cast<rtos::semaphore&> (*semaphore)).~semaphore ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::semaphore::name()
+ */
 const char*
 os_semaphore_get_name (os_semaphore_t* semaphore)
 {
@@ -1321,6 +1654,13 @@ os_semaphore_get_name (os_semaphore_t* semaphore)
   return (reinterpret_cast<rtos::semaphore&> (*semaphore)).name ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::semaphore::post()
+ */
 os_result_t
 os_semaphore_post (os_semaphore_t* semaphore)
 {
@@ -1328,6 +1668,13 @@ os_semaphore_post (os_semaphore_t* semaphore)
   return (os_result_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).post ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::semaphore::wait()
+ */
 os_result_t
 os_semaphore_wait (os_semaphore_t* semaphore)
 {
@@ -1335,6 +1682,13 @@ os_semaphore_wait (os_semaphore_t* semaphore)
   return (os_result_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).wait ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::semaphore::try_wait()
+ */
 os_result_t
 os_semaphore_try_wait (os_semaphore_t* semaphore)
 {
@@ -1342,6 +1696,13 @@ os_semaphore_try_wait (os_semaphore_t* semaphore)
   return (os_result_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).try_wait ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::semaphore::timed_wait()
+ */
 os_result_t
 os_semaphore_timed_wait (os_semaphore_t* semaphore, os_clock_duration_t timeout)
 {
@@ -1350,6 +1711,13 @@ os_semaphore_timed_wait (os_semaphore_t* semaphore, os_clock_duration_t timeout)
       timeout);
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::semaphore::value()
+ */
 os_semaphore_count_t
 os_semaphore_get_value (os_semaphore_t* semaphore)
 {
@@ -1357,6 +1725,13 @@ os_semaphore_get_value (os_semaphore_t* semaphore)
   return (os_semaphore_count_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).value ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::semaphore::reset()
+ */
 os_result_t
 os_semaphore_reset (os_semaphore_t* semaphore)
 {
@@ -1364,6 +1739,13 @@ os_semaphore_reset (os_semaphore_t* semaphore)
   return (os_result_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).reset ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::semaphore::initial_value()
+ */
 os_semaphore_count_t
 os_semaphore_get_initial_value (os_semaphore_t* semaphore)
 {
@@ -1371,6 +1753,13 @@ os_semaphore_get_initial_value (os_semaphore_t* semaphore)
   return (os_semaphore_count_t) (reinterpret_cast<rtos::semaphore&> (*semaphore)).initial_value ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::semaphore::max_value()
+ */
 os_semaphore_count_t
 os_semaphore_get_max_value (os_semaphore_t* semaphore)
 {
@@ -1380,6 +1769,13 @@ os_semaphore_get_max_value (os_semaphore_t* semaphore)
 
 // ----------------------------------------------------------------------------
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::memory_pool::attributes
+ */
 void
 os_mempool_attr_init (os_mempool_attr_t* attr)
 {
@@ -1387,6 +1783,13 @@ os_mempool_attr_init (os_mempool_attr_t* attr)
   new (attr) memory_pool::attributes ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::memory_pool
+ */
 void
 os_mempool_create (os_mempool_t* mempool, const char* name, size_t blocks,
                    size_t block_size_bytes, const os_mempool_attr_t* attr)
@@ -1400,6 +1803,13 @@ os_mempool_create (os_mempool_t* mempool, const char* name, size_t blocks,
                              (memory_pool::attributes&) *attr);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::memory_pool
+ */
 void
 os_mempool_destroy (os_mempool_t* mempool)
 {
@@ -1407,6 +1817,13 @@ os_mempool_destroy (os_mempool_t* mempool)
   (reinterpret_cast<memory_pool&> (*mempool)).~memory_pool ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::memory_pool::name()
+ */
 const char*
 os_mempool_get_name (os_mempool_t* mempool)
 {
@@ -1414,6 +1831,13 @@ os_mempool_get_name (os_mempool_t* mempool)
   return (reinterpret_cast<memory_pool&> (*mempool)).name ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::memory_pool::alloc()
+ */
 void*
 os_mempool_alloc (os_mempool_t* mempool)
 {
@@ -1421,6 +1845,13 @@ os_mempool_alloc (os_mempool_t* mempool)
   return (reinterpret_cast<memory_pool&> (*mempool)).alloc ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::memory_pool::try_alloc()
+ */
 void*
 os_mempool_try_alloc (os_mempool_t* mempool)
 {
@@ -1428,6 +1859,13 @@ os_mempool_try_alloc (os_mempool_t* mempool)
   return (reinterpret_cast<memory_pool&> (*mempool)).try_alloc ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::memory_pool::timed_alloc()
+ */
 void*
 os_mempool_timed_alloc (os_mempool_t* mempool, os_clock_duration_t timeout)
 {
@@ -1435,6 +1873,13 @@ os_mempool_timed_alloc (os_mempool_t* mempool, os_clock_duration_t timeout)
   return (reinterpret_cast<memory_pool&> (*mempool)).timed_alloc (timeout);
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::memory_pool::free()
+ */
 os_result_t
 os_mempool_free (os_mempool_t* mempool, void* block)
 {
@@ -1442,6 +1887,13 @@ os_mempool_free (os_mempool_t* mempool, void* block)
   return (os_result_t) (reinterpret_cast<memory_pool&> (*mempool)).free (block);
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::memory_pool::capacity()
+ */
 size_t
 os_mempool_get_capacity (os_mempool_t* mempool)
 {
@@ -1449,6 +1901,13 @@ os_mempool_get_capacity (os_mempool_t* mempool)
   return (reinterpret_cast<memory_pool&> (*mempool)).capacity ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::memory_pool::count()
+ */
 size_t
 os_mempool_get_count (os_mempool_t* mempool)
 {
@@ -1456,6 +1915,13 @@ os_mempool_get_count (os_mempool_t* mempool)
   return (reinterpret_cast<memory_pool&> (*mempool)).count ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::memory_pool::block_size()
+ */
 size_t
 os_mempool_get_block_size (os_mempool_t* mempool)
 {
@@ -1463,6 +1929,13 @@ os_mempool_get_block_size (os_mempool_t* mempool)
   return (reinterpret_cast<memory_pool&> (*mempool)).block_size ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::memory_pool::empty()
+ */
 bool
 os_mempool_is_empty (os_mempool_t* mempool)
 {
@@ -1470,6 +1943,13 @@ os_mempool_is_empty (os_mempool_t* mempool)
   return (reinterpret_cast<memory_pool&> (*mempool)).empty ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::memory_pool::full()
+ */
 bool
 os_mempool_is_full (os_mempool_t* mempool)
 {
@@ -1477,6 +1957,13 @@ os_mempool_is_full (os_mempool_t* mempool)
   return (reinterpret_cast<memory_pool&> (*mempool)).full ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::memory_pool::reset()
+ */
 os_result_t
 os_mempool_reset (os_mempool_t* mempool)
 {
@@ -1484,6 +1971,13 @@ os_mempool_reset (os_mempool_t* mempool)
   return (os_result_t) (reinterpret_cast<memory_pool&> (*mempool)).reset ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::memory_pool::pool()
+ */
 void*
 os_mempool_get_pool (os_mempool_t* mempool)
 {
@@ -1493,6 +1987,13 @@ os_mempool_get_pool (os_mempool_t* mempool)
 
 // --------------------------------------------------------------------------
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::message_queue::attributes
+ */
 void
 os_mqueue_attr_init (os_mqueue_attr_t* attr)
 {
@@ -1500,6 +2001,13 @@ os_mqueue_attr_init (os_mqueue_attr_t* attr)
   new (attr) message_queue::attributes ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::message_queue
+ */
 void
 os_mqueue_create (os_mqueue_t* mqueue, const char* name, size_t msgs,
                   size_t msg_size_bytes, const os_mqueue_attr_t* attr)
@@ -1513,6 +2021,13 @@ os_mqueue_create (os_mqueue_t* mqueue, const char* name, size_t msgs,
                               (message_queue::attributes&) *attr);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::message_queue
+ */
 void
 os_mqueue_destroy (os_mqueue_t* mqueue)
 {
@@ -1520,6 +2035,13 @@ os_mqueue_destroy (os_mqueue_t* mqueue)
   (reinterpret_cast<message_queue&> (*mqueue)).~message_queue ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::message_queue::name()
+ */
 const char*
 os_mqueue_get_name (os_mqueue_t* mqueue)
 {
@@ -1527,6 +2049,13 @@ os_mqueue_get_name (os_mqueue_t* mqueue)
   return (reinterpret_cast<message_queue&> (*mqueue)).name ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::message_queue::send()
+ */
 os_result_t
 os_mqueue_send (os_mqueue_t* mqueue, const void* msg, size_t nbytes,
                 os_mqueue_prio_t mprio)
@@ -1536,6 +2065,13 @@ os_mqueue_send (os_mqueue_t* mqueue, const void* msg, size_t nbytes,
       msg, nbytes, mprio);
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::message_queue::try_send()
+ */
 os_result_t
 os_mqueue_try_send (os_mqueue_t* mqueue, const void* msg, size_t nbytes,
                     os_mqueue_prio_t mprio)
@@ -1545,6 +2081,13 @@ os_mqueue_try_send (os_mqueue_t* mqueue, const void* msg, size_t nbytes,
       msg, nbytes, mprio);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::message_queue::timed_send()
+ */
 os_result_t
 os_mqueue_timed_send (os_mqueue_t* mqueue, const void* msg, size_t nbytes,
                       os_clock_duration_t timeout, os_mqueue_prio_t mprio)
@@ -1554,6 +2097,13 @@ os_mqueue_timed_send (os_mqueue_t* mqueue, const void* msg, size_t nbytes,
       msg, nbytes, timeout, mprio);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::message_queue::receive()
+ */
 os_result_t
 os_mqueue_receive (os_mqueue_t* mqueue, void* msg, size_t nbytes,
                    os_mqueue_prio_t* mprio)
@@ -1563,6 +2113,13 @@ os_mqueue_receive (os_mqueue_t* mqueue, void* msg, size_t nbytes,
       msg, nbytes, mprio);
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::message_queue::try_receive()
+ */
 os_result_t
 os_mqueue_try_receive (os_mqueue_t* mqueue, void* msg, size_t nbytes,
                        os_mqueue_prio_t* mprio)
@@ -1572,6 +2129,13 @@ os_mqueue_try_receive (os_mqueue_t* mqueue, void* msg, size_t nbytes,
       msg, nbytes, mprio);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::message_queue::timed_receive()
+ */
 os_result_t
 os_mqueue_timed_receive (os_mqueue_t* mqueue, void* msg, size_t nbytes,
                          os_clock_duration_t timeout, os_mqueue_prio_t* mprio)
@@ -1581,6 +2145,13 @@ os_mqueue_timed_receive (os_mqueue_t* mqueue, void* msg, size_t nbytes,
       msg, nbytes, timeout, mprio);
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::message_queue::length()
+ */
 size_t
 os_mqueue_get_length (os_mqueue_t* mqueue)
 {
@@ -1588,6 +2159,13 @@ os_mqueue_get_length (os_mqueue_t* mqueue)
   return (reinterpret_cast<message_queue&> (*mqueue)).length ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::message_queue::capacity()
+ */
 size_t
 os_mqueue_get_capacity (os_mqueue_t* mqueue)
 {
@@ -1595,6 +2173,13 @@ os_mqueue_get_capacity (os_mqueue_t* mqueue)
   return (reinterpret_cast<message_queue&> (*mqueue)).capacity ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::message_queue::msg_size()
+ */
 size_t
 os_mqueue_get_msg_size (os_mqueue_t* mqueue)
 {
@@ -1602,6 +2187,13 @@ os_mqueue_get_msg_size (os_mqueue_t* mqueue)
   return (reinterpret_cast<message_queue&> (*mqueue)).msg_size ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::message_queue::empty()
+ */
 bool
 os_mqueue_is_empty (os_mqueue_t* mqueue)
 {
@@ -1609,6 +2201,13 @@ os_mqueue_is_empty (os_mqueue_t* mqueue)
   return (reinterpret_cast<message_queue&> (*mqueue)).empty ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::message_queue::full()
+ */
 bool
 os_mqueue_is_full (os_mqueue_t* mqueue)
 {
@@ -1616,6 +2215,13 @@ os_mqueue_is_full (os_mqueue_t* mqueue)
   return (reinterpret_cast<message_queue&> (*mqueue)).full ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::message_queue::reset()
+ */
 os_result_t
 os_mqueue_reset (os_mqueue_t* mqueue)
 {
@@ -1625,6 +2231,13 @@ os_mqueue_reset (os_mqueue_t* mqueue)
 
 // --------------------------------------------------------------------------
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::event_flags::attributes
+ */
 void
 os_evflags_attr_init (os_evflags_attr_t* attr)
 {
@@ -1632,6 +2245,13 @@ os_evflags_attr_init (os_evflags_attr_t* attr)
   new (attr) event_flags::attributes ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::event_flags
+ */
 void
 os_evflags_create (os_evflags_t* evflags, const char* name,
                    const os_evflags_attr_t* attr)
@@ -1644,6 +2264,13 @@ os_evflags_create (os_evflags_t* evflags, const char* name,
   new (evflags) event_flags (name, (event_flags::attributes&) *attr);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::event_flags
+ */
 void
 os_evflags_destroy (os_evflags_t* evflags)
 {
@@ -1651,6 +2278,13 @@ os_evflags_destroy (os_evflags_t* evflags)
   (reinterpret_cast<event_flags&> (*evflags)).~event_flags ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::event_flags::name()
+ */
 const char*
 os_evflags_get_name (os_evflags_t* evflags)
 {
@@ -1658,6 +2292,13 @@ os_evflags_get_name (os_evflags_t* evflags)
   return (reinterpret_cast<event_flags&> (*evflags)).name ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::event_flags::wait()
+ */
 os_result_t
 os_evflags_wait (os_evflags_t* evflags, os_flags_mask_t mask,
                  os_flags_mask_t* oflags, os_flags_mode_t mode)
@@ -1668,6 +2309,13 @@ os_evflags_wait (os_evflags_t* evflags, os_flags_mask_t mask,
                                                                          mode);
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::event_flags::try_wait()
+ */
 os_result_t
 os_evflags_try_wait (os_evflags_t* evflags, os_flags_mask_t mask,
                      os_flags_mask_t* oflags, os_flags_mode_t mode)
@@ -1677,6 +2325,13 @@ os_evflags_try_wait (os_evflags_t* evflags, os_flags_mask_t mask,
       mask, oflags, mode);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::event_flags::timed_wait()
+ */
 os_result_t
 os_evflags_timed_wait (os_evflags_t* evflags, os_flags_mask_t mask,
                        os_clock_duration_t timeout, os_flags_mask_t* oflags,
@@ -1687,6 +2342,13 @@ os_evflags_timed_wait (os_evflags_t* evflags, os_flags_mask_t mask,
       mask, timeout, oflags, mode);
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::event_flags::raise()
+ */
 os_result_t
 os_evflags_raise (os_evflags_t* evflags, os_flags_mask_t mask,
                   os_flags_mask_t* oflags)
@@ -1696,6 +2358,13 @@ os_evflags_raise (os_evflags_t* evflags, os_flags_mask_t mask,
       mask, oflags);
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::event_flags::clear()
+ */
 os_result_t
 os_evflags_clear (os_evflags_t* evflags, os_flags_mask_t mask,
                   os_flags_mask_t* oflags)
@@ -1705,6 +2374,13 @@ os_evflags_clear (os_evflags_t* evflags, os_flags_mask_t mask,
       mask, oflags);
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::event_flags::get()
+ */
 os_flags_mask_t
 os_evflags_get (os_evflags_t* evflags, os_flags_mask_t mask,
                 os_flags_mode_t mode)
@@ -1714,6 +2390,13 @@ os_evflags_get (os_evflags_t* evflags, os_flags_mask_t mask,
       mask, mode);
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::event_flags::raise()
+ */
 bool
 os_evflags_are_waiting (os_evflags_t* evflags)
 {

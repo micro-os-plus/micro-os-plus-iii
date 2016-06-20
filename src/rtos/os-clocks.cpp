@@ -167,6 +167,11 @@ namespace os
       return steady_count_;
     }
 
+    /**
+     * @details
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
     clock::timestamp_t
     clock::steady_now (void)
     {
@@ -176,6 +181,11 @@ namespace os
       return steady_count_;
     }
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     result_t
     clock::sleep_for (duration_t duration)
     {
@@ -211,6 +221,11 @@ namespace os
       return ENOTRECOVERABLE;
     }
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     result_t
     clock::sleep_until (timestamp_t timestamp)
     {
@@ -244,6 +259,11 @@ namespace os
       return ENOTRECOVERABLE;
     }
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     result_t
     clock::wait_for (duration_t timeout)
     {
@@ -330,6 +350,11 @@ namespace os
      */
 
     // ========================================================================
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     adjustable_clock::~adjustable_clock ()
     {
       ;
@@ -352,6 +377,11 @@ namespace os
 #pragma GCC diagnostic pop
     }
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     result_t
     adjustable_clock::sleep_until (timestamp_t timestamp)
     {
@@ -385,12 +415,22 @@ namespace os
       return ENOTRECOVERABLE;
     }
 
+    /**
+     * @details
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
     clock::offset_t
     adjustable_clock::offset (void)
     {
       return offset_;
     }
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     clock::offset_t
     adjustable_clock::offset (offset_t value)
     {
@@ -456,6 +496,11 @@ namespace os
 
     // ------------------------------------------------------------------------
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     clock_systick::clock_systick () :
         clock
           { "sysclock" }
@@ -463,11 +508,21 @@ namespace os
       ;
     }
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     clock_systick::~clock_systick ()
     {
       ;
     }
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     void
     clock_systick::start (void)
     {
@@ -550,6 +605,11 @@ namespace os
 
     // ------------------------------------------------------------------------
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     clock_rtc::clock_rtc () :
         adjustable_clock
           { "rtclock" }
@@ -557,6 +617,11 @@ namespace os
       ;
     }
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     clock_rtc::~clock_rtc ()
     {
       ;
@@ -596,6 +661,11 @@ namespace os
 
     // ------------------------------------------------------------------------
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     clock_highres::clock_highres () :
         clock
           { "hrclock" }
@@ -603,11 +673,21 @@ namespace os
       ;
     }
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     clock_highres::~clock_highres ()
     {
       ;
     }
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     void
     clock_highres::start (void)
     {

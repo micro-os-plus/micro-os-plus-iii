@@ -1260,6 +1260,8 @@ namespace os
      * @details
      * @par POSIX compatibility
      *  Extension to standard, no POSIX similar functionality identified.
+     *
+     * @note Can be invoked from Interrupt Service Routines.
      */
     inline std::size_t
     message_queue::length (void) const
@@ -1270,6 +1272,8 @@ namespace os
     /**
      * @details
      * @par POSIX compatibility
+     *
+     * @note Can be invoked from Interrupt Service Routines.
      *  Extension to standard, no POSIX similar functionality identified.
      */
     inline std::size_t
@@ -1282,6 +1286,8 @@ namespace os
      * @details
      * @par POSIX compatibility
      *  Extension to standard, no POSIX similar functionality identified.
+     *
+     * @note Can be invoked from Interrupt Service Routines.
      */
     inline std::size_t
     message_queue::msg_size (void) const
@@ -1293,6 +1299,8 @@ namespace os
      * @details
      * @par POSIX compatibility
      *  Extension to standard, no POSIX similar functionality identified.
+     *
+     * @note Can be invoked from Interrupt Service Routines.
      */
     inline bool
     message_queue::empty (void) const
@@ -1304,6 +1312,8 @@ namespace os
      * @details
      * @par POSIX compatibility
      *  Extension to standard, no POSIX similar functionality identified.
+     *
+     * @note Can be invoked from Interrupt Service Routines.
      */
     inline bool
     message_queue::full (void) const

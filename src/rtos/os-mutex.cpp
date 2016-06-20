@@ -1115,6 +1115,8 @@ namespace os
      *
      * @par POSIX compatibility
      *  Extension to standard, no POSIX similar functionality identified.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
     mutex::reset (void)

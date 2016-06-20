@@ -218,7 +218,7 @@ namespace os
       }; /* struct priority */
 
       /**
-       * @brief Type of variables holding the thread state.
+       * @brief Type of variables holding thread states.
        */
       using state_t = uint8_t;
 

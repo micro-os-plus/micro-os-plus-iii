@@ -300,7 +300,7 @@ extern "C"
   (*os_thread_func_t) (os_thread_func_args_t args);
 
   /**
-   * @brief Type of variables holding the thread state.
+   * @brief Type of variables holding thread states.
    *
    * @see os::rtos::thread::state_t
    */
@@ -452,10 +452,11 @@ extern "C"
    * @brief Thread object storage.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
    * @details
-   * This C structure has the same size as the C++ @ref Thread object.
+   * This C structure has the same size as the C++ @ref os::rtos::thread object
+   * and must be initialised with os_thread_create().
    *
-   * It must be initialised with os_thread_create() and later a pointer
-   * to it can be used to refer to the thread object in other functions.
+   * Later on a pointer to it can be used both in C and C++
+   * to refer to the thread object.
    *
    * The members of this structure are hidden and should not
    * be used directly, but only through specific functions.
@@ -523,13 +524,32 @@ extern "C"
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+  /**
+   * @brief Clock object storage.
+   * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   * @details
+   * This C structure has the same size as the C++ @ref os::rtos::clock object.
+   *
+   * The members of this structure are hidden and should not
+   * be used directly, but only through specific functions.
+   *
+   * @see os::rtos::clock
+   */
   typedef struct os_clock_s
   {
+    /**
+     * @cond ignore
+     */
+
     void* vtbl;
     const char* name;
     os_clock_timestamps_list_t steady_list;
     os_clock_duration_t sleep_count;
     os_clock_timestamp_t steady_count;
+
+    /**
+     * @endcond
+     */
 
   } os_clock_t;
 
@@ -559,37 +579,97 @@ extern "C"
    * @{
    */
 
+  /**
+   * @brief An enumeration with the timer types.
+   */
   enum
   {
     os_timer_once = 0, //
-    os_timer_periodic = 1
+    os_timer_periodic = 1 //
   };
 
+  /**
+   * @brief Type of timer function arguments.
+   * @details
+   * Useful to cast other similar types
+   * to silence possible compiler warnings.
+   *
+   * @see os::rtos::timer::func_args_t
+   */
   typedef void* os_timer_func_args_t;
+
+  /**
+   * @brief Type of timer function.
+   * @details
+   * Useful to cast other similar types
+   * to silence possible compiler warnings.
+   *
+   * @see os::rtos::timer::func_t
+   */
   typedef void
   (*os_timer_func_t) (os_timer_func_args_t args);
 
+  /**
+   * @brief Type of variables holding timer types.
+   *
+   * @see os::rtos::timer::type_t
+   */
   typedef uint8_t os_timer_type_t;
-  typedef uint8_t os_timer_state_t;
 
-  enum
-  {
-    //
-    os_timer_run_once = 0,
-    os_timer_run_periodic = 1
-  };
+  /**
+   * @brief Type of variables holding timer states.
+   *
+   * @see os::rtos::timer::state_t
+   */
+  typedef uint8_t os_timer_state_t;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+  /**
+   * @brief Timer attributes.
+   * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   * @details
+   * Initialise this structure with os_timer_attr_init() and then
+   * set any of the individual members directly.
+   *
+   * @see os::rtos::timer::attributes
+   */
   typedef struct os_timer_attr_s
   {
+    /**
+     * @brief Pointer to clock object.
+     */
     void* clock;
+
+    /**
+     * @brief Timer type.
+     */
     os_timer_type_t tm_type;
+
   } os_timer_attr_t;
 
+  /**
+   * @brief Timer object storage.
+   * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   * @details
+   * This C structure has the same size as the C++ @ref os::rtos::timer object
+   * and must be initialised with os_timer_create().
+   *
+   * Later on a pointer to it can be used both in C and C++
+   * to refer to the timer object.
+   *
+   * The members of this structure are hidden and should not
+   * be used directly, but only through specific functions.
+   *
+   * @see os::rtos::timer
+   */
   typedef struct os_timer_s
   {
+    /**
+     * @cond ignore
+     */
+
     const char* name;
     os_timer_func_t func;
     os_timer_func_args_t func_args;
@@ -603,6 +683,11 @@ extern "C"
 #endif
     os_timer_type_t type;
     os_timer_state_t state;
+
+    /**
+     * @endcond
+     */
+
   } os_timer_t;
 
 #pragma GCC diagnostic pop
@@ -622,6 +707,11 @@ extern "C"
    * @{
    */
 
+  /**
+   * @brief An enumeration with mutex protocols.
+   *
+   * @see os::rtos::mutex::protocol
+   */
   enum
   {
     //
@@ -630,6 +720,11 @@ extern "C"
     os_mutex_protocol_protect = 2
   };
 
+  /**
+   * @brief An enumeration with mutex robustness.
+   *
+   * @see os::rtos::mutex::robustness
+   */
   enum
   {
     //
@@ -637,6 +732,11 @@ extern "C"
     os_mutex_robustness_robust = 1
   };
 
+  /**
+   * @brief An enumeration with mutex types.
+   *
+   * @see os::rtos::mutex::type
+   */
   enum
   {
     //
@@ -649,18 +749,70 @@ extern "C"
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+  /**
+   * @brief Mutex attributes.
+   * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   * @details
+   * Initialise this structure with os_mutex_attr_init() and then
+   * set any of the individual members directly.
+   *
+   * @see os::rtos::mutex::attributes
+   */
   typedef struct os_mutex_attr_s
   {
+    /**
+     * @brief Pointer to clock object.
+     */
     void* clock;
+
+    /**
+     * @brief Mutex priority ceiling.
+     */
     os_thread_prio_t mx_priority_ceiling;
+
+    /**
+     * @brief Mutex protocol.
+     */
     os_mutex_protocol_t mx_protocol;
+
+    /**
+     * @brief Mutex robustness.
+     */
     os_mutex_robustness_t mx_robustness;
+
+    /**
+     * @brief Mutex type.
+     */
     os_mutex_type_t mx_type;
+
+    /**
+     * @brief Recursive mutex max count.
+     */
     os_mutex_count_t mx_max_count;
+
   } os_mutex_attr_t;
 
+  /**
+   * @brief Mutex object storage.
+   * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   * @details
+   * This C structure has the same size as the C++ @ref os::rtos::mutex object
+   * and must be initialised with os_mutex_create().
+   *
+   * Later on a pointer to it can be used both in C and C++
+   * to refer to the mutex object.
+   *
+   * The members of this structure are hidden and should not
+   * be used directly, but only through specific functions.
+   *
+   * @see os::rtos::mutex
+   */
   typedef struct os_mutex_s
   {
+    /**
+     * @cond ignore
+     */
+
     const char* name;
     void* owner;
 #if !defined(OS_USE_RTOS_PORT_MUTEX)
@@ -677,6 +829,11 @@ extern "C"
     os_mutex_protocol_t protocol;
     os_mutex_robustness_t robustness;
     os_mutex_count_t max_count;
+
+    /**
+     * @endcond
+     */
+
   } os_mutex_t;
 
 #pragma GCC diagnostic pop
@@ -691,18 +848,56 @@ extern "C"
    * @{
    */
 
+  /**
+   * @brief Condition variable attributes.
+   * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   * @details
+   * Initialise this structure with os_condvar_attr_init() and then
+   * set any of the individual members directly.
+   *
+   * @see os::rtos::condition_variable::attributes
+   */
   typedef struct os_condvar_attr_s
   {
+    /**
+     * @brief Pointer to clock object.
+     */
     void* clock;
+
   } os_condvar_attr_t;
 
+  /**
+   * @brief Condition variable object storage.
+   * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   * @details
+   * This C structure has the same size as the C++
+   * @ref os::rtos::condition_variable
+   * object and must be initialised with os_timer_create().
+   *
+   * Later on a pointer to it can be used both in C and C++
+   * to refer to the timer object.
+   *
+   * The members of this structure are hidden and should not
+   * be used directly, but only through specific functions.
+   *
+   * @see os::rtos::condition_variable
+   */
   typedef struct os_condvar_s
   {
+    /**
+     * @cond ignore
+     */
+
     const char* name;
 #if !defined(OS_USE_RTOS_PORT_CONDITION_VARIABLE)
     os_threads_waiting_list_t list;
     // void* clock;
 #endif
+
+    /**
+     * @endcond
+     */
+
   } os_condvar_t;
 
   /**
@@ -715,20 +910,65 @@ extern "C"
    * @{
    */
 
+  /**
+   * @brief Type of variables holding semaphore counts.
+   *
+   * @see os::rtos::semaphore::count_t
+   */
   typedef int16_t os_semaphore_count_t;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+  /**
+   * @brief Semaphore attributes.
+   * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   * @details
+   * Initialise this structure with os_semaphore_attr_init() and then
+   * set any of the individual members directly.
+   *
+   * @see os::rtos::semaphore::attributes
+   */
   typedef struct os_semaphore_attr_s
   {
+    /**
+     * @brief Pointer to clock object.
+     */
     void* clock;
+
+    /**
+     * @brief Semaphore initial count.
+     */
     os_semaphore_count_t sm_initial_count;
+
+    /**
+     * @brief Semaphore max count.
+     */
     os_semaphore_count_t sm_max_count;
+
   } os_semaphore_attr_t;
 
+  /**
+   * @brief Semaphore object storage.
+   * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   * @details
+   * This C structure has the same size as the C++ @ref os::rtos::semaphore
+   * object and must be initialised with os_semaphore_create().
+   *
+   * Later on a pointer to it can be used both in C and C++
+   * to refer to the semaphore object.
+   *
+   * The members of this structure are hidden and should not
+   * be used directly, but only through specific functions.
+   *
+   * @see os::rtos::semaphore
+   */
   typedef struct os_semaphore_s
   {
+    /**
+     * @cond ignore
+     */
+
     const char* name;
 #if !defined(OS_USE_RTOS_PORT_SEMAPHORE)
     os_threads_waiting_list_t list;
@@ -740,6 +980,11 @@ extern "C"
     os_semaphore_count_t initial_count;
     os_semaphore_count_t count;
     os_semaphore_count_t max_count;
+
+    /**
+     * @endcond
+     */
+
   } os_semaphore_t;
 
 #pragma GCC diagnostic pop
@@ -759,15 +1004,55 @@ extern "C"
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+  /**
+   * @brief Memory pool attributes.
+   * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   * @details
+   * Initialise this structure with os_mempool_attr_init() and then
+   * set any of the individual members directly.
+   *
+   * @see os::rtos::memory_pool::attributes
+   */
   typedef struct os_mempool_attr_s
   {
+    /**
+     * @brief Pointer to clock object.
+     */
     void* clock;
+
+    /**
+     * @brief Pointer to user provided memory pool area.
+     */
     void* mp_pool_address;
+
+    /**
+     * @brief Size of user provided memory pool area, in bytes.
+     */
     size_t mp_pool_size_bytes;
+
   } os_mempool_attr_t;
 
+  /**
+   * @brief Memory pool object storage.
+   * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   * @details
+   * This C structure has the same size as the C++ @ref os::rtos::memory_pool
+   * object and must be initialised with os_mempool_create().
+   *
+   * Later on a pointer to it can be used both in C and C++
+   * to refer to the memory pool object.
+   *
+   * The members of this structure are hidden and should not
+   * be used directly, but only through specific functions.
+   *
+   * @see os::rtos::memory_pool
+   */
   typedef struct os_mempool_s
   {
+    /**
+     * @cond ignore
+     */
+
     void* vtbl;
     const char* name;
 #if !defined(OS_USE_RTOS_PORT_MEMORY_POOL)
@@ -786,6 +1071,11 @@ extern "C"
     os_mempool_size_t block_size_bytes;
     os_mempool_size_t count;
     void* first;
+
+    /**
+     * @endcond
+     */
+
   } os_mempool_t;
 
 #pragma GCC diagnostic pop
@@ -809,20 +1099,65 @@ extern "C"
    * @{
    */
 
+  /**
+   * @brief Type of variables holding message queue priorities.
+   *
+   * @see os::rtos::message_queue::priority_t
+   */
   typedef uint8_t os_mqueue_prio_t;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+  /**
+   * @brief Message queue attributes.
+   * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   * @details
+   * Initialise this structure with os_mqueue_attr_init() and then
+   * set any of the individual members directly.
+   *
+   * @see os::rtos::message_queue::attributes
+   */
   typedef struct os_mqueue_attr_s
   {
+    /**
+     * @brief Pointer to clock object.
+     */
     void* clock;
+
+    /**
+     * @brief Pointer to user provided message queue area.
+     */
     void* mq_queue_addr;
+
+    /**
+     * @brief Size of user provided message queue area, in bytes.
+     */
     size_t mq_queue_size_bytes;
+
   } os_mqueue_attr_t;
 
+  /**
+   * @brief Message queue object storage.
+   * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   * @details
+   * This C structure has the same size as the C++ @ref os::rtos::message_queue
+   * object and must be initialised with os_mqueue_create().
+   *
+   * Later on a pointer to it can be used both in C and C++
+   * to refer to the message queue object.
+   *
+   * The members of this structure are hidden and should not
+   * be used directly, but only through specific functions.
+   *
+   * @see os::rtos::message_queue
+   */
   typedef struct os_mqueue_s
   {
+    /**
+     * @cond ignore
+     */
+
     void* vtbl;
     const char* name;
 #if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
@@ -853,6 +1188,11 @@ extern "C"
 #if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
     os_mqueue_index_t head;
 #endif
+
+    /**
+     * @endcond
+     */
+
   } os_mqueue_t;
 
 #pragma GCC diagnostic pop
@@ -870,13 +1210,45 @@ extern "C"
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+  /**
+   * @brief Event flags attributes.
+   * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   * @details
+   * Initialise this structure with os_evflags_attr_init() and then
+   * set any of the individual members directly.
+   *
+   * @see os::rtos::event_flags::attributes
+   */
   typedef struct os_evflags_attr_s
   {
+    /**
+     * @brief Pointer to clock object.
+     */
     void* clock;
+
   } os_evflags_attr_t;
 
+  /**
+   * @brief Event flags object storage.
+   * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   * @details
+   * This C structure has the same size as the C++ @ref os::rtos::event_flags
+   * object and must be initialised with os_evflags_create().
+   *
+   * Later on a pointer to it can be used both in C and C++
+   * to refer to the event flags object.
+   *
+   * The members of this structure are hidden and should not
+   * be used directly, but only through specific functions.
+   *
+   * @see os::rtos::event_flags
+   */
   typedef struct os_evflags_s
   {
+    /**
+     * @cond ignore
+     */
+
     const char* name;
 #if !defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
     os_threads_waiting_list_t list;
@@ -888,6 +1260,11 @@ extern "C"
 #endif
 
     os_flags_mask_t flags;
+
+    /**
+     * @endcond
+     */
+
   } os_evflags_t;
 
 #pragma GCC diagnostic pop

@@ -644,6 +644,11 @@ namespace os
       return this == &rhs;
     }
 
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
     inline thread*
     mutex::owner (void)
     {
