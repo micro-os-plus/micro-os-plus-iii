@@ -952,6 +952,20 @@ os_clock_now (os_clock_t* clock)
 /**
  * @details
  *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::clock::steady_now()
+ */
+os_clock_timestamp_t
+os_clock_steady_now (os_clock_t* clock)
+{
+  assert(clock != nullptr);
+  return (os_clock_timestamp_t) (reinterpret_cast<rtos::clock&> (*clock)).steady_now ();
+}
+
+/**
+ * @details
+ *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @see os::rtos::clock::sleep_for()

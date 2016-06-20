@@ -198,13 +198,13 @@ test_c_api (void)
       os_sysclock_sleep_for (2);
 
       os_clock_timestamp_t ts;
-      // Return number of ticks since epoch, or, if epoch not set, from startup.
+      // Return number of ticks since startup.
       ts = os_sysclock_now ();
 
       os_sysclock_sleep_until (ts + 2);
 
       // Return the number of ticks since startup.
-      ts = os_sysclock_steady_now ();
+      ts = os_clock_steady_now (os_clock_get_sysclock());
 
       // An event may resume the thread before the timeout expire.
       os_sysclock_wait_for (2);
