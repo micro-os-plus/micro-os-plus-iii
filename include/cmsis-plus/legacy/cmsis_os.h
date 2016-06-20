@@ -220,6 +220,12 @@ extern "C"
   typedef os_mqueue_t osMessageQ;
   typedef os_mqueue_attr_t osMessageQAttr;
 
+  typedef struct os_mail_queue_s
+  {
+    os_mempool_t pool;
+    os_mqueue_t queue;
+  } os_mail_queue_t;
+
   typedef os_mail_queue_t osMailQ;
 
   /**
