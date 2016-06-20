@@ -147,14 +147,14 @@ static_assert(alignof(os_mqueue_prio_t) == alignof(message_queue::priority_t), "
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wenum-compare"
 
-static_assert(os_priority_idle == thread::priority::idle, "adjust os_priority_idle");
-static_assert(os_priority_low == thread::priority::low, "adjust os_priority_low");
-static_assert(os_priority_below_normal == thread::priority::below_normal, "adjust os_priority_below_normal");
-static_assert(os_priority_normal == thread::priority::normal, "adjust os_priority_normal");
-static_assert(os_priority_above_normal == thread::priority::above_normal, "adjust os_priority_above_normal");
-static_assert(os_priority_high == thread::priority::high, "adjust os_priority_high");
-static_assert(os_priority_realtime == thread::priority::realtime, "adjust os_priority_realtime");
-static_assert(os_priority_error == thread::priority::error, "adjust os_priority_error");
+static_assert(os_thread_priority_idle == thread::priority::idle, "adjust os_thread_priority_idle");
+static_assert(os_thread_priority_low == thread::priority::low, "adjust os_thread_priority_low");
+static_assert(os_thread_priority_below_normal == thread::priority::below_normal, "adjust os_thread_priority_below_normal");
+static_assert(os_thread_priority_normal == thread::priority::normal, "adjust os_thread_priority_normal");
+static_assert(os_thread_priority_above_normal == thread::priority::above_normal, "adjust os_thread_priority_above_normal");
+static_assert(os_thread_priority_high == thread::priority::high, "adjust os_thread_priority_high");
+static_assert(os_thread_priority_realtime == thread::priority::realtime, "adjust os_thread_priority_realtime");
+static_assert(os_thread_priority_error == thread::priority::error, "adjust os_thread_priority_error");
 
 static_assert(os_flags_mode_all == flags::mode::all, "adjust os_flags_mode_all");
 static_assert(os_flags_mode_any == flags::mode::any, "adjust os_flags_mode_any");

@@ -138,14 +138,14 @@ extern "C"
 /// @note The names MUST REMAIN UNCHANGED: @b osPriority shall be consistent in every CMSIS-RTOS.
   typedef enum
   {
-    osPriorityIdle = os_priority_idle, ///< priority: idle (lowest)
-    osPriorityLow = os_priority_low, ///< priority: low
-    osPriorityBelowNormal = os_priority_below_normal, ///< priority: below normal
-    osPriorityNormal = os_priority_normal, ///< priority: normal (default)
-    osPriorityAboveNormal = os_priority_above_normal, ///< priority: above normal
-    osPriorityHigh = os_priority_high, ///< priority: high
-    osPriorityRealtime = os_priority_realtime, ///< priority: realtime (highest)
-    osPriorityError = os_priority_error ///< system cannot determine priority or thread has illegal priority
+    osPriorityIdle = os_thread_priority_idle, ///< priority: idle (lowest)
+    osPriorityLow = os_thread_priority_low, ///< priority: low
+    osPriorityBelowNormal = os_thread_priority_below_normal, ///< priority: below normal
+    osPriorityNormal = os_thread_priority_normal, ///< priority: normal (default)
+    osPriorityAboveNormal = os_thread_priority_above_normal, ///< priority: above normal
+    osPriorityHigh = os_thread_priority_high, ///< priority: high
+    osPriorityRealtime = os_thread_priority_realtime, ///< priority: realtime (highest)
+    osPriorityError = os_thread_priority_error ///< system cannot determine priority or thread has illegal priority
   } osPriority;
 
   /**

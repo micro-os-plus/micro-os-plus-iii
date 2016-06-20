@@ -244,7 +244,7 @@ test_c_api (void)
 
       os_thread_attr_t ath3;
       os_thread_attr_init (&ath3);
-      ath3.th_priority = os_priority_below_normal;
+      ath3.th_priority = os_thread_priority_below_normal;
       ath3.th_stack_address = stack;
       ath3.th_stack_size_bytes = sizeof(stack);
 
@@ -256,12 +256,12 @@ test_c_api (void)
       os_thread_set_prio (os_this_thread (), prio);
 
       // Lower main thread priority to allow task to run.
-      os_thread_set_prio (os_this_thread (), os_priority_below_normal);
+      os_thread_set_prio (os_this_thread (), os_thread_priority_below_normal);
 
       os_thread_join (&th3, NULL);
 
       // Restore main thread priority.
-      os_thread_set_prio (os_this_thread (), os_priority_normal);
+      os_thread_set_prio (os_this_thread (), os_thread_priority_normal);
 
       // os_thread_destroy(&th3);
     }
@@ -362,7 +362,7 @@ test_c_api (void)
       os_mutex_attr_t amx2;
       os_mutex_attr_init (&amx2);
 
-      amx2.mx_priority_ceiling = os_priority_high;
+      amx2.mx_priority_ceiling = os_thread_priority_high;
       amx2.mx_protocol = os_mutex_protocol_protect;
       amx2.mx_type = os_mutex_type_recursive;
       amx2.mx_max_count = 7;
