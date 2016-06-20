@@ -662,6 +662,8 @@ namespace os
 
       assert(port::interrupts::is_priority_valid ());
 
+      interrupts::critical_section ics; // ----- Critical section -----
+
       return !list_.empty ();
 
 #endif
