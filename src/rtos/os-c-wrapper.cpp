@@ -54,6 +54,139 @@ using namespace os::rtos;
 
 // ----------------------------------------------------------------------------
 
+// Validate C typedefs sizes & alignment.
+
+static_assert(sizeof(os_result_t) == sizeof(result_t), "adjust size of os_result_t");
+static_assert(alignof(os_result_t) == alignof(result_t), "adjust align of os_result_t");
+
+static_assert(sizeof(os_flags_mode_t) == sizeof(flags::mode_t), "adjust size of os_flags_mode_t");
+static_assert(alignof(os_flags_mode_t) == alignof(flags::mode_t), "adjust align of os_flags_mode_t");
+
+static_assert(sizeof(os_flags_mask_t) == sizeof(flags::mask_t), "adjust size of os_flags_mask_t");
+static_assert(alignof(os_flags_mask_t) == alignof(flags::mask_t), "adjust align of os_flags_mask_t");
+
+static_assert(sizeof(os_sched_status_t) == sizeof(scheduler::status_t), "adjust size of os_sched_status_t");
+static_assert(alignof(os_sched_status_t) == alignof(scheduler::status_t), "adjust align of os_sched_status_t");
+
+static_assert(sizeof(os_irq_status_t) == sizeof(interrupts::status_t), "adjust size of os_irq_status_t");
+static_assert(alignof(os_irq_status_t) == alignof(interrupts::status_t), "adjust align of os_irq_status_t");
+
+static_assert(sizeof(os_clock_timestamp_t) == sizeof(clock::timestamp_t), "adjust size of os_port_clock_timestamp_t");
+static_assert(alignof(os_clock_timestamp_t) == alignof(clock::timestamp_t), "adjust align of os_port_clock_timestamp_t");
+
+static_assert(sizeof(os_clock_duration_t) == sizeof(clock::duration_t), "adjust size of os_port_clock_duration_t");
+static_assert(alignof(os_clock_duration_t) == alignof(clock::duration_t), "adjust align of os_port_clock_duration_t");
+
+static_assert(sizeof(os_clock_offset_t) == sizeof(clock::offset_t), "adjust size of os_port_clock_offset_t");
+static_assert(alignof(os_clock_offset_t) == alignof(clock::offset_t), "adjust align of os_port_clock_offset_t");
+
+static_assert(sizeof(os_statistics_counter_t) == sizeof(statistics::counter_t), "adjust size of os_statistics_counter_t");
+static_assert(alignof(os_statistics_counter_t) == alignof(statistics::counter_t), "adjust align of os_statistics_counter_t");
+
+static_assert(sizeof(os_statistics_duration_t) == sizeof(statistics::duration_t), "adjust size of os_statistics_duration_t");
+static_assert(alignof(os_statistics_duration_t) == alignof(statistics::duration_t), "adjust align of os_statistics_duration_t");
+
+static_assert(sizeof(os_thread_func_args_t) == sizeof(thread::func_args_t), "adjust size of os_thread_func_args_t");
+static_assert(alignof(os_thread_func_args_t) == alignof(thread::func_args_t), "adjust align of os_thread_func_args_t");
+
+static_assert(sizeof(os_thread_func_t) == sizeof(thread::func_t), "adjust size of os_thread_func_t");
+static_assert(alignof(os_thread_func_t) == alignof(thread::func_t), "adjust align of os_thread_func_t");
+
+static_assert(sizeof(os_thread_state_t) == sizeof(thread::state_t), "adjust size of os_thread_state_t");
+static_assert(alignof(os_thread_state_t) == alignof(thread::state_t), "adjust align of os_thread_state_t");
+
+static_assert(sizeof(os_thread_prio_t) == sizeof(thread::priority_t), "adjust size of os_thread_prio_t");
+static_assert(alignof(os_thread_prio_t) == alignof(thread::priority_t), "adjust align of os_thread_prio_t");
+
+static_assert(sizeof(os_timer_func_args_t) == sizeof(timer::func_args_t), "adjust size of os_timer_func_args_t");
+static_assert(alignof(os_timer_func_args_t) == alignof(timer::func_args_t), "adjust align of os_timer_func_args_t");
+
+static_assert(sizeof(os_timer_func_t) == sizeof(timer::func_t), "adjust size of os_timer_func_t");
+static_assert(alignof(os_timer_func_t) == alignof(timer::func_t), "adjust align of os_timer_func_t");
+
+static_assert(sizeof(os_timer_type_t) == sizeof(timer::type_t), "adjust size of os_timer_type_t");
+static_assert(alignof(os_timer_type_t) == alignof(timer::type_t), "adjust align of os_timer_type_t");
+
+static_assert(sizeof(os_timer_state_t) == sizeof(timer::state_t), "adjust size of os_timer_state_t");
+static_assert(alignof(os_timer_state_t) == alignof(timer::state_t), "adjust align of os_timer_state_t");
+
+static_assert(sizeof(os_mutex_count_t) == sizeof(mutex::count_t), "adjust size of os_mutex_count_t");
+static_assert(alignof(os_mutex_count_t) == alignof(mutex::count_t), "adjust align of os_mutex_count_t");
+
+static_assert(sizeof(os_mutex_type_t) == sizeof(mutex::type_t), "adjust size of os_mutex_type_t");
+static_assert(alignof(os_mutex_type_t) == alignof(mutex::type_t), "adjust align of os_mutex_type_t");
+
+static_assert(sizeof(os_mutex_protocol_t) == sizeof(mutex::protocol_t), "adjust size of os_mutex_protocol_t");
+static_assert(alignof(os_mutex_protocol_t) == alignof(mutex::protocol_t), "adjust align of os_mutex_protocol_t");
+
+static_assert(sizeof(os_mutex_robustness_t) == sizeof(mutex::robustness_t), "adjust size of os_mutex_robustness_t");
+static_assert(alignof(os_mutex_robustness_t) == alignof(mutex::robustness_t), "adjust align of os_mutex_robustness_t");
+
+static_assert(sizeof(os_semaphore_count_t) == sizeof(semaphore::count_t), "adjust size of os_semaphore_count_t");
+static_assert(alignof(os_semaphore_count_t) == alignof(semaphore::count_t), "adjust align of os_semaphore_count_t");
+
+static_assert(sizeof(os_mempool_size_t) == sizeof(memory_pool::size_t), "adjust size of os_mempool_size_t");
+static_assert(alignof(os_mempool_size_t) == alignof(memory_pool::size_t), "adjust align of os_mempool_size_t");
+
+static_assert(sizeof(os_mqueue_size_t) == sizeof(message_queue::size_t), "adjust size of os_mqueue_size_t");
+static_assert(alignof(os_mqueue_size_t) == alignof(message_queue::size_t), "adjust align of os_mqueue_size_t");
+
+static_assert(sizeof(os_mqueue_msg_size_t) == sizeof(message_queue::msg_size_t), "adjust size of os_mqueue_msg_size_t");
+static_assert(alignof(os_mqueue_msg_size_t) == alignof(message_queue::msg_size_t), "adjust align of os_mqueue_msg_size_t");
+
+static_assert(sizeof(os_mqueue_index_t) == sizeof(message_queue::index_t), "adjust size of os_mqueue_index_t");
+static_assert(alignof(os_mqueue_index_t) == alignof(message_queue::index_t), "adjust align of os_mqueue_index_t");
+
+static_assert(sizeof(os_mqueue_prio_t) == sizeof(message_queue::priority_t), "adjust size of os_mqueue_prio_t");
+static_assert(alignof(os_mqueue_prio_t) == alignof(message_queue::priority_t), "adjust align of os_mqueue_prio_t");
+
+// ----------------------------------------------------------------------------
+
+// Validate C enumeration values
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wenum-compare"
+
+static_assert(os_priority_idle == thread::priority::idle, "adjust os_priority_idle");
+static_assert(os_priority_low == thread::priority::low, "adjust os_priority_low");
+static_assert(os_priority_below_normal == thread::priority::below_normal, "adjust os_priority_below_normal");
+static_assert(os_priority_normal == thread::priority::normal, "adjust os_priority_normal");
+static_assert(os_priority_above_normal == thread::priority::above_normal, "adjust os_priority_above_normal");
+static_assert(os_priority_high == thread::priority::high, "adjust os_priority_high");
+static_assert(os_priority_realtime == thread::priority::realtime, "adjust os_priority_realtime");
+static_assert(os_priority_error == thread::priority::error, "adjust os_priority_error");
+
+static_assert(os_flags_mode_all == flags::mode::all, "adjust os_flags_mode_all");
+static_assert(os_flags_mode_any == flags::mode::any, "adjust os_flags_mode_any");
+static_assert(os_flags_mode_clear == flags::mode::clear, "adjust os_flags_mode_clear");
+
+static_assert(os_thread_state_undefined == thread::state::undefined, "adjust os_thread_state_undefined");
+static_assert(os_thread_state_inactive == thread::state::inactive, "adjust os_thread_state_inactive");
+static_assert(os_thread_state_ready == thread::state::ready, "adjust os_thread_state_ready");
+static_assert(os_thread_state_running == thread::state::running, "adjust os_thread_state_running");
+static_assert(os_thread_state_waiting == thread::state::waiting, "adjust os_thread_state_waiting");
+static_assert(os_thread_state_terminated == thread::state::terminated, "adjust os_thread_state_terminated");
+static_assert(os_thread_state_destroyed == thread::state::destroyed, "adjust os_thread_state_destroyed");
+
+static_assert(os_timer_once == timer::run::once, "adjust os_timer_once");
+static_assert(os_timer_periodic == timer::run::periodic, "adjust os_timer_periodic");
+
+static_assert(os_mutex_protocol_none == mutex::protocol::none, "adjust os_mutex_protocol_none");
+static_assert(os_mutex_protocol_inherit == mutex::protocol::inherit, "adjust os_mutex_protocol_inherit");
+static_assert(os_mutex_protocol_protect == mutex::protocol::protect, "adjust os_mutex_protocol_protect");
+
+static_assert(os_mutex_robustness_stalled == mutex::robustness::stalled, "adjust os_mutex_robustness_stalled");
+static_assert(os_mutex_robustness_robust == mutex::robustness::robust, "adjust os_mutex_robustness_robust");
+
+static_assert(os_mutex_type_normal == mutex::type::normal, "adjust os_mutex_type_normal");
+static_assert(os_mutex_type_errorcheck == mutex::type::errorcheck, "adjust os_mutex_type_errorcheck");
+static_assert(os_mutex_type_recursive == mutex::type::recursive, "adjust os_mutex_type_recursive");
+static_assert(os_mutex_type_default == mutex::type::_default, "adjust os_mutex_type_default");
+
+#pragma GCC diagnostic pop
+
+// ----------------------------------------------------------------------------
+
 // Validate C structs sizes (should match the C++ objects sizes).
 // Validate offset of individual members (if needed, validate member size).
 
@@ -98,19 +231,18 @@ static_assert(sizeof(rtos::message_queue::attributes) == sizeof(os_mqueue_attr_t
 static_assert(offsetof(rtos::message_queue::attributes, mq_queue_address) == offsetof(os_mqueue_attr_t, mq_queue_addr), "adjust os_mqueue_attr_t members");
 static_assert(offsetof(rtos::message_queue::attributes, mq_queue_size_bytes) == offsetof(os_mqueue_attr_t, mq_queue_size_bytes), "adjust os_mqueue_attr_t members");
 
-#pragma GCC diagnostic pop
+static_assert(sizeof(rtos::event_flags) == sizeof(os_evflags_t), "adjust size of os_evflags_t");
+static_assert(sizeof(rtos::event_flags::attributes) == sizeof(os_evflags_attr_t), "adjust size of os_evflags_attr_t");
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wenum-compare"
+static_assert(sizeof(class thread::stack) == sizeof(os_thread_stack_t), "adjust size of os_thread_stack_t");
+static_assert(sizeof(class thread::context) == sizeof(os_thread_context_t), "adjust size of os_thread_context_t");
 
-static_assert(os_priority_idle == thread::priority::idle, "adjust os_priority_idle");
-static_assert(os_priority_low == thread::priority::low, "adjust os_priority_low");
-static_assert(os_priority_below_normal == thread::priority::below_normal, "adjust os_priority_below_normal");
-static_assert(os_priority_normal == thread::priority::normal, "adjust os_priority_normal");
-static_assert(os_priority_above_normal == thread::priority::above_normal, "adjust os_priority_above_normal");
-static_assert(os_priority_high == thread::priority::high, "adjust os_priority_high");
-static_assert(os_priority_realtime == thread::priority::realtime, "adjust os_priority_realtime");
-static_assert(os_priority_error == thread::priority::error, "adjust os_priority_error");
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) \
+  || defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
+static_assert(sizeof(class thread::statistics) == sizeof(os_thread_statistics_t), "adjust size of os_thread_statistics_t");
+#endif
+
+static_assert(sizeof(timer_node) == sizeof(os_clock_timer_node_t), "adjust size of os_clock_timer_node_t");
 
 #pragma GCC diagnostic pop
 
@@ -121,6 +253,9 @@ static_assert(os_priority_error == thread::priority::error, "adjust os_priority_
 
 /**
  * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
  * @see os::rtos::scheduler::initialize()
  */
 os_result_t
@@ -129,30 +264,65 @@ os_sched_initialize (void)
   return (os_result_t) scheduler::initialize ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::scheduler::start()
+ */
 void
 os_sched_start (void)
 {
   scheduler::start ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::scheduler::started()
+ */
 bool
 os_sched_is_started (void)
 {
   return scheduler::started ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::scheduler::lock()
+ */
 os_sched_status_t
 os_sched_lock (os_sched_status_t status)
 {
   return scheduler::lock (status);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::scheduler::unlock()
+ */
 void
 os_sched_unlock (os_sched_status_t status)
 {
   scheduler::unlock (status);
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::scheduler::locked()
+ */
 bool
 os_sched_is_locked (void)
 {
@@ -161,6 +331,13 @@ os_sched_is_locked (void)
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::scheduler::statistics::context_switches()
+ */
 os_statistics_counter_t
 os_sched_stat_get_context_switches (void)
 {
@@ -171,6 +348,13 @@ os_sched_stat_get_context_switches (void)
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::scheduler::statistics::cpu_cycles()
+ */
 os_statistics_duration_t
 os_sched_stat_get_cpu_cycles (void)
 {
@@ -181,12 +365,41 @@ os_sched_stat_get_cpu_cycles (void)
 
 // ----------------------------------------------------------------------------
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::scheduler::in_handler_mode()
+ */
+bool
+os_irq_in_handler_mode (void)
+{
+  return scheduler::in_handler_mode ();
+}
+
+// ----------------------------------------------------------------------------
+
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::interrupts::critical_section::enter()
+ */
 os_irq_status_t
 os_irq_critical_enter (void)
 {
   return interrupts::critical_section::enter ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::interrupts::critical_section::exit()
+ */
 void
 os_irq_critical_exit (os_irq_status_t status)
 {
@@ -195,12 +408,26 @@ os_irq_critical_exit (os_irq_status_t status)
 
 // ----------------------------------------------------------------------------
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::interrupts::uncritical_section::enter()
+ */
 os_irq_status_t
 os_irq_uncritical_enter (void)
 {
   return interrupts::uncritical_section::enter ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::interrupts::uncritical_section::exit()
+ */
 void
 os_irq_uncritical_exit (os_irq_status_t status)
 {
@@ -209,24 +436,52 @@ os_irq_uncritical_exit (os_irq_status_t status)
 
 // ----------------------------------------------------------------------------
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::this_thread::thread()
+ */
 os_thread_t*
 os_this_thread (void)
 {
   return (os_thread_t*) &this_thread::thread ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::this_thread::wait()
+ */
 void
 os_this_thread_wait (void)
 {
   return this_thread::wait ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::this_thread::exit()
+ */
 void
 os_this_thread_exit (void* exit_ptr)
 {
   this_thread::exit (exit_ptr);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::this_thread::sig_wait()
+ */
 os_result_t
 os_this_thread_sig_wait (os_flags_mask_t mask, os_flags_mask_t* oflags,
                          os_flags_mode_t mode)
@@ -234,6 +489,13 @@ os_this_thread_sig_wait (os_flags_mask_t mask, os_flags_mask_t* oflags,
   return (os_result_t) this_thread::sig_wait (mask, oflags, mode);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::this_thread::try_sig_wait()
+ */
 os_result_t
 os_this_thread_try_sig_wait (os_flags_mask_t mask, os_flags_mask_t* oflags,
                              os_flags_mode_t mode)
@@ -241,6 +503,13 @@ os_this_thread_try_sig_wait (os_flags_mask_t mask, os_flags_mask_t* oflags,
   return (os_result_t) this_thread::try_sig_wait (mask, oflags, mode);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::this_thread::timed_sig_wait()
+ */
 os_result_t
 os_this_thread_timed_sig_wait (os_flags_mask_t mask,
                                os_clock_duration_t timeout,
@@ -251,6 +520,13 @@ os_this_thread_timed_sig_wait (os_flags_mask_t mask,
 
 // ----------------------------------------------------------------------------
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::attributes
+ */
 void
 os_thread_attr_init (os_thread_attr_t* attr)
 {
@@ -258,6 +534,13 @@ os_thread_attr_init (os_thread_attr_t* attr)
   new (attr) thread::attributes ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread
+ */
 void
 os_thread_create (os_thread_t* thread, const char* name, os_thread_func_t func,
                   const os_thread_func_args_t args,
@@ -273,6 +556,13 @@ os_thread_create (os_thread_t* thread, const char* name, os_thread_func_t func,
                              (thread::attributes&) *attr);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread
+ */
 void
 os_thread_destroy (os_thread_t* thread)
 {
@@ -280,6 +570,13 @@ os_thread_destroy (os_thread_t* thread)
   (reinterpret_cast<rtos::thread&> (*thread)).~thread ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::name()
+ */
 const char*
 os_thread_get_name (os_thread_t* thread)
 {
@@ -287,6 +584,13 @@ os_thread_get_name (os_thread_t* thread)
   return (reinterpret_cast<rtos::thread&> (*thread)).name ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::sched_prio(void)
+ */
 os_thread_prio_t
 os_thread_get_prio (os_thread_t* thread)
 {
@@ -294,6 +598,13 @@ os_thread_get_prio (os_thread_t* thread)
   return (os_thread_prio_t) (reinterpret_cast<rtos::thread&> (*thread)).sched_prio ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::sched_prio(priority_t)
+ */
 os_result_t
 os_thread_set_prio (os_thread_t* thread, os_thread_prio_t prio)
 {
@@ -302,6 +613,13 @@ os_thread_set_prio (os_thread_t* thread, os_thread_prio_t prio)
       prio);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::join()
+ */
 os_result_t
 os_thread_join (os_thread_t* thread, void** exit_ptr)
 {
@@ -309,6 +627,13 @@ os_thread_join (os_thread_t* thread, void** exit_ptr)
   return (os_result_t) reinterpret_cast<rtos::thread&> (*thread).join (exit_ptr);
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::resume()
+ */
 void
 os_thread_resume (os_thread_t* thread)
 {
@@ -316,6 +641,13 @@ os_thread_resume (os_thread_t* thread)
   return (reinterpret_cast<rtos::thread&> (*thread)).resume ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::sig_raise()
+ */
 os_result_t
 os_thread_sig_raise (os_thread_t* thread, os_flags_mask_t mask,
                      os_flags_mask_t* oflags)
@@ -325,6 +657,13 @@ os_thread_sig_raise (os_thread_t* thread, os_flags_mask_t mask,
       mask, oflags);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::sig_clear()
+ */
 os_result_t
 os_thread_sig_clear (os_thread_t* thread, os_flags_mask_t mask,
                      os_flags_mask_t* oflags)
@@ -334,6 +673,13 @@ os_thread_sig_clear (os_thread_t* thread, os_flags_mask_t mask,
       mask, oflags);
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::sig_get()
+ */
 os_flags_mask_t
 os_thread_sig_get (os_thread_t* thread, os_flags_mask_t mask,
                    os_flags_mode_t mode)
@@ -343,6 +689,13 @@ os_thread_sig_get (os_thread_t* thread, os_flags_mask_t mask,
       mask, mode);
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::sched_state()
+ */
 os_thread_state_t
 os_thread_get_sched_state (os_thread_t* thread)
 {
@@ -350,6 +703,13 @@ os_thread_get_sched_state (os_thread_t* thread)
   return reinterpret_cast<os_thread_state_t> ((reinterpret_cast<rtos::thread&> (*thread)).sched_state ());
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::user_storage()
+ */
 os_thread_user_storage_t*
 os_thread_get_user_storage (os_thread_t* thread)
 {
@@ -357,6 +717,13 @@ os_thread_get_user_storage (os_thread_t* thread)
   return (reinterpret_cast<rtos::thread&> (*thread)).user_storage ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::stack(void)
+ */
 os_thread_stack_t*
 os_thread_get_stack (os_thread_t* thread)
 {
@@ -366,30 +733,65 @@ os_thread_get_stack (os_thread_t* thread)
 
 // ----------------------------------------------------------------------------
 
-std::size_t
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::stack::default_size(void)
+ */
+size_t
 os_thread_stack_get_default_size (void)
 {
   return thread::stack::default_size ();
 }
 
-std::size_t
-os_thread_stack_set_default_size (std::size_t size_bytes)
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::stack::default_size(std::size_t)
+ */
+size_t
+os_thread_stack_set_default_size (size_t size_bytes)
 {
   return thread::stack::default_size (size_bytes);
 }
 
-std::size_t
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::stack::min_size(void)
+ */
+size_t
 os_thread_stack_get_min_size (void)
 {
   return thread::stack::min_size ();
 }
 
-std::size_t
-os_thread_stack_set_min_size (std::size_t size_bytes)
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::stack::min_size(std::size_t)
+ */
+size_t
+os_thread_stack_set_min_size (size_t size_bytes)
 {
   return thread::stack::min_size (size_bytes);
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::stack::size(void)
+ */
 size_t
 os_thread_stack_get_size (os_thread_stack_t* stack)
 {
@@ -397,6 +799,13 @@ os_thread_stack_get_size (os_thread_stack_t* stack)
   return (reinterpret_cast<class rtos::thread::stack&> (*stack)).size ();
 }
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::stack::available(void)
+ */
 size_t
 os_thread_stack_get_available (os_thread_stack_t* stack)
 {
@@ -408,6 +817,13 @@ os_thread_stack_get_available (os_thread_stack_t* stack)
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::statistics::context_switches(void)
+ */
 os_statistics_counter_t
 os_thread_stat_get_context_switches (os_thread_t* thread)
 {
@@ -419,6 +835,13 @@ os_thread_stat_get_context_switches (os_thread_t* thread)
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
 
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::statistics::cpu_cycles(void)
+ */
 os_statistics_duration_t
 os_thread_stat_get_cpu_cycles (os_thread_t* thread)
 {
@@ -430,6 +853,14 @@ os_thread_stat_get_cpu_cycles (os_thread_t* thread)
 
 // ----------------------------------------------------------------------------
 
+/**
+ * @details
+ * Return the position of the first element in the list of
+ * children threads of the given thread. If NULL, the position
+ * first element in the list of top threads is returned.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ */
 os_iterator_t
 os_children_threads_iter_begin (os_thread_t* thread)
 {
@@ -437,6 +868,17 @@ os_children_threads_iter_begin (os_thread_t* thread)
       reinterpret_cast<rtos::thread*> (thread)).begin ().get_iterator_pointer ());
 }
 
+/**
+ * @details
+ * Return the position after the last element in the list of
+ * children threads of the given thread. If NULL, the position
+ * after the last element in the list of top threads is returned.
+ *
+ * The iteration loop must be terminated when the current
+ * iterator is equal to this position, before entering the loop body.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ */
 os_iterator_t
 os_children_threads_iter_end (os_thread_t* thread)
 {
@@ -444,6 +886,13 @@ os_children_threads_iter_end (os_thread_t* thread)
       reinterpret_cast<rtos::thread*> (thread)).end ().get_iterator_pointer ());
 }
 
+/**
+ * @details
+ * Calling it when the iterator is equal to the end position leads to
+ * unpredictable results.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ */
 os_thread_t*
 os_children_threads_iter_get (os_iterator_t iterator)
 {
@@ -453,6 +902,13 @@ os_children_threads_iter_get (os_iterator_t iterator)
   return reinterpret_cast<os_thread_t*> (&(*it));
 }
 
+/**
+ * @details
+ * Calling it when the iterator is equal to the end position leads to
+ * unpredictable results.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ */
 os_iterator_t
 os_children_threads_iter_next (os_iterator_t iterator)
 {
