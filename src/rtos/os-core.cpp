@@ -119,7 +119,7 @@ namespace os
       result_t
       initialize (void)
       {
-        os_assert_err(!scheduler::in_handler_mode (), EPERM);
+        os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_SCHEDULER)
         trace::printf ("scheduler::%s() \n", __func__);
@@ -138,16 +138,6 @@ namespace os
       }
 
       /**
-       *
-       * @note Can be invoked from Interrupt Service Routines (obviously).
-       */
-      bool
-      in_handler_mode (void)
-      {
-        return port::scheduler::in_handler_mode ();
-      }
-
-      /**
        * @details
        * The scheduler cannot be stopped, it will run forever, but
        * thread switching can be locked/unlocked.
@@ -157,7 +147,7 @@ namespace os
       [[noreturn]] void
       start (void)
       {
-        os_assert_throw(!scheduler::in_handler_mode (), EPERM);
+        os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_SCHEDULER)
         trace::printf ("scheduler::%s() \n", __func__);
@@ -200,7 +190,7 @@ namespace os
 #if defined(OS_TRACE_RTOS_SCHEDULER)
         trace::printf ("scheduler::%s(%d) \n", __func__, status);
 #endif
-        os_assert_throw(!scheduler::in_handler_mode (), EPERM);
+        os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
         status_t tmp;
 
@@ -234,7 +224,7 @@ namespace os
 #if defined(OS_TRACE_RTOS_SCHEDULER)
         trace::printf ("scheduler::%s(%d) \n", __func__, status);
 #endif
-        os_assert_throw(!scheduler::in_handler_mode (), EPERM);
+        os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
         status_t tmp;
 

@@ -577,6 +577,9 @@ namespace os
       namespace interrupts
       {
 
+        bool
+        in_handler_mode (void);
+
         // ====================================================================
 
         class critical_section
@@ -626,9 +629,6 @@ namespace os
 
         [[noreturn]] void
         start (void);
-
-        bool
-        in_handler_mode (void);
 
         void
         lock (rtos::scheduler::status_t status);

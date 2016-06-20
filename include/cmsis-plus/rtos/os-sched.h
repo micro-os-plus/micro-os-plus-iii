@@ -130,16 +130,6 @@ namespace os
       void
       unlock (status_t status);
 
-      /**
-       * @brief Check if the CPU is in handler mode.
-       * @par Parameters
-       *  None
-       * @retval true Execution is in an exception handler context.
-       * @retval false Execution is in a thread context.
-       */
-      bool
-      in_handler_mode (void);
-
       // ----------------------------------------------------------------------
 
       /**
@@ -460,12 +450,22 @@ namespace os
 
     namespace interrupts
     {
+      /**
+       * @brief Check if the CPU is in handler mode.
+       * @par Parameters
+       *  None
+       * @retval true Execution is in an exception handler context.
+       * @retval false Execution is in a thread context.
+       */
+      bool
+      in_handler_mode (void);
+
+      // ======================================================================
+
       // TODO: define all levels of critical sections
       // (kernel, real-time(level), complete)
 
       // TODO: make template, parameter IRQ level
-
-      // ======================================================================
 
       /**
        * @brief Interrupts critical section [RAII](https://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization) helper.
@@ -982,6 +982,18 @@ namespace os
 
     namespace interrupts
     {
+      /**
+       * @details
+       *
+       * @note Can be invoked from Interrupt Service Routines (obviously).
+       */
+      inline bool
+      __attribute__((always_inline))
+      in_handler_mode (void)
+      {
+        return port::interrupts::in_handler_mode ();
+      }
+
       /**
        * @details
        *

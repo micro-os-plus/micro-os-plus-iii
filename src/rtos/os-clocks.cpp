@@ -189,7 +189,7 @@ namespace os
     result_t
     clock::sleep_for (duration_t duration)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_CLOCKS)
       trace::printf ("%s(%u)\n", __func__,
@@ -229,7 +229,7 @@ namespace os
     result_t
     clock::sleep_until (timestamp_t timestamp)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_CLOCKS)
       trace::printf ("%s()\n", __func__);
@@ -267,7 +267,7 @@ namespace os
     result_t
     clock::wait_for (duration_t timeout)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_CLOCKS)
       trace::printf ("%s(%u)\n", __func__, static_cast<unsigned int> (timeout));
@@ -385,7 +385,7 @@ namespace os
     result_t
     adjustable_clock::sleep_until (timestamp_t timestamp)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_CLOCKS)
       trace::printf ("%s()\n", __func__);
@@ -641,7 +641,7 @@ namespace os
 #if defined(OS_TRACE_RTOS_CLOCKS)
       trace::printf ("clock_rtc::%s()\n", __func__);
 #endif
-      assert(!scheduler::in_handler_mode ());
+      assert(!interrupts::in_handler_mode ());
 
       // TODO: Use the RTC driver to initialise the seconds to epoch.
     }

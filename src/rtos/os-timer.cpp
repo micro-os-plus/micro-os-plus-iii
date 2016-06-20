@@ -175,7 +175,7 @@ namespace os
         named_object
           { name }
     {
-      os_assert_throw(!scheduler::in_handler_mode (), EPERM);
+      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
       os_assert_throw(function != nullptr, EINVAL);
 
       type_ = attr.tm_type;
@@ -246,7 +246,7 @@ namespace os
     result_t
     timer::start (clock::duration_t period)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_TIMER)
       trace::printf ("%s(%u) @%p %s\n", __func__,
@@ -301,7 +301,7 @@ namespace os
     result_t
     timer::stop (void)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_TIMER)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());

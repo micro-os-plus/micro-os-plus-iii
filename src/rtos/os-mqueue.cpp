@@ -515,7 +515,7 @@ namespace os
                                const attributes& attr, void* queue_address,
                                std::size_t queue_size_bytes)
     {
-      os_assert_throw(!scheduler::in_handler_mode (), EPERM);
+      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
 #if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
       clock_ = attr.clock != nullptr ? attr.clock : &sysclock;
@@ -855,7 +855,7 @@ namespace os
     result_t
     message_queue::send (const void* msg, std::size_t nbytes, priority_t mprio)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
 
@@ -1034,7 +1034,7 @@ namespace os
     message_queue::timed_send (const void* msg, std::size_t nbytes,
                                clock::duration_t timeout, priority_t mprio)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
 
@@ -1154,7 +1154,7 @@ namespace os
     result_t
     message_queue::receive (void* msg, std::size_t nbytes, priority_t* mprio)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
       os_assert_err(nbytes <= max_size, EMSGSIZE);
@@ -1350,7 +1350,7 @@ namespace os
     message_queue::timed_receive (void* msg, std::size_t nbytes,
                                   clock::duration_t timeout, priority_t* mprio)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
       os_assert_err(nbytes <= max_size, EMSGSIZE);
@@ -1452,7 +1452,7 @@ namespace os
     result_t
     message_queue::reset (void)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());

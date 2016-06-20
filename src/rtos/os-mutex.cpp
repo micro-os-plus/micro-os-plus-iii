@@ -411,7 +411,7 @@ namespace os
         robustness_ (attr.mx_robustness), //
         max_count_ ((attr.mx_type == type::recursive) ? attr.mx_max_count : 1)
     {
-      os_assert_throw(!scheduler::in_handler_mode (), EPERM);
+      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
@@ -618,7 +618,7 @@ namespace os
     result_t
     mutex::lock (void)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
@@ -730,7 +730,7 @@ namespace os
     result_t
     mutex::try_lock (void)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
@@ -796,7 +796,7 @@ namespace os
     result_t
     mutex::timed_lock (clock::duration_t timeout)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s(%u) @%p %s by %p %s\n", __func__,
@@ -911,7 +911,7 @@ namespace os
     result_t
     mutex::unlock (void)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
@@ -984,7 +984,7 @@ namespace os
     thread::priority_t
     mutex::prio_ceiling (void) const
     {
-      assert(!scheduler::in_handler_mode ());
+      assert(!interrupts::in_handler_mode ());
 
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -1025,7 +1025,7 @@ namespace os
     mutex::prio_ceiling (thread::priority_t prio_ceiling,
                          thread::priority_t* old_prio_ceiling)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -1090,7 +1090,7 @@ namespace os
     result_t
     mutex::consistent (void)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -1121,7 +1121,7 @@ namespace os
     result_t
     mutex::reset (void)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());

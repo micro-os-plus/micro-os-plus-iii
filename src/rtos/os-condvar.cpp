@@ -266,7 +266,7 @@ namespace os
         named_object
           { name }
     {
-      os_assert_throw(!scheduler::in_handler_mode (), EPERM);
+      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
@@ -338,7 +338,7 @@ namespace os
     result_t
     condition_variable::signal ()
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -407,7 +407,7 @@ namespace os
     result_t
     condition_variable::broadcast ()
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -503,7 +503,7 @@ namespace os
     result_t
     condition_variable::wait (mutex& mutex)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -645,7 +645,7 @@ namespace os
     result_t
     condition_variable::timed_wait (mutex& mutex, clock::duration_t timeout)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s(%u) @%p %s\n", __func__,

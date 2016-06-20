@@ -314,7 +314,7 @@ namespace os
                              const attributes& attr, void* pool_address,
                              std::size_t pool_size_bytes)
     {
-      os_assert_throw(!scheduler::in_handler_mode (), EPERM);
+      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
 #if !defined(OS_USE_RTOS_PORT_MEMORY_POOL)
       clock_ = attr.clock != nullptr ? attr.clock : &sysclock;
@@ -489,7 +489,7 @@ namespace os
     void*
     memory_pool::alloc (void)
     {
-      os_assert_throw(!scheduler::in_handler_mode (), EPERM);
+      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -623,7 +623,7 @@ namespace os
     void*
     memory_pool::timed_alloc (clock::duration_t timeout)
     {
-      os_assert_throw(!scheduler::in_handler_mode (), EPERM);
+      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s(%u) @%p %s\n", __func__,
@@ -755,7 +755,7 @@ namespace os
     result_t
     memory_pool::reset (void)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());

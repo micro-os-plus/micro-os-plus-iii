@@ -196,7 +196,7 @@ namespace os
         initial_count_ (attr.sm_initial_count), //
         max_count_ (attr.sm_max_count ? attr.sm_max_count : max_count_value)
     {
-      os_assert_throw(!scheduler::in_handler_mode (), EPERM);
+      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
       // The CMSIS validator requires the max_count to be equal to
       // the initial count, which can be 0, but we patch it on the way.
@@ -418,7 +418,7 @@ namespace os
     result_t
     semaphore::wait ()
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -570,7 +570,7 @@ namespace os
     result_t
     semaphore::timed_wait (clock::duration_t timeout)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s(%u) @%p %s\n", __func__,
@@ -692,7 +692,7 @@ namespace os
     result_t
     semaphore::reset (void)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 

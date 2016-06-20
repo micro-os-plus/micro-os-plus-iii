@@ -391,7 +391,7 @@ namespace os
                         const attributes& attr, void* stack_address,
                         std::size_t stack_size_bytes)
     {
-      os_assert_throw(!scheduler::in_handler_mode (), EPERM);
+      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
       assert(function != nullptr);
       assert(attr.th_priority != priority::none);
@@ -565,7 +565,7 @@ namespace os
     thread::priority_t
     thread::sched_prio (void)
     {
-      os_assert_err(!scheduler::in_handler_mode (), priority::error);
+      os_assert_err(!interrupts::in_handler_mode (), priority::error);
 
       // trace::printf ("%s() @%p %s\n", __func__, this, name ());
       return prio_;
@@ -593,7 +593,7 @@ namespace os
     result_t
     thread::sched_prio (priority_t prio)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
       os_assert_err(prio < priority::error, EINVAL);
       os_assert_err(prio != priority::none, EINVAL);
 
@@ -652,7 +652,7 @@ namespace os
     result_t
     thread::detach (void)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -706,7 +706,7 @@ namespace os
     result_t
     thread::join (void** exit_ptr)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
       // Fail if current thread
       assert(this != this_thread::_thread ());
@@ -755,7 +755,7 @@ namespace os
     result_t
     thread::cancel (void)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -818,7 +818,7 @@ namespace os
     void
     thread::_exit (void* exit_ptr)
     {
-      assert(!scheduler::in_handler_mode ());
+      assert(!interrupts::in_handler_mode ());
 
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -939,7 +939,7 @@ namespace os
     result_t
     thread::kill (void)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -1046,7 +1046,7 @@ namespace os
     flags::mask_t
     thread::sig_get (flags::mask_t mask, flags::mode_t mode)
     {
-      os_assert_err(!scheduler::in_handler_mode (), sig::all);
+      os_assert_err(!interrupts::in_handler_mode (), sig::all);
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
@@ -1079,7 +1079,7 @@ namespace os
     result_t
     thread::sig_clear (flags::mask_t mask, flags::mask_t* oflags)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
       trace::printf ("%s(0x%X) @%p %s 0x%X\n", __func__, mask, this, name (),
@@ -1157,7 +1157,7 @@ namespace os
     thread::_sig_wait (flags::mask_t mask, flags::mask_t* oflags,
                        flags::mode_t mode)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
       trace::printf ("%s(0x%X, %u) @%p %s 0x%X\n", __func__, mask, mode, this,
@@ -1200,7 +1200,7 @@ namespace os
     thread::_try_sig_wait (flags::mask_t mask, flags::mask_t* oflags,
                            flags::mode_t mode)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
       trace::printf ("%s(0x%X, %d) @%p %s 0x%X\n", __func__, mask, mode, this,
@@ -1216,7 +1216,7 @@ namespace os
     thread::_timed_sig_wait (flags::mask_t mask, clock::duration_t timeout,
                              flags::mask_t* oflags, flags::mode_t mode)
     {
-      os_assert_err(!scheduler::in_handler_mode (), EPERM);
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_TRACE_RTOS_THREAD_SIG)
       trace::printf ("%s(0x%X, %u, %u) @%p %s 0x%X\n", __func__, mask, mode,
@@ -1347,7 +1347,7 @@ namespace os
       rtos::thread&
       thread (void)
       {
-        os_assert_throw(!scheduler::in_handler_mode (), EPERM);
+        os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
         rtos::thread* th;
 
@@ -1366,7 +1366,7 @@ namespace os
       void
       yield (void)
       {
-        os_assert_throw(!scheduler::in_handler_mode (), EPERM);
+        os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
         if (!scheduler::started ())
           {

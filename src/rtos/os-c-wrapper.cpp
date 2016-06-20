@@ -370,12 +370,12 @@ os_sched_stat_get_cpu_cycles (void)
  *
  * @note Can be invoked from Interrupt Service Routines.
  *
- * @see os::rtos::scheduler::in_handler_mode()
+ * @see os::rtos::interrupts::in_handler_mode()
  */
 bool
 os_irq_in_handler_mode (void)
 {
-  return scheduler::in_handler_mode ();
+  return interrupts::in_handler_mode ();
 }
 
 // ----------------------------------------------------------------------------
@@ -2437,7 +2437,7 @@ os_evflags_are_waiting (os_evflags_t* evflags)
 osStatus
 osKernelInitialize (void)
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return osErrorISR;
     }
@@ -2521,7 +2521,7 @@ osKernelSysTick (void)
 osThreadId
 osThreadCreate (const osThreadDef_t* thread_def, void* args)
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return nullptr;
     }
@@ -2573,7 +2573,7 @@ osThreadCreate (const osThreadDef_t* thread_def, void* args)
 osThreadId
 osThreadGetId (void)
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return nullptr;
     }
@@ -2595,7 +2595,7 @@ osThreadGetId (void)
 osStatus
 osThreadTerminate (osThreadId thread_id)
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return osErrorISR;
     }
@@ -2636,7 +2636,7 @@ osThreadTerminate (osThreadId thread_id)
 osStatus
 osThreadYield (void)
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return osErrorISR;
     }
@@ -2657,7 +2657,7 @@ osThreadYield (void)
 osStatus
 osThreadSetPriority (osThreadId thread_id, osPriority priority)
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return osErrorISR;
     }
@@ -2711,7 +2711,7 @@ osThreadSetPriority (osThreadId thread_id, osPriority priority)
 osPriority
 osThreadGetPriority (osThreadId thread_id)
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return osPriorityError;
     }
@@ -2746,7 +2746,7 @@ osThreadGetPriority (osThreadId thread_id)
 osStatus
 osDelay (uint32_t millisec)
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return osErrorISR;
     }
@@ -2791,7 +2791,7 @@ osWait (uint32_t millisec)
 {
   osEvent event;
 
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       event.status = osErrorISR;
       return event;
@@ -2831,7 +2831,7 @@ osWait (uint32_t millisec)
 osTimerId
 osTimerCreate (const osTimerDef_t* timer_def, os_timer_type type, void* args)
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return nullptr;
     }
@@ -2858,7 +2858,7 @@ osTimerCreate (const osTimerDef_t* timer_def, os_timer_type type, void* args)
 osStatus
 osTimerStart (osTimerId timer_id, uint32_t millisec)
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return osErrorISR;
     }
@@ -2889,7 +2889,7 @@ osTimerStart (osTimerId timer_id, uint32_t millisec)
 osStatus
 osTimerStop (osTimerId timer_id)
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return osErrorISR;
     }
@@ -2923,7 +2923,7 @@ osTimerStop (osTimerId timer_id)
 osStatus
 osTimerDelete (osTimerId timer_id)
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return osErrorISR;
     }
@@ -2978,7 +2978,7 @@ osSignalClear (osThreadId thread_id, int32_t signals)
       return (int32_t) 0x80000000;
     }
 
-  if (scheduler::in_handler_mode () || (signals == 0))
+  if (interrupts::in_handler_mode () || (signals == 0))
     {
       return (int32_t) 0x80000000;
     }
@@ -3019,7 +3019,7 @@ osSignalWait (int32_t signals, uint32_t millisec)
 {
   osEvent event;
 
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       event.status = osErrorISR;
       return event;
@@ -3092,7 +3092,7 @@ osSignalWait (int32_t signals, uint32_t millisec)
 osMutexId
 osMutexCreate (const osMutexDef_t* mutex_def)
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return nullptr;
     }
@@ -3131,7 +3131,7 @@ osMutexCreate (const osMutexDef_t* mutex_def)
 osStatus
 osMutexWait (osMutexId mutex_id, uint32_t millisec)
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return osErrorISR;
     }
@@ -3200,7 +3200,7 @@ osMutexWait (osMutexId mutex_id, uint32_t millisec)
 osStatus
 osMutexRelease (osMutexId mutex_id)
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return osErrorISR;
     }
@@ -3239,7 +3239,7 @@ osMutexRelease (osMutexId mutex_id)
 osStatus
 osMutexDelete (osMutexId mutex_id)
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return osErrorISR;
     }
@@ -3271,7 +3271,7 @@ osMutexDelete (osMutexId mutex_id)
 osSemaphoreId
 osSemaphoreCreate (const osSemaphoreDef_t* semaphore_def, int32_t count)
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return nullptr;
     }
@@ -3319,7 +3319,7 @@ osSemaphoreCreate (const osSemaphoreDef_t* semaphore_def, int32_t count)
 int32_t
 osSemaphoreWait (osSemaphoreId semaphore_id, uint32_t millisec)
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return -1;
     }
@@ -3413,7 +3413,7 @@ osSemaphoreRelease (osSemaphoreId semaphore_id)
 osStatus
 osSemaphoreDelete (osSemaphoreId semaphore_id)
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return osErrorISR;
     }
@@ -3443,7 +3443,7 @@ osSemaphoreDelete (osSemaphoreId semaphore_id)
 osPoolId
 osPoolCreate (const osPoolDef_t* pool_def)
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return nullptr;
     }
@@ -3556,7 +3556,7 @@ osMessageQId
 osMessageCreate (const osMessageQDef_t* queue_def,
                  osThreadId thread_id __attribute__((unused)))
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return nullptr;
     }
@@ -3607,7 +3607,7 @@ osMessagePut (osMessageQId queue_id, uint32_t info, uint32_t millisec)
   result_t res;
   if (millisec == osWaitForever)
     {
-      if (scheduler::in_handler_mode ())
+      if (interrupts::in_handler_mode ())
         {
           return osErrorParameter;
         }
@@ -3623,7 +3623,7 @@ osMessagePut (osMessageQId queue_id, uint32_t info, uint32_t millisec)
     }
   else
     {
-      if (scheduler::in_handler_mode ())
+      if (interrupts::in_handler_mode ())
         {
           return osErrorParameter;
         }
@@ -3696,7 +3696,7 @@ osMessageGet (osMessageQId queue_id, uint32_t millisec)
 
   if (millisec == osWaitForever)
     {
-      if (scheduler::in_handler_mode ())
+      if (interrupts::in_handler_mode ())
         {
           event.status = osErrorParameter;
           return event;
@@ -3715,7 +3715,7 @@ osMessageGet (osMessageQId queue_id, uint32_t millisec)
     }
   else
     {
-      if (scheduler::in_handler_mode ())
+      if (interrupts::in_handler_mode ())
         {
           event.status = osErrorParameter;
           return event;
@@ -3774,7 +3774,7 @@ osMailQId
 osMailCreate (const osMailQDef_t* mail_def,
               osThreadId thread_id __attribute__((unused)))
 {
-  if (scheduler::in_handler_mode ())
+  if (interrupts::in_handler_mode ())
     {
       return nullptr;
     }
@@ -3838,7 +3838,7 @@ osMailAlloc (osMailQId mail_id, uint32_t millisec)
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
   if (millisec == osWaitForever)
     {
-      if (scheduler::in_handler_mode ())
+      if (interrupts::in_handler_mode ())
         {
           return nullptr;
         }
@@ -3850,7 +3850,7 @@ osMailAlloc (osMailQId mail_id, uint32_t millisec)
     }
   else
     {
-      if (scheduler::in_handler_mode ())
+      if (interrupts::in_handler_mode ())
         {
           return nullptr;
         }
@@ -3979,7 +3979,7 @@ osMailGet (osMailQId mail_id, uint32_t millisec)
 
   if (millisec == osWaitForever)
     {
-      if (scheduler::in_handler_mode ())
+      if (interrupts::in_handler_mode ())
         {
           event.status = osErrorParameter;
           return event;
@@ -3998,7 +3998,7 @@ osMailGet (osMailQId mail_id, uint32_t millisec)
     }
   else
     {
-      if (scheduler::in_handler_mode ())
+      if (interrupts::in_handler_mode ())
         {
           event.status = osErrorParameter;
           return event;
