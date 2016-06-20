@@ -454,12 +454,12 @@ os_this_thread (void)
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
- * @see os::rtos::this_thread::wait()
+ * @see os::rtos::this_thread::suspend()
  */
 void
-os_this_thread_wait (void)
+os_this_thread_suspend (void)
 {
-  return this_thread::wait ();
+  return this_thread::suspend ();
 }
 
 /**

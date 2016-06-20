@@ -75,7 +75,7 @@ namespace os
        */
 
       void
-      wait (void);
+      suspend (void);
 
       [[noreturn]] void
       exit (void* exit_ptr);
@@ -1119,7 +1119,7 @@ namespace os
       friend class mutex;
 
       friend void
-      this_thread::wait (void);
+      this_thread::suspend (void);
 
       friend void
       this_thread::exit (void* exit_ptr);
@@ -1216,7 +1216,7 @@ namespace os
        * @return  Nothing.
        */
       void
-      _wait (void);
+      _suspend (void);
 
       /**
        * @brief Terminate thread by itself.
@@ -1657,7 +1657,7 @@ namespace os
        *  Nothing.
        */
       void
-      wait (void);
+      suspend (void);
 
       /**
        * @brief Terminate the current running thread.
@@ -1779,9 +1779,9 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline void
-      wait (void)
+      suspend (void)
       {
-        this_thread::thread ()._wait ();
+        this_thread::thread ()._suspend ();
       }
 
       /**

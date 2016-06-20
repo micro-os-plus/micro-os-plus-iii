@@ -718,7 +718,7 @@ namespace os
       while (sched_state_ != state::destroyed)
         {
           joiner_ = this_thread::_thread ();
-          this_thread::_thread ()->_wait ();
+          this_thread::_thread ()->_suspend ();
         }
 
 #if defined(OS_TRACE_RTOS_THREAD)
@@ -797,7 +797,7 @@ namespace os
      *  Extension to standard, no POSIX similar functionality identified.
      */
     void
-    thread::_wait (void)
+    thread::_suspend (void)
     {
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -1186,7 +1186,7 @@ namespace os
                 }
             }
 
-          _wait ();
+          _suspend ();
 
           if (interrupted ())
             {

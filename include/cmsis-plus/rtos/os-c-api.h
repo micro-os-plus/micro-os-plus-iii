@@ -305,7 +305,7 @@ extern "C"
    *  Nothing.
    */
   void
-  os_this_thread_wait (void);
+  os_this_thread_suspend (void);
 
   /**
    * @brief Terminate the current running thread.
