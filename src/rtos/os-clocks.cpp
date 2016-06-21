@@ -475,7 +475,7 @@ namespace os
      *
      *    // Put the current thread to sleep for a given number of microseconds.
      *    // For a 1000 Hz clock, the actual value is 4 ticks.
-     *    sysclock.sleep_for(clock_systick::ticks_cast(3500));
+     *    sysclock.sleep_for(clock_systick::ticks_cast((uint64_t)(3500)));
      *
      *    // Do something else.
      * }
