@@ -42,15 +42,22 @@
 
 // ----------------------------------------------------------------------------
 
+#include <cmsis-plus/os-versions.h>
+
+/**
+ * @brief Tell the world that CMSIS++ is in use.
+ * @details
+ * Macro to inform including files that CMSIS++ RTOS
+ * definitions are available.
+ */
+#define OS_USE_CMSIS_PLUS
+
 #include <cmsis-plus/os-app-config.h>
 #include <cmsis-plus/rtos/port/os-decls.h>
 
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
-
-// We definitely use CMSIS++.
-#define OS_USE_CMSIS_PLUS
 
 // ----------------------------------------------------------------------------
 

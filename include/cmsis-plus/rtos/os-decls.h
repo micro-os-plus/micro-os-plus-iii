@@ -35,6 +35,8 @@
 
 // ----------------------------------------------------------------------------
 
+#include <cmsis-plus/os-versions.h>
+
 /**
  * @brief Tell the world that CMSIS++ is in use.
  * @details
