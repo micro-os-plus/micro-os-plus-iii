@@ -389,6 +389,8 @@ namespace os
 
       // ----------------------------------------------------------------------
 
+#if !defined(OS_USE_RTOS_PORT_SCHEDULER)
+
       void
       _switch_threads (void)
       {
@@ -439,6 +441,8 @@ namespace os
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
 
       }
+
+#endif /* !defined(OS_USE_RTOS_PORT_SCHEDULER) */
 
       namespace statistics
       {
