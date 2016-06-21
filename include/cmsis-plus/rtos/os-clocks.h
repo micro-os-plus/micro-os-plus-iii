@@ -496,7 +496,7 @@ namespace os
        * @return The number of ticks.
        */
       template<typename Rep_T>
-        static constexpr uint32_t
+        static constexpr clock::duration_t
         ticks_cast (Rep_T microsec);
 
       /**
