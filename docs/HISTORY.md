@@ -106,16 +106,18 @@ The core context switching routine is written in C++, with two inlined insertion
 
 The scheduler is part of the portable/micro-os-plus-xpack.
 
-It does not come from nowhere, it is heavily based on the experience with the previous µOS++ versions.
+It does not come from nowhere, it is heavily based on the experience with the previous µOS++ versions (the current version of µOS++ is 6.x).
 
+## Reference implementation complete; first public release (RTOS API v0.2.1)
 
+The C API was also refurbished and brought in-line with the C++ API, and reference documentation added.
 
+A high resolution clock was added and thread statistics can now be kept based on this clock.
 
+Further validations were activated, to check the interrupt priority and the stack bottom. It is possible to control how interrupt critical sections are entered, either by handling the BASEPRI register (selective disable/enable), or the PRIMASK register (complete disable/enable).
 
+The C++ iterators were also implemented in C, and the tree of children threads can be recursively walked to list the threads (for example in a `ps`-like command).
 
-
-
-
-
+As a fast trace channel, support for SEGGER RTT was added. For such cases it is necessary to prevent the idle task to enter sleep (`OS_EXCLUDE_RTOS_IDLE_SLEEP`).
 
 
