@@ -4,7 +4,7 @@
 
 ### v0.1.1 2016-03-11 
 
-- initial version of the APIs publicly announced on [ARM Connected Community](https://community.arm.com/groups/tools/blog/2016/03/11/cmsis-a-proposal-for-a-future-cmsis-written-in-c)
+- initial version of the APIs announced on [ARM Connected Community](https://community.arm.com/groups/tools/blog/2016/03/11/cmsis-a-proposal-for-a-future-cmsis-written-in-c)
 
 ### v0.2.1 2016-06-21 
 
