@@ -444,7 +444,7 @@ extern "C"
    * @note Reflects the system timer setting and is typically defined
    * in a configuration file.
    */
-#define osKernelSysTickFrequency (1000)
+#define osKernelSysTickFrequency (OS_INTEGER_SYSTICK_FREQUENCY_HZ)
 
   /**
    * @brief Convert a microseconds value to ticks.
