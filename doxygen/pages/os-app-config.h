@@ -109,6 +109,11 @@
 #define OS_INTEGER_RTOS_DEFAULT_STACK_SIZE_BYTES
 
 /**
+ * @brief Define the minimum thread stack size.
+ */
+#define OS_INTEGER_RTOS_DEFAULT_STACK_SIZE_BYTES
+
+/**
  * @brief Define the **main** thread stack size.
  */
 #define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES
