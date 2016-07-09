@@ -107,7 +107,7 @@ namespace os
      * @details
      * CMSIS++ threads are inspired by POSIX threads; they support
      * functions that terminate and a simplified version of
-     * signal flags.
+     * signals as event flags.
      *
      * @par Example
      *
@@ -1001,16 +1001,16 @@ namespace os
 
     /**
      * @details
-     * Set more bits in the thread current signal flags mask.
+     * Set more bits in the thread current event flags mask.
      * Use OR at bit-mask level.
-     * Wake-up the thread to evaluate the signal flags.
+     * Wake-up the thread to evaluate the event flags.
      *
      * @note Can be invoked from Interrupt Service Routines.
      */
     result_t
-    thread::sig_raise (flags::mask_t mask, flags::mask_t* oflags)
+    thread::flags_raise (flags::mask_t mask, flags::mask_t* oflags)
     {
-#if defined(OS_TRACE_RTOS_THREAD_SIG)
+#if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
 #endif
 
@@ -1022,87 +1022,12 @@ namespace os
 
       if (oflags != nullptr)
         {
-          *oflags = sig_mask_;
+          *oflags = flags_mask_;
         }
 
-      sig_mask_ |= mask;
+      flags_mask_ |= mask;
 
       this->resume ();
-
-      return result::ok;
-    }
-
-    /**
-     * @details
-     * Select the requested bits from the thread current signal mask
-     * and return them. If requested, clear the selected bits in the
-     * thread signal mask.
-     *
-     * If the mask is zero, return the full thread signal mask,
-     * without any masking or subsequent clearing.
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    flags::mask_t
-    thread::sig_get (flags::mask_t mask, flags::mode_t mode)
-    {
-      os_assert_err(!interrupts::in_handler_mode (), sig::all);
-
-#if defined(OS_TRACE_RTOS_THREAD_SIG)
-      trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
-#endif
-
-      interrupts::critical_section ics; // ----- Critical section -----
-
-      if (mask == 0)
-        {
-          // Return the entire mask.
-          return sig_mask_;
-        }
-
-      flags::mask_t ret = sig_mask_ & mask;
-      if ((mode & flags::mode::clear) != 0)
-        {
-          // Clear the selected bits; leave the rest untouched.
-          sig_mask_ &= ~mask;
-        }
-
-      // Return the selected bits.
-      return ret;
-    }
-
-    /**
-     * @details
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    result_t
-    thread::sig_clear (flags::mask_t mask, flags::mask_t* oflags)
-    {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-
-#if defined(OS_TRACE_RTOS_THREAD_SIG)
-      trace::printf ("%s(0x%X) @%p %s 0x%X\n", __func__, mask, this, name (),
-                     sig_mask_);
-#endif
-
-      interrupts::critical_section ics; // ----- Critical section -----
-
-      if (oflags != nullptr)
-        {
-          *oflags = sig_mask_;
-        }
-
-      if (mask == 0)
-        {
-          // Clear all flags.
-          sig_mask_ = 0;
-        }
-      else
-        {
-          // Clear the selected bits; leave the rest untouched.
-          sig_mask_ &= ~mask;
-        }
 
       return result::ok;
     }
@@ -1114,7 +1039,7 @@ namespace os
     /**
      * @details
      *
-     * Internal function used to test if the desired signal flags are raised.
+     * Internal function used to test if the desired flags are raised.
      */
     result_t
     thread::_try_wait (flags::mask_t mask, flags::mask_t* oflags,
@@ -1122,30 +1047,30 @@ namespace os
     {
       if ((mask != 0) && ((mode & flags::mode::all) != 0))
         {
-          // Only if all desires signals are raised we're done.
-          if ((sig_mask_ & mask) == mask)
+          // Only if all desires flags are raised we're done.
+          if ((flags_mask_ & mask) == mask)
             {
               if (oflags != nullptr)
                 {
-                  *oflags = sig_mask_;
+                  *oflags = flags_mask_;
                 }
-              // Clear desired signals.
-              sig_mask_ &= ~mask;
+              // Clear desired flags.
+              flags_mask_ &= ~mask;
               return result::ok;
             }
         }
       else if ((mask == 0) || ((mode & flags::mode::any) != 0))
         {
-          // Any signal will do it.
-          if (sig_mask_ != 0)
+          // Any flag will do it.
+          if (flags_mask_ != 0)
             {
               // Possibly return .
               if (oflags != nullptr)
                 {
-                  *oflags = sig_mask_;
+                  *oflags = flags_mask_;
                 }
               // Since we returned them all, also clear them all.
-              sig_mask_ = 0;
+              flags_mask_ = 0;
               return result::ok;
             }
         }
@@ -1154,17 +1079,17 @@ namespace os
     }
 
     result_t
-    thread::_sig_wait (flags::mask_t mask, flags::mask_t* oflags,
-                       flags::mode_t mode)
+    thread::_flags_wait (flags::mask_t mask, flags::mask_t* oflags,
+                         flags::mode_t mode)
     {
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
-#if defined(OS_TRACE_RTOS_THREAD_SIG)
+#if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X, %u) @%p %s 0x%X\n", __func__, mask, mode, this,
-                     name (), sig_mask_);
+          name (), flags_mask_);
 #endif
 
-#if defined(OS_TRACE_RTOS_THREAD_SIG)
+#if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       clock::timestamp_t prev = clock_->now ();
       clock::duration_t slept_ticks = 0;
 #endif
@@ -1175,12 +1100,12 @@ namespace os
 
               if (_try_wait (mask, oflags, mode) == result::ok)
                 {
-#if defined(OS_TRACE_RTOS_THREAD_SIG)
+#if defined(OS_TRACE_RTOS_THREAD_FLAGS)
                   slept_ticks = static_cast<clock::duration_t> (clock_->now ()
                       - prev);
                   trace::printf ("%s(0x%X, %d)=%d @%p %s 0x%X\n", __func__,
-                                 mask, mode, slept_ticks, this, name (),
-                                 sig_mask_);
+                      mask, mode, slept_ticks, this, name (),
+                      flags_mask_);
 #endif
                   return result::ok;
                 }
@@ -1197,14 +1122,14 @@ namespace os
     }
 
     result_t
-    thread::_try_sig_wait (flags::mask_t mask, flags::mask_t* oflags,
-                           flags::mode_t mode)
+    thread::_try_flags_wait (flags::mask_t mask, flags::mask_t* oflags,
+                             flags::mode_t mode)
     {
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
-#if defined(OS_TRACE_RTOS_THREAD_SIG)
+#if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X, %d) @%p %s 0x%X\n", __func__, mask, mode, this,
-                     name (), sig_mask_);
+          name (), flags_mask_);
 #endif
 
       interrupts::critical_section ics; // ----- Critical section -----
@@ -1213,14 +1138,14 @@ namespace os
     }
 
     result_t
-    thread::_timed_sig_wait (flags::mask_t mask, clock::duration_t timeout,
-                             flags::mask_t* oflags, flags::mode_t mode)
+    thread::_timed_flags_wait (flags::mask_t mask, clock::duration_t timeout,
+                               flags::mask_t* oflags, flags::mode_t mode)
     {
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
-#if defined(OS_TRACE_RTOS_THREAD_SIG)
+#if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X, %u, %u) @%p %s 0x%X\n", __func__, mask, mode,
-                     timeout, this, name (), sig_mask_);
+          timeout, this, name (), flags_mask_);
 #endif
 
         {
@@ -1235,7 +1160,7 @@ namespace os
       clock_timestamps_list& clock_list = clock_->steady_list ();
       clock::timestamp_t timeout_timestamp = clock_->steady_now () + timeout;
 
-#if defined(OS_TRACE_RTOS_THREAD_SIG)
+#if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       clock::timestamp_t begin_timestamp = clock_->steady_now ();
 #endif
 
@@ -1289,16 +1214,91 @@ namespace os
             }
         }
 
-#if defined(OS_TRACE_RTOS_THREAD_SIG)
+#if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       clock::duration_t slept_ticks =
-          static_cast<clock::duration_t> (clock_->steady_now ()
-              - begin_timestamp);
+      static_cast<clock::duration_t> (clock_->steady_now ()
+          - begin_timestamp);
       trace::printf ("%s(0x%X, %u, %u)=%u @%p %s 0x%X\n", __func__, mask, mode,
-                     timeout, static_cast<unsigned int> (slept_ticks), this,
-                     name (), sig_mask_);
+          timeout, static_cast<unsigned int> (slept_ticks), this,
+          name (), flags_mask_);
 #endif
 
       return res;
+    }
+
+    /**
+     * @details
+     * Select the requested bits from the thread current flags mask
+     * and return them. If requested, clear the selected bits in the
+     * thread flags mask.
+     *
+     * If the mask is zero, return the full thread flags mask,
+     * without any masking or subsequent clearing.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    flags::mask_t
+    thread::_flags_get (flags::mask_t mask, flags::mode_t mode)
+    {
+      os_assert_err(!interrupts::in_handler_mode (), flags::all);
+
+#if defined(OS_TRACE_RTOS_THREAD_FLAGS)
+      trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
+#endif
+
+      interrupts::critical_section ics; // ----- Critical section -----
+
+      if (mask == 0)
+        {
+          // Return the entire mask.
+          return flags_mask_;
+        }
+
+      flags::mask_t ret = flags_mask_ & mask;
+      if ((mode & flags::mode::clear) != 0)
+        {
+          // Clear the selected bits; leave the rest untouched.
+          flags_mask_ &= ~mask;
+        }
+
+      // Return the selected bits.
+      return ret;
+    }
+
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    result_t
+    thread::_flags_clear (flags::mask_t mask, flags::mask_t* oflags)
+    {
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+
+#if defined(OS_TRACE_RTOS_THREAD_FLAGS)
+      trace::printf ("%s(0x%X) @%p %s 0x%X\n", __func__, mask, this, name (),
+          flags_mask_);
+#endif
+
+      interrupts::critical_section ics; // ----- Critical section -----
+
+      if (oflags != nullptr)
+        {
+          *oflags = flags_mask_;
+        }
+
+      if (mask == 0)
+        {
+          // Clear all flags.
+          flags_mask_ = 0;
+        }
+      else
+        {
+          // Clear the selected bits; leave the rest untouched.
+          flags_mask_ &= ~mask;
+        }
+
+      return result::ok;
     }
 
     /**

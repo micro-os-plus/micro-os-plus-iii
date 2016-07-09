@@ -46,11 +46,11 @@ Based on the standard definition of system clocks, to the initial SysTick
 clock (with ticks granularity) was added a new RTC based clock (with seconds
 granularity).
 
-## Clarify the behaviour of thread signal flags
+## Clarify the behaviour of thread event flags
 
 Use a simplified behaviours, inspired by POSIX, but without queues and handlers. 
 
-## Define the behaviour of Event Flags, similar to that of thread signal flags
+## Define the behaviour of Event Flags, similar to that of thread event flags
 
 Add an Event_flags object.
 

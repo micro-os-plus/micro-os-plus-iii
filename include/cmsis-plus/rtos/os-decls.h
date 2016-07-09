@@ -278,7 +278,7 @@ namespace os
        * An unsigned type large enough to store all the flags, usually
        * 32-bits wide.
        *
-       * Both thread signal flags and event flags use this definition.
+       * Both thread event flags and generic event flags use this definition.
        */
       using mask_t = uint32_t;
 
@@ -288,7 +288,7 @@ namespace os
        * An unsigned type used to hold the mode bits passed to
        * functions returning flags.
        *
-       * Both thread signal flags and event flags use this definition.
+       * Both thread event flags and generic event flags use this definition.
        */
       using mode_t = uint32_t;
 
@@ -321,6 +321,24 @@ namespace os
               clear = 4
         };
       } /* namespace mode */
+
+      /**
+       * @brief Flags sets with special meaning.
+       */
+      enum
+        : mask_t
+          {
+            /**
+             * @brief Special mask to represent any flag.
+             */
+            any = 0,
+
+            /**
+             * Special mask to represent all flags.
+             */
+            all = 0xFFFFFFFF,
+      };
+
     } /* namespace flags */
 
     /**

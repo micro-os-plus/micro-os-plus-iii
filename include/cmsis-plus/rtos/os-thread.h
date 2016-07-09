@@ -81,14 +81,21 @@ namespace os
       exit (void* exit_ptr);
 
       result_t
-      sig_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
+      flags_wait (flags::mask_t mask, flags::mask_t* oflags,
+                  flags::mode_t mode);
 
       result_t
-      try_sig_wait (flags::mask_t mask, flags::mask_t* oflags,
-                    flags::mode_t mode);
+      try_flags_wait (flags::mask_t mask, flags::mask_t* oflags,
+                      flags::mode_t mode);
       result_t
-      timed_sig_wait (flags::mask_t mask, clock::duration_t timeout,
-                      flags::mask_t* oflags, flags::mode_t mode);
+      timed_flags_wait (flags::mask_t mask, clock::duration_t timeout,
+                        flags::mask_t* oflags, flags::mode_t mode);
+
+      result_t
+      flags_clear (flags::mask_t mask, flags::mask_t* oflags);
+
+      flags::mask_t
+      flags_get (flags::mask_t mask, flags::mode_t mode);
 
       /**
        * @endcond
@@ -246,32 +253,6 @@ namespace os
         };
         /* enum  */
       }; /* struct state */
-
-      /**
-       * @brief Thread signals.
-       * @details
-       * The os::rtos::thread::sig namespace is a container for
-       * signal flags masks, which cannot be restricted to an enumeration..
-       */
-      struct sig
-      {
-        /**
-         * @brief Signal sets with special meaning.
-         */
-        enum
-          : flags::mask_t
-            {
-              /**
-               * @brief Special signal mask to represent any flag.
-               */
-              any = 0,
-
-              /**
-               * Special signal mask to represent all flags.
-               */
-              all = 0xFFFFFFFF,
-        };
-      }; /* struct sig */
 
       /**
        * @brief Type of thread function arguments.
@@ -1040,7 +1021,7 @@ namespace os
       user_storage (void);
 
       /**
-       * @brief Raise thread signal flags.
+       * @brief Raise thread event flags.
        * @param [in] mask The OR-ed flags to raise.
        * @param [out] oflags Optional pointer where to store the
        *  previous flags; may be `nullptr`.
@@ -1049,31 +1030,7 @@ namespace os
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
       result_t
-      sig_raise (flags::mask_t mask, flags::mask_t* oflags);
-
-      /**
-       * @brief Clear thread signal flags.
-       * @param [in] mask The OR-ed flags to clear. Zero means 'all'
-       * @param [out] oflags Optional pointer where to store the
-       *  previous flags; may be `nullptr`.
-       * @retval result::ok The flags were cleared.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
-       * @retval EINVAL The mask is zero.
-       */
-      result_t
-      sig_clear (flags::mask_t mask, flags::mask_t* oflags);
-
-      /**
-       * @brief Get/clear thread signal flags.
-       * @param [in] mask The OR-ed flags to get/clear; may be zero.
-       * @param [in] mode Mode bits to select if the flags should be
-       *  cleared (the other bits are ignored).
-       * @retval flags The selected bits from the current thread
-       *  signal flags mask.
-       * @retval sig::all Cannot be invoked from an Interrupt Service Routines.
-       */
-      flags::mask_t
-      sig_get (flags::mask_t mask, flags::mode_t mode);
+      flags_raise (flags::mask_t mask, flags::mask_t* oflags);
 
       /**
        * @brief Force thread termination.
@@ -1125,16 +1082,23 @@ namespace os
       this_thread::exit (void* exit_ptr);
 
       friend result_t
-      this_thread::sig_wait (flags::mask_t mask, flags::mask_t* oflags,
-                             flags::mode_t mode);
+      this_thread::flags_wait (flags::mask_t mask, flags::mask_t* oflags,
+                               flags::mode_t mode);
 
       friend result_t
-      this_thread::try_sig_wait (flags::mask_t mask, flags::mask_t* oflags,
-                                 flags::mode_t mode);
+      this_thread::try_flags_wait (flags::mask_t mask, flags::mask_t* oflags,
+                                   flags::mode_t mode);
       friend result_t
-      this_thread::timed_sig_wait (flags::mask_t mask,
-                                   clock::duration_t timeout,
-                                   flags::mask_t* oflags, flags::mode_t mode);
+      this_thread::timed_flags_wait (flags::mask_t mask,
+                                     clock::duration_t timeout,
+                                     flags::mask_t* oflags, flags::mode_t mode);
+
+      friend result_t
+      this_thread::flags_clear (flags::mask_t mask, flags::mask_t* oflags);
+
+      friend flags::mask_t
+      this_thread::flags_get (flags::mask_t mask, flags::mode_t mode);
+
       friend int*
       this_thread::__errno (void);
 
@@ -1237,7 +1201,7 @@ namespace os
       _invoke_with_exit (thread* thread);
 
       /**
-       * @brief Wait for signal flags.
+       * @brief Wait for event flags.
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
@@ -1251,10 +1215,11 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      _sig_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
+      _flags_wait (flags::mask_t mask, flags::mask_t* oflags,
+                   flags::mode_t mode);
 
       /**
-       * @brief Try to wait for signal flags.
+       * @brief Try to wait for event flags.
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
@@ -1267,11 +1232,11 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      _try_sig_wait (flags::mask_t mask, flags::mask_t* oflags,
-                     flags::mode_t mode);
+      _try_flags_wait (flags::mask_t mask, flags::mask_t* oflags,
+                       flags::mode_t mode);
 
       /**
-       * @brief Timed wait for signal flags.
+       * @brief Timed wait for event flags.
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
@@ -1288,11 +1253,11 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      _timed_sig_wait (flags::mask_t mask, clock::duration_t timeout,
-                       flags::mask_t* oflags, flags::mode_t mode);
+      _timed_flags_wait (flags::mask_t mask, clock::duration_t timeout,
+                         flags::mask_t* oflags, flags::mode_t mode);
 
       /**
-       * @brief Internal wait for signal.
+       * @brief Internal wait for event flags.
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
@@ -1306,6 +1271,30 @@ namespace os
        */
       result_t
       _try_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
+
+      /**
+       * @brief Clear thread event flags.
+       * @param [in] mask The OR-ed flags to clear. Zero means 'all'
+       * @param [out] oflags Optional pointer where to store the
+       *  previous flags; may be `nullptr`.
+       * @retval result::ok The flags were cleared.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @retval EINVAL The mask is zero.
+       */
+      result_t
+      _flags_clear (flags::mask_t mask, flags::mask_t* oflags);
+
+      /**
+       * @brief Get/clear thread event flags.
+       * @param [in] mask The OR-ed flags to get/clear; may be zero.
+       * @param [in] mode Mode bits to select if the flags should be
+       *  cleared (the other bits are ignored).
+       * @retval flags The selected bits from the current thread
+       *  event flags mask.
+       * @retval flags::all Cannot be invoked from an Interrupt Service Routines.
+       */
+      flags::mask_t
+      _flags_get (flags::mask_t mask, flags::mode_t mode);
 
       /**
        * @brief The actual destructor, also called from exit() and kill().
@@ -1409,13 +1398,13 @@ namespace os
       // - running - in ready_threads_list::unlink_head()
       // - ready - in ready_threads_list::link()
       // - waiting - in clock::_wait_until(), scheduler::_link_node()
-      //              thread::_wait(), thread::_timed_sig_wait()
+      //              thread::_wait(), thread::_timed_flags_wait()
       // - terminated - in state::_exit()
       // - destroyed - in thread::_destroy()
       state_t volatile sched_state_ = state::undefined;
       priority_t volatile prio_ = priority::none;
 
-      flags::mask_t volatile sig_mask_ = 0;
+      flags::mask_t volatile flags_mask_ = 0;
       bool volatile interrupted_ = false;
 
       os_thread_user_storage_t user_storage_;
@@ -1682,7 +1671,7 @@ namespace os
 #endif
 
       /**
-       * @brief Wait for thread signal flags.
+       * @brief Wait for thread event flags.
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
@@ -1696,11 +1685,11 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      sig_wait (flags::mask_t mask, flags::mask_t* oflags = nullptr,
-                flags::mode_t mode = flags::mode::all | flags::mode::clear);
+      flags_wait (flags::mask_t mask, flags::mask_t* oflags = nullptr,
+                  flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
       /**
-       * @brief Try to wait for thread signal flags.
+       * @brief Try to wait for thread event flags.
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
@@ -1713,11 +1702,12 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      try_sig_wait (flags::mask_t mask, flags::mask_t* oflags = nullptr,
-                    flags::mode_t mode = flags::mode::all | flags::mode::clear);
+      try_flags_wait (
+          flags::mask_t mask, flags::mask_t* oflags = nullptr,
+          flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
       /**
-       * @brief Timed wait for thread signal flags.
+       * @brief Timed wait for thread event flags.
        * @param [in] mask The expected flags (OR-ed bit-mask);
        *  may be zero.
        * @param [out] oflags Pointer where to store the current flags;
@@ -1734,10 +1724,34 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      timed_sig_wait (
+      timed_flags_wait (
           flags::mask_t mask, clock::duration_t timeout, flags::mask_t* oflags =
               nullptr,
           flags::mode_t mode = flags::mode::all | flags::mode::clear);
+
+      /**
+       * @brief Clear thread event flags.
+       * @param [in] mask The OR-ed flags to clear. Zero means 'all'
+       * @param [out] oflags Optional pointer where to store the
+       *  previous flags; may be `nullptr`.
+       * @retval result::ok The flags were cleared.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @retval EINVAL The mask is zero.
+       */
+      result_t
+      flags_clear (flags::mask_t mask, flags::mask_t* oflags);
+
+      /**
+       * @brief Get/clear thread event flags.
+       * @param [in] mask The OR-ed flags to get/clear; may be zero.
+       * @param [in] mode Mode bits to select if the flags should be
+       *  cleared (the other bits are ignored).
+       * @retval flags The selected bits from the current thread
+       *  event flags mask.
+       * @retval flags::all Cannot be invoked from an Interrupt Service Routines.
+       */
+      flags::mask_t
+      flags_get (flags::mask_t mask, flags::mode_t mode);
 
       /**
        * @cond ignore
@@ -1790,25 +1804,25 @@ namespace os
        * all given flags to be raised; otherwise, if the flags::mode::any
        * bit is set, the function expects any single flag to be raised.
        *
-       * If the expected signal flags are
+       * If the expected event flags are
        * raised, the function returns instantly.
        *
        * Otherwise suspend the execution of the current thread until all/any
-       * specified signal flags are raised.
+       * specified event flags are raised.
        *
        * When the parameter mask is 0, the thread is suspended
-       * until any signal flag is raised. In this case, if any signal flags
+       * until any event flag is raised. In this case, if any event flags
        * are already raised, the function returns instantly.
        *
-       * If the flags::mode::clear bit is set, the signal flags that are
+       * If the flags::mode::clear bit is set, the event flags that are
        * returned are automatically cleared.
        *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline result_t
-      sig_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode)
+      flags_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode)
       {
-        return this_thread::thread ()._sig_wait (mask, oflags, mode);
+        return this_thread::thread ()._flags_wait (mask, oflags, mode);
       }
 
       /**
@@ -1817,16 +1831,16 @@ namespace os
        * all given flags to be raised; otherwise, if the flags::mode::any
        * bit is set, the function expects any single flag to be raised.
        *
-       * The function does not blocks, if the expected signal flags are
+       * The function does not blocks, if the expected event flags are
        * not raised, but returns `EGAIN`.
        *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline result_t
-      try_sig_wait (flags::mask_t mask, flags::mask_t* oflags,
-                    flags::mode_t mode)
+      try_flags_wait (flags::mask_t mask, flags::mask_t* oflags,
+                      flags::mode_t mode)
       {
-        return this_thread::thread ()._try_sig_wait (mask, oflags, mode);
+        return this_thread::thread ()._try_flags_wait (mask, oflags, mode);
       }
 
       /**
@@ -1835,14 +1849,14 @@ namespace os
        * all given flags to be raised; otherwise, if the flags::mode::any
        * bit is set, the function expects any single flag to be raised.
        *
-       * If the expected signal flags are
+       * If the expected event flags are
        * raised, the function returns instantly.
        *
        * Otherwise suspend the execution of the thread until all/any
-       * specified signal flags are raised.
+       * specified event flags are raised.
        *
        * When the parameter mask is 0, the thread is suspended
-       * until any event flag is raised. In this case, if any signal flags
+       * until any event flag is raised. In this case, if any event flags
        * are already raised, the function returns instantly.
        *
        * The wait shall be terminated when the specified timeout
@@ -1854,7 +1868,7 @@ namespace os
        * clock on which it is based (the SysTick clock for CMSIS).
        *
        * Under no circumstance shall the operation fail with a timeout
-       * if the signal flags are already raised. The validity of
+       * if the event flags are already raised. The validity of
        * the timeout need not be checked if the expected flags
        * are already raised and the call can return immediately.
        *
@@ -1862,17 +1876,45 @@ namespace os
        * attribute. By default, the clock derived from the scheduler
        * timer is used, and the durations are expressed in ticks.
        *
-       * If the flags::mode::clear bit is set, the signal flags that are
+       * If the flags::mode::clear bit is set, the event flags that are
        * returned are automatically cleared.
        *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline result_t
-      timed_sig_wait (flags::mask_t mask, clock::duration_t timeout,
-                      flags::mask_t* oflags, flags::mode_t mode)
+      timed_flags_wait (flags::mask_t mask, clock::duration_t timeout,
+                        flags::mask_t* oflags, flags::mode_t mode)
       {
-        return this_thread::thread ()._timed_sig_wait (mask, timeout, oflags,
-                                                       mode);
+        return this_thread::thread ()._timed_flags_wait (mask, timeout, oflags,
+                                                         mode);
+      }
+
+      /**
+       * @details
+       * Select the requested bits from the thread current flags mask
+       * and return them. If requested, clear the selected bits in the
+       * thread flags mask.
+       *
+       * If the mask is zero, return the full thread flags mask,
+       * without any masking or subsequent clearing.
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      inline flags::mask_t
+      flags_get (flags::mask_t mask, flags::mode_t mode)
+      {
+        return this_thread::thread ()._flags_get (mask, mode);
+      }
+
+      /**
+       * @details
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      inline result_t
+      flags_clear (flags::mask_t mask, flags::mask_t* oflags)
+      {
+        return this_thread::thread ()._flags_clear (mask, oflags);
       }
 
       /**

@@ -318,7 +318,7 @@ extern "C"
   os_this_thread_exit (void* exit_ptr);
 
   /**
-   * @brief Wait for thread signal flags.
+   * @brief Wait for thread event flags.
    * @param [in] mask The expected flags (OR-ed bit-mask);
    *  may be zero.
    * @param [out] oflags Pointer where to store the current flags;
@@ -332,11 +332,11 @@ extern "C"
    * @retval ENOTRECOVERABLE Wait failed.
    */
   os_result_t
-  os_this_thread_sig_wait (os_flags_mask_t mask, os_flags_mask_t* oflags,
-                           os_flags_mode_t mode);
+  os_this_thread_flags_wait (os_flags_mask_t mask, os_flags_mask_t* oflags,
+                             os_flags_mode_t mode);
 
   /**
-   * @brief Try to wait for thread signal flags.
+   * @brief Try to wait for thread event flags.
    * @param [in] mask The expected flags (OR-ed bit-mask);
    *  may be zero.
    * @param [out] oflags Pointer where to store the current flags;
@@ -349,11 +349,11 @@ extern "C"
    * @retval ENOTRECOVERABLE Wait failed.
    */
   os_result_t
-  os_this_thread_try_sig_wait (os_flags_mask_t mask, os_flags_mask_t* oflags,
-                               os_flags_mode_t mode);
+  os_this_thread_try_flags_wait (os_flags_mask_t mask, os_flags_mask_t* oflags,
+                                 os_flags_mode_t mode);
 
   /**
-   * @brief Timed wait for thread signal flags.
+   * @brief Timed wait for thread event flags.
    * @param [in] mask The expected flags (OR-ed bit-mask);
    *  may be zero.
    * @param [out] oflags Pointer where to store the current flags;
@@ -370,9 +370,34 @@ extern "C"
    * @retval ENOTRECOVERABLE Wait failed.
    */
   os_result_t
-  os_this_thread_timed_sig_wait (os_flags_mask_t mask,
-                                 os_clock_duration_t timeout,
-                                 os_flags_mask_t* oflags, os_flags_mode_t mode);
+  os_this_thread_timed_flags_wait (os_flags_mask_t mask,
+                                   os_clock_duration_t timeout,
+                                   os_flags_mask_t* oflags,
+                                   os_flags_mode_t mode);
+
+  /**
+   * @brief Clear thread event flags.
+   * @param [in] mask The OR-ed flags to clear. Zero means 'all'
+   * @param [out] oflags Optional pointer where to store the
+   *  previous flags; may be `NULL`.
+   * @retval os_ok The flags were cleared.
+   * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+   * @retval EINVAL The mask is zero.
+   */
+  os_result_t
+  os_this_thread_flags_clear (os_flags_mask_t mask, os_flags_mask_t* oflags);
+
+  /**
+   * @brief Get/clear thread event flags.
+   * @param [in] mask The OR-ed flags to get/clear; may be zero.
+   * @param [in] mode Mode bits to select if the flags should be
+   *  cleared (the other bits are ignored).
+   * @retval flags The selected bits from the current thread
+   *  event flags mask.
+   * @retval sig::all Cannot be invoked from an Interrupt Service Routines.
+   */
+  os_flags_mask_t
+  os_this_thread_flags_get (os_flags_mask_t mask, os_flags_mode_t mode);
 
   /**
    * @}
@@ -465,7 +490,7 @@ extern "C"
   os_thread_resume (os_thread_t* thread);
 
   /**
-   * @brief Raise thread signal flags.
+   * @brief Raise thread event flags.
    * @param [in] thread Pointer to thread object.
    * @param [in] mask The OR-ed flags to raise.
    * @param [out] oflags Optional pointer where to store the
@@ -475,36 +500,8 @@ extern "C"
    * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
    */
   os_result_t
-  os_thread_sig_raise (os_thread_t* thread, os_flags_mask_t mask,
-                       os_flags_mask_t* oflags);
-
-  /**
-   * @brief Clear thread signal flags.
-   * @param [in] thread Pointer to thread object.
-   * @param [in] mask The OR-ed flags to clear. Zero means 'all'
-   * @param [out] oflags Optional pointer where to store the
-   *  previous flags; may be `NULL`.
-   * @retval os_ok The flags were cleared.
-   * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
-   * @retval EINVAL The mask is zero.
-   */
-  os_result_t
-  os_thread_sig_clear (os_thread_t* thread, os_flags_mask_t mask,
-                       os_flags_mask_t* oflags);
-
-  /**
-   * @brief Get/clear thread signal flags.
-   * @param [in] thread Pointer to thread object.
-   * @param [in] mask The OR-ed flags to get/clear; may be zero.
-   * @param [in] mode Mode bits to select if the flags should be
-   *  cleared (the other bits are ignored).
-   * @retval flags The selected bits from the current thread
-   *  signal flags mask.
-   * @retval sig::all Cannot be invoked from an Interrupt Service Routines.
-   */
-  os_flags_mask_t
-  os_thread_sig_get (os_thread_t* thread, os_flags_mask_t mask,
-                     os_flags_mode_t mode);
+  os_thread_flags_raise (os_thread_t* thread, os_flags_mask_t mask,
+                         os_flags_mask_t* oflags);
 
   /**
    * @brief Get the thread scheduler state.

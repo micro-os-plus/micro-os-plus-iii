@@ -75,7 +75,7 @@
  * - add Wait_list in base class
  *
  * Notes:
- * - the try_wait(), try_sig_wait() names are probably not very inspired,
+ * - the try_wait(), try_flags_wait() names are probably not very inspired,
  * but at least they are consistent in POSIX.
  */
 

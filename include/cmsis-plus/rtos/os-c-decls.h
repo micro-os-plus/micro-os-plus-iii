@@ -115,7 +115,7 @@ extern "C"
    * An unsigned type used to hold the mode bits passed to
    * functions returning flags.
    *
-   * Both thread signal flags and event flags use this definition.
+   * Both thread event flags and generic event flags use this definition.
    *
    * @see os::rtos::flags::mode_t
    */
@@ -127,7 +127,7 @@ extern "C"
    * An unsigned type large enough to store all the flags, usually
    * 32-bits wide.
    *
-   * Both thread signal flags and event flags use this definition.
+   * Both thread event flags and generic event flags use this definition.
    *
    * @see os::rtos::flags::mask_t
    */
@@ -496,7 +496,7 @@ extern "C"
     size_t allocated_stack_size_elements;
     os_thread_state_t state;
     os_thread_prio_t prio;
-    os_flags_mask_t signals;
+    os_flags_mask_t flags;
     os_thread_user_storage_t user_storage; //
     bool interrupted;
 

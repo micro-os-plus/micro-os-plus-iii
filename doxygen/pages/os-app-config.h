@@ -537,9 +537,9 @@
  */
 #define OS_TRACE_RTOS_THREAD_CONTEXT
 /**
- * @brief Enable trace messages for RTOS thread signal functions.
+ * @brief Enable trace messages for RTOS thread flags functions.
  */
-#define OS_TRACE_RTOS_THREAD_SIG
+#define OS_TRACE_RTOS_THREAD_FLAGS
 /**
  * @brief Enable trace messages for RTOS timer functions.
  */
