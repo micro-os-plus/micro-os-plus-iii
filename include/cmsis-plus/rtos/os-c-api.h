@@ -1675,7 +1675,7 @@ extern "C"
    * @param [in] msg The address of the message to enqueue.
    * @param [in] nbytes The length of the message. Must be not
    *  higher than the value used when creating the queue.
-   * @param [in] mprio The message priority. The default is 0.
+   * @param [in] mprio The message priority. Enter 0 if priorities are not used.
    * @retval os_ok The message was enqueued.
    * @retval EINVAL A parameter is invalid or outside of a permitted range.
    * @retval EMSGSIZE The specified message length, nbytes,
@@ -1695,7 +1695,7 @@ extern "C"
    * @param [in] msg The address of the message to enqueue.
    * @param [in] nbytes The length of the message. Must be not
    *  higher than the value used when creating the queue.
-   * @param [in] mprio The message priority. The default is 0.
+   * @param [in] mprio The message priority. Enter 0 if priorities are not used.
    * @retval os_ok The message was enqueued.
    * @retval EWOULDBLOCK The specified message queue is full.
    * @retval EINVAL A parameter is invalid or outside of a permitted range.
@@ -1715,7 +1715,7 @@ extern "C"
    * @param [in] nbytes The length of the message. Must be not
    *  higher than the value used when creating the queue.
    * @param [in] timeout The timeout duration.
-   * @param [in] mprio The message priority. The default is 0.
+   * @param [in] mprio The message priority. Enter 0 if priorities are not used.
    * @retval os_ok The message was enqueued.
    * @retval EINVAL A parameter is invalid or outside of a permitted range.
    * @retval EMSGSIZE The specified message length, nbytes,
@@ -1738,7 +1738,7 @@ extern "C"
    * @param [in] nbytes The size of the destination buffer. Must
    *  be lower than the value used when creating the queue.
    * @param [out] mprio The address where to store the message
-   *  priority. The default is `NULL`.
+   *  priority. Enter `NULL` if priorities are not used.
    * @retval os_ok The message was received.
    * @retval EINVAL A parameter is invalid or outside of a permitted range.
    * @retval EMSGSIZE The specified message length, nbytes, is
@@ -1761,7 +1761,7 @@ extern "C"
    * @param [in] nbytes The size of the destination buffer. Must
    *  be lower than the value used when creating the queue.
    * @param [out] mprio The address where to store the message
-   *  priority. The default is `NULL`.
+   *  priority. Enter `NULL` if priorities are not used.
    * @retval os_ok The message was received.
    * @retval EINVAL A parameter is invalid or outside of a permitted range.
    * @retval EMSGSIZE The specified message length, nbytes, is
@@ -1784,7 +1784,7 @@ extern "C"
    *  be lower than the value used when creating the queue.
    * @param [in] timeout The timeout duration.
    * @param [out] mprio The address where to store the message
-   *  priority. The default is `NULL`.
+   *  priority. Enter `NULL` if priorities are not used.
    * @retval os_ok The message was received.
    * @retval EINVAL A parameter is invalid or outside of a permitted range.
    * @retval EMSGSIZE The specified message length, nbytes, is

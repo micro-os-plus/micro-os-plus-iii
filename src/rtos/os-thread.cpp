@@ -680,7 +680,7 @@ namespace os
      * Suspend execution of the calling thread until the target thread
      * terminates, unless the target thread has already terminated.
      * On return from a successful `join()` call with a non-NULL
-     * _exit_ptr_ argument, the value passed to exit() by the
+     * _exit_ptr_ argument, the value passed to `exit()` by the
      * terminating thread shall be made available in the location
      * referenced by _exit_ptr_. When a `join()` returns successfully,
      * the target thread has been terminated. The results of
