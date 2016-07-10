@@ -104,7 +104,7 @@ namespace os
       protected:
 
         constexpr
-        attributes (count_t max_count);
+        attributes (count_t max_value, count_t initial_value = 0);
 
       public:
 
@@ -138,14 +138,14 @@ namespace os
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
         /**
-         * @brief Semaphore initial count.
+         * @brief Semaphore initial count value.
          */
-        count_t sm_initial_count = 0;
+        count_t sm_initial_value = 0;
 
         /**
-         * @brief Semaphore max count.
+         * @brief Semaphore max count value.
          */
-        count_t sm_max_count = max_count_value;
+        count_t sm_max_value = 1;
 
         // Add more attributes here.
 
@@ -156,17 +156,17 @@ namespace os
       }; /* class attributes */
 
       /**
-       * @brief Default counting semaphore initialiser.
+       * @brief Default binary semaphore initialiser.
        */
-      static const attributes counting_initializer;
+      static const attributes binary_initializer;
 
       // ======================================================================
 
       /**
-       * @brief Binary semaphore attributes.
+       * @brief Counting semaphore attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class binary_attributes : public attributes
+      class counting_attributes : public attributes
       {
       public:
 
@@ -177,22 +177,22 @@ namespace os
 
         /**
          * @brief Create a binary semaphore attributes object.
-         * @par Parameters
-         *  None
+         * @param [in] max_value Maximum count value.
+         * @param [in] initial_value Initial count value; 0 if missing.
          */
         constexpr
-        binary_attributes ();
+        counting_attributes (count_t max_value, count_t initial_value = 0);
 
         /**
          * @cond ignore
          */
 
-        binary_attributes (const binary_attributes&) = default;
-        binary_attributes (binary_attributes&&) = default;
-        binary_attributes&
-        operator= (const binary_attributes&) = default;
-        binary_attributes&
-        operator= (binary_attributes&&) = default;
+        counting_attributes (const counting_attributes&) = default;
+        counting_attributes (counting_attributes&&) = default;
+        counting_attributes&
+        operator= (const counting_attributes&) = default;
+        counting_attributes&
+        operator= (counting_attributes&&) = default;
 
         /**
          * @endcond
@@ -201,19 +201,15 @@ namespace os
         /**
          * @brief Destroy the semaphore attributes object.
          */
-        ~binary_attributes () = default;
+        ~counting_attributes () = default;
 
         /**
          * @}
          */
 
-      }; /* class binary_attributes */
+      }; /* class counting_attributes */
 
-      /**
-       * @brief Default binary semaphore initialiser.
-       */
-      static const binary_attributes binary_initializer;
-
+      // ======================================================================
       /**
        * @name Constructors & Destructor
        * @{
@@ -223,19 +219,26 @@ namespace os
        * @brief Create a semaphore object.
        * @param [in] attr Reference to attributes.
        */
-      semaphore (const attributes& attr = counting_initializer);
+      semaphore (const attributes& attr = binary_initializer);
 
       /**
        * @brief Create a named semaphore object.
        * @param [in] name Pointer to name.
        * @param [in] attr Reference to attributes.
        */
-      semaphore (const char* name,
-                 const attributes& attr = counting_initializer);
+      semaphore (const char* name, const attributes& attr = binary_initializer);
 
       /**
        * @cond ignore
        */
+
+    protected:
+
+      semaphore (const char* name, const count_t max_value,
+                 const count_t initial_value, const attributes& attr =
+                     binary_initializer);
+
+    public:
 
       semaphore (const semaphore&) = delete;
       semaphore (semaphore&&) = delete;
@@ -431,19 +434,167 @@ namespace os
       os_semaphore_port_data_t port_;
 #endif
 
-      const count_t initial_count_;
+      // Constant set during construction.
+      const count_t max_value_ = max_count_value;
+
+      const count_t initial_value_;
 
       // Can be updated in different contexts (interrupts or threads)
       volatile count_t count_ = 0;
-
-      // Constant set during construction.
-      const count_t max_count_ = max_count_value;
 
       // Add more internal data.
 
       /**
        * @endcond
        */
+
+      /**
+       * @}
+       */
+
+    };
+
+    // ========================================================================
+
+    /**
+     * @brief POSIX compliant binary **semaphore**.
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos-semaphore
+     */
+    class semaphore_binary : public semaphore
+    {
+    public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+      /**
+       * @brief Create a binary semaphore object.
+       * @param [in] initial_value Initial count value; 0 if missing.
+       */
+      semaphore_binary (const count_t initial_value = 0);
+
+      /**
+       * @brief Create a named binary semaphore object.
+       * @param [in] name Pointer to name.
+       * @param [in] initial_value Initial count value; 0 if missing.
+       */
+      semaphore_binary (const char* name, const count_t initial_value = 0);
+
+      /**
+       * @cond ignore
+       */
+
+      semaphore_binary (const semaphore_binary&) = delete;
+      semaphore_binary (semaphore_binary&&) = delete;
+      semaphore_binary&
+      operator= (const semaphore_binary&) = delete;
+      semaphore_binary&
+      operator= (semaphore_binary&&) = delete;
+
+      /**
+       * @endcond
+       */
+
+      /**
+       * @brief Destroy the semaphore object.
+       */
+      ~semaphore_binary ();
+
+      /**
+       * @}
+       */
+
+      /*
+       * @name Operators
+       * @{
+       */
+
+      /**
+       * @brief Compare semaphores.
+       * @retval true The given semaphore is the same as this semaphore.
+       * @retval false The semaphores are different.
+       */
+      bool
+      operator== (const semaphore_binary& rhs) const;
+
+      /**
+       * @}
+       */
+
+    };
+
+    // ========================================================================
+
+    /**
+     * @brief POSIX compliant counting **semaphore**.
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos-semaphore
+     */
+    class semaphore_counting : public semaphore
+    {
+    public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+      /**
+       * @brief Create a binary semaphore object.
+       * @param [in] max_value Maximum count value.
+       * @param [in] initial_value Initial count value; 0 if missing.
+       */
+      semaphore_counting (const count_t max_value, const count_t initial_value =
+                              0);
+
+      /**
+       * @brief Create a named binary semaphore object.
+       * @param [in] name Pointer to name.
+       * @param [in] max_value Maximum count value.
+       * @param [in] initial_value Initial count value; 0 if missing.
+       */
+      semaphore_counting (const char* name, const count_t max_value,
+                          const count_t initial_value = 0);
+
+      /**
+       * @cond ignore
+       */
+
+      semaphore_counting (const semaphore_counting&) = delete;
+      semaphore_counting (semaphore_counting&&) = delete;
+      semaphore_counting&
+      operator= (const semaphore_counting&) = delete;
+      semaphore_counting&
+      operator= (semaphore_counting&&) = delete;
+
+      /**
+       * @endcond
+       */
+
+      /**
+       * @brief Destroy the semaphore object.
+       */
+      ~semaphore_counting ();
+
+      /**
+       * @}
+       */
+
+      /*
+       * @name Operators
+       * @{
+       */
+
+      /**
+       * @brief Compare semaphores.
+       * @retval true The given semaphore is the same as this semaphore.
+       * @retval false The semaphores are different.
+       */
+      bool
+      operator== (const semaphore_counting& rhs) const;
 
       /**
        * @}
@@ -473,8 +624,9 @@ namespace os
     }
 
     constexpr
-    semaphore::attributes::attributes (count_t max_count) :
-        sm_max_count (max_count)
+    semaphore::attributes::attributes (count_t max_value, count_t initial_value) :
+        sm_initial_value (initial_value), //
+        sm_max_value (max_value)
     {
       ;
     }
@@ -482,14 +634,50 @@ namespace os
     // ========================================================================
 
     constexpr
-    semaphore::binary_attributes::binary_attributes () :
+    semaphore::counting_attributes::counting_attributes (count_t max_value,
+                                                         count_t initial_value) :
         attributes
-          { 1 } // Use the protected constructor.
+          { max_value, initial_value } // Use the protected constructor.
     {
       ;
     }
 
     // ========================================================================
+
+    /**
+     * @details
+     * This constructor shall initialise a generic semaphore object
+     * with attributes referenced by _attr_.
+     * If the attributes specified by _attr_ are modified later,
+     * the semaphore attributes shall not be affected.
+     * Upon successful initialisation, the state of the
+     * semaphore object shall become initialised.
+     *
+     * Only the semaphore object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * semaphore objects.
+     *
+     * In cases where default semaphore attributes are
+     * appropriate, the variable `semaphore::binary_initializer`
+     * can be used to
+     * initialise semaphores.
+     * The effect shall be equivalent to creating a semaphore
+     * object with the default constructor.
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
+     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    inline
+    semaphore::semaphore (const attributes& attr) :
+        semaphore
+          { nullptr, attr }
+    {
+      ;
+    }
 
     /**
      * @details
@@ -511,7 +699,7 @@ namespace os
     inline semaphore::count_t
     semaphore::initial_value (void) const
     {
-      return initial_count_;
+      return initial_value_;
     }
 
     /**
@@ -524,8 +712,170 @@ namespace os
     inline semaphore::count_t
     semaphore::max_value (void) const
     {
-      return max_count_;
+      return max_value_;
     }
+
+    // ========================================================================
+
+    /**
+     * @details
+     * This constructor shall initialise a binary semaphore object
+     * with the given _initial_value_.
+     * Upon successful initialisation, the state of the
+     * semaphore object shall become initialised.
+     *
+     * Only the semaphore object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * semaphore objects.
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
+     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    inline
+    semaphore_binary::semaphore_binary (const count_t initial_value) :
+        semaphore
+          { nullptr, 1, initial_value, binary_initializer }
+    {
+      ;
+    }
+
+    /**
+     * @details
+     * This constructor shall initialise a named binary semaphore object
+     * with the given _initial_value_.
+     * Upon successful initialisation, the state of the
+     * semaphore object shall become initialised.
+     *
+     * Only the semaphore object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * semaphore objects.
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
+     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    inline
+    semaphore_binary::semaphore_binary (const char* name,
+                                        const count_t initial_value) :
+        semaphore
+          { name, 1, initial_value }
+    {
+      ;
+    }
+
+    /**
+     * @details
+     * This destructor shall destroy the semaphore object; the object
+     * becomes, in effect, uninitialised. An implementation may cause
+     * the destructor to set the object to an invalid value.
+     *
+     * It is safe to destroy an initialised semaphore upon which
+     * no threads are currently blocked. The effect of destroying
+     * a semaphore upon which other threads are currently blocked
+     * is undefined.
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`sem_destroy()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_destroy.html)
+     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    inline
+    semaphore_binary::~semaphore_binary ()
+    {
+      ;
+    }
+
+    // ========================================================================
+
+    /**
+     * @details
+     * This constructor shall initialise a counting semaphore object
+     * with the given _max_value_ and _initial_value_.
+     * Upon successful initialisation, the state of the
+     * semaphore object shall become initialised.
+     *
+     * Only the semaphore object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * semaphore objects.
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
+     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    inline
+    semaphore_counting::semaphore_counting (const count_t max_value,
+                                            const count_t initial_value) :
+        semaphore
+          { nullptr, max_value, initial_value }
+    {
+      ;
+    }
+
+    /**
+     * @details
+     * This constructor shall initialise a named counting semaphore object
+     * with the given _max_value_ and _initial_value_.
+     * Upon successful initialisation, the state of the
+     * semaphore object shall become initialised.
+     *
+     * Only the semaphore object itself may be used for performing
+     * synchronisation. It is not allowed to make copies of
+     * semaphore objects.
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
+     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    inline
+    semaphore_counting::semaphore_counting (const char* name,
+                                            const count_t max_value,
+                                            const count_t initial_value) :
+        semaphore
+          { name, max_value, initial_value }
+    {
+      ;
+    }
+
+    /**
+     * @details
+     * This destructor shall destroy the semaphore object; the object
+     * becomes, in effect, uninitialised. An implementation may cause
+     * the destructor to set the object to an invalid value.
+     *
+     * It is safe to destroy an initialised semaphore upon which
+     * no threads are currently blocked. The effect of destroying
+     * a semaphore upon which other threads are currently blocked
+     * is undefined.
+     *
+     * @par POSIX compatibility
+     *  Inspired by [`sem_destroy()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_destroy.html)
+     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    inline
+    semaphore_counting::~semaphore_counting ()
+    {
+      ;
+    }
+
+  // ========================================================================
 
   } /* namespace rtos */
 } /* namespace os */

@@ -62,14 +62,14 @@ namespace os
      */
 
     /**
-     * @var semaphore::count_t semaphore::attributes::sm_initial_count
+     * @var semaphore::count_t semaphore::attributes::sm_initial_value
      * @details
      * This values represents the number of resources initially
      * available to the semaphore.
      */
 
     /**
-     * @var semaphore::count_t semaphore::attributes::sm_max_count
+     * @var semaphore::count_t semaphore::attributes::sm_max_value
      * @details
      * This values represents the maximum number of resources
      * available to the semaphore.
@@ -90,13 +90,7 @@ namespace os
      * @details
      * This variable is used by the default constructor.
      */
-    const semaphore::attributes semaphore::counting_initializer;
-
-    /**
-     * @details
-     * This variable can be used to create a binary semaphore.
-     */
-    const semaphore::binary_attributes semaphore::binary_initializer;
+    const semaphore::attributes semaphore::binary_initializer;
 
     // ------------------------------------------------------------------------
 
@@ -131,7 +125,7 @@ namespace os
 
     /**
      * @details
-     * This constructor shall initialise a semaphore object
+     * This constructor shall initialise a named generic semaphore object
      * with attributes referenced by _attr_.
      * If the attributes specified by _attr_ are modified later,
      * the semaphore attributes shall not be affected.
@@ -143,42 +137,8 @@ namespace os
      * semaphore objects.
      *
      * In cases where default semaphore attributes are
-     * appropriate, the variables `semaphore::binary_initializer`
-     * or `semaphore::counting_initializer` can be used to
-     * initialise semaphores.
-     * The effect shall be equivalent to creating a semaphore
-     * object with the default constructor.
-     *
-     * @par POSIX compatibility
-     *  Inspired by [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
-     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    semaphore::semaphore (const attributes& attr) :
-        semaphore
-          { nullptr, attr }
-    {
-      ;
-    }
-
-    /**
-     * @details
-     * This constructor shall initialise a named semaphore object
-     * with attributes referenced by _attr_.
-     * If the attributes specified by _attr_ are modified later,
-     * the semaphore attributes shall not be affected.
-     * Upon successful initialisation, the state of the
-     * semaphore object shall become initialised.
-     *
-     * Only the semaphore object itself may be used for performing
-     * synchronisation. It is not allowed to make copies of
-     * semaphore objects.
-     *
-     * In cases where default semaphore attributes are
-     * appropriate, the variables `semaphore::binary_initializer`
-     * or `semaphore::counting_initializer` can be used to
+     * appropriate, the variable `semaphore::binary_initializer`
+     * can be used to
      * initialise semaphores.
      * The effect shall be equivalent to creating a semaphore
      * object with the default constructor.
@@ -191,24 +151,36 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     semaphore::semaphore (const char* name, const attributes& attr) :
+        semaphore
+          { name, attr.sm_max_value, attr.sm_initial_value, attr }
+    {
+      ;
+    }
+
+    /**
+     * @cond ignore
+     */
+
+    semaphore::semaphore (const char* name, const count_t max_value,
+                          const count_t initial_value, const attributes& attr) :
         named_object
           { name }, //
-        initial_count_ (attr.sm_initial_count), //
-        max_count_ (attr.sm_max_count ? attr.sm_max_count : max_count_value)
+        max_value_ (max_value), //
+        initial_value_ (initial_value)
     {
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
-      // The CMSIS validator requires the max_count to be equal to
+      // The CMSIS validator requires the max_value to be equal to
       // the initial count, which can be 0, but we patch it on the way.
-      assert(max_count_ > 0);
-      assert(attr.sm_initial_count >= 0);
-      assert(attr.sm_initial_count <= max_count_);
+      assert(max_value_ > 0);
+      assert(initial_value >= 0);
+      assert(initial_value <= max_value_);
 
-      count_ = attr.sm_initial_count;
+      count_ = initial_value;
 
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s %u %u\n", __func__, this, this->name (),
-                     count_, max_count_);
+                     count_, max_value_);
 #endif
 
 #if !defined(OS_USE_RTOS_PORT_SEMAPHORE)
@@ -225,6 +197,10 @@ namespace os
 
 #endif
     }
+
+    /**
+     * @endcond
+     */
 
     /**
      * @details
@@ -269,7 +245,7 @@ namespace os
     semaphore::_init (void)
     {
 
-      count_ = initial_count_;
+      count_ = initial_value_;
 
 #if !defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
@@ -312,7 +288,7 @@ namespace os
      * @details
      * Perform a post operation on the semaphore, informing
      * the waiting consumers that one more resource is available.
-     * The semaphore count is incremented, up to max_count.
+     * The semaphore count is incremented, up to max_value.
      *
      * If the semaphore count resulting from this operation is
      * positive, then no threads were blocked waiting for the
@@ -364,7 +340,7 @@ namespace os
         {
           interrupts::critical_section ics; // ----- Critical section -----
 
-          if (count_ >= this->max_count_)
+          if (count_ >= this->max_value_)
             {
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
               trace::printf ("%s() @%p %s EAGAIN\n", __func__, this, name ());

@@ -1360,7 +1360,18 @@ extern "C"
    *  Nothing.
    */
   void
-  os_semaphore_attr_init_binary (os_semaphore_attr_t* attr);
+  os_semaphore_attr_binary_init (os_semaphore_attr_t* attr);
+
+  /**
+   * @brief Initialise the counting semaphore attributes.
+   * @param [in] attr Pointer to semaphore attributes object.
+   * @param [in] max_value Maximum count value.
+   * @param [in] initial_value Initial count value; 0 if missing.
+   */
+  void
+  os_semaphore_attr_counting_init (os_semaphore_attr_t* attr,
+                                   const os_semaphore_count_t max_value,
+                                   const os_semaphore_count_t initial_value);
 
   /**
    * @brief Get a binary semaphore attributes object.
@@ -1380,6 +1391,30 @@ extern "C"
   void
   os_semaphore_create (os_semaphore_t* semaphore, const char* name,
                        const os_semaphore_attr_t* attr);
+
+  /**
+   * @brief Create a binary semaphore object.
+   * @param [in] semaphore Pointer to semaphore object.
+   * @param [in] name Pointer to name.
+   * @par Returns
+   *  Nothing.
+   */
+  void
+  os_semaphore_binary_create (os_semaphore_t* semaphore, const char* name);
+
+  /**
+   * @brief Create a counting semaphore object.
+   * @param [in] semaphore Pointer to semaphore object.
+   * @param [in] name Pointer to name.
+   * @param [in] max_value Maximum count value.
+   * @param [in] initial_value Initial count value; 0 if missing.
+   * @par Returns
+   *  Nothing.
+   */
+  void
+  os_semaphore_counting_create (os_semaphore_t* semaphore, const char* name,
+                                const os_semaphore_count_t max_value,
+                                const os_semaphore_count_t initial_value);
 
   /**
    * @brief Destroy the semaphore object.
