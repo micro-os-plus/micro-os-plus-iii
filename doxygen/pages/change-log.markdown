@@ -32,6 +32,18 @@ Changes, in reverse chronological order:
 - prefix all init functions with `os_`
 - many other, too many to mention, inherent for first versions...
 
+### v0.3.1 2016-07-10
+
+Changes, in reverse chronological order:
+
+- for consistency reasons, thread signals were renamed thread event flags
+- `flags_clear()`, `flags_get()` moved from `thread` to `this_thread`
+- `os_thread_stack_element_t` and `os_thread_stack_allocation_element_t` added to C API
+- `os_thread_stack_get_bottom()`, `os_thread_stack_get_top()`, `os_thread_stack_check_bottom_magic()`, `os_thread_stack_check_top_magic()` added
+- thread `waiting` renamed `suspended`
+- validation: waiting function are allowed only if scheduler is not locked
+
+
 
 
 

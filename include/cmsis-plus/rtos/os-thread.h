@@ -229,6 +229,13 @@ namespace os
        */
       using state_t = uint8_t;
 
+      /**
+       * @brief Thread states.
+       * @details
+       * The os::rtos::thread::state definition is a container for
+       * thread states.
+       * @ingroup cmsis-plus-rtos-thread
+       */
       struct state
       {
         /**
@@ -275,6 +282,7 @@ namespace os
       /**
        * @brief Thread stack.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @ingroup cmsis-plus-rtos-thread
        */
       class stack
       {
@@ -496,6 +504,7 @@ namespace os
       /**
        * @brief Thread context.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @ingroup cmsis-plus-rtos-thread
        */
       class context
       {
@@ -625,6 +634,7 @@ namespace os
       /**
        * @brief Thread attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @ingroup cmsis-plus-rtos-thread
        */
       class attributes : public clocked_attributes
       {
@@ -702,6 +712,11 @@ namespace os
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) \
   || defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
 
+      /**
+       * @brief Thread statistics.
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @ingroup cmsis-plus-rtos-thread
+       */
       class statistics
       {
       public:
@@ -2337,7 +2352,7 @@ namespace os
     inline result_t
     thread::flags_clear (flags::mask_t mask, flags::mask_t* oflags)
     {
-      return _flags_clear(mask, oflags);
+      return _flags_clear (mask, oflags);
     }
 
 #endif
