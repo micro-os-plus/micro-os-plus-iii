@@ -67,6 +67,98 @@
  @ingroup cmsis-plus-rtos
  @brief  C++ API threads definitions.
  @details
+
+ @par Examples
+
+ @code{.cpp}
+void*
+func (void* args __attribute__((unused)))
+{
+  printf ("%s\n", __func__);
+
+  return nullptr;
+}
+
+int
+os_main (int argc, char* argv[])
+{
+    {
+      // Regular threads.
+      thread th1
+        { func, nullptr };
+      thread th2
+        { "th2", func, nullptr };
+
+      th1.join ();
+      th2.join ();
+    }
+
+  using my_thread = thread_allocated<memory::new_delete_allocator<thread::stack::allocation_element_t>>;
+
+  // Allocated threads.
+    {
+      my_thread ath1
+        { func, nullptr };
+      my_thread ath2
+        { "ath2", func, nullptr };
+
+      ath1.join ();
+      ath2.join ();
+    }
+
+    {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#endif
+      // Statically allocated threads.
+      static thread_static<> sth1
+        { func, nullptr };
+      static thread_static<> sth2
+        { "sth2", func, nullptr };
+#pragma GCC diagnostic pop
+
+      sth1.join ();
+      sth2.join ();
+    }
+
+  // --------------------------------------------------------------------------
+
+    {
+      std::size_t n;
+
+      n = thread::stack::default_size ();
+      thread::stack::default_size (n);
+
+      n = thread::stack::min_size ();
+      thread::stack::min_size (n);
+
+      class thread::stack& stack = this_thread::thread ().stack ();
+
+      stack.bottom ();
+
+      stack.top ();
+
+      stack.check_bottom_magic ();
+      stack.check_top_magic ();
+    }
+
+  // --------------------------------------------------------------------------
+
+    {
+      this_thread::flags_clear (flags::all);
+
+      this_thread::thread ().flags_raise (0x3);
+      this_thread::flags_wait (0x3, nullptr, flags::mode::all);
+
+      this_thread::thread ().flags_raise (0x3);
+      this_thread::flags_try_wait (0x3);
+
+      this_thread::thread ().flags_raise (0x3);
+      this_thread::flags_timed_wait (0x3, 10);
+    }
+}
+ @endcode
  */
 
 /**
@@ -74,6 +166,11 @@
  @ingroup cmsis-plus-rtos
  @brief  C++ API clocks definitions.
  @details
+
+ @par Examples
+
+ @code{.cpp}
+ @endcode
  */
 
 /**
@@ -81,6 +178,23 @@
  @ingroup cmsis-plus-rtos
  @brief  C++ API condition variables definitions.
  @details
+
+ @par Examples
+
+ @code{.cpp}
+int
+os_main (int argc, char* argv[])
+{
+    {
+      condition_variable cv1;
+      cv1.signal ();
+
+      condition_variable cv2
+        { "cv2" };
+      cv2.signal ();
+    }
+}
+ @endcode
  */
 
 /**
@@ -88,6 +202,23 @@
  @ingroup cmsis-plus-rtos
  @brief  C++ API event flags definitions.
  @details
+
+ @par Examples
+
+ @code{.cpp}
+int
+os_main (int argc, char* argv[])
+{
+    {
+      event_flags ev1;
+      ev1.clear (1);
+
+      event_flags ev2
+        { "ev2" };
+      ev2.clear (1);
+    }
+}
+ @endcode
  */
 
 /**
@@ -95,6 +226,103 @@
  @ingroup cmsis-plus-rtos
  @brief  C++ API memory pools definitions.
  @details
+
+ @par Examples
+
+ @code{.cpp}
+typedef struct my_blk_s
+{
+  int i;
+  const char* s;
+} my_blk_t;
+
+int
+os_main (int argc, char* argv[])
+{
+  my_blk_t* blk;
+
+  // Classic usage; block size and cast to char* must be supplied manually.
+    {
+      memory_pool cp1
+        { 3, sizeof(my_blk_t) };
+
+      blk = static_cast<my_blk_t*> (cp1.alloc ());
+      cp1.free (blk);
+
+      blk = static_cast<my_blk_t*> (cp1.try_alloc ());
+      cp1.free (blk);
+
+      blk = static_cast<my_blk_t*> (cp1.timed_alloc (1));
+      cp1.free (blk);
+
+      memory_pool cp2
+        { "cp2", 3, sizeof(my_blk_t) };
+
+      blk = static_cast<my_blk_t*> (cp2.alloc ());
+      cp2.free (blk);
+
+    }
+
+  // --------------------------------------------------------------------------
+
+  // Template usage; block size and cast are supplied automatically.
+
+  // Define a custom queue type parametrised with the
+  // message type.
+  using My_pool = memory_pool_typed<my_blk_t>;
+
+    {
+      My_pool tp1
+        { 7 };
+
+      blk = tp1.alloc ();
+      tp1.free (blk);
+
+      blk = tp1.try_alloc ();
+      tp1.free (blk);
+
+      blk = tp1.timed_alloc (1);
+      tp1.free (blk);
+
+      My_pool tp2
+        { "tp2", 7 };
+
+      blk = tp2.alloc ();
+      tp2.free (blk);
+
+    }
+
+  // --------------------------------------------------------------------------
+
+  // Allocated template usage; block size is supplied automatically.
+
+  // Define a custom pool type parametrised with the
+  // block type and the pool size.
+  using My_static_pool = memory_pool_static<my_blk_t, 4>;
+
+    {
+      // The space for the pool is allocated inside the pool
+      // object, in this case on the stack.
+      My_static_pool sp1;
+
+      blk = sp1.alloc ();
+      sp1.free (blk);
+
+      blk = sp1.try_alloc ();
+      sp1.free (blk);
+
+      blk = sp1.timed_alloc (1);
+      sp1.free (blk);
+
+      My_static_pool sp2
+        { "sp2" };
+
+      blk = sp2.alloc ();
+      sp2.free (blk);
+
+    }
+}
+ @endcode
  */
 
 /**
@@ -102,6 +330,100 @@
  @ingroup cmsis-plus-rtos
  @brief  C++ API message queues definitions.
  @details
+
+ @par Examples
+
+ @code{.cpp}
+typedef struct my_msg_s
+{
+  int i;
+  const char* s;
+} my_msg_t;
+
+int
+os_main (int argc, char* argv[])
+{
+  my_msg_t msg_out
+    { 1, "msg" };
+
+  my_msg_t msg_in;
+
+  // --------------------------------------------------------------------------
+
+  // Classic usage; message size and cast to char* must be supplied manually.
+    {
+      message_queue cq1
+        { 3, sizeof(my_msg_t) };
+
+      cq1.send (&msg_out, sizeof(my_msg_t));
+
+      message_queue cq2
+        { "cq2", 3, sizeof(my_msg_t) };
+
+      cq2.send (&msg_out, sizeof(my_msg_t));
+
+    }
+
+  // --------------------------------------------------------------------------
+
+  // Template usage; message size and cast are supplied automatically.
+
+  // Define a custom queue type parametrised with the
+  // message type.
+  using My_queue = message_queue_typed<my_msg_t>;
+
+    {
+      My_queue tq1
+        { 7 };
+
+      tq1.send (&msg_out);
+      tq1.receive (&msg_in);
+
+      tq1.try_send (&msg_out);
+      tq1.try_receive (&msg_in);
+
+      tq1.timed_send (&msg_out, 1);
+      tq1.timed_receive (&msg_in, 1);
+
+      My_queue tq2
+        { "tq2", 7 };
+
+      tq2.send (&msg_out);
+      tq2.receive (&msg_in);
+
+    }
+
+  // --------------------------------------------------------------------------
+
+  // Allocated template usage; message size and cast are supplied automatically.
+
+  // Define a custom queue type parametrised with the
+  // message type and the queue size.
+  using My_static_queue = message_queue_static<my_msg_t, 4>;
+
+    {
+      // The space for the queue is allocated inside the queue
+      // object, in this case on the stack.
+      My_static_queue sq1;
+
+      sq1.send (&msg_out);
+      sq1.receive (&msg_in);
+
+      sq1.try_send (&msg_out);
+      sq1.try_receive (&msg_in);
+
+      sq1.timed_send (&msg_out, 1);
+      sq1.timed_receive (&msg_in, 1);
+
+      My_static_queue sq2
+        { "sq2" };
+
+      sq2.send (&msg_out);
+      sq2.receive (&msg_in);
+
+    }
+}
+ @endcode
  */
 
 /**
@@ -109,6 +431,34 @@
  @ingroup cmsis-plus-rtos
  @brief  C++ API mutexes definitions.
  @details
+
+ @par Examples
+
+ @code{.cpp}
+int
+os_main (int argc, char* argv[])
+{
+    {
+      mutex mx1;
+      mx1.lock ();
+      mx1.unlock ();
+    }
+
+    {
+      mutex mx2
+        { "mx2" };
+      mx2.lock ();
+      mx2.unlock ();
+    }
+
+    {
+      mutex mx3
+        { "mx2", mutex::recursive_initializer };
+      mx3.lock ();
+      mx3.unlock ();
+    }
+}
+ @endcode
  */
 
 /**
@@ -116,6 +466,52 @@
  @ingroup cmsis-plus-rtos
  @brief  C++ API semaphores definitions.
  @details
+
+ @par Examples
+
+ @code{.cpp}
+int
+os_main (int argc, char* argv[])
+{
+    {
+      // Binary semaphore.
+      semaphore_binary sp1;
+      sp1.post ();
+    }
+
+    {
+      // Named binary semaphore.
+      semaphore_binary sp2
+        { "sp2" };
+
+      sp2.post ();
+      sp2.wait ();
+
+      sp2.post ();
+      sp2.try_wait ();
+
+      sp2.post ();
+      sp2.timed_wait (1);
+
+      sp2.post ();
+      sp2.timed_wait (0xFFFFFFFF);
+    }
+
+    {
+      // Named counting semaphore.
+      semaphore_counting sp3
+        { "sp3", 7 };
+      sp3.post ();
+    }
+
+    {
+      // Named counting semaphore with custom initial value.
+      semaphore_counting sp4
+        { "sp4", 7, 7 };
+      sp4.post ();
+    }
+}
+ @endcode
  */
 
 /**
@@ -123,6 +519,53 @@
  @ingroup cmsis-plus-rtos
  @brief  C++ API timers definitions.
  @details
+
+ @par Examples
+
+ @code{.cpp}
+void
+tmfunc (void* args __attribute__((unused)))
+{
+  printf ("%s\n", __func__);
+}
+
+int
+os_main (int argc, char* argv[])
+{
+    {
+      // Single-shot timer.
+      timer tm1
+        { tmfunc, nullptr };
+      sysclock.sleep_for (1); // Sync
+      tm1.start (1);
+
+      sysclock.sleep_for (2);
+      tm1.stop ();
+    }
+
+    {
+      // Named single-shot timer.
+      timer tm2
+        { "tm2", tmfunc, nullptr };
+      sysclock.sleep_for (1); // Sync
+      tm2.start (1);
+
+      sysclock.sleep_for (2);
+      tm2.stop ();
+    }
+
+    {
+      // Named periodic timer.
+      timer tm3
+        { "tm3", tmfunc, nullptr, timer::periodic_initializer };
+      sysclock.sleep_for (1); // Sync
+      tm3.start (1);
+
+      sysclock.sleep_for (2);
+      tm3.stop ();
+    }
+}
+ @endcode
  */
 
 // ----------------------------------------------------------------------------
@@ -150,6 +593,10 @@
  @par Examples
 
  @code{.c}
+int
+os_main (int argc, char* argv[])
+{
+    {
       flag = os_sched_is_started ();
       assert(flag);
 
@@ -187,6 +634,7 @@
       // ...
       os_irq_critical_exit (st);
     }
+}
  @endcode
  */
 
@@ -201,6 +649,17 @@
  @par Examples
 
  @code{.c}
+void*
+func (void* args __attribute__((unused)))
+{
+  printf ("%s\n", __func__);
+
+  return NULL;
+}
+
+int
+os_main (int argc, char* argv[])
+{
     {
       // Unnamed default thread; stack dynamically allocated.
       os_thread_t th1;
@@ -254,6 +713,19 @@
     }
 
     {
+      os_this_thread_flags_clear (os_flags_all, NULL);
+
+      os_thread_flags_raise (os_this_thread (), 0x3, NULL);
+      os_this_thread_flags_wait (0x3, NULL, os_flags_mode_all);
+
+      os_thread_flags_raise (os_this_thread (), 0x3, NULL);
+      os_this_thread_flags_try_wait (0x3, NULL, os_flags_mode_all);
+
+      os_thread_flags_raise (os_this_thread (), 0x3, NULL);
+      os_this_thread_flags_timed_wait (0x3, 10, NULL, os_flags_mode_all);
+    }
+
+    {
       size_t n;
 
       n = os_thread_stack_get_default_size ();
@@ -261,7 +733,18 @@
 
       n = os_thread_stack_get_min_size ();
       os_thread_stack_set_min_size (n);
+
+      os_thread_stack_t* stack;
+      stack = os_thread_get_stack (os_this_thread ());
+
+      os_thread_stack_get_bottom (stack);
+
+      os_thread_stack_get_top (stack);
+
+      os_thread_stack_check_bottom_magic (stack);
+      os_thread_stack_check_top_magic (stack);
     }
+}
  @endcode
  */
 
@@ -276,6 +759,9 @@
  @par Examples
 
  @code{.c}
+int
+os_main (int argc, char* argv[])
+{
     {
       os_sysclock_sleep_for (2);
 
@@ -291,6 +777,7 @@
       // An event may resume the thread before the timeout expire.
       os_sysclock_wait_for (2);
     }
+}
  @endcode
  */
 
@@ -305,6 +792,9 @@
  @par Examples
 
  @code{.c}
+int
+os_main (int argc, char* argv[])
+{
     {
       os_condvar_t cv1;
       os_condvar_create (&cv1, "cv1", NULL);
@@ -319,6 +809,7 @@
 
       os_condvar_destroy (&cv1);
     }
+}
  @endcode
  */
 
@@ -333,6 +824,9 @@
  @par Examples
 
  @code{.c}
+int
+os_main (int argc, char* argv[])
+{
     {
       os_evflags_t ev1;
       os_evflags_create (&ev1, "ev1", NULL);
@@ -371,6 +865,7 @@
 
       os_evflags_destroy (&ev2);
     }
+}
  @endcode
  */
 
@@ -385,6 +880,15 @@
  @par Examples
 
  @code{.c}
+typedef struct my_blk_s
+{
+  int i;
+  const char* s;
+} my_blk_t;
+
+int
+os_main (int argc, char* argv[])
+{
   my_blk_t* blk;
 
     {
@@ -425,6 +929,7 @@
 
       os_mempool_destroy (&p2);
     }
+}
  @endcode
  */
 
@@ -439,6 +944,15 @@
  @par Examples
 
  @code{.c}
+typedef struct my_msg_s
+{
+  int i;
+  const char* s;
+} my_msg_t;
+
+int
+os_main (int argc, char* argv[])
+{
   // Define two messages.
 
   my_msg_t msg_out =
@@ -514,6 +1028,7 @@
 
       os_mqueue_destroy (&q2);
     }
+}
  @endcode
  */
 
@@ -528,6 +1043,9 @@
  @par Examples
 
  @code{.c}
+int
+os_main (int argc, char* argv[])
+{
     {
       os_mutex_t mx1;
       os_mutex_create (&mx1, "mx1", NULL);
@@ -599,6 +1117,7 @@
 
       os_mutex_destroy (&mx4);
     }
+}
  @endcode
  */
 
@@ -613,10 +1132,13 @@
  @par Examples
 
  @code{.c}
+int
+os_main (int argc, char* argv[])
+{
     {
-      // Default counting semaphore.
+      // Default binary semaphore.
       os_semaphore_t sp1;
-      os_semaphore_create (&sp1, "sp1", NULL);
+      os_semaphore_binary_create (&sp1, "sp1");
 
       os_semaphore_post (&sp1);
       os_semaphore_wait (&sp1);
@@ -643,8 +1165,8 @@
       os_semaphore_attr_t asp2;
       os_semaphore_attr_init (&asp2);
 
-      asp2.sm_initial_count = 3;
-      asp2.sm_max_count = 7;
+      asp2.sm_initial_value = 3;
+      asp2.sm_max_value = 7;
       asp2.clock = os_clock_get_rtclock ();
 
       os_semaphore_t sp2;
@@ -654,9 +1176,9 @@
     }
 
     {
-      // Binary semaphore.
+      // Counting semaphore.
       os_semaphore_t sp3;
-      os_semaphore_create (&sp3, "sp3", os_semaphore_attr_get_binary ());
+      os_semaphore_counting_create (&sp3, "sp3", 7, 7);
 
       os_semaphore_destroy (&sp3);
     }
@@ -664,7 +1186,7 @@
     {
       // Custom binary semaphore.
       os_semaphore_attr_t asp4;
-      os_semaphore_attr_init_binary (&asp4);
+      os_semaphore_attr_binary_init (&asp4);
       asp4.clock = os_clock_get_rtclock ();
 
       os_semaphore_t sp4;
@@ -672,6 +1194,7 @@
 
       os_semaphore_destroy (&sp4);
     }
+}
  @endcode
  */
 
@@ -684,6 +1207,15 @@
  @see @ref cmsis-plus-rtos-timer "RTOS C++ API"
 
  @code{.c}
+void
+tmfunc (void* args __attribute__((unused)))
+{
+  printf ("%s\n", __func__);
+}
+
+int
+os_main (int argc, char* argv[])
+{
    {
       os_timer_t tm1;
       os_timer_create (&tm1, "tm1", tmfunc, NULL, NULL);
@@ -719,6 +1251,7 @@
 
       os_timer_destroy (&tm2);
     }
+}
  @endcode
  */
 
