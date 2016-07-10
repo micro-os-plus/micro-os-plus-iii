@@ -856,6 +856,7 @@ namespace os
     message_queue::send (const void* msg, std::size_t nbytes, priority_t mprio)
     {
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
 
@@ -1035,6 +1036,7 @@ namespace os
                                clock::duration_t timeout, priority_t mprio)
     {
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
 
@@ -1155,6 +1157,7 @@ namespace os
     message_queue::receive (void* msg, std::size_t nbytes, priority_t* mprio)
     {
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
       os_assert_err(nbytes <= max_size, EMSGSIZE);
@@ -1351,6 +1354,7 @@ namespace os
                                   clock::duration_t timeout, priority_t* mprio)
     {
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
       os_assert_err(nbytes <= max_size, EMSGSIZE);

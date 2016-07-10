@@ -707,6 +707,7 @@ namespace os
     thread::join (void** exit_ptr)
     {
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
 
       // Fail if current thread
       assert(this != this_thread::_thread ());
@@ -1083,6 +1084,7 @@ namespace os
                          flags::mode_t mode)
     {
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
 
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X, %u) @%p %s 0x%X\n", __func__, mask, mode, this,
@@ -1142,6 +1144,7 @@ namespace os
                                flags::mask_t* oflags, flags::mode_t mode)
     {
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
 
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X, %u, %u) @%p %s 0x%X\n", __func__, mask, mode,

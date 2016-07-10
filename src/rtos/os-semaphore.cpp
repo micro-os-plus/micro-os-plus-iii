@@ -419,6 +419,7 @@ namespace os
     semaphore::wait ()
     {
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
 
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -571,6 +572,7 @@ namespace os
     semaphore::timed_wait (clock::duration_t timeout)
     {
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
 
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s(%u) @%p %s\n", __func__,

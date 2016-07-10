@@ -619,6 +619,7 @@ namespace os
     mutex::lock (void)
     {
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
 
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
@@ -797,6 +798,7 @@ namespace os
     mutex::timed_lock (clock::duration_t timeout)
     {
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
 
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s(%u) @%p %s by %p %s\n", __func__,
