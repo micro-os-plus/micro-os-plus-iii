@@ -1032,6 +1032,15 @@ namespace os
       result_t
       flags_raise (flags::mask_t mask, flags::mask_t* oflags);
 
+#if defined(OS_INCLUDE_RTOS_THREAD_PUBLIC_FLAGS_CLEAR)
+
+      // This is a kludge required to support CMSIS RTOS V1
+      // public osSignalClear().
+      result_t
+      flags_clear (flags::mask_t mask, flags::mask_t* oflags);
+
+#endif
+
       /**
        * @brief Force thread termination.
        * @par Parameters
@@ -2322,6 +2331,16 @@ namespace os
     }
 
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
+
+#if defined(OS_INCLUDE_RTOS_THREAD_PUBLIC_FLAGS_CLEAR)
+
+    inline result_t
+    thread::flags_clear (flags::mask_t mask, flags::mask_t* oflags)
+    {
+      return _flags_clear(mask, oflags);
+    }
+
+#endif
 
     // ========================================================================
 
