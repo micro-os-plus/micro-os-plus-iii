@@ -572,6 +572,22 @@ extern "C"
   os_thread_stack_set_min_size (size_t size_bytes);
 
   /**
+   * @brief Get the stack lowest reserved address.
+   * @param [in] stack Pointer to stack object.
+   * @return  The address of the stack reserved area.
+   */
+  os_thread_stack_element_t*
+  os_thread_stack_get_bottom (os_thread_stack_t* stack);
+
+  /**
+   * @brief Get the top stack address.
+   * @param [in] stack Pointer to stack object.
+   * @return The address after the last stack element.
+   */
+  os_thread_stack_element_t*
+  os_thread_stack_get_top (os_thread_stack_t* stack);
+
+  /**
    * @brief Get the stack size.
    * @param [in] stack Pointer to stack object.
    * @return  The stack size in bytes.
@@ -586,6 +602,24 @@ extern "C"
    */
   size_t
   os_thread_stack_get_available (os_thread_stack_t* stack);
+
+  /**
+   * @brief Check if bottom magic word is still there.
+   * @param [in] stack Pointer to stack object.
+   * @retval true  The magic word is still there.
+   * @retval false  The magic word was overwritten.
+   */
+  bool
+  os_thread_stack_check_bottom_magic (os_thread_stack_t* stack);
+
+  /**
+   * @brief Check if top magic word is still there.
+   * @param [in] stack Pointer to stack object.
+   * @retval true  The magic word is still there.
+   * @retval false  The magic word was overwritten.
+   */
+  bool
+  os_thread_stack_check_top_magic (os_thread_stack_t* stack);
 
   /**
    * @}

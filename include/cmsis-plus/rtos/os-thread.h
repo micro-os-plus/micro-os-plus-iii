@@ -400,8 +400,8 @@ namespace os
          * @brief Check if bottom magic word is still there.
          * @par Parameters
          *  None
-         * @par Returns
-         *  Nothing
+         * @retval true  The magic word is still there.
+         * @retval false  The magic word was overwritten.
          */
         bool
         check_bottom_magic (void);
@@ -410,8 +410,8 @@ namespace os
          * @brief Check if top magic word is still there.
          * @par Parameters
          *  None
-         * @par Returns
-         *  Nothing
+         * @retval true  The magic word is still there.
+         * @retval false  The magic word was overwritten.
          */
         bool
         check_top_magic (void);

@@ -785,6 +785,34 @@ os_thread_stack_set_min_size (size_t size_bytes)
  *
  * @note Can be invoked from Interrupt Service Routines.
  *
+ * @see os::rtos::thread::stack::bottom()
+ */
+os_thread_stack_element_t*
+os_thread_stack_get_bottom (os_thread_stack_t* stack)
+{
+  assert(stack != nullptr);
+  return (reinterpret_cast<class rtos::thread::stack&> (*stack)).bottom ();
+}
+
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::stack::top()
+ */
+os_thread_stack_element_t*
+os_thread_stack_get_top (os_thread_stack_t* stack)
+{
+  assert(stack != nullptr);
+  return (reinterpret_cast<class rtos::thread::stack&> (*stack)).top ();
+}
+
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
  * @see os::rtos::thread::stack::size()
  */
 size_t
@@ -806,6 +834,34 @@ os_thread_stack_get_available (os_thread_stack_t* stack)
 {
   assert(stack != nullptr);
   return (reinterpret_cast<class rtos::thread::stack&> (*stack)).available ();
+}
+
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::stack::check_bottom_magic()
+ */
+bool
+os_thread_stack_check_bottom_magic (os_thread_stack_t* stack)
+{
+  assert(stack != nullptr);
+  return (reinterpret_cast<class rtos::thread::stack&> (*stack)).check_bottom_magic ();
+}
+
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::thread::stack::check_top_magic()
+ */
+bool
+os_thread_stack_check_top_magic (os_thread_stack_t* stack)
+{
+  assert(stack != nullptr);
+  return (reinterpret_cast<class rtos::thread::stack&> (*stack)).check_top_magic ();
 }
 
 // ----------------------------------------------------------------------------
@@ -2994,7 +3050,7 @@ osSignalClear (osThreadId thread_id, int32_t signals)
 
   flags::mask_t sig;
 
-  assert(((thread*) (thread_id)) == &this_thread::thread());
+  assert(((thread* ) (thread_id)) == &this_thread::thread ());
   // IGNORE THREAD ID!
   this_thread::flags_clear ((flags::mask_t) signals, &sig);
 
