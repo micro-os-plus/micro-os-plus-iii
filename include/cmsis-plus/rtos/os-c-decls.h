@@ -145,6 +145,16 @@ extern "C"
     os_flags_mode_clear = 4, //
   };
 
+  /**
+   * @brief Special mask to represent any flag.
+   */
+#define os_flags_any 0
+
+  /**
+   * Special mask to represent all flags.
+   */
+#define os_flags_all 0xFFFFFFFF
+
   // --------------------------------------------------------------------------
 
   /**

@@ -349,7 +349,7 @@ extern "C"
    * @retval ENOTRECOVERABLE Wait failed.
    */
   os_result_t
-  os_this_thread_try_flags_wait (os_flags_mask_t mask, os_flags_mask_t* oflags,
+  os_this_thread_flags_try_wait (os_flags_mask_t mask, os_flags_mask_t* oflags,
                                  os_flags_mode_t mode);
 
   /**
@@ -370,7 +370,7 @@ extern "C"
    * @retval ENOTRECOVERABLE Wait failed.
    */
   os_result_t
-  os_this_thread_timed_flags_wait (os_flags_mask_t mask,
+  os_this_thread_flags_timed_wait (os_flags_mask_t mask,
                                    os_clock_duration_t timeout,
                                    os_flags_mask_t* oflags,
                                    os_flags_mode_t mode);

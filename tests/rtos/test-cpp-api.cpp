@@ -180,6 +180,46 @@ test_cpp_api (void)
 
   // ==========================================================================
 
+  printf ("\n%s - Thread stack.\n", test_name);
+
+    {
+      std::size_t n;
+
+      n = thread::stack::default_size ();
+      thread::stack::default_size (n);
+
+      n = thread::stack::min_size ();
+      thread::stack::min_size (n);
+
+      class thread::stack& stack = this_thread::thread ().stack ();
+
+      stack.bottom ();
+
+      stack.top ();
+
+      stack.check_bottom_magic ();
+      stack.check_top_magic ();
+    }
+
+  // ==========================================================================
+
+  printf ("\n%s - Thread event flags.\n", test_name);
+
+    {
+      this_thread::flags_clear (flags::all);
+
+      this_thread::thread ().flags_raise (0x3);
+      this_thread::flags_wait (0x3, nullptr, flags::mode::all);
+
+      this_thread::thread ().flags_raise (0x3);
+      this_thread::flags_try_wait (0x3);
+
+      this_thread::thread ().flags_raise (0x3);
+      this_thread::flags_timed_wait (0x3, 10);
+    }
+
+  // ==========================================================================
+
   printf ("\n%s - Message queues.\n", test_name);
 
   // Define two messages.

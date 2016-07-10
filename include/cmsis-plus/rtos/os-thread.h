@@ -67,39 +67,141 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    // Forward definitions required by thread friends.
     namespace this_thread
     {
+      /**
+       * @brief Get the current running thread.
+       * @par Parameters
+       *  None
+       * @return Reference to the current running thread.
+       */
+      thread&
+      thread (void);
+
       /**
        * @cond ignore
        */
 
-      void
-      suspend (void);
-
-      [[noreturn]] void
-      exit (void* exit_ptr);
-
-      result_t
-      flags_wait (flags::mask_t mask, flags::mask_t* oflags,
-                  flags::mode_t mode);
-
-      result_t
-      try_flags_wait (flags::mask_t mask, flags::mask_t* oflags,
-                      flags::mode_t mode);
-      result_t
-      timed_flags_wait (flags::mask_t mask, clock::duration_t timeout,
-                        flags::mask_t* oflags, flags::mode_t mode);
-
-      result_t
-      flags_clear (flags::mask_t mask, flags::mask_t* oflags);
-
-      flags::mask_t
-      flags_get (flags::mask_t mask, flags::mode_t mode);
+      rtos::thread*
+      _thread (void);
 
       /**
        * @endcond
        */
+
+      /**
+       * @brief Yield execution to the next ready thread.
+       * @par Parameters
+       *  None
+       * @par Returns
+       *  Nothing.
+       */
+      void
+      yield (void);
+
+      /**
+       * @brief Suspend the current running thread to wait for an event.
+       * @par Parameters
+       *  None
+       * @par Returns
+       *  Nothing.
+       */
+      void
+      suspend (void);
+
+      /**
+       * @brief Terminate the current running thread.
+       * @param [in] exit_ptr Pointer to object to return. (Optional,
+       * may be nullptr).
+       * @par Returns
+       *  Nothing.
+       */
+      [[noreturn]] void
+      exit (void* exit_ptr = nullptr);
+
+      /**
+       * @brief Wait for thread event flags.
+       * @param [in] mask The expected flags (OR-ed bit-mask);
+       *  may be zero.
+       * @param [out] oflags Pointer where to store the current flags;
+       *  may be `nullptr`.
+       * @param [in] mode Mode bits to select if either all or any flags
+       *  are expected, and if the flags should be cleared.
+       * @retval result::ok All expected flags are raised.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @retval EINVAL The mask is outside of the permitted range.
+       * @retval EINTR The operation was interrupted.
+       * @retval ENOTRECOVERABLE Wait failed.
+       */
+      result_t
+      flags_wait (flags::mask_t mask, flags::mask_t* oflags = nullptr,
+                  flags::mode_t mode = flags::mode::all | flags::mode::clear);
+
+      /**
+       * @brief Try to wait for thread event flags.
+       * @param [in] mask The expected flags (OR-ed bit-mask);
+       *  may be zero.
+       * @param [out] oflags Pointer where to store the current flags;
+       *  may be `nullptr`.
+       * @param [in] mode Mode bits to select if either all or any flags
+       *  are expected, and if the flags should be cleared.
+       * @retval result::ok All expected flags are raised.
+       * @retval EINVAL The mask is outside of the permitted range.
+       * @retval EWOULDBLOCK The expected condition did not occur.
+       * @retval ENOTRECOVERABLE Wait failed.
+       */
+      result_t
+      flags_try_wait (
+          flags::mask_t mask, flags::mask_t* oflags = nullptr,
+          flags::mode_t mode = flags::mode::all | flags::mode::clear);
+
+      /**
+       * @brief Timed wait for thread event flags.
+       * @param [in] mask The expected flags (OR-ed bit-mask);
+       *  may be zero.
+       * @param [out] oflags Pointer where to store the current flags;
+       *  may be `nullptr`.
+       * @param [in] mode Mode bits to select if either all or any flags
+       *  are expected, and if the flags should be cleared.
+       * @param [in] timeout Timeout to wait, in clock units (ticks or seconds).
+       * @retval result::ok All expected flags are raised.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @retval ETIMEDOUT The expected condition did not occur during the
+       *  entire timeout duration.
+       * @retval EINVAL The mask is outside of the permitted range.
+       * @retval EINTR The operation was interrupted.
+       * @retval ENOTRECOVERABLE Wait failed.
+       */
+      result_t
+      flags_timed_wait (
+          flags::mask_t mask, clock::duration_t timeout, flags::mask_t* oflags =
+              nullptr,
+          flags::mode_t mode = flags::mode::all | flags::mode::clear);
+
+      /**
+       * @brief Clear thread event flags.
+       * @param [in] mask The OR-ed flags to clear. Zero means 'all'
+       * @param [out] oflags Optional pointer where to store the
+       *  previous flags; may be `nullptr`.
+       * @retval result::ok The flags were cleared.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @retval EINVAL The mask is zero.
+       */
+      result_t
+      flags_clear (flags::mask_t mask, flags::mask_t* oflags = nullptr);
+
+      /**
+       * @brief Get/clear thread event flags.
+       * @param [in] mask The OR-ed flags to get/clear; may be zero.
+       * @param [in] mode Mode bits to select if the flags should be
+       *  cleared (the other bits are ignored).
+       * @retval flags The selected bits from the current thread
+       *  event flags mask.
+       * @retval flags::all Cannot be invoked from an Interrupt Service Routines.
+       */
+      flags::mask_t
+      flags_get (flags::mask_t mask,
+                 flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
       /**
        * @brief Implementation of the library `__errno()` function.
@@ -1045,7 +1147,7 @@ namespace os
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
       result_t
-      flags_raise (flags::mask_t mask, flags::mask_t* oflags);
+      flags_raise (flags::mask_t mask, flags::mask_t* oflags = nullptr);
 
 #if defined(OS_INCLUDE_RTOS_THREAD_PUBLIC_FLAGS_CLEAR)
 
@@ -1110,10 +1212,10 @@ namespace os
                                flags::mode_t mode);
 
       friend result_t
-      this_thread::try_flags_wait (flags::mask_t mask, flags::mask_t* oflags,
+      this_thread::flags_try_wait (flags::mask_t mask, flags::mask_t* oflags,
                                    flags::mode_t mode);
       friend result_t
-      this_thread::timed_flags_wait (flags::mask_t mask,
+      this_thread::flags_timed_wait (flags::mask_t mask,
                                      clock::duration_t timeout,
                                      flags::mask_t* oflags, flags::mode_t mode);
 
@@ -1256,7 +1358,7 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      _try_flags_wait (flags::mask_t mask, flags::mask_t* oflags,
+      _flags_try_wait (flags::mask_t mask, flags::mask_t* oflags,
                        flags::mode_t mode);
 
       /**
@@ -1277,7 +1379,7 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      _timed_flags_wait (flags::mask_t mask, clock::duration_t timeout,
+      _flags_timed_wait (flags::mask_t mask, clock::duration_t timeout,
                          flags::mask_t* oflags, flags::mode_t mode);
 
       /**
@@ -1638,158 +1740,6 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-    namespace this_thread
-    {
-
-      // ======================================================================
-
-      /**
-       * @brief Get the current running thread.
-       * @par Parameters
-       *  None
-       * @return Reference to the current running thread.
-       */
-      thread&
-      thread (void);
-
-      /**
-       * @brief Yield execution to the next ready thread.
-       * @par Parameters
-       *  None
-       * @par Returns
-       *  Nothing.
-       */
-      void
-      yield (void);
-
-      /**
-       * @brief Suspend the current running thread to wait for an event.
-       * @par Parameters
-       *  None
-       * @par Returns
-       *  Nothing.
-       */
-      void
-      suspend (void);
-
-      /**
-       * @brief Terminate the current running thread.
-       * @param [in] exit_ptr Pointer to object to return. (Optional,
-       * may be nullptr).
-       * @par Returns
-       *  Nothing.
-       */
-      [[noreturn]] void
-      exit (void* exit_ptr = nullptr);
-
-#if 0
-      /**
-       * @brief Check if the wake-up is due to a timeout.
-       * @par Parameters
-       *  None
-       * @retval true The previous sleep returned after the entire duration.
-       * @retval false The previous sleep returned due to an event.
-       */
-      bool
-      is_timeout (void);
-#endif
-
-      /**
-       * @brief Wait for thread event flags.
-       * @param [in] mask The expected flags (OR-ed bit-mask);
-       *  may be zero.
-       * @param [out] oflags Pointer where to store the current flags;
-       *  may be `nullptr`.
-       * @param [in] mode Mode bits to select if either all or any flags
-       *  are expected, and if the flags should be cleared.
-       * @retval result::ok All expected flags are raised.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
-       * @retval EINVAL The mask is outside of the permitted range.
-       * @retval EINTR The operation was interrupted.
-       * @retval ENOTRECOVERABLE Wait failed.
-       */
-      result_t
-      flags_wait (flags::mask_t mask, flags::mask_t* oflags = nullptr,
-                  flags::mode_t mode = flags::mode::all | flags::mode::clear);
-
-      /**
-       * @brief Try to wait for thread event flags.
-       * @param [in] mask The expected flags (OR-ed bit-mask);
-       *  may be zero.
-       * @param [out] oflags Pointer where to store the current flags;
-       *  may be `nullptr`.
-       * @param [in] mode Mode bits to select if either all or any flags
-       *  are expected, and if the flags should be cleared.
-       * @retval result::ok All expected flags are raised.
-       * @retval EINVAL The mask is outside of the permitted range.
-       * @retval EWOULDBLOCK The expected condition did not occur.
-       * @retval ENOTRECOVERABLE Wait failed.
-       */
-      result_t
-      try_flags_wait (
-          flags::mask_t mask, flags::mask_t* oflags = nullptr,
-          flags::mode_t mode = flags::mode::all | flags::mode::clear);
-
-      /**
-       * @brief Timed wait for thread event flags.
-       * @param [in] mask The expected flags (OR-ed bit-mask);
-       *  may be zero.
-       * @param [out] oflags Pointer where to store the current flags;
-       *  may be `nullptr`.
-       * @param [in] mode Mode bits to select if either all or any flags
-       *  are expected, and if the flags should be cleared.
-       * @param [in] timeout Timeout to wait, in clock units (ticks or seconds).
-       * @retval result::ok All expected flags are raised.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
-       * @retval ETIMEDOUT The expected condition did not occur during the
-       *  entire timeout duration.
-       * @retval EINVAL The mask is outside of the permitted range.
-       * @retval EINTR The operation was interrupted.
-       * @retval ENOTRECOVERABLE Wait failed.
-       */
-      result_t
-      timed_flags_wait (
-          flags::mask_t mask, clock::duration_t timeout, flags::mask_t* oflags =
-              nullptr,
-          flags::mode_t mode = flags::mode::all | flags::mode::clear);
-
-      /**
-       * @brief Clear thread event flags.
-       * @param [in] mask The OR-ed flags to clear. Zero means 'all'
-       * @param [out] oflags Optional pointer where to store the
-       *  previous flags; may be `nullptr`.
-       * @retval result::ok The flags were cleared.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
-       * @retval EINVAL The mask is zero.
-       */
-      result_t
-      flags_clear (flags::mask_t mask, flags::mask_t* oflags);
-
-      /**
-       * @brief Get/clear thread event flags.
-       * @param [in] mask The OR-ed flags to get/clear; may be zero.
-       * @param [in] mode Mode bits to select if the flags should be
-       *  cleared (the other bits are ignored).
-       * @retval flags The selected bits from the current thread
-       *  event flags mask.
-       * @retval flags::all Cannot be invoked from an Interrupt Service Routines.
-       */
-      flags::mask_t
-      flags_get (flags::mask_t mask, flags::mode_t mode);
-
-      /**
-       * @cond ignore
-       */
-
-      rtos::thread*
-      _thread (void);
-
-    /**
-     * @endcond
-     */
-
-    } /* namespace this_thread */
-
   } /* namespace rtos */
 } /* namespace os */
 
@@ -1861,10 +1811,10 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline result_t
-      try_flags_wait (flags::mask_t mask, flags::mask_t* oflags,
+      flags_try_wait (flags::mask_t mask, flags::mask_t* oflags,
                       flags::mode_t mode)
       {
-        return this_thread::thread ()._try_flags_wait (mask, oflags, mode);
+        return this_thread::thread ()._flags_try_wait (mask, oflags, mode);
       }
 
       /**
@@ -1906,10 +1856,10 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline result_t
-      timed_flags_wait (flags::mask_t mask, clock::duration_t timeout,
+      flags_timed_wait (flags::mask_t mask, clock::duration_t timeout,
                         flags::mask_t* oflags, flags::mode_t mode)
       {
-        return this_thread::thread ()._timed_flags_wait (mask, timeout, oflags,
+        return this_thread::thread ()._flags_timed_wait (mask, timeout, oflags,
                                                          mode);
       }
 

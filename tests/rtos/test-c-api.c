@@ -204,7 +204,7 @@ test_c_api (void)
       os_sysclock_sleep_until (ts + 2);
 
       // Return the number of ticks since startup.
-      ts = os_clock_steady_now (os_clock_get_sysclock());
+      ts = os_clock_steady_now (os_clock_get_sysclock ());
 
       // An event may resume the thread before the timeout expire.
       os_sysclock_wait_for (2);
@@ -278,6 +278,33 @@ test_c_api (void)
 
       n = os_thread_stack_get_min_size ();
       os_thread_stack_set_min_size (n);
+
+      os_thread_stack_t* stack;
+      stack = os_thread_get_stack (os_this_thread ());
+
+      os_thread_stack_get_bottom (stack);
+
+      os_thread_stack_get_top (stack);
+
+      os_thread_stack_check_bottom_magic (stack);
+      os_thread_stack_check_top_magic (stack);
+    }
+
+  // ==========================================================================
+
+  printf ("\n%s - Thread event flags.\n", test_name);
+
+    {
+      os_this_thread_flags_clear (os_flags_all, NULL);
+
+      os_thread_flags_raise (os_this_thread (), 0x3, NULL);
+      os_this_thread_flags_wait (0x3, NULL, os_flags_mode_all);
+
+      os_thread_flags_raise (os_this_thread (), 0x3, NULL);
+      os_this_thread_flags_try_wait (0x3, NULL, os_flags_mode_all);
+
+      os_thread_flags_raise (os_this_thread (), 0x3, NULL);
+      os_this_thread_flags_timed_wait (0x3, 10, NULL, os_flags_mode_all);
     }
 
   // ==========================================================================

@@ -497,10 +497,10 @@ os_this_thread_flags_wait (os_flags_mask_t mask, os_flags_mask_t* oflags,
  * @see os::rtos::this_thread::try_flags_wait()
  */
 os_result_t
-os_this_thread_try_flags_wait (os_flags_mask_t mask, os_flags_mask_t* oflags,
+os_this_thread_flags_try_wait (os_flags_mask_t mask, os_flags_mask_t* oflags,
                                os_flags_mode_t mode)
 {
-  return (os_result_t) this_thread::try_flags_wait (mask, oflags, mode);
+  return (os_result_t) this_thread::flags_try_wait (mask, oflags, mode);
 }
 
 /**
@@ -511,11 +511,11 @@ os_this_thread_try_flags_wait (os_flags_mask_t mask, os_flags_mask_t* oflags,
  * @see os::rtos::this_thread::timed_flags_wait()
  */
 os_result_t
-os_this_thread_timed_flags_wait (os_flags_mask_t mask,
+os_this_thread_flags_timed_wait (os_flags_mask_t mask,
                                  os_clock_duration_t timeout,
                                  os_flags_mask_t* oflags, os_flags_mode_t mode)
 {
-  return (os_result_t) this_thread::timed_flags_wait (mask, timeout, oflags,
+  return (os_result_t) this_thread::flags_timed_wait (mask, timeout, oflags,
                                                       mode);
 }
 
@@ -3110,12 +3110,12 @@ osSignalWait (int32_t signals, uint32_t millisec)
     }
   else if (millisec == 0)
     {
-      res = this_thread::try_flags_wait ((flags::mask_t) signals,
+      res = this_thread::flags_try_wait ((flags::mask_t) signals,
                                          (flags::mask_t*) &event.value.signals);
     }
   else
     {
-      res = this_thread::timed_flags_wait (
+      res = this_thread::flags_timed_wait (
           (flags::mask_t) signals,
           clock_systick::ticks_cast ((uint64_t) (millisec * 1000u)),
           (flags::mask_t*) &event.value.signals);

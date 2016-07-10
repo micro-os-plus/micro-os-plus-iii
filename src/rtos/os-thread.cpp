@@ -1124,7 +1124,7 @@ namespace os
     }
 
     result_t
-    thread::_try_flags_wait (flags::mask_t mask, flags::mask_t* oflags,
+    thread::_flags_try_wait (flags::mask_t mask, flags::mask_t* oflags,
                              flags::mode_t mode)
     {
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
@@ -1140,7 +1140,7 @@ namespace os
     }
 
     result_t
-    thread::_timed_flags_wait (flags::mask_t mask, clock::duration_t timeout,
+    thread::_flags_timed_wait (flags::mask_t mask, clock::duration_t timeout,
                                flags::mask_t* oflags, flags::mode_t mode)
     {
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
