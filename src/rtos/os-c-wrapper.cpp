@@ -164,7 +164,7 @@ static_assert(os_thread_state_undefined == thread::state::undefined, "adjust os_
 static_assert(os_thread_state_inactive == thread::state::inactive, "adjust os_thread_state_inactive");
 static_assert(os_thread_state_ready == thread::state::ready, "adjust os_thread_state_ready");
 static_assert(os_thread_state_running == thread::state::running, "adjust os_thread_state_running");
-static_assert(os_thread_state_waiting == thread::state::waiting, "adjust os_thread_state_waiting");
+static_assert(os_thread_state_suspended == thread::state::suspended, "adjust os_thread_state_suspended");
 static_assert(os_thread_state_terminated == thread::state::terminated, "adjust os_thread_state_terminated");
 static_assert(os_thread_state_destroyed == thread::state::destroyed, "adjust os_thread_state_destroyed");
 

@@ -327,7 +327,7 @@ namespace os
 
               // Add this thread to the event flags waiting list.
               scheduler::_link_node (list_, node);
-              // state::waiting set in above link().
+              // state::suspended set in above link().
             }
 
           port::scheduler::reschedule ();
@@ -486,7 +486,7 @@ namespace os
               // Add this thread to the event flags waiting list,
               // and the clock timeout list.
               scheduler::_link_node (list_, node, clock_list, timeout_node);
-              // state::waiting set in above link().
+              // state::suspended set in above link().
             }
 
           port::scheduler::reschedule ();

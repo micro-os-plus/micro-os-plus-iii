@@ -244,7 +244,7 @@ namespace os
           inactive = 1, //
           ready = 2, //
           running = 3, //
-          waiting = 4, //
+          suspended = 4, //
           /**
            * @brief Reuse possible if terminated or higher.
            */

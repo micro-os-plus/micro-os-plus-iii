@@ -809,7 +809,7 @@ namespace os
           // Remove this thread from the ready list, if there.
           port::this_thread::prepare_suspend ();
 
-          sched_state_ = state::waiting;
+          sched_state_ = state::suspended;
         }
       port::scheduler::reschedule ();
 
@@ -1086,7 +1086,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X, %u) @%p %s 0x%X\n", __func__, mask, mode, this,
-          name (), flags_mask_);
+                     name (), flags_mask_);
 #endif
 
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
@@ -1104,8 +1104,8 @@ namespace os
                   slept_ticks = static_cast<clock::duration_t> (clock_->now ()
                       - prev);
                   trace::printf ("%s(0x%X, %d)=%d @%p %s 0x%X\n", __func__,
-                      mask, mode, slept_ticks, this, name (),
-                      flags_mask_);
+                                 mask, mode, slept_ticks, this, name (),
+                                 flags_mask_);
 #endif
                   return result::ok;
                 }
@@ -1129,7 +1129,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X, %d) @%p %s 0x%X\n", __func__, mask, mode, this,
-          name (), flags_mask_);
+                     name (), flags_mask_);
 #endif
 
       interrupts::critical_section ics; // ----- Critical section -----
@@ -1145,7 +1145,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X, %u, %u) @%p %s 0x%X\n", __func__, mask, mode,
-          timeout, this, name (), flags_mask_);
+                     timeout, this, name (), flags_mask_);
 #endif
 
         {
@@ -1187,7 +1187,7 @@ namespace os
               clock_list.link (timeout_node);
               timeout_node.thread.clock_node_ = &timeout_node;
 
-              sched_state_ = state::waiting;
+              sched_state_ = state::suspended;
             }
 
           port::scheduler::reschedule ();
@@ -1216,11 +1216,11 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       clock::duration_t slept_ticks =
-      static_cast<clock::duration_t> (clock_->steady_now ()
-          - begin_timestamp);
+          static_cast<clock::duration_t> (clock_->steady_now ()
+              - begin_timestamp);
       trace::printf ("%s(0x%X, %u, %u)=%u @%p %s 0x%X\n", __func__, mask, mode,
-          timeout, static_cast<unsigned int> (slept_ticks), this,
-          name (), flags_mask_);
+                     timeout, static_cast<unsigned int> (slept_ticks), this,
+                     name (), flags_mask_);
 #endif
 
       return res;
@@ -1277,7 +1277,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X) @%p %s 0x%X\n", __func__, mask, this, name (),
-          flags_mask_);
+                     flags_mask_);
 #endif
 
       interrupts::critical_section ics; // ----- Critical section -----

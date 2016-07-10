@@ -280,7 +280,7 @@ extern "C"
     os_thread_state_inactive = 1,
     os_thread_state_ready = 2,
     os_thread_state_running = 3,
-    os_thread_state_waiting = 4,
+    os_thread_state_suspended = 4,
     os_thread_state_terminated = 5,
     os_thread_state_destroyed = 6
   };

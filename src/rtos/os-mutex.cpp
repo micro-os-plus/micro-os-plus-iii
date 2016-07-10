@@ -666,7 +666,7 @@ namespace os
 
                   // Add this thread to the mutex waiting list.
                   scheduler::_link_node (list_, node);
-                  // state::waiting set in above link().
+                  // state::suspended set in above link().
                 }
             }
 
@@ -856,7 +856,7 @@ namespace os
                   // Add this thread to the mutex waiting list,
                   // and the clock timeout list.
                   scheduler::_link_node (list_, node, clock_list, timeout_node);
-                  // state::waiting set in above link().
+                  // state::suspended set in above link().
                 }
             }
 

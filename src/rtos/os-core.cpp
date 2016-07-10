@@ -335,7 +335,7 @@ namespace os
         list.link (node);
         node.thread_.waiting_node_ = &node;
 
-        node.thread_.sched_state_ = thread::state::waiting;
+        node.thread_.sched_state_ = thread::state::suspended;
       }
 
       void
@@ -363,7 +363,7 @@ namespace os
         list.link (node);
         node.thread_.waiting_node_ = &node;
 
-        node.thread_.sched_state_ = thread::state::waiting;
+        node.thread_.sched_state_ = thread::state::suspended;
 
         // Add this thread to the clock timeout list.
         timeout_list.link (timeout_node);

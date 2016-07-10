@@ -899,7 +899,7 @@ namespace os
 
               // Add this thread to the message queue send waiting list.
               scheduler::_link_node (send_list_, node);
-              // state::waiting set in above link().
+              // state::suspended set in above link().
             }
 
           port::scheduler::reschedule ();
@@ -1090,7 +1090,7 @@ namespace os
               // and the clock timeout list.
               scheduler::_link_node (send_list_, node, clock_list,
                                      timeout_node);
-              // state::waiting set in above link().
+              // state::suspended set in above link().
             }
 
           port::scheduler::reschedule ();
@@ -1201,7 +1201,7 @@ namespace os
 
               // Add this thread to the message queue receive waiting list.
               scheduler::_link_node (receive_list_, node);
-              // state::waiting set in above link().
+              // state::suspended set in above link().
             }
 
           port::scheduler::reschedule ();
@@ -1407,7 +1407,7 @@ namespace os
               // and the clock timeout list.
               scheduler::_link_node (receive_list_, node, clock_list,
                                      timeout_node);
-              // state::waiting set in above link().
+              // state::suspended set in above link().
             }
 
           port::scheduler::reschedule ();
