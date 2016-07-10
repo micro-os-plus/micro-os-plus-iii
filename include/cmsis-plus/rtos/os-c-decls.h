@@ -335,6 +335,25 @@ extern "C"
 
   // --------------------------------------------------------------------------
 
+  /**
+   * @brief Type of variables holding stack words.
+   * @details
+   * A numeric type intended to store a stack word
+   * as stored by push instructions.
+   *
+   * @see os::rtos::stack::element_t
+   */
+  typedef os_port_thread_stack_element_t os_thread_stack_element_t;
+
+  /**
+   * @brief Type of variables holding aligned stack elements.
+   * @details
+   * A numeric type intended to be used for stack allocations.
+   *
+   * @see os::rtos::stack::allocation_element_t
+   */
+  typedef os_port_thread_stack_allocation_element_t os_thread_stack_allocation_element_t;
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
