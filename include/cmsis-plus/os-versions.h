@@ -46,7 +46,7 @@
 
 // CMSIS++ RTOS API version.
 #define OS_INTEGER_RTOS_API_VERSION_MAJOR 0
-#define OS_INTEGER_RTOS_API_VERSION_MINOR 2
+#define OS_INTEGER_RTOS_API_VERSION_MINOR 3
 #define OS_INTEGER_RTOS_API_VERSION_PATCH 1
 
 #define OS_STRING_RTOS_API_VERSION \
@@ -56,9 +56,9 @@
 
 // ----------------------------------------------------------------------------
 
-// CMSIS++ RTOS reference implementation (µOS++) version.
+// µOS++ (CMSIS++ RTOS reference implementation) version.
 #define OS_INTEGER_RTOS_IMPL_VERSION_MAJOR 6
-#define OS_INTEGER_RTOS_IMPL_VERSION_MINOR 2
+#define OS_INTEGER_RTOS_IMPL_VERSION_MINOR 3
 #define OS_INTEGER_RTOS_IMPL_VERSION_PATCH 1
 
 #define OS_STRING_RTOS_IMPL_VERSION \
