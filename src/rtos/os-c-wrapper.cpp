@@ -1095,6 +1095,8 @@ os_clock_set_offset (os_clock_t* clock, os_clock_offset_t offset)
  * @details
  *
  * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::sysclock
  */
 os_clock_t*
 os_clock_get_sysclock (void)
@@ -1106,11 +1108,26 @@ os_clock_get_sysclock (void)
  * @details
  *
  * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::rtclock
  */
 os_clock_t*
 os_clock_get_rtclock (void)
 {
   return (os_clock_t*) &rtclock;
+}
+
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::hrclock
+ */
+os_clock_t*
+os_clock_get_hrclock (void)
+{
+  return (os_clock_t*) &hrclock;
 }
 
 // ----------------------------------------------------------------------------

@@ -796,18 +796,25 @@ extern "C"
   os_clock_set_offset (os_clock_t* clock, os_clock_offset_t offset);
 
   /**
-   * @brief Get `sysclock`.
+   * @brief Get `sysclock` (the system clock).
    * @return The address of the clock_systick instance.
    */
   os_clock_t*
   os_clock_get_sysclock (void);
 
   /**
-   * @brief Get `rtclock`.
+   * @brief Get `rtclock` (the real-time clock).
    * @return The address of the clock_rtc instance.
    */
   os_clock_t*
   os_clock_get_rtclock (void);
+
+  /**
+   * @brief Get `hrclock` (the high resolution clock).
+   * @return The address of the clock_highres instance.
+   */
+  os_clock_t*
+  os_clock_get_hrclock (void);
 
   // --------------------------------------------------------------------------
 
