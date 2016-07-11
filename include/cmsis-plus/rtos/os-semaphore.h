@@ -171,7 +171,6 @@ namespace os
 
         /**
          * @brief Create a binary semaphore attributes object.
-         * @param [in] max_value Maximum count value.
          * @param [in] initial_value Initial count value; 0 if missing.
          */
         constexpr
