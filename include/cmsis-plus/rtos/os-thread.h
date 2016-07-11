@@ -789,17 +789,33 @@ namespace os
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
         /**
-         * @brief Address of the user defined storage for the memory pool stack.
+         * @brief Address of the user defined storage for the thread stack.
+         * @details
+         * If `nullptr`, the default is to dynamically allocate the stack.
          */
         void* th_stack_address = 0;
 
         /**
-         * @brief Size of the user defined storage for the memory pool stack.
+         * @brief Size of the user defined storage for the thread
+         * stack, in bytes.
+         * @details
+         * If 0, the default is `thread::stack::default_size()`.
+         *
+         * A convenient and explicit variant to this attribute
+         * is to call `thread::stack::default_size (std::size_t)` just before
+         * creating the thread. However mind setting this from different
+         * threads at the same time.
          */
         std::size_t th_stack_size_bytes = 0;
 
         /**
-         * @brief Thread priority attribute.
+         * @brief Thread initial priority.
+         * @details
+         * If 0, the default is `thread::priority::normal`.
+         *
+         * A convenient and explicit variant to this attribute
+         * is to call `thread::sched_prio (priority_t)` at the
+         * beginning of the thread function.
          */
         priority_t th_priority = priority::normal;
 

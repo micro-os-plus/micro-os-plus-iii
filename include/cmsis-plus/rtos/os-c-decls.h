@@ -455,7 +455,7 @@ extern "C"
    * @brief Thread attributes.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
    * @details
-   * Initialise this structure with os_thread_attr_init() and then
+   * Initialise this structure with `os_thread_attr_init()`, and then
    * set any of the individual members directly.
    *
    * @see os::rtos::thread::attributes
@@ -463,22 +463,43 @@ extern "C"
   typedef struct os_thread_attr_s
   {
     /**
-     * @brief Pointer to clock object.
+     * @brief Address of the clock to use for timeouts.
+     * @details
+     * It may be `os_clock_get_sysclock()`, `os_clock_get_rtclock()`,
+     * or any other user object derived from class `clock`.
+     *
+     * If `NULL`, the default is `sysclock`.
      */
     void* clock;
 
     /**
-     * @brief Pointer to user provided stack area.
+     * @brief Address of the user defined storage for the thread stack.
+     * @details
+     * If `NULL`, the default is to dynamically allocate the stack.
      */
     void* th_stack_address;
 
     /**
-     * @brief Size of user provided stack area, in bytes.
+     * @brief Size of the user defined storage for the thread
+     * stack, in bytes.
+     * @details
+     * If 0, the default is `os_thread_stack_get_default_size()`.
+     *
+     * A convenient and explicit variant to this attribute
+     * is to call `os_thread_stack_set_default_size ()` just before
+     * creating the thread. However mind setting this from different
+     * threads at the same time.
      */
     size_t th_stack_size_bytes;
 
     /**
      * @brief Thread initial priority.
+     * @details
+     * If 0, the default is `os_thread_priority_normal`.
+     *
+     * A convenient and explicit variant to this attribute
+     * is to call `os_thread_set_prio()` at the beginning of the thread
+     * function.
      */
     os_thread_prio_t th_priority;
 

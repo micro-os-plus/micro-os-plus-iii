@@ -491,9 +491,12 @@ namespace os
        */
 
       /**
-       * @brief Pointer to clock.
+       * @brief Address of the clock to use for timeouts.
        * @details
-       * If `nullptr`, the default clock is the os::rtos::sysclock.
+       * It may be one of `os::rtos::sysclock`, `os::rtos::rtclock`,
+       * or any other user object derived from class `clock`.
+       *
+       * If `nullptr`, the default clock is `os::rtos::sysclock`.
        */
       rtos::clock* clock = nullptr;
 
