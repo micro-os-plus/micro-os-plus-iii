@@ -155,10 +155,58 @@ namespace os
 
       }; /* class attributes */
 
+      // ======================================================================
+      /**
+       * @brief Binary semaphore attributes.
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       */
+      class binary_attributes : public attributes
+      {
+      public:
+
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
+
+        /**
+         * @brief Create a binary semaphore attributes object.
+         * @param [in] max_value Maximum count value.
+         * @param [in] initial_value Initial count value; 0 if missing.
+         */
+        constexpr
+        binary_attributes (count_t initial_value = 0);
+
+        /**
+         * @cond ignore
+         */
+
+        binary_attributes (const binary_attributes&) = default;
+        binary_attributes (binary_attributes&&) = default;
+        binary_attributes&
+        operator= (const binary_attributes&) = default;
+        binary_attributes&
+        operator= (binary_attributes&&) = default;
+
+        /**
+         * @endcond
+         */
+
+        /**
+         * @brief Destroy the semaphore attributes object.
+         */
+        ~binary_attributes () = default;
+
+        /**
+         * @}
+         */
+
+      }; /* class binary_attributes */
+
       /**
        * @brief Default binary semaphore initialiser.
        */
-      static const attributes binary_initializer;
+      static const binary_attributes binary_initializer;
 
       // ======================================================================
 
@@ -176,7 +224,7 @@ namespace os
          */
 
         /**
-         * @brief Create a binary semaphore attributes object.
+         * @brief Create a counting semaphore attributes object.
          * @param [in] max_value Maximum count value.
          * @param [in] initial_value Initial count value; 0 if missing.
          */
@@ -627,6 +675,16 @@ namespace os
     semaphore::attributes::attributes (count_t max_value, count_t initial_value) :
         sm_initial_value (initial_value), //
         sm_max_value (max_value)
+    {
+      ;
+    }
+
+    // ========================================================================
+
+    constexpr
+    semaphore::binary_attributes::binary_attributes (count_t initial_value) :
+        attributes
+          { 1, initial_value } // Use the protected constructor.
     {
       ;
     }

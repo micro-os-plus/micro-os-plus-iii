@@ -90,7 +90,8 @@ namespace os
      * @details
      * This variable is used by the default constructor.
      */
-    const semaphore::attributes semaphore::binary_initializer;
+    const semaphore::binary_attributes semaphore::binary_initializer
+      { 0 };
 
     // ------------------------------------------------------------------------
 

@@ -1654,11 +1654,12 @@ os_semaphore_attr_init (os_semaphore_attr_t* attr)
  * @see os::rtos::semaphore::binary_attributes
  */
 void
-os_semaphore_attr_binary_init (os_semaphore_attr_t* attr)
+os_semaphore_attr_binary_init (os_semaphore_attr_t* attr,
+                               const os_semaphore_count_t initial_value)
 {
   assert(attr != nullptr);
-  new (attr) semaphore::attributes
-    { };
+  new (attr) semaphore::binary_attributes
+    { initial_value };
 }
 
 /**
@@ -1707,7 +1708,8 @@ os_semaphore_create (os_semaphore_t* semaphore, const char* name,
     {
       attr = (const os_semaphore_attr_t*) &semaphore::binary_initializer;
     }
-  new (semaphore) rtos::semaphore (name, (semaphore::attributes&) *attr);
+  new (semaphore) rtos::semaphore
+    { name, (semaphore::attributes&) *attr };
 }
 
 /**
@@ -1718,10 +1720,12 @@ os_semaphore_create (os_semaphore_t* semaphore, const char* name,
  * @see os::rtos::semaphore_binary
  */
 void
-os_semaphore_binary_create (os_semaphore_t* semaphore, const char* name)
+os_semaphore_binary_create (os_semaphore_t* semaphore, const char* name,
+                            const os_semaphore_count_t initial_value)
 {
   assert(semaphore != nullptr);
-  new (semaphore) rtos::semaphore_binary (name);
+  new (semaphore) rtos::semaphore_binary
+    { name, initial_value };
 }
 
 /**
@@ -1737,7 +1741,8 @@ os_semaphore_counting_create (os_semaphore_t* semaphore, const char* name,
                               const os_semaphore_count_t initial_value)
 {
   assert(semaphore != nullptr);
-  new (semaphore) rtos::semaphore_counting (name, max_value, initial_value);
+  new (semaphore) rtos::semaphore_counting
+    { name, max_value, initial_value };
 }
 
 /**

@@ -428,9 +428,9 @@ test_c_api (void)
   printf ("\n%s - Semaphores.\n", test_name);
 
     {
-      // Default binary semaphore.
+      // Binary semaphore, start at 0.
       os_semaphore_t sp1;
-      os_semaphore_binary_create (&sp1, "sp1");
+      os_semaphore_binary_create (&sp1, "sp1", 0);
 
       os_semaphore_post (&sp1);
       os_semaphore_wait (&sp1);
@@ -468,7 +468,7 @@ test_c_api (void)
     }
 
     {
-      // Counting semaphore.
+      // Counting semaphore, 7 resources, start at 7.
       os_semaphore_t sp3;
       os_semaphore_counting_create (&sp3, "sp3", 7, 7);
 
@@ -478,7 +478,7 @@ test_c_api (void)
     {
       // Custom binary semaphore.
       os_semaphore_attr_t asp4;
-      os_semaphore_attr_binary_init (&asp4);
+      os_semaphore_attr_binary_init (&asp4, 0);
       asp4.clock = os_clock_get_rtclock ();
 
       os_semaphore_t sp4;
