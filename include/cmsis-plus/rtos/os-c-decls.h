@@ -286,11 +286,29 @@ extern "C"
    */
   enum
   {
+    /**
+     * @brief Used to catch uninitialised threads.
+     */
     os_thread_state_undefined = 0,
+    /**
+     * @brief Present in the READY list and competing for CPU.
+     */
     os_thread_state_ready = 1,
+    /**
+     * @brief Has the CPU and runs.
+     */
     os_thread_state_running = 2,
+    /**
+     * @brief Not present in the READY list, waiting for an event.
+     */
     os_thread_state_suspended = 3,
+    /**
+     * @brief No longer usable, but resources not yet released.
+     */
     os_thread_state_terminated = 4,
+    /**
+     * @brief Terminated and resources (like stack) released.
+     */
     os_thread_state_destroyed = 5
   };
 
