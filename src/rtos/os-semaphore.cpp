@@ -76,7 +76,7 @@ namespace os
      */
 
     /**
-     * @class binary_attributes
+     * @class attributes_binary
      * @details
      * Allow to assign a name and custom attributes to the semaphore.
      *
@@ -90,7 +90,7 @@ namespace os
      * @details
      * This variable is used by the default constructor.
      */
-    const semaphore::binary_attributes semaphore::binary_initializer
+    const semaphore::attributes_binary semaphore::initializer_binary
       { 0 };
 
     // ------------------------------------------------------------------------
@@ -138,7 +138,7 @@ namespace os
      * semaphore objects.
      *
      * In cases where default semaphore attributes are
-     * appropriate, the variable `semaphore::binary_initializer`
+     * appropriate, the variable `semaphore::initializer_binary`
      * can be used to
      * initialise semaphores.
      * The effect shall be equivalent to creating a semaphore

@@ -160,7 +160,7 @@ namespace os
        * @brief Binary semaphore attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class binary_attributes : public attributes
+      class attributes_binary : public attributes
       {
       public:
 
@@ -175,18 +175,18 @@ namespace os
          * @param [in] initial_value Initial count value; 0 if missing.
          */
         constexpr
-        binary_attributes (count_t initial_value = 0);
+        attributes_binary (count_t initial_value = 0);
 
         /**
          * @cond ignore
          */
 
-        binary_attributes (const binary_attributes&) = default;
-        binary_attributes (binary_attributes&&) = default;
-        binary_attributes&
-        operator= (const binary_attributes&) = default;
-        binary_attributes&
-        operator= (binary_attributes&&) = default;
+        attributes_binary (const attributes_binary&) = default;
+        attributes_binary (attributes_binary&&) = default;
+        attributes_binary&
+        operator= (const attributes_binary&) = default;
+        attributes_binary&
+        operator= (attributes_binary&&) = default;
 
         /**
          * @endcond
@@ -195,18 +195,18 @@ namespace os
         /**
          * @brief Destroy the semaphore attributes object.
          */
-        ~binary_attributes () = default;
+        ~attributes_binary () = default;
 
         /**
          * @}
          */
 
-      }; /* class binary_attributes */
+      }; /* class attributes_binary */
 
       /**
        * @brief Default binary semaphore initialiser.
        */
-      static const binary_attributes binary_initializer;
+      static const attributes_binary initializer_binary;
 
       // ======================================================================
 
@@ -214,7 +214,7 @@ namespace os
        * @brief Counting semaphore attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class counting_attributes : public attributes
+      class attributes_counting : public attributes
       {
       public:
 
@@ -229,18 +229,18 @@ namespace os
          * @param [in] initial_value Initial count value; 0 if missing.
          */
         constexpr
-        counting_attributes (count_t max_value, count_t initial_value = 0);
+        attributes_counting (count_t max_value, count_t initial_value = 0);
 
         /**
          * @cond ignore
          */
 
-        counting_attributes (const counting_attributes&) = default;
-        counting_attributes (counting_attributes&&) = default;
-        counting_attributes&
-        operator= (const counting_attributes&) = default;
-        counting_attributes&
-        operator= (counting_attributes&&) = default;
+        attributes_counting (const attributes_counting&) = default;
+        attributes_counting (attributes_counting&&) = default;
+        attributes_counting&
+        operator= (const attributes_counting&) = default;
+        attributes_counting&
+        operator= (attributes_counting&&) = default;
 
         /**
          * @endcond
@@ -249,13 +249,13 @@ namespace os
         /**
          * @brief Destroy the semaphore attributes object.
          */
-        ~counting_attributes () = default;
+        ~attributes_counting () = default;
 
         /**
          * @}
          */
 
-      }; /* class counting_attributes */
+      }; /* class attributes_counting */
 
       // ======================================================================
       /**
@@ -267,14 +267,14 @@ namespace os
        * @brief Create a semaphore object.
        * @param [in] attr Reference to attributes.
        */
-      semaphore (const attributes& attr = binary_initializer);
+      semaphore (const attributes& attr = initializer_binary);
 
       /**
        * @brief Create a named semaphore object.
        * @param [in] name Pointer to name.
        * @param [in] attr Reference to attributes.
        */
-      semaphore (const char* name, const attributes& attr = binary_initializer);
+      semaphore (const char* name, const attributes& attr = initializer_binary);
 
       /**
        * @cond ignore
@@ -284,7 +284,7 @@ namespace os
 
       semaphore (const char* name, const count_t max_value,
                  const count_t initial_value, const attributes& attr =
-                     binary_initializer);
+                     initializer_binary);
 
     public:
 
@@ -682,7 +682,7 @@ namespace os
     // ========================================================================
 
     constexpr
-    semaphore::binary_attributes::binary_attributes (count_t initial_value) :
+    semaphore::attributes_binary::attributes_binary (count_t initial_value) :
         attributes
           { 1, initial_value } // Use the protected constructor.
     {
@@ -692,7 +692,7 @@ namespace os
     // ========================================================================
 
     constexpr
-    semaphore::counting_attributes::counting_attributes (count_t max_value,
+    semaphore::attributes_counting::attributes_counting (count_t max_value,
                                                          count_t initial_value) :
         attributes
           { max_value, initial_value } // Use the protected constructor.
@@ -716,7 +716,7 @@ namespace os
      * semaphore objects.
      *
      * In cases where default semaphore attributes are
-     * appropriate, the variable `semaphore::binary_initializer`
+     * appropriate, the variable `semaphore::initializer_binary`
      * can be used to
      * initialise semaphores.
      * The effect shall be equivalent to creating a semaphore
@@ -796,7 +796,7 @@ namespace os
     inline
     semaphore_binary::semaphore_binary (const count_t initial_value) :
         semaphore
-          { nullptr, 1, initial_value, binary_initializer }
+          { nullptr, 1, initial_value, initializer_binary }
     {
       ;
     }

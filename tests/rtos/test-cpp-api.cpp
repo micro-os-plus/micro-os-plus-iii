@@ -471,7 +471,7 @@ test_cpp_api (void)
     {
       // Named binary semaphore.
       semaphore sp3
-        { "sp3", semaphore::binary_initializer };
+        { "sp3", semaphore::initializer_binary };
       sp3.post ();
     }
 

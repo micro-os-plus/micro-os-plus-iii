@@ -1243,7 +1243,7 @@ namespace os
       const Attributes counting_initializer
         { nullptr };
 
-      const Binary_attributes binary_initializer
+      const attributes_binary initializer_binary
         { nullptr };
 
     } /* namespace semaphore */

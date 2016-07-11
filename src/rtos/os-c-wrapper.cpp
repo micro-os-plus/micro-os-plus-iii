@@ -1651,14 +1651,14 @@ os_semaphore_attr_init (os_semaphore_attr_t* attr)
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
- * @see os::rtos::semaphore::binary_attributes
+ * @see os::rtos::semaphore::attributes_binary
  */
 void
 os_semaphore_attr_binary_init (os_semaphore_attr_t* attr,
                                const os_semaphore_count_t initial_value)
 {
   assert(attr != nullptr);
-  new (attr) semaphore::binary_attributes
+  new (attr) semaphore::attributes_binary
     { initial_value };
 }
 
@@ -1667,7 +1667,7 @@ os_semaphore_attr_binary_init (os_semaphore_attr_t* attr,
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
- * @see os::rtos::semaphore::counting_attributes
+ * @see os::rtos::semaphore::attributes_counting
  */
 void
 os_semaphore_attr_counting_init (os_semaphore_attr_t* attr,
@@ -1675,7 +1675,7 @@ os_semaphore_attr_counting_init (os_semaphore_attr_t* attr,
                                  const os_semaphore_count_t initial_value)
 {
   assert(attr != nullptr);
-  new (attr) semaphore::counting_attributes
+  new (attr) semaphore::attributes_counting
     { max_value, initial_value };
 }
 
@@ -1684,12 +1684,12 @@ os_semaphore_attr_counting_init (os_semaphore_attr_t* attr,
  *
  * @note Can be invoked from Interrupt Service Routines.
  *
- * @see os::rtos::semaphore::binary_initializer
+ * @see os::rtos::semaphore::initializer_binary
  */
 const os_semaphore_attr_t*
 os_semaphore_attr_get_binary (void)
 {
-  return (const os_semaphore_attr_t*) &semaphore::binary_initializer;
+  return (const os_semaphore_attr_t*) &semaphore::initializer_binary;
 }
 
 /**
@@ -1706,7 +1706,7 @@ os_semaphore_create (os_semaphore_t* semaphore, const char* name,
   assert(semaphore != nullptr);
   if (attr == nullptr)
     {
-      attr = (const os_semaphore_attr_t*) &semaphore::binary_initializer;
+      attr = (const os_semaphore_attr_t*) &semaphore::initializer_binary;
     }
   new (semaphore) rtos::semaphore
     { name, (semaphore::attributes&) *attr };
