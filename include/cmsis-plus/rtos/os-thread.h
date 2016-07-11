@@ -350,15 +350,26 @@ namespace os
                * @brief Used to catch uninitialised threads.
                */
               undefined = 0, //
-          inactive = 1, //
-          ready = 2, //
-          running = 3, //
-          suspended = 4, //
           /**
-           * @brief Reuse possible if terminated or higher.
+           * @brief Present in the READY list and competing for CPU.
            */
-          terminated = 5, //
-          destroyed = 6
+          ready = 1, //
+          /**
+           * @brief Has the CPU and runs.
+           */
+          running = 2, //
+          /**
+           * @brief Not present in the READY list, waiting for an event.
+           */
+          suspended = 3, //
+          /**
+           * @brief No longer usable, but resources not yet released.
+           */
+          terminated = 4, //
+          /**
+           * @brief Terminated and resources (like stack) released.
+           */
+          destroyed = 5
         };
         /* enum  */
       }; /* struct state */

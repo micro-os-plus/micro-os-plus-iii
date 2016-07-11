@@ -161,7 +161,6 @@ static_assert(os_flags_mode_any == flags::mode::any, "adjust os_flags_mode_any")
 static_assert(os_flags_mode_clear == flags::mode::clear, "adjust os_flags_mode_clear");
 
 static_assert(os_thread_state_undefined == thread::state::undefined, "adjust os_thread_state_undefined");
-static_assert(os_thread_state_inactive == thread::state::inactive, "adjust os_thread_state_inactive");
 static_assert(os_thread_state_ready == thread::state::ready, "adjust os_thread_state_ready");
 static_assert(os_thread_state_running == thread::state::running, "adjust os_thread_state_running");
 static_assert(os_thread_state_suspended == thread::state::suspended, "adjust os_thread_state_suspended");

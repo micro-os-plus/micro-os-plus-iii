@@ -287,12 +287,11 @@ extern "C"
   enum
   {
     os_thread_state_undefined = 0,
-    os_thread_state_inactive = 1,
-    os_thread_state_ready = 2,
-    os_thread_state_running = 3,
-    os_thread_state_suspended = 4,
-    os_thread_state_terminated = 5,
-    os_thread_state_destroyed = 6
+    os_thread_state_ready = 1,
+    os_thread_state_running = 2,
+    os_thread_state_suspended = 3,
+    os_thread_state_terminated = 4,
+    os_thread_state_destroyed = 5
   };
 
   /**
