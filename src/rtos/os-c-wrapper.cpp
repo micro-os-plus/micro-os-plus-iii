@@ -688,13 +688,13 @@ os_thread_flags_raise (os_thread_t* thread, os_flags_mask_t mask,
  *
  * @note Can be invoked from Interrupt Service Routines.
  *
- * @see os::rtos::thread::sched_state()
+ * @see os::rtos::thread::state()
  */
 os_thread_state_t
-os_thread_get_sched_state (os_thread_t* thread)
+os_thread_get_state (os_thread_t* thread)
 {
   assert(thread != nullptr);
-  return reinterpret_cast<os_thread_state_t> ((reinterpret_cast<rtos::thread&> (*thread)).sched_state ());
+  return reinterpret_cast<os_thread_state_t> ((reinterpret_cast<rtos::thread&> (*thread)).state ());
 }
 
 /**
@@ -2680,8 +2680,8 @@ osThreadCreate (const osThreadDef_t* thread_def, void* args)
   for (uint32_t i = 0; i < thread_def->instances; ++i)
     {
       thread* th = (thread*) &thread_def->data[i];
-      if (th->sched_state () == thread::state::undefined
-          || th->sched_state () == thread::state::destroyed)
+      if (th->state () == thread::state::undefined
+          || th->state () == thread::state::destroyed)
         {
           if (attr.th_stack_size_bytes > 0)
             {
@@ -2741,7 +2741,7 @@ osThreadTerminate (osThreadId thread_id)
     }
 
   thread::state_t state =
-      (reinterpret_cast<rtos::thread&> (*thread_id)).sched_state ();
+      (reinterpret_cast<rtos::thread&> (*thread_id)).state ();
   if (state == thread::state::undefined)
     {
       return osErrorResource;
@@ -2803,7 +2803,7 @@ osThreadSetPriority (osThreadId thread_id, osPriority priority)
     }
 
   thread::state_t state =
-      (reinterpret_cast<rtos::thread&> (*thread_id)).sched_state ();
+      (reinterpret_cast<rtos::thread&> (*thread_id)).state ();
   if (state == thread::state::undefined || state >= thread::state::destroyed)
     {
       return osErrorResource;

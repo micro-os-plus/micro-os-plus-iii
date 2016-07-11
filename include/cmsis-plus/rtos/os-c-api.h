@@ -509,7 +509,7 @@ extern "C"
    * @return Thread scheduler state.
    */
   os_thread_state_t
-  os_thread_get_sched_state (os_thread_t* thread);
+  os_thread_get_state (os_thread_t* thread);
 
   /**
    * @brief Get the thread user storage.

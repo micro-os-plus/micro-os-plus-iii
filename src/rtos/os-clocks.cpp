@@ -331,7 +331,7 @@ namespace os
           // Add this thread to the clock waiting list.
           list.link (node);
           crt_thread.clock_node_ = &node;
-          crt_thread.sched_state_ = thread::state::suspended;
+          crt_thread.state_ = thread::state::suspended;
         }
 
       port::scheduler::reschedule ();

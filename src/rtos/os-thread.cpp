@@ -446,7 +446,7 @@ namespace os
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
           port::thread::create (this);
-          sched_state_ = state::ready;
+          state_ = state::ready;
 
 #else
 
@@ -530,7 +530,7 @@ namespace os
         {
           interrupts::critical_section ics; // ----- Critical section -----
 
-          sched_state_ = state::ready;
+          state_ = state::ready;
           port::thread::resume (this);
         }
 
@@ -612,7 +612,7 @@ namespace os
 
 #else
 
-      if (sched_state_ == state::ready)
+      if (state_ == state::ready)
         {
           interrupts::critical_section ics; // ----- Critical section -----
 
@@ -716,7 +716,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      while (sched_state_ != state::destroyed)
+      while (state_ != state::destroyed)
         {
           joiner_ = this_thread::_thread ();
           this_thread::_thread ()->_suspend ();
@@ -810,7 +810,7 @@ namespace os
           // Remove this thread from the ready list, if there.
           port::this_thread::prepare_suspend ();
 
-          sched_state_ = state::suspended;
+          state_ = state::suspended;
         }
       port::scheduler::reschedule ();
 
@@ -841,7 +841,7 @@ namespace os
 
           assert(acquired_mutexes_ == 0);
 
-          sched_state_ = state::terminated;
+          state_ = state::terminated;
 
           func_result_ = exit_ptr;
 
@@ -915,7 +915,7 @@ namespace os
           allocated_stack_address_ = nullptr;
         }
 
-      sched_state_ = state::destroyed;
+      state_ = state::destroyed;
 
       if (joiner_ != nullptr)
         {
@@ -949,7 +949,7 @@ namespace os
         {
           scheduler::critical_section scs; // ----- Critical section -----
 
-          if (sched_state_ == state::destroyed)
+          if (state_ == state::destroyed)
             {
 #if defined(OS_TRACE_RTOS_THREAD)
               trace::printf ("%s() @%p %s already gone\n", __func__, this,
@@ -1190,7 +1190,7 @@ namespace os
               clock_list.link (timeout_node);
               timeout_node.thread.clock_node_ = &timeout_node;
 
-              sched_state_ = state::suspended;
+              state_ = state::suspended;
             }
 
           port::scheduler::reschedule ();

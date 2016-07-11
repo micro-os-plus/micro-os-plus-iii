@@ -246,7 +246,7 @@ namespace os
 
       insert_after (node, after);
 
-      node.thread_.sched_state_ = thread::state::ready;
+      node.thread_.state_ = thread::state::ready;
     }
 
     /**
@@ -272,7 +272,7 @@ namespace os
       // so in order to guarantee that the thread is marked as
       // running, it is saver to do it here.
 
-      thread->sched_state_ = thread::state::running;
+      thread->state_ = thread::state::running;
       return thread;
     }
 
@@ -397,7 +397,7 @@ namespace os
         }
       assert(thread != nullptr);
 
-      thread::state_t state = thread->sched_state ();
+      thread::state_t state = thread->state ();
       if (state != thread::state::destroyed)
         {
           thread->resume ();
@@ -463,7 +463,7 @@ namespace os
       rtos::thread* th = &this->thread;
       this->unlink ();
 
-      thread::state_t state = th->sched_state ();
+      thread::state_t state = th->state ();
       if (state != thread::state::destroyed)
         {
           th->resume ();

@@ -1135,7 +1135,7 @@ namespace os
        * @return Thread scheduler state.
        */
       state_t
-      sched_state (void) const;
+      state (void) const;
 
       /**
        * @brief Resume the thread.
@@ -1554,7 +1554,7 @@ namespace os
       //              thread::_wait(), thread::_timed_flags_wait()
       // - terminated - in state::_exit()
       // - destroyed - in thread::_destroy()
-      state_t volatile sched_state_ = state::undefined;
+      state_t volatile state_ = state::undefined;
       priority_t volatile prio_ = priority::none;
 
       flags::mask_t volatile flags_mask_ = 0;
@@ -2220,9 +2220,9 @@ namespace os
      * @note Can be invoked from Interrupt Service Routines.
      */
     inline thread::state_t
-    thread::sched_state (void) const
+    thread::state (void) const
     {
-      return sched_state_;
+      return state_;
     }
 
     /**
@@ -2275,7 +2275,7 @@ namespace os
     inline void
     thread::_relink_running (void)
     {
-      if (sched_state_ == state::running)
+      if (state_ == state::running)
         {
           // If the current thread is running, add it to the
           // ready list, so that it will be resumed later.

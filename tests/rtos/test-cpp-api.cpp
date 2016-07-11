@@ -85,7 +85,7 @@ iterate_threads (thread* th, unsigned int depth)
           - stk.available ());
       unsigned int used_proc = static_cast<unsigned int> (used * 100
           / stk.size ());
-      unsigned int st = static_cast<unsigned int> (p.sched_state ());
+      unsigned int st = static_cast<unsigned int> (p.state ());
 
       statistics::counter_t thread_switches =
           p.statistics ().context_switches ();

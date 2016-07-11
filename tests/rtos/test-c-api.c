@@ -101,7 +101,7 @@ iterate_threads (os_thread_t* th, unsigned int depth)
           - os_thread_stack_get_available (pst));
       unsigned int used_proc = (unsigned int) (used * 100
           / os_thread_stack_get_size (pst));
-      unsigned int st = (unsigned int) (os_thread_get_sched_state (p));
+      unsigned int st = (unsigned int) (os_thread_get_state (p));
 
       os_statistics_counter_t thread_switches =
           os_thread_stat_get_context_switches (p);
