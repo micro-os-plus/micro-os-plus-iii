@@ -49,6 +49,13 @@ Changes, in reverse chronological order:
 - os-semaphore: add explicit `initial_value` to `os_semaphore_attr_binary_init()` and `os_semaphore_binary_create()`
 - os-semaphore: rename `attributes_binary`, `attributes_counting`, `initializer_binary`
 
+### v6.3.3 2016-07-11
 
-
+* rtos/c api: add `os_clock_get_hrclock()`
+* doxy: add details for thread attributes
+* rtos/thread state: remove `inactive`, `os_thread_state_inactive`
+* rtos/thread: rename `sched_prio()` -> `priority()`
+* rename `os_thread_get_priority()`, `os_thread_set_priority()`
+* rtos/thread: rename `thread::sched_state()` -> `state()`
+* rename `os_thread_get_state()`
 
