@@ -1356,7 +1356,7 @@ extern "C"
   /**
    * @brief Initialise the binary semaphore attributes.
    * @param [in] attr Pointer to semaphore attributes object.
-   * @param [in] initial_value Initial count value; 0 if missing.
+   * @param [in] initial_value Initial count value.
    * @par Returns
    *  Nothing.
    */
@@ -1368,7 +1368,7 @@ extern "C"
    * @brief Initialise the counting semaphore attributes.
    * @param [in] attr Pointer to semaphore attributes object.
    * @param [in] max_value Maximum count value.
-   * @param [in] initial_value Initial count value; 0 if missing.
+   * @param [in] initial_value Initial count value.
    */
   void
   os_semaphore_attr_counting_init (os_semaphore_attr_t* attr,
@@ -1398,7 +1398,7 @@ extern "C"
    * @brief Create a binary semaphore object.
    * @param [in] semaphore Pointer to semaphore object.
    * @param [in] name Pointer to name.
-   * @param [in] initial_value Initial count value; 0 if missing.
+   * @param [in] initial_value Initial count value.
    * @par Returns
    *  Nothing.
    */
@@ -1411,7 +1411,7 @@ extern "C"
    * @param [in] semaphore Pointer to semaphore object.
    * @param [in] name Pointer to name.
    * @param [in] max_value Maximum count value.
-   * @param [in] initial_value Initial count value; 0 if missing.
+   * @param [in] initial_value Initial count value.
    * @par Returns
    *  Nothing.
    */
