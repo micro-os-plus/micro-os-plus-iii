@@ -6,7 +6,7 @@
 
 - initial version of the APIs announced on [ARM Connected Community](https://community.arm.com/groups/tools/blog/2016/03/11/cmsis-a-proposal-for-a-future-cmsis-written-in-c)
 
-### v0.2.1 2016-06-21 
+### v6.2.1 2016-06-21 
 
 First fully functional reference implementation. The C and C++ APIs were completely refurbished and use all lower case letters.
 
@@ -32,18 +32,22 @@ Changes, in reverse chronological order:
 - prefix all init functions with `os_`
 - many other, too many to mention, inherent for first versions...
 
-### v0.3.1 2016-07-10
+### v6.3.1 2016-07-10
 
-Changes, in reverse chronological order:
-
-- for consistency reasons, thread signals were renamed thread event flags
-- `flags_clear()`, `flags_get()` moved from `thread` to `this_thread`
-- `os_thread_stack_element_t` and `os_thread_stack_allocation_element_t` added to C API
-- `os_thread_stack_get_bottom()`, `os_thread_stack_get_top()`, `os_thread_stack_check_bottom_magic()`, `os_thread_stack_check_top_magic()` added
-- thread `waiting` renamed `suspended`
 - validation: waiting function are allowed only if scheduler is not locked
+- thread `waiting` renamed `suspended`
+- `os_thread_stack_get_bottom()`, `os_thread_stack_get_top()`, `os_thread_stack_check_bottom_magic()`, `os_thread_stack_check_top_magic()` added
+- `os_thread_stack_element_t` and `os_thread_stack_allocation_element_t` added to C API
+- `flags_clear()`, `flags_get()` moved from `thread` to `this_thread`
+- for consistency reasons, thread signals were renamed thread event flags
 
+### v6.3.2 2016-07-11
 
+- fix `thread::flags_try_wait()` spelling
+- semaphores refurbished (make default as binary, add classes `semaphore_binary` and `semaphore_counting`)
+- add `binary_attributes`
+- os-semaphore: add explicit `initial_value` to `os_semaphore_attr_binary_init()` and `os_semaphore_binary_create()`
+- os-semaphore: rename `attributes_binary`, `attributes_counting`, `initializer_binary`
 
 
 
