@@ -825,7 +825,7 @@ namespace os
          * If 0, the default is `thread::priority::normal`.
          *
          * A convenient and explicit variant to this attribute
-         * is to call `thread::sched_prio (priority_t)` at the
+         * is to call `thread::priority (priority_t)` at the
          * beginning of the thread function.
          */
         priority_t th_priority = priority::normal;
@@ -1083,7 +1083,7 @@ namespace os
        *  scheduling policy of the specified thread.
        */
       result_t
-      sched_prio (priority_t prio);
+      priority (priority_t prio);
 
       /**
        * @brief Get the current scheduling priority.
@@ -1092,7 +1092,7 @@ namespace os
        * @return The thread priority.
        */
       priority_t
-      sched_prio (void);
+      priority (void);
 
 #if 0
       // ???

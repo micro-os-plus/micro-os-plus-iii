@@ -698,16 +698,16 @@ os_main (int argc, char* argv[])
       os_thread_create (&th3, "th3", func, NULL, &ath3);
 
       os_thread_prio_t prio;
-      prio = os_thread_get_prio (&th3);
-      os_thread_set_prio (os_this_thread (), prio);
+      prio = os_thread_get_priority (&th3);
+      os_thread_set_priority (os_this_thread (), prio);
 
       // Lower main thread priority to allow task to run.
-      os_thread_set_prio (os_this_thread (), os_thread_priority_below_normal);
+      os_thread_set_priority (os_this_thread (), os_thread_priority_below_normal);
 
       os_thread_join (&th3, NULL);
 
       // Restore main thread priority.
-      os_thread_set_prio (os_this_thread (), os_thread_priority_normal);
+      os_thread_set_priority (os_this_thread (), os_thread_priority_normal);
 
       // os_thread_destroy(&th3);
     }

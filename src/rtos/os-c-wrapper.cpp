@@ -615,13 +615,13 @@ os_thread_get_name (os_thread_t* thread)
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
- * @see os::rtos::thread::sched_prio()
+ * @see os::rtos::thread::priority()
  */
 os_thread_prio_t
-os_thread_get_prio (os_thread_t* thread)
+os_thread_get_priority (os_thread_t* thread)
 {
   assert(thread != nullptr);
-  return (os_thread_prio_t) (reinterpret_cast<rtos::thread&> (*thread)).sched_prio ();
+  return (os_thread_prio_t) (reinterpret_cast<rtos::thread&> (*thread)).priority ();
 }
 
 /**
@@ -629,13 +629,13 @@ os_thread_get_prio (os_thread_t* thread)
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
- * @see os::rtos::thread::sched_prio(priority_t)
+ * @see os::rtos::thread::priority(priority_t)
  */
 os_result_t
-os_thread_set_prio (os_thread_t* thread, os_thread_prio_t prio)
+os_thread_set_priority (os_thread_t* thread, os_thread_prio_t prio)
 {
   assert(thread != nullptr);
-  return (os_result_t) (reinterpret_cast<rtos::thread&> (*thread)).sched_prio (
+  return (os_result_t) (reinterpret_cast<rtos::thread&> (*thread)).priority (
       prio);
 }
 
@@ -2816,8 +2816,8 @@ osThreadSetPriority (osThreadId thread_id, osPriority priority)
 
   // Call C++ mutator.
   thread::priority_t prio = static_cast<thread::priority_t> (priority);
-  result_t res = ((reinterpret_cast<rtos::thread&> (*thread_id)).sched_prio (
-      prio));
+  result_t res =
+      ((reinterpret_cast<rtos::thread&> (*thread_id)).priority (prio));
 
   // A mandatory yield is needed here, must be done
   // by the implementation.
@@ -2858,7 +2858,7 @@ osThreadGetPriority (osThreadId thread_id)
 
   // Call C++ accessor.
   thread::priority_t prio =
-      (reinterpret_cast<rtos::thread&> (*thread_id)).sched_prio ();
+      (reinterpret_cast<rtos::thread&> (*thread_id)).priority ();
   return static_cast<osPriority> (prio);
 }
 

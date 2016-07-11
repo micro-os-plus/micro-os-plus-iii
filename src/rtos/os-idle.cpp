@@ -62,9 +62,9 @@ os_idle (thread::func_args_t args __attribute__((unused)))
   // The CMSIS RTOS validator creates threads with `priority::idle`,
   // so, to be sure that the system idle thread has the lowest priority,
   // go one step below the idle priority.
-  this_thread::thread ().sched_prio (thread::priority::idle-1);
+  this_thread::thread ().priority (thread::priority::idle-1);
 #else
-  this_thread::thread ().sched_prio (thread::priority::idle);
+  this_thread::thread ().priority (thread::priority::idle);
 #endif
 
   while (true)

@@ -723,10 +723,10 @@ namespace os
         using priority_t = uint8_t;
 
         static priority_t
-        sched_prio (rtos::thread* obj);
+        priority (rtos::thread* obj);
 
         static result_t
-        sched_prio (rtos::thread* obj, priority_t prio);
+        priority (rtos::thread* obj, priority_t prio);
 
         static result_t
         detach (rtos::thread* obj);

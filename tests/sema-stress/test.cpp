@@ -36,9 +36,9 @@ sleep_stress (void* args);
 void*
 sleep_stress (void* args __attribute__((unused)))
 {
-  this_thread::thread().sched_prio(thread::priority::below_normal);
+  this_thread::thread ().priority (thread::priority::below_normal);
 
-  while (!this_thread::thread().interrupted())
+  while (!this_thread::thread ().interrupted ())
     {
       sysclock.sleep_for (1);
     }
@@ -52,7 +52,8 @@ run_tests ()
   sema (tmr.in_clk_hz ()/20);
 #else
 
-  thread low { "low", sleep_stress, nullptr };
+  thread low
+    { "low", sleep_stress, nullptr };
 
   int i = 1;
   for (;; i *= 2)

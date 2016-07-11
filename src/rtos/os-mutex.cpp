@@ -516,15 +516,15 @@ namespace os
             {
               // Save owner priority, in case a temporary boost
               // will be later applied.
-              owner_prio_ = owner_->sched_prio ();
+              owner_prio_ = owner_->priority ();
             }
           else if (protocol_ == protocol::protect)
             {
               // Save owner priority and boost priority.
-              owner_prio_ = owner_->sched_prio ();
+              owner_prio_ = owner_->priority ();
               if (prio_ceiling_ > owner_prio_)
                 {
-                  owner_->sched_prio (prio_ceiling_);
+                  owner_->priority (prio_ceiling_);
                 }
             }
 #if defined(OS_TRACE_RTOS_MUTEX)
@@ -557,11 +557,11 @@ namespace os
 
       if (protocol_ == protocol::inherit)
         {
-          thread::priority_t prio = crt_thread->sched_prio ();
-          if ((prio > owner_->sched_prio ()))
+          thread::priority_t prio = crt_thread->priority ();
+          if ((prio > owner_->priority ()))
             {
               // Boost owner priority.
-              owner_->sched_prio (prio);
+              owner_->priority (prio);
             }
         }
 
@@ -945,7 +945,7 @@ namespace os
           if ((protocol_ == protocol::inherit)
               || (protocol_ == protocol::protect))
             {
-              owner_->sched_prio (owner_prio_);
+              owner_->priority (owner_prio_);
             }
 
 #if defined(OS_TRACE_RTOS_MUTEX)

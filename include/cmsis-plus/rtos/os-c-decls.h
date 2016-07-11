@@ -515,7 +515,7 @@ extern "C"
      * If 0, the default is `os_thread_priority_normal`.
      *
      * A convenient and explicit variant to this attribute
-     * is to call `os_thread_set_prio()` at the beginning of the thread
+     * is to call `os_thread_set_priority()` at the beginning of the thread
      * function.
      */
     os_thread_prio_t th_priority;

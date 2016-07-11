@@ -456,7 +456,7 @@ extern "C"
    * @return The thread priority.
    */
   os_thread_prio_t
-  os_thread_get_prio (os_thread_t* thread);
+  os_thread_get_priority (os_thread_t* thread);
 
   /**
    * @brief Set the thread dynamic scheduling priority.
@@ -468,7 +468,7 @@ extern "C"
    *  scheduling policy of the specified thread.
    */
   os_result_t
-  os_thread_set_prio (os_thread_t* thread, os_thread_prio_t prio);
+  os_thread_set_priority (os_thread_t* thread, os_thread_prio_t prio);
 
   /**
    * @brief Wait for thread termination.

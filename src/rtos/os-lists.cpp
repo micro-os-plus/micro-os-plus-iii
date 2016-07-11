@@ -232,7 +232,7 @@ namespace os
         {
           // Insert in the middle of the list.
           // The loop is guaranteed to terminate, not hit the head and
-          // the weight is small, sched_prio() is only an accessor.
+          // the weight is small, priority() is only an accessor.
           while (prio > after->thread_.prio_)
             {
               after =
@@ -323,7 +323,7 @@ namespace os
     void
     waiting_threads_list::link (waiting_thread_node& node)
     {
-      thread::priority_t prio = node.thread_.sched_prio ();
+      thread::priority_t prio = node.thread_.priority ();
 
       waiting_thread_node* after =
           static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (tail ()));
@@ -335,7 +335,7 @@ namespace os
           trace::printf ("wait %s() empty +%u\n", __func__, prio);
 #endif
         }
-      else if (prio <= after->thread_.sched_prio ())
+      else if (prio <= after->thread_.priority ())
         {
           // Insert at the end of the list.
 #if defined(OS_TRACE_RTOS_LISTS)
@@ -343,7 +343,7 @@ namespace os
                          after->thread_.prio_, prio);
 #endif
         }
-      else if (prio > head ()->thread_.sched_prio ())
+      else if (prio > head ()->thread_.priority ())
         {
           // Insert at the beginning of the list
           after =
@@ -357,8 +357,8 @@ namespace os
         {
           // Insert in the middle of the list.
           // The loop is guaranteed to terminate, not hit the head and
-          // the weight is small, sched_prio() is only an accessor.
-          while (prio > after->thread_.sched_prio ())
+          // the weight is small, priority() is only an accessor.
+          while (prio > after->thread_.priority ())
             {
               after =
                   static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (after->prev ()));

@@ -172,7 +172,7 @@ periodic::periodic (unsigned int seconds) :
 void*
 periodic::object_main (void)
 {
-  th_.sched_prio (thread::priority::above_normal);
+  th_.priority (thread::priority::above_normal);
 
   unsigned int t = 0;
   while (true)
@@ -196,7 +196,8 @@ periodic::object_main (void)
               //os::core::timer::ticks_t ticks = pTask->getTicks();
               printf ("%s:%-4u ", m->thread ().name (), cnt);
             }
-          int average = static_cast<int>((sum + ((sizeof(mt) / sizeof(mt[0])) / 2))
+          int average = static_cast<int> ((sum
+              + ((sizeof(mt) / sizeof(mt[0])) / 2))
               / (sizeof(mt) / sizeof(mt[0])));
 
           printf ("sum=%u, avg=%u", sum, average);

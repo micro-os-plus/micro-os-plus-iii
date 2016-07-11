@@ -563,7 +563,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     thread::priority_t
-    thread::sched_prio (void)
+    thread::priority (void)
     {
       os_assert_err(!interrupts::in_handler_mode (), priority::error);
 
@@ -580,7 +580,7 @@ namespace os
      * of its lifetime, it is recommended that the function should
      * fail and report an `ESRCH` error.
      *
-     * The `sched_prio()` function shall not return an error
+     * The `priority()` function shall not return an error
      * code of `EINTR`.
      *
      * @par POSIX compatibility
@@ -591,7 +591,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    thread::sched_prio (priority_t prio)
+    thread::priority (priority_t prio)
     {
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
       os_assert_err(prio < priority::error, EINVAL);
@@ -608,7 +608,7 @@ namespace os
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
       // The port must perform a context switch.
-      res = port::thread::sched_prio (this, prio);
+      res = port::thread::priority (this, prio);
 
 #else
 
