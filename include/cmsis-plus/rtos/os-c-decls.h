@@ -1011,14 +1011,14 @@ extern "C"
     void* clock;
 
     /**
-     * @brief Semaphore initial count value.
-     */
-    os_semaphore_count_t sm_initial_value;
-
-    /**
      * @brief Semaphore max count value.
      */
     os_semaphore_count_t sm_max_value;
+
+    /**
+     * @brief Semaphore initial count value.
+     */
+    os_semaphore_count_t sm_initial_value;
 
   } os_semaphore_attr_t;
 

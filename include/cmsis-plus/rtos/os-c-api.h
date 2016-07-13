@@ -1448,7 +1448,7 @@ extern "C"
    * @brief Post (unlock) the semaphore.
    * @param [in] semaphore Pointer to semaphore object.
    * @retval os_ok The semaphore was posted.
-   * @retval EAGAIN The max count was exceeded.
+   * @retval EAGAIN The maximum count value was exceeded.
    * @retval ENOTRECOVERABLE The semaphore could not be posted
    *  (extension to POSIX).
    */
@@ -1502,9 +1502,9 @@ extern "C"
                            os_clock_duration_t timeout);
 
   /**
-   * @brief Get the semaphore value.
+   * @brief Get the semaphore count value.
    * @param [in] semaphore Pointer to semaphore object.
-   * @return The semaphore value.
+   * @return The semaphore count value.
    */
   os_semaphore_count_t
   os_semaphore_get_value (os_semaphore_t* semaphore);
@@ -1519,7 +1519,7 @@ extern "C"
   os_semaphore_reset (os_semaphore_t* semaphore);
 
   /**
-   * @brief Get the semaphore initial value.
+   * @brief Get the semaphore initial count value.
    * @param [in] semaphore Pointer to semaphore object.
    * @return The numeric value set from attributes.
    */
@@ -1527,7 +1527,7 @@ extern "C"
   os_semaphore_get_initial_value (os_semaphore_t* semaphore);
 
   /**
-   * @brief Get the semaphore count max value.
+   * @brief Get the semaphore maximum count value.
    * @param [in] semaphore Pointer to semaphore object.
    * @return The numeric value set from attributes.
    */

@@ -138,14 +138,14 @@ namespace os
         // Public members, no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
         /**
-         * @brief Semaphore initial count value.
-         */
-        count_t sm_initial_value = 0;
-
-        /**
          * @brief Semaphore max count value.
          */
         count_t sm_max_value = 1;
+
+        /**
+         * @brief Semaphore initial count value.
+         */
+        count_t sm_initial_value = 0;
 
         // Add more attributes here.
 
@@ -171,10 +171,10 @@ namespace os
 
         /**
          * @brief Create a binary semaphore attributes object.
-         * @param [in] initial_value Initial count value; 0 if missing.
+         * @param [in] initial_value Initial count value.
          */
         constexpr
-        attributes_binary (count_t initial_value = 0);
+        attributes_binary (count_t initial_value);
 
         /**
          * @cond ignore
@@ -225,10 +225,10 @@ namespace os
         /**
          * @brief Create a counting semaphore attributes object.
          * @param [in] max_value Maximum count value.
-         * @param [in] initial_value Initial count value; 0 if missing.
+         * @param [in] initial_value Initial count value.
          */
         constexpr
-        attributes_counting (count_t max_value, count_t initial_value = 0);
+        attributes_counting (count_t max_value, count_t initial_value);
 
         /**
          * @cond ignore
@@ -336,7 +336,7 @@ namespace os
        * @par Parameters
        *  None
        * @retval result::ok The semaphore was posted.
-       * @retval EAGAIN The max count was exceeded.
+       * @retval EAGAIN The maximum count value was exceeded.
        * @retval ENOTRECOVERABLE The semaphore could not be posted
        *  (extension to POSIX).
        */
@@ -390,10 +390,10 @@ namespace os
       timed_wait (clock::duration_t timeout);
 
       /**
-       * @brief Get the semaphore value.
+       * @brief Get the semaphore count value.
        * @par Parameters
        *  None
-       * @return The semaphore value.
+       * @return The semaphore count value.
        */
       count_t
       value (void) const;
@@ -409,7 +409,7 @@ namespace os
       reset (void);
 
       /**
-       * @brief Get the semaphore initial value.
+       * @brief Get the semaphore initial count value.
        * @par Parameters
        *  None
        * @return The numeric value set from attributes.
@@ -418,7 +418,7 @@ namespace os
       initial_value (void) const;
 
       /**
-       * @brief Get the semaphore count max value.
+       * @brief Get the semaphore maximum count value.
        * @par Parameters
        *  None
        * @return The numeric value set from attributes.
@@ -484,7 +484,7 @@ namespace os
       // Constant set during construction.
       const count_t max_value_ = max_count_value;
 
-      const count_t initial_value_;
+      const count_t initial_value_ = 0;
 
       // Can be updated in different contexts (interrupts or threads)
       volatile count_t count_ = 0;
@@ -521,14 +521,14 @@ namespace os
        * @brief Create a binary semaphore object.
        * @param [in] initial_value Initial count value; 0 if missing.
        */
-      semaphore_binary (const count_t initial_value = 0);
+      semaphore_binary (const count_t initial_value);
 
       /**
        * @brief Create a named binary semaphore object.
        * @param [in] name Pointer to name.
        * @param [in] initial_value Initial count value; 0 if missing.
        */
-      semaphore_binary (const char* name, const count_t initial_value = 0);
+      semaphore_binary (const char* name, const count_t initial_value);
 
       /**
        * @cond ignore
@@ -594,8 +594,7 @@ namespace os
        * @param [in] max_value Maximum count value.
        * @param [in] initial_value Initial count value; 0 if missing.
        */
-      semaphore_counting (const count_t max_value, const count_t initial_value =
-                              0);
+      semaphore_counting (const count_t max_value, const count_t initial_value);
 
       /**
        * @brief Create a named binary semaphore object.
@@ -604,7 +603,7 @@ namespace os
        * @param [in] initial_value Initial count value; 0 if missing.
        */
       semaphore_counting (const char* name, const count_t max_value,
-                          const count_t initial_value = 0);
+                          const count_t initial_value);
 
       /**
        * @cond ignore
@@ -672,8 +671,8 @@ namespace os
 
     constexpr
     semaphore::attributes::attributes (count_t max_value, count_t initial_value) :
-        sm_initial_value (initial_value), //
-        sm_max_value (max_value)
+        sm_max_value (max_value), //
+        sm_initial_value (initial_value)
     {
       ;
     }
