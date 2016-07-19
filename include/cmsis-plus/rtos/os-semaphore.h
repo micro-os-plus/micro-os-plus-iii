@@ -307,7 +307,7 @@ namespace os
        * @}
        */
 
-      /*
+      /**
        * @name Operators
        * @{
        */
@@ -554,7 +554,7 @@ namespace os
        * @}
        */
 
-      /*
+      /**
        * @name Operators
        * @{
        */
@@ -629,7 +629,7 @@ namespace os
        * @}
        */
 
-      /*
+      /**
        * @name Operators
        * @{
        */

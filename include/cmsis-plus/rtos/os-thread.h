@@ -1019,7 +1019,7 @@ namespace os
        * @}
        */
 
-      /*
+      /**
        * @name Operators
        * @{
        */

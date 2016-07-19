@@ -339,7 +339,7 @@ namespace os
        * @}
        */
 
-      /*
+      /**
        * @name Operators
        * @{
        */
