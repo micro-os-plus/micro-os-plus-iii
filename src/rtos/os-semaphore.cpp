@@ -377,7 +377,7 @@ namespace os
      * locks the semaphore or the call is interrupted by a signal.
      *
      * Upon successful return, the state of the semaphore shall
-     * be locked and shall remain locked until `the post()`
+     * be locked and shall remain locked until the `post()`
      * function is executed and returns successfully.
      *
      * The function is interruptible by the delivery of an external
@@ -513,7 +513,7 @@ namespace os
      * @details
      * Try to perform a lock operation; if the semaphore cannot be
      * locked without waiting for another process or thread to
-     * unlock the semaphore by performing a semaphore::post()
+     * unlock the semaphore by performing a `post()`
      * function, this wait shall be terminated when the specified
      * timeout expires.
      *
