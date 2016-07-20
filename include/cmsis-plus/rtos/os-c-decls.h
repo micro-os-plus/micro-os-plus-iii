@@ -526,8 +526,8 @@ extern "C"
    * @brief Thread object storage.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
    * @details
-   * This C structure has the same size as the C++ @ref os::rtos::thread object
-   * and must be initialised with os_thread_create().
+   * This C structure has the same size as the C++ `os::rtos::thread` object
+   * and must be initialised with `os_thread_create()`.
    *
    * Later on a pointer to it can be used both in C and C++
    * to refer to the thread object.
@@ -602,7 +602,7 @@ extern "C"
    * @brief Clock object storage.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
    * @details
-   * This C structure has the same size as the C++ @ref os::rtos::clock object.
+   * This C structure has the same size as the C++ `os::rtos::clock` object.
    *
    * The members of this structure are hidden and should not
    * be used directly, but only through specific functions.
@@ -704,7 +704,7 @@ extern "C"
    * @brief Timer attributes.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
    * @details
-   * Initialise this structure with os_timer_attr_init() and then
+   * Initialise this structure with `os_timer_attr_init()` and then
    * set any of the individual members directly.
    *
    * @see os::rtos::timer::attributes
@@ -727,8 +727,8 @@ extern "C"
    * @brief Timer object storage.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
    * @details
-   * This C structure has the same size as the C++ @ref os::rtos::timer object
-   * and must be initialised with os_timer_create().
+   * This C structure has the same size as the C++ `os::rtos::timer` object
+   * and must be initialised with `os_timer_create()`.
    *
    * Later on a pointer to it can be used both in C and C++
    * to refer to the timer object.
@@ -827,7 +827,7 @@ extern "C"
    * @brief Mutex attributes.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
    * @details
-   * Initialise this structure with os_mutex_attr_init() and then
+   * Initialise this structure with `os_mutex_attr_init()` and then
    * set any of the individual members directly.
    *
    * @see os::rtos::mutex::attributes
@@ -870,8 +870,8 @@ extern "C"
    * @brief Mutex object storage.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
    * @details
-   * This C structure has the same size as the C++ @ref os::rtos::mutex object
-   * and must be initialised with os_mutex_create().
+   * This C structure has the same size as the C++ `os::rtos::mutex` object
+   * and must be initialised with `os_mutex_create()`.
    *
    * Later on a pointer to it can be used both in C and C++
    * to refer to the mutex object.
@@ -899,6 +899,8 @@ extern "C"
     os_mutex_count_t count;
     os_thread_prio_t prio_ceiling;
     os_thread_prio_t owner_prio;
+    bool consistent;
+    bool recoverable;
     os_mutex_type_t type;
     os_mutex_protocol_t protocol;
     os_mutex_robustness_t robustness;
@@ -926,7 +928,7 @@ extern "C"
    * @brief Condition variable attributes.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
    * @details
-   * Initialise this structure with os_condvar_attr_init() and then
+   * Initialise this structure with `os_condvar_attr_init()` and then
    * set any of the individual members directly.
    *
    * @see os::rtos::condition_variable::attributes
@@ -946,7 +948,7 @@ extern "C"
    * @details
    * This C structure has the same size as the C++
    * @ref os::rtos::condition_variable
-   * object and must be initialised with os_timer_create().
+   * object and must be initialised with os_condvar_create().
    *
    * Later on a pointer to it can be used both in C and C++
    * to refer to the timer object.
@@ -998,7 +1000,7 @@ extern "C"
    * @brief Semaphore attributes.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
    * @details
-   * Initialise this structure with os_semaphore_attr_init() and then
+   * Initialise this structure with `os_semaphore_attr_init()` and then
    * set any of the individual members directly.
    *
    * @see os::rtos::semaphore::attributes
@@ -1026,8 +1028,8 @@ extern "C"
    * @brief Semaphore object storage.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
    * @details
-   * This C structure has the same size as the C++ @ref os::rtos::semaphore
-   * object and must be initialised with os_semaphore_create().
+   * This C structure has the same size as the C++ `os::rtos::semaphore`
+   * object and must be initialised with `os_semaphore_create()`.
    *
    * Later on a pointer to it can be used both in C and C++
    * to refer to the semaphore object.
@@ -1082,7 +1084,7 @@ extern "C"
    * @brief Memory pool attributes.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
    * @details
-   * Initialise this structure with os_mempool_attr_init() and then
+   * Initialise this structure with `os_mempool_attr_init()` and then
    * set any of the individual members directly.
    *
    * @see os::rtos::memory_pool::attributes
@@ -1110,8 +1112,8 @@ extern "C"
    * @brief Memory pool object storage.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
    * @details
-   * This C structure has the same size as the C++ @ref os::rtos::memory_pool
-   * object and must be initialised with os_mempool_create().
+   * This C structure has the same size as the C++ `os::rtos::memory_pool`
+   * object and must be initialised with `os_mempool_create()`.
    *
    * Later on a pointer to it can be used both in C and C++
    * to refer to the memory pool object.
@@ -1187,7 +1189,7 @@ extern "C"
    * @brief Message queue attributes.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
    * @details
-   * Initialise this structure with os_mqueue_attr_init() and then
+   * Initialise this structure with `os_mqueue_attr_init()` and then
    * set any of the individual members directly.
    *
    * @see os::rtos::message_queue::attributes
@@ -1215,8 +1217,8 @@ extern "C"
    * @brief Message queue object storage.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
    * @details
-   * This C structure has the same size as the C++ @ref os::rtos::message_queue
-   * object and must be initialised with os_mqueue_create().
+   * This C structure has the same size as the C++ `os::rtos::message_queue`
+   * object and must be initialised with `os_mqueue_create()`.
    *
    * Later on a pointer to it can be used both in C and C++
    * to refer to the message queue object.
@@ -1288,7 +1290,7 @@ extern "C"
    * @brief Event flags attributes.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
    * @details
-   * Initialise this structure with os_evflags_attr_init() and then
+   * Initialise this structure with `os_evflags_attr_init()` and then
    * set any of the individual members directly.
    *
    * @see os::rtos::event_flags::attributes
@@ -1306,8 +1308,8 @@ extern "C"
    * @brief Event flags object storage.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
    * @details
-   * This C structure has the same size as the C++ @ref os::rtos::event_flags
-   * object and must be initialised with os_evflags_create().
+   * This C structure has the same size as the C++ `os::rtos::event_flags`
+   * object and must be initialised with `os_evflags_create()`.
    *
    * Later on a pointer to it can be used both in C and C++
    * to refer to the event flags object.

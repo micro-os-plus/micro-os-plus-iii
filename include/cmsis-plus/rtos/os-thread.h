@@ -1545,6 +1545,7 @@ namespace os
 
       std::size_t allocated_stack_size_elements_ = 0;
 
+      // TODO: make it a list, to properly process robustness.
       std::size_t volatile acquired_mutexes_ = 0;
 
       // The thread state is set:

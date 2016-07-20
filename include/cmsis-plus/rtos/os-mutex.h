@@ -63,8 +63,19 @@ namespace os
        * @brief Type of mutex protocol.
        */
       using protocol_t = uint8_t;
+
+      /**
+       * @brief Namespace of mutex protocols.
+       * @details
+       * @see attributes::mx_protocol
+       */
       struct protocol
       {
+        /**
+         * @brief Mutex protocols.
+         * @details
+         * @see attributes::mx_protocol
+         */
         enum
           : protocol_t
             {
@@ -74,16 +85,12 @@ namespace os
               none = 0,
 
               /**
-               * @brief Inherit from highest priority thread.
-               * @details
-               * TODO: add
+               * @brief Inherit priority from highest priority thread.
                */
               inherit = 1,
 
               /**
-               * @brief Protect.
-               * @details
-               * TODO: add
+               * @brief Execute at the highest priority (TODO: implement)
                */
               protect = 2
         };
@@ -94,8 +101,18 @@ namespace os
        */
       using robustness_t = uint8_t;
 
+      /**
+       * @brief Namespace of mutex robustness.
+       * @details
+       * @see attributes::mx_robustness
+       */
       struct robustness
       {
+        /**
+         * @brief Mutex robustness.
+         * @details
+         * @see attributes::mx_robustness
+         */
         enum
           : robustness_t
             {
@@ -104,7 +121,7 @@ namespace os
                */
               stalled = 0,
               /**
-               * @brief Enhanced robustness.
+               * @brief Enhanced robustness at thread termination.
                */
               robust = 1
         };
@@ -114,8 +131,18 @@ namespace os
        * @brief Type of mutex behaviour.
        */
       using type_t = uint8_t;
+      /**
+       * @brief Namespace of mutex types.
+       * @details
+       * @see attributes::mx_type
+       */
       struct type
       {
+        /**
+         * @brief Mutex types.
+         * @details
+         * @see attributes::mx_type
+         */
         enum
           : type_t
             {
@@ -135,6 +162,7 @@ namespace os
               _default = normal,
         };
       };
+
       /**
        * @brief Type of mutex recursion counter.
        */
@@ -241,7 +269,7 @@ namespace os
       /**
        * @brief Default normal mutex initialiser.
        */
-      static const attributes normal_initializer;
+      static const attributes initializer_normal;
 
       // ======================================================================
 
@@ -249,7 +277,7 @@ namespace os
        * @brief Recursive mutex attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class recursive_attributes : public attributes
+      class attributes_recursive : public attributes
       {
       public:
 
@@ -264,18 +292,18 @@ namespace os
          *  None
          */
         constexpr
-        recursive_attributes ();
+        attributes_recursive ();
 
         /**
          * @cond ignore
          */
 
-        recursive_attributes (const recursive_attributes&) = default;
-        recursive_attributes (recursive_attributes&&) = default;
-        recursive_attributes&
-        operator= (const recursive_attributes&) = default;
-        recursive_attributes&
-        operator= (recursive_attributes&&) = default;
+        attributes_recursive (const attributes_recursive&) = default;
+        attributes_recursive (attributes_recursive&&) = default;
+        attributes_recursive&
+        operator= (const attributes_recursive&) = default;
+        attributes_recursive&
+        operator= (attributes_recursive&&) = default;
 
         /**
          * @endcond
@@ -284,18 +312,18 @@ namespace os
         /**
          * @brief Destroy the recursive mutex attributes object.
          */
-        ~recursive_attributes () = default;
+        ~attributes_recursive () = default;
 
         /**
          * @}
          */
 
-      }; /* class recursive_attributes */
+      }; /* class attributes_recursive */
 
       /**
        * @brief Default recursive mutex initialiser.
        */
-      static const recursive_attributes recursive_initializer;
+      static const attributes_recursive initializer_recursive;
 
       /**
        * @name Constructors & Destructor
@@ -306,14 +334,14 @@ namespace os
        * @brief Create a mutex object.
        * @param [in] attr Reference to attributes.
        */
-      mutex (const attributes& attr = normal_initializer);
+      mutex (const attributes& attr = initializer_normal);
 
       /**
        * @brief Create a named mutex object.
        * @param [in] name Pointer to name.
        * @param [in] attr Reference to attributes.
        */
-      mutex (const char* name, const attributes& attr = normal_initializer);
+      mutex (const char* name, const attributes& attr = initializer_normal);
 
       /**
        * @cond ignore
@@ -468,6 +496,20 @@ namespace os
        *  store the previous priority; may be `nullptr`.
        * @retval result::ok The priority was changed.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @retval ENOTRECOVERABLE The state protected by the mutex is
+       *  not recoverable..
+       * @retval EAGAIN The mutex could not be acquired because the maximum
+       *  number of recursive locks for mutex has been exceeded.
+       * @retval EINVAL The mutex was created with the protocol
+       *  attribute having the value PTHREAD_PRIO_PROTECT and the
+       *  calling thread's priority is higher than the mutex's
+       *  current priority ceiling.
+       * @retval EOWNERDEAD The mutex is a robust mutex and the process
+       *  containing the previous owning thread terminated while holding
+       *  the mutex lock. The mutex lock shall be acquired by the calling
+       *  thread and it is up to the new owner to make the state consistent.
+       * @retval EDEADLK The mutex type is `mutex::type::errorcheck` and
+       *  the current thread already owns the mutex.
        */
       result_t
       prio_ceiling (thread::priority_t prio_ceiling,
@@ -575,6 +617,9 @@ namespace os
       volatile thread::priority_t prio_ceiling_ = thread::priority::highest;
       volatile thread::priority_t owner_prio_ = 0;
 
+      bool consistent_ = true;
+      bool recoverable_ = true;
+
       // Constants set during construction.
       const type_t type_; // normal, errorcheck, recursive
       const protocol_t protocol_; // none, inherit, protect
@@ -625,7 +670,7 @@ namespace os
     // ========================================================================
 
     constexpr
-    mutex::recursive_attributes::recursive_attributes () :
+    mutex::attributes_recursive::attributes_recursive () :
         attributes
           { type::recursive } // Use the protected constructor.
     {

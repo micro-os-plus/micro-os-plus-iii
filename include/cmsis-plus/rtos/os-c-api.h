@@ -1027,7 +1027,7 @@ extern "C"
    *  Nothing.
    */
   void
-  os_mutex_attr_init_recursive (os_mutex_attr_t* attr);
+  os_mutex_attr_recursive_init (os_mutex_attr_t* attr);
 
   /**
    * @brief Get a recursive mutex attributes object.

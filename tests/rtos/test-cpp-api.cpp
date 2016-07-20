@@ -435,7 +435,7 @@ test_cpp_api (void)
 
     {
       mutex mx3
-        { "mx2", mutex::recursive_initializer };
+        { "mx2", mutex::initializer_recursive };
       mx3.lock ();
       mx3.unlock ();
     }

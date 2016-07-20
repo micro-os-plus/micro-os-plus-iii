@@ -379,7 +379,7 @@ namespace os
     inline
     recursive_mutex::recursive_mutex () :
         nm_
-          { os::rtos::mutex::recursive_initializer }
+          { os::rtos::mutex::initializer_recursive }
     {
       ;
     }

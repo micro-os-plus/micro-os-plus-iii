@@ -56,7 +56,7 @@ namespace os
      */
 
     /**
-     * @class mutex::recursive_attributes
+     * @class mutex::attributes_recursive
      * @details
      * Allow to assign a name and custom attributes (like priority ceiling,
      * robustness, etc) to the mutex.
@@ -230,13 +230,13 @@ namespace os
      * @details
      * This variable is used by the default constructor.
      */
-    const mutex::attributes mutex::normal_initializer;
+    const mutex::attributes mutex::initializer_normal;
 
     /**
      * @details
      * This variable can be used to create a recursive mutex.
      */
-    const mutex::recursive_attributes mutex::recursive_initializer;
+    const mutex::attributes_recursive mutex::initializer_recursive;
 
     // ------------------------------------------------------------------------
 
@@ -304,10 +304,10 @@ namespace os
      *
      * @code{.cpp}
      * // Create a normal mutex. Same as using the default constructor.
-     * mutex mx { normal_initializer };
+     * mutex mx { initializer_normal };
      *
      * // Create a recursive mutex.
-     * mutex rmx { recursive_initializer };
+     * mutex rmx { initializer_recursive };
      * @endcode
      *
      * @par Example
@@ -356,8 +356,8 @@ namespace os
      * condition variable objects.
      *
      * In cases where default mutex attributes are
-     * appropriate, the variables `mutex::normal_initializer`
-     * or `mutex::recursive_initializer` can be used to
+     * appropriate, the variables `mutex::initializer_normal`
+     * or `mutex::initializer_recursive` can be used to
      * initialise mutex objects.
      * The effect shall be equivalent to creating a mutex
      * object with the default constructor.
@@ -390,8 +390,8 @@ namespace os
      * condition variable objects.
      *
      * In cases where default mutex attributes are
-     * appropriate, the variables `mutex::normal_initializer`
-     * or `mutex::recursive_initializer` can be used to
+     * appropriate, the variables `mutex::initializer_normal`
+     * or `mutex::initializer_recursive` can be used to
      * initialise mutex objects.
      * The effect shall be equivalent to creating a mutex
      * object with the default constructor.
@@ -411,11 +411,11 @@ namespace os
         robustness_ (attr.mx_robustness), //
         max_count_ ((attr.mx_type == type::recursive) ? attr.mx_max_count : 1)
     {
-      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
-
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
+
+      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
 #if !defined(OS_USE_RTOS_PORT_MUTEX)
       clock_ = attr.clock != nullptr ? attr.clock : &sysclock;
@@ -483,6 +483,8 @@ namespace os
     mutex::_init (void)
     {
       count_ = 0;
+      consistent_ = true;
+      recoverable_ = true;
 
 #if !defined(OS_USE_RTOS_PORT_MUTEX)
 
@@ -618,13 +620,18 @@ namespace os
     result_t
     mutex::lock (void)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-      os_assert_err(!scheduler::locked (), EPERM);
-
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
                      &this_thread::thread (), this_thread::thread ().name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
+
+      if (!recoverable_)
+        {
+          return ENOTRECOVERABLE;
+        }
 
 #if defined(OS_USE_RTOS_PORT_MUTEX)
 
@@ -731,12 +738,17 @@ namespace os
     result_t
     mutex::try_lock (void)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
                      &this_thread::thread (), this_thread::thread ().name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+
+      if (!recoverable_)
+        {
+          return ENOTRECOVERABLE;
+        }
 
 #if defined(OS_USE_RTOS_PORT_MUTEX)
 
@@ -797,14 +809,19 @@ namespace os
     result_t
     mutex::timed_lock (clock::duration_t timeout)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-      os_assert_err(!scheduler::locked (), EPERM);
-
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s(%u) @%p %s by %p %s\n", __func__,
                      static_cast<unsigned int> (timeout), this, name (),
                      &this_thread::thread (), this_thread::thread ().name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
+
+      if (!recoverable_)
+        {
+          return ENOTRECOVERABLE;
+        }
 
 #if defined(OS_USE_RTOS_PORT_MUTEX)
 
@@ -913,12 +930,12 @@ namespace os
     result_t
     mutex::unlock (void)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
                      &this_thread::thread (), this_thread::thread ().name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_MUTEX)
 
@@ -986,11 +1003,11 @@ namespace os
     thread::priority_t
     mutex::prio_ceiling (void) const
     {
-      assert(!interrupts::in_handler_mode ());
-
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
+
+      assert(!interrupts::in_handler_mode ());
 
 #if defined(OS_USE_RTOS_PORT_MUTEX)
 
@@ -1011,7 +1028,7 @@ namespace os
      * it shall change the mutex's priority ceiling and then
      * release the mutex as if by a call to `unlock()`.
      * When the change is successful, the previous value of
-     * the priority ceiling shall be returned in old_ceiling.
+     * the priority ceiling shall be returned in `old_prio_ceiling`.
      *
      * If `prio_ceiling()` function fails, the mutex
      * priority ceiling shall not be changed.
@@ -1027,11 +1044,11 @@ namespace os
     mutex::prio_ceiling (thread::priority_t prio_ceiling,
                          thread::priority_t* old_prio_ceiling)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_MUTEX)
 
@@ -1039,23 +1056,22 @@ namespace os
 
 #else
 
-      thread::priority_t prio;
+      // TODO: lock() must not adhere to the priority protocol.
+      result_t res = lock ();
+      if (res != result::ok)
         {
-          // TODO: lock() must not adhere to the priority protocol.
-          result_t res = lock ();
-
-          prio = prio_ceiling_;
-          if (res == result::ok)
-            {
-              prio_ceiling_ = prio_ceiling;
-              unlock ();
-            }
-
-          if (old_prio_ceiling != nullptr)
-            {
-              *old_prio_ceiling = prio;
-            }
+          return res;
         }
+
+      if (old_prio_ceiling != nullptr)
+        {
+          *old_prio_ceiling = prio_ceiling_;
+        }
+
+      prio_ceiling_ = prio_ceiling;
+
+      unlock ();
+
       return result::ok;
 
 #endif
@@ -1092,11 +1108,13 @@ namespace os
     result_t
     mutex::consistent (void)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(robustness_ == robustness::robust, EINVAL);
+      os_assert_err(!consistent_, EINVAL);
 
 #if defined(OS_USE_RTOS_PORT_MUTEX)
 
@@ -1104,7 +1122,8 @@ namespace os
 
 #else
 
-      // TODO: update status to be consistent (?)
+      // Update status to consistent.
+      consistent_ = true;
       return result::ok;
 
 #endif
@@ -1123,11 +1142,11 @@ namespace os
     result_t
     mutex::reset (void)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
       scheduler::critical_section cs; // ----- Critical section -----
 

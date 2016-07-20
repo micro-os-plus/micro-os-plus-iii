@@ -1324,13 +1324,13 @@ os_mutex_attr_init (os_mutex_attr_t* attr)
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
- * @see os::rtos::mutex::recursive_attributes
+ * @see os::rtos::mutex::attributes_recursive
  */
 void
-os_mutex_attr_init_recursive (os_mutex_attr_t* attr)
+os_mutex_attr_recursive_init (os_mutex_attr_t* attr)
 {
   assert(attr != nullptr);
-  new (attr) mutex::recursive_attributes ();
+  new (attr) mutex::attributes_recursive ();
 }
 
 /**
@@ -1338,12 +1338,12 @@ os_mutex_attr_init_recursive (os_mutex_attr_t* attr)
  *
  * @note Can be invoked from Interrupt Service Routines.
  *
- * @see os::rtos::mutex::recursive_initializer
+ * @see os::rtos::mutex::initializer_recursive
  */
 const os_mutex_attr_t*
 os_mutex_attr_get_recursive (void)
 {
-  return (const os_mutex_attr_t*) &mutex::recursive_initializer;
+  return (const os_mutex_attr_t*) &mutex::initializer_recursive;
 }
 
 /**
@@ -1360,7 +1360,7 @@ os_mutex_create (os_mutex_t* mutex, const char* name,
   assert(mutex != nullptr);
   if (attr == nullptr)
     {
-      attr = (const os_mutex_attr_t*) &mutex::normal_initializer;
+      attr = (const os_mutex_attr_t*) &mutex::initializer_normal;
     }
   new (mutex) rtos::mutex (name, (mutex::attributes&) *attr);
 }
