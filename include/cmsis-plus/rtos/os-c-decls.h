@@ -788,9 +788,19 @@ extern "C"
    */
   enum
   {
-    //
+    /**
+     * @brief Priority and scheduling not affected by mutex ownership.
+     */
     os_mutex_protocol_none = 0,
+
+    /**
+     * @brief Inherit priority from highest priority thread.
+     */
     os_mutex_protocol_inherit = 1,
+
+    /**
+     * @brief Execute at the highest priority.
+     */
     os_mutex_protocol_protect = 2
   };
 
@@ -801,8 +811,14 @@ extern "C"
    */
   enum
   {
-    //
+    /**
+     * @brief Normal robustness.
+     */
     os_mutex_robustness_stalled = 0,
+
+    /**
+     * @brief Enhanced robustness at thread termination.
+     */
     os_mutex_robustness_robust = 1
   };
 
@@ -813,10 +829,21 @@ extern "C"
    */
   enum
   {
-    //
+    /**
+     * @brief Normal mutex behaviour.
+     */
     os_mutex_type_normal = 0,
+
+    /**
+     * @brief Check mutex behaviour.
+     */
     os_mutex_type_errorcheck = 1,
+
+    /**
+     * @brief Recursive mutex behaviour.
+     */
     os_mutex_type_recursive = 2,
+
     os_mutex_type_default = os_mutex_type_normal,
   };
 
