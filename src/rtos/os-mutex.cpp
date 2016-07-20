@@ -643,7 +643,7 @@ namespace os
 
       result_t res;
         {
-          scheduler::critical_section cs; // ----- Critical section -----
+          scheduler::critical_section scs; // ----- Critical section -----
 
           res = _try_lock (&crt_thread);
           if (res != EWOULDBLOCK)
@@ -661,7 +661,7 @@ namespace os
       for (;;)
         {
             {
-              scheduler::critical_section cs; // ----- Critical section -----
+              scheduler::critical_section scs; // ----- Critical section -----
 
               res = _try_lock (&crt_thread);
               if (res != EWOULDBLOCK)
@@ -758,7 +758,7 @@ namespace os
 
       thread& crt_thread = this_thread::thread ();
 
-      scheduler::critical_section cs; // ----- Critical section -----
+      scheduler::critical_section scs; // ----- Critical section -----
 
       return _try_lock (&crt_thread);
 
@@ -836,7 +836,7 @@ namespace os
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
         {
-          scheduler::critical_section cs; // ----- Critical section -----
+          scheduler::critical_section scs; // ----- Critical section -----
 
           res = _try_lock (&crt_thread);
           if (res != EWOULDBLOCK)
@@ -861,7 +861,7 @@ namespace os
       for (;;)
         {
             {
-              scheduler::critical_section cs; // ----- Critical section -----
+              scheduler::critical_section scs; // ----- Critical section -----
 
               res = _try_lock (&crt_thread);
               if (res != EWOULDBLOCK)
@@ -945,7 +945,7 @@ namespace os
 
       thread* crt_thread = &this_thread::thread ();
 
-      scheduler::critical_section cs; // ----- Critical section -----
+      scheduler::critical_section scs; // ----- Critical section -----
 
       if (owner_ == crt_thread)
         {
@@ -1148,7 +1148,7 @@ namespace os
 
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
-      scheduler::critical_section cs; // ----- Critical section -----
+      scheduler::critical_section scs; // ----- Critical section -----
 
       _init ();
       return result::ok;
