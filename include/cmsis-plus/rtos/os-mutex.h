@@ -90,7 +90,7 @@ namespace os
               inherit = 1,
 
               /**
-               * @brief Execute at the highest priority (TODO: implement)
+               * @brief Execute at the highest priority.
                */
               protect = 2
         };
@@ -120,6 +120,7 @@ namespace os
                * @brief Normal robustness.
                */
               stalled = 0,
+
               /**
                * @brief Enhanced robustness at thread termination.
                */

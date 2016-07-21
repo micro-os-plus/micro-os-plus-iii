@@ -64,6 +64,7 @@ namespace os
       extern bool is_started_;
 
 #if !defined(OS_USE_RTOS_PORT_SCHEDULER)
+      extern bool is_preemptive_;
       extern thread* volatile current_thread_;
       extern ready_threads_list ready_threads_list_;
 #endif /* !defined(OS_USE_RTOS_PORT_SCHEDULER) */
@@ -129,6 +130,24 @@ namespace os
        */
       void
       unlock (status_t status);
+
+      /**
+       * @brief Check if the scheduler is in preemptive mode.
+       * @par Parameters
+       *  None
+       * @retval true The scheduler is in preemptive mode.
+       * @retval false The scheduler is not in preemptive mode.
+       */
+      bool
+      preemptive (void);
+
+      /**
+       * @brief Set the scheduler preemptive mode.
+       * @param [in] status The new status of the scheduler preemptive mode.
+       * @return The previous status of the preemptive mode.
+       */
+      bool
+      preemptive (bool status);
 
       // ----------------------------------------------------------------------
 
@@ -797,6 +816,18 @@ namespace os
       started (void)
       {
         return is_started_;
+      }
+
+      /**
+       * @details
+       * Check if the scheduler preemption is enabled.
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
+      inline bool
+      preemptive (void)
+      {
+        return is_preemptive_;
       }
 
       /**

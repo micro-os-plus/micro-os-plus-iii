@@ -328,6 +328,32 @@ os_sched_is_locked (void)
   return scheduler::locked ();
 }
 
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::scheduler::preemptive()
+ */
+bool
+os_sched_is_preemptive (void)
+{
+  return scheduler::preemptive ();
+}
+
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::scheduler::preemptive(bool)
+ */
+bool
+os_sched_set_preemptive (bool status)
+{
+  return scheduler::preemptive (status);
+}
+
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
 
 /**

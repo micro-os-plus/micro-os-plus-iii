@@ -50,6 +50,8 @@
 // Include the non-portable portable types, enums and constants declarations.
 #include <cmsis-plus/rtos/port/os-decls.h>
 
+#include <cmsis-plus/diag/trace.h>
+
 // ----------------------------------------------------------------------------
 
 #if defined(__cplusplus)
@@ -86,7 +88,7 @@ namespace os
 
     class waiting_threads_list;
     class clock_threads_list;
-    class waiting_threads_list3;
+    class terminated_threads_list;
     class clock_timestamps_list;
 
     namespace memory
@@ -659,6 +661,9 @@ namespace os
         void
         reschedule (void);
 
+        void
+        preempt (void);
+
         stack::element_t*
         switch_stacks (stack::element_t* sp);
 
@@ -878,41 +883,31 @@ extern "C"
 #define os_assert_throw(__e, __er) assert(__e)
 #endif
 
+#endif /* __cplusplus */
+
 // ----------------------------------------------------------------------------
 
+// Default definitions for various configuration macros.
+// Redefine them in `<os-app-config.h>` to the actual values.
+
 #if !defined(OS_INTEGER_SYSTICK_FREQUENCY_HZ)
-/**
- * @brief Default definition for the SysTick frequency, in Hz.
- * @details
- * Redefine it in `<os-app-config.h>` to the actual value.
- */
 #define OS_INTEGER_SYSTICK_FREQUENCY_HZ                     (1000)
 #endif
 
 // ----------------------------------------------------------------------------
 
 #if !defined(OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES)
-/**
- * @brief Default definition for the `main()` stack size, in bytes.
- * @details
- * Redefine it in `<os-app-config.h>` to the actual value.
- *
- * @note Ignored for synthetic platforms.
- */
 #define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES               (os::rtos::port::stack::default_size_bytes)
 #endif
 
 #if !defined(OS_INTEGER_RTOS_IDLE_STACK_SIZE_BYTES)
-/**
- * @brief Default definition for the idle thread stack size, in bytes.
- * @details
- * Redefine it in `<os-app-config.h>` to the actual value.
- *
- * @note Ignored for synthetic platforms.
- */
 #define OS_INTEGER_RTOS_IDLE_STACK_SIZE_BYTES               (os::rtos::port::stack::default_size_bytes)
 #endif
 
-#endif /* __cplusplus */
+#if !defined(OS_BOOL_RTOS_SCHEDULER_PREEMPTIVE)
+#define OS_BOOL_RTOS_SCHEDULER_PREEMPTIVE                   (true)
+#endif
+
+// ----------------------------------------------------------------------------
 
 #endif /* CMSIS_PLUS_RTOS_OS_DECLS_H_ */

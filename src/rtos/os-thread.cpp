@@ -812,8 +812,8 @@ namespace os
 
           state_ = state::suspended;
         }
-      port::scheduler::reschedule ();
 
+      port::scheduler::reschedule ();
     }
 
     void
@@ -841,39 +841,35 @@ namespace os
 
           assert(acquired_mutexes_ == 0);
 
-          state_ = state::terminated;
-
           func_result_ = exit_ptr;
-
         }
-
-#if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
         {
           interrupts::critical_section ics; // ----- Critical section -----
 
           // Add to a list of threads to be destroyed by the idle thread.
+          // Also set state::terminated.
           scheduler::terminated_threads_list_.link (ready_node_);
         }
+
+#if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
       port::thread::destroy_this (this);
       // Does not return if the current thread.
 
 #else
 
-        {
-          interrupts::critical_section ics; // ----- Critical section -----
-
-          // Add to a list of threads to be destroyed by the idle thread.
-          scheduler::terminated_threads_list_.link (ready_node_);
-        }
-
+      // At this point, since the thread state is no longer 'running',
+      // the thread is no longer linked in the READY list.
       port::scheduler::reschedule ();
+
+#endif
+
       assert(true);
       while (true)
         ;
-#endif
-      // Does not return.
+
+      // Definitely does not return.
     }
 
     void

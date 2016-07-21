@@ -79,7 +79,16 @@ os_systick_handler (void)
       os_rtc_handler ();
     }
 
-#endif
+#endif /* !defined(OS_INCLUDE_RTOS_REALTIME_CLOCK_DRIVER) */
+
+#if !defined(OS_USE_RTOS_PORT_SCHEDULER)
+
+  if (scheduler::is_preemptive_)
+    {
+      port::scheduler::preempt ();
+    }
+
+#endif /* !defined(OS_USE_RTOS_PORT_SCHEDULER) */
 
 #if defined(OS_TRACE_RTOS_SYSCLOCK_TICK)
   trace::putchar (',');
@@ -193,8 +202,9 @@ namespace os
       os_assert_err(!scheduler::locked (), EPERM);
 
 #if defined(OS_TRACE_RTOS_CLOCKS)
-      trace::printf ("%s(%u)\n", __func__,
-                     static_cast<unsigned int> (duration));
+      trace::printf ("%s(%u) %p %s\n", __func__,
+                     static_cast<unsigned int> (duration),
+                     &this_thread::thread (), this_thread::thread ().name ());
 #endif
 
       clock::timestamp_t timestamp = steady_now () + duration;

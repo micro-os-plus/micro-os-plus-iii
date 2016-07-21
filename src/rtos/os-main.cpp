@@ -105,8 +105,8 @@ __attribute__((weak))
 #endif
 main (int argc, char* argv[])
 {
-  trace::printf ("\nµOS++ v" OS_STRING_RTOS_IMPL_VERSION \
-                 " / CMSIS++ RTOS API v" OS_STRING_RTOS_API_VERSION ".\n");
+  trace::printf ("\nµOS++ v" OS_STRING_RTOS_IMPL_VERSION
+  " / CMSIS++ RTOS API v" OS_STRING_RTOS_API_VERSION ".\n");
   trace::printf ("Copyright (c) 2016 Liviu Ionescu.\n");
 
   port::scheduler::greeting ();

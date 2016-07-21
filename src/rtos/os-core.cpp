@@ -67,7 +67,7 @@ namespace os
        * Modified by `lock()` and restored to the previous value
        * by `unlock()`.
        */
-      status_t is_locked_ = false;
+      status_t is_locked_ = true;
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -86,7 +86,11 @@ namespace os
 #pragma GCC diagnostic pop
 
 #if !defined(OS_USE_RTOS_PORT_SCHEDULER)
+
+      bool is_preemptive_ = false;
+
       thread* volatile current_thread_;
+
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wglobal-constructors"
@@ -153,9 +157,6 @@ namespace os
         trace::printf ("scheduler::%s() \n", __func__);
 #endif
 
-        is_started_ = true;
-        is_locked_ = false;
-
         sysclock.start ();
         hrclock.start ();
 
@@ -174,7 +175,36 @@ namespace os
 
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
 
+        is_locked_ = false;
+        is_preemptive_ = OS_BOOL_RTOS_SCHEDULER_PREEMPTIVE;
+        is_started_ = true;
+
         port::scheduler::start ();
+      }
+
+      /**
+       * @details
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      bool
+      preemptive (bool status)
+      {
+#if defined(OS_TRACE_RTOS_SCHEDULER)
+        trace::printf ("scheduler::%s(%d) \n", __func__, status);
+#endif
+        os_assert_throw(!interrupts::in_handler_mode (), EPERM);
+
+        bool tmp;
+
+          {
+            interrupts::critical_section ics;
+
+            tmp = is_preemptive_;
+            is_preemptive_ = status;
+          }
+
+        return tmp;
       }
 
       /**

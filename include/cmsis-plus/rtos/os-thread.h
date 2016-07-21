@@ -1291,6 +1291,7 @@ namespace os
       friend class thread_children_list;
       friend class waiting_threads_list;
       friend class clock_timestamps_list;
+      friend class terminated_threads_list;
 
       friend class clock;
       friend class condition_variable;

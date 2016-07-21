@@ -179,6 +179,24 @@ extern "C"
   os_sched_is_locked (void);
 
   /**
+   * @brief Check if the scheduler is in preemptive mode.
+   * @par Parameters
+   *  None
+   * @retval true The scheduler is in preemptive mode.
+   * @retval false The scheduler is not in preemptive mode.
+   */
+  bool
+  os_sched_is_preemptive (void);
+
+  /**
+   * @brief Set the scheduler preemptive mode.
+   * @param [in] status The new status of the scheduler preemptive mode.
+   * @return The previous status of the preemptive mode.
+   */
+  bool
+  os_sched_set_preemptive (bool status);
+
+  /**
    * @}
    */
 

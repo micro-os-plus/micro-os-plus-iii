@@ -104,22 +104,28 @@
 #define OS_INTEGER_RTOS_CRITICAL_SECTION_INTERRUPT_PRIORITY
 
 /**
- * @brief Define the default thread stack size.
+ * @brief Define the default thread stack size, in bytes.
  */
 #define OS_INTEGER_RTOS_DEFAULT_STACK_SIZE_BYTES
 
 /**
- * @brief Define the minimum thread stack size.
+ * @brief Define the minimum thread stack size, in bytes.
  */
 #define OS_INTEGER_RTOS_DEFAULT_STACK_SIZE_BYTES
 
 /**
- * @brief Define the **main** thread stack size.
+ * @brief Define the **main** thread stack size, in bytes.
+ * @details
+ *
+ * @note Ignored for synthetic platforms.
  */
 #define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES
 
 /**
  * @brief Define the **idle** thread stack size.
+ * @details
+ *
+ * @note Ignored for synthetic platforms.
  */
 #define OS_INTEGER_RTOS_IDLE_STACK_SIZE_BYTES
 
@@ -217,6 +223,18 @@
  *  False (the stack trace starts with the first function).
  */
 #define OS_BOOL_RTOS_PORT_CONTEXT_CREATE_ZERO_LR (false)
+
+/**
+ * @brief Default definition for the preemption flag.
+ * @details
+ * This option sets the initial status of the
+ * `scheduler::preemptive()` flag. It can be changed
+ * at any time.
+ *
+ * @par Default
+ *  True (preemption is enabled).
+ */
+#define OS_BOOL_RTOS_SCHEDULER_PREEMPTIVE (true)
 
 /**
  * @brief Do not enter sleep in the idle thread.
