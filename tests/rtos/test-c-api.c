@@ -414,7 +414,7 @@ test_c_api (void)
     {
       // Custom recursive mutex, with RTC.
       os_mutex_attr_t amx4;
-      os_mutex_attr_init_recursive (&amx4);
+      os_mutex_attr_recursive_init (&amx4);
 
       amx4.clock = os_clock_get_rtclock ();
 
