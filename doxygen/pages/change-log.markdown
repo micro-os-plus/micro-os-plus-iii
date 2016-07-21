@@ -59,3 +59,15 @@ Changes, in reverse chronological order:
 * rtos/thread: rename `thread::sched_state()` -> `state()`
 * rename `os_thread_get_state()`
 
+### v6.3.4 2016-07-21
+
+* rtos/os-semaphore: remove defaults, initial value must be explicitly specified
+* doxy: re-enable Operators section
+* rtos/os-mutex: add consistent\_ & recoverable\_ flags; not yet fully functional
+* rename `recursive_attributes` -> `attributes_recursive`
+* rename `recursive_initializer` -> `initializer_recursive`
+* rename `normal_initializer` -> `initializer_normal`
+* rename `os_mutex_attr_init_recursive()` -> `os_mutex_attr_recursive_init()`
+* rtos: add `scheduler::preemptive()` & `scheduler::preemptive(bool)`
+* add `OS_BOOL_RTOS_SCHEDULER_PREEMPTIVE`
+* add `os_sched_is_preemptive()` & `os_sched_set_preemptive()`
