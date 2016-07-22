@@ -244,13 +244,13 @@ namespace os
       /**
        * @brief Type of variables holding interrupts statu codes.
        * @details
-       * Usually an integer large enough to hold the CPU status register
-       * where the interrupt status is stored.
+       * Usually an integer large enough to hold the CPU register
+       * where the interrupt priorities are stored.
        *
-       * Used to temporarily store the CPU status register
+       * Used to temporarily store the CPU register
        * during critical sections.
        */
-      using status_t = port::interrupts::status_t;
+      using state_t = port::interrupts::state_t;
 
     } /* namespace interrupts */
 
@@ -604,12 +604,12 @@ namespace os
           critical_section () = delete;
 
           // Enter an IRQ critical section
-          static rtos::interrupts::status_t
+          static rtos::interrupts::state_t
           enter (void);
 
           // Exit an IRQ critical section
           static void
-          exit (rtos::interrupts::status_t status);
+          exit (rtos::interrupts::state_t state);
 
         };
 
@@ -622,12 +622,12 @@ namespace os
           uncritical_section () = delete;
 
           // Enter an IRQ uncritical section
-          static rtos::interrupts::status_t
+          static rtos::interrupts::state_t
           enter (void);
 
           // Exit an IRQ uncritical section
           static void
-          exit (rtos::interrupts::status_t status);
+          exit (rtos::interrupts::state_t state);
 
         };
 

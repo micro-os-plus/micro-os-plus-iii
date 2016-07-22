@@ -470,13 +470,13 @@ namespace os
      */
 
     /*
-     * @var const status_t critical_section::status_
+     * @var const state_t critical_section::state_
      * @details
      * The variable is constant, after being set by the constructor no
      * further changes are possible.
      *
      * The variable type usually is an unsigned integer where
-     * the status register is saved.
+     * the priorities register is saved.
      */
 
     /**
@@ -486,10 +486,10 @@ namespace os
      */
 
     /*
-     * @var status_t lockable::status_
+     * @var state_t lockable::state_
      * @details
      * The variable type usually is an unsigned integer where
-     * the status register is saved.
+     * the priorities register is saved.
      */
 
     } /* namespace interrupts */

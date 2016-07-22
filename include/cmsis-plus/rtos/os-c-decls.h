@@ -169,17 +169,17 @@ extern "C"
   typedef os_port_scheduler_state_t os_sched_state_t;
 
   /**
-   * @brief Type of variables holding interrupts status codes.
+   * @brief Type of variables holding interrupts priority values.
    * @details
-   * Usually an integer large enough to hold the CPU status register
-   * where the interrupt status is stored.
+   * Usually an integer large enough to hold the CPU register
+   * where the interrupt priorities are stored.
    *
-   * Used to temporarily store the CPU status register
+   * Used to temporarily store the CPU register
    * during critical sections.
    *
-   * @see os::rtos::interrupts::status_t
+   * @see os::rtos::interrupts::state_t
    */
-  typedef os_port_irq_status_t os_irq_status_t;
+  typedef os_port_irq_state_t os_irq_state_t;
 
   // --------------------------------------------------------------------------
 

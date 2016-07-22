@@ -202,19 +202,19 @@ Suggestion:
 
 ```
 
-  scheduler_status_t
+  scheduler_state_t
   osSchedulerLock (void);
 
   void
-  osSchedulerUnlock (scheduler_status_t);
+  osSchedulerUnlock (scheduler_state_t);
 
   // ...
 
-  interrupts_status_t
+  interrupts_state_t
   osCriticalEnter (void);
 
   void
-  osCriticalExit (interrupts_status_t);
+  osCriticalExit (interrupts_state_t);
 
 ```
 
@@ -382,7 +382,7 @@ Suggestion:
 
 It is a good programming practice to define separate types for each different function parameter, instead of using generic `uint32_t`; done properly this usually increases readability.
 
-In [CMSIS++](http://micro-os-plus.github.io/cmsis-plus/) all types have separate definitions (for example: `clock::duration_t`, `scheduler::status_t`, `flags::mask_t`, `thread::priority_t`, and so on).
+In [CMSIS++](http://micro-os-plus.github.io/cmsis-plus/) all types have separate definitions (for example: `clock::duration_t`, `scheduler::state_t`, `flags::mask_t`, `thread::priority_t`, and so on).
 
 Suggestion:
 

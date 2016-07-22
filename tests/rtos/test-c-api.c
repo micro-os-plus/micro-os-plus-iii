@@ -176,12 +176,12 @@ test_c_api (void)
 
     {
       // Interrupts critical section
-      os_irq_status_t st;
+      os_irq_state_t st;
       st = os_irq_critical_enter ();
       // ...
         {
           // Interrupts uncritical section
-          os_irq_status_t st2;
+          os_irq_state_t st2;
           st2 = os_irq_uncritical_enter ();
           // ...
           os_irq_uncritical_exit (st2);

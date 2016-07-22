@@ -68,8 +68,8 @@ static_assert(alignof(os_flags_mask_t) == alignof(flags::mask_t), "adjust align 
 static_assert(sizeof(os_sched_state_t) == sizeof(scheduler::state_t), "adjust size of os_sched_state_t");
 static_assert(alignof(os_sched_state_t) == alignof(scheduler::state_t), "adjust align of os_sched_state_t");
 
-static_assert(sizeof(os_irq_status_t) == sizeof(interrupts::status_t), "adjust size of os_irq_status_t");
-static_assert(alignof(os_irq_status_t) == alignof(interrupts::status_t), "adjust align of os_irq_status_t");
+static_assert(sizeof(os_irq_state_t) == sizeof(interrupts::state_t), "adjust size of os_irq_state_t");
+static_assert(alignof(os_irq_state_t) == alignof(interrupts::state_t), "adjust align of os_irq_state_t");
 
 static_assert(sizeof(os_clock_timestamp_t) == sizeof(clock::timestamp_t), "adjust size of os_port_clock_timestamp_t");
 static_assert(alignof(os_clock_timestamp_t) == alignof(clock::timestamp_t), "adjust align of os_port_clock_timestamp_t");
@@ -425,7 +425,7 @@ os_irq_in_handler_mode (void)
  *
  * @see os::rtos::interrupts::critical_section::enter()
  */
-os_irq_status_t
+os_irq_state_t
 os_irq_critical_enter (void)
 {
   return interrupts::critical_section::enter ();
@@ -439,9 +439,9 @@ os_irq_critical_enter (void)
  * @see os::rtos::interrupts::critical_section::exit()
  */
 void
-os_irq_critical_exit (os_irq_status_t status)
+os_irq_critical_exit (os_irq_state_t state)
 {
-  interrupts::critical_section::exit (status);
+  interrupts::critical_section::exit (state);
 }
 
 // ----------------------------------------------------------------------------
@@ -453,7 +453,7 @@ os_irq_critical_exit (os_irq_status_t status)
  *
  * @see os::rtos::interrupts::uncritical_section::enter()
  */
-os_irq_status_t
+os_irq_state_t
 os_irq_uncritical_enter (void)
 {
   return interrupts::uncritical_section::enter ();
@@ -467,9 +467,9 @@ os_irq_uncritical_enter (void)
  * @see os::rtos::interrupts::uncritical_section::exit()
  */
 void
-os_irq_uncritical_exit (os_irq_status_t status)
+os_irq_uncritical_exit (os_irq_state_t state)
 {
-  interrupts::uncritical_section::exit (status);
+  interrupts::uncritical_section::exit (state);
 }
 
 // ----------------------------------------------------------------------------

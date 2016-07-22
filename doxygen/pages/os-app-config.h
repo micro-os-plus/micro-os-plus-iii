@@ -56,7 +56,6 @@
  */
 
 // ----------------------------------------------------------------------------
-
 /**
  * @ingroup cmsis-plus-app-config-rtos
  * @{
@@ -227,7 +226,7 @@
 /**
  * @brief Default definition for the preemption flag.
  * @details
- * This option sets the initial status of the
+ * This option sets the initial value of the
  * `scheduler::preemptive()` flag. It can be changed
  * at any time.
  *
@@ -257,7 +256,6 @@
  */
 
 // ----------------------------------------------------------------------------
-
 /**
  * @ingroup cmsis-plus-app-config-startup
  * @{
@@ -338,7 +336,6 @@
  */
 
 // ----------------------------------------------------------------------------
-
 /**
  * @ingroup cmsis-plus-app-config-lib
  * @{
@@ -361,9 +358,7 @@
  * @}
  */
 
-
 // ----------------------------------------------------------------------------
-
 /**
  * @ingroup cmsis-plus-app-config-port
  * @{
@@ -418,16 +413,13 @@
  * @}
  */
 
-
 // ----------------------------------------------------------------------------
-
 /**
  * @ingroup cmsis-plus-app-config-trace
  * @{
  */
 
 // TODO: add examples of output for each OS_TRACE_* option.
-
 /**
  * @brief Forward trace messages via the ITM/SWO.
  * @details
@@ -611,4 +603,3 @@
  */
 
 // ----------------------------------------------------------------------------
-

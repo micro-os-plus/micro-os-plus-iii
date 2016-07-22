@@ -546,18 +546,18 @@ namespace os
          * @brief Enter an interrupts critical section.
          * @par Parameters
          *  None
-         * @return The current interrupts status register.
+         * @return The previous value of the interrupts priorities register.
          */
-        static status_t
+        static state_t
         enter (void);
 
         /**
          * @brief Exit the interrupts critical section.
-         * @param status The value to restore the interrupts status register.
+         * @param state The value to restore the interrupts priorities register.
          * @return  Nothing.
          */
         static void
-        exit (status_t status);
+        exit (state_t state);
 
         /**
          * @}
@@ -575,9 +575,9 @@ namespace os
          */
 
         /**
-         * @brief Variable to store the interrupts status.
+         * @brief Variable to store the interrupts priorities register.
          */
-        const status_t status_;
+        const state_t state_;
 
         /**
          * @endcond
@@ -645,18 +645,18 @@ namespace os
          * @brief Enter interrupts uncritical section.
          * @par Parameters
          *  None
-         * @return The current interrupts status register.
+         * @return The previous value of the interrupts priority register.
          */
-        static status_t
+        static state_t
         enter (void);
 
         /**
          * @brief Exit interrupts uncritical section.
-         * @param status The value to restore the interrupts status register.
+         * @param state The value to restore the interrupts priority register.
          * @return  Nothing.
          */
         static void
-        exit (status_t status);
+        exit (state_t state);
 
         /**
          * @}
@@ -674,9 +674,9 @@ namespace os
          */
 
         /**
-         * @brief Variable to store the interrupts status.
+         * @brief Variable to store the interrupts priorities register.
          */
-        const status_t status_;
+        const state_t state_;
 
         /**
          * @endcond
@@ -784,9 +784,9 @@ namespace os
          */
 
         /**
-         * @brief Variable to store the interrupts status.
+         * @brief Variable to store the interrupts priorities register.
          */
-        status_t status_;
+        state_t state_;
 
         /**
          * @endcond
@@ -1081,7 +1081,7 @@ namespace os
       inline
       __attribute__((always_inline))
       critical_section::critical_section () :
-          status_ (enter ())
+          state_ (enter ())
       {
         ;
       }
@@ -1095,7 +1095,7 @@ namespace os
       __attribute__((always_inline))
       critical_section::~critical_section ()
       {
-        exit (status_);
+        exit (state_);
       }
 
       /**
@@ -1103,7 +1103,7 @@ namespace os
        *
        * @note Can be invoked from Interrupt Service Routines.
        */
-      inline status_t
+      inline state_t
       __attribute__((always_inline))
       critical_section::enter (void)
       {
@@ -1117,9 +1117,9 @@ namespace os
        */
       inline void
       __attribute__((always_inline))
-      critical_section::exit (status_t status)
+      critical_section::exit (state_t state)
       {
-        port::interrupts::critical_section::exit (status);
+        port::interrupts::critical_section::exit (state);
       }
 
       // ======================================================================
@@ -1132,7 +1132,7 @@ namespace os
       inline
       __attribute__((always_inline))
       uncritical_section::uncritical_section () :
-          status_ (enter ())
+          state_ (enter ())
       {
         ;
       }
@@ -1146,7 +1146,7 @@ namespace os
       __attribute__((always_inline))
       uncritical_section::~uncritical_section ()
       {
-        exit (status_);
+        exit (state_);
       }
 
       /**
@@ -1154,7 +1154,7 @@ namespace os
        *
        * @note Can be invoked from Interrupt Service Routines.
        */
-      inline status_t
+      inline state_t
       __attribute__((always_inline))
       uncritical_section::enter (void)
       {
@@ -1168,9 +1168,9 @@ namespace os
        */
       inline void
       __attribute__((always_inline))
-      uncritical_section::exit (status_t status)
+      uncritical_section::exit (state_t state)
       {
-        port::interrupts::uncritical_section::exit (status);
+        port::interrupts::uncritical_section::exit (state);
       }
 
       // ======================================================================
@@ -1182,7 +1182,7 @@ namespace os
        */
       constexpr
       lockable::lockable () :
-          status_ (port::interrupts::init_status)
+          state_ (port::interrupts::state::init)
       {
         ;
       }
@@ -1208,7 +1208,7 @@ namespace os
       __attribute__((always_inline))
       lockable::lock (void)
       {
-        status_ = critical_section::enter ();
+        state_ = critical_section::enter ();
       }
 
       /**
@@ -1222,7 +1222,7 @@ namespace os
       __attribute__((always_inline))
       lockable::try_lock (void)
       {
-        status_ = critical_section::enter ();
+        state_ = critical_section::enter ();
         return true;
       }
 
@@ -1235,7 +1235,7 @@ namespace os
       __attribute__((always_inline))
       lockable::unlock (void)
       {
-        critical_section::exit (status_);
+        critical_section::exit (state_);
       }
 
     // ========================================================================

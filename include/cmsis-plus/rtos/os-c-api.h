@@ -200,7 +200,7 @@ extern "C"
   /**
    * @brief Set the scheduler preemptive mode.
    * @param [in] state The new state of the scheduler preemptive mode.
-   * @return The previous status of the preemptive mode.
+   * @return The previous state of the preemptive mode.
    */
   bool
   os_sched_set_preemptive (bool state);
@@ -262,19 +262,19 @@ extern "C"
    * @brief Enter an interrupts critical section.
    * @par Parameters
    *  None
-   * @return The current interrupts status register.
+   * @return The previous value of the interrupts priority register.
    */
-  os_irq_status_t
+  os_irq_state_t
   os_irq_critical_enter (void);
 
   /**
    * @brief Exit the interrupts critical section.
-   * @param status The value to restore the interrupts status register.
+   * @param state The value to restore the interrupts priority register.
    * @par Returns
    *  Nothing.
    */
   void
-  os_irq_critical_exit (os_irq_status_t status);
+  os_irq_critical_exit (os_irq_state_t state);
 
   // --------------------------------------------------------------------------
 
@@ -282,19 +282,19 @@ extern "C"
    * @brief Enter an interrupts uncritical section.
    * @par Parameters
    *  None
-   * @return The current interrupts status register.
+   * @return The previous value of the interrupts priority register.
    */
-  os_irq_status_t
+  os_irq_state_t
   os_irq_uncritical_enter (void);
 
   /**
    * @brief Exit the interrupts uncritical section.
-   * @param status The value to restore the interrupts status register.
+   * @param state The value to restore the interrupts priority register.
    * @par Returns
    *  Nothing.
    */
   void
-  os_irq_uncritical_exit (os_irq_status_t status);
+  os_irq_uncritical_exit (os_irq_state_t state);
 
   /**
    * @}
