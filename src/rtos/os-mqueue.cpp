@@ -760,7 +760,7 @@ namespace os
 #endif
 
         {
-          // ----- Enter uncritical section -----
+          // ----- Enter uncritical section -----------------------------------
           interrupts::uncritical_section iucs;
 
           // Copy message from queue to user buffer.
@@ -769,8 +769,7 @@ namespace os
             {
               *mprio = prio_array_[head_];
             }
-
-          // ----- Exit uncritical section -----
+          // ----- Exit uncritical section ------------------------------------
         }
 
         {
@@ -872,12 +871,14 @@ namespace os
 #else
 
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           if (_try_send (msg, nbytes, mprio))
             {
               return result::ok;
             }
+          // ----- Exit critical section --------------------------------------
         }
 
       thread& crt_thread = this_thread::thread ();
@@ -891,7 +892,8 @@ namespace os
       for (;;)
         {
             {
-              interrupts::critical_section ics; // ----- Critical section -----
+              // ----- Enter critical section ---------------------------------
+              interrupts::critical_section ics;
 
               if (_try_send (msg, nbytes, mprio))
                 {
@@ -901,6 +903,7 @@ namespace os
               // Add this thread to the message queue send waiting list.
               scheduler::_link_node (send_list_, node);
               // state::suspended set in above link().
+              // ----- Exit critical section ----------------------------------
             }
 
           port::scheduler::reschedule ();
@@ -971,15 +974,19 @@ namespace os
 #else
       assert(port::interrupts::is_priority_valid ());
 
-      interrupts::critical_section ics; // ----- Critical section -----
+        {
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
-      if (_try_send (msg, nbytes, mprio))
-        {
-          return result::ok;
-        }
-      else
-        {
-          return EWOULDBLOCK;
+          if (_try_send (msg, nbytes, mprio))
+            {
+              return result::ok;
+            }
+          else
+            {
+              return EWOULDBLOCK;
+            }
+          // ----- Exit critical section --------------------------------------
         }
 
 #endif
@@ -1054,12 +1061,14 @@ namespace os
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           if (_try_send (msg, nbytes, mprio))
             {
               return result::ok;
             }
+          // ----- Exit critical section --------------------------------------
         }
 
       thread& crt_thread = this_thread::thread ();
@@ -1081,7 +1090,8 @@ namespace os
       for (;;)
         {
             {
-              interrupts::critical_section ics; // ----- Critical section -----
+              // ----- Enter critical section ---------------------------------
+              interrupts::critical_section ics;
 
               if (_try_send (msg, nbytes, mprio))
                 {
@@ -1093,6 +1103,7 @@ namespace os
               scheduler::_link_node (send_list_, node, clock_list,
                                      timeout_node);
               // state::suspended set in above link().
+              // ----- Exit critical section ----------------------------------
             }
 
           port::scheduler::reschedule ();
@@ -1176,12 +1187,14 @@ namespace os
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           if (_try_receive (msg, nbytes, mprio))
             {
               return result::ok;
             }
+          // ----- Exit critical section --------------------------------------
         }
 
       thread& crt_thread = this_thread::thread ();
@@ -1195,7 +1208,8 @@ namespace os
       for (;;)
         {
             {
-              interrupts::critical_section ics; // ----- Critical section -----
+              // ----- Enter critical section ---------------------------------
+              interrupts::critical_section ics;
 
               if (_try_receive (msg, nbytes, mprio))
                 {
@@ -1205,6 +1219,7 @@ namespace os
               // Add this thread to the message queue receive waiting list.
               scheduler::_link_node (receive_list_, node);
               // state::suspended set in above link().
+              // ----- Exit critical section ----------------------------------
             }
 
           port::scheduler::reschedule ();
@@ -1276,15 +1291,19 @@ namespace os
 
       assert(port::interrupts::is_priority_valid ());
 
-      interrupts::critical_section ics; // ----- Critical section -----
+        {
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
-      if (_try_receive (msg, nbytes, mprio))
-        {
-          return result::ok;
-        }
-      else
-        {
-          return EWOULDBLOCK;
+          if (_try_receive (msg, nbytes, mprio))
+            {
+              return result::ok;
+            }
+          else
+            {
+              return EWOULDBLOCK;
+            }
+          // ----- Exit critical section --------------------------------------
         }
 
 #endif
@@ -1374,12 +1393,14 @@ namespace os
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           if (_try_receive (msg, nbytes, mprio))
             {
               return result::ok;
             }
+          // ----- Exit critical section --------------------------------------
         }
 
       thread& crt_thread = this_thread::thread ();
@@ -1400,7 +1421,8 @@ namespace os
       for (;;)
         {
             {
-              interrupts::critical_section ics; // ----- Critical section -----
+              // ----- Enter critical section ---------------------------------
+              interrupts::critical_section ics;
 
               if (_try_receive (msg, nbytes, mprio))
                 {
@@ -1412,6 +1434,7 @@ namespace os
               scheduler::_link_node (receive_list_, node, clock_list,
                                      timeout_node);
               // state::suspended set in above link().
+              // ----- Exit critical section ----------------------------------
             }
 
           port::scheduler::reschedule ();
@@ -1468,10 +1491,14 @@ namespace os
 
 #else
 
-      interrupts::critical_section ics; // ----- Critical section -----
+        {
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
-      _init ();
-      return result::ok;
+          _init ();
+          return result::ok;
+          // ----- Exit critical section --------------------------------------
+        }
 
 #endif
     }

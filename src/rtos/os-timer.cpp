@@ -225,12 +225,14 @@ namespace os
 #else
 
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           if (state_ == state::running)
             {
               timer_node_.unlink ();
             }
+          // ----- Exit critical section --------------------------------------
         }
 
 #endif
@@ -271,12 +273,14 @@ namespace os
       timer_node_.timestamp = clock_->steady_now () + period;
 
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           // If started, stop.
           timer_node_.unlink ();
 
           clock_->steady_list ().link (timer_node_);
+          // ----- Exit critical section --------------------------------------
         }
       res = result::ok;
 
@@ -321,9 +325,11 @@ namespace os
 #else
 
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           timer_node_.unlink ();
+          // ----- Exit critical section --------------------------------------
         }
       res = result::ok;
 

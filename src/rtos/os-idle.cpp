@@ -62,7 +62,7 @@ os_idle (thread::func_args_t args __attribute__((unused)))
   // The CMSIS RTOS validator creates threads with `priority::idle`,
   // so, to be sure that the system idle thread has the lowest priority,
   // go one step below the idle priority.
-  this_thread::thread ().priority (thread::priority::idle-1);
+  this_thread::thread ().priority (thread::priority::idle - 1);
 #else
   this_thread::thread ().priority (thread::priority::idle);
 #endif
@@ -73,10 +73,12 @@ os_idle (thread::func_args_t args __attribute__((unused)))
         {
           waiting_thread_node* node;
             {
-              interrupts::critical_section ics; // ----- Critical section -----
+              // ----- Enter critical section ---------------------------------
+              interrupts::critical_section ics;
               node =
                   const_cast<waiting_thread_node*> (scheduler::terminated_threads_list_.head ());
               node->unlink ();
+              // ----- Exit critical section ----------------------------------
             }
           node->thread_._destroy ();
 

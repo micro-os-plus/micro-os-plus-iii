@@ -339,7 +339,8 @@ namespace os
       assert(port::interrupts::is_priority_valid ());
 
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           if (count_ >= this->max_value_)
             {
@@ -354,6 +355,7 @@ namespace os
           trace::printf ("%s() @%p %s count %u\n", __func__, this, name (),
                          count_);
 #endif
+          // ----- Exit critical section --------------------------------------
         }
 
       // Wake-up one thread.
@@ -411,12 +413,14 @@ namespace os
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           if (_try_wait ())
             {
               return result::ok;
             }
+          // ----- Exit critical section --------------------------------------
         }
 
       thread& crt_thread = this_thread::thread ();
@@ -430,7 +434,8 @@ namespace os
       for (;;)
         {
             {
-              interrupts::critical_section ics; // ----- Critical section -----
+              // ----- Enter critical section ---------------------------------
+              interrupts::critical_section ics;
 
               if (_try_wait ())
                 {
@@ -440,6 +445,7 @@ namespace os
               // Add this thread to the semaphore waiting list.
               scheduler::_link_node (list_, node);
               // state::suspended set in above link().
+              // ----- Exit critical section ----------------------------------
             }
 
           port::scheduler::reschedule ();
@@ -495,15 +501,19 @@ namespace os
 
 #else
 
-      interrupts::critical_section ics; // ----- Critical section -----
+        {
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
-      if (_try_wait ())
-        {
-          return result::ok;
-        }
-      else
-        {
-          return EWOULDBLOCK;
+          if (_try_wait ())
+            {
+              return result::ok;
+            }
+          else
+            {
+              return EWOULDBLOCK;
+            }
+          // ----- Exit critical section --------------------------------------
         }
 
 #endif
@@ -565,12 +575,14 @@ namespace os
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           if (_try_wait ())
             {
               return result::ok;
             }
+          // ----- Exit critical section --------------------------------------
         }
 
       thread& crt_thread = this_thread::thread ();
@@ -591,7 +603,8 @@ namespace os
       for (;;)
         {
             {
-              interrupts::critical_section ics; // ----- Critical section -----
+              // ----- Enter critical section ---------------------------------
+              interrupts::critical_section ics;
 
               if (_try_wait ())
                 {
@@ -602,6 +615,7 @@ namespace os
               // and the clock timeout list.
               scheduler::_link_node (list_, node, clock_list, timeout_node);
               // state::suspended set in above link().
+              // ----- Exit critical section ----------------------------------
             }
 
           port::scheduler::reschedule ();
@@ -683,10 +697,14 @@ namespace os
 
 #else
 
-      interrupts::critical_section ics; // ----- Critical section -----
+        {
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
-      _init ();
-      return result::ok;
+          _init ();
+          return result::ok;
+          // ----- Exit critical section --------------------------------------
+        }
 
 #endif
     }

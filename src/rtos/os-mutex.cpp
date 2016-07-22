@@ -509,66 +509,69 @@ namespace os
           ++(crt_thread->acquired_mutexes_);
         }
 
-      // ----- Enter uncritical section -----
-      scheduler::uncritical_section ucs;
-
-      if (saved_owner == nullptr)
         {
-          if (protocol_ == protocol::inherit)
-            {
-              // Save owner priority, in case a temporary boost
-              // will be later applied.
-              owner_prio_ = owner_->priority ();
-            }
-          else if (protocol_ == protocol::protect)
-            {
-              // Save owner priority and boost priority.
-              owner_prio_ = owner_->priority ();
-              if (prio_ceiling_ > owner_prio_)
-                {
-                  owner_->priority (prio_ceiling_);
-                }
-            }
-#if defined(OS_TRACE_RTOS_MUTEX)
-          trace::printf ("%s() @%p %s locked by %p %s\n", __func__, this,
-                         name (), crt_thread, crt_thread->name ());
-#endif
-          return result::ok;
-        }
+          // ----- Enter uncritical section -----------------------------------
+          scheduler::uncritical_section sucs;
 
-      if (saved_owner == crt_thread)
-        {
-          if (type_ == type::recursive)
+          if (saved_owner == nullptr)
             {
-              if (count_ == max_count_)
+              if (protocol_ == protocol::inherit)
                 {
-                  return EAGAIN;
+                  // Save owner priority, in case a temporary boost
+                  // will be later applied.
+                  owner_prio_ = owner_->priority ();
                 }
-              ++count_;
+              else if (protocol_ == protocol::protect)
+                {
+                  // Save owner priority and boost priority.
+                  owner_prio_ = owner_->priority ();
+                  if (prio_ceiling_ > owner_prio_)
+                    {
+                      owner_->priority (prio_ceiling_);
+                    }
+                }
 #if defined(OS_TRACE_RTOS_MUTEX)
-              trace::printf ("%s() @%p %s incr %u by %p %s\n", __func__, this,
-                             name (), count_, crt_thread, crt_thread->name ());
+              trace::printf ("%s() @%p %s locked by %p %s\n", __func__, this,
+                             name (), crt_thread, crt_thread->name ());
 #endif
               return result::ok;
             }
-          else if (type_ == type::errorcheck)
+
+          if (saved_owner == crt_thread)
             {
-              return EDEADLK;
+              if (type_ == type::recursive)
+                {
+                  if (count_ == max_count_)
+                    {
+                      return EAGAIN;
+                    }
+                  ++count_;
+#if defined(OS_TRACE_RTOS_MUTEX)
+                  trace::printf ("%s() @%p %s incr %u by %p %s\n", __func__,
+                                 this, name (), count_, crt_thread,
+                                 crt_thread->name ());
+#endif
+                  return result::ok;
+                }
+              else if (type_ == type::errorcheck)
+                {
+                  return EDEADLK;
+                }
             }
-        }
 
-      if (protocol_ == protocol::inherit)
-        {
-          thread::priority_t prio = crt_thread->priority ();
-          if ((prio > owner_->priority ()))
+          if (protocol_ == protocol::inherit)
             {
-              // Boost owner priority.
-              owner_->priority (prio);
+              thread::priority_t prio = crt_thread->priority ();
+              if ((prio > owner_->priority ()))
+                {
+                  // Boost owner priority.
+                  owner_->priority (prio);
+                }
             }
+
+          return EWOULDBLOCK;
+          // ----- Exit uncritical section ------------------------------------
         }
-
-      return EWOULDBLOCK;
-
       // TODO: EINVAL, EOWNERDEAD
     }
 
@@ -643,13 +646,15 @@ namespace os
 
       result_t res;
         {
-          scheduler::critical_section scs; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          scheduler::critical_section scs;
 
           res = _try_lock (&crt_thread);
           if (res != EWOULDBLOCK)
             {
               return res;
             }
+          // ----- Exit critical section --------------------------------------
         }
 
       // Prepare a list node pointing to the current thread.
@@ -661,7 +666,8 @@ namespace os
       for (;;)
         {
             {
-              scheduler::critical_section scs; // ----- Critical section -----
+              // ----- Enter critical section ---------------------------------
+              scheduler::critical_section scs;
 
               res = _try_lock (&crt_thread);
               if (res != EWOULDBLOCK)
@@ -670,12 +676,15 @@ namespace os
                 }
 
                 {
-                  interrupts::critical_section ics; // ----- Critical section -----
+                  // ----- Enter critical section -----------------------------
+                  interrupts::critical_section ics;
 
                   // Add this thread to the mutex waiting list.
                   scheduler::_link_node (list_, node);
                   // state::suspended set in above link().
+                  // ----- Exit critical section ------------------------------
                 }
+              // ----- Exit critical section ----------------------------------
             }
 
           port::scheduler::reschedule ();
@@ -758,9 +767,13 @@ namespace os
 
       thread& crt_thread = this_thread::thread ();
 
-      scheduler::critical_section scs; // ----- Critical section -----
+        {
+          // ----- Enter critical section -------------------------------------
+          scheduler::critical_section scs;
 
-      return _try_lock (&crt_thread);
+          return _try_lock (&crt_thread);
+          // ----- Exit critical section --------------------------------------
+        }
 
 #endif
     }
@@ -836,13 +849,15 @@ namespace os
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
         {
-          scheduler::critical_section scs; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          scheduler::critical_section scs;
 
           res = _try_lock (&crt_thread);
           if (res != EWOULDBLOCK)
             {
               return res;
             }
+          // ----- Exit critical section --------------------------------------
         }
 
       // Prepare a list node pointing to the current thread.
@@ -861,7 +876,8 @@ namespace os
       for (;;)
         {
             {
-              scheduler::critical_section scs; // ----- Critical section -----
+              // ----- Enter critical section ---------------------------------
+              scheduler::critical_section scs;
 
               res = _try_lock (&crt_thread);
               if (res != EWOULDBLOCK)
@@ -870,13 +886,16 @@ namespace os
                 }
 
                 {
-                  interrupts::critical_section ics; // ----- Critical section -----
+                  // ----- Enter critical section -----------------------------
+                  interrupts::critical_section ics;
 
                   // Add this thread to the mutex waiting list,
                   // and the clock timeout list.
                   scheduler::_link_node (list_, node, clock_list, timeout_node);
                   // state::suspended set in above link().
+                  // ----- Exit critical section ------------------------------
                 }
+              // ----- Exit critical section ----------------------------------
             }
 
           port::scheduler::reschedule ();
@@ -944,47 +963,50 @@ namespace os
 #else
 
       thread* crt_thread = &this_thread::thread ();
-
-      scheduler::critical_section scs; // ----- Critical section -----
-
-      if (owner_ == crt_thread)
         {
-          if ((type_ == type::recursive) && (count_ > 1))
+          // ----- Enter critical section -------------------------------------
+          scheduler::critical_section scs;
+
+          if (owner_ == crt_thread)
             {
-              --count_;
+              if ((type_ == type::recursive) && (count_ > 1))
+                {
+                  --count_;
 #if defined(OS_TRACE_RTOS_MUTEX)
-              trace::printf ("%s() @%p %s decr %u\n", __func__, this, name (),
-                             count_);
+                  trace::printf ("%s() @%p %s decr %u\n", __func__, this,
+                                 name (), count_);
 #endif
+                  return result::ok;
+                }
+
+              if ((protocol_ == protocol::inherit)
+                  || (protocol_ == protocol::protect))
+                {
+                  owner_->priority (owner_prio_);
+                }
+
+#if defined(OS_TRACE_RTOS_MUTEX)
+              trace::printf ("%s() @%p %s unlocked\n", __func__, this, name ());
+#endif
+
+              list_.resume_one ();
+              --(owner_->acquired_mutexes_);
+              owner_ = nullptr;
+              count_ = 0;
+
               return result::ok;
             }
 
-          if ((protocol_ == protocol::inherit)
-              || (protocol_ == protocol::protect))
+          // Not owner, or not locked.
+          if (type_ == type::errorcheck || type_ == type::recursive
+              || robustness_ == robustness::robust)
             {
-              owner_->priority (owner_prio_);
+              return EPERM;
             }
 
-#if defined(OS_TRACE_RTOS_MUTEX)
-          trace::printf ("%s() @%p %s unlocked\n", __func__, this, name ());
-#endif
-
-          list_.resume_one ();
-          --(owner_->acquired_mutexes_);
-          owner_ = nullptr;
-          count_ = 0;
-
-          return result::ok;
+          return ENOTRECOVERABLE;
+          // ----- Exit critical section --------------------------------------
         }
-
-      // Not owner, or not locked.
-      if (type_ == type::errorcheck || type_ == type::recursive
-          || robustness_ == robustness::robust)
-        {
-          return EPERM;
-        }
-
-      return ENOTRECOVERABLE;
 
 #endif
     }
@@ -1148,10 +1170,15 @@ namespace os
 
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
-      scheduler::critical_section scs; // ----- Critical section -----
+        {
+          // ----- Enter critical section -------------------------------------
+          scheduler::critical_section scs;
 
-      _init ();
-      return result::ok;
+          _init ();
+          return result::ok;
+          // ----- Exit critical section --------------------------------------
+        }
+
     }
 
   // --------------------------------------------------------------------------

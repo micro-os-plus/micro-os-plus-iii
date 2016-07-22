@@ -366,7 +366,8 @@ namespace os
     {
       thread* thread;
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           // If the list is empty, silently return.
           if (empty ())
@@ -378,6 +379,7 @@ namespace os
           // so that subsequent wakeups to address different threads.
           thread = &(head ()->thread_);
           const_cast<waiting_thread_node*> (head ())->unlink ();
+          // ----- Exit critical section --------------------------------------
         }
       assert(thread != nullptr);
 
@@ -580,7 +582,8 @@ namespace os
       // iterate until a node with future time stamp is identified.
       for (;;)
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           if (empty ())
             {
@@ -599,6 +602,7 @@ namespace os
             {
               break;
             }
+          // ----- Exit critical section --------------------------------------
         }
     }
 

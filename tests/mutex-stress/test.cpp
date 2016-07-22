@@ -182,6 +182,7 @@ periodic::object_main (void)
       t += 5;
 
         {
+          // ----- Enter critical section -------------------------------------
           scheduler::critical_section scs;
 
           printf ("[%3us] ", t);
@@ -223,8 +224,7 @@ periodic::object_main (void)
 
           puts ("");
 
-          // ----- end of critical section ------------------------------------
-
+          // ----- Exit critical section --------------------------------------
         }
 
       if (seconds_ != 0 && t > seconds_)

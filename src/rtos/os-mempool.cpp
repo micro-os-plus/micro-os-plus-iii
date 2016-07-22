@@ -502,13 +502,15 @@ namespace os
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           p = _try_first ();
           if (p != nullptr)
             {
               return p;
             }
+          // ----- Exit critical section --------------------------------------
         }
 
       thread& crt_thread = this_thread::thread ();
@@ -522,7 +524,8 @@ namespace os
       for (;;)
         {
             {
-              interrupts::critical_section ics; // ----- Critical section -----
+              // ----- Enter critical section ---------------------------------
+              interrupts::critical_section ics;
 
               p = _try_first ();
               if (p != nullptr)
@@ -533,6 +536,7 @@ namespace os
               // Add this thread to the memory pool waiting list.
               scheduler::_link_node (list_, node);
               // state::suspended set in above link().
+              // ----- Exit critical section ----------------------------------
             }
 
           port::scheduler::reschedule ();
@@ -576,9 +580,14 @@ namespace os
 
       assert(port::interrupts::is_priority_valid ());
 
-      interrupts::critical_section ics; // ----- Critical section -----
+        {
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
-      return _try_first ();
+          return _try_first ();
+          // ----- Exit critical section --------------------------------------
+        }
+
     }
 
     /**
@@ -638,13 +647,15 @@ namespace os
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           p = _try_first ();
           if (p != nullptr)
             {
               return p;
             }
+          // ----- Exit critical section --------------------------------------
         }
 
       thread& crt_thread = this_thread::thread ();
@@ -665,7 +676,8 @@ namespace os
       for (;;)
         {
             {
-              interrupts::critical_section ics; // ----- Critical section -----
+              // ----- Enter critical section ---------------------------------
+              interrupts::critical_section ics;
 
               p = _try_first ();
               if (p != nullptr)
@@ -677,6 +689,7 @@ namespace os
               // and the clock timeout list.
               scheduler::_link_node (list_, node, clock_list, timeout_node);
               // state::suspended set in above link().
+              // ----- Exit critical section ----------------------------------
             }
 
           port::scheduler::reschedule ();
@@ -728,7 +741,8 @@ namespace os
         }
 
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           // Perform a push_front() on the single linked LIFO list,
           // i.e. add the block to the beginning of the list.
@@ -741,6 +755,7 @@ namespace os
           first_ = block;
 
           --count_;
+          // ----- Exit critical section --------------------------------------
         }
 
       // Wake-up one thread, if any.
@@ -765,18 +780,22 @@ namespace os
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           _init ();
+          // ----- Exit critical section --------------------------------------
         }
 
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           // Wake-up all threads, if any.
           list_.resume_all ();
 
           list_.clear ();
+          // ----- Exit critical section --------------------------------------
         }
 
       return result::ok;

@@ -300,12 +300,14 @@ namespace os
 #else
 
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           if (_try_wait (mask, oflags, mode))
             {
               return result::ok;
             }
+          // ----- Exit critical section --------------------------------------
         }
 
       thread& crt_thread = this_thread::thread ();
@@ -319,7 +321,8 @@ namespace os
       for (;;)
         {
             {
-              interrupts::critical_section ics; // ----- Critical section -----
+              // ----- Enter critical section ---------------------------------
+              interrupts::critical_section ics;
 
               if (_try_wait (mask, oflags, mode))
                 {
@@ -329,16 +332,19 @@ namespace os
               // Add this thread to the event flags waiting list.
               scheduler::_link_node (list_, node);
               // state::suspended set in above link().
+              // ----- Exit critical section ----------------------------------
             }
 
           port::scheduler::reschedule ();
 
             {
-              interrupts::critical_section ics; // ----- Critical section -----
+              // ----- Enter critical section ---------------------------------
+              interrupts::critical_section ics;
 
               // Remove the thread from the event flags waiting list,
               // if not already removed by raise().
               scheduler::_unlink_node (node);
+              // ----- Exit critical section ----------------------------------
             }
 
           if (crt_thread.interrupted ())
@@ -379,16 +385,19 @@ namespace os
 #else
 
       assert(port::interrupts::is_priority_valid ());
-
-      interrupts::critical_section ics; // ----- Critical section -----
-
-      if (_try_wait (mask, oflags, mode))
         {
-          return result::ok;
-        }
-      else
-        {
-          return EWOULDBLOCK;
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
+
+          if (_try_wait (mask, oflags, mode))
+            {
+              return result::ok;
+            }
+          else
+            {
+              return EWOULDBLOCK;
+            }
+          // ----- Exit critical section --------------------------------------
         }
 
 #endif
@@ -452,12 +461,14 @@ namespace os
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           if (_try_wait (mask, oflags, mode))
             {
               return result::ok;
             }
+          // ----- Exit critical section --------------------------------------
         }
 
       thread& crt_thread = this_thread::thread ();
@@ -478,7 +489,8 @@ namespace os
       for (;;)
         {
             {
-              interrupts::critical_section ics; // ----- Critical section -----
+              // ----- Enter critical section ---------------------------------
+              interrupts::critical_section ics;
 
               if (_try_wait (mask, oflags, mode))
                 {
@@ -489,6 +501,7 @@ namespace os
               // and the clock timeout list.
               scheduler::_link_node (list_, node, clock_list, timeout_node);
               // state::suspended set in above link().
+              // ----- Exit critical section ----------------------------------
             }
 
           port::scheduler::reschedule ();
@@ -540,7 +553,8 @@ namespace os
       assert(port::interrupts::is_priority_valid ());
 
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           flags_ |= mask;
 
@@ -548,13 +562,16 @@ namespace os
             {
               *oflags = flags_;
             }
+          // ----- Exit critical section --------------------------------------
         }
 
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           // Wake-up all threads, if any.
           list_.resume_all ();
+          // ----- Exit critical section --------------------------------------
         }
 
       return result::ok;
@@ -580,25 +597,29 @@ namespace os
 
 #else
 
-      interrupts::critical_section ics; // ----- Critical section -----
-
-      if (oflags != nullptr)
         {
-          *oflags = flags_;
-        }
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
-      if (mask == 0)
-        {
-          // Clear all flags.
-          flags_ = 0;
-        }
-      else
-        {
-          // Clear the selected bits; leave the rest untouched.
-          flags_ &= ~mask;
-        }
+          if (oflags != nullptr)
+            {
+              *oflags = flags_;
+            }
 
-      return result::ok;
+          if (mask == 0)
+            {
+              // Clear all flags.
+              flags_ = 0;
+            }
+          else
+            {
+              // Clear the selected bits; leave the rest untouched.
+              flags_ &= ~mask;
+            }
+
+          return result::ok;
+          // ----- Exit critical section --------------------------------------
+        }
 
 #endif
     }
@@ -627,23 +648,27 @@ namespace os
 
 #else
 
-      interrupts::critical_section ics; // ----- Critical section -----
-
-      if (mask == 0)
         {
-          // Return the entire mask.
-          return flags_;
-        }
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
-      flags::mask_t ret = flags_ & mask;
-      if ((mode & flags::mode::clear) != 0)
-        {
-          // Clear the selected bits; leave the rest untouched.
-          flags_ &= ~mask;
-        }
+          if (mask == 0)
+            {
+              // Return the entire mask.
+              return flags_;
+            }
 
-      // Return the selected bits.
-      return ret;
+          flags::mask_t ret = flags_ & mask;
+          if ((mode & flags::mode::clear) != 0)
+            {
+              // Clear the selected bits; leave the rest untouched.
+              flags_ &= ~mask;
+            }
+
+          // Return the selected bits.
+          return ret;
+          // ----- Exit critical section --------------------------------------
+        }
 
 #endif
     }
@@ -664,9 +689,13 @@ namespace os
 
       assert(port::interrupts::is_priority_valid ());
 
-      interrupts::critical_section ics; // ----- Critical section -----
+        {
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
-      return !list_.empty ();
+          return !list_.empty ();
+          // ----- Exit critical section --------------------------------------
+        }
 
 #endif
     }

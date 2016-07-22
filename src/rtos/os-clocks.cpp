@@ -59,10 +59,12 @@ os_systick_handler (void)
 #endif
 
     {
-      interrupts::critical_section ics; // ----- Critical section -----
+      // ----- Enter critical section -----------------------------------------
+      interrupts::critical_section ics;
 
       sysclock._increment_count ();
       hrclock._increment_count ();
+      // ----- Exit critical section ------------------------------------------
     }
   sysclock._check_timestamps ();
   hrclock._check_timestamps ();
@@ -113,9 +115,11 @@ os_rtc_handler (void)
 #endif
 
     {
-      interrupts::critical_section ics; // ----- Critical section -----
+      // ----- Enter critical section -----------------------------------------
+      interrupts::critical_section ics;
 
       rtclock._increment_count ();
+      // ----- Exit critical section ------------------------------------------
     }
 
   rtclock._check_timestamps ();
@@ -167,10 +171,12 @@ namespace os
     clock::timestamp_t
     clock::now (void)
     {
-      // Prevent inconsistent values.
-      interrupts::critical_section ics; // ----- Critical section -----
+      // ----- Enter critical section -----------------------------------------
+      interrupts::critical_section ics;
 
+      // Prevent inconsistent values using the critical section.
       return steady_count_;
+      // ----- Exit critical section ------------------------------------------
     }
 
     /**
@@ -181,10 +187,12 @@ namespace os
     clock::timestamp_t
     clock::steady_now (void)
     {
-      interrupts::critical_section ics; // ----- Critical section -----
+      // ----- Enter critical section -----------------------------------------
+      interrupts::critical_section ics;
 
       // Prevent inconsistent values using the critical section.
       return steady_count_;
+      // ----- Exit critical section ------------------------------------------
     }
 
     /**
@@ -330,7 +338,8 @@ namespace os
         { timestamp, crt_thread };
 
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           // Remove this thread from the ready list, if there.
           port::this_thread::prepare_suspend ();
@@ -339,17 +348,20 @@ namespace os
           list.link (node);
           crt_thread.clock_node_ = &node;
           crt_thread.state_ = thread::state::suspended;
+          // ----- Exit critical section --------------------------------------
         }
 
       port::scheduler::reschedule ();
 
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           // Remove the thread from the clock timeout list,
           // if not already removed by the timer.
           crt_thread.clock_node_ = nullptr;
           node.unlink ();
+          // ----- Exit critical section --------------------------------------
         }
 
       return result::ok;
@@ -379,12 +391,14 @@ namespace os
     adjustable_clock::now (void)
     {
       // Prevent inconsistent values.
-      interrupts::critical_section ics; // ----- Critical section -----
+      // ----- Enter critical section -----------------------------------------
+      interrupts::critical_section ics;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-conversion"
       return steady_count_ + offset_;
 #pragma GCC diagnostic pop
+      // ----- Exit critical section ------------------------------------------
     }
 
     /**
@@ -445,6 +459,7 @@ namespace os
     clock::offset_t
     adjustable_clock::offset (offset_t value)
     {
+      // ----- Enter critical section -----------------------------------------
       interrupts::critical_section ics;
 
       offset_t tmp;
@@ -452,6 +467,7 @@ namespace os
       offset_ = value;
 
       return tmp;
+      // ----- Exit critical section ------------------------------------------
     }
 
     // ========================================================================
@@ -712,10 +728,11 @@ namespace os
     clock::timestamp_t
     clock_highres::now (void)
     {
-      // Prevent inconsistent values.
-      interrupts::critical_section ics; // ----- Critical section -----
+      // ----- Enter critical section -----------------------------------------
+      interrupts::critical_section ics;
 
       return steady_count_ + port::clock_highres::cycles_since_tick ();
+      // ----- Exit critical section ------------------------------------------
     }
 
   // --------------------------------------------------------------------------

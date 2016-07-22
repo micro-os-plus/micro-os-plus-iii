@@ -424,7 +424,8 @@ namespace os
 
         {
           // Prevent the new thread to execute before all members are set.
-          scheduler::critical_section cs; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          scheduler::critical_section scs;
 
           // Get attributes from user structure.
           prio_ = attr.th_priority;
@@ -465,7 +466,7 @@ namespace os
           resume ();
 
 #endif
-
+          // ----- Exit critical section --------------------------------------
         }
       // For just in case the new thread has higher priority.
       this_thread::yield ();
@@ -529,10 +530,12 @@ namespace os
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           state_ = state::ready;
           port::thread::resume (this);
+          // ----- Exit critical section --------------------------------------
         }
 
 #else
@@ -540,13 +543,15 @@ namespace os
       assert(port::interrupts::is_priority_valid ());
 
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           if (ready_node_.next () == nullptr)
             {
               scheduler::ready_threads_list_.link (ready_node_);
               // state::ready set in above link().
             }
+          // ----- Exit critical section --------------------------------------
         }
 
       port::scheduler::reschedule ();
@@ -615,12 +620,14 @@ namespace os
 
       if (state_ == state::ready)
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           // Remove from initial location and reinsert according
           // to new priority.
           ready_node_.unlink ();
           scheduler::ready_threads_list_.link (ready_node_);
+          // ----- Exit critical section --------------------------------------
         }
 
       // Mandatory, the priority might have been raised, the
@@ -810,12 +817,14 @@ namespace os
 #endif
 
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           // Remove this thread from the ready list, if there.
           port::this_thread::prepare_suspend ();
 
           state_ = state::suspended;
+          // ----- Exit critical section --------------------------------------
         }
 
       port::scheduler::reschedule ();
@@ -831,14 +840,17 @@ namespace os
       assert(!interrupts::in_handler_mode ());
 
         {
-          scheduler::critical_section scs; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          scheduler::critical_section scs;
 
             {
-              interrupts::critical_section ics; // ----- Critical section -----
+              // ----- Enter critical section ---------------------------------
+              interrupts::critical_section ics;
 
               ready_node_.unlink ();
 
               child_links_.unlink ();
+              // ----- Exit critical section ----------------------------------
             }
 
           assert(children_.empty ());
@@ -847,14 +859,17 @@ namespace os
           assert(acquired_mutexes_ == 0);
 
           func_result_ = exit_ptr;
+          // ----- Exit critical section --------------------------------------
         }
 
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           // Add to a list of threads to be destroyed by the idle thread.
           // Also set state::terminated.
           scheduler::terminated_threads_list_.link (ready_node_);
+          // ----- Exit critical section --------------------------------------
         }
 
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)
@@ -948,7 +963,8 @@ namespace os
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
         {
-          scheduler::critical_section scs; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          scheduler::critical_section scs;
 
           if (state_ == state::destroyed)
             {
@@ -960,7 +976,8 @@ namespace os
             }
 
             {
-              interrupts::critical_section ics; // ----- Critical section -----
+              // ----- Enter critical section ---------------------------------
+              interrupts::critical_section ics;
 
               // Remove thread from the funeral list and kill it here.
               ready_node_.unlink ();
@@ -978,6 +995,7 @@ namespace os
                 }
 
               child_links_.unlink ();
+              // ----- Exit critical section ----------------------------------
             }
 
           assert(children_.empty ());
@@ -995,7 +1013,7 @@ namespace os
 
           _destroy ();
 
-          // ----- End of critical section -----
+          // ----- Exit critical section --------------------------------------
         }
 
       return result::ok;
@@ -1019,19 +1037,22 @@ namespace os
       os_assert_err(mask != 0, EINVAL);
 
       assert(port::interrupts::is_priority_valid ());
-
-      interrupts::critical_section ics; // ----- Critical section -----
-
-      if (oflags != nullptr)
         {
-          *oflags = flags_mask_;
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
+
+          if (oflags != nullptr)
+            {
+              *oflags = flags_mask_;
+            }
+
+          flags_mask_ |= mask;
+
+          this->resume ();
+
+          return result::ok;
+          // ----- Exit critical section --------------------------------------
         }
-
-      flags_mask_ |= mask;
-
-      this->resume ();
-
-      return result::ok;
     }
 
     /**
@@ -1099,7 +1120,8 @@ namespace os
       for (;;)
         {
             {
-              interrupts::critical_section ics; // ----- Critical section -----
+              // ----- Enter critical section ---------------------------------
+              interrupts::critical_section ics;
 
               if (_try_wait (mask, oflags, mode) == result::ok)
                 {
@@ -1112,6 +1134,7 @@ namespace os
 #endif
                   return result::ok;
                 }
+              // ----- Exit critical section ----------------------------------
             }
 
           _suspend ();
@@ -1134,10 +1157,13 @@ namespace os
 #endif
 
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+        {
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
-      interrupts::critical_section ics; // ----- Critical section -----
-
-      return _try_wait (mask, oflags, mode);
+          return _try_wait (mask, oflags, mode);
+          // ----- Exit critical section --------------------------------------
+        }
     }
 
     result_t
@@ -1153,12 +1179,14 @@ namespace os
       os_assert_err(!scheduler::locked (), EPERM);
 
         {
-          interrupts::critical_section ics; // ----- Critical section -----
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
           if (_try_wait (mask, oflags, mode) == result::ok)
             {
               return result::ok;
             }
+          // ----- Exit critical section --------------------------------------
         }
 
       clock_timestamps_list& clock_list = clock_->steady_list ();
@@ -1176,7 +1204,8 @@ namespace os
       for (;;)
         {
             {
-              interrupts::critical_section ics; // ----- Critical section -----
+              // ----- Enter critical section ---------------------------------
+              interrupts::critical_section ics;
 
               if (_try_wait (mask, oflags, mode) == result::ok)
                 {
@@ -1192,17 +1221,20 @@ namespace os
               timeout_node.thread.clock_node_ = &timeout_node;
 
               state_ = state::suspended;
+              // ----- Exit critical section ----------------------------------
             }
 
           port::scheduler::reschedule ();
 
             {
-              interrupts::critical_section ics; // ----- Critical section -----
+              // ----- Enter critical section ---------------------------------
+              interrupts::critical_section ics;
 
               // Remove the thread from the clock timeout list,
               // if not already removed by the timer.
               timeout_node.thread.clock_node_ = nullptr;
               timeout_node.unlink ();
+              // ----- Exit critical section ----------------------------------
             }
 
           if (interrupted ())
@@ -1249,24 +1281,27 @@ namespace os
 #endif
 
       os_assert_err(!interrupts::in_handler_mode (), flags::all);
-
-      interrupts::critical_section ics; // ----- Critical section -----
-
-      if (mask == 0)
         {
-          // Return the entire mask.
-          return flags_mask_;
-        }
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
-      flags::mask_t ret = flags_mask_ & mask;
-      if ((mode & flags::mode::clear) != 0)
-        {
-          // Clear the selected bits; leave the rest untouched.
-          flags_mask_ &= ~mask;
-        }
+          if (mask == 0)
+            {
+              // Return the entire mask.
+              return flags_mask_;
+            }
 
-      // Return the selected bits.
-      return ret;
+          flags::mask_t ret = flags_mask_ & mask;
+          if ((mode & flags::mode::clear) != 0)
+            {
+              // Clear the selected bits; leave the rest untouched.
+              flags_mask_ &= ~mask;
+            }
+
+          // Return the selected bits.
+          return ret;
+          // ----- Exit critical section --------------------------------------
+        }
     }
 
     /**
@@ -1284,25 +1319,29 @@ namespace os
 
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
-      interrupts::critical_section ics; // ----- Critical section -----
-
-      if (oflags != nullptr)
         {
-          *oflags = flags_mask_;
-        }
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
-      if (mask == 0)
-        {
-          // Clear all flags.
-          flags_mask_ = 0;
-        }
-      else
-        {
-          // Clear the selected bits; leave the rest untouched.
-          flags_mask_ &= ~mask;
-        }
+          if (oflags != nullptr)
+            {
+              *oflags = flags_mask_;
+            }
 
-      return result::ok;
+          if (mask == 0)
+            {
+              // Clear all flags.
+              flags_mask_ = 0;
+            }
+          else
+            {
+              // Clear the selected bits; leave the rest untouched.
+              flags_mask_ &= ~mask;
+            }
+
+          return result::ok;
+          // ----- Exit critical section --------------------------------------
+        }
     }
 
     /**

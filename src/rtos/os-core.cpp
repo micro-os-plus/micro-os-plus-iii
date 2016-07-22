@@ -199,10 +199,12 @@ namespace os
         bool tmp;
 
           {
+            // ----- Enter critical section -----------------------------------
             interrupts::critical_section ics;
 
             tmp = is_preemptive_;
             is_preemptive_ = state;
+            // ----- Exit critical section ------------------------------------
           }
 
         return tmp;
@@ -302,12 +304,14 @@ namespace os
       _unlink_node (waiting_thread_node& node)
       {
           {
-            interrupts::critical_section ics; // ----- Critical section -----
+            // ----- Enter critical section -----------------------------------
+            interrupts::critical_section ics;
 
             // Remove the thread from the node waiting list,
             // if not already removed.
             node.thread_.waiting_node_ = nullptr;
             node.unlink ();
+            // ----- Exit critical section ------------------------------------
           }
       }
 
@@ -334,7 +338,8 @@ namespace os
       _unlink_node (waiting_thread_node& node,
                     timeout_thread_node& timeout_node)
       {
-        interrupts::critical_section ics; // ----- Critical section -----
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
         // Remove the thread from the clock timeout list,
         // if not already removed by the timer.
@@ -345,6 +350,7 @@ namespace os
         // if not already removed.
         node.thread_.waiting_node_ = nullptr;
         node.unlink ();
+        // ----- Exit critical section ----------------------------------------
       }
 
       // ----------------------------------------------------------------------
