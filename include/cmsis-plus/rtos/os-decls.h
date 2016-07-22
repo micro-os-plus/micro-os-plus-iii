@@ -661,9 +661,6 @@ namespace os
         void
         reschedule (void);
 
-        void
-        preempt (void);
-
         stack::element_t*
         switch_stacks (stack::element_t* sp);
 

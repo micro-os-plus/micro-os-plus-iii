@@ -83,10 +83,7 @@ os_systick_handler (void)
 
 #if !defined(OS_USE_RTOS_PORT_SCHEDULER)
 
-  if (scheduler::is_preemptive_)
-    {
-      port::scheduler::preempt ();
-    }
+  port::scheduler::reschedule ();
 
 #endif /* !defined(OS_USE_RTOS_PORT_SCHEDULER) */
 
