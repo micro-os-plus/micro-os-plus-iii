@@ -508,6 +508,12 @@
  * @brief Enable trace messages for RTOS clocks functions.
  */
 #define OS_TRACE_RTOS_CLOCKS
+
+/**
+ * @brief Enable trace messages for RTOS clocks list functions.
+ */
+#define OS_TRACE_RTOS_LISTS_CLOCKS
+
 /**
  * @brief Enable trace messages for RTOS condition variables functions.
  */

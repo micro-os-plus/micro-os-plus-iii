@@ -531,7 +531,7 @@ namespace os
       if (empty ())
         {
           // Insert at the end of the list.
-#if defined(OS_TRACE_RTOS_CLOCKS)
+#if defined(OS_TRACE_RTOS_LISTS_CLOCKS)
           trace::printf ("clock %s() empty +%u\n", __func__,
                          static_cast<uint32_t> (timestamp));
 #endif
@@ -539,7 +539,7 @@ namespace os
       else if (timestamp >= after->timestamp)
         {
           // Insert at the end of the list.
-#if defined(OS_TRACE_RTOS_CLOCKS)
+#if defined(OS_TRACE_RTOS_LISTS_CLOCKS)
           trace::printf ("clock %s() back %u +%u\n", __func__,
                          static_cast<uint32_t> (after->timestamp),
                          static_cast<uint32_t> (timestamp));
@@ -551,7 +551,7 @@ namespace os
           // and update the new head.
           after =
               static_cast<timeout_thread_node*> (const_cast<static_double_list_links *> (&head_));
-#if defined(OS_TRACE_RTOS_CLOCKS)
+#if defined(OS_TRACE_RTOS_LISTS_CLOCKS)
           trace::printf ("clock %s() front +%u %u\n", __func__,
                          static_cast<uint32_t> (timestamp),
                          static_cast<uint32_t> (head ()->timestamp));
@@ -566,7 +566,7 @@ namespace os
               after =
                   static_cast<timeout_thread_node*> (const_cast<static_double_list_links *> (after->prev ()));
             }
-#if defined(OS_TRACE_RTOS_CLOCKS)
+#if defined(OS_TRACE_RTOS_LISTS_CLOCKS)
           trace::printf ("clock %s() middle %u +%u\n", __func__,
                          static_cast<uint32_t> (after->timestamp),
                          static_cast<uint32_t> (timestamp));
@@ -605,7 +605,7 @@ namespace os
           clock::timestamp_t head_ts = head ()->timestamp;
           if (now >= head_ts)
             {
-#if defined(OS_TRACE_RTOS_CLOCKS)
+#if defined(OS_TRACE_RTOS_LISTS_CLOCKS)
               trace::printf ("%s() %u \n", __func__,
                              static_cast<uint32_t> (sysclock.now ()));
 #endif
