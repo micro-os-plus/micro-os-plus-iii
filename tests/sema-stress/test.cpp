@@ -93,7 +93,7 @@ uint32_t volatile cnt;
 uint32_t volatile delayed;
 uint32_t volatile max_delayed;
 
-semaphore sem;
+semaphore_counting sem { max_count, 0 };
 
 static void
 sema_cb (void)
@@ -135,7 +135,9 @@ sema (uint32_t cycles)
   uint32_t i;
   for (i = 0; i < max_count; ++i)
     {
-      assert(sem.timed_wait (rtos::clock_systick::frequency_hz) == result::ok);
+      result_t res = sem.timed_wait (rtos::clock_systick::frequency_hz);
+      assert(res == result::ok);
+
       trace_putchar ('-');
       assert(buf[i] == i);
       delayed++;
