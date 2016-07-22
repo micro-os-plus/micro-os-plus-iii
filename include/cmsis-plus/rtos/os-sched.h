@@ -54,11 +54,6 @@ namespace os
        */
 
       /**
-       * @brief The scheduler status.
-       */
-      extern status_t is_locked_;
-
-      /**
        * @brief Variable set to true after the scheduler is started.
        */
       extern bool is_started_;
@@ -106,30 +101,40 @@ namespace os
       started (void);
 
       /**
+       * @brief Lock the scheduler.
+       * @par Parameters
+       *  None
+       * @return The previous state of the scheduler lock.
+       */
+      state_t
+      lock (void);
+
+      /**
+       * @brief Unlock the scheduler.
+       * @par Parameters
+       *  None
+       * @return The previous state of the scheduler lock.
+       */
+      state_t
+      unlock (void);
+
+      /**
+       * @brief Lock/unlock the scheduler.
+       * @param [in] state The new state of the scheduler lock.
+       * @return The previous state of the scheduler lock.
+       */
+      state_t
+      locked (state_t state);
+
+      /**
        * @brief Check if the scheduler is locked.
        * @par Parameters
        *  None
        * @retval true The scheduler is locked.
-       * @retval false The scheduler is running (not locked).
+       * @retval false The scheduler is switching threads (not locked).
        */
       bool
       locked (void);
-
-      /**
-       * @brief Lock the scheduler.
-       * @param [in] status The new status of the scheduler (true for locked).
-       * @return The previous status of the scheduler.
-       */
-      status_t
-      lock (status_t status = true);
-
-      /**
-       * @brief Unlock the scheduler.
-       * @param [in] status The new status of the scheduler (false for unlocked).
-       * @return  Nothing.
-       */
-      void
-      unlock (status_t status);
 
       /**
        * @brief Check if the scheduler is in preemptive mode.
@@ -143,11 +148,11 @@ namespace os
 
       /**
        * @brief Set the scheduler preemptive mode.
-       * @param [in] status The new status of the scheduler preemptive mode.
-       * @return The previous status of the preemptive mode.
+       * @param [in] state The new state of the scheduler preemptive mode.
+       * @return The previous state of the preemptive mode.
        */
       bool
-      preemptive (bool status);
+      preemptive (bool state);
 
       // ----------------------------------------------------------------------
 
@@ -219,9 +224,9 @@ namespace os
          */
 
         /**
-         * @brief Variable to store the initial scheduler status.
+         * @brief Variable to store the initial scheduler state.
          */
-        const status_t status_;
+        const state_t state_;
 
         /**
          * @endcond
@@ -290,9 +295,9 @@ namespace os
          */
 
         /**
-         * @brief Variable to store the initial scheduler status.
+         * @brief Variable to store the initial scheduler state.
          */
-        const status_t status_;
+        const state_t state_;
 
         /**
          * @endcond
@@ -400,9 +405,9 @@ namespace os
          */
 
         /**
-         * @brief Variable to store the initial scheduler status.
+         * @brief Variable to store the initial scheduler state.
          */
-        status_t status_ = 0;
+        state_t state_ = 0;
 
         /**
          * @endcond
@@ -840,25 +845,68 @@ namespace os
       inline bool
       locked (void)
       {
-        return is_locked_;
+        return port::scheduler::locked ();
       }
 
       /**
        * @details
-       * Lock the scheduler and remember the initial scheduler status.
+       * Set the scheduler lock state to locked and
+       * return the previous state.
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      inline state_t
+      lock (void)
+      {
+        return port::scheduler::lock ();
+      }
+
+      /**
+       * @details
+       * Set the scheduler lock state to unlocked and
+       * return the previous state.
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      inline state_t
+      unlock (void)
+      {
+        return port::scheduler::unlock ();
+      }
+
+      /**
+       * @details
+       * Set the scheduler lock state based on the parameter and
+       * return the previous state.
+       *
+       * This allows to implement scheduler critical sections, where
+       * the scheduler is disabled and context switches are not
+       * performed.
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      inline state_t
+      locked (state_t state)
+      {
+        return port::scheduler::locked (state);
+      }
+
+      /**
+       * @details
+       * Lock the scheduler and remember the initial scheduler state.
        *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline
       critical_section::critical_section () :
-          status_ (lock ())
+          state_ (lock ())
       {
         ;
       }
 
       /**
        * @details
-       * Restore the initial scheduler status and possibly unlock
+       * Restore the initial scheduler state and possibly unlock
        * the scheduler.
        *
        * @warning Cannot be invoked from Interrupt Service Routines.
@@ -866,25 +914,25 @@ namespace os
       inline
       critical_section::~critical_section ()
       {
-        unlock (status_);
+        locked (state_);
       }
 
       /**
        * @details
-       * Lock the scheduler and remember the initial scheduler status.
+       * Lock the scheduler and remember the initial scheduler state.
        *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline
       uncritical_section::uncritical_section () :
-          status_ (lock (false))
+          state_ (unlock ())
       {
         ;
       }
 
       /**
        * @details
-       * Restore the initial scheduler status and possibly unlock
+       * Restore the initial scheduler state and possibly unlock
        * the scheduler.
        *
        * @warning Cannot be invoked from Interrupt Service Routines.
@@ -892,7 +940,7 @@ namespace os
       inline
       uncritical_section::~uncritical_section ()
       {
-        unlock (status_);
+        locked (state_);
       }
 
       /**
@@ -902,7 +950,7 @@ namespace os
        */
       constexpr
       lockable::lockable () :
-          status_ (scheduler::init_status)
+          state_ (port::scheduler::state::init)
       {
         ;
       }
@@ -926,7 +974,7 @@ namespace os
       inline void
       lockable::lock (void)
       {
-        status_ = scheduler::lock ();
+        state_ = scheduler::lock ();
       }
 
       /**
@@ -939,7 +987,7 @@ namespace os
       inline bool
       lockable::try_lock (void)
       {
-        status_ = scheduler::lock ();
+        state_ = scheduler::lock ();
         return true;
       }
 
@@ -951,7 +999,7 @@ namespace os
       inline void
       lockable::unlock (void)
       {
-        scheduler::unlock (status_);
+        scheduler::locked (state_);
       }
 
       namespace statistics

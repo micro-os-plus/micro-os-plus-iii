@@ -65,8 +65,8 @@ static_assert(alignof(os_flags_mode_t) == alignof(flags::mode_t), "adjust align 
 static_assert(sizeof(os_flags_mask_t) == sizeof(flags::mask_t), "adjust size of os_flags_mask_t");
 static_assert(alignof(os_flags_mask_t) == alignof(flags::mask_t), "adjust align of os_flags_mask_t");
 
-static_assert(sizeof(os_sched_status_t) == sizeof(scheduler::status_t), "adjust size of os_sched_status_t");
-static_assert(alignof(os_sched_status_t) == alignof(scheduler::status_t), "adjust align of os_sched_status_t");
+static_assert(sizeof(os_sched_state_t) == sizeof(scheduler::state_t), "adjust size of os_sched_state_t");
+static_assert(alignof(os_sched_state_t) == alignof(scheduler::state_t), "adjust align of os_sched_state_t");
 
 static_assert(sizeof(os_irq_status_t) == sizeof(interrupts::status_t), "adjust size of os_irq_status_t");
 static_assert(alignof(os_irq_status_t) == alignof(interrupts::status_t), "adjust align of os_irq_status_t");
@@ -296,10 +296,10 @@ os_sched_is_started (void)
  *
  * @see os::rtos::scheduler::lock()
  */
-os_sched_status_t
-os_sched_lock (os_sched_status_t status)
+os_sched_state_t
+os_sched_lock (void)
 {
-  return scheduler::lock (status);
+  return scheduler::lock ();
 }
 
 /**
@@ -309,10 +309,23 @@ os_sched_lock (os_sched_status_t status)
  *
  * @see os::rtos::scheduler::unlock()
  */
-void
-os_sched_unlock (os_sched_status_t status)
+os_sched_state_t
+os_sched_unlock (void)
 {
-  scheduler::unlock (status);
+  return scheduler::unlock ();
+}
+
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::scheduler::lock()
+ */
+os_sched_state_t
+os_sched_set_locked (os_sched_state_t state)
+{
+  return scheduler::locked (state);
 }
 
 /**
@@ -349,9 +362,9 @@ os_sched_is_preemptive (void)
  * @see os::rtos::scheduler::preemptive(bool)
  */
 bool
-os_sched_set_preemptive (bool status)
+os_sched_set_preemptive (bool state)
 {
-  return scheduler::preemptive (status);
+  return scheduler::preemptive (state);
 }
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)

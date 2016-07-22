@@ -60,14 +60,16 @@ namespace os
        * No further changes allowed, the scheduler cannot be stopped,
        * in can be only locked.
        */
-      status_t is_started_ = false;
+      bool is_started_ = false;
 
+#if 0
       /**
        * @details
-       * Modified by `lock()` and restored to the previous value
-       * by `unlock()`.
+       * Modified by `lock()`/`unlock()` and restored to the previous value
+       * by `locked(state_t)`.
        */
-      status_t is_locked_ = true;
+      state_t lock_state_ = state::init;
+#endif
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -175,7 +177,6 @@ namespace os
 
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
 
-        is_locked_ = false;
         is_preemptive_ = OS_BOOL_RTOS_SCHEDULER_PREEMPTIVE;
         is_started_ = true;
 
@@ -188,10 +189,10 @@ namespace os
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       bool
-      preemptive (bool status)
+      preemptive (bool state)
       {
 #if defined(OS_TRACE_RTOS_SCHEDULER)
-        trace::printf ("scheduler::%s(%d) \n", __func__, status);
+        trace::printf ("scheduler::%s(%d) \n", __func__, state);
 #endif
         os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
@@ -201,74 +202,10 @@ namespace os
             interrupts::critical_section ics;
 
             tmp = is_preemptive_;
-            is_preemptive_ = status;
+            is_preemptive_ = state;
           }
 
         return tmp;
-      }
-
-      /**
-       * @details
-       * Lock the scheduler (prevent it for doing thread switches) and
-       * return the previous status, to be restored by `unlock()`.
-       *
-       * @warning Cannot be invoked from Interrupt Service Routines.
-       */
-      status_t
-      lock (status_t status)
-      {
-#if defined(OS_TRACE_RTOS_SCHEDULER)
-        trace::printf ("scheduler::%s(%d) \n", __func__, status);
-#endif
-        os_assert_throw(!interrupts::in_handler_mode (), EPERM);
-
-        status_t tmp;
-
-          {
-            interrupts::critical_section ics;
-
-            tmp = is_locked_;
-            is_locked_ = status;
-          }
-
-        if (tmp != status)
-          {
-            port::scheduler::lock (status);
-          }
-
-        return tmp;
-      }
-
-      /**
-       * @details
-       * Actually restore the scheduler status based on the given
-       * parameter, usually returned by a `lock()`. This allows for
-       * embedded critical sections to preserve the locked status
-       * until the outer one completes and invokes `unlock()`.
-       *
-       * @warning Cannot be invoked from Interrupt Service Routines.
-       */
-      void
-      unlock (status_t status)
-      {
-#if defined(OS_TRACE_RTOS_SCHEDULER)
-        trace::printf ("scheduler::%s(%d) \n", __func__, status);
-#endif
-        os_assert_throw(!interrupts::in_handler_mode (), EPERM);
-
-        status_t tmp;
-
-          {
-            interrupts::critical_section ics;
-
-            tmp = is_locked_;
-            is_locked_ = status;
-          }
-
-        if (tmp != status)
-          {
-            port::scheduler::lock (status);
-          }
       }
 
       /**
@@ -325,7 +262,7 @@ namespace os
      */
 
     /*
-     * @var const status_t critical_section::status_
+     * @var const state_t critical_section::state_
      * @details
      * The variable is constant, after being set by the constructor no
      * further changes are possible.
@@ -338,13 +275,6 @@ namespace os
      * @class lockable
      * @details
      * Locker meeting the standard `Lockable` requirements (30.2.5.3).
-     */
-
-    /*
-     * @var status_t lockable::status_
-     * @details
-     * The variable type usually is a `bool`, but a counter is also
-     * possible if the scheduler uses a recursive lock.
      */
 
     } /* namespace scheduler */

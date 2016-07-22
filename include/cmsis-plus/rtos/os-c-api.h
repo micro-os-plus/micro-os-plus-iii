@@ -153,27 +153,36 @@ extern "C"
 
   /**
    * @brief Lock the scheduler.
-   * @param [in] status The new status of the scheduler (true for locked).
-   * @return The previous status of the scheduler.
+   * @par Parameters
+   *  None
+   * @return The previous state of the scheduler lock.
    */
-  os_sched_status_t
-  os_sched_lock (os_sched_status_t status);
+  os_sched_state_t
+  os_sched_lock (void);
 
   /**
    * @brief Unlock the scheduler.
-   * @param [in] status The new status of the scheduler (false for unlocked).
-   * @par Returns
-   *  Nothing.
+   * @par Parameters
+   *  None
+   * @return The previous state of the scheduler lock.
    */
-  void
-  os_sched_unlock (os_sched_status_t status);
+  os_sched_state_t
+  os_sched_unlock (void);
+
+  /**
+   * @brief Lock/unlock the scheduler.
+   * @param [in] state The new state of the scheduler lock.
+   * @return The previous state of the scheduler lock.
+   */
+  os_sched_state_t
+  os_sched_set_locked (os_sched_state_t state);
 
   /**
    * @brief Check if the scheduler is locked.
    * @par Parameters
    *  None
    * @retval true The scheduler is locked.
-   * @retval false The scheduler is running (not locked).
+   * @retval false The scheduler is switching threads (not locked).
    */
   bool
   os_sched_is_locked (void);
@@ -190,11 +199,11 @@ extern "C"
 
   /**
    * @brief Set the scheduler preemptive mode.
-   * @param [in] status The new status of the scheduler preemptive mode.
+   * @param [in] state The new state of the scheduler preemptive mode.
    * @return The previous status of the preemptive mode.
    */
   bool
-  os_sched_set_preemptive (bool status);
+  os_sched_set_preemptive (bool state);
 
   /**
    * @}

@@ -158,15 +158,15 @@ test_c_api (void)
       // ...
         {
           // Scheduler critical section
-          os_sched_status_t st;
-          st = os_sched_lock (true);
+          os_sched_state_t st;
+          st = os_sched_lock ();
 
           // ...
           flag = os_sched_is_locked ();
           assert(flag);
 
           // ...
-          os_sched_unlock (st);
+          os_sched_set_locked (st);
         }
 
       // ...

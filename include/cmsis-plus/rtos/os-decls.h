@@ -207,23 +207,13 @@ namespace os
     namespace scheduler
     {
       /**
-       * @brief Type of variables holding scheduler status codes.
+       * @brief Type of variables holding scheduler state codes.
        * @details
        * Usually a boolean telling if the scheduler is
        * locked or not, but for recursive locks it might also be a
        * numeric counter.
        */
-      using status_t = bool;
-
-      /**
-       * @cond ignore
-       */
-
-      constexpr status_t init_status = false;
-
-    /**
-     * @endcond
-     */
+      using state_t = port::scheduler::state_t;
 
     } /* namespace scheduler */
 
@@ -655,8 +645,17 @@ namespace os
         [[noreturn]] void
         start (void);
 
-        void
-        lock (rtos::scheduler::status_t status);
+        port::scheduler::state_t
+        lock (void);
+
+        port::scheduler::state_t
+        unlock (void);
+
+        port::scheduler::state_t
+        locked (port::scheduler::state_t state);
+
+        bool
+        locked (void);
 
         void
         reschedule (void);

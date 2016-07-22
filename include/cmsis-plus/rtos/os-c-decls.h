@@ -158,15 +158,15 @@ extern "C"
   // --------------------------------------------------------------------------
 
   /**
-   * @brief Type of variables holding scheduler status codes.
+   * @brief Type of variables holding scheduler state codes.
    * @details
    * Usually a boolean telling if the scheduler is
    * locked or not, but for recursive locks it might also be a
    * numeric counter.
    *
-   * @see os::rtos::scheduler::status_t
+   * @see os::rtos::scheduler::state_t
    */
-  typedef bool os_sched_status_t;
+  typedef os_port_scheduler_state_t os_sched_state_t;
 
   /**
    * @brief Type of variables holding interrupts status codes.
