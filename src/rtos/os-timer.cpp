@@ -175,16 +175,16 @@ namespace os
         named_object
           { name }
     {
+#if defined(OS_TRACE_RTOS_TIMER)
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
+#endif
+
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
       os_assert_throw(function != nullptr, EINVAL);
 
       type_ = attr.tm_type;
       func_ = function;
       func_args_ = args;
-
-#if defined(OS_TRACE_RTOS_TIMER)
-      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
-#endif
 
 #if !defined(OS_USE_RTOS_PORT_TIMER)
       clock_ = attr.clock != nullptr ? attr.clock : &sysclock;
@@ -246,12 +246,12 @@ namespace os
     result_t
     timer::start (clock::duration_t period)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-
 #if defined(OS_TRACE_RTOS_TIMER)
       trace::printf ("%s(%u) @%p %s\n", __func__,
                      static_cast<unsigned int> (period), this, name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
       if (period == 0)
         {
@@ -301,11 +301,11 @@ namespace os
     result_t
     timer::stop (void)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-
 #if defined(OS_TRACE_RTOS_TIMER)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
       if (state_ != state::running)
         {

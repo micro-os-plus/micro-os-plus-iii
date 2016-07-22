@@ -855,15 +855,15 @@ namespace os
     result_t
     message_queue::send (const void* msg, std::size_t nbytes, priority_t mprio)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-      os_assert_err(!scheduler::locked (), EPERM);
-      os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
-
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes, mprio,
                      this, name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
+      os_assert_err(msg != nullptr, EINVAL);
+      os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
@@ -1035,15 +1035,15 @@ namespace os
     message_queue::timed_send (const void* msg, std::size_t nbytes,
                                clock::duration_t timeout, priority_t mprio)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-      os_assert_err(!scheduler::locked (), EPERM);
-      os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
-
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%u,%u,%u) @%p %s\n", __func__, msg, nbytes, mprio,
                      timeout, this, name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
+      os_assert_err(msg != nullptr, EINVAL);
+      os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
@@ -1156,16 +1156,16 @@ namespace os
     result_t
     message_queue::receive (void* msg, std::size_t nbytes, priority_t* mprio)
     {
+#if defined(OS_TRACE_RTOS_MQUEUE)
+      trace::printf ("%s(%p,%u) @%p %s\n", __func__, msg, nbytes, this,
+                     name ());
+#endif
+
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
       os_assert_err(!scheduler::locked (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
       os_assert_err(nbytes <= max_size, EMSGSIZE);
-
-#if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s(%p,%u) @%p %s\n", __func__, msg, nbytes, this,
-                     name ());
-#endif
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
@@ -1353,16 +1353,16 @@ namespace os
     message_queue::timed_receive (void* msg, std::size_t nbytes,
                                   clock::duration_t timeout, priority_t* mprio)
     {
+#if defined(OS_TRACE_RTOS_MQUEUE)
+      trace::printf ("%s(%p,%u,%u) @%p %s\n", __func__, msg, nbytes, timeout,
+                     this, name ());
+#endif
+
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
       os_assert_err(!scheduler::locked (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
       os_assert_err(nbytes <= max_size, EMSGSIZE);
-
-#if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s(%p,%u,%u) @%p %s\n", __func__, msg, nbytes, timeout,
-                     this, name ());
-#endif
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
@@ -1456,11 +1456,11 @@ namespace os
     result_t
     message_queue::reset (void)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 

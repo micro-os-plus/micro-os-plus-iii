@@ -221,6 +221,7 @@ namespace os
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, thread, thread->name ());
 #endif
+
       thread->_exit (thread->func_ (thread->func_args_));
     }
 
@@ -593,13 +594,13 @@ namespace os
     result_t
     thread::priority (priority_t prio)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-      os_assert_err(prio < priority::error, EINVAL);
-      os_assert_err(prio != priority::none, EINVAL);
-
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s(%u) @%p %s\n", __func__, prio, this, name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(prio < priority::error, EINVAL);
+      os_assert_err(prio != priority::none, EINVAL);
 
       prio_ = prio;
 
@@ -652,11 +653,11 @@ namespace os
     result_t
     thread::detach (void)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
@@ -706,15 +707,15 @@ namespace os
     result_t
     thread::join (void** exit_ptr)
     {
+#if defined(OS_TRACE_RTOS_THREAD)
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
+
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
       os_assert_err(!scheduler::locked (), EPERM);
 
       // Fail if current thread
       assert(this != this_thread::_thread ());
-
-#if defined(OS_TRACE_RTOS_THREAD)
-      trace::printf ("%s() @%p %s\n", __func__, this, name ());
-#endif
 
       while (state_ != state::destroyed)
         {
@@ -756,11 +757,11 @@ namespace os
     result_t
     thread::cancel (void)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
       // TODO: implement according to POSIX specs.
       return result::ok;
@@ -780,6 +781,10 @@ namespace os
     bool
     thread::interrupt (bool interrupt)
     {
+#if defined(OS_TRACE_RTOS_THREAD)
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
+
       bool tmp = interrupted_;
       interrupted_ = interrupt;
 
@@ -819,11 +824,11 @@ namespace os
     void
     thread::_exit (void* exit_ptr)
     {
-      assert(!interrupts::in_handler_mode ());
-
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
+
+      assert(!interrupts::in_handler_mode ());
 
         {
           scheduler::critical_section scs; // ----- Critical section -----
@@ -936,11 +941,11 @@ namespace os
     result_t
     thread::kill (void)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
         {
           scheduler::critical_section scs; // ----- Critical section -----
@@ -1079,13 +1084,13 @@ namespace os
     thread::_flags_wait (flags::mask_t mask, flags::mask_t* oflags,
                          flags::mode_t mode)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-      os_assert_err(!scheduler::locked (), EPERM);
-
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X, %u) @%p %s 0x%X\n", __func__, mask, mode, this,
                      name (), flags_mask_);
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
 
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       clock::timestamp_t prev = clock_->now ();
@@ -1123,12 +1128,12 @@ namespace os
     thread::_flags_try_wait (flags::mask_t mask, flags::mask_t* oflags,
                              flags::mode_t mode)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X, %d) @%p %s 0x%X\n", __func__, mask, mode, this,
                      name (), flags_mask_);
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
       interrupts::critical_section ics; // ----- Critical section -----
 
@@ -1139,13 +1144,13 @@ namespace os
     thread::_flags_timed_wait (flags::mask_t mask, clock::duration_t timeout,
                                flags::mask_t* oflags, flags::mode_t mode)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-      os_assert_err(!scheduler::locked (), EPERM);
-
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X, %u, %u) @%p %s 0x%X\n", __func__, mask, mode,
                      timeout, this, name (), flags_mask_);
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
 
         {
           interrupts::critical_section ics; // ----- Critical section -----
@@ -1239,11 +1244,11 @@ namespace os
     flags::mask_t
     thread::_flags_get (flags::mask_t mask, flags::mode_t mode)
     {
-      os_assert_err(!interrupts::in_handler_mode (), flags::all);
-
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), flags::all);
 
       interrupts::critical_section ics; // ----- Critical section -----
 
@@ -1272,12 +1277,12 @@ namespace os
     result_t
     thread::_flags_clear (flags::mask_t mask, flags::mask_t* oflags)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X) @%p %s 0x%X\n", __func__, mask, this, name (),
                      flags_mask_);
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
       interrupts::critical_section ics; // ----- Critical section -----
 

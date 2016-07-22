@@ -276,6 +276,7 @@ namespace os
       trace::printf ("%s() @%p %s %u %u\n", __func__, this, this->name (),
                      blocks, block_size_bytes);
 #endif
+
       if (attr.mp_pool_address != nullptr)
         {
           // Do not use any allocator at all.
@@ -489,12 +490,12 @@ namespace os
     void*
     memory_pool::alloc (void)
     {
-      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
-      os_assert_throw(!scheduler::locked (), EPERM);
-
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
+
+      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
+      os_assert_throw(!scheduler::locked (), EPERM);
 
       void* p;
 
@@ -624,13 +625,13 @@ namespace os
     void*
     memory_pool::timed_alloc (clock::duration_t timeout)
     {
-      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
-      os_assert_throw(!scheduler::locked (), EPERM);
-
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s(%u) @%p %s\n", __func__,
                      static_cast<unsigned int> (timeout), this, name ());
 #endif
+
+      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
+      os_assert_throw(!scheduler::locked (), EPERM);
 
       void* p;
 
@@ -757,11 +758,11 @@ namespace os
     result_t
     memory_pool::reset (void)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
         {
           interrupts::critical_section ics; // ----- Critical section -----

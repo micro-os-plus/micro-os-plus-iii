@@ -169,6 +169,11 @@ namespace os
         max_value_ (max_value), //
         initial_value_ (initial_value)
     {
+#if defined(OS_TRACE_RTOS_SEMAPHORE)
+      trace::printf ("%s() @%p %s %u %u\n", __func__, this, this->name (),
+                     initial_value, max_value_);
+#endif
+
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
       // The CMSIS validator requires the max_value to be equal to
@@ -178,11 +183,6 @@ namespace os
       assert(initial_value <= max_value_);
 
       count_ = initial_value;
-
-#if defined(OS_TRACE_RTOS_SEMAPHORE)
-      trace::printf ("%s() @%p %s %u %u\n", __func__, this, this->name (),
-                     count_, max_value_);
-#endif
 
 #if !defined(OS_USE_RTOS_PORT_SEMAPHORE)
       clock_ = attr.clock != nullptr ? attr.clock : &sysclock;
@@ -395,12 +395,12 @@ namespace os
     result_t
     semaphore::wait ()
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-      os_assert_err(!scheduler::locked (), EPERM);
-
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
@@ -483,11 +483,11 @@ namespace os
     result_t
     semaphore::try_wait ()
     {
-      assert(port::interrupts::is_priority_valid ());
-
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
+
+      assert(port::interrupts::is_priority_valid ());
 
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
@@ -548,13 +548,13 @@ namespace os
     result_t
     semaphore::timed_wait (clock::duration_t timeout)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-      os_assert_err(!scheduler::locked (), EPERM);
-
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s(%u) @%p %s\n", __func__,
                      static_cast<unsigned int> (timeout), this, name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
@@ -671,6 +671,10 @@ namespace os
     result_t
     semaphore::reset (void)
     {
+#if defined(OS_TRACE_RTOS_SEMAPHORE)
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
+
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)

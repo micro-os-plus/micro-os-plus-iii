@@ -162,11 +162,11 @@ namespace os
         named_object
           { name }
     {
-      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
-
 #if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
+
+      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
 #if !defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
       clock_ = attr.clock != nullptr ? attr.clock : &sysclock;
@@ -286,12 +286,12 @@ namespace os
     event_flags::wait (flags::mask_t mask, flags::mask_t* oflags,
                        flags::mode_t mode)
     {
-      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
-      os_assert_throw(!scheduler::locked (), EPERM);
-
 #if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s() @%p %s 0x%X \n", __func__, this, name (), mask);
 #endif
+
+      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
+      os_assert_throw(!scheduler::locked (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 
@@ -436,12 +436,12 @@ namespace os
     event_flags::timed_wait (flags::mask_t mask, clock::duration_t timeout,
                              flags::mask_t* oflags, flags::mode_t mode)
     {
-      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
-      os_assert_throw(!scheduler::locked (), EPERM);
-
 #if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s() @%p %s 0x%X \n", __func__, this, name (), mask);
 #endif
+
+      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
+      os_assert_throw(!scheduler::locked (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 

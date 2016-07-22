@@ -195,14 +195,14 @@ namespace os
     result_t
     clock::sleep_for (duration_t duration)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-      os_assert_err(!scheduler::locked (), EPERM);
-
 #if defined(OS_TRACE_RTOS_CLOCKS)
       trace::printf ("%s(%u) %p %s\n", __func__,
                      static_cast<unsigned int> (duration),
                      &this_thread::thread (), this_thread::thread ().name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
 
       clock::timestamp_t timestamp = steady_now () + duration;
       for (;;)
@@ -237,12 +237,12 @@ namespace os
     result_t
     clock::sleep_until (timestamp_t timestamp)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-      os_assert_err(!scheduler::locked (), EPERM);
-
 #if defined(OS_TRACE_RTOS_CLOCKS)
       trace::printf ("%s()\n", __func__);
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
 
       for (;;)
         {
@@ -276,12 +276,12 @@ namespace os
     result_t
     clock::wait_for (duration_t timeout)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-      os_assert_err(!scheduler::locked (), EPERM);
-
 #if defined(OS_TRACE_RTOS_CLOCKS)
       trace::printf ("%s(%u)\n", __func__, static_cast<unsigned int> (timeout));
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
 
       clock::timestamp_t timestamp = steady_now () + timeout;
 
@@ -395,12 +395,12 @@ namespace os
     result_t
     adjustable_clock::sleep_until (timestamp_t timestamp)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-      os_assert_err(!scheduler::locked (), EPERM);
-
 #if defined(OS_TRACE_RTOS_CLOCKS)
       trace::printf ("%s()\n", __func__);
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
 
       for (;;)
         {

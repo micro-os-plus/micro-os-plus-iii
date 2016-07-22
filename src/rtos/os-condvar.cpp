@@ -266,12 +266,11 @@ namespace os
         named_object
           { name }
     {
-      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
-
 #if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
 
+      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
     }
 
     /**
@@ -338,11 +337,11 @@ namespace os
     result_t
     condition_variable::signal ()
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-
 #if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
       list_.resume_one ();
 
@@ -407,11 +406,11 @@ namespace os
     result_t
     condition_variable::broadcast ()
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-
 #if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
       list_.resume_all ();
 
@@ -503,12 +502,12 @@ namespace os
     result_t
     condition_variable::wait (mutex& mutex)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-      os_assert_err(!scheduler::locked (), EPERM);
-
 #if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
 
       thread& crt_thread = this_thread::thread ();
 
@@ -646,13 +645,13 @@ namespace os
     result_t
     condition_variable::timed_wait (mutex& mutex, clock::duration_t timeout)
     {
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
-      os_assert_err(!scheduler::locked (), EPERM);
-
 #if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s(%u) @%p %s\n", __func__,
                      static_cast<unsigned int> (timeout), this, name ());
 #endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(!scheduler::locked (), EPERM);
 
       thread& crt_thread = this_thread::thread ();
 

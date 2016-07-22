@@ -125,11 +125,11 @@ namespace os
       result_t
       initialize (void)
       {
-        os_assert_err(!interrupts::in_handler_mode (), EPERM);
-
 #if defined(OS_TRACE_RTOS_SCHEDULER)
         trace::printf ("scheduler::%s() \n", __func__);
 #endif
+
+        os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
@@ -153,11 +153,11 @@ namespace os
       [[noreturn]] void
       start (void)
       {
-        os_assert_throw(!interrupts::in_handler_mode (), EPERM);
-
 #if defined(OS_TRACE_RTOS_SCHEDULER)
         trace::printf ("scheduler::%s() \n", __func__);
 #endif
+
+        os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
         sysclock.start ();
         hrclock.start ();
