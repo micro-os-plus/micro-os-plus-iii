@@ -74,11 +74,11 @@ namespace
   {
     trace::dump_args (main_args.argc, main_args.argv);
 
-    int status = os_main (main_args.argc, main_args.argv);
-    trace::printf ("%s() exit = %d\n", __func__, status);
+    int code = os_main (main_args.argc, main_args.argv);
+    trace::printf ("%s() exit = %d\n", __func__, code);
     // Exit will run the atexit() and destructors, then
     // terminate gracefully.
-    std::exit (status);
+    std::exit (code);
   }
 
 // --------------------------------------------------------------------------

@@ -267,11 +267,11 @@ namespace os
      * The thread is created to execute _function_ with _args_ as its
      * sole argument. If the function returns, the effect
      * shall be as if there was an implicit call to `exit()` using
-     * the return value of function as the exit status. Note that
+     * the return value of function as the exit code. Note that
      * the thread in which `main()` was originally invoked differs
      * from this. When it returns from `main()`, the effect shall
      * be as if there was an implicit call to `exit()` using the
-     * return value of `main()` as the exit status.
+     * return value of `main()` as the exit code.
      *
      * If the attributes define a stack area (via `th_stack_address` and
      * `th_stack_size_bytes`), that stack is used, otherwise
@@ -316,11 +316,11 @@ namespace os
      * The thread is created to execute _function_ with _args_ as its
      * sole argument. If the function returns, the effect
      * shall be as if there was an implicit call to `exit()` using
-     * the return value of function as the exit status. Note that
+     * the return value of function as the exit code. Note that
      * the thread in which `main()` was originally invoked differs
      * from this. When it returns from `main()`, the effect shall
      * be as if there was an implicit call to `exit()` using the
-     * return value of `main()` as the exit status.
+     * return value of `main()` as the exit code.
      *
      * If the attributes define a stack area (via `th_stack_address` and
      * `th_stack_size_bytes`), that stack is used, otherwise

@@ -1054,9 +1054,9 @@ __posix_readlink (const char* path, char* buf, size_t bufsize)
 // ----------------------------------------------------------------------------
 
 extern "C" [[noreturn]] void
-_Exit (int status)
+_Exit (int code)
 {
-  trace_printf("%s(%d)\n", __func__, status);
+  trace_printf("%s(%d)\n", __func__, code);
 
   trace_flush();
 
@@ -1071,11 +1071,11 @@ _Exit (int status)
    Note: The RDI implementation of _kill throws away both its
    arguments.  */
   report_exception (
-      status == 0 ? ADP_Stopped_ApplicationExit : ADP_Stopped_RunTimeError);
+      code == 0 ? ADP_Stopped_ApplicationExit : ADP_Stopped_RunTimeError);
 }
 
 extern "C" void __attribute__((alias ("_Exit")))
-_exit (int status);
+_exit (int code);
 
 // ----------------------------------------------------------------------------
 
