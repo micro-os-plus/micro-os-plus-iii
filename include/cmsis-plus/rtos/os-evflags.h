@@ -193,11 +193,11 @@ namespace os
       /**
        * @brief Wait for event flags.
        * @param [in] mask The expected flags (OR-ed bit-mask);
-       *  may be zero.
+       *  if `flags::any`, any flag raised will do it.
        * @param [out] oflags Pointer where to store the current flags;
        *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
-       *  are expected, and if the flags should be cleared.
+       *  in the mask are expected, and if the flags should be cleared.
        * @retval result::ok All expected flags were raised.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINVAL The mask is outside of the permitted range.
@@ -211,11 +211,11 @@ namespace os
       /**
        * @brief Try to wait for event flags.
        * @param [in] mask The expected flags (OR-ed bit-mask);
-       *  may be zero.
+       *  if `flags::any`, any flag raised will do it.
        * @param [out] oflags Pointer where to store the current flags;
        *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
-       *  are expected, and if the flags should be cleared.
+       *  in the mask are expected, and if the flags should be cleared.
        * @retval result::ok All expected flags were raised.
        * @retval EINVAL The mask is outside of the permitted range.
        * @retval EWOULDBLOCK The expected condition did not occur.
@@ -228,11 +228,11 @@ namespace os
       /**
        * @brief Timed wait for event flags.
        * @param [in] mask The expected flags (OR-ed bit-mask);
-       *  may be zero.
+       *  if `flags::any`, any flag raised will do it.
        * @param [out] oflags Pointer where to store the current flags;
        *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
-       *  are expected, and if the flags should be cleared.
+       *  in the mask are expected, and if the flags should be cleared.
        * @param [in] timeout Timeout to wait.
        * @retval result::ok All expected flags are raised.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
@@ -261,7 +261,7 @@ namespace os
 
       /**
        * @brief Clear event flags.
-       * @param [in] mask The OR-ed flags to clear. Zero means 'all'.
+       * @param [in] mask The OR-ed flags to clear.
        * @param [out] oflags Optional pointer where to store the
        *  previous value of the flags; may be `nullptr`.
        * @retval result::ok The flags were cleared.
@@ -272,7 +272,7 @@ namespace os
 
       /**
        * @brief Get (and possibly clear) event flags.
-       * @param [in] mask The OR-ed flags to get/clear; may be zero.
+       * @param [in] mask The OR-ed flags to get/clear; can be `flags::any`.
        * @param [in] mode Mode bits to select if the flags should be
        *  cleared (the other bits are ignored).
        * @return The selected bits from the flags mask.
@@ -353,7 +353,7 @@ namespace os
       /**
        * @brief The event flags.
        */
-      flags::mask_t flags_;
+      flags::mask_t flags_mask_ = 0;
 
       /**
        * @endcond
