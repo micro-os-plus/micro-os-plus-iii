@@ -41,6 +41,8 @@
 #include <cmsis-plus/posix/dirent.h>
 #include <cmsis-plus/posix/sys/socket.h>
 
+#include "cmsis_device.h"
+
 #include <cstring>
 
 #include <cstdint>
@@ -1056,13 +1058,15 @@ __posix_readlink (const char* path, char* buf, size_t bufsize)
 extern "C" [[noreturn]] void
 _Exit (int code)
 {
-  trace_printf("%s(%d)\n", __func__, code);
+  trace_printf ("%s(%d)\n", __func__, code);
 
-  trace_flush();
+  trace_flush ();
 
-#if defined(_DEBUG)
-  // Temporarily disable it, until QEMU fix.
-  trace_dbg_bkpt();
+#if defined(DEBUG)
+  if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
+    {
+      trace_dbg_bkpt ();
+    }
 #endif
 
   /* There is only one SWI for both _exit and _kill. For _exit, call
@@ -1278,5 +1282,4 @@ initialise_monitor_handles (void)
 // ----------------------------------------------------------------------------
 
 #endif /* defined(__ARM_EABI__) */
-
 
