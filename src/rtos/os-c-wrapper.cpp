@@ -1243,13 +1243,13 @@ os_timer_attr_init (os_timer_attr_t* attr)
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
- * @see os::rtos::timer::periodic_attributes
+ * @see os::rtos::timer::attributes_periodic
  */
 void
-os_timer_attr_init_periodic (os_timer_attr_t* attr)
+os_timer_attr_periodic_init (os_timer_attr_t* attr)
 {
   assert(attr != nullptr);
-  new (attr) timer::periodic_attributes ();
+  new (attr) timer::attributes_periodic ();
 }
 
 /**
@@ -1545,6 +1545,48 @@ os_mutex_get_owner (os_mutex_t* mutex)
 {
   assert(mutex != nullptr);
   return (os_thread_t*) (reinterpret_cast<rtos::mutex&> (*mutex)).owner ();
+}
+
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::mutex::type()
+ */
+os_mutex_type_t
+os_mutex_get_type (os_mutex_t* mutex)
+{
+  assert(mutex != nullptr);
+  return (reinterpret_cast<rtos::mutex&> (*mutex)).type ();
+}
+
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::mutex::protocol()
+ */
+os_mutex_protocol_t
+os_mutex_get_protocol (os_mutex_t* mutex)
+{
+  assert(mutex != nullptr);
+  return (reinterpret_cast<rtos::mutex&> (*mutex)).protocol ();
+}
+
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @see os::rtos::mutex::robustness()
+ */
+os_mutex_robustness_t
+os_mutex_get_robustness (os_mutex_t* mutex)
+{
+  assert(mutex != nullptr);
+  return (reinterpret_cast<rtos::mutex&> (*mutex)).robustness ();
 }
 
 /**
@@ -3266,7 +3308,7 @@ osSignalWait (int32_t signals, uint32_t millisec)
 
 /**
  * @details
- * Create and initialise a mutex object.
+ * Create and initialise a mutex object instance.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
@@ -3410,7 +3452,7 @@ osMutexRelease (osMutexId mutex_id)
 
 /**
  * @details
- * Delete a mutex object. The function releases internal memory
+ * Delete a mutex object instance. The function releases internal memory
  * obtained for mutex handling. After this call the mutex_id is no
  * longer valid and cannot be used. The mutex may be created again
  * using the function osMutexCreate.
@@ -3584,7 +3626,7 @@ osSemaphoreRelease (osSemaphoreId semaphore_id)
 
 /**
  * @details
- * Delete a semaphore object. The function releases internal memory
+ * Delete a semaphore object instance. The function releases internal memory
  * obtained for semaphore handling. After this call the semaphore_id
  * is no longer valid and cannot be used. The semaphore may be created
  * again using the function osSemaphoreCreate.
@@ -3617,7 +3659,7 @@ osSemaphoreDelete (osSemaphoreId semaphore_id)
 
 /**
  * @details
- * Create and initialize a memory pool.
+ * Create and initialize a memory pool object instance.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
@@ -3729,7 +3771,7 @@ osPoolFree (osPoolId pool_id, void* block)
 
 /**
  * @details
- * Create and initialise a message queue.
+ * Create and initialise a message queue object instance.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
@@ -3947,7 +3989,7 @@ osMessageGet (osMessageQId queue_id, uint32_t millisec)
 
 /**
  * @details
- * Create and initialise a mail queue.
+ * Create and initialise a mail queue object instance.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
