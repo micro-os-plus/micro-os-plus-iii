@@ -319,7 +319,7 @@ extern "C"
    * @brief Get the current running thread.
    * @par Parameters
    *  None
-   * @return Pointer to the current running thread object.
+   * @return Pointer to the current running thread object instance.
    */
   os_thread_t*
   os_this_thread (void);
@@ -404,7 +404,7 @@ extern "C"
 
   /**
    * @brief Clear thread event flags.
-   * @param [in] mask The OR-ed flags to clear. Zero means 'all'
+   * @param [in] mask The OR-ed flags to clear.
    * @param [out] oflags Optional pointer where to store the
    *  previous flags; may be `NULL`.
    * @retval os_ok The flags were cleared.
@@ -438,7 +438,7 @@ extern "C"
 
   /**
    * @brief Initialise the thread attributes.
-   * @param [in] attr Pointer to thread attributes object.
+   * @param [in] attr Pointer to thread attributes object instance.
    * @par Returns
    *  Nothing.
    */
@@ -446,8 +446,8 @@ extern "C"
   os_thread_attr_init (os_thread_attr_t* attr);
 
   /**
-   * @brief Create a thread.
-   * @param [in] thread Pointer to thread object.
+   * @brief Create a thread object instance.
+   * @param [in] thread Pointer to thread object instance.
    * @param [in] name Thread name (may be NULL).
    * @param [in] func Pointer to thread function.
    * @param [in] args Pointer to thread function arguments (may be NULL).
@@ -462,7 +462,7 @@ extern "C"
 
   /**
    * @brief Destroy the thread.
-   * @param [in] thread Pointer to thread object.
+   * @param [in] thread Pointer to thread object instance.
    * @par Returns
    *  Nothing.
    */
@@ -471,7 +471,7 @@ extern "C"
 
   /**
    * @brief Get the thread name.
-   * @param [in] thread Pointer to thread object.
+   * @param [in] thread Pointer to thread object instance.
    * @return Null terminated string.
    */
   const char*
@@ -479,7 +479,7 @@ extern "C"
 
   /**
    * @brief Get the thread current scheduling priority.
-   * @param [in] thread Pointer to thread object.
+   * @param [in] thread Pointer to thread object instance.
    * @return The thread priority.
    */
   os_thread_prio_t
@@ -487,7 +487,7 @@ extern "C"
 
   /**
    * @brief Set the thread dynamic scheduling priority.
-   * @param [in] thread Pointer to thread object.
+   * @param [in] thread Pointer to thread object instance.
    * @param [in] prio New priority.
    * @retval os_ok The priority was set.
    * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
@@ -499,7 +499,7 @@ extern "C"
 
   /**
    * @brief Wait for thread termination.
-   * @param [in] thread Pointer to terminating thread object.
+   * @param [in] thread Pointer to terminating thread object instance.
    * @param [in] exit_ptr Pointer to thread exit value. (may be NULL).
    * @retval os_ok The thread was terminated.
    * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
@@ -509,7 +509,7 @@ extern "C"
 
   /**
    * @brief Resume the thread.
-   * @param [in] thread Pointer to thread object.
+   * @param [in] thread Pointer to thread object instance.
    * @par Returns
    *  Nothing.
    */
@@ -518,7 +518,7 @@ extern "C"
 
   /**
    * @brief Raise thread event flags.
-   * @param [in] thread Pointer to thread object.
+   * @param [in] thread Pointer to thread object instance.
    * @param [in] mask The OR-ed flags to raise.
    * @param [out] oflags Optional pointer where to store the
    *  previous flags; may be `NULL`.
@@ -532,7 +532,7 @@ extern "C"
 
   /**
    * @brief Get the thread scheduler state.
-   * @param [in] thread Pointer to thread object.
+   * @param [in] thread Pointer to thread object instance.
    * @return Thread scheduler state.
    */
   os_thread_state_t
@@ -540,7 +540,7 @@ extern "C"
 
   /**
    * @brief Get the thread user storage.
-   * @param [in] thread Pointer to thread object.
+   * @param [in] thread Pointer to thread object instance.
    * @return The address of the thread user storage.
    */
   os_thread_user_storage_t*
@@ -548,8 +548,8 @@ extern "C"
 
   /**
    * @brief Get the thread context stack.
-   * @param [in] thread Pointer to thread object.
-   * @return A pointer to the context stack object.
+   * @param [in] thread Pointer to thread object instance.
+   * @return A pointer to the context stack object instance.
    */
   os_thread_stack_t*
   os_thread_get_stack (os_thread_t* thread);
@@ -600,7 +600,7 @@ extern "C"
 
   /**
    * @brief Get the stack lowest reserved address.
-   * @param [in] stack Pointer to stack object.
+   * @param [in] stack Pointer to stack object instance.
    * @return  The address of the stack reserved area.
    */
   os_thread_stack_element_t*
@@ -608,7 +608,7 @@ extern "C"
 
   /**
    * @brief Get the top stack address.
-   * @param [in] stack Pointer to stack object.
+   * @param [in] stack Pointer to stack object instance.
    * @return The address after the last stack element.
    */
   os_thread_stack_element_t*
@@ -616,7 +616,7 @@ extern "C"
 
   /**
    * @brief Get the stack size.
-   * @param [in] stack Pointer to stack object.
+   * @param [in] stack Pointer to stack object instance.
    * @return  The stack size in bytes.
    */
   size_t
@@ -624,7 +624,7 @@ extern "C"
 
   /**
    * @brief Compute how much available stack remains.
-   * @param [in] stack Pointer to stack object.
+   * @param [in] stack Pointer to stack object instance.
    * @return Number of available bytes.
    */
   size_t
@@ -632,7 +632,7 @@ extern "C"
 
   /**
    * @brief Check if bottom magic word is still there.
-   * @param [in] stack Pointer to stack object.
+   * @param [in] stack Pointer to stack object instance.
    * @retval true  The magic word is still there.
    * @retval false  The magic word was overwritten.
    */
@@ -641,7 +641,7 @@ extern "C"
 
   /**
    * @brief Check if top magic word is still there.
-   * @param [in] stack Pointer to stack object.
+   * @param [in] stack Pointer to stack object instance.
    * @retval true  The magic word is still there.
    * @retval false  The magic word was overwritten.
    */
@@ -713,7 +713,7 @@ extern "C"
   /**
    * @brief Get the thread from the current iterator position.
    * @param [in] iterator An active iterator.
-   * @return The pointer to the thread object.
+   * @return The pointer to the thread object instance.
    */
   os_thread_t*
   os_children_threads_iter_get (os_iterator_t iterator);
@@ -747,7 +747,7 @@ extern "C"
 
   /**
    * @brief Get the clock name.
-   * @param [in] clock Pointer to clock object.
+   * @param [in] clock Pointer to clock object instance.
    * @return Null terminated string.
    */
   const char*
@@ -755,7 +755,7 @@ extern "C"
 
   /**
    * @brief Tell the current time, possibly adjusted for epoch.
-   * @param [in] clock Pointer to clock object.
+   * @param [in] clock Pointer to clock object instance.
    * @return The clock current timestamp (time units from startup
    * plus the epoch offset).
    */
@@ -764,7 +764,7 @@ extern "C"
 
   /**
    * @brief Tell the current time since startup.
-   * @param [in] clock Pointer to clock object.
+   * @param [in] clock Pointer to clock object instance.
    * @return The clock current timestamp (time units from startup).
    */
   os_clock_timestamp_t
@@ -772,7 +772,7 @@ extern "C"
 
   /**
    * @brief Sleep for a relative duration.
-   * @param [in] clock Pointer to clock object.
+   * @param [in] clock Pointer to clock object instance.
    * @param [in] duration The number of clock units
    *  (ticks or seconds) to sleep.
    * @retval ETIMEDOUT The sleep lasted the entire duration.
@@ -784,7 +784,7 @@ extern "C"
 
   /**
    * @brief Sleep until an absolute timestamp.
-   * @param [in] clock Pointer to clock object.
+   * @param [in] clock Pointer to clock object instance.
    * @param [in] timestamp The absolute moment in time, in clock units.
    * @retval ETIMEDOUT The sleep lasted the entire duration.
    * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
@@ -795,7 +795,7 @@ extern "C"
 
   /**
    * @brief Timed wait for an event.
-   * @param [in] clock Pointer to clock object.
+   * @param [in] clock Pointer to clock object instance.
    * @param [in] timeout The timeout in clock units.
    * @retval os_ok An event occurred before the timeout.
    * @retval ETIMEDOUT The wait lasted the entire duration.
@@ -807,7 +807,7 @@ extern "C"
 
   /**
    * @brief Get adjustment offset.
-   * @param [in] clock Pointer to clock object.
+   * @param [in] clock Pointer to clock object instance.
    * @return Integer value representing the offset to epoch.
    */
   os_clock_offset_t
@@ -815,7 +815,7 @@ extern "C"
 
   /**
    * @brief Set adjustment offset.
-   * @param [in] clock Pointer to clock object.
+   * @param [in] clock Pointer to clock object instance.
    * @param [in] offset Integer representing the offset to epoch (positive).
    * @return Integer value representing the previous offset to epoch.
    */
@@ -942,7 +942,7 @@ extern "C"
 
   /**
    * @brief Initialise the single shot timer attributes.
-   * @param [in] attr Pointer to timer attributes object.
+   * @param [in] attr Pointer to timer attributes object instance.
    * @par Returns
    *  Nothing.
    */
@@ -951,23 +951,23 @@ extern "C"
 
   /**
    * @brief Initialise the periodic timer attributes.
-   * @param [in] attr Pointer to timer attributes object.
+   * @param [in] attr Pointer to timer attributes object instance.
    * @par Returns
    *  Nothing.
    */
   void
-  os_timer_attr_init_periodic (os_timer_attr_t* attr);
+  os_timer_attr_periodic_init (os_timer_attr_t* attr);
 
   /**
-   * @brief Get a periodic timer attributes object.
-   * @return Pointer to timer attributes object.
+   * @brief Get a periodic timer attributes object instance.
+   * @return Pointer to timer attributes object instance.
    */
   const os_timer_attr_t*
   os_timer_attr_get_periodic (void);
 
   /**
-   * @brief Create a timer object.
-   * @param [in] timer Pointer to timer object.
+   * @brief Create a timer object instance.
+   * @param [in] timer Pointer to timer object instance.
    * @param [in] name Pointer to name.
    * @param [in] function Pointer to timer function.
    * @param [in] args Pointer to timer function arguments.
@@ -982,7 +982,7 @@ extern "C"
 
   /**
    * @brief Destroy the timer.
-   * @param [in] timer Pointer to timer object.
+   * @param [in] timer Pointer to timer object instance.
    * @par Returns
    *  Nothing.
    */
@@ -991,7 +991,7 @@ extern "C"
 
   /**
    * @brief Get the timer name.
-   * @param [in] timer Pointer to timer object.
+   * @param [in] timer Pointer to timer object instance.
    * @return Null terminated string.
    */
   const char*
@@ -999,7 +999,7 @@ extern "C"
 
   /**
    * @brief Start or restart the timer.
-   * @param [in] timer Pointer to timer object.
+   * @param [in] timer Pointer to timer object instance.
    * @param [in] period Timer period, in clock units (ticks or seconds).
    * @retval os_ok The timer has been started or restarted.
    * @retval ENOTRECOVERABLE Timer could not be started.
@@ -1010,7 +1010,7 @@ extern "C"
 
   /**
    * @brief Stop the timer.
-   * @param [in] timer Pointer to timer object.
+   * @param [in] timer Pointer to timer object instance.
    * @retval os_ok The timer has been stopped.
    * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
    * @retval EAGAIN The timer is not yet started.
@@ -1040,7 +1040,7 @@ extern "C"
 
   /**
    * @brief Initialise the mutex attributes.
-   * @param [in] attr Pointer to mutex attributes object.
+   * @param [in] attr Pointer to mutex attributes object instance.
    * @par Returns
    *  Nothing.
    */
@@ -1049,7 +1049,7 @@ extern "C"
 
   /**
    * @brief Initialise the recursive mutex attributes.
-   * @param [in] attr Pointer to mutex attributes object.
+   * @param [in] attr Pointer to mutex attributes object instance.
    * @par Returns
    *  Nothing.
    */
@@ -1057,15 +1057,15 @@ extern "C"
   os_mutex_attr_recursive_init (os_mutex_attr_t* attr);
 
   /**
-   * @brief Get a recursive mutex attributes object.
-   * @return Pointer to mutex attributes object.
+   * @brief Get a recursive mutex attributes object instance.
+   * @return Pointer to mutex attributes object instance.
    */
   const os_mutex_attr_t*
   os_mutex_attr_get_recursive (void);
 
   /**
-   * @brief Create a mutex object.
-   * @param [in] mutex Pointer to mutex object.
+   * @brief Create a mutex object instance.
+   * @param [in] mutex Pointer to mutex object instance.
    * @param [in] name Pointer to name.
    * @param [in] attr Pointer to attributes.
    * @par Returns
@@ -1076,8 +1076,8 @@ extern "C"
                    const os_mutex_attr_t* attr);
 
   /**
-   * @brief Destroy the mutex object.
-   * @param [in] mutex Pointer to mutex object.
+   * @brief Destroy the mutex object instance.
+   * @param [in] mutex Pointer to mutex object instance.
    * @par Returns
    *  Nothing.
    */
@@ -1086,15 +1086,15 @@ extern "C"
 
   /**
    * @brief Get the mutex name.
-   * @param [in] mutex Pointer to mutex object.
+   * @param [in] mutex Pointer to mutex object instance.
    * @return Null terminated string.
    */
   const char*
   os_mutex_get_name (os_mutex_t* mutex);
 
   /**
-   * @brief Lock the mutex.
-   * @param [in] mutex Pointer to mutex object.
+   * @brief Lock/acquire the mutex.
+   * @param [in] mutex Pointer to mutex object instance.
    * @retval os_ok The mutex was locked.
    * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
    * @retval ENOTRECOVERABLE The state protected by the mutex is
@@ -1102,7 +1102,7 @@ extern "C"
    * @retval EAGAIN The mutex could not be acquired because the maximum
    *  number of recursive locks for mutex has been exceeded.
    * @retval EINVAL The mutex was created with the protocol
-   *  attribute having the value PTHREAD_PRIO_PROTECT and the
+   *  attribute having the value `os_mutex_protocol_protect` and the
    *  calling thread's priority is higher than the mutex's
    *  current priority ceiling.
    * @retval EOWNERDEAD The mutex is a robust mutex and the process
@@ -1116,8 +1116,8 @@ extern "C"
   os_mutex_lock (os_mutex_t* mutex);
 
   /**
-   * @brief Try to lock the mutex.
-   * @param [in] mutex Pointer to mutex object.
+   * @brief Try to lock/acquire the mutex.
+   * @param [in] mutex Pointer to mutex object instance.
    * @retval os_ok The mutex was locked.
    * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
    * @retval ENOTRECOVERABLE The state protected by the mutex is
@@ -1125,7 +1125,7 @@ extern "C"
    * @retval EAGAIN The mutex could not be acquired because the maximum
    *  number of recursive locks for mutex has been exceeded.
    * @retval EINVAL The mutex was created with the protocol
-   *  attribute having the value PTHREAD_PRIO_PROTECT and the
+   *  attribute having the value `os_mutex_protocol_protect` and the
    *  calling thread's priority is higher than the mutex's
    *  current priority ceiling.
    * @retval EOWNERDEAD The mutex is a robust mutex and the process
@@ -1141,8 +1141,8 @@ extern "C"
   os_mutex_try_lock (os_mutex_t* mutex);
 
   /**
-   * @brief Timed attempt to lock the mutex.
-   * @param [in] mutex Pointer to mutex object.
+   * @brief Timed attempt to lock/acquire the mutex.
+   * @param [in] mutex Pointer to mutex object instance.
    * @param [in] timeout Timeout to wait, in clock units (ticks or seconds).
    * @retval os_ok The mutex was locked.
    * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
@@ -1155,8 +1155,7 @@ extern "C"
    * @retval EDEADLK The mutex type is `os_mutex_type_errorcheck`
    *  and the current thread already owns the mutex.
    * @retval EINVAL The process or thread would have blocked, and
-   *  the abstime parameter specified a nanoseconds field value
-   *  less than zero or greater than or equal to 1000 million.
+   *  the timeout parameter is invalid.
    * @retval EOWNERDEAD The mutex is a robust mutex and the process
    *  containing the previous owning thread terminated while holding
    *  the mutex lock. The mutex lock shall be acquired by the
@@ -1167,8 +1166,8 @@ extern "C"
   os_mutex_timed_lock (os_mutex_t* mutex, os_clock_duration_t timeout);
 
   /**
-   * @brief Unlock the mutex.
-   * @param [in] mutex Pointer to mutex object.
+   * @brief Unlock/release the mutex.
+   * @param [in] mutex Pointer to mutex object instance.
    * @retval os_ok The mutex was unlocked.
    * @retval EPERM Cannot be invoked from an Interrupt Service Routine;
    *  the mutex type is `os_mutex_type_errorcheck` or
@@ -1181,7 +1180,7 @@ extern "C"
 
   /**
    * @brief Get the priority ceiling of a mutex.
-   * @param [in] mutex Pointer to mutex object.
+   * @param [in] mutex Pointer to mutex object instance.
    * @return The priority ceiling.
    */
   os_thread_prio_t
@@ -1189,7 +1188,7 @@ extern "C"
 
   /**
    * @brief Change the priority ceiling of a mutex.
-   * @param [in] mutex Pointer to mutex object.
+   * @param [in] mutex Pointer to mutex object instance.
    * @param [in] prio_ceiling new priority.
    * @param [out] old_prio_ceiling pointer to location where to
    *  store the previous priority; may be `NULL`.
@@ -1202,7 +1201,7 @@ extern "C"
 
   /**
    * @brief Mark mutex as consistent.
-   * @param [in] mutex Pointer to mutex object.
+   * @param [in] mutex Pointer to mutex object instance.
    * @retval os_ok The mutex was marked as consistent.
    * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
    * @retval EINVAL The mutex object referenced by mutex is not robust
@@ -1213,15 +1212,39 @@ extern "C"
 
   /**
    * @brief Get the thread that owns the mutex.
-   * @param [in] mutex Pointer to mutex object.
+   * @param [in] mutex Pointer to mutex object instance.
    * @return Pointer to thread or `NULL` if not owned.
    */
   os_thread_t*
   os_mutex_get_owner (os_mutex_t* mutex);
 
   /**
+   * @brief Get the mutex type.
+   * @param [in] mutex Pointer to mutex object instance.
+   * @return An integer encoding the @ref os::rtos::mutex::type.
+   */
+  os_mutex_type_t
+  os_mutex_get_type (os_mutex_t* mutex);
+
+  /**
+   * @brief Get the mutex protocol.
+   * @param [in] mutex Pointer to mutex object instance.
+   * @return An integer encoding the @ref os::rtos::mutex::protocol.
+   */
+  os_mutex_protocol_t
+  os_mutex_get_protocol (os_mutex_t* mutex);
+
+  /**
+   * @brief Get the mutex robustness.
+   * @param [in] mutex Pointer to mutex object instance.
+   * @return An integer encoding the @ref os::rtos::mutex::robustness.
+   */
+  os_mutex_robustness_t
+  os_mutex_get_robustness (os_mutex_t* mutex);
+
+  /**
    * @brief Reset the mutex.
-   * @param [in] mutex Pointer to mutex object.
+   * @param [in] mutex Pointer to mutex object instance.
    * @retval os_ok The mutex was reset.
    */
   os_result_t
@@ -1248,7 +1271,7 @@ extern "C"
 
   /**
    * @brief Initialise the condition variable attributes.
-   * @param [in] attr Pointer to condition variable attributes object.
+   * @param [in] attr Pointer to condition variable attributes object instance.
    * @par Returns
    *  Nothing.
    */
@@ -1256,8 +1279,8 @@ extern "C"
   os_condvar_attr_init (os_condvar_attr_t* attr);
 
   /**
-   * @brief Create a condition variable object.
-   * @param [in] condvar Pointer to condition variable object.
+   * @brief Create a condition variable object instance.
+   * @param [in] condvar Pointer to condition variable object instance.
    * @param [in] name Pointer to name.
    * @param [in] attr Pointer to attributes.
    * @par Errors
@@ -1276,8 +1299,8 @@ extern "C"
                      const os_condvar_attr_t* attr);
 
   /**
-   * @brief Destroy the condition variable object.
-   * @param [in] condvar Pointer to condition variable object.
+   * @brief Destroy the condition variable object instance.
+   * @param [in] condvar Pointer to condition variable object instance.
    * @par Returns
    *  Nothing.
    */
@@ -1286,7 +1309,7 @@ extern "C"
 
   /**
    * @brief Get the condition variable name.
-   * @param [in] condvar Pointer to condition variable object.
+   * @param [in] condvar Pointer to condition variable object instance.
    * @return Null terminated string.
    */
   const char*
@@ -1294,7 +1317,7 @@ extern "C"
 
   /**
    * @brief Notify one thread waiting for a condition variable.
-   * @param [in] condvar Pointer to condition variable object.
+   * @param [in] condvar Pointer to condition variable object instance.
    * @retval os_ok The thread was signalled.
    * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
    * @par Errors
@@ -1305,7 +1328,7 @@ extern "C"
 
   /**
    * @brief Notify all threads waiting for a condition variable.
-   * @param [in] condvar Pointer to condition variable object.
+   * @param [in] condvar Pointer to condition variable object instance.
    * @retval os_ok All waiting threads signalled.
    * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
    * @par Errors
@@ -1316,7 +1339,7 @@ extern "C"
 
   /**
    * @brief Wait for a condition variable to be notified.
-   * @param [in] condvar Pointer to condition variable object.
+   * @param [in] condvar Pointer to condition variable object instance.
    * @param [in] mutex Pointer to the associated mutex.
    * @retval os_ok The condition change was signalled.
    * @retval EPERM Cannot be invoked from an Interrupt Service Routines,
@@ -1337,7 +1360,7 @@ extern "C"
 
   /**
    * @brief Timed wait for a condition variable to be notified.
-   * @param [in] condvar Pointer to condition variable object.
+   * @param [in] condvar Pointer to condition variable object instance.
    * @param [in] mutex Pointer to the associated mutex.
    * @param [in] timeout Timeout to wait.
    * @retval os_ok The condition change was signalled.
@@ -1380,7 +1403,7 @@ extern "C"
 
   /**
    * @brief Initialise the counting semaphore attributes.
-   * @param [in] attr Pointer to semaphore attributes object.
+   * @param [in] attr Pointer to semaphore attributes object instance.
    * @par Returns
    *  Nothing.
    */
@@ -1389,7 +1412,7 @@ extern "C"
 
   /**
    * @brief Initialise the binary semaphore attributes.
-   * @param [in] attr Pointer to semaphore attributes object.
+   * @param [in] attr Pointer to semaphore attributes object instance.
    * @param [in] initial_value Initial count value.
    * @par Returns
    *  Nothing.
@@ -1400,7 +1423,7 @@ extern "C"
 
   /**
    * @brief Initialise the counting semaphore attributes.
-   * @param [in] attr Pointer to semaphore attributes object.
+   * @param [in] attr Pointer to semaphore attributes object instance.
    * @param [in] max_value Maximum count value.
    * @param [in] initial_value Initial count value.
    */
@@ -1410,15 +1433,15 @@ extern "C"
                                    const os_semaphore_count_t initial_value);
 
   /**
-   * @brief Get a binary semaphore attributes object.
-   * @return Pointer to semaphore attributes object.
+   * @brief Get a binary semaphore attributes object instance.
+   * @return Pointer to semaphore attributes object instance.
    */
   const os_semaphore_attr_t*
   os_semaphore_attr_get_binary (void);
 
   /**
-   * @brief Create a semaphore object.
-   * @param [in] semaphore Pointer to semaphore object.
+   * @brief Create a semaphore object instance.
+   * @param [in] semaphore Pointer to semaphore object instance.
    * @param [in] name Pointer to name.
    * @param [in] attr Pointer to attributes.
    * @par Returns
@@ -1429,8 +1452,8 @@ extern "C"
                        const os_semaphore_attr_t* attr);
 
   /**
-   * @brief Create a binary semaphore object.
-   * @param [in] semaphore Pointer to semaphore object.
+   * @brief Create a binary semaphore object instance.
+   * @param [in] semaphore Pointer to semaphore object instance.
    * @param [in] name Pointer to name.
    * @param [in] initial_value Initial count value.
    * @par Returns
@@ -1441,8 +1464,8 @@ extern "C"
                               const os_semaphore_count_t initial_value);
 
   /**
-   * @brief Create a counting semaphore object.
-   * @param [in] semaphore Pointer to semaphore object.
+   * @brief Create a counting semaphore object instance.
+   * @param [in] semaphore Pointer to semaphore object instance.
    * @param [in] name Pointer to name.
    * @param [in] max_value Maximum count value.
    * @param [in] initial_value Initial count value.
@@ -1455,8 +1478,8 @@ extern "C"
                                 const os_semaphore_count_t initial_value);
 
   /**
-   * @brief Destroy the semaphore object.
-   * @param [in] semaphore Pointer to semaphore object.
+   * @brief Destroy the semaphore object instance.
+   * @param [in] semaphore Pointer to semaphore object instance.
    * @par Returns
    *  Nothing.
    */
@@ -1465,7 +1488,7 @@ extern "C"
 
   /**
    * @brief Get the semaphore name.
-   * @param [in] semaphore Pointer to semaphore object.
+   * @param [in] semaphore Pointer to semaphore object instance.
    * @return Null terminated string.
    */
   const char*
@@ -1473,7 +1496,7 @@ extern "C"
 
   /**
    * @brief Post (unlock) the semaphore.
-   * @param [in] semaphore Pointer to semaphore object.
+   * @param [in] semaphore Pointer to semaphore object instance.
    * @retval os_ok The semaphore was posted.
    * @retval EAGAIN The maximum count value was exceeded.
    * @retval ENOTRECOVERABLE The semaphore could not be posted
@@ -1484,7 +1507,7 @@ extern "C"
 
   /**
    * @brief Lock the semaphore, possibly waiting.
-   * @param [in] semaphore Pointer to semaphore object.
+   * @param [in] semaphore Pointer to semaphore object instance.
    * @retval os_ok The calling process successfully
    *  performed the semaphore lock operation.
    * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
@@ -1497,7 +1520,7 @@ extern "C"
 
   /**
    * @brief Try to lock the semaphore.
-   * @param [in] semaphore Pointer to semaphore object.
+   * @param [in] semaphore Pointer to semaphore object instance.
    * @retval os_ok The calling process successfully
    *  performed the semaphore lock operation.
    * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
@@ -1511,7 +1534,7 @@ extern "C"
 
   /**
    * @brief Timed wait to lock the semaphore.
-   * @param [in] semaphore Pointer to semaphore object.
+   * @param [in] semaphore Pointer to semaphore object instance.
    * @param [in] timeout Timeout to wait.
    * @retval os_ok The calling process successfully
    *  performed the semaphore lock operation.
@@ -1530,7 +1553,7 @@ extern "C"
 
   /**
    * @brief Get the semaphore count value.
-   * @param [in] semaphore Pointer to semaphore object.
+   * @param [in] semaphore Pointer to semaphore object instance.
    * @return The semaphore count value.
    */
   os_semaphore_count_t
@@ -1538,7 +1561,7 @@ extern "C"
 
   /**
    * @brief Reset the semaphore.
-   * @param [in] semaphore Pointer to semaphore object.
+   * @param [in] semaphore Pointer to semaphore object instance.
    * @retval os_ok The semaphore was reset.
    * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
    */
@@ -1547,7 +1570,7 @@ extern "C"
 
   /**
    * @brief Get the semaphore initial count value.
-   * @param [in] semaphore Pointer to semaphore object.
+   * @param [in] semaphore Pointer to semaphore object instance.
    * @return The numeric value set from attributes.
    */
   os_semaphore_count_t
@@ -1555,7 +1578,7 @@ extern "C"
 
   /**
    * @brief Get the semaphore maximum count value.
-   * @param [in] semaphore Pointer to semaphore object.
+   * @param [in] semaphore Pointer to semaphore object instance.
    * @return The numeric value set from attributes.
    */
   os_semaphore_count_t
@@ -1582,7 +1605,7 @@ extern "C"
 
   /**
    * @brief Initialise the memory pool attributes.
-   * @param [in] attr Pointer to memory pool attributes object.
+   * @param [in] attr Pointer to memory pool attributes object instance.
    * @par Returns
    *  Nothing.
    */
@@ -1590,8 +1613,8 @@ extern "C"
   os_mempool_attr_init (os_mempool_attr_t* attr);
 
   /**
-   * @brief Create a memory pool object.
-   * @param [in] mempool Pointer to memory pool object.
+   * @brief Create a memory pool object instance.
+   * @param [in] mempool Pointer to memory pool object instance.
    * @param [in] name Pointer to name.
    * @param [in] blocks The maximum number of items in the pool.
    * @param [in] block_size_bytes The size of an item, in bytes.
@@ -1604,8 +1627,8 @@ extern "C"
                      size_t block_size_bytes, const os_mempool_attr_t* attr);
 
   /**
-   * @brief Destroy the memory pool object.
-   * @param [in] mempool Pointer to memory pool object.
+   * @brief Destroy the memory pool object instance.
+   * @param [in] mempool Pointer to memory pool object instance.
    * @par Returns
    *  Nothing.
    */
@@ -1614,7 +1637,7 @@ extern "C"
 
   /**
    * @brief Get the memory pool name.
-   * @param [in] mempool Pointer to memory pool object.
+   * @param [in] mempool Pointer to memory pool object instance.
    * @return Null terminated string.
    */
   const char*
@@ -1622,7 +1645,7 @@ extern "C"
 
   /**
    * @brief Allocate a memory block.
-   * @param [in] mempool Pointer to memory pool object.
+   * @param [in] mempool Pointer to memory pool object instance.
    * @return Pointer to memory block, or `NULL` if interrupted.
    */
   void*
@@ -1630,7 +1653,7 @@ extern "C"
 
   /**
    * @brief Try to allocate a memory block.
-   * @param [in] mempool Pointer to memory pool object.
+   * @param [in] mempool Pointer to memory pool object instance.
    * @return Pointer to memory block, or `NULL` if no memory available.
    */
   void*
@@ -1638,7 +1661,7 @@ extern "C"
 
   /**
    * @brief Allocate a memory block with timeout.
-   * @param [in] mempool Pointer to memory pool object.
+   * @param [in] mempool Pointer to memory pool object instance.
    * @param [in] timeout Timeout to wait, in clock units (ticks or seconds).
    * @return Pointer to memory block, or `NULL` if timeout.
    */
@@ -1647,7 +1670,7 @@ extern "C"
 
   /**
    * @brief Free the memory block.
-   * @param [in] mempool Pointer to memory pool object.
+   * @param [in] mempool Pointer to memory pool object instance.
    * @param [in] block Pointer to memory block to free.
    * @retval os_ok The memory block was released.
    * @retval EINVAL The block does not belong to the memory pool.
@@ -1657,7 +1680,7 @@ extern "C"
 
   /**
    * @brief Get memory pool capacity.
-   * @param [in] mempool Pointer to memory pool object.
+   * @param [in] mempool Pointer to memory pool object instance.
    * @return The max number of blocks in the pool.
    */
   size_t
@@ -1665,7 +1688,7 @@ extern "C"
 
   /**
    * @brief Get blocks count.
-   * @param [in] mempool Pointer to memory pool object.
+   * @param [in] mempool Pointer to memory pool object instance.
    * @return The number of blocks used from the queue.
    */
   size_t
@@ -1673,7 +1696,7 @@ extern "C"
 
   /**
    * @brief Get block size.
-   * @param [in] mempool Pointer to memory pool object.
+   * @param [in] mempool Pointer to memory pool object instance.
    * @return The block size, in bytes.
    */
   size_t
@@ -1681,7 +1704,7 @@ extern "C"
 
   /**
    * @brief Check if the memory pool is empty.
-   * @param [in] mempool Pointer to memory pool object.
+   * @param [in] mempool Pointer to memory pool object instance.
    * @retval true The memory pool has no allocated blocks.
    * @retval false The memory pool has allocated blocks.
    */
@@ -1690,7 +1713,7 @@ extern "C"
 
   /**
    * @brief Check if the memory pool is full.
-   * @param [in] mempool Pointer to memory pool object.
+   * @param [in] mempool Pointer to memory pool object instance.
    * @retval true All memory blocks are allocated.
    * @retval false There are still memory blocks that can be allocated.
    */
@@ -1699,7 +1722,7 @@ extern "C"
 
   /**
    * @brief Reset the memory pool.
-   * @param [in] mempool Pointer to memory pool object.
+   * @param [in] mempool Pointer to memory pool object instance.
    * @retval os_ok The memory pool was reset.
    * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
    */
@@ -1708,7 +1731,7 @@ extern "C"
 
   /**
    * @brief Get the pool storage address.
-   * @param [in] mempool Pointer to memory pool object.
+   * @param [in] mempool Pointer to memory pool object instance.
    * @return Pointer to storage.
    */
   void*
@@ -1735,7 +1758,7 @@ extern "C"
 
   /**
    * @brief Initialise the message queue attributes.
-   * @param [in] attr Pointer to message queue attributes object.
+   * @param [in] attr Pointer to message queue attributes object instance.
    * @par Returns
    *  Nothing.
    */
@@ -1743,8 +1766,8 @@ extern "C"
   os_mqueue_attr_init (os_mqueue_attr_t* attr);
 
   /**
-   * @brief Create a message queue object.
-   * @param [in] mqueue Pointer to message queue object.
+   * @brief Create a message queue object instance.
+   * @param [in] mqueue Pointer to message queue object instance.
    * @param [in] name Pointer to name.
    * @param [in] msgs The number of messages.
    * @param [in] msg_size_bytes The message size, in bytes.
@@ -1757,8 +1780,8 @@ extern "C"
                     size_t msg_size_bytes, const os_mqueue_attr_t* attr);
 
   /**
-   * @brief Destroy the message queue object.
-   * @param [in] mqueue Pointer to message queue object.
+   * @brief Destroy the message queue object instance.
+   * @param [in] mqueue Pointer to message queue object instance.
    * @par Returns
    *  Nothing.
    */
@@ -1767,7 +1790,7 @@ extern "C"
 
   /**
    * @brief Get the message queue name.
-   * @param [in] mqueue Pointer to message queue object.
+   * @param [in] mqueue Pointer to message queue object instance.
    * @return Null terminated string.
    */
   const char*
@@ -1775,7 +1798,7 @@ extern "C"
 
   /**
    * @brief Send a message to the queue.
-   * @param [in] mqueue Pointer to message queue object.
+   * @param [in] mqueue Pointer to message queue object instance.
    * @param [in] msg The address of the message to enqueue.
    * @param [in] nbytes The length of the message. Must be not
    *  higher than the value used when creating the queue.
@@ -1795,7 +1818,7 @@ extern "C"
 
   /**
    * @brief Try to send a message to the queue.
-   * @param [in] mqueue Pointer to message queue object.
+   * @param [in] mqueue Pointer to message queue object instance.
    * @param [in] msg The address of the message to enqueue.
    * @param [in] nbytes The length of the message. Must be not
    *  higher than the value used when creating the queue.
@@ -1814,7 +1837,7 @@ extern "C"
 
   /**
    * @brief Send a message to the queue with timeout.
-   * @param [in] mqueue Pointer to message queue object.
+   * @param [in] mqueue Pointer to message queue object instance.
    * @param [in] msg The address of the message to enqueue.
    * @param [in] nbytes The length of the message. Must be not
    *  higher than the value used when creating the queue.
@@ -1837,7 +1860,7 @@ extern "C"
 
   /**
    * @brief Receive a message from the queue.
-   * @param [in] mqueue Pointer to message queue object.
+   * @param [in] mqueue Pointer to message queue object instance.
    * @param [out] msg The address where to store the dequeued message.
    * @param [in] nbytes The size of the destination buffer. Must
    *  be lower than the value used when creating the queue.
@@ -1860,7 +1883,7 @@ extern "C"
 
   /**
    * @brief Try to receive a message from the queue.
-   * @param [in] mqueue Pointer to message queue object.
+   * @param [in] mqueue Pointer to message queue object instance.
    * @param [out] msg The address where to store the dequeued message.
    * @param [in] nbytes The size of the destination buffer. Must
    *  be lower than the value used when creating the queue.
@@ -1882,7 +1905,7 @@ extern "C"
 
   /**
    * @brief Receive a message from the queue with timeout.
-   * @param [in] mqueue Pointer to message queue object.
+   * @param [in] mqueue Pointer to message queue object instance.
    * @param [out] msg The address where to store the dequeued message.
    * @param [in] nbytes The size of the destination buffer. Must
    *  be lower than the value used when creating the queue.
@@ -1909,7 +1932,7 @@ extern "C"
 
   /**
    * @brief Get queue capacity.
-   * @param [in] mqueue Pointer to message queue object.
+   * @param [in] mqueue Pointer to message queue object instance.
    * @return The max number of messages that can be queued.
    */
   size_t
@@ -1917,7 +1940,7 @@ extern "C"
 
   /**
    * @brief Get queue length.
-   * @param [in] mqueue Pointer to message queue object.
+   * @param [in] mqueue Pointer to message queue object instance.
    * @return The number of messages in the queue.
    */
   size_t
@@ -1925,7 +1948,7 @@ extern "C"
 
   /**
    * @brief Get message size.
-   * @param [in] mqueue Pointer to message queue object.
+   * @param [in] mqueue Pointer to message queue object instance.
    * @return The message size, in bytes.
    */
   size_t
@@ -1933,7 +1956,7 @@ extern "C"
 
   /**
    * @brief Check if the queue is empty.
-   * @param [in] mqueue Pointer to message queue object.
+   * @param [in] mqueue Pointer to message queue object instance.
    * @retval true The queue has no messages.
    * @retval false The queue has some messages.
    */
@@ -1942,7 +1965,7 @@ extern "C"
 
   /**
    * @brief Check if the queue is full.
-   * @param [in] mqueue Pointer to message queue object.
+   * @param [in] mqueue Pointer to message queue object instance.
    * @retval true The queue is full.
    * @retval false The queue is not full.
    */
@@ -1951,7 +1974,7 @@ extern "C"
 
   /**
    * @brief Reset the message queue.
-   * @param [in] mqueue Pointer to message queue object.
+   * @param [in] mqueue Pointer to message queue object instance.
    * @retval os_ok The queue was reset.
    * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
    */
@@ -1979,7 +2002,7 @@ extern "C"
 
   /**
    * @brief Initialise the event flags attributes.
-   * @param [in] attr Pointer to event flags attributes object.
+   * @param [in] attr Pointer to event flags attributes object instance.
    * @par Returns
    *  Nothing.
    */
@@ -1987,8 +2010,8 @@ extern "C"
   os_evflags_attr_init (os_evflags_attr_t* attr);
 
   /**
-   * @brief Create an event flags object.
-   * @param [in] evflags Pointer to event flags object.
+   * @brief Create an event flags object instance.
+   * @param [in] evflags Pointer to event flags object instance.
    * @param [in] name Pointer to name.
    * @param [in] attr Pointer to attributes.
    * @par Returns
@@ -1999,8 +2022,8 @@ extern "C"
                      const os_evflags_attr_t* attr);
 
   /**
-   * @brief Destroy the event flags object.
-   * @param [in] evflags Pointer to event flags object.
+   * @brief Destroy the event flags object instance.
+   * @param [in] evflags Pointer to event flags object instance.
    * @par Returns
    *  Nothing.
    */
@@ -2009,7 +2032,7 @@ extern "C"
 
   /**
    * @brief Get the event flags name.
-   * @param [in] evflags Pointer to event flags object.
+   * @param [in] evflags Pointer to event flags object instance.
    * @return Null terminated string.
    */
   const char*
@@ -2017,7 +2040,7 @@ extern "C"
 
   /**
    * @brief Wait for event flags.
-   * @param [in] evflags Pointer to event flags object.
+   * @param [in] evflags Pointer to event flags object instance.
    * @param [in] mask The expected flags (OR-ed bit-mask);
    *  may be zero.
    * @param [out] oflags Pointer where to store the current flags;
@@ -2036,7 +2059,7 @@ extern "C"
 
   /**
    * @brief Try to wait for event flags.
-   * @param [in] evflags Pointer to event flags object.
+   * @param [in] evflags Pointer to event flags object instance.
    * @param [in] mask The expected flags (OR-ed bit-mask);
    *  may be zero.
    * @param [out] oflags Pointer where to store the current flags;
@@ -2054,7 +2077,7 @@ extern "C"
 
   /**
    * @brief Timed wait for event flags.
-   * @param [in] evflags Pointer to event flags object.
+   * @param [in] evflags Pointer to event flags object instance.
    * @param [in] mask The expected flags (OR-ed bit-mask);
    *  may be zero.
    * @param [out] oflags Pointer where to store the current flags;
@@ -2077,7 +2100,7 @@ extern "C"
 
   /**
    * @brief Raise event flags.
-   * @param [in] evflags Pointer to event flags object.
+   * @param [in] evflags Pointer to event flags object instance.
    * @param [in] mask The OR-ed flags to raise.
    * @param [out] oflags Optional pointer where to store the
    *  new value of the flags; may be `NULL`.
@@ -2091,7 +2114,7 @@ extern "C"
 
   /**
    * @brief Clear event flags.
-   * @param [in] evflags Pointer to event flags object.
+   * @param [in] evflags Pointer to event flags object instance.
    * @param [in] mask The OR-ed flags to clear. Zero means 'all'.
    * @param [out] oflags Optional pointer where to store the
    *  previous value of the flags; may be `NULL`.
@@ -2104,7 +2127,7 @@ extern "C"
 
   /**
    * @brief Get (and possibly clear) event flags.
-   * @param [in] evflags Pointer to event flags object.
+   * @param [in] evflags Pointer to event flags object instance.
    * @param [in] mask The OR-ed flags to get/clear; may be zero.
    * @param [in] mode Mode bits to select if the flags should be
    *  cleared (the other bits are ignored).
@@ -2116,7 +2139,7 @@ extern "C"
 
   /**
    * @brief Check if there are threads waiting.
-   * @param [in] evflags Pointer to event flags object.
+   * @param [in] evflags Pointer to event flags object instance.
    * @retval true There are threads waiting.
    * @retval false There are no threads waiting.
    */
