@@ -289,7 +289,6 @@ os_main (int argc, char* argv[])
 
       blk = tp2.alloc ();
       tp2.free (blk);
-
     }
 
   // --------------------------------------------------------------------------
@@ -319,7 +318,6 @@ os_main (int argc, char* argv[])
 
       blk = sp2.alloc ();
       sp2.free (blk);
-
     }
 }
  @endcode
@@ -361,7 +359,6 @@ os_main (int argc, char* argv[])
         { "cq2", 3, sizeof(my_msg_t) };
 
       cq2.send (&msg_out, sizeof(my_msg_t));
-
     }
 
   // --------------------------------------------------------------------------
@@ -390,7 +387,6 @@ os_main (int argc, char* argv[])
 
       tq2.send (&msg_out);
       tq2.receive (&msg_in);
-
     }
 
   // --------------------------------------------------------------------------
@@ -420,7 +416,6 @@ os_main (int argc, char* argv[])
 
       sq2.send (&msg_out);
       sq2.receive (&msg_in);
-
     }
 }
  @endcode
@@ -442,6 +437,24 @@ os_main (int argc, char* argv[])
       mutex mx1;
       mx1.lock ();
       mx1.unlock ();
+
+      mx1.try_lock ();
+      mx1.unlock ();
+
+      mx1.timed_lock (10);
+      mx1.unlock ();
+
+      mx1.name ();
+
+      mx1.type ();
+      mx1.protocol ();
+      mx1.robustness ();
+      mx1.owner ();
+
+      thread::priority_t prio = mx1.prio_ceiling ();
+      mx1.prio_ceiling (prio);
+
+      mx1.reset ();
     }
 
     {
@@ -854,7 +867,7 @@ os_main (int argc, char* argv[])
     }
 
     {
-      // Create custom event flags with a specific clock.
+      // Initialise custom event flags with a specific clock.
       os_evflags_attr_t aev2;
       os_evflags_attr_init (&aev2);
 
