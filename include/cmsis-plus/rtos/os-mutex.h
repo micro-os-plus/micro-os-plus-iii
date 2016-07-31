@@ -60,21 +60,17 @@ namespace os
     public:
 
       /**
-       * @brief Type of mutex protocol.
+       * @brief Type of variables holding mutex protocols.
        */
       using protocol_t = uint8_t;
 
       /**
-       * @brief Namespace of mutex protocols.
-       * @details
-       * @see attributes::mx_protocol
+       * @brief Mutex protocols.
        */
       struct protocol
       {
         /**
-         * @brief Mutex protocols.
-         * @details
-         * @see attributes::mx_protocol
+         * @brief Enumeration of mutex protocols.
          */
         enum
           : protocol_t
@@ -97,21 +93,17 @@ namespace os
       };
 
       /**
-       * @brief Type of mutex robustness.
+       * @brief Type of variables holding mutex robustness.
        */
       using robustness_t = uint8_t;
 
       /**
-       * @brief Namespace of mutex robustness.
-       * @details
-       * @see attributes::mx_robustness
+       * @brief Mutex robustness.
        */
       struct robustness
       {
         /**
-         * @brief Mutex robustness.
-         * @details
-         * @see attributes::mx_robustness
+         * @brief Enumeration of mutex robustness.
          */
         enum
           : robustness_t
@@ -129,20 +121,17 @@ namespace os
       };
 
       /**
-       * @brief Type of mutex behaviour.
+       * @brief Type of variables holding mutex behaviours.
        */
       using type_t = uint8_t;
+
       /**
        * @brief Namespace of mutex types.
-       * @details
-       * @see attributes::mx_type
        */
       struct type
       {
         /**
          * @brief Mutex types.
-         * @details
-         * @see attributes::mx_type
          */
         enum
           : type_t
@@ -165,10 +154,13 @@ namespace os
       };
 
       /**
-       * @brief Type of mutex recursion counter.
+       * @brief Type of variables holding mutex recursion counters.
        */
       using count_t = uint16_t;
 
+      /**
+       * @brief Constant with the maximum value for the recursion counter.
+       */
       static constexpr count_t max_count = 0xFFFF;
 
       // ======================================================================
@@ -187,7 +179,7 @@ namespace os
          */
 
         /**
-         * @brief Create a mutex attributes object.
+         * @brief Construct a mutex attributes object instance.
          * @par Parameters
          *  None
          */
@@ -217,7 +209,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the mutex attributes object.
+         * @brief Destruct the mutex attributes object instance.
          */
         ~attributes () = default;
 
@@ -232,30 +224,30 @@ namespace os
          * @{
          */
 
-        // Public members, no accessors and mutators required.
+        // Public members; no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
         /**
-         * @brief Mutex priority ceiling.
+         * @brief Attribute with the mutex priority ceiling.
          */
         thread::priority_t mx_priority_ceiling = thread::priority::highest;
 
         /**
-         * @brief Mutex protocol attribute.
+         * @brief Attribute with the mutex protocol.
          */
         protocol_t mx_protocol = protocol::none;
 
         /**
-         * @brief Mutex protocol attribute.
+         * @brief Attribute with the mutex robustness.
          */
         robustness_t mx_robustness = robustness::stalled;
 
         /**
-         * @brief Mutex type attribute.
+         * @brief Attribute with the mutex type.
          */
         type_t mx_type = type::_default;
 
         /**
-         * @brief Mutex maximum recursive count.
+         * @brief Attribute with the mutex maximum recursive count.
          */
         count_t mx_max_count = max_count;
 
@@ -288,7 +280,7 @@ namespace os
          */
 
         /**
-         * @brief Create a recursive mutex attributes object.
+         * @brief Construct a recursive mutex attributes object instance.
          * @par Parameters
          *  None
          */
@@ -311,7 +303,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the recursive mutex attributes object.
+         * @brief Destruct the recursive mutex attributes object instance.
          */
         ~attributes_recursive () = default;
 
@@ -332,13 +324,13 @@ namespace os
        */
 
       /**
-       * @brief Create a mutex object.
+       * @brief Construct a mutex object instance.
        * @param [in] attr Reference to attributes.
        */
       mutex (const attributes& attr = initializer_normal);
 
       /**
-       * @brief Create a named mutex object.
+       * @brief Construct a named mutex object instance.
        * @param [in] name Pointer to name.
        * @param [in] attr Reference to attributes.
        */
@@ -360,7 +352,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the mutex object.
+       * @brief Destruct the mutex object instance.
        */
       ~mutex ();
 
@@ -393,7 +385,7 @@ namespace os
        */
 
       /**
-       * @brief Lock the mutex.
+       * @brief Lock/acquire the mutex.
        * @par Parameters
        *  None
        * @retval result::ok The mutex was locked.
@@ -403,7 +395,7 @@ namespace os
        * @retval EAGAIN The mutex could not be acquired because the maximum
        *  number of recursive locks for mutex has been exceeded.
        * @retval EINVAL The mutex was created with the protocol
-       *  attribute having the value PTHREAD_PRIO_PROTECT and the
+       *  attribute having the value `mutex::protocol::protect` and the
        *  calling thread's priority is higher than the mutex's
        *  current priority ceiling.
        * @retval EOWNERDEAD The mutex is a robust mutex and the process
@@ -417,7 +409,7 @@ namespace os
       lock (void);
 
       /**
-       * @brief Try to lock the mutex.
+       * @brief Try to lock/acquire the mutex.
        * @par Parameters
        *  None
        * @retval result::ok The mutex was locked.
@@ -427,7 +419,7 @@ namespace os
        * @retval EAGAIN The mutex could not be acquired because the maximum
        *  number of recursive locks for mutex has been exceeded.
        * @retval EINVAL The mutex was created with the protocol
-       *  attribute having the value PTHREAD_PRIO_PROTECT and the
+       *  attribute having the value `mutex::protocol::protect` and the
        *  calling thread's priority is higher than the mutex's
        *  current priority ceiling.
        * @retval EOWNERDEAD The mutex is a robust mutex and the process
@@ -443,7 +435,7 @@ namespace os
       try_lock (void);
 
       /**
-       * @brief Timed attempt to lock the mutex.
+       * @brief Timed attempt to lock/acquire the mutex.
        * @param [in] timeout Timeout to wait, in clock units (ticks or seconds).
        * @retval result::ok The mutex was locked.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
@@ -456,8 +448,7 @@ namespace os
        * @retval EDEADLK The mutex type is `mutex::type::errorcheck`
        *  and the current thread already owns the mutex.
        * @retval EINVAL The process or thread would have blocked, and
-       *  the abstime parameter specified a nanoseconds field value
-       *  less than zero or greater than or equal to 1000 million.
+       *  the timeout parameter is invalid.
        * @retval EOWNERDEAD The mutex is a robust mutex and the process
        *  containing the previous owning thread terminated while holding
        *  the mutex lock. The mutex lock shall be acquired by the
@@ -468,7 +459,7 @@ namespace os
       timed_lock (clock::duration_t timeout);
 
       /**
-       * @brief Unlock the mutex.
+       * @brief Unlock/release the mutex.
        * @par Parameters
        *  None
        * @retval result::ok The mutex was unlocked.
@@ -502,7 +493,7 @@ namespace os
        * @retval EAGAIN The mutex could not be acquired because the maximum
        *  number of recursive locks for mutex has been exceeded.
        * @retval EINVAL The mutex was created with the protocol
-       *  attribute having the value PTHREAD_PRIO_PROTECT and the
+       *  attribute having the value `mutex::protocol::protect` and the
        *  calling thread's priority is higher than the mutex's
        *  current priority ceiling.
        * @retval EOWNERDEAD The mutex is a robust mutex and the process
@@ -536,6 +527,27 @@ namespace os
        */
       thread*
       owner (void);
+
+      /**
+       * @brief Get the mutex type.
+       * @return An integer encoding the @ref mutex::type.
+       */
+      type_t
+      type (void);
+
+      /**
+       * @brief Get the mutex protocol.
+       * @return An integer encoding the @ref mutex::protocol.
+       */
+      protocol_t
+      protocol (void);
+
+      /**
+       * @brief Get the mutex robustness.
+       * @return An integer encoding the @ref mutex::robustness.
+       */
+      robustness_t
+      robustness (void);
 
       /**
        * @brief Reset the mutex.
@@ -617,6 +629,7 @@ namespace os
       // Can be updated in different thread contexts.
       volatile thread::priority_t prio_ceiling_ = thread::priority::highest;
       volatile thread::priority_t owner_prio_ = 0;
+      volatile thread::priority_t boosted_prio_ = thread::priority::none;
 
       bool consistent_ = true;
       bool recoverable_ = true;
@@ -699,6 +712,39 @@ namespace os
     mutex::owner (void)
     {
       return owner_;
+    }
+
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    inline mutex::type_t
+    mutex::type (void)
+    {
+      return type_;
+    }
+
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    inline mutex::protocol_t
+    mutex::protocol (void)
+    {
+      return protocol_;
+    }
+
+    /**
+     * @details
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    inline mutex::robustness_t
+    mutex::robustness (void)
+    {
+      return robustness_;
     }
 
   } /* namespace rtos */
