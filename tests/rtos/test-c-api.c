@@ -93,7 +93,7 @@ iterate_threads (os_thread_t* th, unsigned int depth)
       // Get the pointer to the thread from the iterator.
       os_thread_t* p = os_children_threads_iter_get (it);
 
-      // Get the pointer to the stack object.
+      // Get the pointer to the stack object instance.
       os_thread_stack_t* pst = os_thread_get_stack (p);
 
       // Get stack size & used, in bytes.
@@ -380,6 +380,12 @@ test_c_api (void)
           os_thread_get_name (th);
         }
 
+      os_mutex_get_type (&mx1);
+
+      os_mutex_get_protocol (&mx1);
+
+      os_mutex_get_robustness (&mx1);
+
       os_mutex_reset (&mx1);
 
       os_mutex_destroy (&mx1);
@@ -633,7 +639,7 @@ test_c_api (void)
       os_evflags_create (&ev1, "ev1", NULL);
 
       // Clear all flags.
-      os_evflags_clear (&ev1, 0x0, NULL);
+      os_evflags_clear (&ev1, os_flags_all, NULL);
 
       os_evflags_raise (&ev1, 0x1, NULL);
       os_evflags_wait (&ev1, 0x1, NULL,
@@ -655,7 +661,7 @@ test_c_api (void)
     }
 
     {
-      // Create custom event flags with a specific clock.
+      // Initialise custom event flags with a specific clock.
       os_evflags_attr_t aev2;
       os_evflags_attr_init (&aev2);
 
