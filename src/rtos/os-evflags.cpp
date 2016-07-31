@@ -178,8 +178,6 @@ namespace os
 
 #else
 
-      flags_mask_ = 0;
-
 #endif
 
     }
@@ -217,63 +215,6 @@ namespace os
     }
 
     /**
-     * @cond ignore
-     */
-
-    /**
-     * @details
-     * Internal function used to test if the desired flags are raised.
-     * Should be called from an interrupts critical section.
-     *
-     * Same as thread::_try_wait().
-     */
-    bool
-    event_flags::_try_wait (flags::mask_t mask, flags::mask_t* oflags,
-                            flags::mode_t mode)
-    {
-      if (mask == flags::any)
-        {
-          // Any flag will do it.
-          if (flags_mask_ != 0)
-            {
-              if (oflags != nullptr)
-                {
-                  *oflags = flags_mask_;
-                }
-
-              if (mode & flags::mode::clear)
-                {
-                  // Clear them all.
-                  flags_mask_ = 0;
-                }
-              return true;
-            }
-        }
-      else if (((((mode & flags::mode::all) != 0))
-          && ((flags_mask_ & mask) == mask))
-          || (((mode & flags::mode::any) != 0) && ((flags_mask_ & mask) != 0)))
-        {
-          if (oflags != nullptr)
-            {
-              *oflags = (flags_mask_ & mask);
-            }
-
-          if (mode & flags::mode::clear)
-            {
-              // Clear desired flags.
-              flags_mask_ &= ~mask;
-            }
-          return true;
-        }
-
-      return false;
-    }
-
-    /**
-     * @endcond
-     */
-
-    /**
      * @details
      * If the `flags::mode::all` bit is set, the function expects
      * all requested flags to be raised; otherwise, if the `flags::mode::any`
@@ -300,7 +241,7 @@ namespace os
     {
 #if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s(0x%X,%u) @%p %s <0x%X\n", __func__, mask, mode, this,
-                     name (), flags_mask_);
+                     name (), event_flags_.mask ());
 #endif
 
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
@@ -316,11 +257,11 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          if (_try_wait (mask, oflags, mode))
+          if (event_flags_.try_wait (mask, oflags, mode))
             {
 #if defined(OS_TRACE_RTOS_EVFLAGS)
               trace::printf ("%s(0x%X,%u) @%p %s >0x%X\n", __func__, mask, mode,
-                             this, name (), flags_mask_);
+                             this, name (), event_flags_.mask ());
 #endif
               return result::ok;
             }
@@ -341,11 +282,11 @@ namespace os
               // ----- Enter critical section ---------------------------------
               interrupts::critical_section ics;
 
-              if (_try_wait (mask, oflags, mode))
+              if (event_flags_.try_wait (mask, oflags, mode))
                 {
 #if defined(OS_TRACE_RTOS_EVFLAGS)
                   trace::printf ("%s(0x%X,%u) @%p %s >0x%X\n", __func__, mask,
-                                 mode, this, name (), flags_mask_);
+                                 mode, this, name (), event_flags_.mask ());
 #endif
                   return result::ok;
                 }
@@ -401,7 +342,7 @@ namespace os
     {
 #if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s(0x%X,%u) @%p %s <0x%X\n", __func__, mask, mode, this,
-                     name (), flags_mask_);
+                     name (), event_flags_.mask ());
 #endif
 
 #if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
@@ -411,15 +352,16 @@ namespace os
 #else
 
       assert(port::interrupts::is_priority_valid ());
+
         {
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          if (_try_wait (mask, oflags, mode))
+          if (event_flags_.try_wait (mask, oflags, mode))
             {
 #if defined(OS_TRACE_RTOS_EVFLAGS)
               trace::printf ("%s(0x%X,%u) @%p %s >0x%X\n", __func__, mask, mode,
-                             this, name (), flags_mask_);
+                             this, name (), event_flags_.mask ());
 #endif
               return result::ok;
             }
@@ -481,7 +423,7 @@ namespace os
     {
 #if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s(0x%X,%u,%u) @%p %s <0x%X\n", __func__, mask, timeout,
-                     mode, this, name (), flags_mask_);
+                     mode, this, name (), event_flags_.mask ());
 #endif
 
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
@@ -499,11 +441,12 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          if (_try_wait (mask, oflags, mode))
+          if (event_flags_.try_wait (mask, oflags, mode))
             {
 #if defined(OS_TRACE_RTOS_EVFLAGS)
               trace::printf ("%s(0x%X,%u,%u) @%p %s >0x%X\n", __func__, mask,
-                             timeout, mode, this, name (), flags_mask_);
+                             timeout, mode, this, name (),
+                             event_flags_.mask ());
 #endif
               return result::ok;
             }
@@ -531,12 +474,12 @@ namespace os
               // ----- Enter critical section ---------------------------------
               interrupts::critical_section ics;
 
-              if (_try_wait (mask, oflags, mode))
+              if (event_flags_.try_wait (mask, oflags, mode))
                 {
 #if defined(OS_TRACE_RTOS_EVFLAGS)
                   trace::printf ("%s(0x%X,%u,%u) @%p %s >0x%X\n", __func__,
                                  mask, timeout, mode, this, name (),
-                                 flags_mask_);
+                                 event_flags_.mask ());
 #endif
                   return result::ok;
                 }
@@ -593,30 +536,18 @@ namespace os
     {
 #if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s(0x%X) @%p %s <0x%X \n", __func__, mask, this, name (),
-                     flags_mask_);
+                     event_flags_.mask ());
 #endif
 
-      os_assert_err(mask != 0, EINVAL);
-
 #if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
+
+      os_assert_err(mask != 0, EINVAL);
 
       return port::event_flags::raise (this, mask, oflags);
 
 #else
-      assert(port::interrupts::is_priority_valid ());
 
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
-
-          flags_mask_ |= mask;
-
-          if (oflags != nullptr)
-            {
-              *oflags = flags_mask_;
-            }
-          // ----- Exit critical section --------------------------------------
-        }
+      result_t res = event_flags_.raise (mask, oflags);
 
       // Wake-up all threads, if any.
       // Need not be inside the critical section,
@@ -625,9 +556,9 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s(0x%X) @%p %s >0x%X\n", __func__, mask, this, name (),
-                     flags_mask_);
+                     event_flags_.mask ());
 #endif
-      return result::ok;
+      return res;
 
 #endif
     }
@@ -642,37 +573,25 @@ namespace os
     {
 #if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s(0x%X) @%p %s <0x%X \n", __func__, mask, this, name (),
-                     flags_mask_);
+                     event_flags_.mask ());
 #endif
 
-      os_assert_err(mask != 0, EINVAL);
-
 #if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
+
+      os_assert_err(mask != 0, EINVAL);
 
       return port::event_flags::clear (this, mask, oflags);
 
 #else
 
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
-
-          if (oflags != nullptr)
-            {
-              *oflags = (flags_mask_ & mask);
-            }
-
-          // Clear the selected flags; leave the rest untouched.
-          flags_mask_ &= ~mask;
-          // ----- Exit critical section --------------------------------------
-        }
+      result_t res = event_flags_.clear (mask, oflags);
 
 #if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s(0x%X) @%p %s >0x%X\n", __func__, mask, this, name (),
-                     flags_mask_);
+                     event_flags_.mask ());
 #endif
 
-      return result::ok;
+      return res;
 
 #endif
     }
@@ -700,31 +619,12 @@ namespace os
       return port::event_flags::get (this, mask, mode);
 
 #else
-      flags::mask_t ret;
 
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      flags::mask_t ret = event_flags_.get (mask, mode);
 
-          if (mask == flags::any)
-            {
-              // Return the entire mask.
-              ret = flags_mask_;
-            }
-          else
-            {
-              ret = flags_mask_ & mask;
-              if ((mode & flags::mode::clear) != 0)
-                {
-                  // Clear the selected flags; leave the rest untouched.
-                  flags_mask_ &= ~mask;
-                }
-            }
-          // ----- Exit critical section --------------------------------------
-        }
 #if defined(OS_TRACE_RTOS_EVFLAGS)
-      trace::printf ("%s(0x%X)=0x%X @%p %s \n", __func__, mask, flags_mask_,
-                     this, name ());
+      trace::printf ("%s(0x%X)=0x%X @%p %s \n", __func__, mask,
+                     event_flags_.mask (), this, name ());
 #endif
       // Return the selected flags.
       return ret;

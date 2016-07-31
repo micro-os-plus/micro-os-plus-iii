@@ -249,6 +249,16 @@ extern "C"
    * @}
    */
 
+  /**
+   * @brief Internal event flags.
+   *
+   * @see os::rtos::internal::event_flags
+   */
+  typedef struct os_internal_evflags_s
+  {
+    os_flags_mask_t flags_mask;
+  } os_internal_evflags_t;
+
   // ==========================================================================
 #define OS_THREAD_PRIO_SHIFT   (4)
 
@@ -563,7 +573,7 @@ extern "C"
     size_t allocated_stack_size_elements;
     os_thread_state_t state;
     os_thread_prio_t prio;
-    os_flags_mask_t flags;
+    os_internal_evflags_t event_flags;
     os_thread_user_storage_t user_storage; //
     bool interrupted;
 
@@ -1362,7 +1372,7 @@ extern "C"
     os_evflags_port_data_t port_;
 #endif
 
-    os_flags_mask_t flags;
+    os_internal_evflags_t flags;
 
     /**
      * @endcond

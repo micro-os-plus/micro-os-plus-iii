@@ -39,6 +39,7 @@
 
 #include <cmsis-plus/rtos/os-decls.h>
 #include <cmsis-plus/rtos/os-clocks.h>
+#include <cmsis-plus/rtos/internal/os-flags.h>
 
 #include <cmsis-plus/diag/trace.h>
 
@@ -1557,7 +1558,7 @@ namespace os
       state_t volatile state_ = state::undefined;
       priority_t volatile prio_ = priority::none;
 
-      flags::mask_t volatile flags_mask_ = 0;
+      internal::event_flags event_flags_;
       bool volatile interrupted_ = false;
 
       os_thread_user_storage_t user_storage_;

@@ -33,6 +33,7 @@
 #if defined(__cplusplus)
 
 #include <cmsis-plus/rtos/os-decls.h>
+#include <cmsis-plus/rtos/internal/os-flags.h>
 
 // ----------------------------------------------------------------------------
 
@@ -353,7 +354,7 @@ namespace os
       /**
        * @brief The event flags.
        */
-      flags::mask_t flags_mask_ = 0;
+      internal::event_flags event_flags_;
 
       /**
        * @endcond
