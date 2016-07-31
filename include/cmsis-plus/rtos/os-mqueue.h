@@ -144,7 +144,7 @@ namespace os
          */
 
         /**
-         * @brief Create a message queue attributes object.
+         * @brief Construct a message queue attributes object instance.
          * @par Parameters
          *  None
          */
@@ -167,7 +167,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the message queue attributes object.
+         * @brief Destruct the message queue attributes object instance.
          */
         ~attributes () = default;
 
@@ -182,7 +182,7 @@ namespace os
          * @{
          */
 
-        // Public members, no accessors and mutators required.
+        // Public members; no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
         /**
          * @brief Address of the user defined storage for the message queue.
@@ -259,7 +259,7 @@ namespace os
        */
 
       /**
-       * @brief Create a message queue object.
+       * @brief Construct a message queue object instance.
        * @param [in] msgs The number of messages.
        * @param [in] msg_size_bytes The message size, in bytes.
        * @param [in] attr Reference to attributes.
@@ -271,7 +271,7 @@ namespace os
                      const Allocator& allocator = Allocator ());
 
       /**
-       * @brief Create a named message queue object.
+       * @brief Construct a named message queue object instance.
        * @param [in] name Pointer to name.
        * @param [in] msgs The number of messages.
        * @param [in] msg_size_bytes The message size, in bytes.
@@ -308,7 +308,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the message queue object.
+       * @brief Destruct the message queue object instance.
        */
       virtual
       ~message_queue ();
@@ -739,7 +739,7 @@ namespace os
          */
 
         /**
-         * @brief Create a message queue object.
+         * @brief Construct a message queue object instance.
          * @param [in] msgs The number of messages.
          * @param [in] msg_size_bytes The message size, in bytes.
          * @param [in] attr Reference to attributes.
@@ -751,7 +751,7 @@ namespace os
                                  const Allocator& allocator = Allocator ());
 
         /**
-         * @brief Create a named message queue object.
+         * @brief Construct a named message queue object instance.
          * @param [in] name Pointer to name.
          * @param [in] msgs The number of messages.
          * @param [in] msg_size_bytes The message size, in bytes.
@@ -782,7 +782,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the message queue.
+         * @brief Destruct the message queue.
          */
         virtual
         ~message_queue_allocated ();
@@ -821,7 +821,7 @@ namespace os
          */
 
         /**
-         * @brief Create a typed message queue object.
+         * @brief Construct a typed message queue object instance.
          * @param [in] msgs The number of messages.
          * @param [in] attr Reference to attributes.
          * @param [in] allocator Reference to allocator. Default a
@@ -833,7 +833,7 @@ namespace os
                              const Allocator& allocator = Allocator ());
 
         /**
-         * @brief Create a named typed message queue object.
+         * @brief Construct a named typed message queue object instance.
          * @param [in] name Pointer to name.
          * @param [in] msgs The number of messages.
          * @param [in] attr Reference to attributes.
@@ -861,7 +861,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the typed message queue.
+         * @brief Destruct the typed message queue object instance.
          */
         virtual
         ~message_queue_typed ();
@@ -1029,13 +1029,13 @@ namespace os
          */
 
         /**
-         * @brief Create a typed message queue object.
+         * @brief Construct a typed message queue object instance.
          * @param [in] attr Reference to attributes.
          */
         message_queue_static (const attributes& attr = initializer);
 
         /**
-         * @brief Create a named typed message queue object.
+         * @brief Construct a named typed message queue object instance.
          * @param [in] name Pointer to name.
          * @param [in] attr Reference to attributes.
          */
@@ -1058,7 +1058,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the typed message queue.
+         * @brief Destruct the typed message queue object instance.
          */
         virtual
         ~message_queue_static ();

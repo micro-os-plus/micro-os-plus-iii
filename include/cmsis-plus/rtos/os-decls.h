@@ -104,6 +104,7 @@ namespace os
 
     /**
      * @brief Type of values returned by RTOS functions.
+     *
      * @details
      * For error processing reasons, most CMSIS++ RTOS functions
      * return a numeric result, which, according to POSIX,
@@ -114,6 +115,7 @@ namespace os
 
     /**
      * @brief Values returned by RTOS functions.
+     *
      * @details
      * This namespace is dedicated to grouping all
      * status code values returned by CMSIS++ RTOS functions.
@@ -177,6 +179,7 @@ namespace os
     {
       /**
        * @brief Custom enumerated values.
+       *
        * @details
        * There are not many custom values returned by
        * CMSIS++ RTOS functions, currently there is only one,
@@ -208,6 +211,7 @@ namespace os
     {
       /**
        * @brief Type of variables holding scheduler state codes.
+       *
        * @details
        * Usually a boolean telling if the scheduler is
        * locked or not, but for recursive locks it might also be a
@@ -359,7 +363,7 @@ namespace os
       named_object ();
 
       /**
-       * @brief Create a named object.
+       * @brief Construct a named object instance.
        * @param [in] name Null terminated name. If `nullptr`,
        * "-" is assigned.
        */
@@ -379,7 +383,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the named object.
+       * @brief Destruct the named object instance.
        */
       ~named_object () = default;
 
@@ -448,7 +452,7 @@ namespace os
        */
 
       /**
-       * @brief Create a named object.
+       * @brief Construct a named object instance.
        * @par Parameters
        *  None.
        */
@@ -469,7 +473,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the named object.
+       * @brief Destruct the named object instance.
        */
       ~clocked_attributes () = default;
 
@@ -483,10 +487,11 @@ namespace os
        */
 
       /**
-       * @brief Address of the clock to use for timeouts.
+       * @brief Attribute with the address of the clock to be used
+       *  for timeouts.
        * @details
        * It may be one of `os::rtos::sysclock`, `os::rtos::rtclock`,
-       * or any other user object derived from class `clock`.
+       * or any other user object derived from class `os::rtos::clock`.
        *
        * If `nullptr`, the default clock is `os::rtos::sysclock`.
        */

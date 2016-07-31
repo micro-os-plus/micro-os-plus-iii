@@ -68,7 +68,7 @@ namespace os
          */
 
         /**
-         * @brief Create a condition variable attributes object.
+         * @brief Construct a condition variable attributes object instance.
          * @par Parameters
          *  None
          */
@@ -91,7 +91,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the condition variable attributes object.
+         * @brief Destruct the condition variable attributes object instance.
          */
         ~attributes () = default;
 
@@ -106,7 +106,7 @@ namespace os
          * @{
          */
 
-        // Public members, no accessors and mutators required.
+        // Public members; no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
         // Add more attributes here.
         /**
@@ -128,7 +128,7 @@ namespace os
        */
 
       /**
-       * @brief Create a condition variable object.
+       * @brief Construct a condition variable object instance.
        * @param [in] attr Reference to attributes.
        * @par Errors
        *  The constructor shall fail if:
@@ -142,7 +142,7 @@ namespace os
       condition_variable (const attributes& attr = initializer);
 
       /**
-       * @brief Create a named condition variable object.
+       * @brief Construct a named condition variable object instance.
        * @param [in] name Pointer to name.
        * @param [in] attr Reference to attributes.
        * @par Errors
@@ -173,7 +173,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the condition variable object.
+       * @brief Destruct the condition variable object instance.
        */
       ~condition_variable ();
 

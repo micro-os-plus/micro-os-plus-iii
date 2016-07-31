@@ -98,7 +98,7 @@ namespace os
          */
 
         /**
-         * @brief Create a memory pool attributes object.
+         * @brief Construct a memory pool attributes object instance.
          * @par Parameters
          *  None
          */
@@ -119,7 +119,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the memory pool attributes object.
+         * @brief Destruct the memory pool attributes object instance.
          */
         ~attributes () = default;
 
@@ -134,7 +134,7 @@ namespace os
          * @{
          */
 
-        // Public members, no accessors and mutators required.
+        // Public members; no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
         /**
          * @brief Address of the user defined storage for the memory pool.
@@ -203,7 +203,7 @@ namespace os
        */
 
       /**
-       * @brief Create a memory pool object.
+       * @brief Construct a memory pool object instance.
        * @param [in] blocks The maximum number of items in the pool.
        * @param [in] block_size_bytes The size of an item, in bytes.
        * @param [in] attr Reference to attributes.
@@ -214,7 +214,7 @@ namespace os
                    const attributes& attr = initializer,
                    const Allocator& allocator = Allocator ());
       /**
-       * @brief Create a named memory pool object.
+       * @brief Construct a named memory pool object instance.
        * @param [in] name Pointer to name.
        * @param [in] blocks The maximum number of items in the pool.
        * @param [in] block_size_bytes The size of an item, in bytes.
@@ -253,7 +253,7 @@ namespace os
     public:
 
       /**
-       * @brief Destroy the memory pool object.
+       * @brief Destruct the memory pool object instance.
        */
       virtual
       ~memory_pool ();
@@ -545,7 +545,7 @@ namespace os
          */
 
         /**
-         * @brief Create a memory pool object.
+         * @brief Construct a memory pool object instance.
          * @param [in] blocks The maximum number of items in the pool.
          * @param [in] block_size_bytes The size of an item, in bytes.
          * @param [in] attr Reference to attributes.
@@ -557,7 +557,7 @@ namespace os
                                const Allocator& allocator = Allocator ());
 
         /**
-         * @brief Create a named memory pool object.
+         * @brief Construct a named memory pool object instance.
          * @param [in] name Pointer to name.
          * @param [in] blocks The maximum number of items in the pool.
          * @param [in] block_size_bytes The size of an item, in bytes.
@@ -586,7 +586,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the memory pool object.
+         * @brief Destruct the memory pool object instance.
          */
         virtual
         ~memory_pool_allocated ();
@@ -625,7 +625,7 @@ namespace os
          */
 
         /**
-         * @brief Create a memory pool object.
+         * @brief Construct a memory pool object instance.
          * @param [in] blocks The maximum number of items in the pool.
          * @param [in] attr Reference to attributes.
          * @param [in] allocator Reference to allocator. Default a
@@ -637,7 +637,7 @@ namespace os
                            const Allocator& allocator = Allocator ());
 
         /**
-         * @brief Create a named memory pool object.
+         * @brief Construct a named memory pool object instance.
          * @param [in] name Pointer to name.
          * @param [in] blocks The maximum number of items in the pool.
          * @param [in] attr Reference to attributes.
@@ -665,7 +665,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the memory pool object.
+         * @brief Destruct the memory pool object instance.
          */
         virtual
         ~memory_pool_typed ();
@@ -752,13 +752,13 @@ namespace os
          */
 
         /**
-         * @brief Create a memory pool object.
+         * @brief Construct a memory pool object instance.
          * @param [in] attr Reference to attributes.
          */
         memory_pool_static (const attributes& attr = initializer);
 
         /**
-         * @brief Create a named memory pool object.
+         * @brief Construct a named memory pool object instance.
          * @param [in] name Pointer to name.
          * @param [in] attr Reference to attributes.
          */
@@ -781,7 +781,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the memory pool object.
+         * @brief Destruct the memory pool object instance.
          */
         virtual
         ~memory_pool_static ();

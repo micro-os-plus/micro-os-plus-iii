@@ -90,7 +90,7 @@ namespace os
          */
 
         /**
-         * @brief Create a semaphore attributes object.
+         * @brief Construct a semaphore attributes object instance.
          * @par Parameters
          *  None
          */
@@ -120,7 +120,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the semaphore attributes object.
+         * @brief Destruct the semaphore attributes object instance.
          */
         ~attributes () = default;
 
@@ -135,7 +135,7 @@ namespace os
          * @{
          */
 
-        // Public members, no accessors and mutators required.
+        // Public members; no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
         /**
          * @brief Semaphore max count value.
@@ -170,7 +170,7 @@ namespace os
          */
 
         /**
-         * @brief Create a binary semaphore attributes object.
+         * @brief Construct a binary semaphore attributes object instance.
          * @param [in] initial_value Initial count value.
          */
         constexpr
@@ -192,7 +192,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the semaphore attributes object.
+         * @brief Destruct the semaphore attributes object instance.
          */
         ~attributes_binary () = default;
 
@@ -223,7 +223,7 @@ namespace os
          */
 
         /**
-         * @brief Create a counting semaphore attributes object.
+         * @brief Construct a counting semaphore attributes object instance.
          * @param [in] max_value Maximum count value.
          * @param [in] initial_value Initial count value.
          */
@@ -246,7 +246,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the semaphore attributes object.
+         * @brief Destruct the semaphore attributes object instance.
          */
         ~attributes_counting () = default;
 
@@ -263,13 +263,13 @@ namespace os
        */
 
       /**
-       * @brief Create a semaphore object.
+       * @brief Construct a semaphore object instance.
        * @param [in] attr Reference to attributes.
        */
       semaphore (const attributes& attr = initializer_binary);
 
       /**
-       * @brief Create a named semaphore object.
+       * @brief Construct a named semaphore object instance.
        * @param [in] name Pointer to name.
        * @param [in] attr Reference to attributes.
        */
@@ -299,7 +299,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the semaphore object.
+       * @brief Destruct the semaphore object instance.
        */
       ~semaphore ();
 
@@ -518,13 +518,13 @@ namespace os
        */
 
       /**
-       * @brief Create a binary semaphore object.
+       * @brief Construct a binary semaphore object instance.
        * @param [in] initial_value Initial count value; 0 if missing.
        */
       semaphore_binary (const count_t initial_value);
 
       /**
-       * @brief Create a named binary semaphore object.
+       * @brief Construct a named binary semaphore object instance.
        * @param [in] name Pointer to name.
        * @param [in] initial_value Initial count value; 0 if missing.
        */
@@ -546,7 +546,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the semaphore object.
+       * @brief Destruct the semaphore object instance.
        */
       ~semaphore_binary ();
 
@@ -590,14 +590,14 @@ namespace os
        */
 
       /**
-       * @brief Create a binary semaphore object.
+       * @brief Construct a binary semaphore object instance.
        * @param [in] max_value Maximum count value.
        * @param [in] initial_value Initial count value; 0 if missing.
        */
       semaphore_counting (const count_t max_value, const count_t initial_value);
 
       /**
-       * @brief Create a named binary semaphore object.
+       * @brief Construct a named binary semaphore object instance.
        * @param [in] name Pointer to name.
        * @param [in] max_value Maximum count value.
        * @param [in] initial_value Initial count value; 0 if missing.
@@ -621,7 +621,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the semaphore object.
+       * @brief Destruct the semaphore object instance.
        */
       ~semaphore_counting ();
 

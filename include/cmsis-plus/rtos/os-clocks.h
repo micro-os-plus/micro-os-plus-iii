@@ -109,7 +109,7 @@ namespace os
        */
 
       /**
-       * @brief Create a clock object (protected, used in derived classes)
+       * @brief Construct a clock object instance (protected, used in derived classes)
        * @param [in] name Pointer to clock name.
        */
       clock (const char* name);
@@ -128,7 +128,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the clock object.
+       * @brief Destruct the clock object instance.
        */
       virtual
       ~clock ();
@@ -315,7 +315,7 @@ namespace os
        */
 
       /**
-       * @brief Create a clock object (protected, used in derived classes)
+       * @brief Construct a clock object instance (protected, used in derived classes)
        * @param [in] name Pointer to clock name.
        */
       adjustable_clock (const char* name);
@@ -334,7 +334,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the clock object.
+       * @brief Destruct the clock object instance.
        */
       virtual
       ~adjustable_clock ();
@@ -453,7 +453,7 @@ namespace os
        */
 
       /**
-       * @brief Create a SysTick clock object.
+       * @brief Construct a SysTick clock object instance.
        */
       clock_systick ();
 
@@ -471,7 +471,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the SysTick clock object.
+       * @brief Destruct the SysTick clock object instance.
        */
       virtual
       ~clock_systick ();
@@ -580,7 +580,7 @@ namespace os
        */
 
       /**
-       * @brief Create a real time clock object.
+       * @brief Construct a real time clock object instance.
        */
       clock_rtc ();
 
@@ -598,7 +598,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the real time clock object.
+       * @brief Destruct the real time clock object instance.
        */
       virtual
       ~clock_rtc ();
@@ -677,7 +677,7 @@ namespace os
        */
 
       /**
-       * @brief Create a SysTick clock object.
+       * @brief Construct a SysTick clock object instance.
        */
       clock_highres ();
 
@@ -695,7 +695,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the SysTick clock object.
+       * @brief Destruct the SysTick clock object instance.
        */
       virtual
       ~clock_highres ();

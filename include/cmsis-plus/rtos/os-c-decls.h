@@ -222,7 +222,7 @@ extern "C"
    * @brief Generic iterator, implemented as a pointer.
    * @details
    * To simplify things, the C implementation of iterators
-   * includes a single pointer to a C++ object. Internally,
+   * includes a single pointer to a C++ object instance. Internally,
    * the functions
    * used to iterate must cast this pointer properly, but this
    * should be transparent for the user.
@@ -530,7 +530,7 @@ extern "C"
    * and must be initialised with `os_thread_create()`.
    *
    * Later on a pointer to it can be used both in C and C++
-   * to refer to the thread object.
+   * to refer to the thread object instance.
    *
    * The members of this structure are hidden and should not
    * be used directly, but only through specific functions.
@@ -712,7 +712,7 @@ extern "C"
   typedef struct os_timer_attr_s
   {
     /**
-     * @brief Pointer to clock object.
+     * @brief Pointer to clock object instance.
      */
     void* clock;
 
@@ -731,7 +731,7 @@ extern "C"
    * and must be initialised with `os_timer_create()`.
    *
    * Later on a pointer to it can be used both in C and C++
-   * to refer to the timer object.
+   * to refer to the timer object instance.
    *
    * The members of this structure are hidden and should not
    * be used directly, but only through specific functions.
@@ -862,7 +862,7 @@ extern "C"
   typedef struct os_mutex_attr_s
   {
     /**
-     * @brief Pointer to clock object.
+     * @brief Pointer to clock object instance.
      */
     void* clock;
 
@@ -901,7 +901,7 @@ extern "C"
    * and must be initialised with `os_mutex_create()`.
    *
    * Later on a pointer to it can be used both in C and C++
-   * to refer to the mutex object.
+   * to refer to the mutex object instance.
    *
    * The members of this structure are hidden and should not
    * be used directly, but only through specific functions.
@@ -963,7 +963,7 @@ extern "C"
   typedef struct os_condvar_attr_s
   {
     /**
-     * @brief Pointer to clock object.
+     * @brief Pointer to clock object instance.
      */
     void* clock;
 
@@ -978,7 +978,7 @@ extern "C"
    * object and must be initialised with os_condvar_create().
    *
    * Later on a pointer to it can be used both in C and C++
-   * to refer to the timer object.
+   * to refer to the timer object instance.
    *
    * The members of this structure are hidden and should not
    * be used directly, but only through specific functions.
@@ -1035,7 +1035,7 @@ extern "C"
   typedef struct os_semaphore_attr_s
   {
     /**
-     * @brief Pointer to clock object.
+     * @brief Pointer to clock object instance.
      */
     void* clock;
 
@@ -1059,7 +1059,7 @@ extern "C"
    * object and must be initialised with `os_semaphore_create()`.
    *
    * Later on a pointer to it can be used both in C and C++
-   * to refer to the semaphore object.
+   * to refer to the semaphore object instance.
    *
    * The members of this structure are hidden and should not
    * be used directly, but only through specific functions.
@@ -1119,7 +1119,7 @@ extern "C"
   typedef struct os_mempool_attr_s
   {
     /**
-     * @brief Pointer to clock object.
+     * @brief Pointer to clock object instance.
      */
     void* clock;
 
@@ -1143,7 +1143,7 @@ extern "C"
    * object and must be initialised with `os_mempool_create()`.
    *
    * Later on a pointer to it can be used both in C and C++
-   * to refer to the memory pool object.
+   * to refer to the memory pool object instance.
    *
    * The members of this structure are hidden and should not
    * be used directly, but only through specific functions.
@@ -1224,7 +1224,7 @@ extern "C"
   typedef struct os_mqueue_attr_s
   {
     /**
-     * @brief Pointer to clock object.
+     * @brief Pointer to clock object instance.
      */
     void* clock;
 
@@ -1248,7 +1248,7 @@ extern "C"
    * object and must be initialised with `os_mqueue_create()`.
    *
    * Later on a pointer to it can be used both in C and C++
-   * to refer to the message queue object.
+   * to refer to the message queue object instance.
    *
    * The members of this structure are hidden and should not
    * be used directly, but only through specific functions.
@@ -1325,7 +1325,7 @@ extern "C"
   typedef struct os_evflags_attr_s
   {
     /**
-     * @brief Pointer to clock object.
+     * @brief Pointer to clock object instance.
      */
     void* clock;
 
@@ -1339,7 +1339,7 @@ extern "C"
    * object and must be initialised with `os_evflags_create()`.
    *
    * Later on a pointer to it can be used both in C and C++
-   * to refer to the event flags object.
+   * to refer to the event flags object instance.
    *
    * The members of this structure are hidden and should not
    * be used directly, but only through specific functions.

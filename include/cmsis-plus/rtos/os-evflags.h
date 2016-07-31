@@ -71,7 +71,7 @@ namespace os
          */
 
         /**
-         * @brief Create an event flags attributes object.
+         * @brief Construct an event flags attributes object instance.
          * @par Parameters
          *  None
          */
@@ -94,7 +94,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the event flags attributes object.
+         * @brief Destruct the event flags attributes object instance.
          */
         ~attributes () = default;
 
@@ -109,7 +109,7 @@ namespace os
          * @{
          */
 
-        // Public members, no accessors and mutators required.
+        // Public members; no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
         // Add more attributes here.
         /**
@@ -129,13 +129,13 @@ namespace os
        */
 
       /**
-       * @brief Create an event flags object.
+       * @brief Construct an event flags object instance.
        * @param [in] attr Reference to attributes.
        */
       event_flags (const attributes& attr = initializer);
 
       /**
-       * @brief Create a named event flags object.
+       * @brief Construct a named event flags object instance.
        * @param [in] name Pointer to name.
        * @param [in] attr Reference to attributes.
        */
@@ -157,7 +157,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the event flags object.
+       * @brief Destruct the event flags object instance.
        */
       ~event_flags ();
 
