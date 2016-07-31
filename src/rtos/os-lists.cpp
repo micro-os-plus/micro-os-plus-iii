@@ -182,7 +182,7 @@ namespace os
           clear ();
         }
 
-      thread::priority_t prio = node.thread_.prio_;
+      thread::priority_t prio = node.thread_->prio_;
 
       waiting_thread_node* after =
           static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (tail ()));
@@ -194,22 +194,22 @@ namespace os
           trace::printf ("ready %s() empty +%u\n", __func__, prio);
 #endif
         }
-      else if (prio <= after->thread_.prio_)
+      else if (prio <= after->thread_->prio_)
         {
           // Insert at the end of the list.
 #if defined(OS_TRACE_RTOS_LISTS)
           trace::printf ("ready %s() back %u +%u \n", __func__,
-                         after->thread_.prio_, prio);
+                         after->thread_->prio_, prio);
 #endif
         }
-      else if (prio > head ()->thread_.prio_)
+      else if (prio > head ()->thread_->prio_)
         {
           // Insert at the beginning of the list
           after =
               static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (&head_));
 #if defined(OS_TRACE_RTOS_LISTS)
           trace::printf ("ready %s() front +%u %u \n", __func__, prio,
-                         head ()->thread_.prio_);
+                         head ()->thread_->prio_);
 #endif
         }
       else
@@ -217,20 +217,20 @@ namespace os
           // Insert in the middle of the list.
           // The loop is guaranteed to terminate, not hit the head and
           // the weight is small, priority() is only an accessor.
-          while (prio > after->thread_.prio_)
+          while (prio > after->thread_->prio_)
             {
               after =
                   static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (after->prev ()));
             }
 #if defined(OS_TRACE_RTOS_LISTS)
           trace::printf ("ready %s() middle %u +%u \n", __func__,
-                         after->thread_.prio_, prio);
+                         after->thread_->prio_, prio);
 #endif
         }
 
       insert_after (node, after);
 
-      node.thread_.state_ = thread::state::ready;
+      node.thread_->state_ = thread::state::ready;
     }
 
     /**
@@ -242,22 +242,22 @@ namespace os
     {
       assert(!empty ());
 
-      thread* thread = &(head ()->thread_);
+      thread* th = head ()->thread_;
 
 #if defined(OS_TRACE_RTOS_LISTS)
-      trace::printf ("ready %s() %p %s\n", __func__, thread, thread->name ());
+      trace::printf ("ready %s() %p %s\n", __func__, th, th->name ());
 #endif
 
       const_cast<waiting_thread_node*> (head ())->unlink ();
 
-      assert(thread != nullptr);
+      assert(th != nullptr);
 
       // Unlinking is immediately followed by a context switch,
       // so in order to guarantee that the thread is marked as
       // running, it is saver to do it here.
 
-      thread->state_ = thread::state::running;
-      return thread;
+      th->state_ = thread::state::running;
+      return th;
     }
 
     // ========================================================================
@@ -307,7 +307,7 @@ namespace os
     void
     waiting_threads_list::link (waiting_thread_node& node)
     {
-      thread::priority_t prio = node.thread_.priority ();
+      thread::priority_t prio = node.thread_->priority ();
 
       waiting_thread_node* after =
           static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (tail ()));
@@ -319,22 +319,22 @@ namespace os
           trace::printf ("wait %s() empty +%u\n", __func__, prio);
 #endif
         }
-      else if (prio <= after->thread_.priority ())
+      else if (prio <= after->thread_->priority ())
         {
           // Insert at the end of the list.
 #if defined(OS_TRACE_RTOS_LISTS)
           trace::printf ("wait %s() back %u +%u \n", __func__,
-                         after->thread_.prio_, prio);
+                         after->thread_->prio_, prio);
 #endif
         }
-      else if (prio > head ()->thread_.priority ())
+      else if (prio > head ()->thread_->priority ())
         {
           // Insert at the beginning of the list
           after =
               static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (&head_));
 #if defined(OS_TRACE_RTOS_LISTS)
           trace::printf ("wait %s() front +%u %u \n", __func__, prio,
-                         head ()->thread_.prio_);
+                         head ()->thread_->prio_);
 #endif
         }
       else
@@ -342,14 +342,14 @@ namespace os
           // Insert in the middle of the list.
           // The loop is guaranteed to terminate, not hit the head and
           // the weight is small, priority() is only an accessor.
-          while (prio > after->thread_.priority ())
+          while (prio > after->thread_->priority ())
             {
               after =
                   static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (after->prev ()));
             }
 #if defined(OS_TRACE_RTOS_LISTS)
           trace::printf ("wait %s() middle %u +%u \n", __func__,
-                         after->thread_.prio_, prio);
+                         after->thread_->prio_, prio);
 #endif
         }
 
@@ -361,10 +361,10 @@ namespace os
      * Atomically get the top thread from the list, remove the node
      * and wake-up the thread.
      */
-    void
+    bool
     waiting_threads_list::resume_one (void)
     {
-      thread* thread;
+      thread* th;
         {
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
@@ -372,21 +372,21 @@ namespace os
           // If the list is empty, silently return.
           if (empty ())
             {
-              return;
+              return false;
             }
 
           // The top priority is to remove the entry from the list
           // so that subsequent wakeups to address different threads.
-          thread = &(head ()->thread_);
+          th = head ()->thread_;
           const_cast<waiting_thread_node*> (head ())->unlink ();
           // ----- Exit critical section --------------------------------------
         }
-      assert(thread != nullptr);
+      assert(th != nullptr);
 
-      thread::state_t state = thread->state ();
+      thread::state_t state = th->state ();
       if (state != thread::state::destroyed)
         {
-          thread->resume ();
+          th->resume ();
         }
       else
         {
@@ -394,15 +394,15 @@ namespace os
           trace::printf ("%s() gone \n", __func__);
 #endif
         }
+
+      return true;
     }
 
     void
     waiting_threads_list::resume_all (void)
     {
-      while (!empty ())
-        {
-          resume_one ();
-        }
+      while (resume_one ())
+        ;
     }
 
     // ========================================================================
@@ -622,10 +622,10 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("terminated %s() %p %s\n", __func__, &node.thread_,
-                     node.thread_.name ());
+                     node.thread_->name ());
 #endif
 
-      node.thread_.state_ = thread::state::terminated;
+      node.thread_->state_ = thread::state::terminated;
 
       insert_after (node, after);
     }
