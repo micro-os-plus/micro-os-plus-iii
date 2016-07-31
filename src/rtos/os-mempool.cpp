@@ -82,7 +82,7 @@ namespace os
      *    attr.mp_pool_address = pool;
      *    attr.mp_pool_size_bytes = sizeof(pool);
      *
-     *    // Create the pool object.
+     *    // Construct the pool object instance.
      *    memory_pool mp { attr, pool_size, sizeof(properties_t) };
      *
      *    // Do something else.
@@ -146,7 +146,7 @@ namespace os
      * // Define the pool size.
      * constexpr uint32_t pool_size = 10;
      *
-     * // Create the pool object.
+     * // Construct the pool object instance.
      * memory_pool mp { pool_size, sizeof(properties_t) };
      *
      * void
@@ -449,6 +449,7 @@ namespace os
     /*
      * Internal function used to return the first block in the
      * free list.
+     * Should be called from an interrupts critical section.
      */
     void*
     memory_pool::_try_first (void)
@@ -508,6 +509,9 @@ namespace os
           p = _try_first ();
           if (p != nullptr)
             {
+#if defined(OS_TRACE_RTOS_MEMPOOL)
+              trace::printf ("%s()=%p @%p %s\n", __func__, p, this, name ());
+#endif
               return p;
             }
           // ----- Exit critical section --------------------------------------
@@ -530,6 +534,10 @@ namespace os
               p = _try_first ();
               if (p != nullptr)
                 {
+#if defined(OS_TRACE_RTOS_MEMPOOL)
+                  trace::printf ("%s()=%p @%p %s\n", __func__, p, this,
+                                 name ());
+#endif
                   return p;
                 }
 
@@ -547,6 +555,9 @@ namespace os
 
           if (this_thread::thread ().interrupted ())
             {
+#if defined(OS_TRACE_RTOS_MEMPOOL)
+              trace::printf ("%s() INTR @%p %s\n", __func__, this, name ());
+#endif
               return nullptr;
             }
         }
@@ -580,14 +591,19 @@ namespace os
 
       assert(port::interrupts::is_priority_valid ());
 
+      void* p;
         {
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          return _try_first ();
+          p = _try_first ();
           // ----- Exit critical section --------------------------------------
         }
 
+#if defined(OS_TRACE_RTOS_MEMPOOL)
+      trace::printf ("%s()=%p @%p %s\n", __func__, p, this, name ());
+#endif
+      return p;
     }
 
     /**
@@ -653,6 +669,9 @@ namespace os
           p = _try_first ();
           if (p != nullptr)
             {
+#if defined(OS_TRACE_RTOS_MEMPOOL)
+              trace::printf ("%s()=%p @%p %s\n", __func__, p, this, name ());
+#endif
               return p;
             }
           // ----- Exit critical section --------------------------------------
@@ -682,6 +701,10 @@ namespace os
               p = _try_first ();
               if (p != nullptr)
                 {
+#if defined(OS_TRACE_RTOS_MEMPOOL)
+                  trace::printf ("%s()=%p @%p %s\n", __func__, p, this,
+                                 name ());
+#endif
                   return p;
                 }
 
@@ -701,11 +724,17 @@ namespace os
 
           if (this_thread::thread ().interrupted ())
             {
+#if defined(OS_TRACE_RTOS_MEMPOOL)
+              trace::printf ("%s() INTR @%p %s\n", __func__, this, name ());
+#endif
               return nullptr;
             }
 
           if (clock_->steady_now () >= timeout_timestamp)
             {
+#if defined(OS_TRACE_RTOS_MEMPOOL)
+              trace::printf ("%s() TMO @%p %s\n", __func__, this, name ());
+#endif
               return nullptr;
             }
         }
@@ -727,7 +756,7 @@ namespace os
     memory_pool::free (void* block)
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
-      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+      trace::printf ("%s(%p) @%p %s\n", __func__, block, this, name ());
 #endif
 
       assert(port::interrupts::is_priority_valid ());
@@ -737,6 +766,10 @@ namespace os
           || (block
               >= (static_cast<char*> (pool_addr_) + blocks_ * block_size_bytes_)))
         {
+#if defined(OS_TRACE_RTOS_MEMPOOL)
+          trace::printf ("%s(%p) EINVAL @%p %s\n", __func__, block, this,
+                         name ());
+#endif
           return EINVAL;
         }
 
@@ -787,16 +820,10 @@ namespace os
           // ----- Exit critical section --------------------------------------
         }
 
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
-
-          // Wake-up all threads, if any.
-          list_.resume_all ();
-
-          list_.clear ();
-          // ----- Exit critical section --------------------------------------
-        }
+      // Wake-up all threads, if any.
+      // Need not be inside the critical section,
+      // the list is protected by inner `resume_one()`.
+      list_.resume_all ();
 
       return result::ok;
     }
