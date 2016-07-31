@@ -62,11 +62,12 @@ namespace os
           scheduler::critical_section cs;
 
           p = ::malloc (size);
+
+#if defined(OS_TRACE_LIBC_MALLOC)
+          trace::printf ("estd::%s(%d)=%p\n", __func__, size, p);
+#endif
           // ----- End of critical section ------------------------------------
         }
-#if defined(OS_TRACE_LIBC_MALLOC)
-      trace::printf ("estd::%s(%d)=%p\n", __func__, size, p);
-#endif
 
       return p;
     }
@@ -85,14 +86,14 @@ namespace os
     void
     free (void *ptr) noexcept
     {
-#if defined(OS_TRACE_LIBC_MALLOC)
-      trace::printf ("estd::%s(%p)\n", __func__, ptr);
-#endif
 
         {
           // ----- Begin of critical section ----------------------------------
           scheduler::critical_section cs;
 
+#if defined(OS_TRACE_LIBC_MALLOC)
+          trace::printf ("estd::%s(%p)\n", __func__, ptr);
+#endif
           return ::free (ptr);
           // ----- End of critical section ------------------------------------
         }
