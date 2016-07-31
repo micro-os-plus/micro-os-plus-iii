@@ -54,6 +54,152 @@ namespace os
     // ========================================================================
 
     /**
+     * @brief Template for a double linked list iterator.
+     * @tparam T Type of object returned by the iterator.
+     * @tparam N Type of intrusive node. Must have the public members
+     * **prev** & **next**.
+     * @tparam MP Name of the intrusive node member in object T.
+     * @tparam U Type stored in the list, derived from T.
+     *
+     * @details
+     * This class provides an interface similar to std::list::iterator.
+     */
+    template<typename T, typename N, T* N::* MP, typename U = T>
+      class double_list_iterator
+      {
+      public:
+
+        /**
+         * @name Public Types
+         * @{
+         */
+
+        /**
+         * @brief Type of value "pointed to" by the iterator.
+         */
+        using value_type = U;
+
+        /**
+         * @brief Type of pointer to object "pointed to" by the iterator.
+         */
+        using pointer = U*;
+
+        /**
+         * @brief Type of reference to object "pointed to" by the iterator.
+         */
+        using reference = U&;
+
+        /**
+         * @brief Type of reference to the iterator internal pointer.
+         */
+        using iterator_pointer = N*;
+
+        /**
+         * @brief Type of pointer difference.
+         */
+        using difference_type = ptrdiff_t;
+
+        /**
+         * @brief Category of iterator.
+         */
+        using iterator_category = std::forward_iterator_tag;
+
+        /**
+         * @}
+         */
+
+        // --------------------------------------------------------------------
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
+
+        constexpr
+        double_list_iterator ();
+
+        constexpr explicit
+        double_list_iterator (N* const node);
+
+        constexpr explicit
+        double_list_iterator (reference element);
+
+        /**
+         * @}
+         */
+
+        /**
+         * @name Operators
+         * @{
+         */
+
+        pointer
+        operator-> () const;
+
+        reference
+        operator* () const;
+
+        double_list_iterator&
+        operator++ ();
+
+        double_list_iterator
+        operator++ (int);
+
+        double_list_iterator&
+        operator-- ();
+
+        double_list_iterator
+        operator-- (int);
+
+        bool
+        operator== (const double_list_iterator& other) const;
+
+        bool
+        operator!= (const double_list_iterator& other) const;
+
+        /**
+         * @}
+         */
+
+        /**
+         * @name Public Member Functions
+         * @{
+         */
+
+        /**
+         * @brief Get the object node from the intrusive node.
+         * @return Pointer to object node.
+         */
+        pointer
+        get_pointer (void) const;
+
+        iterator_pointer
+        get_iterator_pointer () const;
+
+        /**
+         * @}
+         */
+
+      protected:
+
+        /**
+         * @name Private Member Variables
+         * @{
+         */
+
+        /**
+         * @brief Pointer to intrusive node.
+         */
+        N* node_;
+
+        /**
+         * @}
+         */
+
+      };
+
+    // ========================================================================
+
+    /**
      * @brief Template for an intrusive list iterator.
      * @tparam T Type of object that includes the intrusive node.
      * @tparam N Type of intrusive node. Must have the public members
@@ -213,7 +359,7 @@ namespace os
        */
 
       /**
-       * @brief Create a list node (BSS initialised).
+       * @brief Construct a list node (BSS initialised).
        */
       static_double_list_links ();
 
@@ -233,7 +379,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the node.
+       * @brief Destruct the node.
        */
       ~static_double_list_links ();
 
@@ -309,7 +455,7 @@ namespace os
        */
 
       /**
-       * @brief Create a list node (explicitly set to nullptr).
+       * @brief Construct a list node (explicitly set to nullptr).
        */
       double_list_links ();
 
@@ -329,7 +475,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the node.
+       * @brief Destruct the node.
        */
       ~double_list_links ();
 
@@ -357,7 +503,7 @@ namespace os
        */
 
       /**
-       * @brief Create a node with references to the thread.
+       * @brief Construct a node with references to the thread.
        * @param th Reference to the thread.
        */
       waiting_thread_node (thread& th);
@@ -378,7 +524,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the node.
+       * @brief Destruct the node.
        */
       ~waiting_thread_node ();
 
@@ -394,9 +540,9 @@ namespace os
        */
 
       /**
-       * @brief Reference to waiting thread.
+       * @brief Pointer to waiting thread.
        */
-      rtos::thread& thread_;
+      rtos::thread* thread_;
 
       /**
        * @}
@@ -423,7 +569,7 @@ namespace os
        */
 
       /**
-       * @brief Create a node with a time stamp.
+       * @brief Construct a node with a time stamp.
        * @param ts Time stamp.
        */
       timestamp_node (port::clock::timestamp_t ts);
@@ -444,7 +590,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the node.
+       * @brief Destruct the node.
        */
       virtual
       ~timestamp_node ();
@@ -512,7 +658,7 @@ namespace os
        */
 
       /**
-       * @brief Create a clock timeout node.
+       * @brief Construct a clock timeout node.
        * @param [in] ts Time stamp.
        * @param [in] th Reference to thread.
        */
@@ -534,7 +680,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the node.
+       * @brief Destruct the node.
        */
       virtual
       ~timeout_thread_node ();
@@ -601,7 +747,7 @@ namespace os
        */
 
       /**
-       * @brief Create a clock timer node.
+       * @brief Construct a clock timer node.
        * @param [in] ts Time stamp.
        * @param [in] tm Reference to timer.
        */
@@ -621,7 +767,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the node.
+       * @brief Destruct the node.
        */
       virtual
       ~timer_node ();
@@ -685,7 +831,7 @@ namespace os
        */
 
       /**
-       * @brief Create a list.
+       * @brief Construct a list.
        */
       static_double_list ();
 
@@ -705,7 +851,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the list.
+       * @brief Destruct the list.
        */
       ~static_double_list ();
 
@@ -759,12 +905,6 @@ namespace os
        */
       volatile static_double_list_links*
       tail (void) const;
-
-      static_double_list_links*
-      begin (void) const;
-
-      static_double_list_links*
-      end (void) const;
 
       /**
        * @}
@@ -826,7 +966,7 @@ namespace os
        */
 
       /**
-       * @brief Create a list.
+       * @brief Construct a list.
        */
       double_list ();
 
@@ -846,7 +986,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the list.
+       * @brief Destruct the list.
        */
       ~double_list ();
 
@@ -879,7 +1019,7 @@ namespace os
          */
 
         /**
-         * @brief Create an intrusive list.
+         * @brief Construct an intrusive list.
          */
         intrusive_list ();
         intrusive_list (bool clr);
@@ -900,7 +1040,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the list.
+         * @brief Destruct the list.
          */
         ~intrusive_list ();
 
@@ -924,9 +1064,17 @@ namespace os
         void
         link (T& node);
 
+        /**
+         * @brief Iterator begin.
+         * @return An iterator positioned at the first element.
+         */
         iterator
         begin () const;
 
+        /**
+         * @brief Iterator begin.
+         * @return An iterator positioned after the last element.
+         */
         iterator
         end () const;
 
@@ -950,7 +1098,7 @@ namespace os
        */
 
       /**
-       * @brief Create a list of waiting threads.
+       * @brief Construct a list of waiting threads.
        */
       thread_children_list ();
 
@@ -970,7 +1118,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the list.
+       * @brief Destruct the list.
        */
       ~thread_children_list ();
 
@@ -1016,7 +1164,7 @@ namespace os
        */
 
       /**
-       * @brief Create a list of waiting threads.
+       * @brief Construct a list of waiting threads.
        */
       ready_threads_list ();
 
@@ -1036,7 +1184,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the list.
+       * @brief Destruct the list.
        */
       ~ready_threads_list ();
 
@@ -1095,12 +1243,26 @@ namespace os
     public:
 
       /**
+       * @name Types and constants
+       * @{
+       */
+
+      /**
+       * @brief Iterator over the list threads.
+       */
+      using iterator = double_list_iterator<thread, waiting_thread_node, &waiting_thread_node::thread_>;
+
+      /**
+       * @}
+       */
+
+      /**
        * @name Constructors & Destructor
        * @{
        */
 
       /**
-       * @brief Create a list of waiting threads.
+       * @brief Construct a list of waiting threads.
        */
       waiting_threads_list ();
 
@@ -1120,7 +1282,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the list.
+       * @brief Destruct the list.
        */
       ~waiting_threads_list ();
 
@@ -1157,10 +1319,10 @@ namespace os
        * @brief Wake-up one thread (the oldest with the highest priority)
        * @par Parameters
        *  None.
-       * @par Returns
-       *  Nothing.
+       * @retval true The list may have further entries.
+       * @retval false The list is empty.
        */
-      void
+      bool
       resume_one (void);
 
       /**
@@ -1173,7 +1335,19 @@ namespace os
       void
       resume_all (void);
 
-      // TODO add iterator begin(), end()
+      /**
+       * @brief Iterator begin.
+       * @return An iterator positioned at the first element.
+       */
+      iterator
+      begin () const;
+
+      /**
+       * @brief Iterator begin.
+       * @return An iterator positioned after the last element.
+       */
+      iterator
+      end () const;
 
       /**
        * @}
@@ -1195,7 +1369,7 @@ namespace os
        */
 
       /**
-       * @brief Create a list of clock time stamps.
+       * @brief Construct a list of clock time stamps.
        */
       clock_timestamps_list ();
 
@@ -1215,7 +1389,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the list.
+       * @brief Destruct the list.
        */
       ~clock_timestamps_list ();
 
@@ -1277,7 +1451,7 @@ namespace os
        */
 
       /**
-       * @brief Create a list of waiting threads.
+       * @brief Construct a list of waiting threads.
        */
       terminated_threads_list ();
 
@@ -1297,7 +1471,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the list.
+       * @brief Destruct the list.
        */
       ~terminated_threads_list ();
 
@@ -1378,6 +1552,117 @@ namespace os
 {
   namespace rtos
   {
+
+    // ========================================================================
+
+    template<typename T, typename N, T* N::* MP, typename U>
+      constexpr
+      double_list_iterator<T, N, MP, U>::double_list_iterator () :
+          node_
+            { }
+      {
+        ;
+      }
+
+    template<typename T, typename N, T* N::* MP, typename U>
+      constexpr
+      double_list_iterator<T, N, MP, U>::double_list_iterator (N* const node) :
+          node_
+            { node }
+      {
+        ;
+      }
+
+    template<typename T, typename N, T* N::* MP, typename U>
+      constexpr
+      double_list_iterator<T, N, MP, U>::double_list_iterator (
+          reference element) :
+          node_
+            { &(element.*MP) }
+      {
+        static_assert(std::is_convertible<U, T>::value == true, "U must be implicitly convertible to T!");
+      }
+
+    template<typename T, typename N, T* N::* MP, typename U>
+      inline typename double_list_iterator<T, N, MP, U>::pointer
+      double_list_iterator<T, N, MP, U>::operator-> () const
+      {
+        return get_pointer ();
+      }
+
+    template<typename T, typename N, T* N::* MP, typename U>
+      inline typename double_list_iterator<T, N, MP, U>::reference
+      double_list_iterator<T, N, MP, U>::operator* () const
+      {
+        return *get_pointer ();
+      }
+
+    template<typename T, typename N, T* N::* MP, typename U>
+      inline double_list_iterator<T, N, MP, U>&
+      double_list_iterator<T, N, MP, U>::operator++ ()
+      {
+        node_ = static_cast<N*> (node_->next ());
+        return *this;
+      }
+
+    template<typename T, typename N, T* N::* MP, typename U>
+      inline double_list_iterator<T, N, MP, U>
+      double_list_iterator<T, N, MP, U>::operator++ (int)
+      {
+        const auto tmp = *this;
+        node_ = static_cast<N*> (node_->next);
+        return tmp;
+      }
+
+    template<typename T, typename N, T* N::* MP, typename U>
+      inline double_list_iterator<T, N, MP, U>&
+      double_list_iterator<T, N, MP, U>::operator-- ()
+      {
+        node_ = static_cast<N*> (node_->prev);
+        return *this;
+      }
+
+    template<typename T, typename N, T* N::* MP, typename U>
+      double_list_iterator<T, N, MP, U>
+      double_list_iterator<T, N, MP, U>::operator-- (int)
+      {
+        const auto tmp = *this;
+        node_ = static_cast<N*> (node_->prev);
+        return tmp;
+      }
+
+    template<typename T, typename N, T* N::* MP, typename U>
+      inline bool
+      double_list_iterator<T, N, MP, U>::operator== (
+          const double_list_iterator& other) const
+      {
+        return node_ == other.node_;
+      }
+
+    template<typename T, typename N, T* N::* MP, typename U>
+      inline bool
+      double_list_iterator<T, N, MP, U>::operator!= (
+          const double_list_iterator& other) const
+      {
+        return node_ != other.node_;
+      }
+
+#if 1
+    template<typename T, typename N, T* N::* MP, typename U>
+      inline typename double_list_iterator<T, N, MP, U>::pointer
+      double_list_iterator<T, N, MP, U>::get_pointer (void) const
+      {
+        return (node_->*MP);
+      }
+
+    template<typename T, typename N, T* N::* MP, typename U>
+      inline typename double_list_iterator<T, N, MP, U>::iterator_pointer
+      double_list_iterator<T, N, MP, U>::get_iterator_pointer () const
+      {
+        return node_;
+      }
+#endif
+
     // ========================================================================
 
     template<typename T, typename N, N T::* MP, typename U>
@@ -1559,7 +1844,7 @@ namespace os
 
     inline
     waiting_thread_node::waiting_thread_node (rtos::thread& th) :
-        thread_ (th)
+        thread_ (&th)
     {
       ;
     }
@@ -1610,18 +1895,6 @@ namespace os
     static_double_list::tail (void) const
     {
       return (head_.prev ());
-    }
-
-    inline static_double_list_links*
-    static_double_list::begin (void) const
-    {
-      return const_cast<static_double_list_links*> (head_.next ());
-    }
-
-    inline static_double_list_links*
-    static_double_list::end (void) const
-    {
-      return const_cast<static_double_list_links*> (&head_);
     }
 
     // ========================================================================
@@ -1678,7 +1951,7 @@ namespace os
       intrusive_list<T, N, MP>::begin () const
       {
         return iterator
-          { static_cast<N*> (static_double_list::begin ()) };
+          { static_cast<N*> (head_.next ()) };
       }
 
     template<typename T, typename N, N T::* MP>
@@ -1686,7 +1959,7 @@ namespace os
       intrusive_list<T, N, MP>::end () const
       {
         return iterator
-          { static_cast<N*> (static_double_list::end ()) };
+          { static_cast<N*> (const_cast<static_double_list_links*> (&head_)) };
       }
 
     // ========================================================================
@@ -1753,6 +2026,22 @@ namespace os
     waiting_threads_list::head (void) const
     {
       return static_cast<volatile waiting_thread_node*> (double_list::head ());
+    }
+
+    inline waiting_threads_list::iterator
+    waiting_threads_list::begin () const
+    {
+      return iterator
+        {
+            static_cast<waiting_threads_list::iterator::iterator_pointer> (head_.next ()) };
+    }
+
+    inline waiting_threads_list::iterator
+    waiting_threads_list::end () const
+    {
+      return iterator
+        {
+            static_cast<waiting_threads_list::iterator::iterator_pointer> (const_cast<static_double_list_links*> (&head_)) };
     }
 
     // ========================================================================
