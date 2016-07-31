@@ -634,21 +634,12 @@ namespace os
 
       head_ = no_index;
 
-      if (!send_list_.empty ())
-        {
-          // Wake-up all threads, if any.
-          send_list_.resume_all ();
+      // Need not be inside the critical section,
+      // the lists are protected by inner `resume_one()`.
 
-          send_list_.clear ();
-        }
-
-      if (!receive_list_.empty ())
-        {
-          // Wake-up all threads, if any.
-          receive_list_.resume_all ();
-
-          receive_list_.clear ();
-        }
+      // Wake-up all threads, if any.
+      send_list_.resume_all ();
+      receive_list_.resume_all ();
 
 #endif /* !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE) */
 
@@ -656,6 +647,10 @@ namespace os
 
 #if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
+    /*
+     * Internal function.
+     * Should be called from an interrupts critical section.
+     */
     bool
     message_queue::_try_send (const void* msg, std::size_t nbytes,
                               priority_t mprio)
@@ -666,12 +661,32 @@ namespace os
           return false;
         }
 
+      // The first step is to remove the free block from the list,
+      // so another concurrent call will not get it too.
+
       // Get the address where the message will be copied.
       // This is the first free memory block.
       char* dest = static_cast<char*> (first_free_);
 
       // Update to next free, if any (the last one has nullptr).
       first_free_ = *(static_cast<void**> (first_free_));
+
+      // The second step is to copy the message from the user buffer.
+        {
+          // ----- Enter uncritical section -----------------------------------
+          // interrupts::uncritical_section iucs;
+
+          // Copy message from user buffer to queue storage.
+          std::memcpy (dest, msg, nbytes);
+          if (nbytes < msg_size_bytes_)
+            {
+              // Fill in the remaining space with 0x00.
+              std::memset (dest + nbytes, 0x00, msg_size_bytes_ - nbytes);
+            }
+          // ----- Exit uncritical section ------------------------------------
+        }
+
+      // The third step is to link the buffer to the list.
 
       // Using the address, compute the index in the array.
       std::size_t msg_ix = (static_cast<std::size_t> (dest
@@ -719,23 +734,9 @@ namespace os
       // One more message added to the queue.
       ++count_;
 
-        {
-          // ----- Enter uncritical section -----------------------------------
-          interrupts::uncritical_section iucs;
+      // Wake-up one thread, if any.
+      receive_list_.resume_one ();
 
-          // Copy message from user buffer to queue storage.
-          std::memcpy (dest, msg, nbytes);
-          if (nbytes < msg_size_bytes_)
-            {
-              // Fill in the remaining space with 0x00.
-              std::memset (dest + nbytes, 0x00, msg_size_bytes_ - nbytes);
-            }
-
-          // Wake-up one thread, if any.
-          receive_list_.resume_one ();
-
-          // ----- Exit uncritical section ------------------------------------
-        }
       return true;
     }
 
@@ -743,6 +744,10 @@ namespace os
 
 #if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
+    /*
+     * Internal function.
+     * Should be called from an interrupts critical section.
+     */
     bool
     message_queue::_try_receive (void* msg, std::size_t nbytes,
                                  priority_t* mprio)
@@ -753,12 +758,35 @@ namespace os
           return false;
         }
 
+      // Compute the message source address.
       char* src = static_cast<char*> (queue_addr_) + head_ * msg_size_bytes_;
+      priority_t prio = prio_array_[head_];
+
 #if defined(OS_TRACE_RTOS_MQUEUE_)
       trace::printf ("%s(%p,%u) @%p %s src %p %p\n", __func__, msg, nbytes,
           this, name (), src, first_free_);
 #endif
 
+      // Unlink it from the list, so another concurrent call will
+      // not get it too.
+      if (count_ > 1)
+        {
+          // Remove the current element from the list.
+          prev_array_[next_array_[head_]] = prev_array_[head_];
+          next_array_[prev_array_[head_]] = next_array_[head_];
+
+          // Next becomes the new head.
+          head_ = next_array_[head_];
+        }
+      else
+        {
+          // If there was only one, the list is empty now.
+          head_ = no_index;
+        }
+
+      --count_;
+
+      // Copy to destination
         {
           // ----- Enter uncritical section -----------------------------------
           interrupts::uncritical_section iucs;
@@ -767,39 +795,22 @@ namespace os
           memcpy (msg, src, nbytes);
           if (mprio != nullptr)
             {
-              *mprio = prio_array_[head_];
+              *mprio = prio;
             }
           // ----- Exit uncritical section ------------------------------------
         }
 
-        {
-          if (count_ > 1)
-            {
-              // Remove the current element from the list.
-              prev_array_[next_array_[head_]] = prev_array_[head_];
-              next_array_[prev_array_[head_]] = next_array_[head_];
+      // After the message was copied, the block can be released.
 
-              // Next becomes the new head.
-              head_ = next_array_[head_];
-            }
-          else
-            {
-              // If there was only one, the list is empty now.
-              head_ = no_index;
-            }
+      // Perform a push_front() on the single linked LIFO list,
+      // i.e. add the block to the beginning of the list.
 
-          // Perform a push_front() on the single linked LIFO list,
-          // i.e. add the block to the beginning of the list.
+      // Link previous list to this block; may be null, but it does
+      // not matter.
+      *(static_cast<void**> (static_cast<void*> (src))) = first_free_;
 
-          // Link previous list to this block; may be null, but it does
-          // not matter.
-          *(static_cast<void**> (static_cast<void*> (src))) = first_free_;
-
-          // Now this block is the first one.
-          first_free_ = src;
-
-          --count_;
-        }
+      // Now this block is the first one.
+      first_free_ = src;
 
       // Wake-up one thread, if any.
       send_list_.resume_one ();
@@ -914,6 +925,10 @@ namespace os
 
           if (crt_thread.interrupted ())
             {
+#if defined(OS_TRACE_RTOS_MQUEUE)
+              trace::printf ("%s(%p,%d,%d) EINTR @%p %s\n", __func__, msg,
+                             nbytes, mprio, this, name ());
+#endif
               return EINTR;
             }
         }
@@ -1115,11 +1130,19 @@ namespace os
 
           if (crt_thread.interrupted ())
             {
+#if defined(OS_TRACE_RTOS_MQUEUE)
+              trace::printf ("%s(%p,%u,%u,%u) EINTR @%p %s\n", __func__, msg,
+                             nbytes, mprio, timeout, this, name ());
+#endif
               return EINTR;
             }
 
           if (clock_->steady_now () >= timeout_timestamp)
             {
+#if defined(OS_TRACE_RTOS_MQUEUE)
+              trace::printf ("%s(%p,%u,%u,%u) ETIMEDOUT @%p %s\n", __func__,
+                             msg, nbytes, mprio, timeout, this, name ());
+#endif
               return ETIMEDOUT;
             }
         }
@@ -1230,6 +1253,10 @@ namespace os
 
           if (crt_thread.interrupted ())
             {
+#if defined(OS_TRACE_RTOS_MQUEUE)
+              trace::printf ("%s(%p,%u) EINTR @%p %s\n", __func__, msg, nbytes,
+                             this, name ());
+#endif
               return EINTR;
             }
         }
@@ -1446,16 +1473,19 @@ namespace os
 
           if (crt_thread.interrupted ())
             {
+#if defined(OS_TRACE_RTOS_MQUEUE)
+              trace::printf ("%s(%p,%u,%u) EINTR @%p %s\n", __func__, msg,
+                             nbytes, timeout, this, name ());
+#endif
               return EINTR;
-            }
-
-          if (_try_receive (msg, nbytes, mprio))
-            {
-              return result::ok;
             }
 
           if (clock_->steady_now () >= timeout_timestamp)
             {
+#if defined(OS_TRACE_RTOS_MQUEUE)
+              trace::printf ("%s(%p,%u,%u) ETIMEDOUT @%p %s\n", __func__, msg,
+                             nbytes, timeout, this, name ());
+#endif
               return ETIMEDOUT;
             }
         }
