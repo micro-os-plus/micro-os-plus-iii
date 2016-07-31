@@ -51,23 +51,37 @@ Changes, in reverse chronological order:
 
 ### v6.3.3 2016-07-11
 
-* rtos/c api: add `os_clock_get_hrclock()`
-* doxy: add details for thread attributes
-* rtos/thread state: remove `inactive`, `os_thread_state_inactive`
-* rtos/thread: rename `sched_prio()` -> `priority()`
-* rename `os_thread_get_priority()`, `os_thread_set_priority()`
-* rtos/thread: rename `thread::sched_state()` -> `state()`
-* rename `os_thread_get_state()`
+- rtos/c api: add `os_clock_get_hrclock()`
+- doxy: add details for thread attributes
+- rtos/thread state: remove `inactive`, `os_thread_state_inactive`
+- rtos/thread: rename `sched_prio()` -> `priority()`
+- rename `os_thread_get_priority()`, `os_thread_set_priority()`
+- rtos/thread: rename `thread::sched_state()` -> `state()`
+- rename `os_thread_get_state()`.
 
 ### v6.3.4 2016-07-21
 
-* rtos/os-semaphore: remove defaults, initial value must be explicitly specified
-* doxy: re-enable Operators section
-* rtos/os-mutex: add consistent\_ & recoverable\_ flags; not yet fully functional
-* rename `recursive_attributes` -> `attributes_recursive`
-* rename `recursive_initializer` -> `initializer_recursive`
-* rename `normal_initializer` -> `initializer_normal`
-* rename `os_mutex_attr_init_recursive()` -> `os_mutex_attr_recursive_init()`
-* rtos: add `scheduler::preemptive()` & `scheduler::preemptive(bool)`
-* add `OS_BOOL_RTOS_SCHEDULER_PREEMPTIVE`
-* add `os_sched_is_preemptive()` & `os_sched_set_preemptive()`
+- rtos/os-semaphore: remove defaults, initial value must be explicitly specified
+- doxy: re-enable Operators section
+- rtos/os-mutex: add consistent\_ & recoverable\_ flags; not yet fully functional
+- rename `recursive_attributes` -> `attributes_recursive`
+- rename `recursive_initializer` -> `initializer_recursive`
+- rename `normal_initializer` -> `initializer_normal`
+- rename `os_mutex_attr_init_recursive()` -> `os_mutex_attr_recursive_init()`
+- rtos: add `scheduler::preemptive()` & `scheduler::preemptive(bool)`
+- add `OS_BOOL_RTOS_SCHEDULER_PREEMPTIVE`
+- add `os_sched_is_preemptive()` & `os_sched_set_preemptive()`.
+
+### v6.3.5 2016-07-31
+
+- addd `OS_TRACE_RTOS_LISTS_CLOCKS`
+- refurbish scheduler `lock()`, `unlock()`, `locked(state_t)`
+- rename `os_irq_status_t` -> `os_irq_state_t`
+- rename `interrupts::status_t` -> `interrupts::state_t`
+- flags `clear()` no longer accept 0 mask; use `flags::all`
+- add mutex accessors `type()`, `protocol()`, `robustness()`
+- add `class double_list_iterator`; use it in `waiting_threads_list`
+- rename `timer::periodic_attributes` -> `timer::attributes_periodic`
+- add `internal::event_flags`; not public.
+
+---
