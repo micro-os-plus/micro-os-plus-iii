@@ -180,7 +180,7 @@ namespace os
 
       /**
        * @brief Clear thread event flags.
-       * @param [in] mask The OR-ed flags to clear. Zero means 'all'
+       * @param [in] mask The OR-ed flags to clear.
        * @param [out] oflags Optional pointer where to store the
        *  previous flags; may be `nullptr`.
        * @retval result::ok The flags were cleared.
@@ -425,7 +425,7 @@ namespace os
          */
 
         /**
-         * @brief Create a thread stack object.
+         * @brief Construct a thread stack object instance.
          */
         stack ();
 
@@ -445,7 +445,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the stack object.
+         * @brief Destruct the stack object instance.
          */
         ~stack () = default;
 
@@ -629,7 +629,7 @@ namespace os
          */
 
         /**
-         * @brief Create a thread context object.
+         * @brief Construct a thread context object instance.
          */
         context ();
 
@@ -649,7 +649,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the context object.
+         * @brief Destruct the context object instance.
          */
         ~context () = default;
 
@@ -717,7 +717,7 @@ namespace os
          */
 
         /**
-         * @brief Stack object.
+         * @brief Stack object instance.
          */
         thread::stack stack_;
 
@@ -759,7 +759,7 @@ namespace os
          */
 
         /**
-         * @brief Create a thread attributes object.
+         * @brief Construct a thread attributes object instance.
          * @par Parameters
          *  None
          */
@@ -782,7 +782,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the thread attributes object.
+         * @brief Destruct the thread attributes object instance.
          */
         ~attributes () = default;
 
@@ -797,7 +797,7 @@ namespace os
          * @{
          */
 
-        // Public members, no accessors and mutators required.
+        // Public members; no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
         /**
          * @brief Address of the user defined storage for the thread stack.
@@ -855,7 +855,7 @@ namespace os
          */
 
         /**
-         * @brief Create a thread attributes object.
+         * @brief Construct a thread attributes object instance.
          * @par Parameters
          *  None
          */
@@ -878,7 +878,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the thread attributes object.
+         * @brief Destruct the thread attributes object instance.
          */
         ~statistics () = default;
 
@@ -965,7 +965,7 @@ namespace os
        */
 
       /**
-       * @brief Create a thread object.
+       * @brief Construct a thread object instance.
        * @param [in] function Pointer to thread function.
        * @param [in] args Pointer to thread function arguments.
        * @param [in] attr Reference to attributes.
@@ -976,7 +976,7 @@ namespace os
               const Allocator& allocator = Allocator ());
 
       /**
-       * @brief Create a named thread object.
+       * @brief Construct a named thread object instance.
        * @param [in] name Pointer to name.
        * @param [in] function Pointer to thread function.
        * @param [in] args Pointer to thread function arguments.
@@ -1010,7 +1010,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the thread object.
+       * @brief Destruct the thread object instance.
        */
       virtual
       ~thread ();
@@ -1198,7 +1198,7 @@ namespace os
        * @brief Get the thread context stack.
        * @par Parameters
        *  None
-       * @return A reference to the context stack object.
+       * @return A reference to the context stack object instance.
        */
       class thread::stack&
       stack (void);
@@ -1418,12 +1418,10 @@ namespace os
        *  may be `nullptr`.
        * @param [in] mode Mode bits to select if either all or any flags
        *  are expected, and if the flags should be cleared.
-       * @retval result::ok All expected flags are raised.
-       * @retval EINVAL The mask is outside of the permitted range.
-       * @retval EWOULDBLOCK The expected condition did not occur.
-       * @retval ENOTRECOVERABLE Wait failed.
+       * @retval true All expected flags are raised.
+       * @retval false The expected flags are not raised.
        */
-      result_t
+      bool
       _try_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
 
       /**
@@ -1614,7 +1612,7 @@ namespace os
          */
 
         /**
-         * @brief Create a thread object.
+         * @brief Construct a thread object instance.
          * @param [in] function Pointer to thread function.
          * @param [in] args Pointer to thread function arguments.
          * @param [in] attr Reference to attributes.
@@ -1626,7 +1624,7 @@ namespace os
                           const Allocator& allocator = Allocator ());
 
         /**
-         * @brief Create a named thread object.
+         * @brief Construct a named thread object instance.
          * @param [in] name Pointer to name.
          * @param [in] function Pointer to thread function.
          * @param [in] args Pointer to thread function arguments.
@@ -1654,7 +1652,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the thread object.
+         * @brief Destruct the thread object instance.
          */
         virtual
         ~thread_allocated ();
@@ -1708,7 +1706,7 @@ namespace os
          */
 
         /**
-         * @brief Create a thread object.
+         * @brief Construct a thread object instance.
          * @param [in] function Pointer to thread function.
          * @param [in] args Pointer to thread function arguments.
          * @param [in] attr Reference to attributes.
@@ -1717,7 +1715,7 @@ namespace os
                        const attributes& attr = initializer);
 
         /**
-         * @brief Create a named thread object.
+         * @brief Construct a named thread object instance.
          * @param [in] name Pointer to name.
          * @param [in] function Pointer to thread function.
          * @param [in] args Pointer to thread function arguments.
@@ -1742,7 +1740,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the thread object.
+         * @brief Destruct the thread object instance.
          */
         virtual
         ~thread_static ();

@@ -78,11 +78,11 @@ namespace os
      *
      * On some ports (like the Cortex-M) the thread context is
      * stored on the stack and a pointer to the current location
-     * is kept in the context object.
+     * is kept in the context object instance.
      *
      * On other ports (like the synthetic POSIX port), the
      * makecontext() functions create and manage large
-     * ucontex_t structures stored in the context object.
+     * ucontex_t structures stored in the context object instance.
      */
 
     /**
@@ -129,7 +129,7 @@ namespace os
      * int
      * os_main(int argc, char* argv[])
      * {
-     *   // Create new thread, with function and no arguments.
+     *   // Construct new thread, with function and no arguments.
      *   thread th { func, nullptr };
      *
      *   // Do something.
@@ -546,6 +546,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
+          // If the thread is not already in the ready list, enqueue it.
           if (ready_node_.next () == nullptr)
             {
               scheduler::ready_threads_list_.link (ready_node_);
@@ -606,6 +607,12 @@ namespace os
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
       os_assert_err(prio < priority::error, EINVAL);
       os_assert_err(prio != priority::none, EINVAL);
+
+      if (prio_ == prio)
+        {
+          // Optimise, if priority did not change.
+          return result::ok;
+        }
 
       prio_ = prio;
 
@@ -1031,7 +1038,8 @@ namespace os
     thread::flags_raise (flags::mask_t mask, flags::mask_t* oflags)
     {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
-      trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
+      trace::printf ("%s(0x%X) @%p %s <0x%X\n", __func__, mask, this, name (),
+                     flags_mask_);
 #endif
 
       os_assert_err(mask != 0, EINVAL);
@@ -1050,9 +1058,13 @@ namespace os
 
           this->resume ();
 
-          return result::ok;
           // ----- Exit critical section --------------------------------------
         }
+#if defined(OS_TRACE_RTOS_THREAD_FLAGS)
+      trace::printf ("%s(0x%X) @%p %s >0x%X\n", __func__, mask, this, name (),
+                     flags_mask_);
+#endif
+      return result::ok;
     }
 
     /**
@@ -1063,42 +1075,49 @@ namespace os
      * @details
      *
      * Internal function used to test if the desired flags are raised.
+     *
+     * Same as event_flags::_try_wait().
      */
-    result_t
+    bool
     thread::_try_wait (flags::mask_t mask, flags::mask_t* oflags,
                        flags::mode_t mode)
     {
-      if ((mask != 0) && ((mode & flags::mode::all) != 0))
-        {
-          // Only if all desires flags are raised we're done.
-          if ((flags_mask_ & mask) == mask)
-            {
-              if (oflags != nullptr)
-                {
-                  *oflags = flags_mask_;
-                }
-              // Clear desired flags.
-              flags_mask_ &= ~mask;
-              return result::ok;
-            }
-        }
-      else if ((mask == 0) || ((mode & flags::mode::any) != 0))
+      if (mask == flags::any)
         {
           // Any flag will do it.
           if (flags_mask_ != 0)
             {
-              // Possibly return .
               if (oflags != nullptr)
                 {
                   *oflags = flags_mask_;
                 }
-              // Since we returned them all, also clear them all.
-              flags_mask_ = 0;
-              return result::ok;
+
+              if (mode & flags::mode::clear)
+                {
+                  // Clear them all.
+                  flags_mask_ = 0;
+                }
+              return true;
             }
         }
+      else if (((((mode & flags::mode::all) != 0))
+          && ((flags_mask_ & mask) == mask))
+          || (((mode & flags::mode::any) != 0) && ((flags_mask_ & mask) != 0)))
+        {
+          if (oflags != nullptr)
+            {
+              *oflags = (flags_mask_ & mask);
+            }
 
-      return EWOULDBLOCK;
+          if (mode & flags::mode::clear)
+            {
+              // Clear desired flags.
+              flags_mask_ &= ~mask;
+            }
+          return true;
+        }
+
+      return false;
     }
 
     result_t
@@ -1106,7 +1125,7 @@ namespace os
                          flags::mode_t mode)
     {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
-      trace::printf ("%s(0x%X, %u) @%p %s 0x%X\n", __func__, mask, mode, this,
+      trace::printf ("%s(0x%X,%u) @%p %s <0x%X\n", __func__, mask, mode, this,
                      name (), flags_mask_);
 #endif
 
@@ -1114,8 +1133,7 @@ namespace os
       os_assert_err(!scheduler::locked (), EPERM);
 
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
-      clock::timestamp_t prev = clock_->now ();
-      clock::duration_t slept_ticks = 0;
+      clock::timestamp_t begin_timestamp = clock_->now ();
 #endif
       for (;;)
         {
@@ -1123,12 +1141,13 @@ namespace os
               // ----- Enter critical section ---------------------------------
               interrupts::critical_section ics;
 
-              if (_try_wait (mask, oflags, mode) == result::ok)
+              if (_try_wait (mask, oflags, mode))
                 {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
-                  slept_ticks = static_cast<clock::duration_t> (clock_->now ()
-                      - prev);
-                  trace::printf ("%s(0x%X, %d)=%d @%p %s 0x%X\n", __func__,
+                  clock::duration_t slept_ticks =
+                      static_cast<clock::duration_t> (clock_->now ()
+                          - begin_timestamp);
+                  trace::printf ("%s(0x%X,%u) in %d @%p %s >0x%X\n", __func__,
                                  mask, mode, slept_ticks, this, name (),
                                  flags_mask_);
 #endif
@@ -1141,6 +1160,10 @@ namespace os
 
           if (interrupted ())
             {
+#if defined(OS_TRACE_RTOS_THREAD_FLAGS)
+              trace::printf ("%s(0x%X,%u) EINTR @%p %s\n", __func__, mask, mode,
+                             this, name ());
+#endif
               return EINTR;
             }
         }
@@ -1152,7 +1175,7 @@ namespace os
                              flags::mode_t mode)
     {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
-      trace::printf ("%s(0x%X, %d) @%p %s 0x%X\n", __func__, mask, mode, this,
+      trace::printf ("%s(0x%X,%u) @%p %s <0x%X\n", __func__, mask, mode, this,
                      name (), flags_mask_);
 #endif
 
@@ -1161,7 +1184,14 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          return _try_wait (mask, oflags, mode);
+          if (_try_wait (mask, oflags, mode))
+            {
+              return result::ok;
+            }
+          else
+            {
+              return EWOULDBLOCK;
+            }
           // ----- Exit critical section --------------------------------------
         }
     }
@@ -1171,8 +1201,8 @@ namespace os
                                flags::mask_t* oflags, flags::mode_t mode)
     {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
-      trace::printf ("%s(0x%X, %u, %u) @%p %s 0x%X\n", __func__, mask, mode,
-                     timeout, this, name (), flags_mask_);
+      trace::printf ("%s(0x%X,%u,%u) @%p %s <0x%X\n", __func__, mask, timeout,
+                     mode, this, name (), flags_mask_);
 #endif
 
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
@@ -1182,8 +1212,12 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          if (_try_wait (mask, oflags, mode) == result::ok)
+          if (_try_wait (mask, oflags, mode))
             {
+#if defined(OS_TRACE_RTOS_THREAD_FLAGS)
+              trace::printf ("%s(0x%X,%u,%u) @%p %s >0x%X\n", __func__, mask,
+                             timeout, mode, this, name (), flags_mask_);
+#endif
               return result::ok;
             }
           // ----- Exit critical section --------------------------------------
@@ -1200,17 +1234,24 @@ namespace os
       timeout_thread_node timeout_node
         { timeout_timestamp, *this };
 
-      result_t res = ENOTRECOVERABLE;
       for (;;)
         {
             {
               // ----- Enter critical section ---------------------------------
               interrupts::critical_section ics;
 
-              if (_try_wait (mask, oflags, mode) == result::ok)
+              if (_try_wait (mask, oflags, mode))
                 {
-                  res = result::ok;
-                  break;
+#if defined(OS_TRACE_RTOS_THREAD_FLAGS)
+                  clock::duration_t slept_ticks =
+                      static_cast<clock::duration_t> (clock_->steady_now ()
+                          - begin_timestamp);
+                  trace::printf ("%s(0x%X,%u,%u) in %u @%p %s >0x%X\n",
+                                 __func__, mask, timeout, mode,
+                                 static_cast<unsigned int> (slept_ticks), this,
+                                 name (), flags_mask_);
+#endif
+                  return result::ok;
                 }
 
               // Remove this thread from the ready list, if there.
@@ -1239,27 +1280,24 @@ namespace os
 
           if (interrupted ())
             {
-              res = EINTR;
-              break;
+#if defined(OS_TRACE_RTOS_THREAD_FLAGS)
+              trace::printf ("%s(0x%X,%u,%u) EINTR @%p %s\n", __func__, mask,
+                             timeout, mode, this, name ());
+#endif
+              return EINTR;
             }
 
           if (clock_->steady_now () >= timeout_timestamp)
             {
-              res = ETIMEDOUT;
-              break;
+#if defined(OS_TRACE_RTOS_THREAD_FLAGS)
+              trace::printf ("%s(0x%X,%u,%u) ETIMEDOUT @%p %s\n", __func__,
+                             mask, timeout, mode, this, name ());
+#endif
+              return ETIMEDOUT;
             }
         }
 
-#if defined(OS_TRACE_RTOS_THREAD_FLAGS)
-      clock::duration_t slept_ticks =
-          static_cast<clock::duration_t> (clock_->steady_now ()
-              - begin_timestamp);
-      trace::printf ("%s(0x%X, %u, %u)=%u @%p %s 0x%X\n", __func__, mask, mode,
-                     timeout, static_cast<unsigned int> (slept_ticks), this,
-                     name (), flags_mask_);
-#endif
-
-      return res;
+      return ENOTRECOVERABLE;
     }
 
     /**
@@ -1281,6 +1319,8 @@ namespace os
 #endif
 
       os_assert_err(!interrupts::in_handler_mode (), flags::all);
+
+      flags::mask_t ret;
         {
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
@@ -1288,20 +1328,25 @@ namespace os
           if (mask == 0)
             {
               // Return the entire mask.
-              return flags_mask_;
+              ret = flags_mask_;
             }
-
-          flags::mask_t ret = flags_mask_ & mask;
-          if ((mode & flags::mode::clear) != 0)
+          else
             {
-              // Clear the selected bits; leave the rest untouched.
-              flags_mask_ &= ~mask;
+              ret = flags_mask_ & mask;
+              if ((mode & flags::mode::clear) != 0)
+                {
+                  // Clear the selected bits; leave the rest untouched.
+                  flags_mask_ &= ~mask;
+                }
             }
-
-          // Return the selected bits.
-          return ret;
           // ----- Exit critical section --------------------------------------
         }
+#if defined(OS_TRACE_RTOS_THREAD_FLAGS)
+      trace::printf ("%s(0x%X)=0x%X @%p %s\n", __func__, mask, flags_mask_,
+                     this, name ());
+#endif
+      // Return the selected bits.
+      return ret;
     }
 
     /**
@@ -1313,7 +1358,7 @@ namespace os
     thread::_flags_clear (flags::mask_t mask, flags::mask_t* oflags)
     {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
-      trace::printf ("%s(0x%X) @%p %s 0x%X\n", __func__, mask, this, name (),
+      trace::printf ("%s(0x%X) @%p %s <0x%X\n", __func__, mask, this, name (),
                      flags_mask_);
 #endif
 
@@ -1328,20 +1373,16 @@ namespace os
               *oflags = flags_mask_;
             }
 
-          if (mask == 0)
-            {
-              // Clear all flags.
-              flags_mask_ = 0;
-            }
-          else
-            {
-              // Clear the selected bits; leave the rest untouched.
-              flags_mask_ &= ~mask;
-            }
+          // Clear the selected bits; leave the rest untouched.
+          flags_mask_ &= ~mask;
 
-          return result::ok;
           // ----- Exit critical section --------------------------------------
         }
+#if defined(OS_TRACE_RTOS_THREAD_FLAGS)
+      trace::printf ("%s(0x%X) @%p %s >0x%X\n", __func__, mask, this, name (),
+                     flags_mask_);
+#endif
+      return result::ok;
     }
 
     /**
