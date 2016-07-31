@@ -61,7 +61,7 @@ namespace os
     const timer::attributes timer::once_initializer;
 
     /**
-     * @class periodic_attributes
+     * @class attributes_periodic
      * @details
      * Allow to assign a name to the timer.
      */
@@ -70,7 +70,7 @@ namespace os
      * @details
      * This variable can be used to create a periodic timer.
      */
-    const timer::periodic_attributes timer::periodic_initializer;
+    const timer::attributes_periodic timer::periodic_initializer;
 
     // ------------------------------------------------------------------------
 
@@ -100,7 +100,7 @@ namespace os
      * int
      * os_main(int argc, char* argv[])
      * {
-     *   // Create new thread, with function and no arguments.
+     *   // Construct new thread, with function and no arguments.
      *   timer tm { func, nullptr };
      *
      *   // Schedule func() to be executed after 100 ticks.

@@ -127,7 +127,7 @@ namespace os
          */
 
         /**
-         * @brief Create a timer attributes object.
+         * @brief Construct a timer attributes object instance.
          * @par Parameters
          *  None
          */
@@ -157,7 +157,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the timer attributes object.
+         * @brief Destruct the timer attributes object instance.
          */
         ~attributes () = default;
 
@@ -172,7 +172,7 @@ namespace os
          * @{
          */
 
-        // Public members, no accessors and mutators required.
+        // Public members; no accessors and mutators required.
         // Warning: must match the type & order of the C file header.
         /**
          * @brief Timer type attribute.
@@ -196,7 +196,7 @@ namespace os
        * @brief Periodic timer attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      class periodic_attributes : public attributes
+      class attributes_periodic : public attributes
       {
       public:
 
@@ -206,43 +206,43 @@ namespace os
          */
 
         /**
-         * @brief Create periodic timer attributes object.
+         * @brief Construct periodic timer attributes object instance.
          * @par Parameters
          *  None
          */
         constexpr
-        periodic_attributes ();
+        attributes_periodic ();
 
         /**
          * @cond ignore
          */
 
-        periodic_attributes (const periodic_attributes&) = default;
-        periodic_attributes (periodic_attributes&&) = default;
-        periodic_attributes&
-        operator= (const periodic_attributes&) = default;
-        periodic_attributes&
-        operator= (periodic_attributes&&) = default;
+        attributes_periodic (const attributes_periodic&) = default;
+        attributes_periodic (attributes_periodic&&) = default;
+        attributes_periodic&
+        operator= (const attributes_periodic&) = default;
+        attributes_periodic&
+        operator= (attributes_periodic&&) = default;
 
         /**
          * @endcond
          */
 
         /**
-         * @brief Destroy the periodic timer attributes object.
+         * @brief Destruct the periodic timer attributes object instance.
          */
-        ~periodic_attributes () = default;
+        ~attributes_periodic () = default;
 
         /**
          * @}
          */
 
-      }; /* class periodic_attributes */
+      }; /* class attributes_periodic */
 
       /**
        * @brief Default periodic timer initialiser.
        */
-      static const periodic_attributes periodic_initializer;
+      static const attributes_periodic periodic_initializer;
 
       /**
        * @name Constructors & Destructor
@@ -250,7 +250,7 @@ namespace os
        */
 
       /**
-       * @brief Create a timer object.
+       * @brief Construct a timer object instance.
        * @param [in] function Pointer to timer function.
        * @param [in] args Pointer to timer function arguments.
        * @param [in] attr Reference to attributes.
@@ -259,7 +259,7 @@ namespace os
                  once_initializer);
 
       /**
-       * @brief Create a named timer object.
+       * @brief Construct a named timer object instance.
        * @param [in] name Pointer to name.
        * @param [in] function Pointer to timer function.
        * @param [in] args Pointer to timer function arguments.
@@ -284,7 +284,7 @@ namespace os
        */
 
       /**
-       * @brief Destroy the timer object.
+       * @brief Destruct the timer object instance.
        */
       ~timer ();
 
@@ -459,7 +459,7 @@ namespace os
     // ========================================================================
 
     constexpr
-    timer::periodic_attributes::periodic_attributes () :
+    timer::attributes_periodic::attributes_periodic () :
         attributes
           { run::periodic }
     {
