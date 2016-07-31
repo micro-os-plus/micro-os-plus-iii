@@ -412,6 +412,9 @@ namespace os
 
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
+      // Wake-up all threads, if any.
+      // Need not be inside the critical section,
+      // the list is protected by inner `resume_one()`.
       list_.resume_all ();
 
       return result::ok;
@@ -530,13 +533,13 @@ namespace os
         {
           // Add this thread to the condition variable waiting list.
           list_.link (node);
-          node.thread_.waiting_node_ = &node;
+          node.thread_->waiting_node_ = &node;
 
           res = mutex.lock ();
 
           // Remove the thread from the node waiting list,
           // if not already removed.
-          node.thread_.waiting_node_ = nullptr;
+          node.thread_->waiting_node_ = nullptr;
           node.unlink ();
         }
 
@@ -674,13 +677,13 @@ namespace os
         {
           // Add this thread to the condition variable waiting list.
           list_.link (node);
-          node.thread_.waiting_node_ = &node;
+          node.thread_->waiting_node_ = &node;
 
           res = mutex.timed_lock (timeout);
 
           // Remove the thread from the node waiting list,
           // if not already removed.
-          node.thread_.waiting_node_ = nullptr;
+          node.thread_->waiting_node_ = nullptr;
           node.unlink ();
         }
 

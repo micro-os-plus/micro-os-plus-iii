@@ -116,7 +116,7 @@ namespace os
 
       /**
        * @details
-       * Create all RTOS internal objects and be ready to run.
+       * Initialise all RTOS internal objects and be ready to run.
        *
        * Must be called only once, usually in main().
        *
@@ -295,9 +295,9 @@ namespace os
 
         // Add this thread to the node waiting list.
         list.link (node);
-        node.thread_.waiting_node_ = &node;
+        node.thread_->waiting_node_ = &node;
 
-        node.thread_.state_ = thread::state::suspended;
+        node.thread_->state_ = thread::state::suspended;
       }
 
       void
@@ -309,7 +309,7 @@ namespace os
 
             // Remove the thread from the node waiting list,
             // if not already removed.
-            node.thread_.waiting_node_ = nullptr;
+            node.thread_->waiting_node_ = nullptr;
             node.unlink ();
             // ----- Exit critical section ------------------------------------
           }
@@ -325,9 +325,9 @@ namespace os
 
         // Add this thread to the node waiting list.
         list.link (node);
-        node.thread_.waiting_node_ = &node;
+        node.thread_->waiting_node_ = &node;
 
-        node.thread_.state_ = thread::state::suspended;
+        node.thread_->state_ = thread::state::suspended;
 
         // Add this thread to the clock timeout list.
         timeout_list.link (timeout_node);
@@ -348,7 +348,7 @@ namespace os
 
         // Remove the thread from the node waiting list,
         // if not already removed.
-        node.thread_.waiting_node_ = nullptr;
+        node.thread_->waiting_node_ = nullptr;
         node.unlink ();
         // ----- Exit critical section ----------------------------------------
       }

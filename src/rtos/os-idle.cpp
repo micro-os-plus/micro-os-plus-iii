@@ -80,7 +80,7 @@ os_idle (thread::func_args_t args __attribute__((unused)))
               node->unlink ();
               // ----- Exit critical section ----------------------------------
             }
-          node->thread_._destroy ();
+          node->thread_->_destroy ();
 
           this_thread::yield ();
         }
