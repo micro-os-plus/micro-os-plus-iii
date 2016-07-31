@@ -324,7 +324,7 @@ namespace os
          */
 
         /**
-         * @brief Create a lock.
+         * @brief Construct a lockable object instance.
          * @par Parameters
          *  None
          */
@@ -347,7 +347,7 @@ namespace os
          */
 
         /**
-         * @brief Destroy the lock.
+         * @brief Destruct the lockable object instance.
          */
         ~lockable ();
 
@@ -703,7 +703,7 @@ namespace os
          */
 
         /**
-         * @brief Create an interrupts lock.
+         * @brief Construct an interrupts lock.
          * @par Parameters
          *  None
          */
@@ -711,7 +711,7 @@ namespace os
         lockable ();
 
         /**
-         * @brief Destroy the interrupts lock.
+         * @brief Destruct the interrupts lock.
          */
         ~lockable ();
 
@@ -901,7 +901,9 @@ namespace os
       critical_section::critical_section () :
           state_ (lock ())
       {
-        ;
+#if defined(OS_TRACE_RTOS_SCHEDULER)
+        trace::printf (" {c ");
+#endif
       }
 
       /**
@@ -914,6 +916,9 @@ namespace os
       inline
       critical_section::~critical_section ()
       {
+#if defined(OS_TRACE_RTOS_SCHEDULER)
+        trace::printf (" c} ");
+#endif
         locked (state_);
       }
 
@@ -927,7 +932,9 @@ namespace os
       uncritical_section::uncritical_section () :
           state_ (unlock ())
       {
-        ;
+#if defined(OS_TRACE_RTOS_SCHEDULER)
+        trace::printf (" {u ");
+#endif
       }
 
       /**
@@ -940,6 +947,9 @@ namespace os
       inline
       uncritical_section::~uncritical_section ()
       {
+#if defined(OS_TRACE_RTOS_SCHEDULER)
+        trace::printf (" u} ");
+#endif
         locked (state_);
       }
 
