@@ -250,17 +250,18 @@ namespace os
 
 #if !defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
-      if (!list_.empty ())
-        {
-          // Wake-up all threads, if any.
-          list_.resume_all ();
-
-          list_.clear ();
-        }
+      // Wake-up all threads, if any.
+      // Need not be inside the critical section,
+      // the list is protected by inner `resume_one()`.
+      list_.resume_all ();
 
 #endif /* !defined(OS_USE_RTOS_PORT_SEMAPHORE) */
     }
 
+    /*
+     * Internal function.
+     * Should be called from an interrupts critical section.
+     */
     bool
     semaphore::_try_wait (void)
     {
@@ -268,8 +269,7 @@ namespace os
         {
           --count_;
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
-          trace::printf ("%s() @%p %s count %u\n", __func__, this, name (),
-                         count_);
+          trace::printf ("%s() @%p %s >%u\n", __func__, this, name (), count_);
 #endif
           return true;
         }
@@ -398,7 +398,7 @@ namespace os
     semaphore::wait ()
     {
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
-      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+      trace::printf ("%s() @%p %s <%u\n", __func__, this, name (), count_);
 #endif
 
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
@@ -456,6 +456,9 @@ namespace os
 
           if (crt_thread.interrupted ())
             {
+#if defined(OS_TRACE_RTOS_SEMAPHORE)
+              trace::printf ("%s() EINTR @%p %s\n", __func__, this, name ());
+#endif
               return EINTR;
             }
         }
@@ -490,7 +493,7 @@ namespace os
     semaphore::try_wait ()
     {
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
-      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+      trace::printf ("%s() @%p %s <%u\n", __func__, this, name (), count_);
 #endif
 
       assert(port::interrupts::is_priority_valid ());
@@ -559,8 +562,9 @@ namespace os
     semaphore::timed_wait (clock::duration_t timeout)
     {
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
-      trace::printf ("%s(%u) @%p %s\n", __func__,
-                     static_cast<unsigned int> (timeout), this, name ());
+      trace::printf ("%s(%u) @%p %s <%u\n", __func__,
+                     static_cast<unsigned int> (timeout), this, name (),
+                     count_);
 #endif
 
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
@@ -627,11 +631,21 @@ namespace os
 
           if (crt_thread.interrupted ())
             {
+#if defined(OS_TRACE_RTOS_SEMAPHORE)
+              trace::printf ("%s(%u) EINTR @%p %s\n", __func__,
+                             static_cast<unsigned int> (timeout), this,
+                             name ());
+#endif
               return EINTR;
             }
 
           if (clock_->steady_now () >= timeout_timestamp)
             {
+#if defined(OS_TRACE_RTOS_SEMAPHORE)
+              trace::printf ("%s(%u) ETIMEDOUT @%p %s\n", __func__,
+                             static_cast<unsigned int> (timeout), this,
+                             name ());
+#endif
               return ETIMEDOUT;
             }
         }
@@ -686,7 +700,7 @@ namespace os
     semaphore::reset (void)
     {
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
-      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+      trace::printf ("%s() @%p %s <%u\n", __func__, this, name (), count_);
 #endif
 
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
