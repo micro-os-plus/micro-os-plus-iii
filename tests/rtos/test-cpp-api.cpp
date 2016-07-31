@@ -424,6 +424,24 @@ test_cpp_api (void)
       mutex mx1;
       mx1.lock ();
       mx1.unlock ();
+
+      mx1.try_lock ();
+      mx1.unlock ();
+
+      mx1.timed_lock (10);
+      mx1.unlock ();
+
+      mx1.name ();
+
+      mx1.type ();
+      mx1.protocol ();
+      mx1.robustness ();
+      mx1.owner ();
+
+      thread::priority_t prio = mx1.prio_ceiling ();
+      mx1.prio_ceiling (prio);
+
+      mx1.reset ();
     }
 
     {
