@@ -233,7 +233,7 @@ namespace os
      */
     memory_pool::memory_pool (std::size_t blocks, std::size_t block_size_bytes,
                               const attributes& attr,
-                              const Allocator& allocator) :
+                              const allocator_type& allocator) :
         memory_pool
           { nullptr, blocks, block_size_bytes, attr, allocator }
     {
@@ -268,7 +268,7 @@ namespace os
     memory_pool::memory_pool (const char* name, std::size_t blocks,
                               std::size_t block_size_bytes,
                               const attributes& attr,
-                              const Allocator& allocator) :
+                              const allocator_type& allocator) :
         object_named
           { name }
     {
@@ -289,12 +289,13 @@ namespace os
           // If no user storage was provided via attributes,
           // allocate it dynamically via the allocator.
           allocated_pool_size_elements_ = (compute_allocated_size_bytes<
-              typename Allocator::value_type> (blocks, block_size_bytes)
-              + sizeof(typename Allocator::value_type) - 1)
-              / sizeof(typename Allocator::value_type);
+              typename allocator_type::value_type> (blocks, block_size_bytes)
+              + sizeof(typename allocator_type::value_type) - 1)
+              / sizeof(typename allocator_type::value_type);
 
-          allocated_pool_addr_ = const_cast<Allocator&> (allocator).allocate (
-              allocated_pool_size_elements_);
+          allocated_pool_addr_ =
+              const_cast<allocator_type&> (allocator).allocate (
+                  allocated_pool_size_elements_);
 
           _construct (
               blocks,
@@ -302,7 +303,7 @@ namespace os
               attr,
               allocated_pool_addr_,
               allocated_pool_size_elements_
-                  * sizeof(typename Allocator::value_type));
+                  * sizeof(typename allocator_type::value_type));
         }
     }
 
@@ -402,11 +403,11 @@ namespace os
 
       assert(list_.empty ());
 
-      typedef typename std::allocator_traits<Allocator>::pointer pointer;
+      typedef typename std::allocator_traits<allocator_type>::pointer pointer;
 
       if (allocated_pool_addr_ != nullptr)
         {
-          static_cast<Allocator*> (const_cast<void*> (allocator_))->deallocate (
+          static_cast<allocator_type*> (const_cast<void*> (allocator_))->deallocate (
               static_cast<pointer> (allocated_pool_addr_),
               allocated_pool_size_elements_);
         }

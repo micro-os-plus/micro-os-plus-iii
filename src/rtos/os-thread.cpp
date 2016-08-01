@@ -288,7 +288,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     thread::thread (func_t function, func_args_t args, const attributes& attr,
-                    const Allocator& allocator) :
+                    const allocator_type& allocator) :
         thread
           { nullptr, function, args, attr, allocator }
     {
@@ -337,7 +337,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     thread::thread (const char* name, func_t function, func_args_t args,
-                    const attributes& attr, const Allocator& allocator) :
+                    const attributes& attr, const allocator_type& allocator) :
         object_named
           { name }
     {
@@ -352,7 +352,7 @@ namespace os
         }
       else
         {
-          using Allocator = memory::allocator<stack::allocation_element_t>;
+          using allocator_type = memory::allocator<stack::allocation_element_t>;
           allocator_ = &allocator;
 
           if (attr.th_stack_size_bytes > stack::min_size ())
@@ -369,7 +369,7 @@ namespace os
             }
 
           allocated_stack_address_ =
-              reinterpret_cast<stack::element_t*> (const_cast<Allocator&> (allocator).allocate (
+              reinterpret_cast<stack::element_t*> (const_cast<allocator_type&> (allocator).allocate (
                   allocated_stack_size_elements_));
 
           assert(allocated_stack_address_ != nullptr);
@@ -930,9 +930,9 @@ namespace os
 
       if (allocated_stack_address_ != nullptr)
         {
-          typedef typename std::allocator_traits<Allocator>::pointer pointer;
+          typedef typename std::allocator_traits<allocator_type>::pointer pointer;
 
-          static_cast<Allocator*> (const_cast<void*> (allocator_))->deallocate (
+          static_cast<allocator_type*> (const_cast<void*> (allocator_))->deallocate (
               reinterpret_cast<pointer> (allocated_stack_address_),
               allocated_stack_size_elements_);
 

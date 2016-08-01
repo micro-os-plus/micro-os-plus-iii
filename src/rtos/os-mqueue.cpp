@@ -389,7 +389,7 @@ namespace os
      */
     message_queue::message_queue (std::size_t msgs, std::size_t msg_size_bytes,
                                   const attributes& attr,
-                                  const Allocator& allocator) :
+                                  const allocator_type& allocator) :
         message_queue
           { nullptr, msgs, msg_size_bytes, attr, allocator }
     {
@@ -425,7 +425,7 @@ namespace os
     message_queue::message_queue (const char* name, std::size_t msgs,
                                   std::size_t msg_size_bytes,
                                   const attributes& attr,
-                                  const Allocator& allocator) :
+                                  const allocator_type& allocator) :
         object_named
           { name }
     {
@@ -446,12 +446,13 @@ namespace os
           // If no user storage was provided via attributes,
           // allocate it dynamically via the allocator.
           allocated_queue_size_elements_ = (compute_allocated_size_bytes<
-              typename Allocator::value_type> (msgs, msg_size_bytes)
-              + sizeof(typename Allocator::value_type) - 1)
-              / sizeof(typename Allocator::value_type);
+              typename allocator_type::value_type> (msgs, msg_size_bytes)
+              + sizeof(typename allocator_type::value_type) - 1)
+              / sizeof(typename allocator_type::value_type);
 
-          allocated_queue_addr_ = const_cast<Allocator&> (allocator).allocate (
-              allocated_queue_size_elements_);
+          allocated_queue_addr_ =
+              const_cast<allocator_type&> (allocator).allocate (
+                  allocated_queue_size_elements_);
 
           _construct (
               msgs,
@@ -459,7 +460,7 @@ namespace os
               attr,
               allocated_queue_addr_,
               allocated_queue_size_elements_
-                  * sizeof(typename Allocator::value_type));
+                  * sizeof(typename allocator_type::value_type));
         }
     }
 
@@ -492,9 +493,9 @@ namespace os
 
       if (allocated_queue_addr_ != nullptr)
         {
-          typedef typename std::allocator_traits<Allocator>::pointer pointer;
+          typedef typename std::allocator_traits<allocator_type>::pointer pointer;
 
-          static_cast<Allocator*> (const_cast<void*> (allocator_))->deallocate (
+          static_cast<allocator_type*> (const_cast<void*> (allocator_))->deallocate (
               reinterpret_cast<pointer> (allocated_queue_addr_),
               allocated_queue_size_elements_);
         }

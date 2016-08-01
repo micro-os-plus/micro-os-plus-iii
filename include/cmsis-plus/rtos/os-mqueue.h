@@ -222,7 +222,7 @@ namespace os
        * @brief Default RTOS allocator.
        * @ingroup cmsis-plus-rtos-mqueue
        */
-      using Allocator = memory::allocator<thread::stack::allocation_element_t>;
+      using allocator_type = memory::allocator<thread::stack::allocation_element_t>;
 
       /**
        * @brief Storage for a static message queue.
@@ -280,7 +280,7 @@ namespace os
        */
       message_queue (std::size_t msgs, std::size_t msg_size_bytes,
                      const attributes& attr = initializer,
-                     const Allocator& allocator = Allocator ());
+                     const allocator_type& allocator = allocator_type ());
 
       /**
        * @brief Construct a named message queue object instance.
@@ -294,7 +294,7 @@ namespace os
       message_queue (const char* name, std::size_t msgs,
                      std::size_t msg_size_bytes, const attributes& attr =
                          initializer,
-                     const Allocator& allocator = Allocator ());
+                     const allocator_type& allocator = allocator_type ());
 
     protected:
 
@@ -760,7 +760,8 @@ namespace os
          */
         message_queue_allocated (std::size_t msgs, std::size_t msg_size_bytes,
                                  const attributes& attr = initializer,
-                                 const Allocator& allocator = Allocator ());
+                                 const allocator_type& allocator =
+                                     allocator_type ());
 
         /**
          * @brief Construct a named message queue object instance.
@@ -774,7 +775,8 @@ namespace os
         message_queue_allocated (const char* name, std::size_t msgs,
                                  std::size_t msg_size_bytes,
                                  const attributes& attr = initializer,
-                                 const Allocator& allocator = Allocator ());
+                                 const allocator_type& allocator =
+                                     allocator_type ());
 
         /**
          * @cond ignore
@@ -842,7 +844,8 @@ namespace os
         message_queue_typed (std::size_t msgs,
                              const message_queue::attributes& attr =
                                  message_queue::initializer,
-                             const Allocator& allocator = Allocator ());
+                             const allocator_type& allocator =
+                                 allocator_type ());
 
         /**
          * @brief Construct a named typed message queue object instance.
@@ -855,7 +858,8 @@ namespace os
         message_queue_typed (const char* name, std::size_t msgs,
                              const message_queue::attributes& attr =
                                  message_queue::initializer,
-                             const Allocator& allocator = Allocator ());
+                             const allocator_type& allocator =
+                                 allocator_type ());
 
         /**
          * @cond ignore
@@ -1365,7 +1369,7 @@ namespace os
       inline
       message_queue_allocated<Allocator>::message_queue_allocated (
           std::size_t msgs, std::size_t msg_size_bytes, const attributes& attr,
-          const Allocator& allocator) :
+          const allocator_type& allocator) :
           message_queue_allocated
             { nullptr, msgs, msg_size_bytes, attr, allocator }
       {
@@ -1401,7 +1405,7 @@ namespace os
     template<typename Allocator>
       message_queue_allocated<Allocator>::message_queue_allocated (
           const char* name, std::size_t msgs, std::size_t msg_size_bytes,
-          const attributes& attr, const Allocator& allocator) :
+          const attributes& attr, const allocator_type& allocator) :
           message_queue
             { name }
       {
@@ -1422,12 +1426,12 @@ namespace os
             // If no user storage was provided via attributes,
             // allocate it dynamically via the allocator.
             allocated_queue_size_elements_ = (compute_allocated_size_bytes<
-                typename Allocator::value_type> (msgs, msg_size_bytes)
-                + sizeof(typename Allocator::value_type) - 1)
-                / sizeof(typename Allocator::value_type);
+                typename allocator_type::value_type> (msgs, msg_size_bytes)
+                + sizeof(typename allocator_type::value_type) - 1)
+                / sizeof(typename allocator_type::value_type);
 
             allocated_queue_addr_ =
-                const_cast<Allocator&> (allocator).allocate (
+                const_cast<allocator_type&> (allocator).allocate (
                     allocated_queue_size_elements_);
 
             _construct (
@@ -1436,7 +1440,7 @@ namespace os
                 attr,
                 allocated_queue_addr_,
                 allocated_queue_size_elements_
-                    * sizeof(typename Allocator::value_type));
+                    * sizeof(typename allocator_type::value_type));
           }
       }
 
@@ -1460,11 +1464,11 @@ namespace os
 #if defined(OS_TRACE_RTOS_MQUEUE)
         trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
-        typedef typename std::allocator_traits<Allocator>::pointer pointer;
+        typedef typename std::allocator_traits<allocator_type>::pointer pointer;
 
         if (allocated_queue_addr_ != nullptr)
           {
-            static_cast<Allocator*> (const_cast<void*> (allocator_))->deallocate (
+            static_cast<allocator_type*> (const_cast<void*> (allocator_))->deallocate (
                 static_cast<pointer> (allocated_queue_addr_),
                 allocated_queue_size_elements_);
 
@@ -1507,8 +1511,8 @@ namespace os
       inline
       message_queue_typed<T, Allocator>::message_queue_typed (
           std::size_t msgs, const message_queue::attributes& attr,
-          const Allocator& allocator) :
-          message_queue_allocated<Allocator>
+          const allocator_type& allocator) :
+          message_queue_allocated<allocator_type>
             { msgs, sizeof(value_type), attr, allocator }
       {
         ;
@@ -1547,8 +1551,9 @@ namespace os
       inline
       message_queue_typed<T, Allocator>::message_queue_typed (
           const char* name, std::size_t msgs,
-          const message_queue::attributes& attr, const Allocator& allocator) :
-          message_queue_allocated<Allocator>
+          const message_queue::attributes& attr,
+          const allocator_type& allocator) :
+          message_queue_allocated<allocator_type>
             { name, msgs, sizeof(value_type), attr, allocator }
       {
         ;
@@ -1588,7 +1593,7 @@ namespace os
       message_queue_typed<T, Allocator>::send (const value_type* msg,
                                                message_queue::priority_t mprio)
       {
-        return message_queue_allocated<Allocator>::send (
+        return message_queue_allocated<allocator_type>::send (
             reinterpret_cast<const char*> (msg), sizeof(value_type), mprio);
       }
 
@@ -1604,7 +1609,7 @@ namespace os
       message_queue_typed<T, Allocator>::try_send (
           const value_type* msg, message_queue::priority_t mprio)
       {
-        return message_queue_allocated<Allocator>::try_send (
+        return message_queue_allocated<allocator_type>::try_send (
             reinterpret_cast<const char*> (msg), sizeof(value_type), mprio);
       }
 
@@ -1621,7 +1626,7 @@ namespace os
           const value_type* msg, clock::duration_t timeout,
           message_queue::priority_t mprio)
       {
-        return message_queue_allocated<Allocator>::timed_send (
+        return message_queue_allocated<allocator_type>::timed_send (
             reinterpret_cast<const char*> (msg), sizeof(value_type), timeout,
             mprio);
       }
@@ -1638,7 +1643,7 @@ namespace os
       message_queue_typed<T, Allocator>::receive (
           value_type* msg, message_queue::priority_t* mprio)
       {
-        return message_queue_allocated<Allocator>::receive (
+        return message_queue_allocated<allocator_type>::receive (
             reinterpret_cast<char*> (msg), sizeof(value_type), mprio);
       }
 
@@ -1654,7 +1659,7 @@ namespace os
       message_queue_typed<T, Allocator>::try_receive (
           value_type* msg, message_queue::priority_t* mprio)
       {
-        return message_queue_allocated<Allocator>::try_receive (
+        return message_queue_allocated<allocator_type>::try_receive (
             reinterpret_cast<char*> (msg), sizeof(value_type), mprio);
       }
 
@@ -1671,7 +1676,7 @@ namespace os
           value_type* msg, clock::duration_t timeout,
           message_queue::priority_t* mprio)
       {
-        return message_queue_allocated<Allocator>::timed_receive (
+        return message_queue_allocated<allocator_type>::timed_receive (
             reinterpret_cast<char*> (msg), sizeof(value_type), timeout, mprio);
       }
 

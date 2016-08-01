@@ -958,7 +958,7 @@ namespace os
       /**
        * @brief Default RTOS allocator.
        */
-      using Allocator = memory::allocator<stack::allocation_element_t>;
+      using allocator_type = memory::allocator<stack::allocation_element_t>;
 
       /**
        * @name Constructors & Destructor
@@ -974,7 +974,7 @@ namespace os
        */
       thread (func_t function, func_args_t args, const attributes& attr =
                   initializer,
-              const Allocator& allocator = Allocator ());
+              const allocator_type& allocator = allocator_type ());
 
       /**
        * @brief Construct a named thread object instance.
@@ -985,8 +985,8 @@ namespace os
        * @param [in] allocator Reference to allocator. Default a local temporary instance.
        */
       thread (const char* name, func_t function, func_args_t args,
-              const attributes& attr = initializer, const Allocator& allocator =
-                  Allocator ());
+              const attributes& attr = initializer,
+              const allocator_type& allocator = allocator_type ());
 
       /**
        * @cond ignore
@@ -1622,7 +1622,7 @@ namespace os
          */
         thread_allocated (func_t function, func_args_t args,
                           const attributes& attr = initializer,
-                          const Allocator& allocator = Allocator ());
+                          const allocator_type& allocator = allocator_type ());
 
         /**
          * @brief Construct a named thread object instance.
@@ -1635,7 +1635,7 @@ namespace os
          */
         thread_allocated (const char* name, func_t function, func_args_t args,
                           const attributes& attr = initializer,
-                          const Allocator& allocator = Allocator ());
+                          const allocator_type& allocator = allocator_type ());
 
         /**
          * @cond ignore
@@ -2380,10 +2380,9 @@ namespace os
      */
     template<typename Allocator>
       inline
-      thread_allocated<Allocator>::thread_allocated (func_t function,
-                                                     func_args_t args,
-                                                     const attributes& attr,
-                                                     const Allocator& allocator) :
+      thread_allocated<Allocator>::thread_allocated (
+          func_t function, func_args_t args, const attributes& attr,
+          const allocator_type& allocator) :
           thread_allocated
             { nullptr, function, args, attr, allocator }
       {
@@ -2432,11 +2431,9 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     template<typename Allocator>
-      thread_allocated<Allocator>::thread_allocated (const char* name,
-                                                     func_t function,
-                                                     func_args_t args,
-                                                     const attributes& attr,
-                                                     const Allocator& allocator) :
+      thread_allocated<Allocator>::thread_allocated (
+          const char* name, func_t function, func_args_t args,
+          const attributes& attr, const allocator_type& allocator) :
           thread
             { name }
       {
@@ -2455,20 +2452,20 @@ namespace os
             if (attr.th_stack_size_bytes > stack::min_size ())
               {
                 allocated_stack_size_elements_ = (attr.th_stack_size_bytes
-                    + sizeof(typename Allocator::value_type) - 1)
-                    / sizeof(typename Allocator::value_type);
+                    + sizeof(typename allocator_type::value_type) - 1)
+                    / sizeof(typename allocator_type::value_type);
               }
             else
               {
                 allocated_stack_size_elements_ = (stack::default_size ()
-                    + sizeof(typename Allocator::value_type) - 1)
-                    / sizeof(typename Allocator::value_type);
+                    + sizeof(typename allocator_type::value_type) - 1)
+                    / sizeof(typename allocator_type::value_type);
               }
 
             // The reinterpret_cast<> is required since the allocator
             // uses allocation_element_t, which is usually larger.
             allocated_stack_address_ =
-                reinterpret_cast<stack::element_t*> ((const_cast<Allocator&> (allocator)).allocate (
+                reinterpret_cast<stack::element_t*> ((const_cast<allocator_type&> (allocator)).allocate (
                     allocated_stack_size_elements_));
 
             assert(allocated_stack_address_ != nullptr);
@@ -2479,7 +2476,7 @@ namespace os
                 attr,
                 allocated_stack_address_,
                 allocated_stack_size_elements_
-                    * sizeof(typename Allocator::value_type));
+                    * sizeof(typename allocator_type::value_type));
           }
       }
 
@@ -2500,9 +2497,9 @@ namespace os
           {
             _check_stack ();
 
-            typedef typename std::allocator_traits<Allocator>::pointer pointer;
+            typedef typename std::allocator_traits<allocator_type>::pointer pointer;
 
-            static_cast<Allocator*> (const_cast<void*> (allocator_))->deallocate (
+            static_cast<allocator_type*> (const_cast<void*> (allocator_))->deallocate (
                 reinterpret_cast<pointer> (allocated_stack_address_),
                 allocated_stack_size_elements_);
 

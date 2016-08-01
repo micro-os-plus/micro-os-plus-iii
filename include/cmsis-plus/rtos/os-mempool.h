@@ -199,7 +199,7 @@ namespace os
       /**
        * @brief Default RTOS allocator.
        */
-      using Allocator = memory::allocator<thread::stack::allocation_element_t>;
+      using allocator_type = memory::allocator<thread::stack::allocation_element_t>;
 
       /**
        * @name Constructors & Destructor
@@ -216,7 +216,7 @@ namespace os
        */
       memory_pool (std::size_t blocks, std::size_t block_size_bytes,
                    const attributes& attr = initializer,
-                   const Allocator& allocator = Allocator ());
+                   const allocator_type& allocator = allocator_type ());
       /**
        * @brief Construct a named memory pool object instance.
        * @param [in] name Pointer to name.
@@ -229,7 +229,7 @@ namespace os
       memory_pool (const char* name, std::size_t blocks,
                    std::size_t block_size_bytes, const attributes& attr =
                        initializer,
-                   const Allocator& allocator = Allocator ());
+                   const allocator_type& allocator = allocator_type ());
 
       /**
        * @cond ignore
@@ -558,7 +558,8 @@ namespace os
          */
         memory_pool_allocated (std::size_t blocks, std::size_t block_size_bytes,
                                const attributes& attr = initializer,
-                               const Allocator& allocator = Allocator ());
+                               const allocator_type& allocator =
+                                   allocator_type ());
 
         /**
          * @brief Construct a named memory pool object instance.
@@ -572,7 +573,8 @@ namespace os
         memory_pool_allocated (const char* name, std::size_t blocks,
                                std::size_t block_size_bytes,
                                const attributes& attr = initializer,
-                               const Allocator& allocator = Allocator ());
+                               const allocator_type& allocator =
+                                   allocator_type ());
 
         /**
          * @cond ignore
@@ -638,7 +640,7 @@ namespace os
         memory_pool_typed (std::size_t blocks,
                            const memory_pool::attributes& attr =
                                memory_pool::initializer,
-                           const Allocator& allocator = Allocator ());
+                           const allocator_type& allocator = allocator_type ());
 
         /**
          * @brief Construct a named memory pool object instance.
@@ -651,7 +653,7 @@ namespace os
         memory_pool_typed (const char* name, std::size_t blocks,
                            const memory_pool::attributes& attr =
                                memory_pool::initializer,
-                           const Allocator& allocator = Allocator ());
+                           const allocator_type& allocator = allocator_type ());
 
         /**
          * @cond ignore
@@ -990,7 +992,7 @@ namespace os
       inline
       memory_pool_allocated<Allocator>::memory_pool_allocated (
           std::size_t blocks, std::size_t block_size_bytes,
-          const attributes& attr, const Allocator& allocator) :
+          const attributes& attr, const allocator_type& allocator) :
           memory_pool_allocated
             { nullptr, blocks, block_size_bytes, attr, allocator }
       {
@@ -1025,7 +1027,7 @@ namespace os
     template<typename Allocator>
       memory_pool_allocated<Allocator>::memory_pool_allocated (
           const char* name, std::size_t blocks, std::size_t block_size_bytes,
-          const attributes& attr, const Allocator& allocator) :
+          const attributes& attr, const allocator_type& allocator) :
           memory_pool
             { name }
       {
@@ -1045,12 +1047,13 @@ namespace os
             // If no user storage was provided via attributes,
             // allocate it dynamically via the allocator.
             allocated_pool_size_elements_ = (compute_allocated_size_bytes<
-                typename Allocator::value_type> (blocks, block_size_bytes)
-                + sizeof(typename Allocator::value_type) - 1)
-                / sizeof(typename Allocator::value_type);
+                typename allocator_type::value_type> (blocks, block_size_bytes)
+                + sizeof(typename allocator_type::value_type) - 1)
+                / sizeof(typename allocator_type::value_type);
 
-            allocated_pool_addr_ = const_cast<Allocator&> (allocator).allocate (
-                allocated_pool_size_elements_);
+            allocated_pool_addr_ =
+                const_cast<allocator_type&> (allocator).allocate (
+                    allocated_pool_size_elements_);
 
             _construct (
                 blocks,
@@ -1058,7 +1061,7 @@ namespace os
                 attr,
                 allocated_pool_addr_,
                 allocated_pool_size_elements_
-                    * sizeof(typename Allocator::value_type));
+                    * sizeof(typename allocator_type::value_type));
           }
       }
 
@@ -1084,11 +1087,11 @@ namespace os
 #if defined(OS_TRACE_RTOS_MEMPOOL)
         trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
-        typedef typename std::allocator_traits<Allocator>::pointer pointer;
+        typedef typename std::allocator_traits<allocator_type>::pointer pointer;
 
         if (allocated_pool_addr_ != nullptr)
           {
-            static_cast<Allocator*> (const_cast<void*> (allocator_))->deallocate (
+            static_cast<allocator_type*> (const_cast<void*> (allocator_))->deallocate (
                 static_cast<pointer> (allocated_pool_addr_),
                 allocated_pool_size_elements_);
 
@@ -1130,8 +1133,9 @@ namespace os
       inline
       memory_pool_typed<T, Allocator>::memory_pool_typed (
           std::size_t blocks, const memory_pool::attributes& attr,
-          const Allocator& allocator) :
-          memory_pool_allocated<Allocator> (blocks, sizeof(T), attr, allocator)
+          const allocator_type& allocator) :
+          memory_pool_allocated<allocator_type> (blocks, sizeof(T), attr,
+                                                 allocator)
       {
         ;
       }
@@ -1168,9 +1172,9 @@ namespace os
       inline
       memory_pool_typed<T, Allocator>::memory_pool_typed (
           const char* name, std::size_t blocks,
-          const memory_pool::attributes& attr, const Allocator& allocator) :
-          memory_pool_allocated<Allocator> (name, blocks, sizeof(T), attr,
-                                            allocator)
+          const memory_pool::attributes& attr, const allocator_type& allocator) :
+          memory_pool_allocated<allocator_type> (name, blocks, sizeof(T), attr,
+                                                 allocator)
       {
         ;
       }
@@ -1210,7 +1214,7 @@ namespace os
       inline typename memory_pool_typed<T, Allocator>::value_type*
       memory_pool_typed<T, Allocator>::alloc (void)
       {
-        return static_cast<value_type*> (memory_pool_allocated<Allocator>::alloc ());
+        return static_cast<value_type*> (memory_pool_allocated<allocator_type>::alloc ());
       }
 
     /**
@@ -1224,7 +1228,7 @@ namespace os
       inline typename memory_pool_typed<T, Allocator>::value_type*
       memory_pool_typed<T, Allocator>::try_alloc (void)
       {
-        return static_cast<value_type*> (memory_pool_allocated<Allocator>::try_alloc ());
+        return static_cast<value_type*> (memory_pool_allocated<allocator_type>::try_alloc ());
       }
 
     /**
@@ -1238,7 +1242,7 @@ namespace os
       inline typename memory_pool_typed<T, Allocator>::value_type*
       memory_pool_typed<T, Allocator>::timed_alloc (clock::duration_t timeout)
       {
-        return static_cast<value_type*> (memory_pool_allocated<Allocator>::timed_alloc (
+        return static_cast<value_type*> (memory_pool_allocated<allocator_type>::timed_alloc (
             timeout));
       }
 
@@ -1253,7 +1257,7 @@ namespace os
       inline result_t
       memory_pool_typed<T, Allocator>::free (value_type* block)
       {
-        return memory_pool_allocated<Allocator>::free (block);
+        return memory_pool_allocated<allocator_type>::free (block);
       }
 
     // ========================================================================
