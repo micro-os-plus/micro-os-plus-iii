@@ -897,7 +897,7 @@ namespace os
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      waiting_thread_node node
+      internal::waiting_thread_node node
         { crt_thread };
 
       for (;;)
@@ -1091,15 +1091,15 @@ namespace os
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      waiting_thread_node node
+      internal::waiting_thread_node node
         { crt_thread };
 
-      clock_timestamps_list& clock_list = clock_->steady_list ();
+      internal::clock_timestamps_list& clock_list = clock_->steady_list ();
 
       clock::timestamp_t timeout_timestamp = clock_->steady_now () + timeout;
 
       // Prepare a timeout node pointing to the current thread.
-      timeout_thread_node timeout_node
+      internal::timeout_thread_node timeout_node
         { timeout_timestamp, crt_thread };
 
       for (;;)
@@ -1225,7 +1225,7 @@ namespace os
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      waiting_thread_node node
+      internal::waiting_thread_node node
         { crt_thread };
 
       for (;;)
@@ -1435,14 +1435,14 @@ namespace os
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      waiting_thread_node node
+      internal::waiting_thread_node node
         { crt_thread };
 
-      clock_timestamps_list& clock_list = clock_->steady_list ();
+      internal::clock_timestamps_list& clock_list = clock_->steady_list ();
       clock::timestamp_t timeout_timestamp = clock_->steady_now () + timeout;
 
       // Prepare a timeout node pointing to the current thread.
-      timeout_thread_node timeout_node
+      internal::timeout_thread_node timeout_node
         { timeout_timestamp, crt_thread };
 
       for (;;)

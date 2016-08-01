@@ -809,7 +809,7 @@ namespace os
 // ----------------------------------------------------------------------------
 
 // Must be included after the declarations
-#include <cmsis-plus/rtos/os-lists.h>
+#include <cmsis-plus/rtos/internal/os-lists.h>
 
 // ----------------------------------------------------------------------------
 

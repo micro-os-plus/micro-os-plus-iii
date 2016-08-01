@@ -614,7 +614,7 @@ namespace os
       thread* volatile owner_ = nullptr;
 
 #if !defined(OS_USE_RTOS_PORT_MUTEX)
-      waiting_threads_list list_;
+      internal::waiting_threads_list list_;
       clock* clock_ = nullptr;
 #endif
 

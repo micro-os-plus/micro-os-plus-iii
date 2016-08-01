@@ -227,7 +227,7 @@ namespace os
       virtual offset_t
       offset (offset_t value);
 
-      clock_timestamps_list&
+      internal::clock_timestamps_list&
       steady_list (void);
 
       void
@@ -258,7 +258,8 @@ namespace os
        * @retval ENOTRECOVERABLE The wait failed.
        */
       virtual result_t
-      _wait_until (timestamp_t timestamp, clock_timestamps_list& list);
+      _wait_until (timestamp_t timestamp,
+                   internal::clock_timestamps_list& list);
 
       /**
        * @endcond
@@ -274,7 +275,7 @@ namespace os
        * @cond ignore
        */
 
-      clock_timestamps_list steady_list_;
+      internal::clock_timestamps_list steady_list_;
       duration_t volatile sleep_count_ = 0;
 
       /**
@@ -410,7 +411,7 @@ namespace os
        */
       offset_t volatile offset_ = 0;
 
-      clock_timestamps_list adjusted_list_;
+      internal::clock_timestamps_list adjusted_list_;
 
       /**
        * @endcond
@@ -777,7 +778,7 @@ namespace os
       ;
     }
 
-    inline clock_timestamps_list&
+    inline internal::clock_timestamps_list&
     __attribute__((always_inline))
     clock::steady_list (void)
     {

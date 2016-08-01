@@ -68,29 +68,29 @@ extern "C"
 
   // ==========================================================================
 
-  typedef struct os_double_list_links_s
+  typedef struct os_internal_double_list_links_s
   {
     void* prev;
     void* next;
-  } os_double_list_links_t;
+  } os_internal_double_list_links_t;
 
-  typedef os_double_list_links_t os_threads_waiting_list_t;
+  typedef os_internal_double_list_links_t os_internal_threads_waiting_list_t;
 
-  typedef struct os_thread_children_list_s
+  typedef struct os_internal_thread_children_list_s
   {
-    os_double_list_links_t links;
-  } os_thread_children_list_t;
+    os_internal_double_list_links_t links;
+  } os_internal_thread_children_list_t;
 
-  typedef struct os_waiting_thread_node_s
+  typedef struct os_internal_waiting_thread_node_s
   {
-    os_double_list_links_t links;
+    os_internal_double_list_links_t links;
     void* thread;
-  } os_waiting_thread_node_t;
+  } os_internal_waiting_thread_node_t;
 
-  typedef struct os_clock_timestamps_list_s
+  typedef struct os_internal_clock_timestamps_list_s
   {
-    os_double_list_links_t links;
-  } os_clock_timestamps_list_t;
+    os_internal_double_list_links_t links;
+  } os_internal_clock_timestamps_list_t;
 
   /**
    * @addtogroup cmsis-plus-rtos-c-core
@@ -555,14 +555,14 @@ extern "C"
 
     void* vtbl;
     const char* name;
-    os_waiting_thread_node_t ready_node;
+    os_internal_waiting_thread_node_t ready_node;
     int errno_; // Prevent the macro to expand (for example with a prefix).
     os_thread_func_t func;
     os_thread_func_args_t func_args;
     void* func_result_;
     void* parent;
-    os_double_list_links_t child_links;
-    os_thread_children_list_t children;
+    os_internal_double_list_links_t child_links;
+    os_internal_thread_children_list_t children;
     void* joiner;
     void* waiting_node;
     void* clock_node;
@@ -627,7 +627,7 @@ extern "C"
 
     void* vtbl;
     const char* name;
-    os_clock_timestamps_list_t steady_list;
+    os_internal_clock_timestamps_list_t steady_list;
     os_clock_duration_t sleep_count;
     os_clock_timestamp_t steady_count;
 
@@ -654,7 +654,7 @@ extern "C"
     void* list;
     os_clock_timestamp_t timestamp;
     void* timer;
-  } os_clock_timer_node_t;
+  } os_internal_clock_timer_node_t;
 
 #pragma GCC diagnostic pop
 
@@ -759,7 +759,7 @@ extern "C"
     os_timer_func_args_t func_args;
 #if !defined(OS_USE_RTOS_PORT_TIMER)
     void* clock;
-    os_clock_timer_node_t clock_node;
+    os_internal_clock_timer_node_t clock_node;
     os_clock_duration_t period;
 #endif
 #if defined(OS_USE_RTOS_PORT_TIMER)
@@ -927,7 +927,7 @@ extern "C"
     const char* name;
     void* owner;
 #if !defined(OS_USE_RTOS_PORT_MUTEX)
-    os_threads_waiting_list_t list;
+    os_internal_threads_waiting_list_t list;
     void* clock;
 #endif
 #if defined(OS_USE_RTOS_PORT_MUTEX)
@@ -1003,7 +1003,7 @@ extern "C"
 
     const char* name;
 #if !defined(OS_USE_RTOS_PORT_CONDITION_VARIABLE)
-    os_threads_waiting_list_t list;
+    os_internal_threads_waiting_list_t list;
     // void* clock;
 #endif
 
@@ -1084,7 +1084,7 @@ extern "C"
 
     const char* name;
 #if !defined(OS_USE_RTOS_PORT_SEMAPHORE)
-    os_threads_waiting_list_t list;
+    os_internal_threads_waiting_list_t list;
     void* clock;
 #endif
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
@@ -1169,7 +1169,7 @@ extern "C"
     void* vtbl;
     const char* name;
 #if !defined(OS_USE_RTOS_PORT_MEMORY_POOL)
-    os_threads_waiting_list_t list;
+    os_internal_threads_waiting_list_t list;
     void* clock;
 #endif
     void* pool_addr;
@@ -1274,8 +1274,8 @@ extern "C"
     void* vtbl;
     const char* name;
 #if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
-    os_threads_waiting_list_t send_list;
-    os_threads_waiting_list_t receive_list;
+    os_internal_threads_waiting_list_t send_list;
+    os_internal_threads_waiting_list_t receive_list;
     void* clock;
     os_mqueue_index_t* prev_array;
     os_mqueue_index_t* next_array;
@@ -1364,7 +1364,7 @@ extern "C"
 
     const char* name;
 #if !defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
-    os_threads_waiting_list_t list;
+    os_internal_threads_waiting_list_t list;
     void* clock;
 #endif
 

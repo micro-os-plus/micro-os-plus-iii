@@ -353,7 +353,7 @@ namespace os
        * @cond ignore
        */
 
-      friend class timer_node;
+      friend class internal::timer_node;
 
       /**
        * @endcond
@@ -405,7 +405,7 @@ namespace os
 
 #if !defined(OS_USE_RTOS_PORT_TIMER)
       clock* clock_ = nullptr;
-      timer_node timer_node_
+      internal::timer_node timer_node_
         { 0, *this };
       clock::duration_t period_ = 0;
 #endif

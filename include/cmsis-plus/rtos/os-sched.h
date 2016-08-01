@@ -61,10 +61,10 @@ namespace os
 #if !defined(OS_USE_RTOS_PORT_SCHEDULER)
       extern bool is_preemptive_;
       extern thread* volatile current_thread_;
-      extern ready_threads_list ready_threads_list_;
+      extern internal::ready_threads_list ready_threads_list_;
 #endif /* !defined(OS_USE_RTOS_PORT_SCHEDULER) */
 
-      extern terminated_threads_list terminated_threads_list_;
+      extern internal::terminated_threads_list terminated_threads_list_;
 
       /**
        * @endcond

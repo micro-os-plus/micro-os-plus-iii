@@ -1189,7 +1189,7 @@ namespace os
           // ----- Exit critical section --------------------------------------
         }
 
-      clock_timestamps_list& clock_list = clock_->steady_list ();
+      internal::clock_timestamps_list& clock_list = clock_->steady_list ();
       clock::timestamp_t timeout_timestamp = clock_->steady_now () + timeout;
 
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
@@ -1197,7 +1197,7 @@ namespace os
 #endif
 
       // Prepare a timeout node pointing to the current thread.
-      timeout_thread_node timeout_node
+      internal::timeout_thread_node timeout_node
         { timeout_timestamp, *this };
 
       for (;;)

@@ -342,7 +342,7 @@ namespace os
        */
 
 #if !defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
-      waiting_threads_list list_;
+      internal::waiting_threads_list list_;
       clock* clock_;
 #endif
 

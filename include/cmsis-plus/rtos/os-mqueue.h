@@ -619,11 +619,11 @@ namespace os
       /**
        * @brief List of threads waiting to send.
        */
-      waiting_threads_list send_list_;
+      internal::waiting_threads_list send_list_;
       /**
        * @brief List of threads waiting to receive.
        */
-      waiting_threads_list receive_list_;
+      internal::waiting_threads_list receive_list_;
       /**
        * @brief Pointer to clock to be used for timeouts.
        */

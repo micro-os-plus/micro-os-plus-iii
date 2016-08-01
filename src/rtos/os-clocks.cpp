@@ -327,14 +327,15 @@ namespace os
     }
 
     result_t
-    clock::_wait_until (timestamp_t timestamp, clock_timestamps_list& list)
+    clock::_wait_until (timestamp_t timestamp,
+                        internal::clock_timestamps_list& list)
     {
       thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      timeout_thread_node node
+      internal::timeout_thread_node node
         { timestamp, crt_thread };
 
         {

@@ -71,12 +71,12 @@ os_idle (thread::func_args_t args __attribute__((unused)))
     {
       while (!scheduler::terminated_threads_list_.empty ())
         {
-          waiting_thread_node* node;
+          internal::waiting_thread_node* node;
             {
               // ----- Enter critical section ---------------------------------
               interrupts::critical_section ics;
               node =
-                  const_cast<waiting_thread_node*> (scheduler::terminated_threads_list_.head ());
+                  const_cast<internal::waiting_thread_node*> (scheduler::terminated_threads_list_.head ());
               node->unlink ();
               // ----- Exit critical section ----------------------------------
             }

@@ -1257,21 +1257,21 @@ namespace os
       this_thread::__errno (void);
 
       friend void
-      scheduler::_link_node (waiting_threads_list& list,
-                             waiting_thread_node& node);
+      scheduler::_link_node (internal::waiting_threads_list& list,
+                             internal::waiting_thread_node& node);
 
       friend void
-      scheduler::_unlink_node (waiting_thread_node& node);
+      scheduler::_unlink_node (internal::waiting_thread_node& node);
 
       friend void
-      scheduler::_link_node (waiting_threads_list& list,
-                             waiting_thread_node& node,
-                             clock_timestamps_list& timeout_list,
-                             timeout_thread_node& timeout_node);
+      scheduler::_link_node (internal::waiting_threads_list& list,
+                             internal::waiting_thread_node& node,
+                             internal::clock_timestamps_list& timeout_list,
+                             internal::timeout_thread_node& timeout_node);
 
       friend void
-      scheduler::_unlink_node (waiting_thread_node& node,
-                               timeout_thread_node& timeout_node);
+      scheduler::_unlink_node (internal::waiting_thread_node& node,
+                               internal::timeout_thread_node& timeout_node);
 
       friend void
       scheduler::_switch_threads (void);
@@ -1288,11 +1288,11 @@ namespace os
       friend void*
       ::os_idle (func_args_t args);
 
-      friend class ready_threads_list;
-      friend class thread_children_list;
-      friend class waiting_threads_list;
-      friend class clock_timestamps_list;
-      friend class terminated_threads_list;
+      friend class internal::ready_threads_list;
+      friend class internal::thread_children_list;
+      friend class internal::waiting_threads_list;
+      friend class internal::clock_timestamps_list;
+      friend class internal::terminated_threads_list;
 
       friend class clock;
       friend class condition_variable;
@@ -1497,7 +1497,7 @@ namespace os
        */
 
       // TODO: make it fully intrusive with computed offset.
-      waiting_thread_node ready_node_
+      internal::waiting_thread_node ready_node_
         { *this };
 
       int errno_ = 0;
@@ -1512,9 +1512,9 @@ namespace os
     public:
 
       // Intrusive node used to link this thread to parent list.
-      double_list_links child_links_;
+      internal::double_list_links child_links_;
 
-      using threads_list = intrusive_list<thread, double_list_links, &thread::child_links_>;
+      using threads_list = internal::intrusive_list<thread, internal::double_list_links, &thread::child_links_>;
 
       // List of children threads. Force a clear.
       threads_list children_
@@ -1526,10 +1526,10 @@ namespace os
       thread* joiner_ = nullptr;
 
       // Pointer to waiting node (stored on stack)
-      waiting_thread_node* waiting_node_ = nullptr;
+      internal::waiting_thread_node* waiting_node_ = nullptr;
 
       // Pointer to timeout node (stored on stack)
-      timeout_thread_node* clock_node_ = nullptr;
+      internal::timeout_thread_node* clock_node_ = nullptr;
 
       /**
        * @brief Pointer to clock to be used for timeouts.
@@ -2280,7 +2280,7 @@ namespace os
         {
           // If the current thread is running, add it to the
           // ready list, so that it will be resumed later.
-          waiting_thread_node& crt_node = ready_node_;
+          internal::waiting_thread_node& crt_node = ready_node_;
           if (crt_node.next () == nullptr)
             {
               rtos::scheduler::ready_threads_list_.link (crt_node);

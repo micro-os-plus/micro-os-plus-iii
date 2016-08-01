@@ -241,7 +241,7 @@ static_assert(sizeof(class thread::context) == sizeof(os_thread_context_t), "adj
 static_assert(sizeof(class thread::statistics) == sizeof(os_thread_statistics_t), "adjust size of os_thread_statistics_t");
 #endif
 
-static_assert(sizeof(timer_node) == sizeof(os_clock_timer_node_t), "adjust size of os_clock_timer_node_t");
+static_assert(sizeof(internal::timer_node) == sizeof(os_internal_clock_timer_node_t), "adjust size of os_internal_clock_timer_node_t");
 
 #pragma GCC diagnostic pop
 
@@ -987,7 +987,7 @@ os_children_threads_iter_get (os_iterator_t iterator)
 {
   // Construct a local iterator object based on the pointer.
   thread::threads_list::iterator it
-    { reinterpret_cast<double_list_links*> (iterator) };
+    { reinterpret_cast<internal::double_list_links*> (iterator) };
   return reinterpret_cast<os_thread_t*> (&(*it));
 }
 
@@ -1002,7 +1002,7 @@ os_iterator_t
 os_children_threads_iter_next (os_iterator_t iterator)
 {
   thread::threads_list::iterator it
-    { reinterpret_cast<double_list_links*> (iterator) };
+    { reinterpret_cast<internal::double_list_links*> (iterator) };
   ++it;
 
   return reinterpret_cast<os_iterator_t> (it.get_iterator_pointer ());
