@@ -234,7 +234,7 @@ namespace os
     }
 
     thread::thread (const char* name) :
-        named_object
+        object_named
           { name }
     {
 #if defined(OS_TRACE_RTOS_THREAD)
@@ -338,7 +338,7 @@ namespace os
      */
     thread::thread (const char* name, func_t function, func_args_t args,
                     const attributes& attr, const Allocator& allocator) :
-        named_object
+        object_named
           { name }
     {
 #if defined(OS_TRACE_RTOS_THREAD)

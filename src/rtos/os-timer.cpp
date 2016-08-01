@@ -172,7 +172,7 @@ namespace os
      */
     timer::timer (const char* name, func_t function, func_args_t args,
                   const attributes& attr) :
-        named_object
+        object_named
           { name }
     {
 #if defined(OS_TRACE_RTOS_TIMER)

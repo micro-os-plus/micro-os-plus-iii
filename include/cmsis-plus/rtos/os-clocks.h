@@ -56,7 +56,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-clock
      */
-    class clock : public named_object
+    class clock : public internal::object_named
     {
     public:
 
@@ -775,7 +775,7 @@ namespace os
 
     inline
     clock::clock (const char* name) :
-        named_object
+        internal::object_named
           { name }
     {
       ;

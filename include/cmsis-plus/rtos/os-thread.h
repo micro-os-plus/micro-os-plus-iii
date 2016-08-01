@@ -230,7 +230,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-thread
      */
-    class thread : public named_object
+    class thread : public internal::object_named
     {
     public:
 
@@ -750,7 +750,7 @@ namespace os
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        * @ingroup cmsis-plus-rtos-thread
        */
-      class attributes : public clocked_attributes
+      class attributes : public internal::attributes_clocked
       {
       public:
 

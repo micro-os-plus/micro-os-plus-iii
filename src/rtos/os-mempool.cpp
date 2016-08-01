@@ -194,7 +194,7 @@ namespace os
     }
 
     memory_pool::memory_pool (const char* name) :
-        named_object
+        object_named
           { name }
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
@@ -269,7 +269,7 @@ namespace os
                               std::size_t block_size_bytes,
                               const attributes& attr,
                               const Allocator& allocator) :
-        named_object
+        object_named
           { name }
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)

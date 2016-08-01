@@ -468,7 +468,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     mutex::mutex (const char* name, const attributes& attr) :
-        named_object
+        object_named
           { name }, //
         type_ (attr.mx_type), //
         protocol_ (attr.mx_protocol), //

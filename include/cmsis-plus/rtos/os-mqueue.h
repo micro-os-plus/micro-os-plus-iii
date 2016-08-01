@@ -60,7 +60,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-mqueue
      */
-    class message_queue : public named_object
+    class message_queue : public internal::object_named
     {
     public:
 
@@ -144,7 +144,7 @@ namespace os
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        * @ingroup cmsis-plus-rtos-mqueue
        */
-      class attributes : public clocked_attributes
+      class attributes : public internal::attributes_clocked
       {
       public:
 

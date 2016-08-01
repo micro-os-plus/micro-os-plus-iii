@@ -60,7 +60,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-mempool
      */
-    class memory_pool : public named_object
+    class memory_pool : public internal::object_named
     {
     public:
 
@@ -91,7 +91,7 @@ namespace os
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        * @ingroup cmsis-plus-rtos-mempool
        */
-      class attributes : public clocked_attributes
+      class attributes : public internal::attributes_clocked
       {
       public:
 

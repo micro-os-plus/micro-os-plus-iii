@@ -504,51 +504,53 @@ namespace os
 
     // ========================================================================
 
-    /**
-     * @class named_object
-     * @details
-     * This class serves as a base class for all objects that have a
-     * name (most of the RTOS classes do have a name).
-     *
-     * Attributes use a separate constexpr object.
-     */
-
-    /*
-     * @var const char* const named_object::name_
-     * @details
-     * To save space, the null terminated string passed to the
-     * constructor is not copied locally. Instead, the pointer to
-     * the string is copied, so the
-     * caller must ensure that the pointer life cycle
-     * is at least as long as the object life cycle. A constant
-     * string (stored in flash) is preferred.
-     */
-
-    /**
-     *
-     */
-    named_object::named_object ()
+    namespace internal
     {
-      ;
-    }
+      /**
+       * @class object_named
+       * @details
+       * This class serves as a base class for all objects that have a
+       * name (most of the RTOS classes do have a name).
+       *
+       * Attributes use a separate constexpr object.
+       */
 
-    /**
-     * @details
-     * Prefer the given name, otherwise
-     * default to '-'.
-     *
-     * To save space, instead of copying the null terminated string
-     * locally, the pointer to the string
-     * is copied, so the caller must ensure that the pointer
-     * life cycle is at least as long as the object life cycle.
-     * A constant string (stored in flash) is preferred.
-     */
-    named_object::named_object (const char* name) :
-        name_ (name != nullptr ? name : "-")
-    {
-      ;
-    }
+      /*
+       * @var const char* const object_named::name_
+       * @details
+       * To save space, the null terminated string passed to the
+       * constructor is not copied locally. Instead, the pointer to
+       * the string is copied, so the
+       * caller must ensure that the pointer life cycle
+       * is at least as long as the object life cycle. A constant
+       * string (stored in flash) is preferred.
+       */
 
+      /**
+       *
+       */
+      object_named::object_named ()
+      {
+        ;
+      }
+
+      /**
+       * @details
+       * Prefer the given name, otherwise
+       * default to '-'.
+       *
+       * To save space, instead of copying the null terminated string
+       * locally, the pointer to the string
+       * is copied, so the caller must ensure that the pointer
+       * life cycle is at least as long as the object life cycle.
+       * A constant string (stored in flash) is preferred.
+       */
+      object_named::object_named (const char* name) :
+          name_ (name != nullptr ? name : "-")
+      {
+        ;
+      }
+    } /* namespace internal */
   // ==========================================================================
   } /* namespace rtos */
 } /* namespace os */

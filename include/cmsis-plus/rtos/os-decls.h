@@ -73,23 +73,18 @@ namespace os
     // ========================================================================
 
     // Forward references.
-    class named_object;
     class clock;
+    class clock_rtc;
+    class clock_systick;
+
     class condition_variable;
     class event_flags;
     class memory_pool;
     class message_queue;
     class mutex;
-    class clock_rtc;
     class semaphore;
-    class clock_systick;
     class thread;
     class timer;
-
-    class waiting_threads_list;
-    class clock_threads_list;
-    class terminated_threads_list;
-    class clock_timestamps_list;
 
     namespace memory
     {
@@ -258,7 +253,7 @@ namespace os
 
     } /* namespace interrupts */
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     /**
      * @brief Generic flags namespace.
@@ -345,173 +340,177 @@ namespace os
     {
     }
 
-    // ========================================================================
-
-    /**
-     * @brief Base class for named objects.
-     * @headerfile os.h <cmsis-plus/rtos/os.h>
-     */
-    class named_object
+    namespace internal
     {
-    public:
+
+      // ======================================================================
 
       /**
-       * @name Constructors & Destructor
-       * @{
+       * @brief Base class for named objects.
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
+      class object_named
+      {
+      public:
 
-      named_object ();
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
+
+        object_named ();
+
+        /**
+         * @brief Construct a named object instance.
+         * @param [in] name Null terminated name. If `nullptr`,
+         * "-" is assigned.
+         */
+        object_named (const char* name);
+
+        /**
+         * @cond ignore
+         */
+        object_named (const object_named&) = default;
+        object_named (object_named&&) = default;
+        object_named&
+        operator= (const object_named&) = default;
+        object_named&
+        operator= (object_named&&) = default;
+        /**
+         * @endcond
+         */
+
+        /**
+         * @brief Destruct the named object instance.
+         */
+        ~object_named () = default;
+
+        /**
+         * @}
+         */
+
+      public:
+
+        /**
+         * @name Public Member Functions
+         * @{
+         */
+
+        /**
+         * @brief Get object name.
+         * @par Parameters
+         *  None.
+         * @return A null terminated string.
+         */
+        const char*
+        name (void) const;
+
+        /**
+         * @}
+         */
+
+      protected:
+
+        /**
+         * @name Private Member Variables
+         * @{
+         */
+
+        /**
+         * @cond ignore
+         */
+
+        /**
+         * @brief Pointer to name.
+         */
+        const char* const name_ = "-";
+
+        /**
+         * @endcond
+         */
+
+        /**
+         * @}
+         */
+      };
+
+      // ======================================================================
 
       /**
-       * @brief Construct a named object instance.
-       * @param [in] name Null terminated name. If `nullptr`,
-       * "-" is assigned.
+       * @brief Base class for attributes.
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
-      named_object (const char* name);
+      class attributes_clocked
+      {
+      public:
 
-      /**
-       * @cond ignore
-       */
-      named_object (const named_object&) = default;
-      named_object (named_object&&) = default;
-      named_object&
-      operator= (const named_object&) = default;
-      named_object&
-      operator= (named_object&&) = default;
-      /**
-       * @endcond
-       */
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
 
-      /**
-       * @brief Destruct the named object instance.
-       */
-      ~named_object () = default;
+        /**
+         * @brief Construct a named object instance.
+         * @par Parameters
+         *  None.
+         */
+        constexpr
+        attributes_clocked ();
 
-      /**
-       * @}
-       */
+        /**
+         * @cond ignore
+         */
+        attributes_clocked (const attributes_clocked&) = default;
+        attributes_clocked (attributes_clocked&&) = default;
+        attributes_clocked&
+        operator= (const attributes_clocked&) = default;
+        attributes_clocked&
+        operator= (attributes_clocked&&) = default;
+        /**
+         * @endcond
+         */
 
-    public:
+        /**
+         * @brief Destruct the named object instance.
+         */
+        ~attributes_clocked () = default;
 
-      /**
-       * @name Public Member Functions
-       * @{
-       */
+        /**
+         * @}
+         */
 
-      /**
-       * @brief Get object name.
-       * @par Parameters
-       *  None.
-       * @return A null terminated string.
-       */
-      const char*
-      name (void) const;
+        /**
+         * @name Public Member Variables
+         * @{
+         */
 
-      /**
-       * @}
-       */
+        /**
+         * @brief Attribute with the address of the clock to be used
+         *  for timeouts.
+         * @details
+         * It may be one of `os::rtos::sysclock`, `os::rtos::rtclock`,
+         * or any other user object derived from class `os::rtos::clock`.
+         *
+         * If `nullptr`, the default clock is `os::rtos::sysclock`.
+         */
+        rtos::clock* clock = nullptr;
 
-    protected:
+        /**
+         * @}
+         */
 
-      /**
-       * @name Private Member Variables
-       * @{
-       */
+      protected:
 
-      /**
-       * @cond ignore
-       */
+        /**
+         * @name Private Member Variables
+         * @{
+         */
 
-      /**
-       * @brief Pointer to name.
-       */
-      const char* const name_ = "-";
-
-      /**
-       * @endcond
-       */
-
-      /**
-       * @}
-       */
-    };
-
-    // ========================================================================
-
-    /**
-     * @brief Base class for attributes.
-     * @headerfile os.h <cmsis-plus/rtos/os.h>
-     */
-    class clocked_attributes
-    {
-    public:
-
-      /**
-       * @name Constructors & Destructor
-       * @{
-       */
-
-      /**
-       * @brief Construct a named object instance.
-       * @par Parameters
-       *  None.
-       */
-      constexpr
-      clocked_attributes ();
-
-      /**
-       * @cond ignore
-       */
-      clocked_attributes (const clocked_attributes&) = default;
-      clocked_attributes (clocked_attributes&&) = default;
-      clocked_attributes&
-      operator= (const clocked_attributes&) = default;
-      clocked_attributes&
-      operator= (clocked_attributes&&) = default;
-      /**
-       * @endcond
-       */
-
-      /**
-       * @brief Destruct the named object instance.
-       */
-      ~clocked_attributes () = default;
-
-      /**
-       * @}
-       */
-
-      /**
-       * @name Public Member Variables
-       * @{
-       */
-
-      /**
-       * @brief Attribute with the address of the clock to be used
-       *  for timeouts.
-       * @details
-       * It may be one of `os::rtos::sysclock`, `os::rtos::rtclock`,
-       * or any other user object derived from class `os::rtos::clock`.
-       *
-       * If `nullptr`, the default clock is `os::rtos::sysclock`.
-       */
-      rtos::clock* clock = nullptr;
-
-      /**
-       * @}
-       */
-
-    protected:
-
-      /**
-       * @name Private Member Variables
-       * @{
-       */
-
-      /**
-       * @}
-       */
-    };
+        /**
+         * @}
+         */
+      };
+    } /* namespace internal */
 
   // ==========================================================================
   } /* namespace rtos */
@@ -523,35 +522,38 @@ namespace os
 {
   namespace rtos
   {
-    // ------------------------------------------------------------------------
-
-    /**
-     * @details
-     * All objects return a non-null string; anonymous objects
-     * return `"-"`.
-     *
-     * @note Can be invoked from Interrupt Service Routines.
-     */
-    inline const char*
-    named_object::name (void) const
+    namespace internal
     {
-      return name_;
-    }
+      // ----------------------------------------------------------------------
+
+      /**
+       * @details
+       * All objects return a non-null string; anonymous objects
+       * return `"-"`.
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
+      inline const char*
+      object_named::name (void) const
+      {
+        return name_;
+      }
+
+      // ======================================================================
+
+      /**
+       * @details
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      constexpr
+      attributes_clocked::attributes_clocked ()
+      {
+        ;
+      }
 
     // ========================================================================
-
-    /**
-     * @details
-     *
-     * @warning Cannot be invoked from Interrupt Service Routines.
-     */
-    constexpr
-    clocked_attributes::clocked_attributes ()
-    {
-      ;
-    }
-
-  // ==========================================================================
+    } /* namespace internal */
   } /* namespace rtos */
 } /* namespace os */
 

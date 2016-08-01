@@ -55,7 +55,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-mutex
      */
-    class mutex : public named_object
+    class mutex : public internal::object_named
     {
     public:
 
@@ -178,7 +178,7 @@ namespace os
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        * @ingroup cmsis-plus-rtos-mutex
        */
-      class attributes : public clocked_attributes
+      class attributes : public internal::attributes_clocked
       {
       public:
 

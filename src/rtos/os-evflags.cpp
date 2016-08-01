@@ -159,7 +159,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     event_flags::event_flags (const char* name, const attributes& attr) :
-        named_object
+        object_named
           { name }
     {
 #if defined(OS_TRACE_RTOS_EVFLAGS)

@@ -164,7 +164,7 @@ namespace os
 
     semaphore::semaphore (const char* name, const count_t max_value,
                           const count_t initial_value, const attributes& attr) :
-        named_object
+        object_named
           { name }, //
         max_value_ (max_value), //
         initial_value_ (initial_value)

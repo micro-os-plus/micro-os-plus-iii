@@ -52,7 +52,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-evflag
      */
-    class event_flags : public named_object
+    class event_flags : public internal::object_named
     {
     public:
 
@@ -63,7 +63,7 @@ namespace os
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        * @ingroup cmsis-plus-rtos-evflag
        */
-      class attributes : public clocked_attributes
+      class attributes : public internal::attributes_clocked
       {
       public:
 
