@@ -55,6 +55,7 @@ namespace os
        */
       class event_flags
       {
+
       public:
 
         /**
@@ -98,36 +99,58 @@ namespace os
          * @{
          */
 
+        /**
+         * @brief Raise event flags.
+         * @param [in] mask The OR-ed flags to raise.
+         * @param [out] oflags Optional pointer where to store the
+         *  new value of the flags; may be `nullptr`.
+         * @retval result::ok The flags were raised.
+         * @retval EINVAL The mask is zero.
+         * @retval ENOTRECOVERABLE Raise failed.
+         */
         result_t
         raise (flags::mask_t mask, flags::mask_t* oflags);
 
+        /**
+         * @brief Check if expected flags are raised.
+         * @param [in] mask The expected flags (OR-ed bit-mask);
+         *  if `flags::any`, any flag raised will do it.
+         * @param [out] oflags Pointer where to store the current flags;
+         *  may be `nullptr`.
+         * @param [in] mode Mode bits to select if either all or any flags
+         *  in the mask are expected, and if the flags should be cleared.
+         * @retval true The expected flags are raised.
+         * @retval false The expected flags are not raised.
+         */
         bool
-        try_wait (flags::mask_t mask, flags::mask_t* oflags,
-                  flags::mode_t mode);
+        check_raised (flags::mask_t mask, flags::mask_t* oflags,
+                      flags::mode_t mode);
 
-#if 0
-        result_t
-        wait (flags::mask_t mask, flags::mask_t* oflags = nullptr,
-            flags::mode_t mode = flags::mode::all | flags::mode::clear);
-
-        result_t
-        try_wait (
-            flags::mask_t mask, flags::mask_t* oflags = nullptr,
-            flags::mode_t mode = flags::mode::all | flags::mode::clear);
-
-        result_t
-        timed_wait (
-            flags::mask_t mask, clock::duration_t timeout, flags::mask_t* oflags =
-            nullptr,
-            flags::mode_t mode = flags::mode::all | flags::mode::clear);
-#endif
-
+        /**
+         * @brief Get (and possibly clear) event flags.
+         * @param [in] mask The OR-ed flags to get/clear; can be `flags::any`.
+         * @param [in] mode Mode bits to select if the flags should be
+         *  cleared (the other bits are ignored).
+         * @return The selected bits from the flags mask.
+         */
         flags::mask_t
         get (flags::mask_t mask, flags::mode_t mode);
 
+        /**
+         * @brief Clear event flags.
+         * @param [in] mask The OR-ed flags to clear.
+         * @param [out] oflags Optional pointer where to store the
+         *  previous value of the flags; may be `nullptr`.
+         * @retval result::ok The flags were cleared.
+         * @retval EINVAL The mask is zero.
+         */
         result_t
         clear (flags::mask_t mask, flags::mask_t* oflags);
 
+        /**
+         * @brief Get the flags mask.
+         * @return The internal bit-mask.
+         */
         flags::mask_t
         mask (void);
 

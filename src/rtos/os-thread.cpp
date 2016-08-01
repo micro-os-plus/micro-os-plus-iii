@@ -1075,7 +1075,7 @@ namespace os
           // ----- Enter critical section ---------------------------------
           interrupts::critical_section ics;
 
-          if (event_flags_.try_wait (mask, oflags, mode))
+          if (event_flags_.check_raised (mask, oflags, mode))
             {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
               trace::printf ("%s(0x%X,%u) @%p %s >0x%X\n", __func__, mask, mode,
@@ -1095,7 +1095,7 @@ namespace os
               // ----- Enter critical section ---------------------------------
               interrupts::critical_section ics;
 
-              if (event_flags_.try_wait (mask, oflags, mode))
+              if (event_flags_.check_raised (mask, oflags, mode))
                 {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
                   clock::duration_t slept_ticks =
@@ -1141,7 +1141,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          if (event_flags_.try_wait (mask, oflags, mode))
+          if (event_flags_.check_raised (mask, oflags, mode))
             {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
               trace::printf ("%s(0x%X,%u) @%p %s >0x%X\n", __func__, mask, mode,
@@ -1177,7 +1177,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          if (event_flags_.try_wait (mask, oflags, mode))
+          if (event_flags_.check_raised (mask, oflags, mode))
             {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
               trace::printf ("%s(0x%X,%u,%u) @%p %s >0x%X\n", __func__, mask,
@@ -1206,7 +1206,7 @@ namespace os
               // ----- Enter critical section ---------------------------------
               interrupts::critical_section ics;
 
-              if (event_flags_.try_wait (mask, oflags, mode))
+              if (event_flags_.check_raised (mask, oflags, mode))
                 {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
                   clock::duration_t slept_ticks =

@@ -68,8 +68,8 @@ namespace os
       }
 
       bool
-      event_flags::try_wait (flags::mask_t mask, flags::mask_t* oflags,
-                             flags::mode_t mode)
+      event_flags::check_raised (flags::mask_t mask, flags::mask_t* oflags,
+                                 flags::mode_t mode)
       {
         if (mask == flags::any)
           {
