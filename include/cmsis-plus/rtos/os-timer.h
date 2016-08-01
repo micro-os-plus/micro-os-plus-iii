@@ -61,18 +61,26 @@ namespace os
 
       /**
        * @brief Timer call back function arguments.
+       * @ingroup cmsis-plus-rtos-timer
        */
       using func_args_t = void*;
 
       /**
        * @brief Entry point of a timer call back function.
+       * @ingroup cmsis-plus-rtos-timer
        */
       using func_t = void (*) (func_args_t args);
 
       /**
-       * @brief Timer run type.
+       * @brief Type of of variables holding timer run types.
+       * @ingroup cmsis-plus-rtos-timer
        */
       using type_t = uint8_t;
+
+      /**
+       * @brief Timer run types.
+       * @ingroup cmsis-plus-rtos-timer
+       */
       struct run
       {
         enum
@@ -91,9 +99,15 @@ namespace os
       };
 
       /**
-       * @brief Timer state type.
+       * @brief Type of of variables holding timer states.
+       * @ingroup cmsis-plus-rtos-timer
        */
       using state_t = uint8_t;
+
+      /**
+       * @brief Timer states
+       * @ingroup cmsis-plus-rtos-timer
+       */
       struct state
       {
         enum
@@ -116,6 +130,7 @@ namespace os
       /**
        * @brief Timer attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @ingroup cmsis-plus-rtos-timer
        */
       class attributes : public clocked_attributes
       {
@@ -195,6 +210,7 @@ namespace os
       /**
        * @brief Periodic timer attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @ingroup cmsis-plus-rtos-timer
        */
       class attributes_periodic : public attributes
       {
@@ -241,6 +257,7 @@ namespace os
 
       /**
        * @brief Default periodic timer initialiser.
+       * @ingroup cmsis-plus-rtos-timer
        */
       static const attributes_periodic periodic_initializer;
 

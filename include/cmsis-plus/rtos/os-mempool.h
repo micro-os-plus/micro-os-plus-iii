@@ -71,6 +71,7 @@ namespace os
        * @details
        * A numeric value that can hold the maximum size of the
        * memory pool, usually a 16-bits unsigned value.
+       * @ingroup cmsis-plus-rtos-mempool
        */
       using size_t = uint16_t;
 
@@ -78,6 +79,7 @@ namespace os
        * @brief Maximum pool size.
        * @details
        * A constant numeric value used to validate the pool size.
+       * @ingroup cmsis-plus-rtos-mempool
        */
       static constexpr memory_pool::size_t max_size =
           static_cast<memory_pool::size_t> (0 - 1);
@@ -87,6 +89,7 @@ namespace os
       /**
        * @brief Memory pool attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @ingroup cmsis-plus-rtos-mempool
        */
       class attributes : public clocked_attributes
       {
@@ -156,6 +159,7 @@ namespace os
 
       /**
        * @brief Default memory pool initialiser.
+       * @ingroup cmsis-plus-rtos-mempool
        */
       static const attributes initializer;
 

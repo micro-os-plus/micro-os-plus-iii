@@ -72,6 +72,7 @@ namespace os
        * @details
        * A numeric type intended to store a clock duration, either in ticks
        * or in seconds.
+       * @ingroup cmsis-plus-rtos-clock
        */
       using duration_t = port::clock::duration_t;
 
@@ -80,6 +81,7 @@ namespace os
        * @details
        * A numeric type intended to store a clock timestamp, either in ticks
        * or in seconds.
+       * @ingroup cmsis-plus-rtos-clock
        */
       using timestamp_t = port::clock::timestamp_t;
 
@@ -89,6 +91,7 @@ namespace os
        * A numeric type intended to store a clock offset
        * (difference to epoch), either in ticks
        * or in seconds.
+       * @ingroup cmsis-plus-rtos-clock
        */
       using offset_t = port::clock::offset_t;
 
@@ -543,7 +546,7 @@ namespace os
     };
 
     /**
-     * @brief The system clock.
+     * @brief The system clock object instance.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-clock
      */
@@ -655,7 +658,7 @@ namespace os
     };
 
     /**
-     * @brief The real time clock.
+     * @brief The real time clock object instance.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-clock
      */
@@ -748,7 +751,7 @@ namespace os
     };
 
     /**
-     * @brief The high resolution clock instance.
+     * @brief The high resolution clock object instance.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-clock
      */

@@ -72,6 +72,7 @@ namespace os
        * A numeric value to hold the message queue size, usually
        * an 8-bits value, possibly a 16-bits value if longer
        * queues are needed.
+       * @ingroup cmsis-plus-rtos-mqueue
        */
 #if defined(OS_BOOL_RTOS_MESSAGE_QUEUE_SIZE_16BITS)
       using size_t = uint16_t;
@@ -81,26 +82,31 @@ namespace os
 
       /**
        * @brief Maximum queue size.
+       * @ingroup cmsis-plus-rtos-mqueue
        */
       static constexpr message_queue::size_t max_size = 0xFF;
 
       /**
        * @brief Type of message size storage.
+       * @ingroup cmsis-plus-rtos-mqueue
        */
       using msg_size_t = uint16_t;
 
       /**
        * @brief Maximum message size.
+       * @ingroup cmsis-plus-rtos-mqueue
        */
       static constexpr msg_size_t max_msg_size = 0xFFFF;
 
       /**
        * @brief Type of list index storage.
+       * @ingroup cmsis-plus-rtos-mqueue
        */
       using index_t = message_queue::size_t;
 
       /**
        * @brief Index value to represent an illegal index.
+       * @ingroup cmsis-plus-rtos-mqueue
        */
       static constexpr index_t no_index = max_size;
 
@@ -110,6 +116,7 @@ namespace os
        * A numeric value to hold the message priority, which
        * controls the order in which messages are added to the
        * queue (higher values represent higher priorities).
+       * @ingroup cmsis-plus-rtos-mqueue
        */
       using priority_t = uint8_t;
 
@@ -117,6 +124,7 @@ namespace os
        * @brief Default message priority.
        * @details
        * Use this value with `send()` if no special priorities are required.
+       * @ingroup cmsis-plus-rtos-mqueue
        */
       static constexpr priority_t default_priority = 0;
 
@@ -125,6 +133,7 @@ namespace os
        * @details
        * The maximum value allowed by the type, usually used for
        * validation.
+       * @ingroup cmsis-plus-rtos-mqueue
        */
       static constexpr priority_t max_priority = 0xFF;
 
@@ -133,6 +142,7 @@ namespace os
       /**
        * @brief Message queue attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @ingroup cmsis-plus-rtos-mqueue
        */
       class attributes : public clocked_attributes
       {
@@ -204,11 +214,13 @@ namespace os
 
       /**
        * @brief Default message queue initialiser.
+       * @ingroup cmsis-plus-rtos-mqueue
        */
       static const attributes initializer;
 
       /**
        * @brief Default RTOS allocator.
+       * @ingroup cmsis-plus-rtos-mqueue
        */
       using Allocator = memory::allocator<thread::stack::allocation_element_t>;
 

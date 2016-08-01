@@ -64,6 +64,7 @@ namespace os
        * @details
        * A numeric value enough to hold the semaphore counter,
        * usually a 16-bits signed value.
+       * @ingroup cmsis-plus-rtos-semaphore
        */
       using count_t = int16_t;
 
@@ -71,6 +72,7 @@ namespace os
        * @brief Maximum semaphore value.
        * @details
        * Used to validate the semaphore initial count and max count.
+       * @ingroup cmsis-plus-rtos-semaphore
        */
       static constexpr count_t max_count_value = 0x7FFF;
 
@@ -79,6 +81,7 @@ namespace os
       /**
        * @brief Semaphore attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @ingroup cmsis-plus-rtos-semaphore
        */
       class attributes : public clocked_attributes
       {
@@ -159,6 +162,7 @@ namespace os
       /**
        * @brief Binary semaphore attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @ingroup cmsis-plus-rtos-semaphore
        */
       class attributes_binary : public attributes
       {
@@ -204,6 +208,7 @@ namespace os
 
       /**
        * @brief Default binary semaphore initialiser.
+       * @ingroup cmsis-plus-rtos-semaphore
        */
       static const attributes_binary initializer_binary;
 
@@ -212,6 +217,7 @@ namespace os
       /**
        * @brief Counting semaphore attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @ingroup cmsis-plus-rtos-semaphore
        */
       class attributes_counting : public attributes
       {

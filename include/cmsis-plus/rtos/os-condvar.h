@@ -57,6 +57,7 @@ namespace os
       /**
        * @brief Condition variable attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @ingroup cmsis-plus-rtos-condvar
        */
       class attributes : public clocked_attributes
       {
@@ -117,6 +118,7 @@ namespace os
 
       /**
        * @brief Default condition variable initialiser.
+       * @ingroup cmsis-plus-rtos-condvar
        */
       static const attributes initializer;
 

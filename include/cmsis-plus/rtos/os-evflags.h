@@ -61,6 +61,7 @@ namespace os
       /**
        * @brief Event flags attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @ingroup cmsis-plus-rtos-evflag
        */
       class attributes : public clocked_attributes
       {
@@ -121,6 +122,7 @@ namespace os
 
       /**
        * @brief Default event flags initialiser.
+       * @ingroup cmsis-plus-rtos-evflag
        */
       static const attributes initializer;
 
