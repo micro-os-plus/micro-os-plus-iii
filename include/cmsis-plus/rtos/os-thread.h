@@ -253,6 +253,7 @@ namespace os
        * @details
        * The os::rtos::thread::priority definition is a container for
        * priorities not restricted to an enumeration.
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
        * @ingroup cmsis-plus-rtos-thread
        */
       struct priority
@@ -337,6 +338,7 @@ namespace os
        * @details
        * The os::rtos::thread::state definition is a container for
        * thread states.
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
        * @ingroup cmsis-plus-rtos-thread
        */
       struct state

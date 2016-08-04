@@ -106,6 +106,7 @@ namespace os
 
       /**
        * @brief Timer states
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
        * @ingroup cmsis-plus-rtos-timer
        */
       struct state
