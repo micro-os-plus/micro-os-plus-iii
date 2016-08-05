@@ -563,6 +563,7 @@ extern "C"
     void* parent;
     os_internal_double_list_links_t child_links;
     os_internal_thread_children_list_t children;
+    os_internal_double_list_links_t mutexes;
     void* joiner;
     void* waiting_node;
     void* clock_node;
@@ -572,10 +573,11 @@ extern "C"
     size_t acquired_mutexes;
     size_t allocated_stack_size_elements;
     os_thread_state_t state;
-    os_thread_prio_t prio;
+    os_thread_prio_t prio_assigned;
+    os_thread_prio_t prio_inherited;
+    bool interrupted;
     os_internal_evflags_t event_flags;
     os_thread_user_storage_t user_storage; //
-    bool interrupted;
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) \
   || defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
@@ -930,6 +932,7 @@ extern "C"
     os_internal_threads_waiting_list_t list;
     void* clock;
 #endif
+    os_internal_double_list_links_t owner_links;
 #if defined(OS_USE_RTOS_PORT_MUTEX)
     os_mutex_port_data_t port;
 #endif

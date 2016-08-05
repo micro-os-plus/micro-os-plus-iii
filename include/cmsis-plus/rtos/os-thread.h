@@ -1078,7 +1078,7 @@ namespace os
       // Accessors & mutators.
 
       /**
-       * @brief Set the dynamic scheduling priority.
+       * @brief Set the assigned scheduling priority.
        * @param [in] prio New priority.
        * @retval result::ok The priority was set.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
@@ -1089,6 +1089,17 @@ namespace os
       priority (priority_t prio);
 
       /**
+       * @brief Set the inherited scheduling priority.
+       * @param [in] prio New priority.
+       * @retval result::ok The priority was set.
+       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @retval EINVAL The value of prio is invalid for the
+       *  scheduling policy of the specified thread.
+       */
+      result_t
+      priority_inherited (priority_t prio);
+
+      /**
        * @brief Get the current scheduling priority.
        * @par Parameters
        *  None.
@@ -1096,6 +1107,15 @@ namespace os
        */
       priority_t
       priority (void);
+
+      /**
+       * @brief Get the inherited scheduling priority.
+       * @par Parameters
+       *  None.
+       * @return The thread inherited priority. May be `priority::none`.
+       */
+      priority_t
+      priority_inherited (void);
 
 #if 0
       // ???
@@ -1298,6 +1318,7 @@ namespace os
 
       friend class clock;
       friend class condition_variable;
+      friend class mutex;
 
       /**
        * @endcond
@@ -1516,11 +1537,15 @@ namespace os
       // Intrusive node used to link this thread to parent list.
       internal::double_list_links child_links_;
 
-      using threads_list = internal::intrusive_list<thread, internal::double_list_links, &thread::child_links_>;
+      using threads_list = internal::intrusive_list<
+      thread, internal::double_list_links, &thread::child_links_>;
 
       // List of children threads. Force a clear.
       threads_list children_
         { true };
+
+      // List of mutexes that this thread owns.
+      internal::double_list mutexes_;
 
     protected:
 
@@ -1547,7 +1572,7 @@ namespace os
 
       std::size_t allocated_stack_size_elements_ = 0;
 
-      // TODO: make it a list, to properly process robustness.
+      // TODO: Add a list, to properly process robustness.
       std::size_t volatile acquired_mutexes_ = 0;
 
       // The thread state is set:
@@ -1558,10 +1583,19 @@ namespace os
       // - terminated - in state::_exit()
       // - destroyed - in thread::_destroy()
       state_t volatile state_ = state::undefined;
-      priority_t volatile prio_ = priority::none;
+
+      // There are two values used as thread priority. The main one is
+      // assigned via `priority(int)`, and is stored in `prio_assigned_`.
+      // This value is normally used by the scheduler.
+      // However, to prevent priority inversion, mutexes might temporarily
+      // boost priorities via `priority_inherited(int)`; this second
+      // value is stored in `prio_inherited_`.
+      priority_t volatile prio_assigned_ = priority::none;
+      priority_t volatile prio_inherited_ = priority::none;
+
+      bool volatile interrupted_ = false;
 
       internal::event_flags event_flags_;
-      bool volatile interrupted_ = false;
 
       os_thread_user_storage_t user_storage_;
 

@@ -429,7 +429,7 @@ namespace os
           scheduler::critical_section scs;
 
           // Get attributes from user structure.
-          prio_ = attr.th_priority;
+          prio_assigned_ = attr.th_priority;
 
           func_ = function;
           func_args_ = args;
@@ -525,7 +525,8 @@ namespace os
     thread::resume (void)
     {
 #if defined(OS_TRACE_RTOS_THREAD_CONTEXT)
-      trace::printf ("%s() @%p %s %u\n", __func__, this, name (), prio_);
+      trace::printf ("%s() @%p %s %u\n", __func__, this, name (),
+                     prio_assigned_);
 #endif
 
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)
@@ -568,15 +569,42 @@ namespace os
      * @par POSIX compatibility
      *  Extension to standard, no POSIX similar functionality identified.
      *
-     * @warning Cannot be invoked from Interrupt Service Routines.
+     * @note Can be invoked from Interrupt Service Routines.
      */
     thread::priority_t
     thread::priority (void)
     {
+      // trace::printf ("%s() @%p %s\n", __func__, this, name ());
+
+      if (prio_inherited_ == priority::none)
+        {
+          // The common case is to have no inherited priority;
+          // return the assigned one.
+          return prio_assigned_;
+        }
+      else
+        {
+          // Return the maximum between inherited and assigned.
+          return
+              (prio_inherited_ >= prio_assigned_) ?
+                  prio_inherited_ : prio_assigned_;
+        }
+    }
+
+    /**
+     * @details
+     *
+     * @par POSIX compatibility
+     *  Extension to standard, no POSIX similar functionality identified.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    thread::priority_t
+    thread::priority_inherited (void)
+    {
       os_assert_err(!interrupts::in_handler_mode (), priority::error);
 
-      // trace::printf ("%s() @%p %s\n", __func__, this, name ());
-      return prio_;
+      return prio_inherited_;
     }
 
     /**
@@ -609,13 +637,13 @@ namespace os
       os_assert_err(prio < priority::error, EINVAL);
       os_assert_err(prio != priority::none, EINVAL);
 
-      if (prio_ == prio)
+      if (prio_assigned_ == prio)
         {
           // Optimise, if priority did not change.
           return result::ok;
         }
 
-      prio_ = prio;
+      prio_assigned_ = prio;
 
       result_t res = result::ok;
 
@@ -623,6 +651,77 @@ namespace os
 
       // The port must perform a context switch.
       res = port::thread::priority (this, prio);
+
+#else
+
+      if (state_ == state::ready)
+        {
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
+
+          // Remove from initial location and reinsert according
+          // to new priority.
+          ready_node_.unlink ();
+          scheduler::ready_threads_list_.link (ready_node_);
+          // ----- Exit critical section --------------------------------------
+        }
+
+      // Mandatory, the priority might have been raised, the
+      // task must be scheduled to run.
+      this_thread::yield ();
+
+#endif
+
+      return res;
+    }
+
+    /**
+     * @details
+     * Set the scheduling inherited priority for the thread to the value given
+     * by _prio_.
+     *
+     * If an implementation detects use of a thread ID after the end
+     * of its lifetime, it is recommended that the function should
+     * fail and report an `ESRCH` error.
+     *
+     * The `priority()` function shall not return an error
+     * code of `EINTR`.
+     *
+     * @par POSIX compatibility
+     *  Extension to standard, no POSIX similar functionality identified.
+     *
+     * @warning Cannot be invoked from Interrupt Service Routines.
+     */
+    result_t
+    thread::priority_inherited (priority_t prio)
+    {
+#if defined(OS_TRACE_RTOS_THREAD)
+      trace::printf ("%s(%u) @%p %s\n", __func__, prio, this, name ());
+#endif
+
+      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err(prio < priority::error, EINVAL);
+
+      if (prio == prio_inherited_)
+        {
+          // Optimise, if priority did not change.
+          return result::ok;
+        }
+
+      prio_inherited_ = prio;
+
+      if (prio_inherited_ < prio_assigned_)
+        {
+          // Optimise, no need to reschedule.
+          return result::ok;
+        }
+
+      result_t res = result::ok;
+
+#if defined(OS_USE_RTOS_PORT_SCHEDULER)
+
+      // The port must perform a context switch.
+      res = port::thread::priority_inherited (this, prio);
 
 #else
 

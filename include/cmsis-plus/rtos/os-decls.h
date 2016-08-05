@@ -340,6 +340,9 @@ namespace os
     {
     }
 
+    /**
+     * @brief A namespace to group all internal implementation objects.
+     */
     namespace internal
     {
 

@@ -184,7 +184,7 @@ namespace os
             clear ();
           }
 
-        thread::priority_t prio = node.thread_->prio_;
+        thread::priority_t prio = node.thread_->priority ();
 
         waiting_thread_node* after =
             static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (tail ()));
@@ -196,37 +196,37 @@ namespace os
             trace::printf ("ready %s() empty +%u\n", __func__, prio);
 #endif
           }
-        else if (prio <= after->thread_->prio_)
+        else if (prio <= after->thread_->priority ())
           {
             // Insert at the end of the list.
 #if defined(OS_TRACE_RTOS_LISTS)
             trace::printf ("ready %s() back %u +%u \n", __func__,
-                           after->thread_->prio_, prio);
+                           after->thread_->priority (), prio);
 #endif
           }
-        else if (prio > head ()->thread_->prio_)
+        else if (prio > head ()->thread_->priority ())
           {
-            // Insert at the beginning of the list
+            // Insert at the beginning of the list.
             after =
                 static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (&head_));
 #if defined(OS_TRACE_RTOS_LISTS)
             trace::printf ("ready %s() front +%u %u \n", __func__, prio,
-                           head ()->thread_->prio_);
+                           head ()->thread_->priority ());
 #endif
           }
         else
           {
             // Insert in the middle of the list.
-            // The loop is guaranteed to terminate, not hit the head and
-            // the weight is small, priority() is only an accessor.
-            while (prio > after->thread_->prio_)
+            // The loop is guaranteed to terminate, and not hit the head.
+            // The weight is relatively small, priority() is not heavy.
+            while (prio > after->thread_->priority ())
               {
                 after =
                     static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (after->prev ()));
               }
 #if defined(OS_TRACE_RTOS_LISTS)
             trace::printf ("ready %s() middle %u +%u \n", __func__,
-                           after->thread_->prio_, prio);
+                           after->thread_->priority (), prio);
 #endif
           }
 
@@ -326,24 +326,24 @@ namespace os
             // Insert at the end of the list.
 #if defined(OS_TRACE_RTOS_LISTS)
             trace::printf ("wait %s() back %u +%u \n", __func__,
-                           after->thread_->prio_, prio);
+                           after->thread_->priority (), prio);
 #endif
           }
         else if (prio > head ()->thread_->priority ())
           {
-            // Insert at the beginning of the list
+            // Insert at the beginning of the list.
             after =
                 static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (&head_));
 #if defined(OS_TRACE_RTOS_LISTS)
             trace::printf ("wait %s() front +%u %u \n", __func__, prio,
-                           head ()->thread_->prio_);
+                           head ()->thread_->priority ());
 #endif
           }
         else
           {
             // Insert in the middle of the list.
-            // The loop is guaranteed to terminate, not hit the head and
-            // the weight is small, priority() is only an accessor.
+            // The loop is guaranteed to terminate, and not hit the head.
+            // The weight is relatively small, priority() is not heavy.
             while (prio > after->thread_->priority ())
               {
                 after =
@@ -351,7 +351,7 @@ namespace os
               }
 #if defined(OS_TRACE_RTOS_LISTS)
             trace::printf ("wait %s() middle %u +%u \n", __func__,
-                           after->thread_->prio_, prio);
+                           after->thread_->priority (), prio);
 #endif
           }
 

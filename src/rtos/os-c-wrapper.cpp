@@ -652,7 +652,7 @@ os_thread_get_name (os_thread_t* thread)
 /**
  * @details
  *
- * @warning Cannot be invoked from Interrupt Service Routines.
+ * @note Can be invoked from Interrupt Service Routines.
  *
  * @see os::rtos::thread::priority()
  */
