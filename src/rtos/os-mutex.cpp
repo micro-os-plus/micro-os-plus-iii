@@ -304,6 +304,11 @@ namespace os
 
     // ------------------------------------------------------------------------
 
+    using mutexes_list = internal::intrusive_list<
+    mutex, internal::double_list_links, &mutex::owner_links_>;
+
+    // ------------------------------------------------------------------------
+
     /**
      * @class mutex
      * @details
@@ -481,9 +486,18 @@ namespace os
 
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
+      os_assert_throw(type_ <= type::max_, EINVAL);
+      os_assert_throw(protocol_ <= protocol::max_, EINVAL);
+      os_assert_throw(robustness_ <= robustness::max_, EINVAL);
+
 #if !defined(OS_USE_RTOS_PORT_MUTEX)
       clock_ = attr.clock != nullptr ? attr.clock : &sysclock;
 #endif
+
+      os_assert_throw(attr.mx_priority_ceiling >= thread::priority::lowest,
+                      EINVAL);
+      os_assert_throw(attr.mx_priority_ceiling <= thread::priority::highest,
+                      EINVAL);
 
       prio_ceiling_ = attr.mx_priority_ceiling;
 
@@ -590,26 +604,28 @@ namespace os
             {
               // Save owner priority, in case a temporary boost
               // will be later applied.
-              owner_prio_ = owner_->priority ();
+              owner_prio_ = owner_->priority_inherited ();
             }
           else if (protocol_ == protocol::protect)
             {
               if (crt_thread->priority () > prio_ceiling_)
                 {
+                  // Prio ceiling must be at least the priority of the
+                  // highest priority thread.
                   return EINVAL;
                 }
 
               // Save owner priority and boost priority.
-              owner_prio_ = owner_->priority ();
+              owner_prio_ = owner_->priority_inherited ();
               if (prio_ceiling_ > owner_prio_)
                 {
                   boosted_prio_ = prio_ceiling_;
 
-                  // ----- Enter uncritical section -----------------------------------
+                  // ----- Enter uncritical section ---------------------------
                   scheduler::uncritical_section sucs;
 
-                  owner_->priority (boosted_prio_);
-                  // ----- Exit uncritical section ------------------------------------
+                  owner_->priority_inherited (boosted_prio_);
+                  // ----- Exit uncritical section ----------------------------
                 }
             }
 #if defined(OS_TRACE_RTOS_MUTEX)
@@ -655,22 +671,42 @@ namespace os
         }
       else
         {
-          // Try to lock when not owner.
+          // Try to lock when not owner (another thread requested the mutex).
 
-          // Another thread requested the mutex.
+          // POSIX: When a thread makes a call to mutex::lock(), the mutex was
+          // initialised with the protocol attribute having the value
+          // mutex::protocol::inherit, when the calling thread is blocked
+          // because the mutex is owned by another thread, that owner thread
+          // shall inherit the priority level of the calling thread as long
+          // as it continues to own the mutex. The implementation shall
+          // update its execution priority to the maximum of its assigned
+          // priority and all its inherited priorities.
+          // Furthermore, if this owner thread itself becomes blocked on
+          // another mutex with the protocol attribute having the value
+          // mutex::protocol::inherit, the same priority inheritance effect
+          // shall be propagated to this other owner thread, in a recursive
+          // manner.
           if (protocol_ == protocol::inherit)
             {
               thread::priority_t prio = crt_thread->priority ();
-              if ((prio > owner_->priority ()))
+              if ((prio > owner_->priority_inherited ()))
                 {
+                  mutexes_list* th_list =
+                      reinterpret_cast<mutexes_list*> (&owner_->mutexes_);
+                  th_list->link (*this);
+
+                  // If the current thread priority is higher than the
+                  // owner thread priority, boost priority.
                   boosted_prio_ = prio;
 
-                  // ----- Enter uncritical section -----------------------------------
+                  // ----- Enter uncritical section ---------------------------
                   scheduler::uncritical_section sucs;
 
                   // Boost owner priority.
-                  owner_->priority (boosted_prio_);
-                  // ----- Exit uncritical section ------------------------------------
+                  // Will be recomputed in unlock() to the highest
+                  // waiting thread, or removed it if none.
+                  owner_->priority_inherited (boosted_prio_);
+                  // ----- Exit uncritical section ----------------------------
                 }
             }
         }
@@ -1108,18 +1144,44 @@ namespace os
                   return result::ok;
                 }
 
-              if (boosted_prio_ != thread::priority::none)
-                {
-                  // Delayed until end of critical section.
-                  owner_->priority (owner_prio_);
-                  boosted_prio_ = thread::priority::none;
-                }
-
-              // Delayed until end of critical section.
-              list_.resume_one ();
-
               --(owner_->acquired_mutexes_);
 
+              if (boosted_prio_ != thread::priority::none)
+                {
+                  // Remove this mutex from the thread list.
+                  owner_links_.unlink ();
+
+                  mutexes_list* th_list =
+                      reinterpret_cast<mutexes_list*> (&owner_->mutexes_);
+
+                  if (th_list->empty ())
+                    {
+                      // If the owner thread has no more mutexes,
+                      // clear the inherited priority,
+                      // and the assigned priority will take precedence.
+                      boosted_prio_ = thread::priority::none;
+                    }
+                  else
+                    {
+                      // If the owner thread acquired other mutexes too,
+                      // compute the maximum boosted priority.
+                      thread::priority_t max_prio = 0;
+                      for (auto&& mx : *th_list)
+                        {
+                          if (mx.boosted_prio_ > max_prio)
+                            {
+                              max_prio = mx.boosted_prio_;
+                            }
+                        }
+                      boosted_prio_ = max_prio;
+                    }
+                  owner_->priority_inherited (boosted_prio_);
+                }
+
+              // Actually delayed until end of critical section.
+              list_.resume_one ();
+
+              // Finally release the mutex.
               owner_ = nullptr;
               count_ = 0;
 

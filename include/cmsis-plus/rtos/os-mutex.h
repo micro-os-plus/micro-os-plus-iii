@@ -67,6 +67,7 @@ namespace os
 
       /**
        * @brief Mutex protocols.
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
        * @ingroup cmsis-plus-rtos-mutex
        */
       struct protocol
@@ -90,7 +91,12 @@ namespace os
               /**
                * @brief Execute at the highest priority.
                */
-              protect = 2
+              protect = 2,
+
+              /**
+               * @brief Maximum value, for validation purposes.
+               */
+              max_ = protect,
         };
       };
 
@@ -102,6 +108,7 @@ namespace os
 
       /**
        * @brief Mutex robustness.
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
        * @ingroup cmsis-plus-rtos-mutex
        */
       struct robustness
@@ -120,7 +127,12 @@ namespace os
               /**
                * @brief Enhanced robustness at thread termination.
                */
-              robust = 1
+              robust = 1,
+
+              /**
+               * @brief Maximum value, for validation purposes.
+               */
+              max_ = robust,
         };
       };
 
@@ -132,6 +144,7 @@ namespace os
 
       /**
        * @brief Namespace of mutex types.
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
        * @ingroup cmsis-plus-rtos-mutex
        */
       struct type
@@ -156,6 +169,11 @@ namespace os
               recursive = 2,
 
               _default = normal,
+
+              /**
+               * @brief Maximum value, for validation purposes.
+               */
+              max_ = recursive,
         };
       };
 
@@ -630,6 +648,13 @@ namespace os
       clock* clock_ = nullptr;
 #endif
 
+    public:
+
+      // Intrusive node used to link this mutex to the owning thread.
+      internal::double_list_links owner_links_;
+
+    protected:
+
 #if defined(OS_USE_RTOS_PORT_MUTEX)
       friend class port::mutex;
       os_mutex_port_data_t port_;
@@ -640,7 +665,7 @@ namespace os
 
       // Can be updated in different thread contexts.
       volatile thread::priority_t prio_ceiling_ = thread::priority::highest;
-      volatile thread::priority_t owner_prio_ = 0;
+      volatile thread::priority_t owner_prio_ = thread::priority::none;
       volatile thread::priority_t boosted_prio_ = thread::priority::none;
 
       bool consistent_ = true;
