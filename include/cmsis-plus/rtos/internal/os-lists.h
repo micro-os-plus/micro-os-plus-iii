@@ -47,9 +47,6 @@ namespace os
   namespace rtos
   {
     class thread;
-    class double_list;
-    class timeout_thread_node;
-    class timer_node;
 
     namespace internal
     {
@@ -1024,6 +1021,11 @@ namespace os
            * @brief Construct an intrusive list.
            */
           intrusive_list ();
+
+          /**
+           * @brief Construct an intrusive list with controlled inits.
+           * @param clr If true, the list is cleared.
+           */
           intrusive_list (bool clr);
 
           /**
@@ -1933,7 +1935,7 @@ namespace os
 
       template<typename T, typename N, N T::* MP>
         void
-        intrusive_list<T, N, MP>::link (T& thread)
+        intrusive_list<T, N, MP>::link (T& node)
         {
           if (head_.prev () == nullptr)
             {
@@ -1949,7 +1951,7 @@ namespace os
 
           // Add thread intrusive node at the end of the list.
           insert_after (
-              *reinterpret_cast<static_double_list_links*> (reinterpret_cast<difference_type> (&thread)
+              *reinterpret_cast<static_double_list_links*> (reinterpret_cast<difference_type> (&node)
                   + offset),
               const_cast<static_double_list_links *> (tail ()));
         }
