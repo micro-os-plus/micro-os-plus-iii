@@ -36,8 +36,7 @@
 int
 os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
-  printf (
-      "\nCMSIS++ RTOS simple APIs test.\n");
+  printf ("\nCMSIS++ RTOS simple APIs test.\n");
 #if defined(__clang__)
   printf ("Built with clang " __VERSION__ ".\n");
 #else
@@ -67,7 +66,7 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
     }
 #endif
 
-  printf("%d\n", errno);
+  printf ("%d\n", errno);
 
   return ret;
 }
