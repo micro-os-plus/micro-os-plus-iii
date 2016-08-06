@@ -399,6 +399,14 @@ namespace os
         void
         unlink (void);
 
+        /**
+         * @brief Check if the node is unlinked.
+         * @retval true The node is not linked.
+         * @retval false The node is linked to a list.
+         */
+        bool
+        unlinked (void);
+
         static_double_list_links*
         next (void) const;
 
@@ -1809,6 +1817,12 @@ namespace os
       static_double_list_links::~static_double_list_links ()
       {
         ;
+      }
+
+      inline bool
+      static_double_list_links::unlinked (void)
+      {
+        return (next_ == nullptr);
       }
 
       inline static_double_list_links*

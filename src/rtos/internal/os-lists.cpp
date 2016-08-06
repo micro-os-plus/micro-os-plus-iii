@@ -62,8 +62,8 @@ namespace os
       void
       static_double_list_links::unlink (void)
       {
-        // Check if not already removed.
-        if (next_ == nullptr)
+        // Check if not already unlinked.
+        if (unlinked ())
           {
             assert(prev_ == nullptr);
 #if defined(OS_TRACE_RTOS_LISTS)
@@ -80,7 +80,7 @@ namespace os
         prev_->next_ = next_;
         next_->prev_ = prev_;
 
-        // Nullify both pointers in the removed node.
+        // Nullify both pointers in the unlinked node.
         prev_ = nullptr;
         next_ = nullptr;
       }
