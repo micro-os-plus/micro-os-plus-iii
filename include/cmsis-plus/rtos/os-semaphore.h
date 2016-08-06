@@ -510,7 +510,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @brief POSIX compliant binary **semaphore**.
+     * @brief POSIX compliant **binary semaphore**.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-semaphore
      */
@@ -582,7 +582,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @brief POSIX compliant counting **semaphore**.
+     * @brief POSIX compliant **counting semaphore**.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-semaphore
      */
