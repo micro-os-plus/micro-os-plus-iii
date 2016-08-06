@@ -56,6 +56,10 @@ namespace os
      * @endcond
      */
 
+    // ------------------------------------------------------------------------
+    using mutexes_list = internal::intrusive_list<
+    mutex, internal::double_list_links, &mutex::owner_links_>;
+
     // ========================================================================
     /**
      * @class thread::attributes
@@ -963,6 +967,7 @@ namespace os
           assert(children_.empty ());
           parent_ = nullptr;
 
+          // Non-robust mutexes acquired.
           assert(acquired_mutexes_ == 0);
 
           func_result_ = exit_ptr;
@@ -1018,6 +1023,7 @@ namespace os
         }
     }
 
+    // Called from kill() and from idle thread.
     void
     thread::_destroy (void)
     {
@@ -1036,6 +1042,18 @@ namespace os
               allocated_stack_size_elements_);
 
           allocated_stack_address_ = nullptr;
+        }
+
+        {
+          // ----- Enter critical section -------------------------------------
+          scheduler::critical_section scs;
+
+          mutexes_list* mx_list = reinterpret_cast<mutexes_list*> (&mutexes_);
+          for (auto&& mx : *mx_list)
+            {
+              mx.internal_mark_owner_dead_ ();
+            }
+          // ----- Exit critical section --------------------------------------
         }
 
       state_ = state::destroyed;

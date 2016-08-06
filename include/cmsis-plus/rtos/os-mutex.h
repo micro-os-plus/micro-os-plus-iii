@@ -497,7 +497,8 @@ namespace os
        *  the mutex type is `mutex::type::errorcheck` or
        *  `mutex::type::recursive`, or the mutex is a robust mutex,
        *  and the current thread does not own the mutex.
-       * @retval ENOTRECOVERABLE The mutex was not unlocked.
+       * @retval ENOTRECOVERABLE The recursive mutex whose oner
+       *   died was not marked `consistent()` before `unlock()`.
        */
       result_t
       unlock (void);
@@ -594,6 +595,8 @@ namespace os
 
     protected:
 
+      friend class thread;
+
       /**
        * @name Private Member Functions
        * @{
@@ -609,7 +612,7 @@ namespace os
        *  None
        */
       void
-      _init (void);
+      internal_init_ (void);
 
       /**
        * @brief Internal function used to lock the mutex.
@@ -619,7 +622,10 @@ namespace os
        * @retval false The mutex was not locked.
        */
       result_t
-      _try_lock (thread* crt_thread);
+      internal_try_lock_ (thread* crt_thread);
+
+      void
+      internal_mark_owner_dead_ (void);
 
       /**
        * @endcond
@@ -651,6 +657,7 @@ namespace os
     public:
 
       // Intrusive node used to link this mutex to the owning thread.
+      // This is used for priority inheritance and robustness.
       internal::double_list_links owner_links_;
 
     protected:
@@ -664,10 +671,12 @@ namespace os
       volatile count_t count_ = 0;
 
       // Can be updated in different thread contexts.
+      volatile thread::priority_t initial_prio_ceiling_ =
+          thread::priority::highest;
       volatile thread::priority_t prio_ceiling_ = thread::priority::highest;
-      volatile thread::priority_t owner_prio_ = thread::priority::none;
       volatile thread::priority_t boosted_prio_ = thread::priority::none;
 
+      bool owner_dead_ = false;
       bool consistent_ = true;
       bool recoverable_ = true;
 

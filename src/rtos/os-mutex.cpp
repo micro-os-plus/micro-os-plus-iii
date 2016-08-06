@@ -179,24 +179,24 @@ namespace os
      * initialised with this attribute, regardless of whether other
      * threads are blocked on any of these non-robust mutexes or not.
      *
+     * If a thread simultaneously owns several mutexes initialised
+     * with different protocols, it shall execute at the highest of
+     * the priorities that it would have obtained by each of these
+     * protocols (this requirement makes most of the specific max
+     * requirements above irrelevant, a global max is easier to compute).
+     *
      * While a thread is holding a mutex which has been initialised with
      * the `mutex::protocol::inherit` or `mutex::protocol::protect` protocol
      * attributes, it shall not be subject to being moved to the tail
      * of the scheduling queue at its priority in the event that its
-     * original priority is changed, such as by a POSIX call to
-     * sched_setparam(). Likewise, when a thread unlocks a mutex
+     * original priority is changed, such as by a call to
+     * thread::priority(int). Likewise, when a thread unlocks a mutex
      * that has been initialised with the `mutex::protocol::inherit` or
      * `mutex::protocol::protect` protocol attributes, it shall not be
      * subject to being moved to the tail of the scheduling queue
-     * at its priority in the event that its original priority is changed.
-     *
-     * @todo Implement the policy of locking thread priorities
-     * increased by mutexes.
-     *
-     * If a thread simultaneously owns several mutexes initialised
-     * with different protocols, it shall execute at the highest of
-     * the priorities that it would have obtained by each of these
-     * protocols.
+     * at its priority in the event that its original priority is changed
+     * (ILG: not sure what this means, currently after `unlock()` the thread
+     * priority returns to the assigned priority).
      *
      * When a thread makes a call to `mutex::lock()`, the mutex
      * was initialised with the protocol attribute having the
@@ -213,7 +213,7 @@ namespace os
      * other owner thread, in a recursive manner.
      *
      * @par POSIX compatibility
-     *  Inspired by `pthread_mutexattr_setprotocol()`
+     *  Inspired by [`pthread_mutexattr_setprotocol()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_getprotocol.html)
      *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
@@ -237,33 +237,26 @@ namespace os
      *
      * - `mutex::robustness::robust`
      *
-     *   If the process containing the owning thread of a robust
-     *   mutex terminates while holding the mutex lock, the next
-     *   thread that acquires the mutex shall be notified about
-     *   the termination by the return value `EOWNERDEAD` from
-     *   the locking function. If the owning thread of a robust
+     *   If the owning thread of a robust
      *   mutex terminates while holding the mutex lock, the next
      *   thread that acquires the mutex may be notified about the
      *   termination by the return value `EOWNERDEAD`. The notified
      *   thread can then attempt to mark the state protected by
      *   the mutex as consistent again by a call to
      *   `mutex::consistent()`. After a subsequent
-     *   successful call `mutex::unlock()`, the mutex
+     *   successful call to `mutex::unlock()`, the mutex
      *   lock shall be released and can be used normally by
      *   other threads. If the mutex is unlocked without a
      *   call to `mutex::consistent()`, it shall be in a
      *   permanently unusable state and all attempts to lock
      *   the mutex shall fail with the error `ENOTRECOVERABLE`.
-     *   The only permissible operation on such a mutex is
-     *   `mutex::destroy()`.
+     *   The only permissible operations on such a mutex are
+     *   `mutex::reset()` and the mutex destruction.
      *
      * @par POSIX compatibility
      *  Inspired by [`pthread_mutexattr_setrobust()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_setrobust.html)
      *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
-     *
-     * @todo Extend thread to implement robustness. Instead of a count
-     *  of threads, a list is required.
      */
 
     /**
@@ -499,6 +492,7 @@ namespace os
       os_assert_throw(attr.mx_priority_ceiling <= thread::priority::highest,
                       EINVAL);
 
+      initial_prio_ceiling_ = attr.mx_priority_ceiling;
       prio_ceiling_ = attr.mx_priority_ceiling;
 
 #if defined(OS_USE_RTOS_PORT_MUTEX)
@@ -508,10 +502,7 @@ namespace os
 
 #else
 
-      // Robust mutexes not yet fully supported.
-      os_assert_throw(robustness_ != robustness::robust, ENOTSUP);
-
-      _init ();
+      internal_init_ ();
 
 #endif
     }
@@ -558,9 +549,14 @@ namespace os
      */
 
     void
-    mutex::_init (void)
+    mutex::internal_init_ (void)
     {
+      owner_ = nullptr;
+      owner_links_.unlink ();
       count_ = 0;
+      prio_ceiling_ = initial_prio_ceiling_;
+      boosted_prio_ = thread::priority::none;
+      owner_dead_ = false;
       consistent_ = true;
       recoverable_ = true;
 
@@ -579,10 +575,8 @@ namespace os
      * Should be called from a scheduler critical section.
      */
     result_t
-    mutex::_try_lock (thread* crt_thread)
+    mutex::internal_try_lock_ (thread* crt_thread)
     {
-      // TODO: implement robust mutex and return ENOTRECOVERABLE, EOWNERDEAD.
-
       // Save the initial owner for later protocol tests.
       thread* saved_owner = owner_;
 
@@ -595,18 +589,24 @@ namespace os
           // For recursive mutexes, initialise counter.
           count_ = 1;
 
-          // Count the number of mutexes acquired by the thread.
-          ++(crt_thread->acquired_mutexes_);
-
           // When the mutex is acquired, some more actions are
-          // required, according to mutex type.
-          if (protocol_ == protocol::inherit)
+          // required, according to mutex attributes.
+
+          if (robustness_ == robustness::robust)
             {
-              // Save owner priority, in case a temporary boost
-              // will be later applied.
-              owner_prio_ = owner_->priority_inherited ();
+              mutexes_list* th_list =
+                  reinterpret_cast<mutexes_list*> (&owner_->mutexes_);
+              th_list->link (*this);
             }
-          else if (protocol_ == protocol::protect)
+          else
+            {
+              // Count the number of non-robust mutexes acquired by the thread.
+              // Terminating a thread with locked non-robust mutexes
+              // will trigger an assert.
+              ++(crt_thread->acquired_mutexes_);
+            }
+
+          if (protocol_ == protocol::protect)
             {
               if (crt_thread->priority () > prio_ceiling_)
                 {
@@ -615,12 +615,18 @@ namespace os
                   return EINVAL;
                 }
 
-              // Save owner priority and boost priority.
-              owner_prio_ = owner_->priority_inherited ();
-              if (prio_ceiling_ > owner_prio_)
-                {
-                  boosted_prio_ = prio_ceiling_;
+              // POSIX: When a thread owns one or more mutexes
+              // initialised with the mutex::protocol::protect protocol,
+              // it shall execute at the higher of its priority or the
+              // highest of the priority ceilings of all the mutexes
+              // owned by this thread and initialised with this
+              // attribute, regardless of whether other threads are
+              // blocked on any of these robust mutexes or not.
 
+              // Boost priority.
+              boosted_prio_ = prio_ceiling_;
+              if (boosted_prio_ > owner_->priority_inherited ())
+                {
                   // ----- Enter uncritical section ---------------------------
                   scheduler::uncritical_section sucs;
 
@@ -628,14 +634,23 @@ namespace os
                   // ----- Exit uncritical section ----------------------------
                 }
             }
+
 #if defined(OS_TRACE_RTOS_MUTEX)
           trace::printf ("%s() @%p %s by %p %s LCK\n", __func__, this, name (),
                          crt_thread, crt_thread->name ());
 #endif
+          // If the owning thread of a robust mutex terminates while
+          // holding the mutex lock, the next thread that acquires the
+          // mutex may be notified about the termination by the return
+          // value EOWNERDEAD.
+          if (owner_dead_)
+            {
+              return EOWNERDEAD;
+            }
           return result::ok;
         }
 
-      // Relock.
+      // Relock? (lock by the same thread).
       if (saved_owner == crt_thread)
         {
           // The mutex was requested again by the same thread.
@@ -644,6 +659,10 @@ namespace os
               if (count_ >= max_count_)
                 {
                   // The recursive mutex reached its limit.
+#if defined(OS_TRACE_RTOS_MUTEX)
+                  trace::printf ("%s() @%p %s EAGAIN\n", __func__, this,
+                                 name ());
+#endif
                   return EAGAIN;
                 }
 
@@ -658,7 +677,10 @@ namespace os
             }
           else if (type_ == type::errorcheck)
             {
-              // Recursive locks do not block, but return an error.
+              // Errorcheck mutexes do not block, but return an error.
+#if defined(OS_TRACE_RTOS_MUTEX)
+              trace::printf ("%s() @%p %s EDEADLK\n", __func__, this, name ());
+#endif
               return EDEADLK;
             }
           else if (type_ == type::normal)
@@ -668,6 +690,8 @@ namespace os
 #endif
               return EWOULDBLOCK;
             }
+
+          return EWOULDBLOCK;
         }
       else
         {
@@ -689,29 +713,55 @@ namespace os
           if (protocol_ == protocol::inherit)
             {
               thread::priority_t prio = crt_thread->priority ();
-              if ((prio > owner_->priority_inherited ()))
+              boosted_prio_ = prio;
+
+              mutexes_list* th_list =
+                  reinterpret_cast<mutexes_list*> (&owner_->mutexes_);
+              if (owner_links_.unlinked ())
                 {
-                  mutexes_list* th_list =
-                      reinterpret_cast<mutexes_list*> (&owner_->mutexes_);
                   th_list->link (*this);
+                }
 
-                  // If the current thread priority is higher than the
-                  // owner thread priority, boost priority.
-                  boosted_prio_ = prio;
-
+              // Boost owner priority.
+              if ((boosted_prio_ > owner_->priority_inherited ()))
+                {
                   // ----- Enter uncritical section ---------------------------
                   scheduler::uncritical_section sucs;
 
-                  // Boost owner priority.
-                  // Will be recomputed in unlock() to the highest
-                  // waiting thread, or removed it if none.
                   owner_->priority_inherited (boosted_prio_);
                   // ----- Exit uncritical section ----------------------------
                 }
+
+#if defined(OS_TRACE_RTOS_MUTEX)
+              trace::printf ("%s() @%p %s boost %u by %p %s \n", __func__, this,
+                             name (), boosted_prio_, crt_thread,
+                             crt_thread->name ());
+#endif
+
+              return EWOULDBLOCK;
             }
         }
 
+      // Block anyway.
       return EWOULDBLOCK;
+    }
+
+    // Called from thread termination, in a critical section.
+    void
+    mutex::internal_mark_owner_dead_ (void)
+    {
+      if (robustness_ == mutex::robustness::robust)
+        {
+          // If the owning thread of a robust mutex terminates
+          // while holding the mutex lock, the next thread that
+          // acquires the mutex may be notified about the termination
+          // by the return value EOWNERDEAD.
+          owner_dead_ = true;
+          consistent_ = false;
+
+          // Actually delayed until end of critical section.
+          list_.resume_one ();
+        }
     }
 
     /**
@@ -788,7 +838,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           scheduler::critical_section scs;
 
-          res = _try_lock (&crt_thread);
+          res = internal_try_lock_ (&crt_thread);
           if (res != EWOULDBLOCK)
             {
               return res;
@@ -808,7 +858,7 @@ namespace os
               // ----- Enter critical section ---------------------------------
               scheduler::critical_section scs;
 
-              res = _try_lock (&crt_thread);
+              res = internal_try_lock_ (&crt_thread);
               if (res != EWOULDBLOCK)
                 {
                   return res;
@@ -905,7 +955,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           scheduler::critical_section scs;
 
-          return _try_lock (&crt_thread);
+          return internal_try_lock_ (&crt_thread);
           // ----- Exit critical section --------------------------------------
         }
 
@@ -986,7 +1036,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           scheduler::critical_section scs;
 
-          res = _try_lock (&crt_thread);
+          res = internal_try_lock_ (&crt_thread);
           if (res != EWOULDBLOCK)
             {
               return res;
@@ -1013,7 +1063,7 @@ namespace os
               // ----- Enter critical section ---------------------------------
               scheduler::critical_section scs;
 
-              res = _try_lock (&crt_thread);
+              res = internal_try_lock_ (&crt_thread);
               if (res != EWOULDBLOCK)
                 {
                   return res;
@@ -1126,7 +1176,13 @@ namespace os
 
 #else
 
+      if (!recoverable_)
+        {
+          return ENOTRECOVERABLE;
+        }
+
       thread* crt_thread = &this_thread::thread ();
+
         {
           // ----- Enter critical section -------------------------------------
           scheduler::critical_section scs;
@@ -1144,17 +1200,21 @@ namespace os
                   return result::ok;
                 }
 
-              --(owner_->acquired_mutexes_);
+              if (robustness_ != robustness::robust)
+                {
+                  --(owner_->acquired_mutexes_);
+                }
+
+              // Remove this mutex from the thread list; ineffective if
+              // not linked.
+              owner_links_.unlink ();
 
               if (boosted_prio_ != thread::priority::none)
                 {
-                  // Remove this mutex from the thread list.
-                  owner_links_.unlink ();
-
-                  mutexes_list* th_list =
+                  mutexes_list* thread_mutexes =
                       reinterpret_cast<mutexes_list*> (&owner_->mutexes_);
 
-                  if (th_list->empty ())
+                  if (thread_mutexes->empty ())
                     {
                       // If the owner thread has no more mutexes,
                       // clear the inherited priority,
@@ -1166,7 +1226,7 @@ namespace os
                       // If the owner thread acquired other mutexes too,
                       // compute the maximum boosted priority.
                       thread::priority_t max_prio = 0;
-                      for (auto&& mx : *th_list)
+                      for (auto&& mx : *thread_mutexes)
                         {
                           if (mx.boosted_prio_ > max_prio)
                             {
@@ -1175,10 +1235,11 @@ namespace os
                         }
                       boosted_prio_ = max_prio;
                     }
+                  // Delayed until end of critical section.
                   owner_->priority_inherited (boosted_prio_);
                 }
 
-              // Actually delayed until end of critical section.
+              // Delayed until end of critical section.
               list_.resume_one ();
 
               // Finally release the mutex.
@@ -1188,6 +1249,22 @@ namespace os
 #if defined(OS_TRACE_RTOS_MUTEX)
               trace::printf ("%s() @%p %s ULCK\n", __func__, this, name ());
 #endif
+
+              // POSIX: If a robust mutex whose owner died is unlocked without
+              // a call to consistent(), it shall be in a permanently
+              // unusable state and all attempts to lock the mutex
+              // shall fail with the error ENOTRECOVERABLE.
+
+              if (owner_dead_)
+                {
+                  owner_dead_ = false;
+
+                  if (!consistent_)
+                    {
+                      recoverable_ = false;
+                      return ENOTRECOVERABLE;
+                    }
+                }
 
               return result::ok;
             }
@@ -1358,7 +1435,7 @@ namespace os
 
     /**
      * @details
-     * Return the mutex to initial unlocked state. If there were threads
+     * Return the mutex to the state right after creation. If there were threads
      * waiting for this mutex, wakeup all, then clear the waiting list.
      *
      * @par POSIX compatibility
@@ -1379,7 +1456,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           scheduler::critical_section scs;
 
-          _init ();
+          internal_init_ ();
           return result::ok;
           // ----- Exit critical section --------------------------------------
         }

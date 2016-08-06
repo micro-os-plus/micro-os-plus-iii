@@ -1590,6 +1590,13 @@ namespace os
       // However, to prevent priority inversion, mutexes might temporarily
       // boost priorities via `priority_inherited(int)`; this second
       // value is stored in `prio_inherited_`.
+
+      // POSIX: While a thread is holding a mutex which has been
+      // initialised with the mutex::protocol::inherit or
+      // mutex::protocol::protect protocol attributes, it shall
+      // not be subject to being moved to the tail of the scheduling
+      // queue at its priority in the event that its original
+      // priority is changed, such as by a POSIX call to sched_setparam().
       priority_t volatile prio_assigned_ = priority::none;
       priority_t volatile prio_inherited_ = priority::none;
 

@@ -937,8 +937,10 @@ extern "C"
     os_mutex_port_data_t port;
 #endif
     os_mutex_count_t count;
+    os_thread_prio_t initial_prio_ceiling;
     os_thread_prio_t prio_ceiling;
-    os_thread_prio_t owner_prio;
+    os_thread_prio_t bosted_prio;
+    bool owner_dead;
     bool consistent;
     bool recoverable;
     os_mutex_type_t type;
