@@ -97,7 +97,7 @@ namespace os
     /**
      * @var mutex::protocol_t mutex::attributes::mx_protocol
      * @details
-     * The default value of this attribute shall be `mutex::protocol::none`.
+     * The default value of this attribute shall be `mutex::protocol::inherit`.
      *
      * @see mutex::protocol
      *
@@ -105,6 +105,8 @@ namespace os
      *  Inspired by [`pthread_mutexattr_setprotocol()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutexattr_getprotocol.html)
      *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  <br>Differences from the standard:
+     *  - the POSIX default is `mutex::protocol::none`.
      */
 
     /**
@@ -285,13 +287,13 @@ namespace os
 
     /**
      * @details
-     * This variable is used by the default constructor.
+     * This variable is used by the normal mutex default constructor.
      */
     const mutex::attributes mutex::initializer_normal;
 
     /**
      * @details
-     * This variable can be used to create a recursive mutex.
+     * This variable is used by the recursive mutex default constructor.
      */
     const mutex::attributes_recursive mutex::initializer_recursive;
 
@@ -366,10 +368,10 @@ namespace os
      *
      * @code{.cpp}
      * // Construct a normal mutex. Same as using the default constructor.
-     * mutex mx { initializer_normal };
+     * mutex mx { "mx1" };
      *
      * // Construct a recursive mutex.
-     * mutex rmx { initializer_recursive };
+     * mutex_recursive rmx { "mx2" };
      * @endcode
      *
      * @par Example
@@ -514,10 +516,8 @@ namespace os
      * the destructor to set the object to an invalid value.
      *
      * It shall be safe to destroy an initialised mutex that is
-     * unlocked. Attempting to destroy a locked mutex or a mutex
-     * that is referenced (for example, while being used in a
-     * `timed_wait()` or `wait()`) by another
-     * thread results in undefined behaviour.
+     * unlocked. Attempting to destroy a locked mutex
+     * results in undefined behaviour (for example it may trigger an assert).
      *
      * @par POSIX compatibility
      *  Inspired by [`pthread_mutex_destroy()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_destroy.html)
@@ -1463,7 +1463,23 @@ namespace os
 
     }
 
-  // --------------------------------------------------------------------------
+  // ==========================================================================
 
+  /**
+   * @fn mutex_recursive::mutex_recursive (const attributes& attr)
+   * @copydetails mutex::mutex(const attributes&)
+   */
+
+  /**
+   * @fn mutex_recursive::mutex_recursive (const char* name, const attributes& attr)
+   * @copydetails mutex::mutex(const char* name, const attributes&)
+   */
+
+  /**
+   * @fn mutex_recursive::~mutex_recursive ()
+   * @copydetails mutex::~mutex()
+   */
+
+  // --------------------------------------------------------------------------
   } /* namespace rtos */
 } /* namespace os */

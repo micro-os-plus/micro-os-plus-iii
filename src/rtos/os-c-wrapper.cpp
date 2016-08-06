@@ -1409,6 +1409,25 @@ os_mutex_create (os_mutex_t* mutex, const char* name,
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
+ * @see os::rtos::mutex_recursive
+ */
+void
+os_mutex_recursive_create (os_mutex_t* mutex, const char* name,
+                           const os_mutex_attr_t* attr)
+{
+  assert(mutex != nullptr);
+  if (attr == nullptr)
+    {
+      attr = (const os_mutex_attr_t*) &mutex::initializer_recursive;
+    }
+  new (mutex) rtos::mutex_recursive (name, (mutex::attributes&) *attr);
+}
+
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
  * @see os::rtos::mutex
  */
 void

@@ -94,6 +94,11 @@ namespace os
               protect = 2,
 
               /**
+               * @brief Default value. Differs from POSIX, which uses `none`.
+               */
+              _default = inherit,
+
+              /**
                * @brief Maximum value, for validation purposes.
                */
               max_ = protect,
@@ -130,6 +135,11 @@ namespace os
               robust = 1,
 
               /**
+               * @brief Default value.
+               */
+              _default = stalled,
+
+              /**
                * @brief Maximum value, for validation purposes.
                */
               max_ = robust,
@@ -143,7 +153,7 @@ namespace os
       using type_t = uint8_t;
 
       /**
-       * @brief Namespace of mutex types.
+       * @brief Mutex types.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        * @ingroup cmsis-plus-rtos-mutex
        */
@@ -168,6 +178,9 @@ namespace os
                */
               recursive = 2,
 
+              /**
+               * @brief Default value.
+               */
               _default = normal,
 
               /**
@@ -261,7 +274,7 @@ namespace os
         /**
          * @brief Attribute with the mutex protocol.
          */
-        protocol_t mx_protocol = protocol::none;
+        protocol_t mx_protocol = protocol::_default;
 
         /**
          * @brief Attribute with the mutex robustness.
@@ -698,6 +711,74 @@ namespace os
 
     };
 
+    /**
+     * @brief POSIX compliant **recursive mutex**.
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @ingroup cmsis-plus-rtos-mutex
+     */
+    class mutex_recursive : public mutex
+    {
+    public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+      /**
+       * @brief Construct a recursive mutex object instance.
+       */
+      mutex_recursive (const attributes& attr = initializer_recursive);
+
+      /**
+       * @brief Construct a named recursive mutex object instance.
+       */
+      mutex_recursive (const char* name, const attributes& attr =
+                           initializer_recursive);
+
+      /**
+       * @cond ignore
+       */
+
+      mutex_recursive (const mutex_recursive&) = delete;
+      mutex_recursive (mutex_recursive&&) = delete;
+      mutex_recursive&
+      operator= (const mutex_recursive&) = delete;
+      mutex_recursive&
+      operator= (mutex_recursive&&) = delete;
+
+      /**
+       * @endcond
+       */
+
+      /**
+       * @brief Destruct the recursive mutex object instance.
+       */
+      ~mutex_recursive ();
+
+      /**
+       * @}
+       */
+
+      /**
+       * @name Operators
+       * @{
+       */
+
+      /**
+       * @brief Compare mutexes.
+       * @retval true The given mutex is the same as this mutex.
+       * @retval false The mutexes are different.
+       */
+      bool
+      operator== (const mutex_recursive& rhs) const;
+
+      /**
+       * @}
+       */
+
+    };
+
 #pragma GCC diagnostic pop
 
   // ==========================================================================
@@ -791,6 +872,40 @@ namespace os
     mutex::robustness (void)
     {
       return robustness_;
+    }
+
+    // ========================================================================
+
+    inline
+    mutex_recursive::mutex_recursive (const attributes& attr) :
+        mutex
+          { attr }
+    {
+      ;
+    }
+
+    inline
+    mutex_recursive::mutex_recursive (const char* name, const attributes& attr) :
+        mutex
+          { name, attr }
+    {
+      ;
+    }
+
+    inline
+    mutex_recursive::~mutex_recursive ()
+    {
+      ;
+    }
+
+    /**
+     * @details
+     * Identical mutexes should have the same memory address.
+     */
+    inline bool
+    mutex_recursive::operator== (const mutex_recursive& rhs) const
+    {
+      return this == &rhs;
     }
 
   } /* namespace rtos */

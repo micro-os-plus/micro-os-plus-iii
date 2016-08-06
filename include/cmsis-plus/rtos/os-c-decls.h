@@ -813,7 +813,12 @@ extern "C"
     /**
      * @brief Execute at the highest priority.
      */
-    os_mutex_protocol_protect = 2
+    os_mutex_protocol_protect = 2,
+
+    /**
+     * @brief Default mutex protocol.
+     */
+    os_mutex_protocol_default = os_mutex_protocol_inherit,
   };
 
   /**
@@ -831,7 +836,12 @@ extern "C"
     /**
      * @brief Enhanced robustness at thread termination.
      */
-    os_mutex_robustness_robust = 1
+    os_mutex_robustness_robust = 1,
+
+    /**
+     * @brief Default mutex robustness.
+     */
+    os_mutex_robustness_default = os_mutex_robustness_stalled,
   };
 
   /**
@@ -856,6 +866,9 @@ extern "C"
      */
     os_mutex_type_recursive = 2,
 
+    /**
+     * @brief Default mutex type.
+     */
     os_mutex_type_default = os_mutex_type_normal,
   };
 

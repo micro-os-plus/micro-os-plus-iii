@@ -1076,6 +1076,18 @@ extern "C"
                    const os_mutex_attr_t* attr);
 
   /**
+   * @brief Create a recursive mutex object instance.
+   * @param [in] mutex Pointer to mutex object instance.
+   * @param [in] name Pointer to name.
+   * @param [in] attr Pointer to attributes.
+   * @par Returns
+   *  Nothing.
+   */
+  void
+  os_mutex_recursive_create (os_mutex_t* mutex, const char* name,
+                             const os_mutex_attr_t* attr);
+
+  /**
    * @brief Destroy the mutex object instance.
    * @param [in] mutex Pointer to mutex object instance.
    * @par Returns
