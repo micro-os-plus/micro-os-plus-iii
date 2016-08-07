@@ -288,8 +288,8 @@ namespace os
        */
 
       void
-      _link_node (internal::waiting_threads_list& list,
-                  internal::waiting_thread_node& node)
+      internal_link_node (internal::waiting_threads_list& list,
+                          internal::waiting_thread_node& node)
       {
         // Remove this thread from the ready list, if there.
         port::this_thread::prepare_suspend ();
@@ -302,7 +302,7 @@ namespace os
       }
 
       void
-      _unlink_node (internal::waiting_thread_node& node)
+      internal_unlink_node (internal::waiting_thread_node& node)
       {
           {
             // ----- Enter critical section -----------------------------------
@@ -317,10 +317,10 @@ namespace os
       }
 
       void
-      _link_node (internal::waiting_threads_list& list,
-                  internal::waiting_thread_node& node,
-                  internal::clock_timestamps_list& timeout_list,
-                  internal::timeout_thread_node& timeout_node)
+      internal_link_node (internal::waiting_threads_list& list,
+                          internal::waiting_thread_node& node,
+                          internal::clock_timestamps_list& timeout_list,
+                          internal::timeout_thread_node& timeout_node)
       {
         // Remove this thread from the ready list, if there.
         port::this_thread::prepare_suspend ();
@@ -337,8 +337,8 @@ namespace os
       }
 
       void
-      _unlink_node (internal::waiting_thread_node& node,
-                    internal::timeout_thread_node& timeout_node)
+      internal_unlink_node (internal::waiting_thread_node& node,
+                            internal::timeout_thread_node& timeout_node)
       {
         // ----- Enter critical section ---------------------------------------
         interrupts::critical_section ics;
@@ -360,7 +360,7 @@ namespace os
 #if !defined(OS_USE_RTOS_PORT_SCHEDULER)
 
       void
-      _switch_threads (void)
+      internal_switch_threads (void)
       {
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
 
@@ -385,7 +385,7 @@ namespace os
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
 
         // Normally the old running thread must be re-linked to ready.
-        scheduler::current_thread_->_relink_running ();
+        scheduler::current_thread_->internal_relink_running_ ();
 
         // The top of the ready list gives the next thread to run.
         scheduler::current_thread_ =

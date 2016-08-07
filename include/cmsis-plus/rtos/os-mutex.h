@@ -96,7 +96,7 @@ namespace os
               /**
                * @brief Default value. Differs from POSIX, which uses `none`.
                */
-              _default = inherit,
+              default_ = inherit,
 
               /**
                * @brief Maximum value, for validation purposes.
@@ -137,7 +137,7 @@ namespace os
               /**
                * @brief Default value.
                */
-              _default = stalled,
+              default_ = stalled,
 
               /**
                * @brief Maximum value, for validation purposes.
@@ -181,7 +181,7 @@ namespace os
               /**
                * @brief Default value.
                */
-              _default = normal,
+              default_ = normal,
 
               /**
                * @brief Maximum value, for validation purposes.
@@ -274,7 +274,7 @@ namespace os
         /**
          * @brief Attribute with the mutex protocol.
          */
-        protocol_t mx_protocol = protocol::_default;
+        protocol_t mx_protocol = protocol::default_;
 
         /**
          * @brief Attribute with the mutex robustness.
@@ -284,7 +284,7 @@ namespace os
         /**
          * @brief Attribute with the mutex type.
          */
-        type_t mx_type = type::_default;
+        type_t mx_type = type::default_;
 
         /**
          * @brief Attribute with the mutex maximum recursive count.

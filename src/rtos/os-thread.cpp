@@ -221,13 +221,13 @@ namespace os
      * and explicitly invoke exit().
      */
     void
-    thread::_invoke_with_exit (thread* thread)
+    thread::internal_invoke_with_exit_ (thread* thread)
     {
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, thread, thread->name ());
 #endif
 
-      thread->_exit (thread->func_ (thread->func_args_));
+      thread->internal_exit_ (thread->func_ (thread->func_args_));
     }
 
     thread::thread ()
@@ -352,7 +352,7 @@ namespace os
       if (attr.th_stack_address != nullptr
           && attr.th_stack_size_bytes > stack::min_size ())
         {
-          _construct (function, args, attr, nullptr, 0);
+          internal_construct_ (function, args, attr, nullptr, 0);
         }
       else
         {
@@ -378,7 +378,7 @@ namespace os
 
           assert(allocated_stack_address_ != nullptr);
 
-          _construct (
+          internal_construct_ (
               function,
               args,
               attr,
@@ -393,9 +393,9 @@ namespace os
      */
 
     void
-    thread::_construct (func_t function, func_args_t args,
-                        const attributes& attr, void* stack_address,
-                        std::size_t stack_size_bytes)
+    thread::internal_construct_ (func_t function, func_args_t args,
+                                 const attributes& attr, void* stack_address,
+                                 std::size_t stack_size_bytes)
     {
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
@@ -458,9 +458,9 @@ namespace os
 #else
 
           // Create the context.
-          port::context::create (&context_,
-                                 reinterpret_cast<void*> (_invoke_with_exit),
-                                 this);
+          port::context::create (
+              &context_, reinterpret_cast<void*> (internal_invoke_with_exit_),
+              this);
 
           if (!scheduler::started ())
             {
@@ -838,7 +838,7 @@ namespace os
       while (state_ != state::destroyed)
         {
           joiner_ = this_thread::_thread ();
-          this_thread::_thread ()->_suspend ();
+          this_thread::_thread ()->internal_suspend_ ();
         }
 
 #if defined(OS_TRACE_RTOS_THREAD)
@@ -921,7 +921,7 @@ namespace os
      *  Extension to standard, no POSIX similar functionality identified.
      */
     void
-    thread::_suspend (void)
+    thread::internal_suspend_ (void)
     {
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -942,7 +942,7 @@ namespace os
     }
 
     void
-    thread::_exit (void* exit_ptr)
+    thread::internal_exit_ (void* exit_ptr)
     {
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -1005,7 +1005,7 @@ namespace os
     }
 
     void
-    thread::_check_stack (void)
+    thread::internal_check_stack_ (void)
     {
       if (stack ().size () > 0)
         {
@@ -1025,13 +1025,13 @@ namespace os
 
     // Called from kill() and from idle thread.
     void
-    thread::_destroy (void)
+    thread::internal_destroy_ (void)
     {
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      _check_stack ();
+      internal_check_stack_ ();
 
       if (allocated_stack_address_ != nullptr)
         {
@@ -1136,7 +1136,7 @@ namespace os
 
           func_result_ = nullptr;
 
-          _destroy ();
+          internal_destroy_ ();
 
           // ----- Exit critical section --------------------------------------
         }
@@ -1177,8 +1177,8 @@ namespace os
      */
 
     result_t
-    thread::_flags_wait (flags::mask_t mask, flags::mask_t* oflags,
-                         flags::mode_t mode)
+    thread::internal_flags_wait_ (flags::mask_t mask, flags::mask_t* oflags,
+                                  flags::mode_t mode)
     {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X,%u) @%p %s <0x%X\n", __func__, mask, mode, this,
@@ -1227,7 +1227,7 @@ namespace os
               // ----- Exit critical section ----------------------------------
             }
 
-          _suspend ();
+          internal_suspend_ ();
 
           if (interrupted ())
             {
@@ -1244,8 +1244,8 @@ namespace os
     }
 
     result_t
-    thread::_flags_try_wait (flags::mask_t mask, flags::mask_t* oflags,
-                             flags::mode_t mode)
+    thread::internal_flags_try_wait_ (flags::mask_t mask, flags::mask_t* oflags,
+                                      flags::mode_t mode)
     {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X,%u) @%p %s <0x%X\n", __func__, mask, mode, this,
@@ -1279,8 +1279,10 @@ namespace os
     }
 
     result_t
-    thread::_flags_timed_wait (flags::mask_t mask, clock::duration_t timeout,
-                               flags::mask_t* oflags, flags::mode_t mode)
+    thread::internal_flags_timed_wait_ (flags::mask_t mask,
+                                        clock::duration_t timeout,
+                                        flags::mask_t* oflags,
+                                        flags::mode_t mode)
     {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X,%u,%u) @%p %s <0x%X\n", __func__, mask, timeout,
@@ -1395,7 +1397,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     flags::mask_t
-    thread::_flags_get (flags::mask_t mask, flags::mode_t mode)
+    thread::internal_flags_get_ (flags::mask_t mask, flags::mode_t mode)
     {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
@@ -1419,7 +1421,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
-    thread::_flags_clear (flags::mask_t mask, flags::mask_t* oflags)
+    thread::internal_flags_clear_ (flags::mask_t mask, flags::mask_t* oflags)
     {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X) @%p %s <0x%X\n", __func__, mask, this, name (),

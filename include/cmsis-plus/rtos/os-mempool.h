@@ -415,9 +415,9 @@ namespace os
        * @param [in] pool_size_bytes Size of queue storage.
        */
       void
-      _construct (std::size_t blocks, std::size_t block_size_bytes,
-                  const attributes& attr, void* pool_address,
-                  std::size_t pool_size_bytes);
+      internal_construct_ (std::size_t blocks, std::size_t block_size_bytes,
+                           const attributes& attr, void* pool_address,
+                           std::size_t pool_size_bytes);
 
       /**
        * @brief Internal initialisation.
@@ -425,7 +425,7 @@ namespace os
        *  None
        */
       void
-      _init (void);
+      internal_init_ (void);
 
       /**
        * @brief Internal function used to get the first linked block.
@@ -434,7 +434,7 @@ namespace os
        * @return Pointer to block or `nullptr` if no more blocks available.
        */
       void*
-      _try_first (void);
+      internal_try_first_ (void);
 
       /**
        * @endcond
@@ -1038,7 +1038,7 @@ namespace os
         if (attr.mp_pool_address != nullptr)
           {
             // Do not use any allocator at all.
-            _construct (blocks, block_size_bytes, attr, nullptr, 0);
+            internal_construct_ (blocks, block_size_bytes, attr, nullptr, 0);
           }
         else
           {
@@ -1055,7 +1055,7 @@ namespace os
                 const_cast<allocator_type&> (allocator).allocate (
                     allocated_pool_size_elements_);
 
-            _construct (
+            internal_construct_ (
                 blocks,
                 block_size_bytes,
                 attr,
@@ -1291,7 +1291,7 @@ namespace os
     template<typename T, std::size_t N>
       memory_pool_static<T, N>::memory_pool_static (const attributes& attr)
       {
-        _construct (blocks, sizeof(T), attr, &arena_, sizeof(arena_));
+        internal_construct_ (blocks, sizeof(T), attr, &arena_, sizeof(arena_));
       }
 
     /**
@@ -1326,7 +1326,7 @@ namespace os
           memory_pool
             { name }
       {
-        _construct (blocks, sizeof(T), attr, &arena_, sizeof(arena_));
+        internal_construct_ (blocks, sizeof(T), attr, &arena_, sizeof(arena_));
       }
 
     /**

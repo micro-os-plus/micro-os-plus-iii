@@ -50,7 +50,7 @@ os_systick_handler (void)
   // Prevent scheduler actions before starting it.
   if (scheduler::started ())
     {
-      port::clock_systick::_interrupt_service_routine();
+      port::clock_systick::internal_interrupt_service_routine();
     }
 #endif
 
@@ -62,12 +62,12 @@ os_systick_handler (void)
       // ----- Enter critical section -----------------------------------------
       interrupts::critical_section ics;
 
-      sysclock._increment_count ();
-      hrclock._increment_count ();
+      sysclock.internal_increment_count ();
+      hrclock.internal_increment_count ();
       // ----- Exit critical section ------------------------------------------
     }
-  sysclock._check_timestamps ();
-  hrclock._check_timestamps ();
+  sysclock.internal_check_timestamps ();
+  hrclock.internal_check_timestamps ();
 
 #if !defined(OS_INCLUDE_RTOS_REALTIME_CLOCK_DRIVER)
 
@@ -106,7 +106,7 @@ os_rtc_handler (void)
   // Prevent scheduler actions before starting it.
   if (scheduler::started ())
     {
-      port::clock_rtc::_interrupt_service_routine();
+      port::clock_rtc::internal_interrupt_service_routine();
     }
 #endif
 
@@ -118,11 +118,11 @@ os_rtc_handler (void)
       // ----- Enter critical section -----------------------------------------
       interrupts::critical_section ics;
 
-      rtclock._increment_count ();
+      rtclock.internal_increment_count ();
       // ----- Exit critical section ------------------------------------------
     }
 
-  rtclock._check_timestamps ();
+  rtclock.internal_check_timestamps ();
 }
 
 // ----------------------------------------------------------------------------
@@ -216,7 +216,7 @@ namespace os
       for (;;)
         {
           result_t res;
-          res = _wait_until (timestamp, steady_list_);
+          res = internal_wait_until_ (timestamp, steady_list_);
 
           timestamp_t n = steady_now ();
           if (n >= timestamp)
@@ -255,7 +255,7 @@ namespace os
       for (;;)
         {
           result_t res;
-          res = _wait_until (timestamp, steady_list_);
+          res = internal_wait_until_ (timestamp, steady_list_);
 
           timestamp_t nw = now ();
           if (nw >= timestamp)
@@ -294,7 +294,7 @@ namespace os
       clock::timestamp_t timestamp = steady_now () + timeout;
 
       result_t res;
-      res = _wait_until (timestamp, steady_list_);
+      res = internal_wait_until_ (timestamp, steady_list_);
 
       timestamp_t nw = steady_now ();
       if (nw >= timestamp)
@@ -327,8 +327,8 @@ namespace os
     }
 
     result_t
-    clock::_wait_until (timestamp_t timestamp,
-                        internal::clock_timestamps_list& list)
+    clock::internal_wait_until_ (timestamp_t timestamp,
+                                 internal::clock_timestamps_list& list)
     {
       thread& crt_thread = this_thread::thread ();
 
@@ -420,7 +420,7 @@ namespace os
       for (;;)
         {
           result_t res;
-          res = _wait_until (timestamp, adjusted_list_);
+          res = internal_wait_until_ (timestamp, adjusted_list_);
 
           timestamp_t nw = now ();
           if (nw >= timestamp)
@@ -565,7 +565,7 @@ namespace os
 #if defined(OS_USE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
 
     result_t
-    clock_systick::_wait_until (timestamp_t timestamp,
+    clock_systick::internal_wait_until_ (timestamp_t timestamp,
         clock_timestamps_list& list __attribute__((unused)))
       {
         result_t res;

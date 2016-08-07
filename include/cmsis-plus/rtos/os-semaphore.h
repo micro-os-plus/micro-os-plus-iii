@@ -453,10 +453,10 @@ namespace os
        *  None
        */
       void
-      _init (void);
+      internal_init_ (void);
 
       bool
-      _try_wait (void);
+      internal_try_wait_ (void);
 
       /**
        * @endcond

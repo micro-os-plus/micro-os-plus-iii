@@ -930,7 +930,7 @@ namespace os
          */
 
         friend void
-        rtos::scheduler::_switch_threads (void);
+        rtos::scheduler::internal_switch_threads (void);
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
         rtos::statistics::counter_t context_switches_ = 0;
@@ -1279,24 +1279,26 @@ namespace os
       this_thread::__errno (void);
 
       friend void
-      scheduler::_link_node (internal::waiting_threads_list& list,
-                             internal::waiting_thread_node& node);
+      scheduler::internal_link_node (internal::waiting_threads_list& list,
+                                     internal::waiting_thread_node& node);
 
       friend void
-      scheduler::_unlink_node (internal::waiting_thread_node& node);
+      scheduler::internal_unlink_node (internal::waiting_thread_node& node);
 
       friend void
-      scheduler::_link_node (internal::waiting_threads_list& list,
-                             internal::waiting_thread_node& node,
-                             internal::clock_timestamps_list& timeout_list,
-                             internal::timeout_thread_node& timeout_node);
+      scheduler::internal_link_node (
+          internal::waiting_threads_list& list,
+          internal::waiting_thread_node& node,
+          internal::clock_timestamps_list& timeout_list,
+          internal::timeout_thread_node& timeout_node);
 
       friend void
-      scheduler::_unlink_node (internal::waiting_thread_node& node,
-                               internal::timeout_thread_node& timeout_node);
+      scheduler::internal_unlink_node (
+          internal::waiting_thread_node& node,
+          internal::timeout_thread_node& timeout_node);
 
       friend void
-      scheduler::_switch_threads (void);
+      scheduler::internal_switch_threads (void);
 
       friend void
       port::scheduler::reschedule (void);
@@ -1348,8 +1350,9 @@ namespace os
        * @param [in] stack_size_bytes Size of stack storage or 0.
        */
       void
-      _construct (func_t function, func_args_t args, const attributes& attr,
-                  void* stack_address, std::size_t stack_size_bytes);
+      internal_construct_ (func_t function, func_args_t args,
+                           const attributes& attr, void* stack_address,
+                           std::size_t stack_size_bytes);
 
       /**
        * @brief Suspend this thread and wait for an event.
@@ -1358,7 +1361,7 @@ namespace os
        * @return  Nothing.
        */
       void
-      _suspend (void);
+      internal_suspend_ (void);
 
       /**
        * @brief Terminate thread by itself.
@@ -1367,7 +1370,7 @@ namespace os
        */
       [[noreturn]]
       void
-      _exit (void* exit_ptr = nullptr);
+      internal_exit_ (void* exit_ptr = nullptr);
 
       /**
        * @brief Invoke terminating thread function.
@@ -1376,7 +1379,7 @@ namespace os
        */
       [[noreturn]]
       static void
-      _invoke_with_exit (thread* thread);
+      internal_invoke_with_exit_ (thread* thread);
 
       /**
        * @brief Wait for event flags.
@@ -1393,8 +1396,8 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      _flags_wait (flags::mask_t mask, flags::mask_t* oflags,
-                   flags::mode_t mode);
+      internal_flags_wait_ (flags::mask_t mask, flags::mask_t* oflags,
+                            flags::mode_t mode);
 
       /**
        * @brief Try to wait for event flags.
@@ -1410,8 +1413,8 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      _flags_try_wait (flags::mask_t mask, flags::mask_t* oflags,
-                       flags::mode_t mode);
+      internal_flags_try_wait_ (flags::mask_t mask, flags::mask_t* oflags,
+                                flags::mode_t mode);
 
       /**
        * @brief Timed wait for event flags.
@@ -1431,8 +1434,8 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      _flags_timed_wait (flags::mask_t mask, clock::duration_t timeout,
-                         flags::mask_t* oflags, flags::mode_t mode);
+      internal_flags_timed_wait_ (flags::mask_t mask, clock::duration_t timeout,
+                                  flags::mask_t* oflags, flags::mode_t mode);
 
       /**
        * @brief Internal wait for event flags.
@@ -1446,7 +1449,8 @@ namespace os
        * @retval false The expected flags are not raised.
        */
       bool
-      _try_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
+      internal_try_wait_ (flags::mask_t mask, flags::mask_t* oflags,
+                          flags::mode_t mode);
 
       /**
        * @brief Clear thread event flags.
@@ -1458,7 +1462,7 @@ namespace os
        * @retval EINVAL The mask is zero.
        */
       result_t
-      _flags_clear (flags::mask_t mask, flags::mask_t* oflags);
+      internal_flags_clear_ (flags::mask_t mask, flags::mask_t* oflags);
 
       /**
        * @brief Get/clear thread event flags.
@@ -1470,7 +1474,7 @@ namespace os
        * @retval flags::all Cannot be invoked from an Interrupt Service Routines.
        */
       flags::mask_t
-      _flags_get (flags::mask_t mask, flags::mode_t mode);
+      internal_flags_get_ (flags::mask_t mask, flags::mode_t mode);
 
       /**
        * @brief The actual destructor, also called from exit() and kill().
@@ -1480,7 +1484,7 @@ namespace os
        *  Nothing
        */
       virtual void
-      _destroy (void);
+      internal_destroy_ (void);
 
       /**
        * @par Parameters
@@ -1489,7 +1493,7 @@ namespace os
        *  Nothing
        */
       void
-      _relink_running (void);
+      internal_relink_running_ (void);
 
       /**
        * @par Parameters
@@ -1498,7 +1502,7 @@ namespace os
        *  Nothing
        */
       void
-      _check_stack (void);
+      internal_check_stack_ (void);
 
       /**
        * @endcond
@@ -1578,10 +1582,11 @@ namespace os
       // The thread state is set:
       // - running - in ready_threads_list::unlink_head()
       // - ready - in ready_threads_list::link()
-      // - waiting - in clock::_wait_until(), scheduler::_link_node()
-      //              thread::_wait(), thread::_timed_flags_wait()
-      // - terminated - in state::_exit()
-      // - destroyed - in thread::_destroy()
+      // - waiting - in clock::internal_wait_until(),
+      //              scheduler::internal_link_node()
+      //              thread::_timed_flags_wait()
+      // - terminated - in state::internal_exit_()
+      // - destroyed - in thread::internal_destroy_()
       state_t volatile state_ = state::undefined;
 
       // There are two values used as thread priority. The main one is
@@ -1715,7 +1720,7 @@ namespace os
          */
 
         virtual void
-        _destroy (void) override;
+        internal_destroy_ (void) override;
 
         /**
          * @endcond
@@ -1840,7 +1845,7 @@ namespace os
       inline void
       suspend (void)
       {
-        this_thread::thread ()._suspend ();
+        this_thread::thread ().internal_suspend_ ();
       }
 
       /**
@@ -1867,7 +1872,7 @@ namespace os
       inline result_t
       flags_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode)
       {
-        return this_thread::thread ()._flags_wait (mask, oflags, mode);
+        return this_thread::thread ().internal_flags_wait_ (mask, oflags, mode);
       }
 
       /**
@@ -1885,7 +1890,8 @@ namespace os
       flags_try_wait (flags::mask_t mask, flags::mask_t* oflags,
                       flags::mode_t mode)
       {
-        return this_thread::thread ()._flags_try_wait (mask, oflags, mode);
+        return this_thread::thread ().internal_flags_try_wait_ (mask, oflags,
+                                                                mode);
       }
 
       /**
@@ -1930,8 +1936,8 @@ namespace os
       flags_timed_wait (flags::mask_t mask, clock::duration_t timeout,
                         flags::mask_t* oflags, flags::mode_t mode)
       {
-        return this_thread::thread ()._flags_timed_wait (mask, timeout, oflags,
-                                                         mode);
+        return this_thread::thread ().internal_flags_timed_wait_ (mask, timeout,
+                                                                  oflags, mode);
       }
 
       /**
@@ -1948,7 +1954,7 @@ namespace os
       inline flags::mask_t
       flags_get (flags::mask_t mask, flags::mode_t mode)
       {
-        return this_thread::thread ()._flags_get (mask, mode);
+        return this_thread::thread ().internal_flags_get_ (mask, mode);
       }
 
       /**
@@ -1959,7 +1965,7 @@ namespace os
       inline result_t
       flags_clear (flags::mask_t mask, flags::mask_t* oflags)
       {
-        return this_thread::thread ()._flags_clear (mask, oflags);
+        return this_thread::thread ().internal_flags_clear_ (mask, oflags);
       }
 
       /**
@@ -1982,7 +1988,7 @@ namespace os
        * from the start routine that was used to create it.
        * The function's return value shall serve as the thread's
        * exit code.
-       * The behaviour of `_exit()` is undefined if called from a
+       * The behaviour of `internal_exit_()` is undefined if called from a
        * cancellation cleanup handler or destructor function that
        * was invoked as a result of either an implicit or explicit
        * call to `exit()`.
@@ -2002,7 +2008,7 @@ namespace os
       inline void
       exit (void* exit_ptr)
       {
-        this_thread::thread ()._exit (exit_ptr);
+        this_thread::thread ().internal_exit_ (exit_ptr);
       }
 
       /**
@@ -2317,7 +2323,7 @@ namespace os
      */
 
     inline void
-    thread::_relink_running (void)
+    thread::internal_relink_running_ (void)
     {
       if (state_ == state::running)
         {
@@ -2373,7 +2379,7 @@ namespace os
     inline result_t
     thread::flags_clear (flags::mask_t mask, flags::mask_t* oflags)
     {
-      return _flags_clear (mask, oflags);
+      return internal_flags_clear_ (mask, oflags);
     }
 
 #endif
@@ -2486,7 +2492,7 @@ namespace os
         if (attr.th_stack_address != nullptr
             && attr.th_stack_size_bytes > stack::min_size ())
           {
-            _construct (function, args, attr, nullptr, 0);
+            internal_construct_ (function, args, attr, nullptr, 0);
           }
         else
           {
@@ -2513,7 +2519,7 @@ namespace os
 
             assert(allocated_stack_address_ != nullptr);
 
-            _construct (
+            internal_construct_ (
                 function,
                 args,
                 attr,
@@ -2529,7 +2535,7 @@ namespace os
 
     template<typename Allocator>
       void
-      thread_allocated<Allocator>::_destroy (void)
+      thread_allocated<Allocator>::internal_destroy_ (void)
       {
 #if defined(OS_TRACE_RTOS_THREAD)
         trace::printf ("thread_allocated::%s() @%p %s\n", __func__, this,
@@ -2538,7 +2544,7 @@ namespace os
 
         if (allocated_stack_address_ != nullptr)
           {
-            _check_stack ();
+            internal_check_stack_ ();
 
             typedef typename std::allocator_traits<allocator_type>::pointer pointer;
 
@@ -2549,7 +2555,7 @@ namespace os
             allocated_stack_address_ = nullptr;
           }
 
-        thread::_destroy ();
+        thread::internal_destroy_ ();
       }
 
     /**
@@ -2690,7 +2696,7 @@ namespace os
 #if defined(OS_TRACE_RTOS_THREAD)
         trace::printf ("%s @%p %s\n", __func__, this, this->name ());
 #endif
-        _construct (function, args, attr, &stack_, stack_size_bytes);
+        internal_construct_ (function, args, attr, &stack_, stack_size_bytes);
       }
 
     /**

@@ -126,7 +126,7 @@ namespace os
     /**
      * @var mutex::type_t mutex::attributes::mx_type
      * @details
-     * The default value of this attribute shall be `mutex::type::_default`.
+     * The default value of this attribute shall be `mutex::type::default_`.
      *
      * @see mutex::type
      *
@@ -274,9 +274,9 @@ namespace os
      * - `mutex::type::normal`
      * - `mutex::type::errorcheck`
      * - `mutex::type::recursive`
-     * - `mutex::type::_default`
+     * - `mutex::type::default_`
      *
-     * An implementation may map `mutex::type::_default` to one of
+     * An implementation may map `mutex::type::default_` to one of
      * the other mutex types.
      *
      * @par POSIX compatibility
@@ -869,7 +869,7 @@ namespace os
                   interrupts::critical_section ics;
 
                   // Add this thread to the mutex waiting list.
-                  scheduler::_link_node (list_, node);
+                  scheduler::internal_link_node (list_, node);
                   // state::suspended set in above link().
                   // ----- Exit critical section ------------------------------
                 }
@@ -880,7 +880,7 @@ namespace os
 
           // Remove the thread from the semaphore waiting list,
           // if not already removed by unlock().
-          scheduler::_unlink_node (node);
+          scheduler::internal_unlink_node (node);
 
           if (crt_thread.interrupted ())
             {
@@ -1075,7 +1075,8 @@ namespace os
 
                   // Add this thread to the mutex waiting list,
                   // and the clock timeout list.
-                  scheduler::_link_node (list_, node, clock_list, timeout_node);
+                  scheduler::internal_link_node (list_, node, clock_list,
+                                                 timeout_node);
                   // state::suspended set in above link().
                   // ----- Exit critical section ------------------------------
                 }
@@ -1087,7 +1088,7 @@ namespace os
           // Remove the thread from the semaphore waiting list,
           // if not already removed by unlock() and from the clock
           // timeout list, if not already removed by the timer.
-          scheduler::_unlink_node (node, timeout_node);
+          scheduler::internal_unlink_node (node, timeout_node);
 
           res = result::ok;
 

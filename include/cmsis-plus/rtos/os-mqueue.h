@@ -564,9 +564,9 @@ namespace os
        *  Nothing.
        */
       void
-      _construct (std::size_t msgs, std::size_t msg_size_bytes,
-                  const attributes& attr, void* queue_address,
-                  std::size_t queue_size_bytes);
+      internal_construct_ (std::size_t msgs, std::size_t msg_size_bytes,
+                           const attributes& attr, void* queue_address,
+                           std::size_t queue_size_bytes);
 
       /**
        * @brief Internal function used to initialise the queue to empty state.
@@ -576,7 +576,7 @@ namespace os
        *  Nothing.
        */
       void
-      _init (void);
+      internal_init_ (void);
 
 #if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
@@ -590,7 +590,8 @@ namespace os
        * @retval false The message queue is full.
        */
       bool
-      _try_send (const void* msg, std::size_t nbytes, priority_t mprio);
+      internal_try_send_ (const void* msg, std::size_t nbytes,
+                          priority_t mprio);
 
       /**
        * @brief Internal function used to dequeue a message, if available.
@@ -603,7 +604,7 @@ namespace os
        * @retval false There are not messages in the queue.
        */
       bool
-      _try_receive (void* msg, std::size_t nbytes, priority_t* mprio);
+      internal_try_receive_ (void* msg, std::size_t nbytes, priority_t* mprio);
 
 #endif /* !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE) */
 
@@ -1417,7 +1418,7 @@ namespace os
         if (attr.mq_queue_address != nullptr)
           {
             // Do not use any allocator at all.
-            _construct (msgs, msg_size_bytes, attr, nullptr, 0);
+            internal_construct_ (msgs, msg_size_bytes, attr, nullptr, 0);
           }
         else
           {
@@ -1434,7 +1435,7 @@ namespace os
                 const_cast<allocator_type&> (allocator).allocate (
                     allocated_queue_size_elements_);
 
-            _construct (
+            internal_construct_ (
                 msgs,
                 msg_size_bytes,
                 attr,
@@ -1764,7 +1765,8 @@ namespace os
                                                         const attributes& attr) :
           message_queue (name)
       {
-        _construct (msgs, sizeof(value_type), attr, &arena_, sizeof(arena_));
+        internal_construct_ (msgs, sizeof(value_type), attr, &arena_,
+                             sizeof(arena_));
       }
 
     /**

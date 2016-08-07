@@ -767,7 +767,7 @@ namespace os
          * scheduler was started.
          */
         static void
-        _interrupt_service_routine (void);
+        internal_interrupt_service_routine (void);
 
       };
 
@@ -784,7 +784,7 @@ namespace os
          * scheduler was started.
          */
         static void
-        _interrupt_service_routine (void);
+        internal_interrupt_service_routine (void);
 
       };
 

@@ -161,7 +161,7 @@ namespace os
        */
 
       void
-      _switch_threads (void);
+      internal_switch_threads (void);
 
       /**
        * @endcond

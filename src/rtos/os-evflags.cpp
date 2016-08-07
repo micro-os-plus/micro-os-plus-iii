@@ -292,7 +292,7 @@ namespace os
                 }
 
               // Add this thread to the event flags waiting list.
-              scheduler::_link_node (list_, node);
+              scheduler::internal_link_node (list_, node);
               // state::suspended set in above link().
               // ----- Exit critical section ----------------------------------
             }
@@ -305,7 +305,7 @@ namespace os
 
               // Remove the thread from the event flags waiting list,
               // if not already removed by raise().
-              scheduler::_unlink_node (node);
+              scheduler::internal_unlink_node (node);
               // ----- Exit critical section ----------------------------------
             }
 
@@ -486,7 +486,8 @@ namespace os
 
               // Add this thread to the event flags waiting list,
               // and the clock timeout list.
-              scheduler::_link_node (list_, node, clock_list, timeout_node);
+              scheduler::internal_link_node (list_, node, clock_list,
+                                             timeout_node);
               // state::suspended set in above link().
               // ----- Exit critical section ----------------------------------
             }
@@ -496,7 +497,7 @@ namespace os
           // Remove the thread from the event flags waiting list,
           // if not already removed by raise() and from the clock
           // timeout list, if not already removed by the timer.
-          scheduler::_unlink_node (node, timeout_node);
+          scheduler::internal_unlink_node (node, timeout_node);
 
           if (crt_thread.interrupted ())
             {

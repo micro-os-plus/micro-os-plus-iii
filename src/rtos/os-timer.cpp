@@ -346,7 +346,7 @@ namespace os
      */
 
     void
-    timer::_interrupt_service_routine (void)
+    timer::internal_interrupt_service_routine (void)
     {
 
       if (type_ == run::periodic)

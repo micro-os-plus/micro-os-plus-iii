@@ -437,7 +437,7 @@ namespace os
       if (attr.mq_queue_address != nullptr)
         {
           // Do not use any allocator at all.
-          _construct (msgs, msg_size_bytes, attr, nullptr, 0);
+          internal_construct_ (msgs, msg_size_bytes, attr, nullptr, 0);
         }
       else
         {
@@ -454,7 +454,7 @@ namespace os
               const_cast<allocator_type&> (allocator).allocate (
                   allocated_queue_size_elements_);
 
-          _construct (
+          internal_construct_ (
               msgs,
               msg_size_bytes,
               attr,
@@ -512,9 +512,11 @@ namespace os
      */
 
     void
-    message_queue::_construct (std::size_t msgs, std::size_t msg_size_bytes,
-                               const attributes& attr, void* queue_address,
-                               std::size_t queue_size_bytes)
+    message_queue::internal_construct_ (std::size_t msgs,
+                                        std::size_t msg_size_bytes,
+                                        const attributes& attr,
+                                        void* queue_address,
+                                        std::size_t queue_size_bytes)
     {
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
@@ -601,12 +603,12 @@ namespace os
               <= static_cast<ptrdiff_t> (queue_size_bytes_));
 #endif
 
-      _init ();
+      internal_init_ ();
 #endif
     }
 
     void
-    message_queue::_init (void)
+    message_queue::internal_init_ (void)
     {
       count_ = 0;
 
@@ -653,8 +655,8 @@ namespace os
      * Should be called from an interrupts critical section.
      */
     bool
-    message_queue::_try_send (const void* msg, std::size_t nbytes,
-                              priority_t mprio)
+    message_queue::internal_try_send_ (const void* msg, std::size_t nbytes,
+                                       priority_t mprio)
     {
       if (first_free_ == nullptr)
         {
@@ -750,8 +752,8 @@ namespace os
      * Should be called from an interrupts critical section.
      */
     bool
-    message_queue::_try_receive (void* msg, std::size_t nbytes,
-                                 priority_t* mprio)
+    message_queue::internal_try_receive_ (void* msg, std::size_t nbytes,
+                                          priority_t* mprio)
     {
 
       if (head_ == no_index)
@@ -886,7 +888,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          if (_try_send (msg, nbytes, mprio))
+          if (internal_try_send_ (msg, nbytes, mprio))
             {
               return result::ok;
             }
@@ -907,13 +909,13 @@ namespace os
               // ----- Enter critical section ---------------------------------
               interrupts::critical_section ics;
 
-              if (_try_send (msg, nbytes, mprio))
+              if (internal_try_send_ (msg, nbytes, mprio))
                 {
                   return result::ok;
                 }
 
               // Add this thread to the message queue send waiting list.
-              scheduler::_link_node (send_list_, node);
+              scheduler::internal_link_node (send_list_, node);
               // state::suspended set in above link().
               // ----- Exit critical section ----------------------------------
             }
@@ -922,7 +924,7 @@ namespace os
 
           // Remove the thread from the message queue send waiting list,
           // if not already removed by receive().
-          scheduler::_unlink_node (node);
+          scheduler::internal_unlink_node (node);
 
           if (crt_thread.interrupted ())
             {
@@ -994,7 +996,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          if (_try_send (msg, nbytes, mprio))
+          if (internal_try_send_ (msg, nbytes, mprio))
             {
               return result::ok;
             }
@@ -1080,7 +1082,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          if (_try_send (msg, nbytes, mprio))
+          if (internal_try_send_ (msg, nbytes, mprio))
             {
               return result::ok;
             }
@@ -1109,15 +1111,15 @@ namespace os
               // ----- Enter critical section ---------------------------------
               interrupts::critical_section ics;
 
-              if (_try_send (msg, nbytes, mprio))
+              if (internal_try_send_ (msg, nbytes, mprio))
                 {
                   return result::ok;
                 }
 
               // Add this thread to the semaphore waiting list,
               // and the clock timeout list.
-              scheduler::_link_node (send_list_, node, clock_list,
-                                     timeout_node);
+              scheduler::internal_link_node (send_list_, node, clock_list,
+                                             timeout_node);
               // state::suspended set in above link().
               // ----- Exit critical section ----------------------------------
             }
@@ -1127,7 +1129,7 @@ namespace os
           // Remove the thread from the message queue send waiting list,
           // if not already removed by receive() and from the clock timeout list,
           // if not already removed by the timer.
-          scheduler::_unlink_node (node, timeout_node);
+          scheduler::internal_unlink_node (node, timeout_node);
 
           if (crt_thread.interrupted ())
             {
@@ -1214,7 +1216,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          if (_try_receive (msg, nbytes, mprio))
+          if (internal_try_receive_ (msg, nbytes, mprio))
             {
               return result::ok;
             }
@@ -1235,13 +1237,13 @@ namespace os
               // ----- Enter critical section ---------------------------------
               interrupts::critical_section ics;
 
-              if (_try_receive (msg, nbytes, mprio))
+              if (internal_try_receive_ (msg, nbytes, mprio))
                 {
                   return result::ok;
                 }
 
               // Add this thread to the message queue receive waiting list.
-              scheduler::_link_node (receive_list_, node);
+              scheduler::internal_link_node (receive_list_, node);
               // state::suspended set in above link().
               // ----- Exit critical section ----------------------------------
             }
@@ -1250,7 +1252,7 @@ namespace os
 
           // Remove the thread from the message queue receive waiting list,
           // if not already removed by send().
-          scheduler::_unlink_node (node);
+          scheduler::internal_unlink_node (node);
 
           if (crt_thread.interrupted ())
             {
@@ -1323,7 +1325,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          if (_try_receive (msg, nbytes, mprio))
+          if (internal_try_receive_ (msg, nbytes, mprio))
             {
               return result::ok;
             }
@@ -1424,7 +1426,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          if (_try_receive (msg, nbytes, mprio))
+          if (internal_try_receive_ (msg, nbytes, mprio))
             {
               return result::ok;
             }
@@ -1452,15 +1454,15 @@ namespace os
               // ----- Enter critical section ---------------------------------
               interrupts::critical_section ics;
 
-              if (_try_receive (msg, nbytes, mprio))
+              if (internal_try_receive_ (msg, nbytes, mprio))
                 {
                   return result::ok;
                 }
 
               // Add this thread to the message queue receive waiting list,
               // and the clock timeout list.
-              scheduler::_link_node (receive_list_, node, clock_list,
-                                     timeout_node);
+              scheduler::internal_link_node (receive_list_, node, clock_list,
+                                             timeout_node);
               // state::suspended set in above link().
               // ----- Exit critical section ----------------------------------
             }
@@ -1470,7 +1472,7 @@ namespace os
           // Remove the thread from the semaphore waiting list,
           // if not already removed by send()and from the clock
           // timeout list, if not already removed by the timer.
-          scheduler::_unlink_node (node, timeout_node);
+          scheduler::internal_unlink_node (node, timeout_node);
 
           if (crt_thread.interrupted ())
             {
@@ -1526,7 +1528,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          _init ();
+          internal_init_ ();
           return result::ok;
           // ----- Exit critical section --------------------------------------
         }

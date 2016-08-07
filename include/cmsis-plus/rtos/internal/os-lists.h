@@ -1536,21 +1536,21 @@ namespace os
        */
 
       void
-      _link_node (internal::waiting_threads_list& list,
-                  internal::waiting_thread_node& node);
+      internal_link_node (internal::waiting_threads_list& list,
+                          internal::waiting_thread_node& node);
 
       void
-      _unlink_node (internal::waiting_thread_node& node);
+      internal_unlink_node (internal::waiting_thread_node& node);
 
       void
-      _link_node (internal::waiting_threads_list& list,
-                  internal::waiting_thread_node& node,
-                  internal::clock_timestamps_list& timeout_list,
-                  internal::timeout_thread_node& timeout_node);
+      internal_link_node (internal::waiting_threads_list& list,
+                          internal::waiting_thread_node& node,
+                          internal::clock_timestamps_list& timeout_list,
+                          internal::timeout_thread_node& timeout_node);
 
       void
-      _unlink_node (internal::waiting_thread_node& node,
-                    internal::timeout_thread_node& timeout_node);
+      internal_unlink_node (internal::waiting_thread_node& node,
+                            internal::timeout_thread_node& timeout_node);
 
     /**
      * @endcond

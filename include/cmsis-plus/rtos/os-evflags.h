@@ -300,41 +300,6 @@ namespace os
     protected:
 
       /**
-       * @name Private Member Functions
-       * @{
-       */
-
-      /**
-       * @cond ignore
-       */
-
-      /**
-       * @brief Internal function to check the flags condition.
-       * @param [in] mask The expected flags (OR-ed bit-mask);
-       *  may be zero.
-       * @param [out] oflags Pointer where to store the current flags;
-       *  may be `nullptr`.
-       * @param [in] mode Mode bits to select if either all or any flags
-       *  are expected, and if the flags should be cleared.
-       * @retval result::ok All expected flags are raised.
-       * @retval EINVAL The mask is outside of the permitted range.
-       * @retval EWOULDBLOCK The expected condition did not occur.
-       * @retval ENOTRECOVERABLE Wait failed.
-       */
-      bool
-      _try_wait (flags::mask_t mask, flags::mask_t* oflags, flags::mode_t mode);
-
-      /**
-       * @endcond
-       */
-
-      /**
-       * @}
-       */
-
-    protected:
-
-      /**
        * @name Private Member Variables
        * @{
        */

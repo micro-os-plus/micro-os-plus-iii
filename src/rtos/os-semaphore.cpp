@@ -194,7 +194,7 @@ namespace os
 
 #else
 
-      _init ();
+      internal_init_ ();
 
 #endif
     }
@@ -243,7 +243,7 @@ namespace os
      */
 
     void
-    semaphore::_init (void)
+    semaphore::internal_init_ (void)
     {
 
       count_ = initial_value_;
@@ -263,7 +263,7 @@ namespace os
      * Should be called from an interrupts critical section.
      */
     bool
-    semaphore::_try_wait (void)
+    semaphore::internal_try_wait_ (void)
     {
       if (count_ > 0)
         {
@@ -416,7 +416,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          if (_try_wait ())
+          if (internal_try_wait_ ())
             {
               return result::ok;
             }
@@ -437,13 +437,13 @@ namespace os
               // ----- Enter critical section ---------------------------------
               interrupts::critical_section ics;
 
-              if (_try_wait ())
+              if (internal_try_wait_ ())
                 {
                   return result::ok;
                 }
 
               // Add this thread to the semaphore waiting list.
-              scheduler::_link_node (list_, node);
+              scheduler::internal_link_node (list_, node);
               // state::suspended set in above link().
               // ----- Exit critical section ----------------------------------
             }
@@ -452,7 +452,7 @@ namespace os
 
           // Remove the thread from the semaphore waiting list,
           // if not already removed by post().
-          scheduler::_unlink_node (node);
+          scheduler::internal_unlink_node (node);
 
           if (crt_thread.interrupted ())
             {
@@ -508,7 +508,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          if (_try_wait ())
+          if (internal_try_wait_ ())
             {
               return result::ok;
             }
@@ -582,7 +582,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          if (_try_wait ())
+          if (internal_try_wait_ ())
             {
               return result::ok;
             }
@@ -610,14 +610,15 @@ namespace os
               // ----- Enter critical section ---------------------------------
               interrupts::critical_section ics;
 
-              if (_try_wait ())
+              if (internal_try_wait_ ())
                 {
                   return result::ok;
                 }
 
               // Add this thread to the semaphore waiting list,
               // and the clock timeout list.
-              scheduler::_link_node (list_, node, clock_list, timeout_node);
+              scheduler::internal_link_node (list_, node, clock_list,
+                                             timeout_node);
               // state::suspended set in above link().
               // ----- Exit critical section ----------------------------------
             }
@@ -627,7 +628,7 @@ namespace os
           // Remove the thread from the semaphore waiting list,
           // if not already removed by post() and from the clock
           // timeout list, if not already removed by the timer.
-          scheduler::_unlink_node (node, timeout_node);
+          scheduler::internal_unlink_node (node, timeout_node);
 
           if (crt_thread.interrupted ())
             {
@@ -715,7 +716,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          _init ();
+          internal_init_ ();
           return result::ok;
           // ----- Exit critical section --------------------------------------
         }

@@ -180,7 +180,7 @@ static_assert(os_mutex_robustness_robust == mutex::robustness::robust, "adjust o
 static_assert(os_mutex_type_normal == mutex::type::normal, "adjust os_mutex_type_normal");
 static_assert(os_mutex_type_errorcheck == mutex::type::errorcheck, "adjust os_mutex_type_errorcheck");
 static_assert(os_mutex_type_recursive == mutex::type::recursive, "adjust os_mutex_type_recursive");
-static_assert(os_mutex_type_default == mutex::type::_default, "adjust os_mutex_type_default");
+static_assert(os_mutex_type_default == mutex::type::default_, "adjust os_mutex_type_default");
 
 #pragma GCC diagnostic pop
 

@@ -234,10 +234,10 @@ namespace os
       steady_list (void);
 
       void
-      _increment_count (void);
+      internal_increment_count (void);
 
       void
-      _check_timestamps (void);
+      internal_check_timestamps (void);
 
       /**
        * @endcond
@@ -261,8 +261,8 @@ namespace os
        * @retval ENOTRECOVERABLE The wait failed.
        */
       virtual result_t
-      _wait_until (timestamp_t timestamp,
-                   internal::clock_timestamps_list& list);
+      internal_wait_until_ (timestamp_t timestamp,
+                            internal::clock_timestamps_list& list);
 
       /**
        * @endcond
@@ -392,7 +392,7 @@ namespace os
       offset (offset_t value) override;
 
       void
-      _check_timestamps (void);
+      internal_check_timestamps (void);
 
       /**
        * @}
@@ -531,7 +531,7 @@ namespace os
        * @retval EINTR The sleep was interrupted.
        */
       virtual result_t
-      _wait_until (timestamp_t timestamp, clock_timestamps_list& list);
+      internal_wait_until_ (timestamp_t timestamp, clock_timestamps_list& list);
 
 #endif
 
@@ -647,7 +647,7 @@ namespace os
        * @retval EINTR The sleep was interrupted.
        */
       virtual result_t
-      _wait_until (timestamp_t timestamp, clock_timestamps_list& list);
+      internal_wait_until_ (timestamp_t timestamp, clock_timestamps_list& list);
 
 #endif
 
@@ -730,7 +730,7 @@ namespace os
       input_clock_frequency_hz (void);
 
       void
-      _increment_count (void);
+      internal_increment_count (void);
 
       /**
        * @}
@@ -790,7 +790,7 @@ namespace os
 
     inline void
     __attribute__((always_inline))
-    clock::_increment_count (void)
+    clock::internal_increment_count (void)
     {
       // Increment the systick count by 1.
       ++steady_count_;
@@ -798,7 +798,7 @@ namespace os
 
     inline void
     __attribute__((always_inline))
-    clock::_check_timestamps (void)
+    clock::internal_check_timestamps (void)
     {
       steady_list_.check_timestamp (steady_count_);
     }
@@ -822,9 +822,9 @@ namespace os
 
     inline void
     __attribute__((always_inline))
-    adjustable_clock::_check_timestamps (void)
+    adjustable_clock::internal_check_timestamps (void)
     {
-      clock::_check_timestamps ();
+      clock::internal_check_timestamps ();
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-conversion"
@@ -863,7 +863,7 @@ namespace os
     // ========================================================================
     inline void
     __attribute__((always_inline))
-    clock_highres::_increment_count (void)
+    clock_highres::internal_increment_count (void)
     {
       // Increment the highres count by SysTick divisor.
       steady_count_ += port::clock_highres::cycles_per_tick ();

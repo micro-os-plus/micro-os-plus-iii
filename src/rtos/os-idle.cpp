@@ -80,13 +80,13 @@ os_idle (thread::func_args_t args __attribute__((unused)))
               node->unlink ();
               // ----- Exit critical section ----------------------------------
             }
-          node->thread_->_destroy ();
+          node->thread_->internal_destroy_ ();
 
           this_thread::yield ();
         }
 
 #if !defined(OS_USE_RTOS_PORT_SCHEDULER)
-      port::scheduler::_wait_for_interrupt ();
+      port::scheduler::wait_for_interrupt ();
 #endif /* !defined(OS_USE_RTOS_PORT_SCHEDULER) */
       this_thread::yield ();
     }

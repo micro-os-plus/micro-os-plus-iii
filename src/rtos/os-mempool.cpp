@@ -280,7 +280,7 @@ namespace os
       if (attr.mp_pool_address != nullptr)
         {
           // Do not use any allocator at all.
-          _construct (blocks, block_size_bytes, attr, nullptr, 0);
+          internal_construct_ (blocks, block_size_bytes, attr, nullptr, 0);
         }
       else
         {
@@ -297,7 +297,7 @@ namespace os
               const_cast<allocator_type&> (allocator).allocate (
                   allocated_pool_size_elements_);
 
-          _construct (
+          internal_construct_ (
               blocks,
               block_size_bytes,
               attr,
@@ -312,9 +312,11 @@ namespace os
      */
 
     void
-    memory_pool::_construct (std::size_t blocks, std::size_t block_size_bytes,
-                             const attributes& attr, void* pool_address,
-                             std::size_t pool_size_bytes)
+    memory_pool::internal_construct_ (std::size_t blocks,
+                                      std::size_t block_size_bytes,
+                                      const attributes& attr,
+                                      void* pool_address,
+                                      std::size_t pool_size_bytes)
     {
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
@@ -371,7 +373,7 @@ namespace os
 
       os_assert_throw(pool_addr_ != nullptr, ENOMEM);
 
-      _init ();
+      internal_init_ ();
 
     }
 
@@ -422,7 +424,7 @@ namespace os
      * internal pointers and counters.
      */
     void
-    memory_pool::_init (void)
+    memory_pool::internal_init_ (void)
     {
       // Construct a linked list of blocks. Store the pointer at
       // the beginning of each block. Each block
@@ -453,7 +455,7 @@ namespace os
      * Should be called from an interrupts critical section.
      */
     void*
-    memory_pool::_try_first (void)
+    memory_pool::internal_try_first_ (void)
     {
       if (first_ != nullptr)
         {
@@ -507,7 +509,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          p = _try_first ();
+          p = internal_try_first_ ();
           if (p != nullptr)
             {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
@@ -532,7 +534,7 @@ namespace os
               // ----- Enter critical section ---------------------------------
               interrupts::critical_section ics;
 
-              p = _try_first ();
+              p = internal_try_first_ ();
               if (p != nullptr)
                 {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
@@ -543,7 +545,7 @@ namespace os
                 }
 
               // Add this thread to the memory pool waiting list.
-              scheduler::_link_node (list_, node);
+              scheduler::internal_link_node (list_, node);
               // state::suspended set in above link().
               // ----- Exit critical section ----------------------------------
             }
@@ -552,7 +554,7 @@ namespace os
 
           // Remove the thread from the memory pool waiting list,
           // if not already removed by free().
-          scheduler::_unlink_node (node);
+          scheduler::internal_unlink_node (node);
 
           if (this_thread::thread ().interrupted ())
             {
@@ -597,7 +599,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          p = _try_first ();
+          p = internal_try_first_ ();
           // ----- Exit critical section --------------------------------------
         }
 
@@ -667,7 +669,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          p = _try_first ();
+          p = internal_try_first_ ();
           if (p != nullptr)
             {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
@@ -699,7 +701,7 @@ namespace os
               // ----- Enter critical section ---------------------------------
               interrupts::critical_section ics;
 
-              p = _try_first ();
+              p = internal_try_first_ ();
               if (p != nullptr)
                 {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
@@ -711,7 +713,8 @@ namespace os
 
               // Add this thread to the memory pool waiting list,
               // and the clock timeout list.
-              scheduler::_link_node (list_, node, clock_list, timeout_node);
+              scheduler::internal_link_node (list_, node, clock_list,
+                                             timeout_node);
               // state::suspended set in above link().
               // ----- Exit critical section ----------------------------------
             }
@@ -721,7 +724,7 @@ namespace os
           // Remove the thread from the memory pool waiting list,
           // if not already removed by free() and from the clock
           // timeout list, if not already removed by the timer.
-          scheduler::_unlink_node (node, timeout_node);
+          scheduler::internal_unlink_node (node, timeout_node);
 
           if (this_thread::thread ().interrupted ())
             {
@@ -817,7 +820,7 @@ namespace os
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          _init ();
+          internal_init_ ();
           // ----- Exit critical section --------------------------------------
         }
 
