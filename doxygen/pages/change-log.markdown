@@ -84,4 +84,19 @@ Changes, in reverse chronological order:
 - rename `timer::periodic_attributes` -> `timer::attributes_periodic`
 - add `internal::event_flags`; not public.
 
+### v6.3.6 2016-08-07
+
+- move lists to `internal::`
+- rename `named_object` -> `internal::object_named`
+- rename `clocked_attributes` -> `internal::attribute_clocked`
+- rename `Allocator` -> `allocator_type`
+- add `thread::priority_inherited()`, `thread::priority_inherited(int)`
+- make `thread::priority()` public
+- reimplement POSIX mutex inheritance 
+- implement POSIX robust mutexes
+- make default mutex inheritable
+- add class mutex_recursive
+- prefix protected functions with `internal_`
+
+
 ---
