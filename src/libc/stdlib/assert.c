@@ -95,7 +95,8 @@ __assert_func (const char* file, int line, const char* func,
 //#define assert_param(expr) ((void)0)
 //#endif /* USE_FULL_ASSERT */
 
-#if defined(USE_FULL_ASSERT)
+// In the new STM32 HAL, the USE_FULL_ASSERT macro is defined in
+// stm32??xx_hal_conf.
 
 void
 assert_failed (uint8_t* file, uint32_t line);
@@ -104,21 +105,19 @@ assert_failed (uint8_t* file, uint32_t line);
 void
 __attribute__((noreturn))
 assert_failed (uint8_t* file, uint32_t line)
-  {
+{
 #if defined(TRACE)
 
-    trace_printf ("assert_param() failed: file \"%s\", line %d\n", file, line);
+  trace_printf ("assert_param() failed: file \"%s\", line %d\n", file, line);
 
 #elif defined(OS_USE_SEMIHOSTING_SYSCALLS)
 
-    printf ("assert_param() failed: file \"%s\", line %d\n", file, (int)line);
+  printf ("assert_param() failed: file \"%s\", line %d\n", file, (int)line);
 
 #endif
 
-    abort ();
-    /* NOTREACHED */
-  }
-
-#endif /* defined(USE_FULL_ASSERT) */
+  abort ();
+  /* NOTREACHED */
+}
 
 // ----------------------------------------------------------------------------
