@@ -68,43 +68,32 @@ _start (void);
 
 // ----------------------------------------------------------------------------
 
-#if defined(DEBUG)
 
-// The DEBUG version is not naked, but has a proper stack frame,
+// This function is not naked, and has a proper stack frame,
 // to allow setting breakpoints at Reset_Handler.
-void __attribute__ ((section(".after_vectors"),noreturn))
+void __attribute__ ((section(".after_vectors"),noreturn,weak))
 Reset_Handler (void)
 {
   _start ();
 }
 
-#else
-
-// The Release version is optimised to a quick branch to _start.
-void __attribute__ ((section(".after_vectors"),naked))
-Reset_Handler (void)
-  {
-    asm volatile
-    (
-        " ldr     r0,=_start \n"
-        " bx      r0"
-
-        : /* Outputs */
-        : /* Inputs */
-        : /* Clobbers */
-    );
-  }
-
-#endif
-
 void __attribute__ ((section(".after_vectors"),weak))
 NMI_Handler (void)
 {
 #if defined(DEBUG)
-  __DEBUG_BKPT();
-#endif
+#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+  if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
+    {
+      __BKPT (0);
+    }
+#else
+  __BKPT (0);
+#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
+#endif /* defined(DEBUG) */
+
   while (1)
     {
+      ;
     }
 }
 
@@ -156,7 +145,7 @@ dump_exception_stack (exception_stack_frame_t* frame, uint32_t cfsr,
   trace_printf (" LR/EXC_RETURN = %08X\n", lr);
 }
 
-#endif // defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
 
 #if defined(__ARM_ARCH_6M__)
 
@@ -176,9 +165,9 @@ dump_exception_stack (exception_stack_frame_t* frame, uint32_t lr)
     trace_printf (" LR/EXC_RETURN = %08X\n", lr);
   }
 
-#endif // defined(__ARM_ARCH_6M__)
+#endif /* defined(__ARM_ARCH_6M__) */
 
-#endif // defined(TRACE)
+#endif /* defined(TRACE) */
 
 // ----------------------------------------------------------------------------
 
@@ -281,7 +270,7 @@ is_semihosting (exception_stack_frame_t* frame, uint16_t opCode)
           // Should not reach here
           return 0;
 
-#endif // defined(OS_USE_SEMIHOSTING_SYSCALLS)
+#endif /* defined(OS_USE_SEMIHOSTING_SYSCALLS) */
 
 #if defined(OS_USE_SEMIHOSTING_SYSCALLS) || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT)
 
@@ -322,7 +311,7 @@ is_semihosting (exception_stack_frame_t* frame, uint16_t opCode)
               - trace_write ((char*) blk[1], blk[2]);
 #else
               frame->r0 = 0; // all sent, no more.
-#endif // defined(OS_DEBUG_SEMIHOSTING_FAULTS)
+#endif /* defined(OS_DEBUG_SEMIHOSTING_FAULTS) */
             }
           else
             {
@@ -332,7 +321,7 @@ is_semihosting (exception_stack_frame_t* frame, uint16_t opCode)
             }
           break;
 
-#endif // defined(OS_USE_SEMIHOSTING_SYSCALLS) || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT)
+#endif /* defined(OS_USE_SEMIHOSTING_SYSCALLS) || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT) */
 
 #if defined(OS_USE_SEMIHOSTING_SYSCALLS) \
   || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT) \
@@ -358,7 +347,7 @@ is_semihosting (exception_stack_frame_t* frame, uint16_t opCode)
           // Register R0 is corrupted.
           break;
 
-#endif
+#endif /* semihosting */
 
         default:
           return 0;
@@ -407,7 +396,7 @@ HardFault_Handler_C (exception_stack_frame_t* frame __attribute__((unused)),
   uint32_t mmfar = SCB->MMFAR; // MemManage Fault Address
   uint32_t bfar = SCB->BFAR; // Bus Fault Address
   uint32_t cfsr = SCB->CFSR; // Configurable Fault Status Registers
-#endif
+#endif /* defined(TRACE) */
 
 #if defined(OS_USE_SEMIHOSTING_SYSCALLS) \
   || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT) \
@@ -431,22 +420,31 @@ HardFault_Handler_C (exception_stack_frame_t* frame __attribute__((unused)),
         }
     }
 
-#endif
+#endif /* semihosting */
 
 #if defined(TRACE)
   trace_printf ("[HardFault]\n");
   dump_exception_stack (frame, cfsr, mmfar, bfar, lr);
-#endif // defined(TRACE)
+#endif /* defined(TRACE) */
 
 #if defined(DEBUG)
-  __DEBUG_BKPT();
-#endif
+#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+  if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
+    {
+      __BKPT (0);
+    }
+#else
+  __BKPT (0);
+#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
+#endif /* defined(DEBUG) */
+
   while (1)
     {
+      ;
     }
 }
 
-#endif // defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
 
 #if defined(__ARM_ARCH_6M__)
 
@@ -490,17 +488,26 @@ HardFault_Handler_C (exception_stack_frame_t* frame __attribute__((unused)),
 #if defined(TRACE)
     trace_printf ("[HardFault]\n");
     dump_exception_stack (frame, lr);
-#endif // defined(TRACE)
+#endif /* defined(TRACE) */
 
 #if defined(DEBUG)
-    __DEBUG_BKPT();
-#endif
-    while (1)
-      {
-      }
+#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+  if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
+    {
+      __BKPT (0);
+    }
+#else
+  __BKPT (0);
+#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
+#endif /* defined(DEBUG) */
+
+  while (1)
+    {
+      ;
+    }
   }
 
-#endif // defined(__ARM_ARCH_6M__)
+#endif /* defined(__ARM_ARCH_6M__) */
 
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
 
@@ -508,10 +515,19 @@ void __attribute__ ((section(".after_vectors"),weak))
 MemManage_Handler (void)
 {
 #if defined(DEBUG)
-  __DEBUG_BKPT();
-#endif
+#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+  if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
+    {
+      __BKPT (0);
+    }
+#else
+  __BKPT (0);
+#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
+#endif /* defined(DEBUG) */
+
   while (1)
     {
+      ;
     }
 }
 
@@ -544,13 +560,22 @@ BusFault_Handler_C (exception_stack_frame_t* frame __attribute__((unused)),
 
   trace_printf ("[BusFault]\n");
   dump_exception_stack (frame, cfsr, mmfar, bfar, lr);
-#endif // defined(TRACE)
+#endif /* defined(TRACE) */
 
 #if defined(DEBUG)
-  __DEBUG_BKPT();
-#endif
+#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+  if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
+    {
+      __BKPT (0);
+    }
+#else
+  __BKPT (0);
+#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
+#endif /* defined(DEBUG) */
+
   while (1)
     {
+      ;
     }
 }
 
@@ -580,7 +605,7 @@ UsageFault_Handler_C (exception_stack_frame_t* frame __attribute__((unused)),
   uint32_t mmfar = SCB->MMFAR; // MemManage Fault Address
   uint32_t bfar = SCB->BFAR; // Bus Fault Address
   uint32_t cfsr = SCB->CFSR; // Configurable Fault Status Registers
-#endif
+#endif /* defined(TRACE) */
 
 #if defined(OS_DEBUG_SEMIHOSTING_FAULTS)
 
@@ -593,18 +618,27 @@ UsageFault_Handler_C (exception_stack_frame_t* frame __attribute__((unused)),
         }
     }
 
-#endif
+#endif /* defined(OS_DEBUG_SEMIHOSTING_FAULTS) */
 
 #if defined(TRACE)
   trace_printf ("[UsageFault]\n");
   dump_exception_stack (frame, cfsr, mmfar, bfar, lr);
-#endif // defined(TRACE)
+#endif /* defined(TRACE) */
 
 #if defined(DEBUG)
-  __DEBUG_BKPT();
-#endif
+#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+  if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
+    {
+      __BKPT (0);
+    }
+#else
+  __BKPT (0);
+#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
+#endif /* defined(DEBUG) */
+
   while (1)
     {
+      ;
     }
 }
 
@@ -614,10 +648,19 @@ void __attribute__ ((section(".after_vectors"),weak))
 SVC_Handler (void)
 {
 #if defined(DEBUG)
-  __DEBUG_BKPT();
-#endif
+#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+  if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
+    {
+      __BKPT (0);
+    }
+#else
+  __BKPT (0);
+#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
+#endif /* defined(DEBUG) */
+
   while (1)
     {
+      ;
     }
 }
 
@@ -627,23 +670,37 @@ void __attribute__ ((section(".after_vectors"),weak))
 DebugMon_Handler (void)
 {
 #if defined(DEBUG)
-  __DEBUG_BKPT();
-#endif
+  if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
+    {
+      __BKPT (0);
+    }
+#endif /* defined(DEBUG) */
+
   while (1)
     {
+      ;
     }
 }
 
-#endif
+#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
 
 void __attribute__ ((section(".after_vectors"),weak))
 PendSV_Handler (void)
 {
 #if defined(DEBUG)
-  __DEBUG_BKPT();
-#endif
+#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+  if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
+    {
+      __BKPT (0);
+    }
+#else
+  __BKPT (0);
+#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
+#endif /* defined(DEBUG) */
+
   while (1)
     {
+      ;
     }
 }
 

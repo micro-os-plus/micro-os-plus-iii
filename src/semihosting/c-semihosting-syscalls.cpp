@@ -1063,11 +1063,15 @@ _Exit (int code)
   trace_flush ();
 
 #if defined(DEBUG)
+#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
   if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
     {
       trace_dbg_bkpt ();
     }
-#endif
+#else
+  trace_dbg_bkpt ();
+#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
+#endif /* defined(DEBUG) */
 
   /* There is only one SWI for both _exit and _kill. For _exit, call
    the SWI with the second argument set to -1, an invalid value for
