@@ -1390,4 +1390,17 @@ os_main (int argc, char* argv[])
  the CMSIS++ reference C++ implementations.
  */
 
+/**
+ @defgroup cmsis-plus-app-hooks CMSIS++ App Hooks
+ @brief  CMSIS++ application hooks.
+ @details
+ Applications using CMSIS++ can customise the behaviour 
+ of the system or intercept several events by redefining 
+ several hooks.
+
+ All hooks have weak default definitions, effective if the application
+ does not redefine the functions.
+ 
+ */
+
 // ----------------------------------------------------------------------------

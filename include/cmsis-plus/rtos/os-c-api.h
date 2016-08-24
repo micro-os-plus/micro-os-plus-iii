@@ -46,6 +46,8 @@
 // Include the CMSIS++ C API structures declarations.
 #include <cmsis-plus/rtos/os-c-decls.h>
 
+#include <cmsis-plus/rtos/os-hooks.h>
+
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>

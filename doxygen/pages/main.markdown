@@ -20,3 +20,6 @@ From a functional point of view, the documentation pages can be grouped as:
 * [CMSIS++ **Diag**](group__cmsis-plus-diag.html)
 * [CMSIS++ POSIX I/O](group__cmsis-plus-posix-io.html) (future addition)
 * [CMSIS++ **App Config** v0.3.6](group__cmsis-plus-app-config.html)
+* [CMSIS++ **App Hooks** v0.3.6](group__cmsis-plus-app-hooks.html)
+
+

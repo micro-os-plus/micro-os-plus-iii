@@ -85,9 +85,14 @@ os_idle (thread::func_args_t args __attribute__((unused)))
           this_thread::yield ();
         }
 
+      if (!os_rtos_idle_enter_power_saving_mode_hook ())
+        {
 #if !defined(OS_USE_RTOS_PORT_SCHEDULER)
-      port::scheduler::wait_for_interrupt ();
+          port::scheduler::wait_for_interrupt ();
 #endif /* !defined(OS_USE_RTOS_PORT_SCHEDULER) */
+        }
+
+      // Possibly switch to threads that were resumed during sleep.
       this_thread::yield ();
     }
 }
@@ -95,5 +100,30 @@ os_idle (thread::func_args_t args __attribute__((unused)))
 /**
  * @endcond
  */
+
+/**
+ * @details
+ * The hook must check an application specific condition to determine
+ * if it is required to enter a power saving mode, and, if necessary,
+ * actually enter the desired power saving mode.
+ *
+ * The application must ensure that all interrupts associated with
+ * the external events used to awake the device are enabled. Usually
+ * the RTC is used for this purpose, but other devices too, like USB,
+ * GPIO pins, etc may be used to end the power saving mode.
+ *
+ * This function is executed by the idle thread on each iteration,
+ * and must limit complexity to reasonably levels.
+ *
+ * If the user function decides not to enter a power saving mode,
+ * it must return `false`, which will make the idle thread proceed as
+ * usual, by entering a shallow sleep waiting for the next interrupt.
+ */
+bool
+__attribute__((weak))
+os_rtos_idle_enter_power_saving_mode_hook (void)
+{
+  return false;
+}
 
 // ----------------------------------------------------------------------------
