@@ -101,6 +101,9 @@ __assert_func (const char* file, int line, const char* func,
 void
 assert_failed (uint8_t* file, uint32_t line);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
 // Called from the assert_param() macro, usually defined in the stm32f*_conf.h
 void
 __attribute__((noreturn))
@@ -119,5 +122,7 @@ assert_failed (uint8_t* file, uint32_t line)
   abort ();
   /* NOTREACHED */
 }
+
+#pragma GCC diagnostic pop
 
 // ----------------------------------------------------------------------------
