@@ -33,13 +33,22 @@
  * References are to ISO/IEC 14882:2011(E) Third edition (2011-09-01).
  */
 
-#include <cmsis-plus/iso/malloc.h>
+#if defined(__ARM_EABI__)
+
+// ----------------------------------------------------------------------------
+
 #include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/diag/trace.h>
+//#include <cmsis-plus/diag/trace.h>
+#include <cmsis-plus/estd/malloc.h>
+#include <cmsis-plus/estd/memory_resource>
 
 #include <cstdlib>
+#include <malloc.h>
+#include <string.h>
 
 using namespace os::rtos;
+
+// ----------------------------------------------------------------------------
 
 namespace os
 {
@@ -61,7 +70,11 @@ namespace os
           // ----- Begin of critical section ----------------------------------
           scheduler::critical_section cs;
 
+#if 0
           p = ::malloc (size);
+#else
+          p = get_default_resource ()->allocate (size, 1);
+#endif
 
 #if defined(OS_TRACE_LIBC_MALLOC)
           trace::printf ("estd::%s(%d)=%p\n", __func__, size, p);
@@ -86,7 +99,6 @@ namespace os
     void
     free (void *ptr) noexcept
     {
-
         {
           // ----- Begin of critical section ----------------------------------
           scheduler::critical_section cs;
@@ -94,9 +106,168 @@ namespace os
 #if defined(OS_TRACE_LIBC_MALLOC)
           trace::printf ("estd::%s(%p)\n", __func__, ptr);
 #endif
-          return ::free (ptr);
+
+#if 0
+          ::free (ptr);
+#else
+          get_default_resource ()->deallocate (ptr, 0, 1);
+#endif
           // ----- End of critical section ------------------------------------
         }
     }
   } /* namespace estd */
 } /* namespace os */
+
+#if 0
+extern "C"
+  {
+    void*
+    malloc (size_t size);
+
+    void
+    free (void *ptr);
+  }
+#endif
+
+void*
+malloc (size_t size)
+{
+  return os::estd::malloc (size);
+}
+
+void *
+calloc (size_t n, size_t elem)
+{
+  void * mem = os::estd::malloc (n * elem);
+  if (mem != NULL)
+    memset (mem, 0, n * elem);
+
+  return mem;
+}
+
+void *
+realloc (void * ptr, size_t size)
+{
+  void * mem;
+
+  if (ptr == NULL)
+    return malloc (size);
+
+  if (size == 0)
+    {
+      free (ptr);
+      return NULL;
+    }
+
+#if 0
+  /* TODO: There is chance to shrink the chunk if newly requested
+   * size is much small */
+  if (nano_malloc_usable_size (RCALL ptr) >= size)
+  return ptr;
+#endif
+
+  mem = malloc (size);
+  if (mem != NULL)
+    {
+      memcpy (mem, ptr, size);
+      free (ptr);
+    }
+  return mem;
+}
+
+void
+free (void *ptr)
+{
+  return os::estd::free (ptr);
+}
+
+// ----------------------------------------------------------------------------
+
+typedef size_t malloc_size_t;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wmissing-declarations"
+
+void*
+_malloc_r (struct _reent * impure, size_t size)
+{
+  return os::estd::malloc (size);
+}
+
+void *
+_calloc_r (struct _reent * impure, size_t n, size_t elem)
+{
+  return calloc (n, elem);
+}
+
+void
+_cfree_r (void* impure __attribute__((unused)), void* ptr)
+{
+  free (ptr);
+}
+
+void
+_free_r (struct _reent * impure __attribute__((unused)), void* ptr)
+{
+  free (ptr);
+}
+
+struct mallinfo
+_mallinfo_r (void* impure)
+{
+  abort ();
+}
+
+void
+_malloc_stats_r (void* impure __attribute__((unused)))
+{
+  abort ();
+}
+
+malloc_size_t
+_malloc_usable_size_r (void* reent __attribute__((unused)), void * ptr)
+{
+  abort ();
+}
+
+int
+_mallopt_r (void* impure __attribute__((unused)),
+            int parameter_number __attribute__((unused)),
+            int parameter_value __attribute__((unused)))
+{
+  abort ();
+}
+
+void*
+_memalign_r (void* impure __attribute__((unused)), size_t align, size_t s)
+{
+  abort ();
+}
+
+void*
+_pvalloc_r (void* impure __attribute__((unused)), size_t s)
+{
+  abort ();
+}
+
+void*
+_realloc_r (struct _reent * impure __attribute__((unused)), void* ptr,
+            size_t size)
+{
+  return realloc(ptr, size);
+}
+
+void*
+_valloc_r (void* impure __attribute__((unused)), size_t s)
+{
+  abort ();
+}
+
+#pragma GCC diagnostic pop
+
+// ----------------------------------------------------------------------------
+
+#endif /* defined(__ARM_EABI__) */
+
+

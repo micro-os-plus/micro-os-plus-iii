@@ -59,6 +59,7 @@
 #include <cstdint>
 #include <cstddef>
 #include <cerrno>
+#include <cstring>
 
 /**
  * @brief System namespace.
@@ -89,10 +90,7 @@ namespace os
     namespace memory
     {
       template<typename T>
-        class new_delete_allocator;
-
-      template<typename T>
-        class polymorphic_allocator;
+        class default_resource_allocator;
     } /* namespace memory */
 
     // ------------------------------------------------------------------------
@@ -858,7 +856,7 @@ extern "C"
 // ----------------------------------------------------------------------------
 
 // Required by os_assert_throw()
-#include <cmsis-plus/iso/system_error>
+#include <cmsis-plus/estd/system_error>
 
 /**
  * @brief Assert or return an error.

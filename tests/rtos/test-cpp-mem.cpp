@@ -26,58 +26,61 @@
  */
 
 #include <cmsis-plus/rtos/os.h>
-
-#include <cstdio>
-
-#include <test-cpp-api.h>
-#include <test-c-api.h>
-#include <test-iso-api.h>
-
 #include <test-cpp-mem.h>
+#include <cmsis-plus/estd/memory_resource>
 
-int
-os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
-{
-  printf ("\nCMSIS++ RTOS simple APIs test.\n");
+#pragma GCC diagnostic push
 #if defined(__clang__)
-  printf ("Built with clang " __VERSION__ ".\n");
-#else
-  printf ("Built with GCC " __VERSION__ ".\n");
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
 #endif
-
-  int ret = 0;
 
 #if 0
-  if (ret == 0)
-    {
-      ret = test_cpp_mem ();
-    }
+#if 0
+extern unsigned int _Heap_Begin;
+extern unsigned int _Heap_Limit;
+
+os::estd::memory::newlib_nano mr
+  { &_Heap_Begin, (&_Heap_Limit - &_Heap_Begin) * sizeof(unsigned int)};
+#else
+
+char arena[1000];
+
+os::rtos::memory::newlib_nano_malloc mr
+  { arena, sizeof(arena) };
+
 #endif
 
-#if 1
-  if (ret == 0)
-    {
-      ret = test_cpp_api ();
-    }
+os::estd::polymorphic_allocator<char, os::rtos::scheduler::lockable> a
+  { &mr };
+
+#pragma GCC diagnostic pop
 #endif
 
-#if 1
-  if (ret == 0)
-    {
-      ret = test_c_api ();
-    }
+int
+test_cpp_mem (void)
+{
+#if 0
+  char* p1 = a.allocate (19);
+
+  char* p2 = a.allocate (18);
+
+  char* p3 = a.allocate (17);
+
+  char* p4 = a.allocate (18);
+
+  a.deallocate (p2, 20);
+
+  a.deallocate (p3, 20);
+
+  char* p5 = a.allocate (19);
+
+  a.deallocate (p1, 20);
+
+  a.deallocate (p4, 20);
+
+  a.deallocate (p5, 20);
 #endif
-
-#if 1
-  if (ret == 0)
-    {
-      ret = test_iso_api (false);
-    }
-#endif
-
-  printf ("%d\n", errno);
-
-  return ret;
+  return 0;
 }
-
-// ----------------------------------------------------------------------------

@@ -33,104 +33,17 @@
  * References are to ISO/IEC 14882:2011(E) Third edition (2011-09-01).
  */
 
-#include <cmsis-plus/rtos/os-memory.h>
-#include <new>
-#include <cstdlib>
+#include <cmsis-plus/rtos/os.h>
+
+// ----------------------------------------------------------------------------
+
+using namespace os;
+
+// ----------------------------------------------------------------------------
 
 // These definitions refer only to the RTOS allocators.
 // The application should use the similar ones from the
 // os::estd:: namespace.
-using namespace os::rtos;
-
-namespace
-{
-  // ==========================================================================
-
-  class new_delete_memory_resource : public memory::memory_resource
-  {
-  public:
-
-    ~new_delete_memory_resource () = default;
-
-  protected:
-
-    virtual void*
-    do_allocate (std::size_t bytes,
-                 std::size_t alignment __attribute__((unused)))
-    {
-      // Ignore alignment for now.
-      return ::operator new (bytes);
-    }
-
-    virtual void
-    do_deallocate (void * p, std::size_t bytes __attribute__((unused)),
-                   std::size_t alignment __attribute__((unused)))
-    {
-      // Ignore size and alignment for now.
-      ::operator delete (p);
-    }
-
-    virtual bool
-    do_is_equal (memory_resource const & other) const noexcept
-    {
-      return &other == this;
-    }
-  };
-
-  // ==========================================================================
-
-  class null_memory_resource : public memory::memory_resource
-  {
-  public:
-
-    ~null_memory_resource () = default;
-
-  protected:
-
-    virtual void*
-    do_allocate (std::size_t bytes __attribute__((unused)),
-                 std::size_t alignment __attribute__((unused)))
-    {
-#if defined(__EXCEPTIONS)
-      throw std::bad_alloc ();
-#else
-      std::abort ();
-#endif
-    }
-
-    virtual void
-    do_deallocate (void* p __attribute__((unused)),
-                   std::size_t bytes __attribute__((unused)),
-                   std::size_t alignment __attribute__((unused)))
-    {
-      ;
-    }
-
-    virtual bool
-    do_is_equal (memory_resource const & other) const noexcept
-    {
-      return &other == this;
-    }
-  };
-
-  // --------------------------------------------------------------------------
-
-#pragma GCC diagnostic push
-#if defined(__clang__)
-#pragma clang diagnostic ignored "-Wexit-time-destructors"
-#pragma clang diagnostic ignored "-Wglobal-constructors"
-#endif
-
-  static new_delete_memory_resource new_delete_res;
-  static null_memory_resource null_res;
-
-#pragma GCC diagnostic pop
-
-  // --------------------------------------------------------------------------
-
-  // The default memory resource.
-  static memory::memory_resource* default_resource = &new_delete_res;
-}
 
 namespace os
 {
@@ -138,32 +51,79 @@ namespace os
   {
     namespace memory
     {
-      // ----------------------------------------------------------------------
+      // ======================================================================
 
-      memory_resource::~memory_resource ()
+      // Used when running on the synthetic POSIX platform.
+      class malloc_memory_resource : public memory_resource
       {
-        ;
+      public:
+
+        ~malloc_memory_resource () = default;
+
+      protected:
+
+        virtual void*
+        do_allocate (std::size_t bytes,
+                     std::size_t alignment __attribute__((unused))) override;
+
+        virtual void
+        do_deallocate (void* p, std::size_t bytes __attribute__((unused)),
+                       std::size_t alignment __attribute__((unused))) override;
+      };
+
+      void*
+      malloc_memory_resource::do_allocate (
+          std::size_t bytes, std::size_t alignment __attribute__((unused)))
+      {
+        // Ignore alignment for now.
+        return std::malloc (bytes);
+      }
+
+      void
+      malloc_memory_resource::do_deallocate (
+          void* p, std::size_t bytes __attribute__((unused)),
+          std::size_t alignment __attribute__((unused)))
+      {
+        // Ignore size and alignment for now.
+        std::free (p);
       }
 
       // ----------------------------------------------------------------------
 
-      memory_resource*
-      new_delete_resource (void) noexcept
-      {
-        return &new_delete_res;
-      }
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#endif
 
-      memory_resource*
-      null_memory_resource (void) noexcept
-      {
-        return &null_res;
-      }
+      static memory::malloc_memory_resource malloc_res;
+
+#pragma GCC diagnostic pop
+
+    } /* namespace memory */
+  } /* namespace rtos */
+
+  namespace estd
+  {
+    estd::memory_resource* default_resource __attribute__((weak))
+    = &rtos::memory::malloc_res;
+  }
+
+  namespace rtos
+  {
+    namespace memory
+    {
 
       // ----------------------------------------------------------------------
+
+      // The default RTOS memory resource.
+      memory_resource* default_resource __attribute__((weak)) = &malloc_res;
 
       memory_resource*
       set_default_resource (memory_resource* r) noexcept
       {
+        trace::printf ("rtos::memory::%s(%p) \n", __func__, r);
+
         memory_resource* old = default_resource;
         default_resource = r;
 
@@ -171,9 +131,9 @@ namespace os
       }
 
       memory_resource*
-      get_default_resource (void) noexcept
+      malloc_resource (void) noexcept
       {
-        return default_resource;
+        return &malloc_res;
       }
 
     // ------------------------------------------------------------------------
@@ -181,3 +141,5 @@ namespace os
     } /* namespace memory */
   } /* namespace rtos */
 } /* namespace os */
+
+// ----------------------------------------------------------------------------

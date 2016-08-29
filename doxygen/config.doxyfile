@@ -56,11 +56,12 @@ INPUT = \
 	"pages" \
 	"../include/cmsis-plus/" \
 	"../src/" \
-	"../include/cmsis-plus/iso/chrono" \
-	"../include/cmsis-plus/iso/condition_variable" \
-	"../include/cmsis-plus/iso/mutex" \
-	"../include/cmsis-plus/iso/system_error" \
-	"../include/cmsis-plus/iso/thread" \
+	"../include/cmsis-plus/estd/chrono" \
+	"../include/cmsis-plus/estd/condition_variable" \
+	"../include/cmsis-plus/estd/mutex" \
+	"../include/cmsis-plus/estd/memory_resource" \
+	"../include/cmsis-plus/estd/system_error" \
+	"../include/cmsis-plus/estd/thread" \
 
 ## test
 ## _INPUT = \

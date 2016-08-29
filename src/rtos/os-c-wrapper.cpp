@@ -35,17 +35,6 @@
 
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/rtos/os-c-api.h>
-#include <cmsis-plus/diag/trace.h>
-
-// Note: The legacy header is included later, to avoid polluting the namespace.
-
-#include <cassert>
-#include <cerrno>
-#include <cstring>
-#include <cstddef>
-#include <new>
-
-// #include <cstdio>
 
 // ----------------------------------------------------------------------------
 

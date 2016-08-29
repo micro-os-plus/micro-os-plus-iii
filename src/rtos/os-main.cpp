@@ -25,12 +25,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cstdlib>
-
 #include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/rtos/port/os-inlines.h>
-
-#include <cmsis-plus/diag/trace.h>
 
 #if defined(__ARM_EABI__)
 #include "cmsis_device.h"
@@ -40,6 +35,8 @@
 
 using namespace os;
 using namespace os::rtos;
+
+// ----------------------------------------------------------------------------
 
 /**
  * @cond ignore

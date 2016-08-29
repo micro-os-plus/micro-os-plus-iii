@@ -25,8 +25,11 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/iso/thread>
-#include <cstdlib>
+#include <cmsis-plus/estd/thread>
+
+// ----------------------------------------------------------------------------
+
+using namespace os;
 
 // ----------------------------------------------------------------------------
 
@@ -35,8 +38,6 @@ namespace os
   namespace estd
   {
     // ------------------------------------------------------------------------
-
-    using namespace os;
 
     thread::thread (thread&& t) noexcept
     {

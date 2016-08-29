@@ -25,8 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/iso/condition_variable>
-#include <cmsis-plus/iso/system_error>
+#include <cmsis-plus/estd/condition_variable>
+#include <cmsis-plus/estd/system_error>
 #include <cstdlib>
 
 // ----------------------------------------------------------------------------

@@ -25,11 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/diag/trace.h>
 #include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/iso/system_error>
-#include <cstdlib>
-#include <cstring>
+
 #if defined(__EXCEPTIONS)
 #include <string>
 #include <system_error>
@@ -37,72 +34,74 @@
 
 // ----------------------------------------------------------------------------
 
+using namespace os;
+
+// ----------------------------------------------------------------------------
+
 namespace os
 {
   namespace estd
   {
-    // ======================================================================
-
-    using namespace os;
+    // ========================================================================
 
 #if defined(__EXCEPTIONS)
 
     struct system_error_category : public std::error_category
-      {
-        virtual const char*
-        name () const noexcept;
+    {
+      virtual const char*
+      name () const noexcept;
 
-        virtual std::string
-        message (int i) const;
+      virtual std::string
+      message (int i) const;
 
-      };
+    };
 
     const char*
     system_error_category::name () const noexcept
-      {
-        return "system";
-      }
+    {
+      return "system";
+    }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
     std::string
     system_error_category::message (int i) const
-      {
+    {
 #if defined(DEBUG)
-        return std::string (strerror (i));
+      return std::string (strerror (i));
 #else
-        return std::string ("");
+      return std::string ("");
 #endif
-      }
+    }
 
     struct cmsis_error_category : public std::error_category
-      {
-        virtual const char*
-        name () const noexcept;
+    {
+      virtual const char*
+      name () const noexcept;
 
-        virtual std::string
-        message (int i) const;
-      };
+      virtual std::string
+      message (int i) const;
+    };
 
     const char*
     cmsis_error_category::name () const noexcept
-      {
-        return "cmsis";
-      }
+    {
+      return "cmsis";
+    }
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
     std::string
     cmsis_error_category::message (int i) const
-      {
+    {
 #if defined(DEBUG)
-        return std::string (strerror (i));
+      return std::string (strerror (i));
 #else
-        return std::string ("");
+      return std::string ("");
 #endif
-      }
+    }
 
 #pragma GCC diagnostic pop
 
@@ -113,7 +112,7 @@ namespace os
     {
 #if defined(__EXCEPTIONS)
       throw std::system_error (std::error_code (ev, system_error_category ()),
-          what_arg);
+                               what_arg);
 #else
       trace_printf ("system_error(%d, %s)\n", ev, what_arg);
       std::abort ();
@@ -125,14 +124,14 @@ namespace os
     {
 #if defined(__EXCEPTIONS)
       throw std::system_error (std::error_code (ev, cmsis_error_category ()),
-          what_arg);
+                               what_arg);
 #else
       trace_printf ("system_error(%d, %s)\n", ev, what_arg);
       std::abort ();
 #endif
     }
 
-  // ------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
   } /* namespace estd */
 } /* namespace os */

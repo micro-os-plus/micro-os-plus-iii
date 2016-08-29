@@ -25,59 +25,45 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/rtos/os.h>
+#if defined(__ARM_EABI__)
 
-#include <cstdio>
+// ----------------------------------------------------------------------------
 
-#include <test-cpp-api.h>
-#include <test-c-api.h>
-#include <test-iso-api.h>
+#include <cmsis-plus/memory/newlib-nano-malloc.h>
 
-#include <test-cpp-mem.h>
+// ----------------------------------------------------------------------------
 
-int
-os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
+using namespace os;
+
+// ----------------------------------------------------------------------------
+
+extern "C" void
+os_startup_initialize_free_store (void* heap_begin, void* heap_end);
+
+using free_store_memory_resource = os::memory::newlib_nano_malloc;
+
+static std::aligned_storage<sizeof(free_store_memory_resource),
+    alignof(free_store_memory_resource)>::type free_store;
+
+// ----------------------------------------------------------------------------
+
+void __attribute__((weak))
+os_startup_initialize_free_store (void* heap_begin, void* heap_end)
 {
-  printf ("\nCMSIS++ RTOS simple APIs test.\n");
-#if defined(__clang__)
-  printf ("Built with clang " __VERSION__ ".\n");
-#else
-  printf ("Built with GCC " __VERSION__ ".\n");
-#endif
+  trace::printf ("Free store (heap): %p-%p\n", heap_begin, heap_end);
 
-  int ret = 0;
+  new (&free_store) free_store_memory_resource
+    { heap_begin, heap_end };
 
-#if 0
-  if (ret == 0)
-    {
-      ret = test_cpp_mem ();
-    }
-#endif
+  // Set application memory manager.
+  estd::set_default_resource (
+      reinterpret_cast<estd::memory_resource*> (&free_store));
 
-#if 1
-  if (ret == 0)
-    {
-      ret = test_cpp_api ();
-    }
-#endif
-
-#if 1
-  if (ret == 0)
-    {
-      ret = test_c_api ();
-    }
-#endif
-
-#if 1
-  if (ret == 0)
-    {
-      ret = test_iso_api (false);
-    }
-#endif
-
-  printf ("%d\n", errno);
-
-  return ret;
+  // Set RTOS memory manager.
+  rtos::memory::set_default_resource (
+      reinterpret_cast<rtos::memory::memory_resource*> (&free_store));
 }
 
 // ----------------------------------------------------------------------------
+
+#endif /* defined(__ARM_EABI__) */

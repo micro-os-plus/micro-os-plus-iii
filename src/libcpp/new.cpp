@@ -41,11 +41,13 @@
  * @brief Global synchronised new/delete definitions.
  */
 
-#include <cstddef>
-#include <cstdlib>
-#include <new>
 #include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/iso/malloc.h>
+
+// ----------------------------------------------------------------------------
+
+using namespace os;
+
+// ----------------------------------------------------------------------------
 
 namespace
 {
@@ -60,45 +62,43 @@ namespace
 
 namespace std
 {
-
+  // Constant to be used as parameter to differentiate
+  // the `noexcept` functions.
   const nothrow_t nothrow = nothrow_t
     { };
 
   /**
-   * @brief Establishes the function designated by handler as the current new_handler.
-   * @param handler
+   * @brief Establishes the function designated by handler
+   * as the current `new_handler`.
+   * @param handler Pointer to user function.
    * @return The previous handler.
    * @details
-   * The initial new_handler is a null pointer.
+   * The initial `new_handler` is a null pointer.
    */
   new_handler
   set_new_handler (new_handler handler) noexcept
   {
     new_handler prev_handler;
 
-    // Use scheduler lock to synchronise access to the handler.
-    os::rtos::scheduler::critical_section scs;
+    // ----- Begin of critical section ----------------------------------------
+    rtos::scheduler::critical_section scs;
 
     prev_handler = __new_handler;
     __new_handler = handler;
 
+    // ----- End of critical section ------------------------------------------
     return prev_handler;
   }
 
   new_handler
   get_new_handler () noexcept
   {
-    new_handler handler;
-
-    // Use scheduler lock to synchronise access to the handler.
-    os::rtos::scheduler::critical_section scs;
-
-    handler = __new_handler;
-
-    return handler;
+    return __new_handler;
   }
 
 } /* namespace std */
+
+// ----------------------------------------------------------------------------
 
 /**
  * @details
@@ -107,7 +107,7 @@ namespace std
  * any object of that size.
  *
  * Return a non-null pointer to suitably aligned storage (3.7.4),
- * or else throw a bad-alloc exception. This requirement is
+ * or else throw a `bad-alloc` exception. This requirement is
  * binding on a replacement version of this function.
  *
  * @note A C++ program may define a function with this function signature
@@ -115,24 +115,26 @@ namespace std
  */
 void *
 __attribute__((weak))
-#if defined(__EXCEPTIONS) || defined(__DOXYGEN__)
-operator new (std::size_t size) noexcept(false)
-#else
-operator new (std::size_t size) noexcept
-#endif
-{    //
+operator new (std::size_t size)
+{
   if (size == 0)
     {
       size = 1;
     }
 
-  void* p;
+  // ----- Begin of critical section ------------------------------------------
+  rtos::scheduler::critical_section cs;
 
-  // Synchronisation primitives already used by estd::malloc,
-  // no need to use them again here.
-  while ((p = os::estd::malloc (size)) == 0)
+  while (true)
     {
-      // If malloc() fails and there is a new_handler,
+      void* p = estd::get_default_resource ()->allocate (std::nothrow, size);
+
+      if (p != nullptr)
+        {
+          return p;
+        }
+
+      // If allocate() fails and there is a new_handler,
       // call it to try free up memory.
       if (__new_handler)
         {
@@ -140,14 +142,11 @@ operator new (std::size_t size) noexcept
         }
       else
         {
-#if defined(__EXCEPTIONS)
-          throw std::bad_alloc ();
-#else
-          break;
-#endif
+          estd::__throw_bad_alloc (ENOMEM, "new() failed");
         }
     }
-  return p;
+
+  // ----- End of critical section --------------------------------------------
 }
 
 /**
@@ -169,19 +168,38 @@ void*
 __attribute__((weak))
 operator new (std::size_t size, const std::nothrow_t&) noexcept
 {
-  void* p = 0;
-#if defined(__EXCEPTIONS)
-  try
+  if (size == 0)
     {
-      p = ::operator new (size);
+      size = 1;
     }
-  catch (...)
+
+  // ----- Begin of critical section ------------------------------------------
+  rtos::scheduler::critical_section cs;
+
+  while (true)
     {
+      void* p = estd::get_default_resource ()->allocate (std::nothrow, size);
+
+      if (p != nullptr)
+        {
+          return p;
+        }
+
+      // If allocate() fails and there is a new_handler,
+      // call it to try free up memory.
+      if (__new_handler)
+        {
+          __new_handler ();
+        }
+      else
+        {
+          break; // return nullptr
+        }
     }
-#else
-  p = ::operator new (size);
-#endif  // __EXCEPTIONS
-  return p;
+
+  // ----- End of critical section --------------------------------------------
+
+  return nullptr;
 }
 
 /**
@@ -195,11 +213,7 @@ operator new (std::size_t size, const std::nothrow_t&) noexcept
  */
 void*
 __attribute__((weak))
-#if defined(__EXCEPTIONS) || defined(__DOXYGEN__)
-operator new[] (std::size_t size) noexcept(false)
-#else
-operator new[] (std::size_t size) noexcept
-#endif
+operator new[] (std::size_t size)
 {
   return ::operator new (size);
 }
@@ -217,20 +231,10 @@ void*
 __attribute__((weak))
 operator new[] (std::size_t size, const std::nothrow_t&) noexcept
 {
-  void* p = 0;
-#if defined(__EXCEPTIONS)
-  try
-    {
-      p = ::operator new[] (size);
-    }
-  catch (...)
-    {
-    }
-#else
-  p = ::operator new[] (size);
-#endif  // __EXCEPTIONS
-  return p;
+  return ::operator new (size, std::nothrow);
 }
+
+// ----------------------------------------------------------------------------
 
 /**
  * @details
@@ -254,8 +258,12 @@ operator delete (void* ptr) noexcept
 {
   if (ptr)
     {
-      // Synchronisation primitives used by free()
-      os::estd::free (ptr);
+      // ----- Begin of critical section --------------------------------------
+      rtos::scheduler::critical_section cs;
+
+      // The unknown size is passed as 0.
+      estd::get_default_resource ()->deallocate (ptr, 0);
+      // ----- End of critical section ----------------------------------------
     }
 }
 
@@ -267,16 +275,19 @@ operator delete (void* ptr, std::size_t size) noexcept;
 
 void
 __attribute__((weak))
-operator delete (void* ptr, std::size_t size __attribute__((unused))) noexcept
+operator delete (void* ptr, std::size_t size) noexcept
 {
   if (ptr)
     {
-      // Synchronisation primitives used by free()
-      os::estd::free (ptr);
+      // ----- Begin of critical section --------------------------------------
+      rtos::scheduler::critical_section cs;
+
+      estd::get_default_resource ()->deallocate (ptr, size);
+      // ----- End of critical section ----------------------------------------
     }
 }
 
-#pragma GCC diagnostic push
+#pragma GCC diagnostic pop
 
 /**
  * @details
@@ -292,7 +303,14 @@ void
 __attribute__((weak))
 operator delete (void* ptr, const std::nothrow_t&) noexcept
 {
-  ::operator delete (ptr);
+  if (ptr)
+    {
+      // ----- Begin of critical section --------------------------------------
+      rtos::scheduler::critical_section cs;
+
+      estd::get_default_resource ()->deallocate (std::nothrow, ptr, 0);
+      // ----- End of critical section ----------------------------------------
+    }
 }
 
 /**
@@ -318,12 +336,12 @@ operator delete[] (void* ptr, std::size_t size) noexcept;
 
 void
 __attribute__((weak))
-operator delete[] (void* ptr, std::size_t size __attribute__((unused))) noexcept
+operator delete[] (void* ptr, std::size_t size) noexcept
 {
-  ::operator delete (ptr);
+  ::operator delete (ptr, size);
 }
 
-#pragma GCC diagnostic push
+#pragma GCC diagnostic pop
 
 /**
  * @details
@@ -337,7 +355,10 @@ operator delete[] (void* ptr, std::size_t size __attribute__((unused))) noexcept
  */
 void
 __attribute__((weak))
-operator delete[] (void* ptr, const std::nothrow_t&) noexcept
+operator delete[] (void* ptr, const std::nothrow_t& nothrow) noexcept
 {
-  ::operator delete[] (ptr);
+  ::operator delete (ptr, nothrow);
 }
+
+// ----------------------------------------------------------------------------
+

@@ -88,9 +88,11 @@
 
 #include <cmsis-plus/rtos/os-decls.h>
 
+#include <cmsis-plus/rtos/os-sched.h>
+
+// Includes a reference to critical sections.
 #include <cmsis-plus/rtos/os-memory.h>
 
-#include <cmsis-plus/rtos/os-sched.h>
 #include <cmsis-plus/rtos/os-thread.h>
 #include <cmsis-plus/rtos/os-clocks.h>
 #include <cmsis-plus/rtos/os-timer.h>

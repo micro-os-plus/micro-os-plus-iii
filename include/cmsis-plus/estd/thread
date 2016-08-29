@@ -38,10 +38,8 @@
 // ----------------------------------------------------------------------------
 
 #include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/diag/trace.h>
-#include <cmsis-plus/iso/chrono>
+#include <cmsis-plus/estd/chrono>
 
-#include <cstddef>
 #include <type_traits>
 #include <functional>
 

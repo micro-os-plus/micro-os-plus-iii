@@ -28,13 +28,11 @@
 #include <cstdio>
 #include <cstdint>
 
-#include <cmsis-plus/iso/chrono>
-#include <cmsis-plus/iso/condition_variable>
-#include <cmsis-plus/iso/mutex>
-#include <cmsis-plus/iso/thread>
-//#include <atomic>
-
 #include <test-iso-api.h>
+#include <cmsis-plus/estd/chrono>
+#include <cmsis-plus/estd/condition_variable>
+#include <cmsis-plus/estd/mutex>
+#include <cmsis-plus/estd/thread>
 
 // ----------------------------------------------------------------------------
 

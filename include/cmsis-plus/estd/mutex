@@ -38,12 +38,10 @@
 // ----------------------------------------------------------------------------
 
 #include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/diag/trace.h>
 
-#include <cmsis-plus/iso/thread>
-#include <cmsis-plus/iso/system_error>
-#include <cerrno>
-#include <cmsis-plus/iso/chrono>
+#include <cmsis-plus/estd/thread>
+#include <cmsis-plus/estd/system_error>
+#include <cmsis-plus/estd/chrono>
 #include <tuple>
 
 // ----------------------------------------------------------------------------
@@ -204,17 +202,17 @@ namespace os
 
     // ======================================================================
 
-    template<typename Mutex_T>
+    template<typename L>
       class lock_guard
       {
       public:
 
-        typedef Mutex_T mutex_type;
+        typedef L lockable_type;
 
         explicit
-        lock_guard (mutex_type& m);
+        lock_guard (lockable_type& l);
 
-        lock_guard (mutex_type& m, adopt_lock_t);
+        lock_guard (lockable_type& l, adopt_lock_t);
 
         ~lock_guard ();
 
@@ -224,7 +222,7 @@ namespace os
 
       private:
 
-        mutex_type& m_;
+        lockable_type& l_;
       };
 
     // ======================================================================
@@ -232,31 +230,31 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
-    template<typename Mutex_T>
+    template<typename L>
       class unique_lock
       {
       public:
 
-        typedef Mutex_T mutex_type;
+        typedef L lockable_type;
 
         unique_lock () noexcept;
 
         explicit
-        unique_lock (mutex_type& m);
+        unique_lock (lockable_type& l);
 
-        unique_lock (mutex_type& m, defer_lock_t) noexcept;
+        unique_lock (lockable_type& l, defer_lock_t) noexcept;
 
-        unique_lock (mutex_type& m, try_to_lock_t);
+        unique_lock (lockable_type& l, try_to_lock_t);
 
-        unique_lock (mutex_type& m, adopt_lock_t);
+        unique_lock (lockable_type& l, adopt_lock_t);
 
         template<typename Clock_T, typename Duration_T>
           unique_lock (
-              mutex_type& m,
+              lockable_type& m,
               const std::chrono::time_point<Clock_T, Duration_T>& abs_time);
 
         template<typename Rep, typename Period>
-          unique_lock (mutex_type& m,
+          unique_lock (lockable_type& l,
                        const std::chrono::duration<Rep, Period>& rel_time);
 
         ~unique_lock ();
@@ -290,7 +288,7 @@ namespace os
         void
         swap (unique_lock& u) noexcept;
 
-        mutex_type*
+        lockable_type*
         release () noexcept;
 
         bool
@@ -299,12 +297,16 @@ namespace os
         explicit
         operator bool () const noexcept;
 
-        mutex_type*
+        lockable_type*
         mutex () const noexcept;
+
+        // Extension
+        lockable_type*
+        lockable () const noexcept;
 
       private:
 
-        mutex_type* m_;
+        lockable_type* l_;
         bool owns_;
       };
 
@@ -312,9 +314,9 @@ namespace os
 
     // ======================================================================
 
-    template<typename Mutex_T>
+    template<typename L>
       void
-      swap (unique_lock<Mutex_T>& x, unique_lock<Mutex_T>& y) noexcept;
+      swap (unique_lock<L>& x, unique_lock<L>& y) noexcept;
 
     template<typename L1, typename L2, typename ... L3>
       int
@@ -501,135 +503,136 @@ namespace os
 
     // ======================================================================
 
-    template<typename Mutex_T>
+    template<typename L>
       inline
-      lock_guard<Mutex_T>::lock_guard (mutex_type& m) :
-          m_ (m)
+      lock_guard<L>::lock_guard (lockable_type& l) :
+          l_ (l)
       {
-        m_.lock ();
+        l_.lock ();
       }
 
-    template<typename Mutex_T>
+    template<typename L>
       inline
-      lock_guard<Mutex_T>::lock_guard (mutex_type& m, adopt_lock_t) :
-          m_ (m)
+      lock_guard<L>::lock_guard (lockable_type& l, adopt_lock_t) :
+          l_ (l)
       {
-        m_.lock ();
+        l_.lock ();
       }
 
-    template<typename Mutex_T>
+    template<typename L>
       inline
-      lock_guard<Mutex_T>::~lock_guard ()
+      lock_guard<L>::~lock_guard ()
       {
-        m_.unlock ();
+        l_.unlock ();
       }
 
     // ======================================================================
 
-    template<typename Mutex_T>
+    template<typename L>
       inline
-      unique_lock<Mutex_T>::unique_lock () noexcept :
-      m_ (nullptr), //
+      unique_lock<L>::unique_lock () noexcept :
+      l_ (nullptr), //
       owns_ (false)
         {
           ;
         }
 
-    template<typename Mutex_T>
+    template<typename L>
       inline
-      unique_lock<Mutex_T>::unique_lock (mutex_type& m) :
-          m_ (&m), //
+      unique_lock<L>::unique_lock (lockable_type& l) :
+          l_ (&l), //
           owns_ (true)
       {
-        m_->lock ();
+        l_->lock ();
       }
 
-    template<typename Mutex_T>
+    template<typename L>
       inline
-      unique_lock<Mutex_T>::unique_lock (mutex_type& m, defer_lock_t) noexcept:
-      m_ (&m), //
+      unique_lock<L>::unique_lock (lockable_type& l, defer_lock_t) noexcept:
+      l_ (&l), //
       owns_ (false)
         {
         }
 
-    template<typename Mutex_T>
+    template<typename L>
       inline
-      unique_lock<Mutex_T>::unique_lock (mutex_type& m, try_to_lock_t) :
-          m_ (&m), //
-          owns_ (m.try_lock ())
+      unique_lock<L>::unique_lock (lockable_type& l, try_to_lock_t) :
+          l_ (&l), //
+          owns_ (l.try_lock ())
       {
       }
 
-    template<typename Mutex_T>
+    template<typename L>
       inline
-      unique_lock<Mutex_T>::unique_lock (mutex_type& m, adopt_lock_t) :
-          m_ (&m), //
+      unique_lock<L>::unique_lock (lockable_type& l, adopt_lock_t) :
+          l_ (&l), //
           owns_ (true)
       {
         ;
       }
 
-    template<typename Mutex_T>
+    template<typename L>
       template<typename Clock_T, typename Duration_T>
         inline
-        unique_lock<Mutex_T>::unique_lock (
-            mutex_type& m,
+        unique_lock<L>::unique_lock (
+            lockable_type& l,
             const std::chrono::time_point<Clock_T, Duration_T>& abs_time) :
-            m_ (&m), //
-            owns_ (m.try_lock_until (abs_time))
+            l_ (&l), //
+            owns_ (l.try_lock_until (abs_time))
         {
           ;
         }
 
-    template<typename Mutex_T>
+    template<typename L>
       template<typename Rep, typename Period>
         inline
-        unique_lock<Mutex_T>::unique_lock (
-            mutex_type& m, const std::chrono::duration<Rep, Period>& rel_time) :
-            m_ (&m), //
-            owns_ (m.try_lock_for (rel_time))
+        unique_lock<L>::unique_lock (
+            lockable_type& l,
+            const std::chrono::duration<Rep, Period>& rel_time) :
+            l_ (&l), //
+            owns_ (l.try_lock_for (rel_time))
         {
           ;
         }
 
-    template<typename Mutex_T>
+    template<typename L>
       inline
-      unique_lock<Mutex_T>::~unique_lock ()
+      unique_lock<L>::~unique_lock ()
       {
         if (owns_)
-          m_->unlock ();
+          l_->unlock ();
       }
 
-    template<typename Mutex_T>
+    template<typename L>
       inline
-      unique_lock<Mutex_T>::unique_lock (unique_lock&& u) noexcept :
-      m_(u.m_), //
+      unique_lock<L>::unique_lock (unique_lock&& u) noexcept :
+      l_(u.l_), //
       owns_(u.owns_)
         {
-          u.m_ = nullptr;
+          u.l_ = nullptr;
           u.owns_ = false;
         }
 
-    template<typename Mutex_T>
-      inline unique_lock<Mutex_T>&
-      unique_lock<Mutex_T>::operator= (unique_lock&& u) noexcept
+    template<typename L>
+      inline unique_lock<L>&
+      unique_lock<L>::operator= (unique_lock&& u) noexcept
       {
         if (owns_)
           {
-            m_->unlock ();
+            l_->unlock ();
           }
-        m_ = u.m_;
+        l_ = u.l_;
         owns_ = u.owns_;
-        u.m_ = nullptr;
+        u.l_ = nullptr;
         u.owns_ = false;
         return *this;
       }
 
-    template<typename Mutex_T>
+    template<typename L>
       void
-      unique_lock<Mutex_T>::lock ()
+      unique_lock<L>::lock ()
       {
-        if (m_ == nullptr)
+        if (l_ == nullptr)
           {
             __throw_system_error (EPERM,
                                   "unique_lock::lock: references null mutex");
@@ -638,15 +641,15 @@ namespace os
           {
             __throw_system_error (EDEADLK, "unique_lock::lock: already locked");
           }
-        m_->lock ();
+        l_->lock ();
         owns_ = true;
       }
 
-    template<typename Mutex_T>
+    template<typename L>
       bool
-      unique_lock<Mutex_T>::try_lock ()
+      unique_lock<L>::try_lock ()
       {
-        if (m_ == nullptr)
+        if (l_ == nullptr)
           {
             __throw_system_error (
                 EPERM, "unique_lock::try_lock: references null mutex");
@@ -656,17 +659,17 @@ namespace os
             __throw_system_error (EDEADLK,
                                   "unique_lock::try_lock: already locked");
           }
-        owns_ = m_->try_lock ();
+        owns_ = l_->try_lock ();
         return owns_;
       }
 
-    template<typename Mutex_T>
+    template<typename L>
       template<typename Rep, typename Period>
         bool
-        unique_lock<Mutex_T>::try_lock_for (
+        unique_lock<L>::try_lock_for (
             const std::chrono::duration<Rep, Period>& rel_time)
         {
-          if (m_ == nullptr)
+          if (l_ == nullptr)
             {
               __throw_system_error (
                   EPERM, "unique_lock::try_lock_for: references null mutex");
@@ -676,17 +679,17 @@ namespace os
               __throw_system_error (
                   EDEADLK, "unique_lock::try_lock_for: already locked");
             }
-          owns_ = m_->try_lock_for (rel_time);
+          owns_ = l_->try_lock_for (rel_time);
           return owns_;
         }
 
-    template<typename Mutex_T>
+    template<typename L>
       template<typename Clock_T, typename Duration_T>
         bool
-        unique_lock<Mutex_T>::try_lock_until (
+        unique_lock<L>::try_lock_until (
             const std::chrono::time_point<Clock_T, Duration_T>& abs_time)
         {
-          if (m_ == nullptr)
+          if (l_ == nullptr)
             {
               __throw_system_error (
                   EPERM, "unique_lock::try_lock_until: references null mutex");
@@ -696,65 +699,72 @@ namespace os
               __throw_system_error (
                   EDEADLK, "unique_lock::try_lock_until: already locked");
             }
-          owns_ = m_->try_lock_until (abs_time);
+          owns_ = l_->try_lock_until (abs_time);
           return owns_;
         }
 
-    template<typename Mutex_T>
+    template<typename L>
       void
-      unique_lock<Mutex_T>::unlock ()
+      unique_lock<L>::unlock ()
       {
         if (!owns_)
           {
             __throw_system_error (EPERM, "unique_lock::unlock: not locked");
           }
-        m_->unlock ();
+        l_->unlock ();
         owns_ = false;
       }
 
-    template<typename Mutex_T>
+    template<typename L>
       inline void
-      unique_lock<Mutex_T>::swap (unique_lock& u) noexcept
+      unique_lock<L>::swap (unique_lock& u) noexcept
       {
-        std::swap (m_, u.m_);
+        std::swap (l_, u.l_);
         std::swap (owns_, u.owns_);
       }
 
-    template<typename Mutex_T>
-      typename unique_lock<Mutex_T>::mutex_type*
-      unique_lock<Mutex_T>::release () noexcept
+    template<typename L>
+      typename unique_lock<L>::lockable_type*
+      unique_lock<L>::release () noexcept
       {
-        mutex_type* m = m_;
-        m_ = nullptr;
+        lockable_type* l = l_;
+        l_ = nullptr;
         owns_ = false;
-        return m;
+        return l;
       }
 
-    template<typename Mutex_T>
+    template<typename L>
       inline bool
-      unique_lock<Mutex_T>::owns_lock () const noexcept
+      unique_lock<L>::owns_lock () const noexcept
       {
         return owns_;
       }
 
-    template<typename Mutex_T>
-      unique_lock<Mutex_T>::operator bool () const noexcept
+    template<typename L>
+      unique_lock<L>::operator bool () const noexcept
       {
         return owns_;
       }
 
-    template<typename Mutex_T>
-      typename unique_lock<Mutex_T>::mutex_type*
-      unique_lock<Mutex_T>::mutex () const noexcept
+    template<typename L>
+      typename unique_lock<L>::lockable_type*
+      unique_lock<L>::mutex () const noexcept
       {
-        return m_;
+        return l_;
+      }
+
+    template<typename L>
+      typename unique_lock<L>::lockable_type*
+      unique_lock<L>::lockable () const noexcept
+      {
+        return l_;
       }
 
     // ======================================================================
 
-    template<typename Mutex_T>
+    template<typename L>
       inline void
-      swap (unique_lock<Mutex_T>& x, unique_lock<Mutex_T>& y) noexcept
+      swap (unique_lock<L>& x, unique_lock<L>& y) noexcept
       {
         x.swap (y);
       }

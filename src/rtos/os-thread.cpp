@@ -25,15 +25,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cassert>
-#include <new>
-#include <memory>
-
 #include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/rtos/port/os-inlines.h>
-
-#include <cmsis-plus/diag/trace.h>
-#include <cmsis-plus/rtos/internal/os-flags.h>
 
 // ----------------------------------------------------------------------------
 

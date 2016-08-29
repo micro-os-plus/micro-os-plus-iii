@@ -38,9 +38,8 @@
 // ----------------------------------------------------------------------------
 
 #include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/diag/trace.h>
 
-#include <cmsis-plus/iso/mutex>
+#include <cmsis-plus/estd/mutex>
 #include <memory>
 #include <chrono>
 

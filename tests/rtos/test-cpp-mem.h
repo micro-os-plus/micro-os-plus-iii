@@ -25,59 +25,19 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/rtos/os.h>
+#ifndef TEST_CPP_MEM_H_
+#define TEST_CPP_MEM_H_
 
-#include <cstdio>
-
-#include <test-cpp-api.h>
-#include <test-c-api.h>
-#include <test-iso-api.h>
-
-#include <test-cpp-mem.h>
-
-int
-os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
+#if defined(__cplusplus)
+extern "C"
 {
-  printf ("\nCMSIS++ RTOS simple APIs test.\n");
-#if defined(__clang__)
-  printf ("Built with clang " __VERSION__ ".\n");
-#else
-  printf ("Built with GCC " __VERSION__ ".\n");
 #endif
 
-  int ret = 0;
+  int
+  test_cpp_mem ();
 
-#if 0
-  if (ret == 0)
-    {
-      ret = test_cpp_mem ();
-    }
-#endif
-
-#if 1
-  if (ret == 0)
-    {
-      ret = test_cpp_api ();
-    }
-#endif
-
-#if 1
-  if (ret == 0)
-    {
-      ret = test_c_api ();
-    }
-#endif
-
-#if 1
-  if (ret == 0)
-    {
-      ret = test_iso_api (false);
-    }
-#endif
-
-  printf ("%d\n", errno);
-
-  return ret;
+#if defined(__cplusplus)
 }
+#endif
 
-// ----------------------------------------------------------------------------
+#endif /* TEST_CPP_MEM_H_ */

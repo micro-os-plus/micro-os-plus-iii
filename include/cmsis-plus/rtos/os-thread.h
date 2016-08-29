@@ -41,8 +41,6 @@
 #include <cmsis-plus/rtos/os-clocks.h>
 #include <cmsis-plus/rtos/internal/os-flags.h>
 
-#include <cmsis-plus/diag/trace.h>
-
 // ----------------------------------------------------------------------------
 
 /**

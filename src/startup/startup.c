@@ -95,6 +95,9 @@ extern unsigned int __bss_regions_array_start;
 extern unsigned int __bss_regions_array_end;
 #endif
 
+extern unsigned int _Heap_Begin;
+extern unsigned int _Heap_Limit;
+
 extern void
 os_initialize_args (int*, char***);
 
@@ -127,6 +130,9 @@ os_initialize_hardware_early (void);
 
 void
 os_initialize_hardware (void);
+
+void
+os_startup_initialize_free_store (void* heap_begin, void* heap_end);
 
 // ----------------------------------------------------------------------------
 
@@ -330,6 +336,8 @@ _start (void)
   // Initialise the trace output device. From this moment on,
   // trace_printf() calls are available (including in static constructors).
   trace_initialize ();
+
+  os_startup_initialize_free_store(&_Heap_Begin, &_Heap_Limit);
 
   // Get the argc/argv (useful in semihosting configurations).
   int argc;

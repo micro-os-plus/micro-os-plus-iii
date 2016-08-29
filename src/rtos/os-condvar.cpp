@@ -25,12 +25,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cassert>
-
 #include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/rtos/port/os-inlines.h>
-
-#include <cmsis-plus/diag/trace.h>
 
 // ----------------------------------------------------------------------------
 
@@ -200,6 +195,7 @@ namespace os
      *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
 
+    // ========================================================================
     /**
      * @details
      * This constructor shall initialise a condition variable object

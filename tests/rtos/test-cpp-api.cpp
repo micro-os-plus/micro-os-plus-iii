@@ -17,11 +17,11 @@
  */
 
 #include <cmsis-plus/rtos/os.h>
-
 #include <cstdio>
 #include <algorithm>
 
 #include <test-cpp-api.h>
+#include <cmsis-plus/estd/memory_resource>
 
 // ----------------------------------------------------------------------------
 
@@ -147,7 +147,7 @@ test_cpp_api (void)
 
   // --------------------------------------------------------------------------
 
-  using my_thread = thread_allocated<memory::new_delete_allocator<thread::stack::allocation_element_t>>;
+  using my_thread = thread_allocated<rtos::memory::allocator<thread::stack::allocation_element_t>>;
 
   // Allocated threads.
     {

@@ -78,7 +78,7 @@ The project highlights are:
 
 - the actual ARM CMSIS API v1.x is also implemented in the C wrapper; it is defined in [<cmsis_os.h>](https://github.com/micro-os-plus/cmsis-plus/blob/xpack/include/cmsis-plus/legacy/cmsis_os.h) (functional, just passed the CMSIS RTOS validation, using the [FreeRTOS port](https://github.com/xpacks/freertos/blob/xpack/cmsis-plus/include/cmsis-plus/rtos/port/os-inlines.h))
 
-- on top of the core C++ API, the ISO standard thread library is fully implemented, and this is the recommended API for future applications; the definitions are available form [<cmsis-plus/iso/*>](https://github.com/micro-os-plus/cmsis-plus/tree/xpack/include/cmsis-plus/iso)
+- on top of the core C++ API, the ISO standard thread library is fully implemented, and this is the recommended API for future applications; the definitions are available form [<cmsis-plus/estd/*>](https://github.com/micro-os-plus/cmsis-plus/tree/xpack/include/cmsis-plus/estd)
 
 - all RTOS objects are based on the core C++ objects, and objects created in C++ can be used in C and similarly objects created in C can be used in C++ (there is no mystery here, they represent exactly the same objects)
 

@@ -33,16 +33,20 @@
  * References are to ISO/IEC 14882:2011(E) Third edition (2011-09-01).
  */
 
-#include <cmsis-plus/iso/memory_resource>
+#include <cmsis-plus/diag/trace.h>
+#include <cmsis-plus/estd/memory_resource>
 #include <new>
 #include <cstdlib>
+
+// ----------------------------------------------------------------------------
 
 using namespace os::estd;
 
 namespace
 {
-  // ========================================================================
+  // ==========================================================================
 
+  // Standard
   class new_delete_memory_resource : public memory_resource
   {
   public:
@@ -52,7 +56,7 @@ namespace
   protected:
 
     virtual void*
-    do_allocate (size_t bytes, size_t alignment __attribute__((unused)))
+    do_allocate (size_t bytes, size_t alignment __attribute__((unused))) override
     {
       // Ignore alignment for now.
       return ::operator new (bytes);
@@ -60,21 +64,16 @@ namespace
 
     virtual void
     do_deallocate (void* p, size_t bytes __attribute__((unused)),
-                   size_t alignment __attribute__((unused)))
+                   size_t alignment __attribute__((unused))) override
     {
       // Ignore size and alignment for now.
       ::operator delete (p);
     }
-
-    virtual bool
-    do_is_equal (memory_resource const & other) const noexcept
-    {
-      return &other == this;
-    }
   };
 
-  // ========================================================================
+  // ==========================================================================
 
+  // Standard
   class null_memory_resource : public memory_resource
   {
   public:
@@ -85,31 +84,21 @@ namespace
 
     virtual void*
     do_allocate (std::size_t bytes __attribute__((unused)),
-                 std::size_t alignment __attribute__((unused)))
+                 std::size_t alignment __attribute__((unused))) override
     {
-#if defined(__EXCEPTIONS)
-      throw std::bad_alloc ();
-#else
-      std::abort ();
-#endif
+      __throw_bad_alloc (ENOSYS, "No dynamic allocations allowed.");
     }
 
     virtual void
     do_deallocate (void* p __attribute__((unused)),
                    std::size_t bytes __attribute__((unused)),
-                   std::size_t alignment __attribute__((unused)))
+                   std::size_t alignment __attribute__((unused))) override
     {
       ;
     }
-
-    virtual bool
-    do_is_equal (memory_resource const & other) const noexcept
-    {
-      return &other == this;
-    }
   };
 
-  // ------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -122,21 +111,33 @@ namespace
 
 #pragma GCC diagnostic pop
 
-  // ------------------------------------------------------------------------
-
-  // The default memory resource
-  static memory_resource* default_resource = &new_delete_res;
+// ----------------------------------------------------------------------------
 }
 
 namespace os
 {
   namespace estd
   {
-    // ----------------------------------------------------------------------
+    // ========================================================================
 
-    memory_resource::~memory_resource ()
+    void
+    __throw_bad_alloc (int ev
+#if defined(__EXCEPTIONS)
+                       __attribute__((unused))
+#endif
+                       ,
+                       const char* what_arg
+#if defined(__EXCEPTIONS)
+                       __attribute__((unused))
+#endif
+                       )
     {
-      ;
+#if defined(__EXCEPTIONS)
+      throw std::bad_alloc ();
+#else
+      trace::printf ("bad_alloc(), %d, %s\n", ev, what_arg);
+      std::abort ();
+#endif
     }
 
     // ------------------------------------------------------------------------
@@ -155,22 +156,36 @@ namespace os
 
     // ------------------------------------------------------------------------
 
+    // The default memory resource is the LIBC malloc().
+    // The actual definition is located in rtos/os-memory.cpp.
+    // memory_resource* default_resource __attribute__((weak)) = &malloc_res;
+
     memory_resource*
     set_default_resource (memory_resource* r) noexcept
     {
+      trace::printf ("estd::%s(%p) \n", __func__, r);
+
       memory_resource* old = default_resource;
       default_resource = r;
 
       return old;
     }
 
-    memory_resource*
-    get_default_resource (void) noexcept
+    // ========================================================================
+
+    memory_resource::~memory_resource ()
     {
-      return default_resource;
+      ;
+    }
+
+    bool
+    memory_resource::do_is_equal (memory_resource const &other) const noexcept
+    {
+      return &other == this;
     }
 
   // ------------------------------------------------------------------------
-
   } /* namespace estd */
 } /* namespace os */
+
+// ----------------------------------------------------------------------------

@@ -26,7 +26,7 @@
  */
 
 #include <cerrno>
-#include <cmsis-plus/iso/mutex>
+#include <cmsis-plus/estd/mutex>
 
 // ----------------------------------------------------------------------------
 
