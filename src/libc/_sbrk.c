@@ -80,14 +80,15 @@ _sbrk (ptrdiff_t incr)
   return (caddr_t) current_block_address;
 }
 
-void* __attribute__((weak, alias ("_sbrk")))
+void*
+__attribute__((weak, alias ("_sbrk")))
 sbrk (ptrdiff_t incr);
 
 void*
-_sbrk_r (void* impure, ptrdiff_t incr);
+_sbrk_r (struct _reent* impure, ptrdiff_t incr);
 
 void*
-_sbrk_r (void* impure __attribute__((unused)), ptrdiff_t incr)
+_sbrk_r (struct _reent* impure __attribute__((unused)), ptrdiff_t incr)
 {
   return _sbrk (incr);
 }

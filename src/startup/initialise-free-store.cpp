@@ -45,6 +45,9 @@ using free_store_memory_resource = os::memory::newlib_nano_malloc;
 static std::aligned_storage<sizeof(free_store_memory_resource),
     alignof(free_store_memory_resource)>::type free_store;
 
+extern "C" void*
+sbrk (ptrdiff_t incr);
+
 // ----------------------------------------------------------------------------
 
 void __attribute__((weak))
@@ -59,9 +62,12 @@ os_startup_initialize_free_store (void* heap_begin, void* heap_end)
   estd::set_default_resource (
       reinterpret_cast<estd::memory_resource*> (&free_store));
 
-  // Set RTOS memory manager.
+  // Set RTOS system memory manager.
   rtos::memory::set_default_resource (
       reinterpret_cast<rtos::memory::memory_resource*> (&free_store));
+
+  // Adjust sbrk() to prevent it overlapping the free store.
+  sbrk (static_cast<char*> (heap_end) - static_cast<char*> (sbrk (0)));
 }
 
 // ----------------------------------------------------------------------------
