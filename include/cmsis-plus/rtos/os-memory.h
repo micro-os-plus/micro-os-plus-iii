@@ -32,8 +32,11 @@
 
 #if defined(__cplusplus)
 
-#include <cmsis-plus/estd/memory_resource>
 #include <cmsis-plus/estd/system_error>
+
+#include <limits>
+#include <new>
+#include <cerrno>
 
 // ----------------------------------------------------------------------------
 
@@ -50,6 +53,8 @@ namespace os
       class critical_section;
     }
 
+    class null_locker;
+
     namespace memory
     {
       // ----------------------------------------------------------------------
@@ -60,48 +65,33 @@ namespace os
         return a >= b ? a : b;
       }
 
-      using memory_resource = estd::memory_resource;
-
-      template<typename L>
-        class lock_guard;
-
-      using D_T = memory_resource* (void);
-
-      template<typename T, typename L, D_T D>
-        class polymorphic_synchronized_allocator;
-
-      template<typename T1, typename T2, typename L, D_T D>
-        bool
-        operator== (const polymorphic_synchronized_allocator<T1, L, D>& a,
-                    const polymorphic_synchronized_allocator<T2, L, D>& b)
-                        noexcept;
-
-      template<typename T1, typename T2, typename L, D_T D>
-        bool
-        operator!= (const polymorphic_synchronized_allocator<T1, L, D>& a,
-                    const polymorphic_synchronized_allocator<T2, L, D>& b)
-                        noexcept;
+      class memory_resource;
 
       // ----------------------------------------------------------------------
 
       /**
-       * @brief Get the address of the malloc memory resource.
-       * @return Pointer to memory resource.
+       * @addtogroup cmsis-plus-rtos-memres
+       * @{
+       */
+
+      /**
+       * @brief Get the address of a memory manager based on POSIX `malloc()`.
+       * @return Pointer to a memory manager object instance.
        */
       memory_resource*
       malloc_resource () noexcept;
 
       /**
-       * @brief Set the default RTOS memory resource.
-       * @param r Pointer to memory resource.
-       * @return Pointer to previous memory resource.
+       * @brief Set the default RTOS system memory manager.
+       * @param res Pointer to new memory manager object instance.
+       * @return Pointer to previous memory manager object instance.
        */
       memory_resource*
-      set_default_resource (memory_resource* r) noexcept;
+      set_default_resource (memory_resource* res) noexcept;
 
       /**
-       * @brief Get the default RTOS memory resource.
-       * @return Pointer to memory resource.
+       * @brief Get the default RTOS system memory manager.
+       * @return Pointer to a memory manager object instance.
        */
       memory_resource*
       get_default_resource (void) noexcept;
@@ -109,12 +99,28 @@ namespace os
       // ======================================================================
 
       /**
-       * @brief Null locker.
-       * @headerfile os.h <cmsis-plus/estd/memory_resource>
+       * @brief Type of out of memory handler.
        */
-      class null_locker
+      using out_of_memory_handler_t = void (*)(void);
+
+      /**
+       * @brief Memory resource manager.
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @details
+       * This class is based on the standard memory manager, with
+       * several extensions, to control the throw behaviour and to
+       * add statistics.
+       */
+      class memory_resource
       {
+
       public:
+
+        /**
+         * @brief The largest alignment for the platform. Also default
+         * when supplied alignment is not supported.
+         */
+        static constexpr std::size_t max_align = alignof(std::max_align_t);
 
         /**
          * @name Constructors & Destructor
@@ -122,33 +128,11 @@ namespace os
          */
 
         /**
-         * @brief Construct a null lockable object instance.
-         * @par Parameters
-         *  None
+         * @brief Destruct the memory resource object instance.
          */
 
-        constexpr
-        null_locker ();
-
-        /**
-         * @cond ignore
-         */
-
-        null_locker (const null_locker&) = delete;
-        null_locker (null_locker&&) = delete;
-        null_locker&
-        operator= (const null_locker&) = delete;
-        null_locker&
-        operator= (null_locker&&) = delete;
-
-        /**
-         * @endcond
-         */
-
-        /**
-         * @brief Destruct the null lockable object instance.
-         */
-        ~null_locker ();
+        virtual
+        ~memory_resource ();
 
         /**
          * @}
@@ -162,31 +146,286 @@ namespace os
          */
 
         /**
-         * @brief Lock the scheduler.
-         * @par Parameters
-         *  None
-         * @return  Nothing.
+         * @brief Allocate a memory block.
+         * @param bytes Number of bytes to allocate.
+         * @param alignment Alignment constraint (power of 2).
+         * @return Pointer to newly allocated block, or `nullptr`.
          */
-        void
-        lock (void);
+        void*
+        allocate (std::size_t bytes, std::size_t alignment = max_align);
 
         /**
-         * @brief Unlock the scheduler.
-         * @par Parameters
-         *  None
-         * @return  Nothing.
+         * @brief Deallocate the previously allocated memory block.
+         * @param addr Address of the block to free.
+         * @param bytes Number of bytes to deallocate (may be 0 if unknown).
+         * @param alignment Alignment constraint (power of 2).
+         * @par Returns
+         *  Nothing.
          */
         void
-        unlock (void);
+        deallocate (void* addr, std::size_t bytes, std::size_t alignment =
+                        max_align) noexcept;
+
+        /**
+         * @brief Compare for equality with another `memory_resource`.
+         * @param other
+         * @retval true The `memory_resource` objects are equal.
+         * @retval false The `memory_resource` objects are not equal.
+         */
+        bool
+        is_equal (memory_resource const & other) const noexcept;
+
+        /**
+         * @brief The largest value that can be passed to `allocate()`.
+         * @return Number of bytes or 0 if unknown.
+         */
+        std::size_t
+        max_size (void) const noexcept;
+
+        /**
+         * @brief Set the out of memory handler.
+         * @param handler Pointer to new handler.
+         * @return Pointer to old handler.
+         */
+        out_of_memory_handler_t
+        out_of_memory_handler (out_of_memory_handler_t handler);
+
+        /**
+         * @brief Get the out of memory handler.
+         * @return Pointer to existing handler.
+         */
+        out_of_memory_handler_t
+        out_of_memory_handler (void);
 
         /**
          * @}
          */
 
+      protected:
+
+        /**
+         * @name Private Member Functions
+         * @{
+         */
+
+        /**
+         * @brief Implementation of the memory allocator.
+         * @param bytes Number of bytes to allocate.
+         * @param alignment Alignment constraint (power of 2).
+         * @return Pointer to newly allocated block, or `nullptr`.
+         */
+        virtual void*
+        do_allocate (std::size_t bytes, std::size_t alignment) = 0;
+
+        /**
+         * @brief Implementation of the memory deallocator.
+         * @param addr Address of a previously allocated block to free.
+         * @param bytes Number of bytes to deallocate (may be 0 if unknown).
+         * @param alignment Alignment constraint (power of 2).
+         * @par Returns
+         *  Nothing.
+         */
+        virtual void
+        do_deallocate (void* addr, std::size_t bytes, std::size_t alignment)
+            noexcept = 0;
+
+        /**
+         * @brief Implementation of the equality comparator.
+         * @param other Reference to another `memory_resource`.
+         * @retval true The `memory_resource` objects are equal.
+         * @retval false The `memory_resource` objects are not equal.
+         */
+        virtual bool
+        do_is_equal (memory_resource const &other) const noexcept;
+
+        /**
+         * @brief Implementation of the function to get max size.
+         * @return Integer with size in bytes, or 0 if unknown.
+         */
+        virtual std::size_t
+        do_max_size (void) const noexcept;
+
+        /**
+         * @brief Helper function to align size values.
+         * @param size Unaligned size.
+         * @param align Alignment requirement (power of 2).
+         * @return Aligned size.
+         */
+        static constexpr std::size_t
+        align (std::size_t size, std::size_t align) noexcept;
+
+        /**
+         * @}
+         */
+
+      protected:
+
+        /**
+         * @cond ignore
+         */
+
+        out_of_memory_handler_t out_of_memory_handler_ = nullptr;
+
+        /**
+         * @endcond
+         */
+
       };
+
+      /**
+       * @brief Compare the `memory_resource` instances for equality.
+       * @param lhs First instance to compare.
+       * @param rhs Second instance to compare.
+       * @retval true The two object `memory_resource` instances are equal.
+       * @retval false The two object `memory_resource` instances are not equal.
+       */
+      bool
+      operator== (const memory_resource& lhs, const memory_resource& rhs)
+          noexcept;
+
+      /**
+       * @brief Compare the `memory_resource` instances for inequality.
+       * @param lhs First instance to compare.
+       * @param rhs Second instance to compare.
+       * @retval true The two object `memory_resource` instances are not equal.
+       * @retval false The two object `memory_resource` instances are equal.
+       */
+      bool
+      operator!= (const memory_resource& lhs, const memory_resource& rhs)
+          noexcept;
 
       // ======================================================================
 
+      /**
+       * @brief Standard allocator based on the RTOS system default memory
+       * manager.
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @details
+       * This class template is used as the default allocator for
+       * system classes. It gets memory from the system default memory
+       * manager `os::rtos::memory::get_default_resource()`.
+       *
+       * @note As default allocator, this class must be stateless,
+       *  i.e. have no member variables.
+       */
+      template<typename T>
+        class default_resource_allocator
+        {
+        public:
+
+          /**
+           * @brief Type of elements to be allocated.
+           */
+          using value_type = T;
+
+          /**
+           * @name Constructors & Destructor
+           * @{
+           */
+
+          /**
+           * @brief Default constructor. Construct a default resource
+           * allocator object instance.
+           */
+          default_resource_allocator () noexcept = default;
+
+          /**
+           * @brief Copy constructor.
+           * @param a Reference to existing allocator.
+           */
+          default_resource_allocator (default_resource_allocator const & a) = default;
+
+          /**
+           * @brief Copy constructor template.
+           * @param other
+           */
+          template<typename U>
+            default_resource_allocator (
+                default_resource_allocator<U> const & other) noexcept;
+
+          /**
+           * @brief Move constructor.
+           * @param a Reference to existing allocator.
+           */
+          default_resource_allocator (default_resource_allocator && a) = default;
+
+          /**
+           * @brief Copy assignment operator.
+           * @param a Reference to existing allocator.
+           * @return
+           */
+          default_resource_allocator&
+          operator= (default_resource_allocator const & a) = default;
+
+          /**
+           * @brief Move assignment operator.
+           * @param a Reference to existing allocator.
+           * @return
+           */
+          default_resource_allocator&
+          operator= (default_resource_allocator && a) = default;
+
+          /**
+           * @brief Destruct the default resource allocator object instance.
+           */
+          ~default_resource_allocator () = default;
+
+          /**
+           * @}
+           */
+
+        public:
+
+          /**
+           * @name Public Member Functions
+           * @{
+           */
+
+          /**
+           * @brief Allocate a number of memory blocks of type `value_type`.
+           * @param elements Number of elements of type `value_type`.
+           * @return Pointer to newly allocated memory blocks.
+           */
+          value_type*
+          allocate (std::size_t elements);
+
+          /**
+           * @brief Deallocate the number of memory blocks of type `value_type`.
+           * @param addr Pointer to previously allocated memory blocks.
+           * @param elements Number of elements of type `value_type`.
+           * @par Returns
+           *  Nothing
+           */
+          void
+          deallocate (value_type* addr, std::size_t elements) noexcept;
+
+          /**
+           * @brief The number of elements that can be passed to `allocate()`.
+           * @return Number of elements of type `value_type`.
+           */
+          std::size_t
+          max_size (void) const noexcept;
+
+          /**
+           * @}
+           */
+        };
+
+      /**
+       * @}
+       */
+
+      // ======================================================================
+      /**
+       * @cond ignore
+       */
+
+      template<typename L>
+        class lock_guard;
+
+      using D_T = memory_resource* (void);
+
+      // Experimental, to be finalised.
       template<typename T, typename L = null_locker, D_T D =
           get_default_resource>
         class polymorphic_synchronized_allocator
@@ -212,10 +451,10 @@ namespace os
           operator= (polymorphic_synchronized_allocator const & a) = default;
 
           value_type*
-          allocate (std::size_t size);
+          allocate (std::size_t elements);
 
           void
-          deallocate (value_type* p, std::size_t bytes) noexcept;
+          deallocate (value_type* p, std::size_t elements) noexcept;
 
           std::size_t
           max_size (void) const noexcept;
@@ -231,37 +470,23 @@ namespace os
           memory_resource* res_;
         };
 
-      // ======================================================================
+      template<typename T1, typename T2, typename L, D_T D>
+        bool
+        operator== (const polymorphic_synchronized_allocator<T1, L, D>& lhs,
+                    const polymorphic_synchronized_allocator<T2, L, D>& rhs)
+                        noexcept;
 
-      template<typename T>
-        class default_resource_allocator
-        {
-        public:
+      template<typename T1, typename T2, typename L, D_T D>
+        bool
+        operator!= (const polymorphic_synchronized_allocator<T1, L, D>& lhs,
+                    const polymorphic_synchronized_allocator<T2, L, D>& rhs)
+                        noexcept;
 
-          typedef T value_type;
+    /**
+     * @endcond
+     */
 
-          default_resource_allocator () noexcept = default;
-          default_resource_allocator (default_resource_allocator const & a) = default;
-
-          template<typename U>
-            default_resource_allocator (
-                default_resource_allocator<U> const & other) noexcept;
-
-          default_resource_allocator&
-          operator= (default_resource_allocator const & a) = default;
-
-          value_type*
-          allocate (std::size_t size);
-
-          void
-          deallocate (value_type* p, std::size_t bytes) noexcept;
-
-          std::size_t
-          max_size (void) const noexcept;
-        };
-
-    // ----------------------------------------------------------------------
-
+    // ------------------------------------------------------------------------
     } /* namespace memory */
   } /* namespace rtos */
 } /* namespace os */
@@ -280,13 +505,195 @@ namespace os
 
       // ----------------------------------------------------------------------
 
+      /**
+       * @details
+       * If not set explicitly by the user (for example when
+       * running on the synthetic POSIX platform), this function
+       * will return an instance of `malloc_memory_resource`.
+       */
       inline memory_resource*
       get_default_resource (void) noexcept
       {
         return default_resource;
       }
 
-      // ========================================================================
+      // ======================================================================
+
+      /**
+       * @details
+       * Allocates storage with a size of at least `bytes` bytes. The
+       * returned storage is aligned to the specified alignment if
+       * such alignment is supported, and to `alignof(std::max_align_t)`
+       * otherwise.
+       *
+       * If the storage of the requested size and alignment cannot be
+       * obtained:
+       * - if the out of memory handler is not set, return `nullptr`;
+       * - if the out of memory handler is set, call it and retry.
+       *
+       * Equivalent to `return do_allocate(bytes, alignment);`.
+       *
+       * @par Exceptions
+       *   The code itself throws nothing, but if the out of memory
+       *   handler is set, it may throw a `bad_alloc()` exception.
+       *
+       * @see do_allocate();
+       */
+      inline void*
+      memory_resource::allocate (std::size_t bytes, std::size_t alignment)
+      {
+        return do_allocate (bytes, alignment);
+      }
+
+      /**
+       * @details
+       * Deallocates the storage pointed to by `addr`.
+       * The address shall have been returned
+       * by a prior call to `allocate()` on a memory_resource
+       * that compares equal to *this, and the storage it points to shall
+       * not yet have been deallocated.
+       *
+       * Equivalent to `return do_deallocate(p, bytes, alignment);`.
+       *
+       * @par Exceptions
+       *   Throws nothing.
+       *
+       * @see do_deallocate();
+       */
+      inline void
+      memory_resource::deallocate (void* addr, std::size_t bytes,
+                                   std::size_t alignment) noexcept
+      {
+        do_deallocate (addr, bytes, alignment);
+      }
+
+      /**
+       * @details
+       * Compares `*this` for equality with other. Two `memory_resources`
+       * compare equal if and only if memory allocated from one
+       * `memory_resource` can be deallocated from the other and vice versa.
+       *
+       * @par Exceptions
+       *   Throws nothing.
+       *
+       * @see do_is_equal();
+       */
+      inline bool
+      memory_resource::is_equal (memory_resource const & other) const noexcept
+      {
+        return do_is_equal (other);
+      }
+
+      /**
+       * @details
+       *
+       * @see do_max_size();
+       */
+      inline std::size_t
+      memory_resource::max_size (void) const noexcept
+      {
+        return do_max_size ();
+      }
+
+      /**
+       * @details
+       *
+       * @par Standard compliance
+       *   Extension to standard.
+       */
+      inline constexpr std::size_t
+      memory_resource::align (std::size_t size, std::size_t align) noexcept
+      {
+        return ((size) + (align) - 1L) & ~((align) - 1L);
+      }
+
+      /**
+       * @details
+       *
+       * @par Standard compliance
+       *   Extension to standard.
+       */
+      inline out_of_memory_handler_t
+      memory_resource::out_of_memory_handler (out_of_memory_handler_t handler)
+      {
+        trace::printf ("%s(%p) @%p\n", __func__, handler, this);
+
+        out_of_memory_handler_t tmp = out_of_memory_handler_;
+        out_of_memory_handler_ = handler;
+
+        return tmp;
+      }
+
+      /**
+       * @details
+       *
+       * @par Standard compliance
+       *   Extension to standard.
+       */
+      inline out_of_memory_handler_t
+      memory_resource::out_of_memory_handler (void)
+      {
+        return out_of_memory_handler_;
+      }
+
+      // ======================================================================
+
+      inline bool
+      operator== (memory_resource const & lhs, memory_resource const & rhs) noexcept
+      {
+        return &lhs == &rhs || lhs.is_equal (rhs);
+      }
+
+      inline bool
+      operator!= (memory_resource const & lhs, memory_resource const & rhs) noexcept
+      {
+        return !(lhs == rhs);
+      }
+
+      // ======================================================================
+
+      template<typename T>
+        template<typename U>
+          inline
+          default_resource_allocator<T>::default_resource_allocator (
+              default_resource_allocator<U> const & other __attribute__((unused))) noexcept
+          {
+            ;
+          }
+
+      template<typename T>
+        inline typename default_resource_allocator<T>::value_type*
+        default_resource_allocator<T>::allocate (std::size_t elements)
+        {
+          scheduler::critical_section scs;
+
+          return static_cast<value_type*> (get_default_resource ()->allocate (
+              elements * sizeof(value_type)));
+        }
+
+      template<typename T>
+        inline void
+        default_resource_allocator<T>::deallocate (value_type* addr,
+                                                   std::size_t elements) noexcept
+        {
+          scheduler::critical_section scs;
+
+          get_default_resource ()->deallocate (addr,
+                                               elements * sizeof(value_type));
+        }
+
+      template<typename T>
+        inline std::size_t
+        default_resource_allocator<T>::max_size (void) const noexcept
+        {
+          return get_default_resource ()->max_size () / sizeof(value_type);
+        }
+
+      // ======================================================================
+
+      /**
+       * @cond ignore
+       */
 
       template<typename T, typename U, typename L>
         inline bool
@@ -306,31 +713,12 @@ namespace os
 
       // ======================================================================
 
-      inline
-      null_locker::~null_locker ()
-      {
-        ;
-      }
-
-      inline void
-      null_locker::lock (void)
-      {
-        ;
-      }
-
-      inline void
-      null_locker::unlock (void)
-      {
-        ;
-      }
-      // ======================================================================
-
       template<typename T, typename L, D_T D>
+        inline
         polymorphic_synchronized_allocator<T, L, D>::polymorphic_synchronized_allocator () noexcept :
         res_(D())
           {
             trace::printf ("%s() @%p %p\n", __func__, this, res_);
-            ;
           }
 
       template<typename T, typename L, D_T D>
@@ -340,7 +728,6 @@ namespace os
         res_(r)
           {
             trace::printf ("%s(%p) @%p\n", __func__, r, this);
-            ;
           }
 
       template<typename T, typename L, D_T D>
@@ -354,12 +741,12 @@ namespace os
             }
 
       template<typename T, typename L, D_T D>
-        inline typename polymorphic_synchronized_allocator<T, L, D>::value_type*
+        typename polymorphic_synchronized_allocator<T, L, D>::value_type*
         polymorphic_synchronized_allocator<T, L, D>::allocate (
-            std::size_t bytes)
+            std::size_t elements)
         {
-          trace::printf ("%s(%u) @%p\n", __func__, bytes, this);
-          if (bytes > max_size ())
+          trace::printf ("%s(%u) @%p\n", __func__, elements, this);
+          if (elements > max_size ())
             {
               estd::__throw_system_error (
                   EINVAL,
@@ -372,29 +759,30 @@ namespace os
             { lk };
 
           return static_cast<value_type*> (res_->allocate (
-              bytes * sizeof(value_type), alignof(value_type)));
+              elements * sizeof(value_type), alignof(value_type)));
         }
 
       template<typename T, typename L, D_T D>
-        inline void
+        void
         polymorphic_synchronized_allocator<T, L, D>::deallocate (
-            value_type * p, std::size_t bytes) noexcept
+            value_type * addr, std::size_t elements) noexcept
         {
-          assert(bytes <= max_size ());
-          trace::printf ("%s(%p,%u) @%p\n", __func__, p, bytes, this);
+          assert (elements <= max_size ());
+          trace::printf ("%s(%p,%u) @%p\n", __func__, addr, elements, this);
 
           locker_type lk;
           lock_guard<locker_type> ulk
             { lk };
 
-          res_->deallocate (p, bytes * sizeof(value_type), alignof(value_type));
+          res_->deallocate (addr, elements * sizeof(value_type),
+                            alignof(value_type));
         }
 
       template<typename T, typename L, D_T D>
         inline std::size_t
         polymorphic_synchronized_allocator<T, L, D>::max_size (void) const noexcept
         {
-          return std::numeric_limits<std::size_t>::max () / sizeof(value_type);
+          return res_->max_size () / sizeof(T);
         }
 
       template<typename T, typename L, D_T D>
@@ -412,39 +800,11 @@ namespace os
           return res_;
         }
 
-      // ======================================================================
-
-      template<typename T>
-        template<typename U>
-          inline
-          default_resource_allocator<T>::default_resource_allocator (
-              default_resource_allocator<U> const & other __attribute__((unused))) noexcept
-          {
-            ;
-          }
-
-      template<typename T>
-        inline typename default_resource_allocator<T>::value_type*
-        default_resource_allocator<T>::allocate (std::size_t n)
-        {
-          scheduler::critical_section scs;
-
-          return static_cast<value_type*> (get_default_resource ()->allocate (
-              n * sizeof(value_type)));
-        }
-
-      template<typename T>
-        inline void
-        default_resource_allocator<T>::deallocate (
-            value_type* p, std::size_t n __attribute__((unused))) noexcept
-        {
-          scheduler::critical_section scs;
-
-          get_default_resource ()->deallocate (std::nothrow, p, 0);
-        }
+    /**
+     * @endcond
+     */
 
     // ------------------------------------------------------------------------
-
     } /* namespace memory */
   } /* namespace rtos */
 } /* namespace os */

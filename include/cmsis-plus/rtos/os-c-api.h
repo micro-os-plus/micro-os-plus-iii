@@ -34,7 +34,7 @@
  * This file is part of the CMSIS++ proposal, intended as a CMSIS
  * replacement for C++ applications, and provides a C API.
  *
- * The code is inspired by ARM CMSIS cmsis_os.h file, v1.02,
+ * The code was originally inspired by ARM CMSIS cmsis_os.h file, v1.02,
  * and tries to remain functionally close to the CMSIS specifications.
  */
 
@@ -2159,6 +2159,52 @@ extern "C"
    */
   bool
   os_evflags_are_waiting (os_evflags_t* evflags);
+
+  /**
+   * @}
+   */
+
+  /**
+   * @}
+   */
+
+  // --------------------------------------------------------------------------
+  /**
+   * @addtogroup cmsis-plus-rtos-c-memres
+   * @{
+   */
+
+  /**
+   * @name Memory allocation functions
+   * @{
+   */
+
+  /**
+   * @brief Get the application default memory resource (free store).
+   * @return Pointer to memory resource object instance.
+   */
+  os_memory_t*
+  os_memory_get_default (void);
+
+  /**
+   * @brief Allocate a block of memory.
+   * @param memory Pointer to a memory resource object instance.
+   * @param bytes Number of bytes to allocate.
+   * @param alignment Integer (power of 2) with alignment constraints.
+   */
+  void*
+  os_memory_allocate (os_memory_t* memory, size_t bytes, size_t alignment);
+
+  /**
+   * @brief Deallocate the previously allocated block of memory.
+   * @param memory Pointer to a memory resource object instance.
+   * @param addr Address of memory block to free.
+   * @param bytes Number of bytes to deallocate (may be 0 if unknown).
+   * @param alignment Integer (power of 2) with alignment constraints.
+   */
+  void
+  os_memory_deallocate (os_memory_t* memory, void* addr, size_t bytes,
+                        size_t alignment);
 
 /**
  * @}

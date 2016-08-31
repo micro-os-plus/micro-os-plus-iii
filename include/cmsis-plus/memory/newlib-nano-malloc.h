@@ -33,6 +33,7 @@
 #if defined(__cplusplus)
 
 #include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/estd/memory_resource>
 
 // ----------------------------------------------------------------------------
 
@@ -44,30 +45,103 @@ namespace os
     // ========================================================================
 
     /**
-     * @brief Memory resource implementing newlib nano policies.
-     * @headerfile os.h <cmsis-plus/memory/newlib-nano-malloc.h>
+     * @brief Memory resource implementing the newlib nano allocation/deallocation policies.
+     * @ingroup cmsis-plus-rtos-memres
+     * @headerfile newlib-nano-malloc.h <cmsis-plus/memory/newlib-nano-malloc.h>
      */
-    class newlib_nano_malloc : public estd::memory_resource
+    class newlib_nano_malloc : public rtos::memory::memory_resource
     {
     public:
 
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+      /**
+       * @brief Construct a memory resource object instance.
+       * @param addr_begin Begin of allocator arena.
+       * @param addr_end End of allocator arena.
+       */
       newlib_nano_malloc (void* addr_begin, void* addr_end);
 
+      /**
+       * @brief Construct a memory resource object instance.
+       * @param addr Begin of allocator arena.
+       * @param size Size of allocator arena, in bytes.
+       */
       newlib_nano_malloc (void* addr, std::size_t size);
 
+      /**
+       * @cond ignore
+       */
+
+      // The rule of five.
+      newlib_nano_malloc (const newlib_nano_malloc&) = delete;
+      newlib_nano_malloc (newlib_nano_malloc&&) = delete;
+      newlib_nano_malloc&
+      operator= (const newlib_nano_malloc&) = delete;
+      newlib_nano_malloc&
+      operator= (newlib_nano_malloc&&) = delete;
+
+      /**
+       * @endcond
+       */
+
+      /**
+       * @brief Destruct the memory resource object instance.
+       */
       virtual
       ~newlib_nano_malloc ();
 
+      /**
+       * @}
+       */
+
     protected:
 
+      /**
+       * @name Private Member Functions
+       * @{
+       */
+
+      /**
+       * @brief Implementation of the memory allocator.
+       * @param bytes Number of bytes to allocate.
+       * @param alignment Alignment constraint (power of 2).
+       * @return Pointer to newly allocated block, or `nullptr`.
+       */
       virtual void*
       do_allocate (std::size_t bytes, std::size_t alignment) override;
 
+      /**
+       * @brief Implementation of the memory deallocator.
+       * @param addr Address of a previously allocated block to free.
+       * @param bytes Number of bytes to deallocate (may be 0 if unknown).
+       * @param alignment Alignment constraint (power of 2).
+       * @par Returns
+       *  Nothing.
+       */
       virtual void
       do_deallocate (void* addr, std::size_t bytes, std::size_t alignment)
-          override;
+          noexcept override;
+
+      /**
+       * @brief Implementation of the function to get max size.
+       * @return Integer with size in bytes, or 0 if unknown.
+       */
+      virtual std::size_t
+      do_max_size (void) const noexcept override;
+
+      /**
+       * @}
+       */
 
     protected:
+
+      /**
+       * @cond ignore
+       */
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -101,10 +175,14 @@ namespace os
       std::size_t size_;
 
       chunk_t* free_list_;
+
+      /**
+       * @endcond
+       */
+
     };
 
-  // --------------------------------------------------------------------------
-
+  // -------------------------------------------------------------------------
   } /* namespace memory */
 } /* namespace os */
 
@@ -123,7 +201,7 @@ namespace os
           { addr_begin, static_cast<std::size_t> (static_cast<char*> (addr_end)
               - static_cast<char*> (addr_begin)) }
     {
-      ;
+      assert(addr_begin < addr_end);
     }
 
   // --------------------------------------------------------------------------

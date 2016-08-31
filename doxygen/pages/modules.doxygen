@@ -582,6 +582,49 @@ os_main (int argc, char* argv[])
  @endcode
  */
 
+/**
+ @defgroup cmsis-plus-rtos-memres Memory management
+ @ingroup cmsis-plus-rtos
+ @brief  C++ API memory management definitions.
+ @details
+ The CMSIS++ RTOS includes several very advanced and flexible 
+ memory management features.
+ 
+ First, it defines a configurable memory manager for the application
+ free store (also known as the "heap"). 
+
+ Second, it defines a separate memory manager to be used by the 
+ RTOS system objects. This separate manager can also be configured
+ to use any allocation policy. It may use either a statically 
+ or a dynamically allocated area. 
+
+ Third, system objects that require dynamic memory may be created with
+ custom allocators, defined by the user.
+
+ Access to the application memory manager is done using the 
+ standard functions:
+
+ - `malloc()`/`free()` in C (fast, but not thread safe)
+ - `std::malloc()`/`std::free()` in C++ (fast, but not thread safe)
+ - `new`/`delete` in C++ (thread safe)
+
+ The default application memory manager is set in the
+ `os_startup_initialize_free_store()` function, called by the 
+ startup code when running on bare metal.
+
+ On synthetic POSIX platforms the default memory manager is 
+ malloc_memory_resource, which uses memory from the system free store.
+
+ By default the RTOS system memory manager is the same as the application
+ memory manager.
+
+ The basic memory management class is `memory_resource`, which will
+ be standard from C++17. The µOS++/CMSIS++ version of this class
+ includes several extensions, like a better exception processing and 
+ statistics. 
+  
+ */
+
 // ----------------------------------------------------------------------------
 
 /**
@@ -1269,6 +1312,52 @@ os_main (int argc, char* argv[])
  @endcode
  */
 
+/**
+ @defgroup cmsis-plus-rtos-c-memres Memory management
+ @ingroup cmsis-plus-rtos-c
+ @brief  C API memory management definitions.
+ @details
+
+ The CMSIS++ RTOS includes several very advanced and flexible 
+ memory management features.
+ 
+ First, it defines a configurable memory manager for the application
+ free store (also known as the "heap"). 
+
+ Second, it defines a separate memory manager to be used by the 
+ RTOS system objects. This separate manager can also be configured
+ to use any allocation policy. It may use either a statically 
+ or a dynamically allocated area. 
+
+ Third, system objects that require dynamic memory may be created with
+ custom allocators, defined by the user (available only in C++).
+
+ Access to the application memory manager is done using the 
+ standard functions:
+
+ - `malloc()`/`free()` in C (fast, but not thread safe)
+ 
+ The default application memory manager is set in the
+ `os_startup_initialize_free_store()` function, called by the 
+ startup code when running on bare metal.
+
+ On synthetic POSIX platforms the default memory manager is 
+ malloc_memory_resource, which uses memory from the system free store.
+
+ By default the RTOS system memory manager is the same as the application
+ memory manager.
+
+ The basic memory management class is `memory_resource`, which will
+ be standard from C++17. The µOS++/CMSIS++ version of this class
+ includes several extensions, like a better exception processing and 
+ statistics. 
+
+ Access to these classes from C can be done using the `os_memory_*()` 
+ functions.
+  
+ @see @ref cmsis-plus-rtos-memres "RTOS C++ API"
+
+ */
 // ----------------------------------------------------------------------------
 
 /**

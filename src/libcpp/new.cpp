@@ -42,6 +42,7 @@
  */
 
 #include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/estd/memory_resource>
 
 // ----------------------------------------------------------------------------
 
@@ -80,13 +81,9 @@ namespace std
   {
     new_handler prev_handler;
 
-    // ----- Begin of critical section ----------------------------------------
-    rtos::scheduler::critical_section scs;
-
     prev_handler = __new_handler;
     __new_handler = handler;
 
-    // ----- End of critical section ------------------------------------------
     return prev_handler;
   }
 
@@ -127,7 +124,7 @@ operator new (std::size_t size)
 
   while (true)
     {
-      void* p = estd::get_default_resource ()->allocate (std::nothrow, size);
+      void* p = estd::pmr::get_default_resource ()->allocate (size);
 
       if (p != nullptr)
         {
@@ -142,7 +139,7 @@ operator new (std::size_t size)
         }
       else
         {
-          estd::__throw_bad_alloc (ENOMEM, "new() failed");
+          estd::__throw_bad_alloc ();
         }
     }
 
@@ -178,7 +175,7 @@ operator new (std::size_t size, const std::nothrow_t&) noexcept
 
   while (true)
     {
-      void* p = estd::get_default_resource ()->allocate (std::nothrow, size);
+      void* p = estd::pmr::get_default_resource ()->allocate (size);
 
       if (p != nullptr)
         {
@@ -262,7 +259,7 @@ operator delete (void* ptr) noexcept
       rtos::scheduler::critical_section cs;
 
       // The unknown size is passed as 0.
-      estd::get_default_resource ()->deallocate (ptr, 0);
+      estd::pmr::get_default_resource ()->deallocate (ptr, 0);
       // ----- End of critical section ----------------------------------------
     }
 }
@@ -282,7 +279,7 @@ operator delete (void* ptr, std::size_t size) noexcept
       // ----- Begin of critical section --------------------------------------
       rtos::scheduler::critical_section cs;
 
-      estd::get_default_resource ()->deallocate (ptr, size);
+      estd::pmr::get_default_resource ()->deallocate (ptr, size);
       // ----- End of critical section ----------------------------------------
     }
 }
@@ -308,7 +305,7 @@ operator delete (void* ptr, const std::nothrow_t&) noexcept
       // ----- Begin of critical section --------------------------------------
       rtos::scheduler::critical_section cs;
 
-      estd::get_default_resource ()->deallocate (std::nothrow, ptr, 0);
+      estd::pmr::get_default_resource ()->deallocate (ptr, 0);
       // ----- End of critical section ----------------------------------------
     }
 }

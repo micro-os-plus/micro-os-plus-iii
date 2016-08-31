@@ -1427,9 +1427,37 @@ extern "C"
   void
   os_rtc_handler (void);
 
-/**
- * @}
- */
+  /**
+   * @}
+   */
+
+  /**
+   * @}
+   */
+
+  // ==========================================================================
+  /**
+   * @addtogroup cmsis-plus-rtos-c-memres
+   * @{
+   */
+
+  /**
+   * @brief Memory resource object storage.
+   * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   * @details
+   * A pointer to this structure can be used as a pointer to the
+   * `os::rtos::memory::memory_resource` object.
+   *
+   * The members of this structure are hidden and should not
+   * be used directly, but only through specific functions.
+   *
+   * @see os::rtos::memory::memory_resource
+   */
+
+  typedef struct os_memory_s
+  {
+    char dummy; // Content is not relevant.
+  } os_memory_t;
 
 /**
  * @}

@@ -42,20 +42,6 @@ namespace os
      * This memory manager was inspired by the **newlib nano**
      * implementation of `malloc()` & `free()`.
      *
-     * `allocate()` tries to be fast and grasps the first block
-     * large enough, possibly splitting large blocks and increasing
-     * fragmentation. If the block is only slightly larger
-     * (the remaining space is not large enough for a minimum chunk)
-     * the block is not split, but left partly unused.
-     *
-     * When large blocks are split, the top sub-block is returned;
-     * in other words, memory is allocated bottom-down. This speeds
-     * up deallocation for blocks allocated recently.
-     *
-     * The free list is kept ordered by addresses, which means
-     * `deallocate()` will need to traverse part of it, the older
-     * the chunk, the longer the traversal.
-     *
      * Neither allocation nor deallocation are deterministic, but are
      * reasonably fast.
      */
@@ -64,9 +50,7 @@ namespace os
     {
       assert(size > block_minchunk);
 
-#if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
       trace::printf ("%s(%p,%u) @%p \n", __func__, addr, size, this);
-#endif
 
       addr_ = addr;
       size_ = size;
@@ -92,88 +76,104 @@ namespace os
 
     newlib_nano_malloc::~newlib_nano_malloc ()
     {
-#if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
       trace::printf ("%s() @%p \n", __func__, this);
-#endif
     }
 
+    /**
+     * @details
+     * The allocator tries to be fast and grasps the first block
+     * large enough, possibly splitting large blocks and increasing
+     * fragmentation. If the block is only slightly larger
+     * (the remaining space is not large enough for a minimum chunk)
+     * the block is not split, but left partly unused.
+     *
+     * When large blocks are split, the top sub-block is returned;
+     * in other words, memory is allocated bottom-down. This speeds
+     * up deallocation for blocks allocated recently.
+     *
+     * @par Exceptions
+     *   Throws nothing itself, but the out of memory handler may
+     *   throw `bad_alloc()`.
+     */
     void*
-    newlib_nano_malloc::do_allocate (std::size_t bytes, std::size_t alignment)
+    newlib_nano_malloc::do_allocate (
+        std::size_t bytes, std::size_t alignment __attribute__((unused)))
     {
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
       trace::printf ("%s(%u,%u)\n", __func__, bytes, alignment);
 #endif
 
-      bool do_not_throw = false;
-      if ((alignment & no_throw) != 0)
-        {
-          do_not_throw = true;
-          alignment &= ~no_throw;
-        }
-
       // TODO: consider `alignment` if > block_align.
 
-      std::size_t alloc_size = do_align (bytes, chunk_align);
+      std::size_t alloc_size = align (bytes, chunk_align);
       alloc_size += block_padding;
       alloc_size += chunk_offset;
 
       alloc_size = os::rtos::memory::max (alloc_size, block_minchunk);
 
-      chunk_t* prev_chunk = free_list_;
-      chunk_t* chunk = prev_chunk;
+      chunk_t* chunk;
 
-      while (chunk)
+      while (true)
         {
-          int rem = static_cast<int> (chunk->size - alloc_size);
-          if (rem >= 0)
+          chunk_t* prev_chunk = free_list_;
+          chunk = prev_chunk;
+
+          while (chunk)
             {
-              if ((static_cast<std::size_t> (rem)) >= block_minchunk)
+              int rem = static_cast<int> (chunk->size - alloc_size);
+              if (rem >= 0)
                 {
-                  // Found a chunk that is much larger than required size
-                  // (at least one more chunk is available);
-                  // break it into two chunks and return the second one.
-
-                  chunk->size = static_cast<std::size_t> (rem);
-                  chunk =
-                      reinterpret_cast<chunk_t *> (reinterpret_cast<char *> (chunk)
-                          + rem);
-                  chunk->size = alloc_size;
-                }
-              else
-                {
-                  // Found a chunk that is exactly the size or slightly
-                  // larger than the requested size; return this chunk.
-
-                  if (prev_chunk == chunk)
+                  if ((static_cast<std::size_t> (rem)) >= block_minchunk)
                     {
-                      // This implies p==r==free_list, i.e. the list head.
-                      // The next chunk becomes the first list element.
-                      free_list_ = chunk->next;
+                      // Found a chunk that is much larger than required size
+                      // (at least one more chunk is available);
+                      // break it into two chunks and return the second one.
 
-                      // If this was the last chunk, the free list is empty.
+                      chunk->size = static_cast<std::size_t> (rem);
+                      chunk =
+                          reinterpret_cast<chunk_t *> (reinterpret_cast<char *> (chunk)
+                              + rem);
+                      chunk->size = alloc_size;
                     }
                   else
                     {
-                      // Normal case. Remove it from the free_list.
-                      prev_chunk->next = chunk->next;
+                      // Found a chunk that is exactly the size or slightly
+                      // larger than the requested size; return this chunk.
+
+                      if (prev_chunk == chunk)
+                        {
+                          // This implies p==r==free_list, i.e. the list head.
+                          // The next chunk becomes the first list element.
+                          free_list_ = chunk->next;
+
+                          // If this was the last chunk, the free list is empty.
+                        }
+                      else
+                        {
+                          // Normal case. Remove it from the free_list.
+                          prev_chunk->next = chunk->next;
+                        }
                     }
+                  break;
                 }
+              prev_chunk = chunk;
+              chunk = chunk->next;
+            }
+
+          if (chunk != nullptr)
+            {
               break;
             }
-          prev_chunk = chunk;
-          chunk = chunk->next;
-        }
 
-      if (chunk == nullptr)
-        {
-          if (do_not_throw)
+          if (out_of_memory_handler_ == nullptr)
             {
               return nullptr;
             }
-          else
-            {
-              estd::__throw_bad_alloc (ENOMEM, "No more free space.");
-            }
+
+          out_of_memory_handler_ ();
+
+          // If the handler returned, assume it freed some memory
+          // and try again to allocate.
         }
 
       // Compute pointer to payload area.
@@ -211,33 +211,34 @@ namespace os
       return aligned_payload;
     }
 
+    /**
+     * @details
+     *
+     * The free list is kept ordered by addresses, which means
+     * `deallocate()` will need to traverse part of it, the older
+     * the chunk, the longer the traversal.
+     *
+     * @par Exceptions
+     *   Throws nothing.
+     */
     void
     newlib_nano_malloc::do_deallocate (void* addr, std::size_t bytes,
-                                       std::size_t alignment)
+                                       std::size_t alignment
+#if !defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
+                                       __attribute__((unused))
+#endif
+                                       ) noexcept
     {
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
       trace::printf ("%s(%p,%u,%u)\n", __func__, addr, bytes,
           alignment);
 #endif
 
-      bool do_not_throw = false;
-      if ((alignment & no_throw) != 0)
-        {
-          do_not_throw = true;
-          alignment &= ~no_throw;
-        }
-
       // The address must be inside the arena; no exceptions.
       if ((addr < addr_) || (addr > (static_cast<char*> (addr_) + size_)))
         {
-          if (do_not_throw)
-            {
-              return;
-            }
-          else
-            {
-              estd::__throw_bad_alloc (EINVAL, "Address out of arena.");
-            }
+          assert(false);
+          return;
         }
 
       // Compute the chunk address from the user address.
@@ -257,14 +258,8 @@ namespace os
           // (when called from free(), the size is not known).
           if (bytes + chunk_offset > chunk->size)
             {
-              if (do_not_throw)
-                {
-                  return;
-                }
-              else
-                {
-                  estd::__throw_bad_alloc (EINVAL, "Size larger than chunk.");
-                }
+              assert(false);
+              return;
             }
         }
 
@@ -354,8 +349,13 @@ namespace os
         }
     }
 
-  // --------------------------------------------------------------------------
+    std::size_t
+    newlib_nano_malloc::do_max_size (void) const noexcept
+    {
+      return size_;
+    }
 
+  // --------------------------------------------------------------------------
   } /* namespace memory */
 } /* namespace os */
 

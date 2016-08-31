@@ -30,6 +30,7 @@
 // ----------------------------------------------------------------------------
 
 #include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/estd/memory_resource>
 
 #include <malloc.h>
 
@@ -44,7 +45,7 @@ using namespace os;
 void*
 malloc (size_t bytes)
 {
-  void* mem = estd::get_default_resource ()->allocate (std::nothrow, bytes);
+  void* mem = estd::pmr::get_default_resource ()->allocate (bytes);
 
 #if defined(OS_TRACE_LIBC_MALLOC)
   trace::printf ("::%s(%d)=%mem\n", __func__, bytes, mem);
@@ -56,8 +57,7 @@ malloc (size_t bytes)
 void*
 calloc (size_t bytes, size_t elem)
 {
-  void* mem = estd::get_default_resource ()->allocate (std::nothrow,
-                                                       bytes * elem);
+  void* mem = estd::pmr::get_default_resource ()->allocate (bytes * elem);
 
 #if defined(OS_TRACE_LIBC_MALLOC)
   trace::printf ("::%s(%u,%u)=%mem\bytes", __func__, bytes, elem, mem);
@@ -106,7 +106,8 @@ free (void* ptr)
   trace::printf ("::%s(%p)\n", __func__, ptr);
 #endif
 
-  return estd::get_default_resource ()->deallocate (std::nothrow, ptr, 0);
+  // Size unknown, pass 0.
+  estd::pmr::get_default_resource ()->deallocate (ptr, 0);
 }
 
 // ----------------------------------------------------------------------------

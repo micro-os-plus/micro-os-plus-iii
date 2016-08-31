@@ -58,9 +58,13 @@ os_startup_initialize_free_store (void* heap_begin, void* heap_end)
   new (&free_store) free_store_memory_resource
     { heap_begin, heap_end };
 
+  // Configure the memory manager to throw an exception when out of memory.
+  reinterpret_cast<rtos::memory::memory_resource*> (&free_store)->out_of_memory_handler (
+      estd::__throw_bad_alloc);
+
   // Set application memory manager.
-  estd::set_default_resource (
-      reinterpret_cast<estd::memory_resource*> (&free_store));
+  estd::pmr::set_default_resource (
+      reinterpret_cast<estd::pmr::memory_resource*> (&free_store));
 
   // Set RTOS system memory manager.
   rtos::memory::set_default_resource (

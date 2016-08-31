@@ -87,6 +87,8 @@ namespace os
     class thread;
     class timer;
 
+    // ------------------------------------------------------------------------
+
     namespace memory
     {
       template<typename T>
@@ -214,6 +216,8 @@ namespace os
 
     } /* namespace scheduler */
 
+    // ------------------------------------------------------------------------
+
     /**
      * @brief Statistics namespace.
      * @ingroup cmsis-plus-rtos-core
@@ -231,6 +235,8 @@ namespace os
       using duration_t = uint64_t;
 
     } /* namespace statistics */
+
+    // ------------------------------------------------------------------------
 
     /**
      * @brief Interrupts namespace.
@@ -330,6 +336,8 @@ namespace os
 
     } /* namespace flags */
 
+    // ------------------------------------------------------------------------
+
     /**
      * @brief A convenience namespace to access the current running thread.
      * @ingroup cmsis-plus-rtos-thread
@@ -337,6 +345,8 @@ namespace os
     namespace this_thread
     {
     }
+
+    // ------------------------------------------------------------------------
 
     /**
      * @brief A namespace to group all internal implementation objects.
@@ -513,6 +523,90 @@ namespace os
       };
     } /* namespace internal */
 
+    // ========================================================================
+
+    /**
+     * @brief Null locker.
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
+     * @details
+     * This dummy object can be passed as parameter to templates
+     * requiring a lockable, but it does nothing.
+     */
+    class null_locker
+    {
+    public:
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+      /**
+       * @brief Construct a null lockable object instance.
+       * @par Parameters
+       *  None
+       */
+
+      constexpr
+      null_locker ();
+
+      /**
+       * @cond ignore
+       */
+
+      null_locker (const null_locker&) = delete;
+      null_locker (null_locker&&) = delete;
+      null_locker&
+      operator= (const null_locker&) = delete;
+      null_locker&
+      operator= (null_locker&&) = delete;
+
+      /**
+       * @endcond
+       */
+
+      /**
+       * @brief Destruct the null lockable object instance.
+       */
+      ~null_locker ();
+
+      /**
+       * @}
+       */
+
+    public:
+
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+      /**
+       * @brief Pretend to lock scheduler.
+       * @par Parameters
+       *  None
+       * @par Returns
+       *  Nothing
+       */
+      void
+      lock (void);
+
+      /**
+       * @brief Pretend to unlock the scheduler.
+       * @par Parameters
+       *  None
+       * @par Returns
+       *  Nothing
+       */
+      void
+      unlock (void);
+
+      /**
+       * @}
+       */
+
+    };
+
   // ==========================================================================
   } /* namespace rtos */
 } /* namespace os */
@@ -523,9 +617,29 @@ namespace os
 {
   namespace rtos
   {
+    // ========================================================================
+
+    inline
+    null_locker::~null_locker ()
+    {
+      ;
+    }
+
+    inline void
+    null_locker::lock (void)
+    {
+      ; // Does nothing.
+    }
+
+    inline void
+    null_locker::unlock (void)
+    {
+      ; // Does nothing.
+    }
+
     namespace internal
     {
-      // ----------------------------------------------------------------------
+      // ======================================================================
 
       /**
        * @details
@@ -576,6 +690,8 @@ namespace os
       class message_queue;
       class event_flags;
 
+      // ======================================================================
+
       namespace clock
       {
         /**
@@ -596,6 +712,8 @@ namespace os
 
         using offset_t = int64_t;
       } /* namespace clock */
+
+      // ----------------------------------------------------------------------
 
       namespace interrupts
       {
@@ -641,6 +759,8 @@ namespace os
 
       } /* namespace interrupts */
 
+      // ----------------------------------------------------------------------
+
       namespace scheduler
       {
 
@@ -675,6 +795,8 @@ namespace os
         _wait_for_interrupt (void);
 
       } /* namespace scheduler */
+
+      // ----------------------------------------------------------------------
 
       namespace this_thread
       {
@@ -769,6 +891,8 @@ namespace os
 
       };
 
+      // ======================================================================
+
       class clock_rtc
       {
       public:
@@ -785,6 +909,8 @@ namespace os
         internal_interrupt_service_routine (void);
 
       };
+
+      // ======================================================================
 
       class clock_highres
       {
@@ -804,6 +930,8 @@ namespace os
         static uint32_t
         input_clock_frequency_hz (void);
       };
+
+    // ========================================================================
 
     } /* namespace port */
   } /* namespace rtos */
