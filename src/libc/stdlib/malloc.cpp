@@ -40,16 +40,24 @@ using namespace os;
 
 // ----------------------------------------------------------------------------
 
-// These functions are not thread safe.
+// These library functions were modified to use the application
+// memory resource and to be thread safe.
 
 void*
 malloc (size_t bytes)
 {
-  void* mem = estd::pmr::get_default_resource ()->allocate (bytes);
+  void* mem;
+    {
+      // ----- Begin of critical section --------------------------------------
+      rtos::scheduler::critical_section scs;
+
+      mem = estd::pmr::get_default_resource ()->allocate (bytes);
 
 #if defined(OS_TRACE_LIBC_MALLOC)
-  trace::printf ("::%s(%d)=%mem\n", __func__, bytes, mem);
+      trace::printf ("::%s(%d)=%p\n", __func__, bytes, mem);
 #endif
+      // ----- End of critical section ----------------------------------------
+    }
 
   return mem;
 }
@@ -57,11 +65,18 @@ malloc (size_t bytes)
 void*
 calloc (size_t bytes, size_t elem)
 {
-  void* mem = estd::pmr::get_default_resource ()->allocate (bytes * elem);
+  void* mem;
+    {
+      // ----- Begin of critical section --------------------------------------
+      rtos::scheduler::critical_section scs;
+
+      mem = estd::pmr::get_default_resource ()->allocate (bytes * elem);
 
 #if defined(OS_TRACE_LIBC_MALLOC)
-  trace::printf ("::%s(%u,%u)=%mem\bytes", __func__, bytes, elem, mem);
+      trace::printf ("::%s(%u,%u)=%p\n", __func__, bytes, elem, mem);
 #endif
+      // ----- End of critical section ----------------------------------------
+    }
 
   if (mem != NULL)
     memset (mem, 0, bytes * elem);
@@ -74,40 +89,64 @@ realloc (void* ptr, size_t size)
 {
   void* mem;
 
-  if (ptr == NULL)
-    return malloc (size);
-
-  if (size == 0)
     {
-      free (ptr);
-      return NULL;
-    }
+      // ----- Begin of critical section --------------------------------------
+      rtos::scheduler::critical_section scs;
+
+      if (ptr == NULL)
+        {
+          mem = estd::pmr::get_default_resource ()->allocate (size);
+#if defined(OS_TRACE_LIBC_MALLOC)
+          trace::printf ("::%s(%p,%u)=%p\n", __func__, ptr, size, mem);
+#endif
+          return malloc (size);
+        }
+
+      if (size == 0)
+        {
+          estd::pmr::get_default_resource ()->deallocate (ptr, 0);
+#if defined(OS_TRACE_LIBC_MALLOC)
+          trace::printf ("::%s(%p,%u)=0\n", __func__, ptr, size);
+#endif
+          return NULL;
+        }
 
 #if 0
-  /* TODO: There is chance to shrink the chunk if newly requested
-   * size is much small */
-  if (nano_malloc_usable_size (RCALL ptr) >= size)
-  return ptr;
+      /* TODO: There is chance to shrink the chunk if newly requested
+       * size is much small */
+      if (nano_malloc_usable_size (RCALL ptr) >= size)
+      return ptr;
 #endif
 
-  mem = malloc (size);
-  if (mem != NULL)
-    {
-      memcpy (mem, ptr, size);
-      free (ptr);
+      mem = estd::pmr::get_default_resource ()->allocate (size);
+      if (mem != NULL)
+        {
+          memcpy (mem, ptr, size);
+          estd::pmr::get_default_resource ()->deallocate (ptr, 0);
+        }
+
+#if defined(OS_TRACE_LIBC_MALLOC)
+      trace::printf ("::%s(%p,%u)=%p", __func__, ptr, size, mem);
+#endif
+      // ----- End of critical section ----------------------------------------
     }
+
   return mem;
 }
 
 void
 free (void* ptr)
 {
+  // ----- Begin of critical section ------------------------------------------
+  rtos::scheduler::critical_section scs;
+
 #if defined(OS_TRACE_LIBC_MALLOC)
   trace::printf ("::%s(%p)\n", __func__, ptr);
 #endif
 
   // Size unknown, pass 0.
   estd::pmr::get_default_resource ()->deallocate (ptr, 0);
+  // ----- End of critical section --------------------------------------------
 }
 
 // ----------------------------------------------------------------------------
