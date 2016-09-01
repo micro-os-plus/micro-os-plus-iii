@@ -68,12 +68,12 @@ namespace os
       // memory_resource* default_resource __attribute__((weak)) = &malloc_res;
 
       memory_resource*
-      set_default_resource (memory_resource* r) noexcept
+      set_default_resource (memory_resource* res) noexcept
       {
-        trace::printf ("estd::%s(%p) \n", __func__, r);
+        trace::printf ("estd::pmr::%s(%p) \n", __func__, res);
 
         memory_resource* old = default_resource;
-        default_resource = r;
+        default_resource = res;
 
         return old;
       }
