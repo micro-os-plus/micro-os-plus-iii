@@ -569,7 +569,7 @@
 #define OS_TRACE_RTOS_LISTS
 
 /**
- * @brief Enable trace messages for memory allocators.
+ * @brief Enable trace messages for C memory allocators.
  */
 #define OS_TRACE_LIBC_MALLOC
 
@@ -577,6 +577,16 @@
  * @brief Enable trace messages for the atexit() function.
  */
 #define OS_TRACE_LIBC_ATEXIT
+
+/**
+ * @brief Enable trace messages for C++ memory allocators.
+ */
+#define OS_TRACE_LIBCPP_OPERATOR_NEW
+
+/**
+ * @brief Enable trace messages for memory resource managers.
+ */
+#define OS_TRACE_LIBCPP_MEMORY_RESOURCE
 
 /**
  * @brief Define the ITM stimulus port used for the trace messages.

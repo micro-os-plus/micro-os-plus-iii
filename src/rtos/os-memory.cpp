@@ -454,6 +454,38 @@ namespace os
         return 0;
       }
 
+      /**
+       * @details
+       * The default implementation of this virtual function
+       * does nothing.
+       *
+       * Override this function to perform the action.
+       *
+       * @par Standard compliance
+       *   Extension to standard.
+       */
+      void
+      memory_resource::do_reset (void) noexcept
+      {
+        return;
+      }
+
+      /**
+       * @details
+       * The default implementation of this virtual function returns
+       * false, meaning the operation was ineffective.
+       *
+       * Override this function to perform the action.
+       *
+       * @par Standard compliance
+       *   Extension to standard.
+       */
+      bool
+      memory_resource::do_coalesce (void) noexcept
+      {
+        return false;
+      }
+
     // ------------------------------------------------------------------------
 
     } /* namespace memory */
@@ -484,9 +516,10 @@ namespace os
 
 #if defined(__APPLE__) || defined(__linux__)
       memory_resource* default_resource __attribute__((weak))
-          = &rtos::memory::malloc_res;
+      = &rtos::memory::malloc_res;
 #else
-    memory_resource* default_resource __attribute__((weak)) = &rtos::memory::null_res;
+    memory_resource* default_resource __attribute__((weak))
+    = &rtos::memory::null_res;
 #endif
 
     /**

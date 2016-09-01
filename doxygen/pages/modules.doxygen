@@ -604,8 +604,8 @@ os_main (int argc, char* argv[])
  Access to the application memory manager is done using the 
  standard functions:
 
- - `malloc()`/`free()` in C (fast, but not thread safe)
- - `std::malloc()`/`std::free()` in C++ (fast, but not thread safe)
+ - `malloc()`/`free()` in C (thread safe)
+ - `std::malloc()`/`std::free()` in C++ (thread safe)
  - `new`/`delete` in C++ (thread safe)
 
  The default application memory manager is set in the
@@ -613,14 +613,14 @@ os_main (int argc, char* argv[])
  startup code when running on bare metal.
 
  On synthetic POSIX platforms the default memory manager is 
- malloc_memory_resource, which uses memory from the system free store.
+ `malloc_memory_resource`, which uses memory from the system free store.
 
  By default the RTOS system memory manager is the same as the application
  memory manager.
 
  The basic memory management class is `memory_resource`, which will
  be standard from C++17. The µOS++/CMSIS++ version of this class
- includes several extensions, like a better exception processing and 
+ includes several extensions, like out of memory processing and 
  statistics. 
   
  */
@@ -1335,27 +1335,47 @@ os_main (int argc, char* argv[])
  Access to the application memory manager is done using the 
  standard functions:
 
- - `malloc()`/`free()` in C (fast, but not thread safe)
+ - `malloc()`/`free()` in C (thread safe)
  
  The default application memory manager is set in the
  `os_startup_initialize_free_store()` function, called by the 
  startup code when running on bare metal.
 
  On synthetic POSIX platforms the default memory manager is 
- malloc_memory_resource, which uses memory from the system free store.
+ `os::rtos::memory::malloc_memory_resource`, which uses memory 
+ from the system free store.
 
  By default the RTOS system memory manager is the same as the application
  memory manager.
 
- The basic memory management class is `memory_resource`, which will
+ The basic memory management class is `os::rtos::memory::memory_resource`, 
+ which will
  be standard from C++17. The µOS++/CMSIS++ version of this class
- includes several extensions, like a better exception processing and 
+ includes several extensions, like out of memory processing and 
  statistics. 
 
  Access to these classes from C can be done using the `os_memory_*()` 
  functions.
   
  @see @ref cmsis-plus-rtos-memres "RTOS C++ API"
+
+ @code{.c}
+int
+os_main (int argc, char* argv[])
+{
+  os_memory_t* mem;
+
+  // Get the memory resource used to manage the application free store.
+  mem = os_memory_get_default();
+
+  void* p;
+  p = os_memory_allocate(mem, 123, 8);
+  os_memory_deallocate(mem, p, 123, 8);
+
+  // Print some memory resource statistics.
+  trace_printf("%u\n", os_memory_get_free_bytes(mem));
+}
+ @endcode
 
  */
 // ----------------------------------------------------------------------------

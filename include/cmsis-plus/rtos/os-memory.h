@@ -168,7 +168,7 @@ namespace os
 
         /**
          * @brief Compare for equality with another `memory_resource`.
-         * @param other
+         * @param other Reference to another `memory_resource`.
          * @retval true The `memory_resource` objects are equal.
          * @retval false The `memory_resource` objects are not equal.
          */
@@ -176,7 +176,29 @@ namespace os
         is_equal (memory_resource const & other) const noexcept;
 
         /**
+         * @brief Reset the memory manager to the initial status.
+         * @par Parameters
+         *  None
+         * @par Returns
+         *  Nothing.
+         */
+        void
+        reset (void) noexcept;
+
+        /**
+         * @brief Coalesce free blocks.
+         * @par Parameters
+         *  None
+         * @retval true if the operation freed more memory.
+         * @retval false if the operation was ineffective.
+         */
+        bool
+        coalesce (void) noexcept;
+
+        /**
          * @brief The largest value that can be passed to `allocate()`.
+         * @par Parameters
+         *  None
          * @return Number of bytes or 0 if unknown.
          */
         std::size_t
@@ -192,10 +214,55 @@ namespace os
 
         /**
          * @brief Get the out of memory handler.
+         * @par Parameters
+         *  None
          * @return Pointer to existing handler.
          */
         out_of_memory_handler_t
         out_of_memory_handler (void);
+
+        /**
+         * @brief Get total size of managed memory.
+         * @return Number of bytes.
+         */
+        std::size_t
+        total_bytes (void);
+
+        /**
+         * @brief Get total size of allocated chunks.
+         * @par Parameters
+         *  None
+         * @return Number of bytes.
+         */
+        std::size_t
+        allocated_bytes (void);
+
+        /**
+         * @brief Get total size of free chunks.
+         * @par Parameters
+         *  None
+         * @return Number of bytes.
+         */
+        std::size_t
+        free_bytes (void);
+
+        /**
+         * @brief Get number of allocated chunks.
+         * @par Parameters
+         *  None
+         * @return Number of chunks.
+         */
+        std::size_t
+        allocated_chunks (void);
+
+        /**
+         * @brief Get number of free chunks.
+         * @par Parameters
+         *  None
+         * @return Number of chunks.
+         */
+        std::size_t
+        free_chunks (void);
 
         /**
          * @}
@@ -240,10 +307,32 @@ namespace os
 
         /**
          * @brief Implementation of the function to get max size.
+         * @par Parameters
+         *  None
          * @return Integer with size in bytes, or 0 if unknown.
          */
         virtual std::size_t
         do_max_size (void) const noexcept;
+
+        /**
+         * @brief Implementation of the function to reset the memory manager.
+         * @par Parameters
+         *  None
+         * @par Returns
+         *  Nothing.
+         */
+        virtual void
+        do_reset (void) noexcept;
+
+        /**
+         * @brief Implementation of the function to coalesce free blocks.
+         * @par Parameters
+         *  None
+         * @retval true if the operation resulted in larger blocks.
+         * @retval false if the operation was ineffective.
+         */
+        virtual bool
+        do_coalesce (void) noexcept;
 
         /**
          * @brief Helper function to align size values.
@@ -265,6 +354,12 @@ namespace os
          */
 
         out_of_memory_handler_t out_of_memory_handler_ = nullptr;
+
+        std::size_t total_bytes_ = 0;
+        std::size_t allocated_bytes_ = 0;
+        std::size_t free_bytes_ = 0;
+        std::size_t allocated_chunks_ = 0;
+        std::size_t free_chunks_ = 0;
 
         /**
          * @endcond
@@ -598,6 +693,33 @@ namespace os
       /**
        * @details
        *
+       * @see do_reset();
+       */
+      inline void
+      memory_resource::reset (void) noexcept
+      {
+        do_reset ();
+      }
+
+      /**
+       * @details
+       * In case the memory manager does not coalesce during deallocation,
+       * traverse the list of free blocks and coalesce.
+       *
+       * Return `true` if the operation was successful and at least
+       * one larger block resulted.
+       *
+       * @see do_coalesce();
+       */
+      inline bool
+      memory_resource::coalesce (void) noexcept
+      {
+        return do_coalesce ();
+      }
+
+      /**
+       * @details
+       *
        * @par Standard compliance
        *   Extension to standard.
        */
@@ -634,6 +756,36 @@ namespace os
       memory_resource::out_of_memory_handler (void)
       {
         return out_of_memory_handler_;
+      }
+
+      inline std::size_t
+      memory_resource::total_bytes (void)
+      {
+        return total_bytes_;
+      }
+
+      inline std::size_t
+      memory_resource::allocated_bytes (void)
+      {
+        return allocated_bytes_;
+      }
+
+      inline std::size_t
+      memory_resource::free_bytes (void)
+      {
+        return free_bytes_;
+      }
+
+      inline std::size_t
+      memory_resource::allocated_chunks (void)
+      {
+        return allocated_chunks_;
+      }
+
+      inline std::size_t
+      memory_resource::free_chunks (void)
+      {
+        return free_chunks_;
       }
 
       // ======================================================================

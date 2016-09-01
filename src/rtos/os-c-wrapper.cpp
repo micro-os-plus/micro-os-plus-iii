@@ -2785,6 +2785,169 @@ os_evflags_are_waiting (os_evflags_t* evflags)
   return (reinterpret_cast<event_flags&> (*evflags)).waiting ();
 }
 
+// --------------------------------------------------------------------------
+
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::memory::get_default_resource()
+ */
+os_memory_t*
+os_memory_get_default (void)
+{
+  return reinterpret_cast<os_memory_t*> (rtos::memory::get_default_resource ());
+}
+
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ * @warning Not thread safe, use critical sections to protect it.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::memory::memory_resource::allocate()
+ */
+void*
+os_memory_allocate (os_memory_t* memory, size_t bytes, size_t alignment)
+{
+  assert(memory != nullptr);
+  return (reinterpret_cast<rtos::memory::memory_resource&> (*memory)).allocate (
+      bytes, alignment);
+}
+
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ * @warning Not thread safe, use critical sections to protect it.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::memory::memory_resource::deallocate()
+ */
+void
+os_memory_deallocate (os_memory_t* memory, void* addr, size_t bytes,
+                      size_t alignment)
+{
+  assert(memory != nullptr);
+  (reinterpret_cast<rtos::memory::memory_resource&> (*memory)).deallocate (
+      addr, bytes, alignment);
+}
+
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ * @warning Not thread safe, use critical sections to protect it.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::memory::memory_resource::reset()
+ */
+void
+os_memory_reset (os_memory_t* memory)
+{
+  assert(memory != nullptr);
+  (reinterpret_cast<rtos::memory::memory_resource&> (*memory)).reset ();
+}
+
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ * @warning Not thread safe, use critical sections to protect it.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::memory::memory_resource::coalesce()
+ */
+bool
+os_memory_coalesce (os_memory_t* memory)
+{
+  assert(memory != nullptr);
+  return (reinterpret_cast<rtos::memory::memory_resource&> (*memory)).coalesce ();
+}
+
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ * @warning Not thread safe, use critical sections to protect it.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::memory::memory_resource::total_bytes()
+ */
+size_t
+os_memory_get_total_bytes (os_memory_t* memory)
+{
+  assert(memory != nullptr);
+  return (reinterpret_cast<rtos::memory::memory_resource&> (*memory)).total_bytes ();
+}
+
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ * @warning Not thread safe, use critical sections to protect it.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::memory::memory_resource::allocated_bytes()
+ */
+size_t
+os_memory_get_allocated_bytes (os_memory_t* memory)
+{
+  assert(memory != nullptr);
+  return (reinterpret_cast<rtos::memory::memory_resource&> (*memory)).allocated_bytes ();
+}
+
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ * @warning Not thread safe, use critical sections to protect it.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::memory::memory_resource::free_bytes()
+ */
+size_t
+os_memory_get_free_bytes (os_memory_t* memory)
+{
+  assert(memory != nullptr);
+  return (reinterpret_cast<rtos::memory::memory_resource&> (*memory)).free_bytes ();
+}
+
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ * @warning Not thread safe, use critical sections to protect it.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::memory::memory_resource::allocated_chunks()
+ */
+size_t
+os_memory_get_allocated_chunks (os_memory_t* memory)
+{
+  assert(memory != nullptr);
+  return (reinterpret_cast<rtos::memory::memory_resource&> (*memory)).allocated_chunks ();
+}
+
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ * @warning Not thread safe, use critical sections to protect it.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::memory::memory_resource::free_chunks()
+ */
+size_t
+os_memory_get_free_chunks (os_memory_t* memory)
+{
+  assert(memory != nullptr);
+  return (reinterpret_cast<rtos::memory::memory_resource&> (*memory)).free_chunks ();
+}
+
 // ****************************************************************************
 // ***** Legacy CMSIS RTOS implementation *****
 

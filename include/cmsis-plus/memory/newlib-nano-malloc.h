@@ -68,9 +68,9 @@ namespace os
       /**
        * @brief Construct a memory resource object instance.
        * @param addr Begin of allocator arena.
-       * @param size Size of allocator arena, in bytes.
+       * @param bytes Size of allocator arena, in bytes.
        */
-      newlib_nano_malloc (void* addr, std::size_t size);
+      newlib_nano_malloc (void* addr, std::size_t bytes);
 
       /**
        * @cond ignore
@@ -128,10 +128,22 @@ namespace os
 
       /**
        * @brief Implementation of the function to get max size.
+       * @par Parameters
+       *  None
        * @return Integer with size in bytes, or 0 if unknown.
        */
       virtual std::size_t
       do_max_size (void) const noexcept override;
+
+      /**
+       * @brief Implementation of the function to reset the memory manager.
+       * @par Parameters
+       *  None
+       * @par Returns
+       *  Nothing.
+       */
+      virtual void
+      do_reset (void) noexcept override;
 
       /**
        * @}
@@ -172,7 +184,6 @@ namespace os
           + block_minsize;
 
       void* addr_;
-      std::size_t size_;
 
       chunk_t* free_list_;
 

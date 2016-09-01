@@ -73,6 +73,16 @@ namespace
 
     int code = os_main (main_args.argc, main_args.argv);
     trace::printf ("%s() exit = %d\n", __func__, code);
+
+#if defined(TRACE)
+
+    memory::memory_resource* mr = memory::get_default_resource ();
+    trace::printf ("memory %u,%u,%u,%u,%u\n", mr->total_bytes (),
+                   mr->allocated_bytes (), mr->free_bytes (),
+                   mr->allocated_chunks (), mr->free_chunks ());
+
+#endif /* defined(TRACE) */
+
     // Exit will run the atexit() and destructors, then
     // terminate gracefully.
     std::exit (code);

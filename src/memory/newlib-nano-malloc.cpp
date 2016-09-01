@@ -46,17 +46,33 @@ namespace os
      * reasonably fast.
      */
 
-    newlib_nano_malloc::newlib_nano_malloc (void* addr, std::size_t size)
+    newlib_nano_malloc::newlib_nano_malloc (void* addr, std::size_t bytes)
     {
-      assert(size > block_minchunk);
+      assert(bytes > block_minchunk);
 
-      trace::printf ("%s(%p,%u) @%p \n", __func__, addr, size, this);
+      trace::printf ("%s(%p,%u) @%p \n", __func__, addr, bytes, this);
 
       addr_ = addr;
-      size_ = size;
+      total_bytes_ = bytes;
 
-      void* align_addr = addr;
-      std::size_t align_sz = size;
+      // Qualified call of virtual function.
+      newlib_nano_malloc::reset ();
+    }
+
+    newlib_nano_malloc::~newlib_nano_malloc ()
+    {
+      trace::printf ("%s() @%p \n", __func__, this);
+    }
+
+    void
+    newlib_nano_malloc::do_reset (void) noexcept
+    {
+#if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
+      trace::printf ("%s() @%p \n", __func__, this);
+#endif
+
+      void* align_addr = addr_;
+      std::size_t align_sz = total_bytes_;
 
       // Align address for first chunk.
       void* res;
@@ -70,14 +86,18 @@ namespace os
       chunk_t* chunk = reinterpret_cast<chunk_t*> (align_addr);
       chunk->size = align_sz;
 
+      allocated_bytes_ = 0;
+      free_bytes_ = align_sz;
+      allocated_chunks_ = 0;
+      free_chunks_ = 1;
+
       // Remember first chunk as list head.
       free_list_ = chunk;
     }
 
-    newlib_nano_malloc::~newlib_nano_malloc ()
-    {
-      trace::printf ("%s() @%p \n", __func__, this);
-    }
+#pragma GCC diagnostic push
+// Needed because 'alignment' is used only in trace calls.
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 
     /**
      * @details
@@ -96,13 +116,8 @@ namespace os
      *   throw `bad_alloc()`.
      */
     void*
-    newlib_nano_malloc::do_allocate (
-        std::size_t bytes, std::size_t alignment __attribute__((unused)))
+    newlib_nano_malloc::do_allocate (std::size_t bytes, std::size_t alignment)
     {
-#if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
-      trace::printf ("%s(%u,%u)\n", __func__, bytes, alignment);
-#endif
-
       // TODO: consider `alignment` if > block_align.
 
       std::size_t alloc_size = align (bytes, chunk_align);
@@ -134,6 +149,9 @@ namespace os
                           reinterpret_cast<chunk_t *> (reinterpret_cast<char *> (chunk)
                               + rem);
                       chunk->size = alloc_size;
+
+                      // Splitting one chunk creates one more chunk.
+                      ++free_chunks_;
                     }
                   else
                     {
@@ -167,14 +185,30 @@ namespace os
 
           if (out_of_memory_handler_ == nullptr)
             {
+#if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
+              trace::printf ("%s(%u,%u)=0 @%p\n", __func__, bytes, alignment,
+                             this);
+#endif
+
               return nullptr;
             }
 
+#if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
+          trace::printf ("%s(%u,%u) @%p out of memory\n", __func__, bytes,
+                         alignment, this);
+#endif
           out_of_memory_handler_ ();
 
           // If the handler returned, assume it freed some memory
           // and try again to allocate.
         }
+
+      // Update statistics.
+      // What is subtracted from free is added to allocated.
+      allocated_bytes_ += chunk->size;
+      free_bytes_ -= chunk->size;
+      ++allocated_chunks_;
+      --free_chunks_;
 
       // Compute pointer to payload area.
       char* payload = reinterpret_cast<char *> (chunk) + chunk_offset;
@@ -204,8 +238,8 @@ namespace os
         }
 
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
-      trace::printf ("%s(%u,%u)=%p,%u\n", __func__, bytes, alignment,
-          aligned_payload, alloc_size);
+      trace::printf ("%s(%u,%u)=%p,%u @%p\n", __func__, bytes, alignment,
+                     aligned_payload, alloc_size, this);
 #endif
 
       return aligned_payload;
@@ -223,19 +257,16 @@ namespace os
      */
     void
     newlib_nano_malloc::do_deallocate (void* addr, std::size_t bytes,
-                                       std::size_t alignment
-#if !defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
-                                       __attribute__((unused))
-#endif
-                                       ) noexcept
+                                       std::size_t alignment) noexcept
     {
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
-      trace::printf ("%s(%p,%u,%u)\n", __func__, addr, bytes,
-          alignment);
+      trace::printf ("%s(%p,%u,%u) @%p\n", __func__, addr, bytes, alignment,
+                     this);
 #endif
 
       // The address must be inside the arena; no exceptions.
-      if ((addr < addr_) || (addr > (static_cast<char*> (addr_) + size_)))
+      if ((addr < addr_)
+          || (addr > (static_cast<char*> (addr_) + total_bytes_)))
         {
           assert(false);
           return;
@@ -263,6 +294,13 @@ namespace os
             }
         }
 
+      // Update statistics.
+      // What is subtracted from allocated is added to free.
+      allocated_bytes_ -= chunk->size;
+      free_bytes_ += chunk->size;
+      --allocated_chunks_;
+      ++free_chunks_;
+
       // If the free list is empty, create it with the current chunk, alone.
       if (free_list_ == nullptr)
         {
@@ -271,6 +309,8 @@ namespace os
 
           // The chunk becomes the first list element.
           free_list_ = chunk;
+          assert(free_chunks_ == 1);
+
           return;
         }
 
@@ -284,6 +324,9 @@ namespace os
               // Coalesce chunk to the list head.
               chunk->size += free_list_->size;
               chunk->next = free_list_->next;
+
+              // Coalescing means one less chunk.
+              --free_chunks_;
             }
           else
             {
@@ -292,6 +335,7 @@ namespace os
             }
           // The chunk becomes the new list head.
           free_list_ = chunk;
+
           return;
         }
 
@@ -317,6 +361,10 @@ namespace os
         {
           // Chunk to be freed is adjacent to a free chunk before it.
           prev_chunk->size += chunk->size;
+
+          // Coalescing means one less chunk.
+          --free_chunks_;
+
           // If the merged chunk is also adjacent to the chunk after it,
           // merge again.
           if (reinterpret_cast<char *> (prev_chunk) + prev_chunk->size
@@ -324,12 +372,26 @@ namespace os
             {
               prev_chunk->size += next_chunk->size;
               prev_chunk->next = next_chunk->next;
+
+              // Coalescing means one less chunk.
+              --free_chunks_;
             }
         }
       else if (reinterpret_cast<char *> (prev_chunk) + prev_chunk->size
           > reinterpret_cast<char *> (chunk))
         {
           // Already freed.
+
+          // Revert statistics.
+          // What is subtracted from free is added to allocated.
+          allocated_bytes_ += chunk->size;
+          free_bytes_ -= chunk->size;
+          ++allocated_chunks_;
+          --free_chunks_;
+
+          trace::printf ("%s(%p,%u,%u) @%p already freed\n", __func__, addr,
+                         bytes, alignment, this);
+
           return;
         }
       else if (reinterpret_cast<char *> (chunk) + chunk->size
@@ -339,6 +401,9 @@ namespace os
           chunk->size += next_chunk->size;
           chunk->next = next_chunk->next;
           prev_chunk->next = chunk;
+
+          // Coalescing means one less chunk.
+          --free_chunks_;
         }
       else
         {
@@ -352,8 +417,10 @@ namespace os
     std::size_t
     newlib_nano_malloc::do_max_size (void) const noexcept
     {
-      return size_;
+      return total_bytes_;
     }
+
+#pragma GCC diagnostic pop
 
   // --------------------------------------------------------------------------
   } /* namespace memory */
