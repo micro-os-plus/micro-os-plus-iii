@@ -58,7 +58,7 @@ namespace
    * The initial new_handler is a null pointer, initialised as
    * part of the .bss section.
    */
-  std::new_handler __new_handler;
+  std::new_handler new_handler_;
 }
 
 namespace std
@@ -79,10 +79,12 @@ namespace std
   new_handler
   set_new_handler (new_handler handler) noexcept
   {
+    trace::printf ("std::%s(%p) \n", __func__, handler);
+
     new_handler prev_handler;
 
-    prev_handler = __new_handler;
-    __new_handler = handler;
+    prev_handler = new_handler_;
+    new_handler_ = handler;
 
     return prev_handler;
   }
@@ -90,7 +92,7 @@ namespace std
   new_handler
   get_new_handler () noexcept
   {
-    return __new_handler;
+    return new_handler_;
   }
 
 } /* namespace std */
@@ -112,30 +114,33 @@ namespace std
  */
 void *
 __attribute__((weak))
-operator new (std::size_t size)
+operator new (std::size_t bytes)
 {
-  if (size == 0)
+  if (bytes == 0)
     {
-      size = 1;
+      bytes = 1;
     }
 
   // ----- Begin of critical section ------------------------------------------
-  rtos::scheduler::critical_section cs;
+  rtos::scheduler::critical_section scs;
 
   while (true)
     {
-      void* p = estd::pmr::get_default_resource ()->allocate (size);
+      void* mem = estd::pmr::get_default_resource ()->allocate (bytes);
 
-      if (p != nullptr)
+      if (mem != nullptr)
         {
-          return p;
+#if defined(OS_TRACE_LIBCPP_OPERATOR_NEW)
+          trace::printf ("::%s(%d)=%p\n", __func__, bytes, mem);
+#endif
+          return mem;
         }
 
       // If allocate() fails and there is a new_handler,
       // call it to try free up memory.
-      if (__new_handler)
+      if (new_handler_)
         {
-          __new_handler ();
+          new_handler_ ();
         }
       else
         {
@@ -163,30 +168,33 @@ operator new (std::size_t size)
  */
 void*
 __attribute__((weak))
-operator new (std::size_t size, const std::nothrow_t&) noexcept
+operator new (std::size_t bytes, const std::nothrow_t&) noexcept
 {
-  if (size == 0)
+  if (bytes == 0)
     {
-      size = 1;
+      bytes = 1;
     }
 
   // ----- Begin of critical section ------------------------------------------
-  rtos::scheduler::critical_section cs;
+  rtos::scheduler::critical_section scs;
 
   while (true)
     {
-      void* p = estd::pmr::get_default_resource ()->allocate (size);
+      void* mem = estd::pmr::get_default_resource ()->allocate (bytes);
 
-      if (p != nullptr)
+      if (mem != nullptr)
         {
-          return p;
+#if defined(OS_TRACE_LIBCPP_OPERATOR_NEW)
+          trace::printf ("::%s(%d)=%p\n", __func__, bytes, mem);
+#endif
+          return mem;
         }
 
       // If allocate() fails and there is a new_handler,
       // call it to try free up memory.
-      if (__new_handler)
+      if (new_handler_)
         {
-          __new_handler ();
+          new_handler_ ();
         }
       else
         {
@@ -210,9 +218,9 @@ operator new (std::size_t size, const std::nothrow_t&) noexcept
  */
 void*
 __attribute__((weak))
-operator new[] (std::size_t size)
+operator new[] (std::size_t bytes)
 {
-  return ::operator new (size);
+  return ::operator new (bytes);
 }
 
 /**
@@ -226,9 +234,9 @@ operator new[] (std::size_t size)
  */
 void*
 __attribute__((weak))
-operator new[] (std::size_t size, const std::nothrow_t&) noexcept
+operator new[] (std::size_t bytes, const std::nothrow_t&) noexcept
 {
-  return ::operator new (size, std::nothrow);
+  return ::operator new (bytes, std::nothrow);
 }
 
 // ----------------------------------------------------------------------------
@@ -253,10 +261,14 @@ void
 __attribute__((weak))
 operator delete (void* ptr) noexcept
 {
+#if defined(OS_TRACE_LIBCPP_OPERATOR_NEW)
+  trace::printf ("::%s(%p)\n", __func__, ptr);
+#endif
+
   if (ptr)
     {
       // ----- Begin of critical section --------------------------------------
-      rtos::scheduler::critical_section cs;
+      rtos::scheduler::critical_section scs;
 
       // The unknown size is passed as 0.
       estd::pmr::get_default_resource ()->deallocate (ptr, 0);
@@ -268,18 +280,22 @@ operator delete (void* ptr) noexcept
 #pragma GCC diagnostic ignored "-Wc++14-compat"
 
 void
-operator delete (void* ptr, std::size_t size) noexcept;
+operator delete (void* ptr, std::size_t bytes) noexcept;
 
 void
 __attribute__((weak))
-operator delete (void* ptr, std::size_t size) noexcept
+operator delete (void* ptr, std::size_t bytes) noexcept
 {
+#if defined(OS_TRACE_LIBCPP_OPERATOR_NEW)
+  trace::printf ("::%s(%p,%u)\n", __func__, ptr, bytes);
+#endif
+
   if (ptr)
     {
       // ----- Begin of critical section --------------------------------------
-      rtos::scheduler::critical_section cs;
+      rtos::scheduler::critical_section scs;
 
-      estd::pmr::get_default_resource ()->deallocate (ptr, size);
+      estd::pmr::get_default_resource ()->deallocate (ptr, bytes);
       // ----- End of critical section ----------------------------------------
     }
 }
@@ -300,10 +316,14 @@ void
 __attribute__((weak))
 operator delete (void* ptr, const std::nothrow_t&) noexcept
 {
+#if defined(OS_TRACE_LIBCPP_OPERATOR_NEW)
+  trace::printf ("::%s(%p)\n", __func__, ptr);
+#endif
+
   if (ptr)
     {
       // ----- Begin of critical section --------------------------------------
-      rtos::scheduler::critical_section cs;
+      rtos::scheduler::critical_section scs;
 
       estd::pmr::get_default_resource ()->deallocate (ptr, 0);
       // ----- End of critical section ----------------------------------------
@@ -329,13 +349,13 @@ operator delete[] (void* ptr) noexcept
 #pragma GCC diagnostic ignored "-Wc++14-compat"
 
 void
-operator delete[] (void* ptr, std::size_t size) noexcept;
+operator delete[] (void* ptr, std::size_t bytes) noexcept;
 
 void
 __attribute__((weak))
-operator delete[] (void* ptr, std::size_t size) noexcept
+operator delete[] (void* ptr, std::size_t bytes) noexcept
 {
-  ::operator delete (ptr, size);
+  ::operator delete (ptr, bytes);
 }
 
 #pragma GCC diagnostic pop
