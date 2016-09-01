@@ -41,7 +41,9 @@
 #include <cmsis-plus/rtos/os-clocks.h>
 #include <cmsis-plus/rtos/internal/os-flags.h>
 
+#if !defined(__ARM_EABI__)
 #include <memory>
+#endif
 
 // ----------------------------------------------------------------------------
 
