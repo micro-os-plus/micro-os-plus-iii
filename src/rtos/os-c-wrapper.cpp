@@ -2805,7 +2805,7 @@ os_memory_get_default (void)
  * @details
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
- * @warning Not thread safe, use critical sections to protect it.
+ * @warning Not thread safe, use a scheduler critical section to protect it.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::memory::memory_resource::allocate()
@@ -2822,7 +2822,7 @@ os_memory_allocate (os_memory_t* memory, size_t bytes, size_t alignment)
  * @details
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
- * @warning Not thread safe, use critical sections to protect it.
+ * @warning Not thread safe, use a scheduler critical section to protect it.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::memory::memory_resource::deallocate()
@@ -2840,7 +2840,7 @@ os_memory_deallocate (os_memory_t* memory, void* addr, size_t bytes,
  * @details
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
- * @warning Not thread safe, use critical sections to protect it.
+ * @warning Not thread safe, use a scheduler critical section to protect it.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::memory::memory_resource::reset()
@@ -2856,7 +2856,7 @@ os_memory_reset (os_memory_t* memory)
  * @details
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
- * @warning Not thread safe, use critical sections to protect it.
+ * @warning Not thread safe, use a scheduler critical section to protect it.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::memory::memory_resource::coalesce()
@@ -2872,7 +2872,7 @@ os_memory_coalesce (os_memory_t* memory)
  * @details
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
- * @warning Not thread safe, use critical sections to protect it.
+ * @warning Not thread safe, use a scheduler critical section to protect it.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::memory::memory_resource::total_bytes()
@@ -2888,7 +2888,7 @@ os_memory_get_total_bytes (os_memory_t* memory)
  * @details
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
- * @warning Not thread safe, use critical sections to protect it.
+ * @warning Not thread safe, use a scheduler critical section to protect it.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::memory::memory_resource::allocated_bytes()
@@ -2904,7 +2904,7 @@ os_memory_get_allocated_bytes (os_memory_t* memory)
  * @details
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
- * @warning Not thread safe, use critical sections to protect it.
+ * @warning Not thread safe, use a scheduler critical section to protect it.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::memory::memory_resource::free_bytes()
@@ -2920,7 +2920,7 @@ os_memory_get_free_bytes (os_memory_t* memory)
  * @details
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
- * @warning Not thread safe, use critical sections to protect it.
+ * @warning Not thread safe, use a scheduler critical section to protect it.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::memory::memory_resource::allocated_chunks()
@@ -2936,7 +2936,7 @@ os_memory_get_allocated_chunks (os_memory_t* memory)
  * @details
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
- * @warning Not thread safe, use critical sections to protect it.
+ * @warning Not thread safe, use a scheduler critical section to protect it.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::memory::memory_resource::free_chunks()

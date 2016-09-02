@@ -587,14 +587,14 @@ os_main (int argc, char* argv[])
  @ingroup cmsis-plus-rtos
  @brief  C++ API memory management definitions.
  @details
- The CMSIS++ RTOS includes several very advanced and flexible 
+ The CMSIS++ RTOS includes several advanced and flexible 
  memory management features.
  
  First, it defines a configurable memory manager for the application
  free store (also known as the "heap"). 
 
  Second, it defines a separate memory manager to be used by the 
- RTOS system objects. This separate manager can also be configured
+ RTOS system objects. This separate manager can be configured
  to use any allocation policy. It may use either a statically 
  or a dynamically allocated area. 
 
@@ -616,10 +616,11 @@ os_main (int argc, char* argv[])
  `malloc_memory_resource`, which uses memory from the system free store.
 
  By default the RTOS system memory manager is the same as the application
- memory manager.
+ memory manager, but, for isolation reasons, it is recommended to define
+ a separate memory mamanger for the RTOS.
 
  The basic memory management class is `memory_resource`, which will
- be standard from C++17. The µOS++/CMSIS++ version of this class
+ be standard from C++17. The CMSIS++ version of this class
  includes several extensions, like out of memory processing and 
  statistics. 
   
@@ -1263,6 +1264,8 @@ os_main (int argc, char* argv[])
 
  @see @ref cmsis-plus-rtos-timer "RTOS C++ API"
 
+ @par Examples
+
  @code{.c}
 void
 tmfunc (void* args __attribute__((unused)))
@@ -1318,14 +1321,14 @@ os_main (int argc, char* argv[])
  @brief  C API memory management definitions.
  @details
 
- The CMSIS++ RTOS includes several very advanced and flexible 
+ The CMSIS++ RTOS includes several advanced and flexible 
  memory management features.
  
  First, it defines a configurable memory manager for the application
  free store (also known as the "heap"). 
 
  Second, it defines a separate memory manager to be used by the 
- RTOS system objects. This separate manager can also be configured
+ RTOS system objects. This separate manager can be configured
  to use any allocation policy. It may use either a statically 
  or a dynamically allocated area. 
 
@@ -1346,11 +1349,11 @@ os_main (int argc, char* argv[])
  from the system free store.
 
  By default the RTOS system memory manager is the same as the application
- memory manager.
+ memory manager, but, for isolation reasons, it is recommended to define
+ a separate memory mamanger for the RTOS.
 
  The basic memory management class is `os::rtos::memory::memory_resource`, 
- which will
- be standard from C++17. The µOS++/CMSIS++ version of this class
+ which will be standard from C++17. The CMSIS++ version of this class
  includes several extensions, like out of memory processing and 
  statistics. 
 
@@ -1358,6 +1361,8 @@ os_main (int argc, char* argv[])
  functions.
   
  @see @ref cmsis-plus-rtos-memres "RTOS C++ API"
+
+ @par Examples
 
  @code{.c}
 int

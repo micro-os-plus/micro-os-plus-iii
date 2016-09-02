@@ -176,7 +176,7 @@ namespace os
         is_equal (memory_resource const & other) const noexcept;
 
         /**
-         * @brief Reset the memory manager to the initial status.
+         * @brief Reset the memory manager to the initial state.
          * @par Parameters
          *  None
          * @par Returns
@@ -196,7 +196,7 @@ namespace os
         coalesce (void) noexcept;
 
         /**
-         * @brief The largest value that can be passed to `allocate()`.
+         * @brief Get the largest value that can be passed to `allocate()`.
          * @par Parameters
          *  None
          * @return Number of bytes or 0 if unknown.
@@ -222,14 +222,14 @@ namespace os
         out_of_memory_handler (void);
 
         /**
-         * @brief Get total size of managed memory.
+         * @brief Get the total size of managed memory.
          * @return Number of bytes.
          */
         std::size_t
         total_bytes (void);
 
         /**
-         * @brief Get total size of allocated chunks.
+         * @brief Get the total size of allocated chunks.
          * @par Parameters
          *  None
          * @return Number of bytes.
@@ -238,7 +238,7 @@ namespace os
         allocated_bytes (void);
 
         /**
-         * @brief Get total size of free chunks.
+         * @brief Get the total size of free chunks.
          * @par Parameters
          *  None
          * @return Number of bytes.
@@ -247,7 +247,7 @@ namespace os
         free_bytes (void);
 
         /**
-         * @brief Get number of allocated chunks.
+         * @brief Get the number of allocated chunks.
          * @par Parameters
          *  None
          * @return Number of chunks.
@@ -256,7 +256,7 @@ namespace os
         allocated_chunks (void);
 
         /**
-         * @brief Get number of free chunks.
+         * @brief Get the number of free chunks.
          * @par Parameters
          *  None
          * @return Number of chunks.
@@ -616,7 +616,7 @@ namespace os
 
       /**
        * @details
-       * Allocates storage with a size of at least `bytes` bytes. The
+       * Allocate storage with a size of at least `bytes` bytes. The
        * returned storage is aligned to the specified alignment if
        * such alignment is supported, and to `alignof(std::max_align_t)`
        * otherwise.
@@ -642,7 +642,7 @@ namespace os
 
       /**
        * @details
-       * Deallocates the storage pointed to by `addr`.
+       * Deallocate the storage pointed to by `addr`.
        * The address shall have been returned
        * by a prior call to `allocate()` on a memory_resource
        * that compares equal to *this, and the storage it points to shall
@@ -664,7 +664,7 @@ namespace os
 
       /**
        * @details
-       * Compares `*this` for equality with other. Two `memory_resources`
+       * Compare `*this` for equality with other. Two `memory_resources`
        * compare equal if and only if memory allocated from one
        * `memory_resource` can be deallocated from the other and vice versa.
        *

@@ -2175,7 +2175,7 @@ extern "C"
    */
 
   /**
-   * @name Memory allocation functions
+   * @name Memory management functions
    * @{
    */
 
@@ -2207,7 +2207,7 @@ extern "C"
                         size_t alignment);
 
   /**
-   * @brief Reset the memory manager to the initial status.
+   * @brief Reset the memory manager to the initial state.
    * @param memory Pointer to a memory resource object instance.
    * @par Parameters
    *  None
@@ -2229,7 +2229,7 @@ extern "C"
   os_memory_coalesce (os_memory_t* memory);
 
   /**
-   * @brief Get total size of managed memory.
+   * @brief Get the total size of managed memory.
    * @param memory Pointer to a memory resource object instance.
    * @return Number of bytes.
    */
@@ -2237,7 +2237,7 @@ extern "C"
   os_memory_get_total_bytes (os_memory_t* memory);
 
   /**
-   * @brief Get total size of allocated chunks.
+   * @brief Get the total size of allocated chunks.
    * @param memory Pointer to a memory resource object instance.
    * @return Number of bytes.
    */
@@ -2245,7 +2245,7 @@ extern "C"
   os_memory_get_allocated_bytes (os_memory_t* memory);
 
   /**
-   * @brief Get total size of free chunks.
+   * @brief Get the total size of free chunks.
    * @param memory Pointer to a memory resource object instance.
    * @return Number of bytes.
    */
@@ -2253,7 +2253,7 @@ extern "C"
   os_memory_get_free_bytes (os_memory_t* memory);
 
   /**
-   * @brief Get number of allocated chunks.
+   * @brief Get the number of allocated chunks.
    * @param memory Pointer to a memory resource object instance.
    * @return Number of chunks.
    */
@@ -2261,7 +2261,7 @@ extern "C"
   os_memory_get_allocated_chunks (os_memory_t* memory);
 
   /**
-   * @brief Get number of free chunks.
+   * @brief Get the number of free chunks.
    * @param memory Pointer to a memory resource object instance.
    * @return Number of chunks.
    */
