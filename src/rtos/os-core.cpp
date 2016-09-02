@@ -554,7 +554,7 @@ int*
 __errno (void);
 
 /**
- * @name errno getter/setter.
+ * @name errno getter/setter
  * @{
  */
 
