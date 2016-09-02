@@ -30,6 +30,7 @@
 // ----------------------------------------------------------------------------
 
 #include <cmsis-plus/memory/newlib-nano-malloc.h>
+#include <cmsis-plus/memory/lifo.h>
 
 // ----------------------------------------------------------------------------
 
@@ -40,6 +41,7 @@ using namespace os;
 extern "C" void
 os_startup_initialize_free_store (void* heap_begin, void* heap_end);
 
+//using free_store_memory_resource = os::memory::lifo;
 using free_store_memory_resource = os::memory::newlib_nano_malloc;
 
 static std::aligned_storage<sizeof(free_store_memory_resource),

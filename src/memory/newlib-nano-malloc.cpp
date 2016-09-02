@@ -52,8 +52,19 @@ namespace os
 
       trace::printf ("%s(%p,%u) @%p \n", __func__, addr, bytes, this);
 
-      addr_ = addr;
-      total_bytes_ = bytes;
+      void* align_addr = addr;
+      std::size_t align_sz = bytes;
+
+      // Align address for first chunk.
+      void* res;
+      res = std::align (chunk_align, block_minchunk, align_addr, align_sz);
+      if (res != nullptr)
+        {
+          assert(res != nullptr);
+        }
+
+      addr_ = align_addr;
+      total_bytes_ = align_sz;
 
       // Qualified call of virtual function.
       newlib_nano_malloc::reset ();
@@ -71,23 +82,12 @@ namespace os
       trace::printf ("%s() @%p \n", __func__, this);
 #endif
 
-      void* align_addr = addr_;
-      std::size_t align_sz = total_bytes_;
-
-      // Align address for first chunk.
-      void* res;
-      res = std::align (chunk_align, block_minchunk, align_addr, align_sz);
-      if (res != nullptr)
-        {
-          assert(res != nullptr);
-        }
-
       // Fill it the first chunk.
-      chunk_t* chunk = reinterpret_cast<chunk_t*> (align_addr);
-      chunk->size = align_sz;
+      chunk_t* chunk = reinterpret_cast<chunk_t*> (addr_);
+      chunk->size = total_bytes_;
 
       allocated_bytes_ = 0;
-      free_bytes_ = align_sz;
+      free_bytes_ = total_bytes_;
       allocated_chunks_ = 0;
       free_chunks_ = 1;
 
@@ -248,9 +248,14 @@ namespace os
     /**
      * @details
      *
-     * The free list is kept ordered by addresses, which means
-     * `deallocate()` will need to traverse part of it, the older
-     * the chunk, the longer the traversal.
+     * Deallocation is not guaranteed to be deterministic, but if
+     * done in strict reverse allocation order, it becomes deterministic,
+     * otherwise a traversal of the free list is done, the older the block,
+     * the more nodes to traverse (the free list is kept ordered by
+     * addresses).
+     *
+     * If the block is already in the free list, issue a trace message,
+     * but otherwise ignore the condition.
      *
      * @par Exceptions
      *   Throws nothing.
