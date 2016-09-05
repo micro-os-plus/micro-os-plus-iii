@@ -60,7 +60,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-mqueue
      */
-    class message_queue : public internal::object_named
+    class message_queue : public internal::object_named_system
     {
     public:
 

@@ -616,15 +616,17 @@ os_thread_attr_init (os_thread_attr_t* attr)
 /**
  * @details
  *
+ * @note Must be paired with `os_thread_destruct()`.
+ *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::thread
  */
 void
-os_thread_create (os_thread_t* thread, const char* name, os_thread_func_t func,
-                  const os_thread_func_args_t args,
-                  const os_thread_attr_t* attr)
+os_thread_construct (os_thread_t* thread, const char* name,
+                     os_thread_func_t func, const os_thread_func_args_t args,
+                     const os_thread_attr_t* attr)
 {
   assert(thread != nullptr);
   if (attr == nullptr)
@@ -639,16 +641,66 @@ os_thread_create (os_thread_t* thread, const char* name, os_thread_func_t func,
 /**
  * @details
  *
+ * @note Must be paired with `os_thread_construct()`.
+ *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::thread
  */
 void
-os_thread_destroy (os_thread_t* thread)
+os_thread_destruct (os_thread_t* thread)
 {
   assert(thread != nullptr);
   (reinterpret_cast<rtos::thread&> (*thread)).~thread ();
+}
+
+/**
+ * @details
+ *
+ * Dynamically allocate the thread object instance using the RTOS
+ * system allocator and construct it.
+ *
+ * @note Equivalent of C++ `new thread(...)`.
+ * @note Must be paired with `os_thread_delete()`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::thread
+ */
+os_thread_t*
+os_thread_new (const char* name, os_thread_func_t func,
+               const os_thread_func_args_t args, const os_thread_attr_t* attr)
+{
+  if (attr == nullptr)
+    {
+      attr = (const os_thread_attr_t*) &thread::initializer;
+    }
+  return reinterpret_cast<os_thread_t*> (new rtos::thread (
+      name, (thread::func_t) func, (thread::func_args_t) args,
+      (thread::attributes&) *attr));
+}
+
+/**
+ * @details
+ *
+ * Destruct the thread and deallocate the dynamically allocated
+ * space using the RTOS system allocator.
+ *
+ * @note Equivalent of C++ `delete ptr_th`.
+ * @note Must be paired with `os_thread_new()`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::thread
+ */
+void
+os_thread_delete (os_thread_t* thread)
+{
+  assert(thread != nullptr);
+  delete reinterpret_cast<rtos::thread*> (thread);
 }
 
 /**
@@ -1323,14 +1375,17 @@ os_timer_attr_get_periodic (void)
 /**
  * @details
  *
+ * @note Must be paired with `os_timer_destruct()`.
+ *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::timer
  */
 void
-os_timer_create (os_timer_t* timer, const char* name, os_timer_func_t function,
-                 os_timer_func_args_t args, const os_timer_attr_t* attr)
+os_timer_construct (os_timer_t* timer, const char* name,
+                    os_timer_func_t function, os_timer_func_args_t args,
+                    const os_timer_attr_t* attr)
 {
   assert(timer != nullptr);
   if (attr == nullptr)
@@ -1345,16 +1400,66 @@ os_timer_create (os_timer_t* timer, const char* name, os_timer_func_t function,
 /**
  * @details
  *
+ * @note Must be paired with `os_timer_construct()`.
+ *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::timer
  */
 void
-os_timer_destroy (os_timer_t* timer)
+os_timer_destruct (os_timer_t* timer)
 {
   assert(timer != nullptr);
   (reinterpret_cast<rtos::timer&> (*timer)).~timer ();
+}
+
+/**
+ * @details
+ *
+ * Dynamically allocate the timer object instance using the RTOS
+ * system allocator and construct it.
+ *
+ * @note Equivalent of C++ `new timer(...)`.
+ * @note Must be paired with `os_timer_delete()`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::timer
+ */
+os_timer_t*
+os_timer_new (const char* name, os_timer_func_t function,
+              os_timer_func_args_t args, const os_timer_attr_t* attr)
+{
+  if (attr == nullptr)
+    {
+      attr = (const os_timer_attr_t*) &timer::periodic_initializer;
+    }
+  return reinterpret_cast<os_timer_t*> (new rtos::timer (
+      name, (timer::func_t) function, (timer::func_args_t) args,
+      (timer::attributes&) *attr));
+}
+
+/**
+ * @details
+ *
+ * Destruct the timer and deallocate the dynamically allocated
+ * space using the RTOS system allocator.
+ *
+ * @note Equivalent of C++ `delete ptr_timer`.
+ * @note Must be paired with `os_timer_new()`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::timer
+ */
+void
+os_timer_delete (os_timer_t* timer)
+{
+  assert(timer != nullptr);
+  delete reinterpret_cast<rtos::timer*> (timer);
 }
 
 /**
@@ -1451,14 +1556,16 @@ os_mutex_attr_get_recursive (void)
 /**
  * @details
  *
+ * @note Must be paired with `os_mutex_destruct()`.
+ *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::mutex
  */
 void
-os_mutex_create (os_mutex_t* mutex, const char* name,
-                 const os_mutex_attr_t* attr)
+os_mutex_construct (os_mutex_t* mutex, const char* name,
+                    const os_mutex_attr_t* attr)
 {
   assert(mutex != nullptr);
   if (attr == nullptr)
@@ -1471,14 +1578,16 @@ os_mutex_create (os_mutex_t* mutex, const char* name,
 /**
  * @details
  *
+ * @note Must be paired with `os_mutex_destruct()`.
+ *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::mutex_recursive
  */
 void
-os_mutex_recursive_create (os_mutex_t* mutex, const char* name,
-                           const os_mutex_attr_t* attr)
+os_mutex_recursive_construct (os_mutex_t* mutex, const char* name,
+                              const os_mutex_attr_t* attr)
 {
   assert(mutex != nullptr);
   if (attr == nullptr)
@@ -1491,16 +1600,91 @@ os_mutex_recursive_create (os_mutex_t* mutex, const char* name,
 /**
  * @details
  *
+ * @note Must be paired with `os_mutex_construct()` or
+ *  `os_mutex_recursive_construct()`.
+ *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::mutex
  */
 void
-os_mutex_destroy (os_mutex_t* mutex)
+os_mutex_destruct (os_mutex_t* mutex)
 {
   assert(mutex != nullptr);
   (reinterpret_cast<rtos::mutex&> (*mutex)).~mutex ();
+}
+
+/**
+ * @details
+ *
+ * Dynamically allocate the mutex object instance using the RTOS
+ * system allocator and construct it.
+ *
+ * @note Equivalent of C++ `new mutex(...)`.
+ * @note Must be paired with `os_mutex_delete()`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::mutex
+ */
+os_mutex_t*
+os_mutex_new (const char* name, const os_mutex_attr_t* attr)
+{
+  if (attr == nullptr)
+    {
+      attr = (const os_mutex_attr_t*) &mutex::initializer_normal;
+    }
+  return reinterpret_cast<os_mutex_t*> (new rtos::mutex (
+      name, (mutex::attributes&) *attr));
+}
+
+/**
+ * @details
+ *
+ * Dynamically allocate the recursive mutex object instance using the RTOS
+ * system allocator and construct it.
+ *
+ * @note Equivalent of C++ `new mutex_recursive(...)`.
+ * @note Must be paired with `os_mutex_delete()`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::mutex_recursive
+ */
+os_mutex_t*
+os_mutex_recursive_new (const char* name, const os_mutex_attr_t* attr)
+{
+  if (attr == nullptr)
+    {
+      attr = (const os_mutex_attr_t*) &mutex::initializer_recursive;
+    }
+  return reinterpret_cast<os_mutex_t*> (new rtos::mutex_recursive (
+      name, (mutex::attributes&) *attr));
+}
+
+/**
+ * @details
+ *
+ * Destruct the mutex and deallocate the dynamically allocated
+ * space using the RTOS system allocator.
+ *
+ * @note Equivalent of C++ `delete ptr_mutex`.
+ * @note Must be paired with `os_mutex_new()` or
+ *  `os_mutex_recursive_new()`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::mutex
+ */
+void
+os_mutex_delete (os_mutex_t* mutex)
+{
+  assert(mutex != nullptr);
+  delete reinterpret_cast<rtos::mutex*> (mutex);
 }
 
 /**
@@ -1721,14 +1905,16 @@ os_condvar_attr_init (os_condvar_attr_t* attr)
 /**
  * @details
  *
+ * @note Must be paired with `os_condvar_destruct()`.
+ *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::condition_variable
  */
 void
-os_condvar_create (os_condvar_t* condvar, const char* name,
-                   const os_condvar_attr_t* attr)
+os_condvar_construct (os_condvar_t* condvar, const char* name,
+                      const os_condvar_attr_t* attr)
 {
   assert(condvar != nullptr);
   if (attr == nullptr)
@@ -1742,16 +1928,64 @@ os_condvar_create (os_condvar_t* condvar, const char* name,
 /**
  * @details
  *
+ * @note Must be paired with `os_condvar_construct()`.
+ *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::condition_variable
  */
 void
-os_condvar_destroy (os_condvar_t* condvar)
+os_condvar_destruct (os_condvar_t* condvar)
 {
   assert(condvar != nullptr);
   (reinterpret_cast<condition_variable&> (*condvar)).~condition_variable ();
+}
+
+/**
+ * @details
+ *
+ * Dynamically allocate the condition variable object instance using the RTOS
+ * system allocator and construct it.
+ *
+ * @note Equivalent of C++ `new condition_variable(...)`.
+ * @note Must be paired with `os_condvar_delete()`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::condition_variable
+ */
+os_condvar_t*
+os_condvar_new (const char* name, const os_condvar_attr_t* attr)
+{
+  if (attr == nullptr)
+    {
+      attr = (const os_condvar_attr_t*) &condition_variable::initializer;
+    }
+  return reinterpret_cast<os_condvar_t*> (new condition_variable (
+      name, (condition_variable::attributes&) *attr));
+}
+
+/**
+ * @details
+ *
+ * Destruct the condition variable and deallocate the dynamically allocated
+ * space using the RTOS system allocator.
+ *
+ * @note Equivalent of C++ `delete ptr_condvar`.
+ * @note Must be paired with `os_condvar_new()`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::condition_variable
+ */
+void
+os_condvar_delete (os_condvar_t* condvar)
+{
+  assert(condvar != nullptr);
+  delete reinterpret_cast<condition_variable*> (condvar);
 }
 
 /**
@@ -1902,14 +2136,16 @@ os_semaphore_attr_get_binary (void)
 /**
  * @details
  *
+ * @note Must be paired with `os_semaphore_destruct()`.
+ *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::semaphore
  */
 void
-os_semaphore_create (os_semaphore_t* semaphore, const char* name,
-                     const os_semaphore_attr_t* attr)
+os_semaphore_construct (os_semaphore_t* semaphore, const char* name,
+                        const os_semaphore_attr_t* attr)
 {
   assert(semaphore != nullptr);
   if (attr == nullptr)
@@ -1923,14 +2159,16 @@ os_semaphore_create (os_semaphore_t* semaphore, const char* name,
 /**
  * @details
  *
+ * @note Must be paired with `os_semaphore_destruct()`.
+ *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::semaphore_binary
  */
 void
-os_semaphore_binary_create (os_semaphore_t* semaphore, const char* name,
-                            const os_semaphore_count_t initial_value)
+os_semaphore_binary_construct (os_semaphore_t* semaphore, const char* name,
+                               const os_semaphore_count_t initial_value)
 {
   assert(semaphore != nullptr);
   new (semaphore) rtos::semaphore_binary
@@ -1940,15 +2178,17 @@ os_semaphore_binary_create (os_semaphore_t* semaphore, const char* name,
 /**
  * @details
  *
+ * @note Must be paired with `os_semaphore_destruct()`.
+ *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::semaphore_counting
  */
 void
-os_semaphore_counting_create (os_semaphore_t* semaphore, const char* name,
-                              const os_semaphore_count_t max_value,
-                              const os_semaphore_count_t initial_value)
+os_semaphore_counting_construct (os_semaphore_t* semaphore, const char* name,
+                                 const os_semaphore_count_t max_value,
+                                 const os_semaphore_count_t initial_value)
 {
   assert(semaphore != nullptr);
   new (semaphore) rtos::semaphore_counting
@@ -1958,16 +2198,111 @@ os_semaphore_counting_create (os_semaphore_t* semaphore, const char* name,
 /**
  * @details
  *
+ * @note Must be paired with `os_semaphore_construct()` or
+ * `os_semaphore_binary_construct()` or `os_semaphore_counting_construct()`.
+ *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::semaphore
  */
 void
-os_semaphore_destroy (os_semaphore_t* semaphore)
+os_semaphore_destruct (os_semaphore_t* semaphore)
 {
   assert(semaphore != nullptr);
   (reinterpret_cast<rtos::semaphore&> (*semaphore)).~semaphore ();
+}
+
+/**
+ * @details
+ *
+ * Dynamically allocate the semaphore object instance using the RTOS
+ * system allocator and construct it.
+ *
+ * @note Equivalent of C++ `new semaphore(...)`.
+ * @note Must be paired with `os_semaphore_delete()`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::semaphore
+ */
+os_semaphore_t*
+os_semaphore_new (const char* name, const os_semaphore_attr_t* attr)
+{
+  if (attr == nullptr)
+    {
+      attr = (const os_semaphore_attr_t*) &semaphore::initializer_binary;
+    }
+  return reinterpret_cast<os_semaphore_t*> (new rtos::semaphore
+    { name, (semaphore::attributes&) *attr });
+}
+
+/**
+ * @details
+ *
+ * Dynamically allocate the binary semaphore object instance using the RTOS
+ * system allocator and construct it.
+ *
+ * @note Equivalent of C++ `new semaphore_binary(...)`.
+ * @note Must be paired with `os_semaphore_delete()`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::semaphore_binary
+ */
+os_semaphore_t*
+os_semaphore_binary_new (const char* name,
+                         const os_semaphore_count_t initial_value)
+{
+  return reinterpret_cast<os_semaphore_t*> (new rtos::semaphore_binary
+    { name, initial_value });
+}
+
+/**
+ * @details
+ *
+ * Dynamically allocate the counting semaphore object instance using the RTOS
+ * system allocator and construct it.
+ *
+ * @note Equivalent of C++ `new semaphore_counting(...)`.
+ * @note Must be paired with `os_semaphore_delete()`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::semaphore_counting
+ */
+os_semaphore_t*
+os_semaphore_counting_new (const char* name,
+                           const os_semaphore_count_t max_value,
+                           const os_semaphore_count_t initial_value)
+{
+  return reinterpret_cast<os_semaphore_t*> (new rtos::semaphore_counting
+    { name, max_value, initial_value });
+}
+
+/**
+ * @details
+ *
+ * Destruct the semaphore and deallocate the dynamically allocated
+ * space using the RTOS system allocator.
+ *
+ * @note Equivalent of C++ `delete ptr_semaphore`.
+ * @note Must be paired with `os_semaphore_new()` or
+ * `os_semaphore_binary_new()` or `os_semaphore_counting_new()`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::semaphore
+ */
+void
+os_semaphore_delete (os_semaphore_t* semaphore)
+{
+  assert(semaphore != nullptr);
+  delete reinterpret_cast<rtos::semaphore*> (semaphore);
 }
 
 /**
@@ -2126,14 +2461,16 @@ os_mempool_attr_init (os_mempool_attr_t* attr)
 /**
  * @details
  *
+ * @note Must be paired with `os_mempool_destruct()`.
+ *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::memory_pool
  */
 void
-os_mempool_create (os_mempool_t* mempool, const char* name, size_t blocks,
-                   size_t block_size_bytes, const os_mempool_attr_t* attr)
+os_mempool_construct (os_mempool_t* mempool, const char* name, size_t blocks,
+                      size_t block_size_bytes, const os_mempool_attr_t* attr)
 {
   assert(mempool != nullptr);
   if (attr == nullptr)
@@ -2147,16 +2484,65 @@ os_mempool_create (os_mempool_t* mempool, const char* name, size_t blocks,
 /**
  * @details
  *
+ * @note Must be paired with `os_mempool_construct()`.
+ *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::memory_pool
  */
 void
-os_mempool_destroy (os_mempool_t* mempool)
+os_mempool_destruct (os_mempool_t* mempool)
 {
   assert(mempool != nullptr);
   (reinterpret_cast<memory_pool&> (*mempool)).~memory_pool ();
+}
+
+/**
+ * @details
+ *
+ * Dynamically allocate the memory pool object instance using the RTOS
+ * system allocator and construct it.
+ *
+ * @note Equivalent of C++ `new memory_pool(...)`.
+ * @note Must be paired with `os_mempool_delete()`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::memory_pool
+ */
+os_mempool_t*
+os_mempool_new (const char* name, size_t blocks, size_t block_size_bytes,
+                const os_mempool_attr_t* attr)
+{
+  if (attr == nullptr)
+    {
+      attr = (const os_mempool_attr_t*) &memory_pool::initializer;
+    }
+  return reinterpret_cast<os_mempool_t*> (new memory_pool (
+      name, blocks, block_size_bytes, (memory_pool::attributes&) *attr));
+}
+
+/**
+ * @details
+ *
+ * Destruct the memory pool and deallocate the dynamically allocated
+ * space using the RTOS system allocator.
+ *
+ * @note Equivalent of C++ `delete ptr_mempool`.
+ * @note Must be paired with `os_mempool_new()`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::memory_pool
+ */
+void
+os_mempool_delete (os_mempool_t* mempool)
+{
+  assert(mempool != nullptr);
+  delete reinterpret_cast<memory_pool*> (mempool);
 }
 
 /**
@@ -2359,14 +2745,16 @@ os_mqueue_attr_init (os_mqueue_attr_t* attr)
 /**
  * @details
  *
+ * @note Must be paired with `os_mqueue_destruct()`.
+ *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::message_queue
  */
 void
-os_mqueue_create (os_mqueue_t* mqueue, const char* name, size_t msgs,
-                  size_t msg_size_bytes, const os_mqueue_attr_t* attr)
+os_mqueue_construct (os_mqueue_t* mqueue, const char* name, size_t msgs,
+                     size_t msg_size_bytes, const os_mqueue_attr_t* attr)
 {
   assert(mqueue != nullptr);
   if (attr == nullptr)
@@ -2380,16 +2768,65 @@ os_mqueue_create (os_mqueue_t* mqueue, const char* name, size_t msgs,
 /**
  * @details
  *
+ * @note Must be paired with `os_mqueue_construct()`.
+ *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::message_queue
  */
 void
-os_mqueue_destroy (os_mqueue_t* mqueue)
+os_mqueue_destruct (os_mqueue_t* mqueue)
 {
   assert(mqueue != nullptr);
   (reinterpret_cast<message_queue&> (*mqueue)).~message_queue ();
+}
+
+/**
+ * @details
+ *
+ * Dynamically allocate the message queue object instance using the RTOS
+ * system allocator and construct it.
+ *
+ * @note Equivalent of C++ `new message_queue(...)`.
+ * @note Must be paired with `os_mqueue_delete()`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::message_queue
+ */
+os_mqueue_t*
+os_mqueue_new (const char* name, size_t msgs, size_t msg_size_bytes,
+               const os_mqueue_attr_t* attr)
+{
+  if (attr == nullptr)
+    {
+      attr = (const os_mqueue_attr_t*) &message_queue::initializer;
+    }
+  return reinterpret_cast<os_mqueue_t*> (new message_queue (
+      name, msgs, msg_size_bytes, (message_queue::attributes&) *attr));
+}
+
+/**
+ * @details
+ *
+ * Destruct the message queue and deallocate the dynamically allocated
+ * space using the RTOS system allocator.
+ *
+ * @note Equivalent of C++ `delete ptr_mqueue`.
+ * @note Must be paired with `os_mqueue_new()`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::message_queue
+ */
+void
+os_mqueue_delete (os_mqueue_t* mqueue)
+{
+  assert(mqueue != nullptr);
+  delete reinterpret_cast<message_queue*> (mqueue);
 }
 
 /**
@@ -2619,14 +3056,16 @@ os_evflags_attr_init (os_evflags_attr_t* attr)
 /**
  * @details
  *
+ * @note Must be paired with `os_evflags_destruct()`.
+ *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::event_flags
  */
 void
-os_evflags_create (os_evflags_t* evflags, const char* name,
-                   const os_evflags_attr_t* attr)
+os_evflags_construct (os_evflags_t* evflags, const char* name,
+                      const os_evflags_attr_t* attr)
 {
   assert(evflags != nullptr);
   if (attr == nullptr)
@@ -2639,16 +3078,64 @@ os_evflags_create (os_evflags_t* evflags, const char* name,
 /**
  * @details
  *
+ * @note Must be paired with `os_evflags_construct()`.
+ *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
  *  @ref os::rtos::event_flags
  */
 void
-os_evflags_destroy (os_evflags_t* evflags)
+os_evflags_destruct (os_evflags_t* evflags)
 {
   assert(evflags != nullptr);
   (reinterpret_cast<event_flags&> (*evflags)).~event_flags ();
+}
+
+/**
+ * @details
+ *
+ * Dynamically allocate the event flags object instance using the RTOS
+ * system allocator and construct it.
+ *
+ * @note Equivalent of C++ `new event_flags(...)`.
+ * @note Must be paired with `os_evflags_delete()`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::event_flags
+ */
+os_evflags_t*
+os_evflags_new (const char* name, const os_evflags_attr_t* attr)
+{
+  if (attr == nullptr)
+    {
+      attr = (const os_evflags_attr_t*) &event_flags::initializer;
+    }
+  return reinterpret_cast<os_evflags_t*> (new event_flags (
+      name, (event_flags::attributes&) *attr));
+}
+
+/**
+ * @details
+ *
+ * Destruct the event flags and deallocate the dynamically allocated
+ * space using the RTOS system allocator.
+ *
+ * @note Equivalent of C++ `delete ptr_evflags`.
+ * @note Must be paired with `os_evflags_new()`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::event_flags
+ */
+void
+os_evflags_delete (os_evflags_t* evflags)
+{
+  assert(evflags != nullptr);
+  delete reinterpret_cast<event_flags*> (evflags);
 }
 
 /**

@@ -135,7 +135,7 @@ test_cpp_api (void)
   printf ("\n%s - Threads.\n", test_name);
 
     {
-      // Regular threads.
+      // Static threads with allocated stacks.
       thread th1
         { func, nullptr };
       thread th2
@@ -145,12 +145,21 @@ test_cpp_api (void)
       th2.join ();
     }
 
+    {
+      // Dynamically allocated threads with allocated stacks.
+      thread* th3 = new thread
+        { "th3", func, nullptr };
+
+      th3->join ();
+      delete th3;
+    }
+
   // --------------------------------------------------------------------------
 
   using my_thread = thread_allocated<rtos::memory::allocator<thread::stack::allocation_element_t>>;
 
-  // Allocated threads.
     {
+      // Static threads with custom allocated stacks.
       my_thread ath1
         { func, nullptr };
       my_thread ath2
@@ -231,7 +240,7 @@ test_cpp_api (void)
 
   // --------------------------------------------------------------------------
 
-  // Classic usage; message size and cast to char* must be supplied manually.
+  // Classic static usage; message size and cast to char* must be supplied manually.
     {
       message_queue cq1
         { 3, sizeof(my_msg_t) };
@@ -242,7 +251,19 @@ test_cpp_api (void)
         { "cq2", 3, sizeof(my_msg_t) };
 
       cq2.send (&msg_out, sizeof(my_msg_t));
+    }
 
+  // --------------------------------------------------------------------------
+
+  // Classic dynamic usage; message size and cast to char* must be supplied manually.
+    {
+      message_queue* cq3;
+      cq3 = new message_queue
+        { "cq3", 3, sizeof(my_msg_t) };
+
+      cq3->send (&msg_out, sizeof(my_msg_t));
+
+      delete cq3;
     }
 
   // --------------------------------------------------------------------------
@@ -271,7 +292,19 @@ test_cpp_api (void)
 
       tq2.send (&msg_out);
       tq2.receive (&msg_in);
+    }
 
+  // --------------------------------------------------------------------------
+
+    {
+      My_queue* tq3;
+      tq3 = new My_queue
+        { "tq3", 7 };
+
+      tq3->send (&msg_out);
+      tq3->receive (&msg_in);
+
+      delete tq3;
     }
 
   // --------------------------------------------------------------------------
@@ -310,7 +343,7 @@ test_cpp_api (void)
 
   my_blk_t* blk;
 
-  // Classic usage; block size and cast to char* must be supplied manually.
+  // Classic static usage; block size and cast to char* must be supplied manually.
     {
       memory_pool cp1
         { 3, sizeof(my_blk_t) };
@@ -330,6 +363,20 @@ test_cpp_api (void)
       blk = static_cast<my_blk_t*> (cp2.alloc ());
       cp2.free (blk);
 
+    }
+
+  // --------------------------------------------------------------------------
+
+  // Classic dynamic usage; block size and cast to char* must be supplied manually.
+    {
+      memory_pool* cp3;
+      cp3 = new memory_pool
+        { "cp3", 3, sizeof(my_blk_t) };
+
+      blk = static_cast<my_blk_t*> (cp3->alloc ());
+      cp3->free (blk);
+
+      delete cp3;
     }
 
   // --------------------------------------------------------------------------
@@ -363,6 +410,20 @@ test_cpp_api (void)
 
   // --------------------------------------------------------------------------
 
+    {
+
+      My_pool* tp3;
+      tp3 = new My_pool
+        { "tp3", 7 };
+
+      blk = tp3->alloc ();
+      tp3->free (blk);
+
+      delete tp3;
+    }
+
+  // --------------------------------------------------------------------------
+
   // Allocated template usage; block size is supplied automatically.
 
   // Define a custom pool type parametrised with the
@@ -388,7 +449,6 @@ test_cpp_api (void)
 
       blk = sp2.alloc ();
       sp2.free (blk);
-
     }
 
   // ==========================================================================
@@ -403,6 +463,16 @@ test_cpp_api (void)
       cv2.signal ();
     }
 
+    {
+      condition_variable* cv3;
+      cv3 = new condition_variable
+        { "cv3" };
+
+      cv3->signal ();
+
+      delete cv3;
+    }
+
   // ==========================================================================
 
   printf ("\n%s - Event flags.\n", test_name);
@@ -414,6 +484,15 @@ test_cpp_api (void)
       event_flags ev2
         { "ev2" };
       ev2.clear (1);
+    }
+
+    {
+      event_flags* ev3;
+      ev3 = new event_flags
+        { "ev3" };
+      ev3->clear (1);
+
+      delete ev3;
     }
 
   // ==========================================================================
@@ -458,6 +537,16 @@ test_cpp_api (void)
       mx3.unlock ();
     }
 
+    {
+      mutex* mx4;
+      mx4 = new mutex
+        { "mx2" };
+      mx4->lock ();
+      mx4->unlock ();
+
+      delete mx4;
+    }
+
   // ==========================================================================
 
   printf ("\n%s - Semaphores.\n", test_name);
@@ -493,6 +582,16 @@ test_cpp_api (void)
       sp3.post ();
     }
 
+    {
+      // Named semaphore.
+      semaphore* sp4;
+      sp4 = new semaphore
+        { "sp4" };
+      sp4->post ();
+
+      delete sp4;
+    }
+
   // ==========================================================================
 
   printf ("\n%s - Timers.\n", test_name);
@@ -520,7 +619,7 @@ test_cpp_api (void)
     }
 
     {
-      // Named periodic timer.
+      // Static named periodic timer.
       timer tm3
         { "tm3", tmfunc, nullptr, timer::periodic_initializer };
       sysclock.sleep_for (1); // Sync
@@ -528,6 +627,20 @@ test_cpp_api (void)
 
       sysclock.sleep_for (2);
       tm3.stop ();
+    }
+
+    {
+      // Dynamic named single-shot timer.
+      timer* tm4;
+      tm4 = new timer
+        { "tm4", tmfunc, nullptr };
+      sysclock.sleep_for (1); // Sync
+      tm4->start (1);
+
+      sysclock.sleep_for (2);
+      tm4->stop ();
+
+      delete tm4;
     }
 
   // ==========================================================================

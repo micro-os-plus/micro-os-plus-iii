@@ -232,7 +232,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-thread
      */
-    class thread : public internal::object_named
+    class thread : public internal::object_named_system
     {
     public:
 

@@ -215,9 +215,9 @@ test_c_api (void)
   printf ("\n%s - Threads.\n", test_name);
 
     {
-      // Unnamed default thread; stack dynamically allocated.
+      // Unnamed static thread; stack dynamically allocated.
       os_thread_t th1;
-      os_thread_create (&th1, NULL, func, NULL, NULL);
+      os_thread_construct (&th1, NULL, func, NULL, NULL);
 
       name = os_thread_get_name (&th1);
 
@@ -225,21 +225,31 @@ test_c_api (void)
 
       // The destroy() is recommended, but not mandatory when using join().
       // The test checks if join() fully destroys the thread.
-      // os_thread_destroy(&th1);
+      os_thread_destruct (&th1);
     }
 
     {
-      // Named default threads.
+      // Named static threads; stack dynamically allocated.
       os_thread_t th2;
-      os_thread_create (&th2, "th2", func, NULL, NULL);
+      os_thread_construct (&th2, "th2", func, NULL, NULL);
 
       os_thread_join (&th2, NULL);
 
-      // os_thread_destroy(&th2);
+      os_thread_destruct (&th2);
     }
 
     {
-      // Custom thread with static stack and lower priority.
+      // Named dynamically allocated thread; dynamically allocated stack.
+      os_thread_t* th3;
+      th3 = os_thread_new ("th3", func, NULL, NULL);
+
+      os_thread_join (th3, NULL);
+
+      os_thread_delete (th3);
+    }
+
+    {
+      // Custom static thread with static stack and lower priority.
       static char stack[2 * OS_INTEGER_RTOS_DEFAULT_STACK_SIZE_BYTES];
 
       os_thread_attr_t ath3;
@@ -249,7 +259,7 @@ test_c_api (void)
       ath3.th_stack_size_bytes = sizeof(stack);
 
       os_thread_t th3;
-      os_thread_create (&th3, "th3", func, NULL, &ath3);
+      os_thread_construct (&th3, "th3", func, NULL, &ath3);
 
       os_thread_prio_t prio;
       prio = os_thread_get_priority (&th3);
@@ -264,7 +274,7 @@ test_c_api (void)
       // Restore main thread priority.
       os_thread_set_priority (os_this_thread (), os_thread_priority_normal);
 
-      // os_thread_destroy(&th3);
+      os_thread_destruct (&th3);
     }
 
   // ==========================================================================
@@ -314,7 +324,7 @@ test_c_api (void)
 
     {
       os_timer_t tm1;
-      os_timer_create (&tm1, "tm1", tmfunc, NULL, NULL);
+      os_timer_construct (&tm1, "tm1", tmfunc, NULL, NULL);
 
       os_sysclock_sleep_for (1); // Sync
       os_timer_start (&tm1, 1);
@@ -326,14 +336,14 @@ test_c_api (void)
       name = os_timer_get_name (&tm1);
       assert(strcmp (name, "tm1") == 0);
 
-      os_timer_destroy (&tm1);
+      os_timer_destruct (&tm1);
     }
 
     {
       // Periodic timer
       os_timer_t tm2;
-      os_timer_create (&tm2, "tm2", tmfunc, NULL,
-                       os_timer_attr_get_periodic ());
+      os_timer_construct (&tm2, "tm2", tmfunc, NULL,
+                          os_timer_attr_get_periodic ());
 
       os_sysclock_sleep_for (1); // Sync
       os_timer_start (&tm2, 1);
@@ -345,7 +355,24 @@ test_c_api (void)
       name = os_timer_get_name (&tm2);
       assert(strcmp (name, "tm2") == 0);
 
-      os_timer_destroy (&tm2);
+      os_timer_destruct (&tm2);
+    }
+
+    {
+      os_timer_t* tm3;
+      tm3 = os_timer_new ("tm3", tmfunc, NULL, NULL);
+
+      os_sysclock_sleep_for (1); // Sync
+      os_timer_start (tm3, 1);
+
+      os_sysclock_sleep_for (2);
+
+      os_timer_stop (tm3);
+
+      name = os_timer_get_name (tm3);
+      assert(strcmp (name, "tm3") == 0);
+
+      os_timer_delete (tm3);
     }
 
   // ==========================================================================
@@ -354,7 +381,7 @@ test_c_api (void)
 
     {
       os_mutex_t mx1;
-      os_mutex_create (&mx1, "mx1", NULL);
+      os_mutex_construct (&mx1, "mx1", NULL);
 
       os_mutex_lock (&mx1);
       os_mutex_unlock (&mx1);
@@ -388,7 +415,7 @@ test_c_api (void)
 
       os_mutex_reset (&mx1);
 
-      os_mutex_destroy (&mx1);
+      os_mutex_destruct (&mx1);
     }
 
     {
@@ -404,17 +431,17 @@ test_c_api (void)
       amx2.clock = os_clock_get_rtclock ();
 
       os_mutex_t mx2;
-      os_mutex_create (&mx2, "mx2", &amx2);
+      os_mutex_construct (&mx2, "mx2", &amx2);
 
-      os_mutex_destroy (&mx2);
+      os_mutex_destruct (&mx2);
     }
 
     {
       // Recursive mutex.
       os_mutex_t mx3;
-      os_mutex_create (&mx3, "mx3", os_mutex_attr_get_recursive ());
+      os_mutex_construct (&mx3, "mx3", os_mutex_attr_get_recursive ());
 
-      os_mutex_destroy (&mx3);
+      os_mutex_destruct (&mx3);
     }
 
     {
@@ -425,9 +452,19 @@ test_c_api (void)
       amx4.clock = os_clock_get_rtclock ();
 
       os_mutex_t mx4;
-      os_mutex_create (&mx4, "mx4", &amx4);
+      os_mutex_construct (&mx4, "mx4", &amx4);
 
-      os_mutex_destroy (&mx4);
+      os_mutex_destruct (&mx4);
+    }
+
+    {
+      os_mutex_t* mx5;
+      mx5 = os_mutex_new ("mx5", NULL);
+
+      os_mutex_lock (mx5);
+      os_mutex_unlock (mx5);
+
+      os_mutex_delete (mx5);
     }
 
   // ==========================================================================
@@ -437,7 +474,7 @@ test_c_api (void)
     {
       // Binary semaphore, start at 0.
       os_semaphore_t sp1;
-      os_semaphore_binary_create (&sp1, "sp1", 0);
+      os_semaphore_binary_construct (&sp1, "sp1", 0);
 
       os_semaphore_post (&sp1);
       os_semaphore_wait (&sp1);
@@ -456,7 +493,7 @@ test_c_api (void)
 
       name = os_semaphore_get_name (&sp1);
 
-      os_semaphore_destroy (&sp1);
+      os_semaphore_destruct (&sp1);
     }
 
     {
@@ -469,17 +506,17 @@ test_c_api (void)
       asp2.clock = os_clock_get_rtclock ();
 
       os_semaphore_t sp2;
-      os_semaphore_create (&sp2, "sp2", &asp2);
+      os_semaphore_construct (&sp2, "sp2", &asp2);
 
-      os_semaphore_destroy (&sp2);
+      os_semaphore_destruct (&sp2);
     }
 
     {
       // Counting semaphore, 7 resources, start at 7.
       os_semaphore_t sp3;
-      os_semaphore_counting_create (&sp3, "sp3", 7, 7);
+      os_semaphore_counting_construct (&sp3, "sp3", 7, 7);
 
-      os_semaphore_destroy (&sp3);
+      os_semaphore_destruct (&sp3);
     }
 
     {
@@ -489,9 +526,20 @@ test_c_api (void)
       asp4.clock = os_clock_get_rtclock ();
 
       os_semaphore_t sp4;
-      os_semaphore_create (&sp4, "sp4", &asp4);
+      os_semaphore_construct (&sp4, "sp4", &asp4);
 
-      os_semaphore_destroy (&sp4);
+      os_semaphore_destruct (&sp4);
+    }
+
+    {
+      // Binary semaphore, start at 0.
+      os_semaphore_t* sp5;
+      sp5 = os_semaphore_binary_new ("sp5", 0);
+
+      os_semaphore_post (sp5);
+      os_semaphore_wait (sp5);
+
+      os_semaphore_destruct (sp5);
     }
 
   // ==========================================================================
@@ -503,7 +551,7 @@ test_c_api (void)
     {
       // Simple pool, dynamically allocated.
       os_mempool_t p1;
-      os_mempool_create (&p1, "p1", 3, sizeof(my_blk_t), NULL);
+      os_mempool_construct (&p1, "p1", 3, sizeof(my_blk_t), NULL);
 
       blk = os_mempool_alloc (&p1);
       os_mempool_free (&p1, blk);
@@ -514,7 +562,7 @@ test_c_api (void)
       blk = os_mempool_timed_alloc (&p1, 1);
       os_mempool_free (&p1, blk);
 
-      os_mempool_destroy (&p1);
+      os_mempool_destruct (&p1);
     }
 
     {
@@ -528,7 +576,7 @@ test_c_api (void)
       ap2.clock = os_clock_get_rtclock ();
 
       os_mempool_t p2;
-      os_mempool_create (&p2, "p2", 3, sizeof(my_blk_t), &ap2);
+      os_mempool_construct (&p2, "p2", 3, sizeof(my_blk_t), &ap2);
 
       blk = os_mempool_alloc (&p2);
 
@@ -536,7 +584,18 @@ test_c_api (void)
 
       os_mempool_reset (&p2);
 
-      os_mempool_destroy (&p2);
+      os_mempool_destruct (&p2);
+    }
+
+    {
+      // Simple pool, dynamically allocated.
+      os_mempool_t* p3;
+      p3 = os_mempool_new ("p3", 3, sizeof(my_blk_t), NULL);
+
+      blk = os_mempool_alloc (p3);
+      os_mempool_free (p3, blk);
+
+      os_mempool_delete (p3);
     }
 
   // ==========================================================================
@@ -556,7 +615,7 @@ test_c_api (void)
     {
       // Simple queues, dynamically allocated.
       os_mqueue_t q1;
-      os_mqueue_create (&q1, "q1", 3, sizeof(my_msg_t), NULL);
+      os_mqueue_construct (&q1, "q1", 3, sizeof(my_msg_t), NULL);
 
       os_mqueue_send (&q1, &msg_out, sizeof(msg_out), 0);
       os_mqueue_try_send (&q1, &msg_out, sizeof(msg_out), 0);
@@ -604,7 +663,7 @@ test_c_api (void)
 
       os_mqueue_reset (&q1);
 
-      os_mqueue_destroy (&q1);
+      os_mqueue_destruct (&q1);
     }
 
     {
@@ -619,7 +678,7 @@ test_c_api (void)
       aq2.clock = os_clock_get_rtclock ();
 
       os_mqueue_t q2;
-      os_mqueue_create (&q2, "q2", 3, sizeof(my_msg_t), &aq2);
+      os_mqueue_construct (&q2, "q2", 3, sizeof(my_msg_t), &aq2);
 
       os_mqueue_send (&q2, &msg_out, sizeof(msg_out), 0);
 
@@ -627,7 +686,19 @@ test_c_api (void)
       os_mqueue_receive (&q2, &msg_in, sizeof(msg_in), NULL);
       assert(msg_in.i = 1);
 
-      os_mqueue_destroy (&q2);
+      os_mqueue_destruct (&q2);
+    }
+
+    {
+      // Simple queues, dynamically allocated.
+      os_mqueue_t* q3;
+      q3 = os_mqueue_new ("q3", 3, sizeof(my_msg_t), NULL);
+
+      os_mqueue_send (q3, &msg_out, sizeof(msg_out), 0);
+
+      os_mqueue_receive (q3, &msg_in, sizeof(msg_in), NULL);
+
+      os_mqueue_delete (q3);
     }
 
   // ==========================================================================
@@ -636,7 +707,7 @@ test_c_api (void)
 
     {
       os_evflags_t ev1;
-      os_evflags_create (&ev1, "ev1", NULL);
+      os_evflags_construct (&ev1, "ev1", NULL);
 
       // Clear all flags.
       os_evflags_clear (&ev1, os_flags_all, NULL);
@@ -657,7 +728,7 @@ test_c_api (void)
 
       name = os_evflags_get_name (&ev1);
 
-      os_evflags_destroy (&ev1);
+      os_evflags_destruct (&ev1);
     }
 
     {
@@ -668,9 +739,22 @@ test_c_api (void)
       aev2.clock = os_clock_get_rtclock ();
 
       os_evflags_t ev2;
-      os_evflags_create (&ev2, "ev2", &aev2);
+      os_evflags_construct (&ev2, "ev2", &aev2);
 
-      os_evflags_destroy (&ev2);
+      os_evflags_destruct (&ev2);
+    }
+
+    {
+      os_evflags_t* ev3;
+      ev3 = os_evflags_new ("ev3", NULL);
+
+      // Clear all flags.
+      os_evflags_clear (ev3, os_flags_all, NULL);
+
+      os_evflags_raise (ev3, 0x1, NULL);
+      os_evflags_wait (ev3, 0x1, NULL, os_flags_mode_all | os_flags_mode_clear);
+
+      os_evflags_delete (ev3);
     }
 
   // ==========================================================================
@@ -679,7 +763,7 @@ test_c_api (void)
 
     {
       os_condvar_t cv1;
-      os_condvar_create (&cv1, "cv1", NULL);
+      os_condvar_construct (&cv1, "cv1", NULL);
 
       os_condvar_signal (&cv1);
 
@@ -689,7 +773,16 @@ test_c_api (void)
 
       name = os_condvar_get_name (&cv1);
 
-      os_condvar_destroy (&cv1);
+      os_condvar_destruct (&cv1);
+    }
+
+    {
+      os_condvar_t* cv2;
+      cv2 = os_condvar_new ("cv2", NULL);
+
+      os_condvar_signal (cv2);
+
+      os_condvar_delete (cv2);
     }
 
   // ==========================================================================

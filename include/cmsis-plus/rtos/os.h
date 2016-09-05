@@ -105,6 +105,8 @@
 
 #include <cmsis-plus/rtos/os-hooks.h>
 
+// More or less at the end, when all other definitions are available.
+#include <cmsis-plus/rtos/os-inlines.h>
 #include <cmsis-plus/rtos/port/os-inlines.h>
 
 namespace os

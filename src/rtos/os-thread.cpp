@@ -231,7 +231,7 @@ namespace os
     }
 
     thread::thread (const char* name) :
-        object_named
+        object_named_system
           { name }
     {
 #if defined(OS_TRACE_RTOS_THREAD)
@@ -335,12 +335,14 @@ namespace os
      */
     thread::thread (const char* name, func_t function, func_args_t args,
                     const attributes& attr, const allocator_type& allocator) :
-        object_named
+        object_named_system
           { name }
     {
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
+
+      allocator_ = &allocator;
 
       if (attr.th_stack_address != nullptr
           && attr.th_stack_size_bytes > stack::min_size ())
@@ -350,7 +352,6 @@ namespace os
       else
         {
           using allocator_type = memory::allocator<stack::allocation_element_t>;
-          allocator_ = &allocator;
 
           if (attr.th_stack_size_bytes > stack::min_size ())
             {

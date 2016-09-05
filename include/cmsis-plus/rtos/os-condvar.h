@@ -48,7 +48,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-condvar
      */
-    class condition_variable : public internal::object_named
+    class condition_variable : public internal::object_named_system
     {
     public:
 

@@ -259,7 +259,7 @@ namespace os
      */
     condition_variable::condition_variable (
         const char* name, const attributes& attr __attribute__((unused))) :
-        object_named
+        object_named_system
           { name }
     {
 #if defined(OS_TRACE_RTOS_CONDVAR)

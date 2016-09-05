@@ -341,7 +341,7 @@ namespace os
     }
 
     message_queue::message_queue (const char* name) :
-        object_named
+        object_named_system
           { name }
     {
 #if defined(OS_TRACE_RTOS_MQUEUE)
@@ -418,7 +418,7 @@ namespace os
                                   std::size_t msg_size_bytes,
                                   const attributes& attr,
                                   const allocator_type& allocator) :
-        object_named
+        object_named_system
           { name }
     {
 #if defined(OS_TRACE_RTOS_MQUEUE)

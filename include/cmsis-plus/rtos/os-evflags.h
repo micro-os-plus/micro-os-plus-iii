@@ -52,7 +52,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-evflag
      */
-    class event_flags : public internal::object_named
+    class event_flags : public internal::object_named_system
     {
     public:
 

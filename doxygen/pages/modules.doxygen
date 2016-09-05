@@ -613,16 +613,18 @@ os_main (int argc, char* argv[])
  startup code when running on bare metal.
 
  On synthetic POSIX platforms the default memory manager is 
- `malloc_memory_resource`, which uses memory from the system free store.
+ `os::memory::malloc_memory_resource`, which uses memory from 
+ the system free store.
 
  By default the RTOS system memory manager is the same as the application
  memory manager, but, for isolation reasons, it is recommended to define
- a separate memory mamanger for the RTOS.
+ a separate memory mamanger for the RTOS system objects.
 
- The basic memory management class is `memory_resource`, which will
- be standard from C++17. The CMSIS++ version of this class
+ The basic memory management class is `os::rtos::memory::memory_resource`, 
+ which will
+ be standard starting with C++17. The CMSIS++ version of this class
  includes several extensions, like out of memory processing and 
- statistics. 
+ statistics (and this is the reason the class is not defined in `os::estd`). 
   
  */
 
@@ -721,7 +723,7 @@ os_main (int argc, char* argv[])
     {
       // Unnamed default thread; stack dynamically allocated.
       os_thread_t th1;
-      os_thread_create (&th1, NULL, func, NULL, NULL);
+      os_thread_construct (&th1, NULL, func, NULL, NULL);
 
       name = os_thread_get_name (&th1);
 
@@ -729,17 +731,17 @@ os_main (int argc, char* argv[])
 
       // The destroy() is recommended, but not mandatory when using join().
       // The test checks if join() fully destroys the thread.
-      // os_thread_destroy(&th1);
+      os_thread_destruct(&th1);
     }
 
     {
       // Named default threads.
       os_thread_t th2;
-      os_thread_create (&th2, "th2", func, NULL, NULL);
+      os_thread_construct (&th2, "th2", func, NULL, NULL);
 
       os_thread_join (&th2, NULL);
 
-      // os_thread_destroy(&th2);
+      os_thread_destruct(&th2);
     }
 
     {
@@ -753,7 +755,7 @@ os_main (int argc, char* argv[])
       ath3.th_stack_size_bytes = sizeof(stack);
 
       os_thread_t th3;
-      os_thread_create (&th3, "th3", func, NULL, &ath3);
+      os_thread_construct (&th3, "th3", func, NULL, &ath3);
 
       os_thread_prio_t prio;
       prio = os_thread_get_priority (&th3);
@@ -767,7 +769,7 @@ os_main (int argc, char* argv[])
       // Restore main thread priority.
       os_thread_set_priority (os_this_thread (), os_thread_priority_normal);
 
-      // os_thread_destroy(&th3);
+      os_thread_destruct(&th3);
     }
 
     {
@@ -855,7 +857,7 @@ os_main (int argc, char* argv[])
 {
     {
       os_condvar_t cv1;
-      os_condvar_create (&cv1, "cv1", NULL);
+      os_condvar_construct (&cv1, "cv1", NULL);
 
       os_condvar_signal (&cv1);
 
@@ -865,7 +867,7 @@ os_main (int argc, char* argv[])
 
       name = os_condvar_get_name (&cv1);
 
-      os_condvar_destroy (&cv1);
+      os_condvar_destruct (&cv1);
     }
 }
  @endcode
@@ -887,7 +889,7 @@ os_main (int argc, char* argv[])
 {
     {
       os_evflags_t ev1;
-      os_evflags_create (&ev1, "ev1", NULL);
+      os_evflags_construct (&ev1, "ev1", NULL);
 
       // Clear all flags.
       os_evflags_clear (&ev1, 0x0, NULL);
@@ -908,7 +910,7 @@ os_main (int argc, char* argv[])
 
       name = os_evflags_get_name (&ev1);
 
-      os_evflags_destroy (&ev1);
+      os_evflags_destruct (&ev1);
     }
 
     {
@@ -919,9 +921,9 @@ os_main (int argc, char* argv[])
       aev2.clock = os_clock_get_rtclock ();
 
       os_evflags_t ev2;
-      os_evflags_create (&ev2, "ev2", &aev2);
+      os_evflags_construct (&ev2, "ev2", &aev2);
 
-      os_evflags_destroy (&ev2);
+      os_evflags_destruct (&ev2);
     }
 }
  @endcode
@@ -952,7 +954,7 @@ os_main (int argc, char* argv[])
     {
       // Simple pool, dynamically allocated.
       os_mempool_t p1;
-      os_mempool_create (&p1, "p1", 3, sizeof(my_blk_t), NULL);
+      os_mempool_construct (&p1, "p1", 3, sizeof(my_blk_t), NULL);
 
       blk = os_mempool_alloc (&p1);
       os_mempool_free (&p1, blk);
@@ -963,7 +965,7 @@ os_main (int argc, char* argv[])
       blk = os_mempool_timed_alloc (&p1, 1);
       os_mempool_free (&p1, blk);
 
-      os_mempool_destroy (&p1);
+      os_mempool_destruct (&p1);
     }
 
     {
@@ -977,7 +979,7 @@ os_main (int argc, char* argv[])
       ap2.clock = os_clock_get_rtclock ();
 
       os_mempool_t p2;
-      os_mempool_create (&p2, "p2", 3, sizeof(my_blk_t), &ap2);
+      os_mempool_construct (&p2, "p2", 3, sizeof(my_blk_t), &ap2);
 
       blk = os_mempool_alloc (&p2);
 
@@ -985,7 +987,7 @@ os_main (int argc, char* argv[])
 
       os_mempool_reset (&p2);
 
-      os_mempool_destroy (&p2);
+      os_mempool_destruct (&p2);
     }
 }
  @endcode
@@ -1022,7 +1024,7 @@ os_main (int argc, char* argv[])
     {
       // Simple queues, dynamically allocated.
       os_mqueue_t q1;
-      os_mqueue_create (&q1, "q1", 3, sizeof(my_msg_t), NULL);
+      os_mqueue_construct (&q1, "q1", 3, sizeof(my_msg_t), NULL);
 
       os_mqueue_send (&q1, &msg_out, sizeof(msg_out), 0);
       os_mqueue_try_send (&q1, &msg_out, sizeof(msg_out), 0);
@@ -1061,7 +1063,7 @@ os_main (int argc, char* argv[])
 
       os_mqueue_reset (&q1);
 
-      os_mqueue_destroy (&q1);
+      os_mqueue_destruct (&q1);
     }
 
     {
@@ -1076,7 +1078,7 @@ os_main (int argc, char* argv[])
       aq2.clock = os_clock_get_rtclock ();
 
       os_mqueue_t q2;
-      os_mqueue_create (&q2, "q2", 3, sizeof(my_msg_t), &aq2);
+      os_mqueue_construct (&q2, "q2", 3, sizeof(my_msg_t), &aq2);
 
       os_mqueue_send (&q2, &msg_out, sizeof(msg_out), 0);
 
@@ -1084,7 +1086,7 @@ os_main (int argc, char* argv[])
       os_mqueue_receive (&q2, &msg_in, sizeof(msg_in), NULL);
       assert(msg_in.i = 1);
 
-      os_mqueue_destroy (&q2);
+      os_mqueue_destruct (&q2);
     }
 }
  @endcode
@@ -1106,7 +1108,7 @@ os_main (int argc, char* argv[])
 {
     {
       os_mutex_t mx1;
-      os_mutex_create (&mx1, "mx1", NULL);
+      os_mutex_construct (&mx1, "mx1", NULL);
 
       os_mutex_lock (&mx1);
       os_mutex_unlock (&mx1);
@@ -1134,7 +1136,7 @@ os_main (int argc, char* argv[])
 
       os_mutex_reset (&mx1);
 
-      os_mutex_destroy (&mx1);
+      os_mutex_destruct (&mx1);
     }
 
     {
@@ -1150,17 +1152,17 @@ os_main (int argc, char* argv[])
       amx2.clock = os_clock_get_rtclock ();
 
       os_mutex_t mx2;
-      os_mutex_create (&mx2, "mx2", &amx2);
+      os_mutex_construct (&mx2, "mx2", &amx2);
 
-      os_mutex_destroy (&mx2);
+      os_mutex_destruct (&mx2);
     }
 
     {
       // Recursive mutex.
       os_mutex_t mx3;
-      os_mutex_create (&mx3, "mx3", os_mutex_attr_get_recursive ());
+      os_mutex_construct (&mx3, "mx3", os_mutex_attr_get_recursive ());
 
-      os_mutex_destroy (&mx3);
+      os_mutex_destruct (&mx3);
     }
 
     {
@@ -1171,9 +1173,9 @@ os_main (int argc, char* argv[])
       amx4.clock = os_clock_get_rtclock ();
 
       os_mutex_t mx4;
-      os_mutex_create (&mx4, "mx4", &amx4);
+      os_mutex_construct (&mx4, "mx4", &amx4);
 
-      os_mutex_destroy (&mx4);
+      os_mutex_destruct (&mx4);
     }
 }
  @endcode
@@ -1196,7 +1198,7 @@ os_main (int argc, char* argv[])
     {
       // Binary semaphore, start at 0.
       os_semaphore_t sp1;
-      os_semaphore_binary_create (&sp1, "sp1", 0);
+      os_semaphore_binary_construct (&sp1, "sp1", 0);
 
       os_semaphore_post (&sp1);
       os_semaphore_wait (&sp1);
@@ -1215,7 +1217,7 @@ os_main (int argc, char* argv[])
 
       name = os_semaphore_get_name (&sp1);
 
-      os_semaphore_destroy (&sp1);
+      os_semaphore_destruct (&sp1);
     }
 
     {
@@ -1228,17 +1230,17 @@ os_main (int argc, char* argv[])
       asp2.clock = os_clock_get_rtclock ();
 
       os_semaphore_t sp2;
-      os_semaphore_create (&sp2, "sp2", &asp2);
+      os_semaphore_construct (&sp2, "sp2", &asp2);
 
-      os_semaphore_destroy (&sp2);
+      os_semaphore_destruct (&sp2);
     }
 
     {
       // Counting semaphore, 7 resources, start at 7.
       os_semaphore_t sp3;
-      os_semaphore_counting_create (&sp3, "sp3", 7, 7);
+      os_semaphore_counting_construct (&sp3, "sp3", 7, 7);
 
-      os_semaphore_destroy (&sp3);
+      os_semaphore_destruct (&sp3);
     }
 
     {
@@ -1248,9 +1250,9 @@ os_main (int argc, char* argv[])
       asp4.clock = os_clock_get_rtclock ();
 
       os_semaphore_t sp4;
-      os_semaphore_create (&sp4, "sp4", &asp4);
+      os_semaphore_construct (&sp4, "sp4", &asp4);
 
-      os_semaphore_destroy (&sp4);
+      os_semaphore_destruct (&sp4);
     }
 }
  @endcode
@@ -1278,7 +1280,7 @@ os_main (int argc, char* argv[])
 {
    {
       os_timer_t tm1;
-      os_timer_create (&tm1, "tm1", tmfunc, NULL, NULL);
+      os_timer_construct (&tm1, "tm1", tmfunc, NULL, NULL);
 
       os_sysclock_sleep_for (1); // Sync
       os_timer_start (&tm1, 1);
@@ -1290,13 +1292,13 @@ os_main (int argc, char* argv[])
       name = os_timer_get_name (&tm1);
       assert(strcmp (name, "tm1") == 0);
 
-      os_timer_destroy (&tm1);
+      os_timer_destruct (&tm1);
     }
 
     {
       // Periodic timer
       os_timer_t tm2;
-      os_timer_create (&tm2, "tm2", tmfunc, NULL,
+      os_timer_construct (&tm2, "tm2", tmfunc, NULL,
                        os_timer_attr_get_periodic ());
 
       os_sysclock_sleep_for (1); // Sync
@@ -1309,7 +1311,7 @@ os_main (int argc, char* argv[])
       name = os_timer_get_name (&tm2);
       assert(strcmp (name, "tm2") == 0);
 
-      os_timer_destroy (&tm2);
+      os_timer_destruct (&tm2);
     }
 }
  @endcode
@@ -1345,17 +1347,18 @@ os_main (int argc, char* argv[])
  startup code when running on bare metal.
 
  On synthetic POSIX platforms the default memory manager is 
- `os::rtos::memory::malloc_memory_resource`, which uses memory 
+ `os::memory::malloc_memory_resource`, which uses memory 
  from the system free store.
 
  By default the RTOS system memory manager is the same as the application
- memory manager, but, for isolation reasons, it is recommended to define
- a separate memory mamanger for the RTOS.
+ memory manager, but, for isolation reasons, it is recommended to set
+ a separate memory mamanger for the RTOS system objects
+ (with `os::rtos::memory::set_default_resource()`).
 
  The basic memory management class is `os::rtos::memory::memory_resource`, 
- which will be standard from C++17. The CMSIS++ version of this class
+ which will be standard starting with C++17. The CMSIS++ version of this class
  includes several extensions, like out of memory processing and 
- statistics. 
+ statistics (and this is the reason the class is not defined in `os::estd`). 
 
  Access to these classes from C can be done using the `os_memory_*()` 
  functions.

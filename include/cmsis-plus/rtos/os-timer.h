@@ -55,7 +55,7 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-timer
      */
-    class timer : public internal::object_named
+    class timer : public internal::object_named_system
     {
     public:
 
