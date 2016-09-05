@@ -63,10 +63,6 @@ namespace os
     {
       // ----------------------------------------------------------------------
 
-      // The default memory resource is the LIBC malloc().
-      // The actual definition is located in rtos/os-memory.cpp.
-      // memory_resource* default_resource __attribute__((weak)) = &malloc_res;
-
       memory_resource*
       set_default_resource (memory_resource* res) noexcept
       {

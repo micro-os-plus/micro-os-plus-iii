@@ -75,11 +75,18 @@ namespace os
        */
 
       /**
+       * @name RTOS System Memory Functions
+       * @{
+       */
+
+      /**
        * @brief Get the address of a memory manager based on POSIX `malloc()`.
+       * @par Parameters
+       *  None
        * @return Pointer to a memory manager object instance.
        */
       memory_resource*
-      malloc_resource () noexcept;
+      malloc_resource (void) noexcept;
 
       /**
        * @brief Set the default RTOS system memory manager.
@@ -91,13 +98,18 @@ namespace os
 
       /**
        * @brief Get the default RTOS system memory manager.
+       * @par Parameters
+       *  None
        * @return Pointer to a memory manager object instance.
        */
       memory_resource*
       get_default_resource (void) noexcept;
 
-      // ======================================================================
+      /**
+       * @}
+       */
 
+      // ======================================================================
       /**
        * @brief Type of out of memory handler.
        */
@@ -368,6 +380,11 @@ namespace os
       };
 
       /**
+       * @name Operators
+       * @{
+       */
+
+      /**
        * @brief Compare the `memory_resource` instances for equality.
        * @param lhs First instance to compare.
        * @param rhs Second instance to compare.
@@ -389,8 +406,11 @@ namespace os
       operator!= (const memory_resource& lhs, const memory_resource& rhs)
           noexcept;
 
-      // ======================================================================
+      /**
+       * @}
+       */
 
+      // ======================================================================
       /**
        * @brief Standard allocator based on the RTOS system default memory
        * manager.
@@ -602,9 +622,10 @@ namespace os
 
       /**
        * @details
-       * If not set explicitly by the user (for example when
-       * running on the synthetic POSIX platform), this function
-       * will return an instance of `malloc_memory_resource`.
+       * If not set explicitly by the user, this function
+       * will return an instance of `malloc_memory_resource`
+       * on bare metal platforms and of
+       * `malloc_memory_resource` on POSIX platforms.
        */
       inline memory_resource*
       get_default_resource (void) noexcept

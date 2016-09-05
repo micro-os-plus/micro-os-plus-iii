@@ -54,12 +54,18 @@ namespace
 {
   /**
    * @brief The current new handler.
+   *
    * @details
-   * The initial new_handler is a null pointer, initialised as
+   * The initial `new_handler` is a null pointer, initialised as
    * part of the .bss section.
    */
   std::new_handler new_handler_;
 }
+
+/**
+ * @addtogroup cmsis-plus-rtos-memres
+ * @{
+ */
 
 namespace std
 {
@@ -73,7 +79,15 @@ namespace std
    * as the current `new_handler`.
    * @param handler Pointer to user function.
    * @return The previous handler.
+   *
    * @details
+   * This handler is invoked when the standard operator new()
+   * detect an out of memory condition, to give a chance to the
+   * application process it properly. If the application
+   * can arrange for more memory to be used for allocation,
+   * this function should return and the allocation process is retried.
+   * If not, this function should gracefully shut down and restart.
+   *
    * The initial `new_handler` is a null pointer.
    */
   new_handler
@@ -89,6 +103,15 @@ namespace std
     return prev_handler;
   }
 
+  /**
+   * @brief Get the current handler.
+   * @par Parameters
+   *  None
+   * @return Pointer to user function, or `nullptr` if not set.
+   *
+   * @details
+   * The initial `new_handler` is a null pointer.
+   */
   new_handler
   get_new_handler () noexcept
   {
@@ -100,9 +123,18 @@ namespace std
 // ----------------------------------------------------------------------------
 
 /**
+ * @name Standard operators
+ * @{
+ */
+
+/**
+ * @brief Allocate space for a new object instance.
+ * @param bytes Number of bytes to allocate.
+ * @return Pointer to allocated object.
+ *
  * @details
  * The allocation function (3.7.4.1) called by a new-expression (5.3.4)
- * to allocate size bytes of storage suitably aligned to represent
+ * to allocate a storage of size _bytes_ suitably aligned to represent
  * any object of that size.
  *
  * Return a non-null pointer to suitably aligned storage (3.7.4),
@@ -111,11 +143,14 @@ namespace std
  *
  * @note A C++ program may define a function with this function signature
  * that displaces the default version defined by the C++ standard library.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
  */
 void *
 __attribute__((weak))
 operator new (std::size_t bytes)
 {
+  assert(!rtos::interrupts::in_handler_mode ());
   if (bytes == 0)
     {
       bytes = 1;
@@ -152,24 +187,34 @@ operator new (std::size_t bytes)
 }
 
 /**
+ * @brief Allocate space for a new object instance (nothrow).
+ * @param bytes Number of bytes to allocate.
+ * @param nothrow
+ * @return Pointer to allocated object.
+ *
  * @details
- * Same as new(size), except that it is called by a placement
- * version of a new-expression when a C++ program prefers a null
- * pointer result as an error indication, instead of a bad_alloc exception.
+ * Same as `new(bytes)`, except that it is called
+ * when a C++ program prefers a null
+ * pointer result as an error indication, instead of a `bad_alloc` exception.
  *
  * Return a non-null pointer to suitably aligned storage (3.7.4),
- * or else return a null pointer. This nothrow version of operator new
+ * or else return a null pointer. This `nothrow` version of `operator new`
  * returns a pointer obtained as if acquired from the (possibly replaced)
  * ordinary version. This requirement is binding on a replacement
  * version of this function.
  *
  * @note A C++ program may define a function with this function signature
  * that displaces the default version defined by the C++ standard library.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
  */
 void*
 __attribute__((weak))
-operator new (std::size_t bytes, const std::nothrow_t&) noexcept
+operator new (std::size_t bytes,
+              const std::nothrow_t& nothrow __attribute__((unused))) noexcept
 {
+  assert(!rtos::interrupts::in_handler_mode ());
+
   if (bytes == 0)
     {
       bytes = 1;
@@ -208,6 +253,10 @@ operator new (std::size_t bytes, const std::nothrow_t&) noexcept
 }
 
 /**
+ * @brief Allocate space for an array of new object instances.
+ * @param bytes Number of bytes to allocate.
+ * @return Pointer to allocated object.
+ *
  * @details
  * The allocation function (3.7.4.1) called by the array form of a
  * new-expression (5.3.4) to allocate size bytes of storage suitably
@@ -215,6 +264,8 @@ operator new (std::size_t bytes, const std::nothrow_t&) noexcept
  *
  * @note A C++ program may define a function with this function signature
  * that displaces the default version defined by the C++ standard library.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
  */
 void*
 __attribute__((weak))
@@ -224,17 +275,25 @@ operator new[] (std::size_t bytes)
 }
 
 /**
+ * @brief Allocate space for an array of new object instances (nothrow).
+ * @param bytes Number of bytes to allocate.
+ * @param nothrow
+ * @return Pointer to allocated object.
+ *
  * @details
- * Same as new[](size), except that it is called by a placement
- * version of a new-expression when a C++ program prefers a null
- * pointer result as an error indication, instead of a bad_alloc exception.
+ * Same as new[](size), except that it is called by
+ * a C++ program that prefers a null
+ * pointer result as an error indication, instead of a `bad_alloc` exception.
  *
  * @note A C++ program may define a function with this function signature
  * that displaces the default version defined by the C++ standard library.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
  */
 void*
 __attribute__((weak))
-operator new[] (std::size_t bytes, const std::nothrow_t&) noexcept
+operator new[] (std::size_t bytes,
+                const std::nothrow_t& nothrow __attribute__((unused))) noexcept
 {
   return ::operator new (bytes, std::nothrow);
 }
@@ -242,6 +301,11 @@ operator new[] (std::size_t bytes, const std::nothrow_t&) noexcept
 // ----------------------------------------------------------------------------
 
 /**
+ * @brief Deallocate the dynamically allocated object instance.
+ * @param ptr Pointer to object.
+ * @par Returns
+ *  Nothing.
+ *
  * @details
  * The deallocation function (3.7.4.2) called by a delete-expression
  * to render the value of ptr invalid.
@@ -256,6 +320,8 @@ operator new[] (std::size_t bytes, const std::nothrow_t&) noexcept
  *
  * @note A C++ program may define a function with this function signature
  * that displaces the default version defined by the C++ standard library.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
  */
 void
 __attribute__((weak))
@@ -264,6 +330,8 @@ operator delete (void* ptr) noexcept
 #if defined(OS_TRACE_LIBCPP_OPERATOR_NEW)
   trace::printf ("::%s(%p)\n", __func__, ptr);
 #endif
+
+  assert(!rtos::interrupts::in_handler_mode ());
 
   if (ptr)
     {
@@ -282,6 +350,30 @@ operator delete (void* ptr) noexcept
 void
 operator delete (void* ptr, std::size_t bytes) noexcept;
 
+/**
+ * @brief Deallocate the dynamically allocated object instance.
+ * @param ptr Pointer to object.
+ * @param bytes Number of bytes to deallocate.
+ * @par Returns
+ *  Nothing.
+ *
+ * @details
+ * The deallocation function (3.7.4.2) called by a delete-expression
+ * to render the value of _ptr_ invalid.
+ *
+ * _ptr_ shall be a null pointer or its value shall be a value returned by
+ * an earlier call to the (possibly replaced) operator new()
+ * which has not
+ * been invalidated by an intervening call to operator delete(void*).
+ *
+ * If _ptr_ is null, does nothing. Otherwise, reclaims the storage
+ * allocated by the earlier call to operator new.
+ *
+ * @note A C++ program may define a function with this function signature
+ * that displaces the default version defined by the C++ standard library.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ */
 void
 __attribute__((weak))
 operator delete (void* ptr, std::size_t bytes) noexcept
@@ -289,6 +381,8 @@ operator delete (void* ptr, std::size_t bytes) noexcept
 #if defined(OS_TRACE_LIBCPP_OPERATOR_NEW)
   trace::printf ("::%s(%p,%u)\n", __func__, ptr, bytes);
 #endif
+
+  assert(!rtos::interrupts::in_handler_mode ());
 
   if (ptr)
     {
@@ -303,6 +397,12 @@ operator delete (void* ptr, std::size_t bytes) noexcept
 #pragma GCC diagnostic pop
 
 /**
+ * @brief Deallocate the dynamically allocated object instance (nothrow).
+ * @param ptr Pointer to object.
+ * @param nothrow
+ * @par Returns
+ *  Nothing.
+ *
  * @details
  * The deallocation function (3.7.4.2) called by the implementation
  * to render the value of ptr invalid when the constructor invoked
@@ -311,14 +411,19 @@ operator delete (void* ptr, std::size_t bytes) noexcept
  *
  * @note A C++ program may define a function with this function signature
  * that displaces the default version defined by the C++ standard library.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
  */
 void
 __attribute__((weak))
-operator delete (void* ptr, const std::nothrow_t&) noexcept
+operator delete (void* ptr,
+                 const std::nothrow_t& nothrow __attribute__((unused))) noexcept
 {
 #if defined(OS_TRACE_LIBCPP_OPERATOR_NEW)
   trace::printf ("::%s(%p)\n", __func__, ptr);
 #endif
+
+  assert(!rtos::interrupts::in_handler_mode ());
 
   if (ptr)
     {
@@ -331,12 +436,22 @@ operator delete (void* ptr, const std::nothrow_t&) noexcept
 }
 
 /**
+ * @brief Deallocate the dynamically allocated array of object.
+ * @param ptr Pointer to array of objects.
+ * @par Returns
+ *  Nothing.
+ *
  * @details
  * The deallocation function (3.7.4.2) called by the array form of
  * a delete-expression to render the value of ptr invalid.
  *
+ * If _ptr_ is null, does nothing. Otherwise, reclaims the storage
+ * allocated by the earlier call to operator new.
+ *
  * @note A C++ program may define a function with this function signature
  * that displaces the default version defined by the C++ standard library.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
  */
 void
 __attribute__((weak))
@@ -351,6 +466,25 @@ operator delete[] (void* ptr) noexcept
 void
 operator delete[] (void* ptr, std::size_t bytes) noexcept;
 
+/**
+ * @brief Deallocate the dynamically allocated array of object.
+ * @param ptr Pointer to array of objects.
+ * @param bytes Number of bytes to deallocate.
+ * @par Returns
+ *  Nothing.
+ *
+ * @details
+ * The deallocation function (3.7.4.2) called by the array form of
+ * a delete-expression to render the value of ptr invalid.
+ *
+ * If _ptr_ is null, does nothing. Otherwise, reclaims the storage
+ * allocated by the earlier call to operator new.
+ *
+ * @note A C++ program may define a function with this function signature
+ * that displaces the default version defined by the C++ standard library.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ */
 void
 __attribute__((weak))
 operator delete[] (void* ptr, std::size_t bytes) noexcept
@@ -361,14 +495,25 @@ operator delete[] (void* ptr, std::size_t bytes) noexcept
 #pragma GCC diagnostic pop
 
 /**
+ * @brief Deallocate the dynamically allocated array of object (nothrow).
+ * @param ptr Pointer to array of objects.
+ * @param nothrow
+ * @par Returns
+ *  Nothing.
+ *
  * @details
  * The deallocation function (3.7.4.2) called by the implementation to
  * render the value of ptr invalid when the constructor invoked
  * from a nothrow placement version of the array new-expression
  * throws an exception.
  *
+ * If _ptr_ is null, does nothing. Otherwise, reclaims the storage
+ * allocated by the earlier call to operator new.
+ *
  * @note A C++ program may define a function with this function signature
  * that displaces the default version defined by the C++ standard library.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
  */
 void
 __attribute__((weak))
@@ -377,5 +522,12 @@ operator delete[] (void* ptr, const std::nothrow_t& nothrow) noexcept
   ::operator delete (ptr, nothrow);
 }
 
-// ----------------------------------------------------------------------------
+/**
+ * @}
+ */
 
+/**
+ * @}
+ */
+
+// ----------------------------------------------------------------------------

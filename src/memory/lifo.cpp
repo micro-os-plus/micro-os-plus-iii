@@ -26,6 +26,7 @@
  */
 
 #include <cmsis-plus/memory/lifo.h>
+#include <memory>
 
 // ----------------------------------------------------------------------------
 
@@ -44,8 +45,8 @@ namespace os
      *
      * Deallocation is not guaranteed to be deterministic, but if
      * done in strict reverse allocation order, it becomes deterministic,
-     * otherwise a traversal of the free list is done, the older the block,
-     * the more nodes to traverse.
+     * otherwise a traversal of the free list is required, the older the
+     * block, the more nodes to traverse.
      */
 
     /**
@@ -64,7 +65,7 @@ namespace os
      * @details
      * The allocator is deterministic and fast, it always uses
      * the top part of the first block (memory is allocated
-     * bottom-down). If this block is not large enough, the
+     * top-down). If this block is not large enough, the
      * allocation fails; the free list is never traversed, since
      * this is no longer deterministic.
      *
@@ -73,6 +74,12 @@ namespace os
      * is allowed, but memory is not reused until the previous
      * adjacent block is freed, and so on recursively, increasing
      * back the size of the first block.
+     *
+     * With the given top-down allocation policy, recent block have always
+     * lower addresses.
+     *
+     * Similarly, a block is reused only after all more recently
+     * allocated blocks are freed.
      *
      * @par Exceptions
      *   Throws nothing itself, but the out of memory handler may

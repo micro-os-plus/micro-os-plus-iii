@@ -31,6 +31,7 @@
 
 #include <cmsis-plus/memory/newlib-nano-malloc.h>
 #include <cmsis-plus/memory/lifo.h>
+#include <cmsis-plus/estd/memory_resource>
 
 // ----------------------------------------------------------------------------
 

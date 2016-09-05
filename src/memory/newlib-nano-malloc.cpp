@@ -26,6 +26,7 @@
  */
 
 #include <cmsis-plus/memory/newlib-nano-malloc.h>
+#include <memory>
 
 // ----------------------------------------------------------------------------
 
@@ -108,7 +109,7 @@ namespace os
      * the block is not split, but left partly unused.
      *
      * When large blocks are split, the top sub-block is returned;
-     * in other words, memory is allocated bottom-down. This speeds
+     * in other words, memory is allocated top-down. This speeds
      * up deallocation for blocks allocated recently.
      *
      * @par Exceptions
@@ -250,9 +251,9 @@ namespace os
      *
      * Deallocation is not guaranteed to be deterministic, but if
      * done in strict reverse allocation order, it becomes deterministic,
-     * otherwise a traversal of the free list is done, the older the block,
-     * the more nodes to traverse (the free list is kept ordered by
-     * addresses).
+     * otherwise a traversal of the free list is required, the older the
+     * block, the more nodes to traverse (the free list is kept in
+     * ascending addresses order).
      *
      * If the block is already in the free list, issue a trace message,
      * but otherwise ignore the condition.

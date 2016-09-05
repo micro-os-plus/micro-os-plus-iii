@@ -25,15 +25,14 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CMSIS_PLUS_MEMORY_LIFO_H_
-#define CMSIS_PLUS_MEMORY_LIFO_H_
+#ifndef CMSIS_PLUS_MEMORY_NULL_H_
+#define CMSIS_PLUS_MEMORY_NULL_H_
 
 // ----------------------------------------------------------------------------
 
 #if defined(__cplusplus)
 
 #include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/memory/newlib-nano-malloc.h>
 
 // ----------------------------------------------------------------------------
 
@@ -42,15 +41,25 @@ namespace os
   namespace memory
   {
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wweak-vtables"
+#endif
+
     // ========================================================================
 
     /**
-     * @brief Memory resource implementing the LIFO
-     * allocation/deallocation policies.
+     * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-memres
-     * @headerfile newlib-nano-malloc.h <cmsis-plus/memory/lifo.h>
+     * @brief
+     * An internal memory manager that throws a `bad_alloc()`
+     * exception when trying to allocate.
+     *
+     * It is the default memory manager when running on bare metal
+     * platforms, to prevent unwanted dynamic allocations,
+     * unless another setting is done during startup.
      */
-    class lifo : public os::memory::newlib_nano_malloc
+    class null_memory_resource : public rtos::memory::memory_resource
     {
     public:
 
@@ -60,40 +69,30 @@ namespace os
        */
 
       /**
-       * @brief Construct a memory resource object instance.
-       * @param addr_begin Begin of allocator arena.
-       * @param addr_end End of allocator arena.
+       * @brief Default constructor. Construct a memory manager object instance.
        */
-      lifo (void* addr_begin, void* addr_end);
-
-      /**
-       * @brief Construct a memory resource object instance.
-       * @param addr Begin of allocator arena.
-       * @param bytes Size of allocator arena, in bytes.
-       */
-      lifo (void* addr, std::size_t bytes);
+      null_memory_resource () = default;
 
       /**
        * @cond ignore
        */
 
       // The rule of five.
-      lifo (const lifo&) = delete;
-      lifo (lifo&&) = delete;
-      lifo&
-      operator= (const lifo&) = delete;
-      lifo&
-      operator= (lifo&&) = delete;
+      null_memory_resource (const null_memory_resource&) = delete;
+      null_memory_resource (null_memory_resource&&) = delete;
+      null_memory_resource&
+      operator= (const null_memory_resource&) = delete;
+      null_memory_resource&
+      operator= (null_memory_resource&&) = delete;
 
       /**
        * @endcond
        */
 
       /**
-       * @brief Destruct the memory resource object instance.
+       * @brief Destruct the memory manager object instance.
        */
-      virtual
-      ~lifo ();
+      ~null_memory_resource () = default;
 
       /**
        * @}
@@ -116,10 +115,23 @@ namespace os
       do_allocate (std::size_t bytes, std::size_t alignment) override;
 
       /**
+       * @brief Implementation of the memory deallocator.
+       * @param addr Address of a previously allocated block to free.
+       * @param bytes Number of bytes to deallocate (may be 0 if unknown).
+       * @param alignment Alignment constraint (power of 2).
+       * @par Returns
+       *  Nothing.
+       */
+      virtual void
+      do_deallocate (void* addr, std::size_t bytes, std::size_t alignment)
+          noexcept override;
+
+      /**
        * @}
        */
-
     };
+
+#pragma GCC diagnostic pop
 
   // -------------------------------------------------------------------------
   } /* namespace memory */
@@ -134,24 +146,26 @@ namespace os
 
     // ========================================================================
 
-    inline
-    lifo::lifo (void* addr, std::size_t bytes) :
-        newlib_nano_malloc
-          { addr, bytes }
+#pragma GCC diagnostic push
+// Needed because 'alignment' is used only in trace calls.
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+    inline void*
+    null_memory_resource::do_allocate (std::size_t bytes, std::size_t alignment)
+    {
+      estd::__throw_bad_alloc ();
+    }
+
+    inline void
+    null_memory_resource::do_deallocate (void* addr, std::size_t bytes,
+                                         std::size_t alignment) noexcept
     {
       ;
     }
 
-    inline
-    lifo::lifo (void* addr_begin, void* addr_end) :
-        newlib_nano_malloc
-          { addr_begin, addr_end }
-    {
-      ;
-    }
+#pragma GCC diagnostic pop
 
-  // --------------------------------------------------------------------------
-
+  // ==========================================================================
   } /* namespace memory */
 } /* namespace os */
 
@@ -159,4 +173,4 @@ namespace os
 
 #endif /* __cplusplus */
 
-#endif /* CMSIS_PLUS_MEMORY_LIFO_H_ */
+#endif /* CMSIS_PLUS_MEMORY_NULL_H_ */

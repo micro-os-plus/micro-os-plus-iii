@@ -33,7 +33,6 @@
 #if defined(__cplusplus)
 
 #include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/estd/memory_resource>
 
 // ----------------------------------------------------------------------------
 
