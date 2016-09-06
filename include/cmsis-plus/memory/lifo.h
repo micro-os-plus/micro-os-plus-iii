@@ -66,11 +66,27 @@ namespace os
       lifo (void* addr_begin, void* addr_end);
 
       /**
+       * @brief Construct a named memory resource object instance.
+       * @param name Pointer to name.
+       * @param addr_begin Begin of allocator arena.
+       * @param addr_end End of allocator arena.
+       */
+      lifo (const char* name, void* addr_begin, void* addr_end);
+
+      /**
        * @brief Construct a memory resource object instance.
        * @param addr Begin of allocator arena.
        * @param bytes Size of allocator arena, in bytes.
        */
       lifo (void* addr, std::size_t bytes);
+
+      /**
+       * @brief Construct a named memory resource object instance.
+       * @param name Pointer to name.
+       * @param addr Begin of allocator arena.
+       * @param bytes Size of allocator arena, in bytes.
+       */
+      lifo (const char* name, void* addr, std::size_t bytes);
 
       /**
        * @cond ignore
@@ -134,20 +150,39 @@ namespace os
     // ========================================================================
 
     inline
-    lifo::lifo (void* addr, std::size_t bytes) :
+    lifo::lifo (const char* name, void* addr, std::size_t bytes) :
         first_fit_top
-          { addr, bytes }
+          { name, addr, bytes }
     {
-      trace::printf ("%s(%p,%u) @%p \n", __func__, addr, bytes, this);
+      trace::printf ("%s(%p,%u) @%p %s\n", __func__, addr, bytes, this,
+                     this->name ());
+    }
+
+    inline
+    lifo::lifo (const char* name, void* addr_begin, void* addr_end) :
+        first_fit_top
+          { name, addr_begin, addr_end }
+    {
+      assert(addr_begin < addr_end);
+
+      trace::printf ("%s(%p,%p) @%p %s\n", __func__, addr_begin, addr_end, this,
+                     this->name ());
     }
 
     inline
     lifo::lifo (void* addr_begin, void* addr_end) :
         lifo
-          { addr_begin, static_cast<std::size_t> (static_cast<char*> (addr_end)
-              - static_cast<char*> (addr_begin)) }
+          { nullptr, addr_begin, addr_end }
     {
-      assert(addr_begin < addr_end);
+      ;
+    }
+
+    inline
+    lifo::lifo (void* addr, std::size_t bytes) :
+        first_fit_top
+          { nullptr, addr, bytes }
+    {
+      ;
     }
 
   // --------------------------------------------------------------------------

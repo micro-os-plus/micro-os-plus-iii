@@ -62,7 +62,8 @@ namespace os
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #endif
 
-      static os::memory::malloc_memory_resource malloc_res;
+      static os::memory::malloc_memory_resource malloc_res
+        { "malloc" };
       static os::memory::new_delete_memory_resource new_delete_res;
       static os::memory::null_memory_resource null_res;
 

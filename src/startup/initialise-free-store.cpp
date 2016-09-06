@@ -93,7 +93,7 @@ os_startup_initialize_free_store (void* heap_begin, void* heap_end)
 
   // Construct the memory resource used for the application free store.
   new (&application_free_store) application_memory_resource
-    { heap_begin, heap_end };
+    { "app", heap_begin, heap_end };
 
   // Configure the memory manager to throw an exception when out of memory.
   reinterpret_cast<rtos::memory::memory_resource*> (&application_free_store)->out_of_memory_handler (
@@ -110,13 +110,13 @@ os_startup_initialize_free_store (void* heap_begin, void* heap_end)
 
   // Allocate the RTOS dynamic memory on the application free store.
   void* rtos_arena =
-      reinterpret_cast<rtos::memory::memory_resource*> (&application_free_store)->allocate (
+  reinterpret_cast<rtos::memory::memory_resource*> (&application_free_store)->allocate (
       OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES);
 
   // Allocate & construct the memory resource used for the RTOS.
   rtos::memory::memory_resource* rtos_dynamic_memory;
   rtos_dynamic_memory = new rtos_memory_resource
-    { rtos_arena, OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES };
+    { "sys", rtos_arena, OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES};
 
   // Configure the memory manager to throw an exception when out of memory.
   rtos_dynamic_memory->out_of_memory_handler (estd::__throw_bad_alloc);

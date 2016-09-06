@@ -75,6 +75,11 @@ namespace os
       malloc_memory_resource ();
 
       /**
+       * @brief Construct a named memory manager object instance.
+       */
+      malloc_memory_resource (const char* name);
+
+      /**
        * @cond ignore
        */
 
@@ -214,13 +219,21 @@ namespace os
     inline
     malloc_memory_resource::malloc_memory_resource ()
     {
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
+    }
+
+    inline
+    malloc_memory_resource::malloc_memory_resource (const char* name) :
+        rtos::memory::memory_resource
+          { name }
+    {
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
     }
 
     inline
     malloc_memory_resource::~malloc_memory_resource ()
     {
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
     }
 
 #pragma GCC diagnostic push
@@ -234,8 +247,8 @@ namespace os
       // Ignore alignment for now.
       void* mem = std::malloc (bytes);
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
-      trace::printf ("%s(%u,%u)=%p @%p\n", __func__, bytes, alignment, mem,
-          this);
+      trace::printf ("%s(%u,%u)=%p @%p %s\n", __func__, bytes, alignment, mem,
+                     this, name ());
 #endif
       return mem;
     }
@@ -245,8 +258,8 @@ namespace os
                                            std::size_t alignment) noexcept
     {
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
-      trace::printf ("%s(%p,%u,%u) @%p\n", __func__, addr, bytes, alignment,
-          this);
+      trace::printf ("%s(%p,%u,%u) @%p %s\n", __func__, addr, bytes, alignment,
+                     this, name ());
 #endif
       // Ignore size and alignment for now.
       std::free (addr);
@@ -266,8 +279,8 @@ namespace os
       // Ignore alignment for now.
       void* mem = ::operator new (bytes);
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
-      trace::printf ("%s(%u,%u)=%p @%p\n", __func__, bytes, alignment, mem,
-          this);
+      trace::printf ("%s(%u,%u)=%p @%p %s\n", __func__, bytes, alignment, mem,
+                     this, name ());
 #endif
       return mem;
     }
@@ -277,8 +290,8 @@ namespace os
                                                size_t alignment) noexcept
     {
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
-      trace::printf ("%s(%p,%u,%u) @%p\n", __func__, addr, bytes, alignment,
-          this);
+      trace::printf ("%s(%p,%u,%u) @%p %s\n", __func__, addr, bytes, alignment,
+                     this, name ());
 #endif
       // Ignore size and alignment for now.
       ::operator delete (addr);

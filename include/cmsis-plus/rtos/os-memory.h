@@ -123,7 +123,7 @@ namespace os
        * several extensions, to control the throw behaviour and to
        * add statistics.
        */
-      class memory_resource
+      class memory_resource : public internal::object_named
       {
 
       public:
@@ -140,9 +140,20 @@ namespace os
          */
 
         /**
+         * @brief Default constructor. Construct a memory resource
+         *  object instance.
+         */
+        memory_resource () = default;
+
+        /**
+         * @brief Construct a named memory resource object instance.
+         * @param name Pointer to name.
+         */
+        memory_resource (const char* name);
+
+        /**
          * @brief Destruct the memory resource object instance.
          */
-
         virtual
         ~memory_resource ();
 
@@ -477,7 +488,7 @@ namespace os
           /**
            * @brief Copy assignment operator.
            * @param a Reference to existing allocator.
-           * @return
+           * @return Reference to allocator.
            */
           default_resource_allocator&
           operator= (default_resource_allocator const & a) = default;
@@ -485,7 +496,7 @@ namespace os
           /**
            * @brief Move assignment operator.
            * @param a Reference to existing allocator.
-           * @return
+           * @return Reference to allocator.
            */
           default_resource_allocator&
           operator= (default_resource_allocator && a) = default;
@@ -519,7 +530,7 @@ namespace os
            * @param addr Pointer to previously allocated memory blocks.
            * @param elements Number of elements of type `value_type`.
            * @par Returns
-           *  Nothing
+           *  Nothing.
            */
           void
           deallocate (value_type* addr, std::size_t elements) noexcept;
@@ -645,6 +656,14 @@ namespace os
 
       // ======================================================================
 
+      inline
+      memory_resource::memory_resource (const char* name) :
+          object_named
+            { name }
+      {
+        ;
+      }
+
       /**
        * @details
        * Allocate storage with a size of at least `bytes` bytes. The
@@ -769,7 +788,7 @@ namespace os
       inline out_of_memory_handler_t
       memory_resource::out_of_memory_handler (out_of_memory_handler_t handler)
       {
-        trace::printf ("%s(%p) @%p\n", __func__, handler, this);
+        trace::printf ("%s(%p) @%p %s\n", __func__, handler, this, name ());
 
         out_of_memory_handler_t tmp = out_of_memory_handler_;
         out_of_memory_handler_ = handler;

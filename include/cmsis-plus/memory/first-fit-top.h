@@ -65,6 +65,14 @@ namespace os
       first_fit_top (void* addr_begin, void* addr_end);
 
       /**
+       * @brief Construct a named memory resource object instance.
+       * @param name Pointer to name.
+       * @param addr_begin Begin of allocator arena.
+       * @param addr_end End of allocator arena.
+       */
+      first_fit_top (const char* name, void* addr_begin, void* addr_end);
+
+      /**
        * @brief Construct a memory resource object instance.
        * @param addr Begin of allocator arena.
        * @param bytes Size of allocator arena, in bytes.
@@ -72,8 +80,26 @@ namespace os
       first_fit_top (void* addr, std::size_t bytes);
 
       /**
+       * @brief Construct a named memory resource object instance.
+       * @param name Pointer to name.
+       * @param addr Begin of allocator arena.
+       * @param bytes Size of allocator arena, in bytes.
+       */
+      first_fit_top (const char* name, void* addr, std::size_t bytes);
+
+      /**
        * @cond ignore
        */
+
+    protected:
+
+      /**
+       * @brief Default constructor. Construct a memory resource
+       *  object instance.
+       */
+      first_fit_top () = default;
+
+    public:
 
       // The rule of five.
       first_fit_top (const first_fit_top&) = delete;
@@ -103,6 +129,16 @@ namespace os
        * @name Private Member Functions
        * @{
        */
+
+      /**
+       * @brief Internal function to construct the memory resource.
+       * @param addr Begin of allocator arena.
+       * @param bytes Size of allocator arena, in bytes.
+       * @par Returns
+       *  Nothing.
+       */
+      void
+      internal_construct_ (void* addr, std::size_t bytes);
 
       /**
        * @brief Implementation of the memory allocator.
@@ -182,9 +218,9 @@ namespace os
       static constexpr std::size_t block_minchunk = chunk_offset + block_padding
           + block_minsize;
 
-      void* addr_;
+      void* addr_ = nullptr;
 
-      chunk_t* free_list_;
+      chunk_t* free_list_ = nullptr;
 
       /**
        * @endcond
@@ -206,12 +242,48 @@ namespace os
     // ========================================================================
 
     inline
-    first_fit_top::first_fit_top (void* addr_begin, void* addr_end) :
-        first_fit_top
-          { addr_begin, static_cast<std::size_t> (static_cast<char*> (addr_end)
-              - static_cast<char*> (addr_begin)) }
+    first_fit_top::first_fit_top (const char* name, void* addr,
+                                  std::size_t bytes) :
+        rtos::memory::memory_resource
+          { name }
+    {
+      trace::printf ("%s(%p,%u) @%p %s\n", __func__, addr, bytes, this,
+                     this->name ());
+
+      internal_construct_ (addr, bytes);
+    }
+
+    inline
+    first_fit_top::first_fit_top (const char* name, void* addr_begin,
+                                  void* addr_end) :
+        rtos::memory::memory_resource
+          { name }
     {
       assert(addr_begin < addr_end);
+
+      trace::printf ("%s(%p,%p) @%p %s\n", __func__, addr_begin, addr_end, this,
+                     this->name ());
+
+      internal_construct_ (
+          addr_begin,
+          static_cast<std::size_t> (static_cast<char*> (addr_end)
+              - static_cast<char*> (addr_begin)));
+    }
+
+    inline
+    first_fit_top::first_fit_top (void* addr_begin, void* addr_end) :
+        first_fit_top
+          { nullptr, addr_begin, addr_end }
+    {
+      ;
+    }
+
+    inline
+    first_fit_top::first_fit_top (void* addr, std::size_t bytes) :
+        first_fit_top
+          { nullptr, addr, bytes }
+    {
+      ;
     }
 
   // --------------------------------------------------------------------------

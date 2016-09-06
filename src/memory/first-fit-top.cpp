@@ -50,11 +50,10 @@ namespace os
     /**
      *
      */
-    first_fit_top::first_fit_top (void* addr, std::size_t bytes)
+    void
+    first_fit_top::internal_construct_ (void* addr, std::size_t bytes)
     {
       assert(bytes > block_minchunk);
-
-      trace::printf ("%s(%p,%u) @%p \n", __func__, addr, bytes, this);
 
       void* align_addr = addr;
       std::size_t align_sz = bytes;
@@ -76,14 +75,14 @@ namespace os
 
     first_fit_top::~first_fit_top ()
     {
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
     }
 
     void
     first_fit_top::do_reset (void) noexcept
     {
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
-      trace::printf ("%s() @%p \n", __func__, this);
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
       // Fill it the first chunk.
@@ -191,16 +190,16 @@ namespace os
           if (out_of_memory_handler_ == nullptr)
             {
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
-              trace::printf ("%s(%u,%u)=0 @%p\n", __func__, bytes, alignment,
-                             this);
+              trace::printf ("%s(%u,%u)=0 @%p %s\n", __func__, bytes, alignment,
+                             this, name ());
 #endif
 
               return nullptr;
             }
 
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
-          trace::printf ("%s(%u,%u) @%p out of memory\n", __func__, bytes,
-                         alignment, this);
+          trace::printf ("%s(%u,%u) @%p %s out of memory\n", __func__, bytes,
+                         alignment, this, name ());
 #endif
           out_of_memory_handler_ ();
 
@@ -247,8 +246,8 @@ namespace os
         }
 
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
-      trace::printf ("%s(%u,%u)=%p,%u @%p\n", __func__, bytes, alignment,
-                     aligned_payload, alloc_size, this);
+      trace::printf ("%s(%u,%u)=%p,%u @%p %s\n", __func__, bytes, alignment,
+                     aligned_payload, alloc_size, this, name ());
 #endif
 
       return aligned_payload;
@@ -274,8 +273,8 @@ namespace os
                                   std::size_t alignment) noexcept
     {
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
-      trace::printf ("%s(%p,%u,%u) @%p\n", __func__, addr, bytes, alignment,
-                     this);
+      trace::printf ("%s(%p,%u,%u) @%p %s\n", __func__, addr, bytes, alignment,
+                     this, name ());
 #endif
 
       // The address must be inside the arena; no exceptions.
@@ -403,8 +402,8 @@ namespace os
           ++allocated_chunks_;
           --free_chunks_;
 
-          trace::printf ("%s(%p,%u,%u) @%p already freed\n", __func__, addr,
-                         bytes, alignment, this);
+          trace::printf ("%s(%p,%u,%u) @%p %s already freed\n", __func__, addr,
+                         bytes, alignment, this, name ());
 
           return;
         }
