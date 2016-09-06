@@ -154,6 +154,54 @@ test_cpp_api (void)
       delete th3;
     }
 
+    {
+      // Dynamically allocated threads with allocated stacks.
+      std::unique_ptr<thread> th4
+        { new thread
+          { "th4", func, nullptr } };
+
+      th4->join ();
+    }
+
+    {
+      auto th5 = std::make_unique<thread> ("th5", func, nullptr);
+
+      th5->join ();
+    }
+
+    {
+      // Dynamically allocated threads with allocated stacks.
+      // The smart pointer internal data is allocated with the
+      // application allocator, but the thread is allocated with
+      // the system allocator.
+      std::shared_ptr<thread> th6
+        { new thread
+          { "th6", func, nullptr } };
+
+      th6->join ();
+    }
+
+    {
+      // Warning, the thread is not allocated with the system allocator,
+      // but with the application allocator.
+      auto th7 = std::make_shared<thread> ("th7", func, nullptr);
+
+      th7->join ();
+    }
+
+    {
+      auto th8 = std::allocate_shared<thread> (
+          rtos::memory::allocator<thread> (), "th8", func, nullptr);
+
+      th8->join ();
+    }
+
+    {
+      auto th9 = rtos::make_shared<thread> ("th9", func, nullptr);
+
+      th9->join ();
+    }
+
   // --------------------------------------------------------------------------
 
   using my_thread = thread_allocated<rtos::memory::allocator<thread::stack::allocation_element_t>>;
