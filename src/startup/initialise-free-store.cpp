@@ -68,8 +68,8 @@ sbrk (ptrdiff_t incr);
  * @brief Initialise the dynamic allocation arenas.
  * @param heap_begin
  * @param heap_end
- * @par Return
- *  Nothing
+ * @par Returns
+ *  Nothing.
  *
  * @details
  * This routine is called after the hardware is initialised, before

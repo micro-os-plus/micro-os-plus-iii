@@ -73,7 +73,7 @@ namespace os
       /**
        * @brief Initialise the RTOS scheduler.
        * @par Parameters
-       *  None
+       *  None.
        * @retval result::ok The scheduler was initialised.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
@@ -83,7 +83,7 @@ namespace os
       /**
        * @brief Start the RTOS scheduler.
        * @par Parameters
-       *  None
+       *  None.
        * @par Returns
        *  Nothing.
        */
@@ -93,7 +93,7 @@ namespace os
       /**
        * @brief Check if the scheduler was started.
        * @par Parameters
-       *  None
+       *  None.
        * @retval true The scheduler was started.
        * @retval false The scheduler was not started.
        */
@@ -103,7 +103,7 @@ namespace os
       /**
        * @brief Lock the scheduler.
        * @par Parameters
-       *  None
+       *  None.
        * @return The previous state of the scheduler lock.
        */
       state_t
@@ -112,7 +112,7 @@ namespace os
       /**
        * @brief Unlock the scheduler.
        * @par Parameters
-       *  None
+       *  None.
        * @return The previous state of the scheduler lock.
        */
       state_t
@@ -129,7 +129,7 @@ namespace os
       /**
        * @brief Check if the scheduler is locked.
        * @par Parameters
-       *  None
+       *  None.
        * @retval true The scheduler is locked.
        * @retval false The scheduler is switching threads (not locked).
        */
@@ -184,7 +184,7 @@ namespace os
         /**
          * @brief Enter a critical section.
          * @par Parameters
-         *  None
+         *  None.
          */
         critical_section ();
 
@@ -255,7 +255,7 @@ namespace os
         /**
          * @brief Enter a critical section.
          * @par Parameters
-         *  None
+         *  None.
          */
         uncritical_section ();
 
@@ -326,7 +326,7 @@ namespace os
         /**
          * @brief Construct a lockable object instance.
          * @par Parameters
-         *  None
+         *  None.
          */
         constexpr
         lockable ();
@@ -365,8 +365,9 @@ namespace os
         /**
          * @brief %Lock the scheduler.
          * @par Parameters
-         *  None
-         * @return  Nothing.
+         *  None.
+         * @par Returns
+         *  Nothing.
          */
         void
         lock (void);
@@ -374,7 +375,7 @@ namespace os
         /**
          * @brief Try to lock the scheduler.
          * @par Parameters
-         *  None
+         *  None.
          * @retval true The scheduler was locked.
          */
         bool
@@ -383,8 +384,9 @@ namespace os
         /**
          * @brief Unlock the scheduler.
          * @par Parameters
-         *  None
-         * @return  Nothing.
+         *  None.
+         * @par Returns
+         *  Nothing.
          */
         void
         unlock (void);
@@ -477,7 +479,7 @@ namespace os
       /**
        * @brief Check if the CPU is in handler mode.
        * @par Parameters
-       *  None
+       *  None.
        * @retval true Execution is in an exception handler context.
        * @retval false Execution is in a thread context.
        */
@@ -507,7 +509,7 @@ namespace os
         /**
          * @brief Enter an interrupts critical section.
          * @par Parameters
-         *  None
+         *  None.
          */
         critical_section ();
 
@@ -545,7 +547,7 @@ namespace os
         /**
          * @brief Enter an interrupts critical section.
          * @par Parameters
-         *  None
+         *  None.
          * @return The previous value of the interrupts priorities register.
          */
         static state_t
@@ -606,7 +608,7 @@ namespace os
         /**
          * @brief Enter an interrupts uncritical section.
          * @par Parameters
-         *  None
+         *  None.
          */
         uncritical_section ();
 
@@ -644,7 +646,7 @@ namespace os
         /**
          * @brief Enter interrupts uncritical section.
          * @par Parameters
-         *  None
+         *  None.
          * @return The previous value of the interrupts priority register.
          */
         static state_t
@@ -653,7 +655,8 @@ namespace os
         /**
          * @brief Exit interrupts uncritical section.
          * @param state The value to restore the interrupts priority register.
-         * @return  Nothing.
+         * @par Returns
+         *  Nothing.
          */
         static void
         exit (state_t state);
@@ -705,7 +708,7 @@ namespace os
         /**
          * @brief Construct an interrupts lock.
          * @par Parameters
-         *  None
+         *  None.
          */
         constexpr
         lockable ();
@@ -744,8 +747,9 @@ namespace os
         /**
          * @brief Lock the interrupts.
          * @par Parameters
-         *  None
-         * @return  Nothing.
+         *  None.
+         * @par Returns
+         *  Nothing.
          */
         void
         lock (void);
@@ -753,7 +757,7 @@ namespace os
         /**
          * @brief Try to lock the interrupts.
          * @par Parameters
-         *  None
+         *  None.
          * @retval true The interrupts were locked.
          */
         bool
@@ -762,8 +766,9 @@ namespace os
         /**
          * @brief Unlock the interrupts.
          * @par Parameters
-         *  None
-         * @return  Nothing.
+         *  None.
+         * @par Returns
+         *  Nothing.
          */
         void
         unlock (void);

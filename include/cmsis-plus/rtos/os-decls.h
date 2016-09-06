@@ -665,7 +665,7 @@ namespace os
       /**
        * @brief Construct a null lockable object instance.
        * @par Parameters
-       *  None
+       *  None.
        */
 
       constexpr
@@ -705,9 +705,9 @@ namespace os
       /**
        * @brief Pretend to lock scheduler.
        * @par Parameters
-       *  None
+       *  None.
        * @par Returns
-       *  Nothing
+       *  Nothing.
        */
       void
       lock (void);
@@ -715,9 +715,9 @@ namespace os
       /**
        * @brief Pretend to unlock the scheduler.
        * @par Parameters
-       *  None
+       *  None.
        * @par Returns
-       *  Nothing
+       *  Nothing.
        */
       void
       unlock (void);

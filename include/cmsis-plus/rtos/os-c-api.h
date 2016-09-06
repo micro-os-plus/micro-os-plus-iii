@@ -125,7 +125,7 @@ extern "C"
   /**
    * @brief Initialise the RTOS scheduler.
    * @par Parameters
-   *  None
+   *  None.
    * @retval os_ok The scheduler was initialised.
    * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
    */
@@ -135,7 +135,7 @@ extern "C"
   /**
    * @brief Start the RTOS scheduler.
    * @par Parameters
-   *  None
+   *  None.
    * @par Returns
    *  Nothing.
    */
@@ -146,7 +146,7 @@ extern "C"
   /**
    * @brief Check if the scheduler was started.
    * @par Parameters
-   *  None
+   *  None.
    * @retval true The scheduler was started.
    * @retval false The scheduler was not started.
    */
@@ -156,7 +156,7 @@ extern "C"
   /**
    * @brief Lock the scheduler.
    * @par Parameters
-   *  None
+   *  None.
    * @return The previous state of the scheduler lock.
    */
   os_sched_state_t
@@ -165,7 +165,7 @@ extern "C"
   /**
    * @brief Unlock the scheduler.
    * @par Parameters
-   *  None
+   *  None.
    * @return The previous state of the scheduler lock.
    */
   os_sched_state_t
@@ -182,7 +182,7 @@ extern "C"
   /**
    * @brief Check if the scheduler is locked.
    * @par Parameters
-   *  None
+   *  None.
    * @retval true The scheduler is locked.
    * @retval false The scheduler is switching threads (not locked).
    */
@@ -192,7 +192,7 @@ extern "C"
   /**
    * @brief Check if the scheduler is in preemptive mode.
    * @par Parameters
-   *  None
+   *  None.
    * @retval true The scheduler is in preemptive mode.
    * @retval false The scheduler is not in preemptive mode.
    */
@@ -254,7 +254,7 @@ extern "C"
   /**
    * @brief Check if the CPU is in handler mode.
    * @par Parameters
-   *  None
+   *  None.
    * @retval true Execution is in an exception handler context.
    * @retval false Execution is in a thread context.
    */
@@ -264,7 +264,7 @@ extern "C"
   /**
    * @brief Enter an interrupts critical section.
    * @par Parameters
-   *  None
+   *  None.
    * @return The previous value of the interrupts priority register.
    */
   os_irq_state_t
@@ -284,7 +284,7 @@ extern "C"
   /**
    * @brief Enter an interrupts uncritical section.
    * @par Parameters
-   *  None
+   *  None.
    * @return The previous value of the interrupts priority register.
    */
   os_irq_state_t
@@ -321,7 +321,7 @@ extern "C"
   /**
    * @brief Get the current running thread.
    * @par Parameters
-   *  None
+   *  None.
    * @return Pointer to the current running thread object instance.
    */
   os_thread_t*
@@ -330,7 +330,7 @@ extern "C"
   /**
    * @brief Suspend the current running thread to wait for an event.
    * @par Parameters
-   *  None
+   *  None.
    * @par Returns
    *  Nothing.
    */
@@ -623,7 +623,7 @@ extern "C"
   /**
    * @brief Get the default stack size.
    * @par Parameters
-   *  None
+   *  None.
    * @return  The default stack size in bytes.
    */
   size_t
@@ -640,7 +640,7 @@ extern "C"
   /**
    * @brief Get the min stack size.
    * @par Parameters
-   *  None
+   *  None.
    * @return  The min stack size in bytes.
    */
   size_t
@@ -904,7 +904,7 @@ extern "C"
   /**
    * @brief Tell the current time since startup.
    * @par Parameters
-   *  None
+   *  None.
    * @return The number of SysTick input clocks since startup.
    */
   os_clock_timestamp_t
@@ -2661,7 +2661,7 @@ extern "C"
    * @brief Reset the memory manager to the initial state.
    * @param memory Pointer to a memory resource object instance.
    * @par Parameters
-   *  None
+   *  None.
    * @par Returns
    *  Nothing.
    */
@@ -2672,7 +2672,7 @@ extern "C"
    * @brief Coalesce free blocks.
    * @param memory Pointer to a memory resource object instance.
    * @par Parameters
-   *  None
+   *  None.
    * @retval true if the operation resulted in larger blocks.
    * @retval false if the operation was ineffective.
    */

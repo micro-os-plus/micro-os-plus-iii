@@ -106,7 +106,7 @@ namespace std
   /**
    * @brief Get the current handler.
    * @par Parameters
-   *  None
+   *  None.
    * @return Pointer to user function, or `nullptr` if not set.
    *
    * @details

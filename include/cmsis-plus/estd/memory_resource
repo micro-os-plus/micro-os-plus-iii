@@ -80,7 +80,7 @@ namespace os
       /**
        * @brief Get the address of a memory manager based on `new/delete`.
        * @par Parameters
-       *  None
+       *  None.
        * @return Pointer to a memory manager object instance.
        */
       memory_resource*
@@ -89,7 +89,7 @@ namespace os
       /**
        * @brief Get the address of an ineffective memory manager.
        * @par Parameters
-       *  None
+       *  None.
        * @return Pointer to a memory manager object instance.
        */
       memory_resource*
@@ -106,7 +106,7 @@ namespace os
       /**
        * @brief Get the default application memory manager.
        * @par Parameters
-       *  None
+       *  None.
        * @return Pointer to a memory manager object instance.
        */
       memory_resource*

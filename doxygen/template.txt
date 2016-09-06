@@ -4,17 +4,19 @@
 	
     /**
      * @brief
+     *
      * @details
      */
      
 	/**
 	 * @par Parameters
-	 *	None
+	 *	None.
 	 */
 	
 	
 	/**
-	 * @return  Nothing.
+	 * @par Returns  
+	 *  Nothing.
 	 */
 
 	  /*

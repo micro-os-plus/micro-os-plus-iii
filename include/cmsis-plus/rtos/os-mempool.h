@@ -103,7 +103,7 @@ namespace os
         /**
          * @brief Construct a memory pool attributes object instance.
          * @par Parameters
-         *  None
+         *  None.
          */
         constexpr
         attributes ();
@@ -293,7 +293,7 @@ namespace os
       /**
        * @brief Allocate a memory block.
        * @par Parameters
-       *  None
+       *  None.
        * @return Pointer to memory block, or `nullptr` if interrupted.
        */
       void*
@@ -302,7 +302,7 @@ namespace os
       /**
        * @brief Try to allocate a memory block.
        * @par Parameters
-       *  None
+       *  None.
        * @return Pointer to memory block, or `nullptr` if no memory available.
        */
       void*
@@ -328,7 +328,7 @@ namespace os
       /**
        * @brief Get memory pool capacity.
        * @par Parameters
-       *  None
+       *  None.
        * @return The max number of blocks in the pool.
        */
       std::size_t
@@ -337,7 +337,7 @@ namespace os
       /**
        * @brief Get blocks count.
        * @par Parameters
-       *  None
+       *  None.
        * @return The number of blocks used from the queue.
        */
       std::size_t
@@ -346,7 +346,7 @@ namespace os
       /**
        * @brief Get block size.
        * @par Parameters
-       *  None
+       *  None.
        * @return The block size, in bytes.
        */
       std::size_t
@@ -365,7 +365,7 @@ namespace os
       /**
        * @brief Check if the memory pool is full.
        * @par Parameters
-       *  None
+       *  None.
        * @retval true All memory blocks are allocated.
        * @retval false There are still memory blocks that can be allocated.
        */
@@ -375,7 +375,7 @@ namespace os
       /**
        * @brief Reset the memory pool.
        * @par Parameters
-       *  None
+       *  None.
        * @retval result::ok The memory pool was reset.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
@@ -385,7 +385,7 @@ namespace os
       /**
        * @brief Get the pool storage address.
        * @par Parameters
-       *  None
+       *  None.
        * @return Pointer to storage.
        */
       void*
@@ -422,7 +422,9 @@ namespace os
       /**
        * @brief Internal initialisation.
        * @par Parameters
-       *  None
+       *  None.
+       * @returns
+       *  Nothing.
        */
       void
       internal_init_ (void);
@@ -430,7 +432,7 @@ namespace os
       /**
        * @brief Internal function used to get the first linked block.
        * @par Parameters
-       *  None
+       *  None.
        * @return Pointer to block or `nullptr` if no more blocks available.
        */
       void*
@@ -690,7 +692,7 @@ namespace os
         /**
          * @brief Allocate a memory block.
          * @par Parameters
-         *  None
+         *  None.
          * @return Pointer to memory block, or `nullptr` if interrupted.
          */
         value_type*
@@ -699,7 +701,7 @@ namespace os
         /**
          * @brief Allocate a memory block.
          * @par Parameters
-         *  None
+         *  None.
          * @return Pointer to memory block, or `nullptr` if no memory available.
          */
         value_type*
@@ -716,7 +718,7 @@ namespace os
         /**
          * @brief Free the memory block.
          * @par Parameters
-         *  None
+         *  None.
          * @retval result::ok The memory block was released.
          * @retval EINVAL The block does not belong to the memory pool.
          */
@@ -827,7 +829,7 @@ namespace os
         /**
          * @brief Allocate a memory block.
          * @par Parameters
-         *  None
+         *  None.
          * @return Pointer to memory block, or `nullptr` if interrupted.
          */
         value_type*
@@ -836,7 +838,7 @@ namespace os
         /**
          * @brief Allocate a memory block.
          * @par Parameters
-         *  None
+         *  None.
          * @return Pointer to memory block, or `nullptr` if no memory available.
          */
         value_type*
@@ -853,7 +855,7 @@ namespace os
         /**
          * @brief Free the memory block.
          * @par Parameters
-         *  None
+         *  None.
          * @retval result::ok The memory block was released.
          * @retval EINVAL The block does not belong to the memory pool.
          */

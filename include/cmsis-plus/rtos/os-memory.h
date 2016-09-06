@@ -82,7 +82,7 @@ namespace os
       /**
        * @brief Get the address of a memory manager based on POSIX `malloc()`.
        * @par Parameters
-       *  None
+       *  None.
        * @return Pointer to a memory manager object instance.
        */
       memory_resource*
@@ -99,7 +99,7 @@ namespace os
       /**
        * @brief Get the default RTOS system memory manager.
        * @par Parameters
-       *  None
+       *  None.
        * @return Pointer to a memory manager object instance.
        */
       memory_resource*
@@ -190,7 +190,7 @@ namespace os
         /**
          * @brief Reset the memory manager to the initial state.
          * @par Parameters
-         *  None
+         *  None.
          * @par Returns
          *  Nothing.
          */
@@ -200,7 +200,7 @@ namespace os
         /**
          * @brief Coalesce free blocks.
          * @par Parameters
-         *  None
+         *  None.
          * @retval true if the operation freed more memory.
          * @retval false if the operation was ineffective.
          */
@@ -210,7 +210,7 @@ namespace os
         /**
          * @brief Get the largest value that can be passed to `allocate()`.
          * @par Parameters
-         *  None
+         *  None.
          * @return Number of bytes or 0 if unknown.
          */
         std::size_t
@@ -227,7 +227,7 @@ namespace os
         /**
          * @brief Get the out of memory handler.
          * @par Parameters
-         *  None
+         *  None.
          * @return Pointer to existing handler.
          */
         out_of_memory_handler_t
@@ -243,7 +243,7 @@ namespace os
         /**
          * @brief Get the current size of all allocated chunks.
          * @par Parameters
-         *  None
+         *  None.
          * @return Number of bytes.
          */
         std::size_t
@@ -252,7 +252,7 @@ namespace os
         /**
          * @brief Get the maximum allocated size.
          * @par Parameters
-         *  None
+         *  None.
          * @return Number of bytes.
          */
         std::size_t
@@ -261,7 +261,7 @@ namespace os
         /**
          * @brief Get the current size of all free chunks.
          * @par Parameters
-         *  None
+         *  None.
          * @return Number of bytes.
          */
         std::size_t
@@ -270,7 +270,7 @@ namespace os
         /**
          * @brief Get the current number of allocated chunks.
          * @par Parameters
-         *  None
+         *  None.
          * @return Number of chunks.
          */
         std::size_t
@@ -279,7 +279,7 @@ namespace os
         /**
          * @brief Get the current number of free chunks.
          * @par Parameters
-         *  None
+         *  None.
          * @return Number of chunks.
          */
         std::size_t
@@ -329,7 +329,7 @@ namespace os
         /**
          * @brief Implementation of the function to get max size.
          * @par Parameters
-         *  None
+         *  None.
          * @return Integer with size in bytes, or 0 if unknown.
          */
         virtual std::size_t
@@ -338,7 +338,7 @@ namespace os
         /**
          * @brief Implementation of the function to reset the memory manager.
          * @par Parameters
-         *  None
+         *  None.
          * @par Returns
          *  Nothing.
          */
@@ -348,7 +348,7 @@ namespace os
         /**
          * @brief Implementation of the function to coalesce free blocks.
          * @par Parameters
-         *  None
+         *  None.
          * @retval true if the operation resulted in larger blocks.
          * @retval false if the operation was ineffective.
          */

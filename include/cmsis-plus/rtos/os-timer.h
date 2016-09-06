@@ -145,7 +145,7 @@ namespace os
         /**
          * @brief Construct a timer attributes object instance.
          * @par Parameters
-         *  None
+         *  None.
          */
         constexpr
         attributes ();
@@ -225,7 +225,7 @@ namespace os
         /**
          * @brief Construct periodic timer attributes object instance.
          * @par Parameters
-         *  None
+         *  None.
          */
         constexpr
         attributes_periodic ();
@@ -347,7 +347,7 @@ namespace os
       /**
        * @brief Stop the timer.
        * @par Parameters
-       *  None
+       *  None.
        * @retval result::ok The timer has been stopped.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EAGAIN The timer is not yet started.

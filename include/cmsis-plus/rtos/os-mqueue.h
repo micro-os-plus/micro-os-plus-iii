@@ -156,7 +156,7 @@ namespace os
         /**
          * @brief Construct a message queue attributes object instance.
          * @par Parameters
-         *  None
+         *  None.
          */
         constexpr
         attributes ();
@@ -484,7 +484,7 @@ namespace os
       /**
        * @brief Get queue capacity.
        * @par Parameters
-       *  None
+       *  None.
        * @return The max number of messages that can be queued.
        */
       std::size_t
@@ -493,7 +493,7 @@ namespace os
       /**
        * @brief Get queue length.
        * @par Parameters
-       *  None
+       *  None.
        * @return The number of messages in the queue.
        */
       std::size_t
@@ -502,7 +502,7 @@ namespace os
       /**
        * @brief Get message size.
        * @par Parameters
-       *  None
+       *  None.
        * @return The message size, in bytes.
        */
       std::size_t
@@ -511,7 +511,7 @@ namespace os
       /**
        * @brief Check if the queue is empty.
        * @par Parameters
-       *  None
+       *  None.
        * @retval true The queue has no messages.
        * @retval false The queue has some messages.
        */
@@ -521,7 +521,7 @@ namespace os
       /**
        * @brief Check if the queue is full.
        * @par Parameters
-       *  None
+       *  None.
        * @retval true The queue is full.
        * @retval false The queue is not full.
        */
@@ -531,7 +531,7 @@ namespace os
       /**
        * @brief Reset the message queue.
        * @par Parameters
-       *  None
+       *  None.
        * @retval result::ok The queue was reset.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
@@ -571,7 +571,7 @@ namespace os
       /**
        * @brief Internal function used to initialise the queue to empty state.
        * @par Parameters
-       *  None
+       *  None.
        * @par Returns
        *  Nothing.
        */
@@ -825,6 +825,7 @@ namespace os
          * @brief Standard allocator type definition.
          */
         using value_type = T;
+
         /**
          * @brief Standard allocator type definition.
          */

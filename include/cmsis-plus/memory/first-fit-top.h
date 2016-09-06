@@ -128,7 +128,7 @@ namespace os
       /**
        * @brief Implementation of the function to get max size.
        * @par Parameters
-       *  None
+       *  None.
        * @return Integer with size in bytes, or 0 if unknown.
        */
       virtual std::size_t
@@ -137,7 +137,7 @@ namespace os
       /**
        * @brief Implementation of the function to reset the memory manager.
        * @par Parameters
-       *  None
+       *  None.
        * @par Returns
        *  Nothing.
        */

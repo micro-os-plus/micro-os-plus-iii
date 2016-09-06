@@ -151,9 +151,9 @@ namespace os
       /**
        * @brief Start the clock.
        * @par Parameters
-       *  None
+       *  None.
        * @par Returns
-       *  Nothing
+       *  Nothing.
        */
       virtual void
       start (void) = 0;
@@ -161,7 +161,7 @@ namespace os
       /**
        * @brief Tell the current time, possibly adjusted for epoch.
        * @par Parameters
-       *  None
+       *  None.
        * @return The clock current timestamp (time units from startup
        * plus the epoch offset).
        */
@@ -171,7 +171,7 @@ namespace os
       /**
        * @brief Tell the current time since startup.
        * @par Parameters
-       *  None
+       *  None.
        * @return The clock current timestamp (time units from startup).
        */
       timestamp_t
@@ -216,7 +216,7 @@ namespace os
       /**
        * @brief Get adjustment offset (placeholder).
        * @par Parameters
-       *  None
+       *  None.
        * @return 0 for steady clocks.
        */
       virtual offset_t
@@ -357,7 +357,7 @@ namespace os
       /**
        * @brief Tell the current time adjusted for epoch.
        * @par Parameters
-       *  None
+       *  None.
        * @return The clock current timestamp (time units from startup
        * plus the epoch offset).
        */
@@ -377,7 +377,7 @@ namespace os
       /**
        * @brief Get adjustment offset.
        * @par Parameters
-       *  None
+       *  None.
        * @return Integer value representing the offset to epoch.
        */
       virtual offset_t
@@ -620,7 +620,7 @@ namespace os
       /**
        * @brief Initialise and make the RTC tick.
        * @par Parameters
-       *  None
+       *  None.
        * @retval result::ok   The real time clock was started.
        * @retval ENOTRECOVERABLE Could not start real time clock.
        */
@@ -720,7 +720,7 @@ namespace os
       /**
        * @brief Tell the current time.
        * @par Parameters
-       *  None
+       *  None.
        * @return The number of SysTick input clocks since startup.
        */
       virtual timestamp_t

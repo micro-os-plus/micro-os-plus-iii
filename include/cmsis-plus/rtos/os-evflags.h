@@ -75,7 +75,7 @@ namespace os
         /**
          * @brief Construct an event flags attributes object instance.
          * @par Parameters
-         *  None
+         *  None.
          */
         constexpr
         attributes ();
@@ -286,7 +286,7 @@ namespace os
       /**
        * @brief Check if there are threads waiting.
        * @par Parameters
-       *  None
+       *  None.
        * @retval true There are threads waiting.
        * @retval false There are no threads waiting.
        */

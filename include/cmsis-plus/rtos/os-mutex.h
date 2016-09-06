@@ -221,7 +221,7 @@ namespace os
         /**
          * @brief Construct a mutex attributes object instance.
          * @par Parameters
-         *  None
+         *  None.
          */
         constexpr
         attributes ();
@@ -324,7 +324,7 @@ namespace os
         /**
          * @brief Construct a recursive mutex attributes object instance.
          * @par Parameters
-         *  None
+         *  None.
          */
         constexpr
         attributes_recursive ();
@@ -430,7 +430,7 @@ namespace os
       /**
        * @brief Lock/acquire the mutex.
        * @par Parameters
-       *  None
+       *  None.
        * @retval result::ok The mutex was locked.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval ENOTRECOVERABLE The state protected by the mutex is
@@ -454,7 +454,7 @@ namespace os
       /**
        * @brief Try to lock/acquire the mutex.
        * @par Parameters
-       *  None
+       *  None.
        * @retval result::ok The mutex was locked.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval ENOTRECOVERABLE The state protected by the mutex is
@@ -504,7 +504,7 @@ namespace os
       /**
        * @brief Unlock/release the mutex.
        * @par Parameters
-       *  None
+       *  None.
        * @retval result::ok The mutex was unlocked.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routine;
        *  the mutex type is `mutex::type::errorcheck` or
@@ -519,7 +519,7 @@ namespace os
       /**
        * @brief Get the priority ceiling of a mutex.
        * @par Parameters
-       *  None
+       *  None.
        * @return The priority ceiling.
        */
       thread::priority_t
@@ -554,7 +554,7 @@ namespace os
       /**
        * @brief Mark mutex as consistent.
        * @par Parameters
-       *  None
+       *  None.
        * @retval result::ok The mutex was marked as consistent.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @retval EINVAL The mutex object referenced by mutex is not robust
@@ -566,7 +566,7 @@ namespace os
       /**
        * @brief Get the thread that owns the mutex.
        * @par Parameters
-       *  None
+       *  None.
        * @return Pointer to thread or `nullptr` if not owned.
        */
       thread*
@@ -596,7 +596,7 @@ namespace os
       /**
        * @brief Reset the mutex.
        * @par Parameters
-       *  None
+       *  None.
        * @retval result::ok The mutex was reset.
        */
       result_t
@@ -622,7 +622,7 @@ namespace os
       /**
        * @brief Internal initialisation.
        * @par Parameters
-       *  None
+       *  None.
        */
       void
       internal_init_ (void);
@@ -630,7 +630,7 @@ namespace os
       /**
        * @brief Internal function used to lock the mutex.
        * @par Parameters
-       *  None
+       *  None.
        * @retval true The mutex was locked.
        * @retval false The mutex was not locked.
        */

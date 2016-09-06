@@ -71,7 +71,7 @@ namespace os
         /**
          * @brief Construct a condition variable attributes object instance.
          * @par Parameters
-         *  None
+         *  None.
          */
         constexpr
         attributes ();
@@ -211,7 +211,7 @@ namespace os
       /**
        * @brief Notify one thread waiting for a condition variable.
        * @par Parameters
-       *  None
+       *  None.
        * @retval result::ok The thread was signalled.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @par Errors
@@ -223,7 +223,7 @@ namespace os
       /**
        * @brief Notify all threads waiting for a condition variable.
        * @par Parameters
-       *  None
+       *  None.
        * @retval result::ok All waiting threads signalled.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        * @par Errors

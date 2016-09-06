@@ -75,7 +75,7 @@ namespace os
       /**
        * @brief Get the current running thread.
        * @par Parameters
-       *  None
+       *  None.
        * @return Reference to the current running thread.
        */
       thread&
@@ -95,7 +95,7 @@ namespace os
       /**
        * @brief Yield execution to the next ready thread.
        * @par Parameters
-       *  None
+       *  None.
        * @par Returns
        *  Nothing.
        */
@@ -105,7 +105,7 @@ namespace os
       /**
        * @brief Suspend the current running thread to wait for an event.
        * @par Parameters
-       *  None
+       *  None.
        * @par Returns
        *  Nothing.
        */
@@ -468,7 +468,7 @@ namespace os
         /**
          * @brief Clear the stack pointer and size.
          * @par Parameters
-         *  None
+         *  None.
          * @par Returns
          *  Nothing
          */
@@ -480,7 +480,9 @@ namespace os
          * @param [in] address Bottom stack address.
          * @param [in] size_bytes Reserved stack size, in bytes.
          * @par Parameters
-         *  None
+         *  None.
+         * @par Returns
+         *  Nothing
          */
         void
         set (stack::element_t* address, std::size_t size_bytes);
@@ -488,9 +490,9 @@ namespace os
         /**
          * @brief Align the pointers and initialise to a known pattern.
          * @par Parameters
-         *  None
+         *  None.
          * @par Returns
-         *  Nothing
+         *  Nothing.
          */
         void
         initialize (void);
@@ -498,7 +500,7 @@ namespace os
         /**
          * @brief Get the stack lowest reserved address.
          * @par Parameters
-         *  None
+         *  None.
          * @return  The address of the stack reserved area.
          */
         stack::element_t*
@@ -507,7 +509,7 @@ namespace os
         /**
          * @brief Get the top stack address.
          * @par Parameters
-         *  None
+         *  None.
          * @return The address after the last stack element.
          */
         stack::element_t*
@@ -516,7 +518,7 @@ namespace os
         /**
          * @brief Get the stack size.
          * @par Parameters
-         *  None
+         *  None.
          * @return  The stack size in bytes.
          */
         std::size_t
@@ -525,7 +527,7 @@ namespace os
         /**
          * @brief Check if bottom magic word is still there.
          * @par Parameters
-         *  None
+         *  None.
          * @retval true  The magic word is still there.
          * @retval false  The magic word was overwritten.
          */
@@ -535,7 +537,7 @@ namespace os
         /**
          * @brief Check if top magic word is still there.
          * @par Parameters
-         *  None
+         *  None.
          * @retval true  The magic word is still there.
          * @retval false  The magic word was overwritten.
          */
@@ -544,6 +546,8 @@ namespace os
 
         /**
          * @brief Compute how much available stack remains.
+         * @par Parameters
+         *  None.
          * @return Number of available bytes.
          */
         std::size_t
@@ -563,7 +567,7 @@ namespace os
         /**
          * @brief Get the min stack size.
          * @par Parameters
-         *  None
+         *  None.
          * @return  The min stack size in bytes.
          */
         static std::size_t
@@ -580,7 +584,7 @@ namespace os
         /**
          * @brief Get the default stack size.
          * @par Parameters
-         *  None
+         *  None.
          * @return  The default stack size in bytes.
          */
         static std::size_t
@@ -669,6 +673,12 @@ namespace os
          * @{
          */
 
+        /**
+         * @brief Get the associated stack.
+         * @par Parameters
+         *  None.
+         * @return Reference to stack object.
+         */
         thread::stack&
         stack (void);
 
@@ -766,7 +776,7 @@ namespace os
         /**
          * @brief Construct a thread attributes object instance.
          * @par Parameters
-         *  None
+         *  None.
          */
         constexpr
         attributes ();
@@ -862,9 +872,8 @@ namespace os
         /**
          * @brief Construct a thread attributes object instance.
          * @par Parameters
-         *  None
+         *  None.
          */
-
         statistics () = default;
 
         /**
@@ -902,6 +911,8 @@ namespace os
 
         /**
          * @brief Get the number of thread context switches.
+         * @par Parameters
+         *  None.
          * @return A long integer with the number of times the thread
          * was scheduled for execution.
          */
@@ -914,6 +925,8 @@ namespace os
 
         /**
          * @brief Get the thread execution time.
+         * @par Parameters
+         *  None.
          * @return A long integer with accumulated number of CPU cycles.
          */
         rtos::statistics::duration_t
@@ -1061,7 +1074,7 @@ namespace os
       /**
        * @brief Detach a thread.
        * @par Parameters
-       *  None
+       *  None.
        * @retval result::ok The thread was detached.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
@@ -1138,7 +1151,7 @@ namespace os
       /**
        * @brief Check if interrupted.
        * @par Parameters
-       *  None
+       *  None.
        * @retval true The thread was interrupted.
        * @retval false The thread was not interrupted.
        */
@@ -1156,7 +1169,7 @@ namespace os
       /**
        * @brief Get thread scheduler state.
        * @par Parameters
-       *  None
+       *  None.
        * @return Thread scheduler state.
        */
       state_t
@@ -1165,7 +1178,7 @@ namespace os
       /**
        * @brief Resume the thread.
        * @par Parameters
-       *  None
+       *  None.
        * @return  Nothing.
        */
       void
@@ -1183,7 +1196,7 @@ namespace os
       /**
        * @brief Get the user storage.
        * @par Parameters
-       *  None
+       *  None.
        * @return The address of the thread user storage.
        */
       os_thread_user_storage_t*
@@ -1213,7 +1226,7 @@ namespace os
       /**
        * @brief Force thread termination.
        * @par Parameters
-       *  None
+       *  None.
        * @retval result::ok The tread was terminated.
        */
       result_t
@@ -1222,7 +1235,7 @@ namespace os
       /**
        * @brief Get the thread context stack.
        * @par Parameters
-       *  None
+       *  None.
        * @return A reference to the context stack object instance.
        */
       class thread::stack&
@@ -1359,8 +1372,9 @@ namespace os
       /**
        * @brief Suspend this thread and wait for an event.
        * @par Parameters
-       *  None
-       * @return  Nothing.
+       *  None.
+       * @par Returns
+       *  Nothing.
        */
       void
       internal_suspend_ (void);
@@ -1377,7 +1391,8 @@ namespace os
       /**
        * @brief Invoke terminating thread function.
        * @param [in] thread The static `this`.
-       * @return  Nothing.
+       * @par Returns
+       *  Nothing.
        */
       [[noreturn]]
       static void
@@ -1481,27 +1496,27 @@ namespace os
       /**
        * @brief The actual destructor, also called from exit() and kill().
        * @par Parameters
-       *  None
+       *  None.
        * @par Returns
-       *  Nothing
+       *  Nothing.
        */
       virtual void
       internal_destroy_ (void);
 
       /**
        * @par Parameters
-       *  None
+       *  None.
        * @par Returns
-       *  Nothing
+       *  Nothing.
        */
       void
       internal_relink_running_ (void);
 
       /**
        * @par Parameters
-       *  None
+       *  None.
        * @par Returns
-       *  Nothing
+       *  Nothing.
        */
       void
       internal_check_stack_ (void);

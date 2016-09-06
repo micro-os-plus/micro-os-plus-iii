@@ -43,7 +43,7 @@ extern "C"
   /**
    * @brief Hook to enter a power saving mode.
    * @par Parameters
-   *  None
+   *  None.
    * @retval true The hook entered a power saving mode.
    * @retval false The hook did not enter a power saving mode.
    */

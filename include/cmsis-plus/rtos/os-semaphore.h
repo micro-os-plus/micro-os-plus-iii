@@ -95,7 +95,7 @@ namespace os
         /**
          * @brief Construct a semaphore attributes object instance.
          * @par Parameters
-         *  None
+         *  None.
          */
         constexpr
         attributes ();
@@ -340,7 +340,7 @@ namespace os
       /**
        * @brief Post (unlock) the semaphore.
        * @par Parameters
-       *  None
+       *  None.
        * @retval result::ok The semaphore was posted.
        * @retval EAGAIN The maximum count value was exceeded.
        * @retval ENOTRECOVERABLE The semaphore could not be posted
@@ -352,7 +352,7 @@ namespace os
       /**
        * @brief Lock the semaphore, possibly waiting.
        * @par Parameters
-       *  None
+       *  None.
        * @retval result::ok The calling process successfully
        *  performed the semaphore lock operation.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
@@ -366,7 +366,7 @@ namespace os
       /**
        * @brief Try to lock the semaphore.
        * @par Parameters
-       *  None
+       *  None.
        * @retval result::ok The calling process successfully
        *  performed the semaphore lock operation.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
@@ -398,7 +398,7 @@ namespace os
       /**
        * @brief Get the semaphore count value.
        * @par Parameters
-       *  None
+       *  None.
        * @return The semaphore count value.
        */
       count_t
@@ -407,7 +407,7 @@ namespace os
       /**
        * @brief Reset the semaphore.
        * @par Parameters
-       *  None
+       *  None.
        * @retval result::ok The semaphore was reset.
        * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
        */
@@ -417,7 +417,7 @@ namespace os
       /**
        * @brief Get the semaphore initial count value.
        * @par Parameters
-       *  None
+       *  None.
        * @return The numeric value set from attributes.
        */
       count_t
@@ -426,7 +426,7 @@ namespace os
       /**
        * @brief Get the semaphore maximum count value.
        * @par Parameters
-       *  None
+       *  None.
        * @return The numeric value set from attributes.
        */
       count_t
@@ -450,7 +450,7 @@ namespace os
       /**
        * @brief Internal initialisation.
        * @par Parameters
-       *  None
+       *  None.
        */
       void
       internal_init_ (void);
