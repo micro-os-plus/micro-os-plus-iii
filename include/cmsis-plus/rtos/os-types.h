@@ -36,6 +36,7 @@
 
 // Include the application specific definitions.
 #include <cmsis-plus/os-app-config.h>
+#include <memory>
 
 namespace os
 {
@@ -44,15 +45,35 @@ namespace os
     namespace memory
     {
 
-#if !defined(OS_INCLUDE_RTOS_CUSTOM_ALLOCATOR)
+#if !defined(OS_INCLUDE_RTOS_CUSTOM_ALLOCATOR) || defined(__DOXYGEN__)
 
-      // Allocator used by the system objects. Must be stateless.
+      /**
+       * @brief Allocator used by the system objects. Must be stateless.
+       * @ingroup cmsis-plus-rtos-memres
+       */
       template<typename T>
         using allocator = default_resource_allocator<T>;
 
 #endif
 
     } /* namespace memory */
+
+    /**
+     * @brief  Create an object that is owned by a `shared_ptr` and is
+     *  allocated using the RTOS system allocator.
+     * @ingroup cmsis-plus-rtos-memres
+     * @param  args  Arguments for the _T_ object's constructor.
+     * @return A shared_ptr that owns the newly created object.
+     * @throw * An exception may be thrown from `allocate()` or
+     *          from the constructor of _T_.
+     */
+    template<typename T, typename ... Args>
+      inline std::shared_ptr<T>
+      make_shared (Args&&... args)
+      {
+        return std::allocate_shared<T> (rtos::memory::allocator<thread> (),
+                                        std::forward<Args>(args)...);
+      }
 
   } /* namespace rtos */
 } /* namespace os */
