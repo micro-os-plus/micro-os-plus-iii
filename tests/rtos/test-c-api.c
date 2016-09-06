@@ -539,7 +539,7 @@ test_c_api (void)
       os_semaphore_post (sp5);
       os_semaphore_wait (sp5);
 
-      os_semaphore_destruct (sp5);
+      os_semaphore_delete (sp5);
     }
 
   // ==========================================================================
