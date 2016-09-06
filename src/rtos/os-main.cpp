@@ -28,10 +28,6 @@
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/estd/memory_resource>
 
-#if defined(__ARM_EABI__)
-#include "cmsis_device.h"
-#endif
-
 // ----------------------------------------------------------------------------
 
 using namespace os;
@@ -79,16 +75,16 @@ namespace
 
     memory::memory_resource* mr;
     mr = estd::pmr::get_default_resource ();
-    trace::printf ("app memory @%p %u,a=%u:%u,f=%u:%u,ma=%u\n", mr,
+    trace::printf ("memory @%p %s %u,a=%u:%u,f=%u:%u,ma=%u\n", mr, mr->name (),
                    mr->total_bytes (), mr->allocated_bytes (),
                    mr->allocated_chunks (), mr->free_bytes (),
-                   mr->free_chunks (), mr->max_allocated_bytes());
+                   mr->free_chunks (), mr->max_allocated_bytes ());
 #if defined(OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES)
     mr = memory::get_default_resource ();
-    trace::printf ("sys memory @%p %u,a=%u:%u,f=%u:%u,ma=%u\n", mr,
-                   mr->total_bytes (), mr->allocated_bytes (),
-                   mr->allocated_chunks (), mr->free_bytes (),
-                   mr->free_chunks (), mr->max_allocated_bytes());
+    trace::printf ("memory @%p %s %u,a=%u:%u,f=%u:%u,ma=%u\n", mr, mr->name (),
+        mr->total_bytes (), mr->allocated_bytes (),
+        mr->allocated_chunks (), mr->free_bytes (),
+        mr->free_chunks (), mr->max_allocated_bytes ());
 #endif /* defined(OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES) */
 
 #endif /* defined(TRACE) */
@@ -114,7 +110,7 @@ using main_thread = thread_static<OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES>;
 static std::aligned_storage<sizeof(main_thread), alignof(main_thread)>::type os_main_thread;
 
 /**
- * @brief Default implementation of main().
+ * @brief Default implementation of `main()`.
  */
 int
 #if !defined(__APPLE__)
@@ -127,12 +123,6 @@ main (int argc, char* argv[])
   trace::printf ("Copyright (c) 2016 Liviu Ionescu.\n");
 
   port::scheduler::greeting ();
-
-  // At this stage the system clock should have already been configured
-  // at high speed by __initialise_hardware().
-#if defined(__ARM_EABI__)
-  trace::printf ("System clock: %u Hz.\n", SystemCoreClock);
-#endif
 
   trace::printf ("Scheduler frequency: %u ticks/sec.\n",
                  rtos::clock_systick::frequency_hz);
