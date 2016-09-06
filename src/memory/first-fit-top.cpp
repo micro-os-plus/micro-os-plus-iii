@@ -47,6 +47,9 @@ namespace os
      * reasonably fast.
      */
 
+    /**
+     *
+     */
     first_fit_top::first_fit_top (void* addr, std::size_t bytes)
     {
       assert(bytes > block_minchunk);
@@ -88,6 +91,7 @@ namespace os
       chunk->size = total_bytes_;
 
       allocated_bytes_ = 0;
+      max_allocated_bytes_ = 0;
       free_bytes_ = total_bytes_;
       allocated_chunks_ = 0;
       free_chunks_ = 1;
@@ -207,6 +211,10 @@ namespace os
       // Update statistics.
       // What is subtracted from free is added to allocated.
       allocated_bytes_ += chunk->size;
+      if (allocated_bytes_ > max_allocated_bytes_)
+        {
+          max_allocated_bytes_ = allocated_bytes_;
+        }
       free_bytes_ -= chunk->size;
       ++allocated_chunks_;
       --free_chunks_;

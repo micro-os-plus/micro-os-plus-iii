@@ -89,7 +89,7 @@ sbrk (ptrdiff_t incr);
 void __attribute__((weak))
 os_startup_initialize_free_store (void* heap_begin, void* heap_end)
 {
-  trace::printf ("Free store (heap): %p-%p\n", heap_begin, heap_end);
+  trace::printf ("%s(%p,%p)\n", __func__, heap_begin, heap_end);
 
   // Construct the memory resource used for the application free store.
   new (&application_free_store) application_memory_resource

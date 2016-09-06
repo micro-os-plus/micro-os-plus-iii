@@ -26,6 +26,7 @@
  */
 
 #include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/estd/memory_resource>
 
 #if defined(__ARM_EABI__)
 #include "cmsis_device.h"
@@ -76,10 +77,19 @@ namespace
 
 #if defined(TRACE)
 
-    memory::memory_resource* mr = memory::get_default_resource ();
-    trace::printf ("memory %u,%u,%u,%u,%u\n", mr->total_bytes (),
-                   mr->allocated_bytes (), mr->free_bytes (),
-                   mr->allocated_chunks (), mr->free_chunks ());
+    memory::memory_resource* mr;
+    mr = estd::pmr::get_default_resource ();
+    trace::printf ("app memory @%p %u,a=%u:%u,f=%u:%u,ma=%u\n", mr,
+                   mr->total_bytes (), mr->allocated_bytes (),
+                   mr->allocated_chunks (), mr->free_bytes (),
+                   mr->free_chunks (), mr->max_allocated_bytes());
+#if defined(OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES)
+    mr = memory::get_default_resource ();
+    trace::printf ("sys memory @%p %u,a=%u:%u,f=%u:%u,ma=%u\n", mr,
+                   mr->total_bytes (), mr->allocated_bytes (),
+                   mr->allocated_chunks (), mr->free_bytes (),
+                   mr->free_chunks (), mr->max_allocated_bytes());
+#endif /* defined(OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES) */
 
 #endif /* defined(TRACE) */
 

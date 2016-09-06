@@ -169,6 +169,10 @@ namespace os
       // Update statistics.
       // What is subtracted from free is added to allocated.
       allocated_bytes_ += chunk->size;
+      if (allocated_bytes_ > max_allocated_bytes_)
+        {
+          max_allocated_bytes_ = allocated_bytes_;
+        }
       free_bytes_ -= chunk->size;
       ++allocated_chunks_;
       --free_chunks_;

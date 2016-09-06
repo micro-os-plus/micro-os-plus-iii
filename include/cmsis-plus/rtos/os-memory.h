@@ -241,7 +241,7 @@ namespace os
         total_bytes (void);
 
         /**
-         * @brief Get the total size of allocated chunks.
+         * @brief Get the current size of all allocated chunks.
          * @par Parameters
          *  None
          * @return Number of bytes.
@@ -250,7 +250,16 @@ namespace os
         allocated_bytes (void);
 
         /**
-         * @brief Get the total size of free chunks.
+         * @brief Get the maximum allocated size.
+         * @par Parameters
+         *  None
+         * @return Number of bytes.
+         */
+        std::size_t
+        max_allocated_bytes (void);
+
+        /**
+         * @brief Get the current size of all free chunks.
          * @par Parameters
          *  None
          * @return Number of bytes.
@@ -259,7 +268,7 @@ namespace os
         free_bytes (void);
 
         /**
-         * @brief Get the number of allocated chunks.
+         * @brief Get the current number of allocated chunks.
          * @par Parameters
          *  None
          * @return Number of chunks.
@@ -268,7 +277,7 @@ namespace os
         allocated_chunks (void);
 
         /**
-         * @brief Get the number of free chunks.
+         * @brief Get the current number of free chunks.
          * @par Parameters
          *  None
          * @return Number of chunks.
@@ -372,6 +381,7 @@ namespace os
         std::size_t free_bytes_ = 0;
         std::size_t allocated_chunks_ = 0;
         std::size_t free_chunks_ = 0;
+        std::size_t max_allocated_bytes_ = 0;
 
         /**
          * @endcond
@@ -789,6 +799,12 @@ namespace os
       memory_resource::allocated_bytes (void)
       {
         return allocated_bytes_;
+      }
+
+      inline std::size_t
+      memory_resource::max_allocated_bytes (void)
+      {
+        return max_allocated_bytes_;
       }
 
       inline std::size_t

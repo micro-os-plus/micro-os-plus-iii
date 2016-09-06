@@ -138,15 +138,16 @@ namespace os
         first_fit_top
           { addr, bytes }
     {
-      ;
+      trace::printf ("%s(%p,%u) @%p \n", __func__, addr, bytes, this);
     }
 
     inline
     lifo::lifo (void* addr_begin, void* addr_end) :
-        first_fit_top
-          { addr_begin, addr_end }
+        lifo
+          { addr_begin, static_cast<std::size_t> (static_cast<char*> (addr_end)
+              - static_cast<char*> (addr_begin)) }
     {
-      ;
+      assert(addr_begin < addr_end);
     }
 
   // --------------------------------------------------------------------------
