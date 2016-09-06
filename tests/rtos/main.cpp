@@ -75,7 +75,7 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
     }
 #endif
 
-  printf ("%d\n", errno);
+  printf ("errno=%d\n", errno);
 
   return ret;
 }
