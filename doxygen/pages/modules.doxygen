@@ -1443,7 +1443,7 @@ os_main (int argc, char* argv[])
  several proprocessor definitions, grouped in a header file 
  named `<cmsis-plus/os-app-config.h>`.
 
- There are two kinds of definitions:
+ There are several kinds of definitions:
 
  - definitions with values (`OS_INTEGER_*`, `OS_BOOL_*`, `OS_STRING_*`, ...);
  for these definitions the value should be used 
@@ -1451,7 +1451,9 @@ os_main (int argc, char* argv[])
  parenthesis are recommended;
  - definitions without values (`OS_INCLUDE_*`, `OS_EXCLUDE_*`, `OS_USE_*`, 
  `OS_TRACE_*`, ...); for these definitions only the presence should be tested;
- the value, if present, should be completely ignored.
+ the value, if present, should be completely ignored;
+- definitions of types (`OS_TYPE_*`); the values are special and represent 
+ expressions that can be sed as types to define variables or other types.
  
  */
 
