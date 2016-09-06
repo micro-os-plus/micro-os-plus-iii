@@ -337,6 +337,8 @@ _start (void)
   // trace_printf() calls are available (including in static constructors).
   trace_initialize ();
 
+  trace_printf("Hardware initialised.\n");
+
   os_startup_initialize_free_store(&_Heap_Begin, &_Heap_Limit);
 
   // Get the argc/argv (useful in semihosting configurations).
