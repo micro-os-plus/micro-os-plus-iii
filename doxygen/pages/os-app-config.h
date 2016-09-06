@@ -1,6 +1,7 @@
 /**
  * @file
  * @brief Application configuration file.
+ *
  * @details
  * The `<cmsis-plus/os-ap-config.h>` header file is used to configure
  * all build
@@ -18,6 +19,7 @@
 
 /**
  * @brief Enable debug support.
+ *
  * @details
  * This definition must always be used in **debug** configurations.
  */
@@ -25,6 +27,7 @@
 
 /**
  * @brief Enable trace support.
+ *
  * @details
  * This definition can be used to enable trace support. Without
  * this definition, all trace calls are inlined to empty statements.
@@ -35,6 +38,7 @@
 
 /**
  * @brief Disable assert support.
+ *
  * @details
  * This is the standard ISO/ANSI definition used to
  * disable all `assert()` statements. Without this definition
@@ -57,6 +61,75 @@
 
 // ----------------------------------------------------------------------------
 /**
+ * @ingroup cmsis-plus-app-config-mem
+ * @{
+ */
+
+/**
+ * @brief Ask for separate RTOS dynamic memory and define its size.
+ *
+ * @details
+ * To protect the system objects from possible application bugs, it is
+ * recommended to define a separate allocation arena with a separate
+ * memory manager.
+ *
+ * If this definition is present, a memory block with the requested size
+ * is allocated with the application allocator (thus reducing the size of
+ * the application free store), and a memory resource object is created
+ * to use this separate memory.
+ *
+ * The default memory manager is `os::memory::lifo`
+ * and can be change by defining `OS_TYPE_RTOS_MEMORY_RESOURCE`.
+ *
+ * @par Default
+ *   Use of application free store for system objects too.
+ */
+#define OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES
+
+/**
+ * @brief The memory manager to be used for the RTOS system area.
+ *
+ * @details
+ * The default memory manager is `os::memory::lifo`, which is guaranteed
+ * deterministic for allocations and prevents fragmentation, but has
+ * the disadvantage that favours deallocations when
+ * performed in the reverse order of allocations (actually older
+ * blocks are reused only after all more recent blocks are freed).
+ *
+ * The LIFO allocation policy is a perfect fit when most objects
+ * are created during the initialisation phase, and later on thee is
+ * little activity.
+ *
+ * Redefine it to `os::memory::first_fit_top` if your application
+ * is more dynamic, but be sure it tolerates restarts due to
+ * fragmentation.
+ *
+ * @par Default
+ *   The default memory manager is `os::memory::lifo`.
+ */
+#define OS_TYPE_RTOS_MEMORY_RESOURCE
+
+/**
+ * @brief The memory manager to be used for the application free store.
+ *
+ * @details
+ * The default memory manager is `os::memory::first_fit_top`, which
+ * is not deterministic, but reasonably fast.
+ *
+ * If your application is very active with random allocation, be sure
+ * tolerates restarts due to fragmentation.
+ *
+ * @par Default
+ *   The default memory manager is `os::memory::first_fit_top`.
+ */
+#define OS_TYPE_APPLICATION_MEMORY_RESOURCE
+
+/**
+ * @}
+ */
+
+// ----------------------------------------------------------------------------
+/**
  * @ingroup cmsis-plus-app-config-rtos
  * @{
  */
@@ -70,6 +143,7 @@
 
 /**
  * @brief For Cortex-M[347], define the interrupt priority level.
+ *
  * @details
  * Simple devices implement critical sections by disabling/enabling
  * all interrupts. Cortex-M[347] devices can selectively disable
@@ -114,6 +188,7 @@
 
 /**
  * @brief Define the **main** thread stack size, in bytes.
+ *
  * @details
  *
  * @note Ignored for synthetic platforms.
@@ -122,6 +197,7 @@
 
 /**
  * @brief Define the **idle** thread stack size.
+ *
  * @details
  *
  * @note Ignored for synthetic platforms.
@@ -130,6 +206,7 @@
 
 /**
  * @brief Include statistics to count thread CPU cycles.
+ *
  * @details
  * Add support to measure and accumulate accurate thread duration statistics.
  *
@@ -154,6 +231,7 @@
 
 /**
  * @brief Include statistics to count thread context switches.
+ *
  * @details
  * Add support to count the number of times each thread was scheduled to run.
  *
@@ -180,6 +258,7 @@
 
 /**
  * @brief Extend the message size to 16 bits.
+ *
  * @details
  * For embedded applications the message queues are
  * optimised for small messages, up to 256 bytes.
@@ -194,6 +273,7 @@
 
 /**
  * @brief Push down the idle thread priority.
+ *
  * @details
  * Normally the applications should not create threads with
  * the idle priority.
@@ -210,6 +290,7 @@
 
 /**
  * @brief Force the stack trace to start with a 0x0.
+ *
  * @details
  * This option has no functional consequences, it is only
  * cosmetic, affecting how a debugger displays the stack trace.
@@ -225,6 +306,7 @@
 
 /**
  * @brief Default definition for the preemption flag.
+ *
  * @details
  * This option sets the initial value of the
  * `scheduler::preemptive()` flag. It can be changed
@@ -237,6 +319,7 @@
 
 /**
  * @brief Do not enter sleep in the idle thread.
+ *
  * @details
  * Very fast debuggers need direct access to a RAM buffer, which
  * in turn need the clock that powers the bus where the RAM is
@@ -268,6 +351,7 @@
 
 /**
  * @brief Enable guard checks for .bss and .data sections.
+ *
  * @details
  * Sometimes mistakes in the liner script prevent the .bss area
  * to be initialised to zero, and/or the .data area to be fully
@@ -288,6 +372,7 @@
 
 /**
  * @brief Make the application a fully semihosted application.
+ *
  * @details
  * When writing test applications it is necessary to use some
  * of the resources available from the host system (STDOUT/STDERR,
@@ -307,6 +392,7 @@
 
 /**
  * @brief Define the maximum number of semihosting open files.
+ *
  * @details
  * The implementation of the semihosting file support requires
  * an array of open files, to keep track of the host files.
@@ -321,12 +407,14 @@
 
 /**
  * @brief Include definitions for the standard POSIX system calls.
+ *
  * @todo update after POSIX I/O is updated.
  */
 #define OS_INCLUDE_STANDARD_POSIX_FUNCTIONS
 
 /**
  * @brief Include definitions for the newlib system calls.
+ *
  * @todo update after POSIX I/O is updated.
  */
 #define OS_INCLUDE_NEWLIB_POSIX_FUNCTIONS
@@ -342,7 +430,8 @@
  */
 
 /**
- * @brief Define the size of the atexit() array.
+ * @brief Define the size of the `atexit()` array.
+ *
  * @details
  * To simplify the implementation and avoid dynamic allocations, a static
  * array is used. This option defines the size of this array.
@@ -366,6 +455,7 @@
 
 /**
  * @brief Use a custom scheduler implementation.
+ *
  * @details
  * When using a CMSIS++ port that runs on top of another RTOS,
  * this option disables the CMSIS++ reference
@@ -380,30 +470,37 @@
  * @brief Use a custom condition variable implementation.
  */
 #define OS_USE_RTOS_PORT_CONDITION_VARIABLE
+
 /**
  * @brief Use a custom event flags implementation.
  */
 #define OS_USE_RTOS_PORT_EVENT_FLAGS
+
 /**
  * @brief Use a custom message queue implementation.
  */
 #define OS_USE_RTOS_PORT_MESSAGE_QUEUE
+
 /**
  * @brief Use a custom mutex implementation.
  */
 #define OS_USE_RTOS_PORT_MUTEX
+
 /**
  * @brief Use a custom semaphore implementation.
  */
 #define OS_USE_RTOS_PORT_SEMAPHORE
+
 /**
  * @brief Use a custom system tick sleep_for() implementation.
  */
 #define OS_USE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR
+
 /**
  * @brief Use a custom real time sleep_for() implementation.
  */
 #define OS_USE_RTOS_PORT_REALTIME_CLOCK_SLEEP_FOR
+
 /**
  * @brief Use a custom timer implementation.
  */
@@ -422,6 +519,7 @@
 // TODO: add examples of output for each OS_TRACE_* option.
 /**
  * @brief Forward trace messages via the ITM/SWO.
+ *
  * @details
  * ITM (Instrumentation Trace Macrocell) is one of the available ARM
  * technologies intended to facilitate debugging, by providing a trace
@@ -440,6 +538,7 @@
 
 /**
  * @brief Forward trace messages via the semihosting debug channel.
+ *
  * @details
  * The semihosting debug channel is a dedicated output channel,
  * distinct from STDOUT and STDERR, intended for printf()-like messages.
@@ -466,6 +565,7 @@
 
 /**
  * @brief Forward trace messages via the semihosting output stream.
+ *
  * @details
  * The semihosting output channel is the same as STDOUT, and
  * usually it is buffered, so characters may not be displayed
@@ -486,6 +586,7 @@
 
 /**
  * @brief Forward trace messages via the SEGGER RTT.
+ *
  * @details
  * SEGGER RTT (Real Time Terminal) is a very fast communication channel
  * available for J-Link probes.
@@ -510,52 +611,67 @@
  * @brief Enable trace messages for RTOS condition variables functions.
  */
 #define OS_TRACE_RTOS_CONDVAR
+
 /**
  * @brief Enable trace messages for RTOS event flags functions.
  */
 #define OS_TRACE_RTOS_EVFLAGS
+
 /**
  * @brief Enable trace messages for RTOS memory pools functions.
  */
 #define OS_TRACE_RTOS_MEMPOOL
+
 /**
  * @brief Enable trace messages for RTOS message queues functions.
  */
 #define OS_TRACE_RTOS_MQUEUE
+
 /**
  * @brief Enable trace messages for RTOS mutex functions.
  */
 #define OS_TRACE_RTOS_MUTEX
+
 /**
  * @brief Display an exclamation mark for each RTC tick.
  */
 #define OS_TRACE_RTOS_RTC_TICK
+
 /**
  * @brief Enable trace messages for RTOS scheduler functions.
  */
 #define OS_TRACE_RTOS_SCHEDULER
+
 /**
  * @brief Enable trace messages for RTOS semaphore functions.
  */
 #define OS_TRACE_RTOS_SEMAPHORE
+
 /**
  * @brief Display a dot and a comma for each system clock tick.
  */
 #define OS_TRACE_RTOS_SYSCLOCK_TICK
+
 /**
  * @brief Enable trace messages for RTOS thread functions.
  */
 #define OS_TRACE_RTOS_THREAD
+
 /**
  * @brief Enable trace messages for RTOS thread context functions.
+ *
+ * @details
+ *
  * @warning
  * This option requires a fast trace channel, like SEGGER RTT or at least ITM.
  */
 #define OS_TRACE_RTOS_THREAD_CONTEXT
+
 /**
  * @brief Enable trace messages for RTOS thread flags functions.
  */
 #define OS_TRACE_RTOS_THREAD_FLAGS
+
 /**
  * @brief Enable trace messages for RTOS timer functions.
  */
@@ -563,6 +679,9 @@
 
 /**
  * @brief Enable trace messages for RTOS list functions.
+ *
+ * @details
+ *
  * @warning
  * This option requires a fast trace channel, like SEGGER RTT or at least ITM.
  */
@@ -590,6 +709,7 @@
 
 /**
  * @brief Define the ITM stimulus port used for the trace messages.
+ *
  * @details
  * ITM provides 32 distinct stimulus ports for separate trace channels (0-31).
  *
@@ -600,7 +720,9 @@
 
 /**
  * @brief Define the semihosting debug buffer size.
- * @details The size of the internal buffer used to improve
+ *
+ * @details
+ * The size of the internal buffer used to improve
  * performance for the semihosting debug channel.
  *
  * @par Default

@@ -1456,7 +1456,7 @@ os_main (int argc, char* argv[])
  */
 
 /**
- @defgroup cmsis-plus-app-config-cmdline Command line options
+ @defgroup cmsis-plus-app-config-cmdline Command Line Options
  @ingroup cmsis-plus-app-config
  @brief  Definitions passed via the compiler command line.
  @details
@@ -1467,28 +1467,35 @@ os_main (int argc, char* argv[])
  */
 
 /**
- @defgroup cmsis-plus-app-config-startup Start-up & general options
+ @defgroup cmsis-plus-app-config-startup Start-up & General Options
  @ingroup cmsis-plus-app-config
  @brief  Definitions used to configure the program start-up.
  @details
  */
 
 /**
- @defgroup cmsis-plus-app-config-lib Library options
+ @defgroup cmsis-plus-app-config-mem Memory Management Options
+ @ingroup cmsis-plus-app-config
+ @brief  Definitions used to configure the memory management features.
+ @details
+ */
+
+/**
+ @defgroup cmsis-plus-app-config-lib Library Options
  @ingroup cmsis-plus-app-config
  @brief  Definitions used to configure various library options.
  @details
  */
 
 /**
- @defgroup cmsis-plus-app-config-rtos RTOS options
+ @defgroup cmsis-plus-app-config-rtos RTOS Options
  @ingroup cmsis-plus-app-config
  @brief  Definitions used to configure the RTOS.
  @details
  */
 
 /**
- @defgroup cmsis-plus-app-config-trace Trace options
+ @defgroup cmsis-plus-app-config-trace Trace Options
  @ingroup cmsis-plus-app-config
  @brief  Definitions used to configure the trace channel.
  @details
@@ -1497,7 +1504,7 @@ os_main (int argc, char* argv[])
  */
 
 /**
- @defgroup cmsis-plus-app-config-port Custom RTOS options
+ @defgroup cmsis-plus-app-config-port Custom RTOS Options
  @ingroup cmsis-plus-app-config
  @brief  Definitions used to select various custom RTOS port implementations.
  @details
