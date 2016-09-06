@@ -32,8 +32,7 @@
 
 #if defined(__cplusplus)
 
-#include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/memory/newlib-nano-malloc.h>
+#include <cmsis-plus/memory/first-fit-top.h>
 
 // ----------------------------------------------------------------------------
 
@@ -48,9 +47,9 @@ namespace os
      * @brief Memory resource implementing the LIFO
      * allocation/deallocation policies.
      * @ingroup cmsis-plus-rtos-memres
-     * @headerfile newlib-nano-malloc.h <cmsis-plus/memory/lifo.h>
+     * @headerfile lifo.h <cmsis-plus/memory/lifo.h>
      */
-    class lifo : public os::memory::newlib_nano_malloc
+    class lifo : public os::memory::first_fit_top
     {
     public:
 
@@ -136,7 +135,7 @@ namespace os
 
     inline
     lifo::lifo (void* addr, std::size_t bytes) :
-        newlib_nano_malloc
+        first_fit_top
           { addr, bytes }
     {
       ;
@@ -144,7 +143,7 @@ namespace os
 
     inline
     lifo::lifo (void* addr_begin, void* addr_end) :
-        newlib_nano_malloc
+        first_fit_top
           { addr_begin, addr_end }
     {
       ;

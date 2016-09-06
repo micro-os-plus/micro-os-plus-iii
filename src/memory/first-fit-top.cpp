@@ -25,7 +25,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/memory/newlib-nano-malloc.h>
+#include <cmsis-plus/memory/first-fit-top.h>
 #include <memory>
 
 // ----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @class newlib_nano_malloc
+     * @class first_fit_top
      * @details
      * This memory manager was inspired by the **newlib nano**
      * implementation of `malloc()` & `free()`.
@@ -47,7 +47,7 @@ namespace os
      * reasonably fast.
      */
 
-    newlib_nano_malloc::newlib_nano_malloc (void* addr, std::size_t bytes)
+    first_fit_top::first_fit_top (void* addr, std::size_t bytes)
     {
       assert(bytes > block_minchunk);
 
@@ -68,16 +68,16 @@ namespace os
       total_bytes_ = align_sz;
 
       // Qualified call of virtual function.
-      newlib_nano_malloc::reset ();
+      first_fit_top::reset ();
     }
 
-    newlib_nano_malloc::~newlib_nano_malloc ()
+    first_fit_top::~first_fit_top ()
     {
       trace::printf ("%s() @%p \n", __func__, this);
     }
 
     void
-    newlib_nano_malloc::do_reset (void) noexcept
+    first_fit_top::do_reset (void) noexcept
     {
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
       trace::printf ("%s() @%p \n", __func__, this);
@@ -113,11 +113,11 @@ namespace os
      * up deallocation for blocks allocated recently.
      *
      * @par Exceptions
-     *   Throws nothing itself, but the out of memory handler may
+     *   Throws nothing by itself, but the out of memory handler may
      *   throw `bad_alloc()`.
      */
     void*
-    newlib_nano_malloc::do_allocate (std::size_t bytes, std::size_t alignment)
+    first_fit_top::do_allocate (std::size_t bytes, std::size_t alignment)
     {
       // TODO: consider `alignment` if > block_align.
 
@@ -262,8 +262,8 @@ namespace os
      *   Throws nothing.
      */
     void
-    newlib_nano_malloc::do_deallocate (void* addr, std::size_t bytes,
-                                       std::size_t alignment) noexcept
+    first_fit_top::do_deallocate (void* addr, std::size_t bytes,
+                                  std::size_t alignment) noexcept
     {
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
       trace::printf ("%s(%p,%u,%u) @%p\n", __func__, addr, bytes, alignment,
@@ -421,7 +421,7 @@ namespace os
     }
 
     std::size_t
-    newlib_nano_malloc::do_max_size (void) const noexcept
+    first_fit_top::do_max_size (void) const noexcept
     {
       return total_bytes_;
     }

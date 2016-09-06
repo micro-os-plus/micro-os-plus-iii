@@ -29,7 +29,7 @@
 
 // ----------------------------------------------------------------------------
 
-#include <cmsis-plus/memory/newlib-nano-malloc.h>
+#include <cmsis-plus/memory/first-fit-top.h>
 #include <cmsis-plus/memory/lifo.h>
 #include <cmsis-plus/estd/memory_resource>
 
@@ -43,8 +43,9 @@ extern "C" void
 os_startup_initialize_free_store (void* heap_begin, void* heap_end);
 
 //using free_store_memory_resource = os::memory::lifo;
-using free_store_memory_resource = os::memory::newlib_nano_malloc;
+using free_store_memory_resource = os::memory::first_fit_top;
 
+// Reserve storage for the memory resource.
 static std::aligned_storage<sizeof(free_store_memory_resource),
     alignof(free_store_memory_resource)>::type free_store;
 
@@ -58,6 +59,7 @@ os_startup_initialize_free_store (void* heap_begin, void* heap_end)
 {
   trace::printf ("Free store (heap): %p-%p\n", heap_begin, heap_end);
 
+  // Construct the memory resource used for the application free store.
   new (&free_store) free_store_memory_resource
     { heap_begin, heap_end };
 

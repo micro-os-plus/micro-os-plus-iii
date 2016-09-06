@@ -25,8 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CMSIS_PLUS_MEMORY_NEWLIB_NANO_MALLOC_H_
-#define CMSIS_PLUS_MEMORY_NEWLIB_NANO_MALLOC_H_
+#ifndef CMSIS_PLUS_MEMORY_FIRST_FIT_TOP_H_
+#define CMSIS_PLUS_MEMORY_FIRST_FIT_TOP_H_
 
 // ----------------------------------------------------------------------------
 
@@ -46,9 +46,9 @@ namespace os
     /**
      * @brief Memory resource implementing the newlib nano allocation/deallocation policies.
      * @ingroup cmsis-plus-rtos-memres
-     * @headerfile newlib-nano-malloc.h <cmsis-plus/memory/newlib-nano-malloc.h>
+     * @headerfile first_fit_top.h <cmsis-plus/memory/first_fit_top.h>
      */
-    class newlib_nano_malloc : public rtos::memory::memory_resource
+    class first_fit_top : public rtos::memory::memory_resource
     {
     public:
 
@@ -62,26 +62,26 @@ namespace os
        * @param addr_begin Begin of allocator arena.
        * @param addr_end End of allocator arena.
        */
-      newlib_nano_malloc (void* addr_begin, void* addr_end);
+      first_fit_top (void* addr_begin, void* addr_end);
 
       /**
        * @brief Construct a memory resource object instance.
        * @param addr Begin of allocator arena.
        * @param bytes Size of allocator arena, in bytes.
        */
-      newlib_nano_malloc (void* addr, std::size_t bytes);
+      first_fit_top (void* addr, std::size_t bytes);
 
       /**
        * @cond ignore
        */
 
       // The rule of five.
-      newlib_nano_malloc (const newlib_nano_malloc&) = delete;
-      newlib_nano_malloc (newlib_nano_malloc&&) = delete;
-      newlib_nano_malloc&
-      operator= (const newlib_nano_malloc&) = delete;
-      newlib_nano_malloc&
-      operator= (newlib_nano_malloc&&) = delete;
+      first_fit_top (const first_fit_top&) = delete;
+      first_fit_top (first_fit_top&&) = delete;
+      first_fit_top&
+      operator= (const first_fit_top&) = delete;
+      first_fit_top&
+      operator= (first_fit_top&&) = delete;
 
       /**
        * @endcond
@@ -91,7 +91,7 @@ namespace os
        * @brief Destruct the memory resource object instance.
        */
       virtual
-      ~newlib_nano_malloc ();
+      ~first_fit_top ();
 
       /**
        * @}
@@ -206,8 +206,8 @@ namespace os
     // ========================================================================
 
     inline
-    newlib_nano_malloc::newlib_nano_malloc (void* addr_begin, void* addr_end) :
-        newlib_nano_malloc
+    first_fit_top::first_fit_top (void* addr_begin, void* addr_end) :
+        first_fit_top
           { addr_begin, static_cast<std::size_t> (static_cast<char*> (addr_end)
               - static_cast<char*> (addr_begin)) }
     {
@@ -223,4 +223,4 @@ namespace os
 
 #endif /* __cplusplus */
 
-#endif /* CMSIS_PLUS_MEMORY_NEWLIB_NANO_MALLOC_H_ */
+#endif /* CMSIS_PLUS_MEMORY_FIRST_FIT_TOP_H_ */
