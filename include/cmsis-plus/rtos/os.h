@@ -137,6 +137,24 @@ namespace os
       children_threads (thread* th);
 
     } /* namespace scheduler */
+
+    /**
+     * @brief  Create an object that is owned by a `shared_ptr` and is
+     *  allocated using the RTOS system allocator.
+     * @ingroup cmsis-plus-rtos-memres
+     * @param  args  Arguments for the _T_ object's constructor.
+     * @return A shared_ptr that owns the newly created object.
+     * @throw * An exception may be thrown from `allocate()` or
+     *          from the constructor of _T_.
+     */
+    template<typename T, typename ... Args>
+      inline std::shared_ptr<T>
+      make_shared (Args&&... args)
+      {
+        return std::allocate_shared<T> (memory::allocator<thread> (),
+                                        std::forward<Args>(args)...);
+      }
+
   } /* namespace rtos */
 } /* namespace os */
 
