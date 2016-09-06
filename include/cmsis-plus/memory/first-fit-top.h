@@ -46,7 +46,7 @@ namespace os
     /**
      * @brief Memory resource implementing the newlib nano allocation/deallocation policies.
      * @ingroup cmsis-plus-rtos-memres
-     * @headerfile first_fit_top.h <cmsis-plus/memory/first_fit_top.h>
+     * @headerfile first-fit-top.h <cmsis-plus/memory/first-fit-top.h>
      */
     class first_fit_top : public rtos::memory::memory_resource
     {
