@@ -477,6 +477,25 @@ os_irq_uncritical_exit (os_irq_state_t state)
   interrupts::uncritical_section::exit (state);
 }
 
+#if defined(OS_HAS_INTERRUPTS_STACK) || defined(__DOXYGEN__)
+
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::interrupts::stack()
+ */
+
+os_thread_stack_t*
+os_irq_get_stack (void)
+{
+  return reinterpret_cast<os_thread_stack_t*> (rtos::interrupts::stack ());
+}
+
+#endif
+
 // ----------------------------------------------------------------------------
 
 /**

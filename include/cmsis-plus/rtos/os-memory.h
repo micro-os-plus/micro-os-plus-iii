@@ -296,6 +296,9 @@ namespace os
         std::size_t
         free_chunks (void);
 
+        void
+        trace_print_statistics (void);
+
         /**
          * @}
          */
@@ -842,6 +845,18 @@ namespace os
       memory_resource::free_chunks (void)
       {
         return free_chunks_;
+      }
+
+      inline void
+      memory_resource::trace_print_statistics (void)
+      {
+#if defined(TRACE)
+        trace::printf (
+            "Memory '%s' @%p: total=%u, allocated=%u (%u chunks), free=%u (%u chunks), max=%u\n",
+            name (), this, total_bytes (), allocated_bytes (),
+            allocated_chunks (), free_bytes (), free_chunks (),
+            max_allocated_bytes ());
+#endif /* defined(TRACE) */
       }
 
       // ======================================================================

@@ -1452,7 +1452,7 @@ os_main (int argc, char* argv[])
  - definitions without values (`OS_INCLUDE_*`, `OS_EXCLUDE_*`, `OS_USE_*`, 
  `OS_TRACE_*`, ...); for these definitions only the presence should be tested;
  the value, if present, should be completely ignored;
-- definitions of types (`OS_TYPE_*`); the values are special and represent 
+ - definitions of types (`OS_TYPE_*`); the values are special and represent 
  expressions that can be sed as types to define variables or other types.
  
  */

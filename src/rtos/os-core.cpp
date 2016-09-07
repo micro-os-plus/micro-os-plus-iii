@@ -29,6 +29,16 @@
 
 // ----------------------------------------------------------------------------
 
+namespace
+{
+#if defined(OS_HAS_INTERRUPTS_STACK)
+// Object used to manage the interrupts stack.
+  class os::rtos::thread::stack interrupts_stack;
+#endif /* defined(OS_HAS_INTERRUPTS_STACK) */
+  void
+  _ (void); // Avoid formatter bug.
+}
+
 namespace os
 {
   /**
@@ -437,65 +447,88 @@ namespace os
      */
     namespace interrupts
     {
-    /**
-     * @class critical_section
-     * @details
-     * Use this class to define a critical section
-     * protected to interrupts service routines. The begining of the
-     * critical section is exactly the place where this class is
-     * instantiated (the constructor will disable interrupts below
-     * the scheduler priority). The end of the critical
-     * section is the end of the surrounding block (the destructor will
-     * enable the interrupts).
-     *
-     * @note Can be nested as many times as required without problems,
-     * only the outer call will re-enable the interrupts.
-     *
-     * @par Example
-     *
-     * @code{.cpp}
-     * void
-     * func(void)
-     * {
-     *    // Do something
-     *
-     *    {
-     *      interrupts::critical_section ics;  // Critical section begins here.
-     *
-     *      // Inside the critical section.
-     *      // No scheduler switches will happen here.
-     *
-     *    } // Critical section ends here.
-     *
-     *    // Do something else.
-     * }
-     * @endcode
-     */
+      /**
+       * @class critical_section
+       * @details
+       * Use this class to define a critical section
+       * protected to interrupts service routines. The begining of the
+       * critical section is exactly the place where this class is
+       * instantiated (the constructor will disable interrupts below
+       * the scheduler priority). The end of the critical
+       * section is the end of the surrounding block (the destructor will
+       * enable the interrupts).
+       *
+       * @note Can be nested as many times as required without problems,
+       * only the outer call will re-enable the interrupts.
+       *
+       * @par Example
+       *
+       * @code{.cpp}
+       * void
+       * func(void)
+       * {
+       *    // Do something
+       *
+       *    {
+       *      interrupts::critical_section ics;  // Critical section begins here.
+       *
+       *      // Inside the critical section.
+       *      // No scheduler switches will happen here.
+       *
+       *    } // Critical section ends here.
+       *
+       *    // Do something else.
+       * }
+       * @endcode
+       */
 
-    /*
-     * @var const state_t critical_section::state_
-     * @details
-     * The variable is constant, after being set by the constructor no
-     * further changes are possible.
-     *
-     * The variable type usually is an unsigned integer where
-     * the priorities register is saved.
-     */
+      /*
+       * @var const state_t critical_section::state_
+       * @details
+       * The variable is constant, after being set by the constructor no
+       * further changes are possible.
+       *
+       * The variable type usually is an unsigned integer where
+       * the priorities register is saved.
+       */
 
-    /**
-     * @class lockable
-     * @details
-     * Locker meeting the standard `Lockable` requirements (30.2.5.3).
-     */
+      /**
+       * @class lockable
+       * @details
+       * Locker meeting the standard `Lockable` requirements (30.2.5.3).
+       */
 
-    /*
-     * @var state_t lockable::state_
-     * @details
-     * The variable type usually is an unsigned integer where
-     * the priorities register is saved.
-     */
+      /*
+       * @var state_t lockable::state_
+       * @details
+       * The variable type usually is an unsigned integer where
+       * the priorities register is saved.
+       */
 
-    } /* namespace interrupts */
+#if defined(OS_HAS_INTERRUPTS_STACK) || defined(__DOXYGEN__)
+
+      /**
+       * @details
+       * The interrupts stack can be manipulated in a way similar to
+       * the thread stack.
+       *
+       * @note This function is available only on platforms that
+       *  support a separate interrupt stack (like Cortex-M).
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      class thread::stack*
+      stack (void)
+        {
+          return &interrupts_stack;
+        }
+
+#endif /* defined(OS_HAS_INTERRUPTS_STACK) */
+
+      void
+      _ (void); // Avoid formatter bug.
+    }
+    /* namespace interrupts */
 
     // ========================================================================
 
@@ -547,6 +580,7 @@ namespace os
       }
 
     } /* namespace internal */
+
   // ==========================================================================
   } /* namespace rtos */
 } /* namespace os */

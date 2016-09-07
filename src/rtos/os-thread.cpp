@@ -1007,8 +1007,9 @@ namespace os
           assert(stack ().check_top_magic ());
 
 #if defined(OS_TRACE_RTOS_THREAD)
-          trace::printf ("%s() @%p %s %u/%u stack bytes unused\n", __func__,
-                         this, name (), stack ().available (),
+          trace::printf ("%s() @%p %s stack: %u/%u bytes used\n", __func__,
+                         this, name (),
+                         stack ().size () - stack ().available (),
                          stack ().size ());
 #endif
 
@@ -1530,6 +1531,5 @@ namespace os
     } /* namespace this_thread */
 
   // --------------------------------------------------------------------------
-
   } /* namespace rtos */
 } /* namespace os */

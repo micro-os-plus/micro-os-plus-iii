@@ -299,6 +299,19 @@ extern "C"
   void
   os_irq_uncritical_exit (os_irq_state_t state);
 
+#if defined(OS_HAS_INTERRUPTS_STACK) || defined(__DOXYGEN__)
+
+  /**
+   * @brief Get the interrupts stack.
+   * @par Parameters
+   *  None.
+   * @return A pointer to the interrupts stack object instance.
+   */
+  os_thread_stack_t*
+  os_irq_get_stack (void);
+
+#endif
+
   /**
    * @}
    */

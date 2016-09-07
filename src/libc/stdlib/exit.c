@@ -51,9 +51,9 @@
  */
 void
 __attribute__ ((noreturn))
-exit(int status)
+exit (int status)
 {
-  trace_printf("%s(%d)\n", __func__, status);
+  trace_printf ("%s(%d)\n", __func__, status);
 
   // Call the cleanup functions enrolled with atexit().
   __call_exitprocs (status, NULL);
@@ -79,6 +79,9 @@ extern void __attribute__((noreturn))
 __reset_hardware(void);
 #endif
 
+extern void
+os_goodbye (void);
+
 // ----------------------------------------------------------------------------
 
 // On Release, call the hardware reset procedure.
@@ -90,22 +93,24 @@ __reset_hardware(void);
 
 void __attribute__((weak, noreturn))
 _Exit (int code __attribute__((unused)))
-{
-  trace_printf ("%s()", __func__);
+  {
+    trace_printf ("%s()", __func__);
 
-  trace_flush();
+    os_goodbye ();
+
+    trace_flush();
 
 #if !defined(DEBUG)
-  __reset_hardware();
+    __reset_hardware();
 #else
-  trace_dbg_bkpt();
+    trace_dbg_bkpt();
 #endif
 
-  // For just in case.
-  while (1)
+    // For just in case.
+    while (1)
     ;
-  /* NOTREACHED */
-}
+    /* NOTREACHED */
+  }
 
 void __attribute__((weak, alias ("_Exit")))
 _exit (int status);

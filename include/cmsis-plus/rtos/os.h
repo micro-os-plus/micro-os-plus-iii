@@ -138,6 +138,30 @@ namespace os
 
     } /* namespace scheduler */
 
+    // ------------------------------------------------------------------------
+
+    namespace interrupts
+    {
+#if defined(OS_HAS_INTERRUPTS_STACK) || defined(__DOXYGEN__)
+
+      /**
+       * @brief Get the interrupts stack
+       * @ingroup cmsis-plus-rtos-core
+       * @par Parameters
+       *  None.
+       * @return Pointer to stack object instance.
+       */
+      class thread::stack*
+      stack (void);
+
+#else
+#endif /* defined(OS_HAS_INTERRUPTS_STACK) */
+
+      void
+      _ (void); // Avoid formatter bug.
+    } /* namespace interrupts */
+
+// ------------------------------------------------------------------------
     /**
      * @brief  Create an object that is owned by a `shared_ptr` and is
      *  allocated using the RTOS system allocator.

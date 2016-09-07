@@ -31,13 +31,15 @@
 // ----------------------------------------------------------------------------
 
 using namespace os;
-using namespace os::rtos;
 
 // ----------------------------------------------------------------------------
 
 /**
  * @cond ignore
  */
+
+extern "C" void
+os_goodbye (void);
 
 namespace
 {
@@ -71,24 +73,6 @@ namespace
     int code = os_main (main_args.argc, main_args.argv);
     trace::printf ("%s() exit = %d\n", __func__, code);
 
-#if defined(TRACE)
-
-    memory::memory_resource* mr;
-    mr = estd::pmr::get_default_resource ();
-    trace::printf ("memory @%p %s %u,a=%u:%u,f=%u:%u,ma=%u\n", mr, mr->name (),
-                   mr->total_bytes (), mr->allocated_bytes (),
-                   mr->allocated_chunks (), mr->free_bytes (),
-                   mr->free_chunks (), mr->max_allocated_bytes ());
-#if defined(OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES)
-    mr = memory::get_default_resource ();
-    trace::printf ("memory @%p %s %u,a=%u:%u,f=%u:%u,ma=%u\n", mr, mr->name (),
-        mr->total_bytes (), mr->allocated_bytes (),
-        mr->allocated_chunks (), mr->free_bytes (),
-        mr->free_chunks (), mr->max_allocated_bytes ());
-#endif /* defined(OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES) */
-
-#endif /* defined(TRACE) */
-
     // Exit will run the atexit() and destructors, then
     // terminate gracefully.
     std::exit (code);
@@ -106,7 +90,7 @@ namespace
 // Necessarily static, on Cortex-M the reset stack will be used
 // as MSP for the interrupts, so the current stack must be freed
 // and os_main() shall run on its own stack.
-using main_thread = thread_static<OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES>;
+using main_thread = rtos::thread_static<OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES>;
 static std::aligned_storage<sizeof(main_thread), alignof(main_thread)>::type os_main_thread;
 
 /**
@@ -118,6 +102,8 @@ __attribute__((weak))
 #endif
 main (int argc, char* argv[])
 {
+  using namespace os::rtos;
+
   trace::printf ("\nµOS++ v" OS_STRING_RTOS_IMPL_VERSION
   " / CMSIS++ RTOS API v" OS_STRING_RTOS_API_VERSION ".\n");
   trace::printf ("Copyright (c) 2016 Liviu Ionescu.\n");
@@ -163,4 +149,33 @@ main (int argc, char* argv[])
   /* NOTREACHED */
 }
 
+void
+#if !defined(__APPLE__)
+__attribute__((weak))
+#endif
+os_goodbye (void)
+{
+#if defined(TRACE)
+
+  trace::printf ("\n");
+
+  // Application memory.
+  estd::pmr::get_default_resource ()->trace_print_statistics ();
+
+#if defined(OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES)
+  rtos::memory::get_default_resource ()->trace_print_statistics();
+#endif /* defined(OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES) */
+
+#if defined(OS_HAS_INTERRUPTS_STACK)
+  trace::printf (
+      "Interrupts stack: %u/%u bytes used\n",
+      rtos::interrupts::stack ()->size ()
+          - rtos::interrupts::stack ()->available (),
+      rtos::interrupts::stack ()->size ());
+#endif /* defined(OS_HAS_INTERRUPTS_STACK) */
+
+  trace::printf ("Hasta la Vista!\n");
+
+#endif /* defined(TRACE) */
+}
 // ----------------------------------------------------------------------------

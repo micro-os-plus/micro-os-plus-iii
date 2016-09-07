@@ -82,6 +82,12 @@ os_idle (thread::func_args_t args __attribute__((unused)))
           this_thread::yield ();
         }
 
+#if defined(OS_HAS_INTERRUPTS_STACK)
+      // Simple test to verify that the interrupts
+      // did not underflow the stack.
+      assert(rtos::interrupts::stack()->check_bottom_magic());
+#endif
+
       if (!os_rtos_idle_enter_power_saving_mode_hook ())
         {
 #if !defined(OS_USE_RTOS_PORT_SCHEDULER)

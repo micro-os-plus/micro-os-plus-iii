@@ -2354,7 +2354,7 @@ namespace os
             }
 
           // Simple test to verify that the old thread
-          // did not overflow the stack.
+          // did not underflow the stack.
           assert(stack ().check_bottom_magic ());
         }
     }
@@ -2395,9 +2395,9 @@ namespace os
 
     inline result_t
     thread::flags_clear (flags::mask_t mask, flags::mask_t* oflags)
-    {
-      return internal_flags_clear_ (mask, oflags);
-    }
+      {
+        return internal_flags_clear_ (mask, oflags);
+      }
 
 #endif
 

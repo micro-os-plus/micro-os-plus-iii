@@ -1055,10 +1055,17 @@ __posix_readlink (const char* path, char* buf, size_t bufsize)
 
 // ----------------------------------------------------------------------------
 
+extern "C" void
+os_goodbye (void);
+
+// ----------------------------------------------------------------------------
+
 extern "C" [[noreturn]] void
 _Exit (int code)
 {
   trace_printf ("%s(%d)\n", __func__, code);
+
+  os_goodbye ();
 
   trace_flush ();
 

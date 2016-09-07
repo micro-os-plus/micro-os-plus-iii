@@ -30,6 +30,7 @@
 // ----------------------------------------------------------------------------
 
 #include <cmsis-plus/os-app-config.h>
+#include <cmsis-plus/rtos/port/os-c-decls.h>
 
 #include <cmsis_device.h>
 #include <cmsis-plus/arm/semihosting.h>
@@ -43,10 +44,14 @@
 extern void __attribute__((noreturn,weak))
 _start (void);
 
+extern unsigned int _Heap_Limit;
+extern unsigned int __stack;
+
 // ----------------------------------------------------------------------------
 
-// Default exception handlers. Override the ones here by defining your own
-// handler routines in your application code.
+// Default exception handlers.
+// Weak definitions, override them with similar
+// handler routines defined in the application code.
 //
 // The ARCH_7M exception handlers are:
 // 0x00 stack
@@ -74,6 +79,13 @@ _start (void);
 void __attribute__ ((section(".after_vectors"),noreturn,weak))
 Reset_Handler (void)
 {
+  // Fill the main stack with a pattern, to detect usage and underflow.
+  for (unsigned int* p = &_Heap_Limit;
+      p < &__stack;)
+    {
+      *p++ = OS_INTEGER_RTOS_STACK_FILL_MAGIC; // DEADBEEF
+    }
+
   _start ();
 }
 
@@ -103,7 +115,7 @@ NMI_Handler (void)
 
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
 
-// The values of BFAR and MMFAR stay unchanged if the BFARVALID or
+// The values of BFAR and MMFAR remain unchanged if the BFARVALID or
 // MMARVALID is set. However, if a new fault occurs during the
 // execution of this fault handler, the value of the BFAR and MMFAR
 // could potentially be erased. In order to ensure the fault addresses
