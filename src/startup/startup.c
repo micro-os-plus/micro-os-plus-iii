@@ -182,7 +182,7 @@ inline __attribute__((always_inline))
 void
 os_run_init_array (void)
 {
-  trace_printf("%s()\n", __func__);
+  trace_printf ("%s()\n", __func__);
 
   int count = __preinit_array_end - __preinit_array_start;
   for (int i = 0; i < count; i++)
@@ -190,9 +190,9 @@ os_run_init_array (void)
       __preinit_array_start[i] ();
     }
 
-  // If you need to run the code in the .init section, please use
-  // the startup files, since this requires the code in crti.o and crtn.o
-  // to add the function prologue/epilogue.
+  // If the application needs to run the code in the .init section,
+  // please use the startup files, since this requires the code in
+  // crti.o and crtn.o to add the function prologue/epilogue.
   //_init(); // DO NOT ENABE THIS!
 
   count = __init_array_end - __init_array_start;
@@ -206,7 +206,7 @@ os_run_init_array (void)
 void
 os_run_fini_array (void)
 {
-  trace_printf("%s()\n", __func__);
+  trace_printf ("%s()\n", __func__);
 
   int count = __fini_array_end - __fini_array_start;
   for (int i = count; i > 0; i--)
@@ -214,9 +214,9 @@ os_run_fini_array (void)
       __fini_array_start[i - 1] ();
     }
 
-  // If you need to run the code in the .fini section, please use
-  // the startup files, since this requires the code in crti.o and crtn.o
-  // to add the function prologue/epilogue.
+  // If the application needs to run the code in the .fini section,
+  // please use the startup files, since this requires the code in
+  // crti.o and crtn.o to add the function prologue/epilogue.
   //_fini(); // DO NOT ENABLE THIS!
 }
 
@@ -296,8 +296,10 @@ _start (void)
   if ((__data_begin_guard != DATA_BEGIN_GUARD_VALUE)
       || (__data_end_guard != DATA_END_GUARD_VALUE))
     {
-      while (1)
-        ;
+      while (true)
+        {
+          __NOP();
+        }
     }
 #endif
 
@@ -324,8 +326,10 @@ _start (void)
 #if defined(DEBUG) && (OS_BOOL_STARTUP_GUARD_CHECKS)
   if ((__bss_begin_guard != 0) || (__bss_end_guard != 0))
     {
-      while (1)
-        ;
+      while (true)
+        {
+          __NOP();
+        }
     }
 #endif
 
@@ -337,9 +341,9 @@ _start (void)
   // trace_printf() calls are available (including in static constructors).
   trace_initialize ();
 
-  trace_printf("Hardware initialised.\n");
+  trace_printf ("Hardware initialised.\n");
 
-  os_startup_initialize_free_store(&_Heap_Begin, &_Heap_Limit);
+  os_startup_initialize_free_store (&_Heap_Begin, &_Heap_Limit);
 
   // Get the argc/argv (useful in semihosting configurations).
   int argc;
@@ -353,7 +357,8 @@ _start (void)
   // Call the main entry point, and save the exit code.
   int code = main (argc, argv);
 
-  // Also run the C++ static destructors.
+  // Standard program termination;
+  // `atexit()` and C++ static destructors are executed.
   exit (code);
   /* NOTREACHED */
 }
@@ -365,13 +370,6 @@ _start (void)
 // Semihosting uses a more elaborate version of os_initialize_args()
 // to parse args received from host.
 
-// `initialise_monitor_handles()` is a newlib libgloss function used to prepare
-// the stdio files when using semihosting. Better keep the name the same.
-#if __STDC_HOSTED__ != 0
-extern void
-initialise_monitor_handles (void);
-#endif
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
@@ -381,7 +379,8 @@ initialise_monitor_handles (void);
 // For semihosting applications, this is redefined to get the real
 // args from the debugger.
 //
-// You can redefine it to fetch some args from a non-volatile memory.
+// The application can redefine it to fetch some args from a
+// non-volatile memory.
 
 void __attribute__((weak))
 os_initialize_args (int* p_argc, char*** p_argv)
@@ -402,11 +401,6 @@ os_initialize_args (int* p_argc, char*** p_argv)
 
     *p_argc = 1;
     *p_argv = &argv[0];
-
-#if __STDC_HOSTED__ != 0
-    // temporary here
-    initialise_monitor_handles ();
-#endif
 
     return;
   }

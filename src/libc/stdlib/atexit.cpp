@@ -46,17 +46,17 @@
  * @retval -1 The call failed, possibly due to memory problems.
  *
  * @details
- *  You can use `atexit()` to enroll functions in a list of functions that
- * will be called when your program terminates normally.  The argument is
+ * `atexit()` can be used to enroll functions in a list of functions that
+ * will be called when the program terminates normally.  The argument is
  * a pointer to a user-defined function (which must not require arguments and
  * must not return a result).
  *
  * The functions are kept in a LIFO stack; that is, the last function
- * enrolled by `atexit()` will be the first to execute when your program
+ * enrolled by `atexit()` will be the first to execute when the program
  * exits.
  *
  * The ANSI standard specifies that
- * there is no built-in limit to the number of functions you can enroll
+ * there is no built-in limit to the number of functions that can be enrolled
  * in this list; however, after every group of 32 functions is enrolled,
  * `atexit()` will call `malloc()` to get space for the next part of the
  * list.   The initial list of 32 functions is statically allocated, so

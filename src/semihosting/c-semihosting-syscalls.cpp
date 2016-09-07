@@ -72,8 +72,8 @@
 // Notes: Reentrancy and 'errno'.
 //
 // The standard headers define errno as '*(__errno())';
-// If you use a multi-threaded environment, be sure you
-// redefine __errno() to return a thread specific pointer.
+// In a multi-threaded environment, __errno() must return a
+// thread specific pointer.
 
 // Documentation:
 // http://infocenter.arm.com/help/topic/com.arm.doc.dui0205g/DUI0205.pdf
@@ -1055,31 +1055,22 @@ __posix_readlink (const char* path, char* buf, size_t bufsize)
 
 // ----------------------------------------------------------------------------
 
-extern "C" void
-os_goodbye (void);
+extern "C"
+{
+  void
+  __attribute__ ((noreturn))
+  os_exit (int status);
+
+  void
+  initialise_monitor_handles (void);
+}
 
 // ----------------------------------------------------------------------------
 
-extern "C" [[noreturn]] void
-_Exit (int code)
+void
+__attribute__ ((noreturn,weak))
+os_exit (int code __attribute__((unused)))
 {
-  trace_printf ("%s(%d)\n", __func__, code);
-
-  os_goodbye ();
-
-  trace_flush ();
-
-#if defined(DEBUG)
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
-  if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
-    {
-      trace_dbg_bkpt ();
-    }
-#else
-  trace_dbg_bkpt ();
-#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
-#endif /* defined(DEBUG) */
-
   /* There is only one SWI for both _exit and _kill. For _exit, call
    the SWI with the second argument set to -1, an invalid value for
    signum, so that the SWI handler can distinguish the two calls.
@@ -1087,26 +1078,15 @@ _Exit (int code)
    arguments.  */
   report_exception (
       code == 0 ? ADP_Stopped_ApplicationExit : ADP_Stopped_RunTimeError);
+  /* NOTREACHED */
 }
-
-extern "C" void __attribute__((alias ("_Exit")))
-_exit (int code);
 
 // ----------------------------------------------------------------------------
 
-extern "C"
-{
-  void
-  initialise_monitor_handles (void);
-}
-
-// This is the standard default implementation for the routine to
-// process args. It returns a single empty arg.
-//
-// For semihosting applications, this is redefined to get the real
-// args from the debugger.
-//
-// You can redefine it to fetch some args in a non-volatile memory.
+// This is the semihosting implementation for the routine to
+// process args.
+// The entire command line is received from the host
+// and parsed into strings.
 
 #define ARGS_BUF_ARRAY_SIZE 80
 #define ARGV_BUF_ARRAY_SIZE 10

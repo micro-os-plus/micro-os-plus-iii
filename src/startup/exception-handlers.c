@@ -73,15 +73,13 @@ extern unsigned int __stack;
 
 // ----------------------------------------------------------------------------
 
-
 // This function is not naked, and has a proper stack frame,
 // to allow setting breakpoints at Reset_Handler.
 void __attribute__ ((section(".after_vectors"),noreturn,weak))
 Reset_Handler (void)
 {
   // Fill the main stack with a pattern, to detect usage and underflow.
-  for (unsigned int* p = &_Heap_Limit;
-      p < &__stack;)
+  for (unsigned int* p = &_Heap_Limit; p < &__stack;)
     {
       *p++ = OS_INTEGER_RTOS_STACK_FILL_MAGIC; // DEADBEEF
     }
@@ -96,16 +94,16 @@ NMI_Handler (void)
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
   if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
     {
-      __BKPT (0);
+      __BKPT(0);
     }
 #else
   __BKPT (0);
 #endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
 #endif /* defined(DEBUG) */
 
-  while (1)
+  while (true)
     {
-      ;
+      __NOP ();
     }
 }
 
@@ -443,16 +441,16 @@ HardFault_Handler_C (exception_stack_frame_t* frame __attribute__((unused)),
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
   if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
     {
-      __BKPT (0);
+      __BKPT(0);
     }
 #else
   __BKPT (0);
 #endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
 #endif /* defined(DEBUG) */
 
-  while (1)
+  while (true)
     {
-      ;
+      __NOP ();
     }
 }
 
@@ -504,19 +502,19 @@ HardFault_Handler_C (exception_stack_frame_t* frame __attribute__((unused)),
 
 #if defined(DEBUG)
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
-  if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
-    {
-      __BKPT (0);
-    }
+    if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
+      {
+        __BKPT (0);
+      }
 #else
-  __BKPT (0);
+    __BKPT (0);
 #endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
 #endif /* defined(DEBUG) */
 
-  while (1)
-    {
-      ;
-    }
+    while (true)
+      {
+        __NOP();
+      }
   }
 
 #endif /* defined(__ARM_ARCH_6M__) */
@@ -530,16 +528,16 @@ MemManage_Handler (void)
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
   if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
     {
-      __BKPT (0);
+      __BKPT(0);
     }
 #else
   __BKPT (0);
 #endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
 #endif /* defined(DEBUG) */
 
-  while (1)
+  while (true)
     {
-      ;
+      __NOP ();
     }
 }
 
@@ -578,16 +576,16 @@ BusFault_Handler_C (exception_stack_frame_t* frame __attribute__((unused)),
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
   if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
     {
-      __BKPT (0);
+      __BKPT(0);
     }
 #else
   __BKPT (0);
 #endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
 #endif /* defined(DEBUG) */
 
-  while (1)
+  while (true)
     {
-      ;
+      __NOP ();
     }
 }
 
@@ -641,16 +639,16 @@ UsageFault_Handler_C (exception_stack_frame_t* frame __attribute__((unused)),
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
   if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
     {
-      __BKPT (0);
+      __BKPT(0);
     }
 #else
   __BKPT (0);
 #endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
 #endif /* defined(DEBUG) */
 
-  while (1)
+  while (true)
     {
-      ;
+      __NOP ();
     }
 }
 
@@ -663,16 +661,16 @@ SVC_Handler (void)
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
   if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
     {
-      __BKPT (0);
+      __BKPT(0);
     }
 #else
   __BKPT (0);
 #endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
 #endif /* defined(DEBUG) */
 
-  while (1)
+  while (true)
     {
-      ;
+      __NOP ();
     }
 }
 
@@ -684,13 +682,13 @@ DebugMon_Handler (void)
 #if defined(DEBUG)
   if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
     {
-      __BKPT (0);
+      __BKPT(0);
     }
 #endif /* defined(DEBUG) */
 
-  while (1)
+  while (true)
     {
-      ;
+      __NOP ();
     }
 }
 
@@ -703,16 +701,16 @@ PendSV_Handler (void)
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
   if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
     {
-      __BKPT (0);
+      __BKPT(0);
     }
 #else
   __BKPT (0);
 #endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
 #endif /* defined(DEBUG) */
 
-  while (1)
+  while (true)
     {
-      ;
+      __NOP ();
     }
 }
 
