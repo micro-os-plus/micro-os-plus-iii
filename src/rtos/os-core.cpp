@@ -35,8 +35,8 @@ namespace
 // Object used to manage the interrupts stack.
   class os::rtos::thread::stack interrupts_stack;
 #endif /* defined(OS_HAS_INTERRUPTS_STACK) */
-  void
-  _ (void); // Avoid formatter bug.
+  ;
+// Avoid formatter bug
 }
 
 namespace os
@@ -525,13 +525,12 @@ namespace os
 
 #endif /* defined(OS_HAS_INTERRUPTS_STACK) */
 
-      void
-      _ (void); // Avoid formatter bug.
+      ;
+    // Avoid formatter bug.
     }
     /* namespace interrupts */
 
     // ========================================================================
-
     namespace internal
     {
       /**

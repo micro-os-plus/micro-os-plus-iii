@@ -157,8 +157,8 @@ namespace os
 #else
 #endif /* defined(OS_HAS_INTERRUPTS_STACK) */
 
-      void
-      _ (void); // Avoid formatter bug.
+      ;
+    // Avoid formatter bug.
     } /* namespace interrupts */
 
 // ------------------------------------------------------------------------
