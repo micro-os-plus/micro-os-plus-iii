@@ -250,6 +250,7 @@ namespace os
       trace::printf ("%s(%u,%u)=%p @%p %s\n", __func__, bytes, alignment, mem,
                      this, name ());
 #endif
+
       return mem;
     }
 
@@ -282,6 +283,7 @@ namespace os
       trace::printf ("%s(%u,%u)=%p @%p %s\n", __func__, bytes, alignment, mem,
                      this, name ());
 #endif
+      allocated_chunks_++;
       return mem;
     }
 
@@ -295,6 +297,7 @@ namespace os
 #endif
       // Ignore size and alignment for now.
       ::operator delete (addr);
+      allocated_chunks_--;
     }
 
 #pragma GCC diagnostic pop
