@@ -30,8 +30,11 @@
 // ----------------------------------------------------------------------------
 
 #include <cmsis-plus/os-app-config.h>
+#include <cmsis-plus/rtos/os-hooks.h>
 
 #include <cmsis-plus/diag/trace.h>
+
+#include <cmsis_device.h>
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -98,9 +101,6 @@ extern unsigned int __bss_regions_array_end;
 extern unsigned int _Heap_Begin;
 extern unsigned int _Heap_Limit;
 
-extern void
-os_initialize_args (int*, char***);
-
 extern int
 main (int argc, char* argv[]);
 
@@ -124,15 +124,6 @@ os_run_init_array (void);
 // Not static since it is called from exit()
 void
 os_run_fini_array (void);
-
-void
-os_initialize_hardware_early (void);
-
-void
-os_initialize_hardware (void);
-
-void
-os_startup_initialize_free_store (void* heap_begin, void* heap_end);
 
 // ----------------------------------------------------------------------------
 
@@ -244,16 +235,21 @@ __data_end_guard = DATA_END_GUARD_VALUE;
 
 #endif // defined(DEBUG) && (OS_BOOL_STARTUP_GUARD_CHECKS)
 
-// This is the place where Cortex-M core will go immediately after reset,
-// via a call or jump from the Reset_Handler.
-//
-// For the call to work, and for the call to os_initialize_hardware_early()
-// to work, the reset stack must point to a valid internal RAM area.
-
+/**
+ * @details
+ * This is the place where the Cortex-M core will go immediately
+ * after reset (the `Reset_Handler` calls this function).
+ *
+ * To reach here, the reset stack must point to a valid internal RAM area.
+ */
 void
 __attribute__ ((section(".after_vectors"),noreturn,weak))
 _start (void)
 {
+  // After Reset the Cortex-M processor is in Thread mode,
+  // priority is Privileged, and the Stack is set to Main.
+
+  // --------------------------------------------------------------------------
 
   // Initialise hardware right after reset, to switch clock to higher
   // frequency and have the rest of the initialisations run faster.
@@ -264,19 +260,23 @@ _start (void)
   // Also useful on platform with external RAM, that need to be
   // initialised before filling the BSS section.
 
-  os_initialize_hardware_early ();
+  os_startup_initialize_hardware_early ();
 
   // Use Old Style DATA and BSS section initialisation,
   // that will manage a single BSS sections.
 
 #if defined(DEBUG) && (OS_BOOL_STARTUP_GUARD_CHECKS)
+
   __data_begin_guard = DATA_GUARD_BAD_VALUE;
   __data_end_guard = DATA_GUARD_BAD_VALUE;
+
 #endif
 
 #if !defined(OS_INCLUDE_STARTUP_INIT_MULTIPLE_RAM_SECTIONS)
+
   // Copy the DATA segment from Flash to RAM (inlined).
   os_initialize_data (&_sidata, &_sdata, &_edata);
+
 #else
 
   // Copy the data sections from flash to SRAM.
@@ -293,24 +293,30 @@ _start (void)
 #endif
 
 #if defined(DEBUG) && (OS_BOOL_STARTUP_GUARD_CHECKS)
+
   if ((__data_begin_guard != DATA_BEGIN_GUARD_VALUE)
       || (__data_end_guard != DATA_END_GUARD_VALUE))
     {
       while (true)
         {
-          __NOP();
+          __NOP ();
         }
     }
+
 #endif
 
 #if defined(DEBUG) && (OS_BOOL_STARTUP_GUARD_CHECKS)
+
   __bss_begin_guard = BSS_GUARD_BAD_VALUE;
   __bss_end_guard = BSS_GUARD_BAD_VALUE;
+
 #endif
 
 #if !defined(OS_INCLUDE_STARTUP_INIT_MULTIPLE_RAM_SECTIONS)
+
   // Zero fill the BSS section (inlined).
   os_initialize_bss (&__bss_start__, &__bss_end__);
+
 #else
 
   // Zero fill all bss segments
@@ -321,21 +327,24 @@ _start (void)
       unsigned int* region_end = (unsigned int*) (*p++);
       os_initialize_bss (region_begin, region_end);
     }
+
 #endif
 
 #if defined(DEBUG) && (OS_BOOL_STARTUP_GUARD_CHECKS)
+
   if ((__bss_begin_guard != 0) || (__bss_end_guard != 0))
     {
       while (true)
         {
-          __NOP();
+          __NOP ();
         }
     }
+
 #endif
 
   // Hook to continue the initialisations. Usually compute and store the
   // clock frequency in the global CMSIS variable, cleared above.
-  os_initialize_hardware ();
+  os_startup_initialize_hardware ();
 
   // Initialise the trace output device. From this moment on,
   // trace_printf() calls are available (including in static constructors).
@@ -348,7 +357,7 @@ _start (void)
   // Get the argc/argv (useful in semihosting configurations).
   int argc;
   char** argv;
-  os_initialize_args (&argc, &argv);
+  os_startup_initialize_args (&argc, &argv);
 
   // Call the standard library initialisation (mandatory for C++ to
   // execute the constructors for the static objects).
@@ -367,7 +376,7 @@ _start (void)
 
 #if !defined(OS_USE_SEMIHOSTING_SYSCALLS)
 
-// Semihosting uses a more elaborate version of os_initialize_args()
+// Semihosting uses a more elaborate version of os_startup_initialize_args()
 // to parse args received from host.
 
 #pragma GCC diagnostic push
@@ -383,7 +392,7 @@ _start (void)
 // non-volatile memory.
 
 void __attribute__((weak))
-os_initialize_args (int* p_argc, char*** p_argv)
+os_startup_initialize_args (int* p_argc, char*** p_argv)
   {
     // By the time we reach this, the data and bss should have been initialised.
 

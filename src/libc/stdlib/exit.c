@@ -68,7 +68,7 @@ abort (void)
  * - calls all application-defined cleanup functions enrolled with `atexit()`;
  * - files and streams are
  * cleaned up: any pending output is delivered to the host system, each
- * open file or stream is closed, and files created by <<tmpfile>> are
+ * open file or stream is closed, and files created by `tmpfile()` are
  * deleted (wishful thinking, not implemented);
  * - call the static destructors (in reverse order of constructors)
  *

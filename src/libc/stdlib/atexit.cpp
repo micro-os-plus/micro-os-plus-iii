@@ -92,7 +92,7 @@ size_t __atexit_count;
 
 /**
  * @brief Array of pointers to functions registered by atexit().
- * @detail
+ * @details
  * To minimise the RAM consumption, the ANSI requirement to support
  * a minimum of 32 functions and to grow the storage dynamically
  * is not met; instead, this static array is used.

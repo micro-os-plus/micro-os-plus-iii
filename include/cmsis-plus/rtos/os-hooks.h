@@ -28,6 +28,8 @@
 #ifndef CMSIS_PLUS_RTOS_OS_HOOKS_H_
 #define CMSIS_PLUS_RTOS_OS_HOOKS_H_
 
+#include <stdbool.h>
+
 // ----------------------------------------------------------------------------
 
 #if defined(__cplusplus)
@@ -41,6 +43,69 @@ extern "C"
    */
 
   /**
+   * @name Startup Routines
+   * @{
+   */
+
+  /**
+   * @brief The standard C application entry point.
+   * @par Parameters
+   *  None.
+   * @par Returns
+   *  Does not return.
+   */
+  void
+  __attribute__ ((noreturn))
+  _start (void);
+
+  /**
+   * @brief Early hardware initialisations.
+   * @par Parameters
+   *  None.
+   * @par Returns
+   *  Nothing.
+   */
+  void
+  os_startup_initialize_hardware_early (void);
+
+  /**
+   * @brief Hardware initialisations.
+   * @par Parameters
+   *  None.
+   * @par Returns
+   *  Nothing.
+   */
+  void
+  os_startup_initialize_hardware (void);
+
+  /**
+   * @brief Free store initialisations.
+   * @param heap_begin The first unallocated RAM address (after the BSS).
+   * @param heap_end The address after the free store.
+   * @par Returns
+   *  Nothing.
+   */
+  void
+  os_startup_initialize_free_store (void* heap_begin, void* heap_end);
+
+  /**
+   * @brief Arguments initialisations.
+   * @param [out] p_argc Pointer to argc.
+   * @param [out] p_argv Pointer to argv.
+   */
+  void
+  os_startup_initialize_args (int* p_argc, char*** p_argv);
+
+  /**
+   * @}
+   */
+
+  /**
+   * @name Hooks
+   * @{
+   */
+
+  /**
    * @brief Hook to enter a power saving mode.
    * @par Parameters
    *  None.
@@ -49,6 +114,23 @@ extern "C"
    */
   bool
   os_rtos_idle_enter_power_saving_mode_hook (void);
+
+/**
+ * @}
+ */
+
+/**
+ * @name Compatibility Macros
+ * @{
+ */
+
+#define os_initialize_hardware_early os_startup_initialize_hardware_early
+#define os_initialize_hardware os_startup_initialize_hardware
+#define os_initialize_args os_startup_initialize_args
+
+/**
+ * @}
+ */
 
 /**
  * @}

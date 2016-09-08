@@ -30,6 +30,7 @@
 // ----------------------------------------------------------------------------
 
 #include <cmsis-plus/os-app-config.h>
+#include <cmsis-plus/rtos/os-hooks.h>
 
 #if defined(OS_USE_SEMIHOSTING_SYSCALLS)
 
@@ -1091,14 +1092,14 @@ os_exit (int code __attribute__((unused)))
 #define ARGS_BUF_ARRAY_SIZE 80
 #define ARGV_BUF_ARRAY_SIZE 10
 
-typedef struct
+typedef struct command_line_block_s
 {
-  char* pCommandLine;
+  char* command_line;
   int size;
-} CommandLineBlock;
+} command_line_block_t;
 
 void
-os_initialize_args (int* p_argc, char*** p_argv)
+os_startup_initialize_args (int* p_argc, char*** p_argv)
 {
   // Array of chars to receive the command line from the host.
   static char args_buf[ARGS_BUF_ARRAY_SIZE];
@@ -1108,13 +1109,13 @@ os_initialize_args (int* p_argc, char*** p_argv)
   static char* argv_buf[ARGV_BUF_ARRAY_SIZE];
 
   int argc = 0;
-  int isInArgument = 0;
+  int is_in_argument = 0;
 
-  CommandLineBlock cmdBlock;
-  cmdBlock.pCommandLine = args_buf;
-  cmdBlock.size = sizeof(args_buf) - 1;
+  command_line_block_t cmd_block;
+  cmd_block.command_line = args_buf;
+  cmd_block.size = sizeof(args_buf) - 1;
 
-  int ret = call_host (SEMIHOSTING_SYS_GET_CMDLINE, &cmdBlock);
+  int ret = call_host (SEMIHOSTING_SYS_GET_CMDLINE, &cmd_block);
   if (ret == 0)
     {
       // In case the host send more than we can chew, limit the
@@ -1122,14 +1123,14 @@ os_initialize_args (int* p_argc, char*** p_argv)
       args_buf[ARGS_BUF_ARRAY_SIZE - 1] = '\0';
 
       // The command line is a null terminated string.
-      char* p = cmdBlock.pCommandLine;
+      char* p = cmd_block.command_line;
 
       int delim = '\0';
       int ch;
 
       while ((ch = *p) != '\0')
         {
-          if (isInArgument == 0)
+          if (is_in_argument == 0)
             {
               if (!isblank (ch))
                 {
@@ -1147,7 +1148,7 @@ os_initialize_args (int* p_argc, char*** p_argv)
                     }
                   // Remember the arg beginning address.
                   argv_buf[argc++] = p;
-                  isInArgument = 1;
+                  is_in_argument = 1;
                 }
             }
           else if (delim != '\0')
@@ -1156,14 +1157,14 @@ os_initialize_args (int* p_argc, char*** p_argv)
                 {
                   delim = '\0';
                   *p = '\0';
-                  isInArgument = 0;
+                  is_in_argument = 0;
                 }
             }
           else if (isblank (ch))
             {
               delim = '\0';
               *p = '\0';
-              isInArgument = 0;
+              is_in_argument = 0;
             }
           ++p;
         }

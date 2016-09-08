@@ -29,6 +29,7 @@
 
 // ----------------------------------------------------------------------------
 
+#include <cmsis-plus/rtos/os-hooks.h>
 #include <cmsis-plus/memory/first-fit-top.h>
 #include <cmsis-plus/memory/lifo.h>
 #include <cmsis-plus/estd/memory_resource>
@@ -38,9 +39,6 @@
 using namespace os;
 
 // ----------------------------------------------------------------------------
-
-extern "C" void
-os_startup_initialize_free_store (void* heap_begin, void* heap_end);
 
 #if defined(OS_TYPE_APPLICATION_MEMORY_RESOURCE)
 using application_memory_resource = OS_TYPE_APPLICATION_MEMORY_RESOURCE;
@@ -65,17 +63,11 @@ sbrk (ptrdiff_t incr);
 // ----------------------------------------------------------------------------
 
 /**
- * @brief Initialise the dynamic allocation arenas.
- * @param heap_begin
- * @param heap_end
- * @par Returns
- *  Nothing.
- *
  * @details
  * This routine is called after the hardware is initialised, before
  * the static constructors, to initialise the application free store
- * and the RTOS dynamic memory (when OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES
- * is defined).
+ * and the RTOS dynamic memory (when
+ * `OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES` is defined).
  *
  * If the RTOS is configured with its own memory, this area is
  * dynamically allocated on the application free store. The RTOS
