@@ -89,7 +89,7 @@ os_startup_initialize_free_store (void* heap_begin, void* heap_end)
 
   // Configure the memory manager to throw an exception when out of memory.
   reinterpret_cast<rtos::memory::memory_resource*> (&application_free_store)->out_of_memory_handler (
-      estd::__throw_bad_alloc);
+      os_rtos_application_out_of_memory_hook);
 
   // Set application memory manager.
   estd::pmr::set_default_resource (
@@ -102,16 +102,17 @@ os_startup_initialize_free_store (void* heap_begin, void* heap_end)
 
   // Allocate the RTOS dynamic memory on the application free store.
   void* rtos_arena =
-  reinterpret_cast<rtos::memory::memory_resource*> (&application_free_store)->allocate (
+      reinterpret_cast<rtos::memory::memory_resource*> (&application_free_store)->allocate (
       OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES);
 
   // Allocate & construct the memory resource used for the RTOS.
   rtos::memory::memory_resource* rtos_dynamic_memory;
   rtos_dynamic_memory = new rtos_memory_resource
-    { "sys", rtos_arena, OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES};
+    { "sys", rtos_arena, OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES };
 
   // Configure the memory manager to throw an exception when out of memory.
-  rtos_dynamic_memory->out_of_memory_handler (estd::__throw_bad_alloc);
+  rtos_dynamic_memory->out_of_memory_handler (
+      os_rtos_system_out_of_memory_hook);
 
   // Set RTOS system memory manager.
   rtos::memory::set_default_resource (rtos_dynamic_memory);
@@ -125,6 +126,52 @@ os_startup_initialize_free_store (void* heap_begin, void* heap_end)
 #endif /* defined(OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES) */
 
 }
+
+/**
+ * @details
+ * This function is called when the application memory manager detects
+ * an out of memory condition.
+ *
+ * This function is usually used to gracefully reset the device.
+ *
+ * However, for special memory managers, which do not coalesce
+ * automatically, it might be possible to first try to coalesce.
+ * If this succeeds, this call can return, and the allocation will be
+ * resumed.
+ *
+ * @note Since most allocations are done in critical sections,
+ * this function is very likely to be called with the scheduler locked.
+ */
+void __attribute__((weak))
+os_rtos_application_out_of_memory_hook (void)
+{
+  estd::__throw_bad_alloc ();
+}
+
+#if defined(OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES)
+
+/**
+ * @details
+ * This function is called when the RTOS system memory manager detects
+ * an out of memory condition.
+ *
+ * This function is usually used to gracefully reset the device.
+ *
+ * However, for special memory managers, which do not coalesce
+ * automatically, it might be possible to first try to coalesce.
+ * If this succeeds, this call can return, and the allocation will be
+ * resumed.
+ *
+ * @note Since most allocations are done in critical sections,
+ * this function is very likely to be called with the scheduler locked.
+ */
+void __attribute__((weak))
+os_rtos_system_out_of_memory_hook (void)
+{
+  estd::__throw_bad_alloc ();
+}
+
+#endif
 
 // ----------------------------------------------------------------------------
 

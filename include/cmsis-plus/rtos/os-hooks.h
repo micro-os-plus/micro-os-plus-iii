@@ -115,6 +115,26 @@ extern "C"
   bool
   os_rtos_idle_enter_power_saving_mode_hook (void);
 
+  /**
+   * @brief Hook to handle out of memory in the application free store.
+   * @par Parameters
+   *  None.
+   * @par Returns
+   *  Nothing.
+   */
+  void
+  os_rtos_application_out_of_memory_hook (void);
+
+  /**
+   * @brief Hook to handle out of memory in the RTOS dynamic memory.
+   * @par Parameters
+   *  None.
+   * @par Returns
+   *  Nothing.
+   */
+  void
+  os_rtos_system_out_of_memory_hook (void);
+
 /**
  * @}
  */
