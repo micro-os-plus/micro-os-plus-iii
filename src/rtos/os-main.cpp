@@ -174,7 +174,7 @@ os_terminate_goodbye (void)
       rtos::interrupts::stack ()->size ());
 #endif /* defined(OS_HAS_INTERRUPTS_STACK) */
 
-  trace::printf ("Hasta la Vista!\n");
+  trace::printf ("\nHasta la Vista!\n");
 
 #endif /* defined(TRACE) */
 }
