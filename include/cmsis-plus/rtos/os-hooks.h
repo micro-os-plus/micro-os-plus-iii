@@ -101,6 +101,35 @@ extern "C"
    */
 
   /**
+   * @name Termination Routines
+   * @{
+   */
+
+  /**
+   * @brief Display statistics and say goodbye before terminating.
+   * @par Parameters
+   *  None.
+   * @par Returns
+   *  Nothing.
+   */
+  void
+  os_terminate_goodbye (void);
+
+  /**
+   * @brief Terminate the application. There is no more life after this.
+   * @param [in] code Exit code, 0 for success, non 0 for failure.
+   * @par Returns
+   *  Nothing.
+   */
+  void
+  __attribute__ ((noreturn))
+  os_terminate (int code);
+
+  /**
+   * @}
+   */
+
+  /**
    * @name Hooks
    * @{
    */

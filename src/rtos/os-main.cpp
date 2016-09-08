@@ -153,7 +153,7 @@ void
 #if !defined(__APPLE__)
 __attribute__((weak))
 #endif
-os_goodbye (void)
+os_terminate_goodbye (void)
 {
 #if defined(TRACE)
 
@@ -163,7 +163,7 @@ os_goodbye (void)
   estd::pmr::get_default_resource ()->trace_print_statistics ();
 
 #if defined(OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES)
-  rtos::memory::get_default_resource ()->trace_print_statistics();
+  rtos::memory::get_default_resource ()->trace_print_statistics ();
 #endif /* defined(OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES) */
 
 #if defined(OS_HAS_INTERRUPTS_STACK)

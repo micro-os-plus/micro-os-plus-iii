@@ -1517,15 +1517,15 @@ os_main (int argc, char* argv[])
  */
 
 /**
- @defgroup cmsis-plus-app-hooks CMSIS++ App Inits & Hooks
- @brief  CMSIS++ application initialisations and hooks.
+ @defgroup cmsis-plus-app-hooks CMSIS++ App Overrides & Hooks
+ @brief  CMSIS++ application customisable functions and hooks.
  @details
  Applications using CMSIS++ can customise the behaviour 
  of the system or intercept several events by redefining 
- several hooks.
+ these functions.
 
- All these functions have weak default definitions, 
- providing a default functionality.
+ All of them have weak default definitions, 
+ providing a reasonable functionality.
  */
 
 // ----------------------------------------------------------------------------

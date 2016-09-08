@@ -240,7 +240,11 @@ __data_end_guard = DATA_END_GUARD_VALUE;
  * This is the place where the Cortex-M core will go immediately
  * after reset (the `Reset_Handler` calls this function).
  *
- * To reach here, the reset stack must point to a valid internal RAM area.
+ * To reach this location, the reset stack must point to a valid
+ * internal RAM area.
+ *
+ * Debugging new startup configurations usually begins with placing
+ * a breakpoint at `_start()`, and stepping through the routine.
  */
 void
 __attribute__ ((section(".after_vectors"),noreturn,weak))

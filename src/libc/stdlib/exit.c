@@ -29,6 +29,7 @@
 
 // ----------------------------------------------------------------------------
 
+#include <cmsis-plus/rtos/os-hooks.h>
 #include <cmsis-plus/diag/trace.h>
 #include <cmsis_device.h>
 
@@ -37,9 +38,6 @@
 #include "atexit.h"
 
 // ----------------------------------------------------------------------------
-
-extern void __attribute__((noreturn))
-NVIC_SystemReset (void);
 
 void
 __attribute__ ((noreturn))
@@ -93,7 +91,7 @@ exit (int code)
   // Reset again, in case _Exit() did not kill it.
   // This normally should not happen, but since it can be
   // overloaded by the application, better safe than sorry.
-  os_exit (code);
+  os_terminate (code);
 
   // If it does not want o die, loop.
   while (true)
@@ -121,7 +119,7 @@ _Exit (int code)
   trace_printf ("%s()\n", __func__);
 
   // Print some statistics about memory use.
-  os_goodbye ();
+  os_terminate_goodbye ();
 
   // Gracefully terminate the trace session.
   trace_flush ();
@@ -139,7 +137,7 @@ _Exit (int code)
 #endif /* defined(DEBUG) */
 
   // Reset hardware or terminate the semihosting session.
-  os_exit (code);
+  os_terminate (code);
 
   while (true)
     {
@@ -158,9 +156,14 @@ _exit (int status);
 // Semihosting defines this function to terminate the semihosting session.
 #if !defined(OS_USE_SEMIHOSTING_SYSCALLS)
 
+/**
+ * @details
+ * The freestanding version of this function resets the MCU core,
+ * using the NVIC features.
+ */
 void
 __attribute__ ((noreturn,weak))
-os_exit(int code __attribute__((unused)))
+os_terminate(int code __attribute__((unused)))
   {
     NVIC_SystemReset ();
     /* NOTREACHED */
