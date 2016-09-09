@@ -40,13 +40,30 @@ namespace os
     /**
      * @class lifo
      * @details
-     * This memory manager is a variant of `newlib_nano_malloc` that
+     * This memory manager is a variant of `first_fit_top` that
      * guarantees a deterministic, fragmentation free, allocation.
      *
-     * Deallocation is not guaranteed to be deterministic, but if
-     * done in strict reverse allocation order, it becomes deterministic,
-     * otherwise a traversal of the free list is required, the older the
-     * block, the more nodes to traverse.
+     * Deallocation is guaranteed to be deterministic only when
+     * deallocating the last allocated block (strict LIFO policy).
+     *
+     * However this class does not enforce the strict LIFO policy,
+     * deallocating older block is allowed, but generally it is
+     * no longer deterministic, since a traversal of the free list
+     * is required. On the other side, with block always allocated
+     * from top to down, and the free list ordered, deallocating
+     * older block is predictable if the age of the block
+     * is known, in other words deallocating the last allocated block
+     * inserts it after the head block, deallocating the second last
+     * allocated block inserts it before the second element in the list,
+     * and generally deallocating the n-th last allocated block
+     * inserts it somewhere up to the n-th element in the free list,
+     * possibly sooner, so the behaviour is somehow deterministic.
+     *
+     * This memory manager is ideal for one-time allocations of
+     * objects during startup, objects to be kept alive for the
+     * entire life span of the application. It is also ideal
+     * for pools of objects, that are later created and destroyed
+     * on an as-needed basis.
      */
 
     /**
@@ -90,7 +107,7 @@ namespace os
     {
       // TODO: consider `alignment` if > block_align.
 
-      std::size_t alloc_size = align (bytes, chunk_align);
+      std::size_t alloc_size = rtos::memory::align_size (bytes, chunk_align);
       alloc_size += block_padding;
       alloc_size += chunk_offset;
 

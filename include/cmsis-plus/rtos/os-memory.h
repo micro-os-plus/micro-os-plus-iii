@@ -65,6 +65,18 @@ namespace os
         return a >= b ? a : b;
       }
 
+      /**
+       * @brief Helper function to align size values.
+       * @param size Unaligned size.
+       * @param align Alignment requirement (power of 2).
+       * @return Aligned size.
+       */
+      constexpr std::size_t
+      align_size (std::size_t size, std::size_t align) noexcept
+      {
+        return ((size) + (align) - 1L) & ~((align) - 1L);
+      }
+
       class memory_resource;
 
       // ----------------------------------------------------------------------
@@ -370,15 +382,6 @@ namespace os
         do_coalesce (void) noexcept;
 
         /**
-         * @brief Helper function to align size values.
-         * @param size Unaligned size.
-         * @param align Alignment requirement (power of 2).
-         * @return Aligned size.
-         */
-        static constexpr std::size_t
-        align (std::size_t size, std::size_t align) noexcept;
-
-        /**
          * @}
          */
 
@@ -548,6 +551,11 @@ namespace os
           /**
            * @}
            */
+
+        protected:
+
+          // This class should have no member variables, to meet the
+          // default allocator stateless requirements.
         };
 
       /**
@@ -768,18 +776,6 @@ namespace os
       memory_resource::coalesce (void) noexcept
       {
         return do_coalesce ();
-      }
-
-      /**
-       * @details
-       *
-       * @par Standard compliance
-       *   Extension to standard.
-       */
-      inline constexpr std::size_t
-      memory_resource::align (std::size_t size, std::size_t align) noexcept
-      {
-        return ((size) + (align) - 1L) & ~((align) - 1L);
       }
 
       /**

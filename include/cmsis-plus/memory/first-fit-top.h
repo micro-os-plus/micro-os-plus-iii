@@ -44,7 +44,8 @@ namespace os
     // ========================================================================
 
     /**
-     * @brief Memory resource implementing the newlib nano allocation/deallocation policies.
+     * @brief Memory resource implementing the first fit, top-down
+     *  allocation policies.
      * @ingroup cmsis-plus-rtos-memres
      * @headerfile first-fit-top.h <cmsis-plus/memory/first-fit-top.h>
      */

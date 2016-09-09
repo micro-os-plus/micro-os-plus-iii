@@ -124,7 +124,7 @@ namespace os
     {
       // TODO: consider `alignment` if > block_align.
 
-      std::size_t alloc_size = align (bytes, chunk_align);
+      std::size_t alloc_size = rtos::memory::align_size (bytes, chunk_align);
       alloc_size += block_padding;
       alloc_size += chunk_offset;
 

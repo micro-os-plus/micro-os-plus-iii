@@ -161,7 +161,7 @@ namespace os
     // Avoid formatter bug.
     } /* namespace interrupts */
 
-// ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /**
      * @brief  Create an object that is owned by a `shared_ptr` and is
      *  allocated using the RTOS system allocator.
@@ -175,7 +175,7 @@ namespace os
       inline std::shared_ptr<T>
       make_shared (Args&&... args)
       {
-        return std::allocate_shared<T> (memory::allocator<thread> (),
+        return std::allocate_shared<T> (memory::allocator<T> (),
                                         std::forward<Args>(args)...);
       }
 

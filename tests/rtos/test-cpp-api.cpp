@@ -17,11 +17,12 @@
  */
 
 #include <cmsis-plus/rtos/os.h>
-#include <cstdio>
+#include <cmsis-plus/memory/block_pool.h>
+#include <cmsis-plus/memory/lifo.h>
+
 #include <algorithm>
 
 #include <test-cpp-api.h>
-#include <cmsis-plus/estd/memory_resource>
 
 // ----------------------------------------------------------------------------
 
@@ -129,6 +130,72 @@ test_cpp_api (void)
       scheduler::top_threads_list2_.end (), [](thread &th)
         { printf ("%s\n", th.name ());});
 #endif
+
+  my_blk_t* blk;
+
+  // ==========================================================================
+
+  printf ("\n%s - Memory managers.\n", test_name);
+
+    {
+      os::memory::block_pool bp1
+        { "bp1", 2, sizeof(my_blk_t) };
+
+      void* b1;
+      b1 = bp1.allocate (1, 1);
+
+      void* b2;
+      b2 = bp1.allocate (1, 1);
+
+      void* b3;
+      b3 = bp1.allocate (1, 1);
+      assert(b3 == nullptr);
+
+      bp1.deallocate (b1, 0, 1);
+      bp1.deallocate (b2, 0, 1);
+    }
+
+    {
+      char arena[60];
+
+      os::memory::block_pool bp2
+        { "bp2", 2, sizeof(my_blk_t), arena, sizeof(arena) };
+
+      void* b1;
+      b1 = bp2.allocate (1, 1);
+
+      void* b2;
+      b2 = bp2.allocate (1, 1);
+
+      void* b3;
+      b3 = bp2.allocate (1, 1);
+      assert(b3 == nullptr);
+
+      bp2.deallocate (b1, 0, 1);
+      bp2.deallocate (b2, 0, 1);
+    }
+
+    {
+      //using aa = os::rtos::memory::allocator<my_blk_t>;
+
+      using my_pool = os::memory::block_pool_typed<my_blk_t>;
+
+      my_pool bp3
+        { "bp3", 2 };
+
+      void* b1;
+      b1 = bp3.allocate (1, 1);
+
+      void* b2;
+      b2 = bp3.allocate (1, 1);
+
+      void* b3;
+      b3 = bp3.allocate (1, 1);
+      assert(b3 == nullptr);
+
+      bp3.deallocate (b1, 0, 1);
+      bp3.deallocate (b2, 0, 1);
+    }
 
   // ==========================================================================
 
@@ -388,8 +455,6 @@ test_cpp_api (void)
   // ==========================================================================
 
   printf ("\n%s - Memory pools.\n", test_name);
-
-  my_blk_t* blk;
 
   // Classic static usage; block size and cast to char* must be supplied manually.
     {

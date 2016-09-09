@@ -598,6 +598,17 @@ os_main (int argc, char* argv[])
  to use any allocation policy. It may use either a statically 
  or a dynamically allocated area. 
 
+ The reason for the system memory manager is to allow  RTOS 
+ system objects to be separated from application objects; this hase 
+ several advantages:
+
+ - it helps to protect the system objects from application bugs; 
+ this is beneficial during debug and it can improve reliability 
+ in the field.
+ - it helps improve system performances, by allowing to locate the 
+ system objects on a fast, on-chip RAM, in case the platform has
+ multiple RAM regions with different performances.
+
  Third, system objects that require dynamic memory may be created with
  custom allocators, defined by the user.
 
@@ -648,7 +659,8 @@ os_main (int argc, char* argv[])
  @brief  C API core & scheduler definitions.
  @details
 
- @see @ref cmsis-plus-rtos-core "RTOS C++ API"
+ @par For the complete definition, see
+  @ref cmsis-plus-rtos-core "RTOS C++ API"
 
  @par Examples
 
@@ -704,7 +716,8 @@ os_main (int argc, char* argv[])
  @brief  C API thread definitions.
  @details
 
- @see @ref cmsis-plus-rtos-thread "RTOS C++ API"
+ @par For the complete definition, see
+  @ref cmsis-plus-rtos-thread "RTOS C++ API"
 
  @par Examples
 
@@ -814,7 +827,8 @@ os_main (int argc, char* argv[])
  @brief  C API clocks definitions.
  @details
 
- @see os::rtos::clock
+ @par For the complete definition, see
+  @ref os::rtos::clock "RTOS C++ API"
 
  @par Examples
 
@@ -847,7 +861,8 @@ os_main (int argc, char* argv[])
  @brief  C API condition variable definitions.
  @details
 
- @see @ref cmsis-plus-rtos-condvar "RTOS C++ API"
+ @par For the complete definition, see
+  @ref cmsis-plus-rtos-condvar "RTOS C++ API"
 
  @par Examples
 
@@ -879,7 +894,8 @@ os_main (int argc, char* argv[])
  @brief  C API event flags definitions.
  @details
 
- @see @ref cmsis-plus-rtos-evflag "RTOS C++ API"
+ @par For the complete definition, see
+  @ref cmsis-plus-rtos-evflag "RTOS C++ API"
 
  @par Examples
 
@@ -935,7 +951,8 @@ os_main (int argc, char* argv[])
  @brief  C API memory pool definitions.
  @details
 
- @see @ref cmsis-plus-rtos-mempool "RTOS C++ API"
+ @par For the complete definition, see
+  @ref cmsis-plus-rtos-mempool "RTOS C++ API"
 
  @par Examples
 
@@ -999,7 +1016,8 @@ os_main (int argc, char* argv[])
  @brief  C API message queue definitions.
  @details
 
- @see @ref cmsis-plus-rtos-mqueue "RTOS C++ API"
+ @par For the complete definition, see
+  @ref cmsis-plus-rtos-mqueue "RTOS C++ API"
 
  @par Examples
 
@@ -1098,7 +1116,8 @@ os_main (int argc, char* argv[])
  @brief  C API mutex definitions.
  @details
 
- @see @ref cmsis-plus-rtos-mutex "RTOS C++ API"
+ @par For the complete definition, see
+  @ref cmsis-plus-rtos-mutex "RTOS C++ API"
 
  @par Examples
 
@@ -1187,7 +1206,8 @@ os_main (int argc, char* argv[])
  @brief  C API semaphore definitions.
  @details
 
- @see @ref cmsis-plus-rtos-semaphore "RTOS C++ API"
+ @par For the complete definition, see
+  @ref cmsis-plus-rtos-semaphore "RTOS C++ API"
 
  @par Examples
 
@@ -1264,7 +1284,8 @@ os_main (int argc, char* argv[])
  @brief  C API timer definitions.
  @details
 
- @see @ref cmsis-plus-rtos-timer "RTOS C++ API"
+ @par For the complete definition, see
+  @ref cmsis-plus-rtos-timer "RTOS C++ API"
 
  @par Examples
 
@@ -1326,44 +1347,11 @@ os_main (int argc, char* argv[])
  The CMSIS++ RTOS includes several advanced and flexible 
  memory management features.
  
- First, it defines a configurable memory manager for the application
- free store (also known as the "heap"). 
-
- Second, it defines a separate memory manager to be used by the 
- RTOS system objects. This separate manager can be configured
- to use any allocation policy. It may use either a statically 
- or a dynamically allocated area. 
-
- Third, system objects that require dynamic memory may be created with
- custom allocators, defined by the user (available only in C++).
-
- Access to the application memory manager is done using the 
- standard functions:
-
- - `malloc()`/`free()` in C (thread safe)
- 
- The default application memory manager is set in the
- `os_startup_initialize_free_store()` function, called by the 
- startup code when running on bare metal.
-
- On synthetic POSIX platforms the default memory manager is 
- `os::memory::malloc_memory_resource`, which uses memory 
- from the system free store.
-
- By default the RTOS system memory manager is the same as the application
- memory manager, but, for isolation reasons, it is recommended to set
- a separate memory mamanger for the RTOS system objects
- (with `os::rtos::memory::set_default_resource()`).
-
- The basic memory management class is `os::rtos::memory::memory_resource`, 
- which will be standard starting with C++17. The CMSIS++ version of this class
- includes several extensions, like out of memory processing and 
- statistics (and this is the reason the class is not defined in `os::estd`). 
-
  Access to these classes from C can be done using the `os_memory_*()` 
  functions.
-  
- @see @ref cmsis-plus-rtos-memres "RTOS C++ API"
+ 
+ @par For the complete definition, see
+   @ref cmsis-plus-rtos-memres "RTOS C++ API"
 
  @par Examples
 
