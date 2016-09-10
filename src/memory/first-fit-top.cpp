@@ -48,43 +48,44 @@ namespace os
      */
 
     /**
-     *
+     * @details
+     */
+    first_fit_top::~first_fit_top ()
+    {
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+    }
+
+    /**
+     * @details
      */
     void
     first_fit_top::internal_construct_ (void* addr, std::size_t bytes)
     {
       assert(bytes > block_minchunk);
 
-      void* align_addr = addr;
-      std::size_t align_sz = bytes;
+      addr_ = addr;
+      total_bytes_ = bytes;
 
       // Align address for first chunk.
       void* res;
-      res = std::align (chunk_align, block_minchunk, align_addr, align_sz);
+      // Possibly adjust the last two parameters.
+      res = std::align (chunk_align, block_minchunk, addr_, total_bytes_);
+      // std::align() will fail if it cannot fit the block min chunk.
       if (res != nullptr)
         {
           assert(res != nullptr);
         }
 
-      addr_ = align_addr;
-      total_bytes_ = align_sz;
-
       // Qualified call of virtual function.
       first_fit_top::reset ();
     }
 
-    first_fit_top::~first_fit_top ()
-    {
-      trace::printf ("%s() @%p %s\n", __func__, this, name ());
-    }
-
+    /**
+     * @details
+     */
     void
-    first_fit_top::do_reset (void) noexcept
+    first_fit_top::internal_reset_ (void) noexcept
     {
-#if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
-      trace::printf ("%s() @%p %s\n", __func__, this, name ());
-#endif
-
       // Fill it the first chunk.
       chunk_t* chunk = reinterpret_cast<chunk_t*> (addr_);
       chunk->size = total_bytes_;
@@ -97,6 +98,16 @@ namespace os
 
       // Remember first chunk as list head.
       free_list_ = chunk;
+    }
+
+    void
+    first_fit_top::do_reset (void) noexcept
+    {
+#if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+#endif
+
+      internal_reset_ ();
     }
 
 #pragma GCC diagnostic push

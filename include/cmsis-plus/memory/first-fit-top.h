@@ -142,6 +142,12 @@ namespace os
       internal_construct_ (void* addr, std::size_t bytes);
 
       /**
+       *
+       */
+      void
+      internal_reset_ (void) noexcept;
+
+      /**
        * @brief Implementation of the memory allocator.
        * @param bytes Number of bytes to allocate.
        * @param alignment Alignment constraint (power of 2).
