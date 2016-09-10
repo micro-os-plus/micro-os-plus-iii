@@ -151,7 +151,10 @@ test_cpp_api (void)
 
       void* b3;
       b3 = bp2.allocate (1, 1);
-      assert(b3 == nullptr);
+      if (b3 == nullptr)
+        {
+          assert(b3 == nullptr);
+        }
 
       bp2.deallocate (b1, 0, 1);
       bp2.deallocate (b2, 0, 1);
@@ -173,7 +176,10 @@ test_cpp_api (void)
 
       void* b3;
       b3 = bp3.allocate (1, 1);
-      assert(b3 == nullptr);
+      if (b3 == nullptr)
+        {
+          assert(b3 == nullptr);
+        }
 
       bp3.deallocate (b1, 0, 1);
       bp3.deallocate (b2, 0, 1);
