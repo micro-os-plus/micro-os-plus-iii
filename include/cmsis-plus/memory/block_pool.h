@@ -55,11 +55,6 @@ namespace os
     public:
 
       /**
-       * @brief Standard allocator type definition.
-       */
-      using allocator_type = rtos::memory::allocator<std::max_align_t>;
-
-      /**
        * @name Constructors & Destructor
        * @{
        */
@@ -75,16 +70,6 @@ namespace os
                   std::size_t bytes);
 
       /**
-       * @brief Construct a memory resource object instance.
-       * @param [in] blocks The maximum number of items in the pool.
-       * @param [in] block_size_bytes The size of an item, in bytes.
-       * @param [in] allocator Reference to allocator. Default a
-       * local temporary instance.
-       */
-      block_pool (std::size_t blocks, std::size_t block_size_bytes,
-                  const allocator_type& allocator = allocator_type ());
-
-      /**
        * @brief Construct a named memory resource object instance.
        * @param name Pointer to name.
        * @param [in] blocks The maximum number of items in the pool.
@@ -94,18 +79,6 @@ namespace os
        */
       block_pool (const char* name, std::size_t blocks,
                   std::size_t block_size_bytes, void* addr, std::size_t bytes);
-
-      /**
-       * @brief Construct a named memory resource object instance.
-       * @param name Pointer to name.
-       * @param [in] blocks The maximum number of items in the pool.
-       * @param [in] block_size_bytes The size of an item, in bytes.
-       * @param [in] allocator Reference to allocator. Default a
-       * local temporary instance.
-       */
-      block_pool (const char* name, std::size_t blocks,
-                  std::size_t block_size_bytes,
-                  const allocator_type& allocator = allocator_type ());
 
       /**
        * @cond ignore
@@ -229,13 +202,6 @@ namespace os
       void* pool_addr_ = nullptr;
 
       /**
-       * @brief Pointer to allocator.
-       * @details
-       * A non-null allocator requires deallocation during destruction.
-       */
-      const void* allocator_ = nullptr;
-
-      /**
        * @brief Pointer to the first free block, or nullptr.
        */
       void* volatile first_ = nullptr;
@@ -254,12 +220,6 @@ namespace os
        * @brief The current number of blocks allocated from the pool.
        */
       volatile std::size_t count_ = 0;
-
-      /**
-       * @brief Total size of the dynamically allocated storage,
-       *  in allocation elements.
-       */
-      std::size_t allocated_elements_ = 0;
 
       /**
        * @endcond
@@ -297,32 +257,11 @@ namespace os
         /**
          * @brief Construct a memory resource object instance.
          * @param [in] blocks The maximum number of items in the pool.
-         * @param [in] addr Begin of allocator arena.
-         * @param [in] bytes Size of allocator arena, in bytes.
-         * local temporary instance.
-         */
-        block_pool_typed (std::size_t blocks, void* addr, std::size_t bytes);
-
-        /**
-         * @brief Construct a memory resource object instance.
-         * @param [in] blocks The maximum number of items in the pool.
          * @param [in] allocator Reference to allocator. Default a
          * local temporary instance.
          */
         block_pool_typed (std::size_t blocks, const allocator_type& allocator =
                               allocator_type ());
-
-        /**
-         * @brief Construct a named memory resource object instance.
-         * @param name Pointer to name.
-         * @param [in] blocks The maximum number of items in the pool.
-         * @param [in] addr Begin of allocator arena.
-         * @param [in] bytes Size of allocator arena, in bytes.
-         * @param [in] allocator Reference to allocator. Default a
-         * local temporary instance.
-         */
-        block_pool_typed (const char* name, std::size_t blocks, void* addr,
-                          std::size_t bytes);
 
         /**
          * @brief Construct a named memory resource object instance.
@@ -362,6 +301,29 @@ namespace os
          * @}
          */
 
+      protected:
+
+        /**
+         * @cond ignore
+         */
+
+        /**
+         * @brief Pointer to allocator.
+         * @details
+         * A non-null allocator requires deallocation during destruction.
+         */
+        allocator_type* allocator_ = nullptr;
+
+        /**
+         * @brief Total size of the dynamically allocated storage,
+         *  in allocation elements.
+         */
+        std::size_t allocated_elements_ = 0;
+
+        /**
+         * @endcond
+         */
+
       };
 
   // -------------------------------------------------------------------------
@@ -394,25 +356,7 @@ namespace os
       ;
     }
 
-    inline
-    block_pool::block_pool (std::size_t blocks, std::size_t block_size_bytes,
-                            const allocator_type& allocator) :
-        block_pool
-          { nullptr, blocks, block_size_bytes, allocator }
-    {
-      ;
-    }
-
     // ========================================================================
-
-    template<typename T, typename A>
-      inline
-      block_pool_typed<T, A>::block_pool_typed (std::size_t blocks, void* addr,
-                                                std::size_t bytes) :
-          block_pool_typed (nullptr, blocks, addr, bytes)
-      {
-        ;
-      }
 
     template<typename T, typename A>
       inline
@@ -421,16 +365,6 @@ namespace os
           block_pool_typed (nullptr, blocks, allocator)
       {
         ;
-      }
-
-    template<typename T, typename A>
-      block_pool_typed<T, A>::block_pool_typed (const char* name,
-                                                std::size_t blocks, void* addr,
-                                                std::size_t bytes) :
-          block_pool (name, blocks, sizeof(value_type), addr, bytes)
-      {
-        trace::printf ("%s(%u,%p,%u) @%p %s\n", __func__, blocks, addr, bytes,
-                       this, this->name ());
       }
 
     template<typename T, typename A>
@@ -444,7 +378,8 @@ namespace os
                        this->name ());
 
         // A non-null allocator will require deallocation during destruction.
-        allocator_ = &allocator;
+        allocator_ =
+            static_cast<allocator_type*> (&const_cast<allocator_type&> (allocator));
 
         // Allocate pool dynamically via the allocator.
         allocated_elements_ = (compute_allocated_size_bytes<
@@ -455,8 +390,7 @@ namespace os
         blocks_ = blocks;
         block_size_bytes_ = sizeof(value_type);
 
-        pool_addr_ = const_cast<allocator_type&> (allocator).allocate (
-            allocated_elements_);
+        pool_addr_ = allocator_->allocate (allocated_elements_);
 
         internal_reset_ ();
       }
@@ -470,8 +404,8 @@ namespace os
 
         if (allocator_ != nullptr)
           {
-            static_cast<allocator_type*> (const_cast<void*> (allocator_))->deallocate (
-                static_cast<pointer> (pool_addr_), allocated_elements_);
+            allocator_->deallocate (static_cast<pointer> (pool_addr_),
+                                    allocated_elements_);
 
             // After deallocation, clear the pointer to prevent a new
             // deallocation in parent destructor.

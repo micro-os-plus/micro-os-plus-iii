@@ -51,9 +51,6 @@ namespace os
      * not a problem.
      */
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
     /**
      * @details
      */
@@ -66,46 +63,30 @@ namespace os
       trace::printf ("%s(%u,%u,%p,%u) @%p %s\n", __func__, blocks,
                      block_size_bytes, addr, bytes, this, this->name ());
 
+      blocks_ = blocks;
+
+      block_size_bytes_ = rtos::memory::align_size (block_size_bytes,
+                                                    alignof(void*));
+      assert(block_size_bytes_ >= sizeof(void*));
+
       assert(addr != nullptr);
 
-      block_size_bytes = rtos::memory::align_size (block_size_bytes,
-                                                   alignof(std::max_align_t));
-      assert(blocks * block_size_bytes <= bytes);
-
-      blocks_ = blocks;
-      block_size_bytes_ = block_size_bytes;
       pool_addr_ = addr;
+      std::size_t align_sz = bytes;
 
-      internal_reset_ ();
-    }
+      void* res;
+      // Possibly adjust the last two parameters.
+      res = std::align (alignof(void*), blocks * block_size_bytes_, pool_addr_,
+                        align_sz);
 
-    /**
-     * @details
-     */
-    block_pool::block_pool (const char* name, std::size_t blocks,
-                            std::size_t block_size_bytes,
-                            const allocator_type& allocator) :
-        rtos::memory::memory_resource
-          { name }
-    {
-      trace::printf ("%s(%u,%u,%p) @%p %s\n", __func__, blocks,
-                     block_size_bytes, &allocator, this, this->name ());
+      // std::align() will fail if it cannot fit the adjusted block size.
+      if (res != nullptr)
+        {
+          assert(res != nullptr);
+        }
 
-      // A non-null allocator is a good indication that deallocation
-      // is required during destruction.
-      allocator_ = &allocator;
-
-      // If no user storage was provided via attributes,
-      // allocate it dynamically via the allocator.
-      allocated_elements_ = (compute_allocated_size_bytes<
-          typename allocator_type::value_type> (blocks, block_size_bytes)
-          + sizeof(typename allocator_type::value_type) - 1)
-          / sizeof(typename allocator_type::value_type);
-
-      blocks_ = blocks;
-      block_size_bytes_ = block_size_bytes;
-      pool_addr_ = const_cast<allocator_type&> (allocator).allocate (
-          allocated_elements_);
+      // The extra assert is made redundant by std::align().
+      // assert(blocks * block_size_bytes_ <= align_sz);
 
       internal_reset_ ();
     }
@@ -116,17 +97,10 @@ namespace os
     block_pool::~block_pool ()
     {
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
-
-      typedef typename std::allocator_traits<allocator_type>::pointer pointer;
-
-      if (allocator_ != nullptr)
-        {
-          static_cast<allocator_type*> (const_cast<void*> (allocator_))->deallocate (
-              static_cast<pointer> (pool_addr_), allocated_elements_);
-
-          allocator_ = nullptr;
-        }
     }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 
     /**
      * @details
@@ -180,11 +154,13 @@ namespace os
       // not matter.
       *(static_cast<void**> (addr)) = first_;
 
-      // Now this block is the first one.
+      // Now this block is the first in the free list..
       first_ = addr;
 
       --count_;
     }
+
+#pragma GCC diagnostic push
 
     /**
      * @details
@@ -235,8 +211,6 @@ namespace os
 
       count_ = 0; // No allocated blocks.
     }
-
-#pragma GCC diagnostic pop
 
   // --------------------------------------------------------------------------
   } /* namespace memory */

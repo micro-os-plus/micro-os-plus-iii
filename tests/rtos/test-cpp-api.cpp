@@ -138,24 +138,6 @@ test_cpp_api (void)
   printf ("\n%s - Memory managers.\n", test_name);
 
     {
-      os::memory::block_pool bp1
-        { "bp1", 2, sizeof(my_blk_t) };
-
-      void* b1;
-      b1 = bp1.allocate (1, 1);
-
-      void* b2;
-      b2 = bp1.allocate (1, 1);
-
-      void* b3;
-      b3 = bp1.allocate (1, 1);
-      assert(b3 == nullptr);
-
-      bp1.deallocate (b1, 0, 1);
-      bp1.deallocate (b2, 0, 1);
-    }
-
-    {
       char arena[60];
 
       os::memory::block_pool bp2
