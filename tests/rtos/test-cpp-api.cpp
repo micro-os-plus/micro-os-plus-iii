@@ -17,7 +17,7 @@
  */
 
 #include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/memory/block_pool.h>
+#include <cmsis-plus/memory/block-pool.h>
 #include <cmsis-plus/memory/lifo.h>
 
 #include <algorithm>
@@ -140,8 +140,33 @@ test_cpp_api (void)
     {
       char arena[60];
 
-      os::memory::block_pool bp2
+      // The basic object, with explicit separate arena.
+      os::memory::block_pool bp1
         { "bp2", 2, sizeof(my_blk_t), arena, sizeof(arena) };
+
+      void* b1;
+      b1 = bp1.allocate (1, 1);
+
+      void* b2;
+      b2 = bp1.allocate (1, 1);
+
+      void* b3;
+      b3 = bp1.allocate (1, 1);
+      if (b3 == nullptr)
+        {
+          assert(b3 == nullptr);
+        }
+
+      bp1.deallocate (b1, 0, 1);
+      bp1.deallocate (b2, 0, 1);
+    }
+
+    {
+      using my_pool = os::memory::block_pool_typed_static<my_blk_t, 2>;
+
+      // The arena is typed and included in the pool object.
+      my_pool bp2
+        { "bp2" };
 
       void* b1;
       b1 = bp2.allocate (1, 1);
@@ -161,10 +186,10 @@ test_cpp_api (void)
     }
 
     {
-      //using aa = os::rtos::memory::allocator<my_blk_t>;
+      using my_pool = os::memory::block_pool_typed_allocated<my_blk_t,
+      os::rtos::memory::allocator<my_blk_t>>;
 
-      using my_pool = os::memory::block_pool_typed<my_blk_t>;
-
+      // The arena is typed and dynamically allocated.
       my_pool bp3
         { "bp3", 2 };
 
@@ -219,7 +244,7 @@ test_cpp_api (void)
     }
 
     {
-      auto th5 = std::make_unique<thread> ("th5", func, nullptr);
+      auto th5 = std::make_unique < thread > ("th5", func, nullptr);
 
       th5->join ();
     }

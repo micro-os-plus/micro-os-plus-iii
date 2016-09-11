@@ -46,6 +46,12 @@
 
 namespace os
 {
+  namespace estd
+  {
+    [[noreturn]] void
+    __throw_bad_alloc (void);
+  }
+
   namespace rtos
   {
     namespace scheduler
@@ -128,10 +134,10 @@ namespace os
       using out_of_memory_handler_t = void (*)(void);
 
       /**
-       * @brief Memory resource manager.
+       * @brief Memory resource manager (abstract class).
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        * @details
-       * This class is based on the standard memory manager, with
+       * This class is based on the standard C++17 memory manager, with
        * several extensions, to control the throw behaviour and to
        * add statistics.
        */
@@ -380,6 +386,24 @@ namespace os
          */
         virtual bool
         do_coalesce (void) noexcept;
+
+        /**
+         * @brief Update statistics after allocation.
+         * @param [in] bytes Number of allocated bytes.
+         * @par Returns
+         *  Nothing.
+         */
+        void
+        internal_increase_allocated_statistics (std::size_t bytes) noexcept;
+
+        /**
+         * @brief Update statistics after deallocation.
+         * @param [in] bytes Number of deallocated bytes.
+         * @par Returns
+         *  Nothing.
+         */
+        void
+        internal_decrease_allocated_statistics (std::size_t bytes) noexcept;
 
         /**
          * @}

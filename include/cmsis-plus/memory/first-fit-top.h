@@ -45,9 +45,16 @@ namespace os
 
     /**
      * @brief Memory resource implementing the first fit, top-down
-     *  allocation policies.
+     *  allocation policies, using an existing arena.
      * @ingroup cmsis-plus-rtos-memres
      * @headerfile first-fit-top.h <cmsis-plus/memory/first-fit-top.h>
+     *
+     * @details
+     * This memory manager was inspired by the **newlib nano**
+     * implementation of `malloc()` & `free()`.
+     *
+     * Neither allocation nor deallocation are deterministic, but are
+     * reasonably fast.
      */
     class first_fit_top : public rtos::memory::memory_resource
     {
@@ -60,37 +67,18 @@ namespace os
 
       /**
        * @brief Construct a memory resource object instance.
-       * @param addr_begin Begin of allocator arena.
-       * @param addr_end End of allocator arena.
-       */
-      first_fit_top (void* addr_begin, void* addr_end);
-
-      /**
-       * @brief Construct a named memory resource object instance.
-       * @param name Pointer to name.
-       * @param addr_begin Begin of allocator arena.
-       * @param addr_end End of allocator arena.
-       */
-      first_fit_top (const char* name, void* addr_begin, void* addr_end);
-
-      /**
-       * @brief Construct a memory resource object instance.
-       * @param addr Begin of allocator arena.
-       * @param bytes Size of allocator arena, in bytes.
+       * @param [in] addr Begin of allocator arena.
+       * @param [in] bytes Size of allocator arena, in bytes.
        */
       first_fit_top (void* addr, std::size_t bytes);
 
       /**
        * @brief Construct a named memory resource object instance.
-       * @param name Pointer to name.
-       * @param addr Begin of allocator arena.
-       * @param bytes Size of allocator arena, in bytes.
+       * @param [in] name Pointer to name.
+       * @param [in] addr Begin of allocator arena.
+       * @param [in] bytes Size of allocator arena, in bytes.
        */
       first_fit_top (const char* name, void* addr, std::size_t bytes);
-
-      /**
-       * @cond ignore
-       */
 
     protected:
 
@@ -100,7 +88,17 @@ namespace os
        */
       first_fit_top () = default;
 
+      /**
+       * @brief Construct a named memory resource object instance.
+       * @param [in] name
+       */
+      first_fit_top (const char* name);
+
     public:
+
+      /**
+       * @cond ignore
+       */
 
       // The rule of five.
       first_fit_top (const first_fit_top&) = delete;
@@ -133,8 +131,8 @@ namespace os
 
       /**
        * @brief Internal function to construct the memory resource.
-       * @param addr Begin of allocator arena.
-       * @param bytes Size of allocator arena, in bytes.
+       * @param [in] addr Begin of allocator arena.
+       * @param [in] bytes Size of allocator arena, in bytes.
        * @par Returns
        *  Nothing.
        */
@@ -142,15 +140,17 @@ namespace os
       internal_construct_ (void* addr, std::size_t bytes);
 
       /**
-       *
+       * @brief Internal function to reset the memory resource.
+       * @par Parameters
+       *  None.
        */
       void
       internal_reset_ (void) noexcept;
 
       /**
        * @brief Implementation of the memory allocator.
-       * @param bytes Number of bytes to allocate.
-       * @param alignment Alignment constraint (power of 2).
+       * @param [in] bytes Number of bytes to allocate.
+       * @param [in] alignment Alignment constraint (power of 2).
        * @return Pointer to newly allocated block, or `nullptr`.
        */
       virtual void*
@@ -158,9 +158,9 @@ namespace os
 
       /**
        * @brief Implementation of the memory deallocator.
-       * @param addr Address of a previously allocated block to free.
-       * @param bytes Number of bytes to deallocate (may be 0 if unknown).
-       * @param alignment Alignment constraint (power of 2).
+       * @param [in] addr Address of a previously allocated block to free.
+       * @param [in] bytes Number of bytes to deallocate (may be 0 if unknown).
+       * @param [in] alignment Alignment constraint (power of 2).
        * @par Returns
        *  Nothing.
        */
@@ -225,7 +225,8 @@ namespace os
       static constexpr std::size_t block_minchunk = chunk_offset + block_padding
           + block_minsize;
 
-      void* addr_ = nullptr;
+      void* arena_addr_ = nullptr;
+      // No need for arena_size_bytes_, use total_bytes_.
 
       chunk_t* free_list_ = nullptr;
 
@@ -235,7 +236,209 @@ namespace os
 
     };
 
-  // -------------------------------------------------------------------------
+    // ========================================================================
+
+    /**
+     * @brief Memory resource implementing the first fit, top-down
+     *  allocation policies, using a statically allocated arena.
+     * @ingroup cmsis-plus-rtos-memres
+     * @headerfile first-fit-top.h <cmsis-plus/memory/first-fit-top.h>
+     *
+     * @details
+     * This class template is a convenience class that includes
+     * an array of chars to be used as the allocation arena.
+     *
+     * The common use case it to define statically allocated memory managers.
+     */
+    template<std::size_t N>
+      class first_fit_top_static : public first_fit_top
+      {
+      public:
+
+        /**
+         * @brief Local constant based on template definition.
+         */
+        static const std::size_t bytes = N;
+
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
+
+        /**
+         * @brief Construct a memory resource object instance.
+         * @par Parameters
+         *  None.
+         */
+        first_fit_top_static (void);
+
+        /**
+         * @brief Construct a named memory resource object instance.
+         * @param [in] name Pointer to name.
+         */
+        first_fit_top_static (const char* name);
+
+      public:
+
+        /**
+         * @cond ignore
+         */
+
+        // The rule of five.
+        first_fit_top_static (const first_fit_top_static&) = delete;
+        first_fit_top_static (first_fit_top_static&&) = delete;
+        first_fit_top_static&
+        operator= (const first_fit_top_static&) = delete;
+        first_fit_top_static&
+        operator= (first_fit_top_static&&) = delete;
+
+        /**
+         * @endcond
+         */
+
+        /**
+         * @brief Destruct the memory resource object instance.
+         */
+        virtual
+        ~first_fit_top_static ();
+
+        /**
+         * @}
+         */
+
+      protected:
+
+        /**
+         * @cond ignore
+         */
+
+        /**
+         * @brief The allocation arena is an array of bytes.
+         */
+        char arena_[bytes];
+
+        /**
+         * @endcond
+         */
+
+      };
+
+    // ========================================================================
+
+    /**
+     * @brief Memory resource implementing the first fit, top-down
+     *  allocation policies, using a dynamically allocated arena.
+     * @ingroup cmsis-plus-rtos-memres
+     * @headerfile first-fit-top.h <cmsis-plus/memory/first-fit-top.h>
+     *
+     * @details
+     * This class template is a convenience class that allocates
+     * an array of chars to be used as the allocation arena.
+     *
+     * The common use case it to define dynamically allocated memory managers.
+     */
+    template<typename A = os::rtos::memory::allocator<char>>
+      class first_fit_top_allocated : public first_fit_top
+      {
+      public:
+
+        /**
+         * @brief Standard allocator type definition.
+         */
+        using value_type = char;
+
+        /**
+         * @brief Standard allocator type definition.
+         */
+        using allocator_type = A;
+
+        /**
+         * @brief Standard allocator traits definition.
+         */
+        using allocator_traits = std::allocator_traits<A>;
+
+        // It is recommended to have the same type, but at least the types
+        // should have the same size.
+        static_assert(sizeof(value_type) == sizeof(typename allocator_traits::value_type),
+            "The allocator must be parametrised with a type of same size.");
+
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
+
+        /**
+         * @brief Construct a memory resource object instance.
+         * @param [in] bytes The size of the allocation arena.
+         * @param [in] allocator Reference to allocator. Default a
+         * local temporary instance.
+         */
+        first_fit_top_allocated (std::size_t bytes,
+                                 const allocator_type& allocator =
+                                     allocator_type ());
+
+        /**
+         * @brief Construct a named memory resource object instance.
+         * @param [in] name Pointer to name.
+         * @param [in] bytes The size of the allocation arena.
+         * @param [in] allocator Reference to allocator. Default a
+         * local temporary instance.
+         */
+        first_fit_top_allocated (const char* name, std::size_t bytes,
+                                 const allocator_type& allocator =
+                                     allocator_type ());
+
+      public:
+
+        /**
+         * @cond ignore
+         */
+
+        // The rule of five.
+        first_fit_top_allocated (const first_fit_top_allocated&) = delete;
+        first_fit_top_allocated (first_fit_top_allocated&&) = delete;
+        first_fit_top_allocated&
+        operator= (const first_fit_top_allocated&) = delete;
+        first_fit_top_allocated&
+        operator= (first_fit_top_allocated&&) = delete;
+
+        /**
+         * @endcond
+         */
+
+        /**
+         * @brief Destruct the memory resource object instance.
+         */
+        virtual
+        ~first_fit_top_allocated ();
+
+        /**
+         * @}
+         */
+
+      protected:
+
+        /**
+         * @cond ignore
+         */
+
+        /**
+         * @brief Pointer to allocator.
+         * @details
+         * The allocator is remembered because deallocation
+         * must be performed during destruction. A more automated
+         * solution using a unique_ptr<> would require more RAM
+         * and is considered not justified.
+         */
+        allocator_type* allocator_ = nullptr;
+
+        /**
+         * @endcond
+         */
+
+      };
+
+  // --------------------------------------------------------------------------
   } /* namespace memory */
 } /* namespace os */
 
@@ -249,38 +452,9 @@ namespace os
     // ========================================================================
 
     inline
-    first_fit_top::first_fit_top (const char* name, void* addr,
-                                  std::size_t bytes) :
+    first_fit_top::first_fit_top (const char* name) :
         rtos::memory::memory_resource
           { name }
-    {
-      trace::printf ("%s(%p,%u) @%p %s\n", __func__, addr, bytes, this,
-                     this->name ());
-
-      internal_construct_ (addr, bytes);
-    }
-
-    inline
-    first_fit_top::first_fit_top (const char* name, void* addr_begin,
-                                  void* addr_end) :
-        rtos::memory::memory_resource
-          { name }
-    {
-      assert(addr_begin < addr_end);
-
-      trace::printf ("%s(%p,%p) @%p %s\n", __func__, addr_begin, addr_end, this,
-                     this->name ());
-
-      internal_construct_ (
-          addr_begin,
-          static_cast<std::size_t> (static_cast<char*> (addr_end)
-              - static_cast<char*> (addr_begin)));
-    }
-
-    inline
-    first_fit_top::first_fit_top (void* addr_begin, void* addr_end) :
-        first_fit_top
-          { nullptr, addr_begin, addr_end }
     {
       ;
     }
@@ -292,6 +466,94 @@ namespace os
     {
       ;
     }
+
+    inline
+    first_fit_top::first_fit_top (const char* name, void* addr,
+                                  std::size_t bytes) :
+        rtos::memory::memory_resource
+          { name }
+    {
+      trace::printf ("%s(%p,%u) @%p %s\n", __func__, addr, bytes, this,
+                     this->name ());
+
+      internal_construct_ (addr, bytes);
+    }
+
+    // ========================================================================
+
+    template<std::size_t N>
+      inline
+      first_fit_top_static<N>::first_fit_top_static () :
+          first_fit_top_static (nullptr)
+      {
+        ;
+      }
+
+    template<std::size_t N>
+      inline
+      first_fit_top_static<N>::first_fit_top_static (const char* name) :
+          first_fit_top
+            { name }
+      {
+        trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
+
+        internal_construct_ (&arena_[0], bytes);
+      }
+
+    template<std::size_t N>
+      first_fit_top_static<N>::~first_fit_top_static ()
+      {
+        trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
+      }
+
+    // ========================================================================
+
+    template<typename A>
+      inline
+      first_fit_top_allocated<A>::first_fit_top_allocated (
+          std::size_t bytes, const allocator_type& allocator) :
+          first_fit_top_allocated (nullptr, bytes, allocator)
+      {
+        ;
+      }
+
+    template<typename A>
+      first_fit_top_allocated<A>::first_fit_top_allocated (
+          const char* name, std::size_t bytes, const allocator_type& allocator) :
+          first_fit_top
+            { name }
+      {
+        trace::printf ("%s(%u) @%p %s\n", __func__, bytes, this, this->name ());
+
+        // Remember the allocator, it'll be used by the destructor.
+        allocator_ =
+            static_cast<allocator_type*> (&const_cast<allocator_type&> (allocator));
+
+        void* addr = allocator_->allocate (bytes);
+        if (addr == nullptr)
+          {
+            estd::__throw_bad_alloc ();
+          }
+
+        internal_construct_ (addr, bytes);
+      }
+
+    template<typename A>
+      first_fit_top_allocated<A>::~first_fit_top_allocated ()
+      {
+        trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
+
+        // Skip in case a derived class did the deallocation.
+        if (allocator_ != nullptr)
+          {
+            allocator_->deallocate (
+                static_cast<typename allocator_traits::pointer> (arena_addr_),
+                total_bytes_);
+
+            // Prevent another deallocation.
+            allocator_ = nullptr;
+          }
+      }
 
   // --------------------------------------------------------------------------
 

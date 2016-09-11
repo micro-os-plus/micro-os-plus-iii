@@ -38,36 +38,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @class lifo
      * @details
-     * This memory manager is a variant of `first_fit_top` that
-     * guarantees a deterministic, fragmentation free, allocation.
-     *
-     * Deallocation is guaranteed to be deterministic only when
-     * deallocating the last allocated block (strict LIFO policy).
-     *
-     * However this class does not enforce the strict LIFO policy,
-     * deallocating older block is allowed, but generally it is
-     * no longer deterministic, since a traversal of the free list
-     * is required. On the other side, with block always allocated
-     * from top to down, and the free list ordered, deallocating
-     * older block is predictable if the age of the block
-     * is known, in other words deallocating the last allocated block
-     * inserts it after the head block, deallocating the second last
-     * allocated block inserts it before the second element in the list,
-     * and generally deallocating the n-th last allocated block
-     * inserts it somewhere up to the n-th element in the free list,
-     * possibly sooner, so the behaviour is somehow deterministic.
-     *
-     * This memory manager is ideal for one-time allocations of
-     * objects during startup, objects to be kept alive for the
-     * entire life span of the application. It is also ideal
-     * for pools of objects, that are later created and destroyed
-     * on an as-needed basis.
-     */
-
-    /**
-     *
      */
     lifo::~lifo ()
     {
@@ -119,7 +90,7 @@ namespace os
         {
           // Allocate only from the first block and only if it is
           // the really first in the arena; this prevents fragmentation.
-          if (free_list_ == reinterpret_cast<chunk_t*> (addr_))
+          if (free_list_ == reinterpret_cast<chunk_t*> (arena_addr_))
             {
               chunk = free_list_;
 
@@ -185,14 +156,7 @@ namespace os
 
       // Update statistics.
       // What is subtracted from free is added to allocated.
-      allocated_bytes_ += chunk->size;
-      if (allocated_bytes_ > max_allocated_bytes_)
-        {
-          max_allocated_bytes_ = allocated_bytes_;
-        }
-      free_bytes_ -= chunk->size;
-      ++allocated_chunks_;
-      --free_chunks_;
+      internal_increase_allocated_statistics (chunk->size);
 
       // Compute pointer to payload area.
       char* payload = reinterpret_cast<char *> (chunk) + chunk_offset;

@@ -38,16 +38,6 @@ namespace os
     // ========================================================================
 
     /**
-     * @class first_fit_top
-     * @details
-     * This memory manager was inspired by the **newlib nano**
-     * implementation of `malloc()` & `free()`.
-     *
-     * Neither allocation nor deallocation are deterministic, but are
-     * reasonably fast.
-     */
-
-    /**
      * @details
      */
     first_fit_top::~first_fit_top ()
@@ -63,21 +53,20 @@ namespace os
     {
       assert(bytes > block_minchunk);
 
-      addr_ = addr;
+      arena_addr_ = addr;
       total_bytes_ = bytes;
 
       // Align address for first chunk.
       void* res;
       // Possibly adjust the last two parameters.
-      res = std::align (chunk_align, block_minchunk, addr_, total_bytes_);
+      res = std::align (chunk_align, block_minchunk, arena_addr_, total_bytes_);
       // std::align() will fail if it cannot fit the block min chunk.
       if (res != nullptr)
         {
           assert(res != nullptr);
         }
 
-      // Qualified call of virtual function.
-      first_fit_top::reset ();
+      internal_reset_ ();
     }
 
     /**
@@ -87,7 +76,7 @@ namespace os
     first_fit_top::internal_reset_ (void) noexcept
     {
       // Fill it the first chunk.
-      chunk_t* chunk = reinterpret_cast<chunk_t*> (addr_);
+      chunk_t* chunk = reinterpret_cast<chunk_t*> (arena_addr_);
       chunk->size = total_bytes_;
 
       allocated_bytes_ = 0;
@@ -100,6 +89,9 @@ namespace os
       free_list_ = chunk;
     }
 
+    /**
+     * @details
+     */
     void
     first_fit_top::do_reset (void) noexcept
     {
@@ -220,14 +212,7 @@ namespace os
 
       // Update statistics.
       // What is subtracted from free is added to allocated.
-      allocated_bytes_ += chunk->size;
-      if (allocated_bytes_ > max_allocated_bytes_)
-        {
-          max_allocated_bytes_ = allocated_bytes_;
-        }
-      free_bytes_ -= chunk->size;
-      ++allocated_chunks_;
-      --free_chunks_;
+      internal_increase_allocated_statistics (chunk->size);
 
       // Compute pointer to payload area.
       char* payload = reinterpret_cast<char *> (chunk) + chunk_offset;
@@ -289,8 +274,8 @@ namespace os
 #endif
 
       // The address must be inside the arena; no exceptions.
-      if ((addr < addr_)
-          || (addr > (static_cast<char*> (addr_) + total_bytes_)))
+      if ((addr < arena_addr_)
+          || (addr > (static_cast<char*> (arena_addr_) + total_bytes_)))
         {
           assert(false);
           return;
@@ -320,10 +305,7 @@ namespace os
 
       // Update statistics.
       // What is subtracted from allocated is added to free.
-      allocated_bytes_ -= chunk->size;
-      free_bytes_ += chunk->size;
-      --allocated_chunks_;
-      ++free_chunks_;
+      internal_decrease_allocated_statistics (chunk->size);
 
       // If the free list is empty, create it with the current chunk, alone.
       if (free_list_ == nullptr)
@@ -438,6 +420,9 @@ namespace os
         }
     }
 
+    /**
+     * @details
+     */
     std::size_t
     first_fit_top::do_max_size (void) const noexcept
     {

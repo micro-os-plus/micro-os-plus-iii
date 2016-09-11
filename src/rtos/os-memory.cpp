@@ -230,6 +230,35 @@ namespace os
         return false;
       }
 
+      void
+      memory_resource::internal_increase_allocated_statistics (
+          std::size_t bytes) noexcept
+      {
+        // Update statistics.
+        // What is subtracted from free is added to allocated.
+        allocated_bytes_ += bytes;
+        if (allocated_bytes_ > max_allocated_bytes_)
+          {
+            max_allocated_bytes_ = allocated_bytes_;
+          }
+        free_bytes_ -= bytes;
+        ++allocated_chunks_;
+        --free_chunks_;
+      }
+
+      void
+      memory_resource::internal_decrease_allocated_statistics (
+          std::size_t bytes) noexcept
+      {
+        // Update statistics.
+        // What is subtracted from allocated is added to free.
+        allocated_bytes_ -= bytes;
+        free_bytes_ += bytes;
+        --allocated_chunks_;
+        ++free_chunks_;
+
+      }
+
     // ------------------------------------------------------------------------
 
     } /* namespace memory */

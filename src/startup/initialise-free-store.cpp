@@ -79,13 +79,14 @@ sbrk (ptrdiff_t incr);
  * function entirely.
  */
 void __attribute__((weak))
-os_startup_initialize_free_store (void* heap_begin, void* heap_end)
+os_startup_initialize_free_store (void* heap_address,
+                                  std::size_t heap_size_bytes)
 {
-  trace::printf ("%s(%p,%p)\n", __func__, heap_begin, heap_end);
+  trace::printf ("%s(%p,%u)\n", __func__, heap_address, heap_size_bytes);
 
   // Construct the memory resource used for the application free store.
   new (&application_free_store) application_memory_resource
-    { "app", heap_begin, heap_end };
+    { "app", heap_address, heap_size_bytes };
 
   // Configure the memory manager to throw an exception when out of memory.
   reinterpret_cast<rtos::memory::memory_resource*> (&application_free_store)->out_of_memory_handler (
@@ -96,7 +97,9 @@ os_startup_initialize_free_store (void* heap_begin, void* heap_end)
       reinterpret_cast<estd::pmr::memory_resource*> (&application_free_store));
 
   // Adjust sbrk() to prevent it overlapping the free store.
-  sbrk (static_cast<char*> (heap_end) - static_cast<char*> (sbrk (0)));
+  sbrk (
+      static_cast<char*> (static_cast<char*> (heap_address) + heap_size_bytes)
+          - static_cast<char*> (sbrk (0)));
 
 #if defined(OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES)
 

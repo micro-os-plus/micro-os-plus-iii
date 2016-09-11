@@ -25,8 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include <cmsis-plus/memory/block-pool.h>
 #include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/memory/block_pool.h>
 
 // ----------------------------------------------------------------------------
 
@@ -36,60 +36,6 @@ namespace os
   {
 
     // ========================================================================
-
-    /**
-     * @class block_pool
-     * @details
-     *
-     * This memory manager is a deterministic, non-fragmenting memory
-     * manager, that allocates blocks having the same size from a pool.
-     *
-     * This memory manager is ideal for allocation of system objects.
-     *
-     * The only drawback is that the maximum number of must be
-     * known before starting the allocations, but this usually is
-     * not a problem.
-     */
-
-    /**
-     * @details
-     */
-    block_pool::block_pool (const char* name, std::size_t blocks,
-                            std::size_t block_size_bytes, void* addr,
-                            std::size_t bytes) :
-        rtos::memory::memory_resource
-          { name }
-    {
-      trace::printf ("%s(%u,%u,%p,%u) @%p %s\n", __func__, blocks,
-                     block_size_bytes, addr, bytes, this, this->name ());
-
-      blocks_ = blocks;
-
-      block_size_bytes_ = rtos::memory::align_size (block_size_bytes,
-                                                    alignof(void*));
-      assert(block_size_bytes_ >= sizeof(void*));
-
-      assert(addr != nullptr);
-
-      pool_addr_ = addr;
-      std::size_t align_sz = bytes;
-
-      void* res;
-      // Possibly adjust the last two parameters.
-      res = std::align (alignof(void*), blocks * block_size_bytes_, pool_addr_,
-                        align_sz);
-
-      // std::align() will fail if it cannot fit the adjusted block size.
-      if (res != nullptr)
-        {
-          assert(res != nullptr);
-        }
-
-      // The extra assert is made redundant by std::align().
-      // assert(blocks * block_size_bytes_ <= align_sz);
-
-      internal_reset_ ();
-    }
 
     /**
      * @details
@@ -118,6 +64,10 @@ namespace os
       void* p = static_cast<void*> (first_);
       first_ = *(static_cast<void**> (first_));
       ++count_;
+
+      // Update statistics.
+      // What is subtracted from free is added to allocated.
+      internal_increase_allocated_statistics (block_size_bytes_);
 
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
       trace::printf ("%s(%u,%u)=%p,%u @%p %s\n", __func__, bytes, alignment, p,
@@ -158,6 +108,10 @@ namespace os
       first_ = addr;
 
       --count_;
+
+      // Update statistics.
+      // What is subtracted from allocated is added to free.
+      internal_decrease_allocated_statistics (block_size_bytes_);
     }
 
 #pragma GCC diagnostic push
@@ -180,6 +134,44 @@ namespace os
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
+      internal_reset_ ();
+    }
+
+    /**
+     * @details
+     */
+    void
+    block_pool::internal_construct_ (std::size_t blocks,
+                                     std::size_t block_size_bytes, void* addr,
+                                     std::size_t bytes) noexcept
+    {
+      blocks_ = blocks;
+
+      block_size_bytes_ = rtos::memory::align_size (block_size_bytes,
+                                                    alignof(void*));
+      assert(block_size_bytes_ >= sizeof(void*));
+
+      assert(addr != nullptr);
+      pool_addr_ = addr;
+
+      std::size_t align_sz = bytes;
+
+      void* res;
+      // Possibly adjust the last two parameters.
+      res = std::align (alignof(void*), blocks * block_size_bytes_, pool_addr_,
+                        align_sz);
+
+      // std::align() will fail if it cannot fit the adjusted block size.
+      if (res != nullptr)
+        {
+          assert(res != nullptr);
+        }
+
+      // The extra assert is made redundant by std::align().
+      // assert(blocks * block_size_bytes_ <= align_sz);
+
+      total_bytes_ = blocks_ * block_size_bytes_;
+
       internal_reset_ ();
     }
 
@@ -210,6 +202,13 @@ namespace os
       first_ = pool_addr_; // Pointer to first block.
 
       count_ = 0; // No allocated blocks.
+
+      allocated_bytes_ = 0;
+      max_allocated_bytes_ = 0;
+      free_bytes_ = total_bytes_;
+      allocated_chunks_ = 0;
+      free_chunks_ = blocks_;
+
     }
 
   // --------------------------------------------------------------------------

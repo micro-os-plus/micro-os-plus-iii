@@ -28,6 +28,7 @@
 #ifndef CMSIS_PLUS_RTOS_OS_HOOKS_H_
 #define CMSIS_PLUS_RTOS_OS_HOOKS_H_
 
+#include <stddef.h>
 #include <stdbool.h>
 
 // ----------------------------------------------------------------------------
@@ -80,13 +81,14 @@ extern "C"
 
   /**
    * @brief Free store initialisations.
-   * @param heap_begin The first unallocated RAM address (after the BSS).
-   * @param heap_end The address after the free store.
+   * @param heap_address The first unallocated RAM address (after the BSS).
+   * @param heap_size_bytes The free store size.
    * @par Returns
    *  Nothing.
    */
   void
-  os_startup_initialize_free_store (void* heap_begin, void* heap_end);
+  os_startup_initialize_free_store (void* heap_address,
+                                    size_t heap_size_bytes);
 
   /**
    * @brief Arguments initialisations.

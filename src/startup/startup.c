@@ -356,7 +356,8 @@ _start (void)
 
   trace_printf ("Hardware initialised.\n");
 
-  os_startup_initialize_free_store (&_Heap_Begin, &_Heap_Limit);
+  os_startup_initialize_free_store (
+      &_Heap_Begin, (size_t) ((char*) (&_Heap_Limit) - (char*) (&_Heap_Begin)));
 
   // Get the argc/argv (useful in semihosting configurations).
   int argc;

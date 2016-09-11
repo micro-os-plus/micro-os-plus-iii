@@ -48,7 +48,7 @@ namespace os
   {
     // ========================================================================
 
-    void
+    [[noreturn]] void
     __throw_bad_alloc (void)
     {
 #if defined(__EXCEPTIONS)
