@@ -53,14 +53,18 @@ using rtos_memory_resource = OS_TYPE_RTOS_MEMORY_RESOURCE;
 using rtos_memory_resource = os::memory::lifo;
 #endif
 
-// Reserve storage for the application memory resource.
-static std::aligned_storage<sizeof(application_memory_resource),
-    alignof(application_memory_resource)>::type application_free_store;
-
 extern "C" void*
 sbrk (ptrdiff_t incr);
 
 // ----------------------------------------------------------------------------
+
+#if !defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS)
+
+// Reserve storage for the application memory resource.
+static std::aligned_storage<sizeof(application_memory_resource),
+    alignof(application_memory_resource)>::type application_free_store;
+
+#endif /* !defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS) */
 
 /**
  * @details
@@ -83,6 +87,8 @@ os_startup_initialize_free_store (void* heap_address,
                                   std::size_t heap_size_bytes)
 {
   trace::printf ("%s(%p,%u)\n", __func__, heap_address, heap_size_bytes);
+
+#if !defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS)
 
   // Construct the memory resource used for the application free store.
   new (&application_free_store) application_memory_resource
@@ -128,6 +134,7 @@ os_startup_initialize_free_store (void* heap_address,
 
 #endif /* defined(OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES) */
 
+#endif /* !defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS) */
 }
 
 /**

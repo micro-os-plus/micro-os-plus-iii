@@ -87,11 +87,20 @@ namespace
  */
 
 // ----------------------------------------------------------------------------
+extern rtos::thread* os_main_thread;
+
+// Intentionally a raw pointer, to prevent destruction.
+rtos::thread* os_main_thread;
+
+#if defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS)
+
 // Necessarily static, on Cortex-M the reset stack will be used
 // as MSP for the interrupts, so the current stack must be freed
 // and os_main() shall run on its own stack.
 using main_thread = rtos::thread_static<OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES>;
-static std::aligned_storage<sizeof(main_thread), alignof(main_thread)>::type os_main_thread;
+static std::aligned_storage<sizeof(main_thread), alignof(main_thread)>::type os_main_thread_;
+
+#endif /* defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS) */
 
 /**
  * @brief Default implementation of `main()`.
@@ -134,12 +143,28 @@ main (int argc, char* argv[])
   main_args.argc = argc;
   main_args.argv = argv;
 
+#if defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS)
+
   // Running the constructor manually has the additional advantage of
   // not registering any destructor, and for main this is important,
   // since the destructors are executed on its context, and it cannot
   // destruct itself.
-  new (&os_main_thread) main_thread
-    { "main", reinterpret_cast<thread::func_t> (_main_trampoline), nullptr };
+  new (&os_main_thread_) main_thread
+    { "main", reinterpret_cast<thread::func_t> (_main_trampoline), nullptr};
+
+  os_main_thread = &os_main_thread_;
+
+#else
+
+  thread::attributes attr = thread::initializer;
+  attr.th_stack_size_bytes = OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES;
+  os_main_thread = new thread (
+      "main", reinterpret_cast<thread::func_t> (_main_trampoline), nullptr,
+      attr);
+
+#endif /* defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS) */
+
+  os_startup_create_thread_idle ();
 
   // Execution will proceed to first registered thread, possibly
   // "idle", which will immediately lower its priority,
@@ -159,6 +184,8 @@ os_terminate_goodbye (void)
 
   trace::printf ("\n");
 
+#if !defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS)
+
   // Application memory.
   estd::pmr::get_default_resource ()->trace_print_statistics ();
 
@@ -166,11 +193,18 @@ os_terminate_goodbye (void)
   rtos::memory::get_default_resource ()->trace_print_statistics ();
 #endif /* defined(OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES) */
 
+#endif /* !defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS) */
+
+  class rtos::thread::stack& st = os_main_thread->stack ();
+
+  trace::printf ("Main thread stack: %u/%u bytes used\n",
+                 st.size () - st.available (), st.size ());
+
 #if defined(OS_HAS_INTERRUPTS_STACK)
   trace::printf (
       "Interrupts stack: %u/%u bytes used\n",
       rtos::interrupts::stack ()->size ()
-          - rtos::interrupts::stack ()->available (),
+      - rtos::interrupts::stack ()->available (),
       rtos::interrupts::stack ()->size ());
 #endif /* defined(OS_HAS_INTERRUPTS_STACK) */
 

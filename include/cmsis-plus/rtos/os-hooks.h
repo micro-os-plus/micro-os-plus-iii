@@ -87,8 +87,7 @@ extern "C"
    *  Nothing.
    */
   void
-  os_startup_initialize_free_store (void* heap_address,
-                                    size_t heap_size_bytes);
+  os_startup_initialize_free_store (void* heap_address, size_t heap_size_bytes);
 
   /**
    * @brief Arguments initialisations.
@@ -97,6 +96,16 @@ extern "C"
    */
   void
   os_startup_initialize_args (int* p_argc, char*** p_argv);
+
+  /**
+   * @brief Create the idle thread.
+   * @par Parameters
+   *  None.
+   * @par Returns
+   *  Nothing.
+   */
+  void
+  os_startup_create_thread_idle (void);
 
   /**
    * @}

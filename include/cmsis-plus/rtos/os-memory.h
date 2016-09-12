@@ -653,9 +653,43 @@ namespace os
                     const polymorphic_synchronized_allocator<T2, L, D>& rhs)
                         noexcept;
 
-    /**
-     * @endcond
-     */
+      /**
+       * @endcond
+       */
+
+      template<typename A>
+        class allocator_deleter
+        {
+        public:
+
+          /**
+           * @brief Standard allocator type definition.
+           */
+          using allocator_type = A;
+
+          /**
+           * @brief Standard allocator traits definition.
+           */
+          using allocator_traits = std::allocator_traits<A>;
+
+          using pointer = typename allocator_traits::pointer;
+
+          /**
+           * @brief Copy constructor.
+           * @param a Reference to allocator.
+           */
+          allocator_deleter (const allocator_type& a);
+
+          void
+          operator() (pointer p) const;
+
+        protected:
+          allocator_type a_;
+        };
+
+      template<typename T, typename A, typename ... Args>
+        auto
+        allocate_unique (const A& allocator, Args&&... args);
 
     // ------------------------------------------------------------------------
     } /* namespace memory */
@@ -872,10 +906,10 @@ namespace os
       {
 #if defined(TRACE)
         trace::printf ("Memory '%s' @%p: \n"
-                       "\ttotal=%u bytes, \n"
-                       "\tallocated=%u bytes in %u chunk(s), \n"
-                       "\tfree=%u bytes in %u chunk(s), \n"
-                       "\tmax=%u bytes\n",
+                       "\ttotal: %u bytes, \n"
+                       "\tallocated: %u bytes in %u chunk(s), \n"
+                       "\tfree: %u bytes in %u chunk(s), \n"
+                       "\tmax: %u bytes\n",
                        name (), this, total_bytes (), allocated_bytes (),
                        allocated_chunks (), free_bytes (), free_chunks (),
                        max_allocated_bytes ());
@@ -1046,9 +1080,78 @@ namespace os
           return res_;
         }
 
-    /**
-     * @endcond
-     */
+      /**
+       * @endcond
+       */
+
+      template<typename A>
+        inline
+        allocator_deleter<A>::allocator_deleter (const allocator_type& a) :
+            a_
+              { a }
+        {
+          ;
+        }
+
+      template<typename A>
+        inline void
+        allocator_deleter<A>::operator() (pointer p) const
+        {
+          // Local allocator, without it many errors are issued.
+          // TODO: understand why.
+          allocator_type alloc
+            { a_ };
+
+          allocator_traits::destroy (alloc, std::addressof (*p));
+          allocator_traits::deallocate (alloc, p, 1);
+        }
+
+      template<typename T, typename A, typename ... Args>
+        auto
+        allocate_unique (const A& allocator, Args&&... args)
+        {
+          /**
+           * @brief Standard allocator type definition.
+           */
+          using allocator_type = A;
+
+          /**
+           * @brief Standard allocator traits definition.
+           */
+          using allocator_traits = std::allocator_traits<A>;
+
+          static_assert(std::is_same<typename allocator_traits::value_type, std::remove_cv_t<T>>::value
+              || std::is_base_of<typename allocator_traits::value_type, std::remove_cv_t<T>>::value,
+              "Allocator has the wrong value_type");
+
+          allocator_type alloc
+            { allocator };
+          auto p = allocator_traits::allocate (alloc, 1);
+
+#if defined(__EXCEPTIONS)
+
+          try
+            {
+              allocator_traits::construct (alloc, std::addressof (*p),
+                                           std::forward<Args>(args)...);
+              using D = allocator_deleter<A>;
+              return std::unique_ptr<T, D> (p, D (alloc));
+            }
+          catch (...)
+            {
+              allocator_traits::deallocate (alloc, p, 1);
+              throw;
+            }
+
+#else
+
+          allocator_traits::construct (alloc, std::addressof (*p),
+              std::forward<Args>(args)...);
+          using D = allocator_deleter<A>;
+          return std::unique_ptr<T, D> (p, D (alloc));
+
+#endif /* defined(__EXCEPTIONS) */
+        }
 
     // ------------------------------------------------------------------------
     } /* namespace memory */

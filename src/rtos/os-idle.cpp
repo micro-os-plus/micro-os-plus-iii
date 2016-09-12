@@ -37,6 +37,9 @@ using namespace os::rtos;
 /**
  * @cond ignore
  */
+extern thread* os_idle_thread;
+
+thread* os_idle_thread;
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -44,9 +47,42 @@ using namespace os::rtos;
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
 #endif
-static thread_static<OS_INTEGER_RTOS_IDLE_STACK_SIZE_BYTES> os_idle_thread
-  { "idle", os_idle, nullptr };
+
+#if defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS)
+
+static thread_static<OS_INTEGER_RTOS_IDLE_STACK_SIZE_BYTES> os_idle_thread_
+  { "idle", os_idle, nullptr};
+
+#else
+
+static std::unique_ptr<thread> os_idle_thread_;
+
+#endif /* defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS) */
+
 #pragma GCC diagnostic pop
+
+void
+__attribute__((weak))
+os_startup_create_thread_idle (void)
+{
+#if defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS)
+
+  // The thread object instance was created by the static constructors.
+  os_idle_thread = &os_idle_thread_;
+
+#else
+
+  thread::attributes attr = thread::initializer;
+  attr.th_stack_size_bytes = OS_INTEGER_RTOS_IDLE_STACK_SIZE_BYTES;
+
+  // No need for an explicit delete, it is deallocated by the unique_ptr.
+  os_idle_thread_ = std::unique_ptr<thread> (
+      new thread ("idle", os_idle, nullptr, attr));
+
+  os_idle_thread = os_idle_thread_.get ();
+
+#endif /* defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS) */
+}
 
 void*
 os_idle (thread::func_args_t args __attribute__((unused)))
@@ -85,7 +121,7 @@ os_idle (thread::func_args_t args __attribute__((unused)))
 #if defined(OS_HAS_INTERRUPTS_STACK)
       // Simple test to verify that the interrupts
       // did not underflow the stack.
-      assert(rtos::interrupts::stack()->check_bottom_magic());
+      assert(rtos::interrupts::stack ()->check_bottom_magic ());
 #endif
 
       if (!os_rtos_idle_enter_power_saving_mode_hook ())

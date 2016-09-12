@@ -62,10 +62,30 @@ namespace os
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #endif
 
-      static os::memory::malloc_memory_resource malloc_res
-        { "malloc" };
-      static os::memory::new_delete_memory_resource new_delete_res;
-      static os::memory::null_memory_resource null_res;
+      // The memory resources must not be destructed, since some
+      // static objects will want to deallocate memory they manage.
+
+      // static os::memory::new_delete_memory_resource new_delete_res;
+      // static os::memory::null_memory_resource null_res;
+
+      static std::aligned_storage<sizeof(os::memory::malloc_memory_resource),
+          alignof(os::memory::malloc_memory_resource)>::type malloc_res;
+
+      static std::aligned_storage<sizeof(os::memory::null_memory_resource),
+          alignof(os::memory::null_memory_resource)>::type null_res;
+
+      static std::aligned_storage<
+          sizeof(os::memory::new_delete_memory_resource),
+          alignof(os::memory::new_delete_memory_resource)>::type new_delete_res;
+
+      static void
+      __attribute__((constructor))
+      __init (void)
+      {
+        new (&malloc_res) os::memory::malloc_memory_resource ("malloc");
+        new (&null_res) os::memory::null_memory_resource ();
+        new (&new_delete_res) os::memory::new_delete_memory_resource ();
+      }
 
 #pragma GCC diagnostic pop
 
@@ -79,9 +99,10 @@ namespace os
 
       // The default RTOS system memory resource.
 #if defined(__APPLE__) || defined(__linux__)
-      memory_resource* default_resource __attribute__((weak)) = &malloc_res;
+      memory_resource* default_resource __attribute__((weak))
+      = reinterpret_cast<memory_resource*> (&malloc_res);
 #else
-      memory_resource* default_resource __attribute__((weak)) = &null_res;
+      memory_resource* default_resource __attribute__((weak)) = reinterpret_cast<memory_resource*> (&null_res);
 #endif
 
       /**
@@ -116,7 +137,7 @@ namespace os
       memory_resource*
       malloc_resource (void) noexcept
       {
-        return &malloc_res;
+        return reinterpret_cast<memory_resource*> (&malloc_res);
       }
 
       // ======================================================================
@@ -278,29 +299,30 @@ namespace os
       memory_resource*
       new_delete_resource (void) noexcept
       {
-        return &rtos::memory::new_delete_res;
+        return reinterpret_cast<memory_resource*> (&rtos::memory::new_delete_res);
       }
 
       memory_resource*
       null_memory_resource (void) noexcept
       {
-        return &rtos::memory::null_res;
+        return reinterpret_cast<memory_resource*> (&rtos::memory::null_res);
       }
 
 #if defined(__APPLE__) || defined(__linux__)
       memory_resource* default_resource __attribute__((weak))
-      = &rtos::memory::malloc_res;
+      = reinterpret_cast<memory_resource*> (&rtos::memory::malloc_res);
 #else
-    memory_resource* default_resource __attribute__((weak))
-    = &rtos::memory::null_res;
+      memory_resource* default_resource __attribute__((weak))
+      = reinterpret_cast<memory_resource*> (&rtos::memory::null_res);
 #endif
 
-    /**
-     * @endcond
-     */
-  }
-/* namespace pmr */
-} /* namespace estd */
+      /**
+       * @endcond
+       */
+      ;
+    // Avoid formatter bug
+    } /* namespace pmr */
+  } /* namespace estd */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------
