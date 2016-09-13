@@ -319,6 +319,12 @@ namespace os
         std::size_t
         free_chunks (void);
 
+        std::size_t
+        allocations(void);
+
+        std::size_t
+        deallocations(void);
+
         void
         trace_print_statistics (void);
 
@@ -428,6 +434,8 @@ namespace os
         std::size_t allocated_chunks_ = 0;
         std::size_t free_chunks_ = 0;
         std::size_t max_allocated_bytes_ = 0;
+        std::size_t allocations_ = 0;
+        std::size_t deallocations_ = 0;
 
         /**
          * @endcond
@@ -877,6 +885,7 @@ namespace os
       inline void*
       memory_resource::allocate (std::size_t bytes, std::size_t alignment)
       {
+        ++allocations_;
         return do_allocate (bytes, alignment);
       }
 
@@ -899,6 +908,7 @@ namespace os
       memory_resource::deallocate (void* addr, std::size_t bytes,
                                    std::size_t alignment) noexcept
       {
+        ++deallocations_;
         do_deallocate (addr, bytes, alignment);
       }
 
@@ -1022,6 +1032,18 @@ namespace os
         return free_chunks_;
       }
 
+      inline std::size_t
+      memory_resource::allocations(void)
+      {
+        return allocations_;
+      }
+
+      inline std::size_t
+      memory_resource::deallocations(void)
+      {
+        return deallocations_;
+      }
+
       inline void
       memory_resource::trace_print_statistics (void)
       {
@@ -1030,10 +1052,11 @@ namespace os
                        "\ttotal: %u bytes, \n"
                        "\tallocated: %u bytes in %u chunk(s), \n"
                        "\tfree: %u bytes in %u chunk(s), \n"
-                       "\tmax: %u bytes\n",
+                       "\tmax: %u bytes, \n"
+                       "\tcalls: %u allocs, %u deallocs\n",
                        name (), this, total_bytes (), allocated_bytes (),
                        allocated_chunks (), free_bytes (), free_chunks (),
-                       max_allocated_bytes ());
+                       max_allocated_bytes (), allocations(), deallocations());
 #endif /* defined(TRACE) */
       }
 
