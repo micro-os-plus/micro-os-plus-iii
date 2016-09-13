@@ -324,7 +324,7 @@ namespace os
         /**
          * @brief The allocation arena is an array of objects.
          */
-        value_type arena_[blocks];
+        typename std::aligned_storage<sizeof(value_type), alignof(value_type)>::type arena_[blocks];
 
         /**
          * @endcond
