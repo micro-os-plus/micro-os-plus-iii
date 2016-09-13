@@ -320,10 +320,10 @@ namespace os
         free_chunks (void);
 
         std::size_t
-        allocations(void);
+        allocations (void);
 
         std::size_t
-        deallocations(void);
+        deallocations (void);
 
         void
         trace_print_statistics (void);
@@ -703,6 +703,11 @@ namespace os
            */
 
           /**
+           * @brief Default constructor.
+           */
+          allocator_deleter ();
+
+          /**
            * @brief Copy constructor.
            * @param a Reference to allocator.
            */
@@ -717,6 +722,10 @@ namespace os
            * @{
            */
 
+          /**
+           * @brief Function operator.
+           * @param p Pointer to memory to deallocate.
+           */
           void
           operator() (pointer p) const;
 
@@ -764,11 +773,81 @@ namespace os
 
       template<>
         memory_resource*
+        set_resource_typed<thread> (memory_resource* res) noexcept;
+
+      template<>
+        memory_resource*
+        get_resource_typed<thread> (void) noexcept;
+
+      // ----------------------------------------------------------------------
+
+      template<>
+        memory_resource*
+        set_resource_typed<condition_variable> (memory_resource* res) noexcept;
+
+      template<>
+        memory_resource*
+        get_resource_typed<condition_variable> (void) noexcept;
+
+      // ----------------------------------------------------------------------
+
+      template<>
+        memory_resource*
+        set_resource_typed<event_flags> (memory_resource* res) noexcept;
+
+      template<>
+        memory_resource*
+        get_resource_typed<event_flags> (void) noexcept;
+
+      // ----------------------------------------------------------------------
+
+      template<>
+        memory_resource*
+        set_resource_typed<memory_pool> (memory_resource* res) noexcept;
+
+      template<>
+        memory_resource*
+        get_resource_typed<memory_pool> (void) noexcept;
+
+      // ----------------------------------------------------------------------
+
+      template<>
+        memory_resource*
+        set_resource_typed<message_queue> (memory_resource* res) noexcept;
+
+      template<>
+        memory_resource*
+        get_resource_typed<message_queue> (void) noexcept;
+
+      // ----------------------------------------------------------------------
+
+      template<>
+        memory_resource*
         set_resource_typed<mutex> (memory_resource* res) noexcept;
 
       template<>
         memory_resource*
         get_resource_typed<mutex> (void) noexcept;
+
+      // ----------------------------------------------------------------------
+
+      template<>
+        memory_resource*
+        set_resource_typed<semaphore> (memory_resource* res) noexcept;
+
+      template<>
+        memory_resource*
+        get_resource_typed<semaphore> (void) noexcept;
+
+      // ----------------------------------------------------------------------
+
+      template<>
+        memory_resource*
+        set_resource_typed<timer> (memory_resource* res) noexcept;
+
+      template<>
+        memory_resource*
+        get_resource_typed<timer> (void) noexcept;
 
       // ----------------------------------------------------------------------
 
@@ -780,8 +859,8 @@ namespace os
        * The allocator uses scheduler critical sections to be thread safe,
        * and the default memory resource associated with the given type.
        */
-      template<typename T>
-        using allocator_typed = allocator_stateless_polymorphic_synchronized<T, scheduler::lockable, get_resource_typed<T>>;
+      template<typename T, typename U = T>
+        using allocator_typed = allocator_stateless_polymorphic_synchronized<T, scheduler::lockable, get_resource_typed<U>>;
 
       /**
        * @brief Type of a RTOS unique pointer to objects of type T.
@@ -791,8 +870,8 @@ namespace os
        * The type is based on the standard unique pointer, but with the
        * specific RTOS deleter.
        */
-      template<typename T>
-        using unique_ptr = std::unique_ptr<T, allocator_deleter<allocator_typed<T>>>;
+      template<typename T, typename U = T>
+        using unique_ptr = std::unique_ptr<T, allocator_deleter<allocator_typed<T, U>>>;
 
     // ------------------------------------------------------------------------
     } /* namespace memory */
@@ -815,7 +894,14 @@ namespace os
 
       extern memory_resource* default_resource;
 
+      extern memory_resource* resource_thread;
+      extern memory_resource* resource_condition_variable;
+      extern memory_resource* resource_event_flags;
+      extern memory_resource* resource_memory_pool;
+      extern memory_resource* resource_message_queue;
       extern memory_resource* resource_mutex;
+      extern memory_resource* resource_semaphore;
+      extern memory_resource* resource_timer;
 
       /**
        * @endcond
@@ -844,9 +930,107 @@ namespace os
        */
       template<>
         inline memory_resource*
+        get_resource_typed<thread> (void) noexcept
+        {
+          return resource_thread;
+        }
+
+      /**
+       * @details
+       * If not set explicitly by the user, this function
+       * will return an instance of `null_memory_resource`
+       * on bare metal platforms and of
+       * `malloc_memory_resource` on POSIX platforms.
+       */
+      template<>
+        inline memory_resource*
+        get_resource_typed<condition_variable> (void) noexcept
+        {
+          return resource_condition_variable;
+        }
+
+      /**
+       * @details
+       * If not set explicitly by the user, this function
+       * will return an instance of `null_memory_resource`
+       * on bare metal platforms and of
+       * `malloc_memory_resource` on POSIX platforms.
+       */
+      template<>
+        inline memory_resource*
+        get_resource_typed<event_flags> (void) noexcept
+        {
+          return resource_event_flags;
+        }
+
+      /**
+       * @details
+       * If not set explicitly by the user, this function
+       * will return an instance of `null_memory_resource`
+       * on bare metal platforms and of
+       * `malloc_memory_resource` on POSIX platforms.
+       */
+      template<>
+        inline memory_resource*
+        get_resource_typed<memory_pool> (void) noexcept
+        {
+          return resource_memory_pool;
+        }
+
+      /**
+       * @details
+       * If not set explicitly by the user, this function
+       * will return an instance of `null_memory_resource`
+       * on bare metal platforms and of
+       * `malloc_memory_resource` on POSIX platforms.
+       */
+      template<>
+        inline memory_resource*
+        get_resource_typed<message_queue> (void) noexcept
+        {
+          return resource_message_queue;
+        }
+
+      /**
+       * @details
+       * If not set explicitly by the user, this function
+       * will return an instance of `null_memory_resource`
+       * on bare metal platforms and of
+       * `malloc_memory_resource` on POSIX platforms.
+       */
+      template<>
+        inline memory_resource*
         get_resource_typed<mutex> (void) noexcept
         {
           return resource_mutex;
+        }
+
+      /**
+       * @details
+       * If not set explicitly by the user, this function
+       * will return an instance of `null_memory_resource`
+       * on bare metal platforms and of
+       * `malloc_memory_resource` on POSIX platforms.
+       */
+      template<>
+        inline memory_resource*
+        get_resource_typed<semaphore> (void) noexcept
+        {
+          return resource_semaphore;
+        }
+
+      /**
+       * @details
+       * If not set explicitly by the user, this function
+       * will return an instance of `null_memory_resource`
+       * on bare metal platforms and of
+       * `malloc_memory_resource` on POSIX platforms.
+       */
+      template<>
+        inline memory_resource*
+        get_resource_typed<timer> (void) noexcept
+        {
+          return resource_timer;
         }
 
       // ======================================================================
@@ -1033,13 +1217,13 @@ namespace os
       }
 
       inline std::size_t
-      memory_resource::allocations(void)
+      memory_resource::allocations (void)
       {
         return allocations_;
       }
 
       inline std::size_t
-      memory_resource::deallocations(void)
+      memory_resource::deallocations (void)
       {
         return deallocations_;
       }
@@ -1056,7 +1240,8 @@ namespace os
                        "\tcalls: %u allocs, %u deallocs\n",
                        name (), this, total_bytes (), allocated_bytes (),
                        allocated_chunks (), free_bytes (), free_chunks (),
-                       max_allocated_bytes (), allocations(), deallocations());
+                       max_allocated_bytes (), allocations (),
+                       deallocations ());
 #endif /* defined(TRACE) */
       }
 
@@ -1157,13 +1342,17 @@ namespace os
             std::size_t elements)
         {
           trace::printf ("%s(%u) @%p\n", __func__, elements, this);
-          if (elements > max_size ())
+
+#if 0
+          std::size_t ms = max_size ();
+          if ((ms > 0) && (elements > max_size ()))
             {
               estd::__throw_system_error (
                   EINVAL,
                   "allocator_stateless_polymorphic_synchronized<T>::allocate(size_t n)"
                   " 'n' exceeds maximum supported size");
             }
+#endif
 
           locker_type lk;
           estd::lock_guard<locker_type> ulk
@@ -1178,8 +1367,15 @@ namespace os
         allocator_stateless_polymorphic_synchronized<T, L, get_resource>::deallocate (
             value_type * addr, std::size_t elements) noexcept
         {
-          assert (elements <= max_size ());
           trace::printf ("%s(%p,%u) @%p\n", __func__, addr, elements, this);
+
+#if 0
+          std::size_t ms = max_size ();
+          if (ms > 0)
+            {
+              assert (elements <= max_size ());
+            }
+#endif
 
           locker_type lk;
           estd::lock_guard<locker_type> ulk
@@ -1214,6 +1410,13 @@ namespace os
         }
 
       // ======================================================================
+
+      template<typename A>
+        inline
+        allocator_deleter<A>::allocator_deleter ()
+        {
+          ;
+        }
 
       template<typename A>
         inline
@@ -1259,7 +1462,10 @@ namespace os
 
           static_assert(std::is_same<typename allocator_traits::value_type, std::remove_cv_t<T>>::value
               || std::is_base_of<typename allocator_traits::value_type, std::remove_cv_t<T>>::value,
-              "Allocator has the wrong value_type");
+              "Allocator must be of same type or derived.");
+
+          static_assert(sizeof(T) <= sizeof(typename allocator_traits::value_type),
+              "Derived type must not be larger.");
 
           allocator_type alloc
             { allocator };

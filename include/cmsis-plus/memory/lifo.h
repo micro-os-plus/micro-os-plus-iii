@@ -167,7 +167,7 @@ namespace os
 
     /**
      * @brief Memory resource implementing the LIFO
-     *  allocation policies, using a statically allocated arena.
+     *  allocation policies, using an internal arena.
      * @ingroup cmsis-plus-rtos-memres
      * @headerfile first-fit-top.h <cmsis-plus/memory/first-fit-top.h>
      *
@@ -178,7 +178,7 @@ namespace os
      * The common use case it to define statically allocated memory managers.
      */
     template<std::size_t N>
-      class lifo_static : public lifo
+      class lifo_inner : public lifo
       {
       public:
 
@@ -197,13 +197,13 @@ namespace os
          * @par Parameters
          *  None.
          */
-        lifo_static (void);
+        lifo_inner (void);
 
         /**
          * @brief Construct a named memory resource object instance.
          * @param [in] name Pointer to name.
          */
-        lifo_static (const char* name);
+        lifo_inner (const char* name);
 
       public:
 
@@ -212,12 +212,12 @@ namespace os
          */
 
         // The rule of five.
-        lifo_static (const lifo_static&) = delete;
-        lifo_static (lifo_static&&) = delete;
-        lifo_static&
-        operator= (const lifo_static&) = delete;
-        lifo_static&
-        operator= (lifo_static&&) = delete;
+        lifo_inner (const lifo_inner&) = delete;
+        lifo_inner (lifo_inner&&) = delete;
+        lifo_inner&
+        operator= (const lifo_inner&) = delete;
+        lifo_inner&
+        operator= (lifo_inner&&) = delete;
 
         /**
          * @endcond
@@ -227,7 +227,7 @@ namespace os
          * @brief Destruct the memory resource object instance.
          */
         virtual
-        ~lifo_static ();
+        ~lifo_inner ();
 
         /**
          * @}
@@ -398,15 +398,15 @@ namespace os
 
     template<std::size_t N>
       inline
-      lifo_static<N>::lifo_static () :
-          lifo_static (nullptr)
+      lifo_inner<N>::lifo_inner () :
+          lifo_inner (nullptr)
       {
         ;
       }
 
     template<std::size_t N>
       inline
-      lifo_static<N>::lifo_static (const char* name) :
+      lifo_inner<N>::lifo_inner (const char* name) :
           lifo
             { name }
       {
@@ -416,7 +416,7 @@ namespace os
       }
 
     template<std::size_t N>
-      lifo_static<N>::~lifo_static ()
+      lifo_inner<N>::~lifo_inner ()
       {
         trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
       }

@@ -102,12 +102,99 @@
  */
 #define OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES
 
+
+/**
+ * @brief Define a pool of thread objects.
+ *
+ * @details
+ * This option instructs the startup code to create a pool of empty
+ * thread objects of the given size.
+ * This pool can be used as an allocator to
+ * create life thread objects using
+ * `rtos::memory::allocate_unique<thread> (...)`.
+ *
+ * The pool is dynamically allocated, and never deallocated.
+ *
+ * @par Default
+ *   Do not create the pool of thread objects.
+ */
+#define OS_INTEGER_RTOS_ALLOC_THREAD_POOL_SIZE
+
+/**
+ * @brief Define a pool of condition variable objects.
+ *
+ * @details
+ * This option instructs the startup code to create a pool of empty
+ * condition variable objects of the given size.
+ * This pool can be used as an allocator to
+ * create life condition variable objects using
+ * `rtos::memory::allocate_unique<condition_variable> (...)`.
+ *
+ * The pool is dynamically allocated, and never deallocated.
+ *
+ * @par Default
+ *   Do not create the pool of condition variable objects.
+ */
+#define OS_INTEGER_RTOS_ALLOC_CONDITION_VARIABLE_POOL_SIZE
+
+/**
+ * @brief Define a pool of event flags objects.
+ *
+ * @details
+ * This option instructs the startup code to create a pool of empty
+ * event flags objects of the given size.
+ * This pool can be used as an allocator to
+ * create life event flags objects using
+ * `rtos::memory::allocate_unique<event_flags> (...)`.
+ *
+ * The pool is dynamically allocated, and never deallocated.
+ *
+ * @par Default
+ *   Do not create the pool of event flags objects.
+ */
+#define OS_INTEGER_RTOS_ALLOC_EVENT_FLAGS_POOL_SIZE
+
+/**
+ * @brief Define a pool of memory pool objects.
+ *
+ * @details
+ * This option instructs the startup code to create a pool of empty
+ * memory pool objects of the given size.
+ * This pool can be used as an allocator to
+ * create life memory pool objects using
+ * `rtos::memory::allocate_unique<memory_pool> (...)`.
+ *
+ * The pool is dynamically allocated, and never deallocated.
+ *
+ * @par Default
+ *   Do not create the pool of memory pool objects.
+ */
+#define OS_INTEGER_RTOS_ALLOC_MEMORY_POOL_POOL_SIZE
+
+/**
+ * @brief Define a pool of message queue objects.
+ *
+ * @details
+ * This option instructs the startup code to create a pool of empty
+ * message queue objects of the given size.
+ * This pool can be used as an allocator to
+ * create life message queue objects using
+ * `rtos::memory::allocate_unique<message_queue> (...)`.
+ *
+ * The pool is dynamically allocated, and never deallocated.
+ *
+ * @par Default
+ *   Do not create the pool of message queue objects.
+ */
+#define OS_INTEGER_RTOS_ALLOC_MESSAGE_QUEUE_POOL_SIZE
+
 /**
  * @brief Define a pool of mutex objects.
  *
  * @details
- * This option instructs the startup code to create a pool of empty mutex
- * objects of the given size. This pool can be used as an allocator to
+ * This option instructs the startup code to create a pool of empty
+ * mutex objects of the given size.
+ * This pool can be used as an allocator to
  * create life mutex objects using
  * `rtos::memory::allocate_unique<mutex> (...)`.
  *
@@ -116,7 +203,41 @@
  * @par Default
  *   Do not create the pool of mutex objects.
  */
-#define OS_INTEGER_RTOS_MEMORY_MUTEX_POOL_SIZE
+#define OS_INTEGER_RTOS_ALLOC_MUTEX_POOL_SIZE
+
+/**
+ * @brief Define a pool of semaphore objects.
+ *
+ * @details
+ * This option instructs the startup code to create a pool of empty
+ * semaphore objects of the given size.
+ * This pool can be used as an allocator to
+ * create life semaphore objects using
+ * `rtos::memory::allocate_unique<semaphore> (...)`.
+ *
+ * The pool is dynamically allocated, and never deallocated.
+ *
+ * @par Default
+ *   Do not create the pool of semaphore objects.
+ */
+#define OS_INTEGER_RTOS_ALLOC_SEMAPHORE_POOL_SIZE
+
+/**
+ * @brief Define a pool of timer objects.
+ *
+ * @details
+ * This option instructs the startup code to create a pool of empty
+ * timer objects of the given size.
+ * This pool can be used as an allocator to
+ * create life timer objects using
+ * `rtos::memory::allocate_unique<timer> (...)`.
+ *
+ * The pool is dynamically allocated, and never deallocated.
+ *
+ * @par Default
+ *   Do not create the pool of timer objects.
+ */
+#define OS_INTEGER_RTOS_ALLOC_TIMER_POOL_SIZE
 
 /**
  * @brief The memory manager to be used for the RTOS system area.

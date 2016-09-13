@@ -122,7 +122,7 @@ namespace os
     std::size_t
     block_pool::do_max_size (void) const noexcept
     {
-      return block_size_bytes_;
+      return block_size_bytes_ * blocks_;
     }
 
     /**

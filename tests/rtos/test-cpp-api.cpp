@@ -56,7 +56,7 @@ func (void* args);
 void*
 func (void* args __attribute__((unused)))
 {
-  printf ("%s\n", __func__);
+  printf ("%s %s\n", __func__, this_thread::thread ().name ());
 
   return nullptr;
 }
@@ -191,7 +191,7 @@ test_cpp_api (void)
     }
 
     {
-      using my_pool = os::memory::block_pool_typed_static<my_blk_t, 2>;
+      using my_pool = os::memory::block_pool_typed_inner<my_blk_t, 2>;
 
       // The arena is typed and included in the pool object.
       my_pool bp2
@@ -311,6 +311,20 @@ test_cpp_api (void)
       th9->join ();
     }
 
+    {
+      // Smart pointer to thread. Allocated with the mutex allocator (pool).
+      rtos::memory::unique_ptr<thread> th =
+          rtos::memory::allocate_unique<thread> (
+              rtos::memory::allocator_typed<thread> (), "th10", func, nullptr);
+
+      th->join ();
+
+      auto th2 = rtos::memory::allocate_unique<thread> (
+          rtos::memory::allocator_typed<thread> (), "th11", func, nullptr);
+
+      th2->join ();
+    }
+
   // --------------------------------------------------------------------------
 
   using my_thread = thread_allocated<rtos::memory::allocator<thread::stack::allocation_element_t>>;
@@ -420,7 +434,33 @@ test_cpp_api (void)
 
       cq3->send (&msg_out, sizeof(my_msg_t));
 
+      // Mandatory delete.
       delete cq3;
+    }
+
+    {
+      // Smart pointer to message queue. Allocated with the system allocator.
+      std::unique_ptr<message_queue> q = std::make_unique<message_queue> (
+          "cq4", 3, sizeof(my_msg_t));
+
+      q->send (&msg_out, sizeof(my_msg_t));
+
+      // No delete needed.
+    }
+
+    {
+      // Smart pointer to mutex. Allocated with the mutex allocator (pool).
+      rtos::memory::unique_ptr<message_queue> q = rtos::memory::allocate_unique<
+          message_queue> (rtos::memory::allocator_typed<message_queue> (),
+                          "cq5", 3, sizeof(my_msg_t));
+
+      q->send (&msg_out, sizeof(my_msg_t));
+
+      auto q2 = rtos::memory::allocate_unique<message_queue> (
+          rtos::memory::allocator_typed<message_queue> (), "cq6", 3,
+          sizeof(my_msg_t));
+
+      q2->send (&msg_out, sizeof(my_msg_t));
     }
 
   // --------------------------------------------------------------------------
@@ -454,14 +494,49 @@ test_cpp_api (void)
   // --------------------------------------------------------------------------
 
     {
-      My_queue* tq3;
-      tq3 = new My_queue
+      My_queue* tq;
+      tq = new My_queue
         { "tq3", 7 };
 
-      tq3->send (&msg_out);
-      tq3->receive (&msg_in);
+      tq->send (&msg_out);
+      tq->receive (&msg_in);
 
-      delete tq3;
+      delete tq;
+    }
+
+    {
+      // Smart pointer to message queue. Allocated with the system allocator.
+      std::unique_ptr<My_queue> tq = std::make_unique<My_queue> ("tq4", 7);
+
+      tq->send (&msg_out);
+      tq->receive (&msg_in);
+
+      // No delete needed.
+    }
+
+    {
+      // Uninitialised smart pointer.
+      rtos::memory::unique_ptr<My_queue, message_queue> tq0;
+      if (tq0 != nullptr)
+        {
+          tq0->send (&msg_out);
+        }
+
+      // Smart pointer to message queue. Allocated with the message
+      // queue allocator (pool).
+      rtos::memory::unique_ptr<My_queue, message_queue> tq =
+          rtos::memory::allocate_unique<My_queue> (
+              rtos::memory::allocator_typed<My_queue, message_queue> (), "tq5",
+              7);
+
+      tq->send (&msg_out);
+      tq->receive (&msg_in);
+
+      auto tq2 = rtos::memory::allocate_unique<My_queue> (
+          rtos::memory::allocator_typed<My_queue, message_queue> (), "tq6", 7);
+
+      tq2->send (&msg_out);
+      tq2->receive (&msg_in);
     }
 
   // --------------------------------------------------------------------------
@@ -524,14 +599,50 @@ test_cpp_api (void)
 
   // Classic dynamic usage; block size and cast to char* must be supplied manually.
     {
-      memory_pool* cp3;
-      cp3 = new memory_pool
+      memory_pool* cp;
+      cp = new memory_pool
         { "cp3", 3, sizeof(my_blk_t) };
 
-      blk = static_cast<my_blk_t*> (cp3->alloc ());
-      cp3->free (blk);
+      blk = static_cast<my_blk_t*> (cp->alloc ());
+      cp->free (blk);
 
-      delete cp3;
+      delete cp;
+    }
+
+    {
+      // Smart pointer to memory pool. Allocated with the system allocator.
+      std::unique_ptr<memory_pool> cp = std::make_unique<memory_pool> (
+          "cp4", 3, sizeof(my_blk_t));
+
+      blk = static_cast<my_blk_t*> (cp->alloc ());
+      cp->free (blk);
+
+      // No delete needed.
+    }
+
+    {
+      // Uninitialised smart pointer.
+      rtos::memory::unique_ptr<memory_pool> cp0;
+      if (cp0 != nullptr)
+        {
+          blk = static_cast<my_blk_t*> (cp0->alloc ());
+        }
+
+      // Smart pointer to memory pool. Allocated with the
+      // memory pool allocator (pool).
+      rtos::memory::unique_ptr<memory_pool> cp = rtos::memory::allocate_unique<
+          memory_pool> (rtos::memory::allocator_typed<memory_pool> (), "cp5", 3,
+                        sizeof(my_blk_t));
+
+      blk = static_cast<my_blk_t*> (cp->alloc ());
+      cp->free (blk);
+
+      auto cp2 = rtos::memory::allocate_unique<memory_pool> (
+          rtos::memory::allocator_typed<memory_pool> (), "cp6", 3,
+          sizeof(my_blk_t));
+
+      blk = static_cast<my_blk_t*> (cp2->alloc ());
+      cp2->free (blk);
     }
 
   // --------------------------------------------------------------------------
@@ -566,15 +677,49 @@ test_cpp_api (void)
   // --------------------------------------------------------------------------
 
     {
-
-      My_pool* tp3;
-      tp3 = new My_pool
+      My_pool* tp;
+      tp = new My_pool
         { "tp3", 7 };
 
-      blk = tp3->alloc ();
-      tp3->free (blk);
+      blk = tp->alloc ();
+      tp->free (blk);
 
-      delete tp3;
+      delete tp;
+    }
+
+    {
+      // Smart pointer to memory pool. Allocated with the system allocator.
+      std::unique_ptr<My_pool> tp = std::make_unique<My_pool> ("tp4", 7);
+
+      blk = tp->alloc ();
+      tp->free (blk);
+
+      // No delete needed.
+    }
+
+    {
+      // Uninitialised smart pointer.
+      rtos::memory::unique_ptr<My_pool, message_queue> tp0;
+      if (tp0 != nullptr)
+        {
+          blk = tp0->alloc ();
+          tp0->free (blk);
+        }
+
+      // Smart pointer to memory pool. Allocated with the memory pool
+      // allocator (pool).
+      rtos::memory::unique_ptr<My_pool, memory_pool> tp =
+          rtos::memory::allocate_unique<My_pool> (
+              rtos::memory::allocator_typed<My_pool, memory_pool> (), "tp5", 7);
+
+      blk = tp->alloc ();
+      tp->free (blk);
+
+      auto tp2 = rtos::memory::allocate_unique<My_pool> (
+          rtos::memory::allocator_typed<My_pool, memory_pool> (), "tp6", 7);
+
+      blk = tp2->alloc ();
+      tp2->free (blk);
     }
 
   // --------------------------------------------------------------------------
@@ -619,13 +764,50 @@ test_cpp_api (void)
     }
 
     {
-      condition_variable* cv3;
-      cv3 = new condition_variable
+      condition_variable* cv;
+      cv = new condition_variable
         { "cv3" };
 
-      cv3->signal ();
+      cv->signal ();
 
-      delete cv3;
+      // Mandatory delete.
+      delete cv;
+    }
+
+    {
+      // Smart pointer to condition variable. Allocated with the system allocator.
+      std::unique_ptr<condition_variable> cv = std::make_unique<
+          condition_variable> ("cv4");
+
+      cv->signal ();
+
+      auto cv2 = std::make_unique<condition_variable> ("cv5");
+
+      cv2->signal ();
+
+      // No delete needed.
+    }
+
+    {
+      // Uninitialised smart pointer.
+      rtos::memory::unique_ptr<condition_variable> cv0;
+      if (cv0 != nullptr)
+        {
+          cv0->signal ();
+        }
+
+      // Smart pointer to condition variable. Allocated with the
+      // condition variable allocator (pool).
+      rtos::memory::unique_ptr<condition_variable> cv =
+          rtos::memory::allocate_unique<condition_variable> (
+              rtos::memory::allocator_typed<condition_variable> (), "cv6");
+
+      cv->signal ();
+
+      auto cv2 = rtos::memory::allocate_unique<condition_variable> (
+          rtos::memory::allocator_typed<condition_variable> (), "cv7");
+
+      cv2->signal ();
     }
 
   // ==========================================================================
@@ -642,12 +824,46 @@ test_cpp_api (void)
     }
 
     {
-      event_flags* ev3;
-      ev3 = new event_flags
+      event_flags* ev;
+      ev = new event_flags
         { "ev3" };
-      ev3->clear (1);
+      ev->clear (1);
 
-      delete ev3;
+      // Mandatory delete.
+      delete ev;
+    }
+
+    {
+      // Smart pointer to event flags. Allocated with the system allocator.
+      std::unique_ptr<event_flags> ev = std::make_unique<event_flags> ("ev4");
+
+      ev->clear (1);
+
+      auto ev2 = std::make_unique<event_flags> ("ev5");
+
+      ev2->clear (1);
+
+      // No delete needed.
+    }
+
+    {
+      // Uninitialised smart pointer.
+      rtos::memory::unique_ptr<event_flags> ev0;
+      if (ev0 != nullptr)
+        {
+          ev0->clear (1);
+        }
+
+      // Smart pointer to mutex. Allocated with the mutex allocator (pool).
+      rtos::memory::unique_ptr<event_flags> ev = rtos::memory::allocate_unique<
+          event_flags> (rtos::memory::allocator_typed<event_flags> (), "ev6");
+
+      ev->clear (1);
+
+      auto ev2 = rtos::memory::allocate_unique<event_flags> (
+          rtos::memory::allocator_typed<event_flags> (), "ev7");
+
+      ev2->clear (1);
     }
 
   // ==========================================================================
@@ -696,7 +912,8 @@ test_cpp_api (void)
       mx.lock ();
       mx.unlock ();
 
-      mutex_recursive mx2 { "mx4" };
+      mutex_recursive mx2
+        { "mx4" };
 
       mx2.lock ();
       mx2.unlock ();
@@ -721,12 +938,42 @@ test_cpp_api (void)
       mx->lock ();
       mx->unlock ();
 
+      auto mx2 = std::make_unique<mutex> ("mx6");
+
+      mx2->lock ();
+      mx2->unlock ();
+
       // No delete needed.
     }
 
     {
+      // Uninitialised smart pointer.
+      rtos::memory::unique_ptr<mutex> mx0;
+      if (mx0 != nullptr)
+        {
+          mx0->lock ();
+          mx0->unlock ();
+        }
+
+      // Smart pointer to mutex. Allocated with the mutex allocator (pool).
+      rtos::memory::unique_ptr<mutex> mx =
+          rtos::memory::allocate_unique<mutex> (
+              rtos::memory::allocator_typed<mutex> (), "mx7");
+
+      mx->lock ();
+      mx->unlock ();
+
+      auto mx2 = rtos::memory::allocate_unique<mutex> (
+          rtos::memory::allocator_typed<mutex> (), "mx8");
+
+      mx2->lock ();
+      mx2->unlock ();
+    }
+
+  // Unique pointer handling test.
+    {
       std::unique_ptr<mutex> mx;
-      mx = std::make_unique<mutex> ("mx7");
+      mx = std::make_unique<mutex> ("mx9");
 
       mx->lock ();
       mx->unlock ();
@@ -749,65 +996,82 @@ test_cpp_api (void)
       trace::printf ("%p\n", mx.get ());
     }
 
-    {
-      // Smart pointer to mutex. Allocated with the mutex allocator (pool).
-      rtos::memory::unique_ptr<mutex> mx =
-          rtos::memory::allocate_unique<mutex> (
-              rtos::memory::allocator_typed<mutex> (), "mx8");
-
-      mx->lock ();
-      mx->unlock ();
-
-      auto mx2 = rtos::memory::allocate_unique<mutex> (
-          rtos::memory::allocator_typed<mutex> (), "mx9");
-
-      mx2->lock ();
-      mx2->unlock ();
-    }
-
   // ==========================================================================
 
   printf ("\n%s - Semaphores.\n", test_name);
 
     {
-      // Counting semaphore.
-      semaphore sp1;
-      sp1.post ();
+      // Unnamed counting semaphore.
+      semaphore sp;
+      sp.post ();
     }
 
     {
       // Named counting semaphore.
-      semaphore sp2
+      semaphore sp
         { "sp2" };
 
-      sp2.post ();
-      sp2.wait ();
+      sp.post ();
+      sp.wait ();
 
-      sp2.post ();
-      sp2.try_wait ();
+      sp.post ();
+      sp.try_wait ();
 
-      sp2.post ();
-      sp2.timed_wait (1);
+      sp.post ();
+      sp.timed_wait (1);
 
-      sp2.post ();
-      sp2.timed_wait (0xFFFFFFFF);
+      sp.post ();
+      sp.timed_wait (0xFFFFFFFF);
     }
 
     {
       // Named binary semaphore.
-      semaphore sp3
+      semaphore sp
         { "sp3", semaphore::initializer_binary };
-      sp3.post ();
+
+      sp.post ();
     }
 
     {
-      // Named semaphore.
-      semaphore* sp4;
-      sp4 = new semaphore
+      // Raw pointer to semaphore. Allocated with the system allocator.
+      semaphore* sp;
+      sp = new semaphore
         { "sp4" };
-      sp4->post ();
 
-      delete sp4;
+      sp->post ();
+
+      // Mandatory delete.
+      delete sp;
+    }
+
+    {
+      // Smart pointer to semaphore. Allocated with the system allocator.
+      std::unique_ptr<semaphore> sp = std::make_unique<semaphore> ("sp5");
+
+      sp->post ();
+
+      // No delete needed.
+    }
+
+    {
+      // Uninitialised smart pointer.
+      rtos::memory::unique_ptr<semaphore> sp0;
+      if (sp0 != nullptr)
+        {
+          sp0->post ();
+        }
+
+      // Smart pointer to semaphore. Allocated with the
+      // semaphore allocator (pool).
+      rtos::memory::unique_ptr<semaphore> sp = rtos::memory::allocate_unique<
+          semaphore> (rtos::memory::allocator_typed<semaphore> (), "sp6");
+
+      sp->post ();
+
+      auto sp2 = rtos::memory::allocate_unique<semaphore> (
+          rtos::memory::allocator_typed<semaphore> (), "sp7");
+
+      sp2->post ();
     }
 
   // ==========================================================================
@@ -816,49 +1080,102 @@ test_cpp_api (void)
 
     {
       // Single-shot timer.
-      timer tm1
+      timer tm
         { tmfunc, nullptr };
       sysclock.sleep_for (1); // Sync
-      tm1.start (1);
+      tm.start (1);
 
       sysclock.sleep_for (2);
-      tm1.stop ();
+      tm.stop ();
     }
 
     {
       // Named single-shot timer.
-      timer tm2
+      timer tm
         { "tm2", tmfunc, nullptr };
       sysclock.sleep_for (1); // Sync
-      tm2.start (1);
+      tm.start (1);
 
       sysclock.sleep_for (2);
-      tm2.stop ();
+      tm.stop ();
     }
 
     {
       // Static named periodic timer.
-      timer tm3
+      timer tm
         { "tm3", tmfunc, nullptr, timer::periodic_initializer };
       sysclock.sleep_for (1); // Sync
-      tm3.start (1);
+      tm.start (1);
 
       sysclock.sleep_for (2);
-      tm3.stop ();
+      tm.stop ();
     }
 
     {
-      // Dynamic named single-shot timer.
-      timer* tm4;
-      tm4 = new timer
+      // Dynamic named single-shot timer. Allocated with the system allocator.
+      timer* tm;
+      tm = new timer
         { "tm4", tmfunc, nullptr };
+
       sysclock.sleep_for (1); // Sync
-      tm4->start (1);
+      tm->start (1);
 
       sysclock.sleep_for (2);
-      tm4->stop ();
+      tm->stop ();
 
-      delete tm4;
+      // Mandatory delete.
+      delete tm;
+    }
+
+    {
+      // Smart pointer to timer. Allocated with the system allocator.
+      std::unique_ptr<timer> tm = std::make_unique<timer> ("tm5", tmfunc,
+                                                           nullptr);
+
+      sysclock.sleep_for (1); // Sync
+      tm->start (1);
+
+      sysclock.sleep_for (2);
+      tm->stop ();
+
+      auto tm2 = std::make_unique<timer> ("tm6", tmfunc, nullptr);
+
+      sysclock.sleep_for (1); // Sync
+      tm2->start (1);
+
+      sysclock.sleep_for (2);
+      tm2->stop ();
+
+      // No delete needed.
+    }
+
+    {
+      // Uninitialised smart pointer.
+      rtos::memory::unique_ptr<timer> tm0;
+      if (tm0 != nullptr)
+        {
+          tm0->stop ();
+        }
+
+      // Smart pointer to mutex. Allocated with the mutex allocator (pool).
+      rtos::memory::unique_ptr<timer> tm =
+          rtos::memory::allocate_unique<timer> (
+              rtos::memory::allocator_typed<timer> (), "tm7", tmfunc, nullptr);
+
+      sysclock.sleep_for (1); // Sync
+      tm->start (1);
+
+      sysclock.sleep_for (2);
+      tm->stop ();
+
+      auto tm2 = rtos::memory::allocate_unique<timer> (
+          rtos::memory::allocator_typed<timer> (), "tm8", tmfunc, nullptr);
+
+      sysclock.sleep_for (1); // Sync
+      tm2->start (1);
+
+      sysclock.sleep_for (2);
+      tm2->stop ();
     }
 
   // ==========================================================================

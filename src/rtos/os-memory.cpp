@@ -102,7 +102,30 @@ namespace os
       memory_resource* default_resource __attribute__((weak))
       = reinterpret_cast<memory_resource*> (&malloc_res);
 
+      // ----------------------------------------------------------------------
+
+      memory_resource* resource_thread __attribute__((weak))
+      = reinterpret_cast<memory_resource*> (&malloc_res);
+
+      memory_resource* resource_condition_variable __attribute__((weak))
+      = reinterpret_cast<memory_resource*> (&malloc_res);
+
+      memory_resource* resource_event_flags __attribute__((weak))
+      = reinterpret_cast<memory_resource*> (&malloc_res);
+
+      memory_resource* resource_memory_pool __attribute__((weak))
+      = reinterpret_cast<memory_resource*> (&malloc_res);
+
+      memory_resource* resource_message_queue __attribute__((weak))
+      = reinterpret_cast<memory_resource*> (&malloc_res);
+
       memory_resource* resource_mutex __attribute__((weak))
+      = reinterpret_cast<memory_resource*> (&malloc_res);
+
+      memory_resource* resource_semaphore __attribute__((weak))
+      = reinterpret_cast<memory_resource*> (&malloc_res);
+
+      memory_resource* resource_timer __attribute__((weak))
       = reinterpret_cast<memory_resource*> (&malloc_res);
 
 #else
@@ -110,7 +133,30 @@ namespace os
       memory_resource* default_resource __attribute__((weak))
       = reinterpret_cast<memory_resource*> (&null_res);
 
+      // ----------------------------------------------------------------------
+
+      memory_resource* resource_thread __attribute__((weak))
+      = reinterpret_cast<memory_resource*> (&null_res);
+
+      memory_resource* resource_condition_variable __attribute__((weak))
+      = reinterpret_cast<memory_resource*> (&null_res);
+
+      memory_resource* resource_event_flags __attribute__((weak))
+      = reinterpret_cast<memory_resource*> (&null_res);
+
+      memory_resource* resource_memory_pool __attribute__((weak))
+      = reinterpret_cast<memory_resource*> (&null_res);
+
+      memory_resource* resource_message_queue __attribute__((weak))
+      = reinterpret_cast<memory_resource*> (&null_res);
+
       memory_resource* resource_mutex __attribute__((weak))
+      = reinterpret_cast<memory_resource*> (&null_res);
+
+      memory_resource* resource_semaphore __attribute__((weak))
+      = reinterpret_cast<memory_resource*> (&null_res);
+
+      memory_resource* resource_timer __attribute__((weak))
       = reinterpret_cast<memory_resource*> (&null_res);
 
 #endif
@@ -118,6 +164,20 @@ namespace os
       /**
        * @endcond
        */
+
+      // ----------------------------------------------------------------------
+      /**
+       * @details
+       *
+       * @see malloc_memory_resource
+       */
+      memory_resource*
+      malloc_resource (void) noexcept
+      {
+        return reinterpret_cast<memory_resource*> (&malloc_res);
+      }
+
+      // ----------------------------------------------------------------------
 
       /**
        * @details
@@ -139,11 +199,103 @@ namespace os
         return old;
       }
 
+      // ----------------------------------------------------------------------
+
       /**
        * @details
        * On bare metal applications, this function is called
        * from `os_startup_initialize_free_store()`, during the
-       * system startup, with a memory manager specific to its object type.
+       * system startup, with a memory manager specific to this object type.
+       */
+      template<>
+        memory_resource*
+        set_resource_typed<thread> (memory_resource* res) noexcept
+        {
+          trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
+
+          memory_resource* old = resource_thread;
+          resource_thread = res;
+
+          return old;
+        }
+
+      /**
+       * @details
+       * On bare metal applications, this function is called
+       * from `os_startup_initialize_free_store()`, during the
+       * system startup, with a memory manager specific to this object type.
+       */
+      template<>
+        memory_resource*
+        set_resource_typed<condition_variable> (memory_resource* res) noexcept
+        {
+          trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
+
+          memory_resource* old = resource_condition_variable;
+          resource_condition_variable = res;
+
+          return old;
+        }
+
+      /**
+       * @details
+       * On bare metal applications, this function is called
+       * from `os_startup_initialize_free_store()`, during the
+       * system startup, with a memory manager specific to this object type.
+       */
+      template<>
+        memory_resource*
+        set_resource_typed<event_flags> (memory_resource* res) noexcept
+        {
+          trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
+
+          memory_resource* old = resource_event_flags;
+          resource_event_flags = res;
+
+          return old;
+        }
+
+      /**
+       * @details
+       * On bare metal applications, this function is called
+       * from `os_startup_initialize_free_store()`, during the
+       * system startup, with a memory manager specific to this object type.
+       */
+      template<>
+        memory_resource*
+        set_resource_typed<memory_pool> (memory_resource* res) noexcept
+        {
+          trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
+
+          memory_resource* old = resource_memory_pool;
+          resource_memory_pool = res;
+
+          return old;
+        }
+
+      /**
+       * @details
+       * On bare metal applications, this function is called
+       * from `os_startup_initialize_free_store()`, during the
+       * system startup, with a memory manager specific to this object type.
+       */
+      template<>
+        memory_resource*
+        set_resource_typed<message_queue> (memory_resource* res) noexcept
+        {
+          trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
+
+          memory_resource* old = resource_message_queue;
+          resource_message_queue = res;
+
+          return old;
+        }
+
+      /**
+       * @details
+       * On bare metal applications, this function is called
+       * from `os_startup_initialize_free_store()`, during the
+       * system startup, with a memory manager specific to this object type.
        */
       template<>
         memory_resource*
@@ -159,14 +311,39 @@ namespace os
 
       /**
        * @details
-       *
-       * @see malloc_memory_resource
+       * On bare metal applications, this function is called
+       * from `os_startup_initialize_free_store()`, during the
+       * system startup, with a memory manager specific to this object type.
        */
-      memory_resource*
-      malloc_resource (void) noexcept
-      {
-        return reinterpret_cast<memory_resource*> (&malloc_res);
-      }
+      template<>
+        memory_resource*
+        set_resource_typed<semaphore> (memory_resource* res) noexcept
+        {
+          trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
+
+          memory_resource* old = resource_semaphore;
+          resource_semaphore = res;
+
+          return old;
+        }
+
+      /**
+       * @details
+       * On bare metal applications, this function is called
+       * from `os_startup_initialize_free_store()`, during the
+       * system startup, with a memory manager specific to this object type.
+       */
+      template<>
+        memory_resource*
+        set_resource_typed<timer> (memory_resource* res) noexcept
+        {
+          trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
+
+          memory_resource* old = resource_timer;
+          resource_timer = res;
+
+          return old;
+        }
 
       // ======================================================================
 
