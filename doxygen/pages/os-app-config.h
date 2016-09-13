@@ -66,6 +66,22 @@
  */
 
 /**
+ * @brief Prevent any dynamic memory allocation, everything should be static.
+ *
+ * @details
+ * For special applications that require all objects to be statically
+ * allocated, this option not only allocates all system objects
+ * statically (like the main and idle thread), but also installs
+ * a null memory manager, that guarantees a loud _bang_
+ * if a dynamic allocation (like `malloc()` or `new`) is attempted
+ * by the application.
+ *
+ * @par Default
+ *  Allow dynamic allocations.
+ */
+#define OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS
+
+/**
  * @brief Ask for separate RTOS dynamic memory and define its size.
  *
  * @details
@@ -85,6 +101,22 @@
  *   Use of application free store for system objects too.
  */
 #define OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES
+
+/**
+ * @brief Define a pool of mutex objects.
+ *
+ * @details
+ * This option instructs the startup code to create a pool of empty mutex
+ * objects of the given size. This pool can be used as an allocator to
+ * create life mutex objects using
+ * `rtos::memory::allocate_unique<mutex> (...)`.
+ *
+ * The pool is dynamically allocated, and never deallocated.
+ *
+ * @par Default
+ *   Do not create the pool of mutex objects.
+ */
+#define OS_INTEGER_RTOS_MEMORY_MUTEX_POOL_SIZE
 
 /**
  * @brief The memory manager to be used for the RTOS system area.

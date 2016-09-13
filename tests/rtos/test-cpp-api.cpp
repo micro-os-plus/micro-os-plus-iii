@@ -19,6 +19,8 @@
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/memory/block-pool.h>
 #include <cmsis-plus/memory/lifo.h>
+#include <cmsis-plus/estd/memory_resource>
+#include <cmsis-plus/estd/mutex>
 
 #include <algorithm>
 
@@ -103,6 +105,33 @@ iterate_threads (thread* th, unsigned int depth)
 }
 
 #endif
+
+void
+pass_mutex_up1 (const std::unique_ptr<mutex>& pp);
+
+void
+pass_mutex_up1 (const std::unique_ptr<mutex>& pp)
+{
+  trace::printf ("%p\n", pp.get ());
+}
+
+void
+pass_mutex_up2 (std::unique_ptr<mutex>& pp);
+
+void
+pass_mutex_up2 (std::unique_ptr<mutex>& pp)
+{
+  trace::printf ("%p\n", pp.get ());
+}
+
+void
+pass_mutex_up3 (std::unique_ptr<mutex> pp);
+
+void
+pass_mutex_up3 (std::unique_ptr<mutex> pp)
+{
+  trace::printf ("%p\n", pp.get ());
+}
 
 int
 test_cpp_api (void)
@@ -244,7 +273,7 @@ test_cpp_api (void)
     }
 
     {
-      auto th5 = std::make_unique < thread > ("th5", func, nullptr);
+      auto th5 = std::make_unique<thread> ("th5", func, nullptr);
 
       th5->join ();
     }
@@ -626,6 +655,7 @@ test_cpp_api (void)
   printf ("\n%s - Mutexes.\n", test_name);
 
     {
+      // Unnamed mutex.
       mutex mx1;
       mx1.lock ();
       mx1.unlock ();
@@ -650,27 +680,89 @@ test_cpp_api (void)
     }
 
     {
-      mutex mx2
+      // Named mutex created in the local scope (the stack).
+      mutex mx
         { "mx2" };
+
+      mx.lock ();
+      mx.unlock ();
+    }
+
+    {
+      // Recursive mutex created in the local scope (the stack).
+      mutex mx
+        { "mx3", mutex::initializer_recursive };
+
+      mx.lock ();
+      mx.unlock ();
+
+      mutex_recursive mx2 { "mx4" };
+
       mx2.lock ();
       mx2.unlock ();
     }
 
     {
-      mutex mx3
-        { "mx2", mutex::initializer_recursive };
-      mx3.lock ();
-      mx3.unlock ();
+      // Raw pointer to mutex. Allocated with the system allocator.
+      mutex* mx = new mutex
+        { "mx5" };
+
+      mx->lock ();
+      mx->unlock ();
+
+      // Mandatory delete.
+      delete mx;
     }
 
     {
-      mutex* mx4;
-      mx4 = new mutex
-        { "mx2" };
-      mx4->lock ();
-      mx4->unlock ();
+      // Smart pointer to mutex. Allocated with the system allocator.
+      std::unique_ptr<mutex> mx = std::make_unique<mutex> ("mx6");
 
-      delete mx4;
+      mx->lock ();
+      mx->unlock ();
+
+      // No delete needed.
+    }
+
+    {
+      std::unique_ptr<mutex> mx;
+      mx = std::make_unique<mutex> ("mx7");
+
+      mx->lock ();
+      mx->unlock ();
+
+      // Pass by const reference.
+      pass_mutex_up1 (mx);
+
+      trace::printf ("%p\n", mx.get ());
+
+      // Pass by non-const reference.
+      pass_mutex_up2 (mx);
+
+      trace::printf ("%p\n", mx.get ());
+
+      // Move.
+      pass_mutex_up3 (std::move (mx));
+
+      // This pointer is null now, ownership was transfered to function,
+      // which in our case destroyed the object.
+      trace::printf ("%p\n", mx.get ());
+    }
+
+    {
+      // Smart pointer to mutex. Allocated with the mutex allocator (pool).
+      rtos::memory::unique_ptr<mutex> mx =
+          rtos::memory::allocate_unique<mutex> (
+              rtos::memory::allocator_typed<mutex> (), "mx8");
+
+      mx->lock ();
+      mx->unlock ();
+
+      auto mx2 = rtos::memory::allocate_unique<mutex> (
+          rtos::memory::allocator_typed<mutex> (), "mx9");
+
+      mx2->lock ();
+      mx2->unlock ();
     }
 
   // ==========================================================================

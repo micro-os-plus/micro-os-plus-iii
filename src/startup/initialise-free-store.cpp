@@ -32,6 +32,7 @@
 #include <cmsis-plus/rtos/os-hooks.h>
 #include <cmsis-plus/memory/first-fit-top.h>
 #include <cmsis-plus/memory/lifo.h>
+#include <cmsis-plus/memory/block-pool.h>
 #include <cmsis-plus/estd/memory_resource>
 
 // ----------------------------------------------------------------------------
@@ -98,7 +99,7 @@ os_startup_initialize_free_store (void* heap_address,
   reinterpret_cast<rtos::memory::memory_resource*> (&application_free_store)->out_of_memory_handler (
       os_rtos_application_out_of_memory_hook);
 
-  // Set application memory manager.
+  // Set the application free store memory manager.
   estd::pmr::set_default_resource (
       reinterpret_cast<estd::pmr::memory_resource*> (&application_free_store));
 
@@ -111,13 +112,13 @@ os_startup_initialize_free_store (void* heap_address,
 
   // Allocate the RTOS dynamic memory on the application free store.
   void* rtos_arena =
-      reinterpret_cast<rtos::memory::memory_resource*> (&application_free_store)->allocate (
+  reinterpret_cast<rtos::memory::memory_resource*> (&application_free_store)->allocate (
       OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES);
 
   // Allocate & construct the memory resource used for the RTOS.
   rtos::memory::memory_resource* rtos_dynamic_memory;
   rtos_dynamic_memory = new rtos_memory_resource
-    { "sys", rtos_arena, OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES };
+    { "sys", rtos_arena, OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES};
 
   // Configure the memory manager to throw an exception when out of memory.
   rtos_dynamic_memory->out_of_memory_handler (
@@ -128,11 +129,25 @@ os_startup_initialize_free_store (void* heap_address,
 
 #else
 
-  // Set RTOS system memory manager.
+  // The RTOS system memory manager is identical with the application one.
   rtos::memory::set_default_resource (
       reinterpret_cast<rtos::memory::memory_resource*> (&application_free_store));
 
 #endif /* defined(OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES) */
+
+#if defined(OS_INTEGER_RTOS_MEMORY_MUTEX_POOL_SIZE)
+
+  static_assert(OS_INTEGER_RTOS_MEMORY_MUTEX_POOL_SIZE > 1,
+      "Mutex pool size must be >1.");
+  rtos::memory::memory_resource* mr =
+  new os::memory::block_pool_typed_allocated<rtos::mutex> (
+      "pool-mx", OS_INTEGER_RTOS_MEMORY_MUTEX_POOL_SIZE);
+  rtos::memory::set_resource_typed<rtos::mutex> (mr);
+
+  // Configure the memory manager to throw an exception when out of memory.
+  mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
+
+#endif /* defined(OS_INTEGER_RTOS_MEMORY_MUTEX_POOL_SIZE) */
 
 #endif /* !defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS) */
 }
@@ -177,9 +192,9 @@ os_rtos_application_out_of_memory_hook (void)
  */
 void __attribute__((weak))
 os_rtos_system_out_of_memory_hook (void)
-{
-  estd::__throw_bad_alloc ();
-}
+  {
+    estd::__throw_bad_alloc ();
+  }
 
 #endif
 

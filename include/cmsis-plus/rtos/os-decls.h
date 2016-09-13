@@ -92,7 +92,7 @@ namespace os
     namespace memory
     {
       template<typename T>
-        class default_resource_allocator;
+        class allocator_stateless_default_resource;
     } /* namespace memory */
 
     // ------------------------------------------------------------------------

@@ -52,7 +52,7 @@ namespace os
        * @ingroup cmsis-plus-rtos-memres
        */
       template<typename T>
-        using allocator = default_resource_allocator<T>;
+        using allocator = allocator_stateless_default_resource<T>;
 
 #endif
 

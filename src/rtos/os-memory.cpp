@@ -65,9 +65,6 @@ namespace os
       // The memory resources must not be destructed, since some
       // static objects will want to deallocate memory they manage.
 
-      // static os::memory::new_delete_memory_resource new_delete_res;
-      // static os::memory::null_memory_resource null_res;
-
       static std::aligned_storage<sizeof(os::memory::malloc_memory_resource),
           alignof(os::memory::malloc_memory_resource)>::type malloc_res;
 
@@ -87,6 +84,8 @@ namespace os
         new (&new_delete_res) os::memory::new_delete_memory_resource ();
       }
 
+      // allocator_pool<mutex> allocator_mutex_instance;
+
 #pragma GCC diagnostic pop
 
       /**
@@ -99,10 +98,21 @@ namespace os
 
       // The default RTOS system memory resource.
 #if defined(__APPLE__) || defined(__linux__)
+
       memory_resource* default_resource __attribute__((weak))
       = reinterpret_cast<memory_resource*> (&malloc_res);
+
+      memory_resource* resource_mutex __attribute__((weak))
+      = reinterpret_cast<memory_resource*> (&malloc_res);
+
 #else
-      memory_resource* default_resource __attribute__((weak)) = reinterpret_cast<memory_resource*> (&null_res);
+
+      memory_resource* default_resource __attribute__((weak))
+      = reinterpret_cast<memory_resource*> (&null_res);
+
+      memory_resource* resource_mutex __attribute__((weak))
+      = reinterpret_cast<memory_resource*> (&null_res);
+
 #endif
 
       /**
@@ -128,6 +138,24 @@ namespace os
 
         return old;
       }
+
+      /**
+       * @details
+       * On bare metal applications, this function is called
+       * from `os_startup_initialize_free_store()`, during the
+       * system startup, with a memory manager specific to its object type.
+       */
+      template<>
+        memory_resource*
+        set_resource_typed<mutex> (memory_resource* res) noexcept
+        {
+          trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
+
+          memory_resource* old = resource_mutex;
+          resource_mutex = res;
+
+          return old;
+        }
 
       /**
        * @details
