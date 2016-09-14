@@ -98,5 +98,47 @@ Changes, in reverse chronological order:
 - add class mutex_recursive
 - prefix protected functions with `internal_`
 
+### v6.3.7 2016-09-14
+
+- always include `assert_failed()` (used by STM HAL)
+- for ARMv7-M, in default handlers use BKPT(0) only if C_DEBUGEN is enabled, to prevent crashes when not connected to debugger
+- add `os_rtos_idle_enter_power_saving_mode_hook()`
+- rename include folder `cmsis-plus/iso` -> `cmsis-plus/estd`
+- add memory resource manager `first-fit-top` for variable size allocations
+- add memory resource manager `lifo` for one-time allocations
+- add memory resource manager `null` to completely disable dynamic allocations
+- add `os_startup_initialize_free_store()` to initialise the application free store
+- if `OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES` is defined, optionally initialise a separate RTOS system allocation area
+ and class specific pools
+- adjust `_sbrk()` to acknowledge all available RAM is used
+- refurbish C `malloc` & C++ `new`/`delete` to be thread safe and use the memory resource manager
+- for bare bone, if dynamic memory is not used, the default manager is `null_resource`
+- for POSIX, the default is `malloc_resource`
+- the standard definitions were moved to the C++17-like `estd::pmr` namespace
+- `estd::malloc()` is no longer needed and was removed, the standard malloc() is now thread safe
+- a C API was added for memory resources
+- add statistics to `memory_resource`
+- rename C API `_create` -> `_construct`, `_destroy` -> `_destruct` (add compatibility macros for the old names)
+- to make use of the system allocator in system classes, add custom `new`/`delete` operators to class `object_named_system`, and use it as base for all system objects
+- add `rtos::make_shared<>` to use the system allocator (experimental, to be further refined with thread safe)
+- for Cortex-M, manage the interrupts stack via the `thread::stack` class; initialise interrupts stack with pattern and check the bottom marker in the idle thread
+- add `os_irq_get_stack()` to the C API 
+- add `os_terminate_goodbye()` to display memory usage statistics
+- refubish the exit code to avoid crashes when building freestanding apps
+- rename `os_initialize_args()` -> `os_startup_initialize_args()`
+- rename `os_initialize_hardware_early()` -> `os_startup_initialize_hardware_early()`
+- rename `os_initialize_hardware()` -> `os_startup_initialize_hardware()`
+- add _out of memory_ hooks to memory managers
+- add `os_terminate()` as a portable function to terminate the application (implemented as reset on Cortex-M) 
+- add the `block_pool` class to manage pools of memory blocks
+- add `block_pool_typed_allocated` and `block_pool_typed_inclusive` templates
+- add `first_fit_top_allocated` and `first_fit_top_inclusive` templates
+- add `lifo_allocated` and `lifo_inclusive` templates
+- add `os_startup_create_thread_idle()` as weak
+- add `OS_INTEGER_RTOS_ALLOC_MUTEX_POOL_SIZE` and similar, to create pools of storage for system objects
+- rename  `thread_static<>` -> `thread_inclusive<>`
+- rename `memory_pool_static<>` -> `memory_pool_inclusive<>`
+- rename `message_queue_static<>` -> `message_queue_inclusive<>`
+
 
 ---
