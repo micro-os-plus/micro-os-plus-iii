@@ -48,8 +48,10 @@ namespace os
 #if !defined(OS_INCLUDE_RTOS_CUSTOM_ALLOCATOR) || defined(__DOXYGEN__)
 
       /**
-       * @brief Allocator used by the system objects. Must be stateless.
+       * @brief Type of allocator used by the system objects.
+       *  Must be stateless.
        * @ingroup cmsis-plus-rtos-memres
+       * @tparam T Type of elements to be allocated.
        */
       template<typename T>
         using allocator = allocator_stateless_default_resource<T>;

@@ -514,6 +514,7 @@ namespace os
        * @brief Standard allocator based on the RTOS system default memory
        * manager.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @tparam T Type of elements to be allocated.
        *
        * @details
        * This class template is used as the default allocator for
@@ -546,10 +547,10 @@ namespace os
 
           /**
            * @brief Copy constructor.
-           * @param a Reference to existing allocator.
+           * @param other Reference to existing allocator.
            */
           allocator_stateless_default_resource (
-              allocator_stateless_default_resource const & a) = default;
+              allocator_stateless_default_resource const & other) = default;
 
           /**
            * @brief Copy constructor template.
@@ -561,31 +562,40 @@ namespace os
 
           /**
            * @brief Move constructor.
-           * @param a Reference to existing allocator.
+           * @param other Reference to existing allocator.
            */
           allocator_stateless_default_resource (
-              allocator_stateless_default_resource && a) = default;
-
-          /**
-           * @brief Copy assignment operator.
-           * @param a Reference to existing allocator.
-           * @return Reference to allocator.
-           */
-          allocator_stateless_default_resource&
-          operator= (allocator_stateless_default_resource const & a) = default;
-
-          /**
-           * @brief Move assignment operator.
-           * @param a Reference to existing allocator.
-           * @return Reference to allocator.
-           */
-          allocator_stateless_default_resource&
-          operator= (allocator_stateless_default_resource && a) = default;
+              allocator_stateless_default_resource && other) = default;
 
           /**
            * @brief Destruct the default resource allocator object instance.
            */
           ~allocator_stateless_default_resource () = default;
+
+          /**
+           * @}
+           */
+
+          /**
+           * @name Operators
+           * @{
+           */
+
+          /**
+           * @brief Copy assignment operator.
+           * @param other Reference to existing allocator.
+           * @return Reference to allocator.
+           */
+          allocator_stateless_default_resource&
+          operator= (allocator_stateless_default_resource const & other) = default;
+
+          /**
+           * @brief Move assignment operator.
+           * @param other Reference to existing allocator.
+           * @return Reference to allocator.
+           */
+          allocator_stateless_default_resource&
+          operator= (allocator_stateless_default_resource && other) = default;
 
           /**
            * @}
@@ -634,10 +644,6 @@ namespace os
           // default allocator stateless requirements.
         };
 
-      /**
-       * @}
-       */
-
       // ======================================================================
       /**
        * @cond ignore
@@ -655,6 +661,9 @@ namespace os
       /**
        * @brief Allocator using memory resources.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
+       * @tparam T Type of elements to be allocated.
+       * @tparam L Type of lockable object.
+       * @tparam get_resource Function to get the default resource.
        */
       template<typename T, typename L, F get_resource>
         class allocator_stateless_polymorphic_synchronized
@@ -677,10 +686,10 @@ namespace os
 
           /**
            * @brief Copy constructor.
-           * @param a Reference to existing allocator.
+           * @param other Reference to existing allocator.
            */
           allocator_stateless_polymorphic_synchronized (
-              allocator_stateless_polymorphic_synchronized const & a) = default;
+              allocator_stateless_polymorphic_synchronized const & other) = default;
 
           /**
            * @brief Copy constructor template.
@@ -693,31 +702,40 @@ namespace os
 
           /**
            * @brief Move constructor.
-           * @param a Reference to existing allocator.
+           * @param other Reference to existing allocator.
            */
           allocator_stateless_polymorphic_synchronized (
-              allocator_stateless_polymorphic_synchronized && a) = default;
-
-          /**
-           * @brief Copy assignment operator.
-           * @param a Reference to existing allocator.
-           * @return Reference to allocator.
-           */
-          allocator_stateless_polymorphic_synchronized&
-          operator= (allocator_stateless_polymorphic_synchronized const & a) = default;
-
-          /**
-           * @brief Move assignment operator.
-           * @param a Reference to existing allocator.
-           * @return Reference to allocator.
-           */
-          allocator_stateless_polymorphic_synchronized&
-          operator= (allocator_stateless_polymorphic_synchronized && a) = default;
+              allocator_stateless_polymorphic_synchronized && other) = default;
 
           /**
            * @brief Destruct the default allocator object instance.
            */
           ~allocator_stateless_polymorphic_synchronized () = default;
+
+          /**
+           * @}
+           */
+
+          /**
+           * @name Operators
+           * @{
+           */
+
+          /**
+           * @brief Copy assignment operator.
+           * @param other Reference to existing allocator.
+           * @return Reference to allocator.
+           */
+          allocator_stateless_polymorphic_synchronized&
+          operator= (allocator_stateless_polymorphic_synchronized const & other) = default;
+
+          /**
+           * @brief Move assignment operator.
+           * @param other Reference to existing allocator.
+           * @return Reference to allocator.
+           */
+          allocator_stateless_polymorphic_synchronized&
+          operator= (allocator_stateless_polymorphic_synchronized && other) = default;
 
           /**
            * @}
@@ -792,6 +810,13 @@ namespace os
 
       /**
        * @brief Allocator deleter.
+       * @tparam A Allocator type.
+       *
+       * @details
+       * This class acts as a function to be used as deleter
+       * by smart pointers, like `unique_ptr<>`.
+       *
+       * It refers to the allocator to destruct and deallocate the object.
        */
       template<typename A>
         class allocator_deleter
@@ -833,6 +858,20 @@ namespace os
           allocator_deleter (allocator_deleter&& other) = default;
 
           /**
+           * @brief Destruct the allocator deleter.
+           */
+          ~allocator_deleter () = default;
+
+          /**
+           * @}
+           */
+
+          /**
+           * @name Operators
+           * @{
+           */
+
+          /**
            * @brief Copy assignment operator.
            * @param other Reference to existing allocator.
            * @return Reference to allocator.
@@ -849,25 +888,11 @@ namespace os
           operator= (allocator_deleter&& other) = default;
 
           /**
-           * @brief Destruct the allocator deleter.
-           */
-          ~allocator_deleter () = default;
-
-          /**
-           * @}
-           */
-
-          /**
-           * @name Operators
-           * @{
-           */
-
-          /**
            * @brief Function operator.
-           * @param p Pointer to memory to deallocate.
+           * @param addr Pointer to memory to deallocate.
            */
           void
-          operator() (pointer p) const;
+          operator() (pointer addr) const;
 
           /**
            * @}
@@ -891,6 +916,7 @@ namespace os
        * @tparam T Type of object to be allocated.
        * @tparam A Allocator type.
        * @tparam Args Variable arguments list.
+       *
        * @param allocator Reference to allocator.
        * @param args Arguments used to construct the object of type T.
        * @return A standard unique pointer with deleter.
@@ -901,10 +927,24 @@ namespace os
 
       // ----------------------------------------------------------------------
 
+      /**
+       * @name Type Specific Resource Managers
+       * @{
+       */
+
+      /**
+       * @brief Function template to set a memory resource.
+       * @param res Pointer to memory resource.
+       * @return Pointer to previous memory resource.
+       */
       template<typename T>
         memory_resource*
         set_resource_typed (memory_resource* res) noexcept;
 
+      /**
+       * @brief Function template to get a memory resource.
+       * @return Pointer to current memory resource.
+       */
       template<typename T>
         memory_resource*
         get_resource_typed (void) noexcept;
@@ -989,10 +1029,13 @@ namespace os
         memory_resource*
         get_resource_typed<timer> (void) noexcept;
 
-      // ----------------------------------------------------------------------
-
       /**
-       * @brief Type of an allocator for object of type T.
+       * @}
+       */
+
+      // ----------------------------------------------------------------------
+      /**
+       * @brief Type of an allocator for objects of type T.
        * @tparam T type of object.
        *
        * @details
@@ -1012,6 +1055,10 @@ namespace os
        */
       template<typename T, typename U = T>
         using unique_ptr = std::unique_ptr<T, allocator_deleter<allocator_typed<T, U>>>;
+
+    /**
+     * @}
+     */
 
     // ------------------------------------------------------------------------
     } /* namespace memory */
@@ -1569,9 +1616,16 @@ namespace os
           ;
         }
 
+      /**
+       * @brief Function operator to delete an allocated object.
+       * @param addr Pointer to object.
+       *
+       * @details
+       * Use `allocator_traits` to destroy and deallocate the object.
+       */
       template<typename A>
         inline void
-        allocator_deleter<A>::operator() (pointer p) const
+        allocator_deleter<A>::operator() (pointer addr) const
         {
           // Local allocator, without it many errors are issued.
           // TODO: understand exactly why.
@@ -1579,15 +1633,26 @@ namespace os
             { a_ };
 
           // Call the object destructor.
-          allocator_traits::destroy (alloc, std::addressof (*p));
+          allocator_traits::destroy (alloc, std::addressof (*addr));
 
           // Deallocate the object, using the same allocator
           // used to allocate the object.
-          allocator_traits::deallocate (alloc, p, 1);
+          allocator_traits::deallocate (alloc, addr, 1);
         }
 
       // ======================================================================
 
+      /**
+       * @details
+       * This function is a factory of unique pointers.
+       * It is inspired by `std::allocate_shared<>`.
+       *
+       * Objects are allocated using the given allocator, and
+       * deallocated using a custom deleter associated to the allocator.
+       *
+       * The returned unique pointers always have the deleter associated,
+       * so the object size is two pointers.
+       */
       template<typename T, typename A, typename ... Args>
         auto
         allocate_unique (const A& allocator, Args&&... args)
