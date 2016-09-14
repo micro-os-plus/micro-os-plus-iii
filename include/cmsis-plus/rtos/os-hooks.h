@@ -60,7 +60,7 @@ extern "C"
   _start (void);
 
   /**
-   * @brief Early hardware initialisations.
+   * @brief Initialise hardware early.
    * @par Parameters
    *  None.
    * @par Returns
@@ -70,7 +70,7 @@ extern "C"
   os_startup_initialize_hardware_early (void);
 
   /**
-   * @brief Hardware initialisations.
+   * @brief Initialise hardware.
    * @par Parameters
    *  None.
    * @par Returns
@@ -80,7 +80,7 @@ extern "C"
   os_startup_initialize_hardware (void);
 
   /**
-   * @brief Free store initialisations.
+   * @brief Initialise free store.
    * @param heap_address The first unallocated RAM address (after the BSS).
    * @param heap_size_bytes The free store size.
    * @par Returns
@@ -90,7 +90,7 @@ extern "C"
   os_startup_initialize_free_store (void* heap_address, size_t heap_size_bytes);
 
   /**
-   * @brief Arguments initialisations.
+   * @brief Initialise arguments.
    * @param [out] p_argc Pointer to argc.
    * @param [out] p_argv Pointer to argv.
    */

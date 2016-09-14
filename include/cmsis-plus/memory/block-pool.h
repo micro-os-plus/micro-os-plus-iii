@@ -206,7 +206,7 @@ namespace os
        */
 
       /**
-       * @brief The static address where the pool is stored
+       * @brief The static address where the pool is stored.
        * (from `attr.mp_pool_address`).
        */
       void* pool_addr_ = nullptr;
@@ -240,7 +240,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @brief Memory resource managing an internal pool
+     * @brief Memory resource managing an internal pool.
      *  of same size blocks of type T.
      * @ingroup cmsis-plus-rtos-memres
      * @headerfile block-pool.h <cmsis-plus/memory/block-pool.h>
@@ -335,7 +335,7 @@ namespace os
     // ========================================================================
 
     /**
-     * @brief Memory resource managing a dynamically allocated pool
+     * @brief Memory resource managing a dynamically allocated pool.
      *  of same size blocks of type T.
      * @ingroup cmsis-plus-rtos-memres
      * @headerfile block-pool.h <cmsis-plus/memory/block-pool.h>

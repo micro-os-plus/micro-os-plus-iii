@@ -240,7 +240,8 @@
 #define OS_INTEGER_RTOS_ALLOC_TIMER_POOL_SIZE
 
 /**
- * @brief The memory manager to be used for the RTOS system area.
+ * @brief The type of the memory manager to be used for
+ *  the RTOS system area.
  *
  * @details
  * The default memory manager is `os::memory::lifo`, which is guaranteed
@@ -263,7 +264,8 @@
 #define OS_TYPE_RTOS_MEMORY_RESOURCE
 
 /**
- * @brief The memory manager to be used for the application free store.
+ * @brief The type of the memory manager to be used for
+ *  the application free store.
  *
  * @details
  * The default memory manager is `os::memory::first_fit_top`, which

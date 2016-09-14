@@ -46,6 +46,7 @@
 
 /**
  * @brief Tell the world that CMSIS++ is in use.
+ *
  * @details
  * Macro to inform including files that CMSIS++ RTOS
  * definitions are available.
@@ -99,6 +100,7 @@ extern "C"
 
   /**
    * @brief Type of values returned by RTOS functions.
+   *
    * @details
    * For error processing reasons, most CMSIS++ RTOS functions
    * return a numeric result, which, according to POSIX,
@@ -111,6 +113,7 @@ extern "C"
 
   /**
    * @brief Type of variables holding flags modes.
+   *
    * @details
    * An unsigned type used to hold the mode bits passed to
    * functions returning flags.
@@ -123,6 +126,7 @@ extern "C"
 
   /**
    * @brief Type of variables holding flags masks.
+   *
    * @details
    * An unsigned type large enough to store all the flags, usually
    * 32-bits wide.
@@ -159,6 +163,7 @@ extern "C"
 
   /**
    * @brief Type of variables holding scheduler state codes.
+   *
    * @details
    * Usually a boolean telling if the scheduler is
    * locked or not, but for recursive locks it might also be a
@@ -170,6 +175,7 @@ extern "C"
 
   /**
    * @brief Type of variables holding interrupts priority values.
+   *
    * @details
    * Usually an integer large enough to hold the CPU register
    * where the interrupt priorities are stored.
@@ -187,6 +193,7 @@ extern "C"
 
   /**
    * @brief Type of variables holding clock time stamps.
+   *
    * @details
    * A numeric type intended to store a clock timestamp, either in ticks
    * cycles or seconds.
@@ -197,6 +204,7 @@ extern "C"
 
   /**
    * @brief Type of variables holding clock durations.
+   *
    * @details
    * A numeric type intended to store a clock duration, either in ticks
    * cycles, or seconds.
@@ -207,6 +215,7 @@ extern "C"
 
   /**
    * @brief Type of variables holding clock offsets.
+   *
    * @details
    * A numeric type intended to store a clock offset
    * (difference to epoch), either in ticks
@@ -220,6 +229,7 @@ extern "C"
 
   /**
    * @brief Generic iterator, implemented as a pointer.
+   *
    * @details
    * To simplify things, the C implementation of iterators
    * includes a single pointer to a C++ object instance. Internally,
@@ -334,6 +344,7 @@ extern "C"
 
   /**
    * @brief Type of thread function.
+   *
    * @details
    * Useful to cast other similar types
    * to silence possible compiler warnings.
@@ -352,6 +363,7 @@ extern "C"
 
   /**
    * @brief Type of variables holding thread priorities.
+   *
    * @details
    * A numeric type used to hold thread priorities, affecting the thread
    * behaviour, like scheduling and thread wakeup due to events;
@@ -374,6 +386,7 @@ extern "C"
 
   /**
    * @brief Type of variables holding stack words.
+   *
    * @details
    * A numeric type intended to store a stack word
    * as stored by push instructions.
@@ -384,6 +397,7 @@ extern "C"
 
   /**
    * @brief Type of variables holding aligned stack elements.
+   *
    * @details
    * A numeric type intended to be used for stack allocations.
    *
@@ -397,6 +411,7 @@ extern "C"
   /**
    * @brief Thread stack.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   *
    * @details
    * The members of this structure are hidden and should not
    * be accessed directly, but through associated functions.
@@ -421,6 +436,7 @@ extern "C"
   /**
    * @brief Thread context.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   *
    * @details
    * The members of this structure are hidden and should not
    * be accessed directly, but through associated functions.
@@ -450,6 +466,7 @@ extern "C"
   /**
    * @brief Thread statistics.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   *
    * @details
    * The members of this structure are hidden and should not
    * be accessed directly, but through associated functions.
@@ -481,6 +498,7 @@ extern "C"
   /**
    * @brief Thread attributes.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   *
    * @details
    * Initialise this structure with `os_thread_attr_init()`, and then
    * set any of the individual members directly.
@@ -491,6 +509,7 @@ extern "C"
   {
     /**
      * @brief Address of the clock to use for timeouts.
+     *
      * @details
      * It may be `os_clock_get_sysclock()`, `os_clock_get_rtclock()`,
      * or any other user object derived from class `clock`.
@@ -501,6 +520,7 @@ extern "C"
 
     /**
      * @brief Address of the user defined storage for the thread stack.
+     *
      * @details
      * If `NULL`, the default is to dynamically allocate the stack.
      */
@@ -508,7 +528,8 @@ extern "C"
 
     /**
      * @brief Size of the user defined storage for the thread
-     * stack, in bytes.
+     *  stack, in bytes.
+     *
      * @details
      * If 0, the default is `os_thread_stack_get_default_size()`.
      *
@@ -521,6 +542,7 @@ extern "C"
 
     /**
      * @brief Thread initial priority.
+     *
      * @details
      * If 0, the default is `os_thread_priority_normal`.
      *
@@ -535,6 +557,7 @@ extern "C"
   /**
    * @brief Thread object storage.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   *
    * @details
    * This C structure has the same size as the C++ `os::rtos::thread` object
    * and must be initialised with `os_thread_create()`.
@@ -613,6 +636,7 @@ extern "C"
   /**
    * @brief Clock object storage.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   *
    * @details
    * This C structure has the same size as the C++ `os::rtos::clock` object.
    *
@@ -676,6 +700,7 @@ extern "C"
 
   /**
    * @brief Type of timer function arguments.
+   *
    * @details
    * Useful to cast other similar types
    * to silence possible compiler warnings.
@@ -686,6 +711,7 @@ extern "C"
 
   /**
    * @brief Type of timer function.
+   *
    * @details
    * Useful to cast other similar types
    * to silence possible compiler warnings.
@@ -715,6 +741,7 @@ extern "C"
   /**
    * @brief Timer attributes.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   *
    * @details
    * Initialise this structure with `os_timer_attr_init()` and then
    * set any of the individual members directly.
@@ -738,6 +765,7 @@ extern "C"
   /**
    * @brief Timer object storage.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   *
    * @details
    * This C structure has the same size as the C++ `os::rtos::timer` object
    * and must be initialised with `os_timer_create()`.
@@ -878,6 +906,7 @@ extern "C"
   /**
    * @brief Mutex attributes.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   *
    * @details
    * Initialise this structure with `os_mutex_attr_init()` and then
    * set any of the individual members directly.
@@ -921,6 +950,7 @@ extern "C"
   /**
    * @brief Mutex object storage.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   *
    * @details
    * This C structure has the same size as the C++ `os::rtos::mutex` object
    * and must be initialised with `os_mutex_create()`.
@@ -982,6 +1012,7 @@ extern "C"
   /**
    * @brief Condition variable attributes.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   *
    * @details
    * Initialise this structure with `os_condvar_attr_init()` and then
    * set any of the individual members directly.
@@ -1000,6 +1031,7 @@ extern "C"
   /**
    * @brief Condition variable object storage.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   *
    * @details
    * This C structure has the same size as the C++
    * @ref os::rtos::condition_variable
@@ -1054,6 +1086,7 @@ extern "C"
   /**
    * @brief Semaphore attributes.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   *
    * @details
    * Initialise this structure with `os_semaphore_attr_init()` and then
    * set any of the individual members directly.
@@ -1082,6 +1115,7 @@ extern "C"
   /**
    * @brief Semaphore object storage.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   *
    * @details
    * This C structure has the same size as the C++ `os::rtos::semaphore`
    * object and must be initialised with `os_semaphore_create()`.
@@ -1138,6 +1172,7 @@ extern "C"
   /**
    * @brief Memory pool attributes.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   *
    * @details
    * Initialise this structure with `os_mempool_attr_init()` and then
    * set any of the individual members directly.
@@ -1166,6 +1201,7 @@ extern "C"
   /**
    * @brief Memory pool object storage.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   *
    * @details
    * This C structure has the same size as the C++ `os::rtos::memory_pool`
    * object and must be initialised with `os_mempool_create()`.
@@ -1243,6 +1279,7 @@ extern "C"
   /**
    * @brief Message queue attributes.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   *
    * @details
    * Initialise this structure with `os_mqueue_attr_init()` and then
    * set any of the individual members directly.
@@ -1271,6 +1308,7 @@ extern "C"
   /**
    * @brief Message queue object storage.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   *
    * @details
    * This C structure has the same size as the C++ `os::rtos::message_queue`
    * object and must be initialised with `os_mqueue_create()`.
@@ -1344,6 +1382,7 @@ extern "C"
   /**
    * @brief Event flags attributes.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   *
    * @details
    * Initialise this structure with `os_evflags_attr_init()` and then
    * set any of the individual members directly.
@@ -1362,6 +1401,7 @@ extern "C"
   /**
    * @brief Event flags object storage.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   *
    * @details
    * This C structure has the same size as the C++ `os::rtos::event_flags`
    * object and must be initialised with `os_evflags_create()`.
@@ -1444,6 +1484,7 @@ extern "C"
   /**
    * @brief Memory resource object storage.
    * @headerfile os-c-api.h <cmsis-plus/rtos/os-c-api.h>
+   *
    * @details
    * A pointer to this structure can be used as a pointer to the
    * `os::rtos::memory::memory_resource` object.

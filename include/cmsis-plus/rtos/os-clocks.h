@@ -328,7 +328,8 @@ namespace os
        */
 
       /**
-       * @brief Construct a clock object instance (protected, used in derived classes)
+       * @brief Construct a clock object instance (protected, used in
+       *  derived classes).
        * @param [in] name Pointer to clock name.
        */
       adjustable_clock (const char* name);
