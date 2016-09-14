@@ -150,27 +150,28 @@ namespace os
         constexpr
         attributes ();
 
+      protected:
+
         /**
          * @cond ignore
          */
 
-      protected:
-
         constexpr
         attributes (type_t type);
 
+        /**
+         * @endcond
+         */
+
       public:
 
+        // The rule of five.
         attributes (const attributes&) = default;
         attributes (attributes&&) = default;
         attributes&
         operator= (const attributes&) = default;
         attributes&
         operator= (attributes&&) = default;
-
-        /**
-         * @endcond
-         */
 
         /**
          * @brief Destruct the timer attributes object instance.
@@ -230,20 +231,13 @@ namespace os
         constexpr
         attributes_periodic ();
 
-        /**
-         * @cond ignore
-         */
-
+        // The rule of five.
         attributes_periodic (const attributes_periodic&) = default;
         attributes_periodic (attributes_periodic&&) = default;
         attributes_periodic&
         operator= (const attributes_periodic&) = default;
         attributes_periodic&
         operator= (attributes_periodic&&) = default;
-
-        /**
-         * @endcond
-         */
 
         /**
          * @brief Destruct the periodic timer attributes object instance.
@@ -467,6 +461,10 @@ namespace os
       ;
     }
 
+    /**
+     * @cond ignore
+     */
+
     constexpr
     timer::attributes::attributes (type_t type) :
         tm_type (type)
@@ -474,8 +472,11 @@ namespace os
       ;
     }
 
-    // ========================================================================
+    /**
+     * @endcond
+     */
 
+    // ========================================================================
     constexpr
     timer::attributes_periodic::attributes_periodic () :
         attributes

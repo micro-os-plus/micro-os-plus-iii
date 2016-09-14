@@ -175,6 +175,22 @@ namespace os
         memory_resource (const char* name);
 
         /**
+         * @cond ignore
+         */
+
+        // The rule of five.
+        memory_resource (const memory_resource&) = delete;
+        memory_resource (memory_resource&&) = delete;
+        memory_resource&
+        operator= (const memory_resource&) = delete;
+        memory_resource&
+        operator= (memory_resource&&) = delete;
+
+        /**
+         * @endcond
+         */
+
+        /**
          * @brief Destruct the memory resource object instance.
          */
         virtual
@@ -319,12 +335,31 @@ namespace os
         std::size_t
         free_chunks (void);
 
+        /**
+         * @brief Get the number of allocations.
+         * @par Parameters
+         *  None.
+         * @return Number of allocations.
+         */
         std::size_t
         allocations (void);
 
+        /**
+         * @brief Get the number of deallocations.
+         * @par Parameters
+         *  None.
+         * @return Number of deallocations
+         */
         std::size_t
         deallocations (void);
 
+        /**
+         * @brief Print a long message with usage statistics.
+         * @par Parameters
+         *  None.
+         * @par Returns
+         *  Nothing.
+         */
         void
         trace_print_statistics (void);
 
@@ -518,7 +553,7 @@ namespace os
 
           /**
            * @brief Copy constructor template.
-           * @param other
+           * @param other Reference to allocator.
            */
           template<typename U>
             allocator_stateless_default_resource (
@@ -582,7 +617,8 @@ namespace os
           deallocate (value_type* addr, std::size_t elements) noexcept;
 
           /**
-           * @brief The number of elements that can be passed to `allocate()`.
+           * @brief The maximum number of elements that can be
+           *  passed to `allocate()`.
            * @return Number of elements of type `value_type`.
            */
           std::size_t
@@ -618,6 +654,7 @@ namespace os
 
       /**
        * @brief Allocator using memory resources.
+       * @headerfile os.h <cmsis-plus/rtos/os.h>
        */
       template<typename T, typename L, F get_resource>
         class allocator_stateless_polymorphic_synchronized
@@ -627,33 +664,109 @@ namespace os
           using value_type = T;
           using locker_type = L;
 
+          /**
+           * @name Constructors & Destructor
+           * @{
+           */
+
+          /**
+           * @brief Default constructor. Construct a default
+           * allocator object instance.
+           */
           allocator_stateless_polymorphic_synchronized () noexcept;
 
+          /**
+           * @brief Copy constructor.
+           * @param a Reference to existing allocator.
+           */
           allocator_stateless_polymorphic_synchronized (
               allocator_stateless_polymorphic_synchronized const & a) = default;
 
+          /**
+           * @brief Copy constructor template.
+           * @param other Reference to allocator.
+           */
           template<typename U>
             allocator_stateless_polymorphic_synchronized (
                 allocator_stateless_polymorphic_synchronized<U, L, get_resource> const & other)
                     noexcept;
 
+          /**
+           * @brief Move constructor.
+           * @param a Reference to existing allocator.
+           */
+          allocator_stateless_polymorphic_synchronized (
+              allocator_stateless_polymorphic_synchronized && a) = default;
+
+          /**
+           * @brief Copy assignment operator.
+           * @param a Reference to existing allocator.
+           * @return Reference to allocator.
+           */
           allocator_stateless_polymorphic_synchronized&
           operator= (allocator_stateless_polymorphic_synchronized const & a) = default;
 
+          /**
+           * @brief Move assignment operator.
+           * @param a Reference to existing allocator.
+           * @return Reference to allocator.
+           */
+          allocator_stateless_polymorphic_synchronized&
+          operator= (allocator_stateless_polymorphic_synchronized && a) = default;
+
+          /**
+           * @brief Destruct the default allocator object instance.
+           */
+          ~allocator_stateless_polymorphic_synchronized () = default;
+
+          /**
+           * @}
+           */
+
+        public:
+
+          /**
+           * @name Public Member Functions
+           * @{
+           */
+
+          /**
+           * @brief Allocate a number of memory blocks of type `value_type`.
+           * @param elements Number of elements of type `value_type`.
+           * @return Pointer to newly allocated memory blocks.
+           */
           value_type*
           allocate (std::size_t elements);
 
+          /**
+           * @brief Deallocate the number of memory blocks of type `value_type`.
+           * @param addr Pointer to previously allocated memory blocks.
+           * @param elements Number of elements of type `value_type`.
+           * @par Returns
+           *  Nothing.
+           */
           void
-          deallocate (value_type* p, std::size_t elements) noexcept;
+          deallocate (value_type* addr, std::size_t elements) noexcept;
 
+          /**
+           * @brief The maximum number of elements that can be
+           *  passed to `allocate()`.
+           * @return Number of elements of type `value_type`.
+           */
           std::size_t
           max_size (void) const noexcept;
 
+#if 0
           allocator_stateless_polymorphic_synchronized
           select_on_container_copy_construction (void) const noexcept;
 
           memory_resource*
           resource (void) const noexcept;
+#endif
+
+          /**
+           * @}
+           */
 
         private:
 
@@ -709,9 +822,36 @@ namespace os
 
           /**
            * @brief Copy constructor.
-           * @param a Reference to allocator.
+           * @param other Reference to allocator.
            */
-          allocator_deleter (const allocator_type& a);
+          allocator_deleter (const allocator_type& other);
+
+          /**
+           * @brief Move constructor.
+           * @param other Reference to existing allocator.
+           */
+          allocator_deleter (allocator_deleter&& other) = default;
+
+          /**
+           * @brief Copy assignment operator.
+           * @param other Reference to existing allocator.
+           * @return Reference to allocator.
+           */
+          allocator_deleter&
+          operator= (const allocator_deleter& other) = default;
+
+          /**
+           * @brief Move assignment operator.
+           * @param other Reference to existing allocator.
+           * @return Reference to allocator.
+           */
+          allocator_deleter&
+          operator= (allocator_deleter&& other) = default;
+
+          /**
+           * @brief Destruct the allocator deleter.
+           */
+          ~allocator_deleter () = default;
 
           /**
            * @}
@@ -1365,7 +1505,7 @@ namespace os
       template<typename T, typename L, F get_resource>
         void
         allocator_stateless_polymorphic_synchronized<T, L, get_resource>::deallocate (
-            value_type * addr, std::size_t elements) noexcept
+            value_type* addr, std::size_t elements) noexcept
         {
           trace::printf ("%s(%p,%u) @%p\n", __func__, addr, elements, this);
 
@@ -1393,21 +1533,23 @@ namespace os
           return get_resource ()->max_size () / sizeof(T);
         }
 
+#if 0
       template<typename T, typename L, F get_resource>
-        inline allocator_stateless_polymorphic_synchronized<T, L, get_resource>
-        allocator_stateless_polymorphic_synchronized<T, L, get_resource>::select_on_container_copy_construction (
-            void) const noexcept
+      inline allocator_stateless_polymorphic_synchronized<T, L, get_resource>
+      allocator_stateless_polymorphic_synchronized<T, L, get_resource>::select_on_container_copy_construction (
+          void) const noexcept
         {
           return allocator_stateless_polymorphic_synchronized ();
         }
 
       template<typename T, typename L, F get_resource>
-        inline memory_resource*
-        allocator_stateless_polymorphic_synchronized<T, L, get_resource>::resource (
-            void) const noexcept
+      inline memory_resource*
+      allocator_stateless_polymorphic_synchronized<T, L, get_resource>::resource (
+          void) const noexcept
         {
           return get_resource ();
         }
+#endif
 
       // ======================================================================
 
@@ -1420,9 +1562,9 @@ namespace os
 
       template<typename A>
         inline
-        allocator_deleter<A>::allocator_deleter (const allocator_type& a) :
+        allocator_deleter<A>::allocator_deleter (const allocator_type& other) :
             a_
-              { a }
+              { other }
         {
           ;
         }

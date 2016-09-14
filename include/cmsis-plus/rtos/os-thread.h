@@ -438,6 +438,7 @@ namespace os
          * @cond ignore
          */
 
+        // The rule of five.
         stack (const stack&) = delete;
         stack (stack&&) = delete;
         stack&
@@ -646,6 +647,7 @@ namespace os
          * @cond ignore
          */
 
+        // The rule of five.
         context (const context&) = delete;
         context (context&&) = delete;
         context&
@@ -781,20 +783,13 @@ namespace os
         constexpr
         attributes ();
 
-        /**
-         * @cond ignore
-         */
-
+        // The rule of five.
         attributes (const attributes&) = default;
         attributes (attributes&&) = default;
         attributes&
         operator= (const attributes&) = default;
         attributes&
         operator= (attributes&&) = default;
-
-        /**
-         * @endcond
-         */
 
         /**
          * @brief Destruct the thread attributes object instance.
@@ -880,6 +875,7 @@ namespace os
          * @cond ignore
          */
 
+        // The rule of five.
         statistics (const statistics&) = delete;
         statistics (statistics&&) = delete;
         statistics&
@@ -1005,17 +1001,27 @@ namespace os
               const attributes& attr = initializer,
               const allocator_type& allocator = allocator_type ());
 
+    protected:
+
       /**
        * @cond ignore
        */
-    protected:
 
       // Internal constructors, used from templates.
       thread ();
       thread (const char* name);
 
+      /**
+       * @endcond
+       */
+
     public:
 
+      /**
+       * @cond ignore
+       */
+
+      // The rule of five.
       thread (const thread&) = delete;
       thread (thread&&) = delete;
       thread&
@@ -1706,6 +1712,7 @@ namespace os
          * @cond ignore
          */
 
+        // The rule of five.
         thread_allocated (const thread_allocated&) = delete;
         thread_allocated (thread_allocated&&) = delete;
         thread_allocated&
@@ -1757,7 +1764,7 @@ namespace os
      * @tparam N Size of statically allocated stack in bytes.
      */
     template<std::size_t N = port::stack::default_size_bytes>
-      class thread_static : public thread
+      class thread_inclusive : public thread
       {
       public:
 
@@ -1777,8 +1784,8 @@ namespace os
          * @param [in] args Pointer to thread function arguments.
          * @param [in] attr Reference to attributes.
          */
-        thread_static (func_t function, func_args_t args,
-                       const attributes& attr = initializer);
+        thread_inclusive (func_t function, func_args_t args,
+                          const attributes& attr = initializer);
 
         /**
          * @brief Construct a named thread object instance.
@@ -1787,19 +1794,20 @@ namespace os
          * @param [in] args Pointer to thread function arguments.
          * @param [in] attr Reference to attributes.
          */
-        thread_static (const char* name, func_t function, func_args_t args,
-                       const attributes& attr = initializer);
+        thread_inclusive (const char* name, func_t function, func_args_t args,
+                          const attributes& attr = initializer);
 
         /**
          * @cond ignore
          */
 
-        thread_static (const thread_static&) = delete;
-        thread_static (thread_static&&) = delete;
-        thread_static&
-        operator= (const thread_static&) = delete;
-        thread_static&
-        operator= (thread_static&&) = delete;
+        // The rule of five.
+        thread_inclusive (const thread_inclusive&) = delete;
+        thread_inclusive (thread_inclusive&&) = delete;
+        thread_inclusive&
+        operator= (const thread_inclusive&) = delete;
+        thread_inclusive&
+        operator= (thread_inclusive&&) = delete;
 
         /**
          * @endcond
@@ -1809,7 +1817,7 @@ namespace os
          * @brief Destruct the thread object instance.
          */
         virtual
-        ~thread_static ();
+        ~thread_inclusive ();
 
         /**
          * @}
@@ -2650,9 +2658,9 @@ namespace os
      */
     template<std::size_t N>
       inline
-      thread_static<N>::thread_static (func_t function, func_args_t args,
-                                       const attributes& attr) :
-          thread_static<N>
+      thread_inclusive<N>::thread_inclusive (func_t function, func_args_t args,
+                                             const attributes& attr) :
+          thread_inclusive<N>
             { nullptr, function, args, attr }
       {
         ;
@@ -2705,8 +2713,9 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     template<std::size_t N>
-      thread_static<N>::thread_static (const char* name, func_t function,
-                                       func_args_t args, const attributes& attr) :
+      thread_inclusive<N>::thread_inclusive (const char* name, func_t function,
+                                             func_args_t args,
+                                             const attributes& attr) :
           thread
             { name }
       {
@@ -2728,7 +2737,7 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     template<std::size_t N>
-      thread_static<N>::~thread_static ()
+      thread_inclusive<N>::~thread_inclusive ()
       {
 #if defined(OS_TRACE_RTOS_THREAD)
         trace::printf ("%s @%p %s\n", __func__, this, name ());

@@ -226,27 +226,28 @@ namespace os
         constexpr
         attributes ();
 
+      protected:
+
         /**
          * @cond ignore
          */
 
-      protected:
-
         constexpr
         attributes (type_t type);
 
+        /**
+         * @endcond
+         */
+
       public:
 
+        // The rule of five.
         attributes (const attributes&) = default;
         attributes (attributes&&) = default;
         attributes&
         operator= (const attributes&) = default;
         attributes&
         operator= (attributes&&) = default;
-
-        /**
-         * @endcond
-         */
 
         /**
          * @brief Destruct the mutex attributes object instance.
@@ -329,20 +330,13 @@ namespace os
         constexpr
         attributes_recursive ();
 
-        /**
-         * @cond ignore
-         */
-
+        // The rule of five.
         attributes_recursive (const attributes_recursive&) = default;
         attributes_recursive (attributes_recursive&&) = default;
         attributes_recursive&
         operator= (const attributes_recursive&) = default;
         attributes_recursive&
         operator= (attributes_recursive&&) = default;
-
-        /**
-         * @endcond
-         */
 
         /**
          * @brief Destruct the recursive mutex attributes object instance.
@@ -383,6 +377,7 @@ namespace os
        * @cond ignore
        */
 
+      // The rule of five.
       mutex (const mutex&) = delete;
       mutex (mutex&&) = delete;
       mutex&
@@ -740,6 +735,7 @@ namespace os
        * @cond ignore
        */
 
+      // The rule of five.
       mutex_recursive (const mutex_recursive&) = delete;
       mutex_recursive (mutex_recursive&&) = delete;
       mutex_recursive&
@@ -801,6 +797,10 @@ namespace os
       ;
     }
 
+    /**
+     * @cond ignore
+     */
+
     constexpr
     mutex::attributes::attributes (type_t type) :
         mx_type (type)
@@ -808,8 +808,11 @@ namespace os
       ;
     }
 
-    // ========================================================================
+    /**
+     * @endcond
+     */
 
+    // ========================================================================
     constexpr
     mutex::attributes_recursive::attributes_recursive () :
         attributes

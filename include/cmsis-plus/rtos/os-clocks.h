@@ -117,8 +117,17 @@ namespace os
        */
       clock (const char* name);
 
+      /**
+       * @endcond
+       */
+
     public:
 
+      /**
+       * @cond ignore
+       */
+
+      // The rule of five.
       clock (const clock&) = delete;
       clock (clock&&) = delete;
       clock&
@@ -324,8 +333,17 @@ namespace os
        */
       adjustable_clock (const char* name);
 
+      /**
+       * @endcond
+       */
+
     public:
 
+      /**
+       * @cond ignore
+       */
+
+      // The rule of five.
       adjustable_clock (const adjustable_clock&) = delete;
       adjustable_clock (adjustable_clock&&) = delete;
       adjustable_clock&
@@ -464,12 +482,15 @@ namespace os
       /**
        * @cond ignore
        */
+
+      // The rule of five.
       clock_systick (const clock_systick&) = delete;
       clock_systick (clock_systick&&) = delete;
       clock_systick&
       operator= (const clock_systick&) = delete;
       clock_systick&
       operator= (clock_systick&&) = delete;
+
       /**
        * @endcond
        */
@@ -591,12 +612,15 @@ namespace os
       /**
        * @cond ignore
        */
+
+      // The rule of five.
       clock_rtc (const clock_rtc&) = delete;
       clock_rtc (clock_rtc&&) = delete;
       clock_rtc&
       operator= (const clock_rtc&) = delete;
       clock_rtc&
       operator= (clock_rtc&&) = delete;
+
       /**
        * @endcond
        */
@@ -688,12 +712,15 @@ namespace os
       /**
        * @cond ignore
        */
+
+      // The rule of five.
       clock_highres (const clock_highres&) = delete;
       clock_highres (clock_highres&&) = delete;
       clock_highres&
       operator= (const clock_highres&) = delete;
       clock_highres&
       operator= (clock_highres&&) = delete;
+
       /**
        * @endcond
        */

@@ -192,6 +192,7 @@ namespace os
          * @cond ignore
          */
 
+        // The rule of five.
         critical_section (const critical_section&) = delete;
         critical_section (critical_section&&) = delete;
         critical_section&
@@ -263,6 +264,7 @@ namespace os
          * @cond ignore
          */
 
+        // The rule of five.
         uncritical_section (const uncritical_section&) = delete;
         uncritical_section (uncritical_section&&) = delete;
         uncritical_section&
@@ -335,6 +337,7 @@ namespace os
          * @cond ignore
          */
 
+        // The rule of five.
         lockable (const lockable&) = delete;
         lockable (lockable&&) = delete;
         lockable&
@@ -517,6 +520,7 @@ namespace os
          * @cond ignore
          */
 
+        // The rule of five.
         critical_section (const critical_section&) = delete;
         critical_section (critical_section&&) = delete;
         critical_section&
@@ -616,6 +620,7 @@ namespace os
          * @cond ignore
          */
 
+        // The rule of five.
         uncritical_section (const uncritical_section&) = delete;
         uncritical_section (uncritical_section&&) = delete;
         uncritical_section&
@@ -722,6 +727,7 @@ namespace os
          * @cond ignore
          */
 
+        // The rule of five.
         lockable (const lockable&) = delete;
         lockable (lockable&&) = delete;
         lockable&

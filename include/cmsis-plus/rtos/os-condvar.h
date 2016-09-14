@@ -76,20 +76,13 @@ namespace os
         constexpr
         attributes ();
 
-        /**
-         * @cond ignore
-         */
-
+        // The rule of five.
         attributes (const attributes&) = default;
         attributes (attributes&&) = default;
         attributes&
         operator= (const attributes&) = default;
         attributes&
         operator= (attributes&&) = default;
-
-        /**
-         * @endcond
-         */
 
         /**
          * @brief Destruct the condition variable attributes object instance.
@@ -163,6 +156,7 @@ namespace os
        * @cond ignore
        */
 
+      // The rule of five.
       condition_variable (const condition_variable&) = delete;
       condition_variable (condition_variable&&) = delete;
       condition_variable&

@@ -100,27 +100,28 @@ namespace os
         constexpr
         attributes ();
 
+      protected:
+
         /**
          * @cond ignore
          */
 
-      protected:
-
         constexpr
         attributes (count_t max_value, count_t initial_value = 0);
 
+        /**
+         * @endcond
+         */
+
       public:
 
+        // The rule of five.
         attributes (const attributes&) = default;
         attributes (attributes&&) = default;
         attributes&
         operator= (const attributes&) = default;
         attributes&
         operator= (attributes&&) = default;
-
-        /**
-         * @endcond
-         */
 
         /**
          * @brief Destruct the semaphore attributes object instance.
@@ -180,20 +181,13 @@ namespace os
         constexpr
         attributes_binary (count_t initial_value);
 
-        /**
-         * @cond ignore
-         */
-
+        // The rule of five.
         attributes_binary (const attributes_binary&) = default;
         attributes_binary (attributes_binary&&) = default;
         attributes_binary&
         operator= (const attributes_binary&) = default;
         attributes_binary&
         operator= (attributes_binary&&) = default;
-
-        /**
-         * @endcond
-         */
 
         /**
          * @brief Destruct the semaphore attributes object instance.
@@ -236,20 +230,13 @@ namespace os
         constexpr
         attributes_counting (count_t max_value, count_t initial_value);
 
-        /**
-         * @cond ignore
-         */
-
+        // The rule of five.
         attributes_counting (const attributes_counting&) = default;
         attributes_counting (attributes_counting&&) = default;
         attributes_counting&
         operator= (const attributes_counting&) = default;
         attributes_counting&
         operator= (attributes_counting&&) = default;
-
-        /**
-         * @endcond
-         */
 
         /**
          * @brief Destruct the semaphore attributes object instance.
@@ -281,18 +268,27 @@ namespace os
        */
       semaphore (const char* name, const attributes& attr = initializer_binary);
 
+    protected:
+
       /**
        * @cond ignore
        */
-
-    protected:
 
       semaphore (const char* name, const count_t max_value,
                  const count_t initial_value, const attributes& attr =
                      initializer_binary);
 
+      /**
+       * @endcond
+       */
+
     public:
 
+      /**
+       * @cond ignore
+       */
+
+      // The rule of five.
       semaphore (const semaphore&) = delete;
       semaphore (semaphore&&) = delete;
       semaphore&
@@ -540,6 +536,7 @@ namespace os
        * @cond ignore
        */
 
+      // The rule of five.
       semaphore_binary (const semaphore_binary&) = delete;
       semaphore_binary (semaphore_binary&&) = delete;
       semaphore_binary&
@@ -615,6 +612,7 @@ namespace os
        * @cond ignore
        */
 
+      // The rule of five.
       semaphore_counting (const semaphore_counting&) = delete;
       semaphore_counting (semaphore_counting&&) = delete;
       semaphore_counting&
@@ -675,6 +673,10 @@ namespace os
       ;
     }
 
+    /**
+     * @cond ignore
+     */
+
     constexpr
     semaphore::attributes::attributes (count_t max_value, count_t initial_value) :
         sm_max_value (max_value), //
@@ -683,8 +685,11 @@ namespace os
       ;
     }
 
-    // ========================================================================
+    /**
+     * @endcond
+     */
 
+    // ========================================================================
     constexpr
     semaphore::attributes_binary::attributes_binary (count_t initial_value) :
         attributes

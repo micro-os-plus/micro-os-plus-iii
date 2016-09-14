@@ -348,9 +348,9 @@ test_cpp_api (void)
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #endif
       // Statically allocated threads.
-      static thread_static<> sth1
+      static thread_inclusive<> sth1
         { func, nullptr };
-      static thread_static<> sth2
+      static thread_inclusive<> sth2
         { "sth2", func, nullptr };
 #pragma GCC diagnostic pop
 
@@ -545,12 +545,12 @@ test_cpp_api (void)
 
   // Define a custom queue type parametrised with the
   // message type and the queue size.
-  using My_static_queue = message_queue_static<my_msg_t, 4>;
+  using My_inclusive_queue = message_queue_inclusive<my_msg_t, 4>;
 
     {
       // The space for the queue is allocated inside the queue
       // object, in this case on the stack.
-      My_static_queue sq1;
+      My_inclusive_queue sq1;
 
       sq1.send (&msg_out);
       sq1.receive (&msg_in);
@@ -561,7 +561,7 @@ test_cpp_api (void)
       sq1.timed_send (&msg_out, 1);
       sq1.timed_receive (&msg_in, 1);
 
-      My_static_queue sq2
+      My_inclusive_queue sq2
         { "sq2" };
 
       sq2.send (&msg_out);
@@ -728,12 +728,12 @@ test_cpp_api (void)
 
   // Define a custom pool type parametrised with the
   // block type and the pool size.
-  using My_static_pool = memory_pool_static<my_blk_t, 4>;
+  using My_inclusive_pool = memory_pool_inclusive<my_blk_t, 4>;
 
     {
       // The space for the pool is allocated inside the pool
       // object, in this case on the stack.
-      My_static_pool sp1;
+      My_inclusive_pool sp1;
 
       blk = sp1.alloc ();
       sp1.free (blk);
@@ -744,7 +744,7 @@ test_cpp_api (void)
       blk = sp1.timed_alloc (1);
       sp1.free (blk);
 
-      My_static_pool sp2
+      My_inclusive_pool sp2
         { "sp2" };
 
       blk = sp2.alloc ();

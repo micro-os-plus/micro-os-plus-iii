@@ -275,13 +275,13 @@ namespace os
 
     // ------------------------------------------------------------------------
     /**
-     * @class message_queue_static
+     * @class message_queue_inclusive
      * @details
      * If the queue size is known at compile time and the queue is used
      * for the entire application life cycle, it might be preferred to allocate
      * the queue storage statically inside the queue instance.
      *
-     * For convenience, `message_queue_static` are also typed, so
+     * For convenience, `message_queue_inclusive` are also typed, so
      * the message size is handled automatically.
      *
      * @par Example
@@ -296,7 +296,7 @@ namespace os
      * constexpr uint32_t queue_size = 5;
      *
      * // The queue storage is allocated statically inside this instance.
-     * message_queue_static<msg_t, queue_size> mq;
+     * message_queue_inclusive<msg_t, queue_size> mq;
      *
      * void
      * consumer(void)

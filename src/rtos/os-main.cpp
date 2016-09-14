@@ -97,7 +97,7 @@ rtos::thread* os_main_thread;
 // Necessarily static, on Cortex-M the reset stack will be used
 // as MSP for the interrupts, so the current stack must be freed
 // and os_main() shall run on its own stack.
-using main_thread = rtos::thread_static<OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES>;
+using main_thread = rtos::thread_inclusive<OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES>;
 static std::aligned_storage<sizeof(main_thread), alignof(main_thread)>::type os_main_thread_;
 
 #endif /* defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS) */

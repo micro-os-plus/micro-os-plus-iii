@@ -50,7 +50,7 @@ thread* os_idle_thread;
 
 #if defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS)
 
-static thread_static<OS_INTEGER_RTOS_IDLE_STACK_SIZE_BYTES> os_idle_thread_
+static thread_inclusive<OS_INTEGER_RTOS_IDLE_STACK_SIZE_BYTES> os_idle_thread_
   { "idle", os_idle, nullptr};
 
 #else

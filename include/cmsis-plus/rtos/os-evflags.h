@@ -80,20 +80,13 @@ namespace os
         constexpr
         attributes ();
 
-        /**
-         * @cond ignore
-         */
-
+        // The rule of five.
         attributes (const attributes&) = default;
         attributes (attributes&&) = default;
         attributes&
         operator= (const attributes&) = default;
         attributes&
         operator= (attributes&&) = default;
-
-        /**
-         * @endcond
-         */
 
         /**
          * @brief Destruct the event flags attributes object instance.
@@ -148,6 +141,7 @@ namespace os
        * @cond ignore
        */
 
+      // The rule of five.
       event_flags (const event_flags&) = delete;
       event_flags (event_flags&&) = delete;
       event_flags&
