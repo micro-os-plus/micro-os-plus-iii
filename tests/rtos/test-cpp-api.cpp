@@ -191,7 +191,7 @@ test_cpp_api (void)
     }
 
     {
-      using my_pool = os::memory::block_pool_typed_inner<my_blk_t, 2>;
+      using my_pool = os::memory::block_pool_typed_inclusive<my_blk_t, 2>;
 
       // The arena is typed and included in the pool object.
       my_pool bp2

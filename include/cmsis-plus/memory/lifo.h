@@ -178,7 +178,7 @@ namespace os
      * The common use case it to define statically allocated memory managers.
      */
     template<std::size_t N>
-      class lifo_inner : public lifo
+      class lifo_inclusive : public lifo
       {
       public:
 
@@ -197,13 +197,13 @@ namespace os
          * @par Parameters
          *  None.
          */
-        lifo_inner (void);
+        lifo_inclusive (void);
 
         /**
          * @brief Construct a named memory resource object instance.
          * @param [in] name Pointer to name.
          */
-        lifo_inner (const char* name);
+        lifo_inclusive (const char* name);
 
       public:
 
@@ -212,12 +212,12 @@ namespace os
          */
 
         // The rule of five.
-        lifo_inner (const lifo_inner&) = delete;
-        lifo_inner (lifo_inner&&) = delete;
-        lifo_inner&
-        operator= (const lifo_inner&) = delete;
-        lifo_inner&
-        operator= (lifo_inner&&) = delete;
+        lifo_inclusive (const lifo_inclusive&) = delete;
+        lifo_inclusive (lifo_inclusive&&) = delete;
+        lifo_inclusive&
+        operator= (const lifo_inclusive&) = delete;
+        lifo_inclusive&
+        operator= (lifo_inclusive&&) = delete;
 
         /**
          * @endcond
@@ -227,7 +227,7 @@ namespace os
          * @brief Destruct the memory resource object instance.
          */
         virtual
-        ~lifo_inner ();
+        ~lifo_inclusive ();
 
         /**
          * @}
@@ -398,15 +398,15 @@ namespace os
 
     template<std::size_t N>
       inline
-      lifo_inner<N>::lifo_inner () :
-          lifo_inner (nullptr)
+      lifo_inclusive<N>::lifo_inclusive () :
+          lifo_inclusive (nullptr)
       {
         ;
       }
 
     template<std::size_t N>
       inline
-      lifo_inner<N>::lifo_inner (const char* name) :
+      lifo_inclusive<N>::lifo_inclusive (const char* name) :
           lifo
             { name }
       {
@@ -416,7 +416,7 @@ namespace os
       }
 
     template<std::size_t N>
-      lifo_inner<N>::~lifo_inner ()
+      lifo_inclusive<N>::~lifo_inclusive ()
       {
         trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
       }

@@ -251,7 +251,7 @@ namespace os
      * The common use case it to define statically allocated memory managers.
      */
     template<std::size_t N>
-      class first_fit_top_inner : public first_fit_top
+      class first_fit_top_inclusive : public first_fit_top
       {
       public:
 
@@ -270,13 +270,13 @@ namespace os
          * @par Parameters
          *  None.
          */
-        first_fit_top_inner (void);
+        first_fit_top_inclusive (void);
 
         /**
          * @brief Construct a named memory resource object instance.
          * @param [in] name Pointer to name.
          */
-        first_fit_top_inner (const char* name);
+        first_fit_top_inclusive (const char* name);
 
       public:
 
@@ -285,12 +285,12 @@ namespace os
          */
 
         // The rule of five.
-        first_fit_top_inner (const first_fit_top_inner&) = delete;
-        first_fit_top_inner (first_fit_top_inner&&) = delete;
-        first_fit_top_inner&
-        operator= (const first_fit_top_inner&) = delete;
-        first_fit_top_inner&
-        operator= (first_fit_top_inner&&) = delete;
+        first_fit_top_inclusive (const first_fit_top_inclusive&) = delete;
+        first_fit_top_inclusive (first_fit_top_inclusive&&) = delete;
+        first_fit_top_inclusive&
+        operator= (const first_fit_top_inclusive&) = delete;
+        first_fit_top_inclusive&
+        operator= (first_fit_top_inclusive&&) = delete;
 
         /**
          * @endcond
@@ -300,7 +300,7 @@ namespace os
          * @brief Destruct the memory resource object instance.
          */
         virtual
-        ~first_fit_top_inner ();
+        ~first_fit_top_inclusive ();
 
         /**
          * @}
@@ -483,15 +483,15 @@ namespace os
 
     template<std::size_t N>
       inline
-      first_fit_top_inner<N>::first_fit_top_inner () :
-          first_fit_top_inner (nullptr)
+      first_fit_top_inclusive<N>::first_fit_top_inclusive () :
+          first_fit_top_inclusive (nullptr)
       {
         ;
       }
 
     template<std::size_t N>
       inline
-      first_fit_top_inner<N>::first_fit_top_inner (const char* name) :
+      first_fit_top_inclusive<N>::first_fit_top_inclusive (const char* name) :
           first_fit_top
             { name }
       {
@@ -501,7 +501,7 @@ namespace os
       }
 
     template<std::size_t N>
-      first_fit_top_inner<N>::~first_fit_top_inner ()
+      first_fit_top_inclusive<N>::~first_fit_top_inclusive ()
       {
         trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
       }

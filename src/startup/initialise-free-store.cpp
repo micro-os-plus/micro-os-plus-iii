@@ -141,7 +141,7 @@ os_startup_initialize_free_store (void* heap_address,
       static_assert(OS_INTEGER_RTOS_ALLOC_THREAD_POOL_SIZE > 1,
           "Mutex pool size must be >1.");
       rtos::memory::memory_resource* mr =
-          new os::memory::block_pool_typed_inner<rtos::thread,
+          new os::memory::block_pool_typed_inclusive<rtos::thread,
               OS_INTEGER_RTOS_ALLOC_THREAD_POOL_SIZE> ("pool-th");
 
       // Configure the memory manager to throw an exception when out of memory.
@@ -158,7 +158,7 @@ os_startup_initialize_free_store (void* heap_address,
       static_assert(OS_INTEGER_RTOS_ALLOC_CONDITION_VARIABLE_POOL_SIZE > 1,
           "Mutex pool size must be >1.");
       rtos::memory::memory_resource* mr =
-          new os::memory::block_pool_typed_inner<rtos::condition_variable,
+          new os::memory::block_pool_typed_inclusive<rtos::condition_variable,
               OS_INTEGER_RTOS_ALLOC_CONDITION_VARIABLE_POOL_SIZE> ("pool-cv");
 
       // Configure the memory manager to throw an exception when out of memory.
@@ -175,7 +175,7 @@ os_startup_initialize_free_store (void* heap_address,
       static_assert(OS_INTEGER_RTOS_ALLOC_EVENT_FLAGS_POOL_SIZE > 1,
           "Mutex pool size must be >1.");
       rtos::memory::memory_resource* mr =
-          new os::memory::block_pool_typed_inner<rtos::event_flags,
+          new os::memory::block_pool_typed_inclusive<rtos::event_flags,
               OS_INTEGER_RTOS_ALLOC_EVENT_FLAGS_POOL_SIZE> ("pool-ef");
 
       // Configure the memory manager to throw an exception when out of memory.
@@ -192,7 +192,7 @@ os_startup_initialize_free_store (void* heap_address,
       static_assert(OS_INTEGER_RTOS_ALLOC_MEMORY_POOL_POOL_SIZE > 1,
           "Mutex pool size must be >1.");
       rtos::memory::memory_resource* mr =
-          new os::memory::block_pool_typed_inner<rtos::memory_pool,
+          new os::memory::block_pool_typed_inclusive<rtos::memory_pool,
               OS_INTEGER_RTOS_ALLOC_MEMORY_POOL_POOL_SIZE> ("pool-mp");
 
       // Configure the memory manager to throw an exception when out of memory.
@@ -209,7 +209,7 @@ os_startup_initialize_free_store (void* heap_address,
       static_assert(OS_INTEGER_RTOS_ALLOC_MESSAGE_QUEUE_POOL_SIZE > 1,
           "Mutex pool size must be >1.");
       rtos::memory::memory_resource* mr =
-          new os::memory::block_pool_typed_inner<rtos::message_queue,
+          new os::memory::block_pool_typed_inclusive<rtos::message_queue,
               OS_INTEGER_RTOS_ALLOC_MESSAGE_QUEUE_POOL_SIZE> ("pool-mq");
 
       // Configure the memory manager to throw an exception when out of memory.
@@ -226,7 +226,7 @@ os_startup_initialize_free_store (void* heap_address,
       static_assert(OS_INTEGER_RTOS_ALLOC_MUTEX_POOL_SIZE > 1,
           "Mutex pool size must be >1.");
       rtos::memory::memory_resource* mr =
-          new os::memory::block_pool_typed_inner<rtos::mutex,
+          new os::memory::block_pool_typed_inclusive<rtos::mutex,
               OS_INTEGER_RTOS_ALLOC_MUTEX_POOL_SIZE> ("pool-mx");
 
       // Configure the memory manager to throw an exception when out of memory.
@@ -243,7 +243,7 @@ os_startup_initialize_free_store (void* heap_address,
       static_assert(OS_INTEGER_RTOS_ALLOC_SEMAPHORE_POOL_SIZE > 1,
           "Semaphore pool size must be >1.");
       rtos::memory::memory_resource* mr =
-          new os::memory::block_pool_typed_inner<rtos::semaphore,
+          new os::memory::block_pool_typed_inclusive<rtos::semaphore,
               OS_INTEGER_RTOS_ALLOC_MUTEX_POOL_SIZE> ("pool-sp");
 
       // Configure the memory manager to throw an exception when out of memory.
@@ -260,7 +260,7 @@ os_startup_initialize_free_store (void* heap_address,
       static_assert(OS_INTEGER_RTOS_ALLOC_TIMER_POOL_SIZE > 1,
           "Mutex pool size must be >1.");
       rtos::memory::memory_resource* mr =
-          new os::memory::block_pool_typed_inner<rtos::timer,
+          new os::memory::block_pool_typed_inclusive<rtos::timer,
               OS_INTEGER_RTOS_ALLOC_TIMER_POOL_SIZE> ("pool-tm");
 
       // Configure the memory manager to throw an exception when out of memory.

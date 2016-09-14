@@ -252,7 +252,7 @@ namespace os
      * The common use case it to define statically allocated block pools.
      */
     template<typename T, std::size_t N>
-      class block_pool_typed_inner : public block_pool
+      class block_pool_typed_inclusive : public block_pool
       {
       public:
 
@@ -279,13 +279,13 @@ namespace os
          * @par Parameters
          *  None.
          */
-        block_pool_typed_inner (void);
+        block_pool_typed_inclusive (void);
 
         /**
          * @brief Construct a named memory resource object instance.
          * @param [in] name Pointer to name.
          */
-        block_pool_typed_inner (const char* name);
+        block_pool_typed_inclusive (const char* name);
 
       public:
 
@@ -294,12 +294,12 @@ namespace os
          */
 
         // The rule of five.
-        block_pool_typed_inner (const block_pool_typed_inner&) = delete;
-        block_pool_typed_inner (block_pool_typed_inner&&) = delete;
-        block_pool_typed_inner&
-        operator= (const block_pool_typed_inner&) = delete;
-        block_pool_typed_inner&
-        operator= (block_pool_typed_inner&&) = delete;
+        block_pool_typed_inclusive (const block_pool_typed_inclusive&) = delete;
+        block_pool_typed_inclusive (block_pool_typed_inclusive&&) = delete;
+        block_pool_typed_inclusive&
+        operator= (const block_pool_typed_inclusive&) = delete;
+        block_pool_typed_inclusive&
+        operator= (block_pool_typed_inclusive&&) = delete;
 
         /**
          * @endcond
@@ -309,7 +309,7 @@ namespace os
          * @brief Destruct the memory resource object instance.
          */
         virtual
-        ~block_pool_typed_inner ();
+        ~block_pool_typed_inclusive ();
 
         /**
          * @}
@@ -499,15 +499,16 @@ namespace os
 
     template<typename T, std::size_t N>
       inline
-      block_pool_typed_inner<T, N>::block_pool_typed_inner () :
-          block_pool_typed_inner (nullptr)
+      block_pool_typed_inclusive<T, N>::block_pool_typed_inclusive () :
+          block_pool_typed_inclusive (nullptr)
       {
         ;
       }
 
     template<typename T, std::size_t N>
       inline
-      block_pool_typed_inner<T, N>::block_pool_typed_inner (const char* name) :
+      block_pool_typed_inclusive<T, N>::block_pool_typed_inclusive (
+          const char* name) :
           block_pool
             { name }
       {
@@ -518,7 +519,7 @@ namespace os
       }
 
     template<typename T, std::size_t N>
-      block_pool_typed_inner<T, N>::~block_pool_typed_inner ()
+      block_pool_typed_inclusive<T, N>::~block_pool_typed_inclusive ()
       {
         trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
       }
