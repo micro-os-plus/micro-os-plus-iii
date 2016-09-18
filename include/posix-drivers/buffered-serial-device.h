@@ -58,7 +58,7 @@ namespace os
       public:
 
         Buffered_serial_device (const char* device_name,
-                                os::cmsis::driver::Serial* driver,
+                                os::driver::Serial* driver,
                                 os::dev::ByteCircularBuffer* rx_buf,
                                 os::dev::ByteCircularBuffer* tx_buf);
 
@@ -122,7 +122,7 @@ namespace os
       private:
 
         // Pointer to actual CMSIS-like serial driver (usart or usb cdc acm)
-        os::cmsis::driver::Serial* driver_;
+        os::driver::Serial* driver_;
 
         osSemaphoreId open_sem_; //
         osSemaphoreDef(open_sem_);
@@ -150,7 +150,7 @@ namespace os
     template<typename Cs_T>
       Buffered_serial_device<Cs_T>::Buffered_serial_device (
           const char* deviceName, //
-          os::cmsis::driver::Serial* driver,
+          os::driver::Serial* driver,
           os::dev::ByteCircularBuffer* rx_buf,
           os::dev::ByteCircularBuffer* tx_buf) :
           //
@@ -171,7 +171,7 @@ namespace os
         // Do not check the same for tx_buf, it may be null.
 
         driver_->register_callback (
-            reinterpret_cast<os::cmsis::driver::signal_event_t> (signal_event),
+            reinterpret_cast<os::driver::signal_event_t> (signal_event),
             this);
       }
 
@@ -213,7 +213,7 @@ namespace os
             if ((open_sem_ == nullptr) || (rx_sem_ == nullptr)
                 || (tx_sem_ == nullptr))
               {
-                result = os::cmsis::driver::ERROR;
+                result = os::driver::ERROR;
                 break;
               }
 
@@ -229,42 +229,42 @@ namespace os
             // Default configuration: 8 bits, no parity, 1 stop bit,
             // no flow control, 115200 bps.
             result = driver_->configure (
-                os::cmsis::driver::serial::MODE_ASYNCHRONOUS
-                    | os::cmsis::driver::serial::DATA_BITS_8
-                    | os::cmsis::driver::serial::PARITY_NONE
-                    | os::cmsis::driver::serial::STOP_BITS_1
-                    | os::cmsis::driver::serial::FLOW_CONTROL_NONE,
+                os::driver::serial::MODE_ASYNCHRONOUS
+                    | os::driver::serial::DATA_BITS_8
+                    | os::driver::serial::PARITY_NONE
+                    | os::driver::serial::STOP_BITS_1
+                    | os::driver::serial::FLOW_CONTROL_NONE,
                 115200);
-            // assert(result == os::cmsis::driver::RETURN_OK);
-            if (result != os::cmsis::driver::RETURN_OK)
+            // assert(result == os::driver::RETURN_OK);
+            if (result != os::driver::RETURN_OK)
               break;
 
             // Enable TX output.
             result = driver_->control (
-                os::cmsis::driver::serial::Control::enable_tx);
-            if (result != os::cmsis::driver::RETURN_OK)
+                os::driver::serial::Control::enable_tx);
+            if (result != os::driver::RETURN_OK)
               break;
 
             // Enable RX input.
             result = driver_->control (
-                os::cmsis::driver::serial::Control::enable_rx);
-            if (result != os::cmsis::driver::RETURN_OK)
+                os::driver::serial::Control::enable_rx);
+            if (result != os::driver::RETURN_OK)
               break;
 
           }
         while (false); // Actually NOT a loop, just a sequence of ifs!
 
-        if (result != os::cmsis::driver::RETURN_OK)
+        if (result != os::driver::RETURN_OK)
           {
             errno = EIO;
             return -1;
           }
 
-        os::cmsis::driver::serial::Capabilities capa;
+        os::driver::serial::Capabilities capa;
         capa = driver_->get_capabilities ();
         if (capa.dcd)
           {
-            os::cmsis::driver::serial::Modem_status status;
+            os::driver::serial::Modem_status status;
             for (;;)
               {
                   {
@@ -284,7 +284,7 @@ namespace os
         std::size_t nbyte = rx_buf_->getBackContiguousBuffer (&pbuf);
 
         result = driver_->receive (pbuf, nbyte);
-        if (result != os::cmsis::driver::RETURN_OK)
+        if (result != os::driver::RETURN_OK)
           {
             errno = EIO;
             return -1;
@@ -333,24 +333,24 @@ namespace os
           }
 
         // Abort pending reads.
-        os::cmsis::driver::return_t ret;
+        os::driver::return_t ret;
         ret = driver_->control (
-            os::cmsis::driver::serial::Control::abort_receive);
-        assert(ret == os::cmsis::driver::RETURN_OK);
+            os::driver::serial::Control::abort_receive);
+        assert(ret == os::driver::RETURN_OK);
 
         // Abort pending writes.
-        ret = driver_->control (os::cmsis::driver::serial::Control::abort_send);
-        assert(ret == os::cmsis::driver::RETURN_OK);
+        ret = driver_->control (os::driver::serial::Control::abort_send);
+        assert(ret == os::driver::RETURN_OK);
 
         // Disable transmitter and receiver.
-        ret = driver_->control (os::cmsis::driver::serial::Control::disable_tx);
-        assert(ret == os::cmsis::driver::RETURN_OK);
+        ret = driver_->control (os::driver::serial::Control::disable_tx);
+        assert(ret == os::driver::RETURN_OK);
 
-        ret = driver_->control (os::cmsis::driver::serial::Control::disable_rx);
-        assert(ret == os::cmsis::driver::RETURN_OK);
+        ret = driver_->control (os::driver::serial::Control::disable_rx);
+        assert(ret == os::driver::RETURN_OK);
         ret = driver_->control (
-            os::cmsis::driver::serial::Control::disable_break);
-        assert(ret == os::cmsis::driver::RETURN_OK);
+            os::driver::serial::Control::disable_break);
+        assert(ret == os::driver::RETURN_OK);
 
         osSemaphoreDelete (rx_sem_);
         rx_sem_ = nullptr;
@@ -418,7 +418,7 @@ namespace os
               }
             while (true)
               {
-                os::cmsis::driver::serial::Status status;
+                os::driver::serial::Status status;
                   {
                     Critical_section cs; // -----
 
@@ -440,7 +440,7 @@ namespace os
                     if (nb > 0)
                       {
                         if (driver_->send (pbuf, nb)
-                            != os::cmsis::driver::RETURN_OK)
+                            != os::driver::RETURN_OK)
                           {
                             errno = EIO;
                             return -1;
@@ -490,7 +490,7 @@ namespace os
           {
             // Do not use a transmit buffer, send directly from the user buffer.
             // Wait while transmitting.
-            os::cmsis::driver::serial::Status status;
+            os::driver::serial::Status status;
             for (;;)
               {
                 if (!is_connected_)
@@ -507,7 +507,7 @@ namespace os
                 osSemaphoreWait (tx_sem_, osWaitForever);
               }
 
-            if ((driver_->send (buf, nbyte)) == os::cmsis::driver::RETURN_OK)
+            if ((driver_->send (buf, nbyte)) == os::driver::RETURN_OK)
               {
                 for (;;)
                   {
@@ -576,9 +576,9 @@ namespace os
             return;
           }
         if ((event
-            & (os::cmsis::driver::serial::Event::receive_complete
-                | os::cmsis::driver::serial::Event::rx_framing_error
-                | os::cmsis::driver::serial::Event::rx_timeout)))
+            & (os::driver::serial::Event::receive_complete
+                | os::driver::serial::Event::rx_framing_error
+                | os::driver::serial::Event::rx_timeout)))
           {
             // TODO: process errors and timeouts
             std::size_t tmpCount = object->driver_->get_rx_count ();
@@ -587,7 +587,7 @@ namespace os
             std::size_t adjust = object->rx_buf_->advanceBack (count);
             assert(count == adjust);
 
-            if (event & os::cmsis::driver::serial::Event::receive_complete)
+            if (event & os::driver::serial::Event::receive_complete)
               {
                 uint8_t* pbuf;
                 std::size_t nbyte = object->rx_buf_->getBackContiguousBuffer (
@@ -605,7 +605,7 @@ namespace os
                 int32_t status;
                 status = object->driver_->receive (pbuf, nbyte);
                 // TODO: implement error processing.
-                assert(status == os::cmsis::driver::RETURN_OK);
+                assert(status == os::driver::RETURN_OK);
 
                 object->rx_count_ = 0;
               }
@@ -615,7 +615,7 @@ namespace os
                 osSemaphoreRelease (object->rx_sem_);
               }
           }
-        if (event & os::cmsis::driver::serial::Event::tx_complete)
+        if (event & os::driver::serial::Event::tx_complete)
           {
             if (object->tx_buf_ != nullptr)
               {
@@ -631,7 +631,7 @@ namespace os
                     int32_t status;
                     status = object->driver_->send (pbuf, nbyte);
                     // TODO: implement error processing
-                    assert(status == os::cmsis::driver::RETURN_OK);
+                    assert(status == os::driver::RETURN_OK);
                   }
                 else
                   {
@@ -649,9 +649,9 @@ namespace os
                 osSemaphoreRelease (object->tx_sem_);
               }
           }
-        if (event & os::cmsis::driver::serial::Event::dcd)
+        if (event & os::driver::serial::Event::dcd)
           {
-            os::cmsis::driver::serial::Modem_status status;
+            os::driver::serial::Modem_status status;
             status = object->driver_->get_modem_status ();
 
             bool is_dcd_active = status.is_dcd_active ();
@@ -670,11 +670,11 @@ namespace os
                 osSemaphoreRelease (object->tx_sem_);
               }
           }
-        if (event & os::cmsis::driver::serial::Event::cts)
+        if (event & os::driver::serial::Event::cts)
           {
             // TODO: add flow control
           }
-        if (event & os::cmsis::driver::serial::Event::dsr)
+        if (event & os::driver::serial::Event::dsr)
           {
             // TODO: add flow control
           }
