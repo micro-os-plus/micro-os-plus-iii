@@ -375,13 +375,6 @@ extern "C"
    */
   typedef uint8_t os_thread_prio_t;
 
-#if !defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE) && !defined(__cplusplus)
-  typedef struct
-    {
-      char dummy;
-    }os_thread_user_storage_t;
-#endif
-
   // --------------------------------------------------------------------------
 
   /**
@@ -600,7 +593,9 @@ extern "C"
     os_thread_prio_t prio_inherited;
     bool interrupted;
     os_internal_evflags_t event_flags;
+#if defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE)
     os_thread_user_storage_t user_storage; //
+#endif /* defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE) */
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) \
   || defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)

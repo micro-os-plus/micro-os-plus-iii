@@ -830,8 +830,14 @@ os_thread_get_state (os_thread_t* thread)
   return reinterpret_cast<os_thread_state_t> ((reinterpret_cast<rtos::thread&> (*thread)).state ());
 }
 
+#if defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE) || defined(__DOXYGEN__)
+
 /**
  * @details
+ *
+ * @note
+ *  Available only when `OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE`
+ *  is defined.
  *
  * @note Can be invoked from Interrupt Service Routines.
  *
@@ -844,6 +850,9 @@ os_thread_get_user_storage (os_thread_t* thread)
   assert(thread != nullptr);
   return (reinterpret_cast<rtos::thread&> (*thread)).user_storage ();
 }
+
+#endif /* defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE) */
+
 
 /**
  * @details

@@ -1090,23 +1090,6 @@ extern "C"
   int
   os_main (int argc, char* argv[]);
 
-#if !defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE)
-  /**
-   * @brief Default empty thread user storage.
-   *
-   * If the application requires to store some additional data
-   * to each thread, redefine this structure in the `<os-app-conf.h>`
-   * file.
-   *
-   * To get the address of the user storage associated with a
-   * given thread, use thread::user_storage().
-   */
-  typedef struct
-  {
-    char dummy;
-  } os_thread_user_storage_t;
-#endif
-
 /**
  * @endcond
  */

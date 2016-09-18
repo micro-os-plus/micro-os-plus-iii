@@ -1199,6 +1199,8 @@ namespace os
       void*
       function_args (void) const;
 
+#if defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE) || defined(__DOXYGEN__)
+
       /**
        * @brief Get the user storage.
        * @par Parameters
@@ -1207,6 +1209,8 @@ namespace os
        */
       os_thread_user_storage_t*
       user_storage (void);
+
+#endif /* defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE) */
 
       /**
        * @brief Raise thread event flags.
@@ -1632,7 +1636,9 @@ namespace os
 
       internal::event_flags event_flags_;
 
+#if defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE) || defined(__DOXYGEN__)
       os_thread_user_storage_t user_storage_;
+#endif /* defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE) */
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
 
@@ -2322,6 +2328,8 @@ namespace os
       return interrupted_;
     }
 
+#if defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE) || defined(__DOXYGEN__)
+
     /**
      * @details
      * The user storage is a custom structure defined in `<os-app-config.h>`,
@@ -2332,6 +2340,10 @@ namespace os
      * registers and FreeRTOS thread local storage, which proved useful
      * when implementing CMSIS+ over FreeRTOS.
      *
+     * @note
+     *  Available only when `OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE`
+     *  is defined.
+     *
      *
      * @note Can be invoked from Interrupt Service Routines.
      */
@@ -2340,6 +2352,8 @@ namespace os
     {
       return &user_storage_;
     }
+
+#endif /* defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE) */
 
 #if !defined(OS_USE_RTOS_PORT_SCHEDULER)
 

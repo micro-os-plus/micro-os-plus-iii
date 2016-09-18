@@ -594,6 +594,8 @@ extern "C"
   os_thread_state_t
   os_thread_get_state (os_thread_t* thread);
 
+#if defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE) || defined(__DOXYGEN__)
+
   /**
    * @brief Get the thread user storage.
    * @param [in] thread Pointer to thread object instance.
@@ -601,6 +603,8 @@ extern "C"
    */
   os_thread_user_storage_t*
   os_thread_get_user_storage (os_thread_t* thread);
+
+#endif /* defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE) */
 
   /**
    * @brief Get the thread context stack.
