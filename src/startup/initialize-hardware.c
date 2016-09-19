@@ -101,6 +101,8 @@ os_startup_initialize_hardware_early (void)
 #endif
 }
 
+// Temporarily disabled, to help identify missing application inits.
+#if 0 || defined(__DOXYGEN__)
 /**
  * @details
  * This is the default implementation for the second hardware
@@ -121,6 +123,7 @@ os_startup_initialize_hardware (void)
   // in the SystemCoreClock global RAM location.
   SystemCoreClockUpdate ();
 }
+#endif /* 0 || defined(__DOXYGEN__) */
 
 // ----------------------------------------------------------------------------
 
