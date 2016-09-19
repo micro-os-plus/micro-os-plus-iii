@@ -140,5 +140,8 @@ Changes, in reverse chronological order:
 - rename `memory_pool_static<>` -> `memory_pool_inclusive<>`
 - rename `message_queue_static<>` -> `message_queue_inclusive<>`
 
+#### Problematic incompatible changes
+
+Experience proved that one of the above changes was trickier than planned: the rename of the `os_startup_initialize_hardware()`, since without the renamed function the linker used the weak version of this function. To help developers, the weak definition was temporarily disabled, so if this function was not yet renamed in the application, the linker will complain. 
 
 ---
