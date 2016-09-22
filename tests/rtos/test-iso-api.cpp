@@ -128,8 +128,8 @@ test_iso_api (bool extra)
           th11.join ();
         }
 
-#if 0
-        // Sometimes triggers a user fault, thread termination should be fixed
+#if 1
+        // TODO: check thread termination; at a certain moment some user faults were triggered.
         {
           char c;
 
