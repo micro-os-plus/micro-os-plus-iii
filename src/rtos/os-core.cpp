@@ -182,7 +182,10 @@ namespace os
 
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
 
+#if !defined(OS_USE_RTOS_PORT_SCHEDULER)
         is_preemptive_ = OS_BOOL_RTOS_SCHEDULER_PREEMPTIVE;
+#endif /* defined(OS_USE_RTOS_PORT_SCHEDULER) */
+
         is_started_ = true;
 
         port::scheduler::start ();
@@ -201,6 +204,11 @@ namespace os
 #endif
         os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
+#if defined(OS_USE_RTOS_PORT_SCHEDULER)
+
+        return port::scheduler::preemptive(state);
+
+#else
         bool tmp;
 
           {
@@ -213,6 +221,7 @@ namespace os
           }
 
         return tmp;
+#endif
       }
 
       /**

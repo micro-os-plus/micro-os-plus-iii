@@ -754,8 +754,13 @@ namespace os
           owner_dead_ = true;
           consistent_ = false;
 
+#if !defined(OS_USE_RTOS_PORT_MUTEX)
+
           // Actually delayed until end of critical section.
           list_.resume_one ();
+
+#endif
+
         }
     }
 

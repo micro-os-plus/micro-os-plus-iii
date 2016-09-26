@@ -843,7 +843,11 @@ namespace os
       inline bool
       preemptive (void)
       {
+#if !defined(OS_USE_RTOS_PORT_SCHEDULER)
         return is_preemptive_;
+#else
+        return port::scheduler::preemptive();
+#endif
       }
 
       /**

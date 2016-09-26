@@ -719,7 +719,7 @@ namespace os
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
       // The port must perform a context switch.
-      res = port::thread::priority_inherited (this, prio);
+      res = port::thread::priority (this, prio);
 
 #else
 

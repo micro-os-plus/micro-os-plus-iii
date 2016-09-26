@@ -930,6 +930,12 @@ namespace os
         void
         _wait_for_interrupt (void);
 
+        bool
+        preemptive (void);
+
+        bool
+        preemptive (bool);
+
       } /* namespace scheduler */
 
       // ----------------------------------------------------------------------

@@ -543,6 +543,7 @@ namespace os
 
 #if defined(OS_USE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
 
+#if 0
       /**
        * @brief Internal wait.
        * @param timestamp
@@ -554,6 +555,7 @@ namespace os
        */
       virtual result_t
       internal_wait_until_ (timestamp_t timestamp, clock_timestamps_list& list);
+#endif
 
 #endif
 

@@ -158,7 +158,11 @@ namespace os
      */
 
     semaphore::semaphore (const char* name, const count_t max_value,
-                          const count_t initial_value, const attributes& attr) :
+                          const count_t initial_value, const attributes& attr
+#if defined(OS_USE_RTOS_PORT_SEMAPHORE)
+                          __attribute__((unused))
+#endif
+                          ) :
         object_named_system
           { name }, //
         max_value_ (max_value), //
