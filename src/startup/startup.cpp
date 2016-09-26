@@ -29,8 +29,11 @@
 
 // ----------------------------------------------------------------------------
 
-#include <cmsis-plus/os-app-config.h>
-#include <cmsis-plus/rtos/os-hooks.h>
+#include <cmsis-plus/rtos/os.h>
+
+//#include <cmsis-plus/os-app-config.h>
+//#include <cmsis-plus/rtos/port/os-c-decls.h>
+//#include <cmsis-plus/rtos/os-hooks.h>
 
 #include <cmsis-plus/diag/trace.h>
 
@@ -99,15 +102,18 @@ extern unsigned int __bss_regions_array_end;
 #endif
 
 extern unsigned int _Heap_Begin;
-extern unsigned int _Heap_Limit;
+extern unsigned long int _Heap_Limit;
+extern unsigned long int __stack;
 
-extern int
+extern "C" int
 main (int argc, char* argv[]);
 
 // ----------------------------------------------------------------------------
 
 // Forward declarations
 
+extern "C"
+{
 void
 _start (void);
 
@@ -124,6 +130,7 @@ os_run_init_array (void);
 // Not static since it is called from exit()
 void
 os_run_fini_array (void);
+}
 
 // ----------------------------------------------------------------------------
 
@@ -367,6 +374,10 @@ _start (void)
   // Call the standard library initialisation (mandatory for C++ to
   // execute the constructors for the static objects).
   os_run_init_array ();
+
+#if defined(OS_HAS_INTERRUPTS_STACK)
+  os::rtos::interrupts::stack ()->set(&_Heap_Limit,  (size_t) ((char*) (&__stack) - (char*) (&_Heap_Limit)));
+#endif /* defined(OS_HAS_INTERRUPTS_STACK) */
 
   // Call the main entry point, and save the exit code.
   int code = main (argc, argv);
