@@ -421,11 +421,16 @@ _realloc_r (struct _reent* impure __attribute__((unused)), void* ptr,
  * @cond ignore
  */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
 struct mallinfo
 _mallinfo_r (struct _reent* impure __attribute__((unused)))
 {
   abort ();
 }
+
+#pragma GCC diagnostic pop
 
 void
 _malloc_stats_r (struct _reent* impure __attribute__((unused)))
