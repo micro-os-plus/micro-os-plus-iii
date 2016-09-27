@@ -166,6 +166,8 @@ __attribute__ ((noreturn,weak))
 os_terminate(int code __attribute__((unused)))
   {
     NVIC_SystemReset ();
+    while(1)
+      ;
     /* NOTREACHED */
   }
 
