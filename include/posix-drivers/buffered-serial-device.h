@@ -205,10 +205,10 @@ namespace os
 
         do
           {
-            // Start disabled, the first wait will block.
-            open_sem_ = osSemaphoreCreate (osSemaphore(open_sem_), 0);
-            rx_sem_ = osSemaphoreCreate (osSemaphore(rx_sem_), 0);
-            tx_sem_ = osSemaphoreCreate (osSemaphore(tx_sem_), 0);
+            // cmsis_os semaphores cannot start with 0.
+            open_sem_ = osSemaphoreCreate (osSemaphore(open_sem_), 1);
+            rx_sem_ = osSemaphoreCreate (osSemaphore(rx_sem_), 1);
+            tx_sem_ = osSemaphoreCreate (osSemaphore(tx_sem_), 1);
 
             if ((open_sem_ == nullptr) || (rx_sem_ == nullptr)
                 || (tx_sem_ == nullptr))
@@ -216,6 +216,12 @@ namespace os
                 result = os::driver::ERROR;
                 break;
               }
+
+            // Consume the artificial value of 1, after this
+            // the next wait will block.
+            osSemaphoreWait(open_sem_, 0);
+            osSemaphoreWait(rx_sem_, 0);
+            osSemaphoreWait(tx_sem_, 0);
 
             // Clear buffers.
             rx_buf_->clear ();
@@ -570,6 +576,7 @@ namespace os
       Buffered_serial_device<Cs_T>::signal_event (
           Buffered_serial_device* object, uint32_t event)
       {
+        trace::printf("%s(%d)\n", __func__, event);
         if (object->rx_sem_ == nullptr)
           {
             // After close(), ignore interrupts.
