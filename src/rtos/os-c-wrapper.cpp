@@ -490,9 +490,9 @@ os_irq_uncritical_exit (os_irq_state_t state)
 
 os_thread_stack_t*
 os_irq_get_stack (void)
-{
-  return reinterpret_cast<os_thread_stack_t*> (rtos::interrupts::stack ());
-}
+  {
+    return reinterpret_cast<os_thread_stack_t*> (rtos::interrupts::stack ());
+  }
 
 #endif
 
@@ -846,13 +846,12 @@ os_thread_get_state (os_thread_t* thread)
  */
 os_thread_user_storage_t*
 os_thread_get_user_storage (os_thread_t* thread)
-{
-  assert(thread != nullptr);
-  return (reinterpret_cast<rtos::thread&> (*thread)).user_storage ();
-}
+  {
+    assert(thread != nullptr);
+    return (reinterpret_cast<rtos::thread&> (*thread)).user_storage ();
+  }
 
 #endif /* defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE) */
-
 
 /**
  * @details
@@ -3903,9 +3902,11 @@ osTimerCreate (const osTimerDef_t* timer_def, os_timer_type type, void* args)
   timer::attributes attr;
   attr.tm_type = (timer::type_t) type;
 
-  return reinterpret_cast<osTimerId> (new ((void*) timer_def->data) timer (
-      timer_def->name, (timer::func_t) timer_def->ptimer,
-      (timer::func_args_t) args, attr));
+  new ((void*) timer_def->data) timer (timer_def->name,
+                                       (timer::func_t) timer_def->ptimer,
+                                       (timer::func_args_t) args, attr);
+
+  return reinterpret_cast<osTimerId> (timer_def->data);
 }
 
 /**
@@ -4172,8 +4173,9 @@ osMutexCreate (const osMutexDef_t* mutex_def)
   attr.mx_type = mutex::type::recursive;
   attr.mx_protocol = mutex::protocol::inherit;
 
-  return reinterpret_cast<osMutexId> (new ((void*) mutex_def->data) mutex (
-      mutex_def->name, attr));
+  new ((void*) mutex_def->data) mutex (mutex_def->name, attr);
+
+  return reinterpret_cast<osMutexId> (mutex_def->data);
 }
 
 /**
@@ -4356,8 +4358,9 @@ osSemaphoreCreate (const osSemaphoreDef_t* semaphore_def, int32_t count)
   attr.sm_max_value = (semaphore::count_t) (
       count == 0 ? osFeature_Semaphore : count);
 
-  return reinterpret_cast<osSemaphoreId> (new ((void*) semaphore_def->data) semaphore (
-      semaphore_def->name, attr));
+  new ((void*) semaphore_def->data) semaphore (semaphore_def->name, attr);
+
+  return reinterpret_cast<osSemaphoreId> (semaphore_def->data);
 }
 
 /**
@@ -4522,9 +4525,13 @@ osPoolCreate (const osPoolDef_t* pool_def)
   memory_pool::attributes attr;
   attr.mp_pool_address = pool_def->pool;
   attr.mp_pool_size_bytes = pool_def->pool_sz;
-  return reinterpret_cast<osPoolId> (new ((void*) pool_def->data) memory_pool (
-      pool_def->name, (std::size_t) pool_def->items,
-      (std::size_t) pool_def->item_sz, attr));
+
+  new ((void*) pool_def->data) memory_pool (pool_def->name,
+                                            (std::size_t) pool_def->items,
+                                            (std::size_t) pool_def->item_sz,
+                                            attr);
+
+  return reinterpret_cast<osPoolId> (pool_def->data);
 }
 
 /**
@@ -4636,9 +4643,12 @@ osMessageCreate (const osMessageQDef_t* queue_def,
   attr.mq_queue_address = queue_def->queue;
   attr.mq_queue_size_bytes = queue_def->queue_sz;
 
-  return reinterpret_cast<osMessageQId> (new ((void*) queue_def->data) message_queue (
-      queue_def->name, (std::size_t) queue_def->items,
-      (std::size_t) queue_def->item_sz, attr));
+  new ((void*) queue_def->data) message_queue (queue_def->name,
+                                               (std::size_t) queue_def->items,
+                                               (std::size_t) queue_def->item_sz,
+                                               attr);
+
+  return reinterpret_cast<osMessageQId> (queue_def->data);
 }
 
 /**
