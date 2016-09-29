@@ -541,9 +541,8 @@ namespace os
        * @cond ignore
        */
 
-#if defined(OS_USE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
+#if defined(OS_USE_RTOS_PORT_CLOCK_SYSTICK_WAIT_FOR)
 
-#if 0
       /**
        * @brief Internal wait.
        * @param timestamp
@@ -554,10 +553,9 @@ namespace os
        * @retval EINTR The sleep was interrupted.
        */
       virtual result_t
-      internal_wait_until_ (timestamp_t timestamp, clock_timestamps_list& list);
-#endif
+      internal_wait_until_ (timestamp_t timestamp, internal::clock_timestamps_list& list);
 
-#endif
+#endif /* defined(OS_USE_RTOS_PORT_CLOCK_SYSTICK_WAIT_FOR) */
 
       /**
        * @endcond
@@ -662,7 +660,7 @@ namespace os
        * @cond ignore
        */
 
-#if defined(OS_USE_RTOS_PORT_REALTIME_CLOCK_SLEEP_FOR)
+#if defined(OS_USE_RTOS_PORT_CLOCK_REALTIME_WAIT_FOR)
 
       /**
        * @brief Internal wait.

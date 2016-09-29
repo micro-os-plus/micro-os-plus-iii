@@ -649,12 +649,12 @@
 /**
  * @brief Use a custom system tick sleep_for() implementation.
  */
-#define OS_USE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR
+#define OS_USE_RTOS_PORT_CLOCK_SYSTICK_WAIT_FOR
 
 /**
  * @brief Use a custom real time sleep_for() implementation.
  */
-#define OS_USE_RTOS_PORT_REALTIME_CLOCK_SLEEP_FOR
+#define OS_USE_RTOS_PORT_CLOCK_REALTIME_WAIT_FOR
 
 /**
  * @brief Use a custom timer implementation.

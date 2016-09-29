@@ -559,12 +559,11 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-#if defined(OS_USE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR)
+#if defined(OS_USE_RTOS_PORT_CLOCK_SYSTICK_WAIT_FOR)
 
-#if 0
     result_t
     clock_systick::internal_wait_until_ (timestamp_t timestamp,
-        clock_timestamps_list& list __attribute__((unused)))
+        internal::clock_timestamps_list& list __attribute__((unused)))
       {
         result_t res;
 
@@ -577,9 +576,8 @@ namespace os
         res = port::clock_systick::wait_for (ticks);
         return res;
       }
-#endif
 
-#endif
+#endif /* defined(OS_USE_RTOS_PORT_CLOCK_SYSTICK_WAIT_FOR) */
 
     // ========================================================================
 
