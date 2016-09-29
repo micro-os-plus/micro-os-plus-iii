@@ -57,8 +57,8 @@ namespace
   using _func_args_t = void*;
 }
 
-void*
-os_idle (_func_args_t args);
+void
+os_rtos_idle_actions (void);
 
 /**
  * @endcond
@@ -1334,8 +1334,8 @@ namespace os
       friend port::stack::element_t*
       port::scheduler::switch_stacks (port::stack::element_t* sp);
 
-      friend void*
-      ::os_idle (func_args_t args);
+      friend void
+      ::os_rtos_idle_actions (void);
 
       friend class internal::ready_threads_list;
       friend class internal::thread_children_list;
@@ -2349,9 +2349,9 @@ namespace os
      */
     inline os_thread_user_storage_t*
     thread::user_storage (void)
-    {
-      return &user_storage_;
-    }
+      {
+        return &user_storage_;
+      }
 
 #endif /* defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE) */
 

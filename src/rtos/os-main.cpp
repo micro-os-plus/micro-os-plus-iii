@@ -164,7 +164,9 @@ main (int argc, char* argv[])
 
 #endif /* defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS) */
 
+#if !defined(OS_USE_RTOS_PORT_SCHEDULER)
   os_startup_create_thread_idle ();
+#endif /* !defined(OS_USE_RTOS_PORT_SCHEDULER) */
 
   // Execution will proceed to first registered thread, possibly
   // "idle", which will immediately lower its priority,
