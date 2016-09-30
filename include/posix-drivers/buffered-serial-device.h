@@ -576,7 +576,6 @@ namespace os
       Buffered_serial_device<Cs_T>::signal_event (
           Buffered_serial_device* object, uint32_t event)
       {
-        trace::printf("%s(%d)\n", __func__, event);
         if (object->rx_sem_ == nullptr)
           {
             // After close(), ignore interrupts.
