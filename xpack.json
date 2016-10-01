@@ -30,7 +30,7 @@
 		}
 	],
 
-	"license": "LGPL-3.0",
+	"license": "MIT",
 	"maintainers": [
 		{
 			"name": "Liviu Ionescu",

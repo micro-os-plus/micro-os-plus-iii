@@ -3,17 +3,26 @@
  *   (https://github.com/micro-os-plus)
  * Copyright (c) 2015 Liviu Ionescu.
  *
- * µOS++ is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation, version 3.
+ * Permission is hereby granted, free of charge, to any person
+ * obtaining a copy of this software and associated documentation
+ * files (the "Software"), to deal in the Software without
+ * restriction, including without limitation the rights to use,
+ * copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom
+ * the Software is furnished to do so, subject to the following
+ * conditions:
  *
- * µOS++ is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * The above copyright notice and this permission notice shall be
+ * included in all copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ * OTHER DEALINGS IN THE SOFTWARE.
  */
 
 #ifndef POSIX_DRIVERS_BUFFERED_SERIAL_DEVICE_H_
@@ -21,18 +30,11 @@
 
 // ----------------------------------------------------------------------------
 
+#include <cmsis-plus/rtos/os.h>
+
 #include <posix-io/CharDevice.h>
 #include <posix-drivers/ByteCircularBuffer.h>
 #include <cmsis-plus/drivers/serial.h>
-
-#include <cmsis-plus/diag/trace.h>
-
-#include <cmsis_os.h>
-
-#include <cstdarg>
-#include <cstdlib>
-#include <cerrno>
-#include <cassert>
 
 // ----------------------------------------------------------------------------
 
@@ -122,23 +124,19 @@ namespace os
       private:
 
         // Pointer to actual CMSIS-like serial driver (usart or usb cdc acm)
-        os::driver::Serial* driver_;
+        os::driver::Serial* driver_ = nullptr;
 
-        osSemaphoreId open_sem_; //
-        osSemaphoreDef(open_sem_);
+        os::rtos::semaphore_binary open_sem_ { "open", 0 };
+        os::rtos::semaphore_binary rx_sem_  { "rx", 0 };
+        os::rtos::semaphore_binary tx_sem_ { "tx", 0 };
 
-        osSemaphoreId rx_sem_; //
-        osSemaphoreDef(rx_sem_);
+        os::dev::ByteCircularBuffer* rx_buf_ = nullptr;
+        os::dev::ByteCircularBuffer* tx_buf_ = nullptr;
 
-        osSemaphoreId tx_sem_; //
-        osSemaphoreDef(tx_sem_);
-
-        os::dev::ByteCircularBuffer* rx_buf_;
-        os::dev::ByteCircularBuffer* tx_buf_;
-
-        std::size_t rx_count_; //
-        bool volatile tx_busy_;
-        bool volatile is_connected_;
+        std::size_t rx_count_ = 0; //
+        bool volatile tx_busy_ = false;
+        bool volatile is_connected_ = false;
+        bool volatile is_opened_ = false;
         // Padding!
 
       };
@@ -155,16 +153,9 @@ namespace os
           os::dev::ByteCircularBuffer* tx_buf) :
           //
           CharDevice (deviceName), // Construct parent.
-          //
           driver_ (driver), //
-          open_sem_ (nullptr), //
-          rx_sem_ (nullptr), //
-          tx_sem_ (nullptr), //
           rx_buf_ (rx_buf), //
-          tx_buf_ (tx_buf), //
-          rx_count_ (0), //
-          tx_busy_ (false), //
-          is_connected_ (false)
+          tx_buf_ (tx_buf) //
       {
         assert(rx_buf != nullptr);
 
@@ -179,10 +170,8 @@ namespace os
       Buffered_serial_device<Cs_T>::~Buffered_serial_device ()
       {
         driver_ = nullptr;
-
-        open_sem_ = nullptr;
-        rx_sem_ = nullptr;
-        tx_sem_ = nullptr;
+        is_connected_ = false;
+        is_opened_ = false;
       }
 
     // ------------------------------------------------------------------------
@@ -195,7 +184,7 @@ namespace os
       Buffered_serial_device<Cs_T>::do_vopen (const char* path, int oflag,
                                               std::va_list args)
       {
-        if (open_sem_ != nullptr)
+        if (is_opened_)
           {
             errno = EEXIST; // Already opened
             return -1;
@@ -205,23 +194,12 @@ namespace os
 
         do
           {
-            // cmsis_os semaphores cannot start with 0.
-            open_sem_ = osSemaphoreCreate (osSemaphore(open_sem_), 1);
-            rx_sem_ = osSemaphoreCreate (osSemaphore(rx_sem_), 1);
-            tx_sem_ = osSemaphoreCreate (osSemaphore(tx_sem_), 1);
+            // Reset semaphores, in case we come here after close.
+            open_sem_.reset();
+            rx_sem_.reset();
+            tx_sem_.reset();
 
-            if ((open_sem_ == nullptr) || (rx_sem_ == nullptr)
-                || (tx_sem_ == nullptr))
-              {
-                result = os::driver::ERROR;
-                break;
-              }
-
-            // Consume the artificial value of 1, after this
-            // the next wait will block.
-            osSemaphoreWait(open_sem_, 0);
-            osSemaphoreWait(rx_sem_, 0);
-            osSemaphoreWait(tx_sem_, 0);
+            is_opened_ = true;
 
             // Clear buffers.
             rx_buf_->clear ();
@@ -282,7 +260,7 @@ namespace os
                   {
                     break;
                   }
-                osSemaphoreWait (open_sem_, osWaitForever);
+                open_sem_.wait();
               }
           }
 
@@ -306,7 +284,7 @@ namespace os
       bool
       Buffered_serial_device<Cs_T>::do_is_opened (void)
       {
-        return (open_sem_ != nullptr);
+        return is_opened_;
       }
 
     template<typename Cs_T>
@@ -333,7 +311,7 @@ namespace os
                       {
                         break;
                       }
-                    osSemaphoreWait (tx_sem_, osWaitForever);
+                    tx_sem_.wait();
                   }
               }
           }
@@ -358,15 +336,7 @@ namespace os
             os::driver::serial::Control::disable_break);
         assert(ret == os::driver::RETURN_OK);
 
-        osSemaphoreDelete (rx_sem_);
-        rx_sem_ = nullptr;
-
-        osSemaphoreDelete (tx_sem_);
-        tx_sem_ = nullptr;
-
-        osSemaphoreDelete (open_sem_);
-        open_sem_ = nullptr;
-
+        is_opened_ = false;
         is_connected_ = false;
 
         // Return POSIX idea of OK.
@@ -398,7 +368,7 @@ namespace os
                 return -1;
               }
             // Block and wait for bytes to arrive.
-            osSemaphoreWait (rx_sem_, osWaitForever);
+            rx_sem_.wait();
           }
       }
 
@@ -477,7 +447,7 @@ namespace os
                   }
 
                 // Block and wait for buffer to be freed.
-                osSemaphoreWait (tx_sem_, osWaitForever);
+                tx_sem_.wait();
 
                 if (count < nbyte)
                   {
@@ -510,7 +480,7 @@ namespace os
                   {
                     break;
                   }
-                osSemaphoreWait (tx_sem_, osWaitForever);
+                tx_sem_.wait();
               }
 
             if ((driver_->send (buf, nbyte)) == os::driver::RETURN_OK)
@@ -528,7 +498,7 @@ namespace os
                       {
                         break;
                       }
-                    osSemaphoreWait (tx_sem_, osWaitForever);
+                     tx_sem_.wait();
                   }
                 count = driver_->get_tx_count ();
               }
@@ -576,7 +546,7 @@ namespace os
       Buffered_serial_device<Cs_T>::signal_event (
           Buffered_serial_device* object, uint32_t event)
       {
-        if (object->rx_sem_ == nullptr)
+        if (!object->is_opened_)
           {
             // After close(), ignore interrupts.
             return;
@@ -618,7 +588,7 @@ namespace os
             if (count > 0)
               {
                 // Immediately wake up, do not wait to reach any water mark.
-                osSemaphoreRelease (object->rx_sem_);
+                object->rx_sem_.post();
               }
           }
         if (event & os::driver::serial::Event::tx_complete)
@@ -646,13 +616,13 @@ namespace os
                 if (object->tx_buf_->isBelowLowWaterMark ())
                   {
                     // Wake up thread, to come and send more bytes.
-                    osSemaphoreRelease (object->tx_sem_);
+                    object->tx_sem_.post();
                   }
               }
             else
               {
                 // No buffer, wake up the thread to return from write().
-                osSemaphoreRelease (object->tx_sem_);
+                object->tx_sem_.post();
               }
           }
         if (event & os::driver::serial::Event::dcd)
@@ -665,15 +635,15 @@ namespace os
             if (is_dcd_active)
               {
                 // Connected, wake-up open().
-                osSemaphoreRelease (object->open_sem_);
+                object->open_sem_.post();
               }
             else
               {
                 // Disconnected, cancel read.
-                osSemaphoreRelease (object->rx_sem_);
+                object->rx_sem_.post();
 
                 // Cancel write.
-                osSemaphoreRelease (object->tx_sem_);
+                object->tx_sem_.post();
               }
           }
         if (event & os::driver::serial::Event::cts)
