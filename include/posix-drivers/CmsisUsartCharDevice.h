@@ -30,7 +30,7 @@
 
 // ----------------------------------------------------------------------------
 
-#include "posix-io/CharDevice.h"
+#include <cmsis-plus/posix-io/CharDevice.h>
 
 #include "cmsis_os.h"
 
