@@ -9,15 +9,23 @@
 		"xpack",
 		"xcdl"
 	],
+
 	"author": "Liviu Ionescu <ilg@livius.net>",
 	"homepage": "https://github.com/micro-os-plus/posix-io",
-	"repository": {
+	"repository": 
+	{
 		"type": "git",
 		"url": "https://github.com/micro-os-plus/posix-io.git"
 	},
-	"bugs": {
+
+	"bugs": 
+	{
 		"url": "https://github.com/micro-os-plus/posix-io/issues"
 	},
-	"license": "LGPL-3.0",
-	"dependencies": {}
+
+	"license": "MIT",
+	"dependencies": 
+	{
+		
+	}
 }
