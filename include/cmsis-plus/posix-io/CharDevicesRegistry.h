@@ -28,9 +28,9 @@
 #ifndef CMSIS_PLUS_POSIX_IO_CHAR_DEVICES_REGISTRY_H_
 #define CMSIS_PLUS_POSIX_IO_CHAR_DEVICES_REGISTRY_H_
 
-// ----------------------------------------------------------------------------
-
 #if defined(__cplusplus)
+
+// ----------------------------------------------------------------------------
 
 #include <cstddef>
 #include <cassert>
@@ -93,7 +93,7 @@ namespace os
     inline CharDevice*
     CharDevicesRegistry::getDevice (std::size_t index)
     {
-      assert(index < sfSize);
+      assert (index < sfSize);
       return sfRegistryArray[index];
     }
 

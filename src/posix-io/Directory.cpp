@@ -92,7 +92,7 @@ namespace os
     struct dirent*
     Directory::read (void)
     {
-      assert(fFileSystem != nullptr);
+      assert (fFileSystem != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -102,7 +102,7 @@ namespace os
     void
     Directory::rewind (void)
     {
-      assert(fFileSystem != nullptr);
+      assert (fFileSystem != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -112,7 +112,7 @@ namespace os
     int
     Directory::close (void)
     {
-      assert(fFileSystem != nullptr);
+      assert (fFileSystem != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.

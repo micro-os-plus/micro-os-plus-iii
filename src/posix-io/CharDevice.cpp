@@ -57,9 +57,9 @@ namespace os
     {
       // Forward to the variadic version of the function.
       std::va_list args;
-      va_start(args, request);
+      va_start (args, request);
       int ret = vioctl (request, args);
-      va_end(args);
+      va_end (args);
 
       return ret;
     }
@@ -78,8 +78,8 @@ namespace os
     bool
     CharDevice::matchName (const char* name) const
     {
-      assert(name != nullptr);
-      assert(fName != nullptr);
+      assert (name != nullptr);
+      assert (fName != nullptr);
 
       return (std::strcmp (name, fName) == 0);
     }

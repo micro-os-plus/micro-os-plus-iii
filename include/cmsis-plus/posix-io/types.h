@@ -264,7 +264,7 @@ extern "C"
   __posix_symlink (const char* existing, const char* _new);
 
   int __attribute__((weak))
-  __posix_system(const char *command);
+  __posix_system (const char *command);
 
   clock_t __attribute__((weak))
   __posix_times (struct tms* buf);

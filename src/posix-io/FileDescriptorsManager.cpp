@@ -48,7 +48,7 @@ namespace os
 
     FileDescriptorsManager::FileDescriptorsManager (std::size_t size)
     {
-      assert(size > 3);
+      assert (size > 3);
 
       sfSize = size;
       sfDescriptorsArray = new IO*[size];
@@ -105,8 +105,8 @@ namespace os
           if (sfDescriptorsArray[i] == nullptr)
             {
               sfDescriptorsArray[i] = io;
-              io->setFileDescriptor (static_cast<int>(i));
-              return static_cast<int>(i);
+              io->setFileDescriptor (static_cast<int> (i));
+              return static_cast<int> (i);
             }
         }
 
@@ -153,7 +153,7 @@ namespace os
     Socket*
     FileDescriptorsManager::getSocket (int fildes)
     {
-      assert((fildes >= 0) && (static_cast<std::size_t> (fildes) < sfSize));
+      assert ((fildes >= 0) && (static_cast<std::size_t> (fildes) < sfSize));
       auto* const io = sfDescriptorsArray[fildes];
       if (io->getType () != IO::Type::SOCKET)
         {

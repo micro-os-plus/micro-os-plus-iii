@@ -102,14 +102,14 @@ namespace os
     inline FileSystem*
     MountManager::getFileSystem (std::size_t index)
     {
-      assert(index < sfSize);
+      assert (index < sfSize);
       return sfFileSystemsArray[index];
     }
 
     inline const char*
     MountManager::getPath (std::size_t index)
     {
-      assert(index < sfSize);
+      assert (index < sfSize);
       return sfPathsArray[index];
     }
 

@@ -45,9 +45,9 @@ namespace os
     {
       // Forward to the variadic version of the function.
       std::va_list args;
-      va_start(args, oflag);
+      va_start (args, oflag);
       auto* const ret = vopen (path, oflag, args);
-      va_end(args);
+      va_end (args);
 
       return ret;
     }

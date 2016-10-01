@@ -68,7 +68,7 @@ namespace os
           return -1;
         }
 
-      assert(fs->getBlockDevice () != nullptr);
+      assert (fs->getBlockDevice () != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -100,7 +100,7 @@ namespace os
           return -1;
         }
 
-      assert(fs->getBlockDevice () != nullptr);
+      assert (fs->getBlockDevice () != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -368,7 +368,7 @@ namespace os
     int
     FileSystem::chmod (const char* path, mode_t mode)
     {
-      assert(fBlockDevice != nullptr);
+      assert (fBlockDevice != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -378,7 +378,7 @@ namespace os
     int
     FileSystem::stat (const char* path, struct stat* buf)
     {
-      assert(fBlockDevice != nullptr);
+      assert (fBlockDevice != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -388,7 +388,7 @@ namespace os
     int
     FileSystem::truncate (const char* path, off_t length)
     {
-      assert(fBlockDevice != nullptr);
+      assert (fBlockDevice != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -398,7 +398,7 @@ namespace os
     int
     FileSystem::rename (const char* existing, const char* _new)
     {
-      assert(fBlockDevice != nullptr);
+      assert (fBlockDevice != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -408,7 +408,7 @@ namespace os
     int
     FileSystem::unlink (const char* path)
     {
-      assert(fBlockDevice != nullptr);
+      assert (fBlockDevice != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -418,7 +418,7 @@ namespace os
     int
     FileSystem::utime (const char* path, const struct utimbuf* times)
     {
-      assert(fBlockDevice != nullptr);
+      assert (fBlockDevice != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.

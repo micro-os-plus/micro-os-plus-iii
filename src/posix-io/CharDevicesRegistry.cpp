@@ -49,7 +49,7 @@ namespace os
 
     CharDevicesRegistry::CharDevicesRegistry (std::size_t size)
     {
-      assert(size > 0);
+      assert (size > 0);
 
       sfSize = size;
       sfRegistryArray = new CharDevice*[size];
@@ -124,7 +124,7 @@ namespace os
     CharDevice*
     CharDevicesRegistry::identifyDevice (const char* path)
     {
-      assert(path != nullptr);
+      assert (path != nullptr);
 
       auto prefix = CharDevice::getDevicePrefix ();
       if (std::strncmp (prefix, path, std::strlen (prefix)) != 0)

@@ -49,7 +49,7 @@ namespace os
 
     MountManager::MountManager (std::size_t size)
     {
-      assert(size > 0);
+      assert (size > 0);
 
       sfSize = size;
       sfFileSystemsArray = new FileSystem*[size];
@@ -77,8 +77,8 @@ namespace os
     FileSystem*
     MountManager::identifyFileSystem (const char** path1, const char** path2)
     {
-      assert(path1 != nullptr);
-      assert(*path1 != nullptr);
+      assert (path1 != nullptr);
+      assert (*path1 != nullptr);
 
       for (std::size_t i = 0; i < sfSize; ++i)
         {
@@ -119,7 +119,7 @@ namespace os
     MountManager::setRoot (FileSystem* fs, BlockDevice* blockDevice,
                            unsigned int flags)
     {
-      assert(fs != nullptr);
+      assert (fs != nullptr);
       errno = 0;
 
       sfRoot = fs;
@@ -132,10 +132,10 @@ namespace os
     MountManager::mount (FileSystem* fs, const char* path,
                          BlockDevice* blockDevice, unsigned int flags)
     {
-      assert(fs != nullptr);
-      assert(path != nullptr);
+      assert (fs != nullptr);
+      assert (path != nullptr);
 
-      assert(path[std::strlen (path) - 1] == '/');
+      assert (path[std::strlen (path) - 1] == '/');
 
       errno = 0;
 
@@ -175,7 +175,7 @@ namespace os
     int
     MountManager::umount (const char* path, unsigned int flags)
     {
-      assert(path != nullptr);
+      assert (path != nullptr);
       errno = 0;
 
       for (std::size_t i = 0; i < sfSize; ++i)
