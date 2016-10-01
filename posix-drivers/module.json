@@ -1,0 +1,31 @@
+{
+	"name": "ilg-posix-drivers",
+	"description": "An xPack with drivers for the POSIX layer.",
+	"version": "0.1.1",
+	"keywords": [
+		"posix",
+		"drivers",
+		"portable",
+		"xpack",
+		"xcdl"
+	],
+
+	"author": "Liviu Ionescu <ilg@livius.net>",
+	"homepage": "https://github.com/micro-os-plus/posix-drivers",
+	"repository": 
+	{
+		"type": "git",
+		"url": "https://github.com/micro-os-plus/posix-drivers.git"
+	},
+
+	"bugs": 
+	{
+		"url": "https://github.com/micro-os-plus/posix-drivers/issues"
+	},
+
+	"license": "MIT",
+	"dependencies": 
+	{
+		
+	}
+}

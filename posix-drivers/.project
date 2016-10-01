@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>posix-drivers-xpack</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
+			<triggers>clean,full,incremental,</triggers>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.cdt.managedbuilder.core.ScannerConfigBuilder</name>
+			<triggers>full,incremental,</triggers>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.cdt.core.cnature</nature>
+		<nature>org.eclipse.cdt.core.ccnature</nature>
+		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
+		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>src/diag-trace</name>
+			<type>2</type>
+			<location>/Users/ilg/My Files/MacBookPro Projects/uOS/micro-os-plus-iiie.git/ilg/portable/diag-trace-xpack/src</location>
+		</link>
+		<link>
+			<name>src/posix-arch</name>
+			<type>2</type>
+			<location>/Users/ilg/My Files/MacBookPro Projects/uOS/micro-os-plus-iiie.git/ilg/synthetic/posix-arch-xpack/src</location>
+		</link>
+		<link>
+			<name>src/posix-io</name>
+			<type>2</type>
+			<location>/Users/ilg/My Files/MacBookPro Projects/uOS/micro-os-plus-iiie.git/ilg/portable/posix-io-xpack/src</location>
+		</link>
+	</linkedResources>
+</projectDescription>
