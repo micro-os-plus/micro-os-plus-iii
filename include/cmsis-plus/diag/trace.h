@@ -372,7 +372,9 @@ trace_initialize (void)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
 #pragma GCC diagnostic push
+#if defined(__cplusplus)
 #pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
 
 inline ssize_t
 __attribute__((always_inline))
