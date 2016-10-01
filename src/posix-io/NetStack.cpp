@@ -25,7 +25,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "posix-io/NetStack.h"
+#include <cmsis-plus/posix-io/NetStack.h>
 
 // ----------------------------------------------------------------------------
 

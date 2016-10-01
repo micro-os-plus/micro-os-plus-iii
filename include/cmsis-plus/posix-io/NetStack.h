@@ -25,12 +25,15 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef POSIX_IO_NET_STACK_H_
-#define POSIX_IO_NET_STACK_H_
+#ifndef CMSIS_PLUS_POSIX_IO_NET_STACK_H_
+#define CMSIS_PLUS_POSIX_IO_NET_STACK_H_
+
+#if defined(__cplusplus)
 
 // ----------------------------------------------------------------------------
 
-#include "posix-io/types.h"
+#include <cmsis-plus/posix-io/types.h>
+
 #include <cstddef>
 #include <cassert>
 
@@ -83,4 +86,6 @@ namespace os
 
 // ----------------------------------------------------------------------------
 
-#endif /* POSIX_IO_NET_STACK_H_ */
+#endif /* __cplusplus */
+
+#endif /* CMSIS_PLUS_POSIX_IO_NET_STACK_H_ */

@@ -25,8 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef POSIX_IO_STANDARD_ALIASES_H_
-#define POSIX_IO_STANDARD_ALIASES_H_
+#ifndef CMSIS_PLUS_POSIX_IO_STANDARD_ALIASES_H_
+#define CMSIS_PLUS_POSIX_IO_STANDARD_ALIASES_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -232,7 +232,7 @@ extern "C"
 }
 #endif
 
-#endif /* POSIX_IO_STANDARD_ALIASES_H_ */
+#endif /* CMSIS_PLUS_POSIX_IO_STANDARD_ALIASES_H_ */
 
 // ----------------------------------------------------------------------------
 

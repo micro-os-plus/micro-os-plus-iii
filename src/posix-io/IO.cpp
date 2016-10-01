@@ -25,17 +25,17 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "posix-io/FileDescriptorsManager.h"
-#include "posix-io/IO.h"
-#include "posix-io/CharDevice.h"
-#include "posix-io/CharDevicesRegistry.h"
-#include "posix-io/File.h"
-#include "posix-io/FileSystem.h"
-#include "posix-io/MountManager.h"
-#include "posix-io/Pool.h"
-#include "posix-io/NetStack.h"
+#include <cmsis-plus/posix-io/FileDescriptorsManager.h>
+#include <cmsis-plus/posix-io/IO.h>
+#include <cmsis-plus/posix-io/CharDevice.h>
+#include <cmsis-plus/posix-io/CharDevicesRegistry.h>
+#include <cmsis-plus/posix-io/File.h>
+#include <cmsis-plus/posix-io/FileSystem.h>
+#include <cmsis-plus/posix-io/MountManager.h>
+#include <cmsis-plus/posix-io/Pool.h>
+#include <cmsis-plus/posix-io/NetStack.h>
 
-#include "posix/sys/uio.h"
+#include <cmsis-plus/posix/sys/uio.h>
 
 #include <cassert>
 #include <cerrno>

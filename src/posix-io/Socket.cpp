@@ -25,12 +25,12 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "posix-io/Socket.h"
-#include "posix-io/NetStack.h"
-#include "posix-io/Pool.h"
+#include <cmsis-plus/posix-io/Socket.h>
+#include <cmsis-plus/posix-io/NetStack.h>
+#include <cmsis-plus/posix-io/Pool.h>
 
 #include <cerrno>
-#include "posix/sys/socket.h"
+#include <cmsis-plus/posix/sys/socket.h>
 
 // ----------------------------------------------------------------------------
 

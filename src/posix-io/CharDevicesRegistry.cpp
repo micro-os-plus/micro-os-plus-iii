@@ -25,8 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "posix-io/CharDevicesRegistry.h"
-#include "posix-io/CharDevice.h"
+#include <cmsis-plus/posix-io/CharDevicesRegistry.h>
+#include <cmsis-plus/posix-io/CharDevice.h>
 #include <cmsis-plus/diag/trace.h>
 
 #include <cassert>

@@ -25,17 +25,19 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "posix-io/types.h"
-#include "posix-io/FileDescriptorsManager.h"
-#include "posix-io/IO.h"
-#include "posix-io/CharDevice.h"
-#include "posix-io/File.h"
-#include "posix-io/FileSystem.h"
-#include "posix-io/MountManager.h"
-#include "posix-io/Directory.h"
-#include "posix-io/Socket.h"
+#if !defined(OS_USE_SEMIHOSTING_SYSCALLS)
 
-#include "posix/sys/uio.h"
+#include <cmsis-plus/posix-io/types.h>
+#include <cmsis-plus/posix-io/FileDescriptorsManager.h>
+#include <cmsis-plus/posix-io/IO.h>
+#include <cmsis-plus/posix-io/CharDevice.h>
+#include <cmsis-plus/posix-io/File.h>
+#include <cmsis-plus/posix-io/FileSystem.h>
+#include <cmsis-plus/posix-io/MountManager.h>
+#include <cmsis-plus/posix-io/Directory.h>
+#include <cmsis-plus/posix-io/Socket.h>
+
+#include <cmsis-plus/posix/sys/uio.h>
 
 #include <cmsis-plus/diag/trace.h>
 
@@ -694,7 +696,7 @@ clock_t
 __posix_times (struct tms* buf)
 {
   errno = ENOSYS; // Not implemented
-  return ((clock_t) -1);
+  return static_cast<clock_t> (-1);
 }
 
 int
@@ -718,7 +720,7 @@ clock_t
 __posix_clock (void)
 {
   errno = ENOSYS; // Not implemented
-  return (clock_t) -1;
+  return static_cast<clock_t> (-1);
 }
 
 int
@@ -732,14 +734,14 @@ pid_t
 __posix_fork (void)
 {
   errno = ENOSYS; // Not implemented
-  return ((pid_t) -1);
+  return static_cast<pid_t> (-1);
 }
 
 pid_t
 __posix_getpid (void)
 {
   errno = ENOSYS; // Not implemented
-  return ((pid_t) -1);
+  return static_cast<pid_t> (-1);
 }
 
 int
@@ -767,7 +769,7 @@ pid_t
 __posix_wait (int* stat_loc)
 {
   errno = ENOSYS; // Not implemented
-  return ((pid_t) -1);
+  return static_cast<pid_t> (-1);
 }
 
 int
@@ -795,7 +797,7 @@ ssize_t
 __posix_readlink (const char* path, char* buf, size_t bufsize)
 {
   errno = ENOSYS; // Not implemented
-  return ((ssize_t) -1);
+  return static_cast<ssize_t> (-1);
 }
 
 #pragma GCC diagnostic pop
@@ -830,11 +832,13 @@ initialise_monitor_handles (void)
 // For regular embedded environment that use POSIX system calls,
 // redefine **all** functions without the '__posix_' prefix.
 
-#include "posix-io/standard-aliases.h"
+#include <cmsis-plus/posix-io/standard-aliases.h>
 
 #endif
 
 #endif /* defined(__ARM_EABI__) && (__STDC_HOSTED__ != 0) */
+
+#endif /* !defined(OS_USE_SEMIHOSTING_SYSCALLS) */
 
 // ----------------------------------------------------------------------------
 

@@ -25,7 +25,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "posix-io/Pool.h"
+#include <cmsis-plus/posix-io/Pool.h>
 
 namespace os
 {

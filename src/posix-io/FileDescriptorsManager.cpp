@@ -25,12 +25,13 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "posix-io/FileDescriptorsManager.h"
-#include "posix-io/IO.h"
-#include "posix-io/Socket.h"
+#include <cmsis-plus/posix-io/FileDescriptorsManager.h>
+#include <cmsis-plus/posix-io/IO.h>
+#include <cmsis-plus/posix-io/Socket.h>
 
 #include <cerrno>
 #include <cassert>
+#include <cstddef>
 
 // ----------------------------------------------------------------------------
 
@@ -70,7 +71,7 @@ namespace os
     FileDescriptorsManager::getIo (int fildes)
     {
       // Check if valid descriptor or buffer not yet initialised
-      if ((fildes < 0) || (((std::size_t) fildes) >= sfSize)
+      if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= sfSize)
           || (sfDescriptorsArray == nullptr))
         {
           return nullptr;
@@ -81,7 +82,7 @@ namespace os
     bool
     FileDescriptorsManager::isValid (int fildes)
     {
-      if ((fildes < 0) || (((std::size_t) fildes) >= sfSize))
+      if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= sfSize))
         {
           return false;
         }
@@ -104,8 +105,8 @@ namespace os
           if (sfDescriptorsArray[i] == nullptr)
             {
               sfDescriptorsArray[i] = io;
-              io->setFileDescriptor (i);
-              return i;
+              io->setFileDescriptor (static_cast<int>(i));
+              return static_cast<int>(i);
             }
         }
 
@@ -117,7 +118,7 @@ namespace os
     int
     FileDescriptorsManager::assign (fileDescriptor_t fildes, IO* io)
     {
-      if ((fildes < 0) || (((std::size_t) fildes) >= sfSize))
+      if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= sfSize))
         {
           errno = EBADF;
           return -1;
@@ -138,7 +139,7 @@ namespace os
     int
     FileDescriptorsManager::free (int fildes)
     {
-      if ((fildes < 0) || (((std::size_t) fildes) >= sfSize))
+      if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= sfSize))
         {
           errno = EBADF;
           return -1;
@@ -152,7 +153,7 @@ namespace os
     Socket*
     FileDescriptorsManager::getSocket (int fildes)
     {
-      assert((fildes >= 0) && (((std::size_t ) fildes) < sfSize));
+      assert((fildes >= 0) && (static_cast<std::size_t> (fildes) < sfSize));
       auto* const io = sfDescriptorsArray[fildes];
       if (io->getType () != IO::Type::SOCKET)
         {

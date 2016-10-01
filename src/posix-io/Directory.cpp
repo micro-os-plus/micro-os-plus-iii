@@ -25,10 +25,10 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "posix-io/Directory.h"
-#include "posix-io/FileSystem.h"
-#include "posix-io/MountManager.h"
-#include "posix-io/Pool.h"
+#include <cmsis-plus/posix-io/Directory.h>
+#include <cmsis-plus/posix-io/FileSystem.h>
+#include <cmsis-plus/posix-io/MountManager.h>
+#include <cmsis-plus/posix-io/Pool.h>
 
 #include <cerrno>
 #include <cassert>

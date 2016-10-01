@@ -25,14 +25,15 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef POSIX_IO_SOCKET_H_
-#define POSIX_IO_SOCKET_H_
+#ifndef CMSIS_PLUS_POSIX_IO_SOCKET_H_
+#define CMSIS_PLUS_POSIX_IO_SOCKET_H_
+
+#if defined(__cplusplus)
 
 // ----------------------------------------------------------------------------
 
-#include "posix-io/IO.h"
-
-#include "posix/sys/socket.h"
+#include <cmsis-plus/posix-io/IO.h>
+#include <cmsis-plus/posix/sys/socket.h>
 
 // ----------------------------------------------------------------------------
 
@@ -196,4 +197,8 @@ namespace os
   } /* namespace posix */
 } /* namespace os */
 
-#endif /* POSIX_IO_SOCKET_H_ */
+// ----------------------------------------------------------------------------
+
+#endif /* __cplusplus */
+
+#endif /* CMSIS_PLUS_POSIX_IO_SOCKET_H_ */

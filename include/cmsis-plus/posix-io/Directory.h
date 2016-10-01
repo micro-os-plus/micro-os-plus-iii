@@ -25,14 +25,16 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef POSIX_IO_DIRECTORY_H_
-#define POSIX_IO_DIRECTORY_H_
+#ifndef CMSIS_PLUS_POSIX_IO_DIRECTORY_H_
+#define CMSIS_PLUS_POSIX_IO_DIRECTORY_H_
+
+#if defined(__cplusplus)
 
 // ----------------------------------------------------------------------------
 
-#include "posix-io/FileSystem.h"
+#include <cmsis-plus/posix-io/FileSystem.h>
 
-#include "posix/dirent.h"
+#include <cmsis-plus/posix/dirent.h>
 
 // ----------------------------------------------------------------------------
 
@@ -154,4 +156,6 @@ namespace os
 
 // ----------------------------------------------------------------------------
 
-#endif /* POSIX_IO_DIRECTORY_H_ */
+#endif /* __cplusplus */
+
+#endif /* CMSIS_PLUS_POSIX_IO_DIRECTORY_H_ */

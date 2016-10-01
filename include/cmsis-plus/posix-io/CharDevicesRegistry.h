@@ -25,10 +25,12 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef POSIX_IO_CHAR_DEVICES_REGISTRY_H_
-#define POSIX_IO_CHAR_DEVICES_REGISTRY_H_
+#ifndef CMSIS_PLUS_POSIX_IO_CHAR_DEVICES_REGISTRY_H_
+#define CMSIS_PLUS_POSIX_IO_CHAR_DEVICES_REGISTRY_H_
 
 // ----------------------------------------------------------------------------
+
+#if defined(__cplusplus)
 
 #include <cstddef>
 #include <cassert>
@@ -100,4 +102,6 @@ namespace os
 
 // ----------------------------------------------------------------------------
 
-#endif /* POSIX_IO_CHAR_DEVICES_REGISTRY_H_ */
+#endif /* __cplusplus */
+
+#endif /* CMSIS_PLUS_POSIX_IO_CHAR_DEVICES_REGISTRY_H_ */

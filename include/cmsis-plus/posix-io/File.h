@@ -25,14 +25,15 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef POSIX_IO_FILE_H_
-#define POSIX_IO_FILE_H_
+#ifndef CMSIS_PLUS_POSIX_IO_FILE_H_
+#define CMSIS_PLUS_POSIX_IO_FILE_H_
+
+#if defined(__cplusplus)
 
 // ----------------------------------------------------------------------------
 
-#include "posix-io/IO.h"
-
-#include "posix/utime.h"
+#include <cmsis-plus/posix-io/IO.h>
+#include <cmsis-plus/posix/utime.h>
 
 // ----------------------------------------------------------------------------
 
@@ -143,4 +144,6 @@ namespace os
 
 // ----------------------------------------------------------------------------
 
-#endif /* POSIX_IO_FILE_H_ */
+#endif /* __cplusplus */
+
+#endif /* CMSIS_PLUS_POSIX_IO_FILE_H_ */

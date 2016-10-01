@@ -25,12 +25,13 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef POSIX_IO_TYPES_H_
-#define POSIX_IO_TYPES_H_
+#ifndef CMSIS_PLUS_POSIX_IO_TYPES_H_
+#define CMSIS_PLUS_POSIX_IO_TYPES_H_
 
 // ----------------------------------------------------------------------------
 
 #include <sys/types.h>
+#include <sys/select.h>
 
 #include <cmsis-plus/posix/dirent.h>
 #include <cmsis-plus/posix/sys/socket.h>
@@ -297,4 +298,4 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 
-#endif /* POSIX_IO_TYPES_H_ */
+#endif /* CMSIS_PLUS_POSIX_IO_TYPES_H_ */

@@ -25,8 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef POSIX_IO_REDEFINITIONS_H_
-#define POSIX_IO_REDEFINITIONS_H_
+#ifndef CMSIS_PLUS_POSIX_IO_REDEFINITIONS_H_
+#define CMSIS_PLUS_POSIX_IO_REDEFINITIONS_H_
 
 // These definitions might be useful in some tests, to check
 // if both prefixed and not prefixed names are ok.
@@ -93,4 +93,4 @@
 #define __posix_write write
 #define __posix_writev writev
 
-#endif /* POSIX_IO_REDEFINITIONS_H_ */
+#endif /* CMSIS_PLUS_POSIX_IO_REDEFINITIONS_H_ */
