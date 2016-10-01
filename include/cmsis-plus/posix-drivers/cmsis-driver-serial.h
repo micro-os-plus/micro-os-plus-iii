@@ -25,13 +25,17 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef POSIX_DRIVERS_CMSIS_DRIVER_SERIAL_H_
-#define POSIX_DRIVERS_CMSIS_DRIVER_SERIAL_H_
+#ifndef CMSIS_PLUS_POSIX_DRIVERS_CMSIS_DRIVER_SERIAL_H_
+#define CMSIS_PLUS_POSIX_DRIVERS_CMSIS_DRIVER_SERIAL_H_
 
-// #include "Driver_USART.h"
+#if defined(__cplusplus)
 
 // ----------------------------------------------------------------------------
-#ifdef __cplusplus
+
+#include "Driver_USART.h"
+//#include <cstdint>
+
+// ----------------------------------------------------------------------------
 
 namespace os
 {
@@ -56,7 +60,7 @@ namespace os
         Serial ();
 
         virtual
-        ~Serial () = default;
+        ~Serial ();
 
         // --------------------------------------------------------------------
 
@@ -120,12 +124,14 @@ namespace os
   } /* namespace cmsis */
 } /* namespace os */
 
-#endif /* __cplusplus */
-
 extern "C"
 {
   void
   cmsis_driver_serial_signal_event (void* object, uint32_t event);
 }
 
-#endif /* POSIX_DRIVERS_CMSIS_DRIVER_SERIAL_H_ */
+// ----------------------------------------------------------------------------
+
+#endif /* __cplusplus */
+
+#endif /* CMSIS_PLUS_POSIX_DRIVERS_CMSIS_DRIVER_SERIAL_H_ */

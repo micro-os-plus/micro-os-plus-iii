@@ -25,7 +25,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "posix-drivers/ByteCircularBuffer.h"
+#include <cmsis-plus/posix-drivers/ByteCircularBuffer.h>
 #include <cmsis-plus/diag/trace.h>
 
 #include <cstring>
@@ -39,8 +39,7 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    ByteCircularBuffer::ByteCircularBuffer (const uint8_t* buf,
-                                            std::size_t siz,
+    ByteCircularBuffer::ByteCircularBuffer (const uint8_t* buf, std::size_t siz,
                                             std::size_t highWaterMark,
                                             std::size_t lowWaterMark) :
         fBuf (buf), //
@@ -48,13 +47,12 @@ namespace os
         fHighWaterMark (highWaterMark <= fSize ? highWaterMark : siz), //
         fLowWaterMark (lowWaterMark)
     {
-      assert(fLowWaterMark <= fHighWaterMark);
+      assert (fLowWaterMark <= fHighWaterMark);
 
       clear ();
     }
 
-    ByteCircularBuffer::ByteCircularBuffer (const uint8_t* buf,
-                                            std::size_t siz) :
+    ByteCircularBuffer::ByteCircularBuffer (const uint8_t* buf, std::size_t siz) :
         ByteCircularBuffer (buf, siz, siz, 0)
     {
       ;
@@ -68,7 +66,7 @@ namespace os
       fBack = fFront = const_cast<uint8_t* volatile > (fBuf);
       fLen = 0;
 #if defined(DEBUG)
-      std::memset ((void*) fBuf, '?', fSize);
+      std::memset (static_cast<void*> (const_cast<uint8_t*> (fBuf)), '?', fSize);
 #endif
     }
 
@@ -82,7 +80,7 @@ namespace os
 
       // Add to back.
       *fBack++ = c;
-      if ((std::size_t) (fBack - fBuf) >= fSize)
+      if (static_cast<std::size_t> (fBack - fBuf) >= fSize)
         {
           // Wrap.
           fBack = const_cast<uint8_t* volatile > (fBuf);
@@ -95,7 +93,7 @@ namespace os
     std::size_t
     ByteCircularBuffer::pushBack (const uint8_t* buf, std::size_t count)
     {
-      assert(buf != nullptr);
+      assert (buf != nullptr);
 
       std::size_t len = count;
       if (count > (fSize - fLen))
@@ -108,12 +106,13 @@ namespace os
           return 0;
         }
 
-      std::size_t sizeToEnd = (std::size_t) (fSize - (fBack - fBuf));
+      std::size_t sizeToEnd = static_cast<std::size_t> (fSize
+          - static_cast<std::size_t> (fBack - fBuf));
       if (len <= sizeToEnd)
         {
           std::memcpy (fBack, buf, len);
           fBack += len;
-          if ((std::size_t) (fBack - fBuf) >= fSize)
+          if (static_cast<std::size_t> (fBack - fBuf) >= fSize)
             {
               // Wrap.
               fBack = const_cast<uint8_t* volatile > (fBuf);
@@ -161,7 +160,8 @@ namespace os
     {
       if (fBack == fBuf)
         {
-          fBack = (uint8_t*) (fBuf + fSize - 1);
+          fBack =
+              static_cast<uint8_t*> (const_cast<uint8_t*> (fBuf) + fSize - 1);
         }
       else
         {
@@ -173,7 +173,7 @@ namespace os
     std::size_t
     ByteCircularBuffer::popFront (uint8_t* buf)
     {
-      assert(buf != nullptr);
+      assert (buf != nullptr);
 
       uint8_t c;
       if (fLen == 0)
@@ -183,7 +183,7 @@ namespace os
       else
         {
           c = *fFront++;
-          if ((std::size_t) (fFront - fBuf) >= fSize)
+          if (static_cast<std::size_t> (fFront - fBuf) >= fSize)
             {
               fFront = const_cast<uint8_t* volatile > (fBuf);
             }
@@ -196,7 +196,7 @@ namespace os
     std::size_t
     ByteCircularBuffer::popFront (uint8_t* buf, std::size_t siz)
     {
-      assert(buf != nullptr);
+      assert (buf != nullptr);
 
       std::size_t len = siz;
       if (len > fLen)
@@ -204,12 +204,12 @@ namespace os
           len = fLen;
         }
 
-      std::size_t sizeToEnd = fSize - (std::size_t) (fFront - fBuf);
+      std::size_t sizeToEnd = fSize - static_cast<std::size_t> (fFront - fBuf);
       if (len <= sizeToEnd)
         {
           std::memcpy (buf, fFront, len);
           fFront += len;
-          if ((std::size_t) (fFront - fBuf) >= fSize)
+          if (static_cast<std::size_t> (fFront - fBuf) >= fSize)
             {
               fFront = const_cast<uint8_t* volatile > (fBuf);
             }
@@ -254,10 +254,10 @@ namespace os
     std::size_t
     ByteCircularBuffer::getFrontContiguousBuffer (uint8_t** ppbuf)
     {
-      assert(ppbuf != nullptr);
+      assert (ppbuf != nullptr);
       *ppbuf = fFront;
 
-      std::size_t sizeToEnd = fSize - (std::size_t) (fFront - fBuf);
+      std::size_t sizeToEnd = fSize - static_cast<std::size_t> (fFront - fBuf);
       std::size_t len = sizeToEnd;
       if (len > fLen)
         {
@@ -270,10 +270,10 @@ namespace os
     std::size_t
     ByteCircularBuffer::getBackContiguousBuffer (uint8_t** ppbuf)
     {
-      assert(ppbuf != nullptr);
+      assert (ppbuf != nullptr);
       *ppbuf = fBack;
 
-      std::size_t sizeToEnd = fSize - (std::size_t) (fBack - fBuf);
+      std::size_t sizeToEnd = fSize - static_cast<std::size_t> (fBack - fBuf);
       std::size_t len = sizeToEnd;
       if (len > (fSize - fLen))
         {

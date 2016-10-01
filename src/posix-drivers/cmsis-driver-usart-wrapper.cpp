@@ -25,7 +25,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "posix-drivers/cmsis-driver-usart-wrapper.h"
+#include <cmsis-plus/posix-drivers/cmsis-driver-usart-wrapper.h>
 #include "Driver_USART.h"
 
 // ----------------------------------------------------------------------------

@@ -25,8 +25,10 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef POSIX_DRIVERS_TBUFFERED_CMSIS_USART_CHAR_DEVICE_H_
-#define POSIX_DRIVERS_TBUFFERED_CMSIS_USART_CHAR_DEVICE_H_
+#ifndef CMSIS_PLUS_POSIX_DRIVERS_TBUFFERED_CMSIS_USART_CHAR_DEVICE_H_
+#define CMSIS_PLUS_POSIX_DRIVERS_TBUFFERED_CMSIS_USART_CHAR_DEVICE_H_
+
+#if defined(__cplusplus)
 
 // ----------------------------------------------------------------------------
 
@@ -155,7 +157,7 @@ namespace os
           fRxCount (0), //
           fTxBusy (false) //
       {
-        assert(rxBuf != nullptr);
+        assert (rxBuf != nullptr);
         // txBuf may be null.
       }
 
@@ -454,7 +456,7 @@ namespace os
             std::size_t count = tmpCount - fRxCount;
             fRxCount = tmpCount;
             std::size_t adjust = fRxBuf->advanceBack (count);
-            assert(count == adjust);
+            assert (count == adjust);
 
             if (event & ARM_USART_EVENT_RECEIVE_COMPLETE)
               {
@@ -467,13 +469,13 @@ namespace os
                     fRxBuf->retreatBack ();
                     nbyte = fRxBuf->getBackContiguousBuffer (&pbuf);
                   }
-                assert(nbyte > 0);
+                assert (nbyte > 0);
 
                 // Read as much as we can.
                 int32_t status;
                 status = fDriver->Receive (pbuf, nbyte);
                 // TODO: implement error processing.
-                assert(status == ARM_DRIVER_OK);
+                assert (status == ARM_DRIVER_OK);
 
                 fRxCount = 0;
               }
@@ -489,7 +491,7 @@ namespace os
               {
                 std::size_t count = fDriver->GetTxCount ();
                 std::size_t adjust = fTxBuf->advanceFront (count);
-                assert(count == adjust);
+                assert (count == adjust);
 
                 uint8_t* pbuf;
                 std::size_t nbyte = fTxBuf->getFrontContiguousBuffer (&pbuf);
@@ -498,7 +500,7 @@ namespace os
                     int32_t status;
                     status = fDriver->Send (pbuf, nbyte);
                     // TODO: implement error processing
-                    assert(status == ARM_DRIVER_OK);
+                    assert (status == ARM_DRIVER_OK);
                   }
                 else
                   {
@@ -523,4 +525,8 @@ namespace os
   } /* namespace dev */
 } /* namespace os */
 
-#endif /* POSIX_DRIVERS_TBUFFERED_CMSIS_USART_CHAR_DEVICE_H_ */
+// ----------------------------------------------------------------------------
+
+#endif /* __cplusplus */
+
+#endif /* CMSIS_PLUS_POSIX_DRIVERS_TBUFFERED_CMSIS_USART_CHAR_DEVICE_H_ */

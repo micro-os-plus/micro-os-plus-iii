@@ -25,15 +25,17 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef POSIX_DRIVERS_BUFFERED_SERIAL_DEVICE_H_
-#define POSIX_DRIVERS_BUFFERED_SERIAL_DEVICE_H_
+#ifndef CMSIS_PLUS_POSIX_DRIVERS_BUFFERED_SERIAL_DEVICE_H_
+#define CMSIS_PLUS_POSIX_DRIVERS_BUFFERED_SERIAL_DEVICE_H_
+
+#if defined(__cplusplus)
 
 // ----------------------------------------------------------------------------
 
 #include <cmsis-plus/rtos/os.h>
 
 #include <cmsis-plus/posix-io/CharDevice.h>
-#include <posix-drivers/ByteCircularBuffer.h>
+#include <cmsis-plus/posix-drivers/ByteCircularBuffer.h>
 #include <cmsis-plus/drivers/serial.h>
 
 // ----------------------------------------------------------------------------
@@ -126,9 +128,12 @@ namespace os
         // Pointer to actual CMSIS-like serial driver (usart or usb cdc acm)
         os::driver::Serial* driver_ = nullptr;
 
-        os::rtos::semaphore_binary open_sem_ { "open", 0 };
-        os::rtos::semaphore_binary rx_sem_  { "rx", 0 };
-        os::rtos::semaphore_binary tx_sem_ { "tx", 0 };
+        os::rtos::semaphore_binary open_sem_
+          { "open", 0 };
+        os::rtos::semaphore_binary rx_sem_
+          { "rx", 0 };
+        os::rtos::semaphore_binary tx_sem_
+          { "tx", 0 };
 
         os::dev::ByteCircularBuffer* rx_buf_ = nullptr;
         os::dev::ByteCircularBuffer* tx_buf_ = nullptr;
@@ -148,8 +153,7 @@ namespace os
     template<typename Cs_T>
       Buffered_serial_device<Cs_T>::Buffered_serial_device (
           const char* deviceName, //
-          os::driver::Serial* driver,
-          os::dev::ByteCircularBuffer* rx_buf,
+          os::driver::Serial* driver, os::dev::ByteCircularBuffer* rx_buf,
           os::dev::ByteCircularBuffer* tx_buf) :
           //
           CharDevice (deviceName), // Construct parent.
@@ -157,13 +161,12 @@ namespace os
           rx_buf_ (rx_buf), //
           tx_buf_ (tx_buf) //
       {
-        assert(rx_buf != nullptr);
+        assert (rx_buf != nullptr);
 
         // Do not check the same for tx_buf, it may be null.
 
         driver_->register_callback (
-            reinterpret_cast<os::driver::signal_event_t> (signal_event),
-            this);
+            reinterpret_cast<os::driver::signal_event_t> (signal_event), this);
       }
 
     template<typename Cs_T>
@@ -195,9 +198,9 @@ namespace os
         do
           {
             // Reset semaphores, in case we come here after close.
-            open_sem_.reset();
-            rx_sem_.reset();
-            tx_sem_.reset();
+            open_sem_.reset ();
+            rx_sem_.reset ();
+            tx_sem_.reset ();
 
             is_opened_ = true;
 
@@ -224,14 +227,12 @@ namespace os
               break;
 
             // Enable TX output.
-            result = driver_->control (
-                os::driver::serial::Control::enable_tx);
+            result = driver_->control (os::driver::serial::Control::enable_tx);
             if (result != os::driver::RETURN_OK)
               break;
 
             // Enable RX input.
-            result = driver_->control (
-                os::driver::serial::Control::enable_rx);
+            result = driver_->control (os::driver::serial::Control::enable_rx);
             if (result != os::driver::RETURN_OK)
               break;
 
@@ -260,7 +261,7 @@ namespace os
                   {
                     break;
                   }
-                open_sem_.wait();
+                open_sem_.wait ();
               }
           }
 
@@ -311,30 +312,28 @@ namespace os
                       {
                         break;
                       }
-                    tx_sem_.wait();
+                    tx_sem_.wait ();
                   }
               }
           }
 
         // Abort pending reads.
         os::driver::return_t ret;
-        ret = driver_->control (
-            os::driver::serial::Control::abort_receive);
-        assert(ret == os::driver::RETURN_OK);
+        ret = driver_->control (os::driver::serial::Control::abort_receive);
+        assert (ret == os::driver::RETURN_OK);
 
         // Abort pending writes.
         ret = driver_->control (os::driver::serial::Control::abort_send);
-        assert(ret == os::driver::RETURN_OK);
+        assert (ret == os::driver::RETURN_OK);
 
         // Disable transmitter and receiver.
         ret = driver_->control (os::driver::serial::Control::disable_tx);
-        assert(ret == os::driver::RETURN_OK);
+        assert (ret == os::driver::RETURN_OK);
 
         ret = driver_->control (os::driver::serial::Control::disable_rx);
-        assert(ret == os::driver::RETURN_OK);
-        ret = driver_->control (
-            os::driver::serial::Control::disable_break);
-        assert(ret == os::driver::RETURN_OK);
+        assert (ret == os::driver::RETURN_OK);
+        ret = driver_->control (os::driver::serial::Control::disable_break);
+        assert (ret == os::driver::RETURN_OK);
 
         is_opened_ = false;
         is_connected_ = false;
@@ -368,7 +367,7 @@ namespace os
                 return -1;
               }
             // Block and wait for bytes to arrive.
-            rx_sem_.wait();
+            rx_sem_.wait ();
           }
       }
 
@@ -415,8 +414,7 @@ namespace os
                       }
                     if (nb > 0)
                       {
-                        if (driver_->send (pbuf, nb)
-                            != os::driver::RETURN_OK)
+                        if (driver_->send (pbuf, nb) != os::driver::RETURN_OK)
                           {
                             errno = EIO;
                             return -1;
@@ -447,7 +445,7 @@ namespace os
                   }
 
                 // Block and wait for buffer to be freed.
-                tx_sem_.wait();
+                tx_sem_.wait ();
 
                 if (count < nbyte)
                   {
@@ -480,7 +478,7 @@ namespace os
                   {
                     break;
                   }
-                tx_sem_.wait();
+                tx_sem_.wait ();
               }
 
             if ((driver_->send (buf, nbyte)) == os::driver::RETURN_OK)
@@ -498,7 +496,7 @@ namespace os
                       {
                         break;
                       }
-                     tx_sem_.wait();
+                    tx_sem_.wait ();
                   }
                 count = driver_->get_tx_count ();
               }
@@ -561,7 +559,7 @@ namespace os
             std::size_t count = tmpCount - object->rx_count_;
             object->rx_count_ = tmpCount;
             std::size_t adjust = object->rx_buf_->advanceBack (count);
-            assert(count == adjust);
+            assert (count == adjust);
 
             if (event & os::driver::serial::Event::receive_complete)
               {
@@ -575,20 +573,20 @@ namespace os
                     object->rx_buf_->retreatBack ();
                     nbyte = object->rx_buf_->getBackContiguousBuffer (&pbuf);
                   }
-                assert(nbyte > 0);
+                assert (nbyte > 0);
 
                 // Read as much as we can.
                 int32_t status;
                 status = object->driver_->receive (pbuf, nbyte);
                 // TODO: implement error processing.
-                assert(status == os::driver::RETURN_OK);
+                assert (status == os::driver::RETURN_OK);
 
                 object->rx_count_ = 0;
               }
             if (count > 0)
               {
                 // Immediately wake up, do not wait to reach any water mark.
-                object->rx_sem_.post();
+                object->rx_sem_.post ();
               }
           }
         if (event & os::driver::serial::Event::tx_complete)
@@ -597,7 +595,7 @@ namespace os
               {
                 std::size_t count = object->driver_->get_tx_count ();
                 std::size_t adjust = object->tx_buf_->advanceFront (count);
-                assert(count == adjust);
+                assert (count == adjust);
 
                 uint8_t* pbuf;
                 std::size_t nbyte = object->tx_buf_->getFrontContiguousBuffer (
@@ -607,7 +605,7 @@ namespace os
                     int32_t status;
                     status = object->driver_->send (pbuf, nbyte);
                     // TODO: implement error processing
-                    assert(status == os::driver::RETURN_OK);
+                    assert (status == os::driver::RETURN_OK);
                   }
                 else
                   {
@@ -616,13 +614,13 @@ namespace os
                 if (object->tx_buf_->isBelowLowWaterMark ())
                   {
                     // Wake up thread, to come and send more bytes.
-                    object->tx_sem_.post();
+                    object->tx_sem_.post ();
                   }
               }
             else
               {
                 // No buffer, wake up the thread to return from write().
-                object->tx_sem_.post();
+                object->tx_sem_.post ();
               }
           }
         if (event & os::driver::serial::Event::dcd)
@@ -635,15 +633,15 @@ namespace os
             if (is_dcd_active)
               {
                 // Connected, wake-up open().
-                object->open_sem_.post();
+                object->open_sem_.post ();
               }
             else
               {
                 // Disconnected, cancel read.
-                object->rx_sem_.post();
+                object->rx_sem_.post ();
 
                 // Cancel write.
-                object->tx_sem_.post();
+                object->tx_sem_.post ();
               }
           }
         if (event & os::driver::serial::Event::cts)
@@ -661,4 +659,8 @@ namespace os
   } /* namespace dev */
 } /* namespace os */
 
-#endif /* POSIX_DRIVERS_BUFFERED_SERIAL_DEVICE_H_ */
+// ----------------------------------------------------------------------------
+
+#endif /* __cplusplus */
+
+#endif /* CMSIS_PLUS_POSIX_DRIVERS_BUFFERED_SERIAL_DEVICE_H_ */

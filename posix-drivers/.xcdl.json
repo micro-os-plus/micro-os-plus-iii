@@ -1,5 +1,0 @@
-{
-	"$schema": "http://xcdl.github.io/schemas/xcdl-1-1.json",
-	"name": "/ilg/portable/posix-drivers",
-	"description": "Drivers for POSIX IO char devices."
-}

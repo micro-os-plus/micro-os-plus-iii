@@ -25,7 +25,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "posix-drivers/cmsis-driver-serial.h"
+#include <cmsis-plus/posix-drivers/cmsis-driver-serial.h>
 #include "Driver_USART.h"
 
 // ----------------------------------------------------------------------------
@@ -42,6 +42,11 @@ namespace os
       {
         cb_event_ = nullptr;
         cb_object_ = nullptr;
+      }
+
+      Serial::~Serial ()
+      {
+        ;
       }
 
       int32_t
@@ -74,5 +79,5 @@ namespace os
 void
 cmsis_driver_serial_signal_event (void* object, uint32_t event)
 {
-  ((os::cmsis::driver::Serial*) object)->signal_event (event);
+  (static_cast<os::cmsis::driver::Serial*> (object))->signal_event (event);
 }

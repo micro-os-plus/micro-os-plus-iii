@@ -29,7 +29,7 @@
  *
  */
 
-#include "posix-drivers/CmsisUsartCharDevice.h"
+#include <cmsis-plus/posix-drivers/CmsisUsartCharDevice.h>
 
 #include "Driver_USART.h"
 
@@ -177,7 +177,7 @@ namespace os
     CmsisUsartCharDevice::do_read (void* buf, std::size_t nbyte)
     {
       ssize_t count = 0;
-      uint8_t* ubuf = (uint8_t*) buf;
+      uint8_t* ubuf = static_cast<uint8_t*> (buf);
       ARM_USART_STATUS status;
 
       while (fCntOut == ((fCntIn = fDriver->GetRxCount ())))
@@ -188,7 +188,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Waggregate-return"
           status = fDriver->GetStatus ();
 #pragma GCC diagnostic pop
-          if (status.rx_framing_error)  // other error checking should be added here
+          if (status.rx_framing_error) // other error checking should be added here
             {
               errno = EIO;
               return -1;
@@ -223,7 +223,7 @@ namespace os
           osSemaphoreWait (fTxSem, osWaitForever);
         }
 
-      if ((fDriver->Send (buf, nbyte)) == ARM_DRIVER_OK)
+      if ((fDriver->Send (buf, static_cast<uint32_t> (nbyte))) == ARM_DRIVER_OK)
         {
           osSemaphoreWait (fTxSem, osWaitForever);
           count = fDriver->GetTxCount ();

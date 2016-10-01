@@ -25,14 +25,16 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef POSIX_DRIVERS_CMSIS_USART_CHAR_DEVICE_H_
-#define POSIX_DRIVERS_CMSIS_USART_CHAR_DEVICE_H_
+#ifndef CMSIS_PLUS_POSIX_DRIVERS_CMSIS_USART_CHAR_DEVICE_H_
+#define CMSIS_PLUS_POSIX_DRIVERS_CMSIS_USART_CHAR_DEVICE_H_
+
+#if defined(__cplusplus)
 
 // ----------------------------------------------------------------------------
 
 #include <cmsis-plus/posix-io/CharDevice.h>
 
-#include "cmsis_os.h"
+#include "cmsis-plus/legacy/cmsis_os.h"
 
 #include <cstdarg>
 #include <cstdlib>
@@ -124,4 +126,8 @@ namespace os
   } /* namespace posix */
 } /* namespace os */
 
-#endif /* POSIX_DRIVERS_CMSIS_USART_CHAR_DEVICE_H_ */
+// ----------------------------------------------------------------------------
+
+#endif /* __cplusplus */
+
+#endif /* CMSIS_PLUS_POSIX_DRIVERS_CMSIS_USART_CHAR_DEVICE_H_ */

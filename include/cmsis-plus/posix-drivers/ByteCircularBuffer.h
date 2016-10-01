@@ -25,8 +25,12 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef POSIX_DRIVERS_BYTE_CIRCULAR_BUFFER_H_
-#define POSIX_DRIVERS_BYTE_CIRCULAR_BUFFER_H_
+#ifndef CMSIS_PLUS_POSIX_DRIVERS_BYTE_CIRCULAR_BUFFER_H_
+#define CMSIS_PLUS_POSIX_DRIVERS_BYTE_CIRCULAR_BUFFER_H_
+
+#if defined(__cplusplus)
+
+// ----------------------------------------------------------------------------
 
 #include <cstdint>
 #include <cstddef>
@@ -200,4 +204,8 @@ namespace os
   } /* namespace dev */
 } /* namespace os */
 
-#endif /* POSIX_DRIVERS_BYTE_CIRCULAR_BUFFER_H_ */
+// ----------------------------------------------------------------------------
+
+#endif /* __cplusplus */
+
+#endif /* CMSIS_PLUS_POSIX_DRIVERS_BYTE_CIRCULAR_BUFFER_H_ */

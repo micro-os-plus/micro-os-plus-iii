@@ -28,7 +28,11 @@
 #ifndef CMSIS_DRIVER_USART_WRAPPER_H_
 #define CMSIS_DRIVER_USART_WRAPPER_H_
 
-#include "posix-drivers/cmsis-driver-serial.h"
+#if defined(__cplusplus)
+
+// ----------------------------------------------------------------------------
+
+#include <cmsis-plus/posix-drivers/cmsis-driver-serial.h>
 
 // ----------------------------------------------------------------------------
 
@@ -115,5 +119,9 @@ namespace os
     } /* namespace driver */
   } /* namespace cmsis */
 } /* namespace os */
+
+// ----------------------------------------------------------------------------
+
+#endif /* __cplusplus */
 
 #endif /* CMSIS_DRIVER_USART_WRAPPER_H_ */
