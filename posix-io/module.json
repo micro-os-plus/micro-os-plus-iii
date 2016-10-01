@@ -1,0 +1,31 @@
+{
+	"name": "ilg-posix-io",
+	"description": "An xPack with a portable POSIX IO layer, supporting devices, files and sockets.",
+	"version": "0.1.1",
+	"keywords": [
+		"posix",
+		"io",
+		"portable",
+		"xpack",
+		"xcdl"
+	],
+
+	"author": "Liviu Ionescu <ilg@livius.net>",
+	"homepage": "https://github.com/micro-os-plus/posix-io",
+	"repository": 
+	{
+		"type": "git",
+		"url": "https://github.com/micro-os-plus/posix-io.git"
+	},
+
+	"bugs": 
+	{
+		"url": "https://github.com/micro-os-plus/posix-io/issues"
+	},
+
+	"license": "MIT",
+	"dependencies": 
+	{
+		
+	}
+}

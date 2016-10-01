@@ -1,0 +1,53 @@
+{
+	"$schema": "http://xcdl.github.io/schemas/xpack-1-1.json",
+	"name": "ilg-posix-io",
+	"title": "POSIX IO",
+	"description": "An xPack with a portable POSIX IO layer, supporting devices, files and sockets.",
+	"xcdlFile": ".xcdl.json",
+	"repository": 
+	{
+		"type": "git",
+		"url": "https://github.com/micro-os-plus/posix-io.git",
+		"archive": "https://github.com/micro-os-plus/posix-io/archive/xpack.zip"
+	},
+
+	"version": "0.1.1",
+	"releases": [
+		
+	],
+
+	"keywords": [
+		"posix",
+		"io",
+		"portable"
+	],
+
+	"homepage": "https://github.com/micro-os-plus/posix-io",
+	"support": [
+		{
+			"description": "all issues",
+			"url": "https://github.com/micro-os-plus/posix-io/issues"
+		}
+	],
+
+	"license": "MIT",
+	"maintainers": [
+		{
+			"name": "Liviu Ionescu",
+			"email": "ilg@livius.net",
+			"url": "http://liviusdotnet.worldpress.com"
+		}
+	],
+
+	"contributors": [
+		{
+			"name": "Liviu Ionescu",
+			"email": "ilg@livius.net",
+			"url": "http://liviusdotnet.worldpress.com"
+		}
+	],
+
+	"dependencies": [
+		
+	]
+}
