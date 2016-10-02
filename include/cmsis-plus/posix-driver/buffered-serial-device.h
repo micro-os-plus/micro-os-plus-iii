@@ -35,7 +35,7 @@
 #include <cmsis-plus/rtos/os.h>
 
 #include <cmsis-plus/posix-io/CharDevice.h>
-#include <cmsis-plus/posix-driver/ByteCircularBuffer.h>
+#include <cmsis-plus/posix-driver/circular-buffer.h>
 #include <cmsis-plus/driver/serial.h>
 
 // ----------------------------------------------------------------------------
