@@ -25,14 +25,12 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CMSIS_PLUS_POSIX_IO_NET_STACK_H_
-#define CMSIS_PLUS_POSIX_IO_NET_STACK_H_
+#ifndef CMSIS_PLUS_POSIX_IO_DEVICE_CHAR_REGISTRY_H_
+#define CMSIS_PLUS_POSIX_IO_DEVICE_CHAR_REGISTRY_H_
 
 #if defined(__cplusplus)
 
 // ----------------------------------------------------------------------------
-
-#include <cmsis-plus/posix-io/types.h>
 
 #include <cstddef>
 #include <cassert>
@@ -43,42 +41,60 @@ namespace os
 {
   namespace posix
   {
+    // ------------------------------------------------------------------------
+
+    class device_char;
 
     // ------------------------------------------------------------------------
 
-    class IO;
-    class Socket;
-    class Pool;
-
-    // ------------------------------------------------------------------------
-
-    class NetStack
+    class device_char_registry
     {
     public:
 
-      NetStack (Pool* socketsPool);
-      NetStack (const NetStack&) = delete;
+      device_char_registry (std::size_t size);
+      device_char_registry (const device_char_registry&) = delete;
 
-      ~NetStack ();
+      ~device_char_registry ();
+
+      // ----------------------------------------------------------------------
+
+      static void
+      add (device_char* device);
+
+      static void
+      remove (device_char* device);
+
+      static device_char*
+      identifyDevice (const char* path);
+
+      static std::size_t
+      getSize (void);
+
+      static device_char*
+      getDevice (std::size_t index);
 
       // ----------------------------------------------------------------------
 
-      static Pool*
-      getSocketsPool (void);
-
-      // ----------------------------------------------------------------------
     private:
 
-      static Pool* sfSocketsPool;
+      static std::size_t sfSize;
 
+      static device_char** sfRegistryArray;
     };
 
     // ------------------------------------------------------------------------
 
-    inline Pool*
-    NetStack::getSocketsPool (void)
+    inline std::size_t
+    device_char_registry::getSize (void)
     {
-      return sfSocketsPool;
+      return sfSize;
+    }
+
+    inline device_char*
+    device_char_registry::getDevice (std::size_t index)
+    {
+      assert (index < sfSize);
+      return sfRegistryArray[index];
     }
 
   } /* namespace posix */
@@ -88,4 +104,4 @@ namespace os
 
 #endif /* __cplusplus */
 
-#endif /* CMSIS_PLUS_POSIX_IO_NET_STACK_H_ */
+#endif /* CMSIS_PLUS_POSIX_IO_DEVICE_CHAR_REGISTRY_H_ */

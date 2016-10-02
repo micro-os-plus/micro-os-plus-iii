@@ -26,8 +26,8 @@
  */
 
 #include "posix-io/FileDescriptorsManager.h"
-#include "posix-io/IO.h"
-#include "posix-io/File.h"
+#include "posix-io/io.h"
+#include "posix-io/file.h"
 #include "posix-io/TPool.h"
 #include <cmsis-plus/diag/trace.h>
 
@@ -40,7 +40,7 @@
 
 // Test class, all methods return ENOSYS, as not implemented, except open().
 
-class TestFile : public os::posix::File
+class TestFile : public os::posix::file
 {
 public:
 

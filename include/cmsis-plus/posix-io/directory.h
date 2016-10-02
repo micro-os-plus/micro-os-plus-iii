@@ -25,14 +25,16 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CMSIS_PLUS_POSIX_IO_POOL_H_
-#define CMSIS_PLUS_POSIX_IO_POOL_H_
+#ifndef CMSIS_PLUS_POSIX_IO_DIRECTORY_H_
+#define CMSIS_PLUS_POSIX_IO_DIRECTORY_H_
 
 #if defined(__cplusplus)
 
 // ----------------------------------------------------------------------------
 
-#include <cstddef>
+#include <cmsis-plus/posix-io/file-system.h>
+
+#include <cmsis-plus/posix/dirent.h>
 
 // ----------------------------------------------------------------------------
 
@@ -42,63 +44,111 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    class Pool
-    {
-    public:
-      Pool (std::size_t size);
-      Pool (const Pool&) = delete;
-
-      virtual
-      ~Pool ();
-
-      // ----------------------------------------------------------------------
-
-      void*
-      aquire (void);
-
-      bool
-      release (void* obj);
-
-      // ----------------------------------------------------------------------
-
-      std::size_t
-      getSize (void) const;
-
-      void*
-      getObject (std::size_t index) const;
-
-      bool
-      getFlag (std::size_t index) const;
-
-      // ----------------------------------------------------------------------
-
-    protected:
-
-      // Referred directly in TPool.
-
-      void** fArray;
-      bool* fInUse;
-      std::size_t fSize;
-    };
+    class directory;
 
     // ------------------------------------------------------------------------
 
-    inline std::size_t
-    Pool::getSize (void) const
+    directory*
+    opendir (const char* dirname);
+
+    // ------------------------------------------------------------------------
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+    class directory
     {
-      return fSize;
+      friend class file_system;
+
+    public:
+
+      directory (void);
+      directory (const directory&) = delete;
+
+      virtual
+      ~directory ();
+
+      // ----------------------------------------------------------------------
+
+      struct dirent *
+      read (void);
+
+      void
+      rewind (void);
+
+      int
+      close (void);
+
+      // ----------------------------------------------------------------------
+      // Support functions.
+
+      struct dirent*
+      getDirEntry (void);
+
+      const char*
+      getName (void) const;
+
+      file_system*
+      getFileSystem (void) const;
+
+    protected:
+
+      // ----------------------------------------------------------------------
+      // Implementations.
+
+      /**
+       * @return object if successful, otherwise nullptr and errno.
+       */
+      virtual directory*
+      do_vopen (const char* dirname) = 0;
+
+      virtual struct dirent*
+      do_read (void);
+
+      virtual void
+      do_rewind (void);
+
+      virtual int
+      do_close (void);
+
+      // ----------------------------------------------------------------------
+      // Support functions.
+
+      void
+      setFileSystem (file_system* fileSystem);
+
+    private:
+
+      file_system* fFileSystem;
+      struct dirent fDirEntry;
+    };
+
+#pragma GCC diagnostic pop
+
+    // ------------------------------------------------------------------------
+
+    inline void
+    directory::setFileSystem (file_system* fileSystem)
+    {
+      fFileSystem = fileSystem;
     }
 
-    inline void*
-    Pool::getObject (std::size_t index) const
+    inline file_system*
+    directory::getFileSystem (void) const
     {
-      return fArray[index];
+      return fFileSystem;
     }
 
-    inline bool
-    Pool::getFlag (std::size_t index) const
+    inline struct dirent*
+    directory::getDirEntry (void)
     {
-      return fInUse[index];
+      return &fDirEntry;
+    }
+
+    inline const char*
+    directory::getName (void) const
+    {
+      return &fDirEntry.d_name[0];
     }
 
   } /* namespace posix */
@@ -108,4 +158,4 @@ namespace os
 
 #endif /* __cplusplus */
 
-#endif /* CMSIS_PLUS_POSIX_IO_POOL_H_ */
+#endif /* CMSIS_PLUS_POSIX_IO_DIRECTORY_H_ */

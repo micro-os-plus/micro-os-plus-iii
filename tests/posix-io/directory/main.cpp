@@ -25,14 +25,14 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "posix-io/FileDescriptorsManager.h"
-#include "posix-io/IO.h"
-#include "posix-io/Directory.h"
-#include "posix-io/File.h"
-#include "posix-io/FileSystem.h"
+#include "posix-io/file_descriptors_manager.h"
+#include "posix-io/io.h"
+#include "posix-io/directory.h"
+#include "posix-io/file.h"
+#include "posix-io/file-system.h"
 #include "posix-io/TPool.h"
-#include "posix-io/MountManager.h"
-#include "posix-io/BlockDevice.h"
+#include "posix-io/mount_manager.h"
+#include "posix-io/device_block.h"
 #include <cmsis-plus/diag/trace.h>
 
 #include <cerrno>
@@ -53,7 +53,7 @@ enum class Cmds
     { UNKNOWN, NOTSET, OPEN, CLOSE, READ, REWIND
 };
 
-class TestFile : public os::posix::File
+class TestFile : public os::posix::file
 {
 public:
 
@@ -150,7 +150,7 @@ TestFile::do_close (void)
 // Test class, all methods store the input in local variables,
 // to be checked later.
 
-class TestDir : public os::posix::Directory
+class TestDir : public os::posix::directory
 {
 public:
 
@@ -167,7 +167,7 @@ protected:
 
   // Implementations.
 
-  virtual Directory*
+  virtual directory*
   do_vopen (const char* dirname) override;
 
   virtual struct dirent*
@@ -208,7 +208,7 @@ TestDir::getPath (void)
   return fPath;
 }
 
-os::posix::Directory*
+os::posix::directory*
 TestDir::do_vopen (const char* dirname)
 {
   fPath = dirname;
@@ -245,11 +245,11 @@ TestDir::do_rewind (void)
 
 // ----------------------------------------------------------------------------
 
-class TestFileSystem : public os::posix::FileSystem
+class TestFileSystem : public os::posix::file_system
 {
 public:
 
-  TestFileSystem (os::posix::Pool* filesPool, os::posix::Pool* dirsPool);
+  TestFileSystem (os::posix::pool* filesPool, os::posix::pool* dirsPool);
 
   // Methods used for test purposes only.
   unsigned int
@@ -281,9 +281,9 @@ private:
   unsigned int fSyncCount;
 };
 
-TestFileSystem::TestFileSystem (os::posix::Pool* filesPool,
-                                os::posix::Pool* dirsPool) :
-    os::posix::FileSystem (filesPool, dirsPool)
+TestFileSystem::TestFileSystem (os::posix::pool* filesPool,
+                                os::posix::pool* dirsPool) :
+    os::posix::file_system (filesPool, dirsPool)
 {
   fMountFlags = 1;
   fCmd = Cmds::NOTSET;
@@ -333,7 +333,7 @@ TestFileSystem::do_sync (void)
 // ----------------------------------------------------------------------------
 
 // Required only as a reference, no functionality needed.
-class TestBlockDevice : public os::posix::BlockDevice
+class TestBlockDevice : public os::posix::device_block
 {
 public:
   TestBlockDevice () = default;
@@ -345,7 +345,7 @@ using TestFilePool = os::posix::TPool<TestFile>;
 
 constexpr std::size_t FILES_POOL_ARRAY_SIZE = 2;
 
-// Pool of File objects, used in common by all filesystems.
+// pool of file objects, used in common by all filesystems.
 TestFilePool filesPool
   { FILES_POOL_ARRAY_SIZE };
 
@@ -353,20 +353,20 @@ using TestDirPool = os::posix::TPool<TestDir>;
 
 constexpr std::size_t DIRS_POOL_ARRAY_SIZE = 2;
 
-// Pool of Dir objects, used in common by all filesystems.
+// pool of Dir objects, used in common by all filesystems.
 TestDirPool dirsPool
   { DIRS_POOL_ARRAY_SIZE };
 
-// File systems, all using the same pool.
+// file systems, all using the same pool.
 TestFileSystem root (&filesPool, &dirsPool);
 TestFileSystem babu (&filesPool, &dirsPool);
 
 // Static manager
-os::posix::FileDescriptorsManager dm
+os::posix::file_descriptors_manager dm
   { 5 };
 
 // Static manager
-os::posix::MountManager fsm
+os::posix::mount_manager fsm
   { 2 };
 
 // Block devices, just referenced, no calls forwarded to them.
@@ -383,7 +383,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       // Mount
       errno = -2;
       assert(
-          (os::posix::MountManager::mount (&babu, "/babu/", &babuDevice, 124) == 0) && (errno == 0));
+          (os::posix::mount_manager::mount (&babu, "/babu/", &babuDevice, 124) == 0) && (errno == 0));
     }
 
     {
@@ -465,7 +465,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       // Test OPEN
       errno = -2;
-      os::posix::Directory* dir = os::posix::opendir ("/babu/d2");
+      os::posix::directory* dir = os::posix::opendir ("/babu/d2");
       assert((dir != nullptr) && (errno == 0));
 
       // Must be the first used slot in the pool.

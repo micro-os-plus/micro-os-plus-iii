@@ -25,28 +25,62 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CMSIS_PLUS_POSIX_IO_NET_INTERFACE_H_
-#define CMSIS_PLUS_POSIX_IO_NET_INTERFACE_H_
-
-#if defined(__cplusplus)
-
-// ----------------------------------------------------------------------------
+#include <cmsis-plus/posix-io/pool.h>
 
 namespace os
 {
   namespace posix
   {
-    class NetInterface
-    {
-    public:
-      NetInterface () = default;
 
-    };
+    // ------------------------------------------------------------------------
+
+    pool::pool (std::size_t size)
+    {
+      fSize = size;
+      fInUse = new bool[size];
+      for (std::size_t i = 0; i < fSize; ++i)
+        {
+          fInUse[i] = false;
+        }
+      // The derived class must alloc and set this pointer.
+      fArray = nullptr;
+    }
+
+    pool::~pool ()
+    {
+      delete[] fInUse;
+    }
+
+    // ------------------------------------------------------------------------
+
+    void*
+    pool::aquire (void)
+    {
+      for (std::size_t i = 0; i < fSize; ++i)
+        {
+          if (!fInUse[i])
+            {
+              fInUse[i] = true;
+              return fArray[i];
+            }
+        }
+
+      return nullptr;
+    }
+
+    bool
+    pool::release (void* file)
+    {
+      for (std::size_t i = 0; i < fSize; ++i)
+        {
+          if (fInUse[i] && (fArray[i] == file))
+            {
+              fInUse[i] = false;
+              return true;
+            }
+        }
+      return false;
+    }
+
   } /* namespace posix */
 } /* namespace os */
-
-// ----------------------------------------------------------------------------
-
-#endif /* __cplusplus */
-
-#endif /* CMSIS_PLUS_POSIX_IO_NET_INTERFACE_H_ */

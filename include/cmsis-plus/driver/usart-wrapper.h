@@ -53,27 +53,27 @@ namespace os
     // This wrapper makes a CMSIS USART Keil driver behave like a
     // CMSIS++ Serial driver.
 
-    class Usart_wrapper : public Serial
+    class usart_wrapper : public Serial
     {
     public:
 
       // --------------------------------------------------------------------
 
-      Usart_wrapper (ARM_DRIVER_USART* driver,
+      usart_wrapper (ARM_DRIVER_USART* driver,
                      ARM_USART_SignalEvent_t c_cb_func) noexcept;
 
-      Usart_wrapper (const Usart_wrapper&) = delete;
+      usart_wrapper (const usart_wrapper&) = delete;
 
-      Usart_wrapper (Usart_wrapper&&) = delete;
+      usart_wrapper (usart_wrapper&&) = delete;
 
-      Usart_wrapper&
-      operator= (const Usart_wrapper&) = delete;
+      usart_wrapper&
+      operator= (const usart_wrapper&) = delete;
 
-      Usart_wrapper&
-      operator= (Usart_wrapper&&) = delete;
+      usart_wrapper&
+      operator= (usart_wrapper&&) = delete;
 
       virtual
-      ~Usart_wrapper () noexcept;
+      ~usart_wrapper () noexcept;
 
       // --------------------------------------------------------------------
 

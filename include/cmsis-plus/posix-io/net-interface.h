@@ -25,67 +25,28 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef POSIX_IO_DIRENT_H_
-#define POSIX_IO_DIRENT_H_
+#ifndef CMSIS_PLUS_POSIX_IO_NET_INTERFACE_H_
+#define CMSIS_PLUS_POSIX_IO_NET_INTERFACE_H_
 
-#if !defined(__ARM_EABI__)
-#include <dirent.h>
-#else
+#if defined(__cplusplus)
 
-#include <sys/types.h>
+// ----------------------------------------------------------------------------
 
-#ifdef __cplusplus
-extern "C"
+namespace os
 {
-#endif
-
-// ----------------------------------------------------------------------------
-
-#if !defined(OS_INTEGER_DIRENT_NAME_MAX)
-#define OS_INTEGER_DIRENT_NAME_MAX  (256)
-#endif
-
-// ----------------------------------------------------------------------------
-
-  struct dirent
+  namespace posix
   {
-    ino_t d_ino;
-    char d_name[OS_INTEGER_DIRENT_NAME_MAX];
-  };
+    class net_interface
+    {
+    public:
+      net_interface () = default;
 
-// The content of this structure is not relevant, it is here just to keep
-// POSIX compatibility, in real life the directory class is used
-// and casted to DIR.
-  typedef struct
-  {
-    ;
-  } DIR;
+    };
+  } /* namespace posix */
+} /* namespace os */
 
 // ----------------------------------------------------------------------------
 
-  DIR*
-  opendir (const char* dirname);
+#endif /* __cplusplus */
 
-  struct dirent*
-  readdir (DIR* dirp);
-
-#if 0
-  int
-  readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result);
-#endif
-
-  void
-  rewinddir (DIR* dirp);
-
-  int
-  closedir (DIR* dirp);
-
-// ----------------------------------------------------------------------------
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* __ARM_EABI__ */
-
-#endif /* POSIX_IO_DIRENT_H_ */
+#endif /* CMSIS_PLUS_POSIX_IO_NET_INTERFACE_H_ */

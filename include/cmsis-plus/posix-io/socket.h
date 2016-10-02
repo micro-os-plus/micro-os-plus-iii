@@ -32,7 +32,7 @@
 
 // ----------------------------------------------------------------------------
 
-#include <cmsis-plus/posix-io/IO.h>
+#include <cmsis-plus/posix-io/io.h>
 #include <cmsis-plus/posix/sys/socket.h>
 
 // ----------------------------------------------------------------------------
@@ -43,39 +43,44 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    class Socket;
+    class socket;
 
     // ------------------------------------------------------------------------
 
-    Socket*
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
+    class socket*
     socket (int domain, int type, int protocol);
+
+#pragma GCC diagnostic pop
 
 #if 0
     int
-    socketpair (int domain, int type, int protocol, Socket* socket_vector[2]);
+    socketpair (int domain, int type, int protocol, socket* socket_vector[2]);
 #endif
 
     // ------------------------------------------------------------------------
 
-    class Socket : public IO
+    class socket : public io
     {
       // ----------------------------------------------------------------------
 
-      friend Socket*
+      friend socket*
       socket (int domain, int type, int protocol);
 
       // ----------------------------------------------------------------------
 
     public:
 
-      Socket ();
+      socket ();
 
       virtual
-      ~Socket ();
+      ~socket ();
 
       // ----------------------------------------------------------------------
 
-      Socket*
+      socket*
       accept (struct sockaddr* address, socklen_t* address_len);
 
       int
@@ -137,7 +142,7 @@ namespace os
       do_socket (int domain, int type, int protocol) = 0;
 
       virtual int
-      do_accept (Socket* sock, struct sockaddr* address,
+      do_accept (socket* sock, struct sockaddr* address,
                  socklen_t* address_len);
 
       virtual int

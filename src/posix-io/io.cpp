@@ -25,17 +25,16 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/posix-io/FileDescriptorsManager.h>
-#include <cmsis-plus/posix-io/IO.h>
-#include <cmsis-plus/posix-io/CharDevice.h>
-#include <cmsis-plus/posix-io/CharDevicesRegistry.h>
-#include <cmsis-plus/posix-io/File.h>
-#include <cmsis-plus/posix-io/FileSystem.h>
-#include <cmsis-plus/posix-io/MountManager.h>
-#include <cmsis-plus/posix-io/Pool.h>
-#include <cmsis-plus/posix-io/NetStack.h>
-
+#include <cmsis-plus/posix-io/device-char.h>
 #include <cmsis-plus/posix/sys/uio.h>
+#include <cmsis-plus/posix-io/device-char-registry.h>
+#include <cmsis-plus/posix-io/file.h>
+#include <cmsis-plus/posix-io/file-descriptors-manager.h>
+#include <cmsis-plus/posix-io/file-system.h>
+#include <cmsis-plus/posix-io/io.h>
+#include <cmsis-plus/posix-io/mount-manager.h>
+#include <cmsis-plus/posix-io/net-stack.h>
+#include <cmsis-plus/posix-io/pool.h>
 
 #include <cassert>
 #include <cerrno>
@@ -53,24 +52,24 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    IO*
+    io*
     open (const char* path, int oflag, ...)
     {
       // Forward to the variadic version of the function.
       std::va_list args;
       va_start (args, oflag);
-      IO* const ret = vopen (path, oflag, args);
+      io* const ret = vopen (path, oflag, args);
       va_end (args);
 
       return ret;
     }
 
     /**
-     * The actual open workhorse. Using the 'path', try to identify the
-     * IO object, then call the implementation. If successful, allocate a
+     * The actual open workhorse. Using the _path_, try to identify the
+     * `io` object, then call the implementation. If successful, allocate a
      * new POSIX file descriptor, to be used by C functions.
      */
-    IO*
+    io*
     vopen (const char* path, int oflag, std::va_list args)
     {
       if (path == nullptr)
@@ -88,12 +87,13 @@ namespace os
       errno = 0;
 
       // First check if path is a device.
-      os::posix::IO* io = os::posix::CharDevicesRegistry::identifyDevice (path);
+      os::posix::io* io = os::posix::device_char_registry::identifyDevice (
+          path);
       if (io != nullptr)
         {
           // If so, use the implementation to open the device.
-          int oret = static_cast<CharDevice*> (io)->do_vopen (path, oflag,
-                                                              args);
+          int oret = static_cast<device_char*> (io)->do_vopen (path, oflag,
+                                                               args);
           if (oret < 0)
             {
               // Open failed.
@@ -103,7 +103,7 @@ namespace os
       else
         {
           auto adjusted_path = path;
-          auto* const fs = os::posix::MountManager::identifyFileSystem (
+          auto* const fs = os::posix::mount_manager::identifyFileSystem (
               &adjusted_path);
 
           // The manager will return null if there are no file systems
@@ -125,17 +125,17 @@ namespace os
         }
 
       // If successful, allocate a file descriptor.
-      // Return a valid pointer to an object derived from IO, or nullptr.
+      // Return a valid pointer to an object derived from io, or nullptr.
       return io->allocFileDescriptor ();
     }
 
     // ------------------------------------------------------------------------
 
-    IO*
-    IO::allocFileDescriptor (void)
+    io*
+    io::allocFileDescriptor (void)
     {
 
-      int fd = FileDescriptorsManager::alloc (this);
+      int fd = file_descriptors_manager::alloc (this);
       if (fd < 0)
         {
           // If allocation failed, close this object.
@@ -144,19 +144,19 @@ namespace os
           return nullptr;
         }
 
-      // Return a valid pointer to an object derived from IO.
+      // Return a valid pointer to an object derived from `io`.
       return this;
     }
 
     // ------------------------------------------------------------------------
 
-    IO::IO ()
+    io::io ()
     {
       fType = Type::NOTSET;
       fFileDescriptor = noFileDescriptor;
     }
 
-    IO::~IO ()
+    io::~io ()
     {
       fFileDescriptor = noFileDescriptor;
     }
@@ -164,7 +164,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     int
-    IO::close (void)
+    io::close (void)
     {
       errno = 0;
 
@@ -178,7 +178,7 @@ namespace os
       int ret = do_close ();
 
       // Remove this IO from the file descriptors registry.
-      FileDescriptorsManager::free (fFileDescriptor);
+      file_descriptors_manager::free (fFileDescriptor);
       fFileDescriptor = noFileDescriptor;
 
       // Release objects acquired from a pool.
@@ -187,19 +187,19 @@ namespace os
     }
 
     void
-    IO::do_release (void)
+    io::do_release (void)
     {
       return;
     }
 
     bool
-    IO::do_is_opened (void)
+    io::do_is_opened (void)
     {
       return true;
     }
 
     bool
-    IO::do_is_connected (void)
+    io::do_is_connected (void)
     {
       return true;
     }
@@ -209,7 +209,7 @@ namespace os
     // All these wrappers are required to clear 'errno'.
 
     ssize_t
-    IO::read (void* buf, std::size_t nbyte)
+    io::read (void* buf, std::size_t nbyte)
     {
 
       if (buf == nullptr)
@@ -237,7 +237,7 @@ namespace os
     }
 
     ssize_t
-    IO::write (const void* buf, std::size_t nbyte)
+    io::write (const void* buf, std::size_t nbyte)
     {
       if (buf == nullptr)
         {
@@ -269,7 +269,7 @@ namespace os
     }
 
     ssize_t
-    IO::writev (const struct iovec* iov, int iovcnt)
+    io::writev (const struct iovec* iov, int iovcnt)
     {
       if (iov == nullptr)
         {
@@ -302,7 +302,7 @@ namespace os
     }
 
     int
-    IO::fcntl (int cmd, ...)
+    io::fcntl (int cmd, ...)
     {
       // Forward to the variadic version of the function.
       std::va_list args;
@@ -314,7 +314,7 @@ namespace os
     }
 
     int
-    IO::vfcntl (int cmd, std::va_list args)
+    io::vfcntl (int cmd, std::va_list args)
     {
       if (!do_is_opened ())
         {
@@ -335,7 +335,7 @@ namespace os
     }
 
     int
-    IO::isatty (void)
+    io::isatty (void)
     {
       errno = 0;
 
@@ -345,7 +345,7 @@ namespace os
 
     // fstat() on a socket returns a zero'd buffer.
     int
-    IO::fstat (struct stat* buf)
+    io::fstat (struct stat* buf)
     {
       if (buf == nullptr)
         {
@@ -377,7 +377,7 @@ namespace os
     // it must be implemented by derived classes.
 
     int
-    IO::do_close (void)
+    io::do_close (void)
     {
       return 0; // Always return success
     }
@@ -386,14 +386,14 @@ namespace os
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
     ssize_t
-    IO::do_read (void* buf, std::size_t nbyte)
+    io::do_read (void* buf, std::size_t nbyte)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     ssize_t
-    IO::do_write (const void* buf, std::size_t nbyte)
+    io::do_write (const void* buf, std::size_t nbyte)
     {
       errno = ENOSYS; // Not implemented
       return -1;
@@ -404,7 +404,7 @@ namespace os
     // it properly in the derived class.
 
     ssize_t
-    IO::do_writev (const struct iovec* iov, int iovcnt)
+    io::do_writev (const struct iovec* iov, int iovcnt)
     {
       ssize_t total = 0;
 
@@ -422,21 +422,21 @@ namespace os
     }
 
     int
-    IO::do_vfcntl (int cmd, std::va_list args)
+    io::do_vfcntl (int cmd, std::va_list args)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     int
-    IO::do_isatty (void)
+    io::do_isatty (void)
     {
       errno = ENOTTY; // By default, it is not a TTY.
       return 0;
     }
 
     int
-    IO::do_fstat (struct stat* buf)
+    io::do_fstat (struct stat* buf)
     {
       errno = ENOSYS; // Not implemented
       return -1;

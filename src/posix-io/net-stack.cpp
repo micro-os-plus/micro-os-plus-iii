@@ -25,7 +25,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/posix-io/NetStack.h>
+#include <cmsis-plus/posix-io/net-stack.h>
 
 // ----------------------------------------------------------------------------
 
@@ -35,16 +35,16 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    Pool* NetStack::sfSocketsPool;
+    pool* net_stack::sfSocketsPool;
 
     // ------------------------------------------------------------------------
 
-    NetStack::NetStack (Pool* socketsPool)
+    net_stack::net_stack (pool* socketsPool)
     {
       sfSocketsPool = socketsPool;
     }
 
-    NetStack::~NetStack ()
+    net_stack::~net_stack ()
     {
       ;
     }

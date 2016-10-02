@@ -47,7 +47,7 @@ namespace os
 {
   namespace driver
   {
-    // ======================================================================
+    // ========================================================================
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
@@ -55,30 +55,30 @@ namespace os
     // This wrapper makes a CMSIS USBD Keil driver behave like a
     // CMSIS++ Serial driver.
 
-    class Usbd_wrapper : public usb::Device
+    class usbd_wrapper : public usb::Device
     {
     public:
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
-      Usbd_wrapper (ARM_DRIVER_USBD* driver,
+      usbd_wrapper (ARM_DRIVER_USBD* driver,
                     ARM_USBD_SignalDeviceEvent_t c_cb_device_func,
                     ARM_USBD_SignalEndpointEvent_t c_cb_endpoint_func) noexcept;
 
-      Usbd_wrapper (const Usbd_wrapper&) = delete;
+      usbd_wrapper (const usbd_wrapper&) = delete;
 
-      Usbd_wrapper (Usbd_wrapper&&) = delete;
+      usbd_wrapper (usbd_wrapper&&) = delete;
 
-      Usbd_wrapper&
-      operator= (const Usbd_wrapper&) = delete;
+      usbd_wrapper&
+      operator= (const usbd_wrapper&) = delete;
 
-      Usbd_wrapper&
-      operator= (Usbd_wrapper&&) = delete;
+      usbd_wrapper&
+      operator= (usbd_wrapper&&) = delete;
 
       virtual
-      ~Usbd_wrapper () noexcept;
+      ~usbd_wrapper () noexcept;
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
     protected:
 
@@ -134,7 +134,7 @@ namespace os
       virtual return_t
       do_abort_transfer (usb::endpoint_t ep_addr) noexcept override;
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
     private:
 

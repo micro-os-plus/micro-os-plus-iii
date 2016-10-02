@@ -25,12 +25,12 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/posix-io/File.h>
-#include <cmsis-plus/posix-io/FileSystem.h>
-#include <cmsis-plus/posix-io/MountManager.h>
-#include <cmsis-plus/posix-io/Pool.h>
-
+#include <cmsis-plus/posix-io/directory.h>
+#include <cmsis-plus/posix-io/file-system.h>
+#include <cmsis-plus/posix-io/mount-manager.h>
+#include <cmsis-plus/posix-io/pool.h>
 #include <cerrno>
+#include <cassert>
 
 // ----------------------------------------------------------------------------
 
@@ -40,110 +40,115 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    File*
-    File::open (const char* path, int oflag, ...)
+    directory*
+    opendir (const char* dirname)
     {
-      // Forward to the variadic version of the function.
-      std::va_list args;
-      va_start (args, oflag);
-      auto* const ret = vopen (path, oflag, args);
-      va_end (args);
+      if (dirname == nullptr)
+        {
+          errno = EFAULT;
+          return nullptr;
+        }
 
+      if (*dirname == '\0')
+        {
+          errno = ENOENT;
+          return nullptr;
+        }
+
+      errno = 0;
+
+      auto adjusted_dirname = dirname;
+      auto* const fs = os::posix::mount_manager::identifyFileSystem (
+          &adjusted_dirname);
+
+      // The manager will return null if there are no file systems
+      // registered, no need to check this condition separately.
+      if (fs == nullptr)
+        {
+          errno = EBADF;
+          return nullptr;
+        }
+
+      // Use the file system implementation to open the directory, using
+      // the adjusted path (mount point prefix removed).
+      return fs->opendir (adjusted_dirname);
+    }
+
+    // ------------------------------------------------------------------------
+
+    directory::directory (void)
+    {
+      fFileSystem = nullptr;
+    }
+
+    directory::~directory ()
+    {
+      fFileSystem = nullptr;
+    }
+
+    // ------------------------------------------------------------------------
+
+    struct dirent*
+    directory::read (void)
+    {
+      assert (fFileSystem != nullptr);
+      errno = 0;
+
+      // Execute the implementation specific code.
+      return do_read ();
+    }
+
+    void
+    directory::rewind (void)
+    {
+      assert (fFileSystem != nullptr);
+      errno = 0;
+
+      // Execute the implementation specific code.
+      do_rewind ();
+    }
+
+    int
+    directory::close (void)
+    {
+      assert (fFileSystem != nullptr);
+      errno = 0;
+
+      // Execute the implementation specific code.
+      int ret = do_close ();
+      auto* const pool = fFileSystem->getDirsPool ();
+      if (pool != nullptr)
+        {
+          pool->release (this);
+        }
       return ret;
     }
 
     // ------------------------------------------------------------------------
+    // Default implementations; overwrite them with real code.
 
-    File::File ()
+    // do_vopen() is not here because it is an abstract virtual to be
+    // implemented by derived classes.
+
+    struct dirent*
+    directory::do_read (void)
     {
-      fType = Type::FILE;
-      fFileSystem = nullptr;
+      // Return end of directory.
+      return nullptr;
     }
-
-    File::~File ()
-    {
-      fFileSystem = nullptr;
-    }
-
-    // ------------------------------------------------------------------------
 
     void
-    File::do_release (void)
+    directory::do_rewind (void)
     {
-      // Files is free, return it to the pool.
-      auto fs = getFileSystem ();
-      if (fs != nullptr)
-        {
-          auto pool = fs->getFilesPool ();
-          if (pool != nullptr)
-            {
-              pool->release (this);
-            }
-          setFileSystem (nullptr);
-        }
-    }
-
-    // ------------------------------------------------------------------------
-
-    off_t
-    File::lseek (off_t offset, int whence)
-    {
-      errno = 0;
-
-      // Execute the implementation specific code.
-      return do_lseek (offset, whence);
+      // Ignore rewind.
+      return;
     }
 
     int
-    File::ftruncate (off_t length)
+    directory::do_close (void)
     {
-      if (length < 0)
-        {
-          errno = EINVAL;
-          return -1;
-        }
-
-      errno = 0;
-
-      // Execute the implementation specific code.
-      return do_ftruncate (length);
-    }
-
-    int
-    File::fsync (void)
-    {
-      errno = 0;
-
-      // Execute the implementation specific code.
-      return do_fsync ();
-    }
-
-    // ------------------------------------------------------------------------
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
-    off_t
-    File::do_lseek (off_t offset, int whence)
-    {
-      errno = ENOSYS; // Not implemented
-      return -1;
-    }
-
-    int
-    File::do_ftruncate (off_t length)
-    {
-      errno = ENOSYS; // Not implemented
-      return -1;
-    }
-
-#pragma GCC diagnostic pop
-
-    int
-    File::do_fsync (void)
-    {
-      errno = ENOSYS; // Not implemented
-      return -1;
+      // Ignore close, return ok.
+      return 0;
     }
 
   } /* namespace posix */

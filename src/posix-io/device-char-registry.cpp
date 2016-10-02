@@ -25,8 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/posix-io/CharDevicesRegistry.h>
-#include <cmsis-plus/posix-io/CharDevice.h>
+#include <cmsis-plus/posix-io/device-char-registry.h>
+#include <cmsis-plus/posix-io/device-char.h>
 #include <cmsis-plus/diag/trace.h>
 
 #include <cassert>
@@ -41,18 +41,18 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    std::size_t CharDevicesRegistry::sfSize;
+    std::size_t device_char_registry::sfSize;
 
-    CharDevice** CharDevicesRegistry::sfRegistryArray;
+    device_char** device_char_registry::sfRegistryArray;
 
     // ------------------------------------------------------------------------
 
-    CharDevicesRegistry::CharDevicesRegistry (std::size_t size)
+    device_char_registry::device_char_registry (std::size_t size)
     {
       assert (size > 0);
 
       sfSize = size;
-      sfRegistryArray = new CharDevice*[size];
+      sfRegistryArray = new device_char*[size];
 
       for (std::size_t i = 0; i < size; ++i)
         {
@@ -60,7 +60,7 @@ namespace os
         }
     }
 
-    CharDevicesRegistry::~CharDevicesRegistry ()
+    device_char_registry::~device_char_registry ()
     {
       delete[] sfRegistryArray;
       sfSize = 0;
@@ -69,7 +69,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     void
-    CharDevicesRegistry::add (CharDevice* device)
+    device_char_registry::add (device_char* device)
     {
 #if defined(DEBUG)
       for (std::size_t i = 0; i < sfSize; ++i)
@@ -104,7 +104,7 @@ namespace os
     }
 
     void
-    CharDevicesRegistry::remove (CharDevice* device)
+    device_char_registry::remove (device_char* device)
     {
       for (std::size_t i = 0; i < sfSize; ++i)
         {
@@ -121,12 +121,12 @@ namespace os
     /**
      * return pointer to device or nullptr if not found.
      */
-    CharDevice*
-    CharDevicesRegistry::identifyDevice (const char* path)
+    device_char*
+    device_char_registry::identifyDevice (const char* path)
     {
       assert (path != nullptr);
 
-      auto prefix = CharDevice::getDevicePrefix ();
+      auto prefix = device_char::getDevicePrefix ();
       if (std::strncmp (prefix, path, std::strlen (prefix)) != 0)
         {
           // The device prefix does not match, not a device.

@@ -25,18 +25,18 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "posix-drivers/CmsisUsartCharDevice.h"
-#include "posix-drivers/TBufferedCmsisUsartCharDevice.h"
-#include "posix-io/FileDescriptorsManager.h"
-#include "posix-io/CharDevicesRegistry.h"
+#include "posix-drivers/CmsisUsartdevice_char.h"
+#include "posix-drivers/TBufferedCmsisUsartdevice_char.h"
+#include "posix-io/file-descriptors-manager.h"
+#include "posix-io/device_charsRegistry.h"
 #include "Driver_USART.h"
 
 // Static manager
-os::posix::FileDescriptorsManager descriptorsManager
+os::posix::file_descriptors_manager descriptorsManager
   { 5 };
 
 // Static manager
-os::posix::CharDevicesRegistry devicesRegistry
+os::posix::device_char_registry devicesRegistry
   { 2 };
 
 // ----------------------------------------------------------------------------
@@ -48,7 +48,7 @@ extern "C" void
 eventCallBack1 (uint32_t event);
 
 // This device will be mapped as "/dev/usart"
-os::posix::CmsisUsartCharDevice usart1
+os::posix::CmsisUsartdevice_char usart1
   { "usart1", &driver1, eventCallBack1 };
 
 void
@@ -81,8 +81,8 @@ private:
   // uint32_t fStatus;
 };
 
-using BufferedCmsisUsartCharDevice =
-os::posix::TBufferedCmsisUsartCharDevice<TestCriticalSection>;
+using BufferedCmsisUsartdevice_char =
+os::posix::TBufferedCmsisUsartdevice_char<TestCriticalSection>;
 
 ARM_DRIVER_USART driver2
   { };
@@ -99,7 +99,7 @@ extern "C" void
 eventCallBack2 (uint32_t event);
 
 // This device will be mapped as "/dev/usart2"
-BufferedCmsisUsartCharDevice usart2
+BufferedCmsisUsartdevice_char usart2
   { "usart2", &driver2, eventCallBack2, &usart2_rx_circular_buffer,
       &usart2_tx_circular_buffer };
 
@@ -115,8 +115,8 @@ eventCallBack2 (uint32_t event)
 int
 main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
-  os::posix::CharDevicesRegistry::add (&usart1);
-  os::posix::CharDevicesRegistry::add (&usart2);
+  os::posix::device_charsRegistry::add (&usart1);
+  os::posix::device_charsRegistry::add (&usart2);
 
   int fd1 = __posix_open ("/dev/usart1", 0);
   __posix_close (fd1);

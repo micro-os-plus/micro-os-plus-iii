@@ -50,27 +50,27 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    class IO;
-    class FileSystem;
+    class io;
+    class file_system;
 
     // ------------------------------------------------------------------------
 
-    IO*
+    io*
     open (const char* path, int oflag, ...);
 
-    IO*
+    io*
     vopen (const char* path, int oflag, std::va_list args);
 
     // ------------------------------------------------------------------------
 
-    class IO
+    class io
     {
       // ----------------------------------------------------------------------
 
-      friend class FileSystem;
-      friend class FileDescriptorsManager;
+      friend class file_system;
+      friend class file_descriptors_manager;
 
-      friend IO*
+      friend io*
       vopen (const char* path, int oflag, std::va_list args);
 
       // ----------------------------------------------------------------------
@@ -89,11 +89,11 @@ namespace os
 
       // ----------------------------------------------------------------------
 
-      IO ();
-      IO (const IO&) = delete;
+      io ();
+      io (const io&) = delete;
 
       virtual
-      ~IO ();
+      ~io ();
 
       // ----------------------------------------------------------------------
 
@@ -187,7 +187,7 @@ namespace os
       void
       clearFileDescriptor (void);
 
-      IO*
+      io*
       allocFileDescriptor (void);
 
       // ----------------------------------------------------------------------
@@ -203,39 +203,39 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    inline IO::Type
-    IO::getType (void) const
+    inline io::Type
+    io::getType (void) const
     {
       return fType;
     }
 
     inline void
-    IO::setFileDescriptor (fileDescriptor_t fildes)
+    io::setFileDescriptor (fileDescriptor_t fildes)
     {
       fFileDescriptor = fildes;
     }
 
     inline void
-    IO::clearFileDescriptor (void)
+    io::clearFileDescriptor (void)
     {
       fFileDescriptor = noFileDescriptor;
     }
 
     inline fileDescriptor_t
-    IO::getFileDescriptor (void) const
+    io::getFileDescriptor (void) const
     {
       return fFileDescriptor;
     }
 
 #if 0
   inline bool
-  IO::is_opened (void)
+  io::is_opened (void)
     {
       return do_is_opened ();
     }
 
   inline bool
-  IO::is_connected (void)
+  io::is_connected (void)
     {
       return do_is_connected ();
     }

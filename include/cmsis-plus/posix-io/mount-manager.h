@@ -25,20 +25,15 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CMSIS_PLUS_POSIX_IO_CHAR_DEVICE_H_
-#define CMSIS_PLUS_POSIX_IO_CHAR_DEVICE_H_
+#ifndef CMSIS_PLUS_POSIX_IO_MOUNT_MANAGER_H_
+#define CMSIS_PLUS_POSIX_IO_MOUNT_MANAGER_H_
 
 #if defined(__cplusplus)
 
 // ----------------------------------------------------------------------------
 
-#include <cmsis-plus/posix-io/IO.h>
-
-// ----------------------------------------------------------------------------
-
-#if ! defined(OS_STRING_POSIX_DEVICE_PREFIX)
-#define OS_STRING_POSIX_DEVICE_PREFIX "/dev/"
-#endif
+#include <cstddef>
+#include <cassert>
 
 // ----------------------------------------------------------------------------
 
@@ -48,73 +43,80 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    class CharDevice : public IO
-    {
-      // ----------------------------------------------------------------------
-
-      friend IO*
-      vopen (const char* path, int oflag, std::va_list args);
-
-      // ----------------------------------------------------------------------
-
-    public:
-
-      CharDevice (const char* name);
-      CharDevice (const CharDevice&) = delete;
-
-      virtual
-      ~CharDevice ();
-
-      int
-      ioctl (int request, ...);
-
-      int
-      vioctl (int request, std::va_list args);
-
-      // ----------------------------------------------------------------------
-
-      virtual bool
-      matchName (const char* name) const;
-
-      const char*
-      getName (void) const;
-
-      static const char*
-      getDevicePrefix (void);
-
-      // ----------------------------------------------------------------------
-
-    protected:
-
-      virtual int
-      do_vopen (const char* path, int oflag, std::va_list args) = 0;
-
-      virtual int
-      do_vioctl (int request, std::va_list args);
-
-      virtual int
-      do_isatty (void) override;
-
-      // ----------------------------------------------------------------------
-
-    protected:
-
-      const char* fName;
-
-    };
+    class file_system;
 
     // ------------------------------------------------------------------------
 
-    inline const char*
-    CharDevice::getDevicePrefix (void)
+    class mount_manager
     {
-      return OS_STRING_POSIX_DEVICE_PREFIX;
+    public:
+
+      mount_manager (std::size_t size);
+      mount_manager (const mount_manager&) = delete;
+
+      ~mount_manager ();
+
+      // ----------------------------------------------------------------------
+
+      static file_system*
+      identifyFileSystem (const char** path1, const char** path2 = nullptr);
+
+      static int
+      setRoot (file_system* fs, device_block* blockDevice, unsigned int flags);
+
+      static file_system*
+      getRoot (void);
+
+      static int
+      mount (file_system* fs, const char* path, device_block* blockDevice,
+             unsigned int flags);
+
+      static int
+      umount (const char* path, int unsigned flags);
+
+      static std::size_t
+      getSize (void);
+
+      static file_system*
+      getFileSystem (std::size_t index);
+
+      static const char*
+      getPath (std::size_t index);
+
+    private:
+
+      static std::size_t sfSize;
+
+      static file_system* sfRoot;
+      static file_system** sfFileSystemsArray;
+      static const char** sfPathsArray;
+
+    };
+
+    inline std::size_t
+    mount_manager::getSize (void)
+    {
+      return sfSize;
+    }
+
+    inline file_system*
+    mount_manager::getFileSystem (std::size_t index)
+    {
+      assert (index < sfSize);
+      return sfFileSystemsArray[index];
     }
 
     inline const char*
-    CharDevice::getName (void) const
+    mount_manager::getPath (std::size_t index)
     {
-      return fName;
+      assert (index < sfSize);
+      return sfPathsArray[index];
+    }
+
+    inline file_system*
+    mount_manager::getRoot (void)
+    {
+      return sfRoot;
     }
 
   } /* namespace posix */
@@ -124,4 +126,4 @@ namespace os
 
 #endif /* __cplusplus */
 
-#endif /* CMSIS_PLUS_POSIX_IO_CHAR_DEVICE_H_ */
+#endif /* CMSIS_PLUS_POSIX_IO_MOUNT_MANAGER_H_ */

@@ -25,62 +25,84 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/posix-io/Pool.h>
+#include <cmsis-plus/posix-io/device-char.h>
+
+#include <cstring>
+#include <cassert>
+#include <cerrno>
+
+// ----------------------------------------------------------------------------
 
 namespace os
 {
   namespace posix
   {
-
     // ------------------------------------------------------------------------
 
-    Pool::Pool (std::size_t size)
+    device_char::device_char (const char* name)
     {
-      fSize = size;
-      fInUse = new bool[size];
-      for (std::size_t i = 0; i < fSize; ++i)
-        {
-          fInUse[i] = false;
-        }
-      // The derived class must alloc and set this pointer.
-      fArray = nullptr;
+      fType = Type::DEVICE;
+      fName = name;
     }
 
-    Pool::~Pool ()
+    device_char::~device_char ()
     {
-      delete[] fInUse;
+      fName = nullptr;
     }
 
     // ------------------------------------------------------------------------
 
-    void*
-    Pool::aquire (void)
+    int
+    device_char::ioctl (int request, ...)
     {
-      for (std::size_t i = 0; i < fSize; ++i)
-        {
-          if (!fInUse[i])
-            {
-              fInUse[i] = true;
-              return fArray[i];
-            }
-        }
+      // Forward to the variadic version of the function.
+      std::va_list args;
+      va_start (args, request);
+      int ret = vioctl (request, args);
+      va_end (args);
 
-      return nullptr;
+      return ret;
     }
+
+    int
+    device_char::vioctl (int request, std::va_list args)
+    {
+      errno = 0;
+
+      // Execute the implementation specific code.
+      return do_vioctl (request, args);
+    }
+
+    // ------------------------------------------------------------------------
 
     bool
-    Pool::release (void* file)
+    device_char::matchName (const char* name) const
     {
-      for (std::size_t i = 0; i < fSize; ++i)
-        {
-          if (fInUse[i] && (fArray[i] == file))
-            {
-              fInUse[i] = false;
-              return true;
-            }
-        }
-      return false;
+      assert (name != nullptr);
+      assert (fName != nullptr);
+
+      return (std::strcmp (name, fName) == 0);
     }
+
+    int
+    device_char::do_isatty (void)
+    {
+      return 1; // Yes, it is a TTY
+    }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+    int
+    device_char::do_vioctl (int request, std::va_list args)
+    {
+      errno = ENOSYS; // Not implemented
+      return -1;
+    }
+
+#pragma GCC diagnostic pop
 
   } /* namespace posix */
 } /* namespace os */
+
+// ----------------------------------------------------------------------------

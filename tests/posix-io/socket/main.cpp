@@ -25,12 +25,12 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "posix-io/FileDescriptorsManager.h"
-#include "posix-io/IO.h"
+#include "posix-io/file_descriptors_manager.h"
+#include "posix-io/io.h"
 #include "posix-io/TPool.h"
-#include "posix-io/Socket.h"
-#include "posix-io/NetInterface.h"
-#include "posix-io/NetStack.h"
+#include "posix-io/socket.h"
+#include "posix-io/net_interface.h"
+#include "posix-io/net_stack.h"
 #include <cmsis-plus/diag/trace.h>
 
 #include "posix/sys/socket.h"
@@ -80,7 +80,7 @@ enum class Cmds
 // Test class, all methods store the input in local variables,
 // to be checked later.
 
-class TestSocket : public os::posix::Socket
+class TestSocket : public os::posix::socket
 {
 public:
 
@@ -141,7 +141,7 @@ protected:
   do_vfcntl (int cmd, va_list args) override;
 
   int
-  do_accept (Socket* sock, struct sockaddr* address, socklen_t* address_len)
+  do_accept (socket* sock, struct sockaddr* address, socklen_t* address_len)
       override;
 
   int
@@ -340,7 +340,7 @@ TestSocket::do_socket (int domain, int type, int protocol)
 }
 
 int
-TestSocket::do_accept (Socket* sock, struct sockaddr* address,
+TestSocket::do_accept (socket* sock, struct sockaddr* address,
                        socklen_t* address_len)
 {
   fCmd = Cmds::SOCKET;
@@ -516,7 +516,7 @@ TestSocket::do_sockatmark (void)
 
 // ----------------------------------------------------------------------------
 
-class TestNetInterface : public os::posix::NetInterface
+class TestNetInterface : public os::posix::net_interface
 {
 public:
   TestNetInterface () = default;
@@ -528,17 +528,17 @@ using TestSocketPool = os::posix::TPool<TestSocket>;
 
 constexpr std::size_t SOCKETS_POOL_ARRAY_SIZE = 2;
 
-// Pool of File objects, used in common by all filesystems.
+// Pool of file objects, used in common by all filesystems.
 TestSocketPool socketsPool
   { SOCKETS_POOL_ARRAY_SIZE };
 
 TestNetInterface if0;
 
-os::posix::NetStack net
+os::posix::net_stack net
   { &socketsPool };
 
 // Static manager
-os::posix::FileDescriptorsManager dm
+os::posix::file_descriptors_manager dm
   { 5 };
 
 // ----------------------------------------------------------------------------
@@ -554,10 +554,10 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       int fd;
       assert(((fd = __posix_socket (123, 234, 345)) == 3) && (errno == 0));
 
-      os::posix::IO* io = os::posix::FileDescriptorsManager::getIo (fd);
+      os::posix::io* io = os::posix::file_descriptors_manager::getIo (fd);
       assert(io != nullptr);
 
-      assert(io->getType () == os::posix::IO::Type::SOCKET);
+      assert(io->getType () == os::posix::io::Type::SOCKET);
 
       TestSocket* tsock = static_cast<TestSocket*> (io);
       assert(socketsPool.getObject (0) == tsock);
@@ -574,10 +574,10 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       socklen_t len1;
       assert(((fd2 = __posix_accept(fd, &addr1, &len1)) == 4) && (errno == 0));
 
-      os::posix::IO* io2 = os::posix::FileDescriptorsManager::getIo (fd2);
+      os::posix::io* io2 = os::posix::file_descriptors_manager::getIo (fd2);
       assert(io2 != nullptr);
 
-      assert(io2->getType () == os::posix::IO::Type::SOCKET);
+      assert(io2->getType () == os::posix::io::Type::SOCKET);
 
       TestSocket* tsock2 = static_cast<TestSocket*> (io2);
       assert(socketsPool.getObject (1) == tsock2);
@@ -759,10 +759,10 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       // Test SOCKET.
       errno = -2;
-      os::posix::Socket* sock;
+      os::posix::socket* sock;
       assert(
           ((sock = os::posix::socket(123, 234, 345)) != nullptr) && errno == 0);
-      assert(sock->getType () == os::posix::IO::Type::SOCKET);
+      assert(sock->getType () == os::posix::io::Type::SOCKET);
 
       assert(sock->getFileDescriptor () > 0);
 
@@ -778,11 +778,11 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       struct sockaddr addr1;
       socklen_t len1;
-      os::posix::Socket* sock2;
+      os::posix::socket* sock2;
       assert(
           ((sock2 = sock->accept(&addr1, &len1)) != nullptr) && (errno == 0));
 
-      assert(sock2->getType () == os::posix::IO::Type::SOCKET);
+      assert(sock2->getType () == os::posix::io::Type::SOCKET);
 
       assert(sock2->getFileDescriptor () > 0);
 

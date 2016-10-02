@@ -25,12 +25,11 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/posix-io/Socket.h>
-#include <cmsis-plus/posix-io/NetStack.h>
-#include <cmsis-plus/posix-io/Pool.h>
-
 #include <cerrno>
 #include <cmsis-plus/posix/sys/socket.h>
+#include <cmsis-plus/posix-io/net-stack.h>
+#include <cmsis-plus/posix-io/pool.h>
+#include <cmsis-plus/posix-io/socket.h>
 
 // ----------------------------------------------------------------------------
 
@@ -43,13 +42,13 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-    Socket*
+    class socket*
     socket (int domain, int type, int protocol)
     {
       errno = 0;
 
-      Socket* sock =
-          reinterpret_cast<Socket*> (NetStack::getSocketsPool ()->aquire ());
+      class socket* sock =
+          reinterpret_cast<class socket*> (net_stack::getSocketsPool ()->aquire ());
       if (sock == nullptr)
         {
           errno = ENFILE;
@@ -66,7 +65,7 @@ namespace os
     }
 
 #if 0
-    Socket*
+    socket*
     socketpair (int domain, int type, int protocol, int socket_vector[2])
       {
         return nullptr;
@@ -77,12 +76,12 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    Socket::Socket ()
+    socket::socket ()
     {
       fType = Type::SOCKET;
     }
 
-    Socket::~Socket ()
+    socket::~socket ()
     {
       ;
     }
@@ -90,10 +89,10 @@ namespace os
     // ------------------------------------------------------------------------
 
     void
-    Socket::do_release (void)
+    socket::do_release (void)
     {
       // Files is free, return it to the pool.
-      auto pool = NetStack::getSocketsPool ();
+      auto pool = net_stack::getSocketsPool ();
       if (pool != nullptr)
         {
           pool->release (this);
@@ -102,22 +101,22 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    Socket*
-    Socket::accept (struct sockaddr* address, socklen_t* address_len)
+    class socket*
+    socket::accept (struct sockaddr* address, socklen_t* address_len)
     {
       errno = 0;
 
-      auto pool = NetStack::getSocketsPool ();
+      auto pool = net_stack::getSocketsPool ();
       if (pool == nullptr)
         {
-          errno = EMFILE; // Pool is considered the per-process table.
+          errno = EMFILE; // pool is considered the per-process table.
           return nullptr;
         }
 
-      Socket* const new_socket = static_cast<Socket*> (pool->aquire ());
+      socket* const new_socket = static_cast<socket*> (pool->aquire ());
       if (new_socket == nullptr)
         {
-          errno = EMFILE; // Pool is considered the per-process table.
+          errno = EMFILE; // pool is considered the per-process table.
           return nullptr;
         }
 
@@ -127,11 +126,11 @@ namespace os
         {
           return nullptr;
         }
-      return static_cast<Socket*> (new_socket->allocFileDescriptor ());
+      return static_cast<socket*> (new_socket->allocFileDescriptor ());
     }
 
     int
-    Socket::bind (const struct sockaddr* address, socklen_t address_len)
+    socket::bind (const struct sockaddr* address, socklen_t address_len)
     {
       errno = 0;
 
@@ -140,7 +139,7 @@ namespace os
     }
 
     int
-    Socket::connect (const struct sockaddr* address, socklen_t address_len)
+    socket::connect (const struct sockaddr* address, socklen_t address_len)
     {
       errno = 0;
 
@@ -149,7 +148,7 @@ namespace os
     }
 
     int
-    Socket::getpeername (struct sockaddr* address, socklen_t* address_len)
+    socket::getpeername (struct sockaddr* address, socklen_t* address_len)
     {
       errno = 0;
 
@@ -158,7 +157,7 @@ namespace os
     }
 
     int
-    Socket::getsockname (struct sockaddr* address, socklen_t* address_len)
+    socket::getsockname (struct sockaddr* address, socklen_t* address_len)
     {
       errno = 0;
 
@@ -167,7 +166,7 @@ namespace os
     }
 
     int
-    Socket::getsockopt (int level, int option_name, void* option_value,
+    socket::getsockopt (int level, int option_name, void* option_value,
                         socklen_t* option_len)
     {
       errno = 0;
@@ -177,7 +176,7 @@ namespace os
     }
 
     int
-    Socket::listen (int backlog)
+    socket::listen (int backlog)
     {
       errno = 0;
 
@@ -186,7 +185,7 @@ namespace os
     }
 
     ssize_t
-    Socket::recv (void* buffer, size_t length, int flags)
+    socket::recv (void* buffer, size_t length, int flags)
     {
       errno = 0;
 
@@ -195,7 +194,7 @@ namespace os
     }
 
     ssize_t
-    Socket::recvfrom (void* buffer, size_t length, int flags,
+    socket::recvfrom (void* buffer, size_t length, int flags,
                       struct sockaddr* address, socklen_t* address_len)
     {
       errno = 0;
@@ -205,7 +204,7 @@ namespace os
     }
 
     ssize_t
-    Socket::recvmsg (struct msghdr* message, int flags)
+    socket::recvmsg (struct msghdr* message, int flags)
     {
       errno = 0;
 
@@ -214,7 +213,7 @@ namespace os
     }
 
     ssize_t
-    Socket::send (const void* buffer, size_t length, int flags)
+    socket::send (const void* buffer, size_t length, int flags)
     {
       errno = 0;
 
@@ -223,7 +222,7 @@ namespace os
     }
 
     ssize_t
-    Socket::sendmsg (const struct msghdr* message, int flags)
+    socket::sendmsg (const struct msghdr* message, int flags)
     {
       errno = 0;
 
@@ -232,7 +231,7 @@ namespace os
     }
 
     ssize_t
-    Socket::sendto (const void* message, size_t length, int flags,
+    socket::sendto (const void* message, size_t length, int flags,
                     const struct sockaddr* dest_addr, socklen_t dest_len)
     {
       errno = 0;
@@ -242,7 +241,7 @@ namespace os
     }
 
     int
-    Socket::setsockopt (int level, int option_name, const void* option_value,
+    socket::setsockopt (int level, int option_name, const void* option_value,
                         socklen_t option_len)
     {
       errno = 0;
@@ -252,7 +251,7 @@ namespace os
     }
 
     int
-    Socket::shutdown (int how)
+    socket::shutdown (int how)
     {
       errno = 0;
 
@@ -261,7 +260,7 @@ namespace os
     }
 
     int
-    Socket::sockatmark (void)
+    socket::sockatmark (void)
     {
       errno = 0;
 
@@ -273,7 +272,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
     int
-    Socket::do_accept (Socket* sock, struct sockaddr* address,
+    socket::do_accept (socket* sock, struct sockaddr* address,
                        socklen_t* address_len)
     {
       errno = ENOSYS; // Not implemented
@@ -281,35 +280,35 @@ namespace os
     }
 
     int
-    Socket::do_bind (const struct sockaddr* address, socklen_t address_len)
+    socket::do_bind (const struct sockaddr* address, socklen_t address_len)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     int
-    Socket::do_connect (const struct sockaddr* address, socklen_t address_len)
+    socket::do_connect (const struct sockaddr* address, socklen_t address_len)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     int
-    Socket::do_getpeername (struct sockaddr* address, socklen_t* address_len)
+    socket::do_getpeername (struct sockaddr* address, socklen_t* address_len)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     int
-    Socket::do_getsockname (struct sockaddr* address, socklen_t* address_len)
+    socket::do_getsockname (struct sockaddr* address, socklen_t* address_len)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     int
-    Socket::do_getsockopt (int level, int option_name, void* option_value,
+    socket::do_getsockopt (int level, int option_name, void* option_value,
                            socklen_t* option_len)
     {
       errno = ENOSYS; // Not implemented
@@ -317,21 +316,21 @@ namespace os
     }
 
     int
-    Socket::do_listen (int backlog)
+    socket::do_listen (int backlog)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     ssize_t
-    Socket::do_recv (void* buffer, size_t length, int flags)
+    socket::do_recv (void* buffer, size_t length, int flags)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     ssize_t
-    Socket::do_recvfrom (void* buffer, size_t length, int flags,
+    socket::do_recvfrom (void* buffer, size_t length, int flags,
                          struct sockaddr* address, socklen_t* address_len)
     {
       errno = ENOSYS; // Not implemented
@@ -339,28 +338,28 @@ namespace os
     }
 
     ssize_t
-    Socket::do_recvmsg (struct msghdr* message, int flags)
+    socket::do_recvmsg (struct msghdr* message, int flags)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     ssize_t
-    Socket::do_send (const void* buffer, size_t length, int flags)
+    socket::do_send (const void* buffer, size_t length, int flags)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     ssize_t
-    Socket::do_sendmsg (const struct msghdr* message, int flags)
+    socket::do_sendmsg (const struct msghdr* message, int flags)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     ssize_t
-    Socket::do_sendto (const void* message, size_t length, int flags,
+    socket::do_sendto (const void* message, size_t length, int flags,
                        const struct sockaddr* dest_addr, socklen_t dest_len)
     {
       errno = ENOSYS; // Not implemented
@@ -368,7 +367,7 @@ namespace os
     }
 
     int
-    Socket::do_setsockopt (int level, int option_name, const void* option_value,
+    socket::do_setsockopt (int level, int option_name, const void* option_value,
                            socklen_t option_len)
     {
       errno = ENOSYS; // Not implemented
@@ -376,14 +375,14 @@ namespace os
     }
 
     int
-    Socket::do_shutdown (int how)
+    socket::do_shutdown (int how)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     int
-    Socket::do_sockatmark (void)
+    socket::do_sockatmark (void)
     {
       errno = ENOSYS; // Not implemented
       return -1;

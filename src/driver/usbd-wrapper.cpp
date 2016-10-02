@@ -40,7 +40,7 @@ namespace os
   {
     // ----------------------------------------------------------------------
 
-    Usbd_wrapper::Usbd_wrapper (
+    usbd_wrapper::usbd_wrapper (
         ARM_DRIVER_USBD* driver, ARM_USBD_SignalDeviceEvent_t c_cb_device_func,
         ARM_USBD_SignalEndpointEvent_t c_cb_endpoint_func) noexcept :
     driver_ (driver),
@@ -50,7 +50,7 @@ namespace os
         ;
       }
 
-    Usbd_wrapper::~Usbd_wrapper () noexcept
+    usbd_wrapper::~usbd_wrapper () noexcept
     {
       driver_ = nullptr;
     }
@@ -62,7 +62,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 
     const Version&
-    Usbd_wrapper::do_get_version (void) noexcept
+    usbd_wrapper::do_get_version (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
       *(reinterpret_cast<ARM_DRIVER_VERSION*> (&version_)) =
@@ -71,7 +71,7 @@ namespace os
     }
 
     const usb::device::Capabilities&
-    Usbd_wrapper::do_get_capabilities (void) noexcept
+    usbd_wrapper::do_get_capabilities (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
       *(reinterpret_cast<ARM_USBD_CAPABILITIES*> (&capa_)) =
@@ -80,7 +80,7 @@ namespace os
     }
 
     usb::device::Status&
-    Usbd_wrapper::do_get_status (void) noexcept
+    usbd_wrapper::do_get_status (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
       *(reinterpret_cast<ARM_USBD_STATE*> (&status_)) =
@@ -91,7 +91,7 @@ namespace os
 #pragma GCC diagnostic pop
 
     return_t
-    Usbd_wrapper::do_power (Power state) noexcept
+    usbd_wrapper::do_power (Power state) noexcept
     {
       assert (driver_ != nullptr);
 
@@ -117,43 +117,43 @@ namespace os
     }
 
     return_t
-    Usbd_wrapper::do_connect (void) noexcept
+    usbd_wrapper::do_connect (void) noexcept
     {
       return driver_->DeviceConnect ();
     }
 
     return_t
-    Usbd_wrapper::do_disconnect (void) noexcept
+    usbd_wrapper::do_disconnect (void) noexcept
     {
       return driver_->DeviceDisconnect ();
     }
 
     return_t
-    Usbd_wrapper::do_wakeup_remote (void) noexcept
+    usbd_wrapper::do_wakeup_remote (void) noexcept
     {
       return driver_->DeviceRemoteWakeup ();
     }
 
     return_t
-    Usbd_wrapper::do_configure_address (usb::device_address_t dev_addr) noexcept
+    usbd_wrapper::do_configure_address (usb::device_address_t dev_addr) noexcept
     {
       return driver_->DeviceSetAddress (dev_addr);
     }
 
     return_t
-    Usbd_wrapper::do_read_setup_packet (uint8_t* buf) noexcept
+    usbd_wrapper::do_read_setup_packet (uint8_t* buf) noexcept
     {
       return driver_->ReadSetupPacket (buf);
     }
 
     usb::frame_number_t
-    Usbd_wrapper::do_get_frame_number (void) noexcept
+    usbd_wrapper::do_get_frame_number (void) noexcept
     {
       return driver_->GetFrameNumber ();
     }
 
     return_t
-    Usbd_wrapper::do_configure_endpoint (usb::endpoint_t ep_addr,
+    usbd_wrapper::do_configure_endpoint (usb::endpoint_t ep_addr,
                                          usb::Endpoint_type ep_type,
                                          usb::packet_size_t ep_max_packet_size) noexcept
     {
@@ -163,19 +163,19 @@ namespace os
     }
 
     return_t
-    Usbd_wrapper::do_unconfigure_endpoint (usb::endpoint_t ep_addr) noexcept
+    usbd_wrapper::do_unconfigure_endpoint (usb::endpoint_t ep_addr) noexcept
     {
       return driver_->EndpointUnconfigure (ep_addr);
     }
 
     return_t
-    Usbd_wrapper::do_stall_endpoint (usb::endpoint_t ep_addr, bool stall) noexcept
+    usbd_wrapper::do_stall_endpoint (usb::endpoint_t ep_addr, bool stall) noexcept
     {
       return driver_->EndpointStall (ep_addr, stall);
     }
 
     return_t
-    Usbd_wrapper::do_transfer (usb::endpoint_t ep_addr, uint8_t* data,
+    usbd_wrapper::do_transfer (usb::endpoint_t ep_addr, uint8_t* data,
                                std::size_t num) noexcept
     {
       return driver_->EndpointTransfer (ep_addr, data,
@@ -183,13 +183,13 @@ namespace os
     }
 
     std::size_t
-    Usbd_wrapper::do_get_transfer_count (usb::endpoint_t ep_addr) noexcept
+    usbd_wrapper::do_get_transfer_count (usb::endpoint_t ep_addr) noexcept
     {
       return driver_->EndpointTransferGetResult (ep_addr);
     }
 
     return_t
-    Usbd_wrapper::do_abort_transfer (usb::endpoint_t ep_addr) noexcept
+    usbd_wrapper::do_abort_transfer (usb::endpoint_t ep_addr) noexcept
     {
       return driver_->EndpointTransferAbort (ep_addr);
     }

@@ -25,15 +25,20 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CMSIS_PLUS_POSIX_IO_MOUNT_MANAGER_H_
-#define CMSIS_PLUS_POSIX_IO_MOUNT_MANAGER_H_
+#ifndef CMSIS_PLUS_POSIX_IO_DEVICE_CHAR_H_
+#define CMSIS_PLUS_POSIX_IO_DEVICE_CHAR_H_
 
 #if defined(__cplusplus)
 
 // ----------------------------------------------------------------------------
 
-#include <cstddef>
-#include <cassert>
+#include <cmsis-plus/posix-io/io.h>
+
+// ----------------------------------------------------------------------------
+
+#if ! defined(OS_STRING_POSIX_DEVICE_PREFIX)
+#define OS_STRING_POSIX_DEVICE_PREFIX "/dev/"
+#endif
 
 // ----------------------------------------------------------------------------
 
@@ -43,80 +48,73 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    class FileSystem;
-
-    // ------------------------------------------------------------------------
-
-    class MountManager
+    class device_char : public io
     {
-    public:
+      // ----------------------------------------------------------------------
 
-      MountManager (std::size_t size);
-      MountManager (const MountManager&) = delete;
-
-      ~MountManager ();
+      friend io*
+      vopen (const char* path, int oflag, std::va_list args);
 
       // ----------------------------------------------------------------------
 
-      static FileSystem*
-      identifyFileSystem (const char** path1, const char** path2 = nullptr);
+    public:
 
-      static int
-      setRoot (FileSystem* fs, BlockDevice* blockDevice, unsigned int flags);
+      device_char (const char* name);
+      device_char (const device_char&) = delete;
 
-      static FileSystem*
-      getRoot (void);
+      virtual
+      ~device_char ();
 
-      static int
-      mount (FileSystem* fs, const char* path, BlockDevice* blockDevice,
-             unsigned int flags);
+      int
+      ioctl (int request, ...);
 
-      static int
-      umount (const char* path, int unsigned flags);
+      int
+      vioctl (int request, std::va_list args);
 
-      static std::size_t
-      getSize (void);
+      // ----------------------------------------------------------------------
 
-      static FileSystem*
-      getFileSystem (std::size_t index);
+      virtual bool
+      matchName (const char* name) const;
+
+      const char*
+      getName (void) const;
 
       static const char*
-      getPath (std::size_t index);
+      getDevicePrefix (void);
 
-    private:
+      // ----------------------------------------------------------------------
 
-      static std::size_t sfSize;
+    protected:
 
-      static FileSystem* sfRoot;
-      static FileSystem** sfFileSystemsArray;
-      static const char** sfPathsArray;
+      virtual int
+      do_vopen (const char* path, int oflag, std::va_list args) = 0;
+
+      virtual int
+      do_vioctl (int request, std::va_list args);
+
+      virtual int
+      do_isatty (void) override;
+
+      // ----------------------------------------------------------------------
+
+    protected:
+
+      const char* fName;
 
     };
 
-    inline std::size_t
-    MountManager::getSize (void)
-    {
-      return sfSize;
-    }
+    // ------------------------------------------------------------------------
 
-    inline FileSystem*
-    MountManager::getFileSystem (std::size_t index)
+    inline const char*
+    device_char::getDevicePrefix (void)
     {
-      assert (index < sfSize);
-      return sfFileSystemsArray[index];
+      return OS_STRING_POSIX_DEVICE_PREFIX;
     }
 
     inline const char*
-    MountManager::getPath (std::size_t index)
+    device_char::getName (void) const
     {
-      assert (index < sfSize);
-      return sfPathsArray[index];
-    }
-
-    inline FileSystem*
-    MountManager::getRoot (void)
-    {
-      return sfRoot;
+      return fName;
     }
 
   } /* namespace posix */
@@ -126,4 +124,4 @@ namespace os
 
 #endif /* __cplusplus */
 
-#endif /* CMSIS_PLUS_POSIX_IO_MOUNT_MANAGER_H_ */
+#endif /* CMSIS_PLUS_POSIX_IO_DEVICE_CHAR_H_ */

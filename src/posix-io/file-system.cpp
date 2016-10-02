@@ -25,13 +25,12 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/posix-io/IO.h>
-#include <cmsis-plus/posix-io/FileSystem.h>
-#include <cmsis-plus/posix-io/File.h>
-#include <cmsis-plus/posix-io/Directory.h>
-#include <cmsis-plus/posix-io/MountManager.h>
-#include <cmsis-plus/posix-io/Pool.h>
-
+#include <cmsis-plus/posix-io/directory.h>
+#include <cmsis-plus/posix-io/file.h>
+#include <cmsis-plus/posix-io/file-system.h>
+#include <cmsis-plus/posix-io/io.h>
+#include <cmsis-plus/posix-io/mount-manager.h>
+#include <cmsis-plus/posix-io/pool.h>
 #include <cerrno>
 #include <cassert>
 
@@ -59,7 +58,7 @@ namespace os
         }
 
       auto adjusted_path = path;
-      auto* const fs = os::posix::MountManager::identifyFileSystem (
+      auto* const fs = os::posix::mount_manager::identifyFileSystem (
           &adjusted_path);
 
       if (fs == nullptr)
@@ -91,7 +90,7 @@ namespace os
         }
 
       auto adjusted_path = path;
-      auto* const fs = os::posix::MountManager::identifyFileSystem (
+      auto* const fs = os::posix::mount_manager::identifyFileSystem (
           &adjusted_path);
 
       if (fs == nullptr)
@@ -113,9 +112,9 @@ namespace os
       errno = 0;
 
       // Enumerate all mounted file systems and sync them.
-      for (std::size_t i = 0; i < MountManager::getSize (); ++i)
+      for (std::size_t i = 0; i < mount_manager::getSize (); ++i)
         {
-          auto fs = MountManager::getFileSystem (i);
+          auto fs = mount_manager::getFileSystem (i);
           if (fs != nullptr)
             {
               fs->do_sync ();
@@ -125,7 +124,7 @@ namespace os
 
     // ------------------------------------------------------------------------
     // Functions related to files, other than IO. The implementations is
-    // specific to each FileSystem.
+    // specific to each file_system.
 
     int
     chmod (const char* path, mode_t mode)
@@ -143,7 +142,7 @@ namespace os
         }
 
       const char* adjusted_path = path;
-      auto* const fs = os::posix::MountManager::identifyFileSystem (
+      auto* const fs = os::posix::mount_manager::identifyFileSystem (
           &adjusted_path);
 
       if (fs == nullptr)
@@ -171,7 +170,7 @@ namespace os
         }
 
       const char* adjusted_path = path;
-      auto* const fs = os::posix::MountManager::identifyFileSystem (
+      auto* const fs = os::posix::mount_manager::identifyFileSystem (
           &adjusted_path);
 
       if (fs == nullptr)
@@ -199,7 +198,7 @@ namespace os
         }
 
       const char* adjusted_path = path;
-      auto* const fs = os::posix::MountManager::identifyFileSystem (
+      auto* const fs = os::posix::mount_manager::identifyFileSystem (
           &adjusted_path);
 
       if (fs == nullptr)
@@ -234,7 +233,7 @@ namespace os
 
       auto adjusted_existing = existing;
       auto adjusted_new = _new;
-      auto* const fs = os::posix::MountManager::identifyFileSystem (
+      auto* const fs = os::posix::mount_manager::identifyFileSystem (
           &adjusted_existing, &adjusted_new);
 
       if (fs == nullptr)
@@ -262,7 +261,7 @@ namespace os
         }
 
       auto adjusted_path = path;
-      auto* const fs = os::posix::MountManager::identifyFileSystem (
+      auto* const fs = os::posix::mount_manager::identifyFileSystem (
           &adjusted_path);
 
       if (fs == nullptr)
@@ -290,7 +289,7 @@ namespace os
         }
 
       auto adjusted_path = path;
-      auto* const fs = os::posix::MountManager::identifyFileSystem (
+      auto* const fs = os::posix::mount_manager::identifyFileSystem (
           &adjusted_path);
 
       if (fs == nullptr)
@@ -304,22 +303,22 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    FileSystem::FileSystem (Pool* filesPool, Pool* dirsPool)
+    file_system::file_system (pool* filesPool, pool* dirsPool)
     {
       fFilesPool = filesPool;
       fDirsPool = dirsPool;
       fBlockDevice = nullptr;
     }
 
-    FileSystem::~FileSystem ()
+    file_system::~file_system ()
     {
       fBlockDevice = nullptr;
     }
 
     // ------------------------------------------------------------------------
 
-    IO*
-    FileSystem::open (const char* path, int oflag, std::va_list args)
+    io*
+    file_system::open (const char* path, int oflag, std::va_list args)
     {
       if (fBlockDevice == nullptr)
         {
@@ -327,21 +326,21 @@ namespace os
           return nullptr;
         }
 
-      // Get a File object from the pool.
-      auto* const file = static_cast<File*> (fFilesPool->aquire ());
+      // Get a file object from the pool.
+      auto* const f = static_cast<file*> (fFilesPool->aquire ());
 
       // Associate the file with this file system (used, for example,
       // to reach the pools at close).
-      file->setFileSystem (this);
+      f->setFileSystem (this);
 
       // Execute the file specific implementation code.
-      file->do_vopen (path, oflag, args);
+      f->do_vopen (path, oflag, args);
 
-      return file;
+      return f;
     }
 
-    Directory*
-    FileSystem::opendir (const char* dirpath)
+    directory*
+    file_system::opendir (const char* dirpath)
     {
       if (fBlockDevice == nullptr)
         {
@@ -349,8 +348,8 @@ namespace os
           return nullptr;
         }
 
-      // Get a Directory object from the pool.
-      auto* const dir = static_cast<Directory*> (fDirsPool->aquire ());
+      // Get a directory object from the pool.
+      auto* const dir = static_cast<directory*> (fDirsPool->aquire ());
 
       // Associate the dir with this file system (used, for example,
       // to reach the pools at close).
@@ -366,7 +365,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
     int
-    FileSystem::chmod (const char* path, mode_t mode)
+    file_system::chmod (const char* path, mode_t mode)
     {
       assert (fBlockDevice != nullptr);
       errno = 0;
@@ -376,7 +375,7 @@ namespace os
     }
 
     int
-    FileSystem::stat (const char* path, struct stat* buf)
+    file_system::stat (const char* path, struct stat* buf)
     {
       assert (fBlockDevice != nullptr);
       errno = 0;
@@ -386,7 +385,7 @@ namespace os
     }
 
     int
-    FileSystem::truncate (const char* path, off_t length)
+    file_system::truncate (const char* path, off_t length)
     {
       assert (fBlockDevice != nullptr);
       errno = 0;
@@ -396,7 +395,7 @@ namespace os
     }
 
     int
-    FileSystem::rename (const char* existing, const char* _new)
+    file_system::rename (const char* existing, const char* _new)
     {
       assert (fBlockDevice != nullptr);
       errno = 0;
@@ -406,7 +405,7 @@ namespace os
     }
 
     int
-    FileSystem::unlink (const char* path)
+    file_system::unlink (const char* path)
     {
       assert (fBlockDevice != nullptr);
       errno = 0;
@@ -416,7 +415,7 @@ namespace os
     }
 
     int
-    FileSystem::utime (const char* path, const struct utimbuf* times)
+    file_system::utime (const char* path, const struct utimbuf* times)
     {
       assert (fBlockDevice != nullptr);
       errno = 0;
@@ -429,7 +428,7 @@ namespace os
 
     const
     char*
-    FileSystem::adjustPath (const char* path)
+    file_system::adjustPath (const char* path)
     {
       return path;
     }
@@ -437,76 +436,76 @@ namespace os
     // ------------------------------------------------------------------------
 
     int
-    FileSystem::do_chmod (const char* path, mode_t mode)
+    file_system::do_chmod (const char* path, mode_t mode)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     int
-    FileSystem::do_stat (const char* path, struct stat* buf)
+    file_system::do_stat (const char* path, struct stat* buf)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     int
-    FileSystem::do_truncate (const char* path, off_t length)
+    file_system::do_truncate (const char* path, off_t length)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     int
-    FileSystem::do_rename (const char* existing, const char* _new)
+    file_system::do_rename (const char* existing, const char* _new)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     int
-    FileSystem::do_unlink (const char* path)
+    file_system::do_unlink (const char* path)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     int
-    FileSystem::do_utime (const char* path, const struct utimbuf* times)
+    file_system::do_utime (const char* path, const struct utimbuf* times)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     int
-    FileSystem::do_mkdir (const char* path, mode_t mode)
+    file_system::do_mkdir (const char* path, mode_t mode)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     int
-    FileSystem::do_rmdir (const char* path)
+    file_system::do_rmdir (const char* path)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     void
-    FileSystem::do_sync (void)
+    file_system::do_sync (void)
     {
       errno = ENOSYS; // Not implemented
     }
 
     int
-    FileSystem::do_mount (unsigned int flags)
+    file_system::do_mount (unsigned int flags)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     int
-    FileSystem::do_unmount (unsigned int flags)
+    file_system::do_unmount (unsigned int flags)
     {
       errno = ENOSYS; // Not implemented
       return -1;

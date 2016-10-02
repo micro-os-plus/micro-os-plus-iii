@@ -25,13 +25,13 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "posix-io/FileDescriptorsManager.h"
-#include "posix-io/IO.h"
-#include "posix-io/File.h"
-#include "posix-io/FileSystem.h"
+#include "posix-io/file_descriptors_manager.h"
+#include "posix-io/io.h"
+#include "posix-io/file.h"
+#include "posix-io/file-system.h"
 #include "posix-io/TPool.h"
-#include "posix-io/MountManager.h"
-#include "posix-io/BlockDevice.h"
+#include "posix-io/mount_manager.h"
+#include "posix-io/device_block.h"
 #include <cmsis-plus/diag/trace.h>
 
 #include <cerrno>
@@ -96,7 +96,7 @@ enum class Cmds
 // Test class, all methods store the input in local variables,
 // to be checked later.
 
-class TestFile : public os::posix::File
+class TestFile : public os::posix::file
 {
 public:
 
@@ -311,11 +311,11 @@ TestFile::do_fsync (void)
 
 // ----------------------------------------------------------------------------
 
-class TestFileSystem : public os::posix::FileSystem
+class TestFileSystem : public os::posix::file_system
 {
 public:
 
-  TestFileSystem (os::posix::Pool* filesPool, os::posix::Pool* dirsPool);
+  TestFileSystem (os::posix::pool* filesPool, os::posix::pool* dirsPool);
 
   // Methods used for test purposes only.
   unsigned int
@@ -384,9 +384,9 @@ private:
 
 };
 
-TestFileSystem::TestFileSystem (os::posix::Pool* filesPool,
-                                os::posix::Pool* dirsPool) :
-    os::posix::FileSystem (filesPool, dirsPool)
+TestFileSystem::TestFileSystem (os::posix::pool* filesPool,
+                                os::posix::pool* dirsPool) :
+    os::posix::file_system (filesPool, dirsPool)
 {
   fMountFlags = 1;
   fCmd = Cmds::NOTSET;
@@ -529,7 +529,7 @@ TestFileSystem::do_rmdir (const char* path)
 // ----------------------------------------------------------------------------
 
 // Required only as a reference, no functionality needed.
-class TestBlockDevice : public os::posix::BlockDevice
+class TestBlockDevice : public os::posix::device_block
 {
 public:
   TestBlockDevice () = default;
@@ -541,11 +541,11 @@ using TestFilePool = os::posix::TPool<TestFile>;
 
 constexpr std::size_t FILES_POOL_ARRAY_SIZE = 2;
 
-// Pool of File objects, used in common by all filesystems.
+// pool of file objects, used in common by all filesystems.
 TestFilePool filesPool
   { FILES_POOL_ARRAY_SIZE };
 
-// File systems, all using the same pool.
+// file systems, all using the same pool.
 TestFileSystem root_fs
   { &filesPool, nullptr };
 TestFileSystem fs1
@@ -554,11 +554,11 @@ TestFileSystem fs2
   { &filesPool, nullptr };
 
 // Static manager
-os::posix::FileDescriptorsManager dm
+os::posix::file_descriptors_manager dm
   { 5 };
 
 // Static manager
-os::posix::MountManager mm
+os::posix::mount_manager mm
   { 2 };
 
 // Block devices, just referenced, no calls forwarded to them.
@@ -572,7 +572,7 @@ int
 main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
     {
-      // ----- MountManager -----
+      // ----- mount_manager -----
 
       // Check initial size.
       assert(mm.getSize () == 2);
@@ -590,15 +590,15 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       // No file system, identify nothing
       assert(
-          os::posix::MountManager::identifyFileSystem (&path2, nullptr)
+          os::posix::mount_manager::identifyFileSystem (&path2, nullptr)
               == nullptr);
 
       // Check if root_fs file system flags are those set by constructor.
       assert(root_fs.getFlags () == 1);
 
       // Check setRoot(), and mount().
-      assert(os::posix::MountManager::setRoot (&root_fs, &root_dev, 123) == 0);
-      assert(os::posix::MountManager::getRoot () == &root_fs);
+      assert(os::posix::mount_manager::setRoot (&root_fs, &root_dev, 123) == 0);
+      assert(os::posix::mount_manager::getRoot () == &root_fs);
       assert(root_fs.getBlockDevice () == &root_dev);
 
       // Check mount flags.
@@ -606,18 +606,18 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       // No file systems mounted, identify root.
       assert(
-          os::posix::MountManager::identifyFileSystem (&path2, nullptr)
+          os::posix::mount_manager::identifyFileSystem (&path2, nullptr)
               == &root_fs);
       assert(path2 == path1);
     }
 
     {
-      // ----- MountManager mounts & umounts -----
+      // ----- mount_manager mounts & umounts -----
 
       errno = -2;
       assert(
-          (os::posix::MountManager::mount (&fs1, "/fs1/", &dev1, 124) == 0) && (errno == 0));
-      assert(os::posix::MountManager::getFileSystem (0) == &fs1);
+          (os::posix::mount_manager::mount (&fs1, "/fs1/", &dev1, 124) == 0) && (errno == 0));
+      assert(os::posix::mount_manager::getFileSystem (0) == &fs1);
       assert(fs1.getBlockDevice () == &dev1);
 
       assert(fs1.getFlags () == 124);
@@ -627,13 +627,13 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       const char* path2 = path1;
 
       assert(
-          os::posix::MountManager::identifyFileSystem (&path2, nullptr)
+          os::posix::mount_manager::identifyFileSystem (&path2, nullptr)
               == &root_fs);
       assert(path2 == path1);
 
       // Check busy error
       errno = -2;
-      assert(os::posix::MountManager::mount (&fs1, "/fs1/", &dev1, 124) == -1);
+      assert(os::posix::mount_manager::mount (&fs1, "/fs1/", &dev1, 124) == -1);
       assert(errno == EBUSY);
 
       path1 = "/fs1/babu";
@@ -644,7 +644,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       // Check if identified properly
       assert(
-          os::posix::MountManager::identifyFileSystem (&path2, &path4) == &fs1);
+          os::posix::mount_manager::identifyFileSystem (&path2, &path4) == &fs1);
 
       // Check if path adjusted properly
       assert(path2 == (path1 + std::strlen ("/fs1")));
@@ -653,16 +653,16 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       // Check size exceeded
       errno = -2;
       assert(
-          (os::posix::MountManager::mount (&fs2, "/fs2/", &dev2, 124) == 0) && (errno == 0));
+          (os::posix::mount_manager::mount (&fs2, "/fs2/", &dev2, 124) == 0) && (errno == 0));
       errno = -2;
-      assert(os::posix::MountManager::mount (&fs2, "/fs3/", &dev2, 124) == -1);
+      assert(os::posix::mount_manager::mount (&fs2, "/fs3/", &dev2, 124) == -1);
       assert(errno == ENOENT);
 
       // Check umounts
       unsigned int cnt = fs1.getSyncCount ();
       errno = -2;
       assert(
-          (os::posix::MountManager::umount ("/fs1/", 134) == 0) && (errno == 0));
+          (os::posix::mount_manager::umount ("/fs1/", 134) == 0) && (errno == 0));
       assert(fs1.getFlags () == 134);
       assert(fs1.getSyncCount () == cnt + 1);
       assert(fs1.getBlockDevice () == nullptr);
@@ -671,7 +671,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       cnt = fs2.getSyncCount ();
       errno = -2;
       assert(
-          (os::posix::MountManager::umount ("/fs2/", 144) == 0) && (errno == 0));
+          (os::posix::mount_manager::umount ("/fs2/", 144) == 0) && (errno == 0));
       assert(fs2.getFlags () == 144);
       assert(fs2.getSyncCount () == cnt + 1);
       assert(fs2.getBlockDevice () == nullptr);
@@ -681,7 +681,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       // Mount again
       errno = -2;
       assert(
-          (os::posix::MountManager::mount (&fs1, "/fs1/", &dev1, 124) == 0) && (errno == 0));
+          (os::posix::mount_manager::mount (&fs1, "/fs1/", &dev1, 124) == 0) && (errno == 0));
     }
 
     {
@@ -829,10 +829,10 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       int fd = __posix_open ("/fs1/f1", 123, 234);
       assert((fd >= 0) && (errno == 0));
 
-      os::posix::IO* io = os::posix::FileDescriptorsManager::getIo (fd);
+      os::posix::io* io = os::posix::file_descriptors_manager::getIo (fd);
       assert(io != nullptr);
 
-      assert(io->getType () == os::posix::IO::Type::FILE);
+      assert(io->getType () == os::posix::io::Type::FILE);
 
       TestFile* file = static_cast<TestFile*> (io);
       // Must be the first used slot in the pool.
@@ -939,10 +939,10 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       // Test OPEN via namespace generic call.
       errno = -2;
-      os::posix::IO* io = os::posix::open ("/fs1/f0", 124, 235);
+      os::posix::io* io = os::posix::open ("/fs1/f0", 124, 235);
       assert((io != nullptr) && (errno == 0));
 
-      assert(io->getType () == os::posix::IO::Type::FILE);
+      assert(io->getType () == os::posix::io::Type::FILE);
 
       TestFile* tfile = static_cast<TestFile*> (io);
 
@@ -968,10 +968,10 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
     {
       // Test OPEN via class call.
       errno = -2;
-      os::posix::File* file = os::posix::File::open ("/fs1/f1", 123, 234);
+      os::posix::file* file = os::posix::file::open ("/fs1/f1", 123, 234);
       assert((file != nullptr) && (errno == 0));
 
-      assert(file->getType () == os::posix::IO::Type::FILE);
+      assert(file->getType () == os::posix::io::Type::FILE);
 
       TestFile* tfile = static_cast<TestFile*> (file);
       // Must be the first used slot in the pool.

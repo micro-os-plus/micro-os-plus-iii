@@ -520,7 +520,7 @@ __posix_fstat (int fildes, struct stat* buf)
 }
 
 // ----------------------------------------------------------------------------
-// ----- POSIX File functions -----
+// ----- POSIX file functions -----
 
 int
 __posix_stat (const char* path, struct stat* buf)
@@ -657,7 +657,7 @@ __posix_getcwd (char* buf, size_t size)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
 // ----------------------------------------------------------------------------
-// ----- POSIX FileSystem functions -----
+// ----- POSIX file_system functions -----
 
 // Required by Google Tests
 int

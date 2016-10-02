@@ -40,7 +40,7 @@ namespace os
   {
     // ----------------------------------------------------------------------
 
-    Usbh_wrapper::Usbh_wrapper (ARM_DRIVER_USBH* driver,
+    usbh_wrapper::usbh_wrapper (ARM_DRIVER_USBH* driver,
                                 ARM_USBH_SignalPortEvent_t c_cb_port_func,
                                 ARM_USBH_SignalPipeEvent_t c_cb_pipe_func) noexcept :
     driver_ (driver),
@@ -50,7 +50,7 @@ namespace os
         ;
       }
 
-    Usbh_wrapper::~Usbh_wrapper () noexcept
+    usbh_wrapper::~usbh_wrapper () noexcept
     {
       driver_ = nullptr;
     }
@@ -62,7 +62,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 
     const Version&
-    Usbh_wrapper::do_get_version (void) noexcept
+    usbh_wrapper::do_get_version (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
       *(reinterpret_cast<ARM_DRIVER_VERSION*> (&version_)) =
@@ -71,7 +71,7 @@ namespace os
     }
 
     const usb::host::Capabilities&
-    Usbh_wrapper::do_get_capabilities (void) noexcept
+    usbh_wrapper::do_get_capabilities (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
       *(reinterpret_cast<ARM_USBH_CAPABILITIES*> (&capa_)) =
@@ -80,7 +80,7 @@ namespace os
     }
 
     usb::host::Status&
-    Usbh_wrapper::do_get_port_status (usb::port_t port) noexcept
+    usbh_wrapper::do_get_port_status (usb::port_t port) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
       *(reinterpret_cast<ARM_USBH_PORT_STATE*> (&status_)) =
@@ -91,7 +91,7 @@ namespace os
 #pragma GCC diagnostic pop
 
     return_t
-    Usbh_wrapper::do_power (Power state) noexcept
+    usbh_wrapper::do_power (Power state) noexcept
     {
       assert (driver_ != nullptr);
 
@@ -117,31 +117,31 @@ namespace os
     }
 
     return_t
-    Usbh_wrapper::do_power_port_vbus (usb::port_t port, bool vbus) noexcept
+    usbh_wrapper::do_power_port_vbus (usb::port_t port, bool vbus) noexcept
     {
       return driver_->PortVbusOnOff (port, vbus);
     }
 
     return_t
-    Usbh_wrapper::do_reset_port (usb::port_t port) noexcept
+    usbh_wrapper::do_reset_port (usb::port_t port) noexcept
     {
       return driver_->PortReset (port);
     }
 
     return_t
-    Usbh_wrapper::do_suspend_port (usb::port_t port) noexcept
+    usbh_wrapper::do_suspend_port (usb::port_t port) noexcept
     {
       return driver_->PortSuspend (port);
     }
 
     return_t
-    Usbh_wrapper::do_resume_port (usb::port_t port) noexcept
+    usbh_wrapper::do_resume_port (usb::port_t port) noexcept
     {
       return driver_->PortResume (port);
     }
 
     usb::pipe_t
-    Usbh_wrapper::do_create_pipe (usb::device_address_t dev_addr,
+    usbh_wrapper::do_create_pipe (usb::device_address_t dev_addr,
                                   usb::speed_t dev_speed,
                                   usb::hub_addr_t hub_addr,
                                   usb::hub_port_t hub_port,
@@ -156,7 +156,7 @@ namespace os
     }
 
     return_t
-    Usbh_wrapper::do_modify_pipe (usb::pipe_t pipe,
+    usbh_wrapper::do_modify_pipe (usb::pipe_t pipe,
                                   usb::device_address_t dev_addr,
                                   usb::speed_t dev_speed,
                                   usb::hub_addr_t hub_addr,
@@ -168,19 +168,19 @@ namespace os
     }
 
     return_t
-    Usbh_wrapper::do_delete_pipe (usb::pipe_t pipe) noexcept
+    usbh_wrapper::do_delete_pipe (usb::pipe_t pipe) noexcept
     {
       return driver_->PipeDelete (pipe);
     }
 
     return_t
-    Usbh_wrapper::do_reset_pipe (usb::pipe_t pipe) noexcept
+    usbh_wrapper::do_reset_pipe (usb::pipe_t pipe) noexcept
     {
       return driver_->PipeReset (pipe);
     }
 
     return_t
-    Usbh_wrapper::do_transfer (usb::pipe_t pipe, uint32_t packet, uint8_t* data,
+    usbh_wrapper::do_transfer (usb::pipe_t pipe, uint32_t packet, uint8_t* data,
                                std::size_t num) noexcept
     {
       return driver_->PipeTransfer (pipe, packet, data,
@@ -188,19 +188,19 @@ namespace os
     }
 
     std::size_t
-    Usbh_wrapper::do_get_transfer_count (usb::pipe_t pipe) noexcept
+    usbh_wrapper::do_get_transfer_count (usb::pipe_t pipe) noexcept
     {
       return driver_->PipeTransferGetResult (pipe);
     }
 
     return_t
-    Usbh_wrapper::do_abort_transfer (usb::pipe_t pipe) noexcept
+    usbh_wrapper::do_abort_transfer (usb::pipe_t pipe) noexcept
     {
       return driver_->PipeTransferAbort (pipe);
     }
 
     usb::frame_number_t
-    Usbh_wrapper::do_get_frame_number (void) noexcept
+    usbh_wrapper::do_get_frame_number (void) noexcept
     {
       return driver_->GetFrameNumber ();
     }

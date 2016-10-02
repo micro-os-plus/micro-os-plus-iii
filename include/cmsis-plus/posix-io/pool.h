@@ -25,17 +25,14 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CMSIS_PLUS_POSIX_IO_FILE_DESCRIPTORS_MANAGER_H_
-#define CMSIS_PLUS_POSIX_IO_FILE_DESCRIPTORS_MANAGER_H_
+#ifndef CMSIS_PLUS_POSIX_IO_POOL_H_
+#define CMSIS_PLUS_POSIX_IO_POOL_H_
 
 #if defined(__cplusplus)
 
 // ----------------------------------------------------------------------------
 
-#include <cmsis-plus/posix-io/types.h>
-
 #include <cstddef>
-#include <cassert>
 
 // ----------------------------------------------------------------------------
 
@@ -43,60 +40,65 @@ namespace os
 {
   namespace posix
   {
-
     // ------------------------------------------------------------------------
 
-    class IO;
-    class Socket;
-
-    // ------------------------------------------------------------------------
-
-    class FileDescriptorsManager
+    class pool
     {
     public:
+      pool (std::size_t size);
+      pool (const pool&) = delete;
 
-      FileDescriptorsManager (std::size_t size);
-      FileDescriptorsManager (const FileDescriptorsManager&) = delete;
+      virtual
+      ~pool ();
 
-      ~FileDescriptorsManager ();
+      // ----------------------------------------------------------------------
+
+      void*
+      aquire (void);
+
+      bool
+      release (void* obj);
 
       // ----------------------------------------------------------------------
 
-      static size_t
-      getSize (void);
+      std::size_t
+      getSize (void) const;
 
-      static bool
-      isValid (int fildes);
+      void*
+      getObject (std::size_t index) const;
 
-      static IO*
-      getIo (int fildes);
-
-      static Socket*
-      getSocket (int fildes);
-
-      static int
-      alloc (IO* io);
-
-      static int
-      assign (fileDescriptor_t fildes, IO* io);
-
-      static int
-      free (fileDescriptor_t fildes);
+      bool
+      getFlag (std::size_t index) const;
 
       // ----------------------------------------------------------------------
-    private:
 
-      static std::size_t sfSize;
+    protected:
 
-      static IO** sfDescriptorsArray;
+      // Referred directly in TPool.
+
+      void** fArray;
+      bool* fInUse;
+      std::size_t fSize;
     };
 
     // ------------------------------------------------------------------------
 
-    inline size_t
-    FileDescriptorsManager::getSize (void)
+    inline std::size_t
+    pool::getSize (void) const
     {
-      return sfSize;
+      return fSize;
+    }
+
+    inline void*
+    pool::getObject (std::size_t index) const
+    {
+      return fArray[index];
+    }
+
+    inline bool
+    pool::getFlag (std::size_t index) const
+    {
+      return fInUse[index];
     }
 
   } /* namespace posix */
@@ -106,4 +108,4 @@ namespace os
 
 #endif /* __cplusplus */
 
-#endif /* CMSIS_PLUS_POSIX_IO_FILE_DESCRIPTORS_MANAGER_H_ */
+#endif /* CMSIS_PLUS_POSIX_IO_POOL_H_ */

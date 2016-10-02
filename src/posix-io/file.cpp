@@ -25,10 +25,10 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/posix-io/CharDevice.h>
-
-#include <cstring>
-#include <cassert>
+#include <cmsis-plus/posix-io/file.h>
+#include <cmsis-plus/posix-io/file-system.h>
+#include <cmsis-plus/posix-io/mount-manager.h>
+#include <cmsis-plus/posix-io/pool.h>
 #include <cerrno>
 
 // ----------------------------------------------------------------------------
@@ -39,68 +39,111 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    CharDevice::CharDevice (const char* name)
-    {
-      fType = Type::DEVICE;
-      fName = name;
-    }
-
-    CharDevice::~CharDevice ()
-    {
-      fName = nullptr;
-    }
-
-    // ------------------------------------------------------------------------
-
-    int
-    CharDevice::ioctl (int request, ...)
+    file*
+    file::open (const char* path, int oflag, ...)
     {
       // Forward to the variadic version of the function.
       std::va_list args;
-      va_start (args, request);
-      int ret = vioctl (request, args);
+      va_start (args, oflag);
+      auto* const ret = vopen (path, oflag, args);
       va_end (args);
 
       return ret;
     }
 
-    int
-    CharDevice::vioctl (int request, std::va_list args)
-    {
-      errno = 0;
+    // ------------------------------------------------------------------------
 
-      // Execute the implementation specific code.
-      return do_vioctl (request, args);
+    file::file ()
+    {
+      fType = Type::FILE;
+      fFileSystem = nullptr;
+    }
+
+    file::~file ()
+    {
+      fFileSystem = nullptr;
     }
 
     // ------------------------------------------------------------------------
 
-    bool
-    CharDevice::matchName (const char* name) const
+    void
+    file::do_release (void)
     {
-      assert (name != nullptr);
-      assert (fName != nullptr);
+      // Files is free, return it to the pool.
+      auto fs = getFileSystem ();
+      if (fs != nullptr)
+        {
+          auto pool = fs->getFilesPool ();
+          if (pool != nullptr)
+            {
+              pool->release (this);
+            }
+          setFileSystem (nullptr);
+        }
+    }
 
-      return (std::strcmp (name, fName) == 0);
+    // ------------------------------------------------------------------------
+
+    off_t
+    file::lseek (off_t offset, int whence)
+    {
+      errno = 0;
+
+      // Execute the implementation specific code.
+      return do_lseek (offset, whence);
     }
 
     int
-    CharDevice::do_isatty (void)
+    file::ftruncate (off_t length)
     {
-      return 1; // Yes, it is a TTY
+      if (length < 0)
+        {
+          errno = EINVAL;
+          return -1;
+        }
+
+      errno = 0;
+
+      // Execute the implementation specific code.
+      return do_ftruncate (length);
     }
+
+    int
+    file::fsync (void)
+    {
+      errno = 0;
+
+      // Execute the implementation specific code.
+      return do_fsync ();
+    }
+
+    // ------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
+    off_t
+    file::do_lseek (off_t offset, int whence)
+    {
+      errno = ENOSYS; // Not implemented
+      return -1;
+    }
+
     int
-    CharDevice::do_vioctl (int request, std::va_list args)
+    file::do_ftruncate (off_t length)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
 #pragma GCC diagnostic pop
+
+    int
+    file::do_fsync (void)
+    {
+      errno = ENOSYS; // Not implemented
+      return -1;
+    }
 
   } /* namespace posix */
 } /* namespace os */

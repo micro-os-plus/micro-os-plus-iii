@@ -44,11 +44,11 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    class IO;
-    class File;
-    class Directory;
-    class BlockDevice;
-    class Pool;
+    class io;
+    class file;
+    class directory;
+    class device_block;
+    class pool;
 
     // ----------------------------------------------------------------------
     // ----- Non-io, global file system functions -----
@@ -85,14 +85,14 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    class FileSystem
+    class file_system
     {
       // ----------------------------------------------------------------------
 
-      friend class File;
-      friend class Directory;
-      friend class MountManager;
-      friend class IO;
+      friend class file;
+      friend class directory;
+      friend class mount_manager;
+      friend class io;
 
       friend int
       mkdir (const char* path, mode_t mode);
@@ -125,30 +125,30 @@ namespace os
 
     public:
 
-      FileSystem (Pool* filesPool, Pool* dirsPool);
-      FileSystem (const FileSystem&) = delete;
+      file_system (pool* filesPool, pool* dirsPool);
+      file_system (const file_system&) = delete;
 
       virtual
-      ~FileSystem ();
+      ~file_system ();
 
       // ----------------------------------------------------------------------
 
-      IO*
+      io*
       open (const char* path, int oflag, std::va_list args);
 
-      Directory*
+      directory*
       opendir (const char* dirpath);
 
       // ----------------------------------------------------------------------
       // Support functions.
 
-      BlockDevice*
+      device_block*
       getBlockDevice (void) const;
 
-      Pool*
+      pool*
       getFilesPool (void) const;
 
-      Pool*
+      pool*
       getDirsPool (void) const;
 
     protected:
@@ -214,7 +214,7 @@ namespace os
       // Support functions.
 
       void
-      setBlockDevice (BlockDevice* blockDevice);
+      setBlockDevice (device_block* blockDevice);
 
     public:
 
@@ -223,32 +223,32 @@ namespace os
 
     private:
 
-      Pool* fFilesPool;
-      Pool* fDirsPool;
+      pool* fFilesPool;
+      pool* fDirsPool;
 
-      BlockDevice* fBlockDevice;
+      device_block* fBlockDevice;
     };
 
-    inline Pool*
-    FileSystem::getFilesPool (void) const
+    inline pool*
+    file_system::getFilesPool (void) const
     {
       return fFilesPool;
     }
 
-    inline Pool*
-    FileSystem::getDirsPool (void) const
+    inline pool*
+    file_system::getDirsPool (void) const
     {
       return fDirsPool;
     }
 
     inline void
-    FileSystem::setBlockDevice (BlockDevice* blockDevice)
+    file_system::setBlockDevice (device_block* blockDevice)
     {
       fBlockDevice = blockDevice;
     }
 
-    inline BlockDevice*
-    FileSystem::getBlockDevice (void) const
+    inline device_block*
+    file_system::getBlockDevice (void) const
     {
       return fBlockDevice;
     }

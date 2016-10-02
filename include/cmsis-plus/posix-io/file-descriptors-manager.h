@@ -25,10 +25,17 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CMSIS_PLUS_POSIX_IO_BLOCK_DEVICE_H_
-#define CMSIS_PLUS_POSIX_IO_BLOCK_DEVICE_H_
+#ifndef CMSIS_PLUS_POSIX_IO_FILE_DESCRIPTORS_MANAGER_H_
+#define CMSIS_PLUS_POSIX_IO_FILE_DESCRIPTORS_MANAGER_H_
 
 #if defined(__cplusplus)
+
+// ----------------------------------------------------------------------------
+
+#include <cmsis-plus/posix-io/types.h>
+
+#include <cstddef>
+#include <cassert>
 
 // ----------------------------------------------------------------------------
 
@@ -36,12 +43,62 @@ namespace os
 {
   namespace posix
   {
-    class BlockDevice
+
+    // ------------------------------------------------------------------------
+
+    class io;
+    class socket;
+
+    // ------------------------------------------------------------------------
+
+    class file_descriptors_manager
     {
     public:
-      BlockDevice () = default;
 
+      file_descriptors_manager (std::size_t size);
+      file_descriptors_manager (const file_descriptors_manager&) = delete;
+
+      ~file_descriptors_manager ();
+
+      // ----------------------------------------------------------------------
+
+      static size_t
+      getSize (void);
+
+      static bool
+      isValid (int fildes);
+
+      static io*
+      getIo (int fildes);
+
+      static socket*
+      getSocket (int fildes);
+
+      static int
+      alloc (io* io);
+
+      static int
+      assign (fileDescriptor_t fildes, io* io);
+
+      static int
+      free (fileDescriptor_t fildes);
+
+      // ----------------------------------------------------------------------
+    private:
+
+      static std::size_t sfSize;
+
+      static io** sfDescriptorsArray;
     };
+
+    // ------------------------------------------------------------------------
+
+    inline size_t
+    file_descriptors_manager::getSize (void)
+    {
+      return sfSize;
+    }
+
   } /* namespace posix */
 } /* namespace os */
 
@@ -49,4 +106,4 @@ namespace os
 
 #endif /* __cplusplus */
 
-#endif /* CMSIS_PLUS_POSIX_IO_BLOCK_DEVICE_H_ */
+#endif /* CMSIS_PLUS_POSIX_IO_FILE_DESCRIPTORS_MANAGER_H_ */

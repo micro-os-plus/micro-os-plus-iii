@@ -58,28 +58,28 @@ namespace os
     // This wrapper makes a CMSIS USBH Keil driver behave like a
     // CMSIS++ Serial driver.
 
-    class Usbh_wrapper : public usb::Host
+    class usbh_wrapper : public usb::Host
     {
     public:
 
       // --------------------------------------------------------------------
 
-      Usbh_wrapper (ARM_DRIVER_USBH* driver,
+      usbh_wrapper (ARM_DRIVER_USBH* driver,
                     ARM_USBH_SignalPortEvent_t c_cb_port_func,
                     ARM_USBH_SignalPipeEvent_t c_cb_pipe_func) noexcept;
 
-      Usbh_wrapper (const Usbh_wrapper&) = delete;
+      usbh_wrapper (const usbh_wrapper&) = delete;
 
-      Usbh_wrapper (Usbh_wrapper&&) = delete;
+      usbh_wrapper (usbh_wrapper&&) = delete;
 
-      Usbh_wrapper&
-      operator= (const Usbh_wrapper&) = delete;
+      usbh_wrapper&
+      operator= (const usbh_wrapper&) = delete;
 
-      Usbh_wrapper&
-      operator= (Usbh_wrapper&&) = delete;
+      usbh_wrapper&
+      operator= (usbh_wrapper&&) = delete;
 
       virtual
-      ~Usbh_wrapper () noexcept;
+      ~usbh_wrapper () noexcept;
 
       // --------------------------------------------------------------------
 

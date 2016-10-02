@@ -25,9 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/posix-io/FileSystem.h>
-#include <cmsis-plus/posix-io/MountManager.h>
-
+#include <cmsis-plus/posix-io/file-system.h>
+#include <cmsis-plus/posix-io/mount-manager.h>
 #include <cerrno>
 #include <cstring>
 
@@ -39,20 +38,20 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    std::size_t MountManager::sfSize;
+    std::size_t mount_manager::sfSize;
 
-    FileSystem* MountManager::sfRoot;
-    FileSystem** MountManager::sfFileSystemsArray;
-    const char** MountManager::sfPathsArray;
+    file_system* mount_manager::sfRoot;
+    file_system** mount_manager::sfFileSystemsArray;
+    const char** mount_manager::sfPathsArray;
 
     // ------------------------------------------------------------------------
 
-    MountManager::MountManager (std::size_t size)
+    mount_manager::mount_manager (std::size_t size)
     {
       assert (size > 0);
 
       sfSize = size;
-      sfFileSystemsArray = new FileSystem*[size];
+      sfFileSystemsArray = new file_system*[size];
       sfPathsArray = new const char*[size];
 
       for (std::size_t i = 0; i < size; ++i)
@@ -62,7 +61,7 @@ namespace os
         }
     }
 
-    MountManager::~MountManager ()
+    mount_manager::~mount_manager ()
     {
       delete[] sfFileSystemsArray;
       delete[] sfPathsArray;
@@ -74,8 +73,8 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-    FileSystem*
-    MountManager::identifyFileSystem (const char** path1, const char** path2)
+    file_system*
+    mount_manager::identifyFileSystem (const char** path1, const char** path2)
     {
       assert (path1 != nullptr);
       assert (*path1 != nullptr);
@@ -116,8 +115,8 @@ namespace os
 #pragma GCC diagnostic pop
 
     int
-    MountManager::setRoot (FileSystem* fs, BlockDevice* blockDevice,
-                           unsigned int flags)
+    mount_manager::setRoot (file_system* fs, device_block* blockDevice,
+                            unsigned int flags)
     {
       assert (fs != nullptr);
       errno = 0;
@@ -129,8 +128,8 @@ namespace os
     }
 
     int
-    MountManager::mount (FileSystem* fs, const char* path,
-                         BlockDevice* blockDevice, unsigned int flags)
+    mount_manager::mount (file_system* fs, const char* path,
+                          device_block* blockDevice, unsigned int flags)
     {
       assert (fs != nullptr);
       assert (path != nullptr);
@@ -173,7 +172,7 @@ namespace os
     }
 
     int
-    MountManager::umount (const char* path, unsigned int flags)
+    mount_manager::umount (const char* path, unsigned int flags)
     {
       assert (path != nullptr);
       errno = 0;

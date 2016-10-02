@@ -32,7 +32,7 @@
 
 // ----------------------------------------------------------------------------
 
-#include <cmsis-plus/posix-io/IO.h>
+#include <cmsis-plus/posix-io/io.h>
 #include <cmsis-plus/posix/utime.h>
 
 // ----------------------------------------------------------------------------
@@ -43,29 +43,29 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    class FileSystem;
-    class Pool;
+    class file_system;
+    class pool;
 
     // ------------------------------------------------------------------------
 
-    class File : public IO
+    class file : public io
     {
-      friend class FileSystem;
-      friend class IO;
+      friend class file_system;
+      friend class io;
 
     public:
 
-      File ();
-      File (const File&) = delete;
+      file ();
+      file (const file&) = delete;
 
-      ~File ();
+      ~file ();
 
       // ----------------------------------------------------------------------
 
-      static File*
+      static file*
       open (const char* path, int oflag, ...);
 
-      static File*
+      static file*
       vopen (const char* path, int oflag, std::va_list args);
 
       // ----------------------------------------------------------------------
@@ -82,7 +82,7 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
-      FileSystem*
+      file_system*
       getFileSystem (void) const;
 
     protected:
@@ -112,29 +112,29 @@ namespace os
       // Support functions.
 
       void
-      setFileSystem (FileSystem* fileSystem);
+      setFileSystem (file_system* fileSystem);
 
     private:
 
-      FileSystem* fFileSystem;
+      file_system* fFileSystem;
     };
 
     // ------------------------------------------------------------------------
 
-    inline File*
-    File::vopen (const char* path, int oflag, std::va_list args)
+    inline file*
+    file::vopen (const char* path, int oflag, std::va_list args)
     {
-      return static_cast<File*> (os::posix::vopen (path, oflag, args));
+      return static_cast<file*> (os::posix::vopen (path, oflag, args));
     }
 
     inline void
-    File::setFileSystem (FileSystem* fileSystem)
+    file::setFileSystem (file_system* fileSystem)
     {
       fFileSystem = fileSystem;
     }
 
-    inline FileSystem*
-    File::getFileSystem (void) const
+    inline file_system*
+    file::getFileSystem (void) const
     {
       return fFileSystem;
     }

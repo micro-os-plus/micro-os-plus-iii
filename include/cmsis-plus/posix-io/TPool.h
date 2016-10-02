@@ -32,7 +32,7 @@
 
 // ----------------------------------------------------------------------------
 
-#include <cmsis-plus/posix-io/Pool.h>
+#include <cmsis-plus/posix-io/pool.h>
 
 // ----------------------------------------------------------------------------
 
@@ -43,12 +43,12 @@ namespace os
     // ------------------------------------------------------------------------
 
     template<typename T>
-      class TPool : public Pool
+      class TPool : public pool
       {
       public:
 
         TPool (std::size_t size) :
-            Pool (size)
+            pool (size)
         {
           fArray = reinterpret_cast<void**> (new T*[size]);
           for (std::size_t i = 0; i < size; ++i)
@@ -76,14 +76,14 @@ namespace os
         __attribute__((always_inline))
         aquire (void)
         {
-          return static_cast<T*> (Pool::aquire ());
+          return static_cast<T*> (pool::aquire ());
         }
 
         inline bool
         __attribute__((always_inline))
         release (T* obj)
         {
-          return Pool::release (obj);
+          return pool::release (obj);
         }
       };
 

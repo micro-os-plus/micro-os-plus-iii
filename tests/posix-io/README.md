@@ -12,21 +12,21 @@ indices in an array of pointers to objects.
 
 ## device
 
-Test the `CharDevice` class, that implements the POSIX read/write API.
+Test the `device_char` class, that implements the POSIX read/write API.
 
 ## pool
 
-Test the `Pool` class, that manages a pool of File or Socket objects.
+Test the `pool` class, that manages a pool of file or socket objects.
 
 ## file
 
-Test the `File` and `FileSystem` classes, that implement the POSIX file 
+Test the `file` and `file_system` classes, that implement the POSIX file 
 related functions.
 
 ## directory
 
-Test the `Directory` class, that implements the POSIX directory related functions (opendir(), readdir(), etc).
+Test the `directory` class, that implements the POSIX directory related functions (opendir(), readdir(), etc).
 
 ## socket
 
-Test the `Socket` class, that implements the POSIX socket API.
+Test the `socket` class, that implements the POSIX socket API.

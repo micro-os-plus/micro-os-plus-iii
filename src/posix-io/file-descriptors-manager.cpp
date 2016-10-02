@@ -25,10 +25,9 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/posix-io/FileDescriptorsManager.h>
-#include <cmsis-plus/posix-io/IO.h>
-#include <cmsis-plus/posix-io/Socket.h>
-
+#include <cmsis-plus/posix-io/file-descriptors-manager.h>
+#include <cmsis-plus/posix-io/io.h>
+#include <cmsis-plus/posix-io/socket.h>
 #include <cerrno>
 #include <cassert>
 #include <cstddef>
@@ -41,17 +40,17 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    std::size_t FileDescriptorsManager::sfSize;
-    IO** FileDescriptorsManager::sfDescriptorsArray;
+    std::size_t file_descriptors_manager::sfSize;
+    io** file_descriptors_manager::sfDescriptorsArray;
 
     // ------------------------------------------------------------------------
 
-    FileDescriptorsManager::FileDescriptorsManager (std::size_t size)
+    file_descriptors_manager::file_descriptors_manager (std::size_t size)
     {
       assert (size > 3);
 
       sfSize = size;
-      sfDescriptorsArray = new IO*[size];
+      sfDescriptorsArray = new io*[size];
 
       for (std::size_t i = 0; i < getSize (); ++i)
         {
@@ -59,7 +58,7 @@ namespace os
         }
     }
 
-    FileDescriptorsManager::~FileDescriptorsManager ()
+    file_descriptors_manager::~file_descriptors_manager ()
     {
       delete[] sfDescriptorsArray;
       sfSize = 0;
@@ -67,8 +66,8 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    IO*
-    FileDescriptorsManager::getIo (int fildes)
+    io*
+    file_descriptors_manager::getIo (int fildes)
     {
       // Check if valid descriptor or buffer not yet initialised
       if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= sfSize)
@@ -80,7 +79,7 @@ namespace os
     }
 
     bool
-    FileDescriptorsManager::isValid (int fildes)
+    file_descriptors_manager::isValid (int fildes)
     {
       if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= sfSize))
         {
@@ -90,7 +89,7 @@ namespace os
     }
 
     int
-    FileDescriptorsManager::alloc (IO* io)
+    file_descriptors_manager::alloc (io* io)
     {
       if (io->getFileDescriptor () >= 0)
         {
@@ -116,7 +115,7 @@ namespace os
     }
 
     int
-    FileDescriptorsManager::assign (fileDescriptor_t fildes, IO* io)
+    file_descriptors_manager::assign (fileDescriptor_t fildes, io* io)
     {
       if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= sfSize))
         {
@@ -137,7 +136,7 @@ namespace os
     }
 
     int
-    FileDescriptorsManager::free (int fildes)
+    file_descriptors_manager::free (int fildes)
     {
       if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= sfSize))
         {
@@ -150,16 +149,16 @@ namespace os
       return 0;
     }
 
-    Socket*
-    FileDescriptorsManager::getSocket (int fildes)
+    class socket*
+    file_descriptors_manager::getSocket (int fildes)
     {
       assert ((fildes >= 0) && (static_cast<std::size_t> (fildes) < sfSize));
       auto* const io = sfDescriptorsArray[fildes];
-      if (io->getType () != IO::Type::SOCKET)
+      if (io->getType () != io::Type::SOCKET)
         {
           return nullptr;
         }
-      return reinterpret_cast<Socket*> (io);
+      return reinterpret_cast<class socket*> (io);
     }
 
   } /* namespace posix */

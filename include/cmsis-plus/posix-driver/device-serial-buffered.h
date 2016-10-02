@@ -34,7 +34,7 @@
 
 #include <cmsis-plus/rtos/os.h>
 
-#include <cmsis-plus/posix-io/CharDevice.h>
+#include <cmsis-plus/posix-io/device-char.h>
 #include <cmsis-plus/posix-driver/circular-buffer.h>
 #include <cmsis-plus/driver/serial.h>
 
@@ -55,7 +55,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     template<typename CS>
-      class device_serial_buffered : public os::posix::CharDevice
+      class device_serial_buffered : public os::posix::device_char
       {
         using critical_section = CS;
 
@@ -156,7 +156,7 @@ namespace os
           os::driver::Serial* driver, os::posix::circular_buffer_bytes* rx_buf,
           os::posix::circular_buffer_bytes* tx_buf) :
           //
-          CharDevice (deviceName), // Construct parent.
+          device_char (deviceName), // Construct parent.
           driver_ (driver), //
           rx_buf_ (rx_buf), //
           tx_buf_ (tx_buf) //

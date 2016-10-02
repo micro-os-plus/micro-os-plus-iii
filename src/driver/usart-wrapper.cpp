@@ -39,7 +39,7 @@ namespace os
   {
     // ----------------------------------------------------------------------
 
-    Usart_wrapper::Usart_wrapper (ARM_DRIVER_USART* driver,
+    usart_wrapper::usart_wrapper (ARM_DRIVER_USART* driver,
                                   ARM_USART_SignalEvent_t c_cb_func) noexcept :
     driver_ (driver),
     c_cb_func_ (c_cb_func)
@@ -47,7 +47,7 @@ namespace os
         ;
       }
 
-    Usart_wrapper::~Usart_wrapper () noexcept
+    usart_wrapper::~usart_wrapper () noexcept
     {
       driver_ = nullptr;
     }
@@ -59,7 +59,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 
     const Version&
-    Usart_wrapper::do_get_version (void) noexcept
+    usart_wrapper::do_get_version (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
       *(reinterpret_cast<ARM_DRIVER_VERSION*> (&version_)) =
@@ -68,7 +68,7 @@ namespace os
     }
 
     const serial::Capabilities&
-    Usart_wrapper::do_get_capabilities (void) noexcept
+    usart_wrapper::do_get_capabilities (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
       *(reinterpret_cast<ARM_USART_CAPABILITIES*> (&capa_)) =
@@ -77,7 +77,7 @@ namespace os
     }
 
     serial::Status&
-    Usart_wrapper::do_get_status (void) noexcept
+    usart_wrapper::do_get_status (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
       *(reinterpret_cast<ARM_USART_STATUS*> (&status_)) = driver_->GetStatus ();
@@ -85,7 +85,7 @@ namespace os
     }
 
     serial::Modem_status&
-    Usart_wrapper::do_get_modem_status (void) noexcept
+    usart_wrapper::do_get_modem_status (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
       *(reinterpret_cast<ARM_USART_MODEM_STATUS*> (&modem_status_)) =
@@ -96,7 +96,7 @@ namespace os
 #pragma GCC diagnostic pop
 
     return_t
-    Usart_wrapper::do_power (Power state) noexcept
+    usart_wrapper::do_power (Power state) noexcept
     {
       return_t status;
 
@@ -120,44 +120,44 @@ namespace os
     }
 
     return_t
-    Usart_wrapper::do_send (const void* data, std::size_t num) noexcept
+    usart_wrapper::do_send (const void* data, std::size_t num) noexcept
     {
       return driver_->Send (data, static_cast<uint32_t> (num));
     }
 
     return_t
-    Usart_wrapper::do_receive (void* data, std::size_t num) noexcept
+    usart_wrapper::do_receive (void* data, std::size_t num) noexcept
     {
       return driver_->Receive (data, static_cast<uint32_t> (num));
     }
 
     return_t
-    Usart_wrapper::do_transfer (const void* data_out, void* data_in,
+    usart_wrapper::do_transfer (const void* data_out, void* data_in,
                                 std::size_t num) noexcept
     {
       return driver_->Transfer (data_out, data_in, static_cast<uint32_t> (num));
     }
 
     std::size_t
-    Usart_wrapper::do_get_tx_count (void) noexcept
+    usart_wrapper::do_get_tx_count (void) noexcept
     {
       return driver_->GetTxCount ();
     }
 
     std::size_t
-    Usart_wrapper::do_get_rx_count (void) noexcept
+    usart_wrapper::do_get_rx_count (void) noexcept
     {
       return driver_->GetRxCount ();
     }
 
     return_t
-    Usart_wrapper::do_configure (serial::config_t cfg, serial::config_arg_t arg) noexcept
+    usart_wrapper::do_configure (serial::config_t cfg, serial::config_arg_t arg) noexcept
     {
       return driver_->Control (cfg, arg);
     }
 
     return_t
-    Usart_wrapper::do_control (serial::control_t ctrl) noexcept
+    usart_wrapper::do_control (serial::control_t ctrl) noexcept
     {
       switch (ctrl)
         {
@@ -172,7 +172,7 @@ namespace os
     }
 
     return_t
-    Usart_wrapper::do_control_modem_line (serial::Modem_control ctrl) noexcept
+    usart_wrapper::do_control_modem_line (serial::Modem_control ctrl) noexcept
     {
       return driver_->SetModemControl (
           static_cast<ARM_USART_MODEM_CONTROL> (ctrl));

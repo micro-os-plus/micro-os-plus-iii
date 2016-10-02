@@ -25,10 +25,10 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include "posix-io/FileDescriptorsManager.h"
-#include "posix-io/IO.h"
-#include "posix-io/CharDevice.h"
-#include "posix-io/CharDevicesRegistry.h"
+#include "posix-io/file_descriptors_manager.h"
+#include "posix-io/io.h"
+#include "posix-io/device-char.h"
+#include "posix-io/device_charsRegistry.h"
 #include <cmsis-plus/diag/trace.h>
 
 #include "posix/stropts.h"
@@ -52,7 +52,7 @@ enum class Cmds
 
 // Test class, all methods return ENOSYS, as not implemented, except open().
 
-class TestDevice : public os::posix::CharDevice
+class TestDevice : public os::posix::device_char
 {
 public:
 
@@ -88,7 +88,7 @@ private:
 };
 
 TestDevice::TestDevice (const char* deviceName, uint32_t deviceNumber) :
-    CharDevice (deviceName)
+    device_char (deviceName)
 {
   fDeviceNumber = deviceNumber;
 
@@ -146,11 +146,11 @@ TestDevice::do_vopen (const char* path, int oflag, va_list args)
 // ----------------------------------------------------------------------------
 
 #define DESCRIPTORS_ARRAY_SIZE (5)
-os::posix::FileDescriptorsManager descriptorsManager
+os::posix::file_descriptors_manager descriptorsManager
   { DESCRIPTORS_ARRAY_SIZE };
 
 #define DEVICES_ARRAY_SIZE (3)
-os::posix::CharDevicesRegistry devicesRegistry
+os::posix::device_charsRegistry devicesRegistry
   { DEVICES_ARRAY_SIZE };
 
 // This device will be mapped as "/dev/test"
@@ -162,25 +162,25 @@ TestDevice test
 int
 main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
-  std::size_t sz = os::posix::CharDevicesRegistry::getSize ();
+  std::size_t sz = os::posix::device_charsRegistry::getSize ();
   assert (sz == DEVICES_ARRAY_SIZE);
 
   // Check if initial status is empty.
   for (std::size_t i = 0; i < sz; ++i)
     {
-      assert (os::posix::CharDevicesRegistry::getDevice (i) == nullptr);
+      assert (os::posix::device_charsRegistry::getDevice (i) == nullptr);
     }
 
   // Register device
-  os::posix::CharDevicesRegistry::add (&test);
+  os::posix::device_charsRegistry::add (&test);
 
   // Check if first device is registered.
-  assert (os::posix::CharDevicesRegistry::getDevice (0) == &test);
+  assert (os::posix::device_charsRegistry::getDevice (0) == &test);
 
     {
       // Test C++ API
 
-      os::posix::IO* io;
+      os::posix::io* io;
       io = os::posix::open ("/dev/test", 0, 123);
       assert ((io != nullptr) && (errno == 0));
 
@@ -188,7 +188,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       fd = io->getFileDescriptor ();
 
       // Get it back; is it the same?
-      assert (os::posix::FileDescriptorsManager::getIo (fd) == &test);
+      assert (os::posix::file_descriptors_manager::getIo (fd) == &test);
 
       // Check passing variadic mode.
       assert (test.getMode () == 123);
@@ -206,7 +206,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert ((ret == 0) && (errno == 0));
 
       // Check if descriptor freed.
-      assert (os::posix::FileDescriptorsManager::getIo (fd) == nullptr);
+      assert (os::posix::file_descriptors_manager::getIo (fd) == nullptr);
       assert (test.getFileDescriptor () == os::posix::noFileDescriptor);
     }
 
@@ -217,10 +217,10 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert ((fd >= 3) && (errno == 0));
 
       // Get it back; is it the same?
-      assert (os::posix::FileDescriptorsManager::getIo (fd) == &test);
+      assert (os::posix::file_descriptors_manager::getIo (fd) == &test);
       assert (test.getFileDescriptor () == fd);
 
-      assert (test.getType () == os::posix::IO::Type::DEVICE);
+      assert (test.getType () == os::posix::io::Type::DEVICE);
 
       // Check passing variadic mode.
       assert (test.getMode () == 234);
@@ -238,7 +238,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert ((ret == 0) && (errno == 0));
 
       // Check if descriptor freed.
-      assert (os::posix::FileDescriptorsManager::getIo (fd) == nullptr);
+      assert (os::posix::file_descriptors_manager::getIo (fd) == nullptr);
       assert (test.getFileDescriptor () == os::posix::noFileDescriptor);
     }
 
