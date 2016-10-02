@@ -82,17 +82,17 @@ private:
 };
 
 using BufferedCmsisUsartCharDevice =
-os::dev::TBufferedCmsisUsartCharDevice<TestCriticalSection>;
+os::posix::TBufferedCmsisUsartCharDevice<TestCriticalSection>;
 
 ARM_DRIVER_USART driver2
   { };
 
 uint8_t usart2_rx_buffer[200];
-os::dev::ByteCircularBuffer usart2_rx_circular_buffer
+os::posix::ByteCircularBuffer usart2_rx_circular_buffer
   { usart2_rx_buffer, sizeof(usart2_rx_buffer) };
 
 uint8_t usart2_tx_buffer[200];
-os::dev::ByteCircularBuffer usart2_tx_circular_buffer
+os::posix::ByteCircularBuffer usart2_tx_circular_buffer
   { usart2_tx_buffer, sizeof(usart2_tx_buffer) };
 
 extern "C" void

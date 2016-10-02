@@ -25,8 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CMSIS_PLUS_POSIX_DRIVERS_BUFFERED_SERIAL_DEVICE_H_
-#define CMSIS_PLUS_POSIX_DRIVERS_BUFFERED_SERIAL_DEVICE_H_
+#ifndef CMSIS_PLUS_POSIX_DRIVER_BUFFERED_SERIAL_DEVICE_H_
+#define CMSIS_PLUS_POSIX_DRIVER_BUFFERED_SERIAL_DEVICE_H_
 
 #if defined(__cplusplus)
 
@@ -35,8 +35,8 @@
 #include <cmsis-plus/rtos/os.h>
 
 #include <cmsis-plus/posix-io/CharDevice.h>
-#include <cmsis-plus/posix-drivers/ByteCircularBuffer.h>
-#include <cmsis-plus/drivers/serial.h>
+#include <cmsis-plus/posix-driver/ByteCircularBuffer.h>
+#include <cmsis-plus/driver/serial.h>
 
 // ----------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@
 
 namespace os
 {
-  namespace dev
+  namespace posix
   {
     // ------------------------------------------------------------------------
 
@@ -63,8 +63,8 @@ namespace os
 
         Buffered_serial_device (const char* device_name,
                                 os::driver::Serial* driver,
-                                os::dev::ByteCircularBuffer* rx_buf,
-                                os::dev::ByteCircularBuffer* tx_buf);
+                                os::posix::ByteCircularBuffer* rx_buf,
+                                os::posix::ByteCircularBuffer* tx_buf);
 
         // Prevent copy, move, assign
         Buffered_serial_device (const Buffered_serial_device&) = delete;
@@ -135,8 +135,8 @@ namespace os
         os::rtos::semaphore_binary tx_sem_
           { "tx", 0 };
 
-        os::dev::ByteCircularBuffer* rx_buf_ = nullptr;
-        os::dev::ByteCircularBuffer* tx_buf_ = nullptr;
+        os::posix::ByteCircularBuffer* rx_buf_ = nullptr;
+        os::posix::ByteCircularBuffer* tx_buf_ = nullptr;
 
         std::size_t rx_count_ = 0; //
         bool volatile tx_busy_ = false;
@@ -153,8 +153,8 @@ namespace os
     template<typename Cs_T>
       Buffered_serial_device<Cs_T>::Buffered_serial_device (
           const char* deviceName, //
-          os::driver::Serial* driver, os::dev::ByteCircularBuffer* rx_buf,
-          os::dev::ByteCircularBuffer* tx_buf) :
+          os::driver::Serial* driver, os::posix::ByteCircularBuffer* rx_buf,
+          os::posix::ByteCircularBuffer* tx_buf) :
           //
           CharDevice (deviceName), // Construct parent.
           driver_ (driver), //
@@ -656,11 +656,11 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-  } /* namespace dev */
+  } /* namespace posix */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------
 
 #endif /* __cplusplus */
 
-#endif /* CMSIS_PLUS_POSIX_DRIVERS_BUFFERED_SERIAL_DEVICE_H_ */
+#endif /* CMSIS_PLUS_POSIX_DRIVER_BUFFERED_SERIAL_DEVICE_H_ */

@@ -25,8 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CMSIS_PLUS_POSIX_DRIVERS_TBUFFERED_CMSIS_USART_CHAR_DEVICE_H_
-#define CMSIS_PLUS_POSIX_DRIVERS_TBUFFERED_CMSIS_USART_CHAR_DEVICE_H_
+#ifndef CMSIS_PLUS_POSIX_DRIVER_TBUFFERED_CMSIS_USART_CHAR_DEVICE_H_
+#define CMSIS_PLUS_POSIX_DRIVER_TBUFFERED_CMSIS_USART_CHAR_DEVICE_H_
 
 #if defined(__cplusplus)
 
@@ -60,7 +60,7 @@
 
 namespace os
 {
-  namespace dev
+  namespace posix
   {
     // ------------------------------------------------------------------------
 
@@ -74,8 +74,8 @@ namespace os
         TBufferedCmsisUsartCharDevice (const char* deviceName,
                                        ARM_DRIVER_USART* driver,
                                        ARM_USART_SignalEvent_t eventCallBack,
-                                       os::dev::ByteCircularBuffer* rxBuf,
-                                       os::dev::ByteCircularBuffer* txBuf =
+                                       os::posix::ByteCircularBuffer* rxBuf,
+                                       os::posix::ByteCircularBuffer* txBuf =
                                            nullptr);
 
         virtual
@@ -129,8 +129,8 @@ namespace os
         osSemaphoreId fTxSem; //
         osSemaphoreDef(fTxSem);
 
-        os::dev::ByteCircularBuffer* fRxBuf;
-        os::dev::ByteCircularBuffer* fTxBuf;
+        os::posix::ByteCircularBuffer* fRxBuf;
+        os::posix::ByteCircularBuffer* fTxBuf;
 
         std::size_t fRxCount; //
         bool volatile fTxBusy;
@@ -143,8 +143,8 @@ namespace os
       TBufferedCmsisUsartCharDevice<CriticalSection_T>::TBufferedCmsisUsartCharDevice (
           const char* deviceName, ARM_DRIVER_USART* driver,
           ARM_USART_SignalEvent_t eventCallBack,
-          os::dev::ByteCircularBuffer* rxBuf,
-          os::dev::ByteCircularBuffer* txBuf) :
+          os::posix::ByteCircularBuffer* rxBuf,
+          os::posix::ByteCircularBuffer* txBuf) :
           //
           CharDevice (deviceName), // Construct parent.
           //
@@ -522,11 +522,11 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-  } /* namespace dev */
+  } /* namespace posix */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------
 
 #endif /* __cplusplus */
 
-#endif /* CMSIS_PLUS_POSIX_DRIVERS_TBUFFERED_CMSIS_USART_CHAR_DEVICE_H_ */
+#endif /* CMSIS_PLUS_POSIX_DRIVER_TBUFFERED_CMSIS_USART_CHAR_DEVICE_H_ */

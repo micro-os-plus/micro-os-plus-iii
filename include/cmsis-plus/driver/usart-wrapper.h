@@ -25,22 +25,20 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CMSIS_DRIVER_USBD_WRAPPER_H_
-#define CMSIS_DRIVER_USBD_WRAPPER_H_
+#ifndef CMSIS_PLUS_DRIVER_USART_WRAPPER_H_
+#define CMSIS_PLUS_DRIVER_USART_WRAPPER_H_
 
-#include <cmsis-plus/drivers/usb-device.h>
+#include <cmsis-plus/driver/serial.h>
 
 // ----------------------------------------------------------------------------
 
 extern "C"
 {
-  // Avoid to include <Driver_USBD.h>
+  // Avoid to include <Driver_USART.h>
   typedef void
-  (*ARM_USBD_SignalDeviceEvent_t) (uint32_t event); ///< Pointer to device event callback.
-  typedef void
-  (*ARM_USBD_SignalEndpointEvent_t) (uint8_t ep_addr, uint32_t event); ///< Pointer to endpoint event callback.
+  (*ARM_USART_SignalEvent_t) (uint32_t event);
 
-  typedef struct _ARM_DRIVER_USBD const ARM_DRIVER_USBD;
+  typedef struct _ARM_DRIVER_USART const ARM_DRIVER_USART;
 }
 
 namespace os
@@ -52,31 +50,30 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
-    // This wrapper makes a CMSIS USBD Keil driver behave like a
+    // This wrapper makes a CMSIS USART Keil driver behave like a
     // CMSIS++ Serial driver.
 
-    class Usbd_wrapper : public usb::Device
+    class Usart_wrapper : public Serial
     {
     public:
 
       // --------------------------------------------------------------------
 
-      Usbd_wrapper (ARM_DRIVER_USBD* driver,
-                    ARM_USBD_SignalDeviceEvent_t c_cb_device_func,
-                    ARM_USBD_SignalEndpointEvent_t c_cb_endpoint_func) noexcept;
+      Usart_wrapper (ARM_DRIVER_USART* driver,
+                     ARM_USART_SignalEvent_t c_cb_func) noexcept;
 
-      Usbd_wrapper (const Usbd_wrapper&) = delete;
+      Usart_wrapper (const Usart_wrapper&) = delete;
 
-      Usbd_wrapper (Usbd_wrapper&&) = delete;
+      Usart_wrapper (Usart_wrapper&&) = delete;
 
-      Usbd_wrapper&
-      operator= (const Usbd_wrapper&) = delete;
+      Usart_wrapper&
+      operator= (const Usart_wrapper&) = delete;
 
-      Usbd_wrapper&
-      operator= (Usbd_wrapper&&) = delete;
+      Usart_wrapper&
+      operator= (Usart_wrapper&&) = delete;
 
       virtual
-      ~Usbd_wrapper () noexcept;
+      ~Usart_wrapper () noexcept;
 
       // --------------------------------------------------------------------
 
@@ -85,66 +82,54 @@ namespace os
       virtual const Version&
       do_get_version (void) noexcept override;
 
-      const usb::device::Capabilities&
+      virtual const serial::Capabilities&
       do_get_capabilities (void) noexcept override;
 
       virtual return_t
       do_power (Power state) noexcept override;
 
       virtual return_t
-      do_connect (void) noexcept override;
+      do_send (const void* data, std::size_t num) noexcept override;
 
       virtual return_t
-      do_disconnect (void) noexcept override;
-
-      virtual usb::device::Status&
-      do_get_status (void) noexcept override;
+      do_receive (void* data, std::size_t num) noexcept override;
 
       virtual return_t
-      do_wakeup_remote (void) noexcept override;
-
-      virtual return_t
-      do_configure_address (usb::device_address_t dev_addr) noexcept override;
-
-      virtual return_t
-      do_read_setup_packet (uint8_t* buf) noexcept override;
-
-      virtual usb::frame_number_t
-      do_get_frame_number (void) noexcept override;
-
-      virtual return_t
-      do_configure_endpoint (usb::endpoint_t ep_addr,
-                             usb::Endpoint_type ep_type,
-                             usb::packet_size_t ep_max_packet_size)
-                                 noexcept override;
-
-      virtual return_t
-      do_unconfigure_endpoint (usb::endpoint_t ep_addr) noexcept override;
-
-      virtual return_t
-      do_stall_endpoint (usb::endpoint_t ep_addr, bool stall) noexcept override;
-
-      virtual return_t
-      do_transfer (usb::endpoint_t ep_addr, uint8_t* data, std::size_t num)
+      do_transfer (const void* data_out, void* data_in, std::size_t num)
           noexcept override;
 
       virtual std::size_t
-      do_get_transfer_count (usb::endpoint_t ep_addr) noexcept override;
+      do_get_tx_count (void) noexcept override;
+
+      virtual std::size_t
+      do_get_rx_count (void) noexcept override;
 
       virtual return_t
-      do_abort_transfer (usb::endpoint_t ep_addr) noexcept override;
+      do_configure (serial::config_t ctrl, serial::config_arg_t arg)
+          noexcept override;
+
+      virtual return_t
+      do_control (serial::control_t ctrl) noexcept override;
+
+      virtual serial::Status&
+      do_get_status (void) noexcept override;
+
+      virtual return_t
+      do_control_modem_line (serial::Modem_control ctrl) noexcept override;
+
+      virtual serial::Modem_status&
+      do_get_modem_status (void) noexcept override;
 
       // --------------------------------------------------------------------
 
     private:
 
-      /// Pointer to CMSIS USBD Keil driver.
-      ARM_DRIVER_USBD* driver_;
+      /// Pointer to CMSIS USART Keil driver.
+      ARM_DRIVER_USART* driver_;
 
       /// Pointer to non-reentrant callback. Must be stored because
       /// Initialize() is now delayed just before PowerControl(FULL).
-      ARM_USBD_SignalDeviceEvent_t c_cb_device_func_;
-      ARM_USBD_SignalEndpointEvent_t c_cb_endpoint_func_;
+      ARM_USART_SignalEvent_t c_cb_func_;
 
       // Attempts to somehow use && failed, since the Keil driver
       // functions return temporary objects. So the only portable
@@ -155,8 +140,9 @@ namespace os
 
       Version version_
         { 0, 0 };
-      usb::device::Capabilities capa_;
-      usb::device::Status status_;
+      serial::Capabilities capa_;
+      serial::Status status_;
+      serial::Modem_status modem_status_;
 
     };
 
@@ -167,4 +153,4 @@ namespace os
 
 // ----------------------------------------------------------------------------
 
-#endif /* CMSIS_DRIVER_USBD_WRAPPER_H_ */
+#endif /* CMSIS_PLUS_DRIVER_USART_WRAPPER_H_ */

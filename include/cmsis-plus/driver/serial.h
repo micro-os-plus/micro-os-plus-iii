@@ -34,14 +34,14 @@
  * and tries to remain functionally close to the CMSIS specifications.
  */
 
-#ifndef CMSIS_PLUS_DRIVERS_SERIAL_H_
-#define CMSIS_PLUS_DRIVERS_SERIAL_H_
+#ifndef CMSIS_PLUS_DRIVER_SERIAL_H_
+#define CMSIS_PLUS_DRIVER_SERIAL_H_
 
 // ----------------------------------------------------------------------------
 
 #ifdef __cplusplus
 
-#include <cmsis-plus/drivers/common.h>
+#include <cmsis-plus/driver/common.h>
 
 #include <cstdint>
 #include <cstddef>
@@ -857,4 +857,4 @@ namespace os
 
 // ----------------------------------------------------------------------------
 
-#endif /* CMSIS_PLUS_DRIVERS_SERIAL_H_ */
+#endif /* CMSIS_PLUS_DRIVER_SERIAL_H_ */

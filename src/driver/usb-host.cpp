@@ -30,11 +30,11 @@
  * This file is part of the CMSIS++ proposal, intended as a CMSIS
  * replacement for C++ applications.
  *
- * The code is inspired by ARM CMSIS Driver_USBD.h file, v2.01,
+ * The code is inspired by ARM CMSIS Driver_USBH.h file, v2.01,
  * and tries to remain functionally close to the CMSIS specifications.
  */
 
-#include <cmsis-plus/drivers/usb-device.h>
+#include <cmsis-plus/driver/usb-host.h>
 #include <cassert>
 
 // ----------------------------------------------------------------------------
@@ -47,75 +47,69 @@ namespace os
     {
       // ----------------------------------------------------------------------
 
-      Device::Device () noexcept
+      Host::Host () noexcept
       {
-        cb_device_func_ = nullptr;
-        cb_device_object_ = nullptr;
+        cb_port_func_ = nullptr;
+        cb_port_object_ = nullptr;
 
-        cb_endpoint_func_ = nullptr;
-        cb_endpoint_object_ = nullptr;
+        cb_pipe_func_ = nullptr;
+        cb_pipe_object_ = nullptr;
       }
 
-      Device::~Device () noexcept
+      Host::~Host () noexcept
       {
         ;
       }
 
       void
-      Device::register_device_callback (device::signal_device_event_t cb_func,
-                                        const void* cb_object) noexcept
+      Host::register_port_callback (host::signal_port_event_t cb_func,
+                                    const void* cb_object) noexcept
       {
-        cb_device_func_ = cb_func;
-        cb_device_object_ = cb_object;
+        cb_port_func_ = cb_func;
+        cb_port_object_ = cb_object;
       }
 
       void
-      Device::register_endpoint_callback (
-          device::signal_endpoint_event_t cb_func, const void* cb_object) noexcept
+      Host::register_pipe_callback (host::signal_pipe_event_t cb_func,
+                                    const void* cb_object) noexcept
       {
-        cb_endpoint_func_ = cb_func;
-        cb_endpoint_object_ = cb_object;
+        cb_pipe_func_ = cb_func;
+        cb_pipe_object_ = cb_object;
       }
 
       // ----------------------------------------------------------------------
 
       return_t
-      Device::read_setup_packet (uint8_t* buf) noexcept
-      {
-        assert (buf != nullptr);
-        return do_read_setup_packet (buf);
-      }
-
-      return_t
-      Device::transfer (endpoint_t ep_addr, uint8_t* data, std::size_t num) noexcept
+      Host::transfer (pipe_t pipe, uint32_t packet, uint8_t* data,
+                      std::size_t num) noexcept
       {
         assert (data != nullptr);
         if (num == 0)
           {
             return RETURN_OK;
           }
-        return do_transfer (ep_addr, data, num);
+        return do_transfer (pipe, packet, data, num);
       }
 
       // ----------------------------------------------------------------------
 
       void
-      Device::signal_device_event (event_t event) noexcept
+      Host::signal_port_event (port_t port, event_t event) noexcept
       {
-        if (cb_device_func_ != nullptr)
+        if (cb_port_func_ != nullptr)
           {
             // Forward event to registered callback.
-            cb_device_func_ (cb_device_object_, event);
+            cb_port_func_ (cb_port_object_, port, event);
           }
       }
 
       void
-      Device::signal_endpoint_event (endpoint_t ep_addr, event_t event) noexcept
+      Host::signal_pipe_event (pipe_t pipe, event_t event) noexcept
       {
-        if (cb_endpoint_func_ != nullptr)
+        if (cb_pipe_func_ != nullptr)
           {
             // Forward event to registered callback.
-            cb_endpoint_func_ (cb_endpoint_object_, ep_addr, event);
+            cb_pipe_func_ (cb_pipe_object_, pipe, event);
           }
       }
 

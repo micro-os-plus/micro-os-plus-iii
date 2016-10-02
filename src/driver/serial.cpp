@@ -34,8 +34,7 @@
  * and tries to remain functionally close to the CMSIS specifications.
  */
 
-#include <cmsis-plus/drivers/serial.h>
-
+#include <cmsis-plus/driver/serial.h>
 #include <cassert>
 
 // ----------------------------------------------------------------------------

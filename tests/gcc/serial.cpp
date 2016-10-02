@@ -25,8 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/drivers/serial.h>
-#include <cmsis-plus/drivers/usart-wrapper.h>
+#include <cmsis-plus/driver/serial.h>
+#include <cmsis-plus/driver/usart-wrapper.h>
 
 #include <cassert>
 

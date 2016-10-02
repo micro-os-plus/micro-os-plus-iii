@@ -34,8 +34,8 @@
  * and tries to remain functionally close to the CMSIS specifications.
  */
 
-#ifndef CMSIS_PLUS_DRIVERS_USB_H_
-#define CMSIS_PLUS_DRIVERS_USB_H_
+#ifndef CMSIS_PLUS_DRIVER_USB_H_
+#define CMSIS_PLUS_DRIVER_USB_H_
 
 // ----------------------------------------------------------------------------
 
@@ -131,4 +131,4 @@ namespace os
 
 // ----------------------------------------------------------------------------
 
-#endif /* CMSIS_PLUS_DRIVERS_USB_H_ */
+#endif /* CMSIS_PLUS_DRIVER_USB_H_ */

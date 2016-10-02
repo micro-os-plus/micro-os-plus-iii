@@ -25,8 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/posix-drivers/ByteCircularBuffer.h>
 #include <cmsis-plus/diag/trace.h>
+#include <cmsis-plus/posix-driver/ByteCircularBuffer.h>
 
 #include <cstring>
 #include <cassert>
@@ -35,7 +35,7 @@
 
 namespace os
 {
-  namespace dev
+  namespace posix
   {
     // ------------------------------------------------------------------------
 
@@ -66,7 +66,8 @@ namespace os
       fBack = fFront = const_cast<uint8_t* volatile > (fBuf);
       fLen = 0;
 #if defined(DEBUG)
-      std::memset (static_cast<void*> (const_cast<uint8_t*> (fBuf)), '?', fSize);
+      std::memset (static_cast<void*> (const_cast<uint8_t*> (fBuf)), '?',
+                   fSize);
 #endif
     }
 
@@ -291,6 +292,5 @@ namespace os
                          fLowWaterMark);
     }
 
-  }
-/* namespace dev */
+  } /* namespace posix */
 } /* namespace os */

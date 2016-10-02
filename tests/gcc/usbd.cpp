@@ -25,8 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/drivers/usb-device.h>
-#include <cmsis-plus/drivers/usbd-wrapper.h>
+#include <cmsis-plus/driver/usb-device.h>
+#include <cmsis-plus/driver/usbd-wrapper.h>
 
 #include <cassert>
 

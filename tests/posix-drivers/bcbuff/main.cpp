@@ -37,7 +37,7 @@ int
 main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
   uint8_t buff[5];
-  os::dev::ByteCircularBuffer cb
+  os::posix::ByteCircularBuffer cb
     { buff, 5 };
 
   // Empty buffer.

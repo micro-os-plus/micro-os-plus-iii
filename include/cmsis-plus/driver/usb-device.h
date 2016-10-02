@@ -34,15 +34,15 @@
  * and tries to remain functionally close to the CMSIS specifications.
  */
 
-#ifndef CMSIS_PLUS_DRIVERS_USB_DEVICE_H_
-#define CMSIS_PLUS_DRIVERS_USB_DEVICE_H_
+#ifndef CMSIS_PLUS_DRIVER_USB_DEVICE_H_
+#define CMSIS_PLUS_DRIVER_USB_DEVICE_H_
 
 // ----------------------------------------------------------------------------
 
 #ifdef __cplusplus
 
-#include <cmsis-plus/drivers/common.h>
-#include <cmsis-plus/drivers/usb.h>
+#include <cmsis-plus/driver/common.h>
+#include <cmsis-plus/driver/usb.h>
 
 #include <cstdint>
 #include <cstddef>
@@ -553,4 +553,4 @@ namespace os
 
 // ----------------------------------------------------------------------------
 
-#endif /* CMSIS_PLUS_DRIVERS_USB_DEVICE_H_ */
+#endif /* CMSIS_PLUS_DRIVER_USB_DEVICE_H_ */

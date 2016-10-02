@@ -25,10 +25,10 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CMSIS_DRIVER_USBH_WRAPPER_H_
-#define CMSIS_DRIVER_USBH_WRAPPER_H_
+#ifndef CMSIS_PLUS_DRIVER_USBH_WRAPPER_H_
+#define CMSIS_PLUS_DRIVER_USBH_WRAPPER_H_
 
-#include <cmsis-plus/drivers/usb-host.h>
+#include <cmsis-plus/driver/usb-host.h>
 
 // ----------------------------------------------------------------------------
 
@@ -174,4 +174,4 @@ namespace os
 
 // ----------------------------------------------------------------------------
 
-#endif /* CMSIS_DRIVER_USBH_WRAPPER_H_ */
+#endif /* CMSIS_PLUS_DRIVER_USBH_WRAPPER_H_ */

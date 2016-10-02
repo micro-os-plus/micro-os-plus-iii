@@ -34,8 +34,7 @@
  * and tries to remain functionally close to the CMSIS specifications.
  */
 
-#include <cmsis-plus/drivers/common.h>
-
+#include <cmsis-plus/driver/common.h>
 #include <cassert>
 
 // ----------------------------------------------------------------------------

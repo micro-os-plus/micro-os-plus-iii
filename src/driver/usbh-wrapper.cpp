@@ -25,8 +25,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/drivers/usbh-wrapper.h>
-
+#include <cmsis-plus/driver/usbh-wrapper.h>
 #include <Driver_USBH.h>
 
 #include <cassert>

@@ -34,8 +34,8 @@
  * and tries to remain functionally close to the CMSIS specifications.
  */
 
-#ifndef CMSIS_PLUS_DRIVERS_COMMON_H_
-#define CMSIS_PLUS_DRIVERS_COMMON_H_
+#ifndef CMSIS_PLUS_DRIVER_COMMON_H_
+#define CMSIS_PLUS_DRIVER_COMMON_H_
 
 // ----------------------------------------------------------------------------
 
@@ -219,4 +219,4 @@ namespace os
 
 // ----------------------------------------------------------------------------
 
-#endif /* CMSIS_PLUS_DRIVERS_COMMON_H_ */
+#endif /* CMSIS_PLUS_DRIVER_COMMON_H_ */

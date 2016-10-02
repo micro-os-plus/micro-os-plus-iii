@@ -29,8 +29,7 @@
  *
  */
 
-#include <cmsis-plus/posix-drivers/CmsisUsartCharDevice.h>
-
+#include <cmsis-plus/posix-driver/CmsisUsartCharDevice.h>
 #include "Driver_USART.h"
 
 #include <cerrno>

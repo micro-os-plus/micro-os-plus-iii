@@ -25,8 +25,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/drivers/usart-wrapper.h>
-
+#include <cmsis-plus/driver/usart-wrapper.h>
 #include <Driver_USART.h>
 
 #include <utility>
