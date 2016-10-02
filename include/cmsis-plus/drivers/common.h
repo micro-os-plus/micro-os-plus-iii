@@ -167,7 +167,7 @@ namespace os
       Base () noexcept = default;
 
       virtual
-      ~Base () noexcept = default;
+      ~Base () noexcept;
 
       // --------------------------------------------------------------------
 

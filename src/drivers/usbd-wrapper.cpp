@@ -66,7 +66,8 @@ namespace os
     Usbd_wrapper::do_get_version (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
-      *((ARM_DRIVER_VERSION*) (&version_)) = driver_->GetVersion ();
+      *(reinterpret_cast<ARM_DRIVER_VERSION*> (&version_)) =
+          driver_->GetVersion ();
       return version_;
     }
 
@@ -74,7 +75,8 @@ namespace os
     Usbd_wrapper::do_get_capabilities (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
-      *((ARM_USBD_CAPABILITIES*) (&capa_)) = driver_->GetCapabilities ();
+      *(reinterpret_cast<ARM_USBD_CAPABILITIES*> (&capa_)) =
+          driver_->GetCapabilities ();
       return capa_;
     }
 
@@ -82,7 +84,8 @@ namespace os
     Usbd_wrapper::do_get_status (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
-      *((ARM_USBD_STATE*) (&status_)) = driver_->DeviceGetState ();
+      *(reinterpret_cast<ARM_USBD_STATE*> (&status_)) =
+          driver_->DeviceGetState ();
       return status_;
     }
 
@@ -91,7 +94,7 @@ namespace os
     return_t
     Usbd_wrapper::do_power (Power state) noexcept
     {
-      assert(driver_ != nullptr);
+      assert (driver_ != nullptr);
 
       return_t status;
 
@@ -104,7 +107,7 @@ namespace os
             }
         }
 
-      status = driver_->PowerControl ((ARM_POWER_STATE) state);
+      status = driver_->PowerControl (static_cast<ARM_POWER_STATE> (state));
 
       if (state == Power::off)
         {
@@ -155,7 +158,8 @@ namespace os
                                          usb::Endpoint_type ep_type,
                                          usb::packet_size_t ep_max_packet_size) noexcept
     {
-      return driver_->EndpointConfigure (ep_addr, (uint8_t) ep_type,
+      return driver_->EndpointConfigure (ep_addr,
+                                         static_cast<uint8_t> (ep_type),
                                          ep_max_packet_size);
     }
 
@@ -175,7 +179,8 @@ namespace os
     Usbd_wrapper::do_transfer (usb::endpoint_t ep_addr, uint8_t* data,
                                std::size_t num) noexcept
     {
-      return driver_->EndpointTransfer (ep_addr, data, (uint32_t) num);
+      return driver_->EndpointTransfer (ep_addr, data,
+                                        static_cast<uint32_t> (num));
     }
 
     std::size_t

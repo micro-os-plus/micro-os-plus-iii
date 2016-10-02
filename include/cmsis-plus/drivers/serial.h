@@ -250,6 +250,9 @@ namespace os
       // ====================================================================
       // ***** Serial Status *****
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
       /**
        * @brief %Serial port status
        */
@@ -307,6 +310,8 @@ namespace os
         bool rx_parity_error :1;
       };
 
+#pragma GCC diagnostic pop
+
       // ====================================================================
       // ***** Serial Modem Control *****
 
@@ -334,6 +339,9 @@ namespace os
       };
 
       // ====================================================================
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
 
       /**
        * @brief %Serial modem status
@@ -372,6 +380,8 @@ namespace os
         ///< RI  state: true=Active, false=Inactive
         bool ri :1;
       };
+
+#pragma GCC diagnostic pop
 
       // ====================================================================
       // ****** Serial Events *****
@@ -428,6 +438,9 @@ namespace os
       };
 
       // ====================================================================
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
 
       /**
        * @brief %Serial device driver capabilities.
@@ -503,6 +516,8 @@ namespace os
         bool event_ri :1;
       };
 
+#pragma GCC diagnostic pop
+
     } /* namespace serial */
 
     // ======================================================================
@@ -530,7 +545,7 @@ namespace os
       operator= (Serial&&) = delete;
 
       virtual
-      ~Serial () noexcept = default;
+      ~Serial () noexcept;
 
       // --------------------------------------------------------------------
 

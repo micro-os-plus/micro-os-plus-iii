@@ -230,7 +230,7 @@ namespace os
         operator= (Host&&) = delete;
 
         virtual
-        ~Host () noexcept = default;
+        ~Host () noexcept;
 
         // ------------------------------------------------------------------
 

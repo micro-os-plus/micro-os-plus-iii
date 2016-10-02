@@ -54,6 +54,11 @@ namespace os
       clean ();
     }
 
+    Serial::~Serial () noexcept
+    {
+      ;
+    }
+
     // ----------------------------------------------------------------------
 
     void
@@ -85,7 +90,7 @@ namespace os
     return_t
     Serial::send (const void* data, std::size_t num) noexcept
     {
-      assert(data != nullptr);
+      assert (data != nullptr);
       if (num == 0)
         {
           return RETURN_OK;
@@ -96,7 +101,7 @@ namespace os
     return_t
     Serial::receive (void* data, std::size_t num) noexcept
     {
-      assert(data != nullptr);
+      assert (data != nullptr);
       if (num == 0)
         {
           return RETURN_OK;
@@ -107,8 +112,8 @@ namespace os
     return_t
     Serial::transfer (const void* data_out, void* data_in, std::size_t num) noexcept
     {
-      assert(data_out != nullptr);
-      assert(data_in != nullptr);
+      assert (data_out != nullptr);
+      assert (data_in != nullptr);
       if (num == 0)
         {
           return RETURN_OK;

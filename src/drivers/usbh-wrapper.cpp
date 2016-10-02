@@ -66,7 +66,8 @@ namespace os
     Usbh_wrapper::do_get_version (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
-      *((ARM_DRIVER_VERSION*) (&version_)) = driver_->GetVersion ();
+      *(reinterpret_cast<ARM_DRIVER_VERSION*> (&version_)) =
+          driver_->GetVersion ();
       return version_;
     }
 
@@ -74,7 +75,8 @@ namespace os
     Usbh_wrapper::do_get_capabilities (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
-      *((ARM_USBH_CAPABILITIES*) (&capa_)) = driver_->GetCapabilities ();
+      *(reinterpret_cast<ARM_USBH_CAPABILITIES*> (&capa_)) =
+          driver_->GetCapabilities ();
       return capa_;
     }
 
@@ -82,7 +84,8 @@ namespace os
     Usbh_wrapper::do_get_port_status (usb::port_t port) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
-      *((ARM_USBH_PORT_STATE*) (&status_)) = driver_->PortGetState (port);
+      *(reinterpret_cast<ARM_USBH_PORT_STATE*> (&status_)) =
+          driver_->PortGetState (port);
       return status_;
     }
 
@@ -91,7 +94,7 @@ namespace os
     return_t
     Usbh_wrapper::do_power (Power state) noexcept
     {
-      assert(driver_ != nullptr);
+      assert (driver_ != nullptr);
 
       return_t status;
 
@@ -104,7 +107,7 @@ namespace os
             }
         }
 
-      status = driver_->PowerControl ((ARM_POWER_STATE) state);
+      status = driver_->PowerControl (static_cast<ARM_POWER_STATE> (state));
 
       if (state == Power::off)
         {
@@ -181,7 +184,8 @@ namespace os
     Usbh_wrapper::do_transfer (usb::pipe_t pipe, uint32_t packet, uint8_t* data,
                                std::size_t num) noexcept
     {
-      return driver_->PipeTransfer (pipe, packet, data, (uint32_t) num);
+      return driver_->PipeTransfer (pipe, packet, data,
+                                    static_cast<uint32_t> (num));
     }
 
     std::size_t

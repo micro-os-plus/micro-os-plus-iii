@@ -56,6 +56,11 @@ namespace os
         cb_endpoint_object_ = nullptr;
       }
 
+      Device::~Device () noexcept
+      {
+        ;
+      }
+
       void
       Device::register_device_callback (device::signal_device_event_t cb_func,
                                         const void* cb_object) noexcept
@@ -77,14 +82,14 @@ namespace os
       return_t
       Device::read_setup_packet (uint8_t* buf) noexcept
       {
-        assert(buf != nullptr);
+        assert (buf != nullptr);
         return do_read_setup_packet (buf);
       }
 
       return_t
       Device::transfer (endpoint_t ep_addr, uint8_t* data, std::size_t num) noexcept
       {
-        assert(data != nullptr);
+        assert (data != nullptr);
         if (num == 0)
           {
             return RETURN_OK;

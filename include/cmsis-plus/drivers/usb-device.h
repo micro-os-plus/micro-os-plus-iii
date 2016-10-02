@@ -57,6 +57,9 @@ namespace os
       {
         // ==================================================================
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
         /**
          * @brief USB device driver capabilities.
          */
@@ -77,6 +80,8 @@ namespace os
           bool event_vbus_off :1;
 
         };
+
+#pragma GCC diagnostic pop
 
         // ==================================================================
         // ----- USB Device Status -----
@@ -206,7 +211,7 @@ namespace os
         operator= (Device&&) = delete;
 
         virtual
-        ~Device () noexcept = default;
+        ~Device () noexcept;
 
         // ------------------------------------------------------------------
 

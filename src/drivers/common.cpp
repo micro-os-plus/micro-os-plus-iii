@@ -2,6 +2,7 @@
  * This file is part of the µOS++ distribution.
  *   (https://github.com/micro-os-plus)
  * Copyright (c) 2016 Liviu Ionescu.
+ * Copyright (c) 2013-2014 ARM Ltd.
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,59 +26,33 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/posix-drivers/cmsis-driver-serial.h>
-#include "Driver_USART.h"
+/*
+ * This file is part of the CMSIS++ proposal, intended as a CMSIS
+ * replacement for C++ applications.
+ *
+ * The code is inspired by ARM CMSIS Driver_USART.h file, v2.02,
+ * and tries to remain functionally close to the CMSIS specifications.
+ */
+
+#include <cmsis-plus/drivers/common.h>
+
+#include <cassert>
 
 // ----------------------------------------------------------------------------
 
 namespace os
 {
-  namespace cmsis
+  namespace driver
   {
-    namespace driver
+    // ----------------------------------------------------------------------
+
+    Base::~Base () noexcept
     {
-      // ----------------------------------------------------------------------
+      ;
+    }
 
-      Serial::Serial ()
-      {
-        cb_event_ = nullptr;
-        cb_object_ = nullptr;
-      }
-
-      Serial::~Serial ()
-      {
-        ;
-      }
-
-      int32_t
-      Serial::initialize (signal_event_t cb_event, const void* cb_object)
-      {
-        cb_event_ = cb_event;
-        cb_object_ = cb_object;
-
-        return do_initialize ();
-      }
-
-      // ----------------------------------------------------------------------
-
-      void
-      Serial::signal_event (uint32_t event)
-      {
-        if (cb_event_ != nullptr)
-          {
-            // Forward event to registered callback.
-            cb_event_ (cb_object_, event);
-          }
-      }
-
-    } /* namespace driver */
-  } /* namespace cmsis */
+  // ----------------------------------------------------------------------
+  } /* namespace driver */
 } /* namespace os */
 
-// Forward C calls to C++ implementation.
-
-void
-cmsis_driver_serial_signal_event (void* object, uint32_t event)
-{
-  (static_cast<os::cmsis::driver::Serial*> (object))->signal_event (event);
-}
+// ----------------------------------------------------------------------------
