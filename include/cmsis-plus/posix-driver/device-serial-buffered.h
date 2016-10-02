@@ -25,8 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CMSIS_PLUS_POSIX_DRIVER_BUFFERED_SERIAL_DEVICE_H_
-#define CMSIS_PLUS_POSIX_DRIVER_BUFFERED_SERIAL_DEVICE_H_
+#ifndef CMSIS_PLUS_POSIX_DRIVER_DEVICE_SERIAL_BUFFERED_H_
+#define CMSIS_PLUS_POSIX_DRIVER_DEVICE_SERIAL_BUFFERED_H_
 
 #if defined(__cplusplus)
 
@@ -54,31 +54,31 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
-    template<typename Cs_T>
-      class Buffered_serial_device : public os::posix::CharDevice
+    template<typename CS>
+      class device_serial_buffered : public os::posix::CharDevice
       {
-        using Critical_section = Cs_T;
+        using critical_section = CS;
 
       public:
 
-        Buffered_serial_device (const char* device_name,
+        device_serial_buffered (const char* device_name,
                                 os::driver::Serial* driver,
-                                os::posix::ByteCircularBuffer* rx_buf,
-                                os::posix::ByteCircularBuffer* tx_buf);
+                                os::posix::circular_buffer_bytes* rx_buf,
+                                os::posix::circular_buffer_bytes* tx_buf);
 
         // Prevent copy, move, assign
-        Buffered_serial_device (const Buffered_serial_device&) = delete;
+        device_serial_buffered (const device_serial_buffered&) = delete;
 
-        Buffered_serial_device (Buffered_serial_device&&) = delete;
+        device_serial_buffered (device_serial_buffered&&) = delete;
 
-        Buffered_serial_device&
-        operator= (const Buffered_serial_device&) = delete;
+        device_serial_buffered&
+        operator= (const device_serial_buffered&) = delete;
 
-        Buffered_serial_device&
-        operator= (Buffered_serial_device&&) = delete;
+        device_serial_buffered&
+        operator= (device_serial_buffered&&) = delete;
 
         virtual
-        ~Buffered_serial_device ();
+        ~device_serial_buffered ();
 
         // --------------------------------------------------------------------
 
@@ -86,7 +86,7 @@ namespace os
         // interrupt context.
 
         static void
-        signal_event (Buffered_serial_device* object, uint32_t event);
+        signal_event (device_serial_buffered* object, uint32_t event);
 
         // --------------------------------------------------------------------
 
@@ -135,8 +135,8 @@ namespace os
         os::rtos::semaphore_binary tx_sem_
           { "tx", 0 };
 
-        os::posix::ByteCircularBuffer* rx_buf_ = nullptr;
-        os::posix::ByteCircularBuffer* tx_buf_ = nullptr;
+        os::posix::circular_buffer_bytes* rx_buf_ = nullptr;
+        os::posix::circular_buffer_bytes* tx_buf_ = nullptr;
 
         std::size_t rx_count_ = 0; //
         bool volatile tx_busy_ = false;
@@ -150,18 +150,18 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    template<typename Cs_T>
-      Buffered_serial_device<Cs_T>::Buffered_serial_device (
+    template<typename CS>
+      device_serial_buffered<CS>::device_serial_buffered (
           const char* deviceName, //
-          os::driver::Serial* driver, os::posix::ByteCircularBuffer* rx_buf,
-          os::posix::ByteCircularBuffer* tx_buf) :
+          os::driver::Serial* driver, os::posix::circular_buffer_bytes* rx_buf,
+          os::posix::circular_buffer_bytes* tx_buf) :
           //
           CharDevice (deviceName), // Construct parent.
           driver_ (driver), //
           rx_buf_ (rx_buf), //
           tx_buf_ (tx_buf) //
       {
-        assert (rx_buf != nullptr);
+        assert(rx_buf != nullptr);
 
         // Do not check the same for tx_buf, it may be null.
 
@@ -169,8 +169,8 @@ namespace os
             reinterpret_cast<os::driver::signal_event_t> (signal_event), this);
       }
 
-    template<typename Cs_T>
-      Buffered_serial_device<Cs_T>::~Buffered_serial_device ()
+    template<typename CS>
+      device_serial_buffered<CS>::~device_serial_buffered ()
       {
         driver_ = nullptr;
         is_connected_ = false;
@@ -182,10 +182,10 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-    template<typename Cs_T>
+    template<typename CS>
       int
-      Buffered_serial_device<Cs_T>::do_vopen (const char* path, int oflag,
-                                              std::va_list args)
+      device_serial_buffered<CS>::do_vopen (const char* path, int oflag,
+                                            std::va_list args)
       {
         if (is_opened_)
           {
@@ -253,9 +253,11 @@ namespace os
             for (;;)
               {
                   {
-                    Critical_section cs; // -----
+                    // ----- Enter critical section ---------------------------
+                    critical_section cs;
 
                     status = driver_->get_modem_status ();
+                    // ----- Exit critical section ----------------------------
                   }
                 if (status.is_dcd_active ())
                   {
@@ -281,23 +283,23 @@ namespace os
         return 0;
       }
 
-    template<typename Cs_T>
+    template<typename CS>
       bool
-      Buffered_serial_device<Cs_T>::do_is_opened (void)
+      device_serial_buffered<CS>::do_is_opened (void)
       {
         return is_opened_;
       }
 
-    template<typename Cs_T>
+    template<typename CS>
       bool
-      Buffered_serial_device<Cs_T>::do_is_connected (void)
+      device_serial_buffered<CS>::do_is_connected (void)
       {
         return is_connected_;
       }
 
-    template<typename Cs_T>
+    template<typename CS>
       int
-      Buffered_serial_device<Cs_T>::do_close (void)
+      device_serial_buffered<CS>::do_close (void)
       {
 
         if (is_connected_)
@@ -320,20 +322,20 @@ namespace os
         // Abort pending reads.
         os::driver::return_t ret;
         ret = driver_->control (os::driver::serial::Control::abort_receive);
-        assert (ret == os::driver::RETURN_OK);
+        assert(ret == os::driver::RETURN_OK);
 
         // Abort pending writes.
         ret = driver_->control (os::driver::serial::Control::abort_send);
-        assert (ret == os::driver::RETURN_OK);
+        assert(ret == os::driver::RETURN_OK);
 
         // Disable transmitter and receiver.
         ret = driver_->control (os::driver::serial::Control::disable_tx);
-        assert (ret == os::driver::RETURN_OK);
+        assert(ret == os::driver::RETURN_OK);
 
         ret = driver_->control (os::driver::serial::Control::disable_rx);
-        assert (ret == os::driver::RETURN_OK);
+        assert(ret == os::driver::RETURN_OK);
         ret = driver_->control (os::driver::serial::Control::disable_break);
-        assert (ret == os::driver::RETURN_OK);
+        assert(ret == os::driver::RETURN_OK);
 
         is_opened_ = false;
         is_connected_ = false;
@@ -342,9 +344,9 @@ namespace os
         return 0;
       }
 
-    template<typename Cs_T>
+    template<typename CS>
       ssize_t
-      Buffered_serial_device<Cs_T>::do_read (void* buf, std::size_t nbyte)
+      device_serial_buffered<CS>::do_read (void* buf, std::size_t nbyte)
       {
         // TODO: implement cases when 0 must be returned
         // (disconnects, timeouts).
@@ -352,9 +354,11 @@ namespace os
           {
             std::size_t count;
               {
-                Critical_section cs; // -----
+                // ----- Enter critical section -------------------------------
+                critical_section cs;
 
                 count = rx_buf_->popFront (static_cast<uint8_t*> (buf), nbyte);
+                // ----- Exit critical section --------------------------------
               }
             if (count > 0)
               {
@@ -371,10 +375,9 @@ namespace os
           }
       }
 
-    template<typename Cs_T>
+    template<typename CS>
       ssize_t
-      Buffered_serial_device<Cs_T>::do_write (const void* buf,
-                                              std::size_t nbyte)
+      device_serial_buffered<CS>::do_write (const void* buf, std::size_t nbyte)
       {
         std::size_t count;
 
@@ -382,7 +385,8 @@ namespace os
           {
             count = 0;
               {
-                Critical_section cs; // -----
+                // ----- Enter critical section -------------------------------
+                critical_section cs;
 
                 if (tx_buf_->isBelowHighWaterMark ())
                   {
@@ -390,27 +394,32 @@ namespace os
                     count = tx_buf_->pushBack (
                         static_cast<const uint8_t*> (buf), nbyte);
                   }
+                // ----- Exit critical section --------------------------------
               }
             while (true)
               {
                 os::driver::serial::Status status;
                   {
-                    Critical_section cs; // -----
+                    // ----- Enter critical section ---------------------------
+                    critical_section cs;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
                     status = driver_->get_status ();
 #pragma GCC diagnostic pop
 
+                    // ----- Exit critical section ----------------------------
                   }
                 if (!status.tx_busy)
                   {
                     uint8_t* pbuf;
                     std::size_t nb;
                       {
-                        Critical_section cs; // -----
+                        // ----- Enter critical section -----------------------
+                        critical_section cs; // -----
 
                         nb = tx_buf_->getFrontContiguousBuffer (&pbuf);
+                        // ----- Exit critical section ------------------------
                       }
                     if (nb > 0)
                       {
@@ -424,7 +433,7 @@ namespace os
 
 //                bool isBelowHWM;
 //                  {
-//                    Critical_section cs; // -----
+//                    critical_section cs; // -----
 //
 //                    isBelowHWM = tx_buf_->isBelowHighWaterMark ();
 //                  }
@@ -449,7 +458,8 @@ namespace os
 
                 if (count < nbyte)
                   {
-                    Critical_section cs;  // -----
+                    // ----- Enter critical section ---------------------------
+                    critical_section cs;
 
                     std::size_t n;
                     // If there is more space in the buffer, try to fill it.
@@ -457,6 +467,7 @@ namespace os
                         static_cast<const uint8_t*> (buf) + count,
                         nbyte - count);
                     count += n;
+                    // ----- Exit critical section ----------------------------
                   }
               }
           }
@@ -512,25 +523,25 @@ namespace os
       }
 
 #if 0
-    template<typename Cs_T>
+    template<typename CS>
     ssize_t
-    Buffered_serial_device<Cs_T>::do_writev (const struct iovec* iov, int iovcnt)
+    device_serial_buffered<CS>::do_writev (const struct iovec* iov, int iovcnt)
       {
         errno = ENOSYS; // Not implemented
         return -1;
       }
 
-    template<typename Cs_T>
+    template<typename CS>
     int
-    Buffered_serial_device<Cs_T>::do_vioctl (int request, std::va_list args)
+    device_serial_buffered<CS>::do_vioctl (int request, std::va_list args)
       {
         errno = ENOSYS; // Not implemented
         return -1;
       }
 
-    template<typename Cs_T>
+    template<typename CS>
     int
-    Buffered_serial_device<Cs_T>::do_vfcntl (int cmd, std::va_list args)
+    device_serial_buffered<CS>::do_vfcntl (int cmd, std::va_list args)
       {
         errno = ENOSYS; // Not implemented
         return -1;
@@ -539,10 +550,10 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    template<typename Cs_T>
+    template<typename CS>
       void
-      Buffered_serial_device<Cs_T>::signal_event (
-          Buffered_serial_device* object, uint32_t event)
+      device_serial_buffered<CS>::signal_event (device_serial_buffered* object,
+                                                uint32_t event)
       {
         if (!object->is_opened_)
           {
@@ -559,7 +570,7 @@ namespace os
             std::size_t count = tmpCount - object->rx_count_;
             object->rx_count_ = tmpCount;
             std::size_t adjust = object->rx_buf_->advanceBack (count);
-            assert (count == adjust);
+            assert(count == adjust);
 
             if (event & os::driver::serial::Event::receive_complete)
               {
@@ -573,13 +584,13 @@ namespace os
                     object->rx_buf_->retreatBack ();
                     nbyte = object->rx_buf_->getBackContiguousBuffer (&pbuf);
                   }
-                assert (nbyte > 0);
+                assert(nbyte > 0);
 
                 // Read as much as we can.
                 int32_t status;
                 status = object->driver_->receive (pbuf, nbyte);
                 // TODO: implement error processing.
-                assert (status == os::driver::RETURN_OK);
+                assert(status == os::driver::RETURN_OK);
 
                 object->rx_count_ = 0;
               }
@@ -595,7 +606,7 @@ namespace os
               {
                 std::size_t count = object->driver_->get_tx_count ();
                 std::size_t adjust = object->tx_buf_->advanceFront (count);
-                assert (count == adjust);
+                assert(count == adjust);
 
                 uint8_t* pbuf;
                 std::size_t nbyte = object->tx_buf_->getFrontContiguousBuffer (
@@ -605,7 +616,7 @@ namespace os
                     int32_t status;
                     status = object->driver_->send (pbuf, nbyte);
                     // TODO: implement error processing
-                    assert (status == os::driver::RETURN_OK);
+                    assert(status == os::driver::RETURN_OK);
                   }
                 else
                   {
@@ -663,4 +674,4 @@ namespace os
 
 #endif /* __cplusplus */
 
-#endif /* CMSIS_PLUS_POSIX_DRIVER_BUFFERED_SERIAL_DEVICE_H_ */
+#endif /* CMSIS_PLUS_POSIX_DRIVER_DEVICE_SERIAL_BUFFERED_H_ */

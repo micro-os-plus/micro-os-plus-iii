@@ -150,7 +150,7 @@ namespace os
       };
     // ========================================================================
 
-    using ByteCircularBuffer = circular_buffer<uint8_t>;
+    using circular_buffer_bytes = circular_buffer<uint8_t>;
 
   // ==========================================================================
   } /* namespace posix */
