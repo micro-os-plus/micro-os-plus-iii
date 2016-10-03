@@ -25,8 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CMSIS_PLUS_POSIX_IO_STANDARD_ALIASES_H_
-#define CMSIS_PLUS_POSIX_IO_STANDARD_ALIASES_H_
+#ifndef CMSIS_PLUS_POSIX_IO_C_POSIX_SYSCALLS_ALIASES_NEWLIB_H_
+#define CMSIS_PLUS_POSIX_IO_C_POSIX_SYSCALLS_ALIASES_NEWLIB_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -36,7 +36,7 @@ extern "C"
   // --------------------------------------------------------------------------
 
   // For embedded environment that use POSIX system calls, redefine
-  // all functions without the '__posix_' prefix.
+  // some functions with _name(), some directly with name().
 
   int __attribute__((weak, alias ("__posix_accept")))
   accept (int socket, struct sockaddr* address, socklen_t* address_len);
@@ -51,13 +51,13 @@ extern "C"
   chmod (const char* path, mode_t mode);
 
   int __attribute__((weak, alias ("__posix_chown")))
-  chown (const char* path, uid_t owner, gid_t group);
+  _chown (const char* path, uid_t owner, gid_t group);
 
   clock_t __attribute__((weak, alias ("__posix_clock")))
-  clock (void);
+  _clock (void);
 
   int __attribute__((weak, alias ("__posix_close")))
-  close (int fildes);
+  _close (int fildes);
 
   int __attribute__((weak, alias ("__posix_closedir")))
   closedir (DIR* dirp);
@@ -66,16 +66,16 @@ extern "C"
   connect (int socket, const struct sockaddr* address, socklen_t address_len);
 
   int __attribute__((weak, alias ("__posix_execve")))
-  execve (const char* path, char* const argv[], char* const envp[]);
+  _execve (const char* path, char* const argv[], char* const envp[]);
 
   int __attribute__((weak, alias ("__posix_fcntl")))
   fcntl (int fildes, int cmd, ...);
 
   pid_t __attribute__((weak, alias ("__posix_fork")))
-  fork (void);
+  _fork (void);
 
   int __attribute__((weak, alias ("__posix_fstat")))
-  fstat (int fildes, struct stat* buf);
+  _fstat (int fildes, struct stat* buf);
 
   int __attribute__((weak, alias ("__posix_ftruncate")))
   ftruncate (int fildes, off_t length);
@@ -91,7 +91,7 @@ extern "C"
   getpeername (int socket, struct sockaddr* address, socklen_t* address_len);
 
   pid_t __attribute__((weak, alias ("__posix_getpid")))
-  getpid (void);
+  _getpid (void);
 
   int __attribute__((weak, alias ("__posix_getsockname")))
   getsockname (int socket, struct sockaddr* address, socklen_t* address_len);
@@ -101,31 +101,31 @@ extern "C"
               socklen_t* option_len);
 
   int __attribute__((weak, alias ("__posix_gettimeofday")))
-  gettimeofday (struct timeval* ptimeval, void* ptimezone);
+  _gettimeofday (struct timeval* ptimeval, void* ptimezone);
 
   int __attribute__((weak, alias ("__posix_ioctl")))
   ioctl (int fildes, int request, ...);
 
   int __attribute__((weak, alias ("__posix_isatty")))
-  isatty (int fildes);
+  _isatty (int fildes);
 
   int __attribute__((weak, alias ("__posix_kill")))
-  kill (pid_t pid, int sig);
+  _kill (pid_t pid, int sig);
 
   int __attribute__((weak, alias ("__posix_link")))
-  link (const char* existing, const char* _new);
+  _link (const char* existing, const char* _new);
 
   int __attribute__((weak, alias ("__posix_listen")))
   listen (int socket, int backlog);
 
   off_t __attribute__((weak, alias ("__posix_lseek")))
-  lseek (int fildes, off_t offset, int whence);
+  _lseek (int fildes, off_t offset, int whence);
 
   int __attribute__((weak, alias ("__posix_mkdir")))
   mkdir (const char* path, mode_t mode);
 
   int __attribute__((weak, alias ("__posix_open")))
-  open (const char* path, int oflag, ...);
+  _open (const char* path, int oflag, ...);
 
   DIR*
   __attribute__((weak, alias ("__posix_opendir")))
@@ -135,7 +135,7 @@ extern "C"
   raise (int sig);
 
   ssize_t __attribute__((weak, alias ("__posix_read")))
-  read (int fildes, void* buf, size_t nbyte);
+  _read (int fildes, void* buf, size_t nbyte);
 
   struct dirent*
   __attribute__((weak, alias ("__posix_readdir")))
@@ -145,7 +145,7 @@ extern "C"
   readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result);
 
   ssize_t __attribute__((weak, alias ("__posix_readlink")))
-  readlink (const char* path, char* buf, size_t bufsize);
+  _readlink (const char* path, char* buf, size_t bufsize);
 
   ssize_t __attribute__((weak, alias ("__posix_recv")))
   recv (int socket, void* buffer, size_t length, int flags);
@@ -199,34 +199,34 @@ extern "C"
 #endif
 
   int __attribute__((weak, alias ("__posix_stat")))
-  stat (const char* path, struct stat* buf);
+  _stat (const char* path, struct stat* buf);
 
   void __attribute__((weak, alias ("__posix_sync")))
   sync (void);
 
   int __attribute__((weak, alias ("__posix_symlink")))
-  symlink (const char* existing, const char* _new);
+  _symlink (const char* existing, const char* _new);
 
   int __attribute__((weak, alias ("__posix_system")))
   system (const char *command);
 
   clock_t __attribute__((weak, alias ("__posix_times")))
-  times (struct tms* buf);
+  _times (struct tms* buf);
 
   int __attribute__((weak, alias ("__posix_truncate")))
   truncate (const char* path, off_t length);
 
   int __attribute__((weak, alias ("__posix_unlink")))
-  unlink (const char* name);
+  _unlink (const char* name);
 
   int __attribute__((weak, alias ("__posix_utime")))
   utime (const char* path, const struct utimbuf* times);
 
   pid_t __attribute__((weak, alias ("__posix_wait")))
-  wait (int* stat_loc);
+  _wait (int* stat_loc);
 
   ssize_t __attribute__((weak, alias ("__posix_write")))
-  write (int fildes, const void* buf, size_t nbyte);
+  _write (int fildes, const void* buf, size_t nbyte);
 
   ssize_t __attribute__((weak, alias ("__posix_writev")))
   writev (int fildes, const struct iovec* iov, int iovcnt);
@@ -237,7 +237,7 @@ extern "C"
 }
 #endif
 
-#endif /* CMSIS_PLUS_POSIX_IO_STANDARD_ALIASES_H_ */
+#endif /* CMSIS_PLUS_POSIX_IO_C_POSIX_SYSCALLS_ALIASES_NEWLIB_H_ */
 
 // ----------------------------------------------------------------------------
 
