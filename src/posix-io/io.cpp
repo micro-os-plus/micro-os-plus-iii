@@ -87,7 +87,7 @@ namespace os
       errno = 0;
 
       // First check if path is a device.
-      os::posix::io* io = os::posix::device_char_registry::identifyDevice (
+      os::posix::io* io = os::posix::device_char_registry::identify_device (
           path);
       if (io != nullptr)
         {
@@ -103,7 +103,7 @@ namespace os
       else
         {
           auto adjusted_path = path;
-          auto* const fs = os::posix::mount_manager::identifyFileSystem (
+          auto* const fs = os::posix::mount_manager::identify_file_system (
               &adjusted_path);
 
           // The manager will return null if there are no file systems
@@ -126,13 +126,13 @@ namespace os
 
       // If successful, allocate a file descriptor.
       // Return a valid pointer to an object derived from io, or nullptr.
-      return io->allocFileDescriptor ();
+      return io->alloc_file_descriptor ();
     }
 
     // ------------------------------------------------------------------------
 
     io*
-    io::allocFileDescriptor (void)
+    io::alloc_file_descriptor (void)
     {
 
       int fd = file_descriptors_manager::alloc (this);
@@ -140,7 +140,7 @@ namespace os
         {
           // If allocation failed, close this object.
           do_close ();
-          clearFileDescriptor ();
+          clear_file_descriptor ();
           return nullptr;
         }
 
@@ -150,15 +150,15 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    io::io ()
+    io::io (type t)
     {
-      fType = Type::NOTSET;
-      fFileDescriptor = noFileDescriptor;
+      type_ = t;
+      file_descriptor_ = no_file_descriptor;
     }
 
     io::~io ()
     {
-      fFileDescriptor = noFileDescriptor;
+      file_descriptor_ = no_file_descriptor;
     }
 
     // ------------------------------------------------------------------------
@@ -178,8 +178,8 @@ namespace os
       int ret = do_close ();
 
       // Remove this IO from the file descriptors registry.
-      file_descriptors_manager::free (fFileDescriptor);
-      fFileDescriptor = noFileDescriptor;
+      file_descriptors_manager::free (file_descriptor_);
+      file_descriptor_ = no_file_descriptor;
 
       // Release objects acquired from a pool.
       do_release ();

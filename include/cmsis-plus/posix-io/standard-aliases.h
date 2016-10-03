@@ -32,6 +32,9 @@
 extern "C"
 {
 #endif
+
+  // --------------------------------------------------------------------------
+
   // For embedded environment that use POSIX system calls, redefine
   // all functions without the '__posix_' prefix.
 
@@ -227,6 +230,8 @@ extern "C"
 
   ssize_t __attribute__((weak, alias ("__posix_writev")))
   writev (int fildes, const struct iovec* iov, int iovcnt);
+
+// --------------------------------------------------------------------------
 
 #ifdef __cplusplus
 }

@@ -53,15 +53,15 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    file::file ()
+    file::file () :
+        io (type::file)
     {
-      fType = Type::FILE;
-      fFileSystem = nullptr;
+      file_system_ = nullptr;
     }
 
     file::~file ()
     {
-      fFileSystem = nullptr;
+      file_system_ = nullptr;
     }
 
     // ------------------------------------------------------------------------
@@ -70,15 +70,15 @@ namespace os
     file::do_release (void)
     {
       // Files is free, return it to the pool.
-      auto fs = getFileSystem ();
+      auto fs = file_system ();
       if (fs != nullptr)
         {
-          auto pool = fs->getFilesPool ();
+          auto pool = fs->files_pool ();
           if (pool != nullptr)
             {
               pool->release (this);
             }
-          setFileSystem (nullptr);
+          file_system (nullptr);
         }
     }
 

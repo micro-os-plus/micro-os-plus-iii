@@ -67,7 +67,7 @@ public:
   getMode (void);
 
   const char*
-  getPath (void);
+  path (void);
 
   unsigned int
   getNumber (void);
@@ -121,7 +121,7 @@ TestFile::getMode (void)
 }
 
 inline const char*
-TestFile::getPath (void)
+TestFile::path (void)
 {
   return fPath;
 }
@@ -161,7 +161,7 @@ public:
   getCmd (void);
 
   const char*
-  getPath (void);
+  path (void);
 
 protected:
 
@@ -203,7 +203,7 @@ TestDir::getCmd (void)
 }
 
 inline const char*
-TestDir::getPath (void)
+TestDir::path (void)
 {
   return fPath;
 }
@@ -228,10 +228,10 @@ struct dirent*
 TestDir::do_read ()
 {
   fCmd = Cmds::READ;
-  sprintf (getDirEntry ()->d_name, "file%d", fCount);
+  sprintf (dir_entry ()->d_name, "file%d", fCount);
 
   fCount++;
-  return getDirEntry ();
+  return dir_entry ();
 }
 
 void
@@ -341,7 +341,7 @@ public:
 
 // ----------------------------------------------------------------------------
 
-using TestFilePool = os::posix::TPool<TestFile>;
+using TestFilePool = os::posix::pool_typed<TestFile>;
 
 constexpr std::size_t FILES_POOL_ARRAY_SIZE = 2;
 
@@ -349,7 +349,7 @@ constexpr std::size_t FILES_POOL_ARRAY_SIZE = 2;
 TestFilePool filesPool
   { FILES_POOL_ARRAY_SIZE };
 
-using TestDirPool = os::posix::TPool<TestDir>;
+using TestDirPool = os::posix::pool_typed<TestDir>;
 
 constexpr std::size_t DIRS_POOL_ARRAY_SIZE = 2;
 
@@ -394,11 +394,11 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       TestDir* dir = reinterpret_cast<TestDir*> (pdir);
       // Must be the first used slot in the pool.
-      assert(dirsPool.getObject (0) == dir);
-      assert(dirsPool.getFlag (0) == true);
+      assert(dirsPool.object (0) == dir);
+      assert(dirsPool.in_use (0) == true);
 
       // Check params passing.
-      assert(std::strcmp ("/d1", dir->getPath ()) == 0);
+      assert(std::strcmp ("/d1", dir->path ()) == 0);
 
       // Test READ
       errno = -2;
@@ -419,7 +419,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert(dir->getCmd () == Cmds::CLOSE);
 
       // Must no longer be in the pool
-      assert(dirsPool.getFlag (0) == false);
+      assert(dirsPool.in_use (0) == false);
     }
 
     {
@@ -432,11 +432,11 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       TestDir* dir = reinterpret_cast<TestDir*> (pdir);
       // Must be the first used slot in the pool.
-      assert(dirsPool.getObject (0) == dir);
-      assert(dirsPool.getFlag (0) == true);
+      assert(dirsPool.object (0) == dir);
+      assert(dirsPool.in_use (0) == true);
 
       // Check params passing.
-      assert(std::strcmp ("/d1", dir->getPath ()) == 0);
+      assert(std::strcmp ("/d1", dir->path ()) == 0);
 
       // Test READ
       errno = -2;
@@ -457,7 +457,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert(dir->getCmd () == Cmds::CLOSE);
 
       // Must no longer be in the pool
-      assert(dirsPool.getFlag (0) == false);
+      assert(dirsPool.in_use (0) == false);
     }
 
     {
@@ -469,26 +469,26 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert((dir != nullptr) && (errno == 0));
 
       // Must be the first used slot in the pool.
-      assert(dirsPool.getObject (0) == dir);
-      assert(dirsPool.getFlag (0) == true);
+      assert(dirsPool.object (0) == dir);
+      assert(dirsPool.in_use (0) == true);
 
       TestDir* tdir = static_cast<TestDir*> (dir);
 
       // Check params passing.
-      assert(std::strcmp ("/d2", tdir->getPath ()) == 0);
+      assert(std::strcmp ("/d2", tdir->path ()) == 0);
 
       // Test READ
       errno = -2;
       struct dirent* de = dir->read ();
       assert((de != nullptr) && (errno == 0));
       assert(tdir->getCmd () == Cmds::READ);
-      assert(std::strcmp (dir->getName (), "file1") == 0);
+      assert(std::strcmp (dir->name (), "file1") == 0);
 
       // Second READ
       de = dir->read ();
       assert((de != nullptr) && (errno == 0));
       assert(tdir->getCmd () == Cmds::READ);
-      assert(std::strcmp (dir->getName (), "file2") == 0);
+      assert(std::strcmp (dir->name (), "file2") == 0);
 
       // Test REWIND
       errno = -2;
@@ -500,7 +500,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       de = dir->read ();
       assert((de != nullptr) && (errno == 0));
       assert(tdir->getCmd () == Cmds::READ);
-      assert(std::strcmp (dir->getName (), "file1") == 0);
+      assert(std::strcmp (dir->name (), "file1") == 0);
 
       // Test CLOSE
       errno = -2;
@@ -509,7 +509,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert(tdir->getCmd () == Cmds::CLOSE);
 
       // Must no longer be in the pool
-      assert(dirsPool.getFlag (0) == false);
+      assert(dirsPool.in_use (0) == false);
     }
 
   trace_puts ("'test-directory-debug' succeeded.");

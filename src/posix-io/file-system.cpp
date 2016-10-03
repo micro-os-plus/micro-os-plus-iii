@@ -58,8 +58,7 @@ namespace os
         }
 
       auto adjusted_path = path;
-      auto* const fs = os::posix::mount_manager::identifyFileSystem (
-          &adjusted_path);
+      auto* const fs = mount_manager::identify_file_system (&adjusted_path);
 
       if (fs == nullptr)
         {
@@ -67,7 +66,7 @@ namespace os
           return -1;
         }
 
-      assert (fs->getBlockDevice () != nullptr);
+      assert (fs->device () != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -90,8 +89,7 @@ namespace os
         }
 
       auto adjusted_path = path;
-      auto* const fs = os::posix::mount_manager::identifyFileSystem (
-          &adjusted_path);
+      auto* const fs = mount_manager::identify_file_system (&adjusted_path);
 
       if (fs == nullptr)
         {
@@ -99,7 +97,7 @@ namespace os
           return -1;
         }
 
-      assert (fs->getBlockDevice () != nullptr);
+      assert (fs->device () != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -112,9 +110,9 @@ namespace os
       errno = 0;
 
       // Enumerate all mounted file systems and sync them.
-      for (std::size_t i = 0; i < mount_manager::getSize (); ++i)
+      for (std::size_t i = 0; i < mount_manager::size (); ++i)
         {
-          auto fs = mount_manager::getFileSystem (i);
+          auto fs = mount_manager::get_file_system (i);
           if (fs != nullptr)
             {
               fs->do_sync ();
@@ -142,8 +140,7 @@ namespace os
         }
 
       const char* adjusted_path = path;
-      auto* const fs = os::posix::mount_manager::identifyFileSystem (
-          &adjusted_path);
+      auto* const fs = mount_manager::identify_file_system (&adjusted_path);
 
       if (fs == nullptr)
         {
@@ -170,8 +167,7 @@ namespace os
         }
 
       const char* adjusted_path = path;
-      auto* const fs = os::posix::mount_manager::identifyFileSystem (
-          &adjusted_path);
+      auto* const fs = mount_manager::identify_file_system (&adjusted_path);
 
       if (fs == nullptr)
         {
@@ -198,8 +194,7 @@ namespace os
         }
 
       const char* adjusted_path = path;
-      auto* const fs = os::posix::mount_manager::identifyFileSystem (
-          &adjusted_path);
+      auto* const fs = mount_manager::identify_file_system (&adjusted_path);
 
       if (fs == nullptr)
         {
@@ -233,8 +228,8 @@ namespace os
 
       auto adjusted_existing = existing;
       auto adjusted_new = _new;
-      auto* const fs = os::posix::mount_manager::identifyFileSystem (
-          &adjusted_existing, &adjusted_new);
+      auto* const fs = mount_manager::identify_file_system (&adjusted_existing,
+                                                            &adjusted_new);
 
       if (fs == nullptr)
         {
@@ -261,8 +256,7 @@ namespace os
         }
 
       auto adjusted_path = path;
-      auto* const fs = os::posix::mount_manager::identifyFileSystem (
-          &adjusted_path);
+      auto* const fs = mount_manager::identify_file_system (&adjusted_path);
 
       if (fs == nullptr)
         {
@@ -289,8 +283,7 @@ namespace os
         }
 
       auto adjusted_path = path;
-      auto* const fs = os::posix::mount_manager::identifyFileSystem (
-          &adjusted_path);
+      auto* const fs = mount_manager::identify_file_system (&adjusted_path);
 
       if (fs == nullptr)
         {
@@ -303,16 +296,16 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    file_system::file_system (pool* filesPool, pool* dirsPool)
+    file_system::file_system (pool* files_pool, pool* dirs_pool)
     {
-      fFilesPool = filesPool;
-      fDirsPool = dirsPool;
-      fBlockDevice = nullptr;
+      files_pool_ = files_pool;
+      dirs_pool_ = dirs_pool;
+      block_device_ = nullptr;
     }
 
     file_system::~file_system ()
     {
-      fBlockDevice = nullptr;
+      block_device_ = nullptr;
     }
 
     // ------------------------------------------------------------------------
@@ -320,18 +313,18 @@ namespace os
     io*
     file_system::open (const char* path, int oflag, std::va_list args)
     {
-      if (fBlockDevice == nullptr)
+      if (block_device_ == nullptr)
         {
           errno = EBADF;
           return nullptr;
         }
 
       // Get a file object from the pool.
-      auto* const f = static_cast<file*> (fFilesPool->aquire ());
+      auto* const f = static_cast<file*> (files_pool_->aquire ());
 
       // Associate the file with this file system (used, for example,
       // to reach the pools at close).
-      f->setFileSystem (this);
+      f->file_system (this);
 
       // Execute the file specific implementation code.
       f->do_vopen (path, oflag, args);
@@ -342,18 +335,18 @@ namespace os
     directory*
     file_system::opendir (const char* dirpath)
     {
-      if (fBlockDevice == nullptr)
+      if (block_device_ == nullptr)
         {
           errno = EBADF;
           return nullptr;
         }
 
       // Get a directory object from the pool.
-      auto* const dir = static_cast<directory*> (fDirsPool->aquire ());
+      auto* const dir = static_cast<directory*> (dirs_pool_->aquire ());
 
       // Associate the dir with this file system (used, for example,
       // to reach the pools at close).
-      dir->setFileSystem (this);
+      dir->file_system (this);
 
       // Execute the dir specific implementation code.
       dir->do_vopen (dirpath);
@@ -367,7 +360,7 @@ namespace os
     int
     file_system::chmod (const char* path, mode_t mode)
     {
-      assert (fBlockDevice != nullptr);
+      assert (block_device_ != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -377,7 +370,7 @@ namespace os
     int
     file_system::stat (const char* path, struct stat* buf)
     {
-      assert (fBlockDevice != nullptr);
+      assert (block_device_ != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -387,7 +380,7 @@ namespace os
     int
     file_system::truncate (const char* path, off_t length)
     {
-      assert (fBlockDevice != nullptr);
+      assert (block_device_ != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -397,7 +390,7 @@ namespace os
     int
     file_system::rename (const char* existing, const char* _new)
     {
-      assert (fBlockDevice != nullptr);
+      assert (block_device_ != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -407,7 +400,7 @@ namespace os
     int
     file_system::unlink (const char* path)
     {
-      assert (fBlockDevice != nullptr);
+      assert (block_device_ != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -417,7 +410,7 @@ namespace os
     int
     file_system::utime (const char* path, const struct utimbuf* times)
     {
-      assert (fBlockDevice != nullptr);
+      assert (block_device_ != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -428,7 +421,7 @@ namespace os
 
     const
     char*
-    file_system::adjustPath (const char* path)
+    file_system::adjust_path (const char* path)
     {
       return path;
     }

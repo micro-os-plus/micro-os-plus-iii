@@ -83,13 +83,13 @@ namespace os
       // Support functions.
 
       struct dirent*
-      getDirEntry (void);
+      dir_entry (void);
 
       const char*
-      getName (void) const;
+      name (void) const;
 
-      file_system*
-      getFileSystem (void) const;
+      class file_system*
+      file_system (void) const;
 
     protected:
 
@@ -115,40 +115,49 @@ namespace os
       // Support functions.
 
       void
-      setFileSystem (file_system* fileSystem);
+      file_system (class file_system* fileSystem);
 
     private:
 
-      file_system* fFileSystem;
-      struct dirent fDirEntry;
+      class file_system* file_system_;
+      struct dirent dir_entry_;
     };
 
 #pragma GCC diagnostic pop
 
+  } /* namespace posix */
+} /* namespace os */
+
+// ===== Inline & template implementations ====================================
+
+namespace os
+{
+  namespace posix
+  {
     // ------------------------------------------------------------------------
 
     inline void
-    directory::setFileSystem (file_system* fileSystem)
+    directory::file_system (class file_system* fileSystem)
     {
-      fFileSystem = fileSystem;
+      file_system_ = fileSystem;
     }
 
     inline file_system*
-    directory::getFileSystem (void) const
+    directory::file_system (void) const
     {
-      return fFileSystem;
+      return file_system_;
     }
 
     inline struct dirent*
-    directory::getDirEntry (void)
+    directory::dir_entry (void)
     {
-      return &fDirEntry;
+      return &dir_entry_;
     }
 
     inline const char*
-    directory::getName (void) const
+    directory::name (void) const
     {
-      return &fDirEntry.d_name[0];
+      return &dir_entry_.d_name[0];
     }
 
   } /* namespace posix */

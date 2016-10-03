@@ -45,9 +45,9 @@ namespace os
   namespace posix
   {
 
-    typedef int fileDescriptor_t;
+    using file_descriptor_t = int;
 
-    constexpr fileDescriptor_t noFileDescriptor = -1;
+    constexpr file_descriptor_t no_file_descriptor = -1;
 
   } /* namespace posix */
 } /* namespace os */

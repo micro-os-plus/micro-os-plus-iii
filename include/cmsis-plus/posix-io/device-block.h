@@ -41,6 +41,7 @@ namespace os
     public:
       device_block () = default;
 
+      // TODO: add content
     };
   } /* namespace posix */
 } /* namespace os */

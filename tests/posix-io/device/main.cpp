@@ -162,20 +162,20 @@ TestDevice test
 int
 main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
-  std::size_t sz = os::posix::device_charsRegistry::getSize ();
+  std::size_t sz = os::posix::device_charsRegistry::size ();
   assert (sz == DEVICES_ARRAY_SIZE);
 
   // Check if initial status is empty.
   for (std::size_t i = 0; i < sz; ++i)
     {
-      assert (os::posix::device_charsRegistry::getDevice (i) == nullptr);
+      assert (os::posix::device_charsRegistry::device (i) == nullptr);
     }
 
   // Register device
   os::posix::device_charsRegistry::add (&test);
 
   // Check if first device is registered.
-  assert (os::posix::device_charsRegistry::getDevice (0) == &test);
+  assert (os::posix::device_charsRegistry::device (0) == &test);
 
     {
       // Test C++ API
@@ -185,10 +185,10 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert ((io != nullptr) && (errno == 0));
 
       int fd;
-      fd = io->getFileDescriptor ();
+      fd = io->file_descriptor ();
 
       // Get it back; is it the same?
-      assert (os::posix::file_descriptors_manager::getIo (fd) == &test);
+      assert (os::posix::file_descriptors_manager::io (fd) == &test);
 
       // Check passing variadic mode.
       assert (test.getMode () == 123);
@@ -206,8 +206,8 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert ((ret == 0) && (errno == 0));
 
       // Check if descriptor freed.
-      assert (os::posix::file_descriptors_manager::getIo (fd) == nullptr);
-      assert (test.getFileDescriptor () == os::posix::noFileDescriptor);
+      assert (os::posix::file_descriptors_manager::io (fd) == nullptr);
+      assert (test.file_descriptor () == os::posix::no_file_descriptor);
     }
 
     {
@@ -217,10 +217,10 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert ((fd >= 3) && (errno == 0));
 
       // Get it back; is it the same?
-      assert (os::posix::file_descriptors_manager::getIo (fd) == &test);
-      assert (test.getFileDescriptor () == fd);
+      assert (os::posix::file_descriptors_manager::io (fd) == &test);
+      assert (test.file_descriptor () == fd);
 
-      assert (test.getType () == os::posix::io::Type::DEVICE);
+      assert (test.get_type () == os::posix::io::type::device);
 
       // Check passing variadic mode.
       assert (test.getMode () == 234);
@@ -238,8 +238,8 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert ((ret == 0) && (errno == 0));
 
       // Check if descriptor freed.
-      assert (os::posix::file_descriptors_manager::getIo (fd) == nullptr);
-      assert (test.getFileDescriptor () == os::posix::noFileDescriptor);
+      assert (os::posix::file_descriptors_manager::io (fd) == nullptr);
+      assert (test.file_descriptor () == os::posix::no_file_descriptor);
     }
 
   trace_puts ("'test-device-debug' succeeded.");

@@ -74,13 +74,13 @@ namespace os
       // ----------------------------------------------------------------------
 
       virtual bool
-      matchName (const char* name) const;
+      match_name (const char* name) const;
 
       const char*
-      getName (void) const;
+      name (void) const;
 
       static const char*
-      getDevicePrefix (void);
+      device_prefix (void);
 
       // ----------------------------------------------------------------------
 
@@ -99,22 +99,30 @@ namespace os
 
     protected:
 
-      const char* fName;
+      const char* name_;
 
     };
+  } /* namespace posix */
+} /* namespace os */
 
+// ===== Inline & template implementations ====================================
+
+namespace os
+{
+  namespace posix
+  {
     // ------------------------------------------------------------------------
 
     inline const char*
-    device_char::getDevicePrefix (void)
+    device_char::device_prefix (void)
     {
       return OS_STRING_POSIX_DEVICE_PREFIX;
     }
 
     inline const char*
-    device_char::getName (void) const
+    device_char::name (void) const
     {
-      return fName;
+      return name_;
     }
 
   } /* namespace posix */

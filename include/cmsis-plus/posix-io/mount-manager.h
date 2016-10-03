@@ -59,13 +59,13 @@ namespace os
       // ----------------------------------------------------------------------
 
       static file_system*
-      identifyFileSystem (const char** path1, const char** path2 = nullptr);
+      identify_file_system (const char** path1, const char** path2 = nullptr);
 
       static int
-      setRoot (file_system* fs, device_block* blockDevice, unsigned int flags);
+      root (file_system* fs, device_block* blockDevice, unsigned int flags);
 
       static file_system*
-      getRoot (void);
+      root (void);
 
       static int
       mount (file_system* fs, const char* path, device_block* blockDevice,
@@ -75,48 +75,59 @@ namespace os
       umount (const char* path, int unsigned flags);
 
       static std::size_t
-      getSize (void);
+      size (void);
 
-      static file_system*
-      getFileSystem (std::size_t index);
+      static class file_system*
+      get_file_system (std::size_t index);
 
       static const char*
-      getPath (std::size_t index);
+      path (std::size_t index);
 
     private:
 
-      static std::size_t sfSize;
+      static std::size_t size__;
 
-      static file_system* sfRoot;
-      static file_system** sfFileSystemsArray;
-      static const char** sfPathsArray;
+      static class file_system* root__;
+      static class file_system** file_systems_array__;
+      static const char** paths_array__;
 
     };
 
+  } /* namespace posix */
+} /* namespace os */
+
+// ===== Inline & template implementations ====================================
+
+namespace os
+{
+  namespace posix
+  {
+    // ------------------------------------------------------------------------
+
     inline std::size_t
-    mount_manager::getSize (void)
+    mount_manager::size (void)
     {
-      return sfSize;
+      return size__;
     }
 
     inline file_system*
-    mount_manager::getFileSystem (std::size_t index)
+    mount_manager::get_file_system (std::size_t index)
     {
-      assert (index < sfSize);
-      return sfFileSystemsArray[index];
+      assert (index < size__);
+      return file_systems_array__[index];
     }
 
     inline const char*
-    mount_manager::getPath (std::size_t index)
+    mount_manager::path (std::size_t index)
     {
-      assert (index < sfSize);
-      return sfPathsArray[index];
+      assert (index < size__);
+      return paths_array__[index];
     }
 
     inline file_system*
-    mount_manager::getRoot (void)
+    mount_manager::root (void)
     {
-      return sfRoot;
+      return root__;
     }
 
   } /* namespace posix */

@@ -78,20 +78,22 @@ namespace os
     public:
 
       using type_t = unsigned int;
-      enum Type
+      enum type
         : type_t
-          { UNKNOWN = 0,
-        NOTSET = 1 << 0,
-        DEVICE = 1 << 1,
-        FILE = 1 << 2,
-        SOCKET = 1 << 3
+          { unknown = 0,
+        not_set = 1 << 0,
+        device = 1 << 1,
+        file = 1 << 2,
+        socket = 1 << 3
       };
 
       // ----------------------------------------------------------------------
 
-      io ();
+    protected:
+      io (type t);
       io (const io&) = delete;
 
+    public:
       virtual
       ~io ();
 
@@ -124,11 +126,11 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
-      Type
-      getType (void) const;
+      type
+      get_type (void) const;
 
-      fileDescriptor_t
-      getFileDescriptor (void) const;
+      file_descriptor_t
+      file_descriptor (void) const;
 
 #if 0
       bool
@@ -182,67 +184,74 @@ namespace os
       do_is_connected (void);
 
       void
-      setFileDescriptor (fileDescriptor_t fildes);
+      file_descriptor (file_descriptor_t fildes);
 
       void
-      clearFileDescriptor (void);
+      clear_file_descriptor (void);
 
       io*
-      allocFileDescriptor (void);
+      alloc_file_descriptor (void);
 
       // ----------------------------------------------------------------------
 
-    protected:
-
-      Type fType;
-
     private:
 
-      fileDescriptor_t fFileDescriptor;
+      type type_ = type::not_set;
+
+      file_descriptor_t file_descriptor_ = no_file_descriptor;
     };
 
+  } /* namespace posix */
+} /* namespace os */
+
+// ===== Inline & template implementations ====================================
+
+namespace os
+{
+  namespace posix
+  {
     // ------------------------------------------------------------------------
 
-    inline io::Type
-    io::getType (void) const
+    inline io::type
+    io::get_type (void) const
     {
-      return fType;
+      return type_;
     }
 
     inline void
-    io::setFileDescriptor (fileDescriptor_t fildes)
+    io::file_descriptor (file_descriptor_t fildes)
     {
-      fFileDescriptor = fildes;
+      file_descriptor_ = fildes;
     }
 
     inline void
-    io::clearFileDescriptor (void)
+    io::clear_file_descriptor (void)
     {
-      fFileDescriptor = noFileDescriptor;
+      file_descriptor_ = no_file_descriptor;
     }
 
-    inline fileDescriptor_t
-    io::getFileDescriptor (void) const
+    inline file_descriptor_t
+    io::file_descriptor (void) const
     {
-      return fFileDescriptor;
+      return file_descriptor_;
     }
 
 #if 0
-  inline bool
-  io::is_opened (void)
-    {
-      return do_is_opened ();
-    }
+    inline bool
+    io::is_opened (void)
+      {
+        return do_is_opened ();
+      }
 
-  inline bool
-  io::is_connected (void)
-    {
-      return do_is_connected ();
-    }
+    inline bool
+    io::is_connected (void)
+      {
+        return do_is_connected ();
+      }
 #endif
-
-}
-/* namespace posix */
+    ;
+  // Avoid formatter bug
+  } /* namespace posix */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------

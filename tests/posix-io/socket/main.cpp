@@ -98,7 +98,7 @@ public:
   getMode (void);
 
   const char*
-  getPath (void);
+  path (void);
 
   unsigned int
   getNumber1 (void);
@@ -259,7 +259,7 @@ TestSocket::getMode (void)
 }
 
 inline const char*
-TestSocket::getPath (void)
+TestSocket::path (void)
 {
   return fPath;
 }
@@ -524,7 +524,7 @@ public:
 
 // ----------------------------------------------------------------------------
 
-using TestSocketPool = os::posix::TPool<TestSocket>;
+using TestSocketPool = os::posix::pool_typed<TestSocket>;
 
 constexpr std::size_t SOCKETS_POOL_ARRAY_SIZE = 2;
 
@@ -554,14 +554,14 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       int fd;
       assert(((fd = __posix_socket (123, 234, 345)) == 3) && (errno == 0));
 
-      os::posix::io* io = os::posix::file_descriptors_manager::getIo (fd);
+      os::posix::io* io = os::posix::file_descriptors_manager::io (fd);
       assert(io != nullptr);
 
-      assert(io->getType () == os::posix::io::Type::SOCKET);
+      assert(io->get_type () == os::posix::io::type::socket);
 
       TestSocket* tsock = static_cast<TestSocket*> (io);
-      assert(socketsPool.getObject (0) == tsock);
-      assert(socketsPool.getFlag (0) == true);
+      assert(socketsPool.object (0) == tsock);
+      assert(socketsPool.in_use (0) == true);
 
       // Check SOCKET params.
       assert(tsock->getCmd () == Cmds::SOCKET);
@@ -574,14 +574,14 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       socklen_t len1;
       assert(((fd2 = __posix_accept(fd, &addr1, &len1)) == 4) && (errno == 0));
 
-      os::posix::io* io2 = os::posix::file_descriptors_manager::getIo (fd2);
+      os::posix::io* io2 = os::posix::file_descriptors_manager::io (fd2);
       assert(io2 != nullptr);
 
-      assert(io2->getType () == os::posix::io::Type::SOCKET);
+      assert(io2->get_type () == os::posix::io::type::socket);
 
       TestSocket* tsock2 = static_cast<TestSocket*> (io2);
-      assert(socketsPool.getObject (1) == tsock2);
-      assert(socketsPool.getFlag (1) == true);
+      assert(socketsPool.object (1) == tsock2);
+      assert(socketsPool.in_use (1) == true);
 
       assert(tsock->getPtr1 () == &addr1);
       assert(tsock->getPtr2 () == &len1);
@@ -594,7 +594,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert(tsock2->getCmd () == Cmds::CLOSE);
 
       // Must no longer be in the pool
-      assert(socketsPool.getFlag (1) == false);
+      assert(socketsPool.in_use (1) == false);
 
       // Test BIND
       errno = -2;
@@ -751,7 +751,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert(tsock->getCmd () == Cmds::CLOSE);
 
       // Must no longer be in the pool
-      assert(socketsPool.getFlag (0) == false);
+      assert(socketsPool.in_use (0) == false);
     }
 
     {
@@ -762,13 +762,13 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       os::posix::socket* sock;
       assert(
           ((sock = os::posix::socket(123, 234, 345)) != nullptr) && errno == 0);
-      assert(sock->getType () == os::posix::io::Type::SOCKET);
+      assert(sock->get_type () == os::posix::io::type::socket);
 
-      assert(sock->getFileDescriptor () > 0);
+      assert(sock->file_descriptor () > 0);
 
       TestSocket* tsock = static_cast<TestSocket*> (sock);
-      assert(socketsPool.getObject (0) == tsock);
-      assert(socketsPool.getFlag (0) == true);
+      assert(socketsPool.object (0) == tsock);
+      assert(socketsPool.in_use (0) == true);
 
       // Check SOCKET params.
       assert(tsock->getCmd () == Cmds::SOCKET);
@@ -782,13 +782,13 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert(
           ((sock2 = sock->accept(&addr1, &len1)) != nullptr) && (errno == 0));
 
-      assert(sock2->getType () == os::posix::io::Type::SOCKET);
+      assert(sock2->get_type () == os::posix::io::type::socket);
 
-      assert(sock2->getFileDescriptor () > 0);
+      assert(sock2->file_descriptor () > 0);
 
       TestSocket* tsock2 = static_cast<TestSocket*> (sock2);
-      assert(socketsPool.getObject (1) == tsock2);
-      assert(socketsPool.getFlag (1) == true);
+      assert(socketsPool.object (1) == tsock2);
+      assert(socketsPool.in_use (1) == true);
 
       assert(tsock->getPtr1 () == &addr1);
       assert(tsock->getPtr2 () == &len1);
@@ -801,7 +801,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert(tsock2->getCmd () == Cmds::CLOSE);
 
       // Must no longer be in the pool
-      assert(socketsPool.getFlag (1) == false);
+      assert(socketsPool.in_use (1) == false);
 
       // Test CLOSE.
       errno = -2;
@@ -810,7 +810,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert(tsock->getCmd () == Cmds::CLOSE);
 
       // Must no longer be in the pool
-      assert(socketsPool.getFlag (0) == false);
+      assert(socketsPool.in_use (0) == false);
     }
 
   trace_puts ("'test-socket-debug' succeeded.");

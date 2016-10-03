@@ -58,7 +58,7 @@ namespace os
       errno = 0;
 
       auto adjusted_dirname = dirname;
-      auto* const fs = os::posix::mount_manager::identifyFileSystem (
+      auto* const fs = os::posix::mount_manager::identify_file_system (
           &adjusted_dirname);
 
       // The manager will return null if there are no file systems
@@ -78,12 +78,12 @@ namespace os
 
     directory::directory (void)
     {
-      fFileSystem = nullptr;
+      file_system_ = nullptr;
     }
 
     directory::~directory ()
     {
-      fFileSystem = nullptr;
+      file_system_ = nullptr;
     }
 
     // ------------------------------------------------------------------------
@@ -91,7 +91,7 @@ namespace os
     struct dirent*
     directory::read (void)
     {
-      assert (fFileSystem != nullptr);
+      assert (file_system_ != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -101,7 +101,7 @@ namespace os
     void
     directory::rewind (void)
     {
-      assert (fFileSystem != nullptr);
+      assert (file_system_ != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -111,12 +111,12 @@ namespace os
     int
     directory::close (void)
     {
-      assert (fFileSystem != nullptr);
+      assert (file_system_ != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
       int ret = do_close ();
-      auto* const pool = fFileSystem->getDirsPool ();
+      auto* const pool = file_system_->dirs_pool ();
       if (pool != nullptr)
         {
           pool->release (this);

@@ -41,6 +41,7 @@ namespace os
     public:
       net_interface () = default;
 
+      // TODO: add content
     };
   } /* namespace posix */
 } /* namespace os */

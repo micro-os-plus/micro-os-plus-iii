@@ -38,11 +38,11 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    std::size_t mount_manager::sfSize;
+    std::size_t mount_manager::size__;
 
-    file_system* mount_manager::sfRoot;
-    file_system** mount_manager::sfFileSystemsArray;
-    const char** mount_manager::sfPathsArray;
+    file_system* mount_manager::root__;
+    file_system** mount_manager::file_systems_array__;
+    const char** mount_manager::paths_array__;
 
     // ------------------------------------------------------------------------
 
@@ -50,22 +50,22 @@ namespace os
     {
       assert (size > 0);
 
-      sfSize = size;
-      sfFileSystemsArray = new file_system*[size];
-      sfPathsArray = new const char*[size];
+      size__ = size;
+      file_systems_array__ = new file_system*[size];
+      paths_array__ = new const char*[size];
 
       for (std::size_t i = 0; i < size; ++i)
         {
-          sfFileSystemsArray[i] = nullptr;
-          sfPathsArray[i] = nullptr;
+          file_systems_array__[i] = nullptr;
+          paths_array__[i] = nullptr;
         }
     }
 
     mount_manager::~mount_manager ()
     {
-      delete[] sfFileSystemsArray;
-      delete[] sfPathsArray;
-      sfSize = 0;
+      delete[] file_systems_array__;
+      delete[] paths_array__;
+      size__ = 0;
     }
 
     // ------------------------------------------------------------------------
@@ -74,22 +74,22 @@ namespace os
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
     file_system*
-    mount_manager::identifyFileSystem (const char** path1, const char** path2)
+    mount_manager::identify_file_system (const char** path1, const char** path2)
     {
       assert (path1 != nullptr);
       assert (*path1 != nullptr);
 
-      for (std::size_t i = 0; i < sfSize; ++i)
+      for (std::size_t i = 0; i < size__; ++i)
         {
-          if (sfPathsArray[i] == nullptr)
+          if (paths_array__[i] == nullptr)
             {
               continue;
             }
 
-          auto len = std::strlen (sfPathsArray[i]);
+          auto len = std::strlen (paths_array__[i]);
 
           // Check if path1 starts with the mounted path.
-          if (std::strncmp (sfPathsArray[i], *path1, len) == 0)
+          if (std::strncmp (paths_array__[i], *path1, len) == 0)
             {
               // If so, adjust paths to skip over prefix, but keep '/'.
               *path1 = (*path1 + len - 1);
@@ -98,14 +98,14 @@ namespace os
                   *path2 = (*path2 + len - 1);
                 }
 
-              return sfFileSystemsArray[i];
+              return file_systems_array__[i];
             }
         }
 
       // If root file system defined, return it.
-      if (sfRoot != nullptr)
+      if (root__ != nullptr)
         {
-          return sfRoot;
+          return root__;
         }
 
       // Not found.
@@ -115,15 +115,15 @@ namespace os
 #pragma GCC diagnostic pop
 
     int
-    mount_manager::setRoot (file_system* fs, device_block* blockDevice,
-                            unsigned int flags)
+    mount_manager::root (file_system* fs, device_block* blockDevice,
+                         unsigned int flags)
     {
       assert (fs != nullptr);
       errno = 0;
 
-      sfRoot = fs;
+      root__ = fs;
 
-      fs->setBlockDevice (blockDevice);
+      fs->device (blockDevice);
       return fs->do_mount (flags);
     }
 
@@ -138,11 +138,11 @@ namespace os
 
       errno = 0;
 
-      for (std::size_t i = 0; i < sfSize; ++i)
+      for (std::size_t i = 0; i < size__; ++i)
         {
-          if (sfPathsArray[i] != nullptr)
+          if (paths_array__[i] != nullptr)
             {
-              if (std::strcmp (sfPathsArray[i], path) == 0)
+              if (std::strcmp (paths_array__[i], path) == 0)
                 {
                   // Folder already mounted.
                   errno = EBUSY;
@@ -151,15 +151,15 @@ namespace os
             }
         }
 
-      for (std::size_t i = 0; i < sfSize; ++i)
+      for (std::size_t i = 0; i < size__; ++i)
         {
-          if (sfFileSystemsArray[i] == nullptr)
+          if (file_systems_array__[i] == nullptr)
             {
-              fs->setBlockDevice (blockDevice);
+              fs->device (blockDevice);
               fs->do_mount (flags);
 
-              sfFileSystemsArray[i] = fs;
-              sfPathsArray[i] = path;
+              file_systems_array__[i] = fs;
+              paths_array__[i] = path;
 
               return 0;
             }
@@ -177,16 +177,17 @@ namespace os
       assert (path != nullptr);
       errno = 0;
 
-      for (std::size_t i = 0; i < sfSize; ++i)
+      for (std::size_t i = 0; i < size__; ++i)
         {
-          if (sfPathsArray[i] != nullptr && strcmp (path, sfPathsArray[i]) == 0)
+          if (paths_array__[i] != nullptr
+              && strcmp (path, paths_array__[i]) == 0)
             {
-              sfFileSystemsArray[i]->do_sync ();
-              sfFileSystemsArray[i]->do_unmount (flags);
-              sfFileSystemsArray[i]->setBlockDevice (nullptr);
+              file_systems_array__[i]->do_sync ();
+              file_systems_array__[i]->do_unmount (flags);
+              file_systems_array__[i]->device (nullptr);
 
-              sfFileSystemsArray[i] = nullptr;
-              sfPathsArray[i] = nullptr;
+              file_systems_array__[i] = nullptr;
+              paths_array__[i] = nullptr;
 
               return 0;
             }

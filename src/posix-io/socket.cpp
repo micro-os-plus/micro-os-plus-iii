@@ -48,7 +48,7 @@ namespace os
       errno = 0;
 
       class socket* sock =
-          reinterpret_cast<class socket*> (net_stack::getSocketsPool ()->aquire ());
+          reinterpret_cast<class socket*> (net_stack::sockets_pool ()->aquire ());
       if (sock == nullptr)
         {
           errno = ENFILE;
@@ -60,7 +60,7 @@ namespace os
           sock->close ();
           return nullptr;
         }
-      sock->allocFileDescriptor ();
+      sock->alloc_file_descriptor ();
       return sock;
     }
 
@@ -76,9 +76,10 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    socket::socket ()
+    socket::socket () :
+        io (type::socket)
     {
-      fType = Type::SOCKET;
+      ;
     }
 
     socket::~socket ()
@@ -92,7 +93,7 @@ namespace os
     socket::do_release (void)
     {
       // Files is free, return it to the pool.
-      auto pool = net_stack::getSocketsPool ();
+      auto pool = net_stack::sockets_pool ();
       if (pool != nullptr)
         {
           pool->release (this);
@@ -106,7 +107,7 @@ namespace os
     {
       errno = 0;
 
-      auto pool = net_stack::getSocketsPool ();
+      auto pool = net_stack::sockets_pool ();
       if (pool == nullptr)
         {
           errno = EMFILE; // pool is considered the per-process table.
@@ -126,7 +127,7 @@ namespace os
         {
           return nullptr;
         }
-      return static_cast<socket*> (new_socket->allocFileDescriptor ());
+      return static_cast<socket*> (new_socket->alloc_file_descriptor ());
     }
 
     int

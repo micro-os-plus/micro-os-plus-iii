@@ -62,44 +62,124 @@ namespace os
       // ----------------------------------------------------------------------
 
       std::size_t
-      getSize (void) const;
+      size (void) const;
 
       void*
-      getObject (std::size_t index) const;
+      object (std::size_t index) const;
 
       bool
-      getFlag (std::size_t index) const;
+      in_use (std::size_t index) const;
 
       // ----------------------------------------------------------------------
 
     protected:
 
-      // Referred directly in TPool.
+      // Referred directly in pool_typed.
 
-      void** fArray;
-      bool* fInUse;
-      std::size_t fSize;
+      void** array_;
+      bool* in_use_;
+      std::size_t size_;
     };
 
+    // ========================================================================
+
+    template<typename T>
+      class pool_typed : public pool
+      {
+      public:
+
+        /**
+         * @brief Standard type definition.
+         */
+        using value_type = T;
+
+        pool_typed (std::size_t size);
+
+        pool_typed (const pool_typed&) = delete;
+
+        virtual
+        ~pool_typed ();
+
+        // ----------------------------------------------------------------------
+
+        value_type*
+        aquire (void);
+
+        bool
+        release (value_type* obj);
+      };
+  } /* namespace posix */
+} /* namespace os */
+
+// ===== Inline & template implementations ====================================
+
+namespace os
+{
+  namespace posix
+  {
     // ------------------------------------------------------------------------
 
     inline std::size_t
-    pool::getSize (void) const
+    pool::size (void) const
     {
-      return fSize;
+      return size_;
     }
 
     inline void*
-    pool::getObject (std::size_t index) const
+    pool::object (std::size_t index) const
     {
-      return fArray[index];
+      return array_[index];
     }
 
     inline bool
-    pool::getFlag (std::size_t index) const
+    pool::in_use (std::size_t index) const
     {
-      return fInUse[index];
+      return in_use_[index];
     }
+
+    // ========================================================================
+
+    template<typename T>
+      pool_typed<T>::pool_typed (std::size_t size) :
+          pool (size)
+      {
+        array_ = reinterpret_cast<void**> (new value_type*[size]);
+        for (std::size_t i = 0; i < size; ++i)
+          {
+            array_[i] = new value_type;
+          }
+      }
+
+    template<typename T>
+      pool_typed<T>::~pool_typed ()
+      {
+        for (std::size_t i = 0; i < size_; ++i)
+          {
+            delete static_cast<value_type*> (array_[i]);
+          }
+        delete[] array_;
+        size_ = 0;
+      }
+
+    // ----------------------------------------------------------------------
+
+    template<typename T>
+      inline typename pool_typed<T>::value_type*
+      __attribute__((always_inline))
+      pool_typed<T>::aquire (void)
+      {
+        return static_cast<value_type*> (pool::aquire ());
+      }
+
+    template<typename T>
+      inline bool
+      __attribute__((always_inline))
+      pool_typed<T>::release (value_type* obj)
+      {
+        return pool::release (obj);
+      }
+
+  // ========================================================================
 
   } /* namespace posix */
 } /* namespace os */

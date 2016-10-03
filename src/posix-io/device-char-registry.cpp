@@ -41,9 +41,9 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    std::size_t device_char_registry::sfSize;
+    std::size_t device_char_registry::size__;
 
-    device_char** device_char_registry::sfRegistryArray;
+    device_char** device_char_registry::registry_array__;
 
     // ------------------------------------------------------------------------
 
@@ -51,19 +51,19 @@ namespace os
     {
       assert (size > 0);
 
-      sfSize = size;
-      sfRegistryArray = new device_char*[size];
+      size__ = size;
+      registry_array__ = new device_char*[size];
 
       for (std::size_t i = 0; i < size; ++i)
         {
-          sfRegistryArray[i] = nullptr;
+          registry_array__[i] = nullptr;
         }
     }
 
     device_char_registry::~device_char_registry ()
     {
-      delete[] sfRegistryArray;
-      sfSize = 0;
+      delete[] registry_array__;
+      size__ = 0;
     }
 
     // ------------------------------------------------------------------------
@@ -72,16 +72,15 @@ namespace os
     device_char_registry::add (device_char* device)
     {
 #if defined(DEBUG)
-      for (std::size_t i = 0; i < sfSize; ++i)
+      for (std::size_t i = 0; i < size__; ++i)
         {
-          if (sfRegistryArray[i] == nullptr)
+          if (registry_array__[i] == nullptr)
             {
               continue;
             }
 
           // Validate the device name by checking duplicates.
-          if (std::strcmp (device->getName (), sfRegistryArray[i]->getName ())
-              == 0)
+          if (std::strcmp (device->name (), registry_array__[i]->name ()) == 0)
             {
               trace_puts ("Duplicate Device name. Abort.");
               std::abort ();
@@ -90,11 +89,11 @@ namespace os
         }
 #endif // DEBUG
 
-      for (std::size_t i = 0; i < sfSize; ++i)
+      for (std::size_t i = 0; i < size__; ++i)
         {
-          if (sfRegistryArray[i] == nullptr)
+          if (registry_array__[i] == nullptr)
             {
-              sfRegistryArray[i] = device;
+              registry_array__[i] = device;
               return;
             }
         }
@@ -106,11 +105,11 @@ namespace os
     void
     device_char_registry::remove (device_char* device)
     {
-      for (std::size_t i = 0; i < sfSize; ++i)
+      for (std::size_t i = 0; i < size__; ++i)
         {
-          if (sfRegistryArray[i] == device)
+          if (registry_array__[i] == device)
             {
-              sfRegistryArray[i] = nullptr;
+              registry_array__[i] = nullptr;
               return;
             }
         }
@@ -122,11 +121,11 @@ namespace os
      * return pointer to device or nullptr if not found.
      */
     device_char*
-    device_char_registry::identifyDevice (const char* path)
+    device_char_registry::identify_device (const char* path)
     {
       assert (path != nullptr);
 
-      auto prefix = device_char::getDevicePrefix ();
+      auto prefix = device_char::device_prefix ();
       if (std::strncmp (prefix, path, std::strlen (prefix)) != 0)
         {
           // The device prefix does not match, not a device.
@@ -135,13 +134,13 @@ namespace os
 
       // The prefix was identified; try to match the rest of the path.
       auto name = path + std::strlen (prefix);
-      for (std::size_t i = 0; i < sfSize; ++i)
+      for (std::size_t i = 0; i < size__; ++i)
         {
-          if (sfRegistryArray[i] != nullptr
-              && sfRegistryArray[i]->matchName (name))
+          if (registry_array__[i] != nullptr
+              && registry_array__[i]->match_name (name))
             {
               // Return the first device that matches the path.
-              return sfRegistryArray[i];
+              return registry_array__[i];
             }
         }
 

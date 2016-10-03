@@ -77,18 +77,18 @@ TestIO test3;
 int
 main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
-  size_t sz = os::posix::file_descriptors_manager::getSize ();
+  size_t sz = os::posix::file_descriptors_manager::size ();
   // Size must be 5 for this test
   assert (sz == FD_MANAGER_ARRAY_SIZE);
 
   for (std::size_t i = 0; i < sz; ++i)
     {
-      assert (os::posix::file_descriptors_manager::getIo (i) == nullptr);
+      assert (os::posix::file_descriptors_manager::io (i) == nullptr);
     }
 
   // Check limits.
-  assert (os::posix::file_descriptors_manager::isValid (-1) == false);
-  assert (os::posix::file_descriptors_manager::isValid (sz) == false);
+  assert (os::posix::file_descriptors_manager::valid (-1) == false);
+  assert (os::posix::file_descriptors_manager::valid (sz) == false);
 
   // Allocation should start with 3 (stdin, stdout, stderr preserved).
   int fd1;
@@ -96,8 +96,8 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   assert (fd1 == 3);
 
   // Get it back; is it the same?
-  assert (os::posix::file_descriptors_manager::getIo (fd1) == &test1);
-  assert (test1.getFileDescriptor () == fd1);
+  assert (os::posix::file_descriptors_manager::io (fd1) == &test1);
+  assert (test1.file_descriptor () == fd1);
 
   // Reallocate opened file, must be busy.
   int fd2;
@@ -106,8 +106,8 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
   // Free descriptor.
   assert (os::posix::file_descriptors_manager::free (fd1) == 0);
-  assert (os::posix::file_descriptors_manager::getIo (fd1) == nullptr);
-  assert (test1.getFileDescriptor () == os::posix::noFileDescriptor);
+  assert (os::posix::file_descriptors_manager::io (fd1) == nullptr);
+  assert (test1.file_descriptor () == os::posix::no_file_descriptor);
 
   // With clean table, alloc repeatedly to fill the table (size is 5).
   fd1 = os::posix::file_descriptors_manager::alloc (&test1);
@@ -131,7 +131,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
   // Reallocate last.
   fd3 = os::posix::file_descriptors_manager::alloc (&test3);
-  assert (fd3 == ((os::posix::fileDescriptor_t) (sz - 1)));
+  assert (fd3 == ((os::posix::file_descriptor_t) (sz - 1)));
 
   trace_puts ("'test-descriptors-manager-debug' done.");
 

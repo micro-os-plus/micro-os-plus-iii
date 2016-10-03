@@ -56,7 +56,7 @@ namespace os
     {
     public:
 
-      net_stack (pool* socketsPool);
+      net_stack (pool* sockets_pool);
       net_stack (const net_stack&) = delete;
 
       ~net_stack ();
@@ -64,21 +64,30 @@ namespace os
       // ----------------------------------------------------------------------
 
       static pool*
-      getSocketsPool (void);
+      sockets_pool (void);
 
       // ----------------------------------------------------------------------
     private:
 
-      static pool* sfSocketsPool;
+      static pool* sockets_pool__;
 
     };
 
+  } /* namespace posix */
+} /* namespace os */
+
+// ===== Inline & template implementations ====================================
+
+namespace os
+{
+  namespace posix
+  {
     // ------------------------------------------------------------------------
 
     inline pool*
-    net_stack::getSocketsPool (void)
+    net_stack::sockets_pool (void)
     {
-      return sfSocketsPool;
+      return sockets_pool__;
     }
 
   } /* namespace posix */

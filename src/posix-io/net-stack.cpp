@@ -35,13 +35,13 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    pool* net_stack::sfSocketsPool;
+    pool* net_stack::sockets_pool__;
 
     // ------------------------------------------------------------------------
 
-    net_stack::net_stack (pool* socketsPool)
+    net_stack::net_stack (pool* sockets_pool)
     {
-      sfSocketsPool = socketsPool;
+      sockets_pool__ = sockets_pool;
     }
 
     net_stack::~net_stack ()

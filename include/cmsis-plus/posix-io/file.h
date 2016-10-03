@@ -82,8 +82,8 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
-      file_system*
-      getFileSystem (void) const;
+      class file_system*
+      file_system (void) const;
 
     protected:
 
@@ -112,13 +112,22 @@ namespace os
       // Support functions.
 
       void
-      setFileSystem (file_system* fileSystem);
+      file_system (class file_system* file_system);
 
     private:
 
-      file_system* fFileSystem;
+      class file_system* file_system_;
     };
 
+  } /* namespace posix */
+} /* namespace os */
+
+// ===== Inline & template implementations ====================================
+
+namespace os
+{
+  namespace posix
+  {
     // ------------------------------------------------------------------------
 
     inline file*
@@ -128,15 +137,15 @@ namespace os
     }
 
     inline void
-    file::setFileSystem (file_system* fileSystem)
+    file::file_system (class file_system* file_system)
     {
-      fFileSystem = fileSystem;
+      file_system_ = file_system;
     }
 
     inline file_system*
-    file::getFileSystem (void) const
+    file::file_system (void) const
     {
-      return fFileSystem;
+      return file_system_;
     }
 
   } /* namespace posix */

@@ -125,7 +125,7 @@ namespace os
 
     public:
 
-      file_system (pool* filesPool, pool* dirsPool);
+      file_system (pool* filesPool, pool* dirs_pool);
       file_system (const file_system&) = delete;
 
       virtual
@@ -143,13 +143,13 @@ namespace os
       // Support functions.
 
       device_block*
-      getBlockDevice (void) const;
+      device (void) const;
 
       pool*
-      getFilesPool (void) const;
+      files_pool (void) const;
 
       pool*
-      getDirsPool (void) const;
+      dirs_pool (void) const;
 
     protected:
 
@@ -214,43 +214,54 @@ namespace os
       // Support functions.
 
       void
-      setBlockDevice (device_block* blockDevice);
+      device (device_block* block_device);
 
     public:
 
       const char*
-      adjustPath (const char* path);
+      adjust_path (const char* path);
 
     private:
 
-      pool* fFilesPool;
-      pool* fDirsPool;
+      pool* files_pool_;
+      pool* dirs_pool_;
 
-      device_block* fBlockDevice;
+      device_block* block_device_;
     };
 
+  } /* namespace posix */
+} /* namespace os */
+
+// ===== Inline & template implementations ====================================
+
+namespace os
+{
+  namespace posix
+  {
+    // ------------------------------------------------------------------------
+
     inline pool*
-    file_system::getFilesPool (void) const
+    file_system::files_pool (void) const
     {
-      return fFilesPool;
+      return files_pool_;
     }
 
     inline pool*
-    file_system::getDirsPool (void) const
+    file_system::dirs_pool (void) const
     {
-      return fDirsPool;
+      return dirs_pool_;
     }
 
     inline void
-    file_system::setBlockDevice (device_block* blockDevice)
+    file_system::device (device_block* block_device)
     {
-      fBlockDevice = blockDevice;
+      block_device_ = block_device;
     }
 
     inline device_block*
-    file_system::getBlockDevice (void) const
+    file_system::device (void) const
     {
-      return fBlockDevice;
+      return block_device_;
     }
 
   } /* namespace posix */

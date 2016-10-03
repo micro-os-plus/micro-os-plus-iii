@@ -75,7 +75,7 @@ TestFile::do_vopen (const char* path, int oflag, std::va_list args)
 
 // ----------------------------------------------------------------------------
 
-using TestFilePool = os::posix::TPool<TestFile>;
+using TestFilePool = os::posix::pool_typed<TestFile>;
 
 constexpr std::size_t POOL_ARRAY_SIZE = 2;
 
@@ -87,29 +87,29 @@ TestFilePool pool
 int
 main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
-  assert(pool.getSize () == POOL_ARRAY_SIZE);
-  for (std::size_t i = 0; i < pool.getSize (); ++i)
+  assert(pool.size () == POOL_ARRAY_SIZE);
+  for (std::size_t i = 0; i < pool.size (); ++i)
     {
-      assert(pool.getObject (i) != nullptr);
-      assert(pool.getFlag (i) == false);
+      assert(pool.object (i) != nullptr);
+      assert(pool.in_use (i) == false);
     }
 
   TestFile* fil = pool.aquire ();
-  assert(pool.getFlag (0) == true);
-  assert(fil == pool.getObject (0));
+  assert(pool.in_use (0) == true);
+  assert(fil == pool.object (0));
 
   // Release something not in array
   assert(pool.release (nullptr) == false);
   assert(pool.release (fil) == true);
 
   // Check if released
-  assert(pool.getFlag (0) == false);
+  assert(pool.in_use (0) == false);
 
   // Check full pool.
-  for (std::size_t i = 0; i < pool.getSize (); ++i)
+  for (std::size_t i = 0; i < pool.size (); ++i)
     {
       fil = pool.aquire ();
-      assert(fil == pool.getObject (i));
+      assert(fil == pool.object (i));
     }
 
   // One more should return error

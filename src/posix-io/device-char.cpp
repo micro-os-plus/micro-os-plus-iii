@@ -39,15 +39,15 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    device_char::device_char (const char* name)
+    device_char::device_char (const char* name) :
+        io (type::device)
     {
-      fType = Type::DEVICE;
-      fName = name;
+      name_ = name;
     }
 
     device_char::~device_char ()
     {
-      fName = nullptr;
+      name_ = nullptr;
     }
 
     // ------------------------------------------------------------------------
@@ -76,12 +76,12 @@ namespace os
     // ------------------------------------------------------------------------
 
     bool
-    device_char::matchName (const char* name) const
+    device_char::match_name (const char* name) const
     {
       assert (name != nullptr);
-      assert (fName != nullptr);
+      assert (name_ != nullptr);
 
-      return (std::strcmp (name, fName) == 0);
+      return (std::strcmp (name, name_) == 0);
     }
 
     int

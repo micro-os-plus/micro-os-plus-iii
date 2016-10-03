@@ -36,19 +36,19 @@ namespace os
 
     pool::pool (std::size_t size)
     {
-      fSize = size;
-      fInUse = new bool[size];
-      for (std::size_t i = 0; i < fSize; ++i)
+      size_ = size;
+      in_use_ = new bool[size];
+      for (std::size_t i = 0; i < size_; ++i)
         {
-          fInUse[i] = false;
+          in_use_[i] = false;
         }
       // The derived class must alloc and set this pointer.
-      fArray = nullptr;
+      array_ = nullptr;
     }
 
     pool::~pool ()
     {
-      delete[] fInUse;
+      delete[] in_use_;
     }
 
     // ------------------------------------------------------------------------
@@ -56,12 +56,12 @@ namespace os
     void*
     pool::aquire (void)
     {
-      for (std::size_t i = 0; i < fSize; ++i)
+      for (std::size_t i = 0; i < size_; ++i)
         {
-          if (!fInUse[i])
+          if (!in_use_[i])
             {
-              fInUse[i] = true;
-              return fArray[i];
+              in_use_[i] = true;
+              return array_[i];
             }
         }
 
@@ -71,11 +71,11 @@ namespace os
     bool
     pool::release (void* file)
     {
-      for (std::size_t i = 0; i < fSize; ++i)
+      for (std::size_t i = 0; i < size_; ++i)
         {
-          if (fInUse[i] && (fArray[i] == file))
+          if (in_use_[i] && (array_[i] == file))
             {
-              fInUse[i] = false;
+              in_use_[i] = false;
               return true;
             }
         }

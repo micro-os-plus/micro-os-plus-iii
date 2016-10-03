@@ -40,8 +40,8 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    std::size_t file_descriptors_manager::sfSize;
-    io** file_descriptors_manager::sfDescriptorsArray;
+    std::size_t file_descriptors_manager::size__;
+    io** file_descriptors_manager::descriptors_array__;
 
     // ------------------------------------------------------------------------
 
@@ -49,39 +49,39 @@ namespace os
     {
       assert (size > 3);
 
-      sfSize = size;
-      sfDescriptorsArray = new io*[size];
+      size__ = size;
+      descriptors_array__ = new class io*[size];
 
-      for (std::size_t i = 0; i < getSize (); ++i)
+      for (std::size_t i = 0; i < file_descriptors_manager::size (); ++i)
         {
-          sfDescriptorsArray[i] = nullptr;
+          descriptors_array__[i] = nullptr;
         }
     }
 
     file_descriptors_manager::~file_descriptors_manager ()
     {
-      delete[] sfDescriptorsArray;
-      sfSize = 0;
+      delete[] descriptors_array__;
+      size__ = 0;
     }
 
     // ------------------------------------------------------------------------
 
     io*
-    file_descriptors_manager::getIo (int fildes)
+    file_descriptors_manager::io (int fildes)
     {
       // Check if valid descriptor or buffer not yet initialised
-      if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= sfSize)
-          || (sfDescriptorsArray == nullptr))
+      if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= size__)
+          || (descriptors_array__ == nullptr))
         {
           return nullptr;
         }
-      return sfDescriptorsArray[fildes];
+      return descriptors_array__[fildes];
     }
 
     bool
-    file_descriptors_manager::isValid (int fildes)
+    file_descriptors_manager::valid (int fildes)
     {
-      if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= sfSize))
+      if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= size__))
         {
           return false;
         }
@@ -89,9 +89,9 @@ namespace os
     }
 
     int
-    file_descriptors_manager::alloc (io* io)
+    file_descriptors_manager::alloc (class io* io)
     {
-      if (io->getFileDescriptor () >= 0)
+      if (io->file_descriptor () >= 0)
         {
           // Already allocated
           errno = EBUSY;
@@ -99,12 +99,12 @@ namespace os
         }
 
       // Reserve 0, 1, 2 (stdin, stdout, stderr)
-      for (std::size_t i = 3; i < sfSize; ++i)
+      for (std::size_t i = 3; i < size__; ++i)
         {
-          if (sfDescriptorsArray[i] == nullptr)
+          if (descriptors_array__[i] == nullptr)
             {
-              sfDescriptorsArray[i] = io;
-              io->setFileDescriptor (static_cast<int> (i));
+              descriptors_array__[i] = io;
+              io->file_descriptor (static_cast<int> (i));
               return static_cast<int> (i);
             }
         }
@@ -115,46 +115,46 @@ namespace os
     }
 
     int
-    file_descriptors_manager::assign (fileDescriptor_t fildes, io* io)
+    file_descriptors_manager::assign (file_descriptor_t fildes, class io* io)
     {
-      if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= sfSize))
+      if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= size__))
         {
           errno = EBADF;
           return -1;
         }
 
-      if (io->getFileDescriptor () >= 0)
+      if (io->file_descriptor () >= 0)
         {
           // Already allocated
           errno = EBUSY;
           return -1;
         }
 
-      sfDescriptorsArray[fildes] = io;
-      io->setFileDescriptor (fildes);
+      descriptors_array__[fildes] = io;
+      io->file_descriptor (fildes);
       return fildes;
     }
 
     int
     file_descriptors_manager::free (int fildes)
     {
-      if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= sfSize))
+      if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= size__))
         {
           errno = EBADF;
           return -1;
         }
 
-      sfDescriptorsArray[fildes]->clearFileDescriptor ();
-      sfDescriptorsArray[fildes] = nullptr;
+      descriptors_array__[fildes]->clear_file_descriptor ();
+      descriptors_array__[fildes] = nullptr;
       return 0;
     }
 
     class socket*
-    file_descriptors_manager::getSocket (int fildes)
+    file_descriptors_manager::socket (int fildes)
     {
-      assert ((fildes >= 0) && (static_cast<std::size_t> (fildes) < sfSize));
-      auto* const io = sfDescriptorsArray[fildes];
-      if (io->getType () != io::Type::SOCKET)
+      assert ((fildes >= 0) && (static_cast<std::size_t> (fildes) < size__));
+      auto* const io = descriptors_array__[fildes];
+      if (io->get_type () != io::type::socket)
         {
           return nullptr;
         }

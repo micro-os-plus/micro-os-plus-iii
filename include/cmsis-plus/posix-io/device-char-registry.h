@@ -65,36 +65,44 @@ namespace os
       remove (device_char* device);
 
       static device_char*
-      identifyDevice (const char* path);
+      identify_device (const char* path);
 
       static std::size_t
-      getSize (void);
+      size (void);
 
       static device_char*
-      getDevice (std::size_t index);
+      device (std::size_t index);
 
       // ----------------------------------------------------------------------
 
     private:
 
-      static std::size_t sfSize;
+      static std::size_t size__;
 
-      static device_char** sfRegistryArray;
+      static device_char** registry_array__;
     };
+  } /* namespace posix */
+} /* namespace os */
 
+// ===== Inline & template implementations ====================================
+
+namespace os
+{
+  namespace posix
+  {
     // ------------------------------------------------------------------------
 
     inline std::size_t
-    device_char_registry::getSize (void)
+    device_char_registry::size (void)
     {
-      return sfSize;
+      return size__;
     }
 
     inline device_char*
-    device_char_registry::getDevice (std::size_t index)
+    device_char_registry::device (std::size_t index)
     {
-      assert (index < sfSize);
-      return sfRegistryArray[index];
+      assert (index < size__);
+      return registry_array__[index];
     }
 
   } /* namespace posix */

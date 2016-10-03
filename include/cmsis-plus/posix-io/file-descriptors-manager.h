@@ -63,40 +63,49 @@ namespace os
       // ----------------------------------------------------------------------
 
       static size_t
-      getSize (void);
+      size (void);
 
       static bool
-      isValid (int fildes);
+      valid (int fildes);
 
-      static io*
-      getIo (int fildes);
+      static class io*
+      io (int fildes);
 
-      static socket*
-      getSocket (int fildes);
-
-      static int
-      alloc (io* io);
+      static class socket*
+      socket (int fildes);
 
       static int
-      assign (fileDescriptor_t fildes, io* io);
+      alloc (class io* io);
 
       static int
-      free (fileDescriptor_t fildes);
+      assign (file_descriptor_t fildes, class io* io);
+
+      static int
+      free (file_descriptor_t fildes);
 
       // ----------------------------------------------------------------------
     private:
 
-      static std::size_t sfSize;
+      static std::size_t size__;
 
-      static io** sfDescriptorsArray;
+      static class io** descriptors_array__;
     };
 
+  } /* namespace posix */
+} /* namespace os */
+
+// ===== Inline & template implementations ====================================
+
+namespace os
+{
+  namespace posix
+  {
     // ------------------------------------------------------------------------
 
     inline size_t
-    file_descriptors_manager::getSize (void)
+    file_descriptors_manager::size (void)
     {
-      return sfSize;
+      return size__;
     }
 
   } /* namespace posix */

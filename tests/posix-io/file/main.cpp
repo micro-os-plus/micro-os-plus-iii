@@ -114,7 +114,7 @@ public:
   getMode (void);
 
   const char*
-  getPath (void);
+  path (void);
 
   unsigned int
   getNumber (void);
@@ -205,7 +205,7 @@ TestFile::getMode (void)
 }
 
 inline const char*
-TestFile::getPath (void)
+TestFile::path (void)
 {
   return fPath;
 }
@@ -331,7 +331,7 @@ public:
   getNumber (void);
 
   const char*
-  getPath (void);
+  path (void);
 
   void*
   getPtr (void);
@@ -421,7 +421,7 @@ TestFileSystem::getNumber (void)
 }
 
 inline const char*
-TestFileSystem::getPath (void)
+TestFileSystem::path (void)
 {
   return fPath;
 }
@@ -537,7 +537,7 @@ public:
 
 // ----------------------------------------------------------------------------
 
-using TestFilePool = os::posix::TPool<TestFile>;
+using TestFilePool = os::posix::pool_typed<TestFile>;
 
 constexpr std::size_t FILES_POOL_ARRAY_SIZE = 2;
 
@@ -575,38 +575,38 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       // ----- mount_manager -----
 
       // Check initial size.
-      assert(mm.getSize () == 2);
+      assert(mm.size () == 2);
 
       // Check if FileSystemsManger is empty.
-      for (std::size_t i = 0; i < mm.getSize (); ++i)
+      for (std::size_t i = 0; i < mm.size (); ++i)
         {
-          assert(mm.getFileSystem (i) == nullptr);
-          assert(mm.getPath (i) == nullptr);
+          assert(mm.file_system (i) == nullptr);
+          assert(mm.path (i) == nullptr);
         }
-      assert(mm.getRoot () == nullptr);
+      assert(mm.root () == nullptr);
 
       const char* path1 = "/babu/riba";
       const char* path2 = path1;
 
       // No file system, identify nothing
       assert(
-          os::posix::mount_manager::identifyFileSystem (&path2, nullptr)
+          os::posix::mount_manager::identify_file_system (&path2, nullptr)
               == nullptr);
 
       // Check if root_fs file system flags are those set by constructor.
       assert(root_fs.getFlags () == 1);
 
-      // Check setRoot(), and mount().
-      assert(os::posix::mount_manager::setRoot (&root_fs, &root_dev, 123) == 0);
-      assert(os::posix::mount_manager::getRoot () == &root_fs);
-      assert(root_fs.getBlockDevice () == &root_dev);
+      // Check root(), and mount().
+      assert(os::posix::mount_manager::root (&root_fs, &root_dev, 123) == 0);
+      assert(os::posix::mount_manager::root () == &root_fs);
+      assert(root_fs.block_device () == &root_dev);
 
       // Check mount flags.
       assert(root_fs.getFlags () == 123);
 
       // No file systems mounted, identify root.
       assert(
-          os::posix::mount_manager::identifyFileSystem (&path2, nullptr)
+          os::posix::mount_manager::identify_file_system (&path2, nullptr)
               == &root_fs);
       assert(path2 == path1);
     }
@@ -617,8 +617,8 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       errno = -2;
       assert(
           (os::posix::mount_manager::mount (&fs1, "/fs1/", &dev1, 124) == 0) && (errno == 0));
-      assert(os::posix::mount_manager::getFileSystem (0) == &fs1);
-      assert(fs1.getBlockDevice () == &dev1);
+      assert(os::posix::mount_manager::file_system (0) == &fs1);
+      assert(fs1.block_device () == &dev1);
 
       assert(fs1.getFlags () == 124);
 
@@ -627,7 +627,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       const char* path2 = path1;
 
       assert(
-          os::posix::mount_manager::identifyFileSystem (&path2, nullptr)
+          os::posix::mount_manager::identify_file_system (&path2, nullptr)
               == &root_fs);
       assert(path2 == path1);
 
@@ -644,7 +644,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 
       // Check if identified properly
       assert(
-          os::posix::mount_manager::identifyFileSystem (&path2, &path4) == &fs1);
+          os::posix::mount_manager::identify_file_system (&path2, &path4) == &fs1);
 
       // Check if path adjusted properly
       assert(path2 == (path1 + std::strlen ("/fs1")));
@@ -665,7 +665,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
           (os::posix::mount_manager::umount ("/fs1/", 134) == 0) && (errno == 0));
       assert(fs1.getFlags () == 134);
       assert(fs1.getSyncCount () == cnt + 1);
-      assert(fs1.getBlockDevice () == nullptr);
+      assert(fs1.block_device () == nullptr);
 
       // Check umounts
       cnt = fs2.getSyncCount ();
@@ -674,7 +674,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
           (os::posix::mount_manager::umount ("/fs2/", 144) == 0) && (errno == 0));
       assert(fs2.getFlags () == 144);
       assert(fs2.getSyncCount () == cnt + 1);
-      assert(fs2.getBlockDevice () == nullptr);
+      assert(fs2.block_device () == nullptr);
     }
 
     {
@@ -692,7 +692,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert((__posix_chmod ("/fs1/p1", 321) == 0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::CHMOD);
       assert(fs1.getNumber () == 321);
-      assert(std::strcmp ("/p1", fs1.getPath ()) == 0);
+      assert(std::strcmp ("/p1", fs1.path ()) == 0);
 
       // STAT
       errno = -2;
@@ -700,27 +700,27 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert((__posix_stat ("/fs1/p2", &stat_buf) == 0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::STAT);
       assert(fs1.getPtr () == &stat_buf);
-      assert(std::strcmp ("/p2", fs1.getPath ()) == 0);
+      assert(std::strcmp ("/p2", fs1.path ()) == 0);
 
       // TRUNCATE
       errno = -2;
       assert((__posix_truncate ("/fs1/p3", 876) == 0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::TRUNCATE);
       assert(fs1.getNumber () == 876);
-      assert(std::strcmp ("/p3", fs1.getPath ()) == 0);
+      assert(std::strcmp ("/p3", fs1.path ()) == 0);
 
       // RENAME
       errno = -2;
       assert((__posix_rename ("/fs1/p4", "/fs1/p4-new") == 0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::RENAME);
-      assert(std::strcmp ("/p4", fs1.getPath ()) == 0);
+      assert(std::strcmp ("/p4", fs1.path ()) == 0);
       assert(std::strcmp ("/p4-new", (const char* )fs1.getPtr ()) == 0);
 
       // UNLINK
       errno = -2;
       assert((__posix_unlink ("/fs1/p5") ==0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::UNLINK);
-      assert(std::strcmp ("/p5", fs1.getPath ()) == 0);
+      assert(std::strcmp ("/p5", fs1.path ()) == 0);
 
       // UTIME
       errno = -2;
@@ -728,20 +728,20 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert((__posix_utime ("/fs1/p6", &times) ==0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::UTIME);
       assert(fs1.getPtr () == &times);
-      assert(std::strcmp ("/p6", fs1.getPath ()) == 0);
+      assert(std::strcmp ("/p6", fs1.path ()) == 0);
 
       // MKDIR
       errno = -2;
       assert((__posix_mkdir ("/fs1/p7", 654) ==0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::MKDIR);
       assert(fs1.getNumber () == 654);
-      assert(std::strcmp ("/p7", fs1.getPath ()) == 0);
+      assert(std::strcmp ("/p7", fs1.path ()) == 0);
 
       // RMDIR
       errno = -2;
       assert((__posix_rmdir ("/fs1/p8") ==0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::RMDIR);
-      assert(std::strcmp ("/p8", fs1.getPath ()) == 0);
+      assert(std::strcmp ("/p8", fs1.path ()) == 0);
 
       // SYNC
       unsigned int cnt = fs1.getSyncCount ();
@@ -760,7 +760,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert((os::posix::chmod ("/fs1/p1", 321) == 0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::CHMOD);
       assert(fs1.getNumber () == 321);
-      assert(std::strcmp ("/p1", fs1.getPath ()) == 0);
+      assert(std::strcmp ("/p1", fs1.path ()) == 0);
 
       // STAT
       errno = -2;
@@ -768,28 +768,28 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert((os::posix::stat ("/fs1/p2", &stat_buf) == 0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::STAT);
       assert(fs1.getPtr () == &stat_buf);
-      assert(std::strcmp ("/p2", fs1.getPath ()) == 0);
+      assert(std::strcmp ("/p2", fs1.path ()) == 0);
 
       // TRUNCATE
       errno = -2;
       assert((os::posix::truncate ("/fs1/p3", 876) == 0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::TRUNCATE);
       assert(fs1.getNumber () == 876);
-      assert(std::strcmp ("/p3", fs1.getPath ()) == 0);
+      assert(std::strcmp ("/p3", fs1.path ()) == 0);
 
       // RENAME
       errno = -2;
       assert(
           (os::posix::rename ("/fs1/p4", "/fs1/p4-new") == 0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::RENAME);
-      assert(std::strcmp ("/p4", fs1.getPath ()) == 0);
+      assert(std::strcmp ("/p4", fs1.path ()) == 0);
       assert(std::strcmp ("/p4-new", (const char* )fs1.getPtr ()) == 0);
 
       // UNLINK
       errno = -2;
       assert((os::posix::unlink ("/fs1/p5") ==0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::UNLINK);
-      assert(std::strcmp ("/p5", fs1.getPath ()) == 0);
+      assert(std::strcmp ("/p5", fs1.path ()) == 0);
 
       // UTIME
       errno = -2;
@@ -797,20 +797,20 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert((os::posix::utime ("/fs1/p6", &times) ==0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::UTIME);
       assert(fs1.getPtr () == &times);
-      assert(std::strcmp ("/p6", fs1.getPath ()) == 0);
+      assert(std::strcmp ("/p6", fs1.path ()) == 0);
 
       // MKDIR
       errno = -2;
       assert((os::posix::mkdir ("/fs1/p7", 654) ==0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::MKDIR);
       assert(fs1.getNumber () == 654);
-      assert(std::strcmp ("/p7", fs1.getPath ()) == 0);
+      assert(std::strcmp ("/p7", fs1.path ()) == 0);
 
       // RMDIR
       errno = -2;
       assert((os::posix::rmdir ("/fs1/p8") ==0) && (errno == 0));
       assert(fs1.getCmd () == Cmds::RMDIR);
-      assert(std::strcmp ("/p8", fs1.getPath ()) == 0);
+      assert(std::strcmp ("/p8", fs1.path ()) == 0);
 
       // SYNC
       unsigned int cnt = fs1.getSyncCount ();
@@ -829,18 +829,18 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       int fd = __posix_open ("/fs1/f1", 123, 234);
       assert((fd >= 0) && (errno == 0));
 
-      os::posix::io* io = os::posix::file_descriptors_manager::getIo (fd);
+      os::posix::io* io = os::posix::file_descriptors_manager::io (fd);
       assert(io != nullptr);
 
-      assert(io->getType () == os::posix::io::Type::FILE);
+      assert(io->get_type () == os::posix::io::type::file);
 
       TestFile* file = static_cast<TestFile*> (io);
       // Must be the first used slot in the pool.
-      assert(filesPool.getObject (0) == file);
-      assert(filesPool.getFlag (0) == true);
+      assert(filesPool.object (0) == file);
+      assert(filesPool.in_use (0) == true);
 
       // Check params passing.
-      assert(std::strcmp ("/f1", file->getPath ()) == 0);
+      assert(std::strcmp ("/f1", file->path ()) == 0);
       assert(file->getNumber () == 123);
       assert(file->getMode () == 234);
 
@@ -931,7 +931,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert(file->getCmd () == Cmds::CLOSE);
 
       // Must no longer be in the pool
-      assert(filesPool.getFlag (0) == false);
+      assert(filesPool.in_use (0) == false);
     }
 
     {
@@ -942,16 +942,16 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       os::posix::io* io = os::posix::open ("/fs1/f0", 124, 235);
       assert((io != nullptr) && (errno == 0));
 
-      assert(io->getType () == os::posix::io::Type::FILE);
+      assert(io->get_type () == os::posix::io::type::file);
 
       TestFile* tfile = static_cast<TestFile*> (io);
 
       // Must be the first used slot in the pool.
-      assert(filesPool.getObject (0) == tfile);
-      assert(filesPool.getFlag (0) == true);
+      assert(filesPool.object (0) == tfile);
+      assert(filesPool.in_use (0) == true);
 
       // Check params passing.
-      assert(std::strcmp ("/f0", tfile->getPath ()) == 0);
+      assert(std::strcmp ("/f0", tfile->path ()) == 0);
       assert(tfile->getNumber () == 124);
       assert(tfile->getMode () == 235);
 
@@ -962,7 +962,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert(tfile->getCmd () == Cmds::CLOSE);
 
       // Must no longer be in the pool
-      assert(filesPool.getFlag (0) == false);
+      assert(filesPool.in_use (0) == false);
     }
 
     {
@@ -971,15 +971,15 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       os::posix::file* file = os::posix::file::open ("/fs1/f1", 123, 234);
       assert((file != nullptr) && (errno == 0));
 
-      assert(file->getType () == os::posix::io::Type::FILE);
+      assert(file->get_type () == os::posix::io::type::file);
 
       TestFile* tfile = static_cast<TestFile*> (file);
       // Must be the first used slot in the pool.
-      assert(filesPool.getObject (0) == tfile);
-      assert(filesPool.getFlag (0) == true);
+      assert(filesPool.object (0) == tfile);
+      assert(filesPool.in_use (0) == true);
 
       // Check params passing.
-      assert(std::strcmp ("/f1", tfile->getPath ()) == 0);
+      assert(std::strcmp ("/f1", tfile->path ()) == 0);
       assert(tfile->getNumber () == 123);
       assert(tfile->getMode () == 234);
 
@@ -1060,7 +1060,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert(tfile->getCmd () == Cmds::CLOSE);
 
       // Must no longer be in the pool
-      assert(filesPool.getFlag (0) == false);
+      assert(filesPool.in_use (0) == false);
     }
 
   trace_puts ("'test-file-debug' succeeded.");
