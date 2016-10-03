@@ -47,8 +47,20 @@ namespace os
 
     // ------------------------------------------------------------------------
 
+    /**
+     * @brief Mount manager static class.
+     * @headerfile mount-manager.h <cmsis-plus/posix-io/mount-manager.h>
+     * @ingroup cmsis-plus-posix-io-base
+     */
     class mount_manager
     {
+      // ----------------------------------------------------------------------
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
     public:
 
       mount_manager (std::size_t size);
@@ -56,7 +68,17 @@ namespace os
 
       ~mount_manager ();
 
+      /**
+       * @}
+       */
+
       // ----------------------------------------------------------------------
+      /**
+       * @name Public Static Member Functions
+       * @{
+       */
+
+    public:
 
       static file_system*
       identify_file_system (const char** path1, const char** path2 = nullptr);
@@ -83,13 +105,26 @@ namespace os
       static const char*
       path (std::size_t index);
 
+      /**
+       * @}
+       */
+
+      // ----------------------------------------------------------------------
     private:
+
+      /**
+       * @cond ignore
+       */
 
       static std::size_t size__;
 
       static class file_system* root__;
       static class file_system** file_systems_array__;
       static const char** paths_array__;
+
+      /**
+       * @endcond
+       */
 
     };
 

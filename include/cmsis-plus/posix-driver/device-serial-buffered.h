@@ -54,10 +54,22 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+    /**
+     * @brief Buffered serial driver class template.
+     * @headerfile circular-buffer.h <cmsis-plus/posix-driver/circular-buffer.h>
+     * @ingroup cmsis-plus-posix-io-driver
+     */
     template<typename CS>
       class device_serial_buffered : public os::posix::device_char
       {
         using critical_section = CS;
+
+        // ----------------------------------------------------------------------
+
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
 
       public:
 
@@ -80,7 +92,17 @@ namespace os
         virtual
         ~device_serial_buffered ();
 
+        /**
+         * @}
+         */
+
         // --------------------------------------------------------------------
+        /**
+         * @name Public Static Member Functions
+         * @{
+         */
+
+      public:
 
         // Static function called by the CMSIS driver in an
         // interrupt context.
@@ -88,7 +110,15 @@ namespace os
         static void
         signal_event (device_serial_buffered* object, uint32_t event);
 
+        /**
+         * @}
+         */
+
         // --------------------------------------------------------------------
+        /**
+         * @name Private Member Functions
+         * @{
+         */
 
       protected:
 
@@ -121,9 +151,16 @@ namespace os
         virtual bool
         do_is_connected (void) override;
 
-        // --------------------------------------------------------------------
+        /**
+         * @}
+         */
 
+        // --------------------------------------------------------------------
       private:
+
+        /**
+         * @cond ignore
+         */
 
         // Pointer to actual CMSIS-like serial driver (usart or usb cdc acm)
         os::driver::Serial* driver_ = nullptr;
@@ -144,10 +181,23 @@ namespace os
         bool volatile is_opened_ = false;
         // Padding!
 
+        /**
+         * @endcond
+         */
+
       };
 
 #pragma GCC diagnostic pop
 
+  } /* namespace posix */
+} /* namespace os */
+
+// ===== Inline & template implementations ====================================
+
+namespace os
+{
+  namespace posix
+  {
     // ------------------------------------------------------------------------
 
     template<typename CS>
@@ -161,7 +211,7 @@ namespace os
           rx_buf_ (rx_buf), //
           tx_buf_ (tx_buf) //
       {
-        assert(rx_buf != nullptr);
+        assert (rx_buf != nullptr);
 
         // Do not check the same for tx_buf, it may be null.
 
@@ -322,20 +372,20 @@ namespace os
         // Abort pending reads.
         os::driver::return_t ret;
         ret = driver_->control (os::driver::serial::Control::abort_receive);
-        assert(ret == os::driver::RETURN_OK);
+        assert (ret == os::driver::RETURN_OK);
 
         // Abort pending writes.
         ret = driver_->control (os::driver::serial::Control::abort_send);
-        assert(ret == os::driver::RETURN_OK);
+        assert (ret == os::driver::RETURN_OK);
 
         // Disable transmitter and receiver.
         ret = driver_->control (os::driver::serial::Control::disable_tx);
-        assert(ret == os::driver::RETURN_OK);
+        assert (ret == os::driver::RETURN_OK);
 
         ret = driver_->control (os::driver::serial::Control::disable_rx);
-        assert(ret == os::driver::RETURN_OK);
+        assert (ret == os::driver::RETURN_OK);
         ret = driver_->control (os::driver::serial::Control::disable_break);
-        assert(ret == os::driver::RETURN_OK);
+        assert (ret == os::driver::RETURN_OK);
 
         is_opened_ = false;
         is_connected_ = false;
@@ -570,7 +620,7 @@ namespace os
             std::size_t count = tmpCount - object->rx_count_;
             object->rx_count_ = tmpCount;
             std::size_t adjust = object->rx_buf_->advanceBack (count);
-            assert(count == adjust);
+            assert (count == adjust);
 
             if (event & os::driver::serial::Event::receive_complete)
               {
@@ -584,13 +634,13 @@ namespace os
                     object->rx_buf_->retreatBack ();
                     nbyte = object->rx_buf_->getBackContiguousBuffer (&pbuf);
                   }
-                assert(nbyte > 0);
+                assert (nbyte > 0);
 
                 // Read as much as we can.
                 int32_t status;
                 status = object->driver_->receive (pbuf, nbyte);
                 // TODO: implement error processing.
-                assert(status == os::driver::RETURN_OK);
+                assert (status == os::driver::RETURN_OK);
 
                 object->rx_count_ = 0;
               }
@@ -606,7 +656,7 @@ namespace os
               {
                 std::size_t count = object->driver_->get_tx_count ();
                 std::size_t adjust = object->tx_buf_->advanceFront (count);
-                assert(count == adjust);
+                assert (count == adjust);
 
                 uint8_t* pbuf;
                 std::size_t nbyte = object->tx_buf_->getFrontContiguousBuffer (
@@ -616,7 +666,7 @@ namespace os
                     int32_t status;
                     status = object->driver_->send (pbuf, nbyte);
                     // TODO: implement error processing
-                    assert(status == os::driver::RETURN_OK);
+                    assert (status == os::driver::RETURN_OK);
                   }
                 else
                   {

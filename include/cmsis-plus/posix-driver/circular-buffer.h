@@ -43,9 +43,16 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
+    /**
+     * @brief Circular buffer class template.
+     * @headerfile circular-buffer.h <cmsis-plus/posix-driver/circular-buffer.h>
+     * @ingroup cmsis-plus-posix-io-utils
+     */
     template<typename T>
       class circular_buffer
       {
+        // ----------------------------------------------------------------------
+
       public:
 
         /**
@@ -53,13 +60,30 @@ namespace os
          */
         using value_type = T;
 
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
+
+      public:
+
         circular_buffer (const value_type* buf, std::size_t size,
                          std::size_t high_water_mark,
                          std::size_t low_water_mark = 0);
 
         circular_buffer (const value_type* buf, std::size_t size);
 
+        /**
+         * @}
+         */
+
         // ----------------------------------------------------------------------
+        /**
+         * @name Public Member Functions
+         * @{
+         */
+
+      public:
 
         void
         clear (void);
@@ -127,9 +151,16 @@ namespace os
         void
         dump (void);
 
-        // ----------------------------------------------------------------------
+        /**
+         * @}
+         */
 
+        // ----------------------------------------------------------------------
       private:
+
+        /**
+         * @cond ignore
+         */
 
         const value_type* const buf_;
         std::size_t const size_;
@@ -147,9 +178,19 @@ namespace os
 
         // First used position to pop, at the front.
         value_type* volatile front_;
+
+        /**
+         * @endcond
+         */
+
       };
     // ========================================================================
 
+    /**
+     * @brief Circular buffer of bytes.
+     * @headerfile circular-buffer.h <cmsis-plus/posix-driver/circular-buffer.h>
+     * @ingroup cmsis-plus-posix-io-utils
+     */
     using circular_buffer_bytes = circular_buffer<uint8_t>;
 
   // ==========================================================================

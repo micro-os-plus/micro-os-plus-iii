@@ -51,8 +51,20 @@ namespace os
 
     // ------------------------------------------------------------------------
 
+    /**
+     * @brief File descriptors manager static class.
+     * @headerfile file-descriptors-manager.h <cmsis-plus/posix-io/file-descriptors-manager.h>
+     * @ingroup cmsis-plus-posix-io-base
+     */
     class file_descriptors_manager
     {
+      // ----------------------------------------------------------------------
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
     public:
 
       file_descriptors_manager (std::size_t size);
@@ -60,7 +72,17 @@ namespace os
 
       ~file_descriptors_manager ();
 
+      /**
+       * @}
+       */
+
       // ----------------------------------------------------------------------
+      /**
+       * @name Public Static Member Functions
+       * @{
+       */
+
+    public:
 
       static size_t
       size (void);
@@ -83,12 +105,25 @@ namespace os
       static int
       free (file_descriptor_t fildes);
 
+      /**
+       * @}
+       */
+
       // ----------------------------------------------------------------------
     private:
+
+      /**
+       * @cond ignore
+       */
 
       static std::size_t size__;
 
       static class io** descriptors_array__;
+
+      /**
+       * @endcond
+       */
+
     };
 
   } /* namespace posix */

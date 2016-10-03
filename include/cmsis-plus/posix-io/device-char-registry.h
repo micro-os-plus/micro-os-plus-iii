@@ -47,8 +47,20 @@ namespace os
 
     // ------------------------------------------------------------------------
 
+    /**
+     * @brief Char devices registry static class.
+     * @headerfile device-char-registry.h <cmsis-plus/posix-io/device-char-registry.h>
+     * @ingroup cmsis-plus-posix-io-base
+     */
     class device_char_registry
     {
+      // ----------------------------------------------------------------------
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
     public:
 
       device_char_registry (std::size_t size);
@@ -56,7 +68,17 @@ namespace os
 
       ~device_char_registry ();
 
+      /**
+       * @}
+       */
+
       // ----------------------------------------------------------------------
+      /**
+       * @name Public Static Member Functions
+       * @{
+       */
+
+    public:
 
       static void
       add (device_char* device);
@@ -73,14 +95,26 @@ namespace os
       static device_char*
       device (std::size_t index);
 
-      // ----------------------------------------------------------------------
+      /**
+       * @}
+       */
 
+      // ----------------------------------------------------------------------
     private:
+
+      /**
+       * @cond ignore
+       */
 
       static std::size_t size__;
 
       static device_char** registry_array__;
+
+      /**
+       * @endcond
+       */
     };
+
   } /* namespace posix */
 } /* namespace os */
 

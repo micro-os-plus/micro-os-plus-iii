@@ -52,8 +52,20 @@ namespace os
 
     // ------------------------------------------------------------------------
 
+    /**
+     * @brief Network stack class.
+     * @headerfile net-stack.h <cmsis-plus/posix-io/net-stack.h>
+     * @ingroup cmsis-plus-posix-io-base
+     */
     class net_stack
     {
+      // ----------------------------------------------------------------------
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
     public:
 
       net_stack (pool* sockets_pool);
@@ -61,15 +73,37 @@ namespace os
 
       ~net_stack ();
 
+      /**
+       * @}
+       */
+
       // ----------------------------------------------------------------------
+      /**
+       * @name Public Static Member Functions
+       * @{
+       */
+
+    public:
 
       static pool*
       sockets_pool (void);
 
+      /**
+       * @}
+       */
+
       // ----------------------------------------------------------------------
     private:
 
+      /**
+       * @cond ignore
+       */
+
       static pool* sockets_pool__;
+
+      /**
+       * @endcond
+       */
 
     };
 

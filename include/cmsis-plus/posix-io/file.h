@@ -48,10 +48,31 @@ namespace os
 
     // ------------------------------------------------------------------------
 
+    /**
+     * @brief File class.
+     * @headerfile file.h <cmsis-plus/posix-io/file.h>
+     * @ingroup cmsis-plus-posix-io-base
+     */
     class file : public io
     {
+      // ----------------------------------------------------------------------
+
+      /**
+       * @cond ignore
+       */
+
       friend class file_system;
       friend class io;
+
+      /**
+       * @endcond
+       */
+
+      // ----------------------------------------------------------------------
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
     public:
 
@@ -60,7 +81,17 @@ namespace os
 
       ~file ();
 
+      /**
+       * @}
+       */
+
       // ----------------------------------------------------------------------
+      /**
+       * @name Public Static Member Functions
+       * @{
+       */
+
+    public:
 
       static file*
       open (const char* path, int oflag, ...);
@@ -68,7 +99,17 @@ namespace os
       static file*
       vopen (const char* path, int oflag, std::va_list args);
 
+      /**
+       * @}
+       */
+
       // ----------------------------------------------------------------------
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+    public:
 
       off_t
       lseek (off_t offset, int whence);
@@ -85,9 +126,18 @@ namespace os
       class file_system*
       file_system (void) const;
 
-    protected:
+      /**
+       * @}
+       */
 
       // ----------------------------------------------------------------------
+      /**
+       * @name Private Member Functions
+       * @{
+       */
+
+    protected:
+
       // Implementations
 
       /**
@@ -114,9 +164,22 @@ namespace os
       void
       file_system (class file_system* file_system);
 
+      /**
+       * @}
+       */
+
     private:
 
+      /**
+       * @cond ignore
+       */
+
       class file_system* file_system_;
+
+      /**
+       * @endcond
+       */
+
     };
 
   } /* namespace posix */

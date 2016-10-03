@@ -47,6 +47,11 @@ namespace os
 
     // ------------------------------------------------------------------------
 
+    /**
+     * @ingroup cmsis-plus-posix-io-func
+     * @{
+     */
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wshadow"
 
@@ -60,16 +65,37 @@ namespace os
     socketpair (int domain, int type, int protocol, socket* socket_vector[2]);
 #endif
 
-    // ------------------------------------------------------------------------
+    /**
+     * @}
+     */
 
+    // ------------------------------------------------------------------------
+    /**
+     * @brief Network socket.
+     * @headerfile socket.h <cmsis-plus/posix-io/socket.h>
+     * @ingroup cmsis-plus-posix-io-base
+     */
     class socket : public io
     {
       // ----------------------------------------------------------------------
 
+      /**
+       * @cond ignore
+       */
+
       friend socket*
       socket (int domain, int type, int protocol);
 
+      /**
+       * @endcond
+       */
+
       // ----------------------------------------------------------------------
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
     public:
 
@@ -78,7 +104,17 @@ namespace os
       virtual
       ~socket ();
 
+      /**
+       * @}
+       */
+
       // ----------------------------------------------------------------------
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+    public:
 
       socket*
       accept (struct sockaddr* address, socklen_t* address_len);
@@ -132,7 +168,16 @@ namespace os
       int
       sockatmark (void);
 
+      /**
+       * @}
+       */
+
       // ----------------------------------------------------------------------
+      /**
+       * @name Private Member Functions
+       * @{
+       */
+
     protected:
 
       /**
@@ -196,6 +241,10 @@ namespace os
 
       virtual void
       do_release (void) override;
+
+      /**
+       * @}
+       */
 
     };
 

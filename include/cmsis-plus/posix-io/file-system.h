@@ -50,9 +50,13 @@ namespace os
     class device_block;
     class pool;
 
+    /**
+     * @ingroup cmsis-plus-posix-io-func
+     * @{
+     */
+
     // ----------------------------------------------------------------------
     // ----- Non-io, global file system functions -----
-
     int
     mkdir (const char* path, mode_t mode);
 
@@ -83,11 +87,23 @@ namespace os
     int
     utime (const char* path, const struct utimbuf* times);
 
-    // ------------------------------------------------------------------------
+    /**
+     * @}
+     */
 
+    // ------------------------------------------------------------------------
+    /**
+     * @brief File system class.
+     * @headerfile file-system.h <cmsis-plus/posix-io/file-system.h>
+     * @ingroup cmsis-plus-posix-io-base
+     */
     class file_system
     {
       // ----------------------------------------------------------------------
+
+      /**
+       * @cond ignore
+       */
 
       friend class file;
       friend class directory;
@@ -121,7 +137,15 @@ namespace os
       friend int
       utime (const char* path, const struct utimbuf* times);
 
+      /**
+       * @endcond
+       */
+
       // ----------------------------------------------------------------------
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
     public:
 
@@ -131,7 +155,17 @@ namespace os
       virtual
       ~file_system ();
 
+      /**
+       * @}
+       */
+
       // ----------------------------------------------------------------------
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+    public:
 
       io*
       open (const char* path, int oflag, std::va_list args);
@@ -150,6 +184,10 @@ namespace os
 
       pool*
       dirs_pool (void) const;
+
+      /**
+       * @}
+       */
 
     protected:
 
@@ -213,20 +251,40 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
+    protected:
+
       void
       device (device_block* block_device);
+
+      /**
+       * @name Public Member Functions
+       * @{
+       */
 
     public:
 
       const char*
       adjust_path (const char* path);
 
+      /**
+       * @}
+       */
+
     private:
+
+      /**
+       * @cond ignore
+       */
 
       pool* files_pool_;
       pool* dirs_pool_;
 
       device_block* block_device_;
+
+      /**
+       * @endcond
+       */
+
     };
 
   } /* namespace posix */

@@ -38,14 +38,21 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
+    /**
+     * @cond ignore
+     */
+
     std::size_t mount_manager::size__;
 
     file_system* mount_manager::root__;
     file_system** mount_manager::file_systems_array__;
     const char** mount_manager::paths_array__;
 
-    // ------------------------------------------------------------------------
+    /**
+     * @endcond
+     */
 
+    // ------------------------------------------------------------------------
     mount_manager::mount_manager (std::size_t size)
     {
       assert (size > 0);

@@ -42,16 +42,37 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
+    /**
+     * @brief Pool of objects.
+     * @headerfile pool.h <cmsis-plus/posix-io/pool.h>
+     * @ingroup cmsis-plus-posix-io-utils
+     */
     class pool
     {
+      // ----------------------------------------------------------------------
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
     public:
+
       pool (std::size_t size);
       pool (const pool&) = delete;
 
       virtual
       ~pool ();
 
+      /**
+       * @}
+       */
+
       // ----------------------------------------------------------------------
+      /**
+       * @name Public Member Functions
+       * @{
+       */
 
       void*
       aquire (void);
@@ -70,28 +91,61 @@ namespace os
       bool
       in_use (std::size_t index) const;
 
-      // ----------------------------------------------------------------------
+      /**
+       * @}
+       */
 
+      // ----------------------------------------------------------------------
     protected:
 
-      // Referred directly in pool_typed.
+      /**
+       * @cond ignore
+       */
 
+      // Referred directly in pool_typed.
       void** array_;
       bool* in_use_;
       std::size_t size_;
+
+      /**
+       * @endcond
+       */
+
     };
 
     // ========================================================================
 
+    /**
+     * @brief Pool of typed objects class template.
+     * @headerfile pool.h <cmsis-plus/posix-io/pool.h>
+     * @ingroup cmsis-plus-posix-io-utils
+     */
     template<typename T>
       class pool_typed : public pool
       {
+
+        /**
+         * @name Types & Constants
+         * @{
+         */
+
       public:
 
         /**
          * @brief Standard type definition.
          */
         using value_type = T;
+
+        /**
+         * @}
+         */
+
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
+
+      public:
 
         pool_typed (std::size_t size);
 
@@ -100,14 +154,31 @@ namespace os
         virtual
         ~pool_typed ();
 
+        /**
+         * @}
+         */
+
         // ----------------------------------------------------------------------
+        /**
+         * @name Public Member Functions
+         * @{
+         */
+
+      public:
 
         value_type*
         aquire (void);
 
         bool
         release (value_type* obj);
+
+        /**
+         * @}
+         */
+
       };
+
+  // ==========================================================================
   } /* namespace posix */
 } /* namespace os */
 

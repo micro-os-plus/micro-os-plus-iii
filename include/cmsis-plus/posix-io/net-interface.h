@@ -36,13 +36,31 @@ namespace os
 {
   namespace posix
   {
+    /**
+     * @brief Network interface class.
+     * @headerfile net-interface.h <cmsis-plus/posix-io/net-interface.h>
+     * @ingroup cmsis-plus-posix-io-base
+     */
     class net_interface
     {
+      // ----------------------------------------------------------------------
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
     public:
+
       net_interface () = default;
+
+      /**
+       * @}
+       */
 
       // TODO: add content
     };
+
   } /* namespace posix */
 } /* namespace os */
 

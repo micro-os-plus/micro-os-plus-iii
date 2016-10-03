@@ -36,13 +36,32 @@ namespace os
 {
   namespace posix
   {
+    /**
+     * @brief Block device class.
+     * @headerfile device-block.h <cmsis-plus/posix-io/device-block.h>
+     * @ingroup cmsis-plus-posix-io-base
+     */
     class device_block
     {
+
+      // ----------------------------------------------------------------------
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
     public:
+
       device_block () = default;
+
+      /**
+       * @}
+       */
 
       // TODO: add content
     };
+
   } /* namespace posix */
 } /* namespace os */
 

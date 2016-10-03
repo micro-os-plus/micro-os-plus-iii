@@ -41,12 +41,19 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
+    /**
+     * @cond ignore
+     */
+
     std::size_t device_char_registry::size__;
 
     device_char** device_char_registry::registry_array__;
 
-    // ------------------------------------------------------------------------
+    /**
+     * @endcond
+     */
 
+    // ------------------------------------------------------------------------
     device_char_registry::device_char_registry (std::size_t size)
     {
       assert (size > 0);

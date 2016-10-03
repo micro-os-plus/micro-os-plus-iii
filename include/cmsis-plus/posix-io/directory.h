@@ -48,6 +48,12 @@ namespace os
 
     // ------------------------------------------------------------------------
 
+    /**
+     * @brief Open directory.
+     * @param dirname
+     * @return
+     * @ingroup cmsis-plus-posix-io-func
+     */
     directory*
     opendir (const char* dirname);
 
@@ -56,9 +62,30 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+    /**
+     * @brief Directory class.
+     * @headerfile directory.h <cmsis-plus/posix-io/directory.h>
+     * @ingroup cmsis-plus-posix-io-base
+     */
     class directory
     {
+      // ----------------------------------------------------------------------
+
+      /**
+       * @cond ignore
+       */
+
       friend class file_system;
+
+      /**
+       * @endcond
+       */
+
+      // ----------------------------------------------------------------------
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
     public:
 
@@ -68,7 +95,17 @@ namespace os
       virtual
       ~directory ();
 
+      /**
+       * @}
+       */
+
       // ----------------------------------------------------------------------
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+    public:
 
       struct dirent *
       read (void);
@@ -91,9 +128,18 @@ namespace os
       class file_system*
       file_system (void) const;
 
-    protected:
+      /**
+       * @}
+       */
 
       // ----------------------------------------------------------------------
+      /**
+       * @name Private Member Functions
+       * @{
+       */
+
+    protected:
+
       // Implementations.
 
       /**
@@ -111,16 +157,29 @@ namespace os
       virtual int
       do_close (void);
 
-      // ----------------------------------------------------------------------
       // Support functions.
 
       void
       file_system (class file_system* fileSystem);
 
+      /**
+       * @}
+       */
+
     private:
 
+      /**
+       * @cond ignore
+       */
+
       class file_system* file_system_;
+
       struct dirent dir_entry_;
+
+      /**
+       * @endcond
+       */
+
     };
 
 #pragma GCC diagnostic pop

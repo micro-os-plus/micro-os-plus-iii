@@ -53,19 +53,35 @@ namespace os
     class io;
     class file_system;
 
-    // ------------------------------------------------------------------------
+    /**
+     * @ingroup cmsis-plus-posix-io-func
+     * @{
+     */
 
+    // ------------------------------------------------------------------------
     io*
     open (const char* path, int oflag, ...);
 
     io*
     vopen (const char* path, int oflag, std::va_list args);
 
-    // ------------------------------------------------------------------------
+    /**
+     * @}
+     */
 
+    // ------------------------------------------------------------------------
+    /**
+     * @brief Base I/O class.
+     * @headerfile io.h <cmsis-plus/posix-io/io.h>
+     * @ingroup cmsis-plus-posix-io-base
+     */
     class io
     {
       // ----------------------------------------------------------------------
+
+      /**
+       * @cond ignore
+       */
 
       friend class file_system;
       friend class file_descriptors_manager;
@@ -73,9 +89,17 @@ namespace os
       friend io*
       vopen (const char* path, int oflag, std::va_list args);
 
-      // ----------------------------------------------------------------------
+      /**
+       * @endcond
+       */
 
+      // ----------------------------------------------------------------------
     public:
+
+      /**
+       * @name Types & Constants
+       * @{
+       */
 
       using type_t = unsigned int;
       enum type
@@ -87,9 +111,18 @@ namespace os
         socket = 1 << 3
       };
 
+      /**
+       * @}
+       */
+
       // ----------------------------------------------------------------------
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
     protected:
+
       io (type t);
       io (const io&) = delete;
 
@@ -97,7 +130,17 @@ namespace os
       virtual
       ~io ();
 
+      /**
+       * @}
+       */
+
       // ----------------------------------------------------------------------
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+    public:
 
       int
       close (void);
@@ -140,9 +183,18 @@ namespace os
       is_connected (void);
 #endif
 
-    protected:
+      /**
+       * @}
+       */
 
       // ----------------------------------------------------------------------
+      /**
+       * @name Private Member Functions
+       * @{
+       */
+
+    protected:
+
       // Implementations.
 
       // do_vopen() is not here, because it is not common
@@ -192,13 +244,25 @@ namespace os
       io*
       alloc_file_descriptor (void);
 
-      // ----------------------------------------------------------------------
+      /**
+       * @}
+       */
 
+      // ----------------------------------------------------------------------
     private:
+
+      /**
+       * @cond ignore
+       */
 
       type type_ = type::not_set;
 
       file_descriptor_t file_descriptor_ = no_file_descriptor;
+
+      /**
+       * @endcond
+       */
+
     };
 
   } /* namespace posix */

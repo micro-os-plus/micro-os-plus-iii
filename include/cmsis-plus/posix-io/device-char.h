@@ -48,14 +48,32 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
+    /**
+     * @brief Char device class.
+     * @headerfile device-char.h <cmsis-plus/posix-io/device-char.h>
+     * @ingroup cmsis-plus-posix-io-base
+     */
     class device_char : public io
     {
       // ----------------------------------------------------------------------
 
+      /**
+       * @cond ignore
+       */
+
       friend io*
       vopen (const char* path, int oflag, std::va_list args);
 
+      /**
+       * @endcond
+       */
+
       // ----------------------------------------------------------------------
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
     public:
 
@@ -64,6 +82,17 @@ namespace os
 
       virtual
       ~device_char ();
+
+      /**
+       * @}
+       */
+
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+    public:
 
       int
       ioctl (int request, ...);
@@ -82,7 +111,15 @@ namespace os
       static const char*
       device_prefix (void);
 
+      /**
+       * @}
+       */
+
       // ----------------------------------------------------------------------
+      /**
+       * @name Private Member Functions
+       * @{
+       */
 
     protected:
 
@@ -95,11 +132,22 @@ namespace os
       virtual int
       do_isatty (void) override;
 
-      // ----------------------------------------------------------------------
+      /**
+       * @}
+       */
 
+      // ----------------------------------------------------------------------
     protected:
 
+      /**
+       * @cond ignore
+       */
+
       const char* name_;
+
+      /**
+       * @endcond
+       */
 
     };
   } /* namespace posix */

@@ -40,11 +40,19 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
+    /**
+     * @cond ignore
+     */
+
     std::size_t file_descriptors_manager::size__;
+
     io** file_descriptors_manager::descriptors_array__;
 
-    // ------------------------------------------------------------------------
+    /**
+     * @endcond
+     */
 
+    // ------------------------------------------------------------------------
     file_descriptors_manager::file_descriptors_manager (std::size_t size)
     {
       assert (size > 3);

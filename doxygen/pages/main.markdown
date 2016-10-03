@@ -18,8 +18,8 @@ From a functional point of view, the documentation pages can be grouped as:
 * [CMSIS++ ISO Standard C++ Threads](group__cmsis-plus-iso.html) (work in progress)
 * [CMSIS++ Drivers](group__cmsis-plus-drivers.html) (future addition)
 * [CMSIS++ **Diag**](group__cmsis-plus-diag.html)
-* [CMSIS++ POSIX I/O](group__cmsis-plus-posix-io.html) (work in progress)
+* [CMSIS++ **POSIX I/O**](group__cmsis-plus-posix-io.html) (work in progress)
 * [CMSIS++ **Application Config** v0.3.7](group__cmsis-plus-app-config.html)
-* [CMSIS++ **Application Overrided & Hooks** v0.3.7](group__cmsis-plus-app-hooks.html)
+* [CMSIS++ **Application Overrides & Hooks** v0.3.7](group__cmsis-plus-app-hooks.html)
 
 
