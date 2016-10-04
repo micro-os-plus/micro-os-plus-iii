@@ -26,6 +26,9 @@
  */
 
 #include <cmsis-plus/posix-io/device-char.h>
+#include <cmsis-plus/posix-io/device-char-registry.h>
+
+#include <cmsis-plus/diag/trace.h>
 
 #include <cstring>
 #include <cassert>
@@ -40,13 +43,20 @@ namespace os
     // ------------------------------------------------------------------------
 
     device_char::device_char (const char* name) :
-        io (type::device)
+        io (type::device), //
+        name_ (name)
     {
-      name_ = name;
+      trace::printf ("%s(\"%s\") @%p\n", __func__, name_, this);
+
+      device_char_registry::link (this);
     }
 
     device_char::~device_char ()
     {
+      trace::printf ("%s() @%p %s\n", __func__, this, name_);
+
+      registry_links_.unlink ();
+
       name_ = nullptr;
     }
 

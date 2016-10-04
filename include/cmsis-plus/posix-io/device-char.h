@@ -33,6 +33,7 @@
 // ----------------------------------------------------------------------------
 
 #include <cmsis-plus/posix-io/io.h>
+#include <cmsis-plus/utils/lists.h>
 
 // ----------------------------------------------------------------------------
 
@@ -151,6 +152,20 @@ namespace os
        */
 
       // ----------------------------------------------------------------------
+    public:
+
+      /**
+       * @cond ignore
+       */
+
+      // Intrusive node used to link this device to the registry list.
+      // Must be public.
+      utils::double_list_links registry_links_;
+
+      /**
+       * @endcond
+       */
+
     protected:
 
       /**

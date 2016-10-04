@@ -36,6 +36,8 @@
 #include <cmsis-plus/posix-io/net-stack.h>
 #include <cmsis-plus/posix-io/pool.h>
 
+#include <cmsis-plus/diag/trace.h>
+
 #include <cassert>
 #include <cerrno>
 #include <cstdarg>
@@ -86,7 +88,7 @@ namespace os
 
       errno = 0;
 
-      // First check if path is a device.
+      // First check if path is a char device.
       os::posix::io* io = os::posix::device_char_registry::identify_device (
           path);
       if (io != nullptr)
@@ -126,7 +128,11 @@ namespace os
 
       // If successful, allocate a file descriptor.
       // Return a valid pointer to an object derived from io, or nullptr.
-      return io->alloc_file_descriptor ();
+
+      auto ret = io->alloc_file_descriptor ();
+      trace::printf ("%s(\"%s\")=%p fd=%d\n", __func__, path, io,
+                     io->file_descriptor ());
+      return ret;
     }
 
     // ------------------------------------------------------------------------

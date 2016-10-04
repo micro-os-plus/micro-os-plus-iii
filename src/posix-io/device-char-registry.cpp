@@ -45,83 +45,38 @@ namespace os
      * @cond ignore
      */
 
-    std::size_t device_char_registry::size__;
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#endif
 
-    device_char** device_char_registry::registry_array__;
+    // Initialised to 0 by BSS.
+    device_char_registry::device_list device_char_registry::registry_list__;
+
+#pragma GCC diagnostic pop
 
     /**
      * @endcond
      */
 
     // ------------------------------------------------------------------------
-    device_char_registry::device_char_registry (std::size_t size)
-    {
-      assert (size > 0);
-
-      size__ = size;
-      registry_array__ = new device_char*[size];
-
-      for (std::size_t i = 0; i < size; ++i)
-        {
-          registry_array__[i] = nullptr;
-        }
-    }
-
-    device_char_registry::~device_char_registry ()
-    {
-      delete[] registry_array__;
-      size__ = 0;
-    }
-
-    // ------------------------------------------------------------------------
-
     void
-    device_char_registry::add (device_char* device)
+    device_char_registry::link (device_char* device)
     {
 #if defined(DEBUG)
-      for (std::size_t i = 0; i < size__; ++i)
+      for (auto&& d : registry_list__)
         {
-          if (registry_array__[i] == nullptr)
-            {
-              continue;
-            }
-
           // Validate the device name by checking duplicates.
-          if (std::strcmp (device->name (), registry_array__[i]->name ()) == 0)
+          if (std::strcmp (device->name (), d.name ()) == 0)
             {
-              trace_puts ("Duplicate Device name. Abort.");
+              trace_puts ("Duplicate char device name. Abort.");
               std::abort ();
             }
-
         }
 #endif // DEBUG
 
-      for (std::size_t i = 0; i < size__; ++i)
-        {
-          if (registry_array__[i] == nullptr)
-            {
-              registry_array__[i] = device;
-              return;
-            }
-        }
-
-      trace_puts ("Max number of Devices reached. Abort.");
-      std::abort ();
-    }
-
-    void
-    device_char_registry::remove (device_char* device)
-    {
-      for (std::size_t i = 0; i < size__; ++i)
-        {
-          if (registry_array__[i] == device)
-            {
-              registry_array__[i] = nullptr;
-              return;
-            }
-        }
-
-      // Not found... It would be good to tell.
+      registry_list__.link (*device);
     }
 
     /**
@@ -141,13 +96,12 @@ namespace os
 
       // The prefix was identified; try to match the rest of the path.
       auto name = path + std::strlen (prefix);
-      for (std::size_t i = 0; i < size__; ++i)
+
+      for (auto&& p : registry_list__)
         {
-          if (registry_array__[i] != nullptr
-              && registry_array__[i]->match_name (name))
+          if (p.match_name (name))
             {
-              // Return the first device that matches the path.
-              return registry_array__[i];
+              return &p;
             }
         }
 
