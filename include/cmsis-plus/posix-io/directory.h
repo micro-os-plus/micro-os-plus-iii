@@ -49,13 +49,21 @@ namespace os
     // ------------------------------------------------------------------------
 
     /**
-     * @brief Open directory.
-     * @param dirname
-     * @return
      * @ingroup cmsis-plus-posix-io-func
+     * @{
+     */
+
+    /**
+     * @brief Open directory.
+     * @param dirname [in] Directory name.
+     * @return Pointer to `directory` object.
      */
     directory*
     opendir (const char* dirname);
+
+    /**
+     * @}
+     */
 
     // ------------------------------------------------------------------------
 

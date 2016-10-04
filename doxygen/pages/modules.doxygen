@@ -88,7 +88,7 @@
  */
 
 /**
- @defgroup cmsis-plus-diag CMSIS++ Diag
+ @defgroup cmsis-plus-diag CMSIS++ Diagnostics & Trace
  @brief  CMSIS++ Diagnostic & Trace summary page.
  @details
  This page groups the main classes providing support for 
@@ -97,10 +97,20 @@
 
 /**
  @defgroup cmsis-plus-posix-io CMSIS++ POSIX I/O C++ API
- @brief  CMSIS++ POSIX I/O summary page.
+ @brief  CMSIS++ POSIX I/O C++ API summary page.
  @details
  This page groups the main classes providing support for standard
  POSIX I/O (uniform access to dtream devices, files, sockets).
+
+ TODO: add content
+ */
+
+/**
+ @defgroup cmsis-plus-posix-io-c CMSIS++ POSIX I/O C API
+ @brief  CMSIS++ POSIX I/O C API summary page.
+ @details
+ This page groups the standard
+ POSIX I/O functions.
 
  TODO: add content
  */

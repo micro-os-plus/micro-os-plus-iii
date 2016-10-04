@@ -35,6 +35,11 @@ extern "C"
 
   // --------------------------------------------------------------------------
 
+  /**
+   * @ingroup cmsis-plus-posix-io-c
+   * @{
+   */
+
   // For embedded environment that use POSIX system calls, redefine
   // all functions without the '__posix_' prefix.
 
@@ -127,6 +132,11 @@ extern "C"
   int __attribute__((weak, alias ("__posix_open")))
   open (const char* path, int oflag, ...);
 
+  /**
+   * @brief Open directory.
+   * @param dirname [in] Directory name.
+   * @return Pointer to DIR object.
+   */
   DIR*
   __attribute__((weak, alias ("__posix_opendir")))
   opendir (const char* dirname);
@@ -230,6 +240,10 @@ extern "C"
 
   ssize_t __attribute__((weak, alias ("__posix_writev")))
   writev (int fildes, const struct iovec* iov, int iovcnt);
+
+  /**
+   * @}
+   */
 
 // --------------------------------------------------------------------------
 
