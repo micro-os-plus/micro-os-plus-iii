@@ -124,6 +124,7 @@ __posix_read (int fildes, void* buf, size_t nbyte)
   auto* const io = posix::file_descriptors_manager::io (fildes);
   if (io == nullptr)
     {
+      // STDIN
       if (fildes == 0)
         {
           return 0; // Default empty input (EOF).
@@ -140,6 +141,7 @@ __posix_write (int fildes, const void* buf, size_t nbyte)
   auto* const io = posix::file_descriptors_manager::io (fildes);
   if (io == nullptr)
     {
+      // STDOUT & STDERR
       if (fildes == 1 || fildes == 2)
         {
           return trace_write (buf, nbyte); // Default output on trace.
@@ -181,7 +183,7 @@ __posix_ioctl (int fildes, int request, ...)
 
   va_list args;
   va_start (args, request);
-  int ret = static_cast<posix::device_char*> (io)->vioctl (request, args);
+  int ret = (static_cast<posix::device_char*> (io))->vioctl (request, args);
   va_end (args);
 
   return ret;
@@ -204,7 +206,7 @@ __posix_lseek (int fildes, off_t offset, int whence)
       return -1;
     }
 
-  return static_cast<posix::file*> (io)->lseek (offset, whence);
+  return (static_cast<posix::file*> (io))->lseek (offset, whence);
 }
 
 /**
@@ -276,7 +278,7 @@ __posix_ftruncate (int fildes, off_t length)
       return -1;
     }
 
-  return static_cast<posix::file*> (io)->ftruncate (length);
+  return (static_cast<posix::file*> (io))->ftruncate (length);
 }
 
 int
@@ -296,7 +298,7 @@ __posix_fsync (int fildes)
       return -1;
     }
 
-  return static_cast<posix::file*> (io)->fsync ();
+  return (static_cast<posix::file*> (io))->fsync ();
 }
 
 // ----------------------------------------------------------------------------
@@ -654,7 +656,7 @@ __posix_sockatmark (int socket)
 // standing applications. They might be called in some error cases
 // from library code.
 //
-// If you detect other functions to be needed, just let us know
+// If you detect other functions needed, just let us know
 // and we'll add them.
 
 // ----------------------------------------------------------------------------
