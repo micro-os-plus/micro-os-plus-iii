@@ -89,13 +89,13 @@ namespace os
          * @endcond
          */
 
-        ~circular_buffer () = default;
+        ~circular_buffer ();
 
         /**
          * @}
          */
 
-        // ----------------------------------------------------------------------
+        // --------------------------------------------------------------------
         /**
          * @name Public Member Functions
          * @{
@@ -111,54 +111,54 @@ namespace os
 
         // Insert bytes to the back of the buffer.
         std::size_t
-        pushBack (value_type v);
+        push_back (value_type v);
 
         std::size_t
-        pushBack (const value_type* buf, std::size_t count);
+        push_back (const value_type* buf, std::size_t count);
 
         std::size_t
-        advanceBack (std::size_t count);
+        advance_back (std::size_t count);
 
         void
-        retreatBack (void);
+        retreat_back (void);
 
         // Retrieve bytes from the front of the buffer.
         std::size_t
-        popFront (value_type* buf);
+        pop_front (value_type* buf);
 
         std::size_t
-        popFront (value_type* buf, std::size_t size);
+        pop_front (value_type* buf, std::size_t size);
 
         std::size_t
-        advanceFront (std::size_t count);
+        advance_front (std::size_t count);
 
         // Get the address of the largest contiguous buffer in the front, and
         // length; might be only partial, if buffer wraps.
         std::size_t
-        getFrontContiguousBuffer (value_type** ppbuf);
+        front_contiguous_buffer (value_type** ppbuf);
 
         // Get the address of the largest contiguous buffer in the back, and
         // length; might be only partial, if buffer wraps.
         std::size_t
-        getBackContiguousBuffer (value_type** ppbuf);
+        back_contiguous_buffer (value_type** ppbuf);
 
         bool
-        isEmpty (void) const;
+        empty (void) const;
 
         bool
-        isFull (void) const;
+        full (void) const;
 
         bool
-        isAboveHighWaterMark (void) const;
+        above_high_water_mark (void) const;
 
         bool
-        isBelowHighWaterMark (void) const;
+        below_high_water_mark (void) const;
 
         bool
-        isAboveLowWaterMark (void) const;
+        above_low_water_mark (void) const;
 
         bool
-        isBelowLowWaterMark (void) const;
+        below_low_water_mark (void) const;
 
         std::size_t
         length (void) const;
@@ -173,7 +173,7 @@ namespace os
          * @}
          */
 
-        // ----------------------------------------------------------------------
+        // --------------------------------------------------------------------
       private:
 
         /**
@@ -246,6 +246,12 @@ namespace os
         ;
       }
 
+    template<typename T>
+      circular_buffer<T>::~circular_buffer ()
+      {
+        ;
+      }
+
     // ------------------------------------------------------------------------
 
     template<typename T>
@@ -269,21 +275,21 @@ namespace os
 
     template<typename T>
       inline bool
-      circular_buffer<T>::isEmpty (void) const
+      circular_buffer<T>::empty (void) const
       {
         return (len_ == 0);
       }
 
     template<typename T>
       inline bool
-      circular_buffer<T>::isFull (void) const
+      circular_buffer<T>::full (void) const
       {
         return (len_ >= size_);
       }
 
     template<typename T>
       inline bool
-      circular_buffer<T>::isAboveHighWaterMark (void) const
+      circular_buffer<T>::above_high_water_mark (void) const
       {
         // Allow for water mark to be size.
         return (len_ >= high_water_mark_);
@@ -291,7 +297,7 @@ namespace os
 
     template<typename T>
       inline bool
-      circular_buffer<T>::isBelowLowWaterMark (void) const
+      circular_buffer<T>::below_low_water_mark (void) const
       {
         // Allow for water mark to be 0.
         return (len_ <= low_water_mark_);
@@ -299,16 +305,16 @@ namespace os
 
     template<typename T>
       inline bool
-      circular_buffer<T>::isBelowHighWaterMark (void) const
+      circular_buffer<T>::below_high_water_mark (void) const
       {
-        return !isAboveHighWaterMark ();
+        return !above_high_water_mark ();
       }
 
     template<typename T>
       inline bool
-      circular_buffer<T>::isAboveLowWaterMark (void) const
+      circular_buffer<T>::above_low_water_mark (void) const
       {
-        return !isBelowLowWaterMark ();
+        return !below_low_water_mark ();
       }
 
     template<typename T>
@@ -327,9 +333,9 @@ namespace os
 
     template<typename T>
       std::size_t
-      circular_buffer<T>::pushBack (value_type v)
+      circular_buffer<T>::push_back (value_type v)
       {
-        if (isFull ())
+        if (full ())
           {
             return 0;
           }
@@ -348,7 +354,7 @@ namespace os
     // Return the actual number of bytes, if not enough space for all.
     template<typename T>
       std::size_t
-      circular_buffer<T>::pushBack (const value_type* buf, std::size_t count)
+      circular_buffer<T>::push_back (const value_type* buf, std::size_t count)
       {
         assert (buf != nullptr);
 
@@ -389,7 +395,7 @@ namespace os
 
     template<typename T>
       std::size_t
-      circular_buffer<T>::advanceBack (std::size_t count)
+      circular_buffer<T>::advance_back (std::size_t count)
       {
         std::size_t adjust = count;
         if (count > (size_ - len_))
@@ -415,7 +421,7 @@ namespace os
 
     template<typename T>
       void
-      circular_buffer<T>::retreatBack (void)
+      circular_buffer<T>::retreat_back (void)
       {
         if (back_ == buf_)
           {
@@ -431,7 +437,7 @@ namespace os
 
     template<typename T>
       std::size_t
-      circular_buffer<T>::popFront (value_type* buf)
+      circular_buffer<T>::pop_front (value_type* buf)
       {
         assert (buf != nullptr);
 
@@ -455,7 +461,7 @@ namespace os
 
     template<typename T>
       std::size_t
-      circular_buffer<T>::popFront (value_type* buf, std::size_t siz)
+      circular_buffer<T>::pop_front (value_type* buf, std::size_t siz)
       {
         assert (buf != nullptr);
 
@@ -490,7 +496,7 @@ namespace os
 
     template<typename T>
       std::size_t
-      circular_buffer<T>::advanceFront (std::size_t count)
+      circular_buffer<T>::advance_front (std::size_t count)
       {
         if (count == 0)
           {
@@ -516,9 +522,10 @@ namespace os
 
     template<typename T>
       std::size_t
-      circular_buffer<T>::getFrontContiguousBuffer (value_type** ppbuf)
+      circular_buffer<T>::front_contiguous_buffer (value_type** ppbuf)
       {
         assert (ppbuf != nullptr);
+
         *ppbuf = front_;
 
         std::size_t sizeToEnd = size_
@@ -534,9 +541,10 @@ namespace os
 
     template<typename T>
       std::size_t
-      circular_buffer<T>::getBackContiguousBuffer (value_type** ppbuf)
+      circular_buffer<T>::back_contiguous_buffer (value_type** ppbuf)
       {
         assert (ppbuf != nullptr);
+
         *ppbuf = back_;
 
         std::size_t sizeToEnd = size_ - static_cast<std::size_t> (back_ - buf_);
@@ -558,7 +566,7 @@ namespace os
                            high_water_mark_, low_water_mark_);
       }
 
-  // ========================================================================
+  // ==========================================================================
   } /* namespace posix */
 } /* namespace os */
 

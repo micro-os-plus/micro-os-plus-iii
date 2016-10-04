@@ -43,69 +43,69 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   // Empty buffer.
   assert(cb.size () == 5);
   assert(cb.length () == 0);
-  assert(cb.isEmpty ());
-  assert(!cb.isFull ());
+  assert(cb.empty ());
+  assert(!cb.full ());
 
   // Low water marks.
-  assert(cb.isBelowLowWaterMark ());
-  assert(!cb.isAboveLowWaterMark ());
+  assert(cb.below_low_water_mark ());
+  assert(!cb.above_low_water_mark ());
 
   // No more pops.
   uint8_t ch[6];
-  assert(cb.popFront (&ch[0]) == 0);
-  assert(cb.popFront (ch, 5) == 0);
-  assert(cb.advanceFront (2) == 0);
+  assert(cb.pop_front (&ch[0]) == 0);
+  assert(cb.pop_front (ch, 5) == 0);
+  assert(cb.advance_front (2) == 0);
 
   uint8_t* pb;
-  assert(cb.getFrontContiguousBuffer (&pb) == 0);
+  assert(cb.front_contiguous_buffer (&pb) == 0);
   pb = nullptr;
-  assert(cb.getBackContiguousBuffer (&pb) == 5);
+  assert(cb.back_contiguous_buffer (&pb) == 5);
   assert(pb == &buff[0]);
 
   // Full buffer.
-  assert(cb.pushBack ((uint8_t* )"012345", 5) == 5);
-  assert(cb.isFull ());
-  assert(!cb.isEmpty ());
+  assert(cb.push_back ((uint8_t* )"012345", 5) == 5);
+  assert(cb.full ());
+  assert(!cb.empty ());
 
   // No more pushes
-  assert(cb.pushBack ('?') == 0);
-  assert(cb.pushBack ((uint8_t* )"012345", 5) == 0);
-  assert(cb.advanceBack (2) == 0);
+  assert(cb.push_back ('?') == 0);
+  assert(cb.push_back ((uint8_t* )"012345", 5) == 0);
+  assert(cb.advance_back (2) == 0);
 
   // High water marks.
-  assert(cb.isAboveHighWaterMark ());
-  assert(!cb.isBelowHighWaterMark ());
+  assert(cb.above_high_water_mark ());
+  assert(!cb.below_high_water_mark ());
 
   // Array operator.
   assert(cb[2] == '2');
 
   // Clear.
   cb.clear ();
-  assert(cb.isEmpty ());
+  assert(cb.empty ());
 
   //  0 1 2 3 4
   // | |x|x| | |
   // +-+-+-+-+-+
   //    f   b
 
-  assert(cb.pushBack ((uint8_t* )"abc", 3) == 3);
-  assert(cb.popFront (&ch[0]) == 1);
+  assert(cb.push_back ((uint8_t* )"abc", 3) == 3);
+  assert(cb.pop_front (&ch[0]) == 1);
   assert(ch[0] == 'a');
 
   assert(cb.length () == 2);
 
-  assert(!cb.isBelowLowWaterMark ());
-  assert(cb.isAboveLowWaterMark ());
+  assert(!cb.below_low_water_mark ());
+  assert(cb.above_low_water_mark ());
 
-  assert(!cb.isAboveHighWaterMark ());
-  assert(cb.isBelowHighWaterMark ());
+  assert(!cb.above_high_water_mark ());
+  assert(cb.below_high_water_mark ());
 
   pb = nullptr;
-  assert(cb.getFrontContiguousBuffer (&pb) == 2);
+  assert(cb.front_contiguous_buffer (&pb) == 2);
   assert(pb == &buff[1]);
 
   pb = nullptr;
-  assert(cb.getBackContiguousBuffer (&pb) == 2);
+  assert(cb.back_contiguous_buffer (&pb) == 2);
   assert(pb == &buff[3]);
 
   //  0 1 2 3 4
@@ -113,14 +113,14 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   // +-+-+-+-+-+
   //    f     b
 
-  assert(cb.pushBack ('d') == 1);
+  assert(cb.push_back ('d') == 1);
 
   pb = nullptr;
-  assert(cb.getFrontContiguousBuffer (&pb) == 3);
+  assert(cb.front_contiguous_buffer (&pb) == 3);
   assert(pb == &buff[1]);
 
   pb = nullptr;
-  assert(cb.getBackContiguousBuffer (&pb) == 1);
+  assert(cb.back_contiguous_buffer (&pb) == 1);
   assert(pb == &buff[4]);
 
   //  0 1 2 3 4
@@ -128,18 +128,18 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   // +-+-+-+-+-+
   //        f b
 
-  assert(cb.popFront (&ch[0]) == 1);
+  assert(cb.pop_front (&ch[0]) == 1);
   assert(ch[0] == 'b');
 
-  assert(cb.popFront (&ch[0]) == 1);
+  assert(cb.pop_front (&ch[0]) == 1);
   assert(ch[0] == 'c');
 
   pb = nullptr;
-  assert(cb.getFrontContiguousBuffer (&pb) == 1);
+  assert(cb.front_contiguous_buffer (&pb) == 1);
   assert(pb == &buff[3]);
 
   pb = nullptr;
-  assert(cb.getBackContiguousBuffer (&pb) == 1);
+  assert(cb.back_contiguous_buffer (&pb) == 1);
   assert(pb == &buff[4]);
 
   //  0 1 2 3 4
@@ -147,14 +147,14 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   // +-+-+-+-+-+
   //  b     f
 
-  assert(cb.pushBack ('e') == 1);
+  assert(cb.push_back ('e') == 1);
 
   pb = nullptr;
-  assert(cb.getFrontContiguousBuffer (&pb) == 2);
+  assert(cb.front_contiguous_buffer (&pb) == 2);
   assert(pb == &buff[3]);
 
   pb = nullptr;
-  assert(cb.getBackContiguousBuffer (&pb) == 3);
+  assert(cb.back_contiguous_buffer (&pb) == 3);
   assert(pb == &buff[0]);
 
   //  0 1 2 3 4
@@ -162,33 +162,33 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   // +-+-+-+-+-+
   //  b     f
 
-  assert(cb.pushBack ('f') == 1);
+  assert(cb.push_back ('f') == 1);
 
   pb = nullptr;
-  assert(cb.getFrontContiguousBuffer (&pb) == 2);
+  assert(cb.front_contiguous_buffer (&pb) == 2);
   assert(pb == &buff[3]);
 
   pb = nullptr;
-  assert(cb.getBackContiguousBuffer (&pb) == 2);
+  assert(cb.back_contiguous_buffer (&pb) == 2);
   assert(pb == &buff[1]);
 
-  // pushBack/popFront buffer
+  // push_back/pop_front buffer
   cb.clear ();
-  assert(cb.pushBack ((uint8_t* )"xy", 1) == 1);
-  assert(cb.pushBack ((uint8_t* )"yz", 2) == 2);
-  assert(cb.pushBack ((uint8_t* )"defghi", 5) == 2);
+  assert(cb.push_back ((uint8_t* )"xy", 1) == 1);
+  assert(cb.push_back ((uint8_t* )"yz", 2) == 2);
+  assert(cb.push_back ((uint8_t* )"defghi", 5) == 2);
 
   cb.clear ();
-  assert(cb.pushBack ((uint8_t* )"xy", 1) == 1);
-  assert(cb.pushBack ((uint8_t* )"yz", 2) == 2);
-  assert(cb.advanceFront (2) == 2);
-  assert(cb.pushBack ((uint8_t* )"defghi", 6) == 4);
+  assert(cb.push_back ((uint8_t* )"xy", 1) == 1);
+  assert(cb.push_back ((uint8_t* )"yz", 2) == 2);
+  assert(cb.advance_front (2) == 2);
+  assert(cb.push_back ((uint8_t* )"defghi", 6) == 4);
 
   std::memset (ch, '?', sizeof(ch));
-  assert(cb.popFront (ch, 1) == 1);
+  assert(cb.pop_front (ch, 1) == 1);
   assert(ch[0] == 'z');
   assert(ch[1] == '?');
-  assert(cb.popFront (ch, 6) == 4);
+  assert(cb.pop_front (ch, 6) == 4);
   assert(ch[0] == 'd');
   assert(ch[3] == 'g');
   assert(ch[4] == '?');

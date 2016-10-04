@@ -323,7 +323,7 @@ namespace os
           }
 
         uint8_t* pbuf;
-        std::size_t nbyte = rx_buf_->getBackContiguousBuffer (&pbuf);
+        std::size_t nbyte = rx_buf_->back_contiguous_buffer (&pbuf);
 
         result = driver_->receive (pbuf, nbyte);
         if (result != os::driver::RETURN_OK)
@@ -365,7 +365,7 @@ namespace os
               {
                 for (;;)
                   {
-                    if (tx_buf_->isEmpty ())
+                    if (tx_buf_->empty ())
                       {
                         break;
                       }
@@ -412,7 +412,7 @@ namespace os
                 // ----- Enter critical section -------------------------------
                 critical_section cs;
 
-                count = rx_buf_->popFront (static_cast<uint8_t*> (buf), nbyte);
+                count = rx_buf_->pop_front (static_cast<uint8_t*> (buf), nbyte);
                 // ----- Exit critical section --------------------------------
               }
             if (count > 0)
@@ -443,10 +443,10 @@ namespace os
                 // ----- Enter critical section -------------------------------
                 critical_section cs;
 
-                if (tx_buf_->isBelowHighWaterMark ())
+                if (tx_buf_->below_high_water_mark ())
                   {
                     // If there is more space in the buffer, try to fill it.
-                    count = tx_buf_->pushBack (
+                    count = tx_buf_->push_back (
                         static_cast<const uint8_t*> (buf), nbyte);
                   }
                 // ----- Exit critical section --------------------------------
@@ -473,7 +473,7 @@ namespace os
                         // ----- Enter critical section -----------------------
                         critical_section cs; // -----
 
-                        nb = tx_buf_->getFrontContiguousBuffer (&pbuf);
+                        nb = tx_buf_->front_contiguous_buffer (&pbuf);
                         // ----- Exit critical section ------------------------
                       }
                     if (nb > 0)
@@ -490,7 +490,7 @@ namespace os
 //                  {
 //                    critical_section cs; // -----
 //
-//                    isBelowHWM = tx_buf_->isBelowHighWaterMark ();
+//                    isBelowHWM = tx_buf_->below_high_water_mark ();
 //                  }
                 if (count == nbyte)
                   {
@@ -518,7 +518,7 @@ namespace os
 
                     std::size_t n;
                     // If there is more space in the buffer, try to fill it.
-                    n = tx_buf_->pushBack (
+                    n = tx_buf_->push_back (
                         static_cast<const uint8_t*> (buf) + count,
                         nbyte - count);
                     count += n;
@@ -624,20 +624,20 @@ namespace os
             std::size_t tmpCount = object->driver_->get_rx_count ();
             std::size_t count = tmpCount - object->rx_count_;
             object->rx_count_ = tmpCount;
-            std::size_t adjust = object->rx_buf_->advanceBack (count);
+            std::size_t adjust = object->rx_buf_->advance_back (count);
             assert (count == adjust);
 
             if (event & os::driver::serial::Event::receive_complete)
               {
                 uint8_t* pbuf;
-                std::size_t nbyte = object->rx_buf_->getBackContiguousBuffer (
+                std::size_t nbyte = object->rx_buf_->back_contiguous_buffer (
                     &pbuf);
                 if (nbyte == 0)
                   {
                     // Overwrite the last byte, but keep the driver in
                     // receive mode continuously.
-                    object->rx_buf_->retreatBack ();
-                    nbyte = object->rx_buf_->getBackContiguousBuffer (&pbuf);
+                    object->rx_buf_->retreat_back ();
+                    nbyte = object->rx_buf_->back_contiguous_buffer (&pbuf);
                   }
                 assert (nbyte > 0);
 
@@ -660,11 +660,11 @@ namespace os
             if (object->tx_buf_ != nullptr)
               {
                 std::size_t count = object->driver_->get_tx_count ();
-                std::size_t adjust = object->tx_buf_->advanceFront (count);
+                std::size_t adjust = object->tx_buf_->advance_front (count);
                 assert (count == adjust);
 
                 uint8_t* pbuf;
-                std::size_t nbyte = object->tx_buf_->getFrontContiguousBuffer (
+                std::size_t nbyte = object->tx_buf_->front_contiguous_buffer (
                     &pbuf);
                 if (nbyte > 0)
                   {
@@ -677,7 +677,7 @@ namespace os
                   {
                     object->tx_busy_ = false;
                   }
-                if (object->tx_buf_->isBelowLowWaterMark ())
+                if (object->tx_buf_->below_low_water_mark ())
                   {
                     // Wake up thread, to come and send more bytes.
                     object->tx_sem_.post ();
