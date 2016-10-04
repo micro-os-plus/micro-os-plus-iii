@@ -18,7 +18,7 @@
 #------------------------------------------------------------------------------
 
 ## PROJECT_NAME = 
-PROJECT_NAME = "µOS++ IIIe / CMSIS++ Reference"
+PROJECT_NAME = "µOS++ IIIe / CMSIS++ / POSIX++ Reference"
 
 ## PROJECT_NUMBER = 
 PROJECT_NUMBER = v6.3.7
