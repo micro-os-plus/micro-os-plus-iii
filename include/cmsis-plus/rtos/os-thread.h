@@ -1566,17 +1566,17 @@ namespace os
     public:
 
       // Intrusive node used to link this thread to parent list.
-      internal::double_list_links child_links_;
+      utils::double_list_links child_links_;
 
-      using threads_list = internal::intrusive_list<
-      thread, internal::double_list_links, &thread::child_links_>;
+      using threads_list = utils::intrusive_list<
+      thread, utils::double_list_links, &thread::child_links_>;
 
       // List of children threads. Force a clear.
       threads_list children_
         { true };
 
       // List of mutexes that this thread owns.
-      internal::double_list mutexes_;
+      utils::double_list mutexes_;
 
     protected:
 
@@ -2200,8 +2200,8 @@ namespace os
     inline std::size_t
     thread::stack::default_size (std::size_t size_bytes)
     {
-      assert(size_bytes != 0);
-      assert(size_bytes >= min_size_bytes_);
+      assert (size_bytes != 0);
+      assert (size_bytes >= min_size_bytes_);
 
       std::size_t tmp = default_size_bytes_;
       default_size_bytes_ = size_bytes;
@@ -2377,7 +2377,7 @@ namespace os
 
           // Simple test to verify that the old thread
           // did not underflow the stack.
-          assert(stack ().check_bottom_magic ());
+          assert (stack ().check_bottom_magic ());
         }
     }
 
@@ -2556,7 +2556,7 @@ namespace os
                 reinterpret_cast<stack::element_t*> ((const_cast<allocator_type&> (allocator)).allocate (
                     allocated_stack_size_elements_));
 
-            assert(allocated_stack_address_ != nullptr);
+            assert (allocated_stack_address_ != nullptr);
 
             internal_construct_ (
                 function,

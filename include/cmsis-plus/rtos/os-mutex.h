@@ -666,7 +666,7 @@ namespace os
 
       // Intrusive node used to link this mutex to the owning thread.
       // This is used for priority inheritance and robustness.
-      internal::double_list_links owner_links_;
+      utils::double_list_links owner_links_;
 
     protected:
 

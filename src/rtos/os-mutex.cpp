@@ -294,8 +294,8 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    using mutexes_list = internal::intrusive_list<
-    mutex, internal::double_list_links, &mutex::owner_links_>;
+    using mutexes_list = utils::intrusive_list<
+    mutex, utils::double_list_links, &mutex::owner_links_>;
 
     // ------------------------------------------------------------------------
 
@@ -533,8 +533,8 @@ namespace os
 
 #else
 
-      assert(owner_ == nullptr);
-      assert(list_.empty ());
+      assert (owner_ == nullptr);
+      assert (list_.empty ());
 
 #endif
     }
@@ -1312,7 +1312,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      assert(!interrupts::in_handler_mode ());
+      assert (!interrupts::in_handler_mode ());
 
 #if defined(OS_USE_RTOS_PORT_MUTEX)
 

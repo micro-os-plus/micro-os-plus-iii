@@ -50,8 +50,8 @@ namespace os
      */
 
     // ------------------------------------------------------------------------
-    using mutexes_list = internal::intrusive_list<
-    mutex, internal::double_list_links, &mutex::owner_links_>;
+    using mutexes_list = utils::intrusive_list<
+    mutex, utils::double_list_links, &mutex::owner_links_>;
 
     // ========================================================================
     /**
@@ -370,7 +370,7 @@ namespace os
               reinterpret_cast<stack::element_t*> (const_cast<allocator_type&> (allocator).allocate (
                   allocated_stack_size_elements_));
 
-          assert(allocated_stack_address_ != nullptr);
+          assert (allocated_stack_address_ != nullptr);
 
           internal_construct_ (
               function,
@@ -393,8 +393,8 @@ namespace os
     {
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
-      assert(function != nullptr);
-      assert(attr.th_priority != priority::none);
+      assert (function != nullptr);
+      assert (attr.th_priority != priority::none);
 
       clock_ = attr.clock != nullptr ? attr.clock : &sysclock;
 
@@ -403,7 +403,7 @@ namespace os
           // The attributes should not define any storage in this case.
           if (attr.th_stack_size_bytes > stack::min_size ())
             {
-              assert(attr.th_stack_address == nullptr);
+              assert (attr.th_stack_address == nullptr);
             }
 
           stack ().set (static_cast<stack::element_t*> (stack_address),
@@ -540,7 +540,7 @@ namespace os
 
 #else
 
-      assert(port::interrupts::is_priority_valid ());
+      assert (port::interrupts::is_priority_valid ());
 
         {
           // ----- Enter critical section -------------------------------------
@@ -827,7 +827,7 @@ namespace os
       os_assert_err(!scheduler::locked (), EPERM);
 
       // Fail if current thread
-      assert(this != this_thread::_thread ());
+      assert (this != this_thread::_thread ());
 
       while (state_ != state::destroyed)
         {
@@ -942,7 +942,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      assert(!interrupts::in_handler_mode ());
+      assert (!interrupts::in_handler_mode ());
 
         {
           // ----- Enter critical section -------------------------------------
@@ -958,11 +958,11 @@ namespace os
               // ----- Exit critical section ----------------------------------
             }
 
-          assert(children_.empty ());
+          assert (children_.empty ());
           parent_ = nullptr;
 
           // Non-robust mutexes acquired.
-          assert(acquired_mutexes_ == 0);
+          assert (acquired_mutexes_ == 0);
 
           func_result_ = exit_ptr;
           // ----- Exit critical section --------------------------------------
@@ -991,7 +991,7 @@ namespace os
 
 #endif
 
-      assert(true);
+      assert (true);
       while (true)
         ;
 
@@ -1003,8 +1003,8 @@ namespace os
     {
       if (stack ().size () > 0)
         {
-          assert(stack ().check_bottom_magic ());
-          assert(stack ().check_top_magic ());
+          assert (stack ().check_bottom_magic ());
+          assert (stack ().check_top_magic ());
 
 #if defined(OS_TRACE_RTOS_THREAD)
           trace::printf ("%s() @%p %s stack: %u/%u bytes used\n", __func__,
@@ -1118,10 +1118,10 @@ namespace os
               // ----- Exit critical section ----------------------------------
             }
 
-          assert(children_.empty ());
+          assert (children_.empty ());
           parent_ = nullptr;
 
-          assert(acquired_mutexes_ == 0);
+          assert (acquired_mutexes_ == 0);
 
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
@@ -1486,7 +1486,7 @@ namespace os
 
         th = _thread ();
 
-        assert(th != nullptr);
+        assert (th != nullptr);
         return (*th);
       }
 

@@ -35,134 +35,6 @@ namespace os
   {
     namespace internal
     {
-
-      // ======================================================================
-
-      /**
-       * @class static_double_list_links
-       * @details
-       * This is the simplest list node, used as base class for other
-       * list nodes and as storage for static_double_list,
-       * that must be available for any statically constructed
-       * objects while still avoiding the 'static initialisation order fiasco'.
-       *
-       * The idea is to design the object in such a way as to benefit
-       * from the standard BSS initialisation, in other words take `nullptr`
-       * as starting values.
-       */
-
-      /**
-       * @details
-       * Update the neighbours to
-       * point to each other, skipping the node.
-       *
-       * For more robustness, to prevent unexpected accesses,
-       * the links in the removed node are nullified.
-       */
-      void
-      static_double_list_links::unlink (void)
-      {
-        // Check if not already unlinked.
-        if (unlinked ())
-          {
-            assert(prev_ == nullptr);
-#if defined(OS_TRACE_RTOS_LISTS)
-            trace::printf ("%s() %p nop\n", __func__, this);
-#endif
-            return;
-          }
-
-#if defined(OS_TRACE_RTOS_LISTS)
-        trace::printf ("%s() %p \n", __func__, this);
-#endif
-
-        // Make neighbours point to each other.
-        prev_->next_ = next_;
-        next_->prev_ = prev_;
-
-        // Nullify both pointers in the unlinked node.
-        prev_ = nullptr;
-        next_ = nullptr;
-      }
-
-      // ======================================================================
-
-      /**
-       * @class static_double_list
-       * @details
-       * This is the simplest list, used as base class for scheduler
-       * lists that must be available for any statically constructed
-       * thread while still avoiding the 'static initialisation order fiasco'.
-       *
-       * The idea is to design the object in such a way as to benefit
-       * from the standard BSS initialisation, in other words take `nullptr`
-       * as starting values.
-       *
-       * This has the downside of requiring additional tests before
-       * adding new nodes to the list, to create the initial self
-       * links, and when checking if the list is empty.
-       */
-
-      /**
-       * @details
-       * Initialise the mandatory node with links to itself.
-       */
-      void
-      static_double_list::clear (void)
-      {
-        head_.next (const_cast<static_double_list_links*> (&head_));
-        head_.prev (const_cast<static_double_list_links*> (&head_));
-      }
-
-      void
-      static_double_list::insert_after (static_double_list_links& node,
-                                        static_double_list_links* after)
-      {
-#if defined(OS_TRACE_RTOS_LISTS)
-        trace::printf ("%s() n=%p after %p\n", __func__, &node, after);
-#endif
-
-        assert(node.prev () == nullptr);
-        assert(node.next () == nullptr);
-        assert(after->next () != nullptr);
-
-        // Make the new node point to its neighbours.
-        node.prev (after);
-        node.next (after->next ());
-
-        // Make the neighbours point to the node. The order is important.
-        after->next ()->prev (&node);
-        after->next (&node);
-      }
-
-      // ======================================================================
-
-      /**
-       * @details
-       * The initial list status is empty.
-       */
-      double_list::double_list ()
-      {
-#if defined(OS_TRACE_RTOS_LISTS_CONSTRUCT)
-        trace::printf ("%s() %p \n", __func__, this);
-#endif
-
-        clear ();
-      }
-
-      /**
-       * @details
-       * There must be no nodes in the list.
-       */
-      double_list::~double_list ()
-      {
-#if defined(OS_TRACE_RTOS_LISTS_CONSTRUCT)
-        trace::printf ("%s() %p \n", __func__, this);
-#endif
-
-        assert(empty ());
-      }
-
       // ======================================================================
 
       void
@@ -170,7 +42,7 @@ namespace os
       {
         // Add thread intrusive node at the end of the list.
         insert_after (thread.child_links_,
-                      const_cast<static_double_list_links*> (tail ()));
+                      const_cast<utils::static_double_list_links*> (tail ()));
       }
 
       // ======================================================================
@@ -187,7 +59,7 @@ namespace os
         thread::priority_t prio = node.thread_->priority ();
 
         waiting_thread_node* after =
-            static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (tail ()));
+            static_cast<waiting_thread_node*> (const_cast<utils::static_double_list_links *> (tail ()));
 
         if (empty ())
           {
@@ -208,7 +80,7 @@ namespace os
           {
             // Insert at the beginning of the list.
             after =
-                static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (&head_));
+                static_cast<waiting_thread_node*> (const_cast<utils::static_double_list_links *> (&head_));
 #if defined(OS_TRACE_RTOS_LISTS)
             trace::printf ("ready %s() front +%u %u \n", __func__, prio,
                            head ()->thread_->priority ());
@@ -222,7 +94,7 @@ namespace os
             while (prio > after->thread_->priority ())
               {
                 after =
-                    static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (after->prev ()));
+                    static_cast<waiting_thread_node*> (const_cast<utils::static_double_list_links *> (after->prev ()));
               }
 #if defined(OS_TRACE_RTOS_LISTS)
             trace::printf ("ready %s() middle %u +%u \n", __func__,
@@ -242,7 +114,7 @@ namespace os
       thread*
       ready_threads_list::unlink_head (void)
       {
-        assert(!empty ());
+        assert (!empty ());
 
         thread* th = head ()->thread_;
 
@@ -252,7 +124,7 @@ namespace os
 
         const_cast<waiting_thread_node*> (head ())->unlink ();
 
-        assert(th != nullptr);
+        assert (th != nullptr);
 
         // Unlinking is immediately followed by a context switch,
         // so in order to guarantee that the thread is marked as
@@ -312,7 +184,7 @@ namespace os
         thread::priority_t prio = node.thread_->priority ();
 
         waiting_thread_node* after =
-            static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (tail ()));
+            static_cast<waiting_thread_node*> (const_cast<utils::static_double_list_links *> (tail ()));
 
         if (empty ())
           {
@@ -333,7 +205,7 @@ namespace os
           {
             // Insert at the beginning of the list.
             after =
-                static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (&head_));
+                static_cast<waiting_thread_node*> (const_cast<utils::static_double_list_links *> (&head_));
 #if defined(OS_TRACE_RTOS_LISTS)
             trace::printf ("wait %s() front +%u %u \n", __func__, prio,
                            head ()->thread_->priority ());
@@ -347,7 +219,7 @@ namespace os
             while (prio > after->thread_->priority ())
               {
                 after =
-                    static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (after->prev ()));
+                    static_cast<waiting_thread_node*> (const_cast<utils::static_double_list_links *> (after->prev ()));
               }
 #if defined(OS_TRACE_RTOS_LISTS)
             trace::printf ("wait %s() middle %u +%u \n", __func__,
@@ -383,7 +255,7 @@ namespace os
             const_cast<waiting_thread_node*> (head ())->unlink ();
             // ----- Exit critical section ------------------------------------
           }
-        assert(th != nullptr);
+        assert (th != nullptr);
 
         thread::state_t state = th->state ();
         if (state != thread::state::destroyed)
@@ -514,7 +386,7 @@ namespace os
         clock::timestamp_t timestamp = node.timestamp;
 
         timeout_thread_node* after =
-            static_cast<timeout_thread_node*> (const_cast<static_double_list_links *> (tail ()));
+            static_cast<timeout_thread_node*> (const_cast<utils::static_double_list_links *> (tail ()));
 
         if (empty ())
           {
@@ -538,7 +410,7 @@ namespace os
             // Insert at the beginning of the list
             // and update the new head.
             after =
-                static_cast<timeout_thread_node*> (const_cast<static_double_list_links *> (&head_));
+                static_cast<timeout_thread_node*> (const_cast<utils::static_double_list_links *> (&head_));
 #if defined(OS_TRACE_RTOS_LISTS_CLOCKS)
             trace::printf ("clock %s() front +%u %u\n", __func__,
                 static_cast<uint32_t> (timestamp),
@@ -552,7 +424,7 @@ namespace os
             while (timestamp < after->timestamp)
               {
                 after =
-                    static_cast<timeout_thread_node*> (const_cast<static_double_list_links *> (after->prev ()));
+                    static_cast<timeout_thread_node*> (const_cast<utils::static_double_list_links *> (after->prev ()));
               }
 #if defined(OS_TRACE_RTOS_LISTS_CLOCKS)
             trace::printf ("clock %s() middle %u +%u\n", __func__,
@@ -620,7 +492,7 @@ namespace os
           }
 
         waiting_thread_node* after =
-            static_cast<waiting_thread_node*> (const_cast<static_double_list_links *> (tail ()));
+            static_cast<waiting_thread_node*> (const_cast<utils::static_double_list_links *> (tail ()));
 
 #if defined(OS_TRACE_RTOS_THREAD)
         trace::printf ("terminated %s() %p %s\n", __func__, &node.thread_,
