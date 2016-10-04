@@ -69,7 +69,6 @@ namespace os
        */
 
       // ----------------------------------------------------------------------
-
       /**
        * @name Constructors & Destructor
        * @{
@@ -78,7 +77,22 @@ namespace os
     public:
 
       device_char (const char* name);
+
+      /**
+       * @cond ignore
+       */
+
+      // The rule of five.
       device_char (const device_char&) = delete;
+      device_char (device_char&&) = delete;
+      device_char&
+      operator= (const device_char&) = delete;
+      device_char&
+      operator= (device_char&&) = delete;
+
+      /**
+       * @endcond
+       */
 
       virtual
       ~device_char ();

@@ -59,7 +59,22 @@ namespace os
     public:
 
       pool (std::size_t size);
+
+      /**
+       * @cond ignore
+       */
+
+      // The rule of five.
       pool (const pool&) = delete;
+      pool (pool&&) = delete;
+      pool&
+      operator= (const pool&) = delete;
+      pool&
+      operator= (pool&&) = delete;
+
+      /**
+       * @endcond
+       */
 
       virtual
       ~pool ();
@@ -149,7 +164,21 @@ namespace os
 
         pool_typed (std::size_t size);
 
+        /**
+         * @cond ignore
+         */
+
+        // The rule of five.
         pool_typed (const pool_typed&) = delete;
+        pool_typed (pool_typed&&) = delete;
+        pool_typed&
+        operator= (const pool_typed&) = delete;
+        pool_typed&
+        operator= (pool_typed&&) = delete;
+
+        /**
+         * @endcond
+         */
 
         virtual
         ~pool_typed ();

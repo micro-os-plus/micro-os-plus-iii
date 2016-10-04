@@ -64,7 +64,22 @@ namespace os
     public:
 
       mount_manager (std::size_t size);
+
+      /**
+       * @cond ignore
+       */
+
+      // The rule of five.
       mount_manager (const mount_manager&) = delete;
+      mount_manager (mount_manager&&) = delete;
+      mount_manager&
+      operator= (const mount_manager&) = delete;
+      mount_manager&
+      operator= (mount_manager&&) = delete;
+
+      /**
+       * @endcond
+       */
 
       ~mount_manager ();
 

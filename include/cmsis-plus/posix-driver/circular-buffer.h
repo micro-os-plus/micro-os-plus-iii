@@ -74,6 +74,24 @@ namespace os
         circular_buffer (const value_type* buf, std::size_t size);
 
         /**
+         * @cond ignore
+         */
+
+        // The rule of five.
+        circular_buffer (const circular_buffer&) = delete;
+        circular_buffer (circular_buffer&&) = delete;
+        circular_buffer&
+        operator= (const circular_buffer&) = delete;
+        circular_buffer&
+        operator= (circular_buffer&&) = delete;
+
+        /**
+         * @endcond
+         */
+
+        ~circular_buffer () = default;
+
+        /**
          * @}
          */
 

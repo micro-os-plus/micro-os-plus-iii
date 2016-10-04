@@ -78,16 +78,21 @@ namespace os
                                 os::posix::circular_buffer_bytes* rx_buf,
                                 os::posix::circular_buffer_bytes* tx_buf);
 
-        // Prevent copy, move, assign
+        /**
+         * @cond ignore
+         */
+
+        // The rule of five.
         device_serial_buffered (const device_serial_buffered&) = delete;
-
         device_serial_buffered (device_serial_buffered&&) = delete;
-
         device_serial_buffered&
         operator= (const device_serial_buffered&) = delete;
-
         device_serial_buffered&
         operator= (device_serial_buffered&&) = delete;
+
+        /**
+         * @endcond
+         */
 
         virtual
         ~device_serial_buffered ();

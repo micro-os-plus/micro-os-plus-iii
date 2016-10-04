@@ -64,7 +64,22 @@ namespace os
     public:
 
       device_char_registry (std::size_t size);
+
+      /**
+       * @cond ignore
+       */
+
+      // The rule of five.
       device_char_registry (const device_char_registry&) = delete;
+      device_char_registry (device_char_registry&&) = delete;
+      device_char_registry&
+      operator= (const device_char_registry&) = delete;
+      device_char_registry&
+      operator= (device_char_registry&&) = delete;
+
+      /**
+       * @endcond
+       */
 
       ~device_char_registry ();
 

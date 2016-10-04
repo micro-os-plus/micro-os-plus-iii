@@ -66,7 +66,6 @@ namespace os
      */
 
     // ------------------------------------------------------------------------
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
@@ -98,7 +97,22 @@ namespace os
     public:
 
       directory (void);
+
+      /**
+       * @cond ignore
+       */
+
+      // The rule of five.
       directory (const directory&) = delete;
+      directory (directory&&) = delete;
+      directory&
+      operator= (const directory&) = delete;
+      directory&
+      operator= (directory&&) = delete;
+
+      /**
+       * @endcond
+       */
 
       virtual
       ~directory ();

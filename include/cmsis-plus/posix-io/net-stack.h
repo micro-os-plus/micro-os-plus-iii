@@ -69,7 +69,22 @@ namespace os
     public:
 
       net_stack (pool* sockets_pool);
+
+      /**
+       * @cond ignore
+       */
+
+      // The rule of five.
       net_stack (const net_stack&) = delete;
+      net_stack (net_stack&&) = delete;
+      net_stack&
+      operator= (const net_stack&) = delete;
+      net_stack&
+      operator= (net_stack&&) = delete;
+
+      /**
+       * @endcond
+       */
 
       ~net_stack ();
 

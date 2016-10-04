@@ -91,7 +91,6 @@ namespace os
        */
 
       // ----------------------------------------------------------------------
-
       /**
        * @name Constructors & Destructor
        * @{
@@ -100,6 +99,22 @@ namespace os
     public:
 
       socket ();
+
+      /**
+       * @cond ignore
+       */
+
+      // The rule of five.
+      socket (const socket&) = delete;
+      socket (socket&&) = delete;
+      socket&
+      operator= (const socket&) = delete;
+      socket&
+      operator= (socket&&) = delete;
+
+      /**
+       * @endcond
+       */
 
       virtual
       ~socket ();

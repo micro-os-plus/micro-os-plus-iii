@@ -55,6 +55,24 @@ namespace os
       net_interface () = default;
 
       /**
+       * @cond ignore
+       */
+
+      // The rule of five.
+      net_interface (const net_interface&) = delete;
+      net_interface (net_interface&&) = delete;
+      net_interface&
+      operator= (const net_interface&) = delete;
+      net_interface&
+      operator= (net_interface&&) = delete;
+
+      /**
+       * @endcond
+       */
+
+      ~net_interface () = default;
+
+      /**
        * @}
        */
 

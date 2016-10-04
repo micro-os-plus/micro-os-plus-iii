@@ -56,6 +56,24 @@ namespace os
       device_block () = default;
 
       /**
+       * @cond ignore
+       */
+
+      // The rule of five.
+      device_block (const device_block&) = delete;
+      device_block (device_block&&) = delete;
+      device_block&
+      operator= (const device_block&) = delete;
+      device_block&
+      operator= (device_block&&) = delete;
+
+      /**
+       * @endcond
+       */
+
+      ~device_block () = default;
+
+      /**
        * @}
        */
 

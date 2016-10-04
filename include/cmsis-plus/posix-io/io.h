@@ -124,7 +124,22 @@ namespace os
     protected:
 
       io (type t);
+
+      /**
+       * @cond ignore
+       */
+
+      // The rule of five.
       io (const io&) = delete;
+      io (io&&) = delete;
+      io&
+      operator= (const io&) = delete;
+      io&
+      operator= (io&&) = delete;
+
+      /**
+       * @endcond
+       */
 
     public:
       virtual

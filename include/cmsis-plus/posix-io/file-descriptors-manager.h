@@ -68,7 +68,22 @@ namespace os
     public:
 
       file_descriptors_manager (std::size_t size);
+
+      /**
+       * @cond ignore
+       */
+
+      // The rule of five.
       file_descriptors_manager (const file_descriptors_manager&) = delete;
+      file_descriptors_manager (file_descriptors_manager&&) = delete;
+      file_descriptors_manager&
+      operator= (const file_descriptors_manager&) = delete;
+      file_descriptors_manager&
+      operator= (file_descriptors_manager&&) = delete;
+
+      /**
+       * @endcond
+       */
 
       ~file_descriptors_manager ();
 

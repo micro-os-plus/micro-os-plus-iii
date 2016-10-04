@@ -150,7 +150,22 @@ namespace os
     public:
 
       file_system (pool* filesPool, pool* dirs_pool);
+
+      /**
+       * @cond ignore
+       */
+
+      // The rule of five.
       file_system (const file_system&) = delete;
+      file_system (file_system&&) = delete;
+      file_system&
+      operator= (const file_system&) = delete;
+      file_system&
+      operator= (file_system&&) = delete;
+
+      /**
+       * @endcond
+       */
 
       virtual
       ~file_system ();
