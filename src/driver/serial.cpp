@@ -35,6 +35,8 @@
  */
 
 #include <cmsis-plus/driver/serial.h>
+#include <cmsis-plus/diag/trace.h>
+
 #include <cassert>
 
 // ----------------------------------------------------------------------------
@@ -47,6 +49,8 @@ namespace os
 
     Serial::Serial () noexcept
     {
+      trace::printf ("%s() %p\n", __func__, this);
+
       cb_func_ = nullptr;
       cb_object_ = nullptr;
 
@@ -55,7 +59,7 @@ namespace os
 
     Serial::~Serial () noexcept
     {
-      ;
+      trace::printf ("%s() %p\n", __func__, this);
     }
 
     // ----------------------------------------------------------------------

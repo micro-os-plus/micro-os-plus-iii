@@ -26,6 +26,7 @@
  */
 
 #include <cmsis-plus/driver/usbd-wrapper.h>
+#include <cmsis-plus/diag/trace.h>
 #include <Driver_USBD.h>
 
 #include <cassert>
@@ -47,11 +48,13 @@ namespace os
     c_cb_device_func_ (c_cb_device_func),
     c_cb_endpoint_func_ (c_cb_endpoint_func)
       {
-        ;
+        trace::printf("%s() %p\n", __func__, this);
       }
 
     usbd_wrapper::~usbd_wrapper () noexcept
     {
+      trace::printf ("%s() %p\n", __func__, this);
+
       driver_ = nullptr;
     }
 

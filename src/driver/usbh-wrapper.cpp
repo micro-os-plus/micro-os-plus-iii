@@ -26,6 +26,7 @@
  */
 
 #include <cmsis-plus/driver/usbh-wrapper.h>
+#include <cmsis-plus/diag/trace.h>
 #include <Driver_USBH.h>
 
 #include <cassert>
@@ -47,11 +48,13 @@ namespace os
     c_cb_port_func_ (c_cb_port_func),
     c_cb_pipe_func_ (c_cb_pipe_func)
       {
-        ;
+        trace::printf("%s() %p\n", __func__, this);
       }
 
     usbh_wrapper::~usbh_wrapper () noexcept
     {
+      trace::printf ("%s() %p\n", __func__, this);
+
       driver_ = nullptr;
     }
 

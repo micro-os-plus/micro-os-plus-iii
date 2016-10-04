@@ -26,6 +26,7 @@
  */
 
 #include <cmsis-plus/driver/usart-wrapper.h>
+#include <cmsis-plus/diag/trace.h>
 #include <Driver_USART.h>
 
 #include <utility>
@@ -44,11 +45,13 @@ namespace os
     driver_ (driver),
     c_cb_func_ (c_cb_func)
       {
-        ;
+        trace::printf("%s() %p\n", __func__, this);
       }
 
     usart_wrapper::~usart_wrapper () noexcept
     {
+      trace::printf ("%s() %p\n", __func__, this);
+
       driver_ = nullptr;
     }
 

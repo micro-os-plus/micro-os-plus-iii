@@ -35,6 +35,7 @@
  */
 
 #include <cmsis-plus/driver/usb-device.h>
+#include <cmsis-plus/diag/trace.h>
 #include <cassert>
 
 // ----------------------------------------------------------------------------
@@ -49,6 +50,8 @@ namespace os
 
       Device::Device () noexcept
       {
+        trace::printf ("%s() %p\n", __func__, this);
+
         cb_device_func_ = nullptr;
         cb_device_object_ = nullptr;
 
@@ -58,7 +61,7 @@ namespace os
 
       Device::~Device () noexcept
       {
-        ;
+        trace::printf ("%s() %p\n", __func__, this);
       }
 
       void

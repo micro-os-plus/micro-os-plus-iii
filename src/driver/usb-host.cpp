@@ -35,6 +35,7 @@
  */
 
 #include <cmsis-plus/driver/usb-host.h>
+#include <cmsis-plus/diag/trace.h>
 #include <cassert>
 
 // ----------------------------------------------------------------------------
@@ -49,6 +50,8 @@ namespace os
 
       Host::Host () noexcept
       {
+        trace::printf ("%s() %p\n", __func__, this);
+
         cb_port_func_ = nullptr;
         cb_port_object_ = nullptr;
 
@@ -58,7 +61,7 @@ namespace os
 
       Host::~Host () noexcept
       {
-        ;
+        trace::printf ("%s() %p\n", __func__, this);
       }
 
       void
