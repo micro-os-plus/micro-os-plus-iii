@@ -207,15 +207,18 @@ namespace os
 
     template<typename CS>
       device_serial_buffered<CS>::device_serial_buffered (
-          const char* deviceName, //
+          const char* device_name, //
           os::driver::Serial* driver, os::posix::circular_buffer_bytes* rx_buf,
           os::posix::circular_buffer_bytes* tx_buf) :
           //
-          device_char (deviceName), // Construct parent.
+          device_char (device_name), // Construct parent.
           driver_ (driver), //
           rx_buf_ (rx_buf), //
           tx_buf_ (tx_buf) //
       {
+        trace::printf ("%s(\"%s\",%p,%p,%p) %p\n", __func__, device_name,
+                       driver, rx_buf, tx_buf, this);
+
         assert (rx_buf != nullptr);
 
         // Do not check the same for tx_buf, it may be null.
@@ -227,6 +230,8 @@ namespace os
     template<typename CS>
       device_serial_buffered<CS>::~device_serial_buffered ()
       {
+        trace::printf ("%s() %p\n", __func__, this);
+
         driver_ = nullptr;
         is_connected_ = false;
         is_opened_ = false;

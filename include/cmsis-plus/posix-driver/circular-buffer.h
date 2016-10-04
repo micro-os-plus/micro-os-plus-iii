@@ -243,13 +243,13 @@ namespace os
           circular_buffer
             { buf, siz, siz, 0 }
       {
-        ;
+        trace::printf ("%s(%p,%u) %p\n", __func__, buf, siz, this);
       }
 
     template<typename T>
       circular_buffer<T>::~circular_buffer ()
       {
-        ;
+        trace::printf ("%s() %p\n", __func__, this);
       }
 
     // ------------------------------------------------------------------------
