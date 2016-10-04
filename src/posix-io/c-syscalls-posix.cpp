@@ -829,14 +829,14 @@ initialise_monitor_handles (void)
 // with the newlib reentrant code, redefine
 // some functions with _name(), others directly with name().
 
-#include "c-posix-syscalls-aliases-newlib.h"
+#include <cmsis-plus/posix-io/c-syscalls-aliases-newlib.h>
 
 #else
 
 // For regular embedded environment that use POSIX system calls,
 // redefine **all** functions without the '__posix_' prefix.
 
-#include "c-posix-syscalls-aliases-standard.h"
+#include <cmsis-plus/posix-io/c-syscalls-aliases-standard.h>
 
 #endif
 
