@@ -150,4 +150,11 @@
  providing a reasonable functionality.
  */
 
+/**
+ @defgroup cmsis-plus-utils Utilities
+ @brief  Application utility classes and functions.
+ @details
+ 
+ */
+
 // ----------------------------------------------------------------------------
