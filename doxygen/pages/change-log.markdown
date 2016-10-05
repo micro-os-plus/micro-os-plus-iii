@@ -144,4 +144,19 @@ Changes, in reverse chronological order:
 
 Experience proved that one of the above changes was trickier than planned: the rename of the `os_startup_initialize_hardware()`, since without the renamed function the linker used the weak version of this function. To help developers, the weak definition was temporarily disabled, so if this function was not yet renamed in the application, the linker will complain. 
 
+### v6.3.8 2016-10-05
+
+- refine thread user storage support, available only when `OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE`
+- startup: temporarily disable weak `os_startup_initialize_hardware()`
+- rename `startup.c` -> `startup.cpp` to be able to call C++ code, like the code to initialise the main stack
+- rename `OS_USE_RTOS_PORT_SYSTICK_CLOCK_SLEEP_FOR` -> `OS_USE_RTOS_PORT_CLOCK_SYSTICK_WAIT_FOR`
+- rename `OS_USE_RTOS_PORT_REALTIME_CLOCK_SLEEP_FOR` -> `OS_USE_RTOS_PORT_CLOCK_REALTIME_WAIT_FOR`
+- os-c-wrapper: fix object creation return values
+- idle thread: use separate `os_rtos_idle_actions ()`
+- integrate posix-io & posix-driver git subtrees
+- rename folder `cmsis-plus/drivers` -> `cmsis-plus/driver` (singular)
+- update posix-io & posix-driver to all lower case naming convention
+- add separate utils, with generic utility code, like lists
+- automate char device registry by using lists; no more need to manually add/remove devices
+
 ---
