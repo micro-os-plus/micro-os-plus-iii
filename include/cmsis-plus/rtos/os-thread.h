@@ -2098,6 +2098,7 @@ namespace os
     inline void
     thread::stack::set (stack::element_t* address, std::size_t size_bytes)
     {
+      assert (size_bytes >= min_size_bytes_);
       bottom_address_ = address;
       size_bytes_ = size_bytes;
     }
