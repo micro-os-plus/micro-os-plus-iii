@@ -30,7 +30,33 @@ do_add_micro_os_plus_iii_xpack() {
 
   while [ $# -ge 1 ]
   do
-    do_add_content "${pack_folder}/src/$1" 
+    case "$1" in
+    tests)
+      do_prepare_dest "${pack_name}"
+      do_add_content "${pack_folder}/tests"
+      ;;
+    posix-io | driver)
+      do_prepare_dest "${pack_name}/src"
+      do_add_content "${pack_folder}/src/$1"
+      ;;
+    esac
+
+    shift
+  done
+}
+
+do_add_micro_os_plus_iii_tests_xpack() {
+  local pack_name='micro-os-plus-iii'
+  do_tell_xpack "${pack_name}-xpack"
+
+  do_select_pack_folder "ilg/${pack_name}.git"
+
+  do_prepare_dest "${pack_name}/tests"
+
+  while [ $# -ge 1 ]
+  do
+    do_add_content "${pack_folder}/tests/$1"
+    
     shift
   done
 }
