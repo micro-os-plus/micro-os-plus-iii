@@ -108,7 +108,7 @@ namespace os
     puts (const char* s)
     {
       int ret = static_cast<int> (write (s, strlen (s)));
-      if (ret > 0)
+      if (ret >= 0)
         {
           ret = static_cast<int> (write ("\n", 1)); // Add a line terminator
         }
