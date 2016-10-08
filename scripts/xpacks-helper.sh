@@ -12,7 +12,6 @@ do_add_micro_os_plus_iii_xpack() {
   do_tell_xpack "${pack_name}-xpack"
 
   do_select_pack_folder "ilg/${pack_name}.git"
-  do_check_micro_os_plus "${pack_name}"
 
   # Exception to the rule, folder is micro-os-plus, not cmsis-plus; 
   # The package will be renamed.
