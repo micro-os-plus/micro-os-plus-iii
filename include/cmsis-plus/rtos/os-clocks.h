@@ -181,7 +181,7 @@ namespace os
        * @brief Tell the current time since startup.
        * @par Parameters
        *  None.
-       * @return The clock current timestamp (time units from startup).
+       * @return The clock current steady timestamp (time units from startup).
        */
       timestamp_t
       steady_now (void);
@@ -217,6 +217,14 @@ namespace os
        */
       result_t
       wait_for (duration_t timeout);
+
+      /**
+       * @brief Increase the internal count after a deep sleep.
+       * @param duration Number of ticks lost during sleep.
+       * @return The clock current steady timestamp (time units from startup).
+       */
+      timestamp_t
+      update_for_slept_time (duration_t duration);
 
       /**
        * @cond ignore

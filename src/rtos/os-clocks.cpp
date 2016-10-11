@@ -308,6 +308,28 @@ namespace os
     }
 
     /**
+     * @details
+     * During deep sleep the interrupts used to count clock ticks are
+     * usually disabled and an external RTC is configured to wake-up the
+     * device, so a number of clock ticks are lost.
+     *
+     * To keep the clocks accurate, it is recommended to sample the
+     * external RTC before entering deep sleep and again when the device
+     * is back to life, compute the time slept as difference, and
+     * use this function to update the internal clock counter.
+     */
+    clock::timestamp_t
+    clock::update_for_slept_time (duration_t duration)
+    {
+      // ----- Enter critical section -----------------------------------------
+      interrupts::critical_section ics;
+
+      steady_count_ += duration;
+      return steady_count_;
+      // ----- Exit critical section ------------------------------------------
+    }
+
+    /**
      * @cond ignore
      */
 
@@ -666,7 +688,7 @@ namespace os
 #if defined(OS_TRACE_RTOS_CLOCKS)
       trace::printf ("clock_rtc::%s()\n", __func__);
 #endif
-      assert(!interrupts::in_handler_mode ());
+      assert (!interrupts::in_handler_mode ());
 
       // TODO: Use the RTC driver to initialise the seconds to epoch.
     }
