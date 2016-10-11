@@ -68,6 +68,7 @@ namespace
   [[noreturn]] static void
   _main_trampoline (void)
   {
+    trace::puts ("");
     trace::dump_args (main_args.argc, main_args.argv);
 
     int code = os_main (main_args.argc, main_args.argv);
@@ -113,8 +114,7 @@ main (int argc, char* argv[])
 {
   using namespace os::rtos;
 
-  trace::printf ("\nµOS++ v" OS_STRING_RTOS_IMPL_VERSION
-  " / CMSIS++ RTOS API v" OS_STRING_RTOS_API_VERSION ".\n");
+  trace::printf ("\nµOS++ IIIe RTOS v" OS_STRING_RTOS_IMPL_VERSION ".\n");
   trace::printf ("Copyright (c) 2016 Liviu Ionescu.\n");
 
   port::scheduler::greeting ();
@@ -123,6 +123,10 @@ main (int argc, char* argv[])
                  rtos::clock_systick::frequency_hz);
   trace::printf ("Default stack size: %u bytes.\n",
                  thread::stack::default_size ());
+#if defined(OS_HAS_INTERRUPTS_STACK)
+  trace::printf ("Interrupts stack size: %u bytes.\n",
+                 interrupts::stack ()->size ());
+#endif /* defined(OS_HAS_INTERRUPTS_STACK) */
 
 #if defined(__clang__)
   trace::printf ("Built with clang " __VERSION__);
@@ -135,7 +139,7 @@ main (int argc, char* argv[])
 #else
   trace::printf (", no exceptions");
 #endif
-  trace::puts (".");
+  trace::puts (".\n");
 
   scheduler::initialize ();
 
@@ -206,7 +210,7 @@ os_terminate_goodbye (void)
   trace::printf (
       "Interrupts stack: %u/%u bytes used\n",
       rtos::interrupts::stack ()->size ()
-      - rtos::interrupts::stack ()->available (),
+          - rtos::interrupts::stack ()->available (),
       rtos::interrupts::stack ()->size ());
 #endif /* defined(OS_HAS_INTERRUPTS_STACK) */
 
