@@ -33,7 +33,7 @@ do_add_micro_os_plus_iii_xpack() {
     case "$1" in
     tests)
       do_prepare_dest "${pack_name}"
-      do_add_content "${pack_folder}/tests"
+      do_add_content "${pack_folder}/test"
       ;;
     posix-io | driver)
       do_prepare_dest "${pack_name}/src"
@@ -51,11 +51,11 @@ do_add_micro_os_plus_iii_tests_xpack() {
 
   do_select_pack_folder "ilg/${pack_name}.git"
 
-  do_prepare_dest "${pack_name}/tests"
+  do_prepare_dest "${pack_name}/test"
 
   while [ $# -ge 1 ]
   do
-    do_add_content "${pack_folder}/tests/$1"
+    do_add_content "${pack_folder}/test/$1"
     
     shift
   done
