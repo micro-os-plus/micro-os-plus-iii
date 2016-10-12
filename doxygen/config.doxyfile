@@ -30,7 +30,7 @@ PROJECT_BRIEF = "The third edition of µOS++ and CMSIS++, a proposal for the nex
 PROJECT_LOGO = logo.png
 
 ## OUTPUT_DIRECTORY = 
-OUTPUT_DIRECTORY = ../../../../../micro-os-plus.github.io-source.git/reference/
+OUTPUT_DIRECTORY = "/Users/ilg/My Files/MacBookPro Projects/uOS/micro-os-plus.github.io-source.git/reference/"
 
 ## INLINE_INHERITED_MEMB = NO
 INLINE_INHERITED_MEMB = YES
