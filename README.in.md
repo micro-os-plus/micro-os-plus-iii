@@ -8,11 +8,20 @@ The **µOS++ IIIe** _(micro oh ɛs plus plus third edition)_ project is the thir
 
 ## Status
 
-The µOS++ project is fully functional for Cortex-M devices and also runs on synthetic POSIX platforms (like macOS and GNU/Linux)
+The µOS++ project is fully functional for Cortex-M devices and also runs on synthetic POSIX platforms (like macOS and GNU/Linux).
+
+## Related projects
+
+The current µOS++ code tries to be as portable as possible.
+
+Specific implementations are available from separate projects:
+
+- the Cortex-M port of the scheduler is packed as [µOS++ IIIe Cortex-M xPack](https://github.com/micro-os-plus/micro-os-plus-iii-cortexm)
+- the synthetic POSIX port of the scheduler is packed as [POSIX arch xPack](https://github.com/micro-os-plus/posix-arch)
 
 ## Build Configuration
 
-To include this µOS++ port in a project, consider the following details.
+To include µOS++ in a project, in addition to one of the port specific project, consider the following details:
 
 ### Include folders
 
@@ -33,18 +42,9 @@ See [CMSIS++ Application Config](http://micro-os-plus.github.io/reference/cmsis-
 * the original ARM CMSIS documentation is available form 
 [keil.com](http://www.keil.com/pack/doc/CMSIS/General/html/index.html)
 
-## License
+## Demo projects
 
-CMSIS++ is provided free of charge under the terms of the [MIT License](https://opensource.org/licenses/MIT).
-
-## Related projects
-
-The current µOS++ code tries to be as portable as possible.
-
-Specific implementations are available from separate projects:
-
-- the Cortex-M port of the scheduler is packed as [µOS++ IIIe Cortex-M xPack](https://github.com/micro-os-plus/micro-os-plus-iii-cortexm)
-- the synthetic POSIX port of the scheduler is packed as [POSIX arch xPack](https://github.com/micro-os-plus/posix-arch)
+Examples on how to structure projects using µOS++, including integration with CubeMX for STM devices, can be found in the separate [GitHub project](https://github.com/micro-os-plus/eclipse-demo-projects).
 
 ## Tests
 
@@ -54,5 +54,11 @@ Specific implementations are available from separate projects:
 * tests/gcc - compile test with host GCC compiler
 
 The ARM CMSIS RTOS validator is available from a [separate project](https://github.com/xpacks/arm-cmsis-rtos-validator).
+
+To run these tests, several Eclipse projects are available in a separate [GitHub project](https://github.com/micro-os-plus/eclipse-test-projects).
+
+## License
+
+µOS++ is provided free of charge under the terms of the [MIT License](https://opensource.org/licenses/MIT).
 
 
