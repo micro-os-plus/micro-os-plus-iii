@@ -159,4 +159,14 @@ Experience proved that one of the above changes was trickier than planned: the r
 - add separate utils, with generic utility code, like lists
 - automate char device registry by using lists; no more need to manually add/remove devices
 
+### v6.3.9 2016-10-13
+
+- assert stack size > min_size_bytes_
+- diag/trace.cpp: `puts()` accepts empty string
+- rtos/os-main.cpp: display interrupts stack size
+- rtos/os-clock: add `update_for_slept_time()`
+- rename `tests` -> `test`
+- reorganise test with subfolders
+- rework xpack.json (rename to **µOS++ IIIe**)
+
 ---
