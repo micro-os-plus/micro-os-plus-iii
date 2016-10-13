@@ -93,7 +93,6 @@ os_rtos_idle_actions (void)
 
   if (!os_rtos_idle_enter_power_saving_mode_hook ())
     {
-
       port::scheduler::wait_for_interrupt ();
     }
 }

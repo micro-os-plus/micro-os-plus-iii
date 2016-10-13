@@ -45,19 +45,20 @@
 // ----------------------------------------------------------------------------
 
 #if defined(USE_FREERTOS)
-// Request the inclusion of custom implementations.
-#define OS_USE_RTOS_PORT_SCHEDULER                         (1)
+
+// Request the inclusion of a custom implementations.
+#define OS_USE_RTOS_PORT_SCHEDULER                      (1)
+
 #if 1
 #define OS_USE_RTOS_PORT_TIMER                          (1)
-#define OS_USE_RTOS_PORT_CLOCK_SYSTICK_WAIT_FOR        (1)
+#define OS_USE_RTOS_PORT_CLOCK_SYSTICK_WAIT_FOR         (1)
 #define OS_USE_RTOS_PORT_MUTEX                          (1)
-// #define OS_USE_RTOS_PORT_CONDITION_VARIABLE             (1)
 #define OS_USE_RTOS_PORT_SEMAPHORE                      (1)
-// #define OS_USE_RTOS_PORT_MEMORY_POOL                    (1)
 #define OS_USE_RTOS_PORT_MESSAGE_QUEUE                  (1)
 #define OS_USE_RTOS_PORT_EVENT_FLAGS                    (1)
 #endif
-#endif
+
+#endif /* defined(USE_FREERTOS) */
 
 // ----------------------------------------------------------------------------
 
