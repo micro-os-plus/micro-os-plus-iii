@@ -1,58 +1,3 @@
-# CMSIS++
-
-An xPack with the third version of µOS++, based on CMSIS++ (a proposal for a future CMSIS in C++)
-
-## Package
-
-[CMSIS++](https://github.com/micro-os-plus/micro-os-plus-iii) package details:
-
-* type: [xcdl](http://xcdl.github.io)
-* name: `ilg/micro-os-plus-iii`
-* git repo: https://github.com/micro-os-plus/micro-os-plus-iii.git
-* homepage: https://github.com/micro-os-plus/micro-os-plus-iii
-* latest archive: https://github.com/micro-os-plus/micro-os-plus-iii/archive/xpack.zip
-
-## Version
-
-* 0.1.1
-
-## Releases
-
-* none
-
-## Package maintainers
-
-* [Liviu Ionescu](http://liviusdotnet.worldpress.com) [&lt;ilg@livius.net&gt;](mailto:ilg@livius.net)
-
-## Content contributors
-
-* [Liviu Ionescu](http://liviusdotnet.worldpress.com) [&lt;ilg@livius.net&gt;](mailto:ilg@livius.net)
-
-## Support
-
-* [forum](http://www.element14.com/community/groups/gnu-arm-eclipse)
-* [bugs & enhancements](https://github.com/micro-os-plus/micro-os-plus-iii/issues)
-
-## Dependencies
-
-* none
-
-## Keywords
-
-* arm
-* cmsis
-* cortex
-* c++
-* rtos
-* drivers
-* scheduler
-* posix
-
-## License
-
-* [spdx](http://spdx.org/licenses/): MIT
-
---- 
 ## Purpose
 
 The **µOS++ IIIe** _(micro oh ɛs plus plus third edition)_ project is the third iteration of µOS++, a POSIX-like, portable, open source, royalty-free, multi-tasking real-time operating system intended for 32/64-bits embedded applications, written in C++. 
@@ -111,5 +56,3 @@ Specific implementations are available from separate projects:
 The ARM CMSIS RTOS validator is available from a [separate project](https://github.com/xpacks/arm-cmsis-rtos-validator).
 
 
-
---- 
