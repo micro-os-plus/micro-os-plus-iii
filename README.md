@@ -1,10 +1,10 @@
-# CMSIS++
+# µOS++ IIIe
 
 An xPack with the third version of µOS++, based on CMSIS++ (a proposal for a future CMSIS in C++)
 
 ## Package
 
-[CMSIS++](https://github.com/micro-os-plus/micro-os-plus-iii) package details:
+[µOS++ IIIe](https://github.com/micro-os-plus/micro-os-plus-iii) package details:
 
 * type: [xcdl](http://xcdl.github.io)
 * name: `ilg/micro-os-plus-iii`

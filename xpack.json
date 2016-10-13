@@ -2,7 +2,7 @@
 	"$schema": "http://xcdl.github.io/schemas/xpack-1-1.json",
 	"group": "ilg",
 	"name": "micro-os-plus-iii",
-	"title": "CMSIS++",
+	"title": "µOS++ IIIe",
 	"description": "An xPack with the third version of µOS++, based on CMSIS++ (a proposal for a future CMSIS in C++)",
 	"xcdlFile": ".xcdl.json",
 	"repository": 
