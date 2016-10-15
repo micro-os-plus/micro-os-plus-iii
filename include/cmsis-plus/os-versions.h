@@ -35,7 +35,9 @@
 //
 // MAJOR version when you make incompatible API changes,
 // MINOR version when you add functionality in a backwards-compatible manner,
-// PATCH version when you make backwards-compatible bug fixes.
+// PATCH version when you make backwards-compatible bug fixes,
+// PRE_RELEASE is a hyphen and a series of dot separated identifiers,
+// BUILD a plus sign and a series of dot separated identifiers.
 
 // ----------------------------------------------------------------------------
 
@@ -47,12 +49,16 @@
 // µOS++ version.
 #define OS_INTEGER_RTOS_IMPL_VERSION_MAJOR 6
 #define OS_INTEGER_RTOS_IMPL_VERSION_MINOR 3
-#define OS_INTEGER_RTOS_IMPL_VERSION_PATCH 9
+#define OS_INTEGER_RTOS_IMPL_VERSION_PATCH 10
+#define OS_STRING_RTOS_IMPL_VERSION_PRE_RELEASE "-beta"
+#define OS_STRING_RTOS_IMPL_VERSION_BUILD ""
 
 #define OS_STRING_RTOS_IMPL_VERSION \
   OS_MACRO_STRINGIFY(OS_INTEGER_RTOS_IMPL_VERSION_MAJOR) "." \
   OS_MACRO_STRINGIFY(OS_INTEGER_RTOS_IMPL_VERSION_MINOR) "." \
-  OS_MACRO_STRINGIFY(OS_INTEGER_RTOS_IMPL_VERSION_PATCH)
+  OS_MACRO_STRINGIFY(OS_INTEGER_RTOS_IMPL_VERSION_PATCH) \
+  OS_STRING_RTOS_IMPL_VERSION_PRE_RELEASE \
+  OS_STRING_RTOS_IMPL_VERSION_BUILD
 
 // ----------------------------------------------------------------------------
 
