@@ -325,6 +325,8 @@ namespace os
       interrupts::critical_section ics;
 
       steady_count_ += duration;
+
+      internal_check_timestamps ();
       return steady_count_;
       // ----- Exit critical section ------------------------------------------
     }

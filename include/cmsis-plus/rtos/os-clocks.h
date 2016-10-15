@@ -828,7 +828,7 @@ namespace os
     __attribute__((always_inline))
     clock::internal_increment_count (void)
     {
-      // Increment the systick count by 1.
+      // One more tick count passed.
       ++steady_count_;
     }
 
