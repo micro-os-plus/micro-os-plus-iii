@@ -205,7 +205,7 @@ namespace os
         // The actual chunk size, in bytes;
         // exactly after it comes the next chunk.
         std::size_t size;
-        // When chunk is in the free list, pointer to next chunk, .
+        // When chunk is in the free list, pointer to next chunk.
         // At this address, or slightly further if alignment was
         // required, starts the payload.
         struct chunk_s* next;

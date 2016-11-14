@@ -77,7 +77,10 @@ namespace os
     {
       // Fill it the first chunk.
       chunk_t* chunk = reinterpret_cast<chunk_t*> (arena_addr_);
+      // Entire arena is a big free chunk.
       chunk->size = total_bytes_;
+      // Mark the end of the list with a null pointer.
+      chunk->next = nullptr;
 
       allocated_bytes_ = 0;
       max_allocated_bytes_ = 0;
@@ -329,7 +332,7 @@ namespace os
             {
               // Coalesce chunk to the list head.
               chunk->size += free_list_->size;
-              chunk->next = free_list_->next;
+              chunk->next = free_list_->next; // May be nullptr
 
               // Coalescing means one less chunk.
               --free_chunks_;
@@ -372,7 +375,7 @@ namespace os
           --free_chunks_;
 
           // If the merged chunk is also adjacent to the chunk after it,
-          // merge again.
+          // merge again. Does not match if next_chunk == nullptr.
           if (reinterpret_cast<char *> (prev_chunk) + prev_chunk->size
               == reinterpret_cast<char *> (next_chunk))
             {
@@ -400,12 +403,13 @@ namespace os
 
           return;
         }
+      // Does not match if next_chunk == nullptr.
       else if (reinterpret_cast<char *> (chunk) + chunk->size
           == reinterpret_cast<char *> (next_chunk))
         {
           // The chunk to be freed is adjacent to a free chunk after it.
           chunk->size += next_chunk->size;
-          chunk->next = next_chunk->next;
+          chunk->next = next_chunk->next; // May be nullptr.
           prev_chunk->next = chunk;
 
           // Coalescing means one less chunk.
@@ -415,7 +419,7 @@ namespace os
         {
           // Not adjacent to any chunk. Just insert it.
           // The result is a new fragment. Not great...
-          chunk->next = next_chunk;
+          chunk->next = next_chunk; // May be nullptr.
           prev_chunk->next = chunk;
         }
     }
