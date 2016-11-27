@@ -169,4 +169,12 @@ Experience proved that one of the above changes was trickier than planned: the r
 - reorganise test with subfolders
 - rework xpack.json (rename to **µOS++ IIIe**)
 
+### v6.3.10 2016-11-27
+
+- os-clocks: check timestamps to trigger timer actions after deep sleep
+- first-fit-top: fix free list chunk init
+- startup/initialize-hardware.c: use `__ARM_FP` instead of `__VFP_FP__`
+- micro-os-plus-iii-cortexm.git/os-core: fix PendSV stack frame for FP
+- micro-os-plus-iii-cortexm.git/os-core: fix setMSP() optimisation bug
+
 ---
