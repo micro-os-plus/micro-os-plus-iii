@@ -14,7 +14,7 @@ An xPack with the third version of µOS++, based on CMSIS++ (a proposal for a fu
 
 ## Version
 
-* 6.3.8
+* 6.3.10
 
 ## Releases
 
