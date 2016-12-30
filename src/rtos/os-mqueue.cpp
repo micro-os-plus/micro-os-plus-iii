@@ -1194,7 +1194,6 @@ namespace os
       os_assert_err(!scheduler::locked (), EPERM);
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
-      os_assert_err(nbytes <= max_size, EMSGSIZE);
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
