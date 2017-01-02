@@ -2,6 +2,8 @@
 
 ## RTOS
 
+Records in chronologycal order.
+
 ### v0.1.1 2016-03-11 
 
 - initial version of the APIs announced on [ARM Connected Community](https://community.arm.com/groups/tools/blog/2016/03/11/cmsis-a-proposal-for-a-future-cmsis-written-in-c)
@@ -176,5 +178,12 @@ Experience proved that one of the above changes was trickier than planned: the r
 - startup/initialize-hardware.c: use `__ARM_FP` instead of `__VFP_FP__`
 - micro-os-plus-iii-cortexm.git/os-core: fix PendSV stack frame for FP
 - micro-os-plus-iii-cortexm.git/os-core: fix setMSP() optimisation bug
+
+### v6.3.11 2017-01-02
+
+- os-mqueue.cpp: remove wrong assert from *_receive()
+- cortexm/os-core.cpp: setMSP() with uint32_t* volatile vectors_addr
+- cortexm/os-core.cpp: align thread stack to 8 byte boundary
+- cortexm/os-core.cpp: assert both thread stack and MSP aligned
 
 ---
