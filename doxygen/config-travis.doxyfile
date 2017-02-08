@@ -19,10 +19,9 @@
 # Project related configuration options
 #------------------------------------------------------------------------------
 
-OUTPUT_DIRECTORY = "/Users/ilg/My Files/MacBookPro Projects/uOS/micro-os-plus.github.io-source.git/reference/"
+OUTPUT_DIRECTORY = "$(DOXYGEN_OUTPUT_DIRECTORY)"
 
-STRIP_FROM_PATH = \
-	"/Users/ilg/My Files/MacBookPro Projects/uOS/micro-os-plus-iii-tree.git/ilg/arm/cmsis-plus-xpack/"
+STRIP_FROM_PATH = "$(STRIP_FROM_PATH)"
 
 # QUIET = NO
 # QUIET = YES
