@@ -740,6 +740,22 @@
 #define OS_USE_TRACE_SEMIHOSTING_STDOUT
 
 /**
+ * @brief Forward trace messages via the POSIX STDOUT stream.
+ *
+ * @details
+ * By default, without any definition, the trace messages are ignored.
+ */
+#define OS_USE_TRACE_POSIX_STDOUT
+
+/**
+ * @brief Forward trace messages via the POSIX STDERR stream.
+ *
+ * @details
+ * By default, without any definition, the trace messages are ignored.
+ */
+#define OS_USE_TRACE_POSIX_STDERR
+
+/**
  * @brief Forward trace messages via the SEGGER RTT.
  *
  * @details

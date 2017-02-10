@@ -65,6 +65,10 @@
 #define OS_EXCLUDE_RTOS_IDLE_SLEEP (1)
 #endif
 
+#else
+
+#define OS_USE_TRACE_POSIX_STDOUT
+
 #endif /* defined(__ARM_EABI__) */
 
 #define OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES  (1)
