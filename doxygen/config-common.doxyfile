@@ -1,0 +1,168 @@
+# Doxyfile 1.8.11
+
+# This file describes the settings to be used by the documentation system
+# doxygen (www.doxygen.org) for a project.
+#
+# All text after a double hash (##) is considered a comment and is placed in
+# front of the TAG it is preceding.
+#
+# All text after a single hash (#) is considered a comment and will be ignored.
+# The format is:
+# TAG = value [value, ...]
+# For lists, items can also be appended using:
+# TAG += value [value, ...]
+# Values that contain spaces should be placed between quotes (\" \").
+
+#------------------------------------------------------------------------------
+# Project related configuration options
+#------------------------------------------------------------------------------
+
+# PROJECT_NAME = 
+PROJECT_NAME = "µOS++ IIIe / CMSIS++ / POSIX++ Reference"
+
+# PROJECT_NUMBER = 
+PROJECT_NUMBER = v6.3.11
+
+# PROJECT_BRIEF =
+PROJECT_BRIEF = "The third edition of µOS++ and CMSIS++, a proposal for the next generation CMSIS, written in C++."
+
+# PROJECT_LOGO = 
+PROJECT_LOGO = logo.png
+
+# WARN_AS_ERROR = NO
+WARN_AS_ERROR = YES
+
+INPUT = \
+	"pages" \
+	"../include/cmsis-plus/" \
+	"../src/" \
+	"../include/cmsis-plus/estd/chrono" \
+	"../include/cmsis-plus/estd/condition_variable" \
+	"../include/cmsis-plus/estd/mutex" \
+	"../include/cmsis-plus/estd/memory_resource" \
+	"../include/cmsis-plus/estd/system_error" \
+	"../include/cmsis-plus/estd/thread" \
+
+# test
+# _INPUT = \
+#	"pages" \
+#	"../include/cmsis-plus/rtos/os.h" \
+#	"../src/cmsis-plus/rtos/" \
+	
+EXCLUDE = \
+	"../src/cmsis-plus/rtos/os-impl.cpp" \
+	"../src/cmsis-plus/libcpp/chrono.cpp" \
+	"../src/cmsis-plus/libcpp/condition-variable.cpp" \
+	"../src/cmsis-plus/libcpp/mutex.cpp" \
+	"../src/cmsis-plus/libcpp/thread.cpp" \
+
+# INLINE_INHERITED_MEMB = NO
+INLINE_INHERITED_MEMB = YES
+
+# EXTRACT_ALL = NO
+EXTRACT_ALL = YES
+
+# EXTRACT_PRIVATE = NO
+EXTRACT_PRIVATE = YES
+
+# EXTRACT_STATIC = NO
+EXTRACT_STATIC = YES
+
+# EXTRACT_ANON_NSPACES = NO
+EXTRACT_ANON_NSPACES = YES
+
+# FILE_PATTERNS = 
+FILE_PATTERNS = *.doxygen *.markdown *.h *.c *.cpp *.
+# X=	chrono \
+#	condition_variable \
+#	mutex \
+#	system_error \
+#	thread \
+	
+# EXTENSION_MAPPING =
+EXTENSION_MAPPING = "no_extension=C++"
+
+# RECURSIVE = NO
+RECURSIVE = YES
+
+#INPUT_FILTER =
+INPUT_FILTER = "perl -p -e 's/__attribute__\s*[(]\s*[(].*?[)]\s*[)]//g'"
+
+# USE_MDFILE_AS_MAINPAGE =
+# USE_MDFILE_AS_MAINPAGE = main.markdown
+
+# SOURCE_BROWSER = NO
+SOURCE_BROWSER = YES
+
+# INLINE_SOURCES = NO
+#? INLINE_SOURCES = YES
+
+# REFERENCED_BY_RELATION = NO
+#? REFERENCED_BY_RELATION = YES
+
+# REFERENCES_RELATION = NO
+#? REFERENCES_RELATION = YES
+
+# GENERATE_LATEX = YES
+GENERATE_LATEX = NO
+
+# REPEAT_BRIEF = YES
+
+ENABLE_PREPROCESSING = YES
+
+# MACRO_EXPANSION = NO
+MACRO_EXPANSION = YES
+
+# PREDEFINED = 
+PREDEFINED = \
+__DOXYGEN__ \
+__cplusplus \
+__ARM_EABI__ \
+TRACE \
+OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES \
+OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES \
+OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES \
+
+# CLASS_DIAGRAMS = YES
+CLASS_DIAGRAMS = NO
+
+# LAYOUT_FILE =
+LAYOUT_FILE = DoxygenLayout.xml
+
+# HTML_HEADER =
+HTML_HEADER = header.html
+
+# HTML_EXTRA_STYLESHEET =
+HTML_EXTRA_STYLESHEET = custom.css
+
+# HTML_DYNAMIC_SECTIONS  = NO
+HTML_DYNAMIC_SECTIONS = YES
+
+# HTML_COLORSTYLE_SAT = 100
+HTML_COLORSTYLE_SAT = 0
+
+# HTML_COLORSTYLE_GAMMA = 80
+HTML_COLORSTYLE_GAMMA = 50
+
+# DISABLE_INDEX = NO
+DISABLE_INDEX = NO
+
+# GENERATE_TREEVIEW = NO
+GENERATE_TREEVIEW = YES
+
+# ENUM_VALUES_PER_LINE = 4
+ENUM_VALUES_PER_LINE = 1
+
+# SORT_BRIEF_DOCS = NO
+SORT_BRIEF_DOCS = YES
+
+# SORT_MEMBERS_CTORS_1ST = NO
+SORT_MEMBERS_CTORS_1ST = YES
+
+# HTML_OUTPUT = html
+HTML_OUTPUT = cmsis-plus
+
+# SUBGROUPING = YES
+# SUBGROUPING = NO
+
+
