@@ -749,6 +749,21 @@ namespace os
            */
 
           /**
+           * @brief Define a rebind template.
+           * @tparam U Type of elements to be allocated.
+           * @details
+           * The definition follows the default rebind, so functionally
+           * it does not bring any new functionality, but avoids a bug
+           * in GCC 6.2 which prevented the code to compile
+           * (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=72792).
+           */
+          template<typename U>
+            struct rebind
+            {
+              using other = allocator_stateless_polymorphic_synchronized<U, L, get_resource>;
+            };
+
+          /**
            * @brief Allocate a number of memory blocks of type `value_type`.
            * @param elements Number of elements of type `value_type`.
            * @return Pointer to newly allocated memory blocks.

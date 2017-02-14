@@ -61,4 +61,33 @@ To run these tests, several Eclipse projects are available in a separate [GitHub
 
 µOS++ is provided free of charge under the terms of the [MIT License](https://opensource.org/licenses/MIT).
 
+## GCC 6.2 patches
+
+Up to including GCC 6.2, the `allocator_traits<>` template had a misplaced static_assert, preventing µOS++ to compile.
+
+The final workaround was to add a `rebind` template to the allocator, but before this an alternate workaround was to patch the `bits/alloc_traits.h` file.
+
+```
+# Note: EOF is quoted to prevent substitutions here.
+$ cat <<'__EOF__' > /tmp/alloc_traits_patch.txt
+--- bits/alloc_traits.h	2017-02-14 19:17:10.000000000 +0200
++++ bits/alloc_traits_patched.h	2017-02-14 19:25:39.000000000 +0200
+@@ -184,8 +184,8 @@
+       template<typename _Tp>
+ 	using rebind_traits = allocator_traits<rebind_alloc<_Tp>>;
+ 
+-      static_assert(!is_same<rebind_alloc<value_type>, __undefined>::value,
+-	  "allocator defines rebind or is like Alloc<T, Args>");
++//      static_assert(!is_same<rebind_alloc<value_type>, __undefined>::value,
++//	  "allocator defines rebind or is like Alloc<T, Args>");
+ 
+     private:
+       template<typename _Alloc2>
+__EOF__
+
+# Update the --directory= to point to your location.
+$ sudo patch --backup --unified --verbose --strip=0 \
+--input=/tmp/alloc_traits_patch.txt \
+--directory=/Users/ilg/opt/gcc-arm-none-eabi-6_2-2016q4/arm-none-eabi/include/c++/6.2.1
+```
 
