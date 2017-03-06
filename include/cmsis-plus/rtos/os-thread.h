@@ -740,10 +740,16 @@ namespace os
 
 #if !defined(OS_USE_RTOS_PORT_SCHEDULER)
 
+#if defined(OS_INCLUDE_RTOS_DRTI)
+      public:
+#else
+      protected:
+#endif
         /**
          * @brief Non-portable context data.
          */
         port::thread_context_t port_;
+      protected:
 
 #endif
 
@@ -1560,7 +1566,12 @@ namespace os
       func_args_t func_args_ = nullptr;
       void* func_result_ = nullptr;
 
-      // Pointer to parent, or null for top/detached thread.
+#if defined(OS_INCLUDE_RTOS_DRTI)
+      public:
+#else
+      protected:
+#endif
+     // Pointer to parent, or null for top/detached thread.
       thread* parent_ = nullptr;
 
     public:
@@ -1606,6 +1617,11 @@ namespace os
       // TODO: Add a list, to properly process robustness.
       std::size_t volatile acquired_mutexes_ = 0;
 
+#if defined(OS_INCLUDE_RTOS_DRTI)
+      public:
+#else
+      protected:
+#endif
       // The thread state is set:
       // - running - in ready_threads_list::unlink_head()
       // - ready - in ready_threads_list::link()
@@ -1615,6 +1631,8 @@ namespace os
       // - terminated - in state::internal_exit_()
       // - destroyed - in thread::internal_destroy_()
       state_t volatile state_ = state::undefined;
+
+      protected:
 
       // There are two values used as thread priority. The main one is
       // assigned via `priority(int)`, and is stored in `prio_assigned_`.
@@ -1654,8 +1672,15 @@ namespace os
       os_thread_port_data_t port_;
 #endif
 
+#if defined(OS_INCLUDE_RTOS_DRTI)
+      public:
+#else
+      protected:
+#endif
       // Better be the last one!
       context context_;
+
+      protected:
 
       /**
        * @endcond
@@ -1664,6 +1689,7 @@ namespace os
       /**
        * @}
        */
+
     };
     /* class thread */
 

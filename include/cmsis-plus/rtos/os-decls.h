@@ -434,10 +434,18 @@ namespace os
          * @cond ignore
          */
 
+#if defined(OS_INCLUDE_RTOS_DRTI)
+      public:
+#else
+      protected:
+#endif
+
         /**
          * @brief Pointer to name.
          */
         const char* const name_ = "-";
+
+      protected:
 
         /**
          * @endcond
