@@ -1632,8 +1632,6 @@ namespace os
       // - destroyed - in thread::internal_destroy_()
       state_t volatile state_ = state::undefined;
 
-      protected:
-
       // There are two values used as thread priority. The main one is
       // assigned via `priority(int)`, and is stored in `prio_assigned_`.
       // This value is normally used by the scheduler.
@@ -1649,6 +1647,8 @@ namespace os
       // priority is changed, such as by a POSIX call to sched_setparam().
       priority_t volatile prio_assigned_ = priority::none;
       priority_t volatile prio_inherited_ = priority::none;
+
+      protected:
 
       bool volatile interrupted_ = false;
 
