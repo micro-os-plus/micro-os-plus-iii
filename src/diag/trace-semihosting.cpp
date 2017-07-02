@@ -119,7 +119,7 @@ namespace os
             size_t togo = nbyte;
             while (togo > 0)
               {
-                std::size_t n = ((togo < sizeof(tmp)) ? togo : sizeof(tmp));
+                std::size_t n = ((togo < sizeof(tmp)) ? togo : sizeof(tmp) - 1);
                 std::size_t i = 0;
                 for (; i < n; ++i, ++cbuf)
                   {
