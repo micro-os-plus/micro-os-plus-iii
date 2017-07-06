@@ -1,3 +1,5 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/d3a58fbdf7414c15871f3b65a488318d)](https://www.codacy.com/app/ilg-ul/micro-os-plus-iii?utm_source=github.com&utm_medium=referral&utm_content=micro-os-plus/micro-os-plus-iii&utm_campaign=badger)
+
 # µOS++ IIIe
 
 An xPack with the third version of µOS++, based on CMSIS++ (a proposal for a future CMSIS in C++)
