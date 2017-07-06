@@ -129,7 +129,7 @@ namespace os
         {
         public:
 
-          typedef T value_type;
+          using value_type = T;
 
           polymorphic_allocator () noexcept;
 
@@ -145,10 +145,10 @@ namespace os
           operator= (polymorphic_allocator const & a) = default;
 
           value_type*
-          allocate (std::size_t n);
+          allocate (std::size_t nobjects);
 
           void
-          deallocate (value_type* p, std::size_t n) noexcept;
+          deallocate (value_type* p, std::size_t nobjects) noexcept;
 
           std::size_t
           max_size (void) const noexcept;
@@ -161,7 +161,7 @@ namespace os
 
         private:
 
-          memory_resource* res_;
+          memory_resource* mr_;
         };
 
     // ------------------------------------------------------------------------
@@ -197,7 +197,7 @@ namespace os
 
       template<typename T>
         polymorphic_allocator<T>::polymorphic_allocator () noexcept :
-        res_(get_default_resource())
+        mr_(get_default_resource())
           {
             ;
           }
@@ -205,7 +205,7 @@ namespace os
       template<typename T>
         inline
         polymorphic_allocator<T>::polymorphic_allocator (memory_resource* r) noexcept :
-        res_(r)
+        mr_(r)
           {
             ;
           }
@@ -215,32 +215,34 @@ namespace os
           inline
           polymorphic_allocator<T>::polymorphic_allocator (
               polymorphic_allocator<U> const & other) noexcept :
-          res_(other.resource())
+          mr_(other.resource())
             {
               ;
             }
 
       template<typename T>
         inline typename polymorphic_allocator<T>::value_type*
-        polymorphic_allocator<T>::allocate (std::size_t n)
+        polymorphic_allocator<T>::allocate (std::size_t nobjects)
         {
-          if (n > max_size ())
+          if (nobjects > max_size ())
             {
               estd::__throw_system_error (
                   EINVAL, "polymorphic_allocator<T>::allocate(std::size_t n)"
                   " 'n' exceeds maximum supported size");
             }
 
-          return static_cast<value_type*> (res_->allocate (
-              n * sizeof(value_type), alignof(value_type)));
+          return static_cast<value_type*> (mr_->allocate (
+              nobjects * sizeof(value_type), alignof(value_type)));
         }
 
       template<typename T>
         inline void
-        polymorphic_allocator<T>::deallocate (value_type* p, std::size_t n) noexcept
+        polymorphic_allocator<T>::deallocate (value_type* p,
+                                              std::size_t nobjects) noexcept
         {
-          assert(n <= max_size ());
-          res_->deallocate (p, n * sizeof(value_type), alignof(value_type));
+          assert(nobjects <= max_size ());
+          mr_->deallocate (p, nobjects * sizeof(value_type),
+                           alignof(value_type));
         }
 
       template<typename T>
@@ -262,7 +264,7 @@ namespace os
         inline memory_resource*
         polymorphic_allocator<T>::resource (void) const noexcept
         {
-          return res_;
+          return mr_;
         }
 
       // ======================================================================
