@@ -434,7 +434,7 @@ namespace os
          * @cond ignore
          */
 
-#if defined(OS_INCLUDE_RTOS_DRTI)
+#if defined(OS_INCLUDE_RTOS_DRTM)
       public:
 #else
       protected:

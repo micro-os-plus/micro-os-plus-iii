@@ -754,7 +754,7 @@ namespace os
            * @details
            * The definition follows the default rebind, so functionally
            * it does not bring any new functionality, but avoids a bug
-           * in GCC 6.2 which prevented the code to compile
+           * in GCC 6.2 that prevented the code to compile
            * (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=72792).
            */
           template<typename U>

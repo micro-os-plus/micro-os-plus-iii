@@ -740,7 +740,7 @@ namespace os
 
 #if !defined(OS_USE_RTOS_PORT_SCHEDULER)
 
-#if defined(OS_INCLUDE_RTOS_DRTI)
+#if defined(OS_INCLUDE_RTOS_DRTM)
       public:
 #else
       protected:
@@ -1566,7 +1566,7 @@ namespace os
       func_args_t func_args_ = nullptr;
       void* func_result_ = nullptr;
 
-#if defined(OS_INCLUDE_RTOS_DRTI)
+#if defined(OS_INCLUDE_RTOS_DRTM)
       public:
 #else
       protected:
@@ -1617,7 +1617,7 @@ namespace os
       // TODO: Add a list, to properly process robustness.
       std::size_t volatile acquired_mutexes_ = 0;
 
-#if defined(OS_INCLUDE_RTOS_DRTI)
+#if defined(OS_INCLUDE_RTOS_DRTM)
       public:
 #else
       protected:
@@ -1672,7 +1672,7 @@ namespace os
       os_thread_port_data_t port_;
 #endif
 
-#if defined(OS_INCLUDE_RTOS_DRTI)
+#if defined(OS_INCLUDE_RTOS_DRTM)
       public:
 #else
       protected:
