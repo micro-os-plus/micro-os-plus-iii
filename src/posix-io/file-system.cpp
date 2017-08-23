@@ -320,7 +320,7 @@ namespace os
         }
 
       // Get a file object from the pool.
-      auto* const f = static_cast<file*> (files_pool_->aquire ());
+      auto* const f = static_cast<file*> (files_pool_->acquire ());
 
       // Associate the file with this file system (used, for example,
       // to reach the pools at close).
@@ -342,7 +342,7 @@ namespace os
         }
 
       // Get a directory object from the pool.
-      auto* const dir = static_cast<directory*> (dirs_pool_->aquire ());
+      auto* const dir = static_cast<directory*> (dirs_pool_->acquire ());
 
       // Associate the dir with this file system (used, for example,
       // to reach the pools at close).

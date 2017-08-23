@@ -458,7 +458,7 @@ namespace os
        * @class critical_section
        * @details
        * Use this class to define a critical section
-       * protected to interrupts service routines. The begining of the
+       * protected to interrupts service routines. The beginning of the
        * critical section is exactly the place where this class is
        * instantiated (the constructor will disable interrupts below
        * the scheduler priority). The end of the critical

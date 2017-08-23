@@ -48,7 +48,7 @@ namespace os
       errno = 0;
 
       class socket* sock =
-          reinterpret_cast<class socket*> (net_stack::sockets_pool ()->aquire ());
+          reinterpret_cast<class socket*> (net_stack::sockets_pool ()->acquire ());
       if (sock == nullptr)
         {
           errno = ENFILE;
@@ -114,7 +114,7 @@ namespace os
           return nullptr;
         }
 
-      socket* const new_socket = static_cast<socket*> (pool->aquire ());
+      socket* const new_socket = static_cast<socket*> (pool->acquire ());
       if (new_socket == nullptr)
         {
           errno = EMFILE; // pool is considered the per-process table.

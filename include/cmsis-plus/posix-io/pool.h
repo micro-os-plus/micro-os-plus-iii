@@ -90,7 +90,7 @@ namespace os
        */
 
       void*
-      aquire (void);
+      acquire (void);
 
       bool
       release (void* obj);
@@ -196,7 +196,7 @@ namespace os
       public:
 
         value_type*
-        aquire (void);
+        acquire (void);
 
         bool
         release (value_type* obj);
@@ -266,9 +266,9 @@ namespace os
     template<typename T>
       inline typename pool_typed<T>::value_type*
       __attribute__((always_inline))
-      pool_typed<T>::aquire (void)
+      pool_typed<T>::acquire (void)
       {
-        return static_cast<value_type*> (pool::aquire ());
+        return static_cast<value_type*> (pool::acquire ());
       }
 
     template<typename T>
