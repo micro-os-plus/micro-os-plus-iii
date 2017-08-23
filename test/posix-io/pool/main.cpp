@@ -94,7 +94,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert(pool.in_use (i) == false);
     }
 
-  TestFile* fil = pool.aquire ();
+  TestFile* fil = pool.acquire ();
   assert(pool.in_use (0) == true);
   assert(fil == pool.object (0));
 
@@ -108,12 +108,12 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   // Check full pool.
   for (std::size_t i = 0; i < pool.size (); ++i)
     {
-      fil = pool.aquire ();
+      fil = pool.acquire ();
       assert(fil == pool.object (i));
     }
 
   // One more should return error
-  fil = pool.aquire ();
+  fil = pool.acquire ();
   assert(fil == nullptr);
 
   trace_puts ("'test-pool-debug' succeeded.\n");
