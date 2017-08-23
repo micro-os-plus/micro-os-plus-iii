@@ -23,7 +23,7 @@ From my point of view, the main problems with the CMSIS RTOS API are:
 - no POSIX compliance
 - not C++ friendly.
 
-Please note that I did not ask for C++ APIs, the plain C APIs should be perfectly fine, I just prefered tha APIs to be designed by someone who thinks in C++, not in C (and as such knows how to avoid the usual mess that unstructured C programs bring, especially in the embedded world); unfortunately ARM seems to have no C++ specialists in their design teams.
+Please note that I did not ask for C++ APIs, the plain C APIs should be perfectly fine, I just preferred tha APIs to be designed by someone who thinks in C++, not in C (and as such knows how to avoid the usual mess that unstructured C programs bring, especially in the embedded world); unfortunately ARM seems to have no C++ specialists in their design teams.
 
 ### The CMSIS++ proposal
 
@@ -60,7 +60,7 @@ Avoid mixing time durations (in milliseconds) with timer counts in ticks (#39)
 Add a separate RTC system clock (#40)
 Add os_main() to make the use of a main thread explicit (#41)
 Add support for a synchronised public memory allocator (#42)
-Avoid returning agregates (like osEvent) (#43)
+Avoid returning aggregates (like osEvent) (#43)
 Extend the range for osKernelSysTick() (#44)
 Make the scheme to assign names to objects more consecvent (#46)
 Add missing destructor functions to all objects (#47)
@@ -101,9 +101,9 @@ However, based on the CMSIS++ experience, there are still more design decisions 
 
 ### Final personal thoughts
 
-As a personal remark, the design of the initial CMSIS RTOS API seems greatly influenced by Keil RTX (function names and prototypes), which, in my oppinion, might not necessarily be the most fortunate design, with some ideas from POSIX threads, an established standard.
+As a personal remark, the design of the initial CMSIS RTOS API seems greatly influenced by Keil RTX (function names and prototypes), which, in my opinion, might not necessarily be the most fortunate design, with some ideas from POSIX threads, an established standard.
 
-However the expected influence from POSIX threads is mostly aparent and  inconsecvent.
+However the expected influence from POSIX threads is mostly apparent and  inconsecvent.
 
 In POSIX threads one of the design characteristics is the use of attributes to configure various creation parameters, instead of passing all of them in a long prototype. As such, all functions used to create objects have a pointer to the attributes. For simple use cases, this pointer can be NULL, and reasonable defaults are applied. After this pointer, the function prototypes include a minimum set of mandatory parameters (for example a pointer to the thread function when creating threads).
 
@@ -274,7 +274,7 @@ Suggestion:
 
 * add support for synchronised malloc()/free(); syncronisation can be done either by mutex or scheduler critical sections (assuming no allocations will be performed on interrupts).
 
-### CMSIS RTOS API: Avoid returning agregates (like osEvent) (#43)
+### CMSIS RTOS API: Avoid returning aggregates (like osEvent) (#43)
 
 Although allowed by the C language, and supported by most compilers, returning structures directly is not a good ideea, since it will trigger lots of warnings in build environments where all warnings are enabled.
 
@@ -288,7 +288,7 @@ Suggestion:
 
 The 32-bits value of the returned counter allows only small time ranges.
 
-For example, for a 100 MHz CPU, at 1000 ticks/sec, the SysTick counter divisor is 100.000, or 10^5, allowing only 4*10^(9-5), or 40000 ticks, which represent only 40 seconds beween rollovers.
+For example, for a 100 MHz CPU, at 1000 ticks/sec, the SysTick counter divisor is 100.000, or 10^5, allowing only 4*10^(9-5), or 40000 ticks, which represent only 40 seconds between rollovers.
 
 In [CMSIS++](http://micro-os-plus.github.io/cmsis-plus/), the SysTick clock can return separate values in a user provided  structure, allowing any kind of computations related to accurate timings.
 
@@ -369,9 +369,9 @@ Note: apparently addressed in CMSIS 5, but must be checked.
 
 ### CMSIS RTOS API: Use POSIX error codes (#65)
 
-The CMSIS RTOS API defines a set of error codes, but the semantic is proprietary (and, to my oppinion, not very consistent).
+The CMSIS RTOS API defines a set of error codes, but the semantic is proprietary (and, to my opinion, not very consistent).
 
-Based on POSIX, [CMSIS++](http://micro-os-plus.github.io/cmsis-plus/) uses the standard POSIX error codes from the <errno.h> header file, the only specific definition being `result::ok` to indicate that no error occured.
+Based on POSIX, [CMSIS++](http://micro-os-plus.github.io/cmsis-plus/) uses the standard POSIX error codes from the <errno.h> header file, the only specific definition being `result::ok` to indicate that no error occurred.
 
 Suggestion:
 
@@ -391,7 +391,7 @@ Suggestion:
 
 #### CMSIS RTOS API: For all objects, add reset functions to return the object to initial status (#67)
 
-In [CMSIS++](http://micro-os-plus.github.io/cmsis-plus/) objects can be returned to the inital status with `reset()`.
+In [CMSIS++](http://micro-os-plus.github.io/cmsis-plus/) objects can be returned to the initial status with `reset()`.
 
 Suggestion:
 
@@ -776,7 +776,7 @@ For example, in the compatibility wrapper, the implementation of `osThreadCreate
 
 Suggestion:
 
-* use a consistent, similar loooking, macro to initialise all objects with default values and explictly set structure members for each attribute.
+* use a consistent, similar loooking, macro to initialise all objects with default values and explicitly set structure members for each attribute.
 
 #### CMSIS RTOS API v2: When using attributes, avoid unnecessary creation parameters (#78)
 
@@ -811,7 +811,7 @@ Suggestion:
 
 #### CMSIS RTOS API v2: Fix inconsistent type naming convention (#80)
 
-This is a recuring problem, that seems to affect all CMSIS components, not only RTOS, and, if I remember right, I already reported, but apparently without effect.
+This is a recurring problem, that seems to affect all CMSIS components, not only RTOS, and, if I remember right, I already reported, but apparently without effect.
 
 In the current `cmsis_os.h` I can read the following types:
 
@@ -832,7 +832,7 @@ typedef struct os_mutex_attr {
 
 ```
 
-In my oppinion your general naming convention, not only the type naming convention, is problematic, but the issue here is not which naming convention you choose (this may turn into a religious war), but once you choose it, stick to it consistently.
+In my opinion your general naming convention, not only the type naming convention, is problematic, but the issue here is not which naming convention you choose (this may turn into a religious war), but once you choose it, stick to it consistently.
 
 [CMSIS++](http://micro-os-plus.github.io/cmsis-plus/) uses the lower case naming convention, also adopted by POSIX and by the ISO C/C++ standards, with types suffixed by `_t`. User class names may have the initial character in uppercase.
 

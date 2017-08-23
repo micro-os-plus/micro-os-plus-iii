@@ -54,7 +54,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     void*
-    pool::aquire (void)
+    pool::acquire (void)
     {
       for (std::size_t i = 0; i < size_; ++i)
         {
