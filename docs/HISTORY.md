@@ -11,7 +11,7 @@ Using the new C++ definitions, an implementation of CMSIS was added.
 
 To be able to include the C++ definitions, the implementation file
 must be in C++ (`cmsis_os.cpp`), but from the functional point of view,
-it defines the clasical C functions (as `extern "C"`).
+it defines the classical C functions (as `extern "C"`).
 
 ## Add extensions
 

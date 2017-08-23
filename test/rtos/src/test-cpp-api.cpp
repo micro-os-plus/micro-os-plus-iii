@@ -991,7 +991,7 @@ test_cpp_api (void)
       // Move.
       pass_mutex_up3 (std::move (mx));
 
-      // This pointer is null now, ownership was transfered to function,
+      // This pointer is null now, ownership was transferred to function,
       // which in our case destroyed the object.
       trace::printf ("%p\n", mx.get ());
     }
