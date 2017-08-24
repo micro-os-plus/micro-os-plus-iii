@@ -26,10 +26,7 @@
  */
 
 /*
- * This file is part of the CMSIS++ proposal, intended as a CMSIS
- * replacement for C++ applications.
- *
- * The code provides an implementation of the C API for the CMSIS++
+ * The code provides an implementation of the C API for the µOS++
  * and legacy CMSIS, using the CMSIC++ RTOS definitions.
  */
 
@@ -3518,7 +3515,7 @@ osStatus
 osKernelStart (void)
 {
   scheduler::start ();
-  // In CMSIS++ this does not return.
+  // In µOS++ this does not return.
 }
 
 /**

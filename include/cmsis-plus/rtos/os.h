@@ -26,17 +26,14 @@
  */
 
 /*
- * The initial CMSIS++ RTOS API was inspired by CMSIS RTOS API v1.x,
+ * The initial µOS++ RTOS API was inspired by CMSIS RTOS API v1.x,
  * Copyright (c) 2013 ARM LIMITED.
  */
 
 /**
  * @file os.h
- * @brief Single file CMSIS++ RTOS definitions.
+ * @brief Single file µOS++ RTOS definitions.
  * @details
- * This file is part of the CMSIS++ proposal, intended as a CMSIS
- * replacement for C++ applications.
- *
  * The code was originally inspired by ARM CMSIS `<cmsis_os.h>` file, v1.02,
  * and tries to remain functionally close to the CMSIS specifications.
  *

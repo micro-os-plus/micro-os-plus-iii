@@ -25,11 +25,6 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/*
- * This file is part of the CMSIS++ proposal, intended as a CMSIS
- * replacement for C++ applications.
- */
-
 #ifndef CMSIS_PLUS_RTOS_INTERNAL_OS_FLAGS_H_
 #define CMSIS_PLUS_RTOS_INTERNAL_OS_FLAGS_H_
 

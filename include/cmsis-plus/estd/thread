@@ -26,9 +26,6 @@
  */
 
 /*
- * This file is part of the CMSIS++ proposal, intended as a CMSIS
- * replacement for C++ applications.
- *
  * The code is inspired by LLVM libcxx and GNU libstdc++-v3.
  */
 

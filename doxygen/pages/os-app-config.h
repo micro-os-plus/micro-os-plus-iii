@@ -5,7 +5,7 @@
  * @details
  * The `<cmsis-plus/os-ap-config.h>` header file is used to configure
  * all build
- * options available for CMSIS++ applications.
+ * options available for µOS++ applications.
  *
  * Each application should provide such a configuration file
  * in the compiler include path, even if there are no
@@ -612,12 +612,12 @@
  * @brief Use a custom scheduler implementation.
  *
  * @details
- * When using a CMSIS++ port that runs on top of another RTOS,
- * this option disables the CMSIS++ reference
+ * When using a µOS++ port that runs on top of another RTOS,
+ * this option disables the µOS++ reference
  * scheduler and forwards all related calls to the custom
  * implementation RTOS.
  *
- * The default is to use the CMSIS++ reference scheduler.
+ * The default is to use the µOS++ reference scheduler.
  */
 #define OS_USE_RTOS_PORT_SCHEDULER
 
@@ -680,7 +680,7 @@
  * technologies intended to facilitate debugging, by providing a trace
  * channel for printf()-like messages and various events.
  *
- * CMSIS++ is capable of forwarding the trace::printf() messages
+ * µOS++ is capable of forwarding the trace::printf() messages
  * via the ITM, and, if available, this is the standard recommended
  * trace channel.
  *
@@ -762,7 +762,7 @@
  * SEGGER RTT (Real Time Terminal) is a very fast communication channel
  * available for J-Link probes.
  *
- * CMSIS++ is capable of forwarding the trace::printf() messages
+ * µOS++ is capable of forwarding the trace::printf() messages
  * via the RTT, and, if available, this is the fastest
  * trace channel.
  */

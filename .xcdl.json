@@ -1,5 +1,5 @@
 {
 	"$schema": "http://xcdl.github.io/schemas/xcdl-1-1.json",
 	"name": "/ilg/arm/cmsis-plus",
-	"description": "CMSIS++, a C++ version of CMSIS."
+	"description": "The third edition of µOS++, a POSIX inspired open source system, written in C++."
 }

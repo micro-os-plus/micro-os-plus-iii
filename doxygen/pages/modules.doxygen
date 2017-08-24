@@ -28,24 +28,24 @@
 // ----------------------------------------------------------------------------
 
 /**
- @defgroup cmsis-plus-core CMSIS++ Core
- @brief  CMSIS++ Core summary page.
+ @defgroup cmsis-plus-core µOS++ Core
+ @brief  µOS++ Core summary page.
  @details
  TODO: add core definitions.
  */
 
 /**
- @defgroup cmsis-plus-startup CMSIS++ Startup
- @brief  CMSIS++ Startup summary page.
+ @defgroup cmsis-plus-startup µOS++ Startup
+ @brief  µOS++ Startup summary page.
  @details
  TODO: add startup definitions.
  */
 
 /**
- @defgroup cmsis-plus-rtos CMSIS++ RTOS C++ API
- @brief  CMSIS++ RTOS C++ API summary page.
+ @defgroup cmsis-plus-rtos µOS++ RTOS C++ API
+ @brief  µOS++ RTOS C++ API summary page.
  @details
- The C++ API is the main interface to the CMSIS++ RTOS, and is the native
+ The C++ API is the main interface to the µOS++ RTOS, and is the native
  interface used for the implementation.
 
  The API is composed of a series of classes, subclasses, types and  
@@ -56,8 +56,8 @@
  */
 
 /**
- @defgroup cmsis-plus-rtos-c CMSIS++ RTOS C API
- @brief  CMSIS++ RTOS C API summary page.
+ @defgroup cmsis-plus-rtos-c µOS++ RTOS C API
+ @brief  µOS++ RTOS C API summary page.
  @details
  The C API maps most of the basic C++ functionality to C programmers.
  Usually the overhead is minimal, one function call. The object pointer
@@ -68,10 +68,10 @@
  */
 
 /**
- @defgroup cmsis-plus-iso CMSIS++ ISO Standard C++ Threads
- @brief  CMSIS++ ISO Threads summary page.
+ @defgroup cmsis-plus-iso µOS++ ISO Standard C++ Threads
+ @brief  µOS++ ISO Threads summary page.
  @details
- This page groups the main CMSIS++ ISO Threads classes and namespaces.
+ This page groups the main µOS++ ISO Threads classes and namespaces.
 
  @par Standards
  These definitions provide implementations for the classes defined in 
@@ -79,25 +79,25 @@
  */
 
 /**
- @defgroup cmsis-plus-drivers CMSIS++ Drivers
- @brief  CMSIS++ Drivers summary page.
+ @defgroup cmsis-plus-drivers µOS++ Drivers
+ @brief  µOS++ Drivers summary page.
  @details
- This page groups the main CMSIS++ Driver classes. 
+ This page groups the main µOS++ Driver classes. 
 
  TODO: add content
  */
 
 /**
- @defgroup cmsis-plus-diag CMSIS++ Diagnostics & Trace
- @brief  CMSIS++ Diagnostic & Trace summary page.
+ @defgroup cmsis-plus-diag µOS++ Diagnostics & Trace
+ @brief  µOS++ Diagnostic & Trace summary page.
  @details
  This page groups the main classes providing support for 
  diagnostics. For example the `trace::printf()` functions are defined here.
  */
 
 /**
- @defgroup cmsis-plus-posix-io CMSIS++ POSIX I/O C++ API
- @brief  CMSIS++ POSIX I/O C++ API summary page.
+ @defgroup cmsis-plus-posix-io µOS++ POSIX I/O C++ API
+ @brief  µOS++ POSIX I/O C++ API summary page.
  @details
  This page groups the main classes providing support for standard
  POSIX I/O (uniform access to dtream devices, files, sockets).
@@ -106,8 +106,8 @@
  */
 
 /**
- @defgroup cmsis-plus-posix-io-c CMSIS++ POSIX I/O C API
- @brief  CMSIS++ POSIX I/O C API summary page.
+ @defgroup cmsis-plus-posix-io-c µOS++ POSIX I/O C API
+ @brief  µOS++ POSIX I/O C API summary page.
  @details
  This page groups the standard
  POSIX I/O functions.
@@ -116,10 +116,10 @@
  */
 
 /**
- @defgroup cmsis-plus-app-config CMSIS++ Application Config
- @brief  CMSIS++ application configuration definitions.
+ @defgroup cmsis-plus-app-config µOS++ Application Config
+ @brief  µOS++ application configuration definitions.
  @details
- Applications using CMSIS++ can be configured during 
+ Applications using µOS++ can be configured during 
  build time using
  several proprocessor definitions, grouped in a header file 
  named `<cmsis-plus/os-app-config.h>`.
@@ -139,10 +139,10 @@
  */
 
 /**
- @defgroup cmsis-plus-app-hooks CMSIS++ Application Overrides & Hooks
- @brief  CMSIS++ application customisable functions and hooks.
+ @defgroup cmsis-plus-app-hooks µOS++ Application Overrides & Hooks
+ @brief  µOS++ application customisable functions and hooks.
  @details
- Applications using CMSIS++ can customise the behaviour 
+ Applications using µOS++ can customise the behaviour 
  of the system or intercept several events by redefining 
  these functions.
 

@@ -51,7 +51,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     // This wrapper makes a CMSIS USART Keil driver behave like a
-    // CMSIS++ Serial driver.
+    // µOS++ Serial driver.
 
     class usart_wrapper : public Serial
     {

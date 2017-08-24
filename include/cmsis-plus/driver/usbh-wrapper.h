@@ -56,7 +56,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     // This wrapper makes a CMSIS USBH Keil driver behave like a
-    // CMSIS++ Serial driver.
+    // µOS++ Serial driver.
 
     class usbh_wrapper : public usb::Host
     {

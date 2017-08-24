@@ -25,11 +25,6 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/*
- * The initial CMSIS++ RTOS API was inspired by CMSIS RTOS API v1.x,
- * Copyright (c) 2013 ARM LIMITED.
- */
-
 #ifndef CMSIS_PLUS_RTOS_OS_DECLS_H_
 #define CMSIS_PLUS_RTOS_OS_DECLS_H_
 
@@ -38,13 +33,13 @@
 #include <cmsis-plus/os-versions.h>
 
 /**
- * @brief Tell the world that CMSIS++ is in use.
+ * @brief Tell the world that µOS++ is in use.
  * @details
- * Macro to inform including files that CMSIS++ RTOS
+ * Macro to inform including files that µOS++ RTOS
  * definitions are available.
  */
-#define OS_USE_CMSIS_PLUS
-
+ #define OS_USE_MICRO_OS_PLUS
+ 
 // Include the application specific definitions.
 #include <cmsis-plus/os-app-config.h>
 // Include the non-portable portable types, enums and constants declarations.
@@ -101,7 +96,7 @@ namespace os
      * @brief Type of values returned by RTOS functions.
      *
      * @details
-     * For error processing reasons, most CMSIS++ RTOS functions
+     * For error processing reasons, most µOS++ RTOS functions
      * return a numeric result, which, according to POSIX,
      * when the call was successful, must be `0`
      * (`result::ok`) or an error code defined in `<errno.h>` otherwise.
@@ -113,9 +108,9 @@ namespace os
      *
      * @details
      * This namespace is dedicated to grouping all
-     * status code values returned by CMSIS++ RTOS functions.
+     * status code values returned by µOS++ RTOS functions.
      *
-     * However, CMSIS++ favours POSIX error codes, so,
+     * However, µOS++ favours POSIX error codes, so,
      * except a few enumerated values, most of them are exactly those
      * defined by POSIX, in the
      * `<errno.h>` header, and are not redefined here.
@@ -123,15 +118,15 @@ namespace os
      * Currently in use are:
      * - `EPERM` - Operation not permitted. An attempt was made to perform
      * an operation limited to processes with appropriate privileges
-     * or to the owner of a file or other resource. In CMSIS++ this
+     * or to the owner of a file or other resource. In µOS++ this
      * usually means that the call is not available in handler mode.
      * - `EINVAL` - Invalid argument. Some invalid argument was supplied;
      * - `EWOULDBLOCK` - Operation would block.
-     * In CMSIS++ case, this usually means that a call to `try_xxx()`
+     * In µOS++ case, this usually means that a call to `try_xxx()`
      * found the resource busy.
      * - `EAGAIN` - Resource temporarily unavailable. This is a temporary
      * condition and later calls to the same routine may complete normally.
-     * - `ENOTRECOVERABLE` - State not recoverable. In CMSIS++ this
+     * - `ENOTRECOVERABLE` - State not recoverable. In µOS++ this
      * usually means an unrecoverable error occurred.
      * - `EDEADLOCK` - Resource deadlock would occur. An attempt was made
      * to lock a system resource that would have resulted in a deadlock
@@ -141,7 +136,7 @@ namespace os
      * network limit, or inappropriate message buffer length.
      * - `EBADMSG` - Bad message. The implementation has detected a
      * corrupted message.
-     * - `EINTR` - Interrupted function call. In CMSIS++ this
+     * - `EINTR` - Interrupted function call. In µOS++ this
      * usually mens that a thread waiting for a message is waken
      * before the event or the timeout occurred, at user request.
      * - `ETIMEDOUT` - Operation timed out. The time limit associated
@@ -177,7 +172,7 @@ namespace os
        *
        * @details
        * There are not many custom values returned by
-       * CMSIS++ RTOS functions, currently there is only one,
+       * µOS++ RTOS functions, currently there is only one,
        * `ok`, represented by `0`.
        *
        * If more custom codes will be needed and are not present in POSIX,

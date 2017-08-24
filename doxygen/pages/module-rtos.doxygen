@@ -559,7 +559,7 @@ os_main (int argc, char* argv[])
  @ingroup cmsis-plus-rtos
  @brief  C++ API memory management definitions.
  @details
- The CMSIS++ RTOS includes several advanced and flexible 
+ The µOS++ RTOS includes several advanced and flexible 
  memory management features.
  
  First, it defines a configurable memory manager for the application
@@ -605,7 +605,7 @@ os_main (int argc, char* argv[])
 
  The basic memory management class is `os::rtos::memory::memory_resource`, 
  which will
- be standard starting with C++17. The CMSIS++ version of this class
+ be standard starting with C++17. The µOS++ version of this class
  includes several extensions, like out of memory processing and 
  statistics (and this is the reason the class is not defined in `os::estd`). 
   

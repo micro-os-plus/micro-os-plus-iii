@@ -30,7 +30,7 @@
 /**
  @defgroup cmsis-plus-posix-io-base Basic classes
  @ingroup cmsis-plus-posix-io
- @brief  CMSIS++ POSIX I/O C++ basic classes.
+ @brief  µOS++ POSIX I/O C++ basic classes.
  @details
  This page groups the classes providing support for standard
  POSIX I/O operations.
@@ -41,7 +41,7 @@
 /**
  @defgroup cmsis-plus-posix-io-func Functions
  @ingroup cmsis-plus-posix-io
- @brief  CMSIS++ POSIX I/O C++ functions.
+ @brief  µOS++ POSIX I/O C++ functions.
  @details
  This page groups the functions providing support for standard
  POSIX I/O operations.
@@ -52,7 +52,7 @@
 /**
  @defgroup cmsis-plus-posix-io-drivers Driver classes
  @ingroup cmsis-plus-posix-io
- @brief  CMSIS++ POSIX I/O C++ drivers.
+ @brief  µOS++ POSIX I/O C++ drivers.
  @details
  This page groups the driver classes providing implemetations for the
  POSIX I/O devices.
@@ -63,7 +63,7 @@
 /**
  @defgroup cmsis-plus-posix-io-utils Utility classes
  @ingroup cmsis-plus-posix-io
- @brief  CMSIS++ POSIX I/O C++ utilites.
+ @brief  µOS++ POSIX I/O C++ utilites.
  @details
  This page groups the classes providing various utilities used in the
  POSIX I/O subsistem.

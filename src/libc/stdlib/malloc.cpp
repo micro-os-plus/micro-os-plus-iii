@@ -82,7 +82,7 @@ using namespace os;
  * passed to `free()` shall be returned. Otherwise, it shall return a
  * null pointer and set `errno` to indicate the error.
  *
- * @note In CMSIS++ this function uses a scheduler critical section
+ * @note In µOS++ this function uses a scheduler critical section
  * and is thread safe.
  *
  * @par POSIX compatibility
@@ -149,7 +149,7 @@ malloc (size_t bytes)
  * returned. Otherwise, it shall return a null pointer and set `errno`
  * to indicate the error.
  *
- * @note In CMSIS++ this function uses a scheduler critical section
+ * @note In µOS++ this function uses a scheduler critical section
  * and is thread safe.
  *
  * @par POSIX compatibility
@@ -248,7 +248,7 @@ calloc (size_t nelem, size_t elbytes)
  * returns a null pointer and `errno` has been set to `ENOMEM`,
  * the memory referenced by _ptr_ shall not be changed.
  *
- * @note In CMSIS++ this function uses a scheduler critical section
+ * @note In µOS++ this function uses a scheduler critical section
  * and is thread safe.
  *
  * @par POSIX compatibility
@@ -339,7 +339,7 @@ realloc (void* ptr, size_t bytes)
  *
  * The `free()` function shall not return a value.
  *
- * @note In CMSIS++ this function uses a scheduler critical section
+ * @note In µOS++ this function uses a scheduler critical section
  * and is thread safe.
  *
  * @par POSIX compatibility

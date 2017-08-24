@@ -27,9 +27,6 @@
  */
 
 /*
- * This file is part of the CMSIS++ proposal, intended as a CMSIS
- * replacement for C++ applications.
- *
  * The code is inspired by ARM CMSIS Driver_USART.h file, v2.02,
  * and tries to remain functionally close to the CMSIS specifications.
  */

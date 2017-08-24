@@ -29,9 +29,6 @@
 #define CMSIS_PLUS_RTOS_OS_INLINES_H_
 
 /*
- * This file is part of the CMSIS++ proposal, intended as a CMSIS
- * replacement for C++ applications.
- *
  * References are to ISO/IEC 14882:2011(E) Third edition (2011-09-01)
  */
 

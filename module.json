@@ -1,6 +1,6 @@
 {
 	"name": "ilg-cmsis-plus",
-	"description": "An xPack with CMSIS++, a proposal for a future CMSIS, written in C++ and POSIX compliant.",
+	"description": "An xPack with µOS++ IIIe, a POSIX inspired open source system, written in C++.",
 	"version": "0.1.1",
 	"keywords": [
 		"arm",

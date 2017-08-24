@@ -718,7 +718,7 @@ os_main (int argc, char* argv[])
  @brief  C API memory management definitions.
  @details
 
- The CMSIS++ RTOS includes several advanced and flexible 
+ The µOS++ RTOS includes several advanced and flexible 
  memory management features.
  
  Access to these classes from C can be done using the `os_memory_*()` 

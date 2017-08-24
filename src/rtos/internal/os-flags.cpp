@@ -25,11 +25,6 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/*
- * This file is part of the CMSIS++ proposal, intended as a CMSIS
- * replacement for C++ applications.
- */
-
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/diag/trace.h>
 #include <cmsis-plus/rtos/internal/os-flags.h>

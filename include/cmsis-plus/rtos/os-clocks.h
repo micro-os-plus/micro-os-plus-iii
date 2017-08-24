@@ -25,11 +25,6 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-/*
- * The initial CMSIS++ RTOS API was inspired by CMSIS RTOS API v1.x,
- * Copyright (c) 2013 ARM LIMITED.
- */
-
 #ifndef CMSIS_PLUS_RTOS_OS_CLOCKS_H_
 #define CMSIS_PLUS_RTOS_OS_CLOCKS_H_
 

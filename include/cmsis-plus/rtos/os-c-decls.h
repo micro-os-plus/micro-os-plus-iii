@@ -26,9 +26,6 @@
  */
 
 /*
- * This file is part of the CMSIS++ proposal, intended as a CMSIS
- * replacement for C++ applications.
- *
  * The structures declared in this file are used both in the C API
  * and in the legacy CMSIS API.
  *
@@ -45,14 +42,13 @@
 #include <cmsis-plus/os-versions.h>
 
 /**
- * @brief Tell the world that CMSIS++ is in use.
- *
+ * @brief Tell the world that µOS++ is in use.
  * @details
- * Macro to inform including files that CMSIS++ RTOS
+ * Macro to inform including files that µOS++ RTOS
  * definitions are available.
  */
-#define OS_USE_CMSIS_PLUS
-
+ #define OS_USE_MICRO_OS_PLUS
+ 
 #include <cmsis-plus/os-app-config.h>
 #include <cmsis-plus/rtos/port/os-decls.h>
 
@@ -102,7 +98,7 @@ extern "C"
    * @brief Type of values returned by RTOS functions.
    *
    * @details
-   * For error processing reasons, most CMSIS++ RTOS functions
+   * For error processing reasons, most µOS++ RTOS functions
    * return a numeric result, which, according to POSIX,
    * when the call was successful, must be `0`
    * (`os_ok`) or an error code defined in `<errno.h>` otherwise.

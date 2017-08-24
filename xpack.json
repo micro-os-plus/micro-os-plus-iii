@@ -3,7 +3,7 @@
 	"group": "ilg",
 	"name": "micro-os-plus-iii",
 	"title": "µOS++ IIIe",
-	"description": "An xPack with the third version of µOS++, based on CMSIS++ (a proposal for a future CMSIS in C++)",
+	"description": "An xPack with the third version of µOS++, a POSIX inspired open source system, written in C++",
 	"xcdlFile": ".xcdl.json",
 	"repository": 
 	{

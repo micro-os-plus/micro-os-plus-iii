@@ -53,7 +53,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wpadded"
 
     // This wrapper makes a CMSIS USBD Keil driver behave like a
-    // CMSIS++ Serial driver.
+    // µOS++ Serial driver.
 
     class usbd_wrapper : public usb::Device
     {

@@ -78,11 +78,8 @@
  */
 
 /*
- * This file is part of the CMSIS++ proposal, intended as a CMSIS
- * replacement for C++ applications.
- *
  * The code exposes a fully compliant ARM CMSIS API in the
- * context of the CMSIS++.
+ * context of the µOS++.
  */
 
 /*
@@ -109,7 +106,7 @@
 #define osCMSIS_KERNEL    0x00010000	 ///< RTOS identification and version (main [31:16] .sub [15:0])
 
 /// @note MUST REMAIN UNCHANGED: @b osKernelSystemId shall be consistent in every CMSIS-RTOS.
-#define osKernelSystemId "CMSIS++ V1.00" ///< RTOS identification string
+#define osKernelSystemId "µOS++" ///< RTOS identification string
 
 /// @note MUST REMAIN UNCHANGED: @b osFeature_xxx shall be consistent in every CMSIS-RTOS.
 #define osFeature_MainThread   0 ///< main thread      1=main can be thread, 0=not available
@@ -121,7 +118,7 @@
 #define osFeature_Wait         1 ///< osWait function: 1=available, 0=not available
 #define osFeature_SysTick      1 ///< osKernelSysTick functions: 1=available, 0=not available
 
-// Include the CMSIS++ C API structures declarations.
+// Include the µOS++ C API structures declarations.
 #include <cmsis-plus/rtos/os-c-decls.h>
 
 #include <stdint.h>
@@ -201,7 +198,7 @@ extern "C"
   typedef void
   (*os_ptimer) (void const *argument);
 
-  // Redefine some CMSIS++ struct's to the legacy code.
+  // Redefine some µOS++ struct's to the legacy code.
   typedef os_thread_t osThread;
   typedef os_thread_attr_t osThreadAttr;
 

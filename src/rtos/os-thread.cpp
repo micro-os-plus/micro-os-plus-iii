@@ -103,7 +103,7 @@ namespace os
     /**
      * @class thread
      * @details
-     * CMSIS++ threads are inspired by POSIX threads; they support
+     * µOS++ threads are inspired by POSIX threads; they support
      * functions that terminate and a simplified version of
      * signals as event flags.
      *

@@ -1,8 +1,6 @@
 ## Purpose
 
-The **µOS++ IIIe** _(micro oh ɛs plus plus third edition)_ project is the third iteration of µOS++, a POSIX-like, portable, open source, royalty-free, multi-tasking real-time operating system intended for 32/64-bits embedded applications, written in C++. 
-
-**CMSIS++** is a proposal for a future CMSIS, written in C++, and is the core component of µOS++ IIIe, defining the system APIs. These APIs are documented in the [CMSIS++ reference](http://micro-os-plus.github.io/reference/cmsis-plus/).
+The **µOS++ IIIe** _(micro oh ɛs plus plus third edition)_ project is the third iteration of µOS++, a POSIX-like, portable, open source, royalty-free, multi-tasking real-time operating system intended for 32/64-bits embedded applications, written in C++. The APIs are documented in the [µOS++ reference](http://micro-os-plus.github.io/reference/cmsis-plus/).
 
 **POSIX++** is another point of view of the project; with most system APIs using the POSIX semantics, but being written in C++, the **µOS++ IIIe** APIs can also be seen as a C++ version of POSIX, thus the name **POSIX++**.
 
@@ -33,12 +31,12 @@ To include µOS++ in a project, in addition to one of the port specific project,
 
 ### Symbols
 
-See [CMSIS++ Application Config](http://micro-os-plus.github.io/reference/cmsis-plus/group__cmsis-plus-app-config.html).
+See [µOS++ Application Config](http://micro-os-plus.github.io/reference/cmsis-plus/group__cmsis-plus-app-config.html).
 
 ## Documentation
 
 * [µOS++ IIIe](http://micro-os-plus.github.io)
-* [CMSIS++ reference](http://micro-os-plus.github.io/reference/cmsis-plus/)
+* [µOS++ reference](http://micro-os-plus.github.io/reference/cmsis-plus/)
 * the original ARM CMSIS documentation is available form 
 [keil.com](http://www.keil.com/pack/doc/CMSIS/General/html/index.html)
 
@@ -48,7 +46,7 @@ Examples on how to structure projects using µOS++, including integration with C
 
 ## Tests
 
-* tests/rtos - simple test to exercise the CMSIS++ RTOS C++ API, the C API and the ISO C++ API
+* tests/rtos - simple test to exercise the µOS++ RTOS C++ API, the C API and the ISO C++ API
 * tests/mutex-stress - a stress test with 10 threads fighting for a mutex
 * tests/sema-stress - a stress test posting to a semaphore from a high frequency interrupt.
 * tests/gcc - compile test with host GCC compiler

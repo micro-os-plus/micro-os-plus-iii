@@ -80,10 +80,10 @@
  @ingroup cmsis-plus-app-config
  @brief  Definitions used to select various custom RTOS port implementations.
  @details
- The CMSIS++ RTOS API can be configured to run on top of another
+ The µOS++ RTOS API can be configured to run on top of another
  RTOS scheduler (like FreeRTOS). It is also possible to select
  each synchronisation objects to use either the custom port objects or
- the CMSIS++ reference C++ implementations.
+ the µOS++ reference C++ implementations.
  */
 
 // ----------------------------------------------------------------------------

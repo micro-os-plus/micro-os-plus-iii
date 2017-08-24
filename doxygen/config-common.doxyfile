@@ -18,13 +18,13 @@
 #------------------------------------------------------------------------------
 
 # PROJECT_NAME = 
-PROJECT_NAME = "µOS++ IIIe / CMSIS++ / POSIX++ Reference"
+PROJECT_NAME = "µOS++ IIIe Reference"
 
 # PROJECT_NUMBER = 
 PROJECT_NUMBER = v6.3.11
 
 # PROJECT_BRIEF =
-PROJECT_BRIEF = "The third edition of µOS++ and CMSIS++, a proposal for the next generation CMSIS, written in C++."
+PROJECT_BRIEF = "The third edition of µOS++, a POSIX inspired open source system, written in C++."
 
 # PROJECT_LOGO = 
 PROJECT_LOGO = logo.png

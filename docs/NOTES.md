@@ -1,8 +1,8 @@
 # Criticism & suggestions
 
-These are some issues related to the current CMSIS APIs, with suggestions based on solutions used in CMSIS++.
+These are some issues related to the current CMSIS APIs, with suggestions based on solutions used in µOS++.
 
-## CMSIS RTOS API: Criticism, comments and CMSIS++ suggestions
+## CMSIS RTOS API: Criticism, comments and µOS++ suggestions
 
 ### For the impatient
 
@@ -93,7 +93,7 @@ Somehow acknowledging the initial design problems, ARM announced working on CMSI
 
 ARM also gave up returning aggregate objects, extended the priorities range, added explicit normal/recursive mutex objects, renamed some objects and generally kept very few features from the initial specification, so a design reset seems possible.
 
-However, based on the CMSIS++ experience, there are still more design decisions required to bring the new RTOS v2 closer to POSIX and ISO, for example using the POSIX error codes, using the POSIX explicit separate calls for different waiting functions (like `lock()`, `try_lock()`, `timed_wait()`), etc.
+However, based on the µOS++ experience, there are still more design decisions required to bring the new RTOS v2 closer to POSIX and ISO, for example using the POSIX error codes, using the POSIX explicit separate calls for different waiting functions (like `lock()`, `try_lock()`, `timed_wait()`), etc.
 
 
 ----

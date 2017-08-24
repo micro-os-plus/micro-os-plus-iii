@@ -26,14 +26,6 @@
  */
 
 /*
- * The initial CMSIS++ RTOS API was inspired by CMSIS RTOS API v1.x,
- * Copyright (c) 2013 ARM LIMITED.
- */
-
-/*
- * This file is part of the CMSIS++ proposal, intended as a CMSIS
- * replacement for C++ applications, and provides a C API.
- *
  * The code was originally inspired by ARM CMSIS cmsis_os.h file, v1.02,
  * and tries to remain functionally close to the CMSIS specifications.
  */
@@ -43,7 +35,7 @@
 
 // ----------------------------------------------------------------------------
 
-// Include the CMSIS++ C API structures declarations.
+// Include the µOS++ C API structures declarations.
 #include <cmsis-plus/rtos/os-c-decls.h>
 
 #include <cmsis-plus/rtos/os-hooks.h>
@@ -103,7 +95,7 @@ extern "C"
    * @details
    * If the application does not define a main() function but defines
    * os_main(),
-   * the CMSIS++ RTOS will automatically provide a main() function
+   * the µOS++ RTOS will automatically provide a main() function
    * that starts the main thread and calls os_main() within this context.
    *
    * The returned value is used in semihosted tests, to inform the

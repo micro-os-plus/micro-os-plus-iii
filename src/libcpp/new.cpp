@@ -26,9 +26,6 @@
  */
 
 /*
- * This file is part of the CMSIS++ proposal, intended as a CMSIS
- * replacement for C++ applications.
- *
  * [Partly inspired from the LLVM libcxx sources].
  * Copyright (c) 2009-2013 by the contributors listed in
  * 'LLVM libcxx Credits.txt'. See 'LLVM libcxx License.txt' for details.
