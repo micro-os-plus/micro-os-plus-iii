@@ -21,7 +21,7 @@
 PROJECT_NAME = "µOS++ IIIe Reference"
 
 # PROJECT_NUMBER = 
-PROJECT_NUMBER = v6.3.11
+PROJECT_NUMBER = v6.3.12
 
 # PROJECT_BRIEF =
 PROJECT_BRIEF = "The third edition of µOS++, a POSIX inspired open source system, written in C++."

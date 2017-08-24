@@ -186,4 +186,10 @@ Experience proved that one of the above changes was trickier than planned: the r
 - cortexm/os-core.cpp: align thread stack to 8 byte boundary
 - cortexm/os-core.cpp: assert both thread stack and MSP aligned
 
+### v6.3.12 2017-08-24
+
+- [#13] Fix typo (aquire -> acquire)
+- [#13] fix typos in documentation
+- replace most CMSIS++ references by µOS++
+
 ---
