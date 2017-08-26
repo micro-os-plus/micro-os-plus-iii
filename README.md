@@ -14,7 +14,7 @@ An xPack with the third version of µOS++, a POSIX inspired open source system, 
 
 ## Version
 
-* 6.3.12
+* 6.3.13
 
 ## Releases
 

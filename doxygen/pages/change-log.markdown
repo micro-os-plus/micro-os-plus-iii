@@ -2,7 +2,7 @@
 
 ## RTOS
 
-Records in chronologycal order.
+Records in chronological order.
 
 ### v0.1.1 2016-03-11 
 
@@ -191,5 +191,12 @@ Experience proved that one of the above changes was trickier than planned: the r
 - [#13] Fix typo (aquire -> acquire)
 - [#13] fix typos in documentation
 - replace most CMSIS++ references by µOS++
+
+### v6.3.13 2017-08-26
+
+- posix-io/c-syscalls-posix.cpp: __posix_gettimeofday() calls rtclock.now ()
+- add posix/termios.h
+- add posix-io/tty class
+- posix/*.h: update guard macros
 
 ---
