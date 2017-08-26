@@ -27,6 +27,7 @@
 
 #if !defined(OS_USE_SEMIHOSTING_SYSCALLS)
 
+#include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/posix-io/types.h>
 #include <cmsis-plus/posix-io/file-descriptors-manager.h>
 #include <cmsis-plus/posix-io/io.h>
@@ -684,8 +685,8 @@ __posix_socketpair (int domain, int type, int protocol, int socket_vector[2])
 int
 __posix_gettimeofday (struct timeval* ptimeval, void* ptimezone)
 {
-  errno = ENOSYS; // Not implemented
-  return -1;
+  ptimeval->tv_sec = (time_t) os::rtos::rtclock.now ();
+  ptimeval->tv_usec = 0;
 }
 
 int
