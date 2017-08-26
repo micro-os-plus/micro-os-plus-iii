@@ -25,8 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef POSIX_IO_DIRENT_H_
-#define POSIX_IO_DIRENT_H_
+#ifndef POSIX_DIRENT_H_
+#define POSIX_DIRENT_H_
 
 #if !defined(__ARM_EABI__)
 #include <dirent.h>
@@ -88,4 +88,4 @@ extern "C"
 
 #endif /* __ARM_EABI__ */
 
-#endif /* POSIX_IO_DIRENT_H_ */
+#endif /* POSIX_DIRENT_H_ */

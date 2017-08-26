@@ -30,15 +30,8 @@
  * $FreeBSD$
  */
 
-/*
- * Adapted for µOS++ as an initial solution to the missing termios header in the
- * embedded newlib. Should be included in the µOS++ package.
- *
- * 13 July 2017 (LNP) - no additional rights claimed.
- */
-
-#ifndef _SYS__TERMIOS_H_
-#define	_SYS__TERMIOS_H_
+#ifndef POSIX_TERMIOS_H_
+#define	POSIX_TERMIOS_H_
 
 /*
  * Special Control Characters
@@ -247,4 +240,4 @@ struct termios {
 	speed_t		c_ospeed;	/* output speed */
 };
 
-#endif /* !_SYS__TERMIOS_H_ */
+#endif /* POSIX_TERMIOS_H_ */

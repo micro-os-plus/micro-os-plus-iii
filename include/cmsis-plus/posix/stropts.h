@@ -25,8 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef POSIX_IO_STROPTS_H_
-#define POSIX_IO_STROPTS_H_
+#ifndef POSIX_STROPTS_H_
+#define POSIX_STROPTS_H_
 
 #if !defined(__ARM_EABI__)
 //#include <stropts.h>
@@ -47,4 +47,4 @@ extern "C"
 
 #endif /* __ARM_EABI__ */
 
-#endif /* POSIX_IO_STROPTS_H_ */
+#endif /* POSIX_STROPTS_H_ */

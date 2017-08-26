@@ -25,8 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef POSIX_IO_EMBED_H_
-#define POSIX_IO_EMBED_H_
+#ifndef POSIX_EMBED_H_
+#define POSIX_EMBED_H_
 
 // ----------------------------------------------------------------------------
 
@@ -38,4 +38,4 @@ sync (void);
 
 // ----------------------------------------------------------------------------
 
-#endif /* POSIX_IO_EMBED_H_ */
+#endif /* POSIX_EMBED_H_ */

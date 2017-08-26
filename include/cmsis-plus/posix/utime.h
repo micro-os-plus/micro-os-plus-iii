@@ -25,8 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef POSIX_IO_UTIME_H_
-#define POSIX_IO_UTIME_H_
+#ifndef POSIX_UTIME_H_
+#define POSIX_UTIME_H_
 
 // ----------------------------------------------------------------------------
 
@@ -54,4 +54,4 @@ extern "C"
 
 #endif /* __ARM_EABI__ */
 
-#endif /* POSIX_IO_UTIME_H_ */
+#endif /* POSIX_UTIME_H_ */
