@@ -30,7 +30,7 @@
 
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/posix-io/device-char.h>
-#include <termios.h>
+#include <cmsis-plus/posix/termios.h>
 
 #if defined (__cplusplus)
 
