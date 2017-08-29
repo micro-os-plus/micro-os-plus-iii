@@ -687,6 +687,8 @@ __posix_gettimeofday (struct timeval* ptimeval, void* ptimezone)
 {
   ptimeval->tv_sec = (time_t) os::rtos::rtclock.now ();
   ptimeval->tv_usec = 0;
+
+  return 0;
 }
 
 int
