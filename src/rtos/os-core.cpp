@@ -96,7 +96,25 @@ namespace os
 
       bool is_preemptive_ = false;
 
-      thread* volatile current_thread_;
+      // A small kludge to provide a temporary errno before
+      // the first real thread is created.
+      typedef struct {
+        void* vtbl;
+        void* name_;
+        // errno is the first thread member, so right after the name.
+        int errno_;
+      } tiny_thread_t;
+
+      // Ensure the tiny thread is large enough to have the errno
+      // member in the same location.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Winvalid-offsetof"
+      static_assert(offsetof(tiny_thread_t, errno_) == offsetof(thread, errno_), "adjust tiny_thread_t members");
+#pragma GCC diagnostic pop
+
+      tiny_thread_t tiny_thread;
+
+      thread* volatile current_thread_ = reinterpret_cast<thread*>(&tiny_thread);
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
