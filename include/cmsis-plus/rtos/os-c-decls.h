@@ -567,8 +567,8 @@ extern "C"
 
     void* vtbl;
     const char* name;
-    os_internal_waiting_thread_node_t ready_node;
     int errno_; // Prevent the macro to expand (for example with a prefix).
+    os_internal_waiting_thread_node_t ready_node;
     os_thread_func_t func;
     os_thread_func_args_t func_args;
     void* func_result_;

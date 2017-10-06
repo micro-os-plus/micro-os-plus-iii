@@ -231,6 +231,12 @@ namespace os
     {
     public:
 
+      // Must be the very first, for easy access and to keep the
+      // tiny thread used during initialisations to a minimum size.
+      int errno_ = 0;
+
+    public:
+
       // ======================================================================
 
       /**
@@ -1548,8 +1554,6 @@ namespace os
       // TODO: make it fully intrusive with computed offset.
       internal::waiting_thread_node ready_node_
         { *this };
-
-      int errno_ = 0;
 
       func_t func_ = nullptr;
       func_args_t func_args_ = nullptr;
