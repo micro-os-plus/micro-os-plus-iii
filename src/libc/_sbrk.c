@@ -48,15 +48,15 @@ _sbrk (ptrdiff_t incr);
 void*
 _sbrk (ptrdiff_t incr)
 {
-  extern char _Heap_Begin; // Defined by the linker.
-  extern char _Heap_Limit; // Defined by the linker.
+  extern unsigned int _Heap_Begin; // Defined by the linker.
+  extern unsigned int _Heap_Limit; // Defined by the linker.
 
   static char* current_heap_end; // STATIC! Zero after BSS init.
   char* current_block_address;
 
   if (current_heap_end == 0)
     {
-      current_heap_end = &_Heap_Begin;
+      current_heap_end = (char*)&_Heap_Begin;
     }
 
   current_block_address = current_heap_end;
@@ -66,7 +66,7 @@ _sbrk (ptrdiff_t incr)
   // word boundary, hence make sure we always add a multiple of
   // 4 to it.
   incr = (incr + 3) & (~3); // align value to 4
-  if (current_heap_end + incr > &_Heap_Limit)
+  if (current_heap_end + incr > ((char*)&_Heap_Limit))
     {
       // Some of the libstdc++-v3 tests rely upon detecting
       // out of memory errors, so DO NOT abort here.
