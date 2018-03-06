@@ -59,9 +59,9 @@ namespace os
     {
       // Forward to the variadic version of the function.
       std::va_list args;
-      va_start (args, oflag);
+      va_start(args, oflag);
       io* const ret = vopen (path, oflag, args);
-      va_end (args);
+      va_end(args);
 
       return ret;
     }
@@ -238,8 +238,23 @@ namespace os
 
       errno = 0;
 
+      // http://pubs.opengroup.org/onlinepubs/9699919799/functions/read.html
+      // Before any action described below is taken, and if nbyte is zero,
+      // the read() function may detect and return errors as described below.
+      // In the absence of errors, or if error detection is not performed,
+      // the read() function shall return zero and have no other results.
+      if (nbyte == 0)
+        {
+          return 0; // Nothing to do.
+        }
+
       // Execute the implementation specific code.
-      return do_read (buf, nbyte);
+      ssize_t ret = do_read (buf, nbyte);
+      if (ret >= 0)
+        {
+          offset_ += ret;
+        }
+      return ret;
     }
 
     ssize_t
@@ -265,13 +280,25 @@ namespace os
 
       errno = 0;
 
+      // http://pubs.opengroup.org/onlinepubs/9699919799/functions/pwrite.html
+      // Before any action described below is taken, and if nbyte is zero
+      // and the file is a regular file, the write() function may detect and
+      // return errors as described below. In the absence of errors, or if
+      // error detection is not performed, the write() function shall return
+      // zero and have no other results. If nbyte is zero and the file is
+      // not a regular file, the results are unspecified.
       if (nbyte == 0)
         {
           return 0; // Nothing to do.
         }
 
       // Execute the implementation specific code.
-      return do_write (buf, nbyte);
+      ssize_t ret = do_write (buf, nbyte);
+      if (ret >= 0)
+        {
+          offset_ += ret;
+        }
+      return ret;
     }
 
     ssize_t
@@ -304,7 +331,12 @@ namespace os
       errno = 0;
 
       // Execute the implementation specific code.
-      return do_writev (iov, iovcnt);
+      ssize_t ret = do_writev (iov, iovcnt);
+      if (ret >= 0)
+        {
+          offset_ += ret;
+        }
+      return ret;
     }
 
     int
@@ -312,9 +344,9 @@ namespace os
     {
       // Forward to the variadic version of the function.
       std::va_list args;
-      va_start (args, cmd);
+      va_start(args, cmd);
       int ret = vfcntl (cmd, args);
-      va_end (args);
+      va_end(args);
 
       return ret;
     }
@@ -375,6 +407,15 @@ namespace os
 
       // Execute the implementation specific code.
       return do_fstat (buf);
+    }
+
+    off_t
+    io::lseek (off_t offset, int whence)
+    {
+      errno = 0;
+
+      // Execute the implementation specific code.
+      return do_lseek (offset, whence);
     }
 
     // ------------------------------------------------------------------------
@@ -443,6 +484,13 @@ namespace os
 
     int
     io::do_fstat (struct stat* buf)
+    {
+      errno = ENOSYS; // Not implemented
+      return -1;
+    }
+
+    off_t
+    io::do_lseek (off_t offset, int whence)
     {
       errno = ENOSYS; // Not implemented
       return -1;

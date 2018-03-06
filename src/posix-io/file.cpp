@@ -44,9 +44,9 @@ namespace os
     {
       // Forward to the variadic version of the function.
       std::va_list args;
-      va_start (args, oflag);
+      va_start(args, oflag);
       auto* const ret = vopen (path, oflag, args);
-      va_end (args);
+      va_end(args);
 
       return ret;
     }
@@ -84,15 +84,6 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    off_t
-    file::lseek (off_t offset, int whence)
-    {
-      errno = 0;
-
-      // Execute the implementation specific code.
-      return do_lseek (offset, whence);
-    }
-
     int
     file::ftruncate (off_t length)
     {
@@ -121,13 +112,6 @@ namespace os
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-
-    off_t
-    file::do_lseek (off_t offset, int whence)
-    {
-      errno = ENOSYS; // Not implemented
-      return -1;
-    }
 
     int
     file::do_ftruncate (off_t length)

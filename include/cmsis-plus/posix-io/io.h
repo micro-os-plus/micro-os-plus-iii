@@ -181,6 +181,9 @@ namespace os
       int
       fstat (struct stat* buf);
 
+      off_t
+      lseek (off_t offset, int whence);
+
       // ----------------------------------------------------------------------
       // Support functions.
 
@@ -236,6 +239,9 @@ namespace os
       virtual int
       do_fstat (struct stat* buf);
 
+      virtual off_t
+      do_lseek (off_t offset, int whence);
+
       // ----------------------------------------------------------------------
       // Support functions.
 
@@ -264,6 +270,10 @@ namespace os
        */
 
       // ----------------------------------------------------------------------
+    protected:
+
+      off_t offset_ = 0;
+
     private:
 
       /**

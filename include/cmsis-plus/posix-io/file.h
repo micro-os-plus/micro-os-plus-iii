@@ -126,9 +126,6 @@ namespace os
 
     public:
 
-      off_t
-      lseek (off_t offset, int whence);
-
       int
       ftruncate (off_t length);
 
@@ -160,9 +157,6 @@ namespace os
        */
       virtual int
       do_vopen (const char* path, int oflag, std::va_list args) = 0;
-
-      virtual off_t
-      do_lseek (off_t offset, int whence);
 
       virtual int
       do_ftruncate (off_t length);
