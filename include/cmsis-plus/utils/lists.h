@@ -551,13 +551,6 @@ namespace os
      *
      * @details
      * This class provides an interface similar to std::list::iterator.
-     *
-     * @par Examples
-     *
-     * @code{.cpp}
-     * using threads_list = utils::intrusive_list<
-     * thread, utils::double_list_links, &thread::child_links_>;
-     * @endcode
      */
     template<typename T, typename N, N T::* MP, typename U = T>
       class intrusive_list_iterator
@@ -698,18 +691,30 @@ namespace os
      * @brief List of intrusive nodes.
      * @headerfile lists.h <cmsis-plus/utils/lists.h>
      * @ingroup cmsis-plus-utils
+     * @tparam T Type of object that includes the intrusive node.
+     * @tparam N Type of intrusive node. Must have the public members
+     * **prev** & **next**.
+     * @tparam MP Name of the intrusive node member in object T.
+     * @tparam U Type stored in the list, derived from T.
+     *
+     * @par Examples
+     *
+     * @code{.cpp}
+     * using threads_list = utils::intrusive_list<
+     * thread, utils::double_list_links, &thread::child_links_>;
+     * @endcode
      */
-    template<typename T, typename N, N T::* MP>
+    template<typename T, typename N, N T::* MP, typename U = T>
       class intrusive_list : public static_double_list
       {
       public:
 
-        using value_type = T;
-        using pointer = T*;
-        using reference = T&;
+        using value_type = U;
+        using pointer = U*;
+        using reference = U&;
         using difference_type = ptrdiff_t;
 
-        using iterator = intrusive_list_iterator<T, N, MP>;
+        using iterator = intrusive_list_iterator<T, N, MP, U>;
 
         /**
          * @brief Type of reference to the iterator internal pointer.
@@ -1127,8 +1132,7 @@ namespace os
         // Compute the distance between the member intrusive link
         // node and the class begin.
         const auto offset =
-            reinterpret_cast<difference_type> (&(static_cast<pointer> (nullptr)
-                ->*MP));
+            reinterpret_cast<difference_type> (&(static_cast<T*> (nullptr)->*MP));
 
         // Compute the address of the object which includes the
         // intrusive node, by adjusting down the node address.
@@ -1145,16 +1149,16 @@ namespace os
 
     // ========================================================================
 
-    template<typename T, typename N, N T::* MP>
+    template<typename T, typename N, N T::* MP, typename U>
       inline
-      intrusive_list<T, N, MP>::intrusive_list ()
+      intrusive_list<T, N, MP, U>::intrusive_list ()
       {
         ;
       }
 
-    template<typename T, typename N, N T::* MP>
+    template<typename T, typename N, N T::* MP, typename U>
       inline
-      intrusive_list<T, N, MP>::intrusive_list (bool clr)
+      intrusive_list<T, N, MP, U>::intrusive_list (bool clr)
       {
         if (clr)
           {
@@ -1162,16 +1166,16 @@ namespace os
           }
       }
 
-    template<typename T, typename N, N T::* MP>
+    template<typename T, typename N, N T::* MP, typename U>
       inline
-      intrusive_list<T, N, MP>::~intrusive_list ()
+      intrusive_list<T, N, MP, U>::~intrusive_list ()
       {
         ;
       }
 
-    template<typename T, typename N, N T::* MP>
+    template<typename T, typename N, N T::* MP, typename U>
       void
-      intrusive_list<T, N, MP>::link (T& node)
+      intrusive_list<T, N, MP, U>::link (U& node)
       {
         if (uninitialized ())
           {
@@ -1182,8 +1186,7 @@ namespace os
         // Compute the distance between the member intrusive link
         // node and the class begin.
         const auto offset =
-            reinterpret_cast<difference_type> (&(static_cast<pointer> (nullptr)
-                ->*MP));
+            reinterpret_cast<difference_type> (&(static_cast<T*> (nullptr)->*MP));
 
         // Add thread intrusive node at the end of the list.
         insert_after (
@@ -1196,9 +1199,9 @@ namespace os
      * @details
      * @note It is not `const` because it may initialise on first use.
      */
-    template<typename T, typename N, N T::* MP>
-      inline typename intrusive_list<T, N, MP>::iterator
-      intrusive_list<T, N, MP>::begin ()
+    template<typename T, typename N, N T::* MP, typename U>
+      inline typename intrusive_list<T, N, MP, U>::iterator
+      intrusive_list<T, N, MP, U>::begin ()
       {
         if (uninitialized ())
           {
@@ -1209,9 +1212,9 @@ namespace os
           { static_cast<iterator_pointer> (head_.next ()) };
       }
 
-    template<typename T, typename N, N T::* MP>
-      inline typename intrusive_list<T, N, MP>::iterator
-      intrusive_list<T, N, MP>::end () const
+    template<typename T, typename N, N T::* MP, typename U>
+      inline typename intrusive_list<T, N, MP, U>::iterator
+      intrusive_list<T, N, MP, U>::end () const
       {
         return iterator
           {
