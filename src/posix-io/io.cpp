@@ -444,28 +444,8 @@ namespace os
     // doOpen() is not here because it is virtual,
     // it must be implemented by derived classes.
 
-    int
-    io::do_close (void)
-    {
-      return 0; // Always return success
-    }
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-
-    ssize_t
-    io::do_read (void* buf, std::size_t nbyte)
-    {
-      errno = ENOSYS; // Not implemented
-      return -1;
-    }
-
-    ssize_t
-    io::do_write (const void* buf, std::size_t nbyte)
-    {
-      errno = ENOSYS; // Not implemented
-      return -1;
-    }
 
     // This is not exactly standard, since POSIX requires writev() to be
     // atomic, but functionally it is close. Override it and implement

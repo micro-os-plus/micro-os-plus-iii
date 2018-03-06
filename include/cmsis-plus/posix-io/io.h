@@ -221,13 +221,13 @@ namespace os
       // (for example for sockets()).
 
       virtual int
-      do_close (void);
+      do_close (void) = 0;
 
       virtual ssize_t
-      do_read (void* buf, std::size_t nbyte);
+      do_read (void* buf, std::size_t nbyte) = 0;
 
       virtual ssize_t
-      do_write (const void* buf, std::size_t nbyte);
+      do_write (const void* buf, std::size_t nbyte) = 0;
 
       virtual ssize_t
       do_writev (const struct iovec* iov, int iovcnt);
