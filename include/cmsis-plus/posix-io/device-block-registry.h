@@ -1,7 +1,7 @@
 /*
  * This file is part of the µOS++ distribution.
  *   (https://github.com/micro-os-plus)
- * Copyright (c) 2015 Liviu Ionescu.
+ * Copyright (c) 2018 Liviu Ionescu.
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,7 +25,15 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/posix-io/device-char-registry.h>
+#ifndef CMSIS_PLUS_POSIX_IO_DEVICE_BLOCK_REGISTRY_H_
+#define CMSIS_PLUS_POSIX_IO_DEVICE_BLOCK_REGISTRY_H_
+
+#if defined(__cplusplus)
+
+// ----------------------------------------------------------------------------
+
+#include <cmsis-plus/posix-io/device-registry.h>
+#include <cmsis-plus/posix-io/device-block.h>
 
 // ----------------------------------------------------------------------------
 
@@ -36,22 +44,17 @@ namespace os
     // ------------------------------------------------------------------------
 
     /**
-     * @cond ignore
+     * @brief Block devices registry static class.
+     * @headerfile device-block-registry.h <cmsis-plus/posix-io/device-block-registry.h>
+     * @ingroup cmsis-plus-posix-io-base
      */
-
-#pragma GCC diagnostic push
-#if defined(__clang__)
-#pragma clang diagnostic ignored "-Wglobal-constructors"
-#pragma clang diagnostic ignored "-Wexit-time-destructors"
-#endif
-
-    // Explicit template instantiation.
-    // Used mainly to allocate the static `registry_list__` member.
-    template class device_registry<device_char> ;
-
-#pragma GCC diagnostic pop
+    using device_block_registry = device_registry<device_block>;
 
   } /* namespace posix */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------
+
+#endif /* __cplusplus */
+
+#endif /* CMSIS_PLUS_POSIX_IO_DEVICE_BLOCK_REGISTRY_H_ */

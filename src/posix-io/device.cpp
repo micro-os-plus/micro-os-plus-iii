@@ -1,7 +1,7 @@
 /*
  * This file is part of the µOS++ distribution.
  *   (https://github.com/micro-os-plus)
- * Copyright (c) 2015 Liviu Ionescu.
+ * Copyright (c) 2018 Liviu Ionescu.
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,7 +25,17 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/posix-io/device-char-registry.h>
+#include <cmsis-plus/posix-io/device.h>
+
+#include <cmsis-plus/posix/sys/ioctl.h>
+
+#include <cmsis-plus/diag/trace.h>
+
+#include <cstring>
+#include <cassert>
+#include <cerrno>
+#include <cstdarg>
+#include <unistd.h>
 
 // ----------------------------------------------------------------------------
 
@@ -35,19 +45,62 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    /**
-     * @cond ignore
-     */
+    device::device (type t, const char* name) :
+        io (t), //
+        name_ (name)
+    {
+      trace::printf ("%s(\"%s\") @%p\n", __func__, name_, this);
+    }
+
+    device::~device ()
+    {
+      trace::printf ("%s() @%p %s\n", __func__, this, name_);
+
+      registry_links_.unlink ();
+
+      name_ = nullptr;
+    }
+
+    // ------------------------------------------------------------------------
+
+    int
+    device::ioctl (int request, ...)
+    {
+      // Forward to the variadic version of the function.
+      std::va_list args;
+      va_start(args, request);
+      int ret = vioctl (request, args);
+      va_end(args);
+
+      return ret;
+    }
+
+    int
+    device::vioctl (int request, std::va_list args)
+    {
+      return do_vioctl (request, args);
+    }
+
+    // ------------------------------------------------------------------------
+
+    bool
+    device::match_name (const char* name) const
+    {
+      assert(name != nullptr);
+      assert(name_ != nullptr);
+
+      return (std::strcmp (name, name_) == 0);
+    }
 
 #pragma GCC diagnostic push
-#if defined(__clang__)
-#pragma clang diagnostic ignored "-Wglobal-constructors"
-#pragma clang diagnostic ignored "-Wexit-time-destructors"
-#endif
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 
-    // Explicit template instantiation.
-    // Used mainly to allocate the static `registry_list__` member.
-    template class device_registry<device_char> ;
+    int
+    device::do_vioctl (int request, std::va_list args)
+    {
+      errno = ENOSYS; // Not implemented
+      return -1;
+    }
 
 #pragma GCC diagnostic pop
 

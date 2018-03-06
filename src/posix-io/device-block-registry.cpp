@@ -1,7 +1,7 @@
 /*
  * This file is part of the µOS++ distribution.
  *   (https://github.com/micro-os-plus)
- * Copyright (c) 2015 Liviu Ionescu.
+ * Copyright (c) 2018 Liviu Ionescu.
  *
  * Permission is hereby granted, free of charge, to any person
  * obtaining a copy of this software and associated documentation
@@ -25,7 +25,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/posix-io/device-char-registry.h>
+#include <cmsis-plus/posix-io/device-block-registry.h>
 
 // ----------------------------------------------------------------------------
 
@@ -47,9 +47,13 @@ namespace os
 
     // Explicit template instantiation.
     // Used mainly to allocate the static `registry_list__` member.
-    template class device_registry<device_char> ;
+    template class device_registry<device_block> ;
 
 #pragma GCC diagnostic pop
+
+  /**
+   * @endcond
+   */
 
   } /* namespace posix */
 } /* namespace os */

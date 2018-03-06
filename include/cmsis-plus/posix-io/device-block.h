@@ -32,6 +32,24 @@
 
 // ----------------------------------------------------------------------------
 
+#include <cmsis-plus/posix-io/device.h>
+#include <cmsis-plus/utils/lists.h>
+
+// ----------------------------------------------------------------------------
+
+#if ! defined(OS_STRING_POSIX_DEVICE_BLOCK_PREFIX)
+#define OS_STRING_POSIX_DEVICE_BLOCK_PREFIX "/bdev/"
+#endif
+
+namespace os
+{
+  namespace rtos
+  {
+    class mutex;
+  }
+}
+// ----------------------------------------------------------------------------
+
 namespace os
 {
   namespace posix
@@ -41,8 +59,25 @@ namespace os
      * @headerfile device-block.h <cmsis-plus/posix-io/device-block.h>
      * @ingroup cmsis-plus-posix-io-base
      */
-    class device_block
+    class device_block : public device
     {
+      // ----------------------------------------------------------------------
+
+      /**
+       * @cond ignore
+       */
+
+      friend io*
+      vopen (const char* path, int oflag, std::va_list args);
+
+      /**
+       * @endcond
+       */
+
+    public:
+
+      // TODO: define a way to change this to uint64_t;
+      using blknum_t = uint32_t;
 
       // ----------------------------------------------------------------------
 
@@ -53,7 +88,7 @@ namespace os
 
     public:
 
-      device_block () = default;
+      device_block (const char* name, os::rtos::mutex* mutex = nullptr);
 
       /**
        * @cond ignore
@@ -71,14 +106,134 @@ namespace os
        * @endcond
        */
 
-      ~device_block () = default;
+      virtual
+      ~device_block ();
 
       /**
        * @}
        */
 
-      // TODO: add content
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+    public:
+
+      virtual int
+      vioctl (int request, std::va_list args) override;
+
+      ssize_t
+      read_block (void* buf, blknum_t blknum, std::size_t nblocks = 1);
+
+      ssize_t
+      write_block (const void* buf, blknum_t blknum, std::size_t nblocks = 1);
+
+      /**
+       *
+       * @return The number of blocks.
+       */
+      blknum_t
+      blocks (void);
+
+      /**
+       *
+       * @return The number of bytes in a block.
+       */
+      std::size_t
+      block_size_bytes (void);
+
+      // ----------------------------------------------------------------------
+
+      static const char*
+      device_prefix (void);
+
+      /**
+       * @}
+       */
+
+      // ----------------------------------------------------------------------
+      /**
+       * @name Private Member Functions
+       * @{
+       */
+
+    protected:
+
+      // Derived classes **must** set `block_size_` and `num_blocks_`.
+      virtual int
+      do_vopen (const char* path, int oflag, std::va_list args) = 0;
+
+      virtual int
+      do_vioctl (int request, std::va_list args) override;
+
+      virtual ssize_t
+      do_read (void* buf, std::size_t nbyte) override;
+
+      virtual ssize_t
+      do_write (const void* buf, std::size_t nbyte) override;
+
+      virtual ssize_t
+      do_read_block (void* buf, blknum_t blknum, std::size_t nblocks) = 0;
+
+      virtual ssize_t
+      do_write_block (const void* buf, blknum_t blknum,
+                      std::size_t nblocks) = 0;
+
+      virtual int
+      do_isatty (void) final;
+
+      virtual off_t
+      do_lseek (off_t offset, int whence) override;
+
+      /**
+       * @}
+       */
+
+      // ----------------------------------------------------------------------
+    protected:
+
+      /**
+       * @cond ignore
+       */
+
+      os::rtos::mutex* mutex_ = nullptr;
+      std::size_t block_size_bytes_ = 0;
+      blknum_t num_blocks_ = 0;
+
+      /**
+       * @endcond
+       */
     };
+
+  } /* namespace posix */
+} /* namespace os */
+
+// ===== Inline & template implementations ====================================
+
+namespace os
+{
+  namespace posix
+  {
+    // ------------------------------------------------------------------------
+
+    inline device_block::blknum_t
+    device_block::blocks (void)
+    {
+      return num_blocks_;
+    }
+
+    inline std::size_t
+    device_block::block_size_bytes (void)
+    {
+      return block_size_bytes_;
+    }
+
+    inline const char*
+    device_block::device_prefix (void)
+    {
+      return OS_STRING_POSIX_DEVICE_BLOCK_PREFIX;
+    }
 
   } /* namespace posix */
 } /* namespace os */

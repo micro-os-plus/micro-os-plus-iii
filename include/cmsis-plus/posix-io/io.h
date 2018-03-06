@@ -107,8 +107,9 @@ namespace os
           { unknown = 0,
         not_set = 1 << 0,
         device = 1 << 1,
-        file = 1 << 2,
-        socket = 1 << 3
+        block = 1 << 2,
+        file = 1 << 3,
+        socket = 1 << 4
       };
 
       /**
@@ -142,6 +143,7 @@ namespace os
        */
 
     public:
+
       virtual
       ~io ();
 

@@ -26,8 +26,10 @@
  */
 
 #include <cmsis-plus/posix-io/device-char.h>
+#include <cmsis-plus/posix-io/device-block.h>
 #include <cmsis-plus/posix/sys/uio.h>
 #include <cmsis-plus/posix-io/device-char-registry.h>
+#include <cmsis-plus/posix-io/device-block-registry.h>
 #include <cmsis-plus/posix-io/file.h>
 #include <cmsis-plus/posix-io/file-descriptors-manager.h>
 #include <cmsis-plus/posix-io/file-system.h>
@@ -88,22 +90,40 @@ namespace os
 
       errno = 0;
 
-      // First check if path is a char device.
-      os::posix::io* io = os::posix::device_char_registry::identify_device (
-          path);
-      if (io != nullptr)
+      os::posix::io* io;
+      while (true)
         {
-          // If so, use the implementation to open the device.
-          int oret = static_cast<device_char*> (io)->do_vopen (path, oflag,
-                                                               args);
-          if (oret < 0)
+          // Check if path is a char device.
+          io = os::posix::device_char_registry::identify_device (path);
+          if (io != nullptr)
             {
-              // Open failed.
-              return nullptr;
+              // If so, use the implementation to open the device.
+              int oret = static_cast<device_char*> (io)->do_vopen (path, oflag,
+                                                                   args);
+              if (oret < 0)
+                {
+                  // Open failed.
+                  return nullptr;
+                }
+              break;
             }
-        }
-      else
-        {
+
+          // Check if path is a block device.
+          io = os::posix::device_block_registry::identify_device (path);
+          if (io != nullptr)
+            {
+              // If so, use the implementation to open the device.
+              int oret = static_cast<device_block*> (io)->do_vopen (path, oflag,
+                                                                    args);
+              if (oret < 0)
+                {
+                  // Open failed.
+                  return nullptr;
+                }
+              break;
+            }
+
+          // Check if a regular file.
           auto adjusted_path = path;
           auto* const fs = os::posix::mount_manager::identify_file_system (
               &adjusted_path);
@@ -124,6 +144,7 @@ namespace os
               // Open failed.
               return nullptr;
             }
+          break;
         }
 
       // If successful, allocate a file descriptor.
