@@ -92,7 +92,6 @@ namespace os
       errno = 0;
 
       os::posix::io* io;
-      int ret = 0;
       while (true)
         {
           // Check if path is a device.
