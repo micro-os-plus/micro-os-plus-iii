@@ -69,7 +69,7 @@ namespace os
     void
     file::do_release (void)
     {
-      // Files is free, return it to the pool.
+      // The `file` object is free, return it to the pool.
       auto fs = file_system ();
       if (fs != nullptr)
         {
@@ -78,6 +78,7 @@ namespace os
             {
               pool->release (this);
             }
+          // Clear the file_system pointer, to avoid entering again.
           file_system (nullptr);
         }
     }
@@ -127,6 +128,12 @@ namespace os
     {
       errno = ENOSYS; // Not implemented
       return -1;
+    }
+
+    int
+    file::do_isatty (void)
+    {
+      return 0; // Files are not TTYs.
     }
 
   } /* namespace posix */

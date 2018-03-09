@@ -167,6 +167,9 @@ namespace os
       virtual void
       do_release (void) override;
 
+      virtual int
+      do_isatty (void) final;
+
       // ----------------------------------------------------------------------
       // Support functions.
 
