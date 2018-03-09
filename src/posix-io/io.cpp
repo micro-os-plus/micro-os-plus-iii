@@ -76,6 +76,8 @@ namespace os
     io*
     vopen (const char* path, int oflag, std::va_list args)
     {
+      trace::printf ("%s(\"%s\")\n", __func__, path ? path : "");
+
       if (path == nullptr)
         {
           errno = EFAULT;
@@ -161,6 +163,7 @@ namespace os
     io*
     io::alloc_file_descriptor (void)
     {
+      trace::printf ("io::%s() @%p\n", __func__, this);
 
       int fd = file_descriptors_manager::alloc (this);
       if (fd < 0)
@@ -171,6 +174,8 @@ namespace os
           return nullptr;
         }
 
+      trace::printf ("io::%s() @%p fd=%d\n", __func__, this, fd);
+
       // Return a valid pointer to an object derived from `io`.
       return this;
     }
@@ -179,12 +184,16 @@ namespace os
 
     io::io (type t)
     {
+      trace::printf ("io::%s()=%p\n", __func__, this);
+
       type_ = t;
       file_descriptor_ = no_file_descriptor;
     }
 
     io::~io ()
     {
+      trace::printf ("io::%s() @%p\n", __func__, this);
+
       file_descriptor_ = no_file_descriptor;
     }
 
@@ -194,6 +203,7 @@ namespace os
     io::close (void)
     {
       errno = 0;
+      trace::printf ("io::%s() @%p\n", __func__, this);
 
       if (!do_is_opened ())
         {
@@ -238,6 +248,7 @@ namespace os
     ssize_t
     io::read (void* buf, std::size_t nbyte)
     {
+      trace::printf ("io::%s(0x0%X, %u) @%p\n", __func__, buf, nbyte, this);
 
       if (buf == nullptr)
         {
@@ -281,6 +292,8 @@ namespace os
     ssize_t
     io::write (const void* buf, std::size_t nbyte)
     {
+      trace::printf ("io::%s(0x0%X, %u) @%p\n", __func__, buf, nbyte, this);
+
       if (buf == nullptr)
         {
           errno = EFAULT;
@@ -325,6 +338,8 @@ namespace os
     ssize_t
     io::writev (const struct iovec* iov, int iovcnt)
     {
+      trace::printf ("io::%s(0x0%X, %d) @%p\n", __func__, iov, iovcnt, this);
+
       if (iov == nullptr)
         {
           errno = EFAULT;
@@ -375,6 +390,8 @@ namespace os
     int
     io::vfcntl (int cmd, std::va_list args)
     {
+      trace::printf ("io::%s(%d) @%p\n", __func__, cmd, this);
+
       if (!do_is_opened ())
         {
           errno = EBADF; // Not opened.
@@ -406,6 +423,8 @@ namespace os
     int
     io::fstat (struct stat* buf)
     {
+      trace::printf ("io::%s(%p) @%p\n", __func__, buf, this);
+
       if (buf == nullptr)
         {
           errno = EFAULT;
@@ -433,6 +452,8 @@ namespace os
     off_t
     io::lseek (off_t offset, int whence)
     {
+      trace::printf ("io::%s(%d, %d) @%p\n", __func__, offset, whence, this);
+
       errno = 0;
 
       // Execute the implementation specific code.

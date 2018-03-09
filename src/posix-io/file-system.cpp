@@ -31,6 +31,8 @@
 #include <cmsis-plus/posix-io/io.h>
 #include <cmsis-plus/posix-io/mount-manager.h>
 #include <cmsis-plus/posix-io/pool.h>
+#include <cmsis-plus/diag/trace.h>
+
 #include <cerrno>
 #include <cassert>
 
@@ -298,6 +300,8 @@ namespace os
 
     file_system::file_system (pool* files_pool, pool* dirs_pool)
     {
+      os::trace::printf ("%s() @%p\n", __func__, this);
+
       files_pool_ = files_pool;
       dirs_pool_ = dirs_pool;
       block_device_ = nullptr;
@@ -305,6 +309,8 @@ namespace os
 
     file_system::~file_system ()
     {
+      trace::printf ("%s() @%p\n", __func__, this);
+
       block_device_ = nullptr;
     }
 

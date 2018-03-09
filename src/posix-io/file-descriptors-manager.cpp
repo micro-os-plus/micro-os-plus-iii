@@ -28,6 +28,9 @@
 #include <cmsis-plus/posix-io/file-descriptors-manager.h>
 #include <cmsis-plus/posix-io/io.h>
 #include <cmsis-plus/posix-io/socket.h>
+
+#include <cmsis-plus/diag/trace.h>
+
 #include <cerrno>
 #include <cassert>
 #include <cstddef>
@@ -56,6 +59,9 @@ namespace os
     file_descriptors_manager::file_descriptors_manager (std::size_t size)
     {
       assert (size > 3);
+      trace::printf ("file_descriptors_manager::%s(%d)=%p\n", __func__, size,
+                     this);
+
 
       size__ = size;
       descriptors_array__ = new class io*[size];
@@ -68,6 +74,8 @@ namespace os
 
     file_descriptors_manager::~file_descriptors_manager ()
     {
+      trace::printf ("file_descriptors_manager::%s(%) @%p\n", __func__, this);
+
       delete[] descriptors_array__;
       size__ = 0;
     }
@@ -99,6 +107,8 @@ namespace os
     int
     file_descriptors_manager::alloc (class io* io)
     {
+      trace::printf ("file_descriptors_manager::%s(%p)\n", __func__, io);
+
       if (io->file_descriptor () >= 0)
         {
           // Already allocated
@@ -113,6 +123,8 @@ namespace os
             {
               descriptors_array__[i] = io;
               io->file_descriptor (static_cast<int> (i));
+              trace::printf ("file_descriptors_manager::%s(%p) fd=%d\n",
+                             __func__, io, i);
               return static_cast<int> (i);
             }
         }
@@ -146,6 +158,8 @@ namespace os
     int
     file_descriptors_manager::free (int fildes)
     {
+      trace::printf ("file_descriptors_manager::%s(%d)\n", __func__, fildes);
+
       if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= size__))
         {
           errno = EBADF;

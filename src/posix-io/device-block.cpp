@@ -51,14 +51,14 @@ namespace os
         device (type::block, name), //
         mutex_ (mutex)
     {
-      trace::printf ("%s(\"%s\") @%p\n", __func__, name_, this);
+      trace::printf ("device_block::%s(\"%s\")=@%p\n", __func__, name_, this);
 
       device_block_registry::link (this);
     }
 
     device_block::~device_block ()
     {
-      trace::printf ("%s() @%p %s\n", __func__, this, name_);
+      trace::printf ("device_block::%s() @%p %s\n", __func__, this, name_);
 
       mutex_ = nullptr;
       block_size_bytes_ = 0;
@@ -70,6 +70,9 @@ namespace os
     ssize_t
     device_block::read_block (void* buf, blknum_t blknum, std::size_t nblocks)
     {
+      trace::printf ("device_block::%s(%p, %u, %u) @%p\n", __func__, buf,
+                     blknum, nblocks, this);
+
       ssize_t ret;
       if (mutex_ != nullptr)
         {
@@ -87,6 +90,9 @@ namespace os
     device_block::write_block (const void* buf, blknum_t blknum,
                                std::size_t nblocks)
     {
+      trace::printf ("device_block::%s(%p, %u, %u) @%p\n", __func__, buf,
+                     blknum, nblocks, this);
+
       ssize_t ret;
       if (mutex_ != nullptr)
         {
@@ -103,6 +109,8 @@ namespace os
     int
     device_block::vioctl (int request, std::va_list args)
     {
+      trace::printf ("device_block::%s(%d) @%p\n", __func__, request, this);
+
       errno = 0;
 
       switch (request)
@@ -155,6 +163,9 @@ namespace os
     off_t
     device_block::do_lseek (off_t offset, int whence)
     {
+      trace::printf ("device_block::%s(%d, %d) @%p\n", __func__, offset, whence,
+                     this);
+
       errno = 0;
       off_t tmp = offset_;
 
@@ -187,6 +198,9 @@ namespace os
     ssize_t
     device_block::do_read (void* buf, std::size_t nbyte)
     {
+      trace::printf ("device_block::%s(%p, %u) @%p\n", __func__, buf, nbyte,
+                     this);
+
       if ((block_size_bytes_ == 0) || ((nbyte % block_size_bytes_) != 0)
           || ((offset_ % block_size_bytes_) != 0))
         {
@@ -208,6 +222,9 @@ namespace os
     ssize_t
     device_block::do_write (const void* buf, std::size_t nbyte)
     {
+      trace::printf ("device_block::%s(%p, %u) @%p\n", __func__, buf, nbyte,
+                     this);
+
       if ((block_size_bytes_ == 0) || ((nbyte % block_size_bytes_) != 0)
           || ((offset_ % block_size_bytes_) != 0))
         {

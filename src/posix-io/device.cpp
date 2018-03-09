@@ -49,12 +49,12 @@ namespace os
         io (t), //
         name_ (name)
     {
-      trace::printf ("%s(\"%s\") @%p\n", __func__, name_, this);
+      trace::printf ("device::%s(\"%s\")=%p\n", __func__, name_, this);
     }
 
     device::~device ()
     {
-      trace::printf ("%s() @%p %s\n", __func__, this, name_);
+      trace::printf ("device::%s() @%p %s\n", __func__, this, name_);
 
       registry_links_.unlink ();
 
