@@ -58,13 +58,13 @@ namespace os
     // ------------------------------------------------------------------------
     file_descriptors_manager::file_descriptors_manager (std::size_t size)
     {
-      assert (size > 3);
       trace::printf ("file_descriptors_manager::%s(%d)=%p\n", __func__, size,
                      this);
 
+      assert(size > 0);
 
-      size__ = size;
-      descriptors_array__ = new class io*[size];
+      size__ = size + 3; // Add space for standard files.
+      descriptors_array__ = new class io*[size__];
 
       for (std::size_t i = 0; i < file_descriptors_manager::size (); ++i)
         {
