@@ -182,6 +182,14 @@ namespace os
 
     public:
 
+      int
+      mount (const char* path = nullptr, unsigned int flags = 0);
+
+      int
+      umount (int unsigned flags = 0);
+
+      // ----------------------------------------------------------------------
+
       io*
       vopen (const char* path, int oflag, std::va_list args);
 

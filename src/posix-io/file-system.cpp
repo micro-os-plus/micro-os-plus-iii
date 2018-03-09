@@ -316,6 +316,20 @@ namespace os
 
     // ------------------------------------------------------------------------
 
+    int
+    file_system::mount (const char* path, unsigned int flags)
+    {
+      return -1;
+    }
+
+    int
+    file_system::umount (int unsigned flags)
+    {
+      return -1;
+    }
+
+    // ------------------------------------------------------------------------
+
     io*
     file_system::vopen (const char* path, int oflag, std::va_list args)
     {
@@ -413,16 +427,30 @@ namespace os
       return do_unlink (path);
     }
 
+    // http://pubs.opengroup.org/onlinepubs/9699919799/functions/utime.html
     int
     file_system::utime (const char* path, const struct utimbuf* times)
     {
       assert(block_device_ != nullptr);
       errno = 0;
 
-      // Execute the implementation specific code.
-      return do_utime (path, times);
+      struct utimbuf tmp;
+      if (times == nullptr)
+        {
+          // If times is a null pointer, the access and modification times
+          // of the file shall be set to the current time.
+          tmp.actime = time (nullptr);
+          tmp.modtime = tmp.actime;
+          return do_utime (path, &tmp);
+        }
+      else
+        {
+          // Execute the implementation specific code.
+          return do_utime (path, times);
+        }
     }
 
+    // http://pubs.opengroup.org/onlinepubs/9699919799/functions/chdir.html
     // ------------------------------------------------------------------------
 
     const
