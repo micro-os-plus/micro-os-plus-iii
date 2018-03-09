@@ -89,9 +89,9 @@ int
 __posix_open (const char* path, int oflag, ...)
 {
   va_list args;
-  va_start (args, oflag);
+  va_start(args, oflag);
   auto* const io = posix::vopen (path, oflag, args);
-  va_end (args);
+  va_end(args);
 
   if (io == nullptr)
     {
@@ -183,9 +183,9 @@ __posix_ioctl (int fildes, int request, ...)
     }
 
   va_list args;
-  va_start (args, request);
+  va_start(args, request);
   int ret = (static_cast<posix::device_char*> (io))->vioctl (request, args);
-  va_end (args);
+  va_end(args);
 
   return ret;
 }
@@ -243,9 +243,9 @@ __posix_fcntl (int fildes, int cmd, ...)
     }
 
   va_list args;
-  va_start (args, cmd);
+  va_start(args, cmd);
   int ret = io->vfcntl (cmd, args);
-  va_end (args);
+  va_end(args);
 
   return ret;
 }

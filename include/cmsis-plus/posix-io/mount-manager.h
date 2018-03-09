@@ -163,14 +163,14 @@ namespace os
     inline file_system*
     mount_manager::get_file_system (std::size_t index)
     {
-      assert (index < size__);
+      assert(index < size__);
       return file_systems_array__[index];
     }
 
     inline const char*
     mount_manager::path (std::size_t index)
     {
-      assert (index < size__);
+      assert(index < size__);
       return paths_array__[index];
     }
 

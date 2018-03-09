@@ -160,7 +160,7 @@ namespace os
     class socket*
     file_descriptors_manager::socket (int fildes)
     {
-      assert ((fildes >= 0) && (static_cast<std::size_t> (fildes) < size__));
+      assert((fildes >= 0) && (static_cast<std::size_t> (fildes) < size__));
       auto* const io = descriptors_array__[fildes];
       if (io->get_type () != io::type::socket)
         {

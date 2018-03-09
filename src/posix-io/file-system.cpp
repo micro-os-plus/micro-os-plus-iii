@@ -66,7 +66,7 @@ namespace os
           return -1;
         }
 
-      assert (fs->device () != nullptr);
+      assert(fs->device () != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -97,7 +97,7 @@ namespace os
           return -1;
         }
 
-      assert (fs->device () != nullptr);
+      assert(fs->device () != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -311,7 +311,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     io*
-    file_system::open (const char* path, int oflag, std::va_list args)
+    file_system::vopen (const char* path, int oflag, std::va_list args)
     {
       if (block_device_ == nullptr)
         {
@@ -360,7 +360,7 @@ namespace os
     int
     file_system::chmod (const char* path, mode_t mode)
     {
-      assert (block_device_ != nullptr);
+      assert(block_device_ != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -370,7 +370,7 @@ namespace os
     int
     file_system::stat (const char* path, struct stat* buf)
     {
-      assert (block_device_ != nullptr);
+      assert(block_device_ != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -380,7 +380,7 @@ namespace os
     int
     file_system::truncate (const char* path, off_t length)
     {
-      assert (block_device_ != nullptr);
+      assert(block_device_ != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -390,7 +390,7 @@ namespace os
     int
     file_system::rename (const char* existing, const char* _new)
     {
-      assert (block_device_ != nullptr);
+      assert(block_device_ != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -400,7 +400,7 @@ namespace os
     int
     file_system::unlink (const char* path)
     {
-      assert (block_device_ != nullptr);
+      assert(block_device_ != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -410,7 +410,7 @@ namespace os
     int
     file_system::utime (const char* path, const struct utimbuf* times)
     {
-      assert (block_device_ != nullptr);
+      assert(block_device_ != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.

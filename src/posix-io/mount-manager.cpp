@@ -55,7 +55,7 @@ namespace os
     // ------------------------------------------------------------------------
     mount_manager::mount_manager (std::size_t size)
     {
-      assert (size > 0);
+      assert(size > 0);
 
       size__ = size;
       file_systems_array__ = new file_system*[size];
@@ -83,8 +83,8 @@ namespace os
     file_system*
     mount_manager::identify_file_system (const char** path1, const char** path2)
     {
-      assert (path1 != nullptr);
-      assert (*path1 != nullptr);
+      assert(path1 != nullptr);
+      assert(*path1 != nullptr);
 
       for (std::size_t i = 0; i < size__; ++i)
         {
@@ -125,7 +125,7 @@ namespace os
     mount_manager::root (file_system* fs, device_block* blockDevice,
                          unsigned int flags)
     {
-      assert (fs != nullptr);
+      assert(fs != nullptr);
       errno = 0;
 
       root__ = fs;
@@ -138,10 +138,10 @@ namespace os
     mount_manager::mount (file_system* fs, const char* path,
                           device_block* blockDevice, unsigned int flags)
     {
-      assert (fs != nullptr);
-      assert (path != nullptr);
+      assert(fs != nullptr);
+      assert(path != nullptr);
 
-      assert (path[std::strlen (path) - 1] == '/');
+      assert(path[std::strlen (path) - 1] == '/');
 
       errno = 0;
 
@@ -181,7 +181,7 @@ namespace os
     int
     mount_manager::umount (const char* path, unsigned int flags)
     {
-      assert (path != nullptr);
+      assert(path != nullptr);
       errno = 0;
 
       for (std::size_t i = 0; i < size__; ++i)

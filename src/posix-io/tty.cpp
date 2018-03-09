@@ -37,7 +37,8 @@ namespace os
     // ------------------------------------------------------------------------
 
     tty::tty (const char* name) :
-        device_char { name }
+        device_char
+          { name }
     {
       trace::printf ("%s(\"%s\") @%p\n", __func__, name_, this);
     }
@@ -47,7 +48,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name_);
     }
 
-    // ------------------------------------------------------------------------
+  // ------------------------------------------------------------------------
 
   } /* namespace posix */
 } /* namespace os */
