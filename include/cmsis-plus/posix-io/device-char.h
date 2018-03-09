@@ -32,14 +32,8 @@
 
 // ----------------------------------------------------------------------------
 
-#include <cmsis-plus/posix-io/io.h>
+#include <cmsis-plus/posix-io/device.h>
 #include <cmsis-plus/utils/lists.h>
-
-// ----------------------------------------------------------------------------
-
-#if ! defined(OS_STRING_POSIX_DEVICE_PREFIX)
-#define OS_STRING_POSIX_DEVICE_PREFIX "/dev/"
-#endif
 
 // ----------------------------------------------------------------------------
 
@@ -54,7 +48,7 @@ namespace os
      * @headerfile device-char.h <cmsis-plus/posix-io/device-char.h>
      * @ingroup cmsis-plus-posix-io-base
      */
-    class device_char : public io
+    class device_char : public device
     {
       // ----------------------------------------------------------------------
 
@@ -109,20 +103,6 @@ namespace os
 
     public:
 
-      int
-      ioctl (int request, ...);
-
-      int
-      vioctl (int request, std::va_list args);
-
-      // ----------------------------------------------------------------------
-
-      virtual bool
-      match_name (const char* name) const;
-
-      const char*
-      name (void) const;
-
       static const char*
       device_prefix (void);
 
@@ -139,12 +119,6 @@ namespace os
     protected:
 
       virtual int
-      do_vopen (const char* path, int oflag, std::va_list args) = 0;
-
-      virtual int
-      do_vioctl (int request, std::va_list args);
-
-      virtual int
       do_isatty (void) final;
 
       /**
@@ -158,10 +132,6 @@ namespace os
        * @cond ignore
        */
 
-      // Intrusive node used to link this device to the registry list.
-      // Must be public.
-      utils::double_list_links registry_links_;
-
       /**
        * @endcond
        */
@@ -171,8 +141,6 @@ namespace os
       /**
        * @cond ignore
        */
-
-      const char* name_;
 
       /**
        * @endcond
@@ -194,12 +162,6 @@ namespace os
     device_char::device_prefix (void)
     {
       return OS_STRING_POSIX_DEVICE_PREFIX;
-    }
-
-    inline const char*
-    device_char::name (void) const
-    {
-      return name_;
     }
 
   } /* namespace posix */
