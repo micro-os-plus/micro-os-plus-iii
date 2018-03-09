@@ -37,7 +37,6 @@
 #include <cassert>
 #include <cerrno>
 #include <cstdarg>
-#include <unistd.h>
 
 // ----------------------------------------------------------------------------
 
@@ -73,6 +72,12 @@ namespace os
       trace::printf ("device_block::%s(%p, %u, %u) @%p\n", __func__, buf,
                      blknum, nblocks, this);
 
+      if (blknum + nblocks > num_blocks_)
+        {
+          errno = EINVAL;
+          return -1;
+        }
+
       ssize_t ret;
       if (mutex_ != nullptr)
         {
@@ -92,6 +97,12 @@ namespace os
     {
       trace::printf ("device_block::%s(%p, %u, %u) @%p\n", __func__, buf,
                      blknum, nblocks, this);
+
+      if (blknum + nblocks > num_blocks_)
+        {
+          errno = EINVAL;
+          return -1;
+        }
 
       ssize_t ret;
       if (mutex_ != nullptr)
