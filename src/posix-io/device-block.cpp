@@ -26,7 +26,7 @@
  */
 
 #include <cmsis-plus/posix-io/device-block.h>
-#include <cmsis-plus/posix-io/device-block-registry.h>
+#include <cmsis-plus/posix-io/device-registry.h>
 
 #include <cmsis-plus/posix/sys/ioctl.h>
 
@@ -53,7 +53,7 @@ namespace os
     {
       trace::printf ("device_block::%s(\"%s\")=@%p\n", __func__, name_, this);
 
-      device_block_registry::link (this);
+      device_registry<device>::link (this);
     }
 
     device_block::~device_block ()

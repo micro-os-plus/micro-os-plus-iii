@@ -28,8 +28,7 @@
 #include <cmsis-plus/posix-io/device-char.h>
 #include <cmsis-plus/posix-io/device-block.h>
 #include <cmsis-plus/posix/sys/uio.h>
-#include <cmsis-plus/posix-io/device-char-registry.h>
-#include <cmsis-plus/posix-io/device-block-registry.h>
+#include <cmsis-plus/posix-io/device-registry.h>
 #include <cmsis-plus/posix-io/file.h>
 #include <cmsis-plus/posix-io/file-descriptors-manager.h>
 #include <cmsis-plus/posix-io/file-system.h>
@@ -93,35 +92,22 @@ namespace os
       errno = 0;
 
       os::posix::io* io;
+      int ret = 0;
       while (true)
         {
-          // Check if path is a char device.
-          io = os::posix::device_char_registry::identify_device (path);
+          // Check if path is a device.
+          io = os::posix::device_registry<device>::identify_device (path);
           if (io != nullptr)
             {
               // If so, use the implementation to open the device.
-              int oret = static_cast<device_char*> (io)->do_vopen (path, oflag,
-                                                                   args);
+              int oret = static_cast<device*> (io)->vopen (path, oflag, args);
               if (oret < 0)
                 {
                   // Open failed.
                   return nullptr;
                 }
-              break;
-            }
 
-          // Check if path is a block device.
-          io = os::posix::device_block_registry::identify_device (path);
-          if (io != nullptr)
-            {
-              // If so, use the implementation to open the device.
-              int oret = static_cast<device_block*> (io)->do_vopen (path, oflag,
-                                                                    args);
-              if (oret < 0)
-                {
-                  // Open failed.
-                  return nullptr;
-                }
+              // File descriptor already allocated by device.
               break;
             }
 
@@ -140,22 +126,23 @@ namespace os
 
           // Use the file system implementation to open the file, using
           // the adjusted path (mount point prefix removed).
-          io = fs->open (adjusted_path, oflag, args);
+          io = fs->vopen (adjusted_path, oflag, args);
           if (io == nullptr)
             {
               // Open failed.
               return nullptr;
             }
+
+          // If successful, allocate a file descriptor.
+          io->alloc_file_descriptor ();
           break;
         }
 
-      // If successful, allocate a file descriptor.
       // Return a valid pointer to an object derived from io, or nullptr.
 
-      auto ret = io->alloc_file_descriptor ();
       trace::printf ("%s(\"%s\")=%p fd=%d\n", __func__, path, io,
                      io->file_descriptor ());
-      return ret;
+      return io;
     }
 
     // ------------------------------------------------------------------------
@@ -202,7 +189,6 @@ namespace os
     int
     io::close (void)
     {
-      errno = 0;
       trace::printf ("io::%s() @%p\n", __func__, this);
 
       if (!do_is_opened ())
@@ -210,6 +196,8 @@ namespace os
           errno = EBADF; // Not opened.
           return -1;
         }
+
+      errno = 0;
 
       // Execute the implementation specific code.
       int ret = do_close ();

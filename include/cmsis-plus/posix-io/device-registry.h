@@ -151,9 +151,10 @@ namespace os
           }
 #endif // DEBUG
 
+        registry_list__.link (*device);
+
         os::trace::printf ("Device '%s%s' linked\n",
                            value_type::device_prefix (), device->name ());
-        registry_list__.link (*device);
       }
 
     /**

@@ -41,17 +41,16 @@
 #define OS_STRING_POSIX_DEVICE_BLOCK_PREFIX "/bdev/"
 #endif
 
-namespace os
-{
-  namespace rtos
-  {
-    class mutex;
-  }
-}
 // ----------------------------------------------------------------------------
 
 namespace os
 {
+  namespace rtos
+  {
+    // Forward reference.
+    class mutex;
+  }
+
   namespace posix
   {
     /**
@@ -161,8 +160,7 @@ namespace os
     protected:
 
       // Derived classes **must** set `block_size_` and `num_blocks_`.
-      virtual int
-      do_vopen (const char* path, int oflag, std::va_list args) = 0;
+      // do_vopen()
 
       virtual int
       do_vioctl (int request, std::va_list args) override;

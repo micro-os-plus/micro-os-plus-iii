@@ -37,6 +37,12 @@
 
 // ----------------------------------------------------------------------------
 
+#if ! defined(OS_STRING_POSIX_DEVICE_PREFIX)
+#define OS_STRING_POSIX_DEVICE_PREFIX "/dev/"
+#endif
+
+// ----------------------------------------------------------------------------
+
 namespace os
 {
   namespace posix
@@ -88,6 +94,28 @@ namespace os
 
     public:
 
+      /**
+       *
+       * @param path May be nullptr.
+       * @param oflag
+       * @return
+       */
+      int
+      open (const char* path = nullptr, int oflag = 0, ...);
+
+      /**
+       *
+       * @param path May be nullptr.
+       * @param oflag
+       * @param args
+       * @return
+       */
+      int
+      vopen (const char* path, int oflag, std::va_list args);
+
+      virtual int
+      close (void) override;
+
       int
       ioctl (int request, ...);
 
@@ -102,6 +130,9 @@ namespace os
       const char*
       name (void) const;
 
+      static const char*
+      device_prefix (void);
+
       /**
        * @}
        */
@@ -115,7 +146,13 @@ namespace os
     protected:
 
       virtual int
+      do_vopen (const char* path, int oflag, std::va_list args) = 0;
+
+      virtual int
       do_vioctl (int request, std::va_list args);
+
+      bool
+      do_is_opened (void);
 
       /**
        * @}
@@ -143,6 +180,7 @@ namespace os
        */
 
       const char* name_ = nullptr;
+      int open_count_ = 0;
 
       /**
        * @endcond
@@ -164,6 +202,12 @@ namespace os
     device::name (void) const
     {
       return name_;
+    }
+
+    inline const char*
+    device::device_prefix (void)
+    {
+      return OS_STRING_POSIX_DEVICE_PREFIX;
     }
 
   } /* namespace posix */

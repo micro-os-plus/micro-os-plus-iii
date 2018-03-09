@@ -183,7 +183,7 @@ namespace os
     public:
 
       io*
-      open (const char* path, int oflag, std::va_list args);
+      vopen (const char* path, int oflag, std::va_list args);
 
       directory*
       opendir (const char* dirpath);

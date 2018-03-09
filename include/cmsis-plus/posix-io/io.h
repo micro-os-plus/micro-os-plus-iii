@@ -159,7 +159,7 @@ namespace os
 
     public:
 
-      int
+      virtual int
       close (void);
 
       ssize_t
