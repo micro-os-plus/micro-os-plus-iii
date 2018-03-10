@@ -103,9 +103,6 @@ namespace os
 
     public:
 
-      static const char*
-      device_prefix (void);
-
       /**
        * @}
        */
@@ -144,23 +141,6 @@ namespace os
        */
 
     };
-  } /* namespace posix */
-} /* namespace os */
-
-// ===== Inline & template implementations ====================================
-
-namespace os
-{
-  namespace posix
-  {
-    // ------------------------------------------------------------------------
-
-    inline const char*
-    device_char::device_prefix (void)
-    {
-      return OS_STRING_POSIX_DEVICE_PREFIX;
-    }
-
   } /* namespace posix */
 } /* namespace os */
 
