@@ -106,8 +106,9 @@
 #define _IOW(type,nr,size)  _IOC(_IOC_WRITE,(type),(nr),(_IOC_TYPECHECK(size)))
 #define _IOWR(type,nr,size) _IOC(_IOC_READ|_IOC_WRITE,(type),(nr),(_IOC_TYPECHECK(size)))
 
-#define BLKSSZGET  _IO(0x12,104) /* get block physical device sector size */
+#define BLKSSZGET  _IO(0x12,104) /* get block logical device sector size */
 #define BLKGETSIZE64 _IOR(0x12,114,size_t)  /* get device size in bytes (u64 *arg) */
+#define BLKPBSZGET _IO(0x12,123) /* get block physical device sector size */
 
 // ----------------------------------------------------------------------------
 

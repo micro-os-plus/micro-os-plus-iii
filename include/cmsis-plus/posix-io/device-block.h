@@ -37,12 +37,6 @@
 
 // ----------------------------------------------------------------------------
 
-#if ! defined(OS_STRING_POSIX_DEVICE_BLOCK_PREFIX)
-#define OS_STRING_POSIX_DEVICE_BLOCK_PREFIX "/bdev/"
-#endif
-
-// ----------------------------------------------------------------------------
-
 namespace os
 {
   namespace rtos
@@ -140,7 +134,10 @@ namespace os
        * @return The number of bytes in a block.
        */
       std::size_t
-      block_size_bytes (void);
+      block_logical_size_bytes (void);
+
+      std::size_t
+      block_physical_size_bytes (void);
 
       // ----------------------------------------------------------------------
 
@@ -159,7 +156,8 @@ namespace os
 
     protected:
 
-      // Derived classes **must** set `block_size_` and `num_blocks_`.
+      // Derived classes **must** set `block_logical_size_bytes_`,
+      // `block_physical_size_bytes_` and `num_blocks_`.
       // do_vopen()
 
       virtual int
@@ -193,7 +191,8 @@ namespace os
        */
 
       os::rtos::mutex* mutex_ = nullptr;
-      std::size_t block_size_bytes_ = 0;
+      std::size_t block_logical_size_bytes_ = 0;
+      std::size_t block_physical_size_bytes_ = 0;
       blknum_t num_blocks_ = 0;
 
       /**
@@ -219,15 +218,15 @@ namespace os
     }
 
     inline std::size_t
-    device_block::block_size_bytes (void)
+    device_block::block_logical_size_bytes (void)
     {
-      return block_size_bytes_;
+      return block_logical_size_bytes_;
     }
 
-    inline const char*
-    device_block::device_prefix (void)
+    inline std::size_t
+    device_block::block_physical_size_bytes (void)
     {
-      return OS_STRING_POSIX_DEVICE_BLOCK_PREFIX;
+      return block_physical_size_bytes_;
     }
 
   } /* namespace posix */

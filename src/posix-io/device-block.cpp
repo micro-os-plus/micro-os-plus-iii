@@ -60,7 +60,7 @@ namespace os
       trace::printf ("device_block::%s() @%p %s\n", __func__, this, name_);
 
       mutex_ = nullptr;
-      block_size_bytes_ = 0;
+      block_logical_size_bytes_ = 0;
       num_blocks_ = 0;
     }
 
@@ -127,16 +127,30 @@ namespace os
       switch (request)
         {
         case BLKSSZGET:
-          // Get physical device sector size.
+          // Get logical device sector size (to be used for read/writes).
           {
             std::size_t* sz = va_arg(args, std::size_t*);
-            if (sz == nullptr || block_size_bytes_ != 0)
+            if (sz == nullptr || block_logical_size_bytes_ != 0)
               {
                 errno = EINVAL;
                 return -1;
               }
 
-            *sz = block_size_bytes_;
+            *sz = block_logical_size_bytes_;
+            return 0;
+          }
+
+        case BLKPBSZGET:
+          // Get physical device sector size (internally used for erase).
+          {
+            std::size_t* sz = va_arg(args, std::size_t*);
+            if (sz == nullptr || block_physical_size_bytes_ != 0)
+              {
+                errno = EINVAL;
+                return -1;
+              }
+
+            *sz = block_physical_size_bytes_;
             return 0;
           }
 
@@ -150,7 +164,7 @@ namespace os
                 return -1;
               }
 
-            *sz = ((uint64_t) num_blocks_ * block_size_bytes_);
+            *sz = ((uint64_t) num_blocks_ * block_logical_size_bytes_);
             return 0;
           }
 
@@ -212,20 +226,21 @@ namespace os
       trace::printf ("device_block::%s(%p, %u) @%p\n", __func__, buf, nbyte,
                      this);
 
-      if ((block_size_bytes_ == 0) || ((nbyte % block_size_bytes_) != 0)
-          || ((offset_ % block_size_bytes_) != 0))
+      if ((block_logical_size_bytes_ == 0)
+          || ((nbyte % block_logical_size_bytes_) != 0)
+          || ((offset_ % block_logical_size_bytes_) != 0))
         {
           errno = EINVAL;
           return -1;
         }
 
-      std::size_t nblocks = nbyte / block_size_bytes_;
-      blknum_t blknum = offset_ / block_size_bytes_;
+      std::size_t nblocks = nbyte / block_logical_size_bytes_;
+      blknum_t blknum = offset_ / block_logical_size_bytes_;
 
       ssize_t ret = read_block (buf, blknum, nblocks);
       if (ret >= 0)
         {
-          ret *= block_size_bytes_;
+          ret *= block_logical_size_bytes_;
         }
       return ret;
     }
@@ -236,20 +251,21 @@ namespace os
       trace::printf ("device_block::%s(%p, %u) @%p\n", __func__, buf, nbyte,
                      this);
 
-      if ((block_size_bytes_ == 0) || ((nbyte % block_size_bytes_) != 0)
-          || ((offset_ % block_size_bytes_) != 0))
+      if ((block_logical_size_bytes_ == 0)
+          || ((nbyte % block_logical_size_bytes_) != 0)
+          || ((offset_ % block_logical_size_bytes_) != 0))
         {
           errno = EINVAL;
           return -1;
         }
 
-      std::size_t nblocks = nbyte / block_size_bytes_;
-      blknum_t blknum = offset_ / block_size_bytes_;
+      std::size_t nblocks = nbyte / block_logical_size_bytes_;
+      blknum_t blknum = offset_ / block_logical_size_bytes_;
 
       ssize_t ret = write_block (buf, blknum, nblocks);
       if (ret >= 0)
         {
-          ret *= block_size_bytes_;
+          ret *= block_logical_size_bytes_;
         }
       return ret;
     }

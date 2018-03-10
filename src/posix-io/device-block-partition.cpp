@@ -66,7 +66,8 @@ namespace os
       num_blocks_ = nblocks;
 
       // Inherit from parent.
-      block_size_bytes_ = parent_.block_size_bytes ();
+      block_logical_size_bytes_ = parent_.block_logical_size_bytes ();
+      block_physical_size_bytes_ = parent_.block_physical_size_bytes ();
     }
 
     int
