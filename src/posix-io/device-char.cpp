@@ -45,14 +45,14 @@ namespace os
     device_char::device_char (const char* name) :
         device (type::device, name)
     {
-      trace::printf ("%s(\"%s\") @%p\n", __func__, name_, this);
+      trace::printf ("device_char::%s(\"%s\") @%p\n", __func__, name_, this);
 
       device_registry<device>::link (this);
     }
 
     device_char::~device_char ()
     {
-      trace::printf ("%s() @%p %s\n", __func__, this, name_);
+      trace::printf ("device_char::%s() @%p %s\n", __func__, this, name_);
 
       registry_links_.unlink ();
 

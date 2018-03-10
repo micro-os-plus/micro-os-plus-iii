@@ -300,7 +300,7 @@ namespace os
 
     file_system::file_system (pool* files_pool, pool* dirs_pool)
     {
-      os::trace::printf ("%s() @%p\n", __func__, this);
+      os::trace::printf ("file_system::%s() @%p\n", __func__, this);
 
       files_pool_ = files_pool;
       dirs_pool_ = dirs_pool;
@@ -309,7 +309,7 @@ namespace os
 
     file_system::~file_system ()
     {
-      trace::printf ("%s() @%p\n", __func__, this);
+      trace::printf ("file_system::%s() @%p\n", __func__, this);
 
       block_device_ = nullptr;
     }

@@ -40,12 +40,12 @@ namespace os
         device_char
           { name }
     {
-      trace::printf ("%s(\"%s\") @%p\n", __func__, name_, this);
+      trace::printf ("tty::%s(\"%s\") @%p\n", __func__, name_, this);
     }
 
     tty::~tty ()
     {
-      trace::printf ("%s() @%p %s\n", __func__, this, name_);
+      trace::printf ("tty::%s() @%p %s\n", __func__, this, name_);
     }
 
   // ------------------------------------------------------------------------

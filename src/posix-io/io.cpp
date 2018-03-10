@@ -75,7 +75,7 @@ namespace os
     io*
     vopen (const char* path, int oflag, std::va_list args)
     {
-      trace::printf ("%s(\"%s\")\n", __func__, path ? path : "");
+      trace::printf ("io::%s(\"%s\")\n", __func__, path ? path : "");
 
       if (path == nullptr)
         {
@@ -139,7 +139,7 @@ namespace os
 
       // Return a valid pointer to an object derived from io, or nullptr.
 
-      trace::printf ("%s(\"%s\")=%p fd=%d\n", __func__, path, io,
+      trace::printf ("io::%s(\"%s\")=%p fd=%d\n", __func__, path, io,
                      io->file_descriptor ());
       return io;
     }
