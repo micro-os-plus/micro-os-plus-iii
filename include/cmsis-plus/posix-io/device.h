@@ -122,6 +122,9 @@ namespace os
       virtual int
       vioctl (int request, std::va_list args);
 
+      int
+      sync (void);
+
       // ----------------------------------------------------------------------
 
       virtual bool
@@ -151,8 +154,11 @@ namespace os
       virtual int
       do_vioctl (int request, std::va_list args);
 
-      bool
-      do_is_opened (void);
+      virtual bool
+      do_is_opened (void) override;
+
+      virtual int
+      do_sync (void);
 
       /**
        * @}
