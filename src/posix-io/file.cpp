@@ -130,12 +130,6 @@ namespace os
       return -1;
     }
 
-    int
-    file::do_isatty (void)
-    {
-      return 0; // Files are not TTYs.
-    }
-
   } /* namespace posix */
 } /* namespace os */
 

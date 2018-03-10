@@ -48,6 +48,12 @@ namespace os
       trace::printf ("tty::%s() @%p %s\n", __func__, this, name_);
     }
 
+    int
+    tty::do_isatty (void)
+    {
+      return 1; // Yes!
+    }
+
   // ------------------------------------------------------------------------
 
   } /* namespace posix */

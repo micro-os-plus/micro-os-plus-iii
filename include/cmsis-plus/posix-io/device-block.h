@@ -178,9 +178,6 @@ namespace os
       do_write_block (const void* buf, blknum_t blknum,
                       std::size_t nblocks) = 0;
 
-      virtual int
-      do_isatty (void) final;
-
       virtual off_t
       do_lseek (off_t offset, int whence) override;
 

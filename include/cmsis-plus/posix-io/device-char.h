@@ -118,9 +118,6 @@ namespace os
 
     protected:
 
-      virtual int
-      do_isatty (void) final;
-
       /**
        * @}
        */

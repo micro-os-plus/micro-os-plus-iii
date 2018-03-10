@@ -59,14 +59,6 @@ namespace os
       name_ = nullptr;
     }
 
-    // ------------------------------------------------------------------------
-
-    int
-    device_char::do_isatty (void)
-    {
-      return 1; // Yes, it is a TTY
-    }
-
   } /* namespace posix */
 } /* namespace os */
 

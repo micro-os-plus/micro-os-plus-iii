@@ -256,12 +256,6 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    int
-    device_block::do_isatty (void)
-    {
-      return 0; // No, block devices definitely are not TTYs.
-    }
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 

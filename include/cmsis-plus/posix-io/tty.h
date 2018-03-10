@@ -88,6 +88,9 @@ namespace os
       virtual int
       do_tcsendbreak (int duration) = 0;
 
+      virtual int
+      do_isatty (void) final;
+
       // --------------------------------------------------------------------
 
     private:
