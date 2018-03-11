@@ -99,17 +99,16 @@ namespace os
       identify_file_system (const char** path1, const char** path2 = nullptr);
 
       static int
-      root (file_system* fs, device_block* blockDevice, unsigned int flags);
+      root (file_system* fs);
 
       static file_system*
       root (void);
 
       static int
-      mount (file_system* fs, const char* path, device_block* blockDevice,
-             unsigned int flags);
+      mount (file_system* fs, const char* paths);
 
       static int
-      umount (const char* path, int unsigned flags);
+      umount (file_system* fs);
 
       static std::size_t
       size (void);

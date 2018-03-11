@@ -318,13 +318,46 @@ namespace os
     int
     file_system::mount (const char* path, unsigned int flags)
     {
-      return -1;
+      char* p = const_cast<char*> (path);
+      if (p != nullptr)
+        {
+          if (strcmp ("/", path) == 0)
+            {
+              p = nullptr;
+            }
+        }
+      int ret = do_mount (flags);
+      if (ret < 0)
+        {
+          return -1;
+        }
+
+      if (p == nullptr)
+        {
+          ret = mount_manager::root (this);
+        }
+      else
+        {
+          ret = mount_manager::mount (this, path);
+        }
+      // TODO register.
+      return ret;
     }
 
+    /**
+     * @details
+     * The root file system must be unmounted last, it cannot be
+     * unmounted if other mount points exists.
+     */
     int
     file_system::umount (int unsigned flags)
     {
-      return -1;
+      // Ignore error?
+      mount_manager::umount (this);
+
+      this->sync ();
+      int ret = do_umount (flags);
+      return ret;
     }
 
     // ------------------------------------------------------------------------
@@ -523,7 +556,7 @@ namespace os
     }
 
     int
-    file_system::do_unmount (unsigned int flags)
+    file_system::do_umount (unsigned int flags)
     {
       errno = ENOSYS; // Not implemented
       return -1;

@@ -182,9 +182,28 @@ namespace os
 
     public:
 
+      /**
+       * @brief Mount file system.
+       *
+       * @param path Path, terminated in `/`. If `/` or nullptr, the
+       *   file system is mounted as root, i.e. the default if no other
+       *   mount point matches.
+       * @param flags File system specific flags.
+       * @retval 0 if successful,
+       * @retval -1 otherwise and the variable errno is set to
+       *   indicate the error.
+       */
       int
       mount (const char* path = nullptr, unsigned int flags = 0);
 
+      /**
+       * @brief Unmount file system.
+       *
+       * @param flags File system specific flags.
+       * @retval 0 if successful,
+       * @retval -1 otherwise and the variable errno is set to
+       *   indicate the error.
+       */
       int
       umount (int unsigned flags = 0);
 
@@ -272,7 +291,7 @@ namespace os
       do_mount (unsigned int flags);
 
       virtual int
-      do_unmount (unsigned int flags);
+      do_umount (unsigned int flags);
 
       // ----------------------------------------------------------------------
       // Support functions.

@@ -122,21 +122,19 @@ namespace os
 #pragma GCC diagnostic pop
 
     int
-    mount_manager::root (file_system* fs, device_block* blockDevice,
-                         unsigned int flags)
+    mount_manager::root (file_system* fs)
     {
       assert(fs != nullptr);
+      assert(root__ == nullptr);
+
       errno = 0;
 
       root__ = fs;
-
-      fs->device (blockDevice);
-      return fs->do_mount (flags);
+      return 0;
     }
 
     int
-    mount_manager::mount (file_system* fs, const char* path,
-                          device_block* blockDevice, unsigned int flags)
+    mount_manager::mount (file_system* fs, const char* path)
     {
       assert(fs != nullptr);
       assert(path != nullptr);
@@ -162,9 +160,6 @@ namespace os
         {
           if (file_systems_array__[i] == nullptr)
             {
-              fs->device (blockDevice);
-              fs->do_mount (flags);
-
               file_systems_array__[i] = fs;
               paths_array__[i] = path;
 
@@ -179,28 +174,37 @@ namespace os
     }
 
     int
-    mount_manager::umount (const char* path, unsigned int flags)
+    mount_manager::umount (file_system* fs)
     {
       assert(path != nullptr);
       errno = 0;
 
+      bool has_content = false;
       for (std::size_t i = 0; i < size__; ++i)
         {
-          if (paths_array__[i] != nullptr
-              && strcmp (path, paths_array__[i]) == 0)
+          if (file_systems_array__[i] == fs)
             {
-              file_systems_array__[i]->do_sync ();
-              file_systems_array__[i]->do_unmount (flags);
-              file_systems_array__[i]->device (nullptr);
-
               file_systems_array__[i] = nullptr;
               paths_array__[i] = nullptr;
 
               return 0;
             }
+          if (file_systems_array__[i] != nullptr)
+            {
+              has_content = true;
+            }
         }
 
-      // The requested directory is not in the mount table.
+      if (!has_content)
+        {
+          if (root__ == fs)
+            {
+              root__ = nullptr;
+              return 0;
+            }
+        }
+
+      // The requested file system is not in the mount table.
       errno = EINVAL;
       return -1;
     }
