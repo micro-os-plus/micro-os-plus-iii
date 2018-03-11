@@ -149,7 +149,7 @@ namespace os
 
     public:
 
-      file_system (pool* filesPool, pool* dirs_pool);
+      file_system (device_block& device, pool* filesPool, pool* dirs_pool);
 
       /**
        * @cond ignore
@@ -199,7 +199,7 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
-      device_block*
+      device_block&
       device (void) const;
 
       pool*
@@ -302,7 +302,7 @@ namespace os
       pool* files_pool_;
       pool* dirs_pool_;
 
-      device_block* block_device_;
+      device_block& block_device_;
 
       /**
        * @endcond
@@ -333,13 +333,7 @@ namespace os
       return dirs_pool_;
     }
 
-    inline void
-    file_system::device (device_block* block_device)
-    {
-      block_device_ = block_device;
-    }
-
-    inline device_block*
+    inline device_block&
     file_system::device (void) const
     {
       return block_device_;

@@ -31,10 +31,12 @@
 #include <cmsis-plus/posix-io/io.h>
 #include <cmsis-plus/posix-io/mount-manager.h>
 #include <cmsis-plus/posix-io/pool.h>
+#include <cmsis-plus/posix-io/device-block.h>
 #include <cmsis-plus/diag/trace.h>
 
 #include <cerrno>
 #include <cassert>
+#include <cstring>
 
 // ----------------------------------------------------------------------------
 
@@ -68,7 +70,6 @@ namespace os
           return -1;
         }
 
-      assert(fs->device () != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -99,7 +100,6 @@ namespace os
           return -1;
         }
 
-      assert(fs->device () != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -298,20 +298,19 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    file_system::file_system (pool* files_pool, pool* dirs_pool)
+    file_system::file_system (device_block& device, pool* files_pool,
+                              pool* dirs_pool) :
+        block_device_ (device)
     {
       os::trace::printf ("file_system::%s() @%p\n", __func__, this);
 
       files_pool_ = files_pool;
       dirs_pool_ = dirs_pool;
-      block_device_ = nullptr;
     }
 
     file_system::~file_system ()
     {
       trace::printf ("file_system::%s() @%p\n", __func__, this);
-
-      block_device_ = nullptr;
     }
 
     // ------------------------------------------------------------------------
@@ -333,12 +332,6 @@ namespace os
     io*
     file_system::vopen (const char* path, int oflag, std::va_list args)
     {
-      if (block_device_ == nullptr)
-        {
-          errno = EBADF;
-          return nullptr;
-        }
-
       // Get a file object from the pool.
       auto* const f = static_cast<file*> (files_pool_->acquire ());
 
@@ -355,12 +348,6 @@ namespace os
     directory*
     file_system::opendir (const char* dirpath)
     {
-      if (block_device_ == nullptr)
-        {
-          errno = EBADF;
-          return nullptr;
-        }
-
       // Get a directory object from the pool.
       auto* const dir = static_cast<directory*> (dirs_pool_->acquire ());
 
@@ -380,7 +367,6 @@ namespace os
     int
     file_system::chmod (const char* path, mode_t mode)
     {
-      assert(block_device_ != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -390,7 +376,6 @@ namespace os
     int
     file_system::stat (const char* path, struct stat* buf)
     {
-      assert(block_device_ != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -400,7 +385,6 @@ namespace os
     int
     file_system::truncate (const char* path, off_t length)
     {
-      assert(block_device_ != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -410,7 +394,6 @@ namespace os
     int
     file_system::rename (const char* existing, const char* _new)
     {
-      assert(block_device_ != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -420,7 +403,6 @@ namespace os
     int
     file_system::unlink (const char* path)
     {
-      assert(block_device_ != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
@@ -431,7 +413,6 @@ namespace os
     int
     file_system::utime (const char* path, const struct utimbuf* times)
     {
-      assert(block_device_ != nullptr);
       errno = 0;
 
       struct utimbuf tmp;
