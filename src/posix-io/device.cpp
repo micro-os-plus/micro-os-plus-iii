@@ -53,7 +53,7 @@ namespace os
 
     device::~device ()
     {
-      trace::printf ("device::%s() @%p %s\n", __func__, this, name_);
+      trace::printf ("device::%s() @%p\n", __func__, this);
 
       registry_links_.unlink ();
 
@@ -151,6 +151,8 @@ namespace os
     int
     device::vioctl (int request, std::va_list args)
     {
+      trace::printf ("device::%s(%d) @%p\n", __func__, request, this);
+
       errno = 0;
 
       return do_vioctl (request, args);
