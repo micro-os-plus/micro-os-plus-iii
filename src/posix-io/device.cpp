@@ -158,19 +158,18 @@ namespace os
       return do_vioctl (request, args);
     }
 
-    int
+    void
     device::sync (void)
     {
       trace::printf ("device::%s() @%p\n", __func__, this);
 
-      return do_sync ();
+      do_sync ();
     }
 
-    int
+    void
     device::do_sync (void)
     {
       errno = ENOSYS; // Not implemented
-      return -1;
     }
 
     // ------------------------------------------------------------------------

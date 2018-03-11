@@ -431,6 +431,16 @@ namespace os
         }
     }
 
+    void
+    file_system::sync (void)
+    {
+      trace::printf ("file_system::%s() @%p\n", __func__, this);
+
+      do_sync ();
+
+      block_device_.sync ();
+    }
+
     // http://pubs.opengroup.org/onlinepubs/9699919799/functions/chdir.html
     // ------------------------------------------------------------------------
 

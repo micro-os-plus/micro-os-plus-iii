@@ -235,6 +235,9 @@ namespace os
       int
       utime (const char* path, const struct utimbuf* times);
 
+      void
+      sync (void);
+
       // ----------------------------------------------------------------------
       // Implementations.
 
