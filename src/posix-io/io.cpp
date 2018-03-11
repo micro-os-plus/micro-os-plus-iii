@@ -132,8 +132,6 @@ namespace os
               return nullptr;
             }
 
-          // If successful, allocate a file descriptor.
-          io->alloc_file_descriptor ();
           break;
         }
 

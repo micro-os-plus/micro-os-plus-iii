@@ -209,7 +209,10 @@ namespace os
 
       // ----------------------------------------------------------------------
 
-      io*
+      file*
+      open (const char* path = nullptr, int oflag = 0, ...);
+
+      file*
       vopen (const char* path, int oflag, std::va_list args);
 
       directory*
@@ -259,6 +262,9 @@ namespace os
 
       // ----------------------------------------------------------------------
       // Implementations.
+
+      virtual file*
+      do_vopen (const char* path, int oflag, std::va_list args) = 0;
 
       virtual int
       do_chmod (const char* path, mode_t mode);

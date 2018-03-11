@@ -152,12 +152,6 @@ namespace os
 
       // Implementations
 
-      /**
-       * return 0 if success or -1 & errno
-       */
-      virtual int
-      do_vopen (const char* path, int oflag, std::va_list args) = 0;
-
       virtual int
       do_ftruncate (off_t length);
 

@@ -39,20 +39,6 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    file*
-    file::open (const char* path, int oflag, ...)
-    {
-      // Forward to the variadic version of the function.
-      std::va_list args;
-      va_start(args, oflag);
-      auto* const ret = vopen (path, oflag, args);
-      va_end(args);
-
-      return ret;
-    }
-
-    // ------------------------------------------------------------------------
-
     file::file () :
         io (type::file)
     {

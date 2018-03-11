@@ -362,18 +362,28 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    io*
+    file*
+    file_system::open (const char* path, int oflag, ...)
+    {
+      // Forward to the variadic version of the function.
+      std::va_list args;
+      va_start(args, oflag);
+      file* ret = vopen (path, oflag, args);
+      va_end(args);
+
+      return ret;
+    }
+
+    file*
     file_system::vopen (const char* path, int oflag, std::va_list args)
     {
-      // Get a file object from the pool.
-      auto* const f = static_cast<file*> (files_pool_->acquire ());
-
-      // Associate the file with this file system (used, for example,
-      // to reach the pools at close).
-      f->file_system (this);
-
       // Execute the file specific implementation code.
-      f->do_vopen (path, oflag, args);
+      file* f = do_vopen (path, oflag, args);
+      if (f != nullptr)
+        {
+          // If successful, allocate a file descriptor.
+          f->alloc_file_descriptor ();
+        }
 
       return f;
     }
