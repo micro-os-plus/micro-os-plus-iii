@@ -76,7 +76,7 @@ namespace os
 
     public:
 
-      file ();
+      file (void);
 
       /**
        * @cond ignore
@@ -94,6 +94,7 @@ namespace os
        * @endcond
        */
 
+      virtual
       ~file ();
 
       /**
@@ -107,12 +108,6 @@ namespace os
        */
 
     public:
-
-      static file*
-      open (const char* path, int oflag, ...);
-
-      static file*
-      vopen (const char* path, int oflag, std::va_list args);
 
       /**
        * @}
@@ -195,12 +190,6 @@ namespace os
   namespace posix
   {
     // ------------------------------------------------------------------------
-
-    inline file*
-    file::vopen (const char* path, int oflag, std::va_list args)
-    {
-      return static_cast<file*> (os::posix::vopen (path, oflag, args));
-    }
 
     inline void
     file::file_system (class file_system* file_system)

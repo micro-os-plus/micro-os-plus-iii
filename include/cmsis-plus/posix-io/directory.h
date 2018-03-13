@@ -129,12 +129,15 @@ namespace os
 
     public:
 
+      // http://pubs.opengroup.org/onlinepubs/9699919799/functions/readdir.html
       struct dirent *
       read (void);
 
+      // http://pubs.opengroup.org/onlinepubs/9699919799/functions/rewinddir.html
       void
       rewind (void);
 
+      // http://pubs.opengroup.org/onlinepubs/9699919799/functions/closedir.html
       int
       close (void);
 
@@ -167,17 +170,15 @@ namespace os
       /**
        * @return object if successful, otherwise nullptr and errno.
        */
-      virtual directory*
-      do_vopen (const char* dirname) = 0;
 
       virtual struct dirent*
-      do_read (void);
+      do_read (void) = 0;
 
       virtual void
-      do_rewind (void);
+      do_rewind (void) = 0;
 
       virtual int
-      do_close (void);
+      do_close (void) = 0;
 
       // Support functions.
 
@@ -188,6 +189,19 @@ namespace os
        * @}
        */
 
+    protected:
+
+      /**
+       * @cond ignore
+       */
+
+      // This also solves the readdir() re-entrancy issue.
+      struct dirent dir_entry_;
+
+      /**
+       * @endcond
+       */
+
     private:
 
       /**
@@ -195,8 +209,6 @@ namespace os
        */
 
       class file_system* file_system_;
-
-      struct dirent dir_entry_;
 
       /**
        * @endcond

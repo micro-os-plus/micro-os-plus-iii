@@ -409,17 +409,10 @@ namespace os
     directory*
     file_system::opendir (const char* dirpath)
     {
-      // Get a directory object from the pool.
-      auto* const dir = static_cast<directory*> (dirs_pool_->acquire ());
-
-      // Associate the dir with this file system (used, for example,
-      // to reach the pools at close).
-      dir->file_system (this);
-
       // Execute the dir specific implementation code.
-      dir->do_vopen (dirpath);
+      directory* d = do_opendir (dirpath);
 
-      return dir;
+      return d;
     }
 
 #pragma GCC diagnostic push

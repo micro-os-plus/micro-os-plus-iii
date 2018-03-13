@@ -100,6 +100,10 @@ namespace os
       os::trace::printf ("directory::%s() @%p\n", __func__, this);
 
       assert(file_system_ != nullptr);
+
+      // POSIX requires not to change errno when end of directory is
+      // encountered. However, in this implementation, errno is
+      // always cleared when entering system calls.
       errno = 0;
 
       // Execute the implementation specific code.
@@ -112,6 +116,8 @@ namespace os
       os::trace::printf ("directory::%s() @%p\n", __func__, this);
 
       assert(file_system_ != nullptr);
+
+      // POSIX does not mention what to do with errno.
       errno = 0;
 
       // Execute the implementation specific code.
@@ -134,33 +140,6 @@ namespace os
           pool->release (this);
         }
       return ret;
-    }
-
-    // ------------------------------------------------------------------------
-    // Default implementations; overwrite them with real code.
-
-    // do_vopen() is not here because it is an abstract virtual to be
-    // implemented by derived classes.
-
-    struct dirent*
-    directory::do_read (void)
-    {
-      // Return end of directory.
-      return nullptr;
-    }
-
-    void
-    directory::do_rewind (void)
-    {
-      // Ignore rewind.
-      return;
-    }
-
-    int
-    directory::do_close (void)
-    {
-      // Ignore close, return ok.
-      return 0;
     }
 
   } /* namespace posix */

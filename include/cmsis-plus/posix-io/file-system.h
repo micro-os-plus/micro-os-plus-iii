@@ -215,6 +215,7 @@ namespace os
       file*
       vopen (const char* path, int oflag, std::va_list args);
 
+      // http://pubs.opengroup.org/onlinepubs/9699919799/functions/opendir.html
       directory*
       opendir (const char* dirpath);
 
@@ -265,6 +266,9 @@ namespace os
 
       virtual file*
       do_vopen (const char* path, int oflag, std::va_list args) = 0;
+
+      virtual directory*
+      do_opendir (const char* dirname) = 0;
 
       virtual int
       do_chmod (const char* path, mode_t mode);
