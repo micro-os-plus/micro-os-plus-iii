@@ -27,7 +27,6 @@
 
 #include <cmsis-plus/posix-io/file.h>
 #include <cmsis-plus/posix-io/file-system.h>
-#include <cmsis-plus/posix-io/mount-manager.h>
 #include <cmsis-plus/posix-io/pool.h>
 #include <cmsis-plus/diag/trace.h>
 

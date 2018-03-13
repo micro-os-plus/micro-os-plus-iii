@@ -33,7 +33,6 @@
 #include <cmsis-plus/posix-io/file-descriptors-manager.h>
 #include <cmsis-plus/posix-io/file-system.h>
 #include <cmsis-plus/posix-io/io.h>
-#include <cmsis-plus/posix-io/mount-manager.h>
 #include <cmsis-plus/posix-io/net-stack.h>
 #include <cmsis-plus/posix-io/pool.h>
 
@@ -112,7 +111,7 @@ namespace os
 
           // Check if a regular file.
           auto adjusted_path = path;
-          auto* const fs = os::posix::mount_manager::identify_file_system (
+          auto* const fs = os::posix::file_system::identify_mounted (
               &adjusted_path);
 
           // The manager will return null if there are no file systems

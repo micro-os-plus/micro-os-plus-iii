@@ -32,6 +32,8 @@
 
 // ----------------------------------------------------------------------------
 
+#include <cmsis-plus/utils/lists.h>
+
 #include <cstdarg>
 #include <sys/stat.h>
 #include <utime.h>
@@ -49,6 +51,7 @@ namespace os
     class directory;
     class device_block;
     class pool;
+    class mount_manager;
 
     /**
      * @ingroup cmsis-plus-posix-io-func
@@ -207,6 +210,9 @@ namespace os
       int
       umount (int unsigned flags = 0);
 
+      static file_system*
+      identify_mounted (const char** path1, const char** path2 = nullptr);
+
       // ----------------------------------------------------------------------
 
       file*
@@ -321,8 +327,26 @@ namespace os
       const char*
       adjust_path (const char* path);
 
+      const char*
+      mounted_path (void);
+
       /**
        * @}
+       */
+
+    public:
+
+      /**
+       * @cond ignore
+       */
+
+      // Intrusive node used to link this file system to the
+      // mount manager list.
+      // Must be public. The constructor clears the pointers.
+      utils::double_list_links mount_manager_links_;
+
+      /**
+       * @endcond
        */
 
     private:
@@ -331,10 +355,17 @@ namespace os
        * @cond ignore
        */
 
-      pool* files_pool_;
-      pool* dirs_pool_;
+      pool* files_pool_ = nullptr;
+      pool* dirs_pool_ = nullptr;
 
       device_block& block_device_;
+
+      const char* mounted_path_ = nullptr;
+
+      using mounted_list = utils::intrusive_list<file_system,
+      utils::double_list_links, &file_system::mount_manager_links_>;
+      static mounted_list mounted_list__;
+      static file_system* mounted_root__;
 
       /**
        * @endcond

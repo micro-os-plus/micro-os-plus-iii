@@ -27,7 +27,6 @@
 
 #include <cmsis-plus/posix-io/directory.h>
 #include <cmsis-plus/posix-io/file-system.h>
-#include <cmsis-plus/posix-io/mount-manager.h>
 #include <cmsis-plus/posix-io/pool.h>
 #include <cmsis-plus/diag/trace.h>
 
@@ -60,7 +59,7 @@ namespace os
       errno = 0;
 
       auto adjusted_dirname = dirname;
-      auto* const fs = os::posix::mount_manager::identify_file_system (
+      auto* const fs = os::posix::file_system::identify_mounted (
           &adjusted_dirname);
 
       // The manager will return null if there are no file systems

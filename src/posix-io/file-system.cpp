@@ -29,7 +29,6 @@
 #include <cmsis-plus/posix-io/file.h>
 #include <cmsis-plus/posix-io/file-system.h>
 #include <cmsis-plus/posix-io/io.h>
-#include <cmsis-plus/posix-io/mount-manager.h>
 #include <cmsis-plus/posix-io/pool.h>
 #include <cmsis-plus/posix-io/device-block.h>
 #include <cmsis-plus/diag/trace.h>
@@ -46,6 +45,19 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
+    /**
+     * @cond ignore
+     */
+
+    file_system::mounted_list file_system::mounted_list__;
+
+    class file_system* file_system::mounted_root__;
+
+    /**
+     * @endcond
+     */
+
+    // ------------------------------------------------------------------------
     int
     mkdir (const char* path, mode_t mode)
     {
@@ -64,7 +76,7 @@ namespace os
         }
 
       auto adjusted_path = path;
-      auto* const fs = mount_manager::identify_file_system (&adjusted_path);
+      auto* const fs = file_system::identify_mounted (&adjusted_path);
 
       if (fs == nullptr)
         {
@@ -96,7 +108,7 @@ namespace os
         }
 
       auto adjusted_path = path;
-      auto* const fs = mount_manager::identify_file_system (&adjusted_path);
+      auto* const fs = file_system::identify_mounted (&adjusted_path);
 
       if (fs == nullptr)
         {
@@ -118,13 +130,14 @@ namespace os
       errno = 0;
 
       // Enumerate all mounted file systems and sync them.
-      for (std::size_t i = 0; i < mount_manager::size (); ++i)
+      for (auto&& fs : file_system::mounted_list__)
         {
-          auto fs = mount_manager::get_file_system (i);
-          if (fs != nullptr)
-            {
-              fs->do_sync ();
-            }
+          fs.sync ();
+        }
+
+      if (file_system::mounted_root__ != nullptr)
+        {
+          file_system::mounted_root__->sync ();
         }
     }
 
@@ -150,7 +163,7 @@ namespace os
         }
 
       const char* adjusted_path = path;
-      auto* const fs = mount_manager::identify_file_system (&adjusted_path);
+      auto* const fs = file_system::identify_mounted (&adjusted_path);
 
       if (fs == nullptr)
         {
@@ -179,7 +192,7 @@ namespace os
         }
 
       const char* adjusted_path = path;
-      auto* const fs = mount_manager::identify_file_system (&adjusted_path);
+      auto* const fs = file_system::identify_mounted (&adjusted_path);
 
       if (fs == nullptr)
         {
@@ -208,7 +221,7 @@ namespace os
         }
 
       const char* adjusted_path = path;
-      auto* const fs = mount_manager::identify_file_system (&adjusted_path);
+      auto* const fs = file_system::identify_mounted (&adjusted_path);
 
       if (fs == nullptr)
         {
@@ -244,8 +257,8 @@ namespace os
 
       auto adjusted_existing = existing;
       auto adjusted_new = _new;
-      auto* const fs = mount_manager::identify_file_system (&adjusted_existing,
-                                                            &adjusted_new);
+      auto* const fs = file_system::identify_mounted (&adjusted_existing,
+                                                      &adjusted_new);
 
       if (fs == nullptr)
         {
@@ -274,7 +287,7 @@ namespace os
         }
 
       auto adjusted_path = path;
-      auto* const fs = mount_manager::identify_file_system (&adjusted_path);
+      auto* const fs = file_system::identify_mounted (&adjusted_path);
 
       if (fs == nullptr)
         {
@@ -303,7 +316,7 @@ namespace os
         }
 
       auto adjusted_path = path;
-      auto* const fs = mount_manager::identify_file_system (&adjusted_path);
+      auto* const fs = file_system::identify_mounted (&adjusted_path);
 
       if (fs == nullptr)
         {
@@ -336,6 +349,28 @@ namespace os
     int
     file_system::mount (const char* path, unsigned int flags)
     {
+      if (mounted_path_ != nullptr)
+        {
+          // File system already mounted.
+          errno = EBUSY;
+          return -1;
+        }
+
+      if (path != nullptr)
+        {
+          for (auto&& fs : mounted_list__)
+            {
+              // Validate the device name by checking duplicates.
+              if (std::strcmp (path, fs.mounted_path_) == 0)
+                {
+                  os::trace::printf ("Path \"%s\" already mounted.", path);
+
+                  errno = EBUSY;
+                  return -1;
+                }
+            }
+        }
+
       char* p = const_cast<char*> (path);
       if (p != nullptr)
         {
@@ -352,14 +387,16 @@ namespace os
 
       if (p == nullptr)
         {
-          ret = mount_manager::root (this);
+          mounted_root__ = this;
+          mounted_path_ = "/";
         }
       else
         {
-          ret = mount_manager::mount (this, path);
+          mounted_list__.link (*this);
+          mounted_path_ = path;
         }
-      // TODO register.
-      return ret;
+
+      return 0;
     }
 
     /**
@@ -370,12 +407,58 @@ namespace os
     int
     file_system::umount (int unsigned flags)
     {
-      // Ignore error?
-      mount_manager::umount (this);
+      mount_manager_links_.unlink ();
+      mounted_path_ = nullptr;
+
+      if (this == mounted_root__)
+        {
+          if (!mounted_list__.empty ())
+            {
+              errno = EBUSY;
+              return -1;
+            }
+
+          mounted_root__ = nullptr;
+        }
 
       this->sync ();
       int ret = do_umount (flags);
       return ret;
+    }
+
+    file_system*
+    file_system::identify_mounted (const char** path1, const char** path2)
+    {
+      assert(path1 != nullptr);
+      assert(*path1 != nullptr);
+
+      for (auto&& fs : mounted_list__)
+        {
+          auto len = std::strlen (fs.mounted_path_);
+
+          // Check if path1 starts with the mounted path.
+          if (std::strncmp (fs.mounted_path_, *path1, len) == 0)
+            {
+              // If so, adjust paths to skip over prefix, but keep '/'.
+              *path1 = (*path1 + len - 1);
+
+              if ((path2 != nullptr) && (*path2 != nullptr))
+                {
+                  *path2 = (*path2 + len - 1);
+                }
+
+              return &fs;
+            }
+        }
+
+      // If root file system defined, return it.
+      if (mounted_root__ != nullptr)
+        {
+          return mounted_root__;
+        }
+
+      // Not found.
+      return nullptr;
     }
 
     // ------------------------------------------------------------------------
@@ -491,8 +574,6 @@ namespace os
       trace::printf ("file_system::%s() @%p\n", __func__, this);
 
       do_sync ();
-
-      block_device_.sync ();
     }
 
     // http://pubs.opengroup.org/onlinepubs/9699919799/functions/chdir.html
