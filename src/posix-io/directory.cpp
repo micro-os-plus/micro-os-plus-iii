@@ -29,6 +29,8 @@
 #include <cmsis-plus/posix-io/file-system.h>
 #include <cmsis-plus/posix-io/mount-manager.h>
 #include <cmsis-plus/posix-io/pool.h>
+#include <cmsis-plus/diag/trace.h>
+
 #include <cerrno>
 #include <cassert>
 
@@ -78,11 +80,15 @@ namespace os
 
     directory::directory (void)
     {
+      os::trace::printf ("directory::%s()=%p\n", __func__, this);
+
       file_system_ = nullptr;
     }
 
     directory::~directory ()
     {
+      os::trace::printf ("directory::%s() @%p\n", __func__, this);
+
       file_system_ = nullptr;
     }
 
@@ -91,6 +97,8 @@ namespace os
     struct dirent*
     directory::read (void)
     {
+      os::trace::printf ("directory::%s() @%p\n", __func__, this);
+
       assert(file_system_ != nullptr);
       errno = 0;
 
@@ -101,6 +109,8 @@ namespace os
     void
     directory::rewind (void)
     {
+      os::trace::printf ("directory::%s() @%p\n", __func__, this);
+
       assert(file_system_ != nullptr);
       errno = 0;
 
@@ -111,6 +121,8 @@ namespace os
     int
     directory::close (void)
     {
+      os::trace::printf ("directory::%s() @%p\n", __func__, this);
+
       assert(file_system_ != nullptr);
       errno = 0;
 

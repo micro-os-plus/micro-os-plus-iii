@@ -29,6 +29,8 @@
 #include <cmsis-plus/posix-io/file-system.h>
 #include <cmsis-plus/posix-io/mount-manager.h>
 #include <cmsis-plus/posix-io/pool.h>
+#include <cmsis-plus/diag/trace.h>
+
 #include <cerrno>
 
 // ----------------------------------------------------------------------------
@@ -42,11 +44,15 @@ namespace os
     file::file () :
         io (type::file)
     {
+      os::trace::printf ("file::%s()=%p\n", __func__, this);
+
       file_system_ = nullptr;
     }
 
     file::~file ()
     {
+      os::trace::printf ("file::%s() @%p\n", __func__, this);
+
       file_system_ = nullptr;
     }
 
@@ -74,6 +80,8 @@ namespace os
     int
     file::ftruncate (off_t length)
     {
+      os::trace::printf ("file::%s(%u) @%p\n", __func__, length, this);
+
       if (length < 0)
         {
           errno = EINVAL;
@@ -89,6 +97,8 @@ namespace os
     int
     file::fsync (void)
     {
+      os::trace::printf ("file::%s() @%p\n", __func__, this);
+
       errno = 0;
 
       // Execute the implementation specific code.

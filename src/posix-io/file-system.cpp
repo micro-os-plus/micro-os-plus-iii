@@ -49,6 +49,8 @@ namespace os
     int
     mkdir (const char* path, mode_t mode)
     {
+      os::trace::printf ("%s(\"%s\", %u)\n", __func__, path, mode);
+
       if (path == nullptr)
         {
           errno = EFAULT;
@@ -79,6 +81,8 @@ namespace os
     int
     rmdir (const char* path)
     {
+      os::trace::printf ("%s(\"%s\")\n", __func__, path);
+
       if (path == nullptr)
         {
           errno = EFAULT;
@@ -109,6 +113,8 @@ namespace os
     void
     sync (void)
     {
+      os::trace::printf ("%s()\n", __func__);
+
       errno = 0;
 
       // Enumerate all mounted file systems and sync them.
@@ -129,6 +135,8 @@ namespace os
     int
     chmod (const char* path, mode_t mode)
     {
+      os::trace::printf ("%s(\"%s\", %u)\n", __func__, path, mode);
+
       if (path == nullptr)
         {
           errno = EFAULT;
@@ -156,6 +164,8 @@ namespace os
     int
     stat (const char* path, struct stat* buf)
     {
+      os::trace::printf ("%s(\"%s\", %p)\n", __func__, path, buf);
+
       if ((path == nullptr) || (buf == nullptr))
         {
           errno = EFAULT;
@@ -183,6 +193,8 @@ namespace os
     int
     truncate (const char* path, off_t length)
     {
+      os::trace::printf ("%s(\"%s\", %u)\n", __func__, path, length);
+
       if (path == nullptr)
         {
           errno = EFAULT;
@@ -216,6 +228,8 @@ namespace os
     int
     rename (const char* existing, const char* _new)
     {
+      os::trace::printf ("%s(\"%s\",\"%s\")\n", __func__, existing, _new);
+
       if ((existing == nullptr) || (_new == nullptr))
         {
           errno = EFAULT;
@@ -245,6 +259,8 @@ namespace os
     int
     unlink (const char* path)
     {
+      os::trace::printf ("%s(\"%s\")\n", __func__, path);
+
       if (path == nullptr)
         {
           errno = EFAULT;
@@ -272,6 +288,8 @@ namespace os
     int
     utime (const char* path, const struct utimbuf* times)
     {
+      os::trace::printf ("%s(\"%s\", %p)\n", __func__, path, times);
+
       if ((path == nullptr) || (times == nullptr))
         {
           errno = EFAULT;
@@ -302,7 +320,7 @@ namespace os
                               pool* dirs_pool) :
         block_device_ (device)
     {
-      os::trace::printf ("file_system::%s() @%p\n", __func__, this);
+      os::trace::printf ("file_system::%s()=%p\n", __func__, this);
 
       files_pool_ = files_pool;
       dirs_pool_ = dirs_pool;
