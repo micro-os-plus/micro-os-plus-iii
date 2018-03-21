@@ -761,6 +761,11 @@ namespace os
          * @}
          */
 
+      protected:
+
+        pointer
+        get_pointer (iterator_pointer node) const;
+
       public:
 
         /**
@@ -769,7 +774,7 @@ namespace os
          */
 
         /**
-         * @brief Add a node to the list.
+         * @brief Add a node to the tail of the list.
          * @param [in] node Reference to a list node.
          * @par Returns
          *  Nothing.
@@ -790,6 +795,20 @@ namespace os
          */
         iterator
         end () const;
+
+        /**
+         * @brief Unlink the first element from the list.
+         * @return Pointer to the first element in the list.
+         */
+        pointer
+        unlink_head (void);
+
+        /**
+         * @brief Unlink the last element from the list.
+         * @return Pointer to the last element in the list.
+         */
+        pointer
+        unlink_tail (void);
 
         /**
          * @}
@@ -1219,6 +1238,49 @@ namespace os
         return iterator
           {
               static_cast<iterator_pointer> (const_cast<static_double_list_links*> (&head_)) };
+      }
+
+    template<typename T, typename N, N T::* MP, typename U>
+      inline typename intrusive_list<T, N, MP, U>::pointer
+      intrusive_list<T, N, MP, U>::get_pointer (iterator_pointer node) const
+      {
+        // static_assert(std::is_convertible<U, T>::value == true, "U must be implicitly convertible to T!");
+
+        // Compute the distance between the member intrusive link
+        // node and the class begin.
+        const auto offset =
+            reinterpret_cast<difference_type> (&(static_cast<T*> (nullptr)->*MP));
+
+        // Compute the address of the object which includes the
+        // intrusive node, by adjusting down the node address.
+        return reinterpret_cast<pointer> (reinterpret_cast<difference_type> (node)
+            - offset);
+      }
+
+    template<typename T, typename N, N T::* MP, typename U>
+      typename intrusive_list<T, N, MP, U>::pointer
+      intrusive_list<T, N, MP, U>::unlink_head (void)
+      {
+        assert(!empty ());
+
+        // The first element in the list.
+        iterator_pointer link = static_cast<iterator_pointer> (head_.next ());
+        link->unlink ();
+
+        return get_pointer (link);
+      }
+
+    template<typename T, typename N, N T::* MP, typename U>
+      typename intrusive_list<T, N, MP, U>::pointer
+      intrusive_list<T, N, MP, U>::unlink_tail (void)
+      {
+        assert(!empty ());
+
+        // The last element in the list.
+        iterator_pointer link = static_cast<iterator_pointer> (head_.prev ());
+        link->unlink ();
+
+        return get_pointer (link);
       }
 
   } /* namespace utils */
