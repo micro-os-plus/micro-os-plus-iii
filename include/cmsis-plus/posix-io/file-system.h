@@ -894,15 +894,19 @@ namespace os
           impl_instance_
             { *this, device }
       {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
         trace::printf ("file_system_implementable::%s(\"%s\")=@%p\n", __func__,
                        name_, this);
+#endif
       }
 
     template<typename T>
       file_system_implementable<T>::~file_system_implementable ()
       {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
         trace::printf ("file_system_implementable::%s() @%p %s\n", __func__,
                        this, name_);
+#endif
       }
 
     // ========================================================================
@@ -916,13 +920,17 @@ namespace os
           impl_instance_
             { *this, device, locker }
       {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
         trace::printf ("file_system_lockable::%s()=%p\n", __func__, this);
+#endif
       }
 
     template<typename T, typename L>
       file_system_lockable<T, L>::~file_system_lockable ()
       {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
         trace::printf ("file_system_lockable::%s() @%p\n", __func__, this);
+#endif
       }
 
     // ------------------------------------------------------------------------

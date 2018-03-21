@@ -227,12 +227,6 @@ namespace os
       virtual int
       do_fsync (void) = 0;
 
-#if 0
-      // TODO: check if it is needed.
-      virtual void
-      do_release (void) = 0;
-#endif
-
       // ----------------------------------------------------------------------
 
       file&
@@ -440,13 +434,17 @@ namespace os
           impl_instance_
             { *this }
       {
+#if defined(OS_TRACE_POSIX_IO_FILE)
         trace::printf ("file_implementable::%s()=@%p\n", __func__, this);
+#endif
       }
 
     template<typename T>
       file_implementable<T>::~file_implementable ()
       {
+#if defined(OS_TRACE_POSIX_IO_FILE)
         trace::printf ("file_implementable::%s() @%p\n", __func__, this);
+#endif
       }
 
     // ========================================================================
@@ -460,13 +458,17 @@ namespace os
             { *this }, //
           locker_ (locker)
       {
+#if defined(OS_TRACE_POSIX_IO_FILE)
         trace::printf ("file_lockable::%s()=@%p\n", __func__, this);
+#endif
       }
 
     template<typename T, typename L>
       file_lockable<T, L>::~file_lockable ()
       {
+#if defined(OS_TRACE_POSIX_IO_FILE)
         trace::printf ("file_lockable::%s() @%p\n", __func__, this);
+#endif
       }
 
     // ------------------------------------------------------------------------

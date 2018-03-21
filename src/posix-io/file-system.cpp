@@ -56,7 +56,9 @@ namespace os
     int
     mkdir (const char* path, mode_t mode)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s(\"%s\", %u)\n", __func__, path, mode);
+#endif
 
       if (path == nullptr)
         {
@@ -86,7 +88,9 @@ namespace os
     int
     rmdir (const char* path)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s(\"%s\")\n", __func__, path);
+#endif
 
       if (path == nullptr)
         {
@@ -116,7 +120,9 @@ namespace os
     void
     sync (void)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s()\n", __func__);
+#endif
 
       // Enumerate all mounted file systems and sync them.
       for (auto&& fs : file_system::mounted_list__)
@@ -137,7 +143,9 @@ namespace os
     int
     chmod (const char* path, mode_t mode)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s(\"%s\", %u)\n", __func__, path, mode);
+#endif
 
       if (path == nullptr)
         {
@@ -166,7 +174,9 @@ namespace os
     int
     stat (const char* path, struct stat* buf)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s(\"%s\", %p)\n", __func__, path, buf);
+#endif
 
       if ((path == nullptr) || (buf == nullptr))
         {
@@ -195,7 +205,9 @@ namespace os
     int
     truncate (const char* path, off_t length)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s(\"%s\", %u)\n", __func__, path, length);
+#endif
 
       if (path == nullptr)
         {
@@ -230,7 +242,9 @@ namespace os
     int
     rename (const char* existing, const char* _new)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s(\"%s\",\"%s\")\n", __func__, existing, _new);
+#endif
 
       if ((existing == nullptr) || (_new == nullptr))
         {
@@ -261,7 +275,9 @@ namespace os
     int
     unlink (const char* path)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s(\"%s\")\n", __func__, path);
+#endif
 
       if (path == nullptr)
         {
@@ -290,7 +306,9 @@ namespace os
     int
     utime (const char* path, const struct utimbuf* times)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s(\"%s\", %p)\n", __func__, path, times);
+#endif
 
       if ((path == nullptr) || (times == nullptr))
         {
@@ -322,12 +340,16 @@ namespace os
         name_ (name), //
         impl_ (impl)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\")=%p\n", __func__, name_, this);
+#endif
     }
 
     file_system::~file_system ()
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s() @%p %s\n", __func__, this, name_);
+#endif
     }
 
     // ------------------------------------------------------------------------
@@ -368,8 +390,10 @@ namespace os
     file_system::vmount (const char* path, unsigned int flags,
                          std::va_list args)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\", %u) @%p\n", __func__,
                      path ? path : "0", flags, this);
+#endif
 
       if (mounted_path_ != nullptr)
         {
@@ -429,7 +453,9 @@ namespace os
     int
     file_system::umount (int unsigned flags)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(%u) @%p\n", __func__, flags, this);
+#endif
 
       mount_manager_links_.unlink ();
       mounted_path_ = nullptr;
@@ -502,18 +528,8 @@ namespace os
     file*
     file_system::vopen (const char* path, int oflag, std::va_list args)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\", %u)\n", __func__, path, oflag);
-
-#if 0
-      auto* const fil = static_cast<file*> (files_pool ()->acquire ());
-
-      if (fil == nullptr)
-        {
-          errno = EBADF;
-          return nullptr;
-        }
-
-      fil->file_system (this);
 #endif
 
       // Execute the file specific implementation code.
@@ -534,17 +550,8 @@ namespace os
     directory*
     file_system::opendir (const char* dirpath)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\")\n", __func__, dirpath);
-#if 0
-      auto* const dir = static_cast<directory*> (dirs_pool ()->acquire ());
-
-      if (dir == nullptr)
-        {
-          errno = EBADF;
-          return nullptr;
-        }
-
-      dir->file_system (this);
 #endif
 
       // Execute the dir specific implementation code.
@@ -564,7 +571,9 @@ namespace os
     int
     file_system::mkdir (const char* path, mode_t mode)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\", %u)\n", __func__, path, mode);
+#endif
 
       if (path == nullptr)
         {
@@ -586,7 +595,9 @@ namespace os
     int
     file_system::rmdir (const char* path)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\")\n", __func__, path);
+#endif
 
       if (path == nullptr)
         {
@@ -608,7 +619,9 @@ namespace os
     void
     file_system::sync (void)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s() @%p\n", __func__, this);
+#endif
 
       errno = 0;
 
@@ -620,7 +633,9 @@ namespace os
     int
     file_system::chmod (const char* path, mode_t mode)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\", %u)\n", __func__, path, mode);
+#endif
 
       if (path == nullptr)
         {
@@ -643,7 +658,9 @@ namespace os
     int
     file_system::stat (const char* path, struct stat* buf)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\", %p)\n", __func__, path, buf);
+#endif
 
       if ((path == nullptr) || (buf == nullptr))
         {
@@ -666,7 +683,9 @@ namespace os
     int
     file_system::truncate (const char* path, off_t length)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\", %u)\n", __func__, path, length);
+#endif
 
       if (path == nullptr)
         {
@@ -689,8 +708,10 @@ namespace os
     int
     file_system::rename (const char* existing, const char* _new)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\",\"%s\")\n", __func__, existing,
                      _new);
+#endif
 
       if ((existing == nullptr) || (_new == nullptr))
         {
@@ -713,7 +734,9 @@ namespace os
     int
     file_system::unlink (const char* path)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\")\n", __func__, path);
+#endif
 
       if (path == nullptr)
         {
@@ -737,7 +760,9 @@ namespace os
     int
     file_system::utime (const char* path, const struct utimbuf* times)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\", %p)\n", __func__, path, times);
+#endif
 
       if ((path == nullptr) || (times == nullptr))
         {
@@ -775,27 +800,22 @@ namespace os
     // http://pubs.opengroup.org/onlinepubs/9699919799/functions/chdir.html
     // ------------------------------------------------------------------------
 
-#if 0
-    const
-    char*
-    file_system::adjust_path (const char* path)
-      {
-        return path;
-      }
-#endif
-
     // ========================================================================
 
     file_system_impl::file_system_impl (file_system& self, device_block& device) :
         self_ (self), //
         device_ (device)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system_impl::%s()=%p\n", __func__, this);
+#endif
     }
 
     file_system_impl::~file_system_impl ()
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system_impl::%s() @%p\n", __func__, this);
+#endif
     }
 
 #pragma GCC diagnostic push

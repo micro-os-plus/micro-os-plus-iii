@@ -44,14 +44,18 @@ namespace os
         device
           { impl, type::device, name }
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_CHAR)
       trace::printf ("device_char::%s(\"%s\")=@%p\n", __func__, name_, this);
+#endif
 
       device_registry<device>::link (this);
     }
 
     device_char::~device_char ()
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_CHAR)
       trace::printf ("device_char::%s() @%p %s\n", __func__, this, name_);
+#endif
 
       registry_links_.unlink ();
 
@@ -64,12 +68,16 @@ namespace os
         device_impl
           { self }
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_CHAR)
       trace::printf ("device_char_impl::%s()=@%p\n", __func__, this);
+#endif
     }
 
     device_char_impl::~device_char_impl ()
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_CHAR)
       trace::printf ("device_char_impl::%s() @%p\n", __func__, this);
+#endif
     }
 
   // ==========================================================================

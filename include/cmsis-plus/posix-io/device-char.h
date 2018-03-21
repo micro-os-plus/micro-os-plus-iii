@@ -254,15 +254,19 @@ namespace os
           impl_instance_
             { *this }
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_CHAR)
         trace::printf ("device_char_implementable::%s(\"%s\")=@%p\n", __func__,
                        name_, this);
+#endif
       }
 
     template<typename T>
       device_char_implementable<T>::~device_char_implementable ()
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_CHAR)
         trace::printf ("device_char_implementable::%s() @%p %s\n", __func__,
                        this, name_);
+#endif
       }
 
   // ==========================================================================

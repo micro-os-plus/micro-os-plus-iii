@@ -47,12 +47,16 @@ namespace os
           { impl, t }, //
         name_ (name)
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE)
       trace::printf ("device::%s(\"%s\")=%p\n", __func__, name_, this);
+#endif
     }
 
     device::~device ()
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE)
       trace::printf ("device::%s() @%p\n", __func__, this);
+#endif
 
       registry_links_.unlink ();
 
@@ -76,8 +80,10 @@ namespace os
     int
     device::vopen (const char* path, int oflag, std::va_list args)
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE)
       trace::printf ("device::%s(\"%s\") @%p\n", __func__, path ? path : "",
                      this);
+#endif
 
       errno = 0;
 
@@ -110,7 +116,9 @@ namespace os
     int
     device::close (void)
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE)
       trace::printf ("device::%s() @%p\n", __func__, this);
+#endif
 
       errno = 0;
 
@@ -129,14 +137,6 @@ namespace os
       return ret;
     }
 
-#if 0
-    bool
-    device::do_is_opened (void)
-      {
-        return (open_count_ > 0);
-      }
-#endif
-
     int
     device::ioctl (int request, ...)
     {
@@ -152,7 +152,9 @@ namespace os
     int
     device::vioctl (int request, std::va_list args)
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE)
       trace::printf ("device::%s(%d) @%p\n", __func__, request, this);
+#endif
 
       errno = 0;
 
@@ -167,14 +169,6 @@ namespace os
       impl ().do_sync ();
     }
 
-#if 0
-    void
-    device::do_sync (void)
-      {
-        errno = ENOSYS; // Not implemented
-      }
-#endif
-
     // ------------------------------------------------------------------------
 
     bool
@@ -186,32 +180,22 @@ namespace os
       return (std::strcmp (name, name_) == 0);
     }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
-#if 0
-    int
-    device::do_vioctl (int request, std::va_list args)
-      {
-        errno = ENOSYS; // Not implemented
-        return -1;
-      }
-#endif
-
-#pragma GCC diagnostic pop
-
     // ========================================================================
 
     device_impl::device_impl (device& self) :
         io_impl
           { self }
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE)
       trace::printf ("device_impl::%s()=%p\n", __func__, this);
+#endif
     }
 
     device_impl::~device_impl ()
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE)
       trace::printf ("device_impl::%s() @%p\n", __func__, this);
+#endif
     }
 
     // ----------------------------------------------------------------------

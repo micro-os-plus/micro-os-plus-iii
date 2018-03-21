@@ -41,12 +41,16 @@ namespace os
         device_char
           { impl, name }
     {
+#if defined(OS_TRACE_POSIX_IO_TTY)
       trace::printf ("tty::%s(\"%s\")=@%p\n", __func__, name_, this);
+#endif
     }
 
     tty::~tty ()
     {
+#if defined(OS_TRACE_POSIX_IO_TTY)
       trace::printf ("tty::%s() @%p %s\n", __func__, this, name_);
+#endif
     }
 
     // ------------------------------------------------------------------------
@@ -81,12 +85,16 @@ namespace os
         device_char_impl
           { self }
     {
+#if defined(OS_TRACE_POSIX_IO_TTY)
       trace::printf ("tty_impl::%s()=@%p\n", __func__, this);
+#endif
     }
 
     tty_impl::~tty_impl ()
     {
+#if defined(OS_TRACE_POSIX_IO_TTY)
       trace::printf ("tty_impl::%s() @%p\n", __func__, this);
+#endif
     }
 
     int

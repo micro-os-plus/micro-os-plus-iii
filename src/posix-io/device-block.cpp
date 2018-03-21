@@ -47,14 +47,18 @@ namespace os
         device
           { impl, type::block, name, }
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
       trace::printf ("device_block::%s(\"%s\")=@%p\n", __func__, name_, this);
+#endif
 
       device_registry<device>::link (this);
     }
 
     device_block::~device_block ()
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
       trace::printf ("device_block::%s() @%p %s\n", __func__, this, name_);
+#endif
     }
 
     // ------------------------------------------------------------------------
@@ -62,8 +66,10 @@ namespace os
     ssize_t
     device_block::read_block (void* buf, blknum_t blknum, std::size_t nblocks)
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
       trace::printf ("device_block::%s(%p, %u, %u) @%p\n", __func__, buf,
                      blknum, nblocks, this);
+#endif
 
       if (blknum + nblocks > impl ().num_blocks_)
         {
@@ -78,8 +84,10 @@ namespace os
     device_block::write_block (const void* buf, blknum_t blknum,
                                std::size_t nblocks)
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
       trace::printf ("device_block::%s(%p, %u, %u) @%p\n", __func__, buf,
                      blknum, nblocks, this);
+#endif
 
       if (blknum + nblocks > impl ().num_blocks_)
         {
@@ -93,7 +101,9 @@ namespace os
     int
     device_block::vioctl (int request, std::va_list args)
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
       trace::printf ("device_block::%s(%d) @%p\n", __func__, request, this);
+#endif
 
       errno = 0;
 
@@ -149,34 +159,22 @@ namespace os
         }
     }
 
-#if 0
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
-    int
-    device_block::do_vioctl (int request, std::va_list args)
-      {
-        errno = ENOSYS; // Not implemented
-        return -1;
-      }
-
-#pragma GCC diagnostic pop
-
-#endif
-
     // ========================================================================
 
     device_block_impl::device_block_impl (device_block& self) :
         device_impl
           { self }
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
       trace::printf ("device_block_impl::%s()=@%p\n", __func__, this);
+#endif
     }
 
     device_block_impl::~device_block_impl ()
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
       trace::printf ("device_block_impl::%s() @%p\n", __func__, this);
+#endif
 
       block_logical_size_bytes_ = 0;
       num_blocks_ = 0;
@@ -187,8 +185,10 @@ namespace os
     off_t
     device_block_impl::do_lseek (off_t offset, int whence)
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
       trace::printf ("device_block_impl::%s(%d, %d) @%p\n", __func__, offset,
                      whence, this);
+#endif
 
       errno = 0;
       off_t tmp = offset_;
@@ -222,8 +222,10 @@ namespace os
     ssize_t
     device_block_impl::do_read (void* buf, std::size_t nbyte)
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
       trace::printf ("device_block_impl::%s(%p, %u) @%p\n", __func__, buf,
                      nbyte, this);
+#endif
 
       if ((block_logical_size_bytes_ == 0)
           || ((nbyte % block_logical_size_bytes_) != 0)
@@ -247,8 +249,10 @@ namespace os
     ssize_t
     device_block_impl::do_write (const void* buf, std::size_t nbyte)
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
       trace::printf ("device_block_impl::%s(%p, %u) @%p\n", __func__, buf,
                      nbyte, this);
+#endif
 
       if ((block_logical_size_bytes_ == 0)
           || ((nbyte % block_logical_size_bytes_) != 0)

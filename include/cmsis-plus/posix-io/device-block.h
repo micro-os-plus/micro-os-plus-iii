@@ -450,15 +450,19 @@ namespace os
           impl_instance_
             { *this }
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
         trace::printf ("device_block_implementable::%s(\"%s\")=@%p\n", __func__,
                        name_, this);
+#endif
       }
 
     template<typename T>
       device_block_implementable<T>::~device_block_implementable ()
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
         trace::printf ("device_block_implementable::%s() @%p %s\n", __func__,
                        this, name_);
+#endif
       }
 
     // ========================================================================
@@ -472,15 +476,19 @@ namespace os
             { *this }, //
           locker_ (locker)
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
         trace::printf ("device_block_lockable::%s(\"%s\")=@%p\n", __func__,
                        name_, this);
+#endif
       }
 
     template<typename T, typename L>
       device_block_lockable<T, L>::~device_block_lockable ()
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
         trace::printf ("device_block_lockable::%s() @%p %s\n", __func__, this,
                        name_);
+#endif
       }
 
     // ------------------------------------------------------------------------
@@ -489,7 +497,9 @@ namespace os
       int
       device_block_lockable<T, L>::close (void)
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
         trace::printf ("device_block_lockable::%s() @%p\n", __func__, this);
+#endif
 
         estd::lock_guard<L> lock
           { locker_ };
@@ -501,8 +511,10 @@ namespace os
       ssize_t
       device_block_lockable<T, L>::read (void* buf, std::size_t nbyte)
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
         trace::printf ("device_block_lockable::%s(0x0%X, %u) @%p\n", __func__,
                        buf, nbyte, this);
+#endif
 
         estd::lock_guard<L> lock
           { locker_ };
@@ -514,8 +526,10 @@ namespace os
       ssize_t
       device_block_lockable<T, L>::write (const void* buf, std::size_t nbyte)
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
         trace::printf ("device_block_lockable::%s(0x0%X, %u) @%p\n", __func__,
                        buf, nbyte, this);
+#endif
 
         estd::lock_guard<L> lock
           { locker_ };
@@ -527,8 +541,10 @@ namespace os
       ssize_t
       device_block_lockable<T, L>::writev (const struct iovec* iov, int iovcnt)
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
         trace::printf ("device_block_lockable::%s(0x0%X, %d) @%p\n", __func__,
                        iov, iovcnt, this);
+#endif
 
         estd::lock_guard<L> lock
           { locker_ };
@@ -540,8 +556,10 @@ namespace os
       int
       device_block_lockable<T, L>::vfcntl (int cmd, std::va_list args)
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
         trace::printf ("device_block_lockable::%s(%d) @%p\n", __func__, cmd,
                        this);
+#endif
 
         estd::lock_guard<L> lock
           { locker_ };
@@ -553,8 +571,10 @@ namespace os
       int
       device_block_lockable<T, L>::vioctl (int request, std::va_list args)
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
         trace::printf ("device_block_lockable::%s(%d) @%p\n", __func__, request,
                        this);
+#endif
 
         estd::lock_guard<L> lock
           { locker_ };
@@ -566,8 +586,10 @@ namespace os
       off_t
       device_block_lockable<T, L>::lseek (off_t offset, int whence)
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
         trace::printf ("device_block_lockable::%s(%d, %d) @%p\n", __func__,
                        offset, whence, this);
+#endif
 
         estd::lock_guard<L> lock
           { locker_ };
@@ -580,8 +602,10 @@ namespace os
       device_block_lockable<T, L>::read_block (void* buf, blknum_t blknum,
                                                std::size_t nblocks)
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
         trace::printf ("device_block_lockable::%s(%p, %u, %u) @%p\n", __func__,
                        buf, blknum, nblocks, this);
+#endif
 
         estd::lock_guard<L> lock
           { locker_ };
@@ -595,8 +619,10 @@ namespace os
                                                 blknum_t blknum,
                                                 std::size_t nblocks)
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
         trace::printf ("device_block_lockable::%s(%p, %u, %u) @%p\n", __func__,
                        buf, blknum, nblocks, this);
+#endif
 
         estd::lock_guard<L> lock
           { locker_ };

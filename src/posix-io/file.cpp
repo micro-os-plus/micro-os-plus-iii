@@ -45,12 +45,16 @@ namespace os
           { impl, type::file }, //
         file_system_ (&fs)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE)
       trace::printf ("file::%s()=%p\n", __func__, this);
+#endif
     }
 
     file::~file ()
     {
+#if defined(OS_TRACE_POSIX_IO_FILE)
       trace::printf ("file::%s() @%p\n", __func__, this);
+#endif
 
       file_system_ = nullptr;
     }
@@ -60,7 +64,9 @@ namespace os
     int
     file::close (void)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE)
       trace::printf ("file::%s() @%p\n", __func__, this);
+#endif
 
       int ret = io::close ();
 
@@ -76,7 +82,9 @@ namespace os
     int
     file::ftruncate (off_t length)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE)
       trace::printf ("file::%s(%u) @%p\n", __func__, length, this);
+#endif
 
       if (length < 0)
         {
@@ -93,7 +101,9 @@ namespace os
     int
     file::fsync (void)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE)
       trace::printf ("file::%s() @%p\n", __func__, this);
+#endif
 
       errno = 0;
 
@@ -101,67 +111,25 @@ namespace os
       return impl ().do_fsync ();
     }
 
-    // ------------------------------------------------------------------------
-
-#if 0
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
-    int
-    file::do_ftruncate (off_t length)
-      {
-        errno = ENOSYS; // Not implemented
-        return -1;
-      }
-
-#pragma GCC diagnostic pop
-
-    int
-    file::do_fsync (void)
-      {
-        errno = ENOSYS; // Not implemented
-        return -1;
-      }
-
-#endif
-
     // ========================================================================
 
     file_impl::file_impl (file& self) :
         io_impl
           { self }
     {
+#if defined(OS_TRACE_POSIX_IO_FILE)
       trace::printf ("file_impl::%s()=%p\n", __func__, this);
+#endif
     }
 
     file_impl::~file_impl ()
     {
+#if defined(OS_TRACE_POSIX_IO_FILE)
       trace::printf ("file_impl::%s() @%p\n", __func__, this);
+#endif
     }
 
     // ------------------------------------------------------------------------
-
-#if 0
-    void
-    file_impl::do_release (void)
-      {
-        // The `file` object is free, return it to the pool.
-        auto fs = file_system_;
-        if (fs != nullptr)
-          {
-#if 0
-            auto pool = fs->files_pool ();
-            if (pool != nullptr)
-              {
-                pool->release (this);
-              }
-            // Clear the file_system pointer, to avoid entering again.
-#endif
-            file_system_ = nullptr;
-          }
-      }
-#endif
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -182,7 +150,7 @@ namespace os
       return -1;
     }
 
-  // ========================================================================
+  // ==========================================================================
   } /* namespace posix */
 } /* namespace os */
 

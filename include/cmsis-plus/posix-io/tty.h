@@ -268,15 +268,19 @@ namespace os
           impl_instance_
             { *this }
       {
+#if defined(OS_TRACE_POSIX_IO_TTY)
         trace::printf ("tty_implementable::%s(\"%s\")=@%p\n", __func__, name_,
                        this);
+#endif
       }
 
     template<typename T>
       tty_implementable<T>::~tty_implementable ()
       {
+#if defined(OS_TRACE_POSIX_IO_TTY)
         trace::printf ("tty_implementable::%s() @%p %s\n", __func__, this,
                        name_);
+#endif
       }
 
   // ==========================================================================

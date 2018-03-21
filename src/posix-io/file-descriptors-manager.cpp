@@ -107,7 +107,9 @@ namespace os
     int
     file_descriptors_manager::alloc (class io* io)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_DESCRIPTORS_MANAGER)
       trace::printf ("file_descriptors_manager::%s(%p)\n", __func__, io);
+#endif
 
       if (io->file_descriptor () >= 0)
         {
@@ -158,7 +160,9 @@ namespace os
     int
     file_descriptors_manager::free (int fildes)
     {
+#if defined(OS_TRACE_POSIX_IO_FILE_DESCRIPTORS_MANAGER)
       trace::printf ("file_descriptors_manager::%s(%d)\n", __func__, fildes);
+#endif
 
       if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= size__))
         {

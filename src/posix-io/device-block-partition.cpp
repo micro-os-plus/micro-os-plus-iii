@@ -42,14 +42,18 @@ namespace os
         device_block
           { impl, name }
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
       trace::printf ("device_block_partition::%s(\"%s\")=@%p\n", __func__,
                      name_, this);
+#endif
     }
 
     device_block_partition::~device_block_partition ()
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
       trace::printf ("device_block_partition::%s() @%p %s\n", __func__, this,
                      name_);
+#endif
     }
 
     // ------------------------------------------------------------------------
@@ -57,8 +61,10 @@ namespace os
     void
     device_block_partition::configure (blknum_t offset, blknum_t nblocks)
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
       trace::printf ("device_block_partition::%s(%u,%u) @%p\n", __func__,
                      offset, nblocks, this);
+#endif
 
       impl ().configure (offset, nblocks);
     }
@@ -71,12 +77,16 @@ namespace os
           { self }, //
         parent_ (parent)
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
       trace::printf ("device_block_partition_impl::%s()=@%p\n", __func__, this);
+#endif
     }
 
     device_block_partition_impl::~device_block_partition_impl ()
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
       trace::printf ("device_block_partition_impl::%s() @%p\n", __func__, this);
+#endif
     }
 
     // ----------------------------------------------------------------------
@@ -96,8 +106,10 @@ namespace os
     void
     device_block_partition_impl::configure (blknum_t offset, blknum_t nblocks)
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
       trace::printf ("device_block_partition_impl::%s(%u,%u) @%p\n", __func__,
                      offset, nblocks, this);
+#endif
 
       partition_offset_blocks_ = offset;
       assert(nblocks > 0);
@@ -112,8 +124,10 @@ namespace os
     device_block_partition_impl::do_vopen (const char* path, int oflag,
                                            std::va_list args)
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
       trace::printf ("device_block_partition_impl::%s(%d) @%p\n", __func__,
                      oflag, this);
+#endif
 
       return parent_.vopen (path, oflag, args);
     }
@@ -122,8 +136,10 @@ namespace os
     device_block_partition_impl::do_read_block (void* buf, blknum_t blknum,
                                                 std::size_t nblocks)
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
       trace::printf ("device_block_partition_impl::%s(0x%X, %u, %u) @%p\n",
                      __func__, buf, blknum, nblocks, this);
+#endif
 
       return parent_.read_block (buf, blknum + partition_offset_blocks_,
                                  nblocks);
@@ -134,8 +150,10 @@ namespace os
                                                  blknum_t blknum,
                                                  std::size_t nblocks)
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
       trace::printf ("device_block_partition_impl::%s(0x%X, %u, %u) @%p\n",
                      __func__, buf, blknum, nblocks, this);
+#endif
 
       return parent_.write_block (buf, blknum + partition_offset_blocks_,
                                   nblocks);
@@ -144,7 +162,9 @@ namespace os
     void
     device_block_partition_impl::do_sync (void)
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
       trace::printf ("device_block_partition_impl::%s() @%p\n", __func__, this);
+#endif
 
       return parent_.sync ();
     }
@@ -152,7 +172,9 @@ namespace os
     int
     device_block_partition_impl::do_close (void)
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
       trace::printf ("device_block_partition_impl::%s() @%p\n", __func__, this);
+#endif
 
       return parent_.close ();
     }

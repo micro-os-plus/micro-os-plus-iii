@@ -401,16 +401,20 @@ namespace os
             { *this, parent }, //
           locker_ (locker)
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
         trace::printf ("device_block_partition_lockable::%s(\"%s\")=@%p\n",
                        __func__, name_, this);
+#endif
 
       }
 
     template<typename T, typename L>
       device_block_partition_lockable<T, L>::~device_block_partition_lockable ()
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
         trace::printf ("device_block_partition_lockable::%s() @%p %s\n",
                        __func__, this, name_);
+#endif
       }
 
     // ------------------------------------------------------------------------
@@ -420,8 +424,10 @@ namespace os
       device_block_partition_lockable<T, L>::vioctl (int request,
                                                      std::va_list args)
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
         trace::printf ("device_block_partition_lockable::%s(%d) @%p\n",
                        __func__, request, this);
+#endif
 
         estd::lock_guard<L> lock (locker_);
 
@@ -434,8 +440,10 @@ namespace os
                                                          blknum_t blknum,
                                                          std::size_t nblocks)
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
         trace::printf ("device_block_partition_lockable::%s(%p, %u, %u) @%p\n",
                        __func__, buf, blknum, nblocks, this);
+#endif
 
         estd::lock_guard<L> lock (locker_);
 
@@ -448,8 +456,10 @@ namespace os
                                                           blknum_t blknum,
                                                           std::size_t nblocks)
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
         trace::printf ("device_block_partition_lockable::%s(%p, %u, %u) @%p\n",
                        __func__, buf, blknum, nblocks, this);
+#endif
 
         estd::lock_guard<L> lock (locker_);
 

@@ -71,7 +71,9 @@ namespace os
     io*
     vopen (const char* path, int oflag, std::va_list args)
     {
+#if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s(\"%s\")\n", __func__, path ? path : "");
+#endif
 
       if (path == nullptr)
         {
@@ -133,8 +135,10 @@ namespace os
 
       // Return a valid pointer to an object derived from io, or nullptr.
 
+#if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s(\"%s\")=%p fd=%d\n", __func__, path, io,
                      io->file_descriptor ());
+#endif
       return io;
     }
 
@@ -144,14 +148,18 @@ namespace os
         impl_ (impl), //
         type_ (t)
     {
+#if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s()=%p\n", __func__, this);
+#endif
 
       file_descriptor_ = no_file_descriptor;
     }
 
     io::~io ()
     {
+#if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s() @%p\n", __func__, this);
+#endif
 
       file_descriptor_ = no_file_descriptor;
     }
@@ -161,7 +169,9 @@ namespace os
     int
     io::close (void)
     {
+#if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s() @%p\n", __func__, this);
+#endif
 
       if (!impl ().do_is_opened ())
         {
@@ -181,32 +191,12 @@ namespace os
       return ret;
     }
 
-#if 0
-    void
-    io::do_release (void)
-      {
-        return;
-      }
-#endif
-
-#if 0
-    bool
-    io::do_is_opened (void)
-      {
-        return true;
-      }
-
-    bool
-    io::do_is_connected (void)
-      {
-        return true;
-      }
-#endif
-
     io*
     io::alloc_file_descriptor (void)
     {
+#if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s() @%p\n", __func__, this);
+#endif
 
       int fd = file_descriptors_manager::alloc (this);
       if (fd < 0)
@@ -217,7 +207,9 @@ namespace os
           return nullptr;
         }
 
+#if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s() @%p fd=%d\n", __func__, this, fd);
+#endif
 
       // Return a valid pointer to an object derived from `io`.
       return this;
@@ -230,7 +222,9 @@ namespace os
     ssize_t
     io::read (void* buf, std::size_t nbyte)
     {
+#if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s(0x0%X, %u) @%p\n", __func__, buf, nbyte, this);
+#endif
 
       if (buf == nullptr)
         {
@@ -269,15 +263,19 @@ namespace os
           impl ().offset () += ret;
         }
 
+#if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s(0x0%X, %u) @%p n=%d\n", __func__, buf, nbyte, this,
                      ret);
+#endif
       return ret;
     }
 
     ssize_t
     io::write (const void* buf, std::size_t nbyte)
     {
+#if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s(0x0%X, %u) @%p\n", __func__, buf, nbyte, this);
+#endif
 
       if (buf == nullptr)
         {
@@ -318,15 +316,19 @@ namespace os
           impl ().offset () += ret;
         }
 
+#if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s(0x0%X, %u) @%p n=%d\n", __func__, buf, nbyte, this,
                      ret);
+#endif
       return ret;
     }
 
     ssize_t
     io::writev (const struct iovec* iov, int iovcnt)
     {
+#if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s(0x0%X, %d) @%p\n", __func__, iov, iovcnt, this);
+#endif
 
       if (iov == nullptr)
         {
@@ -378,7 +380,9 @@ namespace os
     int
     io::vfcntl (int cmd, std::va_list args)
     {
+#if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s(%d) @%p\n", __func__, cmd, this);
+#endif
 
       if (!impl ().do_is_opened ())
         {
@@ -411,7 +415,9 @@ namespace os
     int
     io::fstat (struct stat* buf)
     {
+#if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s(%p) @%p\n", __func__, buf, this);
+#endif
 
       if (buf == nullptr)
         {
@@ -440,7 +446,9 @@ namespace os
     off_t
     io::lseek (off_t offset, int whence)
     {
+#if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s(%d, %d) @%p\n", __func__, offset, whence, this);
+#endif
 
       errno = 0;
 
@@ -453,12 +461,16 @@ namespace os
     io_impl::io_impl (io& self) :
         self_ (self)
     {
+#if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io_impl::%s()=%p\n", __func__, this);
+#endif
     }
 
     io_impl::~io_impl ()
     {
+#if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io_impl::%s() @%p\n", __func__, this);
+#endif
     }
 
     void

@@ -81,12 +81,16 @@ namespace os
         impl_ (impl), //
         file_system_ (&fs)
     {
+#if defined(OS_TRACE_POSIX_IO_DIRECTORY)
       trace::printf ("directory::%s()=%p\n", __func__, this);
+#endif
     }
 
     directory::~directory ()
     {
+#if defined(OS_TRACE_POSIX_IO_DIRECTORY)
       trace::printf ("directory::%s() @%p\n", __func__, this);
+#endif
 
       file_system_ = nullptr;
     }
@@ -96,7 +100,9 @@ namespace os
     struct dirent*
     directory::read (void)
     {
+#if defined(OS_TRACE_POSIX_IO_DIRECTORY)
       trace::printf ("directory::%s() @%p\n", __func__, this);
+#endif
 
       // assert(file_system_ != nullptr);
 
@@ -112,7 +118,9 @@ namespace os
     void
     directory::rewind (void)
     {
+#if defined(OS_TRACE_POSIX_IO_DIRECTORY)
       trace::printf ("directory::%s() @%p\n", __func__, this);
+#endif
 
       // assert(file_system_ != nullptr);
 
@@ -126,7 +134,9 @@ namespace os
     int
     directory::close (void)
     {
+#if defined(OS_TRACE_POSIX_IO_DIRECTORY)
       trace::printf ("directory::%s() @%p\n", __func__, this);
+#endif
 
       // assert(file_system_ != nullptr);
       errno = 0;
@@ -145,12 +155,16 @@ namespace os
     directory_impl::directory_impl (directory& self) :
         self_ (self)
     {
+#if defined(OS_TRACE_POSIX_IO_DIRECTORY)
       trace::printf ("directory_impl::%s()=%p\n", __func__, this);
+#endif
     }
 
     directory_impl::~directory_impl ()
     {
+#if defined(OS_TRACE_POSIX_IO_DIRECTORY)
       trace::printf ("directory_impl::%s() @%p\n", __func__, this);
+#endif
     }
 
   // ========================================================================
