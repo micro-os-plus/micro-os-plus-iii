@@ -45,7 +45,7 @@ namespace os
 {
   namespace posix
   {
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
     /**
      * @brief Devices registry static class.
@@ -61,7 +61,7 @@ namespace os
         using pointer = T*;
         using reference = T&;
 
-        // ----------------------------------------------------------------------
+        // --------------------------------------------------------------------
 
         /**
          * @name Constructors & Destructor
@@ -95,7 +95,7 @@ namespace os
          * @}
          */
 
-        // ----------------------------------------------------------------------
+        // --------------------------------------------------------------------
         /**
          * @name Public Static Member Functions
          * @{
@@ -113,7 +113,7 @@ namespace os
          * @}
          */
 
-        // ----------------------------------------------------------------------
+        // --------------------------------------------------------------------
       private:
 
         /**
@@ -135,6 +135,18 @@ namespace os
          */
       };
 
+  // ==========================================================================
+  } /* namespace posix */
+} /* namespace os */
+
+// ===== Inline & template implementations ====================================
+
+namespace os
+{
+  namespace posix
+  {
+    // ========================================================================
+
     template<typename T>
       void
       device_registry<T>::link (value_type* device)
@@ -145,7 +157,7 @@ namespace os
             // Validate the device name by checking duplicates.
             if (std::strcmp (device->name (), d.name ()) == 0)
               {
-                os::trace::puts ("Duplicate device name. Abort.");
+                trace::puts ("Duplicate device name. Abort.");
                 std::abort ();
               }
           }
@@ -153,8 +165,8 @@ namespace os
 
         registry_list__.link (*device);
 
-        os::trace::printf ("Device '%s%s' linked\n",
-                           value_type::device_prefix (), device->name ());
+        trace::printf ("Device '%s%s' linked\n", value_type::device_prefix (),
+                       device->name ());
       }
 
     /**
@@ -192,6 +204,7 @@ namespace os
     template<typename T>
       typename device_registry<T>::device_list device_registry<T>::registry_list__;
 
+  // ==========================================================================
   } /* namespace posix */
 } /* namespace os */
 

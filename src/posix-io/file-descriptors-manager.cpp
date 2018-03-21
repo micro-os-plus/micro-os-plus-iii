@@ -55,7 +55,7 @@ namespace os
      * @endcond
      */
 
-    // ------------------------------------------------------------------------
+    // ========================================================================
     file_descriptors_manager::file_descriptors_manager (std::size_t size)
     {
       trace::printf ("file_descriptors_manager::%s(%d)=%p\n", __func__, size,
@@ -183,6 +183,7 @@ namespace os
       return reinterpret_cast<class socket*> (io);
     }
 
+  // ========================================================================
   } /* namespace posix */
 } /* namespace os */
 

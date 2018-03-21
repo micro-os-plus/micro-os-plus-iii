@@ -26,6 +26,7 @@
  */
 
 #include <cmsis-plus/posix-io/device-block-partition.h>
+
 #include <cmsis-plus/diag/trace.h>
 
 // ----------------------------------------------------------------------------
@@ -34,23 +35,21 @@ namespace os
 {
   namespace posix
   {
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
-    device_block_partition::device_block_partition (const char* name,
-                                                    device_block& parent,
-                                                    os::rtos::mutex* mutex) :
+    device_block_partition::device_block_partition (device_block_impl& impl,
+                                                    const char* name) :
         device_block
-          { name, mutex }, //
-        parent_ (parent)
+          { impl, name }
     {
-      os::trace::printf ("device_block_partition::%s(\"%s\")=@%p\n", __func__,
-                         name_, this);
+      trace::printf ("device_block_partition::%s(\"%s\")=@%p\n", __func__,
+                     name_, this);
     }
 
     device_block_partition::~device_block_partition ()
     {
-      os::trace::printf ("device_block_partition::%s() @%p %s\n", __func__,
-                         this, name_);
+      trace::printf ("device_block_partition::%s() @%p %s\n", __func__, this,
+                     name_);
     }
 
     // ------------------------------------------------------------------------
@@ -58,8 +57,47 @@ namespace os
     void
     device_block_partition::configure (blknum_t offset, blknum_t nblocks)
     {
-      os::trace::printf ("device_block_partition::%s(%u,%u) @%p\n", __func__,
-                         offset, nblocks, this);
+      trace::printf ("device_block_partition::%s(%u,%u) @%p\n", __func__,
+                     offset, nblocks, this);
+
+      impl ().configure (offset, nblocks);
+    }
+
+    // ========================================================================
+
+    device_block_partition_impl::device_block_partition_impl (
+        device_block_partition& self, device_block& parent) :
+        device_block_impl
+          { self }, //
+        parent_ (parent)
+    {
+      trace::printf ("device_block_partition_impl::%s()=@%p\n", __func__, this);
+    }
+
+    device_block_partition_impl::~device_block_partition_impl ()
+    {
+      trace::printf ("device_block_partition_impl::%s() @%p\n", __func__, this);
+    }
+
+    // ----------------------------------------------------------------------
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+    int
+    device_block_partition_impl::do_vioctl (int request, std::va_list args)
+    {
+      errno = ENOSYS;
+      return -1;
+    }
+
+#pragma GCC diagnostic pop
+
+    void
+    device_block_partition_impl::configure (blknum_t offset, blknum_t nblocks)
+    {
+      trace::printf ("device_block_partition_impl::%s(%u,%u) @%p\n", __func__,
+                     offset, nblocks, this);
 
       partition_offset_blocks_ = offset;
       assert(nblocks > 0);
@@ -71,45 +109,55 @@ namespace os
     }
 
     int
-    device_block_partition::do_vopen (const char* path, int oflag,
-                                      std::va_list args)
+    device_block_partition_impl::do_vopen (const char* path, int oflag,
+                                           std::va_list args)
     {
-      os::trace::printf ("device_block_partition::%s(%d) @%p\n", __func__,
-                         oflag, this);
+      trace::printf ("device_block_partition_impl::%s(%d) @%p\n", __func__,
+                     oflag, this);
 
       return parent_.vopen (path, oflag, args);
     }
 
     ssize_t
-    device_block_partition::do_read_block (void* buf, blknum_t blknum,
-                                           std::size_t nblocks)
+    device_block_partition_impl::do_read_block (void* buf, blknum_t blknum,
+                                                std::size_t nblocks)
     {
-      os::trace::printf ("device_block_partition::%s(0x%X, %u, %u) @%p\n",
-                         __func__, buf, blknum, nblocks, this);
+      trace::printf ("device_block_partition_impl::%s(0x%X, %u, %u) @%p\n",
+                     __func__, buf, blknum, nblocks, this);
 
       return parent_.read_block (buf, blknum + partition_offset_blocks_,
                                  nblocks);
     }
 
     ssize_t
-    device_block_partition::do_write_block (const void* buf, blknum_t blknum,
-                                            std::size_t nblocks)
+    device_block_partition_impl::do_write_block (const void* buf,
+                                                 blknum_t blknum,
+                                                 std::size_t nblocks)
     {
-      os::trace::printf ("device_block_partition::%s(0x%X, %u, %u) @%p\n",
-                         __func__, buf, blknum, nblocks, this);
+      trace::printf ("device_block_partition_impl::%s(0x%X, %u, %u) @%p\n",
+                     __func__, buf, blknum, nblocks, this);
 
       return parent_.write_block (buf, blknum + partition_offset_blocks_,
                                   nblocks);
     }
 
-    int
-    device_block_partition::do_close (void)
+    void
+    device_block_partition_impl::do_sync (void)
     {
-      os::trace::printf ("device_block_partition::%s() @%p\n", __func__, this);
+      trace::printf ("device_block_partition_impl::%s() @%p\n", __func__, this);
+
+      return parent_.sync ();
+    }
+
+    int
+    device_block_partition_impl::do_close (void)
+    {
+      trace::printf ("device_block_partition_impl::%s() @%p\n", __func__, this);
 
       return parent_.close ();
     }
 
+  // ==========================================================================
   } /* namespace posix */
 } /* namespace os */
 

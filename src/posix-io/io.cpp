@@ -25,16 +25,13 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/posix-io/device-char.h>
-#include <cmsis-plus/posix-io/device-block.h>
+#include <cmsis-plus/posix-io/device.h>
 #include <cmsis-plus/posix/sys/uio.h>
 #include <cmsis-plus/posix-io/device-registry.h>
 #include <cmsis-plus/posix-io/file.h>
 #include <cmsis-plus/posix-io/file-descriptors-manager.h>
 #include <cmsis-plus/posix-io/file-system.h>
 #include <cmsis-plus/posix-io/io.h>
-#include <cmsis-plus/posix-io/net-stack.h>
-#include <cmsis-plus/posix-io/pool.h>
 
 #include <cmsis-plus/diag/trace.h>
 
@@ -141,35 +138,14 @@ namespace os
       return io;
     }
 
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
-    io*
-    io::alloc_file_descriptor (void)
-    {
-      trace::printf ("io::%s() @%p\n", __func__, this);
-
-      int fd = file_descriptors_manager::alloc (this);
-      if (fd < 0)
-        {
-          // If allocation failed, close this object.
-          do_close ();
-          clear_file_descriptor ();
-          return nullptr;
-        }
-
-      trace::printf ("io::%s() @%p fd=%d\n", __func__, this, fd);
-
-      // Return a valid pointer to an object derived from `io`.
-      return this;
-    }
-
-    // ------------------------------------------------------------------------
-
-    io::io (type t)
+    io::io (io_impl& impl, type t) :
+        impl_ (impl), //
+        type_ (t)
     {
       trace::printf ("io::%s()=%p\n", __func__, this);
 
-      type_ = t;
       file_descriptor_ = no_file_descriptor;
     }
 
@@ -187,7 +163,7 @@ namespace os
     {
       trace::printf ("io::%s() @%p\n", __func__, this);
 
-      if (!do_is_opened ())
+      if (!impl ().do_is_opened ())
         {
           errno = EBADF; // Not opened.
           return -1;
@@ -196,33 +172,55 @@ namespace os
       errno = 0;
 
       // Execute the implementation specific code.
-      int ret = do_close ();
+      int ret = impl ().do_close ();
 
       // Remove this IO from the file descriptors registry.
       file_descriptors_manager::free (file_descriptor_);
       file_descriptor_ = no_file_descriptor;
 
-      // Release objects acquired from a pool.
-      do_release ();
       return ret;
     }
 
+#if 0
     void
     io::do_release (void)
-    {
-      return;
-    }
+      {
+        return;
+      }
+#endif
 
+#if 0
     bool
     io::do_is_opened (void)
-    {
-      return true;
-    }
+      {
+        return true;
+      }
 
     bool
     io::do_is_connected (void)
+      {
+        return true;
+      }
+#endif
+
+    io*
+    io::alloc_file_descriptor (void)
     {
-      return true;
+      trace::printf ("io::%s() @%p\n", __func__, this);
+
+      int fd = file_descriptors_manager::alloc (this);
+      if (fd < 0)
+        {
+          // If allocation failed, close this object.
+          impl ().do_close ();
+          clear_file_descriptor ();
+          return nullptr;
+        }
+
+      trace::printf ("io::%s() @%p fd=%d\n", __func__, this, fd);
+
+      // Return a valid pointer to an object derived from `io`.
+      return this;
     }
 
     // ------------------------------------------------------------------------
@@ -240,13 +238,13 @@ namespace os
           return -1;
         }
 
-      if (!do_is_opened ())
+      if (!impl ().do_is_opened ())
         {
           errno = EBADF; // Not opened.
           return -1;
         }
 
-      if (!do_is_connected ())
+      if (!impl ().do_is_connected ())
         {
           errno = EIO; // Not opened.
           return -1;
@@ -265,11 +263,14 @@ namespace os
         }
 
       // Execute the implementation specific code.
-      ssize_t ret = do_read (buf, nbyte);
+      ssize_t ret = impl ().do_read (buf, nbyte);
       if (ret >= 0)
         {
-          offset_ += ret;
+          impl ().offset () += ret;
         }
+
+      trace::printf ("io::%s(0x0%X, %u) @%p n=%d\n", __func__, buf, nbyte, this,
+                     ret);
       return ret;
     }
 
@@ -284,13 +285,13 @@ namespace os
           return -1;
         }
 
-      if (!do_is_opened ())
+      if (!impl ().do_is_opened ())
         {
           errno = EBADF; // Not opened.
           return -1;
         }
 
-      if (!do_is_connected ())
+      if (!impl ().do_is_connected ())
         {
           errno = EIO; // Not opened.
           return -1;
@@ -311,11 +312,14 @@ namespace os
         }
 
       // Execute the implementation specific code.
-      ssize_t ret = do_write (buf, nbyte);
+      ssize_t ret = impl ().do_write (buf, nbyte);
       if (ret >= 0)
         {
-          offset_ += ret;
+          impl ().offset () += ret;
         }
+
+      trace::printf ("io::%s(0x0%X, %u) @%p n=%d\n", __func__, buf, nbyte, this,
+                     ret);
       return ret;
     }
 
@@ -336,13 +340,13 @@ namespace os
           return -1;
         }
 
-      if (!do_is_opened ())
+      if (!impl ().do_is_opened ())
         {
           errno = EBADF; // Not opened.
           return -1;
         }
 
-      if (!do_is_connected ())
+      if (!impl ().do_is_connected ())
         {
           errno = EIO; // Not opened.
           return -1;
@@ -351,10 +355,10 @@ namespace os
       errno = 0;
 
       // Execute the implementation specific code.
-      ssize_t ret = do_writev (iov, iovcnt);
+      ssize_t ret = impl ().do_writev (iov, iovcnt);
       if (ret >= 0)
         {
-          offset_ += ret;
+          impl ().offset () += ret;
         }
       return ret;
     }
@@ -376,13 +380,13 @@ namespace os
     {
       trace::printf ("io::%s(%d) @%p\n", __func__, cmd, this);
 
-      if (!do_is_opened ())
+      if (!impl ().do_is_opened ())
         {
           errno = EBADF; // Not opened.
           return -1;
         }
 
-      if (!do_is_connected ())
+      if (!impl ().do_is_connected ())
         {
           errno = EIO; // Not opened.
           return -1;
@@ -391,7 +395,7 @@ namespace os
       errno = 0;
 
       // Execute the implementation specific code.
-      return do_vfcntl (cmd, args);
+      return impl ().do_vfcntl (cmd, args);
     }
 
     int
@@ -400,7 +404,7 @@ namespace os
       errno = 0;
 
       // Execute the implementation specific code.
-      return do_isatty ();
+      return impl ().do_isatty ();
     }
 
     // fstat() on a socket returns a zero'd buffer.
@@ -415,13 +419,13 @@ namespace os
           return -1;
         }
 
-      if (!do_is_opened ())
+      if (!impl ().do_is_opened ())
         {
           errno = EBADF; // Not opened.
           return -1;
         }
 
-      if (!do_is_connected ())
+      if (!impl ().do_is_connected ())
         {
           errno = EIO; // Not opened.
           return -1;
@@ -430,7 +434,7 @@ namespace os
       errno = 0;
 
       // Execute the implementation specific code.
-      return do_fstat (buf);
+      return impl ().do_fstat (buf);
     }
 
     off_t
@@ -441,23 +445,36 @@ namespace os
       errno = 0;
 
       // Execute the implementation specific code.
-      return do_lseek (offset, whence);
+      return impl ().do_lseek (offset, whence);
     }
 
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
-    // doOpen() is not here because it is virtual,
-    // it must be implemented by derived classes.
+    io_impl::io_impl (io& self) :
+        self_ (self)
+    {
+      trace::printf ("io_impl::%s()=%p\n", __func__, this);
+    }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
+    io_impl::~io_impl ()
+    {
+      trace::printf ("io_impl::%s() @%p\n", __func__, this);
+    }
 
-    // This is not exactly standard, since POSIX requires writev() to be
-    // atomic, but functionally it is close. Override it and implement
-    // it properly in the derived class.
+    void
+    io_impl::do_deallocate (void)
+    {
+      return;
+    }
+
+    bool
+    io_impl::do_is_connected (void)
+    {
+      return true;
+    }
 
     ssize_t
-    io::do_writev (const struct iovec* iov, int iovcnt)
+    io_impl::do_writev (const struct iovec* iov, int iovcnt)
     {
       ssize_t total = 0;
 
@@ -474,29 +491,25 @@ namespace os
       return total;
     }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
     int
-    io::do_vfcntl (int cmd, std::va_list args)
+    io_impl::do_vfcntl (int cmd, std::va_list args)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     int
-    io::do_isatty (void)
+    io_impl::do_isatty (void)
     {
       errno = ENOTTY; // By default, it is not a TTY.
       return 0;
     }
 
     int
-    io::do_fstat (struct stat* buf)
-    {
-      errno = ENOSYS; // Not implemented
-      return -1;
-    }
-
-    off_t
-    io::do_lseek (off_t offset, int whence)
+    io_impl::do_fstat (struct stat* buf)
     {
       errno = ENOSYS; // Not implemented
       return -1;
@@ -504,6 +517,7 @@ namespace os
 
 #pragma GCC diagnostic pop
 
+  // ==========================================================================
   } /* namespace posix */
 } /* namespace os */
 

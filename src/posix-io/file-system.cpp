@@ -25,13 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/posix-io/directory.h>
-#include <cmsis-plus/posix-io/file.h>
 #include <cmsis-plus/posix-io/file-system.h>
-#include <cmsis-plus/posix-io/io.h>
-#include <cmsis-plus/posix-io/pool.h>
 #include <cmsis-plus/posix-io/device-block.h>
-#include <cmsis-plus/diag/trace.h>
 
 #include <cerrno>
 #include <cassert>
@@ -61,7 +56,7 @@ namespace os
     int
     mkdir (const char* path, mode_t mode)
     {
-      os::trace::printf ("%s(\"%s\", %u)\n", __func__, path, mode);
+      trace::printf ("%s(\"%s\", %u)\n", __func__, path, mode);
 
       if (path == nullptr)
         {
@@ -84,16 +79,14 @@ namespace os
           return -1;
         }
 
-      errno = 0;
-
       // Execute the implementation specific code.
-      return fs->do_mkdir (adjusted_path, mode);
+      return fs->mkdir (adjusted_path, mode);
     }
 
     int
     rmdir (const char* path)
     {
-      os::trace::printf ("%s(\"%s\")\n", __func__, path);
+      trace::printf ("%s(\"%s\")\n", __func__, path);
 
       if (path == nullptr)
         {
@@ -116,18 +109,14 @@ namespace os
           return -1;
         }
 
-      errno = 0;
-
       // Execute the implementation specific code.
-      return fs->do_rmdir (adjusted_path);
+      return fs->rmdir (adjusted_path);
     }
 
     void
     sync (void)
     {
-      os::trace::printf ("%s()\n", __func__);
-
-      errno = 0;
+      trace::printf ("%s()\n", __func__);
 
       // Enumerate all mounted file systems and sync them.
       for (auto&& fs : file_system::mounted_list__)
@@ -148,7 +137,7 @@ namespace os
     int
     chmod (const char* path, mode_t mode)
     {
-      os::trace::printf ("%s(\"%s\", %u)\n", __func__, path, mode);
+      trace::printf ("%s(\"%s\", %u)\n", __func__, path, mode);
 
       if (path == nullptr)
         {
@@ -177,7 +166,7 @@ namespace os
     int
     stat (const char* path, struct stat* buf)
     {
-      os::trace::printf ("%s(\"%s\", %p)\n", __func__, path, buf);
+      trace::printf ("%s(\"%s\", %p)\n", __func__, path, buf);
 
       if ((path == nullptr) || (buf == nullptr))
         {
@@ -206,7 +195,7 @@ namespace os
     int
     truncate (const char* path, off_t length)
     {
-      os::trace::printf ("%s(\"%s\", %u)\n", __func__, path, length);
+      trace::printf ("%s(\"%s\", %u)\n", __func__, path, length);
 
       if (path == nullptr)
         {
@@ -241,7 +230,7 @@ namespace os
     int
     rename (const char* existing, const char* _new)
     {
-      os::trace::printf ("%s(\"%s\",\"%s\")\n", __func__, existing, _new);
+      trace::printf ("%s(\"%s\",\"%s\")\n", __func__, existing, _new);
 
       if ((existing == nullptr) || (_new == nullptr))
         {
@@ -272,7 +261,7 @@ namespace os
     int
     unlink (const char* path)
     {
-      os::trace::printf ("%s(\"%s\")\n", __func__, path);
+      trace::printf ("%s(\"%s\")\n", __func__, path);
 
       if (path == nullptr)
         {
@@ -301,7 +290,7 @@ namespace os
     int
     utime (const char* path, const struct utimbuf* times)
     {
-      os::trace::printf ("%s(\"%s\", %p)\n", __func__, path, times);
+      trace::printf ("%s(\"%s\", %p)\n", __func__, path, times);
 
       if ((path == nullptr) || (times == nullptr))
         {
@@ -327,28 +316,61 @@ namespace os
       return fs->utime (adjusted_path, times);
     }
 
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
-    file_system::file_system (device_block& device, pool* files_pool,
-                              pool* dirs_pool) :
-        block_device_ (device)
+    file_system::file_system (file_system_impl& impl, const char* name) :
+        name_ (name), //
+        impl_ (impl)
     {
-      os::trace::printf ("file_system::%s()=%p\n", __func__, this);
-
-      files_pool_ = files_pool;
-      dirs_pool_ = dirs_pool;
+      trace::printf ("file_system::%s(\"%s\")=%p\n", __func__, name_, this);
     }
 
     file_system::~file_system ()
     {
-      trace::printf ("file_system::%s() @%p\n", __func__, this);
+      trace::printf ("file_system::%s() @%p %s\n", __func__, this, name_);
     }
 
     // ------------------------------------------------------------------------
 
     int
-    file_system::mount (const char* path, unsigned int flags)
+    file_system::mkfs (int options, ...)
     {
+      // Forward to the variadic version of the function.
+      std::va_list args;
+      va_start(args, options);
+      int ret = vmkfs (options, args);
+      va_end(args);
+
+      return ret;
+    }
+
+    int
+    file_system::vmkfs (int options, std::va_list args)
+    {
+      int ret = impl ().do_vmkfs (options, args);
+
+      return ret;
+    }
+
+    int
+    file_system::mount (const char* path, unsigned int flags, ...)
+    {
+      // Forward to the variadic version of the function.
+      std::va_list args;
+      va_start(args, flags);
+      int ret = vmount (path, flags, args);
+      va_end(args);
+
+      return ret;
+    }
+
+    int
+    file_system::vmount (const char* path, unsigned int flags,
+                         std::va_list args)
+    {
+      trace::printf ("file_system::%s(\"%s\", %u) @%p\n", __func__,
+                     path ? path : "0", flags, this);
+
       if (mounted_path_ != nullptr)
         {
           // File system already mounted.
@@ -363,7 +385,7 @@ namespace os
               // Validate the device name by checking duplicates.
               if (std::strcmp (path, fs.mounted_path_) == 0)
                 {
-                  os::trace::printf ("Path \"%s\" already mounted.", path);
+                  trace::printf ("Path \"%s\" already mounted.", path);
 
                   errno = EBUSY;
                   return -1;
@@ -379,7 +401,7 @@ namespace os
               p = nullptr;
             }
         }
-      int ret = do_mount (flags);
+      int ret = impl ().do_vmount (flags, args);
       if (ret < 0)
         {
           return -1;
@@ -407,6 +429,8 @@ namespace os
     int
     file_system::umount (int unsigned flags)
     {
+      trace::printf ("file_system::%s(%u) @%p\n", __func__, flags, this);
+
       mount_manager_links_.unlink ();
       mounted_path_ = nullptr;
 
@@ -421,8 +445,8 @@ namespace os
           mounted_root__ = nullptr;
         }
 
-      this->sync ();
-      int ret = do_umount (flags);
+      impl ().do_sync ();
+      int ret = impl ().do_umount (flags);
       return ret;
     }
 
@@ -478,78 +502,255 @@ namespace os
     file*
     file_system::vopen (const char* path, int oflag, std::va_list args)
     {
-      // Execute the file specific implementation code.
-      file* f = do_vopen (path, oflag, args);
-      if (f != nullptr)
+      trace::printf ("file_system::%s(\"%s\", %u)\n", __func__, path, oflag);
+
+#if 0
+      auto* const fil = static_cast<file*> (files_pool ()->acquire ());
+
+      if (fil == nullptr)
         {
-          // If successful, allocate a file descriptor.
-          f->alloc_file_descriptor ();
+          errno = EBADF;
+          return nullptr;
         }
 
-      return f;
+      fil->file_system (this);
+#endif
+
+      // Execute the file specific implementation code.
+      // Allocation is done by the implementation, where
+      // the size is known.
+      file* fil = impl ().do_vopen (path, oflag, args);
+      if (fil == nullptr)
+        {
+          return nullptr;
+        }
+
+      // If successful, allocate a file descriptor.
+      fil->alloc_file_descriptor ();
+
+      return fil;
     }
 
     directory*
     file_system::opendir (const char* dirpath)
     {
-      // Execute the dir specific implementation code.
-      directory* d = do_opendir (dirpath);
+      trace::printf ("file_system::%s(\"%s\")\n", __func__, dirpath);
+#if 0
+      auto* const dir = static_cast<directory*> (dirs_pool ()->acquire ());
 
-      return d;
+      if (dir == nullptr)
+        {
+          errno = EBADF;
+          return nullptr;
+        }
+
+      dir->file_system (this);
+#endif
+
+      // Execute the dir specific implementation code.
+      // Allocation is done by the implementation, where
+      // the size is known.
+      directory* dir = impl ().do_opendir (dirpath);
+      if (dir == nullptr)
+        {
+          return nullptr;
+        }
+
+      return dir;
     }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
+    // ------------------------------------------------------------------------
+
+    int
+    file_system::mkdir (const char* path, mode_t mode)
+    {
+      trace::printf ("file_system::%s(\"%s\", %u)\n", __func__, path, mode);
+
+      if (path == nullptr)
+        {
+          errno = EFAULT;
+          return -1;
+        }
+
+      if (*path == '\0')
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
+      errno = 0;
+
+      return impl ().do_mkdir (path, mode);
+    }
+
+    int
+    file_system::rmdir (const char* path)
+    {
+      trace::printf ("file_system::%s(\"%s\")\n", __func__, path);
+
+      if (path == nullptr)
+        {
+          errno = EFAULT;
+          return -1;
+        }
+
+      if (*path == '\0')
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
+      errno = 0;
+
+      return impl ().do_rmdir (path);
+    }
+
+    void
+    file_system::sync (void)
+    {
+      trace::printf ("file_system::%s() @%p\n", __func__, this);
+
+      errno = 0;
+
+      impl ().do_sync ();
+    }
+
+    // ------------------------------------------------------------------------
 
     int
     file_system::chmod (const char* path, mode_t mode)
     {
+      trace::printf ("file_system::%s(\"%s\", %u)\n", __func__, path, mode);
+
+      if (path == nullptr)
+        {
+          errno = EFAULT;
+          return -1;
+        }
+
+      if (*path == '\0')
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
       errno = 0;
 
       // Execute the implementation specific code.
-      return do_chmod (path, mode);
+      return impl ().do_chmod (path, mode);
     }
 
     int
     file_system::stat (const char* path, struct stat* buf)
     {
+      trace::printf ("file_system::%s(\"%s\", %p)\n", __func__, path, buf);
+
+      if ((path == nullptr) || (buf == nullptr))
+        {
+          errno = EFAULT;
+          return -1;
+        }
+
+      if (*path == '\0')
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
       errno = 0;
 
       // Execute the implementation specific code.
-      return do_stat (path, buf);
+      return impl ().do_stat (path, buf);
     }
 
     int
     file_system::truncate (const char* path, off_t length)
     {
+      trace::printf ("file_system::%s(\"%s\", %u)\n", __func__, path, length);
+
+      if (path == nullptr)
+        {
+          errno = EFAULT;
+          return -1;
+        }
+
+      if (*path == '\0')
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
       errno = 0;
 
       // Execute the implementation specific code.
-      return do_truncate (path, length);
+      return impl ().do_truncate (path, length);
     }
 
     int
     file_system::rename (const char* existing, const char* _new)
     {
+      trace::printf ("file_system::%s(\"%s\",\"%s\")\n", __func__, existing,
+                     _new);
+
+      if ((existing == nullptr) || (_new == nullptr))
+        {
+          errno = EFAULT;
+          return -1;
+        }
+
+      if ((*existing == '\0') || (*_new == '\0'))
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
       errno = 0;
 
       // Execute the implementation specific code.
-      return do_rename (existing, _new);
+      return impl ().do_rename (existing, _new);
     }
 
     int
     file_system::unlink (const char* path)
     {
+      trace::printf ("file_system::%s(\"%s\")\n", __func__, path);
+
+      if (path == nullptr)
+        {
+          errno = EFAULT;
+          return -1;
+        }
+
+      if (*path == '\0')
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
       errno = 0;
 
       // Execute the implementation specific code.
-      return do_unlink (path);
+      return impl ().do_unlink (path);
     }
 
     // http://pubs.opengroup.org/onlinepubs/9699919799/functions/utime.html
     int
     file_system::utime (const char* path, const struct utimbuf* times)
     {
+      trace::printf ("file_system::%s(\"%s\", %p)\n", __func__, path, times);
+
+      if ((path == nullptr) || (times == nullptr))
+        {
+          errno = EFAULT;
+          return -1;
+        }
+
+      if (*path == '\0')
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
       errno = 0;
 
       struct utimbuf tmp;
@@ -559,106 +760,104 @@ namespace os
           // of the file shall be set to the current time.
           tmp.actime = time (nullptr);
           tmp.modtime = tmp.actime;
-          return do_utime (path, &tmp);
+          return impl ().do_utime (path, &tmp);
         }
       else
         {
           // Execute the implementation specific code.
-          return do_utime (path, times);
+          return impl ().do_utime (path, times);
         }
     }
 
-    void
-    file_system::sync (void)
-    {
-      trace::printf ("file_system::%s() @%p\n", __func__, this);
-
-      do_sync ();
-    }
+    // TODO: check if the file system should keep a static current path for
+    // relative paths.
 
     // http://pubs.opengroup.org/onlinepubs/9699919799/functions/chdir.html
     // ------------------------------------------------------------------------
 
+#if 0
     const
     char*
     file_system::adjust_path (const char* path)
+      {
+        return path;
+      }
+#endif
+
+    // ========================================================================
+
+    file_system_impl::file_system_impl (file_system& self, device_block& device) :
+        self_ (self), //
+        device_ (device)
     {
-      return path;
+      trace::printf ("file_system_impl::%s()=%p\n", __func__, this);
     }
 
-    // ------------------------------------------------------------------------
-
-    int
-    file_system::do_chmod (const char* path, mode_t mode)
+    file_system_impl::~file_system_impl ()
     {
-      errno = ENOSYS; // Not implemented
-      return -1;
+      trace::printf ("file_system_impl::%s() @%p\n", __func__, this);
     }
 
-    int
-    file_system::do_stat (const char* path, struct stat* buf)
-    {
-      errno = ENOSYS; // Not implemented
-      return -1;
-    }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 
     int
-    file_system::do_truncate (const char* path, off_t length)
-    {
-      errno = ENOSYS; // Not implemented
-      return -1;
-    }
-
-    int
-    file_system::do_rename (const char* existing, const char* _new)
+    file_system_impl::do_mkdir (const char* path, mode_t mode)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     int
-    file_system::do_unlink (const char* path)
-    {
-      errno = ENOSYS; // Not implemented
-      return -1;
-    }
-
-    int
-    file_system::do_utime (const char* path, const struct utimbuf* times)
-    {
-      errno = ENOSYS; // Not implemented
-      return -1;
-    }
-
-    int
-    file_system::do_mkdir (const char* path, mode_t mode)
-    {
-      errno = ENOSYS; // Not implemented
-      return -1;
-    }
-
-    int
-    file_system::do_rmdir (const char* path)
+    file_system_impl::do_rmdir (const char* path)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     void
-    file_system::do_sync (void)
+    file_system_impl::do_sync (void)
     {
       errno = ENOSYS; // Not implemented
     }
 
     int
-    file_system::do_mount (unsigned int flags)
+    file_system_impl::do_chmod (const char* path, mode_t mode)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
     int
-    file_system::do_umount (unsigned int flags)
+    file_system_impl::do_stat (const char* path, struct stat* buf)
+    {
+      errno = ENOSYS; // Not implemented
+      return -1;
+    }
+
+    int
+    file_system_impl::do_truncate (const char* path, off_t length)
+    {
+      errno = ENOSYS; // Not implemented
+      return -1;
+    }
+
+    int
+    file_system_impl::do_rename (const char* existing, const char* _new)
+    {
+      errno = ENOSYS; // Not implemented
+      return -1;
+    }
+
+    int
+    file_system_impl::do_unlink (const char* path)
+    {
+      errno = ENOSYS; // Not implemented
+      return -1;
+    }
+
+    int
+    file_system_impl::do_utime (const char* path, const struct utimbuf* times)
     {
       errno = ENOSYS; // Not implemented
       return -1;
@@ -666,6 +865,7 @@ namespace os
 
 #pragma GCC diagnostic pop
 
+  // ==========================================================================
   } /* namespace posix */
 } /* namespace os */
 

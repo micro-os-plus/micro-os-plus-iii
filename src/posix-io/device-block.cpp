@@ -30,9 +30,6 @@
 
 #include <cmsis-plus/posix/sys/ioctl.h>
 
-#include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/diag/trace.h>
-
 #include <cstring>
 #include <cassert>
 #include <cerrno>
@@ -44,11 +41,11 @@ namespace os
 {
   namespace posix
   {
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
-    device_block::device_block (const char* name, os::rtos::mutex* mutex) :
-        device (type::block, name), //
-        mutex_ (mutex)
+    device_block::device_block (device_block_impl& impl, const char* name) :
+        device
+          { impl, type::block, name, }
     {
       trace::printf ("device_block::%s(\"%s\")=@%p\n", __func__, name_, this);
 
@@ -58,10 +55,6 @@ namespace os
     device_block::~device_block ()
     {
       trace::printf ("device_block::%s() @%p %s\n", __func__, this, name_);
-
-      mutex_ = nullptr;
-      block_logical_size_bytes_ = 0;
-      num_blocks_ = 0;
     }
 
     // ------------------------------------------------------------------------
@@ -72,23 +65,13 @@ namespace os
       trace::printf ("device_block::%s(%p, %u, %u) @%p\n", __func__, buf,
                      blknum, nblocks, this);
 
-      if (blknum + nblocks > num_blocks_)
+      if (blknum + nblocks > impl ().num_blocks_)
         {
           errno = EINVAL;
           return -1;
         }
 
-      ssize_t ret;
-      if (mutex_ != nullptr)
-        {
-          mutex_->lock ();
-        }
-      ret = do_read_block (buf, blknum, nblocks);
-      if (mutex_ != nullptr)
-        {
-          mutex_->unlock ();
-        }
-      return ret;
+      return impl ().do_read_block (buf, blknum, nblocks);
     }
 
     ssize_t
@@ -98,23 +81,13 @@ namespace os
       trace::printf ("device_block::%s(%p, %u, %u) @%p\n", __func__, buf,
                      blknum, nblocks, this);
 
-      if (blknum + nblocks > num_blocks_)
+      if (blknum + nblocks > impl ().num_blocks_)
         {
           errno = EINVAL;
           return -1;
         }
 
-      ssize_t ret;
-      if (mutex_ != nullptr)
-        {
-          mutex_->lock ();
-        }
-      ret = do_write_block (buf, blknum, nblocks);
-      if (mutex_ != nullptr)
-        {
-          mutex_->unlock ();
-        }
-      return ret;
+      return impl ().do_write_block (buf, blknum, nblocks);
     }
 
     int
@@ -130,13 +103,13 @@ namespace os
           // Get logical device sector size (to be used for read/writes).
           {
             std::size_t* sz = va_arg(args, std::size_t*);
-            if (sz == nullptr || block_logical_size_bytes_ != 0)
+            if (sz == nullptr || impl ().block_logical_size_bytes_ != 0)
               {
                 errno = EINVAL;
                 return -1;
               }
 
-            *sz = block_logical_size_bytes_;
+            *sz = impl ().block_logical_size_bytes_;
             return 0;
           }
 
@@ -144,13 +117,13 @@ namespace os
           // Get physical device sector size (internally used for erase).
           {
             std::size_t* sz = va_arg(args, std::size_t*);
-            if (sz == nullptr || block_physical_size_bytes_ != 0)
+            if (sz == nullptr || impl ().block_physical_size_bytes_ != 0)
               {
                 errno = EINVAL;
                 return -1;
               }
 
-            *sz = block_physical_size_bytes_;
+            *sz = impl ().block_physical_size_bytes_;
             return 0;
           }
 
@@ -158,38 +131,64 @@ namespace os
           // Get device size in bytes.
           {
             uint64_t* sz = va_arg(args, uint64_t*);
-            if (sz == nullptr || num_blocks_ != 0)
+            if (sz == nullptr || impl ().num_blocks_ != 0)
               {
                 errno = EINVAL;
                 return -1;
               }
 
-            *sz = ((uint64_t) num_blocks_ * block_logical_size_bytes_);
+            *sz = ((uint64_t) impl ().num_blocks_
+                * impl ().block_logical_size_bytes_);
             return 0;
           }
 
         default:
 
           // Execute the implementation specific code.
-          int ret;
-          if (mutex_ != nullptr)
-            {
-              mutex_->lock ();
-            }
-          ret = do_vioctl (request, args);
-          if (mutex_ != nullptr)
-            {
-              mutex_->unlock ();
-            }
-          return ret;
+          return impl ().do_vioctl (request, args);
         }
     }
 
-    off_t
-    device_block::do_lseek (off_t offset, int whence)
+#if 0
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+    int
+    device_block::do_vioctl (int request, std::va_list args)
+      {
+        errno = ENOSYS; // Not implemented
+        return -1;
+      }
+
+#pragma GCC diagnostic pop
+
+#endif
+
+    // ========================================================================
+
+    device_block_impl::device_block_impl (device_block& self) :
+        device_impl
+          { self }
     {
-      trace::printf ("device_block::%s(%d, %d) @%p\n", __func__, offset, whence,
-                     this);
+      trace::printf ("device_block_impl::%s()=@%p\n", __func__, this);
+    }
+
+    device_block_impl::~device_block_impl ()
+    {
+      trace::printf ("device_block_impl::%s() @%p\n", __func__, this);
+
+      block_logical_size_bytes_ = 0;
+      num_blocks_ = 0;
+    }
+
+    // ------------------------------------------------------------------------
+
+    off_t
+    device_block_impl::do_lseek (off_t offset, int whence)
+    {
+      trace::printf ("device_block_impl::%s(%d, %d) @%p\n", __func__, offset,
+                     whence, this);
 
       errno = 0;
       off_t tmp = offset_;
@@ -221,10 +220,10 @@ namespace os
     // ------------------------------------------------------------------------
 
     ssize_t
-    device_block::do_read (void* buf, std::size_t nbyte)
+    device_block_impl::do_read (void* buf, std::size_t nbyte)
     {
-      trace::printf ("device_block::%s(%p, %u) @%p\n", __func__, buf, nbyte,
-                     this);
+      trace::printf ("device_block_impl::%s(%p, %u) @%p\n", __func__, buf,
+                     nbyte, this);
 
       if ((block_logical_size_bytes_ == 0)
           || ((nbyte % block_logical_size_bytes_) != 0)
@@ -237,7 +236,7 @@ namespace os
       std::size_t nblocks = nbyte / block_logical_size_bytes_;
       blknum_t blknum = offset_ / block_logical_size_bytes_;
 
-      ssize_t ret = read_block (buf, blknum, nblocks);
+      ssize_t ret = self ().read_block (buf, blknum, nblocks);
       if (ret >= 0)
         {
           ret *= block_logical_size_bytes_;
@@ -246,10 +245,10 @@ namespace os
     }
 
     ssize_t
-    device_block::do_write (const void* buf, std::size_t nbyte)
+    device_block_impl::do_write (const void* buf, std::size_t nbyte)
     {
-      trace::printf ("device_block::%s(%p, %u) @%p\n", __func__, buf, nbyte,
-                     this);
+      trace::printf ("device_block_impl::%s(%p, %u) @%p\n", __func__, buf,
+                     nbyte, this);
 
       if ((block_logical_size_bytes_ == 0)
           || ((nbyte % block_logical_size_bytes_) != 0)
@@ -262,7 +261,7 @@ namespace os
       std::size_t nblocks = nbyte / block_logical_size_bytes_;
       blknum_t blknum = offset_ / block_logical_size_bytes_;
 
-      ssize_t ret = write_block (buf, blknum, nblocks);
+      ssize_t ret = self ().write_block (buf, blknum, nblocks);
       if (ret >= 0)
         {
           ret *= block_logical_size_bytes_;
@@ -270,20 +269,7 @@ namespace os
       return ret;
     }
 
-    // ------------------------------------------------------------------------
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
-    int
-    device_block::do_vioctl (int request, std::va_list args)
-    {
-      errno = ENOSYS; // Not implemented
-      return -1;
-    }
-
-#pragma GCC diagnostic pop
-
+  // ==========================================================================
   } /* namespace posix */
 } /* namespace os */
 

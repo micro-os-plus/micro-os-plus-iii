@@ -33,6 +33,7 @@
 // ----------------------------------------------------------------------------
 
 #include <cmsis-plus/posix-io/types.h>
+#include <cmsis-plus/diag/trace.h>
 
 #include <cstddef>
 #include <cstdarg>
@@ -51,6 +52,8 @@ namespace os
     // ------------------------------------------------------------------------
 
     class io;
+    class io_impl;
+
     class file_system;
 
     /**
@@ -69,7 +72,7 @@ namespace os
      * @}
      */
 
-    // ------------------------------------------------------------------------
+    // ========================================================================
     /**
      * @brief Base I/O class.
      * @headerfile io.h <cmsis-plus/posix-io/io.h>
@@ -124,7 +127,7 @@ namespace os
 
     protected:
 
-      io (type t);
+      io (io_impl& impl, type t);
 
       /**
        * @cond ignore
@@ -162,28 +165,28 @@ namespace os
       virtual int
       close (void);
 
-      ssize_t
+      virtual ssize_t
       read (void* buf, std::size_t nbyte);
 
-      ssize_t
+      virtual ssize_t
       write (const void* buf, std::size_t nbyte);
 
-      ssize_t
+      virtual ssize_t
       writev (const struct iovec* iov, int iovcnt);
 
       int
       fcntl (int cmd, ...);
 
-      int
+      virtual int
       vfcntl (int cmd, std::va_list args);
 
       int
       isatty (void);
 
-      int
+      virtual int
       fstat (struct stat* buf);
 
-      off_t
+      virtual off_t
       lseek (off_t offset, int whence);
 
       // ----------------------------------------------------------------------
@@ -195,13 +198,8 @@ namespace os
       file_descriptor_t
       file_descriptor (void) const;
 
-#if 0
-      bool
-      is_opened (void);
-
-      bool
-      is_connected (void);
-#endif
+      io_impl&
+      impl (void) const;
 
       /**
        * @}
@@ -215,13 +213,113 @@ namespace os
 
     protected:
 
-      // Implementations.
+      // ----------------------------------------------------------------------
+      // Support functions.
 
-      // do_vopen() is not here, because it is not common
-      // (for example for sockets()).
+#if 0
+      // Is called at the end of close, to release objects
+      // acquired from a pool.
+      virtual void
+      do_release (void);
+#endif
 
-      virtual int
-      do_close (void) = 0;
+      void
+      file_descriptor (file_descriptor_t fildes);
+
+      void
+      clear_file_descriptor (void);
+
+      io*
+      alloc_file_descriptor (void);
+
+      /**
+       * @}
+       */
+
+      // ----------------------------------------------------------------------
+    protected:
+
+      /**
+       * @cond ignore
+       */
+
+      io_impl& impl_;
+
+      /**
+       * @endcond
+       */
+
+    private:
+
+      /**
+       * @cond ignore
+       */
+
+      type type_ = type::not_set;
+
+      file_descriptor_t file_descriptor_ = no_file_descriptor;
+
+      /**
+       * @endcond
+       */
+    };
+
+    // ========================================================================
+
+    class io_impl
+    {
+      // ----------------------------------------------------------------------
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+    public:
+
+      io_impl (io& self);
+
+      /**
+       * @cond ignore
+       */
+
+      // The rule of five.
+      io_impl (const io_impl&) = delete;
+      io_impl (io_impl&&) = delete;
+      io_impl&
+      operator= (const io_impl&) = delete;
+      io_impl&
+      operator= (io_impl&&) = delete;
+
+      /**
+       * @endcond
+       */
+
+      virtual
+      ~io_impl ();
+
+      /**
+       * @}
+       */
+
+      // ----------------------------------------------------------------------
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+    public:
+
+      // Implementations
+
+      virtual void
+      do_deallocate (void);
+
+      virtual bool
+      do_is_opened (void) = 0;
+
+      virtual bool
+      do_is_connected (void);
 
       virtual ssize_t
       do_read (void* buf, std::size_t nbyte) = 0;
@@ -242,56 +340,42 @@ namespace os
       do_fstat (struct stat* buf);
 
       virtual off_t
-      do_lseek (off_t offset, int whence);
+      do_lseek (off_t offset, int whence) = 0;
+
+      virtual int
+      do_close (void) = 0;
 
       // ----------------------------------------------------------------------
-      // Support functions.
 
-      // Is called at the end of close, to release objects
-      // acquired from a pool.
-      virtual void
-      do_release (void);
+      io&
+      self (void);
 
-      virtual bool
-      do_is_opened (void);
-
-      virtual bool
-      do_is_connected (void);
+      off_t&
+      offset (void);
 
       void
-      file_descriptor (file_descriptor_t fildes);
-
-      void
-      clear_file_descriptor (void);
-
-      io*
-      alloc_file_descriptor (void);
+      offset (off_t offset);
 
       /**
        * @}
        */
 
-      // ----------------------------------------------------------------------
     protected:
-
-      off_t offset_ = 0;
-
-    private:
 
       /**
        * @cond ignore
        */
 
-      type type_ = type::not_set;
+      io& self_;
 
-      file_descriptor_t file_descriptor_ = no_file_descriptor;
+      off_t offset_ = 0;
 
       /**
        * @endcond
        */
-
     };
 
+  // ==========================================================================
   } /* namespace posix */
 } /* namespace os */
 
@@ -301,7 +385,7 @@ namespace os
 {
   namespace posix
   {
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
     inline io::type
     io::get_type (void) const
@@ -327,21 +411,33 @@ namespace os
       return file_descriptor_;
     }
 
-#if 0
-    inline bool
-    io::is_opened (void)
-      {
-        return do_is_opened ();
-      }
+    inline io_impl&
+    io::impl (void) const
+    {
+      return impl_;
+    }
 
-    inline bool
-    io::is_connected (void)
-      {
-        return do_is_connected ();
-      }
-#endif
-    ;
-  // Avoid formatter bug
+    // ========================================================================
+
+    inline io&
+    io_impl::self (void)
+    {
+      return self_;
+    }
+
+    inline off_t&
+    io_impl::offset (void)
+    {
+      return offset_;
+    }
+
+    inline void
+    io_impl::offset (off_t offset)
+    {
+      offset_ = offset;
+    }
+
+  // ==========================================================================
   } /* namespace posix */
 } /* namespace os */
 

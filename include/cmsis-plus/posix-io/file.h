@@ -33,6 +33,8 @@
 // ----------------------------------------------------------------------------
 
 #include <cmsis-plus/posix-io/io.h>
+#include <cmsis-plus/utils/lists.h>
+#include <cmsis-plus/estd/mutex>
 #include <cmsis-plus/posix/utime.h>
 
 // ----------------------------------------------------------------------------
@@ -44,9 +46,9 @@ namespace os
     // ------------------------------------------------------------------------
 
     class file_system;
-    class pool;
+    class file_impl;
 
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
     /**
      * @brief File class.
@@ -76,7 +78,7 @@ namespace os
 
     public:
 
-      file (void);
+      file (file_impl& impl, class file_system& fs);
 
       /**
        * @cond ignore
@@ -103,11 +105,107 @@ namespace os
 
       // ----------------------------------------------------------------------
       /**
-       * @name Public Static Member Functions
+       * @name Public Member Functions
        * @{
        */
 
     public:
+
+      virtual int
+      close (void) override;
+
+      virtual int
+      ftruncate (off_t length);
+
+      virtual int
+      fsync (void);
+
+      // ----------------------------------------------------------------------
+      // Support functions.
+
+      class file_system*
+      file_system (void);
+
+      file_impl&
+      impl (void) const;
+
+      /**
+       * @}
+       */
+
+    public:
+
+      /**
+       * @cond ignore
+       */
+
+      // Intrusive node used to link this file to the deferred
+      // deallocation list. Must be public.
+      utils::double_list_links deferred_links_;
+
+      /**
+       * @endcond
+       */
+
+    protected:
+
+      /**
+       * @cond ignore
+       */
+
+      class file_system* file_system_;
+
+      /**
+       * @endcond
+       */
+    };
+
+    // ========================================================================
+
+    class file_impl : public io_impl
+    {
+      // ----------------------------------------------------------------------
+
+      /**
+       * @cond ignore
+       */
+
+      // friend class file_system;
+      // friend class io;
+      friend class file;
+
+      /**
+       * @endcond
+       */
+
+      // ----------------------------------------------------------------------
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+    public:
+
+      file_impl (file& self);
+
+      /**
+       * @cond ignore
+       */
+
+      // The rule of five.
+      file_impl (const file_impl&) = delete;
+      file_impl (file_impl&&) = delete;
+      file_impl&
+      operator= (const file_impl&) = delete;
+      file_impl&
+      operator= (file_impl&&) = delete;
+
+      /**
+       * @endcond
+       */
+
+      virtual
+      ~file_impl ();
 
       /**
        * @}
@@ -121,65 +219,187 @@ namespace os
 
     public:
 
-      int
-      ftruncate (off_t length);
-
-      int
-      fsync (void);
-
-      // ----------------------------------------------------------------------
-      // Support functions.
-
-      class file_system*
-      file_system (void) const;
-
-      /**
-       * @}
-       */
-
-      // ----------------------------------------------------------------------
-      /**
-       * @name Private Member Functions
-       * @{
-       */
-
-    protected:
-
       // Implementations
 
       virtual int
-      do_ftruncate (off_t length);
+      do_ftruncate (off_t length) = 0;
 
       virtual int
-      do_fsync (void);
+      do_fsync (void) = 0;
 
+#if 0
+      // TODO: check if it is needed.
       virtual void
-      do_release (void) override;
+      do_release (void) = 0;
+#endif
 
       // ----------------------------------------------------------------------
-      // Support functions.
 
-      void
-      file_system (class file_system* file_system);
+      file&
+      self (void);
 
       /**
        * @}
        */
-
-    private:
-
-      /**
-       * @cond ignore
-       */
-
-      class file_system* file_system_;
-
-      /**
-       * @endcond
-       */
-
     };
 
+    // ========================================================================
+
+    template<typename T>
+      class file_implementable : public file
+      {
+        // --------------------------------------------------------------------
+
+      public:
+
+        using value_type = T;
+
+        // ---------------------------------------------------------------------
+
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
+
+      public:
+
+        file_implementable (class file_system& fs);
+
+        /**
+         * @cond ignore
+         */
+
+        // The rule of five.
+        file_implementable (const file_implementable&) = delete;
+        file_implementable (file_implementable&&) = delete;
+        file_implementable&
+        operator= (const file_implementable&) = delete;
+        file_implementable&
+        operator= (file_implementable&&) = delete;
+
+        /**
+         * @endcond
+         */
+
+        virtual
+        ~file_implementable ();
+
+        /**
+         * @}
+         */
+
+      protected:
+
+        /**
+         * @cond ignore
+         */
+
+        value_type impl_instance_;
+
+        /**
+         * @endcond
+         */
+      };
+
+    // ========================================================================
+
+    template<typename T, typename L>
+      class file_lockable : public file
+      {
+        // --------------------------------------------------------------------
+
+      public:
+
+        using value_type = T;
+        using lockable_type = L;
+
+        // --------------------------------------------------------------------
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
+
+      public:
+
+        file_lockable (class file_system& fs, lockable_type& locker);
+
+        /**
+         * @cond ignore
+         */
+
+        // The rule of five.
+        file_lockable (const file_lockable&) = delete;
+        file_lockable (file_lockable&&) = delete;
+        file_lockable&
+        operator= (const file_lockable&) = delete;
+        file_lockable&
+        operator= (file_lockable&&) = delete;
+
+        /**
+         * @endcond
+         */
+
+        virtual
+        ~file_lockable ();
+
+        /**
+         * @}
+         */
+
+        /**
+         * @name Public Member Functions
+         * @{
+         */
+
+      public:
+
+        virtual int
+        close (void) override;
+
+        virtual ssize_t
+        read (void* buf, std::size_t nbyte) override;
+
+        virtual ssize_t
+        write (const void* buf, std::size_t nbyte) override;
+
+        virtual ssize_t
+        writev (const struct iovec* iov, int iovcnt) override;
+
+        virtual int
+        vfcntl (int cmd, std::va_list args) override;
+
+        virtual int
+        fstat (struct stat* buf);
+
+        virtual off_t
+        lseek (off_t offset, int whence) override;
+
+        virtual int
+        ftruncate (off_t length);
+
+        virtual int
+        fsync (void);
+
+        /**
+         * @}
+         */
+
+      protected:
+
+        /**
+         * @cond ignore
+         */
+
+        value_type impl_instance_;
+
+        lockable_type& locker_;
+
+        /**
+         * @endcond
+         */
+      };
+
+  // ==========================================================================
   } /* namespace posix */
 } /* namespace os */
 
@@ -189,20 +409,159 @@ namespace os
 {
   namespace posix
   {
-    // ------------------------------------------------------------------------
-
-    inline void
-    file::file_system (class file_system* file_system)
-    {
-      file_system_ = file_system;
-    }
+    // ========================================================================
 
     inline file_system*
-    file::file_system (void) const
+    file::file_system (void)
     {
       return file_system_;
     }
 
+    inline file_impl&
+    file::impl (void) const
+    {
+      return static_cast<file_impl&> (impl_);
+    }
+
+    // ========================================================================
+
+    inline file&
+    file_impl::self (void)
+    {
+      return static_cast<file&> (self_);
+    }
+
+    // ========================================================================
+
+    template<typename T>
+      file_implementable<T>::file_implementable (class file_system& fs) :
+          file
+            { impl_instance_, fs }, //
+          impl_instance_
+            { *this }
+      {
+        trace::printf ("file_implementable::%s()=@%p\n", __func__, this);
+      }
+
+    template<typename T>
+      file_implementable<T>::~file_implementable ()
+      {
+        trace::printf ("file_implementable::%s() @%p\n", __func__, this);
+      }
+
+    // ========================================================================
+
+    template<typename T, typename L>
+      file_lockable<T, L>::file_lockable (class file_system& fs,
+                                          lockable_type& locker) :
+          file
+            { impl_instance_, fs }, //
+          impl_instance_
+            { *this }, //
+          locker_ (locker)
+      {
+        trace::printf ("file_lockable::%s()=@%p\n", __func__, this);
+      }
+
+    template<typename T, typename L>
+      file_lockable<T, L>::~file_lockable ()
+      {
+        trace::printf ("file_lockable::%s() @%p\n", __func__, this);
+      }
+
+    // ------------------------------------------------------------------------
+
+    template<typename T, typename L>
+      int
+      file_lockable<T, L>::close (void)
+      {
+        estd::lock_guard<L> lock
+          { locker_ };
+
+        return file::close ();
+      }
+
+    template<typename T, typename L>
+      ssize_t
+      file_lockable<T, L>::read (void* buf, std::size_t nbyte)
+      {
+        estd::lock_guard<L> lock
+          { locker_ };
+
+        return file::read (buf, nbyte);
+      }
+
+    template<typename T, typename L>
+      ssize_t
+      file_lockable<T, L>::write (const void* buf, std::size_t nbyte)
+      {
+        estd::lock_guard<L> lock
+          { locker_ };
+
+        return file::write (buf, nbyte);
+      }
+
+    template<typename T, typename L>
+      ssize_t
+      file_lockable<T, L>::writev (const struct iovec* iov, int iovcnt)
+      {
+        estd::lock_guard<L> lock
+          { locker_ };
+
+        return file::writev (iov, iovcnt);
+      }
+
+    template<typename T, typename L>
+      int
+      file_lockable<T, L>::vfcntl (int cmd, std::va_list args)
+      {
+        estd::lock_guard<L> lock
+          { locker_ };
+
+        return file::vfcntl (cmd, args);
+      }
+
+    template<typename T, typename L>
+      int
+      file_lockable<T, L>::fstat (struct stat* buf)
+      {
+        estd::lock_guard<L> lock
+          { locker_ };
+
+        return file::fstat (buf);
+      }
+
+    template<typename T, typename L>
+      off_t
+      file_lockable<T, L>::lseek (off_t offset, int whence)
+      {
+        estd::lock_guard<L> lock
+          { locker_ };
+
+        return file::lseek (offset, whence);
+      }
+
+    template<typename T, typename L>
+      int
+      file_lockable<T, L>::ftruncate (off_t length)
+      {
+        estd::lock_guard<L> lock
+          { locker_ };
+
+        return file::ftruncate (length);
+      }
+
+    template<typename T, typename L>
+      int
+      file_lockable<T, L>::fsync (void)
+      {
+        estd::lock_guard<L> lock
+          { locker_ };
+
+        return file::fsync ();
+      }
+
+  // ==========================================================================
   } /* namespace posix */
 } /* namespace os */
 

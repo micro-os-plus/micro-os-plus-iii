@@ -38,43 +38,118 @@ namespace os
 {
   namespace posix
   {
+    // ------------------------------------------------------------------------
 
-    class tty : public os::posix::device_char
+    class tty_impl;
+
+    // ========================================================================
+
+    class tty : public device_char
     {
     public:
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
-      tty (const char* name);
+    public:
 
+      tty (tty_impl& impl, const char* name);
+
+      /**
+       * @cond ignore
+       */
+
+      // The rule of five.
       tty (const tty&) = delete;
-
       tty (tty&&) = delete;
-
       tty&
       operator= (const tty&) = delete;
-
       tty&
       operator= (tty&&) = delete;
+
+      /**
+       * @endcond
+       */
 
       virtual
       ~tty () noexcept;
 
-      int
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+    public:
+
+      virtual int
       tcgetattr (struct termios *ptio);
 
-      int
+      virtual int
       tcsetattr (int options, const struct termios *ptio);
 
-      int
+      virtual int
       tcflush (int queue_selector);
 
-      int
+      virtual int
       tcsendbreak (int duration);
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
-    protected:
+      tty_impl&
+      impl (void) const;
+    };
+
+    // ========================================================================
+
+    class tty_impl : public device_char_impl
+    {
+      // ----------------------------------------------------------------------
+
+      friend class device_block;
+
+      // ----------------------------------------------------------------------
+
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+    public:
+
+      tty_impl (tty& self);
+
+      /**
+       * @cond ignore
+       */
+
+      // The rule of five.
+      tty_impl (const tty_impl&) = delete;
+      tty_impl (tty_impl&&) = delete;
+      tty_impl&
+      operator= (const tty_impl&) = delete;
+      tty_impl&
+      operator= (tty_impl&&) = delete;
+
+      /**
+       * @endcond
+       */
+
+      virtual
+      ~tty_impl ();
+
+      /**
+       * @}
+       */
+
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+    public:
 
       virtual int
       do_tcgetattr (struct termios *ptio) = 0;
@@ -91,12 +166,74 @@ namespace os
       virtual int
       do_isatty (void) final;
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
-    private:
+      tty&
+      self (void);
 
+      /**
+       * @}
+       */
     };
 
+    // ========================================================================
+
+    template<typename T>
+      class tty_implementable : public device_char
+      {
+        // --------------------------------------------------------------------
+
+      public:
+
+        using value_type = T;
+
+        // --------------------------------------------------------------------
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
+
+      public:
+
+        tty_implementable (const char* name);
+
+        /**
+         * @cond ignore
+         */
+
+        // The rule of five.
+        tty_implementable (const tty_implementable&) = delete;
+        tty_implementable (tty_implementable&&) = delete;
+        tty_implementable&
+        operator= (const tty_implementable&) = delete;
+        tty_implementable&
+        operator= (tty_implementable&&) = delete;
+
+        /**
+         * @endcond
+         */
+
+        virtual
+        ~tty_implementable ();
+
+        /**
+         * @}
+         */
+
+      protected:
+
+        /**
+         * @cond ignore
+         */
+
+        value_type impl_instance_;
+
+        /**
+         * @endcond
+         */
+      };
+
+  // ==========================================================================
   } /* namespace posix */
 } /* namespace os */
 
@@ -106,31 +243,43 @@ namespace os
 {
   namespace posix
   {
+    // ========================================================================
 
-    inline int
-    tty::tcsendbreak (int duration)
+    inline tty_impl&
+    tty::impl (void) const
     {
-      return do_tcsendbreak (duration);
+      return static_cast<tty_impl&> (impl_);
     }
 
-    inline int
-    tty::tcgetattr (struct termios *ptio)
+    // ========================================================================
+
+    inline tty&
+    tty_impl::self (void)
     {
-      return do_tcgetattr (ptio);
+      return static_cast<tty&> (self_);
     }
 
-    inline int
-    tty::tcsetattr (int options, const struct termios *ptio)
-    {
-      return do_tcsetattr (options, ptio);
-    }
+    // ========================================================================
 
-    inline int
-    tty::tcflush (int queue_selector)
-    {
-      return do_tcflush (queue_selector);
-    }
+    template<typename T>
+      tty_implementable<T>::tty_implementable (const char* name) :
+          device_char
+            { impl_instance_, name }, //
+          impl_instance_
+            { *this }
+      {
+        trace::printf ("tty_implementable::%s(\"%s\")=@%p\n", __func__, name_,
+                       this);
+      }
 
+    template<typename T>
+      tty_implementable<T>::~tty_implementable ()
+      {
+        trace::printf ("tty_implementable::%s() @%p %s\n", __func__, this,
+                       name_);
+      }
+
+  // ==========================================================================
   } /* namespace posix */
 } /* namespace os */
 

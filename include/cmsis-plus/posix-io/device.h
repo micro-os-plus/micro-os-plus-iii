@@ -34,6 +34,7 @@
 
 #include <cmsis-plus/posix-io/io.h>
 #include <cmsis-plus/utils/lists.h>
+#include <cmsis-plus/estd/mutex>
 
 // ----------------------------------------------------------------------------
 
@@ -47,6 +48,12 @@ namespace os
 {
   namespace posix
   {
+    // ------------------------------------------------------------------------
+
+    class device_impl;
+
+    // ========================================================================
+
     /**
      * @brief Base device class.
      * @headerfile device.h <cmsis-plus/posix-io/device.h>
@@ -63,7 +70,7 @@ namespace os
 
     public:
 
-      device (type t, const char* name);
+      device (device_impl& impl, type t, const char* name);
 
       /**
        * @cond ignore
@@ -133,6 +140,9 @@ namespace os
       const char*
       name (void) const;
 
+      device_impl&
+      impl (void) const;
+
       static const char*
       device_prefix (void);
 
@@ -141,30 +151,18 @@ namespace os
        */
 
       // ----------------------------------------------------------------------
-      /**
-       * @name Private Member Functions
-       * @{
-       */
-
     protected:
 
-      virtual int
-      do_vopen (const char* path, int oflag, std::va_list args) = 0;
-
-      virtual int
-      do_vioctl (int request, std::va_list args);
-
-      virtual bool
-      do_is_opened (void) override;
-
-      virtual void
-      do_sync (void);
-
       /**
-       * @}
+       * @cond ignore
        */
 
-      // ----------------------------------------------------------------------
+      const char* name_ = nullptr;
+
+      /**
+       * @endcond
+       */
+
     public:
 
       /**
@@ -178,6 +176,87 @@ namespace os
       /**
        * @endcond
        */
+    };
+
+    // ========================================================================
+
+    class device_impl : public io_impl
+    {
+      // ----------------------------------------------------------------------
+
+      /**
+       * @cond ignore
+       */
+
+      friend class device;
+
+      /**
+       * @endcond
+       */
+
+      // ----------------------------------------------------------------------
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
+
+    public:
+
+      device_impl (device& self);
+
+      /**
+       * @cond ignore
+       */
+
+      // The rule of five.
+      device_impl (const device_impl&) = delete;
+      device_impl (device_impl&&) = delete;
+      device_impl&
+      operator= (const device_impl&) = delete;
+      device_impl&
+      operator= (device_impl&&) = delete;
+
+      /**
+       * @endcond
+       */
+
+      virtual
+      ~device_impl ();
+
+      /**
+       * @}
+       */
+
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
+    public:
+
+      bool
+      do_is_opened (void) override;
+
+      virtual int
+      do_vopen (const char* path, int oflag, std::va_list args) = 0;
+
+      virtual int
+      do_vioctl (int request, std::va_list args) = 0;
+
+      virtual void
+      do_sync (void) = 0;
+
+      // ----------------------------------------------------------------------
+
+      device&
+      self (void);
+
+      int&
+      open_count (void);
+
+      /**
+       * @}
+       */
 
     protected:
 
@@ -185,7 +264,6 @@ namespace os
        * @cond ignore
        */
 
-      const char* name_ = nullptr;
       int open_count_ = 0;
 
       /**
@@ -193,6 +271,7 @@ namespace os
        */
     };
 
+  // ==========================================================================
   } /* namespace posix */
 } /* namespace os */
 
@@ -202,12 +281,18 @@ namespace os
 {
   namespace posix
   {
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
     inline const char*
     device::name (void) const
     {
       return name_;
+    }
+
+    inline device_impl&
+    device::impl (void) const
+    {
+      return static_cast<device_impl&> (impl_);
     }
 
     inline const char*
@@ -216,6 +301,21 @@ namespace os
       return OS_STRING_POSIX_DEVICE_PREFIX;
     }
 
+    // ========================================================================
+
+    inline device&
+    device_impl::self (void)
+    {
+      return static_cast<device&> (self_);
+    }
+
+    inline int&
+    device_impl::open_count (void)
+    {
+      return open_count_;
+    }
+
+  // ==========================================================================
   } /* namespace posix */
 } /* namespace os */
 

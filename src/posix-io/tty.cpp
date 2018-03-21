@@ -26,6 +26,7 @@
  */
 
 #include <cmsis-plus/posix-io/tty.h>
+
 #include <cmsis-plus/diag/trace.h>
 
 // ----------------------------------------------------------------------------
@@ -34,13 +35,13 @@ namespace os
 {
   namespace posix
   {
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
-    tty::tty (const char* name) :
+    tty::tty (tty_impl& impl, const char* name) :
         device_char
-          { name }
+          { impl, name }
     {
-      trace::printf ("tty::%s(\"%s\") @%p\n", __func__, name_, this);
+      trace::printf ("tty::%s(\"%s\")=@%p\n", __func__, name_, this);
     }
 
     tty::~tty ()
@@ -48,14 +49,53 @@ namespace os
       trace::printf ("tty::%s() @%p %s\n", __func__, this, name_);
     }
 
+    // ------------------------------------------------------------------------
+
+    inline int
+    tty::tcsendbreak (int duration)
+    {
+      return impl ().do_tcsendbreak (duration);
+    }
+
+    inline int
+    tty::tcgetattr (struct termios *ptio)
+    {
+      return impl ().do_tcgetattr (ptio);
+    }
+
+    inline int
+    tty::tcsetattr (int options, const struct termios *ptio)
+    {
+      return impl ().do_tcsetattr (options, ptio);
+    }
+
+    inline int
+    tty::tcflush (int queue_selector)
+    {
+      return impl ().do_tcflush (queue_selector);
+    }
+
+    // ========================================================================
+
+    tty_impl::tty_impl (tty& self) :
+        device_char_impl
+          { self }
+    {
+      trace::printf ("tty_impl::%s()=@%p\n", __func__, this);
+    }
+
+    tty_impl::~tty_impl ()
+    {
+      trace::printf ("tty_impl::%s() @%p\n", __func__, this);
+    }
+
     int
-    tty::do_isatty (void)
+    tty_impl::do_isatty (void)
     {
       return 1; // Yes!
     }
 
-  // ------------------------------------------------------------------------
-
+  // ==========================================================================
   } /* namespace posix */
 } /* namespace os */
 

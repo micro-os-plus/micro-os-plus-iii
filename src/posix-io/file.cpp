@@ -27,7 +27,7 @@
 
 #include <cmsis-plus/posix-io/file.h>
 #include <cmsis-plus/posix-io/file-system.h>
-#include <cmsis-plus/posix-io/pool.h>
+
 #include <cmsis-plus/diag/trace.h>
 
 #include <cerrno>
@@ -38,48 +38,45 @@ namespace os
 {
   namespace posix
   {
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
-    file::file () :
-        io (type::file)
+    file::file (file_impl& impl, class file_system& fs) :
+        io
+          { impl, type::file }, //
+        file_system_ (&fs)
     {
-      os::trace::printf ("file::%s()=%p\n", __func__, this);
-
-      file_system_ = nullptr;
+      trace::printf ("file::%s()=%p\n", __func__, this);
     }
 
     file::~file ()
     {
-      os::trace::printf ("file::%s() @%p\n", __func__, this);
+      trace::printf ("file::%s() @%p\n", __func__, this);
 
       file_system_ = nullptr;
-    }
-
-    // ------------------------------------------------------------------------
-
-    void
-    file::do_release (void)
-    {
-      // The `file` object is free, return it to the pool.
-      auto fs = file_system ();
-      if (fs != nullptr)
-        {
-          auto pool = fs->files_pool ();
-          if (pool != nullptr)
-            {
-              pool->release (this);
-            }
-          // Clear the file_system pointer, to avoid entering again.
-          file_system (nullptr);
-        }
     }
 
     // ------------------------------------------------------------------------
 
     int
+    file::close (void)
+    {
+      trace::printf ("file::%s() @%p\n", __func__, this);
+
+      int ret = io::close ();
+
+      // Note: the constructor is not called here.
+
+      // Link the file object to a list kept by the file system.
+      // It will be deallocated at the next open.
+      file_system ()->add_deferred_file (this);
+
+      return ret;
+    }
+
+    int
     file::ftruncate (off_t length)
     {
-      os::trace::printf ("file::%s(%u) @%p\n", __func__, length, this);
+      trace::printf ("file::%s(%u) @%p\n", __func__, length, this);
 
       if (length < 0)
         {
@@ -90,27 +87,87 @@ namespace os
       errno = 0;
 
       // Execute the implementation specific code.
-      return do_ftruncate (length);
+      return impl ().do_ftruncate (length);
     }
 
     int
     file::fsync (void)
     {
-      os::trace::printf ("file::%s() @%p\n", __func__, this);
+      trace::printf ("file::%s() @%p\n", __func__, this);
 
       errno = 0;
 
       // Execute the implementation specific code.
-      return do_fsync ();
+      return impl ().do_fsync ();
     }
 
     // ------------------------------------------------------------------------
+
+#if 0
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
     int
     file::do_ftruncate (off_t length)
+      {
+        errno = ENOSYS; // Not implemented
+        return -1;
+      }
+
+#pragma GCC diagnostic pop
+
+    int
+    file::do_fsync (void)
+      {
+        errno = ENOSYS; // Not implemented
+        return -1;
+      }
+
+#endif
+
+    // ========================================================================
+
+    file_impl::file_impl (file& self) :
+        io_impl
+          { self }
+    {
+      trace::printf ("file_impl::%s()=%p\n", __func__, this);
+    }
+
+    file_impl::~file_impl ()
+    {
+      trace::printf ("file_impl::%s() @%p\n", __func__, this);
+    }
+
+    // ------------------------------------------------------------------------
+
+#if 0
+    void
+    file_impl::do_release (void)
+      {
+        // The `file` object is free, return it to the pool.
+        auto fs = file_system_;
+        if (fs != nullptr)
+          {
+#if 0
+            auto pool = fs->files_pool ();
+            if (pool != nullptr)
+              {
+                pool->release (this);
+              }
+            // Clear the file_system pointer, to avoid entering again.
+#endif
+            file_system_ = nullptr;
+          }
+      }
+#endif
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+    int
+    file_impl::do_ftruncate (off_t length)
     {
       errno = ENOSYS; // Not implemented
       return -1;
@@ -119,12 +176,13 @@ namespace os
 #pragma GCC diagnostic pop
 
     int
-    file::do_fsync (void)
+    file_impl::do_fsync (void)
     {
       errno = ENOSYS; // Not implemented
       return -1;
     }
 
+  // ========================================================================
   } /* namespace posix */
 } /* namespace os */
 

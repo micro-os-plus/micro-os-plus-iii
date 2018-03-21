@@ -28,8 +28,6 @@
 #include <cmsis-plus/posix-io/device.h>
 #include <cmsis-plus/posix/sys/ioctl.h>
 
-#include <cmsis-plus/diag/trace.h>
-
 #include <cstring>
 #include <cassert>
 #include <cerrno>
@@ -42,10 +40,11 @@ namespace os
 {
   namespace posix
   {
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
-    device::device (type t, const char* name) :
-        io (t), //
+    device::device (device_impl& impl, type t, const char* name) :
+        io
+          { impl, t }, //
         name_ (name)
     {
       trace::printf ("device::%s(\"%s\")=%p\n", __func__, name_, this);
@@ -83,10 +82,10 @@ namespace os
       errno = 0;
 
       int ret = 0;
-      if (open_count_ == 0)
+      if (impl ().open_count_ == 0)
         {
           // If so, use the implementation to open the device.
-          ret = do_vopen (path, oflag, args);
+          ret = impl ().do_vopen (path, oflag, args);
           if (ret < 0)
             {
               // Open failed.
@@ -100,7 +99,7 @@ namespace os
             }
 
         }
-      ++open_count_;
+      ++(impl ().open_count_);
       ret = file_descriptor ();
       trace::printf ("device::%s(\"%s\")=%p fd=%d\n", __func__,
                      path ? path : "", this, ret);
@@ -116,25 +115,27 @@ namespace os
       errno = 0;
 
       int ret = 0;
-      if (open_count_ == 1)
+      if (impl ().open_count_ == 1)
         {
           ret = io::close ();
         }
 
-      if (open_count_ > 0)
+      if (impl ().open_count_ > 0)
         {
           // Must be after close(), to keep do_is_open() true.
-          --open_count_;
+          --(impl ().open_count_);
         }
 
       return ret;
     }
 
+#if 0
     bool
     device::do_is_opened (void)
-    {
-      return (open_count_ > 0);
-    }
+      {
+        return (open_count_ > 0);
+      }
+#endif
 
     int
     device::ioctl (int request, ...)
@@ -155,7 +156,7 @@ namespace os
 
       errno = 0;
 
-      return do_vioctl (request, args);
+      return impl ().do_vioctl (request, args);
     }
 
     void
@@ -163,14 +164,16 @@ namespace os
     {
       trace::printf ("device::%s() @%p\n", __func__, this);
 
-      do_sync ();
+      impl ().do_sync ();
     }
 
+#if 0
     void
     device::do_sync (void)
-    {
-      errno = ENOSYS; // Not implemented
-    }
+      {
+        errno = ENOSYS; // Not implemented
+      }
+#endif
 
     // ------------------------------------------------------------------------
 
@@ -186,14 +189,40 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
+#if 0
     int
     device::do_vioctl (int request, std::va_list args)
-    {
-      errno = ENOSYS; // Not implemented
-      return -1;
-    }
+      {
+        errno = ENOSYS; // Not implemented
+        return -1;
+      }
+#endif
 
 #pragma GCC diagnostic pop
+
+    // ========================================================================
+
+    device_impl::device_impl (device& self) :
+        io_impl
+          { self }
+    {
+      trace::printf ("device_impl::%s()=%p\n", __func__, this);
+    }
+
+    device_impl::~device_impl ()
+    {
+      trace::printf ("device_impl::%s() @%p\n", __func__, this);
+    }
+
+    // ----------------------------------------------------------------------
+
+    bool
+    device_impl::do_is_opened (void)
+    {
+      return (open_count_ > 0);
+    }
+
+  // ========================================================================
 
   } /* namespace posix */
 } /* namespace os */

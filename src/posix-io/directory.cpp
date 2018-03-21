@@ -27,7 +27,7 @@
 
 #include <cmsis-plus/posix-io/directory.h>
 #include <cmsis-plus/posix-io/file-system.h>
-#include <cmsis-plus/posix-io/pool.h>
+
 #include <cmsis-plus/diag/trace.h>
 
 #include <cerrno>
@@ -75,18 +75,18 @@ namespace os
       return fs->opendir (adjusted_dirname);
     }
 
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
-    directory::directory (void)
+    directory::directory (directory_impl& impl, class file_system& fs) :
+        impl_ (impl), //
+        file_system_ (&fs)
     {
-      os::trace::printf ("directory::%s()=%p\n", __func__, this);
-
-      file_system_ = nullptr;
+      trace::printf ("directory::%s()=%p\n", __func__, this);
     }
 
     directory::~directory ()
     {
-      os::trace::printf ("directory::%s() @%p\n", __func__, this);
+      trace::printf ("directory::%s() @%p\n", __func__, this);
 
       file_system_ = nullptr;
     }
@@ -96,9 +96,9 @@ namespace os
     struct dirent*
     directory::read (void)
     {
-      os::trace::printf ("directory::%s() @%p\n", __func__, this);
+      trace::printf ("directory::%s() @%p\n", __func__, this);
 
-      assert(file_system_ != nullptr);
+      // assert(file_system_ != nullptr);
 
       // POSIX requires not to change errno when end of directory is
       // encountered. However, in this implementation, errno is
@@ -106,40 +106,54 @@ namespace os
       errno = 0;
 
       // Execute the implementation specific code.
-      return do_read ();
+      return impl ().do_read ();
     }
 
     void
     directory::rewind (void)
     {
-      os::trace::printf ("directory::%s() @%p\n", __func__, this);
+      trace::printf ("directory::%s() @%p\n", __func__, this);
 
-      assert(file_system_ != nullptr);
+      // assert(file_system_ != nullptr);
 
       // POSIX does not mention what to do with errno.
       errno = 0;
 
       // Execute the implementation specific code.
-      do_rewind ();
+      impl ().do_rewind ();
     }
 
     int
     directory::close (void)
     {
-      os::trace::printf ("directory::%s() @%p\n", __func__, this);
+      trace::printf ("directory::%s() @%p\n", __func__, this);
 
-      assert(file_system_ != nullptr);
+      // assert(file_system_ != nullptr);
       errno = 0;
 
       // Execute the implementation specific code.
-      int ret = do_close ();
-      auto* const pool = file_system_->dirs_pool ();
-      if (pool != nullptr)
-        {
-          pool->release (this);
-        }
+      int ret = impl ().do_close ();
+
+      // The file object will be deallocated at the next open.
+      file_system ()->add_deferred_directory (this);
+
       return ret;
     }
+
+    // ========================================================================
+
+    directory_impl::directory_impl (directory& self) :
+        self_ (self)
+    {
+      trace::printf ("directory_impl::%s()=%p\n", __func__, this);
+    }
+
+    directory_impl::~directory_impl ()
+    {
+      trace::printf ("directory_impl::%s() @%p\n", __func__, this);
+    }
+
+  // ========================================================================
 
   } /* namespace posix */
 } /* namespace os */

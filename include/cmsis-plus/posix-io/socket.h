@@ -254,8 +254,10 @@ namespace os
       virtual int
       do_sockatmark (void);
 
+#if 0
       virtual void
       do_release (void) override;
+#endif
 
       /**
        * @}

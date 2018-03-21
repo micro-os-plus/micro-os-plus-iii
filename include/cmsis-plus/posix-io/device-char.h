@@ -33,7 +33,6 @@
 // ----------------------------------------------------------------------------
 
 #include <cmsis-plus/posix-io/device.h>
-#include <cmsis-plus/utils/lists.h>
 
 // ----------------------------------------------------------------------------
 
@@ -42,6 +41,10 @@ namespace os
   namespace posix
   {
     // ------------------------------------------------------------------------
+
+    class device_char_impl;
+
+    // ========================================================================
 
     /**
      * @brief Char device class.
@@ -53,25 +56,13 @@ namespace os
       // ----------------------------------------------------------------------
 
       /**
-       * @cond ignore
-       */
-
-      friend io*
-      vopen (const char* path, int oflag, std::va_list args);
-
-      /**
-       * @endcond
-       */
-
-      // ----------------------------------------------------------------------
-      /**
        * @name Constructors & Destructor
        * @{
        */
 
     public:
 
-      device_char (const char* name);
+      device_char (device_char_impl& impl, const char* name);
 
       /**
        * @cond ignore
@@ -103,44 +94,178 @@ namespace os
 
     public:
 
+      device_char_impl&
+      impl (void) const;
+
       /**
        * @}
        */
+    };
+
+    // ========================================================================
+
+    class device_char_impl : public device_impl
+    {
+      // ----------------------------------------------------------------------
+
+      friend class device_block;
 
       // ----------------------------------------------------------------------
+
       /**
-       * @name Private Member Functions
+       * @name Constructors & Destructor
        * @{
        */
 
-    protected:
+    public:
+
+      device_char_impl (device_char& self);
+
+      /**
+       * @cond ignore
+       */
+
+      // The rule of five.
+      device_char_impl (const device_char_impl&) = delete;
+      device_char_impl (device_char_impl&&) = delete;
+      device_char_impl&
+      operator= (const device_char_impl&) = delete;
+      device_char_impl&
+      operator= (device_char_impl&&) = delete;
+
+      /**
+       * @endcond
+       */
+
+      virtual
+      ~device_char_impl ();
 
       /**
        * @}
        */
 
-      // ----------------------------------------------------------------------
+      /**
+       * @name Public Member Functions
+       * @{
+       */
+
     public:
 
-      /**
-       * @cond ignore
-       */
+      // ----------------------------------------------------------------------
+
+      device_char&
+      self (void);
 
       /**
-       * @endcond
+       * @}
        */
-
-    protected:
-
-      /**
-       * @cond ignore
-       */
-
-      /**
-       * @endcond
-       */
-
     };
+
+    // ========================================================================
+
+    template<typename T>
+      class device_char_implementable : public device_char
+      {
+        // --------------------------------------------------------------------
+
+      public:
+
+        using value_type = T;
+
+        // --------------------------------------------------------------------
+
+        /**
+         * @name Constructors & Destructor
+         * @{
+         */
+
+      public:
+
+        device_char_implementable (const char* name);
+
+        /**
+         * @cond ignore
+         */
+
+        // The rule of five.
+        device_char_implementable (const device_char_implementable&) = delete;
+        device_char_implementable (device_char_implementable&&) = delete;
+        device_char_implementable&
+        operator= (const device_char_implementable&) = delete;
+        device_char_implementable&
+        operator= (device_char_implementable&&) = delete;
+
+        /**
+         * @endcond
+         */
+
+        virtual
+        ~device_char_implementable ();
+
+        /**
+         * @}
+         */
+
+      protected:
+
+        /**
+         * @cond ignore
+         */
+
+        value_type impl_instance_;
+
+        /**
+         * @endcond
+         */
+      };
+
+  // ==========================================================================
+  } /* namespace posix */
+} /* namespace os */
+
+// ===== Inline & template implementations ====================================
+
+namespace os
+{
+  namespace posix
+  {
+    // ========================================================================
+
+    inline device_char_impl&
+    device_char::impl (void) const
+    {
+      return static_cast<device_char_impl&> (impl_);
+    }
+
+    // ========================================================================
+
+    inline device_char&
+    device_char_impl::self (void)
+    {
+      return static_cast<device_char&> (self_);
+    }
+
+    // ========================================================================
+
+    template<typename T>
+      device_char_implementable<T>::device_char_implementable (const char* name) :
+          device_char
+            { impl_instance_, name }, //
+          impl_instance_
+            { *this }
+      {
+        trace::printf ("device_char_implementable::%s(\"%s\")=@%p\n", __func__,
+                       name_, this);
+      }
+
+    template<typename T>
+      device_char_implementable<T>::~device_char_implementable ()
+      {
+        trace::printf ("device_char_implementable::%s() @%p %s\n", __func__,
+                       this, name_);
+      }
+
+  // ==========================================================================
   } /* namespace posix */
 } /* namespace os */
 
