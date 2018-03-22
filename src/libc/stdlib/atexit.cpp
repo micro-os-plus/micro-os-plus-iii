@@ -39,6 +39,8 @@
 
 // ----------------------------------------------------------------------------
 
+#if !defined(__EXCEPTIONS)
+
 /**
  * @brief Request execution of functions at program exit.
  * @param fn
@@ -148,6 +150,8 @@ __call_exitprocs (int code __attribute__((unused)),
       __atexit_functions[--i] ();
     }
 }
+
+#endif /* !defined(__EXCEPTIONS) */
 
 // ----------------------------------------------------------------------------
 
