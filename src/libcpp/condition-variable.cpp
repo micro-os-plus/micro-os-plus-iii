@@ -64,7 +64,7 @@ namespace os
     }
 
     void
-    condition_variable::wait (unique_lock<mutex>& lk)
+    condition_variable::wait (std::unique_lock<mutex>& lk)
     {
       if (!lk.owns_lock ())
         __throw_system_error (EPERM,
@@ -81,7 +81,8 @@ namespace os
 #pragma GCC diagnostic ignored "-Wmissing-noreturn"
 
     void
-    notify_all_at_thread_exit (condition_variable& cond, unique_lock<mutex> lk)
+    notify_all_at_thread_exit (condition_variable& cond,
+                               std::unique_lock<mutex> lk)
     {
       //__thread_local_data()->notify_all_at_thread_exit(&cond, lk.release());
       std::abort (); // Not implemented

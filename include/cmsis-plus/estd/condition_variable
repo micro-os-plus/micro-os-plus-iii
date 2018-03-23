@@ -37,6 +37,7 @@
 #include <cmsis-plus/rtos/os.h>
 
 #include <cmsis-plus/estd/mutex>
+#include <mutex>
 #include <memory>
 #include <chrono>
 
@@ -99,33 +100,33 @@ namespace os
       notify_all () noexcept;
 
       void
-      wait (unique_lock<mutex>& lock);
+      wait (std::unique_lock<mutex>& lock);
 
       template<class Predicate_T>
         void
-        wait (unique_lock<mutex>& lock, Predicate_T pred);
+        wait (std::unique_lock<mutex>& lock, Predicate_T pred);
 
       template<class Clock_T, class Duration_T>
         cv_status
         wait_until (
-            unique_lock<mutex>& lock,
+            std::unique_lock<mutex>& lock,
             const std::chrono::time_point<Clock_T, Duration_T>& abs_time);
 
       template<class Clock_T, class Duration_T, class Predicate_T>
         bool
         wait_until (
-            unique_lock<mutex>& lock,
+            std::unique_lock<mutex>& lock,
             const std::chrono::time_point<Clock_T, Duration_T>& abs_time,
             Predicate_T pred);
 
       template<class Rep_T, class Period_T>
         cv_status
-        wait_for (unique_lock<mutex>& lock,
+        wait_for (std::unique_lock<mutex>& lock,
                   const std::chrono::duration<Rep_T, Period_T>& rel_time);
 
       template<class Rep_T, class Period_T, class Predicate_T>
         bool
-        wait_for (unique_lock<mutex>& lock,
+        wait_for (std::unique_lock<mutex>& lock,
                   const std::chrono::duration<Rep_T, Period_T>& rel_time,
                   Predicate_T pred);
 
@@ -140,7 +141,8 @@ namespace os
     };
 
     void
-    notify_all_at_thread_exit (condition_variable& cond, unique_lock<mutex> lk);
+    notify_all_at_thread_exit (condition_variable& cond,
+                               std::unique_lock<mutex> lk);
 
     class condition_variable_any
     {
@@ -205,6 +207,7 @@ namespace os
    * @}
    */
 
+  // ==========================================================================
   } /* namespace estd */
 } /* namespace os */
 
@@ -231,7 +234,7 @@ namespace os
 
     template<class Predicate_T>
       void
-      condition_variable::wait (unique_lock<mutex>& lock, Predicate_T pred)
+      condition_variable::wait (std::unique_lock<mutex>& lock, Predicate_T pred)
       {
         while (!pred ())
           wait (lock);
@@ -243,7 +246,7 @@ namespace os
     template<class Clock_T, class Duration_T>
       cv_status
       condition_variable::wait_until (
-          unique_lock<mutex>& lock,
+          std::unique_lock<mutex>& lock,
           const std::chrono::time_point<Clock_T, Duration_T>& abs_time)
       {
         using namespace std::chrono;
@@ -268,7 +271,7 @@ namespace os
     template<class Clock_T, class Duration_T, class Predicate_T>
       bool
       condition_variable::wait_until (
-          unique_lock<mutex>& lock,
+          std::unique_lock<mutex>& lock,
           const std::chrono::time_point<Clock_T, Duration_T>& abs_time,
           Predicate_T pred)
       {
@@ -286,7 +289,7 @@ namespace os
     template<class Rep_T, class Period_T>
       cv_status
       condition_variable::wait_for (
-          unique_lock<mutex>& lock,
+          std::unique_lock<mutex>& lock,
           const std::chrono::duration<Rep_T, Period_T>& rel_time)
       {
         using namespace std::chrono;
@@ -315,7 +318,7 @@ namespace os
       inline
       bool
       condition_variable::wait_for (
-          unique_lock<mutex>& lock,
+          std::unique_lock<mutex>& lock,
           const std::chrono::duration<Rep_T, Period_T>& rel_time,
           Predicate_T pred)
       {
@@ -346,14 +349,14 @@ namespace os
     inline void
     condition_variable_any::notify_one () noexcept
     {
-      lock_guard<mutex> lock (*mx_);
+      std::lock_guard<mutex> lock (*mx_);
       cv_.notify_one ();
     }
 
     inline void
     condition_variable_any::notify_all () noexcept
     {
-      lock_guard<mutex> lock (*mx_);
+      std::lock_guard<mutex> lock (*mx_);
       cv_.notify_all ();
     }
 
@@ -372,10 +375,10 @@ namespace os
       condition_variable_any::wait (Lock_T& lock)
       {
         std::shared_ptr<mutex> mx = mx_;
-        unique_lock<mutex> lk (*mx);
+        std::unique_lock<mutex> lk (*mx);
         lock.unlock ();
         std::unique_ptr<Lock_T, __lock_external> lxx(&lock);
-        lock_guard<unique_lock<mutex> > lx (lk, adopt_lock);
+        std::lock_guard<std::unique_lock<mutex> > lx (lk, std::adopt_lock);
         cv_.wait (lk);
         // mx.unlock()
         // lock.lock()
@@ -396,10 +399,10 @@ namespace os
           const std::chrono::time_point<Clock_T, Duration_T>& abs_time)
       {
         std::shared_ptr<mutex> mx = mx_;
-        unique_lock<mutex> lk (*mx);
+        std::unique_lock<mutex> lk (*mx);
         lock.unlock ();
         std::unique_ptr<Lock_T, __lock_external> lxx(&lock);
-        lock_guard<unique_lock<mutex> > lx (lk, adopt_lock);
+        std::lock_guard<std::unique_lock<mutex> > lx (lk, std::adopt_lock);
         return cv_.wait_until (lk, abs_time);
         // mx.unlock()
         // lock.lock()
@@ -441,8 +444,7 @@ namespace os
                            std::move (pred));
       }
 
-  // --------------------------------------------------------------------------
-
+  // ==========================================================================
   } /* namespace estd */
 } /* namespace os */
 
