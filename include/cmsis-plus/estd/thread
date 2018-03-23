@@ -35,528 +35,532 @@
 // ----------------------------------------------------------------------------
 
 #include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/estd/chrono>
 
+#include <thread>
+
+#include <cmsis-plus/estd/chrono>
 #include <type_traits>
 #include <functional>
 
 // ----------------------------------------------------------------------------
 
+#if defined(OS_USE_NAMESPACE_ESTD)
 namespace os
-{
-  namespace estd
   {
+    namespace estd
+      {
+#else
+namespace std
+{
+#endif
+
+  /**
+   * @ingroup cmsis-plus-iso
+   * @{
+   */
+
+  // ==========================================================================
+  /**
+   * @brief Standard thread.
+   */
+  class thread
+  {
+  public:
+
+    using native_handle_type = os::rtos::thread*;
+
+    class id
+    {
+    public:
+      id () noexcept;
+
+      explicit
+      id (native_handle_type system_thread) noexcept;
+
+      id (const id&) = default;
+      id&
+      operator= (const id&) = default;
+
+      ~id ();
+
+    private:
+
+      friend class thread;
+#if 0
+      friend class hash<thread::id>;
+#endif
+
+      // The id is actually a pointer to the system thread.
+      native_handle_type native_thread_;
+
+      // Only two of them, the other 4 are defined in terms of these.
+      friend bool
+      operator== (thread::id x, thread::id y) noexcept;
+
+      friend bool
+      operator< (thread::id x, thread::id y) noexcept;
+    };
+
+    thread () noexcept = default;
+
+    template<typename Callable_T, //
+        typename ... Args_T>
+      explicit
+      thread (Callable_T&& f, Args_T&&... args);
+
+    ~thread ();
+
+    thread (const thread&) = delete;
+    thread (thread&& t) noexcept;
+
+    thread&
+    operator= (const thread&) = delete;
+    thread&
+    operator= (thread&& t) noexcept;
+
+    // ------------------------------------------------------------------------
+
+    void
+    swap (thread& t) noexcept;
+
+    bool
+    joinable () const noexcept;
+
+    void
+    join ();
+
+    void
+    detach ();
+
+    id
+    get_id () const noexcept;
+
+    native_handle_type
+    native_handle ();
+
+    static unsigned
+    hardware_concurrency () noexcept;
+
+  private:
+
+    template<typename F_T>
+      static void
+      run_function_object (const void* func_object);
+
+    template<typename F_T>
+      static void
+      delete_function_object (const void* func_obj);
+
+    void
+    delete_system_thread (void);
+
+    // The current implementation creates temporary id() objects
+    // and copies (moves?) them here.
+    id id_;
+
+    using function_object_deleter_t = void (*) (void*);
+    function_object_deleter_t function_object_deleter_ = nullptr;
+
+  public:
+
+  };
+
+  // ==========================================================================
+
+  void
+  swap (thread& x, thread& y) noexcept;
+
+  bool
+  operator== (thread::id x, thread::id y) noexcept;
+  bool
+  operator!= (thread::id x, thread::id y) noexcept;
+  bool
+  operator< (thread::id x, thread::id y) noexcept;
+  bool
+  operator<= (thread::id x, thread::id y) noexcept;
+  bool
+  operator> (thread::id x, thread::id y) noexcept;
+  bool
+  operator>= (thread::id x, thread::id y) noexcept;
+
+#if 0
+  template<class charT, class traits>
+  basic_ostream<charT, traits>&
+  operator<<(basic_ostream<charT, traits>& out, thread::id id);
+#endif
+
+  /**
+   * @}
+   */
+
+  // ==========================================================================
+  /**
+   * @brief A namespace for functions applying to the current thread.
+   *
+   * @ingroup cmsis-plus-iso
+   */
+  namespace this_thread
+  {
+
     /**
      * @ingroup cmsis-plus-iso
      * @{
      */
 
-    // ========================================================================
     /**
-     * @brief Standard thread.
+     * @brief Return the **id** of the current running thread.
      */
-    class thread
-    {
-    public:
+    thread::id
+    get_id () noexcept;
 
-      using native_handle_type = os::rtos::thread*;
-
-      class id
-      {
-      public:
-        id () noexcept;
-
-        explicit
-        id (native_handle_type system_thread) noexcept;
-
-        id (const id&) = default;
-        id&
-        operator= (const id&) = default;
-
-        ~id ();
-
-      private:
-
-        friend class thread;
-#if 0
-        friend class hash<thread::id>;
-#endif
-
-        // The id is actually a pointer to the system thread.
-        native_handle_type native_thread_;
-
-        // Only two of them, the other 4 are defined in terms of these.
-        friend bool
-        operator== (thread::id x, thread::id y) noexcept;
-
-        friend bool
-        operator< (thread::id x, thread::id y) noexcept;
-      };
-
-      thread () noexcept = default;
-
-      template<typename Callable_T, //
-          typename ... Args_T>
-        explicit
-        thread (Callable_T&& f, Args_T&&... args);
-
-      ~thread ();
-
-      thread (const thread&) = delete;
-      thread (thread&& t) noexcept;
-
-      thread&
-      operator= (const thread&) = delete;
-      thread&
-      operator= (thread&& t) noexcept;
-
-      // ----------------------------------------------------------------------
-
-      void
-      swap (thread& t) noexcept;
-
-      bool
-      joinable () const noexcept;
-
-      void
-      join ();
-
-      void
-      detach ();
-
-      id
-      get_id () const noexcept;
-
-      native_handle_type
-      native_handle ();
-
-      static unsigned
-      hardware_concurrency () noexcept;
-
-    private:
-
-      template<typename F_T>
-        static void
-        run_function_object (const void* func_object);
-
-      template<typename F_T>
-        static void
-        delete_function_object (const void* func_obj);
-
-      void
-      delete_system_thread (void);
-
-      // The current implementation creates temporary id() objects
-      // and copies (moves?) them here.
-      id id_;
-
-      using function_object_deleter_t = void (*) (void*);
-      function_object_deleter_t function_object_deleter_ = nullptr;
-
-    public:
-
-    };
-
-    // ========================================================================
-
+    /**
+     * @brief Yield the CPU to the next ready thread.
+     */
     void
-    swap (thread& x, thread& y) noexcept;
-
-    bool
-    operator== (thread::id x, thread::id y) noexcept;
-    bool
-    operator!= (thread::id x, thread::id y) noexcept;
-    bool
-    operator< (thread::id x, thread::id y) noexcept;
-    bool
-    operator<= (thread::id x, thread::id y) noexcept;
-    bool
-    operator> (thread::id x, thread::id y) noexcept;
-    bool
-    operator>= (thread::id x, thread::id y) noexcept;
-
-#if 0
-    template<class charT, class traits>
-    basic_ostream<charT, traits>&
-    operator<<(basic_ostream<charT, traits>& out, thread::id id);
-#endif
+    yield () noexcept;
 
     /**
-     * @}
+     * @brief Sleep for a given duration.
+     * @param [in] rel_time
+     * @details
+     * extra Clock_T is an extension to the standard
      */
+    template<typename Clock_T = os::estd::chrono::systick_clock, typename Rep_T,
+        typename Period_T>
+      constexpr void
+      sleep_for (const std::chrono::duration<Rep_T, Period_T>& rel_time);
 
-    // ========================================================================
     /**
-     * @brief A namespace for functions applying to the current thread.
-     *
-     * @ingroup cmsis-plus-iso
+     * @brief Sleep until a given time point.
+     * @param [in] abs_time
      */
-    namespace this_thread
-    {
-
-      /**
-       * @ingroup cmsis-plus-iso
-       * @{
-       */
-
-      /**
-       * @brief Return the **id** of the current running thread.
-       */
-      thread::id
-      get_id () noexcept;
-
-      /**
-       * @brief Yield the CPU to the next ready thread.
-       */
+    template<typename Clock_T, typename Duration_T>
       void
-      yield () noexcept;
+      sleep_until (
+          const std::chrono::time_point<Clock_T, Duration_T>& abs_time);
 
-      /**
-       * @brief Sleep for a given duration.
-       * @param [in] rel_time
-       * @details
-       * extra Clock_T is an extension to the standard
-       */
-      template<typename Clock_T = chrono::systick_clock, typename Rep_T,
-          typename Period_T>
-        constexpr void
-        sleep_for (const std::chrono::duration<Rep_T, Period_T>& rel_time);
+  /**
+   * @}
+   */
 
-      /**
-       * @brief Sleep until a given time point.
-       * @param [in] abs_time
-       */
-      template<typename Clock_T, typename Duration_T>
-        void
-        sleep_until (
-            const std::chrono::time_point<Clock_T, Duration_T>& abs_time);
+  } /* namespace this_thread */
 
-    /**
-     * @}
-     */
+  // ==========================================================================
+  // Inline & template implementations.
 
-    } /* namespace this_thread */
+  // ==========================================================================
 
-  } /* namespace estd */
-} /* namespace os */
-
-// ----------------------------------------------------------------------------
-// Inline & template implementations.
-
-namespace os
-{
-  namespace estd
+  inline void
+  swap (thread& x, thread& y) noexcept
   {
-    // ========================================================================
+    x.swap (y);
+  }
 
-    inline void
-    swap (thread& x, thread& y) noexcept
-    {
-      x.swap (y);
-    }
+  inline bool
+  operator== (thread::id x, thread::id y) noexcept
+  {
+    return x.native_thread_ == y.native_thread_;
+  }
 
-    inline bool
-    operator== (thread::id x, thread::id y) noexcept
-    {
-      return x.native_thread_ == y.native_thread_;
-    }
+  inline bool
+  operator!= (thread::id x, thread::id y) noexcept
+  {
+    return !(x == y);
+  }
 
-    inline bool
-    operator!= (thread::id x, thread::id y) noexcept
-    {
-      return !(x == y);
-    }
+  inline bool
+  operator< (thread::id x, thread::id y) noexcept
+  {
+    return x.native_thread_ < y.native_thread_;
+  }
 
-    inline bool
-    operator< (thread::id x, thread::id y) noexcept
-    {
-      return x.native_thread_ < y.native_thread_;
-    }
+  inline bool
+  operator<= (thread::id x, thread::id y) noexcept
+  {
+    return !(y < x);
+  }
 
-    inline bool
-    operator<= (thread::id x, thread::id y) noexcept
-    {
-      return !(y < x);
-    }
+  inline bool
+  operator> (thread::id x, thread::id y) noexcept
+  {
+    return y < x;
+  }
 
-    inline bool
-    operator> (thread::id x, thread::id y) noexcept
-    {
-      return y < x;
-    }
+  inline bool
+  operator>= (thread::id x, thread::id y) noexcept
+  {
+    return !(x < y);
+  }
 
-    inline bool
-    operator>= (thread::id x, thread::id y) noexcept
-    {
-      return !(x < y);
-    }
+  // ==========================================================================
 
-    // ========================================================================
-
-    inline
-    thread::id::id () noexcept :
-    native_thread_ ( nullptr)
-      {
-        ;
-      }
-
-    inline
-    thread::id::id (native_handle_type native_thread) noexcept :
-    native_thread_ ( native_thread)
-      {
-        ;
-      }
-
-    inline
-    thread::id::~id ()
+  inline
+  thread::id::id () noexcept :
+  native_thread_ ( nullptr)
     {
       ;
     }
 
-    // ------------------------------------------------------------------------
-
-    inline thread::id
-    thread::get_id () const noexcept
+  inline
+  thread::id::id (native_handle_type native_thread) noexcept :
+  native_thread_ ( native_thread)
     {
-      return id_;
+      ;
     }
 
-    inline thread::native_handle_type
-    thread::native_handle ()
-    {
-      return id_.native_thread_;
-    }
-
-    inline unsigned
-    thread::hardware_concurrency () noexcept
-    {
-      return 1;
-    }
-
-    template<typename F_T>
-      void
-      thread::run_function_object (const void* func_obj)
-      {
-        os::trace::printf ("%s()\n", __PRETTY_FUNCTION__);
-
-        using Function_object = F_T;
-        const Function_object* f =
-            static_cast<const Function_object*> (func_obj);
-        (*f) ();
-      }
-
-    template<typename F_T>
-      void
-      thread::delete_function_object (const void* func_obj)
-      {
-        os::trace::printf ("%s()\n", __PRETTY_FUNCTION__);
-
-        using Function_object = F_T;
-        const Function_object* f =
-            static_cast<const Function_object*> (func_obj);
-
-        // The delete now has the knowledge required to
-        // correctly delete the object (i.e. the object size).
-        delete f;
-      }
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Waggregate-return"
-
-    template<typename Callable_T, typename ... Args_T>
-      thread::thread (Callable_T&& f, Args_T&&... args)
-      {
-        // static_assert(std::is_same<Attr_T, os::rtos::thread::attr_t>::value, "first param must be thread_attr_t*");
-
-        os::trace::printf ("%s() @%p\n", __PRETTY_FUNCTION__, this);
-
-        using Function_object = decltype(std::bind (std::forward<Callable_T> (f),
-                std::forward<Args_T>(args)...));
-
-        // Dynamic allocation! The size depends on the number of arguments.
-        // This creates a small problem, since both running the function
-        // and deleting the object requires the type. It is passes as
-        // template functions.
-        Function_object* funct_obj = new Function_object (
-            std::bind (std::forward<Callable_T> (f),
-                       std::forward<Args_T>(args)...));
-
-        // The function to start the thread is a custom proxy that
-        // knows how to get the variadic arguments.
-        id_ = id
-          { new os::rtos::thread (
-              reinterpret_cast<os::rtos::thread::func_t> (&run_function_object<
-                  Function_object> ),
-              reinterpret_cast<os::rtos::thread::func_args_t> (funct_obj)) };
-
-        // The deleter, to be used during destruction.
-        function_object_deleter_ =
-            reinterpret_cast<function_object_deleter_t> (&delete_function_object<
-                Function_object> );
-      }
-
-#pragma GCC diagnostic pop
-
-    // ========================================================================
-
-    namespace this_thread
-    {
-
-      inline void
-      __attribute__((always_inline))
-      yield () noexcept
-      {
-        os::rtos::this_thread::yield ();
-      }
-
-      inline thread::id
-      get_id () noexcept
-      {
-        return thread::id (&os::rtos::this_thread::thread ());
-      }
-
-      // This implementation currently supports only short
-      // delays, since it uses the ticks timer.
-
-      // Note: there is no absolute guarantee that the
-      // sleep will not return earlier, so the application
-      // might need to retry.
-
-      // Note the constexpr return type, which tries to compute everything at
-      // compile time. And, for constant durations, it succeeds.
-#if 0
-      template<class Rep_T, class Period_T>
-      constexpr void
-      sleep_for (const std::chrono::duration<Rep_T, Period_T>& rel_time)
-        {
-          using namespace std::chrono;
-
-          if (rel_time > duration<Rep_T, Period_T>::zero ())
-            {
-              // Round up to micros, in case of nanos.
-              microseconds micros =
-              os::estd::chrono::ceil<microseconds> (rel_time);
-
-              // Round up to ticks.
-#if 0
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Waggregate-return"
-
-              os::rtos::thread::sleep (
-                  (os::rtos::systicks_t) (os::estd::chrono::ceil<
-                      systicks> (micros).count ()));
-#pragma GCC diagnostic pop
-
-#else
-              // The code seems better with this variant, otherwise it
-              // does not optimise constant calls.
-              os::rtos::Systick_clock::sleep_for (
-                  os::rtos::Systick_clock::ticks_cast (
-                      micros.count ()));
-#endif
-
-            }
-        }
-#endif
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Waggregate-return"
-
-      template<typename Clock_T, class Rep_T, class Period_T>
-        constexpr void
-        sleep_for (const std::chrono::duration<Rep_T, Period_T>& rel_time)
-        {
-          using namespace std::chrono;
-
-          using clock = Clock_T;
-          using sleep_rep = typename clock::sleep_rep;
-
-          if (rel_time > duration<Rep_T, Period_T>::zero ())
-            {
-              sleep_rep d = static_cast<sleep_rep> (os::estd::chrono::ceil<
-                  typename clock::duration> (rel_time).count ());
-
-              clock::sleep_for (d);
-            }
-        }
-
-#pragma GCC diagnostic pop
-
-      template<typename Clock_T, typename Duration_T>
-        void
-        sleep_until (
-            const std::chrono::time_point<Clock_T, Duration_T>& abs_time)
-        {
-          using clock = Clock_T;
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Waggregate-return"
-
-          auto now = clock::now ();
-
-          while (now < abs_time)
-            {
-              sleep_for (abs_time - now);
-              now = clock::now ();
-            }
-
-#pragma GCC diagnostic pop
-
-        }
-
-      template<typename Duration_T>
-        void
-        sleep_until (
-            const std::chrono::time_point<chrono::realtime_clock, Duration_T>& abs_time)
-        {
-          using clock = chrono::realtime_clock;
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Waggregate-return"
-
-          auto now = clock::now ();
-          while (now < abs_time)
-            {
-              typename clock::sleep_rep d = (os::estd::chrono::ceil<
-                  typename clock::sleep_duration> (abs_time - now)).count ();
-              clock::sleep_for (d);
-              now = clock::now ();
-            }
-
-#pragma GCC diagnostic pop
-
-        }
-
-      template<typename Duration_T>
-        void
-        sleep_until (
-            const std::chrono::time_point<chrono::systick_clock, Duration_T>& abs_time)
-        {
-          using clock = chrono::systick_clock;
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Waggregate-return"
-
-          auto now = clock::now ();
-          while (now < abs_time)
-            {
-              typename clock::sleep_rep d = (os::estd::chrono::ceil<
-                  typename clock::sleep_duration> (abs_time - now)).count ();
-              clock::sleep_for (d);
-              now = clock::now ();
-            }
-
-#pragma GCC diagnostic pop
-
-        }
-
-    } /* namespace this_thread */
+  inline
+  thread::id::~id ()
+  {
+    ;
+  }
 
   // --------------------------------------------------------------------------
 
-  } /* namespace estd */
+  inline thread::id
+  thread::get_id () const noexcept
+  {
+    return id_;
+  }
+
+  inline thread::native_handle_type
+  thread::native_handle ()
+  {
+    return id_.native_thread_;
+  }
+
+  inline unsigned
+  thread::hardware_concurrency () noexcept
+  {
+    return 1;
+  }
+
+  template<typename F_T>
+    void
+    thread::run_function_object (const void* func_obj)
+    {
+      os::trace::printf ("%s()\n", __PRETTY_FUNCTION__);
+
+      using Function_object = F_T;
+      const Function_object* f = static_cast<const Function_object*> (func_obj);
+      (*f) ();
+    }
+
+  template<typename F_T>
+    void
+    thread::delete_function_object (const void* func_obj)
+    {
+      os::trace::printf ("%s()\n", __PRETTY_FUNCTION__);
+
+      using Function_object = F_T;
+      const Function_object* f = static_cast<const Function_object*> (func_obj);
+
+      // The delete now has the knowledge required to
+      // correctly delete the object (i.e. the object size).
+      delete f;
+    }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
+  template<typename Callable_T, typename ... Args_T>
+    thread::thread (Callable_T&& f, Args_T&&... args)
+    {
+      // static_assert(std::is_same<Attr_T, os::rtos::thread::attr_t>::value, "first param must be thread_attr_t*");
+
+      os::trace::printf ("%s() @%p\n", __PRETTY_FUNCTION__, this);
+
+      using Function_object = decltype(std::bind (std::forward<Callable_T> (f),
+              std::forward<Args_T>(args)...));
+
+      // Dynamic allocation! The size depends on the number of arguments.
+      // This creates a small problem, since both running the function
+      // and deleting the object requires the type. It is passes as
+      // template functions.
+      Function_object* funct_obj = new Function_object (
+          std::bind (std::forward<Callable_T> (f),
+                     std::forward<Args_T>(args)...));
+
+      // The function to start the thread is a custom proxy that
+      // knows how to get the variadic arguments.
+      id_ = id
+        { new os::rtos::thread (
+            reinterpret_cast<os::rtos::thread::func_t> (&run_function_object<
+                Function_object> ),
+            reinterpret_cast<os::rtos::thread::func_args_t> (funct_obj)) };
+
+      // The deleter, to be used during destruction.
+      function_object_deleter_ =
+          reinterpret_cast<function_object_deleter_t> (&delete_function_object<
+              Function_object> );
+    }
+
+#pragma GCC diagnostic pop
+
+  // ==========================================================================
+
+  namespace this_thread
+  {
+
+    inline void
+    __attribute__((always_inline))
+    yield () noexcept
+    {
+      os::rtos::this_thread::yield ();
+    }
+
+    inline thread::id
+    get_id () noexcept
+    {
+      return thread::id (&os::rtos::this_thread::thread ());
+    }
+
+    // This implementation currently supports only short
+    // delays, since it uses the ticks timer.
+
+    // Note: there is no absolute guarantee that the
+    // sleep will not return earlier, so the application
+    // might need to retry.
+
+    // Note the constexpr return type, which tries to compute everything at
+    // compile time. And, for constant durations, it succeeds.
+#if 0
+    template<class Rep_T, class Period_T>
+    constexpr void
+    sleep_for (const std::chrono::duration<Rep_T, Period_T>& rel_time)
+      {
+        using namespace std::chrono;
+
+        if (rel_time > duration<Rep_T, Period_T>::zero ())
+          {
+            // Round up to micros, in case of nanos.
+            microseconds micros =
+            os::estd::chrono::ceil<microseconds> (rel_time);
+
+            // Round up to ticks.
+#if 0
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
+            os::rtos::thread::sleep (
+                (os::rtos::systicks_t) (os::estd::chrono::ceil<
+                    systicks> (micros).count ()));
+#pragma GCC diagnostic pop
+
+#else
+            // The code seems better with this variant, otherwise it
+            // does not optimise constant calls.
+            os::rtos::Systick_clock::sleep_for (
+                os::rtos::Systick_clock::ticks_cast (
+                    micros.count ()));
+#endif
+
+          }
+      }
+#endif
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
+    template<typename Clock_T, class Rep_T, class Period_T>
+      constexpr void
+      sleep_for (const std::chrono::duration<Rep_T, Period_T>& rel_time)
+      {
+        using namespace std::chrono;
+
+        using clock = Clock_T;
+        using sleep_rep = typename clock::sleep_rep;
+
+        if (rel_time > duration<Rep_T, Period_T>::zero ())
+          {
+            sleep_rep d = static_cast<sleep_rep> (os::estd::chrono::ceil<
+                typename clock::duration> (rel_time).count ());
+
+            clock::sleep_for (d);
+          }
+      }
+
+#pragma GCC diagnostic pop
+
+    template<typename Clock_T, typename Duration_T>
+      void
+      sleep_until (const std::chrono::time_point<Clock_T, Duration_T>& abs_time)
+      {
+        using clock = Clock_T;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
+        auto now = clock::now ();
+
+        while (now < abs_time)
+          {
+            sleep_for (abs_time - now);
+            now = clock::now ();
+          }
+
+#pragma GCC diagnostic pop
+
+      }
+
+    template<typename Duration_T>
+      void
+      sleep_until (
+          const std::chrono::time_point<os::estd::chrono::realtime_clock,
+              Duration_T>& abs_time)
+      {
+        using clock = os::estd::chrono::realtime_clock;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
+        auto now = clock::now ();
+        while (now < abs_time)
+          {
+            typename clock::sleep_rep d = (os::estd::chrono::ceil<
+                typename clock::sleep_duration> (abs_time - now)).count ();
+            clock::sleep_for (d);
+            now = clock::now ();
+          }
+
+#pragma GCC diagnostic pop
+
+      }
+
+    template<typename Duration_T>
+      void
+      sleep_until (
+          const std::chrono::time_point<os::estd::chrono::systick_clock,
+              Duration_T>& abs_time)
+      {
+        using clock = os::estd::chrono::systick_clock;
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
+        auto now = clock::now ();
+        while (now < abs_time)
+          {
+            typename clock::sleep_rep d = (os::estd::chrono::ceil<
+                typename clock::sleep_duration> (abs_time - now)).count ();
+            clock::sleep_for (d);
+            now = clock::now ();
+          }
+
+#pragma GCC diagnostic pop
+
+      }
+
+  } /* namespace this_thread */
+
+// ==========================================================================
+#if defined(OS_USE_NAMESPACE_ESTD)
+} /* namespace estd */
 } /* namespace os */
+#else
+}
+/* namespace std */
+#endif
 
 // ----------------------------------------------------------------------------
 
