@@ -58,7 +58,7 @@ namespace os
         {
           return true;
         }
-      else if (res == ETIMEDOUT)
+      else if (res == EWOULDBLOCK)
         {
           return false;
         }
@@ -101,7 +101,7 @@ namespace os
         {
           return true;
         }
-      else if (res == ETIMEDOUT)
+      else if (res == EWOULDBLOCK)
         {
           return false;
         }
