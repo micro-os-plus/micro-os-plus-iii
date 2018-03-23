@@ -1144,7 +1144,12 @@ namespace os
           assert(children_.empty ());
           parent_ = nullptr;
 
-          assert(acquired_mutexes_ == 0);
+          if (acquired_mutexes_ != 0) {
+              trace::printf ("%s() @%p %s has %u acquired mutexes!\n", __func__, this,
+                             name (), acquired_mutexes_);
+              // TODO: release?
+          }
+          // assert(acquired_mutexes_ == 0);
 
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)
 

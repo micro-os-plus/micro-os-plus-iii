@@ -533,7 +533,10 @@ namespace os
 
 #else
 
-      assert (owner_ == nullptr);
+      if (owner_ != nullptr) {
+          trace::printf ("%s() @%p %s still owned!\n", __func__, this, name ());
+      }
+      // assert (owner_ == nullptr);
       assert (list_.empty ());
 
 #endif
