@@ -608,6 +608,18 @@
 #define OS_INTEGER_DIRENT_NAME_MAX  (256)
 
 /**
+ * @brief Use a separate estd:: namespace.
+ *
+ * @details
+ * When running µOS++ tests on the POSIX synthetic target, it
+ * is mandatory to avoid name clashes. By defining this option, the
+ * objects `thread`, `mutex`, `condition_variable` are no longer
+ * defined in `std::` but in `os::estd::`. When present,
+ * `OS_NAMESPACE_STD` is defined as `os::estd`, otherwise it is `std`.
+ */
+#define OS_USE_NAMESPACE_ESTD
+
+/**
  * @}
  */
 
