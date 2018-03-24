@@ -850,6 +850,9 @@ namespace os
     void
     mutex::internal_mark_owner_dead_ (void)
     {
+      // May return error if not the rightful owner.
+      trace::printf ("%s() @%p %s\n", __func__, this, name ());
+
       if (robustness_ == mutex::robustness::robust)
         {
           // If the owning thread of a robust mutex terminates
@@ -858,14 +861,6 @@ namespace os
           // by the return value EOWNERDEAD.
           owner_dead_ = true;
           consistent_ = false;
-
-#if !defined(OS_USE_RTOS_PORT_MUTEX)
-
-          // Actually delayed until end of critical section.
-          list_.resume_one ();
-
-#endif
-
         }
     }
 
