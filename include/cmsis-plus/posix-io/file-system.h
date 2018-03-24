@@ -278,9 +278,6 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
-      device_block&
-      device (void) const;
-
       const char*
       mounted_path (void);
 
@@ -305,6 +302,12 @@ namespace os
       deferred_directories_list_t&
       deferred_directories_list (void);
 
+      // --------------------------------------------------------------------
+      // Support functions.
+
+      device_block&
+      device (void) const;
+
       file_system_impl&
       impl (void) const;
 
@@ -312,6 +315,7 @@ namespace os
        * @}
        */
 
+      // ----------------------------------------------------------------------
     protected:
 
       /**
@@ -332,6 +336,7 @@ namespace os
        * @endcond
        */
 
+      // ----------------------------------------------------------------------
     public:
 
       /**
@@ -347,6 +352,7 @@ namespace os
        * @endcond
        */
 
+      // ----------------------------------------------------------------------
     protected:
 
       /**
@@ -370,6 +376,7 @@ namespace os
     class file_system_impl
     {
       // ----------------------------------------------------------------------
+
       /**
        * @name Constructors & Destructor
        * @{
@@ -470,12 +477,20 @@ namespace os
         T*
         allocate_directory (L& locker);
 
+      // ----------------------------------------------------------------------
+      // Support functions.
+
       device_block&
       device (void) const;
 
       file_system&
       self (void);
 
+      /**
+       * @}
+       */
+
+      // ----------------------------------------------------------------------
     protected:
 
       /**
@@ -580,6 +595,7 @@ namespace os
         using lockable_type = L;
 
         // --------------------------------------------------------------------
+
         /**
          * @name Constructors & Destructor
          * @{

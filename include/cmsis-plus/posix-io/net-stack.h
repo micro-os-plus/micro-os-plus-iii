@@ -123,7 +123,6 @@ namespace os
       /**
        * @endcond
        */
-
     };
 
   } /* namespace posix */

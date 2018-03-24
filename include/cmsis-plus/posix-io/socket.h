@@ -266,7 +266,6 @@ namespace os
       /**
        * @}
        */
-
     };
 
   } /* namespace posix */

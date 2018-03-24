@@ -28,6 +28,10 @@
 #ifndef CMSIS_PLUS_POSIX_IO_TTY_H_
 #define CMSIS_PLUS_POSIX_IO_TTY_H_
 
+#if defined (__cplusplus)
+
+// ----------------------------------------------------------------------------
+
 #if defined(OS_USE_OS_APP_CONFIG_H)
 #include <cmsis-plus/os-app-config.h>
 #endif
@@ -36,7 +40,7 @@
 #include <cmsis-plus/posix-io/device-char.h>
 #include <cmsis-plus/posix/termios.h>
 
-#if defined (__cplusplus)
+// ----------------------------------------------------------------------------
 
 namespace os
 {
@@ -50,9 +54,8 @@ namespace os
 
     class tty : public device_char
     {
-    public:
-
       // ----------------------------------------------------------------------
+
       /**
        * @name Constructors & Destructor
        * @{
@@ -82,6 +85,11 @@ namespace os
       ~tty () noexcept;
 
       /**
+       * @}
+       */
+
+      // ----------------------------------------------------------------------
+      /**
        * @name Public Member Functions
        * @{
        */
@@ -101,6 +109,7 @@ namespace os
       tcsendbreak (int duration);
 
       // ----------------------------------------------------------------------
+      // Support functions.
 
       tty_impl&
       impl (void) const;
@@ -148,6 +157,7 @@ namespace os
        * @}
        */
 
+      // ----------------------------------------------------------------------
       /**
        * @name Public Member Functions
        * @{
@@ -171,6 +181,7 @@ namespace os
       do_isatty (void) final;
 
       // ----------------------------------------------------------------------
+      // Support functions.
 
       tty&
       self (void);
@@ -192,6 +203,7 @@ namespace os
         using value_type = T;
 
         // --------------------------------------------------------------------
+
         /**
          * @name Constructors & Destructor
          * @{

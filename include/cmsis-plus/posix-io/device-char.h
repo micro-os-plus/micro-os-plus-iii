@@ -91,12 +91,15 @@ namespace os
        * @}
        */
 
+      // ----------------------------------------------------------------------
       /**
        * @name Public Member Functions
        * @{
        */
 
     public:
+
+      // Support functions.
 
       device_char_impl&
       impl (void) const;
@@ -148,6 +151,7 @@ namespace os
        * @}
        */
 
+      // ----------------------------------------------------------------------
       /**
        * @name Public Member Functions
        * @{
@@ -164,6 +168,7 @@ namespace os
       do_sync (void);
 
       // ----------------------------------------------------------------------
+      // Support functions.
 
       device_char&
       self (void);

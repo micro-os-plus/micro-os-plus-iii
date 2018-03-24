@@ -59,10 +59,6 @@ namespace os
     {
       // ----------------------------------------------------------------------
 
-    public:
-
-      // ----------------------------------------------------------------------
-
       /**
        * @name Constructors & Destructor
        * @{
@@ -95,6 +91,7 @@ namespace os
        * @}
        */
 
+      // ----------------------------------------------------------------------
       /**
        * @name Public Member Functions
        * @{
@@ -104,6 +101,9 @@ namespace os
 
       void
       configure (blknum_t offset, blknum_t nblocks);
+
+      // ----------------------------------------------------------------------
+      // Support functions.
 
       device_block_partition_impl&
       impl (void) const;
@@ -120,6 +120,8 @@ namespace os
       // ----------------------------------------------------------------------
 
       friend device_block_partition;
+
+      // ----------------------------------------------------------------------
 
       /**
        * @name Constructors & Destructor
@@ -151,6 +153,11 @@ namespace os
       ~device_block_partition_impl ();
 
       /**
+       * @}
+       */
+
+      // ----------------------------------------------------------------------
+      /**
        * @name Public Member Functions
        * @{
        */
@@ -180,6 +187,9 @@ namespace os
 
       void
       configure (blknum_t offset, blknum_t nblocks);
+
+      // --------------------------------------------------------------------
+      // Support functions.
 
       device_block_partition&
       self (void);
@@ -214,6 +224,8 @@ namespace os
       public:
 
         using value_type = T;
+
+        // ----------------------------------------------------------------------
 
         /**
          * @name Constructors & Destructor
@@ -329,6 +341,7 @@ namespace os
          * @}
          */
 
+        // ----------------------------------------------------------------------
         /**
          * @name Public Member Functions
          * @{

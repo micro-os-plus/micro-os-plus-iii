@@ -98,6 +98,7 @@ namespace os
        * @}
        */
 
+      // ----------------------------------------------------------------------
       /**
        * @name Public Member Functions
        * @{
@@ -115,8 +116,6 @@ namespace os
       write_block (const void* buf, blknum_t blknum, std::size_t nblocks = 1);
 
       // ----------------------------------------------------------------------
-
-    public:
 
       /**
        *
@@ -136,6 +135,7 @@ namespace os
       block_physical_size_bytes (void);
 
       // ----------------------------------------------------------------------
+      // Support functions.
 
       device_block_impl&
       impl (void) const;
@@ -190,6 +190,11 @@ namespace os
       ~device_block_impl ();
 
       /**
+       * @}
+       */
+
+      // ----------------------------------------------------------------------
+      /**
        * @name Public Member Functions
        * @{
        */
@@ -213,6 +218,7 @@ namespace os
                       std::size_t nblocks) = 0;
 
       // ----------------------------------------------------------------------
+      // Support functions.
 
       device_block&
       self (void);
@@ -362,6 +368,7 @@ namespace os
          * @}
          */
 
+        // ----------------------------------------------------------------------
         /**
          * @name Public Member Functions
          * @{
