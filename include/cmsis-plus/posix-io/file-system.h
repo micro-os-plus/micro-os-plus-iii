@@ -287,9 +287,6 @@ namespace os
       const char*
       name (void) const;
 
-      file_system_impl&
-      impl (void) const;
-
       void
       add_deferred_file (file* fil);
 
@@ -307,6 +304,9 @@ namespace os
 
       deferred_directories_list_t&
       deferred_directories_list (void);
+
+      file_system_impl&
+      impl (void) const;
 
       /**
        * @}
@@ -536,6 +536,24 @@ namespace os
          * @}
          */
 
+        // ----------------------------------------------------------------------
+        /**
+         * @name Public Member Functions
+         * @{
+         */
+
+      public:
+
+        // Support functions.
+
+        value_type&
+        impl (void) const;
+
+        /**
+         * @}
+         */
+
+        // ----------------------------------------------------------------------
       protected:
 
         /**
@@ -668,7 +686,16 @@ namespace os
         utime (const char* path, const struct utimbuf* times) override;
 
         // --------------------------------------------------------------------
+        // Support functions.
 
+        value_type&
+        impl (void) const;
+
+        /**
+         * @}
+         */
+
+        // --------------------------------------------------------------------
       protected:
 
         /**
@@ -913,6 +940,13 @@ namespace os
 #endif
       }
 
+    template<typename T>
+      typename file_system_implementable<T>::value_type&
+      file_system_implementable<T>::impl (void) const
+      {
+        return static_cast<value_type&> (impl_);
+      }
+
     // ========================================================================
 
     template<typename T, typename L>
@@ -1083,6 +1117,13 @@ namespace os
           { impl_instance_.locker () };
 
         return file_system::utime (path, times);
+      }
+
+    template<typename T, typename L>
+      typename file_system_lockable<T, L>::value_type&
+      file_system_lockable<T, L>::impl (void) const
+      {
+        return static_cast<value_type&> (impl_);
       }
 
   } /* namespace posix */

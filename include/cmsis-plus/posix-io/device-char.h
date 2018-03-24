@@ -210,6 +210,24 @@ namespace os
          * @}
          */
 
+        // ----------------------------------------------------------------------
+        /**
+         * @name Public Member Functions
+         * @{
+         */
+
+      public:
+
+        // Support functions.
+
+        value_type&
+        impl (void) const;
+
+        /**
+         * @}
+         */
+
+        // ----------------------------------------------------------------------
       protected:
 
         /**
@@ -271,6 +289,13 @@ namespace os
         trace::printf ("device_char_implementable::%s() @%p %s\n", __func__,
                        this, name_);
 #endif
+      }
+
+    template<typename T>
+      typename device_char_implementable<T>::value_type&
+      device_char_implementable<T>::impl (void) const
+      {
+        return static_cast<value_type&> (impl_);
       }
 
   // ==========================================================================

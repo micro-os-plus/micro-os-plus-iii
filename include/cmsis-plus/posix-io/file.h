@@ -287,6 +287,24 @@ namespace os
          * @}
          */
 
+        // ----------------------------------------------------------------------
+        /**
+         * @name Public Member Functions
+         * @{
+         */
+
+      public:
+
+        // Support functions.
+
+        value_type&
+        impl (void) const;
+
+        /**
+         * @}
+         */
+
+        // --------------------------------------------------------------------
       protected:
 
         /**
@@ -379,10 +397,17 @@ namespace os
         virtual int
         fsync (void);
 
+        // ----------------------------------------------------------------------
+        // Support functions.
+
+        value_type&
+        impl (void) const;
+
         /**
          * @}
          */
 
+        // --------------------------------------------------------------------
       protected:
 
         /**
@@ -450,6 +475,13 @@ namespace os
 #if defined(OS_TRACE_POSIX_IO_FILE)
         trace::printf ("file_implementable::%s() @%p\n", __func__, this);
 #endif
+      }
+
+    template<typename T>
+      typename file_implementable<T>::value_type&
+      file_implementable<T>::impl (void) const
+      {
+        return static_cast<value_type&> (impl_);
       }
 
     // ========================================================================
@@ -566,6 +598,13 @@ namespace os
           { locker_ };
 
         return file::fsync ();
+      }
+
+    template<typename T, typename L>
+      typename file_lockable<T, L>::value_type&
+      file_lockable<T, L>::impl (void) const
+      {
+        return static_cast<value_type&> (impl_);
       }
 
   // ==========================================================================

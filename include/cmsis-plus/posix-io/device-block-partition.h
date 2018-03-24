@@ -250,6 +250,24 @@ namespace os
          * @}
          */
 
+        // ----------------------------------------------------------------------
+        /**
+         * @name Public Member Functions
+         * @{
+         */
+
+      public:
+
+        // Support functions.
+
+        value_type&
+        impl (void) const;
+
+        /**
+         * @}
+         */
+
+        // ----------------------------------------------------------------------
       protected:
 
         /**
@@ -329,6 +347,12 @@ namespace os
         write_block (const void* buf, blknum_t blknum, std::size_t nblocks = 1)
             override;
 
+        // --------------------------------------------------------------------
+        // Support functions.
+
+        value_type&
+        impl (void) const;
+
         /**
          * @}
          */
@@ -392,6 +416,13 @@ namespace os
       {
         trace::printf ("device_block_partition_implementable::%s() @%p %s\n",
                        __func__, this, name_);
+      }
+
+    template<typename T>
+      typename device_block_partition_implementable<T>::value_type&
+      device_block_partition_implementable<T>::impl (void) const
+      {
+        return static_cast<value_type&> (impl_);
       }
 
     // ========================================================================
@@ -468,6 +499,13 @@ namespace os
         std::lock_guard<L> lock (locker_);
 
         return device_block_partition::write_block (buf, blknum, nblocks);
+      }
+
+    template<typename T, typename L>
+      typename device_block_partition_lockable<T, L>::value_type&
+      device_block_partition_lockable<T, L>::impl (void) const
+      {
+        return static_cast<value_type&> (impl_);
       }
 
   // ==========================================================================

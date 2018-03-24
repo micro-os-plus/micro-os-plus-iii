@@ -144,11 +144,14 @@ namespace os
       const char*
       name (void) const;
 
-      device_impl&
-      impl (void) const;
-
       static const char*
       device_prefix (void);
+
+      // ----------------------------------------------------------------------
+      // Support functions.
+
+      device_impl&
+      impl (void) const;
 
       /**
        * @}

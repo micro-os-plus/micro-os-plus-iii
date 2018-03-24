@@ -336,6 +336,24 @@ namespace os
          * @}
          */
 
+        // ----------------------------------------------------------------------
+        /**
+         * @name Public Member Functions
+         * @{
+         */
+
+      public:
+
+        // Support functions.
+
+        value_type&
+        impl (void) const;
+
+        /**
+         * @}
+         */
+
+        // ----------------------------------------------------------------------
       protected:
 
         /**
@@ -415,6 +433,12 @@ namespace os
         // http://pubs.opengroup.org/onlinepubs/9699919799/functions/closedir.html
         virtual int
         close (void) override;
+
+        // --------------------------------------------------------------------
+        // Support functions.
+
+        value_type&
+        impl (void) const;
 
         /**
          * @}
@@ -499,6 +523,13 @@ namespace os
 #endif
       }
 
+    template<typename T>
+      typename directory_implementable<T>::value_type&
+      directory_implementable<T>::impl (void) const
+      {
+        return static_cast<value_type&> (impl_);
+      }
+
     // ========================================================================
 
     template<typename T, typename L>
@@ -565,6 +596,13 @@ namespace os
           { locker_ };
 
         return directory::close ();
+      }
+
+    template<typename T, typename L>
+      typename directory_lockable<T, L>::value_type&
+      directory_lockable<T, L>::impl (void) const
+      {
+        return static_cast<value_type&> (impl_);
       }
 
   // ========================================================================

@@ -224,6 +224,24 @@ namespace os
          * @}
          */
 
+        // ----------------------------------------------------------------------
+        /**
+         * @name Public Member Functions
+         * @{
+         */
+
+      public:
+
+        // Support functions.
+
+        value_type&
+        impl (void) const;
+
+        /**
+         * @}
+         */
+
+        // ----------------------------------------------------------------------
       protected:
 
         /**
@@ -285,6 +303,13 @@ namespace os
         trace::printf ("tty_implementable::%s() @%p %s\n", __func__, this,
                        name_);
 #endif
+      }
+
+    template<typename T>
+      typename tty_implementable<T>::value_type&
+      tty_implementable<T>::impl (void) const
+      {
+        return static_cast<value_type&> (impl_);
       }
 
   // ==========================================================================
