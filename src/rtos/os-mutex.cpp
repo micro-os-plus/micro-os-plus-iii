@@ -533,11 +533,9 @@ namespace os
 
 #else
 
-      if (owner_ != nullptr) {
-          trace::printf ("%s() @%p %s still owned!\n", __func__, this, name ());
-      }
-      // assert (owner_ == nullptr);
-      assert (list_.empty ());
+      assert(owner_ == nullptr);
+      // There must be no threads waiting for this mutex.
+      assert(list_.empty ());
 
 #endif
     }
@@ -587,22 +585,13 @@ namespace os
           // For recursive mutexes, initialise counter.
           count_ = 1;
 
-          // When the mutex is acquired, some more actions are
-          // required, according to mutex attributes.
+          // Add mutex to the thread list.
+          mutexes_list* th_list =
+              reinterpret_cast<mutexes_list*> (&owner_->mutexes_);
+          th_list->link (*this);
 
-          if (robustness_ == robustness::robust)
-            {
-              mutexes_list* th_list =
-                  reinterpret_cast<mutexes_list*> (&owner_->mutexes_);
-              th_list->link (*this);
-            }
-          else
-            {
-              // Count the number of non-robust mutexes acquired by the thread.
-              // Terminating a thread with locked non-robust mutexes
-              // will trigger an assert.
-              ++(crt_thread->acquired_mutexes_);
-            }
+          // Count the number of mutexes acquired by the thread.
+          ++(owner_->acquired_mutexes_);
 
           if (protocol_ == protocol::protect)
             {
