@@ -36,10 +36,10 @@
 #include <cmsis-plus/posix-io/directory.h>
 
 #include <cmsis-plus/utils/lists.h>
-#include <cmsis-plus/estd/mutex>
 
 #include <cmsis-plus/diag/trace.h>
 
+#include <mutex>
 #include <cstdarg>
 #include <sys/stat.h>
 #include <utime.h>
@@ -940,7 +940,7 @@ namespace os
       file_system_lockable<T, L>::vmount (const char* path, unsigned int flags,
                                           std::va_list args)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { impl_instance_.locker () };
 
         return file_system::vmount (path, flags, args);
@@ -955,7 +955,7 @@ namespace os
       int
       file_system_lockable<T, L>::umount (int unsigned flags)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { impl_instance_.locker () };
 
         return file_system::umount (flags);
@@ -968,7 +968,7 @@ namespace os
       file_system_lockable<T, L>::vopen (const char* path, int oflag,
                                          std::va_list args)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { impl_instance_.locker () };
 
         return file_system::vopen (path, oflag, args);
@@ -978,7 +978,7 @@ namespace os
       directory*
       file_system_lockable<T, L>::opendir (const char* dirpath)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { impl_instance_.locker () };
 
         return file_system::opendir (dirpath);
@@ -990,7 +990,7 @@ namespace os
       int
       file_system_lockable<T, L>::mkdir (const char* path, mode_t mode)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { impl_instance_.locker () };
 
         return file_system::mkdir (path, mode);
@@ -1000,7 +1000,7 @@ namespace os
       int
       file_system_lockable<T, L>::rmdir (const char* path)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { impl_instance_.locker () };
 
         return file_system::rmdir (path);
@@ -1010,7 +1010,7 @@ namespace os
       void
       file_system_lockable<T, L>::sync (void)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { impl_instance_.locker () };
 
         return file_system::sync ();
@@ -1022,7 +1022,7 @@ namespace os
       int
       file_system_lockable<T, L>::chmod (const char* path, mode_t mode)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { impl_instance_.locker () };
 
         return file_system::chmod (path, mode);
@@ -1032,7 +1032,7 @@ namespace os
       int
       file_system_lockable<T, L>::stat (const char* path, struct stat* buf)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { impl_instance_.locker () };
 
         return file_system::stat (path, buf);
@@ -1042,7 +1042,7 @@ namespace os
       int
       file_system_lockable<T, L>::truncate (const char* path, off_t length)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { impl_instance_.locker () };
 
         return file_system::truncate (path, length);
@@ -1053,7 +1053,7 @@ namespace os
       file_system_lockable<T, L>::rename (const char* existing,
                                           const char* _new)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { impl_instance_.locker () };
 
         return file_system::rename (existing, _new);
@@ -1063,7 +1063,7 @@ namespace os
       int
       file_system_lockable<T, L>::unlink (const char* path)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { impl_instance_.locker () };
 
         return file_system::unlink (path);
@@ -1075,7 +1075,7 @@ namespace os
       file_system_lockable<T, L>::utime (const char* path,
                                          const struct utimbuf* times)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { impl_instance_.locker () };
 
         return file_system::utime (path, times);

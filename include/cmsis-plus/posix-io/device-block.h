@@ -501,7 +501,7 @@ namespace os
         trace::printf ("device_block_lockable::%s() @%p\n", __func__, this);
 #endif
 
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { locker_ };
 
         return device_block::close ();
@@ -516,7 +516,7 @@ namespace os
                        buf, nbyte, this);
 #endif
 
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { locker_ };
 
         return device_block::read (buf, nbyte);
@@ -531,7 +531,7 @@ namespace os
                        buf, nbyte, this);
 #endif
 
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { locker_ };
 
         return device_block::write (buf, nbyte);
@@ -546,7 +546,7 @@ namespace os
                        iov, iovcnt, this);
 #endif
 
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { locker_ };
 
         return device_block::writev (iov, iovcnt);
@@ -561,7 +561,7 @@ namespace os
                        this);
 #endif
 
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { locker_ };
 
         return device_block::vfcntl (cmd, args);
@@ -576,7 +576,7 @@ namespace os
                        this);
 #endif
 
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { locker_ };
 
         return device_block::vioctl (request, args);
@@ -591,7 +591,7 @@ namespace os
                        offset, whence, this);
 #endif
 
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { locker_ };
 
         return device_block::lseek (offset, whence);
@@ -607,7 +607,7 @@ namespace os
                        buf, blknum, nblocks, this);
 #endif
 
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { locker_ };
 
         return device_block::read_block (buf, blknum, nblocks);
@@ -624,7 +624,7 @@ namespace os
                        buf, blknum, nblocks, this);
 #endif
 
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { locker_ };
 
         return device_block::write_block (buf, blknum, nblocks);

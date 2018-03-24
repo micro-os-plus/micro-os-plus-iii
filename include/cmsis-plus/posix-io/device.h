@@ -34,7 +34,7 @@
 
 #include <cmsis-plus/posix-io/io.h>
 #include <cmsis-plus/utils/lists.h>
-#include <cmsis-plus/estd/mutex>
+#include <mutex>
 
 // ----------------------------------------------------------------------------
 

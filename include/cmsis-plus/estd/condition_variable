@@ -38,6 +38,7 @@
 
 #include <condition_variable>
 
+// Need this for std::mutex
 #include <cmsis-plus/estd/mutex>
 #include <memory>
 #include <chrono>

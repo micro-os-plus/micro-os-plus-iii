@@ -32,10 +32,13 @@
 
 // ----------------------------------------------------------------------------
 
-#include <cmsis-plus/utils/lists.h>
-#include <cmsis-plus/estd/mutex>
 
+#include <cmsis-plus/utils/lists.h>
 #include <cmsis-plus/posix/dirent.h>
+
+#include <cmsis-plus/diag/trace.h>
+
+#include <mutex>
 
 // ----------------------------------------------------------------------------
 
@@ -527,7 +530,7 @@ namespace os
         trace::printf ("directory_lockable::%s() @%p\n", __func__, this);
 #endif
 
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { locker_ };
 
         return directory::read ();
@@ -541,7 +544,7 @@ namespace os
         trace::printf ("directory_lockable::%s() @%p\n", __func__, this);
 #endif
 
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { locker_ };
 
         return directory::rewind ();
@@ -555,7 +558,7 @@ namespace os
         trace::printf ("directory_lockable::%s() @%p\n", __func__, this);
 #endif
 
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { locker_ };
 
         return directory::close ();

@@ -429,7 +429,7 @@ namespace os
                        __func__, request, this);
 #endif
 
-        estd::lock_guard<L> lock (locker_);
+        std::lock_guard<L> lock (locker_);
 
         return device_block_partition::vioctl (request, args);
       }
@@ -445,7 +445,7 @@ namespace os
                        __func__, buf, blknum, nblocks, this);
 #endif
 
-        estd::lock_guard<L> lock (locker_);
+        std::lock_guard<L> lock (locker_);
 
         return device_block_partition::read_block (buf, blknum, nblocks);
       }
@@ -461,7 +461,7 @@ namespace os
                        __func__, buf, blknum, nblocks, this);
 #endif
 
-        estd::lock_guard<L> lock (locker_);
+        std::lock_guard<L> lock (locker_);
 
         return device_block_partition::write_block (buf, blknum, nblocks);
       }

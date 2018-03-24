@@ -37,6 +37,7 @@
 #include <limits>
 #include <new>
 #include <cerrno>
+#include <mutex>
 
 // ----------------------------------------------------------------------------
 
@@ -1557,7 +1558,7 @@ namespace os
 #endif
 
           locker_type lk;
-          estd::lock_guard<locker_type> ulk
+          std::lock_guard<locker_type> ulk
             { lk };
 
           return static_cast<value_type*> (get_resource ()->allocate (
@@ -1580,7 +1581,7 @@ namespace os
 #endif
 
           locker_type lk;
-          estd::lock_guard<locker_type> ulk
+          std::lock_guard<locker_type> ulk
             { lk };
 
           get_resource ()->deallocate (addr, elements * sizeof(value_type),

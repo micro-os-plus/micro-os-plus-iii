@@ -34,8 +34,9 @@
 
 #include <cmsis-plus/posix-io/io.h>
 #include <cmsis-plus/utils/lists.h>
-#include <cmsis-plus/estd/mutex>
 #include <cmsis-plus/posix/utime.h>
+
+#include <mutex>
 
 // ----------------------------------------------------------------------------
 
@@ -477,7 +478,7 @@ namespace os
       int
       file_lockable<T, L>::close (void)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { locker_ };
 
         return file::close ();
@@ -487,7 +488,7 @@ namespace os
       ssize_t
       file_lockable<T, L>::read (void* buf, std::size_t nbyte)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { locker_ };
 
         return file::read (buf, nbyte);
@@ -497,7 +498,7 @@ namespace os
       ssize_t
       file_lockable<T, L>::write (const void* buf, std::size_t nbyte)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { locker_ };
 
         return file::write (buf, nbyte);
@@ -507,7 +508,7 @@ namespace os
       ssize_t
       file_lockable<T, L>::writev (const struct iovec* iov, int iovcnt)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { locker_ };
 
         return file::writev (iov, iovcnt);
@@ -517,7 +518,7 @@ namespace os
       int
       file_lockable<T, L>::vfcntl (int cmd, std::va_list args)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { locker_ };
 
         return file::vfcntl (cmd, args);
@@ -527,7 +528,7 @@ namespace os
       int
       file_lockable<T, L>::fstat (struct stat* buf)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { locker_ };
 
         return file::fstat (buf);
@@ -537,7 +538,7 @@ namespace os
       off_t
       file_lockable<T, L>::lseek (off_t offset, int whence)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { locker_ };
 
         return file::lseek (offset, whence);
@@ -547,7 +548,7 @@ namespace os
       int
       file_lockable<T, L>::ftruncate (off_t length)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { locker_ };
 
         return file::ftruncate (length);
@@ -557,7 +558,7 @@ namespace os
       int
       file_lockable<T, L>::fsync (void)
       {
-        estd::lock_guard<L> lock
+        std::lock_guard<L> lock
           { locker_ };
 
         return file::fsync ();
