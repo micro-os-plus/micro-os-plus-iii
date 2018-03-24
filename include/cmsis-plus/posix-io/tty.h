@@ -183,7 +183,7 @@ namespace os
     // ========================================================================
 
     template<typename T>
-      class tty_implementable : public device_char
+      class tty_implementable : public tty
       {
         // --------------------------------------------------------------------
 
@@ -285,7 +285,7 @@ namespace os
 
     template<typename T>
       tty_implementable<T>::tty_implementable (const char* name) :
-          device_char
+          tty
             { impl_instance_, name }, //
           impl_instance_
             { *this }
