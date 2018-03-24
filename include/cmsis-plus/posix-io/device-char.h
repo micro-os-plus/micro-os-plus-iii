@@ -155,6 +155,14 @@ namespace os
 
     public:
 
+      // Implementations
+
+      virtual off_t
+      do_lseek (off_t offset, int whence);
+
+      virtual void
+      do_sync (void);
+
       // ----------------------------------------------------------------------
 
       device_char&

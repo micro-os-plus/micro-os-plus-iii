@@ -80,6 +80,24 @@ namespace os
 #endif
     }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+    off_t
+    device_char_impl::do_lseek (off_t offset, int whence)
+    {
+      errno = ENOSYS; // Not implemented
+      return -1;
+    }
+
+#pragma GCC diagnostic pop
+
+    void
+    device_char_impl::do_sync (void)
+    {
+      errno = ENOSYS; // Not implemented
+    }
+
   // ==========================================================================
   } /* namespace posix */
 } /* namespace os */
