@@ -28,6 +28,10 @@
 #ifndef CMSIS_PLUS_POSIX_IO_TTY_H_
 #define CMSIS_PLUS_POSIX_IO_TTY_H_
 
+#if defined(OS_USE_OS_APP_CONFIG_H)
+#include <cmsis-plus/os-app-config.h>
+#endif
+
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/posix-io/device-char.h>
 #include <cmsis-plus/posix/termios.h>
