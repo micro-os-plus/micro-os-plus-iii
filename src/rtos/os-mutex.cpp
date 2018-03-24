@@ -744,6 +744,119 @@ namespace os
       return EWOULDBLOCK;
     }
 
+    result_t
+    mutex::internal_unlock_ (thread* th)
+    {
+      if (!recoverable_)
+        {
+          return ENOTRECOVERABLE;
+        }
+
+        {
+          // ----- Enter critical section -------------------------------------
+          scheduler::critical_section scs;
+
+          // Is the rightful owner?
+          if (owner_ == th)
+            {
+              if ((type_ == type::recursive) && (count_ > 1))
+                {
+                  --count_;
+#if defined(OS_TRACE_RTOS_MUTEX)
+                  trace::printf ("%s() @%p %s >%u\n", __func__, this, name (),
+                                 count_);
+#endif
+                  return result::ok;
+                }
+
+              --(owner_->acquired_mutexes_);
+
+              // Remove this mutex from the thread list; ineffective if
+              // not linked.
+              owner_links_.unlink ();
+
+              if (boosted_prio_ != thread::priority::none)
+                {
+                  mutexes_list* thread_mutexes =
+                      reinterpret_cast<mutexes_list*> (&owner_->mutexes_);
+
+                  if (thread_mutexes->empty ())
+                    {
+                      // If the owner thread has no more mutexes,
+                      // clear the inherited priority,
+                      // and the assigned priority will take precedence.
+                      boosted_prio_ = thread::priority::none;
+                    }
+                  else
+                    {
+                      // If the owner thread acquired other mutexes too,
+                      // compute the maximum boosted priority.
+                      thread::priority_t max_prio = 0;
+                      for (auto&& mx : *thread_mutexes)
+                        {
+                          if (mx.boosted_prio_ > max_prio)
+                            {
+                              max_prio = mx.boosted_prio_;
+                            }
+                        }
+                      boosted_prio_ = max_prio;
+                    }
+                  // Delayed until end of critical section.
+                  owner_->priority_inherited (boosted_prio_);
+                }
+
+              // Delayed until end of critical section.
+              list_.resume_one ();
+
+              // Finally release the mutex.
+              owner_ = nullptr;
+              count_ = 0;
+
+#if defined(OS_TRACE_RTOS_MUTEX)
+              trace::printf ("%s() @%p %s ULCK\n", __func__, this, name ());
+#endif
+
+              // POSIX: If a robust mutex whose owner died is unlocked without
+              // a call to consistent(), it shall be in a permanently
+              // unusable state and all attempts to lock the mutex
+              // shall fail with the error ENOTRECOVERABLE.
+
+              if (owner_dead_)
+                {
+                  owner_dead_ = false;
+
+                  if (!consistent_)
+                    {
+                      recoverable_ = false;
+                      return ENOTRECOVERABLE;
+                    }
+                }
+
+              return result::ok;
+            }
+
+          // Not owner, or not locked.
+          if (type_ == type::errorcheck || type_ == type::recursive
+              || robustness_ == robustness::robust)
+            {
+#if defined(OS_TRACE_RTOS_MUTEX)
+              trace::printf ("%s() EPERM @%p %s \n", __func__, this, name ());
+#endif
+              return EPERM;
+            }
+
+          // Normal no-robust mutexes owned by other threads have
+          // undefined behaviour.
+
+#if defined(OS_TRACE_RTOS_MUTEX)
+          trace::printf ("%s() ENOTRECOVERABLE @%p %s \n", __func__, this,
+                         name ());
+#endif
+          return ENOTRECOVERABLE;
+          // ----- Exit critical section --------------------------------------
+        }
+    }
+
     // Called from thread termination, in a critical section.
     void
     mutex::internal_mark_owner_dead_ (void)
@@ -1180,119 +1293,9 @@ namespace os
 
 #else
 
-      if (!recoverable_)
-        {
-          return ENOTRECOVERABLE;
-        }
-
       thread* crt_thread = &this_thread::thread ();
 
-        {
-          // ----- Enter critical section -------------------------------------
-          scheduler::critical_section scs;
-
-          // Is the rightful owner?
-          if (owner_ == crt_thread)
-            {
-              if ((type_ == type::recursive) && (count_ > 1))
-                {
-                  --count_;
-#if defined(OS_TRACE_RTOS_MUTEX)
-                  trace::printf ("%s() @%p %s >%u\n", __func__, this, name (),
-                                 count_);
-#endif
-                  return result::ok;
-                }
-
-              if (robustness_ != robustness::robust)
-                {
-                  --(owner_->acquired_mutexes_);
-                }
-
-              // Remove this mutex from the thread list; ineffective if
-              // not linked.
-              owner_links_.unlink ();
-
-              if (boosted_prio_ != thread::priority::none)
-                {
-                  mutexes_list* thread_mutexes =
-                      reinterpret_cast<mutexes_list*> (&owner_->mutexes_);
-
-                  if (thread_mutexes->empty ())
-                    {
-                      // If the owner thread has no more mutexes,
-                      // clear the inherited priority,
-                      // and the assigned priority will take precedence.
-                      boosted_prio_ = thread::priority::none;
-                    }
-                  else
-                    {
-                      // If the owner thread acquired other mutexes too,
-                      // compute the maximum boosted priority.
-                      thread::priority_t max_prio = 0;
-                      for (auto&& mx : *thread_mutexes)
-                        {
-                          if (mx.boosted_prio_ > max_prio)
-                            {
-                              max_prio = mx.boosted_prio_;
-                            }
-                        }
-                      boosted_prio_ = max_prio;
-                    }
-                  // Delayed until end of critical section.
-                  owner_->priority_inherited (boosted_prio_);
-                }
-
-              // Delayed until end of critical section.
-              list_.resume_one ();
-
-              // Finally release the mutex.
-              owner_ = nullptr;
-              count_ = 0;
-
-#if defined(OS_TRACE_RTOS_MUTEX)
-              trace::printf ("%s() @%p %s ULCK\n", __func__, this, name ());
-#endif
-
-              // POSIX: If a robust mutex whose owner died is unlocked without
-              // a call to consistent(), it shall be in a permanently
-              // unusable state and all attempts to lock the mutex
-              // shall fail with the error ENOTRECOVERABLE.
-
-              if (owner_dead_)
-                {
-                  owner_dead_ = false;
-
-                  if (!consistent_)
-                    {
-                      recoverable_ = false;
-                      return ENOTRECOVERABLE;
-                    }
-                }
-
-              return result::ok;
-            }
-
-          // Not owner, or not locked.
-          if (type_ == type::errorcheck || type_ == type::recursive
-              || robustness_ == robustness::robust)
-            {
-#if defined(OS_TRACE_RTOS_MUTEX)
-              trace::printf ("%s() EPERM @%p %s \n", __func__, this, name ());
-#endif
-              return EPERM;
-            }
-
-          // Normal no-robust mutexes owned by other threads have
-          // undefined behaviour.
-
-#if defined(OS_TRACE_RTOS_MUTEX)
-          trace::printf ("%s() ENOTRECOVERABLE @%p %s \n", __func__, this,
-                         name ());
-#endif
-          return ENOTRECOVERABLE;
-          // ----- Exit critical section --------------------------------------
-        }
+      return internal_unlock_ (crt_thread);
 
 #endif
     }

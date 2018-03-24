@@ -627,6 +627,14 @@ namespace os
       result_t
       internal_try_lock_ (thread* crt_thread);
 
+      /**
+       * @brief Internal function used to unlock the mutex.
+       * @param th Pointer to thread.
+       * @return
+       */
+      result_t
+      internal_unlock_ (thread* th);
+
       void
       internal_mark_owner_dead_ (void);
 
