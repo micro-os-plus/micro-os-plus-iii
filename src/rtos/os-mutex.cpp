@@ -571,7 +571,7 @@ namespace os
      * Should be called from a scheduler critical section.
      */
     result_t
-    mutex::internal_try_lock_ (thread* crt_thread)
+    mutex::internal_try_lock_ (class thread* th)
     {
       // Save the initial owner for later protocol tests.
       thread* saved_owner = owner_;
@@ -580,7 +580,7 @@ namespace os
       if (owner_ == nullptr)
         {
           // If the mutex has no owner, own it.
-          owner_ = crt_thread;
+          owner_ = th;
 
           // For recursive mutexes, initialise counter.
           count_ = 1;
@@ -595,7 +595,7 @@ namespace os
 
           if (protocol_ == protocol::protect)
             {
-              if (crt_thread->priority () > prio_ceiling_)
+              if (th->priority () > prio_ceiling_)
                 {
                   // Prio ceiling must be at least the priority of the
                   // highest priority thread.
@@ -624,7 +624,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MUTEX)
           trace::printf ("%s() @%p %s by %p %s LCK\n", __func__, this, name (),
-                         crt_thread, crt_thread->name ());
+                         th, th->name ());
 #endif
           // If the owning thread of a robust mutex terminates while
           // holding the mutex lock, the next thread that acquires the
@@ -638,7 +638,7 @@ namespace os
         }
 
       // Relock? (lock by the same thread).
-      if (saved_owner == crt_thread)
+      if (saved_owner == th)
         {
           // The mutex was requested again by the same thread.
           if (type_ == type::recursive)
@@ -658,7 +658,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MUTEX)
               trace::printf ("%s() @%p %s by %p %s >%u\n", __func__, this,
-                             name (), crt_thread, crt_thread->name (), count_);
+                             name (), th, th->name (), count_);
 #endif
               return result::ok;
             }
@@ -699,13 +699,13 @@ namespace os
           // manner.
           if (protocol_ == protocol::inherit)
             {
-              thread::priority_t prio = crt_thread->priority ();
+              thread::priority_t prio = th->priority ();
               boosted_prio_ = prio;
 
-              mutexes_list* th_list =
-                  reinterpret_cast<mutexes_list*> (&owner_->mutexes_);
               if (owner_links_.unlinked ())
                 {
+                  mutexes_list* th_list =
+                      reinterpret_cast<mutexes_list*> (&owner_->mutexes_);
                   th_list->link (*this);
                 }
 
@@ -721,8 +721,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MUTEX)
               trace::printf ("%s() @%p %s boost %u by %p %s \n", __func__, this,
-                             name (), boosted_prio_, crt_thread,
-                             crt_thread->name ());
+                             name (), boosted_prio_, th, th->name ());
 #endif
 
               return EWOULDBLOCK;
@@ -1302,7 +1301,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      assert (!interrupts::in_handler_mode ());
+      assert(!interrupts::in_handler_mode ());
 
 #if defined(OS_USE_RTOS_PORT_MUTEX)
 

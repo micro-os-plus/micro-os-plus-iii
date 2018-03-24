@@ -619,13 +619,12 @@ namespace os
 
       /**
        * @brief Internal function used to lock the mutex.
-       * @par Parameters
-       *  None.
-       * @retval true The mutex was locked.
+       * @par th Pointer to thread.
+       * @retval result::ok The mutex was locked.
        * @retval false The mutex was not locked.
        */
       result_t
-      internal_try_lock_ (thread* crt_thread);
+      internal_try_lock_ (thread* th);
 
       /**
        * @brief Internal function used to unlock the mutex.
