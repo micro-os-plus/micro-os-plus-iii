@@ -125,8 +125,10 @@ namespace os
             {
               descriptors_array__[i] = io;
               io->file_descriptor (static_cast<int> (i));
+#if defined(OS_TRACE_POSIX_IO_FILE_DESCRIPTORS_MANAGER)
               trace::printf ("file_descriptors_manager::%s(%p) fd=%d\n",
                              __func__, io, i);
+#endif
               return static_cast<int> (i);
             }
         }

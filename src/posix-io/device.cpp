@@ -107,8 +107,10 @@ namespace os
         }
       ++(impl ().open_count_);
       ret = file_descriptor ();
+#if defined(OS_TRACE_POSIX_IO_DEVICE)
       trace::printf ("device::%s(\"%s\")=%p fd=%d\n", __func__,
                      path ? path : "", this, ret);
+#endif
 
       return ret;
     }
@@ -164,7 +166,9 @@ namespace os
     void
     device::sync (void)
     {
+#if defined(OS_TRACE_POSIX_IO_DEVICE)
       trace::printf ("device::%s() @%p\n", __func__, this);
+#endif
 
       impl ().do_sync ();
     }

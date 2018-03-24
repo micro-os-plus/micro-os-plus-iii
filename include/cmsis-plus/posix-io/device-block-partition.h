@@ -407,15 +407,19 @@ namespace os
           impl_instance_
             { *this, parent }
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
         trace::printf ("device_block_partition_implementable::%s(\"%s\")=@%p\n",
                        __func__, name_, this);
+#endif
       }
 
     template<typename T>
       device_block_partition_implementable<T>::~device_block_partition_implementable ()
       {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
         trace::printf ("device_block_partition_implementable::%s() @%p %s\n",
                        __func__, this, name_);
+#endif
       }
 
     template<typename T>
