@@ -900,6 +900,16 @@
 #define OS_TRACE_LIBCPP_MEMORY_RESOURCE
 
 /**
+ * @brief Enable trace messages for list constructors.
+ */
+#define OS_TRACE_UTILS_LISTS_CONSTRUCT
+
+/**
+ * @brief Enable trace messages for list insert and unlink.
+ */
+#define OS_TRACE_UTILS_LISTS
+
+/**
  * @brief Define the ITM stimulus port used for the trace messages.
  *
  * @details
