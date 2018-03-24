@@ -984,7 +984,7 @@ namespace os
           assert(children_.empty ());
           parent_ = nullptr;
 
-          // Non-robust mutexes acquired.
+          assert(mutexes_.empty ());
           assert(acquired_mutexes_ == 0);
 
           func_result_ = exit_ptr;
@@ -1066,10 +1066,15 @@ namespace os
           // ----- Enter critical section -------------------------------------
           scheduler::critical_section scs;
 
-          mutexes_list* mx_list = reinterpret_cast<mutexes_list*> (&mutexes_);
-          for (auto&& mx : *mx_list)
+          mutexes_list& mx_list = reinterpret_cast<mutexes_list&> (mutexes_);
+          while (not mx_list.empty ())
             {
-              mx.internal_mark_owner_dead_ ();
+              auto mx = mx_list.unlink_head ();
+
+              mx->internal_mark_owner_dead_ ();
+
+              // Unlock the mutex as owned by the thread itself.
+              mx->internal_unlock_ (this);
             }
           // ----- Exit critical section --------------------------------------
         }
@@ -1144,13 +1149,6 @@ namespace os
           assert(children_.empty ());
           parent_ = nullptr;
 
-          if (acquired_mutexes_ != 0) {
-              trace::printf ("%s() @%p %s has %u acquired mutexes!\n", __func__, this,
-                             name (), acquired_mutexes_);
-              // TODO: release?
-          }
-          // assert(acquired_mutexes_ == 0);
-
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
           port::thread::destroy_other (this);
@@ -1160,6 +1158,10 @@ namespace os
           func_result_ = nullptr;
 
           internal_destroy_ ();
+
+          // Must have been cleaned before.
+          assert(mutexes_.empty ());
+          assert(acquired_mutexes_ == 0);
 
           // ----- Exit critical section --------------------------------------
         }
