@@ -1008,7 +1008,7 @@ namespace os
     static_double_list::static_double_list ()
     {
       // By all means, do not add any code here.
-      // The contructor was not `default` to benefit from inline.
+      // The constructor was not `default` to benefit from inline.
     }
 
     /**

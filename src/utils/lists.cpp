@@ -62,7 +62,7 @@ namespace os
       // Check if not already unlinked.
       if (unlinked ())
         {
-          assert (prev_ == nullptr);
+          assert(prev_ == nullptr);
 #if defined(OS_TRACE_UTILS_LISTS)
           trace::printf ("%s() %p nop\n", __func__, this);
 #endif
@@ -119,9 +119,9 @@ namespace os
       trace::printf ("%s() n=%p after %p\n", __func__, &node, after);
 #endif
 
-      assert (node.prev () == nullptr);
-      assert (node.next () == nullptr);
-      assert (after->next () != nullptr);
+      assert(node.prev () == nullptr);
+      assert(node.next () == nullptr);
+      assert(after->next () != nullptr);
 
       // Make the new node point to its neighbours.
       node.prev (after);
@@ -140,7 +140,7 @@ namespace os
      */
     double_list::double_list ()
     {
-#if defined(OS_TRACE_UTILS_LISTS_CONSTRUCT)
+#if defined(OS_TRACE_UTILS_LISTS_CONSTRUCT) || defined(OS_TRACE_UTILS_LISTS)
       trace::printf ("%s() %p \n", __func__, this);
 #endif
 
@@ -153,11 +153,11 @@ namespace os
      */
     double_list::~double_list ()
     {
-#if defined(OS_TRACE_UTILS_LISTS_CONSTRUCT)
+#if defined(OS_TRACE_UTILS_LISTS_CONSTRUCT) || defined(OS_TRACE_UTILS_LISTS)
       trace::printf ("%s() %p \n", __func__, this);
 #endif
 
-      assert (empty ());
+      assert(empty ());
     }
 
   } /* namespace utils */

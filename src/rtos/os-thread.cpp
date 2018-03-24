@@ -231,13 +231,13 @@ namespace os
       catch (std::exception e)
         {
           trace::printf ("%s() @%p %s top exception \"%s\".\n", __func__,
-                         thread, thread->name (), e.what ());
+              thread, thread->name (), e.what ());
           exit_ptr = nullptr;
         }
       catch (...)
         {
           trace::printf ("%s() @%p %s top exception.\n", __func__, thread,
-                         thread->name ());
+              thread->name ());
           exit_ptr = nullptr;
         }
 #else
@@ -547,7 +547,7 @@ namespace os
     {
 #if defined(OS_TRACE_RTOS_THREAD_CONTEXT)
       trace::printf ("%s() @%p %s %u\n", __func__, this, name (),
-          prio_assigned_);
+                     prio_assigned_);
 #endif
 
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)
@@ -1182,7 +1182,7 @@ namespace os
     {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X) @%p %s <0x%X\n", __func__, mask, this, name (),
-          event_flags_.mask ());
+                     event_flags_.mask ());
 #endif
 
       result_t res = event_flags_.raise (mask, oflags);
@@ -1191,7 +1191,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X) @%p %s >0x%X\n", __func__, mask, this, name (),
-          event_flags_.mask ());
+                     event_flags_.mask ());
 #endif
 
       return res;
@@ -1207,7 +1207,7 @@ namespace os
     {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X,%u) @%p %s <0x%X\n", __func__, mask, mode, this,
-          name (), event_flags_.mask ());
+                     name (), event_flags_.mask ());
 #endif
 
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
@@ -1221,7 +1221,7 @@ namespace os
             {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
               trace::printf ("%s(0x%X,%u) @%p %s >0x%X\n", __func__, mask, mode,
-                  this, name (), event_flags_.mask ());
+                             this, name (), event_flags_.mask ());
 #endif
               return result::ok;
             }
@@ -1241,11 +1241,11 @@ namespace os
                 {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
                   clock::duration_t slept_ticks =
-                  static_cast<clock::duration_t> (clock_->now ()
-                      - begin_timestamp);
+                      static_cast<clock::duration_t> (clock_->now ()
+                          - begin_timestamp);
                   trace::printf ("%s(0x%X,%u) in %d @%p %s >0x%X\n", __func__,
-                      mask, mode, slept_ticks, this, name (),
-                      event_flags_.mask ());
+                                 mask, mode, slept_ticks, this, name (),
+                                 event_flags_.mask ());
 #endif
                   return result::ok;
                 }
@@ -1258,7 +1258,7 @@ namespace os
             {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
               trace::printf ("%s(0x%X,%u) EINTR @%p %s\n", __func__, mask, mode,
-                  this, name ());
+                             this, name ());
 #endif
               return EINTR;
             }
@@ -1274,7 +1274,7 @@ namespace os
     {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X,%u) @%p %s <0x%X\n", __func__, mask, mode, this,
-          name (), event_flags_.mask ());
+                     name (), event_flags_.mask ());
 #endif
 
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
@@ -1287,7 +1287,7 @@ namespace os
             {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
               trace::printf ("%s(0x%X,%u) @%p %s >0x%X\n", __func__, mask, mode,
-                  this, name (), event_flags_.mask ());
+                             this, name (), event_flags_.mask ());
 #endif
               return result::ok;
             }
@@ -1295,7 +1295,7 @@ namespace os
             {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
               trace::printf ("%s(0x%X,%u) EWOULDBLOCK @%p %s \n", __func__,
-                  mask, mode, this, name ());
+                             mask, mode, this, name ());
 #endif
               return EWOULDBLOCK;
             }
@@ -1311,7 +1311,7 @@ namespace os
     {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X,%u,%u) @%p %s <0x%X\n", __func__, mask, timeout,
-          mode, this, name (), event_flags_.mask ());
+                     mode, this, name (), event_flags_.mask ());
 #endif
 
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
@@ -1325,8 +1325,8 @@ namespace os
             {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
               trace::printf ("%s(0x%X,%u,%u) @%p %s >0x%X\n", __func__, mask,
-                  timeout, mode, this, name (),
-                  event_flags_.mask ());
+                             timeout, mode, this, name (),
+                             event_flags_.mask ());
 #endif
               return result::ok;
             }
@@ -1354,12 +1354,12 @@ namespace os
                 {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
                   clock::duration_t slept_ticks =
-                  static_cast<clock::duration_t> (clock_->steady_now ()
-                      - begin_timestamp);
+                      static_cast<clock::duration_t> (clock_->steady_now ()
+                          - begin_timestamp);
                   trace::printf ("%s(0x%X,%u,%u) in %u @%p %s >0x%X\n",
-                      __func__, mask, timeout, mode,
-                      static_cast<unsigned int> (slept_ticks), this,
-                      name (), event_flags_.mask ());
+                                 __func__, mask, timeout, mode,
+                                 static_cast<unsigned int> (slept_ticks), this,
+                                 name (), event_flags_.mask ());
 #endif
                   return result::ok;
                 }
@@ -1392,7 +1392,7 @@ namespace os
             {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
               trace::printf ("%s(0x%X,%u,%u) EINTR @%p %s\n", __func__, mask,
-                  timeout, mode, this, name ());
+                             timeout, mode, this, name ());
 #endif
               return EINTR;
             }
@@ -1401,7 +1401,7 @@ namespace os
             {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
               trace::printf ("%s(0x%X,%u,%u) ETIMEDOUT @%p %s\n", __func__,
-                  mask, timeout, mode, this, name ());
+                             mask, timeout, mode, this, name ());
 #endif
               return ETIMEDOUT;
             }
@@ -1434,7 +1434,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X)=0x%X @%p %s\n", __func__, mask,
-          event_flags_.mask (), this, name ());
+                     event_flags_.mask (), this, name ());
 #endif
       // Return the selected bits.
       return ret;
@@ -1450,7 +1450,7 @@ namespace os
     {
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X) @%p %s <0x%X\n", __func__, mask, this, name (),
-          event_flags_.mask ());
+                     event_flags_.mask ());
 #endif
 
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
@@ -1459,7 +1459,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X) @%p %s >0x%X\n", __func__, mask, this, name (),
-          event_flags_.mask ());
+                     event_flags_.mask ());
 #endif
       return res;
     }
