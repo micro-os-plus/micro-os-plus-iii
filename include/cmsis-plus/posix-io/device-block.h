@@ -265,7 +265,8 @@ namespace os
 
       public:
 
-        device_block_implementable (const char* name);
+        template<typename ... Args>
+          device_block_implementable (const char* name, Args&&... args);
 
         /**
          * @cond ignore
@@ -343,7 +344,9 @@ namespace os
 
       public:
 
-        device_block_lockable (const char* name, lockable_type& locker);
+        template<typename ... Args>
+          device_block_lockable (const char* name, lockable_type& locker,
+                                 Args&&... args);
 
         /**
          * @cond ignore
@@ -478,18 +481,19 @@ namespace os
     // ========================================================================
 
     template<typename T>
-      device_block_implementable<T>::device_block_implementable (
-          const char* name) :
-          device_block
-            { impl_instance_, name }, //
-          impl_instance_
-            { *this }
-      {
+      template<typename ... Args>
+        device_block_implementable<T>::device_block_implementable (
+            const char* name, Args&&... args) :
+            device_block
+              { impl_instance_, name }, //
+            impl_instance_
+              { *this, std::forward<Args>(args)... }
+        {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
-        trace::printf ("device_block_implementable::%s(\"%s\")=@%p\n", __func__,
-                       name_, this);
+          trace::printf ("device_block_implementable::%s(\"%s\")=@%p\n",
+                         __func__, name_, this);
 #endif
-      }
+        }
 
     template<typename T>
       device_block_implementable<T>::~device_block_implementable ()
@@ -510,19 +514,20 @@ namespace os
     // ========================================================================
 
     template<typename T, typename L>
-      device_block_lockable<T, L>::device_block_lockable (const char* name,
-                                                          lockable_type& locker) :
-          device_block
-            { impl_instance_, name }, //
-          impl_instance_
-            { *this }, //
-          locker_ (locker)
-      {
+      template<typename ... Args>
+        device_block_lockable<T, L>::device_block_lockable (
+            const char* name, lockable_type& locker, Args&&... args) :
+            device_block
+              { impl_instance_, name }, //
+            impl_instance_
+              { *this, std::forward<Args>(args)... }, //
+            locker_ (locker)
+        {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
-        trace::printf ("device_block_lockable::%s(\"%s\")=@%p\n", __func__,
-                       name_, this);
+          trace::printf ("device_block_lockable::%s(\"%s\")=@%p\n", __func__,
+                         name_, this);
 #endif
-      }
+        }
 
     template<typename T, typename L>
       device_block_lockable<T, L>::~device_block_lockable ()

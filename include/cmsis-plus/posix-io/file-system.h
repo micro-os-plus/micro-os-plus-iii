@@ -526,7 +526,9 @@ namespace os
 
       public:
 
-        file_system_implementable (const char* name, device_block& device);
+        template<typename ... Args>
+          file_system_implementable (const char* name, device_block& device,
+                                     Args&&... args);
 
         /**
          * @cond ignore
@@ -603,8 +605,9 @@ namespace os
 
       public:
 
-        file_system_lockable (const char* name, device_block& device,
-                              lockable_type& locker);
+        template<typename ... Args>
+          file_system_lockable (const char* name, device_block& device,
+                                lockable_type& locker, Args&&... args);
 
         /**
          * @cond ignore
@@ -934,18 +937,19 @@ namespace os
     // ========================================================================
 
     template<typename T>
-      file_system_implementable<T>::file_system_implementable (
-          const char* name, device_block& device) :
-          file_system
-            { impl_instance_, name }, //
-          impl_instance_
-            { *this, device }
-      {
+      template<typename ... Args>
+        file_system_implementable<T>::file_system_implementable (
+            const char* name, device_block& device, Args&&... args) :
+            file_system
+              { impl_instance_, name }, //
+            impl_instance_
+              { *this, device, std::forward<Args>(args)... }
+        {
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
-        trace::printf ("file_system_implementable::%s(\"%s\")=@%p\n", __func__,
-                       name_, this);
+          trace::printf ("file_system_implementable::%s(\"%s\")=@%p\n",
+                         __func__, name_, this);
 #endif
-      }
+        }
 
     template<typename T>
       file_system_implementable<T>::~file_system_implementable ()
@@ -966,18 +970,20 @@ namespace os
     // ========================================================================
 
     template<typename T, typename L>
-      file_system_lockable<T, L>::file_system_lockable (const char* name,
-                                                        device_block& device,
-                                                        lockable_type& locker) :
-          file_system
-            { impl_instance_, name }, //
-          impl_instance_
-            { *this, device, locker }
-      {
+      template<typename ... Args>
+        file_system_lockable<T, L>::file_system_lockable (const char* name,
+                                                          device_block& device,
+                                                          lockable_type& locker,
+                                                          Args&&... args) :
+            file_system
+              { impl_instance_, name }, //
+            impl_instance_
+              { *this, device, locker, std::forward<Args>(args)... }
+        {
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
-        trace::printf ("file_system_lockable::%s()=%p\n", __func__, this);
+          trace::printf ("file_system_lockable::%s()=%p\n", __func__, this);
 #endif
-      }
+        }
 
     template<typename T, typename L>
       file_system_lockable<T, L>::~file_system_lockable ()

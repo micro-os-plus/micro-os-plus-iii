@@ -234,8 +234,10 @@ namespace os
 
       public:
 
-        device_block_partition_implementable (const char* name,
-                                              device_block& parent);
+        template<typename ... Args>
+          device_block_partition_implementable (const char* name,
+                                                device_block& parent,
+                                                Args&&... args);
 
         /**
          * @cond ignore
@@ -315,8 +317,11 @@ namespace os
 
       public:
 
-        device_block_partition_lockable (const char* name, device_block& parent,
-                                         lockable_type& locker);
+        template<typename ... Args>
+          device_block_partition_lockable (const char* name,
+                                           device_block& parent,
+                                           lockable_type& locker,
+                                           Args&&... args);
 
         /**
          * @cond ignore
@@ -413,18 +418,20 @@ namespace os
     // ========================================================================
 
     template<typename T>
-      device_block_partition_implementable<T>::device_block_partition_implementable (
-          const char* name, device_block& parent) :
-          device_block_partition
-            { impl_instance_, name }, //
-          impl_instance_
-            { *this, parent }
-      {
+      template<typename ... Args>
+        device_block_partition_implementable<T>::device_block_partition_implementable (
+            const char* name, device_block& parent, Args&&... args) :
+            device_block_partition
+              { impl_instance_, name }, //
+            impl_instance_
+              { *this, parent, std::forward<Args>(args)... }
+        {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
-        trace::printf ("device_block_partition_implementable::%s(\"%s\")=@%p\n",
-                       __func__, name_, this);
+          trace::printf (
+              "device_block_partition_implementable::%s(\"%s\")=@%p\n",
+              __func__, name_, this);
 #endif
-      }
+        }
 
     template<typename T>
       device_block_partition_implementable<T>::~device_block_partition_implementable ()
@@ -445,20 +452,22 @@ namespace os
     // ========================================================================
 
     template<typename T, typename L>
-      device_block_partition_lockable<T, L>::device_block_partition_lockable (
-          const char* name, device_block& parent, lockable_type& locker) :
-          device_block_partition
-            { impl_instance_, name }, //
-          impl_instance_
-            { *this, parent }, //
-          locker_ (locker)
-      {
+      template<typename ... Args>
+        device_block_partition_lockable<T, L>::device_block_partition_lockable (
+            const char* name, device_block& parent, lockable_type& locker,
+            Args&&... args) :
+            device_block_partition
+              { impl_instance_, name }, //
+            impl_instance_
+              { *this, parent, std::forward<Args>(args)... }, //
+            locker_ (locker)
+        {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
-        trace::printf ("device_block_partition_lockable::%s(\"%s\")=@%p\n",
-                       __func__, name_, this);
+          trace::printf ("device_block_partition_lockable::%s(\"%s\")=@%p\n",
+                         __func__, name_, this);
 #endif
 
-      }
+        }
 
     template<typename T, typename L>
       device_block_partition_lockable<T, L>::~device_block_partition_lockable ()
@@ -481,7 +490,8 @@ namespace os
                        __func__, request, this);
 #endif
 
-        std::lock_guard<L> lock (locker_);
+        std::lock_guard<L> lock
+          { locker_ };
 
         return device_block_partition::vioctl (request, args);
       }
@@ -497,7 +507,8 @@ namespace os
                        __func__, buf, blknum, nblocks, this);
 #endif
 
-        std::lock_guard<L> lock (locker_);
+        std::lock_guard<L> lock
+          { locker_ };
 
         return device_block_partition::read_block (buf, blknum, nblocks);
       }
@@ -513,7 +524,8 @@ namespace os
                        __func__, buf, blknum, nblocks, this);
 #endif
 
-        std::lock_guard<L> lock (locker_);
+        std::lock_guard<L> lock
+          { locker_ };
 
         return device_block_partition::write_block (buf, blknum, nblocks);
       }
