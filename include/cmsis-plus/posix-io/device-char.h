@@ -198,7 +198,8 @@ namespace os
 
       public:
 
-        device_char_implementable (const char* name);
+        template<typename ... Args>
+          device_char_implementable (const char* name, Args&&... args);
 
         /**
          * @cond ignore
@@ -283,17 +284,19 @@ namespace os
     // ========================================================================
 
     template<typename T>
-      device_char_implementable<T>::device_char_implementable (const char* name) :
-          device_char
-            { impl_instance_, name }, //
-          impl_instance_
-            { *this }
-      {
+      template<typename ... Args>
+        device_char_implementable<T>::device_char_implementable (
+            const char* name, Args&&... args) :
+            device_char
+              { impl_instance_, name }, //
+            impl_instance_
+              { *this, std::forward<Args>(args)... }
+        {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_CHAR)
-        trace::printf ("device_char_implementable::%s(\"%s\")=@%p\n", __func__,
-                       name_, this);
+          trace::printf ("device_char_implementable::%s(\"%s\")=@%p\n",
+                         __func__, name_, this);
 #endif
-      }
+        }
 
     template<typename T>
       device_char_implementable<T>::~device_char_implementable ()

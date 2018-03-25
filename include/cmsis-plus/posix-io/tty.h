@@ -211,7 +211,8 @@ namespace os
 
       public:
 
-        tty_implementable (const char* name);
+        template<typename ... Args>
+          tty_implementable (const char* name, Args&&... args);
 
         /**
          * @cond ignore
@@ -296,17 +297,19 @@ namespace os
     // ========================================================================
 
     template<typename T>
-      tty_implementable<T>::tty_implementable (const char* name) :
-          tty
-            { impl_instance_, name }, //
-          impl_instance_
-            { *this }
-      {
+      template<typename ... Args>
+        tty_implementable<T>::tty_implementable (const char* name,
+                                                 Args&&... args) :
+            tty
+              { impl_instance_, name }, //
+            impl_instance_
+              { *this, std::forward<Args>(args)... }
+        {
 #if defined(OS_TRACE_POSIX_IO_TTY)
-        trace::printf ("tty_implementable::%s(\"%s\")=@%p\n", __func__, name_,
-                       this);
+          trace::printf ("tty_implementable::%s(\"%s\")=@%p\n", __func__, name_,
+                         this);
 #endif
-      }
+        }
 
     template<typename T>
       tty_implementable<T>::~tty_implementable ()
