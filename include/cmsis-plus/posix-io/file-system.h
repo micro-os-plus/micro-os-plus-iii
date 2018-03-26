@@ -63,7 +63,7 @@ namespace os
     class io;
     class file;
     class directory;
-    class device_block;
+    class block_device;
 
     class file_system_impl;
 
@@ -305,7 +305,7 @@ namespace os
       // --------------------------------------------------------------------
       // Support functions.
 
-      device_block&
+      block_device&
       device (void) const;
 
       file_system_impl&
@@ -384,7 +384,7 @@ namespace os
 
     public:
 
-      file_system_impl (file_system& self, device_block& device);
+      file_system_impl (file_system& self, block_device& device);
 
       /**
        * @cond ignore
@@ -480,7 +480,7 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
-      device_block&
+      block_device&
       device (void) const;
 
       file_system&
@@ -499,7 +499,7 @@ namespace os
 
       file_system& self_;
 
-      device_block& device_;
+      block_device& device_;
 
       /**
        * @endcond
@@ -527,7 +527,7 @@ namespace os
       public:
 
         template<typename ... Args>
-          file_system_implementable (const char* name, device_block& device,
+          file_system_implementable (const char* name, block_device& device,
                                      Args&&... args);
 
         /**
@@ -606,7 +606,7 @@ namespace os
       public:
 
         template<typename ... Args>
-          file_system_lockable (const char* name, device_block& device,
+          file_system_lockable (const char* name, block_device& device,
                                 lockable_type& locker, Args&&... args);
 
         /**
@@ -778,7 +778,7 @@ namespace os
 
     // ========================================================================
 
-    inline device_block&
+    inline block_device&
     file_system_impl::device (void) const
     {
       return device_;
@@ -939,7 +939,7 @@ namespace os
     template<typename T>
       template<typename ... Args>
         file_system_implementable<T>::file_system_implementable (
-            const char* name, device_block& device, Args&&... args) :
+            const char* name, block_device& device, Args&&... args) :
             file_system
               { impl_instance_, name }, //
             impl_instance_
@@ -972,7 +972,7 @@ namespace os
     template<typename T, typename L>
       template<typename ... Args>
         file_system_lockable<T, L>::file_system_lockable (const char* name,
-                                                          device_block& device,
+                                                          block_device& device,
                                                           lockable_type& locker,
                                                           Args&&... args) :
             file_system

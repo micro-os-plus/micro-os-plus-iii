@@ -36,7 +36,7 @@
 #include <cmsis-plus/os-app-config.h>
 #endif
 
-#include <cmsis-plus/posix-io/device-block.h>
+#include <cmsis-plus/posix-io/block-device.h>
 
 // ----------------------------------------------------------------------------
 
@@ -46,16 +46,16 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    class device_block_partition_impl;
+    class block_device_partition_impl;
 
     // ========================================================================
 
     /**
      * @brief Block device partition class.
-     * @headerfile device-block-partition.h <cmsis-plus/posix-io/device-block-partitions.h>
+     * @headerfile block-device-partition.h <cmsis-plus/posix-io/block-device-partitions.h>
      * @ingroup cmsis-plus-posix-io-base
      */
-    class device_block_partition : public device_block
+    class block_device_partition : public block_device
     {
       // ----------------------------------------------------------------------
 
@@ -66,26 +66,26 @@ namespace os
 
     public:
 
-      device_block_partition (device_block_impl& impl, const char* name);
+      block_device_partition (block_device_impl& impl, const char* name);
 
       /**
        * @cond ignore
        */
 
       // The rule of five.
-      device_block_partition (const device_block_partition&) = delete;
-      device_block_partition (device_block_partition&&) = delete;
-      device_block_partition&
-      operator= (const device_block_partition&) = delete;
-      device_block_partition&
-      operator= (device_block_partition&&) = delete;
+      block_device_partition (const block_device_partition&) = delete;
+      block_device_partition (block_device_partition&&) = delete;
+      block_device_partition&
+      operator= (const block_device_partition&) = delete;
+      block_device_partition&
+      operator= (block_device_partition&&) = delete;
 
       /**
        * @endcond
        */
 
       virtual
-      ~device_block_partition ();
+      ~block_device_partition ();
 
       /**
        * @}
@@ -105,7 +105,7 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
-      device_block_partition_impl&
+      block_device_partition_impl&
       impl (void) const;
 
       /**
@@ -115,11 +115,11 @@ namespace os
 
     // ========================================================================
 
-    class device_block_partition_impl : public device_block_impl
+    class block_device_partition_impl : public block_device_impl
     {
       // ----------------------------------------------------------------------
 
-      friend device_block_partition;
+      friend block_device_partition;
 
       // ----------------------------------------------------------------------
 
@@ -130,27 +130,27 @@ namespace os
 
     public:
 
-      device_block_partition_impl (device_block_partition& self,
-                                   device_block& parent);
+      block_device_partition_impl (block_device_partition& self,
+                                   block_device& parent);
 
       /**
        * @cond ignore
        */
 
       // The rule of five.
-      device_block_partition_impl (const device_block_partition_impl&) = delete;
-      device_block_partition_impl (device_block_partition_impl&&) = delete;
-      device_block_partition_impl&
-      operator= (const device_block_partition_impl&) = delete;
-      device_block_partition_impl&
-      operator= (device_block_partition_impl&&) = delete;
+      block_device_partition_impl (const block_device_partition_impl&) = delete;
+      block_device_partition_impl (block_device_partition_impl&&) = delete;
+      block_device_partition_impl&
+      operator= (const block_device_partition_impl&) = delete;
+      block_device_partition_impl&
+      operator= (block_device_partition_impl&&) = delete;
 
       /**
        * @endcond
        */
 
       virtual
-      ~device_block_partition_impl ();
+      ~block_device_partition_impl ();
 
       /**
        * @}
@@ -191,7 +191,7 @@ namespace os
       // --------------------------------------------------------------------
       // Support functions.
 
-      device_block_partition&
+      block_device_partition&
       self (void);
 
       /**
@@ -205,7 +205,7 @@ namespace os
        * @cond ignore
        */
 
-      device_block& parent_;
+      block_device& parent_;
 
       blknum_t partition_offset_blocks_ = 0;
 
@@ -216,8 +216,8 @@ namespace os
 
     // ========================================================================
 
-    template<typename T = device_block_partition_impl>
-      class device_block_partition_implementable : public device_block_partition
+    template<typename T = block_device_partition_impl>
+      class block_device_partition_implementable : public block_device_partition
       {
         // --------------------------------------------------------------------
 
@@ -235,8 +235,8 @@ namespace os
       public:
 
         template<typename ... Args>
-          device_block_partition_implementable (const char* name,
-                                                device_block& parent,
+          block_device_partition_implementable (const char* name,
+                                                block_device& parent,
                                                 Args&&... args);
 
         /**
@@ -244,21 +244,21 @@ namespace os
          */
 
         // The rule of five.
-        device_block_partition_implementable (
-            const device_block_partition_implementable&) = delete;
-        device_block_partition_implementable (
-            device_block_partition_implementable&&) = delete;
-        device_block_partition_implementable&
-        operator= (const device_block_partition_implementable&) = delete;
-        device_block_partition_implementable&
-        operator= (device_block_partition_implementable&&) = delete;
+        block_device_partition_implementable (
+            const block_device_partition_implementable&) = delete;
+        block_device_partition_implementable (
+            block_device_partition_implementable&&) = delete;
+        block_device_partition_implementable&
+        operator= (const block_device_partition_implementable&) = delete;
+        block_device_partition_implementable&
+        operator= (block_device_partition_implementable&&) = delete;
 
         /**
          * @endcond
          */
 
         virtual
-        ~device_block_partition_implementable ();
+        ~block_device_partition_implementable ();
 
         /**
          * @}
@@ -299,7 +299,7 @@ namespace os
     // ========================================================================
 
     template<typename T, typename L>
-      class device_block_partition_lockable : public device_block_partition
+      class block_device_partition_lockable : public block_device_partition
       {
         // --------------------------------------------------------------------
 
@@ -318,8 +318,8 @@ namespace os
       public:
 
         template<typename ... Args>
-          device_block_partition_lockable (const char* name,
-                                           device_block& parent,
+          block_device_partition_lockable (const char* name,
+                                           block_device& parent,
                                            lockable_type& locker,
                                            Args&&... args);
 
@@ -328,19 +328,19 @@ namespace os
          */
 
         // The rule of five.
-        device_block_partition_lockable (const device_block_partition_lockable&) = delete;
-        device_block_partition_lockable (device_block_partition_lockable&&) = delete;
-        device_block_partition_lockable&
-        operator= (const device_block_partition_lockable&) = delete;
-        device_block_partition_lockable&
-        operator= (device_block_partition_lockable&&) = delete;
+        block_device_partition_lockable (const block_device_partition_lockable&) = delete;
+        block_device_partition_lockable (block_device_partition_lockable&&) = delete;
+        block_device_partition_lockable&
+        operator= (const block_device_partition_lockable&) = delete;
+        block_device_partition_lockable&
+        operator= (block_device_partition_lockable&&) = delete;
 
         /**
          * @endcond
          */
 
         virtual
-        ~device_block_partition_lockable ();
+        ~block_device_partition_lockable ();
 
         /**
          * @}
@@ -394,8 +394,8 @@ namespace os
 
     // ========================================================================
 
-    extern template class device_block_partition_implementable<
-        device_block_partition_impl> ;
+    extern template class block_device_partition_implementable<
+        block_device_partition_impl> ;
 
   // ========================================================================
   } /* namespace posix */
@@ -409,42 +409,42 @@ namespace os
   {
     // ========================================================================
 
-    inline device_block_partition_impl&
-    device_block_partition::impl (void) const
+    inline block_device_partition_impl&
+    block_device_partition::impl (void) const
     {
-      return static_cast<device_block_partition_impl&> (impl_);
+      return static_cast<block_device_partition_impl&> (impl_);
     }
 
     // ========================================================================
 
     template<typename T>
       template<typename ... Args>
-        device_block_partition_implementable<T>::device_block_partition_implementable (
-            const char* name, device_block& parent, Args&&... args) :
-            device_block_partition
+        block_device_partition_implementable<T>::block_device_partition_implementable (
+            const char* name, block_device& parent, Args&&... args) :
+            block_device_partition
               { impl_instance_, name }, //
             impl_instance_
               { *this, parent, std::forward<Args>(args)... }
         {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
           trace::printf (
-              "device_block_partition_implementable::%s(\"%s\")=@%p\n",
+              "block_device_partition_implementable::%s(\"%s\")=@%p\n",
               __func__, name_, this);
 #endif
         }
 
     template<typename T>
-      device_block_partition_implementable<T>::~device_block_partition_implementable ()
+      block_device_partition_implementable<T>::~block_device_partition_implementable ()
       {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
-        trace::printf ("device_block_partition_implementable::%s() @%p %s\n",
+        trace::printf ("block_device_partition_implementable::%s() @%p %s\n",
                        __func__, this, name_);
 #endif
       }
 
     template<typename T>
-      typename device_block_partition_implementable<T>::value_type&
-      device_block_partition_implementable<T>::impl (void) const
+      typename block_device_partition_implementable<T>::value_type&
+      block_device_partition_implementable<T>::impl (void) const
       {
         return static_cast<value_type&> (impl_);
       }
@@ -453,27 +453,27 @@ namespace os
 
     template<typename T, typename L>
       template<typename ... Args>
-        device_block_partition_lockable<T, L>::device_block_partition_lockable (
-            const char* name, device_block& parent, lockable_type& locker,
+        block_device_partition_lockable<T, L>::block_device_partition_lockable (
+            const char* name, block_device& parent, lockable_type& locker,
             Args&&... args) :
-            device_block_partition
+            block_device_partition
               { impl_instance_, name }, //
             impl_instance_
               { *this, parent, std::forward<Args>(args)... }, //
             locker_ (locker)
         {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
-          trace::printf ("device_block_partition_lockable::%s(\"%s\")=@%p\n",
+          trace::printf ("block_device_partition_lockable::%s(\"%s\")=@%p\n",
                          __func__, name_, this);
 #endif
 
         }
 
     template<typename T, typename L>
-      device_block_partition_lockable<T, L>::~device_block_partition_lockable ()
+      block_device_partition_lockable<T, L>::~block_device_partition_lockable ()
       {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
-        trace::printf ("device_block_partition_lockable::%s() @%p %s\n",
+        trace::printf ("block_device_partition_lockable::%s() @%p %s\n",
                        __func__, this, name_);
 #endif
       }
@@ -482,57 +482,57 @@ namespace os
 
     template<typename T, typename L>
       int
-      device_block_partition_lockable<T, L>::vioctl (int request,
+      block_device_partition_lockable<T, L>::vioctl (int request,
                                                      std::va_list args)
       {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
-        trace::printf ("device_block_partition_lockable::%s(%d) @%p\n",
+        trace::printf ("block_device_partition_lockable::%s(%d) @%p\n",
                        __func__, request, this);
 #endif
 
         std::lock_guard<L> lock
           { locker_ };
 
-        return device_block_partition::vioctl (request, args);
+        return block_device_partition::vioctl (request, args);
       }
 
     template<typename T, typename L>
       ssize_t
-      device_block_partition_lockable<T, L>::read_block (void* buf,
+      block_device_partition_lockable<T, L>::read_block (void* buf,
                                                          blknum_t blknum,
                                                          std::size_t nblocks)
       {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
-        trace::printf ("device_block_partition_lockable::%s(%p, %u, %u) @%p\n",
+        trace::printf ("block_device_partition_lockable::%s(%p, %u, %u) @%p\n",
                        __func__, buf, blknum, nblocks, this);
 #endif
 
         std::lock_guard<L> lock
           { locker_ };
 
-        return device_block_partition::read_block (buf, blknum, nblocks);
+        return block_device_partition::read_block (buf, blknum, nblocks);
       }
 
     template<typename T, typename L>
       ssize_t
-      device_block_partition_lockable<T, L>::write_block (const void* buf,
+      block_device_partition_lockable<T, L>::write_block (const void* buf,
                                                           blknum_t blknum,
                                                           std::size_t nblocks)
       {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK_PARTITION)
-        trace::printf ("device_block_partition_lockable::%s(%p, %u, %u) @%p\n",
+        trace::printf ("block_device_partition_lockable::%s(%p, %u, %u) @%p\n",
                        __func__, buf, blknum, nblocks, this);
 #endif
 
         std::lock_guard<L> lock
           { locker_ };
 
-        return device_block_partition::write_block (buf, blknum, nblocks);
+        return block_device_partition::write_block (buf, blknum, nblocks);
       }
 
     template<typename T, typename L>
-      typename device_block_partition_lockable<T, L>::value_type&
-      device_block_partition_lockable<T, L>::impl (void) const
+      typename block_device_partition_lockable<T, L>::value_type&
+      block_device_partition_lockable<T, L>::impl (void) const
       {
         return static_cast<value_type&> (impl_);
       }

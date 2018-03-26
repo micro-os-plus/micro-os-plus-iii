@@ -38,7 +38,7 @@ namespace os
     // ========================================================================
 
     tty::tty (tty_impl& impl, const char* name) :
-        device_char
+        char_device
           { impl, name }
     {
 #if defined(OS_TRACE_POSIX_IO_TTY)
@@ -82,7 +82,7 @@ namespace os
     // ========================================================================
 
     tty_impl::tty_impl (tty& self) :
-        device_char_impl
+        char_device_impl
           { self }
     {
 #if defined(OS_TRACE_POSIX_IO_TTY)

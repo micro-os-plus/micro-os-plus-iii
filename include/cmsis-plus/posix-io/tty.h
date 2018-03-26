@@ -37,7 +37,7 @@
 #endif
 
 #include <cmsis-plus/rtos/os.h>
-#include <cmsis-plus/posix-io/device-char.h>
+#include <cmsis-plus/posix-io/char-device.h>
 #include <cmsis-plus/posix/termios.h>
 
 // ----------------------------------------------------------------------------
@@ -52,7 +52,7 @@ namespace os
 
     // ========================================================================
 
-    class tty : public device_char
+    class tty : public char_device
     {
       // ----------------------------------------------------------------------
 
@@ -96,15 +96,19 @@ namespace os
 
     public:
 
+      // http://pubs.opengroup.org/onlinepubs/9699919799/functions/tcgetattr.html
       virtual int
       tcgetattr (struct termios *ptio);
 
+      // http://pubs.opengroup.org/onlinepubs/9699919799/functions/tcsetattr.html
       virtual int
       tcsetattr (int options, const struct termios *ptio);
 
+      // http://pubs.opengroup.org/onlinepubs/9699919799/functions/tcflush.html
       virtual int
       tcflush (int queue_selector);
 
+      // http://pubs.opengroup.org/onlinepubs/9699919799/functions/tcsendbreak.html
       virtual int
       tcsendbreak (int duration);
 
@@ -117,12 +121,8 @@ namespace os
 
     // ========================================================================
 
-    class tty_impl : public device_char_impl
+    class tty_impl : public char_device_impl
     {
-      // ----------------------------------------------------------------------
-
-      friend class device_block;
-
       // ----------------------------------------------------------------------
 
       /**

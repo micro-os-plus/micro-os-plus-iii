@@ -26,7 +26,7 @@
  */
 
 #include <cmsis-plus/posix-io/file-system.h>
-#include <cmsis-plus/posix-io/device-block.h>
+#include <cmsis-plus/posix-io/block-device.h>
 
 #include <cerrno>
 #include <cassert>
@@ -802,7 +802,7 @@ namespace os
 
     // ========================================================================
 
-    file_system_impl::file_system_impl (file_system& self, device_block& device) :
+    file_system_impl::file_system_impl (file_system& self, block_device& device) :
         self_ (self), //
         device_ (device)
     {

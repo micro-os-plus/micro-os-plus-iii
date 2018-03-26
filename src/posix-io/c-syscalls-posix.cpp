@@ -31,7 +31,7 @@
 #include <cmsis-plus/posix-io/types.h>
 #include <cmsis-plus/posix-io/file-descriptors-manager.h>
 #include <cmsis-plus/posix-io/io.h>
-#include <cmsis-plus/posix-io/device-char.h>
+#include <cmsis-plus/posix-io/char-device.h>
 #include <cmsis-plus/posix-io/file.h>
 #include <cmsis-plus/posix-io/file-system.h>
 #include <cmsis-plus/posix-io/directory.h>
@@ -183,7 +183,7 @@ __posix_ioctl (int fildes, int request, ...)
 
   va_list args;
   va_start(args, request);
-  int ret = (static_cast<posix::device_char*> (io))->vioctl (request, args);
+  int ret = (static_cast<posix::char_device*> (io))->vioctl (request, args);
   va_end(args);
 
   return ret;

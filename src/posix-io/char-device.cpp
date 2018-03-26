@@ -25,7 +25,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/posix-io/device-char.h>
+#include <cmsis-plus/posix-io/char-device.h>
 #include <cmsis-plus/posix-io/device-registry.h>
 
 #include <cstring>
@@ -40,21 +40,21 @@ namespace os
   {
     // ========================================================================
 
-    device_char::device_char (device_char_impl& impl, const char* name) :
+    char_device::char_device (char_device_impl& impl, const char* name) :
         device
           { impl, type::device, name }
     {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_CHAR)
-      trace::printf ("device_char::%s(\"%s\")=@%p\n", __func__, name_, this);
+      trace::printf ("char_device::%s(\"%s\")=@%p\n", __func__, name_, this);
 #endif
 
       device_registry<device>::link (this);
     }
 
-    device_char::~device_char ()
+    char_device::~char_device ()
     {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_CHAR)
-      trace::printf ("device_char::%s() @%p %s\n", __func__, this, name_);
+      trace::printf ("char_device::%s() @%p %s\n", __func__, this, name_);
 #endif
 
       registry_links_.unlink ();
@@ -64,19 +64,19 @@ namespace os
 
     // ========================================================================
 
-    device_char_impl::device_char_impl (device_char& self) :
+    char_device_impl::char_device_impl (char_device& self) :
         device_impl
           { self }
     {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_CHAR)
-      trace::printf ("device_char_impl::%s()=@%p\n", __func__, this);
+      trace::printf ("char_device_impl::%s()=@%p\n", __func__, this);
 #endif
     }
 
-    device_char_impl::~device_char_impl ()
+    char_device_impl::~char_device_impl ()
     {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_CHAR)
-      trace::printf ("device_char_impl::%s() @%p\n", __func__, this);
+      trace::printf ("char_device_impl::%s() @%p\n", __func__, this);
 #endif
     }
 
@@ -84,7 +84,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
     off_t
-    device_char_impl::do_lseek (off_t offset, int whence)
+    char_device_impl::do_lseek (off_t offset, int whence)
     {
       errno = ENOSYS; // Not implemented
       return -1;
@@ -93,7 +93,7 @@ namespace os
 #pragma GCC diagnostic pop
 
     void
-    device_char_impl::do_sync (void)
+    char_device_impl::do_sync (void)
     {
       errno = ENOSYS; // Not implemented
     }

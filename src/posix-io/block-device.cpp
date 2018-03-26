@@ -25,7 +25,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <cmsis-plus/posix-io/device-block.h>
+#include <cmsis-plus/posix-io/block-device.h>
 #include <cmsis-plus/posix-io/device-registry.h>
 
 #include <cmsis-plus/posix/sys/ioctl.h>
@@ -43,31 +43,31 @@ namespace os
   {
     // ========================================================================
 
-    device_block::device_block (device_block_impl& impl, const char* name) :
+    block_device::block_device (block_device_impl& impl, const char* name) :
         device
           { impl, type::block, name, }
     {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
-      trace::printf ("device_block::%s(\"%s\")=@%p\n", __func__, name_, this);
+      trace::printf ("block_device::%s(\"%s\")=@%p\n", __func__, name_, this);
 #endif
 
       device_registry<device>::link (this);
     }
 
-    device_block::~device_block ()
+    block_device::~block_device ()
     {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
-      trace::printf ("device_block::%s() @%p %s\n", __func__, this, name_);
+      trace::printf ("block_device::%s() @%p %s\n", __func__, this, name_);
 #endif
     }
 
     // ------------------------------------------------------------------------
 
     ssize_t
-    device_block::read_block (void* buf, blknum_t blknum, std::size_t nblocks)
+    block_device::read_block (void* buf, blknum_t blknum, std::size_t nblocks)
     {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
-      trace::printf ("device_block::%s(%p, %u, %u) @%p\n", __func__, buf,
+      trace::printf ("block_device::%s(%p, %u, %u) @%p\n", __func__, buf,
                      blknum, nblocks, this);
 #endif
 
@@ -81,11 +81,11 @@ namespace os
     }
 
     ssize_t
-    device_block::write_block (const void* buf, blknum_t blknum,
+    block_device::write_block (const void* buf, blknum_t blknum,
                                std::size_t nblocks)
     {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
-      trace::printf ("device_block::%s(%p, %u, %u) @%p\n", __func__, buf,
+      trace::printf ("block_device::%s(%p, %u, %u) @%p\n", __func__, buf,
                      blknum, nblocks, this);
 #endif
 
@@ -99,10 +99,10 @@ namespace os
     }
 
     int
-    device_block::vioctl (int request, std::va_list args)
+    block_device::vioctl (int request, std::va_list args)
     {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
-      trace::printf ("device_block::%s(%d) @%p\n", __func__, request, this);
+      trace::printf ("block_device::%s(%d) @%p\n", __func__, request, this);
 #endif
 
       errno = 0;
@@ -161,19 +161,19 @@ namespace os
 
     // ========================================================================
 
-    device_block_impl::device_block_impl (device_block& self) :
+    block_device_impl::block_device_impl (block_device& self) :
         device_impl
           { self }
     {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
-      trace::printf ("device_block_impl::%s()=@%p\n", __func__, this);
+      trace::printf ("block_device_impl::%s()=@%p\n", __func__, this);
 #endif
     }
 
-    device_block_impl::~device_block_impl ()
+    block_device_impl::~block_device_impl ()
     {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
-      trace::printf ("device_block_impl::%s() @%p\n", __func__, this);
+      trace::printf ("block_device_impl::%s() @%p\n", __func__, this);
 #endif
 
       block_logical_size_bytes_ = 0;
@@ -183,10 +183,10 @@ namespace os
     // ------------------------------------------------------------------------
 
     off_t
-    device_block_impl::do_lseek (off_t offset, int whence)
+    block_device_impl::do_lseek (off_t offset, int whence)
     {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
-      trace::printf ("device_block_impl::%s(%d, %d) @%p\n", __func__, offset,
+      trace::printf ("block_device_impl::%s(%d, %d) @%p\n", __func__, offset,
                      whence, this);
 #endif
 
@@ -220,10 +220,10 @@ namespace os
     // ------------------------------------------------------------------------
 
     ssize_t
-    device_block_impl::do_read (void* buf, std::size_t nbyte)
+    block_device_impl::do_read (void* buf, std::size_t nbyte)
     {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
-      trace::printf ("device_block_impl::%s(%p, %u) @%p\n", __func__, buf,
+      trace::printf ("block_device_impl::%s(%p, %u) @%p\n", __func__, buf,
                      nbyte, this);
 #endif
 
@@ -247,10 +247,10 @@ namespace os
     }
 
     ssize_t
-    device_block_impl::do_write (const void* buf, std::size_t nbyte)
+    block_device_impl::do_write (const void* buf, std::size_t nbyte)
     {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
-      trace::printf ("device_block_impl::%s(%p, %u) @%p\n", __func__, buf,
+      trace::printf ("block_device_impl::%s(%p, %u) @%p\n", __func__, buf,
                      nbyte, this);
 #endif
 

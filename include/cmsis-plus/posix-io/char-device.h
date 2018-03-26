@@ -46,7 +46,7 @@ namespace os
   {
     // ------------------------------------------------------------------------
 
-    class device_char_impl;
+    class char_device_impl;
 
     // ========================================================================
 
@@ -55,7 +55,7 @@ namespace os
      * @headerfile device-char.h <cmsis-plus/posix-io/device-char.h>
      * @ingroup cmsis-plus-posix-io-base
      */
-    class device_char : public device
+    class char_device : public device
     {
       // ----------------------------------------------------------------------
 
@@ -66,26 +66,26 @@ namespace os
 
     public:
 
-      device_char (device_char_impl& impl, const char* name);
+      char_device (char_device_impl& impl, const char* name);
 
       /**
        * @cond ignore
        */
 
       // The rule of five.
-      device_char (const device_char&) = delete;
-      device_char (device_char&&) = delete;
-      device_char&
-      operator= (const device_char&) = delete;
-      device_char&
-      operator= (device_char&&) = delete;
+      char_device (const char_device&) = delete;
+      char_device (char_device&&) = delete;
+      char_device&
+      operator= (const char_device&) = delete;
+      char_device&
+      operator= (char_device&&) = delete;
 
       /**
        * @endcond
        */
 
       virtual
-      ~device_char ();
+      ~char_device ();
 
       /**
        * @}
@@ -101,7 +101,7 @@ namespace os
 
       // Support functions.
 
-      device_char_impl&
+      char_device_impl&
       impl (void) const;
 
       /**
@@ -111,12 +111,8 @@ namespace os
 
     // ========================================================================
 
-    class device_char_impl : public device_impl
+    class char_device_impl : public device_impl
     {
-      // ----------------------------------------------------------------------
-
-      friend class device_block;
-
       // ----------------------------------------------------------------------
 
       /**
@@ -126,26 +122,26 @@ namespace os
 
     public:
 
-      device_char_impl (device_char& self);
+      char_device_impl (char_device& self);
 
       /**
        * @cond ignore
        */
 
       // The rule of five.
-      device_char_impl (const device_char_impl&) = delete;
-      device_char_impl (device_char_impl&&) = delete;
-      device_char_impl&
-      operator= (const device_char_impl&) = delete;
-      device_char_impl&
-      operator= (device_char_impl&&) = delete;
+      char_device_impl (const char_device_impl&) = delete;
+      char_device_impl (char_device_impl&&) = delete;
+      char_device_impl&
+      operator= (const char_device_impl&) = delete;
+      char_device_impl&
+      operator= (char_device_impl&&) = delete;
 
       /**
        * @endcond
        */
 
       virtual
-      ~device_char_impl ();
+      ~char_device_impl ();
 
       /**
        * @}
@@ -170,7 +166,7 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
-      device_char&
+      char_device&
       self (void);
 
       /**
@@ -181,7 +177,7 @@ namespace os
     // ========================================================================
 
     template<typename T>
-      class device_char_implementable : public device_char
+      class char_device_implementable : public char_device
       {
         // --------------------------------------------------------------------
 
@@ -199,26 +195,26 @@ namespace os
       public:
 
         template<typename ... Args>
-          device_char_implementable (const char* name, Args&&... args);
+          char_device_implementable (const char* name, Args&&... args);
 
         /**
          * @cond ignore
          */
 
         // The rule of five.
-        device_char_implementable (const device_char_implementable&) = delete;
-        device_char_implementable (device_char_implementable&&) = delete;
-        device_char_implementable&
-        operator= (const device_char_implementable&) = delete;
-        device_char_implementable&
-        operator= (device_char_implementable&&) = delete;
+        char_device_implementable (const char_device_implementable&) = delete;
+        char_device_implementable (char_device_implementable&&) = delete;
+        char_device_implementable&
+        operator= (const char_device_implementable&) = delete;
+        char_device_implementable&
+        operator= (char_device_implementable&&) = delete;
 
         /**
          * @endcond
          */
 
         virtual
-        ~device_char_implementable ();
+        ~char_device_implementable ();
 
         /**
          * @}
@@ -267,49 +263,49 @@ namespace os
   {
     // ========================================================================
 
-    inline device_char_impl&
-    device_char::impl (void) const
+    inline char_device_impl&
+    char_device::impl (void) const
     {
-      return static_cast<device_char_impl&> (impl_);
+      return static_cast<char_device_impl&> (impl_);
     }
 
     // ========================================================================
 
-    inline device_char&
-    device_char_impl::self (void)
+    inline char_device&
+    char_device_impl::self (void)
     {
-      return static_cast<device_char&> (self_);
+      return static_cast<char_device&> (self_);
     }
 
     // ========================================================================
 
     template<typename T>
       template<typename ... Args>
-        device_char_implementable<T>::device_char_implementable (
+        char_device_implementable<T>::char_device_implementable (
             const char* name, Args&&... args) :
-            device_char
+            char_device
               { impl_instance_, name }, //
             impl_instance_
               { *this, std::forward<Args>(args)... }
         {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_CHAR)
-          trace::printf ("device_char_implementable::%s(\"%s\")=@%p\n",
+          trace::printf ("char_device_implementable::%s(\"%s\")=@%p\n",
                          __func__, name_, this);
 #endif
         }
 
     template<typename T>
-      device_char_implementable<T>::~device_char_implementable ()
+      char_device_implementable<T>::~char_device_implementable ()
       {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_CHAR)
-        trace::printf ("device_char_implementable::%s() @%p %s\n", __func__,
+        trace::printf ("char_device_implementable::%s() @%p %s\n", __func__,
                        this, name_);
 #endif
       }
 
     template<typename T>
-      typename device_char_implementable<T>::value_type&
-      device_char_implementable<T>::impl (void) const
+      typename char_device_implementable<T>::value_type&
+      char_device_implementable<T>::impl (void) const
       {
         return static_cast<value_type&> (impl_);
       }
