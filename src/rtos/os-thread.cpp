@@ -1069,7 +1069,7 @@ namespace os
           mutexes_list& mx_list = reinterpret_cast<mutexes_list&> (mutexes_);
           while (not mx_list.empty ())
             {
-              auto mx = mx_list.unlink_head ();
+              auto* mx = mx_list.unlink_head ();
 
               mx->internal_mark_owner_dead_ ();
 
