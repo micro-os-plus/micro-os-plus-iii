@@ -266,6 +266,23 @@ extern "C"
   int __attribute__((weak))
   __posix_system (const char *command);
 
+  // http://pubs.opengroup.org/onlinepubs/9699919799/functions/tcgetattr.html
+  int __attribute__((weak))
+  __posix_tcgetattr (int fildes, struct termios *termios_p);
+
+  // http://pubs.opengroup.org/onlinepubs/9699919799/functions/tcsetattr.html
+  int __attribute__((weak))
+  __posix_tcsetattr (int fildes, int optional_actions,
+                     const struct termios *termios_p);
+
+  // http://pubs.opengroup.org/onlinepubs/9699919799/functions/tcflush.html
+  int __attribute__((weak))
+  __posix_tcflush (int fildes, int queue_selector);
+
+  // http://pubs.opengroup.org/onlinepubs/9699919799/functions/tcsendbreak.html
+  int __attribute__((weak))
+  __posix_tcsendbreak (int fildes, int duration);
+
   clock_t __attribute__((weak))
   __posix_times (struct tms* buf);
 
