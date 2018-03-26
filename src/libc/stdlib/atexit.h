@@ -29,7 +29,9 @@
 
 // ----------------------------------------------------------------------------
 
+#if !defined(_LITE_EXIT)
 #define _LITE_EXIT
+#endif
 
 /*
  *  Common definitions for atexit-like routines
