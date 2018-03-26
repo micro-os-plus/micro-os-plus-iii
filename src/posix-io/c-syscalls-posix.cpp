@@ -233,6 +233,108 @@ __posix_isatty (int fildes)
 }
 
 int
+__posix_tcdrain (int fildes)
+{
+  auto* const io = posix::file_descriptors_manager::io (fildes);
+  if (io == nullptr)
+    {
+      errno = EBADF; // Fildes is not an open file descriptor.
+      return -1;
+    }
+
+  // Works only on tty...)
+  if ((io->get_type () & posix::io::type::tty) == 0)
+    {
+      errno = ESPIPE; // Not a tty.
+      return -1;
+    }
+
+  return (static_cast<posix::tty*> (io))->tcdrain ();
+}
+
+int
+__posix_tcgetattr (int fildes, struct termios *termios_p)
+{
+  auto* const io = posix::file_descriptors_manager::io (fildes);
+  if (io == nullptr)
+    {
+      errno = EBADF; // Fildes is not an open file descriptor.
+      return -1;
+    }
+
+  // Works only on tty...)
+  if ((io->get_type () & posix::io::type::tty) == 0)
+    {
+      errno = ESPIPE; // Not a tty.
+      return -1;
+    }
+
+  return (static_cast<posix::tty*> (io))->tcgetattr (termios_p);
+}
+
+int
+__posix_tcsetattr (int fildes, int optional_actions,
+                   const struct termios *termios_p)
+{
+  auto* const io = posix::file_descriptors_manager::io (fildes);
+  if (io == nullptr)
+    {
+      errno = EBADF; // Fildes is not an open file descriptor.
+      return -1;
+    }
+
+  // Works only on tty...)
+  if ((io->get_type () & posix::io::type::tty) == 0)
+    {
+      errno = ESPIPE; // Not a tty.
+      return -1;
+    }
+
+  return (static_cast<posix::tty*> (io))->tcsetattr (optional_actions,
+                                                     termios_p);
+}
+
+int
+__posix_tcflush (int fildes, int queue_selector)
+{
+  auto* const io = posix::file_descriptors_manager::io (fildes);
+  if (io == nullptr)
+    {
+      errno = EBADF; // Fildes is not an open file descriptor.
+      return -1;
+    }
+
+  // Works only on tty...)
+  if ((io->get_type () & posix::io::type::tty) == 0)
+    {
+      errno = ESPIPE; // Not a tty.
+      return -1;
+    }
+
+  return (static_cast<posix::tty*> (io))->tcflush (queue_selector);
+}
+
+int
+__posix_tcsendbreak (int fildes, int duration)
+{
+  auto* const io = posix::file_descriptors_manager::io (fildes);
+  if (io == nullptr)
+    {
+      errno = EBADF; // Fildes is not an open file descriptor.
+      return -1;
+    }
+
+  // Works only on tty...)
+  if ((io->get_type () & posix::io::type::tty) == 0)
+    {
+      errno = ESPIPE; // Not a tty.
+      return -1;
+    }
+
+  return (static_cast<posix::tty*> (io))->tcsendbreak (duration);
+}
+
+int
 __posix_fcntl (int fildes, int cmd, ...)
 {
   auto* const io = posix::file_descriptors_manager::io (fildes);
@@ -697,88 +799,6 @@ __posix_select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
 {
   errno = ENOSYS; // Not implemented
   return -1;
-}
-
-int
-__posix_tcgetattr (int fildes, struct termios *termios_p)
-{
-  auto* const io = posix::file_descriptors_manager::io (fildes);
-  if (io == nullptr)
-    {
-      errno = EBADF; // Fildes is not an open file descriptor.
-      return -1;
-    }
-
-  // Works only on tty...)
-  if ((io->get_type () & posix::io::type::tty) == 0)
-    {
-      errno = ESPIPE; // Not a tty.
-      return -1;
-    }
-
-  return (static_cast<posix::tty*> (io))->tcgetattr (termios_p);
-}
-
-int
-__posix_tcsetattr (int fildes, int optional_actions,
-                   const struct termios *termios_p)
-{
-  auto* const io = posix::file_descriptors_manager::io (fildes);
-  if (io == nullptr)
-    {
-      errno = EBADF; // Fildes is not an open file descriptor.
-      return -1;
-    }
-
-  // Works only on tty...)
-  if ((io->get_type () & posix::io::type::tty) == 0)
-    {
-      errno = ESPIPE; // Not a tty.
-      return -1;
-    }
-
-  return (static_cast<posix::tty*> (io))->tcsetattr (optional_actions,
-                                                     termios_p);
-}
-
-int
-__posix_tcflush (int fildes, int queue_selector)
-{
-  auto* const io = posix::file_descriptors_manager::io (fildes);
-  if (io == nullptr)
-    {
-      errno = EBADF; // Fildes is not an open file descriptor.
-      return -1;
-    }
-
-  // Works only on tty...)
-  if ((io->get_type () & posix::io::type::tty) == 0)
-    {
-      errno = ESPIPE; // Not a tty.
-      return -1;
-    }
-
-  return (static_cast<posix::tty*> (io))->tcflush (queue_selector);
-}
-
-int
-__posix_tcsendbreak (int fildes, int duration)
-{
-  auto* const io = posix::file_descriptors_manager::io (fildes);
-  if (io == nullptr)
-    {
-      errno = EBADF; // Fildes is not an open file descriptor.
-      return -1;
-    }
-
-  // Works only on tty...)
-  if ((io->get_type () & posix::io::type::tty) == 0)
-    {
-      errno = ESPIPE; // Not a tty.
-      return -1;
-    }
-
-  return (static_cast<posix::tty*> (io))->tcsendbreak (duration);
 }
 
 clock_t

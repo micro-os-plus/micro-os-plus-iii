@@ -112,6 +112,10 @@ namespace os
       virtual int
       tcsendbreak (int duration);
 
+      // http://pubs.opengroup.org/onlinepubs/9699919799/functions/tcdrain.html
+      virtual int
+      tcdrain (void);
+
       // ----------------------------------------------------------------------
       // Support functions.
 
@@ -176,6 +180,9 @@ namespace os
 
       virtual int
       do_tcsendbreak (int duration) = 0;
+
+      virtual int
+      do_tcdrain (void) = 0;
 
       virtual int
       do_isatty (void) final;
