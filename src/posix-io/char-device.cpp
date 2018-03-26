@@ -42,7 +42,7 @@ namespace os
 
     char_device::char_device (char_device_impl& impl, const char* name) :
         device
-          { impl, type::device, name }
+          { impl, type::char_device, name }
     {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_CHAR)
       trace::printf ("char_device::%s(\"%s\")=@%p\n", __func__, name_, this);

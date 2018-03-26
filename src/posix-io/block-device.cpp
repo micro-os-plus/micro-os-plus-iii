@@ -45,7 +45,7 @@ namespace os
 
     block_device::block_device (block_device_impl& impl, const char* name) :
         device
-          { impl, type::block, name, }
+          { impl, type::block_device, name, }
     {
 #if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
       trace::printf ("block_device::%s(\"%s\")=@%p\n", __func__, name_, this);

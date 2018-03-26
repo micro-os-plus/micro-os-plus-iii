@@ -113,10 +113,11 @@ namespace os
         : type_t
           { unknown = 0,
         not_set = 1 << 0,
-        device = 1 << 1,
-        block = 1 << 2,
-        file = 1 << 3,
-        socket = 1 << 4
+        char_device = 1 << 1,
+        block_device = 1 << 2,
+        tty = 1 << 3,
+        file = 1 << 4,
+        socket = 1 << 5
       };
 
       /**
@@ -197,7 +198,7 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
-      type
+      type_t
       get_type (void) const;
 
       file_descriptor_t
@@ -255,13 +256,13 @@ namespace os
        */
 
       // ----------------------------------------------------------------------
-    private:
+    protected:
 
       /**
        * @cond ignore
        */
 
-      type type_ = type::not_set;
+      type_t type_ = type::not_set;
 
       file_descriptor_t file_descriptor_ = no_file_descriptor;
 
@@ -395,7 +396,7 @@ namespace os
   {
     // ========================================================================
 
-    inline io::type
+    inline io::type_t
     io::get_type (void) const
     {
       return type_;

@@ -175,7 +175,7 @@ __posix_ioctl (int fildes, int request, ...)
     }
 
   // Works only on STREAMS (CherDevices, in this implementation)
-  if ((io->get_type () & posix::io::type::device) == 0)
+  if ((io->get_type () & posix::io::type::char_device) == 0)
     {
       errno = ENOTTY; // Not a stream.
       return -1;
