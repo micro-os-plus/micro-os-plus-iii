@@ -594,6 +594,25 @@
  */
 
 /**
+ * @brief Use a very lite atexit().
+ *
+ * @details
+ * The standard `atexit()` maintains a generic registry
+ * to keep track of the actions to be performed at exit.
+ * As storage, this uses an
+ * initial static buffer plus a series of dynamically allocated
+ * blocks.
+ * For very tight configurations
+ * this might be problematic, and a lite, always static version is provided.
+ * Please note that this version supports only simple actions
+ * registered via atexit(); more general cxa or dso handles are not
+ * supported, and when exception are enabled, this options is ignored.
+ * The size of the static array is configured via
+ * `OS_INTEGER_ATEXIT_ARRAY_SIZE`.
+ */
+#define OS_INCLUDE_ATEXIT_STATIC
+
+/**
  * @brief Define the size of the `atexit()` array.
  *
  * @details
