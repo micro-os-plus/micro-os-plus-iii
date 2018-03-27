@@ -216,14 +216,19 @@ namespace os
       // Offset of payload inside the chunk.
       static constexpr std::size_t chunk_offset = offsetof(chunk_t, next);
       static constexpr std::size_t chunk_align = sizeof(void*);
+      static constexpr std::size_t chunk_minsize = sizeof(chunk_t);
 
-      static constexpr std::size_t block_align = alignof(std::max_align_t);
       static constexpr std::size_t block_minsize = sizeof(void *);
-      static constexpr std::size_t block_maxsize = 1024 * 1024;
-      static constexpr std::size_t block_padding = os::rtos::memory::max (
-          block_align, chunk_align) - chunk_align;
-      static constexpr std::size_t block_minchunk = chunk_offset + block_padding
-          + block_minsize;
+      static constexpr std::size_t
+      calc_block_padding (std::size_t block_align)
+      {
+        return os::rtos::memory::max (block_align, chunk_align) - chunk_align;
+      }
+      static constexpr std::size_t
+      calc_block_minchunk(std::size_t block_padding)
+      {
+        return chunk_offset + block_padding + block_minsize;
+      }
 
       void* arena_addr_ = nullptr;
       // No need for arena_size_bytes_, use total_bytes_.
