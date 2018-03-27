@@ -39,7 +39,7 @@
 
 // ----------------------------------------------------------------------------
 
-#if !defined(__EXCEPTIONS)
+#if defined(OS_INCLUDE_ATEXIT_STATIC) && !defined(__EXCEPTIONS)
 
 /**
  * @brief Request execution of functions at program exit.
