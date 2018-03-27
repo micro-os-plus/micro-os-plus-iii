@@ -73,7 +73,7 @@ namespace os
     void
     first_fit_top::internal_reset_ (void) noexcept
     {
-      // Fill it the first chunk.
+      // Fill it with the first chunk.
       chunk_t* chunk = reinterpret_cast<chunk_t*> (arena_addr_);
       // Entire arena is a big free chunk.
       chunk->size = total_bytes_;
@@ -212,7 +212,7 @@ namespace os
         }
 
       // Update statistics.
-      // What is subtracted from free is added to allocated.
+      // The value subtracted from free is added to allocated.
       internal_increase_allocated_statistics (chunk->size);
 
       // Compute pointer to payload area.
@@ -224,10 +224,7 @@ namespace os
 
       void* res;
       res = std::align (alignment, bytes, aligned_payload, aligned_size);
-      if (res != nullptr)
-        {
-          assert(res != nullptr);
-        }
+      assert(res != nullptr);
 
       // Compute the possible alignment offset.
       std::ptrdiff_t offset = static_cast<char *> (aligned_payload) - payload;

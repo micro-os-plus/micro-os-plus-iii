@@ -200,14 +200,20 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
+      // A 'chunk' is where the user block resides; it keeps track of size,
+      // it accommodates alignment and helps maintain the free list.
       typedef struct chunk_s
       {
         // The actual chunk size, in bytes;
-        // exactly after it comes the next chunk.
+        // the next chunk starts exactly after this number of bytes.
+        // This is the only overhead that applies to all allocated blocks.
         std::size_t size;
-        // When chunk is in the free list, pointer to next chunk.
-        // At this address, or slightly further if alignment was
-        // required, starts the payload.
+
+        // For allocated chunks, here, or at the next address that
+        // satisfies the required alignment, starts the payload.
+
+        // When the chunk is in the free list, instead of the
+        // payload, here is a pointer to the next chunk.
         struct chunk_s* next;
       } chunk_t;
 
@@ -219,13 +225,15 @@ namespace os
       static constexpr std::size_t chunk_minsize = sizeof(chunk_t);
 
       static constexpr std::size_t block_minsize = sizeof(void *);
+
       static constexpr std::size_t
       calc_block_padding (std::size_t block_align)
       {
         return os::rtos::memory::max (block_align, chunk_align) - chunk_align;
       }
+
       static constexpr std::size_t
-      calc_block_minchunk(std::size_t block_padding)
+      calc_block_minchunk (std::size_t block_padding)
       {
         return chunk_offset + block_padding + block_minsize;
       }
