@@ -55,30 +55,6 @@ namespace os
     class net_stack;
 
     // ------------------------------------------------------------------------
-
-    /**
-     * @ingroup cmsis-plus-posix-io-func
-     * @{
-     */
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wshadow"
-
-    class socket*
-    socket (int domain, int type, int protocol);
-
-#pragma GCC diagnostic pop
-
-#if 0
-    int
-    socketpair (int domain, int type, int protocol, socket* socket_vector[2]);
-#endif
-
-    /**
-     * @}
-     */
-
-    // ------------------------------------------------------------------------
     /**
      * @brief Network socket.
      * @headerfile socket.h <cmsis-plus/posix-io/socket.h>
@@ -86,19 +62,6 @@ namespace os
      */
     class socket : public io
     {
-      // ----------------------------------------------------------------------
-
-      /**
-       * @cond ignore
-       */
-#if 0
-      friend socket*
-      socket (int domain, int type, int protocol);
-#endif
-      /**
-       * @endcond
-       */
-
       // ----------------------------------------------------------------------
       /**
        * @name Constructors & Destructor

@@ -451,12 +451,21 @@ namespace os
 
 namespace std
 {
+  /**
+   * @ingroup cmsis-plus-iso
+   * @{
+   */
+
   // Redefine the objects in the std:: namespace.
 
   using cv_status = os::estd::cv_status;
 
   using condition_variable = os::estd::condition_variable;
   using condition_variable_any = os::estd::condition_variable_any;
+
+  /**
+   * @}
+   */
 }
 
 #endif

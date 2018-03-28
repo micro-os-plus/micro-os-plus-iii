@@ -210,6 +210,7 @@ namespace os
        *   file system is mounted as root, i.e. the default if no other
        *   mount point matches.
        * @param flags File system specific flags.
+       * @param args Optional arguments.
        * @retval 0 if successful,
        * @retval -1 otherwise and the variable errno is set to
        *   indicate the error.
@@ -647,6 +648,7 @@ namespace os
          *   file system is mounted as root, i.e. the default if no other
          *   mount point matches.
          * @param flags File system specific flags.
+         * @param args Optional arguments.
          * @retval 0 if successful,
          * @retval -1 otherwise and the variable errno is set to
          *   indicate the error.

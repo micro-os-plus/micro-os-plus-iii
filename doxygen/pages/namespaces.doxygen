@@ -30,3 +30,14 @@
  @brief Embedded **std** namespace.
  @ingroup cmsis-plus-iso
  */
+
+/**
+ @namespace std
+ @brief Standard **std** namespace.
+ @ingroup cmsis-plus-iso
+ @details
+
+ When building µOS++ applications for embedded targets, in addition to the `os::estd` namespace, the standard thread classes are also defined in the `std` namespace, so that applications explicitly using the `std::` prefix need minimal changes to build.
+
+ The only non-standard feature is the need to prefix the included headers with `cmsis-plus/std/`, for example `<cmsis-plus/std/thread>`.
+ */

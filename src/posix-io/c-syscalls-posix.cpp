@@ -37,6 +37,7 @@
 #include <cmsis-plus/posix-io/file-system.h>
 #include <cmsis-plus/posix-io/directory.h>
 #include <cmsis-plus/posix-io/socket.h>
+#include <cmsis-plus/posix-io/net-stack.h>
 
 #include <cmsis-plus/posix/sys/uio.h>
 

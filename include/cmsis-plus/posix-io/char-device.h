@@ -52,7 +52,7 @@ namespace os
 
     /**
      * @brief Char device class.
-     * @headerfile device-char.h <cmsis-plus/posix-io/device-char.h>
+     * @headerfile char-device.h <cmsis-plus/posix-io/char-device.h>
      * @ingroup cmsis-plus-posix-io-base
      */
     class char_device : public device

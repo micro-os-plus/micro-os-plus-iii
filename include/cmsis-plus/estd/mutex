@@ -337,12 +337,21 @@ namespace os
 
 namespace std
 {
+  /**
+   * @ingroup cmsis-plus-iso
+   * @{
+   */
+
   // Redefine the objects in the std:: namespace.
 
   using mutex = os::estd::mutex;
   using recursive_mutex = os::estd::recursive_mutex;
   using timed_mutex = os::estd::timed_mutex;
   using recursive_timed_mutex = os::estd::recursive_timed_mutex;
+
+  /**
+   * @}
+   */
 }
 
 #endif

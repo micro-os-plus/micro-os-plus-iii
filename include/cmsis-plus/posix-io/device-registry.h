@@ -204,6 +204,10 @@ namespace os
         return nullptr;
       }
 
+    /**
+     * @cond ignore
+     */
+
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
@@ -215,6 +219,10 @@ namespace os
       typename device_registry<T>::device_list device_registry<T>::registry_list__;
 
 #pragma GCC diagnostic pop
+
+  /**
+   * @endcond
+   */
 
   // ==========================================================================
   } /* namespace posix */
