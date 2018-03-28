@@ -33,6 +33,8 @@
 #include <cmsis-plus/estd/condition_variable>
 #include <cmsis-plus/estd/mutex>
 #include <cmsis-plus/estd/thread>
+#include <type_traits>
+#include <atomic>
 
 // ----------------------------------------------------------------------------
 
@@ -110,7 +112,6 @@ sleep_for_ticks (uint32_t)
 
 using namespace std::chrono;
 using namespace os::estd::chrono;
-using namespace os::estd;
 using namespace os;
 
 int
@@ -122,40 +123,84 @@ test_iso_api (bool extra)
   printf ("\n%s - Threads.\n", test_name);
     {
         {
-          thread th11
+          estd::thread th11
             { task1 };
 
           th11.join ();
         }
+
+#if !defined(__APPLE__) && !defined(__linux__) && !defined(_GLIBCXX_HAS_GTHREADS)
+
+        {
+          std::thread th12
+            { task1 };
+
+          th12.join ();
+        }
+
+#endif
 
 #if 1
         // TODO: check thread termination; at a certain moment some user faults were triggered.
         {
           char c;
 
-          thread th21
+          estd::thread th21
             { task2, &c };
 
-          thread th31
+          estd::thread th31
             { task3, &c };
 
-          thread th41
+          estd::thread th41
             { task4, 7, "xyz" };
 
           th21.join ();
           th31.join ();
           th41.join ();
         }
+
+#if !defined(__APPLE__) && !defined(__linux__) && !defined(_GLIBCXX_HAS_GTHREADS)
+
+        {
+          char c;
+
+          std::thread th22
+            { task2, &c };
+
+          std::thread th32
+            { task3, &c };
+
+          std::thread th42
+            { task4, 7, "xyz" };
+
+          th22.join ();
+          th32.join ();
+          th42.join ();
+        }
+
+#endif
+
 #endif
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#pragma GCC diagnostic ignored "-Wunused-variable"
 
         {
-          thread::id id = this_thread::get_id ();
+          estd::thread::id id = estd::this_thread::get_id ();
 
-          this_thread::yield ();
+          estd::this_thread::yield ();
         }
+
+#if !defined(__APPLE__) && !defined(__linux__) && !defined(_GLIBCXX_HAS_GTHREADS)
+
+        {
+          std::thread::id id = std::this_thread::get_id ();
+
+          std::this_thread::yield ();
+        }
+
+#endif
 
 #pragma GCC diagnostic pop
 
@@ -166,121 +211,242 @@ test_iso_api (bool extra)
 
     {
         {
-          mutex mx1;
+          estd::mutex mx11;
 
-          mx1.lock ();
-          mx1.unlock ();
+          mx11.lock ();
+          mx11.unlock ();
 
-          mx1.try_lock ();
-          mx1.unlock ();
+          mx11.try_lock ();
+          mx11.unlock ();
         }
 
         {
-          timed_mutex mx2;
+          estd::timed_mutex mx21;
 
-          mx2.lock ();
-          mx2.unlock ();
+          mx21.lock ();
+          mx21.unlock ();
 
-          mx2.try_lock ();
-          mx2.unlock ();
+          mx21.try_lock ();
+          mx21.unlock ();
 
-          mx2.try_lock_for (systicks (2999));
-          mx2.unlock ();
-          mx2.try_lock_for (seconds (3));
-          mx2.unlock ();
-          mx2.try_lock_for (milliseconds (3001)); // 3001 ticks
-          mx2.unlock ();
-          mx2.try_lock_for (microseconds (3001001)); // 3002 ticks
-          mx2.unlock ();
-          mx2.try_lock_for (nanoseconds (3002000001ul)); // 3003 ticks
-          mx2.unlock ();
+          mx21.try_lock_for (systicks (2999));
+          mx21.unlock ();
+          mx21.try_lock_for (seconds (3));
+          mx21.unlock ();
+          mx21.try_lock_for (milliseconds (3001)); // 3001 ticks
+          mx21.unlock ();
+          mx21.try_lock_for (microseconds (3001001)); // 3002 ticks
+          mx21.unlock ();
+          mx21.try_lock_for (nanoseconds (3002000001ul)); // 3003 ticks
+          mx21.unlock ();
 
-          mx2.try_lock_for (microseconds (1)); // 1 tick
-          mx2.unlock ();
-          mx2.try_lock_for (nanoseconds (1)); // 1 tick
-          mx2.unlock ();
+          mx21.try_lock_for (microseconds (1)); // 1 tick
+          mx21.unlock ();
+          mx21.try_lock_for (nanoseconds (1)); // 1 tick
+          mx21.unlock ();
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
 
-          if (mx2.try_lock_until (chrono::system_clock::now () + 5000us))
-            mx2.unlock ();
-          if (mx2.try_lock_until (chrono::system_clock::now () + 5ms))
-            mx2.unlock ();
+          if (mx21.try_lock_until (estd::chrono::system_clock::now () + 5000us))
+            mx21.unlock ();
+          if (mx21.try_lock_until (estd::chrono::system_clock::now () + 5ms))
+            mx21.unlock ();
 
-          if (mx2.try_lock_until (chrono::systick_clock::now () + 5us))
-            mx2.unlock ();
-          if (mx2.try_lock_until (chrono::systick_clock::now () + 5ms))
-            mx2.unlock ();
+          if (mx21.try_lock_until (estd::chrono::systick_clock::now () + 5us))
+            mx21.unlock ();
+          if (mx21.try_lock_until (estd::chrono::systick_clock::now () + 5ms))
+            mx21.unlock ();
 
-          if (mx2.try_lock_until (chrono::realtime_clock::now () + 10ms))
-            mx2.unlock ();
-          if (mx2.try_lock_until (chrono::realtime_clock::now () + 100ms))
-            mx2.unlock ();
+          if (mx21.try_lock_until (estd::chrono::realtime_clock::now () + 10ms))
+            mx21.unlock ();
+          if (mx21.try_lock_until (estd::chrono::realtime_clock::now () + 100ms))
+            mx21.unlock ();
 
 #pragma GCC diagnostic pop
 
         }
+
+#if !defined(__APPLE__) && !defined(__linux__) && !defined(_GLIBCXX_HAS_GTHREADS)
+
+        {
+          std::mutex mx12;
+
+          mx12.lock ();
+          mx12.unlock ();
+
+          mx12.try_lock ();
+          mx12.unlock ();
+        }
+
+        {
+          std::timed_mutex mx22;
+
+          mx22.lock ();
+          mx22.unlock ();
+
+          mx22.try_lock ();
+          mx22.unlock ();
+
+          mx22.try_lock_for (systicks (2999));
+          mx22.unlock ();
+          mx22.try_lock_for (seconds (3));
+          mx22.unlock ();
+          mx22.try_lock_for (milliseconds (3001)); // 3001 ticks
+          mx22.unlock ();
+          mx22.try_lock_for (microseconds (3001001)); // 3002 ticks
+          mx22.unlock ();
+          mx22.try_lock_for (nanoseconds (3002000001ul)); // 3003 ticks
+          mx22.unlock ();
+
+          mx22.try_lock_for (microseconds (1)); // 1 tick
+          mx22.unlock ();
+          mx22.try_lock_for (nanoseconds (1)); // 1 tick
+          mx22.unlock ();
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
+          if (mx22.try_lock_until (estd::chrono::system_clock::now () + 5000us))
+            mx22.unlock ();
+          if (mx22.try_lock_until (estd::chrono::system_clock::now () + 5ms))
+            mx22.unlock ();
+
+          if (mx22.try_lock_until (estd::chrono::systick_clock::now () + 5us))
+            mx22.unlock ();
+          if (mx22.try_lock_until (estd::chrono::systick_clock::now () + 5ms))
+            mx22.unlock ();
+
+          if (mx22.try_lock_until (estd::chrono::realtime_clock::now () + 10ms))
+            mx22.unlock ();
+          if (mx22.try_lock_until (estd::chrono::realtime_clock::now () + 100ms))
+            mx22.unlock ();
+
+#pragma GCC diagnostic pop
+
+        }
+
+#endif
     }
 
   // ==========================================================================
 
   printf ("\n%s - Condition variables.\n", test_name);
     {
-      condition_variable cv1;
-      cv1.notify_one ();
-      cv1.notify_all ();
+      estd::condition_variable cv11;
+      cv11.notify_one ();
+      cv11.notify_all ();
 
       if (extra)
         {
 
-          mutex mxl;
-          unique_lock<mutex> lock
+          estd::mutex mxl;
+          std::unique_lock<estd::mutex> lock
             { mxl };
 
-          cv1.wait (lock);
+          cv11.wait (lock);
 
           auto pred = []()
             { return is_ready();};
 
-          cv1.wait (lock, pred);
+          cv11.wait (lock, pred);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
 
-          cv1.wait_until (lock, chrono::system_clock::now () + 10ms);
-          cv1.wait_until (lock, chrono::systick_clock::now () + 10ms);
-          cv1.wait_until (lock, chrono::realtime_clock::now () + 1s);
+          cv11.wait_until (lock, estd::chrono::system_clock::now () + 10ms);
+          cv11.wait_until (lock, estd::chrono::systick_clock::now () + 10ms);
+          cv11.wait_until (lock, estd::chrono::realtime_clock::now () + 1s);
 
-          cv1.wait_until (lock, chrono::system_clock::now () + 10ms, pred);
-          cv1.wait_until (lock, chrono::systick_clock::now () + 10ms, pred);
-          cv1.wait_until (lock, chrono::realtime_clock::now () + 1s, pred);
+          cv11.wait_until (lock, estd::chrono::system_clock::now () + 10ms, pred);
+          cv11.wait_until (lock, estd::chrono::systick_clock::now () + 10ms, pred);
+          cv11.wait_until (lock, estd::chrono::realtime_clock::now () + 1s, pred);
 
-          cv1.wait_for (lock, 10_ticks);
-          cv1.wait_for (lock, 10ms);
-          cv1.wait_for (lock, 10000us);
+          cv11.wait_for (lock, 10_ticks);
+          cv11.wait_for (lock, 10ms);
+          cv11.wait_for (lock, 10000us);
 
-          cv1.wait_for (lock, 12_ticks, pred);
-          cv1.wait_for (lock, 12ms, pred);
-          cv1.wait_for (lock, 12000us, pred);
+          cv11.wait_for (lock, 12_ticks, pred);
+          cv11.wait_for (lock, 12ms, pred);
+          cv11.wait_for (lock, 12000us, pred);
 
           if (extra)
             {
-              cv1.wait_for (lock, 2999_ticks);
-              cv1.wait_for (lock, 3s);
-              cv1.wait_for (lock, 3001ms);
-              cv1.wait_for (lock, 3001001us); // 3002 ticks
+              cv11.wait_for (lock, 2999_ticks);
+              cv11.wait_for (lock, 3s);
+              cv11.wait_for (lock, 3001ms);
+              cv11.wait_for (lock, 3001001us); // 3002 ticks
 
-              cv1.wait_for (lock, 2999_ticks, pred);
-              cv1.wait_for (lock, 3s, pred);
-              cv1.wait_for (lock, 3001ms, pred);
-              cv1.wait_for (lock, 3001001us, pred); // 3002 ticks
+              cv11.wait_for (lock, 2999_ticks, pred);
+              cv11.wait_for (lock, 3s, pred);
+              cv11.wait_for (lock, 3001ms, pred);
+              cv11.wait_for (lock, 3001001us, pred); // 3002 ticks
             }
 
 #pragma GCC diagnostic pop
 
         }
     }
+
+#if !defined(__APPLE__) && !defined(__linux__) && !defined(_GLIBCXX_HAS_GTHREADS)
+
+    {
+      std::condition_variable cv12;
+      cv12.notify_one ();
+      cv12.notify_all ();
+
+      if (extra)
+        {
+
+          std::mutex mxl;
+          std::unique_lock<estd::mutex> lock
+            { mxl };
+
+          cv12.wait (lock);
+
+          auto pred = []()
+            { return is_ready();};
+
+          cv12.wait (lock, pred);
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waggregate-return"
+
+          cv12.wait_until (lock, estd::chrono::system_clock::now () + 10ms);
+          cv12.wait_until (lock, estd::chrono::systick_clock::now () + 10ms);
+          cv12.wait_until (lock, estd::chrono::realtime_clock::now () + 1s);
+
+          cv12.wait_until (lock, estd::chrono::system_clock::now () + 10ms, pred);
+          cv12.wait_until (lock, estd::chrono::systick_clock::now () + 10ms, pred);
+          cv12.wait_until (lock, estd::chrono::realtime_clock::now () + 1s, pred);
+
+          cv12.wait_for (lock, 10_ticks);
+          cv12.wait_for (lock, 10ms);
+          cv12.wait_for (lock, 10000us);
+
+          cv12.wait_for (lock, 12_ticks, pred);
+          cv12.wait_for (lock, 12ms, pred);
+          cv12.wait_for (lock, 12000us, pred);
+
+          if (extra)
+            {
+              cv12.wait_for (lock, 2999_ticks);
+              cv12.wait_for (lock, 3s);
+              cv12.wait_for (lock, 3001ms);
+              cv12.wait_for (lock, 3001001us); // 3002 ticks
+
+              cv12.wait_for (lock, 2999_ticks, pred);
+              cv12.wait_for (lock, 3s, pred);
+              cv12.wait_for (lock, 3001ms, pred);
+              cv12.wait_for (lock, 3001001us, pred); // 3002 ticks
+            }
+
+#pragma GCC diagnostic pop
+
+        }
+    }
+
+#endif
 
   // ==========================================================================
 
@@ -289,16 +455,16 @@ test_iso_api (bool extra)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
 
-  chrono::realtime_clock::startup_time_point = chrono::realtime_clock::now ();
+  estd::chrono::realtime_clock::startup_time_point = estd::chrono::realtime_clock::now ();
 
 #pragma GCC diagnostic pop
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
 
-  this_thread::sleep_for (5_ticks);
+  estd::this_thread::sleep_for (5_ticks);
 
-  auto tp = chrono::systick_clock::now ();
+  auto tp = estd::chrono::systick_clock::now ();
   printf ("Systick_clock::now() = %lu ticks\n",
           static_cast<unsigned long int> (tp.time_since_epoch ().count ()));
 
@@ -310,61 +476,61 @@ test_iso_api (bool extra)
   printf ("high_resolution_clock::now() = %lu ns\n",
           static_cast<unsigned long int> (tp3.time_since_epoch ().count ()));
 
-  this_thread::sleep_for (5_ticks);
-  this_thread::sleep_for (5ms);
-  this_thread::sleep_for (5001us); // 5 ticks
-  this_thread::sleep_for (5002000ns); // 5 ticks
+  estd::this_thread::sleep_for (5_ticks);
+  estd::this_thread::sleep_for (5ms);
+  estd::this_thread::sleep_for (5001us); // 5 ticks
+  estd::this_thread::sleep_for (5002000ns); // 5 ticks
 
-  this_thread::sleep_for (microseconds (1)); // 1 tick
-  this_thread::sleep_for (nanoseconds (1)); // 1 tick
+  estd::this_thread::sleep_for (microseconds (1)); // 1 tick
+  estd::this_thread::sleep_for (nanoseconds (1)); // 1 tick
 
-  this_thread::sleep_for<chrono::systick_clock> (4_ticks);
-  this_thread::sleep_for<chrono::systick_clock> (4ms);
+  estd::this_thread::sleep_for<estd::chrono::systick_clock> (4_ticks);
+  estd::this_thread::sleep_for<estd::chrono::systick_clock> (4ms);
 
   printf ("sleep_for<chrono::realtime_clock> (1s)\n");
-  this_thread::sleep_for<chrono::realtime_clock> (1s);
+  estd::this_thread::sleep_for<estd::chrono::realtime_clock> (1s);
   printf ("sleep_for<chrono::realtime_clock> (1001ms)\n");
-  this_thread::sleep_for<chrono::realtime_clock> (1001ms);
+  estd::this_thread::sleep_for<estd::chrono::realtime_clock> (1001ms);
 
   if (extra)
     {
-      this_thread::sleep_for (2999_ticks);
-      this_thread::sleep_for (3s);
-      this_thread::sleep_for (3001ms);
-      this_thread::sleep_for (3001001us); // 3002 ticks
-      this_thread::sleep_for (3002000001ns); // 3003 ticks
+      estd::this_thread::sleep_for (2999_ticks);
+      estd::this_thread::sleep_for (3s);
+      estd::this_thread::sleep_for (3001ms);
+      estd::this_thread::sleep_for (3001001us); // 3002 ticks
+      estd::this_thread::sleep_for (3002000001ns); // 3003 ticks
 
-      this_thread::sleep_for<chrono::systick_clock> (3999_ticks);
-      this_thread::sleep_for<chrono::systick_clock> (4s);
-      this_thread::sleep_for<chrono::systick_clock> (4001ms);
+      estd::this_thread::sleep_for<estd::chrono::systick_clock> (3999_ticks);
+      estd::this_thread::sleep_for<estd::chrono::systick_clock> (4s);
+      estd::this_thread::sleep_for<estd::chrono::systick_clock> (4001ms);
 
-      this_thread::sleep_for<chrono::realtime_clock> (5s);
-      this_thread::sleep_for<chrono::realtime_clock> (5001ms);
+      estd::this_thread::sleep_for<estd::chrono::realtime_clock> (5s);
+      estd::this_thread::sleep_for<estd::chrono::realtime_clock> (5001ms);
     }
 
-  this_thread::sleep_until (chrono::system_clock::now () + 1000us);
-  this_thread::sleep_until (chrono::system_clock::now () + 1ms);
+  estd::this_thread::sleep_until (estd::chrono::system_clock::now () + 1000us);
+  estd::this_thread::sleep_until (estd::chrono::system_clock::now () + 1ms);
 
-  this_thread::sleep_until (chrono::systick_clock::now () + 1us);
-  this_thread::sleep_until (chrono::systick_clock::now () + 1ms);
+  estd::this_thread::sleep_until (estd::chrono::systick_clock::now () + 1us);
+  estd::this_thread::sleep_until (estd::chrono::systick_clock::now () + 1ms);
 
-  this_thread::sleep_until (chrono::realtime_clock::now () + 10ms);
-  this_thread::sleep_until (chrono::realtime_clock::now () + 100ms);
+  estd::this_thread::sleep_until (estd::chrono::realtime_clock::now () + 10ms);
+  estd::this_thread::sleep_until (estd::chrono::realtime_clock::now () + 100ms);
   printf ("sleep_until (chrono::realtime_clock::now () + 1000ms)\n");
-  this_thread::sleep_until (chrono::realtime_clock::now () + 1000ms);
+  estd::this_thread::sleep_until (estd::chrono::realtime_clock::now () + 1000ms);
 
   printf ("sleep_until (chrono::realtime_clock::now () + 1s)\n");
-  this_thread::sleep_until (chrono::realtime_clock::now () + 1s);
+  estd::this_thread::sleep_until (estd::chrono::realtime_clock::now () + 1s);
 
   if (extra)
     {
-      this_thread::sleep_until (chrono::system_clock::now () + 1s);
+      estd::this_thread::sleep_until (estd::chrono::system_clock::now () + 1s);
 
-      this_thread::sleep_until (chrono::systick_clock::now () + 1s);
+      estd::this_thread::sleep_until (estd::chrono::systick_clock::now () + 1s);
 
-      this_thread::sleep_until (chrono::realtime_clock::now () + 10ms);
-      this_thread::sleep_until (chrono::realtime_clock::now () + 10s);
-      this_thread::sleep_until (chrono::realtime_clock::now () + 1min);
+      estd::this_thread::sleep_until (estd::chrono::realtime_clock::now () + 10ms);
+      estd::this_thread::sleep_until (estd::chrono::realtime_clock::now () + 10s);
+      estd::this_thread::sleep_until (estd::chrono::realtime_clock::now () + 1min);
     }
 
 #pragma GCC diagnostic pop
@@ -385,7 +551,7 @@ void
 my_sleep (int n)
 {
 #if 1
-  this_thread::sleep_for (systicks (n));
+  estd::this_thread::sleep_for (systicks (n));
 #endif
 }
 
