@@ -92,6 +92,7 @@ namespace os
        * @endcond
        */
 
+      virtual
       ~device ();
 
       /**
@@ -134,7 +135,7 @@ namespace os
       virtual int
       vioctl (int request, std::va_list args);
 
-      void
+      virtual void
       sync (void);
 
       // ----------------------------------------------------------------------
@@ -264,7 +265,7 @@ namespace os
       int&
       open_count (void);
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
       // Support functions.
 
       device&
