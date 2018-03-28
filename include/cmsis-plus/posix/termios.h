@@ -33,6 +33,9 @@
 #ifndef POSIX_TERMIOS_H_
 #define	POSIX_TERMIOS_H_
 
+// Avoid warnings for __BSD* definitions.
+#pragma GCC system_header
+
 /*
  * Special Control Characters
  *

@@ -30,6 +30,9 @@
 
 // ----------------------------------------------------------------------------
 
+// Avoid warnings for _IOC* definitions.
+#pragma GCC system_header
+
 /*
  * From: https://github.com/torvalds/linux/blob/master/include/uapi/asm-generic/ioctl.h
  *
@@ -82,7 +85,7 @@
 #endif
 
 #define _IOC(dir,type,nr,size) \
-  (((dir)  << _IOC_DIRSHIFT) | \
+   (((dir)  << _IOC_DIRSHIFT) | \
    ((type) << _IOC_TYPESHIFT) | \
    ((nr)   << _IOC_NRSHIFT) | \
    ((size) << _IOC_SIZESHIFT))
