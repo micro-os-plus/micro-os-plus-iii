@@ -29,8 +29,8 @@
  * The code is inspired by LLVM libcxx and GNU libstdc++-v3.
  */
 
-#ifndef CMSIS_PLUS_STD_MUTEX_
-#define CMSIS_PLUS_STD_MUTEX_
+#ifndef CMSIS_PLUS_ESTD_MUTEX_
+#define CMSIS_PLUS_ESTD_MUTEX_
 
 // ----------------------------------------------------------------------------
 
@@ -337,4 +337,4 @@ namespace std
 
 // ----------------------------------------------------------------------------
 
-#endif /* CMSIS_PLUS_STD_MUTEX_ */
+#endif /* CMSIS_PLUS_ESTD_MUTEX_ */

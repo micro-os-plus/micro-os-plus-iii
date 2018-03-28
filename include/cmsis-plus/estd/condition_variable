@@ -29,8 +29,8 @@
  * The code is inspired by LLVM libcxx and GNU libstdc++-v3.
  */
 
-#ifndef CMSIS_PLUS_STD_CONDITION_VARIABLE_
-#define CMSIS_PLUS_STD_CONDITION_VARIABLE_
+#ifndef CMSIS_PLUS_ESTD_CONDITION_VARIABLE_
+#define CMSIS_PLUS_ESTD_CONDITION_VARIABLE_
 
 // ----------------------------------------------------------------------------
 
@@ -464,4 +464,4 @@ namespace std
 
 // ----------------------------------------------------------------------------
 
-#endif /* CMSIS_PLUS_STD_CONDITION_VARIABLE_ */
+#endif /* CMSIS_PLUS_ESTD_CONDITION_VARIABLE_ */

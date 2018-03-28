@@ -29,8 +29,8 @@
  * The code is inspired by LLVM libcxx and GNU libstdc++-v3.
  */
 
-#ifndef CMSIS_PLUS_STD_THREAD_
-#define CMSIS_PLUS_STD_THREAD_
+#ifndef CMSIS_PLUS_ESTD_THREAD_
+#define CMSIS_PLUS_ESTD_THREAD_
 
 // ----------------------------------------------------------------------------
 
@@ -564,4 +564,4 @@ namespace std
 
 // ----------------------------------------------------------------------------
 
-#endif /* CMSIS_PLUS_STD_THREAD_ */
+#endif /* CMSIS_PLUS_ESTD_THREAD_ */
