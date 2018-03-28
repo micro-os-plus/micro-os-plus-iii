@@ -107,7 +107,7 @@ namespace os
 
       errno = 0;
 
-      switch (request)
+      switch (static_cast<unsigned int> (request))
         {
         case BLKSSZGET:
           // Get logical device sector size (to be used for read/writes).
@@ -147,8 +147,8 @@ namespace os
                 return -1;
               }
 
-            *sz = ((uint64_t) impl ().num_blocks_
-                * impl ().block_logical_size_bytes_);
+            *sz = (static_cast<uint64_t> (impl ().num_blocks_
+                * impl ().block_logical_size_bytes_));
             return 0;
           }
 
@@ -229,14 +229,16 @@ namespace os
 
       if ((block_logical_size_bytes_ == 0)
           || ((nbyte % block_logical_size_bytes_) != 0)
-          || ((offset_ % block_logical_size_bytes_) != 0))
+          || ((static_cast<std::size_t> (offset_) % block_logical_size_bytes_)
+              != 0))
         {
           errno = EINVAL;
           return -1;
         }
 
       std::size_t nblocks = nbyte / block_logical_size_bytes_;
-      blknum_t blknum = offset_ / block_logical_size_bytes_;
+      blknum_t blknum = static_cast<std::size_t> (offset_)
+          / block_logical_size_bytes_;
 
       ssize_t ret = self ().read_block (buf, blknum, nblocks);
       if (ret >= 0)
@@ -256,14 +258,16 @@ namespace os
 
       if ((block_logical_size_bytes_ == 0)
           || ((nbyte % block_logical_size_bytes_) != 0)
-          || ((offset_ % block_logical_size_bytes_) != 0))
+          || ((static_cast<std::size_t> (offset_) % block_logical_size_bytes_)
+              != 0))
         {
           errno = EINVAL;
           return -1;
         }
 
       std::size_t nblocks = nbyte / block_logical_size_bytes_;
-      blknum_t blknum = offset_ / block_logical_size_bytes_;
+      blknum_t blknum = static_cast<std::size_t> (offset_)
+          / block_logical_size_bytes_;
 
       ssize_t ret = self ().write_block (buf, blknum, nblocks);
       if (ret >= 0)

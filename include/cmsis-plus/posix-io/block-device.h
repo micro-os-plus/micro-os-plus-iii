@@ -61,8 +61,7 @@ namespace os
 
     public:
 
-      // TODO: define a way to change this to uint64_t;
-      using blknum_t = uint32_t;
+      using blknum_t = std::size_t;
 
       // ----------------------------------------------------------------------
 
