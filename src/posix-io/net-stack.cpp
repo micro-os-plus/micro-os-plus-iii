@@ -26,6 +26,7 @@
  */
 
 #include <cmsis-plus/posix-io/net-stack.h>
+#include <cmsis-plus/posix-io/net-interface.h>
 
 // ----------------------------------------------------------------------------
 
@@ -39,23 +40,88 @@ namespace os
      * @cond ignore
      */
 
-    pool* net_stack::sockets_pool__;
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#endif
+
+    net_stack::net_list net_stack::net_list__;
+
+#pragma GCC diagnostic pop
 
     /**
      * @endcond
      */
 
     // ------------------------------------------------------------------------
-    net_stack::net_stack (pool* sockets_pool)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
+    class socket*
+    socket (int domain, int type, int protocol)
     {
-      sockets_pool__ = sockets_pool;
+      errno = 0;
+
+      // TODO: implement a way to identify the net stack.
+      net_stack* ns = nullptr;
+      class socket* sock = ns->socket (domain, type, protocol);
+      if (sock == nullptr)
+        {
+          return nullptr;
+        }
+      sock->alloc_file_descriptor ();
+      return sock;
+    }
+
+#pragma GCC diagnostic pop
+
+    // ========================================================================
+
+    net_stack::net_stack (net_stack_impl& impl, const char* name) :
+        name_ (name), //
+        impl_ (impl)
+    {
+#if defined(OS_TRACE_POSIX_IO_NET_STACK)
+      trace::printf ("net_stack::%s(\"%s\")=%p\n", __func__, name_, this);
+#endif
     }
 
     net_stack::~net_stack ()
     {
-      ;
+#if defined(OS_TRACE_POSIX_IO_NET_STACK)
+      trace::printf ("net_stack::%s(\"%s\") %p\n", __func__, name_, this);
+#endif
     }
 
-  }
-}
+    class socket*
+    net_stack::socket (int domain, int type, int protocol)
+    {
+      errno = 0;
 
+      return impl ().do_socket (domain, type, protocol);
+    }
+
+    // ========================================================================
+
+    net_stack_impl::net_stack_impl (net_stack& self, net_interface& interface) :
+        self_ (self), //
+        interface_ (interface)
+    {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
+      trace::printf ("net_stack_impl::%s()=%p\n", __func__, this);
+#endif
+    }
+
+    net_stack_impl::~net_stack_impl ()
+    {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
+      trace::printf ("net_stack_impl::%s() @%p\n", __func__, this);
+#endif
+    }
+
+  // ==========================================================================
+  } /* namespace posix */
+} /* namespace os */
+
+// ----------------------------------------------------------------------------

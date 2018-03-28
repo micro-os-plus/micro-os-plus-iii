@@ -36,10 +36,18 @@
 #include <cmsis-plus/os-app-config.h>
 #endif
 
+// ----------------------------------------------------------------------------
+
 namespace os
 {
   namespace posix
   {
+    // ------------------------------------------------------------------------
+
+    class net_interface_impl;
+
+    // ========================================================================
+
     /**
      * @brief Network interface class.
      * @headerfile net-interface.h <cmsis-plus/posix-io/net-interface.h>
@@ -56,7 +64,7 @@ namespace os
 
     public:
 
-      net_interface () = default;
+      net_interface (net_interface_impl& impl, const char* name);
 
       /**
        * @cond ignore
@@ -74,7 +82,8 @@ namespace os
        * @endcond
        */
 
-      ~net_interface () = default;
+      virtual
+      ~net_interface ();
 
       /**
        * @}

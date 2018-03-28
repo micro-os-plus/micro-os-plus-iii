@@ -59,6 +59,7 @@ namespace os
     class io_impl;
 
     class file_system;
+    class socket;
 
     /**
      * @ingroup cmsis-plus-posix-io-func
@@ -95,6 +96,12 @@ namespace os
 
       friend io*
       vopen (const char* path, int oflag, std::va_list args);
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+      friend class socket*
+      socket (int domain, int type, int protocol);
+#pragma GCC diagnostic pop
 
       /**
        * @endcond
