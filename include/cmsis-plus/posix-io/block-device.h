@@ -412,6 +412,9 @@ namespace os
         write_block (const void* buf, blknum_t blknum, std::size_t nblocks = 1)
             override;
 
+        virtual void
+        sync (void) override;
+
         // --------------------------------------------------------------------
         // Support functions.
 
@@ -679,6 +682,20 @@ namespace os
           { locker_ };
 
         return block_device::write_block (buf, blknum, nblocks);
+      }
+
+    template<typename T, typename L>
+      void
+      block_device_lockable<T, L>::sync (void)
+      {
+#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+        trace::printf ("block_device_lockable::%s() @%p\n", __func__, this);
+#endif
+
+        std::lock_guard<L> lock
+          { locker_ };
+
+        return block_device::sync ();
       }
 
     template<typename T, typename L>
