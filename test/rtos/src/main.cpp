@@ -32,6 +32,7 @@
 #include <test-cpp-api.h>
 #include <test-c-api.h>
 #include <test-iso-api.h>
+#include <test-posix-io-api.h>
 
 #include <test-cpp-mem.h>
 
@@ -84,6 +85,14 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
     }
 #endif
 
+#if !defined(__APPLE__) && !defined(__linux__)
+  if (ret == 0)
+    {
+      ret = test_posix_io_api (false);
+      printf ("errno=%d\n", errno);
+      errno = 0;
+    }
+#endif
 
   return ret;
 }
