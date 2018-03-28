@@ -312,6 +312,7 @@ namespace os
                                       void* pool_address,
                                       std::size_t pool_size_bytes)
     {
+      // Don't call this from interrupt handlers.
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
 #if !defined(OS_USE_RTOS_PORT_MEMORY_POOL)
@@ -361,10 +362,13 @@ namespace os
 
       if (pool_addr_ != nullptr)
         {
+          // The pool must be real, and have a non zero size.
           os_assert_throw(pool_size_bytes_ > 0, EINVAL);
+          // The pool must fit the storage.
           os_assert_throw(pool_size_bytes_ >= storage_size, EINVAL);
         }
 
+      // The pool must have a real address.
       os_assert_throw(pool_addr_ != nullptr, ENOMEM);
 
       internal_init_ ();
@@ -397,6 +401,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      // There must be no threads waiting for this pool.
       assert(list_.empty ());
 
       typedef typename std::allocator_traits<allocator_type>::pointer pointer;
@@ -492,7 +497,9 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
+      // Don't call this from critical regions.
       os_assert_throw(!scheduler::locked (), EPERM);
 
       void* p;
@@ -586,6 +593,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      // Don't call this from high priority interrupts.
       assert(port::interrupts::is_priority_valid ());
 
       void* p;
@@ -652,7 +660,9 @@ namespace os
                      static_cast<unsigned int> (timeout), this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
+      // Don't call this from critical regions.
       os_assert_throw(!scheduler::locked (), EPERM);
 
       void* p;
@@ -757,6 +767,7 @@ namespace os
       trace::printf ("%s(%p) @%p %s\n", __func__, block, this, name ());
 #endif
 
+      // Don't call this from high priority interrupts.
       assert(port::interrupts::is_priority_valid ());
 
       // Validate pointer.
@@ -808,6 +819,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
         {

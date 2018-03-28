@@ -152,6 +152,7 @@ namespace os
         trace::printf ("scheduler::%s() \n", __func__);
 #endif
 
+        // Don't call this from interrupt handlers.
         os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)
@@ -178,6 +179,7 @@ namespace os
       {
         trace::printf ("scheduler::%s() \n", __func__);
 
+        // Don't call this from interrupt handlers.
         os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
         sysclock.start ();
@@ -218,6 +220,7 @@ namespace os
 #if defined(OS_TRACE_RTOS_SCHEDULER)
         trace::printf ("scheduler::%s(%d) \n", __func__, state);
 #endif
+        // Don't call this from interrupt handlers.
         os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)

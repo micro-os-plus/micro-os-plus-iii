@@ -393,6 +393,7 @@ namespace os
               reinterpret_cast<stack::element_t*> (const_cast<allocator_type&> (allocator).allocate (
                   allocated_stack_size_elements_));
 
+          // Stack allocation failed.
           assert(allocated_stack_address_ != nullptr);
 
           internal_construct_ (
@@ -414,9 +415,12 @@ namespace os
                                  const attributes& attr, void* stack_address,
                                  std::size_t stack_size_bytes)
     {
+      // Don't call this from interrupt handlers.
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
+      // The thread function must be real.
       assert(function != nullptr);
+      // Don't forget to set the thread priority.
       assert(attr.th_priority != priority::none);
 
       clock_ = attr.clock != nullptr ? attr.clock : &sysclock;
@@ -426,6 +430,7 @@ namespace os
           // The attributes should not define any storage in this case.
           if (attr.th_stack_size_bytes > stack::min_size ())
             {
+              // The stack address must be real.
               assert(attr.th_stack_address == nullptr);
             }
 
@@ -563,6 +568,7 @@ namespace os
 
 #else
 
+      // Don't call this from high priority interrupts.
       assert(port::interrupts::is_priority_valid ());
 
         {
@@ -623,6 +629,7 @@ namespace os
     thread::priority_t
     thread::priority_inherited (void)
     {
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), priority::error);
 
       return prio_inherited_;
@@ -654,7 +661,9 @@ namespace os
       trace::printf ("%s(%u) @%p %s\n", __func__, prio, this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      // Check the priority, it is not in the allowed range.
       os_assert_err(prio < priority::error, EINVAL);
       os_assert_err(prio != priority::none, EINVAL);
 
@@ -720,8 +729,12 @@ namespace os
       trace::printf ("%s(%u) @%p %s\n", __func__, prio, this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      // Check the priority, it is not in the allowed range.
       os_assert_err(prio < priority::error, EINVAL);
+
+      // TODO: check why priority::none is seen here.
 
       if (prio == prio_inherited_)
         {
@@ -792,6 +805,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)
@@ -846,7 +860,9 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      // Don't call this from critical regions.
       os_assert_err(!scheduler::locked (), EPERM);
 
       // Fail if current thread
@@ -896,6 +912,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
       // TODO: implement according to POSIX specs.
@@ -965,6 +982,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       assert(!interrupts::in_handler_mode ());
 
         {
@@ -981,9 +999,11 @@ namespace os
               // ----- Exit critical section ----------------------------------
             }
 
+          // There must be no children threads still alive.
           assert(children_.empty ());
           parent_ = nullptr;
 
+          // There must be no more mutexes locked by this thread.
           assert(mutexes_.empty ());
           assert(acquired_mutexes_ == 0);
 
@@ -1108,6 +1128,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
         {
@@ -1146,6 +1167,7 @@ namespace os
               // ----- Exit critical section ----------------------------------
             }
 
+          // The must be no more children threads alive.
           assert(children_.empty ());
           parent_ = nullptr;
 
@@ -1159,6 +1181,7 @@ namespace os
 
           internal_destroy_ ();
 
+          // There must be no mutexes locked by this thread.
           // Must have been cleaned before.
           assert(mutexes_.empty ());
           assert(acquired_mutexes_ == 0);
@@ -1210,7 +1233,9 @@ namespace os
                      name (), event_flags_.mask ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      // Don't call this from critical regions.
       os_assert_err(!scheduler::locked (), EPERM);
 
         {
@@ -1277,6 +1302,7 @@ namespace os
                      name (), event_flags_.mask ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
         {
@@ -1314,7 +1340,9 @@ namespace os
                      mode, this, name (), event_flags_.mask ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      // Don't call this from critical regions.
       os_assert_err(!scheduler::locked (), EPERM);
 
         {
@@ -1428,6 +1456,7 @@ namespace os
       trace::printf ("%s(0x%X) @%p %s\n", __func__, mask, this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), flags::all);
 
       flags::mask_t ret = event_flags_.get (mask, mode);
@@ -1453,6 +1482,7 @@ namespace os
                      event_flags_.mask ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
       result_t res = event_flags_.clear (mask, oflags);
@@ -1510,12 +1540,14 @@ namespace os
       rtos::thread&
       thread (void)
       {
+        // Don't call this from interrupt handlers.
         os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
         rtos::thread* th;
 
         th = _thread ();
 
+        // Could not get the current thread.
         assert(th != nullptr);
         return (*th);
       }
@@ -1529,6 +1561,7 @@ namespace os
       void
       yield (void)
       {
+        // Don't call this from interrupt handlers.
         os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
         if (!scheduler::started ())

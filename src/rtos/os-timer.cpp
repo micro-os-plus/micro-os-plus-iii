@@ -174,7 +174,9 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
+      // Don't call this from critical regions.
       os_assert_throw(function != nullptr, EINVAL);
 
       type_ = attr.tm_type;
@@ -248,6 +250,7 @@ namespace os
                      static_cast<unsigned int> (period), this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
       if (period == 0)
@@ -304,6 +307,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
       if (state_ != state::running)

@@ -173,6 +173,7 @@ namespace os
                      initial_value, max_value_);
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
       // The CMSIS validator requires the max_value to be equal to
@@ -232,6 +233,7 @@ namespace os
 
 #else
 
+      // There must be no threads waiting for this semaphore.
       assert(list_.empty ());
 
 #endif
@@ -335,6 +337,7 @@ namespace os
 
 #else
 
+      // Don't call this from high priority interrupts.
       assert(port::interrupts::is_priority_valid ());
 
         {
@@ -400,7 +403,9 @@ namespace os
       trace::printf ("%s() @%p %s <%u\n", __func__, this, name (), count_);
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      // Don't call this from critical regions.
       os_assert_err(!scheduler::locked (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
@@ -495,6 +500,7 @@ namespace os
       trace::printf ("%s() @%p %s <%u\n", __func__, this, name (), count_);
 #endif
 
+      // Don't call this from high priority interrupts.
       assert(port::interrupts::is_priority_valid ());
 
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
@@ -566,7 +572,9 @@ namespace os
                      count_);
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      // Don't call this from critical regions.
       os_assert_err(!scheduler::locked (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
@@ -703,6 +711,7 @@ namespace os
       trace::printf ("%s() @%p %s <%u\n", __func__, this, name (), count_);
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)

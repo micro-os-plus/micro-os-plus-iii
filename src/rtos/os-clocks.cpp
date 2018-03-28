@@ -206,7 +206,9 @@ namespace os
                      &this_thread::thread (), this_thread::thread ().name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      // Don't call this from critical regions.
       os_assert_err(!scheduler::locked (), EPERM);
 
       clock::timestamp_t timestamp = steady_now () + duration;
@@ -246,7 +248,9 @@ namespace os
       trace::printf ("%s()\n", __func__);
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      // Don't call this from critical regions.
       os_assert_err(!scheduler::locked (), EPERM);
 
       for (;;)
@@ -285,7 +289,9 @@ namespace os
       trace::printf ("%s(%u)\n", __func__, static_cast<unsigned int> (timeout));
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      // Don't call this from critical regions.
       os_assert_err(!scheduler::locked (), EPERM);
 
       clock::timestamp_t timestamp = steady_now () + timeout;
@@ -435,7 +441,9 @@ namespace os
       trace::printf ("%s()\n", __func__);
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      // Don't call this from critical regions.
       os_assert_err(!scheduler::locked (), EPERM);
 
       for (;;)
@@ -690,6 +698,7 @@ namespace os
 #if defined(OS_TRACE_RTOS_CLOCKS)
       trace::printf ("clock_rtc::%s()\n", __func__);
 #endif
+      // Don't call this from interrupt handlers.
       assert (!interrupts::in_handler_mode ());
 
       // TODO: Use the RTC driver to initialise the seconds to epoch.

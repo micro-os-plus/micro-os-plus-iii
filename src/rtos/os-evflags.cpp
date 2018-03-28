@@ -161,6 +161,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
 #if !defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
@@ -204,6 +205,7 @@ namespace os
 
 #else
 
+      // There must be no threads waiting for these flags.
       assert(list_.empty ());
 
 #endif
@@ -239,7 +241,9 @@ namespace os
                      name (), event_flags_.mask ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
+      // Don't call this from critical regions.
       os_assert_throw(!scheduler::locked (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
@@ -346,6 +350,7 @@ namespace os
 
 #else
 
+      // Don't call this from high priority interrupts.
       assert(port::interrupts::is_priority_valid ());
 
         {
@@ -421,7 +426,9 @@ namespace os
                      mode, this, name (), event_flags_.mask ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
+      // Don't call this from critical regions.
       os_assert_throw(!scheduler::locked (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
@@ -646,6 +653,7 @@ namespace os
 
 #else
 
+      // Don't call this from high priority interrupts.
       assert(port::interrupts::is_priority_valid ());
 
         {

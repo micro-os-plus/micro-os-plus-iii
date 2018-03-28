@@ -474,6 +474,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
       os_assert_throw(type_ <= type::max_, EINVAL);
@@ -533,6 +534,7 @@ namespace os
 
 #else
 
+      // The mutex must have no owner (must have been unlocked).
       assert(owner_ == nullptr);
       // There must be no threads waiting for this mutex.
       assert(list_.empty ());
@@ -916,7 +918,9 @@ namespace os
                      &this_thread::thread (), this_thread::thread ().name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      // Don't try to lock a non-recursive mutex again.
       os_assert_err(!scheduler::locked (), EPERM);
 
       if (!recoverable_)
@@ -1035,6 +1039,7 @@ namespace os
                      &this_thread::thread (), this_thread::thread ().name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
       if (!recoverable_)
@@ -1111,7 +1116,9 @@ namespace os
                      &this_thread::thread (), this_thread::thread ().name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      // Don't try to lock a non-recursive mutex again.
       os_assert_err(!scheduler::locked (), EPERM);
 
       if (!recoverable_)
@@ -1268,6 +1275,7 @@ namespace os
                      &this_thread::thread (), this_thread::thread ().name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_MUTEX)
@@ -1301,6 +1309,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       assert(!interrupts::in_handler_mode ());
 
 #if defined(OS_USE_RTOS_PORT_MUTEX)
@@ -1342,6 +1351,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_MUTEX)
@@ -1406,8 +1416,11 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      // Don't call this for non-robust mutexes.
       os_assert_err(robustness_ == robustness::robust, EINVAL);
+      // Don't call it if already consistent.
       os_assert_err(!consistent_, EINVAL);
 
 #if defined(OS_USE_RTOS_PORT_MUTEX)
@@ -1440,6 +1453,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
         {

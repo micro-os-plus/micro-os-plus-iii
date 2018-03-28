@@ -478,6 +478,7 @@ namespace os
 
 #if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
+      // There must be no threads waiting for this queue.
       assert(send_list_.empty ());
       assert(receive_list_.empty ());
 
@@ -510,6 +511,7 @@ namespace os
                                         void* queue_address,
                                         std::size_t queue_size_bytes)
     {
+      // Don't call this from interrupt handlers.
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
 
 #if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
@@ -549,12 +551,14 @@ namespace os
 #endif
       if (queue_addr_ != nullptr)
         {
+          // The queue must be real, and have a non zero size.
           os_assert_throw(queue_size_bytes_ > 0, EINVAL);
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
           os_assert_throw(
               queue_size_bytes_ >= (std::size_t) (msgs * msg_size_bytes),
               EINVAL);
 #else
+          // The queue must fit the storage.
           os_assert_throw(queue_size_bytes_ >= storage_size, EINVAL);
 #endif
         }
@@ -568,6 +572,7 @@ namespace os
 
       head_ = no_index;
 
+      // The queue storage must have a real address.
       os_assert_throw(queue_addr_ != nullptr, ENOMEM);
 
       // The array of prev indexes follows immediately after the content array.
@@ -865,8 +870,11 @@ namespace os
                      this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      // Don't call this from critical regions.
       os_assert_err(!scheduler::locked (), EPERM);
+
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
 
@@ -982,6 +990,7 @@ namespace os
       return port::message_queue::try_send (this, msg, nbytes, mprio);
 
 #else
+      // Don't call this from high priority interrupts.
       assert(port::interrupts::is_priority_valid ());
 
         {
@@ -1057,8 +1066,11 @@ namespace os
                      timeout, this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      // Don't call this from critical regions.
       os_assert_err(!scheduler::locked (), EPERM);
+
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
 
@@ -1190,8 +1202,11 @@ namespace os
                      name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      // Don't call this from critical regions.
       os_assert_err(!scheduler::locked (), EPERM);
+
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
 
@@ -1309,6 +1324,7 @@ namespace os
 
 #else
 
+      // Don't call this from high priority interrupts.
       assert(port::interrupts::is_priority_valid ());
 
         {
@@ -1397,8 +1413,11 @@ namespace os
                      this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      // Don't call this from critical regions.
       os_assert_err(!scheduler::locked (), EPERM);
+
       os_assert_err(msg != nullptr, EINVAL);
       os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
 
@@ -1505,6 +1524,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)

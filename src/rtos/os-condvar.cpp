@@ -266,6 +266,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_throw(!interrupts::in_handler_mode (), EPERM);
     }
 
@@ -293,6 +294,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      // There must be no threads waiting for this condition.
       assert(list_.empty ());
     }
 
@@ -337,6 +339,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
       list_.resume_one ();
@@ -406,6 +409,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
 
       // Wake-up all threads, if any.
@@ -505,7 +509,9 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      // Don't call this from critical regions.
       os_assert_err(!scheduler::locked (), EPERM);
 
       thread& crt_thread = this_thread::thread ();
@@ -649,7 +655,9 @@ namespace os
                      static_cast<unsigned int> (timeout), this, name ());
 #endif
 
+      // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      // Don't call this from critical regions.
       os_assert_err(!scheduler::locked (), EPERM);
 
       thread& crt_thread = this_thread::thread ();
