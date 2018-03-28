@@ -47,7 +47,7 @@ namespace os
 #endif
     }
 
-    tty::~tty ()
+    tty::~tty () noexcept
     {
 #if defined(OS_TRACE_POSIX_IO_TTY)
       trace::printf ("tty::%s() @%p %s\n", __func__, this, name_);
@@ -78,6 +78,12 @@ namespace os
     tty::tcflush (int queue_selector)
     {
       return impl ().do_tcflush (queue_selector);
+    }
+
+    inline int
+    tty::tcdrain (void)
+    {
+      return impl ().do_tcdrain ();
     }
 
     // ========================================================================
