@@ -61,7 +61,10 @@ namespace os
       // Possibly adjust the last two parameters.
       res = std::align (chunk_align, chunk_minsize, arena_addr_, total_bytes_);
       // std::align() will fail if it cannot fit the min chunk.
-      assert(res != nullptr);
+      if (res == nullptr)
+        {
+          assert(res != nullptr);
+        }
       assert((total_bytes_ % chunk_align) == 0);
 
       internal_reset_ ();
@@ -224,7 +227,10 @@ namespace os
 
       void* res;
       res = std::align (alignment, bytes, aligned_payload, aligned_size);
-      assert(res != nullptr);
+      if (res == nullptr)
+        {
+          assert(res != nullptr);
+        }
 
       // Compute the possible alignment offset.
       std::ptrdiff_t offset = static_cast<char *> (aligned_payload) - payload;
