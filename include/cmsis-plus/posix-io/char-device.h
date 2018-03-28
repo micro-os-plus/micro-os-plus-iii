@@ -111,6 +111,9 @@ namespace os
 
     // ========================================================================
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
     class char_device_impl : public device_impl
     {
       // ----------------------------------------------------------------------
@@ -173,6 +176,8 @@ namespace os
        * @}
        */
     };
+
+#pragma GCC diagnostic pop
 
     // ========================================================================
 

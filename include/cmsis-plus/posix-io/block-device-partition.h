@@ -115,6 +115,9 @@ namespace os
 
     // ========================================================================
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
     class block_device_partition_impl : public block_device_impl
     {
       // ----------------------------------------------------------------------
@@ -213,6 +216,8 @@ namespace os
        * @endcond
        */
     };
+
+#pragma GCC diagnostic pop
 
     // ========================================================================
 
@@ -394,10 +399,17 @@ namespace os
 
     // ========================================================================
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wweak-template-vtables"
+#endif
+
     extern template class block_device_partition_implementable<
         block_device_partition_impl> ;
 
-  // ========================================================================
+#pragma GCC diagnostic pop
+
+  // ==========================================================================
   } /* namespace posix */
 } /* namespace os */
 

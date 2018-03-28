@@ -96,6 +96,8 @@ namespace os
 
       bool is_preemptive_ = false;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
       // A small kludge to provide a temporary errno before
       // the first real thread is created.
       typedef struct {
@@ -104,6 +106,7 @@ namespace os
         // errno is the first thread member, so right after the name.
         int errno_;
       } tiny_thread_t;
+#pragma GCC diagnostic pop
 
       // Ensure the tiny thread is large enough to have the errno
       // member in the same location.
@@ -112,7 +115,12 @@ namespace os
       static_assert(offsetof(tiny_thread_t, errno_) == offsetof(thread, errno_), "adjust tiny_thread_t members");
 #pragma GCC diagnostic pop
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#endif
       tiny_thread_t tiny_thread;
+#pragma GCC diagnostic pop
 
       thread* volatile current_thread_ = reinterpret_cast<thread*>(&tiny_thread);
 

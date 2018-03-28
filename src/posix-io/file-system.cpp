@@ -44,7 +44,15 @@ namespace os
      * @cond ignore
      */
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#endif
+
     file_system::mounted_list file_system::mounted_list__;
+
+#pragma GCC diagnostic pop
 
     class file_system* file_system::mounted_root__;
 

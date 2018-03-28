@@ -204,9 +204,17 @@ namespace os
         return nullptr;
       }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#endif
+
     // Initialised to 0 by BSS.
     template<typename T>
       typename device_registry<T>::device_list device_registry<T>::registry_list__;
+
+#pragma GCC diagnostic pop
 
   // ==========================================================================
   } /* namespace posix */
