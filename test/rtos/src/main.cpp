@@ -46,11 +46,14 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 #endif
 
   int ret = 0;
+  errno = 0;
 
 #if 0
   if (ret == 0)
     {
       ret = test_cpp_mem ();
+      printf ("errno=%d\n", errno);
+      errno = 0;
     }
 #endif
 
@@ -58,6 +61,8 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   if (ret == 0)
     {
       ret = test_cpp_api ();
+      printf ("errno=%d\n", errno);
+      errno = 0;
     }
 #endif
 
@@ -65,6 +70,8 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   if (ret == 0)
     {
       ret = test_c_api ();
+      printf ("errno=%d\n", errno);
+      errno = 0;
     }
 #endif
 
@@ -72,10 +79,11 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   if (ret == 0)
     {
       ret = test_iso_api (false);
+      printf ("errno=%d\n", errno);
+      errno = 0;
     }
 #endif
 
-  printf ("errno=%d\n", errno);
 
   return ret;
 }
