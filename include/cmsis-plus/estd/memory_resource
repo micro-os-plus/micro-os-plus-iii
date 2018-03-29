@@ -190,6 +190,7 @@ namespace os
       inline memory_resource*
       get_default_resource (void) noexcept
       {
+        rtos::memory::init_once_default_resource ();
         return default_resource;
       }
 

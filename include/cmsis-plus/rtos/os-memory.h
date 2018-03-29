@@ -128,6 +128,9 @@ namespace os
       memory_resource*
       get_default_resource (void) noexcept;
 
+      void
+      init_once_default_resource (void);
+
       /**
        * @}
        */
@@ -1121,6 +1124,7 @@ namespace os
       inline memory_resource*
       get_default_resource (void) noexcept
       {
+        rtos::memory::init_once_default_resource ();
         return default_resource;
       }
 
@@ -1135,6 +1139,7 @@ namespace os
         inline memory_resource*
         get_resource_typed<thread> (void) noexcept
         {
+          rtos::memory::init_once_default_resource ();
           return resource_thread;
         }
 
@@ -1149,6 +1154,7 @@ namespace os
         inline memory_resource*
         get_resource_typed<condition_variable> (void) noexcept
         {
+          rtos::memory::init_once_default_resource ();
           return resource_condition_variable;
         }
 
@@ -1163,6 +1169,7 @@ namespace os
         inline memory_resource*
         get_resource_typed<event_flags> (void) noexcept
         {
+          rtos::memory::init_once_default_resource ();
           return resource_event_flags;
         }
 
@@ -1177,6 +1184,7 @@ namespace os
         inline memory_resource*
         get_resource_typed<memory_pool> (void) noexcept
         {
+          rtos::memory::init_once_default_resource ();
           return resource_memory_pool;
         }
 
@@ -1191,6 +1199,7 @@ namespace os
         inline memory_resource*
         get_resource_typed<message_queue> (void) noexcept
         {
+          rtos::memory::init_once_default_resource ();
           return resource_message_queue;
         }
 
@@ -1205,6 +1214,7 @@ namespace os
         inline memory_resource*
         get_resource_typed<mutex> (void) noexcept
         {
+          rtos::memory::init_once_default_resource ();
           return resource_mutex;
         }
 
@@ -1219,6 +1229,7 @@ namespace os
         inline memory_resource*
         get_resource_typed<semaphore> (void) noexcept
         {
+          rtos::memory::init_once_default_resource ();
           return resource_semaphore;
         }
 
@@ -1233,6 +1244,7 @@ namespace os
         inline memory_resource*
         get_resource_typed<timer> (void) noexcept
         {
+          rtos::memory::init_once_default_resource ();
           return resource_timer;
         }
 

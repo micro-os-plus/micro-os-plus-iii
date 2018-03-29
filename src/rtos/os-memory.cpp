@@ -75,13 +75,29 @@ namespace os
           sizeof(os::memory::new_delete_memory_resource),
           alignof(os::memory::new_delete_memory_resource)>::type new_delete_res;
 
+      void
+      init_once_default_resource (void)
+      {
+        static int guard; // Cleared during BSS init.
+        if (guard == 0)
+          {
+            guard = 1;
+
+            trace::printf ("rtos::memory::%s() \n", __func__);
+
+            new (&malloc_res) os::memory::malloc_memory_resource ("malloc");
+            new (&null_res) os::memory::null_memory_resource ();
+            new (&new_delete_res) os::memory::new_delete_memory_resource ();
+          }
+      }
+
+      // This guarantees that the memory resources are initialised
+      // before entering main().
       static void
       __attribute__((constructor))
-      __init (void)
+      __constructor (void)
       {
-        new (&malloc_res) os::memory::malloc_memory_resource ("malloc");
-        new (&null_res) os::memory::null_memory_resource ();
-        new (&new_delete_res) os::memory::new_delete_memory_resource ();
+        init_once_default_resource ();
       }
 
       // allocator_pool<mutex> allocator_mutex_instance;
