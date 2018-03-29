@@ -169,10 +169,13 @@ namespace os
      *          from the constructor of _T_.
      */
     template<typename T, typename ... Args>
-      inline std::shared_ptr<T>
+      inline typename std::enable_if<!std::is_array<T>::value,
+          std::shared_ptr<T> >::type
       make_shared (Args&&... args)
       {
-        return std::allocate_shared<T> (memory::allocator<T> (),
+        // -Wno-psabi to disble the ABI warning.
+        typedef typename std::remove_const<T>::type T_nc;
+        return std::allocate_shared<T> (memory::allocator<T_nc> (),
                                         std::forward<Args>(args)...);
       }
 
