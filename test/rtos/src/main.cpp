@@ -85,7 +85,7 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
     }
 #endif
 
-#if !defined(__APPLE__) && !defined(__linux__)
+#if 1
   if (ret == 0)
     {
       ret = test_posix_io_api (false);

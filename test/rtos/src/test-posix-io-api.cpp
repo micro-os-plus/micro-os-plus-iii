@@ -46,9 +46,6 @@ using namespace os;
 
 // ----------------------------------------------------------------------------
 
-#if !defined(__APPLE__) && !defined(__linux__)
-
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
@@ -366,7 +363,9 @@ static uint8_t buff[512 * 4];
 static const char* test_name = "Test POSIX I/O";
 
 #pragma GCC diagnostic push
+#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
 
 int
 test_posix_io_api (bool extra __attribute__((unused)))
@@ -457,7 +456,7 @@ test_posix_io_api (bool extra __attribute__((unused)))
       assert(res2 >= 0);
     }
 
-#if !defined(OS_USE_SEMIHOSTING_SYSCALLS)
+#if !defined(__APPLE__) && !defined(__linux__) && !defined(OS_USE_SEMIHOSTING_SYSCALLS)
 
   printf ("\n%s - Block device - C API.\n", test_name);
     {
@@ -482,8 +481,6 @@ test_posix_io_api (bool extra __attribute__((unused)))
 }
 
 #pragma GCC diagnostic pop
-
-#endif
 
 // ----------------------------------------------------------------------------
 
