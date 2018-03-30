@@ -32,14 +32,6 @@
 
 #include <cmsis-plus/os-versions.h>
 
-/**
- * @brief Tell the world that µOS++ is in use.
- * @details
- * Macro to inform including files that µOS++ RTOS
- * definitions are available.
- */
- #define OS_USE_MICRO_OS_PLUS
- 
 // Include the application specific definitions.
 #include <cmsis-plus/os-app-config.h>
 // Include the non-portable portable types, enums and constants declarations.

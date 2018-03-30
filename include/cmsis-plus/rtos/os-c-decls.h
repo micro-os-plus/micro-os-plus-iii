@@ -40,14 +40,6 @@
 // ----------------------------------------------------------------------------
 
 #include <cmsis-plus/os-versions.h>
-
-/**
- * @brief Tell the world that µOS++ is in use.
- * @details
- * Macro to inform including files that µOS++ RTOS
- * definitions are available.
- */
- #define OS_USE_MICRO_OS_PLUS
  
 #include <cmsis-plus/os-app-config.h>
 #include <cmsis-plus/rtos/port/os-decls.h>

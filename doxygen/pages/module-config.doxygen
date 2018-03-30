@@ -86,4 +86,12 @@
  the µOS++ reference C++ implementations.
  */
 
+/**
+ @defgroup cmsis-plus-app-config-info Informative Options
+ @ingroup cmsis-plus-app-config
+ @brief  Definitions passed back to the application.
+ @details
+ Definitions originated in the µOS++ headers, useful to the application.
+ */
+
 // ----------------------------------------------------------------------------

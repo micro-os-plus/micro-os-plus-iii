@@ -66,4 +66,47 @@
 
 // ----------------------------------------------------------------------------
 
+/**
+ * @ingroup cmsis-plus-app-config-info
+ * @{
+ */
+
+/**
+ * @brief Tell the world that µOS++ is in use.
+ * @details
+ * Macro to inform the application build that µOS++
+ * is in use.
+ */
+ #define OS_USE_MICRO_OS_PLUS
+
+/**
+ * @def OS_IS_CROSS_BUILD
+ * @brief Tell the world that this is a cross build.
+ * @details
+ * Currently only macOS and GNU/Linux are identified as native builds,
+ * all the other are considered cross builds.
+ */
+
+/**
+ * @def OS_HAS_STD_THREADS
+ * @brief Tell the world that `std::tread` is available.
+ * @details
+ * For cross builds, standard thread definitions (available in the
+ * `os::estd::` namespace) are also aliased or redefined in the `std::`
+ * namespace.
+ */
+
+#if !defined(__APPLE__) && !defined(__linux__)
+#define OS_IS_CROSS_BUILD
+#if !defined(_GLIBCXX_HAS_GTHREADS)
+#define OS_HAS_STD_THREADS
+#endif
+#endif
+
+/**
+ * @}
+ */
+
+// ----------------------------------------------------------------------------
+
 #endif /* CMSIS_PLUS_OS_VERSIONS_H_ */
