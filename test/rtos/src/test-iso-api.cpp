@@ -129,7 +129,7 @@ test_iso_api (bool extra)
           th11.join ();
         }
 
-#if !defined(__APPLE__) && !defined(__linux__) && !defined(_GLIBCXX_HAS_GTHREADS)
+#if defined(OS_HAS_STD_THREADS)
 
         {
           std::thread th12
@@ -159,7 +159,7 @@ test_iso_api (bool extra)
           th41.join ();
         }
 
-#if !defined(__APPLE__) && !defined(__linux__) && !defined(_GLIBCXX_HAS_GTHREADS)
+#if defined(OS_HAS_STD_THREADS)
 
         {
           char c;
@@ -192,7 +192,7 @@ test_iso_api (bool extra)
           estd::this_thread::yield ();
         }
 
-#if !defined(__APPLE__) && !defined(__linux__) && !defined(_GLIBCXX_HAS_GTHREADS)
+#if defined(OS_HAS_STD_THREADS)
 
         {
           std::thread::id id = std::this_thread::get_id ();
@@ -267,7 +267,7 @@ test_iso_api (bool extra)
 
         }
 
-#if !defined(__APPLE__) && !defined(__linux__) && !defined(_GLIBCXX_HAS_GTHREADS)
+#if defined(OS_HAS_STD_THREADS)
 
         {
           std::mutex mx12;
@@ -388,7 +388,7 @@ test_iso_api (bool extra)
         }
     }
 
-#if !defined(__APPLE__) && !defined(__linux__) && !defined(_GLIBCXX_HAS_GTHREADS)
+#if defined(OS_HAS_STD_THREADS)
 
     {
       std::condition_variable cv12;

@@ -447,7 +447,7 @@ namespace os
   } /* namespace estd */
 } /* namespace os */
 
-#if !defined(__APPLE__) && !defined(__linux__) && !defined(_GLIBCXX_HAS_GTHREADS)
+#if defined(OS_HAS_STD_THREADS)
 
 namespace std
 {
