@@ -113,7 +113,7 @@ namespace os
        */
 
       // The default RTOS system memory resource.
-#if defined(__APPLE__) || defined(__linux__)
+#if !defined(OS_IS_CROSS_BUILD)
 
       memory_resource* default_resource __attribute__((weak))
       = reinterpret_cast<memory_resource*> (&malloc_res);
@@ -529,7 +529,7 @@ namespace os
         return reinterpret_cast<memory_resource*> (&rtos::memory::null_res);
       }
 
-#if defined(__APPLE__) || defined(__linux__)
+#if !defined(OS_IS_CROSS_BUILD)
       memory_resource* default_resource __attribute__((weak))
       = reinterpret_cast<memory_resource*> (&rtos::memory::malloc_res);
 #else

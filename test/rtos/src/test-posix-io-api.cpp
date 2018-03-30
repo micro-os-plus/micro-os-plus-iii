@@ -456,7 +456,7 @@ test_posix_io_api (bool extra __attribute__((unused)))
       assert(res2 >= 0);
     }
 
-#if !defined(__APPLE__) && !defined(__linux__) && !defined(OS_USE_SEMIHOSTING_SYSCALLS)
+#if defined(OS_IS_CROSS_BUILD) && !defined(OS_USE_SEMIHOSTING_SYSCALLS)
 
   printf ("\n%s - Block device - C API.\n", test_name);
     {
