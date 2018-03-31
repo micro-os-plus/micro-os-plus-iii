@@ -25,8 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CMSIS_PLUS_POSIX_IO_DEVICE_CHAR_H_
-#define CMSIS_PLUS_POSIX_IO_DEVICE_CHAR_H_
+#ifndef CMSIS_PLUS_POSIX_IO_CHAR_DEVICE_H_
+#define CMSIS_PLUS_POSIX_IO_CHAR_DEVICE_H_
 
 #if defined(__cplusplus)
 
@@ -293,7 +293,7 @@ namespace os
             impl_instance_
               { *this, std::forward<Args>(args)... }
         {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_CHAR)
+#if defined(OS_TRACE_POSIX_IO_CHAR_DEVICE)
           trace::printf ("char_device_implementable::%s(\"%s\")=@%p\n",
                          __func__, name_, this);
 #endif
@@ -302,7 +302,7 @@ namespace os
     template<typename T>
       char_device_implementable<T>::~char_device_implementable ()
       {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_CHAR)
+#if defined(OS_TRACE_POSIX_IO_CHAR_DEVICE)
         trace::printf ("char_device_implementable::%s() @%p %s\n", __func__,
                        this, name_);
 #endif
@@ -323,4 +323,4 @@ namespace os
 
 #endif /* __cplusplus */
 
-#endif /* CMSIS_PLUS_POSIX_IO_DEVICE_CHAR_H_ */
+#endif /* CMSIS_PLUS_POSIX_IO_CHAR_DEVICE_H_ */

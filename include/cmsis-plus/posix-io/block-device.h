@@ -25,8 +25,8 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CMSIS_PLUS_POSIX_IO_DEVICE_BLOCK_H_
-#define CMSIS_PLUS_POSIX_IO_DEVICE_BLOCK_H_
+#ifndef CMSIS_PLUS_POSIX_IO_BLOCK_DEVICE_H_
+#define CMSIS_PLUS_POSIX_IO_BLOCK_DEVICE_H_
 
 #if defined(__cplusplus)
 
@@ -496,7 +496,7 @@ namespace os
             impl_instance_
               { *this, std::forward<Args>(args)... }
         {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
           trace::printf ("block_device_implementable::%s(\"%s\")=@%p\n",
                          __func__, name_, this);
 #endif
@@ -505,7 +505,7 @@ namespace os
     template<typename T>
       block_device_implementable<T>::~block_device_implementable ()
       {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
         trace::printf ("block_device_implementable::%s() @%p %s\n", __func__,
                        this, name_);
 #endif
@@ -530,7 +530,7 @@ namespace os
               { *this, std::forward<Args>(args)... }, //
             locker_ (locker)
         {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
           trace::printf ("block_device_lockable::%s(\"%s\")=@%p\n", __func__,
                          name_, this);
 #endif
@@ -539,7 +539,7 @@ namespace os
     template<typename T, typename L>
       block_device_lockable<T, L>::~block_device_lockable ()
       {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
         trace::printf ("block_device_lockable::%s() @%p %s\n", __func__, this,
                        name_);
 #endif
@@ -551,7 +551,7 @@ namespace os
       int
       block_device_lockable<T, L>::close (void)
       {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
         trace::printf ("block_device_lockable::%s() @%p\n", __func__, this);
 #endif
 
@@ -565,7 +565,7 @@ namespace os
       ssize_t
       block_device_lockable<T, L>::read (void* buf, std::size_t nbyte)
       {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
         trace::printf ("block_device_lockable::%s(0x0%X, %u) @%p\n", __func__,
                        buf, nbyte, this);
 #endif
@@ -580,7 +580,7 @@ namespace os
       ssize_t
       block_device_lockable<T, L>::write (const void* buf, std::size_t nbyte)
       {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
         trace::printf ("block_device_lockable::%s(0x0%X, %u) @%p\n", __func__,
                        buf, nbyte, this);
 #endif
@@ -595,7 +595,7 @@ namespace os
       ssize_t
       block_device_lockable<T, L>::writev (const struct iovec* iov, int iovcnt)
       {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
         trace::printf ("block_device_lockable::%s(0x0%X, %d) @%p\n", __func__,
                        iov, iovcnt, this);
 #endif
@@ -610,7 +610,7 @@ namespace os
       int
       block_device_lockable<T, L>::vfcntl (int cmd, std::va_list args)
       {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
         trace::printf ("block_device_lockable::%s(%d) @%p\n", __func__, cmd,
                        this);
 #endif
@@ -625,7 +625,7 @@ namespace os
       int
       block_device_lockable<T, L>::vioctl (int request, std::va_list args)
       {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
         trace::printf ("block_device_lockable::%s(%d) @%p\n", __func__, request,
                        this);
 #endif
@@ -640,7 +640,7 @@ namespace os
       off_t
       block_device_lockable<T, L>::lseek (off_t offset, int whence)
       {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
         trace::printf ("block_device_lockable::%s(%d, %d) @%p\n", __func__,
                        offset, whence, this);
 #endif
@@ -656,7 +656,7 @@ namespace os
       block_device_lockable<T, L>::read_block (void* buf, blknum_t blknum,
                                                std::size_t nblocks)
       {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
         trace::printf ("block_device_lockable::%s(%p, %u, %u) @%p\n", __func__,
                        buf, blknum, nblocks, this);
 #endif
@@ -673,7 +673,7 @@ namespace os
                                                 blknum_t blknum,
                                                 std::size_t nblocks)
       {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
         trace::printf ("block_device_lockable::%s(%p, %u, %u) @%p\n", __func__,
                        buf, blknum, nblocks, this);
 #endif
@@ -688,7 +688,7 @@ namespace os
       void
       block_device_lockable<T, L>::sync (void)
       {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
         trace::printf ("block_device_lockable::%s() @%p\n", __func__, this);
 #endif
 
@@ -713,4 +713,4 @@ namespace os
 
 #endif /* __cplusplus */
 
-#endif /* CMSIS_PLUS_POSIX_IO_DEVICE_BLOCK_H_ */
+#endif /* CMSIS_PLUS_POSIX_IO_BLOCK_DEVICE_H_ */

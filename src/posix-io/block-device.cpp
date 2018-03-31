@@ -47,7 +47,7 @@ namespace os
         device
           { impl, type::block_device, name, }
     {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
       trace::printf ("block_device::%s(\"%s\")=@%p\n", __func__, name_, this);
 #endif
 
@@ -56,7 +56,7 @@ namespace os
 
     block_device::~block_device ()
     {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
       trace::printf ("block_device::%s() @%p %s\n", __func__, this, name_);
 #endif
     }
@@ -66,7 +66,7 @@ namespace os
     ssize_t
     block_device::read_block (void* buf, blknum_t blknum, std::size_t nblocks)
     {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
       trace::printf ("block_device::%s(%p, %u, %u) @%p\n", __func__, buf,
                      blknum, nblocks, this);
 #endif
@@ -84,7 +84,7 @@ namespace os
     block_device::write_block (const void* buf, blknum_t blknum,
                                std::size_t nblocks)
     {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
       trace::printf ("block_device::%s(%p, %u, %u) @%p\n", __func__, buf,
                      blknum, nblocks, this);
 #endif
@@ -101,7 +101,7 @@ namespace os
     int
     block_device::vioctl (int request, std::va_list args)
     {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
       trace::printf ("block_device::%s(%d) @%p\n", __func__, request, this);
 #endif
 
@@ -165,14 +165,14 @@ namespace os
         device_impl
           { self }
     {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
       trace::printf ("block_device_impl::%s()=@%p\n", __func__, this);
 #endif
     }
 
     block_device_impl::~block_device_impl ()
     {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
       trace::printf ("block_device_impl::%s() @%p\n", __func__, this);
 #endif
 
@@ -185,7 +185,7 @@ namespace os
     off_t
     block_device_impl::do_lseek (off_t offset, int whence)
     {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
       trace::printf ("block_device_impl::%s(%d, %d) @%p\n", __func__, offset,
                      whence, this);
 #endif
@@ -222,7 +222,7 @@ namespace os
     ssize_t
     block_device_impl::do_read (void* buf, std::size_t nbyte)
     {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
       trace::printf ("block_device_impl::%s(%p, %u) @%p\n", __func__, buf,
                      nbyte, this);
 #endif
@@ -251,7 +251,7 @@ namespace os
     ssize_t
     block_device_impl::do_write (const void* buf, std::size_t nbyte)
     {
-#if defined(OS_TRACE_POSIX_IO_DEVICE_BLOCK)
+#if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
       trace::printf ("block_device_impl::%s(%p, %u) @%p\n", __func__, buf,
                      nbyte, this);
 #endif
