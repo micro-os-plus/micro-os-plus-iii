@@ -42,7 +42,6 @@ extern "C"
 
   // For embedded environment that use POSIX system calls, redefine
   // all functions without the '__posix_' prefix.
-
   int __attribute__((weak, alias ("__posix_accept")))
   accept (int socket, struct sockaddr* address, socklen_t* address_len);
 
@@ -220,6 +219,21 @@ extern "C"
   int __attribute__((weak, alias ("__posix_system")))
   system (const char *command);
 
+  int __attribute__((weak, alias ("__posix_symlink")))
+  tcdrain (int fildes);
+
+  int __attribute__((weak, alias ("__posix_tcflush")))
+  tcflush (int fildes, int queue_selector);
+
+  int __attribute__((weak, alias ("__posix_tcgetattr")))
+  tcgetattr (int fildes, struct termios *termios_p);
+
+  int __attribute__((weak, alias ("__posix_tcsendbreak")))
+  tcsendbreak (int fildes, int duration);
+
+  int __attribute__((weak, alias ("__posix_tcsetattr")))
+  tcsetattr (int fildes, int optional_actions, const struct termios *termios_p);
+
   clock_t __attribute__((weak, alias ("__posix_times")))
   times (struct tms* buf);
 
@@ -241,12 +255,11 @@ extern "C"
   ssize_t __attribute__((weak, alias ("__posix_writev")))
   writev (int fildes, const struct iovec* iov, int iovcnt);
 
-  /**
-   * @}
-   */
+/**
+ * @}
+ */
 
 // --------------------------------------------------------------------------
-
 #ifdef __cplusplus
 }
 #endif

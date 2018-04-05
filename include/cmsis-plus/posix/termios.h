@@ -242,5 +242,33 @@ struct termios {
 	speed_t		c_ispeed;	/* input speed */
 	speed_t		c_ospeed;	/* output speed */
 };
+// ----------------------------------------------------------------------------
+
+// Some functions are not yet implemented in µOS++.
+
+// speed_t cfgetispeed(const struct termios *);
+// speed_t cfgetospeed(const struct termios *);
+// int     cfsetispeed(struct termios *, speed_t);
+// int     cfsetospeed(struct termios *, speed_t);
+
+  int
+  tcdrain (int fildes);
+
+// int tcflow(int, int);
+
+  int
+  tcflush (int fildes, int queue_selector);
+
+  int
+  tcgetattr (int fildes, struct termios *termios_p);
+
+// pid_t tcgetsid(int);
+
+  int
+  tcsendbreak (int fildes, int duration);
+
+  int
+  tcsetattr (int fildes, int optional_actions, const struct termios *termios_p);
+
 
 #endif /* POSIX_TERMIOS_H_ */

@@ -967,6 +967,42 @@ __posix_chmod (const char* path, mode_t mode)
 }
 
 int
+__posix_tcdrain (int fildes)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int
+__posix_tcgetattr (int fildes, struct termios *termios_p)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int
+__posix_tcsetattr (int fildes, int optional_actions,
+                   const struct termios *termios_p)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int
+__posix_tcflush (int fildes, int queue_selector)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int
+__posix_tcsendbreak (int fildes, int duration)
+{
+  errno = ENOSYS; // Not implemented
+  return -1;
+}
+
+int
 __posix_truncate (const char* path, off_t length)
 {
   errno = ENOSYS; // Not implemented
