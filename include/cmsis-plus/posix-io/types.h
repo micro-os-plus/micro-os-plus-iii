@@ -35,6 +35,7 @@
 
 #include <cmsis-plus/posix/dirent.h>
 #include <cmsis-plus/posix/sys/socket.h>
+#include <cmsis-plus/posix/termios.h>
 
 // ----------------------------------------------------------------------------
 

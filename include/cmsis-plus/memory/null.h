@@ -92,7 +92,7 @@ namespace os
       /**
        * @brief Destruct the memory manager object instance.
        */
-      ~null_memory_resource () = default;
+      ~null_memory_resource () override = default;
 
       /**
        * @}

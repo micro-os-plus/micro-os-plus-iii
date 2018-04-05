@@ -93,7 +93,7 @@ namespace os
        */
 
       virtual
-      ~device ();
+      ~device () override;
 
       /**
        * @}
@@ -234,7 +234,7 @@ namespace os
        */
 
       virtual
-      ~device_impl ();
+      ~device_impl () override;
 
       /**
        * @}

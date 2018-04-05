@@ -116,7 +116,7 @@ namespace os
        * @brief Destruct the memory resource object instance.
        */
       virtual
-      ~first_fit_top ();
+      ~first_fit_top () override;
 
       /**
        * @}

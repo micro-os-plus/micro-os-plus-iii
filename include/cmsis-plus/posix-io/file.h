@@ -102,7 +102,7 @@ namespace os
        */
 
       virtual
-      ~file ();
+      ~file () override;
 
       /**
        * @}

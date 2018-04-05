@@ -245,7 +245,7 @@ namespace os
          * @brief Destruct the node.
          */
         virtual
-        ~timeout_thread_node ();
+        ~timeout_thread_node () override;
 
         /**
          * @}
@@ -332,7 +332,7 @@ namespace os
          * @brief Destruct the node.
          */
         virtual
-        ~timer_node ();
+        ~timer_node () override;
 
         /**
          * @}

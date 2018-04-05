@@ -363,7 +363,7 @@ namespace os
        * @brief Destruct the clock object instance.
        */
       virtual
-      ~adjustable_clock ();
+      ~adjustable_clock () override;
 
       /**
        * @}
@@ -503,7 +503,7 @@ namespace os
        * @brief Destruct the SysTick clock object instance.
        */
       virtual
-      ~clock_systick ();
+      ~clock_systick () override;
 
       /**
        * @}
@@ -633,7 +633,7 @@ namespace os
        * @brief Destruct the real time clock object instance.
        */
       virtual
-      ~clock_rtc ();
+      ~clock_rtc () override;
 
       /**
        * @}
@@ -733,7 +733,7 @@ namespace os
        * @brief Destruct the SysTick clock object instance.
        */
       virtual
-      ~clock_highres ();
+      ~clock_highres () override;
 
       /**
        * @}

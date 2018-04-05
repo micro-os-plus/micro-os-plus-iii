@@ -97,7 +97,7 @@ namespace os
       /**
        * @brief Destruct the memory manager object instance.
        */
-      ~malloc_memory_resource ();
+      ~malloc_memory_resource () override;
 
       /**
        * @}
@@ -161,7 +161,7 @@ namespace os
       /**
        * @brief Destruct the memory manager object instance.
        */
-      ~new_delete_memory_resource () = default;
+      ~new_delete_memory_resource () override = default;
 
       /**
        * @}

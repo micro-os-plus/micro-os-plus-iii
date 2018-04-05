@@ -91,7 +91,7 @@ namespace os
        */
 
       virtual
-      ~block_device ();
+      ~block_device () override;
 
       /**
        * @}
@@ -189,7 +189,7 @@ namespace os
        */
 
       virtual
-      ~block_device_impl ();
+      ~block_device_impl () override;
 
       /**
        * @}
@@ -369,7 +369,7 @@ namespace os
          */
 
         virtual
-        ~block_device_lockable ();
+        ~block_device_lockable () override;
 
         /**
          * @}

@@ -119,7 +119,7 @@ namespace os
        * @brief Destruct the memory resource object instance.
        */
       virtual
-      ~block_pool ();
+      ~block_pool () override;
 
       /**
        * @}

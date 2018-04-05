@@ -153,7 +153,7 @@ namespace os
        */
 
       virtual
-      ~block_device_partition_impl ();
+      ~block_device_partition_impl () override;
 
       /**
        * @}
@@ -345,7 +345,7 @@ namespace os
          */
 
         virtual
-        ~block_device_partition_lockable ();
+        ~block_device_partition_lockable () override;
 
         /**
          * @}

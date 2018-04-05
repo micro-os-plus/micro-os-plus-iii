@@ -815,7 +815,7 @@ namespace os
          * @details
          * If `nullptr`, the default is to dynamically allocate the stack.
          */
-        void* th_stack_address = 0;
+        void* th_stack_address = nullptr;
 
         /**
          * @brief Size of the user defined storage for the thread
@@ -1733,7 +1733,7 @@ namespace os
          * @brief Destruct the thread object instance.
          */
         virtual
-        ~thread_allocated ();
+        ~thread_allocated () override;
 
         /**
          * @}

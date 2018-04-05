@@ -135,7 +135,7 @@ namespace os
        * @brief Destruct the memory resource object instance.
        */
       virtual
-      ~lifo ();
+      ~lifo () override;
 
       /**
        * @}

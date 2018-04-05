@@ -374,7 +374,7 @@ namespace os
         }
       else
         {
-          using allocator_type = memory::allocator<stack::allocation_element_t>;
+          using allocator_type2 = memory::allocator<stack::allocation_element_t>;
 
           if (attr.th_stack_size_bytes > stack::min_size ())
             {
@@ -390,7 +390,7 @@ namespace os
             }
 
           allocated_stack_address_ =
-              reinterpret_cast<stack::element_t*> (const_cast<allocator_type&> (allocator).allocate (
+              reinterpret_cast<stack::element_t*> (const_cast<allocator_type2&> (allocator).allocate (
                   allocated_stack_size_elements_));
 
           // Stack allocation failed.

@@ -65,7 +65,7 @@ public:
   operator= (my_char_impl&&) = delete;
 
   virtual
-  ~my_char_impl ();
+  ~my_char_impl () override;
 
   virtual bool
   do_is_opened (void) override;
@@ -189,7 +189,7 @@ public:
   operator= (my_block_impl&&) = delete;
 
   virtual
-  ~my_block_impl ();
+  ~my_block_impl () override;
 
   virtual bool
   do_is_opened (void) override;

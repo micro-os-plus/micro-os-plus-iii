@@ -651,7 +651,7 @@ os_thread_construct (os_thread_t* thread, const char* name,
     }
   new (thread) rtos::thread (name, (thread::func_t) func,
                              (thread::func_args_t) args,
-                             (thread::attributes&) *attr);
+                             (const thread::attributes&) *attr);
 }
 
 /**
@@ -695,7 +695,7 @@ os_thread_new (const char* name, os_thread_func_t func,
     }
   return reinterpret_cast<os_thread_t*> (new rtos::thread (
       name, (thread::func_t) func, (thread::func_args_t) args,
-      (thread::attributes&) *attr));
+      (const thread::attributes&) *attr));
 }
 
 /**
@@ -1418,7 +1418,7 @@ os_timer_construct (os_timer_t* timer, const char* name,
     }
   new (timer) rtos::timer (name, (timer::func_t) function,
                            (timer::func_args_t) args,
-                           (timer::attributes&) *attr);
+                           (const timer::attributes&) *attr);
 }
 
 /**
@@ -1462,7 +1462,7 @@ os_timer_new (const char* name, os_timer_func_t function,
     }
   return reinterpret_cast<os_timer_t*> (new rtos::timer (
       name, (timer::func_t) function, (timer::func_args_t) args,
-      (timer::attributes&) *attr));
+      (const timer::attributes&) *attr));
 }
 
 /**
@@ -1596,7 +1596,7 @@ os_mutex_construct (os_mutex_t* mutex, const char* name,
     {
       attr = (const os_mutex_attr_t*) &mutex::initializer_normal;
     }
-  new (mutex) rtos::mutex (name, (mutex::attributes&) *attr);
+  new (mutex) rtos::mutex (name, (const mutex::attributes&) *attr);
 }
 
 /**
@@ -1618,7 +1618,7 @@ os_mutex_recursive_construct (os_mutex_t* mutex, const char* name,
     {
       attr = (const os_mutex_attr_t*) &mutex::initializer_recursive;
     }
-  new (mutex) rtos::mutex_recursive (name, (mutex::attributes&) *attr);
+  new (mutex) rtos::mutex_recursive (name, (const mutex::attributes&) *attr);
 }
 
 /**
@@ -1661,7 +1661,7 @@ os_mutex_new (const char* name, const os_mutex_attr_t* attr)
       attr = (const os_mutex_attr_t*) &mutex::initializer_normal;
     }
   return reinterpret_cast<os_mutex_t*> (new rtos::mutex (
-      name, (mutex::attributes&) *attr));
+      name, (const mutex::attributes&) *attr));
 }
 
 /**
@@ -1686,7 +1686,7 @@ os_mutex_recursive_new (const char* name, const os_mutex_attr_t* attr)
       attr = (const os_mutex_attr_t*) &mutex::initializer_recursive;
     }
   return reinterpret_cast<os_mutex_t*> (new rtos::mutex_recursive (
-      name, (mutex::attributes&) *attr));
+      name, (const mutex::attributes&) *attr));
 }
 
 /**
@@ -1946,7 +1946,7 @@ os_condvar_construct (os_condvar_t* condvar, const char* name,
       attr = (const os_condvar_attr_t*) &condition_variable::initializer;
     }
   new (condvar) condition_variable (name,
-                                    (condition_variable::attributes&) *attr);
+                                    (const condition_variable::attributes&) *attr);
 }
 
 /**
@@ -1988,7 +1988,7 @@ os_condvar_new (const char* name, const os_condvar_attr_t* attr)
       attr = (const os_condvar_attr_t*) &condition_variable::initializer;
     }
   return reinterpret_cast<os_condvar_t*> (new condition_variable (
-      name, (condition_variable::attributes&) *attr));
+      name, (const condition_variable::attributes&) *attr));
 }
 
 /**
@@ -2177,7 +2177,7 @@ os_semaphore_construct (os_semaphore_t* semaphore, const char* name,
       attr = (const os_semaphore_attr_t*) &semaphore::initializer_binary;
     }
   new (semaphore) rtos::semaphore
-    { name, (semaphore::attributes&) *attr };
+    { name, (const semaphore::attributes&) *attr };
 }
 
 /**
@@ -2259,7 +2259,7 @@ os_semaphore_new (const char* name, const os_semaphore_attr_t* attr)
       attr = (const os_semaphore_attr_t*) &semaphore::initializer_binary;
     }
   return reinterpret_cast<os_semaphore_t*> (new rtos::semaphore
-    { name, (semaphore::attributes&) *attr });
+    { name, (const semaphore::attributes&) *attr });
 }
 
 /**
@@ -2502,7 +2502,7 @@ os_mempool_construct (os_mempool_t* mempool, const char* name, size_t blocks,
       attr = (const os_mempool_attr_t*) &memory_pool::initializer;
     }
   new (mempool) memory_pool (name, blocks, block_size_bytes,
-                             (memory_pool::attributes&) *attr);
+                             (const memory_pool::attributes&) *attr);
 }
 
 /**
@@ -2545,7 +2545,7 @@ os_mempool_new (const char* name, size_t blocks, size_t block_size_bytes,
       attr = (const os_mempool_attr_t*) &memory_pool::initializer;
     }
   return reinterpret_cast<os_mempool_t*> (new memory_pool (
-      name, blocks, block_size_bytes, (memory_pool::attributes&) *attr));
+      name, blocks, block_size_bytes, (const memory_pool::attributes&) *attr));
 }
 
 /**
@@ -2786,7 +2786,7 @@ os_mqueue_construct (os_mqueue_t* mqueue, const char* name, size_t msgs,
       attr = (const os_mqueue_attr_t*) &message_queue::initializer;
     }
   new (mqueue) message_queue (name, msgs, msg_size_bytes,
-                              (message_queue::attributes&) *attr);
+                              (const message_queue::attributes&) *attr);
 }
 
 /**
@@ -2829,7 +2829,7 @@ os_mqueue_new (const char* name, size_t msgs, size_t msg_size_bytes,
       attr = (const os_mqueue_attr_t*) &message_queue::initializer;
     }
   return reinterpret_cast<os_mqueue_t*> (new message_queue (
-      name, msgs, msg_size_bytes, (message_queue::attributes&) *attr));
+      name, msgs, msg_size_bytes, (const message_queue::attributes&) *attr));
 }
 
 /**
@@ -3096,7 +3096,7 @@ os_evflags_construct (os_evflags_t* evflags, const char* name,
     {
       attr = (const os_evflags_attr_t*) &event_flags::initializer;
     }
-  new (evflags) event_flags (name, (event_flags::attributes&) *attr);
+  new (evflags) event_flags (name, (const event_flags::attributes&) *attr);
 }
 
 /**
@@ -3138,7 +3138,7 @@ os_evflags_new (const char* name, const os_evflags_attr_t* attr)
       attr = (const os_evflags_attr_t*) &event_flags::initializer;
     }
   return reinterpret_cast<os_evflags_t*> (new event_flags (
-      name, (event_flags::attributes&) *attr));
+      name, (const event_flags::attributes&) *attr));
 }
 
 /**
@@ -4775,13 +4775,13 @@ osMessageGet (osMessageQId queue_id, uint32_t millisec)
           return event;
         }
       res = (reinterpret_cast<message_queue&> (*queue_id)).receive (
-          (char*) &event.value.v, sizeof(uint32_t), NULL);
+          (char*) &event.value.v, sizeof(uint32_t), nullptr);
       // result::event_message;
     }
   else if (millisec == 0)
     {
       res = (reinterpret_cast<message_queue&> (*queue_id)).try_receive (
-          (char*) &event.value.v, sizeof(uint32_t), NULL);
+          (char*) &event.value.v, sizeof(uint32_t), nullptr);
       // result::event_message when message;
       // result::ok when no meessage
     }
@@ -4794,7 +4794,7 @@ osMessageGet (osMessageQId queue_id, uint32_t millisec)
         }
       res = (reinterpret_cast<message_queue&> (*queue_id)).timed_receive (
           (char*) &event.value.v, sizeof(uint32_t),
-          clock_systick::ticks_cast ((uint64_t) (millisec * 1000u)), NULL);
+          clock_systick::ticks_cast ((uint64_t) (millisec * 1000u)), nullptr);
       // result::event_message when message;
       // result::event_timeout when timeout;
     }
@@ -5057,13 +5057,13 @@ osMailGet (osMailQId mail_id, uint32_t millisec)
           return event;
         }
       res = (reinterpret_cast<message_queue&> ((mail_id->queue))).receive (
-          (char*) &event.value.p, sizeof(void*), NULL);
+          (char*) &event.value.p, sizeof(void*), nullptr);
       // osEventMail for ok,
     }
   else if (millisec == 0)
     {
       res = (reinterpret_cast<message_queue&> (mail_id->queue)).try_receive (
-          (char*) &event.value.p, sizeof(void*), NULL);
+          (char*) &event.value.p, sizeof(void*), nullptr);
       // osEventMail for ok,
     }
   else
@@ -5075,7 +5075,7 @@ osMailGet (osMailQId mail_id, uint32_t millisec)
         }
       res = (reinterpret_cast<message_queue&> (mail_id->queue)).timed_receive (
           (char*) &event.value.p, sizeof(void*),
-          clock_systick::ticks_cast ((uint64_t) (millisec * 1000u)), NULL);
+          clock_systick::ticks_cast ((uint64_t) (millisec * 1000u)), nullptr);
       // osEventMail for ok, osEventTimeout
     }
 
