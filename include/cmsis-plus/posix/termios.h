@@ -1,4 +1,8 @@
-/*-
+/*
+ * This file is part of the µOS++ distribution.
+ *   (https://github.com/micro-os-plus)
+ * Copyright (c) 2018 Liviu Ionescu.
+ *
  * Copyright (c) 1988, 1989, 1993, 1994
  *	The Regents of the University of California.  All rights reserved.
  *
@@ -33,16 +37,38 @@
 #ifndef POSIX_TERMIOS_H_
 #define	POSIX_TERMIOS_H_
 
+// ----------------------------------------------------------------------------
+
+#include <unistd.h>
+
+#if defined(_POSIX_VERSION)
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wgnu-include-next"
+#endif
+#include_next <termios.h>
+#pragma GCC diagnostic pop
+
+#else
+
 // Avoid warnings for __BSD* definitions.
 #pragma GCC system_header
 
-/*
- * Special Control Characters
- *
- * Index into c_cc[] character array.
- *
- *	Name	     Subscript	Enabled by
- */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+// ----------------------------------------------------------------------------
+
+  /*
+   * Special Control Characters
+   *
+   * Index into c_cc[] character array.
+   *
+   *	Name	     Subscript	Enabled by
+   */
 #define	VEOF		0	/* ICANON */
 #define	VEOL		1	/* ICANON */
 #if __BSD_VISIBLE
@@ -57,7 +83,7 @@
 #define	VREPRINT 	6	/* ICANON together with IEXTEN */
 #define	VERASE2 	7	/* ICANON */
 #endif
-/*			7	   ex-spare 1 */
+  /*			7	   ex-spare 1 */
 #define	VINTR		8	/* ISIG */
 #define	VQUIT		9	/* ISIG */
 #define	VSUSP		10	/* ISIG */
@@ -74,18 +100,18 @@
 #define	VTIME		17	/* !ICANON */
 #if __BSD_VISIBLE
 #define	VSTATUS		18	/* ICANON together with IEXTEN */
-/*			19	   spare 2 */
+  /*			19	   spare 2 */
 #endif
-/* Added 2017/08/18 (LNP) */
+  /* Added 2017/08/18 (LNP) */
 #define VTIME_MS        19      /* !ICANON */
-/* End added */
+  /* End added */
 #define	NCCS		20
 
 #define	_POSIX_VDISABLE	0xff
 
-/*
- * Input flags - software input processing
- */
+  /*
+   * Input flags - software input processing
+   */
 #define	IGNBRK		0x00000001	/* ignore BREAK condition */
 #define	BRKINT		0x00000002	/* map BREAK to SIGINTR */
 #define	IGNPAR		0x00000004	/* ignore (discard) parity errors */
@@ -102,9 +128,9 @@
 #define	IMAXBEL		0x00002000	/* ring bell on input queue full */
 #endif
 
-/*
- * Output flags - software output processing
- */
+  /*
+   * Output flags - software output processing
+   */
 #define	OPOST		0x00000001	/* enable following output processing */
 #if __BSD_VISIBLE
 #define	ONLCR		0x00000002	/* map NL to CR-NL (ala CRMOD) */
@@ -117,9 +143,9 @@
 #define	ONLRET		0x00000040	/* NL performs CR function */
 #endif
 
-/*
- * Control flags - hardware control of terminal
- */
+  /*
+   * Control flags - hardware control of terminal
+   */
 #if __BSD_VISIBLE
 #define	CIGNORE		0x00000001	/* ignore control flags */
 #endif
@@ -143,14 +169,13 @@
 #define	CCAR_OFLOW	0x00100000	/* DCD flow control of output */
 #endif
 
-
-/*
- * "Local" flags - dumping ground for other state
- *
- * Warning: some flags in this structure begin with
- * the letter "I" and look like they belong in the
- * input flag.
- */
+  /*
+   * "Local" flags - dumping ground for other state
+   *
+   * Warning: some flags in this structure begin with
+   * the letter "I" and look like they belong in the
+   * input flag.
+   */
 
 #if __BSD_VISIBLE
 #define	ECHOKE		0x00000001	/* visual erase for line kill */
@@ -178,9 +203,9 @@
 #endif
 #define	NOFLSH		0x80000000	/* don't flush after interrupt */
 
-/*
- * Standard speeds
- */
+  /*
+   * Standard speeds
+   */
 #define	B0	0
 #define	B50	50
 #define	B75	75
@@ -211,9 +236,9 @@
 #define	EXTB	38400
 #endif
 
-/*
- * Commands passed to tcsetattr() for setting the termios structure.
- */
+  /*
+   * Commands passed to tcsetattr() for setting the termios structure.
+   */
 #define TCSANOW         0               /* make change immediate */
 #define TCSADRAIN       1               /* drain output, then change */
 #define TCSAFLUSH       2               /* drain output, flush input */
@@ -229,19 +254,23 @@
 #define TCIOFF          3
 #define TCION           4
 
-typedef unsigned int	tcflag_t;
-typedef unsigned char	cc_t;
-typedef unsigned int	speed_t;
+// ----------------------------------------------------------------------------
 
-struct termios {
-	tcflag_t	c_iflag;	/* input flags */
-	tcflag_t	c_oflag;	/* output flags */
-	tcflag_t	c_cflag;	/* control flags */
-	tcflag_t	c_lflag;	/* local flags */
-	cc_t		c_cc[NCCS];	/* control chars */
-	speed_t		c_ispeed;	/* input speed */
-	speed_t		c_ospeed;	/* output speed */
-};
+  typedef unsigned int tcflag_t;
+  typedef unsigned char cc_t;
+  typedef unsigned int speed_t;
+
+  struct termios
+  {
+    tcflag_t c_iflag; /* input flags */
+    tcflag_t c_oflag; /* output flags */
+    tcflag_t c_cflag; /* control flags */
+    tcflag_t c_lflag; /* local flags */
+    cc_t c_cc[NCCS]; /* control chars */
+    speed_t c_ispeed; /* input speed */
+    speed_t c_ospeed; /* output speed */
+  };
+
 // ----------------------------------------------------------------------------
 
 // Some functions are not yet implemented in µOS++.
@@ -270,5 +299,12 @@ struct termios {
   int
   tcsetattr (int fildes, int optional_actions, const struct termios *termios_p);
 
+// ----------------------------------------------------------------------------
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* defined(_POSIX_VERSION) */
 
 #endif /* POSIX_TERMIOS_H_ */

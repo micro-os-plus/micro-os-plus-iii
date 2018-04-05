@@ -28,8 +28,19 @@
 #ifndef POSIX_DIRENT_H_
 #define POSIX_DIRENT_H_
 
-#if !defined(__ARM_EABI__)
-#include <dirent.h>
+// ----------------------------------------------------------------------------
+
+#include <unistd.h>
+
+#if defined(_POSIX_VERSION)
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wgnu-include-next"
+#endif
+#include_next <dirent.h>
+#pragma GCC diagnostic pop
+
 #else
 
 #include <sys/types.h>
@@ -45,7 +56,7 @@ extern "C"
 #define OS_INTEGER_DIRENT_NAME_MAX  (256)
 #endif
 
-// ----------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
   struct dirent
   {
@@ -61,7 +72,7 @@ extern "C"
     ;
   } DIR;
 
-// ----------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
   DIR*
   opendir (const char* dirname);
@@ -86,6 +97,6 @@ extern "C"
 }
 #endif
 
-#endif /* __ARM_EABI__ */
+#endif /* defined(_POSIX_VERSION) */
 
 #endif /* POSIX_DIRENT_H_ */

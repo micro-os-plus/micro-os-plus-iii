@@ -28,8 +28,19 @@
 #ifndef POSIX_IO_SYS_UIO_H_
 #define POSIX_IO_SYS_UIO_H_
 
-#if !defined(__ARM_EABI__)
-#include <sys/uio.h>
+// ----------------------------------------------------------------------------
+
+#include <unistd.h>
+
+#if defined(_POSIX_VERSION)
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wgnu-include-next"
+#endif
+#include_next <sys/uio.h>
+#pragma GCC diagnostic pop
+
 #else
 
 #include <sys/types.h>
@@ -38,6 +49,8 @@
 extern "C"
 {
 #endif
+
+// ----------------------------------------------------------------------------
 
   struct iovec
   {
@@ -48,10 +61,12 @@ extern "C"
   ssize_t
   writev (int fildes, const struct iovec* iov, int iovcnt);
 
+// ----------------------------------------------------------------------------
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __ARM_EABI__ */
+#endif /* defined(_POSIX_VERSION) */
 
 #endif /* POSIX_IO_SYS_UIO_H_ */

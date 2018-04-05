@@ -28,9 +28,13 @@
 #ifndef POSIX_STROPTS_H_
 #define POSIX_STROPTS_H_
 
-#if !defined(__ARM_EABI__)
-//#include <stropts.h>
-#include <sys/ioctl.h>
+// ----------------------------------------------------------------------------
+
+#include <unistd.h>
+
+#if defined(_POSIX_VERSION)
+#include_next <stropts.h>
+// #include <sys/ioctl.h>
 #else
 
 #ifdef __cplusplus
@@ -38,13 +42,17 @@ extern "C"
 {
 #endif
 
+// ----------------------------------------------------------------------------
+
   int
   ioctl (int fildes, int request, ...);
+
+// ----------------------------------------------------------------------------
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __ARM_EABI__ */
+#endif /* defined(_POSIX_VERSION) */
 
 #endif /* POSIX_STROPTS_H_ */

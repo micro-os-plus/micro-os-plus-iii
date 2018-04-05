@@ -28,8 +28,19 @@
 #ifndef POSIX_IO_SYS_SOCKET_H_
 #define POSIX_IO_SYS_SOCKET_H_
 
-#if !defined(__ARM_EABI__)
-#include <sys/socket.h>
+// ----------------------------------------------------------------------------
+
+#include <unistd.h>
+
+#if defined(_POSIX_VERSION)
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wgnu-include-next"
+#endif
+#include_next <sys/socket.h>
+#pragma GCC diagnostic pop
+
 #else
 
 #include <sys/types.h>
@@ -38,6 +49,8 @@
 extern "C"
 {
 #endif
+
+// ----------------------------------------------------------------------------
 
   typedef uint32_t socklen_t;
 
@@ -104,10 +117,12 @@ extern "C"
   int
   socketpair (int domain, int type, int protocol, int socket_vector[2]);
 
+// ----------------------------------------------------------------------------
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __ARM_EABI__ */
+#endif /* defined(_POSIX_VERSION) */
 
 #endif /* POSIX_IO_SYS_SOCKET_H_ */

@@ -30,12 +30,29 @@
 
 // ----------------------------------------------------------------------------
 
-int __attribute__((weak))
-ioctl (int fildes, unsigned long request, ...);
+#include <unistd.h>
 
-void
-sync (void);
+#if !defined(_POSIX_VERSION)
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 // ----------------------------------------------------------------------------
+
+  int __attribute__((weak))
+  ioctl (int fildes, unsigned long request, ...);
+
+  void
+  sync (void);
+
+// ----------------------------------------------------------------------------
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* !defined(_POSIX_VERSION) */
 
 #endif /* POSIX_EMBED_H_ */

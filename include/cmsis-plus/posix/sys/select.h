@@ -28,17 +28,22 @@
 #ifndef POSIX_IO_SYS_SELECT_H_
 #define POSIX_IO_SYS_SELECT_H_
 
-#if !defined(__ARM_EABI__)
-#include <sys/select.h>
+// ----------------------------------------------------------------------------
+
+#include <unistd.h>
+
+#if defined(_POSIX_VERSION)
+#include_next <sys/select.h>
 #else
 
 #include <sys/types.h>
-
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
+
+// ----------------------------------------------------------------------------
 
 //  typedef struct
 //  {
@@ -54,10 +59,12 @@ extern "C"
   select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
           struct timeval* timeout);
 
+// ----------------------------------------------------------------------------
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __ARM_EABI__ */
+#endif /* defined(_POSIX_VERSION) */
 
 #endif /* POSIX_IO_SYS_SELECT_H_ */

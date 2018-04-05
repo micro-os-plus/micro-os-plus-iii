@@ -30,28 +30,38 @@
 
 // ----------------------------------------------------------------------------
 
-#if !defined(__ARM_EABI__)
-#include <sys/select.h>
+#include <unistd.h>
+
+#if defined(_POSIX_VERSION)
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wgnu-include-next"
+#endif
+#include_next <utime.h>
+// #include <sys/select.h>
+#pragma GCC diagnostic pop
+
 #else
 
 #include <sys/types.h>
 
 #ifdef __cplusplus
 extern "C"
-  {
+{
 #endif
 
 // ----------------------------------------------------------------------------
 
-    int
-    utime (const char *path, const struct utimbuf* times);
+  int
+  utime (const char *path, const struct utimbuf* times);
 
 // ----------------------------------------------------------------------------
 
 #ifdef __cplusplus
-  }
+}
 #endif
 
-#endif /* __ARM_EABI__ */
+#endif /* defined(_POSIX_VERSION) */
 
 #endif /* POSIX_UTIME_H_ */
