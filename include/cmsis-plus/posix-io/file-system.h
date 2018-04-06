@@ -434,31 +434,31 @@ namespace os
       do_opendir (const char* dirname) = 0;
 
       virtual int
-      do_mkdir (const char* path, mode_t mode);
+      do_mkdir (const char* path, mode_t mode) = 0;
 
       virtual int
-      do_rmdir (const char* path);
+      do_rmdir (const char* path) = 0;
 
       virtual void
-      do_sync (void);
+      do_sync (void) = 0;
 
       virtual int
-      do_chmod (const char* path, mode_t mode);
+      do_chmod (const char* path, mode_t mode) = 0;
 
       virtual int
-      do_stat (const char* path, struct stat* buf);
+      do_stat (const char* path, struct stat* buf) = 0;
 
       virtual int
-      do_truncate (const char* path, off_t length);
+      do_truncate (const char* path, off_t length) = 0;
 
       virtual int
-      do_rename (const char* existing, const char* _new);
+      do_rename (const char* existing, const char* _new) = 0;
 
       virtual int
-      do_unlink (const char* path);
+      do_unlink (const char* path) = 0;
 
       virtual int
-      do_utime (const char* path, const struct utimbuf* times);
+      do_utime (const char* path, const struct utimbuf* times) = 0;
 
       // ----------------------------------------------------------------------
 
