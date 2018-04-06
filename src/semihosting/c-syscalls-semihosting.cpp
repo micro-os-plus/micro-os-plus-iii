@@ -1088,6 +1088,20 @@ __posix_readlink (const char* path, char* buf, size_t bufsize)
   return ((ssize_t) -1);
 }
 
+int
+__posix_statvfs (const char* path, struct statvfs* buf)
+{
+  errno = ENOSYS; // Not implemented
+  return ((ssize_t) -1);
+}
+
+int
+__posix_fstatvfs (int fildes, struct statvfs* buf)
+{
+  errno = ENOSYS; // Not implemented
+  return ((ssize_t) -1);
+}
+
 #pragma GCC diagnostic pop
 
 // ----------------------------------------------------------------------------

@@ -39,6 +39,7 @@
 #include <cmsis-plus/posix-io/io.h>
 #include <cmsis-plus/utils/lists.h>
 #include <cmsis-plus/posix/utime.h>
+#include <cmsis-plus/posix/sys/statvfs.h>
 
 #include <mutex>
 
@@ -124,6 +125,9 @@ namespace os
 
       virtual int
       fsync (void);
+
+      virtual int
+      fstatvfs (struct statvfs *buf);
 
       // ----------------------------------------------------------------------
       // Support functions.
@@ -399,6 +403,9 @@ namespace os
 
         virtual int
         fsync (void);
+
+        // fstatvfs() - must not be locked, since will be locked by the
+        // file system. (otherwise non-recursive mutexes will fail).
 
         // --------------------------------------------------------------------
         // Support functions.

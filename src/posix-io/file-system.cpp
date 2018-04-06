@@ -342,6 +342,37 @@ namespace os
       return fs->utime (adjusted_path, times);
     }
 
+    int
+    statvfs (const char* path, struct statvfs* buf)
+    {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
+      trace::printf ("%s(\"%s\", %p)\n", __func__, path, buf);
+#endif
+
+      if ((path == nullptr) || (buf == nullptr))
+        {
+          errno = EFAULT;
+          return -1;
+        }
+
+      if (*path == '\0')
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
+      auto adjusted_path = path;
+      auto* const fs = file_system::identify_mounted (&adjusted_path);
+
+      if (fs == nullptr)
+        {
+          errno = ENOENT;
+          return -1;
+        }
+
+      return fs->statvfs (buf);
+    }
+
     // ========================================================================
 
     file_system::file_system (file_system_impl& impl, const char* name) :
@@ -802,6 +833,16 @@ namespace os
         }
     }
 
+    // http://pubs.opengroup.org/onlinepubs/9699919799/functions/fstatvfs.html
+    int
+    file_system::statvfs (struct statvfs* buf)
+    {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
+      trace::printf ("file_system::%s(%p)\n", __func__, buf);
+#endif
+
+      return impl ().do_statvfs (buf);
+    }
     // TODO: check if the file system should keep a static current path for
     // relative paths.
 

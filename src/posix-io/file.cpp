@@ -111,6 +111,19 @@ namespace os
       return impl ().do_fsync ();
     }
 
+    int
+    file::fstatvfs (struct statvfs *buf)
+    {
+#if defined(OS_TRACE_POSIX_IO_FILE)
+      trace::printf ("file::%s(%p) @%p\n", __func__, buf, this);
+#endif
+
+      errno = 0;
+
+      // Execute the file system code. Might be locked there.
+      return file_system ()->statvfs (buf);
+    }
+
     // ========================================================================
 
     file_impl::file_impl (file& self) :

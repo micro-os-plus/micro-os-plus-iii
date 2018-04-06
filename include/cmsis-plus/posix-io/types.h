@@ -108,6 +108,9 @@ extern "C"
   __posix_fstat (int fildes, struct stat* buf);
 
   int __attribute__((weak))
+  __posix_fstatvfs (int fildes, struct statvfs* buf);
+
+  int __attribute__((weak))
   __posix_ftruncate (int fildes, off_t length);
 
   int __attribute__((weak))
@@ -257,6 +260,9 @@ extern "C"
 
   int __attribute__((weak))
   __posix_stat (const char* path, struct stat* buf);
+
+  int __attribute__((weak))
+  __posix_statvfs (const char* path, struct statvfs* buf);
 
   void __attribute__((weak))
   __posix_sync (void);

@@ -366,6 +366,26 @@ __posix_fstat (int fildes, struct stat* buf)
 }
 
 int
+__posix_fstatvfs (int fildes, struct statvfs* buf)
+{
+  auto* const io = posix::file_descriptors_manager::io (fildes);
+  if (io == nullptr)
+    {
+      errno = EBADF;
+      return -1;
+    }
+
+  // Works only on files (Does not work on sockets, pipes or FIFOs...)
+  if ((io->get_type () & posix::io::type::file) == 0)
+    {
+      errno = EINVAL; // Not a file.
+      return -1;
+    }
+
+  return (static_cast<posix::file*> (io))->fstatvfs (buf);
+}
+
+int
 __posix_ftruncate (int fildes, off_t length)
 {
   auto* const io = posix::file_descriptors_manager::io (fildes);
@@ -442,6 +462,12 @@ int
 __posix_utime (const char* path, const struct utimbuf* times)
 {
   return posix::utime (path, times);
+}
+
+int
+__posix_statvfs (const char* path, struct statvfs* buf)
+{
+  return posix::statvfs (path, buf);
 }
 
 // ----------------------------------------------------------------------------

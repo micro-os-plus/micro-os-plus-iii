@@ -81,6 +81,9 @@ extern "C"
   int __attribute__((weak, alias ("__posix_fstat")))
   fstat (int fildes, struct stat* buf);
 
+  int __attribute__((weak, alias ("__posix_fstatvfs")))
+  fstatvfs (int fildes, struct statvfs* buf);
+
   int __attribute__((weak, alias ("__posix_ftruncate")))
   ftruncate (int fildes, off_t length);
 
@@ -209,6 +212,14 @@ extern "C"
 
   int __attribute__((weak, alias ("__posix_stat")))
   stat (const char* path, struct stat* buf);
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
+  int __attribute__((weak, alias ("__posix_statvfs")))
+  statvfs (const char* path, struct statvfs* buf);
+
+#pragma GCC diagnostic pop
 
   void __attribute__((weak, alias ("__posix_sync")))
   sync (void);

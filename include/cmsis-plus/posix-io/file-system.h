@@ -104,6 +104,9 @@ namespace os
     int
     utime (const char* path, const struct utimbuf* times);
 
+    int
+    statvfs (const char* path, struct statvfs* buf);
+
     /**
      * @}
      */
@@ -148,6 +151,9 @@ namespace os
 
       friend int
       utime (const char* path, const struct utimbuf* times);
+
+      friend int
+      statvfs (struct statvfs* buf);
 
       /**
        * @endcond
@@ -273,6 +279,9 @@ namespace os
 
       virtual int
       utime (const char* path, const struct utimbuf* times);
+
+      virtual int
+      statvfs (struct statvfs* buf);
 
     public:
 
@@ -459,6 +468,9 @@ namespace os
 
       virtual int
       do_utime (const char* path, const struct utimbuf* times) = 0;
+
+      virtual int
+      do_statvfs (struct statvfs* buf) = 0;
 
       // ----------------------------------------------------------------------
 
@@ -705,6 +717,9 @@ namespace os
 
         virtual int
         utime (const char* path, const struct utimbuf* times) override;
+
+        virtual int
+        statvfs (struct statvfs* buf) override;
 
         // --------------------------------------------------------------------
         // Support functions.
@@ -1141,6 +1156,16 @@ namespace os
           { impl_instance_.locker () };
 
         return file_system::utime (path, times);
+      }
+
+    template<typename T, typename L>
+      int
+      file_system_lockable<T, L>::statvfs (struct statvfs* buf)
+      {
+        std::lock_guard<L> lock
+          { impl_instance_.locker () };
+
+        return file_system::statvfs (buf);
       }
 
     template<typename T, typename L>
