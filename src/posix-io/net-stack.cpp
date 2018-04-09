@@ -104,8 +104,7 @@ namespace os
 
     // ========================================================================
 
-    net_stack_impl::net_stack_impl (net_stack& self, net_interface& interface) :
-        self_ (self), //
+    net_stack_impl::net_stack_impl (net_interface& interface) :
         interface_ (interface)
     {
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)

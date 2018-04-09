@@ -186,9 +186,7 @@ namespace os
 
     // ========================================================================
 
-    device_impl::device_impl (device& self) :
-        io_impl
-          { self }
+    device_impl::device_impl (void)
     {
 #if defined(OS_TRACE_POSIX_IO_DEVICE)
       trace::printf ("device_impl::%s()=%p\n", __func__, this);

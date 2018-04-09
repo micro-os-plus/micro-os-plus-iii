@@ -137,6 +137,16 @@ namespace os
       deferred_sockets_list_t&
       deferred_sockets_list (void);
 
+      // ----------------------------------------------------------------------
+
+      template<typename T>
+        T*
+        allocate_socket (void);
+
+      template<typename T, typename L>
+        T*
+        allocate_socket (L& locker);
+
       // --------------------------------------------------------------------
       // Support functions.
 
@@ -214,7 +224,7 @@ namespace os
 
     public:
 
-      net_stack_impl (net_stack& self, net_interface& interface);
+      net_stack_impl (net_interface& interface);
 
       /**
        * @cond ignore
@@ -251,23 +261,10 @@ namespace os
       do_socket (int domain, int type, int protocol) = 0;
 
       // ----------------------------------------------------------------------
-
-      template<typename T>
-        T*
-        allocate_socket (void);
-
-      template<typename T, typename L>
-        T*
-        allocate_socket (L& locker);
-
-      // ----------------------------------------------------------------------
       // Support functions.
 
       net_interface&
       interface (void) const;
-
-      net_stack&
-      self (void);
 
       /**
        * @}
@@ -279,8 +276,6 @@ namespace os
       /**
        * @cond ignore
        */
-
-      net_stack& self_;
 
       net_interface& interface_;
 
@@ -485,48 +480,34 @@ namespace os
       return deferred_sockets_list_;
     }
 
-    // ========================================================================
-
-    inline net_interface&
-    net_stack_impl::interface (void) const
-    {
-      return interface_;
-    }
-
-    inline net_stack&
-    net_stack_impl::self (void)
-    {
-      return static_cast<net_stack&> (self_);
-    }
-
     template<typename T>
       T*
-      net_stack_impl::allocate_socket (void)
+      net_stack::allocate_socket (void)
       {
         using socket_type = T;
 
         socket_type* sock;
 
-        if (self ().deferred_sockets_list ().empty ())
+        if (deferred_sockets_list_.empty ())
           {
-            sock = new socket_type (self ());
+            sock = new socket_type (*this);
           }
         else
           {
             sock =
-                static_cast<socket_type*> (self ().deferred_sockets_list ().unlink_head ());
+                static_cast<socket_type*> (deferred_sockets_list_.unlink_head ());
 
             // Call the constructor before reusing the object,
             sock->~socket_type ();
 
             // Placement new, run only the constructor.
-            new (sock) socket_type (self ());
+            new (sock) socket_type (*this);
 
             // Deallocate all remaining elements in the list.
-            while (!self ().deferred_sockets_list ().empty ())
+            while (!deferred_sockets_list_.empty ())
               {
                 socket_type* s =
-                    static_cast<socket_type*> (self ().deferred_sockets_list ().unlink_head ());
+                    static_cast<socket_type*> (deferred_sockets_list_.unlink_head ());
 
                 // Call the destructor and the deallocator.
                 delete s;
@@ -537,32 +518,32 @@ namespace os
 
     template<typename T, typename L>
       T*
-      net_stack_impl::allocate_socket (L& locker)
+      net_stack::allocate_socket (L& locker)
       {
         using socket_type = T;
 
         socket_type* sock;
 
-        if (self ().deferred_sockets_list ().empty ())
+        if (deferred_sockets_list_.empty ())
           {
-            sock = new socket_type (self (), locker);
+            sock = new socket_type (*this, locker);
           }
         else
           {
             sock =
-                static_cast<socket_type*> (self ().deferred_sockets_list ().unlink_head ());
+                static_cast<socket_type*> (deferred_sockets_list_.unlink_head ());
 
             // Call the constructor before reusing the object,
             sock->~socket_type ();
 
             // Placement new, run only the constructor.
-            new (sock) socket_type (self (), locker);
+            new (sock) socket_type (*this, locker);
 
             // Deallocate all remaining elements in the list.
-            while (!self ().deferred_sockets_list ().empty ())
+            while (!deferred_sockets_list_.empty ())
               {
                 socket_type* s =
-                    static_cast<socket_type*> (self ().deferred_sockets_list ().unlink_head ());
+                    static_cast<socket_type*> (deferred_sockets_list_.unlink_head ());
 
                 // Call the destructor and the deallocator.
                 delete s;
@@ -573,6 +554,14 @@ namespace os
 
     // ========================================================================
 
+    inline net_interface&
+    net_stack_impl::interface (void) const
+    {
+      return interface_;
+    }
+
+    // ========================================================================
+
     template<typename T>
       template<typename ... Args>
         net_stack_implementable<T>::net_stack_implementable (
@@ -580,7 +569,7 @@ namespace os
             net_stack
               { impl_instance_, name }, //
             impl_instance_
-              { *this, interface, std::forward<Args>(args)... }
+              { interface, std::forward<Args>(args)... }
         {
 #if defined(OS_TRACE_POSIX_IO_NET_STACK)
           trace::printf ("net_stack_implementable::%s(\"%s\")=@%p\n", __func__,
@@ -615,7 +604,7 @@ namespace os
             net_stack
               { impl_instance_, name }, //
             impl_instance_
-              { *this, interface, locker, std::forward<Args>(args)... }
+              { interface, locker, std::forward<Args>(args)... }
         {
 #if defined(OS_TRACE_POSIX_IO_NET_STACK)
           trace::printf ("net_stack_lockable::%s()=%p\n", __func__, this);

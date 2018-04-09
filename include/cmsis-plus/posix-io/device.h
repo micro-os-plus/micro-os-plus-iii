@@ -215,7 +215,7 @@ namespace os
 
     public:
 
-      device_impl (device& self);
+      device_impl (void);
 
       /**
        * @cond ignore
@@ -264,12 +264,6 @@ namespace os
 
       int&
       open_count (void);
-
-      // ----------------------------------------------------------------------
-      // Support functions.
-
-      device&
-      self (void);
 
       /**
        * @}
@@ -322,12 +316,6 @@ namespace os
     }
 
     // ========================================================================
-
-    inline device&
-    device_impl::self (void)
-    {
-      return static_cast<device&> (self_);
-    }
 
     inline int&
     device_impl::open_count (void)

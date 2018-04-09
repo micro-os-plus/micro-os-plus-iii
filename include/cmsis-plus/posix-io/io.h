@@ -291,7 +291,7 @@ namespace os
 
     public:
 
-      io_impl (io& self);
+      io_impl (void);
 
       /**
        * @cond ignore
@@ -362,9 +362,6 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
-      io&
-      self (void);
-
       off_t&
       offset (void);
 
@@ -381,8 +378,6 @@ namespace os
       /**
        * @cond ignore
        */
-
-      io& self_;
 
       off_t offset_ = 0;
 
@@ -434,12 +429,6 @@ namespace os
     }
 
     // ========================================================================
-
-    inline io&
-    io_impl::self (void)
-    {
-      return self_;
-    }
 
     inline off_t&
     io_impl::offset (void)

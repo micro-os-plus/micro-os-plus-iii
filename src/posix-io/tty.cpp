@@ -88,9 +88,7 @@ namespace os
 
     // ========================================================================
 
-    tty_impl::tty_impl (tty& self) :
-        char_device_impl
-          { self }
+    tty_impl::tty_impl (void)
     {
 #if defined(OS_TRACE_POSIX_IO_TTY)
       trace::printf ("tty_impl::%s()=@%p\n", __func__, this);

@@ -574,7 +574,7 @@ namespace os
       // Execute the file specific implementation code.
       // Allocation is done by the implementation, where
       // the size is known.
-      file* fil = impl ().do_vopen (path, oflag, args);
+      file* fil = impl ().do_vopen (*this, path, oflag, args);
       if (fil == nullptr)
         {
           return nullptr;
@@ -596,7 +596,7 @@ namespace os
       // Execute the dir specific implementation code.
       // Allocation is done by the implementation, where
       // the size is known.
-      directory* dir = impl ().do_opendir (dirpath);
+      directory* dir = impl ().do_opendir (*this, dirpath);
       if (dir == nullptr)
         {
           return nullptr;
@@ -851,8 +851,7 @@ namespace os
 
     // ========================================================================
 
-    file_system_impl::file_system_impl (file_system& self, block_device& device) :
-        self_ (self), //
+    file_system_impl::file_system_impl (block_device& device) :
         device_ (device)
     {
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)

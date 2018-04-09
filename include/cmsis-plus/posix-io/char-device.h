@@ -125,7 +125,7 @@ namespace os
 
     public:
 
-      char_device_impl (char_device& self);
+      char_device_impl (void);
 
       /**
        * @cond ignore
@@ -165,12 +165,6 @@ namespace os
 
       virtual void
       do_sync (void);
-
-      // ----------------------------------------------------------------------
-      // Support functions.
-
-      char_device&
-      self (void);
 
       /**
        * @}
@@ -276,14 +270,6 @@ namespace os
 
     // ========================================================================
 
-    inline char_device&
-    char_device_impl::self (void)
-    {
-      return static_cast<char_device&> (self_);
-    }
-
-    // ========================================================================
-
     template<typename T>
       template<typename ... Args>
         char_device_implementable<T>::char_device_implementable (
@@ -291,7 +277,7 @@ namespace os
             char_device
               { impl_instance_, name }, //
             impl_instance_
-              { *this, std::forward<Args>(args)... }
+              { std::forward<Args>(args)... }
         {
 #if defined(OS_TRACE_POSIX_IO_CHAR_DEVICE)
           trace::printf ("char_device_implementable::%s(\"%s\")=@%p\n",

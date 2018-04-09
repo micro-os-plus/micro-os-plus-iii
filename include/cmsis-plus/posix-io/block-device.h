@@ -170,7 +170,7 @@ namespace os
 
     public:
 
-      block_device_impl (block_device& self);
+      block_device_impl (void);
 
       /**
        * @cond ignore
@@ -218,12 +218,6 @@ namespace os
       virtual ssize_t
       do_write_block (const void* buf, blknum_t blknum,
                       std::size_t nblocks) = 0;
-
-      // ----------------------------------------------------------------------
-      // Support functions.
-
-      block_device&
-      self (void);
 
       /**
        * @}
@@ -479,14 +473,6 @@ namespace os
 
     // ========================================================================
 
-    inline block_device&
-    block_device_impl::self (void)
-    {
-      return static_cast<block_device&> (self_);
-    }
-
-    // ========================================================================
-
     template<typename T>
       template<typename ... Args>
         block_device_implementable<T>::block_device_implementable (
@@ -494,7 +480,7 @@ namespace os
             block_device
               { impl_instance_, name }, //
             impl_instance_
-              { *this, std::forward<Args>(args)... }
+              { std::forward<Args>(args)... }
         {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
           trace::printf ("block_device_implementable::%s(\"%s\")=@%p\n",
@@ -527,7 +513,7 @@ namespace os
             block_device
               { impl_instance_, name }, //
             impl_instance_
-              { *this, std::forward<Args>(args)... }, //
+              { std::forward<Args>(args)... }, //
             locker_ (locker)
         {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)

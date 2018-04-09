@@ -40,10 +40,9 @@ namespace os
   {
     // ========================================================================
 
-    file::file (file_impl& impl, class file_system& fs) :
+    file::file (file_impl& impl) :
         io
-          { impl, type::file }, //
-        file_system_ (&fs)
+          { impl, type::file }
     {
 #if defined(OS_TRACE_POSIX_IO_FILE)
       trace::printf ("file::%s()=%p\n", __func__, this);
@@ -55,8 +54,6 @@ namespace os
 #if defined(OS_TRACE_POSIX_IO_FILE)
       trace::printf ("file::%s() @%p\n", __func__, this);
 #endif
-
-      file_system_ = nullptr;
     }
 
     // ------------------------------------------------------------------------
@@ -126,9 +123,8 @@ namespace os
 
     // ========================================================================
 
-    file_impl::file_impl (file& self) :
-        io_impl
-          { self }
+    file_impl::file_impl (class file_system& fs) :
+        file_system_ (&fs)
     {
 #if defined(OS_TRACE_POSIX_IO_FILE)
       trace::printf ("file_impl::%s()=%p\n", __func__, this);

@@ -161,9 +161,7 @@ namespace os
 
     // ========================================================================
 
-    block_device_impl::block_device_impl (block_device& self) :
-        device_impl
-          { self }
+    block_device_impl::block_device_impl (void)
     {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
       trace::printf ("block_device_impl::%s()=@%p\n", __func__, this);
@@ -240,7 +238,13 @@ namespace os
       blknum_t blknum = static_cast<std::size_t> (offset_)
           / block_logical_size_bytes_;
 
-      ssize_t ret = self ().read_block (buf, blknum, nblocks);
+      if (blknum + nblocks > num_blocks_)
+        {
+          errno = EINVAL;
+          return -1;
+        }
+
+      ssize_t ret = do_read_block (buf, blknum, nblocks);
       if (ret >= 0)
         {
           ret *= block_logical_size_bytes_;
@@ -269,7 +273,13 @@ namespace os
       blknum_t blknum = static_cast<std::size_t> (offset_)
           / block_logical_size_bytes_;
 
-      ssize_t ret = self ().write_block (buf, blknum, nblocks);
+      if (blknum + nblocks > num_blocks_)
+        {
+          errno = EINVAL;
+          return -1;
+        }
+
+      ssize_t ret = do_write_block (buf, blknum, nblocks);
       if (ret >= 0)
         {
           ret *= block_logical_size_bytes_;

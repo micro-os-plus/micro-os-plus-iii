@@ -77,9 +77,8 @@ namespace os
 
     // ========================================================================
 
-    directory::directory (directory_impl& impl, class file_system& fs) :
-        impl_ (impl), //
-        file_system_ (&fs)
+    directory::directory (directory_impl& impl) :
+        impl_ (impl)
     {
 #if defined(OS_TRACE_POSIX_IO_DIRECTORY)
       trace::printf ("directory::%s()=%p\n", __func__, this);
@@ -91,8 +90,6 @@ namespace os
 #if defined(OS_TRACE_POSIX_IO_DIRECTORY)
       trace::printf ("directory::%s() @%p\n", __func__, this);
 #endif
-
-      file_system_ = nullptr;
     }
 
     // ------------------------------------------------------------------------
@@ -152,8 +149,8 @@ namespace os
 
     // ========================================================================
 
-    directory_impl::directory_impl (directory& self) :
-        self_ (self)
+    directory_impl::directory_impl (class file_system& fs) :
+        file_system_ (&fs)
     {
 #if defined(OS_TRACE_POSIX_IO_DIRECTORY)
       trace::printf ("directory_impl::%s()=%p\n", __func__, this);

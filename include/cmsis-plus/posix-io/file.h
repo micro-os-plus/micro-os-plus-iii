@@ -84,7 +84,7 @@ namespace os
 
     public:
 
-      file (file_impl& impl, class file_system& fs);
+      file (file_impl& impl);
 
       /**
        * @cond ignore
@@ -156,19 +156,6 @@ namespace os
       /**
        * @endcond
        */
-
-      // ----------------------------------------------------------------------
-    protected:
-
-      /**
-       * @cond ignore
-       */
-
-      class file_system* file_system_;
-
-      /**
-       * @endcond
-       */
     };
 
     // ========================================================================
@@ -195,7 +182,7 @@ namespace os
 
     public:
 
-      file_impl (file& self);
+      file_impl (class file_system& fs);
 
       /**
        * @cond ignore
@@ -239,11 +226,24 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
-      file&
-      self (void);
+      class file_system*
+      file_system (void);
 
       /**
        * @}
+       */
+
+      // ----------------------------------------------------------------------
+    protected:
+
+      /**
+       * @cond ignore
+       */
+
+      class file_system* file_system_;
+
+      /**
+       * @endcond
        */
     };
 
@@ -448,7 +448,7 @@ namespace os
     inline file_system*
     file::file_system (void)
     {
-      return file_system_;
+      return impl ().file_system ();
     }
 
     inline file_impl&
@@ -459,10 +459,10 @@ namespace os
 
     // ========================================================================
 
-    inline file&
-    file_impl::self (void)
+    inline class file_system*
+    file_impl::file_system (void)
     {
-      return static_cast<file&> (self_);
+      return file_system_;
     }
 
     // ========================================================================
@@ -470,9 +470,9 @@ namespace os
     template<typename T>
       file_implementable<T>::file_implementable (class file_system& fs) :
           file
-            { impl_instance_, fs }, //
+            { impl_instance_ }, //
           impl_instance_
-            { *this }
+            { fs }
       {
 #if defined(OS_TRACE_POSIX_IO_FILE)
         trace::printf ("file_implementable::%s()=@%p\n", __func__, this);
@@ -500,9 +500,9 @@ namespace os
       file_lockable<T, L>::file_lockable (class file_system& fs,
                                           lockable_type& locker) :
           file
-            { impl_instance_, fs }, //
+            { impl_instance_ }, //
           impl_instance_
-            { *this }, //
+            { fs }, //
           locker_ (locker)
       {
 #if defined(OS_TRACE_POSIX_IO_FILE)

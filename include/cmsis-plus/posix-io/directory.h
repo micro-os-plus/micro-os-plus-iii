@@ -105,7 +105,7 @@ namespace os
 
     public:
 
-      directory (directory_impl& impl, class file_system& fs);
+      directory (directory_impl& impl);
 
       /**
        * @cond ignore
@@ -221,7 +221,7 @@ namespace os
 
     public:
 
-      directory_impl (directory& self);
+      directory_impl (class file_system& fs);
 
       /**
        * @cond ignore
@@ -271,8 +271,8 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
-      directory&
-      self (void);
+      class file_system*
+      file_system (void) const;
 
       /**
        * @}
@@ -285,10 +285,10 @@ namespace os
        * @cond ignore
        */
 
-      directory& self_;
-
       // This also solves the readdir() re-entrancy issue.
       struct dirent dir_entry_;
+
+      class file_system* file_system_;
 
       /**
        * @endcond
@@ -481,7 +481,7 @@ namespace os
     inline file_system*
     directory::file_system (void) const
     {
-      return file_system_;
+      return impl ().file_system ();
     }
 
     inline struct dirent*
@@ -498,10 +498,10 @@ namespace os
 
     // ========================================================================
 
-    inline directory&
-    directory_impl::self (void)
+    inline file_system*
+    directory_impl::file_system (void) const
     {
-      return static_cast<directory&> (self_);
+      return file_system_;
     }
 
     // ========================================================================
@@ -510,9 +510,9 @@ namespace os
       directory_implementable<T>::directory_implementable (
           class file_system& fs) :
           directory
-            { impl_instance_, fs }, //
+            { impl_instance_ }, //
           impl_instance_
-            { *this }
+            { fs }
       {
 #if defined(OS_TRACE_POSIX_IO_DIRECTORY)
         trace::printf ("directory_implementable::%s()=@%p\n", __func__, this);
@@ -540,9 +540,9 @@ namespace os
       directory_lockable<T, L>::directory_lockable (class file_system& fs,
                                                     lockable_type& locker) :
           directory
-            { impl_instance_, fs }, //
+            { impl_instance_ }, //
           impl_instance_
-            { *this }, //
+            { fs }, //
           locker_ (locker)
       {
 #if defined(OS_TRACE_POSIX_IO_DIRECTORY)

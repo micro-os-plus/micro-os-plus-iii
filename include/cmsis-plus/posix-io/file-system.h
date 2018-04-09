@@ -313,6 +313,24 @@ namespace os
       deferred_directories_list (void);
 
       // ----------------------------------------------------------------------
+
+      template<typename T>
+        T*
+        allocate_file (void);
+
+      template<typename T>
+        T*
+        allocate_directory (void);
+
+      template<typename T, typename L>
+        T*
+        allocate_file (L& locker);
+
+      template<typename T, typename L>
+        T*
+        allocate_directory (L& locker);
+
+      // ----------------------------------------------------------------------
       // Support functions.
 
       block_device&
@@ -394,7 +412,7 @@ namespace os
 
     public:
 
-      file_system_impl (file_system& self, block_device& device);
+      file_system_impl (block_device& device);
 
       /**
        * @cond ignore
@@ -437,10 +455,11 @@ namespace os
       do_umount (unsigned int flags) = 0;
 
       virtual file*
-      do_vopen (const char* path, int oflag, std::va_list args) = 0;
+      do_vopen (class file_system& fs, const char* path, int oflag,
+                std::va_list args) = 0;
 
       virtual directory*
-      do_opendir (const char* dirname) = 0;
+      do_opendir (class file_system& fs, const char* dirname) = 0;
 
       virtual int
       do_mkdir (const char* path, mode_t mode) = 0;
@@ -496,9 +515,6 @@ namespace os
       block_device&
       device (void) const;
 
-      file_system&
-      self (void);
-
       /**
        * @}
        */
@@ -509,8 +525,6 @@ namespace os
       /**
        * @cond ignore
        */
-
-      file_system& self_;
 
       block_device& device_;
 
@@ -793,6 +807,148 @@ namespace os
       return deferred_directories_list_;
     }
 
+    template<typename T>
+      T*
+      file_system::allocate_file (void)
+      {
+        using file_type = T;
+
+        file_type* fil;
+
+        if (deferred_files_list_.empty ())
+          {
+            fil = new file_type (*this);
+          }
+        else
+          {
+            fil = static_cast<file_type*> (deferred_files_list_.unlink_head ());
+
+            // Call the constructor before reusing the object,
+            fil->~file_type ();
+
+            // Placement new, run only the constructor.
+            new (fil) file_type (*this);
+
+            // Deallocate all remaining elements in the list.
+            while (!deferred_files_list_.empty ())
+              {
+                file_type* f =
+                    static_cast<file_type*> (deferred_files_list_.unlink_head ());
+
+                // Call the destructor and the deallocator.
+                delete f;
+              }
+          }
+        return fil;
+      }
+
+    template<typename T, typename L>
+      T*
+      file_system::allocate_file (L& locker)
+      {
+        using file_type = T;
+
+        file_type* fil;
+
+        if (deferred_files_list_.empty ())
+          {
+            fil = new file_type (*this, locker);
+          }
+        else
+          {
+            fil = static_cast<file_type*> (deferred_files_list_.unlink_head ());
+
+            // Call the constructor before reusing the object,
+            fil->~file_type ();
+
+            // Placement new, run only the constructor.
+            new (fil) file_type (*this, locker);
+
+            // Deallocate all remaining elements in the list.
+            while (!deferred_files_list_.empty ())
+              {
+                file_type* f =
+                    static_cast<file_type*> (deferred_files_list_.unlink_head ());
+
+                // Call the destructor and the deallocator.
+                delete f;
+              }
+          }
+        return fil;
+      }
+
+    template<typename T>
+      T*
+      file_system::allocate_directory (void)
+      {
+        using directory_type = T;
+
+        directory_type* dir;
+
+        if (deferred_directories_list_.empty ())
+          {
+            dir = new directory_type (*this);
+          }
+        else
+          {
+            dir =
+                static_cast<directory_type*> (deferred_directories_list_.unlink_head ());
+
+            // Call the constructor before reusing the object,
+            dir->~directory_type ();
+
+            // Placement new, run only the constructor.
+            new (dir) directory_type (*this);
+
+            // Deallocate all remaining elements in the list.
+            while (!deferred_directories_list_.empty ())
+              {
+                directory_type* d =
+                    static_cast<directory_type*> (deferred_directories_list_.unlink_head ());
+
+                // Call the destructor and the deallocator.
+                delete d;
+              }
+          }
+        return dir;
+      }
+
+    template<typename T, typename L>
+      T*
+      file_system::allocate_directory (L& locker)
+      {
+        using directory_type = T;
+
+        directory_type* dir;
+
+        if (deferred_directories_list_.empty ())
+          {
+            dir = new directory_type (*this, locker);
+          }
+        else
+          {
+            dir =
+                static_cast<directory_type*> (deferred_directories_list_.unlink_head ());
+
+            // Call the constructor before reusing the object,
+            dir->~directory_type ();
+
+            // Placement new, run only the constructor.
+            new (dir) directory_type (*this, locker);
+
+            // Deallocate all remaining elements in the list.
+            while (!deferred_directories_list_.empty ())
+              {
+                directory_type* d =
+                    static_cast<directory_type*> (deferred_directories_list_.unlink_head ());
+
+                // Call the destructor and the deallocator.
+                delete d;
+              }
+          }
+        return dir;
+      }
+
     // ========================================================================
 
     inline block_device&
@@ -800,156 +956,6 @@ namespace os
     {
       return device_;
     }
-
-    inline file_system&
-    file_system_impl::self (void)
-    {
-      return static_cast<file_system&> (self_);
-    }
-
-    template<typename T>
-      T*
-      file_system_impl::allocate_file (void)
-      {
-        using file_type = T;
-
-        file_type* fil;
-
-        if (self ().deferred_files_list ().empty ())
-          {
-            fil = new file_type (self ());
-          }
-        else
-          {
-            fil =
-                static_cast<file_type*> (self ().deferred_files_list ().unlink_head ());
-
-            // Call the constructor before reusing the object,
-            fil->~file_type ();
-
-            // Placement new, run only the constructor.
-            new (fil) file_type (self ());
-
-            // Deallocate all remaining elements in the list.
-            while (!self ().deferred_files_list ().empty ())
-              {
-                file_type* f =
-                    static_cast<file_type*> (self ().deferred_files_list ().unlink_head ());
-
-                // Call the destructor and the deallocator.
-                delete f;
-              }
-          }
-        return fil;
-      }
-
-    template<typename T, typename L>
-      T*
-      file_system_impl::allocate_file (L& locker)
-      {
-        using file_type = T;
-
-        file_type* fil;
-
-        if (self ().deferred_files_list ().empty ())
-          {
-            fil = new file_type (self (), locker);
-          }
-        else
-          {
-            fil =
-                static_cast<file_type*> (self ().deferred_files_list ().unlink_head ());
-
-            // Call the constructor before reusing the object,
-            fil->~file_type ();
-
-            // Placement new, run only the constructor.
-            new (fil) file_type (self (), locker);
-
-            // Deallocate all remaining elements in the list.
-            while (!self ().deferred_files_list ().empty ())
-              {
-                file_type* f =
-                    static_cast<file_type*> (self ().deferred_files_list ().unlink_head ());
-
-                // Call the destructor and the deallocator.
-                delete f;
-              }
-          }
-        return fil;
-      }
-
-    template<typename T>
-      T*
-      file_system_impl::allocate_directory (void)
-      {
-        using directory_type = T;
-
-        directory_type* dir;
-
-        if (self ().deferred_directories_list ().empty ())
-          {
-            dir = new directory_type (self ());
-          }
-        else
-          {
-            dir =
-                static_cast<directory_type*> (self ().deferred_directories_list ().unlink_head ());
-
-            // Call the constructor before reusing the object,
-            dir->~directory_type ();
-
-            // Placement new, run only the constructor.
-            new (dir) directory_type (self ());
-
-            // Deallocate all remaining elements in the list.
-            while (!self ().deferred_directories_list ().empty ())
-              {
-                directory_type* d =
-                    static_cast<directory_type*> (self ().deferred_directories_list ().unlink_head ());
-
-                // Call the destructor and the deallocator.
-                delete d;
-              }
-          }
-        return dir;
-      }
-
-    template<typename T, typename L>
-      T*
-      file_system_impl::allocate_directory (L& locker)
-      {
-        using directory_type = T;
-
-        directory_type* dir;
-
-        if (self ().deferred_directories_list ().empty ())
-          {
-            dir = new directory_type (self (), locker);
-          }
-        else
-          {
-            dir =
-                static_cast<directory_type*> (self ().deferred_directories_list ().unlink_head ());
-
-            // Call the constructor before reusing the object,
-            dir->~directory_type ();
-
-            // Placement new, run only the constructor.
-            new (dir) directory_type (self (), locker);
-
-            // Deallocate all remaining elements in the list.
-            while (!self ().deferred_directories_list ().empty ())
-              {
-                directory_type* d =
-                    static_cast<directory_type*> (self ().deferred_directories_list ().unlink_head ());
-
-                // Call the destructor and the deallocator.
-                delete d;
-              }
-          }
-        return dir;
-      }
 
     // ========================================================================
 
@@ -960,7 +966,7 @@ namespace os
             file_system
               { impl_instance_, name }, //
             impl_instance_
-              { *this, device, std::forward<Args>(args)... }
+              { device, std::forward<Args>(args)... }
         {
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
           trace::printf ("file_system_implementable::%s(\"%s\")=@%p\n",
@@ -995,7 +1001,7 @@ namespace os
             file_system
               { impl_instance_, name }, //
             impl_instance_
-              { *this, device, locker, std::forward<Args>(args)... }
+              { device, locker, std::forward<Args>(args)... }
         {
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
           trace::printf ("file_system_lockable::%s()=%p\n", __func__, this);

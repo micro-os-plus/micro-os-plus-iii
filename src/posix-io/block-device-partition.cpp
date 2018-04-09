@@ -72,9 +72,7 @@ namespace os
     // ========================================================================
 
     block_device_partition_impl::block_device_partition_impl (
-        block_device_partition& self, block_device& parent) :
-        block_device_impl
-          { self }, //
+        block_device& parent) :
         parent_ (parent)
     {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE_PARTITION)

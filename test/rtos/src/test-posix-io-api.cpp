@@ -53,8 +53,8 @@ class my_char_impl : public posix::char_device_impl
 {
 public:
 
-  my_char_impl (posix::char_device& self, uint8_t* buf, size_t sz);
-  my_char_impl (posix::char_device& self, uint8_t* buf, size_t sz, int extra);
+  my_char_impl (uint8_t* buf, size_t sz);
+  my_char_impl (uint8_t* buf, size_t sz, int extra);
 
   // The rule of five.
   my_char_impl (const my_char_impl&) = delete;
@@ -98,17 +98,13 @@ public:
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-my_char_impl::my_char_impl (posix::char_device& self, uint8_t* buf, size_t sz) :
-    char_device_impl
-      { self }
+my_char_impl::my_char_impl (uint8_t* buf, size_t sz)
 {
   os::trace::printf ("%s()=@%p 1\n", __func__, this);
 }
 
-my_char_impl::my_char_impl (posix::char_device& self, uint8_t* buf, size_t sz,
-                            int extra) :
-    char_device_impl
-      { self }
+my_char_impl::my_char_impl (uint8_t* buf, size_t sz,
+                            int extra)
 {
   os::trace::printf ("%s()=@%p 2\n", __func__, this);
 }
@@ -178,7 +174,7 @@ class my_block_impl : public posix::block_device_impl
 {
 public:
 
-  my_block_impl (posix::block_device& self);
+  my_block_impl (void);
 
   // The rule of five.
   my_block_impl (const my_block_impl&) = delete;
@@ -219,9 +215,7 @@ private:
   uint32_t arena_[SZ][(BSZ / sizeof(uint32_t))];
 };
 
-my_block_impl::my_block_impl (posix::block_device& self) :
-    block_device_impl
-      { self }
+my_block_impl::my_block_impl (void)
 {
   trace::printf ("my_block_impl::%s()=@%p\n", __func__, this);
 

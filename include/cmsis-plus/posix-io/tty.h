@@ -139,7 +139,7 @@ namespace os
 
     public:
 
-      tty_impl (tty& self);
+      tty_impl (void);
 
       /**
        * @cond ignore
@@ -189,12 +189,6 @@ namespace os
 
       virtual int
       do_isatty (void) final;
-
-      // ----------------------------------------------------------------------
-      // Support functions.
-
-      tty&
-      self (void);
 
       /**
        * @}
@@ -300,14 +294,6 @@ namespace os
 
     // ========================================================================
 
-    inline tty&
-    tty_impl::self (void)
-    {
-      return static_cast<tty&> (self_);
-    }
-
-    // ========================================================================
-
     template<typename T>
       template<typename ... Args>
         tty_implementable<T>::tty_implementable (const char* name,
@@ -315,7 +301,7 @@ namespace os
             tty
               { impl_instance_, name }, //
             impl_instance_
-              { *this, std::forward<Args>(args)... }
+              { std::forward<Args>(args)... }
         {
 #if defined(OS_TRACE_POSIX_IO_TTY)
           trace::printf ("tty_implementable::%s(\"%s\")=@%p\n", __func__, name_,

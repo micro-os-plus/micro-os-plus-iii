@@ -458,8 +458,7 @@ namespace os
 
     // ========================================================================
 
-    io_impl::io_impl (io& self) :
-        self_ (self)
+    io_impl::io_impl (void)
     {
 #if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io_impl::%s()=%p\n", __func__, this);

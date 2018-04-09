@@ -222,7 +222,7 @@ namespace os
 
     public:
 
-      socket_impl (class socket& self);
+      socket_impl (void);
 
       /**
        * @cond ignore
@@ -306,12 +306,6 @@ namespace os
 
       virtual int
       do_sockatmark (void) = 0;
-
-      // ----------------------------------------------------------------------
-      // Support functions.
-
-      class socket&
-      self (void);
 
       /**
        * @}
@@ -556,20 +550,10 @@ namespace os
 
     // ========================================================================
 
-    inline class socket&
-    socket_impl::self (void)
-    {
-      return static_cast<class socket&> (self_);
-    }
-
-    // ========================================================================
-
     template<typename T>
       socket_implementable<T>::socket_implementable (class net_stack& ns) :
           socket
-            { impl_instance_, ns }, //
-          impl_instance_
-            { *this }
+            { impl_instance_, ns }
       {
 #if defined(OS_TRACE_POSIX_IO_SOCKET)
         trace::printf ("socket_implementable::%s()=@%p\n", __func__, this);
@@ -598,8 +582,6 @@ namespace os
                                               lockable_type& locker) :
           socket
             { impl_instance_, ns }, //
-          impl_instance_
-            { *this }, //
           locker_ (locker)
       {
 #if defined(OS_TRACE_POSIX_IO_SOCKET)

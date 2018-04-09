@@ -64,9 +64,7 @@ namespace os
 
     // ========================================================================
 
-    char_device_impl::char_device_impl (char_device& self) :
-        device_impl
-          { self }
+    char_device_impl::char_device_impl (void)
     {
 #if defined(OS_TRACE_POSIX_IO_CHAR_DEVICE)
       trace::printf ("char_device_impl::%s()=@%p\n", __func__, this);

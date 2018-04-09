@@ -217,9 +217,7 @@ namespace os
     }
     // ========================================================================
 
-    socket_impl::socket_impl (class socket& self) :
-        io_impl
-          { self }
+    socket_impl::socket_impl (void)
     {
 #if defined(OS_TRACE_POSIX_IO_SOCKET)
       trace::printf ("socket_impl::%s()=%p\n", __func__, this);

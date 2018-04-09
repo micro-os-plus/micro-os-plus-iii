@@ -133,8 +133,7 @@ namespace os
 
     public:
 
-      block_device_partition_impl (block_device_partition& self,
-                                   block_device& parent);
+      block_device_partition_impl (block_device& parent);
 
       /**
        * @cond ignore
@@ -190,12 +189,6 @@ namespace os
 
       void
       configure (blknum_t offset, blknum_t nblocks);
-
-      // ----------------------------------------------------------------------
-      // Support functions.
-
-      block_device_partition&
-      self (void);
 
       /**
        * @}
@@ -436,7 +429,7 @@ namespace os
             block_device_partition
               { impl_instance_, name }, //
             impl_instance_
-              { *this, parent, std::forward<Args>(args)... }
+              { parent, std::forward<Args>(args)... }
         {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE_PARTITION)
           trace::printf (
@@ -471,7 +464,7 @@ namespace os
             block_device_partition
               { impl_instance_, name }, //
             impl_instance_
-              { *this, parent, std::forward<Args>(args)... }, //
+              { parent, std::forward<Args>(args)... }, //
             locker_ (locker)
         {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE_PARTITION)
