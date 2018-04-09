@@ -262,7 +262,7 @@ namespace os
 
       // ----------------------------------------------------------------------
 
-      int&
+      int
       open_count (void);
 
       /**
@@ -317,7 +317,7 @@ namespace os
 
     // ========================================================================
 
-    inline int&
+    inline int
     device_impl::open_count (void)
     {
       return open_count_;

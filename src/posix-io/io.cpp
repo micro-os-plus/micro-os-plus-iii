@@ -260,7 +260,7 @@ namespace os
       ssize_t ret = impl ().do_read (buf, nbyte);
       if (ret >= 0)
         {
-          impl ().offset () += ret;
+          impl ().offset_ += ret;
         }
 
 #if defined(OS_TRACE_POSIX_IO_IO)
@@ -313,7 +313,7 @@ namespace os
       ssize_t ret = impl ().do_write (buf, nbyte);
       if (ret >= 0)
         {
-          impl ().offset () += ret;
+          impl ().offset_ += ret;
         }
 
 #if defined(OS_TRACE_POSIX_IO_IO)
@@ -360,7 +360,7 @@ namespace os
       ssize_t ret = impl ().do_writev (iov, iovcnt);
       if (ret >= 0)
         {
-          impl ().offset () += ret;
+          impl ().offset_ += ret;
         }
       return ret;
     }

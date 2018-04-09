@@ -362,7 +362,7 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
-      off_t&
+      off_t
       offset (void);
 
       void
@@ -430,7 +430,7 @@ namespace os
 
     // ========================================================================
 
-    inline off_t&
+    inline off_t
     io_impl::offset (void)
     {
       return offset_;
