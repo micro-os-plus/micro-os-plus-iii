@@ -118,6 +118,8 @@ namespace os
     {
       // ----------------------------------------------------------------------
 
+      friend class char_device;
+
       /**
        * @name Constructors & Destructor
        * @{

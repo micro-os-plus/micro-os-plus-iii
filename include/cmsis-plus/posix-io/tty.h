@@ -132,6 +132,8 @@ namespace os
     {
       // ----------------------------------------------------------------------
 
+      friend class tty;
+
       /**
        * @name Constructors & Destructor
        * @{

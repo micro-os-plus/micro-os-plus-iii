@@ -284,6 +284,8 @@ namespace os
     {
       // ----------------------------------------------------------------------
 
+      friend class io;
+
       /**
        * @name Constructors & Destructor
        * @{

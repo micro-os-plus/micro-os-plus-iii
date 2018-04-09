@@ -405,6 +405,8 @@ namespace os
     {
       // ----------------------------------------------------------------------
 
+      friend class file_system;
+
       /**
        * @name Constructors & Destructor
        * @{
