@@ -71,7 +71,7 @@ namespace os
 
       // Link the file object to a list kept by the file system.
       // It will be deallocated at the next open.
-      file_system ()->add_deferred_file (this);
+      file_system ().add_deferred_file (this);
 
       return ret;
     }
@@ -118,13 +118,13 @@ namespace os
       errno = 0;
 
       // Execute the file system code. Might be locked there.
-      return file_system ()->statvfs (buf);
+      return file_system ().statvfs (buf);
     }
 
     // ========================================================================
 
     file_impl::file_impl (class file_system& fs) :
-        file_system_ (&fs)
+        file_system_ (fs)
     {
 #if defined(OS_TRACE_POSIX_IO_FILE)
       trace::printf ("file_impl::%s()=%p\n", __func__, this);

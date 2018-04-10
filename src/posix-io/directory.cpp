@@ -142,7 +142,7 @@ namespace os
       int ret = impl ().do_close ();
 
       // The file object will be deallocated at the next open.
-      file_system ()->add_deferred_directory (this);
+      file_system ().add_deferred_directory (this);
 
       return ret;
     }
@@ -150,7 +150,7 @@ namespace os
     // ========================================================================
 
     directory_impl::directory_impl (class file_system& fs) :
-        file_system_ (&fs)
+        file_system_ (fs)
     {
 #if defined(OS_TRACE_POSIX_IO_DIRECTORY)
       trace::printf ("directory_impl::%s()=%p\n", __func__, this);

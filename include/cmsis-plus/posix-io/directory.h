@@ -156,7 +156,7 @@ namespace os
       struct dirent*
       dir_entry (void);
 
-      class file_system*
+      class file_system&
       file_system (void) const;
 
       directory_impl&
@@ -189,8 +189,6 @@ namespace os
        */
 
       directory_impl& impl_;
-
-      class file_system* file_system_;
 
       /**
        * @endcond
@@ -271,7 +269,7 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
-      class file_system*
+      class file_system&
       file_system (void) const;
 
       /**
@@ -288,7 +286,7 @@ namespace os
       // This also solves the readdir() re-entrancy issue.
       struct dirent dir_entry_;
 
-      class file_system* file_system_;
+      class file_system& file_system_;
 
       /**
        * @endcond
@@ -478,7 +476,7 @@ namespace os
   {
     // ========================================================================
 
-    inline file_system*
+    inline file_system&
     directory::file_system (void) const
     {
       return impl ().file_system ();
@@ -498,7 +496,7 @@ namespace os
 
     // ========================================================================
 
-    inline file_system*
+    inline file_system&
     directory_impl::file_system (void) const
     {
       return file_system_;

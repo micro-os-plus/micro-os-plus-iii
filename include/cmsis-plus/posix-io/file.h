@@ -132,7 +132,7 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
-      class file_system*
+      class file_system&
       file_system (void);
 
       file_impl&
@@ -226,7 +226,7 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
-      class file_system*
+      class file_system&
       file_system (void);
 
       /**
@@ -240,7 +240,7 @@ namespace os
        * @cond ignore
        */
 
-      class file_system* file_system_;
+      class file_system& file_system_;
 
       /**
        * @endcond
@@ -445,7 +445,7 @@ namespace os
   {
     // ========================================================================
 
-    inline file_system*
+    inline file_system&
     file::file_system (void)
     {
       return impl ().file_system ();
@@ -459,7 +459,7 @@ namespace os
 
     // ========================================================================
 
-    inline class file_system*
+    inline class file_system&
     file_impl::file_system (void)
     {
       return file_system_;
