@@ -41,7 +41,7 @@
 #define OS_INTEGER_RTOS_CRITICAL_SECTION_INTERRUPT_PRIORITY (4)
 #endif
 
-#define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES               (3000)
+#define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES               (4000)
 
 #define OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES           (12*1024)
 
@@ -126,6 +126,7 @@
 #define OS_TRACE_RTOS_RTC_TICK
 //#define OS_TRACE_RTOS_SYSCLOCK_TICK
 
+#if 0
 #define OS_TRACE_POSIX_IO_DEVICE
 #define OS_TRACE_POSIX_IO_CHAR_DEVICE
 #define OS_TRACE_POSIX_IO_BLOCK_DEVICE
@@ -140,6 +141,9 @@
 #define OS_TRACE_POSIX_IO_SOCKET
 #define OS_TRACE_POSIX_IO_TTY
 #define OS_TRACE_POSIX_IO_CHAN_FATFS
+#endif
+
+// ----------------------------------------------------------------------------
 
 #define FF_MAX_SS (4096)
 
