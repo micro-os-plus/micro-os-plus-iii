@@ -238,6 +238,10 @@ namespace os
         return chunk_offset + block_padding + block_minsize;
       }
 
+      void*
+      do_align (chunk_t* chunk, std::size_t bytes, std::size_t alignment,
+                std::size_t alloc_size);
+
       void* arena_addr_ = nullptr;
       // No need for arena_size_bytes_, use total_bytes_.
 

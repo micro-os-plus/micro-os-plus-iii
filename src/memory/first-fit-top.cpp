@@ -214,36 +214,7 @@ namespace os
           // and try again to allocate.
         }
 
-      // Update statistics.
-      // The value subtracted from free is added to allocated.
-      internal_increase_allocated_statistics (chunk->size);
-
-      // Compute pointer to payload area.
-      char* payload = reinterpret_cast<char *> (chunk) + chunk_offset;
-
-      // Align it to user provided alignment.
-      void* aligned_payload = payload;
-      std::size_t aligned_size = chunk->size - chunk_offset;
-
-      void* res;
-      res = std::align (alignment, bytes, aligned_payload, aligned_size);
-      if (res == nullptr)
-        {
-          assert(res != nullptr);
-        }
-
-      // Compute the possible alignment offset.
-      std::ptrdiff_t offset = static_cast<char *> (aligned_payload) - payload;
-      if (offset)
-        {
-          // If non-zero, store it in the gap left by alignment in the
-          // chunk header.
-
-          chunk_t* adj_chunk =
-              reinterpret_cast<chunk_t *> (static_cast<char *> (aligned_payload)
-                  - chunk_offset);
-          adj_chunk->size = static_cast<std::size_t> (-offset);
-        }
+      void* aligned_payload = do_align (chunk, bytes, alignment, alloc_size);
 
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
       trace::printf ("%s(%u,%u)=%p,%u @%p %s\n", __func__, bytes, alignment,
@@ -432,6 +403,48 @@ namespace os
     first_fit_top::do_max_size (void) const noexcept
     {
       return total_bytes_;
+    }
+
+    void*
+    first_fit_top::do_align (chunk_t* chunk, std::size_t bytes,
+                             std::size_t alignment, std::size_t alloc_size)
+    {
+      // Update statistics.
+      // The value subtracted from free is added to allocated.
+      internal_increase_allocated_statistics (chunk->size);
+
+      // Compute pointer to payload area.
+      char* payload = reinterpret_cast<char *> (chunk) + chunk_offset;
+
+      // Align it to user provided alignment.
+      void* aligned_payload = payload;
+      std::size_t aligned_size = chunk->size - chunk_offset;
+
+      void* res;
+      res = std::align (alignment, bytes, aligned_payload, aligned_size);
+      if (res == nullptr)
+        {
+          assert(res != nullptr);
+        }
+
+      // Compute the possible alignment offset.
+      std::ptrdiff_t offset = static_cast<char *> (aligned_payload) - payload;
+      if (offset)
+        {
+          // If non-zero, store it in the gap left by alignment in the
+          // chunk header.
+
+          chunk_t* adj_chunk =
+              reinterpret_cast<chunk_t *> (static_cast<char *> (aligned_payload)
+                  - chunk_offset);
+          adj_chunk->size = static_cast<std::size_t> (-offset);
+        }
+
+      assert(
+          (reinterpret_cast<uintptr_t> (aligned_payload) & (alignment - 1))
+              == 0);
+
+      return aligned_payload;
     }
 
 #pragma GCC diagnostic pop
