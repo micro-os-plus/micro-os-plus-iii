@@ -450,6 +450,12 @@ namespace os
       trace::printf ("io::%s(%d, %d) @%p\n", __func__, offset, whence, this);
 #endif
 
+      if (!impl ().do_is_opened ())
+        {
+          errno = EBADF; // Not opened.
+          return -1;
+        }
+
       errno = 0;
 
       // Execute the implementation specific code.

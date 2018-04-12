@@ -77,6 +77,12 @@ namespace os
           return -1;
         }
 
+      if (!impl ().do_is_opened ())
+        {
+          errno = EBADF; // Not opened.
+          return -1;
+        }
+
       return impl ().do_read_block (buf, blknum, nblocks);
     }
 
@@ -95,6 +101,12 @@ namespace os
           return -1;
         }
 
+      if (!impl ().do_is_opened ())
+        {
+          errno = EBADF; // Not opened.
+          return -1;
+        }
+
       return impl ().do_write_block (buf, blknum, nblocks);
     }
 
@@ -104,6 +116,12 @@ namespace os
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
       trace::printf ("block_device::%s(%d) @%p\n", __func__, request, this);
 #endif
+
+      if (!impl ().do_is_opened ())
+        {
+          errno = EBADF; // Not opened.
+          return -1;
+        }
 
       errno = 0;
 

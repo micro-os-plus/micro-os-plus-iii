@@ -464,6 +464,15 @@ namespace os
               p = nullptr;
             }
         }
+
+      if (!device ().is_opened ())
+        {
+          errno = EBADF; // Not opened.
+          return -1;
+        }
+
+      errno = 0;
+
       int ret = impl ().do_vmount (flags, args);
       if (ret < 0)
         {
@@ -508,6 +517,12 @@ namespace os
             }
 
           mounted_root__ = nullptr;
+        }
+
+      if (!device ().is_opened ())
+        {
+          errno = EBADF; // Not opened.
+          return -1;
         }
 
       impl ().do_sync ();
@@ -571,6 +586,14 @@ namespace os
       trace::printf ("file_system::%s(\"%s\", %u)\n", __func__, path, oflag);
 #endif
 
+      if (!device ().is_opened ())
+        {
+          errno = EBADF; // Not opened.
+          return nullptr;
+        }
+
+      errno = 0;
+
       // Execute the file specific implementation code.
       // Allocation is done by the implementation, where
       // the size is known.
@@ -592,6 +615,14 @@ namespace os
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\")\n", __func__, dirpath);
 #endif
+
+      if (!device ().is_opened ())
+        {
+          errno = EBADF; // Not opened.
+          return nullptr;
+        }
+
+      errno = 0;
 
       // Execute the dir specific implementation code.
       // Allocation is done by the implementation, where
@@ -626,6 +657,12 @@ namespace os
           return -1;
         }
 
+      if (!device ().is_opened ())
+        {
+          errno = EBADF; // Not opened.
+          return -1;
+        }
+
       errno = 0;
 
       return impl ().do_mkdir (path, mode);
@@ -650,6 +687,12 @@ namespace os
           return -1;
         }
 
+      if (!device ().is_opened ())
+        {
+          errno = EBADF; // Not opened.
+          return -1;
+        }
+
       errno = 0;
 
       return impl ().do_rmdir (path);
@@ -661,6 +704,12 @@ namespace os
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s() @%p\n", __func__, this);
 #endif
+
+      if (!device ().is_opened ())
+        {
+          errno = EBADF; // Not opened.
+          return;
+        }
 
       errno = 0;
 
@@ -685,6 +734,12 @@ namespace os
       if (*path == '\0')
         {
           errno = ENOENT;
+          return -1;
+        }
+
+      if (!device ().is_opened ())
+        {
+          errno = EBADF; // Not opened.
           return -1;
         }
 
@@ -713,6 +768,12 @@ namespace os
           return -1;
         }
 
+      if (!device ().is_opened ())
+        {
+          errno = EBADF; // Not opened.
+          return -1;
+        }
+
       errno = 0;
 
       // Execute the implementation specific code.
@@ -735,6 +796,12 @@ namespace os
       if (*path == '\0')
         {
           errno = ENOENT;
+          return -1;
+        }
+
+      if (!device ().is_opened ())
+        {
+          errno = EBADF; // Not opened.
           return -1;
         }
 
@@ -764,6 +831,12 @@ namespace os
           return -1;
         }
 
+      if (!device ().is_opened ())
+        {
+          errno = EBADF; // Not opened.
+          return -1;
+        }
+
       errno = 0;
 
       // Execute the implementation specific code.
@@ -786,6 +859,12 @@ namespace os
       if (*path == '\0')
         {
           errno = ENOENT;
+          return -1;
+        }
+
+      if (!device ().is_opened ())
+        {
+          errno = EBADF; // Not opened.
           return -1;
         }
 
@@ -815,6 +894,12 @@ namespace os
           return -1;
         }
 
+      if (!device ().is_opened ())
+        {
+          errno = EBADF; // Not opened.
+          return -1;
+        }
+
       errno = 0;
 
       struct utimbuf tmp;
@@ -840,6 +925,12 @@ namespace os
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(%p)\n", __func__, buf);
 #endif
+
+      if (!device ().is_opened ())
+        {
+          errno = EBADF; // Not opened.
+          return -1;
+        }
 
       return impl ().do_statvfs (buf);
     }
