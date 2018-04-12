@@ -226,16 +226,18 @@ namespace os
 
       static constexpr std::size_t block_minsize = sizeof(void *);
 
+      // Extra padding from chunk to block.
       static constexpr std::size_t
       calc_block_padding (std::size_t block_align)
       {
         return os::rtos::memory::max (block_align, chunk_align) - chunk_align;
       }
 
+      // The minimum chunk to it the block.
       static constexpr std::size_t
       calc_block_minchunk (std::size_t block_padding)
       {
-        return chunk_offset + block_padding + block_minsize;
+        return chunk_offset + block_minsize + block_padding;
       }
 
       void*

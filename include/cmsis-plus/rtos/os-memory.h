@@ -73,7 +73,7 @@ namespace os
       constexpr std::size_t
       max (std::size_t a, std::size_t b)
       {
-        return a >= b ? a : b;
+        return (a >= b) ? a : b;
       }
 
       /**
@@ -1714,7 +1714,7 @@ namespace os
             {
               // Use placement new to construct the object.
               allocator_traits::construct (alloc, std::addressof (*p),
-                                           std::forward<Args>(args)...);
+                  std::forward<Args>(args)...);
 
               // Figure out the deleter type.
               using D = allocator_deleter<A>;
@@ -1732,7 +1732,7 @@ namespace os
 
           // Use placement new to construct the object.
           allocator_traits::construct (alloc, std::addressof (*p),
-              std::forward<Args>(args)...);
+                                       std::forward<Args>(args)...);
 
           // Figure out the deleter type.
           using D = allocator_deleter<A>;
