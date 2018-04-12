@@ -382,6 +382,8 @@ namespace os
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\")=%p\n", __func__, name_, this);
 #endif
+      deferred_files_list_.clear ();
+      deferred_directories_list_.clear ();
     }
 
     file_system::~file_system ()

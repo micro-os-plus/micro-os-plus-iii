@@ -85,6 +85,7 @@ namespace os
 #if defined(OS_TRACE_POSIX_IO_NET_STACK)
       trace::printf ("net_stack::%s(\"%s\")=%p\n", __func__, name_, this);
 #endif
+      deferred_sockets_list_.clear ();
     }
 
     net_stack::~net_stack ()
