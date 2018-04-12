@@ -158,6 +158,12 @@ namespace os
       trace::printf ("device::%s(%d) @%p\n", __func__, request, this);
 #endif
 
+      if (impl ().open_count_ == 0)
+        {
+          errno = EBADF; // Not opened.
+          return -1;
+        }
+
       errno = 0;
 
       return impl ().do_vioctl (request, args);
@@ -169,6 +175,12 @@ namespace os
 #if defined(OS_TRACE_POSIX_IO_DEVICE)
       trace::printf ("device::%s() @%p\n", __func__, this);
 #endif
+
+      if (impl ().open_count_ == 0)
+        {
+          errno = EBADF; // Not opened.
+          return;
+        }
 
       impl ().do_sync ();
     }

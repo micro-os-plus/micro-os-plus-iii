@@ -50,6 +50,9 @@ namespace os
 
     // ========================================================================
 
+    // TODO: add support to indicate that there is no media in drive.
+    // TODO: add support to indicate the media is write protected.
+
     /**
      * @brief Block device class.
      * @headerfile block-device.h <cmsis-plus/posix-io/block-device.h>

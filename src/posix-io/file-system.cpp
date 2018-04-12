@@ -410,7 +410,21 @@ namespace os
     int
     file_system::vmkfs (int options, std::va_list args)
     {
-      int ret = impl ().do_vmkfs (options, args);
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
+      trace::printf ("file_system::%s(%u) @%p\n", __func__, options, this);
+#endif
+
+      if (mounted_path_ != nullptr)
+        {
+          // File system already mounted.
+          errno = EBUSY;
+          return -1;
+        }
+
+      errno = 0;
+
+      int ret;
+      ret = impl ().do_vmkfs (options, args);
 
       return ret;
     }
@@ -433,7 +447,7 @@ namespace os
     {
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\", %u) @%p\n", __func__,
-                     path ? path : "0", flags, this);
+                     path ? path : "nullptr", flags, this);
 #endif
 
       if (mounted_path_ != nullptr)

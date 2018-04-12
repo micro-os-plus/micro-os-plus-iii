@@ -785,6 +785,12 @@ namespace os
       return static_cast<file_system_impl&> (impl_);
     }
 
+    inline block_device&
+    file_system::device (void) const
+    {
+      return impl ().device ();
+    }
+
     inline void
     file_system::add_deferred_file (file* fil)
     {
