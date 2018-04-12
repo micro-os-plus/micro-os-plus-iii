@@ -655,7 +655,7 @@ namespace os
          */
 
         virtual
-        ~file_system_lockable ();
+        ~file_system_lockable () override;
 
         /**
          * @}

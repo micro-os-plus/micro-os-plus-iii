@@ -363,7 +363,7 @@ namespace os
          */
 
         virtual
-        ~file_lockable ();
+        ~file_lockable () override;
 
         /**
          * @}
@@ -393,16 +393,16 @@ namespace os
         vfcntl (int cmd, std::va_list args) override;
 
         virtual int
-        fstat (struct stat* buf);
+        fstat (struct stat* buf) override;
 
         virtual off_t
         lseek (off_t offset, int whence) override;
 
         virtual int
-        ftruncate (off_t length);
+        ftruncate (off_t length) override;
 
         virtual int
-        fsync (void);
+        fsync (void) override;
 
         // fstatvfs() - must not be locked, since will be locked by the
         // file system. (otherwise non-recursive mutexes will fail).

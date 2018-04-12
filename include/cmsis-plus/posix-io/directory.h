@@ -408,7 +408,7 @@ namespace os
          */
 
         virtual
-        ~directory_lockable ();
+        ~directory_lockable () override;
 
         /**
          * @}
