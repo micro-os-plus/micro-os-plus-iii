@@ -211,6 +211,9 @@ namespace os
       file_descriptor_t
       file_descriptor (void) const;
 
+      bool
+      is_opened (void);
+
       io_impl&
       impl (void) const;
 
@@ -422,6 +425,12 @@ namespace os
     io::file_descriptor (void) const
     {
       return file_descriptor_;
+    }
+
+    inline bool
+    io::is_opened (void)
+    {
+      return impl ().do_is_opened ();
     }
 
     inline io_impl&
