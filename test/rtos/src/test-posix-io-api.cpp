@@ -103,8 +103,7 @@ my_char_impl::my_char_impl (uint8_t* buf, size_t sz)
   os::trace::printf ("%s()=@%p 1\n", __func__, this);
 }
 
-my_char_impl::my_char_impl (uint8_t* buf, size_t sz,
-                            int extra)
+my_char_impl::my_char_impl (uint8_t* buf, size_t sz, int extra)
 {
   os::trace::printf ("%s()=@%p 2\n", __func__, this);
 }
@@ -170,61 +169,32 @@ my_char_impl::do_close (void)
 
 #pragma GCC diagnostic pop
 
-class my_block_impl : public posix::block_device_impl
-{
-public:
-
-  my_block_impl (void);
-
-  // The rule of five.
-  my_block_impl (const my_block_impl&) = delete;
-  my_block_impl (my_block_impl&&) = delete;
-  my_block_impl&
-  operator= (const my_block_impl&) = delete;
-  my_block_impl&
-  operator= (my_block_impl&&) = delete;
-
-  virtual
-  ~my_block_impl () override;
-
-  virtual bool
-  do_is_opened (void) override;
-
-  virtual int
-  do_vopen (const char* path, int oflag, std::va_list args) override;
-
-  virtual ssize_t
-  do_read_block (void* buf, blknum_t blknum, std::size_t nblocks) override;
-
-  virtual ssize_t
-  do_write_block (const void* buf, blknum_t blknum, std::size_t nblocks)
-      override;
-
-  virtual int
-  do_vioctl (int request, std::va_list args) override;
-
-  virtual void
-  do_sync (void) override;
-
-  virtual int
-  do_close (void) override;
-
-private:
-  static constexpr std::size_t BSZ = 512;
-  static constexpr std::size_t SZ = 128 + 3;
-  uint32_t arena_[SZ][(BSZ / sizeof(uint32_t))];
-};
-
-my_block_impl::my_block_impl (void)
+my_block_impl::my_block_impl (std::size_t bsize, std::size_t esize,
+                              std::size_t nblocks)
 {
   trace::printf ("my_block_impl::%s()=@%p\n", __func__, this);
 
-  memset (arena_, 0xFF, sizeof(arena_));
+  num_blocks_ = nblocks;
+  // Align.
+  block_logical_size_bytes_ = (bsize + sizeof(elem_t) - 1)
+      & (~(sizeof(elem_t) - 1));
+  block_physical_size_bytes_ = (esize + sizeof(elem_t) - 1)
+      & (~(sizeof(elem_t) - 1));
+
+#if 1
+  arena_ = new elem_t[nblocks * bsize / sizeof(elem_t)];
+  memset (static_cast<void*> (arena_), 0xFF, nblocks * bsize / sizeof(elem_t));
+#else
+  arena_ = new elem_t[(nblocks > 128 ? 128 : nblocks) * bsize / sizeof(elem_t)];
+  memset (static_cast<void*> (arena_), 0xFF, (nblocks > 128 ? 128 : nblocks) * bsize / sizeof(elem_t));
+#endif
 }
 
 my_block_impl::~my_block_impl ()
 {
   trace::printf ("my_block_impl::%s() @%p\n", __func__, this);
+
+  delete[] arena_;
 }
 
 #pragma GCC diagnostic push
@@ -239,11 +209,6 @@ my_block_impl::do_is_opened (void)
 int
 my_block_impl::do_vopen (const char* path, int oflag, std::va_list args)
 {
-
-  num_blocks_ = SZ;
-  block_logical_size_bytes_ = BSZ;
-  block_physical_size_bytes_ = BSZ;
-
   return 0;
 }
 
@@ -251,8 +216,16 @@ ssize_t
 my_block_impl::do_read_block (void* buf, posix::block_device::blknum_t blknum,
                               std::size_t nblocks)
 {
-  memcpy (buf, &arena_[blknum], nblocks * BSZ);
-  return static_cast<ssize_t>(nblocks);
+#if 1
+  memcpy (buf, &arena_[blknum * block_logical_size_bytes_],
+          nblocks * block_logical_size_bytes_);
+#else
+  if (blknum < 128) {
+      memcpy (buf, &arena_[blknum * block_logical_size_bytes_],
+              nblocks * block_logical_size_bytes_);
+  }
+#endif
+  return static_cast<ssize_t> (nblocks);
 }
 
 ssize_t
@@ -260,8 +233,16 @@ my_block_impl::do_write_block (const void* buf,
                                posix::block_device::blknum_t blknum,
                                std::size_t nblocks)
 {
-  memcpy (&arena_[blknum], buf, nblocks * BSZ);
-  return static_cast<ssize_t>(nblocks);
+#if 1
+  memcpy (&arena_[blknum * block_logical_size_bytes_], buf,
+          nblocks * block_logical_size_bytes_);
+#else
+  if (blknum < 128) {
+      memcpy (&arena_[blknum * block_logical_size_bytes_], buf,
+              nblocks * block_logical_size_bytes_);
+  }
+#endif
+  return static_cast<ssize_t> (nblocks);
 }
 
 int
@@ -305,8 +286,10 @@ static my_char mc
 static my_char mc2
   { "mc2", cbuf, sizeof(cbuf), 7 };
 
-
 // ----------------------------------------------------------------------------
+
+// Explicit template instantiation.
+template class posix::block_device_implementable<my_block_impl>;
 
 // Explicit template instantiation.
 template class posix::block_device_lockable<my_block_impl, os::rtos::mutex>;
@@ -317,8 +300,7 @@ static os::rtos::mutex mx1
 
 // /dev/mb
 static my_block mb
-  { "mb", mx1 };
-
+  { "mb", mx1, 512u, 512u, 2u + 3u };
 
 // Explicit template instantiation.
 template class posix::block_device_partition_implementable<>;
@@ -326,7 +308,7 @@ using my_partition1 = posix::block_device_partition_implementable<>;
 
 // /dev/mb1
 static my_partition1 p1
-  { "mb1", mb };
+  { "mb-p1", mb };
 
 // Explicit template instantiation.
 template class posix::block_device_partition_lockable<
@@ -339,7 +321,7 @@ static rtos::mutex mx2
 // /dev/mb2
 // The mutex is not really needed, but it is used to test the template.
 static my_partition2 p2
-  { "mb2", mb, mx2 };
+  { "mb-p2", mb, mx2 };
 
 // ----------
 
@@ -349,10 +331,7 @@ static posix::file_descriptors_manager fdm
 
 #pragma GCC diagnostic pop
 
-
 // ----------
-
-static uint8_t buff[512 * 4];
 
 static const char* test_name = "Test POSIX I/O";
 
@@ -364,6 +343,8 @@ static const char* test_name = "Test POSIX I/O";
 int
 test_posix_io_api (bool extra __attribute__((unused)))
 {
+  static uint8_t* buff;
+  buff = new uint8_t[512];
 
   ssize_t res;
 
@@ -402,16 +383,18 @@ test_posix_io_api (bool extra __attribute__((unused)))
           res = p2.read_block (buff, i);
           assert(res >= 0);
           buff[0] = static_cast<uint8_t> (i);
+          buff[bsz - 1] = static_cast<uint8_t> (i);
           res = p2.write_block (buff, i);
           assert(res >= 0);
         }
 
       for (std::size_t i = 0; i < p2.blocks (); ++i)
         {
-          buff[0] = 0xFF;
+          memset (buff, 0xFF, bsz);
           res = p2.read_block (buff, i);
           assert(res >= 0);
           assert(buff[0] == i);
+          assert(buff[bsz - 1] == i);
         }
 
       res = p2.read_block (buff, p2.blocks ());
@@ -470,6 +453,8 @@ test_posix_io_api (bool extra __attribute__((unused)))
     }
 
 #endif
+
+  delete buff;
 
   return 0;
 }

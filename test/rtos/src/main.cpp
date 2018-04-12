@@ -33,6 +33,7 @@
 #include <test-c-api.h>
 #include <test-iso-api.h>
 #include <test-posix-io-api.h>
+#include <test-chan-fatfs.h>
 
 #include <test-cpp-mem.h>
 
@@ -89,6 +90,15 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   if (ret == 0)
     {
       ret = test_posix_io_api (false);
+      printf ("errno=%d\n", errno);
+      errno = 0;
+    }
+#endif
+
+#if 1
+  if (ret == 0)
+    {
+      ret = test_chan_fatfs (false);
       printf ("errno=%d\n", errno);
       errno = 0;
     }

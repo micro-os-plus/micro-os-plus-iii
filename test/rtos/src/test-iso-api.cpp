@@ -133,7 +133,7 @@ test_iso_api (bool extra)
 
         {
           std::thread th12
-            { task1 };
+            { task1};
 
           th12.join ();
         }
@@ -141,7 +141,7 @@ test_iso_api (bool extra)
 #endif
 
 #if 1
-        // TODO: check thread termination; at a certain moment some user faults were triggered.
+      // TODO: check thread termination; at a certain moment some user faults were triggered.
         {
           char c;
 
@@ -165,13 +165,13 @@ test_iso_api (bool extra)
           char c;
 
           std::thread th22
-            { task2, &c };
+            { task2, &c};
 
           std::thread th32
-            { task3, &c };
+            { task3, &c};
 
           std::thread th42
-            { task4, 7, "xyz" };
+            { task4, 7, "xyz"};
 
           th22.join ();
           th32.join ();
@@ -260,7 +260,8 @@ test_iso_api (bool extra)
 
           if (mx21.try_lock_until (estd::chrono::realtime_clock::now () + 10ms))
             mx21.unlock ();
-          if (mx21.try_lock_until (estd::chrono::realtime_clock::now () + 100ms))
+          if (mx21.try_lock_until (
+              estd::chrono::realtime_clock::now () + 100ms))
             mx21.unlock ();
 
 #pragma GCC diagnostic pop
@@ -294,33 +295,33 @@ test_iso_api (bool extra)
           mx22.unlock ();
           mx22.try_lock_for (milliseconds (3001)); // 3001 ticks
           mx22.unlock ();
-          mx22.try_lock_for (microseconds (3001001)); // 3002 ticks
+          mx22.try_lock_for (microseconds (3001001));// 3002 ticks
           mx22.unlock ();
-          mx22.try_lock_for (nanoseconds (3002000001ul)); // 3003 ticks
+          mx22.try_lock_for (nanoseconds (3002000001ul));// 3003 ticks
           mx22.unlock ();
 
-          mx22.try_lock_for (microseconds (1)); // 1 tick
+          mx22.try_lock_for (microseconds (1));// 1 tick
           mx22.unlock ();
-          mx22.try_lock_for (nanoseconds (1)); // 1 tick
+          mx22.try_lock_for (nanoseconds (1));// 1 tick
           mx22.unlock ();
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
 
           if (mx22.try_lock_until (estd::chrono::system_clock::now () + 5000us))
-            mx22.unlock ();
+          mx22.unlock ();
           if (mx22.try_lock_until (estd::chrono::system_clock::now () + 5ms))
-            mx22.unlock ();
+          mx22.unlock ();
 
           if (mx22.try_lock_until (estd::chrono::systick_clock::now () + 5us))
-            mx22.unlock ();
+          mx22.unlock ();
           if (mx22.try_lock_until (estd::chrono::systick_clock::now () + 5ms))
-            mx22.unlock ();
+          mx22.unlock ();
 
           if (mx22.try_lock_until (estd::chrono::realtime_clock::now () + 10ms))
-            mx22.unlock ();
+          mx22.unlock ();
           if (mx22.try_lock_until (estd::chrono::realtime_clock::now () + 100ms))
-            mx22.unlock ();
+          mx22.unlock ();
 
 #pragma GCC diagnostic pop
 
@@ -358,9 +359,12 @@ test_iso_api (bool extra)
           cv11.wait_until (lock, estd::chrono::systick_clock::now () + 10ms);
           cv11.wait_until (lock, estd::chrono::realtime_clock::now () + 1s);
 
-          cv11.wait_until (lock, estd::chrono::system_clock::now () + 10ms, pred);
-          cv11.wait_until (lock, estd::chrono::systick_clock::now () + 10ms, pred);
-          cv11.wait_until (lock, estd::chrono::realtime_clock::now () + 1s, pred);
+          cv11.wait_until (lock, estd::chrono::system_clock::now () + 10ms,
+                           pred);
+          cv11.wait_until (lock, estd::chrono::systick_clock::now () + 10ms,
+                           pred);
+          cv11.wait_until (lock, estd::chrono::realtime_clock::now () + 1s,
+                           pred);
 
           cv11.wait_for (lock, 10_ticks);
           cv11.wait_for (lock, 10ms);
@@ -400,7 +404,7 @@ test_iso_api (bool extra)
 
           std::mutex mxl;
           std::unique_lock<estd::mutex> lock
-            { mxl };
+            { mxl};
 
           cv12.wait (lock);
 
@@ -438,7 +442,7 @@ test_iso_api (bool extra)
               cv12.wait_for (lock, 2999_ticks, pred);
               cv12.wait_for (lock, 3s, pred);
               cv12.wait_for (lock, 3001ms, pred);
-              cv12.wait_for (lock, 3001001us, pred); // 3002 ticks
+              cv12.wait_for (lock, 3001001us, pred);// 3002 ticks
             }
 
 #pragma GCC diagnostic pop
@@ -455,7 +459,8 @@ test_iso_api (bool extra)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
 
-  estd::chrono::realtime_clock::startup_time_point = estd::chrono::realtime_clock::now ();
+  estd::chrono::realtime_clock::startup_time_point =
+      estd::chrono::realtime_clock::now ();
 
 #pragma GCC diagnostic pop
 
@@ -517,7 +522,8 @@ test_iso_api (bool extra)
   estd::this_thread::sleep_until (estd::chrono::realtime_clock::now () + 10ms);
   estd::this_thread::sleep_until (estd::chrono::realtime_clock::now () + 100ms);
   printf ("sleep_until (chrono::realtime_clock::now () + 1000ms)\n");
-  estd::this_thread::sleep_until (estd::chrono::realtime_clock::now () + 1000ms);
+  estd::this_thread::sleep_until (
+      estd::chrono::realtime_clock::now () + 1000ms);
 
   printf ("sleep_until (chrono::realtime_clock::now () + 1s)\n");
   estd::this_thread::sleep_until (estd::chrono::realtime_clock::now () + 1s);
@@ -528,9 +534,12 @@ test_iso_api (bool extra)
 
       estd::this_thread::sleep_until (estd::chrono::systick_clock::now () + 1s);
 
-      estd::this_thread::sleep_until (estd::chrono::realtime_clock::now () + 10ms);
-      estd::this_thread::sleep_until (estd::chrono::realtime_clock::now () + 10s);
-      estd::this_thread::sleep_until (estd::chrono::realtime_clock::now () + 1min);
+      estd::this_thread::sleep_until (
+          estd::chrono::realtime_clock::now () + 10ms);
+      estd::this_thread::sleep_until (
+          estd::chrono::realtime_clock::now () + 10s);
+      estd::this_thread::sleep_until (
+          estd::chrono::realtime_clock::now () + 1min);
     }
 
 #pragma GCC diagnostic pop
