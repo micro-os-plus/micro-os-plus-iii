@@ -42,7 +42,7 @@ namespace os
      */
     lifo::~lifo ()
     {
-      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
+      trace::printf ("lifo::%s() @%p %s\n", __func__, this, this->name ());
     }
 
 #pragma GCC diagnostic push
@@ -137,16 +137,16 @@ namespace os
           if (out_of_memory_handler_ == nullptr)
             {
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
-              trace::printf ("%s(%u,%u)=0 @%p %s\n", __func__, bytes, alignment,
-                             this, this->name ());
+              trace::printf ("lifo::%s(%u,%u)=0 @%p %s\n", __func__, bytes,
+                             alignment, this, this->name ());
 #endif
 
               return nullptr;
             }
 
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
-          trace::printf ("%s(%u,%u) @%p %s out of memory\n", __func__, bytes,
-                         alignment, this, this->name ());
+          trace::printf ("lifo::%s(%u,%u) @%p %s out of memory\n", __func__,
+                         bytes, alignment, this, this->name ());
 #endif
           out_of_memory_handler_ ();
 
@@ -157,8 +157,8 @@ namespace os
       void* aligned_payload = do_align (chunk, bytes, alignment, alloc_size);
 
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
-      trace::printf ("%s(%u,%u)=%p,%u @%p %s\n", __func__, bytes, alignment,
-                     aligned_payload, alloc_size, this, name ());
+      trace::printf ("lifo::%s(%u,%u)=%p,%u @%p %s\n", __func__, bytes,
+                     alignment, aligned_payload, alloc_size, this, name ());
 #endif
 
       return aligned_payload;
