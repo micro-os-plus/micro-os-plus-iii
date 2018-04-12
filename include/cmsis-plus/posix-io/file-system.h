@@ -330,6 +330,14 @@ namespace os
         T*
         allocate_directory (L& locker);
 
+      template<typename T>
+        void
+        deallocate_files (void);
+
+      template<typename T>
+        void
+        deallocate_directories (void);
+
       // ----------------------------------------------------------------------
       // Support functions.
 
@@ -494,24 +502,6 @@ namespace os
       do_statvfs (struct statvfs* buf) = 0;
 
       // ----------------------------------------------------------------------
-
-      template<typename T>
-        T*
-        allocate_file (void);
-
-      template<typename T>
-        T*
-        allocate_directory (void);
-
-      template<typename T, typename L>
-        T*
-        allocate_file (L& locker);
-
-      template<typename T, typename L>
-        T*
-        allocate_directory (L& locker);
-
-      // ----------------------------------------------------------------------
       // Support functions.
 
       block_device&
@@ -529,6 +519,8 @@ namespace os
        */
 
       block_device& device_;
+
+      file_system* fs_ = nullptr;
 
       /**
        * @endcond
@@ -837,15 +829,7 @@ namespace os
             // Placement new, run only the constructor.
             new (fil) file_type (*this);
 
-            // Deallocate all remaining elements in the list.
-            while (!deferred_files_list_.empty ())
-              {
-                file_type* f =
-                    static_cast<file_type*> (deferred_files_list_.unlink_head ());
-
-                // Call the destructor and the deallocator.
-                delete f;
-              }
+            deallocate_files<file_type> ();
           }
         return fil;
       }
@@ -872,17 +856,26 @@ namespace os
             // Placement new, run only the constructor.
             new (fil) file_type (*this, locker);
 
-            // Deallocate all remaining elements in the list.
-            while (!deferred_files_list_.empty ())
-              {
-                file_type* f =
-                    static_cast<file_type*> (deferred_files_list_.unlink_head ());
-
-                // Call the destructor and the deallocator.
-                delete f;
-              }
+            deallocate_files<file_type> ();
           }
         return fil;
+      }
+
+    template<typename T>
+      void
+      file_system::deallocate_files (void)
+      {
+        using file_type = T;
+
+        // Deallocate all remaining elements in the list.
+        while (!deferred_files_list_.empty ())
+          {
+            file_type* f =
+                static_cast<file_type*> (deferred_files_list_.unlink_head ());
+
+            // Call the destructor and the deallocator.
+            delete f;
+          }
       }
 
     template<typename T>
@@ -908,15 +901,7 @@ namespace os
             // Placement new, run only the constructor.
             new (dir) directory_type (*this);
 
-            // Deallocate all remaining elements in the list.
-            while (!deferred_directories_list_.empty ())
-              {
-                directory_type* d =
-                    static_cast<directory_type*> (deferred_directories_list_.unlink_head ());
-
-                // Call the destructor and the deallocator.
-                delete d;
-              }
+            deallocate_directories<directory_type> ();
           }
         return dir;
       }
@@ -944,17 +929,26 @@ namespace os
             // Placement new, run only the constructor.
             new (dir) directory_type (*this, locker);
 
-            // Deallocate all remaining elements in the list.
-            while (!deferred_directories_list_.empty ())
-              {
-                directory_type* d =
-                    static_cast<directory_type*> (deferred_directories_list_.unlink_head ());
-
-                // Call the destructor and the deallocator.
-                delete d;
-              }
+            deallocate_directories<directory_type> ();
           }
         return dir;
+      }
+
+    template<typename T>
+      void
+      file_system::deallocate_directories (void)
+      {
+        using directory_type = T;
+
+        // Deallocate all remaining elements in the list.
+        while (!deferred_directories_list_.empty ())
+          {
+            directory_type* d =
+                static_cast<directory_type*> (deferred_directories_list_.unlink_head ());
+
+            // Call the destructor and the deallocator.
+            delete d;
+          }
       }
 
     // ========================================================================
@@ -1189,7 +1183,7 @@ namespace os
         return static_cast<value_type&> (impl_);
       }
 
-  // ==========================================================================
+// ==========================================================================
   } /* namespace posix */
 } /* namespace os */
 
