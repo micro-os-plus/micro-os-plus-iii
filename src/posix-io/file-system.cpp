@@ -481,12 +481,6 @@ namespace os
             }
         }
 
-      if (!device ().is_opened ())
-        {
-          errno = EBADF; // Not opened.
-          return -1;
-        }
-
       errno = 0;
 
       int ret = impl ().do_vmount (flags, args);
