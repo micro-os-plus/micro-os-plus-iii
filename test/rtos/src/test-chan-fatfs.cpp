@@ -115,7 +115,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
 
       // <4085 -> FAT12
       my_block* chbk = new my_block
-        { "ch-bk-1m", 512u, 512u, 128u};
+        { "ch-bk-1m", 512u, 512u, 128u };
 
       static constexpr std::size_t buff_size = FF_MAX_SS + 4;
 
@@ -124,8 +124,8 @@ test_chan_fatfs (bool extra __attribute__((unused)))
       assert(res == 0);
 
       posix::chan_fatfs_file_system_lockable<rtos::mutex>* fs =
-      new posix::chan_fatfs_file_system_lockable<rtos::mutex>
-        { "fat-1m", *chbk, chmx};
+          new posix::chan_fatfs_file_system_lockable<rtos::mutex>
+            { "fat-1m", *chbk, chmx };
 
       res = fs->device ().open ();
       assert(res != -1);
@@ -152,7 +152,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
 
       // >4085 && <65535 -> FAT16
       my_block* chbk = new my_block
-        { "ch-bk-2", 512u, 512u, 8229u };
+        { "ch-bk-2", 512u, 512u, 8229u};
 
       static constexpr std::size_t buff_size = FF_MAX_SS + 4;
 
@@ -161,7 +161,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
       assert(res == 0);
 
       posix::chan_fatfs_file_system* fs = new posix::chan_fatfs_file_system
-        { "fat-2", *chbk };
+        { "fat-2", *chbk};
 
       res = fs->device ().open ();
       assert(res != -1);
@@ -181,7 +181,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
     }
 
 #if 0
-    // Currently fails on macOS.
+  // Currently fails on macOS.
     {
       printf ("\n%s - 512/512 fat32.\n", test_name);
 
@@ -189,7 +189,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
 
       // >65535 -> FAT32
       my_block* chbk = new my_block
-        { "ch-bk-3", 512u, 512u, 66130u };
+        { "ch-bk-3", 512u, 512u, 66130u};
 
       static constexpr std::size_t buff_size = FF_MAX_SS + 4;
 
@@ -198,7 +198,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
       assert(res == 0);
 
       posix::chan_fatfs_file_system* fs = new posix::chan_fatfs_file_system
-        { "fat-3", *chbk };
+        { "fat-3", *chbk};
 
       res = fs->device ().open ();
       assert(res != -1);
@@ -373,72 +373,138 @@ void
 test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
 {
 
-#define FILE_NAME "file-with-long-name.extension"
+#define FILE_NAME "/file-with-long-name.extension"
 #define TEST_TEXT "baburiba\nhey\n"
+#define DIR_NAME "/folder-with-long-name"
 
   int res;
   ssize_t sres;
 
-  // Mount as root file system.
-  res = fs.mount ();
-  assert(res == 0);
-
-  // Must fail, so the sector size is not relevant.
-  res = fs.mkfs (FM_FAT | FM_SFD, 0, 512, buff, buff_size);
-  assert(res == -1);
-
-  posix::file* f;
-  f = fs.open (FILE_NAME, O_WRONLY | O_CREAT);
-  assert(f != nullptr);
-
-  sres = f->write (TEST_TEXT, strlen (TEST_TEXT));
-  assert(sres == strlen(TEST_TEXT));
-
-  res = f->close ();
-  assert(res == 0);
-
-  f = fs.open (FILE_NAME, O_RDONLY);
-  assert(f != nullptr);
-
-  sres = f->read (buff, buff_size);
-  assert(sres == strlen(TEST_TEXT));
-
-  res = f->close ();
-  assert(res == 0);
-
-  // --------------------------
-
-  struct statvfs sfs;
-  res = fs.statvfs (&sfs);
-  assert(res == 0);
-
-  // --------------------------
-
-  posix::directory* d;
-  d = fs.opendir ("/");
-  assert(d != nullptr);
-
-  struct dirent *dp;
-  while (true)
     {
-      errno = 0;
-      dp = d->read ();
+      // Mount as root file system.
+      res = fs.mount ();
+      assert(res == 0);
 
-      if (dp == nullptr)
+      // Must fail, so the sector size is not relevant.
+      res = fs.mkfs (FM_FAT | FM_SFD, 0, 512, buff, buff_size);
+      assert(res == -1);
+
+      posix::file* f;
+      f = fs.open (FILE_NAME, O_WRONLY | O_CREAT);
+      assert(f != nullptr);
+
+      sres = f->write (TEST_TEXT, strlen (TEST_TEXT));
+      assert(sres == strlen(TEST_TEXT));
+
+      res = f->close ();
+      assert(res == 0);
+
+      f = fs.open (FILE_NAME, O_RDONLY);
+      assert(f != nullptr);
+
+      sres = f->read (buff, buff_size);
+      assert(sres == strlen(TEST_TEXT));
+
+      res = f->close ();
+      assert(res == 0);
+
+      fs.mkdir(DIR_NAME, 0);
+      assert(res == 0);
+
+      f = fs.open (DIR_NAME FILE_NAME, O_WRONLY | O_CREAT);
+      assert(f != nullptr);
+
+      sres = f->write (TEST_TEXT, strlen (TEST_TEXT));
+      assert(sres == strlen(TEST_TEXT));
+
+      res = f->close ();
+      assert(res == 0);
+
+      f = fs.open (DIR_NAME FILE_NAME, O_RDONLY);
+      assert(f != nullptr);
+
+      sres = f->read (buff, buff_size);
+      assert(sres == strlen(TEST_TEXT));
+
+      res = f->close ();
+      assert(res == 0);
+
+      // --------------------------
+
+      struct statvfs sfs;
+      res = fs.statvfs (&sfs);
+      assert(res == 0);
+
+      // --------------------------
+
+      posix::directory* d;
+      d = fs.opendir ("/");
+      assert(d != nullptr);
+
+      struct dirent *dp;
+      while (true)
         {
-          break;
-        }
-      printf ("\"%s\"\n", dp->d_name);
-      assert(strcmp(dp->d_name, FILE_NAME) == 0);
-    };
+          errno = 0;
+          dp = d->read ();
 
-  res = d->close ();
-  assert(res == 0);
+          if (dp == nullptr)
+            {
+              break;
+            }
+          printf ("\"%s\"\n", dp->d_name);
+        };
 
-  // --------------------------
+      res = d->close ();
+      assert(res == 0);
 
-  res = fs.umount ();
-  assert(res == 0);
+      // --------------------------
+
+      res = fs.umount ();
+      assert(res == 0);
+    }
+
+    {
+      // Mount as a  file system.
+      res = fs.mount ("/ram/");
+      assert(res == 0);
+
+      posix::file* f;
+      f = fs.open (FILE_NAME, O_RDONLY);
+      assert(f != nullptr);
+
+      sres = f->read (buff, buff_size);
+      assert(sres == strlen(TEST_TEXT));
+
+      res = f->close ();
+      assert(res == 0);
+
+      // --------------------------
+
+      posix::directory* d;
+      d = fs.opendir ("/");
+      assert(d != nullptr);
+
+      struct dirent *dp;
+      while (true)
+        {
+          errno = 0;
+          dp = d->read ();
+
+          if (dp == nullptr)
+            {
+              break;
+            }
+          printf ("\"%s\"\n", dp->d_name);
+        };
+
+      res = d->close ();
+      assert(res == 0);
+
+      // --------------------------
+
+      res = fs.umount ();
+      assert(res == 0);
+    }
 
 }
 
