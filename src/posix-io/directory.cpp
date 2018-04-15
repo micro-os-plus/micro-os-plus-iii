@@ -32,6 +32,7 @@
 
 #include <cerrno>
 #include <cassert>
+#include <string.h>
 
 // ----------------------------------------------------------------------------
 
@@ -119,6 +120,7 @@ namespace os
 #if defined(OS_TRACE_POSIX_IO_DIRECTORY)
       trace::printf ("directory_impl::%s()=%p\n", __func__, this);
 #endif
+      memset (&dir_entry_, 0, sizeof(struct dirent));
     }
 
     directory_impl::~directory_impl ()
