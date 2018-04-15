@@ -38,7 +38,6 @@ extern "C"
   int
   test_posix_io_api (bool extra);
 
-
   class my_block_impl : public os::posix::block_device_impl
   {
   public:
@@ -55,9 +54,6 @@ extern "C"
 
     virtual
     ~my_block_impl () override;
-
-    virtual bool
-    do_is_opened (void) override;
 
     virtual int
     do_vopen (const char* path, int oflag, std::va_list args) override;

@@ -248,7 +248,7 @@ namespace os
 
     public:
 
-      bool
+      virtual bool
       do_is_opened (void) override;
 
       virtual int
