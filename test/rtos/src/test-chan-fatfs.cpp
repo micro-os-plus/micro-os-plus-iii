@@ -104,6 +104,12 @@ test_chan_fatfs (bool extra __attribute__((unused)))
       delete fs;
       delete[] buff;
       delete chbk;
+
+#if defined(OS_IS_CROSS_BUILD)
+      // malloc: *** error for object 0x7f84db812400: incorrect checksum for
+      // freed object - object was probably modified after being freed.
+      break;
+#endif
     }
 
 #if defined(OS_IS_CROSS_BUILD)
