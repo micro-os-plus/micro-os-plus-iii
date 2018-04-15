@@ -58,10 +58,11 @@ extern "C"
 
   // --------------------------------------------------------------------------
 
+  // http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/dirent.h.html
   struct dirent
   {
-    ino_t d_ino;
-    char d_name[OS_INTEGER_DIRENT_NAME_MAX];
+    ino_t d_ino; /* File serial number. */
+    char d_name[OS_INTEGER_DIRENT_NAME_MAX]; /* Filename string of entry. */
   };
 
 // The content of this structure is not relevant, it is here just to keep
