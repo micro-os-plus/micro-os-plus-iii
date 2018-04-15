@@ -605,7 +605,7 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
           res = d->close ();
           assert (res == 0);
 
-          d = fs.opendir (DIR1_NAME);
+          d = posix::opendir (DIR1_NAME);
           assert (d != nullptr);
 
           while (true)
