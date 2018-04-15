@@ -105,6 +105,11 @@ namespace os
 
       // Execute the implementation specific code.
       int ret = impl ().do_close ();
+      if (ret != 0)
+        {
+          trace::printf ("directory::%s() @%p do_close() returned %d\n",
+                         __func__, this, ret);
+        }
 
       // The file object will be deallocated at the next open.
       file_system ().add_deferred_directory (this);
