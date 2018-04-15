@@ -110,7 +110,7 @@ timegm (struct tm* tim_p)
   tim += (days * _SEC_IN_DAY);
 
   /* compute day of the week */
-  if ((tim_p->tm_wday = (days + 4) % 7) < 0)
+  if ((tim_p->tm_wday = (int)((days + 4) % 7)) < 0)
     tim_p->tm_wday += 7;
 
   return tim;
