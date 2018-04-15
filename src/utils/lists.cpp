@@ -119,8 +119,14 @@ namespace os
       trace::printf ("%s() n=%p after %p\n", __func__, &node, after);
 #endif
 
+      // Unlinked nodes must have both pointers null.
+      // If not, most probably the node was already linked.
+      // Or the memory is corrupted.
       assert(node.prev () == nullptr);
       assert(node.next () == nullptr);
+
+      // The `after` node must be linked. Only the `next` pointer is
+      // tested, since only it is used.
       assert(after->next () != nullptr);
 
       // Make the new node point to its neighbours.
