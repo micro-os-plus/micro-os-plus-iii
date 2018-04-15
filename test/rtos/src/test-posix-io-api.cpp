@@ -183,13 +183,8 @@ my_block_impl::my_block_impl (std::size_t bsize, std::size_t esize,
   block_physical_size_bytes_ = (esize + sizeof(elem_t) - 1)
       & (~(sizeof(elem_t) - 1));
 
-#if 1
   arena_ = new elem_t[nblocks * bsize / sizeof(elem_t)];
   memset (static_cast<void*> (arena_), 0xFF, nblocks * bsize / sizeof(elem_t));
-#else
-  arena_ = new elem_t[(nblocks > 128 ? 128 : nblocks) * bsize / sizeof(elem_t)];
-  memset (static_cast<void*> (arena_), 0xFF, (nblocks > 128 ? 128 : nblocks) * bsize / sizeof(elem_t));
-#endif
 }
 
 my_block_impl::~my_block_impl ()
@@ -212,15 +207,8 @@ ssize_t
 my_block_impl::do_read_block (void* buf, posix::block_device::blknum_t blknum,
                               std::size_t nblocks)
 {
-#if 1
   memcpy (buf, &arena_[blknum * block_logical_size_bytes_],
           nblocks * block_logical_size_bytes_);
-#else
-  if (blknum < 128) {
-      memcpy (buf, &arena_[blknum * block_logical_size_bytes_],
-              nblocks * block_logical_size_bytes_);
-  }
-#endif
   return static_cast<ssize_t> (nblocks);
 }
 
@@ -229,15 +217,8 @@ my_block_impl::do_write_block (const void* buf,
                                posix::block_device::blknum_t blknum,
                                std::size_t nblocks)
 {
-#if 1
   memcpy (&arena_[blknum * block_logical_size_bytes_], buf,
           nblocks * block_logical_size_bytes_);
-#else
-  if (blknum < 128) {
-      memcpy (&arena_[blknum * block_logical_size_bytes_], buf,
-              nblocks * block_logical_size_bytes_);
-  }
-#endif
   return static_cast<ssize_t> (nblocks);
 }
 
