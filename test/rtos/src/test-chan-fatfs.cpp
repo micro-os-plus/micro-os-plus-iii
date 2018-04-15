@@ -84,20 +84,20 @@ test_chan_fatfs (bool extra __attribute__((unused)))
 
       uint8_t* buff = new uint8_t[buff_size];
       int res = test_diskio (*chbk, 3, buff, buff_size);
-      assert(res == 0);
+      assert (res == 0);
 
       posix::chan_fatfs_file_system* fs = new posix::chan_fatfs_file_system
         { "fat-1", *chbk };
 
       res = fs->device ().open ();
-      assert(res != -1);
+      assert (res != -1);
 
       // Partition 0, allocation unit 0=auto.
       res = fs->mkfs (FM_FAT | FM_SFD, 0, 0, buff, buff_size);
-      assert(res == 0);
+      assert (res == 0);
 
       res = fs->device ().close ();
-      assert(res == 0);
+      assert (res == 0);
 
       test_fs (*fs, buff, buff_size);
 
@@ -121,20 +121,20 @@ test_chan_fatfs (bool extra __attribute__((unused)))
 
       uint8_t* buff = new uint8_t[buff_size];
       int res = test_diskio (*chbk, 3, buff, buff_size);
-      assert(res == 0);
+      assert (res == 0);
 
       posix::chan_fatfs_file_system_lockable<rtos::mutex>* fs =
           new posix::chan_fatfs_file_system_lockable<rtos::mutex>
             { "fat-1m", *chbk, chmx };
 
       res = fs->device ().open ();
-      assert(res != -1);
+      assert (res != -1);
 
       res = fs->mkfs (FM_FAT | FM_SFD, 0, 0, buff, buff_size);
-      assert(res == 0);
+      assert (res == 0);
 
       res = fs->device ().close ();
-      assert(res == 0);
+      assert (res == 0);
 
       test_fs (*fs, buff, buff_size);
 
@@ -373,9 +373,40 @@ void
 test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
 {
 
-#define FILE_NAME "/file-with-long-name.extension"
-#define TEST_TEXT "baburiba\nhey\n"
-#define DIR_NAME "/folder-with-long-name"
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunused-macros"
+#endif
+
+#define FILE1_NAME "/file1-with-long-name.extension"
+#define TEST1_TEXT "baburiba\nhey one\n"
+
+#define DIR1_NAME "/folder1-with-long-name"
+
+#define FILE2_NAME "/file2-with-long-name.extension"
+#define TEST2_TEXT "baburiba\nhey one two\n"
+
+#define DIR2_NAME "/folder2-with-long-name"
+
+#define FILE3_NAME "/file3-with-long-name.extension"
+#define TEST3_TEXT "baburiba\nhey one two three\n"
+
+#define FILE4_NAME "/file4-with-long-name.extension"
+#define TEST4_TEXT "baburiba\nhey one two three four\n"
+
+#define DIR3_NAME "/folder3-with-long-name"
+
+#define FILE5_NAME "/file5-with-long-name.extension"
+#define TEST5_TEXT "baburiba\nhey one two three four five\n"
+
+#define DIR4_NAME "/folder4-with-long-name"
+
+#define FILE6_NAME "/file6-with-long-name.extension"
+#define TEST6_TEXT "baburiba\nhey one two three four five six\n"
+
+#define MOUNT_NAME "/ram/"
+
+#pragma GCC diagnostic pop
 
   int res;
   ssize_t sres;
@@ -383,134 +414,378 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
     {
       // Mount as root file system.
       res = fs.mount ();
-      assert(res == 0);
+      assert (res == 0);
 
       // Must fail, so the sector size is not relevant.
       res = fs.mkfs (FM_FAT | FM_SFD, 0, 512, buff, buff_size);
-      assert(res == -1);
+      assert (res == -1);
 
-      posix::file* f;
-      f = fs.open (FILE_NAME, O_WRONLY | O_CREAT);
-      assert(f != nullptr);
+        {
+          posix::file* f;
+          // Write test.
+          f = fs.open (FILE1_NAME, O_WRONLY | O_CREAT);
+          assert (f != nullptr);
 
-      sres = f->write (TEST_TEXT, strlen (TEST_TEXT));
-      assert(sres == strlen(TEST_TEXT));
+          sres = f->write (TEST1_TEXT, strlen (TEST1_TEXT));
+          assert (sres == strlen (TEST1_TEXT));
 
-      res = f->close ();
-      assert(res == 0);
+          res = f->close ();
+          assert (res == 0);
 
-      f = fs.open (FILE_NAME, O_RDONLY);
-      assert(f != nullptr);
+          // Read test.
+          f = fs.open (FILE1_NAME, O_RDONLY);
+          assert (f != nullptr);
 
-      sres = f->read (buff, buff_size);
-      assert(sres == strlen(TEST_TEXT));
+          sres = f->read (buff, buff_size);
+          assert (sres == strlen (TEST1_TEXT));
 
-      res = f->close ();
-      assert(res == 0);
+          res = f->close ();
+          assert (res == 0);
 
-      fs.mkdir(DIR_NAME, 0);
-      assert(res == 0);
+          // Folder creation test.
+          fs.mkdir (DIR1_NAME, 0);
+          assert (res == 0);
 
-      f = fs.open (DIR_NAME FILE_NAME, O_WRONLY | O_CREAT);
-      assert(f != nullptr);
+          // Write test with sub-folder.
+          f = fs.open (DIR1_NAME FILE2_NAME, O_WRONLY | O_CREAT);
+          assert (f != nullptr);
 
-      sres = f->write (TEST_TEXT, strlen (TEST_TEXT));
-      assert(sres == strlen(TEST_TEXT));
+          sres = f->write (TEST2_TEXT, strlen (TEST2_TEXT));
+          assert (sres == strlen (TEST2_TEXT));
 
-      res = f->close ();
-      assert(res == 0);
+          res = f->close ();
+          assert (res == 0);
 
 #if !(defined(__APPLE__) || defined(__linux__))
 
-      // Fails with clang :-(
-      f = fs.open (DIR_NAME FILE_NAME, O_RDONLY);
-      assert(f != nullptr);
+          // Fails with clang :-(
 
-      sres = f->read (buff, buff_size);
-      assert(sres == strlen(TEST_TEXT));
+          // Read test with sub-folder.
+          f = fs.open (DIR1_NAME FILE2_NAME, O_RDONLY);
+          assert (f != nullptr);
 
-      res = f->close ();
-      assert(res == 0);
+          sres = f->read (buff, buff_size);
+          assert (sres == strlen (TEST2_TEXT));
+
+          res = f->close ();
+          assert (res == 0);
 
 #endif
 
-      // --------------------------
+          // --------------------------
 
-      struct statvfs sfs;
-      res = fs.statvfs (&sfs);
-      assert(res == 0);
+          // File system statistics.
+          struct statvfs sfs;
+          res = fs.statvfs (&sfs);
+          assert (res == 0);
 
-      // --------------------------
+          // --------------------------
 
-      posix::directory* d;
-      d = fs.opendir ("/");
-      assert(d != nullptr);
+          posix::directory* d;
 
-      struct dirent *dp;
-      while (true)
-        {
-          errno = 0;
-          dp = d->read ();
+          // Opendir test.
+          d = fs.opendir ("/");
+          assert (d != nullptr);
 
-          if (dp == nullptr)
+          struct dirent *dp;
+          while (true)
             {
-              break;
-            }
-          printf ("\"%s\"\n", dp->d_name);
-        };
+              errno = 0;
+              dp = d->read ();
 
-      res = d->close ();
-      assert(res == 0);
+              if (dp == nullptr)
+                {
+                  break;
+                }
+              printf ("\"%s\"\n", dp->d_name);
+            };
 
-      // --------------------------
+          res = d->close ();
+          assert (res == 0);
 
-      res = fs.umount ();
-      assert(res == 0);
+          d = fs.opendir (DIR1_NAME);
+          assert (d != nullptr);
+
+          while (true)
+            {
+              errno = 0;
+              dp = d->read ();
+
+              if (dp == nullptr)
+                {
+                  break;
+                }
+              printf ("\"%s\"\n", dp->d_name);
+            };
+
+          res = d->close ();
+          assert (res == 0);
+
+        }
+
+      // Similar to the above, but using static functions.
+        {
+          posix::io* f;
+          f = posix::open (FILE3_NAME, O_WRONLY | O_CREAT);
+          assert (f != nullptr);
+
+          sres = f->write (TEST3_TEXT, strlen (TEST3_TEXT));
+          assert (sres == strlen (TEST3_TEXT));
+
+          res = f->close ();
+          assert (res == 0);
+
+          f = posix::open (FILE3_NAME, O_RDONLY);
+          assert (f != nullptr);
+
+          sres = f->read (buff, buff_size);
+          assert (sres == strlen (TEST3_TEXT));
+
+          res = f->close ();
+          assert (res == 0);
+
+          posix::mkdir (DIR3_NAME, 0);
+          assert (res == 0);
+
+          f = posix::open (DIR3_NAME FILE4_NAME, O_WRONLY | O_CREAT);
+          assert (f != nullptr);
+
+          sres = f->write (TEST4_TEXT, strlen (TEST4_TEXT));
+          assert (sres == strlen (TEST4_TEXT));
+
+          res = f->close ();
+          assert (res == 0);
+
+#if !(defined(__APPLE__) || defined(__linux__))
+
+          // Fails with clang :-(
+          f = posix::open (DIR3_NAME FILE4_NAME, O_RDONLY);
+          assert (f != nullptr);
+
+          sres = f->read (buff, buff_size);
+          assert (sres == strlen (TEST4_TEXT));
+
+          res = f->close ();
+          assert (res == 0);
+
+#endif
+
+          // --------------------------
+
+          struct statvfs sfs;
+          res = fs.statvfs (&sfs);
+          assert (res == 0);
+
+          // --------------------------
+
+          posix::directory* d;
+
+          d = posix::opendir ("/");
+          assert (d != nullptr);
+
+          struct dirent *dp;
+          while (true)
+            {
+              errno = 0;
+              dp = d->read ();
+
+              if (dp == nullptr)
+                {
+                  break;
+                }
+              printf ("\"%s\"\n", dp->d_name);
+            };
+
+          res = d->close ();
+          assert (res == 0);
+
+          d = fs.opendir (DIR1_NAME);
+          assert (d != nullptr);
+
+          while (true)
+            {
+              errno = 0;
+              dp = d->read ();
+
+              if (dp == nullptr)
+                {
+                  break;
+                }
+              printf ("\"%s\"\n", dp->d_name);
+            };
+
+          res = d->close ();
+          assert (res == 0);
+
+          // --------------------------
+
+          res = fs.umount ();
+          assert (res == 0);
+        }
     }
 
 #if !(defined(__APPLE__) && defined(__clang__))
 
     {
-      // Mount as a  file system.
-      res = fs.mount ("/ram/");
-      assert(res == 0);
+      // Mount file system below a folder.
+      res = fs.mount (MOUNT_NAME);
+      assert (res == 0);
 
-      posix::file* f;
-      f = fs.open (FILE_NAME, O_RDONLY);
-      assert(f != nullptr);
+        {
+          posix::file* f;
+          f = fs.open (FILE1_NAME, O_RDONLY);
+          assert (f != nullptr);
 
-      sres = f->read (buff, buff_size);
-      assert(sres == strlen(TEST_TEXT));
+          sres = f->read (buff, buff_size);
+          assert (sres == strlen (TEST1_TEXT));
 
-      res = f->close ();
-      assert(res == 0);
+          res = f->close ();
+          assert (res == 0);
+
+#if !(defined(__APPLE__) || defined(__linux__))
+
+          // Fails with clang :-(
+
+          // Read test with sub-folder.
+          f = fs.open (DIR1_NAME FILE2_NAME, O_RDONLY);
+          assert (f != nullptr);
+
+          sres = f->read (buff, buff_size);
+          assert (sres == strlen (TEST2_TEXT));
+
+          res = f->close ();
+          assert (res == 0);
+
+#endif
+
+          // --------------------------
+
+          posix::directory* d;
+
+          d = fs.opendir ("/");
+          assert (d != nullptr);
+
+          struct dirent *dp;
+          while (true)
+            {
+              errno = 0;
+              dp = d->read ();
+
+              if (dp == nullptr)
+                {
+                  break;
+                }
+              printf ("\"%s\"\n", dp->d_name);
+            };
+
+          res = d->close ();
+          assert (res == 0);
+
+          d = fs.opendir (DIR1_NAME);
+          assert (d != nullptr);
+
+          while (true)
+            {
+              errno = 0;
+              dp = d->read ();
+
+              if (dp == nullptr)
+                {
+                  break;
+                }
+              printf ("\"%s\"\n", dp->d_name);
+            };
+
+          res = d->close ();
+          assert (res == 0);
+        }
 
       // --------------------------
 
-      posix::directory* d;
-      d = fs.opendir ("/");
-      assert(d != nullptr);
-
-      struct dirent *dp;
-      while (true)
         {
-          errno = 0;
-          dp = d->read ();
+          posix::io* f;
 
-          if (dp == nullptr)
+          f = posix::open (MOUNT_NAME FILE5_NAME, O_WRONLY | O_CREAT);
+          assert (f != nullptr);
+
+          sres = f->write (TEST5_TEXT, strlen (TEST5_TEXT));
+          assert (sres == strlen (TEST5_TEXT));
+
+          res = f->close ();
+          assert (res == 0);
+
+#if !(defined(__APPLE__) || defined(__linux__))
+
+          f = posix::open (MOUNT_NAME FILE5_NAME, O_RDONLY);
+          assert (f != nullptr);
+
+          sres = f->read (buff, buff_size);
+          assert (sres == strlen (TEST5_TEXT));
+
+          res = f->close ();
+          assert (res == 0);
+
+          posix::mkdir (MOUNT_NAME DIR4_NAME, 0);
+          assert (res == 0);
+
+          f = posix::open (MOUNT_NAME DIR4_NAME FILE6_NAME, O_WRONLY | O_CREAT);
+          assert (f != nullptr);
+
+          sres = f->write (TEST6_TEXT, strlen (TEST6_TEXT));
+          assert (sres == strlen (TEST6_TEXT));
+
+          res = f->close ();
+          assert (res == 0);
+
+          // --------------------------
+
+          posix::directory* d;
+
+          d = posix::opendir (MOUNT_NAME);
+          assert (d != nullptr);
+
+          struct dirent *dp;
+          while (true)
             {
-              break;
-            }
-          printf ("\"%s\"\n", dp->d_name);
-        };
+              errno = 0;
+              dp = d->read ();
 
-      res = d->close ();
-      assert(res == 0);
+              if (dp == nullptr)
+                {
+                  break;
+                }
+              printf ("\"%s\"\n", dp->d_name);
+            };
+
+          res = d->close ();
+          assert (res == 0);
+
+          d = posix::opendir (MOUNT_NAME DIR4_NAME);
+          assert (d != nullptr);
+
+          while (true)
+            {
+              errno = 0;
+              dp = d->read ();
+
+              if (dp == nullptr)
+                {
+                  break;
+                }
+              printf ("\"%s\"\n", dp->d_name);
+            };
+
+          res = d->close ();
+          assert (res == 0);
+
+#endif
+
+        }
 
       // --------------------------
 
       res = fs.umount ();
-      assert(res == 0);
+      assert (res == 0);
     }
 #endif
 
@@ -566,26 +841,26 @@ test_diskio (posix::block_device& bd, /* Physical drive number to be checked (al
   printf ("\ntest_diskio(%p, %u, %p, %u)\n", pdrv, ncyc,
           static_cast<void*> (pbuff), sz_buff);
 
-  assert(sz_buff >= FF_MAX_SS + 4);
+  assert (sz_buff >= FF_MAX_SS + 4);
 
   for (cc = 1; cc <= ncyc; cc++)
     {
       printf ("**** Test cycle %u of %u ****\n", cc, ncyc);
 
       ds = disk_initialize (pdrv);
-      assert((ds & STA_NOINIT) == 0);
+      assert ((ds & STA_NOINIT) == 0);
 
       sz_drv = 0;
       dr = disk_ioctl (pdrv, GET_SECTOR_COUNT, &sz_drv);
-      assert(dr == RES_OK);
+      assert (dr == RES_OK);
 
-      assert(sz_drv >= 12);
+      assert (sz_drv >= 12);
       printf (" Number of sectors is %lu.\n", sz_drv);
 
 #if FF_MAX_SS != FF_MIN_SS
       sz_sect = 0;
       dr = disk_ioctl (pdrv, GET_SECTOR_SIZE, &sz_sect);
-      assert(dr == RES_OK);
+      assert (dr == RES_OK);
       printf (" Size of sector is %u bytes.\n", sz_sect);
 #else
       sz_sect = FF_MAX_SS;
@@ -593,7 +868,7 @@ test_diskio (posix::block_device& bd, /* Physical drive number to be checked (al
 
       sz_eblk = 0;
       dr = disk_ioctl (pdrv, GET_BLOCK_SIZE, &sz_eblk);
-      assert(dr == RES_OK);
+      assert (dr == RES_OK);
 
       if (dr == RES_OK || sz_eblk >= 2)
         {
@@ -610,18 +885,18 @@ test_diskio (posix::block_device& bd, /* Physical drive number to be checked (al
         pbuff[n] = (BYTE) pn (0);
 
       dr = disk_write (pdrv, pbuff, lba, 1);
-      assert(dr == RES_OK);
+      assert (dr == RES_OK);
 
       dr = disk_ioctl (pdrv, CTRL_SYNC, nullptr);
-      assert(dr == RES_OK);
+      assert (dr == RES_OK);
 
       memset (pbuff, 0, sz_sect);
       dr = disk_read (pdrv, pbuff, lba, 1);
-      assert(dr == RES_OK);
+      assert (dr == RES_OK);
 
       for (n = 0, pn (pns); n < sz_sect && pbuff[n] == (BYTE) pn (0); n++)
         ;
-      assert(n == sz_sect);
+      assert (n == sz_sect);
 
       pns++;
 
@@ -634,19 +909,19 @@ test_diskio (posix::block_device& bd, /* Physical drive number to be checked (al
         pbuff[n] = (BYTE) pn (0);
 
       dr = disk_write (pdrv, pbuff, lba, ns);
-      assert(dr == RES_OK);
+      assert (dr == RES_OK);
 
       dr = disk_ioctl (pdrv, CTRL_SYNC, nullptr);
-      assert(dr == RES_OK);
+      assert (dr == RES_OK);
 
       memset (pbuff, 0, sz_sect * ns);
       dr = disk_read (pdrv, pbuff, lba, ns);
-      assert(dr == RES_OK);
+      assert (dr == RES_OK);
 
       for (n = 0, pn (pns);
           n < (UINT) (sz_sect * ns) && pbuff[n] == (BYTE) pn (0); n++)
         ;
-      assert(n == (UINT ) (sz_sect * ns));
+      assert (n == (UINT) (sz_sect * ns));
       pns++;
 
       lba = 5;
@@ -654,18 +929,18 @@ test_diskio (posix::block_device& bd, /* Physical drive number to be checked (al
         pbuff[n + 3] = (BYTE) pn (0);
 
       dr = disk_write (pdrv, pbuff + 3, lba, 1);
-      assert(dr == RES_OK);
+      assert (dr == RES_OK);
 
       dr = disk_ioctl (pdrv, CTRL_SYNC, nullptr);
-      assert(dr == RES_OK);
+      assert (dr == RES_OK);
 
       memset (pbuff + 5, 0, sz_sect);
       dr = disk_read (pdrv, pbuff + 5, lba, 1);
-      assert(dr == RES_OK);
+      assert (dr == RES_OK);
 
       for (n = 0, pn (pns); n < sz_sect && pbuff[n + 5] == (BYTE) pn (0); n++)
         ;
-      assert(n == sz_sect);
+      assert (n == sz_sect);
       pns++;
 
       if (sz_drv >= 128 + 0x80000000 / (sz_sect / 2))
@@ -676,25 +951,25 @@ test_diskio (posix::block_device& bd, /* Physical drive number to be checked (al
             pbuff[n] = (BYTE) pn (0);
 
           dr = disk_write (pdrv, pbuff, lba, 1);
-          assert(dr == RES_OK);
+          assert (dr == RES_OK);
 
           dr = disk_write (pdrv, pbuff + sz_sect, lba2, 1);
-          assert(dr == RES_OK);
+          assert (dr == RES_OK);
 
           dr = disk_ioctl (pdrv, CTRL_SYNC, nullptr);
-          assert(dr == RES_OK);
+          assert (dr == RES_OK);
 
           memset (pbuff, 0, sz_sect * 2);
           dr = disk_read (pdrv, pbuff, lba, 1);
-          assert(dr == RES_OK);
+          assert (dr == RES_OK);
 
           dr = disk_read (pdrv, pbuff + sz_sect, lba2, 1);
-          assert(dr == RES_OK);
+          assert (dr == RES_OK);
 
           for (n = 0, pn (pns);
               pbuff[n] == (BYTE) pn (0) && n < (UINT) (sz_sect * 2); n++)
             ;
-          assert(n == (UINT ) (sz_sect * 2));
+          assert (n == (UINT) (sz_sect * 2));
         }
       else
         {
@@ -703,7 +978,7 @@ test_diskio (posix::block_device& bd, /* Physical drive number to be checked (al
       pns++;
 
       ds = disk_deinitialize (pdrv);
-      assert((ds & STA_NOINIT) == 0);
+      assert ((ds & STA_NOINIT) == 0);
     }
 
   return 0;

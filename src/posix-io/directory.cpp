@@ -39,42 +39,6 @@ namespace os
 {
   namespace posix
   {
-    // ------------------------------------------------------------------------
-
-    directory*
-    opendir (const char* dirname)
-    {
-      if (dirname == nullptr)
-        {
-          errno = EFAULT;
-          return nullptr;
-        }
-
-      if (*dirname == '\0')
-        {
-          errno = ENOENT;
-          return nullptr;
-        }
-
-      errno = 0;
-
-      auto adjusted_dirname = dirname;
-      auto* const fs = os::posix::file_system::identify_mounted (
-          &adjusted_dirname);
-
-      // The manager will return null if there are no file systems
-      // registered, no need to check this condition separately.
-      if (fs == nullptr)
-        {
-          errno = EBADF;
-          return nullptr;
-        }
-
-      // Use the file system implementation to open the directory, using
-      // the adjusted path (mount point prefix removed).
-      return fs->opendir (adjusted_dirname);
-    }
-
     // ========================================================================
 
     directory::directory (directory_impl& impl) :

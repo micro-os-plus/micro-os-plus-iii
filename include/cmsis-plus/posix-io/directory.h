@@ -57,23 +57,6 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    /**
-     * @ingroup cmsis-plus-posix-io-func
-     * @{
-     */
-
-    /**
-     * @brief Open directory.
-     * @param dirname [in] Directory name.
-     * @return Pointer to `directory` object.
-     */
-    directory*
-    opendir (const char* dirname);
-
-    /**
-     * @}
-     */
-
     // ========================================================================
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"

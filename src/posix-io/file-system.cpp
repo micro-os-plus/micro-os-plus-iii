@@ -27,6 +27,7 @@
 
 #include <cmsis-plus/posix-io/file-system.h>
 #include <cmsis-plus/posix-io/block-device.h>
+#include <cmsis-plus/posix-io/device-registry.h>
 
 #include <cerrno>
 #include <cassert>
@@ -371,6 +372,73 @@ namespace os
         }
 
       return fs->statvfs (buf);
+    }
+
+    directory*
+    opendir (const char* dirpath)
+    {
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
+      trace::printf ("%s(\"%s\")\n", __func__, dirpath);
+#endif
+
+      if (dirpath == nullptr)
+        {
+          errno = EFAULT;
+          return nullptr;
+        }
+
+      if (*dirpath == '\0')
+        {
+          errno = ENOENT;
+          return nullptr;
+        }
+
+      errno = 0;
+
+      os::posix::directory* dir;
+
+      while (true)
+        {
+          // Check if path is a device.
+          os::posix::io* io;
+          io = os::posix::device_registry<device>::identify_device (dirpath);
+          if (io != nullptr)
+            {
+              // Cannot list devices (for now).
+              return nullptr;
+            }
+
+          // Check if a regular folder.
+          auto adjusted_path = dirpath;
+          auto* const fs = os::posix::file_system::identify_mounted (
+              &adjusted_path);
+
+          // The manager will return null if there are no file systems
+          // registered, no need to check this condition separately.
+          if (fs == nullptr)
+            {
+              errno = EBADF;
+              return nullptr;
+            }
+
+          // Use the file system implementation to open the directory, using
+          // the adjusted path (mount point prefix removed).
+          dir = fs->opendir (adjusted_path);
+          if (dir == nullptr)
+            {
+              // Open failed.
+              return nullptr;
+            }
+
+          break;
+        }
+
+      // Return a valid pointer to an object derived from directory, or nullptr.
+
+#if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
+      trace::printf ("%s(\"%s\")=%p\n", __func__, dirpath, dir);
+#endif
+      return dir;
     }
 
     // ========================================================================

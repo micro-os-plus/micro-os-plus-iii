@@ -108,6 +108,14 @@ namespace os
     statvfs (const char* path, struct statvfs* buf);
 
     /**
+     * @brief Open directory.
+     * @param dirname [in] Directory name.
+     * @return Pointer to `directory` object.
+     */
+    directory*
+    opendir (const char* dirname);
+
+    /**
      * @}
      */
 
