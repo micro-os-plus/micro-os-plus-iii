@@ -579,7 +579,7 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
           // --------------------------
 
           struct statvfs sfs;
-          res = fs.statvfs (&sfs);
+          res = posix::statvfs ("/", &sfs);
           assert (res == 0);
 
           // --------------------------
@@ -741,6 +741,12 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
           assert (sres == strlen (TEST6_TEXT));
 
           res = f->close ();
+          assert (res == 0);
+
+          // --------------------------
+
+          struct statvfs sfs;
+          res = posix::statvfs (MOUNT_NAME, &sfs);
           assert (res == 0);
 
           // --------------------------
