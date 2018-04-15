@@ -623,10 +623,18 @@ namespace os
             {
               // If so, adjust paths to skip over prefix, but keep '/'.
               *path1 = (*path1 + len - 1);
+              while ((*path1)[1] == '/')
+                {
+                  *path1 = (*path1 + 1);
+                }
 
               if ((path2 != nullptr) && (*path2 != nullptr))
                 {
                   *path2 = (*path2 + len - 1);
+                  while ((*path2)[1] == '/')
+                    {
+                      *path2 = (*path2 + 1);
+                    }
                 }
 
               return &fs;
