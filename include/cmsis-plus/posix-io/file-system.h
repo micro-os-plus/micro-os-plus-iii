@@ -161,7 +161,7 @@ namespace os
       utime (const char* path, const struct utimbuf* times);
 
       friend int
-      statvfs (struct statvfs* buf);
+      statvfs (const char* path, struct statvfs* buf);
 
       /**
        * @endcond
