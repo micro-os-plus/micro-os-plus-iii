@@ -185,7 +185,7 @@ namespace os
       int ret = impl ().do_close ();
 
       // Remove this IO from the file descriptors registry.
-      file_descriptors_manager::free (file_descriptor_);
+      file_descriptors_manager::deallocate (file_descriptor_);
       file_descriptor_ = no_file_descriptor;
 
       return ret;
@@ -198,7 +198,7 @@ namespace os
       trace::printf ("io::%s() @%p\n", __func__, this);
 #endif
 
-      int fd = file_descriptors_manager::alloc (this);
+      int fd = file_descriptors_manager::allocate (this);
       if (fd < 0)
         {
           // If allocation failed, close this object.

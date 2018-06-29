@@ -116,13 +116,13 @@ namespace os
       socket (int fildes);
 
       static int
-      alloc (class io* io);
+      allocate (class io* io);
 
       static int
       assign (file_descriptor_t fildes, class io* io);
 
       static int
-      free (file_descriptor_t fildes);
+      deallocate (file_descriptor_t fildes);
 
       /**
        * @}

@@ -105,7 +105,7 @@ namespace os
     }
 
     int
-    file_descriptors_manager::alloc (class io* io)
+    file_descriptors_manager::allocate (class io* io)
     {
 #if defined(OS_TRACE_POSIX_IO_FILE_DESCRIPTORS_MANAGER)
       trace::printf ("file_descriptors_manager::%s(%p)\n", __func__, io);
@@ -160,7 +160,7 @@ namespace os
     }
 
     int
-    file_descriptors_manager::free (int fildes)
+    file_descriptors_manager::deallocate (int fildes)
     {
 #if defined(OS_TRACE_POSIX_IO_FILE_DESCRIPTORS_MANAGER)
       trace::printf ("file_descriptors_manager::%s(%d)\n", __func__, fildes);
