@@ -63,7 +63,7 @@ namespace os
 
       assert(size > 0);
 
-      size__ = size + 3; // Add space for standard files.
+      size__ = size + reserved__; // Add space for standard files.
       descriptors_array__ = new class io*[size__];
 
       for (std::size_t i = 0; i < file_descriptors_manager::size (); ++i)
@@ -118,8 +118,7 @@ namespace os
           return -1;
         }
 
-      // Reserve 0, 1, 2 (stdin, stdout, stderr)
-      for (std::size_t i = 3; i < size__; ++i)
+      for (std::size_t i = reserved__; i < size__; ++i)
         {
           if (descriptors_array__[i] == nullptr)
             {

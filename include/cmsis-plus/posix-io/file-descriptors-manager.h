@@ -138,6 +138,9 @@ namespace os
        * @cond ignore
        */
 
+      // Reserve 0, 1, 2 (stdin, stdout, stderr).
+      static constexpr std::size_t reserved__ = 3;
+
       static std::size_t size__;
 
       static class io** descriptors_array__;
