@@ -189,6 +189,21 @@ namespace os
       return reinterpret_cast<class socket*> (io);
     }
 
+    size_t
+    file_descriptors_manager::used (void)
+    {
+      std::size_t count = reserved__;
+      for (std::size_t i = reserved__; i < file_descriptors_manager::size ();
+          ++i)
+        {
+          if (descriptors_array__[i] != nullptr)
+            {
+              ++count;
+            }
+        }
+      return count;
+    }
+
   // ========================================================================
   } /* namespace posix */
 } /* namespace os */

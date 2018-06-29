@@ -124,6 +124,9 @@ namespace os
       static int
       deallocate (file_descriptor_t fildes);
 
+      static size_t
+      used (void);
+
       /**
        * @}
        */
