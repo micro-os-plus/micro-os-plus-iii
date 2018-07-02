@@ -33,6 +33,7 @@
 
 #include <cmsis-plus/posix-io/chan-fatfs-file-system.h>
 // #include <cmsis-plus/posix-io/block-device.h>
+#include <cmsis-plus/posix-io/file-descriptors-manager.h>
 
 #include "chan-fatfs/diskio.h"     /* Declarations of disk functions */
 
@@ -84,36 +85,28 @@ test_chan_fatfs (bool extra __attribute__((unused)))
 
       uint8_t* buff = new uint8_t[buff_size];
       int res = test_diskio (*chbk, 3, buff, buff_size);
-      assert (res == 0);
+      assert(res == 0);
 
       posix::chan_fatfs_file_system* fs = new posix::chan_fatfs_file_system
         { "fat-1", *chbk };
 
       res = fs->device ().open ();
-      assert (res != -1);
+      assert(res != -1);
 
       // Partition 0, allocation unit 0=auto.
       res = fs->mkfs (FM_FAT | FM_SFD, 0, 0, buff, buff_size);
-      assert (res == 0);
+      assert(res == 0);
 
       res = fs->device ().close ();
-      assert (res == 0);
+      assert(res == 0);
 
       test_fs (*fs, buff, buff_size);
 
       delete fs;
       delete[] buff;
       delete chbk;
-
-#if defined(OS_IS_CROSS_BUILD)
-      // malloc: *** error for object 0x7f84db812400: incorrect checksum for
-      // freed object - object was probably modified after being freed.
-      break;
-#endif
     }
 
-#if defined(OS_IS_CROSS_BUILD)
-  // Currently fails on macOS.
     {
       printf ("\n%s - 512/512 fat12 mutex.\n", test_name);
 
@@ -127,20 +120,20 @@ test_chan_fatfs (bool extra __attribute__((unused)))
 
       uint8_t* buff = new uint8_t[buff_size];
       int res = test_diskio (*chbk, 3, buff, buff_size);
-      assert (res == 0);
+      assert(res == 0);
 
       posix::chan_fatfs_file_system_lockable<rtos::mutex>* fs =
           new posix::chan_fatfs_file_system_lockable<rtos::mutex>
             { "fat-1m", *chbk, chmx };
 
       res = fs->device ().open ();
-      assert (res != -1);
+      assert(res != -1);
 
       res = fs->mkfs (FM_FAT | FM_SFD, 0, 0, buff, buff_size);
-      assert (res == 0);
+      assert(res == 0);
 
       res = fs->device ().close ();
-      assert (res == 0);
+      assert(res == 0);
 
       test_fs (*fs, buff, buff_size);
 
@@ -148,8 +141,9 @@ test_chan_fatfs (bool extra __attribute__((unused)))
       delete[] buff;
       delete chbk;
     }
-#endif
 
+// The next one are too large to fit the STM32F4DISCO board RAM,
+// so can be executed only on the synthetic platform.
 #if !defined(OS_IS_CROSS_BUILD)
     {
       printf ("\n%s - 512/512 fat16.\n", test_name);
@@ -158,7 +152,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
 
       // >4085 && <65535 -> FAT16
       my_block* chbk = new my_block
-        { "ch-bk-2", 512u, 512u, 8229u};
+        { "ch-bk-2", 512u, 512u, 8229u };
 
       static constexpr std::size_t buff_size = FF_MAX_SS + 4;
 
@@ -167,7 +161,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
       assert(res == 0);
 
       posix::chan_fatfs_file_system* fs = new posix::chan_fatfs_file_system
-        { "fat-2", *chbk};
+        { "fat-2", *chbk };
 
       res = fs->device ().open ();
       assert(res != -1);
@@ -186,8 +180,6 @@ test_chan_fatfs (bool extra __attribute__((unused)))
       delete chbk;
     }
 
-#if 0
-  // Currently fails on macOS.
     {
       printf ("\n%s - 512/512 fat32.\n", test_name);
 
@@ -195,7 +187,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
 
       // >65535 -> FAT32
       my_block* chbk = new my_block
-        { "ch-bk-3", 512u, 512u, 66130u};
+        { "ch-bk-3", 512u, 512u, 66130u };
 
       static constexpr std::size_t buff_size = FF_MAX_SS + 4;
 
@@ -204,7 +196,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
       assert(res == 0);
 
       posix::chan_fatfs_file_system* fs = new posix::chan_fatfs_file_system
-        { "fat-3", *chbk};
+        { "fat-3", *chbk };
 
       res = fs->device ().open ();
       assert(res != -1);
@@ -222,18 +214,15 @@ test_chan_fatfs (bool extra __attribute__((unused)))
       delete[] buff;
       delete chbk;
     }
-#endif
 
-#if 0
     {
-      // Currently fails on macOS.
       printf ("\n%s - 512/512 exfat.\n", test_name);
 
       using my_block = posix::block_device_implementable<my_block_impl>;
 
-      // >= 1 MB, 2048 blocks; actually 4096.
+      // >= 1 MB, 2048 blocks; actually 4096 (minimum 4096).
       my_block* chbk = new my_block
-        { "ch-bk-4", 512u, 512u, 4096u};
+        { "ch-bk-4", 512u, 512u, 4096u };
 
       static constexpr std::size_t buff_size = FF_MAX_SS + 4;
 
@@ -242,7 +231,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
       assert(res == 0);
 
       posix::chan_fatfs_file_system* fs = new posix::chan_fatfs_file_system
-        { "fat-4", *chbk};
+        { "fat-4", *chbk };
 
       res = fs->device ().open ();
       assert(res != -1);
@@ -259,8 +248,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
       delete[] buff;
       delete chbk;
     }
-#endif
-#if 0
+
     {
       printf ("\n%s - 1024/1024 fat.\n", test_name);
 
@@ -268,7 +256,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
 
       // >128 & <4085 -> FAT12
       my_block* chbk = new my_block
-        { "ch-bk-5", 1024u, 1024u, 128u};
+        { "ch-bk-5", 1024u, 1024u, 128u };
 
       static constexpr std::size_t buff_size = FF_MAX_SS + 4;
 
@@ -277,7 +265,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
       assert(res == 0);
 
       posix::chan_fatfs_file_system* fs = new posix::chan_fatfs_file_system
-        { "fat-5", *chbk};
+        { "fat-5", *chbk };
 
       res = fs->device ().open ();
       assert(res != -1);
@@ -295,8 +283,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
       delete[] buff;
       delete chbk;
     }
-#endif
-#if 0
+
     {
       printf ("\n%s - 4096/4096 fat.\n", test_name);
 
@@ -304,7 +291,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
 
       // >128 & <4085 -> FAT12
       my_block* chbk = new my_block
-        { "ch-bk-6", 4096u, 4096u, 128u};
+        { "ch-bk-6", 4096u, 4096u, 128u };
 
       static constexpr std::size_t buff_size = FF_MAX_SS + 4;
 
@@ -313,7 +300,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
       assert(res == 0);
 
       posix::chan_fatfs_file_system* fs = new posix::chan_fatfs_file_system
-        { "fat-6", *chbk};
+        { "fat-6", *chbk };
 
       res = fs->device ().open ();
       assert(res != -1);
@@ -331,8 +318,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
       delete[] buff;
       delete chbk;
     }
-#endif
-#if 0
+
     {
       printf ("\n%s - 512/4096 fat.\n", test_name);
 
@@ -340,7 +326,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
 
       // >128 & <4085 -> FAT12
       my_block* chbk = new my_block
-        { "ch-bk-7", 512u, 4096u, 128u};
+        { "ch-bk-7", 512u, 4096u, 128u };
 
       static constexpr std::size_t buff_size = FF_MAX_SS + 4;
 
@@ -349,7 +335,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
       assert(res == 0);
 
       posix::chan_fatfs_file_system* fs = new posix::chan_fatfs_file_system
-        { "fat-7", *chbk};
+        { "fat-7", *chbk };
 
       res = fs->device ().open ();
       assert(res != -1);
@@ -367,7 +353,6 @@ test_chan_fatfs (bool extra __attribute__((unused)))
       delete[] buff;
       delete chbk;
     }
-#endif
 #endif
 
   return 0;
@@ -420,47 +405,47 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
     {
       // Mount as root file system.
       res = fs.mount ();
-      assert (res == 0);
+      assert(res == 0);
 
       // Must fail, so the sector size is not relevant.
       res = fs.mkfs (FM_FAT | FM_SFD, 0, 512, buff, buff_size);
-      assert (res == -1);
+      assert(res == -1);
 
         {
           posix::file* f;
           // Write test.
           f = fs.open (FILE1_NAME, O_WRONLY | O_CREAT);
-          assert (f != nullptr);
+          assert(f != nullptr);
 
           sres = f->write (TEST1_TEXT, strlen (TEST1_TEXT));
-          assert (sres == strlen (TEST1_TEXT));
+          assert(sres == strlen (TEST1_TEXT));
 
           res = f->close ();
-          assert (res == 0);
+          assert(res == 0);
 
           // Read test.
           f = fs.open (FILE1_NAME, O_RDONLY);
-          assert (f != nullptr);
+          assert(f != nullptr);
 
           sres = f->read (buff, buff_size);
-          assert (sres == strlen (TEST1_TEXT));
+          assert(sres == strlen (TEST1_TEXT));
 
           res = f->close ();
-          assert (res == 0);
+          assert(res == 0);
 
           // Folder creation test.
           fs.mkdir (DIR1_NAME, 0);
-          assert (res == 0);
+          assert(res == 0);
 
           // Write test with sub-folder.
           f = fs.open (DIR1_NAME FILE2_NAME, O_WRONLY | O_CREAT);
-          assert (f != nullptr);
+          assert(f != nullptr);
 
           sres = f->write (TEST2_TEXT, strlen (TEST2_TEXT));
-          assert (sres == strlen (TEST2_TEXT));
+          assert(sres == strlen (TEST2_TEXT));
 
           res = f->close ();
-          assert (res == 0);
+          assert(res == 0);
 
 #if !(defined(__APPLE__) || defined(__linux__))
 
@@ -483,7 +468,7 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
           // File system statistics.
           struct statvfs sfs;
           res = fs.statvfs (&sfs);
-          assert (res == 0);
+          assert(res == 0);
 
           // --------------------------
 
@@ -491,7 +476,7 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
 
           // Opendir test.
           d = fs.opendir ("/");
-          assert (d != nullptr);
+          assert(d != nullptr);
 
           struct dirent *dp;
           while (true)
@@ -507,10 +492,10 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
             };
 
           res = d->close ();
-          assert (res == 0);
+          assert(res == 0);
 
           d = fs.opendir (DIR1_NAME);
-          assert (d != nullptr);
+          assert(d != nullptr);
 
           while (true)
             {
@@ -525,7 +510,7 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
             };
 
           res = d->close ();
-          assert (res == 0);
+          assert(res == 0);
 
         }
 
@@ -533,34 +518,34 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
         {
           posix::io* f;
           f = posix::open (FILE3_NAME, O_WRONLY | O_CREAT);
-          assert (f != nullptr);
+          assert(f != nullptr);
 
           sres = f->write (TEST3_TEXT, strlen (TEST3_TEXT));
-          assert (sres == strlen (TEST3_TEXT));
+          assert(sres == strlen (TEST3_TEXT));
 
           res = f->close ();
-          assert (res == 0);
+          assert(res == 0);
 
           f = posix::open (FILE3_NAME, O_RDONLY);
-          assert (f != nullptr);
+          assert(f != nullptr);
 
           sres = f->read (buff, buff_size);
-          assert (sres == strlen (TEST3_TEXT));
+          assert(sres == strlen (TEST3_TEXT));
 
           res = f->close ();
-          assert (res == 0);
+          assert(res == 0);
 
           posix::mkdir (DIR3_NAME, 0);
-          assert (res == 0);
+          assert(res == 0);
 
           f = posix::open (DIR3_NAME FILE4_NAME, O_WRONLY | O_CREAT);
-          assert (f != nullptr);
+          assert(f != nullptr);
 
           sres = f->write (TEST4_TEXT, strlen (TEST4_TEXT));
-          assert (sres == strlen (TEST4_TEXT));
+          assert(sres == strlen (TEST4_TEXT));
 
           res = f->close ();
-          assert (res == 0);
+          assert(res == 0);
 
 #if !(defined(__APPLE__) || defined(__linux__))
 
@@ -580,14 +565,14 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
 
           struct statvfs sfs;
           res = posix::statvfs ("/", &sfs);
-          assert (res == 0);
+          assert(res == 0);
 
           // --------------------------
 
           posix::directory* d;
 
           d = posix::opendir ("/");
-          assert (d != nullptr);
+          assert(d != nullptr);
 
           struct dirent *dp;
           while (true)
@@ -603,10 +588,10 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
             };
 
           res = d->close ();
-          assert (res == 0);
+          assert(res == 0);
 
           d = posix::opendir (DIR1_NAME);
-          assert (d != nullptr);
+          assert(d != nullptr);
 
           while (true)
             {
@@ -621,12 +606,12 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
             };
 
           res = d->close ();
-          assert (res == 0);
+          assert(res == 0);
 
           // --------------------------
 
           res = fs.umount ();
-          assert (res == 0);
+          assert(res == 0);
         }
     }
 
@@ -800,7 +785,6 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
       assert (res == 0);
     }
 #endif
-
 }
 
 // ----------------------------------------------------------------------------
@@ -853,20 +837,20 @@ test_diskio (posix::block_device& bd, /* Physical drive number to be checked (al
   printf ("\ntest_diskio(%p, %u, %p, %u)\n", pdrv, ncyc,
           static_cast<void*> (pbuff), sz_buff);
 
-  assert (sz_buff >= FF_MAX_SS + 4);
+  assert(sz_buff >= FF_MAX_SS + 4);
 
   for (cc = 1; cc <= ncyc; cc++)
     {
       printf ("**** Test cycle %u of %u ****\n", cc, ncyc);
 
       ds = disk_initialize (pdrv);
-      assert ((ds & STA_NOINIT) == 0);
+      assert((ds & STA_NOINIT) == 0);
 
       sz_drv = 0;
       dr = disk_ioctl (pdrv, GET_SECTOR_COUNT, &sz_drv);
-      assert (dr == RES_OK);
+      assert(dr == RES_OK);
 
-      assert (sz_drv >= 12);
+      assert(sz_drv >= 12);
       printf (" Number of sectors is %lu.\n", sz_drv);
 
 #if FF_MAX_SS != FF_MIN_SS
@@ -880,7 +864,7 @@ test_diskio (posix::block_device& bd, /* Physical drive number to be checked (al
 
       sz_eblk = 0;
       dr = disk_ioctl (pdrv, GET_BLOCK_SIZE, &sz_eblk);
-      assert (dr == RES_OK);
+      assert(dr == RES_OK);
 
       if (dr == RES_OK || sz_eblk >= 2)
         {
@@ -897,18 +881,18 @@ test_diskio (posix::block_device& bd, /* Physical drive number to be checked (al
         pbuff[n] = (BYTE) pn (0);
 
       dr = disk_write (pdrv, pbuff, lba, 1);
-      assert (dr == RES_OK);
+      assert(dr == RES_OK);
 
       dr = disk_ioctl (pdrv, CTRL_SYNC, nullptr);
-      assert (dr == RES_OK);
+      assert(dr == RES_OK);
 
       memset (pbuff, 0, sz_sect);
       dr = disk_read (pdrv, pbuff, lba, 1);
-      assert (dr == RES_OK);
+      assert(dr == RES_OK);
 
       for (n = 0, pn (pns); n < sz_sect && pbuff[n] == (BYTE) pn (0); n++)
         ;
-      assert (n == sz_sect);
+      assert(n == sz_sect);
 
       pns++;
 
@@ -921,19 +905,19 @@ test_diskio (posix::block_device& bd, /* Physical drive number to be checked (al
         pbuff[n] = (BYTE) pn (0);
 
       dr = disk_write (pdrv, pbuff, lba, ns);
-      assert (dr == RES_OK);
+      assert(dr == RES_OK);
 
       dr = disk_ioctl (pdrv, CTRL_SYNC, nullptr);
-      assert (dr == RES_OK);
+      assert(dr == RES_OK);
 
       memset (pbuff, 0, sz_sect * ns);
       dr = disk_read (pdrv, pbuff, lba, ns);
-      assert (dr == RES_OK);
+      assert(dr == RES_OK);
 
       for (n = 0, pn (pns);
           n < (UINT) (sz_sect * ns) && pbuff[n] == (BYTE) pn (0); n++)
         ;
-      assert (n == (UINT) (sz_sect * ns));
+      assert(n == (UINT ) (sz_sect * ns));
       pns++;
 
       lba = 5;
@@ -941,18 +925,18 @@ test_diskio (posix::block_device& bd, /* Physical drive number to be checked (al
         pbuff[n + 3] = (BYTE) pn (0);
 
       dr = disk_write (pdrv, pbuff + 3, lba, 1);
-      assert (dr == RES_OK);
+      assert(dr == RES_OK);
 
       dr = disk_ioctl (pdrv, CTRL_SYNC, nullptr);
-      assert (dr == RES_OK);
+      assert(dr == RES_OK);
 
       memset (pbuff + 5, 0, sz_sect);
       dr = disk_read (pdrv, pbuff + 5, lba, 1);
-      assert (dr == RES_OK);
+      assert(dr == RES_OK);
 
       for (n = 0, pn (pns); n < sz_sect && pbuff[n + 5] == (BYTE) pn (0); n++)
         ;
-      assert (n == sz_sect);
+      assert(n == sz_sect);
       pns++;
 
       if (sz_drv >= 128 + 0x80000000 / (sz_sect / 2))
@@ -963,25 +947,25 @@ test_diskio (posix::block_device& bd, /* Physical drive number to be checked (al
             pbuff[n] = (BYTE) pn (0);
 
           dr = disk_write (pdrv, pbuff, lba, 1);
-          assert (dr == RES_OK);
+          assert(dr == RES_OK);
 
           dr = disk_write (pdrv, pbuff + sz_sect, lba2, 1);
-          assert (dr == RES_OK);
+          assert(dr == RES_OK);
 
           dr = disk_ioctl (pdrv, CTRL_SYNC, nullptr);
-          assert (dr == RES_OK);
+          assert(dr == RES_OK);
 
           memset (pbuff, 0, sz_sect * 2);
           dr = disk_read (pdrv, pbuff, lba, 1);
-          assert (dr == RES_OK);
+          assert(dr == RES_OK);
 
           dr = disk_read (pdrv, pbuff + sz_sect, lba2, 1);
-          assert (dr == RES_OK);
+          assert(dr == RES_OK);
 
           for (n = 0, pn (pns);
               pbuff[n] == (BYTE) pn (0) && n < (UINT) (sz_sect * 2); n++)
             ;
-          assert (n == (UINT) (sz_sect * 2));
+          assert(n == (UINT ) (sz_sect * 2));
         }
       else
         {
@@ -990,7 +974,7 @@ test_diskio (posix::block_device& bd, /* Physical drive number to be checked (al
       pns++;
 
       ds = disk_deinitialize (pdrv);
-      assert ((ds & STA_NOINIT) == 0);
+      assert((ds & STA_NOINIT) == 0);
     }
 
   return 0;
