@@ -46,6 +46,17 @@ using namespace os;
 
 // ----------------------------------------------------------------------------
 
+void*
+my_memcpy (void *dst, const void *src, std::size_t n);
+
+void*
+my_memcpy (void *dst, const void *src, std::size_t n)
+{
+  // os::trace::printf ("%s(%p, %p, %u)\n", __func__, dst, src,
+  //                    static_cast<std::size_t> (n));
+  return memcpy (dst, src, n);
+}
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpadded"
 
@@ -207,8 +218,8 @@ ssize_t
 my_block_impl::do_read_block (void* buf, posix::block_device::blknum_t blknum,
                               std::size_t nblocks)
 {
-  memcpy (buf, &arena_[blknum * block_logical_size_bytes_],
-          nblocks * block_logical_size_bytes_);
+  my_memcpy (buf, &arena_[blknum * block_logical_size_bytes_ / sizeof(elem_t)],
+             nblocks * block_logical_size_bytes_);
   return static_cast<ssize_t> (nblocks);
 }
 
@@ -217,8 +228,8 @@ my_block_impl::do_write_block (const void* buf,
                                posix::block_device::blknum_t blknum,
                                std::size_t nblocks)
 {
-  memcpy (&arena_[blknum * block_logical_size_bytes_], buf,
-          nblocks * block_logical_size_bytes_);
+  my_memcpy (&arena_[blknum * block_logical_size_bytes_ / sizeof(elem_t)], buf,
+             nblocks * block_logical_size_bytes_);
   return static_cast<ssize_t> (nblocks);
 }
 
