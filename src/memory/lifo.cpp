@@ -154,7 +154,7 @@ namespace os
           // and try again to allocate.
         }
 
-      void* aligned_payload = do_align (chunk, bytes, alignment, alloc_size);
+      void* aligned_payload = internal_align_ (chunk, bytes, alignment);
 
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
       trace::printf ("lifo::%s(%u,%u)=%p,%u @%p %s\n", __func__, bytes,

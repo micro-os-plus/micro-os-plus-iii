@@ -214,7 +214,7 @@ namespace os
           // and try again to allocate.
         }
 
-      void* aligned_payload = do_align (chunk, bytes, alignment, alloc_size);
+      void* aligned_payload = internal_align_ (chunk, bytes, alignment);
 
 #if defined(OS_TRACE_LIBCPP_MEMORY_RESOURCE)
       trace::printf ("first_fit_top::%s(%u,%u)=%p,%u @%p %s\n", __func__, bytes,
@@ -405,9 +405,12 @@ namespace os
       return total_bytes_;
     }
 
+    /**
+     * @details
+     */
     void*
-    first_fit_top::do_align (chunk_t* chunk, std::size_t bytes,
-                             std::size_t alignment, std::size_t alloc_size)
+    first_fit_top::internal_align_ (chunk_t* chunk, std::size_t bytes,
+                             std::size_t alignment)
     {
       // Update statistics.
       // The value subtracted from free is added to allocated.

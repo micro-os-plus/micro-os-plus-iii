@@ -125,6 +125,36 @@ namespace os
     protected:
 
       /**
+       * @cond ignore
+       */
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpadded"
+
+      // A 'chunk' is where the user block resides; it keeps track of size,
+      // it accommodates alignment and helps maintain the free list.
+      typedef struct chunk_s
+      {
+        // The actual chunk size, in bytes;
+        // the next chunk starts exactly after this number of bytes.
+        // This is the only overhead that applies to all allocated blocks.
+        std::size_t size;
+
+        // For allocated chunks, here, or at the next address that
+        // satisfies the required alignment, starts the payload.
+
+        // When the chunk is in the free list, instead of the
+        // payload, here is a pointer to the next chunk.
+        struct chunk_s* next;
+      } chunk_t;
+
+#pragma GCC diagnostic pop
+
+      /**
+       * @endcond
+       */
+
+      /**
        * @name Private Member Functions
        * @{
        */
@@ -146,6 +176,16 @@ namespace os
        */
       void
       internal_reset_ (void) noexcept;
+
+      /**
+       * @brief Internal function to align a chunk.
+       * @param [in] chunk Pointer to chunk.
+       * @param [in] bytes Bytes to allocate.
+       * @param [in] alignment Power of two.
+       * @return Pointer to aligned payload.
+       */
+      void*
+      internal_align_ (chunk_t* chunk, std::size_t bytes, std::size_t alignment);
 
       /**
        * @brief Implementation of the memory allocator.
@@ -197,28 +237,6 @@ namespace os
        * @cond ignore
        */
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
-
-      // A 'chunk' is where the user block resides; it keeps track of size,
-      // it accommodates alignment and helps maintain the free list.
-      typedef struct chunk_s
-      {
-        // The actual chunk size, in bytes;
-        // the next chunk starts exactly after this number of bytes.
-        // This is the only overhead that applies to all allocated blocks.
-        std::size_t size;
-
-        // For allocated chunks, here, or at the next address that
-        // satisfies the required alignment, starts the payload.
-
-        // When the chunk is in the free list, instead of the
-        // payload, here is a pointer to the next chunk.
-        struct chunk_s* next;
-      } chunk_t;
-
-#pragma GCC diagnostic pop
-
       // Offset of payload inside the chunk.
       static constexpr std::size_t chunk_offset = offsetof(chunk_t, next);
       static constexpr std::size_t chunk_align = sizeof(void*);
@@ -239,10 +257,6 @@ namespace os
       {
         return chunk_offset + block_minsize + block_padding;
       }
-
-      void*
-      do_align (chunk_t* chunk, std::size_t bytes, std::size_t alignment,
-                std::size_t alloc_size);
 
       void* arena_addr_ = nullptr;
       // No need for arena_size_bytes_, use total_bytes_.
