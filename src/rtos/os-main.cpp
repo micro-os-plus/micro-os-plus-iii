@@ -154,9 +154,9 @@ main (int argc, char* argv[])
   // since the destructors are executed on its context, and it cannot
   // destruct itself.
   new (&os_main_thread_) main_thread
-    { "main", reinterpret_cast<thread::func_t> (_main_trampoline), nullptr};
+    {"main", reinterpret_cast<thread::func_t> (_main_trampoline), nullptr};
 
-  os_main_thread = &os_main_thread_;
+  os_main_thread = reinterpret_cast<rtos::thread*>(&os_main_thread_);
 
 #else
 
