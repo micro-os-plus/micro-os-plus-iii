@@ -199,4 +199,21 @@ Experience proved that one of the above changes was trickier than planned: the r
 - add posix-io/tty class
 - posix/*.h: update guard macros
 
+### v6.3.14 2018-07-04
+
+- add support for Chan FatFS to the POSIX I/O layer
+- add `file_descriptors_manager::used()` to tell how many file 
+descriptors are used
+- [#41] add nonstandard `timegm()`, as the opposite of `gmtime()`
+- implement alignment in memory allocators
+- [#40] posix: add `statvfs()`/`fstatvfs()`
+- [#36] posix: add `tcdrain()`/`tcflush()`/`tcgetattr()`/`tcsendbreak()`/
+`tcgetattr()` to POSIX aliases
+- [#29] add thread top try/catch for exceptions; support for C++ exceptions 
+was tested and is now available
+- [#20] add sys/ioctl.h
+- [#35] add missing `_fini()`
+- [#17] fix `_LITE_EXIT` redefinition
+- rtos/thread: unlock dangling mutexes
+
 ---
