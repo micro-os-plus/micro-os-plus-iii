@@ -201,6 +201,11 @@ Experience proved that one of the above changes was trickier than planned: the r
 
 ### v6.3.14 2018-07-04
 
+- [#44] os_main.cpp: add os_main_thread cast
+- [#35] add missing `_fini()`
+- [#17] fix `_LITE_EXIT` redefinition
+- rtos/thread: unlock dangling mutexes
+
 - add support for Chan FatFS to the POSIX I/O layer
 - add `file_descriptors_manager::used()` to tell how many file 
 descriptors are used
@@ -212,8 +217,5 @@ descriptors are used
 - [#29] add thread top try/catch for exceptions; support for C++ exceptions 
 was tested and is now available
 - [#20] add sys/ioctl.h
-- [#35] add missing `_fini()`
-- [#17] fix `_LITE_EXIT` redefinition
-- rtos/thread: unlock dangling mutexes
 
 ---
