@@ -714,7 +714,7 @@ namespace os
      * of its lifetime, it is recommended that the function should
      * fail and report an `ESRCH` error.
      *
-     * The `priority()` function shall not return an error
+     * The `priority_inherited()` function shall not return an error
      * code of `EINTR`.
      *
      * @par POSIX compatibility
