@@ -734,7 +734,9 @@ namespace os
       // Check the priority, it is not in the allowed range.
       os_assert_err(prio < priority::error, EINVAL);
 
-      // TODO: check why priority::none is seen here.
+      // Warning: do not check for `priority::none`, since
+      // `mutex::unlock()` sets it when the list of mutexes owned
+      // by a thread is empty.
 
       if (prio == prio_inherited_)
         {
