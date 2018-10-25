@@ -599,6 +599,9 @@ namespace os
             {
               if (th->priority () > prio_ceiling_)
                 {
+                  // No need to keep the lock.
+                  owner_ = nullptr;
+
                   // Prio ceiling must be at least the priority of the
                   // highest priority thread.
                   return EINVAL;
@@ -634,6 +637,7 @@ namespace os
           // value EOWNERDEAD.
           if (owner_dead_)
             {
+              // TODO: decide if the lock must be preserved.
               return EOWNERDEAD;
             }
           return result::ok;
