@@ -425,12 +425,17 @@ namespace os
 
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
 
-        // Normally the old running thread must be re-linked to ready.
-        scheduler::current_thread_->internal_relink_running_ ();
+        // The very core of the scheduler, if not locked, re-link the
+        // current thread and return the top priority thread.
+        if (!locked ())
+          {
+            // Normally the old running thread must be re-linked to ready.
+            scheduler::current_thread_->internal_relink_running_ ();
 
-        // The top of the ready list gives the next thread to run.
-        scheduler::current_thread_ =
-            scheduler::ready_threads_list_.unlink_head ();
+            // The top of the ready list gives the next thread to run.
+            scheduler::current_thread_ =
+                scheduler::ready_threads_list_.unlink_head ();
+          }
 
         // ***** Pointer switched to new thread! *****
 
