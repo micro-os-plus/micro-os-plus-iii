@@ -13,3 +13,5 @@ $ doxygen --version
 1.8.14
 $ doxygen config.doxyfile
 ```
+
+Please note that the version used by Travis might be a bit older.
