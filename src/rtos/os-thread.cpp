@@ -183,7 +183,7 @@ namespace os
 
     /**
      * @details
-     * Count the number of words where the magic is still there.
+     * Count the number of bytes where the magic is still there.
      *
      * @warning: For large stacks it may be an expensive operation.
      *
