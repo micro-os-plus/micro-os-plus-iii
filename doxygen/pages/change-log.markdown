@@ -4,6 +4,12 @@
 
 Records in reverse chronological order.
 
+### v6.3.15 2018-11-19
+
+- [#47] stack::available() comment (size in bytes)
+- [#46]: protected mutex, do not keep ownership if error
+- [#45]: rtos/os-core.cpp: check locked()
+
 ### v6.3.14 2018-07-04
 
 - [#44] os_main.cpp: add os_main_thread cast
