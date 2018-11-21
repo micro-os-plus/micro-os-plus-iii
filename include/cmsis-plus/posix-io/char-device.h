@@ -163,10 +163,10 @@ namespace os
       // Implementations
 
       virtual off_t
-      do_lseek (off_t offset, int whence);
+      do_lseek (off_t offset, int whence) override;
 
       virtual void
-      do_sync (void);
+      do_sync (void) override;
 
       /**
        * @}
