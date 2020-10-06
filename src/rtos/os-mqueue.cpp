@@ -521,6 +521,10 @@ namespace os
       assert(msg_size_bytes_ == msg_size_bytes);
       assert(msg_size_bytes_ > 0);
 
+      // in order for the list of free messages to not consume additional memory,
+      // the pointers are stored at the beginning of the messages, thus messages should be large enough to fit a pointer
+      assert(msg_size_bytes_ >= sizeof(void*));
+
       msgs_ = static_cast<message_queue::size_t> (msgs);
       assert(msgs_ == msgs);
       assert(msgs > 0);

@@ -1767,6 +1767,8 @@ namespace os
           const char* name, const attributes& attr) :
           message_queue (name)
       {
+        static_assert(sizeof(T) >= sizeof(void*), "Messages of message_queue need to have at least the size of a pointer");
+
         internal_construct_ (msgs, sizeof(value_type), attr, &arena_,
                              sizeof(arena_));
       }
