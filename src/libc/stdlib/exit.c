@@ -148,7 +148,7 @@ _Exit (int code)
 
 #pragma GCC diagnostic pop
 
-void __attribute__((weak, alias ("_Exit")))
+void __attribute__((weak, alias ("_Exit"), noreturn))
 _exit (int status);
 
 // ----------------------------------------------------------------------------
