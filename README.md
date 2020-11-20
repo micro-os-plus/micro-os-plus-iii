@@ -1,4 +1,4 @@
-[![license](https://img.shields.io/github/license/micro-os-plus/micro-os-plus-xpack.svg)](https://github.com/micro-os-plus/micro-os-plus-xpack/blob/xpack/LICENSE)
+[![license](https://img.shields.io/github/license/micro-os-plus/micro-os-plus-xpack)](https://github.com/micro-os-plus/micro-os-plus-xpack/blob/xpack/LICENSE)
 [![Travis](https://img.shields.io/travis/micro-os-plus/micro-os-plus-xpack.svg)](https://travis-ci.org/micro-os-plus/micro-os-plus-xpack)
 [![GitHub issues](https://img.shields.io/github/issues/micro-os-plus/micro-os-plus-xpack.svg)](https://github.com/micro-os-plus/micro-os-plus-xpack/issues)
 [![GitHub pulls](https://img.shields.io/github/issues-pr/micro-os-plus/micro-os-plus-xpack.svg)](https://github.com/micro-os-plus/micro-os-plus-xpack/pulls)
