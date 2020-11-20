@@ -1,0 +1,34 @@
+{
+    "name": "@micro-os-plus/micro-os-plus",
+    "version": "7.0.0",
+    "description": "A source xPack with the µOS++ framework",
+    "main": "",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/micro-os-plus/micro-os-plus-xpack.git"
+    },
+    "keywords": [
+      "xpack",
+      "c++",
+      "posix",
+      "micro-os-plus",
+      "rtos"
+    ],
+    "homepage": "https://github.com/micro-os-plus/micro-os-plus-xpack",
+    "author": {
+      "name": "Liviu Ionescu",
+      "email": "ilg@livius.net",
+      "url": "https://github.com/ilg-ul"
+    },
+    "license": "MIT",
+    "bugs": {
+      "url": "https://github.com/micro-os-plus/micro-os-plus-xpack/issues"
+    },
+    "config": {},
+    "dependencies": {
+    },
+    "xpack": {}
+}
