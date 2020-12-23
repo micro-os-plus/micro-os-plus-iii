@@ -571,7 +571,7 @@ os_main (int argc, char* argv[])
  or a dynamically allocated area. 
 
  The reason for the system memory manager is to allow  RTOS 
- system objects to be separated from application objects; this hase 
+ system objects to be separated from application objects; this has 
  several advantages:
 
  - it helps to protect the system objects from application bugs; 
@@ -601,7 +601,7 @@ os_main (int argc, char* argv[])
 
  By default the RTOS system memory manager is the same as the application
  memory manager, but, for isolation reasons, it is recommended to define
- a separate memory mamanger for the RTOS system objects.
+ a separate memory mananger for the RTOS system objects.
 
  The basic memory management class is `os::rtos::memory::memory_resource`, 
  which will
