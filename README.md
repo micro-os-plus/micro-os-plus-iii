@@ -1,15 +1,14 @@
-[![license](https://img.shields.io/github/license/micro-os-plus/micro-os-plus-xpack)](https://github.com/micro-os-plus/micro-os-plus-xpack/blob/xpack/LICENSE)
-[![Travis](https://img.shields.io/travis/micro-os-plus/micro-os-plus-xpack.svg)](https://travis-ci.org/micro-os-plus/micro-os-plus-xpack)
-[![GitHub issues](https://img.shields.io/github/issues/micro-os-plus/micro-os-plus-xpack.svg)](https://github.com/micro-os-plus/micro-os-plus-xpack/issues)
-[![GitHub pulls](https://img.shields.io/github/issues-pr/micro-os-plus/micro-os-plus-xpack.svg)](https://github.com/micro-os-plus/micro-os-plus-xpack/pulls)
+[![license](https://img.shields.io/github/license/micro-os-plus/micro-os-plus)](https://github.com/micro-os-plus/micro-os-plus/blob/xpack/LICENSE)
+[![Travis](https://img.shields.io/travis/micro-os-plus/micro-os-plus.svg)](https://travis-ci.org/micro-os-plus/micro-os-plus)
+[![GitHub issues](https://img.shields.io/github/issues/micro-os-plus/micro-os-plus.svg)](https://github.com/micro-os-plus/micro-os-plus/issues)
+[![GitHub pulls](https://img.shields.io/github/issues-pr/micro-os-plus/micro-os-plus.svg)](https://github.com/micro-os-plus/micro-os-plus/pulls)
 
 # µOS++
 
-A source xPack with **µOS++**, a POSIX inspired open
+**µOS++** is a POSIX inspired open
 source framework, written in C++. The project is hosted on
 GitHub as
-[micro-os-plus/micro-os-plus-xpack](https://github.com/micro-os-plus/micro-os-plus-xpack).
-
+[micro-os-plus/micro-os-plus](https://github.com/micro-os-plus/micro-os-plus).
 ## Purpose
 
 The **µOS++** _(micro oh ɛs plus plus)_ project is
@@ -25,6 +24,9 @@ The APIs are documented in the
 The µOS++ project is fully functional for Cortex-M devices and also runs
 on synthetic POSIX platforms (like macOS and GNU/Linux).
 
+Note: The project is currently under restructuring, with the monolithic
+repository split into multiple separate source xPacks.
+
 ## Related projects
 
 The current µOS++ code tries to be as portable as possible.
@@ -32,9 +34,9 @@ The current µOS++ code tries to be as portable as possible.
 Specific implementations are available from separate projects:
 
 - the Cortex-M port of the scheduler is packed as
-[µOS++ Cortex-M xPack](https://github.com/micro-os-plus/cortexm-arch-xpack)
+[µOS++ Cortex-M xPack](https://github.com/micro-os-plus/architecture-cortexm-xpack)
 - the synthetic POSIX port of the scheduler is packed as
-[µOS++ POSIX arch xPack](https://github.com/micro-os-plus/posix-arch-xpack)
+[µOS++ POSIX arch xPack](https://github.com/micro-os-plus/architecture-posix-xpack)
 
 ## Build Configuration
 
@@ -82,5 +84,5 @@ To run these tests, several Eclipse projects are available in a separate
 ## License
 
 µOS++ is provided free of charge under the terms of the
-[MIT License](https://opensource.org/licenses/MIT), with all rights
-reserved to [Liviu Ionescu](https://github.com/ilg-ul).
+[MIT License](https://opensource.org/licenses/MIT), with all rights reserved to
+[Liviu Ionescu](https://github.com/ilg-ul).
