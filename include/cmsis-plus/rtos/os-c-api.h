@@ -546,6 +546,15 @@ extern "C"
   os_thread_set_priority (os_thread_t* thread, os_thread_prio_t prio);
 
   /**
+   * @brief Force thread termination.
+   * @param [in] thread Pointer to thread object instance.
+   * @retval os_ok The thread was terminated.
+   * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+   */
+  os_result_t
+  os_thread_kill (os_thread_t* thread);
+
+  /**
    * @brief Wait for thread termination.
    * @param [in] thread Pointer to terminating thread object instance.
    * @param [in] exit_ptr Pointer to thread exit value. (may be NULL).

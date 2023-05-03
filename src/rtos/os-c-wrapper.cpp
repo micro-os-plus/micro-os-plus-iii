@@ -771,6 +771,21 @@ os_thread_set_priority (os_thread_t* thread, os_thread_prio_t prio)
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
+ *  @ref os::rtos::thread::kill()
+ */
+os_result_t
+os_thread_kill (os_thread_t* thread)
+{
+  assert (thread != nullptr);
+  return (os_result_t) reinterpret_cast<rtos::thread&> (*thread).kill ();
+}
+
+/**
+ * @details
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
  *  @ref os::rtos::thread::join()
  */
 os_result_t
