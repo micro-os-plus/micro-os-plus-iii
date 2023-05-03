@@ -396,7 +396,7 @@ namespace os
        */
 
       /**
-       * @brief Check if the list is unitialised.
+       * @brief Check if the list is uninitialised.
        * @par Parameters
        *  None.
        * @retval true The list was not initialised.
@@ -840,7 +840,10 @@ namespace os
     inline
     static_double_list_links::~static_double_list_links ()
     {
-      ;
+      // Revert the content to a state similar to the statically initialised
+      // state (BSS zero).
+      next_ = nullptr;
+      prev_ = nullptr;
     }
 
     inline bool
