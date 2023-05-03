@@ -17,16 +17,16 @@
 # Project related configuration options
 #------------------------------------------------------------------------------
 
-# PROJECT_NAME = 
+# PROJECT_NAME =
 PROJECT_NAME = "µOS++ IIIe Reference"
 
-# PROJECT_NUMBER = 
-PROJECT_NUMBER = v6.3.15
+# PROJECT_NUMBER =
+PROJECT_NUMBER = v6.3.16
 
 # PROJECT_BRIEF =
 PROJECT_BRIEF = "The third edition of µOS++, a POSIX inspired open source system, written in C++."
 
-# PROJECT_LOGO = 
+# PROJECT_LOGO =
 PROJECT_LOGO = logo.png
 
 # WARN_AS_ERROR = NO
@@ -48,7 +48,7 @@ INPUT = \
 #	"pages" \
 #	"../include/cmsis-plus/rtos/os.h" \
 #	"../src/cmsis-plus/rtos/" \
-	
+
 EXCLUDE = \
 	"../src/cmsis-plus/rtos/os-impl.cpp" \
 	"../src/cmsis-plus/libcpp/chrono.cpp" \
@@ -71,14 +71,14 @@ EXTRACT_STATIC = YES
 # EXTRACT_ANON_NSPACES = NO
 EXTRACT_ANON_NSPACES = YES
 
-# FILE_PATTERNS = 
+# FILE_PATTERNS =
 FILE_PATTERNS = *.doxygen *.markdown *.h *.c *.cpp *.
 # X=	chrono \
 #	condition_variable \
 #	mutex \
 #	system_error \
 #	thread \
-	
+
 # EXTENSION_MAPPING =
 EXTENSION_MAPPING = "no_extension=C++"
 
@@ -113,7 +113,7 @@ ENABLE_PREPROCESSING = YES
 # MACRO_EXPANSION = NO
 MACRO_EXPANSION = YES
 
-# PREDEFINED = 
+# PREDEFINED =
 PREDEFINED = \
 __DOXYGEN__ \
 __cplusplus \

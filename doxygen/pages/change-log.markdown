@@ -4,6 +4,10 @@
 
 Records in reverse chronological order.
 
+### v6.3.16 2021-05-03
+
+- [#74]: add the `os_thread_kill()` wrapper to `thread::kill()`
+
 ### v6.3.15 2018-11-19
 
 - [#47] stack::available() comment (size in bytes)
@@ -18,14 +22,14 @@ Records in reverse chronological order.
 - rtos/thread: unlock dangling mutexes
 
 - add support for Chan FatFS to the POSIX I/O layer
-- add `file_descriptors_manager::used()` to tell how many file 
+- add `file_descriptors_manager::used()` to tell how many file
 descriptors are used
 - [#41] add nonstandard `timegm()`, as the opposite of `gmtime()`
 - implement alignment in memory allocators
 - [#40] posix: add `statvfs()`/`fstatvfs()`
 - [#36] posix: add `tcdrain()`/`tcflush()`/`tcgetattr()`/`tcsendbreak()`/
 `tcgetattr()` to POSIX aliases
-- [#29] add thread top try/catch for exceptions; support for C++ exceptions 
+- [#29] add thread top try/catch for exceptions; support for C++ exceptions
 was tested and is now available
 - [#20] add sys/ioctl.h
 
@@ -106,14 +110,14 @@ was tested and is now available
 - to make use of the system allocator in system classes, add custom `new`/`delete` operators to class `object_named_system`, and use it as base for all system objects
 - add `rtos::make_shared<>` to use the system allocator (experimental, to be further refined with thread safe)
 - for Cortex-M, manage the interrupts stack via the `thread::stack` class; initialise interrupts stack with pattern and check the bottom marker in the idle thread
-- add `os_irq_get_stack()` to the C API 
+- add `os_irq_get_stack()` to the C API
 - add `os_terminate_goodbye()` to display memory usage statistics
 - refubish the exit code to avoid crashes when building freestanding apps
 - rename `os_initialize_args()` -> `os_startup_initialize_args()`
 - rename `os_initialize_hardware_early()` -> `os_startup_initialize_hardware_early()`
 - rename `os_initialize_hardware()` -> `os_startup_initialize_hardware()`
 - add _out of memory_ hooks to memory managers
-- add `os_terminate()` as a portable function to terminate the application (implemented as reset on Cortex-M) 
+- add `os_terminate()` as a portable function to terminate the application (implemented as reset on Cortex-M)
 - add the `block_pool` class to manage pools of memory blocks
 - add `block_pool_typed_allocated` and `block_pool_typed_inclusive` templates
 - add `first_fit_top_allocated` and `first_fit_top_inclusive` templates
@@ -126,7 +130,7 @@ was tested and is now available
 
 #### Problematic incompatible changes
 
-Experience proved that one of the above changes was trickier than planned: the rename of the `os_startup_initialize_hardware()`, since without the renamed function the linker used the weak version of this function. To help developers, the weak definition was temporarily disabled, so if this function was not yet renamed in the application, the linker will complain. 
+Experience proved that one of the above changes was trickier than planned: the rename of the `os_startup_initialize_hardware()`, since without the renamed function the linker used the weak version of this function. To help developers, the weak definition was temporarily disabled, so if this function was not yet renamed in the application, the linker will complain.
 
 ### v6.3.6 2016-08-07
 
@@ -136,7 +140,7 @@ Experience proved that one of the above changes was trickier than planned: the r
 - rename `Allocator` -> `allocator_type`
 - add `thread::priority_inherited()`, `thread::priority_inherited(int)`
 - make `thread::priority()` public
-- reimplement POSIX mutex inheritance 
+- reimplement POSIX mutex inheritance
 - implement POSIX robust mutexes
 - make default mutex inheritable
 - add class mutex_recursive
@@ -194,7 +198,7 @@ Experience proved that one of the above changes was trickier than planned: the r
 - `flags_clear()`, `flags_get()` moved from `thread` to `this_thread`
 - for consistency reasons, thread signals were renamed thread event flags
 
-### v6.2.1 2016-06-21 
+### v6.2.1 2016-06-21
 
 First fully functional reference implementation. The C and C++ APIs were completely refurbished and use all lower case letters.
 
@@ -220,7 +224,7 @@ Changes, in reverse chronological order:
 - prefix all init functions with `os_`
 - many other, too many to mention, inherent for first versions...
 
-### v0.1.1 2016-03-11 
+### v0.1.1 2016-03-11
 
 - initial version of the APIs announced on [ARM Connected Community](https://community.arm.com/groups/tools/blog/2016/03/11/cmsis-a-proposal-for-a-future-cmsis-written-in-c)
 
