@@ -54,13 +54,17 @@ extern "C"
 
   typedef uint32_t socklen_t;
 
+#if !defined (OS_EXCLUDE_SOCKET_SA_FAMILY_T)
   typedef unsigned int sa_family_t;
+#endif
 
+#if !defined (OS_EXCLUDE_SOCKET_STRUCT_SOCKADDR)
   struct sockaddr
   {
     sa_family_t sa_family;  //Address family.
     char sa_data[];  // Socket address (variable-length data).
   };
+#endif
 
   int
   accept (int socket, struct sockaddr* address, socklen_t* address_len);
