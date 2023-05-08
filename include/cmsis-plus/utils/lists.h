@@ -842,8 +842,10 @@ namespace os
     {
       // Revert the content to a state similar to the statically initialised
       // state (BSS zero).
-      next_ = nullptr;
-      prev_ = nullptr;
+      // Unfortunately GCC removes this code as part of
+      // _dead store elimination_.
+      // next_ = nullptr;
+      // prev_ = nullptr;
     }
 
     inline bool
