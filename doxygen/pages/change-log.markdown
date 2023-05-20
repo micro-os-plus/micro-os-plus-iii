@@ -4,7 +4,25 @@
 
 Records in reverse chronological order.
 
-### v6.3.16 2021-05-03
+### v6.3.17 2023-05-21
+
+* 0869a4b os-version.h: remove -beta
+* 77b2b44 os-memory.h: disable doxy for operator()
+* 5910137 c-syscalls: disable doxygen
+
+### 2023-05-08
+
+* 2f1a3b8 #75: cannot clear members in destructor
+
+### 2023-05-04
+
+* 46e2836 #76: Exclude socket definitions used by LWIP
+
+### 2023-05-03
+
+* 9ecdf5d #75: Revert statically initialised lists to BSS
+
+### v6.3.16 2023-05-03
 
 - [#74]: add the `os_thread_kill()` wrapper to `thread::kill()`
 
