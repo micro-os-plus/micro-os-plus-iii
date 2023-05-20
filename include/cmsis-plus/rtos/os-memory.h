@@ -906,10 +906,10 @@ namespace os
           allocator_deleter&
           operator= (allocator_deleter&& other) = default;
 
-          /**
-           * @brief Function operator.
-           * @param addr Pointer to memory to deallocate.
-           */
+          // /**
+          //  * @brief Function operator.
+          //  * @param addr Pointer to memory to deallocate.
+          //  */
           void
           operator() (pointer addr) const;
 
