@@ -134,11 +134,11 @@ extern "C"
   int __attribute__((weak, alias ("__posix_open")))
   open (const char* path, int oflag, ...);
 
-  /**
-   * @brief Open directory.
-   * @param dirname [in] Directory name.
-   * @return Pointer to DIR object.
-   */
+  // /**
+  //  * @brief Open directory.
+  //  * @param dirname [in] Directory name.
+  //  * @return Pointer to DIR object.
+  //  */
   DIR*
   __attribute__((weak, alias ("__posix_opendir")))
   opendir (const char* dirname);
