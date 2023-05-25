@@ -34,7 +34,7 @@
 
 using namespace os;
 
-RNG_HandleTypeDef hrng;
+extern RNG_HandleTypeDef hrng;
 
 int
 os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
