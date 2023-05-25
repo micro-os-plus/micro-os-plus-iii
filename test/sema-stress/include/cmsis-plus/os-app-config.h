@@ -95,6 +95,14 @@
 
 #endif
 
+#if defined(__ARM_EABI__)
+
+#define OS_INTEGER_RTOS_IDLE_STACK_SIZE_BYTES (3000)
+#define OS_INTEGER_RTOS_DEFAULT_STACK_SIZE_BYTES (3000)
+
+#endif
+
+
 // ----------------------------------------------------------------------------
 
 #endif /* CMSIS_PLUS_RTOS_OS_APP_CONFIG_H_ */
