@@ -89,7 +89,7 @@ namespace os
        */
 
       virtual
-      ~socket ();
+      ~socket () override;
 
       /**
        * @}
@@ -241,7 +241,7 @@ namespace os
        */
 
       virtual
-      ~socket_impl ();
+      ~socket_impl () override;
 
       /**
        * @}

@@ -314,7 +314,7 @@ namespace os
          */
 
         virtual
-        ~directory_implementable ();
+        ~directory_implementable () override;
 
         /**
          * @}

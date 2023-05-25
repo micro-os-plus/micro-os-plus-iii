@@ -1822,7 +1822,7 @@ namespace os
          * @brief Destruct the thread object instance.
          */
         virtual
-        ~thread_inclusive ();
+        ~thread_inclusive () override;
 
         /**
          * @}

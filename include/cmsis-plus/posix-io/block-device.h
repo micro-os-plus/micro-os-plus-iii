@@ -286,7 +286,7 @@ namespace os
          */
 
         virtual
-        ~block_device_implementable ();
+        ~block_device_implementable () override;
 
         /**
          * @}

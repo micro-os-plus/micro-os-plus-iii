@@ -82,7 +82,7 @@ namespace os
        */
 
       virtual
-      ~tty () noexcept;
+      ~tty () noexcept override;
 
       /**
        * @}
@@ -160,7 +160,7 @@ namespace os
        */
 
       virtual
-      ~tty_impl ();
+      ~tty_impl () override;
 
       /**
        * @}

@@ -597,7 +597,7 @@ namespace os
          * @brief Destruct the memory pool object instance.
          */
         virtual
-        ~memory_pool_allocated ();
+        ~memory_pool_allocated () override;
 
         /**
          * @}
@@ -677,7 +677,7 @@ namespace os
          * @brief Destruct the memory pool object instance.
          */
         virtual
-        ~memory_pool_typed ();
+        ~memory_pool_typed () override;
 
         /**
          * @}
@@ -794,7 +794,7 @@ namespace os
          * @brief Destruct the memory pool object instance.
          */
         virtual
-        ~memory_pool_inclusive ();
+        ~memory_pool_inclusive () override;
 
         /**
          * @}

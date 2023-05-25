@@ -309,7 +309,7 @@ namespace os
          * @brief Destruct the memory resource object instance.
          */
         virtual
-        ~block_pool_typed_inclusive ();
+        ~block_pool_typed_inclusive () override;
 
         /**
          * @}
@@ -424,7 +424,7 @@ namespace os
          * @brief Destruct the memory resource object instance.
          */
         virtual
-        ~block_pool_typed_allocated ();
+        ~block_pool_typed_allocated () override;
 
         /**
          * @}

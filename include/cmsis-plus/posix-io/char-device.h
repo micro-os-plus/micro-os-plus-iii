@@ -85,7 +85,7 @@ namespace os
        */
 
       virtual
-      ~char_device ();
+      ~char_device () override;
 
       /**
        * @}
@@ -146,7 +146,7 @@ namespace os
        */
 
       virtual
-      ~char_device_impl ();
+      ~char_device_impl () override;
 
       /**
        * @}
@@ -215,7 +215,7 @@ namespace os
          */
 
         virtual
-        ~char_device_implementable ();
+        ~char_device_implementable () override;
 
         /**
          * @}

@@ -576,7 +576,7 @@ namespace os
          */
 
         virtual
-        ~file_system_implementable ();
+        ~file_system_implementable () override;
 
         /**
          * @}

@@ -85,7 +85,7 @@ namespace os
        */
 
       virtual
-      ~block_device_partition ();
+      ~block_device_partition () override;
 
       /**
        * @}
@@ -256,7 +256,7 @@ namespace os
          */
 
         virtual
-        ~block_device_partition_implementable ();
+        ~block_device_partition_implementable () override;
 
         /**
          * @}

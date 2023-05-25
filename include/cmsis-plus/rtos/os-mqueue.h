@@ -798,7 +798,7 @@ namespace os
          * @brief Destruct the message queue.
          */
         virtual
-        ~message_queue_allocated ();
+        ~message_queue_allocated () override;
 
         /**
          * @}
@@ -881,7 +881,7 @@ namespace os
          * @brief Destruct the typed message queue object instance.
          */
         virtual
-        ~message_queue_typed ();
+        ~message_queue_typed () override;
 
         /**
          * @}
@@ -1079,7 +1079,7 @@ namespace os
          * @brief Destruct the typed message queue object instance.
          */
         virtual
-        ~message_queue_inclusive ();
+        ~message_queue_inclusive () override;
 
         /**
          * @}

@@ -201,7 +201,7 @@ namespace os
        */
 
       virtual
-      ~file_impl ();
+      ~file_impl () override;
 
       /**
        * @}
@@ -286,7 +286,7 @@ namespace os
          */
 
         virtual
-        ~file_implementable ();
+        ~file_implementable () override;
 
         /**
          * @}

@@ -49,10 +49,10 @@ namespace os
     struct system_error_category : public std::error_category
       {
         virtual const char*
-        name () const noexcept;
+        name () const noexcept override;
 
         virtual std::string
-        message (int i) const;
+        message (int i) const override;
 
       };
 
@@ -78,10 +78,10 @@ namespace os
     struct cmsis_error_category : public std::error_category
       {
         virtual const char*
-        name () const noexcept;
+        name () const noexcept override;
 
         virtual std::string
-        message (int i) const;
+        message (int i) const override;
       };
 
     const char*
