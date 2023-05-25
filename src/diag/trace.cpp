@@ -192,7 +192,7 @@ int __attribute__((weak, alias ("_ZN2os5trace6printfEPKcz")))
 trace_printf (const char* format, ...);
 
 int __attribute__((weak, alias ("_ZN2os5trace7vprintfEPKcSt9__va_list")))
-trace_vprintf (const char* format, ...);
+trace_vprintf (const char* format, va_list args);
 
 int __attribute__((weak, alias("_ZN2os5trace4putsEPKc")))
 trace_puts (const char *s);
