@@ -9,6 +9,7 @@
 source framework, written in C++. The project is hosted on
 GitHub as
 [micro-os-plus/micro-os-plus](https://github.com/micro-os-plus/micro-os-plus).
+
 ## Purpose
 
 The **µOS++** _(micro oh ɛs plus plus)_ project is
