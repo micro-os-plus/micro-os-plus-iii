@@ -373,10 +373,10 @@ namespace os
          */
         object_named (const object_named&) = default;
         object_named (object_named&&) = default;
-        object_named&
-        operator= (const object_named&) = default;
-        object_named&
-        operator= (object_named&&) = default;
+        // object_named&
+        // operator= (const object_named&) = default;
+        // object_named&
+        // operator= (object_named&&) = default;
         /**
          * @endcond
          */
@@ -467,10 +467,10 @@ namespace os
          */
         object_named_system (const object_named_system&) = default;
         object_named_system (object_named_system&&) = default;
-        object_named_system&
-        operator= (const object_named_system&) = default;
-        object_named_system&
-        operator= (object_named_system&&) = default;
+        // object_named_system&
+        // operator= (const object_named_system&) = default;
+        // object_named_system&
+        // operator= (object_named_system&&) = default;
         /**
          * @endcond
          */
