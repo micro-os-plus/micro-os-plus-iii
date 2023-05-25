@@ -3629,8 +3629,11 @@ osThreadCreate (const osThreadDef_t* thread_def, void* args)
                   * ((thread_def->stacksize + sizeof(uint64_t) - 1)
                       / sizeof(uint64_t))];
             }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
           new (th) thread (thread_def->name,
-                           (thread::func_t) thread_def->pthread, args, attr);
+                           reinterpret_cast<thread::func_t> (thread_def->pthread), args, attr);
+#pragma GCC diagnostic pop
 
           // No need to yield here, already done by constructor.
           return reinterpret_cast<osThreadId> (th);
