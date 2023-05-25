@@ -74,6 +74,9 @@ namespace os
 
 namespace std
 {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
   // Define a std::hash specialisation.
   template<>
     struct hash<os::estd::thread::id> : public std::unary_function<
@@ -86,6 +89,9 @@ namespace std
             v.native_thread_);
       }
     };
+
+#pragma GCC diagnostic push
+
 }
 
 #if defined(OS_HAS_STD_THREADS) && defined(OS_INCLUDE_STD_THREADS)
