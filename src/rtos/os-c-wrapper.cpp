@@ -132,6 +132,11 @@ static_assert(alignof(os_mqueue_prio_t) == alignof(message_queue::priority_t), "
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wenum-compare"
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wanon-enum-enum-conversion"
+#else
+#pragma GCC diagnostic ignored "-Wsign-compare"
+#endif
 
 static_assert(os_thread_priority_idle == thread::priority::idle, "adjust os_thread_priority_idle");
 static_assert(os_thread_priority_low == thread::priority::low, "adjust os_thread_priority_low");
