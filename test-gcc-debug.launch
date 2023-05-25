@@ -21,7 +21,7 @@
 <stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="test-gcc-debug/test-gcc-debug.elf"/>
 <stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="micro-os-plus-iii-xpack"/>
 <booleanAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_AUTO_ATTR" value="false"/>
-<stringAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_ID_ATTR" value="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.1099817463.701037644"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_ID_ATTR" value="ilg.gnumcueclipse.managedbuild.cross.config.elf.debug.1099817463.701037644"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
 <listEntry value="/micro-os-plus-iii-xpack"/>
 </listAttribute>
