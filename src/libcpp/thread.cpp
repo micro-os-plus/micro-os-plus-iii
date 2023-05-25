@@ -39,7 +39,7 @@ namespace os
   } /* namespace estd */
 } /* namespace os */
 
-#if defined(OS_HAS_STD_THREADS)
+#if defined(OS_HAS_STD_THREADS) && defined(OS_INCLUDE_STD_THREADS)
 
 namespace std
 {
