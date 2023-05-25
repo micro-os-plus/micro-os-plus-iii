@@ -57,6 +57,8 @@ namespace os
     // ------------------------------------------------------------------------
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+// TODO: remove after fixing implementation.
+#pragma GCC diagnostic ignored "-Wnonnull"
 
     class socket*
     socket (int domain, int type, int protocol)
