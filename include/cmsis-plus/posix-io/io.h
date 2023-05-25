@@ -115,6 +115,9 @@ namespace os
        * @{
        */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
+
       using type_t = unsigned int;
       enum type
         : type_t
@@ -126,6 +129,8 @@ namespace os
         file = 1 << 4,
         socket = 1 << 5
       };
+
+#pragma GCC diagnostic pop
 
       /**
        * @}
