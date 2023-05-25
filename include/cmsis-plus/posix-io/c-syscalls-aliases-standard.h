@@ -230,7 +230,7 @@ extern "C"
   int __attribute__((weak, alias ("__posix_system")))
   system (const char *command);
 
-  int __attribute__((weak, alias ("__posix_symlink")))
+  int __attribute__((weak, alias ("__posix_tcdrain")))
   tcdrain (int fildes);
 
   int __attribute__((weak, alias ("__posix_tcflush")))
