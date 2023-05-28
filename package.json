@@ -1,0 +1,37 @@
+{
+  "name": "@micro-os-plus/micro-os-plus-iii",
+  "version": "6.3.18",
+  "description": "A source xPack with µOS++",
+  "main": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/micro-os-plus/micro-os-plus-iii.git"
+  },
+  "homepage": "https://github.com/micro-os-plus/micro-os-plus-iii/",
+  "bugs": {
+    "url": "https://github.com/micro-os-plus/micro-os-plus-iii/issues/"
+  },
+  "keywords": [
+    "xpack"
+  ],
+  "author": {
+    "name": "Liviu Ionescu",
+    "email": "ilg@livius.net",
+    "url": "https://github.com/ilg-ul/"
+  },
+  "license": "MIT",
+  "config": {},
+  "dependencies": {},
+  "devDependencies": {},
+  "xpack": {
+    "minimumXpmRequired": "0.15.2",
+    "dependencies": {},
+    "devDependencies": {},
+    "properties": {},
+    "actions": {},
+    "buildConfigurations": {}
+  }
+}
