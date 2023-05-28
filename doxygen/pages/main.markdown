@@ -2,14 +2,18 @@
 
 ## Scope
 
-This doxygen site contains detailed reference documentation for the
-[µOS++ IIIe](https://github.com/micro-os-plus) project.
+This site contains detailed reference documentation for the
+third edition of the **µOS++**
+[GitHub](https://github.com/micro-os-plus) project.
 
-With most functions adopting the POSIX semantics, but written in C++, these specifications can also be seen as a C++ version of POSIX, thus the name <b>POSIX++</b>.
+With most functions adopting the POSIX semantics, but written in C++,
+these specifications can also be seen as a C++ version of POSIX, thus
+the name **POSIX++**.
 
-For tutorials and general documentation, check the main [project site](http://micro-os-plus.github.io).
+For tutorials and general documentation, check the main project
+[web](http://micro-os-plus.github.io) site.
 
-## Sections
+## Modules
 
 From a functional point of view, the documentation pages can be grouped as:
 
@@ -24,5 +28,3 @@ From a functional point of view, the documentation pages can be grouped as:
 * [µOS++ **POSIX I/O C API**](group__cmsis-plus-posix-io-c.html) (work in progress)
 * [µOS++ **Application Config**](group__cmsis-plus-app-config.html)
 * [µOS++ **Application Overrides & Hooks**](group__cmsis-plus-app-hooks.html)
-
-
