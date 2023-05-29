@@ -1258,7 +1258,7 @@ os_clock_get_offset (os_clock_t* clock)
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
- *  @ref os::rtos::adjustable_clock::offset(offset_t)
+ *  @ref os::rtos::adjustable_clock::offset(os::rtos::clock::offset_t)
  */
 os_clock_offset_t
 os_clock_set_offset (os_clock_t* clock, os_clock_offset_t offset)
@@ -1828,7 +1828,7 @@ os_mutex_get_prio_ceiling (os_mutex_t* mutex)
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
- *  @ref os::rtos::mutex::prio_ceiling(thread::priority_t, thread::priority_t*)
+ *  @ref os::rtos::mutex::prio_ceiling(os::rtos::thread::priority_t, os::rtos::thread::priority_t*)
  */
 os_result_t
 os_mutex_set_prio_ceiling (os_mutex_t* mutex, os_thread_prio_t prio_ceiling,
