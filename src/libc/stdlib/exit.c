@@ -60,6 +60,8 @@ abort (void)
 // ----------------------------------------------------------------------------
 
 /**
+ * @param code Exit code.
+ *
  * @details
  * `exit()` does several cleanups before ending the application:
  *
