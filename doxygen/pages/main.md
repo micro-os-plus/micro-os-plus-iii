@@ -20,9 +20,9 @@ This site contains detailed reference documentation for the
 third edition of the **µOS++**
 [GitHub](https://github.com/micro-os-plus) project.
 
-With most functions adopting the POSIX semantics, but written in C++,
-these specifications can also be seen as a C++ version of POSIX, thus
-the name **POSIX++**.
+With most functions implementing the POSIX semantics, but written in C++,
+these specifications can also be seen as a C++ version of some
+POSIX parts, thus the name **POSIX++**.
 
 For tutorials and general documentation, check the main project
 [web](http://micro-os-plus.github.io) site.
