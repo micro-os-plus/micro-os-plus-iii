@@ -555,7 +555,8 @@ namespace os
         /**
          * @brief Exit the interrupts critical section.
          * @param state The value to restore the interrupts priorities register.
-         * @return  Nothing.
+         * @par Returns
+         *  Nothing.
          */
         static void
         exit (state_t state);

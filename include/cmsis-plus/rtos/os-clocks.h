@@ -649,8 +649,8 @@ namespace os
        * @brief Initialise and make the RTC tick.
        * @par Parameters
        *  None.
-       * @retval result::ok   The real time clock was started.
-       * @retval ENOTRECOVERABLE Could not start real time clock.
+       * @par Returns
+       *  Nothing.
        */
       virtual void
       start (void) override;

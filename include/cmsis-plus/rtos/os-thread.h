@@ -1186,7 +1186,8 @@ namespace os
        * @brief Resume the thread.
        * @par Parameters
        *  None.
-       * @return  Nothing.
+       * @par Returns
+       *  Nothing.
        */
       void
       resume (void);
@@ -1393,7 +1394,8 @@ namespace os
       /**
        * @brief Terminate thread by itself.
        * @param [in] exit_ptr Pointer to object to return (optional).
-       * @return  Nothing.
+       * @par Returns
+       *  Nothing.
        */
       [[noreturn]]
       void

@@ -216,7 +216,8 @@ namespace os
          * @brief       Register device event callback.
          * @param [in]   cb_func  Pointer to function.
          * @param [in] cb_object Pointer to object passed to the function.
-         * @return      Execution status.
+         * @par Returns
+         *  Nothing.
          */
         void
         register_device_callback (device::signal_device_event_t cb_func,
@@ -357,7 +358,8 @@ namespace os
         /**
          * @brief       Signal device events.
          * @param [in]  event
-         * @return      none
+         * @par Returns
+         *  Nothing.
          */
         void
         signal_device_event (event_t event) noexcept;
@@ -368,7 +370,8 @@ namespace os
          *                - ep_addr.0..3: Address
          *                - ep_addr.7:    Direction
          * @param [in]  event
-         * @return      none
+         * @par Returns
+         *  Nothing.
          */
         void
         signal_endpoint_event (endpoint_t ep_addr, event_t event) noexcept;

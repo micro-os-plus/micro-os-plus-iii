@@ -550,7 +550,8 @@ namespace os
        * @brief       Register event callback.
        * @param [in] cb_func  Pointer to function.
        * @param [in] cb_object Pointer to object passed to function.
-       * @return      Execution status
+       * @par Returns
+       *  Nothing.
        */
       void
       register_callback (signal_event_t cb_func,
@@ -649,7 +650,8 @@ namespace os
       /**
        * @brief       Signal serial events.
        * @param [in]  event Event notification mask.
-       * @return      none
+       * @par Returns
+       *  Nothing.
        */
       void
       signal_event (event_t event) noexcept;
