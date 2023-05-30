@@ -33,6 +33,7 @@
 #include <stdio.h>
 
 #include <cmsis-plus/diag/trace.h>
+#include <cmsis-plus/rtos/os-c-api.h>
 
 // ----------------------------------------------------------------------------
 
@@ -68,6 +69,8 @@ __assert_func (const char* file, int line, const char* func,
     {
       trace_printf ("function: %s\n", func);
     }
+  trace_printf ("this_thread: %s @%p\n", os_thread_get_name(os_this_thread()),
+                os_this_thread());
 
 #elif defined(OS_USE_SEMIHOSTING_SYSCALLS)
 
@@ -78,6 +81,9 @@ __assert_func (const char* file, int line, const char* func,
     {
       printf ("function: %s\n", func);
     }
+  printf ("this_thread: %s @%p\n", os_thread_get_name(os_this_thread()),
+          os_this_thread());
+
 #endif
   abort ();
   /* NOTREACHED */
@@ -112,6 +118,7 @@ assert_failed (uint8_t* file, uint32_t line)
 #if defined(TRACE)
 
   trace_printf ("assert_param() failed: file \"%s\", line %d\n", file, line);
+  trace_printf ("this_thread: %s\n", os_thread_get_name(os_this_thread()));
 
 #elif defined(OS_USE_SEMIHOSTING_SYSCALLS)
 

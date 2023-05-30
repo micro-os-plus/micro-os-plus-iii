@@ -2305,7 +2305,7 @@ namespace os
      * or
      * @ref OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES
      * is/are defined.
-     * 
+     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     inline void
@@ -2419,7 +2419,11 @@ namespace os
 
           // Simple test to verify that the old thread
           // did not underflow the stack.
-          assert (stack ().check_bottom_magic ());
+          if (!stack ().check_bottom_magic ())
+            {
+              trace::printf("%s() @%p %s\n", __func__, this, name ());
+              assert (stack ().check_bottom_magic ());
+            }
         }
     }
 

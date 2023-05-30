@@ -1048,8 +1048,12 @@ namespace os
     {
       if (stack ().size () > 0)
         {
-          assert(stack ().check_bottom_magic ());
-          assert(stack ().check_top_magic ());
+          if (!stack ().check_bottom_magic () || !stack ().check_top_magic ())
+            {
+              trace::printf("%s() @%p %s\n", __func__, this, name ());
+              assert(stack ().check_bottom_magic ());
+              assert(stack ().check_top_magic ());
+            }
 
 #if defined(OS_TRACE_RTOS_THREAD)
           trace::printf ("%s() @%p %s stack: %u/%u bytes used\n", __func__,
