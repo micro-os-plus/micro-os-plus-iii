@@ -932,6 +932,16 @@ namespace os
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
 
         /**
+         * @brief Clear the thread statistic counters.
+         * @par Parameters
+         *  None.
+         * @par Returns
+         *  Nothing.
+         */
+        void
+        clear (void);
+
+        /**
          * @}
          */
 
@@ -2250,7 +2260,7 @@ namespace os
      * @ref OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES
      * is defined.
      *
-     * @warning Cannot be invoked from Interrupt Service Routines.
+     * @note Can be invoked from Interrupt Service Routines.
      */
     inline statistics::counter_t
     thread::statistics::context_switches (void)
@@ -2272,7 +2282,7 @@ namespace os
      * @ref OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES
      * is defined.
      *
-     * @warning Cannot be invoked from Interrupt Service Routines.
+     * @note Can be invoked from Interrupt Service Routines.
      */
     inline rtos::statistics::duration_t
     thread::statistics::cpu_cycles (void)
@@ -2281,6 +2291,36 @@ namespace os
     }
 
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) \
+  || defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
+
+    /**
+     * @details
+     *
+     * This function sets all statistic counters to zero.
+     *
+     * @note This function is available only when
+     * @ref OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES
+     * or
+     * @ref OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES
+     * is/are defined.
+     * 
+     * @note Can be invoked from Interrupt Service Routines.
+     */
+    inline void
+    thread::statistics::clear (void) {
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
+      context_switches_ = 0;
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
+      cpu_cycles_ = 0;
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
+    }
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) \
+  || defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
 
     // ========================================================================
 

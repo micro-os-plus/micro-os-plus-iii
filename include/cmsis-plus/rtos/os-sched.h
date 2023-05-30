@@ -469,6 +469,20 @@ namespace os
 
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
 
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) \
+  || defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
+
+        /**
+         * @brief Get the total duration of all threads.
+         * @return Integer with the number of CPU cycles, possibly
+         * divided by some prescaller.
+         */
+        rtos::statistics::duration_t
+        cpu_cycles (void);
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) \
+  || defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
+
       } /* namespace statistics */
     } /* namespace scheduler */
 
@@ -1039,7 +1053,7 @@ namespace os
          * @ref OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES
          * is defined.
          *
-         * @warning Cannot be invoked from Interrupt Service Routines.
+         * @note Can be invoked from Interrupt Service Routines.
          */
         inline rtos::statistics::counter_t
         context_switches (void)
@@ -1064,7 +1078,7 @@ namespace os
          * @ref OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES
          * is defined.
          *
-         * @warning Cannot be invoked from Interrupt Service Routines.
+         * @note Can be invoked from Interrupt Service Routines.
          */
         inline rtos::statistics::duration_t
         cpu_cycles (void)
@@ -1073,6 +1087,36 @@ namespace os
         }
 
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) \
+  || defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
+
+        /**
+         * @details
+         *
+         * This function sets all statistic counters to zero.
+         *
+         * @note This function is available only when
+         * @ref OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES
+         * or
+         * @ref OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES
+         * is/are defined.
+         *
+         * @note Can be invoked from Interrupt Service Routines.
+         */
+        inline void
+        clear (void) {
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
+          context_switches_ = 0;
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
+
+#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
+          cpu_cycles_ = 0;
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
+        }
+
+#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) \
+  || defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
 
       } /* namespace statistics */
 
