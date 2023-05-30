@@ -44,6 +44,9 @@ namespace os
      * To simplify access, the member variables are public and do not
      * require accessors or mutators.
      *
+     * If the attributes are modified **after** the message_queue creation,
+     * the message_queue attributes shall not be affected.
+     *
      * @par POSIX compatibility
      *  Inspired by `mq_attr`
      *  from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
@@ -377,6 +380,9 @@ namespace os
      * the storage is dynamically allocated using the RTOS specific allocator
      * (`rtos::memory::allocator`).
      *
+     * If the _attr_ attributes are modified **after** the message_queue creation,
+     * the message_queue attributes shall not be affected.
+     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     message_queue::message_queue (std::size_t msgs, std::size_t msg_size_bytes,
@@ -411,6 +417,9 @@ namespace os
      * `mq_queue_size_bytes`), that storage is used, otherwise
      * the storage is dynamically allocated using the RTOS specific allocator
      * (`rtos::memory::allocator`).
+     *
+     * If the _attr_ attributes are modified **after** the message_queue creation,
+     * the message_queue attributes shall not be affected.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */

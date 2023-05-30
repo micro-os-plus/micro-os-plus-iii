@@ -40,6 +40,9 @@ namespace os
      * @details
      * Allow to assign a name to the condition variable.
      *
+     * If the attributes are modified **after** the condition_variable creation,
+     * the condition_variable attributes shall not be affected.
+     *
      * @par POSIX compatibility
      *  Inspired by `pthread_condattr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
      *  (IEEE Std 1003.1, 2013 Edition).
@@ -216,6 +219,9 @@ namespace os
      * The effect shall be equivalent to creating a condition variables
      * object with the default constructor.
      *
+     * If the _attr_ attributes are modified **after** the condition_variable creation,
+     * the condition_variable attributes shall not be affected.
+     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      *
      * @par POSIX compatibility
@@ -249,6 +255,9 @@ namespace os
      * can be used to initialise condition variables.
      * The effect shall be equivalent to creating a condition variables
      * object with the default constructor.
+     *
+     * If the _attr_ attributes are modified **after** the condition_variable creation,
+     * the condition_variable attributes shall not be affected.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      *

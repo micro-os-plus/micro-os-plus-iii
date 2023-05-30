@@ -40,6 +40,9 @@ namespace os
      * @details
      * Allow to assign a name to the event flags.
      *
+     * If the attributes are modified **after** the event_flags creation,
+     * the event_flags attributes shall not be affected.
+     *
      * @par POSIX compatibility
      *  No POSIX similar functionality identified, but inspired by POSIX
      *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
@@ -120,6 +123,9 @@ namespace os
      * The effect shall be equivalent to creating an event flags object with
      * the default constructor.
      *
+     * If the _attr_ attributes are modified **after** the event_flags creation,
+     * the event_flags attributes shall not be affected.
+     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     event_flags::event_flags (const attributes& attr) :
@@ -150,6 +156,9 @@ namespace os
      * initialise event flags.
      * The effect shall be equivalent to creating an event flags object with
      * the default constructor.
+     *
+     * If the _attr_ attributes are modified **after** the event_flags creation,
+     * the event_flags attributes shall not be affected.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */

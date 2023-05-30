@@ -46,6 +46,9 @@ namespace os
      * To simplify access, the member variables are public and do not
      * require accessors or mutators.
      *
+     * If the attributes are modified **after** the memory_pool creation,
+     * the memory_pool attributes shall not be affected.
+     *
      * @par Example
      *
      * Define an array of structures and
@@ -223,6 +226,9 @@ namespace os
      * the storage is dynamically allocated using the RTOS specific allocator
      * (`rtos::memory::allocator`).
      *
+     * If the _attr_ attributes are modified **after** the memory_pool creation,
+     * the memory_pool attributes shall not be affected.
+     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     memory_pool::memory_pool (std::size_t blocks, std::size_t block_size_bytes,
@@ -256,6 +262,9 @@ namespace os
      * `mp_pool_size_bytes`), that storage is used, otherwise
      * the storage is dynamically allocated using the RTOS specific allocator
      * (`rtos::memory::allocator`).
+     *
+     * If the _attr_ attributes are modified **after** the memory_pool creation,
+     * the memory_pool attributes shall not be affected.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */

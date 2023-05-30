@@ -50,6 +50,9 @@ namespace os
      * To simplify access, the member variables are public and do not
      * require accessors or mutators.
      *
+     * If the attributes are modified **after** the semaphore creation,
+     * the semaphore attributes shall not be affected.
+     *
      * @par POSIX compatibility
      *  No POSIX similar functionality identified, but inspired by POSIX
      *  attributes used in [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
@@ -138,6 +141,9 @@ namespace os
      * initialise semaphores.
      * The effect shall be equivalent to creating a semaphore
      * object with the default constructor.
+     *
+     * If the _attr_ attributes are modified **after** the semaphore creation,
+     * the semaphore attributes shall not be affected.
      *
      * @par POSIX compatibility
      *  Inspired by [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)

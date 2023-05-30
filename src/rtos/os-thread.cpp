@@ -65,6 +65,9 @@ namespace os
      * To simplify access, the member variables are public and do not
      * require accessors or mutators.
      *
+     * If the attributes are modified **after** the thread creation,
+     * the thread attributes shall not be affected.
+     *
      * @par POSIX compatibility
      *  Inspired by `pthread_attr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
      *  (IEEE Std 1003.1, 2013 Edition).
@@ -300,6 +303,9 @@ namespace os
      * the stack is dynamically allocated using the RTOS specific allocator
      * (`rtos::memory::allocator`).
      *
+     * If the _attr_ attributes are modified **after** the thread creation,
+     * the thread attributes shall not be affected.
+     *
      * @par POSIX compatibility
      *  Inspired by [`pthread_create()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html)
      *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
@@ -348,6 +354,9 @@ namespace os
      * `th_stack_size_bytes`), that stack is used, otherwise
      * the stack is dynamically allocated using the RTOS specific allocator
      * (`rtos::memory::allocator`).
+     *
+     * If the _attr_ attributes are modified **after** the thread creation,
+     * the thread attributes shall not be affected.
      *
      * @par POSIX compatibility
      *  Inspired by [`pthread_create()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_create.html)

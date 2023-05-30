@@ -43,6 +43,9 @@ namespace os
      * To simplify access, the member variables are public and do not
      * require accessors or mutators.
      *
+     * If the attributes are modified **after** the timer creation,
+     * the timer attributes shall not be affected.
+     *
      * @par POSIX compatibility
      *  No POSIX similar functionality identified, but inspired by POSIX
      *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
@@ -133,6 +136,9 @@ namespace os
      * The effect shall be equivalent to creating a timer
      * object with the simple constructor.
      *
+     * If the _attr_ attributes are modified **after** the timer creation,
+     * the timer attributes shall not be affected.
+     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     timer::timer (func_t function, func_args_t args, const attributes& attr) :
@@ -162,6 +168,9 @@ namespace os
      * initialise timers.
      * The effect shall be equivalent to creating a timer
      * object with the simple constructor.
+     *
+     * If the _attr_ attributes are modified **after** the timer creation,
+     * the timer attributes shall not be affected.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */

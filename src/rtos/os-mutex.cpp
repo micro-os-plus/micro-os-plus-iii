@@ -44,6 +44,9 @@ namespace os
      * To simplify access, the member variables are public and do not
      * require accessors or mutators.
      *
+     * If the attributes are modified **after** the mutex creation,
+     * the mutex attributes shall not be affected.
+     *
      * @par POSIX compatibility
      *  Inspired by `pthread_mutexattr_t`
      *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
@@ -421,6 +424,9 @@ namespace os
      * The effect shall be equivalent to creating a mutex
      * object with the default constructor.
      *
+     * If the _attr_ attributes are modified **after** the mutex creation,
+     * the mutex attributes shall not be affected.
+     *
      * @par POSIX compatibility
      *  Inspired by [`pthread_mutex_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_init.html)
      *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
@@ -454,6 +460,9 @@ namespace os
      * initialise mutex objects.
      * The effect shall be equivalent to creating a mutex
      * object with the default constructor.
+     *
+     * If the _attr_ attributes are modified **after** the mutex creation,
+     * the mutex attributes shall not be affected.
      *
      * @par POSIX compatibility
      *  Inspired by [`pthread_mutex_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_mutex_init.html)
