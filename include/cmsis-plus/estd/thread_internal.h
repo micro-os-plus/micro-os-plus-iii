@@ -372,11 +372,14 @@ template<typename Callable_T, typename ... Args_T>
 
     // The function to start the thread is a custom proxy that
     // knows how to get the variadic arguments.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-function-type"
     id_ = id
       { new os::rtos::thread (
           reinterpret_cast<os::rtos::thread::func_t> (&run_function_object<
               Function_object> ),
           reinterpret_cast<os::rtos::thread::func_args_t> (funct_obj)) };
+#pragma GCC diagnostic pop
 
     // The deleter, to be used during destruction.
     function_object_deleter_ =
