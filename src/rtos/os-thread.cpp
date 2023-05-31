@@ -254,6 +254,10 @@ namespace os
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
+      // Must be explicit here, since they are not done in the members
+      // declarations to allow th_check_reuse.
+      state_ = state::initializing;
+      func_ = nullptr;
     }
 
     thread::thread (const char* name) :
@@ -263,6 +267,10 @@ namespace os
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
+      // Must be explicit here, since they are not done in the members
+      // declarations to allow th_check_reuse.
+      state_ = state::initializing;
+      func_ = nullptr;
     }
 
     /**
@@ -373,6 +381,16 @@ namespace os
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
+
+#if defined(DEBUG)
+      if (attr.th_check_reuse) {
+        assert((state_ == state::undefined || state_ == state::destroyed) &&
+               (func_ == nullptr || func_ == reinterpret_cast<func_t>(OS_INTEGER_RTOS_REUSE_MAGIC)));
+      }
+#endif /* defined(DEBUG) */
+
+      state_ = state::initializing;
+      func_ = nullptr;
 
       allocator_ = &allocator;
 
@@ -1018,6 +1036,9 @@ namespace os
           assert(children_.empty ());
           parent_ = nullptr;
 
+          func_ = nullptr;
+          func_args_ = nullptr;
+
           // There must be no more mutexes locked by this thread.
           assert(mutexes_.empty ());
           assert(acquired_mutexes_ == 0);
@@ -1119,6 +1140,10 @@ namespace os
         }
 
       state_ = state::destroyed;
+#if defined(DEBUG)
+      // Set this member to a magic value, to help check for reuse.
+      func_ = reinterpret_cast<func_t> (OS_INTEGER_RTOS_REUSE_MAGIC);
+#endif
 
       if (joiner_ != nullptr)
         {

@@ -1573,7 +1573,8 @@ namespace os
       internal::waiting_thread_node ready_node_
         { *this };
 
-      func_t func_ = nullptr;
+      // DO NOT initialise here, it is used to check for reuse.
+      func_t func_; // = nullptr;
       func_args_t func_args_ = nullptr;
       void* func_result_ = nullptr;
 
@@ -1631,7 +1632,8 @@ namespace os
       //              thread::_timed_flags_wait()
       // - terminated - in state::internal_exit_()
       // - destroyed - in thread::internal_destroy_()
-      state_t volatile state_ = state::undefined;
+      // DO NOT initialise here, it is used to check for reuse.
+      state_t volatile state_; // = state::initializing;
 
       // There are two values used as thread priority. The main one is
       // assigned via `priority(int)`, and is stored in `prio_assigned_`.
