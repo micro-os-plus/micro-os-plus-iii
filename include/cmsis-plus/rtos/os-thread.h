@@ -845,7 +845,7 @@ namespace os
          */
         priority_t th_priority = priority::normal;
 
-        bool th_check_reuse = false;
+        bool th_assert_reuse = false;
 
         // Add more attributes here.
 

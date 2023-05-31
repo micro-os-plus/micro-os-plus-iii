@@ -255,7 +255,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
       // Must be explicit here, since they are not done in the members
-      // declarations to allow th_check_reuse.
+      // declarations to allow th_assert_reuse.
       state_ = state::initializing;
       func_ = nullptr;
     }
@@ -268,7 +268,7 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
       // Must be explicit here, since they are not done in the members
-      // declarations to allow th_check_reuse.
+      // declarations to allow th_assert_reuse.
       state_ = state::initializing;
       func_ = nullptr;
     }
@@ -383,7 +383,7 @@ namespace os
 #endif
 
 #if defined(DEBUG)
-      if (attr.th_check_reuse) {
+      if (attr.th_assert_reuse) {
         // Expect either statically initialised, or destroyed.
         assert((state_ == state::undefined && func_ == nullptr) ||
                (state_ == state::destroyed && func_ == reinterpret_cast<func_t>(OS_INTEGER_RTOS_REUSE_MAGIC)));
