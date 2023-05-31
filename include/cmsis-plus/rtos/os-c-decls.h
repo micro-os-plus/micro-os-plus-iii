@@ -40,7 +40,7 @@
 // ----------------------------------------------------------------------------
 
 #include <cmsis-plus/os-versions.h>
- 
+
 #include <cmsis-plus/os-app-config.h>
 #include <cmsis-plus/rtos/port/os-decls.h>
 
@@ -317,7 +317,11 @@ extern "C"
     /**
      * @brief Terminated and resources (like stack) released.
      */
-    os_thread_state_destroyed = 5
+    os_thread_state_destroyed = 5,
+    /**
+     * @brief Used to check reused threads.
+     */
+    os_thread_state_initialising = 6,
   };
 
   /**

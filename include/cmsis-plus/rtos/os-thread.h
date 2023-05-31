@@ -375,7 +375,11 @@ namespace os
           /**
            * @brief Terminated and resources (like stack) released.
            */
-          destroyed = 5
+          destroyed = 5, //
+          /**
+           * @brief Used to check reused threads.
+           */
+          initializing = 6, //
         };
         /* enum  */
       }; /* struct state */
