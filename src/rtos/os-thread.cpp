@@ -384,8 +384,9 @@ namespace os
 
 #if defined(DEBUG)
       if (attr.th_check_reuse) {
-        assert((state_ == state::undefined || state_ == state::destroyed) &&
-               (func_ == nullptr || func_ == reinterpret_cast<func_t>(OS_INTEGER_RTOS_REUSE_MAGIC)));
+        // Expect either statically initialised, or destroyed.
+        assert((state_ == state::undefined && func_ == nullptr) ||
+               (state_ == state::destroyed && func_ == reinterpret_cast<func_t>(OS_INTEGER_RTOS_REUSE_MAGIC)));
       }
 #endif /* defined(DEBUG) */
 
