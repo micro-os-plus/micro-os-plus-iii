@@ -279,6 +279,31 @@ namespace os
 
     /**
      * @details
+     *
+     * Check the thread status to determine if in
+     * a constructed state.
+     * This is useful for threads constructed via placement new,
+     * to avoid constructing them is already constructed.
+     *
+     * For extra robustness, the code also sets the `func_`
+     * member to a magic value after destruction.
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
+    bool
+    thread::is_constructed(const thread& thread)
+    {
+      return ((thread.state_ == state::ready ||
+               thread.state_ == state::running ||
+               thread.state_ == state::suspended ||
+               thread.state_ == state::terminated) &&
+              (thread.func_ != nullptr &&
+               thread.func_ != reinterpret_cast<func_t>(OS_INTEGER_RTOS_REUSE_MAGIC))
+             );
+    }
+
+    /**
+     * @details
      * This constructor shall initialise a thread object
      * with attributes referenced by _attr_.
      * If the attributes specified by _attr_ are modified later,

@@ -509,6 +509,14 @@ extern "C"
   os_thread_delete (os_thread_t* thread);
 
   /**
+   * @brief Check if the thread is constructed.
+   * @param [in] thread Pointer to thread object instance.
+   * @return true if the thread is in the constructed state.
+   */
+  bool
+  os_thread_is_constructed (os_thread_t* thread);
+
+  /**
    * @}
    */
 

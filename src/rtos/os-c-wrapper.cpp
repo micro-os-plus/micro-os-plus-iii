@@ -732,6 +732,22 @@ os_thread_delete (os_thread_t* thread)
  *
  * @par For the complete definition, see
  *  @ref os::rtos::thread::name()
+*/
+bool
+os_thread_is_constructed (os_thread_t* thread)
+{
+  assert (thread != nullptr);
+  return rtos::thread::is_constructed(
+    reinterpret_cast<rtos::thread&> (*thread));
+}
+
+/**
+ * @details
+ *
+ * @note Can be invoked from Interrupt Service Routines.
+ *
+ * @par For the complete definition, see
+ *  @ref os::rtos::thread::name()
  */
 const char*
 os_thread_get_name (os_thread_t* thread)
