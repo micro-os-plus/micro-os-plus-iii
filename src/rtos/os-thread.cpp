@@ -536,7 +536,11 @@ namespace os
       // the exit cleanup code.
       if (this != &this_thread::thread ())
         {
-          kill ();
+          // Extra test to avoid the 'already gone' message.
+          if (state_ != state::destroyed)
+            {
+              kill ();
+            }
         }
       else
         {
