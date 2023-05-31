@@ -1152,10 +1152,8 @@ extern "C"
 #define OS_BOOL_RTOS_SCHEDULER_PREEMPTIVE                   (true)
 #endif
 
-#if defined(DEBUG)
 #if !defined(OS_INTEGER_RTOS_REUSE_MAGIC)
 #define OS_INTEGER_RTOS_REUSE_MAGIC                         (0xA55AAA55)
-#endif
 #endif
 
 // ----------------------------------------------------------------------------

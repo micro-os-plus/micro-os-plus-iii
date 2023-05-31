@@ -388,7 +388,7 @@ namespace os
         assert((state_ == state::undefined && func_ == nullptr) ||
                (state_ == state::destroyed && func_ == reinterpret_cast<func_t>(OS_INTEGER_RTOS_REUSE_MAGIC)));
       }
-#endif /* defined(DEBUG) */
+#endif /* DEBUG */
 
       state_ = state::initializing;
       func_ = nullptr;
@@ -1141,10 +1141,8 @@ namespace os
         }
 
       state_ = state::destroyed;
-#if defined(DEBUG)
       // Set this member to a magic value, to help check for reuse.
       func_ = reinterpret_cast<func_t> (OS_INTEGER_RTOS_REUSE_MAGIC);
-#endif
 
       if (joiner_ != nullptr)
         {
