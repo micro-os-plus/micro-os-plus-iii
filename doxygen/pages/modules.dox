@@ -134,7 +134,7 @@
  `OS_TRACE_*`, ...); for these definitions only the presence should be tested;
  the value, if present, should be completely ignored;
  - definitions of types (`OS_TYPE_*`); the values are special and represent
- expressions that can be sed as types to define variables or other types.
+ expressions that can be used as types to define variables or other types.
 
  */
 
