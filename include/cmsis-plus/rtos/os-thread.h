@@ -1581,8 +1581,7 @@ namespace os
       internal::waiting_thread_node ready_node_
         { *this };
 
-      // DO NOT initialise here, it is used to check for reuse.
-      func_t func_; // = nullptr;
+      func_t func_ = nullptr;
       func_args_t func_args_ = nullptr;
       void* func_result_ = nullptr;
 

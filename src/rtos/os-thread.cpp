@@ -270,7 +270,6 @@ namespace os
       // Must be explicit here, since they are not done in the members
       // declarations to allow th_enable_assert_reuse.
       state_ = state::initializing;
-      func_ = nullptr;
     }
 
     /**
@@ -285,10 +284,10 @@ namespace os
      * This is useful for threads constructed via placement new,
      * to avoid constructing them is already constructed.
      *
-     * For extra robustness, the code also sets the `func_`
-     * member to a magic value after destruction.
-     *
      * @note Can be invoked from Interrupt Service Routines.
+     *
+     * @todo: Consider adding a separate member with the magic,
+     * for improved reliability.
      */
     bool
     thread::is_constructed(const thread& thread)
@@ -296,10 +295,7 @@ namespace os
       return ((thread.state_ == state::ready ||
                thread.state_ == state::running ||
                thread.state_ == state::suspended ||
-               thread.state_ == state::terminated) &&
-              (thread.func_ != nullptr &&
-               thread.func_ != reinterpret_cast<func_t>(OS_INTEGER_RTOS_REUSE_MAGIC))
-             );
+               thread.state_ == state::terminated));
     }
 
     /**
@@ -409,14 +405,12 @@ namespace os
 
 #if defined(DEBUG)
       if (attr.th_enable_assert_reuse) {
-        // Expect either statically initialised, or destroyed.
-        assert((state_ == state::undefined && func_ == nullptr) ||
-               (state_ == state::destroyed && func_ == reinterpret_cast<func_t>(OS_INTEGER_RTOS_REUSE_MAGIC)));
+        // Expect either statically initialised (undefined), or destroyed.
+        assert((state_ == state::undefined) || (state_ == state::destroyed));
       }
 #endif /* DEBUG */
 
       state_ = state::initializing;
-      func_ = nullptr;
 
       allocator_ = &allocator;
 
@@ -1166,8 +1160,6 @@ namespace os
         }
 
       state_ = state::destroyed;
-      // Set this member to a magic value, to help check for reuse.
-      func_ = reinterpret_cast<func_t> (OS_INTEGER_RTOS_REUSE_MAGIC);
 
       if (joiner_ != nullptr)
         {
@@ -1246,6 +1238,9 @@ namespace os
 #endif
 
           func_result_ = nullptr;
+
+          func_ = nullptr;
+          func_args_ = nullptr;
 
           internal_destroy_ ();
 
