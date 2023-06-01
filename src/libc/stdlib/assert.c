@@ -58,6 +58,8 @@ __attribute__((noreturn))
 __assert_func (const char* file, int line, const char* func,
                const char* failedexpr)
 {
+  os_irq_critical_enter ();
+
   // Not atomic, but otherwise the entire string might get too long,
   // and temporary buffer used by trace_printf() will overflow.
 #if defined(TRACE)
