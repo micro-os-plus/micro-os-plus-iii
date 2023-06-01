@@ -2419,6 +2419,9 @@ namespace os
      * @cond ignore
      */
 
+    // Runs during context switches, on the
+    // scheduler timer interrupt context, for the thread being
+    // switched out.
     inline void
     thread::internal_relink_running_ (void)
     {
@@ -2437,7 +2440,9 @@ namespace os
           // did not underflow the stack.
           if (!stack ().check_bottom_magic ())
             {
-              trace::printf("%s() @%p %s\n", __func__, this, name ());
+              // The `\n` is intentional, to make the message more readable,
+              // since it can occur inside another message.
+              trace::printf("\n%s() @%p %s\n", __func__, this, name ());
               assert (stack ().check_bottom_magic ());
             }
         }
