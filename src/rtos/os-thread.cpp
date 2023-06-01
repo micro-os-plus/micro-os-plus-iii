@@ -279,10 +279,11 @@ namespace os
     /**
      * @details
      *
-     * Check the thread status to determine if in
+     * Check the thread status to determine if the thread is already in
      * a constructed state.
-     * This is useful for threads constructed via placement new,
-     * to avoid constructing them is already constructed.
+     * This is useful for threads constructed via the C API or
+     * in C++ via placement new,
+     * to avoid constructing them when already constructed.
      *
      * @note Can be invoked from Interrupt Service Routines.
      *
