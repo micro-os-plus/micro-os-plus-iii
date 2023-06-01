@@ -540,7 +540,7 @@ extern "C"
     /**
      *
      */
-    bool th_assert_reuse;
+    bool th_enable_assert_reuse;
 
   } os_thread_attr_t;
 
