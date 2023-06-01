@@ -191,6 +191,7 @@ static_assert(sizeof(rtos::thread::attributes) == sizeof(os_thread_attr_t), "adj
 static_assert(offsetof(rtos::thread::attributes, th_stack_address) == offsetof(os_thread_attr_t, th_stack_address), "adjust os_thread_attr_t members");
 static_assert(offsetof(rtos::thread::attributes, th_stack_size_bytes) == offsetof(os_thread_attr_t, th_stack_size_bytes), "adjust os_thread_attr_t members");
 static_assert(offsetof(rtos::thread::attributes, th_priority) == offsetof(os_thread_attr_t, th_priority), "adjust os_thread_attr_t members");
+static_assert(offsetof(rtos::thread::attributes, th_assert_reuse) == offsetof(os_thread_attr_t, th_assert_reuse), "adjust os_thread_attr_t members");
 
 static_assert(sizeof(rtos::timer) == sizeof(os_timer_t), "adjust size of os_timer_t");
 static_assert(sizeof(rtos::timer::attributes) == sizeof(os_timer_attr_t), "adjust size of os_timer_attr_t");

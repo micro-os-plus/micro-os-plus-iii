@@ -537,6 +537,11 @@ extern "C"
      */
     os_thread_prio_t th_priority;
 
+    /**
+     *
+     */
+    bool th_assert_reuse;
+
   } os_thread_attr_t;
 
   /**
