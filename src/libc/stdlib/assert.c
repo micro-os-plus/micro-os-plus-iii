@@ -69,10 +69,13 @@ __assert_func (const char* file, int line, const char* func,
     {
       trace_printf ("function: %s\n", func);
     }
-  if (os_this_thread() != NULL)
+  if (!os_irq_in_handler_mode())
     {
-      trace_printf ("this_thread: %s @%p\n", os_thread_get_name(os_this_thread()),
-                    os_this_thread());
+      if (os_this_thread() != NULL)
+        {
+          trace_printf ("this_thread: %s @%p\n", os_thread_get_name(os_this_thread()),
+                        os_this_thread());
+        }
     }
 
 #elif defined(OS_USE_SEMIHOSTING_SYSCALLS)
@@ -84,10 +87,13 @@ __assert_func (const char* file, int line, const char* func,
     {
       printf ("function: %s\n", func);
     }
-  if (os_this_thread() != NULL)
+  if (!os_irq_in_handler_mode())
     {
-      printf ("this_thread: %s @%p\n", os_thread_get_name(os_this_thread()),
-              os_this_thread());
+      if (os_this_thread() != NULL)
+        {
+          printf ("this_thread: %s @%p\n", os_thread_get_name(os_this_thread()),
+                        os_this_thread());
+        }
     }
 
 #endif
