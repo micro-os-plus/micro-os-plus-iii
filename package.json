@@ -4,34 +4,51 @@
   "description": "A source xPack with µOS++",
   "main": "",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "npm-install": "npm install",
+    "pack": "npm pack",
+    "version-patch": "npm version patch",
+    "version-minor": "npm version minor",
+    "postversion": "git push origin --all && git push origin --tags",
+    "git-log": "git log --pretty='%cd * %h %s' --date=short"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/micro-os-plus/micro-os-plus-iii.git"
   },
-  "homepage": "https://github.com/micro-os-plus/micro-os-plus-iii/",
+  "homepage": "https://github.com/micro-os-plus/micro-os-plus-iii",
   "bugs": {
-    "url": "https://github.com/micro-os-plus/micro-os-plus-iii/issues/"
+    "url": "https://github.com/micro-os-plus/micro-os-plus-iii/issues"
   },
   "keywords": [
-    "xpack"
+    "xpack",
+    "c++",
+    "micro-os-plus"
   ],
   "author": {
     "name": "Liviu Ionescu",
     "email": "ilg@livius.net",
-    "url": "https://github.com/ilg-ul/"
+    "url": "https://github.com/ilg-ul"
   },
   "license": "MIT",
   "config": {},
   "dependencies": {},
   "devDependencies": {},
   "xpack": {
-    "minimumXpmRequired": "0.15.2",
+    "minimumXpmRequired": "0.16.0",
     "dependencies": {},
+    "$dependenciesUrls": [
+      "https://github.com/micro-os-plus",
+      "https://github.com/micro-os-plus",
+      "https://github.com/xpack-dev-tools"
+    ],
     "devDependencies": {},
     "properties": {},
-    "actions": {},
+    "actions": {
+      "install": [
+        "npm install",
+        "xpm install"
+      ]
+    },
     "buildConfigurations": {}
   }
 }
