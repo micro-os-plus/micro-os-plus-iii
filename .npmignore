@@ -10,8 +10,9 @@ Thumbs.db
 build/
 *.tgz
 inspiration/
-test/
+test*/
 doxygen/
 docs/
 templates/
 *.launch
+scripts/
