@@ -290,7 +290,7 @@ namespace os
      * it is necessary for the thread to start with the memory cleared,
      * for example via a `memset()`.
      *
-     * @todo: Consider adding a separate member with the magic,
+     * @todo Consider adding a separate member with the magic,
      * for improved reliability.
      *
      * @note Can be invoked from Interrupt Service Routines.
