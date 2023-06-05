@@ -1082,7 +1082,7 @@ namespace os
       /**
        * @brief Check if the thread is constructed.
        * @param [in] thread Reference to thread object instance.
-       * @return true if the thread is in the constructed state.
+       * @return true if the thread was constructed and not yet destructed.
        */
       static bool
       is_constructed(const thread& thread);

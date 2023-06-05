@@ -732,7 +732,7 @@ os_thread_delete (os_thread_t* thread)
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
- *  @ref os::rtos::thread::name()
+ *  @ref os::rtos::thread::is_constructed()
 */
 bool
 os_thread_is_constructed (os_thread_t* thread)

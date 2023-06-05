@@ -511,7 +511,7 @@ extern "C"
   /**
    * @brief Check if the thread is constructed.
    * @param [in] thread Pointer to thread object instance.
-   * @return true if the thread is in the constructed state.
+   * @return true if the thread was constructed and not yet destructed.
    */
   bool
   os_thread_is_constructed (os_thread_t* thread);

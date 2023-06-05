@@ -280,15 +280,20 @@ namespace os
      * @details
      *
      * Check the thread status to determine if the thread is already in
-     * a constructed state.
+     * a constructed state, which means it was constructed and not yet
+     * destructed.
      * This is useful for threads constructed via the C API or
      * in C++ via placement new,
      * to avoid constructing them when already constructed.
      *
-     * @note Can be invoked from Interrupt Service Routines.
+     * @note For this function to be accurate before the first invocation,
+     * it is necessary for the thread to start with the memory cleared,
+     * for example via a `memset()`.
      *
      * @todo: Consider adding a separate member with the magic,
      * for improved reliability.
+     *
+     * @note Can be invoked from Interrupt Service Routines.
      */
     bool
     thread::is_constructed(const thread& thread)
