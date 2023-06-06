@@ -24,6 +24,8 @@ message(VERBOSE "Including platform-native global definitions...")
 
 set(xpack_platform_common_args
   -Werror
+  # Apple clang 13 does not support -Wunused-but-set-variable
+  $<$<PLATFORM_ID:Darwin>:-Wno-unknown-warning-option>
   # $<$<PLATFORM_ID:Darwin>:-Wno-missing-include-dirs>
 )
 

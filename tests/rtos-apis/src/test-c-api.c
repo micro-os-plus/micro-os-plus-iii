@@ -128,7 +128,9 @@ int
 test_c_api (void)
 {
 #pragma GCC diagnostic push
+#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
 
   const char* name;
   bool flag;
@@ -630,7 +632,9 @@ test_c_api (void)
       assert(msg_in.i = 1);
 
 #pragma GCC diagnostic push
+#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
 
       const char* str;
       size_t n;
