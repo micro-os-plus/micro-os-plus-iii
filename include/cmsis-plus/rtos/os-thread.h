@@ -42,6 +42,15 @@
 
 // ----------------------------------------------------------------------------
 
+#pragma GCC diagnostic push
+
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
+#endif
+
+// ----------------------------------------------------------------------------
+
 /**
  * @cond ignore
  */
@@ -55,9 +64,14 @@ namespace
 void
 os_rtos_idle_actions (void);
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
 /**
  * @endcond
  */
+#pragma GCC diagnostic pop
 
 namespace os
 {
@@ -2784,6 +2798,8 @@ namespace os
 
   } /* namespace rtos */
 } /* namespace os */
+
+#pragma GCC diagnostic pop
 
 // ----------------------------------------------------------------------------
 

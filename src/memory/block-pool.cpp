@@ -30,6 +30,12 @@
 
 // ----------------------------------------------------------------------------
 
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
+
+// ----------------------------------------------------------------------------
+
 namespace os
 {
   namespace memory
@@ -57,7 +63,13 @@ namespace os
 
       void* p = static_cast<void*> (first_);
       first_ = *(static_cast<void**> (first_));
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#endif
       ++count_;
+#pragma GCC diagnostic pop
 
       // Update statistics.
       // What is subtracted from free is added to allocated.
@@ -98,7 +110,12 @@ namespace os
       // Now this block is the first in the free list..
       first_ = addr;
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#endif
       --count_;
+#pragma GCC diagnostic pop
 
       // Update statistics.
       // What is subtracted from allocated is added to free.

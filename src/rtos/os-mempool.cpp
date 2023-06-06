@@ -30,6 +30,12 @@
 
 // ----------------------------------------------------------------------------
 
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
+
+// ----------------------------------------------------------------------------
+
 namespace os
 {
   namespace rtos
@@ -469,7 +475,14 @@ namespace os
         {
           void* p = static_cast<void*> (first_);
           first_ = *(static_cast<void**> (first_));
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#endif
           ++count_;
+#pragma GCC diagnostic pop
+
           return p;
         }
 
@@ -804,7 +817,13 @@ namespace os
           // Now this block is the first one.
           first_ = block;
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#endif
           --count_;
+#pragma GCC diagnostic pop
+
           // ----- Exit critical section --------------------------------------
         }
 

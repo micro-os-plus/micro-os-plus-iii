@@ -32,6 +32,12 @@
 
 // ----------------------------------------------------------------------------
 
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
+
+// ----------------------------------------------------------------------------
+
 namespace os
 {
   namespace rtos
@@ -531,10 +537,15 @@ namespace os
 
 #else
 
-          // Create the context.
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
+#endif
+          // Create the port specific context.
           port::context::create (
               &context_, reinterpret_cast<void*> (internal_invoke_with_exit_),
               this);
+#pragma GCC diagnostic pop
 
           if (!scheduler::started ())
             {

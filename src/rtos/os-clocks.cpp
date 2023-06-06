@@ -29,6 +29,12 @@
 
 // ----------------------------------------------------------------------------
 
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
+
+// ----------------------------------------------------------------------------
+
 using namespace os;
 using namespace os::rtos;
 
@@ -320,7 +326,12 @@ namespace os
       // ----- Enter critical section -----------------------------------------
       interrupts::critical_section ics;
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#endif
       steady_count_ += duration;
+#pragma GCC diagnostic pop
 
       internal_check_timestamps ();
       return steady_count_;

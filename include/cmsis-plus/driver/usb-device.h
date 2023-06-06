@@ -44,6 +44,16 @@
 #include <cstdint>
 #include <cstddef>
 
+// ----------------------------------------------------------------------------
+
+#pragma GCC diagnostic push
+
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
+
+// ----------------------------------------------------------------------------
+
 namespace os
 {
   namespace driver
@@ -548,6 +558,8 @@ namespace os
     } /* namespace usb */
   } /* namespace driver */
 } /* namespace os */
+
+#pragma GCC diagnostic pop
 
 #endif /* __cplusplus */
 

@@ -27,6 +27,14 @@
 
 #include <cmsis-plus/estd/thread>
 
+// ----------------------------------------------------------------------------
+
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
+
+// ----------------------------------------------------------------------------
+
 namespace os
 {
   namespace estd

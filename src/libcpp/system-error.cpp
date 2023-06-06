@@ -34,6 +34,13 @@
 
 // ----------------------------------------------------------------------------
 
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#pragma clang diagnostic ignored "-Wc++98-compat-bind-to-temporary-copy"
+#endif
+
+// ----------------------------------------------------------------------------
+
 using namespace os;
 
 // ----------------------------------------------------------------------------
@@ -111,6 +118,7 @@ namespace os
     __throw_system_error (int ev, const char* what_arg)
     {
 #if defined(__EXCEPTIONS)
+      // error: copying parameter of type 'os::estd::system_error_category' when binding a reference to a temporary would invoke a deleted constructor in C++98 [-Werror,-Wc++98-compat-bind-to-temporary-copy]
       throw std::system_error (std::error_code (ev, system_error_category ()),
           what_arg);
 #else
@@ -123,6 +131,7 @@ namespace os
     __throw_cmsis_error (int ev, const char* what_arg)
     {
 #if defined(__EXCEPTIONS)
+      // error: copying parameter of type 'os::estd::cmsis_error_category' when binding a reference to a temporary would invoke a deleted constructor in C++98 [-Werror,-Wc++98-compat-bind-to-temporary-copy]
       throw std::system_error (std::error_code (ev, cmsis_error_category ()),
           what_arg);
 #else

@@ -48,6 +48,12 @@
 
 // ----------------------------------------------------------------------------
 
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
+
+// ----------------------------------------------------------------------------
+
 // Notes: Function prefix.
 //
 // To facilitate testing on POSIX platforms, and also to allow
@@ -75,6 +81,8 @@ extern "C"
 // ---- POSIX IO functions ----------------------------------------------------
 
 using namespace os;
+
+// ----------------------------------------------------------------------------
 
 /**
  * @details

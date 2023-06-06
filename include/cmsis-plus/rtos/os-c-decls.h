@@ -50,6 +50,14 @@
 
 // ----------------------------------------------------------------------------
 
+#pragma GCC diagnostic push
+
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
+#endif
+
+// ----------------------------------------------------------------------------
+
 #ifdef  __cplusplus
 extern "C"
 {
@@ -1500,5 +1508,11 @@ extern "C"
 #ifdef  __cplusplus
 }
 #endif
+
+// ----------------------------------------------------------------------------
+
+#pragma GCC diagnostic push
+
+// ----------------------------------------------------------------------------
 
 #endif /* CMSIS_PLUS_RTOS_OS_C_STRUCTS_H_ */

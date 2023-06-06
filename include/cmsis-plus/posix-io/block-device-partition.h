@@ -40,6 +40,14 @@
 
 // ----------------------------------------------------------------------------
 
+#pragma GCC diagnostic push
+
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
+
+// ----------------------------------------------------------------------------
+
 namespace os
 {
   namespace posix
@@ -395,6 +403,8 @@ namespace os
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wweak-template-vtables"
+// error: extern templates are incompatible with C++98 [-Werror,-Wc++98-compat-pedantic]
+#pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
 #endif
 
     extern template class block_device_partition_implementable<
@@ -545,6 +555,8 @@ namespace os
   // ==========================================================================
   } /* namespace posix */
 } /* namespace os */
+
+#pragma GCC diagnostic pop
 
 #endif /* __cplusplus */
 

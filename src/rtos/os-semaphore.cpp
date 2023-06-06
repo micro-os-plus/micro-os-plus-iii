@@ -29,6 +29,12 @@
 
 // ----------------------------------------------------------------------------
 
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
+
+// ----------------------------------------------------------------------------
+
 namespace os
 {
   namespace rtos
@@ -274,7 +280,13 @@ namespace os
     {
       if (count_ > 0)
         {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#endif
           --count_;
+#pragma GCC diagnostic pop
+
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
           trace::printf ("%s() @%p %s >%u\n", __func__, this, name (), count_);
 #endif
@@ -358,7 +370,13 @@ namespace os
               return EAGAIN;
             }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#endif
           ++count_;
+#pragma GCC diagnostic pop
+
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
           trace::printf ("%s() @%p %s count %u\n", __func__, this, name (),
                          count_);

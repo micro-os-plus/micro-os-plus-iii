@@ -36,6 +36,15 @@
 
 // ----------------------------------------------------------------------------
 
+#pragma GCC diagnostic push
+
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
+#endif
+
+// ----------------------------------------------------------------------------
+
 namespace os
 {
   namespace estd
@@ -112,6 +121,11 @@ namespace os
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+// error: 'long long' is incompatible with C++98 [-Werror,-Wc++98-compat-pedantic]
+#pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
+#endif
 
       constexpr systicks
       operator"" _ticks (unsigned long long t)
@@ -280,6 +294,8 @@ constexpr        typename std::enable_if<
     } /* namespace chrono */
   } /* namespace estd */
 } /* namespace os */
+
+#pragma GCC diagnostic pop
 
 // ----------------------------------------------------------------------------
 

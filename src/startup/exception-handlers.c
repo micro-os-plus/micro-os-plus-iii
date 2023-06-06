@@ -25,6 +25,12 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wempty-translation-unit"
+#endif
+
+// ----------------------------------------------------------------------------
+
 #if defined(__ARM_EABI__)
 
 // ----------------------------------------------------------------------------
@@ -724,4 +730,3 @@ SysTick_Handler (void)
 // ----------------------------------------------------------------------------
 
 #endif /* defined(__ARM_EABI__) */
-

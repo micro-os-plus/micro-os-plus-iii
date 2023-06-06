@@ -29,6 +29,12 @@
 
 // ----------------------------------------------------------------------------
 
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
+
+// ----------------------------------------------------------------------------
+
 namespace os
 {
   namespace rtos
@@ -599,8 +605,13 @@ namespace os
               reinterpret_cast<mutexes_list*> (&owner_->mutexes_);
           th_list->link (*this);
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#endif
           // Count the number of mutexes acquired by the thread.
           ++(owner_->acquired_mutexes_);
+#pragma GCC diagnostic pop
 
           if (protocol_ == protocol::protect)
             {
@@ -666,8 +677,13 @@ namespace os
                   return EAGAIN;
                 }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#endif
               // Increment the recursion depth counter.
               ++count_;
+#pragma GCC diagnostic pop
 
 #if defined(OS_TRACE_RTOS_MUTEX)
               trace::printf ("%s() @%p %s by %p %s >%u\n", __func__, this,
@@ -762,7 +778,14 @@ namespace os
             {
               if ((type_ == type::recursive) && (count_ > 1))
                 {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#endif
+                  // Decrement the recursion depth counter.
                   --count_;
+#pragma GCC diagnostic pop
+
 #if defined(OS_TRACE_RTOS_MUTEX)
                   trace::printf ("%s() @%p %s >%u\n", __func__, this, name (),
                                  count_);
@@ -770,7 +793,12 @@ namespace os
                   return result::ok;
                 }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#endif
               --(owner_->acquired_mutexes_);
+#pragma GCC diagnostic pop
 
               // Remove this mutex from the thread list; ineffective if
               // not linked.

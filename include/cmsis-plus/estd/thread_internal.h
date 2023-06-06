@@ -40,6 +40,16 @@
  * - that has a trivial, non-deleted destructor (15.4).
  */
 
+// ----------------------------------------------------------------------------
+
+#pragma GCC diagnostic push
+
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
+
+// ----------------------------------------------------------------------------
+
 /**
  * @brief Standard thread.
  */
@@ -544,3 +554,5 @@ namespace this_thread
 
     }
 } /* namespace this_thread */
+
+#pragma GCC diagnostic pop

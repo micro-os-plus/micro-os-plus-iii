@@ -31,6 +31,12 @@
 
 // ----------------------------------------------------------------------------
 
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
+
+// ----------------------------------------------------------------------------
+
 namespace os
 {
   namespace rtos
@@ -55,7 +61,12 @@ namespace os
                 *oflags = flags_mask_;
               }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#endif
             flags_mask_ |= mask;
+#pragma GCC diagnostic pop
 
             // ----- Exit critical section --------------------------------------
           }
@@ -95,8 +106,13 @@ namespace os
 
             if (mode & flags::mode::clear)
               {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#endif
                 // Clear desired flags.
                 flags_mask_ &= ~mask;
+#pragma GCC diagnostic pop
               }
             return true;
           }
@@ -122,8 +138,13 @@ namespace os
                 ret = flags_mask_ & mask;
                 if ((mode & flags::mode::clear) != 0)
                   {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#endif
                     // Clear the selected bits; leave the rest untouched.
                     flags_mask_ &= ~mask;
+#pragma GCC diagnostic pop
                   }
               }
             // ----- Exit critical section --------------------------------------
@@ -147,8 +168,13 @@ namespace os
                 *oflags = flags_mask_;
               }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#endif
             // Clear the selected bits; leave the rest untouched.
             flags_mask_ &= ~mask;
+#pragma GCC diagnostic pop
 
             // ----- Exit critical section --------------------------------------
           }

@@ -32,6 +32,14 @@
 
 // ----------------------------------------------------------------------------
 
+#pragma GCC diagnostic push
+
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
+
+// ----------------------------------------------------------------------------
+
 extern "C"
 {
   // Avoid to include <Driver_USART.h>
@@ -150,6 +158,8 @@ namespace os
 
   } /* namespace driver */
 } /* namespace os */
+
+#pragma GCC diagnostic pop
 
 // ----------------------------------------------------------------------------
 

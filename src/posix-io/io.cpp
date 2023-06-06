@@ -41,6 +41,12 @@
 
 // ----------------------------------------------------------------------------
 
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
+
+// ----------------------------------------------------------------------------
+
 // Variadic calls are processed in two steps, first prepare a
 // va_list structure, then call implementation functions like doOpen()
 // doIoctl(), that use 'va_list args'.

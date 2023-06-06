@@ -40,6 +40,12 @@
 
 // ----------------------------------------------------------------------------
 
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
+
+// ----------------------------------------------------------------------------
+
 using namespace os;
 
 // ----------------------------------------------------------------------------
@@ -535,8 +541,6 @@ namespace os
       /**
        * @endcond
        */
-      ;
-    // Avoid formatter bug
     } /* namespace pmr */
   } /* namespace estd */
 } /* namespace os */

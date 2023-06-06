@@ -106,6 +106,16 @@
 #include <cmsis-plus/rtos/os-inlines.h>
 #include <cmsis-plus/rtos/port/os-inlines.h>
 
+// ----------------------------------------------------------------------------
+
+#pragma GCC diagnostic push
+
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
+
+// ----------------------------------------------------------------------------
+
 namespace os
 {
   namespace rtos
@@ -181,6 +191,8 @@ namespace os
 
   } /* namespace rtos */
 } /* namespace os */
+
+#pragma GCC diagnostic pop
 
 #endif /* __cplusplus */
 

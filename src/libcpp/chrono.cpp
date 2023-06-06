@@ -30,6 +30,12 @@
 
 // ----------------------------------------------------------------------------
 
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
+
+// ----------------------------------------------------------------------------
+
 namespace os
 {
   namespace estd
@@ -108,6 +114,11 @@ namespace os
       {
         auto cycles = rtos::hrclock.now ();
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+// error: 'long long' is incompatible with C++98 [-Werror,-Wc++98-compat-pedantic]
+#pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
+#endif
         // The duration is the number of sum of SysTick ticks plus the current
         // count of CPU cycles (computed from the SysTick counter).
         // Notice: a more exact solution would be to compute
@@ -120,6 +131,7 @@ namespace os
                   / rtos::hrclock.input_clock_frequency_hz () }
                 + realtime_clock::startup_time_point.time_since_epoch () } //
           };
+#pragma GCC diagnostic pop
       }
 
 #pragma GCC diagnostic pop

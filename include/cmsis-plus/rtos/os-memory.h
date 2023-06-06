@@ -45,6 +45,15 @@
 // The application should use the similar ones from the
 // os::estd:: namespace.
 
+#pragma GCC diagnostic push
+
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
+#endif
+
+// ----------------------------------------------------------------------------
+
 namespace os
 {
   namespace estd
@@ -1736,6 +1745,9 @@ namespace os
     } /* namespace memory */
   } /* namespace rtos */
 } /* namespace os */
+
+#pragma GCC diagnostic pop
+
 
 // ----------------------------------------------------------------------------
 

@@ -29,14 +29,18 @@
 
 // ----------------------------------------------------------------------------
 
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
+
+// ----------------------------------------------------------------------------
+
 namespace
 {
 #if defined(OS_HAS_INTERRUPTS_STACK)
 // Object used to manage the interrupts stack.
   class os::rtos::thread::stack interrupts_stack;
 #endif /* defined(OS_HAS_INTERRUPTS_STACK) */
-  ;
-// Avoid formatter bug
 }
 
 namespace os
@@ -564,10 +568,7 @@ namespace os
 
 #endif /* defined(OS_HAS_INTERRUPTS_STACK) */
 
-      ;
-    // Avoid formatter bug.
-    }
-    /* namespace interrupts */
+    } /* namespace interrupts */
 
     // ========================================================================
     namespace internal

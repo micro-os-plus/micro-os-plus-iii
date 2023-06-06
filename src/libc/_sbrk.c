@@ -25,6 +25,12 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wempty-translation-unit"
+#endif
+
+// ----------------------------------------------------------------------------
+
 #if defined(__ARM_EABI__)
 
 // ----------------------------------------------------------------------------
@@ -96,3 +102,5 @@ _sbrk_r (struct _reent* impure __attribute__((unused)), ptrdiff_t incr)
 // ----------------------------------------------------------------------------
 
 #endif /* defined(__ARM_EABI__) */
+
+// ----------------------------------------------------------------------------

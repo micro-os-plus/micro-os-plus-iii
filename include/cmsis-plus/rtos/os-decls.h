@@ -48,9 +48,21 @@
 #include <cerrno>
 #include <cstring>
 
+// ----------------------------------------------------------------------------
+
+#pragma GCC diagnostic push
+
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
+#endif
+
+// ----------------------------------------------------------------------------
+
 /**
  * @brief System namespace.
  */
+
 namespace os
 {
   /**
@@ -1063,6 +1075,8 @@ namespace os
     } /* namespace port */
   } /* namespace rtos */
 } /* namespace os */
+
+#pragma GCC diagnostic pop
 
 // ----------------------------------------------------------------------------
 

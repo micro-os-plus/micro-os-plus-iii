@@ -36,6 +36,15 @@
 
 // ----------------------------------------------------------------------------
 
+#pragma GCC diagnostic push
+
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
+#endif
+
+// ----------------------------------------------------------------------------
+
 namespace os
 {
   namespace rtos
@@ -824,7 +833,13 @@ namespace os
     clock::internal_increment_count (void)
     {
       // One more tick count passed.
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#endif
       ++steady_count_;
+#pragma GCC diagnostic pop
     }
 
     inline void
@@ -888,16 +903,27 @@ namespace os
             / static_cast<Rep_T> (1000000ul));
       }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#endif
     /**
      * @endcond
      */
+#pragma GCC diagnostic pop
+
     // ========================================================================
     inline void
     __attribute__((always_inline))
     clock_highres::internal_increment_count (void)
     {
       // Increment the highres count by SysTick divisor.
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#endif
       steady_count_ += port::clock_highres::cycles_per_tick ();
+#pragma GCC diagnostic pop
     }
 
     inline uint32_t
@@ -911,6 +937,8 @@ namespace os
 
   } /* namespace rtos */
 } /* namespace os */
+
+#pragma GCC diagnostic pop
 
 // ----------------------------------------------------------------------------
 
