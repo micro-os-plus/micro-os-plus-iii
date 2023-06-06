@@ -32,7 +32,9 @@
   "license": "MIT",
   "config": {},
   "dependencies": {},
-  "devDependencies": {},
+  "devDependencies": {
+    "del-cli": "^5.0.0"
+  },
   "xpack": {
     "minimumXpmRequired": "0.16.0",
     "dependencies": {},
@@ -99,7 +101,8 @@
       "clean-native-cmake": [
         "xpm run clean --config native-cmake-sys-debug --ignore-errors",
         "xpm run clean --config native-cmake-sys-release --ignore-errors"
-      ]
+      ],
+      "deep-clean": "del-cli build node_modules xpacks package-lock.json"
     },
     "buildConfigurations": {
       "cmake-actions": {
