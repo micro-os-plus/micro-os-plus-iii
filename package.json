@@ -41,14 +41,132 @@
       "https://github.com/micro-os-plus",
       "https://github.com/xpack-dev-tools"
     ],
-    "devDependencies": {},
-    "properties": {},
+    "devDependencies": {
+      "@xpack-dev-tools/cmake": "3.23.5-1.1",
+      "@xpack-dev-tools/meson-build": "0.63.3-1.1",
+      "@xpack-dev-tools/ninja-build": "1.11.1-2.1",
+      "@micro-os-plus/build-helper": "github:micro-os-plus/build-helper-xpack#xpack-develop",
+      "@xpacks/arm-cmsis-rtos-validator": "github:xpacks/arm-cmsis-rtos-validator#xpack-develop",
+      "@xpacks/chan-fatfs": "github:xpacks/chan-fatfs#xpack-develop"
+    },
+    "properties": {
+      "buildFolderRelativePath": "{{ 'build' | path_join: configuration.name | to_filename | downcase }}",
+      "buildFolderRelativePathPosix": "{{ 'build' | path_posix_join: configuration.name | downcase }}",
+      "commandCMakePrepare": "{{ properties.commandCMakeReconfigure }} --log-level=VERBOSE",
+      "commandCMakePrepareWithToolchain": "{{ properties.commandCMakePrepare }} -D CMAKE_TOOLCHAIN_FILE=../xpacks/@micro-os-plus/build-helper/cmake/toolchains/{{ properties.toolchainFileName }}",
+      "commandCMakeReconfigure": "cmake -S tests -B {{ properties.buildFolderRelativePathPosix }} -G Ninja -D CMAKE_BUILD_TYPE={{ properties.buildType }} -D PLATFORM_NAME={{ properties.platformName }} -D CMAKE_EXPORT_COMPILE_COMMANDS=ON",
+      "commandCMakeBuild": "cmake --build {{ properties.buildFolderRelativePathPosix }}",
+      "commandCMakeBuildVerbose": "cmake --build {{ properties.buildFolderRelativePathPosix }} --verbose",
+      "commandCMakeClean": "cmake --build {{ properties.buildFolderRelativePathPosix }} --target clean",
+      "commandCMakePerformTests": "cd {{ properties.buildFolderRelativePath }} && ctest -V"
+    },
     "actions": {
       "install": [
         "npm install",
         "xpm install"
+      ],
+      "install-all": [
+        "npm install",
+        "xpm install --all-configs"
+      ],
+      "link-deps": [
+        "xpm link @micro-os-plus/build-helper",
+        "xpm link @xpacks/arm-cmsis-rtos-validator",
+        "xpm link @xpacks/chan-fatfs"
+      ],
+      "link-deps-all": [
+        "xpm run link-deps",
+        "xpm run link-deps --config native-cmake-sys-debug",
+        "xpm run link-deps --config native-cmake-sys-debug"
+      ],
+      "test-all": [
+        "xpm run test-native-cmake"
+      ],
+      "test-native-cmake": [
+        "{% if os.platform == 'darwin' %}xpm run test-native-cmake-sys{% endif %}"
+      ],
+      "test-native-cmake-sys": [
+        "xpm run prepare --config native-cmake-sys-debug",
+        "xpm run build --config native-cmake-sys-debug",
+        "xpm run test --config native-cmake-sys-debug",
+        "xpm run prepare --config native-cmake-sys-release",
+        "xpm run build --config native-cmake-sys-release",
+        "xpm run test --config native-cmake-sys-release"
+      ],
+      "clean-all": [
+        "xpm run clean-native-cmake"
+      ],
+      "clean-native-cmake": [
+        "xpm run clean --config native-cmake-sys-debug --ignore-errors",
+        "xpm run clean --config native-cmake-sys-release --ignore-errors"
       ]
     },
-    "buildConfigurations": {}
+    "buildConfigurations": {
+      "cmake-actions": {
+        "hidden": true,
+        "actions": {
+          "prepare": "{{ properties.commandCMakePrepareWithToolchain }}",
+          "build": [
+            "{{ properties.commandCMakeReconfigure }}",
+            "{{ properties.commandCMakeBuild }}"
+          ],
+          "test": "{{ properties.commandCMakePerformTests }}",
+          "clean": "{{ properties.commandCMakeClean }}"
+        }
+      },
+      "native-dependencies": {
+        "hidden": true,
+        "devDependencies": {
+          "@micro-os-plus/posix-arch": "github:micro-os-plus/posix-arch#xpack-develop"
+        }
+      },
+      "native-actions": {
+        "hidden": true,
+        "actions": {
+          "install": [
+            "xpm install --config {{ configuration.name }}"
+          ],
+          "link-deps": [
+            "xpm link @micro-os-plus/posix-arch --config {{ configuration.name }}"
+          ]
+        }
+      },
+      "arm-none-eabi-gcc-dependencies": {
+        "hidden": true,
+        "$devDependenciesUrl": "https://www.npmjs.com/package/@xpack-dev-tools/arm-none-eabi-gcc",
+        "devDependencies": {
+          "@xpack-dev-tools/arm-none-eabi-gcc": "12.2.1-1.2.1"
+        }
+      },
+      "qemu-arm-dependencies": {
+        "hidden": true,
+        "$devDependenciesUrl": "https://www.npmjs.com/package/@xpack-dev-tools/qemu-arm",
+        "devDependencies": {
+          "@xpack-dev-tools/qemu-arm": "7.2.0-1.1"
+        }
+      },
+      "native-cmake-sys-debug": {
+        "inherit": [
+          "native-actions",
+          "cmake-actions",
+          "native-dependencies"
+        ],
+        "properties": {
+          "buildType": "Debug",
+          "platformName": "native"
+        },
+        "actions": {
+          "prepare": "{{ properties.commandCMakePrepare }}"
+        }
+      },
+      "native-cmake-sys-release": {
+        "inherit": [
+          "native-cmake-sys-debug"
+        ],
+        "properties": {
+          "buildType": "Release"
+        }
+      }
+    }
   }
 }
