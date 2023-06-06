@@ -552,7 +552,7 @@ namespace os
       operator= (Serial&&) = delete;
 
       virtual
-      ~Serial () noexcept;
+      ~Serial () noexcept override;
 
       // --------------------------------------------------------------------
 

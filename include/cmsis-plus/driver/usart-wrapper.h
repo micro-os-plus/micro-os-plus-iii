@@ -81,7 +81,7 @@ namespace os
       operator= (usart_wrapper&&) = delete;
 
       virtual
-      ~usart_wrapper () noexcept;
+      ~usart_wrapper () noexcept override;
 
       // --------------------------------------------------------------------
 

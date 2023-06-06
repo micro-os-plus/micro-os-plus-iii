@@ -218,7 +218,7 @@ namespace os
         operator= (Device&&) = delete;
 
         virtual
-        ~Device () noexcept;
+        ~Device () noexcept override;
 
         // ------------------------------------------------------------------
 
