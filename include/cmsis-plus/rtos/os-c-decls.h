@@ -142,7 +142,7 @@ extern "C"
   {
     os_flags_mode_all = 1, //
     os_flags_mode_any = 2, //
-    os_flags_mode_clear = 4, //
+    os_flags_mode_clear = 4 //
   };
 
   /**
@@ -329,7 +329,7 @@ extern "C"
     /**
      * @brief Used to check reused threads.
      */
-    os_thread_state_initialising = 6,
+    os_thread_state_initialising = 6
   };
 
   /**
@@ -846,7 +846,7 @@ extern "C"
     /**
      * @brief Default mutex protocol.
      */
-    os_mutex_protocol_default = os_mutex_protocol_inherit,
+    os_mutex_protocol_default = os_mutex_protocol_inherit
   };
 
   /**
@@ -869,7 +869,7 @@ extern "C"
     /**
      * @brief Default mutex robustness.
      */
-    os_mutex_robustness_default = os_mutex_robustness_stalled,
+    os_mutex_robustness_default = os_mutex_robustness_stalled
   };
 
   /**
@@ -897,7 +897,7 @@ extern "C"
     /**
      * @brief Default mutex type.
      */
-    os_mutex_type_default = os_mutex_type_normal,
+    os_mutex_type_default = os_mutex_type_normal
   };
 
 #pragma GCC diagnostic push

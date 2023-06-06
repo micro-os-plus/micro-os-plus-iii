@@ -393,7 +393,7 @@ namespace os
           /**
            * @brief Used to check reused threads.
            */
-          initializing = 6, //
+          initializing = 6 //
         };
         /* enum  */
       }; /* struct state */

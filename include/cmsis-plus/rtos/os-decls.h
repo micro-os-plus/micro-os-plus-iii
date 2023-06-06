@@ -190,7 +190,7 @@ namespace os
             /**
              * @brief Function completed; no errors or events occurred.
              */
-            ok = 0,
+            ok = 0
 
       };
     } /* namespace result */
@@ -330,7 +330,7 @@ namespace os
             /**
              * Special mask to represent all flags.
              */
-            all = 0xFFFFFFFF,
+            all = 0xFFFFFFFF
       };
 
     } /* namespace flags */

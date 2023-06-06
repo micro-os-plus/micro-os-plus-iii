@@ -70,7 +70,7 @@ extern "C"
     /**
      * @brief Function completed; no error or event occurred.
      */
-    os_ok = 0,
+    os_ok = 0
   };
 
   /**

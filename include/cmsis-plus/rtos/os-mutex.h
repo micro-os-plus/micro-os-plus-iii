@@ -105,7 +105,7 @@ namespace os
               /**
                * @brief Maximum value, for validation purposes.
                */
-              max_ = protect,
+              max_ = protect
         };
       };
 
@@ -146,7 +146,7 @@ namespace os
               /**
                * @brief Maximum value, for validation purposes.
                */
-              max_ = robust,
+              max_ = robust
         };
       };
 
@@ -190,7 +190,7 @@ namespace os
               /**
                * @brief Maximum value, for validation purposes.
                */
-              max_ = recursive,
+              max_ = recursive
         };
       };
 
