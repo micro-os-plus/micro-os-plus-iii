@@ -357,7 +357,7 @@ namespace os
 
         /**
          * @brief       Signal device events.
-         * @param [in]  event
+         * @param [in]  event Event.
          * @par Returns
          *  Nothing.
          */
@@ -369,7 +369,7 @@ namespace os
          * @param[in]   ep_addr  Endpoint Address
          *                - ep_addr.0..3: Address
          *                - ep_addr.7:    Direction
-         * @param [in]  event
+         * @param [in]  event Event.
          * @par Returns
          *  Nothing.
          */

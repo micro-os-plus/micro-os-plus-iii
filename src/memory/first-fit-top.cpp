@@ -37,17 +37,11 @@ namespace os
 
     // ========================================================================
 
-    /**
-     * @details
-     */
     first_fit_top::~first_fit_top ()
     {
       trace::printf ("first_fit_top::%s() @%p %s\n", __func__, this, name ());
     }
 
-    /**
-     * @details
-     */
     void
     first_fit_top::internal_construct_ (void* addr, std::size_t bytes)
     {
@@ -70,9 +64,6 @@ namespace os
       internal_reset_ ();
     }
 
-    /**
-     * @details
-     */
     void
     first_fit_top::internal_reset_ (void) noexcept
     {
@@ -93,9 +84,6 @@ namespace os
       free_list_ = chunk;
     }
 
-    /**
-     * @details
-     */
     void
     first_fit_top::do_reset (void) noexcept
     {
@@ -226,7 +214,6 @@ namespace os
 
     /**
      * @details
-     *
      * Deallocation is not guaranteed to be deterministic, but if
      * done in strict reverse allocation order, it becomes deterministic,
      * otherwise a traversal of the free list is required, the older the
@@ -396,18 +383,12 @@ namespace os
         }
     }
 
-    /**
-     * @details
-     */
     std::size_t
     first_fit_top::do_max_size (void) const noexcept
     {
       return total_bytes_;
     }
 
-    /**
-     * @details
-     */
     void*
     first_fit_top::internal_align_ (chunk_t* chunk, std::size_t bytes,
                              std::size_t alignment)

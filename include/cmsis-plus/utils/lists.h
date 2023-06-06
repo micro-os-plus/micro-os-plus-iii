@@ -1220,7 +1220,6 @@ namespace os
       }
 
     /**
-     * @details
      * @note It is not `const` because it may initialise on first use.
      */
     template<typename T, typename N, N T::* MP, typename U>

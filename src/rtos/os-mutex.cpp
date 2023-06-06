@@ -221,7 +221,6 @@ namespace os
     /**
      * @class mutex::robustness
      * @details
-     *
      * Allow to define the behaviour when the thread
      * owning a mutex terminates.
      *
@@ -262,7 +261,6 @@ namespace os
     /**
      * @class mutex::type
      * @details
-     *
      * Allow to define the behaviour of calls which lock
      * and unlock the mutex. See `mutex::lock()` for details.
      *

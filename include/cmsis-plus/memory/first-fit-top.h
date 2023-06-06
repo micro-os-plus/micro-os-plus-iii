@@ -90,7 +90,7 @@ namespace os
 
       /**
        * @brief Construct a named memory resource object instance.
-       * @param [in] name
+       * @param [in] name Pointer to name.
        */
       first_fit_top (const char* name);
 

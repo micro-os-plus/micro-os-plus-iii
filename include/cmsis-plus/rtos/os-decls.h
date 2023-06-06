@@ -780,8 +780,6 @@ namespace os
       // ======================================================================
 
       /**
-       * @details
-       *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       constexpr

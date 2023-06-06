@@ -161,8 +161,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     clock::timestamp_t
@@ -177,8 +175,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     clock::timestamp_t
@@ -193,8 +189,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
@@ -237,8 +231,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
@@ -278,8 +270,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
@@ -401,8 +391,6 @@ namespace os
 
     // ========================================================================
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     adjustable_clock::~adjustable_clock ()
@@ -411,8 +399,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     clock::timestamp_t
@@ -430,8 +416,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
@@ -471,8 +455,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     clock::offset_t
@@ -482,8 +464,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     clock::offset_t
@@ -554,8 +534,6 @@ namespace os
     // ------------------------------------------------------------------------
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     clock_systick::clock_systick () :
@@ -566,8 +544,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     clock_systick::~clock_systick ()
@@ -576,8 +552,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     void
@@ -663,8 +637,6 @@ namespace os
     // ------------------------------------------------------------------------
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     clock_rtc::clock_rtc () :
@@ -675,8 +647,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     clock_rtc::~clock_rtc ()
@@ -720,8 +690,6 @@ namespace os
     // ------------------------------------------------------------------------
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     clock_highres::clock_highres () :
@@ -732,8 +700,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     clock_highres::~clock_highres ()
@@ -742,8 +708,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     void

@@ -186,7 +186,7 @@ operator new (std::size_t bytes)
 /**
  * @brief Allocate space for a new object instance (nothrow).
  * @param bytes Number of bytes to allocate.
- * @param nothrow
+ * @param nothrow (unused)
  * @return Pointer to allocated object.
  *
  * @details
@@ -274,7 +274,7 @@ operator new[] (std::size_t bytes)
 /**
  * @brief Allocate space for an array of new object instances (nothrow).
  * @param bytes Number of bytes to allocate.
- * @param nothrow
+ * @param nothrow (unused)
  * @return Pointer to allocated object.
  *
  * @details
@@ -396,7 +396,7 @@ operator delete (void* ptr, std::size_t bytes) noexcept
 /**
  * @brief Deallocate the dynamically allocated object instance (nothrow).
  * @param ptr Pointer to object.
- * @param nothrow
+ * @param nothrow (unused)
  * @par Returns
  *  Nothing.
  *
@@ -494,7 +494,7 @@ operator delete[] (void* ptr, std::size_t bytes) noexcept
 /**
  * @brief Deallocate the dynamically allocated array of object (nothrow).
  * @param ptr Pointer to array of objects.
- * @param nothrow
+ * @param nothrow (unused)
  * @par Returns
  *  Nothing.
  *

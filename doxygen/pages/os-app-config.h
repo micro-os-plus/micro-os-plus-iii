@@ -339,16 +339,12 @@
 /**
  * @brief Define the **main** thread stack size, in bytes.
  *
- * @details
- *
  * @note Ignored for synthetic platforms.
  */
 #define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES
 
 /**
  * @brief Define the **idle** thread stack size.
- *
- * @details
  *
  * @note Ignored for synthetic platforms.
  */
@@ -860,8 +856,6 @@
 /**
  * @brief Enable trace messages for RTOS thread context functions.
  *
- * @details
- *
  * @warning
  * This option requires a fast trace channel, like SEGGER RTT or at least ITM.
  */
@@ -879,8 +873,6 @@
 
 /**
  * @brief Enable trace messages for RTOS list functions.
- *
- * @details
  *
  * @warning
  * This option requires a fast trace channel, like SEGGER RTT or at least ITM.

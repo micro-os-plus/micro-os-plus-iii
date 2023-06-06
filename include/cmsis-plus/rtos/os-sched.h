@@ -979,8 +979,6 @@ namespace os
       }
 
       /**
-       * @details
-       *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       constexpr
@@ -991,8 +989,6 @@ namespace os
       }
 
       /**
-       * @details
-       *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline
@@ -1002,8 +998,6 @@ namespace os
       }
 
       /**
-       * @details
-       *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline void
@@ -1027,8 +1021,6 @@ namespace os
       }
 
       /**
-       * @details
-       *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline void
@@ -1093,7 +1085,6 @@ namespace os
 
         /**
          * @details
-         *
          * This function sets all statistic counters to zero.
          *
          * @note This function is available only when
@@ -1127,8 +1118,6 @@ namespace os
     namespace interrupts
     {
       /**
-       * @details
-       *
        * @note Can be invoked from Interrupt Service Routines (obviously).
        */
       inline bool
@@ -1139,8 +1128,6 @@ namespace os
       }
 
       /**
-       * @details
-       *
        * @note Can be invoked from Interrupt Service Routines.
        */
       inline
@@ -1152,8 +1139,6 @@ namespace os
       }
 
       /**
-       * @details
-       *
        * @note Can be invoked from Interrupt Service Routines.
        */
       inline
@@ -1164,8 +1149,6 @@ namespace os
       }
 
       /**
-       * @details
-       *
        * @note Can be invoked from Interrupt Service Routines.
        */
       inline state_t
@@ -1176,8 +1159,6 @@ namespace os
       }
 
       /**
-       * @details
-       *
        * @note Can be invoked from Interrupt Service Routines.
        */
       inline void
@@ -1190,8 +1171,6 @@ namespace os
       // ======================================================================
 
       /**
-       * @details
-       *
        * @note Can be invoked from Interrupt Service Routines.
        */
       inline
@@ -1203,8 +1182,6 @@ namespace os
       }
 
       /**
-       * @details
-       *
        * @note Can be invoked from Interrupt Service Routines.
        */
       inline
@@ -1215,8 +1192,6 @@ namespace os
       }
 
       /**
-       * @details
-       *
        * @note Can be invoked from Interrupt Service Routines.
        */
       inline state_t
@@ -1227,8 +1202,6 @@ namespace os
       }
 
       /**
-       * @details
-       *
        * @note Can be invoked from Interrupt Service Routines.
        */
       inline void
@@ -1241,8 +1214,6 @@ namespace os
       // ======================================================================
 
       /**
-       * @details
-       *
        * @note Can be invoked from Interrupt Service Routines.
        */
       constexpr
@@ -1253,8 +1224,6 @@ namespace os
       }
 
       /**
-       * @details
-       *
        * @note Can be invoked from Interrupt Service Routines.
        */
       inline
@@ -1265,8 +1234,6 @@ namespace os
       }
 
       /**
-       * @details
-       *
        * @note Can be invoked from Interrupt Service Routines.
        */
       inline void
@@ -1292,8 +1259,6 @@ namespace os
       }
 
       /**
-       * @details
-       *
        * @note Can be invoked from Interrupt Service Routines.
        */
       inline void

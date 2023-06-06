@@ -621,7 +621,6 @@ namespace os
        * @brief Internal function used to lock the mutex.
        * @par th Pointer to thread.
        * @retval result::ok The mutex was locked.
-       * @retval false The mutex was not locked.
        */
       result_t
       internal_try_lock_ (thread* th);
@@ -629,7 +628,7 @@ namespace os
       /**
        * @brief Internal function used to unlock the mutex.
        * @param th Pointer to thread.
-       * @return
+       * @retval result::ok The mutex was unlocked.
        */
       result_t
       internal_unlock_ (thread* th);
@@ -836,8 +835,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     inline thread*
@@ -847,8 +844,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     inline mutex::type_t
@@ -858,8 +853,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     inline mutex::protocol_t
@@ -869,8 +862,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     inline mutex::robustness_t

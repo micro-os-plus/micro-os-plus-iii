@@ -183,8 +183,6 @@ namespace os
 
       // ----------------------------------------------------------------------
       /**
-       * @details
-       *
        * @see malloc_memory_resource
        */
       memory_resource*
@@ -363,9 +361,6 @@ namespace os
 
       // ======================================================================
 
-      /**
-       * @details
-       */
       memory_resource::~memory_resource ()
       {
         ;

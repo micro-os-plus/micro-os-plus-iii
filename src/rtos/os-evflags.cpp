@@ -576,8 +576,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     result_t
@@ -645,8 +643,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     bool

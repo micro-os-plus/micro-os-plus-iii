@@ -622,7 +622,6 @@ namespace os
 
     /**
      * @details
-     *
      * The `timed_alloc()` function shall allocate a
      * fixed size memory block from the memory pool.
      *

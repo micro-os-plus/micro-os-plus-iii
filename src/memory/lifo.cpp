@@ -37,9 +37,6 @@ namespace os
 
     // ========================================================================
 
-    /**
-     * @details
-     */
     lifo::~lifo ()
     {
       trace::printf ("lifo::%s() @%p %s\n", __func__, this, this->name ());

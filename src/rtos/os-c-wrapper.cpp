@@ -244,8 +244,6 @@ static_assert(sizeof(internal::timer_node) == sizeof(os_internal_clock_timer_nod
 // ----------------------------------------------------------------------------
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -258,8 +256,6 @@ os_sched_initialize (void)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -272,8 +268,6 @@ os_sched_start (void)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -286,8 +280,6 @@ os_sched_is_started (void)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -300,8 +292,6 @@ os_sched_lock (void)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -314,8 +304,6 @@ os_sched_unlock (void)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -328,8 +316,6 @@ os_sched_set_locked (os_sched_state_t state)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -342,8 +328,6 @@ os_sched_is_locked (void)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -356,8 +340,6 @@ os_sched_is_preemptive (void)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -372,8 +354,6 @@ os_sched_set_preemptive (bool state)
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -390,8 +370,6 @@ os_sched_stat_get_context_switches (void)
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -408,8 +386,6 @@ os_sched_stat_get_cpu_cycles (void)
 // ----------------------------------------------------------------------------
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -424,8 +400,6 @@ os_irq_in_handler_mode (void)
 // ----------------------------------------------------------------------------
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -438,8 +412,6 @@ os_irq_critical_enter (void)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -454,8 +426,6 @@ os_irq_critical_exit (os_irq_state_t state)
 // ----------------------------------------------------------------------------
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -468,8 +438,6 @@ os_irq_uncritical_enter (void)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -484,8 +452,6 @@ os_irq_uncritical_exit (os_irq_state_t state)
 #if defined(OS_HAS_INTERRUPTS_STACK) || defined(__DOXYGEN__)
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -503,8 +469,6 @@ os_irq_get_stack (void)
 // ----------------------------------------------------------------------------
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -517,8 +481,6 @@ os_this_thread (void)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -531,8 +493,6 @@ os_this_thread_suspend (void)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -545,8 +505,6 @@ os_this_thread_exit (void* exit_ptr)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -560,8 +518,6 @@ os_this_thread_flags_wait (os_flags_mask_t mask, os_flags_mask_t* oflags,
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -575,8 +531,6 @@ os_this_thread_flags_try_wait (os_flags_mask_t mask, os_flags_mask_t* oflags,
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -592,8 +546,6 @@ os_this_thread_flags_timed_wait (os_flags_mask_t mask,
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -606,8 +558,6 @@ os_this_thread_flags_clear (os_flags_mask_t mask, os_flags_mask_t* oflags)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -622,8 +572,6 @@ os_this_thread_flags_get (os_flags_mask_t mask, os_flags_mode_t mode)
 // ----------------------------------------------------------------------------
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -637,8 +585,6 @@ os_thread_attr_init (os_thread_attr_t* attr)
 }
 
 /**
- * @details
- *
  * @note Must be paired with `os_thread_destruct()`.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
@@ -662,8 +608,6 @@ os_thread_construct (os_thread_t* thread, const char* name,
 }
 
 /**
- * @details
- *
  * @note Must be paired with `os_thread_construct()`.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
@@ -680,7 +624,6 @@ os_thread_destruct (os_thread_t* thread)
 
 /**
  * @details
- *
  * Dynamically allocate the thread object instance using the RTOS
  * system allocator and construct it.
  *
@@ -707,7 +650,6 @@ os_thread_new (const char* name, os_thread_func_t func,
 
 /**
  * @details
- *
  * Destruct the thread and deallocate the dynamically allocated
  * space using the RTOS system allocator.
  *
@@ -727,8 +669,6 @@ os_thread_delete (os_thread_t* thread)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -743,8 +683,6 @@ os_thread_is_constructed (os_thread_t* thread)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -758,8 +696,6 @@ os_thread_get_name (os_thread_t* thread)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -773,8 +709,6 @@ os_thread_get_priority (os_thread_t* thread)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -789,8 +723,6 @@ os_thread_set_priority (os_thread_t* thread, os_thread_prio_t prio)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -804,8 +736,6 @@ os_thread_kill (os_thread_t* thread)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -819,8 +749,6 @@ os_thread_join (os_thread_t* thread, void** exit_ptr)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -834,8 +762,6 @@ os_thread_resume (os_thread_t* thread)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -851,8 +777,6 @@ os_thread_flags_raise (os_thread_t* thread, os_flags_mask_t mask,
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -868,8 +792,6 @@ os_thread_get_state (os_thread_t* thread)
 #if defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE) || defined(__DOXYGEN__)
 
 /**
- * @details
- *
  * @note
  *  Available only when `OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE`
  *  is defined.
@@ -889,8 +811,6 @@ os_thread_get_user_storage (os_thread_t* thread)
 #endif /* defined(OS_INCLUDE_RTOS_CUSTOM_THREAD_USER_STORAGE) */
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -906,8 +826,6 @@ os_thread_get_stack (os_thread_t* thread)
 // ----------------------------------------------------------------------------
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -920,8 +838,6 @@ os_thread_stack_get_default_size (void)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -934,8 +850,6 @@ os_thread_stack_set_default_size (size_t size_bytes)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -948,8 +862,6 @@ os_thread_stack_get_min_size (void)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -962,8 +874,6 @@ os_thread_stack_set_min_size (size_t size_bytes)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -977,8 +887,6 @@ os_thread_stack_get_bottom (os_thread_stack_t* stack)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -992,8 +900,6 @@ os_thread_stack_get_top (os_thread_stack_t* stack)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1007,8 +913,6 @@ os_thread_stack_get_size (os_thread_stack_t* stack)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1022,8 +926,6 @@ os_thread_stack_get_available (os_thread_stack_t* stack)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1037,8 +939,6 @@ os_thread_stack_check_bottom_magic (os_thread_stack_t* stack)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1056,8 +956,6 @@ os_thread_stack_check_top_magic (os_thread_stack_t* stack)
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1075,8 +973,6 @@ os_thread_stat_get_context_switches (os_thread_t* thread)
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1162,8 +1058,6 @@ os_children_threads_iter_next (os_iterator_t iterator)
 // ----------------------------------------------------------------------------
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1177,8 +1071,6 @@ os_clock_get_name (os_clock_t* clock)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1192,8 +1084,6 @@ os_clock_now (os_clock_t* clock)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1207,8 +1097,6 @@ os_clock_steady_now (os_clock_t* clock)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1223,8 +1111,6 @@ os_clock_sleep_for (os_clock_t* clock, os_clock_duration_t duration)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1239,8 +1125,6 @@ os_clock_sleep_until (os_clock_t* clock, os_clock_timestamp_t timestamp)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1255,8 +1139,6 @@ os_clock_wait_for (os_clock_t* clock, os_clock_duration_t timeout)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1271,8 +1153,6 @@ os_clock_get_offset (os_clock_t* clock)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1289,8 +1169,6 @@ os_clock_set_offset (os_clock_t* clock, os_clock_offset_t offset)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1303,8 +1181,6 @@ os_clock_get_sysclock (void)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1317,8 +1193,6 @@ os_clock_get_rtclock (void)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1333,8 +1207,6 @@ os_clock_get_hrclock (void)
 // ----------------------------------------------------------------------------
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1347,8 +1219,6 @@ os_sysclock_now (void)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1361,8 +1231,6 @@ os_sysclock_sleep_for (os_clock_duration_t duration)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1375,8 +1243,6 @@ os_sysclock_sleep_until (os_clock_timestamp_t timestamp)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1391,8 +1257,6 @@ os_sysclock_wait_for (os_clock_duration_t timeout)
 // ----------------------------------------------------------------------------
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1406,8 +1270,6 @@ os_timer_attr_init (os_timer_attr_t* attr)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1421,8 +1283,6 @@ os_timer_attr_periodic_init (os_timer_attr_t* attr)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1435,8 +1295,6 @@ os_timer_attr_get_periodic (void)
 }
 
 /**
- * @details
- *
  * @note Must be paired with `os_timer_destruct()`.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
@@ -1460,8 +1318,6 @@ os_timer_construct (os_timer_t* timer, const char* name,
 }
 
 /**
- * @details
- *
  * @note Must be paired with `os_timer_construct()`.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
@@ -1478,7 +1334,6 @@ os_timer_destruct (os_timer_t* timer)
 
 /**
  * @details
- *
  * Dynamically allocate the timer object instance using the RTOS
  * system allocator and construct it.
  *
@@ -1505,7 +1360,6 @@ os_timer_new (const char* name, os_timer_func_t function,
 
 /**
  * @details
- *
  * Destruct the timer and deallocate the dynamically allocated
  * space using the RTOS system allocator.
  *
@@ -1525,8 +1379,6 @@ os_timer_delete (os_timer_t* timer)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1540,8 +1392,6 @@ os_timer_get_name (os_timer_t* timer)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1555,8 +1405,6 @@ os_timer_start (os_timer_t* timer, os_clock_duration_t period)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1572,8 +1420,6 @@ os_timer_stop (os_timer_t* timer)
 // ----------------------------------------------------------------------------
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1587,8 +1433,6 @@ os_mutex_attr_init (os_mutex_attr_t* attr)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1602,8 +1446,6 @@ os_mutex_attr_recursive_init (os_mutex_attr_t* attr)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1616,8 +1458,6 @@ os_mutex_attr_get_recursive (void)
 }
 
 /**
- * @details
- *
  * @note Must be paired with `os_mutex_destruct()`.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
@@ -1638,8 +1478,6 @@ os_mutex_construct (os_mutex_t* mutex, const char* name,
 }
 
 /**
- * @details
- *
  * @note Must be paired with `os_mutex_destruct()`.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
@@ -1660,8 +1498,6 @@ os_mutex_recursive_construct (os_mutex_t* mutex, const char* name,
 }
 
 /**
- * @details
- *
  * @note Must be paired with `os_mutex_construct()` or
  *  `os_mutex_recursive_construct()`.
  *
@@ -1679,7 +1515,6 @@ os_mutex_destruct (os_mutex_t* mutex)
 
 /**
  * @details
- *
  * Dynamically allocate the mutex object instance using the RTOS
  * system allocator and construct it.
  *
@@ -1704,7 +1539,6 @@ os_mutex_new (const char* name, const os_mutex_attr_t* attr)
 
 /**
  * @details
- *
  * Dynamically allocate the recursive mutex object instance using the RTOS
  * system allocator and construct it.
  *
@@ -1729,7 +1563,6 @@ os_mutex_recursive_new (const char* name, const os_mutex_attr_t* attr)
 
 /**
  * @details
- *
  * Destruct the mutex and deallocate the dynamically allocated
  * space using the RTOS system allocator.
  *
@@ -1750,8 +1583,6 @@ os_mutex_delete (os_mutex_t* mutex)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1765,8 +1596,6 @@ os_mutex_get_name (os_mutex_t* mutex)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1780,8 +1609,6 @@ os_mutex_lock (os_mutex_t* mutex)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1795,8 +1622,6 @@ os_mutex_try_lock (os_mutex_t* mutex)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1811,8 +1636,6 @@ os_mutex_timed_lock (os_mutex_t* mutex, os_clock_duration_t timeout)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1826,8 +1649,6 @@ os_mutex_unlock (os_mutex_t* mutex)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1841,8 +1662,6 @@ os_mutex_get_prio_ceiling (os_mutex_t* mutex)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1858,8 +1677,6 @@ os_mutex_set_prio_ceiling (os_mutex_t* mutex, os_thread_prio_t prio_ceiling,
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1873,8 +1690,6 @@ os_mutex_mark_consistent (os_mutex_t* mutex)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1888,8 +1703,6 @@ os_mutex_get_owner (os_mutex_t* mutex)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1903,8 +1716,6 @@ os_mutex_get_type (os_mutex_t* mutex)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1918,8 +1729,6 @@ os_mutex_get_protocol (os_mutex_t* mutex)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1933,8 +1742,6 @@ os_mutex_get_robustness (os_mutex_t* mutex)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1950,8 +1757,6 @@ os_mutex_reset (os_mutex_t* mutex)
 // ----------------------------------------------------------------------------
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -1965,8 +1770,6 @@ os_condvar_attr_init (os_condvar_attr_t* attr)
 }
 
 /**
- * @details
- *
  * @note Must be paired with `os_condvar_destruct()`.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
@@ -1988,8 +1791,6 @@ os_condvar_construct (os_condvar_t* condvar, const char* name,
 }
 
 /**
- * @details
- *
  * @note Must be paired with `os_condvar_construct()`.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
@@ -2006,7 +1807,6 @@ os_condvar_destruct (os_condvar_t* condvar)
 
 /**
  * @details
- *
  * Dynamically allocate the condition variable object instance using the RTOS
  * system allocator and construct it.
  *
@@ -2031,7 +1831,6 @@ os_condvar_new (const char* name, const os_condvar_attr_t* attr)
 
 /**
  * @details
- *
  * Destruct the condition variable and deallocate the dynamically allocated
  * space using the RTOS system allocator.
  *
@@ -2051,8 +1850,6 @@ os_condvar_delete (os_condvar_t* condvar)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2066,8 +1863,6 @@ os_condvar_get_name (os_condvar_t* condvar)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2081,8 +1876,6 @@ os_condvar_signal (os_condvar_t* condvar)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2096,8 +1889,6 @@ os_condvar_broadcast (os_condvar_t* condvar)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2112,8 +1903,6 @@ os_condvar_wait (os_condvar_t* condvar, os_mutex_t* mutex)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2131,8 +1920,6 @@ os_condvar_timed_wait (os_condvar_t* condvar, os_mutex_t* mutex,
 // ----------------------------------------------------------------------------
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2147,8 +1934,6 @@ os_semaphore_attr_init (os_semaphore_attr_t* attr)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2164,8 +1949,6 @@ os_semaphore_attr_binary_init (os_semaphore_attr_t* attr,
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2182,8 +1965,6 @@ os_semaphore_attr_counting_init (os_semaphore_attr_t* attr,
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2196,8 +1977,6 @@ os_semaphore_attr_get_binary (void)
 }
 
 /**
- * @details
- *
  * @note Must be paired with `os_semaphore_destruct()`.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
@@ -2219,8 +1998,6 @@ os_semaphore_construct (os_semaphore_t* semaphore, const char* name,
 }
 
 /**
- * @details
- *
  * @note Must be paired with `os_semaphore_destruct()`.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
@@ -2238,8 +2015,6 @@ os_semaphore_binary_construct (os_semaphore_t* semaphore, const char* name,
 }
 
 /**
- * @details
- *
  * @note Must be paired with `os_semaphore_destruct()`.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
@@ -2258,8 +2033,6 @@ os_semaphore_counting_construct (os_semaphore_t* semaphore, const char* name,
 }
 
 /**
- * @details
- *
  * @note Must be paired with `os_semaphore_construct()` or
  * `os_semaphore_binary_construct()` or `os_semaphore_counting_construct()`.
  *
@@ -2277,7 +2050,6 @@ os_semaphore_destruct (os_semaphore_t* semaphore)
 
 /**
  * @details
- *
  * Dynamically allocate the semaphore object instance using the RTOS
  * system allocator and construct it.
  *
@@ -2302,7 +2074,6 @@ os_semaphore_new (const char* name, const os_semaphore_attr_t* attr)
 
 /**
  * @details
- *
  * Dynamically allocate the binary semaphore object instance using the RTOS
  * system allocator and construct it.
  *
@@ -2324,7 +2095,6 @@ os_semaphore_binary_new (const char* name,
 
 /**
  * @details
- *
  * Dynamically allocate the counting semaphore object instance using the RTOS
  * system allocator and construct it.
  *
@@ -2347,7 +2117,6 @@ os_semaphore_counting_new (const char* name,
 
 /**
  * @details
- *
  * Destruct the semaphore and deallocate the dynamically allocated
  * space using the RTOS system allocator.
  *
@@ -2368,8 +2137,6 @@ os_semaphore_delete (os_semaphore_t* semaphore)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2383,8 +2150,6 @@ os_semaphore_get_name (os_semaphore_t* semaphore)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2398,8 +2163,6 @@ os_semaphore_post (os_semaphore_t* semaphore)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2413,8 +2176,6 @@ os_semaphore_wait (os_semaphore_t* semaphore)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2428,8 +2189,6 @@ os_semaphore_try_wait (os_semaphore_t* semaphore)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2444,8 +2203,6 @@ os_semaphore_timed_wait (os_semaphore_t* semaphore, os_clock_duration_t timeout)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2459,8 +2216,6 @@ os_semaphore_get_value (os_semaphore_t* semaphore)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2474,8 +2229,6 @@ os_semaphore_reset (os_semaphore_t* semaphore)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2489,8 +2242,6 @@ os_semaphore_get_initial_value (os_semaphore_t* semaphore)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2506,8 +2257,6 @@ os_semaphore_get_max_value (os_semaphore_t* semaphore)
 // ----------------------------------------------------------------------------
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2521,8 +2270,6 @@ os_mempool_attr_init (os_mempool_attr_t* attr)
 }
 
 /**
- * @details
- *
  * @note Must be paired with `os_mempool_destruct()`.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
@@ -2544,8 +2291,6 @@ os_mempool_construct (os_mempool_t* mempool, const char* name, size_t blocks,
 }
 
 /**
- * @details
- *
  * @note Must be paired with `os_mempool_construct()`.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
@@ -2562,7 +2307,6 @@ os_mempool_destruct (os_mempool_t* mempool)
 
 /**
  * @details
- *
  * Dynamically allocate the memory pool object instance using the RTOS
  * system allocator and construct it.
  *
@@ -2588,7 +2332,6 @@ os_mempool_new (const char* name, size_t blocks, size_t block_size_bytes,
 
 /**
  * @details
- *
  * Destruct the memory pool and deallocate the dynamically allocated
  * space using the RTOS system allocator.
  *
@@ -2608,8 +2351,6 @@ os_mempool_delete (os_mempool_t* mempool)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2623,8 +2364,6 @@ os_mempool_get_name (os_mempool_t* mempool)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2638,8 +2377,6 @@ os_mempool_alloc (os_mempool_t* mempool)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2653,8 +2390,6 @@ os_mempool_try_alloc (os_mempool_t* mempool)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2668,8 +2403,6 @@ os_mempool_timed_alloc (os_mempool_t* mempool, os_clock_duration_t timeout)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2683,8 +2416,6 @@ os_mempool_free (os_mempool_t* mempool, void* block)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2698,8 +2429,6 @@ os_mempool_get_capacity (os_mempool_t* mempool)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2713,8 +2442,6 @@ os_mempool_get_count (os_mempool_t* mempool)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2728,8 +2455,6 @@ os_mempool_get_block_size (os_mempool_t* mempool)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2743,8 +2468,6 @@ os_mempool_is_empty (os_mempool_t* mempool)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2758,8 +2481,6 @@ os_mempool_is_full (os_mempool_t* mempool)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2773,8 +2494,6 @@ os_mempool_reset (os_mempool_t* mempool)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2790,8 +2509,6 @@ os_mempool_get_pool (os_mempool_t* mempool)
 // --------------------------------------------------------------------------
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2805,8 +2522,6 @@ os_mqueue_attr_init (os_mqueue_attr_t* attr)
 }
 
 /**
- * @details
- *
  * @note Must be paired with `os_mqueue_destruct()`.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
@@ -2828,8 +2543,6 @@ os_mqueue_construct (os_mqueue_t* mqueue, const char* name, size_t msgs,
 }
 
 /**
- * @details
- *
  * @note Must be paired with `os_mqueue_construct()`.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
@@ -2846,7 +2559,6 @@ os_mqueue_destruct (os_mqueue_t* mqueue)
 
 /**
  * @details
- *
  * Dynamically allocate the message queue object instance using the RTOS
  * system allocator and construct it.
  *
@@ -2872,7 +2584,6 @@ os_mqueue_new (const char* name, size_t msgs, size_t msg_size_bytes,
 
 /**
  * @details
- *
  * Destruct the message queue and deallocate the dynamically allocated
  * space using the RTOS system allocator.
  *
@@ -2892,8 +2603,6 @@ os_mqueue_delete (os_mqueue_t* mqueue)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2907,8 +2616,6 @@ os_mqueue_get_name (os_mqueue_t* mqueue)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2924,8 +2631,6 @@ os_mqueue_send (os_mqueue_t* mqueue, const void* msg, size_t nbytes,
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2941,8 +2646,6 @@ os_mqueue_try_send (os_mqueue_t* mqueue, const void* msg, size_t nbytes,
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2958,8 +2661,6 @@ os_mqueue_timed_send (os_mqueue_t* mqueue, const void* msg, size_t nbytes,
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2975,8 +2676,6 @@ os_mqueue_receive (os_mqueue_t* mqueue, void* msg, size_t nbytes,
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -2992,8 +2691,6 @@ os_mqueue_try_receive (os_mqueue_t* mqueue, void* msg, size_t nbytes,
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -3009,8 +2706,6 @@ os_mqueue_timed_receive (os_mqueue_t* mqueue, void* msg, size_t nbytes,
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -3024,8 +2719,6 @@ os_mqueue_get_length (os_mqueue_t* mqueue)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -3039,8 +2732,6 @@ os_mqueue_get_capacity (os_mqueue_t* mqueue)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -3054,8 +2745,6 @@ os_mqueue_get_msg_size (os_mqueue_t* mqueue)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -3069,8 +2758,6 @@ os_mqueue_is_empty (os_mqueue_t* mqueue)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -3084,8 +2771,6 @@ os_mqueue_is_full (os_mqueue_t* mqueue)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -3101,8 +2786,6 @@ os_mqueue_reset (os_mqueue_t* mqueue)
 // --------------------------------------------------------------------------
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -3116,8 +2799,6 @@ os_evflags_attr_init (os_evflags_attr_t* attr)
 }
 
 /**
- * @details
- *
  * @note Must be paired with `os_evflags_destruct()`.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
@@ -3138,8 +2819,6 @@ os_evflags_construct (os_evflags_t* evflags, const char* name,
 }
 
 /**
- * @details
- *
  * @note Must be paired with `os_evflags_construct()`.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
@@ -3156,7 +2835,6 @@ os_evflags_destruct (os_evflags_t* evflags)
 
 /**
  * @details
- *
  * Dynamically allocate the event flags object instance using the RTOS
  * system allocator and construct it.
  *
@@ -3181,7 +2859,6 @@ os_evflags_new (const char* name, const os_evflags_attr_t* attr)
 
 /**
  * @details
- *
  * Destruct the event flags and deallocate the dynamically allocated
  * space using the RTOS system allocator.
  *
@@ -3201,8 +2878,6 @@ os_evflags_delete (os_evflags_t* evflags)
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -3216,8 +2891,6 @@ os_evflags_get_name (os_evflags_t* evflags)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -3234,8 +2907,6 @@ os_evflags_wait (os_evflags_t* evflags, os_flags_mask_t mask,
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -3251,8 +2922,6 @@ os_evflags_try_wait (os_evflags_t* evflags, os_flags_mask_t mask,
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -3269,8 +2938,6 @@ os_evflags_timed_wait (os_evflags_t* evflags, os_flags_mask_t mask,
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -3286,8 +2953,6 @@ os_evflags_raise (os_evflags_t* evflags, os_flags_mask_t mask,
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -3303,8 +2968,6 @@ os_evflags_clear (os_evflags_t* evflags, os_flags_mask_t mask,
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -3320,8 +2983,6 @@ os_evflags_get (os_evflags_t* evflags, os_flags_mask_t mask,
 }
 
 /**
- * @details
- *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -3337,8 +2998,6 @@ os_evflags_are_waiting (os_evflags_t* evflags)
 // --------------------------------------------------------------------------
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -3351,8 +3010,6 @@ os_memory_get_default (void)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  * @warning Not thread safe, use a scheduler critical section to protect it.
  *
@@ -3368,8 +3025,6 @@ os_memory_allocate (os_memory_t* memory, size_t bytes, size_t alignment)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  * @warning Not thread safe, use a scheduler critical section to protect it.
  *
@@ -3386,8 +3041,6 @@ os_memory_deallocate (os_memory_t* memory, void* addr, size_t bytes,
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  * @warning Not thread safe, use a scheduler critical section to protect it.
  *
@@ -3402,8 +3055,6 @@ os_memory_reset (os_memory_t* memory)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  * @warning Not thread safe, use a scheduler critical section to protect it.
  *
@@ -3418,8 +3069,6 @@ os_memory_coalesce (os_memory_t* memory)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  * @warning Not thread safe, use a scheduler critical section to protect it.
  *
@@ -3434,8 +3083,6 @@ os_memory_get_total_bytes (os_memory_t* memory)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  * @warning Not thread safe, use a scheduler critical section to protect it.
  *
@@ -3450,8 +3097,6 @@ os_memory_get_allocated_bytes (os_memory_t* memory)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  * @warning Not thread safe, use a scheduler critical section to protect it.
  *
@@ -3466,8 +3111,6 @@ os_memory_get_free_bytes (os_memory_t* memory)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  * @warning Not thread safe, use a scheduler critical section to protect it.
  *
@@ -3482,8 +3125,6 @@ os_memory_get_allocated_chunks (os_memory_t* memory)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  * @warning Not thread safe, use a scheduler critical section to protect it.
  *
@@ -3980,8 +3621,6 @@ osTimerStart (osTimerId timer_id, uint32_t millisec)
 }
 
 /**
- * @details
- *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
 osStatus

@@ -222,7 +222,7 @@ namespace this_thread
 
   /**
    * @brief Sleep for a given duration.
-   * @param [in] rel_time
+   * @param [in] rel_time sleep duration.
    * @details
    * extra Clock_T is an extension to the standard
    */
@@ -233,7 +233,7 @@ namespace this_thread
 
   /**
    * @brief Sleep until a given time point.
-   * @param [in] abs_time
+   * @param [in] abs_time Absolute time point.
    */
   template<typename Clock_T, typename Duration_T>
     void

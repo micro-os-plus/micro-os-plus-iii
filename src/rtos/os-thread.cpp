@@ -278,7 +278,6 @@ namespace os
 
     /**
      * @details
-     *
      * Check the thread status to determine if the thread is already in
      * a constructed state, which means it was constructed and not yet
      * destructed.
@@ -648,8 +647,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @par POSIX compatibility
      *  Extension to standard, no POSIX similar functionality identified.
      *
@@ -676,8 +673,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @par POSIX compatibility
      *  Extension to standard, no POSIX similar functionality identified.
      *
@@ -947,7 +942,6 @@ namespace os
 
     /**
      * @details
-     *
      * The `cancel()` function shall not return an error code of `EINTR`.
      * If an implementation detects use of a thread ID after the end
      * of its lifetime, it is recommended that the function should
@@ -1008,8 +1002,6 @@ namespace os
      */
 
     /**
-     * @details
-     *
      * @par POSIX compatibility
      *  Extension to standard, no POSIX similar functionality identified.
      */
@@ -1178,8 +1170,6 @@ namespace os
      */
 
     /**
-     * @details
-     *
      * @par POSIX compatibility
      *  Inspired by [`pthread_kill()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_kill.html)
      *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
@@ -1539,8 +1529,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
@@ -1602,8 +1590,6 @@ namespace os
        */
 
       /**
-       * @details
-       *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       rtos::thread&

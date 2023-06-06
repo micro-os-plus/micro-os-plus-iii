@@ -422,7 +422,7 @@ namespace os
        * @brief Internal initialisation.
        * @par Parameters
        *  None.
-       * @returns
+       * @par Returns
        *  Nothing.
        */
       void
@@ -900,8 +900,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     inline std::size_t
@@ -911,8 +909,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     inline std::size_t
@@ -922,8 +918,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     inline std::size_t
@@ -933,8 +927,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     inline bool
@@ -944,8 +936,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     inline bool
@@ -955,8 +945,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     inline void*

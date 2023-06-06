@@ -2015,8 +2015,6 @@ namespace os
       }
 
       /**
-       * @details
-       *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
       inline result_t
@@ -2094,8 +2092,6 @@ namespace os
     // ======================================================================
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     inline
@@ -2105,8 +2101,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     inline void
@@ -2117,8 +2111,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     inline void
@@ -2130,8 +2122,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     inline thread::stack::element_t*
@@ -2141,8 +2131,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     inline thread::stack::element_t*
@@ -2152,8 +2140,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     inline std::size_t
@@ -2163,8 +2149,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     inline bool
@@ -2174,8 +2158,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     inline bool
@@ -2185,8 +2167,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     inline std::size_t
@@ -2196,8 +2176,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     inline std::size_t
@@ -2209,8 +2187,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     inline std::size_t
@@ -2220,8 +2196,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     inline std::size_t
@@ -2238,8 +2212,6 @@ namespace os
     // ========================================================================
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     inline
@@ -2249,8 +2221,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     inline class thread::stack&
@@ -2289,7 +2259,6 @@ namespace os
 
     /**
      * @details
-     *
      * This value can be used together with the corresponding
      * scheduler function, to compute percentages.
      *
@@ -2312,7 +2281,6 @@ namespace os
 
     /**
      * @details
-     *
      * This function sets all statistic counters to zero.
      *
      * @note This function is available only when
@@ -2353,8 +2321,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     inline thread::state_t
@@ -2364,8 +2330,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     inline void*
@@ -2375,8 +2339,6 @@ namespace os
     }
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     inline bool
@@ -2454,8 +2416,6 @@ namespace os
 #endif
 
     /**
-     * @details
-     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     inline class thread::stack&
@@ -2467,8 +2427,6 @@ namespace os
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
 
     /**
-     * @details
-     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     inline class thread::statistics&

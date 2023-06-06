@@ -37,9 +37,6 @@ namespace os
 
     // ========================================================================
 
-    /**
-     * @details
-     */
     block_pool::~block_pool ()
     {
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
@@ -48,9 +45,6 @@ namespace os
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
-    /**
-     * @details
-     */
     void*
     block_pool::do_allocate (std::size_t bytes, std::size_t alignment)
     {
@@ -77,9 +71,6 @@ namespace os
       return p;
     }
 
-    /**
-     * @details
-     */
     void
     block_pool::do_deallocate (void* addr, std::size_t bytes,
                                std::size_t alignment) noexcept
@@ -116,18 +107,12 @@ namespace os
 
 #pragma GCC diagnostic push
 
-    /**
-     * @details
-     */
     std::size_t
     block_pool::do_max_size (void) const noexcept
     {
       return block_size_bytes_ * blocks_;
     }
 
-    /**
-     * @details
-     */
     void
     block_pool::do_reset (void) noexcept
     {
@@ -137,9 +122,6 @@ namespace os
       internal_reset_ ();
     }
 
-    /**
-     * @details
-     */
     void
     block_pool::internal_construct_ (std::size_t blocks,
                                      std::size_t block_size_bytes, void* addr,
@@ -175,9 +157,6 @@ namespace os
       internal_reset_ ();
     }
 
-    /**
-     * @details
-     */
     void
     block_pool::internal_reset_ (void) noexcept
     {

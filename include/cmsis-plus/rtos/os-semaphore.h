@@ -752,7 +752,6 @@ namespace os
     }
 
     /**
-     * @details
      * @par POSIX compatibility
      *  Extension to standard, no POSIX similar functionality identified.
      *
@@ -765,7 +764,6 @@ namespace os
     }
 
     /**
-     * @details
      * @par POSIX compatibility
      *  Extension to standard, no POSIX similar functionality identified.
      *

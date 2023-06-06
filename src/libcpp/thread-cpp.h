@@ -28,13 +28,6 @@
 // ============================================================================
 // This file is for internal use in µOS++ and should not be included
 // in applications.
-/**
- * @class thread
- *
- *
- * @details
- *
- */
 
 thread::thread (thread&& t) noexcept
 {

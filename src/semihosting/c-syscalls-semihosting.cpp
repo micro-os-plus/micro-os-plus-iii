@@ -287,7 +287,6 @@ __semihosting_stat (int fd, struct stat* st)
 
 /**
  * @details
- *
  * The `open()` function shall establish the connection between a file and a
  * file descriptor. It shall create an open file description that refers
  * to a file and a file descriptor that refers to that open file
@@ -485,7 +484,6 @@ __posix_lseek (int fildes, off_t offset, int whence)
 
 /**
  * @details
- *
  * This function shall test whether _fildes_, an open file descriptor,
  * is associated with a terminal device.
  */

@@ -108,20 +108,18 @@ namespace os
     public:
 
       /**
-       *
        * @param path May be nullptr.
-       * @param oflag
-       * @return
+       * @param oflag Output flags
+       * @return non-negative file descriptor, -1 on failure
        */
       int
       open (const char* path = nullptr, int oflag = 0, ...);
 
       /**
-       *
        * @param path May be nullptr.
-       * @param oflag
-       * @param args
-       * @return
+       * @param oflag Output flags
+       * @param args Arguments
+       * @return non-negative file descriptor, -1 on failure
        */
       int
       vopen (const char* path, int oflag, std::va_list args);

@@ -1250,9 +1250,6 @@ namespace os
 
       // ======================================================================
 
-      /**
-       * @details
-       */
       inline
       memory_resource::memory_resource (const char* name) :
           object_named
@@ -1329,8 +1326,6 @@ namespace os
       }
 
       /**
-       * @details
-       *
        * @see do_max_size();
        */
       inline std::size_t
@@ -1340,8 +1335,6 @@ namespace os
       }
 
       /**
-       * @details
-       *
        * @see do_reset();
        */
       inline void
@@ -1367,8 +1360,6 @@ namespace os
       }
 
       /**
-       * @details
-       *
        * @par Standard compliance
        *   Extension to standard.
        */
@@ -1384,8 +1375,6 @@ namespace os
       }
 
       /**
-       * @details
-       *
        * @par Standard compliance
        *   Extension to standard.
        */
