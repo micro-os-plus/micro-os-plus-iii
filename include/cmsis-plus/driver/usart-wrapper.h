@@ -149,8 +149,8 @@ namespace os
       Version version_
         { 0, 0 };
       serial::Capabilities capa_;
-      serial::Status status_;
-      serial::Modem_status modem_status_;
+      // serial::Status status_;
+      // serial::Modem_status modem_status_;
 
     };
 
