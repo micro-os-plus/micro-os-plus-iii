@@ -45,7 +45,7 @@ target_compile_options(platform-native-interface INTERFACE
 )
 
 target_link_libraries(platform-native-interface INTERFACE
-  micro-os-plus::posix-arch
+  micro-os-plus::iii-posix-arch
 )
 
 if (COMMAND xpack_display_target_lists)

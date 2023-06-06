@@ -22,11 +22,12 @@ The APIs are documented in the
 
 ## Status
 
-The µOS++ project is fully functional for Cortex-M devices and also runs
+µOS++ IIIe is fully functional for Cortex-M devices and also runs
 on synthetic POSIX platforms (like macOS and GNU/Linux).
 
-Note: The project is currently under restructuring, with the monolithic
-repository split into multiple separate source xPacks.
+Note: The next edition of the project (IVe) is currently work in progress,
+with the monolithic
+repository to be split into multiple separate source libraries.
 
 ## Related projects
 
@@ -34,10 +35,10 @@ The current µOS++ code tries to be as portable as possible.
 
 Specific implementations are available from separate projects:
 
-- the Cortex-M port of the scheduler is packed as
-[µOS++ Cortex-M xPack](https://github.com/micro-os-plus/architecture-cortexm-xpack)
-- the synthetic POSIX port of the scheduler is packed as
-[µOS++ POSIX arch xPack](https://github.com/micro-os-plus/architecture-posix-xpack)
+- the Cortex-M port of the scheduler is in the separate project
+[µOS++ Cortex-M](https://github.com/micro-os-plus/micro-os-plus-iii-cortexm)
+- the synthetic POSIX port of the scheduler is in the separate project
+[µOS++ POSIX arch](https://github.com/micro-os-plus/micro-os-plus-iii-posix-arch)
 
 ## Build Configuration
 

@@ -120,7 +120,7 @@
       "native-dependencies": {
         "hidden": true,
         "devDependencies": {
-          "@micro-os-plus/posix-arch": "github:micro-os-plus/posix-arch#xpack-develop"
+          "@micro-os-plus/posix-arch": "github:micro-os-plus/micro-os-plus-iii-posix-arch#xpack-develop"
         }
       },
       "native-actions": {
@@ -130,7 +130,7 @@
             "xpm install --config {{ configuration.name }}"
           ],
           "link-deps": [
-            "xpm link @micro-os-plus/posix-arch --config {{ configuration.name }}"
+            "xpm link @micro-os-plus/micro-os-plus-iii-posix-arch --config {{ configuration.name }}"
           ]
         }
       },

@@ -16,7 +16,7 @@
 
 set(xpack_dependencies_folders
   # Project dependencies.
-  "${CMAKE_BINARY_DIR}/xpacks/@micro-os-plus/posix-arch"
+  "${CMAKE_BINARY_DIR}/xpacks/@micro-os-plus/micro-os-plus-iii-posix-arch"
   # "${CMAKE_SOURCE_DIR}/../xpacks/@xpacks/arm-cmsis-rtos-validator"
   "${CMAKE_SOURCE_DIR}/../xpacks/@xpacks/chan-fatfs"
 
