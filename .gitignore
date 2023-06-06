@@ -8,3 +8,6 @@ test-*/
 *.tgz
 doxygen/html/
 
+.vscode/c_cpp_properties.json
+node_modules/
+xpacks/
