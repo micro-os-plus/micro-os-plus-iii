@@ -38,6 +38,8 @@
 
 #ifdef __cplusplus
 
+// ----------------------------------------------------------------------------
+
 #include <cmsis-plus/driver/common.h>
 #include <cmsis-plus/driver/usb.h>
 
@@ -504,6 +506,8 @@ namespace os
 } /* namespace os */
 
 #pragma GCC diagnostic pop
+
+// ----------------------------------------------------------------------------
 
 #endif /* __cplusplus */
 

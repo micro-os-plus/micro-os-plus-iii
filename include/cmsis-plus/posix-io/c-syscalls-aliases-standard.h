@@ -280,4 +280,3 @@ extern "C"
 #endif /* CMSIS_PLUS_POSIX_IO_C_POSIX_SYSCALLS_ALIASES_STANDARD_H_ */
 
 // ----------------------------------------------------------------------------
-

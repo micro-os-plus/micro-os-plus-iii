@@ -62,7 +62,7 @@
  * it looked more convenient for the user to enter short durations
  * instead of very large absolute times.
  */
- 
+
 /*
  * TODO:
  * - make Thread virtual, to allow create_hook/delete_hook functionality
@@ -191,6 +191,8 @@ namespace os
 } /* namespace os */
 
 #pragma GCC diagnostic pop
+
+// ----------------------------------------------------------------------------
 
 #endif /* __cplusplus */
 

@@ -480,5 +480,5 @@ _valloc_r (struct _reent* impure __attribute__((unused)),
  */
 
 // ----------------------------------------------------------------------------
-#endif /* defined(__ARM_EABI__) */
 
+#endif /* defined(__ARM_EABI__) */

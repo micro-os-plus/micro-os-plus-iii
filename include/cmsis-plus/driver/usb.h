@@ -38,6 +38,8 @@
 
 #ifdef __cplusplus
 
+// ----------------------------------------------------------------------------
+
 #include <cstdint>
 
 #pragma GCC diagnostic push
@@ -133,6 +135,8 @@ namespace os
 } /* namespace os */
 
 #pragma GCC diagnostic pop
+
+// ----------------------------------------------------------------------------
 
 #endif /* __cplusplus */
 

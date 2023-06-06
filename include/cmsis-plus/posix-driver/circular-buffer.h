@@ -574,4 +574,6 @@ namespace os
 
 #endif /* __cplusplus */
 
+// ----------------------------------------------------------------------------
+
 #endif /* CMSIS_PLUS_POSIX_DRIVER_CIRCULAR_BUFFER_H_ */

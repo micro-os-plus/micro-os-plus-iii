@@ -28,6 +28,8 @@
 #ifndef CMSIS_PLUS_POSIX_IO_FILE_DESCRIPTORS_MANAGER_H_
 #define CMSIS_PLUS_POSIX_IO_FILE_DESCRIPTORS_MANAGER_H_
 
+// ----------------------------------------------------------------------------
+
 #if defined(__cplusplus)
 
 // ----------------------------------------------------------------------------
@@ -186,5 +188,7 @@ namespace os
 // ----------------------------------------------------------------------------
 
 #endif /* __cplusplus */
+
+// ----------------------------------------------------------------------------
 
 #endif /* CMSIS_PLUS_POSIX_IO_FILE_DESCRIPTORS_MANAGER_H_ */

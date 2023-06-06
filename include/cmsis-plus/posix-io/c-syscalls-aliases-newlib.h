@@ -28,6 +28,8 @@
 #ifndef CMSIS_PLUS_POSIX_IO_C_POSIX_SYSCALLS_ALIASES_NEWLIB_H_
 #define CMSIS_PLUS_POSIX_IO_C_POSIX_SYSCALLS_ALIASES_NEWLIB_H_
 
+// ----------------------------------------------------------------------------
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -272,4 +274,3 @@ extern "C"
 #endif /* CMSIS_PLUS_POSIX_IO_C_POSIX_SYSCALLS_ALIASES_NEWLIB_H_ */
 
 // ----------------------------------------------------------------------------
-

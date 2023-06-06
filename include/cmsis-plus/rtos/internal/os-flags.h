@@ -32,6 +32,8 @@
 
 #ifdef  __cplusplus
 
+// ----------------------------------------------------------------------------
+
 #include <cmsis-plus/rtos/os-decls.h>
 
 #include <cmsis-plus/diag/trace.h>
@@ -215,6 +217,10 @@ namespace os
 
 #pragma GCC diagnostic pop
 
+// ----------------------------------------------------------------------------
+
 #endif /* __cplusplus */
+
+// ----------------------------------------------------------------------------
 
 #endif /* CMSIS_PLUS_RTOS_INTERNAL_OS_FLAGS_H_ */

@@ -84,4 +84,6 @@ namespace os
 
 #endif /* __cplusplus */
 
+// ----------------------------------------------------------------------------
+
 #endif /* CMSIS_PLUS_RTOS_OS_TYPES_H_ */

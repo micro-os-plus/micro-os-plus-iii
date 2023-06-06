@@ -43,6 +43,8 @@
 
 #if defined(__cplusplus)
 
+// ----------------------------------------------------------------------------
+
 #include <cstdint>
 #include <cstddef>
 #include <cerrno>

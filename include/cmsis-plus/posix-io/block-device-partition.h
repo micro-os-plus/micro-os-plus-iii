@@ -28,6 +28,8 @@
 #ifndef CMSIS_PLUS_POSIX_IO_BLOCK_DEVICE_PARTITION_H_
 #define CMSIS_PLUS_POSIX_IO_BLOCK_DEVICE_PARTITION_H_
 
+// ----------------------------------------------------------------------------
+
 #if defined(__cplusplus)
 
 // ----------------------------------------------------------------------------
@@ -558,6 +560,10 @@ namespace os
 
 #pragma GCC diagnostic pop
 
+// ----------------------------------------------------------------------------
+
 #endif /* __cplusplus */
+
+// ----------------------------------------------------------------------------
 
 #endif /* CMSIS_PLUS_POSIX_IO_BLOCK_DEVICE_PARTITION_H_ */

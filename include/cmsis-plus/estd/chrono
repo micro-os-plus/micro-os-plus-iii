@@ -289,8 +289,7 @@ constexpr        typename std::enable_if<
 #pragma GCC diagnostic pop
 
         // ----------------------------------------------------------------------
-      ;
-    // Avoid formatter bug
+
     } /* namespace chrono */
   } /* namespace estd */
 } /* namespace os */

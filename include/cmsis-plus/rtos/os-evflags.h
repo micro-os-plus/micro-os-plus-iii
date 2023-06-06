@@ -32,6 +32,8 @@
 
 #if defined(__cplusplus)
 
+// ----------------------------------------------------------------------------
+
 #include <cmsis-plus/rtos/os-decls.h>
 #include <cmsis-plus/rtos/internal/os-flags.h>
 
@@ -360,5 +362,7 @@ namespace os
 // ----------------------------------------------------------------------------
 
 #endif /* __cplusplus */
+
+// ----------------------------------------------------------------------------
 
 #endif /* CMSIS_PLUS_RTOS_OS_EVFLAGS_H_ */

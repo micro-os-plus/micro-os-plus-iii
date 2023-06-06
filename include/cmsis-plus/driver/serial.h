@@ -38,6 +38,8 @@
 
 #ifdef __cplusplus
 
+// ----------------------------------------------------------------------------
+
 #include <cmsis-plus/driver/common.h>
 
 #include <cstdint>
