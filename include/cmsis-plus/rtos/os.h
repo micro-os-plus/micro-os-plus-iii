@@ -164,8 +164,6 @@ namespace os
 #else
 #endif /* defined(OS_HAS_INTERRUPTS_STACK) */
 
-      ;
-    // Avoid formatter bug.
     } /* namespace interrupts */
 
     // ------------------------------------------------------------------------

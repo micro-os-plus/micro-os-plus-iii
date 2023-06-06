@@ -818,9 +818,7 @@ namespace os
 
       };
 
-    }
-    ;
-    /* namespace internal */
+    } /* namespace internal */
 
     // ------------------------------------------------------------------------
     namespace scheduler
