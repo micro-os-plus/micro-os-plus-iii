@@ -48,6 +48,10 @@ extern "C"
    * @{
    */
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+#endif
   /**
    * @brief The standard C application entry point.
    * @par Parameters
@@ -58,6 +62,7 @@ extern "C"
   void
   __attribute__ ((noreturn))
   _start (void);
+#pragma GCC diagnostic pop
 
   /**
    * @brief Initialise hardware early.

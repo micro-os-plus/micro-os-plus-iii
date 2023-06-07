@@ -60,8 +60,13 @@ namespace os
 {
   namespace estd
   {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+#endif
     [[noreturn]] void
     __throw_bad_alloc (void);
+#pragma GCC diagnostic pop
 
     template<typename L>
       class lock_guard;

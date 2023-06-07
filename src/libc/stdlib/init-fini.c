@@ -31,6 +31,9 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+#endif
 
 void
 _init (void);

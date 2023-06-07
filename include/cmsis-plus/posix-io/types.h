@@ -68,6 +68,12 @@ namespace os
 
 #endif /* __cplusplus */
 
+#pragma GCC diagnostic push
+
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+#endif
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -336,6 +342,8 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
+
+#pragma GCC diagnostic push
 
 // ----------------------------------------------------------------------------
 

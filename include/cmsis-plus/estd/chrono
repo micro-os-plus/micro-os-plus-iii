@@ -271,9 +271,12 @@ namespace os
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+#endif
 
       template<class _To, class Rep_T, class Period_T>
-constexpr        typename std::enable_if<
+        constexpr typename std::enable_if<
         std::chrono::__is_duration<_To>::value, _To>::type
         ceil (std::chrono::duration<Rep_T, Period_T> d)
           {

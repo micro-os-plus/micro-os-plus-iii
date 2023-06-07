@@ -622,8 +622,13 @@ namespace os
   } /* namespace rtos */
 } /* namespace os */
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+#endif
 int*
 __errno (void);
+#pragma GCC diagnostic pop
 
 /**
  * @name errno getter/setter

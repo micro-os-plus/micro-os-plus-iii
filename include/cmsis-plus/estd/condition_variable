@@ -361,6 +361,10 @@ namespace os
       cv_.notify_all ();
     }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+#endif
     struct __lock_external
     {
       template<class Lock_T>
@@ -370,6 +374,7 @@ namespace os
           lk->lock ();
         }
     };
+#pragma GCC diagnostic pop
 
     template<class Lock_T>
       void

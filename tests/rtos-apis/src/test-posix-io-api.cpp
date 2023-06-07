@@ -331,9 +331,7 @@ static posix::file_descriptors_manager fdm
 static const char* test_name = "Test POSIX I/O";
 
 #pragma GCC diagnostic push
-#if defined(__GNUC__) && !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-#endif
 
 int
 test_posix_io_api (bool extra __attribute__((unused)))

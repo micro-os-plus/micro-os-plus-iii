@@ -217,12 +217,17 @@ namespace os
       flags_get (flags::mask_t mask,
                  flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+#endif
       /**
        * @brief Implementation of the library `__errno()` function.
        * @return Pointer to thread specific `errno`.
        */
       int*
       __errno (void);
+#pragma GCC diagnostic pop
 
     } /* namespace this_thread */
 

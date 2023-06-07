@@ -37,9 +37,14 @@
 
 // ----------------------------------------------------------------------------
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+#endif
 void
 __assert_func (const char* file, int line, const char* func,
                const char* failedexpr);
+#pragma GCC diagnostic pop
 
 #if !defined(TRACE) && !defined(OS_USE_SEMIHOSTING_SYSCALLS)
 void

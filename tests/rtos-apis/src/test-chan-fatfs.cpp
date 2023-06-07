@@ -48,8 +48,9 @@
 
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
-#pragma clang diagnostic ignored "-Wunused-but-set-variable"
+#pragma clang diagnostic ignored "-Wextra-semi-stmt"
 #endif
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 
 // ----------------------------------------------------------------------------
 

@@ -97,6 +97,10 @@ namespace os
           }
       }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+#endif
       // This guarantees that the memory resources are initialised
       // before entering main().
       static void
@@ -105,6 +109,7 @@ namespace os
       {
         init_once_default_resource ();
       }
+#pragma GCC diagnostic pop
 
       // allocator_pool<mutex> allocator_mutex_instance;
 
