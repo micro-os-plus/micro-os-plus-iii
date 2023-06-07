@@ -138,7 +138,6 @@ namespace os
         event_flags
           { nullptr, attr }
     {
-      ;
     }
 
 #pragma GCC diagnostic push

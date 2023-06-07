@@ -676,7 +676,6 @@ namespace os
     constexpr
     semaphore::attributes::attributes ()
     {
-      ;
     }
 
     /**
@@ -688,7 +687,6 @@ namespace os
         sm_max_value (max_value), //
         sm_initial_value (initial_value)
     {
-      ;
     }
 
     /**
@@ -701,7 +699,6 @@ namespace os
         attributes
           { 1, initial_value } // Use the protected constructor.
     {
-      ;
     }
 
     // ========================================================================
@@ -712,7 +709,6 @@ namespace os
         attributes
           { max_value, initial_value } // Use the protected constructor.
     {
-      ;
     }
 
     // ========================================================================
@@ -749,7 +745,6 @@ namespace os
         semaphore
           { nullptr, attr }
     {
-      ;
     }
 
     /**
@@ -811,7 +806,6 @@ namespace os
         semaphore
           { nullptr, 1, initial_value, initializer_binary }
     {
-      ;
     }
 
     /**
@@ -838,7 +832,6 @@ namespace os
         semaphore
           { name, 1, initial_value }
     {
-      ;
     }
 
     /**
@@ -862,7 +855,6 @@ namespace os
     inline
     semaphore_binary::~semaphore_binary ()
     {
-      ;
     }
 
     // ========================================================================
@@ -891,7 +883,6 @@ namespace os
         semaphore
           { nullptr, max_value, initial_value }
     {
-      ;
     }
 
     /**
@@ -919,7 +910,6 @@ namespace os
         semaphore
           { name, max_value, initial_value }
     {
-      ;
     }
 
     /**
@@ -943,7 +933,6 @@ namespace os
     inline
     semaphore_counting::~semaphore_counting ()
     {
-      ;
     }
 
   // ========================================================================

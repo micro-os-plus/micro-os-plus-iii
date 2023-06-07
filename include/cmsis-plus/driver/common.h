@@ -141,7 +141,6 @@ namespace os
     api_ (0), //
     drv_ (0)
       {
-        ;
       }
 
     inline constexpr
@@ -149,7 +148,6 @@ namespace os
     api_ (api), //
     drv_ (drv)
       {
-        ;
       }
 
     inline version_t

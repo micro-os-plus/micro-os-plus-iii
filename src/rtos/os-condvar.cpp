@@ -239,7 +239,6 @@ namespace os
         condition_variable
           { nullptr, attr }
     {
-      ;
     }
 
     /**

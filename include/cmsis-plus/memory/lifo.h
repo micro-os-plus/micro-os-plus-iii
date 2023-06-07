@@ -411,7 +411,6 @@ namespace os
       lifo_inclusive<N>::lifo_inclusive () :
           lifo_inclusive (nullptr)
       {
-        ;
       }
 
     template<std::size_t N>
@@ -439,7 +438,6 @@ namespace os
                                          const allocator_type& allocator) :
           lifo_allocated (nullptr, bytes, allocator)
       {
-        ;
       }
 
     template<typename A>

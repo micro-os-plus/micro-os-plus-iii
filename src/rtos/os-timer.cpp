@@ -151,7 +151,6 @@ namespace os
         timer
           { nullptr, function, args, attr }
     {
-      ;
     }
 
     /**

@@ -500,7 +500,6 @@ namespace os
         rtos::memory::memory_resource
           { name }
     {
-      ;
     }
 
     inline
@@ -508,7 +507,6 @@ namespace os
         first_fit_top
           { nullptr, addr, bytes }
     {
-      ;
     }
 
     inline
@@ -530,7 +528,6 @@ namespace os
       first_fit_top_inclusive<N>::first_fit_top_inclusive () :
           first_fit_top_inclusive (nullptr)
       {
-        ;
       }
 
     template<std::size_t N>
@@ -558,7 +555,6 @@ namespace os
           std::size_t bytes, const allocator_type& allocator) :
           first_fit_top_allocated (nullptr, bytes, allocator)
       {
-        ;
       }
 
     template<typename A>

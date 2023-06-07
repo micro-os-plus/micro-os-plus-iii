@@ -820,7 +820,6 @@ namespace os
         internal::object_named
           { name }
     {
-      ;
     }
 
     inline internal::clock_timestamps_list&
@@ -866,7 +865,6 @@ namespace os
         clock
           { name }
     {
-      ;
     }
 
     inline void

@@ -397,7 +397,6 @@ namespace os
         message_queue
           { nullptr, msgs, msg_size_bytes, attr, allocator }
     {
-      ;
     }
 
     /**

@@ -49,7 +49,6 @@ namespace os
     void __attribute__((weak))
     initialize (void)
     {
-      ;
     }
 
     /**
@@ -65,7 +64,6 @@ namespace os
     void __attribute__((weak))
     flush (void)
     {
-      ;
     }
 
     // ----------------------------------------------------------------------

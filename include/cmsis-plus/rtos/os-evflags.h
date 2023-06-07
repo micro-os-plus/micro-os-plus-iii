@@ -351,7 +351,6 @@ namespace os
     constexpr
     event_flags::attributes::attributes ()
     {
-      ;
     }
 
   } /* namespace rtos */

@@ -228,13 +228,11 @@ namespace os
     inline
     condition_variable::condition_variable ()
     {
-      ;
     }
 
     inline
     condition_variable::~condition_variable ()
     {
-      ;
     }
 
     template<class Predicate_T>
@@ -342,13 +340,11 @@ namespace os
         mx_
           { std::make_shared<mutex> () }
     {
-      ;
     }
 
     inline
     condition_variable_any::~condition_variable_any ()
     {
-      ;
     }
 
     inline void

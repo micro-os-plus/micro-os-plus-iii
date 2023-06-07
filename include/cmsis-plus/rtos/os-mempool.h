@@ -895,7 +895,6 @@ namespace os
     constexpr
     memory_pool::attributes::attributes ()
     {
-      ;
     }
 
     // ========================================================================
@@ -999,7 +998,6 @@ namespace os
           memory_pool_allocated
             { nullptr, blocks, block_size_bytes, attr, allocator }
       {
-        ;
       }
 
     /**
@@ -1140,7 +1138,6 @@ namespace os
           memory_pool_allocated<allocator_type> (blocks, sizeof(T), attr,
                                                  allocator)
       {
-        ;
       }
 
     /**
@@ -1179,7 +1176,6 @@ namespace os
           memory_pool_allocated<allocator_type> (name, blocks, sizeof(T), attr,
                                                  allocator)
       {
-        ;
       }
 
     /**
@@ -1203,7 +1199,6 @@ namespace os
     template<typename T, typename Allocator>
       memory_pool_typed<T, Allocator>::~memory_pool_typed ()
       {
-        ;
       }
 
     /**
@@ -1349,7 +1344,6 @@ namespace os
     template<typename T, std::size_t N>
       memory_pool_inclusive<T, N>::~memory_pool_inclusive ()
       {
-        ;
       }
 
     /**

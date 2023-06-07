@@ -358,7 +358,6 @@ namespace os
         thread
           { nullptr, function, args, attr, allocator }
     {
-      ;
     }
 
     /**

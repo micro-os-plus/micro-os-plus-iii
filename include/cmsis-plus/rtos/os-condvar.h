@@ -323,7 +323,6 @@ namespace os
     constexpr
     condition_variable::attributes::attributes ()
     {
-      ;
     }
 
     // ========================================================================

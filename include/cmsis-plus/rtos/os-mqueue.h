@@ -1267,7 +1267,6 @@ namespace os
     constexpr
     message_queue::attributes::attributes ()
     {
-      ;
     }
 
     // ========================================================================
@@ -1381,7 +1380,6 @@ namespace os
           message_queue_allocated
             { nullptr, msgs, msg_size_bytes, attr, allocator }
       {
-        ;
       }
 
     /**
@@ -1523,7 +1521,6 @@ namespace os
           message_queue_allocated<allocator_type>
             { msgs, sizeof(value_type), attr, allocator }
       {
-        ;
       }
 
     /**
@@ -1564,7 +1561,6 @@ namespace os
           message_queue_allocated<allocator_type>
             { name, msgs, sizeof(value_type), attr, allocator }
       {
-        ;
       }
 
     /**
@@ -1586,7 +1582,6 @@ namespace os
     template<typename T, typename Allocator>
       message_queue_typed<T, Allocator>::~message_queue_typed ()
       {
-        ;
       }
 
     /**
@@ -1731,7 +1726,6 @@ namespace os
           message_queue_inclusive
             { nullptr, attr }
       {
-        ;
       }
 
     /**
@@ -1795,7 +1789,6 @@ namespace os
     template<typename T, std::size_t N>
       message_queue_inclusive<T, N>::~message_queue_inclusive ()
       {
-        ;
       }
 
     /**

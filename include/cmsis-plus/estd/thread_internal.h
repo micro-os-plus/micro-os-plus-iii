@@ -304,14 +304,12 @@ inline
 thread::id::id () noexcept :
 native_thread_ ( nullptr)
   {
-    ;
   }
 
 inline
 thread::id::id (native_handle_type native_thread) noexcept :
 native_thread_ ( native_thread)
   {
-    ;
   }
 
 // ------------------------------------------------------------------------

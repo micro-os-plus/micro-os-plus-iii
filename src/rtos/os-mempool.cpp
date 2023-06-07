@@ -243,7 +243,6 @@ namespace os
         memory_pool
           { nullptr, blocks, block_size_bytes, attr, allocator }
     {
-      ;
     }
 
     /**

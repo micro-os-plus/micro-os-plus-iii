@@ -203,7 +203,6 @@ namespace os
     inline
     mutex::mutex () noexcept
     {
-      ;
     }
 
     inline mutex::native_handle_type
@@ -219,7 +218,6 @@ namespace os
         nm_
           { os::rtos::mutex::initializer_recursive }
     {
-      ;
     }
 
     inline recursive_mutex::native_handle_type

@@ -442,7 +442,6 @@ namespace os
         mutex
           { nullptr, attr }
     {
-      ;
     }
 
     /**

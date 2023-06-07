@@ -480,7 +480,6 @@ namespace os
         rtos::memory::memory_resource
           { name }
     {
-      ;
     }
 
     inline
@@ -489,7 +488,6 @@ namespace os
         block_pool
           { nullptr, blocks, block_size_bytes, addr, bytes }
     {
-      ;
     }
 
     inline
@@ -512,7 +510,6 @@ namespace os
       block_pool_typed_inclusive<T, N>::block_pool_typed_inclusive () :
           block_pool_typed_inclusive (nullptr)
       {
-        ;
       }
 
     template<typename T, std::size_t N>
@@ -542,7 +539,6 @@ namespace os
           std::size_t blocks, const allocator_type& allocator) :
           block_pool_typed_allocated (nullptr, blocks, allocator)
       {
-        ;
       }
 
     template<typename T, typename A>

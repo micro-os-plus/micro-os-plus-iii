@@ -996,7 +996,6 @@ namespace os
       lockable::lockable () :
           state_ (port::scheduler::state::init)
       {
-        ;
       }
 
       /**
@@ -1005,7 +1004,6 @@ namespace os
       inline
       lockable::~lockable ()
       {
-        ;
       }
 
       /**
@@ -1146,7 +1144,6 @@ namespace os
       critical_section::critical_section () :
           state_ (enter ())
       {
-        ;
       }
 
       /**
@@ -1189,7 +1186,6 @@ namespace os
       uncritical_section::uncritical_section () :
           state_ (enter ())
       {
-        ;
       }
 
       /**
@@ -1231,7 +1227,6 @@ namespace os
       lockable::lockable () :
           state_ (port::interrupts::state::init)
       {
-        ;
       }
 
       /**
@@ -1241,7 +1236,6 @@ namespace os
       __attribute__((always_inline))
       lockable::~lockable ()
       {
-        ;
       }
 
       /**

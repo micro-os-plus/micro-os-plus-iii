@@ -846,7 +846,6 @@ namespace os
     inline
     static_double_list_links::static_double_list_links ()
     {
-      ;
     }
 
     inline
@@ -902,7 +901,6 @@ namespace os
     inline
     double_list_links::~double_list_links ()
     {
-      ;
     }
 
     // ========================================================================
@@ -912,7 +910,6 @@ namespace os
           node_
             { }
       {
-        ;
       }
 
     template<typename T, typename N, T* N::* MP, typename U>
@@ -922,7 +919,6 @@ namespace os
           node_
             { node }
       {
-        ;
       }
 
     template<typename T, typename N, T* N::* MP, typename U>
@@ -1035,7 +1031,6 @@ namespace os
     inline
     static_double_list::~static_double_list ()
     {
-      ;
     }
 
     inline bool
@@ -1072,7 +1067,6 @@ namespace os
           node_
             { }
       {
-        ;
       }
 
     template<typename T, typename N, N T::* MP, typename U>
@@ -1082,7 +1076,6 @@ namespace os
           node_
             { node }
       {
-        ;
       }
 
     template<typename T, typename N, N T::* MP, typename U>
@@ -1189,7 +1182,6 @@ namespace os
       inline
       intrusive_list<T, N, MP, U>::intrusive_list ()
       {
-        ;
       }
 
     template<typename T, typename N, N T::* MP, typename U>
@@ -1206,7 +1198,6 @@ namespace os
       inline
       intrusive_list<T, N, MP, U>::~intrusive_list ()
       {
-        ;
       }
 
     template<typename T, typename N, N T::* MP, typename U>

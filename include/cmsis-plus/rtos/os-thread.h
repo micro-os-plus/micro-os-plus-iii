@@ -2102,7 +2102,6 @@ namespace os
     constexpr
     thread::attributes::attributes ()
     {
-      ;
     }
 
     // ======================================================================
@@ -2233,7 +2232,6 @@ namespace os
     inline
     thread::context::context ()
     {
-      ;
     }
 
     /**
@@ -2514,7 +2512,6 @@ namespace os
           thread_allocated
             { nullptr, function, args, attr, allocator }
       {
-        ;
       }
 
     /**
@@ -2717,7 +2714,6 @@ namespace os
           thread_inclusive<N>
             { nullptr, function, args, attr }
       {
-        ;
       }
 
     /**

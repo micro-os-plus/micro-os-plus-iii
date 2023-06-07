@@ -153,7 +153,6 @@ namespace os
 
     clock::~clock ()
     {
-      ;
     }
 
     /**
@@ -163,7 +162,6 @@ namespace os
     void
     clock::start (void)
     {
-      ;
     }
 
     /**
@@ -406,7 +404,6 @@ namespace os
      */
     adjustable_clock::~adjustable_clock ()
     {
-      ;
     }
 
     /**
@@ -551,7 +548,6 @@ namespace os
         clock
           { "sysclock" }
     {
-      ;
     }
 
     /**
@@ -559,7 +555,6 @@ namespace os
      */
     clock_systick::~clock_systick ()
     {
-      ;
     }
 
     /**
@@ -654,7 +649,6 @@ namespace os
         adjustable_clock
           { "rtclock" }
     {
-      ;
     }
 
     /**
@@ -662,7 +656,6 @@ namespace os
      */
     clock_rtc::~clock_rtc ()
     {
-      ;
     }
 
     // ------------------------------------------------------------------------
@@ -707,7 +700,6 @@ namespace os
         clock
           { "hrclock" }
     {
-      ;
     }
 
     /**
@@ -715,7 +707,6 @@ namespace os
      */
     clock_highres::~clock_highres ()
     {
-      ;
     }
 
     /**

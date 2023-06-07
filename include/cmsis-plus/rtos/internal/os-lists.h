@@ -873,13 +873,11 @@ namespace os
       waiting_thread_node::waiting_thread_node (rtos::thread& th) :
           thread_ (&th)
       {
-        ;
       }
 
       inline
       waiting_thread_node::~waiting_thread_node ()
       {
-        ;
       }
 
       // ======================================================================
@@ -891,13 +889,11 @@ namespace os
       inline
       thread_children_list::thread_children_list ()
       {
-        ;
       }
 
       inline
       thread_children_list::~thread_children_list ()
       {
-        ;
       }
 
       // ======================================================================
@@ -909,13 +905,11 @@ namespace os
       inline
       ready_threads_list::ready_threads_list ()
       {
-        ;
       }
 
       inline
       ready_threads_list::~ready_threads_list ()
       {
-        ;
       }
 
       inline volatile waiting_thread_node*
@@ -933,13 +927,11 @@ namespace os
       inline
       waiting_threads_list::waiting_threads_list ()
       {
-        ;
       }
 
       inline
       waiting_threads_list::~waiting_threads_list ()
       {
-        ;
       }
 
       inline volatile waiting_thread_node*
@@ -969,13 +961,11 @@ namespace os
       inline
       clock_timestamps_list::clock_timestamps_list ()
       {
-        ;
       }
 
       inline
       clock_timestamps_list::~clock_timestamps_list ()
       {
-        ;
       }
 
       inline volatile timestamp_node*
@@ -993,13 +983,11 @@ namespace os
       inline
       terminated_threads_list::terminated_threads_list ()
       {
-        ;
       }
 
       inline
       terminated_threads_list::~terminated_threads_list ()
       {
-        ;
       }
 
       inline volatile waiting_thread_node*

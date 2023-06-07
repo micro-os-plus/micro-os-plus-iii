@@ -170,7 +170,6 @@ namespace os
     null_memory_resource::do_deallocate (void* addr, std::size_t bytes,
                                          std::size_t alignment) noexcept
     {
-      ;
     }
 
 #pragma GCC diagnostic pop

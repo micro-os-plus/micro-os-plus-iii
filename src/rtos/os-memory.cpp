@@ -369,7 +369,6 @@ namespace os
 
       memory_resource::~memory_resource ()
       {
-        ;
       }
 
       /**

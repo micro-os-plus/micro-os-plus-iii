@@ -598,7 +598,6 @@ namespace os
        */
       object_named::object_named ()
       {
-        ;
       }
 
       /**
@@ -615,7 +614,6 @@ namespace os
       object_named::object_named (const char* name) :
           name_ (name != nullptr ? name : "-")
       {
-        ;
       }
 
     } /* namespace internal */

@@ -288,7 +288,6 @@ namespace os
         inline void __attribute__((always_inline))
         flush (void)
           {
-            ;
           }
 
         inline int __attribute__((always_inline))
@@ -365,7 +364,6 @@ inline void
 __attribute__((always_inline))
 trace_initialize (void)
   {
-    ;
   }
 
 #pragma GCC diagnostic push
@@ -387,7 +385,6 @@ inline void
 __attribute__((always_inline))
 trace_flush (void)
   {
-    ;
   }
 
 #pragma GCC diagnostic pop

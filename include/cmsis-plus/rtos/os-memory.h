@@ -1267,7 +1267,6 @@ namespace os
           object_named
             { name }
       {
-        ;
       }
 
       /**
@@ -1483,7 +1482,6 @@ namespace os
           allocator_stateless_default_resource<T>::allocator_stateless_default_resource (
               allocator_stateless_default_resource<U> const & other __attribute__((unused))) noexcept
           {
-            ;
           }
 
       template<typename T>
@@ -1549,7 +1547,6 @@ namespace os
           allocator_stateless_polymorphic_synchronized<T, L, get_resource>::allocator_stateless_polymorphic_synchronized (
               allocator_stateless_polymorphic_synchronized<U, L, get_resource> const & other __attribute__((unused))) noexcept
           {
-            ;
           }
 
       template<typename T, typename L, F get_resource>
@@ -1633,7 +1630,6 @@ namespace os
         inline
         allocator_deleter<A>::allocator_deleter ()
         {
-          ;
         }
 
       template<typename A>
@@ -1642,7 +1638,6 @@ namespace os
             a_
               { other }
         {
-          ;
         }
 
       /**

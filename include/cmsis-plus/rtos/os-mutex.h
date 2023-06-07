@@ -806,7 +806,6 @@ namespace os
     constexpr
     mutex::attributes::attributes ()
     {
-      ;
     }
 
     /**
@@ -817,7 +816,6 @@ namespace os
     mutex::attributes::attributes (type_t type) :
         mx_type (type)
     {
-      ;
     }
 
     /**
@@ -830,7 +828,6 @@ namespace os
         attributes
           { type::recursive } // Use the protected constructor.
     {
-      ;
     }
 
     // ========================================================================
@@ -888,7 +885,6 @@ namespace os
         mutex
           { attr }
     {
-      ;
     }
 
     inline
@@ -896,13 +892,11 @@ namespace os
         mutex
           { name, attr }
     {
-      ;
     }
 
     inline
     mutex_recursive::~mutex_recursive ()
     {
-      ;
     }
 
     /**

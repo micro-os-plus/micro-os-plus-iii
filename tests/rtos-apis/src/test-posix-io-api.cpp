@@ -178,7 +178,6 @@ my_char_impl::do_vioctl (int request, std::va_list args)
 void
 my_char_impl::do_sync (void)
 {
-  ;
 }
 
 int
@@ -251,7 +250,6 @@ my_block_impl::do_vioctl (int request, std::va_list args)
 void
 my_block_impl::do_sync (void)
 {
-  ;
 }
 
 int

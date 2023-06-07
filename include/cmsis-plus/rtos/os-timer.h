@@ -464,7 +464,6 @@ namespace os
     constexpr
     timer::attributes::attributes ()
     {
-      ;
     }
 
     /**
@@ -475,7 +474,6 @@ namespace os
     timer::attributes::attributes (type_t type) :
         tm_type (type)
     {
-      ;
     }
 
     /**
@@ -488,7 +486,6 @@ namespace os
         attributes
           { run::periodic }
     {
-      ;
     }
 
     /**

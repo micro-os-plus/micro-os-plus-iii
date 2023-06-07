@@ -744,19 +744,18 @@ namespace os
     inline
     null_locker::~null_locker ()
     {
-      ;
     }
 
     inline void
     null_locker::lock (void)
     {
-      ; // Does nothing.
+      // Does nothing.
     }
 
     inline void
     null_locker::unlock (void)
     {
-      ; // Does nothing.
+      // Does nothing.
     }
 
     namespace internal
@@ -781,14 +780,12 @@ namespace os
       inline
       object_named_system::object_named_system ()
       {
-        ;
       }
 
       inline
       object_named_system::object_named_system (const char* name) :
           object_named (name)
       {
-        ;
       }
 
       // ======================================================================
@@ -799,7 +796,6 @@ namespace os
       constexpr
       attributes_clocked::attributes_clocked ()
       {
-        ;
       }
 
     // ========================================================================

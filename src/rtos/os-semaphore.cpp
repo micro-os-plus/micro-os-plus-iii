@@ -162,7 +162,6 @@ namespace os
         semaphore
           { name, attr.sm_max_value, attr.sm_initial_value, attr }
     {
-      ;
     }
 
     /**
