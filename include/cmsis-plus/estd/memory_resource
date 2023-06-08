@@ -52,8 +52,9 @@ namespace os
 
     // ========================================================================
 
-    [[noreturn]] void
-    __throw_bad_alloc (void);
+    // in os-memory.h
+    // [[noreturn]] void
+    // __throw_bad_alloc (void);
 
     namespace pmr
     {
