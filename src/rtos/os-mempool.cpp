@@ -362,9 +362,11 @@ namespace os
       // Blocks must be pointer aligned.
       void* p = pool_addr_;
       std::size_t sz = pool_size_bytes_;
-      pool_addr_ = static_cast<char*> (std::align (__SIZEOF_POINTER__,
-                                                   blocks_ * block_size_bytes_,
-                                                   p, sz));
+      pool_addr_ = static_cast<char*> (
+        std::align (__SIZEOF_POINTER__,
+                    static_cast<std::size_t>(blocks_ * block_size_bytes_),
+                    p, sz)
+      );
 
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s %u %u %p %u\n", __func__, this, name (),
