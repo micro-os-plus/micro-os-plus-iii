@@ -228,6 +228,10 @@ namespace os
         case SEEK_END:
           errno = EINVAL;
           return -1;
+
+        default:
+          errno = EINVAL;
+          return -1;
         }
 
       if (tmp < 0)
