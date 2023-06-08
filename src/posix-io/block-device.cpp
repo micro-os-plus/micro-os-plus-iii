@@ -275,7 +275,7 @@ namespace os
       ssize_t ret = do_read_block (buf, blknum, nblocks);
       if (ret >= 0)
         {
-          ret *= block_logical_size_bytes_;
+          ret *= static_cast<ssize_t>(block_logical_size_bytes_);
         }
       return ret;
     }
@@ -310,7 +310,7 @@ namespace os
       ssize_t ret = do_write_block (buf, blknum, nblocks);
       if (ret >= 0)
         {
-          ret *= block_logical_size_bytes_;
+          ret *= static_cast<ssize_t>(block_logical_size_bytes_);
         }
       return ret;
     }
