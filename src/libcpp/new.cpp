@@ -353,8 +353,9 @@ operator delete (void* ptr) noexcept
 #pragma GCC diagnostic ignored "-Wc++14-compat"
 #endif
 
-void
-operator delete (void* ptr, std::size_t bytes) noexcept;
+// error: redundant redeclaration of 'void operator delete(void*, std::size_t)' in same scope [-Werror=redundant-decls]
+// void
+// operator delete (void* ptr, std::size_t bytes) noexcept;
 
 /**
  * @brief Deallocate the dynamically allocated object instance.
@@ -472,8 +473,9 @@ operator delete[] (void* ptr) noexcept
 #pragma GCC diagnostic ignored "-Wc++14-compat"
 #endif
 
-void
-operator delete[] (void* ptr, std::size_t bytes) noexcept;
+// error: redundant redeclaration of 'void operator delete [](void*, std::size_t)' in same scope [-Werror=redundant-decls]
+// void
+// operator delete[] (void* ptr, std::size_t bytes) noexcept;
 
 /**
  * @brief Deallocate the dynamically allocated array of object.
