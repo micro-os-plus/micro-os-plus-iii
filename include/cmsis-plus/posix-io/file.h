@@ -143,7 +143,7 @@ namespace os
       // Support functions.
 
       class file_system&
-      file_system (void);
+      get_file_system (void);
 
       file_impl&
       impl (void) const;
@@ -237,7 +237,7 @@ namespace os
       // Support functions.
 
       class file_system&
-      file_system (void);
+      get_file_system (void);
 
       /**
        * @}
@@ -456,9 +456,9 @@ namespace os
     // ========================================================================
 
     inline file_system&
-    file::file_system (void)
+    file::get_file_system (void)
     {
-      return impl ().file_system ();
+      return impl ().get_file_system ();
     }
 
     inline file_impl&
@@ -470,7 +470,7 @@ namespace os
     // ========================================================================
 
     inline class file_system&
-    file_impl::file_system (void)
+    file_impl::get_file_system (void)
     {
       return file_system_;
     }

@@ -112,7 +112,7 @@ namespace os
         }
 
       // The file object will be deallocated at the next open.
-      file_system ().add_deferred_directory (this);
+      get_file_system ().add_deferred_directory (this);
 
       return ret;
     }

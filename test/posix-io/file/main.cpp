@@ -580,7 +580,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       // Check if FileSystemsManger is empty.
       for (std::size_t i = 0; i < mm.size (); ++i)
         {
-          assert(mm.file_system (i) == nullptr);
+          assert(mm.get_file_system (i) == nullptr);
           assert(mm.path (i) == nullptr);
         }
       assert(mm.root () == nullptr);
@@ -617,7 +617,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       errno = -2;
       assert(
           (os::posix::mount_manager::mount (&fs1, "/fs1/", &dev1, 124) == 0) && (errno == 0));
-      assert(os::posix::mount_manager::file_system (0) == &fs1);
+      assert(os::posix::mount_manager::get_file_system (0) == &fs1);
       assert(fs1.block_device () == &dev1);
 
       assert(fs1.getFlags () == 124);

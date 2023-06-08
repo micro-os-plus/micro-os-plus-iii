@@ -77,7 +77,7 @@ namespace os
 
       // Link the file object to a list kept by the file system.
       // It will be deallocated at the next open.
-      file_system ().add_deferred_file (this);
+      get_file_system ().add_deferred_file (this);
 
       return ret;
     }
@@ -124,7 +124,7 @@ namespace os
       errno = 0;
 
       // Execute the file system code. Might be locked there.
-      return file_system ().statvfs (buf);
+      return get_file_system ().statvfs (buf);
     }
 
     // ========================================================================

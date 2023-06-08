@@ -151,7 +151,7 @@ namespace os
       dir_entry (void);
 
       class file_system&
-      file_system (void) const;
+      get_file_system (void) const;
 
       directory_impl&
       impl (void) const;
@@ -264,7 +264,7 @@ namespace os
       // Support functions.
 
       class file_system&
-      file_system (void) const;
+      get_file_system (void) const;
 
       /**
        * @}
@@ -471,9 +471,9 @@ namespace os
     // ========================================================================
 
     inline file_system&
-    directory::file_system (void) const
+    directory::get_file_system (void) const
     {
-      return impl ().file_system ();
+      return impl ().get_file_system ();
     }
 
     inline struct dirent*
@@ -491,7 +491,7 @@ namespace os
     // ========================================================================
 
     inline file_system&
-    directory_impl::file_system (void) const
+    directory_impl::get_file_system (void) const
     {
       return file_system_;
     }
