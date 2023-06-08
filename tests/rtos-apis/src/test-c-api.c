@@ -561,13 +561,13 @@ test_c_api (void)
       os_mempool_t p1;
       os_mempool_construct (&p1, "p1", 3, sizeof(my_blk_t), NULL);
 
-      blk = os_mempool_alloc (&p1);
+      blk = (my_blk_t*)os_mempool_alloc (&p1);
       os_mempool_free (&p1, blk);
 
-      blk = os_mempool_try_alloc (&p1);
+      blk = (my_blk_t*)os_mempool_try_alloc (&p1);
       os_mempool_free (&p1, blk);
 
-      blk = os_mempool_timed_alloc (&p1, 1);
+      blk = (my_blk_t*)os_mempool_timed_alloc (&p1, 1);
       os_mempool_free (&p1, blk);
 
       os_mempool_destruct (&p1);
@@ -586,7 +586,7 @@ test_c_api (void)
       os_mempool_t p2;
       os_mempool_construct (&p2, "p2", 3, sizeof(my_blk_t), &ap2);
 
-      blk = os_mempool_alloc (&p2);
+      blk = (my_blk_t*)os_mempool_alloc (&p2);
 
       os_mempool_free (&p2, blk);
 
@@ -600,7 +600,7 @@ test_c_api (void)
       os_mempool_t* p3;
       p3 = os_mempool_new ("p3", 3, sizeof(my_blk_t), NULL);
 
-      blk = os_mempool_alloc (p3);
+      blk = (my_blk_t*)os_mempool_alloc (p3);
       os_mempool_free (p3, blk);
 
       os_mempool_delete (p3);

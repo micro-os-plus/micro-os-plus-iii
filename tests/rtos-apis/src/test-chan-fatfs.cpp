@@ -829,6 +829,7 @@ DWORD pns /* 0:Initialize, !0:Read */
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif
 
 int
@@ -967,7 +968,7 @@ test_diskio (posix::block_device& bd, /* Physical drive number to be checked (al
           dr = disk_ioctl (pdrv, CTRL_SYNC, nullptr);
           assert(dr == RES_OK);
 
-          memset (pbuff, 0, sz_sect * 2);
+          memset (pbuff, 0, (size_t)(sz_sect * 2));
           dr = disk_read (pdrv, pbuff, lba, 1);
           assert(dr == RES_OK);
 
