@@ -43,8 +43,9 @@ using namespace os::rtos;
 void*
 os_idle (thread::func_args_t args);
 
-void
-os_rtos_idle_actions (void);
+// os-thread.h
+// void
+// os_rtos_idle_actions (void);
 
 /**
  * @details
