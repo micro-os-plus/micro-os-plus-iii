@@ -21,7 +21,7 @@
  * Version 1.02
  *    Control functions for short timeouts in microsecond resolution:
  *    Added: osKernelSysTick, osKernelSysTickFrequency, osKernelSysTickMicroSec
- *    Removed: osSignalGet 
+ *    Removed: osSignalGet
  *----------------------------------------------------------------------------
  *
  * Copyright (c) 2013 ARM LIMITED
