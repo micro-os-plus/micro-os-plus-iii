@@ -1095,8 +1095,9 @@ extern "C"
    * @cond ignore
    */
 
-  int
-  os_main (int argc, char* argv[]);
+  // os-c-api.h
+  // int
+  // os_main (int argc, char* argv[]);
 
 /**
  * @endcond
