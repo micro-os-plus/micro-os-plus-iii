@@ -237,7 +237,7 @@ namespace os
         {
           exit_ptr = thread->func_ (thread->func_args_);
         }
-      catch (std::exception e)
+      catch (std::exception const &e)
         {
           trace::printf ("%s() @%p %s top exception \"%s\".\n", __func__,
               thread, thread->name (), e.what ());
