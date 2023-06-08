@@ -187,7 +187,7 @@ namespace os
     {
       assert((fildes >= 0) && (static_cast<std::size_t> (fildes) < size__));
       auto* const io = descriptors_array__[fildes];
-      if (io->get_type () != io::type::socket)
+      if (io->get_type () != static_cast<posix::io::type_t>(io::type::socket))
         {
           return nullptr;
         }

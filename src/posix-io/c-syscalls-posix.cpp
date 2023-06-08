@@ -184,7 +184,7 @@ __posix_ioctl (int fildes, int request, ...)
     }
 
   // Works only on STREAMS (CherDevices, in this implementation)
-  if ((io->get_type () & posix::io::type::char_device) == 0)
+  if ((io->get_type () & static_cast<posix::io::type_t>(posix::io::type::char_device)) == 0)
     {
       errno = ENOTTY; // Not a stream.
       return -1;
@@ -209,7 +209,7 @@ __posix_lseek (int fildes, off_t offset, int whence)
     }
 
   // Works only on files (Does not work on sockets, pipes or FIFOs...)
-  if ((io->get_type () & posix::io::type::file) == 0)
+  if ((io->get_type () & static_cast<posix::io::type_t>(posix::io::type::file)) == 0)
     {
       errno = ESPIPE; // Not a file.
       return -1;
@@ -250,7 +250,7 @@ __posix_tcdrain (int fildes)
     }
 
   // Works only on tty...)
-  if ((io->get_type () & posix::io::type::tty) == 0)
+  if ((io->get_type () & static_cast<posix::io::type_t>(posix::io::type::tty)) == 0)
     {
       errno = ESPIPE; // Not a tty.
       return -1;
@@ -270,7 +270,7 @@ __posix_tcgetattr (int fildes, struct termios *termios_p)
     }
 
   // Works only on tty...)
-  if ((io->get_type () & posix::io::type::tty) == 0)
+  if ((io->get_type () & static_cast<posix::io::type_t>(posix::io::type::tty)) == 0)
     {
       errno = ESPIPE; // Not a tty.
       return -1;
@@ -291,7 +291,7 @@ __posix_tcsetattr (int fildes, int optional_actions,
     }
 
   // Works only on tty...)
-  if ((io->get_type () & posix::io::type::tty) == 0)
+  if ((io->get_type () & static_cast<posix::io::type_t>(posix::io::type::tty)) == 0)
     {
       errno = ESPIPE; // Not a tty.
       return -1;
@@ -312,7 +312,7 @@ __posix_tcflush (int fildes, int queue_selector)
     }
 
   // Works only on tty...)
-  if ((io->get_type () & posix::io::type::tty) == 0)
+  if ((io->get_type () & static_cast<posix::io::type_t>(posix::io::type::tty)) == 0)
     {
       errno = ESPIPE; // Not a tty.
       return -1;
@@ -332,7 +332,7 @@ __posix_tcsendbreak (int fildes, int duration)
     }
 
   // Works only on tty...)
-  if ((io->get_type () & posix::io::type::tty) == 0)
+  if ((io->get_type () & static_cast<posix::io::type_t>(posix::io::type::tty)) == 0)
     {
       errno = ESPIPE; // Not a tty.
       return -1;
@@ -382,7 +382,7 @@ __posix_fstatvfs (int fildes, struct statvfs* buf)
     }
 
   // Works only on files (Does not work on sockets, pipes or FIFOs...)
-  if ((io->get_type () & posix::io::type::file) == 0)
+  if ((io->get_type () & static_cast<posix::io::type_t>(posix::io::type::file)) == 0)
     {
       errno = EINVAL; // Not a file.
       return -1;
@@ -402,7 +402,7 @@ __posix_ftruncate (int fildes, off_t length)
     }
 
   // Works only on files (Does not work on sockets, pipes or FIFOs...)
-  if ((io->get_type () & posix::io::type::file) == 0)
+  if ((io->get_type () & static_cast<posix::io::type_t>(posix::io::type::file)) == 0)
     {
       errno = EINVAL; // Not a file.
       return -1;
@@ -422,7 +422,7 @@ __posix_fsync (int fildes)
     }
 
   // Works only on files (Does not work on sockets, pipes or FIFOs...)
-  if ((io->get_type () & posix::io::type::file) == 0)
+  if ((io->get_type () & static_cast<posix::io::type_t>(posix::io::type::file)) == 0)
     {
       errno = EINVAL; // Not a file.
       return -1;

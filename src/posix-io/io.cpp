@@ -152,7 +152,7 @@ namespace os
 
     io::io (io_impl& impl, type t) :
         impl_ (impl), //
-        type_ (t)
+        type_ (static_cast<type_t>(t))
     {
 #if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s()=%p\n", __func__, this);

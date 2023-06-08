@@ -220,7 +220,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert (os::posix::file_descriptors_manager::io (fd) == &test);
       assert (test.file_descriptor () == fd);
 
-      assert (test.get_type () == os::posix::io::type::device);
+      assert (test.get_type () == static_cast<posix::io::type_t>(os::posix::io::type::device));
 
       // Check passing variadic mode.
       assert (test.getMode () == 234);

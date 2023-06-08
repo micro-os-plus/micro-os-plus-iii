@@ -47,7 +47,7 @@ namespace os
         char_device
           { impl, name }
     {
-      type_ |= type::tty;
+      type_ |= static_cast<type_t>(type::tty);
 #if defined(OS_TRACE_POSIX_IO_TTY)
       trace::printf ("tty::%s(\"%s\")=@%p\n", __func__, name_, this);
 #endif

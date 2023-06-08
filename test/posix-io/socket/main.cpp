@@ -557,7 +557,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       os::posix::io* io = os::posix::file_descriptors_manager::io (fd);
       assert(io != nullptr);
 
-      assert(io->get_type () == os::posix::io::type::socket);
+      assert(io->get_type () == static_cast<posix::io::type_t>(os::posix::io::type::socket));
 
       TestSocket* tsock = static_cast<TestSocket*> (io);
       assert(socketsPool.object (0) == tsock);
@@ -577,7 +577,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       os::posix::io* io2 = os::posix::file_descriptors_manager::io (fd2);
       assert(io2 != nullptr);
 
-      assert(io2->get_type () == os::posix::io::type::socket);
+      assert(io2->get_type () == static_cast<posix::io::type_t>(os::posix::io::type::socket));
 
       TestSocket* tsock2 = static_cast<TestSocket*> (io2);
       assert(socketsPool.object (1) == tsock2);
@@ -762,7 +762,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       os::posix::socket* sock;
       assert(
           ((sock = os::posix::socket(123, 234, 345)) != nullptr) && errno == 0);
-      assert(sock->get_type () == os::posix::io::type::socket);
+      assert(sock->get_type () == static_cast<posix::io::type_t>(os::posix::io::type::socket));
 
       assert(sock->file_descriptor () > 0);
 
@@ -782,7 +782,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       assert(
           ((sock2 = sock->accept(&addr1, &len1)) != nullptr) && (errno == 0));
 
-      assert(sock2->get_type () == os::posix::io::type::socket);
+      assert(sock2->get_type () == static_cast<posix::io::type_t>(os::posix::io::type::socket));
 
       assert(sock2->file_descriptor () > 0);
 

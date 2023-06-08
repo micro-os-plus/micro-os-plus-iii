@@ -130,7 +130,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wshadow"
 
       using type_t = unsigned int;
-      enum type
+      enum class type
         : type_t
           { unknown = 0,
         not_set = 1 << 0,
@@ -288,7 +288,7 @@ namespace os
        * @cond ignore
        */
 
-      type_t type_ = type::not_set;
+      type_t type_ = static_cast<type_t>(type::not_set);
 
       file_descriptor_t file_descriptor_ = no_file_descriptor;
 

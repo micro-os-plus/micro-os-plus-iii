@@ -832,7 +832,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       os::posix::io* io = os::posix::file_descriptors_manager::io (fd);
       assert(io != nullptr);
 
-      assert(io->get_type () == os::posix::io::type::file);
+      assert(io->get_type () == static_cast<posix::io::type_t>(os::posix::io::type::file));
 
       TestFile* file = static_cast<TestFile*> (io);
       // Must be the first used slot in the pool.
@@ -942,7 +942,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       os::posix::io* io = os::posix::open ("/fs1/f0", 124, 235);
       assert((io != nullptr) && (errno == 0));
 
-      assert(io->get_type () == os::posix::io::type::file);
+      assert(io->get_type () == static_cast<posix::io::type_t>(os::posix::io::type::file));
 
       TestFile* tfile = static_cast<TestFile*> (io);
 
@@ -971,7 +971,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
       os::posix::file* file = os::posix::file::open ("/fs1/f1", 123, 234);
       assert((file != nullptr) && (errno == 0));
 
-      assert(file->get_type () == os::posix::io::type::file);
+      assert(file->get_type () == static_cast<posix::io::type_t>(os::posix::io::type::file));
 
       TestFile* tfile = static_cast<TestFile*> (file);
       // Must be the first used slot in the pool.
