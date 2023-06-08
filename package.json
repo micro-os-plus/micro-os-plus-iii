@@ -79,13 +79,35 @@
       "link-deps-all": [
         "xpm run link-deps",
         "xpm run link-deps --config native-cmake-sys-debug",
-        "xpm run link-deps --config native-cmake-sys-debug"
+        "xpm run link-deps --config native-cmake-sys-release",
+        "xpm run link-deps --config native-cmake-gcc-debug",
+        "xpm run link-deps --config native-cmake-gcc-release",
+        "xpm run link-deps --config native-cmake-gcc11-debug",
+        "xpm run link-deps --config native-cmake-gcc11-release",
+        "xpm run link-deps --config native-cmake-gcc12-debug",
+        "xpm run link-deps --config native-cmake-gcc12-release",
+        "xpm run link-deps --config native-cmake-clang-debug",
+        "xpm run link-deps --config native-cmake-clang-release",
+        "xpm run link-deps --config native-cmake-clang12-debug",
+        "xpm run link-deps --config native-cmake-clang12-release",
+        "xpm run link-deps --config native-cmake-clang13-debug",
+        "xpm run link-deps --config native-cmake-clang13-release",
+        "xpm run link-deps --config native-cmake-clang14-debug",
+        "xpm run link-deps --config native-cmake-clang14-release",
+        "xpm run link-deps --config native-cmake-clang15-debug",
+        "xpm run link-deps --config native-cmake-clang15-release"
       ],
       "test-all": [
         "xpm run test-native-cmake"
       ],
       "test-native-cmake": [
-        "{% if os.platform == 'darwin' %}xpm run test-native-cmake-sys{% endif %}"
+        "{% if os.platform == 'darwin' %}xpm run test-native-cmake-sys{% endif %}",
+        "xpm run test-native-cmake-gcc11",
+        "xpm run test-native-cmake-gcc12",
+        "xpm run test-native-cmake-clang12",
+        "xpm run test-native-cmake-clang13",
+        "xpm run test-native-cmake-clang14",
+        "xpm run test-native-cmake-clang15"
       ],
       "test-native-cmake-sys": [
         "xpm run prepare --config native-cmake-sys-debug",
@@ -95,12 +117,92 @@
         "xpm run build --config native-cmake-sys-release",
         "xpm run test --config native-cmake-sys-release"
       ],
+      "test-native-cmake-gcc": [
+        "xpm run prepare --config native-cmake-gcc-debug",
+        "xpm run build --config native-cmake-gcc-debug",
+        "xpm run test --config native-cmake-gcc-debug",
+        "xpm run prepare --config native-cmake-gcc-release",
+        "xpm run build --config native-cmake-gcc-release",
+        "xpm run test --config native-cmake-gcc-release"
+      ],
+      "test-native-cmake-gcc11": [
+        "xpm run prepare --config native-cmake-gcc11-debug",
+        "xpm run build --config native-cmake-gcc11-debug",
+        "xpm run test --config native-cmake-gcc11-debug",
+        "xpm run prepare --config native-cmake-gcc11-release",
+        "xpm run build --config native-cmake-gcc11-release",
+        "xpm run test --config native-cmake-gcc11-release"
+      ],
+      "test-native-cmake-gcc12": [
+        "xpm run prepare --config native-cmake-gcc12-debug",
+        "xpm run build --config native-cmake-gcc12-debug",
+        "xpm run test --config native-cmake-gcc12-debug",
+        "xpm run prepare --config native-cmake-gcc12-release",
+        "xpm run build --config native-cmake-gcc12-release",
+        "xpm run test --config native-cmake-gcc12-release"
+      ],
+      "test-native-cmake-clang": [
+        "xpm run prepare --config native-cmake-clang-debug",
+        "xpm run build --config native-cmake-clang-debug",
+        "xpm run test --config native-cmake-clang-debug",
+        "xpm run prepare --config native-cmake-clang-release",
+        "xpm run build --config native-cmake-clang-release",
+        "xpm run test --config native-cmake-clang-release"
+      ],
+      "test-native-cmake-clang12": [
+        "xpm run prepare --config native-cmake-clang12-debug",
+        "xpm run build --config native-cmake-clang12-debug",
+        "xpm run test --config native-cmake-clang12-debug",
+        "xpm run prepare --config native-cmake-clang12-release",
+        "xpm run build --config native-cmake-clang12-release",
+        "xpm run test --config native-cmake-clang12-release"
+      ],
+      "test-native-cmake-clang13": [
+        "xpm run prepare --config native-cmake-clang13-debug",
+        "xpm run build --config native-cmake-clang13-debug",
+        "xpm run test --config native-cmake-clang13-debug",
+        "xpm run prepare --config native-cmake-clang13-release",
+        "xpm run build --config native-cmake-clang13-release",
+        "xpm run test --config native-cmake-clang13-release"
+      ],
+      "test-native-cmake-clang14": [
+        "xpm run prepare --config native-cmake-clang14-debug",
+        "xpm run build --config native-cmake-clang14-debug",
+        "xpm run test --config native-cmake-clang14-debug",
+        "xpm run prepare --config native-cmake-clang14-release",
+        "xpm run build --config native-cmake-clang14-release",
+        "xpm run test --config native-cmake-clang14-release"
+      ],
+      "test-native-cmake-clang15": [
+        "xpm run prepare --config native-cmake-clang15-debug",
+        "xpm run build --config native-cmake-clang15-debug",
+        "xpm run test --config native-cmake-clang15-debug",
+        "xpm run prepare --config native-cmake-clang15-release",
+        "xpm run build --config native-cmake-clang15-release",
+        "xpm run test --config native-cmake-clang15-release"
+      ],
       "clean-all": [
         "xpm run clean-native-cmake"
       ],
       "clean-native-cmake": [
         "xpm run clean --config native-cmake-sys-debug --ignore-errors",
-        "xpm run clean --config native-cmake-sys-release --ignore-errors"
+        "xpm run clean --config native-cmake-sys-release --ignore-errors",
+        "xpm run clean --config native-cmake-gcc-debug --ignore-errors",
+        "xpm run clean --config native-cmake-gcc-release --ignore-errors",
+        "xpm run clean --config native-cmake-clang-debug --ignore-errors",
+        "xpm run clean --config native-cmake-clang-release --ignore-errors",
+        "xpm run clean --config native-cmake-gcc11-debug --ignore-errors",
+        "xpm run clean --config native-cmake-gcc11-release --ignore-errors",
+        "xpm run clean --config native-cmake-gcc12-debug --ignore-errors",
+        "xpm run clean --config native-cmake-gcc12-release --ignore-errors",
+        "xpm run clean --config native-cmake-clang12-debug --ignore-errors",
+        "xpm run clean --config native-cmake-clang12-release --ignore-errors",
+        "xpm run clean --config native-cmake-clang13-debug --ignore-errors",
+        "xpm run clean --config native-cmake-clang13-release --ignore-errors",
+        "xpm run clean --config native-cmake-clang14-debug --ignore-errors",
+        "xpm run clean --config native-cmake-clang14-release --ignore-errors",
+        "xpm run clean --config native-cmake-clang15-debug --ignore-errors",
+        "xpm run clean --config native-cmake-clang15-release --ignore-errors"
       ],
       "deep-clean": "del-cli build node_modules xpacks package-lock.json"
     },
@@ -141,11 +243,72 @@
           "@xpack-dev-tools/arm-none-eabi-gcc": "12.2.1-1.2.1"
         }
       },
+      "gcc-latest-dependencies": {
+        "hidden": true,
+        "inherit": [
+          "gcc12-dependencies"
+        ]
+      },
+      "gcc11-dependencies": {
+        "hidden": true,
+        "$devDependenciesUrl": "https://www.npmjs.com/package/@xpack-dev-tools/gcc",
+        "devDependencies": {
+          "@xpack-dev-tools/gcc": "11.3.0-1.1"
+        }
+      },
+      "gcc12-dependencies": {
+        "hidden": true,
+        "$devDependenciesUrl": "https://www.npmjs.com/package/@xpack-dev-tools/gcc",
+        "devDependencies": {
+          "@xpack-dev-tools/gcc": "12.2.0-2.1"
+        }
+      },
+      "clang-latest-dependencies": {
+        "hidden": true,
+        "inherit": [
+          "clang15-dependencies"
+        ]
+      },
+      "clang12-dependencies": {
+        "hidden": true,
+        "$devDependenciesUrl": "https://www.npmjs.com/package/@xpack-dev-tools/clang",
+        "devDependencies": {
+          "@xpack-dev-tools/clang": "12.0.1-2.2"
+        }
+      },
+      "clang13-dependencies": {
+        "hidden": true,
+        "$devDependenciesUrl": "https://www.npmjs.com/package/@xpack-dev-tools/clang",
+        "devDependencies": {
+          "@xpack-dev-tools/clang": "13.0.1-1.1"
+        }
+      },
+      "clang14-dependencies": {
+        "hidden": true,
+        "$devDependenciesUrl": "https://www.npmjs.com/package/@xpack-dev-tools/clang",
+        "devDependencies": {
+          "@xpack-dev-tools/clang": "14.0.6-2.1"
+        }
+      },
+      "clang15-dependencies": {
+        "hidden": true,
+        "$devDependenciesUrl": "https://www.npmjs.com/package/@xpack-dev-tools/clang",
+        "devDependencies": {
+          "@xpack-dev-tools/clang": "15.0.7-2.1"
+        }
+      },
       "qemu-arm-dependencies": {
         "hidden": true,
         "$devDependenciesUrl": "https://www.npmjs.com/package/@xpack-dev-tools/qemu-arm",
         "devDependencies": {
           "@xpack-dev-tools/qemu-arm": "7.2.0-1.1"
+        }
+      },
+      "short-win-paths-properties": {
+        "hidden": true,
+        "properties": {
+          "buildFolderRelativePath": "{% if os.platform != 'win32' %}{{ 'build' | path_join: configuration.name | to_filename | downcase }}{% else %}{{ 'build' | path_join: properties.shortConfigurationName | to_filename | downcase }}{% endif %}",
+          "buildFolderRelativePathPosix": "{% if os.platform != 'win32' %}{{ 'build' | path_posix_join: configuration.name | downcase }}{% else %}{{ 'build' | path_posix_join: properties.shortConfigurationName | downcase }}{% endif %}"
         }
       },
       "native-cmake-sys-debug": {
@@ -168,6 +331,220 @@
         ],
         "properties": {
           "buildType": "Release"
+        }
+      },
+      "native-cmake-gcc-debug": {
+        "inherit": [
+          "native-actions",
+          "cmake-actions",
+          "native-dependencies",
+          "gcc-latest-dependencies"
+        ],
+        "properties": {
+          "buildType": "Debug",
+          "platformName": "native",
+          "toolchainFileName": "gcc.cmake"
+        }
+      },
+      "native-cmake-gcc-release": {
+        "inherit": [
+          "native-cmake-gcc-debug"
+        ],
+        "properties": {
+          "buildType": "Release"
+        }
+      },
+      "native-cmake-gcc11-debug": {
+        "inherit": [
+          "native-actions",
+          "cmake-actions",
+          "native-dependencies",
+          "gcc11-dependencies"
+        ],
+        "properties": {
+          "buildType": "Debug",
+          "platformName": "native",
+          "toolchainFileName": "gcc.cmake"
+        }
+      },
+      "native-cmake-gcc11-release": {
+        "inherit": [
+          "native-cmake-gcc11-debug"
+        ],
+        "properties": {
+          "buildType": "Release"
+        }
+      },
+      "native-cmake-gcc12-debug": {
+        "inherit": [
+          "native-actions",
+          "cmake-actions",
+          "native-dependencies",
+          "gcc12-dependencies"
+        ],
+        "properties": {
+          "buildType": "Debug",
+          "platformName": "native",
+          "toolchainFileName": "gcc.cmake"
+        }
+      },
+      "native-cmake-gcc12-release": {
+        "inherit": [
+          "native-cmake-gcc12-debug"
+        ],
+        "properties": {
+          "buildType": "Release"
+        }
+      },
+      "native-cmake-clang-debug": {
+        "inherit": [
+          "native-actions",
+          "cmake-actions",
+          "native-dependencies",
+          "clang-latest-dependencies"
+        ],
+        "properties": {
+          "buildType": "Debug",
+          "platformName": "native",
+          "toolchainFileName": "clang.cmake"
+        }
+      },
+      "native-cmake-clang-release": {
+        "inherit": [
+          "native-cmake-clang-debug"
+        ],
+        "properties": {
+          "buildType": "Release"
+        }
+      },
+      "native-cmake-clang12-debug": {
+        "inherit": [
+          "native-actions",
+          "cmake-actions",
+          "native-dependencies",
+          "clang12-dependencies"
+        ],
+        "properties": {
+          "buildType": "Debug",
+          "platformName": "native",
+          "toolchainFileName": "clang.cmake"
+        }
+      },
+      "native-cmake-clang12-release": {
+        "inherit": [
+          "native-cmake-clang12-debug"
+        ],
+        "properties": {
+          "buildType": "Release"
+        }
+      },
+      "native-cmake-clang13-debug": {
+        "inherit": [
+          "native-actions",
+          "cmake-actions",
+          "native-dependencies",
+          "clang13-dependencies"
+        ],
+        "properties": {
+          "buildType": "Debug",
+          "platformName": "native",
+          "toolchainFileName": "clang.cmake"
+        }
+      },
+      "native-cmake-clang13-release": {
+        "inherit": [
+          "native-cmake-clang13-debug"
+        ],
+        "properties": {
+          "buildType": "Release"
+        }
+      },
+      "native-cmake-clang14-debug": {
+        "inherit": [
+          "native-actions",
+          "cmake-actions",
+          "native-dependencies",
+          "clang14-dependencies"
+        ],
+        "properties": {
+          "buildType": "Debug",
+          "platformName": "native",
+          "toolchainFileName": "clang.cmake"
+        }
+      },
+      "native-cmake-clang14-release": {
+        "inherit": [
+          "native-cmake-clang14-debug"
+        ],
+        "properties": {
+          "buildType": "Release"
+        }
+      },
+      "native-cmake-clang15-debug": {
+        "inherit": [
+          "native-actions",
+          "cmake-actions",
+          "native-dependencies",
+          "clang15-dependencies"
+        ],
+        "properties": {
+          "buildType": "Debug",
+          "platformName": "native",
+          "toolchainFileName": "clang.cmake"
+        }
+      },
+      "native-cmake-clang15-release": {
+        "inherit": [
+          "native-cmake-clang15-debug"
+        ],
+        "properties": {
+          "buildType": "Release"
+        }
+      },
+      "qemu-cortex-m7f-cmake-debug": {
+        "inherit": [
+          "short-win-paths-properties",
+          "cmake-actions",
+          "arm-none-eabi-gcc-dependencies",
+          "qemu-arm-dependencies"
+        ],
+        "properties": {
+          "buildType": "Debug",
+          "platformName": "qemu-cortex-m7f",
+          "toolchainFileName": "arm-none-eabi-gcc.cmake",
+          "shortConfigurationName": "q1d"
+        }
+      },
+      "qemu-cortex-m7f-cmake-release": {
+        "inherit": [
+          "qemu-cortex-m7f-cmake-debug"
+        ],
+        "properties": {
+          "buildType": "MinSizeRel",
+          "shortConfigurationName": "q1r"
+        }
+      },
+      "qemu-cortex-m0-cmake-debug": {
+        "inherit": [
+          "short-win-paths-properties",
+          "cmake-actions",
+          "arm-none-eabi-gcc-dependencies",
+          "qemu-arm-dependencies"
+        ],
+        "properties": {
+          "buildType": "Debug",
+          "platformName": "qemu-cortex-m0",
+          "toolchainFileName": "arm-none-eabi-gcc.cmake",
+          "shortConfigurationName": "q2d"
+        }
+      },
+      "qemu-cortex-m0-cmake-release": {
+        "inherit": [
+          "qemu-cortex-m0-cmake-debug"
+        ],
+        "properties": {
+          "buildType": "MinSizeRel",
+          "shortConfigurationName": "q2r"
         }
       }
     }
