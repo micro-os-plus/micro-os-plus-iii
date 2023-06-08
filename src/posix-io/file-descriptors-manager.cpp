@@ -182,7 +182,7 @@ namespace os
       return 0;
     }
 
-    class socket*
+    /* class */ socket*
     file_descriptors_manager::socket (int fildes)
     {
       assert((fildes >= 0) && (static_cast<std::size_t> (fildes) < size__));

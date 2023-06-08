@@ -585,7 +585,7 @@ namespace os
      * Should be called from a scheduler critical section.
      */
     result_t
-    mutex::internal_try_lock_ (class thread* th)
+    mutex::internal_try_lock_ (/* class */ thread* th)
     {
       // Save the initial owner for later protocol tests.
       thread* saved_owner = owner_;

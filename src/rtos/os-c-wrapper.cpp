@@ -238,7 +238,7 @@ static_assert(sizeof(rtos::event_flags) == sizeof(os_evflags_t), "adjust size of
 static_assert(sizeof(rtos::event_flags::attributes) == sizeof(os_evflags_attr_t), "adjust size of os_evflags_attr_t");
 
 static_assert(sizeof(class thread::stack) == sizeof(os_thread_stack_t), "adjust size of os_thread_stack_t");
-static_assert(sizeof(class thread::context) == sizeof(os_thread_context_t), "adjust size of os_thread_context_t");
+static_assert(sizeof(/* class */ thread::context) == sizeof(os_thread_context_t), "adjust size of os_thread_context_t");
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) \
   || defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)

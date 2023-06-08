@@ -1308,13 +1308,13 @@ namespace os
        *  None.
        * @return A reference to the context stack object instance.
        */
-      class thread::stack&
+      /* class */ thread::stack&
       stack (void);
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) \
   || defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
 
-      class thread::statistics&
+      /* class */ thread::statistics&
       statistics (void);
 
 #endif
@@ -1405,7 +1405,7 @@ namespace os
 
       friend class clock;
       friend class condition_variable;
-      friend class mutex;
+      /* friend class mutex; */
 
       /**
        * @endcond

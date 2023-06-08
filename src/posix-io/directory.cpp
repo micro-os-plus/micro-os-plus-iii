@@ -59,7 +59,7 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-    struct dirent*
+    /* struct */ dirent*
     directory::read (void)
     {
 #if defined(OS_TRACE_POSIX_IO_DIRECTORY)
@@ -119,13 +119,13 @@ namespace os
 
     // ========================================================================
 
-    directory_impl::directory_impl (class file_system& fs) :
+    directory_impl::directory_impl (/* class */ file_system& fs) :
         file_system_ (fs)
     {
 #if defined(OS_TRACE_POSIX_IO_DIRECTORY)
       trace::printf ("directory_impl::%s()=%p\n", __func__, this);
 #endif
-      memset (&dir_entry_, 0, sizeof(struct dirent));
+      memset (&dir_entry_, 0, sizeof(/* struct */ dirent));
     }
 
     directory_impl::~directory_impl ()

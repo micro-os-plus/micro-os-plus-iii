@@ -206,7 +206,7 @@ namespace os
 
     public:
 
-      file_impl (class file_system& fs);
+      file_impl (/* class */ file_system& fs);
 
       /**
        * @cond ignore
@@ -272,7 +272,7 @@ namespace os
        * @cond ignore
        */
 
-      class file_system& file_system_;
+      /* class */ file_system& file_system_;
 
       /**
        * @endcond
@@ -305,7 +305,7 @@ namespace os
 
       public:
 
-        file_implementable (class file_system& fs);
+        file_implementable (/* class */ file_system& fs);
 
         /**
          * @cond ignore
@@ -389,7 +389,7 @@ namespace os
 
       public:
 
-        file_lockable (class file_system& fs, lockable_type& locker);
+        file_lockable (/* class */ file_system& fs, lockable_type& locker);
 
         /**
          * @cond ignore
@@ -432,13 +432,13 @@ namespace os
         write (const void* buf, std::size_t nbyte) override;
 
         virtual ssize_t
-        writev (const struct iovec* iov, int iovcnt) override;
+        writev (const /* struct */ iovec* iov, int iovcnt) override;
 
         virtual int
         vfcntl (int cmd, std::va_list args) override;
 
         virtual int
-        fstat (struct stat* buf) override;
+        fstat (/* struct */ stat* buf) override;
 
         virtual off_t
         lseek (off_t offset, int whence) override;
@@ -505,7 +505,7 @@ namespace os
 
     // ========================================================================
 
-    inline class file_system&
+    inline /* class */ file_system&
     file_impl::get_file_system (void)
     {
       return file_system_;
@@ -514,7 +514,7 @@ namespace os
     // ========================================================================
 
     template<typename T>
-      file_implementable<T>::file_implementable (class file_system& fs) :
+      file_implementable<T>::file_implementable (/* class */ file_system& fs) :
           file
             { impl_instance_ }, //
           impl_instance_
@@ -549,7 +549,7 @@ namespace os
     // ========================================================================
 
     template<typename T, typename L>
-      file_lockable<T, L>::file_lockable (class file_system& fs,
+      file_lockable<T, L>::file_lockable (/* class */ file_system& fs,
                                           lockable_type& locker) :
           file
             { impl_instance_ }, //
@@ -610,7 +610,7 @@ namespace os
 
     template<typename T, typename L>
       ssize_t
-      file_lockable<T, L>::writev (const struct iovec* iov, int iovcnt)
+      file_lockable<T, L>::writev (const /* struct */ iovec* iov, int iovcnt)
       {
         std::lock_guard<L> lock
           { locker_ };
@@ -630,7 +630,7 @@ namespace os
 
     template<typename T, typename L>
       int
-      file_lockable<T, L>::fstat (struct stat* buf)
+      file_lockable<T, L>::fstat (/* struct */ stat* buf)
       {
         std::lock_guard<L> lock
           { locker_ };

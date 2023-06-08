@@ -129,7 +129,7 @@ namespace os
 
     // ========================================================================
 
-    file_impl::file_impl (class file_system& fs) :
+    file_impl::file_impl (/* class */ file_system& fs) :
         file_system_ (fs)
     {
 #if defined(OS_TRACE_POSIX_IO_FILE)

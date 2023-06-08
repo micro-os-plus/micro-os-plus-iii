@@ -63,7 +63,7 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-    class file_system* file_system::mounted_root__;
+    /* class */ file_system* file_system::mounted_root__;
 
     /**
      * @endcond
@@ -321,7 +321,7 @@ namespace os
     }
 
     int
-    utime (const char* path, const struct utimbuf* times)
+    utime (const char* path, const /* struct */ utimbuf* times)
     {
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s(\"%s\", %p)\n", __func__, path, times);
@@ -970,7 +970,7 @@ namespace os
 
     // http://pubs.opengroup.org/onlinepubs/9699919799/functions/utime.html
     int
-    file_system::utime (const char* path, const struct utimbuf* times)
+    file_system::utime (const char* path, const /* struct */ utimbuf* times)
     {
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\", %p)\n", __func__, path, times);
@@ -996,7 +996,7 @@ namespace os
 
       errno = 0;
 
-      struct utimbuf tmp;
+      /* struct */ utimbuf tmp;
       if (times == nullptr)
         {
           // If times is a null pointer, the access and modification times

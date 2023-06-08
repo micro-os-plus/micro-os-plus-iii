@@ -330,7 +330,7 @@ namespace os
     }
 
     ssize_t
-    io::writev (const struct iovec* iov, int iovcnt)
+    io::writev (const /* struct */ iovec* iov, int iovcnt)
     {
 #if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s(0x0%X, %d) @%p\n", __func__, iov, iovcnt, this);
@@ -511,11 +511,11 @@ namespace os
     }
 
     ssize_t
-    io_impl::do_writev (const struct iovec* iov, int iovcnt)
+    io_impl::do_writev (const /* struct */ iovec* iov, int iovcnt)
     {
       ssize_t total = 0;
 
-      const struct iovec* p = iov;
+      const /* struct */ iovec* p = iov;
       for (int i = 0; i < iovcnt; ++i, ++p)
         {
           ssize_t ret = do_write (p->iov_base, p->iov_len);

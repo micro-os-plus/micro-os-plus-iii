@@ -485,7 +485,7 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
           d = fs.opendir ("/");
           assert(d != nullptr);
 
-          struct dirent *dp;
+          /* struct */ dirent *dp;
           while (true)
             {
               errno = 0;
@@ -581,7 +581,7 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
           d = posix::opendir ("/");
           assert(d != nullptr);
 
-          struct dirent *dp;
+          /* struct */ dirent *dp;
           while (true)
             {
               errno = 0;
@@ -663,7 +663,7 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
           d = fs.opendir ("/");
           assert (d != nullptr);
 
-          struct dirent *dp;
+          /* struct */ dirent *dp;
           while (true)
             {
               errno = 0;

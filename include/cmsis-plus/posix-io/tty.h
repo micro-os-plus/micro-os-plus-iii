@@ -113,11 +113,11 @@ namespace os
 
       // http://pubs.opengroup.org/onlinepubs/9699919799/functions/tcgetattr.html
       virtual int
-      tcgetattr (struct termios *ptio);
+      tcgetattr (/* struct */termios *ptio);
 
       // http://pubs.opengroup.org/onlinepubs/9699919799/functions/tcsetattr.html
       virtual int
-      tcsetattr (int options, const struct termios *ptio);
+      tcsetattr (int options, const /* struct */ termios *ptio);
 
       // http://pubs.opengroup.org/onlinepubs/9699919799/functions/tcflush.html
       virtual int
@@ -195,10 +195,10 @@ namespace os
     public:
 
       virtual int
-      do_tcgetattr (struct termios *ptio) = 0;
+      do_tcgetattr (/* struct */ termios *ptio) = 0;
 
       virtual int
-      do_tcsetattr (int options, const struct termios *ptio) = 0;
+      do_tcsetattr (int options, const /* struct */ termios *ptio) = 0;
 
       virtual int
       do_tcflush (int queue_selector) = 0;

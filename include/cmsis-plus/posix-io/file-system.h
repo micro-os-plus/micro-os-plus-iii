@@ -111,7 +111,7 @@ namespace os
     unlink (const char* path);
 
     int
-    utime (const char* path, const struct utimbuf* times);
+    utime (const char* path, const /* struct */ utimbuf* times);
 
     int
     statvfs (const char* path, struct statvfs* buf);
@@ -173,7 +173,7 @@ namespace os
       unlink (const char* path);
 
       friend int
-      utime (const char* path, const struct utimbuf* times);
+      utime (const char* path, const /* struct */ utimbuf* times);
 
       friend int
       statvfs (const char* path, struct statvfs* buf);
@@ -301,7 +301,7 @@ namespace os
       unlink (const char* path);
 
       virtual int
-      utime (const char* path, const struct utimbuf* times);
+      utime (const char* path, const /* struct */ utimbuf* times);
 
       virtual int
       statvfs (struct statvfs* buf);
@@ -489,11 +489,11 @@ namespace os
       do_umount (unsigned int flags) = 0;
 
       virtual file*
-      do_vopen (class file_system& fs, const char* path, int oflag,
+      do_vopen (/* class */ file_system& fs, const char* path, int oflag,
                 std::va_list args) = 0;
 
       virtual directory*
-      do_opendir (class file_system& fs, const char* dirname) = 0;
+      do_opendir (/* class */ file_system& fs, const char* dirname) = 0;
 
       virtual int
       do_mkdir (const char* path, mode_t mode) = 0;
@@ -520,7 +520,7 @@ namespace os
       do_unlink (const char* path) = 0;
 
       virtual int
-      do_utime (const char* path, const struct utimbuf* times) = 0;
+      do_utime (const char* path, const /* struct */ utimbuf* times) = 0;
 
       virtual int
       do_statvfs (struct statvfs* buf) = 0;
@@ -761,7 +761,7 @@ namespace os
         unlink (const char* path) override;
 
         virtual int
-        utime (const char* path, const struct utimbuf* times) override;
+        utime (const char* path, const /* struct */ utimbuf* times) override;
 
         virtual int
         statvfs (struct statvfs* buf) override;
@@ -1216,7 +1216,7 @@ namespace os
     template<typename T, typename L>
       int
       file_system_lockable<T, L>::utime (const char* path,
-                                         const struct utimbuf* times)
+                                         const /* struct */ utimbuf* times)
       {
         std::lock_guard<L> lock
           { impl_instance_.locker () };

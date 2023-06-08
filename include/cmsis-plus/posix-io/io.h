@@ -211,7 +211,7 @@ namespace os
       write (const void* buf, std::size_t nbyte);
 
       virtual ssize_t
-      writev (const struct iovec* iov, int iovcnt);
+      writev (const /* struct */ iovec* iov, int iovcnt);
 
       int
       fcntl (int cmd, ...);
@@ -223,7 +223,7 @@ namespace os
       isatty (void);
 
       virtual int
-      fstat (struct stat* buf);
+      fstat (/* struct */ stat* buf);
 
       virtual off_t
       lseek (off_t offset, int whence);
@@ -380,7 +380,7 @@ namespace os
       do_write (const void* buf, std::size_t nbyte) = 0;
 
       virtual ssize_t
-      do_writev (const struct iovec* iov, int iovcnt);
+      do_writev (const /* struct */ iovec* iov, int iovcnt);
 
       virtual int
       do_vfcntl (int cmd, std::va_list args);

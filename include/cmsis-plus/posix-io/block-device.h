@@ -417,7 +417,7 @@ namespace os
         write (const void* buf, std::size_t nbyte) override;
 
         virtual ssize_t
-        writev (const struct iovec* iov, int iovcnt) override;
+        writev (const /* struct */ iovec* iov, int iovcnt) override;
 
         virtual int
         vfcntl (int cmd, std::va_list args) override;
@@ -615,7 +615,7 @@ namespace os
 
     template<typename T, typename L>
       ssize_t
-      block_device_lockable<T, L>::writev (const struct iovec* iov, int iovcnt)
+      block_device_lockable<T, L>::writev (const /* struct */ iovec* iov, int iovcnt)
       {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
         trace::printf ("block_device_lockable::%s(0x0%X, %d) @%p\n", __func__,

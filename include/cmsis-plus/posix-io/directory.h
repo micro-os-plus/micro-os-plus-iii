@@ -143,7 +143,7 @@ namespace os
     public:
 
       // http://pubs.opengroup.org/onlinepubs/9699919799/functions/readdir.html
-      virtual struct dirent *
+      virtual /* struct */ dirent *
       read (void);
 
       // http://pubs.opengroup.org/onlinepubs/9699919799/functions/rewinddir.html
@@ -157,7 +157,7 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
-      struct dirent*
+      /* struct */ dirent*
       dir_entry (void);
 
 #pragma GCC diagnostic push
@@ -232,7 +232,7 @@ namespace os
 
     public:
 
-      directory_impl (class file_system& fs);
+      directory_impl (/* class */ file_system& fs);
 
       /**
        * @cond ignore
@@ -270,7 +270,7 @@ namespace os
       /**
        * @return object if successful, otherwise nullptr and errno.
        */
-      virtual struct dirent*
+      virtual /* struct */ dirent*
       do_read (void) = 0;
 
       virtual void
@@ -305,9 +305,9 @@ namespace os
        */
 
       // This also solves the readdir() re-entrancy issue.
-      struct dirent dir_entry_;
+      /* struct */ dirent dir_entry_;
 
-      class file_system& file_system_;
+      /* class */ file_system& file_system_;
 
       /**
        * @endcond
@@ -339,7 +339,7 @@ namespace os
 
       public:
 
-        directory_implementable (class file_system& fs);
+        directory_implementable (/* class */ file_system& fs);
 
         /**
          * @cond ignore
@@ -423,7 +423,7 @@ namespace os
 
       public:
 
-        directory_lockable (class file_system& fs, lockable_type& locker);
+        directory_lockable (/* class */ file_system& fs, lockable_type& locker);
 
         /**
          * @cond ignore
@@ -459,7 +459,7 @@ namespace os
         // opendir() uses the file system lock.
 
         // http://pubs.opengroup.org/onlinepubs/9699919799/functions/readdir.html
-        virtual struct dirent *
+        virtual /* struct */ dirent *
         read (void) override;
 
         // http://pubs.opengroup.org/onlinepubs/9699919799/functions/rewinddir.html
@@ -517,7 +517,7 @@ namespace os
       return impl ().get_file_system ();
     }
 
-    inline struct dirent*
+    inline /* struct */ dirent*
     directory::dir_entry (void)
     {
       return &(impl ().dir_entry_);
@@ -526,7 +526,7 @@ namespace os
     inline directory_impl&
     directory::impl (void) const
     {
-      return static_cast<directory_impl&> (impl_);
+      return /* static_cast<directory_impl&> */ (impl_);
     }
 
     // ========================================================================
@@ -541,7 +541,7 @@ namespace os
 
     template<typename T>
       directory_implementable<T>::directory_implementable (
-          class file_system& fs) :
+          /* class */ file_system& fs) :
           directory
             { impl_instance_ }, //
           impl_instance_
@@ -576,7 +576,7 @@ namespace os
     // ========================================================================
 
     template<typename T, typename L>
-      directory_lockable<T, L>::directory_lockable (class file_system& fs,
+      directory_lockable<T, L>::directory_lockable (/* class */ file_system& fs,
                                                     lockable_type& locker) :
           directory
             { impl_instance_ }, //
@@ -606,7 +606,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     template<typename T, typename L>
-      struct dirent *
+      /* struct */ dirent *
       directory_lockable<T, L>::read (void)
       {
 #if defined(OS_TRACE_POSIX_IO_DIRECTORY)

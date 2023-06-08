@@ -69,13 +69,13 @@ namespace os
     }
 
     inline int
-    tty::tcgetattr (struct termios *ptio)
+    tty::tcgetattr (/* struct */ termios *ptio)
     {
       return impl ().do_tcgetattr (ptio);
     }
 
     inline int
-    tty::tcsetattr (int options, const struct termios *ptio)
+    tty::tcsetattr (int options, const /* struct */ termios *ptio)
     {
       return impl ().do_tcsetattr (options, ptio);
     }

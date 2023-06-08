@@ -159,7 +159,7 @@ namespace os
 
         // When the chunk is in the free list, instead of the
         // payload, here is a pointer to the next chunk.
-        struct chunk_s* next;
+        /* struct */ chunk_s* next;
       } chunk_t;
 
 #pragma GCC diagnostic pop

@@ -67,7 +67,7 @@ namespace os
     // ------------------------------------------------------------------------
 
     class socket*
-    socket::accept (struct sockaddr* address, socklen_t* address_len)
+    socket::accept (/* struct */ sockaddr* address, socklen_t* address_len)
     {
       errno = 0;
 
@@ -82,7 +82,7 @@ namespace os
     }
 
     int
-    socket::bind (const struct sockaddr* address, socklen_t address_len)
+    socket::bind (const /* struct */ sockaddr* address, socklen_t address_len)
     {
       errno = 0;
 
@@ -91,7 +91,7 @@ namespace os
     }
 
     int
-    socket::connect (const struct sockaddr* address, socklen_t address_len)
+    socket::connect (const /* struct */ sockaddr* address, socklen_t address_len)
     {
       errno = 0;
 
@@ -100,7 +100,7 @@ namespace os
     }
 
     int
-    socket::getpeername (struct sockaddr* address, socklen_t* address_len)
+    socket::getpeername (/* struct */ sockaddr* address, socklen_t* address_len)
     {
       errno = 0;
 
@@ -109,7 +109,7 @@ namespace os
     }
 
     int
-    socket::getsockname (struct sockaddr* address, socklen_t* address_len)
+    socket::getsockname (/* struct */ sockaddr* address, socklen_t* address_len)
     {
       errno = 0;
 
@@ -148,7 +148,7 @@ namespace os
 
     ssize_t
     socket::recvfrom (void* buffer, size_t length, int flags,
-                      struct sockaddr* address, socklen_t* address_len)
+                      /* struct */ sockaddr* address, socklen_t* address_len)
     {
       errno = 0;
 
@@ -157,7 +157,7 @@ namespace os
     }
 
     ssize_t
-    socket::recvmsg (struct msghdr* message, int flags)
+    socket::recvmsg (/* struct */ msghdr* message, int flags)
     {
       errno = 0;
 
@@ -175,7 +175,7 @@ namespace os
     }
 
     ssize_t
-    socket::sendmsg (const struct msghdr* message, int flags)
+    socket::sendmsg (const /* struct */ msghdr* message, int flags)
     {
       errno = 0;
 
@@ -185,7 +185,7 @@ namespace os
 
     ssize_t
     socket::sendto (const void* message, size_t length, int flags,
-                    const struct sockaddr* dest_addr, socklen_t dest_len)
+                    const /* struct */ sockaddr* dest_addr, socklen_t dest_len)
     {
       errno = 0;
 
