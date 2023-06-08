@@ -1004,9 +1004,17 @@ extern "C"
   __attribute__((always_inline))
   os_sysclock_ticks_cast_long (uint64_t microsec)
   {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#if defined(__cplusplus)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
+#endif
     return (os_clock_duration_t) ((((microsec)
         * ((uint64_t) OS_INTEGER_SYSTICK_FREQUENCY_HZ)) + (uint64_t) 1000000ul
         - 1) / (uint64_t) 1000000ul);
+#pragma GCC diagnostic pop
   }
 
 #pragma GCC diagnostic pop

@@ -96,6 +96,12 @@ namespace os
           };
       }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
+
       time_t
       system_clock::to_time_t (const time_point& t) noexcept
       {
@@ -103,6 +109,8 @@ namespace os
             std::chrono::duration_cast<std::chrono::seconds> (
                 t.time_since_epoch ()).count ());
       }
+
+#pragma GCC diagnostic pop
 
       system_clock::time_point
       system_clock::from_time_t (time_t t) noexcept

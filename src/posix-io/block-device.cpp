@@ -171,8 +171,15 @@ namespace os
                 return -1;
               }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
             *sz = (static_cast<uint64_t> (impl ().num_blocks_
                 * impl ().block_logical_size_bytes_));
+#pragma GCC diagnostic pop
+
             return 0;
           }
 

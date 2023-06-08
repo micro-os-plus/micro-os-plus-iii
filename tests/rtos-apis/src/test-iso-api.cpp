@@ -42,12 +42,9 @@ static const char* test_name = "Test ISO C++ API";
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
-
-#if defined(__clang__)
-#pragma clang diagnostic ignored "-Wc++98-compat"
 #endif
 
 // ----------------------------------------------------------------------------
@@ -482,6 +479,7 @@ test_iso_api (bool extra)
 #if defined(__clang__)
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif
 
   estd::chrono::realtime_clock::startup_time_point =
