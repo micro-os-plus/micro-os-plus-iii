@@ -104,7 +104,10 @@ private:
 };
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 const Version&
 Test_usb_device::do_get_version (void) noexcept

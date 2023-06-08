@@ -37,7 +37,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
@@ -120,11 +119,14 @@ namespace os
       //operator "" systicks (Ssstick_clock::rep); // C++14
 
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Waggregate-return"
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 // error: 'long long' is incompatible with C++98 [-Werror,-Wc++98-compat-pedantic]
 #pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
+#pragma clang diagnostic ignored "-Wreserved-identifier"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Waggregate-return"
+#pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif
 
       constexpr systicks
@@ -270,9 +272,10 @@ namespace os
       // ======================================================================
 
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Waggregate-return"
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wreserved-identifier"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Waggregate-return"
 #endif
 
       template<class _To, class Rep_T, class Period_T>

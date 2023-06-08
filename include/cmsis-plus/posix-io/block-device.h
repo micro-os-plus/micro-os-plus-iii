@@ -43,7 +43,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #endif
@@ -68,6 +67,12 @@ namespace os
      * @headerfile block-device.h <cmsis-plus/posix-io/block-device.h>
      * @ingroup cmsis-plus-posix-io-base
      */
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
     class block_device : public device
     {
       // ----------------------------------------------------------------------
@@ -158,11 +163,16 @@ namespace os
 
       // ----------------------------------------------------------------------
     };
+#pragma GCC diagnostic pop
 
     // ========================================================================
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
     class block_device_impl : public device_impl
     {
@@ -258,6 +268,12 @@ namespace os
 
     // ========================================================================
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
     template<typename T>
       class block_device_implementable : public block_device
       {
@@ -333,6 +349,7 @@ namespace os
          * @endcond
          */
       };
+#pragma GCC diagnostic pop
 
     // ========================================================================
 
@@ -501,6 +518,11 @@ namespace os
 #endif
         }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#endif
     template<typename T>
       block_device_implementable<T>::~block_device_implementable ()
       {
@@ -509,6 +531,7 @@ namespace os
                        this, name_);
 #endif
       }
+#pragma GCC diagnostic pop
 
     template<typename T>
       typename block_device_implementable<T>::value_type&

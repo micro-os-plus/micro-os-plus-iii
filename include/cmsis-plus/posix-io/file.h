@@ -48,7 +48,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #endif
@@ -71,6 +70,12 @@ namespace os
      * @headerfile file.h <cmsis-plus/posix-io/file.h>
      * @ingroup cmsis-plus-posix-io-base
      */
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
     class file : public io
     {
       // ----------------------------------------------------------------------
@@ -142,8 +147,16 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wredundant-tags"
+#endif
+
       class file_system&
       get_file_system (void);
+
+#pragma GCC diagnostic pop
 
       file_impl&
       impl (void) const;
@@ -167,6 +180,7 @@ namespace os
        * @endcond
        */
     };
+#pragma GCC diagnostic pop
 
     // ========================================================================
 
@@ -236,8 +250,16 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wredundant-tags"
+#endif
+
       class file_system&
       get_file_system (void);
+
+#pragma GCC diagnostic pop
 
       /**
        * @}
@@ -259,6 +281,12 @@ namespace os
 
     // ========================================================================
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
     template<typename T>
       class file_implementable : public file
       {
@@ -332,9 +360,16 @@ namespace os
          * @endcond
          */
       };
+#pragma GCC diagnostic pop
 
     // ========================================================================
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
     template<typename T, typename L>
       class file_lockable : public file
       {
@@ -442,6 +477,7 @@ namespace os
          * @endcond
          */
       };
+#pragma GCC diagnostic pop
 
   // ==========================================================================
   } /* namespace posix */
@@ -489,6 +525,11 @@ namespace os
 #endif
       }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#endif
     template<typename T>
       file_implementable<T>::~file_implementable ()
       {
@@ -496,6 +537,7 @@ namespace os
         trace::printf ("file_implementable::%s() @%p\n", __func__, this);
 #endif
       }
+#pragma GCC diagnostic pop
 
     template<typename T>
       typename file_implementable<T>::value_type&
@@ -520,6 +562,11 @@ namespace os
 #endif
       }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#endif
     template<typename T, typename L>
       file_lockable<T, L>::~file_lockable ()
       {
@@ -527,6 +574,7 @@ namespace os
         trace::printf ("file_lockable::%s() @%p\n", __func__, this);
 #endif
       }
+#pragma GCC diagnostic pop
 
     // ------------------------------------------------------------------------
 

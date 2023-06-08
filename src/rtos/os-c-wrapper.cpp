@@ -37,6 +37,8 @@
 
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif
 
 // ----------------------------------------------------------------------------
@@ -137,10 +139,10 @@ static_assert(alignof(os_mqueue_prio_t) == alignof(message_queue::priority_t), "
 // Validate C enumeration values
 
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wenum-compare"
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wanon-enum-enum-conversion"
 #else
+#pragma GCC diagnostic ignored "-Wenum-compare"
 #pragma GCC diagnostic ignored "-Wsign-compare"
 #endif
 
@@ -188,7 +190,10 @@ static_assert(os_mutex_type_default == mutex::type::default_, "adjust os_mutex_t
 // Validate offset of individual members (if needed, validate member size).
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"
+#endif
 
 static_assert(sizeof(rtos::clock) == sizeof(os_clock_t), "adjust os_clock_t size");
 
@@ -245,7 +250,11 @@ static_assert(sizeof(internal::timer_node) == sizeof(os_internal_clock_timer_nod
 #pragma GCC diagnostic pop
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
 
 // ----------------------------------------------------------------------------
 
@@ -1006,8 +1015,14 @@ os_thread_stat_get_cpu_cycles (os_thread_t* thread)
 os_iterator_t
 os_children_threads_iter_begin (os_thread_t* thread)
 {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
   return reinterpret_cast<os_iterator_t> (scheduler::children_threads (
       reinterpret_cast<rtos::thread*> (thread)).begin ().get_iterator_pointer ());
+#pragma GCC diagnostic pop
 }
 
 /**
@@ -1024,8 +1039,14 @@ os_children_threads_iter_begin (os_thread_t* thread)
 os_iterator_t
 os_children_threads_iter_end (os_thread_t* thread)
 {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
   return reinterpret_cast<os_iterator_t> (scheduler::children_threads (
       reinterpret_cast<rtos::thread*> (thread)).end ().get_iterator_pointer ());
+#pragma GCC diagnostic pop
 }
 
 /**
@@ -3295,7 +3316,11 @@ osThreadCreate (const osThreadDef_t* thread_def, void* args)
                       / sizeof(uint64_t))];
             }
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wcast-function-type"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
           new (th) thread (thread_def->name,
                            reinterpret_cast<thread::func_t> (thread_def->pthread), args, attr);
 #pragma GCC diagnostic pop
@@ -3510,7 +3535,10 @@ osDelay (uint32_t millisec)
 #if (defined (osFeature_Wait)  &&  (osFeature_Wait != 0))
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 
 /**
  * @details
@@ -3739,7 +3767,10 @@ osSignalClear (osThreadId thread_id, int32_t signals)
 }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 
 /**
  * @details
@@ -4421,7 +4452,10 @@ osMessagePut (osMessageQId queue_id, uint32_t info, uint32_t millisec)
 }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 
 /**
  * @details
@@ -4593,7 +4627,10 @@ osMailAlloc (osMailQId mail_id, uint32_t millisec)
   void* ret = nullptr;
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#endif
   if (millisec == osWaitForever)
     {
       if (interrupts::in_handler_mode ())
@@ -4649,7 +4686,10 @@ osMailCAlloc (osMailQId mail_id, uint32_t millisec)
   if (ret != nullptr)
     {
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#endif
       memset (ret, 0,
               (reinterpret_cast<memory_pool&> (mail_id->pool)).block_size ());
 #pragma GCC diagnostic pop
@@ -4687,7 +4727,10 @@ osMailPut (osMailQId mail_id, void* mail)
 
   result_t res;
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+#endif
   res = (reinterpret_cast<message_queue&> (mail_id->queue)).try_send (
       (const char*) &mail, sizeof(void*), 0);
 #pragma GCC diagnostic pop
@@ -4702,7 +4745,10 @@ osMailPut (osMailQId mail_id, void* mail)
 }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 
 /**

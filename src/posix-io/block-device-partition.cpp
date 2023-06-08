@@ -96,7 +96,11 @@ namespace os
     // ----------------------------------------------------------------------
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
     int
     block_device_partition_impl::do_vioctl (int request, std::va_list args)

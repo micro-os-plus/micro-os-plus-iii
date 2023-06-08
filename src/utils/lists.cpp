@@ -115,8 +115,14 @@ namespace os
     void
     static_double_list::clear (void)
     {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
       head_.next (const_cast<static_double_list_links*> (&head_));
       head_.prev (const_cast<static_double_list_links*> (&head_));
+#pragma GCC diagnostic pop
     }
 
     void

@@ -85,7 +85,11 @@ namespace os
     }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
     off_t
     char_device_impl::do_lseek (off_t offset, int whence)

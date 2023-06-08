@@ -555,7 +555,10 @@ __posix_closedir (DIR* dirp)
 // Socket functions
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 // socket() and socketpair() are the fuctions creating sockets.
 // The other are socket specific functions.
@@ -798,7 +801,11 @@ __posix_sockatmark (int socket)
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 // ----------------------------------------------------------------------------
 // Not yet implemented.
@@ -876,14 +883,32 @@ pid_t
 __posix_fork (void)
 {
   errno = ENOSYS; // Not implemented
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
+
   return static_cast<pid_t> (-1);
+
+#pragma GCC diagnostic push
 }
 
 pid_t
 __posix_getpid (void)
 {
   errno = ENOSYS; // Not implemented
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
+
   return static_cast<pid_t> (-1);
+
+#pragma GCC diagnostic pop
 }
 
 int
@@ -911,7 +936,16 @@ pid_t
 __posix_wait (int* stat_loc)
 {
   errno = ENOSYS; // Not implemented
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
+
   return static_cast<pid_t> (-1);
+
+#pragma GCC diagnostic pop
 }
 
 int

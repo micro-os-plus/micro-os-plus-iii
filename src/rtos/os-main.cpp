@@ -57,7 +57,11 @@ namespace
   // trampoline to invoke the os_main().
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
   using main_args_t = struct
     {

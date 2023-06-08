@@ -607,6 +607,8 @@ namespace os
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wvolatile"
 #endif
           // Count the number of mutexes acquired by the thread.
           ++(owner_->acquired_mutexes_);
@@ -679,6 +681,8 @@ namespace os
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wvolatile"
 #endif
               // Increment the recursion depth counter.
               ++count_;
@@ -780,6 +784,8 @@ namespace os
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wvolatile"
 #endif
                   // Decrement the recursion depth counter.
                   --count_;
@@ -795,6 +801,8 @@ namespace os
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wvolatile"
 #endif
               --(owner_->acquired_mutexes_);
 #pragma GCC diagnostic pop
@@ -820,6 +828,11 @@ namespace os
                       // If the owner thread acquired other mutexes too,
                       // compute the maximum boosted priority.
                       thread::priority_t max_prio = 0;
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
                       for (auto&& mx : *thread_mutexes)
                         {
                           if (mx.boosted_prio_ > max_prio)
@@ -827,6 +840,7 @@ namespace os
                               max_prio = mx.boosted_prio_;
                             }
                         }
+#pragma GCC diagnostic pop
                       boosted_prio_ = max_prio;
                     }
                   // Delayed until end of critical section.
@@ -1149,10 +1163,16 @@ namespace os
     mutex::timed_lock (clock::duration_t timeout)
     {
 #if defined(OS_TRACE_RTOS_MUTEX)
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
       trace::printf ("%s(%u) @%p %s by %p %s\n", __func__,
                      static_cast<unsigned int> (timeout), this, name (),
                      &this_thread::thread (), this_thread::thread ().name ());
-#endif
+#pragma GCC diagnostic pop
+#endif /* defined(OS_TRACE_RTOS_MUTEX) */
 
       // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
@@ -1260,6 +1280,11 @@ namespace os
 
                   thread::priority_t max_prio = thread::priority::none;
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
                   for (auto&& th : list_)
                     {
                       thread::priority_t prio = th.priority ();
@@ -1268,6 +1293,7 @@ namespace os
                           max_prio = prio;
                         }
                     }
+#pragma GCC diagnostic pop
 
                   if (max_prio != thread::priority::none)
                     {

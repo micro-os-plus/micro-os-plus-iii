@@ -46,7 +46,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
@@ -120,11 +119,19 @@ namespace os
       static bool
       valid (int fildes);
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wredundant-tags"
+#endif
+
       static class io*
       io (int fildes);
 
       static class socket*
       socket (int fildes);
+
+#pragma GCC diagnostic pop
 
       static int
       allocate (class io* io);

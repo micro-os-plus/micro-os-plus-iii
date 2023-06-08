@@ -31,7 +31,10 @@
 // is only to keep the linker happy when building the tests.
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 osSemaphoreId
 osSemaphoreCreate (const osSemaphoreDef_t *semaphore_def, int32_t count)

@@ -48,7 +48,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #endif
@@ -260,7 +259,11 @@ namespace os
       // ***** Serial Status *****
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
       /**
        * @brief %Serial port status
@@ -350,7 +353,11 @@ namespace os
       // ====================================================================
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
       /**
        * @brief %Serial modem status
@@ -449,7 +456,11 @@ namespace os
       // ====================================================================
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
       /**
        * @brief %Serial device driver capabilities.
@@ -532,7 +543,11 @@ namespace os
     // ======================================================================
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
     class Serial : public Base
     {

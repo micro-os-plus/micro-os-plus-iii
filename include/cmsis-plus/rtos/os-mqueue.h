@@ -42,7 +42,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
@@ -58,7 +57,11 @@ namespace os
     // ========================================================================
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
     /**
      * @brief POSIX compliant **message queue**, using the
@@ -66,6 +69,12 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-mqueue
      */
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
     class message_queue : public internal::object_named_system
     {
     public:
@@ -736,6 +745,7 @@ namespace os
        */
 
     };
+#pragma GCC diagnostic pop
 
     // ========================================================================
 
@@ -825,6 +835,12 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-mqueue
      */
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
     template<typename T, typename Allocator = memory::allocator<void*>>
       class message_queue_typed : public message_queue_allocated<Allocator>
       {
@@ -1027,6 +1043,7 @@ namespace os
          */
 
       };
+#pragma GCC diagnostic pop
 
     // ========================================================================
 
@@ -1579,10 +1596,16 @@ namespace os
      *
      * Implemented as a wrapper over the parent destructor.
      */
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#endif
     template<typename T, typename Allocator>
       message_queue_typed<T, Allocator>::~message_queue_typed ()
       {
       }
+#pragma GCC diagnostic pop
 
     /**
      * @details

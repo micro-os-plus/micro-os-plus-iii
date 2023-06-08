@@ -44,7 +44,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #endif
@@ -69,7 +68,6 @@ namespace os
 #endif /* __cplusplus */
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wreserved-identifier"
 #endif

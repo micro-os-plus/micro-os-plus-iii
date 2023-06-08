@@ -658,7 +658,10 @@ __posix_getcwd (char* buf, size_t size)
 }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 // ----------------------------------------------------------------------------
 // ----- POSIX file_system functions -----
@@ -734,7 +737,10 @@ __posix_closedir (DIR* dirp)
 // Socket functions
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 // socket() and socketpair() are the fuctions creating sockets.
 // The other are socket specific functions.
@@ -891,7 +897,10 @@ __posix_sockatmark (int socket)
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 // ----------------------------------------------------------------------------
 // Not yet implemented.

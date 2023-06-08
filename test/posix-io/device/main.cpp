@@ -122,7 +122,10 @@ TestDevice::getNumber (void)
 }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 int
 TestDevice::do_vioctl (int request, std::va_list args)

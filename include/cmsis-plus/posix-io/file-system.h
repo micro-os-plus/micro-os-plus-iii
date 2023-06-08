@@ -57,7 +57,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #endif
@@ -135,6 +134,12 @@ namespace os
      * @headerfile file-system.h <cmsis-plus/posix-io/file-system.h>
      * @ingroup cmsis-plus-posix-io-base
      */
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
     class file_system
     {
       // ----------------------------------------------------------------------
@@ -424,6 +429,7 @@ namespace os
        * @endcond
        */
     };
+#pragma GCC diagnostic pop
 
     // ========================================================================
 
@@ -547,6 +553,12 @@ namespace os
 
     // ========================================================================
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
     template<typename T>
       class file_system_implementable : public file_system
       {
@@ -622,9 +634,16 @@ namespace os
          * @endcond
          */
       };
+#pragma GCC diagnostic pop
 
     // ========================================================================
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
     template<typename T, typename L>
       class file_system_lockable : public file_system
       {
@@ -770,6 +789,7 @@ namespace os
          * @endcond
          */
       };
+#pragma GCC diagnostic pop
 
   // ==========================================================================
   } /* namespace posix */
@@ -789,11 +809,19 @@ namespace os
       return name_;
     }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
+
     inline file_system_impl&
     file_system::impl (void) const
     {
       return static_cast<file_system_impl&> (impl_);
     }
+
+#pragma GCC diagnostic pop
 
     inline block_device&
     file_system::device (void) const
@@ -994,6 +1022,11 @@ namespace os
 #endif
         }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#endif
     template<typename T>
       file_system_implementable<T>::~file_system_implementable ()
       {
@@ -1002,6 +1035,7 @@ namespace os
                        this, name_);
 #endif
       }
+#pragma GCC diagnostic pop
 
     template<typename T>
       typename file_system_implementable<T>::value_type&
@@ -1028,6 +1062,11 @@ namespace os
 #endif
         }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#endif
     template<typename T, typename L>
       file_system_lockable<T, L>::~file_system_lockable ()
       {
@@ -1035,6 +1074,7 @@ namespace os
         trace::printf ("file_system_lockable::%s() @%p\n", __func__, this);
 #endif
       }
+#pragma GCC diagnostic pop
 
     // ------------------------------------------------------------------------
 

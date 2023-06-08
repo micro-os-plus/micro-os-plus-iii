@@ -48,7 +48,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
@@ -69,14 +68,25 @@ namespace os
     // ------------------------------------------------------------------------
 
     // ========================================================================
+
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
     /**
      * @brief Directory class.
      * @headerfile directory.h <cmsis-plus/posix-io/directory.h>
      * @ingroup cmsis-plus-posix-io-base
      */
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
     class directory
     {
       // ----------------------------------------------------------------------
@@ -150,8 +160,16 @@ namespace os
       struct dirent*
       dir_entry (void);
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wredundant-tags"
+#endif
+
       class file_system&
       get_file_system (void) const;
+
+#pragma GCC diagnostic pop
 
       directory_impl&
       impl (void) const;
@@ -188,6 +206,7 @@ namespace os
        * @endcond
        */
     };
+#pragma GCC diagnostic pop
 
     // ========================================================================
 
@@ -263,8 +282,16 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wredundant-tags"
+#endif
+
       class file_system&
       get_file_system (void) const;
+
+#pragma GCC diagnostic pop
 
       /**
        * @}
@@ -289,6 +316,12 @@ namespace os
 
     // ========================================================================
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
     template<typename T>
       class directory_implementable : public directory
       {
@@ -361,9 +394,16 @@ namespace os
          * @endcond
          */
       };
+#pragma GCC diagnostic pop
 
     // ========================================================================
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
     template<typename T, typename L>
       class directory_lockable : public directory
       {
@@ -455,6 +495,7 @@ namespace os
          * @endcond
          */
       };
+#pragma GCC diagnostic pop
 
 #pragma GCC diagnostic pop
 
@@ -511,6 +552,11 @@ namespace os
 #endif
       }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#endif
     template<typename T>
       directory_implementable<T>::~directory_implementable ()
       {
@@ -518,6 +564,7 @@ namespace os
         trace::printf ("directory_implementable::%s() @%p\n", __func__, this);
 #endif
       }
+#pragma GCC diagnostic pop
 
     template<typename T>
       typename directory_implementable<T>::value_type&
@@ -542,6 +589,11 @@ namespace os
 #endif
       }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#endif
     template<typename T, typename L>
       directory_lockable<T, L>::~directory_lockable ()
       {
@@ -549,6 +601,7 @@ namespace os
         trace::printf ("directory_lockable::%s() @%p\n", __func__, this);
 #endif
       }
+#pragma GCC diagnostic pop
 
     // ------------------------------------------------------------------------
 

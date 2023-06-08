@@ -665,9 +665,17 @@ namespace os
     condition_variable::timed_wait (mutex& mutex, clock::duration_t timeout)
     {
 #if defined(OS_TRACE_RTOS_CONDVAR)
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
       trace::printf ("%s(%u) @%p %s\n", __func__,
                      static_cast<unsigned int> (timeout), this, name ());
-#endif
+#pragma GCC diagnostic pop
+
+#endif // defined(OS_TRACE_RTOS_CONDVAR)
 
       // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);

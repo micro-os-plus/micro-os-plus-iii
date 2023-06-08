@@ -33,7 +33,11 @@
 using namespace os::driver;
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
 class TestSerial : public Serial
 {
@@ -105,7 +109,10 @@ TestSerial::~TestSerial ()
 }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 const Version&
 TestSerial::do_get_version (void) noexcept

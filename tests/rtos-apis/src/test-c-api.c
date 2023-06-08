@@ -33,7 +33,11 @@
 static const char* test_name = "Test C API";
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
 // Message used in message queues.
 typedef struct my_msg_s
@@ -132,7 +136,11 @@ int
 test_c_api (void)
 {
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunused-but-set-variable"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
 
   const char* name;
   bool flag;
@@ -634,7 +642,11 @@ test_c_api (void)
       assert(msg_in.i = 1);
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunused-but-set-variable"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
 
       const char* str;
       size_t n;

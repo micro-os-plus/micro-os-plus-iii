@@ -91,7 +91,11 @@ namespace os
 
       // Print to the local buffer
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wformat-nonliteral"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
+#endif
       int ret = ::vsnprintf (buf, sizeof(buf), format, args);
 #pragma GCC diagnostic pop
       if (ret > 0)

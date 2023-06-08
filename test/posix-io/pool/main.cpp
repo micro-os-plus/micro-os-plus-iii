@@ -61,7 +61,10 @@ TestFile::TestFile ()
 }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 int
 TestFile::do_vopen (const char* path, int oflag, std::va_list args)

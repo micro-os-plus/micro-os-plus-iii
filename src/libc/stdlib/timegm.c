@@ -131,6 +131,12 @@ validate_structure (struct tm *tim_p)
   div_t res;
   int days_in_feb = 28;
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+// For div()
+#pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
   /* calculate time & date to account for out of range values */
   if (tim_p->tm_sec < 0 || tim_p->tm_sec > 59)
     {
@@ -175,6 +181,7 @@ validate_structure (struct tm *tim_p)
           --tim_p->tm_year;
         }
     }
+#pragma GCC diagnostic pop
 
   if (_DAYS_IN_YEAR (tim_p->tm_year) == 366)
     days_in_feb = 29;

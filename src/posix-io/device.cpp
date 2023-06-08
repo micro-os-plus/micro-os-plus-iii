@@ -157,6 +157,11 @@ namespace os
       return ret;
     }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#endif
     int
     device::vioctl (int request, std::va_list args)
     {
@@ -174,6 +179,7 @@ namespace os
 
       return impl ().do_vioctl (request, args);
     }
+#pragma GCC diagnostic pop
 
     void
     device::sync (void)

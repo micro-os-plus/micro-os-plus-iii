@@ -216,7 +216,10 @@ extern "C"
   stat (const char* path, struct stat* buf);
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wshadow"
+#endif
 
   int __attribute__((weak, alias ("__posix_statvfs")))
   statvfs (const char* path, struct statvfs* buf);

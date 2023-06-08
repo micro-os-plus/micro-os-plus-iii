@@ -422,7 +422,10 @@ _realloc_r (struct _reent* impure __attribute__((unused)), void* ptr,
  */
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 
 struct mallinfo
 _mallinfo_r (struct _reent* impure __attribute__((unused)))

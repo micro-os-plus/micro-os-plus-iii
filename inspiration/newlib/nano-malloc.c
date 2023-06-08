@@ -114,8 +114,11 @@
 #else /* ! INTERNAL_NEWLIB */
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wsign-conversion"
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 
 #define RARG
 

@@ -62,9 +62,13 @@ namespace os
 
     // ------------------------------------------------------------------------
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 // TODO: remove after fixing implementation.
 #pragma GCC diagnostic ignored "-Wnonnull"
+#pragma GCC diagnostic ignored "-Wnull-dereference"
 
     class socket*
     socket (int domain, int type, int protocol)
@@ -103,6 +107,11 @@ namespace os
 #endif
     }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#endif
     class socket*
     net_stack::socket (int domain, int type, int protocol)
     {
@@ -110,6 +119,7 @@ namespace os
 
       return impl ().do_socket (domain, type, protocol);
     }
+#pragma GCC diagnostic pop
 
     // ========================================================================
 

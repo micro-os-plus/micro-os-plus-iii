@@ -84,8 +84,13 @@ namespace os
     }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic ignored "-Wmissing-noreturn"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wmissing-noreturn"
+#endif
 
     void
     notify_all_at_thread_exit (condition_variable& cond,

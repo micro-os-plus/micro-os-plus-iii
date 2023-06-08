@@ -43,7 +43,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #endif
@@ -358,7 +357,10 @@ template<typename F_T>
   }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 
 template<typename Callable_T, typename ... Args_T>
   thread::thread (Callable_T&& f, Args_T&&... args)
@@ -381,7 +383,11 @@ template<typename Callable_T, typename ... Args_T>
     // The function to start the thread is a custom proxy that
     // knows how to get the variadic arguments.
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wcast-function-type"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wcast-function-type"
+#endif
     id_ = id
       { new os::rtos::thread (
           reinterpret_cast<os::rtos::thread::func_t> (&run_function_object<
@@ -409,11 +415,19 @@ namespace this_thread
     os::rtos::this_thread::yield ();
   }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
+
   inline thread::id
   get_id () noexcept
   {
     return thread::id (&os::rtos::this_thread::thread ());
   }
+
+#pragma GCC diagnostic pop
 
   // This implementation currently supports only short
   // delays, since it uses the ticks timer.
@@ -441,8 +455,10 @@ namespace this_thread
 #if 0
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
-
+#endif
           os::rtos::thread::sleep (
               (os::rtos::systicks_t) (os::estd::chrono::ceil<
                   systicks> (micros).count ()));
@@ -461,7 +477,10 @@ namespace this_thread
 #endif
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 
   template<typename Clock_T, class Rep_T, class Period_T>
     constexpr void
@@ -490,7 +509,10 @@ namespace this_thread
       using clock = Clock_T;
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 
       auto now = clock::now ();
 
@@ -513,7 +535,10 @@ namespace this_thread
       using clock = os::estd::chrono::realtime_clock;
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 
       auto now = clock::now ();
       while (now < abs_time)
@@ -537,7 +562,10 @@ namespace this_thread
       using clock = os::estd::chrono::systick_clock;
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 
       auto now = clock::now ();
       while (now < abs_time)

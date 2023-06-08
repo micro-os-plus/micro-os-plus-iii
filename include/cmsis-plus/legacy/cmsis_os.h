@@ -268,7 +268,11 @@ extern "C"
   typedef osMailQ* osMailQId;
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
   /**
    * @brief Thread definition structure contains startup information of a thread.
@@ -319,7 +323,11 @@ extern "C"
   } osSemaphoreDef_t;
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
   /**
    * @brief Definition structure for memory block allocation.

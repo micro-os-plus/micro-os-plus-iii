@@ -42,7 +42,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #endif
@@ -1222,6 +1221,12 @@ namespace os
             const_cast<static_double_list_links *> (tail ()));
       }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
+
     /**
      * @note It is not `const` because it may initialise on first use.
      */
@@ -1246,6 +1251,8 @@ namespace os
           {
               static_cast<iterator_pointer> (const_cast<static_double_list_links*> (&head_)) };
       }
+
+#pragma GCC diagnostic pop
 
     template<typename T, typename N, N T::* MP, typename U>
       inline typename intrusive_list<T, N, MP, U>::pointer

@@ -45,7 +45,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
@@ -240,7 +239,11 @@ namespace os
     // ========================================================================
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
     /**
      * @brief POSIX compliant **thread**, using the
@@ -248,6 +251,12 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-thread
      */
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
     class thread : public internal::object_named_system
     {
     public:
@@ -785,7 +794,11 @@ namespace os
 
       // ======================================================================
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
       /**
        * @brief Thread attributes.
@@ -1713,6 +1726,7 @@ namespace os
        */
     };
     /* class thread */
+#pragma GCC diagnostic pop
 
     /**
      * @brief Template of a POSIX compliant **thread** with allocator.

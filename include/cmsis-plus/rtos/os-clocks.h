@@ -39,7 +39,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
@@ -54,14 +53,19 @@ namespace os
 
     // ========================================================================
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wpadded"
-
     /**
      * @brief Generic clock.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-clock
      */
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wpadded"
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
     class clock : public internal::object_named
     {
     public:
@@ -317,7 +321,6 @@ namespace os
        * @}
        */
     };
-
 #pragma GCC diagnostic pop
 
     // ========================================================================
@@ -838,6 +841,8 @@ namespace os
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wvolatile"
 #endif
       ++steady_count_;
 #pragma GCC diagnostic pop
@@ -874,7 +879,11 @@ namespace os
       clock::internal_check_timestamps ();
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
       adjusted_list_.check_timestamp (steady_count_ + offset_);
 #pragma GCC diagnostic pop
     }
@@ -922,6 +931,8 @@ namespace os
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wvolatile"
 #endif
       steady_count_ += port::clock_highres::cycles_per_tick ();
 #pragma GCC diagnostic pop

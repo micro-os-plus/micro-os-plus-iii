@@ -49,7 +49,10 @@ public:
 };
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 int
 TestIO::do_vopen (const char *path, int oflag, va_list args)

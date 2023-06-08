@@ -101,7 +101,11 @@ namespace os
       bool is_preemptive_ = false;
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
       // A small kludge to provide a temporary errno before
       // the first real thread is created.
       typedef struct {
@@ -115,7 +119,10 @@ namespace os
       // Ensure the tiny thread is large enough to have the errno
       // member in the same location.
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"
+#endif
       static_assert(offsetof(tiny_thread_t, errno_) == offsetof(thread, errno_), "adjust tiny_thread_t members");
 #pragma GCC diagnostic pop
 
@@ -410,11 +417,19 @@ namespace os
         // Get the high resolution timestamp.
         clock::timestamp_t now = hrclock.now ();
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
+
         // Compute duration since previous context switch.
         // Assume scheduler is not disabled for very long.
         rtos::statistics::duration_t delta =
             static_cast<rtos::statistics::duration_t> (now
                 - scheduler::statistics::switch_timestamp_);
+
+#pragma GCC diagnostic pop
 
         // Accumulate durations to scheduler total.
         scheduler::statistics::cpu_cycles_ += delta;

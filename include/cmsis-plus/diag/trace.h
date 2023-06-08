@@ -277,7 +277,11 @@ namespace os
           }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
         inline ssize_t __attribute__((always_inline))
         write (const void* buf, std::size_t nbyte)
@@ -367,11 +371,19 @@ trace_initialize (void)
   }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#elif defined(__GNUC__)
 #if defined(__cplusplus)
 #pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
 #endif
 
 inline ssize_t

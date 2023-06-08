@@ -42,7 +42,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
@@ -58,7 +57,11 @@ namespace os
     // ========================================================================
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
     /**
      * @brief Synchronised **memory pool**, using the
@@ -66,6 +69,12 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-mempool
      */
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
     class memory_pool : public internal::object_named_system
     {
     public:
@@ -537,6 +546,7 @@ namespace os
        */
 
     };
+#pragma GCC diagnostic pop
 
     // ========================================================================
 
@@ -624,6 +634,12 @@ namespace os
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-mempool
      */
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
     template<typename T, typename Allocator = memory::allocator<void*>>
       class memory_pool_typed : public memory_pool_allocated<Allocator>
       {
@@ -742,6 +758,7 @@ namespace os
          */
 
       };
+#pragma GCC diagnostic pop
 
     // ========================================================================
 
@@ -1196,10 +1213,16 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#endif
     template<typename T, typename Allocator>
       memory_pool_typed<T, Allocator>::~memory_pool_typed ()
       {
       }
+#pragma GCC diagnostic pop
 
     /**
      * @details

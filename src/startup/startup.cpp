@@ -404,7 +404,10 @@ _start (void)
 // to parse args received from host.
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 // This is the standard default implementation for the routine to
 // process args. It returns a single empty arg.

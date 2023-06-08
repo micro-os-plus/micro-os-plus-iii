@@ -64,6 +64,8 @@ namespace os
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wvolatile"
 #endif
             flags_mask_ |= mask;
 #pragma GCC diagnostic pop
@@ -109,6 +111,8 @@ namespace os
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wvolatile"
 #endif
                 // Clear desired flags.
                 flags_mask_ &= ~mask;
@@ -141,6 +145,8 @@ namespace os
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wvolatile"
 #endif
                     // Clear the selected bits; leave the rest untouched.
                     flags_mask_ &= ~mask;
@@ -171,6 +177,8 @@ namespace os
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wvolatile"
 #endif
             // Clear the selected bits; leave the rest untouched.
             flags_mask_ &= ~mask;

@@ -49,7 +49,11 @@ namespace os
     }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
     void*
     block_pool::do_allocate (std::size_t bytes, std::size_t alignment)
@@ -67,6 +71,8 @@ namespace os
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wvolatile"
 #endif
       ++count_;
 #pragma GCC diagnostic pop
@@ -113,6 +119,8 @@ namespace os
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wvolatile"
 #endif
       --count_;
 #pragma GCC diagnostic pop

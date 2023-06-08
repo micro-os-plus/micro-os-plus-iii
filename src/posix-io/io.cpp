@@ -383,6 +383,11 @@ namespace os
       return ret;
     }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#endif
     int
     io::vfcntl (int cmd, std::va_list args)
     {
@@ -407,6 +412,7 @@ namespace os
       // Execute the implementation specific code.
       return impl ().do_vfcntl (cmd, args);
     }
+#pragma GCC diagnostic pop
 
     int
     io::isatty (void)
@@ -490,6 +496,14 @@ namespace os
       return;
     }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#endif
+
     bool
     io_impl::do_is_connected (void)
     {
@@ -513,9 +527,6 @@ namespace os
         }
       return total;
     }
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 
     int
     io_impl::do_vfcntl (int cmd, std::va_list args)

@@ -147,7 +147,11 @@ namespace os
     // ------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
     int
     file_impl::do_ftruncate (off_t length)

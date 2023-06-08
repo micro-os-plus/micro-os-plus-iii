@@ -50,7 +50,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #endif
@@ -244,7 +243,10 @@ namespace os
       }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 
     template<class Clock_T, class Duration_T>
       cv_status
@@ -287,7 +289,10 @@ namespace os
       }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 
     template<class Rep_T, class Period_T>
       cv_status

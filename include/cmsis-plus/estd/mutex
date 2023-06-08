@@ -53,7 +53,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #endif
@@ -229,7 +228,10 @@ namespace os
     // ========================================================================
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 
     template<typename Rep_T, typename Period_T>
       bool

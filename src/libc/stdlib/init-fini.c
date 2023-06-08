@@ -30,9 +30,10 @@
 // script must be updated.
 
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmissing-prototypes"
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wreserved-identifier"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wmissing-prototypes"
 #endif
 
 void

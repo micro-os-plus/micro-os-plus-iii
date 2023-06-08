@@ -29,7 +29,10 @@
 #include <stdint.h>
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 #pragma GCC diagnostic ignored "-Wmissing-prototypes"
 
 ARM_DRIVER_VERSION
@@ -91,8 +94,11 @@ Test_GetModemStatus (void)
 #pragma GCC diagnostic pop
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
 
 int32_t
 Test_Initialize (ARM_USART_SignalEvent_t cb_event)

@@ -48,8 +48,11 @@ extern "C"
   // and directly call the posix implementation.
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wmissing-declarations"
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
   int __attribute__((weak))
   _close_r (void* ptr, int fildes)

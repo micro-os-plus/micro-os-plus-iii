@@ -53,7 +53,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
@@ -1078,8 +1077,14 @@ namespace os
 
 // ----------------------------------------------------------------------------
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 // Must be included after the declarations
 #include <cmsis-plus/rtos/internal/os-lists.h>
+#pragma GCC diagnostic pop
 
 // ----------------------------------------------------------------------------
 

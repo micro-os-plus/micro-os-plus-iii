@@ -53,7 +53,10 @@ namespace os
       // uint64_t startup_absolute_seconds;
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 
       // ======================================================================
 

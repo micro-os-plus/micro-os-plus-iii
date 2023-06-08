@@ -52,7 +52,11 @@ namespace os
     // ------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
     /**
      * @brief Buffered serial driver class template.
@@ -240,7 +244,10 @@ namespace os
     // ------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
     template<typename CS>
       int
@@ -464,7 +471,10 @@ namespace os
                     critical_section cs;
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
                     status = driver_->get_status ();
 #pragma GCC diagnostic pop
 

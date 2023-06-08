@@ -86,9 +86,16 @@ namespace os
           }
         else if (prio > head ()->thread_->priority ())
           {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
             // Insert at the beginning of the list.
             after =
                 static_cast<waiting_thread_node*> (const_cast<utils::static_double_list_links *> (&head_));
+#pragma GCC diagnostic pop
+
 #if defined(OS_TRACE_RTOS_LISTS)
             trace::printf ("ready %s() front +%u %u \n", __func__, prio,
                            head ()->thread_->priority ());
@@ -96,6 +103,11 @@ namespace os
           }
         else
           {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
             // Insert in the middle of the list.
             // The loop is guaranteed to terminate, and not hit the head.
             // The weight is relatively small, priority() is not heavy.
@@ -104,6 +116,8 @@ namespace os
                 after =
                     static_cast<waiting_thread_node*> (const_cast<utils::static_double_list_links *> (after->prev ()));
               }
+#pragma GCC diagnostic pop
+
 #if defined(OS_TRACE_RTOS_LISTS)
             trace::printf ("ready %s() middle %u +%u \n", __func__,
                            after->thread_->priority (), prio);
@@ -211,9 +225,16 @@ namespace os
           }
         else if (prio > head ()->thread_->priority ())
           {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
             // Insert at the beginning of the list.
             after =
                 static_cast<waiting_thread_node*> (const_cast<utils::static_double_list_links *> (&head_));
+#pragma GCC diagnostic pop
+
 #if defined(OS_TRACE_RTOS_LISTS)
             trace::printf ("wait %s() front +%u %u \n", __func__, prio,
                            head ()->thread_->priority ());
@@ -221,6 +242,11 @@ namespace os
           }
         else
           {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
             // Insert in the middle of the list.
             // The loop is guaranteed to terminate, and not hit the head.
             // The weight is relatively small, priority() is not heavy.
@@ -229,6 +255,8 @@ namespace os
                 after =
                     static_cast<waiting_thread_node*> (const_cast<utils::static_double_list_links *> (after->prev ()));
               }
+#pragma GCC diagnostic pop
+
 #if defined(OS_TRACE_RTOS_LISTS)
             trace::printf ("wait %s() middle %u +%u \n", __func__,
                            after->thread_->priority (), prio);
@@ -388,6 +416,11 @@ namespace os
        * an empty list still contains the head node with references
        * to itself.
        */
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wnull-dereference"
+#endif
       void
       clock_timestamps_list::link (timestamp_node& node)
       {
@@ -415,6 +448,11 @@ namespace os
           }
         else if (timestamp < head ()->timestamp)
           {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
             // Insert at the beginning of the list
             // and update the new head.
             after =
@@ -424,6 +462,7 @@ namespace os
                 static_cast<uint32_t> (timestamp),
                 static_cast<uint32_t> (head ()->timestamp));
 #endif
+#pragma GCC diagnostic pop
           }
         else
           {
@@ -431,6 +470,11 @@ namespace os
             // The loop is guaranteed to terminate.
             while (timestamp < after->timestamp)
               {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
                 after =
                     static_cast<timeout_thread_node*> (const_cast<utils::static_double_list_links *> (after->prev ()));
               }
@@ -439,10 +483,12 @@ namespace os
                 static_cast<uint32_t> (after->timestamp),
                 static_cast<uint32_t> (timestamp));
 #endif
+#pragma GCC diagnostic pop
           }
 
         insert_after (node, after);
       }
+#pragma GCC diagnostic pop
 
       /**
        * @details

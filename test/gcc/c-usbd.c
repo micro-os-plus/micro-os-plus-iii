@@ -29,7 +29,10 @@
 #include <stdint.h>
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 #pragma GCC diagnostic ignored "-Wmissing-prototypes"
 
 ARM_DRIVER_VERSION
@@ -69,8 +72,11 @@ Usbd_DeviceGetState (void)
 #pragma GCC diagnostic pop
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
 
 int32_t
 Usbd_Initialize (ARM_USBD_SignalDeviceEvent_t cb_device_event,

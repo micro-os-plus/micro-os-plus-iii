@@ -348,7 +348,10 @@ operator delete (void* ptr) noexcept
 }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wc++14-compat"
+#endif
 
 void
 operator delete (void* ptr, std::size_t bytes) noexcept;
@@ -464,7 +467,10 @@ operator delete[] (void* ptr) noexcept
 }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wc++14-compat"
+#endif
 
 void
 operator delete[] (void* ptr, std::size_t bytes) noexcept;

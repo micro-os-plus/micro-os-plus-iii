@@ -446,9 +446,15 @@ namespace os
                   / sizeof(stack::allocation_element_t);
             }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
           allocated_stack_address_ =
               reinterpret_cast<stack::element_t*> (const_cast<allocator_type2&> (allocator).allocate (
                   allocated_stack_size_elements_));
+#pragma GCC diagnostic pop
 
           // Stack allocation failed.
           assert(allocated_stack_address_ != nullptr);
@@ -1129,6 +1135,11 @@ namespace os
         }
     }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#endif
     // Called from kill() and from idle thread.
     void
     thread::internal_destroy_ (void)
@@ -1143,9 +1154,15 @@ namespace os
         {
           typedef typename std::allocator_traits<allocator_type>::pointer pointer;
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
           static_cast<allocator_type*> (const_cast<void*> (allocator_))->deallocate (
               reinterpret_cast<pointer> (allocated_stack_address_),
               allocated_stack_size_elements_);
+#pragma GCC diagnostic pop
 
           allocated_stack_address_ = nullptr;
         }
@@ -1174,6 +1191,7 @@ namespace os
           joiner_->resume ();
         }
     }
+#pragma GCC diagnostic pop
 
     /**
      * @endcond
@@ -1453,10 +1471,16 @@ namespace os
                   clock::duration_t slept_ticks =
                       static_cast<clock::duration_t> (clock_->steady_now ()
                           - begin_timestamp);
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
                   trace::printf ("%s(0x%X,%u,%u) in %u @%p %s >0x%X\n",
                                  __func__, mask, timeout, mode,
                                  static_cast<unsigned int> (slept_ticks), this,
                                  name (), event_flags_.mask ());
+#pragma GCC diagnostic pop
 #endif
                   return result::ok;
                 }

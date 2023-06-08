@@ -260,8 +260,14 @@ namespace os
     timer::start (clock::duration_t period)
     {
 #if defined(OS_TRACE_RTOS_TIMER)
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
       trace::printf ("%s(%u) @%p %s\n", __func__,
                      static_cast<unsigned int> (period), this, name ());
+#pragma GCC diagnostic pop
 #endif
 
       // Don't call this from interrupt handlers.

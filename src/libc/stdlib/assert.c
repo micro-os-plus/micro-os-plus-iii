@@ -127,7 +127,11 @@ void
 assert_failed (uint8_t* file, uint32_t line);
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 // Called from the assert_param() macro, usually defined in the stm32f*_conf.h
 void

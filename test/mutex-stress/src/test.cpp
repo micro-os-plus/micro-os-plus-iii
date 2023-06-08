@@ -43,7 +43,11 @@ mutex mx;
 class periodic;
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
 class mutex_test
 {
@@ -137,7 +141,11 @@ mutex_test* mt[10];
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
 class periodic
 {

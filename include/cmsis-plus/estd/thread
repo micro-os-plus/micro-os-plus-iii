@@ -75,7 +75,10 @@ namespace os
 namespace std
 {
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
   // Define a std::hash specialisation.
   template<>
@@ -90,7 +93,7 @@ namespace std
       }
     };
 
-#pragma GCC diagnostic push
+#pragma GCC diagnostic pop
 
 }
 

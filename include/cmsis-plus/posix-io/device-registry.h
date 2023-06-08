@@ -48,7 +48,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #endif
@@ -166,6 +165,12 @@ namespace os
       device_registry<T>::link (value_type* device)
       {
 #if defined(DEBUG)
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
         for (auto&& d : registry_list__)
           {
             // Validate the device name by checking duplicates.
@@ -175,6 +180,8 @@ namespace os
                 std::abort ();
               }
           }
+#pragma GCC diagnostic push
+
 #endif // DEBUG
 
         registry_list__.link (*device);

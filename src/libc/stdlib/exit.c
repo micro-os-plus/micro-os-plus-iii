@@ -110,7 +110,10 @@ exit (int code)
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 // On Release, call the hardware reset procedure.
 // On Debug, use a breakpoint to notify the debugger.

@@ -67,7 +67,11 @@ my_memcpy (void *dst, const void *src, std::size_t n)
 }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
 class my_char_impl : public posix::char_device_impl
 {
@@ -116,7 +120,11 @@ public:
 #pragma GCC diagnostic pop
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 my_char_impl::my_char_impl (uint8_t* buf, size_t sz)
 {
@@ -136,7 +144,11 @@ my_char_impl::~my_char_impl ()
 }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 int
 my_char_impl::do_vopen (const char* path, int oflag, std::va_list args)
@@ -214,7 +226,11 @@ my_block_impl::~my_block_impl ()
 }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 int
 my_block_impl::do_vopen (const char* path, int oflag, std::va_list args)
@@ -331,7 +347,11 @@ static posix::file_descriptors_manager fdm
 static const char* test_name = "Test POSIX I/O";
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunused-but-set-variable"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
 
 int
 test_posix_io_api (bool extra __attribute__((unused)))

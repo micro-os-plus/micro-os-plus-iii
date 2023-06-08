@@ -44,7 +44,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
@@ -63,7 +62,11 @@ namespace os
       // ======================================================================
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
       /**
        * @brief Double linked list node, with thread reference.
@@ -129,7 +132,11 @@ namespace os
       // ======================================================================
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
       /**
        * @brief Double linked list node, with time stamp.
@@ -218,7 +225,11 @@ namespace os
       // ======================================================================
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
       /**
        * @brief Double linked list node, with time stamp and thread.
@@ -307,7 +318,11 @@ namespace os
       // ======================================================================
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
       /**
        * @brief Double linked list node, with time stamp and timer.
@@ -940,6 +955,11 @@ namespace os
         return static_cast<volatile waiting_thread_node*> (double_list::head ());
       }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
       inline waiting_threads_list::iterator
       waiting_threads_list::begin () const
       {
@@ -955,6 +975,7 @@ namespace os
           {
               static_cast<waiting_threads_list::iterator::iterator_pointer> (const_cast<utils::static_double_list_links*> (&head_)) };
       }
+#pragma GCC diagnostic pop
 
       // ======================================================================
 

@@ -47,7 +47,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #endif
@@ -70,6 +69,12 @@ namespace os
      * @headerfile socket.h <cmsis-plus/posix-io/socket.h>
      * @ingroup cmsis-plus-posix-io-base
      */
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
     class socket : public io
     {
       // ----------------------------------------------------------------------
@@ -168,8 +173,16 @@ namespace os
       // ----------------------------------------------------------------------
       // Support functions.
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wredundant-tags"
+#endif
+
       class net_stack*
       net_stack (void);
+
+#pragma GCC diagnostic pop
 
       socket_impl&
       impl (void) const;
@@ -207,6 +220,7 @@ namespace os
        */
 
     };
+#pragma GCC diagnostic pop
 
     // ========================================================================
 

@@ -30,6 +30,8 @@
 
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Waggregate-return"
 #endif
 
 // ----------------------------------------------------------------------------
@@ -42,7 +44,11 @@ using namespace os::rtos;
 static const char* test_name = "Test C++ API";
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
 typedef struct my_msg_s
 {

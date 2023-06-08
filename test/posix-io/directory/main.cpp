@@ -145,7 +145,11 @@ TestFile::do_close (void)
 }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
 // Test class, all methods store the input in local variables,
 // to be checked later.

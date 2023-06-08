@@ -282,6 +282,8 @@ namespace os
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wvolatile"
 #endif
           --count_;
 #pragma GCC diagnostic pop
@@ -372,6 +374,8 @@ namespace os
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wvolatile"
 #endif
           ++count_;
 #pragma GCC diagnostic pop
@@ -590,9 +594,15 @@ namespace os
     semaphore::timed_wait (clock::duration_t timeout)
     {
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
       trace::printf ("%s(%u) @%p %s <%u\n", __func__,
                      static_cast<unsigned int> (timeout), this, name (),
                      count_);
+#pragma GCC diagnostic pop
 #endif
 
       // Don't call this from interrupt handlers.
@@ -663,9 +673,15 @@ namespace os
           if (crt_thread.interrupted ())
             {
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
               trace::printf ("%s(%u) EINTR @%p %s\n", __func__,
                              static_cast<unsigned int> (timeout), this,
                              name ());
+#pragma GCC diagnostic pop
 #endif
               return EINTR;
             }
@@ -673,9 +689,15 @@ namespace os
           if (clock_->steady_now () >= timeout_timestamp)
             {
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
               trace::printf ("%s(%u) ETIMEDOUT @%p %s\n", __func__,
                              static_cast<unsigned int> (timeout), this,
                              name ());
+#pragma GCC diagnostic pop
 #endif
               return ETIMEDOUT;
             }

@@ -49,7 +49,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #endif
@@ -88,6 +87,12 @@ namespace os
      * @headerfile net-stack.h <cmsis-plus/posix-io/net-stack.h>
      * @ingroup cmsis-plus-posix-io-base
      */
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
     class net_stack
     {
       // ----------------------------------------------------------------------
@@ -220,6 +225,7 @@ namespace os
        */
 
     };
+#pragma GCC diagnostic pop
 
     // ========================================================================
 
@@ -475,7 +481,14 @@ namespace os
     inline net_stack_impl&
     net_stack::impl (void) const
     {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wnull-dereference"
+#endif
       return static_cast<net_stack_impl&> (impl_);
+#pragma GCC diagnostic push
     }
 
     inline void

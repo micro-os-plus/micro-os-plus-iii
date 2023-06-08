@@ -609,9 +609,15 @@ namespace os
               + msgs * sizeof(index_t));
 
 #if !defined(NDEBUG)
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
       char* p =
           reinterpret_cast<char*> (reinterpret_cast<char*> (const_cast<priority_t*> (prio_array_))
               + msgs * sizeof(priority_t));
+#pragma GCC diagnostic pop
 
       assert(
           p - static_cast<char*> (queue_addr_)

@@ -51,7 +51,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
 #endif
@@ -399,7 +398,11 @@ extern "C"
   typedef os_port_thread_stack_allocation_element_t os_thread_stack_allocation_element_t;
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
   /**
    * @brief Thread stack.
@@ -631,7 +634,11 @@ extern "C"
    */
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
   /**
    * @brief Clock object storage.
@@ -671,7 +678,11 @@ extern "C"
 
   // ==========================================================================
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
   typedef struct os_clock_node_s
   {
@@ -736,7 +747,11 @@ extern "C"
   typedef uint8_t os_timer_state_t;
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
   /**
    * @brief Timer attributes.
@@ -901,7 +916,11 @@ extern "C"
   };
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
   /**
    * @brief Mutex attributes.
@@ -1081,7 +1100,11 @@ extern "C"
   typedef int16_t os_semaphore_count_t;
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
   /**
    * @brief Semaphore attributes.
@@ -1167,7 +1190,11 @@ extern "C"
    */
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
   /**
    * @brief Memory pool attributes.
@@ -1274,7 +1301,11 @@ extern "C"
   typedef uint8_t os_mqueue_prio_t;
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
   /**
    * @brief Message queue attributes.
@@ -1377,7 +1408,11 @@ extern "C"
    */
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wpadded"
+#endif
 
   /**
    * @brief Event flags attributes.

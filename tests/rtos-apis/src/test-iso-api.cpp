@@ -41,7 +41,10 @@
 static const char* test_name = "Test ISO C++ API";
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
@@ -187,7 +190,10 @@ test_iso_api (bool extra)
 #endif
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 #pragma GCC diagnostic ignored "-Wunused-variable"
 
         {
@@ -250,7 +256,10 @@ test_iso_api (bool extra)
           mx21.unlock ();
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 
           if (mx21.try_lock_until (estd::chrono::system_clock::now () + 5000us))
             mx21.unlock ();
@@ -310,7 +319,10 @@ test_iso_api (bool extra)
           mx22.unlock ();
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 
           if (mx22.try_lock_until (estd::chrono::system_clock::now () + 5000us))
           mx22.unlock ();
@@ -357,7 +369,10 @@ test_iso_api (bool extra)
           cv11.wait (lock, pred);
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 
           cv11.wait_until (lock, estd::chrono::system_clock::now () + 10ms);
           cv11.wait_until (lock, estd::chrono::systick_clock::now () + 10ms);
@@ -418,7 +433,10 @@ test_iso_api (bool extra)
           cv12.wait (lock, pred);
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 
           cv12.wait_until (lock, estd::chrono::system_clock::now () + 10ms);
           cv12.wait_until (lock, estd::chrono::systick_clock::now () + 10ms);
@@ -461,15 +479,13 @@ test_iso_api (bool extra)
   printf ("\n%s - Chrono.\n", test_name);
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
 
   estd::chrono::realtime_clock::startup_time_point =
       estd::chrono::realtime_clock::now ();
-
-#pragma GCC diagnostic pop
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Waggregate-return"
 
   estd::this_thread::sleep_for (5_ticks);
 

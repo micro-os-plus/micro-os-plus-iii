@@ -109,7 +109,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #endif
@@ -166,6 +165,12 @@ namespace os
 
     } /* namespace interrupts */
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
+
     // ------------------------------------------------------------------------
     /**
      * @brief  Create an object that is owned by a `shared_ptr` and is
@@ -186,6 +191,8 @@ namespace os
         return std::allocate_shared<T> (memory::allocator<T_nc> (),
                                         std::forward<Args>(args)...);
       }
+
+#pragma GCC diagnostic pop
 
   } /* namespace rtos */
 } /* namespace os */

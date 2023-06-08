@@ -199,10 +199,18 @@ namespace os
     clock::sleep_for (duration_t duration)
     {
 #if defined(OS_TRACE_RTOS_CLOCKS)
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
       trace::printf ("%s(%u) %p %s\n", __func__,
                      static_cast<unsigned int> (duration),
                      &this_thread::thread (), this_thread::thread ().name ());
-#endif
+#pragma GCC diagnostic pop
+
+#endif // defined(OS_TRACE_RTOS_CLOCKS)
 
       // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
@@ -280,8 +288,16 @@ namespace os
     clock::wait_for (duration_t timeout)
     {
 #if defined(OS_TRACE_RTOS_CLOCKS)
-      trace::printf ("%s(%u)\n", __func__, static_cast<unsigned int> (timeout));
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif
+      trace::printf ("%s(%u)\n", __func__, static_cast<unsigned int> (timeout));
+#pragma GCC diagnostic pop
+
+#endif // defined(OS_TRACE_RTOS_CLOCKS)
 
       // Don't call this from interrupt handlers.
       os_assert_err(!interrupts::in_handler_mode (), EPERM);
@@ -327,6 +343,8 @@ namespace os
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-volatile"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wvolatile"
 #endif
       steady_count_ += duration;
 #pragma GCC diagnostic pop
@@ -352,6 +370,12 @@ namespace os
       return 0;
     }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
     result_t
     clock::internal_wait_until_ (timestamp_t timestamp,
                                  internal::clock_timestamps_list& list)
@@ -393,6 +417,7 @@ namespace os
 
       return result::ok;
     }
+#pragma GCC diagnostic pop
 
     /**
      * @endcond
@@ -409,6 +434,11 @@ namespace os
     /**
      * @note Can be invoked from Interrupt Service Routines.
      */
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#endif
     clock::timestamp_t
     adjustable_clock::now (void)
     {
@@ -417,11 +447,16 @@ namespace os
       interrupts::critical_section ics;
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wsign-conversion"
+#endif
       return steady_count_ + offset_;
 #pragma GCC diagnostic pop
       // ----- Exit critical section ------------------------------------------
     }
+#pragma GCC diagnostic pop
 
     /**
      * @warning Cannot be invoked from Interrupt Service Routines.

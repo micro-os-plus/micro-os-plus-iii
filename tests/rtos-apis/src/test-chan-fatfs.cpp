@@ -49,8 +49,10 @@
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #pragma clang diagnostic ignored "-Wextra-semi-stmt"
-#endif
+#pragma clang diagnostic ignored "-Wunused-but-set-variable"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
 
 // ----------------------------------------------------------------------------
 
@@ -821,8 +823,13 @@ DWORD pns /* 0:Initialize, !0:Read */
 }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Wformat"
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #pragma GCC diagnostic ignored "-Wformat"
+#endif
 
 int
 test_diskio (posix::block_device& bd, /* Physical drive number to be checked (all data on the drive will be lost) */

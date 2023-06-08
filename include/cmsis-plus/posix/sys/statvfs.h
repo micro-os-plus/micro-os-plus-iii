@@ -77,7 +77,10 @@ extern "C"
   fstatvfs (int fildes, struct statvfs *buf);
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wshadow"
+#endif
 
   int
   statvfs (const char* path, struct statvfs* buf);

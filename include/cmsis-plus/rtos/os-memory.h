@@ -48,7 +48,6 @@
 // os::estd:: namespace.
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
@@ -166,6 +165,12 @@ namespace os
        * several extensions, to control the throw behaviour and to
        * add statistics.
        */
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
       class memory_resource : public internal::object_named
       {
 
@@ -497,6 +502,7 @@ namespace os
          */
 
       };
+#pragma GCC diagnostic pop
 
       /**
        * @name Operators

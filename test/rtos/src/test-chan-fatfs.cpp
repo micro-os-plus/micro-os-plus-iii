@@ -58,13 +58,6 @@ test_diskio (posix::block_device& pdrv, /* Physical drive number to be checked (
              std::size_t sz_buff /* Size of the working buffer in unit of byte */
              );
 
-#pragma GCC diagnostic push
-#if defined(__clang__)
-#pragma clang diagnostic ignored "-Wweak-template-vtables"
-#endif
-
-#pragma GCC diagnostic pop
-
 int
 test_chan_fatfs (bool extra __attribute__((unused)))
 {
@@ -816,8 +809,11 @@ DWORD pns /* 0:Initialize, !0:Read */
 }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #pragma GCC diagnostic ignored "-Wformat"
+#endif
 
 int
 test_diskio (posix::block_device& bd, /* Physical drive number to be checked (all data on the drive will be lost) */

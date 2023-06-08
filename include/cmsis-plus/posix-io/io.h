@@ -50,7 +50,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
@@ -94,6 +93,11 @@ namespace os
      * @headerfile io.h <cmsis-plus/posix-io/io.h>
      * @ingroup cmsis-plus-posix-io-base
      */
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#endif
     class io
     {
       // ----------------------------------------------------------------------
@@ -109,8 +113,11 @@ namespace os
       vopen (const char* path, int oflag, std::va_list args);
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wshadow"
-      friend class socket*
+#endif
+      friend /* class */ socket*
       socket (int domain, int type, int protocol);
 #pragma GCC diagnostic pop
 
@@ -127,7 +134,10 @@ namespace os
        */
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wshadow"
+#endif
 
       using type_t = unsigned int;
       enum class type
@@ -296,9 +306,16 @@ namespace os
        * @endcond
        */
     };
+#pragma GCC diagnostic pop
 
     // ========================================================================
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wsuggest-final-methods"
+#pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#endif
     class io_impl
     {
       // ----------------------------------------------------------------------
@@ -371,8 +388,14 @@ namespace os
       virtual int
       do_isatty (void);
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wredundant-tags"
+#endif
       virtual int
       do_fstat (struct stat* buf);
+#pragma GCC diagnostic pop
 
       virtual off_t
       do_lseek (off_t offset, int whence) = 0;
@@ -406,6 +429,7 @@ namespace os
        * @endcond
        */
     };
+#pragma GCC diagnostic pop
 
   // ==========================================================================
   } /* namespace posix */

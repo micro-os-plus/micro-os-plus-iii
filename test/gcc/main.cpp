@@ -37,7 +37,10 @@ extern void
 test_usbh (void);
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 int
 main (int argc, char* argv[])

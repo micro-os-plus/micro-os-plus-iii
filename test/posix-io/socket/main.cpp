@@ -326,7 +326,10 @@ TestSocket::do_vfcntl (int cmd, std::va_list args)
 }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
 int
 TestSocket::do_socket (int domain, int type, int protocol)

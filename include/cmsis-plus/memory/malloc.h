@@ -39,7 +39,6 @@
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
-
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #endif
@@ -247,8 +246,12 @@ namespace os
     }
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#elif defined(__GNUC__)
 // Needed because 'alignment' is used only in trace calls.
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
     inline void*
     malloc_memory_resource::do_allocate (std::size_t bytes,
@@ -281,8 +284,12 @@ namespace os
     // ========================================================================
 
 #pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#elif defined(__GNUC__)
 // Needed because 'alignment' is used only in trace calls.
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 
     inline void*
     new_delete_memory_resource::do_allocate (size_t bytes, size_t alignment)
