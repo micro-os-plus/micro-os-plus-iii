@@ -25,13 +25,14 @@ message(VERBOSE "Including platform-native global definitions...")
 set(xpack_platform_common_args
   -Werror
   # Apple clang 13 does not support -Wunused-but-set-variable
-  $<$<PLATFORM_ID:Darwin>:-Wno-unknown-warning-option>
-  # $<$<PLATFORM_ID:Darwin>:-Wno-missing-include-dirs>
+  # $<$<PLATFORM_ID:Darwin>:-Wno-unknown-warning-option>
+  $<$<C_COMPILER_ID:Clang,AppleClang>:-Wno-unknown-warning-option>
+  $<$<PLATFORM_ID:Darwin>:-Wno-missing-include-dirs>
 )
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
   list(APPEND xpack_platform_common_args
-    $<$<C_COMPILER_ID:Clang,AppleClang>:-Wno-used-but-marked-unused>
+    # $<$<C_COMPILER_ID:Clang,AppleClang>:-Wno-used-but-marked-unused>
   )
 endif()
 
