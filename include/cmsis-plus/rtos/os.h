@@ -203,6 +203,8 @@ namespace os
 
 #endif /* __cplusplus */
 
+#include <cmsis-plus/rtos/os-c-api.h>
+
 // ----------------------------------------------------------------------------
 
 #endif /* CMSIS_PLUS_RTOS_OS_H_ */
