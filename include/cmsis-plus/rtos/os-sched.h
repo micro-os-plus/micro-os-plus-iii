@@ -479,20 +479,6 @@ namespace os
 
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
 
-#if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) \
-  || defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
-
-        /**
-         * @brief Get the total duration of all threads.
-         * @return Integer with the number of CPU cycles, possibly
-         * divided by some prescaller.
-         */
-        rtos::statistics::duration_t
-        cpu_cycles (void);
-
-#endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) \
-  || defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES) */
-
       } /* namespace statistics */
     } /* namespace scheduler */
 
