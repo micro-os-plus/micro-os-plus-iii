@@ -183,6 +183,8 @@ namespace os
 
         /**
          * @brief USB Host Pipe Event
+         *
+         * @todo Make enum class.
          */
         enum Pipe_event
           : event_t

@@ -145,6 +145,8 @@ namespace os
 
         /**
          * @brief USB Device Events
+         *
+         * @todo Make enum class.
          */
         enum Device_event
           : event_t
