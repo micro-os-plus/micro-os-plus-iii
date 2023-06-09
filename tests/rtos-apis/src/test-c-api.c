@@ -85,7 +85,7 @@ void
 iterate_threads (os_thread_t* th, unsigned int depth);
 
 static const char* thread_state[] =
-  { "undf", "inac", "rdy", "run", "wait", "term", "dead" };
+  { "undf", "rdy", "run", "wait", "term", "dead", "init" };
 
 /*
  * To compute thread percentages, use totals provided by:

@@ -92,7 +92,7 @@ void
 iterate_threads (thread* th = nullptr, unsigned int depth = 0);
 
 static const char* thread_state[] =
-  { "undf", "inac", "rdy", "run", "wait", "term", "dead", "init" };
+  { "undf", "rdy", "run", "wait", "term", "dead", "init" };
 
 void
 iterate_threads (thread* th, unsigned int depth)
