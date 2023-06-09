@@ -1,0 +1,91 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(gdb) Launch native-cmake-gcc-debug rtos-apis-test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/native-cmake-gcc-debug/platform-bin/rtos-apis-test",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [
+                {
+                    "name": "PATH",
+                    "value": "${workspaceFolder}/build/native-cmake-gcc-debug/xpacks/.bin:${env:PATH}"
+                },
+                {
+                    // tests/platform-native/scripts/get-libraries-paths.sh build/native-cmake-gcc-debug/xpacks/.bin/g++
+                    "name": "LD_LIBRARY_PATH",
+                    "value": "/home/ilg/.local/xPacks/@xpack-dev-tools/gcc/12.2.0-2.1/.content/bin/../lib/gcc/aarch64-unknown-linux-gnu/12.2.0/:/home/ilg/.local/xPacks/@xpack-dev-tools/gcc/12.2.0-2.1/.content/bin/../lib/gcc/aarch64-linux-gnu/:/home/ilg/.local/xPacks/@xpack-dev-tools/gcc/12.2.0-2.1/.content/bin/../lib/gcc/:/home/ilg/.local/xPacks/@xpack-dev-tools/gcc/12.2.0-2.1/.content/bin/../lib/gcc/aarch64-unknown-linux-gnu/12.2.0/../../../../aarch64-unknown-linux-gnu/lib/aarch64-unknown-linux-gnu/12.2.0/:/home/ilg/.local/xPacks/@xpack-dev-tools/gcc/12.2.0-2.1/.content/bin/../lib/gcc/aarch64-unknown-linux-gnu/12.2.0/../../../../aarch64-unknown-linux-gnu/lib/aarch64-linux-gnu/:/home/ilg/.local/xPacks/@xpack-dev-tools/gcc/12.2.0-2.1/.content/bin/../lib/gcc/aarch64-unknown-linux-gnu/12.2.0/../../../../aarch64-unknown-linux-gnu/lib/../lib64/:/home/ilg/.local/xPacks/@xpack-dev-tools/gcc/12.2.0-2.1/.content/bin/../lib/gcc/aarch64-unknown-linux-gnu/12.2.0/../../../aarch64-unknown-linux-gnu/12.2.0/:/home/ilg/.local/xPacks/@xpack-dev-tools/gcc/12.2.0-2.1/.content/bin/../lib/gcc/aarch64-unknown-linux-gnu/12.2.0/../../../aarch64-linux-gnu/:/home/ilg/.local/xPacks/@xpack-dev-tools/gcc/12.2.0-2.1/.content/bin/../lib/gcc/aarch64-unknown-linux-gnu/12.2.0/../../../../lib64/:/lib/aarch64-unknown-linux-gnu/12.2.0/:/lib/aarch64-linux-gnu/:/lib/../lib64/:/usr/lib/aarch64-unknown-linux-gnu/12.2.0/:/usr/lib/aarch64-linux-gnu/:/usr/lib/../lib64/:/home/ilg/.local/xPacks/@xpack-dev-tools/gcc/12.2.0-2.1/.content/bin/../lib/gcc/aarch64-unknown-linux-gnu/12.2.0/../../../../aarch64-unknown-linux-gnu/lib/:/home/ilg/.local/xPacks/@xpack-dev-tools/gcc/12.2.0-2.1/.content/bin/../lib/gcc/aarch64-unknown-linux-gnu/12.2.0/../../../:/lib/:/usr/lib/"
+                }
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                // {
+                //     "description": "Set Disassembly Flavor to Intel",
+                //     "text": "-gdb-set disassembly-flavor intel",
+                //     "ignoreFailures": true
+                // }
+            ]
+        },
+        {
+            // https://github.com/vadimcn/codelldb/blob/v1.9.2/MANUAL.md
+            "name": "(lldb) native-cmake-clang-debug rtos-apis-test",
+            "type": "lldb",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/native-cmake-clang-debug/platform-bin/rtos-apis-test",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "PATH": "${workspaceFolder}/build/native-cmake-clang-debug/xpacks/.bin:${env:PATH}",
+                // tests/platform-native/scripts/get-libraries-paths.sh build/native-cmake-clang-debug/xpacks/.bin/clang++
+                "LD_LIBRARY_PATH": "/home/ilg/.local/xPacks/@xpack-dev-tools/clang/15.0.7-2.1/.content/lib/clang/15.0.7:/home/ilg/.local/xPacks/@xpack-dev-tools/clang/15.0.7-2.1/.content/bin/../lib/aarch64-unknown-linux-gnu:/usr/lib/gcc/aarch64-linux-gnu/10:/lib/aarch64-linux-gnu:/usr/lib/aarch64-linux-gnu:/lib:/usr/lib"
+            },
+            "stopOnEntry": false,
+        },
+        {
+            "name": "(gdb) Launch native-cmake-clang-debug rtos-apis-test",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/native-cmake-clang-debug/platform-bin/rtos-apis-test",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [
+                {
+                    "name": "PATH",
+                    "value": "${workspaceFolder}/build/native-cmake-gcc-debug/xpacks/.bin:${env:PATH}"
+                },
+                {
+                    // tests/platform-native/scripts/get-libraries-paths.sh build/native-cmake-gcc-debug/xpacks/.bin/g++
+                    "name": "LD_LIBRARY_PATH",
+                    "value": "/home/ilg/.local/xPacks/@xpack-dev-tools/clang/15.0.7-2.1/.content/lib/clang/15.0.7:/home/ilg/.local/xPacks/@xpack-dev-tools/clang/15.0.7-2.1/.content/bin/../lib/aarch64-unknown-linux-gnu:/usr/lib/gcc/aarch64-linux-gnu/10:/lib/aarch64-linux-gnu:/usr/lib/aarch64-linux-gnu:/lib:/usr/lib"
+                }
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                // {
+                //     "description": "Set Disassembly Flavor to Intel",
+                //     "text": "-gdb-set disassembly-flavor intel",
+                //     "ignoreFailures": true
+                // }
+            ]
+        },
+    ]
+}
