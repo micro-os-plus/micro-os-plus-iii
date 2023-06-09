@@ -30,6 +30,7 @@
 
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#pragma clang diagnostic ignored "-Wformat-pedantic"
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
 #endif
