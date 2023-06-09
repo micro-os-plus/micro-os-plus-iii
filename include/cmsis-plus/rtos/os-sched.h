@@ -923,7 +923,7 @@ namespace os
           state_ (lock ())
       {
 #if defined(OS_TRACE_RTOS_SCHEDULER)
-        trace::printf (" {c ");
+        trace::printf ("{C ");
 #endif
       }
 
@@ -938,7 +938,7 @@ namespace os
       critical_section::~critical_section ()
       {
 #if defined(OS_TRACE_RTOS_SCHEDULER)
-        trace::printf (" c} ");
+        trace::printf (" C}");
 #endif
         locked (state_);
       }
@@ -954,7 +954,7 @@ namespace os
           state_ (unlock ())
       {
 #if defined(OS_TRACE_RTOS_SCHEDULER)
-        trace::printf (" {u ");
+        trace::printf ("{U ");
 #endif
       }
 
@@ -969,7 +969,7 @@ namespace os
       uncritical_section::~uncritical_section ()
       {
 #if defined(OS_TRACE_RTOS_SCHEDULER)
-        trace::printf (" u} ");
+        trace::printf (" U}");
 #endif
         locked (state_);
       }
