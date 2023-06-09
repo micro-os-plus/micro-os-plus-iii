@@ -352,7 +352,7 @@ test_posix_io_api (bool extra __attribute__((unused)))
 
   std::size_t bsz = 0;
 
-  printf ("\n%s - Block device partitions - C++ API.\n", test_name);
+  printf ("\n%s - Block device partitions - C++ API\n", test_name);
     {
       posix::block_device::blknum_t bks = 0;
 
@@ -375,7 +375,7 @@ test_posix_io_api (bool extra __attribute__((unused)))
       p2.configure (bks - nr, nr);
     }
 
-  printf ("\n%s - Block device locked - C++ API.\n", test_name);
+  printf ("\n%s - Block device locked - C++ API\n", test_name);
     {
       res = p2.open ();
       assert(res >= 0);
@@ -408,7 +408,7 @@ test_posix_io_api (bool extra __attribute__((unused)))
       p2.close ();
     }
 
-  printf ("\n%s - Block device unlocked - C++ API.\n", test_name);
+  printf ("\n%s - Block device unlocked - C++ API\n", test_name);
     {
       res = p1.open ();
       assert(res >= 0);
@@ -417,7 +417,7 @@ test_posix_io_api (bool extra __attribute__((unused)))
       assert(res >= 0);
     }
 
-  printf ("\n%s - Block device - intermixed opens - C++ API.\n", test_name);
+  printf ("\n%s - Block device - intermixed opens - C++ API\n", test_name);
     {
       int res1 = p1.open ();
       assert(res1 >= 0);
@@ -437,7 +437,7 @@ test_posix_io_api (bool extra __attribute__((unused)))
 
 #if defined(OS_IS_CROSS_BUILD) && !defined(OS_USE_SEMIHOSTING_SYSCALLS)
 
-  printf ("\n%s - Block device - C API.\n", test_name);
+  printf ("\n%s - Block device - C API\n", test_name);
     {
       int fd = open ("/dev/mb2", 0);
 

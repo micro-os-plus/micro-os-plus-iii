@@ -186,7 +186,7 @@ namespace os
 
         registry_list__.link (*device);
 
-        trace::printf ("Device '%s%s' linked.\n", value_type::device_prefix (),
+        trace::printf ("Device '%s%s' linked\n", value_type::device_prefix (),
                        device->name ());
       }
 

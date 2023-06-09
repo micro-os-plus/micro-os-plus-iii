@@ -62,7 +62,7 @@ func (void* args);
 void*
 func (void* args __attribute__((unused)))
 {
-  printf ("%s\n", __func__);
+  printf ("> %s\n", __func__);
 
   return NULL;
 }
@@ -74,7 +74,7 @@ tmfunc (void* args);
 void
 tmfunc (void* args __attribute__((unused)))
 {
-  printf ("%s\n", __func__);
+  printf (">> %s\n", __func__);
 }
 
 // ----------------------------------------------------------------------------
@@ -147,6 +147,7 @@ test_c_api (void)
 
 #pragma GCC diagnostic pop
 
+  printf ("\n%s - started\n", test_name);
   // ==========================================================================
 
 #if 1
@@ -157,7 +158,7 @@ test_c_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Scheduler.\n", test_name);
+  printf ("\n%s - Scheduler\n", test_name);
 
     {
       flag = os_sched_is_started ();
@@ -200,7 +201,7 @@ test_c_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Clocks.\n", test_name);
+  printf ("\n%s - Clocks\n", test_name);
 
     {
       os_sysclock_sleep_for (2);
@@ -220,7 +221,7 @@ test_c_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Threads.\n", test_name);
+  printf ("\n%s - Threads\n", test_name);
 
     {
       // Unnamed static thread; stack dynamically allocated.
@@ -287,7 +288,7 @@ test_c_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Thread stack.\n", test_name);
+  printf ("\n%s - Thread stack\n", test_name);
 
     {
       size_t n;
@@ -311,7 +312,7 @@ test_c_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Thread event flags.\n", test_name);
+  printf ("\n%s - Thread event flags\n", test_name);
 
     {
       os_this_thread_flags_clear (os_flags_all, NULL);
@@ -328,7 +329,7 @@ test_c_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Timers.\n", test_name);
+  printf ("\n%s - Timers\n", test_name);
 
     {
       os_timer_t tm1;
@@ -385,7 +386,7 @@ test_c_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Mutexes.\n", test_name);
+  printf ("\n%s - Mutexes\n", test_name);
 
     {
       os_mutex_t mx1;
@@ -477,7 +478,7 @@ test_c_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Semaphores.\n", test_name);
+  printf ("\n%s - Semaphores\n", test_name);
 
     {
       // Binary semaphore, start at 0.
@@ -552,7 +553,7 @@ test_c_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Memory pools.\n", test_name);
+  printf ("\n%s - Memory pools\n", test_name);
 
   my_blk_t* blk;
 
@@ -608,7 +609,7 @@ test_c_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Message queues.\n", test_name);
+  printf ("\n%s - Message queues\n", test_name);
 
   // Define two messages.
 
@@ -711,7 +712,7 @@ test_c_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Event flags.\n", test_name);
+  printf ("\n%s - Event flags\n", test_name);
 
     {
       os_evflags_t ev1;
@@ -767,7 +768,7 @@ test_c_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Condition variables.\n", test_name);
+  printf ("\n%s - Condition variables\n", test_name);
 
     {
       os_condvar_t cv1;
@@ -795,7 +796,7 @@ test_c_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Done.\n", test_name);
+  printf ("\n%s - done\n", test_name);
   return 0;
 }
 

@@ -119,7 +119,7 @@ main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   fil = pool.acquire ();
   assert(fil == nullptr);
 
-  trace_puts ("'test-pool-debug' succeeded.\n");
+  trace_puts ("'test-pool-debug' succeeded\n");
 
   // Success!
   return 0;

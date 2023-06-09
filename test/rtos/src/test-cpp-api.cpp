@@ -168,7 +168,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Memory managers.\n", test_name);
+  printf ("\n%s - Memory managers\n", test_name);
 
     {
       char arena[60];
@@ -245,7 +245,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Threads.\n", test_name);
+  printf ("\n%s - Threads\n", test_name);
 
     {
       // Static threads with allocated stacks.
@@ -364,7 +364,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Thread stack.\n", test_name);
+  printf ("\n%s - Thread stack\n", test_name);
 
     {
       std::size_t n;
@@ -387,7 +387,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Thread event flags.\n", test_name);
+  printf ("\n%s - Thread event flags\n", test_name);
 
     {
       this_thread::flags_clear (flags::all);
@@ -404,7 +404,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Message queues.\n", test_name);
+  printf ("\n%s - Message queues\n", test_name);
 
   // Define two messages.
 
@@ -575,7 +575,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Memory pools.\n", test_name);
+  printf ("\n%s - Memory pools\n", test_name);
 
   // Classic static usage; block size and cast to char* must be supplied manually.
     {
@@ -757,7 +757,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Condition variables.\n", test_name);
+  printf ("\n%s - Condition variables\n", test_name);
     {
       condition_variable cv1;
       cv1.signal ();
@@ -816,7 +816,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Event flags.\n", test_name);
+  printf ("\n%s - Event flags\n", test_name);
 
     {
       event_flags ev1;
@@ -872,7 +872,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Mutexes.\n", test_name);
+  printf ("\n%s - Mutexes\n", test_name);
 
     {
       // Unnamed mutex.
@@ -1002,7 +1002,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Semaphores.\n", test_name);
+  printf ("\n%s - Semaphores\n", test_name);
 
     {
       // Unnamed counting semaphore.
@@ -1080,7 +1080,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Timers.\n", test_name);
+  printf ("\n%s - Timers\n", test_name);
 
     {
       // Single-shot timer.
@@ -1184,7 +1184,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Done.\n", test_name);
+  printf ("\n%s - Done\n", test_name);
   return 0;
 }
 

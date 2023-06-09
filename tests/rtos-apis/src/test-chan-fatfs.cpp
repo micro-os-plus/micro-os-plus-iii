@@ -80,7 +80,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
 
   for (int i = 0; i < 3; ++i)
     {
-      printf ("\n%s - 512/512 fat12, step %d.\n", test_name, i);
+      printf ("\n%s - 512/512 fat12, step %d\n", test_name, i);
 
       using my_block = posix::block_device_implementable<my_block_impl>;
 
@@ -115,7 +115,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
     }
 
     {
-      printf ("\n%s - 512/512 fat12 mutex.\n", test_name);
+      printf ("\n%s - 512/512 fat12 mutex\n", test_name);
 
       using my_block = posix::block_device_implementable<my_block_impl>;
 
@@ -153,7 +153,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
 // so can be executed only on the synthetic platform.
 #if !defined(OS_IS_CROSS_BUILD)
     {
-      printf ("\n%s - 512/512 fat16.\n", test_name);
+      printf ("\n%s - 512/512 fat16\n", test_name);
 
       using my_block = posix::block_device_implementable<my_block_impl>;
 
@@ -188,7 +188,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
     }
 
     {
-      printf ("\n%s - 512/512 fat32.\n", test_name);
+      printf ("\n%s - 512/512 fat32\n", test_name);
 
       using my_block = posix::block_device_implementable<my_block_impl>;
 
@@ -223,7 +223,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
     }
 
     {
-      printf ("\n%s - 512/512 exfat.\n", test_name);
+      printf ("\n%s - 512/512 exfat\n", test_name);
 
       using my_block = posix::block_device_implementable<my_block_impl>;
 
@@ -257,7 +257,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
     }
 
     {
-      printf ("\n%s - 1024/1024 fat.\n", test_name);
+      printf ("\n%s - 1024/1024 fat\n", test_name);
 
       using my_block = posix::block_device_implementable<my_block_impl>;
 
@@ -292,7 +292,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
     }
 
     {
-      printf ("\n%s - 4096/4096 fat.\n", test_name);
+      printf ("\n%s - 4096/4096 fat\n", test_name);
 
       using my_block = posix::block_device_implementable<my_block_impl>;
 
@@ -327,7 +327,7 @@ test_chan_fatfs (bool extra __attribute__((unused)))
     }
 
     {
-      printf ("\n%s - 512/4096 fat.\n", test_name);
+      printf ("\n%s - 512/4096 fat\n", test_name);
 
       using my_block = posix::block_device_implementable<my_block_impl>;
 
@@ -854,7 +854,7 @@ test_diskio (posix::block_device& bd, /* Physical drive number to be checked (al
 
   for (cc = 1; cc <= ncyc; cc++)
     {
-      printf ("**** Test cycle %u of %u ****\n", cc, ncyc);
+      printf ("---- Test cycle %u of %u ----\n", cc, ncyc);
 
       ds = disk_initialize (pdrv);
       assert((ds & STA_NOINIT) == 0);
@@ -864,13 +864,13 @@ test_diskio (posix::block_device& bd, /* Physical drive number to be checked (al
       assert(dr == RES_OK);
 
       assert(sz_drv >= 12);
-      printf (" Number of sectors is %lu.\n", sz_drv);
+      printf (" Number of sectors is %lu\n", sz_drv);
 
 #if FF_MAX_SS != FF_MIN_SS
       sz_sect = 0;
       dr = disk_ioctl (pdrv, GET_SECTOR_SIZE, &sz_sect);
       assert (dr == RES_OK);
-      printf (" Size of sector is %u bytes.\n", sz_sect);
+      printf (" Size of sector is %u bytes\n", sz_sect);
 #else
       sz_sect = FF_MAX_SS;
 #endif
@@ -881,11 +881,11 @@ test_diskio (posix::block_device& bd, /* Physical drive number to be checked (al
 
       if (dr == RES_OK || sz_eblk >= 2)
         {
-          printf (" Size of the erase block is %lu sectors.\n", sz_eblk);
+          printf (" Size of the erase block is %lu sectors\n", sz_eblk);
         }
       else
         {
-          printf (" Size of the erase block is unknown.\n");
+          printf (" Size of the erase block is unknown\n");
         }
 
       /* Single sector write test */
@@ -982,7 +982,7 @@ test_diskio (posix::block_device& bd, /* Physical drive number to be checked (al
         }
       else
         {
-          printf (" Barrier test skipped.\n");
+          printf (" Barrier test skipped\n");
         }
       pns++;
 

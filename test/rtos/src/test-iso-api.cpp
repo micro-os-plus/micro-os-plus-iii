@@ -123,7 +123,7 @@ test_iso_api (bool extra)
 
   // ==========================================================================
 
-  printf ("\n%s - Threads.\n", test_name);
+  printf ("\n%s - Threads\n", test_name);
     {
         {
           estd::thread th11
@@ -213,7 +213,7 @@ test_iso_api (bool extra)
     }
 
   // ==========================================================================
-  printf ("\n%s - Mutexes.\n", test_name);
+  printf ("\n%s - Mutexes\n", test_name);
 
     {
         {
@@ -344,7 +344,7 @@ test_iso_api (bool extra)
 
   // ==========================================================================
 
-  printf ("\n%s - Condition variables.\n", test_name);
+  printf ("\n%s - Condition variables\n", test_name);
     {
       estd::condition_variable cv11;
       cv11.notify_one ();
@@ -472,7 +472,7 @@ test_iso_api (bool extra)
 
   // ==========================================================================
 
-  printf ("\n%s - Chrono.\n", test_name);
+  printf ("\n%s - Chrono\n", test_name);
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -568,7 +568,7 @@ test_iso_api (bool extra)
 
   my_sleep (70);
 
-  printf ("\n%s - Done.\n", test_name);
+  printf ("\n%s - Done\n", test_name);
   return 0;
 }
 

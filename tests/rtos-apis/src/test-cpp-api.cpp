@@ -70,7 +70,7 @@ func (void* args);
 void*
 func (void* args __attribute__((unused)))
 {
-  printf ("%s %s\n", __func__, this_thread::thread ().name ());
+  printf ("> %s() on thread %s\n", __func__, this_thread::thread ().name ());
 
   return nullptr;
 }
@@ -81,7 +81,7 @@ tmfunc (void* args);
 void
 tmfunc (void* args __attribute__((unused)))
 {
-  printf ("%s\n", __func__);
+  printf (">> %s()\n", __func__);
 }
 
 #if !defined(OS_USE_RTOS_PORT_SCHEDULER)
@@ -126,7 +126,7 @@ pass_mutex_up1 (const std::unique_ptr<mutex>& pp);
 void
 pass_mutex_up1 (const std::unique_ptr<mutex>& pp)
 {
-  trace::printf ("%p\n", pp.get ());
+  printf ("%p\n", pp.get ());
 }
 
 void
@@ -135,7 +135,7 @@ pass_mutex_up2 (std::unique_ptr<mutex>& pp);
 void
 pass_mutex_up2 (std::unique_ptr<mutex>& pp)
 {
-  trace::printf ("%p\n", pp.get ());
+  printf ("%p\n", pp.get ());
 }
 
 void
@@ -144,13 +144,15 @@ pass_mutex_up3 (std::unique_ptr<mutex> pp);
 void
 pass_mutex_up3 (std::unique_ptr<mutex> pp)
 {
-  trace::printf ("%p\n", pp.get ());
+  printf ("%p\n", pp.get ());
 }
 
 int
 test_cpp_api (void)
 {
   // ==========================================================================
+
+  printf ("\n%s - started\n", test_name);
 
 #if 0
   for (auto p = scheduler::top_threads_list2_.begin ();
@@ -178,7 +180,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Memory managers.\n", test_name);
+  printf ("\n%s - Memory managers\n", test_name);
 
     {
       char arena[60];
@@ -255,7 +257,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Threads.\n", test_name);
+  printf ("\n%s - Threads\n", test_name);
 
     {
       // Static threads with allocated stacks.
@@ -374,7 +376,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Thread stack.\n", test_name);
+  printf ("\n%s - Thread stack\n", test_name);
 
     {
       std::size_t n;
@@ -397,7 +399,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Thread event flags.\n", test_name);
+  printf ("\n%s - Thread event flags\n", test_name);
 
     {
       this_thread::flags_clear (flags::all);
@@ -414,7 +416,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Message queues.\n", test_name);
+  printf ("\n%s - Message queues\n", test_name);
 
   // Define two messages.
 
@@ -585,7 +587,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Memory pools.\n", test_name);
+  printf ("\n%s - Memory pools\n", test_name);
 
   // Classic static usage; block size and cast to char* must be supplied manually.
     {
@@ -767,7 +769,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Condition variables.\n", test_name);
+  printf ("\n%s - Condition variables\n", test_name);
     {
       condition_variable cv1;
       cv1.signal ();
@@ -826,7 +828,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Event flags.\n", test_name);
+  printf ("\n%s - Event flags\n", test_name);
 
     {
       event_flags ev1;
@@ -882,7 +884,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Mutexes.\n", test_name);
+  printf ("\n%s - Mutexes\n", test_name);
 
     {
       // Unnamed mutex.
@@ -995,24 +997,24 @@ test_cpp_api (void)
       // Pass by const reference.
       pass_mutex_up1 (mx);
 
-      trace::printf ("%p\n", mx.get ());
+      printf ("%p\n", mx.get ());
 
       // Pass by non-const reference.
       pass_mutex_up2 (mx);
 
-      trace::printf ("%p\n", mx.get ());
+      printf ("%p\n", mx.get ());
 
       // Move.
       pass_mutex_up3 (std::move (mx));
 
       // This pointer is null now, ownership was transferred to function,
       // which in our case destroyed the object.
-      trace::printf ("%p\n", mx.get ());
+      printf ("%p\n", mx.get ());
     }
 
   // ==========================================================================
 
-  printf ("\n%s - Semaphores.\n", test_name);
+  printf ("\n%s - Semaphores\n", test_name);
 
     {
       // Unnamed counting semaphore.
@@ -1090,7 +1092,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Timers.\n", test_name);
+  printf ("\n%s - Timers\n", test_name);
 
     {
       // Single-shot timer.
@@ -1194,7 +1196,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
-  printf ("\n%s - Done.\n", test_name);
+  printf ("\n%s - done\n", test_name);
   return 0;
 }
 
