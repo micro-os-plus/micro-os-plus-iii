@@ -156,5 +156,6 @@
         "mutex": "cpp",
         "system_error": "cpp",
         "thread": "cpp"
-    }
+    },
+    "lldb.displayFormat": "hex"
 }
