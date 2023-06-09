@@ -49,6 +49,8 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   printf ("Built with GCC " __VERSION__ "\n");
 #endif
 
+  fflush(stdout);
+
   int ret = 0;
   errno = 0;
 
@@ -57,6 +59,7 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
     {
       ret = test_cpp_mem ();
       printf ("errno=%d\n", errno);
+      fflush(stdout);
       errno = 0;
     }
 #endif
@@ -66,6 +69,7 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
     {
       ret = test_cpp_api ();
       printf ("errno=%d\n", errno);
+      fflush(stdout);
       errno = 0;
     }
 #endif
@@ -75,6 +79,7 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
     {
       ret = test_c_api ();
       printf ("errno=%d\n", errno);
+      fflush(stdout);
       errno = 0;
     }
 #endif
@@ -84,6 +89,7 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
     {
       ret = test_iso_api (false);
       printf ("errno=%d\n", errno);
+      fflush(stdout);
       errno = 0;
     }
 #endif
@@ -93,6 +99,7 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
     {
       ret = test_posix_io_api (false);
       printf ("errno=%d\n", errno);
+      fflush(stdout);
       errno = 0;
     }
 #endif
@@ -102,11 +109,13 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
     {
       ret = test_chan_fatfs (false);
       printf ("errno=%d\n", errno);
+      fflush(stdout);
       errno = 0;
     }
 #endif
 
   printf ("done\n");
+  fflush(stdout);
   return ret;
 }
 
