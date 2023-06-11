@@ -63,6 +63,7 @@
 #else
 
 #define OS_USE_TRACE_POSIX_STDOUT
+#define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES               (4*os::rtos::port::stack::default_size_bytes)
 
 #endif /* defined(__ARM_EABI__) */
 
