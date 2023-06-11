@@ -58,7 +58,7 @@ os_systick_handler (void)
 #endif
 
 #if defined(OS_TRACE_RTOS_SYSCLOCK_TICK)
-  trace::putchar ('.');
+  trace::printf ("{t ");
 #endif
 
     {
@@ -93,7 +93,7 @@ os_systick_handler (void)
 #endif /* !defined(OS_USE_RTOS_PORT_SCHEDULER) */
 
 #if defined(OS_TRACE_RTOS_SYSCLOCK_TICK)
-  trace::putchar (',');
+  trace::printf (" t}");
 #endif
 }
 
