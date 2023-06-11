@@ -50,6 +50,8 @@ set(global_common_options
   -fdata-sections
 
   -fdiagnostics-color=always
+
+  # $<$<CONFIG:Debug>:-g>
 )
 
 add_compile_options(
