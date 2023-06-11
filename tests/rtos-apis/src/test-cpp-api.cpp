@@ -184,8 +184,6 @@ test_cpp_api (void)
         { printf ("%s\n", th.name ());});
 #endif
 
-  my_blk_t* blk;
-
   // ==========================================================================
 
   printf ("\n%s - Memory managers\n", test_name);
@@ -599,6 +597,8 @@ test_cpp_api (void)
     }
 
   // ==========================================================================
+
+  my_blk_t* blk;
 
   printf ("\n%s - Memory pools\n", test_name);
   fflush(stdout);
