@@ -2438,6 +2438,7 @@ namespace os
               // since it can occur inside another message.
               trace::printf("\n%s() @%p %s\n", __func__, this, name ());
               assert (stack ().check_bottom_magic ());
+              abort ();
             }
         }
     }
