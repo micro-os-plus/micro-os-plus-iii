@@ -367,8 +367,8 @@ _start (void)
   // trace_printf() calls are available (including in static constructors).
   trace_initialize ();
 
-  trace_printf ("Hardware initialised.\n");
-  trace_printf ("Main stack %p-%p.\n", &_Heap_Limit, &__stack);
+  trace_printf ("Hardware initialised\n");
+  trace_printf ("Main stack %p-%p\n", &_Heap_Limit, &__stack);
 
   os_startup_initialize_free_store (
       &_Heap_Begin, (size_t) ((char*) (&_Heap_Limit) - (char*) (&_Heap_Begin)));
@@ -381,7 +381,7 @@ _start (void)
   // Call the standard library initialisation (mandatory for C++ to
   // execute the constructors for the static objects).
   os_run_init_array ();
-  trace_printf ("Static objects constructed.\n");
+  trace_printf ("Static objects constructed\n");
 
 #if defined(OS_HAS_INTERRUPTS_STACK)
   os::rtos::interrupts::stack ()->set(&_Heap_Limit,  (size_t) ((char*) (&__stack) - (char*) (&_Heap_Limit)));

@@ -124,17 +124,17 @@ main (int argc, char* argv[])
 {
   using namespace os::rtos;
 
-  trace::printf ("\nµOS++ IIIe version " OS_STRING_RTOS_IMPL_VERSION ".\n");
-  trace::printf ("Copyright (c) 2007-" OS_STRING_RTOS_IMPL_YEAR " Liviu Ionescu.\n");
+  trace::printf ("\nµOS++ IIIe version " OS_STRING_RTOS_IMPL_VERSION "\n");
+  trace::printf ("Copyright (c) 2007-" OS_STRING_RTOS_IMPL_YEAR " Liviu Ionescu\n");
 
   port::scheduler::greeting ();
 
-  trace::printf ("Scheduler frequency: %u ticks/sec.\n",
+  trace::printf ("Scheduler frequency: %u ticks/sec\n",
                  rtos::clock_systick::frequency_hz);
-  trace::printf ("Default stack size: %u bytes.\n",
+  trace::printf ("Default stack size: %u bytes\n",
                  thread::stack::default_size ());
 #if defined(OS_HAS_INTERRUPTS_STACK)
-  trace::printf ("Interrupts stack size: %u bytes.\n",
+  trace::printf ("Interrupts stack size: %u bytes\n",
                  interrupts::stack ()->size ());
 #endif /* defined(OS_HAS_INTERRUPTS_STACK) */
 
@@ -149,7 +149,7 @@ main (int argc, char* argv[])
 #else
   trace::printf (", no exceptions");
 #endif
-  trace::puts (".\n");
+  trace::puts ("\n");
 
   scheduler::initialize ();
 

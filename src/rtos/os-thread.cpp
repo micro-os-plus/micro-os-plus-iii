@@ -239,13 +239,13 @@ namespace os
         }
       catch (std::exception const &e)
         {
-          trace::printf ("%s() @%p %s top exception \"%s\".\n", __func__,
+          trace::printf ("%s() @%p %s top exception \"%s\"\n", __func__,
               thread, thread->name (), e.what ());
           exit_ptr = nullptr;
         }
       catch (...)
         {
-          trace::printf ("%s() @%p %s top exception.\n", __func__, thread,
+          trace::printf ("%s() @%p %s top exception\n", __func__, thread,
               thread->name ());
           exit_ptr = nullptr;
         }
