@@ -40,6 +40,8 @@ xpm link -C ~/Work/micro-os-plus/build-helper-xpack.git
 - <https://github.com/micro-os-plus/micro-os-plus-iii-posix-arch>
 
 ```sh
+rm -rf ~/Work/micro-os-plus-iii/micro-os-plus-iii-posix-arch.git && \
+mkdir -pv ~/Work/micro-os-plus-iii && \
 git clone \
   --branch xpack-develop \
   https://github.com/micro-os-plus/micro-os-plus-iii-posix-arch.git \
@@ -53,6 +55,8 @@ xpm link -C ~/Work/micro-os-plus-iii/micro-os-plus-iii-posix-arch.git
 - <https://github.com/xpack-3rd-party/libucontext-xpack>
 
 ```sh
+rm -rf ~/Work/micro-os-plus-iii/libucontext-xpack.git && \
+mkdir -pv ~/Work/micro-os-plus-iii && \
 git clone \
   --branch xpack-develop \
   https://github.com/xpack-3rd-party/libucontext-xpack.git \
@@ -66,6 +70,8 @@ xpm link -C ~/Work/micro-os-plus-iii/libucontext-xpack.git
 - <https://github.com/micro-os-plus/micro-os-plus-iii-cortexm>
 
 ```sh
+rm -rf ~/Work/micro-os-plus-iii/micro-os-plus-iii-cortexm.git && \
+mkdor -pv ~/Work/micro-os-plus-iii && \
 git clone \
   --branch xpack-develop \
   https://github.com/micro-os-plus/micro-os-plus-iii-cortexm.git \
@@ -79,6 +85,8 @@ xpm link -C ~/Work/micro-os-plus-iii/micro-os-plus-iii-cortexm.git
 - <https://github.com/xpacks/chan-fatfs>
 
 ```sh
+rm -rf ~/Work/micro-os-plus-iii/chan-fatfs.git && \
+mkdir -pv ~/Work/micro-os-plus-iii && \
 git clone \
   --branch xpack-develop \
   https://github.com/xpacks/chan-fatfs.git \
