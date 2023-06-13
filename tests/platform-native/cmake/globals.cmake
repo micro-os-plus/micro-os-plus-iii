@@ -28,6 +28,7 @@ set(xpack_platform_common_args
   # $<$<PLATFORM_ID:Darwin>:-Wno-unknown-warning-option>
   $<$<C_COMPILER_ID:Clang,AppleClang>:-Wno-unknown-warning-option>
   $<$<PLATFORM_ID:Darwin>:-Wno-missing-include-dirs>
+  # -g
 )
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")

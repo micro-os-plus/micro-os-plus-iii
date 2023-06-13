@@ -37,7 +37,6 @@ target_sources(platform-native-interface INTERFACE
 
 target_compile_definitions(platform-native-interface INTERFACE
   "${xpack_platform_compile_definition}"
-  "_XOPEN_SOURCE=700L"
 )
 
 target_compile_options(platform-native-interface INTERFACE
@@ -46,6 +45,7 @@ target_compile_options(platform-native-interface INTERFACE
 
 target_link_libraries(platform-native-interface INTERFACE
   micro-os-plus::iii-posix-arch
+  xpack-3rd-party::libucontext
 )
 
 if (COMMAND xpack_display_target_lists)
