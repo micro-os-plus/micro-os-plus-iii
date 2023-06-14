@@ -34,6 +34,11 @@ git clone \
 xpm link -C ~/Work/micro-os-plus/build-helper-xpack.git
 ```
 
+or
+
+```sh
+git -C ~/Work/micro-os-plus/build-helper-xpack.git pull
+```
 
 ## posix-arch
 
@@ -48,6 +53,12 @@ git clone \
   ~/Work/micro-os-plus-iii/micro-os-plus-iii-posix-arch.git
 
 xpm link -C ~/Work/micro-os-plus-iii/micro-os-plus-iii-posix-arch.git
+```
+
+or
+
+```sh
+git -C ~/Work/micro-os-plus-iii/micro-os-plus-iii-posix-arch.git pull
 ```
 
 ## libucontext
@@ -65,6 +76,10 @@ git clone \
 xpm link -C ~/Work/micro-os-plus-iii/libucontext-xpack.git
 ```
 
+```sh
+git -C ~/Work/micro-os-plus-iii/libucontext-xpack.git pull
+```
+
 ## cortexm
 
 - <https://github.com/micro-os-plus/micro-os-plus-iii-cortexm>
@@ -80,6 +95,10 @@ git clone \
 xpm link -C ~/Work/micro-os-plus-iii/micro-os-plus-iii-cortexm.git
 ```
 
+```sh
+git -C ~/Work/micro-os-plus-iii/micro-os-plus-iii-cortexm.git pull
+```
+
 ## chan-fatfs
 
 - <https://github.com/xpacks/chan-fatfs>
@@ -93,4 +112,8 @@ git clone \
   ~/Work/micro-os-plus-iii/chan-fatfs.git
 
 xpm link -C ~/Work/micro-os-plus-iii/chan-fatfs.git
+```
+
+```sh
+git -C ~/Work/micro-os-plus-iii/chan-fatfs.git pull
 ```
