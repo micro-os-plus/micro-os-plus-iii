@@ -74,7 +74,7 @@ add_link_options(
   -v
 )
 
-if("${CMAKE_C_COMPILER_ID}" MATCHES "Clang")
+if("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang" AND "${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
   # https://lld.llvm.org
   add_link_options (
     -fuse-ld=lld
