@@ -70,14 +70,15 @@ add_compile_options(
 
 # When `-flto` is used, the compile options must be passed to the linker too.
 add_link_options(
-  ${xpack_platform_common_args}
   -v
+  ${xpack_platform_common_args}
 )
 
-if("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang" AND "${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-  # https://lld.llvm.org
+if("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang" )
+  # https://clang.llvm.org/docs/Toolchain.html#compiler-runtime
   add_link_options (
-    -fuse-ld=lld
+    -rtlib=compiler-rt
+    $<$<PLATFORM_ID:Linux>:-fuse-ld=lld>
   )
 endif()
 
