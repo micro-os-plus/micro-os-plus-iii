@@ -37,6 +37,14 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
   )
 endif()
 
+if("${CMAKE_C_COMPILER_ID}" MATCHES "Clang")
+  # https://libcxx.llvm.org/UsingLibcxx.html
+  list(APPEND xpack_platform_common_args
+    -stdlib=libc++
+    # -fuse-ld=lld
+  )
+endif()
+
 # https://cmake.org/cmake/help/v3.20/variable/CMAKE_LANG_COMPILER_ID.html
 # message("${CMAKE_C_COMPILER_ID} ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_PROCESSOR}")
 # Unfortunatelly in a container it shows aarch64 instead of armv7l.
@@ -64,6 +72,7 @@ add_compile_options(
 # When `-flto` is used, the compile options must be passed to the linker too.
 add_link_options(
   ${xpack_platform_common_args}
+  -v
 )
 
 # -----------------------------------------------------------------------------
