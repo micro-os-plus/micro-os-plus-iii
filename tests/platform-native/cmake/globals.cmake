@@ -78,6 +78,7 @@ if("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang" )
   # https://clang.llvm.org/docs/Toolchain.html#compiler-runtime
   add_link_options (
     -rtlib=compiler-rt
+    -lunwind
     $<$<PLATFORM_ID:Linux>:-fuse-ld=lld>
   )
 endif()
