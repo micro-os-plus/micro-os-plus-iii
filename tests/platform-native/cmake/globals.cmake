@@ -40,8 +40,7 @@ endif()
 if("${CMAKE_C_COMPILER_ID}" MATCHES "Clang")
   # https://libcxx.llvm.org/UsingLibcxx.html
   list(APPEND xpack_platform_common_args
-    -stdlib=libc++
-    # -fuse-ld=lld
+  $<$<COMPILE_LANGUAGE:CXX>:-stdlib=libc++>
   )
 endif()
 
@@ -74,5 +73,12 @@ add_link_options(
   ${xpack_platform_common_args}
   -v
 )
+
+if("${CMAKE_C_COMPILER_ID}" MATCHES "Clang")
+  # https://lld.llvm.org
+  add_link_options (
+    -fuse-ld=lld
+  )
+endif()
 
 # -----------------------------------------------------------------------------
