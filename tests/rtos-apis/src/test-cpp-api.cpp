@@ -72,7 +72,7 @@ void*
 func (void* args __attribute__((unused)))
 {
   printf ("> %s() on thread %s\n", __func__, this_thread::thread ().name ());
-  fflush(stdout);
+  // fflush(stdout);
 
   return nullptr;
 }
@@ -84,7 +84,7 @@ void
 tmfunc (void* args __attribute__((unused)))
 {
   printf (">> %s()\n", __func__);
-  fflush(stdout);
+  // fflush(stdout);
 }
 
 #if !defined(OS_USE_RTOS_PORT_SCHEDULER)
@@ -130,7 +130,7 @@ void
 pass_mutex_up1 (const std::unique_ptr<mutex>& pp)
 {
   printf ("%p\n", pp.get ());
-  fflush(stdout);
+  // fflush(stdout);
 }
 
 void
@@ -140,7 +140,7 @@ void
 pass_mutex_up2 (std::unique_ptr<mutex>& pp)
 {
   printf ("%p\n", pp.get ());
-  fflush(stdout);
+  // fflush(stdout);
 }
 
 void
@@ -150,7 +150,7 @@ void
 pass_mutex_up3 (std::unique_ptr<mutex> pp)
 {
   printf ("%p\n", pp.get ());
-  fflush(stdout);
+  // fflush(stdout);
 }
 
 int
@@ -159,7 +159,7 @@ test_cpp_api (void)
   // ==========================================================================
 
   printf ("\n%s - started\n", test_name);
-  fflush(stdout);
+  // fflush(stdout);
 
 #if 0
   for (auto p = scheduler::top_threads_list2_.begin ();
@@ -174,7 +174,7 @@ test_cpp_api (void)
   sysclock.sleep_for (5);
   printf ("\nThreads:\n");
   iterate_threads ();
-  fflush(stdout);
+  // fflush(stdout);
 #endif
 #endif
 
@@ -187,7 +187,7 @@ test_cpp_api (void)
   // ==========================================================================
 
   printf ("\n%s - Memory managers\n", test_name);
-  fflush(stdout);
+  // fflush(stdout);
 
     {
       char arena[60];
@@ -265,7 +265,7 @@ test_cpp_api (void)
   // ==========================================================================
 
   printf ("\n%s - Threads\n", test_name);
-  fflush(stdout);
+  // fflush(stdout);
 
     {
       // Static threads with allocated stacks.
@@ -385,7 +385,7 @@ test_cpp_api (void)
   // ==========================================================================
 
   printf ("\n%s - Thread stack\n", test_name);
-  fflush(stdout);
+  // fflush(stdout);
 
     {
       std::size_t n;
@@ -409,7 +409,7 @@ test_cpp_api (void)
   // ==========================================================================
 
   printf ("\n%s - Thread event flags\n", test_name);
-  fflush(stdout);
+  // fflush(stdout);
 
     {
       this_thread::flags_clear (flags::all);
@@ -427,7 +427,7 @@ test_cpp_api (void)
   // ==========================================================================
 
   printf ("\n%s - Message queues\n", test_name);
-  fflush(stdout);
+  // fflush(stdout);
 
   // Define two messages.
 
@@ -601,7 +601,7 @@ test_cpp_api (void)
   my_blk_t* blk;
 
   printf ("\n%s - Memory pools\n", test_name);
-  fflush(stdout);
+  // fflush(stdout);
 
   // Classic static usage; block size and cast to char* must be supplied manually.
     {
@@ -784,7 +784,7 @@ test_cpp_api (void)
   // ==========================================================================
 
   printf ("\n%s - Condition variables\n", test_name);
-  fflush(stdout);
+  // fflush(stdout);
 
     {
       condition_variable cv1;
@@ -845,7 +845,7 @@ test_cpp_api (void)
   // ==========================================================================
 
   printf ("\n%s - Event flags\n", test_name);
-  fflush(stdout);
+  // fflush(stdout);
 
     {
       event_flags ev1;
@@ -902,7 +902,7 @@ test_cpp_api (void)
   // ==========================================================================
 
   printf ("\n%s - Mutexes\n", test_name);
-  fflush(stdout);
+  // fflush(stdout);
 
     {
       // Unnamed mutex.
@@ -1016,13 +1016,13 @@ test_cpp_api (void)
       pass_mutex_up1 (mx);
 
       printf ("%p\n", mx.get ());
-      fflush(stdout);
+      // fflush(stdout);
 
       // Pass by non-const reference.
       pass_mutex_up2 (mx);
 
       printf ("%p\n", mx.get ());
-      fflush(stdout);
+      // fflush(stdout);
 
       // Move.
       pass_mutex_up3 (std::move (mx));
@@ -1030,13 +1030,13 @@ test_cpp_api (void)
       // This pointer is null now, ownership was transferred to function,
       // which in our case destroyed the object.
       printf ("%p\n", mx.get ());
-      fflush(stdout);
+      // fflush(stdout);
     }
 
   // ==========================================================================
 
   printf ("\n%s - Semaphores\n", test_name);
-  fflush(stdout);
+  // fflush(stdout);
 
     {
       // Unnamed counting semaphore.
@@ -1115,7 +1115,7 @@ test_cpp_api (void)
   // ==========================================================================
 
   printf ("\n%s - Timers\n", test_name);
-  fflush(stdout);
+  // fflush(stdout);
 
     {
       // Single-shot timer.
@@ -1220,7 +1220,7 @@ test_cpp_api (void)
   // ==========================================================================
 
   printf ("\n%s - done\n", test_name);
-  fflush(stdout);
+  // fflush(stdout);
 
   return 0;
 }

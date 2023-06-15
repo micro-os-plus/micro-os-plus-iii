@@ -42,14 +42,15 @@
 int
 os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
 {
-  printf ("\nµOS++ RTOS simple APIs test\n");
+  printf ("\n");
+  printf ("µOS++ RTOS simple APIs test\n");
 #if defined(__clang__)
   printf ("Built with clang " __VERSION__ "\n");
 #else
   printf ("Built with GCC " __VERSION__ "\n");
 #endif
 
-  fflush(stdout);
+  // fflush(stdout);
 
   int ret = 0;
   errno = 0;
@@ -59,7 +60,7 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
     {
       ret = test_cpp_mem ();
       printf ("errno=%d\n", errno);
-      fflush(stdout);
+      // fflush(stdout);
       errno = 0;
     }
 #endif
@@ -69,7 +70,7 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
     {
       ret = test_cpp_api ();
       printf ("errno=%d\n", errno);
-      fflush(stdout);
+      // fflush(stdout);
       errno = 0;
     }
 #endif
@@ -79,7 +80,7 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
     {
       ret = test_c_api ();
       printf ("errno=%d\n", errno);
-      fflush(stdout);
+      // fflush(stdout);
       errno = 0;
     }
 #endif
@@ -89,7 +90,7 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
     {
       ret = test_iso_api (false);
       printf ("errno=%d\n", errno);
-      fflush(stdout);
+      // fflush(stdout);
       errno = 0;
     }
 #endif
@@ -99,7 +100,7 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
     {
       ret = test_posix_io_api (false);
       printf ("errno=%d\n", errno);
-      fflush(stdout);
+      // fflush(stdout);
       errno = 0;
     }
 #endif
@@ -109,13 +110,13 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
     {
       ret = test_chan_fatfs (false);
       printf ("errno=%d\n", errno);
-      fflush(stdout);
+      // fflush(stdout);
       errno = 0;
     }
 #endif
 
   printf ("done\n");
-  fflush(stdout);
+  // fflush(stdout);
   return ret;
 }
 
