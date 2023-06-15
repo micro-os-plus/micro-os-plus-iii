@@ -65,10 +65,14 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
   # On Lnux, get the actual libraries paths by asking the compiler.
   execute_process(
     COMMAND "${CMAKE_CURRENT_SOURCE_DIR}/scripts/get-libraries-paths.sh" ${CMAKE_CXX_COMPILER}
-    OUTPUT_VARIABLE LD_LIBRARY_PATH
+    OUTPUT_VARIABLE RPATH
     OUTPUT_STRIP_TRAILING_WHITESPACE
   )
-  message(VERBOSE "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}")
+  message(VERBOSE "RPATH=${RPATH}")
+
+  add_link_options (
+    -Wl,-rpath=${RPATH}
+  )
 
 endif()
 
@@ -118,13 +122,6 @@ if (ENABLE_RTOS_APIS_TEST)
     NAME "rtos-apis-test"
     COMMAND rtos-apis-test
   )
-
-  if(LD_LIBRARY_PATH)
-    set_property(
-      TEST "rtos-apis-test"
-      PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${LD_LIBRARY_PATH}"
-    )
-  endif()
 
 endif()
 
