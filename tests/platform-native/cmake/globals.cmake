@@ -37,10 +37,10 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
   )
 endif()
 
-if("${CMAKE_C_COMPILER_ID}" MATCHES "Clang")
+if("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
   # https://libcxx.llvm.org/UsingLibcxx.html
   list(APPEND xpack_platform_common_args
-  $<$<COMPILE_LANGUAGE:CXX>:-stdlib=libc++>
+    $<$<COMPILE_LANGUAGE:CXX>:-stdlib=libc++>
   )
 endif()
 
