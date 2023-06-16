@@ -55,7 +55,7 @@ if(CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR)
 endif()
 
 # The build-helper is a devDependency, available only after `xpm install`.
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../xpacks/@micro-os-plus/build-helper/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/xpacks/@micro-os-plus/build-helper/cmake")
 include("micro-os-plus-build-helper")
 
 xpack_display_greetings("${CMAKE_CURRENT_SOURCE_DIR}/../package.json")
