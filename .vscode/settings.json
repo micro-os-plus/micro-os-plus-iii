@@ -218,5 +218,16 @@
         "typeinfo": "cpp",
         "valarray": "cpp"
     },
-    "lldb.displayFormat": "hex"
-}
+    "lldb.displayFormat": "hex",
+    "xpack.exclude": [
+        "**/build",
+        "**/docs",
+        "**/doxygen",
+        "**/include",
+        "**/inspiration",
+        "**/scripts",
+        "**/src",
+        "**/templates",
+        "**/test"
+      ]
+    }
