@@ -229,5 +229,9 @@
         "**/src",
         "**/templates",
         "**/test"
-      ]
-    }
+    ],
+    "npm.exclude": [
+        "**/tests",
+        "**/tests/**"
+    ]
+}
