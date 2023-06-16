@@ -4,7 +4,6 @@
   "description": "Tests",
   "main": "",
   "scripts": {
-    "npm-install": "npm install"
   },
   "author": {
     "name": "Liviu Ionescu",
