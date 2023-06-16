@@ -22,11 +22,11 @@ git -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git pull
 Satisfy dependencies for all configurations and run all tests:
 
 ```sh
-xpm run deep-clean -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git
+xpm run deep-clean -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 
-xpm run install-all -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git
+xpm run install-all -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 
-xpm run test-all -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git
+xpm run test-all -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 ```
 
 ## build-helper
