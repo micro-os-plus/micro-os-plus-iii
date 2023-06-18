@@ -86,5 +86,5 @@ To run these tests, several Eclipse projects are available in a separate
 ## License
 
 µOS++ is provided free of charge under the terms of the
-[MIT License](https://opensource.org/licenses/MIT), with all rights reserved to
+[MIT License](https://opensource.org/licenses/mit), with all rights reserved to
 [Liviu Ionescu](https://github.com/ilg-ul).
