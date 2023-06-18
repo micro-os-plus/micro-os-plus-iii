@@ -58,6 +58,7 @@
         "clust",
         "cmsis",
         "cofs",
+        "cortexm",
         "csect",
         "ctest",
         "dbuf",
@@ -232,6 +233,7 @@
     ],
     "npm.exclude": [
         "**/tests",
-        "**/tests/**"
+        "**/tests/**",
+        "**/xpacks/**"
     ]
 }
