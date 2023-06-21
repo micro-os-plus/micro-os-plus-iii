@@ -22,21 +22,15 @@ message(VERBOSE "Including global definitions...")
 
 include_directories(
   # Folders are relative to `tests`.
-  "platform-${PLATFORM_NAME}/include-config"
 )
 
 # https://cmake.org/cmake/help/v3.20/command/add_compile_definitions.html
 add_compile_definitions(
   # NDEBUG is provided by the toolchain definitions on release.
 
-  # TODO: remove DEBUG
   $<$<CONFIG:Debug>:DEBUG>
   $<$<CONFIG:Debug>:TRACE>
 
-  $<$<CONFIG:Debug>:MICRO_OS_PLUS_DEBUG>
-  $<$<CONFIG:Debug>:MICRO_OS_PLUS_TRACE>
-
-  MICRO_OS_PLUS_INCLUDE_CONFIG_H
   OS_USE_OS_APP_CONFIG_H
 )
 
