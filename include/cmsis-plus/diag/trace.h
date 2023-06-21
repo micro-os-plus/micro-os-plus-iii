@@ -67,7 +67,7 @@ __attribute__((always_inline))
 trace_dbg_bkpt (void)
 {
 #if defined(__ARM_EABI__)
-  asm volatile ("bkpt 0");
+  __asm__ volatile ("bkpt 0");
 #endif
 }
 

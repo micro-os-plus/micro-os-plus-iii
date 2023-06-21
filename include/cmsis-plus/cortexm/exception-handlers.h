@@ -31,7 +31,7 @@
 #include <stdint.h>
 
 #if defined(DEBUG)
-#define __DEBUG_BKPT()  asm volatile ("bkpt 0")
+#define __DEBUG_BKPT()  __asm__ volatile ("bkpt 0")
 #endif
 
 // ----------------------------------------------------------------------------

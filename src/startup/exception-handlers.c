@@ -389,7 +389,7 @@ is_semihosting (exception_stack_frame_t* frame, uint16_t opCode)
 void __attribute__ ((section(".after_vectors"),weak,naked))
 HardFault_Handler (void)
 {
-  asm volatile(
+  __asm__ volatile(
       " tst lr,#4       \n"
       " ite eq          \n"
       " mrseq r0,msp    \n"
@@ -474,7 +474,7 @@ HardFault_Handler_C (exception_stack_frame_t* frame __attribute__((unused)),
 void __attribute__ ((section(".after_vectors"),weak,naked))
 HardFault_Handler (void)
   {
-    asm volatile(
+    __asm__ volatile(
         " movs r0,#4      \n"
         " mov r1,lr       \n"
         " tst r0,r1       \n"
@@ -550,7 +550,7 @@ MemManage_Handler (void)
 void __attribute__ ((section(".after_vectors"),weak,naked))
 BusFault_Handler (void)
 {
-  asm volatile(
+  __asm__ volatile(
       " tst lr,#4       \n"
       " ite eq          \n"
       " mrseq r0,msp    \n"
@@ -598,7 +598,7 @@ BusFault_Handler_C (exception_stack_frame_t* frame __attribute__((unused)),
 void __attribute__ ((section(".after_vectors"),weak,naked))
 UsageFault_Handler (void)
 {
-  asm volatile(
+  __asm__ volatile(
       " tst lr,#4       \n"
       " ite eq          \n"
       " mrseq r0,msp    \n"
