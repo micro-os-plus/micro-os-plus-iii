@@ -36,10 +36,10 @@
 
 #if defined(__ARM_EABI__)
 
-#if 1
+#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
 // Disable all interrupts from 15 to 4, keep 3-2-1 enabled
 #define OS_INTEGER_RTOS_CRITICAL_SECTION_INTERRUPT_PRIORITY (4)
-#endif
+#endif // defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
 
 #define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES               (4000)
 
