@@ -386,25 +386,25 @@ free (void* ptr)
  */
 
 void*
-_malloc_r (struct _reent* impure __attribute__((unused)), size_t size)
+_malloc_r (/* struct */_reent* impure __attribute__((unused)), size_t size)
 {
   return malloc (size);
 }
 
 void*
-_calloc_r (struct _reent* impure __attribute__((unused)), size_t n, size_t elem)
+_calloc_r (/* struct */ _reent* impure __attribute__((unused)), size_t n, size_t elem)
 {
   return calloc (n, elem);
 }
 
 void
-_free_r (struct _reent* impure __attribute__((unused)), void* ptr)
+_free_r (/* struct */ _reent* impure __attribute__((unused)), void* ptr)
 {
   free (ptr);
 }
 
 void*
-_realloc_r (struct _reent* impure __attribute__((unused)), void* ptr,
+_realloc_r (/* struct */ _reent* impure __attribute__((unused)), void* ptr,
             size_t size)
 {
   return realloc (ptr, size);
@@ -428,7 +428,7 @@ _realloc_r (struct _reent* impure __attribute__((unused)), void* ptr,
 #endif
 
 struct mallinfo
-_mallinfo_r (struct _reent* impure __attribute__((unused)))
+_mallinfo_r (/* struct */ _reent* impure __attribute__((unused)))
 {
   abort ();
 }
@@ -436,20 +436,20 @@ _mallinfo_r (struct _reent* impure __attribute__((unused)))
 #pragma GCC diagnostic pop
 
 void
-_malloc_stats_r (struct _reent* impure __attribute__((unused)))
+_malloc_stats_r (/* struct */ _reent* impure __attribute__((unused)))
 {
   abort ();
 }
 
 size_t
-_malloc_usable_size_r (struct _reent* reent __attribute__((unused)),
+_malloc_usable_size_r (/* struct */ _reent* reent __attribute__((unused)),
                        void* ptr __attribute__((unused)))
 {
   abort ();
 }
 
 int
-_mallopt_r (struct _reent* impure __attribute__((unused)),
+_mallopt_r (/* struct */ _reent* impure __attribute__((unused)),
             int parameter_number __attribute__((unused)),
             int parameter_value __attribute__((unused)))
 {
@@ -457,7 +457,7 @@ _mallopt_r (struct _reent* impure __attribute__((unused)),
 }
 
 void*
-_memalign_r (struct _reent* impure __attribute__((unused)),
+_memalign_r (/* struct */ _reent* impure __attribute__((unused)),
              size_t align __attribute__((unused)),
              size_t s __attribute__((unused)))
 {
@@ -465,14 +465,14 @@ _memalign_r (struct _reent* impure __attribute__((unused)),
 }
 
 void*
-_pvalloc_r (struct _reent* impure __attribute__((unused)),
+_pvalloc_r (/* struct */ _reent* impure __attribute__((unused)),
             size_t s __attribute__((unused)))
 {
   abort ();
 }
 
 void*
-_valloc_r (struct _reent* impure __attribute__((unused)),
+_valloc_r (/* struct */ _reent* impure __attribute__((unused)),
            size_t s __attribute__((unused)))
 {
   abort ();

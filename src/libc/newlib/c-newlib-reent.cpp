@@ -80,7 +80,7 @@ extern "C"
   }
 
   int __attribute__((weak))
-  _fstat_r (void* ptr, int fildes, struct stat* buf)
+  _fstat_r (void* ptr, int fildes, /* struct */ stat* buf)
   {
     return __posix_fstat (fildes, buf);
   }
@@ -92,7 +92,7 @@ extern "C"
   }
 
   int __attribute__((weak))
-  _gettimeofday_r (void* ptr, struct timeval* ptimeval, void* ptimezone)
+  _gettimeofday_r (void* ptr, /* struct */ timeval* ptimeval, void* ptimezone)
   {
     return __posix_gettimeofday (ptimeval, ptimezone);
   }
@@ -146,13 +146,13 @@ extern "C"
   }
 
   int __attribute__((weak))
-  _stat_r (void* ptr, const char* path, struct stat* buf)
+  _stat_r (void* ptr, const char* path, /* struct */ stat* buf)
   {
     return __posix_stat (path, buf);
   }
 
   clock_t __attribute__((weak))
-  _times_r (void* ptr, struct tms* buf)
+  _times_r (void* ptr, /* struct */ tms* buf)
   {
     return __posix_times (buf);
   }
