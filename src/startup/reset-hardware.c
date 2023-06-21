@@ -58,9 +58,10 @@ __reset_hardware (void);
 // Called from _exit().
 
 void __attribute__((weak,noreturn))
-__reset_hardware ()
+__reset_hardware (void)
 {
   NVIC_SystemReset ();
+  __builtin_unreachable ();
 }
 
 // ----------------------------------------------------------------------------
