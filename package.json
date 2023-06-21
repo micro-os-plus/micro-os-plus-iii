@@ -1,6 +1,6 @@
 {
   "name": "@micro-os-plus/micro-os-plus-iii",
-  "version": "6.3.18",
+  "version": "7.0.0-pre.1",
   "description": "A source xPack with µOS++",
   "main": "",
   "scripts": {
