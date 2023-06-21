@@ -33,6 +33,7 @@
 #pragma clang diagnostic ignored "-Wformat-pedantic"
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
+#pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif
 
 // ----------------------------------------------------------------------------
