@@ -39,8 +39,9 @@
 
 // ----------------------------------------------------------------------------
 
-extern void __attribute__((noreturn))
-NVIC_SystemReset (void);
+// cmsis_device.h
+// extern void __attribute__((noreturn))
+// NVIC_SystemReset (void);
 
 // ----------------------------------------------------------------------------
 
