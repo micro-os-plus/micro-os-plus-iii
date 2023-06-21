@@ -51,13 +51,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # -----------------------------------------------------------------------------
 
 if(CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR)
-  message(FATAL_ERROR "In-source builds are not supported. Please use separate folder for build.")
+  message(FATAL_ERROR "In-source builds are not supported. Please use a separate folder for build.")
 endif()
 
 # The build-helper is a devDependency, available only after `xpm install`.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/xpacks/@micro-os-plus/build-helper/cmake")
 include("micro-os-plus-build-helper")
 
+# Parse the top package.json for the version.
 xpack_display_greetings("${CMAKE_CURRENT_SOURCE_DIR}/../package.json")
 
 # -----------------------------------------------------------------------------
@@ -65,7 +66,6 @@ xpack_display_greetings("${CMAKE_CURRENT_SOURCE_DIR}/../package.json")
 # CMAKE_BUILD_TYPE: Debug, Release, RelWithDebInfo, MinSizeRel
 
 set(ENABLE_RTOS_APIS_TEST true)
-# set(ENABLE_UNIT_TEST true)
 
 # -----------------------------------------------------------------------------
 
@@ -101,7 +101,7 @@ if(ENABLE_RTOS_APIS_TEST)
 endif()
 
 # -----------------------------------------------------------------------------
-## The platform specific pat, where the tests are defined ##
+## The platform specific path, where the tests are defined ##
 
 # Add the platform specific configuration.
 # The result will be in the `platform-bin` folder.
