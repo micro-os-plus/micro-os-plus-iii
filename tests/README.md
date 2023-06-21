@@ -19,8 +19,11 @@ The supported platforms are:
 
 - `platform-native` - run the test applications as native process
   on the development machine
-- `platform-qemu-mps2-an386` - run the tests as fully semihosted applications
-  on a QEMU mps2-an386 emulated board (an Arm Cortex-M4 development board)
+- `platform-qemu-cortex-m7f` - run the tests as fully semihosted applications
+  on a QEMU mps2-an500 emulated board (an Arm Cortex-M7F development board)
+- `platform-qemu-cortex-m0` - run the tests as fully semihosted applications
+  on a QEMU mps2-an385 emulated board (an Arm Cortex-M3 development board,
+  used to run the M0 code)
 
 The tests are performed on GNU/Linux, macOS and Windows.
 
@@ -36,8 +39,8 @@ even with multiple versions of the same toolchain.
 
 For native tests, the toolchains used are:
 
-- GCC 11
-- clang 12
+- GCC 11, 12
+- clang 12, 13, 14, 15
 
 For Cortex-M tests, the toolchain is arm-none-eabi-gcc 11.
 
@@ -46,3 +49,7 @@ For Cortex-M tests, the toolchain is arm-none-eabi-gcc 11.
 ### rtos
 
 A simple test to exercise most of the RTOS APIs.
+
+Question marks:
+
+- the native gcc12 debug occasionally fail on Intel macOS, it may hang or crash
