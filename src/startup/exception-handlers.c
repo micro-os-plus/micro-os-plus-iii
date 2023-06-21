@@ -53,6 +53,11 @@ _start (void);
 extern unsigned int _Heap_Limit;
 extern unsigned int __stack;
 
+typedef void
+(*handler_ptr_t)(void);
+
+extern handler_ptr_t _interrupt_vectors[];
+
 // ----------------------------------------------------------------------------
 
 // Default exception handlers.
@@ -81,11 +86,22 @@ extern unsigned int __stack;
 
 // This function is not naked, and has a proper stack frame,
 // to allow setting breakpoints at Reset_Handler.
-void __attribute__ ((section(".after_vectors"),noreturn,weak))
+void __attribute__ ((section(".after_vectors"),noreturn, weak))
 Reset_Handler (void)
 {
   // For just in case, when started via QEMU.
   __asm__(" MSR msp, %0 " : : "r"(&__stack) :);
+
+  // SCB
+  // https://developer.arm.com/documentation/dui0552/a/cortex-m3-peripherals/system-control-block
+
+  // SCB->VTOR
+  // https://developer.arm.com/documentation/dui0552/a/cortex-m3-peripherals/system-control-block/vector-table-offset-register
+  // Mandatory when running from RAM. Not available on Cortex-M0.
+#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+  *((uint32_t*)0xE000ED08)
+      = ((uint32_t)_interrupt_vectors & (uint32_t)(~0x3F));
+#endif
 
 #if defined(__ARM_FP)
   // Enable CP10 and CP11 coprocessor.
