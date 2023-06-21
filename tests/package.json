@@ -79,7 +79,8 @@
         "xpm run link-deps --config native-cmake-clang15-release"
       ],
       "test-all": [
-        "xpm run test-native-cmake"
+        "xpm run test-native-cmake",
+        "xpm run test-cortex-cmake"
       ],
       "test-native-cmake": [
         "{% if os.platform == 'darwin' %}xpm run test-native-cmake-sys{% endif %}",
@@ -162,8 +163,29 @@
         "xpm run build --config native-cmake-clang15-release",
         "xpm run test --config native-cmake-clang15-release"
       ],
+      "test-cortex-cmake": [
+        "xpm run test-qemu-cortex-m0-cmake",
+        "xpm run test-qemu-cortex-m7f-cmake"
+      ],
+      "test-qemu-cortex-m0-cmake": [
+        "xpm run prepare --config qemu-cortex-m0-cmake-debug",
+        "xpm run build --config qemu-cortex-m0-cmake-debug",
+        "xpm run test --config qemu-cortex-m0-cmake-debug",
+        "xpm run prepare --config qemu-cortex-m0-cmake-release",
+        "xpm run build --config qemu-cortex-m0-cmake-release",
+        "xpm run test --config qemu-cortex-m0-cmake-release"
+      ],
+      "test-qemu-cortex-m7f-cmake": [
+        "xpm run prepare --config qemu-cortex-m7f-cmake-debug",
+        "xpm run build --config qemu-cortex-m7f-cmake-debug",
+        "xpm run test --config qemu-cortex-m7f-cmake-debug",
+        "xpm run prepare --config qemu-cortex-m7f-cmake-release",
+        "xpm run build --config qemu-cortex-m7f-cmake-release",
+        "xpm run test --config qemu-cortex-m7f-cmake-release"
+      ],
       "clean-all": [
-        "xpm run clean-native-cmake"
+        "xpm run clean-native-cmake",
+        "xpm run clean-cortex-cmake"
       ],
       "clean-native-cmake": [
         "xpm run clean --config native-cmake-sys-debug --ignore-errors",
@@ -184,6 +206,12 @@
         "xpm run clean --config native-cmake-clang14-release --ignore-errors",
         "xpm run clean --config native-cmake-clang15-debug --ignore-errors",
         "xpm run clean --config native-cmake-clang15-release --ignore-errors"
+      ],
+      "clean-cortex-cmake": [
+        "xpm run clean --config qemu-cortex-m0-cmake-debug --ignore-errors",
+        "xpm run clean --config qemu-cortex-m0-cmake-release --ignore-errors",
+        "xpm run clean --config qemu-cortex-m7f-cmake-debug --ignore-errors",
+        "xpm run clean --config qemu-cortex-m7f-cmake-release --ignore-errors"
       ],
       "deep-clean": "del-cli build node_modules xpacks package-lock.json"
     },
@@ -219,11 +247,30 @@
           ]
         }
       },
+      "cortexm-dependencies": {
+        "hidden": true,
+        "devDependencies": {
+          "@micro-os-plus/micro-os-plus-iii-cortexm": "github:micro-os-plus/micro-os-plus-iii-cortexm#xpack-develop",
+          "@xpacks/arm-cmsis": "github:xpacks/arm-cmsis#xpack-develop"
+        }
+      },
       "arm-none-eabi-gcc-dependencies": {
         "hidden": true,
         "$devDependenciesUrl": "https://www.npmjs.com/package/@xpack-dev-tools/arm-none-eabi-gcc",
         "devDependencies": {
           "@xpack-dev-tools/arm-none-eabi-gcc": "12.2.1-1.2.1"
+        }
+      },
+      "cortexm-actions": {
+        "hidden": true,
+        "actions": {
+          "install": [
+            "xpm install --config {{ configuration.name }}"
+          ],
+          "link-deps": [
+            "xpm link @micro-os-plus/micro-os-plus-iii-cortexm --config {{ configuration.name }}",
+            "xpm link @xpacks/arm-cmsis --config {{ configuration.name }}"
+          ]
         }
       },
       "gcc-latest-dependencies": {
@@ -484,41 +531,20 @@
           "buildType": "Release"
         }
       },
-      "qemu-cortex-m7f-cmake-debug": {
-        "inherit": [
-          "short-win-paths-properties",
-          "cmake-actions",
-          "arm-none-eabi-gcc-dependencies",
-          "qemu-arm-dependencies"
-        ],
-        "properties": {
-          "buildType": "Debug",
-          "platformName": "qemu-cortex-m7f",
-          "toolchainFileName": "arm-none-eabi-gcc.cmake",
-          "shortConfigurationName": "q1d"
-        }
-      },
-      "qemu-cortex-m7f-cmake-release": {
-        "inherit": [
-          "qemu-cortex-m7f-cmake-debug"
-        ],
-        "properties": {
-          "buildType": "MinSizeRel",
-          "shortConfigurationName": "q1r"
-        }
-      },
       "qemu-cortex-m0-cmake-debug": {
         "inherit": [
-          "short-win-paths-properties",
+          "cortexm-actions",
           "cmake-actions",
+          "cortexm-dependencies",
           "arm-none-eabi-gcc-dependencies",
-          "qemu-arm-dependencies"
+          "qemu-arm-dependencies",
+          "short-win-paths-properties"
         ],
         "properties": {
           "buildType": "Debug",
           "platformName": "qemu-cortex-m0",
           "toolchainFileName": "arm-none-eabi-gcc.cmake",
-          "shortConfigurationName": "q2d"
+          "shortConfigurationName": "m0d"
         }
       },
       "qemu-cortex-m0-cmake-release": {
@@ -527,7 +553,32 @@
         ],
         "properties": {
           "buildType": "MinSizeRel",
-          "shortConfigurationName": "q2r"
+          "shortConfigurationName": "m0r"
+        }
+      },
+      "qemu-cortex-m7f-cmake-debug": {
+        "inherit": [
+          "cortexm-actions",
+          "cmake-actions",
+          "cortexm-dependencies",
+          "arm-none-eabi-gcc-dependencies",
+          "qemu-arm-dependencies",
+          "short-win-paths-properties"
+        ],
+        "properties": {
+          "buildType": "Debug",
+          "platformName": "qemu-cortex-m7f",
+          "toolchainFileName": "arm-none-eabi-gcc.cmake",
+          "shortConfigurationName": "m7fd"
+        }
+      },
+      "qemu-cortex-m7f-cmake-release": {
+        "inherit": [
+          "qemu-cortex-m7f-cmake-debug"
+        ],
+        "properties": {
+          "buildType": "MinSizeRel",
+          "shortConfigurationName": "m7fr"
         }
       }
     }
