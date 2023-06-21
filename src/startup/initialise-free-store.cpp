@@ -110,9 +110,12 @@ os_startup_initialize_free_store (void* heap_address,
       reinterpret_cast<estd::pmr::memory_resource*> (&application_free_store));
 
   // Adjust sbrk() to prevent it overlapping the free store.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
   sbrk (
       static_cast<char*> (static_cast<char*> (heap_address) + heap_size_bytes)
           - static_cast<char*> (sbrk (0)));
+#pragma GCC diagnostic pop
 
 #if defined(OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES)
 

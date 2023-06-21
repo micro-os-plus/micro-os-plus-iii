@@ -80,6 +80,11 @@ namespace os
       return ret;
     }
 
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
+
     int __attribute__((weak))
     vprintf (const char* format, std::va_list args)
     {

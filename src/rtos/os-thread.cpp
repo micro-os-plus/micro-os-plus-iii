@@ -1158,6 +1158,7 @@ namespace os
 #if defined(__clang__)
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wcast-align"
 #endif
           static_cast<allocator_type*> (const_cast<void*> (allocator_))->deallocate (
               reinterpret_cast<pointer> (allocated_stack_address_),

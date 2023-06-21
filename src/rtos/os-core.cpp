@@ -133,7 +133,10 @@ namespace os
       tiny_thread_t tiny_thread;
 #pragma GCC diagnostic pop
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
       thread* volatile current_thread_ = reinterpret_cast<thread*>(&tiny_thread);
+#pragma GCC diagnostic pop
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -640,6 +643,8 @@ namespace os
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wreserved-identifier"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wredundant-decls"
 #endif
 int*
 __errno (void);

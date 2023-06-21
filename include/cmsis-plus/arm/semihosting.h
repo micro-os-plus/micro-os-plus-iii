@@ -101,6 +101,9 @@ enum OperationNumber
 #define AngelSWITestFaultOpCode (0xB658)
 #endif
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
 static inline int
 __attribute__ ((always_inline))
 call_host (int reason, void* arg)
@@ -130,6 +133,8 @@ call_host (int reason, void* arg)
   // Angel is respecting the APCS.
   return value;
 }
+
+#pragma GCC diagnostic pop
 
 // ----------------------------------------------------------------------------
 

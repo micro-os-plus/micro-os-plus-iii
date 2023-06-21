@@ -27,6 +27,12 @@
 
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wempty-translation-unit"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#pragma GCC diagnostic ignored "-Wredundant-tags"
+#pragma GCC diagnostic ignored "-Wcast-qual"
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wsign-conversion"
 #endif
 
 // ----------------------------------------------------------------------------

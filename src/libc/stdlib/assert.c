@@ -40,6 +40,8 @@
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wreserved-identifier"
+#else
+#pragma GCC diagnostic ignored "-Wredundant-decls"
 #endif
 void
 __assert_func (const char* file, int line, const char* func,

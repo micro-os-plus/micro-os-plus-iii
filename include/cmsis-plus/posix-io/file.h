@@ -369,6 +369,7 @@ namespace os
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wsuggest-final-methods"
 #pragma GCC diagnostic ignored "-Wsuggest-final-types"
+#pragma GCC diagnostic ignored "-Wpadded"
 #endif
     template<typename T, typename L>
       class file_lockable : public file

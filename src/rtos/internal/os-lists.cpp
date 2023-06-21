@@ -517,7 +517,13 @@ namespace os
               {
                 break;
               }
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wnull-dereference"
+#endif
             clock::timestamp_t head_ts = head ()->timestamp;
+#pragma GCC diagnostic pop
             if (now >= head_ts)
               {
 #if defined(OS_TRACE_RTOS_LISTS_CLOCKS)

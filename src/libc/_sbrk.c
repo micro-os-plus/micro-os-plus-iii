@@ -41,6 +41,8 @@
 #include <errno.h>
 #include <stddef.h>
 
+#pragma GCC diagnostic ignored "-Wnested-externs"
+
 // ----------------------------------------------------------------------------
 
 void*

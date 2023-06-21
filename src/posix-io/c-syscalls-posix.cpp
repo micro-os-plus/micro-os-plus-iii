@@ -509,7 +509,10 @@ __posix_opendir (const char* dirpath)
 /* struct */ dirent*
 __posix_readdir (DIR* dirp)
 {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
   auto* const dir = reinterpret_cast<posix::directory*> (dirp);
+#pragma GCC diagnostic pop
   if (dir == nullptr)
     {
       errno = ENOENT;
@@ -530,7 +533,10 @@ __posix_readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result)
 void
 __posix_rewinddir (DIR* dirp)
 {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
   auto* const dir = reinterpret_cast<posix::directory*> (dirp);
+#pragma GCC diagnostic pop
   if (dir == nullptr)
     {
       errno = ENOENT;
@@ -542,7 +548,10 @@ __posix_rewinddir (DIR* dirp)
 int
 __posix_closedir (DIR* dirp)
 {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
   auto* const dir = reinterpret_cast<posix::directory*> (dirp);
+#pragma GCC diagnostic pop
   if (dir == nullptr)
     {
       errno = ENOENT;

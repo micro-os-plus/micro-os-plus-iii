@@ -109,10 +109,13 @@ namespace os
                       // Shrink bottom chunk to remaining size.
                       chunk->size = static_cast<std::size_t> (rem);
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
                       // Compute where top chunk starts.
                       chunk =
                           reinterpret_cast<chunk_t *> (reinterpret_cast<char *> (chunk)
                               + rem);
+#pragma GCC diagnostic pop
                       chunk->size = alloc_size;
 
                       // Splitting one chunk creates one more chunk.

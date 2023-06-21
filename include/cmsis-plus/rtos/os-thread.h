@@ -2644,9 +2644,12 @@ namespace os
 
             typedef typename std::allocator_traits<allocator_type>::pointer pointer;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
             static_cast<allocator_type*> (const_cast<void*> (allocator_))->deallocate (
                 reinterpret_cast<pointer> (allocated_stack_address_),
                 allocated_stack_size_elements_);
+#pragma GCC diagnostic pop
 
             allocated_stack_address_ = nullptr;
           }

@@ -150,9 +150,12 @@ namespace os
                       // break it into two chunks and return the second one.
 
                       chunk->size = static_cast<std::size_t> (rem);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
                       chunk =
                           reinterpret_cast<chunk_t *> (reinterpret_cast<char *> (chunk)
                               + rem);
+#pragma GCC diagnostic pop
                       chunk->size = alloc_size;
 
                       // Splitting one chunk creates one more chunk.
@@ -249,6 +252,8 @@ namespace os
           return;
         }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
       // Compute the chunk address from the user address.
       chunk_t* chunk = reinterpret_cast<chunk_t *> (static_cast<char *> (addr)
           - chunk_offset);
@@ -259,6 +264,7 @@ namespace os
           chunk = reinterpret_cast<chunk_t *> (reinterpret_cast<char *> (chunk)
               + static_cast<std::ptrdiff_t> (chunk->size));
         }
+#pragma GCC diagnostic pop
 
       if (bytes)
         {
@@ -424,10 +430,13 @@ namespace os
           // If non-zero, store it in the gap left by alignment in the
           // chunk header.
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
           chunk_t* adj_chunk =
               reinterpret_cast<chunk_t *> (static_cast<char *> (aligned_payload)
                   - chunk_offset);
           adj_chunk->size = static_cast<std::size_t> (-offset);
+#pragma GCC diagnostic pop
         }
 
       assert(

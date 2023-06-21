@@ -157,8 +157,13 @@ _Exit (int code)
 
 #pragma GCC diagnostic pop
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+
 void __attribute__((weak, alias ("_Exit"), noreturn))
 _exit (int status);
+
+#pragma GCC diagnostic pop
 
 // ----------------------------------------------------------------------------
 

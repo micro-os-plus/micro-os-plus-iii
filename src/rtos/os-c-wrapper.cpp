@@ -3047,8 +3047,11 @@ void*
 os_memory_allocate (os_memory_t* memory, size_t bytes, size_t alignment)
 {
   assert (memory != nullptr);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
   return (reinterpret_cast<rtos::memory::memory_resource&> (*memory)).allocate (
       bytes, alignment);
+#pragma GCC diagnostic pop
 }
 
 /**
@@ -3063,8 +3066,11 @@ os_memory_deallocate (os_memory_t* memory, void* addr, size_t bytes,
                       size_t alignment)
 {
   assert (memory != nullptr);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
   (reinterpret_cast<rtos::memory::memory_resource&> (*memory)).deallocate (
       addr, bytes, alignment);
+#pragma GCC diagnostic pop
 }
 
 /**
@@ -3078,7 +3084,10 @@ void
 os_memory_reset (os_memory_t* memory)
 {
   assert (memory != nullptr);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
   (reinterpret_cast<rtos::memory::memory_resource&> (*memory)).reset ();
+#pragma GCC diagnostic pop
 }
 
 /**
@@ -3092,7 +3101,10 @@ bool
 os_memory_coalesce (os_memory_t* memory)
 {
   assert (memory != nullptr);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
   return (reinterpret_cast<rtos::memory::memory_resource&> (*memory)).coalesce ();
+#pragma GCC diagnostic pop
 }
 
 /**
@@ -3106,7 +3118,10 @@ size_t
 os_memory_get_total_bytes (os_memory_t* memory)
 {
   assert (memory != nullptr);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
   return (reinterpret_cast<rtos::memory::memory_resource&> (*memory)).total_bytes ();
+#pragma GCC diagnostic pop
 }
 
 /**
@@ -3120,7 +3135,10 @@ size_t
 os_memory_get_allocated_bytes (os_memory_t* memory)
 {
   assert (memory != nullptr);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
   return (reinterpret_cast<rtos::memory::memory_resource&> (*memory)).allocated_bytes ();
+#pragma GCC diagnostic pop
 }
 
 /**
@@ -3134,7 +3152,10 @@ size_t
 os_memory_get_free_bytes (os_memory_t* memory)
 {
   assert (memory != nullptr);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
   return (reinterpret_cast<rtos::memory::memory_resource&> (*memory)).free_bytes ();
+#pragma GCC diagnostic pop
 }
 
 /**
@@ -3148,7 +3169,10 @@ size_t
 os_memory_get_allocated_chunks (os_memory_t* memory)
 {
   assert (memory != nullptr);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
   return (reinterpret_cast<rtos::memory::memory_resource&> (*memory)).allocated_chunks ();
+#pragma GCC diagnostic pop
 }
 
 /**
@@ -3162,7 +3186,10 @@ size_t
 os_memory_get_free_chunks (os_memory_t* memory)
 {
   assert (memory != nullptr);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
   return (reinterpret_cast<rtos::memory::memory_resource&> (*memory)).free_chunks ();
+#pragma GCC diagnostic pop
 }
 
 // ****************************************************************************

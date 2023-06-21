@@ -142,7 +142,13 @@ namespace os
 #endif
 
       // Enumerate all mounted file systems and sync them.
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
       for (auto&& fs : file_system::mounted_list__)
+#pragma GCC diagnostic pop
         {
           fs.sync ();
         }
@@ -535,7 +541,13 @@ namespace os
 
       if (path != nullptr)
         {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
           for (auto&& fs : mounted_list__)
+#pragma GCC diagnostic pop
             {
               // Validate the device name by checking duplicates.
               if (std::strcmp (path, fs.mounted_path_) == 0)
@@ -622,7 +634,13 @@ namespace os
       assert(path1 != nullptr);
       assert(*path1 != nullptr);
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
       for (auto&& fs : mounted_list__)
+#pragma GCC diagnostic pop
         {
           auto len = std::strlen (fs.mounted_path_);
 
