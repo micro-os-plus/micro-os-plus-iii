@@ -53,3 +53,20 @@ A simple test to exercise most of the RTOS APIs.
 Question marks:
 
 - the native gcc12 debug occasionally fail on Intel macOS, it may hang or crash
+
+```console
+1: main(argc=1, argv=["/Users/ilg/MyProjects/micro-os-plus.github/micro-os-plus-iii/micro-os-plus-iii.git/tests/build/native-cmake-clang12-debug/platform-bin/rtos-apis-test"]);
+1:
+1: µOS++ RTOS simple APIs test
+1: Built with clang xPack x86_64 Clang 12.0.1
+...
+1:  C}{c  c}"folder1-with-long-name"
+1: lock() @0x7fedf8027ed0 ch-mx by 0x7fedf5704290 main
+1: {c  c}{C internal_try_lock_() @0x7fedf8027ed0 ch-mx by 0x7fedf5704290 main LCK
+1:  C}{c  c}unlock() @0x7fedf8027ed0 ch-mx by 0x7fedf5704290 main
+1: {c  c}{C {c  c}internal_unlock_() @0x7fedf8027ed0 ch-mx ULCK
+1:  C}{c  c}lock() @0x7fedf8027ed0 ch-mx by 0x7fedf5704290 main
+1: {c  c}{C internal_try_lock_() @0x7fedf8027ed0 ch-mx by 0x7fedf5704290 main LCK
+1:  C}{c  c}unlock() @0x7fedf8027ed0 ch-mx by 0x7fedf5704290 main
+(hang)
+```
