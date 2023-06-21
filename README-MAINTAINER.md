@@ -96,7 +96,7 @@ git -C ~/Work/micro-os-plus-iii/libucontext-xpack.git pull
 
 ```sh
 rm -rf ~/Work/micro-os-plus-iii/micro-os-plus-iii-cortexm.git && \
-mkdor -pv ~/Work/micro-os-plus-iii && \
+mkdir -pv ~/Work/micro-os-plus-iii && \
 git clone \
   --branch xpack-develop \
   https://github.com/micro-os-plus/micro-os-plus-iii-cortexm.git \
