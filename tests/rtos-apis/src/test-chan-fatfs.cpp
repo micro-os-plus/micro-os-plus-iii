@@ -748,7 +748,7 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
           d = posix::opendir (MOUNT_NAME);
           assert (d != nullptr);
 
-          struct dirent *dp;
+          /* struct */ dirent *dp;
           while (true)
             {
               errno = 0;
