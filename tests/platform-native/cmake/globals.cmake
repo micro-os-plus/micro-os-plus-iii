@@ -19,6 +19,8 @@ message(VERBOSE "Including platform-native global definitions...")
 
 # -----------------------------------------------------------------------------
 
+set(xpack_platform_compile_definition "PLATFORM_NATIVE")
+
 # Global definitions.
 # include_directories()
 
