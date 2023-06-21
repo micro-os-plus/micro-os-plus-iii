@@ -84,6 +84,9 @@ extern unsigned int __stack;
 void __attribute__ ((section(".after_vectors"),noreturn,weak))
 Reset_Handler (void)
 {
+  // For just in case, when started via QEMU.
+  __asm__(" MSR msp, %0 " : : "r"(&__stack) :);
+
   // Fill the main stack with a pattern, to detect usage and underflow.
   for (unsigned int* p = &_Heap_Limit; p < &__stack;)
     {
