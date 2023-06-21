@@ -87,6 +87,16 @@ Reset_Handler (void)
   // For just in case, when started via QEMU.
   __asm__(" MSR msp, %0 " : : "r"(&__stack) :);
 
+#if defined(__ARM_FP)
+  // Enable CP10 and CP11 coprocessor.
+  // SCB->CPACR |= (0xF << 20);
+  *((uint32_t*)0xE000ED88) |= (uint32_t)(0xF << 20);
+
+  // Lazy save.
+  // FPU->FPCCR |= FPU_FPCCR_ASPEN_Msk | FPU_FPCCR_LSPEN_Msk;
+  *((uint32_t*)0xE000EF34) |= (uint32_t)(0x3 << 29);
+#endif // defined(__ARM_FP)
+
   // Fill the main stack with a pattern, to detect usage and underflow.
   for (unsigned int* p = &_Heap_Limit; p < &__stack;)
     {
