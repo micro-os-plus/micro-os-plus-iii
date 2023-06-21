@@ -372,7 +372,10 @@ _start (void)
   trace_printf ("Main stack %p-%p\n", &_Heap_Limit, &__stack);
 
   os_startup_initialize_free_store (
-      &_Heap_Begin, (size_t) ((char*) (&_Heap_Limit) - (char*) (&_Heap_Begin)));
+      &_Heap_Begin, static_cast<size_t> (
+        reinterpret_cast<char*> (&_Heap_Limit) - reinterpret_cast<char*> (&_Heap_Begin)
+      )
+  );
 
   // Get the argc/argv (useful in semihosting configurations).
   int argc;
@@ -385,7 +388,11 @@ _start (void)
   trace_printf ("Static objects constructed\n");
 
 #if defined(OS_HAS_INTERRUPTS_STACK)
-  os::rtos::interrupts::stack ()->set(&_Heap_Limit,  (size_t) ((char*) (&__stack) - (char*) (&_Heap_Limit)));
+  os::rtos::interrupts::stack ()->set(&_Heap_Limit,
+    static_cast<size_t> (
+      reinterpret_cast<char*> (&__stack) - reinterpret_cast<char*> (&_Heap_Limit)
+    )
+  );
 #endif /* defined(OS_HAS_INTERRUPTS_STACK) */
 
   // Call the main entry point, and save the exit code.
