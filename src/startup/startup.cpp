@@ -120,8 +120,9 @@ main (int argc, char* argv[]);
 
 extern "C"
 {
-void
-_start (void);
+// os-hooks.h
+// void
+// _start (void);
 
 static void
 os_initialize_data (unsigned int* from, unsigned int* region_begin,
