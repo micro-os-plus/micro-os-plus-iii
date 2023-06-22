@@ -46,6 +46,11 @@ For Cortex-M tests, the toolchain is arm-none-eabi-gcc 11.
 
 ## Tests details
 
+```sh
+set -e
+while (true); do xpm run test-all -C '/Users/ilg/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests'; done
+```
+
 ### rtos
 
 A simple test to exercise most of the RTOS APIs.
@@ -54,139 +59,78 @@ The Cortex-M tests are generally ok, except a HardFault.
 
 On Apple Silicon macoS, gcc segFaults and was disabled.
 
-The native tests occasionally fail:
-
-- on Intel macOS, both gcc and clang hang
-- on Apple Silicon macoS, gcc segFaults, all clang seem functional
-- on Intel Ubuntu 22, clang & gcc occasionally fail
-- on Raspberry Pi OS, both clang & gcc occasionally fail
+The native tests occasionally fail.
 
 #### Intel macOS
 
 ```console
-1: main(argc=1, argv=["/Users/ilg/MyProjects/micro-os-plus.github/micro-os-plus-iii/micro-os-plus-iii.git/tests/build/native-cmake-gcc12-debug/platform-bin/rtos-apis-test"]);
-1:
-1: µOS++ RTOS simple APIs test
-1: Built with GCC 12.2.0
-1:
-join() @0x7fb145804080 th5 joined
-1: ~thread() @0x7fb145804080 th5
-1: {c  c}{C do_deallocate(0x7fb145804080,536,16) @0x10e4e8640 malloc
-1:  C}{c  c}{c  c}{C do_allocate(536,16)=0x7fb145804080 @0x10e4e8640 malloc
-1:  C}{c  c}thread() @0x7fb145804080 th6
-1: {c  c}{C do_allocate(32768,16)=0x7fb145010200 @0x10e4e8640 malloc
-1:  C}{c  c}internal_construct_() @0x7fb145804080 th6 p96 stack{0x7fb145010200,32768}
-1: {c  c}{C port::context::create() getcontext 0x7fb145804168
-1: port::context::create() makecontext 0x7fb145804168
-1: resume() @0x7fb145804080 th6 96
-1: {c ready link() front +96 16
-1:  c} C}{c  c}yield() from main
-1: port::scheduler::reschedule()
-1: {c port::scheduler::reschedule() from main 2 1
-1: {c  c}ready link() middle 96 +96
-1: ready unlink_head() 0x7fb145804080 th6
-(hang)
-```
+1: Test command: /Users/ilg/MyProjects/micro-os-plus.github/micro-os-plus-iii/micro-os-plus-iii.git/tests/build/native-cmake-gcc11-debug/platform-bin/rtos-apis-test
 
-```console
-1: main(argc=1, argv=["/Users/ilg/MyProjects/micro-os-plus.github/micro-os-plus-iii/micro-os-plus-iii.git/tests/build/native-cmake-clang12-debug/platform-bin/rtos-apis-test"]);
-1:
-1: µOS++ RTOS simple APIs test
-1: Built with clang xPack x86_64 Clang 12.0.1
+1: µOS++ IIIe version 7.0.0-beta
+1: Copyright (c) 2007-2023 Liviu Ionescu
+1: POSIX synthetic, running on x86_64 Darwin 21.6.0; non-preemptive
+1: Scheduler frequency: 1000 ticks/sec
+1: Default stack size: 32768 bytes
+1: Built with GCC 11.3.0, with exceptions
 ...
-1:  C}{c  c}"folder1-with-long-name"
-1: lock() @0x7fedf8027ed0 ch-mx by 0x7fedf5704290 main
-1: {c  c}{C internal_try_lock_() @0x7fedf8027ed0 ch-mx by 0x7fedf5704290 main LCK
-1:  C}{c  c}unlock() @0x7fedf8027ed0 ch-mx by 0x7fedf5704290 main
-1: {c  c}{C {c  c}internal_unlock_() @0x7fedf8027ed0 ch-mx ULCK
-1:  C}{c  c}lock() @0x7fedf8027ed0 ch-mx by 0x7fedf5704290 main
-1: {c  c}{C internal_try_lock_() @0x7fedf8027ed0 ch-mx by 0x7fedf5704290 main LCK
-1:  C}{c  c}unlock() @0x7fedf8027ed0 ch-mx by 0x7fedf5704290 main
-(hang)
+
+1:  C}{c  c}allocator_stateless_polymorphic_synchronized() @0x7f914803faf0 0x1096db660
+1: allocator_stateless_polymorphic_synchronized() @0x7f914803fe3e 0x1096db660
+1: allocate(1) @0x7f914803f5e6
+1: {c  c}do_allocate(72,8)=0x600000808000 @0x1096db660 malloc
+1: {c  c}mutex() @0x600000808000 mx7
+1: {c  c}lock() @0x600000808000 mx7 by 0x7f9147704680 main
+1: {c  c}{C internal_try_lock_() @0x600000808000 mx7 by 0x7f9147704680 main LCK
+1:  C}{c  c}unlock() @0x600000808000 mx7 by 0x7f9147704680 main
+1: {c  c}{C {c  c}internal_unlock_() @0x600000808000 mx7 ULCK
+1:  C}{c  c}allocator_stateless_polymorphic_synchronized() @0x7f914803fe3f 0x1096db660
+1: allocate(1) @0x7f914803f5e6
+1: {c  c}do_allocate(72,8)=0x600000808050 @0x1096db660 malloc
+1: {c  c}mutex() @0x600000808050 mx8
+1/1 Test #1: rtos-apis-test ...................***Exception: Illegal  0.02 sec
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   0.02 sec
+
+The following tests FAILED:
+	  1 - rtos-apis-test (ILLEGAL)
+Errors while running CTest
+Output from these tests are in: /Users/ilg/MyProjects/micro-os-plus.github/micro-os-plus-iii/micro-os-plus-iii.git/tests/build/native-cmake-gcc11-debug/Testing/Temporary/LastTest.log
 ```
 
-With the system ucontext:
-
 ```
-1: main(argc=1, argv=["/Users/ilg/MyProjects/micro-os-plus.github/micro-os-plus-iii/micro-os-plus-iii.git/tests/build/native-cmake-clang12-debug/platform-bin/rtos-apis-test"]);
-1:
-1: µOS++ RTOS simple APIs test
-1: Built with clang xPack x86_64 Clang 12.0.1
+1: Test command: /Users/ilg/MyProjects/micro-os-plus.github/micro-os-plus-iii/micro-os-plus-iii.git/tests/build/native-cmake-gcc11-debug/platform-bin/rtos-apis-test
 ...
-1: Test POSIX I/O - Block device locked - C++ API
-1: lock() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main
-1: {c  c}{C internal_try_lock_() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main LCK
-1:  C}{c  c}lock() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main
-1: {c  c}{C internal_try_lock_() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main LCK
-1:  C}{c  c}unlock() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main
-1: {c  c}{C {c  c}internal_unlock_() @0x10e0f2da8 mx1 ULCK
-1:  C}{c  c}unlock() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main
-1: {c  c}{C {c  c}internal_unlock_() @0x10e0f2ed0 mx2 ULCK
-1:  C}{c  c}lock() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main
-1: {c  c}{C internal_try_lock_() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main LCK
-1:  C}{c  c}lock() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main
-1: {c  c}{C internal_try_lock_() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main LCK
-1:  C}{c  c}unlock() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main
-1: {c  c}{C {c  c}internal_unlock_() @0x10e0f2da8 mx1 ULCK
-1:  C}{c  c}unlock() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main
-1: {c  c}{C {c  c}internal_unlock_() @0x10e0f2ed0 mx2 ULCK
-1:  C}{c  c}lock() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main
-1: {c  c}{C internal_try_lock_() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main LCK
-1:  C}{c  c}lock() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main
-1: {c  c}{C internal_try_lock_() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main LCK
-1:  C}{c  c}unlock() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main
-1: {c  c}{C {c  c}internal_unlock_() @0x10e0f2da8 mx1 ULCK
-1:  C}{c  c}unlock() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main
-1: {c  c}{C {c  c}internal_unlock_() @0x10e0f2ed0 mx2 ULCK
-1:  C}{c  c}lock() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main
-1: {c  c}{C internal_try_lock_() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main LCK
-1:  C}{c  c}lock() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main
-1: {c  c}{C internal_try_lock_() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main LCK
-1:  C}{c  c}unlock() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main
-1: {c  c}{C {c  c}internal_unlock_() @0x10e0f2da8 mx1 ULCK
-1:  C}{c  c}unlock() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main
-1: {c  c}{C {c  c}internal_unlock_() @0x10e0f2ed0 mx2 ULCK
-1:  C}{c  c}lock() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main
-1: {c  c}{C internal_try_lock_() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main LCK
-1:  C}{c  c}lock() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main
-1: {c  c}{C internal_try_lock_() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main LCK
-1:  C}{c  c}unlock() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main
-1: {c  c}{C {c  c}internal_unlock_() @0x10e0f2da8 mx1 ULCK
-1:  C}{c  c}unlock() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main
-1: {c  c}{C {c  c}internal_unlock_() @0x10e0f2ed0 mx2 ULCK
-1:  C}{c  c}lock() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main
-1: {c  c}{C internal_try_lock_() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main LCK
-1:  C}{c  c}lock() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main
-1: {c  c}{C internal_try_lock_() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main LCK
-1:  C}{c  c}unlock() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main
-1: {c  c}{C {c  c}internal_unlock_() @0x10e0f2da8 mx1 ULCK
-1:  C}{c  c}unlock() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main
-1: {c  c}{C {c  c}internal_unlock_() @0x10e0f2ed0 mx2 ULCK
-1:  C}{c  c}lock() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main
-1: {c  c}{C internal_try_lock_() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main LCK
-1:  C}{c  c}lock() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main
-1: {c  c}{C internal_try_lock_() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main LCK
-1:  C}{c  c}unlock() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main
-1: {c  c}{C {c  c}internal_unlock_() @0x10e0f2da8 mx1 ULCK
-1:  C}{c  c}unlock() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main
-1: {c  c}{C {c  c}internal_unlock_() @0x10e0f2ed0 mx2 ULCK
-1:  C}{c  c}lock() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main
-1: {c  c}{C internal_try_lock_() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main LCK
-1:  C}{c  c}lock() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main
-1: {c  c}{C internal_try_lock_() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main LCK
-1:  C}{c  c}unlock() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main
-1: {c  c}{C {c  c}internal_unlock_() @0x10e0f2da8 mx1 ULCK
-1:  C}{c  c}unlock() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main
-1: {c  c}{C {c  c}internal_unlock_() @0x10e0f2ed0 mx2 ULCK
-1:  C}{c  c}lock() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main
-1: {c  c}{C internal_try_lock_() @0x10e0f2ed0 mx2 by 0x7fa854f05cd0 main LCK
-1:  C}{c  c}lock() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main
-1: {c  c}{C internal_try_lock_() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main LCK
-1:  C}{c  c}unlock() @0x10e0f2da8 mx1 by 0x7fa854f05cd0 main
-1: {c  c}{C {c  c}internal_unlock_() @0x10e0f2da8 mx1 ULCK
-1:  C}{c  c}unlock() @0
-1/1 Test #1: rtos-apis-test ...................***Exception: Illegal  7.31 sec
+1: µOS++ IIIe version 7.0.0-beta
+1: Copyright (c) 2007-2023 Liviu Ionescu
+1: POSIX synthetic, running on x86_64 Darwin 21.6.0; non-preemptive
+1: Scheduler frequency: 1000 ticks/sec
+1: Default stack size: 32768 bytes
+1: Built with GCC 11.3.0, with exceptions
+...
+1: {c  c}{C {c  c}internal_unlock_() @0x7f8af803fd80 ch-mx ULCK
+1:  C}{c  c}lock() @0x7f8af803fd80 ch-mx by 0x7f8af1704680 main
+1: {c  c}{C internal_try_lock_() @0x7f8af803fd80 ch-mx by 0x7f8af1704680 main LCK
+1:  C}{c  c}unlock() @0x7f8af803fd80 ch-mx by 0x7f8af1704680 main
+1: {c  c}{C {c  c}internal_unlock_() @0x7f8af803fd80 ch-mx ULCK
+1:  C}{c  c}lock() @0x7f8af803fd80 ch-mx by 0x7f8af1704680 main
+1: {c  c}{C internal_try_lock_() @0x7f8af803fd80 ch-mx by 0x7f8af1704680 main LCK
+1:  C}{c  c}unlock() @0x7f8af803fd80 ch-mx by 0x7f8af1704680 main
+1: {c  c}{C {c  c}internal_unlock_() @0x7f8af803fd80 ch-mx ULCK
+1:  C}{c  c}lock() @0x7f8af803fd80 ch-mx by 0x7f8af1704680 main
+1: {c  c}{C internal_try_lock_() @0x7f8af803fd80 ch-mx by 0x7f8af1704680 main LCK
+1:  C}{c  c}
+1/1 Test #1: rtos-apis-test ...................***Exception: Illegal  7.08 sec
 
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   7.09 sec
+
+The following tests FAILED:
+	  1 - rtos-apis-test (ILLEGAL)
+Errors while running CTest
+Output from these tests are in: /Users/ilg/MyProjects/micro-os-plus.github/micro-os-plus-iii/micro-os-plus-iii.git/tests/build/native-cmake-gcc11-debug/Testing/Temporary/LastTest.log
 ```
 
 #### Apple Silicon macOS
@@ -221,142 +165,113 @@ Errors while running CTest
 (repetitive)
 ```
 
-clang seems functional.
-
 #### Intel Ubuntu 22
 
-```console
-1: main(argc=1, argv=["/home/ilg/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests/build/native-cmake-clang13-debug/platform-bin/rtos-apis-test"]);
-1:
-1: µOS++ RTOS simple APIs test
-1: Built with clang xPack x86_64 Clang 13.0.1
-1:
 ...
-1: port::scheduler::reschedule()
-1: {c port::scheduler::reschedule() from idle 2 1
-1: {c  c}ready link() empty +16
-1: ready unlink_head() 0x1a28fb0 idle
-1:  c}port::scheduler::reschedule() same idle
-1: yield() to idle
-1: wait_for_interrupt()
-1: {i {t {c  c}{c  c}{c  c} t} i}yield() from idle
-1: port::scheduler::reschedule()
-(hang)
-```
-
-```console
-1: main(argc=1, argv=["/home/ilg/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests/build/native-cmake-clang14-debug/platform-bin/rtos-apis-test"]);
-1:
-1: µOS++ RTOS simple APIs test
-1: Built with clang xPack x86_64 Clang 14.0.6
-1:
-...
-1: ::operator new(131072)=0x1e6b3f0
-1:  C}{c  c}{c  c}{C do_allocate(4100,16)=0x1e5b330 @0x2b3788 malloc
-1: ::operator new(4100)=0x1e5b330
-1:  C}{c  c}
-1: test_diskio(0x1e4ade0, 3, 0x1e5b330, 4100)
-1: ---- Test cycle 1 of 3 ----
-1:  Number of sectors is 128
-(hang)
-```
-
-```
-1: main(argc=1, argv=["/home/ilg/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests/build/native-cmake-clang14-debug/platform-bin/rtos-apis-test"]);
-1:
-1: µOS++ RTOS simple APIs test
-1: Built with clang xPack x86_64 Clang 14.0.6
-1:
-...
-1: {c port::scheduler::reschedule() from idle 2 1
-1: {c  c}ready link() empty +16
-1: ready unlink_head() 0x1db3fb0 idle
-1:  c}port::scheduler::reschedule() same idle
-1: yield() to idle
-1: wait_for_interrupt()
-1: {i {t {c  c}{c  c}{c  c} t} i}yield() from idle
-(hang)
-```
-
-```
-1: main(argc=1, argv=["/home/ilg/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests/build/native-cmake-gcc12-debug/platform-bin/rtos-apis-test"]);
-1:
-1: µOS++ RTOS simple APIs test
-1: Built with GCC 12.2.0
-...
-1: {c port::scheduler::reschedule() from idle 2 1
-1: {c  c}ready link() empty +16
-1: ready unlink_head() 0x55ac25e0abc0 idle
-1:  c}port::scheduler::reschedule() same idle
-1: yield() to idle
-1: wait_for_interrupt()
-(hang)
-```
 
 #### Raspberry Pi OS
 
-```console
-1: main(argc=1, argv=["/home/ilg/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests/build/native-cmake-clang14-debug/platform-bin/rtos-apis-test"]);
-1:
-1: µOS++ RTOS simple APIs test
-1: Built with clang xPack aarch64 Clang 14.0.6
 ...
-1: {c  c}{C {c  c}internal_unlock_() @0x7f8d004ec0 ch-mx ULCK
-1:  C}{c  c}lock() @0x7f8d004ec0 ch-mx by 0x37649d10 main
-1: {c  c}{C internal_try_lock_() @0x7f8d004ec0 ch-mx by 0x37649d10 main LCK
-1:  C}{c  c}unlock() @0x7f8d004ec0 ch-mx by 0x37649d10 main
-1: {c  c}{C {c  c}internal_unlock_() @0x7f8d004ec0 ch-mx ULCK
-1:  C}{c  c}::operator delete(0x3765ca60)
-(hang)
+
+#### Cortex-M
+
+```console
+1: Test command: /home/ilg/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests/build/qemu-cortex-m7f-cmake-debug/xpacks/.bin/qemu-system-arm "--machine" "mps2-an500" "--cpu" "cortex-m7" "--kernel" "rtos-apis-test.elf" "--nographic" "-d" "unimp,guest_errors" "--semihosting-config" "enable=on,target=native,arg=rtos-apis-test"
+...
+1: main(argc=1, argv=["rtos-apis-test"]);
+1: internal_invoke_with_exit_() @0x207fe340 idle
+1: priority(16) @0x207fe340 idle
+1: {C first_fit_top::do_allocate(1024,8)=0x207f9c80,1032 @0x20003068 app
+1: ::malloc(1024)=0x207f9c80
+1:  C}
+1: µOS++ RTOS simple APIs test
+1: Built with GCC 12.2.1 20221205
+...
+1: {C  C}internal_invoke_with_exit_() @0x207fc978 -
+1: static void os::estd::thread::run_function_object(const void*) [with F_T = std::_Bind<void (*(int, const char*))(int, const char*)>]()
+1: task4(7,xyz)
+1: internal_exit_() @0x207fc978 -
+1: {C  C}terminated link() 0x207fc98c -
+1: join() @0x207feeac
+1: ~thread() @0x207fdaa8 -
+1: kill() @0x207fdaa8 -
+1: {C internal_destroy_() @0x207fdaa8 -
+1: internal_check_stack_() @0x207fdaa8 - stack: 968/2044 bytes used
+1: {C first_fit_top::do_deallocate(0x207fd2a0,2048,8) @0x207fbbc0 sys
+1:  C}{C  C} C}{C first_fit_top::do_deallocate(0x207fdaa8,136,8) @0x207fbbc0 sys
+1:  C}join() @0x207feeac joined
+1: join() @0x207feea4
+1: static void os::estd::thread::delete_function_object(const void*) [with F_T = std::_Bind<void (*(char*))(void*)>]()
+1: ::operator delete(0x207f9c60,8)
+1: {C first_fit_top::do_deallocate(0x207f9c60,8,8) @0x20003068 app
+1:  C}internal_invoke_with_exit_() @0x207fd210 -
+1: static void os::estd::thread::run_function_object(const void*) [with F_T = std::_Bind<void (*(char*))(void*)>]()
+1: [HardFault]
+1: Stack frame:
+1:  R0   = 207FEEB7
+1:  R1   = 207F9C60
+1:  R2   = 207F9C64
+1:  R3   = 207FEEB7
+1:  R12  = 0003FF3D
+1:  LR   = 00016787
+1:  PC   = 00000000
+1:  PSR  = 00030000
+1: FSR/FAR:
+1:  CFSR = 00020000
+1:  HFSR = 40000000
+1:  DFSR = 00000000
+1: Aux Fault status registers unimplemented
+1:  AFSR = 00000000
+1: Misc
+1:  LR/EXC_RETURN = FFFFFFED
+1: NVIC: Bad read offset 0xdf0
 ```
 
 ```console
-1: main(argc=1, argv=["/home/ilg/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests/build/native-cmake-gcc11-debug/platform-bin/rtos-apis-test"]);
-1:
-1: µOS++ RTOS simple APIs test
-1: Built with GCC 11.3.0
-...
-1:  c}port::scheduler::reschedule()
-1: {c port::scheduler::reschedule() from idle 2 1
-1: {c  c}ready link() back 96 +16
-1: ready unlink_head() 0x55c2184920 main
-1:  c}port::scheduler::reschedule() swapcontext idle -> main
-1: join() @0x7f854e6390 - joined
-1: join() @0x7f854e76d0 th2
-(hang)
-```
+1: Test command: /home/ilg/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests/build/qemu-cortex-m7f-cmake-debug/xpacks/.bin/qemu-system-arm "--machine" "mps2-an500" "--cpu" "cortex-m7" "--kernel" "rtos-apis-test.elf" "--nographic" "-d" "unimp,guest_errors" "--semihosting-config" "enable=on,target=native,arg=rtos-apis-test"
 
-```console
-1: main(argc=1, argv=["/home/ilg/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests/build/native-cmake-gcc11-debug/platform-bin/rtos-apis-test"]);
-1:
-1: µOS++ RTOS simple APIs test
-1: Built with GCC 11.3.0
+1: µOS++ IIIe version 7.0.0-beta
+1: Copyright (c) 2007-2023 Liviu Ionescu
+1: Scheduler: µOS++ Cortex-M7 FP, preemptive, BASEPRI(4), WFI
+1: System clock: 16000000 Hz
+1: Scheduler frequency: 1000 ticks/sec
+1: Default stack size: 2048 bytes
+1: Interrupts stack size: 3072 bytes
+1: Built with GCC 12.2.1 20221205, with exceptions
 ...
-1:  C}{c  c}{c  c}{C  C}{c  c}resume() @0x55c2184920 main 96
-1: {c ready link() empty +96
-1:  c}port::scheduler::reschedule()
-1: {c port::scheduler::reschedule() from idle 2 1
-1: {c  c}ready link() back 96 +16
-1: ready unlink_head() 0x55c2184920 main
-1:  c}port::scheduler::reschedule() swapcontext idle -> main
-1: join() @0x7f854e6390 - joined
-1: join() @0x7f854e76d0 th2
-(hang)
-```
-
-```console
-1: main(argc=1, argv=["/home/ilg/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests/build/native-cmake-clang14-debug/platform-bin/rtos-apis-test"]);
-1:
-1: µOS++ RTOS simple APIs test
-1: Built with clang xPack aarch64 Clang 14.0.6
-...
-1:  c}port::scheduler::reschedule() setcontext main
-1: yield() to main
-1: {c  c}{C do_allocate(32,16)=0x31f3b3c0 @0x2e0cb0 malloc
-1: ::operator new(32)=0x31f3b3c0
-1:  C}{c  c}join() @0x31f3b3f0 th6
-1: internal_suspend_() @0x31f28d10 main
-1: {c  c}port::scheduler::reschedule()
-1: {c port::scheduler::reschedule() from main 3 1
-(hang)
+1: static void os::estd::thread::run_function_object(const void*) [with F_T = std::_Bind<void (*(int, const char*))(int, const char*)>]()
+1: task4(7,xyz)
+1: internal_exit_() @0x207fc978 -
+1: {C  C}terminated link() 0x207fc98c -
+1: join() @0x207feeac
+1: ~thread() @0x207fdaa8 -
+1: kill() @0x207fdaa8 -
+1: {C internal_destroy_() @0x207fdaa8 -
+1: internal_check_stack_() @0x207fdaa8 - stack: 968/2044 bytes used
+1: {C first_fit_top::do_deallocate(0x207fd2a0,2048,8) @0x207fbbc0 sys
+1:  C}{C  C} C}{C first_fit_top::do_deallocate(0x207fdaa8,136,8) @0x207fbbc0 sys
+1:  C}join() @0x207feeac joined
+1: join() @0x207feea4
+1: static void os::estd::thread::delete_function_object(const void*) [with F_T = std::_Bind<void (*(char*))(void*)>]()
+1: ::operator delete(0x207f9c50,8)
+1: {C first_fit_top::do_deallocate(0x207f9c50,8,8) @0x20003068 app
+1:  C}[HardFault]
+1: Stack frame:
+1:  R0   = 207FEEB7
+1:  R1   = 207F9C50
+1:  R2   = 207F9C54
+1:  R3   = 207FEEB7
+1:  R12  = 0003FF3D
+1:  LR   = 00016787
+1:  PC   = 00000000
+1:  PSR  = 00030000
+1: FSR/FAR:
+1:  CFSR = 00020000
+1:  HFSR = 40000000
+1:  DFSR = 00000000
+1: Aux Fault status registers unimplemented
+1:  AFSR = 00000000
+1: Misc
+1:  LR/EXC_RETURN = FFFFFFED
+1: NVIC: Bad read offset 0xdf0
 ```
