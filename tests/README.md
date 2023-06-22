@@ -42,7 +42,7 @@ For native tests, the toolchains used are:
 - GCC 11, 12
 - clang 12, 13, 14, 15
 
-For Cortex-M tests, the toolchain is arm-none-eabi-gcc 11.
+For Cortex-M tests, the toolchain is arm-none-eabi-gcc 12.
 
 ## Tests details
 
