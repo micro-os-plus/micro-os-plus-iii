@@ -50,7 +50,9 @@ For Cortex-M tests, the toolchain is arm-none-eabi-gcc 11.
 
 A simple test to exercise most of the RTOS APIs.
 
-The Cortex-M tests seem fine.
+The Cortex-M tests are generally ok, except a HardFault.
+
+On Apple Silicon macoS, gcc segFaults and was disabled.
 
 The native tests occasionally fail:
 
