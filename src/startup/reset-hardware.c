@@ -60,8 +60,14 @@ __reset_hardware (void);
 void __attribute__((weak,noreturn))
 __reset_hardware (void)
 {
+#if defined(DEBUG) || defined(OS_DISABLE_RESET_HARDWARE)
+  trace_printf("__reset_hardware()");
+  while (1)
+    __WFI();
+#else
   NVIC_SystemReset ();
   __builtin_unreachable ();
+#endif
 }
 
 // ----------------------------------------------------------------------------

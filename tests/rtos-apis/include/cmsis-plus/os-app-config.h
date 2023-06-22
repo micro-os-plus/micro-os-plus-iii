@@ -60,6 +60,8 @@
 #define OS_EXCLUDE_RTOS_IDLE_SLEEP (1)
 #endif
 
+#define OS_DISABLE_RESET_HARDWARE
+
 #else
 
 #define OS_INCLUDE_LIBUCONTEXT
