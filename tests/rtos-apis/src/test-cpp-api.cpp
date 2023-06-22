@@ -1,7 +1,7 @@
 /*
  * This file is part of the µOS++ distribution.
  *   (https://github.com/micro-os-plus)
- * Copyright (c) 2015 Liviu Ionescu.
+ * Copyright (c) 2015-2023 Liviu Ionescu. All rights reserved.
  *
  * µOS++ is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as

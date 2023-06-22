@@ -1,28 +1,13 @@
 /*
  * This file is part of the µOS++ distribution.
  *   (https://github.com/micro-os-plus)
- * Copyright (c) 2016 Liviu Ionescu.
+ * Copyright (c) 2016-2023 Liviu Ionescu. All rights reserved.
  *
- * Permission is hereby granted, free of charge, to any person 
- * obtaining a copy of this software and associated documentation 
- * files (the "Software"), to deal in the Software without 
- * restriction, including without limitation the rights to use, 
- * copy, modify, merge, publish, distribute, sublicense, and/or 
- * sell copies of the Software, and to permit persons to whom 
- * the Software is furnished to do so, subject to the following 
- * conditions:
- * 
- * The above copyright notice and this permission notice shall be 
- * included in all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT 
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
- * OTHER DEALINGS IN THE SOFTWARE.
+ * Permission to use, copy, modify, and/or distribute this software
+ * for any purpose is hereby granted, under the terms of the MIT license.
+ *
+ * If a copy of the license was not distributed with this file, it can
+ * be obtained from https://opensource.org/licenses/mit/.
  */
 
 // ----------------------------------------------------------------------------
@@ -559,32 +544,32 @@ os_main (int argc, char* argv[])
  @ingroup cmsis-plus-rtos
  @brief  C++ API memory management definitions.
  @details
- The µOS++ RTOS includes several advanced and flexible 
+ The µOS++ RTOS includes several advanced and flexible
  memory management features.
- 
+
  First, it defines a configurable memory manager for the application
- free store (also known as the "heap"). 
+ free store (also known as the "heap").
 
- Second, it defines a separate memory manager to be used by the 
+ Second, it defines a separate memory manager to be used by the
  RTOS system objects. This separate manager can be configured
- to use any allocation policy. It may use either a statically 
- or a dynamically allocated area. 
+ to use any allocation policy. It may use either a statically
+ or a dynamically allocated area.
 
- The reason for the system memory manager is to allow  RTOS 
- system objects to be separated from application objects; this has 
+ The reason for the system memory manager is to allow  RTOS
+ system objects to be separated from application objects; this has
  several advantages:
 
- - it helps to protect the system objects from application bugs; 
- this is beneficial during debug and it can improve reliability 
+ - it helps to protect the system objects from application bugs;
+ this is beneficial during debug and it can improve reliability
  in the field.
- - it helps improve system performances, by allowing to locate the 
+ - it helps improve system performances, by allowing to locate the
  system objects on a fast, on-chip RAM, in case the platform has
  multiple RAM regions with different performances.
 
  Third, system objects that require dynamic memory may be created with
  custom allocators, defined by the user.
 
- Access to the application memory manager is done using the 
+ Access to the application memory manager is done using the
  standard functions:
 
  - `malloc()`/`free()` in C (thread safe)
@@ -592,23 +577,23 @@ os_main (int argc, char* argv[])
  - `new`/`delete` in C++ (thread safe)
 
  The default application memory manager is set in the
- `os_startup_initialize_free_store()` function, called by the 
+ `os_startup_initialize_free_store()` function, called by the
  startup code when running on bare metal.
 
- On synthetic POSIX platforms the default memory manager is 
- `os::memory::malloc_memory_resource`, which uses memory from 
+ On synthetic POSIX platforms the default memory manager is
+ `os::memory::malloc_memory_resource`, which uses memory from
  the system free store.
 
  By default the RTOS system memory manager is the same as the application
  memory manager, but, for isolation reasons, it is recommended to define
  a separate memory mananger for the RTOS system objects.
 
- The basic memory management class is `os::rtos::memory::memory_resource`, 
+ The basic memory management class is `os::rtos::memory::memory_resource`,
  which will
  be standard starting with C++17. The µOS++ version of this class
- includes several extensions, like out of memory processing and 
- statistics (and this is the reason the class is not defined in `os::estd`). 
-  
+ includes several extensions, like out of memory processing and
+ statistics (and this is the reason the class is not defined in `os::estd`).
+
  */
 
 // ----------------------------------------------------------------------------
