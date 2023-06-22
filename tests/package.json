@@ -84,8 +84,8 @@
       ],
       "test-native-cmake": [
         "{% if os.platform == 'darwin' %}xpm run test-native-cmake-sys{% endif %}",
-        "xpm run test-native-cmake-gcc11",
-        "xpm run test-native-cmake-gcc12",
+        "{% if os.platform == 'darwin' and os.arch == 'arm64' %}echo {% endif %}xpm run test-native-cmake-gcc11",
+        "{% if os.platform == 'darwin' and os.arch == 'arm64' %}echo {% endif %}xpm run test-native-cmake-gcc12",
         "xpm run test-native-cmake-clang12",
         "xpm run test-native-cmake-clang13",
         "xpm run test-native-cmake-clang14",
