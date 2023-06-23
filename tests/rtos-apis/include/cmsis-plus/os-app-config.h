@@ -17,9 +17,9 @@
 
 #define OS_INTEGER_SYSTICK_FREQUENCY_HZ                     (1000)
 
-// With 4 bits NVIC, there are 16 levels, 0 = highest, 15 = lowest
-
 #if defined(__ARM_EABI__)
+
+// With 4 bits NVIC, there are 16 levels, 0 = highest, 15 = lowest
 
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
 // Disable all interrupts from 15 to 4, keep 3-2-1 enabled
@@ -47,12 +47,9 @@
 
 #define OS_DISABLE_RESET_HARDWARE
 
-#else
+#else // native
 
 #define OS_INCLUDE_LIBUCONTEXT
-
-#define OS_USE_TRACE_POSIX_STDOUT
-// #define OS_USE_TRACE_POSIX_FWRITE_STDOUT
 
 #define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES               (4*os::rtos::port::stack::default_size_bytes)
 

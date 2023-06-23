@@ -84,7 +84,9 @@ if (ENABLE_RTOS_APIS_TEST)
   set_target_properties(rtos-apis-test PROPERTIES OUTPUT_NAME "rtos-apis-test")
 
   target_compile_definitions(rtos-apis-test PRIVATE
-    # None.
+    # Use buffered write with caution, it occasionally hangs.
+    # OS_USE_TRACE_POSIX_FWRITE_STDOUT
+    OS_USE_TRACE_POSIX_STDOUT
   )
 
   # The compile options were defined globally.
