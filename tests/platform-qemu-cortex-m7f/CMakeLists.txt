@@ -103,24 +103,7 @@ if (ENABLE_RTOS_APIS_TEST)
     micro-os-plus::platform
   )
 
-    # TODO use add_custom_target()
-  # https://cmake.org/cmake/help/v3.20/command/add_custom_command.html
-  add_custom_command(TARGET rtos-apis-test POST_BUILD
-    COMMAND ${CMAKE_SIZE} --format=berkeley "$<TARGET_FILE:rtos-apis-test>"
-  )
-
-  if (xpack_create_hex)
-    add_custom_command(TARGET rtos-apis-test POST_BUILD
-      COMMAND ${CMAKE_OBJCOPY} -O ihex "$<TARGET_FILE:rtos-apis-test>" "$<TARGET_FILE:rtos-apis-test>.hex"
-    )
-  endif()
-
-  if(xpack_create_listing)
-    add_custom_command(TARGET rtos-apis-test POST_BUILD
-      COMMAND ${CMAKE_OBJDUMP} --source --all-headers --demangle --line-numbers --wide "$<TARGET_FILE:rtos-apis-test>" > rtos-apis-test-list.txt
-      VERBATIM
-    )
-  endif()
+  xpack_add_cross_custom_commands("rtos-apis-test")
 
   message(VERBOSE "A> rtos-apis-test")
 
