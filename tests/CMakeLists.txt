@@ -66,6 +66,7 @@ xpack_display_greetings("${CMAKE_CURRENT_SOURCE_DIR}/../package.json")
 # CMAKE_BUILD_TYPE: Debug, Release, RelWithDebInfo, MinSizeRel
 
 set(ENABLE_RTOS_APIS_TEST true)
+set(ENABLE_MUTEX_STRESS_TEST true)
 
 # -----------------------------------------------------------------------------
 
@@ -98,6 +99,10 @@ add_subdirectory(".." "top-bin")
 
 if(ENABLE_RTOS_APIS_TEST)
   add_subdirectory("rtos-apis" "tests-bin")
+endif()
+
+if(ENABLE_MUTEX_STRESS_TEST)
+  add_subdirectory("mutex-stress" "tests-bin")
 endif()
 
 # -----------------------------------------------------------------------------

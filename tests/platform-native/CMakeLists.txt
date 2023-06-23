@@ -78,6 +78,8 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 
 endif()
 
+# -----------------------------------------------------------------------------
+
 if (ENABLE_RTOS_APIS_TEST)
 
   add_executable(rtos-apis-test)
@@ -118,6 +120,49 @@ if (ENABLE_RTOS_APIS_TEST)
   add_test(
     NAME "rtos-apis-test"
     COMMAND rtos-apis-test
+  )
+
+endif()
+
+# -----------------------------------------------------------------------------
+
+if (ENABLE_MUTEX_STRESS_TEST)
+
+  add_executable(mutex-stress-test)
+  set_target_properties(mutex-stress-test PROPERTIES OUTPUT_NAME "mutex-stress-test")
+
+  target_compile_definitions(mutex-stress-test PRIVATE
+    # Use buffered write with caution, it occasionally hangs.
+    # OS_USE_TRACE_POSIX_FWRITE_STDOUT
+    OS_USE_TRACE_POSIX_STDOUT
+  )
+
+  # The compile options were defined globally.
+  target_compile_options(mutex-stress-test PRIVATE
+    # None.
+  )
+
+  # https://cmake.org/cmake/help/v3.20/manual/cmake-generator-expressions.7.html
+  target_link_options(mutex-stress-test PRIVATE
+    $<$<PLATFORM_ID:Linux,Windows>:-Wl,-Map,platform-bin/mutex-stress-test-map.txt>
+  )
+
+  target_link_libraries(mutex-stress-test PRIVATE
+    # Test library.
+    test::mutex-stress
+
+    # Tested library.
+    micro-os-plus::iii
+
+    # Platform specific dependencies.
+    micro-os-plus::platform
+  )
+
+  message(VERBOSE "A> mutex-stress-test")
+
+  add_test(
+    NAME "mutex-stress-test"
+    COMMAND mutex-stress-test
   )
 
 endif()

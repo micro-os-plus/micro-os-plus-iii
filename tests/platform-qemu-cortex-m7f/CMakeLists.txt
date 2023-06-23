@@ -123,3 +123,54 @@ if (ENABLE_RTOS_APIS_TEST)
 endif ()
 
 # -----------------------------------------------------------------------------
+
+if (ENABLE_MUTEX_STRESS_TEST)
+
+  add_executable(mutex-stress-test)
+  set_target_properties(mutex-stress-test PROPERTIES OUTPUT_NAME "mutex-stress-test")
+
+  target_compile_definitions(mutex-stress-test PRIVATE
+    OS_USE_SEMIHOSTING_SYSCALLS
+    OS_USE_TRACE_SEMIHOSTING_STDOUT
+  )
+
+  # The compile options were defined globally.
+  target_compile_options(mutex-stress-test PRIVATE
+    # None.
+  )
+
+  target_link_options(mutex-stress-test PRIVATE
+    -Wl,-Map,platform-bin/mutex-stress-test-map.txt
+  )
+
+  target_link_libraries(mutex-stress-test PRIVATE
+    # Test library.
+    test::mutex-stress
+
+    # Tested library.
+    micro-os-plus::iii
+
+    # Platform specific dependencies.
+    micro-os-plus::platform
+  )
+
+  xpack_add_cross_custom_commands("mutex-stress-test")
+
+  message(VERBOSE "A> mutex-stress-test")
+
+  add_test(
+    NAME "mutex-stress-test"
+
+    COMMAND qemu-system-arm${extension}
+      --machine mps2-an500
+      --cpu cortex-m7
+      --kernel mutex-stress-test.elf
+      --nographic
+      -d unimp,guest_errors
+      --semihosting-config enable=on,target=native,arg=mutex-stress-test
+      # --semihosting-config arg=--verbose
+    )
+
+endif ()
+
+# -----------------------------------------------------------------------------
