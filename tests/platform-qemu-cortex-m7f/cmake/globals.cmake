@@ -73,9 +73,28 @@ add_compile_options(
 
 # When `-flto` is used, the compile options must be passed to the linker too.
 add_link_options(
-  ${xpack_platform_common_args}
-  -Wl,--no-warn-rwx-segment
   -v
+  ${xpack_platform_common_args}
+
+  -nostartfiles
+  # --specs=rdimon.specs -Wl,--start-group -lgcc -lc -lc -lm -lrdimon -Wl,--end-group
+
+  # Force the linker to keep the interrupt vectors which otherwise
+  # are not referred from anywhere.
+  # -u_interrupt_vectors
+
+  # nano has no exceptions.
+  # -specs=nano.specs
+
+  -Wl,--gc-sections
+
+  -Wl,--no-warn-rwx-segment
+
+  # Including files from other packages is not very nice, but functional.
+  # Use absolute paths, otherwise set -L.
+  -T${CMAKE_SOURCE_DIR}/device-qemu-cortexm/linker-scripts/mem-mps2-an500.ld
+  -T${CMAKE_SOURCE_DIR}/device-qemu-cortexm/linker-scripts/sections-flash.ld
+  # -T${CMAKE_CURRENT_SOURCE_DIR}/linker-scripts/sections-ram.ld
 )
 
 # -----------------------------------------------------------------------------
