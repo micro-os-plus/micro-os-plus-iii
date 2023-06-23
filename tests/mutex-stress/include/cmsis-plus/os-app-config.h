@@ -32,6 +32,8 @@
 
 #else // native
 
+#define OS_INCLUDE_LIBUCONTEXT
+
 #define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES               (4*os::rtos::port::stack::default_size_bytes)
 
 #endif
