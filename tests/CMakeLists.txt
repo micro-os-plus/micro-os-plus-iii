@@ -98,11 +98,11 @@ add_subdirectory(".." "top-bin")
 # -----------------------------------------------------------------------------
 
 if(ENABLE_RTOS_APIS_TEST)
-  add_subdirectory("rtos-apis" "tests-bin")
+  add_subdirectory("rtos-apis")
 endif()
 
 if(ENABLE_MUTEX_STRESS_TEST)
-  add_subdirectory("mutex-stress" "tests-bin")
+  add_subdirectory("mutex-stress")
 endif()
 
 # -----------------------------------------------------------------------------
