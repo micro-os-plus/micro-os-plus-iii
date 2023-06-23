@@ -111,8 +111,8 @@ if (ENABLE_RTOS_APIS_TEST)
     NAME "rtos-apis-test"
 
     COMMAND qemu-system-arm${extension}
-      --machine mps2-an500
-      --cpu cortex-m7
+      --machine mps2-an385
+      --cpu cortex-m3
       --kernel rtos-apis-test.elf
       --nographic
       -d unimp,guest_errors
