@@ -94,14 +94,7 @@ if (ENABLE_RTOS_APIS_TEST)
 
   # https://cmake.org/cmake/help/v3.20/manual/cmake-generator-expressions.7.html
   target_link_options(rtos-apis-test PRIVATE
-    $<$<PLATFORM_ID:Windows>:-static>
-    $<$<AND:$<C_COMPILER_ID:GNU>,$<PLATFORM_ID:Darwin>>:-static-libgcc>
-    $<$<AND:$<C_COMPILER_ID:GNU>,$<PLATFORM_ID:Darwin>>:-static-libstdc++>
-    $<$<PLATFORM_ID:Darwin>:-Wl,-dead_strip>
-    $<$<PLATFORM_ID:Linux,Windows>:-Wl,--gc-sections>
     $<$<PLATFORM_ID:Linux,Windows>:-Wl,-Map,platform-bin/rtos-apis-test-map.txt>
-    $<$<AND:$<C_COMPILER_ID:Clang>,$<PLATFORM_ID:Linux>>:-fuse-ld=lld>
-    # -v
   )
 
   target_link_libraries(rtos-apis-test PRIVATE

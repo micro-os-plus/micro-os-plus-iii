@@ -68,6 +68,14 @@ add_compile_options(
 add_link_options(
   -v
   ${xpack_platform_common_args}
+
+  $<$<PLATFORM_ID:Windows>:-static>
+
+  $<$<AND:$<C_COMPILER_ID:GNU>,$<PLATFORM_ID:Darwin>>:-static-libgcc>
+  $<$<AND:$<C_COMPILER_ID:GNU>,$<PLATFORM_ID:Darwin>>:-static-libstdc++>
+
+  $<$<PLATFORM_ID:Darwin>:-Wl,-dead_strip>
+  $<$<PLATFORM_ID:Linux,Windows>:-Wl,--gc-sections>
 )
 
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang" )
