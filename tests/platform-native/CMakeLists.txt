@@ -168,3 +168,49 @@ if (ENABLE_MUTEX_STRESS_TEST)
 endif()
 
 # -----------------------------------------------------------------------------
+
+if (ENABLE_CMSIS_OS_VALIDATOR_TEST)
+
+  add_executable(cmsis-os-validator-test)
+  set_target_properties(cmsis-os-validator-test PROPERTIES OUTPUT_NAME "cmsis-os-validator-test")
+
+  target_compile_definitions(cmsis-os-validator-test PRIVATE
+    # Use buffered write with caution, it occasionally hangs.
+    # OS_USE_TRACE_POSIX_FWRITE_STDOUT
+    OS_USE_TRACE_POSIX_STDOUT
+  )
+
+  # The compile options were defined globally.
+  target_compile_options(cmsis-os-validator-test PRIVATE
+    # None.
+  )
+
+  # https://cmake.org/cmake/help/v3.20/manual/cmake-generator-expressions.7.html
+  target_link_options(cmsis-os-validator-test PRIVATE
+    $<$<PLATFORM_ID:Linux,Windows>:-Wl,-Map,platform-bin/cmsis-os-validator-test-map.txt>
+  )
+
+  target_link_libraries(cmsis-os-validator-test PRIVATE
+    # Test library.
+    test::cmsis-os-validator
+
+    # Tested library.
+    micro-os-plus::iii
+
+    # Portable dependencies.
+    xpacks::arm-cmsis-os-validator
+
+    # Platform specific dependencies.
+    micro-os-plus::platform
+  )
+
+  message(VERBOSE "A> cmsis-os-validator-test")
+
+  add_test(
+    NAME "cmsis-os-validator-test"
+    COMMAND cmsis-os-validator-test
+  )
+
+endif()
+
+# -----------------------------------------------------------------------------

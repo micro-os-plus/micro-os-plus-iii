@@ -22,7 +22,7 @@ set(xpack_dependencies_folders
 
   # The SOURCE_DIR is the `tests` folder.
   "${CMAKE_SOURCE_DIR}/device-qemu-cortexm"
-  # "${CMAKE_SOURCE_DIR}/xpacks/@xpacks/arm-cmsis-rtos-validator"
+  "${CMAKE_SOURCE_DIR}/xpacks/@xpacks/arm-cmsis-rtos-validator"
   "${CMAKE_SOURCE_DIR}/xpacks/@xpacks/chan-fatfs"
 
   # Build configuration dependencies.

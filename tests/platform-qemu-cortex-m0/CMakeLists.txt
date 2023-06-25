@@ -174,3 +174,57 @@ if (ENABLE_MUTEX_STRESS_TEST)
 endif ()
 
 # -----------------------------------------------------------------------------
+
+if (ENABLE_CMSIS_OS_VALIDATOR_TEST)
+
+  add_executable(cmsis-os-validator-test)
+  set_target_properties(cmsis-os-validator-test PROPERTIES OUTPUT_NAME "cmsis-os-validator-test")
+
+  target_compile_definitions(cmsis-os-validator-test PRIVATE
+    OS_USE_SEMIHOSTING_SYSCALLS
+    OS_USE_TRACE_SEMIHOSTING_STDOUT
+  )
+
+  # The compile options were defined globally.
+  target_compile_options(cmsis-os-validator-test PRIVATE
+    # None.
+  )
+
+  target_link_options(cmsis-os-validator-test PRIVATE
+    -Wl,-Map,platform-bin/cmsis-os-validator-test-map.txt
+  )
+
+  target_link_libraries(cmsis-os-validator-test PRIVATE
+    # Test library.
+    test::cmsis-os-validator
+
+    # Tested library.
+    micro-os-plus::iii
+
+    # Portable dependencies.
+    xpacks::arm-cmsis-os-validator
+
+    # Platform specific dependencies.
+    micro-os-plus::platform
+  )
+
+  xpack_add_cross_custom_commands("cmsis-os-validator-test")
+
+  message(VERBOSE "A> cmsis-os-validator-test")
+
+  add_test(
+    NAME "cmsis-os-validator-test"
+
+    COMMAND qemu-system-arm${extension}
+      --machine mps2-an385
+      --cpu cortex-m3
+      --kernel cmsis-os-validator-test.elf
+      --nographic
+      -d unimp,guest_errors
+      --semihosting-config enable=on,target=native,arg=cmsis-os-validator-test
+      # --semihosting-config arg=--verbose
+    )
+
+endif ()
+
+# -----------------------------------------------------------------------------
