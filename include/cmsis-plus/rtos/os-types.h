@@ -20,7 +20,9 @@
 // This file is included at the end of os-decls.h.
 
 // Include the application specific definitions.
+#if defined(OS_USE_OS_APP_CONFIG_H)
 #include <cmsis-plus/os-app-config.h>
+#endif
 #include <memory>
 
 // ----------------------------------------------------------------------------

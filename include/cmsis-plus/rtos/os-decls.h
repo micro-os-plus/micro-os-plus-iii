@@ -18,7 +18,9 @@
 #include <cmsis-plus/os-versions.h>
 
 // Include the application specific definitions.
+#if defined(OS_USE_OS_APP_CONFIG_H)
 #include <cmsis-plus/os-app-config.h>
+#endif
 // Include the non-portable portable types, enums and constants declarations.
 #include <cmsis-plus/rtos/port/os-decls.h>
 
