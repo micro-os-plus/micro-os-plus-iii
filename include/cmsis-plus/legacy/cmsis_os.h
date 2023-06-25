@@ -84,6 +84,14 @@
 #ifndef CMSIS_OS_H_
 #define CMSIS_OS_H_
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#if !defined(__cplusplus)
+#pragma GCC diagnostic ignored "-Wc++-compat"
+#endif
+#endif
+
 /// @note MUST REMAIN UNCHANGED: @b osCMSIS identifies the CMSIS-RTOS API version.
 #define osCMSIS           0x00010002 ///< API version (main [31:16] .sub [15:0])
 
@@ -1321,5 +1329,7 @@ const osMailQDef_t os_mailQ_def_##name = { \
 #ifdef  __cplusplus
 }
 #endif
+
+#pragma GCC diagnostic pop
 
 #endif  /* CMSIS_OS_H_ */
