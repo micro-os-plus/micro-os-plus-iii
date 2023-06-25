@@ -45,6 +45,7 @@ add_library(micro-os-plus-iii-interface INTERFACE EXCLUDE_FROM_ALL)
 
 target_include_directories(micro-os-plus-iii-interface INTERFACE
   "include"
+  "include/cmsis-plus/legacy"
 )
 
 target_sources(micro-os-plus-iii-interface INTERFACE
