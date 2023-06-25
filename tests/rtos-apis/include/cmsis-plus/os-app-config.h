@@ -47,7 +47,7 @@
 
 #define OS_DISABLE_RESET_HARDWARE
 
-#else // native
+#elif defined(__APPLE__) || defined(__linux__)
 
 #define OS_INCLUDE_LIBUCONTEXT
 
