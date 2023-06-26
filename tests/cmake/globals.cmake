@@ -16,7 +16,7 @@
 # Must be added with `include()` in the `tests` scope before the platform
 # globals.
 
-message(VERBOSE "Including global definitions...")
+message(VERBOSE "Including top global definitions...")
 
 # -----------------------------------------------------------------------------
 
@@ -45,7 +45,8 @@ set(global_common_options
 
   -fdiagnostics-color=always
 
-  # $<$<CONFIG:Debug>:-g>
+  # No need, the toolchain does it.
+  # $<$<CONFIG:Debug>:${DEBUG_OPTION}>
 )
 
 add_compile_options(
