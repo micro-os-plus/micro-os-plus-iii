@@ -36,6 +36,11 @@ extern uint32_t __stack;
 typedef void
 (*handler_ptr_t)(void);
 
+// WDT_IRQHandler (Arm Generic CM devices)
+// WWDG_IRQHandler (STM devices)
+void __attribute__ ((weak, alias("Default_Handler")))
+WDT_IRQHandler(void);
+
 // ----------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
@@ -82,7 +87,9 @@ handler_ptr_t _interrupt_vectors[] =
 
     // ------------------------------------------------------------------------
     // External Interrupts
-    // Not used by the generic QEMU machine.
+    // WDT is the name used by the generic Arm CM devices.
+    // Here
+    WDT_IRQHandler
 };
 
 #pragma GCC diagnostic pop
