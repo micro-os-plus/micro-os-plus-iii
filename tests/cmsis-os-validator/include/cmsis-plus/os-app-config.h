@@ -23,10 +23,11 @@
 
 // With 4 bits NVIC, there are 16 levels, 0 = highest, 15 = lowest
 
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
-// Disable all interrupts from 15 to 4, keep 3-2-1 enabled
-#define OS_INTEGER_RTOS_CRITICAL_SECTION_INTERRUPT_PRIORITY (4)
-#endif // defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+// assertion "port::interrupts::is_priority_valid ()" failed
+// #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+// // Disable all interrupts from 15 to 4, keep 3-2-1 enabled
+// #define OS_INTEGER_RTOS_CRITICAL_SECTION_INTERRUPT_PRIORITY (4)
+// #endif // defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
 
 #define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES               (4000)
 
