@@ -46,9 +46,16 @@ For Cortex-M tests, the toolchain is arm-none-eabi-gcc 12.
 
 ## Tests details
 
+To run the tests in a forever loop:
+
 ```sh
 set -e
-while (true); do xpm run test-all -C '/Users/ilg/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests'; done
+while (true); do xpm run test-cortex-cmake -C "${HOME}/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests"; done
+```
+
+```sh
+set -e
+while (true); do xpm run test-all -C "${HOME}/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests"; done
 ```
 
 ### rtos
