@@ -86,10 +86,12 @@
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
 #elif defined(__GNUC__)
 #if !defined(__cplusplus)
 #pragma GCC diagnostic ignored "-Wc++-compat"
 #endif
+#pragma GCC diagnostic ignored "-Wpadded"
 #endif
 
 /// @note MUST REMAIN UNCHANGED: @b osCMSIS identifies the CMSIS-RTOS API version.
