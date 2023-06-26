@@ -31,7 +31,7 @@ add_library(platform-qemu-cortex-m7f-interface INTERFACE EXCLUDE_FROM_ALL)
 # -----------------------------------------------------------------------------
 
 target_include_directories(platform-qemu-cortex-m7f-interface INTERFACE
-  # None.
+  "include"
 )
 
 target_sources(platform-qemu-cortex-m7f-interface INTERFACE

@@ -13,6 +13,8 @@
 #ifndef CMSIS_PLUS_RTOS_OS_APP_CONFIG_H_
 #define CMSIS_PLUS_RTOS_OS_APP_CONFIG_H_
 
+#include "cmsis-plus/platform.h"
+
 // ----------------------------------------------------------------------------
 
 #define OS_INTEGER_SYSTICK_FREQUENCY_HZ                     (1000)

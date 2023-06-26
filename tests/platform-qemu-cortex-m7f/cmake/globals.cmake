@@ -15,7 +15,7 @@
 # This file defines the global compiler settings that apply to all targets.
 # Must be included with include() in the `tests` scope.
 
-message(VERBOSE "Including platform-qemu-cortex-m7f globals...")
+message(VERBOSE "Including platform-qemu-cortex-m7f global definitions...")
 
 # -----------------------------------------------------------------------------
 

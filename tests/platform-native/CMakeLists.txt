@@ -30,7 +30,7 @@ add_library(platform-native-interface INTERFACE EXCLUDE_FROM_ALL)
 # -----------------------------------------------------------------------------
 
 target_include_directories(platform-native-interface INTERFACE
-  # None
+  "include"
 )
 
 target_sources(platform-native-interface INTERFACE
