@@ -106,6 +106,10 @@ if(ENABLE_MUTEX_STRESS_TEST)
   add_subdirectory("mutex-stress")
 endif()
 
+if(ENABLE_CMSIS_OS_VALIDATOR_TEST)
+  add_subdirectory("cmsis-os-validator")
+endif()
+
 # -----------------------------------------------------------------------------
 ## The platform specific path, where the tests are defined ##
 
