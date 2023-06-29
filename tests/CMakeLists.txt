@@ -84,12 +84,12 @@ endif()
 # compiled sources, from all libraries.
 
 # Top global definitions, common to all platforms.
-include("cmake/globals.cmake")
+include("cmake/common.cmake")
 
 # Platform global definitions.
-include("platform-${PLATFORM_NAME}/cmake/globals.cmake")
+include("platform-${PLATFORM_NAME}/cmake/common.cmake")
 
-xpack_display_global_lists()
+# xpack_display_global_lists()
 
 # -----------------------------------------------------------------------------
 ## Dependencies ##

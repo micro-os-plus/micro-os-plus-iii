@@ -16,16 +16,14 @@
 # Must be added with `include()` in the `tests` scope before the platform
 # globals.
 
-message(VERBOSE "Including top global definitions...")
+message(VERBOSE "Including top common definitions...")
 
 # -----------------------------------------------------------------------------
 
-include_directories(
-  # Folders are relative to `tests`.
-)
+add_library(micro-os-plus-common-interface INTERFACE EXCLUDE_FROM_ALL)
 
 # https://cmake.org/cmake/help/v3.20/command/add_compile_definitions.html
-add_compile_definitions(
+target_compile_definitions(micro-os-plus-common-interface INTERFACE
   # NDEBUG is provided by the toolchain definitions on release.
 
   $<$<CONFIG:Debug>:DEBUG>
@@ -35,7 +33,6 @@ add_compile_definitions(
 )
 
 set(global_common_options
-
   -fmessage-length=0
   -fsigned-char
 
@@ -49,21 +46,29 @@ set(global_common_options
   # $<$<CONFIG:Debug>:${DEBUG_OPTION}>
 )
 
-add_compile_options(
-  ${global_common_options}
-)
-
-# When `-flto` is used, the compile options must be passed to the linker too.
-add_link_options(
-  ${global_common_options}
-)
-
 # A list of all imaginable warnings.
 # Targets may add options to disable some of them.
 xpack_set_all_compiler_warnings(all_warnings)
 
-add_compile_options(
+target_compile_options(micro-os-plus-common-interface INTERFACE
+  ${global_common_options}
   ${all_warnings}
 )
+
+# When `-flto` is used, the compile options must be passed to the linker too.
+target_link_options(micro-os-plus-common-interface INTERFACE
+  ${global_common_options}
+)
+
+if (COMMAND xpack_display_target_lists)
+  xpack_display_target_lists(micro-os-plus-common-interface)
+endif()
+
+# -----------------------------------------------------------------------------
+# Aliases.
+
+# https://cmake.org/cmake/help/v3.20/command/add_library.html#alias-libraries
+add_library(micro-os-plus::common ALIAS micro-os-plus-common-interface)
+message(VERBOSE "> micro-os-plus::common -> micro-os-plus-common-interface")
 
 # -----------------------------------------------------------------------------
