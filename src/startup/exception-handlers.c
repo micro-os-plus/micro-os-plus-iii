@@ -23,6 +23,7 @@
 #if defined(OS_USE_OS_APP_CONFIG_H)
 #include <cmsis-plus/os-app-config.h>
 #endif
+
 #include <cmsis-plus/rtos/port/os-c-decls.h>
 
 #include <cmsis_device.h>
@@ -34,8 +35,13 @@
 
 // ----------------------------------------------------------------------------
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wredundant-decls"
+
 extern void __attribute__((noreturn,weak))
 _start (void);
+
+#pragma GCC diagnostic pop
 
 extern unsigned int _Heap_Limit;
 extern unsigned int __stack;
