@@ -13,6 +13,10 @@
 #include <cstdio>
 #include <cstdint>
 
+#if defined(OS_USE_OS_APP_CONFIG_H)
+#include <cmsis-plus/os-app-config.h>
+#endif
+
 #include <test-iso-api.h>
 #include <cmsis-plus/estd/chrono>
 #include <cmsis-plus/estd/condition_variable>

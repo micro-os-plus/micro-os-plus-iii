@@ -16,6 +16,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if defined(OS_USE_OS_APP_CONFIG_H)
+#include <cmsis-plus/os-app-config.h>
+#endif
+
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/memory/block-pool.h>
 #include <cmsis-plus/memory/lifo.h>

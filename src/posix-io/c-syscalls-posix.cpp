@@ -10,6 +10,10 @@
  * be obtained from https://opensource.org/licenses/mit/.
  */
 
+#if defined(OS_USE_OS_APP_CONFIG_H)
+#include <cmsis-plus/os-app-config.h>
+#endif
+
 #if !defined(OS_USE_SEMIHOSTING_SYSCALLS)
 
 #include <cmsis-plus/rtos/os.h>

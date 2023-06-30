@@ -10,6 +10,10 @@
  * be obtained from https://opensource.org/licenses/mit/.
  */
 
+#if defined(OS_USE_OS_APP_CONFIG_H)
+#include <cmsis-plus/os-app-config.h>
+#endif
+
 #include <cmsis-plus/posix-io/device.h>
 #include <cmsis-plus/posix/sys/uio.h>
 #include <cmsis-plus/posix-io/device-registry.h>

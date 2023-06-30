@@ -18,6 +18,10 @@
  * References are to ISO/IEC 14882:2011(E) Third edition (2011-09-01).
  */
 
+#if defined(OS_USE_OS_APP_CONFIG_H)
+#include <cmsis-plus/os-app-config.h>
+#endif
+
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/estd/memory_resource>
 #include <cmsis-plus/memory/malloc.h>
