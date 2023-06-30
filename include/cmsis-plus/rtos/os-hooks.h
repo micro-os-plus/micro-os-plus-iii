@@ -37,6 +37,7 @@ extern "C"
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wreserved-identifier"
 #endif
+#pragma GCC diagnostic ignored "-Wredundant-decls"
   /**
    * @brief The standard C application entry point.
    * @par Parameters
