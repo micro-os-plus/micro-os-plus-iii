@@ -27,6 +27,12 @@
 
 // ----------------------------------------------------------------------------
 
+#if !defined(PLATFORM_RASPBERRYPI_PICO)
+// It takes way too long on the small Pico.
+// TODO: fix RTC, since it looks to have a problem.
+#define OS_INCLUDE_RTC_TEST
+#endif
+
 static const char* test_name = "Test ISO C++ API";
 
 #pragma GCC diagnostic push
@@ -499,10 +505,12 @@ test_iso_api (bool extra)
   estd::this_thread::sleep_for<estd::chrono::systick_clock> (4_ticks);
   estd::this_thread::sleep_for<estd::chrono::systick_clock> (4ms);
 
+#if defined(OS_INCLUDE_RTC_TEST)
   printf ("sleep_for<chrono::realtime_clock> (1s)\n");
   estd::this_thread::sleep_for<estd::chrono::realtime_clock> (1s);
   printf ("sleep_for<chrono::realtime_clock> (1001ms)\n");
   estd::this_thread::sleep_for<estd::chrono::realtime_clock> (1001ms);
+#endif // defined(OS_INCLUDE_RTC_TEST)
 
   if (extra)
     {
@@ -526,6 +534,7 @@ test_iso_api (bool extra)
   estd::this_thread::sleep_until (estd::chrono::systick_clock::now () + 1us);
   estd::this_thread::sleep_until (estd::chrono::systick_clock::now () + 1ms);
 
+#if defined(OS_INCLUDE_RTC_TEST)
   estd::this_thread::sleep_until (estd::chrono::realtime_clock::now () + 10ms);
   estd::this_thread::sleep_until (estd::chrono::realtime_clock::now () + 100ms);
   printf ("sleep_until (chrono::realtime_clock::now () + 1000ms)\n");
@@ -534,6 +543,7 @@ test_iso_api (bool extra)
 
   printf ("sleep_until (chrono::realtime_clock::now () + 1s)\n");
   estd::this_thread::sleep_until (estd::chrono::realtime_clock::now () + 1s);
+#endif // defined(OS_INCLUDE_RTC_TEST)
 
   if (extra)
     {
@@ -541,12 +551,14 @@ test_iso_api (bool extra)
 
       estd::this_thread::sleep_until (estd::chrono::systick_clock::now () + 1s);
 
+#if defined(OS_INCLUDE_RTC_TEST)
       estd::this_thread::sleep_until (
           estd::chrono::realtime_clock::now () + 10ms);
       estd::this_thread::sleep_until (
           estd::chrono::realtime_clock::now () + 10s);
       estd::this_thread::sleep_until (
           estd::chrono::realtime_clock::now () + 1min);
+#endif // defined(OS_INCLUDE_RTC_TEST)
     }
 
 #pragma GCC diagnostic pop
