@@ -27,11 +27,7 @@
 
 // ----------------------------------------------------------------------------
 
-#if !defined(MICRO_OS_PLUS_PLATFORM_RASPBERRYPI_PICO)
-// It takes way too long on the small Pico.
-// TODO: fix RTC, since it looks to have a problem.
 #define OS_INCLUDE_RTC_TEST
-#endif
 
 static const char* test_name = "Test ISO C++ API";
 

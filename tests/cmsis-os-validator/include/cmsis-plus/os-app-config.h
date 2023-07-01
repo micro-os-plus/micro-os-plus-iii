@@ -39,7 +39,7 @@
 
 #define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES               (4*os::rtos::port::stack::default_size_bytes)
 
-#endif
+#endif // architecture
 
 // ----------------------------------------------------------------------------
 
@@ -61,38 +61,49 @@
 
 // ----------------------------------------------------------------------------
 
-#if 0
-#define OS_TRACE_RTOS_CLOCKS
-#define OS_TRACE_RTOS_CONDVAR
-#define OS_TRACE_RTOS_EVFLAGS
-#define OS_TRACE_RTOS_LISTS
-#define OS_TRACE_RTOS_MEMPOOL
-#define OS_TRACE_RTOS_MQUEUE
-#define OS_TRACE_RTOS_MUTEX
-#define OS_TRACE_RTOS_RTC_TICK
-#define OS_TRACE_RTOS_SCHEDULER
-#define OS_TRACE_RTOS_SEMAPHORE
-#define OS_TRACE_RTOS_SYSCLOCK_TICK
-#define OS_TRACE_RTOS_THREAD
-#define OS_TRACE_RTOS_THREAD_CONTEXT
-#define OS_TRACE_RTOS_THREAD_FLAGS
-#define OS_TRACE_RTOS_TIMER
-
-#define OS_TRACE_LIBC_MALLOC
-#define OS_TRACE_LIBC_ATEXIT
-#endif
-
 #if defined(DEBUG)
-// #define OS_TRACE_RTOS_LISTS
+
 // #define OS_TRACE_RTOS_CLOCKS
+// #define OS_TRACE_RTOS_CONDVAR
+// #define OS_TRACE_RTOS_EVFLAGS
+// #define OS_TRACE_RTOS_MEMPOOL
+// #define OS_TRACE_RTOS_MQUEUE
+// #define OS_TRACE_RTOS_MUTEX
+#define OS_TRACE_RTOS_RTC_TICK
+// #define OS_TRACE_RTOS_SCHEDULER
+// #define OS_TRACE_RTOS_SEMAPHORE
+// #define OS_TRACE_RTOS_SYSCLOCK_TICK
+// #define OS_TRACE_RTOS_THREAD
+// #define OS_TRACE_RTOS_THREAD_FLAGS
+// #define OS_TRACE_RTOS_TIMER
+
 #define OS_TRACE_LIBC_MALLOC
 #define OS_TRACE_LIBC_ATEXIT
-// #define OS_TRACE_RTOS_MUTEX
-// #define OS_TRACE_RTOS_THREAD
+// #define OS_TRACE_LIBCPP_OPERATOR_NEW
+// #define OS_TRACE_LIBCPP_MEMORY_RESOURCE
+
+#if !defined(__ARM_EABI__) || defined(OS_USE_TRACE_SEGGER_RTT)
+// #define OS_TRACE_RTOS_LISTS
+// #define OS_TRACE_RTOS_LISTS_CLOCKS
 // #define OS_TRACE_RTOS_THREAD_CONTEXT
 #endif
-#define OS_TRACE_RTOS_RTC_TICK
-//#define OS_TRACE_RTOS_SYSCLOCK_TICK
+
+// #define OS_TRACE_POSIX_IO_DEVICE
+// #define OS_TRACE_POSIX_IO_CHAR_DEVICE
+// #define OS_TRACE_POSIX_IO_BLOCK_DEVICE
+// #define OS_TRACE_POSIX_IO_BLOCK_DEVICE_PARTITION
+// #define OS_TRACE_POSIX_IO_DIRECTORY
+// #define OS_TRACE_POSIX_IO_FILE
+// #define OS_TRACE_POSIX_IO_FILE_DESCRIPTORS_MANAGER
+// #define OS_TRACE_POSIX_IO_FILE_SYSTEM
+// #define OS_TRACE_POSIX_IO_IO
+// #define OS_TRACE_POSIX_IO_NET_INTERFACE
+// #define OS_TRACE_POSIX_IO_NET_STACK
+// #define OS_TRACE_POSIX_IO_SOCKET
+// #define OS_TRACE_POSIX_IO_TTY
+// #define OS_TRACE_POSIX_IO_CHAN_FATFS
+
+#endif // defined(DEBUG)
 
 // ----------------------------------------------------------------------------
 
