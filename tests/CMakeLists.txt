@@ -65,8 +65,8 @@ xpack_display_greetings("${CMAKE_CURRENT_SOURCE_DIR}/../package.json")
 
 # CMAKE_BUILD_TYPE: Debug, Release, RelWithDebInfo, MinSizeRel
 
-# set(ENABLE_RTOS_APIS_TEST true)
-# set(ENABLE_MUTEX_STRESS_TEST true)
+set(ENABLE_RTOS_APIS_TEST true)
+set(ENABLE_MUTEX_STRESS_TEST true)
 set(ENABLE_CMSIS_OS_VALIDATOR_TEST true)
 
 # -----------------------------------------------------------------------------
