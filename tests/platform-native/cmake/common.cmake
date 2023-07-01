@@ -19,6 +19,6 @@ message(VERBOSE "Including platform-native common definitions...")
 
 # -----------------------------------------------------------------------------
 
-set(xpack_platform_compile_definition "PLATFORM_NATIVE")
+set(xpack_platform_compile_definition "MICRO_OS_PLUS_PLATFORM_NATIVE")
 
 # -----------------------------------------------------------------------------

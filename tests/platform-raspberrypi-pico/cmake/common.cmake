@@ -20,9 +20,9 @@ message(VERBOSE "Including platform-raspberrypi-pico global definitions...")
 # -----------------------------------------------------------------------------
 
 # Required in devices-qemu-cortexm.
-set(xpack_device_compile_definition "DEVICE_RASPBERRYPI_RP2040")
+set(xpack_device_compile_definition "MICRO_OS_PLUS_DEVICE_RASPBERRYPI_RP2040")
 
-set(xpack_platform_compile_definition "PLATFORM_RASPBERRYPI_PICO")
+set(xpack_platform_compile_definition "MICRO_OS_PLUS_PLATFORM_RASPBERRYPI_PICO")
 
 target_compile_options(micro-os-plus-common-interface INTERFACE
 
