@@ -849,6 +849,11 @@
 #define OS_TRACE_RTOS_SYSCLOCK_TICK
 
 /**
+ * @brief Display a pair of {t t} when entering/exiting the timer handler.
+ */
+#define OS_TRACE_RTOS_SYSCLOCK_TICK_BRACES
+
+/**
  * @brief Enable trace messages for RTOS thread functions.
  */
 #define OS_TRACE_RTOS_THREAD
