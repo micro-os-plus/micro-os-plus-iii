@@ -239,8 +239,7 @@ SECTIONS
 		*(.data_begin .data_begin.*)
 
         /* Pico specific since flash is slow */
-        *(vtable)					/* C++ virtual tables */
- 		/* read-only data (constants) */
+ 		/* read-only data (constants); C++ virtual tables are in rodata */
         *(.rodata .rodata.* .constdata .constdata.*)
 
 		*(.data .data.*)
