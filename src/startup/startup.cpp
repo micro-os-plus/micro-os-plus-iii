@@ -353,6 +353,8 @@ _start (void)
   // trace_printf() calls are available (including in static constructors).
   trace_initialize ();
 
+  trace_puts (""); // Empty line
+
   trace_printf ("Hardware initialised\n");
   trace_printf ("Main stack %p-%p\n", &_Heap_Limit, &__stack);
 
