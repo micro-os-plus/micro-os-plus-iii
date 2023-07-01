@@ -75,7 +75,15 @@
         "xpm run link-deps --config native-cmake-clang14-debug",
         "xpm run link-deps --config native-cmake-clang14-release",
         "xpm run link-deps --config native-cmake-clang15-debug",
-        "xpm run link-deps --config native-cmake-clang15-release"
+        "xpm run link-deps --config native-cmake-clang15-release",
+        "xpm run link-deps --config qemu-cortex-m0-cmake-debug",
+        "xpm run link-deps --config qemu-cortex-m0-cmake-release",
+        "xpm run link-deps --config qemu-cortex-m3-cmake-debug",
+        "xpm run link-deps --config qemu-cortex-m3-cmake-release",
+        "xpm run link-deps --config qemu-cortex-m7f-cmake-debug",
+        "xpm run link-deps --config qemu-cortex-m7f-cmake-release",
+        "xpm run link-deps --config raspberrypi-pico-cmake-debug",
+        "xpm run link-deps --config raspberrypi-pico-cmake-release"
       ],
       "test-all": [
         "xpm run test-native-cmake",
@@ -191,6 +199,14 @@
         "xpm run build --config qemu-cortex-m7f-cmake-release",
         "xpm run test --config qemu-cortex-m7f-cmake-release"
       ],
+      "test-raspberrypi-pico-cmake": [
+        "xpm run prepare --config raspberrypi-pico-cmake-debug",
+        "xpm run build --config raspberrypi-pico-cmake-debug",
+        "xpm run test --config raspberrypi-pico-cmake-debug",
+        "xpm run prepare --config raspberrypi-pico-cmake-release",
+        "xpm run build --config raspberrypi-pico-cmake-release",
+        "xpm run test --config raspberrypi-pico-cmake-release"
+      ],
       "clean-all": [
         "xpm run clean-native-cmake",
         "xpm run clean-cortex-cmake"
@@ -221,7 +237,9 @@
         "xpm run clean --config qemu-cortex-m3-cmake-debug --ignore-errors",
         "xpm run clean --config qemu-cortex-m3-cmake-release --ignore-errors",
         "xpm run clean --config qemu-cortex-m7f-cmake-debug --ignore-errors",
-        "xpm run clean --config qemu-cortex-m7f-cmake-release --ignore-errors"
+        "xpm run clean --config qemu-cortex-m7f-cmake-release --ignore-errors",
+        "xpm run clean --config raspberrypi-pico-cmake-debug --ignore-errors",
+        "xpm run clean --config raspberrypi-pico-cmake-release --ignore-errors"
       ],
       "deep-clean": "del-cli build node_modules xpacks package-lock.json"
     },
@@ -232,7 +250,7 @@
           "prepare": "{{ properties.commandCMakePrepareWithToolchain }}",
           "build": [
             "{{ properties.commandCMakeReconfigure }}",
-            "{{ properties.commandCMakeBuild }}"
+            "{{ properties.commandCMakeBuildVerbose }}"
           ],
           "test": "{{ properties.commandCMakePerformTests }}",
           "clean": "{{ properties.commandCMakeClean }}"
@@ -614,6 +632,45 @@
         "properties": {
           "buildType": "MinSizeRel",
           "shortConfigurationName": "m7fr"
+        }
+      },
+      "raspberrypi-pico-cmake-debug": {
+        "inherit": [
+          "cortexm-actions",
+          "cmake-actions",
+          "cortexm-dependencies",
+          "arm-none-eabi-gcc-dependencies",
+          "short-win-paths-properties"
+        ],
+        "properties": {
+          "buildType": "Debug",
+          "platformName": "raspberrypi-pico",
+          "toolchainFileName": "arm-none-eabi-gcc.cmake",
+          "shortConfigurationName": "rpd"
+        },
+        "devDependencies": {
+          "@xpack-3rd-party/raspberrypi-pico-sdk": "github:xpack-3rd-party/raspberrypi-pico-sdk-xpack#xpack-develop",
+          "@xpack-dev-tools/openocd": {
+            "specifier": "0.12.0-1.1",
+            "local": "link",
+            "platforms": "all"
+          }
+        },
+        "actions": {
+          "link-deps": [
+            "xpm link @micro-os-plus/micro-os-plus-iii-posix-arch --config {{ configuration.name }}",
+            "xpm link @xpack-3rd-party/libucontext --config {{ configuration.name }}",
+            "xpm link @xpack-3rd-party/raspberrypi-pico-sdk --config {{ configuration.name }}"
+          ]
+        }
+      },
+      "raspberrypi-pico-cmake-release": {
+        "inherit": [
+          "raspberrypi-pico-cmake-debug"
+        ],
+        "properties": {
+          "buildType": "MinSizeRel",
+          "shortConfigurationName": "rpr"
         }
       }
     }

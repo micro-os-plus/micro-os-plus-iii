@@ -1,0 +1,438 @@
+/*
+ * Default linker script for Cortex-M (it includes specifics for STM32F[34]xx).
+ *
+ * To make use of the multi-region initialisations, define
+ * OS_INCLUDE_STARTUP_INIT_MULTIPLE_RAM_SECTIONS for the _startup.c file.
+ */
+
+
+/*
+ * The entry point is informative, for debuggers and simulators,
+ * since the Cortex-M vector points to it anyway.
+ */
+ENTRY(_start)
+
+
+/* Sections Definitions */
+
+SECTIONS
+{
+    /* Second stage bootloader is prepended to the image. It must be 256 bytes big
+       and checksummed. It is usually built by the boot_stage2 target
+       in the Raspberry Pi Pico SDK
+    */
+
+    .boot2 : {
+        __boot2_start__ = .;
+        KEEP (*(.boot2))
+        __boot2_end__ = .;
+    } > FLASH
+
+    ASSERT(__boot2_end__ - __boot2_start__ == 256,
+        "ERROR: Pico second stage bootloader must be 256 bytes in size")
+
+    /*
+     * For Cortex-M devices, the beginning of the startup code is stored in
+     * the .isr_vector section, which goes to FLASH.
+     */
+    .isr_vector : ALIGN(4)
+    {
+        FILL(0xFF)
+
+        /* Pico specific */
+        __logical_binary_start = .;
+
+        __vectors_start = ABSOLUTE(.) ;
+        __vectors_start__ = ABSOLUTE(.) ; /* STM specific definition */
+        KEEP(*(.isr_vector))     	/* Interrupt vectors */
+
+		KEEP(*(.cfmconfig))			/* Freescale configuration words */
+
+        /* Pico specific */
+        KEEP (*(.binary_info_header))
+        __binary_info_header_end = .;
+
+        /*
+         * This section is here for convenience, to store the
+         * startup code at the beginning of the flash area, hoping that
+         * this will increase the readability of the listing.
+         */
+        *(.after_vectors .after_vectors.*)	/* Startup code and ISR */
+
+    } >FLASH
+
+    .inits : ALIGN(4)
+    {
+        /*
+         * Memory regions initialisation arrays.
+         *
+         * Thee are two kinds of arrays for each RAM region, one for
+         * data and one for bss. Each is iterrated at startup and the
+         * region initialisation is performed.
+         *
+         * The data array includes:
+         * - from (LOADADDR())
+         * - region_begin (ADDR())
+         * - region_end (ADDR()+SIZEOF())
+         *
+         * The bss array includes:
+         * - region_begin (ADDR())
+         * - region_end (ADDR()+SIZEOF())
+         *
+         * WARNING: It is mandatory that the regions are word aligned,
+         * since the initialisation code works only on words.
+         */
+
+        __data_regions_array_start = .;
+
+        LONG(LOADADDR(.data));
+        LONG(ADDR(.data));
+        LONG(ADDR(.data)+SIZEOF(.data));
+
+        __data_regions_array_end = .;
+
+        __bss_regions_array_start = .;
+
+        LONG(ADDR(.bss));
+        LONG(ADDR(.bss)+SIZEOF(.bss));
+
+        __bss_regions_array_end = .;
+
+        /* End of memory regions initialisation arrays. */
+
+        /*
+         * These are the old initialisation sections, intended to contain
+         * naked code, with the prologue/epilogue added by crti.o/crtn.o
+         * when linking with startup files. The standalone startup code
+         * currently does not run these, better use the init arrays below.
+         */
+		KEEP(*(.init))
+		KEEP(*(.fini))
+
+		. = ALIGN(4);
+
+		/*
+         * The preinit code, i.e. an array of pointers to initialisation
+         * functions to be performed before constructors.
+         */
+		PROVIDE_HIDDEN (__preinit_array_start = .);
+
+        /*
+         * Used to run the SystemInit() before anything else.
+         */
+		KEEP(*(.preinit_array_sysinit .preinit_array_sysinit.*))
+
+        /*
+         * Used for other platform inits.
+         */
+		KEEP(*(.preinit_array_platform .preinit_array_platform.*))
+
+        /*
+         * The application inits. If you need to enforce some order in
+         * execution, create new sections, as before.
+         */
+		KEEP(*(.preinit_array .preinit_array.*))
+
+		PROVIDE_HIDDEN (__preinit_array_end = .);
+
+		. = ALIGN(4);
+
+		/*
+         * The init code, i.e. an array of pointers to static constructors.
+         */
+		PROVIDE_HIDDEN (__init_array_start = .);
+		KEEP(*(SORT(.init_array.*)))
+		KEEP(*(.init_array))
+		PROVIDE_HIDDEN (__init_array_end = .);
+
+		. = ALIGN(4);
+
+		/*
+         * The fini code, i.e. an array of pointers to static destructors.
+         */
+		PROVIDE_HIDDEN (__fini_array_start = .);
+		KEEP(*(SORT(.fini_array.*)))
+		KEEP(*(.fini_array))
+		PROVIDE_HIDDEN (__fini_array_end = .);
+
+    } >FLASH
+
+    /*
+     * For some STRx devices, the beginning of the startup code
+     * is stored in the .flashtext section, which goes to FLASH.
+     */
+    .flashtext : ALIGN(4)
+    {
+        *(.flashtext .flashtext.*)	/* Startup code */
+    } >FLASH
+
+
+    /*
+     * The program code is stored in the .text section,
+     * which goes to FLASH.
+     */
+    .text : ALIGN(4)
+    {
+        *(.text .text.*)			/* all remaining code */
+
+		KEEP(*(.eh_frame*))
+
+		/*
+		 * Stub sections generated by the linker, to glue together
+		 * ARM and Thumb code. .glue_7 is used for ARM code calling
+		 * Thumb code, and .glue_7t is used for Thumb code calling
+		 * ARM code. Apparently always generated by the linker, for some
+		 * architectures, so better leave them here.
+		 */
+        *(.glue_7)
+        *(.glue_7t)
+
+    } >FLASH
+
+	/* ARM magic sections */
+	.ARM.extab : ALIGN(4)
+   	{
+       *(.ARM.extab* .gnu.linkonce.armextab.*)
+   	} > FLASH
+
+    . = ALIGN(4);
+   	__exidx_start = .;
+   	.ARM.exidx : ALIGN(4)
+   	{
+       *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+   	} > FLASH
+   	__exidx_end = .;
+
+    . = ALIGN(4);
+    _etext = .;
+    __etext = .;
+
+    /* MEMORY_ARRAY */
+    /*
+    .ROarraySection :
+    {
+     	*(.ROarraySection .ROarraySection.*)
+    } >MEMORY_ARRAY
+    */
+
+	/*
+     * This address is used by the startup code to
+     * initialise the .data section.
+     */
+    _sidata = LOADADDR(.data);
+
+    /*
+     * The initialised data section.
+     *
+     * The program executes knowing that the data is in the RAM
+     * but the loader puts the initial values in the FLASH (inidata).
+     * It is one task of the startup to copy the initial values from
+     * FLASH to RAM.
+     */
+    .data : ALIGN(4)
+    {
+    	FILL(0xFF)
+        /* This is used by the startup code to initialise the .data section */
+        _sdata = . ;        	/* STM specific definition */
+        __data_start__ = . ;
+
+		*(.data_begin .data_begin.*)
+
+        /* Pico specific since flash is slow */
+        *(vtable)					/* C++ virtual tables */
+ 		/* read-only data (constants) */
+        *(.rodata .rodata.* .constdata .constdata.*)
+
+		*(.data .data.*)
+
+		*(.data_end .data_end.*)
+	    . = ALIGN(4);
+
+	    /* This is used by the startup code to initialise the .data section */
+        _edata = . ;        	/* STM specific definition */
+        __data_end__ = . ;
+
+    } >RAM AT>FLASH
+
+    .uninitialized_data (NOLOAD): {
+        . = ALIGN(4);
+        *(.uninitialized_data*)
+    } > RAM
+
+    /* Start and end symbols must be word-aligned */
+    .scratch_x : {
+        __scratch_x_start__ = .;
+        *(.scratch_x.*)
+        . = ALIGN(4);
+        __scratch_x_end__ = .;
+    } > SCRATCH_X AT > FLASH
+    __scratch_x_source__ = LOADADDR(.scratch_x);
+
+    .scratch_y : {
+        __scratch_y_start__ = .;
+        *(.scratch_y.*)
+        . = ALIGN(4);
+        __scratch_y_end__ = .;
+    } > SCRATCH_Y AT > FLASH
+    __scratch_y_source__ = LOADADDR(.scratch_y);
+
+    /*
+     * The uninitialised data sections. NOLOAD is used to avoid
+     * the "section `.bss' type changed to PROGBITS" warning
+     */
+
+    /* The primary uninitialised data section. */
+    .bss (NOLOAD) : ALIGN(4)
+    {
+        __bss_start__ = .;     	/* standard newlib definition */
+        _sbss = .;              /* STM specific definition */
+        *(.bss_begin .bss_begin.*)
+
+        *(.bss .bss.*)
+        *(COMMON)
+
+        *(.bss_end .bss_end.*)
+	    . = ALIGN(4);
+        __bss_end__ = .;        /* standard newlib definition */
+        _ebss = . ;             /* STM specific definition */
+    } >RAM
+
+
+    .noinit (NOLOAD) : ALIGN(4)
+    {
+        _noinit = .;
+
+        *(.noinit .noinit.*)
+    } > RAM
+
+    .heap (NOLOAD):
+    {
+        /* Mandatory to be word aligned, _sbrk assumes this */
+        . = ALIGN(4) ;
+        __end__ = .;
+        end = __end__;
+        _end = __end__;
+        __end = __end__;
+
+        __Heap_Begin = .;
+        _Heap_Begin = __Heap_Begin;
+
+        KEEP(*(.heap*))
+
+        /* Used to test if there is enough space for the stack */
+        PROVIDE ( __HeapLimit = . ) ;
+
+        /* Checked by _sbrk() */
+        PROVIDE ( _Heap_Limit = ORIGIN(RAM) + LENGTH(RAM) ) ;
+
+    } > RAM
+
+
+    /* .stack*_dummy section doesn't contains any symbols. It is only
+     * used for linker to calculate size of stack sections, and assign
+     * values to stack symbols later
+     *
+     * stack1 section may be empty/missing if platform_launch_core1 is not used */
+
+    /* by default we put core 0 stack at the end of scratch Y, so that if core 1
+     * stack is not used then all of SCRATCH_X is free.
+     */
+    .stack1_dummy (NOLOAD):
+    {
+        *(.stack1*)
+    } > SCRATCH_X
+    .stack_dummy (NOLOAD):
+    {
+        KEEP(*(.stack*))
+    } > SCRATCH_Y
+
+    .flash_end : {
+        PROVIDE(__flash_binary_end = .);
+    } > FLASH
+
+    /* stack limit is poorly named, but historically is maximum heap ptr */
+    __StackLimit = ORIGIN(RAM) + LENGTH(RAM);
+    __StackOneTop = ORIGIN(SCRATCH_X) + LENGTH(SCRATCH_X);
+    __StackTop = ORIGIN(SCRATCH_Y) + LENGTH(SCRATCH_Y);
+    __StackOneBottom = __StackOneTop - SIZEOF(.stack1_dummy);
+    __StackBottom = __StackTop - SIZEOF(.stack_dummy);
+
+    /*
+     * The '__stack' definition is required by crt0, do not remove it.
+     */
+    PROVIDE(__stack = __StackTop);
+
+    /* Check if data + heap + stack exceeds RAM limit */
+    ASSERT(__StackLimit >= __HeapLimit, "region RAM overflowed")
+
+    /*
+    * Default stack sizes.
+    * These are used by the startup in order to allocate stacks
+    * for the different modes.
+    */
+
+    __Main_Stack_Size = 1024*4 ;
+
+    PROVIDE ( _Main_Stack_Size = __Main_Stack_Size ) ;
+
+    __Main_Stack_Limit = __stack  - __Main_Stack_Size ;
+
+    /* "PROVIDE" allows to easily override these values from an
+    * object file or the command line. */
+    PROVIDE ( _Main_Stack_Limit = __Main_Stack_Limit ) ;
+
+    .flash_end : {
+        PROVIDE(__flash_binary_end = .);
+    } > FLASH
+
+    ASSERT( __binary_info_header_end - __logical_binary_start <= 256, "Binary info must be in first 256 bytes of the binary")
+    /* todo assert on extra code */
+
+    /* After that there are only debugging sections. */
+
+    /* This can remove the debugging information from the standard libraries */
+    /*
+    DISCARD :
+    {
+     libc.a ( * )
+     libm.a ( * )
+     libgcc.a ( * )
+     }
+     */
+
+    /* Stabs debugging sections.  */
+    .stab          0 : { *(.stab) }
+    .stabstr       0 : { *(.stabstr) }
+    .stab.excl     0 : { *(.stab.excl) }
+    .stab.exclstr  0 : { *(.stab.exclstr) }
+    .stab.index    0 : { *(.stab.index) }
+    .stab.indexstr 0 : { *(.stab.indexstr) }
+    .comment       0 : { *(.comment) }
+    /*
+     * DWARF debug sections.
+     * Symbols in the DWARF debugging sections are relative to the beginning
+     * of the section so we begin them at 0.
+     */
+    /* DWARF 1 */
+    .debug          0 : { *(.debug) }
+    .line           0 : { *(.line) }
+    /* GNU DWARF 1 extensions */
+    .debug_srcinfo  0 : { *(.debug_srcinfo) }
+    .debug_sfnames  0 : { *(.debug_sfnames) }
+    /* DWARF 1.1 and DWARF 2 */
+    .debug_aranges  0 : { *(.debug_aranges) }
+    .debug_pubnames 0 : { *(.debug_pubnames) }
+    /* DWARF 2 */
+    .debug_info     0 : { *(.debug_info .gnu.linkonce.wi.*) }
+    .debug_abbrev   0 : { *(.debug_abbrev) }
+    .debug_line     0 : { *(.debug_line) }
+    .debug_frame    0 : { *(.debug_frame) }
+    .debug_str      0 : { *(.debug_str) }
+    .debug_loc      0 : { *(.debug_loc) }
+    .debug_macinfo  0 : { *(.debug_macinfo) }
+    /* SGI/MIPS DWARF 2 extensions */
+    .debug_weaknames 0 : { *(.debug_weaknames) }
+    .debug_funcnames 0 : { *(.debug_funcnames) }
+    .debug_typenames 0 : { *(.debug_typenames) }
+    .debug_varnames  0 : { *(.debug_varnames) }
+}
