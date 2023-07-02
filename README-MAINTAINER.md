@@ -13,19 +13,25 @@ git clone \
   ~/Work/micro-os-plus-iii/micro-os-plus-iii.git
 ```
 
-or
+or, to update an existing folder:
 
 ```sh
 git -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git pull
+
+xpm run deep-clean -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 ```
 
 Satisfy dependencies for all configurations and run all tests:
 
 ```sh
-xpm run deep-clean -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
-
 xpm run install-all -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 
+xpm run test -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
+```
+
+or, to run the tests with all available toolchains:
+
+```sh
 xpm run test-all -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 ```
 
