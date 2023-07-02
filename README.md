@@ -70,18 +70,13 @@ with CubeMX for STM devices, can be found in the separate
 
 ## Tests
 
-- tests/rtos - simple test to exercise the µOS++ RTOS C++ API,
+- tests/rtos-apis - simple test to exercise the µOS++ RTOS C++ API,
 the C API and the ISO C++ API
 - tests/mutex-stress - a stress test with 10 threads fighting for a mutex
-- tests/sema-stress - a stress test posting to a semaphore from a high
-frequency interrupt
-- tests/gcc - compile test with host GCC compiler
+- tests/cmsis-os-validator - the Arm CMSIS OS validator
 
 The ARM CMSIS RTOS validator is available from a
 [separate project](https://github.com/xpacks/arm-cmsis-rtos-validator).
-
-To run these tests, several Eclipse projects are available in a separate
-[GitHub project](https://github.com/micro-os-plus/eclipse-test-projects).
 
 ## License
 
