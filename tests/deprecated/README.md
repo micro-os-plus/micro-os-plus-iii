@@ -1,5 +1,13 @@
 # README
 
+These are the initial tests, used in the separate Eclipse projects, now
+deprecated.
+
+However, some tests were not yet ported to the new testing infrastructure.
+
+The initial README is preserved for historical reasons, but the
+instructions are most probably outdated.
+
 ## Download repos to development area
 
 ```bash
