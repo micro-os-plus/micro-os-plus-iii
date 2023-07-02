@@ -85,6 +85,11 @@
         "xpm run link-deps --config raspberrypi-pico-cmake-debug",
         "xpm run link-deps --config raspberrypi-pico-cmake-release"
       ],
+      "test": [
+        "{% if os.platform == 'darwin' and os.arch == 'arm64' %}echo {% endif %}xpm run test-native-cmake-gcc",
+        "xpm run test-native-cmake-clang",
+        "xpm run test-cortex-cmake"
+      ],
       "test-all": [
         "xpm run test-native-cmake",
         "xpm run test-cortex-cmake"
