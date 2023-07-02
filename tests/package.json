@@ -16,7 +16,7 @@
     "del-cli": "^5.0.0"
   },
   "xpack": {
-    "minimumXpmRequired": "0.16.0",
+    "minimumXpmRequired": "0.16.2",
     "dependencies": {},
     "$dependenciesUrls": [
       "https://github.com/micro-os-plus",
@@ -27,9 +27,21 @@
       "@xpack-dev-tools/cmake": "3.23.5-1.1",
       "@xpack-dev-tools/meson-build": "0.63.3-1.1",
       "@xpack-dev-tools/ninja-build": "1.11.1-2.1",
-      "@micro-os-plus/build-helper": "github:micro-os-plus/build-helper-xpack#xpack-develop",
-      "@xpacks/arm-cmsis-rtos-validator": "github:xpacks/arm-cmsis-rtos-validator#xpack-develop",
-      "@xpacks/chan-fatfs": "github:xpacks/chan-fatfs#xpack-develop"
+      "@micro-os-plus/build-helper": {
+        "specifier": "github:micro-os-plus/build-helper-xpack#xpack-develop",
+        "local": "link",
+        "platforms": "all"
+      },
+      "@xpacks/arm-cmsis-rtos-validator": {
+        "specifier": "github:xpacks/arm-cmsis-rtos-validator#xpack-develop",
+        "local": "link",
+        "platforms": "all"
+      },
+      "@xpacks/chan-fatfs": {
+        "specifier": "github:xpacks/chan-fatfs#xpack-develop",
+        "local": "link",
+        "platforms": "all"
+      }
     },
     "properties": {
       "buildFolderRelativePath": "{{ 'build' | path_join: configuration.name | to_filename | downcase }}",
@@ -264,8 +276,16 @@
       "native-dependencies": {
         "hidden": true,
         "devDependencies": {
-          "@micro-os-plus/posix-arch": "github:micro-os-plus/micro-os-plus-iii-posix-arch#xpack-develop",
-          "@xpack-3rd-party/libucontext": "github:xpack-3rd-party/libucontext-xpack#xpack-develop"
+          "@micro-os-plus/posix-arch": {
+            "specifier": "github:micro-os-plus/micro-os-plus-iii-posix-arch#xpack-develop",
+            "local": "link",
+            "platforms": "all"
+          },
+          "@xpack-3rd-party/libucontext": {
+            "specifier": "github:xpack-3rd-party/libucontext-xpack#xpack-develop",
+            "local": "link",
+            "platforms": "all"
+          }
         }
       },
       "native-actions": {
@@ -283,8 +303,16 @@
       "cortexm-dependencies": {
         "hidden": true,
         "devDependencies": {
-          "@micro-os-plus/micro-os-plus-iii-cortexm": "github:micro-os-plus/micro-os-plus-iii-cortexm#xpack-develop",
-          "@xpacks/arm-cmsis": "github:xpacks/arm-cmsis#xpack-develop"
+          "@micro-os-plus/micro-os-plus-iii-cortexm": {
+            "specifier": "github:micro-os-plus/micro-os-plus-iii-cortexm#xpack-develop",
+            "local": "link",
+            "platforms": "all"
+          },
+          "@xpacks/arm-cmsis": {
+            "specifier": "github:xpacks/arm-cmsis#xpack-develop",
+            "local": "link",
+            "platforms": "all"
+          }
         }
       },
       "arm-none-eabi-gcc-dependencies": {
@@ -654,7 +682,11 @@
           "shortConfigurationName": "rpd"
         },
         "devDependencies": {
-          "@xpack-3rd-party/raspberrypi-pico-sdk": "github:xpack-3rd-party/raspberrypi-pico-sdk-xpack#xpack-develop",
+          "@xpack-3rd-party/raspberrypi-pico-sdk": {
+            "specifier": "github:xpack-3rd-party/raspberrypi-pico-sdk-xpack#xpack-develop",
+            "local": "link",
+            "platforms": "all"
+          },
           "@xpack-dev-tools/openocd": {
             "specifier": "0.12.0-1.1",
             "local": "link",
