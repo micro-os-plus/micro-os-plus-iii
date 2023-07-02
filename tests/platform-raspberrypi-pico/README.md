@@ -1,7 +1,26 @@
 # platform-raspberrypi-pico
 
-Support files for building Cortex-M0+ application to run on the
+Support files for building Cortex-M0+ tests to run on the
 Raspberry Pico board.
+
+## Prerequisites
+
+- [Raspberry Pico H](https://www.raspberrypi.com/documentation/microcontrollers/raspberry-pi-pico.html)
+- [Raspberry Pi Debug Probe](https://www.raspberrypi.com/products/debug-probe/)
+
+The **Pico H** is a newer version, with a small 3 pin connector soldered,
+which can be directly connected to the Debug Probe, without any
+custom wiring.
+
+The **Debug Probe** is a cheap SWD (Serial Wire Debug) probe, implementing
+CMSIS-DAP; for best results, this probe requires a recent OpenOCD (>= 0.12),
+the current Raspberry OpenOCD fork (0.11.x) is too verbose for the use with
+semihosting.
+
+An alternate setup can be a pair of Pico's (preferably the initial model,
+without the debug connector soldered) and some custom wiring, with one
+Pico running the [Picoprobe](https://github.com/raspberrypi/picoprobe)
+firmware.
 
 ## Include folders
 
