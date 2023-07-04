@@ -224,6 +224,14 @@
         "xpm run build --config raspberrypi-pico-cmake-release",
         "xpm run test --config raspberrypi-pico-cmake-release"
       ],
+      "test-nucleo-f767zi-cmake": [
+        "xpm run prepare --config nucleo-f767zi-cmake-debug",
+        "xpm run build --config nucleo-f767zi-cmake-debug",
+        "xpm run test --config nucleo-f767zi-cmake-debug",
+        "xpm run prepare --config nucleo-f767zi-cmake-release",
+        "xpm run build --config nucleo-f767zi-cmake-release",
+        "xpm run test --config nucleo-f767zi-cmake-release"
+      ],
       "clean-all": [
         "xpm run clean-native-cmake",
         "xpm run clean-cortex-cmake"
@@ -256,7 +264,9 @@
         "xpm run clean --config qemu-cortex-m7f-cmake-debug --ignore-errors",
         "xpm run clean --config qemu-cortex-m7f-cmake-release --ignore-errors",
         "xpm run clean --config raspberrypi-pico-cmake-debug --ignore-errors",
-        "xpm run clean --config raspberrypi-pico-cmake-release --ignore-errors"
+        "xpm run clean --config raspberrypi-pico-cmake-release --ignore-errors",
+        "xpm run clean --config nucleo-f767zi-cmake-debug --ignore-errors",
+        "xpm run clean --config nucleo-f767zi-cmake-release --ignore-errors"
       ],
       "deep-clean": "del-cli build node_modules xpacks package-lock.json"
     },
@@ -708,6 +718,36 @@
         "properties": {
           "buildType": "MinSizeRel",
           "shortConfigurationName": "rpr"
+        }
+      },
+      "nucleo-f767zi-cmake-debug": {
+        "inherit": [
+          "cortexm-actions",
+          "cmake-actions",
+          "cortexm-dependencies",
+          "arm-none-eabi-gcc-dependencies",
+          "openocd-dependencies",
+          "short-win-paths-properties"
+        ],
+        "properties": {
+          "buildType": "Debug",
+          "platformName": "nucleo-f767zi",
+          "toolchainFileName": "arm-none-eabi-gcc.cmake",
+          "shortConfigurationName": "nf7d"
+        },
+        "actions": {
+          "link-deps": [
+            "xpm link @micro-os-plus/micro-os-plus-iii-cortexm --config {{ configuration.name }}"
+          ]
+        }
+      },
+      "nucleo-f767zi-cmake-release": {
+        "inherit": [
+          "nucleo-f767zi-cmake-debug"
+        ],
+        "properties": {
+          "buildType": "MinSizeRel",
+          "shortConfigurationName": "nf7r"
         }
       }
     }
