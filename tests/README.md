@@ -7,18 +7,19 @@ toolchains as possible, and run them on as many platforms as possible.
 
 There is a GitHub Actions CI workflow that runs a selection of the
 tests on every push; for details see
-[ci.yml](../.github/workflows/ci.yml).
+[ci.yml](../.github/workflows/ci.yml) (to be activated soon for automated
+tests).
 
 A second workflow is triggered manually, and runs all available tests
 on all supported platforms; for details see
-[test-all.yml](../.github/workflows/test-all.yml)
+[test-all.yml](../.github/workflows/test-all.yml) (to be activated soon).
 
 ## Platforms
 
-The supported platforms are:
+The supported platforms for running the µOS++ IIIe tests are:
 
 - `platform-native` - run the test applications as native process
-  on the development machine
+  on the development machine, compiled with gcc or clang
 - `platform-qemu-cortex-m7f` - run the tests as fully semihosted applications
   on a QEMU mps2-an500 emulated board (an Arm Cortex-M7F development board)
 - `platform-qemu-cortex-m3` - run the tests as fully semihosted applications
@@ -64,14 +65,14 @@ set -e
 while (true); do xpm run test-all -C "${HOME}/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests"; done
 ```
 
-### rtos-apis
-
-A simple test to exercise most of the RTOS APIs.
-
-The tests ran many hours in a loop.
+The tests ran many hours in loops without problems.
 
 Note: there should be no trace messages in the scheduler interrupt, otherwise
 the tests occasionally fail, as shown below.
+
+### rtos-apis
+
+A simple test to exercise most of the RTOS APIs, both C and C++.
 
 ### mutex-stress
 
