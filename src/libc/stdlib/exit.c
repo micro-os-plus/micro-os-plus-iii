@@ -122,7 +122,9 @@ _Exit (int code)
   // Gracefully terminate the trace session.
   trace_flush ();
 
-#if defined(DEBUG)
+// By default disable it, since it prevents standalone tests
+// to terminate properly.
+#if defined(DEBUG) && defined(OS_ENABLE_BKPT_ON_EXIT)
 
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
   if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
