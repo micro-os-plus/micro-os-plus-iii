@@ -102,6 +102,8 @@ __assert_func (const char* file, int line, const char* func,
 
 // ----------------------------------------------------------------------------
 
+#if defined(OS_INCLUDE_ASSERT_FAILED)
+
 // This is STM32 specific, but can be used on other platforms too.
 // If the application needs it, add the following to your application header:
 
@@ -145,5 +147,7 @@ assert_failed (uint8_t* file, uint32_t line)
 }
 
 #pragma GCC diagnostic pop
+
+#endif // defined(OS_INCLUDE_ASSERT_FAILED)
 
 // ----------------------------------------------------------------------------
