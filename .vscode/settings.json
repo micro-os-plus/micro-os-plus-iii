@@ -105,6 +105,7 @@
         "nfree",
         "nographic",
         "nrsv",
+        "nucleo",
         "numname",
         "objsize",
         "openocd",
@@ -228,7 +229,10 @@
         "streambuf": "cpp",
         "typeinfo": "cpp",
         "valarray": "cpp",
-        "config.h": "c"
+        "config.h": "c",
+        "cmsis_device.h": "c",
+        "stm32f767xx.h": "c",
+        "trace.h": "c"
     },
     "lldb.displayFormat": "hex",
     "xpack.exclude": [
