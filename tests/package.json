@@ -716,8 +716,7 @@
         },
         "actions": {
           "link-deps": [
-            "xpm link @micro-os-plus/micro-os-plus-iii-posix-arch --config {{ configuration.name }}",
-            "xpm link @xpack-3rd-party/libucontext --config {{ configuration.name }}",
+            "xpm link @micro-os-plus/micro-os-plus-iii-cortexm --config {{ configuration.name }}",
             "xpm link @xpack-3rd-party/raspberrypi-pico-sdk --config {{ configuration.name }}"
           ]
         }
