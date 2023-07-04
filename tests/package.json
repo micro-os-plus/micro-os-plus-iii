@@ -410,6 +410,13 @@
           "@xpack-dev-tools/qemu-arm": "7.2.0-1.1"
         }
       },
+      "openocd-dependencies": {
+        "hidden": true,
+        "$devDependenciesUrl": "https://www.npmjs.com/package/@xpack-dev-tools/openocd",
+        "devDependencies": {
+          "@xpack-dev-tools/openocd": "0.12.0-1.1"
+        }
+      },
       "short-win-paths-properties": {
         "hidden": true,
         "properties": {
@@ -691,6 +698,7 @@
           "cmake-actions",
           "cortexm-dependencies",
           "arm-none-eabi-gcc-dependencies",
+          "openocd-dependencies",
           "short-win-paths-properties"
         ],
         "properties": {
@@ -702,11 +710,6 @@
         "devDependencies": {
           "@xpack-3rd-party/raspberrypi-pico-sdk": {
             "specifier": "github:xpack-3rd-party/raspberrypi-pico-sdk-xpack#xpack-develop",
-            "local": "link",
-            "platforms": "all"
-          },
-          "@xpack-dev-tools/openocd": {
-            "specifier": "0.12.0-1.1",
             "local": "link",
             "platforms": "all"
           }
