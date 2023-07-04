@@ -20,6 +20,8 @@ if(NOT DEFINED xpack_platform_compile_definition)
   message(FATAL_ERROR "Define xpack_platform_compile_definition in platform*/cmake/globals.cmake")
 endif()
 
+# -----------------------------------------------------------------------------
+
 # set(xpack_create_listing true)
 # set(xpack_create_hex true)
 

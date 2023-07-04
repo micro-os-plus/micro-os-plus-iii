@@ -12,7 +12,7 @@
 #
 # -----------------------------------------------------------------------------
 
-message(VERBOSE "Processing 'tests/platform-raspberrypi-pico/device'...")
+message(VERBOSE "Processing 'tests/platform-raspberrypi-pico/device-raspberrypi-rp2040'...")
 
 # -----------------------------------------------------------------------------
 

@@ -18,8 +18,7 @@ set(xpack_dependencies_folders
   # Project dependencies.
   # The BINARY_DIR is the `build/<config>` folder.
   "${CMAKE_BINARY_DIR}/xpacks/@micro-os-plus/micro-os-plus-iii-cortexm"
-
-  # Currently not functional, use individual files.
+  # Pico SDK.
   "${CMAKE_BINARY_DIR}/xpacks/@xpack-3rd-party/raspberrypi-pico-sdk"
 
   # The SOURCE_DIR is the `tests` folder.
