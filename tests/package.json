@@ -317,7 +317,12 @@
             "specifier": "github:micro-os-plus/micro-os-plus-iii-cortexm#xpack-develop",
             "local": "link",
             "platforms": "all"
-          },
+          }
+        }
+      },
+      "arm-cmsis-dependencies": {
+        "hidden": true,
+        "devDependencies": {
           "@xpacks/arm-cmsis": {
             "specifier": "github:xpacks/arm-cmsis#xpack-develop",
             "local": "link",
@@ -607,6 +612,7 @@
           "cortexm-actions",
           "cmake-actions",
           "cortexm-dependencies",
+          "arm-cmsis-dependencies",
           "arm-none-eabi-gcc-dependencies",
           "qemu-arm-dependencies",
           "short-win-paths-properties"
@@ -632,6 +638,7 @@
           "cortexm-actions",
           "cmake-actions",
           "cortexm-dependencies",
+          "arm-cmsis-dependencies",
           "arm-none-eabi-gcc-dependencies",
           "qemu-arm-dependencies",
           "short-win-paths-properties"
@@ -657,6 +664,7 @@
           "cortexm-actions",
           "cmake-actions",
           "cortexm-dependencies",
+          "arm-cmsis-dependencies",
           "arm-none-eabi-gcc-dependencies",
           "qemu-arm-dependencies",
           "short-win-paths-properties"
