@@ -66,7 +66,7 @@ xpack_display_greetings("${CMAKE_CURRENT_SOURCE_DIR}/../package.json")
 # CMAKE_BUILD_TYPE: Debug, Release, RelWithDebInfo, MinSizeRel
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug" AND PLATFORM_NAME STREQUAL "nucleo-f767zi")
-  set(ENABLE_RTOS_APIS_TEST false)
+  set(ENABLE_RTOS_APIS_TEST true)
 else()
   set(ENABLE_RTOS_APIS_TEST true)
 endif()
