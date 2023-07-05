@@ -24,6 +24,9 @@ set(xpack_device_compile_definition "MICRO_OS_PLUS_DEVICE_RASPBERRYPI_RP2040")
 
 set(xpack_platform_compile_definition "MICRO_OS_PLUS_PLATFORM_RASPBERRYPI_PICO")
 
+# -----------------------------------------------------------------------------
+
+# Adjust the common library, defined globally for all platforms.
 target_compile_options(micro-os-plus-common-interface INTERFACE
 
   # Turn off many warnings, the Pico SDK throws a lot of them.
