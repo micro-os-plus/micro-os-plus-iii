@@ -423,8 +423,14 @@ namespace os
         virtual int
         vfcntl (int cmd, std::va_list args) override;
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wredundant-tags"
+#endif
         virtual int
-        fstat (/* struct */ stat* buf) override;
+        fstat (struct stat* buf) override;
+#pragma GCC diagnostic pop
 
         virtual off_t
         lseek (off_t offset, int whence) override;
@@ -614,15 +620,21 @@ namespace os
         return file::vfcntl (cmd, args);
       }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wredundant-tags"
+#endif
     template<typename T, typename L>
       int
-      file_lockable<T, L>::fstat (/* struct */ stat* buf)
+      file_lockable<T, L>::fstat (struct stat* buf)
       {
         std::lock_guard<L> lock
           { locker_ };
 
         return file::fstat (buf);
       }
+#pragma GCC diagnostic pop
 
     template<typename T, typename L>
       off_t

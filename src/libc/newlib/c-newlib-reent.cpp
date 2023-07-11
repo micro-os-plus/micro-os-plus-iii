@@ -64,11 +64,17 @@ extern "C"
     return __posix_fork ();
   }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wredundant-tags"
+#endif
   int __attribute__((weak))
-  _fstat_r (void* ptr, int fildes, /* struct */ stat* buf)
+  _fstat_r (void* ptr, int fildes, struct stat* buf)
   {
     return __posix_fstat (fildes, buf);
   }
+#pragma GCC diagnostic pop
 
   pid_t __attribute__((weak))
   _getpid_r (void* ptr)
@@ -130,11 +136,17 @@ extern "C"
     return __posix_rename (oldfn, newfn);
   }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wredundant-tags"
+#endif
   int __attribute__((weak))
-  _stat_r (void* ptr, const char* path, /* struct */ stat* buf)
+  _stat_r (void* ptr, const char* path, struct stat* buf)
   {
     return __posix_stat (path, buf);
   }
+#pragma GCC diagnostic pop
 
   clock_t __attribute__((weak))
   _times_r (void* ptr, /* struct */ tms* buf)

@@ -207,8 +207,14 @@ namespace os
       int
       isatty (void);
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wredundant-tags"
+#endif
       virtual int
-      fstat (/* struct */ stat* buf);
+      fstat (struct stat* buf);
+#pragma GCC diagnostic pop
 
       virtual off_t
       lseek (off_t offset, int whence);
