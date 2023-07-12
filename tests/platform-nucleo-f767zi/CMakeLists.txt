@@ -182,6 +182,7 @@ if (ENABLE_RTOS_APIS_TEST)
     NAME "rtos-apis-test"
 
     COMMAND openocd${extension}
+      -c "gdb_port disabled"
       -c "tcl_port disabled"
       -c "telnet_port disabled"
       -f interface/stlink.cfg
@@ -234,6 +235,7 @@ if (ENABLE_MUTEX_STRESS_TEST)
     NAME "mutex-stress-test"
 
     COMMAND openocd${extension}
+      -c "gdb_port disabled"
       -c "tcl_port disabled"
       -c "telnet_port disabled"
       -f interface/stlink.cfg
@@ -289,6 +291,7 @@ if (ENABLE_CMSIS_OS_VALIDATOR_TEST)
     NAME "cmsis-os-validator-test"
 
     COMMAND openocd${extension}
+      -c "gdb_port disabled"
       -c "tcl_port disabled"
       -c "telnet_port disabled"
       -f interface/stlink.cfg
