@@ -17,6 +17,8 @@ message(VERBOSE "Processing 'tests/platform-nucleo-f767zi/stm32cubemx'...")
 # -----------------------------------------------------------------------------
 # Define the stm32cubemx library.
 
+# Note: It cannot be a library, since it make extensive use of `weak` symbols.
+
 add_library(stm32cubemx-interface INTERFACE EXCLUDE_FROM_ALL)
 
 # -----------------------------------------------------------------------------

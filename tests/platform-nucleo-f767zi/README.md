@@ -1,4 +1,4 @@
-# stm32cubemx
+# platform-nucleo-f767zi
 
 Note: It cannot be a library, since it make extensive use of `weak` symbols.
 
