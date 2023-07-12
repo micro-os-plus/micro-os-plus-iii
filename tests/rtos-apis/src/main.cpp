@@ -39,8 +39,10 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   printf ("Built with GCC " __VERSION__ "\n");
 #endif
 
+#if defined(MICRO_OS_PLUS_PLATFORM_NUCLEO_F767ZI)
   // workaround for the openocd bug.
-  // printf("\n");
+  printf("\n");
+#endif
 
   // fflush(stdout);
 
