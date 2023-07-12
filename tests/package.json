@@ -224,6 +224,14 @@
         "xpm run build --config raspberrypi-pico-cmake-release",
         "xpm run test --config raspberrypi-pico-cmake-release"
       ],
+      "test-nucleo-f411re-cmake": [
+        "xpm run prepare --config nucleo-f411re-cmake-debug",
+        "xpm run build --config nucleo-f411re-cmake-debug",
+        "xpm run test --config nucleo-f411re-cmake-debug",
+        "xpm run prepare --config nucleo-f411re-cmake-release",
+        "xpm run build --config nucleo-f411re-cmake-release",
+        "xpm run test --config nucleo-f411re-cmake-release"
+      ],
       "test-nucleo-f767zi-cmake": [
         "xpm run prepare --config nucleo-f767zi-cmake-debug",
         "xpm run build --config nucleo-f767zi-cmake-debug",
@@ -728,6 +736,36 @@
         "properties": {
           "buildType": "MinSizeRel",
           "shortConfigurationName": "rpr"
+        }
+      },
+      "nucleo-f411re-cmake-debug": {
+        "inherit": [
+          "cortexm-actions",
+          "cmake-actions",
+          "cortexm-dependencies",
+          "arm-none-eabi-gcc-dependencies",
+          "openocd-dependencies",
+          "short-win-paths-properties"
+        ],
+        "properties": {
+          "buildType": "Debug",
+          "platformName": "nucleo-f411re",
+          "toolchainFileName": "arm-none-eabi-gcc.cmake",
+          "shortConfigurationName": "nf4d"
+        },
+        "actions": {
+          "link-deps": [
+            "xpm link @micro-os-plus/micro-os-plus-iii-cortexm --config {{ configuration.name }}"
+          ]
+        }
+      },
+      "nucleo-f411re-cmake-release": {
+        "inherit": [
+          "nucleo-f411re-cmake-debug"
+        ],
+        "properties": {
+          "buildType": "MinSizeRel",
+          "shortConfigurationName": "nf4r"
         }
       },
       "nucleo-f767zi-cmake-debug": {
