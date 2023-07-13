@@ -21,7 +21,7 @@ set(xpack_create_listing true)
 
 # -----------------------------------------------------------------------------
 
-add_subdirectory("stm32cubemx")
+add_subdirectory("stm32f767cubemx")
 # TODO: update to separate device-stm32f7-extras, when ready.
 add_subdirectory("device")
 add_subdirectory("platform")
