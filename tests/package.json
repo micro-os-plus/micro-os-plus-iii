@@ -240,6 +240,14 @@
         "xpm run build --config nucleo-f767zi-cmake-release",
         "xpm run test --config nucleo-f767zi-cmake-release"
       ],
+      "test-nucleo-h743zi-cmake": [
+        "xpm run prepare --config nucleo-h743zi-cmake-debug",
+        "xpm run build --config nucleo-h743zi-cmake-debug",
+        "xpm run test --config nucleo-h743zi-cmake-debug",
+        "xpm run prepare --config nucleo-h743zi-cmake-release",
+        "xpm run build --config nucleo-h743zi-cmake-release",
+        "xpm run test --config nucleo-h743zi-cmake-release"
+      ],
       "clean-all": [
         "xpm run clean-native-cmake",
         "xpm run clean-cortex-cmake"
@@ -797,7 +805,38 @@
           "buildType": "MinSizeRel",
           "shortConfigurationName": "nf7r"
         }
+      },
+      "nucleo-h743zi-cmake-debug": {
+        "inherit": [
+          "cortexm-actions",
+          "cmake-actions",
+          "cortexm-dependencies",
+          "arm-none-eabi-gcc-dependencies",
+          "openocd-dependencies",
+          "short-win-paths-properties"
+        ],
+        "properties": {
+          "buildType": "Debug",
+          "platformName": "nucleo-h743zi",
+          "toolchainFileName": "arm-none-eabi-gcc.cmake",
+          "shortConfigurationName": "nh7d"
+        },
+        "actions": {
+          "link-deps": [
+            "xpm link @micro-os-plus/micro-os-plus-iii-cortexm --config {{ configuration.name }}"
+          ]
+        }
+      },
+      "nucleo-h743zi-cmake-release": {
+        "inherit": [
+          "nucleo-h743zi-cmake-debug"
+        ],
+        "properties": {
+          "buildType": "MinSizeRel",
+          "shortConfigurationName": "nh7r"
+        }
       }
+
     }
   }
 }
