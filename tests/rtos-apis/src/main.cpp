@@ -39,24 +39,7 @@ os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
   printf ("Built with GCC " __VERSION__ "\n");
 #endif
 
-#if defined(MICRO_OS_PLUS_PLATFORM_NUCLEO_F767ZI)
-  // workaround for the openocd bug.
-  printf("\n");
-#endif
-
   // fflush(stdout);
-
-
-#if 0
-  // Forever loop trying to diagnose openocd bug.
-  for (int i = 0; ; ++i) {
-    call_host(SEMIHOSTING_SYS_ERRNO, NULL);
-    // putchar('.');
-    if (i % 100000 == 0) {
-      puts(".");
-    }
-  }
-#endif
 
   int ret = 0;
   errno = 0;
