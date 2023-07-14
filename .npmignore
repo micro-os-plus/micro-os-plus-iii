@@ -1,14 +1,54 @@
-.DS_Store
-.cproject
-.project
-.settings/
-Debug/
-Release/
-test-*/
-NOTICE.md
-Thumbs.db
-build/
+# Git
+.git/
+.github/
+.gitignore
+.gitmodules
+
+# npm
+node_modules/
+.npm/
 *.tgz
+
+# xpm
+xpacks/
+
+# Windows
+Thumbs.db
+
+# macOS
+.DS_Store
+
+# Visual Studio Code
+.vscode/
+
+# Eclipse
+.settings/
+Debug*/
+Release*/
+*.launch
+.project
+.cproject
+
+# Builds
+test*/
+build/
+
+# Misc
+# patches/
+# pkgconfig/
+# scripts/
+README-*
+NOTES.md
+# CHANGELOG.*
+# LICENSE-*
+.appveyor.yml
+.travis.yml
+.clang-format
+
+.gitkeep
+
+website
+
 inspiration/
 test*/
 doxygen/
