@@ -3,13 +3,13 @@
 [![GitHub issues](https://img.shields.io/github/issues/micro-os-plus/micro-os-plus.svg)](https://github.com/micro-os-plus/micro-os-plus/issues)
 [![GitHub pulls](https://img.shields.io/github/issues-pr/micro-os-plus/micro-os-plus.svg)](https://github.com/micro-os-plus/micro-os-plus/pulls)
 
-# An xpm/npm package with the µOS++ IIIe
+# An xpm/npm package with the portable part of µOS++ IIIe
 
 **µOS++** is a POSIX inspired open
 source framework, written in C++.
 
 The open-source project is hosted on GitHub as
-[micro-os-plus/micro-os-plus](https://github.com/micro-os-plus/micro-os-plus).
+[micro-os-plus/micro-os-plus-iii](https://github.com/micro-os-plus/micro-os-plus-iii.git).
 
 ## Maintainer info
 
