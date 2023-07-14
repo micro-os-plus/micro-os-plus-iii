@@ -1,6 +1,6 @@
 # cmsis-os-validator
 
-This tests uses the Arm CMSIS Validator.
+This test uses the Arm CMSIS Validator.
 
 ## Interrupts
 
