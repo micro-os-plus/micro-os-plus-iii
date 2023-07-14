@@ -45,7 +45,7 @@ in the traditional way,
 by either copying the relevant files into the target project, or by linking
 the entire project as a Git submodule.
 
-However, things can be further automated and the most convenient way is
+However, the workflow can be further automated and the most convenient way is
 to **add it as a dependency** to the project via **xpm**.
 
 ### Install with xpm/npm
