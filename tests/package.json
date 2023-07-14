@@ -28,17 +28,17 @@
       "@xpack-dev-tools/meson-build": "0.63.3-1.1",
       "@xpack-dev-tools/ninja-build": "1.11.1-2.1",
       "@micro-os-plus/build-helper": {
-        "specifier": "github:micro-os-plus/build-helper-xpack#xpack-develop",
+        "specifier": "^2.13.0",
         "local": "link",
         "platforms": "all"
       },
       "@xpacks/arm-cmsis-rtos-validator": {
-        "specifier": "github:xpacks/arm-cmsis-rtos-validator#xpack-develop",
+        "specifier": "github:xpacks/arm-cmsis-rtos-validator#v1.0.0-1",
         "local": "link",
         "platforms": "all"
       },
       "@xpacks/chan-fatfs": {
-        "specifier": "github:xpacks/chan-fatfs#xpack-develop",
+        "specifier": "github:xpacks/chan-fatfs#v0.13.1-3",
         "local": "link",
         "platforms": "all"
       }
@@ -303,12 +303,12 @@
         "hidden": true,
         "devDependencies": {
           "@micro-os-plus/posix-arch": {
-            "specifier": "github:micro-os-plus/micro-os-plus-iii-posix-arch#xpack-develop",
+            "specifier": "github:micro-os-plus/micro-os-plus-iii-posix-arch#v1.0.0",
             "local": "link",
             "platforms": "all"
           },
           "@xpack-3rd-party/libucontext": {
-            "specifier": "github:xpack-3rd-party/libucontext-xpack#xpack-develop",
+            "specifier": "github:xpack-3rd-party/libucontext-xpack#v1.2.0-1",
             "local": "link",
             "platforms": "all"
           }
@@ -330,7 +330,7 @@
         "hidden": true,
         "devDependencies": {
           "@micro-os-plus/micro-os-plus-iii-cortexm": {
-            "specifier": "github:micro-os-plus/micro-os-plus-iii-cortexm#xpack-develop",
+            "specifier": "github:micro-os-plus/micro-os-plus-iii-cortexm#v1.0.0",
             "local": "link",
             "platforms": "all"
           }
@@ -340,7 +340,7 @@
         "hidden": true,
         "devDependencies": {
           "@xpacks/arm-cmsis": {
-            "specifier": "github:xpacks/arm-cmsis#xpack-develop",
+            "specifier": "github:xpacks/arm-cmsis#v4.5.0-7",
             "local": "link",
             "platforms": "all"
           }
@@ -725,7 +725,7 @@
         },
         "devDependencies": {
           "@xpack-3rd-party/raspberrypi-pico-sdk": {
-            "specifier": "github:xpack-3rd-party/raspberrypi-pico-sdk-xpack#xpack-develop",
+            "specifier": "github:xpack-3rd-party/raspberrypi-pico-sdk-xpack#v1.5.1-1",
             "local": "link",
             "platforms": "all"
           }
