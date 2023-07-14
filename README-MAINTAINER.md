@@ -1,135 +1,106 @@
-# README-MAINTAINER
+[![GitHub issues](https://img.shields.io/github/issues/micro-os-plus/micro-os-plus-iii.svg)](https://github.com/micro-os-plus/micro-os-plus-iii/issues/)
+[![GitHub pulls](https://img.shields.io/github/issues-pr/micro-os-plus/micro-os-plus-iii.svg)](https://github.com/micro-os-plus/micro-os-plus-iii/pulls)
 
-## micro-os-plus-iii
+# Maintainer info
 
-- <https://github.com/micro-os-plus/micro-os-plus-iii>
+## Project repository
+
+The project is hosted on GitHub:
+
+- <https://github.com/micro-os-plus/micro-os-plus-iii.git>
+
+To clone the stable branch (`xpack`), run the following commands in a
+terminal (on Windows use the _Git Bash_ console):
 
 ```sh
-rm -rf ~/Work/micro-os-plus-iii/micro-os-plus-iii.git && \
-mkdir -p ~/Work/micro-os-plus-iii && \
+rm -rf ~/Work/micro-os-plus/micro-os-plus-iii.git && \
+mkdir -p ~/Work/xpack-3rd-party && \
+git clone \
+  https://github.com/micro-os-plus/micro-os-plus-iii.git \
+  ~/Work/micro-os-plus/micro-os-plus-iii.git
+```
+
+For development purposes, clone the `xpack-develop` branch:
+
+```sh
+rm -rf ~/Work/micro-os-plus/micro-os-plus-iii.git && \
+mkdir -p ~/Work/xpack-3rd-party && \
 git clone \
   --branch xpack-develop \
   https://github.com/micro-os-plus/micro-os-plus-iii.git \
-  ~/Work/micro-os-plus-iii/micro-os-plus-iii.git
+  ~/Work/micro-os-plus/micro-os-plus-iii.git
 ```
 
-or, to update an existing folder:
+## Prerequisites
 
-```sh
-git -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git pull
+A recent [xpm](https://xpack.github.io/xpm/), which is a portable
+[Node.js](https://nodejs.org/) command line application.
 
-xpm run deep-clean -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
-```
+## How to make new releases
 
-Satisfy dependencies for all configurations and run all tests:
+### Release schedule
 
-```sh
-xpm run install-all -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
+There are no fixed releases, the project aims to follow the upstream releases.
 
-xpm run test -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
-```
+### Check Git
 
-or, to run the tests with all available toolchains:
+In the `micro-os-plus/micro-os-plus-iii` Git repo:
 
-```sh
-xpm run test-all -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
-```
+- switch to the `xpack-develop` branch
+- if needed, merge the `xpack` branch
 
-## build-helper
+No need to add a tag here, it'll be added when the release is created.
 
-- <https://github.com/micro-os-plus/build-helper-xpack>
+### Increase the version
 
-```sh
-rm -rf ~/Work/micro-os-plus/build-helper-xpack.git && \
-mkdir -p ~/Work/micro-os-plus && \
-git clone \
-  --branch xpack-develop \
-  https://github.com/micro-os-plus/build-helper-xpack.git \
-  ~/Work/micro-os-plus/build-helper-xpack.git
+Update the`package.json` file; add an extra field in the
+pre-release field, and initially also add `.pre`,
+for example `7.0.0-pre.1`.
 
-xpm link -C ~/Work/micro-os-plus/build-helper-xpack.git
-```
+### Fix possible open issues
 
-or
+Check GitHub issues and pull requests:
 
-```sh
-git -C ~/Work/micro-os-plus/build-helper-xpack.git pull
-```
+- <https://github.com/micro-os-plus/micro-os-plus-iii/issues/>
 
-## posix-arch
+and fix them; assign them to a milestone (like `7.0.0`).
 
-- <https://github.com/micro-os-plus/micro-os-plus-iii-posix-arch>
+### Update `README-MAINTAINER.md`
 
-```sh
-rm -rf ~/Work/micro-os-plus-iii/micro-os-plus-iii-posix-arch.git && \
-mkdir -pv ~/Work/micro-os-plus-iii && \
-git clone \
-  --branch xpack-develop \
-  https://github.com/micro-os-plus/micro-os-plus-iii-posix-arch.git \
-  ~/Work/micro-os-plus-iii/micro-os-plus-iii-posix-arch.git
+Update the following files to reflect the changes
+related to the new version:
 
-xpm link -C ~/Work/micro-os-plus-iii/micro-os-plus-iii-posix-arch.git
-```
+- `README-MAINTAINER.md`
+- `README.md`
 
-or
+### Update `CHANGELOG.md`
 
-```sh
-git -C ~/Work/micro-os-plus-iii/micro-os-plus-iii-posix-arch.git pull
-```
+- open the `CHANGELOG.md` file
+- check if all previous fixed issues are in
+- add a new entry like _* v7.0.0_
+- commit with a message like _prepare v7.0.0_
 
-## libucontext
+### Push changes
 
-- <https://github.com/xpack-3rd-party/libucontext-xpack>
+- commit and push
 
-```sh
-rm -rf ~/Work/micro-os-plus-iii/libucontext-xpack.git && \
-mkdir -pv ~/Work/micro-os-plus-iii && \
-git clone \
-  --branch xpack-develop \
-  https://github.com/xpack-3rd-party/libucontext-xpack.git \
-  ~/Work/micro-os-plus-iii/libucontext-xpack.git
+### Commit the new version
 
-xpm link -C ~/Work/micro-os-plus-iii/libucontext-xpack.git
-```
+- select the `xpack-develop` branch
+- commit all changes
+- `npm pack` and check the content of the archive, which should list
+  only `package.json`, `README.md`, `LICENSE`, `CHANGELOG.md`,
+  the `doxygen-awesome-*.js` and `doxygen-custom/*` files;
+  possibly adjust `.npmignore`
+- `npm version 7.0.0`
+- push the `xpack-develop` branch to GitHub
+- the `postversion` npm script should also update tags via `git push origin --tags`
 
-```sh
-git -C ~/Work/micro-os-plus-iii/libucontext-xpack.git pull
-```
+### Update the repo
 
-## cortexm
+When the package is considered stable:
 
-- <https://github.com/micro-os-plus/micro-os-plus-iii-cortexm>
-
-```sh
-rm -rf ~/Work/micro-os-plus-iii/micro-os-plus-iii-cortexm.git && \
-mkdir -pv ~/Work/micro-os-plus-iii && \
-git clone \
-  --branch xpack-develop \
-  https://github.com/micro-os-plus/micro-os-plus-iii-cortexm.git \
-  ~/Work/micro-os-plus-iii/micro-os-plus-iii-cortexm.git
-
-xpm link -C ~/Work/micro-os-plus-iii/micro-os-plus-iii-cortexm.git
-```
-
-```sh
-git -C ~/Work/micro-os-plus-iii/micro-os-plus-iii-cortexm.git pull
-```
-
-## chan-fatfs
-
-- <https://github.com/xpacks/chan-fatfs>
-
-```sh
-rm -rf ~/Work/micro-os-plus-iii/chan-fatfs.git && \
-mkdir -pv ~/Work/micro-os-plus-iii && \
-git clone \
-  --branch xpack-develop \
-  https://github.com/xpacks/chan-fatfs.git \
-  ~/Work/micro-os-plus-iii/chan-fatfs.git
-
-xpm link -C ~/Work/micro-os-plus-iii/chan-fatfs.git
-```
-
-```sh
-git -C ~/Work/micro-os-plus-iii/chan-fatfs.git pull
-```
+- with a Git client (VS Code is fine)
+- merge `xpack-develop` into `xpack`
+- push to GitHub
+- select `xpack-develop`
