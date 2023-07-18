@@ -3,7 +3,7 @@
 [![GitHub issues](https://img.shields.io/github/issues/micro-os-plus/micro-os-plus.svg)](https://github.com/micro-os-plus/micro-os-plus/issues)
 [![GitHub pulls](https://img.shields.io/github/issues-pr/micro-os-plus/micro-os-plus.svg)](https://github.com/micro-os-plus/micro-os-plus/pulls)
 
-# An xpm/npm package with the portable part of µOS++ IIIe
+# A source code library with the portable part of µOS++ IIIe (an xpm/npm package)
 
 **µOS++** is a POSIX inspired open
 source framework, written in C++.
@@ -28,15 +28,6 @@ intended for 32/64-bits embedded applications.
 
 The APIs are documented in the
 [µOS++ reference](http://micro-os-plus.github.io/reference/cmsis-plus/).
-
-## Status
-
-µOS++ IIIe is fully functional for Cortex-M devices and also runs
-on synthetic POSIX platforms (like macOS and GNU/Linux).
-
-Note: The next edition of the project (IVe) is currently work in progress,
-with the monolithic
-repository to be split into multiple separate source libraries.
 
 ## Install
 
@@ -140,22 +131,108 @@ Pull Requests should be directed to this branch.
 When new releases are published, the `xpack-develop` branch is merged
 into `xpack`.
 
-## Build Configuration
+## Developer info
 
-To include µOS++ in a project, in addition to one of the port
-specific project, consider the following details:
+### Overview
 
-### Include folders
+The µOS++ IIIe source code is split between a portable part (this project)
+and platform specific code (like Cortex-M). Applications must include both.
+
+The code is relatively complex, and includes multiple components in a
+monolithic repository. Most components use conditional compilation
+and require preprocessor definitions to enable them, otherwise they are
+included in the build.
+
+### Status
+
+µOS++ IIIe is fully functional for Cortex-M devices and also runs
+on synthetic POSIX platforms (like macOS and GNU/Linux).
+
+Note: The next edition of the project (IVe) is currently work in progress,
+with the monolithic
+repository to be split into multiple separate source libraries.
+
+### Build & integration info
+
+The project is written in C/C++ and it is expected
+to be used in C and C++ projects.
+
+The source code was compiled with GCC 11/12, clang 12/13/14/15
+arm-none-eabi-gcc 12, and should be warning free.
+
+To ease the integration of this package into user projects, there
+are already made CMake configuration files (see below).
+
+For other build systems, consider the following details:
+
+#### Include folders
+
+The following folders should be passed to the compiler during the build:
 
 - `include`
 
-### Source folders
+#### Source folders
+
+The source files to be added to the build are in the following folder:
 
 - `src`
 
-### Symbols
+#### Preprocessor definitions
 
 See [µOS++ Application Config](http://micro-os-plus.github.io/reference/cmsis-plus/group__cmsis-plus-app-config.html).
+
+#### Compiler options
+
+- `-std=c++20` or higher for C++ sources
+- `-std=c11` for C sources
+
+#### Dependencies
+
+The portable part of µOS++ is monolithic and does not have direct
+dependencies; however applications must include the platform specific
+implementation, like for Cortex-M.
+
+#### CMake
+
+To integrate the **micro-os-plus-iii** source library
+into a CMake application,
+add this folder to the build:
+
+```cmake
+add_subdirectory("xpacks/@micro-os-plus/micro-os-plus-iii")`
+```
+
+The result is an interface library that can be added as an application
+dependency with:
+
+```cmake
+target_link_libraries(your-target PRIVATE
+
+  micro-os-plus::iii
+)
+```
+
+### Examples
+
+- none
+
+### Known problems
+
+- none
+
+### Limitations
+
+- none
+
+### Tests
+
+- tests/rtos-apis - simple test to exercise the µOS++ RTOS C++ API,
+the C API and the ISO C++ API
+- tests/mutex-stress - a stress test with 10 threads fighting for a mutex
+- tests/cmsis-os-validator - the Arm CMSIS OS validator
+
+The ARM CMSIS RTOS validator is available from a
+[separate project](https://github.com/xpacks/arm-cmsis-rtos-validator).
 
 ## Documentation
 
@@ -167,16 +244,6 @@ See [µOS++ Application Config](http://micro-os-plus.github.io/reference/cmsis-p
 Examples on how to structure projects using µOS++, including integration
 with CubeMX for STM devices, can be found in the separate
 [GitHub project](https://github.com/micro-os-plus/eclipse-demo-projects).
-
-## Tests
-
-- tests/rtos-apis - simple test to exercise the µOS++ RTOS C++ API,
-the C API and the ISO C++ API
-- tests/mutex-stress - a stress test with 10 threads fighting for a mutex
-- tests/cmsis-os-validator - the Arm CMSIS OS validator
-
-The ARM CMSIS RTOS validator is available from a
-[separate project](https://github.com/xpacks/arm-cmsis-rtos-validator).
 
 ## License
 
