@@ -18,7 +18,7 @@
 #
 # The result is an interface library that can be added to the linker with:
 #
-# `target_link_libraries(your-target PUBLIC micro-os-plus::micro-os-plus-iii)`
+# `target_link_libraries(your-target PUBLIC micro-os-plus::iii)`
 
 # -----------------------------------------------------------------------------
 ## Preamble ##
