@@ -1,7 +1,8 @@
-[![license](https://img.shields.io/github/license/micro-os-plus/micro-os-plus)](https://github.com/micro-os-plus/micro-os-plus/blob/xpack/LICENSE)
-[![Travis](https://img.shields.io/travis/micro-os-plus/micro-os-plus.svg)](https://travis-ci.org/micro-os-plus/micro-os-plus)
-[![GitHub issues](https://img.shields.io/github/issues/micro-os-plus/micro-os-plus.svg)](https://github.com/micro-os-plus/micro-os-plus/issues)
-[![GitHub pulls](https://img.shields.io/github/issues-pr/micro-os-plus/micro-os-plus.svg)](https://github.com/micro-os-plus/micro-os-plus/pulls)
+[![GitHub package.json version](https://img.shields.io/github/package-json/v/micro-os-plus/micro-os-plus-iii)](https://github.com/micro-os-plus/micro-os-plus-iii/blob/xpack/package.json)
+[![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/micro-os-plus/micro-os-plus-iii)](https://github.com/micro-os-plus/micro-os-plus-iii/tags/)
+[![license](https://img.shields.io/github/license/micro-os-plus/micro-os-plus-iii)](https://github.com/micro-os-plus/micro-os-plus-iii/blob/xpack/LICENSE)
+[![CI on Push](https://github.com/micro-os-plus/micro-os-plus-iii/actions/workflows/ci.yml/badge.svg)](https://github.com/micro-os-plus/micro-os-plus-iii/actions/workflows/ci.yml)
+[![Website](https://img.shields.io/website?url=https%3A%2F%2Fmicro-os-plus.github.io%2F)](https://micro-os-plus.github.io/micro-os-plus-iii/)
 
 # A source code library with the portable part of µOS++ IIIe (an xpm/npm package)
 
@@ -244,6 +245,21 @@ The ARM CMSIS RTOS validator is available from a
 Examples on how to structure projects using µOS++, including integration
 with CubeMX for STM devices, can be found in the separate
 [GitHub project](https://github.com/micro-os-plus/eclipse-demo-projects).
+
+## Change log - incompatible changes
+
+According to [semver](https://semver.org) rules:
+
+> Major version X (X.y.z | X > 0) MUST be incremented if any
+backwards incompatible changes are introduced to the public API.
+
+The incompatible changes, in reverse chronological order, are:
+
+- v7.x: two minor changes spotted by GCC 12
+  - a name clash between the `file_system()` method and the class;
+  the method was renamed to `get_file_system()`
+  - a name clash between the unscoped enum `socket` definition and
+  the top definition; the definition was changed to a scoped `enum class`
 
 ## License
 

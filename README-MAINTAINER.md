@@ -104,3 +104,12 @@ When the package is considered stable:
 - merge `xpack-develop` into `xpack`
 - push to GitHub
 - select `xpack-develop`
+
+## Share on Twitter
+
+- in a separate browser windows, open [TweetDeck](https://tweetdeck.twitter.com/)
+- using the `@xpack_project` account
+- paste the release name like **µOS++ IIIe v7.0.0 released**
+- paste the link to the Web page
+  [release](https://micro-os-plus.github.io/micro-os-plus/iii/releases/)
+- click the **Tweet** button
