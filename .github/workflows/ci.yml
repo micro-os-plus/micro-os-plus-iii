@@ -50,12 +50,11 @@ jobs:
       with:
         fetch-depth: 3
 
-    - name: Use node ${{ matrix.node-version }}
-      run: |
-        id
-        env | sort
-        which npm
-        nvm use ${{ matrix.node-version }}
+    - name: Setup Node.js ${{ matrix.node-version }}
+      # https://github.com/actions/setup-node/
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
 
     - name: Install xpm@${{ matrix.xpm-version }}
       run: |
