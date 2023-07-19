@@ -2,7 +2,7 @@
 # https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
 # https://github.com/actions
 
-# https://github.com/micro-os-plus/utils-lists-xpack/actions/workflows/ci.yml
+# https://github.com/micro-os-plus/micro-os-plus-iii/actions/workflows/ci.yml
 name: CI on Push
 
 on:
@@ -70,34 +70,34 @@ jobs:
         env
 
     - name: Satisfy project dependencies
-      run: xpm run install
+      run: xpm run install -C tests
 
     - name: Run test-native-cmake-gcc
       run: |
-        xpm install --config native-cmake-gcc-debug
-        xpm install --config native-cmake-gcc-release
-        xpm run test-native-cmake-gcc
+        xpm install --config native-cmake-gcc-debug -C tests
+        xpm install --config native-cmake-gcc-release -C tests
+        xpm run test-native-cmake-gcc -C tests
 
     - name: Run test-native-cmake-clang
       run: |
-        xpm install --config native-cmake-clang-debug
-        xpm install --config native-cmake-clang-release
-        xpm run test-native-cmake-clang
+        xpm install --config native-cmake-clang-debug -C tests
+        xpm install --config native-cmake-clang-release -C tests
+        xpm run test-native-cmake-clang -C tests
 
     - name: Run test-qemu-cortex-m0-cmake
       run: |
-        xpm install --config qemu-cortex-m0-cmake-debug
-        xpm install --config qemu-cortex-m0-cmake-release
-        xpm run test-qemu-cortex-m0-cmake
+        xpm install --config qemu-cortex-m0-cmake-debug -C tests
+        xpm install --config qemu-cortex-m0-cmake-release -C tests
+        xpm run test-qemu-cortex-m0-cmake -C tests
 
     - name: Run test-qemu-cortex-m3-cmake
       run: |
-        xpm install --config qemu-cortex-m3-cmake-debug
-        xpm install --config qemu-cortex-m3-cmake-release
-        xpm run test-qemu-cortex-m3-cmake
+        xpm install --config qemu-cortex-m3-cmake-debug -C tests
+        xpm install --config qemu-cortex-m3-cmake-release -C tests
+        xpm run test-qemu-cortex-m3-cmake -C tests
 
     - name: Run test-qemu-cortex-m7f-cmake
       run: |
-        xpm install --config qemu-cortex-m7f-cmake-debug
-        xpm install --config qemu-cortex-m7f-cmake-release
-        xpm run test-qemu-cortex-m7f-cmake
+        xpm install --config qemu-cortex-m7f-cmake-debug -C tests
+        xpm install --config qemu-cortex-m7f-cmake-release -C tests
+        xpm run test-qemu-cortex-m7f-cmake -C tests
