@@ -1,0 +1,103 @@
+# https://help.github.com/en/actions
+# https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
+# https://github.com/actions
+
+# https://github.com/micro-os-plus/utils-lists-xpack/actions/workflows/ci.yml
+name: CI on Push
+
+on:
+  push:
+    paths-ignore:
+      - '.vscode/**'
+      - 'LICENSE'
+      - '**.md'
+      - '.clang-format'
+      - '.gitignore'
+      - '.npmignore'
+      - 'tests/scripts/**'
+      - '**/README**'
+      - 'docs'
+      - 'doxygen'
+      - 'inspiration'
+      - 'scripts'
+      - 'templates'
+    # This should disable running the workflow on tags, according to the
+    # on.<push|pull_request>.<branches|tags> GitHub Actions docs.
+    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onpushbranchestagsbranches-ignoretags-ignore
+    branches:
+      - '*'
+
+jobs:
+  ci-test:
+    name: 'CI µOS++ tests'
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
+        os: ['ubuntu-22.04', 'macos-12']
+        # https://nodejs.org/en - use LTS
+        node-version: ['18']
+        # https://www.npmjs.com/package/xpm
+        xpm-version: ['0.16.2']
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 3
+
+    - name: Setup Node.js ${{ matrix.node-version }} on ${{ matrix.os }}
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install xpm@${{ matrix.xpm-version }} on Unix
+      if: runner.os != 'Windows'
+      run: sudo npm install -g xpm@${{ matrix.xpm-version }}
+
+    - name: Install xpm@${{ matrix.xpm-version }} on Windows
+      if: runner.os == 'Windows'
+      run: npm install -g xpm@${{ matrix.xpm-version }}
+
+    - name: Show environment
+      run: |
+        uname -a
+        node --version
+        npm --version
+        xpm --version
+        env
+
+    - name: Satisfy project dependencies
+      run: xpm run install
+
+    - name: Run test-native-cmake-gcc
+      run: |
+        xpm install --config native-cmake-gcc-debug
+        xpm install --config native-cmake-gcc-release
+        xpm run test-native-cmake-gcc
+
+    - name: Run test-native-cmake-clang
+      run: |
+        xpm install --config native-cmake-clang-debug
+        xpm install --config native-cmake-clang-release
+        xpm run test-native-cmake-clang
+
+    - name: Run test-qemu-cortex-m0-cmake
+      run: |
+        xpm install --config qemu-cortex-m0-cmake-debug
+        xpm install --config qemu-cortex-m0-cmake-release
+        xpm run test-qemu-cortex-m0-cmake
+
+    - name: Run test-qemu-cortex-m3-cmake
+      run: |
+        xpm install --config qemu-cortex-m3-cmake-debug
+        xpm install --config qemu-cortex-m3-cmake-release
+        xpm run test-qemu-cortex-m3-cmake
+
+    - name: Run test-qemu-cortex-m7f-cmake
+      run: |
+        xpm install --config qemu-cortex-m7f-cmake-debug
+        xpm install --config qemu-cortex-m7f-cmake-release
+        xpm run test-qemu-cortex-m7f-cmake
