@@ -36,9 +36,10 @@ jobs:
     strategy:
       matrix:
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
-        os: [ 'ubuntu-22.04', 'macos-12' ]
+        # os: [ 'ubuntu-22.04', 'macos-12' ]
+        os: [ 'macos-12' ]
         # https://nodejs.org/en - use LTS
-        node-version: [ 18 ]
+        node-version: [ 20 ]
         # https://www.npmjs.com/package/xpm
         xpm-version: [ '0.16.2' ]
 
@@ -56,14 +57,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     - name: Install xpm@${{ matrix.xpm-version }} on Unix
-      if: runner.os != 'Windows'
       run: |
-        sudo chown -R 501:20 "/Users/runner/.npm"
         sudo npm install -g xpm@${{ matrix.xpm-version }}
-
-    - name: Install xpm@${{ matrix.xpm-version }} on Windows
-      if: runner.os == 'Windows'
-      run: npm install -g xpm@${{ matrix.xpm-version }}
 
     - name: Show environment
       run: |
