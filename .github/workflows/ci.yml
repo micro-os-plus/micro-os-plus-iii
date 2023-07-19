@@ -39,7 +39,7 @@ jobs:
         # os: [ 'ubuntu-22.04', 'macos-12' ]
         os: [ 'macos-12' ]
         # https://nodejs.org/en - use LTS
-        node-version: [ 20 ]
+        node-version: [ 18 ]
         # https://www.npmjs.com/package/xpm
         xpm-version: [ '0.16.2' ]
 
@@ -50,15 +50,13 @@ jobs:
       with:
         fetch-depth: 3
 
-    - name: Setup Node.js ${{ matrix.node-version }} on ${{ matrix.os }}
-      # https://github.com/actions/setup-node/
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-
-    - name: Install xpm@${{ matrix.xpm-version }} on Unix
+    - name: Use node ${{ matrix.node-version }}
       run: |
-        sudo npm install -g xpm@${{ matrix.xpm-version }}
+        nvm use ${{ matrix.node-version }}
+
+    - name: Install xpm@${{ matrix.xpm-version }}
+      run: |
+        npm install -g xpm@${{ matrix.xpm-version }}
 
     - name: Show environment
       run: |
@@ -66,10 +64,11 @@ jobs:
         node --version
         npm --version
         xpm --version
-        env
+        env | sort
 
     - name: Satisfy project dependencies
-      run: xpm run install -C tests
+      run: |
+        xpm run install -C tests
 
     - name: Run test-native-cmake-gcc
       run: |
