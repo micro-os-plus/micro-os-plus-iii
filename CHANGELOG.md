@@ -6,9 +6,24 @@ Please check
 [GitHub](https://github.com/micro-os-plus/micro-os-plus-iii-/issues)
 and close existing issues and pull requests.
 
-## 2023-07-14
+## 2023-07-19
 
-* v7.0.0
+* 43944ba README updates
+* 22f4939 package.json: move scripts to actions
+
+## 2023-07-18
+
+* 74e207f CMakeLists cosmetics
+* 5b9e805 README update
+
+## (v7.0.0)
+
+* c776ff6 README update
+* 0a5cbee README update
+* 197d1f3 tests/READMEs update
+* c66306f README update
+* 32e3e6e os-version.h: remove -beta
+* v7.0.0 released
 * 0d39158 tests/package.json: update devDependencies
 * abcf6f4 package.json: minXpm 0.16.2
 
@@ -196,7 +211,10 @@ and close existing issues and pull requests.
 * 330b3d1 os-app-config.h: use _FWRITE_STDOUT
 * 60ac088 native/cmake: -stdlib=libc++ only for C++
 * c56015b cmake: -stdlib=libc++ for clang
-2023-06-14 * 53e4f4d README-MAINTAINER update
+
+## 2023-06-14
+
+* 53e4f4d README-MAINTAINER update
 
 ## 2023-06-13
 
@@ -356,8 +374,9 @@ and close existing issues and pull requests.
 * 2fe30f2 add override
 * c68687f trace.cpp: fix trace_vprintf(...,  va_list args)
 
-## 2023-05-21
+## 2023-05-21 (v6.3.17)
 
+* v6.3.17 released
 * d3ab18d os-versions.h:6.3.18-beta
 * 81f2ab2 prepare 6.3.17
 * 0869a4b os-version.h: remove -beta
@@ -372,8 +391,9 @@ and close existing issues and pull requests.
 
 * 46e2836 #76: Exclude socket definitions used by LWIP
 
-## 2023-05-03
+## 2023-05-03 (v6.3.16)
 
+* v6.3.16 released
 * 9ecdf5d #75: Revert statically initialised lists to BSS
 * a03bcaa os-version.h: bump 6.3.17-beta
 * 466c8d6 prepare v6.3.16
@@ -410,8 +430,9 @@ and close existing issues and pull requests.
 * a6b4410 [#48] posix-io/char-device.h: add override
 * 4b5e21b os-version.h: bump 6.3.16-beta
 
-## 2018-11-19
+## 2018-11-19 (v6.3.15)
 
+* v6.3.15 released
 * 1ea30f6 prepare v6.3.15
 
 ## 2018-11-09
