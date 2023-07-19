@@ -37,9 +37,9 @@ jobs:
       matrix:
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
         # os: [ 'ubuntu-22.04', 'macos-12' ]
-        os: [ 'macos-12' ]
+        os: [ 'ubuntu-22.04' ]
         # https://nodejs.org/en - use LTS
-        node-version: [ 18 ]
+        node-version: [ '18' ]
         # https://www.npmjs.com/package/xpm
         xpm-version: [ '0.16.2' ]
 
