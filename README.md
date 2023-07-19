@@ -14,7 +14,7 @@ The open-source project is hosted on GitHub as
 
 ## Maintainer info
 
-This page is addressed to developers who plan to include this source
+This page is addressed to developers who plan to include this source code
 library into their own projects.
 
 For maintainer info, please see the
@@ -142,7 +142,7 @@ and platform specific code (like Cortex-M). Applications must include both.
 The code is relatively complex, and includes multiple components in a
 monolithic repository. Most components use conditional compilation
 and require preprocessor definitions to enable them, otherwise they are
-included in the build.
+not included in the build.
 
 ### Status
 
@@ -151,14 +151,14 @@ on synthetic POSIX platforms (like macOS and GNU/Linux).
 
 Note: The next edition of the project (IVe) is currently work in progress,
 with the monolithic
-repository to be split into multiple separate source libraries.
+repository to be split into multiple separate source code libraries.
 
 ### Build & integration info
 
 The project is written in C/C++ and it is expected
 to be used in C and C++ projects.
 
-The source code was compiled with GCC 11/12, clang 12/13/14/15
+The source code was compiled with GCC 11/12, clang 12/13/14/15,
 arm-none-eabi-gcc 12, and should be warning free.
 
 To ease the integration of this package into user projects, there
@@ -180,7 +180,9 @@ The source files to be added to the build are in the following folder:
 
 #### Preprocessor definitions
 
-See [µOS++ Application Config](http://micro-os-plus.github.io/reference/cmsis-plus/group__cmsis-plus-app-config.html).
+There are multiple definitions, grouped by various criteria.
+For details, see
+[µOS++ Application Config](http://micro-os-plus.github.io/reference/cmsis-plus/group__cmsis-plus-app-config.html).
 
 #### Compiler options
 
@@ -195,12 +197,12 @@ implementation, like for Cortex-M.
 
 #### CMake
 
-To integrate the **micro-os-plus-iii** source library
+To integrate the **micro-os-plus-iii** source code library
 into a CMake application,
 add this folder to the build:
 
 ```cmake
-add_subdirectory("xpacks/@micro-os-plus/micro-os-plus-iii")`
+add_subdirectory("xpacks/@micro-os-plus/micro-os-plus-iii")
 ```
 
 The result is an interface library that can be added as an application
@@ -227,10 +229,10 @@ target_link_libraries(your-target PRIVATE
 
 ### Tests
 
-- tests/rtos-apis - simple test to exercise the µOS++ RTOS C++ API,
+- `tests/rtos-apis` - simple test to exercise the µOS++ RTOS C++ API,
 the C API and the ISO C++ API
-- tests/mutex-stress - a stress test with 10 threads fighting for a mutex
-- tests/cmsis-os-validator - the Arm CMSIS OS validator
+- `tests/mutex-stress` - a stress test with 10 threads fighting for a mutex
+- `tests/cmsis-os-validator` - the Arm CMSIS OS validator
 
 The ARM CMSIS RTOS validator is available from a
 [separate project](https://github.com/xpacks/arm-cmsis-rtos-validator).
@@ -242,9 +244,12 @@ The ARM CMSIS RTOS validator is available from a
 
 ## Demo projects
 
-Examples on how to structure projects using µOS++, including integration
-with CubeMX for STM devices, can be found in the separate
-[GitHub project](https://github.com/micro-os-plus/eclipse-demo-projects).
+The first source for examples on how to structure projects using µOS++,
+including integration with CubeMX for STM devices, can be found in the
+`tests` folder.
+
+Another source are the Eclipse projects in the separate
+[GitHub eclipse-demo-projects](https://github.com/micro-os-plus/eclipse-demo-projects).
 
 ## Change log - incompatible changes
 
