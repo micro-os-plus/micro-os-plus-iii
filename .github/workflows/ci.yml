@@ -52,7 +52,9 @@ jobs:
 
     - name: Use node ${{ matrix.node-version }}
       run: |
+        id
         env | sort
+        which npm
         nvm use ${{ matrix.node-version }}
 
     - name: Install xpm@${{ matrix.xpm-version }}
@@ -61,6 +63,7 @@ jobs:
 
     - name: Show environment
       run: |
+        id
         uname -a
         node --version
         npm --version
