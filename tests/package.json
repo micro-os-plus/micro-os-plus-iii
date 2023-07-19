@@ -25,7 +25,6 @@
     ],
     "devDependencies": {
       "@xpack-dev-tools/cmake": "3.23.5-1.1",
-      "@xpack-dev-tools/meson-build": "0.63.3-1.1",
       "@xpack-dev-tools/ninja-build": "1.11.1-2.1",
       "@micro-os-plus/build-helper": {
         "specifier": "^2.13.0",
