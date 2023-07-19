@@ -4,12 +4,7 @@
   "description": "A source xPack with µOS++",
   "main": "",
   "scripts": {
-    "npm-install": "npm install",
-    "pack": "npm pack",
-    "version-patch": "npm version patch",
-    "version-minor": "npm version minor",
-    "postversion": "git push origin --all && git push origin --tags",
-    "git-log": "git log --pretty='%cd * %h %s' --date=short"
+    "postversion": "git push origin --all && git push origin --tags"
   },
   "repository": {
     "type": "git",
@@ -35,6 +30,13 @@
   "devDependencies": {},
   "xpack": {
     "minimumXpmRequired": "0.16.2",
+    "actions": {
+      "npm-install": "npm install",
+      "npm-pack": "npm pack",
+      "npm-version-patch": "npm version patch",
+      "npm-version-minor": "npm version minor",
+      "git-log": "git log --pretty='%cd * %h %s' --date=short"
+    },
     "dependencies": {},
     "devDependencies": {}
   }
