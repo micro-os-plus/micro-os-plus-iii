@@ -52,6 +52,7 @@ jobs:
 
     - name: Use node ${{ matrix.node-version }}
       run: |
+        env | sort
         nvm use ${{ matrix.node-version }}
 
     - name: Install xpm@${{ matrix.xpm-version }}
