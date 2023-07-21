@@ -24,7 +24,7 @@ PROJECT_NAME = "µOS++ IIIe Reference"
 PROJECT_NUMBER = v6.3.17
 
 # PROJECT_BRIEF =
-PROJECT_BRIEF = "The third edition of µOS++, a POSIX inspired open source system, written in C++."
+PROJECT_BRIEF = "The third edition of µOS++, a POSIX-like open-source framework, written in C++."
 
 # PROJECT_LOGO =
 PROJECT_LOGO = logo.png
