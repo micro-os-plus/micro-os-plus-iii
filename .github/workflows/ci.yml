@@ -16,11 +16,11 @@ on:
       - '.npmignore'
       - 'tests/scripts/**'
       - '**/README**'
-      - 'docs'
-      - 'doxygen'
-      - 'inspiration'
-      - 'scripts'
-      - 'templates'
+      - 'docs/**'
+      - 'doxygen/**'
+      - 'inspiration/**'
+      - 'scripts/**'
+      - 'templates/**'
     # This should disable running the workflow on tags, according to the
     # on.<push|pull_request>.<branches|tags> GitHub Actions docs.
     # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onpushbranchestagsbranches-ignoretags-ignore
