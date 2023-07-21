@@ -6,8 +6,10 @@
 
 # A source code library with the portable part of µOS++ IIIe (an xpm/npm package)
 
-**µOS++** is a POSIX inspired open
-source framework, written in C++.
+**µOS++** is a POSIX-like open-source framework for writing embedded
+applications, written in C++. It includes multiple components, like startup,
+memory allocators, a multi-threaded scheduler, device drivers, files,
+file systems and more.
 
 The open-source project is hosted on GitHub as
 [micro-os-plus/micro-os-plus-iii](https://github.com/micro-os-plus/micro-os-plus-iii.git).
@@ -23,7 +25,7 @@ For maintainer info, please see the
 ## Purpose
 
 The **µOS++** _(micro oh ɛs plus plus)_ project is
-the third iteration of µOS++, a POSIX-like, portable, open source,
+the third iteration of µOS++, a POSIX-like, portable, open-source,
 royalty-free, multi-tasking real-time framework written in C++,
 intended for 32/64-bits embedded applications.
 
@@ -63,20 +65,23 @@ npm install --global xpm@latest
 For details please follow the instructions in the
 [xPack install](https://xpack.github.io/install/) page.
 
-Warning: Be sure **xpm** is not installed with administrative rights.
+Warning: Be sure **xpm** is not installed with administrative/root rights.
 
 #### xpm
 
-This project can be installed as a package from GitHub with:
+This source code library can be installed as a package from GitHub with:
 
 ```sh
 cd my-project
-xpm init # Unless a package.json is already present
+xpm init # Add a package.json if not already present
 
 xpm install github:micro-os-plus/micro-os-plus-iii#v7.0.0 --save-dev --copy
 
 ls -l xpacks/@micro-os-plus/micro-os-plus-iii
 ```
+
+Note: without `--copy`, the default is to create a link
+to a read-only instance of the package in the **xpm** central store.
 
 #### npm
 
@@ -88,9 +93,12 @@ to use **xpm**.
 
 ### Add as a Git submodule
 
-Besides manually copying the relevant files to the target
-project, which will later require extra maintenance efforts to keep the
-project up to date, a more convenient
+If, for any reason, xpm/npm are not available, it is always possible
+to manually copy the relevant files into the target
+project. However, this will need extra maintenance to keep the
+project up to date.
+
+A more convenient
 solution is to link the entire project as a **Git submodule**,
 for example below an `xpacks` folder:
 
@@ -107,14 +115,14 @@ git submodule add https://github.com/micro-os-plus/micro-os-plus-iii.git \
 
 The current µOS++ code tries to be as portable as possible.
 
-Specific implementations are available from separate projects:
+The following related projects complement µOS++ with specific implementations for different platforms:
 
 - the Cortex-M port of the scheduler is in the separate project
 [µOS++ Cortex-M](https://github.com/micro-os-plus/micro-os-plus-iii-cortexm)
 - the synthetic POSIX port of the scheduler is in the separate project
 [µOS++ POSIX arch](https://github.com/micro-os-plus/micro-os-plus-iii-posix-arch)
 
-Third party libraries are available from
+Third party source code libraries are available from
 
 - <https://github.com/xpacks> - deprecated since mid 2023
 - <https://github.com/xpack-3rd-party>
@@ -244,11 +252,9 @@ The ARM CMSIS RTOS validator is available from a
 
 ## Demo projects
 
-The first source for examples on how to structure projects using µOS++,
-including integration with CubeMX for STM devices, can be found in the
-`tests` folder.
-
-Another source are the Eclipse projects in the separate
+For guidance on how to structure projects using µOS++,
+including integration with CubeMX for STM devices,
+please see the `tests` folder and the Eclipse projects in the separate
 [GitHub eclipse-demo-projects](https://github.com/micro-os-plus/eclipse-demo-projects).
 
 ## Change log - incompatible changes
@@ -268,7 +274,7 @@ The incompatible changes, in reverse chronological order, are:
 
 ## License
 
-The original content is released under the
-[MIT License](https://opensource.org/licenses/mit),
+Unless otherwise stated, the content is released under the terms of the
+[MIT License](https://opensource.org/licenses/mit/),
 with all rights reserved to
 [Liviu Ionescu](https://github.com/ilg-ul).
