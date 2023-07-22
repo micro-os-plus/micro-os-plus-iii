@@ -243,8 +243,8 @@ the C API and the ISO C++ API
 - `tests/mutex-stress` - a stress test with 10 threads fighting for a mutex
 - `tests/cmsis-os-validator` - the Arm CMSIS OS validator
 
-The ARM CMSIS RTOS validator is available from a
-[separate project](https://github.com/xpacks/arm-cmsis-rtos-validator).
+The Arm CMSIS RTOS validator is available from the separate project
+[xpacks/arm-cmsis-rtos-validator](https://github.com/xpacks/arm-cmsis-rtos-validator).
 
 ## Documentation
 
