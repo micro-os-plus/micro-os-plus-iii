@@ -46,7 +46,7 @@ to **add it as a dependency** to the project via **xpm**.
 
 Along with the source files, this project also includes a
 `package.json` file with the metadata that allows it to be identified as an
-**xpm/npm** package so that it can be directly installed from GitHub.
+**xpm/npm** package that can be installed automatically as a dependency.
 
 #### Prerequisites
 
@@ -69,7 +69,7 @@ Warning: Be sure **xpm** is not installed with administrative/root rights.
 
 #### xpm
 
-This source code library can be installed as a sub-folder of `xpacks` with:
+This source code library can be installed as a sub-folder below `xpacks` with:
 
 ```sh
 cd my-project
@@ -80,7 +80,9 @@ xpm install github:micro-os-plus/micro-os-plus-iii#v7.0.0 --save-dev --copy
 ls -l xpacks/@micro-os-plus/micro-os-plus-iii
 ```
 
-Note: without `--copy`, the default is to create a link
+Note: On Windows use `dir` and back-slashes.
+
+Note: Without `--copy`, the default is to create a link
 to a read-only instance of the package in the **xpm** central store.
 
 #### npm
