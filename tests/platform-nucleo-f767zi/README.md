@@ -21,3 +21,19 @@ openocd \
       -c "arm semihosting_cmdline test one two" \
       -c "reset"
 ```
+
+An alternate possible configuration:
+
+```sh
+      -c "gdb_port disabled"
+      -c "tcl_port disabled"
+      -c "telnet_port disabled"
+      -f interface/stlink-dap.cfg
+      -f target/stm32f7x.cfg
+      -c "program rtos-apis-test.elf verify"
+      -c "arm semihosting enable"
+      -c "arm semihosting_cmdline rtos-apis-test"
+      -c "reset halt"
+      -c "cortex_m maskisr on"
+      -c "resume"
+```
