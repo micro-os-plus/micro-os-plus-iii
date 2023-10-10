@@ -69,7 +69,7 @@ endif()
 # message("${CMAKE_C_COMPILER_ID} ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_PROCESSOR}")
 # Unfortunatelly in a container it shows aarch64 instead of armv7l.
 
-# -flto seems ok now with clang too.
+# -flto seems ok now with clang too, but on Linux it requires -fuse-ld=lld
 list(APPEND xpack_platform_common_args
   $<$<CONFIG:Release,MinSizeRel>:-flto>
 )
