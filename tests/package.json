@@ -77,6 +77,8 @@
         "xpm run link-deps --config native-cmake-gcc11-release",
         "xpm run link-deps --config native-cmake-gcc12-debug",
         "xpm run link-deps --config native-cmake-gcc12-release",
+        "xpm run link-deps --config native-cmake-gcc13-debug",
+        "xpm run link-deps --config native-cmake-gcc13-release",
         "xpm run link-deps --config native-cmake-clang-debug",
         "xpm run link-deps --config native-cmake-clang-release",
         "xpm run link-deps --config native-cmake-clang12-debug",
@@ -145,6 +147,14 @@
         "xpm run prepare --config native-cmake-gcc12-release",
         "xpm run build --config native-cmake-gcc12-release",
         "xpm run test --config native-cmake-gcc12-release"
+      ],
+      "test-native-cmake-gcc13": [
+        "xpm run prepare --config native-cmake-gcc13-debug",
+        "xpm run build --config native-cmake-gcc13-debug",
+        "xpm run test --config native-cmake-gcc13-debug",
+        "xpm run prepare --config native-cmake-gcc13-release",
+        "xpm run build --config native-cmake-gcc13-release",
+        "xpm run test --config native-cmake-gcc13-release"
       ],
       "test-native-cmake-clang": [
         "xpm run prepare --config native-cmake-clang-debug",
@@ -262,6 +272,8 @@
         "xpm run clean --config native-cmake-gcc11-release --ignore-errors",
         "xpm run clean --config native-cmake-gcc12-debug --ignore-errors",
         "xpm run clean --config native-cmake-gcc12-release --ignore-errors",
+        "xpm run clean --config native-cmake-gcc13-debug --ignore-errors",
+        "xpm run clean --config native-cmake-gcc13-release --ignore-errors",
         "xpm run clean --config native-cmake-clang12-debug --ignore-errors",
         "xpm run clean --config native-cmake-clang12-release --ignore-errors",
         "xpm run clean --config native-cmake-clang13-debug --ignore-errors",
@@ -367,7 +379,7 @@
       "gcc-latest-dependencies": {
         "hidden": true,
         "inherit": [
-          "gcc12-dependencies"
+          "gcc13-dependencies"
         ]
       },
       "gcc11-dependencies": {
@@ -382,6 +394,13 @@
         "$devDependenciesUrl": "https://www.npmjs.com/package/@xpack-dev-tools/gcc",
         "devDependencies": {
           "@xpack-dev-tools/gcc": "12.3.0-1.1"
+        }
+      },
+      "gcc13-dependencies": {
+        "hidden": true,
+        "$devDependenciesUrl": "https://www.npmjs.com/package/@xpack-dev-tools/gcc",
+        "devDependencies": {
+          "@xpack-dev-tools/gcc": "13.2.0-1.1"
         }
       },
       "clang-latest-dependencies": {
@@ -519,6 +538,27 @@
       "native-cmake-gcc12-release": {
         "inherit": [
           "native-cmake-gcc12-debug"
+        ],
+        "properties": {
+          "buildType": "Release"
+        }
+      },
+      "native-cmake-gcc13-debug": {
+        "inherit": [
+          "native-actions",
+          "cmake-actions",
+          "native-dependencies",
+          "gcc13-dependencies"
+        ],
+        "properties": {
+          "buildType": "Debug",
+          "platformName": "native",
+          "toolchainFileName": "gcc.cmake"
+        }
+      },
+      "native-cmake-gcc13-release": {
+        "inherit": [
+          "native-cmake-gcc13-debug"
         ],
         "properties": {
           "buildType": "Release"
