@@ -95,6 +95,8 @@
         "xpm run link-deps --config qemu-cortex-m0-cmake-release",
         "xpm run link-deps --config qemu-cortex-m3-cmake-debug",
         "xpm run link-deps --config qemu-cortex-m3-cmake-release",
+        "xpm run link-deps --config qemu-cortex-m4f-cmake-debug",
+        "xpm run link-deps --config qemu-cortex-m4f-cmake-release",
         "xpm run link-deps --config qemu-cortex-m7f-cmake-debug",
         "xpm run link-deps --config qemu-cortex-m7f-cmake-release",
         "xpm run link-deps --config raspberrypi-pico-cmake-debug",
@@ -210,6 +212,7 @@
       "test-cortex-cmake": [
         "xpm run test-qemu-cortex-m0-cmake",
         "xpm run test-qemu-cortex-m3-cmake",
+        "xpm run test-qemu-cortex-m4f-cmake",
         "xpm run test-qemu-cortex-m7f-cmake"
       ],
       "test-qemu-cortex-m0-cmake": [
@@ -227,6 +230,14 @@
         "xpm run prepare --config qemu-cortex-m3-cmake-release",
         "xpm run build --config qemu-cortex-m3-cmake-release",
         "xpm run test --config qemu-cortex-m3-cmake-release"
+      ],
+      "test-qemu-cortex-m4f-cmake": [
+        "xpm run prepare --config qemu-cortex-m4f-cmake-debug",
+        "xpm run build --config qemu-cortex-m4f-cmake-debug",
+        "xpm run test --config qemu-cortex-m4f-cmake-debug",
+        "xpm run prepare --config qemu-cortex-m4f-cmake-release",
+        "xpm run build --config qemu-cortex-m4f-cmake-release",
+        "xpm run test --config qemu-cortex-m4f-cmake-release"
       ],
       "test-qemu-cortex-m7f-cmake": [
         "xpm run prepare --config qemu-cortex-m7f-cmake-debug",
@@ -301,6 +312,8 @@
         "xpm run clean --config qemu-cortex-m0-cmake-release --ignore-errors",
         "xpm run clean --config qemu-cortex-m3-cmake-debug --ignore-errors",
         "xpm run clean --config qemu-cortex-m3-cmake-release --ignore-errors",
+        "xpm run clean --config qemu-cortex-m4f-cmake-debug --ignore-errors",
+        "xpm run clean --config qemu-cortex-m4f-cmake-release --ignore-errors",
         "xpm run clean --config qemu-cortex-m7f-cmake-debug --ignore-errors",
         "xpm run clean --config qemu-cortex-m7f-cmake-release --ignore-errors",
         "xpm run clean --config raspberrypi-pico-cmake-debug --ignore-errors",
@@ -760,6 +773,32 @@
         "properties": {
           "buildType": "MinSizeRel",
           "shortConfigurationName": "m3r"
+        }
+      },
+      "qemu-cortex-m4f-cmake-debug": {
+        "inherit": [
+          "cortexm-actions",
+          "cmake-actions",
+          "cortexm-dependencies",
+          "arm-cmsis-dependencies",
+          "arm-none-eabi-gcc-dependencies",
+          "qemu-arm-dependencies",
+          "short-win-paths-properties"
+        ],
+        "properties": {
+          "buildType": "Debug",
+          "platformName": "qemu-cortex-m4f",
+          "toolchainFileName": "arm-none-eabi-gcc.cmake",
+          "shortConfigurationName": "m4fd"
+        }
+      },
+      "qemu-cortex-m4f-cmake-release": {
+        "inherit": [
+          "qemu-cortex-m4f-cmake-debug"
+        ],
+        "properties": {
+          "buildType": "MinSizeRel",
+          "shortConfigurationName": "m4fr"
         }
       },
       "qemu-cortex-m7f-cmake-debug": {

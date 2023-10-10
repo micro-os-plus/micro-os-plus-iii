@@ -22,6 +22,8 @@ The supported platforms for running the µOS++ IIIe tests are:
   on the development machine, compiled with gcc or clang
 - `platform-qemu-cortex-m7f` - run the tests as fully semihosted applications
   on a QEMU mps2-an500 emulated board (an Arm Cortex-M7F development board)
+- `platform-qemu-cortex-m4f` - run the tests as fully semihosted applications
+  on a QEMU mps2-an386 emulated board (an Arm Cortex-M4F development board)
 - `platform-qemu-cortex-m3` - run the tests as fully semihosted applications
   on a QEMU mps2-an385 emulated board (an Arm Cortex-M3 development board)
 - `platform-qemu-cortex-m0` - run the tests as fully semihosted applications
