@@ -59,6 +59,8 @@ namespace os
 
 namespace std
 {
+#if 0
+// std::unary_function is deprecated in C++11.
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -80,7 +82,7 @@ namespace std
     };
 
 #pragma GCC diagnostic pop
-
+#endif
 }
 
 #if defined(OS_HAS_STD_THREADS) && defined(OS_INCLUDE_STD_THREADS)
