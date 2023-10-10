@@ -89,6 +89,8 @@
         "xpm run link-deps --config native-cmake-clang14-release",
         "xpm run link-deps --config native-cmake-clang15-debug",
         "xpm run link-deps --config native-cmake-clang15-release",
+        "xpm run link-deps --config native-cmake-clang16-debug",
+        "xpm run link-deps --config native-cmake-clang16-release",
         "xpm run link-deps --config qemu-cortex-m0-cmake-debug",
         "xpm run link-deps --config qemu-cortex-m0-cmake-release",
         "xpm run link-deps --config qemu-cortex-m3-cmake-debug",
@@ -114,7 +116,8 @@
         "xpm run test-native-cmake-clang12",
         "xpm run test-native-cmake-clang13",
         "xpm run test-native-cmake-clang14",
-        "xpm run test-native-cmake-clang15"
+        "xpm run test-native-cmake-clang15",
+        "xpm run test-native-cmake-clang16"
       ],
       "test-native-cmake-sys": [
         "xpm run prepare --config native-cmake-sys-debug",
@@ -195,6 +198,14 @@
         "xpm run prepare --config native-cmake-clang15-release",
         "xpm run build --config native-cmake-clang15-release",
         "xpm run test --config native-cmake-clang15-release"
+      ],
+      "test-native-cmake-clang16": [
+        "xpm run prepare --config native-cmake-clang16-debug",
+        "xpm run build --config native-cmake-clang16-debug",
+        "xpm run test --config native-cmake-clang16-debug",
+        "xpm run prepare --config native-cmake-clang16-release",
+        "xpm run build --config native-cmake-clang16-release",
+        "xpm run test --config native-cmake-clang16-release"
       ],
       "test-cortex-cmake": [
         "xpm run test-qemu-cortex-m0-cmake",
@@ -281,7 +292,9 @@
         "xpm run clean --config native-cmake-clang14-debug --ignore-errors",
         "xpm run clean --config native-cmake-clang14-release --ignore-errors",
         "xpm run clean --config native-cmake-clang15-debug --ignore-errors",
-        "xpm run clean --config native-cmake-clang15-release --ignore-errors"
+        "xpm run clean --config native-cmake-clang15-release --ignore-errors",
+        "xpm run clean --config native-cmake-clang16-debug --ignore-errors",
+        "xpm run clean --config native-cmake-clang16-release --ignore-errors"
       ],
       "clean-cortex-cmake": [
         "xpm run clean --config qemu-cortex-m0-cmake-debug --ignore-errors",
@@ -406,7 +419,7 @@
       "clang-latest-dependencies": {
         "hidden": true,
         "inherit": [
-          "clang15-dependencies"
+          "clang16-dependencies"
         ]
       },
       "clang12-dependencies": {
@@ -435,6 +448,13 @@
         "$devDependenciesUrl": "https://www.npmjs.com/package/@xpack-dev-tools/clang",
         "devDependencies": {
           "@xpack-dev-tools/clang": "15.0.7-2.1"
+        }
+      },
+      "clang16-dependencies": {
+        "hidden": true,
+        "$devDependenciesUrl": "https://www.npmjs.com/package/@xpack-dev-tools/clang",
+        "devDependencies": {
+          "@xpack-dev-tools/clang": "16.0.6-1.1"
         }
       },
       "qemu-arm-dependencies": {
@@ -664,6 +684,27 @@
       "native-cmake-clang15-release": {
         "inherit": [
           "native-cmake-clang15-debug"
+        ],
+        "properties": {
+          "buildType": "Release"
+        }
+      },
+      "native-cmake-clang16-debug": {
+        "inherit": [
+          "native-actions",
+          "cmake-actions",
+          "native-dependencies",
+          "clang16-dependencies"
+        ],
+        "properties": {
+          "buildType": "Debug",
+          "platformName": "native",
+          "toolchainFileName": "clang.cmake"
+        }
+      },
+      "native-cmake-clang16-release": {
+        "inherit": [
+          "native-cmake-clang16-debug"
         ],
         "properties": {
           "buildType": "Release"
