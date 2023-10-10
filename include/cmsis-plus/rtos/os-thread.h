@@ -2159,7 +2159,12 @@ namespace os
     inline thread::stack::element_t*
     thread::stack::top (void)
     {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
       return bottom_address_ + (size_bytes_ / sizeof(element_t));
+#pragma GCC diagnostic pop
     }
 
     /**

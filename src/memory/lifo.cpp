@@ -100,6 +100,9 @@ namespace os
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcast-align"
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
                       // Compute where top chunk starts.
                       chunk =
                           reinterpret_cast<chunk_t *> (reinterpret_cast<char *> (chunk)

@@ -231,8 +231,13 @@ ssize_t
 my_block_impl::do_read_block (void* buf, posix::block_device::blknum_t blknum,
                               std::size_t nblocks)
 {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
   my_memcpy (buf, &arena_[blknum * block_logical_size_bytes_ / sizeof(elem_t)],
              nblocks * block_logical_size_bytes_);
+#pragma GCC diagnostic pop
   return static_cast<ssize_t> (nblocks);
 }
 
@@ -241,8 +246,13 @@ my_block_impl::do_write_block (const void* buf,
                                posix::block_device::blknum_t blknum,
                                std::size_t nblocks)
 {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
   my_memcpy (&arena_[blknum * block_logical_size_bytes_ / sizeof(elem_t)], buf,
              nblocks * block_logical_size_bytes_);
+#pragma GCC diagnostic pop
   return static_cast<ssize_t> (nblocks);
 }
 
@@ -345,8 +355,13 @@ static const char* test_name = "Test POSIX I/O";
 int
 test_posix_io_api (bool extra __attribute__((unused)))
 {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
   static uint8_t* buff;
   buff = new uint8_t[512];
+#pragma GCC diagnostic pop
 
   ssize_t res;
 

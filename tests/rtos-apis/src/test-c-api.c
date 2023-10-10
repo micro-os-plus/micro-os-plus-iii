@@ -84,8 +84,13 @@ tmfunc (void* args __attribute__((unused)))
 void
 iterate_threads (os_thread_t* th, unsigned int depth);
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
 static const char* thread_state[] =
   { "undf", "rdy", "run", "wait", "term", "dead", "init" };
+#pragma GCC diagnostic pop
 
 /*
  * To compute thread percentages, use totals provided by:
@@ -112,6 +117,7 @@ iterate_threads (os_thread_t* th, unsigned int depth)
       unsigned int used_proc = (unsigned int) (used * 100
           / os_thread_stack_get_size (pst));
       unsigned int st = (unsigned int) (os_thread_get_state (p));
+      assert(st < sizeof(thread_state)/sizeof(thread_state[0]));
 
       os_statistics_counter_t thread_switches =
           os_thread_stat_get_context_switches (p);

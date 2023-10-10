@@ -31,14 +31,20 @@
 #define _SEC_IN_HOUR 3600L
 #define _SEC_IN_DAY 86400L
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
 static const int DAYS_IN_MONTH[12] =
   { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+#pragma GCC diagnostic pop
 
 #define _DAYS_IN_MONTH(x) ((x == 1) ? days_in_feb : DAYS_IN_MONTH[x])
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wreserved-identifier"
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
 static const int _DAYS_BEFORE_MONTH[12] =
   { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };

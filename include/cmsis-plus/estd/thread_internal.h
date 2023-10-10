@@ -380,10 +380,15 @@ template<typename Callable_T, typename ... Args_T>
           reinterpret_cast<os::rtos::thread::func_args_t> (funct_obj)) };
 #pragma GCC diagnostic pop
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wcast-function-type-strict"
+#endif
     // The deleter, to be used during destruction.
     function_object_deleter_ =
         reinterpret_cast<function_object_deleter_t> (&delete_function_object<
             Function_object> );
+#pragma GCC diagnostic pop
   }
 
 #pragma GCC diagnostic pop

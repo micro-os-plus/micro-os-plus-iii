@@ -44,7 +44,12 @@ namespace os
 
     std::size_t file_descriptors_manager::size__;
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
     io** file_descriptors_manager::descriptors_array__;
+#pragma GCC diagnostic pop
 
     /**
      * @endcond

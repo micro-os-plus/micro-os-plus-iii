@@ -161,9 +161,14 @@ main (int argc, char* argv[])
 
   thread::attributes attr = thread::initializer;
   attr.th_stack_size_bytes = OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES;
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wcast-function-type-strict"
+#endif
   os_main_thread = new thread (
       "main", reinterpret_cast<thread::func_t> (_main_trampoline), nullptr,
       attr);
+#pragma GCC diagnostic pop
 
 #endif /* defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS) */
 

@@ -636,6 +636,10 @@ namespace os
           // Check if path1 starts with the mounted path.
           if (std::strncmp (fs.mounted_path_, *path1, len) == 0)
             {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
               // If so, adjust paths to skip over prefix, but keep '/'.
               *path1 = (*path1 + len - 1);
               while ((*path1)[1] == '/')
@@ -651,6 +655,7 @@ namespace os
                       *path2 = (*path2 + 1);
                     }
                 }
+#pragma GCC diagnostic pop
 
               return &fs;
             }

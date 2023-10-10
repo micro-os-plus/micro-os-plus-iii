@@ -140,6 +140,7 @@ mutex_test::object_main (void)
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
 mutex_test* mt[10];
 #pragma GCC diagnostic pop

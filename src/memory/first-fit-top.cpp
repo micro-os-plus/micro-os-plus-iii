@@ -141,6 +141,9 @@ namespace os
                       chunk->size = static_cast<std::size_t> (rem);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcast-align"
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
                       chunk =
                           reinterpret_cast<chunk_t *> (reinterpret_cast<char *> (chunk)
                               + rem);
@@ -234,15 +237,23 @@ namespace os
 #endif
 
       // The address must be inside the arena; no exceptions.
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
       if ((addr < arena_addr_)
           || (addr > (static_cast<char*> (arena_addr_) + total_bytes_)))
         {
           assert(false);
           return;
         }
+#pragma GCC diagnostic pop
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcast-align"
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
       // Compute the chunk address from the user address.
       chunk_t* chunk = reinterpret_cast<chunk_t *> (static_cast<char *> (addr)
           - chunk_offset);
@@ -287,6 +298,10 @@ namespace os
       if (chunk < free_list_)
         {
           // Is the chunk *right* before the list head?
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
           if (reinterpret_cast<char *> (chunk) + chunk->size
               == reinterpret_cast<char *> (free_list_))
             {
@@ -302,6 +317,7 @@ namespace os
               // Insert before the list head.
               chunk->next = free_list_;
             }
+#pragma GCC diagnostic pop
           // The chunk becomes the new list head.
           free_list_ = chunk;
 
@@ -325,6 +341,10 @@ namespace os
       // next_chunk > chunk.
       // Try to merge with chunks immediately before/after it.
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
       if (reinterpret_cast<char *> (prev_chunk) + prev_chunk->size
           == reinterpret_cast<char *> (chunk))
         {
@@ -383,6 +403,7 @@ namespace os
           prev_chunk->next = chunk;
         }
     }
+#pragma GCC diagnostic pop
 
     std::size_t
     first_fit_top::do_max_size (void) const noexcept
@@ -399,7 +420,12 @@ namespace os
       internal_increase_allocated_statistics (chunk->size);
 
       // Compute pointer to payload area.
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
       char* payload = reinterpret_cast<char *> (chunk) + chunk_offset;
+#pragma GCC diagnostic pop
 
       // Align it to user provided alignment.
       void* aligned_payload = payload;
@@ -421,6 +447,9 @@ namespace os
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcast-align"
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
           chunk_t* adj_chunk =
               reinterpret_cast<chunk_t *> (static_cast<char *> (aligned_payload)
                   - chunk_offset);

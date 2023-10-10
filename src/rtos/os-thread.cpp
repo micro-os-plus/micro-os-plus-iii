@@ -161,7 +161,12 @@ namespace os
       // If there is not enough space for the minimal stack, fail.
       os_assert_throw(bottom_address_ != nullptr, ENOMEM);
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
       element_t* p = bottom_address_;
+#pragma GCC diagnostic pop
       element_t* pend = top ();
 
       // Initialise the entire stack with the magic word.
@@ -190,7 +195,12 @@ namespace os
     std::size_t
     thread::stack::available (void)
     {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
       element_t* p = bottom_address_;
+#pragma GCC diagnostic pop
       std::size_t count = 0;
       while (*p == magic)
         {

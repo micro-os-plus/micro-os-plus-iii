@@ -582,6 +582,10 @@ namespace os
       // The queue storage must have a real address.
       os_assert_throw(queue_addr_ != nullptr, ENOMEM);
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
       // The array of prev indexes follows immediately after the content array.
       prev_array_ =
           reinterpret_cast<index_t*> (static_cast<char*> (queue_addr_)
@@ -596,10 +600,12 @@ namespace os
       prio_array_ =
           reinterpret_cast<priority_t*> (reinterpret_cast<char*> (const_cast<index_t*> (next_array_))
               + msgs * sizeof(index_t));
+#pragma GCC diagnostic pop
 
 #if !defined(NDEBUG)
 #pragma GCC diagnostic push
 #if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif
@@ -628,6 +634,10 @@ namespace os
       // the beginning of each block. Each block
       // will hold the address of the next free block,
       // or `nullptr` at the end.
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
       char* p = static_cast<char*> (queue_addr_);
       for (std::size_t i = 1; i < msgs_; ++i)
         {
@@ -639,6 +649,7 @@ namespace os
           // Advance pointer
           p = pn;
         }
+#pragma GCC diagnostic pop
 
       // Mark end of list.
       *(static_cast<void**> (static_cast<void*> (p))) = nullptr;
@@ -679,7 +690,12 @@ namespace os
 
       // Get the address where the message will be copied.
       // This is the first free memory block.
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
       char* dest = static_cast<char*> (first_free_);
+#pragma GCC diagnostic pop
 
       // Update to next free, if any (the last one has nullptr).
       first_free_ = *(static_cast<void**> (first_free_));
@@ -694,13 +710,22 @@ namespace os
           if (nbytes < msg_size_bytes_)
             {
               // Fill in the remaining space with 0x00.
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
               std::memset (dest + nbytes, 0x00, msg_size_bytes_ - nbytes);
+#pragma GCC diagnostic pop
             }
           // ----- Exit uncritical section ------------------------------------
         }
 
       // The third step is to link the buffer to the list.
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
       // Using the address, compute the index in the array.
       std::size_t msg_ix = (static_cast<std::size_t> (dest
           - static_cast<char*> (queue_addr_)) / msg_size_bytes_);
@@ -743,6 +768,7 @@ namespace os
           next_array_[ix] = static_cast<index_t> (msg_ix);
           prev_array_[tmp_ix] = static_cast<index_t> (msg_ix);
         }
+#pragma GCC diagnostic pop
 
       // One more message added to the queue.
       ++count_;
@@ -772,8 +798,13 @@ namespace os
         }
 
       // Compute the message source address.
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
       char* src = static_cast<char*> (queue_addr_) + head_ * msg_size_bytes_;
       priority_t prio = prio_array_[head_];
+#pragma GCC diagnostic pop
 
 #if defined(OS_TRACE_RTOS_MQUEUE_)
       trace::printf ("%s(%p,%u) @%p %s src %p %p\n", __func__, msg, nbytes,
@@ -785,11 +816,16 @@ namespace os
       if (count_ > 1)
         {
           // Remove the current element from the list.
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
           prev_array_[next_array_[head_]] = prev_array_[head_];
           next_array_[prev_array_[head_]] = next_array_[head_];
 
           // Next becomes the new head.
           head_ = next_array_[head_];
+#pragma GCC diagnostic pop
         }
       else
         {

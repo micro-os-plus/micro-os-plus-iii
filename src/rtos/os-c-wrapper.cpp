@@ -3321,6 +3321,10 @@ osThreadCreate (const osThreadDef_t* thread_def, void* args)
   // Find a free slot in the tread definitions array.
   for (uint32_t i = 0; i < thread_def->instances; ++i)
     {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
       thread* th = (thread*) &thread_def->data[i];
       if (th->state () == thread::state::undefined
           || th->state () == thread::state::destroyed)
@@ -3344,6 +3348,7 @@ osThreadCreate (const osThreadDef_t* thread_def, void* args)
           // No need to yield here, already done by constructor.
           return reinterpret_cast<osThreadId> (th);
         }
+#pragma GCC diagnostic pop
     }
   return nullptr;
 }
@@ -3631,9 +3636,14 @@ osTimerCreate (const osTimerDef_t* timer_def, os_timer_type type, void* args)
   timer::attributes attr;
   attr.tm_type = (timer::type_t) type;
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wcast-function-type-strict"
+#endif
   new ((void*) timer_def->data) timer (timer_def->name,
                                        (timer::func_t) timer_def->ptimer,
                                        (timer::func_args_t) args, attr);
+#pragma GCC diagnostic pop
 
   return reinterpret_cast<osTimerId> (timer_def->data);
 }
@@ -4734,12 +4744,17 @@ osMailPut (osMailQId mail_id, void* mail)
 
   // Validate pointer.
   memory_pool* pool = reinterpret_cast<memory_pool*> (&mail_id->pool);
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
   if (((char*) mail < (char*) (pool->pool ()))
       || (((char*) mail)
           >= ((char*) (pool->pool ()) + pool->capacity () * pool->block_size ())))
     {
       return osErrorValue;
     }
+#pragma GCC diagnostic pop
 
   result_t res;
 #pragma GCC diagnostic push

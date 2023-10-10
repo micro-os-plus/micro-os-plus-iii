@@ -433,7 +433,12 @@ namespace os
       // Construct a linked list of blocks. Store the pointer at
       // the beginning of each block. Each block
       // will hold the address of the next free block, or nullptr at the end.
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
       char* p = static_cast<char*> (pool_addr_);
+#pragma GCC diagnostic pop
       for (std::size_t i = 1; i < blocks_; ++i)
         {
           // Compute the address of the next block;
@@ -790,6 +795,10 @@ namespace os
       assert(port::interrupts::is_priority_valid ());
 
       // Validate pointer.
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
       if ((block < pool_addr_)
           || (block
               >= (static_cast<char*> (pool_addr_) + blocks_ * block_size_bytes_)))
@@ -800,6 +809,7 @@ namespace os
 #endif
           return EINVAL;
         }
+#pragma GCC diagnostic pop
 
         {
           // ----- Enter critical section -------------------------------------

@@ -104,8 +104,13 @@ namespace os
         static void
         link (value_type* device);
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
         static value_type*
         identify_device (const char* path);
+#pragma GCC diagnostic pop
 
         /**
          * @}

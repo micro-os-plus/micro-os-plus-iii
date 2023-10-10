@@ -97,8 +97,13 @@ tmfunc (void* args __attribute__((unused)))
 void
 iterate_threads (thread* th = nullptr, unsigned int depth = 0);
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
 static const char* thread_state[] =
   { "undf", "rdy", "run", "wait", "term", "dead", "init" };
+#pragma GCC diagnostic pop
 
 void
 iterate_threads (thread* th, unsigned int depth)
@@ -111,6 +116,7 @@ iterate_threads (thread* th, unsigned int depth)
       unsigned int used_proc = static_cast<unsigned int> (used * 100
           / stk.size ());
       unsigned int st = static_cast<unsigned int> (p.state ());
+      assert(st < sizeof(thread_state)/sizeof(thread_state[0]));
 
       statistics::counter_t thread_switches =
           p.statistics ().context_switches ();

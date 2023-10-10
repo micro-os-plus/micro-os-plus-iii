@@ -66,6 +66,10 @@ busy_wait (unsigned int micros)
 
 #endif
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
 int
 os_main (int argc, char* argv[])
 {
@@ -105,4 +109,5 @@ os_main (int argc, char* argv[])
   status = run_tests (seconds);
   return status;
 }
+#pragma GCC diagnostic pop
 

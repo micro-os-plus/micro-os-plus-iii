@@ -131,6 +131,10 @@ namespace os
         }
     }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
     void __attribute__((weak))
     dump_args (int argc, char* argv[])
     {
@@ -145,6 +149,7 @@ namespace os
         }
       printf ("]);\n");
     }
+#pragma GCC diagnostic pop
 
   } /* namespace trace */
 } /* namespace os */
