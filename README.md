@@ -83,7 +83,7 @@ ls -l xpacks/@micro-os-plus/micro-os-plus-iii
 Note: On Windows use `dir` and back-slashes.
 
 Note: Without `--copy`, the default is to create a link
-to a read-only instance of the package in the **xpm** central store.
+to a read-only instance of the package in the central **xPacks** store.
 
 #### npm
 
