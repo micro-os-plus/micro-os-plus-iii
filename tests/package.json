@@ -24,8 +24,8 @@
       "https://github.com/xpack-dev-tools"
     ],
     "devDependencies": {
-      "@xpack-dev-tools/cmake": "3.23.5-1.1",
-      "@xpack-dev-tools/ninja-build": "1.11.1-2.1",
+      "@xpack-dev-tools/cmake": "3.26.5-1.1",
+      "@xpack-dev-tools/ninja-build": "1.11.1-3.1",
       "@micro-os-plus/build-helper": {
         "specifier": "^2.13.0",
         "local": "link",
@@ -349,7 +349,7 @@
         "hidden": true,
         "$devDependenciesUrl": "https://www.npmjs.com/package/@xpack-dev-tools/arm-none-eabi-gcc",
         "devDependencies": {
-          "@xpack-dev-tools/arm-none-eabi-gcc": "12.2.1-1.2.1"
+          "@xpack-dev-tools/arm-none-eabi-gcc": "12.3.1-1.2.1"
         }
       },
       "cortexm-actions": {
@@ -381,7 +381,7 @@
         "hidden": true,
         "$devDependenciesUrl": "https://www.npmjs.com/package/@xpack-dev-tools/gcc",
         "devDependencies": {
-          "@xpack-dev-tools/gcc": "12.2.0-2.1"
+          "@xpack-dev-tools/gcc": "12.3.0-1.1"
         }
       },
       "clang-latest-dependencies": {
@@ -422,14 +422,14 @@
         "hidden": true,
         "$devDependenciesUrl": "https://www.npmjs.com/package/@xpack-dev-tools/qemu-arm",
         "devDependencies": {
-          "@xpack-dev-tools/qemu-arm": "7.2.0-1.1"
+          "@xpack-dev-tools/qemu-arm": "7.2.5-1.1"
         }
       },
       "openocd-dependencies": {
         "hidden": true,
         "$devDependenciesUrl": "https://www.npmjs.com/package/@xpack-dev-tools/openocd",
         "devDependencies": {
-          "@xpack-dev-tools/openocd": "0.12.0-1.1"
+          "@xpack-dev-tools/openocd": "0.12.0-2.1"
         }
       },
       "short-win-paths-properties": {
