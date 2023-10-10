@@ -22,6 +22,8 @@
 
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wmissing-include-dirs"
 #endif
 
 // ----------------------------------------------------------------------------
