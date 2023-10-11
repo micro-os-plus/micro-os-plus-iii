@@ -85,8 +85,8 @@ target_link_options(platform-native-interface INTERFACE
 
   $<$<PLATFORM_ID:Windows>:-static>
 
-  $<$<AND:$<C_COMPILER_ID:GNU>,$<PLATFORM_ID:Darwin>>:-static-libgcc>
-  $<$<AND:$<C_COMPILER_ID:GNU>,$<PLATFORM_ID:Darwin>>:-static-libstdc++>
+  $<$<AND:$<C_COMPILER_ID:GNU>,$<PLATFORM_ID:Linux,Darwin>>:-static-libgcc>
+  $<$<AND:$<C_COMPILER_ID:GNU>,$<PLATFORM_ID:Linux,Darwin>>:-static-libstdc++>
 
   $<$<PLATFORM_ID:Darwin>:-Wl,-dead_strip>
   $<$<PLATFORM_ID:Linux,Windows>:-Wl,--gc-sections>
