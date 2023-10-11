@@ -37,7 +37,7 @@
         "platforms": "all"
       },
       "@xpacks/chan-fatfs": {
-        "specifier": "github:xpacks/chan-fatfs#v0.13.1-3",
+        "specifier": "github:xpacks/chan-fatfs#v0.13.1-4",
         "local": "link",
         "platforms": "all"
       }
