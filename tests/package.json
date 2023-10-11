@@ -32,7 +32,7 @@
         "platforms": "all"
       },
       "@xpacks/arm-cmsis-rtos-validator": {
-        "specifier": "github:xpacks/arm-cmsis-rtos-validator#v1.0.0-1",
+        "specifier": "github:xpacks/arm-cmsis-rtos-validator#v1.0.0-2",
         "local": "link",
         "platforms": "all"
       },
@@ -345,7 +345,7 @@
             "platforms": "all"
           },
           "@xpack-3rd-party/libucontext": {
-            "specifier": "github:xpack-3rd-party/libucontext-xpack#v1.2.0-1",
+            "specifier": "github:xpack-3rd-party/libucontext-xpack#v1.2.0-2",
             "local": "link",
             "platforms": "all"
           }
