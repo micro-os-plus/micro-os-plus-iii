@@ -54,7 +54,7 @@ set(xpack_platform_common_args
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
   list(APPEND xpack_platform_common_args
-    # $<$<C_COMPILER_ID:Clang,AppleClang>:-Wno-used-but-marked-unused>
+    $<$<C_COMPILER_ID:Clang,AppleClang>:-Wno-used-but-marked-unused>
   )
 endif()
 
@@ -85,9 +85,11 @@ target_link_options(platform-native-interface INTERFACE
 
   $<$<PLATFORM_ID:Windows>:-static>
 
-  # No need for them, -rpath is used.
-  # $<$<AND:$<C_COMPILER_ID:GNU>,$<PLATFORM_ID:Linux,Darwin>>:-static-libgcc>
-  # $<$<AND:$<C_COMPILER_ID:GNU>,$<PLATFORM_ID:Linux,Darwin>>:-static-libstdc++>
+  # On Linux no need for statics, -rpath is fine.
+  # On macOS, GCC 11 gets confused
+  # dyld[72401]: Symbol not found: (__ZNKSt3_V214error_category10_M_messageB5cxx11Ei)
+  $<$<AND:$<C_COMPILER_ID:GNU>,$<PLATFORM_ID:Darwin>>:-static-libgcc>
+  $<$<AND:$<C_COMPILER_ID:GNU>,$<PLATFORM_ID:Darwin>>:-static-libstdc++>
 
   $<$<PLATFORM_ID:Darwin>:-Wl,-dead_strip>
   $<$<PLATFORM_ID:Linux,Windows>:-Wl,--gc-sections>

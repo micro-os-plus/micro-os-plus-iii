@@ -27,11 +27,19 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   # On non-Windows, get the actual libraries paths by asking the compiler.
   execute_process(
     COMMAND "${CMAKE_SOURCE_DIR}/xpacks/@micro-os-plus/build-helper/dev-scripts/get-libraries-paths.sh" ${CMAKE_CXX_COMPILER}
-    OUTPUT_VARIABLE CXX_LIBRARY_PATH
+    OUTPUT_VARIABLE cxx_library_path
     OUTPUT_STRIP_TRAILING_WHITESPACE
   )
-  cmake_path(GET CMAKE_CXX_COMPILER FILENAME CXX_FILENAME)
-  message(VERBOSE "${CXX_FILENAME} RPATH: ${CXX_LIBRARY_PATH}")
+  string(REPLACE ":" ";" cxx_library_path_list ${cxx_library_path})
+
+  set(rpath_options_list)
+  foreach(RPATH IN LISTS cxx_library_path_list)
+    cmake_path(SET normalized_path NORMALIZE ${RPATH})
+    list(APPEND rpath_options_list "-Wl,-rpath,${normalized_path}")
+  endforeach()
+
+  cmake_path(GET CMAKE_CXX_COMPILER FILENAME cxx_filename)
+  message(STATUS "${cxx_filename} RPATH_LIST: ${rpath_options_list}")
 
 endif()
 
@@ -56,7 +64,7 @@ if (ENABLE_RTOS_APIS_TEST)
   # https://cmake.org/cmake/help/v3.20/manual/cmake-generator-expressions.7.html
   target_link_options(rtos-apis-test PRIVATE
     $<$<PLATFORM_ID:Linux,Windows>:-Wl,-Map,platform-bin/rtos-apis-test-map.txt>
-    $<$<PLATFORM_ID:Linux,Darwin>:-Wl,-rpath,${CXX_LIBRARY_PATH}>
+    $<$<PLATFORM_ID:Linux,Darwin>:${rpath_options_list}>
   )
 
   target_link_libraries(rtos-apis-test PRIVATE
@@ -103,7 +111,7 @@ if (ENABLE_MUTEX_STRESS_TEST)
   # https://cmake.org/cmake/help/v3.20/manual/cmake-generator-expressions.7.html
   target_link_options(mutex-stress-test PRIVATE
     $<$<PLATFORM_ID:Linux,Windows>:-Wl,-Map,platform-bin/mutex-stress-test-map.txt>
-    $<$<PLATFORM_ID:Linux,Darwin>:-Wl,-rpath,${CXX_LIBRARY_PATH}>
+    $<$<PLATFORM_ID:Linux,Darwin>:${rpath_options_list}>
   )
 
   target_link_libraries(mutex-stress-test PRIVATE
@@ -147,7 +155,7 @@ if (ENABLE_CMSIS_OS_VALIDATOR_TEST)
   # https://cmake.org/cmake/help/v3.20/manual/cmake-generator-expressions.7.html
   target_link_options(cmsis-os-validator-test PRIVATE
     $<$<PLATFORM_ID:Linux,Windows>:-Wl,-Map,platform-bin/cmsis-os-validator-test-map.txt>
-    $<$<PLATFORM_ID:Linux,Darwin>:-Wl,-rpath,${CXX_LIBRARY_PATH}>
+    $<$<PLATFORM_ID:Linux,Darwin>:${rpath_options_list}>
   )
 
   target_link_libraries(cmsis-os-validator-test PRIVATE
