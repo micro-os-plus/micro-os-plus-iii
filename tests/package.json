@@ -62,6 +62,39 @@
         "npm install",
         "xpm install --all-configs"
       ],
+      "clone-deps": [
+        "rm -rf ${HOME}/Work/micro-os-plus/build-helper-xpack.git",
+        "git clone --branch xpack-develop https://github.com/micro-os-plus/build-helper-xpack.git ${HOME}/Work/micro-os-plus/build-helper-xpack.git",
+        "xpm link -C ${HOME}/Work/micro-os-plus/build-helper-xpack.git",
+
+        "rm -rf ${HOME}/Work/micro-os-plus/micro-os-plus-iii-posix-arch-xpack.git",
+        "git clone --branch xpack-develop https://github.com/micro-os-plus/micro-os-plus-iii-posix-arch.git ${HOME}/Work/micro-os-plus/micro-os-plus-iii-posix-arch.git",
+        "xpm link -C ${HOME}/Work/micro-os-plus/micro-os-plus-iii-posix-arch.git",
+
+        "rm -rf ${HOME}/Work/micro-os-plus/micro-os-plus-iii-cortexm.git",
+        "git clone --branch xpack-develop https://github.com/micro-os-plus/micro-os-plus-iii-cortexm.git ${HOME}/Work/micro-os-plus/micro-os-plus-iii-cortexm.git",
+        "xpm link -C ${HOME}/Work/micro-os-plus/micro-os-plus-iii-cortexm.git",
+
+        "rm -rf ${HOME}/Work/micro-os-plus-iii/arm-cmsis-rtos-validator-xpack.git",
+        "git clone --branch xpack-develop https://github.com/xpacks/arm-cmsis-rtos-validator.git ${HOME}/Work/micro-os-plus-iii/arm-cmsis-rtos-validator.git",
+        "xpm link -C ${HOME}/Work/micro-os-plus-iii/arm-cmsis-rtos-validator.git",
+
+        "rm -rf ${HOME}/Work/micro-os-plus-iii/chan-fatfs-xpack.git",
+        "git clone --branch xpack-develop https://github.com/xpacks/chan-fatfs.git ${HOME}/Work/micro-os-plus-iii/chan-fatfs.git",
+        "xpm link -C ${HOME}/Work/micro-os-plus-iii/chan-fatfs.git",
+
+        "rm -rf ${HOME}/Work/micro-os-plus-iii/arm-cmsis-xpack.git",
+        "git clone --branch xpack-develop https://github.com/xpacks/arm-cmsis.git ${HOME}/Work/micro-os-plus-iii/arm-cmsis.git",
+        "xpm link -C ${HOME}/Work/micro-os-plus-iii/arm-cmsis.git",
+
+        "rm -rf ${HOME}/Work/xpack-3rd-party/libucontext-xpack.git",
+        "git clone --branch xpack-develop https://github.com/xpack-3rd-party/libucontext-xpack.git ${HOME}/Work/xpack-3rd-party/libucontext-xpack.git",
+        "xpm link -C ${HOME}/Work/xpack-3rd-party/libucontext-xpack.git",
+
+        "rm -rf ${HOME}/Work/xpack-3rd-party/raspberrypi-pico-sdk-xpack.git",
+        "git clone --branch xpack-develop https://github.com/xpack-3rd-party/raspberrypi-pico-sdk-xpack.git ${HOME}/Work/xpack-3rd-party/raspberrypi-pico-sdk-xpack.git",
+        "xpm link -C ${HOME}/Work/xpack-3rd-party/raspberrypi-pico-sdk-xpack.git"
+      ],
       "link-deps": [
         "xpm link @micro-os-plus/build-helper",
         "xpm link @xpacks/arm-cmsis-rtos-validator",
