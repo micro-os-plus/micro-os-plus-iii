@@ -54,6 +54,7 @@
       "commandCMakePerformTests": "cd {{ properties.buildFolderRelativePath }} && ctest -V"
     },
     "actions": {
+      "deep-clean": "del-cli build node_modules xpacks package-lock.json",
       "install": [
         "npm install",
         "xpm install"
@@ -134,6 +135,10 @@
         "xpm run link-deps --config qemu-cortex-m7f-cmake-release",
         "xpm run link-deps --config raspberrypi-pico-cmake-debug",
         "xpm run link-deps --config raspberrypi-pico-cmake-release"
+      ],
+      "clean-all": [
+        "xpm run clean-native-cmake",
+        "xpm run clean-cortex-cmake"
       ],
       "test": [
         "{% if os.platform == 'darwin' and os.arch == 'arm64' %}echo {% endif %}xpm run test-native-cmake-gcc",
@@ -312,10 +317,6 @@
         "xpm run build --config nucleo-h743zi-cmake-release",
         "xpm run test --config nucleo-h743zi-cmake-release"
       ],
-      "clean-all": [
-        "xpm run clean-native-cmake",
-        "xpm run clean-cortex-cmake"
-      ],
       "clean-native-cmake": [
         "xpm run clean --config native-cmake-sys-debug --ignore-errors",
         "xpm run clean --config native-cmake-sys-release --ignore-errors",
@@ -353,8 +354,7 @@
         "xpm run clean --config raspberrypi-pico-cmake-release --ignore-errors",
         "xpm run clean --config nucleo-f767zi-cmake-debug --ignore-errors",
         "xpm run clean --config nucleo-f767zi-cmake-release --ignore-errors"
-      ],
-      "deep-clean": "del-cli build node_modules xpacks package-lock.json"
+      ]
     },
     "buildConfigurations": {
       "cmake-actions": {
