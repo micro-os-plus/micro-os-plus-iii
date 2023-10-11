@@ -34,7 +34,7 @@ git clone \
 Or, if the repo was already cloned:
 
 ```sh
-git -C ~/Work/micro-os-plus/micro-os-plus-iii.git
+git -C ~/Work/micro-os-plus/micro-os-plus-iii.git pull
 ```
 
 ## Prerequisites
@@ -95,6 +95,8 @@ related to the new version:
 To run al available tests:
 
 ```sh
+git -C ~/Work/micro-os-plus/micro-os-plus-iii.git pull
+xpm run deep-clean -C ~/Work/micro-os-plus/micro-os-plus-iii.git/tests
 xpm run install-all -C ~/Work/micro-os-plus/micro-os-plus-iii.git/tests
 xpm run test-all -C ~/Work/micro-os-plus/micro-os-plus-iii.git/tests
 ```
