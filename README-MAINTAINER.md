@@ -31,6 +31,12 @@ git clone \
   ~/Work/micro-os-plus/micro-os-plus-iii.git
 ```
 
+Or, if the repo was already cloned:
+
+```sh
+git -C ~/Work/micro-os-plus/micro-os-plus-iii.git
+```
+
 ## Prerequisites
 
 A recent [xpm](https://xpack.github.io/xpm/), which is a portable
@@ -84,6 +90,15 @@ related to the new version:
 
 - commit and push
 
+### Testing
+
+To run al available tests:
+
+```sh
+xpm run install-all -C ~/Work/micro-os-plus/micro-os-plus-iii.git/tests
+xpm run test-all -C ~/Work/micro-os-plus/micro-os-plus-iii.git/tests
+```
+
 ### Commit the new version
 
 - select the `xpack-develop` branch
@@ -95,6 +110,9 @@ related to the new version:
 - `npm version 7.0.0`
 - push the `xpack-develop` branch to GitHub
 - the `postversion` npm script should also update tags via `git push origin --tags`
+
+The workflow result and logs are available from the
+[Actions](https://github.com/micro-os-plus/micro-os-plus-iii/actions) page.
 
 ### Update the repo
 
