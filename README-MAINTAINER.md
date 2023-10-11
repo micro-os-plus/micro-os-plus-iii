@@ -14,7 +14,7 @@ terminal (on Windows use the _Git Bash_ console):
 
 ```sh
 rm -rf ~/Work/micro-os-plus/micro-os-plus-iii.git && \
-mkdir -p ~/Work/xpack-3rd-party && \
+mkdir -p ~/Work/micro-os-plus && \
 git clone \
   https://github.com/micro-os-plus/micro-os-plus-iii.git \
   ~/Work/micro-os-plus/micro-os-plus-iii.git
@@ -24,7 +24,7 @@ For development purposes, clone the `xpack-develop` branch:
 
 ```sh
 rm -rf ~/Work/micro-os-plus/micro-os-plus-iii.git && \
-mkdir -p ~/Work/xpack-3rd-party && \
+mkdir -p ~/Work/micro-os-plus && \
 git clone \
   --branch xpack-develop \
   https://github.com/micro-os-plus/micro-os-plus-iii.git \
