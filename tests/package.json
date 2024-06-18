@@ -18,9 +18,9 @@
   "xpack": {
     "minimumXpmRequired": "0.16.2",
     "dependencies": {},
-    "$dependenciesUrls": [
+    "$devDependenciesUrls": [
       "https://github.com/micro-os-plus",
-      "https://github.com/micro-os-plus",
+      "https://github.com/xpacks",
       "https://github.com/xpack-dev-tools"
     ],
     "devDependencies": {
@@ -151,9 +151,9 @@
       ],
       "test-native-cmake": [
         "{% if os.platform == 'darwin' %}xpm run test-native-cmake-sys{% endif %}",
-        "{% if os.platform == 'darwin' and os.arch == 'arm64' %}echo {% endif %}xpm run test-native-cmake-gcc11",
+        "{% if os.platform == 'darwin' %}echo {% endif %}xpm run test-native-cmake-gcc11",
         "{% if os.platform == 'darwin' and os.arch == 'arm64' %}echo {% endif %}xpm run test-native-cmake-gcc12",
-        "xpm run test-native-cmake-clang12",
+        "{% if os.platform == 'darwin' %}echo {% endif %}xpm run test-native-cmake-clang12",
         "xpm run test-native-cmake-clang13",
         "xpm run test-native-cmake-clang14",
         "xpm run test-native-cmake-clang15",
@@ -369,6 +369,30 @@
           "clean": "{{ properties.commandCMakeClean }}"
         }
       },
+      "native-actions": {
+        "hidden": true,
+        "actions": {
+          "install": [
+            "xpm install --config {{ configuration.name }}"
+          ],
+          "link-deps": [
+            "xpm link @micro-os-plus/micro-os-plus-iii-posix-arch --config {{ configuration.name }}",
+            "xpm link @xpack-3rd-party/libucontext --config {{ configuration.name }}"
+          ]
+        }
+      },
+      "cortexm-actions": {
+        "hidden": true,
+        "actions": {
+          "install": [
+            "xpm install --config {{ configuration.name }}"
+          ],
+          "link-deps": [
+            "xpm link @micro-os-plus/micro-os-plus-iii-cortexm --config {{ configuration.name }}",
+            "xpm link @xpacks/arm-cmsis --config {{ configuration.name }}"
+          ]
+        }
+      },
       "native-dependencies": {
         "hidden": true,
         "devDependencies": {
@@ -382,18 +406,6 @@
             "local": "link",
             "platforms": "all"
           }
-        }
-      },
-      "native-actions": {
-        "hidden": true,
-        "actions": {
-          "install": [
-            "xpm install --config {{ configuration.name }}"
-          ],
-          "link-deps": [
-            "xpm link @micro-os-plus/micro-os-plus-iii-posix-arch --config {{ configuration.name }}",
-            "xpm link @xpack-3rd-party/libucontext --config {{ configuration.name }}"
-          ]
         }
       },
       "cortexm-dependencies": {
@@ -421,18 +433,6 @@
         "$devDependenciesUrl": "https://www.npmjs.com/package/@xpack-dev-tools/arm-none-eabi-gcc",
         "devDependencies": {
           "@xpack-dev-tools/arm-none-eabi-gcc": "12.3.1-1.2.1"
-        }
-      },
-      "cortexm-actions": {
-        "hidden": true,
-        "actions": {
-          "install": [
-            "xpm install --config {{ configuration.name }}"
-          ],
-          "link-deps": [
-            "xpm link @micro-os-plus/micro-os-plus-iii-cortexm --config {{ configuration.name }}",
-            "xpm link @xpacks/arm-cmsis --config {{ configuration.name }}"
-          ]
         }
       },
       "gcc-latest-dependencies": {
