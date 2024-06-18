@@ -929,7 +929,6 @@
         }
       },
       "nucleo-f767zi-cmake-debug": {
-        "hidden": true,
         "inherit": [
           "cortexm-actions",
           "cmake-actions",
@@ -951,7 +950,6 @@
         }
       },
       "nucleo-f767zi-cmake-release": {
-        "hidden": true,
         "inherit": [
           "nucleo-f767zi-cmake-debug"
         ],
@@ -961,7 +959,6 @@
         }
       },
       "nucleo-h743zi-cmake-debug": {
-        "hidden": true,
         "inherit": [
           "cortexm-actions",
           "cmake-actions",
@@ -983,7 +980,6 @@
         }
       },
       "nucleo-h743zi-cmake-release": {
-        "hidden": true,
         "inherit": [
           "nucleo-h743zi-cmake-debug"
         ],
