@@ -1,7 +1,7 @@
 {
   "name": "@micro-os-plus/micro-os-plus-iii",
   "version": "7.0.0",
-  "description": "A source xPack with µOS++",
+  "description": "A source code library with the portable part of µOS++ IIIe",
   "main": "",
   "scripts": {
     "postversion": "git push origin --all && git push origin --tags"
@@ -27,17 +27,26 @@
   "license": "MIT",
   "config": {},
   "dependencies": {},
-  "devDependencies": {},
+  "$devDependenciesUrls": [
+    "https://www.npmjs.com/package/del-cli"
+  ],
+  "devDependencies": {
+    "del-cli": "^5.1.0"
+  },
   "xpack": {
     "minimumXpmRequired": "0.16.2",
     "actions": {
+      "deep-clean": "del-cli node_modules package-lock.json",
       "npm-install": "npm install",
+      "git-log": "git log --pretty='%cd * %h %s' --date=short",
       "npm-pack": "npm pack",
       "npm-version-patch": "npm version patch",
       "npm-version-minor": "npm version minor",
-      "git-log": "git log --pretty='%cd * %h %s' --date=short"
+      "npm-version": "echo $(which node) $(node --version) && echo $(which npm) $(npm --version)"
     },
     "dependencies": {},
-    "devDependencies": {}
+    "devDependencies": {},
+    "properties": {},
+    "buildConfigurations": {}
   }
 }
