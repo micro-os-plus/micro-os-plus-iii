@@ -19,7 +19,7 @@ message(VERBOSE "Processing 'tests/platform-native/platform'...")
 # -----------------------------------------------------------------------------
 
 if(NOT DEFINED xpack_platform_compile_definition)
-  message(FATAL_ERROR "Define xpack_platform_compile_definition in platform*/cmake/globals.cmake")
+  message(FATAL_ERROR "Define xpack_platform_compile_definition in platform*/cmake/common.cmake")
 endif()
 
 # -----------------------------------------------------------------------------
@@ -74,6 +74,36 @@ list(APPEND xpack_platform_common_args
   $<$<CONFIG:Release,MinSizeRel>:-flto>
 )
 
+# Possible workaround for the bug in recent CLT for Ventura 13.6.
+# However it is preferable to downgrade to CLT 14.3.1.
+# https://download.developer.apple.com/Developer_Tools/Command_Line_Tools_for_Xcode_14.3.1/Command_Line_Tools_for_Xcode_14.3.1.dmg
+
+# 0  0x104d87f43  __assert_rtn + 64
+# 1  0x104c89f43  ld::AtomPlacement::findAtom(unsigned char, unsigned long long, ld::AtomPlacement::AtomLoc const*&, long long&) const + 1411
+# 2  0x104ca6431  ld::InputFiles::SliceParser::parseObjectFile(mach_o::Header const*) const + 19745
+# 3  0x104cb6b71  ld::InputFiles::parseAllFiles(void (ld::AtomFile const*) block_pointer)::$_7::operator()(unsigned long, ld::FileInfo const&) const + 657
+# 4  0x7ff806725066  _dispatch_client_callout2 + 8
+# 5  0x7ff806736e09  _dispatch_apply_invoke + 213
+# 6  0x7ff806725033  _dispatch_client_callout + 8
+# 7  0x7ff8067350f6  _dispatch_root_queue_drain + 683
+# 8  0x7ff806735768  _dispatch_worker_thread2 + 170
+# 9  0x7ff8068c2c0f  _pthread_wqthread + 257
+# ld: Assertion failed: (resultIndex < sectData.atoms.size()), function findAtom, file Relocations.cpp, line 1336.
+# collect2: error: ld returned 1 exit status
+
+list(APPEND xpack_platform_common_args
+  # $<$<AND:$<C_COMPILER_ID:GNU>,$<PLATFORM_ID:Darwin>>:-no-pie>
+)
+
+# With clang 12 & CLT 14.3.1:
+# /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/cstdlib:144:9: error: no member named 'at_quick_exit' in the global namespace
+# using ::at_quick_exit _LIBCPP_USING_IF_EXISTS;
+#       ~~^
+# /Library/Developer/CommandLineTools/SDKs/MacOSX14.0.sdk/usr/include/c++/v1/cstdlib:145:9: error: no member named 'quick_exit' in the global namespace
+# using ::quick_exit _LIBCPP_USING_IF_EXISTS;
+#       ~~^
+# 2 errors generated.
+
 target_compile_options(platform-native-interface INTERFACE
   ${xpack_platform_common_args}
 )
@@ -98,8 +128,9 @@ target_link_options(platform-native-interface INTERFACE
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang" )
   # https://clang.llvm.org/docs/Toolchain.html#compiler-runtime
   target_link_options (platform-native-interface INTERFACE
-    # Fails on Raspberry Pi (it hangs, even in Debug).
-    -rtlib=compiler-rt
+
+    $<$<AND:$<PLATFORM_ID:Linux>,$<COMPILE_LANGUAGE:CXX>>:-stdlib=libc++>
+    $<$<PLATFORM_ID:Linux>:-rtlib=compiler-rt>
     $<$<PLATFORM_ID:Linux>:-lunwind>
     $<$<PLATFORM_ID:Linux>:-fuse-ld=lld>
   )

@@ -17,7 +17,7 @@ message(VERBOSE "Processing 'tests/platform-nucleo-f411re/platform'...")
 # -----------------------------------------------------------------------------
 
 if(NOT DEFINED xpack_platform_compile_definition)
-  message(FATAL_ERROR "Define xpack_platform_compile_definition in platform*/cmake/globals.cmake")
+  message(FATAL_ERROR "Define xpack_platform_compile_definition in platform*/cmake/common.cmake")
 endif()
 
 # -----------------------------------------------------------------------------
