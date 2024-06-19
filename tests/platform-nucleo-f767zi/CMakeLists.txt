@@ -78,7 +78,7 @@ if (ENABLE_RTOS_APIS_TEST)
       -c "gdb_port disabled"
       -c "tcl_port disabled"
       -c "telnet_port disabled"
-      -f interface/stlink.cfg
+      -f interface/stlink-dap.cfg
       -f target/stm32f7x.cfg
       -c "program rtos-apis-test.elf verify"
       -c "arm semihosting enable"
@@ -130,7 +130,7 @@ if (ENABLE_MUTEX_STRESS_TEST)
       -c "gdb_port disabled"
       -c "tcl_port disabled"
       -c "telnet_port disabled"
-      -f interface/stlink.cfg
+      -f interface/stlink-dap.cfg
       -f target/stm32f7x.cfg
       -c "program mutex-stress-test.elf verify"
       -c "arm semihosting enable"
@@ -185,7 +185,7 @@ if (ENABLE_CMSIS_OS_VALIDATOR_TEST)
       -c "gdb_port disabled"
       -c "tcl_port disabled"
       -c "telnet_port disabled"
-      -f interface/stlink.cfg
+      -f interface/stlink-dap.cfg
       -f target/stm32f7x.cfg
       -c "program cmsis-os-validator-test.elf verify"
       -c "arm semihosting enable"

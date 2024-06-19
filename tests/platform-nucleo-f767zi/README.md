@@ -13,7 +13,7 @@ openocd \
       -c "gdb_port disabled" \
       -c "tcl_port disabled" \
       -c "telnet_port disabled" \
-      -f interface/stlink.cfg \
+      -f interface/stlink-dap.cfg \
       -c "adapter speed 5000" \
       -f target/stm32f7x.cfg \
       -c "program test.elf verify" \
