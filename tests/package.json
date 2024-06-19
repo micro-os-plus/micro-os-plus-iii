@@ -32,7 +32,7 @@
         "platforms": "all"
       },
       "@xpacks/arm-cmsis-rtos-validator": {
-        "specifier": "github:xpacks/arm-cmsis-rtos-validator#v1.0.0-2",
+        "specifier": "github:xpacks/arm-cmsis-rtos-validator#v1.0.0-3",
         "local": "link",
         "platforms": "all"
       },
@@ -63,7 +63,7 @@
         "npm install",
         "xpm install --all-configs"
       ],
-      "clone-deps": [
+      "git-clone-deps": [
         "rm -rf ${HOME}/Work/micro-os-plus/build-helper-xpack.git",
         "git clone --branch xpack-develop https://github.com/micro-os-plus/build-helper-xpack.git ${HOME}/Work/micro-os-plus/build-helper-xpack.git",
         "xpm link -C ${HOME}/Work/micro-os-plus/build-helper-xpack.git",
@@ -95,6 +95,26 @@
         "rm -rf ${HOME}/Work/xpack-3rd-party/raspberrypi-pico-sdk-xpack.git",
         "git clone --branch xpack-develop https://github.com/xpack-3rd-party/raspberrypi-pico-sdk-xpack.git ${HOME}/Work/xpack-3rd-party/raspberrypi-pico-sdk-xpack.git",
         "xpm link -C ${HOME}/Work/xpack-3rd-party/raspberrypi-pico-sdk-xpack.git"
+      ],
+      "git-status-deps": [
+        "git -C ${HOME}/Work/micro-os-plus/build-helper-xpack.git status",
+        "git -C ${HOME}/Work/micro-os-plus/micro-os-plus-iii-posix-arch.git status",
+        "git -C ${HOME}/Work/micro-os-plus/micro-os-plus-iii-cortexm.git status",
+        "git -C ${HOME}/Work/micro-os-plus-iii/arm-cmsis-rtos-validator.git status",
+        "git -C ${HOME}/Work/micro-os-plus-iii/chan-fatfs.git status",
+        "git -C ${HOME}/Work/micro-os-plus-iii/arm-cmsis.git status",
+        "git -C ${HOME}/Work/xpack-3rd-party/libucontext-xpack.git status",
+        "git -C ${HOME}/Work/xpack-3rd-party/raspberrypi-pico-sdk-xpack.git status"
+      ],
+      "git-pull-deps": [
+        "git -C ${HOME}/Work/micro-os-plus/build-helper-xpack.git pull",
+        "git -C ${HOME}/Work/micro-os-plus/micro-os-plus-iii-posix-arch.git pull",
+        "git -C ${HOME}/Work/micro-os-plus/micro-os-plus-iii-cortexm.git pull",
+        "git -C ${HOME}/Work/micro-os-plus-iii/arm-cmsis-rtos-validator.git pull",
+        "git -C ${HOME}/Work/micro-os-plus-iii/chan-fatfs.git pull",
+        "git -C ${HOME}/Work/micro-os-plus-iii/arm-cmsis.git pull",
+        "git -C ${HOME}/Work/xpack-3rd-party/libucontext-xpack.git pull",
+        "git -C ${HOME}/Work/xpack-3rd-party/raspberrypi-pico-sdk-xpack.git pull"
       ],
       "link-deps": [
         "xpm link @micro-os-plus/build-helper",
