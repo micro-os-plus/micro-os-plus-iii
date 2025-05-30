@@ -32,6 +32,7 @@ namespace os
 
     /**
      * @class event_flags::attributes
+     *
      * @details
      * Allow to assign a name to the event flags.
      *
@@ -54,6 +55,7 @@ namespace os
 
     /**
      * @class event_flags
+     * 
      * @details
      * Synchronised set of flags that can be used to notify events
      * between threads or between ISRs and threads.

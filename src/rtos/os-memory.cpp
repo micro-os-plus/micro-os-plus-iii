@@ -367,6 +367,7 @@ namespace os
 
       /**
        * @fn memory_resource::do_allocate()
+       *
        * @details
        * Allocates storage with a size of at least bytes bytes.
        * The returned storage is aligned to the specified alignment
@@ -384,6 +385,7 @@ namespace os
 
       /**
        * @fn memory_resource::do_deallocate()
+       * 
        * @details
        * Deallocates the storage pointed to by `addr`.
        * The address must have been returned by a prior call to

@@ -476,6 +476,7 @@ namespace os
 
       /**
        * @brief A list node used to point to head and tail.
+       * 
        * @details
        * To simplify processing, the list always has a node.
        */

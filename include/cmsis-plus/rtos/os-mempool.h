@@ -72,6 +72,7 @@ namespace os
 
       /**
        * @brief Type of memory pool size storage.
+       *
        * @details
        * A numeric value that can hold the maximum size of the
        * memory pool, usually a 16-bits unsigned value.
@@ -81,6 +82,7 @@ namespace os
 
       /**
        * @brief Maximum pool size.
+       *
        * @details
        * A constant numeric value used to validate the pool size.
        * @ingroup cmsis-plus-rtos-mempool
@@ -164,6 +166,7 @@ namespace os
 
       /**
        * @brief Storage for a memory pool.
+       *
        * @details
        * Each message is stored in an element
        * extended to a multiple of pointers. The free lists
@@ -826,6 +829,7 @@ namespace os
 
         /**
          * @brief Local storage for the pool.
+         * 
          * @details
          * The local storage is large enough to include `blocks`
          * blocks of type `T`.

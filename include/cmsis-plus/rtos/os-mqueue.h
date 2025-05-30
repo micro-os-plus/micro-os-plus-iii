@@ -72,6 +72,7 @@ namespace os
 
       /**
        * @brief Type of a queue size storage.
+       *
        * @details
        * A numeric value to hold the message queue size, usually
        * an 8-bits value, possibly a 16-bits value if longer
@@ -116,6 +117,7 @@ namespace os
 
       /**
        * @brief Type of message priority storage.
+       *
        * @details
        * A numeric value to hold the message priority, which
        * controls the order in which messages are added to the
@@ -126,6 +128,7 @@ namespace os
 
       /**
        * @brief Default message priority.
+       *
        * @details
        * Use this value with `send()` if no special priorities are required.
        * @ingroup cmsis-plus-rtos-mqueue
@@ -134,6 +137,7 @@ namespace os
 
       /**
        * @brief Maximum message priority.
+       *
        * @details
        * The maximum value allowed by the type, usually used for
        * validation.
@@ -224,6 +228,7 @@ namespace os
       /**
        * @brief Storage for a static message queue.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
+       *
        * @details
        * Each message is stored in an element
        * extended to a multiple of pointers. The lists are kept in two arrays
@@ -665,6 +670,7 @@ namespace os
 
       /**
        * @brief Pointer to the first free message, or `nullptr`.
+       *
        * @details
        * The free messages are in a single linked list, and
        * the allocation strategy is LIFO, messages freed by `receive()`
@@ -1239,6 +1245,7 @@ namespace os
 
         /**
          * @brief Local storage for the queue.
+         * 
          * @details
          * The local storage is large enough to include `msgs`
          * messages of type `T`, plus the separate linked lists and

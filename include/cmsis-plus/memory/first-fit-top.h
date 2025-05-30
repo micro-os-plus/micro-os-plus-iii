@@ -456,6 +456,7 @@ namespace os
 
         /**
          * @brief Pointer to allocator.
+         * 
          * @details
          * The allocator is remembered because deallocation
          * must be performed during destruction. A more automated

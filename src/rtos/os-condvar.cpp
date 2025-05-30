@@ -32,6 +32,7 @@ namespace os
 
     /**
      * @class condition_variable::attributes
+     *
      * @details
      * Allow to assign a name to the condition variable.
      *
@@ -53,6 +54,7 @@ namespace os
 
     /**
      * @class condition_variable
+     * 
      * @details
      * A condition variable is a synchronisation object which allows a thread
      * to suspend execution, repeatedly, until some associated predicate

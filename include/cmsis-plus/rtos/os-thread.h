@@ -260,6 +260,7 @@ namespace os
 
       /**
        * @brief Type of variables holding thread priorities.
+       *
        * @details
        * A numeric type used to hold thread priorities, affecting the thread
        * behaviour, like scheduling and thread wakeup due to events;
@@ -272,6 +273,7 @@ namespace os
 
       /**
        * @brief Thread priorities.
+       *
        * @details
        * The os::rtos::thread::priority definition is a container for
        * priorities not restricted to an enumeration.
@@ -282,6 +284,7 @@ namespace os
       {
         /**
          * @brief Priorities pre-scaler.
+         *
          * @details
          * Decreasing this value narrows the range of allowed
          * priorities. It is recommended to keep it low to give the
@@ -357,6 +360,7 @@ namespace os
 
       /**
        * @brief Thread states.
+       *
        * @details
        * The os::rtos::thread::state definition is a container for
        * thread states.
@@ -405,6 +409,7 @@ namespace os
 
       /**
        * @brief Type of thread function arguments.
+       *
        * @details
        * Useful to cast other similar types
        * to silence possible compiler warnings.
@@ -413,6 +418,7 @@ namespace os
 
       /**
        * @brief Type of thread function.
+       *
        * @details
        * Useful to cast other similar types
        * to silence possible compiler warnings.
@@ -432,6 +438,7 @@ namespace os
 
         /**
          * @brief Type of a stack element.
+         *
          * @details
          * The stack is organised as an array of platform words
          * (usually 4-bytes long on Cortex-M cores).
@@ -440,6 +447,7 @@ namespace os
 
         /**
          * @brief Type of a stack allocation element.
+         *
          * @details
          * For alignment reasons, the stack is allocated in
          * larger chunks, usually 8-bytes long on Cortex-M cores.
@@ -839,6 +847,7 @@ namespace os
         // Warning: must match the type & order of the C file header.
         /**
          * @brief Address of the user defined storage for the thread stack.
+         *
          * @details
          * If `nullptr`, the default is to dynamically allocate the stack.
          */
@@ -847,6 +856,7 @@ namespace os
         /**
          * @brief Size of the user defined storage for the thread
          * stack, in bytes.
+         *
          * @details
          * If 0, the default is `thread::stack::default_size()`.
          *
@@ -859,6 +869,7 @@ namespace os
 
         /**
          * @brief Thread initial priority.
+         * 
          * @details
          * If 0, the default is `thread::priority::normal`.
          *

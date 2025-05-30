@@ -32,6 +32,7 @@ namespace os
 
     /**
      * @class mutex::attributes
+     *
      * @details
      * Allow to assign a name and custom attributes (like priority ceiling,
      * robustness, etc) to the mutex.
@@ -50,6 +51,7 @@ namespace os
 
     /**
      * @class mutex::attributes_recursive
+     *
      * @details
      * Allow to assign a name and custom attributes (like priority ceiling,
      * robustness, etc) to the mutex.
@@ -62,6 +64,7 @@ namespace os
 
     /**
      * @var thread::priority_t mutex::attributes::mx_max_count
+     *
      * @details
      * The @ref mx_max_count attribute defines the upper limit of
      * recursion for a recursive mutex. Further attempts to lock
@@ -70,6 +73,7 @@ namespace os
 
     /**
      * @var thread::priority_t mutex::attributes::mx_priority_ceiling
+     *
      * @details
      * The @ref mx_priority_ceiling attribute defines the priority
      * ceiling of initialised mutexes, which is the minimum priority
@@ -89,6 +93,7 @@ namespace os
 
     /**
      * @var mutex::protocol_t mutex::attributes::mx_protocol
+     *
      * @details
      * The default value of this attribute shall be `mutex::protocol::inherit`.
      *
@@ -104,6 +109,7 @@ namespace os
 
     /**
      * @var mutex::robustness_t mutex::attributes::mx_robustness
+     *
      * @details
      * The default value of this attribute shall be
      * `mutex::robustness::stalled`.
@@ -118,6 +124,7 @@ namespace os
 
     /**
      * @var mutex::type_t mutex::attributes::mx_type
+     *
      * @details
      * The default value of this attribute shall be `mutex::type::default_`.
      *
@@ -131,6 +138,7 @@ namespace os
 
     /**
      * @class mutex::protocol
+     *
      * @details
      * Allow to define the behaviour of the mutex
      * related to scheduling.
@@ -215,6 +223,7 @@ namespace os
 
     /**
      * @class mutex::robustness
+     *
      * @details
      * Allow to define the behaviour when the thread
      * owning a mutex terminates.
@@ -255,6 +264,7 @@ namespace os
 
     /**
      * @class mutex::type
+     *
      * @details
      * Allow to define the behaviour of calls which lock
      * and unlock the mutex. See `mutex::lock()` for details.
@@ -297,6 +307,7 @@ namespace os
 
     /**
      * @class mutex
+     * 
      * @details
      * A synchronisation object used to allow multiple threads to serialise
      * their access to shared data. The name derives from the capability

@@ -763,6 +763,7 @@ namespace os
           /**
            * @brief Define a rebind template.
            * @tparam U Type of elements to be allocated.
+           * 
            * @details
            * The definition follows the default rebind, so functionally
            * it does not bring any new functionality, but avoids a bug

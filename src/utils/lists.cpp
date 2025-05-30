@@ -36,6 +36,7 @@ namespace os
 
     /**
      * @class static_double_list_links
+     *
      * @details
      * This is the simplest list node, used as base class for other
      * list nodes and as storage for static_double_list,
@@ -85,6 +86,7 @@ namespace os
 
     /**
      * @class static_double_list
+     * 
      * @details
      * This is the simplest list, used as base class for scheduler
      * lists that must be available for any statically constructed

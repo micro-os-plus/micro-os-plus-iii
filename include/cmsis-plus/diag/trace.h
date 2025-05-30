@@ -65,6 +65,7 @@ namespace os
   /**
    * @brief Tracing support namespace.
    * @ingroup cmsis-plus-diag
+   * 
    * @details
    * The trace device is an independent output channel, intended
    * for diagnostic purposes.

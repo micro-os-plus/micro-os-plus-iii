@@ -59,6 +59,7 @@ namespace os
 
       /**
        * @brief Type of semaphore counter storage.
+       *
        * @details
        * A numeric value enough to hold the semaphore counter,
        * usually a 16-bits signed value.
@@ -68,6 +69,7 @@ namespace os
 
       /**
        * @brief Maximum semaphore value.
+       * 
        * @details
        * Used to validate the semaphore initial count and max count.
        * @ingroup cmsis-plus-rtos-semaphore

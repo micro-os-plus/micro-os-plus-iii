@@ -53,6 +53,7 @@ namespace os
     // ========================================================================
     /**
      * @class thread::attributes
+     *
      * @details
      * Allow to assign custom attributes (like stack address,
      * stack size, priority) to the thread.
@@ -70,6 +71,7 @@ namespace os
 
     /**
      * @class thread::context
+     *
      * @details
      * The thread context includes the stack object and port
      * specific structures.
@@ -85,6 +87,7 @@ namespace os
 
     /**
      * @class thread::stack
+     *
      * @details
      * This class does not contain the stack space itself, it is
      * allocated outside, but stores the address and the size of
@@ -102,6 +105,7 @@ namespace os
 
     /**
      * @class thread
+     * 
      * @details
      * µOS++ threads are inspired by POSIX threads; they support
      * functions that terminate and a simplified version of

@@ -217,6 +217,7 @@ namespace this_thread
   /**
    * @brief Sleep for a given duration.
    * @param [in] rel_time sleep duration.
+   * 
    * @details
    * extra Clock_T is an extension to the standard
    */

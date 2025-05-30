@@ -321,6 +321,7 @@ extern "C"
 
   /**
    * @brief Type of thread function arguments.
+   * 
    * @details
    * Useful to cast other similar types
    * to silence possible compiler warnings.

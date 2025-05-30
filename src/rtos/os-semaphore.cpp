@@ -38,6 +38,7 @@ namespace os
 
     /**
      * @class semaphore::attributes
+     *
      * @details
      * Allow to assign a name and custom attributes (like initial count,
      * max count) to the semaphore.
@@ -56,6 +57,7 @@ namespace os
 
     /**
      * @var semaphore::count_t semaphore::attributes::sm_initial_value
+     *
      * @details
      * This values represents the number of resources initially
      * available to the semaphore.
@@ -63,6 +65,7 @@ namespace os
 
     /**
      * @var semaphore::count_t semaphore::attributes::sm_max_value
+     *
      * @details
      * This values represents the maximum number of resources
      * available to the semaphore.
@@ -79,6 +82,7 @@ namespace os
 
     /**
      * @class semaphore
+     * 
      * @details
      * Semaphores allow threads and interrupts to synchronise their actions.
      *

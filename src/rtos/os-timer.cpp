@@ -32,6 +32,7 @@ namespace os
 
     /**
      * @class timer::attributes
+     *
      * @details
      * Allow to assign a name to the timer.
      *
@@ -63,6 +64,7 @@ namespace os
 
     /**
      * @class timer
+     * 
      * @details
      * The CMISIS++ timer schedules the execution of a user function after
      * a programmable interval. If the timer is periodic, the function is

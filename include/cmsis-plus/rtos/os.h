@@ -18,6 +18,7 @@
 /**
  * @file os.h
  * @brief Single file µOS++ RTOS definitions.
+ * 
  * @details
  * The code was originally inspired by ARM CMSIS `<cmsis_os.h>` file, v1.02,
  * and tries to remain functionally close to the CMSIS specifications.

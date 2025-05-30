@@ -32,6 +32,7 @@ namespace os
 
     /**
      * @class message_queue::attributes
+     *
      * @details
      * Allow to assign a name and custom attributes (like a static
      * address) to the message queue.
@@ -50,6 +51,7 @@ namespace os
 
     /**
      * @var void* message_queue::attributes::mq_queue_address
+     *
      * @details
      * Set this variable to a user defined memory area large enough
      * to store the message queue. Usually this is a statically
@@ -61,6 +63,7 @@ namespace os
 
     /**
      * @var std::size_t message_queue::attributes::mq_queue_size_bytes
+     *
      * @details
      * The message queue size must match exactly the allocated size. It is
      * used for validation; when the message queue is initialised,
@@ -81,6 +84,7 @@ namespace os
 
     /**
      * @class message_queue_allocated
+     *
      * @details
      * POSIX message queues allow threads to exchange data in the form of
      * messages. Messages are transferred to and from a queue using
@@ -153,6 +157,7 @@ namespace os
 
     /**
      * @class message_queue
+     *
      * @details
      * POSIX message queues allow threads to exchange data in the form of
      * messages. Messages are transferred to and from a queue using
@@ -222,6 +227,7 @@ namespace os
 
     /**
      * @class message_queue_typed
+     *
      * @details
      * If the message is defined as a type (usually an aggregate), it is
      * possible to automate even further the use of message queues,
@@ -274,6 +280,7 @@ namespace os
     // ------------------------------------------------------------------------
     /**
      * @class message_queue_inclusive
+     * 
      * @details
      * If the queue size is known at compile time and the queue is used
      * for the entire application life cycle, it might be preferred to allocate

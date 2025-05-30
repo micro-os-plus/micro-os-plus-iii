@@ -272,6 +272,7 @@ namespace os
 
     /**
      * @class critical_section
+     *
      * @details
      * Use this class to define a critical section
      * protected to scheduler switches. The beginning of the
@@ -307,6 +308,7 @@ namespace os
 
     /*
      * @var const state_t critical_section::state_
+
      * @details
      * The variable is constant, after being set by the constructor no
      * further changes are possible.
@@ -317,6 +319,7 @@ namespace os
 
     /**
      * @class lockable
+     *
      * @details
      * Locker meeting the standard `Lockable` requirements (30.2.5.3).
      */
@@ -499,6 +502,7 @@ namespace os
     {
       /**
        * @class critical_section
+       *
        * @details
        * Use this class to define a critical section
        * protected to interrupts service routines. The beginning of the
@@ -534,6 +538,7 @@ namespace os
 
       /*
        * @var const state_t critical_section::state_
+
        * @details
        * The variable is constant, after being set by the constructor no
        * further changes are possible.
@@ -544,12 +549,14 @@ namespace os
 
       /**
        * @class lockable
+       *
        * @details
        * Locker meeting the standard `Lockable` requirements (30.2.5.3).
        */
 
       /*
        * @var state_t lockable::state_
+
        * @details
        * The variable type usually is an unsigned integer where
        * the priorities register is saved.
@@ -582,6 +589,7 @@ namespace os
     {
       /**
        * @class object_named
+       *
        * @details
        * This class serves as a base class for all objects that have a
        * name (most of the RTOS classes do have a name).
@@ -591,6 +599,7 @@ namespace os
 
       /*
        * @var const char* const object_named::name_
+
        * @details
        * To save space, the null terminated string passed to the
        * constructor is not copied locally. Instead, the pointer to
@@ -647,6 +656,7 @@ __errno (void);
 /**
  * @brief Per-thread error support.
  * @ingroup cmsis-plus-rtos-c
+ * 
  * @details
  * Standard C libraries define `errno` as a macro to a function returning
  * a pointer. This function returns such a pointer, specific to each

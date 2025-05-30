@@ -71,6 +71,7 @@ namespace os
 
       /**
        * @brief Type of variables holding clock durations.
+       *
        * @details
        * A numeric type intended to store a clock duration, either in ticks
        * or in seconds.
@@ -80,6 +81,7 @@ namespace os
 
       /**
        * @brief Type of variables holding clock time stamps.
+       *
        * @details
        * A numeric type intended to store a clock timestamp, either in ticks
        * or in seconds.
@@ -89,6 +91,7 @@ namespace os
 
       /**
        * @brief Type of variables holding clock offsets.
+       * 
        * @details
        * A numeric type intended to store a clock offset
        * (difference to epoch), either in ticks

@@ -58,6 +58,7 @@
 
 /**
  * @brief Tell the world that µOS++ is in use.
+ *
  * @details
  * Macro to inform the application build that µOS++
  * is in use.
@@ -67,6 +68,7 @@
 /**
  * @def OS_IS_CROSS_BUILD
  * @brief Tell the world that this is a cross build.
+ *
  * @details
  * Currently only macOS and GNU/Linux are identified as native builds,
  * all the other are considered cross builds.
@@ -75,6 +77,7 @@
 /**
  * @def OS_HAS_STD_THREADS
  * @brief Tell the world that `std::tread` is available.
+ * 
  * @details
  * For cross builds, standard thread definitions (available in the
  * `os::estd::` namespace) are also aliased or redefined in the `std::`

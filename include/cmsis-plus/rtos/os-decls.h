@@ -232,7 +232,8 @@ namespace os
     namespace interrupts
     {
       /**
-       * @brief Type of variables holding interrupts statu codes.
+       * @brief Type of variables holding interrupts status codes.
+       *
        * @details
        * Usually an integer large enough to hold the CPU register
        * where the interrupt priorities are stored.
@@ -249,6 +250,7 @@ namespace os
     /**
      * @brief Generic flags namespace.
      * @ingroup cmsis-plus-rtos-core
+     *
      * @details
      * The os::rtos::flags namespace groups event types and enumerations.
      */
@@ -256,6 +258,7 @@ namespace os
     {
       /**
        * @brief Type of variables holding flags masks.
+       *
        * @details
        * An unsigned type large enough to store all the flags, usually
        * 32-bits wide.
@@ -266,6 +269,7 @@ namespace os
 
       /**
        * @brief Type of variables holding flags modes.
+       *
        * @details
        * An unsigned type used to hold the mode bits passed to
        * functions returning flags.
@@ -276,6 +280,7 @@ namespace os
 
       /**
        * @brief Flags modes.
+       *
        * @details
        * Container for generic flags enumerations.
        */
@@ -606,6 +611,7 @@ namespace os
         /**
          * @brief Attribute with the address of the clock to be used
          *  for timeouts.
+         *
          * @details
          * It may be one of `os::rtos::sysclock`, `os::rtos::rtclock`,
          * or any other user object derived from class `os::rtos::clock`.
@@ -636,6 +642,7 @@ namespace os
     /**
      * @brief Null locker.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
+     *
      * @details
      * This dummy object can be passed as parameter to templates
      * requiring a lockable, but it does nothing.
@@ -813,6 +820,7 @@ namespace os
       {
         /**
          * @brief Type of variables holding timer durations.
+         *
          * @details
          * A numeric type intended to hold a generic duration, either in ticks
          * cycles or seconds.
@@ -821,6 +829,7 @@ namespace os
 
         /**
          * @brief Type of variables holding time stamps.
+         *
          * @details
          * A numeric type intended to hold a generic timestamp, either in ticks
          * cycles or seconds.
@@ -1005,6 +1014,7 @@ namespace os
 
         /**
          * @brief SysTick implementation hook.
+         *
          * @details
          * It is called from `os_systick_handler()` after the
          * scheduler was started.
@@ -1024,6 +1034,7 @@ namespace os
 
         /**
          * @brief RTC implementation hook.
+         *
          * @details
          * It is called from `os_systick_handler()` after the
          * scheduler was started.
@@ -1103,6 +1114,7 @@ extern "C"
 
 /**
  * @brief Assert or return an error.
+ *
  * @details
  * As required by the ANSI standards, if `NDEBUG` is defined,
  * the assertion is disabled and if the condition is true, the
@@ -1117,6 +1129,7 @@ extern "C"
 
 /**
  * @brief Assert or throw a system error exception.
+ * 
  * @details
  * As required by the ANSI standards, if `NDEBUG` is defined,
  * the assertion is disabled and if the condition is true, a

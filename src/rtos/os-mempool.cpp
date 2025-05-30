@@ -34,6 +34,7 @@ namespace os
 
     /**
      * @class memory_pool::attributes
+     *
      * @details
      * Allow to assign a name and custom attributes (like a static
      * address) to the memory pool.
@@ -89,6 +90,7 @@ namespace os
 
     /**
      * @var void* memory_pool::attributes::mp_pool_address
+     *
      * @details
      * Set this variable to a user defined memory area large enough
      * to store the memory pool. Usually this is a statically
@@ -100,6 +102,7 @@ namespace os
 
     /**
      * @var memory_pool::size_t memory_pool::attributes::mp_pool_size_bytes
+     *
      * @details
      * The memory pool size must match exactly the allocated size. It is
      * used for validation; when the memory pool is initialised,
@@ -120,6 +123,7 @@ namespace os
 
     /**
      * @class memory_pool
+     * 
      * @details
      * Manage a pool of same size blocks. Fast and deterministic allocation
      * and deallocation behaviour, suitable for use even in ISRs.

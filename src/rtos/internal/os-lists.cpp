@@ -149,6 +149,7 @@ namespace os
 
       /**
        * @class waiting_threads_list
+       * 
        * @details
        * There are at least two strategies:
        * - keep the list ordered by priorities and have the top node

@@ -89,6 +89,7 @@ size_t __atexit_count;
 
 /**
  * @brief Array of pointers to functions registered by atexit().
+ *
  * @details
  * To minimise the RAM consumption, the ANSI requirement to support
  * a minimum of 32 functions and to grow the storage dynamically
@@ -105,6 +106,7 @@ exit_func_t __atexit_functions[OS_INTEGER_ATEXIT_ARRAY_SIZE];
  * @retval 0 The function was registered.
  * @retval -1 The function was not registered, either the type is
  *  not supported or the static array is full.
+ * 
  * @details
  * This registry supports only functions passed by atexit(), the
  * more general cxa or dso handles are currently not supported.

@@ -505,6 +505,7 @@ namespace os
 
     /**
      * @class clock_systick
+     *
      * @details
      * This clock counts SysTick interrupts since startup.
      *
@@ -547,7 +548,8 @@ namespace os
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #endif
     /**
-     * @details Kind of singleton instance of the clock_systick class.
+     * @details
+     * Kind of singleton instance of the clock_systick class.
      */
     clock_systick sysclock;
 #pragma GCC diagnostic pop
@@ -608,6 +610,7 @@ namespace os
 
     /**
      * @class clock_rtc
+     * 
      * @details
      * This clock counts seconds since epoch or startup.
      *
