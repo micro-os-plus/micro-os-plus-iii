@@ -547,7 +547,7 @@
  * array is used. This option defines the size of this array.
  *
  * @par Default
- *  20.
+ *  20
  */
 #define OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES (20)
 
