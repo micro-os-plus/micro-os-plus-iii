@@ -316,7 +316,7 @@ namespace os
             any = 0,
 
             /**
-             * Special mask to represent all flags.
+             * @brief Special mask to represent all flags.
              */
             all = 0xFFFFFFFF
       };
