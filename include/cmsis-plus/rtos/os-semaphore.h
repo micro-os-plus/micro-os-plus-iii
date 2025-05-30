@@ -162,6 +162,14 @@ namespace os
        * @brief Binary semaphore attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        * @ingroup cmsis-plus-rtos-semaphore
+       *
+       * @details
+       * Allow to assign a name and custom attributes to the semaphore.
+       *
+       * @par POSIX compatibility
+       *  No POSIX similar functionality identified, but inspired by POSIX
+       *  attributes used in [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
        */
       class attributes_binary : public attributes
       {

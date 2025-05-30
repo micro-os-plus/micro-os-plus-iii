@@ -128,20 +128,6 @@ namespace os
 
     // ========================================================================
 
-    /**
-     * @class clock
-     * @details
-     * Used as base class for all clocks.
-     */
-
-    /**
-     * @cond ignore
-     */
-
-    /**
-     * @endcond
-     */
-
     clock::~clock ()
     {
     }

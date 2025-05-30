@@ -46,6 +46,9 @@ namespace os
      * @brief Generic clock.
      * @headerfile os.h <cmsis-plus/rtos/os.h>
      * @ingroup cmsis-plus-rtos-clock
+     *
+     * @details
+     * Used as base class for all clocks.
      */
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -226,10 +229,6 @@ namespace os
       update_for_slept_time (duration_t duration);
 
       /**
-       * @cond ignore
-       */
-
-      /**
        * @brief Get adjustment offset (placeholder).
        * @par Parameters
        *  None.
@@ -245,6 +244,10 @@ namespace os
        */
       virtual offset_t
       offset (offset_t value);
+
+      /**
+       * @cond ignore
+       */
 
       internal::clock_timestamps_list&
       steady_list (void);
