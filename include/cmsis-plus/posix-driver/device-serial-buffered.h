@@ -46,7 +46,7 @@ namespace os
     /**
      * @brief Buffered serial driver class template.
      * @headerfile circular-buffer.h <cmsis-plus/posix-driver/circular-buffer.h>
-     * @ingroup cmsis-plus-posix-io-driver
+     * @ingroup cmsis-plus-posix-io-drivers
      */
     template<typename CS>
       class device_serial_buffered : public os::posix::device_char
