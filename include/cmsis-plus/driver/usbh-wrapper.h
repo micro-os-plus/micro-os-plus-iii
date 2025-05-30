@@ -23,10 +23,10 @@ extern "C"
   typedef uint32_t ARM_USBH_PIPE_HANDLE;
 
   typedef void
-  (*ARM_USBH_SignalPortEvent_t) (uint8_t port, uint32_t event); ///< Pointer to port event callback
+  (*ARM_USBH_SignalPortEvent_t) (uint8_t port, uint32_t event); /**< Pointer to port event callback. */
   typedef void
   (*ARM_USBH_SignalPipeEvent_t) (ARM_USBH_PIPE_HANDLE pipe_hndl,
-                                 uint32_t event); ///< Pointer to pipe event callback.
+                                 uint32_t event); /**< Pointer to pipe event callback. */
 
   typedef struct _ARM_DRIVER_USBH const ARM_DRIVER_USBH;
 }

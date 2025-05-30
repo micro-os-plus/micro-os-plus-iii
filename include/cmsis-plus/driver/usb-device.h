@@ -67,13 +67,13 @@ namespace os
           // For compatibility with ARM CMSIS, these bits should be
           // exactly in this order.
 
-          ///< VBUS detection
+          /** @brief VBUS detection. */
           bool vbus_detection :1;
 
-          ///< Signal VBUS On event
+          /** @brief Signal VBUS On event. */
           bool event_vbus_on :1;
 
-          ///< Signal VBUS Off event
+          /** @brief Signal VBUS Off event. */
           bool event_vbus_off :1;
 
         };
@@ -113,13 +113,13 @@ namespace os
           // For compatibility with ARM CMSIS, these bits should be
           // exactly in this order.
 
-          ///< USB Device VBUS flag
+          /** @brief USB Device VBUS flag. */
           bool vbus :1;
 
-          ///< USB Device speed setting (ARM_USB_SPEED_xxx)
+          /** @brief USB Device speed setting (ARM_USB_SPEED_xxx). */
           speed_t speed :2;
 
-          ///< USB Device active flag
+          /** @brief USB Device active flag. */
           bool active :1;
         };
 
@@ -138,22 +138,22 @@ namespace os
             {
               //
 
-          ///< USB Device VBUS On
+          /** @brief USB Device VBUS On. */
           vbus_on = (1UL << 0),
 
-          ///< USB Device VBUS Off
+          /** @brief USB Device VBUS Off. */
           vbus_off = (1UL << 1),
 
-          ///< USB Reset occurred
+          /** @brief USB Reset occurred. */
           reset = (1UL << 2),
 
-          ///< USB switch to High Speed occurred
+          /** @brief USB switch to High Speed occurred. */
           high_speed = (1UL << 3),
 
-          ///< USB Suspend occurred
+          /** @brief USB Suspend occurred. */
           suspend = (1UL << 4),
 
-          ///< USB Resume occurred
+          /** @brief USB Resume occurred. */
           resume = (1UL << 5)
         };
 
@@ -168,13 +168,13 @@ namespace os
             {
               //
 
-          ///< SETUP Packet
+          /** @brief SETUP Packet. */
           setup = (1UL << 0),
 
-          ///< OUT Packet(s)
+          /** @brief OUT Packet(s). */
           out = (1UL << 1),
 
-          ///< IN Packet(s)
+          /** @brief IN Packet(s). */
           in = (1UL << 2),
         };
 

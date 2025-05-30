@@ -53,13 +53,13 @@ namespace os
           {
             //
 
-        ///< Low-speed USB
+        /** @brief Low-speed USB. */
         low = 0,
 
-        ///< Full-speed USB
+        /** @brief Full-speed USB. */
         full = 1,
 
-        ///< High-speed USB
+        /** @brief High-speed USB. */
         high = 2,
       };
 
@@ -82,16 +82,16 @@ namespace os
           {
             //
 
-        ///< Control Endpoint
+        /** @brief Control Endpoint. */
         control = 0,
 
-        ///< Isochronous Endpoint
+        /** @brief Isochronous Endpoint. */
         isochronous = 1,
 
-        ///< Bulk Endpoint
+        /** @brief Bulk Endpoint. */
         bulk = 2,
 
-        ///< Interrupt Endpoint
+        /** @brief Interrupt Endpoint. */
         interrupt = 3
       };
 

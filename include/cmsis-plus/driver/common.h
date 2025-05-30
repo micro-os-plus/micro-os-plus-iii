@@ -49,20 +49,20 @@ namespace os
 
     // ----- Return & error codes -----
 
-    ///< Operation succeeded
+    /** Operation succeeded. */
     constexpr return_t RETURN_OK = 0;
 
-    ///< Unspecified error
+    /** Unspecified error. */
     constexpr return_t ERROR = -1;
-    ///< Driver is busy
+    /** Driver is busy. */
     constexpr return_t ERROR_BUSY = -2;
-    ///< Timeout occurred
+    /** Timeout occurred. */
     constexpr return_t ERROR_TIMEOUT = -3;
-    ///< Operation not supported
+    /** Operation not supported. */
     constexpr return_t ERROR_UNSUPPORTED = -4;
-    ///< Parameter error
+    /** Parameter error. */
     constexpr return_t ERROR_PARAMETER = -5;
-    ///< Start of driver specific errors
+    /** Start of driver specific errors. */
     constexpr return_t ERROR_SPECIFIC = -6;
 
     typedef void
@@ -116,8 +116,8 @@ namespace os
 
     private:
 
-      version_t api_; ///< API version
-      version_t drv_; ///< Driver version
+      version_t api_; /**< API version. */
+      version_t drv_; /**< Driver version. */
     };
 
     inline constexpr

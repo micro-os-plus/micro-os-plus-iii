@@ -95,23 +95,23 @@
 #endif
 
 /// @note MUST REMAIN UNCHANGED: @b osCMSIS identifies the CMSIS-RTOS API version.
-#define osCMSIS           0x00010002 ///< API version (main [31:16] .sub [15:0])
+#define osCMSIS           0x00010002 /**< API version (main [31:16] .sub [15:0]). */
 
 /// @note CAN BE CHANGED: @b osCMSIS_KERNEL identifies the underlying RTOS kernel and version number.
-#define osCMSIS_KERNEL    0x00010000	 ///< RTOS identification and version (main [31:16] .sub [15:0])
+#define osCMSIS_KERNEL    0x00010000 /**< RTOS identification and version (main [31:16] .sub [15:0]). */
 
 /// @note MUST REMAIN UNCHANGED: @b osKernelSystemId shall be consistent in every CMSIS-RTOS.
-#define osKernelSystemId "µOS++" ///< RTOS identification string
+#define osKernelSystemId "µOS++" /**< RTOS identification string. */
 
 /// @note MUST REMAIN UNCHANGED: @b osFeature_xxx shall be consistent in every CMSIS-RTOS.
-#define osFeature_MainThread   0 ///< main thread      1=main can be thread, 0=not available
-#define osFeature_Pool         1 ///< Memory Pools:    1=available, 0=not available
-#define osFeature_MailQ        1 ///< Mail Queues:     1=available, 0=not available
-#define osFeature_MessageQ     1 ///< Message Queues:  1=available, 0=not available
-#define osFeature_Signals      8 ///< maximum number of Signal Flags available per thread
-#define osFeature_Semaphore    30 ///< maximum count for @ref osSemaphoreCreate function
-#define osFeature_Wait         1 ///< osWait function: 1=available, 0=not available
-#define osFeature_SysTick      1 ///< osKernelSysTick functions: 1=available, 0=not available
+#define osFeature_MainThread   0 /**< Main thread      1=main can be thread, 0=not available. */
+#define osFeature_Pool         1 /**< Memory Pools:    1=available, 0=not available. */
+#define osFeature_MailQ        1 /**< Mail Queues:     1=available, 0=not available. */
+#define osFeature_MessageQ     1 /**< Message Queues:  1=available, 0=not available. */
+#define osFeature_Signals      8 /**< Maximum number of Signal Flags available per thread. */
+#define osFeature_Semaphore    30 /**< Maximum count for @ref osSemaphoreCreate function. */
+#define osFeature_Wait         1 /**< osWait function: 1=available, 0=not available. */
+#define osFeature_SysTick      1 /**< osKernelSysTick functions: 1=available, 0=not available. */
 
 // Include the µOS++ C API structures declarations.
 #include <cmsis-plus/rtos/os-c-decls.h>
@@ -130,21 +130,21 @@ extern "C"
 /// @note The names MUST REMAIN UNCHANGED: @b osPriority shall be consistent in every CMSIS-RTOS.
   typedef enum
   {
-    osPriorityIdle = os_thread_priority_idle, ///< priority: idle (lowest)
-    osPriorityLow = os_thread_priority_low, ///< priority: low
-    osPriorityBelowNormal = os_thread_priority_below_normal, ///< priority: below normal
-    osPriorityNormal = os_thread_priority_normal, ///< priority: normal (default)
-    osPriorityAboveNormal = os_thread_priority_above_normal, ///< priority: above normal
-    osPriorityHigh = os_thread_priority_high, ///< priority: high
-    osPriorityRealtime = os_thread_priority_realtime, ///< priority: realtime (highest)
-    osPriorityError = os_thread_priority_error ///< system cannot determine priority or thread has illegal priority
+    osPriorityIdle = os_thread_priority_idle, /**< Priority: idle (lowest). */
+    osPriorityLow = os_thread_priority_low, /**< Priority: low. */
+    osPriorityBelowNormal = os_thread_priority_below_normal, /**< Priority: below normal. */
+    osPriorityNormal = os_thread_priority_normal, /**< Priority: normal (default). */
+    osPriorityAboveNormal = os_thread_priority_above_normal, /**< Priority: above normal. */
+    osPriorityHigh = os_thread_priority_high, /**< Priority: high. */
+    osPriorityRealtime = os_thread_priority_realtime, /**< Priority: realtime (highest). */
+    osPriorityError = os_thread_priority_error /**< System cannot determine priority or thread has illegal priority. */
   } osPriority;
 
   /**
    * @brief Timeout value.
    * @note The names MUST REMAIN UNCHANGED: @b osWaitForever shall be consistent in every CMSIS-RTOS.
    */
-#define osWaitForever     0xFFFFFFFF ///< wait forever timeout value
+#define osWaitForever     0xFFFFFFFF /**< Wait forever timeout value. */
 
   /**
    * @brief Status code values returned by CMSIS-RTOS functions.
@@ -152,21 +152,21 @@ extern "C"
    */
   typedef enum
   {
-    osOK = 0, ///< function completed; no error or event occurred.
-    osEventSignal = 0x08, ///< function completed; signal event occurred.
-    osEventMessage = 0x10, ///< function completed; message event occurred.
-    osEventMail = 0x20, ///< function completed; mail event occurred.
-    osEventTimeout = 0x40, ///< function completed; timeout occurred.
-    osErrorParameter = 0x80, ///< parameter error: a mandatory parameter was missing or specified an incorrect object.
-    osErrorResource = 0x81, ///< resource not available: a specified resource was not available.
-    osErrorTimeoutResource = 0xC1, ///< resource not available within given time: a specified resource was not available within the timeout period.
-    osErrorISR = 0x82, ///< not allowed in ISR context: the function cannot be called from interrupt service routines.
-    osErrorISRRecursive = 0x83, ///< function called multiple times from ISR with same object.
-    osErrorPriority = 0x84, ///< system cannot determine priority or thread has illegal priority.
-    osErrorNoMemory = 0x85, ///< system is out of memory: it was impossible to allocate or reserve memory for the operation.
-    osErrorValue = 0x86, ///< value of a parameter is out of range.
-    osErrorOS = 0xFF, ///< unspecified RTOS error: run-time error but no other error message fits.
-    os_status_reserved = 0x7FFFFFFF ///< prevent from enum down-size compiler optimization.
+    osOK = 0, /**< Function completed; no error or event occurred. */
+    osEventSignal = 0x08, /**< Function completed; signal event occurred. */
+    osEventMessage = 0x10, /**< Function completed; message event occurred. */
+    osEventMail = 0x20, /**< Function completed; mail event occurred. */
+    osEventTimeout = 0x40, /**< Function completed; timeout occurred. */
+    osErrorParameter = 0x80, /**< Parameter error: a mandatory parameter was missing or specified an incorrect object. */
+    osErrorResource = 0x81, /**< Resource not available: a specified resource was not available. */
+    osErrorTimeoutResource = 0xC1, /**< Resource not available within given time: a specified resource was not available within the timeout period. */
+    osErrorISR = 0x82, /**< Not allowed in ISR context: the function cannot be called from interrupt service routines. */
+    osErrorISRRecursive = 0x83, /**< Function called multiple times from ISR with same object. */
+    osErrorPriority = 0x84, /**< System cannot determine priority or thread has illegal priority. */
+    osErrorNoMemory = 0x85, /**< System is out of memory: it was impossible to allocate or reserve memory for the operation. */
+    osErrorValue = 0x86, /**< Value of a parameter is out of range. */
+    osErrorOS = 0xFF, /**< Unspecified RTOS error: run-time error but no other error message fits. */
+    os_status_reserved = 0x7FFFFFFF /**< Prevent from enum down-size compiler optimization. */
   } osStatus;
 
   /**
@@ -175,8 +175,8 @@ extern "C"
    */
   typedef enum
   {
-    osTimerOnce = os_timer_once, ///< one-shot timer
-    osTimerPeriodic = os_timer_periodic ///< repeating timer
+    osTimerOnce = os_timer_once, /**< One-shot timer. */
+    osTimerPeriodic = os_timer_periodic /**< Repeating timer. */
   } os_timer_type;
 
   /**
@@ -276,10 +276,10 @@ extern "C"
   typedef struct os_thread_def
   {
     const char* name;
-    os_pthread pthread; ///< start address of thread function
-    osPriority tpriority; ///< initial thread priority
-    uint32_t instances; ///< maximum number of instances of that thread function
-    uint32_t stacksize; ///< stack size requirements in bytes; 0 is default stack size
+    os_pthread pthread; /**< Start address of thread function. */
+    osPriority tpriority; /**< Initial thread priority. */
+    uint32_t instances; /**< Maximum number of instances of that thread function. */
+    uint32_t stacksize; /**< Stack size requirements in bytes; 0 is default stack size. */
     osThread* data;
     uint64_t* stack; // align the stack at 8 bytes
   } osThreadDef_t;
@@ -293,7 +293,7 @@ extern "C"
   typedef struct os_timer_def
   {
     const char* name;
-    os_ptimer ptimer; ///< start address of a timer function
+    os_ptimer ptimer; /**< Start address of a timer function. */
     osTimer* data;
   } osTimerDef_t;
 
@@ -331,9 +331,9 @@ extern "C"
   typedef struct os_pool_def
   {
     const char* name;
-    uint32_t items; ///< number of items (elements) in the pool
-    uint32_t item_sz; ///< size of an item
-    void* pool; ///< pointer to memory for pool
+    uint32_t items; /**< Number of items (elements) in the pool. */
+    uint32_t item_sz; /**< Size of an item. */
+    void* pool; /**< Pointer to memory for pool. */
     uint32_t pool_sz;
     osPool* data;
   } osPoolDef_t;
@@ -345,9 +345,9 @@ extern "C"
   typedef struct os_messageQ_def
   {
     const char* name;
-    uint32_t items; ///< number of elements in the queue
-    uint32_t item_sz; ///< size of an item
-    void* queue; ///< pointer to memory array for messages
+    uint32_t items; /**< Number of elements in the queue. */
+    uint32_t item_sz; /**< Size of an item. */
+    void* queue; /**< Pointer to memory array for messages. */
     uint32_t queue_sz;
     osMessageQ* data;
   } osMessageQDef_t;
@@ -359,12 +359,12 @@ extern "C"
   typedef struct os_mailQ_def
   {
     const char* name;
-    uint32_t items; ///< number of elements in the queue
-    uint32_t pool_item_sz; ///< size of a pool item
-    uint32_t queue_item_sz; ///< size of a queue item
-    void* pool; ///< pointer to memory array for pool
+    uint32_t items; /**< Number of elements in the queue. */
+    uint32_t pool_item_sz; /**< Size of a pool item. */
+    uint32_t queue_item_sz; /**< Size of a queue item. */
+    void* pool; /**< Pointer to memory array for pool. */
     uint32_t pool_sz;
-    void* queue; ///< pointer to memory array for queue
+    void* queue; /**< Pointer to memory array for queue. */
     uint32_t queue_sz;
     osMailQ* data;
   } osMailQDef_t;
@@ -376,18 +376,18 @@ extern "C"
    */
   typedef struct
   {
-    osStatus status; ///< status code: event or error information
+    osStatus status; /**< Status code: event or error information. */
     union
     {
-      uint32_t v; ///< message as 32-bit value
-      void* p; ///< message or mail as void pointer
-      int32_t signals; ///< signal flags
-    } value; ///< event value
+      uint32_t v; /**< Message as 32-bit value. */
+      void* p; /**< Message or mail as void pointer. */
+      int32_t signals; /**< Signal flags. */
+    } value; /**< Event value. */
     union
     {
-      osMailQId mail_id; ///< mail id obtained by @ref osMailCreate
-      osMessageQId message_id; ///< message id obtained by @ref osMessageCreate
-    } def; ///< event definition
+      osMailQId mail_id; /**< Mail id obtained by @ref osMailCreate. */
+      osMessageQId message_id; /**< Message id obtained by @ref osMessageCreate. */
+    } def; /**< Event definition. */
   } osEvent;
 
 #pragma GCC diagnostic pop

@@ -67,19 +67,19 @@ namespace os
           // For compatibility with ARM CMSIS, these bits should be
           // exactly in this order.
 
-          ///< Root HUB available Ports Mask
+          /** @brief Root HUB available Ports Mask. */
           uint32_t port_mask :15;
 
-          ///< Automatic SPLIT packet handling
+          /** @brief Automatic SPLIT packet handling. */
           bool auto_split :1;
 
-          ///< Signal Connect event
+          /** @brief Signal Connect event. */
           bool event_connect :1;
 
-          ///< Signal Disconnect event
+          /** @brief Signal Disconnect event. */
           bool event_disconnect :1;
 
-          ///< Signal Overcurrent event
+          /** @brief Signal Overcurrent event. */
           bool event_overcurrent :1;
         };
 
@@ -118,13 +118,13 @@ namespace os
           // For compatibility with ARM CMSIS, these bits should be
           // exactly in this order.
 
-          ///< USB Host Port connected flag
+          /** @brief USB Host Port connected flag. */
           bool connected :1;
 
-          ///< USB Host Port overcurrent flag
+          /** @brief USB Host Port overcurrent flag. */
           bool overcurrent :1;
 
-          ///< USB Host Port speed setting (ARM_USB_SPEED_xxx)
+          /** @brief USB Host Port speed setting (ARM_USB_SPEED_xxx). */
           speed_t speed :2;
         };
 
@@ -141,25 +141,25 @@ namespace os
             {
               //
 
-          ///< USB Device Connected to Port
+          /** @brief USB Device Connected to Port. */
           connect = (1UL << 0),
 
-          ///< USB Device Disconnected from Port
+          /** @brief USB Device Disconnected from Port. */
           disconnect = (1UL << 1),
 
-          ///< USB Device caused Overcurrent
+          /** @brief USB Device caused Overcurrent. */
           overcurrent = (1UL << 2),
 
-          ///< USB Reset completed
+          /** @brief USB Reset completed. */
           reset = (1UL << 3),
 
-          ///< USB Suspend occurred
+          /** @brief USB Suspend occurred. */
           suspend = (1UL << 4),
 
-          ///< USB Resume occurred
+          /** @brief USB Resume occurred. */
           resume = (1UL << 5),
 
-          ///< USB Device activated Remote Wakeup
+          /** @brief USB Device activated Remote Wakeup. */
           remote_hangup = (1UL << 6)
         };
 
@@ -176,25 +176,25 @@ namespace os
             {
               //
 
-          ///< Transfer completed
+          /** @brief Transfer completed. */
           transfer_complete = (1UL << 0),
 
-          ///< NAK Handshake received
+          /** @brief NAK Handshake received. */
           handshake_nak = (1UL << 1),
 
-          ///< NYET Handshake received
+          /** @brief NYET Handshake received. */
           handshake_nyet = (1UL << 2),
 
-          ///< MDATA Handshake received
+          /** @brief MDATA Handshake received. */
           handshake_mdata = (1UL << 3),
 
-          ///< STALL Handshake received
+          /** @brief STALL Handshake received. */
           handshake_stall = (1UL << 4),
 
-          ///< ERR Handshake received
+          /** @brief ERR Handshake received. */
           handshake_err = (1UL << 5),
 
-          ///< Bus Error detected
+          /** @brief Bus Error detected. */
           bus_err = (1UL << 6)
         };
 

@@ -59,123 +59,123 @@ namespace os
       constexpr config_t CONFIG_Msk (0xFFUL << CONFIG_Pos);
 
       // ----- Serial Control Codes: Mode -----
-      ///< UART = (Asynchronous);; arg = Baudrate
+      /** @brief UART = (Asynchronous);; arg = Baudrate. */
       constexpr config_t MODE_ASYNCHRONOUS = (0x01UL << CONFIG_Pos);
 
-      ///< Synchronous Master = (generates clock signal); arg = Baudrate
+      /** @brief Synchronous Master = (generates clock signal); arg = Baudrate. */
       constexpr config_t MODE_SYNCHRONOUS_MASTER = (0x02UL << CONFIG_Pos);
 
-      ///< Synchronous Slave = (external clock signal);
+      /** @brief Synchronous Slave = (external clock signal);. */
       constexpr config_t MODE_SYNCHRONOUS_SLAVE = (0x03UL << CONFIG_Pos);
 
-      ///< UART Single-wire = (half-duplex);; arg = Baudrate
+      /** @brief UART Single-wire = (half-duplex);; arg = Baudrate. */
       constexpr config_t MODE_SINGLE_WIRE = (0x04UL << CONFIG_Pos);
 
-      ///< UART IrDA; arg = Baudrate
+      /** @brief UART IrDA; arg = Baudrate. */
       constexpr config_t MODE_IRDA = (0x05UL << CONFIG_Pos);
 
-      ///< UART Smart Card; arg = Baudrate
+      /** @brief UART Smart Card; arg = Baudrate. */
       constexpr config_t MODE_SMART_CARD = (0x06UL << CONFIG_Pos);
 
       // ----- Serial Control Codes: Mode Parameters: Data Bits -----
       constexpr bit_number_t DATA_BITS_Pos = 8;
       constexpr config_t DATA_BITS_Msk = (7UL << DATA_BITS_Pos);
 
-      ///< 5 Data bits
+      /** @brief 5 Data bits. */
       constexpr config_t DATA_BITS_5 = (5UL << DATA_BITS_Pos);
 
-      ///< 6 Data bit
+      /** @brief 6 Data bit. */
       constexpr config_t DATA_BITS_6 = (6UL << DATA_BITS_Pos);
 
-      ///< 7 Data bits
+      /** @brief 7 Data bits. */
       constexpr config_t DATA_BITS_7 = (7UL << DATA_BITS_Pos);
 
-      ///< 8 Data bits = (default);
+      /** @brief 8 Data bits = (default);. */
       constexpr config_t DATA_BITS_8 = (0UL << DATA_BITS_Pos);
 
-      ///< 9 Data bits
+      /** @brief 9 Data bits. */
       constexpr config_t DATA_BITS_9 = (1UL << DATA_BITS_Pos);
 
       // ----- Serial Control Codes: Mode Parameters: Parity -----
       constexpr bit_number_t PARITY_Pos = 12;
       constexpr config_t PARITY_Msk = (3UL << PARITY_Pos);
 
-      ///< No Parity = (default);
+      /** @brief No Parity = (default);. */
       constexpr config_t PARITY_NONE = (0UL << PARITY_Pos);
 
-      ///< Even Parity
+      /** @brief Even Parity. */
       constexpr config_t PARITY_EVEN = (1UL << PARITY_Pos);
 
-      ///< Odd Parity
+      /** @brief Odd Parity. */
       constexpr config_t PARITY_ODD = (2UL << PARITY_Pos);
 
       // ----- Serial Control Codes: Mode Parameters: Stop Bits -----
       constexpr bit_number_t STOP_BITS_Pos = 14;
       constexpr config_t STOP_BITS_Msk = (3UL << STOP_BITS_Pos);
 
-      ///< 1 Stop bit = (default);
+      /** @brief 1 Stop bit = (default);. */
       constexpr config_t STOP_BITS_1 = (0UL << STOP_BITS_Pos);
 
-      ///< 2 Stop bits
+      /** @brief 2 Stop bits. */
       constexpr config_t STOP_BITS_2 = (1UL << STOP_BITS_Pos);
 
-      ///< 1.5 Stop bits
+      /** @brief 1.5 Stop bits. */
       constexpr config_t STOP_BITS_1_5 = (2UL << STOP_BITS_Pos);
 
-      ///< 0.5 Stop bits
+      /** @brief 0.5 Stop bits. */
       constexpr config_t STOP_BITS_0_5 = (3UL << STOP_BITS_Pos);
 
       // ----- Serial Control Codes: Mode Parameters: Flow Control -----
       constexpr bit_number_t FLOW_CONFIG_Pos = 16;
       constexpr config_t FLOW_CONTROL_Msk = (3UL << FLOW_CONFIG_Pos);
 
-      ///< No Flow Control = (default);
+      /** @brief No Flow Control = (default);. */
       constexpr config_t FLOW_CONTROL_NONE = (0UL << FLOW_CONFIG_Pos);
 
-      ///< RTS Flow Control
+      /** @brief RTS Flow Control. */
       constexpr config_t FLOW_CONTROL_RTS = (1UL << FLOW_CONFIG_Pos);
 
-      ///< CTS Flow Control
+      /** @brief CTS Flow Control. */
       constexpr config_t FLOW_CONTROL_CTS = (2UL << FLOW_CONFIG_Pos);
 
-      ///< RTS/CTS Flow Control
+      /** @brief RTS/CTS Flow Control. */
       constexpr config_t FLOW_CONTROL_RTS_CTS = (3UL << FLOW_CONFIG_Pos);
 
       // ----- Serial Control Codes: Mode Parameters: Clock Polarity = (Synchronous mode); -----
       constexpr bit_number_t CPOL_Pos = 18;
       constexpr config_t CPOL_Msk = (1UL << CPOL_Pos);
 
-      ///< CPOL = 0 = (default);
+      /** @brief CPOL = 0 = (default);. */
       constexpr config_t CPOL0 = (0UL << CPOL_Pos);
 
-      ///< CPOL = 1
+      /** @brief CPOL = 1. */
       constexpr config_t CPOL1 = (1UL << CPOL_Pos);
 
       // ----- Serial Control Codes: Mode Parameters: Clock Phase = (Synchronous mode); -----
       constexpr bit_number_t CPHA_Pos = 19;
       constexpr config_t CPHA_Msk = (1UL << CPHA_Pos);
 
-      ///< CPHA = 0 = (default);
+      /** @brief CPHA = 0 = (default);. */
       constexpr config_t CPHA0 = (0UL << CPHA_Pos);
 
-      ///< CPHA = 1
+      /** @brief CPHA = 1. */
       constexpr config_t CPHA1 = (1UL << CPHA_Pos);
 
       // ----- Serial Control Codes: Miscellaneous Controls  -----
 
-      ///< Set default Transmit value = (Synchronous Receive only); arg = value
+      /** @brief Set default Transmit value = (Synchronous Receive only); arg = value. */
       constexpr config_t DEFAULT_TX_VALUE = (0x10UL << CONFIG_Pos);
 
-      ///< Set IrDA Pulse in ns; arg: 0=3/16 of bit period
+      /** @brief Set IrDA Pulse in ns; arg: 0=3/16 of bit period. */
       constexpr config_t IRDA_PULSE = (0x11UL << CONFIG_Pos);
 
-      ///< Set Smart Card Guard Time; arg = number of bit periods
+      /** @brief Set Smart Card Guard Time; arg = number of bit periods. */
       constexpr config_t SMART_CARD_GUARD_TIME = (0x12UL << CONFIG_Pos);
 
-      ///< Set Smart Card Clock in Hz; arg: 0=Clock not generated
+      /** @brief Set Smart Card Clock in Hz; arg: 0=Clock not generated. */
       constexpr config_t SMART_CARD_CLOCK = (0x13UL << CONFIG_Pos);
 
-      ///< Smart Card NACK generation; arg: 0=disabled, 1=enabled
+      /** @brief Smart Card NACK generation; arg: 0=disabled, 1=enabled. */
       constexpr config_t SMART_CARD_NACK = (0x14UL << CONFIG_Pos);
 
       // --------------------------------------------------------------------
@@ -185,59 +185,59 @@ namespace os
         : control_t
           {
             //
-        ///< Enable Transmitter
+        /** @brief Enable Transmitter. */
         enable_tx = (0x15UL << CONFIG_Pos),
 
-        ///< Enable Receiver
+        /** @brief Enable Receiver. */
         enable_rx = (0x16UL << CONFIG_Pos),
 
-        ///< Enable Continuous Break transmission
+        /** @brief Enable Continuous Break transmission. */
         enable_break = (0x17UL << CONFIG_Pos),
 
-        ///< Abort @ref Serial::send()
+        /** @brief Abort @ref Serial::send(). */
         abort_send = (0x18UL << CONFIG_Pos),
 
-        ///< Abort @ref Serial::receive()
+        /** @brief Abort @ref Serial::receive(). */
         abort_receive = (0x19UL << CONFIG_Pos),
 
-        ///< Abort @ref Serial::transfer()
+        /** @brief Abort @ref Serial::transfer(). */
         abort_transfer = (0x1AUL << CONFIG_Pos),
 
-        ///< Disable Transmitter
+        /** @brief Disable Transmitter. */
         disable_tx = (0x25UL << CONFIG_Pos),
 
-        ///< Disable Receiver
+        /** @brief Disable Receiver. */
         disable_rx = (0x26UL << CONFIG_Pos),
 
-        ///< Disable Continuous Break transmission;
+        /** @brief Disable Continuous Break transmission;. */
         disable_break = (0x27UL << CONFIG_Pos)
       };
 
       // --------------------------------------------------------------------
       // ****** Serial specific error codes *****
 
-      ///< Specified Mode not supported
+      /** @brief Specified Mode not supported. */
       constexpr return_t ERROR_MODE = ERROR_SPECIFIC - 1;
 
-      ///< Specified baudrate not supported
+      /** @brief Specified baudrate not supported. */
       constexpr return_t ERROR_BAUDRATE = ERROR_SPECIFIC - 2;
 
-      ///< Specified number of Data bits not supported
+      /** @brief Specified number of Data bits not supported. */
       constexpr return_t ERROR_DATA_BITS = ERROR_SPECIFIC - 3;
 
-      ///< Specified Parity not supported
+      /** @brief Specified Parity not supported. */
       constexpr return_t ERROR_PARITY = ERROR_SPECIFIC - 4;
 
-      ///< Specified number of Stop bits not supported
+      /** @brief Specified number of Stop bits not supported. */
       constexpr return_t ERROR_STOP_BITS = ERROR_SPECIFIC - 5;
 
-      ///< Specified Flow Control not supported
+      /** @brief Specified Flow Control not supported. */
       constexpr return_t ERROR_FLOW_CONTROL = ERROR_SPECIFIC - 6;
 
-      ///< Specified Clock Polarity not supported
+      /** @brief Specified Clock Polarity not supported. */
       constexpr return_t ERROR_CPOL = ERROR_SPECIFIC - 7;
 
-      ///< Specified Clock Phase not supported
+      /** @brief Specified Clock Phase not supported. */
       constexpr return_t ERROR_CPHA = ERROR_SPECIFIC - 8;
 
       // ====================================================================
@@ -285,25 +285,25 @@ namespace os
         // For compatibility with ARM CMSIS, these bits should be
         // exactly in this order.
 
-        ///< Transmitter busy flag
+        /** @brief Transmitter busy flag. */
         bool tx_busy :1;
 
-        ///< Receiver busy flag
+        /** @brief Receiver busy flag. */
         bool rx_busy :1;
 
-        ///< Transmit data underflow detected (cleared on start of next send operation)
+        /** @brief Transmit data underflow detected (cleared on start of next send operation). */
         bool tx_underflow :1;
 
-        ///< Receive data overflow detected (cleared on start of next receive operation)
+        /** @brief Receive data overflow detected (cleared on start of next receive operation). */
         bool rx_overflow :1;
 
-        ///< Break detected on receive (cleared on start of next receive operation)
+        /** @brief Break detected on receive (cleared on start of next receive operation). */
         bool rx_break :1;
 
-        ///< Framing error detected on receive (cleared on start of next receive operation)
+        /** @brief Framing error detected on receive (cleared on start of next receive operation). */
         bool rx_framing_error :1;
 
-        ///< Parity error detected on receive (cleared on start of next receive operation)
+        /** @brief Parity error detected on receive (cleared on start of next receive operation). */
         bool rx_parity_error :1;
       };
 
@@ -322,16 +322,16 @@ namespace os
           {
             //
 
-        ///< Deactivate RTS
+        /** @brief Deactivate RTS. */
         clear_rts,
 
-        ///< Activate RTS
+        /** @brief Activate RTS. */
         set_rts,
 
-        ///< Deactivate DTR
+        /** @brief Deactivate DTR. */
         clear_dtr,
 
-        ///< Activate DTR
+        /** @brief Activate DTR. */
         set_dtr
       };
 
@@ -369,16 +369,16 @@ namespace os
         // For compatibility with ARM CMSIS, these bits should be
         // exactly in this order.
 
-        ///< CTS state: true=Active, false=Inactive
+        /** @brief CTS state: true=Active, false=Inactive. */
         bool cts :1;
 
-        ///< DSR state: true=Active, false=Inactive
+        /** @brief DSR state: true=Active, false=Inactive. */
         bool dsr :1;
 
-        ///< DCD state: true=Active, false=Inactive
+        /** @brief DCD state: true=Active, false=Inactive. */
         bool dcd :1;
 
-        ///< RI  state: true=Active, false=Inactive
+        /** @brief RI  state: true=Active, false=Inactive. */
         bool ri :1;
       };
 
@@ -395,46 +395,46 @@ namespace os
           {
             //
 
-        ///< Send completed; however USART may still transmit data
+        /** @brief Send completed; however USART may still transmit data. */
         send_complete = (1UL << 0),
 
-        ///< Receive completed
+        /** @brief Receive completed. */
         receive_complete = (1UL << 1),
 
-        ///< Transfer completed
+        /** @brief Transfer completed. */
         transfer_complete = (1UL << 2),
 
-        ///< Transmit completed (optional)
+        /** @brief Transmit completed (optional). */
         tx_complete = (1UL << 3),
 
-        ///< Transmit data not available (Synchronous Slave)
+        /** @brief Transmit data not available (Synchronous Slave). */
         tx_underflow = (1UL << 4),
 
-        ///< Receive data overflow
+        /** @brief Receive data overflow. */
         rx_overflow = (1UL << 5),
 
-        ///< Receive character timeout (optional)
+        /** @brief Receive character timeout (optional). */
         rx_timeout = (1UL << 6),
 
-        ///< Break detected on receive
+        /** @brief Break detected on receive. */
         rx_break = (1UL << 7),
 
-        ///< Framing error detected on receive
+        /** @brief Framing error detected on receive. */
         rx_framing_error = (1UL << 8),
 
-        ///< Parity error detected on receive
+        /** @brief Parity error detected on receive. */
         rx_parity_error = (1UL << 9),
 
-        ///< CTS state changed (optional)
+        /** @brief CTS state changed (optional). */
         cts = (1UL << 10),
 
-        ///< DSR state changed (optional)
+        /** @brief DSR state changed (optional). */
         dsr = (1UL << 11),
 
-        ///< DCD state changed (optional)
+        /** @brief DCD state changed (optional). */
         dcd = (1UL << 12),
 
-        ///< RI  state changed (optional)
+        /** @brief RI  state changed (optional). */
         ri = (1UL << 13)
       };
 
@@ -457,67 +457,67 @@ namespace os
         // For compatibility with ARM CMSIS, these bits should be
         // exactly in this order.
 
-        ///< supports Asynchronous mode
+        /** @brief supports Asynchronous mode. */
         bool asynchronous :1;
 
-        ///< supports Synchronous Master mode
+        /** @brief supports Synchronous Master mode. */
         bool synchronous_master :1;
 
-        ///< supports Synchronous Slave mode
+        /** @brief supports Synchronous Slave mode. */
         bool synchronous_slave :1;
 
-        ///< supports Single-wire mode
+        /** @brief supports Single-wire mode. */
         bool single_wire :1;
 
-        ///< supports IrDA mode
+        /** @brief supports IrDA mode. */
         bool irda :1;
 
-        ///< supports Smart Card mode
+        /** @brief supports Smart Card mode. */
         bool smart_card :1;
 
-        ///< Smart Card Clock generator available
+        /** @brief Smart Card Clock generator available. */
         bool smart_card_clock :1;
 
-        ///< RTS Flow Control available
+        /** @brief RTS Flow Control available. */
         bool flow_control_rts :1;
 
-        ///< CTS Flow Control available
+        /** @brief CTS Flow Control available. */
         bool flow_control_cts :1;
 
-        ///< Transmit completed event.
+        /** @brief Transmit completed event. */
         bool event_tx_complete :1;
 
-        ///< Signal receive character timeout event.
+        /** @brief Signal receive character timeout event. */
         bool event_rx_timeout :1;
 
-        ///< RTS Line: false=not available, true=available
+        /** @brief RTS Line: false=not available, true=available. */
         bool rts :1;
 
-        ///< CTS Line: false=not available, true=available
+        /** @brief CTS Line: false=not available, true=available. */
         bool cts :1;
 
-        ///< DTR Line: false=not available, true=available
+        /** @brief DTR Line: false=not available, true=available. */
         bool dtr :1;
 
-        ///< DSR Line: false=not available, true=available
+        /** @brief DSR Line: false=not available, true=available. */
         bool dsr :1;
 
-        ///< DCD Line: false=not available, true=available
+        /** @brief DCD Line: false=not available, true=available. */
         bool dcd :1;
 
-        ///< RI Line: false=not available, true=available
+        /** @brief RI Line: false=not available, true=available. */
         bool ri :1;
 
-        ///< Signal CTS change event.
+        /** @brief Signal CTS change event. */
         bool event_cts :1;
 
-        ///< Signal DSR change event.
+        /** @brief Signal DSR change event. */
         bool event_dsr :1;
 
-        ///< Signal DCD change event.
+        /** @brief Signal DCD change event. */
         bool event_dcd :1;
 
-        ///< Signal RI change event.
+        /** @brief Signal RI change event. */
         bool event_ri :1;
       };
 
