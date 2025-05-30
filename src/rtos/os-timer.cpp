@@ -54,12 +54,6 @@ namespace os
     const timer::attributes timer::once_initializer;
 
     /**
-     * @class attributes_periodic
-     * @details
-     * Allow to assign a name to the timer.
-     */
-
-    /**
      * @details
      * This variable can be used to create a periodic timer.
      */

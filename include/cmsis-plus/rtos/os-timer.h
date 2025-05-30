@@ -211,6 +211,9 @@ namespace os
        * @brief Periodic timer attributes.
        * @headerfile os.h <cmsis-plus/rtos/os.h>
        * @ingroup cmsis-plus-rtos-timer
+       *
+       * @details
+       * Allow to assign a name to the timer.
        */
       class attributes_periodic : public attributes
       {
