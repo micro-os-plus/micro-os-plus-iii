@@ -14,6 +14,7 @@
 
 /**
  @defgroup cmsis-plus-core µOS++ Core
+ @ingroup micro-os-plus
  @brief  µOS++ Core summary page.
  @details
  TODO: add core definitions.
@@ -21,6 +22,7 @@
 
 /**
  @defgroup cmsis-plus-startup µOS++ Startup
+ @ingroup micro-os-plus
  @brief  µOS++ Startup summary page.
  @details
  TODO: add startup definitions.
@@ -28,6 +30,7 @@
 
 /**
  @defgroup cmsis-plus-rtos µOS++ RTOS C++ API
+ @ingroup micro-os-plus
  @brief  µOS++ RTOS C++ API summary page.
  @details
  The C++ API is the main interface to the µOS++ RTOS, and is the native
@@ -42,6 +45,7 @@
 
 /**
  @defgroup cmsis-plus-rtos-c µOS++ RTOS C API
+ @ingroup micro-os-plus
  @brief  µOS++ RTOS C API summary page.
  @details
  The C API maps most of the basic C++ functionality to C programmers.
@@ -54,6 +58,7 @@
 
 /**
  @defgroup cmsis-plus-iso µOS++ ISO Standard C++ Threads
+ @ingroup micro-os-plus
  @brief  µOS++ ISO Threads summary page.
  @details
  This page groups the main µOS++ ISO Threads classes and namespaces.
@@ -65,6 +70,7 @@
 
 /**
  @defgroup cmsis-plus-drivers µOS++ Drivers
+ @ingroup micro-os-plus
  @brief  µOS++ Drivers summary page.
  @details
  This page groups the main µOS++ Driver classes.
@@ -74,6 +80,7 @@
 
 /**
  @defgroup cmsis-plus-diag µOS++ Diagnostics & Trace
+ @ingroup micro-os-plus
  @brief  µOS++ Diagnostic & Trace summary page.
  @details
  This page groups the main classes providing support for
@@ -82,6 +89,7 @@
 
 /**
  @defgroup cmsis-plus-posix-io µOS++ POSIX I/O C++ API
+ @ingroup micro-os-plus
  @brief  µOS++ POSIX I/O C++ API summary page.
  @details
  This page groups the main classes providing support for standard
@@ -92,6 +100,7 @@
 
 /**
  @defgroup cmsis-plus-posix-io-c µOS++ POSIX I/O C API
+ @ingroup micro-os-plus
  @brief  µOS++ POSIX I/O C API summary page.
  @details
  This page groups the standard
@@ -102,6 +111,7 @@
 
 /**
  @defgroup cmsis-plus-app-config µOS++ Application Config
+ @ingroup micro-os-plus
  @brief  µOS++ application configuration definitions.
  @details
  Applications using µOS++ can be configured during
@@ -125,6 +135,7 @@
 
 /**
  @defgroup cmsis-plus-app-hooks µOS++ Application Overrides & Hooks
+ @ingroup micro-os-plus
  @brief  µOS++ application customisable functions and hooks.
  @details
  Applications using µOS++ can customise the behaviour
@@ -137,6 +148,7 @@
 
 /**
  @defgroup cmsis-plus-utils Utilities
+ @ingroup micro-os-plus
  @brief  Application utility classes and functions.
  @details
 
