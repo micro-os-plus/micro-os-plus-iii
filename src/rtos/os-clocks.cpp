@@ -331,9 +331,6 @@ namespace os
       // ----- Exit critical section ------------------------------------------
     }
 
-    /**
-     * @cond ignore
-     */
 
     clock::offset_t
     clock::offset (void)
@@ -346,6 +343,10 @@ namespace os
     {
       return 0;
     }
+
+    /**
+     * @cond ignore
+     */
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -646,7 +647,8 @@ namespace os
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #endif
-    /**
+    // error: Ignoring @brief command inside argument documentation
+    /*
      * @brief Kind of singleton instance of the clock_rtc class.
      */
     clock_rtc rtclock;
@@ -697,7 +699,8 @@ namespace os
 #pragma clang diagnostic ignored "-Wglobal-constructors"
 #pragma clang diagnostic ignored "-Wexit-time-destructors"
 #endif
-    /**
+    // error: Ignoring @brief command inside argument documentation
+    /*
      * @brief Kind of singleton instance of the clock_highres class.
      */
     clock_highres hrclock;

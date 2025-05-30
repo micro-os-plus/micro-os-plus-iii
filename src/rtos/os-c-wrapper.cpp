@@ -1168,11 +1168,12 @@ os_clock_get_offset (os_clock_t* clock)
 
 }
 
+// error unable to resolve reference to 'os::rtos::adjustable_clock::offset(os::rtos::clock::offset_t)' for \ref command
 /**
  * @warning Cannot be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
- *  @ref os::rtos::adjustable_clock::offset(os::rtos::clock::offset_t)
+ *  os::rtos::adjustable_clock::offset(os::rtos::clock::offset_t)
  */
 os_clock_offset_t
 os_clock_set_offset (os_clock_t* clock, os_clock_offset_t offset)

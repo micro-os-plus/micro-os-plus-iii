@@ -54,10 +54,6 @@ namespace
   std::new_handler new_handler_;
 }
 
-/**
- * @addtogroup cmsis-plus-rtos-memres
- * @{
- */
 
 namespace std
 {
@@ -114,12 +110,14 @@ namespace std
 
 // ----------------------------------------------------------------------------
 
-/**
+// error: end of file with unbalanced grouping commands
+/*
  * @name Standard operators
  * @{
  */
 
 /**
+ * @ingroup cmsis-plus-rtos-memres
  * @brief Allocate space for a new object instance.
  * @param bytes Number of bytes to allocate.
  * @return Pointer to allocated object.
@@ -179,6 +177,7 @@ operator new (std::size_t bytes)
 }
 
 /**
+ * @ingroup cmsis-plus-rtos-memres
  * @brief Allocate space for a new object instance (nothrow).
  * @param bytes Number of bytes to allocate.
  * @param nothrow (unused)
@@ -244,7 +243,9 @@ operator new (std::size_t bytes,
   return nullptr;
 }
 
-/**
+// error: Ignoring @brief command inside argument documentation
+/*
+ * @ingroup cmsis-plus-rtos-memres
  * @brief Allocate space for an array of new object instances.
  * @param bytes Number of bytes to allocate.
  * @return Pointer to allocated object.
@@ -266,7 +267,9 @@ operator new[] (std::size_t bytes)
   return ::operator new (bytes);
 }
 
-/**
+// error: Ignoring @brief command inside argument documentation
+/*
+ * @ingroup cmsis-plus-rtos-memres
  * @brief Allocate space for an array of new object instances (nothrow).
  * @param bytes Number of bytes to allocate.
  * @param nothrow (unused)
@@ -293,6 +296,7 @@ operator new[] (std::size_t bytes,
 // ----------------------------------------------------------------------------
 
 /**
+ * @ingroup cmsis-plus-rtos-memres
  * @brief Deallocate the dynamically allocated object instance.
  * @param ptr Pointer to object.
  * @par Returns
@@ -347,6 +351,7 @@ void
 operator delete (void* ptr, std::size_t bytes) noexcept;
 
 /**
+ * @ingroup cmsis-plus-rtos-memres
  * @brief Deallocate the dynamically allocated object instance.
  * @param ptr Pointer to object.
  * @param bytes Number of bytes to deallocate.
@@ -393,6 +398,7 @@ operator delete (void* ptr, std::size_t bytes) noexcept
 #pragma GCC diagnostic pop
 
 /**
+ * @ingroup cmsis-plus-rtos-memres
  * @brief Deallocate the dynamically allocated object instance (nothrow).
  * @param ptr Pointer to object.
  * @param nothrow (unused)
@@ -432,6 +438,7 @@ operator delete (void* ptr,
 }
 
 /**
+ * @ingroup cmsis-plus-rtos-memres
  * @brief Deallocate the dynamically allocated array of object.
  * @param ptr Pointer to array of objects.
  * @par Returns
@@ -467,6 +474,7 @@ void
 operator delete[] (void* ptr, std::size_t bytes) noexcept;
 
 /**
+ * @ingroup cmsis-plus-rtos-memres
  * @brief Deallocate the dynamically allocated array of object.
  * @param ptr Pointer to array of objects.
  * @param bytes Number of bytes to deallocate.
@@ -495,6 +503,7 @@ operator delete[] (void* ptr, std::size_t bytes) noexcept
 #pragma GCC diagnostic pop
 
 /**
+ * @ingroup cmsis-plus-rtos-memres
  * @brief Deallocate the dynamically allocated array of object (nothrow).
  * @param ptr Pointer to array of objects.
  * @param nothrow (unused)
@@ -522,12 +531,10 @@ operator delete[] (void* ptr, const std::nothrow_t& nothrow) noexcept
   ::operator delete (ptr, nothrow);
 }
 
-/**
+// error: end of file with unbalanced grouping commands
+/*
  * @}
  */
 
-/**
- * @}
- */
 
 // ----------------------------------------------------------------------------
