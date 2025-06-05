@@ -314,5 +314,11 @@
         "**/tests",
         "**/tests/**",
         "**/xpacks/**"
+    ],
+    "cSpell.words": [
+        "defgroup",
+        "endcode",
+        "ingroup",
+        "nullptr"
     ]
 }

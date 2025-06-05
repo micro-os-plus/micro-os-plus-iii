@@ -13,145 +13,141 @@
 // ----------------------------------------------------------------------------
 
 /**
- @defgroup cmsis-plus-core µOS++ Core
- @ingroup micro-os-plus
- @brief  µOS++ Core summary page.
- @details
- TODO: add core definitions.
- */
 
-/**
- @defgroup cmsis-plus-startup µOS++ Startup
- @ingroup micro-os-plus
- @brief  µOS++ Startup summary page.
- @details
- TODO: add startup definitions.
- */
+@defgroup cmsis-plus-core µOS++ Core
+@ingroup micro-os-plus
+@brief  µOS++ Core summary page.
 
-/**
- @defgroup cmsis-plus-rtos µOS++ RTOS C++ API
- @ingroup micro-os-plus
- @brief  µOS++ RTOS C++ API summary page.
- @details
- The C++ API is the main interface to the µOS++ RTOS, and is the native
- interface used for the implementation.
+@details
+TODO: add core definitions.
 
- The API is composed of a series of classes, subclasses, types and
- several namespaces.
 
- To use the C++ API, include the `<cmsis-plus/rtos/os.h>` header.
+@defgroup cmsis-plus-startup µOS++ Startup
+@ingroup micro-os-plus
+@brief  µOS++ Startup summary page.
 
- */
+@details
+TODO: add startup definitions.
 
-/**
- @defgroup cmsis-plus-rtos-c µOS++ RTOS C API
- @ingroup micro-os-plus
- @brief  µOS++ RTOS C API summary page.
- @details
- The C API maps most of the basic C++ functionality to C programmers.
- Usually the overhead is minimal, one function call. The object pointer
- is passsed as the first parameter. The names are prefixed with a unique
- string inspired by the namespace qualifier.
 
- To use the C API, include the `<cmsis-plus/rtos/os-c-api.h>` header.
- */
+@defgroup cmsis-plus-rtos µOS++ RTOS C++ API
+@ingroup micro-os-plus
+@brief  µOS++ RTOS C++ API summary page.
 
-/**
- @defgroup cmsis-plus-iso µOS++ ISO Standard C++ Threads
- @ingroup micro-os-plus
- @brief  µOS++ ISO Threads summary page.
- @details
- This page groups the main µOS++ ISO Threads classes and namespaces.
+@details
+The C++ API is the main interface to the µOS++ RTOS, and is the native
+interface used for the implementation.
 
- @par Standards
- These definitions provide implementations for the classes defined in
- the **C++ Standard ISO/IEC 14882:2011(E) Third edition (2011-09-01)**.
- */
+The API is composed of a series of classes, subclasses, types and
+several namespaces.
 
-/**
- @defgroup cmsis-plus-drivers µOS++ Drivers
- @ingroup micro-os-plus
- @brief  µOS++ Drivers summary page.
- @details
- This page groups the main µOS++ Driver classes.
+To use the C++ API, include the `<cmsis-plus/rtos/os.h>` header.
 
- TODO: add content
- */
 
-/**
- @defgroup cmsis-plus-diag µOS++ Diagnostics & Trace
- @ingroup micro-os-plus
- @brief  µOS++ Diagnostic & Trace summary page.
- @details
- This page groups the main classes providing support for
- diagnostics. For example the `trace::printf()` functions are defined here.
- */
+@defgroup cmsis-plus-rtos-c µOS++ RTOS C API
+@ingroup micro-os-plus
+@brief  µOS++ RTOS C API summary page.
 
-/**
- @defgroup cmsis-plus-posix-io µOS++ POSIX I/O C++ API
- @ingroup micro-os-plus
- @brief  µOS++ POSIX I/O C++ API summary page.
- @details
- This page groups the main classes providing support for standard
- POSIX I/O (uniform access to dtream devices, files, sockets).
+@details
+The C API maps most of the basic C++ functionality to C programmers.
+Usually the overhead is minimal, one function call. The object pointer
+is passed as the first parameter. The names are prefixed with a unique
+string inspired by the namespace qualifier.
 
- TODO: add content
- */
+To use the C API, include the `<cmsis-plus/rtos/os-c-api.h>` header.
 
-/**
- @defgroup cmsis-plus-posix-io-c µOS++ POSIX I/O C API
- @ingroup micro-os-plus
- @brief  µOS++ POSIX I/O C API summary page.
- @details
- This page groups the standard
- POSIX I/O functions.
 
- TODO: add content
- */
+@defgroup cmsis-plus-iso µOS++ ISO Standard C++ Threads
+@ingroup micro-os-plus
+@brief  µOS++ ISO Threads summary page.
 
-/**
- @defgroup cmsis-plus-app-config µOS++ Application Config
- @ingroup micro-os-plus
- @brief  µOS++ application configuration definitions.
- @details
- Applications using µOS++ can be configured during
- build time using
- several proprocessor definitions, grouped in a header file
- named `<cmsis-plus/os-app-config.h>`.
+@details
+This page groups the main µOS++ ISO Threads classes and namespaces.
 
- There are several kinds of definitions:
+@par Standards
+These definitions provide implementations for the classes defined in
+the **C++ Standard ISO/IEC 14882:2011(E) Third edition (2011-09-01)**.
 
- - definitions with values (`OS_INTEGER_*`, `OS_BOOL_*`, `OS_STRING_*`, ...);
- for these definitions the value should be used
- only in an expression of the given type; to avoid misunderstandings,
- parenthesis are recommended;
- - definitions without values (`OS_INCLUDE_*`, `OS_EXCLUDE_*`, `OS_USE_*`,
- `OS_TRACE_*`, ...); for these definitions only the presence should be tested;
- the value, if present, should be completely ignored;
- - definitions of types (`OS_TYPE_*`); the values are special and represent
- expressions that can be used as types to define variables or other types.
 
- */
+@defgroup cmsis-plus-drivers µOS++ Drivers
+@ingroup micro-os-plus
+@brief  µOS++ Drivers summary page.
 
-/**
- @defgroup cmsis-plus-app-hooks µOS++ Application Overrides & Hooks
- @ingroup micro-os-plus
- @brief  µOS++ application customisable functions and hooks.
- @details
- Applications using µOS++ can customise the behaviour
- of the system or intercept several events by redefining
- these functions.
+@details
+This page groups the main µOS++ Driver classes.
 
- All of them have weak default definitions,
- providing a reasonable functionality.
- */
+TODO: add content
 
-/**
- @defgroup cmsis-plus-utils Utilities
- @ingroup micro-os-plus
- @brief  Application utility classes and functions.
- @details
 
- */
+@defgroup cmsis-plus-diag µOS++ Diagnostics & Trace
+@ingroup micro-os-plus
+@brief  µOS++ Diagnostic & Trace summary page.
 
-// ----------------------------------------------------------------------------
+@details
+This page groups the main classes providing support for
+diagnostics. For example the `trace::printf()` functions are defined here.
+
+
+@defgroup cmsis-plus-posix-io µOS++ POSIX I/O C++ API
+@ingroup micro-os-plus
+@brief  µOS++ POSIX I/O C++ API summary page.
+
+@details
+This page groups the main classes providing support for standard
+POSIX I/O (uniform access to stream devices, files, sockets).
+
+TODO: add content
+
+
+@defgroup cmsis-plus-posix-io-c µOS++ POSIX I/O C API
+@ingroup micro-os-plus
+@brief  µOS++ POSIX I/O C API summary page.
+
+@details
+This page groups the standard
+POSIX I/O functions.
+
+TODO: add content
+
+
+@defgroup cmsis-plus-app-config µOS++ Application Config
+@ingroup micro-os-plus
+@brief  µOS++ application configuration definitions.
+
+@details
+Applications using µOS++ can be configured during
+build time using
+several preprocessor definitions, grouped in a header file
+named `<cmsis-plus/os-app-config.h>`.
+
+There are several kinds of definitions:
+
+- definitions with values (`OS_INTEGER_*`, `OS_BOOL_*`, `OS_STRING_*`, ...);
+for these definitions the value should be used
+only in an expression of the given type; to avoid misunderstandings,
+parenthesis are recommended;
+- definitions without values (`OS_INCLUDE_*`, `OS_EXCLUDE_*`, `OS_USE_*`,
+`OS_TRACE_*`, ...); for these definitions only the presence should be tested;
+the value, if present, should be completely ignored;
+- definitions of types (`OS_TYPE_*`); the values are special and represent
+expressions that can be used as types to define variables or other types.
+
+
+@defgroup cmsis-plus-app-hooks µOS++ Application Overrides & Hooks
+@ingroup micro-os-plus
+@brief  µOS++ application customisable functions and hooks.
+
+@details
+Applications using µOS++ can customise the behaviour
+of the system or intercept several events by redefining
+these functions.
+
+All of them have weak default definitions,
+providing a reasonable functionality.
+
+
+@defgroup cmsis-plus-utils Utilities
+@ingroup micro-os-plus
+@brief  Application utility classes and functions.
+
+*/

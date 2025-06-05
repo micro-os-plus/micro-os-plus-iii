@@ -13,17 +13,19 @@
 // ----------------------------------------------------------------------------
 
 /**
- @defgroup cmsis-plus-rtos-c-core Core & scheduler
- @ingroup cmsis-plus-rtos-c
- @brief  C API core & scheduler definitions.
- @details
 
- @par For the complete definition, see
-  @ref cmsis-plus-rtos-core "RTOS C++ API"
+@defgroup cmsis-plus-rtos-c-core Core & scheduler
+@ingroup cmsis-plus-rtos-c
+@brief  C API core & scheduler definitions.
 
- @par Examples
+@details
 
- @code{.c}
+@par For the complete definition, see
+@ref cmsis-plus-rtos-core "RTOS C++ API"
+
+@par Examples
+
+@code{.c}
 int
 os_main (int argc, char* argv[])
 {
@@ -66,21 +68,21 @@ os_main (int argc, char* argv[])
       os_irq_critical_exit (st);
     }
 }
- @endcode
- */
+@endcode
 
-/**
- @defgroup cmsis-plus-rtos-c-thread Threads
- @ingroup cmsis-plus-rtos-c
- @brief  C API thread definitions.
- @details
 
- @par For the complete definition, see
-  @ref cmsis-plus-rtos-thread "RTOS C++ API"
+@defgroup cmsis-plus-rtos-c-thread Threads
+@ingroup cmsis-plus-rtos-c
+@brief  C API thread definitions.
 
- @par Examples
+@details
 
- @code{.c}
+@par For the complete definition, see
+@ref cmsis-plus-rtos-thread "RTOS C++ API"
+
+@par Examples
+
+@code{.c}
 void*
 func (void* args __attribute__((unused)))
 {
@@ -177,21 +179,21 @@ os_main (int argc, char* argv[])
       os_thread_stack_check_top_magic (stack);
     }
 }
- @endcode
- */
+@endcode
 
-/**
- @defgroup cmsis-plus-rtos-c-clock Clocks
- @ingroup cmsis-plus-rtos-c
- @brief  C API clocks definitions.
- @details
 
- @par For the complete definition, see
-  @ref os::rtos::clock "RTOS C++ API"
+@defgroup cmsis-plus-rtos-c-clock Clocks
+@ingroup cmsis-plus-rtos-c
+@brief  C API clocks definitions.
 
- @par Examples
+@details
 
- @code{.c}
+@par For the complete definition, see
+@ref os::rtos::clock "RTOS C++ API"
+
+@par Examples
+
+@code{.c}
 int
 os_main (int argc, char* argv[])
 {
@@ -211,21 +213,21 @@ os_main (int argc, char* argv[])
       os_sysclock_wait_for (2);
     }
 }
- @endcode
- */
+@endcode
 
-/**
- @defgroup cmsis-plus-rtos-c-condvar Condition variables
- @ingroup cmsis-plus-rtos-c
- @brief  C API condition variable definitions.
- @details
 
- @par For the complete definition, see
-  @ref cmsis-plus-rtos-condvar "RTOS C++ API"
+@defgroup cmsis-plus-rtos-c-condvar Condition variables
+@ingroup cmsis-plus-rtos-c
+@brief  C API condition variable definitions.
 
- @par Examples
+@details
 
- @code{.c}
+@par For the complete definition, see
+@ref cmsis-plus-rtos-condvar "RTOS C++ API"
+
+@par Examples
+
+@code{.c}
 int
 os_main (int argc, char* argv[])
 {
@@ -244,21 +246,21 @@ os_main (int argc, char* argv[])
       os_condvar_destruct (&cv1);
     }
 }
- @endcode
- */
+@endcode
 
-/**
- @defgroup cmsis-plus-rtos-c-evflag Event flags
- @ingroup cmsis-plus-rtos-c
- @brief  C API event flags definitions.
- @details
 
- @par For the complete definition, see
-  @ref cmsis-plus-rtos-evflag "RTOS C++ API"
+@defgroup cmsis-plus-rtos-c-evflag Event flags
+@ingroup cmsis-plus-rtos-c
+@brief  C API event flags definitions.
 
- @par Examples
+@details
 
- @code{.c}
+@par For the complete definition, see
+@ref cmsis-plus-rtos-evflag "RTOS C++ API"
+
+@par Examples
+
+@code{.c}
 int
 os_main (int argc, char* argv[])
 {
@@ -301,21 +303,21 @@ os_main (int argc, char* argv[])
       os_evflags_destruct (&ev2);
     }
 }
- @endcode
- */
+@endcode
 
-/**
- @defgroup cmsis-plus-rtos-c-mempool Memory pools
- @ingroup cmsis-plus-rtos-c
- @brief  C API memory pool definitions.
- @details
 
- @par For the complete definition, see
-  @ref cmsis-plus-rtos-mempool "RTOS C++ API"
+@defgroup cmsis-plus-rtos-c-mempool Memory pools
+@ingroup cmsis-plus-rtos-c
+@brief  C API memory pool definitions.
 
- @par Examples
+@details
 
- @code{.c}
+@par For the complete definition, see
+@ref cmsis-plus-rtos-mempool "RTOS C++ API"
+
+@par Examples
+
+@code{.c}
 typedef struct my_blk_s
 {
   int i;
@@ -366,21 +368,21 @@ os_main (int argc, char* argv[])
       os_mempool_destruct (&p2);
     }
 }
- @endcode
- */
+@endcode
 
-/**
- @defgroup cmsis-plus-rtos-c-mqueue Message queues
- @ingroup cmsis-plus-rtos-c
- @brief  C API message queue definitions.
- @details
 
- @par For the complete definition, see
-  @ref cmsis-plus-rtos-mqueue "RTOS C++ API"
+@defgroup cmsis-plus-rtos-c-mqueue Message queues
+@ingroup cmsis-plus-rtos-c
+@brief  C API message queue definitions.
 
- @par Examples
+@details
 
- @code{.c}
+@par For the complete definition, see
+@ref cmsis-plus-rtos-mqueue "RTOS C++ API"
+
+@par Examples
+
+@code{.c}
 typedef struct my_msg_s
 {
   int i;
@@ -466,21 +468,21 @@ os_main (int argc, char* argv[])
       os_mqueue_destruct (&q2);
     }
 }
- @endcode
- */
+@endcode
 
-/**
- @defgroup cmsis-plus-rtos-c-mutex Mutexes
- @ingroup cmsis-plus-rtos-c
- @brief  C API mutex definitions.
- @details
 
- @par For the complete definition, see
-  @ref cmsis-plus-rtos-mutex "RTOS C++ API"
+@defgroup cmsis-plus-rtos-c-mutex Mutexes
+@ingroup cmsis-plus-rtos-c
+@brief  C API mutex definitions.
 
- @par Examples
+@details
 
- @code{.c}
+@par For the complete definition, see
+@ref cmsis-plus-rtos-mutex "RTOS C++ API"
+
+@par Examples
+
+@code{.c}
 int
 os_main (int argc, char* argv[])
 {
@@ -556,21 +558,21 @@ os_main (int argc, char* argv[])
       os_mutex_destruct (&mx4);
     }
 }
- @endcode
- */
+@endcode
 
-/**
- @defgroup cmsis-plus-rtos-c-semaphore Semaphores
- @ingroup cmsis-plus-rtos-c
- @brief  C API semaphore definitions.
- @details
 
- @par For the complete definition, see
-  @ref cmsis-plus-rtos-semaphore "RTOS C++ API"
+@defgroup cmsis-plus-rtos-c-semaphore Semaphores
+@ingroup cmsis-plus-rtos-c
+@brief  C API semaphore definitions.
 
- @par Examples
+@details
 
- @code{.c}
+@par For the complete definition, see
+@ref cmsis-plus-rtos-semaphore "RTOS C++ API"
+
+@par Examples
+
+@code{.c}
 int
 os_main (int argc, char* argv[])
 {
@@ -634,21 +636,21 @@ os_main (int argc, char* argv[])
       os_semaphore_destruct (&sp4);
     }
 }
- @endcode
- */
+@endcode
 
-/**
- @defgroup cmsis-plus-rtos-c-timer Timers
- @ingroup cmsis-plus-rtos-c
- @brief  C API timer definitions.
- @details
 
- @par For the complete definition, see
-  @ref cmsis-plus-rtos-timer "RTOS C++ API"
+@defgroup cmsis-plus-rtos-c-timer Timers
+@ingroup cmsis-plus-rtos-c
+@brief  C API timer definitions.
 
- @par Examples
+@details
 
- @code{.c}
+@par For the complete definition, see
+@ref cmsis-plus-rtos-timer "RTOS C++ API"
+
+@par Examples
+
+@code{.c}
 void
 tmfunc (void* args __attribute__((unused)))
 {
@@ -694,27 +696,27 @@ os_main (int argc, char* argv[])
       os_timer_destruct (&tm2);
     }
 }
- @endcode
- */
+@endcode
 
-/**
- @defgroup cmsis-plus-rtos-c-memres Memory management
- @ingroup cmsis-plus-rtos-c
- @brief  C API memory management definitions.
- @details
 
- The µOS++ RTOS includes several advanced and flexible
- memory management features.
+@defgroup cmsis-plus-rtos-c-memres Memory management
+@ingroup cmsis-plus-rtos-c
+@brief  C API memory management definitions.
 
- Access to these classes from C can be done using the `os_memory_*()`
- functions.
+@details
 
- @par For the complete definition, see
-   @ref cmsis-plus-rtos-memres "RTOS C++ API"
+The µOS++ RTOS includes several advanced and flexible
+memory management features.
 
- @par Examples
+Access to these classes from C can be done using the `os_memory_*()`
+functions.
 
- @code{.c}
+@par For the complete definition, see
+  @ref cmsis-plus-rtos-memres "RTOS C++ API"
+
+@par Examples
+
+@code{.c}
 int
 os_main (int argc, char* argv[])
 {
@@ -730,8 +732,6 @@ os_main (int argc, char* argv[])
   // Print some memory resource statistics.
   trace_printf("%u\n", os_memory_get_free_bytes(mem));
 }
- @endcode
+@endcode
 
- */
-// ----------------------------------------------------------------------------
-
+*/

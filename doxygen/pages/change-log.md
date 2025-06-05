@@ -42,7 +42,7 @@ Records in reverse chronological order.
 - add support for Chan FatFS to the POSIX I/O layer
 - add `file_descriptors_manager::used()` to tell how many file
 descriptors are used
-- [#41] add nonstandard `timegm()`, as the opposite of `gmtime()`
+- [#41] add non-standard `timegm()`, as the opposite of `gmtime()`
 - implement alignment in memory allocators
 - [#40] posix: add `statvfs()`/`fstatvfs()`
 - [#36] posix: add `tcdrain()`/`tcflush()`/`tcgetattr()`/`tcsendbreak()`/
@@ -60,7 +60,7 @@ was tested and is now available
 
 ### v6.3.12 2017-08-24
 
-- [#13] Fix typo (aquire -> acquire)
+- [#13] Fix typo (acquire -> acquire)
 - [#13] fix typos in documentation
 - replace most CMSIS++ references by µOS++
 
@@ -130,7 +130,7 @@ was tested and is now available
 - for Cortex-M, manage the interrupts stack via the `thread::stack` class; initialise interrupts stack with pattern and check the bottom marker in the idle thread
 - add `os_irq_get_stack()` to the C API
 - add `os_terminate_goodbye()` to display memory usage statistics
-- refubish the exit code to avoid crashes when building freestanding apps
+- refurbish the exit code to avoid crashes when building free-standing apps
 - rename `os_initialize_args()` -> `os_startup_initialize_args()`
 - rename `os_initialize_hardware_early()` -> `os_startup_initialize_hardware_early()`
 - rename `os_initialize_hardware()` -> `os_startup_initialize_hardware()`
@@ -166,7 +166,7 @@ Experience proved that one of the above changes was trickier than planned: the r
 
 ### v6.3.5 2016-07-31
 
-- addd `OS_TRACE_RTOS_LISTS_CLOCKS`
+- add `OS_TRACE_RTOS_LISTS_CLOCKS`
 - refurbish scheduler `lock()`, `unlock()`, `locked(state_t)`
 - rename `os_irq_status_t` -> `os_irq_state_t`
 - rename `interrupts::status_t` -> `interrupts::state_t`

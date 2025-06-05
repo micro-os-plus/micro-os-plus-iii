@@ -13,21 +13,21 @@
 // ----------------------------------------------------------------------------
 
 /**
- @defgroup cmsis-plus-rtos-core Core & scheduler
- @ingroup cmsis-plus-rtos
- @brief  C++ API scheduler definitions.
- @details
- */
 
-/**
- @defgroup cmsis-plus-rtos-thread Threads
- @ingroup cmsis-plus-rtos
- @brief  C++ API threads definitions.
- @details
+@defgroup cmsis-plus-rtos-core Core & scheduler
+@ingroup cmsis-plus-rtos
+@brief  C++ API scheduler definitions.
 
- @par Examples
 
- @code{.cpp}
+@defgroup cmsis-plus-rtos-thread Threads
+@ingroup cmsis-plus-rtos
+@brief  C++ API threads definitions.
+
+@details
+
+@par Examples
+
+@code{.cpp}
 void*
 func (void* args __attribute__((unused)))
 {
@@ -115,31 +115,31 @@ os_main (int argc, char* argv[])
       this_thread::flags_timed_wait (0x3, 10);
     }
 }
- @endcode
- */
+@endcode
 
-/**
- @defgroup cmsis-plus-rtos-clock Clocks
- @ingroup cmsis-plus-rtos
- @brief  C++ API clocks definitions.
- @details
 
- @par Examples
+@defgroup cmsis-plus-rtos-clock Clocks
+@ingroup cmsis-plus-rtos
+@brief  C++ API clocks definitions.
 
- @code{.cpp}
-  // TODO
- @endcode
- */
+@details
 
-/**
- @defgroup cmsis-plus-rtos-condvar Condition variables
- @ingroup cmsis-plus-rtos
- @brief  C++ API condition variables definitions.
- @details
+@par Examples
 
- @par Examples
+@code{.cpp}
+// TODO
+@endcode
 
- @code{.cpp}
+
+@defgroup cmsis-plus-rtos-condvar Condition variables
+@ingroup cmsis-plus-rtos
+@brief  C++ API condition variables definitions.
+
+@details
+
+@par Examples
+
+@code{.cpp}
 int
 os_main (int argc, char* argv[])
 {
@@ -152,18 +152,17 @@ os_main (int argc, char* argv[])
       cv2.signal ();
     }
 }
- @endcode
- */
+@endcode
 
-/**
- @defgroup cmsis-plus-rtos-evflag Event flags
- @ingroup cmsis-plus-rtos
- @brief  C++ API event flags definitions.
- @details
 
- @par Examples
+@defgroup cmsis-plus-rtos-evflag Event flags
+@ingroup cmsis-plus-rtos
+@brief  C++ API event flags definitions.
+@details
 
- @code{.cpp}
+@par Examples
+
+@code{.cpp}
 int
 os_main (int argc, char* argv[])
 {
@@ -176,18 +175,18 @@ os_main (int argc, char* argv[])
       ev2.clear (1);
     }
 }
- @endcode
- */
+@endcode
 
-/**
- @defgroup cmsis-plus-rtos-mempool Memory pools
- @ingroup cmsis-plus-rtos
- @brief  C++ API memory pools definitions.
- @details
 
- @par Examples
+@defgroup cmsis-plus-rtos-mempool Memory pools
+@ingroup cmsis-plus-rtos
+@brief  C++ API memory pools definitions.
 
- @code{.cpp}
+@details
+
+@par Examples
+
+@code{.cpp}
 typedef struct my_blk_s
 {
   int i;
@@ -278,18 +277,18 @@ os_main (int argc, char* argv[])
       sp2.free (blk);
     }
 }
- @endcode
- */
+@endcode
 
-/**
- @defgroup cmsis-plus-rtos-mqueue Message queues
- @ingroup cmsis-plus-rtos
- @brief  C++ API message queues definitions.
- @details
 
- @par Examples
+@defgroup cmsis-plus-rtos-mqueue Message queues
+@ingroup cmsis-plus-rtos
+@brief  C++ API message queues definitions.
 
- @code{.cpp}
+@details
+
+@par Examples
+
+@code{.cpp}
 typedef struct my_msg_s
 {
   int i;
@@ -376,18 +375,18 @@ os_main (int argc, char* argv[])
       sq2.receive (&msg_in);
     }
 }
- @endcode
- */
+@endcode
 
-/**
- @defgroup cmsis-plus-rtos-mutex Mutexes
- @ingroup cmsis-plus-rtos
- @brief  C++ API mutexes definitions.
- @details
 
- @par Examples
+@defgroup cmsis-plus-rtos-mutex Mutexes
+@ingroup cmsis-plus-rtos
+@brief  C++ API mutexes definitions.
 
- @code{.cpp}
+@details
+
+@par Examples
+
+@code{.cpp}
 int
 os_main (int argc, char* argv[])
 {
@@ -429,18 +428,18 @@ os_main (int argc, char* argv[])
       mx3.unlock ();
     }
 }
- @endcode
- */
+@endcode
 
-/**
- @defgroup cmsis-plus-rtos-semaphore Semaphores
- @ingroup cmsis-plus-rtos
- @brief  C++ API semaphores definitions.
- @details
 
- @par Examples
+@defgroup cmsis-plus-rtos-semaphore Semaphores
+@ingroup cmsis-plus-rtos
+@brief  C++ API semaphores definitions.
 
- @code{.cpp}
+@details
+
+@par Examples
+
+@code{.cpp}
 int
 os_main (int argc, char* argv[])
 {
@@ -482,18 +481,18 @@ os_main (int argc, char* argv[])
       sp4.post ();
     }
 }
- @endcode
- */
+@endcode
 
-/**
- @defgroup cmsis-plus-rtos-timer Timers
- @ingroup cmsis-plus-rtos
- @brief  C++ API timers definitions.
- @details
 
- @par Examples
+@defgroup cmsis-plus-rtos-timer Timers
+@ingroup cmsis-plus-rtos
+@brief  C++ API timers definitions.
 
- @code{.cpp}
+@details
+
+@par Examples
+
+@code{.cpp}
 void
 tmfunc (void* args __attribute__((unused)))
 {
@@ -536,64 +535,62 @@ os_main (int argc, char* argv[])
       tm3.stop ();
     }
 }
- @endcode
- */
+@endcode
 
-/**
- @defgroup cmsis-plus-rtos-memres Memory management
- @ingroup cmsis-plus-rtos
- @brief  C++ API memory management definitions.
- @details
- The µOS++ RTOS includes several advanced and flexible
- memory management features.
 
- First, it defines a configurable memory manager for the application
- free store (also known as the "heap").
+@defgroup cmsis-plus-rtos-memres Memory management
+@ingroup cmsis-plus-rtos
+@brief  C++ API memory management definitions.
 
- Second, it defines a separate memory manager to be used by the
- RTOS system objects. This separate manager can be configured
- to use any allocation policy. It may use either a statically
- or a dynamically allocated area.
+@details
+The µOS++ RTOS includes several advanced and flexible
+memory management features.
 
- The reason for the system memory manager is to allow  RTOS
- system objects to be separated from application objects; this has
- several advantages:
+First, it defines a configurable memory manager for the application
+free store (also known as the "heap").
 
- - it helps to protect the system objects from application bugs;
- this is beneficial during debug and it can improve reliability
- in the field.
- - it helps improve system performances, by allowing to locate the
- system objects on a fast, on-chip RAM, in case the platform has
- multiple RAM regions with different performances.
+Second, it defines a separate memory manager to be used by the
+RTOS system objects. This separate manager can be configured
+to use any allocation policy. It may use either a statically
+or a dynamically allocated area.
 
- Third, system objects that require dynamic memory may be created with
- custom allocators, defined by the user.
+The reason for the system memory manager is to allow  RTOS
+system objects to be separated from application objects; this has
+several advantages:
 
- Access to the application memory manager is done using the
- standard functions:
+- it helps to protect the system objects from application bugs;
+this is beneficial during debug and it can improve reliability
+in the field.
+- it helps improve system performances, by allowing to locate the
+system objects on a fast, on-chip RAM, in case the platform has
+multiple RAM regions with different performances.
 
- - `malloc()`/`free()` in C (thread safe)
- - `std::malloc()`/`std::free()` in C++ (thread safe)
- - `new`/`delete` in C++ (thread safe)
+Third, system objects that require dynamic memory may be created with
+custom allocators, defined by the user.
 
- The default application memory manager is set in the
- `os_startup_initialize_free_store()` function, called by the
- startup code when running on bare metal.
+Access to the application memory manager is done using the
+standard functions:
 
- On synthetic POSIX platforms the default memory manager is
- `os::memory::malloc_memory_resource`, which uses memory from
- the system free store.
+- `malloc()`/`free()` in C (thread safe)
+- `std::malloc()`/`std::free()` in C++ (thread safe)
+- `new`/`delete` in C++ (thread safe)
 
- By default the RTOS system memory manager is the same as the application
- memory manager, but, for isolation reasons, it is recommended to define
- a separate memory mananger for the RTOS system objects.
+The default application memory manager is set in the
+`os_startup_initialize_free_store()` function, called by the
+startup code when running on bare metal.
 
- The basic memory management class is `os::rtos::memory::memory_resource`,
- which will
- be standard starting with C++17. The µOS++ version of this class
- includes several extensions, like out of memory processing and
- statistics (and this is the reason the class is not defined in `os::estd`).
+On synthetic POSIX platforms the default memory manager is
+`os::memory::malloc_memory_resource`, which uses memory from
+the system free store.
 
- */
+By default the RTOS system memory manager is the same as the application
+memory manager, but, for isolation reasons, it is recommended to define
+a separate memory manager for the RTOS system objects.
 
-// ----------------------------------------------------------------------------
+The basic memory management class is `os::rtos::memory::memory_resource`,
+which will
+be standard starting with C++17. The µOS++ version of this class
+includes several extensions, like out of memory processing and
+statistics (and this is the reason the class is not defined in `os::estd`).
+
+*/

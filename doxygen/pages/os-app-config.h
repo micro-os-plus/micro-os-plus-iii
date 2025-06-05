@@ -451,7 +451,7 @@
 #define OS_BOOL_RTOS_PORT_CONTEXT_CREATE_ZERO_LR (false)
 
 /**
- * @brief Default definition for the preemption flag.
+ * @brief Default definition for the pre-emption flag.
  *
  * @details
  * This option sets the initial value of the
@@ -459,7 +459,7 @@
  * at any time.
  *
  * @par Default
- *  True (preemption is enabled).
+ *  True (pre-emption is enabled).
  */
 #define OS_BOOL_RTOS_SCHEDULER_PREEMPTIVE (true)
 
