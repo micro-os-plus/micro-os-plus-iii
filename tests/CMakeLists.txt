@@ -87,7 +87,7 @@ endif()
 include("cmake/common.cmake")
 
 # Platform global definitions.
-include("platform-${PLATFORM_NAME}/cmake/common.cmake")
+include("platforms/${PLATFORM_NAME}/cmake/common.cmake")
 
 # xpack_display_global_lists()
 
@@ -95,7 +95,7 @@ include("platform-${PLATFORM_NAME}/cmake/common.cmake")
 ## Dependencies ##
 
 # Platform specific dependencies.
-include("platform-${PLATFORM_NAME}/cmake/dependencies.cmake")
+include("platforms/${PLATFORM_NAME}/cmake/dependencies.cmake")
 
 # Add the main library from the root folder.
 message(VERBOSE "Adding top library...")
@@ -120,7 +120,7 @@ endif()
 ## Platform specifics ##
 
 # Add the platform specific targets and tests.
-# For consistency, the binaries are created in the `platform-bin` folder.
-add_subdirectory("platform-${PLATFORM_NAME}" "platform-bin")
+# For consistency, the binaries are created in the `platforms/bin` folder.
+add_subdirectory("platforms/${PLATFORM_NAME}" "platform-bin")
 
 # -----------------------------------------------------------------------------

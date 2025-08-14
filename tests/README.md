@@ -18,20 +18,20 @@ on all supported platforms; for details see
 
 The supported platforms for running the µOS++ IIIe tests are:
 
-- `platform-native` - run the test applications as native process
+- `platforms/native` - run the test applications as native process
   on the development machine, compiled with gcc or clang
-- `platform-qemu-cortex-m7f` - run the tests as fully semihosted applications
+- `platforms/qemu-cortex-m7f` - run the tests as fully semihosted applications
   on a QEMU mps2-an500 emulated board (an Arm Cortex-M7F development board)
-- `platform-qemu-cortex-m4f` - run the tests as fully semihosted applications
+- `platforms/qemu-cortex-m4f` - run the tests as fully semihosted applications
   on a QEMU mps2-an386 emulated board (an Arm Cortex-M4F development board)
-- `platform-qemu-cortex-m3` - run the tests as fully semihosted applications
+- `platforms/qemu-cortex-m3` - run the tests as fully semihosted applications
   on a QEMU mps2-an385 emulated board (an Arm Cortex-M3 development board)
-- `platform-qemu-cortex-m0` - run the tests as fully semihosted applications
+- `platforms/qemu-cortex-m0` - run the tests as fully semihosted applications
   on a QEMU mps2-an385 emulated board (an Arm Cortex-M3 development board,
   used to run the M0 code)
-- `platform-raspberrypi-pico` - run the tests on a physical Raspberry Pi
+- `platforms/raspberrypi-pico` - run the tests on a physical Raspberry Pi
   Pico (Cortex-M0+) via OpenOCD semihosting
-- `platform-nucleo-f767zi` - run the tests on a physical NUCLEO-Z767ZI
+- `platforms/nucleo-f767zi` - run the tests on a physical NUCLEO-Z767ZI
   board (Cortex-M7) via OpenOCD semihosting
 
 The tests are performed on GNU/Linux, macOS and Windows.
