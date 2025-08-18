@@ -1,13 +1,12 @@
 /*
- * This file is part of the µOS++ distribution.
- *   (https://github.com/micro-os-plus)
- * Copyright (c) 2015-2023 Liviu Ionescu. All rights reserved.
+ * This file is part of the µOS++ project (https://micro-os-plus.github.io/).
+ * Copyright (c) 2015-2025 Liviu Ionescu. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software
  * for any purpose is hereby granted, under the terms of the MIT license.
  *
  * If a copy of the license was not distributed with this file, it can
- * be obtained from https://opensource.org/licenses/mit/.
+ * be obtained from https://opensource.org/licenses/mit.
  */
 
 #if defined(__clang__)
@@ -106,7 +105,7 @@ exit_func_t __atexit_functions[OS_INTEGER_ATEXIT_ARRAY_SIZE];
  * @retval 0 The function was registered.
  * @retval -1 The function was not registered, either the type is
  *  not supported or the static array is full.
- * 
+ *
  * @details
  * This registry supports only functions passed by atexit(), the
  * more general cxa or dso handles are currently not supported.

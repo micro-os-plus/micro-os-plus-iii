@@ -65,7 +65,7 @@ The reference pages, grouped by functionality:
 </div>
 
 <div class="footer">
-  <p>Copyright © 2023 Liviu Ionescu. All rights reserved.</p>
+  <p>Copyright © 2023-2025 Liviu Ionescu. All rights reserved.</p>
 </div>
 
 @endhtmlonly

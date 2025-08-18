@@ -1,7 +1,6 @@
 /*
- * This file is part of the µOS++ distribution.
- *   (https://github.com/micro-os-plus)
- * Copyright (c) 2018-2023 Liviu Ionescu. All rights reserved.
+ * This file is part of the µOS++ project (https://micro-os-plus.github.io/).
+ * Copyright (c) 2018-2025 Liviu Ionescu. All rights reserved.
  *
  * Copyright (c) 1988, 1989, 1993, 1994
  *	The Regents of the University of California.  All rights reserved.

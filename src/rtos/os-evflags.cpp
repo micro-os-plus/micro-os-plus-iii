@@ -1,13 +1,12 @@
 /*
- * This file is part of the µOS++ distribution.
- *   (https://github.com/micro-os-plus)
- * Copyright (c) 2016-2023 Liviu Ionescu. All rights reserved.
+ * This file is part of the µOS++ project (https://micro-os-plus.github.io/).
+ * Copyright (c) 2016-2025 Liviu Ionescu. All rights reserved.
  *
  * Permission to use, copy, modify, and/or distribute this software
  * for any purpose is hereby granted, under the terms of the MIT license.
  *
  * If a copy of the license was not distributed with this file, it can
- * be obtained from https://opensource.org/licenses/mit/.
+ * be obtained from https://opensource.org/licenses/mit.
  */
 
 #if defined(OS_USE_OS_APP_CONFIG_H)
@@ -55,7 +54,7 @@ namespace os
 
     /**
      * @class event_flags
-     * 
+     *
      * @details
      * Synchronised set of flags that can be used to notify events
      * between threads or between ISRs and threads.
