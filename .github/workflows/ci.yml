@@ -36,22 +36,23 @@ jobs:
     strategy:
       matrix:
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
-        os: [ 'ubuntu-22.04', 'macos-12' ]
+        # macos-13 is x64, macos-15 is arm64.
+        os: [ 'ubuntu-24.04', 'macos-13', 'macos-15' ]
         # https://nodejs.org/en - use LTS
-        node-version: [ '18' ]
+        node-version: [ '20' ]
         # https://www.npmjs.com/package/xpm
-        xpm-version: [ '0.17.0' ]
+        xpm-version: [ '0.20.8' ]
 
     steps:
     - name: Checkout
       # https://github.com/actions/checkout/
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         fetch-depth: 3
 
     - name: Setup Node.js ${{ matrix.node-version }}
       # https://github.com/actions/setup-node/
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
 
