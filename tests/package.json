@@ -197,9 +197,9 @@
       "test-ci": [
         "{% if os.platform == 'linux' %}xpm run test-native-cmake-gcc{% endif %}",
         "{% if os.platform == 'linux' or os.platform == 'darwin' %}xpm run test-native-cmake-clang{% endif %}",
-        "xpm run --config test-qemu-cortex-m0-cmake",
-        "xpm run --config test-qemu-cortex-m3-cmake",
-        "xpm run --config test-qemu-cortex-m7f-cmake"
+        "xpm run test-qemu-cortex-m0-cmake",
+        "xpm run test-qemu-cortex-m3-cmake",
+        "xpm run test-qemu-cortex-m7f-cmake"
       ],
       "test-all": [
         "xpm run test-native-cmake",
