@@ -399,7 +399,12 @@ test_posix_io_api (bool extra __attribute__((unused)))
           res = p2.read_block (buff, i);
           assert(res >= 0);
           buff[0] = static_cast<uint8_t> (i);
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
           buff[bsz - 1] = static_cast<uint8_t> (i);
+#pragma GCC diagnostic pop
           res = p2.write_block (buff, i);
           assert(res >= 0);
         }
@@ -410,7 +415,12 @@ test_posix_io_api (bool extra __attribute__((unused)))
           res = p2.read_block (buff, i);
           assert(res >= 0);
           assert(buff[0] == i);
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
           assert(buff[bsz - 1] == i);
+#pragma GCC diagnostic pop
         }
 
       res = p2.read_block (buff, p2.blocks ());

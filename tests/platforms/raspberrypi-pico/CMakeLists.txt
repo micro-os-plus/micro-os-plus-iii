@@ -15,14 +15,12 @@ message(VERBOSE "Processing 'tests/platforms/raspberrypi-pico'...")
 
 # -----------------------------------------------------------------------------
 
-if(NOT DEFINED xpack_platform_compile_definition)
-  message(FATAL_ERROR "Define xpack_platform_compile_definition in platform*/cmake/common.cmake")
-endif()
-
-# -----------------------------------------------------------------------------
-
 # set(xpack_create_listing true)
 # set(xpack_create_hex true)
+
+# https://github.com/raspberrypi/pico-sdk-tools/releases
+# Download, unpack and rename the executable to avoid conflicts.
+set(pico_openocd "pico-openocd")
 
 # -----------------------------------------------------------------------------
 
@@ -30,37 +28,42 @@ endif()
 # here is a separate folder.
 add_subdirectory("device")
 
-add_subdirectory("platform")
-
 # -----------------------------------------------------------------------------
+
 # Define the tests executables.
+function(add_test_executable name)
+  add_executable(${name})
 
-if("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
-  set(extension ".cmd")
-endif()
+  set_target_properties(${name}
 
-# -----------------------------------------------------------------------------
+    PROPERTIES
+    OUTPUT_NAME "${name}"
+  )
 
-if (ENABLE_RTOS_APIS_TEST)
-
-  add_executable(rtos-apis-test)
-  set_target_properties(rtos-apis-test PROPERTIES OUTPUT_NAME "rtos-apis-test")
-
-  target_compile_definitions(rtos-apis-test PRIVATE
+  target_compile_definitions(${name} PRIVATE
     OS_USE_TRACE_SEMIHOSTING_STDOUT
   )
 
-  # The compile options were defined globally.
-  target_compile_options(rtos-apis-test PRIVATE
-    # None.
+  # No other common compile or link options, all were defined in the
+  # libraries and will be inherited.
+  target_link_options(${name} PRIVATE
+    -Wl,-Map,platform-bin/${name}-map.txt
+
+    # -v
   )
 
-  target_link_options(rtos-apis-test PRIVATE
-    -Wl,-Map,platform-bin/rtos-apis-test-map.txt
-  )
+  xpack_add_cross_custom_commands(${name})
+endfunction()
+
+# -----------------------------------------------------------------------------
+if(ENABLE_RTOS_APIS_TEST)
+  add_test_executable(rtos-apis-test)
 
   target_link_libraries(rtos-apis-test PRIVATE
-    # Test library.
+
+    micro-os-plus::common-options
+
+    # Current test library.
     test::rtos-apis
 
     # Tested library.
@@ -73,50 +76,34 @@ if (ENABLE_RTOS_APIS_TEST)
     micro-os-plus::platform
   )
 
-  xpack_add_cross_custom_commands("rtos-apis-test")
-
   message(VERBOSE "A> rtos-apis-test")
 
   add_test(
     NAME "rtos-apis-test"
 
-    COMMAND openocd${extension}
-      -c "gdb_port disabled"
-      -c "tcl_port disabled"
-      -c "telnet_port disabled"
-      -f interface/cmsis-dap.cfg
-      -c "adapter speed 5000"
-      -f target/rp2040.cfg
-      -c "program rtos-apis-test.elf verify"
-      -c "arm semihosting enable"
-      -c "arm semihosting_cmdline rtos-apis-test"
-      -c "reset"
-    )
-
-endif ()
+    COMMAND $(pico_openocd)${extension}
+    -c "gdb port disabled"
+    -c "tcl port disabled"
+    -c "telnet port disabled"
+    -f interface/cmsis-dap.cfg
+    -c "adapter speed 5000"
+    -f target/rp2040.cfg
+    -c "program rtos-apis-test.elf verify"
+    -c "arm semihosting enable"
+    -c "arm semihosting_cmdline rtos-apis-test"
+    -c "reset"
+  )
+endif()
 
 # -----------------------------------------------------------------------------
-
-if (ENABLE_MUTEX_STRESS_TEST)
-
-  add_executable(mutex-stress-test)
-  set_target_properties(mutex-stress-test PROPERTIES OUTPUT_NAME "mutex-stress-test")
-
-  target_compile_definitions(mutex-stress-test PRIVATE
-    OS_USE_TRACE_SEMIHOSTING_STDOUT
-  )
-
-  # The compile options were defined globally.
-  target_compile_options(mutex-stress-test PRIVATE
-    # None.
-  )
-
-  target_link_options(mutex-stress-test PRIVATE
-    -Wl,-Map,platform-bin/mutex-stress-test-map.txt
-  )
+if(ENABLE_MUTEX_STRESS_TEST)
+  add_test_executable(mutex-stress-test)
 
   target_link_libraries(mutex-stress-test PRIVATE
-    # Test library.
+
+    micro-os-plus::common-options
+
+    # Current test library.
     test::mutex-stress
 
     # Tested library.
@@ -126,50 +113,34 @@ if (ENABLE_MUTEX_STRESS_TEST)
     micro-os-plus::platform
   )
 
-  xpack_add_cross_custom_commands("mutex-stress-test")
-
   message(VERBOSE "A> mutex-stress-test")
 
   add_test(
     NAME "mutex-stress-test"
 
-    COMMAND openocd${extension}
-      -c "gdb_port disabled"
-      -c "tcl_port disabled"
-      -c "telnet_port disabled"
-      -f interface/cmsis-dap.cfg
-      -c "adapter speed 5000"
-      -f target/rp2040.cfg
-      -c "program mutex-stress-test.elf verify"
-      -c "arm semihosting enable"
-      -c "arm semihosting_cmdline mutex-stress-test"
-      -c "reset"
-    )
-
-endif ()
+    COMMAND $(pico_openocd)${extension}
+    -c "gdb port disabled"
+    -c "tcl port disabled"
+    -c "telnet port disabled"
+    -f interface/cmsis-dap.cfg
+    -c "adapter speed 5000"
+    -f target/rp2040.cfg
+    -c "program mutex-stress-test.elf verify"
+    -c "arm semihosting enable"
+    -c "arm semihosting_cmdline mutex-stress-test"
+    -c "reset"
+  )
+endif()
 
 # -----------------------------------------------------------------------------
-
-if (ENABLE_CMSIS_OS_VALIDATOR_TEST)
-
-  add_executable(cmsis-os-validator-test)
-  set_target_properties(cmsis-os-validator-test PROPERTIES OUTPUT_NAME "cmsis-os-validator-test")
-
-  target_compile_definitions(cmsis-os-validator-test PRIVATE
-    OS_USE_TRACE_SEMIHOSTING_STDOUT
-  )
-
-  # The compile options were defined globally.
-  target_compile_options(cmsis-os-validator-test PRIVATE
-    # None.
-  )
-
-  target_link_options(cmsis-os-validator-test PRIVATE
-    -Wl,-Map,platform-bin/cmsis-os-validator-test-map.txt
-  )
+if(ENABLE_CMSIS_OS_VALIDATOR_TEST)
+  add_test_executable(cmsis-os-validator-test)
 
   target_link_libraries(cmsis-os-validator-test PRIVATE
-    # Test library.
+
+    micro-os-plus::common-options
+
+    # Current test library.
     test::cmsis-os-validator
 
     # Tested library.
@@ -182,26 +153,23 @@ if (ENABLE_CMSIS_OS_VALIDATOR_TEST)
     micro-os-plus::platform
   )
 
-  xpack_add_cross_custom_commands("cmsis-os-validator-test")
-
   message(VERBOSE "A> cmsis-os-validator-test")
 
   add_test(
     NAME "cmsis-os-validator-test"
 
-    COMMAND openocd${extension}
-      -c "gdb_port disabled"
-      -c "tcl_port disabled"
-      -c "telnet_port disabled"
-      -f interface/cmsis-dap.cfg
-      -c "adapter speed 5000"
-      -f target/rp2040.cfg
-      -c "program cmsis-os-validator-test.elf verify"
-      -c "arm semihosting enable"
-      -c "arm semihosting_cmdline cmsis-os-validator-test"
-      -c "reset"
-    )
-
-endif ()
+    COMMAND $(pico_openocd)${extension}
+    -c "gdb port disabled"
+    -c "tcl port disabled"
+    -c "telnet port disabled"
+    -f interface/cmsis-dap.cfg
+    -c "adapter speed 5000"
+    -f target/rp2040.cfg
+    -c "program cmsis-os-validator-test.elf verify"
+    -c "arm semihosting enable"
+    -c "arm semihosting_cmdline cmsis-os-validator-test"
+    -c "reset"
+  )
+endif()
 
 # -----------------------------------------------------------------------------

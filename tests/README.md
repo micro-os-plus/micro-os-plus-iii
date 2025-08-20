@@ -33,6 +33,8 @@ The supported platforms for running the µOS++ IIIe tests are:
   Pico (Cortex-M0+) via OpenOCD semihosting
 - `platforms/nucleo-f767zi` - run the tests on a physical NUCLEO-Z767ZI
   board (Cortex-M7) via OpenOCD semihosting
+- `platforms/nucleo-f743zi` - run the tests on a physical NUCLEO-Z743ZI
+  board (Cortex-M7) via OpenOCD semihosting
 
 The tests are performed on GNU/Linux, macOS and Windows.
 
@@ -48,10 +50,10 @@ even with multiple versions of the same toolchain.
 
 For native tests, the toolchains used are:
 
-- GCC 11, 12
-- clang 12, 13, 14, 15
+- GCC 11, 12, 13, 14 (not on macOS)
+- clang 16, 17, 18, 19
 
-For Cortex-M tests, the toolchain is arm-none-eabi-gcc 12.
+For Cortex-M tests, the toolchain is arm-none-eabi-gcc 14.
 
 ## Tests details
 

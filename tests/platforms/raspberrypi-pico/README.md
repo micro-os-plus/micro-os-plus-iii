@@ -67,12 +67,12 @@ Startup tab
 
 ## OpenOCD invocation
 
-To run tests, invoke them via OpenOCD:
+To run the tests, invoke them via OpenOCD:
 
 ```sh
 openocd \
-      -c "tcl_port disabled" \
-      -c "telnet_port disabled" \
+      -c "tcl port disabled" \
+      -c "telnet port disabled" \
       -f interface/cmsis-dap.cfg \
       -c "adapter speed 5000" \
       -f target/rp2040.cfg \

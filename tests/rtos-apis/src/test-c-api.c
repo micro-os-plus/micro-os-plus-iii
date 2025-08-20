@@ -124,10 +124,15 @@ iterate_threads (os_thread_t* th, unsigned int depth)
       os_statistics_duration_t thread_cpu_cycles =
           os_thread_stat_get_cpu_cycles (p);
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
       printf ("%s, %u%% (%u/%u), %s, %u, %u \n", os_thread_get_name (p),
               used_proc, used, (unsigned int) (os_thread_stack_get_size (pst)),
               thread_state[st], (unsigned int) thread_switches,
               (unsigned int) thread_cpu_cycles);
+#pragma GCC diagnostic pop
 
       // Go down one level.
       iterate_threads (p, depth + 1);

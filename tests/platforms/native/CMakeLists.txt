@@ -16,58 +16,44 @@
 message(VERBOSE "Processing 'tests/platforms/native'...")
 
 # -----------------------------------------------------------------------------
+function(add_test_executable name)
+  add_executable(${name})
 
-add_subdirectory("platform")
+  # https://cmake.org/cmake/help/v3.20/manual/cmake-generator-expressions.7.html
+  # The link options were defined in `platform-native-interface`.
+  target_link_options(${name} PRIVATE
+    $<$<PLATFORM_ID:Linux,Windows>:-Wl,-Map,platform-bin/${name}-map.txt>
+    $<$<PLATFORM_ID:Linux,Darwin>:${rpath_options_list}>
 
-# -----------------------------------------------------------------------------
-
-if (CMAKE_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-
-  # On non-Windows, get the actual libraries paths by asking the compiler.
-  execute_process(
-    COMMAND "${CMAKE_SOURCE_DIR}/xpacks/@micro-os-plus/build-helper/dev-scripts/get-libraries-paths.sh" ${CMAKE_CXX_COMPILER}
-    OUTPUT_VARIABLE cxx_library_path
-    OUTPUT_STRIP_TRAILING_WHITESPACE
+    # -v
   )
-  string(REPLACE ":" ";" cxx_library_path_list ${cxx_library_path})
 
-  set(rpath_options_list)
-  foreach(RPATH IN LISTS cxx_library_path_list)
-    cmake_path(SET normalized_path NORMALIZE ${RPATH})
-    list(APPEND rpath_options_list "-Wl,-rpath,${normalized_path}")
-  endforeach()
+  if(xpack_create_listing)
+    add_custom_command(TARGET ${name} POST_BUILD
 
-  cmake_path(GET CMAKE_CXX_COMPILER FILENAME cxx_filename)
-  message(STATUS "${cxx_filename} RPATH_LIST: ${rpath_options_list}")
-
-endif()
+      # --all-headers -> Invalid/Unsupported object file format
+      COMMAND ${CMAKE_OBJDUMP} --source --demangle --line-numbers --wide "$<TARGET_FILE:${name}>" > ${name}-list.txt
+      VERBATIM
+    )
+  endif()
+endfunction()
 
 # -----------------------------------------------------------------------------
-
-if (ENABLE_RTOS_APIS_TEST)
-
-  add_executable(rtos-apis-test)
-  set_target_properties(rtos-apis-test PROPERTIES OUTPUT_NAME "rtos-apis-test")
+if(ENABLE_RTOS_APIS_TEST)
+  add_test_executable(rtos-apis-test)
 
   target_compile_definitions(rtos-apis-test PRIVATE
+
     # Use buffered write with caution, it occasionally hangs.
     # OS_USE_TRACE_POSIX_FWRITE_STDOUT
     OS_USE_TRACE_POSIX_STDOUT
   )
 
-  # The compile options were defined globally.
-  target_compile_options(rtos-apis-test PRIVATE
-    # None.
-  )
-
-  # https://cmake.org/cmake/help/v3.20/manual/cmake-generator-expressions.7.html
-  target_link_options(rtos-apis-test PRIVATE
-    $<$<PLATFORM_ID:Linux,Windows>:-Wl,-Map,platform-bin/rtos-apis-test-map.txt>
-    $<$<PLATFORM_ID:Linux,Darwin>:${rpath_options_list}>
-  )
-
   target_link_libraries(rtos-apis-test PRIVATE
-    # Test library.
+
+    micro-os-plus::common-options
+
+    # Current test library.
     test::rtos-apis
 
     # Tested library.
@@ -86,35 +72,24 @@ if (ENABLE_RTOS_APIS_TEST)
     NAME "rtos-apis-test"
     COMMAND rtos-apis-test
   )
-
 endif()
 
 # -----------------------------------------------------------------------------
-
-if (ENABLE_MUTEX_STRESS_TEST)
-
-  add_executable(mutex-stress-test)
-  set_target_properties(mutex-stress-test PROPERTIES OUTPUT_NAME "mutex-stress-test")
+if(ENABLE_MUTEX_STRESS_TEST)
+  add_test_executable(mutex-stress-test)
 
   target_compile_definitions(mutex-stress-test PRIVATE
+
     # Use buffered write with caution, it occasionally hangs.
     # OS_USE_TRACE_POSIX_FWRITE_STDOUT
     OS_USE_TRACE_POSIX_STDOUT
   )
 
-  # The compile options were defined globally.
-  target_compile_options(mutex-stress-test PRIVATE
-    # None.
-  )
-
-  # https://cmake.org/cmake/help/v3.20/manual/cmake-generator-expressions.7.html
-  target_link_options(mutex-stress-test PRIVATE
-    $<$<PLATFORM_ID:Linux,Windows>:-Wl,-Map,platform-bin/mutex-stress-test-map.txt>
-    $<$<PLATFORM_ID:Linux,Darwin>:${rpath_options_list}>
-  )
-
   target_link_libraries(mutex-stress-test PRIVATE
-    # Test library.
+
+    micro-os-plus::common-options
+
+    # Current test library.
     test::mutex-stress
 
     # Tested library.
@@ -130,25 +105,17 @@ if (ENABLE_MUTEX_STRESS_TEST)
     NAME "mutex-stress-test"
     COMMAND mutex-stress-test
   )
-
 endif()
 
 # -----------------------------------------------------------------------------
-
-if (ENABLE_CMSIS_OS_VALIDATOR_TEST)
-
-  add_executable(cmsis-os-validator-test)
-  set_target_properties(cmsis-os-validator-test PROPERTIES OUTPUT_NAME "cmsis-os-validator-test")
+if(ENABLE_CMSIS_OS_VALIDATOR_TEST)
+  add_test_executable(cmsis-os-validator-test)
 
   target_compile_definitions(cmsis-os-validator-test PRIVATE
+
     # Use buffered write with caution, it occasionally hangs.
     # OS_USE_TRACE_POSIX_FWRITE_STDOUT
     OS_USE_TRACE_POSIX_STDOUT
-  )
-
-  # The compile options were defined globally.
-  target_compile_options(cmsis-os-validator-test PRIVATE
-    # None.
   )
 
   # https://cmake.org/cmake/help/v3.20/manual/cmake-generator-expressions.7.html
@@ -158,7 +125,10 @@ if (ENABLE_CMSIS_OS_VALIDATOR_TEST)
   )
 
   target_link_libraries(cmsis-os-validator-test PRIVATE
-    # Test library.
+
+    micro-os-plus::common-options
+
+    # Current test library.
     test::cmsis-os-validator
 
     # Tested library.
@@ -177,7 +147,6 @@ if (ENABLE_CMSIS_OS_VALIDATOR_TEST)
     NAME "cmsis-os-validator-test"
     COMMAND cmsis-os-validator-test
   )
-
 endif()
 
 # -----------------------------------------------------------------------------

@@ -1,18 +1,18 @@
 # platforms/nucleo-h743zi
 
-Note: It cannot be a library, since it make extensive use of `weak` symbols.
+Note: It cannot be a library, since it makes extensive use of `weak` symbols.
 
 DO NOT include `startup_stm32h743xx.s`.
 
 ## OpenOCD invocation
 
-To run tests, invoke them via OpenOCD:
+To run the tests, invoke them via OpenOCD:
 
 ```sh
 openocd \
-      -c "gdb_port disabled" \
-      -c "tcl_port disabled" \
-      -c "telnet_port disabled" \
+      -c "gdb port disabled" \
+      -c "tcl port disabled" \
+      -c "telnet port disabled" \
       -f interface/stlink-dap.cfg \
       -c "adapter speed 5000" \
       -f target/stm32h7x.cfg \

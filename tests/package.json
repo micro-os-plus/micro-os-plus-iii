@@ -27,17 +27,17 @@
       "@xpack-dev-tools/cmake": "3.26.5-1.1",
       "@xpack-dev-tools/ninja-build": "1.11.1-3.1",
       "@micro-os-plus/build-helper": {
-        "specifier": "^2.14.1",
+        "specifier": "^2.17.0",
         "local": "link",
         "platforms": "all"
       },
       "@xpacks/arm-cmsis-rtos-validator": {
-        "specifier": "github:xpacks/arm-cmsis-rtos-validator#v1.0.0-3",
+        "specifier": "github:xpacks/arm-cmsis-rtos-validator#v1.0.0-4",
         "local": "link",
         "platforms": "all"
       },
       "@xpacks/chan-fatfs": {
-        "specifier": "github:xpacks/chan-fatfs#v0.13.1-4",
+        "specifier": "github:xpacks/chan-fatfs#v0.13.1-5",
         "local": "link",
         "platforms": "all"
       }
@@ -190,9 +190,9 @@
         "{% if os.platform != 'darwin' %}xpm run test-native-cmake-gcc12{% endif %}",
         "{% if os.platform != 'darwin' %}xpm run test-native-cmake-gcc13{% endif %}",
         "{% if os.platform != 'darwin' %}xpm run test-native-cmake-gcc14{% endif %}",
-        "xpm run test-native-cmake-clang13",
-        "xpm run test-native-cmake-clang14",
-        "xpm run test-native-cmake-clang15",
+        "echo xpm run test-native-cmake-clang13",
+        "echo xpm run test-native-cmake-clang14",
+        "echo xpm run test-native-cmake-clang15",
         "xpm run test-native-cmake-clang16",
         "xpm run test-native-cmake-clang17",
         "xpm run test-native-cmake-clang18",
@@ -471,7 +471,7 @@
             "platforms": "all"
           },
           "@xpack-3rd-party/libucontext": {
-            "specifier": "github:xpack-3rd-party/libucontext-xpack#v1.2.0-3",
+            "specifier": "github:xpack-3rd-party/libucontext-xpack#v1.2.0-4",
             "local": "link",
             "platforms": "all"
           }

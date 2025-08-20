@@ -20,14 +20,13 @@
 # `target_link_libraries(your-target PUBLIC test::rtos-apis)`
 
 # -----------------------------------------------------------------------------
-## Preamble ##
+# Preamble.
 
 # https://cmake.org/cmake/help/v3.20/
 cmake_minimum_required(VERSION 3.20)
 
 # -----------------------------------------------------------------------------
-## The test library definitions ##
-
+# The test library definitions.
 add_library(test-rtos-apis-interface INTERFACE EXCLUDE_FROM_ALL)
 
 target_include_directories(test-rtos-apis-interface INTERFACE
@@ -46,18 +45,26 @@ target_sources(test-rtos-apis-interface INTERFACE
 )
 
 target_compile_definitions(test-rtos-apis-interface INTERFACE
+
   # None.
 )
 
 target_compile_options(test-rtos-apis-interface INTERFACE
+
+  # None.
+)
+
+target_link_options(test-rtos-apis-interface INTERFACE
+
   # None.
 )
 
 target_link_libraries(test-rtos-apis-interface INTERFACE
+
   # None.
 )
 
-if (COMMAND xpack_display_target_lists)
+if(COMMAND xpack_display_target_lists)
   xpack_display_target_lists(test-rtos-apis-interface)
 endif()
 

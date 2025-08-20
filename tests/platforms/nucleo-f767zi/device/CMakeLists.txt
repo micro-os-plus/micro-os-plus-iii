@@ -11,21 +11,18 @@
 #
 # -----------------------------------------------------------------------------
 
-message(VERBOSE "Processing 'tests/platforms/nucleo-f767zi/device'...")
+message(VERBOSE "Processing 'tests/platforms/${PLATFORM_NAME}/device'...")
 
 # -----------------------------------------------------------------------------
-
 if(NOT DEFINED xpack_device_compile_definition)
-  message(FATAL_ERROR "Define xpack_device_compile_definition in platform*/cmake/common.cmake")
+  message(FATAL_ERROR "Define xpack_device_compile_definition in platform/${PLATFORM_NAME}/cmake/definitions.cmake")
 endif()
 
 # -----------------------------------------------------------------------------
 # Define the device library.
-
 add_library(device-stm32f767xx-interface INTERFACE EXCLUDE_FROM_ALL)
 
 # -----------------------------------------------------------------------------
-
 target_include_directories(device-stm32f767xx-interface INTERFACE
   "include"
 )
@@ -41,20 +38,25 @@ target_compile_definitions(device-stm32f767xx-interface INTERFACE
 )
 
 target_compile_options(device-stm32f767xx-interface INTERFACE
+
   # None.
+)
+
+target_link_options(device-stm32f767xx-interface INTERFACE
+  -T${CMAKE_CURRENT_SOURCE_DIR}/linker-scripts/mem.ld
+  -T${CMAKE_CURRENT_SOURCE_DIR}/linker-scripts/sections-flash.ld
 )
 
 target_link_libraries(device-stm32f767xx-interface INTERFACE
   micro-os-plus::stm32cubemx
 )
 
-if (COMMAND xpack_display_target_lists)
+if(COMMAND xpack_display_target_lists)
   xpack_display_target_lists(device-stm32f767xx-interface)
 endif()
 
 # -----------------------------------------------------------------------------
 # Aliases.
-
 add_library(micro-os-plus::device ALIAS device-stm32f767xx-interface)
 message(VERBOSE "> micro-os-plus::device -> device-stm32f767xx-interface")
 

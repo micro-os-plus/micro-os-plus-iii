@@ -20,14 +20,13 @@
 # `target_link_libraries(your-target PUBLIC test::cmsis-os-validator)`
 
 # -----------------------------------------------------------------------------
-## Preamble ##
+# Preamble.
 
 # https://cmake.org/cmake/help/v3.20/
 cmake_minimum_required(VERSION 3.20)
 
 # -----------------------------------------------------------------------------
-## The test library definitions ##
-
+# The test library definitions.
 add_library(test-cmsis-os-validator-interface INTERFACE EXCLUDE_FROM_ALL)
 
 target_include_directories(test-cmsis-os-validator-interface INTERFACE
@@ -35,22 +34,31 @@ target_include_directories(test-cmsis-os-validator-interface INTERFACE
 )
 
 target_sources(test-cmsis-os-validator-interface INTERFACE
+
   # src/main.cpp
 )
 
 target_compile_definitions(test-cmsis-os-validator-interface INTERFACE
+
   # None.
 )
 
 target_compile_options(test-cmsis-os-validator-interface INTERFACE
+
+  # None.
+)
+
+target_link_options(test-cmsis-os-validator-interface INTERFACE
+
   # None.
 )
 
 target_link_libraries(test-cmsis-os-validator-interface INTERFACE
+
   # None.
 )
 
-if (COMMAND xpack_display_target_lists)
+if(COMMAND xpack_display_target_lists)
   xpack_display_target_lists(test-cmsis-os-validator-interface)
 endif()
 

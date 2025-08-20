@@ -15,48 +15,45 @@ message(VERBOSE "Processing 'tests/platforms/qemu-cortex-m7f'...")
 
 # -----------------------------------------------------------------------------
 
-if(NOT DEFINED xpack_platform_compile_definition)
-  message(FATAL_ERROR "Define xpack_platform_compile_definition in platform*/cmake/common.cmake")
-endif()
-
-# -----------------------------------------------------------------------------
-
 # set(xpack_create_listing true)
 # set(xpack_create_hex true)
 
 # -----------------------------------------------------------------------------
 
-add_subdirectory("platform")
-
-# -----------------------------------------------------------------------------
 # Define the tests executables.
+function(add_test_executable name)
+  add_executable(${name})
 
-if("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
-  set(extension ".cmd")
-endif()
+  set_target_properties(${name}
+
+    PROPERTIES
+    OUTPUT_NAME "${name}"
+  )
+
+  # No other common compile or link options, all were defined in the
+  # libraries and will be inherited.
+  target_link_options(${name} PRIVATE
+    -Wl,-Map,platform-bin/${name}-map.txt
+
+    # -v
+  )
+
+  xpack_add_cross_custom_commands(${name})
+endfunction()
 
 # -----------------------------------------------------------------------------
-
-if (ENABLE_RTOS_APIS_TEST)
-
-  add_executable(rtos-apis-test)
-  set_target_properties(rtos-apis-test PROPERTIES OUTPUT_NAME "rtos-apis-test")
+if(ENABLE_RTOS_APIS_TEST)
+  add_test_executable(rtos-apis-test)
 
   target_compile_definitions(rtos-apis-test PRIVATE
     OS_USE_TRACE_SEMIHOSTING_STDOUT
   )
 
-  # The compile options were defined globally.
-  target_compile_options(rtos-apis-test PRIVATE
-    # None.
-  )
-
-  target_link_options(rtos-apis-test PRIVATE
-    -Wl,-Map,platform-bin/rtos-apis-test-map.txt
-  )
-
   target_link_libraries(rtos-apis-test PRIVATE
-    # Test library.
+
+    micro-os-plus::common-options
+
+    # Current test library.
     test::rtos-apis
 
     # Tested library.
@@ -69,47 +66,36 @@ if (ENABLE_RTOS_APIS_TEST)
     micro-os-plus::platform
   )
 
-  xpack_add_cross_custom_commands("rtos-apis-test")
-
   message(VERBOSE "A> rtos-apis-test")
 
   add_test(
     NAME "rtos-apis-test"
 
     COMMAND qemu-system-arm${extension}
-      --machine mps2-an500
-      --cpu cortex-m7
-      --kernel rtos-apis-test.elf
-      --nographic
-      -d unimp,guest_errors
-      --semihosting-config enable=on,target=native,arg=rtos-apis-test
-      # --semihosting-config arg=--verbose
-    )
+    --machine mps2-an500
+    --cpu cortex-m7
+    --kernel rtos-apis-test.elf
+    --nographic
+    -d unimp,guest_errors
+    --semihosting-config enable=on,target=native,arg=rtos-apis-test
 
-endif ()
+    # --semihosting-config arg=--verbose
+  )
+endif()
 
 # -----------------------------------------------------------------------------
-
-if (ENABLE_MUTEX_STRESS_TEST)
-
-  add_executable(mutex-stress-test)
-  set_target_properties(mutex-stress-test PROPERTIES OUTPUT_NAME "mutex-stress-test")
+if(ENABLE_MUTEX_STRESS_TEST)
+  add_test_executable(mutex-stress-test)
 
   target_compile_definitions(mutex-stress-test PRIVATE
     OS_USE_TRACE_SEMIHOSTING_STDOUT
   )
 
-  # The compile options were defined globally.
-  target_compile_options(mutex-stress-test PRIVATE
-    # None.
-  )
-
-  target_link_options(mutex-stress-test PRIVATE
-    -Wl,-Map,platform-bin/mutex-stress-test-map.txt
-  )
-
   target_link_libraries(mutex-stress-test PRIVATE
-    # Test library.
+
+    micro-os-plus::common-options
+
+    # Current test library.
     test::mutex-stress
 
     # Tested library.
@@ -119,48 +105,36 @@ if (ENABLE_MUTEX_STRESS_TEST)
     micro-os-plus::platform
   )
 
-  xpack_add_cross_custom_commands("mutex-stress-test")
-
   message(VERBOSE "A> mutex-stress-test")
 
   add_test(
     NAME "mutex-stress-test"
 
     COMMAND qemu-system-arm${extension}
-      --machine mps2-an500
-      --cpu cortex-m7
-      --kernel mutex-stress-test.elf
-      --nographic
-      -d unimp,guest_errors
-      --semihosting-config enable=on,target=native,arg=mutex-stress-test
-      # --semihosting-config arg=--verbose
-    )
+    --machine mps2-an500
+    --cpu cortex-m7
+    --kernel mutex-stress-test.elf
+    --nographic
+    -d unimp,guest_errors
+    --semihosting-config enable=on,target=native,arg=mutex-stress-test
 
-endif ()
+    # --semihosting-config arg=--verbose
+  )
+endif()
 
 # -----------------------------------------------------------------------------
-
-
-if (ENABLE_CMSIS_OS_VALIDATOR_TEST)
-
-  add_executable(cmsis-os-validator-test)
-  set_target_properties(cmsis-os-validator-test PROPERTIES OUTPUT_NAME "cmsis-os-validator-test")
+if(ENABLE_CMSIS_OS_VALIDATOR_TEST)
+  add_test_executable(cmsis-os-validator-test)
 
   target_compile_definitions(cmsis-os-validator-test PRIVATE
     OS_USE_TRACE_SEMIHOSTING_STDOUT
   )
 
-  # The compile options were defined globally.
-  target_compile_options(cmsis-os-validator-test PRIVATE
-    # None.
-  )
-
-  target_link_options(cmsis-os-validator-test PRIVATE
-    -Wl,-Map,platform-bin/cmsis-os-validator-test-map.txt
-  )
-
   target_link_libraries(cmsis-os-validator-test PRIVATE
-    # Test library.
+
+    micro-os-plus::common-options
+
+    # Current test library.
     test::cmsis-os-validator
 
     # Tested library.
@@ -173,23 +147,21 @@ if (ENABLE_CMSIS_OS_VALIDATOR_TEST)
     micro-os-plus::platform
   )
 
-  xpack_add_cross_custom_commands("cmsis-os-validator-test")
-
   message(VERBOSE "A> cmsis-os-validator-test")
 
   add_test(
     NAME "cmsis-os-validator-test"
 
     COMMAND qemu-system-arm${extension}
-      --machine mps2-an500
-      --cpu cortex-m7
-      --kernel cmsis-os-validator-test.elf
-      --nographic
-      -d unimp,guest_errors
-      --semihosting-config enable=on,target=native,arg=cmsis-os-validator-test
-      # --semihosting-config arg=--verbose
-    )
+    --machine mps2-an500
+    --cpu cortex-m7
+    --kernel cmsis-os-validator-test.elf
+    --nographic
+    -d unimp,guest_errors
+    --semihosting-config enable=on,target=native,arg=cmsis-os-validator-test
 
-endif ()
+    # --semihosting-config arg=--verbose
+  )
+endif()
 
 # -----------------------------------------------------------------------------

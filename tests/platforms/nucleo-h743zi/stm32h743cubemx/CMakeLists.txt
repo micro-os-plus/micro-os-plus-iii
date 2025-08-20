@@ -11,17 +11,15 @@
 #
 # -----------------------------------------------------------------------------
 
-message(VERBOSE "Processing 'tests/platforms/nucleo-h743zi/stm32h743cubemx'...")
+message(VERBOSE "Processing 'tests/platforms/${PLATFORM_NAME}/stm32h743cubemx'...")
 
 # -----------------------------------------------------------------------------
 # Define the stm32cubemx library.
 
-# Note: It cannot be a library, since it make extensive use of `weak` symbols.
-
+# Note: It cannot be a library, since it makes extensive use of `weak` symbols.
 add_library(stm32cubemx-interface INTERFACE EXCLUDE_FROM_ALL)
 
 # -----------------------------------------------------------------------------
-
 target_include_directories(stm32cubemx-interface INTERFACE
   "Core/Inc"
   "Drivers/CMSIS/Include"
@@ -54,32 +52,60 @@ target_sources(stm32cubemx-interface INTERFACE
   "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim_ex.c"
   "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c_ex.c"
   "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.c"
+
   # DO NOT include the assembly startup, use the .c one.
   # "startup_stm32h743xx.s"
 )
 
 target_compile_definitions(stm32cubemx-interface INTERFACE
+
   # From stm32h7xx.h
   STM32H743xx
   USE_HAL_DRIVER
 )
 
-
 target_compile_options(stm32cubemx-interface INTERFACE
+  $<$<COMPILE_LANGUAGE:C>:-Wno-bad-function-cast>
+  $<$<COMPILE_LANGUAGE:C>:-Wno-nested-externs>
+
+  # -Wno-undef
+  # -Wno-attributes
+  -Wno-padded
+
+  # -Wno-format
+  # -Wno-format-y2k
+  # -Wno-format-nonliteral
+  # -Wno-format-security
+  # -Wno-aggregate-return
+  # -Wno-packed
+  # -Wno-missing-declarations
+  -Wno-redundant-decls
+  -Wno-conversion
+  -Wno-sign-conversion
+  -Wno-duplicated-branches
+  -Wno-switch-enum
+  -Wno-unused-parameter
+  -Wno-switch-default
+  -Wno-cast-align
+  -Wno-undef
+)
+
+target_link_options(stm32cubemx-interface INTERFACE
+
   # None
 )
 
 target_link_libraries(stm32cubemx-interface INTERFACE
+
   # None
 )
 
-if (COMMAND xpack_display_target_lists)
+if(COMMAND xpack_display_target_lists)
   xpack_display_target_lists(stm32cubemx-interface)
 endif()
 
 # -----------------------------------------------------------------------------
 # Aliases.
-
 add_library(micro-os-plus::stm32cubemx ALIAS stm32cubemx-interface)
 message(VERBOSE "> micro-os-plus::stm32cubemx -> stm32cubemx-interface")
 

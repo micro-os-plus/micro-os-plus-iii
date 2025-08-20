@@ -57,14 +57,14 @@ set(global_common_options
 # Targets may add options to disable some of them.
 xpack_set_all_compiler_warnings(all_warnings)
 
-target_compile_options(micro-os-plus-common-options-interface INTERFACE
-  ${global_common_options}
-  ${all_warnings}
-)
-
 target_include_directories(micro-os-plus-common-options-interface INTERFACE
 
   # None.
+)
+
+target_compile_options(micro-os-plus-common-options-interface INTERFACE
+  ${global_common_options}
+  ${all_warnings}
 )
 
 # When `-flto` is used, the compile options must be passed to the linker too.

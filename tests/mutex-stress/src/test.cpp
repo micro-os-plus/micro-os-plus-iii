@@ -270,6 +270,13 @@ run_tests (unsigned int seconds)
   mutex_test mt8 ("t8");
   mutex_test mt9 ("t9");
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#if __clang_major__ == 17 || __clang_major__ == 18
+// Triggered by 18 & 17, but not correct. 19 not affected.
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
+#endif
   mt[0] = &mt0;
   mt[1] = &mt1;
   mt[2] = &mt2;
@@ -280,6 +287,7 @@ run_tests (unsigned int seconds)
   mt[7] = &mt7;
   mt[8] = &mt8;
   mt[9] = &mt9;
+#pragma GCC diagnostic pop
 #endif
 
   periodic pm

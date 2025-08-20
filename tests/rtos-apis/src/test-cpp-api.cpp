@@ -122,10 +122,15 @@ iterate_threads (thread* th, unsigned int depth)
 
       statistics::duration_t thread_cpu_cycles = p.statistics ().cpu_cycles ();
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
       printf ("%s, %u%% (%u/%u), %s, %u, %u \n", p.name (), used_proc, used,
               static_cast<unsigned int> (stk.size ()), thread_state[st],
               static_cast<unsigned int> (thread_switches),
               static_cast<unsigned int> (thread_cpu_cycles));
+#pragma GCC diagnostic pop
 
       iterate_threads (&p, depth + 1);
     }

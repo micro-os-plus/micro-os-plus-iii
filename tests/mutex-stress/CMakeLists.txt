@@ -20,14 +20,13 @@
 # `target_link_libraries(your-target PUBLIC test::mutex-stress)`
 
 # -----------------------------------------------------------------------------
-## Preamble ##
+# Preamble.
 
 # https://cmake.org/cmake/help/v3.20/
 cmake_minimum_required(VERSION 3.20)
 
 # -----------------------------------------------------------------------------
-## The test library definitions ##
-
+# The test library definitions.
 add_library(test-mutex-stress-interface INTERFACE EXCLUDE_FROM_ALL)
 
 target_include_directories(test-mutex-stress-interface INTERFACE
@@ -40,18 +39,26 @@ target_sources(test-mutex-stress-interface INTERFACE
 )
 
 target_compile_definitions(test-mutex-stress-interface INTERFACE
+
   # None.
 )
 
 target_compile_options(test-mutex-stress-interface INTERFACE
+
+  # None.
+)
+
+target_link_options(test-mutex-stress-interface INTERFACE
+
   # None.
 )
 
 target_link_libraries(test-mutex-stress-interface INTERFACE
+
   # None.
 )
 
-if (COMMAND xpack_display_target_lists)
+if(COMMAND xpack_display_target_lists)
   xpack_display_target_lists(test-mutex-stress-interface)
 endif()
 
