@@ -57,10 +57,6 @@ jobs:
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
         # macos-13 is x64, macos-15 is arm64.
         os: [ 'ubuntu-24.04', 'ubuntu-24.04-arm', 'macos-13', 'macos-15', 'windows-2022' ]
-        # https://nodejs.org/en - use LTS
-        node-version: [ '20' ]
-        # https://www.npmjs.com/package/xpm
-        xpm-version: [ '0.20.8' ]
 
     steps:
     - name: Checkout
@@ -69,15 +65,17 @@ jobs:
       with:
         fetch-depth: 3
 
-    - name: Setup Node.js ${{ matrix.node-version }} on ${{ matrix.os }}
+    - name: Setup Node.js on ${{ matrix.os }}
       # https://github.com/actions/setup-node/
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ matrix.node-version }}
+        # https://nodejs.org/en - use LTS
+        node-version: 22
 
-    - name: Install xpm@${{ matrix.xpm-version }} on ${{ matrix.os }}
+    - name: Install xpm on ${{ matrix.os }}
       run: |
-        npm install -g xpm@${{ matrix.xpm-version }}
+        # https://www.npmjs.com/package/xpm
+        npm install -g xpm@0.20.8
 
     - name: Show environment
       run: |
