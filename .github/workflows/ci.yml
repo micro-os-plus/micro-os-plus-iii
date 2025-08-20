@@ -1,3 +1,16 @@
+# -----------------------------------------------------------------------------
+#
+# This file is part of the µOS++ project (http://micro-os-plus.github.io).
+# Copyright (c) 2021-2025 Liviu Ionescu. All rights reserved.
+#
+# Permission to use, copy, modify, and/or distribute this software
+# for any purpose is hereby granted, under the terms of the MIT license.
+#
+# If a copy of the license was not distributed with this file, it can
+# be obtained from https://opensource.org/licenses/mit.
+#
+# -----------------------------------------------------------------------------
+
 # https://help.github.com/en/actions
 # https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
 # https://github.com/actions
@@ -27,9 +40,15 @@ on:
     branches:
       - '*'
 
+# Allow one concurrent deployment.
+# https://docs.github.com/en/actions/using-jobs/using-concurrency
+concurrency:
+  group: "tests"
+  cancel-in-progress: true
+
 jobs:
   ci-test:
-    name: 'CI µOS++ tests'
+    name: 'CI µOS++ IIIe tests'
 
     runs-on: ${{ matrix.os }}
 
@@ -37,7 +56,7 @@ jobs:
       matrix:
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
         # macos-13 is x64, macos-15 is arm64.
-        os: [ 'ubuntu-24.04', 'macos-13', 'macos-15' ]
+        os: [ 'ubuntu-24.04', 'ubuntu-24.04-arm', 'macos-13', 'macos-15', 'windows-2022' ]
         # https://nodejs.org/en - use LTS
         node-version: [ '20' ]
         # https://www.npmjs.com/package/xpm
@@ -50,13 +69,13 @@ jobs:
       with:
         fetch-depth: 3
 
-    - name: Setup Node.js ${{ matrix.node-version }}
+    - name: Setup Node.js ${{ matrix.node-version }} on ${{ matrix.os }}
       # https://github.com/actions/setup-node/
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Install xpm@${{ matrix.xpm-version }}
+    - name: Install xpm@${{ matrix.xpm-version }} on ${{ matrix.os }}
       run: |
         npm install -g xpm@${{ matrix.xpm-version }}
 
@@ -69,36 +88,12 @@ jobs:
         xpm --version
         env | sort
 
-    - name: Satisfy project dependencies
+    - name: Satisfy project dependencies on ${{ matrix.os }}
       run: |
-        xpm run install -C tests
+        npm ci -C tests
+        xpm run install-ci -C tests
 
-    - name: Run test-native-cmake-gcc
-      run: |
-        xpm install --config native-cmake-gcc-debug -C tests
-        xpm install --config native-cmake-gcc-release -C tests
-        xpm run test-native-cmake-gcc -C tests
-
-    - name: Run test-native-cmake-clang
-      run: |
-        xpm install --config native-cmake-clang-debug -C tests
-        xpm install --config native-cmake-clang-release -C tests
-        xpm run test-native-cmake-clang -C tests
-
-    - name: Run test-qemu-cortex-m0-cmake
-      run: |
-        xpm install --config qemu-cortex-m0-cmake-debug -C tests
-        xpm install --config qemu-cortex-m0-cmake-release -C tests
-        xpm run test-qemu-cortex-m0-cmake -C tests
-
-    - name: Run test-qemu-cortex-m3-cmake
-      run: |
-        xpm install --config qemu-cortex-m3-cmake-debug -C tests
-        xpm install --config qemu-cortex-m3-cmake-release -C tests
-        xpm run test-qemu-cortex-m3-cmake -C tests
-
-    - name: Run test-qemu-cortex-m7f-cmake
-      run: |
-        xpm install --config qemu-cortex-m7f-cmake-debug -C tests
-        xpm install --config qemu-cortex-m7f-cmake-release -C tests
-        xpm run test-qemu-cortex-m7f-cmake -C tests
+    - name: Run tests on ${{ matrix.os }}
+      run: xpm run test-ci -C tests
+      env:
+        CI: true
