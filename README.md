@@ -133,12 +133,12 @@ Third party source code libraries are available from
 Apart from the unused `master` branch, there are two active branches:
 
 - `xpack`, with the latest stable version (default)
-- `xpack-develop`, with the current development version
+- `xpack-development`, with the current development version
 
-All development is done in the `xpack-develop` branch, and contributions via
+All development is done in the `xpack-development` branch, and contributions via
 Pull Requests should be directed to this branch.
 
-When new releases are published, the `xpack-develop` branch is merged
+When new releases are published, the `xpack-development` branch is merged
 into `xpack`.
 
 ## Developer info

@@ -16,7 +16,7 @@ A recent [xpm](https://xpack.github.io/xpm/), which is a portable
 rm -rf ~/Work/micro-os-plus-iii/micro-os-plus-iii.git && \
 mkdir -p ~/Work/micro-os-plus-iii && \
 git clone \
-  --branch xpack-develop \
+  --branch xpack-development \
   https://github.com/micro-os-plus/micro-os-plus-iii.git \
   ~/Work/micro-os-plus-iii/micro-os-plus-iii.git
 ```
