@@ -471,7 +471,7 @@
             "platforms": "all"
           },
           "@xpack-3rd-party/libucontext": {
-            "specifier": "github:xpack-3rd-party/libucontext-xpack#v1.2.0-4",
+            "specifier": "github:xpack-3rd-party/libucontext-xpack#v1.2.0-5",
             "local": "link",
             "platforms": "all"
           }
