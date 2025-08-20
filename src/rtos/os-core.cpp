@@ -108,6 +108,7 @@ namespace os
       // member in the same location.
 #pragma GCC diagnostic push
 #if defined(__clang__)
+#pragma clang diagnostic ignored "-Winvalid-offsetof"
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"
 #endif

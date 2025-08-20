@@ -114,7 +114,7 @@ namespace os
 #endif
 
       constexpr systicks
-      operator"" _ticks (unsigned long long t)
+      operator""_ticks (unsigned long long t)
       {
         return systicks (static_cast<systick_clock::rep> (t));
       }

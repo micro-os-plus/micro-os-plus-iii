@@ -186,7 +186,6 @@ namespace os
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
       char* p = static_cast<char*> (pool_addr_);
-#pragma GCC diagnostic pop
       for (std::size_t i = 1; i < blocks_; ++i)
         {
           // Compute the address of the next block;
@@ -197,6 +196,7 @@ namespace os
           // Advance pointer
           p = pn;
         }
+#pragma GCC diagnostic pop
 
       // Mark end of list.
       *(static_cast<void**> (static_cast<void*> (p))) = nullptr;

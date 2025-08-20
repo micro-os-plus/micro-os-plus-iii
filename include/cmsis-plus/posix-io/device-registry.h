@@ -195,8 +195,13 @@ namespace os
             return nullptr;
           }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
         // The prefix was identified; try to match the rest of the path.
         auto name = path + std::strlen (prefix);
+#pragma GCC diagnostic pop
 
         for (auto&& p : registry_list__)
           {

@@ -67,7 +67,12 @@ namespace os
 
       for (std::size_t i = 0; i < file_descriptors_manager::size (); ++i)
         {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
           descriptors_array__[i] = nullptr;
+#pragma GCC diagnostic pop
         }
     }
 
@@ -90,8 +95,13 @@ namespace os
         {
           return nullptr;
         }
-      return descriptors_array__[fildes];
-    }
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
+        return descriptors_array__[fildes];
+#pragma GCC diagnostic pop
+      }
 
     bool
     file_descriptors_manager::valid (int fildes)
@@ -119,6 +129,10 @@ namespace os
 
       for (std::size_t i = reserved__; i < size__; ++i)
         {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
           if (descriptors_array__[i] == nullptr)
             {
               descriptors_array__[i] = io;
@@ -129,6 +143,7 @@ namespace os
 #endif
               return static_cast<int> (i);
             }
+#pragma GCC diagnostic pop
         }
 
       // Too many files open in system.
@@ -152,7 +167,12 @@ namespace os
           return -1;
         }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
       descriptors_array__[fildes] = io;
+#pragma GCC diagnostic pop
       io->file_descriptor (fildes);
       return fildes;
     }
@@ -170,8 +190,13 @@ namespace os
           return -1;
         }
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
       descriptors_array__[fildes]->clear_file_descriptor ();
       descriptors_array__[fildes] = nullptr;
+#pragma GCC diagnostic pop
       return 0;
     }
 
@@ -179,7 +204,12 @@ namespace os
     file_descriptors_manager::socket (int fildes)
     {
       assert((fildes >= 0) && (static_cast<std::size_t> (fildes) < size__));
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
       auto* const io = descriptors_array__[fildes];
+#pragma GCC diagnostic pop
       if (io->get_type () != static_cast<posix::io::type_t>(io::type::socket))
         {
           return nullptr;
@@ -194,10 +224,15 @@ namespace os
       for (std::size_t i = reserved__; i < file_descriptors_manager::size ();
           ++i)
         {
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
           if (descriptors_array__[i] != nullptr)
             {
               ++count;
             }
+#pragma GCC diagnostic pop
         }
       return count;
     }

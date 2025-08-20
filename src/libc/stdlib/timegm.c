@@ -78,7 +78,12 @@ timegm (struct tm* tim_p)
 
   /* compute days in year */
   days += tim_p->tm_mday - 1;
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
   days += _DAYS_BEFORE_MONTH[tim_p->tm_mon];
+#pragma GCC diagnostic pop
   if (tim_p->tm_mon > 1 && _DAYS_IN_YEAR (tim_p->tm_year) == 366)
     days++;
 
@@ -176,6 +181,10 @@ validate_structure (struct tm *tim_p)
   if (_DAYS_IN_YEAR (tim_p->tm_year) == 366)
     days_in_feb = 29;
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
   if (tim_p->tm_mday <= 0)
     {
       while (tim_p->tm_mday <= 0)
@@ -202,6 +211,7 @@ validate_structure (struct tm *tim_p)
             }
         }
     }
+#pragma GCC diagnostic pop
 }
 
 // ----------------------------------------------------------------------------

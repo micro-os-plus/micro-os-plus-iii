@@ -508,7 +508,6 @@ namespace os
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
       const /* struct */ iovec* p = iov;
-#pragma GCC diagnostic pop
       for (int i = 0; i < iovcnt; ++i, ++p)
         {
           ssize_t ret = do_write (p->iov_base, p->iov_len);
@@ -518,6 +517,7 @@ namespace os
             }
           total += ret;
         }
+#pragma GCC diagnostic pop
       return total;
     }
 

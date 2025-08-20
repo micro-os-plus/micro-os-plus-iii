@@ -169,7 +169,6 @@ namespace os
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
       element_t* p = bottom_address_;
-#pragma GCC diagnostic pop
       element_t* pend = top ();
 
       // Initialise the entire stack with the magic word.
@@ -177,6 +176,7 @@ namespace os
         {
           *p = magic;
         }
+#pragma GCC diagnostic pop
 
       // Compute the actual size. The -1 is to leave space for the magic.
       size_bytes_ = ((static_cast<std::size_t> (p - bottom_address_) - 1)
@@ -203,13 +203,13 @@ namespace os
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
       element_t* p = bottom_address_;
-#pragma GCC diagnostic pop
       std::size_t count = 0;
       while (*p == magic)
         {
           count += sizeof(element_t);
           ++p;
         }
+#pragma GCC diagnostic pop
 
       return count;
     }
