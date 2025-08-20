@@ -320,5 +320,6 @@
         "endcode",
         "ingroup",
         "nullptr"
-    ]
+    ],
+    "mesonbuild.selectRootDir": false
 }
