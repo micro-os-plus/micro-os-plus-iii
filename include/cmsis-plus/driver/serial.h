@@ -42,7 +42,7 @@ namespace os
 {
   namespace driver
   {
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     namespace serial
     {
@@ -61,7 +61,8 @@ namespace os
       /** @brief UART = (Asynchronous);; arg = Baudrate. */
       constexpr config_t MODE_ASYNCHRONOUS = (0x01UL << CONFIG_Pos);
 
-      /** @brief Synchronous Master = (generates clock signal); arg = Baudrate. */
+      /** @brief Synchronous Master = (generates clock signal); arg = Baudrate.
+       */
       constexpr config_t MODE_SYNCHRONOUS_MASTER = (0x02UL << CONFIG_Pos);
 
       /** @brief Synchronous Slave = (external clock signal);. */
@@ -140,7 +141,8 @@ namespace os
       /** @brief RTS/CTS Flow Control. */
       constexpr config_t FLOW_CONTROL_RTS_CTS = (3UL << FLOW_CONFIG_Pos);
 
-      // ----- Serial Control Codes: Mode Parameters: Clock Polarity = (Synchronous mode); -----
+      // ----- Serial Control Codes: Mode Parameters: Clock Polarity =
+      // (Synchronous mode); -----
       constexpr bit_number_t CPOL_Pos = 18;
       constexpr config_t CPOL_Msk = (1UL << CPOL_Pos);
 
@@ -150,7 +152,8 @@ namespace os
       /** @brief CPOL = 1. */
       constexpr config_t CPOL1 = (1UL << CPOL_Pos);
 
-      // ----- Serial Control Codes: Mode Parameters: Clock Phase = (Synchronous mode); -----
+      // ----- Serial Control Codes: Mode Parameters: Clock Phase =
+      // (Synchronous mode); -----
       constexpr bit_number_t CPHA_Pos = 19;
       constexpr config_t CPHA_Msk = (1UL << CPHA_Pos);
 
@@ -162,7 +165,8 @@ namespace os
 
       // ----- Serial Control Codes: Miscellaneous Controls  -----
 
-      /** @brief Set default Transmit value = (Synchronous Receive only); arg = value. */
+      /** @brief Set default Transmit value = (Synchronous Receive only); arg =
+       * value. */
       constexpr config_t DEFAULT_TX_VALUE = (0x10UL << CONFIG_Pos);
 
       /** @brief Set IrDA Pulse in ns; arg: 0=3/16 of bit period. */
@@ -177,13 +181,12 @@ namespace os
       /** @brief Smart Card NACK generation; arg: 0=disabled, 1=enabled. */
       constexpr config_t SMART_CARD_NACK = (0x14UL << CONFIG_Pos);
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
       // ----- Commands -----
 
-      enum Control
-        : control_t
-          {
-            //
+      enum Control : control_t
+      {
+        //
         /** @brief Enable Transmitter. */
         enable_tx = (0x15UL << CONFIG_Pos),
 
@@ -212,7 +215,7 @@ namespace os
         disable_break = (0x27UL << CONFIG_Pos)
       };
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
       // ****** Serial specific error codes *****
 
       /** @brief Specified Mode not supported. */
@@ -239,7 +242,7 @@ namespace os
       /** @brief Specified Clock Phase not supported. */
       constexpr return_t ERROR_CPHA = ERROR_SPECIFIC - 8;
 
-      // ====================================================================
+      // ======================================================================
       // ***** Serial Status *****
 
 #pragma GCC diagnostic push
@@ -255,7 +258,6 @@ namespace os
       class Status
       {
       public:
-
         bool
         is_tx_busy (void);
 
@@ -277,38 +279,42 @@ namespace os
         bool
         is_rx_parity_error (void);
 
-        // ------------------------------------------------------------------
+        // --------------------------------------------------------------------
 
       public:
-
         // For compatibility with ARM CMSIS, these bits should be
         // exactly in this order.
 
         /** @brief Transmitter busy flag. */
-        bool tx_busy :1;
+        bool tx_busy : 1;
 
         /** @brief Receiver busy flag. */
-        bool rx_busy :1;
+        bool rx_busy : 1;
 
-        /** @brief Transmit data underflow detected (cleared on start of next send operation). */
-        bool tx_underflow :1;
+        /** @brief Transmit data underflow detected (cleared on start of next
+         * send operation). */
+        bool tx_underflow : 1;
 
-        /** @brief Receive data overflow detected (cleared on start of next receive operation). */
-        bool rx_overflow :1;
+        /** @brief Receive data overflow detected (cleared on start of next
+         * receive operation). */
+        bool rx_overflow : 1;
 
-        /** @brief Break detected on receive (cleared on start of next receive operation). */
-        bool rx_break :1;
+        /** @brief Break detected on receive (cleared on start of next receive
+         * operation). */
+        bool rx_break : 1;
 
-        /** @brief Framing error detected on receive (cleared on start of next receive operation). */
-        bool rx_framing_error :1;
+        /** @brief Framing error detected on receive (cleared on start of next
+         * receive operation). */
+        bool rx_framing_error : 1;
 
-        /** @brief Parity error detected on receive (cleared on start of next receive operation). */
-        bool rx_parity_error :1;
+        /** @brief Parity error detected on receive (cleared on start of next
+         * receive operation). */
+        bool rx_parity_error : 1;
       };
 
 #pragma GCC diagnostic pop
 
-      // ====================================================================
+      // ======================================================================
       // ***** Serial Modem Control *****
 
       using modem_config_t = uint32_t;
@@ -316,10 +322,9 @@ namespace os
       /**
        * @brief Configuration to change the serial modem lines.
        */
-      enum class Modem_control
-        : modem_config_t
-          {
-            //
+      enum class Modem_control : modem_config_t
+      {
+        //
 
         /** @brief Deactivate RTS. */
         clear_rts,
@@ -334,7 +339,7 @@ namespace os
         set_dtr
       };
 
-      // ====================================================================
+      // ======================================================================
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -349,7 +354,6 @@ namespace os
       class Modem_status
       {
       public:
-
         bool
         is_cts_active (void);
 
@@ -362,37 +366,35 @@ namespace os
         bool
         is_ri_active (void);
 
-        // ------------------------------------------------------------------
+        // --------------------------------------------------------------------
       public:
-
         // For compatibility with ARM CMSIS, these bits should be
         // exactly in this order.
 
         /** @brief CTS state: true=Active, false=Inactive. */
-        bool cts :1;
+        bool cts : 1;
 
         /** @brief DSR state: true=Active, false=Inactive. */
-        bool dsr :1;
+        bool dsr : 1;
 
         /** @brief DCD state: true=Active, false=Inactive. */
-        bool dcd :1;
+        bool dcd : 1;
 
         /** @brief RI  state: true=Active, false=Inactive. */
-        bool ri :1;
+        bool ri : 1;
       };
 
 #pragma GCC diagnostic pop
 
-      // ====================================================================
+      // ======================================================================
       // ****** Serial Events *****
 
       /**
        * @brief Serial Events
        */
-      enum Event
-        : event_t
-          {
-            //
+      enum Event : event_t
+      {
+        //
 
         /** @brief Send completed; however USART may still transmit data. */
         send_complete = (1UL << 0),
@@ -437,7 +439,7 @@ namespace os
         ri = (1UL << 13)
       };
 
-      // ====================================================================
+      // ======================================================================
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -452,79 +454,78 @@ namespace os
       class Capabilities
       {
       public:
-
         // For compatibility with ARM CMSIS, these bits should be
         // exactly in this order.
 
         /** @brief supports Asynchronous mode. */
-        bool asynchronous :1;
+        bool asynchronous : 1;
 
         /** @brief supports Synchronous Master mode. */
-        bool synchronous_master :1;
+        bool synchronous_master : 1;
 
         /** @brief supports Synchronous Slave mode. */
-        bool synchronous_slave :1;
+        bool synchronous_slave : 1;
 
         /** @brief supports Single-wire mode. */
-        bool single_wire :1;
+        bool single_wire : 1;
 
         /** @brief supports IrDA mode. */
-        bool irda :1;
+        bool irda : 1;
 
         /** @brief supports Smart Card mode. */
-        bool smart_card :1;
+        bool smart_card : 1;
 
         /** @brief Smart Card Clock generator available. */
-        bool smart_card_clock :1;
+        bool smart_card_clock : 1;
 
         /** @brief RTS Flow Control available. */
-        bool flow_control_rts :1;
+        bool flow_control_rts : 1;
 
         /** @brief CTS Flow Control available. */
-        bool flow_control_cts :1;
+        bool flow_control_cts : 1;
 
         /** @brief Transmit completed event. */
-        bool event_tx_complete :1;
+        bool event_tx_complete : 1;
 
         /** @brief Signal receive character timeout event. */
-        bool event_rx_timeout :1;
+        bool event_rx_timeout : 1;
 
         /** @brief RTS Line: false=not available, true=available. */
-        bool rts :1;
+        bool rts : 1;
 
         /** @brief CTS Line: false=not available, true=available. */
-        bool cts :1;
+        bool cts : 1;
 
         /** @brief DTR Line: false=not available, true=available. */
-        bool dtr :1;
+        bool dtr : 1;
 
         /** @brief DSR Line: false=not available, true=available. */
-        bool dsr :1;
+        bool dsr : 1;
 
         /** @brief DCD Line: false=not available, true=available. */
-        bool dcd :1;
+        bool dcd : 1;
 
         /** @brief RI Line: false=not available, true=available. */
-        bool ri :1;
+        bool ri : 1;
 
         /** @brief Signal CTS change event. */
-        bool event_cts :1;
+        bool event_cts : 1;
 
         /** @brief Signal DSR change event. */
-        bool event_dsr :1;
+        bool event_dsr : 1;
 
         /** @brief Signal DCD change event. */
-        bool event_dcd :1;
+        bool event_dcd : 1;
 
         /** @brief Signal RI change event. */
-        bool event_ri :1;
+        bool event_ri : 1;
       };
 
 #pragma GCC diagnostic pop
 
     } /* namespace serial */
 
-    // ======================================================================
+    // ========================================================================
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -537,8 +538,7 @@ namespace os
     {
 
     public:
-
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
       Serial () noexcept;
 
@@ -547,15 +547,16 @@ namespace os
       Serial (Serial&&) = delete;
 
       Serial&
-      operator= (const Serial&) = delete;
+      operator= (const Serial&)
+          = delete;
 
       Serial&
-      operator= (Serial&&) = delete;
+      operator= (Serial&&)
+          = delete;
 
-      virtual
-      ~Serial () noexcept override;
+      virtual ~Serial () noexcept override;
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
       /**
        * @brief       Register event callback.
@@ -568,7 +569,7 @@ namespace os
       register_callback (signal_event_t cb_func,
                          const void* cb_object = nullptr) noexcept;
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
       /**
        * @brief       Get driver capabilities.
@@ -579,7 +580,8 @@ namespace os
 
       /**
        * @brief       Start the serial transmitter.
-       * @param [in] data  Pointer to buffer with data to send to USART transmitter.
+       * @param [in] data  Pointer to buffer with data to send to USART
+       * transmitter.
        * @param [in] num   Number of data items to send.
        * @return      Execution status
        */
@@ -588,7 +590,8 @@ namespace os
 
       /**
        * @brief       Start the serial receiver.
-       * @param [out] data  Pointer to buffer for data to receive from USART receiver
+       * @param [out] data  Pointer to buffer for data to receive from USART
+       * receiver
        * @param [in] num   Number of data items to receive
        * @return      Execution status
        */
@@ -596,7 +599,8 @@ namespace os
       receive (void* data, std::size_t num) noexcept;
 
       /**
-       * @brief       Start sending/receiving data to/from the serial transmitter/receiver.
+       * @brief       Start sending/receiving data to/from the serial
+       * transmitter/receiver.
        * @param [in] data_out  Pointer to buffer with data to send
        * @param [out] data_in   Pointer to buffer for data to receive
        * @param [in] num       Number of bytes to transfer
@@ -623,7 +627,8 @@ namespace os
        * @brief       Configure the serial interface.
        * @param [in] cfg  Operation
        * @param [in] arg      Argument of operation (optional)
-       * @return      Common execution status and driver specific usart_execution_status
+       * @return      Common execution status and driver specific
+       * usart_execution_status
        */
       return_t
       configure (serial::config_t cfg, serial::config_arg_t arg) noexcept;
@@ -631,7 +636,8 @@ namespace os
       /**
        * @brief       Control the serial interface.
        * @param [in] ctrl  Operation
-       * @return      Common execution status and driver specific usart_execution_status
+       * @return      Common execution status and driver specific
+       * usart_execution_status
        */
       return_t
       control (serial::control_t ctrl) noexcept;
@@ -671,46 +677,54 @@ namespace os
       clean (void) noexcept;
 
     protected:
-
       // ----- To be implemented by derived classes -----
 
       virtual const serial::Capabilities&
-      do_get_capabilities (void) noexcept = 0;
+      do_get_capabilities (void) noexcept
+          = 0;
 
       virtual return_t
-      do_send (const void* data, std::size_t num) noexcept = 0;
+      do_send (const void* data, std::size_t num) noexcept
+          = 0;
 
       virtual return_t
-      do_receive (void* data, std::size_t num) noexcept = 0;
+      do_receive (void* data, std::size_t num) noexcept
+          = 0;
 
       virtual return_t
-      do_transfer (const void* data_out, void* data_in, std::size_t num)
-          noexcept = 0;
+      do_transfer (const void* data_out, void* data_in,
+                   std::size_t num) noexcept
+          = 0;
 
       virtual std::size_t
-      do_get_tx_count (void) noexcept = 0;
+      do_get_tx_count (void) noexcept
+          = 0;
 
       virtual std::size_t
-      do_get_rx_count (void) noexcept = 0;
+      do_get_rx_count (void) noexcept
+          = 0;
 
       virtual return_t
-      do_configure (serial::config_t cfg, serial::config_arg_t arg)
-          noexcept = 0;
+      do_configure (serial::config_t cfg, serial::config_arg_t arg) noexcept
+          = 0;
 
       virtual return_t
-      do_control (serial::control_t ctrl) noexcept = 0;
+      do_control (serial::control_t ctrl) noexcept
+          = 0;
 
       virtual serial::Status&
-      do_get_status (void) noexcept = 0;
+      do_get_status (void) noexcept
+          = 0;
 
       virtual return_t
-      do_control_modem_line (serial::Modem_control ctrl) noexcept = 0;
+      do_control_modem_line (serial::Modem_control ctrl) noexcept
+          = 0;
 
       virtual serial::Modem_status&
-      do_get_modem_status (void) noexcept = 0;
+      do_get_modem_status (void) noexcept
+          = 0;
 
     protected:
-
       /// Pointer to static function that implements the callback.
       signal_event_t cb_func_;
 
@@ -719,17 +733,16 @@ namespace os
 
       serial::Status status_;
       serial::Modem_status modem_status_;
-
     };
 
 #pragma GCC diagnostic pop
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     // ----- Definitions -----
 
     namespace serial
     {
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
       inline bool
       Status::is_tx_busy (void)
@@ -773,7 +786,7 @@ namespace os
         return rx_parity_error;
       }
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
       inline bool
       Modem_status::is_cts_active (void)
@@ -800,7 +813,7 @@ namespace os
       }
     } /* namespace serial */
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     inline const serial::Capabilities&
     Serial::get_capabilities (void) noexcept
@@ -862,7 +875,6 @@ namespace os
 
   } /* namespace driver */
 } /* namespace os */
-
 
 #pragma GCC diagnostic pop
 

@@ -21,11 +21,11 @@ extern "C"
   // Avoid to include <Driver_USBH.h>
   typedef uint32_t ARM_USBH_PIPE_HANDLE;
 
-  typedef void
-  (*ARM_USBH_SignalPortEvent_t) (uint8_t port, uint32_t event); /**< Pointer to port event callback. */
-  typedef void
-  (*ARM_USBH_SignalPipeEvent_t) (ARM_USBH_PIPE_HANDLE pipe_hndl,
-                                 uint32_t event); /**< Pointer to pipe event callback. */
+  typedef void (*ARM_USBH_SignalPortEvent_t) (
+      uint8_t port, uint32_t event); /**< Pointer to port event callback. */
+  typedef void (*ARM_USBH_SignalPipeEvent_t) (
+      ARM_USBH_PIPE_HANDLE pipe_hndl,
+      uint32_t event); /**< Pointer to pipe event callback. */
 
   typedef struct _ARM_DRIVER_USBH const ARM_DRIVER_USBH;
 }
@@ -34,7 +34,7 @@ namespace os
 {
   namespace driver
   {
-    // ======================================================================
+    // ========================================================================
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -49,8 +49,7 @@ namespace os
     class usbh_wrapper : public usb::Host
     {
     public:
-
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
       usbh_wrapper (ARM_DRIVER_USBH* driver,
                     ARM_USBH_SignalPortEvent_t c_cb_port_func,
@@ -61,18 +60,18 @@ namespace os
       usbh_wrapper (usbh_wrapper&&) = delete;
 
       usbh_wrapper&
-      operator= (const usbh_wrapper&) = delete;
+      operator= (const usbh_wrapper&)
+          = delete;
 
       usbh_wrapper&
-      operator= (usbh_wrapper&&) = delete;
+      operator= (usbh_wrapper&&)
+          = delete;
 
-      virtual
-      ~usbh_wrapper () noexcept;
+      virtual ~usbh_wrapper () noexcept;
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
     protected:
-
       virtual const Version&
       do_get_version (void) noexcept override;
 
@@ -129,10 +128,9 @@ namespace os
       virtual uint16_t
       do_get_frame_number (void) noexcept override;
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
     private:
-
       /// Pointer to CMSIS USBD Keil driver.
       ARM_DRIVER_USBH* driver_;
 
@@ -148,11 +146,9 @@ namespace os
       // (Not particularly proud of this solution, but could not find
       // a better one.)
 
-      Version version_
-        { 0, 0 };
+      Version version_{ 0, 0 };
       usb::host::Capabilities capa_;
       usb::host::Status status_;
-
     };
 
 #pragma GCC diagnostic pop

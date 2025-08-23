@@ -47,7 +47,7 @@ namespace os
     {
       namespace host
       {
-        // ==================================================================
+        // ====================================================================
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -62,29 +62,28 @@ namespace os
         class Capabilities
         {
         public:
-
           // For compatibility with ARM CMSIS, these bits should be
           // exactly in this order.
 
           /** @brief Root HUB available Ports Mask. */
-          uint32_t port_mask :15;
+          uint32_t port_mask : 15;
 
           /** @brief Automatic SPLIT packet handling. */
-          bool auto_split :1;
+          bool auto_split : 1;
 
           /** @brief Signal Connect event. */
-          bool event_connect :1;
+          bool event_connect : 1;
 
           /** @brief Signal Disconnect event. */
-          bool event_disconnect :1;
+          bool event_disconnect : 1;
 
           /** @brief Signal Overcurrent event. */
-          bool event_overcurrent :1;
+          bool event_overcurrent : 1;
         };
 
 #pragma GCC diagnostic pop
 
-        // ==================================================================
+        // ====================================================================
         // ----- USB Host Status -----
 
 #pragma GCC diagnostic push
@@ -100,7 +99,6 @@ namespace os
         class Status
         {
         public:
-
           bool
           is_connected (void) const noexcept;
 
@@ -110,36 +108,32 @@ namespace os
           speed_t
           get_speed (void) const noexcept;
 
-          // ----------------------------------------------------------------
+          // ------------------------------------------------------------------
 
         public:
-
           // For compatibility with ARM CMSIS, these bits should be
           // exactly in this order.
 
           /** @brief USB Host Port connected flag. */
-          bool connected :1;
+          bool connected : 1;
 
           /** @brief USB Host Port overcurrent flag. */
-          bool overcurrent :1;
+          bool overcurrent : 1;
 
           /** @brief USB Host Port speed setting (ARM_USB_SPEED_xxx). */
-          speed_t speed :2;
+          speed_t speed : 2;
         };
 
 #pragma GCC diagnostic pop
 
-        // ==================================================================
+        // ====================================================================
         // ----- USB Host Port Events -----
 
         /**
          * @brief USB Host Port Events
          */
-        enum Port_event
-          : event_t
-            {
-              //
-
+        enum Port_event : event_t
+        {
           /** @brief USB Device Connected to Port. */
           connect = (1UL << 0),
 
@@ -162,7 +156,7 @@ namespace os
           remote_hangup = (1UL << 6)
         };
 
-        // ==================================================================
+        // ====================================================================
         // ----- USB Host Pipe Event -----
 
         /**
@@ -170,11 +164,8 @@ namespace os
          *
          * @todo Make enum class.
          */
-        enum Pipe_event
-          : event_t
-            {
-              //
-
+        enum Pipe_event : event_t
+        {
           /** @brief Transfer completed. */
           transfer_complete = (1UL << 0),
 
@@ -197,17 +188,17 @@ namespace os
           bus_err = (1UL << 6)
         };
 
-        // ------------------------------------------------------------------
+        // --------------------------------------------------------------------
 
-        typedef void
-        (*signal_port_event_t) (const void* object, port_t port, event_t event);
+        typedef void (*signal_port_event_t) (const void* object, port_t port,
+                                             event_t event);
 
-        typedef void
-        (*signal_pipe_event_t) (const void* object, pipe_t pipe, event_t event);
+        typedef void (*signal_pipe_event_t) (const void* object, pipe_t pipe,
+                                             event_t event);
 
       } /* namespace host */
 
-      // ====================================================================
+      // ======================================================================
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -220,8 +211,7 @@ namespace os
       {
 
       public:
-
-        // ------------------------------------------------------------------
+        // --------------------------------------------------------------------
 
         Host () noexcept;
 
@@ -230,20 +220,22 @@ namespace os
         Host (Host&&) = delete;
 
         Host&
-        operator= (const Host&) = delete;
+        operator= (const Host&)
+            = delete;
 
         Host&
-        operator= (Host&&) = delete;
+        operator= (Host&&)
+            = delete;
 
-        virtual
-        ~Host () noexcept override;
+        virtual ~Host () noexcept override;
 
-        // ------------------------------------------------------------------
+        // --------------------------------------------------------------------
 
         /**
          * @brief       Register port event callback.
          * @param [in] cb_func  Pointer to callback function.
-         * @param [in] cb_object Pointer to object to be passed to the function.
+         * @param [in] cb_object Pointer to object to be passed to the
+         * function.
          */
         void
         register_port_callback (host::signal_port_event_t cb_func,
@@ -253,7 +245,7 @@ namespace os
         register_pipe_callback (host::signal_pipe_event_t cb_func,
                                 const void* cb_object = nullptr) noexcept;
 
-        // ------------------------------------------------------------------
+        // --------------------------------------------------------------------
 
         const host::Capabilities&
         get_capabilities (void) noexcept;
@@ -292,8 +284,8 @@ namespace os
         reset_pipe (pipe_t pipe) noexcept;
 
         return_t
-        transfer (pipe_t pipe, uint32_t packet, uint8_t* data, std::size_t num)
-            noexcept;
+        transfer (pipe_t pipe, uint32_t packet, uint8_t* data,
+                  std::size_t num) noexcept;
 
         std::size_t
         get_transfer_count (pipe_t pipe) noexcept;
@@ -311,59 +303,71 @@ namespace os
         signal_pipe_event (pipe_t pipe, event_t event) noexcept;
 
       protected:
-
         virtual const host::Capabilities&
-        do_get_capabilities (void) noexcept = 0;
+        do_get_capabilities (void) noexcept
+            = 0;
 
         virtual return_t
-        do_power_port_vbus (port_t port, bool vbus) noexcept = 0;
+        do_power_port_vbus (port_t port, bool vbus) noexcept
+            = 0;
 
         virtual return_t
-        do_reset_port (port_t port) noexcept = 0;
+        do_reset_port (port_t port) noexcept
+            = 0;
 
         virtual return_t
-        do_suspend_port (port_t port) noexcept = 0;
+        do_suspend_port (port_t port) noexcept
+            = 0;
 
         virtual return_t
-        do_resume_port (port_t port) noexcept = 0;
+        do_resume_port (port_t port) noexcept
+            = 0;
 
         virtual host::Status&
-        do_get_port_status (port_t port) noexcept = 0;
+        do_get_port_status (port_t port) noexcept
+            = 0;
 
         virtual pipe_t
         do_create_pipe (device_address_t dev_addr, speed_t dev_speed,
                         hub_addr_t hub_addr, hub_port_t hub_port,
                         endpoint_t ep_addr, endpoint_type_t ep_type,
                         packet_size_t ep_max_packet_size,
-                        polling_interval_t ep_interval) noexcept = 0;
+                        polling_interval_t ep_interval) noexcept
+            = 0;
 
         virtual return_t
         do_modify_pipe (pipe_t pipe, device_address_t dev_addr,
                         speed_t dev_speed, hub_addr_t hub_addr,
-                        hub_port_t hub_port, packet_size_t ep_max_packet_size)
-                            noexcept = 0;
+                        hub_port_t hub_port,
+                        packet_size_t ep_max_packet_size) noexcept
+            = 0;
 
         virtual return_t
-        do_delete_pipe (pipe_t pipe) noexcept = 0;
+        do_delete_pipe (pipe_t pipe) noexcept
+            = 0;
 
         virtual return_t
-        do_reset_pipe (pipe_t pipe) noexcept = 0;
+        do_reset_pipe (pipe_t pipe) noexcept
+            = 0;
 
         virtual return_t
         do_transfer (pipe_t pipe, uint32_t packet, uint8_t* data,
-                     std::size_t num) noexcept = 0;
+                     std::size_t num) noexcept
+            = 0;
 
         virtual std::size_t
-        do_get_transfer_count (pipe_t pipe) noexcept = 0;
+        do_get_transfer_count (pipe_t pipe) noexcept
+            = 0;
 
         virtual return_t
-        do_abort_transfer (pipe_t pipe) noexcept = 0;
+        do_abort_transfer (pipe_t pipe) noexcept
+            = 0;
 
         virtual uint16_t
-        do_get_frame_number (void) noexcept = 0;
+        do_get_frame_number (void) noexcept
+            = 0;
 
       private:
-
         /// Pointer to static function that implements the port callback.
         host::signal_port_event_t cb_port_func_;
 
@@ -377,18 +381,17 @@ namespace os
         const void* cb_pipe_object_;
 
       protected:
-
         host::Status status_;
       };
 
 #pragma GCC diagnostic pop
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
       // ----- Definitions -----
 
       namespace host
       {
-        // ------------------------------------------------------------------
+        // --------------------------------------------------------------------
 
         inline bool
         Status::is_connected (void) const noexcept
@@ -410,7 +413,7 @@ namespace os
 
       } /* namespace host */
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
       inline const host::Capabilities&
       Host::get_capabilities (void) noexcept
@@ -455,14 +458,16 @@ namespace os
                          packet_size_t ep_max_packet_size,
                          polling_interval_t ep_interval) noexcept
       {
-        return do_create_pipe (dev_addr, dev_speed, hub_addr, hub_port, ep_addr,
-                               ep_type, ep_max_packet_size, ep_interval);
+        return do_create_pipe (dev_addr, dev_speed, hub_addr, hub_port,
+                               ep_addr, ep_type, ep_max_packet_size,
+                               ep_interval);
       }
 
       inline return_t
       Host::modify_pipe (pipe_t pipe, device_address_t dev_addr,
                          speed_t dev_speed, hub_addr_t hub_addr,
-                         hub_port_t hub_port, packet_size_t ep_max_packet_size) noexcept
+                         hub_port_t hub_port,
+                         packet_size_t ep_max_packet_size) noexcept
       {
         return do_modify_pipe (pipe, dev_addr, dev_speed, hub_addr, hub_port,
                                ep_max_packet_size);

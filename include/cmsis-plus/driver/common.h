@@ -39,7 +39,7 @@ namespace os
 {
   namespace driver
   {
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     using version_t = uint16_t;
     using event_t = uint32_t;
@@ -64,15 +64,13 @@ namespace os
     /** Start of driver specific errors. */
     constexpr return_t ERROR_SPECIFIC = -6;
 
-    typedef void
-    (*signal_event_t) (const void* object, event_t event);
+    typedef void (*signal_event_t) (const void* object, event_t event);
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
-    enum class Power
-      : power_t
-        {
-          //
+    enum class Power : power_t
+    {
+      //
 
       // Completely power off the device.
       off,
@@ -82,28 +80,26 @@ namespace os
       full
     };
 
-    // ======================================================================
+    // ========================================================================
 
     class Version
     {
     public:
+      // ----------------------------------------------------------------------
 
-      // --------------------------------------------------------------------
+      constexpr Version () noexcept;
 
-      constexpr
-      Version () noexcept;
-
-      constexpr
-      Version (version_t api, version_t drv) noexcept;
+      constexpr Version (version_t api, version_t drv) noexcept;
 
       Version (const Version&) = default;
 
       Version&
-      operator= (const Version&) = default;
+      operator= (const Version&)
+          = default;
 
       ~Version () noexcept = default;
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
       version_t
       get_api (void) const noexcept;
@@ -111,27 +107,24 @@ namespace os
       version_t
       get_drv (void) const noexcept;
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
     private:
-
       version_t api_; /**< API version. */
       version_t drv_; /**< Driver version. */
     };
 
-    inline constexpr
-    Version::Version () noexcept :
-    api_ (0), //
-    drv_ (0)
-      {
-      }
+    inline constexpr Version::Version () noexcept
+        : api_ (0), //
+          drv_ (0)
+    {
+    }
 
-    inline constexpr
-    Version::Version (version_t api, version_t drv) noexcept :
-    api_ (api), //
-    drv_ (drv)
-      {
-      }
+    inline constexpr Version::Version (version_t api, version_t drv) noexcept
+        : api_ (api), //
+          drv_ (drv)
+    {
+    }
 
     inline version_t
     Version::get_api (void) const noexcept
@@ -151,15 +144,13 @@ namespace os
     {
 
     public:
-
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
       Base () noexcept = default;
 
-      virtual
-      ~Base () noexcept;
+      virtual ~Base () noexcept;
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
       /**
        * @brief       Get driver version.
@@ -176,19 +167,19 @@ namespace os
       return_t
       power (Power state) noexcept;
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
     protected:
-
       virtual const Version&
-      do_get_version (void) noexcept = 0;
+      do_get_version (void) noexcept
+          = 0;
 
       virtual return_t
-      do_power (Power state) noexcept = 0;
-
+      do_power (Power state) noexcept
+          = 0;
     };
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     inline const Version&
     Base::get_version (void) noexcept

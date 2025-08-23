@@ -50,9 +50,9 @@ namespace os
     {
       // Forward to the variadic version of the function.
       std::va_list args;
-      va_start(args, oflag);
+      va_start (args, oflag);
       io* const ret = vopen (path, oflag, args);
-      va_end(args);
+      va_end (args);
 
       return ret;
     }
@@ -104,8 +104,8 @@ namespace os
 
           // Check if a regular file.
           auto adjusted_path = path;
-          auto* const fs = os::posix::file_system::identify_mounted (
-              &adjusted_path);
+          auto* const fs
+              = os::posix::file_system::identify_mounted (&adjusted_path);
 
           // The manager will return null if there are no file systems
           // registered, no need to check this condition separately.
@@ -127,7 +127,7 @@ namespace os
           break;
         }
 
-      // Return a valid pointer to an object derived from io, or nullptr.
+        // Return a valid pointer to an object derived from io, or nullptr.
 
 #if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s(\"%s\")=%p fd=%d\n", __func__, path, io,
@@ -138,9 +138,9 @@ namespace os
 
     // ========================================================================
 
-    io::io (io_impl& impl, type t) :
-        impl_ (impl), //
-        type_ (static_cast<type_t>(t))
+    io::io (io_impl& impl, type t)
+        : impl_ (impl), //
+          type_ (static_cast<type_t> (t))
     {
 #if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s()=%p\n", __func__, this);
@@ -258,8 +258,8 @@ namespace os
         }
 
 #if defined(OS_TRACE_POSIX_IO_IO)
-      trace::printf ("io::%s(0x0%X, %u) @%p n=%d\n", __func__, buf, nbyte, this,
-                     ret);
+      trace::printf ("io::%s(0x0%X, %u) @%p n=%d\n", __func__, buf, nbyte,
+                     this, ret);
 #endif
       return ret;
     }
@@ -311,8 +311,8 @@ namespace os
         }
 
 #if defined(OS_TRACE_POSIX_IO_IO)
-      trace::printf ("io::%s(0x0%X, %u) @%p n=%d\n", __func__, buf, nbyte, this,
-                     ret);
+      trace::printf ("io::%s(0x0%X, %u) @%p n=%d\n", __func__, buf, nbyte,
+                     this, ret);
 #endif
       return ret;
     }
@@ -364,9 +364,9 @@ namespace os
     {
       // Forward to the variadic version of the function.
       std::va_list args;
-      va_start(args, cmd);
+      va_start (args, cmd);
       int ret = vfcntl (cmd, args);
-      va_end(args);
+      va_end (args);
 
       return ret;
     }
@@ -544,7 +544,7 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-  // ==========================================================================
+    // ========================================================================
   } /* namespace posix */
 } /* namespace os */
 

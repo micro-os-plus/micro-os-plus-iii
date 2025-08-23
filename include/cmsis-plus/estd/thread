@@ -39,20 +39,20 @@ namespace os
 {
   namespace estd
   {
-  // ------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
-  /**
-   * @ingroup cmsis-plus-iso
-   * @{
-   */
+    /**
+     * @ingroup cmsis-plus-iso
+     * @{
+     */
 
 #include "thread_internal.h"
 
-  /**
-   * @}
-   */
+    /**
+     * @}
+     */
 
-  // ==========================================================================
+    // ========================================================================
   } /* namespace estd */
 } /* namespace os */
 
@@ -82,7 +82,7 @@ namespace std
 
 #pragma GCC diagnostic pop
 #endif
-}
+} // namespace std
 
 #if defined(OS_HAS_STD_THREADS) && defined(OS_INCLUDE_STD_THREADS)
 
@@ -96,21 +96,21 @@ namespace std
 #include "thread_internal.h"
 
   // Define a std::hash specialisation.
-  template<>
-    struct hash<std::thread::id> : public std::unary_function<std::thread::id,
-        size_t>
+  template <>
+  struct hash<std::thread::id>
+      : public std::unary_function<std::thread::id, size_t>
+  {
+    inline size_t
+    operator() (std::thread::id v) const
     {
-      inline size_t
-      operator() (std::thread::id v) const
-      {
-        return std::hash<std::thread::native_handle_type> () (v.native_thread_);
-      }
-    };
+      return std::hash<std::thread::native_handle_type> () (v.native_thread_);
+    }
+  };
 
-/**
- * @}
- */
-}
+  /**
+   * @}
+   */
+} // namespace std
 
 #endif
 

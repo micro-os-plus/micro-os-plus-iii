@@ -60,7 +60,7 @@ namespace os
       trace::printf ("file_descriptors_manager::%s(%d)=%p\n", __func__, size,
                      this);
 
-      assert(size > 0);
+      assert (size > 0);
 
       size__ = size + reserved__; // Add space for standard files.
       descriptors_array__ = new class io*[size__];
@@ -99,9 +99,9 @@ namespace os
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
-        return descriptors_array__[fildes];
+      return descriptors_array__[fildes];
 #pragma GCC diagnostic pop
-      }
+    }
 
     bool
     file_descriptors_manager::valid (int fildes)
@@ -203,14 +203,14 @@ namespace os
     /* class */ socket*
     file_descriptors_manager::socket (int fildes)
     {
-      assert((fildes >= 0) && (static_cast<std::size_t> (fildes) < size__));
+      assert ((fildes >= 0) && (static_cast<std::size_t> (fildes) < size__));
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
       auto* const io = descriptors_array__[fildes];
 #pragma GCC diagnostic pop
-      if (io->get_type () != static_cast<posix::io::type_t>(io::type::socket))
+      if (io->get_type () != static_cast<posix::io::type_t> (io::type::socket))
         {
           return nullptr;
         }
@@ -222,7 +222,7 @@ namespace os
     {
       std::size_t count = reserved__;
       for (std::size_t i = reserved__; i < file_descriptors_manager::size ();
-          ++i)
+           ++i)
         {
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -237,9 +237,8 @@ namespace os
       return count;
     }
 
-  // ========================================================================
+    // ========================================================================
   } /* namespace posix */
 } /* namespace os */
 
 // ----------------------------------------------------------------------------
-

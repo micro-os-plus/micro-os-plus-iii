@@ -31,7 +31,7 @@ namespace os
 {
   namespace utils
   {
-    // ======================================================================
+    // ========================================================================
 
     /**
      * @class static_double_list_links
@@ -61,7 +61,7 @@ namespace os
       // Check if not already unlinked.
       if (unlinked ())
         {
-          assert(prev_ == nullptr);
+          assert (prev_ == nullptr);
 #if defined(OS_TRACE_UTILS_LISTS)
           trace::printf ("%s() %p nop\n", __func__, this);
 #endif
@@ -128,12 +128,12 @@ namespace os
       // Unlinked nodes must have both pointers null.
       // If not, most probably the node was already linked.
       // Or the memory is corrupted.
-      assert(node.prev () == nullptr);
-      assert(node.next () == nullptr);
+      assert (node.prev () == nullptr);
+      assert (node.next () == nullptr);
 
       // The `after` node must be linked. Only the `next` pointer is
       // tested, since only it is used.
-      assert(after->next () != nullptr);
+      assert (after->next () != nullptr);
 
       // Make the new node point to its neighbours.
       node.prev (after);
@@ -169,7 +169,7 @@ namespace os
       trace::printf ("%s() %p \n", __func__, this);
 #endif
 
-      assert(empty ());
+      assert (empty ());
     }
 
   } /* namespace utils */

@@ -24,16 +24,14 @@ void
 _init (void);
 
 void
-_fini(void);
+_fini (void);
 
-void
-__attribute__((weak))
+void __attribute__ ((weak))
 _init (void)
 {
 }
 
-void
-__attribute__((weak))
+void __attribute__ ((weak))
 _fini (void)
 {
 }

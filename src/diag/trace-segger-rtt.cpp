@@ -86,7 +86,7 @@ namespace os
       // For consistency with µOS++ interrupt handling, a µOS++ critical
       // section is preferred.
       rtos::interrupts::critical_section ics;
-      ret = static_cast<ssize_t>(SEGGER_RTT_WriteNoLock (0, buf, nbyte));
+      ret = static_cast<ssize_t> (SEGGER_RTT_WriteNoLock (0, buf, nbyte));
 
       return ret;
     }

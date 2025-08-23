@@ -271,8 +271,8 @@ namespace os
 
       auto adjusted_existing = existing;
       auto adjusted_new = _new;
-      auto* const fs = file_system::identify_mounted (&adjusted_existing,
-                                                      &adjusted_new);
+      auto* const fs
+          = file_system::identify_mounted (&adjusted_existing, &adjusted_new);
 
       if (fs == nullptr)
         {
@@ -412,8 +412,8 @@ namespace os
 
           // Check if a regular folder.
           auto adjusted_path = dirpath;
-          auto* const fs = os::posix::file_system::identify_mounted (
-              &adjusted_path);
+          auto* const fs
+              = os::posix::file_system::identify_mounted (&adjusted_path);
 
           // The manager will return null if there are no file systems
           // registered, no need to check this condition separately.
@@ -435,7 +435,8 @@ namespace os
           break;
         }
 
-      // Return a valid pointer to an object derived from directory, or nullptr.
+        // Return a valid pointer to an object derived from directory, or
+        // nullptr.
 
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s(\"%s\")=%p\n", __func__, dirpath, dir);
@@ -445,9 +446,9 @@ namespace os
 
     // ========================================================================
 
-    file_system::file_system (file_system_impl& impl, const char* name) :
-        name_ (name), //
-        impl_ (impl)
+    file_system::file_system (file_system_impl& impl, const char* name)
+        : name_ (name), //
+          impl_ (impl)
     {
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\")=%p\n", __func__, name_, this);
@@ -470,9 +471,9 @@ namespace os
     {
       // Forward to the variadic version of the function.
       std::va_list args;
-      va_start(args, options);
+      va_start (args, options);
       int ret = vmkfs (options, args);
-      va_end(args);
+      va_end (args);
 
       return ret;
     }
@@ -504,9 +505,9 @@ namespace os
     {
       // Forward to the variadic version of the function.
       std::va_list args;
-      va_start(args, flags);
+      va_start (args, flags);
       int ret = vmount (path, flags, args);
-      va_end(args);
+      va_end (args);
 
       return ret;
     }
@@ -619,8 +620,8 @@ namespace os
     file_system*
     file_system::identify_mounted (const char** path1, const char** path2)
     {
-      assert(path1 != nullptr);
-      assert(*path1 != nullptr);
+      assert (path1 != nullptr);
+      assert (*path1 != nullptr);
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -677,9 +678,9 @@ namespace os
     {
       // Forward to the variadic version of the function.
       std::va_list args;
-      va_start(args, oflag);
+      va_start (args, oflag);
       file* ret = vopen (path, oflag, args);
-      va_end(args);
+      va_end (args);
 
       return ret;
     }
@@ -1047,8 +1048,8 @@ namespace os
 
     // ========================================================================
 
-    file_system_impl::file_system_impl (block_device& device) :
-        device_ (device)
+    file_system_impl::file_system_impl (block_device& device)
+        : device_ (device)
     {
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system_impl::%s()=%p\n", __func__, this);
@@ -1062,7 +1063,7 @@ namespace os
 #endif
     }
 
-  // ==========================================================================
+    // ========================================================================
   } /* namespace posix */
 } /* namespace os */
 

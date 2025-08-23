@@ -51,7 +51,8 @@ namespace os
 
     /**
      * @brief File descriptors manager static class.
-     * @headerfile file-descriptors-manager.h <cmsis-plus/posix-io/file-descriptors-manager.h>
+     * @headerfile file-descriptors-manager.h
+     * <cmsis-plus/posix-io/file-descriptors-manager.h>
      * @ingroup cmsis-plus-posix-io-base
      */
     class file_descriptors_manager
@@ -64,7 +65,6 @@ namespace os
        */
 
     public:
-
       file_descriptors_manager (std::size_t size);
 
       /**
@@ -75,9 +75,11 @@ namespace os
       file_descriptors_manager (const file_descriptors_manager&) = delete;
       file_descriptors_manager (file_descriptors_manager&&) = delete;
       file_descriptors_manager&
-      operator= (const file_descriptors_manager&) = delete;
+      operator= (const file_descriptors_manager&)
+          = delete;
       file_descriptors_manager&
-      operator= (file_descriptors_manager&&) = delete;
+      operator= (file_descriptors_manager&&)
+          = delete;
 
       /**
        * @endcond
@@ -96,7 +98,6 @@ namespace os
        */
 
     public:
-
       static size_t
       size (void);
 
@@ -135,7 +136,6 @@ namespace os
 
       // ----------------------------------------------------------------------
     private:
-
       /**
        * @cond ignore
        */
@@ -152,7 +152,7 @@ namespace os
        */
     };
 
-  // ==========================================================================
+    // ========================================================================
   } /* namespace posix */
 } /* namespace os */
 
@@ -170,7 +170,7 @@ namespace os
       return size__;
     }
 
-  // ==========================================================================
+    // ========================================================================
   } /* namespace posix */
 } /* namespace os */
 

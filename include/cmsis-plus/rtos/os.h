@@ -28,7 +28,8 @@
  * Major improvements:
  * - no more macros required to define objects
  * - allow static memory allocations for all objects
- * - very close to POSIX ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html))
+ * - very close to POSIX ([IEEE Std 1003.1, 2013
+ * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html))
  * - specifically designed to facilitate the implementation of
  *   C++ standard thread library (ISO/IEC 14882:2011)
  * - standard POSIX errors definitions used
@@ -170,16 +171,16 @@ namespace os
      * @throw * An exception may be thrown from `allocate()` or
      *          from the constructor of _T_.
      */
-    template<typename T, typename ... Args>
-      inline typename std::enable_if<!std::is_array<T>::value,
-          std::shared_ptr<T> >::type
-      make_shared (Args&&... args)
-      {
-        // -Wno-psabi to disble the ABI warning.
-        typedef typename std::remove_const<T>::type T_nc;
-        return std::allocate_shared<T> (memory::allocator<T_nc> (),
-                                        std::forward<Args>(args)...);
-      }
+    template <typename T, typename... Args>
+    inline typename std::enable_if<!std::is_array<T>::value,
+                                   std::shared_ptr<T>>::type
+    make_shared (Args&&... args)
+    {
+      // -Wno-psabi to disble the ABI warning.
+      typedef typename std::remove_const<T>::type T_nc;
+      return std::allocate_shared<T> (memory::allocator<T_nc> (),
+                                      std::forward<Args> (args)...);
+    }
 
 #pragma GCC diagnostic pop
 

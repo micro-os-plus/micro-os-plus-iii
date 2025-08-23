@@ -40,18 +40,15 @@ namespace os
     namespace usb
     {
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
       using speed_t = uint8_t;
 
       /**
        * @brief USB Speed.
        */
-      enum class Speed
-        : speed_t
-          {
-            //
-
+      enum class Speed : speed_t
+      {
         /** @brief Low-speed USB. */
         low = 0,
 
@@ -62,25 +59,22 @@ namespace os
         high = 2,
       };
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
       using endpoint_t = uint8_t;
 
       constexpr endpoint_t ENDPOINT_NUMBER_MASK = 0x0F;
       constexpr endpoint_t ENDPOINT_DIRECTION_MASK = 0x80;
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
       using endpoint_type_t = uint8_t;
 
       /**
        * @brief Endpoint type.
        */
-      enum class Endpoint_type
-        : endpoint_type_t
-          {
-            //
-
+      enum class Endpoint_type : endpoint_type_t
+      {
         /** @brief Control Endpoint. */
         control = 0,
 
@@ -94,17 +88,17 @@ namespace os
         interrupt = 3
       };
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
       using packet_size_t = uint16_t;
 
       constexpr packet_size_t ENDPOINT_MAX_PACKET_SIZE_MASK = 0x07FF;
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
       using frame_number_t = uint16_t;
 
       using device_address_t = uint8_t;
 
-      //using ARM_USBH_PIPE_HANDLE = uint32_t;
+      // using ARM_USBH_PIPE_HANDLE = uint32_t;
       using pipe_t = uint32_t;
       using port_t = uint8_t;
 

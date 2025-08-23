@@ -35,11 +35,12 @@ namespace os
      * @details
      * Allow to assign a name to the condition variable.
      *
-     * If the attributes are modified **after** the condition_variable creation,
-     * the condition_variable attributes shall not be affected.
+     * If the attributes are modified **after** the condition_variable
+     * creation, the condition_variable attributes shall not be affected.
      *
      * @par POSIX compatibility
-     *  Inspired by `pthread_condattr_t` from [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  Inspired by `pthread_condattr_t` from
+     * [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
      *  (IEEE Std 1003.1, 2013 Edition).
      */
 
@@ -190,8 +191,10 @@ namespace os
      * @endcode
      *
      * @par POSIX compatibility
-     *  Inspired by `pthread_cond_t` from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by `pthread_cond_t` from
+     * [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
 
     // ========================================================================
@@ -215,19 +218,21 @@ namespace os
      * The effect shall be equivalent to creating a condition variables
      * object with the default constructor.
      *
-     * If the _attr_ attributes are modified **after** the condition_variable creation,
-     * the condition_variable attributes shall not be affected.
+     * If the _attr_ attributes are modified **after** the condition_variable
+     * creation, the condition_variable attributes shall not be affected.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      *
      * @par POSIX compatibility
-     *  Inspired by [`pthread_cond_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cond_destroy.html)
-     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by
+     * [`pthread_cond_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cond_destroy.html)
+     *  from
+     * [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
-    condition_variable::condition_variable (const attributes& attr) :
-        condition_variable
-          { nullptr, attr }
+    condition_variable::condition_variable (const attributes& attr)
+        : condition_variable{ nullptr, attr }
     {
     }
 
@@ -251,27 +256,30 @@ namespace os
      * The effect shall be equivalent to creating a condition variables
      * object with the default constructor.
      *
-     * If the _attr_ attributes are modified **after** the condition_variable creation,
-     * the condition_variable attributes shall not be affected.
+     * If the _attr_ attributes are modified **after** the condition_variable
+     * creation, the condition_variable attributes shall not be affected.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      *
      * @par POSIX compatibility
-     *  Inspired by [`pthread_cond_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cond_destroy.html)
-     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by
+     * [`pthread_cond_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cond_destroy.html)
+     *  from
+     * [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
-    condition_variable::condition_variable (
-        const char* name, const attributes& attr __attribute__((unused))) :
-        object_named_system
-          { name }
+    condition_variable::condition_variable (const char* name,
+                                            const attributes& attr
+                                            __attribute__ ((unused)))
+        : object_named_system{ name }
     {
 #if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
 
       // Don't call this from interrupt handlers.
-      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
+      os_assert_throw (!interrupts::in_handler_mode (), EPERM);
     }
 
     /**
@@ -288,9 +296,12 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      *
      * @par POSIX compatibility
-     *  Inspired by [`pthread_cond_destroy()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cond_destroy.html)
-     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by
+     * [`pthread_cond_destroy()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cond_destroy.html)
+     *  from
+     * [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
     condition_variable::~condition_variable ()
     {
@@ -299,7 +310,7 @@ namespace os
 #endif
 
       // There must be no threads waiting for this condition.
-      assert(list_.empty ());
+      assert (list_.empty ());
     }
 
     /**
@@ -332,9 +343,12 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      *
      * @par POSIX compatibility
-     *  Inspired by [`pthread_cond_signal()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cond_signal.html)
-     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by
+     * [`pthread_cond_signal()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cond_signal.html)
+     *  from
+     * [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
     result_t
     condition_variable::signal ()
@@ -344,7 +358,7 @@ namespace os
 #endif
 
       // Don't call this from interrupt handlers.
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err (!interrupts::in_handler_mode (), EPERM);
 
       list_.resume_one ();
 
@@ -402,9 +416,12 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      *
      * @par POSIX compatibility
-     *  Inspired by [`pthread_cond_broadcast()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cond_broadcast.html)
-     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by
+     * [`pthread_cond_broadcast()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cond_broadcast.html)
+     *  from
+     * [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
     result_t
     condition_variable::broadcast ()
@@ -414,7 +431,7 @@ namespace os
 #endif
 
       // Don't call this from interrupt handlers.
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err (!interrupts::in_handler_mode (), EPERM);
 
       // Wake-up all threads, if any.
       // Need not be inside the critical section,
@@ -502,9 +519,12 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      *
      * @par POSIX compatibility
-     *  Inspired by [`pthread_cond_wait()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cond_wait.html)
-     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by
+     * [`pthread_cond_wait()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cond_wait.html)
+     *  from
+     * [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
     result_t
     condition_variable::wait (mutex& mutex)
@@ -514,17 +534,16 @@ namespace os
 #endif
 
       // Don't call this from interrupt handlers.
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err (!interrupts::in_handler_mode (), EPERM);
       // Don't call this from critical regions.
-      os_assert_err(!scheduler::locked (), EPERM);
+      os_assert_err (!scheduler::locked (), EPERM);
 
       thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      internal::waiting_thread_node node
-        { crt_thread };
+      internal::waiting_thread_node node{ crt_thread };
 
       // TODO: validate
 
@@ -536,18 +555,18 @@ namespace os
           return res;
         }
 
-        {
-          // Add this thread to the condition variable waiting list.
-          list_.link (node);
-          node.thread_->waiting_node_ = &node;
+      {
+        // Add this thread to the condition variable waiting list.
+        list_.link (node);
+        node.thread_->waiting_node_ = &node;
 
-          res = mutex.lock ();
+        res = mutex.lock ();
 
-          // Remove the thread from the node waiting list,
-          // if not already removed.
-          node.thread_->waiting_node_ = nullptr;
-          node.unlink ();
-        }
+        // Remove the thread from the node waiting list,
+        // if not already removed.
+        node.thread_->waiting_node_ = nullptr;
+        node.unlink ();
+      }
 
       return res;
     }
@@ -631,10 +650,10 @@ namespace os
      * equivalent to `wait()`, except that an
      * error is returned if the timeout specified by _timeout_
      * passes (that is, system time equals or exceeds now() + timeout) before
-     * the condition cond is signalled or broadcasted. When such timeouts occur,
-     * `timed_wait()` shall nonetheless release
-     * and re-acquire the mutex referenced by _mutex_, and may consume
-     * a condition signal directed concurrently at the condition variable.
+     * the condition cond is signalled or broadcasted. When such timeouts
+     * occur, `timed_wait()` shall nonetheless release and re-acquire the mutex
+     * referenced by _mutex_, and may consume a condition signal directed
+     * concurrently at the condition variable.
      *
      * The condition variable shall have a clock attribute which
      * specifies the clock that shall be used to measure the time
@@ -647,9 +666,12 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      *
      * @par POSIX compatibility
-     *  Inspired by [`pthread_cond_timedwait()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cond_timedwait.html)
-     *  from [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by
+     * [`pthread_cond_timedwait()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/pthread_cond_timedwait.html)
+     *  from
+     * [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
     result_t
     condition_variable::timed_wait (mutex& mutex, clock::duration_t timeout)
@@ -668,17 +690,16 @@ namespace os
 #endif // defined(OS_TRACE_RTOS_CONDVAR)
 
       // Don't call this from interrupt handlers.
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err (!interrupts::in_handler_mode (), EPERM);
       // Don't call this from critical regions.
-      os_assert_err(!scheduler::locked (), EPERM);
+      os_assert_err (!scheduler::locked (), EPERM);
 
       thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      internal::waiting_thread_node node
-        { crt_thread };
+      internal::waiting_thread_node node{ crt_thread };
 
       // TODO: validate
 
@@ -690,23 +711,23 @@ namespace os
           return res;
         }
 
-        {
-          // Add this thread to the condition variable waiting list.
-          list_.link (node);
-          node.thread_->waiting_node_ = &node;
+      {
+        // Add this thread to the condition variable waiting list.
+        list_.link (node);
+        node.thread_->waiting_node_ = &node;
 
-          res = mutex.timed_lock (timeout);
+        res = mutex.timed_lock (timeout);
 
-          // Remove the thread from the node waiting list,
-          // if not already removed.
-          node.thread_->waiting_node_ = nullptr;
-          node.unlink ();
-        }
+        // Remove the thread from the node waiting list,
+        // if not already removed.
+        node.thread_->waiting_node_ = nullptr;
+        node.unlink ();
+      }
 
       return res;
     }
 
-  // --------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
   } /* namespace rtos */
 } /* namespace os */

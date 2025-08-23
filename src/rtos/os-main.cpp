@@ -52,10 +52,10 @@ namespace
 #endif
 
   using main_args_t = struct
-    {
-      int argc;
-      char** argv;
-    };
+  {
+    int argc;
+    char** argv;
+  };
 
 #pragma GCC diagnostic pop
 
@@ -77,7 +77,7 @@ namespace
     std::exit (code);
   }
 
-// --------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
 } /* namespace  */
 
@@ -96,8 +96,10 @@ rtos::thread* os_main_thread;
 // Necessarily static, on Cortex-M the reset stack will be used
 // as MSP for the interrupts, so the current stack must be freed
 // and os_main() shall run on its own stack.
-using main_thread = rtos::thread_inclusive<OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES>;
-static std::aligned_storage<sizeof(main_thread), alignof(main_thread)>::type os_main_thread_;
+using main_thread
+    = rtos::thread_inclusive<OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES>;
+static std::aligned_storage<sizeof (main_thread), alignof (main_thread)>::type
+    os_main_thread_;
 
 #endif /* defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS) */
 
@@ -106,14 +108,15 @@ static std::aligned_storage<sizeof(main_thread), alignof(main_thread)>::type os_
  */
 int
 #if !defined(__APPLE__)
-__attribute__((weak))
+    __attribute__ ((weak))
 #endif
-main (int argc, char* argv[])
+    main (int argc, char* argv[])
 {
   using namespace os::rtos;
 
   trace::printf ("\nµOS++ IIIe version " OS_STRING_RTOS_IMPL_VERSION "\n");
-  trace::printf ("Copyright (c) 2007-" OS_STRING_RTOS_IMPL_YEAR " Liviu Ionescu\n");
+  trace::printf ("Copyright (c) 2007-" OS_STRING_RTOS_IMPL_YEAR
+                 " Liviu Ionescu\n");
 
   port::scheduler::greeting ();
 
@@ -151,10 +154,11 @@ main (int argc, char* argv[])
   // not registering any destructor, and for main this is important,
   // since the destructors are executed on its context, and it cannot
   // destruct itself.
-  new (&os_main_thread_) main_thread
-    {"main", reinterpret_cast<thread::func_t> (_main_trampoline), nullptr};
+  new (&os_main_thread_)
+      main_thread{ "main", reinterpret_cast<thread::func_t> (_main_trampoline),
+                   nullptr };
 
-  os_main_thread = reinterpret_cast<rtos::thread*>(&os_main_thread_);
+  os_main_thread = reinterpret_cast<rtos::thread*> (&os_main_thread_);
 
 #else
 
@@ -185,9 +189,9 @@ main (int argc, char* argv[])
 
 void
 #if !defined(__APPLE__)
-__attribute__((weak))
+    __attribute__ ((weak))
 #endif
-os_terminate_goodbye (void)
+    os_terminate_goodbye (void)
 {
 #if defined(TRACE)
 
@@ -210,11 +214,10 @@ os_terminate_goodbye (void)
                  st.size () - st.available (), st.size ());
 
 #if defined(OS_HAS_INTERRUPTS_STACK)
-  trace::printf (
-      "Interrupts stack: %u/%u bytes used\n",
-      rtos::interrupts::stack ()->size ()
-          - rtos::interrupts::stack ()->available (),
-      rtos::interrupts::stack ()->size ());
+  trace::printf ("Interrupts stack: %u/%u bytes used\n",
+                 rtos::interrupts::stack ()->size ()
+                     - rtos::interrupts::stack ()->available (),
+                 rtos::interrupts::stack ()->size ());
 #endif /* defined(OS_HAS_INTERRUPTS_STACK) */
 
   trace::printf ("\nHasta la Vista!\n");

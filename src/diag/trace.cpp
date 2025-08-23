@@ -31,9 +31,9 @@ namespace os
 {
   namespace trace
   {
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
-    void __attribute__((weak))
+    void __attribute__ ((weak))
     initialize (void)
     {
     }
@@ -42,28 +42,28 @@ namespace os
      * @brief Write the given number of bytes to the trace output channel.
      * @return  The number of characters actually written, or -1 if error.
      */
-    ssize_t __attribute__((weak))
-    write (const void* buf __attribute__((unused)), std::size_t nbyte)
+    ssize_t __attribute__ ((weak))
+    write (const void* buf __attribute__ ((unused)), std::size_t nbyte)
     {
       return static_cast<ssize_t> (nbyte);
     }
 
-    void __attribute__((weak))
+    void __attribute__ ((weak))
     flush (void)
     {
     }
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
-    int __attribute__((weak))
+    int __attribute__ ((weak))
     printf (const char* format, ...)
     {
       std::va_list args;
-      va_start(args, format);
+      va_start (args, format);
 
       int ret = vprintf (format, args);
 
-      va_end(args);
+      va_end (args);
       return ret;
     }
 
@@ -72,7 +72,7 @@ namespace os
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif
 
-    int __attribute__((weak))
+    int __attribute__ ((weak))
     vprintf (const char* format, std::va_list args)
     {
       // Caution: allocated on the stack!
@@ -88,7 +88,7 @@ namespace os
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
-      int ret = ::vsnprintf (buf, sizeof(buf), format, args);
+      int ret = ::vsnprintf (buf, sizeof (buf), format, args);
 #pragma GCC diagnostic pop
       if (ret > 0)
         {
@@ -98,7 +98,7 @@ namespace os
       return ret;
     }
 
-    int __attribute__((weak))
+    int __attribute__ ((weak))
     puts (const char* s)
     {
       int ret = static_cast<int> (write (s, strlen (s)));
@@ -116,10 +116,11 @@ namespace os
         }
     }
 
-    int __attribute__((weak))
+    int __attribute__ ((weak))
     putchar (int c)
     {
-      int ret = static_cast<int> (write (reinterpret_cast<const char*> (&c), 1));
+      int ret
+          = static_cast<int> (write (reinterpret_cast<const char*> (&c), 1));
       if (ret > 0)
         {
           return c;
@@ -134,7 +135,7 @@ namespace os
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
-    void __attribute__((weak))
+    void __attribute__ ((weak))
     dump_args (int argc, char* argv[])
     {
       printf ("main(argc=%d, argv=[", argc);
@@ -160,19 +161,19 @@ using namespace os;
 // These cannot be aliased, since they might be defined
 // in a different translation units (and usually they are).
 
-void __attribute__((weak))
+void __attribute__ ((weak))
 trace_initialize (void)
 {
   trace::initialize ();
 }
 
-ssize_t __attribute__((weak))
+ssize_t __attribute__ ((weak))
 trace_write (const void* buf, std::size_t nbyte)
 {
   return trace::write (buf, nbyte);
 }
 
-void __attribute__((weak))
+void __attribute__ ((weak))
 trace_flush (void)
 {
   return trace::flush ();
@@ -187,19 +188,19 @@ trace_flush (void)
 // Aliases can only refer symbols defined in the same translation unit
 // and C++ de-mangling must be done manually.
 
-int __attribute__((weak, alias ("_ZN2os5trace6printfEPKcz")))
+int __attribute__ ((weak, alias ("_ZN2os5trace6printfEPKcz")))
 trace_printf (const char* format, ...);
 
-int __attribute__((weak, alias ("_ZN2os5trace7vprintfEPKcSt9__va_list")))
+int __attribute__ ((weak, alias ("_ZN2os5trace7vprintfEPKcSt9__va_list")))
 trace_vprintf (const char* format, va_list args);
 
-int __attribute__((weak, alias("_ZN2os5trace4putsEPKc")))
-trace_puts (const char *s);
+int __attribute__ ((weak, alias ("_ZN2os5trace4putsEPKc")))
+trace_puts (const char* s);
 
-int __attribute__((weak, alias("_ZN2os5trace7putcharEi")))
+int __attribute__ ((weak, alias ("_ZN2os5trace7putcharEi")))
 trace_putchar (int c);
 
-void __attribute__((weak, alias("_ZN2os5trace9dump_argsEiPPc")))
+void __attribute__ ((weak, alias ("_ZN2os5trace9dump_argsEiPPc")))
 trace_dump_args (int argc, char* argv[]);
 
 #else
@@ -211,11 +212,11 @@ int
 trace_printf (const char* format, ...)
 {
   std::va_list args;
-  va_start(args, format);
+  va_start (args, format);
 
   int ret = trace::vprintf (format, args);
 
-  va_end(args);
+  va_end (args);
   return ret;
 }
 

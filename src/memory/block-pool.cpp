@@ -46,7 +46,7 @@ namespace os
     void*
     block_pool::do_allocate (std::size_t bytes, std::size_t alignment)
     {
-      assert(bytes <= block_size_bytes_);
+      assert (bytes <= block_size_bytes_);
 
       if (first_ == nullptr)
         {
@@ -91,10 +91,10 @@ namespace os
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
       if ((addr < pool_addr_)
-          || (addr
-              >= (static_cast<char*> (pool_addr_) + blocks_ * block_size_bytes_)))
+          || (addr >= (static_cast<char*> (pool_addr_)
+                       + blocks_ * block_size_bytes_)))
         {
-          assert(false);
+          assert (false);
           return;
         }
 #pragma GCC diagnostic pop
@@ -147,24 +147,24 @@ namespace os
     {
       blocks_ = blocks;
 
-      block_size_bytes_ = rtos::memory::align_size (block_size_bytes,
-                                                    alignof(void*));
-      assert(block_size_bytes_ >= sizeof(void*));
+      block_size_bytes_
+          = rtos::memory::align_size (block_size_bytes, alignof (void*));
+      assert (block_size_bytes_ >= sizeof (void*));
 
-      assert(addr != nullptr);
+      assert (addr != nullptr);
       pool_addr_ = addr;
 
       std::size_t align_sz = bytes;
 
       void* res;
       // Possibly adjust the last two parameters.
-      res = std::align (alignof(void*), blocks * block_size_bytes_, pool_addr_,
-                        align_sz);
+      res = std::align (alignof (void*), blocks * block_size_bytes_,
+                        pool_addr_, align_sz);
 
       // std::align() will fail if it cannot fit the adjusted block size.
       if (res != nullptr)
         {
-          assert(res != nullptr);
+          assert (res != nullptr);
         }
 
       // The extra assert is made redundant by std::align().
@@ -210,10 +210,9 @@ namespace os
       free_bytes_ = total_bytes_;
       allocated_chunks_ = 0;
       free_chunks_ = blocks_;
-
     }
 
-  // --------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
   } /* namespace memory */
 } /* namespace os */
 

@@ -26,10 +26,10 @@
 namespace
 {
 #if defined(OS_HAS_INTERRUPTS_STACK)
-// Object used to manage the interrupts stack.
+  // Object used to manage the interrupts stack.
   class os::rtos::thread::stack interrupts_stack;
 #endif /* defined(OS_HAS_INTERRUPTS_STACK) */
-}
+} // namespace
 
 namespace os
 {
@@ -96,7 +96,8 @@ namespace os
 #endif
       // A small kludge to provide a temporary errno before
       // the first real thread is created.
-      typedef struct {
+      typedef struct
+      {
         void* vtbl;
         void* name_;
         // errno is the first thread member, so right after the name.
@@ -112,7 +113,9 @@ namespace os
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Winvalid-offsetof"
 #endif
-      static_assert(offsetof(tiny_thread_t, errno_) == offsetof(thread, errno_), "adjust tiny_thread_t members");
+      static_assert (offsetof (tiny_thread_t, errno_)
+                         == offsetof (thread, errno_),
+                     "adjust tiny_thread_t members");
 #pragma GCC diagnostic pop
 
 #pragma GCC diagnostic push
@@ -124,7 +127,8 @@ namespace os
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wcast-align"
-      thread* volatile current_thread_ = reinterpret_cast<thread*>(&tiny_thread);
+      thread* volatile current_thread_
+          = reinterpret_cast<thread*> (&tiny_thread);
 #pragma GCC diagnostic pop
 
 #pragma GCC diagnostic push
@@ -164,7 +168,7 @@ namespace os
 #endif
 
         // Don't call this from interrupt handlers.
-        os_assert_err(!interrupts::in_handler_mode (), EPERM);
+        os_assert_err (!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
@@ -191,7 +195,7 @@ namespace os
         trace::printf ("scheduler::%s() \n", __func__);
 
         // Don't call this from interrupt handlers.
-        os_assert_throw(!interrupts::in_handler_mode (), EPERM);
+        os_assert_throw (!interrupts::in_handler_mode (), EPERM);
 
         sysclock.start ();
         hrclock.start ();
@@ -230,23 +234,23 @@ namespace os
         trace::printf ("scheduler::%s(%d) \n", __func__, state);
 #endif
         // Don't call this from interrupt handlers.
-        os_assert_throw(!interrupts::in_handler_mode (), EPERM);
+        os_assert_throw (!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
-        return port::scheduler::preemptive(state);
+        return port::scheduler::preemptive (state);
 
 #else
         bool tmp;
 
-          {
-            // ----- Enter critical section -----------------------------------
-            interrupts::critical_section ics;
+        {
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
-            tmp = is_preemptive_;
-            is_preemptive_ = state;
-            // ----- Exit critical section ------------------------------------
-          }
+          tmp = is_preemptive_;
+          is_preemptive_ = state;
+          // ----- Exit critical section --------------------------------------
+        }
 
         return tmp;
 #endif
@@ -270,59 +274,60 @@ namespace os
           }
       }
 
-    /**
-     * @class critical_section
-     *
-     * @details
-     * Use this class to define a critical section
-     * protected to scheduler switches. The beginning of the
-     * critical section is exactly the place where this class is
-     * instantiated (the constructor will lock
-     * the scheduler). The end of the critical
-     * section is the end of the surrounding block (the destructor will
-     * unlock the scheduler).
-     *
-     * @note Can be nested as many times as required without problems,
-     * only the outer call will unlock the scheduler.
-     *
-     * @par Example
-     *
-     * @code{.cpp}
-     * void
-     * func(void)
-     * {
-     *    // Do something
-     *
-     *    {
-     *      scheduler::critical_section scs;  // Critical section begins here.
-     *
-     *      // Inside the critical section.
-     *      // No scheduler switches will happen here.
-     *
-     *    } // Critical section ends here.
-     *
-     *    // Do something else.
-     * }
-     * @endcode
-     */
+      /**
+       * @class critical_section
+       *
+       * @details
+       * Use this class to define a critical section
+       * protected to scheduler switches. The beginning of the
+       * critical section is exactly the place where this class is
+       * instantiated (the constructor will lock
+       * the scheduler). The end of the critical
+       * section is the end of the surrounding block (the destructor will
+       * unlock the scheduler).
+       *
+       * @note Can be nested as many times as required without problems,
+       * only the outer call will unlock the scheduler.
+       *
+       * @par Example
+       *
+       * @code{.cpp}
+       * void
+       * func(void)
+       * {
+       *    // Do something
+       *
+       *    {
+       *      scheduler::critical_section scs;  // Critical section begins
+       * here.
+       *
+       *      // Inside the critical section.
+       *      // No scheduler switches will happen here.
+       *
+       *    } // Critical section ends here.
+       *
+       *    // Do something else.
+       * }
+       * @endcode
+       */
 
-    /*
-     * @var const state_t critical_section::state_
+      /*
+       * @var const state_t critical_section::state_
 
-     * @details
-     * The variable is constant, after being set by the constructor no
-     * further changes are possible.
-     *
-     * The variable type usually is a `bool`, but a counter is also
-     * possible if the scheduler uses a recursive lock.
-     */
+       * @details
+       * The variable is constant, after being set by the constructor no
+       * further changes are possible.
+       *
+       * The variable type usually is a `bool`, but a counter is also
+       * possible if the scheduler uses a recursive lock.
+       */
 
-    /**
-     * @class lockable
-     *
-     * @details
-     * Locker meeting the standard `Lockable` requirements (30.2.5.3).
-     */
+      /**
+       * @class lockable
+       *
+       * @details
+       * Locker meeting the standard `Lockable` requirements (30.2.5.3).
+       */
 
     } /* namespace scheduler */
 
@@ -349,16 +354,16 @@ namespace os
       void
       internal_unlink_node (internal::waiting_thread_node& node)
       {
-          {
-            // ----- Enter critical section -----------------------------------
-            interrupts::critical_section ics;
+        {
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
-            // Remove the thread from the node waiting list,
-            // if not already removed.
-            node.thread_->waiting_node_ = nullptr;
-            node.unlink ();
-            // ----- Exit critical section ------------------------------------
-          }
+          // Remove the thread from the node waiting list,
+          // if not already removed.
+          node.thread_->waiting_node_ = nullptr;
+          node.unlink ();
+          // ----- Exit critical section --------------------------------------
+        }
       }
 
       void
@@ -420,9 +425,9 @@ namespace os
 
         // Compute duration since previous context switch.
         // Assume scheduler is not disabled for very long.
-        rtos::statistics::duration_t delta =
-            static_cast<rtos::statistics::duration_t> (now
-                - scheduler::statistics::switch_timestamp_);
+        rtos::statistics::duration_t delta
+            = static_cast<rtos::statistics::duration_t> (
+                now - scheduler::statistics::switch_timestamp_);
 
 #pragma GCC diagnostic pop
 
@@ -445,16 +450,16 @@ namespace os
             scheduler::current_thread_->internal_relink_running_ ();
 
             // The top of the ready list gives the next thread to run.
-            scheduler::current_thread_ =
-                scheduler::ready_threads_list_.unlink_head ();
+            scheduler::current_thread_
+                = scheduler::ready_threads_list_.unlink_head ();
           }
 
-        // ***** Pointer switched to new thread! *****
+          // ***** Pointer switched to new thread! *****
 
-        // The new thread was marked as running in unlink_head(),
-        // so in case the handler is re-entered immediately,
-        // the relink_running() will simply reschedule it,
-        // otherwise the thread will be lost.
+          // The new thread was marked as running in unlink_head(),
+          // so in case the handler is re-entered immediately,
+          // the relink_running() will simply reschedule it,
+          // otherwise the thread will be lost.
 
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES)
 
@@ -465,7 +470,6 @@ namespace os
         scheduler::current_thread_->statistics_.context_switches_++;
 
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
-
       }
 
 #endif /* !defined(OS_USE_RTOS_PORT_SCHEDULER) */
@@ -487,9 +491,9 @@ namespace os
 
       } /* namespace statistics */
 
-    /**
-     * @endcond
-     */
+      /**
+       * @endcond
+       */
 
     } /* namespace scheduler */
 
@@ -524,7 +528,8 @@ namespace os
        *    // Do something
        *
        *    {
-       *      interrupts::critical_section ics;  // Critical section begins here.
+       *      interrupts::critical_section ics;  // Critical section begins
+       * here.
        *
        *      // Inside the critical section.
        *      // No scheduler switches will happen here.
@@ -576,9 +581,9 @@ namespace os
        */
       class thread::stack*
       stack (void)
-        {
-          return &interrupts_stack;
-        }
+      {
+        return &interrupts_stack;
+      }
 
 #endif /* defined(OS_HAS_INTERRUPTS_STACK) */
 
@@ -627,14 +632,14 @@ namespace os
        * life cycle is at least as long as the object life cycle.
        * A constant string (stored in flash) is preferred.
        */
-      object_named::object_named (const char* name) :
-          name_ (name != nullptr ? name : "-")
+      object_named::object_named (const char* name)
+          : name_ (name != nullptr ? name : "-")
       {
       }
 
     } /* namespace internal */
 
-  // ==========================================================================
+    // ========================================================================
   } /* namespace rtos */
 } /* namespace os */
 

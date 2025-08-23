@@ -60,14 +60,14 @@ namespace os
     class malloc_memory_resource : public rtos::memory::memory_resource
     {
     public:
-
       /**
        * @name Constructors & Destructor
        * @{
        */
 
       /**
-       * @brief Default constructor. Construct a memory manager object instance.
+       * @brief Default constructor. Construct a memory manager object
+       * instance.
        */
       malloc_memory_resource ();
 
@@ -83,9 +83,11 @@ namespace os
       malloc_memory_resource (const malloc_memory_resource&) = delete;
       malloc_memory_resource (malloc_memory_resource&&) = delete;
       malloc_memory_resource&
-      operator= (const malloc_memory_resource&) = delete;
+      operator= (const malloc_memory_resource&)
+          = delete;
       malloc_memory_resource&
-      operator= (malloc_memory_resource&&) = delete;
+      operator= (malloc_memory_resource&&)
+          = delete;
 
       /**
        * @endcond
@@ -101,7 +103,6 @@ namespace os
        */
 
     protected:
-
       /**
        * @name Private Member Functions
        * @{
@@ -125,15 +126,15 @@ namespace os
        *  Nothing.
        */
       virtual void
-      do_deallocate (void* addr, std::size_t bytes, std::size_t alignment)
-          noexcept override;
+      do_deallocate (void* addr, std::size_t bytes,
+                     std::size_t alignment) noexcept override;
 
       /**
        * @}
        */
     };
 
-    // ======================================================================
+    // ========================================================================
 
     /**
      * @headerfile os.h <cmsis-plus/memory/malloc.h>
@@ -149,7 +150,6 @@ namespace os
     class new_delete_memory_resource : public rtos::memory::memory_resource
     {
     public:
-
       /**
        * @name Constructors & Destructor
        * @{
@@ -165,7 +165,6 @@ namespace os
        */
 
     protected:
-
       /**
        * @name Private Member Functions
        * @{
@@ -189,18 +188,17 @@ namespace os
        *  Nothing.
        */
       virtual void
-      do_deallocate (void* addr, size_t bytes, size_t alignment)
-          noexcept override;
+      do_deallocate (void* addr, size_t bytes,
+                     size_t alignment) noexcept override;
 
       /**
        * @}
        */
-
     };
 
 #pragma GCC diagnostic pop
 
-  // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
   } /* namespace memory */
 } /* namespace os */
 
@@ -213,22 +211,18 @@ namespace os
 
     // ========================================================================
 
-    inline
-    malloc_memory_resource::malloc_memory_resource ()
+    inline malloc_memory_resource::malloc_memory_resource ()
     {
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
     }
 
-    inline
-    malloc_memory_resource::malloc_memory_resource (const char* name) :
-        rtos::memory::memory_resource
-          { name }
+    inline malloc_memory_resource::malloc_memory_resource (const char* name)
+        : rtos::memory::memory_resource{ name }
     {
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
     }
 
-    inline
-    malloc_memory_resource::~malloc_memory_resource ()
+    inline malloc_memory_resource::~malloc_memory_resource ()
     {
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
     }
@@ -307,7 +301,7 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-  // ==========================================================================
+    // ========================================================================
   } /* namespace memory */
 } /* namespace os */
 

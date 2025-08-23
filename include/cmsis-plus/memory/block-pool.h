@@ -55,7 +55,6 @@ namespace os
     class block_pool : public rtos::memory::memory_resource
     {
     public:
-
       /**
        * @name Constructors & Destructor
        * @{
@@ -83,7 +82,6 @@ namespace os
                   std::size_t block_size_bytes, void* addr, std::size_t bytes);
 
     protected:
-
       /**
        * @brief Default constructor. Construct a memory resource
        *  object instance.
@@ -91,7 +89,6 @@ namespace os
       block_pool (const char* name);
 
     public:
-
       /**
        * @cond ignore
        */
@@ -100,9 +97,11 @@ namespace os
       block_pool (const block_pool&) = delete;
       block_pool (block_pool&&) = delete;
       block_pool&
-      operator= (const block_pool&) = delete;
+      operator= (const block_pool&)
+          = delete;
       block_pool&
-      operator= (block_pool&&) = delete;
+      operator= (block_pool&&)
+          = delete;
 
       /**
        * @endcond
@@ -111,22 +110,21 @@ namespace os
       /**
        * @brief Destruct the memory resource object instance.
        */
-      virtual
-      ~block_pool () override;
+      virtual ~block_pool () override;
 
       /**
        * @}
        */
 
     protected:
-
       /**
        * @name Private Member Functions
        * @{
        */
 
       /**
-       * @brief Internal function to construct the memory resource object instance.
+       * @brief Internal function to construct the memory resource object
+       * instance.
        * @param [in] blocks The maximum number of items in the pool.
        * @param [in] block_size_bytes The size of an item, in bytes.
        * @param [in] addr Begin of allocator arena.
@@ -166,8 +164,8 @@ namespace os
        *  Nothing.
        */
       virtual void
-      do_deallocate (void* addr, std::size_t bytes, std::size_t alignment)
-          noexcept override;
+      do_deallocate (void* addr, std::size_t bytes,
+                     std::size_t alignment) noexcept override;
 
       /**
        * @brief Implementation of the function to get max size.
@@ -193,7 +191,6 @@ namespace os
        */
 
     protected:
-
       /**
        * @cond ignore
        */
@@ -227,7 +224,6 @@ namespace os
       /**
        * @endcond
        */
-
     };
 
     // ========================================================================
@@ -244,86 +240,85 @@ namespace os
      *
      * The common use case it to define statically allocated block pools.
      */
-    template<typename T, std::size_t N>
-      class block_pool_typed_inclusive : public block_pool
-      {
-      public:
+    template <typename T, std::size_t N>
+    class block_pool_typed_inclusive : public block_pool
+    {
+    public:
+      /**
+       * @brief Standard allocator type definition.
+       */
+      using value_type = T;
 
-        /**
-         * @brief Standard allocator type definition.
-         */
-        using value_type = T;
+      static_assert (
+          sizeof (value_type) >= sizeof (void*),
+          "Template type T must be large enough to store a pointer.");
 
-        static_assert(sizeof(value_type) >= sizeof(void*),
-            "Template type T must be large enough to store a pointer.");
+      /**
+       * @brief Local constant based on template definition.
+       */
+      static const std::size_t blocks = N;
 
-        /**
-         * @brief Local constant based on template definition.
-         */
-        static const std::size_t blocks = N;
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
-        /**
-         * @name Constructors & Destructor
-         * @{
-         */
+      /**
+       * @brief Construct a memory resource object instance.
+       * @par Parameters
+       *  None.
+       */
+      block_pool_typed_inclusive (void);
 
-        /**
-         * @brief Construct a memory resource object instance.
-         * @par Parameters
-         *  None.
-         */
-        block_pool_typed_inclusive (void);
+      /**
+       * @brief Construct a named memory resource object instance.
+       * @param [in] name Pointer to name.
+       */
+      block_pool_typed_inclusive (const char* name);
 
-        /**
-         * @brief Construct a named memory resource object instance.
-         * @param [in] name Pointer to name.
-         */
-        block_pool_typed_inclusive (const char* name);
+    public:
+      /**
+       * @cond ignore
+       */
 
-      public:
+      // The rule of five.
+      block_pool_typed_inclusive (const block_pool_typed_inclusive&) = delete;
+      block_pool_typed_inclusive (block_pool_typed_inclusive&&) = delete;
+      block_pool_typed_inclusive&
+      operator= (const block_pool_typed_inclusive&)
+          = delete;
+      block_pool_typed_inclusive&
+      operator= (block_pool_typed_inclusive&&)
+          = delete;
 
-        /**
-         * @cond ignore
-         */
+      /**
+       * @endcond
+       */
 
-        // The rule of five.
-        block_pool_typed_inclusive (const block_pool_typed_inclusive&) = delete;
-        block_pool_typed_inclusive (block_pool_typed_inclusive&&) = delete;
-        block_pool_typed_inclusive&
-        operator= (const block_pool_typed_inclusive&) = delete;
-        block_pool_typed_inclusive&
-        operator= (block_pool_typed_inclusive&&) = delete;
+      /**
+       * @brief Destruct the memory resource object instance.
+       */
+      virtual ~block_pool_typed_inclusive () override;
 
-        /**
-         * @endcond
-         */
+      /**
+       * @}
+       */
 
-        /**
-         * @brief Destruct the memory resource object instance.
-         */
-        virtual
-        ~block_pool_typed_inclusive () override;
+    protected:
+      /**
+       * @cond ignore
+       */
 
-        /**
-         * @}
-         */
+      /**
+       * @brief The allocation arena is an array of objects.
+       */
+      typename std::aligned_storage<sizeof (value_type),
+                                    alignof (value_type)>::type arena_[blocks];
 
-      protected:
-
-        /**
-         * @cond ignore
-         */
-
-        /**
-         * @brief The allocation arena is an array of objects.
-         */
-        typename std::aligned_storage<sizeof(value_type), alignof(value_type)>::type arena_[blocks];
-
-        /**
-         * @endcond
-         */
-
-      };
+      /**
+       * @endcond
+       */
+    };
 
     // ========================================================================
 
@@ -341,112 +336,112 @@ namespace os
      *
      * @note The allocator must be parametrised with the same block type.
      */
-    template<typename T, typename A = os::rtos::memory::allocator<T>>
-      class block_pool_typed_allocated : public block_pool
-      {
-      public:
+    template <typename T, typename A = os::rtos::memory::allocator<T>>
+    class block_pool_typed_allocated : public block_pool
+    {
+    public:
+      /**
+       * @brief Standard allocator type definition.
+       */
+      using value_type = T;
 
-        /**
-         * @brief Standard allocator type definition.
-         */
-        using value_type = T;
+      static_assert (
+          sizeof (value_type) >= sizeof (void*),
+          "Template type T must be large enough to store a pointer.");
 
-        static_assert(sizeof(value_type) >= sizeof(void*),
-            "Template type T must be large enough to store a pointer.");
+      /**
+       * @brief Standard allocator type definition.
+       */
+      using allocator_type = A;
 
-        /**
-         * @brief Standard allocator type definition.
-         */
-        using allocator_type = A;
+      /**
+       * @brief Standard allocator traits definition.
+       */
+      using allocator_traits = std::allocator_traits<A>;
 
-        /**
-         * @brief Standard allocator traits definition.
-         */
-        using allocator_traits = std::allocator_traits<A>;
+      // It is recommended to have the same type, but at least the types
+      // should have the same size.
+      static_assert (
+          sizeof (value_type)
+              == sizeof (typename allocator_traits::value_type),
+          "The allocator must be parametrised with a type of same size.");
 
-        // It is recommended to have the same type, but at least the types
-        // should have the same size.
-        static_assert(sizeof(value_type) == sizeof(typename allocator_traits::value_type),
-            "The allocator must be parametrised with a type of same size.");
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
-        /**
-         * @name Constructors & Destructor
-         * @{
-         */
+      /**
+       * @brief Construct a memory resource object instance.
+       * @param [in] blocks The maximum number of items in the pool.
+       * @param [in] allocator Reference to allocator. Default a
+       * local temporary instance.
+       */
+      block_pool_typed_allocated (std::size_t blocks,
+                                  const allocator_type& allocator
+                                  = allocator_type ());
 
-        /**
-         * @brief Construct a memory resource object instance.
-         * @param [in] blocks The maximum number of items in the pool.
-         * @param [in] allocator Reference to allocator. Default a
-         * local temporary instance.
-         */
-        block_pool_typed_allocated (std::size_t blocks,
-                                    const allocator_type& allocator =
-                                        allocator_type ());
+      /**
+       * @brief Construct a named memory resource object instance.
+       * @param [in] name Pointer to name.
+       * @param [in] blocks The maximum number of items in the pool.
+       * @param [in] allocator Reference to allocator. Default a
+       * local temporary instance.
+       */
+      block_pool_typed_allocated (const char* name, std::size_t blocks,
+                                  const allocator_type& allocator
+                                  = allocator_type ());
 
-        /**
-         * @brief Construct a named memory resource object instance.
-         * @param [in] name Pointer to name.
-         * @param [in] blocks The maximum number of items in the pool.
-         * @param [in] allocator Reference to allocator. Default a
-         * local temporary instance.
-         */
-        block_pool_typed_allocated (const char* name, std::size_t blocks,
-                                    const allocator_type& allocator =
-                                        allocator_type ());
+    public:
+      /**
+       * @cond ignore
+       */
 
-      public:
+      // The rule of five.
+      block_pool_typed_allocated (const block_pool_typed_allocated&) = delete;
+      block_pool_typed_allocated (block_pool_typed_allocated&&) = delete;
+      block_pool_typed_allocated&
+      operator= (const block_pool_typed_allocated&)
+          = delete;
+      block_pool_typed_allocated&
+      operator= (block_pool_typed_allocated&&)
+          = delete;
 
-        /**
-         * @cond ignore
-         */
+      /**
+       * @endcond
+       */
 
-        // The rule of five.
-        block_pool_typed_allocated (const block_pool_typed_allocated&) = delete;
-        block_pool_typed_allocated (block_pool_typed_allocated&&) = delete;
-        block_pool_typed_allocated&
-        operator= (const block_pool_typed_allocated&) = delete;
-        block_pool_typed_allocated&
-        operator= (block_pool_typed_allocated&&) = delete;
+      /**
+       * @brief Destruct the memory resource object instance.
+       */
+      virtual ~block_pool_typed_allocated () override;
 
-        /**
-         * @endcond
-         */
+      /**
+       * @}
+       */
 
-        /**
-         * @brief Destruct the memory resource object instance.
-         */
-        virtual
-        ~block_pool_typed_allocated () override;
+    protected:
+      /**
+       * @cond ignore
+       */
 
-        /**
-         * @}
-         */
+      /**
+       * @brief Pointer to allocator.
+       *
+       * @details
+       * The allocator is remembered because deallocation
+       * must be performed during destruction. A more automated
+       * solution using a unique_ptr<> would require more RAM
+       * and is considered not justified.
+       */
+      allocator_type* allocator_ = nullptr;
 
-      protected:
+      /**
+       * @endcond
+       */
+    };
 
-        /**
-         * @cond ignore
-         */
-
-        /**
-         * @brief Pointer to allocator.
-         *
-         * @details
-         * The allocator is remembered because deallocation
-         * must be performed during destruction. A more automated
-         * solution using a unique_ptr<> would require more RAM
-         * and is considered not justified.
-         */
-        allocator_type* allocator_ = nullptr;
-
-        /**
-         * @endcond
-         */
-
-      };
-
-  // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
   } /* namespace memory */
 } /* namespace os */
 
@@ -459,27 +454,22 @@ namespace os
 
     // ========================================================================
 
-    inline
-    block_pool::block_pool (const char* name) :
-        rtos::memory::memory_resource
-          { name }
+    inline block_pool::block_pool (const char* name)
+        : rtos::memory::memory_resource{ name }
     {
     }
 
-    inline
-    block_pool::block_pool (std::size_t blocks, std::size_t block_size_bytes,
-                            void* addr, std::size_t bytes) :
-        block_pool
-          { nullptr, blocks, block_size_bytes, addr, bytes }
+    inline block_pool::block_pool (std::size_t blocks,
+                                   std::size_t block_size_bytes, void* addr,
+                                   std::size_t bytes)
+        : block_pool{ nullptr, blocks, block_size_bytes, addr, bytes }
     {
     }
 
-    inline
-    block_pool::block_pool (const char* name, std::size_t blocks,
-                            std::size_t block_size_bytes, void* addr,
-                            std::size_t bytes) :
-        rtos::memory::memory_resource
-          { name }
+    inline block_pool::block_pool (const char* name, std::size_t blocks,
+                                   std::size_t block_size_bytes, void* addr,
+                                   std::size_t bytes)
+        : rtos::memory::memory_resource{ name }
     {
       trace::printf ("%s(%u,%u,%p,%u) @%p %s\n", __func__, blocks,
                      block_size_bytes, addr, bytes, this, this->name ());
@@ -489,83 +479,78 @@ namespace os
 
     // ========================================================================
 
-    template<typename T, std::size_t N>
-      inline
-      block_pool_typed_inclusive<T, N>::block_pool_typed_inclusive () :
-          block_pool_typed_inclusive (nullptr)
-      {
-      }
+    template <typename T, std::size_t N>
+    inline block_pool_typed_inclusive<T, N>::block_pool_typed_inclusive ()
+        : block_pool_typed_inclusive (nullptr)
+    {
+    }
 
-    template<typename T, std::size_t N>
-      inline
-      block_pool_typed_inclusive<T, N>::block_pool_typed_inclusive (
-          const char* name) :
-          block_pool
-            { name }
-      {
-        trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
+    template <typename T, std::size_t N>
+    inline block_pool_typed_inclusive<T, N>::block_pool_typed_inclusive (
+        const char* name)
+        : block_pool{ name }
+    {
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 
-        internal_construct_ (blocks, sizeof(value_type), &arena_[0],
-                             sizeof(arena_));
-      }
+      internal_construct_ (blocks, sizeof (value_type), &arena_[0],
+                           sizeof (arena_));
+    }
 
-    template<typename T, std::size_t N>
-      block_pool_typed_inclusive<T, N>::~block_pool_typed_inclusive ()
-      {
-        trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
-      }
+    template <typename T, std::size_t N>
+    block_pool_typed_inclusive<T, N>::~block_pool_typed_inclusive ()
+    {
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
+    }
 
     // ========================================================================
 
-    template<typename T, typename A>
-      inline
-      block_pool_typed_allocated<T, A>::block_pool_typed_allocated (
-          std::size_t blocks, const allocator_type& allocator) :
-          block_pool_typed_allocated (nullptr, blocks, allocator)
-      {
-      }
+    template <typename T, typename A>
+    inline block_pool_typed_allocated<T, A>::block_pool_typed_allocated (
+        std::size_t blocks, const allocator_type& allocator)
+        : block_pool_typed_allocated (nullptr, blocks, allocator)
+    {
+    }
 
-    template<typename T, typename A>
-      block_pool_typed_allocated<T, A>::block_pool_typed_allocated (
-          const char* name, std::size_t blocks, const allocator_type& allocator) :
-          block_pool
-            { name }
-      {
-        trace::printf ("%s(%u,%p) @%p %s\n", __func__, blocks, &allocator, this,
-                       this->name ());
+    template <typename T, typename A>
+    block_pool_typed_allocated<T, A>::block_pool_typed_allocated (
+        const char* name, std::size_t blocks, const allocator_type& allocator)
+        : block_pool{ name }
+    {
+      trace::printf ("%s(%u,%p) @%p %s\n", __func__, blocks, &allocator, this,
+                     this->name ());
 
-        // Remember the allocator, it'll be used by the destructor.
-        allocator_ =
-            static_cast<allocator_type*> (&const_cast<allocator_type&> (allocator));
+      // Remember the allocator, it'll be used by the destructor.
+      allocator_ = static_cast<allocator_type*> (
+          &const_cast<allocator_type&> (allocator));
 
-        void* addr = allocator_->allocate (blocks);
-        if (addr == nullptr)
-          {
-            estd::__throw_bad_alloc ();
-          }
+      void* addr = allocator_->allocate (blocks);
+      if (addr == nullptr)
+        {
+          estd::__throw_bad_alloc ();
+        }
 
-        internal_construct_ (blocks, sizeof(value_type), addr,
-                             blocks * sizeof(value_type));
-      }
+      internal_construct_ (blocks, sizeof (value_type), addr,
+                           blocks * sizeof (value_type));
+    }
 
-    template<typename T, typename A>
-      block_pool_typed_allocated<T, A>::~block_pool_typed_allocated ()
-      {
-        trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
+    template <typename T, typename A>
+    block_pool_typed_allocated<T, A>::~block_pool_typed_allocated ()
+    {
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 
-        // Skip in case a derived class did the deallocation.
-        if (allocator_ != nullptr)
-          {
-            allocator_->deallocate (
-                static_cast<typename allocator_traits::pointer> (pool_addr_),
-                blocks_);
+      // Skip in case a derived class did the deallocation.
+      if (allocator_ != nullptr)
+        {
+          allocator_->deallocate (
+              static_cast<typename allocator_traits::pointer> (pool_addr_),
+              blocks_);
 
-            // Prevent another deallocation.
-            allocator_ = nullptr;
-          }
-      }
+          // Prevent another deallocation.
+          allocator_ = nullptr;
+        }
+    }
 
-  // --------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
   } /* namespace memory */
 } /* namespace os */

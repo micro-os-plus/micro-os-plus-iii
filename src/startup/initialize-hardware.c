@@ -50,7 +50,7 @@ extern unsigned int __vectors_start;
  * Also useful on platform with external RAM, that need to be
  * initialised before filling the BSS section.
  */
-void __attribute__((weak))
+void __attribute__ ((weak))
 os_startup_initialize_hardware_early (void)
 {
   // Call the CSMSIS system initialisation routine.
@@ -60,7 +60,7 @@ os_startup_initialize_hardware_early (void)
 
   // Set VTOR to the actual address, provided by the linker script.
   // Override the manual, possibly wrong, SystemInit() setting.
-  SCB->VTOR = (uint32_t) (&__vectors_start);
+  SCB->VTOR = (uint32_t)(&__vectors_start);
   // Ensure all subsequence instructions use the new configuration.
   __DSB ();
 
@@ -71,7 +71,7 @@ os_startup_initialize_hardware_early (void)
   // so it needs to be recomputed after the RAM initialisations
   // are completed.
 
-#if defined(OS_INCLUDE_STARTUP_INIT_FP) || defined (__ARM_FP)
+#if defined(OS_INCLUDE_STARTUP_INIT_FP) || defined(__ARM_FP)
 
   // Normally FP init is done by SystemInit(). In case this is not done
   // there, it is possible to force its inclusion by defining

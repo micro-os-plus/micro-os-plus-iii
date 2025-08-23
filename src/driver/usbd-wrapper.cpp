@@ -23,17 +23,16 @@ namespace os
 {
   namespace driver
   {
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     usbd_wrapper::usbd_wrapper (
         ARM_DRIVER_USBD* driver, ARM_USBD_SignalDeviceEvent_t c_cb_device_func,
-        ARM_USBD_SignalEndpointEvent_t c_cb_endpoint_func) noexcept :
-    driver_ (driver),
-    c_cb_device_func_ (c_cb_device_func),
-    c_cb_endpoint_func_ (c_cb_endpoint_func)
-      {
-        trace::printf("%s() %p\n", __func__, this);
-      }
+        ARM_USBD_SignalEndpointEvent_t c_cb_endpoint_func) noexcept
+        : driver_ (driver), c_cb_device_func_ (c_cb_device_func),
+          c_cb_endpoint_func_ (c_cb_endpoint_func)
+    {
+      trace::printf ("%s() %p\n", __func__, this);
+    }
 
     usbd_wrapper::~usbd_wrapper () noexcept
     {
@@ -42,7 +41,7 @@ namespace os
       driver_ = nullptr;
     }
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -55,8 +54,8 @@ namespace os
     usbd_wrapper::do_get_version (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
-      *(reinterpret_cast<ARM_DRIVER_VERSION*> (&version_)) =
-          driver_->GetVersion ();
+      *(reinterpret_cast<ARM_DRIVER_VERSION*> (&version_))
+          = driver_->GetVersion ();
       return version_;
     }
 
@@ -64,8 +63,8 @@ namespace os
     usbd_wrapper::do_get_capabilities (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
-      *(reinterpret_cast<ARM_USBD_CAPABILITIES*> (&capa_)) =
-          driver_->GetCapabilities ();
+      *(reinterpret_cast<ARM_USBD_CAPABILITIES*> (&capa_))
+          = driver_->GetCapabilities ();
       return capa_;
     }
 
@@ -73,8 +72,8 @@ namespace os
     usbd_wrapper::do_get_status (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
-      *(reinterpret_cast<ARM_USBD_STATE*> (&status_)) =
-          driver_->DeviceGetState ();
+      *(reinterpret_cast<ARM_USBD_STATE*> (&status_))
+          = driver_->DeviceGetState ();
       return status_;
     }
 
@@ -89,7 +88,8 @@ namespace os
 
       if (state == Power::full)
         {
-          status = driver_->Initialize (c_cb_device_func_, c_cb_endpoint_func_);
+          status
+              = driver_->Initialize (c_cb_device_func_, c_cb_endpoint_func_);
           if (status != ARM_DRIVER_OK)
             {
               return status;
@@ -125,7 +125,8 @@ namespace os
     }
 
     return_t
-    usbd_wrapper::do_configure_address (usb::device_address_t dev_addr) noexcept
+    usbd_wrapper::do_configure_address (
+        usb::device_address_t dev_addr) noexcept
     {
       return driver_->DeviceSetAddress (dev_addr);
     }
@@ -143,13 +144,12 @@ namespace os
     }
 
     return_t
-    usbd_wrapper::do_configure_endpoint (usb::endpoint_t ep_addr,
-                                         usb::Endpoint_type ep_type,
-                                         usb::packet_size_t ep_max_packet_size) noexcept
+    usbd_wrapper::do_configure_endpoint (
+        usb::endpoint_t ep_addr, usb::Endpoint_type ep_type,
+        usb::packet_size_t ep_max_packet_size) noexcept
     {
-      return driver_->EndpointConfigure (ep_addr,
-                                         static_cast<uint8_t> (ep_type),
-                                         ep_max_packet_size);
+      return driver_->EndpointConfigure (
+          ep_addr, static_cast<uint8_t> (ep_type), ep_max_packet_size);
     }
 
     return_t
@@ -159,7 +159,8 @@ namespace os
     }
 
     return_t
-    usbd_wrapper::do_stall_endpoint (usb::endpoint_t ep_addr, bool stall) noexcept
+    usbd_wrapper::do_stall_endpoint (usb::endpoint_t ep_addr,
+                                     bool stall) noexcept
     {
       return driver_->EndpointStall (ep_addr, stall);
     }

@@ -36,10 +36,9 @@ namespace os
   {
     // ========================================================================
 
-    device::device (device_impl& impl, type t, const char* name) :
-        io
-          { impl, t }, //
-        name_ (name)
+    device::device (device_impl& impl, type t, const char* name)
+        : io{ impl, t }, //
+          name_ (name)
     {
 #if defined(OS_TRACE_POSIX_IO_DEVICE)
       trace::printf ("device::%s(\"%s\")=%p\n", __func__, name_, this);
@@ -64,9 +63,9 @@ namespace os
     {
       // Forward to the variadic version of the function.
       std::va_list args;
-      va_start(args, oflag);
+      va_start (args, oflag);
       int ret = vopen (path, oflag, args);
-      va_end(args);
+      va_end (args);
 
       return ret;
     }
@@ -97,7 +96,6 @@ namespace os
             {
               return -1;
             }
-
         }
       ++(impl ().open_count_);
       ret = file_descriptor ();
@@ -138,9 +136,9 @@ namespace os
     {
       // Forward to the variadic version of the function.
       std::va_list args;
-      va_start(args, request);
+      va_start (args, request);
       int ret = vioctl (request, args);
-      va_end(args);
+      va_end (args);
 
       return ret;
     }
@@ -190,8 +188,8 @@ namespace os
     bool
     device::match_name (const char* name) const
     {
-      assert(name != nullptr);
-      assert(name_ != nullptr);
+      assert (name != nullptr);
+      assert (name_ != nullptr);
 
       return (std::strcmp (name, name_) == 0);
     }
@@ -212,7 +210,7 @@ namespace os
 #endif
     }
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     bool
     device_impl::do_is_opened (void)
@@ -220,7 +218,7 @@ namespace os
       return (open_count_ > 0);
     }
 
-  // ========================================================================
+    // ========================================================================
 
   } /* namespace posix */
 } /* namespace os */

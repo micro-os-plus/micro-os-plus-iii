@@ -59,15 +59,18 @@ namespace os
       // The memory resources must not be destructed, since some
       // static objects will want to deallocate memory they manage.
 
-      static std::aligned_storage<sizeof(os::memory::malloc_memory_resource),
-          alignof(os::memory::malloc_memory_resource)>::type malloc_res;
-
-      static std::aligned_storage<sizeof(os::memory::null_memory_resource),
-          alignof(os::memory::null_memory_resource)>::type null_res;
+      static std::aligned_storage<
+          sizeof (os::memory::malloc_memory_resource),
+          alignof (os::memory::malloc_memory_resource)>::type malloc_res;
 
       static std::aligned_storage<
-          sizeof(os::memory::new_delete_memory_resource),
-          alignof(os::memory::new_delete_memory_resource)>::type new_delete_res;
+          sizeof (os::memory::null_memory_resource),
+          alignof (os::memory::null_memory_resource)>::type null_res;
+
+      static std::aligned_storage<
+          sizeof (os::memory::new_delete_memory_resource),
+          alignof (os::memory::new_delete_memory_resource)>::type
+          new_delete_res;
 
       void
       init_once_default_resource (void)
@@ -91,8 +94,7 @@ namespace os
 #endif
       // This guarantees that the memory resources are initialised
       // before entering main().
-      static void
-      __attribute__((constructor))
+      static void __attribute__ ((constructor))
       __constructor (void)
       {
         init_once_default_resource ();
@@ -114,64 +116,64 @@ namespace os
       // The default RTOS system memory resource.
 #if !defined(OS_IS_CROSS_BUILD)
 
-      memory_resource* default_resource __attribute__((weak))
+      memory_resource* default_resource __attribute__ ((weak))
       = reinterpret_cast<memory_resource*> (&malloc_res);
 
       // ----------------------------------------------------------------------
 
-      memory_resource* resource_thread __attribute__((weak))
+      memory_resource* resource_thread __attribute__ ((weak))
       = reinterpret_cast<memory_resource*> (&malloc_res);
 
-      memory_resource* resource_condition_variable __attribute__((weak))
+      memory_resource* resource_condition_variable __attribute__ ((weak))
       = reinterpret_cast<memory_resource*> (&malloc_res);
 
-      memory_resource* resource_event_flags __attribute__((weak))
+      memory_resource* resource_event_flags __attribute__ ((weak))
       = reinterpret_cast<memory_resource*> (&malloc_res);
 
-      memory_resource* resource_memory_pool __attribute__((weak))
+      memory_resource* resource_memory_pool __attribute__ ((weak))
       = reinterpret_cast<memory_resource*> (&malloc_res);
 
-      memory_resource* resource_message_queue __attribute__((weak))
+      memory_resource* resource_message_queue __attribute__ ((weak))
       = reinterpret_cast<memory_resource*> (&malloc_res);
 
-      memory_resource* resource_mutex __attribute__((weak))
+      memory_resource* resource_mutex __attribute__ ((weak))
       = reinterpret_cast<memory_resource*> (&malloc_res);
 
-      memory_resource* resource_semaphore __attribute__((weak))
+      memory_resource* resource_semaphore __attribute__ ((weak))
       = reinterpret_cast<memory_resource*> (&malloc_res);
 
-      memory_resource* resource_timer __attribute__((weak))
+      memory_resource* resource_timer __attribute__ ((weak))
       = reinterpret_cast<memory_resource*> (&malloc_res);
 
 #else
 
-      memory_resource* default_resource __attribute__((weak))
+      memory_resource* default_resource __attribute__ ((weak))
       = reinterpret_cast<memory_resource*> (&null_res);
 
       // ----------------------------------------------------------------------
 
-      memory_resource* resource_thread __attribute__((weak))
+      memory_resource* resource_thread __attribute__ ((weak))
       = reinterpret_cast<memory_resource*> (&null_res);
 
-      memory_resource* resource_condition_variable __attribute__((weak))
+      memory_resource* resource_condition_variable __attribute__ ((weak))
       = reinterpret_cast<memory_resource*> (&null_res);
 
-      memory_resource* resource_event_flags __attribute__((weak))
+      memory_resource* resource_event_flags __attribute__ ((weak))
       = reinterpret_cast<memory_resource*> (&null_res);
 
-      memory_resource* resource_memory_pool __attribute__((weak))
+      memory_resource* resource_memory_pool __attribute__ ((weak))
       = reinterpret_cast<memory_resource*> (&null_res);
 
-      memory_resource* resource_message_queue __attribute__((weak))
+      memory_resource* resource_message_queue __attribute__ ((weak))
       = reinterpret_cast<memory_resource*> (&null_res);
 
-      memory_resource* resource_mutex __attribute__((weak))
+      memory_resource* resource_mutex __attribute__ ((weak))
       = reinterpret_cast<memory_resource*> (&null_res);
 
-      memory_resource* resource_semaphore __attribute__((weak))
+      memory_resource* resource_semaphore __attribute__ ((weak))
       = reinterpret_cast<memory_resource*> (&null_res);
 
-      memory_resource* resource_timer __attribute__((weak))
+      memory_resource* resource_timer __attribute__ ((weak))
       = reinterpret_cast<memory_resource*> (&null_res);
 
 #endif
@@ -220,35 +222,17 @@ namespace os
        * from `os_startup_initialize_free_store()`, during the
        * system startup, with a memory manager specific to this object type.
        */
-      template<>
-        memory_resource*
-        set_resource_typed<thread> (memory_resource* res) noexcept
-        {
-          trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
+      template <>
+      memory_resource*
+      set_resource_typed<thread> (memory_resource* res) noexcept
+      {
+        trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
 
-          memory_resource* old = resource_thread;
-          resource_thread = res;
+        memory_resource* old = resource_thread;
+        resource_thread = res;
 
-          return old;
-        }
-
-      /**
-       * @details
-       * On bare metal applications, this function is called
-       * from `os_startup_initialize_free_store()`, during the
-       * system startup, with a memory manager specific to this object type.
-       */
-      template<>
-        memory_resource*
-        set_resource_typed<condition_variable> (memory_resource* res) noexcept
-        {
-          trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
-
-          memory_resource* old = resource_condition_variable;
-          resource_condition_variable = res;
-
-          return old;
-        }
+        return old;
+      }
 
       /**
        * @details
@@ -256,35 +240,17 @@ namespace os
        * from `os_startup_initialize_free_store()`, during the
        * system startup, with a memory manager specific to this object type.
        */
-      template<>
-        memory_resource*
-        set_resource_typed<event_flags> (memory_resource* res) noexcept
-        {
-          trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
+      template <>
+      memory_resource*
+      set_resource_typed<condition_variable> (memory_resource* res) noexcept
+      {
+        trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
 
-          memory_resource* old = resource_event_flags;
-          resource_event_flags = res;
+        memory_resource* old = resource_condition_variable;
+        resource_condition_variable = res;
 
-          return old;
-        }
-
-      /**
-       * @details
-       * On bare metal applications, this function is called
-       * from `os_startup_initialize_free_store()`, during the
-       * system startup, with a memory manager specific to this object type.
-       */
-      template<>
-        memory_resource*
-        set_resource_typed<memory_pool> (memory_resource* res) noexcept
-        {
-          trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
-
-          memory_resource* old = resource_memory_pool;
-          resource_memory_pool = res;
-
-          return old;
-        }
+        return old;
+      }
 
       /**
        * @details
@@ -292,35 +258,17 @@ namespace os
        * from `os_startup_initialize_free_store()`, during the
        * system startup, with a memory manager specific to this object type.
        */
-      template<>
-        memory_resource*
-        set_resource_typed<message_queue> (memory_resource* res) noexcept
-        {
-          trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
+      template <>
+      memory_resource*
+      set_resource_typed<event_flags> (memory_resource* res) noexcept
+      {
+        trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
 
-          memory_resource* old = resource_message_queue;
-          resource_message_queue = res;
+        memory_resource* old = resource_event_flags;
+        resource_event_flags = res;
 
-          return old;
-        }
-
-      /**
-       * @details
-       * On bare metal applications, this function is called
-       * from `os_startup_initialize_free_store()`, during the
-       * system startup, with a memory manager specific to this object type.
-       */
-      template<>
-        memory_resource*
-        set_resource_typed<mutex> (memory_resource* res) noexcept
-        {
-          trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
-
-          memory_resource* old = resource_mutex;
-          resource_mutex = res;
-
-          return old;
-        }
+        return old;
+      }
 
       /**
        * @details
@@ -328,17 +276,17 @@ namespace os
        * from `os_startup_initialize_free_store()`, during the
        * system startup, with a memory manager specific to this object type.
        */
-      template<>
-        memory_resource*
-        set_resource_typed<semaphore> (memory_resource* res) noexcept
-        {
-          trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
+      template <>
+      memory_resource*
+      set_resource_typed<memory_pool> (memory_resource* res) noexcept
+      {
+        trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
 
-          memory_resource* old = resource_semaphore;
-          resource_semaphore = res;
+        memory_resource* old = resource_memory_pool;
+        resource_memory_pool = res;
 
-          return old;
-        }
+        return old;
+      }
 
       /**
        * @details
@@ -346,17 +294,71 @@ namespace os
        * from `os_startup_initialize_free_store()`, during the
        * system startup, with a memory manager specific to this object type.
        */
-      template<>
-        memory_resource*
-        set_resource_typed<timer> (memory_resource* res) noexcept
-        {
-          trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
+      template <>
+      memory_resource*
+      set_resource_typed<message_queue> (memory_resource* res) noexcept
+      {
+        trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
 
-          memory_resource* old = resource_timer;
-          resource_timer = res;
+        memory_resource* old = resource_message_queue;
+        resource_message_queue = res;
 
-          return old;
-        }
+        return old;
+      }
+
+      /**
+       * @details
+       * On bare metal applications, this function is called
+       * from `os_startup_initialize_free_store()`, during the
+       * system startup, with a memory manager specific to this object type.
+       */
+      template <>
+      memory_resource*
+      set_resource_typed<mutex> (memory_resource* res) noexcept
+      {
+        trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
+
+        memory_resource* old = resource_mutex;
+        resource_mutex = res;
+
+        return old;
+      }
+
+      /**
+       * @details
+       * On bare metal applications, this function is called
+       * from `os_startup_initialize_free_store()`, during the
+       * system startup, with a memory manager specific to this object type.
+       */
+      template <>
+      memory_resource*
+      set_resource_typed<semaphore> (memory_resource* res) noexcept
+      {
+        trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
+
+        memory_resource* old = resource_semaphore;
+        resource_semaphore = res;
+
+        return old;
+      }
+
+      /**
+       * @details
+       * On bare metal applications, this function is called
+       * from `os_startup_initialize_free_store()`, during the
+       * system startup, with a memory manager specific to this object type.
+       */
+      template <>
+      memory_resource*
+      set_resource_typed<timer> (memory_resource* res) noexcept
+      {
+        trace::printf ("rtos::memory::%s(%p) \n", __func__, res);
+
+        memory_resource* old = resource_timer;
+        resource_timer = res;
+
+        return old;
+      }
 
       // ======================================================================
 
@@ -414,7 +416,8 @@ namespace os
        *   Throws nothing.
        */
       bool
-      memory_resource::do_is_equal (memory_resource const &other) const noexcept
+      memory_resource::do_is_equal (
+          memory_resource const& other) const noexcept
       {
         return &other == this;
       }
@@ -493,10 +496,9 @@ namespace os
         free_bytes_ += bytes;
         --allocated_chunks_;
         ++free_chunks_;
-
       }
 
-    // ------------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
     } /* namespace memory */
   } /* namespace rtos */
@@ -515,7 +517,8 @@ namespace os
       memory_resource*
       new_delete_resource (void) noexcept
       {
-        return reinterpret_cast<memory_resource*> (&rtos::memory::new_delete_res);
+        return reinterpret_cast<memory_resource*> (
+            &rtos::memory::new_delete_res);
       }
 
       memory_resource*
@@ -525,10 +528,10 @@ namespace os
       }
 
 #if !defined(OS_IS_CROSS_BUILD)
-      memory_resource* default_resource __attribute__((weak))
+      memory_resource* default_resource __attribute__ ((weak))
       = reinterpret_cast<memory_resource*> (&rtos::memory::malloc_res);
 #else
-      memory_resource* default_resource __attribute__((weak))
+      memory_resource* default_resource __attribute__ ((weak))
       = reinterpret_cast<memory_resource*> (&rtos::memory::null_res);
 #endif
 

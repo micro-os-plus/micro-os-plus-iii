@@ -27,23 +27,23 @@ namespace os
   {
     namespace internal
     {
-      // ------------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
       result_t
       event_flags::raise (flags::mask_t mask, flags::mask_t* oflags)
       {
-        os_assert_err(mask != 0, EINVAL);
+        os_assert_err (mask != 0, EINVAL);
 
-        assert(port::interrupts::is_priority_valid ());
+        assert (port::interrupts::is_priority_valid ());
 
-          {
-            // ----- Enter critical section -------------------------------------
-            interrupts::critical_section ics;
+        {
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
-            if (oflags != nullptr)
-              {
-                *oflags = flags_mask_;
-              }
+          if (oflags != nullptr)
+            {
+              *oflags = flags_mask_;
+            }
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -51,11 +51,11 @@ namespace os
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wvolatile"
 #endif
-            flags_mask_ |= mask;
+          flags_mask_ |= mask;
 #pragma GCC diagnostic pop
 
-            // ----- Exit critical section --------------------------------------
-          }
+          // ----- Exit critical section --------------------------------------
+        }
         return result::ok;
       }
 
@@ -82,8 +82,9 @@ namespace os
               }
           }
         else if (((((mode & flags::mode::all) != 0))
-            && ((flags_mask_ & mask) == mask))
-            || (((mode & flags::mode::any) != 0) && ((flags_mask_ & mask) != 0)))
+                  && ((flags_mask_ & mask) == mask))
+                 || (((mode & flags::mode::any) != 0)
+                     && ((flags_mask_ & mask) != 0)))
           {
             if (oflags != nullptr)
               {
@@ -112,33 +113,33 @@ namespace os
       event_flags::get (flags::mask_t mask, flags::mode_t mode)
       {
         flags::mask_t ret;
-          {
-            // ----- Enter critical section -------------------------------------
-            interrupts::critical_section ics;
+        {
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
-            if (mask == 0)
-              {
-                // Return the entire mask.
-                ret = flags_mask_;
-              }
-            else
-              {
-                ret = flags_mask_ & mask;
-                if ((mode & flags::mode::clear) != 0)
-                  {
+          if (mask == 0)
+            {
+              // Return the entire mask.
+              ret = flags_mask_;
+            }
+          else
+            {
+              ret = flags_mask_ & mask;
+              if ((mode & flags::mode::clear) != 0)
+                {
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wdeprecated-volatile"
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wvolatile"
 #endif
-                    // Clear the selected bits; leave the rest untouched.
-                    flags_mask_ &= ~mask;
+                  // Clear the selected bits; leave the rest untouched.
+                  flags_mask_ &= ~mask;
 #pragma GCC diagnostic pop
-                  }
-              }
-            // ----- Exit critical section --------------------------------------
-          }
+                }
+            }
+          // ----- Exit critical section --------------------------------------
+        }
 
         // Return the selected bits.
         return ret;
@@ -147,16 +148,16 @@ namespace os
       result_t
       event_flags::clear (flags::mask_t mask, flags::mask_t* oflags)
       {
-        os_assert_err(mask != 0, EINVAL);
+        os_assert_err (mask != 0, EINVAL);
 
-          {
-            // ----- Enter critical section -------------------------------------
-            interrupts::critical_section ics;
+        {
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
-            if (oflags != nullptr)
-              {
-                *oflags = flags_mask_;
-              }
+          if (oflags != nullptr)
+            {
+              *oflags = flags_mask_;
+            }
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -164,17 +165,17 @@ namespace os
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wvolatile"
 #endif
-            // Clear the selected bits; leave the rest untouched.
-            flags_mask_ &= ~mask;
+          // Clear the selected bits; leave the rest untouched.
+          flags_mask_ &= ~mask;
 #pragma GCC diagnostic pop
 
-            // ----- Exit critical section --------------------------------------
-          }
+          // ----- Exit critical section --------------------------------------
+        }
 
         return result::ok;
       }
 
-    // --------------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
     } /* namespace internal */
   } /* namespace rtos */

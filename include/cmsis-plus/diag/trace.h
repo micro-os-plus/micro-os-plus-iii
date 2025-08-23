@@ -46,8 +46,7 @@
 /**
  * @brief Insert a BKPT0 for debugger usage.
  */
-inline void
-__attribute__((always_inline))
+inline void __attribute__ ((always_inline))
 trace_dbg_bkpt (void)
 {
 #if defined(__ARM_EABI__)
@@ -90,7 +89,7 @@ namespace os
    */
   namespace trace
   {
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     void
     initialize (void);
@@ -98,7 +97,7 @@ namespace os
     ssize_t
     write (const void* buf, std::size_t nbyte);
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     /**
      * @brief Write a formatted string to the trace device.
@@ -159,15 +158,14 @@ namespace os
      *  Nothing.
      */
     void
-    flush(void);
+    flush (void);
 
     // ------------------------------------------------------------------------
 
     /**
      * @brief Insert a BKPT0 for debugger usage.
      */
-    inline void
-    __attribute__((always_inline))
+    inline void __attribute__ ((always_inline))
     dbg_bkpt (void)
     {
       trace_dbg_bkpt ();
@@ -226,40 +224,40 @@ extern "C"
 #if defined(__cplusplus)
 
 namespace os
+{
+  namespace trace
   {
-    namespace trace
-      {
-        // ----------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
-        inline void
-        initialize (void);
+    inline void
+    initialize (void);
 
-        inline ssize_t
-        write (const void* buf, std::size_t nbyte);
+    inline ssize_t
+    write (const void* buf, std::size_t nbyte);
 
-        // ----------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
-        inline int
-        printf (const char* format, ...);
+    inline int
+    printf (const char* format, ...);
 
-        inline int
-        vprintf (const char* format, std::va_list args);
+    inline int
+    vprintf (const char* format, std::va_list args);
 
-        inline int
-        puts (const char* s);
+    inline int
+    puts (const char* s);
 
-        inline int
-        putchar (int c);
+    inline int
+    putchar (int c);
 
-        inline void
-        dump_args (int argc, char* argv[]);
+    inline void
+    dump_args (int argc, char* argv[]);
 
-        // ----------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
-        inline void __attribute__((always_inline))
-        initialize (void)
-          {
-          }
+    inline void __attribute__ ((always_inline))
+    initialize (void)
+    {
+    }
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -268,92 +266,91 @@ namespace os
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
 
-        inline ssize_t __attribute__((always_inline))
-        write (const void* buf, std::size_t nbyte)
-          {
-            return static_cast<ssize_t> (nbyte);
-          }
+    inline ssize_t __attribute__ ((always_inline))
+    write (const void* buf, std::size_t nbyte)
+    {
+      return static_cast<ssize_t> (nbyte);
+    }
 
-        inline void __attribute__((always_inline))
-        flush (void)
-          {
-          }
+    inline void __attribute__ ((always_inline))
+    flush (void)
+    {
+    }
 
-        inline int __attribute__((always_inline))
-        printf (const char* format, ...)
-          {
-            return 0;
-          }
+    inline int __attribute__ ((always_inline))
+    printf (const char* format, ...)
+    {
+      return 0;
+    }
 
-        inline int __attribute__((always_inline))
-        vprintf (const char* format, std::va_list args)
-          {
-            return 0;
-          }
+    inline int __attribute__ ((always_inline))
+    vprintf (const char* format, std::va_list args)
+    {
+      return 0;
+    }
 
-        inline int __attribute__((always_inline))
-        puts (const char* s)
-          {
-            return 0;
-          }
+    inline int __attribute__ ((always_inline))
+    puts (const char* s)
+    {
+      return 0;
+    }
 
-        inline int __attribute__((always_inline))
-        putchar (int c)
-          {
-            return c;
-          }
+    inline int __attribute__ ((always_inline))
+    putchar (int c)
+    {
+      return c;
+    }
 
-        inline void __attribute__((always_inline))
-        dump_args (int argc, char* argv[])
-          {
-          }
+    inline void __attribute__ ((always_inline))
+    dump_args (int argc, char* argv[])
+    {
+    }
 
 #pragma GCC diagnostic pop
 
-      } /* namespace trace */
-  } /* namespace os */
+  } /* namespace trace */
+} /* namespace os */
 
 #endif /* defined(__cplusplus) */
 
 #if defined(__cplusplus)
 extern "C"
-  {
+{
 #endif
 
-    inline void
-    trace_initialize (void);
+  inline void
+  trace_initialize (void);
 
-    // Implementation dependent
-    inline ssize_t
-    trace_write (const void* buf, size_t nbyte);
+  // Implementation dependent
+  inline ssize_t
+  trace_write (const void* buf, size_t nbyte);
 
-    inline void
-    trace_flush (void);
+  inline void
+  trace_flush (void);
 
-    inline int
-    trace_printf (const char* format, ...);
+  inline int
+  trace_printf (const char* format, ...);
 
-    inline int
-    trace_vprintf (const char* format, va_list args);
+  inline int
+  trace_vprintf (const char* format, va_list args);
 
-    inline int
-    trace_puts (const char* s);
+  inline int
+  trace_puts (const char* s);
 
-    inline int
-    trace_putchar (int c);
+  inline int
+  trace_putchar (int c);
 
-    inline void
-    trace_dump_args (int argc, char* argv[]);
+  inline void
+  trace_dump_args (int argc, char* argv[]);
 
 #if defined(__cplusplus)
-  }
+}
 #endif
 
-inline void
-__attribute__((always_inline))
+inline void __attribute__ ((always_inline))
 trace_initialize (void)
-  {
-  }
+{
+}
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -371,54 +368,47 @@ trace_initialize (void)
 #endif
 #endif
 
-inline ssize_t
-__attribute__((always_inline))
+inline ssize_t __attribute__ ((always_inline))
 trace_write (const void* buf, size_t nbyte)
-  {
-    return (ssize_t) (nbyte);
-  }
+{
+  return (ssize_t)(nbyte);
+}
 
-inline void
-__attribute__((always_inline))
+inline void __attribute__ ((always_inline))
 trace_flush (void)
-  {
-  }
+{
+}
 
 #pragma GCC diagnostic pop
 
-inline int
-__attribute__((always_inline))
+inline int __attribute__ ((always_inline))
 trace_printf (const char* format, ...)
-  {
-    return 0;
-  }
+{
+  return 0;
+}
 
-inline int
-__attribute__((always_inline))
+inline int __attribute__ ((always_inline))
 trace_vprintf (const char* format, va_list args)
-  {
-    return 0;
-  }
+{
+  return 0;
+}
 
-inline int
-__attribute__((always_inline))
+inline int __attribute__ ((always_inline))
 trace_puts (const char* s)
-  {
-    return 0;
-  }
+{
+  return 0;
+}
 
-inline int
-__attribute__((always_inline))
+inline int __attribute__ ((always_inline))
 trace_putchar (int c)
-  {
-    return c;
-  }
+{
+  return c;
+}
 
-inline void
-__attribute__((always_inline))
+inline void __attribute__ ((always_inline))
 trace_dump_args (int argc, char* argv[])
-  {
-  }
+{
+}
 
 #pragma GCC diagnostic pop
 

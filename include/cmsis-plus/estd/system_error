@@ -46,7 +46,7 @@ namespace os
     [[noreturn]] void
     __throw_cmsis_error (int ev, const char* what_arg);
 #endif
-  // --------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
   } /* namespace estd */
 } /* namespace os */

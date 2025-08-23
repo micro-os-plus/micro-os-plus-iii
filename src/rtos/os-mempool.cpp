@@ -83,7 +83,8 @@ namespace os
      *
      * @par POSIX compatibility
      *  No POSIX similar functionality identified, but inspired by POSIX
-     *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  attributes used in
+     * [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
      *  (IEEE Std 1003.1, 2013 Edition).
      */
 
@@ -188,9 +189,7 @@ namespace os
 #endif
     }
 
-    memory_pool::memory_pool (const char* name) :
-        object_named_system
-          { name }
+    memory_pool::memory_pool (const char* name) : object_named_system{ name }
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
@@ -224,16 +223,15 @@ namespace os
      * the storage is dynamically allocated using the RTOS specific allocator
      * (`rtos::memory::allocator`).
      *
-     * If the _attr_ attributes are modified **after** the memory_pool creation,
-     * the memory_pool attributes shall not be affected.
+     * If the _attr_ attributes are modified **after** the memory_pool
+     * creation, the memory_pool attributes shall not be affected.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     memory_pool::memory_pool (std::size_t blocks, std::size_t block_size_bytes,
                               const attributes& attr,
-                              const allocator_type& allocator) :
-        memory_pool
-          { nullptr, blocks, block_size_bytes, attr, allocator }
+                              const allocator_type& allocator)
+        : memory_pool{ nullptr, blocks, block_size_bytes, attr, allocator }
     {
     }
 
@@ -260,17 +258,16 @@ namespace os
      * the storage is dynamically allocated using the RTOS specific allocator
      * (`rtos::memory::allocator`).
      *
-     * If the _attr_ attributes are modified **after** the memory_pool creation,
-     * the memory_pool attributes shall not be affected.
+     * If the _attr_ attributes are modified **after** the memory_pool
+     * creation, the memory_pool attributes shall not be affected.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     memory_pool::memory_pool (const char* name, std::size_t blocks,
                               std::size_t block_size_bytes,
                               const attributes& attr,
-                              const allocator_type& allocator) :
-        object_named_system
-          { name }
+                              const allocator_type& allocator)
+        : object_named_system{ name }
     {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s %u %u\n", __func__, this, this->name (),
@@ -288,22 +285,21 @@ namespace os
 
           // If no user storage was provided via attributes,
           // allocate it dynamically via the allocator.
-          allocated_pool_size_elements_ = (compute_allocated_size_bytes<
-              typename allocator_type::value_type> (blocks, block_size_bytes)
-              + sizeof(typename allocator_type::value_type) - 1)
-              / sizeof(typename allocator_type::value_type);
+          allocated_pool_size_elements_
+              = (compute_allocated_size_bytes<
+                     typename allocator_type::value_type> (blocks,
+                                                           block_size_bytes)
+                 + sizeof (typename allocator_type::value_type) - 1)
+                / sizeof (typename allocator_type::value_type);
 
-          allocated_pool_addr_ =
-              const_cast<allocator_type&> (allocator).allocate (
+          allocated_pool_addr_
+              = const_cast<allocator_type&> (allocator).allocate (
                   allocated_pool_size_elements_);
 
           internal_construct_ (
-              blocks,
-              block_size_bytes,
-              attr,
-              allocated_pool_addr_,
+              blocks, block_size_bytes, attr, allocated_pool_addr_,
               allocated_pool_size_elements_
-                  * sizeof(typename allocator_type::value_type));
+                  * sizeof (typename allocator_type::value_type));
         }
     }
 
@@ -319,28 +315,29 @@ namespace os
                                       std::size_t pool_size_bytes)
     {
       // Don't call this from interrupt handlers.
-      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
+      os_assert_throw (!interrupts::in_handler_mode (), EPERM);
 
 #if !defined(OS_USE_RTOS_PORT_MEMORY_POOL)
       clock_ = attr.clock != nullptr ? attr.clock : &sysclock;
 #endif
 
       blocks_ = static_cast<memory_pool::size_t> (blocks);
-      assert(blocks_ == blocks);
-      assert(blocks_ > 0);
+      assert (blocks_ == blocks);
+      assert (blocks_ > 0);
 
       // Adjust block size to multiple of pointer.
       // Blocks must be large enough to store a pointer, used
       // to construct the list of free blocks.
-      block_size_bytes_ = (static_cast<memory_pool::size_t> (block_size_bytes
-          + __SIZEOF_POINTER__ - 1))
-          & (static_cast<memory_pool::size_t> (~(__SIZEOF_POINTER__ - 1)));
+      block_size_bytes_
+          = (static_cast<memory_pool::size_t> (block_size_bytes
+                                               + __SIZEOF_POINTER__ - 1))
+            & (static_cast<memory_pool::size_t> (~(__SIZEOF_POINTER__ - 1)));
 
       // If the storage is given explicitly, override attributes.
       if (pool_address != nullptr)
         {
           // The attributes should not define any storage in this case.
-          assert(attr.mp_pool_address == nullptr);
+          assert (attr.mp_pool_address == nullptr);
 
           pool_addr_ = pool_address;
           pool_size_bytes_ = pool_size_bytes;
@@ -354,33 +351,30 @@ namespace os
       // Blocks must be pointer aligned.
       void* p = pool_addr_;
       std::size_t sz = pool_size_bytes_;
-      pool_addr_ = static_cast<char*> (
-        std::align (__SIZEOF_POINTER__,
-                    static_cast<std::size_t>(blocks_ * block_size_bytes_),
-                    p, sz)
-      );
+      pool_addr_ = static_cast<char*> (std::align (
+          __SIZEOF_POINTER__,
+          static_cast<std::size_t> (blocks_ * block_size_bytes_), p, sz));
 
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s %u %u %p %u\n", __func__, this, name (),
                      blocks_, block_size_bytes_, pool_addr_, pool_size_bytes_);
 #endif
 
-      std::size_t storage_size = compute_allocated_size_bytes<void*> (
-          blocks_, block_size_bytes_);
+      std::size_t storage_size
+          = compute_allocated_size_bytes<void*> (blocks_, block_size_bytes_);
 
       if (pool_addr_ != nullptr)
         {
           // The pool must be real, and have a non zero size.
-          os_assert_throw(pool_size_bytes_ > 0, EINVAL);
+          os_assert_throw (pool_size_bytes_ > 0, EINVAL);
           // The pool must fit the storage.
-          os_assert_throw(pool_size_bytes_ >= storage_size, EINVAL);
+          os_assert_throw (pool_size_bytes_ >= storage_size, EINVAL);
         }
 
       // The pool must have a real address.
-      os_assert_throw(pool_addr_ != nullptr, ENOMEM);
+      os_assert_throw (pool_addr_ != nullptr, ENOMEM);
 
       internal_init_ ();
-
     }
 
     /**
@@ -410,15 +404,15 @@ namespace os
 #endif
 
       // There must be no threads waiting for this pool.
-      assert(list_.empty ());
+      assert (list_.empty ());
 
       typedef typename std::allocator_traits<allocator_type>::pointer pointer;
 
       if (allocated_pool_addr_ != nullptr)
         {
-          static_cast<allocator_type*> (const_cast<void*> (allocator_))->deallocate (
-              static_cast<pointer> (allocated_pool_addr_),
-              allocated_pool_size_elements_);
+          static_cast<allocator_type*> (const_cast<void*> (allocator_))
+              ->deallocate (static_cast<pointer> (allocated_pool_addr_),
+                            allocated_pool_size_elements_);
         }
     }
 
@@ -520,58 +514,56 @@ namespace os
 #endif
 
       // Don't call this from interrupt handlers.
-      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
+      os_assert_throw (!interrupts::in_handler_mode (), EPERM);
       // Don't call this from critical regions.
-      os_assert_throw(!scheduler::locked (), EPERM);
+      os_assert_throw (!scheduler::locked (), EPERM);
 
       void* p;
 
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          p = internal_try_first_ ();
-          if (p != nullptr)
-            {
+        p = internal_try_first_ ();
+        if (p != nullptr)
+          {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
-              trace::printf ("%s()=%p @%p %s\n", __func__, p, this, name ());
+            trace::printf ("%s()=%p @%p %s\n", __func__, p, this, name ());
 #endif
-              return p;
-            }
-          // ----- Exit critical section --------------------------------------
-        }
+            return p;
+          }
+        // ----- Exit critical section ----------------------------------------
+      }
 
       thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      internal::waiting_thread_node node
-        { crt_thread };
+      internal::waiting_thread_node node{ crt_thread };
 
       for (;;)
         {
-            {
-              // ----- Enter critical section ---------------------------------
-              interrupts::critical_section ics;
+          {
+            // ----- Enter critical section -----------------------------------
+            interrupts::critical_section ics;
 
-              p = internal_try_first_ ();
-              if (p != nullptr)
-                {
+            p = internal_try_first_ ();
+            if (p != nullptr)
+              {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
-                  trace::printf ("%s()=%p @%p %s\n", __func__, p, this,
-                                 name ());
+                trace::printf ("%s()=%p @%p %s\n", __func__, p, this, name ());
 #endif
-                  return p;
-                }
+                return p;
+              }
 
-              // Add this thread to the memory pool waiting list.
-              scheduler::internal_link_node (list_, node);
-              // state::suspended set in above link().
-              // ----- Exit critical section ----------------------------------
-            }
+            // Add this thread to the memory pool waiting list.
+            scheduler::internal_link_node (list_, node);
+            // state::suspended set in above link().
+            // ----- Exit critical section ------------------------------------
+          }
 
           port::scheduler::reschedule ();
 
@@ -616,16 +608,16 @@ namespace os
 #endif
 
       // Don't call this from high priority interrupts.
-      assert(port::interrupts::is_priority_valid ());
+      assert (port::interrupts::is_priority_valid ());
 
       void* p;
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          p = internal_try_first_ ();
-          // ----- Exit critical section --------------------------------------
-        }
+        p = internal_try_first_ ();
+        // ----- Exit critical section ----------------------------------------
+      }
 
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s()=%p @%p %s\n", __func__, p, this, name ());
@@ -688,67 +680,65 @@ namespace os
 #endif
 
       // Don't call this from interrupt handlers.
-      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
+      os_assert_throw (!interrupts::in_handler_mode (), EPERM);
       // Don't call this from critical regions.
-      os_assert_throw(!scheduler::locked (), EPERM);
+      os_assert_throw (!scheduler::locked (), EPERM);
 
       void* p;
 
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          p = internal_try_first_ ();
-          if (p != nullptr)
-            {
+        p = internal_try_first_ ();
+        if (p != nullptr)
+          {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
-              trace::printf ("%s()=%p @%p %s\n", __func__, p, this, name ());
+            trace::printf ("%s()=%p @%p %s\n", __func__, p, this, name ());
 #endif
-              return p;
-            }
-          // ----- Exit critical section --------------------------------------
-        }
+            return p;
+          }
+        // ----- Exit critical section ----------------------------------------
+      }
 
       thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      internal::waiting_thread_node node
-        { crt_thread };
+      internal::waiting_thread_node node{ crt_thread };
 
       internal::clock_timestamps_list& clock_list = clock_->steady_list ();
       clock::timestamp_t timeout_timestamp = clock_->steady_now () + timeout;
 
       // Prepare a timeout node pointing to the current thread.
-      internal::timeout_thread_node timeout_node
-        { timeout_timestamp, crt_thread };
+      internal::timeout_thread_node timeout_node{ timeout_timestamp,
+                                                  crt_thread };
 
       for (;;)
         {
-            {
-              // ----- Enter critical section ---------------------------------
-              interrupts::critical_section ics;
+          {
+            // ----- Enter critical section -----------------------------------
+            interrupts::critical_section ics;
 
-              p = internal_try_first_ ();
-              if (p != nullptr)
-                {
+            p = internal_try_first_ ();
+            if (p != nullptr)
+              {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
-                  trace::printf ("%s()=%p @%p %s\n", __func__, p, this,
-                                 name ());
+                trace::printf ("%s()=%p @%p %s\n", __func__, p, this, name ());
 #endif
-                  return p;
-                }
+                return p;
+              }
 
-              // Add this thread to the memory pool waiting list,
-              // and the clock timeout list.
-              scheduler::internal_link_node (list_, node, clock_list,
-                                             timeout_node);
-              // state::suspended set in above link().
-              // ----- Exit critical section ----------------------------------
-            }
+            // Add this thread to the memory pool waiting list,
+            // and the clock timeout list.
+            scheduler::internal_link_node (list_, node, clock_list,
+                                           timeout_node);
+            // state::suspended set in above link().
+            // ----- Exit critical section ------------------------------------
+          }
 
           port::scheduler::reschedule ();
 
@@ -795,7 +785,7 @@ namespace os
 #endif
 
       // Don't call this from high priority interrupts.
-      assert(port::interrupts::is_priority_valid ());
+      assert (port::interrupts::is_priority_valid ());
 
       // Validate pointer.
 #pragma GCC diagnostic push
@@ -803,8 +793,8 @@ namespace os
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
       if ((block < pool_addr_)
-          || (block
-              >= (static_cast<char*> (pool_addr_) + blocks_ * block_size_bytes_)))
+          || (block >= (static_cast<char*> (pool_addr_)
+                        + blocks_ * block_size_bytes_)))
         {
 #if defined(OS_TRACE_RTOS_MEMPOOL)
           trace::printf ("%s(%p) EINVAL @%p %s\n", __func__, block, this,
@@ -814,19 +804,19 @@ namespace os
         }
 #pragma GCC diagnostic pop
 
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          // Perform a push_front() on the single linked LIFO list,
-          // i.e. add the block to the beginning of the list.
+        // Perform a push_front() on the single linked LIFO list,
+        // i.e. add the block to the beginning of the list.
 
-          // Link previous list to this block; may be null, but it does
-          // not matter.
-          *(static_cast<void**> (block)) = first_;
+        // Link previous list to this block; may be null, but it does
+        // not matter.
+        *(static_cast<void**> (block)) = first_;
 
-          // Now this block is the first one.
-          first_ = block;
+        // Now this block is the first one.
+        first_ = block;
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -834,11 +824,11 @@ namespace os
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wvolatile"
 #endif
-          --count_;
+        --count_;
 #pragma GCC diagnostic pop
 
-          // ----- Exit critical section --------------------------------------
-        }
+        // ----- Exit critical section ----------------------------------------
+      }
 
       // Wake-up one thread, if any.
       list_.resume_one ();
@@ -860,15 +850,15 @@ namespace os
 #endif
 
       // Don't call this from interrupt handlers.
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err (!interrupts::in_handler_mode (), EPERM);
 
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          internal_init_ ();
-          // ----- Exit critical section --------------------------------------
-        }
+        internal_init_ ();
+        // ----- Exit critical section ----------------------------------------
+      }
 
       // Wake-up all threads, if any.
       // Need not be inside the critical section,
@@ -878,7 +868,7 @@ namespace os
       return result::ok;
     }
 
-  // --------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
   } /* namespace rtos */
 } /* namespace os */

@@ -61,7 +61,8 @@ namespace os
 
       void
       Device::register_endpoint_callback (
-          device::signal_endpoint_event_t cb_func, const void* cb_object) noexcept
+          device::signal_endpoint_event_t cb_func,
+          const void* cb_object) noexcept
       {
         cb_endpoint_func_ = cb_func;
         cb_endpoint_object_ = cb_object;
@@ -77,7 +78,8 @@ namespace os
       }
 
       return_t
-      Device::transfer (endpoint_t ep_addr, uint8_t* data, std::size_t num) noexcept
+      Device::transfer (endpoint_t ep_addr, uint8_t* data,
+                        std::size_t num) noexcept
       {
         assert (data != nullptr);
         if (num == 0)
@@ -100,7 +102,8 @@ namespace os
       }
 
       void
-      Device::signal_endpoint_event (endpoint_t ep_addr, event_t event) noexcept
+      Device::signal_endpoint_event (endpoint_t ep_addr,
+                                     event_t event) noexcept
       {
         if (cb_endpoint_func_ != nullptr)
           {

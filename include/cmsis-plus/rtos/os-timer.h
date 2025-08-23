@@ -55,7 +55,6 @@ namespace os
     class timer : public internal::object_named_system
     {
     public:
-
       /**
        * @brief Timer call back function arguments.
        * @ingroup cmsis-plus-rtos-timer
@@ -80,18 +79,17 @@ namespace os
        */
       struct run
       {
-        enum
-          : type_t
-            {
-              /**
-               * @brief Run only once.
-               */
-              once = 0,
+        enum : type_t
+        {
+          /**
+           * @brief Run only once.
+           */
+          once = 0,
 
-              /**
-               * @brief Run periodically.
-               */
-              periodic = 1      //
+          /**
+           * @brief Run periodically.
+           */
+          periodic = 1 //
         };
       };
 
@@ -108,13 +106,12 @@ namespace os
        */
       struct state
       {
-        enum
-          : state_t
-            {
-              /**
-               * @brief Used to catch uninitialised threads.
-               */
-              undefined = 0,
+        enum : state_t
+        {
+          /**
+           * @brief Used to catch uninitialised threads.
+           */
+          undefined = 0,
           initialized = 1,
           running = 2,
           completed = 3,
@@ -133,7 +130,6 @@ namespace os
       class attributes : public internal::attributes_clocked
       {
       public:
-
         /**
          * @name Constructors & Destructor
          * @{
@@ -144,31 +140,29 @@ namespace os
          * @par Parameters
          *  None.
          */
-        constexpr
-        attributes ();
+        constexpr attributes ();
 
       protected:
-
         /**
          * @cond ignore
          */
 
-        constexpr
-        attributes (type_t type);
+        constexpr attributes (type_t type);
 
         /**
          * @endcond
          */
 
       public:
-
         // The rule of five.
         attributes (const attributes&) = default;
         attributes (attributes&&) = default;
         attributes&
-        operator= (const attributes&) = default;
+        operator= (const attributes&)
+            = default;
         attributes&
-        operator= (attributes&&) = default;
+        operator= (attributes&&)
+            = default;
 
         /**
          * @brief Destruct the timer attributes object instance.
@@ -180,7 +174,6 @@ namespace os
          */
 
       public:
-
         /**
          * @name Public Member Variables
          * @{
@@ -217,7 +210,6 @@ namespace os
       class attributes_periodic : public attributes
       {
       public:
-
         /**
          * @name Constructors & Destructor
          * @{
@@ -228,16 +220,17 @@ namespace os
          * @par Parameters
          *  None.
          */
-        constexpr
-        attributes_periodic ();
+        constexpr attributes_periodic ();
 
         // The rule of five.
         attributes_periodic (const attributes_periodic&) = default;
         attributes_periodic (attributes_periodic&&) = default;
         attributes_periodic&
-        operator= (const attributes_periodic&) = default;
+        operator= (const attributes_periodic&)
+            = default;
         attributes_periodic&
-        operator= (attributes_periodic&&) = default;
+        operator= (attributes_periodic&&)
+            = default;
 
         /**
          * @brief Destruct the periodic timer attributes object instance.
@@ -267,8 +260,8 @@ namespace os
        * @param [in] args Pointer to timer function arguments.
        * @param [in] attr Reference to attributes.
        */
-      timer (func_t function, func_args_t args, const attributes& attr =
-                 once_initializer);
+      timer (func_t function, func_args_t args,
+             const attributes& attr = once_initializer);
 
       /**
        * @brief Construct a named timer object instance.
@@ -287,9 +280,11 @@ namespace os
       timer (const timer&) = delete;
       timer (timer&&) = delete;
       timer&
-      operator= (const timer&) = delete;
+      operator= (const timer&)
+          = delete;
       timer&
-      operator= (timer&&) = delete;
+      operator= (timer&&)
+          = delete;
 
       /**
        * @endcond
@@ -322,7 +317,6 @@ namespace os
        */
 
     public:
-
       /**
        * @name Public Member Functions
        * @{
@@ -355,7 +349,6 @@ namespace os
        */
 
     protected:
-
       /**
        * @name Private Friends
        * @{
@@ -376,7 +369,6 @@ namespace os
        */
 
     protected:
-
       /**
        * @name Private Member Functions
        * @{
@@ -402,7 +394,6 @@ namespace os
        */
 
     protected:
-
       /**
        * @name Private Member Variables
        * @{
@@ -417,8 +408,7 @@ namespace os
 
 #if !defined(OS_USE_RTOS_PORT_TIMER)
       clock* clock_ = nullptr;
-      internal::timer_node timer_node_
-        { 0, *this };
+      internal::timer_node timer_node_{ 0, *this };
       clock::duration_t period_ = 0;
 #endif
 
@@ -439,7 +429,6 @@ namespace os
       /**
        * @}
        */
-
     };
 
 #pragma GCC diagnostic pop
@@ -455,8 +444,7 @@ namespace os
   {
     // ========================================================================
 
-    constexpr
-    timer::attributes::attributes ()
+    constexpr timer::attributes::attributes ()
     {
     }
 
@@ -464,9 +452,7 @@ namespace os
      * @cond ignore
      */
 
-    constexpr
-    timer::attributes::attributes (type_t type) :
-        tm_type (type)
+    constexpr timer::attributes::attributes (type_t type) : tm_type (type)
     {
     }
 
@@ -475,10 +461,8 @@ namespace os
      */
 
     // ========================================================================
-    constexpr
-    timer::attributes_periodic::attributes_periodic () :
-        attributes
-          { run::periodic }
+    constexpr timer::attributes_periodic::attributes_periodic ()
+        : attributes{ run::periodic }
     {
     }
 

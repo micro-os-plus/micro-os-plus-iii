@@ -34,8 +34,8 @@
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
-static const int DAYS_IN_MONTH[12] =
-  { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+static const int DAYS_IN_MONTH[12]
+    = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 #pragma GCC diagnostic pop
 
 #define _DAYS_IN_MONTH(x) ((x == 1) ? days_in_feb : DAYS_IN_MONTH[x])
@@ -45,17 +45,18 @@ static const int DAYS_IN_MONTH[12] =
 #pragma clang diagnostic ignored "-Wreserved-identifier"
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
-static const int _DAYS_BEFORE_MONTH[12] =
-  { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
+static const int _DAYS_BEFORE_MONTH[12]
+    = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
 #pragma GCC diagnostic pop
 
-#define _ISLEAP(y) (((y) % 4) == 0 && (((y) % 100) != 0 || (((y)+1900) % 400) == 0))
-#define _DAYS_IN_YEAR(year) (_ISLEAP(year) ? 366 : 365)
+#define _ISLEAP(y) \
+  (((y) % 4) == 0 && (((y) % 100) != 0 || (((y) + 1900) % 400) == 0))
+#define _DAYS_IN_YEAR(year) (_ISLEAP (year) ? 366 : 365)
 
 #pragma GCC diagnostic pop
 
 static void
-validate_structure (struct tm *tim_p);
+validate_structure (struct tm* tim_p);
 
 time_t
 timegm (struct tm* tim_p);
@@ -74,7 +75,7 @@ timegm (struct tm* tim_p)
 
   /* compute hours, minutes, seconds */
   tim += tim_p->tm_sec + (tim_p->tm_min * _SEC_IN_MINUTE)
-      + (tim_p->tm_hour * _SEC_IN_HOUR);
+         + (tim_p->tm_hour * _SEC_IN_HOUR);
 
   /* compute days in year */
   days += tim_p->tm_mday - 1;
@@ -91,19 +92,19 @@ timegm (struct tm* tim_p)
   tim_p->tm_yday = (int)days;
 
   if (tim_p->tm_year > 10000 || tim_p->tm_year < -10000)
-    return (time_t) -1;
+    return (time_t)-1;
 
   /* compute days in other years */
   if ((year = tim_p->tm_year) > 70)
     {
       for (year = 70; year < tim_p->tm_year; year++)
-        days += _DAYS_IN_YEAR(year);
+        days += _DAYS_IN_YEAR (year);
     }
   else if (year < 70)
     {
       for (year = 69; year > tim_p->tm_year; year--)
-        days -= _DAYS_IN_YEAR(year);
-      days -= _DAYS_IN_YEAR(year);
+        days -= _DAYS_IN_YEAR (year);
+      days -= _DAYS_IN_YEAR (year);
     }
 
   /* compute total seconds */
@@ -121,7 +122,7 @@ timegm (struct tm* tim_p)
  * are also static and cannot be used here.
  */
 static void
-validate_structure (struct tm *tim_p)
+validate_structure (struct tm* tim_p)
 {
   div_t res;
   int days_in_feb = 28;
@@ -193,21 +194,23 @@ validate_structure (struct tm *tim_p)
             {
               tim_p->tm_year--;
               tim_p->tm_mon = 11;
-              days_in_feb = ((_DAYS_IN_YEAR (tim_p->tm_year) == 366) ? 29 : 28);
+              days_in_feb
+                  = ((_DAYS_IN_YEAR (tim_p->tm_year) == 366) ? 29 : 28);
             }
-          tim_p->tm_mday += _DAYS_IN_MONTH(tim_p->tm_mon);
+          tim_p->tm_mday += _DAYS_IN_MONTH (tim_p->tm_mon);
         }
     }
   else
     {
-      while (tim_p->tm_mday > _DAYS_IN_MONTH(tim_p->tm_mon))
+      while (tim_p->tm_mday > _DAYS_IN_MONTH (tim_p->tm_mon))
         {
-          tim_p->tm_mday -= _DAYS_IN_MONTH(tim_p->tm_mon);
+          tim_p->tm_mday -= _DAYS_IN_MONTH (tim_p->tm_mon);
           if (++tim_p->tm_mon == 12)
             {
               tim_p->tm_year++;
               tim_p->tm_mon = 0;
-              days_in_feb = ((_DAYS_IN_YEAR (tim_p->tm_year) == 366) ? 29 : 28);
+              days_in_feb
+                  = ((_DAYS_IN_YEAR (tim_p->tm_year) == 366) ? 29 : 28);
             }
         }
     }

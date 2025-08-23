@@ -30,8 +30,7 @@ namespace os
   {
     // ========================================================================
 
-    directory::directory (directory_impl& impl) :
-        impl_ (impl)
+    directory::directory (directory_impl& impl) : impl_ (impl)
     {
 #if defined(OS_TRACE_POSIX_IO_DIRECTORY)
       trace::printf ("directory::%s()=%p\n", __func__, this);
@@ -107,13 +106,13 @@ namespace os
 
     // ========================================================================
 
-    directory_impl::directory_impl (/* class */ file_system& fs) :
-        file_system_ (fs)
+    directory_impl::directory_impl (/* class */ file_system& fs)
+        : file_system_ (fs)
     {
 #if defined(OS_TRACE_POSIX_IO_DIRECTORY)
       trace::printf ("directory_impl::%s()=%p\n", __func__, this);
 #endif
-      memset (&dir_entry_, 0, sizeof(/* struct */ dirent));
+      memset (&dir_entry_, 0, sizeof (/* struct */ dirent));
     }
 
     directory_impl::~directory_impl ()
@@ -123,7 +122,7 @@ namespace os
 #endif
     }
 
-  // ========================================================================
+    // ========================================================================
 
   } /* namespace posix */
 } /* namespace os */

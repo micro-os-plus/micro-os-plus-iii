@@ -48,9 +48,7 @@ namespace os
       systick_clock::now () noexcept
       {
         const auto ticks = rtos::sysclock.now ();
-        return time_point
-          { duration
-            { ticks } };
+        return time_point{ duration{ ticks } };
       }
 
       // ======================================================================
@@ -59,9 +57,7 @@ namespace os
       realtime_clock::now () noexcept
       {
         const auto secs = rtos::rtclock.now ();
-        return time_point
-          { duration
-            { secs } };
+        return time_point{ duration{ secs } };
       }
 
       realtime_clock::time_point realtime_clock::startup_time_point;
@@ -72,12 +68,12 @@ namespace os
       system_clock::now () noexcept
       {
         const auto ticks = rtos::sysclock.now ();
-        return time_point
-          { duration
-            { systicks
-              { ticks } + realtime_clock::startup_time_point.time_since_epoch () //
-            } //
-          };
+        return time_point{
+          duration{
+              systicks{ ticks }
+              + realtime_clock::startup_time_point.time_since_epoch () //
+          } //
+        };
       }
 
 #pragma GCC diagnostic push
@@ -89,9 +85,9 @@ namespace os
       time_t
       system_clock::to_time_t (const time_point& t) noexcept
       {
-        return time_t (
-            std::chrono::duration_cast<std::chrono::seconds> (
-                t.time_since_epoch ()).count ());
+        return time_t (std::chrono::duration_cast<std::chrono::seconds> (
+                           t.time_since_epoch ())
+                           .count ());
       }
 
 #pragma GCC diagnostic pop
@@ -111,7 +107,8 @@ namespace os
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
-// error: 'long long' is incompatible with C++98 [-Werror,-Wc++98-compat-pedantic]
+// error: 'long long' is incompatible with C++98
+// [-Werror,-Wc++98-compat-pedantic]
 #pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
 #endif
         // The duration is the number of sum of SysTick ticks plus the current
@@ -119,19 +116,18 @@ namespace os
         // Notice: a more exact solution would be to compute
         // ticks * divisor + cycles, but this severely reduces the
         // range of ticks.
-        return time_point
-          { duration
-            { duration
-              { cycles * 1000000000ULL
-                  / rtos::hrclock.input_clock_frequency_hz () }
-                + realtime_clock::startup_time_point.time_since_epoch () } //
-          };
+        return time_point{
+          duration{
+              duration{ cycles * 1000000000ULL
+                        / rtos::hrclock.input_clock_frequency_hz () }
+              + realtime_clock::startup_time_point.time_since_epoch () } //
+        };
 #pragma GCC diagnostic pop
       }
 
 #pragma GCC diagnostic pop
 
-    // ------------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
     } /* namespace chrono */
   } /* namespace estd */

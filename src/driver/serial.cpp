@@ -32,7 +32,7 @@ namespace os
 {
   namespace driver
   {
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     Serial::Serial () noexcept
     {
@@ -49,7 +49,7 @@ namespace os
       trace::printf ("%s() %p\n", __func__, this);
     }
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     void
     Serial::clean (void) noexcept
@@ -68,10 +68,11 @@ namespace os
       modem_status_.ri = false;
     }
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     void
-    Serial::register_callback (signal_event_t cb_func, const void* cb_object) noexcept
+    Serial::register_callback (signal_event_t cb_func,
+                               const void* cb_object) noexcept
     {
       cb_func_ = cb_func;
       cb_object_ = cb_object;
@@ -100,7 +101,8 @@ namespace os
     }
 
     return_t
-    Serial::transfer (const void* data_out, void* data_in, std::size_t num) noexcept
+    Serial::transfer (const void* data_out, void* data_in,
+                      std::size_t num) noexcept
     {
       assert (data_out != nullptr);
       assert (data_in != nullptr);

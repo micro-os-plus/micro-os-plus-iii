@@ -22,15 +22,14 @@ namespace os
 {
   namespace driver
   {
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
     usart_wrapper::usart_wrapper (ARM_DRIVER_USART* driver,
-                                  ARM_USART_SignalEvent_t c_cb_func) noexcept :
-    driver_ (driver),
-    c_cb_func_ (c_cb_func)
-      {
-        trace::printf("%s() %p\n", __func__, this);
-      }
+                                  ARM_USART_SignalEvent_t c_cb_func) noexcept
+        : driver_ (driver), c_cb_func_ (c_cb_func)
+    {
+      trace::printf ("%s() %p\n", __func__, this);
+    }
 
     usart_wrapper::~usart_wrapper () noexcept
     {
@@ -39,7 +38,7 @@ namespace os
       driver_ = nullptr;
     }
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -52,8 +51,8 @@ namespace os
     usart_wrapper::do_get_version (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
-      *(reinterpret_cast<ARM_DRIVER_VERSION*> (&version_)) =
-          driver_->GetVersion ();
+      *(reinterpret_cast<ARM_DRIVER_VERSION*> (&version_))
+          = driver_->GetVersion ();
       return version_;
     }
 
@@ -61,8 +60,8 @@ namespace os
     usart_wrapper::do_get_capabilities (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
-      *(reinterpret_cast<ARM_USART_CAPABILITIES*> (&capa_)) =
-          driver_->GetCapabilities ();
+      *(reinterpret_cast<ARM_USART_CAPABILITIES*> (&capa_))
+          = driver_->GetCapabilities ();
       return capa_;
     }
 
@@ -70,7 +69,8 @@ namespace os
     usart_wrapper::do_get_status (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
-      *(reinterpret_cast<ARM_USART_STATUS*> (&status_)) = driver_->GetStatus ();
+      *(reinterpret_cast<ARM_USART_STATUS*> (&status_))
+          = driver_->GetStatus ();
       return status_;
     }
 
@@ -78,8 +78,8 @@ namespace os
     usart_wrapper::do_get_modem_status (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
-      *(reinterpret_cast<ARM_USART_MODEM_STATUS*> (&modem_status_)) =
-          driver_->GetModemStatus ();
+      *(reinterpret_cast<ARM_USART_MODEM_STATUS*> (&modem_status_))
+          = driver_->GetModemStatus ();
       return modem_status_;
     }
 
@@ -125,7 +125,8 @@ namespace os
     usart_wrapper::do_transfer (const void* data_out, void* data_in,
                                 std::size_t num) noexcept
     {
-      return driver_->Transfer (data_out, data_in, static_cast<uint32_t> (num));
+      return driver_->Transfer (data_out, data_in,
+                                static_cast<uint32_t> (num));
     }
 
     std::size_t
@@ -141,7 +142,8 @@ namespace os
     }
 
     return_t
-    usart_wrapper::do_configure (serial::config_t cfg, serial::config_arg_t arg) noexcept
+    usart_wrapper::do_configure (serial::config_t cfg,
+                                 serial::config_arg_t arg) noexcept
     {
       return driver_->Control (cfg, arg);
     }
@@ -155,7 +157,8 @@ namespace os
         case serial::Control::disable_rx:
         case serial::Control::disable_break:
           return driver_->Control (
-              ctrl - (serial::Control::disable_tx - serial::Control::enable_tx),
+              ctrl
+                  - (serial::Control::disable_tx - serial::Control::enable_tx),
               0);
         }
       return driver_->Control (ctrl, 1);

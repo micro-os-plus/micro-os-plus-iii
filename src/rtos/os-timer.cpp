@@ -43,7 +43,8 @@ namespace os
      *
      * @par POSIX compatibility
      *  No POSIX similar functionality identified, but inspired by POSIX
-     *  attributes used in [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  attributes used in
+     * [<pthread.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
      *  (IEEE Std 1003.1, 2013 Edition).
      */
 
@@ -131,9 +132,8 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    timer::timer (func_t function, func_args_t args, const attributes& attr) :
-        timer
-          { nullptr, function, args, attr }
+    timer::timer (func_t function, func_args_t args, const attributes& attr)
+        : timer{ nullptr, function, args, attr }
     {
     }
 
@@ -164,18 +164,17 @@ namespace os
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     timer::timer (const char* name, func_t function, func_args_t args,
-                  const attributes& attr) :
-        object_named_system
-          { name }
+                  const attributes& attr)
+        : object_named_system{ name }
     {
 #if defined(OS_TRACE_RTOS_TIMER)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
 
       // Don't call this from interrupt handlers.
-      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
+      os_assert_throw (!interrupts::in_handler_mode (), EPERM);
       // Don't call this from critical regions.
-      os_assert_throw(function != nullptr, EINVAL);
+      os_assert_throw (function != nullptr, EINVAL);
 
       type_ = attr.tm_type;
       func_ = function;
@@ -219,16 +218,16 @@ namespace os
 
 #else
 
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          if (state_ == state::running)
-            {
-              timer_node_.unlink ();
-            }
-          // ----- Exit critical section --------------------------------------
-        }
+        if (state_ == state::running)
+          {
+            timer_node_.unlink ();
+          }
+        // ----- Exit critical section ----------------------------------------
+      }
 
 #endif
       state_ = state::destroyed;
@@ -255,7 +254,7 @@ namespace os
 #endif
 
       // Don't call this from interrupt handlers.
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err (!interrupts::in_handler_mode (), EPERM);
 
       if (period == 0)
         {
@@ -274,16 +273,16 @@ namespace os
 
       timer_node_.timestamp = clock_->steady_now () + period;
 
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          // If started, stop.
-          timer_node_.unlink ();
+        // If started, stop.
+        timer_node_.unlink ();
 
-          clock_->steady_list ().link (timer_node_);
-          // ----- Exit critical section --------------------------------------
-        }
+        clock_->steady_list ().link (timer_node_);
+        // ----- Exit critical section ----------------------------------------
+      }
       res = result::ok;
 
 #endif
@@ -312,7 +311,7 @@ namespace os
 #endif
 
       // Don't call this from interrupt handlers.
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err (!interrupts::in_handler_mode (), EPERM);
 
       if (state_ != state::running)
         {
@@ -327,13 +326,13 @@ namespace os
 
 #else
 
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          timer_node_.unlink ();
-          // ----- Exit critical section --------------------------------------
-        }
+        timer_node_.unlink ();
+        // ----- Exit critical section ----------------------------------------
+      }
       res = result::ok;
 
 #endif
@@ -373,13 +372,13 @@ namespace os
       func_ (func_args_);
     }
 
-  /**
-   * @endcond
-   */
+    /**
+     * @endcond
+     */
 
 #endif
 
-  // --------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
   } /* namespace rtos */
 } /* namespace os */

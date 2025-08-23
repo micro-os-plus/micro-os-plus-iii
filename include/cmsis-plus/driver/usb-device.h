@@ -47,7 +47,7 @@ namespace os
     {
       namespace device
       {
-        // ==================================================================
+        // ====================================================================
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -62,24 +62,22 @@ namespace os
         class Capabilities
         {
         public:
-
           // For compatibility with ARM CMSIS, these bits should be
           // exactly in this order.
 
           /** @brief VBUS detection. */
-          bool vbus_detection :1;
+          bool vbus_detection : 1;
 
           /** @brief Signal VBUS On event. */
-          bool event_vbus_on :1;
+          bool event_vbus_on : 1;
 
           /** @brief Signal VBUS Off event. */
-          bool event_vbus_off :1;
-
+          bool event_vbus_off : 1;
         };
 
 #pragma GCC diagnostic pop
 
-        // ==================================================================
+        // ====================================================================
         // ----- USB Device Status -----
 
 #pragma GCC diagnostic push
@@ -95,7 +93,6 @@ namespace os
         class Status
         {
         public:
-
           bool
           is_vbus_on (void) const noexcept;
 
@@ -105,26 +102,25 @@ namespace os
           bool
           is_active (void) const noexcept;
 
-          // ----------------------------------------------------------------
+          // ------------------------------------------------------------------
 
         public:
-
           // For compatibility with ARM CMSIS, these bits should be
           // exactly in this order.
 
           /** @brief USB Device VBUS flag. */
-          bool vbus :1;
+          bool vbus : 1;
 
           /** @brief USB Device speed setting (ARM_USB_SPEED_xxx). */
-          speed_t speed :2;
+          speed_t speed : 2;
 
           /** @brief USB Device active flag. */
-          bool active :1;
+          bool active : 1;
         };
 
 #pragma GCC diagnostic pop
 
-        // ==================================================================
+        // ====================================================================
         // ----- USB Device Events -----
 
         /**
@@ -132,10 +128,9 @@ namespace os
          *
          * @todo Make enum class.
          */
-        enum Device_event
-          : event_t
-            {
-              //
+        enum Device_event : event_t
+        {
+          //
 
           /** @brief USB Device VBUS On. */
           vbus_on = (1UL << 0),
@@ -156,17 +151,14 @@ namespace os
           resume = (1UL << 5)
         };
 
-        // ==================================================================
+        // ====================================================================
         // ----- USB Device Endpoint Events -----
 
         /**
          * @brief USB Device Endpoint Events
          */
-        enum Endpoint_event
-          : event_t
-            {
-              //
-
+        enum Endpoint_event : event_t
+        {
           /** @brief SETUP Packet. */
           setup = (1UL << 0),
 
@@ -177,18 +169,18 @@ namespace os
           in = (1UL << 2),
         };
 
-        // ------------------------------------------------------------------
+        // --------------------------------------------------------------------
 
-        typedef void
-        (*signal_device_event_t) (const void* object, event_t event);
+        typedef void (*signal_device_event_t) (const void* object,
+                                               event_t event);
 
-        typedef void
-        (*signal_endpoint_event_t) (const void* object, endpoint_t ep_addr,
-                                    event_t event);
+        typedef void (*signal_endpoint_event_t) (const void* object,
+                                                 endpoint_t ep_addr,
+                                                 event_t event);
 
       } /* namespace device */
 
-      // ====================================================================
+      // ======================================================================
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -201,8 +193,7 @@ namespace os
       {
 
       public:
-
-        // ------------------------------------------------------------------
+        // --------------------------------------------------------------------
 
         Device () noexcept;
 
@@ -211,15 +202,16 @@ namespace os
         Device (Device&&) = delete;
 
         Device&
-        operator= (const Device&) = delete;
+        operator= (const Device&)
+            = delete;
 
         Device&
-        operator= (Device&&) = delete;
+        operator= (Device&&)
+            = delete;
 
-        virtual
-        ~Device () noexcept override;
+        virtual ~Device () noexcept override;
 
-        // ------------------------------------------------------------------
+        // --------------------------------------------------------------------
 
         /**
          * @brief       Register device event callback.
@@ -236,7 +228,7 @@ namespace os
         register_endpoint_callback (device::signal_endpoint_event_t cb_func,
                                     const void* cb_object = nullptr) noexcept;
 
-        // ------------------------------------------------------------------
+        // --------------------------------------------------------------------
 
         /**
          * @brief       Get driver capabilities
@@ -337,7 +329,8 @@ namespace os
          * @param [in]   ep_addr  Endpoint Address
          *                - ep_addr.0..3: Address
          *                - ep_addr.7:    Direction
-         * @param [out]  data Pointer to buffer for data to read or with data to write
+         * @param [out]  data Pointer to buffer for data to read or with data
+         * to write
          * @param [in]   num  Number of data bytes to transfer
          * @return      Execution status.
          */
@@ -386,53 +379,65 @@ namespace os
         signal_endpoint_event (endpoint_t ep_addr, event_t event) noexcept;
 
       protected:
-
         virtual const device::Capabilities&
-        do_get_capabilities (void) noexcept = 0;
+        do_get_capabilities (void) noexcept
+            = 0;
 
         virtual return_t
-        do_connect (void) noexcept = 0;
+        do_connect (void) noexcept
+            = 0;
 
         virtual return_t
-        do_disconnect (void) noexcept = 0;
+        do_disconnect (void) noexcept
+            = 0;
 
         virtual device::Status&
-        do_get_status (void) noexcept = 0;
+        do_get_status (void) noexcept
+            = 0;
 
         virtual return_t
-        do_wakeup_remote (void) noexcept = 0;
+        do_wakeup_remote (void) noexcept
+            = 0;
 
         virtual return_t
-        do_configure_address (device_address_t dev_addr) noexcept = 0;
+        do_configure_address (device_address_t dev_addr) noexcept
+            = 0;
 
         virtual return_t
-        do_read_setup_packet (uint8_t* buf) noexcept = 0;
+        do_read_setup_packet (uint8_t* buf) noexcept
+            = 0;
 
         virtual frame_number_t
-        do_get_frame_number (void) noexcept = 0;
+        do_get_frame_number (void) noexcept
+            = 0;
 
         virtual return_t
         do_configure_endpoint (endpoint_t ep_addr, Endpoint_type ep_type,
-                               packet_size_t ep_max_packet_size) noexcept = 0;
+                               packet_size_t ep_max_packet_size) noexcept
+            = 0;
 
         virtual return_t
-        do_unconfigure_endpoint (endpoint_t ep_addr) noexcept = 0;
+        do_unconfigure_endpoint (endpoint_t ep_addr) noexcept
+            = 0;
 
         virtual return_t
-        do_stall_endpoint (endpoint_t ep_addr, bool stall) noexcept = 0;
+        do_stall_endpoint (endpoint_t ep_addr, bool stall) noexcept
+            = 0;
 
         virtual return_t
-        do_transfer (endpoint_t ep_addr, uint8_t* data, std::size_t num)
-            noexcept = 0;
+        do_transfer (endpoint_t ep_addr, uint8_t* data,
+                     std::size_t num) noexcept
+            = 0;
 
         virtual std::size_t
-        do_get_transfer_count (endpoint_t ep_addr) noexcept = 0;
+        do_get_transfer_count (endpoint_t ep_addr) noexcept
+            = 0;
 
         virtual return_t
-        do_abort_transfer (endpoint_t ep_addr) noexcept = 0;
+        do_abort_transfer (endpoint_t ep_addr) noexcept
+            = 0;
 
       private:
-
         /// Pointer to static function that implements the device callback.
         device::signal_device_event_t cb_device_func_;
 
@@ -446,7 +451,6 @@ namespace os
         const void* cb_endpoint_object_;
 
       protected:
-
         device::Status status_;
       };
 
@@ -479,7 +483,7 @@ namespace os
 
       } /* namespace device */
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
       inline const device::Capabilities&
       Device::get_capabilities (void) noexcept

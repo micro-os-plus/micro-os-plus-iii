@@ -27,23 +27,23 @@ extern "C"
 {
 #endif
 
-// ----------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
-//  typedef struct
-//  {
-//  }fd_set;
-//
-//  struct timeval
-//  {
-//    time_t tv_sec;      // Seconds.
-//    suseconds_t tv_usec;     // Microseconds.
-//  };
+  //  typedef struct
+  //  {
+  //  }fd_set;
+  //
+  //  struct timeval
+  //  {
+  //    time_t tv_sec;      // Seconds.
+  //    suseconds_t tv_usec;     // Microseconds.
+  //  };
 
   int
   select (int nfds, fd_set* readfds, fd_set* writefds, fd_set* errorfds,
           struct timeval* timeout);
 
-// ----------------------------------------------------------------------------
+  // --------------------------------------------------------------------------
 
 #ifdef __cplusplus
 }

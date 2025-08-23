@@ -50,8 +50,10 @@ namespace os
      *
      * @par POSIX compatibility
      *  No POSIX similar functionality identified, but inspired by POSIX
-     *  attributes used in [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  attributes used in
+     * [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
 
     /**
@@ -74,8 +76,7 @@ namespace os
      * @details
      * This variable is used by the default constructor.
      */
-    const semaphore::attributes_binary semaphore::initializer_binary
-      { 0 };
+    const semaphore::attributes_binary semaphore::initializer_binary{ 0 };
 
     // ------------------------------------------------------------------------
 
@@ -105,8 +106,10 @@ namespace os
      *
      * @par POSIX compatibility
      *  Inspired by `sem_t`
-     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  from
+     * [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
 
     /**
@@ -133,15 +136,17 @@ namespace os
      * the semaphore attributes shall not be affected.
      *
      * @par POSIX compatibility
-     *  Inspired by [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
-     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by
+     * [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
+     *  from
+     * [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    semaphore::semaphore (const char* name, const attributes& attr) :
-        semaphore
-          { name, attr.sm_max_value, attr.sm_initial_value, attr }
+    semaphore::semaphore (const char* name, const attributes& attr)
+        : semaphore{ name, attr.sm_max_value, attr.sm_initial_value, attr }
     {
     }
 
@@ -150,15 +155,15 @@ namespace os
      */
 
     semaphore::semaphore (const char* name, const count_t max_value,
-                          const count_t initial_value, const attributes& attr
+                          const count_t initial_value,
+                          const attributes& attr
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
-                          __attribute__((unused))
+                          __attribute__ ((unused))
 #endif
-                          ) :
-        object_named_system
-          { name }, //
-        max_value_ (max_value), //
-        initial_value_ (initial_value)
+                          )
+        : object_named_system{ name }, //
+          max_value_ (max_value), //
+          initial_value_ (initial_value)
     {
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s %u %u\n", __func__, this, this->name (),
@@ -166,13 +171,13 @@ namespace os
 #endif
 
       // Don't call this from interrupt handlers.
-      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
+      os_assert_throw (!interrupts::in_handler_mode (), EPERM);
 
       // The CMSIS validator requires the max_value to be equal to
       // the initial count, which can be 0, but we patch it on the way.
-      assert(max_value_ > 0);
-      assert(initial_value >= 0);
-      assert(initial_value <= max_value_);
+      assert (max_value_ > 0);
+      assert (initial_value >= 0);
+      assert (initial_value <= max_value_);
 
       count_ = initial_value;
 
@@ -207,9 +212,12 @@ namespace os
      * is undefined.
      *
      * @par POSIX compatibility
-     *  Inspired by [`sem_destroy()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_destroy.html)
-     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by
+     * [`sem_destroy()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_destroy.html)
+     *  from
+     * [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -226,7 +234,7 @@ namespace os
 #else
 
       // There must be no threads waiting for this semaphore.
-      assert(list_.empty ());
+      assert (list_.empty ());
 
 #endif
     }
@@ -275,7 +283,7 @@ namespace os
           return true;
         }
 
-      // Count may be 0.
+        // Count may be 0.
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s false\n", __func__, this, name ());
 #endif
@@ -315,13 +323,17 @@ namespace os
      * the semantics are as per SCHED_FIFO.
      *
      * @par POSIX compatibility
-     *  Inspired by [`sem_post()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_post.html)
-     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by
+     * [`sem_post()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_post.html)
+     *  from
+     * [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @note Can be invoked from Interrupt Service Routines.
      *
-     * @warning Applications using these functions may be subject to priority inversion.
+     * @warning Applications using these functions may be subject to priority
+     * inversion.
      */
     result_t
     semaphore::post (void)
@@ -338,19 +350,19 @@ namespace os
 #else
 
       // Don't call this from high priority interrupts.
-      assert(port::interrupts::is_priority_valid ());
+      assert (port::interrupts::is_priority_valid ());
 
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          if (count_ >= this->max_value_)
-            {
+        if (count_ >= this->max_value_)
+          {
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
-              trace::printf ("%s() @%p %s EAGAIN\n", __func__, this, name ());
+            trace::printf ("%s() @%p %s EAGAIN\n", __func__, this, name ());
 #endif
-              return EAGAIN;
-            }
+            return EAGAIN;
+          }
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -358,15 +370,15 @@ namespace os
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wvolatile"
 #endif
-          ++count_;
+        ++count_;
 #pragma GCC diagnostic pop
 
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
-          trace::printf ("%s() @%p %s count %u\n", __func__, this, name (),
-                         count_);
+        trace::printf ("%s() @%p %s count %u\n", __func__, this, name (),
+                       count_);
 #endif
-          // ----- Exit critical section --------------------------------------
-        }
+        // ----- Exit critical section ----------------------------------------
+      }
 
       // Wake-up one thread.
       list_.resume_one ();
@@ -396,13 +408,17 @@ namespace os
      * event (signal, thread cancel, etc).
      *
      * @par POSIX compatibility
-     *  Inspired by [`sem_wait()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_wait.html)
-     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by
+     * [`sem_wait()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_wait.html)
+     *  from
+     * [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      *
-     * @warning Applications using these functions may be subject to priority inversion.
+     * @warning Applications using these functions may be subject to priority
+     * inversion.
      */
     result_t
     semaphore::wait ()
@@ -412,9 +428,9 @@ namespace os
 #endif
 
       // Don't call this from interrupt handlers.
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err (!interrupts::in_handler_mode (), EPERM);
       // Don't call this from critical regions.
-      os_assert_err(!scheduler::locked (), EPERM);
+      os_assert_err (!scheduler::locked (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
@@ -424,41 +440,40 @@ namespace os
 
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          if (internal_try_wait_ ())
-            {
-              return result::ok;
-            }
-          // ----- Exit critical section --------------------------------------
-        }
+        if (internal_try_wait_ ())
+          {
+            return result::ok;
+          }
+        // ----- Exit critical section ----------------------------------------
+      }
 
       thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      internal::waiting_thread_node node
-        { crt_thread };
+      internal::waiting_thread_node node{ crt_thread };
 
       for (;;)
         {
-            {
-              // ----- Enter critical section ---------------------------------
-              interrupts::critical_section ics;
+          {
+            // ----- Enter critical section -----------------------------------
+            interrupts::critical_section ics;
 
-              if (internal_try_wait_ ())
-                {
-                  return result::ok;
-                }
+            if (internal_try_wait_ ())
+              {
+                return result::ok;
+              }
 
-              // Add this thread to the semaphore waiting list.
-              scheduler::internal_link_node (list_, node);
-              // state::suspended set in above link().
-              // ----- Exit critical section ----------------------------------
-            }
+            // Add this thread to the semaphore waiting list.
+            scheduler::internal_link_node (list_, node);
+            // state::suspended set in above link().
+            // ----- Exit critical section ------------------------------------
+          }
 
           port::scheduler::reschedule ();
 
@@ -493,13 +508,17 @@ namespace os
      * function is executed and returns successfully.
      *
      * @par POSIX compatibility
-     *  Inspired by [`sem_trywait()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_trywait.html)
-     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by
+     * [`sem_trywait()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_trywait.html)
+     *  from
+     * [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @note Can be invoked from Interrupt Service Routines.
      *
-     * @warning Applications using these functions may be subject to priority inversion.
+     * @warning Applications using these functions may be subject to priority
+     * inversion.
      */
     result_t
     semaphore::try_wait ()
@@ -509,7 +528,7 @@ namespace os
 #endif
 
       // Don't call this from high priority interrupts.
-      assert(port::interrupts::is_priority_valid ());
+      assert (port::interrupts::is_priority_valid ());
 
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
@@ -517,20 +536,20 @@ namespace os
 
 #else
 
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          if (internal_try_wait_ ())
-            {
-              return result::ok;
-            }
-          else
-            {
-              return EWOULDBLOCK;
-            }
-          // ----- Exit critical section --------------------------------------
-        }
+        if (internal_try_wait_ ())
+          {
+            return result::ok;
+          }
+        else
+          {
+            return EWOULDBLOCK;
+          }
+        // ----- Exit critical section ----------------------------------------
+      }
 
 #endif
     }
@@ -558,9 +577,12 @@ namespace os
      * timer is used, and the durations are expressed in ticks.
      *
      * @par POSIX compatibility
-     *  Inspired by [`sem_timedwait()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_timedwait.html)
-     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by
+     * [`sem_timedwait()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_timedwait.html)
+     *  from
+     * [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *  <br>Differences from the standard:
      *  - the timeout is not expressed as an absolute time point, but
      * as a relative number of timer ticks (by default, the SysTick
@@ -569,7 +591,8 @@ namespace os
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      *
-     * @warning Applications using these functions may be subject to priority inversion.
+     * @warning Applications using these functions may be subject to priority
+     * inversion.
      */
     result_t
     semaphore::timed_wait (clock::duration_t timeout)
@@ -587,9 +610,9 @@ namespace os
 #endif
 
       // Don't call this from interrupt handlers.
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err (!interrupts::in_handler_mode (), EPERM);
       // Don't call this from critical regions.
-      os_assert_err(!scheduler::locked (), EPERM);
+      os_assert_err (!scheduler::locked (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
@@ -599,50 +622,49 @@ namespace os
 
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          if (internal_try_wait_ ())
-            {
-              return result::ok;
-            }
-          // ----- Exit critical section --------------------------------------
-        }
+        if (internal_try_wait_ ())
+          {
+            return result::ok;
+          }
+        // ----- Exit critical section ----------------------------------------
+      }
 
       thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      internal::waiting_thread_node node
-        { crt_thread };
+      internal::waiting_thread_node node{ crt_thread };
 
       internal::clock_timestamps_list& clock_list = clock_->steady_list ();
       clock::timestamp_t timeout_timestamp = clock_->steady_now () + timeout;
 
       // Prepare a timeout node pointing to the current thread.
-      internal::timeout_thread_node timeout_node
-        { timeout_timestamp, crt_thread };
+      internal::timeout_thread_node timeout_node{ timeout_timestamp,
+                                                  crt_thread };
 
       for (;;)
         {
-            {
-              // ----- Enter critical section ---------------------------------
-              interrupts::critical_section ics;
+          {
+            // ----- Enter critical section -----------------------------------
+            interrupts::critical_section ics;
 
-              if (internal_try_wait_ ())
-                {
-                  return result::ok;
-                }
+            if (internal_try_wait_ ())
+              {
+                return result::ok;
+              }
 
-              // Add this thread to the semaphore waiting list,
-              // and the clock timeout list.
-              scheduler::internal_link_node (list_, node, clock_list,
-                                             timeout_node);
-              // state::suspended set in above link().
-              // ----- Exit critical section ----------------------------------
-            }
+            // Add this thread to the semaphore waiting list,
+            // and the clock timeout list.
+            scheduler::internal_link_node (list_, node, clock_list,
+                                           timeout_node);
+            // state::suspended set in above link().
+            // ----- Exit critical section ------------------------------------
+          }
 
           port::scheduler::reschedule ();
 
@@ -705,9 +727,12 @@ namespace os
      * at some unspecified time during the call.
      *
      * @par POSIX compatibility
-     *  Inspired by [`sem_getvalue()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_getvalue.html)
-     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by
+     * [`sem_getvalue()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_getvalue.html)
+     *  from
+     * [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @note Can be invoked from Interrupt Service Routines.
      */
@@ -738,7 +763,7 @@ namespace os
 #endif
 
       // Don't call this from interrupt handlers.
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err (!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
@@ -746,19 +771,19 @@ namespace os
 
 #else
 
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          internal_init_ ();
-          return result::ok;
-          // ----- Exit critical section --------------------------------------
-        }
+        internal_init_ ();
+        return result::ok;
+        // ----- Exit critical section ----------------------------------------
+      }
 
 #endif
     }
 
-  // --------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
   } /* namespace rtos */
 } /* namespace os */

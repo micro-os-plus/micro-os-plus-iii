@@ -85,9 +85,9 @@ int
 __posix_open (const char* path, int oflag, ...)
 {
   va_list args;
-  va_start(args, oflag);
+  va_start (args, oflag);
   auto* const io = posix::vopen (path, oflag, args);
-  va_end(args);
+  va_end (args);
 
   if (io == nullptr)
     {
@@ -172,16 +172,18 @@ __posix_ioctl (int fildes, int request, ...)
     }
 
   // Works only on STREAMS (CherDevices, in this implementation)
-  if ((io->get_type () & static_cast<posix::io::type_t>(posix::io::type::char_device)) == 0)
+  if ((io->get_type ()
+       & static_cast<posix::io::type_t> (posix::io::type::char_device))
+      == 0)
     {
       errno = ENOTTY; // Not a stream.
       return -1;
     }
 
   va_list args;
-  va_start(args, request);
+  va_start (args, request);
   int ret = (static_cast<posix::char_device*> (io))->vioctl (request, args);
-  va_end(args);
+  va_end (args);
 
   return ret;
 }
@@ -197,7 +199,9 @@ __posix_lseek (int fildes, off_t offset, int whence)
     }
 
   // Works only on files (Does not work on sockets, pipes or FIFOs...)
-  if ((io->get_type () & static_cast<posix::io::type_t>(posix::io::type::file)) == 0)
+  if ((io->get_type ()
+       & static_cast<posix::io::type_t> (posix::io::type::file))
+      == 0)
     {
       errno = ESPIPE; // Not a file.
       return -1;
@@ -238,7 +242,8 @@ __posix_tcdrain (int fildes)
     }
 
   // Works only on tty...)
-  if ((io->get_type () & static_cast<posix::io::type_t>(posix::io::type::tty)) == 0)
+  if ((io->get_type () & static_cast<posix::io::type_t> (posix::io::type::tty))
+      == 0)
     {
       errno = ESPIPE; // Not a tty.
       return -1;
@@ -248,7 +253,7 @@ __posix_tcdrain (int fildes)
 }
 
 int
-__posix_tcgetattr (int fildes, /* struct */ termios *termios_p)
+__posix_tcgetattr (int fildes, /* struct */ termios* termios_p)
 {
   auto* const io = posix::file_descriptors_manager::io (fildes);
   if (io == nullptr)
@@ -258,7 +263,8 @@ __posix_tcgetattr (int fildes, /* struct */ termios *termios_p)
     }
 
   // Works only on tty...)
-  if ((io->get_type () & static_cast<posix::io::type_t>(posix::io::type::tty)) == 0)
+  if ((io->get_type () & static_cast<posix::io::type_t> (posix::io::type::tty))
+      == 0)
     {
       errno = ESPIPE; // Not a tty.
       return -1;
@@ -269,7 +275,7 @@ __posix_tcgetattr (int fildes, /* struct */ termios *termios_p)
 
 int
 __posix_tcsetattr (int fildes, int optional_actions,
-                   const /* struct */ termios *termios_p)
+                   const /* struct */ termios* termios_p)
 {
   auto* const io = posix::file_descriptors_manager::io (fildes);
   if (io == nullptr)
@@ -279,14 +285,15 @@ __posix_tcsetattr (int fildes, int optional_actions,
     }
 
   // Works only on tty...)
-  if ((io->get_type () & static_cast<posix::io::type_t>(posix::io::type::tty)) == 0)
+  if ((io->get_type () & static_cast<posix::io::type_t> (posix::io::type::tty))
+      == 0)
     {
       errno = ESPIPE; // Not a tty.
       return -1;
     }
 
-  return (static_cast<posix::tty*> (io))->tcsetattr (optional_actions,
-                                                     termios_p);
+  return (static_cast<posix::tty*> (io))
+      ->tcsetattr (optional_actions, termios_p);
 }
 
 int
@@ -300,7 +307,8 @@ __posix_tcflush (int fildes, int queue_selector)
     }
 
   // Works only on tty...)
-  if ((io->get_type () & static_cast<posix::io::type_t>(posix::io::type::tty)) == 0)
+  if ((io->get_type () & static_cast<posix::io::type_t> (posix::io::type::tty))
+      == 0)
     {
       errno = ESPIPE; // Not a tty.
       return -1;
@@ -320,7 +328,8 @@ __posix_tcsendbreak (int fildes, int duration)
     }
 
   // Works only on tty...)
-  if ((io->get_type () & static_cast<posix::io::type_t>(posix::io::type::tty)) == 0)
+  if ((io->get_type () & static_cast<posix::io::type_t> (posix::io::type::tty))
+      == 0)
     {
       errno = ESPIPE; // Not a tty.
       return -1;
@@ -340,9 +349,9 @@ __posix_fcntl (int fildes, int cmd, ...)
     }
 
   va_list args;
-  va_start(args, cmd);
+  va_start (args, cmd);
   int ret = io->vfcntl (cmd, args);
-  va_end(args);
+  va_end (args);
 
   return ret;
 }
@@ -370,7 +379,9 @@ __posix_fstatvfs (int fildes, struct statvfs* buf)
     }
 
   // Works only on files (Does not work on sockets, pipes or FIFOs...)
-  if ((io->get_type () & static_cast<posix::io::type_t>(posix::io::type::file)) == 0)
+  if ((io->get_type ()
+       & static_cast<posix::io::type_t> (posix::io::type::file))
+      == 0)
     {
       errno = EINVAL; // Not a file.
       return -1;
@@ -390,7 +401,9 @@ __posix_ftruncate (int fildes, off_t length)
     }
 
   // Works only on files (Does not work on sockets, pipes or FIFOs...)
-  if ((io->get_type () & static_cast<posix::io::type_t>(posix::io::type::file)) == 0)
+  if ((io->get_type ()
+       & static_cast<posix::io::type_t> (posix::io::type::file))
+      == 0)
     {
       errno = EINVAL; // Not a file.
       return -1;
@@ -410,7 +423,9 @@ __posix_fsync (int fildes)
     }
 
   // Works only on files (Does not work on sockets, pipes or FIFOs...)
-  if ((io->get_type () & static_cast<posix::io::type_t>(posix::io::type::file)) == 0)
+  if ((io->get_type ()
+       & static_cast<posix::io::type_t> (posix::io::type::file))
+      == 0)
     {
       errno = EINVAL; // Not a file.
       return -1;
@@ -585,7 +600,8 @@ __posix_socketpair (int domain, int type, int protocol, int socket_vector[2])
 #endif
 
 int
-__posix_accept (int socket, /* struct */ sockaddr* address, socklen_t* address_len)
+__posix_accept (int socket, /* struct */ sockaddr* address,
+                socklen_t* address_len)
 {
   auto* const io = posix::file_descriptors_manager::socket (socket);
   if (io == nullptr)
@@ -598,7 +614,8 @@ __posix_accept (int socket, /* struct */ sockaddr* address, socklen_t* address_l
 }
 
 int
-__posix_bind (int socket, const /* struct */ sockaddr* address, socklen_t address_len)
+__posix_bind (int socket, const /* struct */ sockaddr* address,
+              socklen_t address_len)
 {
   auto* const io = posix::file_descriptors_manager::socket (socket);
   if (io == nullptr)
@@ -807,14 +824,15 @@ __posix_sockatmark (int socket)
 // ----------------------------------------------------------------------------
 // Not yet implemented.
 
-int __attribute__((weak))
-__posix_readdir_r (DIR* dirp, /* struct */ dirent* entry, /* struct */ dirent** result)
+int __attribute__ ((weak))
+__posix_readdir_r (DIR* dirp, /* struct */ dirent* entry,
+                   /* struct */ dirent** result)
 {
   errno = ENOSYS; // Not implemented
   return -1;
 }
 
-int __attribute__((weak))
+int __attribute__ ((weak))
 __posix_socketpair (int domain, int type, int protocol, int socket_vector[2])
 {
   errno = ENOSYS; // Not implemented
@@ -923,7 +941,7 @@ __posix_raise (int sig)
 }
 
 int
-__posix_system (const char *command)
+__posix_system (const char* command)
 {
   errno = ENOSYS; // Not implemented
   return -1;
@@ -1014,4 +1032,3 @@ initialise_monitor_handles (void)
 #endif /* !defined(OS_USE_SEMIHOSTING_SYSCALLS) */
 
 // ----------------------------------------------------------------------------
-

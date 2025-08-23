@@ -38,7 +38,7 @@ using namespace os;
 #if defined(OS_TYPE_APPLICATION_MEMORY_RESOURCE)
 using application_memory_resource = OS_TYPE_APPLICATION_MEMORY_RESOURCE;
 #else
-//using free_store_memory_resource = os::memory::lifo;
+// using free_store_memory_resource = os::memory::lifo;
 using application_memory_resource = os::memory::first_fit_top;
 #endif
 
@@ -56,8 +56,9 @@ sbrk (ptrdiff_t incr);
 #if !defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS)
 
 // Reserve storage for the application memory resource.
-static std::aligned_storage<sizeof(application_memory_resource),
-    alignof(application_memory_resource)>::type application_free_store;
+static std::aligned_storage<sizeof (application_memory_resource),
+                            alignof (application_memory_resource)>::type
+    application_free_store;
 
 #endif /* !defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS) */
 
@@ -77,7 +78,7 @@ static std::aligned_storage<sizeof(application_memory_resource),
  * For special applications, it is possible to override this
  * function entirely.
  */
-void __attribute__((weak))
+void __attribute__ ((weak))
 os_startup_initialize_free_store (void* heap_address,
                                   std::size_t heap_size_bytes)
 {
@@ -86,12 +87,12 @@ os_startup_initialize_free_store (void* heap_address,
 #if !defined(OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS)
 
   // Construct the memory resource used for the application free store.
-  new (&application_free_store) application_memory_resource
-    { "app", heap_address, heap_size_bytes };
+  new (&application_free_store)
+      application_memory_resource{ "app", heap_address, heap_size_bytes };
 
   // Configure the memory manager to throw an exception when out of memory.
-  reinterpret_cast<rtos::memory::memory_resource*> (&application_free_store)->out_of_memory_handler (
-      os_rtos_application_out_of_memory_hook);
+  reinterpret_cast<rtos::memory::memory_resource*> (&application_free_store)
+      ->out_of_memory_handler (os_rtos_application_out_of_memory_hook);
 
   // Set the application free store memory manager.
   estd::pmr::set_default_resource (
@@ -102,169 +103,177 @@ os_startup_initialize_free_store (void* heap_address,
 #pragma GCC diagnostic ignored "-Wuseless-cast"
   sbrk (
       static_cast<char*> (static_cast<char*> (heap_address) + heap_size_bytes)
-          - static_cast<char*> (sbrk (0)));
+      - static_cast<char*> (sbrk (0)));
 #pragma GCC diagnostic pop
 
 #if defined(OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES)
 
-    {
-      // Allocate the RTOS dynamic memory on the application free store.
-      void* rtos_arena =
-          reinterpret_cast<rtos::memory::memory_resource*> (&application_free_store)->allocate (
-          OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES);
+  {
+    // Allocate the RTOS dynamic memory on the application free store.
+    void* rtos_arena
+        = reinterpret_cast<rtos::memory::memory_resource*> (
+              &application_free_store)
+              ->allocate (OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES);
 
-      // Allocate & construct the memory resource used for the RTOS.
-      rtos::memory::memory_resource* mr = new rtos_memory_resource
-        { "sys", rtos_arena, OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES };
+    // Allocate & construct the memory resource used for the RTOS.
+    rtos::memory::memory_resource* mr = new rtos_memory_resource{
+      "sys", rtos_arena, OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES
+    };
 
-      // Configure the memory manager to throw an exception when out of memory.
-      mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
+    // Configure the memory manager to throw an exception when out of memory.
+    mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
 
-      // Set RTOS system memory manager.
-      rtos::memory::set_default_resource (mr);
-    }
+    // Set RTOS system memory manager.
+    rtos::memory::set_default_resource (mr);
+  }
 
 #else
 
   // The RTOS system memory manager is identical with the application one.
   rtos::memory::set_default_resource (
-      reinterpret_cast<rtos::memory::memory_resource*> (&application_free_store));
+      reinterpret_cast<rtos::memory::memory_resource*> (
+          &application_free_store));
 
 #endif /* defined(OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES) */
 
 #if defined(OS_INTEGER_RTOS_ALLOC_THREAD_POOL_SIZE)
 
-    {
-      static_assert(OS_INTEGER_RTOS_ALLOC_THREAD_POOL_SIZE > 1,
-          "Mutex pool size must be >1.");
-      rtos::memory::memory_resource* mr =
-          new os::memory::block_pool_typed_inclusive<rtos::thread,
-              OS_INTEGER_RTOS_ALLOC_THREAD_POOL_SIZE> ("pool-th");
+  {
+    static_assert (OS_INTEGER_RTOS_ALLOC_THREAD_POOL_SIZE > 1,
+                   "Mutex pool size must be >1.");
+    rtos::memory::memory_resource* mr
+        = new os::memory::block_pool_typed_inclusive<
+            rtos::thread, OS_INTEGER_RTOS_ALLOC_THREAD_POOL_SIZE> ("pool-th");
 
-      // Configure the memory manager to throw an exception when out of memory.
-      mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
+    // Configure the memory manager to throw an exception when out of memory.
+    mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
 
-      rtos::memory::set_resource_typed<rtos::thread> (mr);
-    }
+    rtos::memory::set_resource_typed<rtos::thread> (mr);
+  }
 
 #endif /* defined(OS_INTEGER_RTOS_ALLOC_THREAD_POOL_SIZE) */
 
 #if defined(OS_INTEGER_RTOS_ALLOC_CONDITION_VARIABLE_POOL_SIZE)
 
-    {
-      static_assert(OS_INTEGER_RTOS_ALLOC_CONDITION_VARIABLE_POOL_SIZE > 1,
-          "Mutex pool size must be >1.");
-      rtos::memory::memory_resource* mr =
-          new os::memory::block_pool_typed_inclusive<rtos::condition_variable,
-              OS_INTEGER_RTOS_ALLOC_CONDITION_VARIABLE_POOL_SIZE> ("pool-cv");
+  {
+    static_assert (OS_INTEGER_RTOS_ALLOC_CONDITION_VARIABLE_POOL_SIZE > 1,
+                   "Mutex pool size must be >1.");
+    rtos::memory::memory_resource* mr
+        = new os::memory::block_pool_typed_inclusive<
+            rtos::condition_variable,
+            OS_INTEGER_RTOS_ALLOC_CONDITION_VARIABLE_POOL_SIZE> ("pool-cv");
 
-      // Configure the memory manager to throw an exception when out of memory.
-      mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
+    // Configure the memory manager to throw an exception when out of memory.
+    mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
 
-      rtos::memory::set_resource_typed<rtos::condition_variable> (mr);
-    }
+    rtos::memory::set_resource_typed<rtos::condition_variable> (mr);
+  }
 
 #endif /* defined(OS_INTEGER_RTOS_ALLOC_CONDITION_VARIABLE_POOL_SIZE) */
 
 #if defined(OS_INTEGER_RTOS_ALLOC_EVENT_FLAGS_POOL_SIZE)
 
-    {
-      static_assert(OS_INTEGER_RTOS_ALLOC_EVENT_FLAGS_POOL_SIZE > 1,
-          "Mutex pool size must be >1.");
-      rtos::memory::memory_resource* mr =
-          new os::memory::block_pool_typed_inclusive<rtos::event_flags,
-              OS_INTEGER_RTOS_ALLOC_EVENT_FLAGS_POOL_SIZE> ("pool-ef");
+  {
+    static_assert (OS_INTEGER_RTOS_ALLOC_EVENT_FLAGS_POOL_SIZE > 1,
+                   "Mutex pool size must be >1.");
+    rtos::memory::memory_resource* mr
+        = new os::memory::block_pool_typed_inclusive<
+            rtos::event_flags, OS_INTEGER_RTOS_ALLOC_EVENT_FLAGS_POOL_SIZE> (
+            "pool-ef");
 
-      // Configure the memory manager to throw an exception when out of memory.
-      mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
+    // Configure the memory manager to throw an exception when out of memory.
+    mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
 
-      rtos::memory::set_resource_typed<rtos::event_flags> (mr);
-    }
+    rtos::memory::set_resource_typed<rtos::event_flags> (mr);
+  }
 
 #endif /* defined(OS_INTEGER_RTOS_ALLOC_EVENT_FLAGS_POOL_SIZE) */
 
 #if defined(OS_INTEGER_RTOS_ALLOC_MEMORY_POOL_POOL_SIZE)
 
-    {
-      static_assert(OS_INTEGER_RTOS_ALLOC_MEMORY_POOL_POOL_SIZE > 1,
-          "Mutex pool size must be >1.");
-      rtos::memory::memory_resource* mr =
-          new os::memory::block_pool_typed_inclusive<rtos::memory_pool,
-              OS_INTEGER_RTOS_ALLOC_MEMORY_POOL_POOL_SIZE> ("pool-mp");
+  {
+    static_assert (OS_INTEGER_RTOS_ALLOC_MEMORY_POOL_POOL_SIZE > 1,
+                   "Mutex pool size must be >1.");
+    rtos::memory::memory_resource* mr
+        = new os::memory::block_pool_typed_inclusive<
+            rtos::memory_pool, OS_INTEGER_RTOS_ALLOC_MEMORY_POOL_POOL_SIZE> (
+            "pool-mp");
 
-      // Configure the memory manager to throw an exception when out of memory.
-      mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
+    // Configure the memory manager to throw an exception when out of memory.
+    mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
 
-      rtos::memory::set_resource_typed<rtos::memory_pool> (mr);
-    }
+    rtos::memory::set_resource_typed<rtos::memory_pool> (mr);
+  }
 
 #endif /* defined(OS_INTEGER_RTOS_ALLOC_MEMORY_POOL_POOL_SIZE) */
 
 #if defined(OS_INTEGER_RTOS_ALLOC_MESSAGE_QUEUE_POOL_SIZE)
 
-    {
-      static_assert(OS_INTEGER_RTOS_ALLOC_MESSAGE_QUEUE_POOL_SIZE > 1,
-          "Mutex pool size must be >1.");
-      rtos::memory::memory_resource* mr =
-          new os::memory::block_pool_typed_inclusive<rtos::message_queue,
-              OS_INTEGER_RTOS_ALLOC_MESSAGE_QUEUE_POOL_SIZE> ("pool-mq");
+  {
+    static_assert (OS_INTEGER_RTOS_ALLOC_MESSAGE_QUEUE_POOL_SIZE > 1,
+                   "Mutex pool size must be >1.");
+    rtos::memory::memory_resource* mr
+        = new os::memory::block_pool_typed_inclusive<
+            rtos::message_queue,
+            OS_INTEGER_RTOS_ALLOC_MESSAGE_QUEUE_POOL_SIZE> ("pool-mq");
 
-      // Configure the memory manager to throw an exception when out of memory.
-      mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
+    // Configure the memory manager to throw an exception when out of memory.
+    mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
 
-      rtos::memory::set_resource_typed<rtos::message_queue> (mr);
-    }
+    rtos::memory::set_resource_typed<rtos::message_queue> (mr);
+  }
 
 #endif /* defined(OS_INTEGER_RTOS_ALLOC_MESSAGE_QUEUE_POOL_SIZE) */
 
 #if defined(OS_INTEGER_RTOS_ALLOC_MUTEX_POOL_SIZE)
 
-    {
-      static_assert(OS_INTEGER_RTOS_ALLOC_MUTEX_POOL_SIZE > 1,
-          "Mutex pool size must be >1.");
-      rtos::memory::memory_resource* mr =
-          new os::memory::block_pool_typed_inclusive<rtos::mutex,
-              OS_INTEGER_RTOS_ALLOC_MUTEX_POOL_SIZE> ("pool-mx");
+  {
+    static_assert (OS_INTEGER_RTOS_ALLOC_MUTEX_POOL_SIZE > 1,
+                   "Mutex pool size must be >1.");
+    rtos::memory::memory_resource* mr
+        = new os::memory::block_pool_typed_inclusive<
+            rtos::mutex, OS_INTEGER_RTOS_ALLOC_MUTEX_POOL_SIZE> ("pool-mx");
 
-      // Configure the memory manager to throw an exception when out of memory.
-      mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
+    // Configure the memory manager to throw an exception when out of memory.
+    mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
 
-      rtos::memory::set_resource_typed<rtos::mutex> (mr);
-    }
+    rtos::memory::set_resource_typed<rtos::mutex> (mr);
+  }
 
 #endif /* defined(OS_INTEGER_RTOS_ALLOC_MUTEX_POOL_SIZE) */
 
 #if defined(OS_INTEGER_RTOS_ALLOC_SEMAPHORE_POOL_SIZE)
 
-    {
-      static_assert(OS_INTEGER_RTOS_ALLOC_SEMAPHORE_POOL_SIZE > 1,
-          "Semaphore pool size must be >1.");
-      rtos::memory::memory_resource* mr =
-          new os::memory::block_pool_typed_inclusive<rtos::semaphore,
-              OS_INTEGER_RTOS_ALLOC_MUTEX_POOL_SIZE> ("pool-sp");
+  {
+    static_assert (OS_INTEGER_RTOS_ALLOC_SEMAPHORE_POOL_SIZE > 1,
+                   "Semaphore pool size must be >1.");
+    rtos::memory::memory_resource* mr
+        = new os::memory::block_pool_typed_inclusive<
+            rtos::semaphore, OS_INTEGER_RTOS_ALLOC_MUTEX_POOL_SIZE> (
+            "pool-sp");
 
-      // Configure the memory manager to throw an exception when out of memory.
-      mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
+    // Configure the memory manager to throw an exception when out of memory.
+    mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
 
-      rtos::memory::set_resource_typed<rtos::semaphore> (mr);
-    }
+    rtos::memory::set_resource_typed<rtos::semaphore> (mr);
+  }
 
 #endif /* defined(OS_INTEGER_RTOS_ALLOC_SEMAPHORE_POOL_SIZE) */
 
 #if defined(OS_INTEGER_RTOS_ALLOC_TIMER_POOL_SIZE)
 
-    {
-      static_assert(OS_INTEGER_RTOS_ALLOC_TIMER_POOL_SIZE > 1,
-          "Mutex pool size must be >1.");
-      rtos::memory::memory_resource* mr =
-          new os::memory::block_pool_typed_inclusive<rtos::timer,
-              OS_INTEGER_RTOS_ALLOC_TIMER_POOL_SIZE> ("pool-tm");
+  {
+    static_assert (OS_INTEGER_RTOS_ALLOC_TIMER_POOL_SIZE > 1,
+                   "Mutex pool size must be >1.");
+    rtos::memory::memory_resource* mr
+        = new os::memory::block_pool_typed_inclusive<
+            rtos::timer, OS_INTEGER_RTOS_ALLOC_TIMER_POOL_SIZE> ("pool-tm");
 
-      // Configure the memory manager to throw an exception when out of memory.
-      mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
+    // Configure the memory manager to throw an exception when out of memory.
+    mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
 
-      rtos::memory::set_resource_typed<rtos::timer> (mr);
-    }
+    rtos::memory::set_resource_typed<rtos::timer> (mr);
+  }
 
 #endif /* defined(OS_INTEGER_RTOS_ALLOC_TIMER_POOL_SIZE) */
 
@@ -286,7 +295,7 @@ os_startup_initialize_free_store (void* heap_address,
  * @note Since most allocations are done in critical sections,
  * this function is very likely to be called with the scheduler locked.
  */
-void __attribute__((weak))
+void __attribute__ ((weak))
 os_rtos_application_out_of_memory_hook (void)
 {
   estd::__throw_bad_alloc ();
@@ -309,7 +318,7 @@ os_rtos_application_out_of_memory_hook (void)
  * @note Since most allocations are done in critical sections,
  * this function is very likely to be called with the scheduler locked.
  */
-void __attribute__((weak))
+void __attribute__ ((weak))
 os_rtos_system_out_of_memory_hook (void)
 {
   estd::__throw_bad_alloc ();

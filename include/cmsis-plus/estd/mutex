@@ -58,11 +58,9 @@ namespace os
     class mutex
     {
     private:
-
       using native_type = os::rtos::mutex;
 
     public:
-
       using native_handle_type = native_type*;
 
       /* constexpr in ISO */
@@ -72,7 +70,8 @@ namespace os
 
       mutex (const mutex&) = delete;
       mutex&
-      operator= (const mutex&) = delete;
+      operator= (const mutex&)
+          = delete;
 
       void
       lock ();
@@ -87,7 +86,6 @@ namespace os
       native_handle ();
 
     protected:
-
       native_type nm_;
     };
 
@@ -96,11 +94,9 @@ namespace os
     class recursive_mutex
     {
     private:
-
       using native_type = os::rtos::mutex;
 
     public:
-
       using native_handle_type = native_type*;
 
       recursive_mutex ();
@@ -109,7 +105,8 @@ namespace os
 
       recursive_mutex (const recursive_mutex&) = delete;
       recursive_mutex&
-      operator= (const recursive_mutex&) = delete;
+      operator= (const recursive_mutex&)
+          = delete;
 
       void
       lock ();
@@ -124,7 +121,6 @@ namespace os
       native_handle ();
 
     protected:
-
       native_type nm_;
     };
 
@@ -133,23 +129,23 @@ namespace os
     class timed_mutex : public mutex
     {
     public:
-
       timed_mutex () = default;
 
       ~timed_mutex () = default;
 
       timed_mutex (const timed_mutex&) = delete;
       timed_mutex&
-      operator= (const timed_mutex&) = delete;
+      operator= (const timed_mutex&)
+          = delete;
 
-      template<typename Rep_T, typename Period_T>
-        bool
-        try_lock_for (const std::chrono::duration<Rep_T, Period_T>& rel_time);
+      template <typename Rep_T, typename Period_T>
+      bool
+      try_lock_for (const std::chrono::duration<Rep_T, Period_T>& rel_time);
 
-      template<typename Clock_T, typename Duration_T>
-        bool
-        try_lock_until (
-            const std::chrono::time_point<Clock_T, Duration_T>& abs_time);
+      template <typename Clock_T, typename Duration_T>
+      bool
+      try_lock_until (
+          const std::chrono::time_point<Clock_T, Duration_T>& abs_time);
     };
 
     // ========================================================================
@@ -157,23 +153,23 @@ namespace os
     class recursive_timed_mutex : recursive_mutex
     {
     public:
-
       recursive_timed_mutex () = default;
 
       ~recursive_timed_mutex () = default;
 
       recursive_timed_mutex (const recursive_timed_mutex&) = delete;
       recursive_timed_mutex&
-      operator= (const recursive_timed_mutex&) = delete;
+      operator= (const recursive_timed_mutex&)
+          = delete;
 
-      template<typename Rep_T, typename Period_T>
-        bool
-        try_lock_for (const std::chrono::duration<Rep_T, Period_T>& rel_time);
+      template <typename Rep_T, typename Period_T>
+      bool
+      try_lock_for (const std::chrono::duration<Rep_T, Period_T>& rel_time);
 
-      template<typename Clock_T, typename Duration_T>
-        bool
-        try_lock_until (
-            const std::chrono::time_point<Clock_T, Duration_T>& abs_time);
+      template <typename Clock_T, typename Duration_T>
+      bool
+      try_lock_until (
+          const std::chrono::time_point<Clock_T, Duration_T>& abs_time);
     };
 
     /**
@@ -183,8 +179,7 @@ namespace os
     // ========================================================================
     // Inline & template implementations.
     // ========================================================================
-    inline
-    mutex::mutex () noexcept
+    inline mutex::mutex () noexcept
     {
     }
 
@@ -196,10 +191,8 @@ namespace os
 
     // ========================================================================
 
-    inline
-    recursive_mutex::recursive_mutex () :
-        nm_
-          { os::rtos::mutex::initializer_recursive }
+    inline recursive_mutex::recursive_mutex ()
+        : nm_{ os::rtos::mutex::initializer_recursive }
     {
     }
 
@@ -217,111 +210,111 @@ namespace os
 #pragma GCC diagnostic ignored "-Waggregate-return"
 #endif
 
-    template<typename Rep_T, typename Period_T>
-      bool
-      timed_mutex::try_lock_for (
-          const std::chrono::duration<Rep_T, Period_T>& rel_time)
-      {
-        using namespace std::chrono;
-        os::rtos::clock::duration_t ticks = 0;
-        if (rel_time > duration<Rep_T, Period_T>::zero ())
-          {
-            ticks =
-                static_cast<os::rtos::clock::duration_t> (os::estd::chrono::ceil<
-                    os::estd::chrono::systicks> (rel_time).count ());
-          }
+    template <typename Rep_T, typename Period_T>
+    bool
+    timed_mutex::try_lock_for (
+        const std::chrono::duration<Rep_T, Period_T>& rel_time)
+    {
+      using namespace std::chrono;
+      os::rtos::clock::duration_t ticks = 0;
+      if (rel_time > duration<Rep_T, Period_T>::zero ())
+        {
+          ticks = static_cast<os::rtos::clock::duration_t> (
+              os::estd::chrono::ceil<os::estd::chrono::systicks> (rel_time)
+                  .count ());
+        }
 
-        os::rtos::result_t res;
-        res = nm_.timed_lock (ticks);
-        if (res == os::rtos::result::ok)
-          {
-            return true;
-          }
-        else if (res == ETIMEDOUT)
-          {
-            return false;
-          }
+      os::rtos::result_t res;
+      res = nm_.timed_lock (ticks);
+      if (res == os::rtos::result::ok)
+        {
+          return true;
+        }
+      else if (res == ETIMEDOUT)
+        {
+          return false;
+        }
 
-        os::estd::__throw_system_error (static_cast<int> (res),
-                                        "timed_mutex try_lock failed");
-        return false;
-      }
+      os::estd::__throw_system_error (static_cast<int> (res),
+                                      "timed_mutex try_lock failed");
+      return false;
+    }
 
-    template<typename Clock_T, typename Duration_T>
-      bool
-      timed_mutex::try_lock_until (
-          const std::chrono::time_point<Clock_T, Duration_T>& abs_time)
-      {
-        using clock = Clock_T;
+    template <typename Clock_T, typename Duration_T>
+    bool
+    timed_mutex::try_lock_until (
+        const std::chrono::time_point<Clock_T, Duration_T>& abs_time)
+    {
+      using clock = Clock_T;
 
-        auto now = clock::now ();
-        while (now < abs_time)
-          {
-            if (try_lock_for (abs_time - now))
-              {
-                return true;
-              }
-            now = clock::now ();
-          }
+      auto now = clock::now ();
+      while (now < abs_time)
+        {
+          if (try_lock_for (abs_time - now))
+            {
+              return true;
+            }
+          now = clock::now ();
+        }
 
-        return false;
-      }
+      return false;
+    }
 
 #pragma GCC diagnostic pop
 
     // ========================================================================
 
-    template<typename Rep_T, typename Period_T>
-      bool
-      recursive_timed_mutex::try_lock_for (
-          const std::chrono::duration<Rep_T, Period_T>& rel_time)
-      {
-        using namespace std::chrono;
-        os::rtos::clock::duration_t ticks = 0;
-        if (rel_time > duration<Rep_T, Period_T>::zero ())
-          {
-            ticks =
-                static_cast<os::rtos::clock::duration_t> (os::estd::chrono::ceil<
-                    os::estd::chrono::systicks> (rel_time).count ());
-          }
+    template <typename Rep_T, typename Period_T>
+    bool
+    recursive_timed_mutex::try_lock_for (
+        const std::chrono::duration<Rep_T, Period_T>& rel_time)
+    {
+      using namespace std::chrono;
+      os::rtos::clock::duration_t ticks = 0;
+      if (rel_time > duration<Rep_T, Period_T>::zero ())
+        {
+          ticks = static_cast<os::rtos::clock::duration_t> (
+              os::estd::chrono::ceil<os::estd::chrono::systicks> (rel_time)
+                  .count ());
+        }
 
-        os::rtos::result_t res;
-        res = nm_.timed_lock (ticks);
-        if (res == os::rtos::result::ok)
-          {
-            return true;
-          }
-        else if (res == ETIMEDOUT)
-          {
-            return false;
-          }
+      os::rtos::result_t res;
+      res = nm_.timed_lock (ticks);
+      if (res == os::rtos::result::ok)
+        {
+          return true;
+        }
+      else if (res == ETIMEDOUT)
+        {
+          return false;
+        }
 
-        os::estd::__throw_system_error (static_cast<int> (res),
-                                        "timed_mutex try_lock failed");
-        return false;
-      }
+      os::estd::__throw_system_error (static_cast<int> (res),
+                                      "timed_mutex try_lock failed");
+      return false;
+    }
 
-    template<typename Clock_T, typename Duration_T>
-      bool
-      recursive_timed_mutex::try_lock_until (
-          const std::chrono::time_point<Clock_T, Duration_T>& abs_time)
-      {
-        using clock = Clock_T;
+    template <typename Clock_T, typename Duration_T>
+    bool
+    recursive_timed_mutex::try_lock_until (
+        const std::chrono::time_point<Clock_T, Duration_T>& abs_time)
+    {
+      using clock = Clock_T;
 
-        auto now = clock::now ();
-        while (now < abs_time)
-          {
-            if (try_lock_for (abs_time - now))
-              {
-                return true;
-              }
-            now = clock::now ();
-          }
+      auto now = clock::now ();
+      while (now < abs_time)
+        {
+          if (try_lock_for (abs_time - now))
+            {
+              return true;
+            }
+          now = clock::now ();
+        }
 
-        return false;
-      }
+      return false;
+    }
 
-  // ==========================================================================
+    // ========================================================================
   } /* namespace estd */
 } /* namespace os */
 
@@ -346,7 +339,7 @@ namespace std
   /**
    * @}
    */
-}
+} // namespace std
 
 #endif
 

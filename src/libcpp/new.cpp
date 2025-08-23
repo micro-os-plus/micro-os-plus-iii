@@ -51,15 +51,13 @@ namespace
    * part of the .bss section.
    */
   std::new_handler new_handler_;
-}
-
+} // namespace
 
 namespace std
 {
   // Constant to be used as parameter to differentiate
   // the `noexcept` functions.
-  const nothrow_t nothrow = nothrow_t
-    { };
+  const nothrow_t nothrow = nothrow_t{};
 
   /**
    * @brief Establishes the function designated by handler
@@ -135,11 +133,9 @@ namespace std
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
-void *
-__attribute__((weak))
-operator new (std::size_t bytes)
+void* __attribute__ ((weak)) operator new (std::size_t bytes)
 {
-  assert(!rtos::interrupts::in_handler_mode ());
+  assert (!rtos::interrupts::in_handler_mode ());
   if (bytes == 0)
     {
       bytes = 1;
@@ -198,12 +194,12 @@ operator new (std::size_t bytes)
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
-void*
-__attribute__((weak))
-operator new (std::size_t bytes,
-              const std::nothrow_t& nothrow __attribute__((unused))) noexcept
+void* __attribute__ ((weak)) operator new (std::size_t bytes,
+                                           const std::nothrow_t
+                                           & nothrow
+                                           __attribute__ ((unused))) noexcept
 {
-  assert(!rtos::interrupts::in_handler_mode ());
+  assert (!rtos::interrupts::in_handler_mode ());
 
   if (bytes == 0)
     {
@@ -259,9 +255,7 @@ operator new (std::size_t bytes,
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
-void*
-__attribute__((weak))
-operator new[] (std::size_t bytes)
+void* __attribute__ ((weak)) operator new[] (std::size_t bytes)
 {
   return ::operator new (bytes);
 }
@@ -284,10 +278,10 @@ operator new[] (std::size_t bytes)
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
-void*
-__attribute__((weak))
-operator new[] (std::size_t bytes,
-                const std::nothrow_t& nothrow __attribute__((unused))) noexcept
+void* __attribute__ ((weak)) operator new[] (std::size_t bytes,
+                                             const std::nothrow_t
+                                             & nothrow
+                                             __attribute__ ((unused))) noexcept
 {
   return ::operator new (bytes, std::nothrow);
 }
@@ -318,15 +312,13 @@ operator new[] (std::size_t bytes,
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
-void
-__attribute__((weak))
-operator delete (void* ptr) noexcept
+void __attribute__ ((weak)) operator delete (void* ptr) noexcept
 {
 #if defined(OS_TRACE_LIBCPP_OPERATOR_NEW)
   trace::printf ("::%s(%p)\n", __func__, ptr);
 #endif
 
-  assert(!rtos::interrupts::in_handler_mode ());
+  assert (!rtos::interrupts::in_handler_mode ());
 
   if (ptr)
     {
@@ -374,15 +366,14 @@ operator delete (void* ptr, std::size_t bytes) noexcept;
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
-void
-__attribute__((weak))
-operator delete (void* ptr, std::size_t bytes) noexcept
+void __attribute__ ((weak)) operator delete (void* ptr,
+                                             std::size_t bytes) noexcept
 {
 #if defined(OS_TRACE_LIBCPP_OPERATOR_NEW)
   trace::printf ("::%s(%p,%u)\n", __func__, ptr, bytes);
 #endif
 
-  assert(!rtos::interrupts::in_handler_mode ());
+  assert (!rtos::interrupts::in_handler_mode ());
 
   if (ptr)
     {
@@ -415,16 +406,15 @@ operator delete (void* ptr, std::size_t bytes) noexcept
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
-void
-__attribute__((weak))
-operator delete (void* ptr,
-                 const std::nothrow_t& nothrow __attribute__((unused))) noexcept
+void __attribute__ ((weak)) operator delete (void* ptr, const std::nothrow_t
+                                             & nothrow
+                                             __attribute__ ((unused))) noexcept
 {
 #if defined(OS_TRACE_LIBCPP_OPERATOR_NEW)
   trace::printf ("::%s(%p)\n", __func__, ptr);
 #endif
 
-  assert(!rtos::interrupts::in_handler_mode ());
+  assert (!rtos::interrupts::in_handler_mode ());
 
   if (ptr)
     {
@@ -455,9 +445,7 @@ operator delete (void* ptr,
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
-void
-__attribute__((weak))
-operator delete[] (void* ptr) noexcept
+void __attribute__ ((weak)) operator delete[] (void* ptr) noexcept
 {
   ::operator delete (ptr);
 }
@@ -492,9 +480,8 @@ operator delete[] (void* ptr, std::size_t bytes) noexcept;
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
-void
-__attribute__((weak))
-operator delete[] (void* ptr, std::size_t bytes) noexcept
+void __attribute__ ((weak)) operator delete[] (void* ptr,
+                                               std::size_t bytes) noexcept
 {
   ::operator delete (ptr, bytes);
 }
@@ -523,9 +510,8 @@ operator delete[] (void* ptr, std::size_t bytes) noexcept
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
-void
-__attribute__((weak))
-operator delete[] (void* ptr, const std::nothrow_t& nothrow) noexcept
+void __attribute__ ((weak)) operator delete[] (void* ptr, const std::nothrow_t
+                                               & nothrow) noexcept
 {
   ::operator delete (ptr, nothrow);
 }
@@ -534,6 +520,5 @@ operator delete[] (void* ptr, const std::nothrow_t& nothrow) noexcept
 /*
  * @}
  */
-
 
 // ----------------------------------------------------------------------------

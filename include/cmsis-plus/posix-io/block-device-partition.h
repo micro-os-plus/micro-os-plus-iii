@@ -45,7 +45,8 @@ namespace os
 
     /**
      * @brief Block device partition class.
-     * @headerfile block-device-partition.h <cmsis-plus/posix-io/block-device-partitions.h>
+     * @headerfile block-device-partition.h
+     * <cmsis-plus/posix-io/block-device-partitions.h>
      * @ingroup cmsis-plus-posix-io-base
      */
     class block_device_partition : public block_device
@@ -58,7 +59,6 @@ namespace os
        */
 
     public:
-
       block_device_partition (block_device_impl& impl, const char* name);
 
       /**
@@ -69,16 +69,17 @@ namespace os
       block_device_partition (const block_device_partition&) = delete;
       block_device_partition (block_device_partition&&) = delete;
       block_device_partition&
-      operator= (const block_device_partition&) = delete;
+      operator= (const block_device_partition&)
+          = delete;
       block_device_partition&
-      operator= (block_device_partition&&) = delete;
+      operator= (block_device_partition&&)
+          = delete;
 
       /**
        * @endcond
        */
 
-      virtual
-      ~block_device_partition () override;
+      virtual ~block_device_partition () override;
 
       /**
        * @}
@@ -91,7 +92,6 @@ namespace os
        */
 
     public:
-
       void
       configure (blknum_t offset, blknum_t nblocks);
 
@@ -129,7 +129,6 @@ namespace os
        */
 
     public:
-
       block_device_partition_impl (block_device& parent);
 
       /**
@@ -137,19 +136,21 @@ namespace os
        */
 
       // The rule of five.
-      block_device_partition_impl (const block_device_partition_impl&) = delete;
+      block_device_partition_impl (const block_device_partition_impl&)
+          = delete;
       block_device_partition_impl (block_device_partition_impl&&) = delete;
       block_device_partition_impl&
-      operator= (const block_device_partition_impl&) = delete;
+      operator= (const block_device_partition_impl&)
+          = delete;
       block_device_partition_impl&
-      operator= (block_device_partition_impl&&) = delete;
+      operator= (block_device_partition_impl&&)
+          = delete;
 
       /**
        * @endcond
        */
 
-      virtual
-      ~block_device_partition_impl () override;
+      virtual ~block_device_partition_impl () override;
 
       /**
        * @}
@@ -162,7 +163,6 @@ namespace os
        */
 
     public:
-
       virtual int
       do_vioctl (int request, std::va_list args) override;
 
@@ -173,8 +173,8 @@ namespace os
       do_read_block (void* buf, blknum_t blknum, std::size_t nblocks) override;
 
       virtual ssize_t
-      do_write_block (const void* buf, blknum_t blknum, std::size_t nblocks)
-          override;
+      do_write_block (const void* buf, blknum_t blknum,
+                      std::size_t nblocks) override;
 
       virtual void
       do_sync (void) override;
@@ -193,7 +193,6 @@ namespace os
 
       // ----------------------------------------------------------------------
     protected:
-
       /**
        * @cond ignore
        */
@@ -211,197 +210,194 @@ namespace os
 
     // ========================================================================
 
-    template<typename T = block_device_partition_impl>
-      class block_device_partition_implementable : public block_device_partition
-      {
-        // --------------------------------------------------------------------
+    template <typename T = block_device_partition_impl>
+    class block_device_partition_implementable : public block_device_partition
+    {
+      // ----------------------------------------------------------------------
 
-      public:
+    public:
+      using value_type = T;
 
-        using value_type = T;
+      // ----------------------------------------------------------------------
 
-        // --------------------------------------------------------------------
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
-        /**
-         * @name Constructors & Destructor
-         * @{
-         */
+    public:
+      template <typename... Args>
+      block_device_partition_implementable (const char* name,
+                                            block_device& parent,
+                                            Args&&... args);
 
-      public:
+      /**
+       * @cond ignore
+       */
 
-        template<typename ... Args>
-          block_device_partition_implementable (const char* name,
-                                                block_device& parent,
-                                                Args&&... args);
+      // The rule of five.
+      block_device_partition_implementable (
+          const block_device_partition_implementable&)
+          = delete;
+      block_device_partition_implementable (
+          block_device_partition_implementable&&)
+          = delete;
+      block_device_partition_implementable&
+      operator= (const block_device_partition_implementable&)
+          = delete;
+      block_device_partition_implementable&
+      operator= (block_device_partition_implementable&&)
+          = delete;
 
-        /**
-         * @cond ignore
-         */
+      /**
+       * @endcond
+       */
 
-        // The rule of five.
-        block_device_partition_implementable (
-            const block_device_partition_implementable&) = delete;
-        block_device_partition_implementable (
-            block_device_partition_implementable&&) = delete;
-        block_device_partition_implementable&
-        operator= (const block_device_partition_implementable&) = delete;
-        block_device_partition_implementable&
-        operator= (block_device_partition_implementable&&) = delete;
+      virtual ~block_device_partition_implementable () override;
 
-        /**
-         * @endcond
-         */
+      /**
+       * @}
+       */
 
-        virtual
-        ~block_device_partition_implementable () override;
+      // ----------------------------------------------------------------------
+      /**
+       * @name Public Member Functions
+       * @{
+       */
 
-        /**
-         * @}
-         */
+    public:
+      // Support functions.
 
-        // --------------------------------------------------------------------
-        /**
-         * @name Public Member Functions
-         * @{
-         */
+      value_type&
+      impl (void) const;
 
-      public:
+      /**
+       * @}
+       */
 
-        // Support functions.
+      // ----------------------------------------------------------------------
+    protected:
+      /**
+       * @cond ignore
+       */
 
-        value_type&
-        impl (void) const;
+      // Include the implementation as a member.
+      value_type impl_instance_;
 
-        /**
-         * @}
-         */
-
-        // --------------------------------------------------------------------
-      protected:
-
-        /**
-         * @cond ignore
-         */
-
-        // Include the implementation as a member.
-        value_type impl_instance_;
-
-        /**
-         * @endcond
-         */
-      };
+      /**
+       * @endcond
+       */
+    };
 
     // ========================================================================
 
-    template<typename T, typename L>
-      class block_device_partition_lockable : public block_device_partition
-      {
-        // --------------------------------------------------------------------
+    template <typename T, typename L>
+    class block_device_partition_lockable : public block_device_partition
+    {
+      // ----------------------------------------------------------------------
 
-      public:
+    public:
+      using value_type = T;
+      using lockable_type = L;
 
-        using value_type = T;
-        using lockable_type = L;
+      // ----------------------------------------------------------------------
 
-        // --------------------------------------------------------------------
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
-        /**
-         * @name Constructors & Destructor
-         * @{
-         */
+    public:
+      template <typename... Args>
+      block_device_partition_lockable (const char* name, block_device& parent,
+                                       lockable_type& locker, Args&&... args);
 
-      public:
+      /**
+       * @cond ignore
+       */
 
-        template<typename ... Args>
-          block_device_partition_lockable (const char* name,
-                                           block_device& parent,
-                                           lockable_type& locker,
-                                           Args&&... args);
+      // The rule of five.
+      block_device_partition_lockable (const block_device_partition_lockable&)
+          = delete;
+      block_device_partition_lockable (block_device_partition_lockable&&)
+          = delete;
+      block_device_partition_lockable&
+      operator= (const block_device_partition_lockable&)
+          = delete;
+      block_device_partition_lockable&
+      operator= (block_device_partition_lockable&&)
+          = delete;
 
-        /**
-         * @cond ignore
-         */
+      /**
+       * @endcond
+       */
 
-        // The rule of five.
-        block_device_partition_lockable (const block_device_partition_lockable&) = delete;
-        block_device_partition_lockable (block_device_partition_lockable&&) = delete;
-        block_device_partition_lockable&
-        operator= (const block_device_partition_lockable&) = delete;
-        block_device_partition_lockable&
-        operator= (block_device_partition_lockable&&) = delete;
+      virtual ~block_device_partition_lockable () override;
 
-        /**
-         * @endcond
-         */
+      /**
+       * @}
+       */
 
-        virtual
-        ~block_device_partition_lockable () override;
+      // ----------------------------------------------------------------------
+      /**
+       * @name Public Member Functions
+       * @{
+       */
 
-        /**
-         * @}
-         */
+    public:
+      virtual int
+      vioctl (int request, std::va_list args) override;
 
-        // --------------------------------------------------------------------
-        /**
-         * @name Public Member Functions
-         * @{
-         */
+      virtual ssize_t
+      read_block (void* buf, blknum_t blknum,
+                  std::size_t nblocks = 1) override;
 
-      public:
+      virtual ssize_t
+      write_block (const void* buf, blknum_t blknum,
+                   std::size_t nblocks = 1) override;
 
-        virtual int
-        vioctl (int request, std::va_list args) override;
+      // ----------------------------------------------------------------------
+      // Support functions.
 
-        virtual ssize_t
-        read_block (void* buf, blknum_t blknum, std::size_t nblocks = 1)
-            override;
+      value_type&
+      impl (void) const;
 
-        virtual ssize_t
-        write_block (const void* buf, blknum_t blknum, std::size_t nblocks = 1)
-            override;
+      /**
+       * @}
+       */
 
-        // --------------------------------------------------------------------
-        // Support functions.
+      // ----------------------------------------------------------------------
+    protected:
+      /**
+       * @cond ignore
+       */
 
-        value_type&
-        impl (void) const;
+      // Include the implementation as a member.
+      value_type impl_instance_;
 
-        /**
-         * @}
-         */
+      lockable_type& locker_;
 
-        // --------------------------------------------------------------------
-      protected:
-
-        /**
-         * @cond ignore
-         */
-
-        // Include the implementation as a member.
-        value_type impl_instance_;
-
-        lockable_type& locker_;
-
-        /**
-         * @endcond
-         */
-      };
+      /**
+       * @endcond
+       */
+    };
 
     // ========================================================================
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wweak-template-vtables"
-// error: extern templates are incompatible with C++98 [-Werror,-Wc++98-compat-pedantic]
+// error: extern templates are incompatible with C++98
+// [-Werror,-Wc++98-compat-pedantic]
 #pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
 #endif
 
     extern template class block_device_partition_implementable<
-        block_device_partition_impl> ;
+        block_device_partition_impl>;
 
 #pragma GCC diagnostic pop
 
-  // ==========================================================================
+    // ========================================================================
   } /* namespace posix */
 } /* namespace os */
 
@@ -421,127 +417,121 @@ namespace os
 
     // ========================================================================
 
-    template<typename T>
-      template<typename ... Args>
-        block_device_partition_implementable<T>::block_device_partition_implementable (
-            const char* name, block_device& parent, Args&&... args) :
-            block_device_partition
-              { impl_instance_, name }, //
-            impl_instance_
-              { parent, std::forward<Args>(args)... }
-        {
+    template <typename T>
+    template <typename... Args>
+    block_device_partition_implementable<
+        T>::block_device_partition_implementable (const char* name,
+                                                  block_device& parent,
+                                                  Args&&... args)
+        : block_device_partition{ impl_instance_, name }, //
+          impl_instance_{ parent, std::forward<Args> (args)... }
+    {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE_PARTITION)
-          trace::printf (
-              "block_device_partition_implementable::%s(\"%s\")=@%p\n",
-              __func__, name_, this);
+      trace::printf ("block_device_partition_implementable::%s(\"%s\")=@%p\n",
+                     __func__, name_, this);
 #endif
-        }
+    }
 
-    template<typename T>
-      block_device_partition_implementable<T>::~block_device_partition_implementable ()
-      {
+    template <typename T>
+    block_device_partition_implementable<
+        T>::~block_device_partition_implementable ()
+    {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE_PARTITION)
-        trace::printf ("block_device_partition_implementable::%s() @%p %s\n",
-                       __func__, this, name_);
+      trace::printf ("block_device_partition_implementable::%s() @%p %s\n",
+                     __func__, this, name_);
 #endif
-      }
+    }
 
-    template<typename T>
-      typename block_device_partition_implementable<T>::value_type&
-      block_device_partition_implementable<T>::impl (void) const
-      {
-        return static_cast<value_type&> (impl_);
-      }
+    template <typename T>
+    typename block_device_partition_implementable<T>::value_type&
+    block_device_partition_implementable<T>::impl (void) const
+    {
+      return static_cast<value_type&> (impl_);
+    }
 
     // ========================================================================
 
-    template<typename T, typename L>
-      template<typename ... Args>
-        block_device_partition_lockable<T, L>::block_device_partition_lockable (
-            const char* name, block_device& parent, lockable_type& locker,
-            Args&&... args) :
-            block_device_partition
-              { impl_instance_, name }, //
-            impl_instance_
-              { parent, std::forward<Args>(args)... }, //
-            locker_ (locker)
-        {
+    template <typename T, typename L>
+    template <typename... Args>
+    block_device_partition_lockable<T, L>::block_device_partition_lockable (
+        const char* name, block_device& parent, lockable_type& locker,
+        Args&&... args)
+        : block_device_partition{ impl_instance_, name }, //
+          impl_instance_{ parent, std::forward<Args> (args)... }, //
+          locker_ (locker)
+    {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE_PARTITION)
-          trace::printf ("block_device_partition_lockable::%s(\"%s\")=@%p\n",
-                         __func__, name_, this);
+      trace::printf ("block_device_partition_lockable::%s(\"%s\")=@%p\n",
+                     __func__, name_, this);
 #endif
+    }
 
-        }
-
-    template<typename T, typename L>
-      block_device_partition_lockable<T, L>::~block_device_partition_lockable ()
-      {
+    template <typename T, typename L>
+    block_device_partition_lockable<T, L>::~block_device_partition_lockable ()
+    {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE_PARTITION)
-        trace::printf ("block_device_partition_lockable::%s() @%p %s\n",
-                       __func__, this, name_);
+      trace::printf ("block_device_partition_lockable::%s() @%p %s\n",
+                     __func__, this, name_);
 #endif
-      }
+    }
 
     // ------------------------------------------------------------------------
 
-    template<typename T, typename L>
-      int
-      block_device_partition_lockable<T, L>::vioctl (int request,
-                                                     std::va_list args)
-      {
+    template <typename T, typename L>
+    int
+    block_device_partition_lockable<T, L>::vioctl (int request,
+                                                   std::va_list args)
+    {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE_PARTITION)
-        trace::printf ("block_device_partition_lockable::%s(%d) @%p\n",
-                       __func__, request, this);
+      trace::printf ("block_device_partition_lockable::%s(%d) @%p\n", __func__,
+                     request, this);
 #endif
 
-        std::lock_guard<L> lock
-          { locker_ };
+      std::lock_guard<L> lock{ locker_ };
 
-        return block_device_partition::vioctl (request, args);
-      }
+      return block_device_partition::vioctl (request, args);
+    }
 
-    template<typename T, typename L>
-      ssize_t
-      block_device_partition_lockable<T, L>::read_block (void* buf,
-                                                         blknum_t blknum,
-                                                         std::size_t nblocks)
-      {
+    template <typename T, typename L>
+    ssize_t
+    block_device_partition_lockable<T, L>::read_block (void* buf,
+                                                       blknum_t blknum,
+                                                       std::size_t nblocks)
+    {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE_PARTITION)
-        trace::printf ("block_device_partition_lockable::%s(%p, %u, %u) @%p\n",
-                       __func__, buf, blknum, nblocks, this);
+      trace::printf ("block_device_partition_lockable::%s(%p, %u, %u) @%p\n",
+                     __func__, buf, blknum, nblocks, this);
 #endif
 
-        std::lock_guard<L> lock
-          { locker_ };
+      std::lock_guard<L> lock{ locker_ };
 
-        return block_device_partition::read_block (buf, blknum, nblocks);
-      }
+      return block_device_partition::read_block (buf, blknum, nblocks);
+    }
 
-    template<typename T, typename L>
-      ssize_t
-      block_device_partition_lockable<T, L>::write_block (const void* buf,
-                                                          blknum_t blknum,
-                                                          std::size_t nblocks)
-      {
+    template <typename T, typename L>
+    ssize_t
+    block_device_partition_lockable<T, L>::write_block (const void* buf,
+                                                        blknum_t blknum,
+                                                        std::size_t nblocks)
+    {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE_PARTITION)
-        trace::printf ("block_device_partition_lockable::%s(%p, %u, %u) @%p\n",
-                       __func__, buf, blknum, nblocks, this);
+      trace::printf ("block_device_partition_lockable::%s(%p, %u, %u) @%p\n",
+                     __func__, buf, blknum, nblocks, this);
 #endif
 
-        std::lock_guard<L> lock
-          { locker_ };
+      std::lock_guard<L> lock{ locker_ };
 
-        return block_device_partition::write_block (buf, blknum, nblocks);
-      }
+      return block_device_partition::write_block (buf, blknum, nblocks);
+    }
 
-    template<typename T, typename L>
-      typename block_device_partition_lockable<T, L>::value_type&
-      block_device_partition_lockable<T, L>::impl (void) const
-      {
-        return static_cast<value_type&> (impl_);
-      }
+    template <typename T, typename L>
+    typename block_device_partition_lockable<T, L>::value_type&
+    block_device_partition_lockable<T, L>::impl (void) const
+    {
+      return static_cast<value_type&> (impl_);
+    }
 
-  // ==========================================================================
+    // ========================================================================
   } /* namespace posix */
 } /* namespace os */
 

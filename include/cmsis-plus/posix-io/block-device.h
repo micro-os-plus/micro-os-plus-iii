@@ -62,7 +62,6 @@ namespace os
       // ----------------------------------------------------------------------
 
     public:
-
       using blknum_t = std::size_t;
 
       // ----------------------------------------------------------------------
@@ -73,7 +72,6 @@ namespace os
        */
 
     public:
-
       block_device (block_device_impl& impl, const char* name);
 
       /**
@@ -84,16 +82,17 @@ namespace os
       block_device (const block_device&) = delete;
       block_device (block_device&&) = delete;
       block_device&
-      operator= (const block_device&) = delete;
+      operator= (const block_device&)
+          = delete;
       block_device&
-      operator= (block_device&&) = delete;
+      operator= (block_device&&)
+          = delete;
 
       /**
        * @endcond
        */
 
-      virtual
-      ~block_device () override;
+      virtual ~block_device () override;
 
       /**
        * @}
@@ -106,7 +105,6 @@ namespace os
        */
 
     public:
-
       virtual int
       vioctl (int request, std::va_list args) override;
 
@@ -165,7 +163,6 @@ namespace os
       friend class block_device;
 
     public:
-
       using blknum_t = block_device::blknum_t;
 
       // ----------------------------------------------------------------------
@@ -176,7 +173,6 @@ namespace os
        */
 
     public:
-
       block_device_impl (void);
 
       /**
@@ -187,16 +183,17 @@ namespace os
       block_device_impl (const block_device_impl&) = delete;
       block_device_impl (block_device_impl&&) = delete;
       block_device_impl&
-      operator= (const block_device_impl&) = delete;
+      operator= (const block_device_impl&)
+          = delete;
       block_device_impl&
-      operator= (block_device_impl&&) = delete;
+      operator= (block_device_impl&&)
+          = delete;
 
       /**
        * @endcond
        */
 
-      virtual
-      ~block_device_impl () override;
+      virtual ~block_device_impl () override;
 
       /**
        * @}
@@ -209,7 +206,6 @@ namespace os
        */
 
     public:
-
       virtual ssize_t
       do_read (void* buf, std::size_t nbyte) override;
 
@@ -220,11 +216,12 @@ namespace os
       do_lseek (off_t offset, int whence) override;
 
       virtual ssize_t
-      do_read_block (void* buf, blknum_t blknum, std::size_t nblocks) = 0;
+      do_read_block (void* buf, blknum_t blknum, std::size_t nblocks)
+          = 0;
 
       virtual ssize_t
-      do_write_block (const void* buf, blknum_t blknum,
-                      std::size_t nblocks) = 0;
+      do_write_block (const void* buf, blknum_t blknum, std::size_t nblocks)
+          = 0;
 
       /**
        * @}
@@ -232,7 +229,6 @@ namespace os
 
       // ----------------------------------------------------------------------
     protected:
-
       /**
        * @cond ignore
        */
@@ -258,198 +254,192 @@ namespace os
 #pragma GCC diagnostic ignored "-Wsuggest-final-methods"
 #pragma GCC diagnostic ignored "-Wsuggest-final-types"
 #endif
-    template<typename T>
-      class block_device_implementable : public block_device
-      {
-        // --------------------------------------------------------------------
+    template <typename T>
+    class block_device_implementable : public block_device
+    {
+      // ----------------------------------------------------------------------
 
-      public:
+    public:
+      using value_type = T;
 
-        using value_type = T;
+      // ----------------------------------------------------------------------
 
-        // --------------------------------------------------------------------
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
-        /**
-         * @name Constructors & Destructor
-         * @{
-         */
+    public:
+      template <typename... Args>
+      block_device_implementable (const char* name, Args&&... args);
 
-      public:
+      /**
+       * @cond ignore
+       */
 
-        template<typename ... Args>
-          block_device_implementable (const char* name, Args&&... args);
+      // The rule of five.
+      block_device_implementable (const block_device_implementable&) = delete;
+      block_device_implementable (block_device_implementable&&) = delete;
+      block_device_implementable&
+      operator= (const block_device_implementable&)
+          = delete;
+      block_device_implementable&
+      operator= (block_device_implementable&&)
+          = delete;
 
-        /**
-         * @cond ignore
-         */
+      /**
+       * @endcond
+       */
 
-        // The rule of five.
-        block_device_implementable (const block_device_implementable&) = delete;
-        block_device_implementable (block_device_implementable&&) = delete;
-        block_device_implementable&
-        operator= (const block_device_implementable&) = delete;
-        block_device_implementable&
-        operator= (block_device_implementable&&) = delete;
+      virtual ~block_device_implementable () override;
 
-        /**
-         * @endcond
-         */
+      /**
+       * @}
+       */
 
-        virtual
-        ~block_device_implementable () override;
+      // ----------------------------------------------------------------------
+      /**
+       * @name Public Member Functions
+       * @{
+       */
 
-        /**
-         * @}
-         */
+    public:
+      // Support functions.
 
-        // --------------------------------------------------------------------
-        /**
-         * @name Public Member Functions
-         * @{
-         */
+      value_type&
+      impl (void) const;
 
-      public:
+      /**
+       * @}
+       */
 
-        // Support functions.
+      // ----------------------------------------------------------------------
+    protected:
+      /**
+       * @cond ignore
+       */
 
-        value_type&
-        impl (void) const;
+      // Include the implementation as a member.
+      value_type impl_instance_;
 
-        /**
-         * @}
-         */
-
-        // --------------------------------------------------------------------
-      protected:
-
-        /**
-         * @cond ignore
-         */
-
-        // Include the implementation as a member.
-        value_type impl_instance_;
-
-        /**
-         * @endcond
-         */
-      };
+      /**
+       * @endcond
+       */
+    };
 #pragma GCC diagnostic pop
 
     // ========================================================================
 
-    template<typename T, typename L>
-      class block_device_lockable : public block_device
-      {
-        // --------------------------------------------------------------------
+    template <typename T, typename L>
+    class block_device_lockable : public block_device
+    {
+      // ----------------------------------------------------------------------
 
-      public:
+    public:
+      using value_type = T;
+      using lockable_type = L;
 
-        using value_type = T;
-        using lockable_type = L;
+      // ----------------------------------------------------------------------
 
-        // --------------------------------------------------------------------
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
-        /**
-         * @name Constructors & Destructor
-         * @{
-         */
+    public:
+      template <typename... Args>
+      block_device_lockable (const char* name, lockable_type& locker,
+                             Args&&... args);
 
-      public:
+      /**
+       * @cond ignore
+       */
 
-        template<typename ... Args>
-          block_device_lockable (const char* name, lockable_type& locker,
-                                 Args&&... args);
+      // The rule of five.
+      block_device_lockable (const block_device_lockable&) = delete;
+      block_device_lockable (block_device_lockable&&) = delete;
+      block_device_lockable&
+      operator= (const block_device_lockable&)
+          = delete;
+      block_device_lockable&
+      operator= (block_device_lockable&&)
+          = delete;
 
-        /**
-         * @cond ignore
-         */
+      /**
+       * @endcond
+       */
 
-        // The rule of five.
-        block_device_lockable (const block_device_lockable&) = delete;
-        block_device_lockable (block_device_lockable&&) = delete;
-        block_device_lockable&
-        operator= (const block_device_lockable&) = delete;
-        block_device_lockable&
-        operator= (block_device_lockable&&) = delete;
+      virtual ~block_device_lockable () override;
 
-        /**
-         * @endcond
-         */
+      /**
+       * @}
+       */
 
-        virtual
-        ~block_device_lockable () override;
+      // ----------------------------------------------------------------------
+      /**
+       * @name Public Member Functions
+       * @{
+       */
 
-        /**
-         * @}
-         */
+    public:
+      virtual int
+      close (void) override;
 
-        // --------------------------------------------------------------------
-        /**
-         * @name Public Member Functions
-         * @{
-         */
+      virtual ssize_t
+      read (void* buf, std::size_t nbyte) override;
 
-      public:
+      virtual ssize_t
+      write (const void* buf, std::size_t nbyte) override;
 
-        virtual int
-        close (void) override;
+      virtual ssize_t
+      writev (const /* struct */ iovec* iov, int iovcnt) override;
 
-        virtual ssize_t
-        read (void* buf, std::size_t nbyte) override;
+      virtual int
+      vfcntl (int cmd, std::va_list args) override;
 
-        virtual ssize_t
-        write (const void* buf, std::size_t nbyte) override;
+      virtual int
+      vioctl (int request, std::va_list args) override;
 
-        virtual ssize_t
-        writev (const /* struct */ iovec* iov, int iovcnt) override;
+      virtual off_t
+      lseek (off_t offset, int whence) override;
 
-        virtual int
-        vfcntl (int cmd, std::va_list args) override;
+      virtual ssize_t
+      read_block (void* buf, blknum_t blknum,
+                  std::size_t nblocks = 1) override;
 
-        virtual int
-        vioctl (int request, std::va_list args) override;
+      virtual ssize_t
+      write_block (const void* buf, blknum_t blknum,
+                   std::size_t nblocks = 1) override;
 
-        virtual off_t
-        lseek (off_t offset, int whence) override;
+      virtual void
+      sync (void) override;
 
-        virtual ssize_t
-        read_block (void* buf, blknum_t blknum, std::size_t nblocks = 1)
-            override;
+      // ----------------------------------------------------------------------
+      // Support functions.
 
-        virtual ssize_t
-        write_block (const void* buf, blknum_t blknum, std::size_t nblocks = 1)
-            override;
+      value_type&
+      impl (void) const;
 
-        virtual void
-        sync (void) override;
+      /**
+       * @}
+       */
 
-        // --------------------------------------------------------------------
-        // Support functions.
+      // ----------------------------------------------------------------------
+    protected:
+      /**
+       * @cond ignore
+       */
 
-        value_type&
-        impl (void) const;
+      value_type impl_instance_;
 
-        /**
-         * @}
-         */
+      lockable_type& locker_;
 
-        // --------------------------------------------------------------------
-      protected:
+      /**
+       * @endcond
+       */
+    };
 
-        /**
-         * @cond ignore
-         */
-
-        value_type impl_instance_;
-
-        lockable_type& locker_;
-
-        /**
-         * @endcond
-         */
-      };
-
-  // ==========================================================================
+    // ========================================================================
   } /* namespace posix */
 } /* namespace os */
 
@@ -487,231 +477,218 @@ namespace os
 
     // ========================================================================
 
-    template<typename T>
-      template<typename ... Args>
-        block_device_implementable<T>::block_device_implementable (
-            const char* name, Args&&... args) :
-            block_device
-              { impl_instance_, name }, //
-            impl_instance_
-              { std::forward<Args>(args)... }
-        {
+    template <typename T>
+    template <typename... Args>
+    block_device_implementable<T>::block_device_implementable (
+        const char* name, Args&&... args)
+        : block_device{ impl_instance_, name }, //
+          impl_instance_{ std::forward<Args> (args)... }
+    {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
-          trace::printf ("block_device_implementable::%s(\"%s\")=@%p\n",
-                         __func__, name_, this);
+      trace::printf ("block_device_implementable::%s(\"%s\")=@%p\n", __func__,
+                     name_, this);
 #endif
-        }
+    }
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wsuggest-final-methods"
 #endif
-    template<typename T>
-      block_device_implementable<T>::~block_device_implementable ()
-      {
+    template <typename T>
+    block_device_implementable<T>::~block_device_implementable ()
+    {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
-        trace::printf ("block_device_implementable::%s() @%p %s\n", __func__,
-                       this, name_);
+      trace::printf ("block_device_implementable::%s() @%p %s\n", __func__,
+                     this, name_);
 #endif
-      }
+    }
 #pragma GCC diagnostic pop
 
-    template<typename T>
-      typename block_device_implementable<T>::value_type&
-      block_device_implementable<T>::impl (void) const
-      {
-        return static_cast<value_type&> (impl_);
-      }
+    template <typename T>
+    typename block_device_implementable<T>::value_type&
+    block_device_implementable<T>::impl (void) const
+    {
+      return static_cast<value_type&> (impl_);
+    }
 
     // ========================================================================
 
-    template<typename T, typename L>
-      template<typename ... Args>
-        block_device_lockable<T, L>::block_device_lockable (
-            const char* name, lockable_type& locker, Args&&... args) :
-            block_device
-              { impl_instance_, name }, //
-            impl_instance_
-              { std::forward<Args>(args)... }, //
-            locker_ (locker)
-        {
+    template <typename T, typename L>
+    template <typename... Args>
+    block_device_lockable<T, L>::block_device_lockable (const char* name,
+                                                        lockable_type& locker,
+                                                        Args&&... args)
+        : block_device{ impl_instance_, name }, //
+          impl_instance_{ std::forward<Args> (args)... }, //
+          locker_ (locker)
+    {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
-          trace::printf ("block_device_lockable::%s(\"%s\")=@%p\n", __func__,
-                         name_, this);
+      trace::printf ("block_device_lockable::%s(\"%s\")=@%p\n", __func__,
+                     name_, this);
 #endif
-        }
+    }
 
-    template<typename T, typename L>
-      block_device_lockable<T, L>::~block_device_lockable ()
-      {
+    template <typename T, typename L>
+    block_device_lockable<T, L>::~block_device_lockable ()
+    {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
-        trace::printf ("block_device_lockable::%s() @%p %s\n", __func__, this,
-                       name_);
+      trace::printf ("block_device_lockable::%s() @%p %s\n", __func__, this,
+                     name_);
 #endif
-      }
+    }
 
     // ------------------------------------------------------------------------
 
-    template<typename T, typename L>
-      int
-      block_device_lockable<T, L>::close (void)
-      {
+    template <typename T, typename L>
+    int
+    block_device_lockable<T, L>::close (void)
+    {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
-        trace::printf ("block_device_lockable::%s() @%p\n", __func__, this);
+      trace::printf ("block_device_lockable::%s() @%p\n", __func__, this);
 #endif
 
-        std::lock_guard<L> lock
-          { locker_ };
+      std::lock_guard<L> lock{ locker_ };
 
-        return block_device::close ();
-      }
+      return block_device::close ();
+    }
 
-    template<typename T, typename L>
-      ssize_t
-      block_device_lockable<T, L>::read (void* buf, std::size_t nbyte)
-      {
+    template <typename T, typename L>
+    ssize_t
+    block_device_lockable<T, L>::read (void* buf, std::size_t nbyte)
+    {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
-        trace::printf ("block_device_lockable::%s(0x0%X, %u) @%p\n", __func__,
-                       buf, nbyte, this);
+      trace::printf ("block_device_lockable::%s(0x0%X, %u) @%p\n", __func__,
+                     buf, nbyte, this);
 #endif
 
-        std::lock_guard<L> lock
-          { locker_ };
+      std::lock_guard<L> lock{ locker_ };
 
-        return block_device::read (buf, nbyte);
-      }
+      return block_device::read (buf, nbyte);
+    }
 
-    template<typename T, typename L>
-      ssize_t
-      block_device_lockable<T, L>::write (const void* buf, std::size_t nbyte)
-      {
+    template <typename T, typename L>
+    ssize_t
+    block_device_lockable<T, L>::write (const void* buf, std::size_t nbyte)
+    {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
-        trace::printf ("block_device_lockable::%s(0x0%X, %u) @%p\n", __func__,
-                       buf, nbyte, this);
+      trace::printf ("block_device_lockable::%s(0x0%X, %u) @%p\n", __func__,
+                     buf, nbyte, this);
 #endif
 
-        std::lock_guard<L> lock
-          { locker_ };
+      std::lock_guard<L> lock{ locker_ };
 
-        return block_device::write (buf, nbyte);
-      }
+      return block_device::write (buf, nbyte);
+    }
 
-    template<typename T, typename L>
-      ssize_t
-      block_device_lockable<T, L>::writev (const /* struct */ iovec* iov, int iovcnt)
-      {
+    template <typename T, typename L>
+    ssize_t
+    block_device_lockable<T, L>::writev (const /* struct */ iovec* iov,
+                                         int iovcnt)
+    {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
-        trace::printf ("block_device_lockable::%s(0x0%X, %d) @%p\n", __func__,
-                       iov, iovcnt, this);
+      trace::printf ("block_device_lockable::%s(0x0%X, %d) @%p\n", __func__,
+                     iov, iovcnt, this);
 #endif
 
-        std::lock_guard<L> lock
-          { locker_ };
+      std::lock_guard<L> lock{ locker_ };
 
-        return block_device::writev (iov, iovcnt);
-      }
+      return block_device::writev (iov, iovcnt);
+    }
 
-    template<typename T, typename L>
-      int
-      block_device_lockable<T, L>::vfcntl (int cmd, std::va_list args)
-      {
+    template <typename T, typename L>
+    int
+    block_device_lockable<T, L>::vfcntl (int cmd, std::va_list args)
+    {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
-        trace::printf ("block_device_lockable::%s(%d) @%p\n", __func__, cmd,
-                       this);
+      trace::printf ("block_device_lockable::%s(%d) @%p\n", __func__, cmd,
+                     this);
 #endif
 
-        std::lock_guard<L> lock
-          { locker_ };
+      std::lock_guard<L> lock{ locker_ };
 
-        return block_device::vfcntl (cmd, args);
-      }
+      return block_device::vfcntl (cmd, args);
+    }
 
-    template<typename T, typename L>
-      int
-      block_device_lockable<T, L>::vioctl (int request, std::va_list args)
-      {
+    template <typename T, typename L>
+    int
+    block_device_lockable<T, L>::vioctl (int request, std::va_list args)
+    {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
-        trace::printf ("block_device_lockable::%s(%d) @%p\n", __func__, request,
-                       this);
+      trace::printf ("block_device_lockable::%s(%d) @%p\n", __func__, request,
+                     this);
 #endif
 
-        std::lock_guard<L> lock
-          { locker_ };
+      std::lock_guard<L> lock{ locker_ };
 
-        return block_device::vioctl (request, args);
-      }
+      return block_device::vioctl (request, args);
+    }
 
-    template<typename T, typename L>
-      off_t
-      block_device_lockable<T, L>::lseek (off_t offset, int whence)
-      {
+    template <typename T, typename L>
+    off_t
+    block_device_lockable<T, L>::lseek (off_t offset, int whence)
+    {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
-        trace::printf ("block_device_lockable::%s(%d, %d) @%p\n", __func__,
-                       offset, whence, this);
+      trace::printf ("block_device_lockable::%s(%d, %d) @%p\n", __func__,
+                     offset, whence, this);
 #endif
 
-        std::lock_guard<L> lock
-          { locker_ };
+      std::lock_guard<L> lock{ locker_ };
 
-        return block_device::lseek (offset, whence);
-      }
+      return block_device::lseek (offset, whence);
+    }
 
-    template<typename T, typename L>
-      ssize_t
-      block_device_lockable<T, L>::read_block (void* buf, blknum_t blknum,
-                                               std::size_t nblocks)
-      {
+    template <typename T, typename L>
+    ssize_t
+    block_device_lockable<T, L>::read_block (void* buf, blknum_t blknum,
+                                             std::size_t nblocks)
+    {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
-        trace::printf ("block_device_lockable::%s(%p, %u, %u) @%p\n", __func__,
-                       buf, blknum, nblocks, this);
+      trace::printf ("block_device_lockable::%s(%p, %u, %u) @%p\n", __func__,
+                     buf, blknum, nblocks, this);
 #endif
 
-        std::lock_guard<L> lock
-          { locker_ };
+      std::lock_guard<L> lock{ locker_ };
 
-        return block_device::read_block (buf, blknum, nblocks);
-      }
+      return block_device::read_block (buf, blknum, nblocks);
+    }
 
-    template<typename T, typename L>
-      ssize_t
-      block_device_lockable<T, L>::write_block (const void* buf,
-                                                blknum_t blknum,
-                                                std::size_t nblocks)
-      {
+    template <typename T, typename L>
+    ssize_t
+    block_device_lockable<T, L>::write_block (const void* buf, blknum_t blknum,
+                                              std::size_t nblocks)
+    {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
-        trace::printf ("block_device_lockable::%s(%p, %u, %u) @%p\n", __func__,
-                       buf, blknum, nblocks, this);
+      trace::printf ("block_device_lockable::%s(%p, %u, %u) @%p\n", __func__,
+                     buf, blknum, nblocks, this);
 #endif
 
-        std::lock_guard<L> lock
-          { locker_ };
+      std::lock_guard<L> lock{ locker_ };
 
-        return block_device::write_block (buf, blknum, nblocks);
-      }
+      return block_device::write_block (buf, blknum, nblocks);
+    }
 
-    template<typename T, typename L>
-      void
-      block_device_lockable<T, L>::sync (void)
-      {
+    template <typename T, typename L>
+    void
+    block_device_lockable<T, L>::sync (void)
+    {
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
-        trace::printf ("block_device_lockable::%s() @%p\n", __func__, this);
+      trace::printf ("block_device_lockable::%s() @%p\n", __func__, this);
 #endif
 
-        std::lock_guard<L> lock
-          { locker_ };
+      std::lock_guard<L> lock{ locker_ };
 
-        return block_device::sync ();
-      }
+      return block_device::sync ();
+    }
 
-    template<typename T, typename L>
-      typename block_device_lockable<T, L>::value_type&
-      block_device_lockable<T, L>::impl (void) const
-      {
-        return static_cast<value_type&> (impl_);
-      }
+    template <typename T, typename L>
+    typename block_device_lockable<T, L>::value_type&
+    block_device_lockable<T, L>::impl (void) const
+    {
+      return static_cast<value_type&> (impl_);
+    }
 
-  // ==========================================================================
+    // ========================================================================
   } /* namespace posix */
 } /* namespace os */
 

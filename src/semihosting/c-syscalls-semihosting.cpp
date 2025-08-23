@@ -120,7 +120,7 @@ static struct fdent*
 __semihosting_findslot (int fd)
 {
   // User file descriptor is out of range.
-  if ((unsigned int) fd >= OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES)
+  if ((unsigned int)fd >= OS_INTEGER_SEMIHOSTING_MAX_OPEN_FILES)
     {
       return nullptr;
     }
@@ -187,7 +187,7 @@ __semihosting_checkerror (int result)
 static int
 __semihosting_lseek (int fd, int ptr, int dir)
 {
-  struct fdent *pfd;
+  struct fdent* pfd;
 
   /* Valid file descriptor? */
   pfd = __semihosting_findslot (fd);
@@ -255,7 +255,7 @@ __semihosting_lseek (int fd, int ptr, int dir)
 static int
 __semihosting_stat (int fd, struct stat* st)
 {
-  struct fdent *pfd;
+  struct fdent* pfd;
   pfd = __semihosting_findslot (fd);
   if (pfd == NULL)
     {
@@ -346,9 +346,9 @@ __posix_open (const char* path, int oflag, ...)
     }
 
   uint32_t block[3];
-  block[0] = (uint32_t) path;
+  block[0] = (uint32_t)path;
   block[2] = std::strlen (path);
-  block[1] = (uint32_t) aflags;
+  block[1] = (uint32_t)aflags;
 
   int fh = call_host (SEMIHOSTING_SYS_OPEN, block);
 
@@ -368,7 +368,7 @@ __posix_open (const char* path, int oflag, ...)
 int
 __posix_close (int fildes)
 {
-  struct fdent *pfd;
+  struct fdent* pfd;
   pfd = __semihosting_findslot (fildes);
   if (pfd == NULL)
     {
@@ -409,7 +409,7 @@ __posix_close (int fildes)
 ssize_t
 __posix_read (int fildes, void* buf, size_t nbyte)
 {
-  struct fdent *pfd;
+  struct fdent* pfd;
   pfd = __semihosting_findslot (fildes);
   if (pfd == NULL)
     {
@@ -419,7 +419,7 @@ __posix_read (int fildes, void* buf, size_t nbyte)
 
   int block[3];
   block[0] = pfd->handle;
-  block[1] = (int) buf;
+  block[1] = (int)buf;
   block[2] = nbyte;
 
   int res;
@@ -440,7 +440,7 @@ __posix_read (int fildes, void* buf, size_t nbyte)
 ssize_t
 __posix_write (int fildes, const void* buf, size_t nbyte)
 {
-  struct fdent *pfd;
+  struct fdent* pfd;
   pfd = __semihosting_findslot (fildes);
   if (pfd == NULL)
     {
@@ -451,7 +451,7 @@ __posix_write (int fildes, const void* buf, size_t nbyte)
   int block[3];
 
   block[0] = pfd->handle;
-  block[1] = (int) buf;
+  block[1] = (int)buf;
   block[2] = nbyte;
 
   // Returns the number of bytes *not* written.
@@ -489,7 +489,7 @@ __posix_lseek (int fildes, off_t offset, int whence)
 int
 __posix_isatty (int fildes)
 {
-  struct fdent *pfd;
+  struct fdent* pfd;
   pfd = __semihosting_findslot (fildes);
   if (pfd == NULL)
     {
@@ -512,7 +512,7 @@ __posix_isatty (int fildes)
 int
 __posix_fstat (int fildes, struct stat* buf)
 {
-  memset (buf, 0, sizeof(*buf));
+  memset (buf, 0, sizeof (*buf));
   return __semihosting_stat (fildes, buf);
 }
 
@@ -523,7 +523,7 @@ int
 __posix_stat (const char* path, struct stat* buf)
 {
   int fd;
-  memset (buf, 0, sizeof(*buf));
+  memset (buf, 0, sizeof (*buf));
   // The best we can do is try to open the file read only.
   // If it exists, then we can guess a few things about it.
   if ((fd = __posix_open (path, O_RDONLY)) == -1)
@@ -541,20 +541,20 @@ int
 __posix_rename (const char* existing, const char* _new)
 {
   uint32_t block[4];
-  block[0] = (uint32_t) existing;
+  block[0] = (uint32_t)existing;
   block[1] = std::strlen (existing);
-  block[2] = (uint32_t) _new;
+  block[2] = (uint32_t)_new;
   block[3] = std::strlen (_new);
-  return
-      __semihosting_checkerror (call_host (SEMIHOSTING_SYS_RENAME, block)) ?
-          -1 : 0;
+  return __semihosting_checkerror (call_host (SEMIHOSTING_SYS_RENAME, block))
+             ? -1
+             : 0;
 }
 
 int
 __posix_unlink (const char* path)
 {
   uint32_t block[2];
-  block[0] = (uint32_t) path;
+  block[0] = (uint32_t)path;
   block[1] = strlen (path);
 
   int res;
@@ -567,7 +567,7 @@ __posix_unlink (const char* path)
 }
 
 int
-__posix_system (const char *command)
+__posix_system (const char* command)
 {
   // Hmmm.  The ARM debug interface specification doesn't say whether
   // SYS_SYSTEM does the right thing with a null argument, or assign any
@@ -578,7 +578,7 @@ __posix_system (const char *command)
     }
 
   uint32_t block[2];
-  block[0] = (uint32_t) command;
+  block[0] = (uint32_t)command;
   block[1] = strlen (command);
   int e = __semihosting_checkerror (call_host (SEMIHOSTING_SYS_SYSTEM, block));
   if ((e >= 0) && (e < 256))
@@ -599,7 +599,7 @@ __posix_system (const char *command)
 int
 __posix_gettimeofday (struct timeval* ptimeval, void* ptimezone)
 {
-  struct timezone* tzp = (struct timezone*) ptimezone;
+  struct timezone* tzp = (struct timezone*)ptimezone;
   if (ptimeval)
     {
       // Ask the host for the seconds since the Unix epoch.
@@ -622,7 +622,7 @@ clock_t
 __posix_clock (void)
 {
   clock_t timeval;
-  timeval = (clock_t) call_host (SEMIHOSTING_SYS_CLOCK, NULL);
+  timeval = (clock_t)call_host (SEMIHOSTING_SYS_CLOCK, NULL);
 
   return timeval;
 }
@@ -765,7 +765,8 @@ __posix_accept (int socket, struct sockaddr* address, socklen_t* address_len)
 }
 
 int
-__posix_bind (int socket, const struct sockaddr* address, socklen_t address_len)
+__posix_bind (int socket, const struct sockaddr* address,
+              socklen_t address_len)
 {
   errno = ENOSYS; // Not implemented
   return -1;
@@ -898,14 +899,14 @@ __posix_sockatmark (int socket)
 // ----------------------------------------------------------------------------
 // Not yet implemented.
 
-int __attribute__((weak))
+int __attribute__ ((weak))
 __posix_readdir_r (DIR* dirp, struct dirent* entry, struct dirent** result)
 {
   errno = ENOSYS; // Not implemented
   return -1;
 }
 
-int __attribute__((weak))
+int __attribute__ ((weak))
 __posix_socketpair (int domain, int type, int protocol, int socket_vector[2])
 {
   errno = ENOSYS; // Not implemented
@@ -980,7 +981,7 @@ __posix_tcdrain (int fildes)
 }
 
 int
-__posix_tcgetattr (int fildes, struct termios *termios_p)
+__posix_tcgetattr (int fildes, struct termios* termios_p)
 {
   errno = ENOSYS; // Not implemented
   return -1;
@@ -988,7 +989,7 @@ __posix_tcgetattr (int fildes, struct termios *termios_p)
 
 int
 __posix_tcsetattr (int fildes, int optional_actions,
-                   const struct termios *termios_p)
+                   const struct termios* termios_p)
 {
   errno = ENOSYS; // Not implemented
   return -1;
@@ -1036,7 +1037,7 @@ pid_t
 __posix_fork (void)
 {
   errno = ENOSYS; // Not implemented
-  return ((pid_t) -1);
+  return ((pid_t)-1);
 }
 
 pid_t
@@ -1063,7 +1064,7 @@ pid_t
 __posix_wait (int* stat_loc)
 {
   errno = ENOSYS; // Not implemented
-  return ((pid_t) -1);
+  return ((pid_t)-1);
 }
 
 int
@@ -1091,21 +1092,21 @@ ssize_t
 __posix_readlink (const char* path, char* buf, size_t bufsize)
 {
   errno = ENOSYS; // Not implemented
-  return ((ssize_t) -1);
+  return ((ssize_t)-1);
 }
 
 int
 __posix_statvfs (const char* path, struct statvfs* buf)
 {
   errno = ENOSYS; // Not implemented
-  return ((ssize_t) -1);
+  return ((ssize_t)-1);
 }
 
 int
 __posix_fstatvfs (int fildes, struct statvfs* buf)
 {
   errno = ENOSYS; // Not implemented
-  return ((ssize_t) -1);
+  return ((ssize_t)-1);
 }
 
 #pragma GCC diagnostic pop
@@ -1120,17 +1121,16 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 
-void
-__attribute__ ((noreturn,weak))
-os_terminate (int code __attribute__((unused)))
+void __attribute__ ((noreturn, weak))
+os_terminate (int code __attribute__ ((unused)))
 {
   /* There is only one SWI for both _exit and _kill. For _exit, call
    the SWI with the second argument set to -1, an invalid value for
    signum, so that the SWI handler can distinguish the two calls.
    Note: The RDI implementation of _kill throws away both its
    arguments.  */
-  report_exception (
-      code == 0 ? ADP_Stopped_ApplicationExit : ADP_Stopped_RunTimeError);
+  report_exception (code == 0 ? ADP_Stopped_ApplicationExit
+                              : ADP_Stopped_RunTimeError);
   /* NOTREACHED */
 }
 
@@ -1165,7 +1165,7 @@ os_startup_initialize_args (int* p_argc, char*** p_argv)
 
   command_line_block_t cmd_block;
   cmd_block.command_line = args_buf;
-  cmd_block.size = sizeof(args_buf) - 1;
+  cmd_block.size = sizeof (args_buf) - 1;
 
   int ret = call_host (SEMIHOSTING_SYS_GET_CMDLINE, &cmd_block);
   if (ret == 0)
@@ -1187,7 +1187,7 @@ os_startup_initialize_args (int* p_argc, char*** p_argv)
               if (!isblank (ch))
                 {
                   if (argc
-                      >= (int) ((sizeof(argv_buf) / sizeof(argv_buf[0])) - 1))
+                      >= (int)((sizeof (argv_buf) / sizeof (argv_buf[0])) - 1))
                     break;
 
                   if (ch == '"' || ch == '\'')
@@ -1262,20 +1262,20 @@ initialise_monitor_handles (void)
 
   int volatile block[3];
 
-  block[0] = (int) ":tt";
+  block[0] = (int)":tt";
   block[2] = 3; // length of filename
   block[1] = 0; // mode "r"
-  monitor_stdin = call_host (SEMIHOSTING_SYS_OPEN, (void*) block);
+  monitor_stdin = call_host (SEMIHOSTING_SYS_OPEN, (void*)block);
 
-  block[0] = (int) ":tt";
+  block[0] = (int)":tt";
   block[2] = 3; // length of filename
   block[1] = 4; // mode "w"
-  monitor_stdout = call_host (SEMIHOSTING_SYS_OPEN, (void*) block);
+  monitor_stdout = call_host (SEMIHOSTING_SYS_OPEN, (void*)block);
 
-  block[0] = (int) ":tt";
+  block[0] = (int)":tt";
   block[2] = 3; // length of filename
   block[1] = 8; // mode "a"
-  monitor_stderr = call_host (SEMIHOSTING_SYS_OPEN, (void*) block);
+  monitor_stderr = call_host (SEMIHOSTING_SYS_OPEN, (void*)block);
 
   // If we failed to open stderr, redirect to stdout.
   if (monitor_stderr == -1)
@@ -1326,4 +1326,3 @@ initialise_monitor_handles (void)
 // ----------------------------------------------------------------------------
 
 #endif /* defined(__ARM_EABI__) */
-

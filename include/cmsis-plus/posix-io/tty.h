@@ -14,7 +14,7 @@
 
 // ----------------------------------------------------------------------------
 
-#if defined (__cplusplus)
+#if defined(__cplusplus)
 
 // ----------------------------------------------------------------------------
 
@@ -61,7 +61,6 @@ namespace os
        */
 
     public:
-
       tty (tty_impl& impl, const char* name);
 
       /**
@@ -72,16 +71,17 @@ namespace os
       tty (const tty&) = delete;
       tty (tty&&) = delete;
       tty&
-      operator= (const tty&) = delete;
+      operator= (const tty&)
+          = delete;
       tty&
-      operator= (tty&&) = delete;
+      operator= (tty&&)
+          = delete;
 
       /**
        * @endcond
        */
 
-      virtual
-      ~tty () noexcept override;
+      virtual ~tty () noexcept override;
 
       /**
        * @}
@@ -94,14 +94,13 @@ namespace os
        */
 
     public:
-
       // http://pubs.opengroup.org/onlinepubs/9699919799/functions/tcgetattr.html
       virtual int
-      tcgetattr (/* struct */termios *ptio);
+      tcgetattr (/* struct */ termios* ptio);
 
       // http://pubs.opengroup.org/onlinepubs/9699919799/functions/tcsetattr.html
       virtual int
-      tcsetattr (int options, const /* struct */ termios *ptio);
+      tcsetattr (int options, const /* struct */ termios* ptio);
 
       // http://pubs.opengroup.org/onlinepubs/9699919799/functions/tcflush.html
       virtual int
@@ -144,7 +143,6 @@ namespace os
        */
 
     public:
-
       tty_impl (void);
 
       /**
@@ -155,16 +153,17 @@ namespace os
       tty_impl (const tty_impl&) = delete;
       tty_impl (tty_impl&&) = delete;
       tty_impl&
-      operator= (const tty_impl&) = delete;
+      operator= (const tty_impl&)
+          = delete;
       tty_impl&
-      operator= (tty_impl&&) = delete;
+      operator= (tty_impl&&)
+          = delete;
 
       /**
        * @endcond
        */
 
-      virtual
-      ~tty_impl () override;
+      virtual ~tty_impl () override;
 
       /**
        * @}
@@ -177,21 +176,25 @@ namespace os
        */
 
     public:
+      virtual int
+      do_tcgetattr (/* struct */ termios* ptio)
+          = 0;
 
       virtual int
-      do_tcgetattr (/* struct */ termios *ptio) = 0;
+      do_tcsetattr (int options, const /* struct */ termios* ptio)
+          = 0;
 
       virtual int
-      do_tcsetattr (int options, const /* struct */ termios *ptio) = 0;
+      do_tcflush (int queue_selector)
+          = 0;
 
       virtual int
-      do_tcflush (int queue_selector) = 0;
+      do_tcsendbreak (int duration)
+          = 0;
 
       virtual int
-      do_tcsendbreak (int duration) = 0;
-
-      virtual int
-      do_tcdrain (void) = 0;
+      do_tcdrain (void)
+          = 0;
 
       virtual int
       do_isatty (void) final;
@@ -205,82 +208,79 @@ namespace os
 
     // ========================================================================
 
-    template<typename T>
-      class tty_implementable : public tty
-      {
-        // --------------------------------------------------------------------
+    template <typename T>
+    class tty_implementable : public tty
+    {
+      // ----------------------------------------------------------------------
 
-      public:
+    public:
+      using value_type = T;
 
-        using value_type = T;
+      // ----------------------------------------------------------------------
 
-        // --------------------------------------------------------------------
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
-        /**
-         * @name Constructors & Destructor
-         * @{
-         */
+    public:
+      template <typename... Args>
+      tty_implementable (const char* name, Args&&... args);
 
-      public:
+      /**
+       * @cond ignore
+       */
 
-        template<typename ... Args>
-          tty_implementable (const char* name, Args&&... args);
+      // The rule of five.
+      tty_implementable (const tty_implementable&) = delete;
+      tty_implementable (tty_implementable&&) = delete;
+      tty_implementable&
+      operator= (const tty_implementable&)
+          = delete;
+      tty_implementable&
+      operator= (tty_implementable&&)
+          = delete;
 
-        /**
-         * @cond ignore
-         */
+      /**
+       * @endcond
+       */
 
-        // The rule of five.
-        tty_implementable (const tty_implementable&) = delete;
-        tty_implementable (tty_implementable&&) = delete;
-        tty_implementable&
-        operator= (const tty_implementable&) = delete;
-        tty_implementable&
-        operator= (tty_implementable&&) = delete;
+      virtual ~tty_implementable ();
 
-        /**
-         * @endcond
-         */
+      /**
+       * @}
+       */
 
-        virtual
-        ~tty_implementable ();
+      // ----------------------------------------------------------------------
+      /**
+       * @name Public Member Functions
+       * @{
+       */
 
-        /**
-         * @}
-         */
+    public:
+      // Support functions.
 
-        // --------------------------------------------------------------------
-        /**
-         * @name Public Member Functions
-         * @{
-         */
+      value_type&
+      impl (void) const;
 
-      public:
+      /**
+       * @}
+       */
 
-        // Support functions.
+      // ----------------------------------------------------------------------
+    protected:
+      /**
+       * @cond ignore
+       */
 
-        value_type&
-        impl (void) const;
+      value_type impl_instance_;
 
-        /**
-         * @}
-         */
+      /**
+       * @endcond
+       */
+    };
 
-        // --------------------------------------------------------------------
-      protected:
-
-        /**
-         * @cond ignore
-         */
-
-        value_type impl_instance_;
-
-        /**
-         * @endcond
-         */
-      };
-
-  // ==========================================================================
+    // ========================================================================
   } /* namespace posix */
 } /* namespace os */
 
@@ -300,38 +300,35 @@ namespace os
 
     // ========================================================================
 
-    template<typename T>
-      template<typename ... Args>
-        tty_implementable<T>::tty_implementable (const char* name,
-                                                 Args&&... args) :
-            tty
-              { impl_instance_, name }, //
-            impl_instance_
-              { std::forward<Args>(args)... }
-        {
+    template <typename T>
+    template <typename... Args>
+    tty_implementable<T>::tty_implementable (const char* name, Args&&... args)
+        : tty{ impl_instance_, name }, //
+          impl_instance_{ std::forward<Args> (args)... }
+    {
 #if defined(OS_TRACE_POSIX_IO_TTY)
-          trace::printf ("tty_implementable::%s(\"%s\")=@%p\n", __func__, name_,
-                         this);
+      trace::printf ("tty_implementable::%s(\"%s\")=@%p\n", __func__, name_,
+                     this);
 #endif
-        }
+    }
 
-    template<typename T>
-      tty_implementable<T>::~tty_implementable ()
-      {
+    template <typename T>
+    tty_implementable<T>::~tty_implementable ()
+    {
 #if defined(OS_TRACE_POSIX_IO_TTY)
-        trace::printf ("tty_implementable::%s() @%p %s\n", __func__, this,
-                       name_);
+      trace::printf ("tty_implementable::%s() @%p %s\n", __func__, this,
+                     name_);
 #endif
-      }
+    }
 
-    template<typename T>
-      typename tty_implementable<T>::value_type&
-      tty_implementable<T>::impl (void) const
-      {
-        return static_cast<value_type&> (impl_);
-      }
+    template <typename T>
+    typename tty_implementable<T>::value_type&
+    tty_implementable<T>::impl (void) const
+    {
+      return static_cast<value_type&> (impl_);
+    }
 
-  // ==========================================================================
+    // ========================================================================
   } /* namespace posix */
 } /* namespace os */
 

@@ -37,19 +37,17 @@ __assert_func (const char* file, int line, const char* func,
 #pragma GCC diagnostic pop
 
 #if !defined(TRACE) && !defined(OS_USE_SEMIHOSTING_SYSCALLS)
-void
-__attribute__((noreturn))
-__assert_func (const char* file __attribute__((unused)),
-    int line __attribute__((unused)),
-    const char* func __attribute__((unused)),
-    const char* failedexpr __attribute__((unused)))
-  {
-    abort ();
-  }
+void __attribute__ ((noreturn))
+__assert_func (const char* file __attribute__ ((unused)),
+               int line __attribute__ ((unused)),
+               const char* func __attribute__ ((unused)),
+               const char* failedexpr __attribute__ ((unused)))
+{
+  abort ();
+}
 
 #else
-void
-__attribute__((noreturn))
+void __attribute__ ((noreturn))
 __assert_func (const char* file, int line, const char* func,
                const char* failedexpr)
 {
@@ -66,12 +64,13 @@ __assert_func (const char* file, int line, const char* func,
     {
       trace_printf ("function: %s\n", func);
     }
-  if (!os_irq_in_handler_mode())
+  if (!os_irq_in_handler_mode ())
     {
-      if (os_this_thread() != NULL)
+      if (os_this_thread () != NULL)
         {
-          trace_printf ("this_thread: %s @%p\n", os_thread_get_name(os_this_thread()),
-                        os_this_thread());
+          trace_printf ("this_thread: %s @%p\n",
+                        os_thread_get_name (os_this_thread ()),
+                        os_this_thread ());
         }
     }
 
@@ -84,12 +83,12 @@ __assert_func (const char* file, int line, const char* func,
     {
       printf ("function: %s\n", func);
     }
-  if (!os_irq_in_handler_mode())
+  if (!os_irq_in_handler_mode ())
     {
-      if (os_this_thread() != NULL)
+      if (os_this_thread () != NULL)
         {
-          printf ("this_thread: %s @%p\n", os_thread_get_name(os_this_thread()),
-                        os_this_thread());
+          printf ("this_thread: %s @%p\n",
+                  os_thread_get_name (os_this_thread ()), os_this_thread ());
         }
     }
 
@@ -106,11 +105,11 @@ __assert_func (const char* file, int line, const char* func,
 // This is STM32 specific, but can be used on other platforms too.
 // If the application needs it, add the following to your application header:
 
-//#if defined(USE_FULL_ASSERT)
-//#define assert_param(expr) ((expr) ? (void)0 : assert_failed((uint8_t*)__FILE__, __LINE__)) void assert_failed(uint8_t* file, uint32_t line);
-//#else
-//#define assert_param(expr) ((void)0)
-//#endif /* USE_FULL_ASSERT */
+// #if defined(USE_FULL_ASSERT)
+// #define assert_param(expr) ((expr) ? (void)0 :
+// assert_failed((uint8_t*)__FILE__, __LINE__)) void assert_failed(uint8_t*
+// file, uint32_t line); #else #define assert_param(expr) ((void)0) #endif /*
+// USE_FULL_ASSERT */
 
 // In the new STM32 HAL, the USE_FULL_ASSERT macro is defined in
 // stm32??xx_hal_conf.
@@ -126,14 +125,13 @@ assert_failed (uint8_t* file, uint32_t line);
 #endif
 
 // Called from the assert_param() macro, usually defined in the stm32f*_conf.h
-void
-__attribute__((noreturn))
+void __attribute__ ((noreturn))
 assert_failed (uint8_t* file, uint32_t line)
 {
 #if defined(TRACE)
 
   trace_printf ("assert_param() failed: file \"%s\", line %d\n", file, line);
-  trace_printf ("this_thread: %s\n", os_thread_get_name(os_this_thread()));
+  trace_printf ("this_thread: %s\n", os_thread_get_name (os_this_thread ()));
 
 #elif defined(OS_USE_SEMIHOSTING_SYSCALLS)
 

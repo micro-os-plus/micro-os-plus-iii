@@ -56,7 +56,6 @@ namespace os
        */
 
     public:
-
       net_interface (net_interface_impl& impl, const char* name);
 
       /**
@@ -67,16 +66,17 @@ namespace os
       net_interface (const net_interface&) = delete;
       net_interface (net_interface&&) = delete;
       net_interface&
-      operator= (const net_interface&) = delete;
+      operator= (const net_interface&)
+          = delete;
       net_interface&
-      operator= (net_interface&&) = delete;
+      operator= (net_interface&&)
+          = delete;
 
       /**
        * @endcond
        */
 
-      virtual
-      ~net_interface ();
+      virtual ~net_interface ();
 
       /**
        * @}

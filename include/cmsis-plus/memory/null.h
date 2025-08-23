@@ -55,14 +55,14 @@ namespace os
     class null_memory_resource : public rtos::memory::memory_resource
     {
     public:
-
       /**
        * @name Constructors & Destructor
        * @{
        */
 
       /**
-       * @brief Default constructor. Construct a memory manager object instance.
+       * @brief Default constructor. Construct a memory manager object
+       * instance.
        */
       null_memory_resource () = default;
 
@@ -74,9 +74,11 @@ namespace os
       null_memory_resource (const null_memory_resource&) = delete;
       null_memory_resource (null_memory_resource&&) = delete;
       null_memory_resource&
-      operator= (const null_memory_resource&) = delete;
+      operator= (const null_memory_resource&)
+          = delete;
       null_memory_resource&
-      operator= (null_memory_resource&&) = delete;
+      operator= (null_memory_resource&&)
+          = delete;
 
       /**
        * @endcond
@@ -92,7 +94,6 @@ namespace os
        */
 
     protected:
-
       /**
        * @name Private Member Functions
        * @{
@@ -116,8 +117,8 @@ namespace os
        *  Nothing.
        */
       virtual void
-      do_deallocate (void* addr, std::size_t bytes, std::size_t alignment)
-          noexcept override;
+      do_deallocate (void* addr, std::size_t bytes,
+                     std::size_t alignment) noexcept override;
 
       /**
        * @}
@@ -126,7 +127,7 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-  // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
   } /* namespace memory */
 } /* namespace os */
 
@@ -148,7 +149,8 @@ namespace os
 #endif
 
     inline void*
-    null_memory_resource::do_allocate (std::size_t bytes, std::size_t alignment)
+    null_memory_resource::do_allocate (std::size_t bytes,
+                                       std::size_t alignment)
     {
       estd::__throw_bad_alloc ();
     }
@@ -161,7 +163,7 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-  // ==========================================================================
+    // ========================================================================
   } /* namespace memory */
 } /* namespace os */
 

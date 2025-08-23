@@ -92,7 +92,6 @@ namespace os
        */
 
     public:
-
       directory (directory_impl& impl);
 
       /**
@@ -103,16 +102,17 @@ namespace os
       directory (const directory&) = delete;
       directory (directory&&) = delete;
       directory&
-      operator= (const directory&) = delete;
+      operator= (const directory&)
+          = delete;
       directory&
-      operator= (directory&&) = delete;
+      operator= (directory&&)
+          = delete;
 
       /**
        * @endcond
        */
 
-      virtual
-      ~directory ();
+      virtual ~directory ();
 
       /**
        * @}
@@ -125,9 +125,8 @@ namespace os
        */
 
     public:
-
       // http://pubs.opengroup.org/onlinepubs/9699919799/functions/readdir.html
-      virtual /* struct */ dirent *
+      virtual /* struct */ dirent*
       read (void);
 
       // http://pubs.opengroup.org/onlinepubs/9699919799/functions/rewinddir.html
@@ -164,7 +163,6 @@ namespace os
 
       // ----------------------------------------------------------------------
     public:
-
       /**
        * @cond ignore
        */
@@ -179,7 +177,6 @@ namespace os
 
       // ----------------------------------------------------------------------
     protected:
-
       /**
        * @cond ignore
        */
@@ -215,7 +212,6 @@ namespace os
        */
 
     public:
-
       directory_impl (/* class */ file_system& fs);
 
       /**
@@ -226,16 +222,17 @@ namespace os
       directory_impl (const directory_impl&) = delete;
       directory_impl (directory_impl&&) = delete;
       directory_impl&
-      operator= (const directory_impl&) = delete;
+      operator= (const directory_impl&)
+          = delete;
       directory_impl&
-      operator= (directory_impl&&) = delete;
+      operator= (directory_impl&&)
+          = delete;
 
       /**
        * @endcond
        */
 
-      virtual
-      ~directory_impl ();
+      virtual ~directory_impl ();
 
       /**
        * @}
@@ -248,20 +245,22 @@ namespace os
        */
 
     public:
-
       // Implementations
 
       /**
        * @return object if successful, otherwise nullptr and errno.
        */
       virtual /* struct */ dirent*
-      do_read (void) = 0;
+      do_read (void)
+          = 0;
 
       virtual void
-      do_rewind (void) = 0;
+      do_rewind (void)
+          = 0;
 
       virtual int
-      do_close (void) = 0;
+      do_close (void)
+          = 0;
 
       // ----------------------------------------------------------------------
       // Support functions.
@@ -283,7 +282,6 @@ namespace os
 
       // ----------------------------------------------------------------------
     protected:
-
       /**
        * @cond ignore
        */
@@ -306,78 +304,75 @@ namespace os
 #pragma GCC diagnostic ignored "-Wsuggest-final-methods"
 #pragma GCC diagnostic ignored "-Wsuggest-final-types"
 #endif
-    template<typename T>
-      class directory_implementable : public directory
-      {
-        // --------------------------------------------------------------------
+    template <typename T>
+    class directory_implementable : public directory
+    {
+      // ----------------------------------------------------------------------
 
-      public:
+    public:
+      using value_type = T;
 
-        using value_type = T;
+      // ----------------------------------------------------------------------
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
-        // --------------------------------------------------------------------
-        /**
-         * @name Constructors & Destructor
-         * @{
-         */
+    public:
+      directory_implementable (/* class */ file_system& fs);
 
-      public:
+      /**
+       * @cond ignore
+       */
 
-        directory_implementable (/* class */ file_system& fs);
+      // The rule of five.
+      directory_implementable (const directory_implementable&) = delete;
+      directory_implementable (directory_implementable&&) = delete;
+      directory_implementable&
+      operator= (const directory_implementable&)
+          = delete;
+      directory_implementable&
+      operator= (directory_implementable&&)
+          = delete;
 
-        /**
-         * @cond ignore
-         */
+      /**
+       * @endcond
+       */
 
-        // The rule of five.
-        directory_implementable (const directory_implementable&) = delete;
-        directory_implementable (directory_implementable&&) = delete;
-        directory_implementable&
-        operator= (const directory_implementable&) = delete;
-        directory_implementable&
-        operator= (directory_implementable&&) = delete;
+      virtual ~directory_implementable () override;
 
-        /**
-         * @endcond
-         */
+      /**
+       * @}
+       */
 
-        virtual
-        ~directory_implementable () override;
+      // ----------------------------------------------------------------------
+      /**
+       * @name Public Member Functions
+       * @{
+       */
 
-        /**
-         * @}
-         */
+    public:
+      // Support functions.
 
-        // --------------------------------------------------------------------
-        /**
-         * @name Public Member Functions
-         * @{
-         */
+      value_type&
+      impl (void) const;
 
-      public:
+      /**
+       * @}
+       */
 
-        // Support functions.
+      // ----------------------------------------------------------------------
+    protected:
+      /**
+       * @cond ignore
+       */
 
-        value_type&
-        impl (void) const;
+      value_type impl_instance_;
 
-        /**
-         * @}
-         */
-
-        // --------------------------------------------------------------------
-      protected:
-
-        /**
-         * @cond ignore
-         */
-
-        value_type impl_instance_;
-
-        /**
-         * @endcond
-         */
-      };
+      /**
+       * @endcond
+       */
+    };
 #pragma GCC diagnostic pop
 
     // ========================================================================
@@ -388,102 +383,99 @@ namespace os
 #pragma GCC diagnostic ignored "-Wsuggest-final-methods"
 #pragma GCC diagnostic ignored "-Wsuggest-final-types"
 #endif
-    template<typename T, typename L>
-      class directory_lockable : public directory
-      {
-        // --------------------------------------------------------------------
+    template <typename T, typename L>
+    class directory_lockable : public directory
+    {
+      // ----------------------------------------------------------------------
 
-      public:
+    public:
+      using value_type = T;
+      using lockable_type = L;
 
-        using value_type = T;
-        using lockable_type = L;
+      // ----------------------------------------------------------------------
 
-        // --------------------------------------------------------------------
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
-        /**
-         * @name Constructors & Destructor
-         * @{
-         */
+    public:
+      directory_lockable (/* class */ file_system& fs, lockable_type& locker);
 
-      public:
+      /**
+       * @cond ignore
+       */
 
-        directory_lockable (/* class */ file_system& fs, lockable_type& locker);
+      // The rule of five.
+      directory_lockable (const directory_lockable&) = delete;
+      directory_lockable (directory_lockable&&) = delete;
+      directory_lockable&
+      operator= (const directory_lockable&)
+          = delete;
+      directory_lockable&
+      operator= (directory_lockable&&)
+          = delete;
 
-        /**
-         * @cond ignore
-         */
+      /**
+       * @endcond
+       */
 
-        // The rule of five.
-        directory_lockable (const directory_lockable&) = delete;
-        directory_lockable (directory_lockable&&) = delete;
-        directory_lockable&
-        operator= (const directory_lockable&) = delete;
-        directory_lockable&
-        operator= (directory_lockable&&) = delete;
+      virtual ~directory_lockable () override;
 
-        /**
-         * @endcond
-         */
+      /**
+       * @}
+       */
 
-        virtual
-        ~directory_lockable () override;
+      // ----------------------------------------------------------------------
+      /**
+       * @name Public Member Functions
+       * @{
+       */
 
-        /**
-         * @}
-         */
+    public:
+      // opendir() uses the file system lock.
 
-        // --------------------------------------------------------------------
-        /**
-         * @name Public Member Functions
-         * @{
-         */
+      // http://pubs.opengroup.org/onlinepubs/9699919799/functions/readdir.html
+      virtual /* struct */ dirent*
+      read (void) override;
 
-      public:
+      // http://pubs.opengroup.org/onlinepubs/9699919799/functions/rewinddir.html
+      virtual void
+      rewind (void) override;
 
-        // opendir() uses the file system lock.
+      // http://pubs.opengroup.org/onlinepubs/9699919799/functions/closedir.html
+      virtual int
+      close (void) override;
 
-        // http://pubs.opengroup.org/onlinepubs/9699919799/functions/readdir.html
-        virtual /* struct */ dirent *
-        read (void) override;
+      // ----------------------------------------------------------------------
+      // Support functions.
 
-        // http://pubs.opengroup.org/onlinepubs/9699919799/functions/rewinddir.html
-        virtual void
-        rewind (void) override;
+      value_type&
+      impl (void) const;
 
-        // http://pubs.opengroup.org/onlinepubs/9699919799/functions/closedir.html
-        virtual int
-        close (void) override;
+      /**
+       * @}
+       */
 
-        // --------------------------------------------------------------------
-        // Support functions.
+      // ----------------------------------------------------------------------
+    protected:
+      /**
+       * @cond ignore
+       */
 
-        value_type&
-        impl (void) const;
+      value_type impl_instance_;
 
-        /**
-         * @}
-         */
+      lockable_type& locker_;
 
-        // --------------------------------------------------------------------
-      protected:
-
-        /**
-         * @cond ignore
-         */
-
-        value_type impl_instance_;
-
-        lockable_type& locker_;
-
-        /**
-         * @endcond
-         */
-      };
+      /**
+       * @endcond
+       */
+    };
 #pragma GCC diagnostic pop
 
 #pragma GCC diagnostic pop
 
-  // ==========================================================================
+    // ========================================================================
   } /* namespace posix */
 } /* namespace os */
 
@@ -523,122 +515,115 @@ namespace os
 
     // ========================================================================
 
-    template<typename T>
-      directory_implementable<T>::directory_implementable (
-          /* class */ file_system& fs) :
-          directory
-            { impl_instance_ }, //
-          impl_instance_
-            { fs }
-      {
+    template <typename T>
+    directory_implementable<T>::directory_implementable (
+        /* class */ file_system& fs)
+        : directory{ impl_instance_ }, //
+          impl_instance_{ fs }
+    {
 #if defined(OS_TRACE_POSIX_IO_DIRECTORY)
-        trace::printf ("directory_implementable::%s()=@%p\n", __func__, this);
+      trace::printf ("directory_implementable::%s()=@%p\n", __func__, this);
 #endif
-      }
+    }
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wsuggest-final-methods"
 #endif
-    template<typename T>
-      directory_implementable<T>::~directory_implementable ()
-      {
+    template <typename T>
+    directory_implementable<T>::~directory_implementable ()
+    {
 #if defined(OS_TRACE_POSIX_IO_DIRECTORY)
-        trace::printf ("directory_implementable::%s() @%p\n", __func__, this);
+      trace::printf ("directory_implementable::%s() @%p\n", __func__, this);
 #endif
-      }
+    }
 #pragma GCC diagnostic pop
 
-    template<typename T>
-      typename directory_implementable<T>::value_type&
-      directory_implementable<T>::impl (void) const
-      {
-        return static_cast<value_type&> (impl_);
-      }
+    template <typename T>
+    typename directory_implementable<T>::value_type&
+    directory_implementable<T>::impl (void) const
+    {
+      return static_cast<value_type&> (impl_);
+    }
 
     // ========================================================================
 
-    template<typename T, typename L>
-      directory_lockable<T, L>::directory_lockable (/* class */ file_system& fs,
-                                                    lockable_type& locker) :
-          directory
-            { impl_instance_ }, //
-          impl_instance_
-            { fs }, //
+    template <typename T, typename L>
+    directory_lockable<T, L>::directory_lockable (/* class */ file_system& fs,
+                                                  lockable_type& locker)
+        : directory{ impl_instance_ }, //
+          impl_instance_{ fs }, //
           locker_ (locker)
-      {
+    {
 #if defined(OS_TRACE_POSIX_IO_DIRECTORY)
-        trace::printf ("directory_lockable::%s()=@%p\n", __func__, this);
+      trace::printf ("directory_lockable::%s()=@%p\n", __func__, this);
 #endif
-      }
+    }
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wsuggest-final-methods"
 #endif
-    template<typename T, typename L>
-      directory_lockable<T, L>::~directory_lockable ()
-      {
+    template <typename T, typename L>
+    directory_lockable<T, L>::~directory_lockable ()
+    {
 #if defined(OS_TRACE_POSIX_IO_DIRECTORY)
-        trace::printf ("directory_lockable::%s() @%p\n", __func__, this);
+      trace::printf ("directory_lockable::%s() @%p\n", __func__, this);
 #endif
-      }
+    }
 #pragma GCC diagnostic pop
 
     // ------------------------------------------------------------------------
 
-    template<typename T, typename L>
-      /* struct */ dirent *
-      directory_lockable<T, L>::read (void)
-      {
+    template <typename T, typename L>
+    /* struct */ dirent*
+    directory_lockable<T, L>::read (void)
+    {
 #if defined(OS_TRACE_POSIX_IO_DIRECTORY)
-        trace::printf ("directory_lockable::%s() @%p\n", __func__, this);
+      trace::printf ("directory_lockable::%s() @%p\n", __func__, this);
 #endif
 
-        std::lock_guard<L> lock
-          { locker_ };
+      std::lock_guard<L> lock{ locker_ };
 
-        return directory::read ();
-      }
+      return directory::read ();
+    }
 
-    template<typename T, typename L>
-      void
-      directory_lockable<T, L>::rewind (void)
-      {
+    template <typename T, typename L>
+    void
+    directory_lockable<T, L>::rewind (void)
+    {
 #if defined(OS_TRACE_POSIX_IO_DIRECTORY)
-        trace::printf ("directory_lockable::%s() @%p\n", __func__, this);
+      trace::printf ("directory_lockable::%s() @%p\n", __func__, this);
 #endif
 
-        std::lock_guard<L> lock
-          { locker_ };
+      std::lock_guard<L> lock{ locker_ };
 
-        return directory::rewind ();
-      }
+      return directory::rewind ();
+    }
 
-    template<typename T, typename L>
-      int
-      directory_lockable<T, L>::close (void)
-      {
+    template <typename T, typename L>
+    int
+    directory_lockable<T, L>::close (void)
+    {
 #if defined(OS_TRACE_POSIX_IO_DIRECTORY)
-        trace::printf ("directory_lockable::%s() @%p\n", __func__, this);
+      trace::printf ("directory_lockable::%s() @%p\n", __func__, this);
 #endif
 
-        std::lock_guard<L> lock
-          { locker_ };
+      std::lock_guard<L> lock{ locker_ };
 
-        return directory::close ();
-      }
+      return directory::close ();
+    }
 
-    template<typename T, typename L>
-      typename directory_lockable<T, L>::value_type&
-      directory_lockable<T, L>::impl (void) const
-      {
-        return static_cast<value_type&> (impl_);
-      }
+    template <typename T, typename L>
+    typename directory_lockable<T, L>::value_type&
+    directory_lockable<T, L>::impl (void) const
+    {
+      return static_cast<value_type&> (impl_);
+    }
 
-  // ==========================================================================
+    // ========================================================================
   } /* namespace posix */
 } /* namespace os */
 

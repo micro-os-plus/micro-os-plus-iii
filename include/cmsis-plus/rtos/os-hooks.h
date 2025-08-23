@@ -44,8 +44,7 @@ extern "C"
    * @par Returns
    *  Does not return.
    */
-  void
-  __attribute__ ((noreturn))
+  void __attribute__ ((noreturn))
   _start (void);
 #pragma GCC diagnostic pop
 
@@ -77,7 +76,8 @@ extern "C"
    *  Nothing.
    */
   void
-  os_startup_initialize_free_store (void* heap_address, size_t heap_size_bytes);
+  os_startup_initialize_free_store (void* heap_address,
+                                    size_t heap_size_bytes);
 
   /**
    * @brief Initialise arguments.
@@ -122,8 +122,7 @@ extern "C"
    * @par Returns
    *  Nothing.
    */
-  void
-  __attribute__ ((noreturn))
+  void __attribute__ ((noreturn))
   os_terminate (int code);
 
   /**
@@ -165,26 +164,26 @@ extern "C"
   void
   os_rtos_system_out_of_memory_hook (void);
 
-/**
- * @}
- */
+  /**
+   * @}
+   */
 
-/**
- * @name Compatibility Macros
- * @{
- */
+  /**
+   * @name Compatibility Macros
+   * @{
+   */
 
 #define os_initialize_hardware_early os_startup_initialize_hardware_early
 #define os_initialize_hardware os_startup_initialize_hardware
 #define os_initialize_args os_startup_initialize_args
 
-/**
- * @}
- */
+  /**
+   * @}
+   */
 
-/**
- * @}
- */
+  /**
+   * @}
+   */
 
 #if defined(__cplusplus)
 }

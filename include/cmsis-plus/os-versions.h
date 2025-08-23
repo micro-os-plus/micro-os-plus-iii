@@ -25,8 +25,8 @@
 
 // ----------------------------------------------------------------------------
 
-#define OS_MACRO_SHARP(x)               #x
-#define OS_MACRO_STRINGIFY(x)           OS_MACRO_SHARP(x)
+#define OS_MACRO_SHARP(x) #x
+#define OS_MACRO_STRINGIFY(x) OS_MACRO_SHARP (x)
 
 // ----------------------------------------------------------------------------
 
@@ -39,14 +39,14 @@
 #define OS_STRING_RTOS_IMPL_VERSION_BUILD ""
 
 #define OS_INTEGER_RTOS_IMPL_YEAR 2023
-#define OS_STRING_RTOS_IMPL_YEAR OS_MACRO_STRINGIFY(OS_INTEGER_RTOS_IMPL_YEAR)
+#define OS_STRING_RTOS_IMPL_YEAR OS_MACRO_STRINGIFY (OS_INTEGER_RTOS_IMPL_YEAR)
 
 #define OS_STRING_RTOS_IMPL_VERSION \
-  OS_MACRO_STRINGIFY(OS_INTEGER_RTOS_IMPL_VERSION_MAJOR) "." \
-  OS_MACRO_STRINGIFY(OS_INTEGER_RTOS_IMPL_VERSION_MINOR) "." \
-  OS_MACRO_STRINGIFY(OS_INTEGER_RTOS_IMPL_VERSION_PATCH) \
-  OS_STRING_RTOS_IMPL_VERSION_PRE_RELEASE \
-  OS_STRING_RTOS_IMPL_VERSION_BUILD
+  OS_MACRO_STRINGIFY (OS_INTEGER_RTOS_IMPL_VERSION_MAJOR) \
+  "." OS_MACRO_STRINGIFY (OS_INTEGER_RTOS_IMPL_VERSION_MINOR) "." OS_MACRO_STRINGIFY ( \
+      OS_INTEGER_RTOS_IMPL_VERSION_PATCH) \
+      OS_STRING_RTOS_IMPL_VERSION_PRE_RELEASE \
+          OS_STRING_RTOS_IMPL_VERSION_BUILD
 
 // ----------------------------------------------------------------------------
 
@@ -62,7 +62,7 @@
  * Macro to inform the application build that µOS++
  * is in use.
  */
- #define OS_USE_MICRO_OS_PLUS
+#define OS_USE_MICRO_OS_PLUS
 
 /**
  * @def OS_IS_CROSS_BUILD

@@ -54,8 +54,8 @@ namespace os
 
         thread::priority_t prio = node.thread_->priority ();
 
-        waiting_thread_node* after =
-            static_cast<waiting_thread_node*> (const_cast<utils::static_double_list_links *> (tail ()));
+        waiting_thread_node* after = static_cast<waiting_thread_node*> (
+            const_cast<utils::static_double_list_links*> (tail ()));
 
         if (empty ())
           {
@@ -80,8 +80,8 @@ namespace os
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif
             // Insert at the beginning of the list.
-            after =
-                static_cast<waiting_thread_node*> (const_cast<utils::static_double_list_links *> (&head_));
+            after = static_cast<waiting_thread_node*> (
+                const_cast<utils::static_double_list_links*> (&head_));
 #pragma GCC diagnostic pop
 
 #if defined(OS_TRACE_RTOS_LISTS)
@@ -101,8 +101,9 @@ namespace os
             // The weight is relatively small, priority() is not heavy.
             while (prio > after->thread_->priority ())
               {
-                after =
-                    static_cast<waiting_thread_node*> (const_cast<utils::static_double_list_links *> (after->prev ()));
+                after = static_cast<waiting_thread_node*> (
+                    const_cast<utils::static_double_list_links*> (
+                        after->prev ()));
               }
 #pragma GCC diagnostic pop
 
@@ -194,8 +195,8 @@ namespace os
       {
         thread::priority_t prio = node.thread_->priority ();
 
-        waiting_thread_node* after =
-            static_cast<waiting_thread_node*> (const_cast<utils::static_double_list_links *> (tail ()));
+        waiting_thread_node* after = static_cast<waiting_thread_node*> (
+            const_cast<utils::static_double_list_links*> (tail ()));
 
         if (empty ())
           {
@@ -220,8 +221,8 @@ namespace os
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif
             // Insert at the beginning of the list.
-            after =
-                static_cast<waiting_thread_node*> (const_cast<utils::static_double_list_links *> (&head_));
+            after = static_cast<waiting_thread_node*> (
+                const_cast<utils::static_double_list_links*> (&head_));
 #pragma GCC diagnostic pop
 
 #if defined(OS_TRACE_RTOS_LISTS)
@@ -241,8 +242,9 @@ namespace os
             // The weight is relatively small, priority() is not heavy.
             while (prio > after->thread_->priority ())
               {
-                after =
-                    static_cast<waiting_thread_node*> (const_cast<utils::static_double_list_links *> (after->prev ()));
+                after = static_cast<waiting_thread_node*> (
+                    const_cast<utils::static_double_list_links*> (
+                        after->prev ()));
               }
 #pragma GCC diagnostic pop
 
@@ -264,22 +266,22 @@ namespace os
       waiting_threads_list::resume_one (void)
       {
         thread* th;
-          {
-            // ----- Enter critical section -----------------------------------
-            interrupts::critical_section ics;
+        {
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
 
-            // If the list is empty, silently return.
-            if (empty ())
-              {
-                return false;
-              }
+          // If the list is empty, silently return.
+          if (empty ())
+            {
+              return false;
+            }
 
-            // The top priority is to remove the entry from the list
-            // so that subsequent wakeups to address different threads.
-            th = head ()->thread_;
-            const_cast<waiting_thread_node*> (head ())->unlink ();
-            // ----- Exit critical section ------------------------------------
-          }
+          // The top priority is to remove the entry from the list
+          // so that subsequent wakeups to address different threads.
+          th = head ()->thread_;
+          const_cast<waiting_thread_node*> (head ())->unlink ();
+          // ----- Exit critical section --------------------------------------
+        }
         assert (th != nullptr);
 
         thread::state_t state = th->state ();
@@ -306,8 +308,7 @@ namespace os
 
       // ======================================================================
 
-      timestamp_node::timestamp_node (clock::timestamp_t ts) :
-          timestamp (ts)
+      timestamp_node::timestamp_node (clock::timestamp_t ts) : timestamp (ts)
       {
 #if defined(OS_TRACE_RTOS_LISTS_CONSTRUCT)
         trace::printf ("%s() %p \n", __func__, this);
@@ -324,10 +325,9 @@ namespace os
       // ======================================================================
 
       timeout_thread_node::timeout_thread_node (clock::timestamp_t ts,
-                                                rtos::thread& th) :
-          timestamp_node
-            { ts }, //
-          thread (th)
+                                                rtos::thread& th)
+          : timestamp_node{ ts }, //
+            thread (th)
       {
 #if defined(OS_TRACE_RTOS_LISTS_CONSTRUCT)
         trace::printf ("%s() %p \n", __func__, this);
@@ -359,10 +359,9 @@ namespace os
 
 #if !defined(OS_USE_RTOS_PORT_TIMER)
 
-      timer_node::timer_node (clock::timestamp_t ts, timer& tm) :
-          timestamp_node
-            { ts }, //
-          tmr (tm)
+      timer_node::timer_node (clock::timestamp_t ts, timer& tm)
+          : timestamp_node{ ts }, //
+            tmr (tm)
       {
 #if defined(OS_TRACE_RTOS_LISTS_CONSTRUCT)
         trace::printf ("%s() %p \n", __func__, this);
@@ -415,15 +414,15 @@ namespace os
       {
         clock::timestamp_t timestamp = node.timestamp;
 
-        timeout_thread_node* after =
-            static_cast<timeout_thread_node*> (const_cast<utils::static_double_list_links *> (tail ()));
+        timeout_thread_node* after = static_cast<timeout_thread_node*> (
+            const_cast<utils::static_double_list_links*> (tail ()));
 
         if (empty ())
           {
             // Insert at the end of the list.
 #if defined(OS_TRACE_RTOS_LISTS_CLOCKS)
             trace::printf ("clock %s() empty +%u\n", __func__,
-                static_cast<uint32_t> (timestamp));
+                           static_cast<uint32_t> (timestamp));
 #endif
           }
         else if (timestamp >= after->timestamp)
@@ -431,8 +430,8 @@ namespace os
             // Insert at the end of the list.
 #if defined(OS_TRACE_RTOS_LISTS_CLOCKS)
             trace::printf ("clock %s() back %u +%u\n", __func__,
-                static_cast<uint32_t> (after->timestamp),
-                static_cast<uint32_t> (timestamp));
+                           static_cast<uint32_t> (after->timestamp),
+                           static_cast<uint32_t> (timestamp));
 #endif
           }
         else if (timestamp < head ()->timestamp)
@@ -444,12 +443,12 @@ namespace os
 #endif
             // Insert at the beginning of the list
             // and update the new head.
-            after =
-                static_cast<timeout_thread_node*> (const_cast<utils::static_double_list_links *> (&head_));
+            after = static_cast<timeout_thread_node*> (
+                const_cast<utils::static_double_list_links*> (&head_));
 #if defined(OS_TRACE_RTOS_LISTS_CLOCKS)
             trace::printf ("clock %s() front +%u %u\n", __func__,
-                static_cast<uint32_t> (timestamp),
-                static_cast<uint32_t> (head ()->timestamp));
+                           static_cast<uint32_t> (timestamp),
+                           static_cast<uint32_t> (head ()->timestamp));
 #endif
 #pragma GCC diagnostic pop
           }
@@ -464,13 +463,14 @@ namespace os
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif
-                after =
-                    static_cast<timeout_thread_node*> (const_cast<utils::static_double_list_links *> (after->prev ()));
+                after = static_cast<timeout_thread_node*> (
+                    const_cast<utils::static_double_list_links*> (
+                        after->prev ()));
               }
 #if defined(OS_TRACE_RTOS_LISTS_CLOCKS)
             trace::printf ("clock %s() middle %u +%u\n", __func__,
-                static_cast<uint32_t> (after->timestamp),
-                static_cast<uint32_t> (timestamp));
+                           static_cast<uint32_t> (after->timestamp),
+                           static_cast<uint32_t> (timestamp));
 #endif
 #pragma GCC diagnostic pop
           }
@@ -517,7 +517,7 @@ namespace os
               {
 #if defined(OS_TRACE_RTOS_LISTS_CLOCKS)
                 trace::printf ("%s() %u \n", __func__,
-                    static_cast<uint32_t> (sysclock.now ()));
+                               static_cast<uint32_t> (sysclock.now ()));
 #endif
                 const_cast<timestamp_node*> (head ())->action ();
               }
@@ -540,8 +540,8 @@ namespace os
             clear ();
           }
 
-        waiting_thread_node* after =
-            static_cast<waiting_thread_node*> (const_cast<utils::static_double_list_links *> (tail ()));
+        waiting_thread_node* after = static_cast<waiting_thread_node*> (
+            const_cast<utils::static_double_list_links*> (tail ()));
 
 #if defined(OS_TRACE_RTOS_THREAD)
         trace::printf ("terminated %s() %p %s\n", __func__, &node.thread_,
@@ -553,7 +553,7 @@ namespace os
         insert_after (node, after);
       }
 
-    // ------------------------------------------------------------------------
+      // ----------------------------------------------------------------------
     } /* namespace internal */
   } /* namespace rtos */
 } /* namespace os */

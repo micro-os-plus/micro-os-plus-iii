@@ -36,8 +36,7 @@ extern "C"
   extern void
   __call_exitprocs (int, void*);
 
-  typedef void
-  (*exit_func_t) (void);
+  typedef void (*exit_func_t) (void);
 
   extern int
   __register_exitproc (int, exit_func_t fn, void*, void*);

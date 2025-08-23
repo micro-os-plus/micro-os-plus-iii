@@ -23,17 +23,16 @@ namespace os
 {
   namespace driver
   {
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
-    usbh_wrapper::usbh_wrapper (ARM_DRIVER_USBH* driver,
-                                ARM_USBH_SignalPortEvent_t c_cb_port_func,
-                                ARM_USBH_SignalPipeEvent_t c_cb_pipe_func) noexcept :
-    driver_ (driver),
-    c_cb_port_func_ (c_cb_port_func),
-    c_cb_pipe_func_ (c_cb_pipe_func)
-      {
-        trace::printf("%s() %p\n", __func__, this);
-      }
+    usbh_wrapper::usbh_wrapper (
+        ARM_DRIVER_USBH* driver, ARM_USBH_SignalPortEvent_t c_cb_port_func,
+        ARM_USBH_SignalPipeEvent_t c_cb_pipe_func) noexcept
+        : driver_ (driver), c_cb_port_func_ (c_cb_port_func),
+          c_cb_pipe_func_ (c_cb_pipe_func)
+    {
+      trace::printf ("%s() %p\n", __func__, this);
+    }
 
     usbh_wrapper::~usbh_wrapper () noexcept
     {
@@ -42,7 +41,7 @@ namespace os
       driver_ = nullptr;
     }
 
-    // ----------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -55,8 +54,8 @@ namespace os
     usbh_wrapper::do_get_version (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
-      *(reinterpret_cast<ARM_DRIVER_VERSION*> (&version_)) =
-          driver_->GetVersion ();
+      *(reinterpret_cast<ARM_DRIVER_VERSION*> (&version_))
+          = driver_->GetVersion ();
       return version_;
     }
 
@@ -64,8 +63,8 @@ namespace os
     usbh_wrapper::do_get_capabilities (void) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
-      *(reinterpret_cast<ARM_USBH_CAPABILITIES*> (&capa_)) =
-          driver_->GetCapabilities ();
+      *(reinterpret_cast<ARM_USBH_CAPABILITIES*> (&capa_))
+          = driver_->GetCapabilities ();
       return capa_;
     }
 
@@ -73,8 +72,8 @@ namespace os
     usbh_wrapper::do_get_port_status (usb::port_t port) noexcept
     {
       // Overwrite the C++ instance. Assume same layout.
-      *(reinterpret_cast<ARM_USBH_PORT_STATE*> (&status_)) =
-          driver_->PortGetState (port);
+      *(reinterpret_cast<ARM_USBH_PORT_STATE*> (&status_))
+          = driver_->PortGetState (port);
       return status_;
     }
 
@@ -146,15 +145,14 @@ namespace os
     }
 
     return_t
-    usbh_wrapper::do_modify_pipe (usb::pipe_t pipe,
-                                  usb::device_address_t dev_addr,
-                                  usb::speed_t dev_speed,
-                                  usb::hub_addr_t hub_addr,
-                                  usb::hub_port_t hub_port,
-                                  usb::packet_size_t ep_max_packet_size) noexcept
+    usbh_wrapper::do_modify_pipe (
+        usb::pipe_t pipe, usb::device_address_t dev_addr,
+        usb::speed_t dev_speed, usb::hub_addr_t hub_addr,
+        usb::hub_port_t hub_port,
+        usb::packet_size_t ep_max_packet_size) noexcept
     {
-      return driver_->PipeModify (pipe, dev_addr, dev_speed, hub_addr, hub_port,
-                                  ep_max_packet_size);
+      return driver_->PipeModify (pipe, dev_addr, dev_speed, hub_addr,
+                                  hub_port, ep_max_packet_size);
     }
 
     return_t
@@ -170,8 +168,8 @@ namespace os
     }
 
     return_t
-    usbh_wrapper::do_transfer (usb::pipe_t pipe, uint32_t packet, uint8_t* data,
-                               std::size_t num) noexcept
+    usbh_wrapper::do_transfer (usb::pipe_t pipe, uint32_t packet,
+                               uint8_t* data, std::size_t num) noexcept
     {
       return driver_->PipeTransfer (pipe, packet, data,
                                     static_cast<uint32_t> (num));

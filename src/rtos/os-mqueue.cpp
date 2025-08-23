@@ -44,8 +44,10 @@ namespace os
      *
      * @par POSIX compatibility
      *  Inspired by `mq_attr`
-     *  from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  from
+     * [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
 
     /**
@@ -118,7 +120,8 @@ namespace os
      *   class my_allocator;
      *
      * // The queue storage is allocated dynamically on the heap.
-     * message_queue_allocated<my_allocator<void*>> mq { queue_size, sizeof(msg_t) };
+     * message_queue_allocated<my_allocator<void*>> mq { queue_size,
+     * sizeof(msg_t) };
      *
      * void
      * consumer(void)
@@ -150,8 +153,10 @@ namespace os
      *
      * @par POSIX compatibility
      *  Inspired by `mqd_t`
-     *  from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  from
+     * [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
 
     /**
@@ -220,8 +225,10 @@ namespace os
      *
      * @par POSIX compatibility
      *  Inspired by `mqd_t`
-     *  from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  from
+     * [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
 
     /**
@@ -344,9 +351,8 @@ namespace os
 #endif
     }
 
-    message_queue::message_queue (const char* name) :
-        object_named_system
-          { name }
+    message_queue::message_queue (const char* name)
+        : object_named_system{ name }
     {
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
@@ -381,16 +387,15 @@ namespace os
      * the storage is dynamically allocated using the RTOS specific allocator
      * (`rtos::memory::allocator`).
      *
-     * If the _attr_ attributes are modified **after** the message_queue creation,
-     * the message_queue attributes shall not be affected.
+     * If the _attr_ attributes are modified **after** the message_queue
+     * creation, the message_queue attributes shall not be affected.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     message_queue::message_queue (std::size_t msgs, std::size_t msg_size_bytes,
                                   const attributes& attr,
-                                  const allocator_type& allocator) :
-        message_queue
-          { nullptr, msgs, msg_size_bytes, attr, allocator }
+                                  const allocator_type& allocator)
+        : message_queue{ nullptr, msgs, msg_size_bytes, attr, allocator }
     {
     }
 
@@ -418,21 +423,20 @@ namespace os
      * the storage is dynamically allocated using the RTOS specific allocator
      * (`rtos::memory::allocator`).
      *
-     * If the _attr_ attributes are modified **after** the message_queue creation,
-     * the message_queue attributes shall not be affected.
+     * If the _attr_ attributes are modified **after** the message_queue
+     * creation, the message_queue attributes shall not be affected.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     message_queue::message_queue (const char* name, std::size_t msgs,
                                   std::size_t msg_size_bytes,
                                   const attributes& attr,
-                                  const allocator_type& allocator) :
-        object_named_system
-          { name }
+                                  const allocator_type& allocator)
+        : object_named_system{ name }
     {
 #if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s() @%p %s %u %u\n", __func__, this, this->name (), msgs,
-                     msg_size_bytes);
+      trace::printf ("%s() @%p %s %u %u\n", __func__, this, this->name (),
+                     msgs, msg_size_bytes);
 #endif
 
       if (attr.mq_queue_address != nullptr)
@@ -446,22 +450,21 @@ namespace os
 
           // If no user storage was provided via attributes,
           // allocate it dynamically via the allocator.
-          allocated_queue_size_elements_ = (compute_allocated_size_bytes<
-              typename allocator_type::value_type> (msgs, msg_size_bytes)
-              + sizeof(typename allocator_type::value_type) - 1)
-              / sizeof(typename allocator_type::value_type);
+          allocated_queue_size_elements_
+              = (compute_allocated_size_bytes<
+                     typename allocator_type::value_type> (msgs,
+                                                           msg_size_bytes)
+                 + sizeof (typename allocator_type::value_type) - 1)
+                / sizeof (typename allocator_type::value_type);
 
-          allocated_queue_addr_ =
-              const_cast<allocator_type&> (allocator).allocate (
+          allocated_queue_addr_
+              = const_cast<allocator_type&> (allocator).allocate (
                   allocated_queue_size_elements_);
 
           internal_construct_ (
-              msgs,
-              msg_size_bytes,
-              attr,
-              allocated_queue_addr_,
+              msgs, msg_size_bytes, attr, allocated_queue_addr_,
               allocated_queue_size_elements_
-                  * sizeof(typename allocator_type::value_type));
+                  * sizeof (typename allocator_type::value_type));
         }
     }
 
@@ -488,18 +491,19 @@ namespace os
 #if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
       // There must be no threads waiting for this queue.
-      assert(send_list_.empty ());
-      assert(receive_list_.empty ());
+      assert (send_list_.empty ());
+      assert (receive_list_.empty ());
 
 #endif
 
       if (allocated_queue_addr_ != nullptr)
         {
-          typedef typename std::allocator_traits<allocator_type>::pointer pointer;
+          typedef
+              typename std::allocator_traits<allocator_type>::pointer pointer;
 
-          static_cast<allocator_type*> (const_cast<void*> (allocator_))->deallocate (
-              reinterpret_cast<pointer> (allocated_queue_addr_),
-              allocated_queue_size_elements_);
+          static_cast<allocator_type*> (const_cast<void*> (allocator_))
+              ->deallocate (reinterpret_cast<pointer> (allocated_queue_addr_),
+                            allocated_queue_size_elements_);
         }
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
@@ -521,28 +525,30 @@ namespace os
                                         std::size_t queue_size_bytes)
     {
       // Don't call this from interrupt handlers.
-      os_assert_throw(!interrupts::in_handler_mode (), EPERM);
+      os_assert_throw (!interrupts::in_handler_mode (), EPERM);
 
 #if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
       clock_ = attr.clock != nullptr ? attr.clock : &sysclock;
 #endif
-      msg_size_bytes_ = static_cast<message_queue::msg_size_t> (msg_size_bytes);
-      assert(msg_size_bytes_ == msg_size_bytes);
-      assert(msg_size_bytes_ > 0);
+      msg_size_bytes_
+          = static_cast<message_queue::msg_size_t> (msg_size_bytes);
+      assert (msg_size_bytes_ == msg_size_bytes);
+      assert (msg_size_bytes_ > 0);
 
-      // in order for the list of free messages to not consume additional memory,
-      // the pointers are stored at the beginning of the messages, thus messages should be large enough to fit a pointer
-      assert(msg_size_bytes_ >= sizeof(void*));
+      // in order for the list of free messages to not consume additional
+      // memory, the pointers are stored at the beginning of the messages, thus
+      // messages should be large enough to fit a pointer
+      assert (msg_size_bytes_ >= sizeof (void*));
 
       msgs_ = static_cast<message_queue::size_t> (msgs);
-      assert(msgs_ == msgs);
-      assert(msgs > 0);
+      assert (msgs_ == msgs);
+      assert (msgs > 0);
 
       // If the storage is given explicitly, override attributes.
       if (queue_address != nullptr)
         {
           // The attributes should not define any storage in this case.
-          assert(attr.mq_queue_address == nullptr);
+          assert (attr.mq_queue_address == nullptr);
 
           queue_addr_ = queue_address;
           queue_size_bytes_ = queue_size_bytes;
@@ -559,20 +565,20 @@ namespace os
 #endif
 
 #if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
-      std::size_t storage_size = compute_allocated_size_bytes<void*> (
-          msgs, msg_size_bytes);
+      std::size_t storage_size
+          = compute_allocated_size_bytes<void*> (msgs, msg_size_bytes);
 #endif
       if (queue_addr_ != nullptr)
         {
           // The queue must be real, and have a non zero size.
-          os_assert_throw(queue_size_bytes_ > 0, EINVAL);
+          os_assert_throw (queue_size_bytes_ > 0, EINVAL);
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
-          os_assert_throw(
-              queue_size_bytes_ >= (std::size_t) (msgs * msg_size_bytes),
-              EINVAL);
+          os_assert_throw (queue_size_bytes_
+                               >= (std::size_t)(msgs * msg_size_bytes),
+                           EINVAL);
 #else
           // The queue must fit the storage.
-          os_assert_throw(queue_size_bytes_ >= storage_size, EINVAL);
+          os_assert_throw (queue_size_bytes_ >= storage_size, EINVAL);
 #endif
         }
 
@@ -586,26 +592,26 @@ namespace os
       head_ = no_index;
 
       // The queue storage must have a real address.
-      os_assert_throw(queue_addr_ != nullptr, ENOMEM);
+      os_assert_throw (queue_addr_ != nullptr, ENOMEM);
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
       // The array of prev indexes follows immediately after the content array.
-      prev_array_ =
-          reinterpret_cast<index_t*> (static_cast<char*> (queue_addr_)
-              + msgs
-                  * ((msg_size_bytes + (sizeof(void*) - 1))
-                      & ~(sizeof(void*) - 1)));
+      prev_array_ = reinterpret_cast<index_t*> (
+          static_cast<char*> (queue_addr_)
+          + msgs
+                * ((msg_size_bytes + (sizeof (void*) - 1))
+                   & ~(sizeof (void*) - 1)));
       // The array of next indexes follows immediately the prev array.
-      next_array_ =
-          reinterpret_cast<index_t*> (reinterpret_cast<char*> (const_cast<index_t*> (prev_array_))
-              + msgs * sizeof(index_t));
+      next_array_ = reinterpret_cast<index_t*> (
+          reinterpret_cast<char*> (const_cast<index_t*> (prev_array_))
+          + msgs * sizeof (index_t));
       // The array of priorities follows immediately the next array.
-      prio_array_ =
-          reinterpret_cast<priority_t*> (reinterpret_cast<char*> (const_cast<index_t*> (next_array_))
-              + msgs * sizeof(index_t));
+      prio_array_ = reinterpret_cast<priority_t*> (
+          reinterpret_cast<char*> (const_cast<index_t*> (next_array_))
+          + msgs * sizeof (index_t));
 #pragma GCC diagnostic pop
 
 #if !defined(NDEBUG)
@@ -615,13 +621,12 @@ namespace os
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif
-      char* p =
-          reinterpret_cast<char*> (reinterpret_cast<char*> (const_cast<priority_t*> (prio_array_))
-              + msgs * sizeof(priority_t));
+      char* p = reinterpret_cast<char*> (
+          reinterpret_cast<char*> (const_cast<priority_t*> (prio_array_))
+          + msgs * sizeof (priority_t));
 #pragma GCC diagnostic pop
 
-      assert(
-          p - static_cast<char*> (queue_addr_)
+      assert (p - static_cast<char*> (queue_addr_)
               <= static_cast<ptrdiff_t> (queue_size_bytes_));
 #endif
 
@@ -672,7 +677,6 @@ namespace os
       receive_list_.resume_all ();
 
 #endif /* !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE) */
-
     }
 
 #if !defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
@@ -691,11 +695,11 @@ namespace os
           return false;
         }
 
-      // The first step is to remove the free block from the list,
-      // so another concurrent call will not get it too.
+        // The first step is to remove the free block from the list,
+        // so another concurrent call will not get it too.
 
-      // Get the address where the message will be copied.
-      // This is the first free memory block.
+        // Get the address where the message will be copied.
+        // This is the first free memory block.
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
@@ -707,24 +711,24 @@ namespace os
       first_free_ = *(static_cast<void**> (first_free_));
 
       // The second step is to copy the message from the user buffer.
-        {
-          // ----- Enter uncritical section -----------------------------------
-          // interrupts::uncritical_section iucs;
+      {
+        // ----- Enter uncritical section -------------------------------------
+        // interrupts::uncritical_section iucs;
 
-          // Copy message from user buffer to queue storage.
-          std::memcpy (dest, msg, nbytes);
-          if (nbytes < msg_size_bytes_)
-            {
-              // Fill in the remaining space with 0x00.
+        // Copy message from user buffer to queue storage.
+        std::memcpy (dest, msg, nbytes);
+        if (nbytes < msg_size_bytes_)
+          {
+            // Fill in the remaining space with 0x00.
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
-              std::memset (dest + nbytes, 0x00, msg_size_bytes_ - nbytes);
+            std::memset (dest + nbytes, 0x00, msg_size_bytes_ - nbytes);
 #pragma GCC diagnostic pop
-            }
-          // ----- Exit uncritical section ------------------------------------
-        }
+          }
+        // ----- Exit uncritical section --------------------------------------
+      }
 
       // The third step is to link the buffer to the list.
 
@@ -733,8 +737,9 @@ namespace os
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
       // Using the address, compute the index in the array.
-      std::size_t msg_ix = (static_cast<std::size_t> (dest
-          - static_cast<char*> (queue_addr_)) / msg_size_bytes_);
+      std::size_t msg_ix
+          = (static_cast<std::size_t> (dest - static_cast<char*> (queue_addr_))
+             / msg_size_bytes_);
       prio_array_[msg_ix] = mprio;
 
       if (head_ == no_index)
@@ -803,7 +808,7 @@ namespace os
           return false;
         }
 
-      // Compute the message source address.
+        // Compute the message source address.
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
@@ -814,7 +819,7 @@ namespace os
 
 #if defined(OS_TRACE_RTOS_MQUEUE_)
       trace::printf ("%s(%p,%u) @%p %s src %p %p\n", __func__, msg, nbytes,
-          this, name (), src, first_free_);
+                     this, name (), src, first_free_);
 #endif
 
       // Unlink it from the list, so another concurrent call will
@@ -842,18 +847,18 @@ namespace os
       --count_;
 
       // Copy to destination
-        {
-          // ----- Enter uncritical section -----------------------------------
-          interrupts::uncritical_section iucs;
+      {
+        // ----- Enter uncritical section -------------------------------------
+        interrupts::uncritical_section iucs;
 
-          // Copy message from queue to user buffer.
-          memcpy (msg, src, nbytes);
-          if (mprio != nullptr)
-            {
-              *mprio = prio;
-            }
-          // ----- Exit uncritical section ------------------------------------
-        }
+        // Copy message from queue to user buffer.
+        memcpy (msg, src, nbytes);
+        if (mprio != nullptr)
+          {
+            *mprio = prio;
+          }
+        // ----- Exit uncritical section --------------------------------------
+      }
 
       // After the message was copied, the block can be released.
 
@@ -910,10 +915,13 @@ namespace os
      * is unblocked.
      *
      * @par POSIX compatibility
-     *  Inspired by [`mq_send()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_send.html)
+     *  Inspired by
+     * [`mq_send()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_send.html)
      *  with `O_NONBLOCK` not set,
-     *  from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  from
+     * [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -926,12 +934,12 @@ namespace os
 #endif
 
       // Don't call this from interrupt handlers.
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err (!interrupts::in_handler_mode (), EPERM);
       // Don't call this from critical regions.
-      os_assert_err(!scheduler::locked (), EPERM);
+      os_assert_err (!scheduler::locked (), EPERM);
 
-      os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
+      os_assert_err (msg != nullptr, EINVAL);
+      os_assert_err (nbytes <= msg_size_bytes_, EMSGSIZE);
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
@@ -939,41 +947,40 @@ namespace os
 
 #else
 
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          if (internal_try_send_ (msg, nbytes, mprio))
-            {
-              return result::ok;
-            }
-          // ----- Exit critical section --------------------------------------
-        }
+        if (internal_try_send_ (msg, nbytes, mprio))
+          {
+            return result::ok;
+          }
+        // ----- Exit critical section ----------------------------------------
+      }
 
       thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      internal::waiting_thread_node node
-        { crt_thread };
+      internal::waiting_thread_node node{ crt_thread };
 
       for (;;)
         {
-            {
-              // ----- Enter critical section ---------------------------------
-              interrupts::critical_section ics;
+          {
+            // ----- Enter critical section -----------------------------------
+            interrupts::critical_section ics;
 
-              if (internal_try_send_ (msg, nbytes, mprio))
-                {
-                  return result::ok;
-                }
+            if (internal_try_send_ (msg, nbytes, mprio))
+              {
+                return result::ok;
+              }
 
-              // Add this thread to the message queue send waiting list.
-              scheduler::internal_link_node (send_list_, node);
-              // state::suspended set in above link().
-              // ----- Exit critical section ----------------------------------
-            }
+            // Add this thread to the message queue send waiting list.
+            scheduler::internal_link_node (send_list_, node);
+            // state::suspended set in above link().
+            // ----- Exit critical section ------------------------------------
+          }
 
           port::scheduler::reschedule ();
 
@@ -1019,10 +1026,13 @@ namespace os
      * not be queued and `try_send()` shall return an error.
      *
      * @par POSIX compatibility
-     *  Inspired by [`mq_send()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_send.html)
+     *  Inspired by
+     * [`mq_send()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_send.html)
      *  with `O_NONBLOCK` set,
-     *  from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  from
+     * [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *  <br>Differences from the standard:
      *  - for consistency reasons, EWOULDBLOCK is used, instead of EAGAIN
      *
@@ -1037,8 +1047,8 @@ namespace os
                      this, name ());
 #endif
 
-      os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
+      os_assert_err (msg != nullptr, EINVAL);
+      os_assert_err (nbytes <= msg_size_bytes_, EMSGSIZE);
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
@@ -1046,22 +1056,22 @@ namespace os
 
 #else
       // Don't call this from high priority interrupts.
-      assert(port::interrupts::is_priority_valid ());
+      assert (port::interrupts::is_priority_valid ());
 
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          if (internal_try_send_ (msg, nbytes, mprio))
-            {
-              return result::ok;
-            }
-          else
-            {
-              return EWOULDBLOCK;
-            }
-          // ----- Exit critical section --------------------------------------
-        }
+        if (internal_try_send_ (msg, nbytes, mprio))
+          {
+            return result::ok;
+          }
+        else
+          {
+            return EWOULDBLOCK;
+          }
+        // ----- Exit critical section ----------------------------------------
+      }
 
 #endif
     }
@@ -1101,10 +1111,13 @@ namespace os
      * timer is used, and the durations are expressed in ticks.
      *
      * @par POSIX compatibility
-     *  Inspired by [`mq_timedsend()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_timedsend.html)
+     *  Inspired by
+     * [`mq_timedsend()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_timedsend.html)
      *  with `O_NONBLOCK` not set,
-     *  from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  from
+     * [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *  <br>Differences from the standard:
      *  - the timeout is not expressed as an absolute time point, but
      * as a relative number of timer ticks (by default, the SysTick
@@ -1122,72 +1135,72 @@ namespace os
 #endif
 
       // Don't call this from interrupt handlers.
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err (!interrupts::in_handler_mode (), EPERM);
       // Don't call this from critical regions.
-      os_assert_err(!scheduler::locked (), EPERM);
+      os_assert_err (!scheduler::locked (), EPERM);
 
-      os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
+      os_assert_err (msg != nullptr, EINVAL);
+      os_assert_err (nbytes <= msg_size_bytes_, EMSGSIZE);
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
-      return port::message_queue::timed_send (this, msg, nbytes, timeout, mprio);
+      return port::message_queue::timed_send (this, msg, nbytes, timeout,
+                                              mprio);
 
 #else
 
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          if (internal_try_send_ (msg, nbytes, mprio))
-            {
-              return result::ok;
-            }
-          // ----- Exit critical section --------------------------------------
-        }
+        if (internal_try_send_ (msg, nbytes, mprio))
+          {
+            return result::ok;
+          }
+        // ----- Exit critical section ----------------------------------------
+      }
 
       thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      internal::waiting_thread_node node
-        { crt_thread };
+      internal::waiting_thread_node node{ crt_thread };
 
       internal::clock_timestamps_list& clock_list = clock_->steady_list ();
 
       clock::timestamp_t timeout_timestamp = clock_->steady_now () + timeout;
 
       // Prepare a timeout node pointing to the current thread.
-      internal::timeout_thread_node timeout_node
-        { timeout_timestamp, crt_thread };
+      internal::timeout_thread_node timeout_node{ timeout_timestamp,
+                                                  crt_thread };
 
       for (;;)
         {
-            {
-              // ----- Enter critical section ---------------------------------
-              interrupts::critical_section ics;
+          {
+            // ----- Enter critical section -----------------------------------
+            interrupts::critical_section ics;
 
-              if (internal_try_send_ (msg, nbytes, mprio))
-                {
-                  return result::ok;
-                }
+            if (internal_try_send_ (msg, nbytes, mprio))
+              {
+                return result::ok;
+              }
 
-              // Add this thread to the semaphore waiting list,
-              // and the clock timeout list.
-              scheduler::internal_link_node (send_list_, node, clock_list,
-                                             timeout_node);
-              // state::suspended set in above link().
-              // ----- Exit critical section ----------------------------------
-            }
+            // Add this thread to the semaphore waiting list,
+            // and the clock timeout list.
+            scheduler::internal_link_node (send_list_, node, clock_list,
+                                           timeout_node);
+            // state::suspended set in above link().
+            // ----- Exit critical section ------------------------------------
+          }
 
           port::scheduler::reschedule ();
 
           // Remove the thread from the message queue send waiting list,
-          // if not already removed by receive() and from the clock timeout list,
-          // if not already removed by the timer.
+          // if not already removed by receive() and from the clock timeout
+          // list, if not already removed by the timer.
           scheduler::internal_unlink_node (node, timeout_node);
 
           if (crt_thread.interrupted ())
@@ -1242,10 +1255,13 @@ namespace os
      * it is unspecified which waiting thread receives the message.
      *
      * @par POSIX compatibility
-     *  Inspired by [`mq_receive()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_receive.html)
+     *  Inspired by
+     * [`mq_receive()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_receive.html)
      *  with `O_NONBLOCK` not set,
-     *  from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  from
+     * [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -1258,12 +1274,12 @@ namespace os
 #endif
 
       // Don't call this from interrupt handlers.
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err (!interrupts::in_handler_mode (), EPERM);
       // Don't call this from critical regions.
-      os_assert_err(!scheduler::locked (), EPERM);
+      os_assert_err (!scheduler::locked (), EPERM);
 
-      os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
+      os_assert_err (msg != nullptr, EINVAL);
+      os_assert_err (nbytes <= msg_size_bytes_, EMSGSIZE);
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
@@ -1273,41 +1289,40 @@ namespace os
 
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          if (internal_try_receive_ (msg, nbytes, mprio))
-            {
-              return result::ok;
-            }
-          // ----- Exit critical section --------------------------------------
-        }
+        if (internal_try_receive_ (msg, nbytes, mprio))
+          {
+            return result::ok;
+          }
+        // ----- Exit critical section ----------------------------------------
+      }
 
       thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      internal::waiting_thread_node node
-        { crt_thread };
+      internal::waiting_thread_node node{ crt_thread };
 
       for (;;)
         {
-            {
-              // ----- Enter critical section ---------------------------------
-              interrupts::critical_section ics;
+          {
+            // ----- Enter critical section -----------------------------------
+            interrupts::critical_section ics;
 
-              if (internal_try_receive_ (msg, nbytes, mprio))
-                {
-                  return result::ok;
-                }
+            if (internal_try_receive_ (msg, nbytes, mprio))
+              {
+                return result::ok;
+              }
 
-              // Add this thread to the message queue receive waiting list.
-              scheduler::internal_link_node (receive_list_, node);
-              // state::suspended set in above link().
-              // ----- Exit critical section ----------------------------------
-            }
+            // Add this thread to the message queue receive waiting list.
+            scheduler::internal_link_node (receive_list_, node);
+            // state::suspended set in above link().
+            // ----- Exit critical section ------------------------------------
+          }
 
           port::scheduler::reschedule ();
 
@@ -1352,10 +1367,13 @@ namespace os
      * from the queue, and `try_receive()` shall return an error.
      *
      * @par POSIX compatibility
-     *  Inspired by [`mq_receive()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_receive.html)
+     *  Inspired by
+     * [`mq_receive()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_receive.html)
      *  with `O_NONBLOCK` set,
-     *  from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  from
+     * [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *  <br>Differences from the standard:
      *  - for consistency reasons, EWOULDBLOCK is used, instead of EAGAIN
      *
@@ -1370,8 +1388,8 @@ namespace os
                      name ());
 #endif
 
-      os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
+      os_assert_err (msg != nullptr, EINVAL);
+      os_assert_err (nbytes <= msg_size_bytes_, EMSGSIZE);
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
@@ -1380,22 +1398,22 @@ namespace os
 #else
 
       // Don't call this from high priority interrupts.
-      assert(port::interrupts::is_priority_valid ());
+      assert (port::interrupts::is_priority_valid ());
 
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          if (internal_try_receive_ (msg, nbytes, mprio))
-            {
-              return result::ok;
-            }
-          else
-            {
-              return EWOULDBLOCK;
-            }
-          // ----- Exit critical section --------------------------------------
-        }
+        if (internal_try_receive_ (msg, nbytes, mprio))
+          {
+            return result::ok;
+          }
+        else
+          {
+            return EWOULDBLOCK;
+          }
+        // ----- Exit critical section ----------------------------------------
+      }
 
 #endif
     }
@@ -1448,10 +1466,13 @@ namespace os
      * http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_receive.html#
      *
      * @par POSIX compatibility
-     *  Inspired by [`mq_timedreceive()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_timedreceive.html)
+     *  Inspired by
+     * [`mq_timedreceive()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/mq_timedreceive.html)
      *  with `O_NONBLOCK` not set,
-     *  from [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  from
+     * [<mqueue.h>](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/mqueue.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *  <br>Differences from the standard:
      *  - the timeout is not expressed as an absolute time point, but
      * as a relative number of timer ticks (by default, the SysTick
@@ -1469,66 +1490,65 @@ namespace os
 #endif
 
       // Don't call this from interrupt handlers.
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err (!interrupts::in_handler_mode (), EPERM);
       // Don't call this from critical regions.
-      os_assert_err(!scheduler::locked (), EPERM);
+      os_assert_err (!scheduler::locked (), EPERM);
 
-      os_assert_err(msg != nullptr, EINVAL);
-      os_assert_err(nbytes <= msg_size_bytes_, EMSGSIZE);
+      os_assert_err (msg != nullptr, EINVAL);
+      os_assert_err (nbytes <= msg_size_bytes_, EMSGSIZE);
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
-      return port::message_queue::timed_receive (this, msg, nbytes,
-          timeout, mprio);
+      return port::message_queue::timed_receive (this, msg, nbytes, timeout,
+                                                 mprio);
 
 #else
 
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          if (internal_try_receive_ (msg, nbytes, mprio))
-            {
-              return result::ok;
-            }
-          // ----- Exit critical section --------------------------------------
-        }
+        if (internal_try_receive_ (msg, nbytes, mprio))
+          {
+            return result::ok;
+          }
+        // ----- Exit critical section ----------------------------------------
+      }
 
       thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
       // Do not worry for being on stack, it is temporarily linked to the
       // list and guaranteed to be removed before this function returns.
-      internal::waiting_thread_node node
-        { crt_thread };
+      internal::waiting_thread_node node{ crt_thread };
 
       internal::clock_timestamps_list& clock_list = clock_->steady_list ();
       clock::timestamp_t timeout_timestamp = clock_->steady_now () + timeout;
 
       // Prepare a timeout node pointing to the current thread.
-      internal::timeout_thread_node timeout_node
-        { timeout_timestamp, crt_thread };
+      internal::timeout_thread_node timeout_node{ timeout_timestamp,
+                                                  crt_thread };
 
       for (;;)
         {
-            {
-              // ----- Enter critical section ---------------------------------
-              interrupts::critical_section ics;
+          {
+            // ----- Enter critical section -----------------------------------
+            interrupts::critical_section ics;
 
-              if (internal_try_receive_ (msg, nbytes, mprio))
-                {
-                  return result::ok;
-                }
+            if (internal_try_receive_ (msg, nbytes, mprio))
+              {
+                return result::ok;
+              }
 
-              // Add this thread to the message queue receive waiting list,
-              // and the clock timeout list.
-              scheduler::internal_link_node (receive_list_, node, clock_list,
-                                             timeout_node);
-              // state::suspended set in above link().
-              // ----- Exit critical section ----------------------------------
-            }
+            // Add this thread to the message queue receive waiting list,
+            // and the clock timeout list.
+            scheduler::internal_link_node (receive_list_, node, clock_list,
+                                           timeout_node);
+            // state::suspended set in above link().
+            // ----- Exit critical section ------------------------------------
+          }
 
           port::scheduler::reschedule ();
 
@@ -1580,7 +1600,7 @@ namespace os
 #endif
 
       // Don't call this from interrupt handlers.
-      os_assert_err(!interrupts::in_handler_mode (), EPERM);
+      os_assert_err (!interrupts::in_handler_mode (), EPERM);
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
@@ -1588,19 +1608,19 @@ namespace os
 
 #else
 
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          internal_init_ ();
-          return result::ok;
-          // ----- Exit critical section --------------------------------------
-        }
+        internal_init_ ();
+        return result::ok;
+        // ----- Exit critical section ----------------------------------------
+      }
 
 #endif
     }
 
-  // --------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
   } /* namespace rtos */
 } /* namespace os */

@@ -31,11 +31,9 @@ namespace os
   {
     // ========================================================================
 
-    tty::tty (tty_impl& impl, const char* name) :
-        char_device
-          { impl, name }
+    tty::tty (tty_impl& impl, const char* name) : char_device{ impl, name }
     {
-      type_ |= static_cast<type_t>(type::tty);
+      type_ |= static_cast<type_t> (type::tty);
 #if defined(OS_TRACE_POSIX_IO_TTY)
       trace::printf ("tty::%s(\"%s\")=@%p\n", __func__, name_, this);
 #endif
@@ -57,13 +55,13 @@ namespace os
     }
 
     inline int
-    tty::tcgetattr (/* struct */ termios *ptio)
+    tty::tcgetattr (/* struct */ termios* ptio)
     {
       return impl ().do_tcgetattr (ptio);
     }
 
     inline int
-    tty::tcsetattr (int options, const /* struct */ termios *ptio)
+    tty::tcsetattr (int options, const /* struct */ termios* ptio)
     {
       return impl ().do_tcsetattr (options, ptio);
     }
@@ -102,7 +100,7 @@ namespace os
       return 1; // Yes!
     }
 
-  // ==========================================================================
+    // ========================================================================
   } /* namespace posix */
 } /* namespace os */
 

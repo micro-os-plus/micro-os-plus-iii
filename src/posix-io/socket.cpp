@@ -34,10 +34,9 @@ namespace os
   {
     // ========================================================================
 
-    socket::socket (socket_impl& impl, class net_stack& ns) :
-        io
-          { impl, type::socket }, //
-        net_stack_ (&ns)
+    socket::socket (socket_impl& impl, class net_stack& ns)
+        : io{ impl, type::socket }, //
+          net_stack_ (&ns)
     {
 #if defined(OS_TRACE_POSIX_IO_SOCKET)
       trace::printf ("socket::%s()=@%p\n", __func__, this);
@@ -80,7 +79,8 @@ namespace os
     }
 
     int
-    socket::connect (const /* struct */ sockaddr* address, socklen_t address_len)
+    socket::connect (const /* struct */ sockaddr* address,
+                     socklen_t address_len)
     {
       errno = 0;
 
@@ -89,7 +89,8 @@ namespace os
     }
 
     int
-    socket::getpeername (/* struct */ sockaddr* address, socklen_t* address_len)
+    socket::getpeername (/* struct */ sockaddr* address,
+                         socklen_t* address_len)
     {
       errno = 0;
 
@@ -98,7 +99,8 @@ namespace os
     }
 
     int
-    socket::getsockname (/* struct */ sockaddr* address, socklen_t* address_len)
+    socket::getsockname (/* struct */ sockaddr* address,
+                         socklen_t* address_len)
     {
       errno = 0;
 
@@ -226,7 +228,7 @@ namespace os
 #endif
     }
 
-  // ==========================================================================
+    // ========================================================================
   } /* namespace posix */
 } /* namespace os */
 

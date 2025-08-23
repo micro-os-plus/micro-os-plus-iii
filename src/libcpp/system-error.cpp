@@ -38,20 +38,19 @@ namespace os
 #if defined(__EXCEPTIONS)
 
     struct system_error_category : public std::error_category
-      {
-        virtual const char*
-        name () const noexcept override;
+    {
+      virtual const char*
+      name () const noexcept override;
 
-        virtual std::string
-        message (int i) const override;
-
-      };
+      virtual std::string
+      message (int i) const override;
+    };
 
     const char*
     system_error_category::name () const noexcept
-      {
-        return "system";
-      }
+    {
+      return "system";
+    }
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -62,28 +61,28 @@ namespace os
 
     std::string
     system_error_category::message (int i) const
-      {
+    {
 #if defined(DEBUG)
-        return std::string (strerror (i));
+      return std::string (strerror (i));
 #else
-        return std::string ("");
+      return std::string ("");
 #endif
-      }
+    }
 
     struct cmsis_error_category : public std::error_category
-      {
-        virtual const char*
-        name () const noexcept override;
+    {
+      virtual const char*
+      name () const noexcept override;
 
-        virtual std::string
-        message (int i) const override;
-      };
+      virtual std::string
+      message (int i) const override;
+    };
 
     const char*
     cmsis_error_category::name () const noexcept
-      {
-        return "cmsis";
-      }
+    {
+      return "cmsis";
+    }
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -94,13 +93,13 @@ namespace os
 
     std::string
     cmsis_error_category::message (int i) const
-      {
+    {
 #if defined(DEBUG)
-        return std::string (strerror (i));
+      return std::string (strerror (i));
 #else
-        return std::string ("");
+      return std::string ("");
 #endif
-      }
+    }
 
 #pragma GCC diagnostic pop
 
@@ -110,9 +109,11 @@ namespace os
     __throw_system_error (int ev, const char* what_arg)
     {
 #if defined(__EXCEPTIONS)
-      // error: copying parameter of type 'os::estd::system_error_category' when binding a reference to a temporary would invoke a deleted constructor in C++98 [-Werror,-Wc++98-compat-bind-to-temporary-copy]
+      // error: copying parameter of type 'os::estd::system_error_category'
+      // when binding a reference to a temporary would invoke a deleted
+      // constructor in C++98 [-Werror,-Wc++98-compat-bind-to-temporary-copy]
       throw std::system_error (std::error_code (ev, system_error_category ()),
-          what_arg);
+                               what_arg);
 #else
       trace_printf ("system_error(%d, %s)\n", ev, what_arg);
       std::abort ();
@@ -123,16 +124,18 @@ namespace os
     __throw_cmsis_error (int ev, const char* what_arg)
     {
 #if defined(__EXCEPTIONS)
-      // error: copying parameter of type 'os::estd::cmsis_error_category' when binding a reference to a temporary would invoke a deleted constructor in C++98 [-Werror,-Wc++98-compat-bind-to-temporary-copy]
+      // error: copying parameter of type 'os::estd::cmsis_error_category' when
+      // binding a reference to a temporary would invoke a deleted constructor
+      // in C++98 [-Werror,-Wc++98-compat-bind-to-temporary-copy]
       throw std::system_error (std::error_code (ev, cmsis_error_category ()),
-          what_arg);
+                               what_arg);
 #else
       trace_printf ("system_error(%d, %s)\n", ev, what_arg);
       std::abort ();
 #endif
     }
 
-  // --------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
   } /* namespace estd */
 } /* namespace os */

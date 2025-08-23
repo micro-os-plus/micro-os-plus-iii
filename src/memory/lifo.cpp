@@ -103,9 +103,8 @@ namespace os
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
                       // Compute where top chunk starts.
-                      chunk =
-                          reinterpret_cast<chunk_t *> (reinterpret_cast<char *> (chunk)
-                              + rem);
+                      chunk = reinterpret_cast<chunk_t*> (
+                          reinterpret_cast<char*> (chunk) + rem);
 #pragma GCC diagnostic pop
                       chunk->size = alloc_size;
 
@@ -163,7 +162,7 @@ namespace os
 
 #pragma GCC diagnostic pop
 
-  // --------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
   } /* namespace memory */
 } /* namespace os */
 

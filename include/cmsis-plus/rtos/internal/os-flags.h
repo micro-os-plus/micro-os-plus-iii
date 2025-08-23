@@ -14,7 +14,7 @@
 
 // ----------------------------------------------------------------------------
 
-#ifdef  __cplusplus
+#ifdef __cplusplus
 
 // ----------------------------------------------------------------------------
 
@@ -47,7 +47,6 @@ namespace os
       {
 
       public:
-
         /**
          * @name Constructors & Destructor
          * @{
@@ -65,9 +64,11 @@ namespace os
         event_flags (const event_flags&) = delete;
         event_flags (event_flags&&) = delete;
         event_flags&
-        operator= (const event_flags&) = delete;
+        operator= (const event_flags&)
+            = delete;
         event_flags&
-        operator= (event_flags&&) = delete;
+        operator= (event_flags&&)
+            = delete;
 
         /**
          * @endcond
@@ -83,7 +84,6 @@ namespace os
          */
 
       public:
-
         /**
          * @name Public Member Functions
          * @{
@@ -149,7 +149,6 @@ namespace os
          */
 
       protected:
-
         /**
          * @name Private Member Variables
          * @{
@@ -171,11 +170,10 @@ namespace os
         /**
          * @}
          */
-
       };
-    /* class event_flags */
+      /* class event_flags */
 
-    // ------------------------------------------------------------------------
+      // ----------------------------------------------------------------------
     } /* namespace internal */
   } /* namespace rtos */
 } /* namespace os */
@@ -193,7 +191,7 @@ namespace os
         return flags_mask_;
       }
 
-    // ------------------------------------------------------------------------
+      // ----------------------------------------------------------------------
     } /* namespace internal */
   } /* namespace rtos */
 } /* namespace os */

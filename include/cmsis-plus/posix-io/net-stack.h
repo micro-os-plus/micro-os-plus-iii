@@ -87,7 +87,6 @@ namespace os
        */
 
     public:
-
       net_stack (net_stack_impl& impl, const char* name);
 
       /**
@@ -98,16 +97,17 @@ namespace os
       net_stack (const net_stack&) = delete;
       net_stack (net_stack&&) = delete;
       net_stack&
-      operator= (const net_stack&) = delete;
+      operator= (const net_stack&)
+          = delete;
       net_stack&
-      operator= (net_stack&&) = delete;
+      operator= (net_stack&&)
+          = delete;
 
       /**
        * @endcond
        */
 
-      virtual
-      ~net_stack ();
+      virtual ~net_stack ();
 
       /**
        * @}
@@ -120,7 +120,6 @@ namespace os
        */
 
     public:
-
       virtual class socket*
       socket (int domain, int type, int protocol);
 
@@ -130,23 +129,24 @@ namespace os
       void
       add_deferred_socket (class socket* sock);
 
-      using deferred_sockets_list_t = utils::intrusive_list<class socket,
-      utils::double_list_links, &socket::deferred_links_>;
+      using deferred_sockets_list_t
+          = utils::intrusive_list<class socket, utils::double_list_links,
+                                  &socket::deferred_links_>;
 
       deferred_sockets_list_t&
       deferred_sockets_list (void);
 
       // ----------------------------------------------------------------------
 
-      template<typename T>
-        T*
-        allocate_socket (void);
+      template <typename T>
+      T*
+      allocate_socket (void);
 
-      template<typename T, typename L>
-        T*
-        allocate_socket (L& locker);
+      template <typename T, typename L>
+      T*
+      allocate_socket (L& locker);
 
-      // --------------------------------------------------------------------
+      // ----------------------------------------------------------------------
       // Support functions.
 
       net_interface&
@@ -161,7 +161,6 @@ namespace os
 
       // ----------------------------------------------------------------------
     protected:
-
       /**
        * @cond ignore
        */
@@ -178,7 +177,6 @@ namespace os
 
       // ----------------------------------------------------------------------
     public:
-
       /**
        * @cond ignore
        */
@@ -194,20 +192,19 @@ namespace os
 
       // ----------------------------------------------------------------------
     protected:
-
       /**
        * @cond ignore
        */
 
       // Statics.
-      using net_list = utils::intrusive_list<net_stack,
-      utils::double_list_links, &net_stack::net_manager_links_>;
+      using net_list
+          = utils::intrusive_list<net_stack, utils::double_list_links,
+                                  &net_stack::net_manager_links_>;
       static net_list net_list__;
 
       /**
        * @endcond
        */
-
     };
 #pragma GCC diagnostic pop
 
@@ -223,7 +220,6 @@ namespace os
        */
 
     public:
-
       net_stack_impl (net_interface& interface);
 
       /**
@@ -234,16 +230,17 @@ namespace os
       net_stack_impl (const net_stack_impl&) = delete;
       net_stack_impl (net_stack_impl&&) = delete;
       net_stack_impl&
-      operator= (const net_stack_impl&) = delete;
+      operator= (const net_stack_impl&)
+          = delete;
       net_stack_impl&
-      operator= (net_stack_impl&&) = delete;
+      operator= (net_stack_impl&&)
+          = delete;
 
       /**
        * @endcond
        */
 
-      virtual
-      ~net_stack_impl ();
+      virtual ~net_stack_impl ();
 
       /**
        * @}
@@ -256,9 +253,9 @@ namespace os
        */
 
     public:
-
       virtual class socket*
-      do_socket (int domain, int type, int protocol) = 0;
+      do_socket (int domain, int type, int protocol)
+          = 0;
 
       // ----------------------------------------------------------------------
       // Support functions.
@@ -272,7 +269,6 @@ namespace os
 
       // ----------------------------------------------------------------------
     protected:
-
       /**
        * @cond ignore
        */
@@ -286,165 +282,159 @@ namespace os
 
     // ========================================================================
 
-    template<typename T>
-      class net_stack_implementable : public net_stack
-      {
-        // --------------------------------------------------------------------
+    template <typename T>
+    class net_stack_implementable : public net_stack
+    {
+      // ----------------------------------------------------------------------
 
-      public:
+    public:
+      using value_type = T;
 
-        using value_type = T;
+      // ----------------------------------------------------------------------
 
-        // --------------------------------------------------------------------
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
-        /**
-         * @name Constructors & Destructor
-         * @{
-         */
+    public:
+      template <typename... Args>
+      net_stack_implementable (const char* name, net_interface& interface,
+                               Args&&... args);
 
-      public:
+      /**
+       * @cond ignore
+       */
 
-        template<typename ... Args>
-          net_stack_implementable (const char* name, net_interface& interface,
-                                   Args&&... args);
+      // The rule of five.
+      net_stack_implementable (const net_stack_implementable&) = delete;
+      net_stack_implementable (net_stack_implementable&&) = delete;
+      net_stack_implementable&
+      operator= (const net_stack_implementable&)
+          = delete;
+      net_stack_implementable&
+      operator= (net_stack_implementable&&)
+          = delete;
 
-        /**
-         * @cond ignore
-         */
+      /**
+       * @endcond
+       */
 
-        // The rule of five.
-        net_stack_implementable (const net_stack_implementable&) = delete;
-        net_stack_implementable (net_stack_implementable&&) = delete;
-        net_stack_implementable&
-        operator= (const net_stack_implementable&) = delete;
-        net_stack_implementable&
-        operator= (net_stack_implementable&&) = delete;
+      virtual ~net_stack_implementable ();
 
-        /**
-         * @endcond
-         */
+      /**
+       * @}
+       */
 
-        virtual
-        ~net_stack_implementable ();
+      // ----------------------------------------------------------------------
+      /**
+       * @name Public Member Functions
+       * @{
+       */
 
-        /**
-         * @}
-         */
+    public:
+      // Support functions.
 
-        // --------------------------------------------------------------------
-        /**
-         * @name Public Member Functions
-         * @{
-         */
+      value_type&
+      impl (void) const;
 
-      public:
+      /**
+       * @}
+       */
 
-        // Support functions.
+      // ----------------------------------------------------------------------
+    protected:
+      /**
+       * @cond ignore
+       */
 
-        value_type&
-        impl (void) const;
+      value_type impl_instance_;
 
-        /**
-         * @}
-         */
-
-        // --------------------------------------------------------------------
-      protected:
-
-        /**
-         * @cond ignore
-         */
-
-        value_type impl_instance_;
-
-        /**
-         * @endcond
-         */
-      };
+      /**
+       * @endcond
+       */
+    };
 
     // ========================================================================
 
-    template<typename T, typename L>
-      class net_stack_lockable : public net_stack
-      {
-        // --------------------------------------------------------------------
+    template <typename T, typename L>
+    class net_stack_lockable : public net_stack
+    {
+      // ----------------------------------------------------------------------
 
-      public:
+    public:
+      using value_type = T;
+      using lockable_type = L;
 
-        using value_type = T;
-        using lockable_type = L;
+      // ----------------------------------------------------------------------
 
-        // --------------------------------------------------------------------
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
-        /**
-         * @name Constructors & Destructor
-         * @{
-         */
+    public:
+      template <typename... Args>
+      net_stack_lockable (const char* name, net_interface& interface,
+                          lockable_type& locker, Args&&... args);
 
-      public:
+      /**
+       * @cond ignore
+       */
 
-        template<typename ... Args>
-          net_stack_lockable (const char* name, net_interface& interface,
-                              lockable_type& locker, Args&&... args);
+      // The rule of five.
+      net_stack_lockable (const net_stack_lockable&) = delete;
+      net_stack_lockable (net_stack_lockable&&) = delete;
+      net_stack_lockable&
+      operator= (const net_stack_lockable&)
+          = delete;
+      net_stack_lockable&
+      operator= (net_stack_lockable&&)
+          = delete;
 
-        /**
-         * @cond ignore
-         */
+      /**
+       * @endcond
+       */
 
-        // The rule of five.
-        net_stack_lockable (const net_stack_lockable&) = delete;
-        net_stack_lockable (net_stack_lockable&&) = delete;
-        net_stack_lockable&
-        operator= (const net_stack_lockable&) = delete;
-        net_stack_lockable&
-        operator= (net_stack_lockable&&) = delete;
+      virtual ~net_stack_lockable ();
 
-        /**
-         * @endcond
-         */
+      /**
+       * @}
+       */
 
-        virtual
-        ~net_stack_lockable ();
+      // ----------------------------------------------------------------------
+      /**
+       * @name Public Member Functions
+       * @{
+       */
 
-        /**
-         * @}
-         */
+    public:
+      // TBD
 
-        // --------------------------------------------------------------------
-        /**
-         * @name Public Member Functions
-         * @{
-         */
+      // ----------------------------------------------------------------------
+      // Support functions.
 
-      public:
+      value_type&
+      impl (void) const;
 
-        // TBD
+      /**
+       * @}
+       */
 
-        // --------------------------------------------------------------------
-        // Support functions.
+      // ----------------------------------------------------------------------
+    protected:
+      /**
+       * @cond ignore
+       */
 
-        value_type&
-        impl (void) const;
+      value_type impl_instance_;
 
-        /**
-         * @}
-         */
+      /**
+       * @endcond
+       */
+    };
 
-        // --------------------------------------------------------------------
-      protected:
-
-        /**
-         * @cond ignore
-         */
-
-        value_type impl_instance_;
-
-        /**
-         * @endcond
-         */
-      };
-
-  // ==========================================================================
+    // ========================================================================
   } /* namespace posix */
 } /* namespace os */
 
@@ -487,77 +477,77 @@ namespace os
       return deferred_sockets_list_;
     }
 
-    template<typename T>
-      T*
-      net_stack::allocate_socket (void)
-      {
-        using socket_type = T;
+    template <typename T>
+    T*
+    net_stack::allocate_socket (void)
+    {
+      using socket_type = T;
 
-        socket_type* sock;
+      socket_type* sock;
 
-        if (deferred_sockets_list_.empty ())
-          {
-            sock = new socket_type (*this);
-          }
-        else
-          {
-            sock =
-                static_cast<socket_type*> (deferred_sockets_list_.unlink_head ());
+      if (deferred_sockets_list_.empty ())
+        {
+          sock = new socket_type (*this);
+        }
+      else
+        {
+          sock = static_cast<socket_type*> (
+              deferred_sockets_list_.unlink_head ());
 
-            // Call the constructor before reusing the object,
-            sock->~socket_type ();
+          // Call the constructor before reusing the object,
+          sock->~socket_type ();
 
-            // Placement new, run only the constructor.
-            new (sock) socket_type (*this);
+          // Placement new, run only the constructor.
+          new (sock) socket_type (*this);
 
-            // Deallocate all remaining elements in the list.
-            while (!deferred_sockets_list_.empty ())
-              {
-                socket_type* s =
-                    static_cast<socket_type*> (deferred_sockets_list_.unlink_head ());
+          // Deallocate all remaining elements in the list.
+          while (!deferred_sockets_list_.empty ())
+            {
+              socket_type* s = static_cast<socket_type*> (
+                  deferred_sockets_list_.unlink_head ());
 
-                // Call the destructor and the deallocator.
-                delete s;
-              }
-          }
-        return sock;
-      }
+              // Call the destructor and the deallocator.
+              delete s;
+            }
+        }
+      return sock;
+    }
 
-    template<typename T, typename L>
-      T*
-      net_stack::allocate_socket (L& locker)
-      {
-        using socket_type = T;
+    template <typename T, typename L>
+    T*
+    net_stack::allocate_socket (L& locker)
+    {
+      using socket_type = T;
 
-        socket_type* sock;
+      socket_type* sock;
 
-        if (deferred_sockets_list_.empty ())
-          {
-            sock = new socket_type (*this, locker);
-          }
-        else
-          {
-            sock =
-                static_cast<socket_type*> (deferred_sockets_list_.unlink_head ());
+      if (deferred_sockets_list_.empty ())
+        {
+          sock = new socket_type (*this, locker);
+        }
+      else
+        {
+          sock = static_cast<socket_type*> (
+              deferred_sockets_list_.unlink_head ());
 
-            // Call the constructor before reusing the object,
-            sock->~socket_type ();
+          // Call the constructor before reusing the object,
+          sock->~socket_type ();
 
-            // Placement new, run only the constructor.
-            new (sock) socket_type (*this, locker);
+          // Placement new, run only the constructor.
+          new (sock) socket_type (*this, locker);
 
-            // Deallocate all remaining elements in the list.
-            while (!deferred_sockets_list_.empty ())
-              {
-                socket_type* s =
-                    static_cast<socket_type*> (deferred_sockets_list_.unlink_head ());
+          // Deallocate all remaining elements in the list.
+          while (!deferred_sockets_list_.empty ())
+            {
+              socket_type* s = static_cast<socket_type*> (
+                  deferred_sockets_list_.unlink_head ());
 
-                // Call the destructor and the deallocator.
-                delete s;
-              }
-          }
-        return sock;
-      }
+              // Call the destructor and the deallocator.
+              delete s;
+            }
+        }
+      return sock;
+    }
 
     // ========================================================================
 
@@ -569,73 +559,69 @@ namespace os
 
     // ========================================================================
 
-    template<typename T>
-      template<typename ... Args>
-        net_stack_implementable<T>::net_stack_implementable (
-            const char* name, net_interface& interface, Args&&... args) :
-            net_stack
-              { impl_instance_, name }, //
-            impl_instance_
-              { interface, std::forward<Args>(args)... }
-        {
+    template <typename T>
+    template <typename... Args>
+    net_stack_implementable<T>::net_stack_implementable (
+        const char* name, net_interface& interface, Args&&... args)
+        : net_stack{ impl_instance_, name }, //
+          impl_instance_{ interface, std::forward<Args> (args)... }
+    {
 #if defined(OS_TRACE_POSIX_IO_NET_STACK)
-          trace::printf ("net_stack_implementable::%s(\"%s\")=@%p\n", __func__,
-                         name_, this);
+      trace::printf ("net_stack_implementable::%s(\"%s\")=@%p\n", __func__,
+                     name_, this);
 #endif
-        }
+    }
 
-    template<typename T>
-      net_stack_implementable<T>::~net_stack_implementable ()
-      {
+    template <typename T>
+    net_stack_implementable<T>::~net_stack_implementable ()
+    {
 #if defined(OS_TRACE_POSIX_IO_NET_STACK)
-        trace::printf ("net_stack_implementable::%s() @%p %s\n", __func__, this,
-                       name_);
+      trace::printf ("net_stack_implementable::%s() @%p %s\n", __func__, this,
+                     name_);
 #endif
-      }
+    }
 
-    template<typename T>
-      typename net_stack_implementable<T>::value_type&
-      net_stack_implementable<T>::impl (void) const
-      {
-        return static_cast<value_type&> (impl_);
-      }
+    template <typename T>
+    typename net_stack_implementable<T>::value_type&
+    net_stack_implementable<T>::impl (void) const
+    {
+      return static_cast<value_type&> (impl_);
+    }
 
     // ========================================================================
 
-    template<typename T, typename L>
-      template<typename ... Args>
-        net_stack_lockable<T, L>::net_stack_lockable (const char* name,
-                                                      net_interface& interface,
-                                                      lockable_type& locker,
-                                                      Args&&... args) :
-            net_stack
-              { impl_instance_, name }, //
-            impl_instance_
-              { interface, locker, std::forward<Args>(args)... }
-        {
+    template <typename T, typename L>
+    template <typename... Args>
+    net_stack_lockable<T, L>::net_stack_lockable (const char* name,
+                                                  net_interface& interface,
+                                                  lockable_type& locker,
+                                                  Args&&... args)
+        : net_stack{ impl_instance_, name }, //
+          impl_instance_{ interface, locker, std::forward<Args> (args)... }
+    {
 #if defined(OS_TRACE_POSIX_IO_NET_STACK)
-          trace::printf ("net_stack_lockable::%s()=%p\n", __func__, this);
+      trace::printf ("net_stack_lockable::%s()=%p\n", __func__, this);
 #endif
-        }
+    }
 
-    template<typename T, typename L>
-      net_stack_lockable<T, L>::~net_stack_lockable ()
-      {
+    template <typename T, typename L>
+    net_stack_lockable<T, L>::~net_stack_lockable ()
+    {
 #if defined(OS_TRACE_POSIX_IO_NET_STACK)
-        trace::printf ("net_stack_lockable::%s() @%p\n", __func__, this);
+      trace::printf ("net_stack_lockable::%s() @%p\n", __func__, this);
 #endif
-      }
+    }
 
     // ------------------------------------------------------------------------
 
-    template<typename T, typename L>
-      typename net_stack_lockable<T, L>::value_type&
-      net_stack_lockable<T, L>::impl (void) const
-      {
-        return static_cast<value_type&> (impl_);
-      }
+    template <typename T, typename L>
+    typename net_stack_lockable<T, L>::value_type&
+    net_stack_lockable<T, L>::impl (void) const
+    {
+      return static_cast<value_type&> (impl_);
+    }
 
-  // ==========================================================================
+    // ========================================================================
   } /* namespace posix */
 } /* namespace os */
 

@@ -55,7 +55,6 @@ namespace os
     class semaphore : public internal::object_named_system
     {
     public:
-
       /**
        * @brief Type of semaphore counter storage.
        *
@@ -85,7 +84,6 @@ namespace os
       class attributes : public internal::attributes_clocked
       {
       public:
-
         /**
          * @name Constructors & Destructor
          * @{
@@ -96,31 +94,29 @@ namespace os
          * @par Parameters
          *  None.
          */
-        constexpr
-        attributes ();
+        constexpr attributes ();
 
       protected:
-
         /**
          * @cond ignore
          */
 
-        constexpr
-        attributes (count_t max_value, count_t initial_value = 0);
+        constexpr attributes (count_t max_value, count_t initial_value = 0);
 
         /**
          * @endcond
          */
 
       public:
-
         // The rule of five.
         attributes (const attributes&) = default;
         attributes (attributes&&) = default;
         attributes&
-        operator= (const attributes&) = default;
+        operator= (const attributes&)
+            = default;
         attributes&
-        operator= (attributes&&) = default;
+        operator= (attributes&&)
+            = default;
 
         /**
          * @brief Destruct the semaphore attributes object instance.
@@ -132,7 +128,6 @@ namespace os
          */
 
       public:
-
         /**
          * @name Public Member Variables
          * @{
@@ -169,13 +164,14 @@ namespace os
        *
        * @par POSIX compatibility
        *  No POSIX similar functionality identified, but inspired by POSIX
-       *  attributes used in [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
-       *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+       *  attributes used in
+       * [`<pthread.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/pthread.h.html)
+       *  ([IEEE Std 1003.1, 2013
+       * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
        */
       class attributes_binary : public attributes
       {
       public:
-
         /**
          * @name Constructors & Destructor
          * @{
@@ -185,16 +181,17 @@ namespace os
          * @brief Construct a binary semaphore attributes object instance.
          * @param [in] initial_value Initial count value.
          */
-        constexpr
-        attributes_binary (count_t initial_value);
+        constexpr attributes_binary (count_t initial_value);
 
         // The rule of five.
         attributes_binary (const attributes_binary&) = default;
         attributes_binary (attributes_binary&&) = default;
         attributes_binary&
-        operator= (const attributes_binary&) = default;
+        operator= (const attributes_binary&)
+            = default;
         attributes_binary&
-        operator= (attributes_binary&&) = default;
+        operator= (attributes_binary&&)
+            = default;
 
         /**
          * @brief Destruct the semaphore attributes object instance.
@@ -223,7 +220,6 @@ namespace os
       class attributes_counting : public attributes
       {
       public:
-
         /**
          * @name Constructors & Destructor
          * @{
@@ -234,16 +230,18 @@ namespace os
          * @param [in] max_value Maximum count value.
          * @param [in] initial_value Initial count value.
          */
-        constexpr
-        attributes_counting (count_t max_value, count_t initial_value);
+        constexpr attributes_counting (count_t max_value,
+                                       count_t initial_value);
 
         // The rule of five.
         attributes_counting (const attributes_counting&) = default;
         attributes_counting (attributes_counting&&) = default;
         attributes_counting&
-        operator= (const attributes_counting&) = default;
+        operator= (const attributes_counting&)
+            = default;
         attributes_counting&
-        operator= (attributes_counting&&) = default;
+        operator= (attributes_counting&&)
+            = default;
 
         /**
          * @brief Destruct the semaphore attributes object instance.
@@ -273,24 +271,23 @@ namespace os
        * @param [in] name Pointer to name.
        * @param [in] attr Reference to attributes.
        */
-      semaphore (const char* name, const attributes& attr = initializer_binary);
+      semaphore (const char* name,
+                 const attributes& attr = initializer_binary);
 
     protected:
-
       /**
        * @cond ignore
        */
 
       semaphore (const char* name, const count_t max_value,
-                 const count_t initial_value, const attributes& attr =
-                     initializer_binary);
+                 const count_t initial_value,
+                 const attributes& attr = initializer_binary);
 
       /**
        * @endcond
        */
 
     public:
-
       /**
        * @cond ignore
        */
@@ -299,9 +296,11 @@ namespace os
       semaphore (const semaphore&) = delete;
       semaphore (semaphore&&) = delete;
       semaphore&
-      operator= (const semaphore&) = delete;
+      operator= (const semaphore&)
+          = delete;
       semaphore&
-      operator= (semaphore&&) = delete;
+      operator= (semaphore&&)
+          = delete;
 
       /**
        * @endcond
@@ -334,7 +333,6 @@ namespace os
        */
 
     public:
-
       /**
        * @name Public Member Functions
        * @{
@@ -440,7 +438,6 @@ namespace os
        */
 
     protected:
-
       /**
        * @name Private Member Functions
        * @{
@@ -470,7 +467,6 @@ namespace os
        */
 
     protected:
-
       /**
        * @name Private Member Variables
        * @{
@@ -507,7 +503,6 @@ namespace os
       /**
        * @}
        */
-
     };
 
     // ========================================================================
@@ -520,7 +515,6 @@ namespace os
     class semaphore_binary : public semaphore
     {
     public:
-
       /**
        * @name Constructors & Destructor
        * @{
@@ -547,9 +541,11 @@ namespace os
       semaphore_binary (const semaphore_binary&) = delete;
       semaphore_binary (semaphore_binary&&) = delete;
       semaphore_binary&
-      operator= (const semaphore_binary&) = delete;
+      operator= (const semaphore_binary&)
+          = delete;
       semaphore_binary&
-      operator= (semaphore_binary&&) = delete;
+      operator= (semaphore_binary&&)
+          = delete;
 
       /**
        * @endcond
@@ -580,7 +576,6 @@ namespace os
       /**
        * @}
        */
-
     };
 
     // ========================================================================
@@ -593,7 +588,6 @@ namespace os
     class semaphore_counting : public semaphore
     {
     public:
-
       /**
        * @name Constructors & Destructor
        * @{
@@ -604,7 +598,8 @@ namespace os
        * @param [in] max_value Maximum count value.
        * @param [in] initial_value Initial count value; 0 if missing.
        */
-      semaphore_counting (const count_t max_value, const count_t initial_value);
+      semaphore_counting (const count_t max_value,
+                          const count_t initial_value);
 
       /**
        * @brief Construct a named binary semaphore object instance.
@@ -623,9 +618,11 @@ namespace os
       semaphore_counting (const semaphore_counting&) = delete;
       semaphore_counting (semaphore_counting&&) = delete;
       semaphore_counting&
-      operator= (const semaphore_counting&) = delete;
+      operator= (const semaphore_counting&)
+          = delete;
       semaphore_counting&
-      operator= (semaphore_counting&&) = delete;
+      operator= (semaphore_counting&&)
+          = delete;
 
       /**
        * @endcond
@@ -656,12 +653,11 @@ namespace os
       /**
        * @}
        */
-
     };
 
 #pragma GCC diagnostic pop
 
-  // ==========================================================================
+    // ========================================================================
 
   } /* namespace rtos */
 } /* namespace os */
@@ -674,8 +670,7 @@ namespace os
   {
     // ========================================================================
 
-    constexpr
-    semaphore::attributes::attributes ()
+    constexpr semaphore::attributes::attributes ()
     {
     }
 
@@ -683,10 +678,10 @@ namespace os
      * @cond ignore
      */
 
-    constexpr
-    semaphore::attributes::attributes (count_t max_value, count_t initial_value) :
-        sm_max_value (max_value), //
-        sm_initial_value (initial_value)
+    constexpr semaphore::attributes::attributes (count_t max_value,
+                                                 count_t initial_value)
+        : sm_max_value (max_value), //
+          sm_initial_value (initial_value)
     {
     }
 
@@ -695,20 +690,18 @@ namespace os
      */
 
     // ========================================================================
-    constexpr
-    semaphore::attributes_binary::attributes_binary (count_t initial_value) :
-        attributes
-          { 1, initial_value } // Use the protected constructor.
+    constexpr semaphore::attributes_binary::attributes_binary (
+        count_t initial_value)
+        : attributes{ 1, initial_value } // Use the protected constructor.
     {
     }
 
     // ========================================================================
 
-    constexpr
-    semaphore::attributes_counting::attributes_counting (count_t max_value,
-                                                         count_t initial_value) :
-        attributes
-          { max_value, initial_value } // Use the protected constructor.
+    constexpr semaphore::attributes_counting::attributes_counting (
+        count_t max_value, count_t initial_value)
+        : attributes{ max_value, initial_value }
+          // Use the protected constructor.
     {
     }
 
@@ -735,16 +728,17 @@ namespace os
      * object with the default constructor.
      *
      * @par POSIX compatibility
-     *  Inspired by [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
-     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by
+     * [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
+     *  from
+     * [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    inline
-    semaphore::semaphore (const attributes& attr) :
-        semaphore
-          { nullptr, attr }
+    inline semaphore::semaphore (const attributes& attr)
+        : semaphore{ nullptr, attr }
     {
     }
 
@@ -796,16 +790,17 @@ namespace os
      * semaphore objects.
      *
      * @par POSIX compatibility
-     *  Inspired by [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
-     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by
+     * [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
+     *  from
+     * [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    inline
-    semaphore_binary::semaphore_binary (const count_t initial_value) :
-        semaphore
-          { nullptr, 1, initial_value, initializer_binary }
+    inline semaphore_binary::semaphore_binary (const count_t initial_value)
+        : semaphore{ nullptr, 1, initial_value, initializer_binary }
     {
     }
 
@@ -821,17 +816,18 @@ namespace os
      * semaphore objects.
      *
      * @par POSIX compatibility
-     *  Inspired by [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
-     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by
+     * [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
+     *  from
+     * [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    inline
-    semaphore_binary::semaphore_binary (const char* name,
-                                        const count_t initial_value) :
-        semaphore
-          { name, 1, initial_value }
+    inline semaphore_binary::semaphore_binary (const char* name,
+                                               const count_t initial_value)
+        : semaphore{ name, 1, initial_value }
     {
     }
 
@@ -847,14 +843,16 @@ namespace os
      * is undefined.
      *
      * @par POSIX compatibility
-     *  Inspired by [`sem_destroy()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_destroy.html)
-     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by
+     * [`sem_destroy()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_destroy.html)
+     *  from
+     * [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    inline
-    semaphore_binary::~semaphore_binary ()
+    inline semaphore_binary::~semaphore_binary ()
     {
     }
 
@@ -872,17 +870,18 @@ namespace os
      * semaphore objects.
      *
      * @par POSIX compatibility
-     *  Inspired by [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
-     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by
+     * [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
+     *  from
+     * [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    inline
-    semaphore_counting::semaphore_counting (const count_t max_value,
-                                            const count_t initial_value) :
-        semaphore
-          { nullptr, max_value, initial_value }
+    inline semaphore_counting::semaphore_counting (const count_t max_value,
+                                                   const count_t initial_value)
+        : semaphore{ nullptr, max_value, initial_value }
     {
     }
 
@@ -898,18 +897,19 @@ namespace os
      * semaphore objects.
      *
      * @par POSIX compatibility
-     *  Inspired by [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
-     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by
+     * [`sem_init()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_init.html)
+     *  from
+     * [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    inline
-    semaphore_counting::semaphore_counting (const char* name,
-                                            const count_t max_value,
-                                            const count_t initial_value) :
-        semaphore
-          { name, max_value, initial_value }
+    inline semaphore_counting::semaphore_counting (const char* name,
+                                                   const count_t max_value,
+                                                   const count_t initial_value)
+        : semaphore{ name, max_value, initial_value }
     {
     }
 
@@ -925,22 +925,23 @@ namespace os
      * is undefined.
      *
      * @par POSIX compatibility
-     *  Inspired by [`sem_destroy()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_destroy.html)
-     *  from [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
-     *  ([IEEE Std 1003.1, 2013 Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
+     *  Inspired by
+     * [`sem_destroy()`](http://pubs.opengroup.org/onlinepubs/9699919799/functions/sem_destroy.html)
+     *  from
+     * [`<semaphore.h>`](http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/semaphore.h.html)
+     *  ([IEEE Std 1003.1, 2013
+     * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    inline
-    semaphore_counting::~semaphore_counting ()
+    inline semaphore_counting::~semaphore_counting ()
     {
     }
 
-  // ========================================================================
+    // ========================================================================
 
   } /* namespace rtos */
 } /* namespace os */
-
 
 #pragma GCC diagnostic pop
 

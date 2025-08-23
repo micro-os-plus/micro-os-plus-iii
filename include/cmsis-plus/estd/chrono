@@ -37,20 +37,20 @@ namespace os
 
       // ======================================================================
 
-      template<typename T, typename = void>
-        struct has_sleep_for : std::false_type
-        {
-        };
+      template <typename T, typename = void>
+      struct has_sleep_for : std::false_type
+      {
+      };
 
       /**
        * @cond ignore
        */
 
-      template<typename T>
-        struct has_sleep_for<T,
-            decltype(std::declval<T>().has_sleep_for, void())> : std::true_type
-        {
-        };
+      template <typename T>
+      struct has_sleep_for<T, decltype (std::declval<T> ().has_sleep_for,
+                                        void ())> : std::true_type
+      {
+      };
 
       /**
        * @endcond
@@ -66,21 +66,19 @@ namespace os
       class systick_clock
       {
       public:
-
         /// type of variable holding the tick counter
         using rep = rtos::clock_systick::timestamp_t;
         using sleep_rep = rtos::clock_systick::duration_t;
-        /// std::ratio type representing the tick period of the clock, in seconds
+        /// std::ratio type representing the tick period of the clock, in
+        /// seconds
         using period = std::ratio<1, os::rtos::clock_systick::frequency_hz>;
         /// basic duration type of clock
         using duration = std::chrono::duration<rep, period>;
         using sleep_duration = std::chrono::duration<sleep_rep, period>;
         /// basic time_point type of clock
         using time_point = std::chrono::time_point<systick_clock>;
-        static constexpr bool is_steady
-          { true };
-        static constexpr bool has_sleep_for
-          { true };
+        static constexpr bool is_steady{ true };
+        static constexpr bool has_sleep_for{ true };
 
         /**
          * @return time_point representing the current value of the clock
@@ -93,19 +91,19 @@ namespace os
 
         static void
         sleep_for (sleep_rep ticks);
-
       };
 
       // Define a duration type, to be used in timeout expressions.
       using systicks = systick_clock::duration;
 
-      //constexpr systicks
-      //operator "" systicks (Ssstick_clock::rep); // C++14
+      // constexpr systicks
+      // operator "" systicks (Ssstick_clock::rep); // C++14
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
-// error: 'long long' is incompatible with C++98 [-Werror,-Wc++98-compat-pedantic]
+// error: 'long long' is incompatible with C++98
+// [-Werror,-Wc++98-compat-pedantic]
 #pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
 #pragma clang diagnostic ignored "-Wreserved-identifier"
 #elif defined(__GNUC__)
@@ -128,11 +126,11 @@ namespace os
       class realtime_clock
       {
       public:
-
         using rep = rtos::clock_rtc::timestamp_t;
         using sleep_rep = rtos::clock_rtc::duration_t;
 
-        /// std::ratio type representing the tick period of the clock, in seconds
+        /// std::ratio type representing the tick period of the clock, in
+        /// seconds
         using period = std::ratio<1, 1>;
         /// basic duration type of clock
         using duration = std::chrono::duration<rep, period>;
@@ -141,10 +139,8 @@ namespace os
         using time_point = std::chrono::time_point<realtime_clock>;
 
         // Non-monotonic, may be adjusted back in time.
-        static constexpr const bool is_steady
-          { false };
-        static constexpr bool has_sleep_for
-          { true };
+        static constexpr const bool is_steady{ false };
+        static constexpr bool has_sleep_for{ true };
 
         static time_point
         now () noexcept;
@@ -152,8 +148,7 @@ namespace os
         // --------------------------------------------------------------------
         // Extension to ISO
 
-        static void
-        sleep_for (sleep_rep);
+        static void sleep_for (sleep_rep);
 
         // Number of seconds from epoch (1 January 1970 00:00:00 UTC)
         // Must be initialised during startup with the value of now().
@@ -170,15 +165,13 @@ namespace os
       class system_clock
       {
       public:
-
         using duration = std::chrono::microseconds;
         using rep = duration::rep;
         using period = duration::period;
         using time_point = std::chrono::time_point<system_clock>;
 
         // Monotonic, never adjusted back in time.
-        static constexpr const bool is_steady
-          { true };
+        static constexpr const bool is_steady{ true };
 
         static time_point
         now () noexcept;
@@ -189,7 +182,6 @@ namespace os
         to_time_t (const time_point& tp) noexcept;
         static time_point
         from_time_t (time_t t) noexcept;
-
       };
 
       // ======================================================================
@@ -205,23 +197,21 @@ namespace os
       class high_resolution_clock
       {
       public:
-
         using duration = std::chrono::nanoseconds;
         using rep = duration::rep;
         using period = duration::period;
         using time_point = std::chrono::time_point<high_resolution_clock>;
 
         // Monotonic, never adjusted back in time.
-        static constexpr const bool is_steady
-          { true };
+        static constexpr const bool is_steady{ true };
 
         static time_point
         now () noexcept;
       };
 
-    /**
-     * @}
-     */
+      /**
+       * @}
+       */
 
     } /* namespace chrono */
   } /* namespace estd */
@@ -262,23 +252,23 @@ namespace os
 #pragma GCC diagnostic ignored "-Waggregate-return"
 #endif
 
-      template<class _To, class Rep_T, class Period_T>
-        constexpr typename std::enable_if<
-        std::chrono::__is_duration<_To>::value, _To>::type
-        ceil (std::chrono::duration<Rep_T, Period_T> d)
+      template <class _To, class Rep_T, class Period_T>
+      constexpr typename std::enable_if<std::chrono::__is_duration<_To>::value,
+                                        _To>::type
+      ceil (std::chrono::duration<Rep_T, Period_T> d)
+      {
+        using namespace std::chrono;
+        _To r = std::chrono::duration_cast<_To> (d);
+        if (r < d)
           {
-            using namespace std::chrono;
-            _To r = std::chrono::duration_cast<_To> (d);
-            if (r < d)
-              {
-                ++r;
-              }
-            return r;
+            ++r;
           }
+        return r;
+      }
 
 #pragma GCC diagnostic pop
 
-        // ----------------------------------------------------------------------
+      // ----------------------------------------------------------------------
 
     } /* namespace chrono */
   } /* namespace estd */

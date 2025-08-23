@@ -71,7 +71,6 @@ namespace os
     class lifo : public os::memory::first_fit_top
     {
     public:
-
       /**
        * @name Constructors & Destructor
        * @{
@@ -93,7 +92,6 @@ namespace os
       lifo (const char* name, void* addr, std::size_t bytes);
 
     protected:
-
       /**
        * @brief Default constructor. Construct a memory resource
        *  object instance.
@@ -107,7 +105,6 @@ namespace os
       lifo (const char* name);
 
     public:
-
       /**
        * @cond ignore
        */
@@ -116,9 +113,11 @@ namespace os
       lifo (const lifo&) = delete;
       lifo (lifo&&) = delete;
       lifo&
-      operator= (const lifo&) = delete;
+      operator= (const lifo&)
+          = delete;
       lifo&
-      operator= (lifo&&) = delete;
+      operator= (lifo&&)
+          = delete;
 
       /**
        * @endcond
@@ -127,15 +126,13 @@ namespace os
       /**
        * @brief Destruct the memory resource object instance.
        */
-      virtual
-      ~lifo () override;
+      virtual ~lifo () override;
 
       /**
        * @}
        */
 
     protected:
-
       /**
        * @name Private Member Functions
        * @{
@@ -153,7 +150,6 @@ namespace os
       /**
        * @}
        */
-
     };
 
     // ========================================================================
@@ -170,78 +166,75 @@ namespace os
      *
      * The common use case it to define statically allocated memory managers.
      */
-    template<std::size_t N>
-      class lifo_inclusive : public lifo
-      {
-      public:
+    template <std::size_t N>
+    class lifo_inclusive : public lifo
+    {
+    public:
+      /**
+       * @brief Local constant based on template definition.
+       */
+      static const std::size_t bytes = N;
 
-        /**
-         * @brief Local constant based on template definition.
-         */
-        static const std::size_t bytes = N;
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
-        /**
-         * @name Constructors & Destructor
-         * @{
-         */
+      /**
+       * @brief Construct a memory resource object instance.
+       * @par Parameters
+       *  None.
+       */
+      lifo_inclusive (void);
 
-        /**
-         * @brief Construct a memory resource object instance.
-         * @par Parameters
-         *  None.
-         */
-        lifo_inclusive (void);
+      /**
+       * @brief Construct a named memory resource object instance.
+       * @param [in] name Pointer to name.
+       */
+      lifo_inclusive (const char* name);
 
-        /**
-         * @brief Construct a named memory resource object instance.
-         * @param [in] name Pointer to name.
-         */
-        lifo_inclusive (const char* name);
+    public:
+      /**
+       * @cond ignore
+       */
 
-      public:
+      // The rule of five.
+      lifo_inclusive (const lifo_inclusive&) = delete;
+      lifo_inclusive (lifo_inclusive&&) = delete;
+      lifo_inclusive&
+      operator= (const lifo_inclusive&)
+          = delete;
+      lifo_inclusive&
+      operator= (lifo_inclusive&&)
+          = delete;
 
-        /**
-         * @cond ignore
-         */
+      /**
+       * @endcond
+       */
 
-        // The rule of five.
-        lifo_inclusive (const lifo_inclusive&) = delete;
-        lifo_inclusive (lifo_inclusive&&) = delete;
-        lifo_inclusive&
-        operator= (const lifo_inclusive&) = delete;
-        lifo_inclusive&
-        operator= (lifo_inclusive&&) = delete;
+      /**
+       * @brief Destruct the memory resource object instance.
+       */
+      virtual ~lifo_inclusive ();
 
-        /**
-         * @endcond
-         */
+      /**
+       * @}
+       */
 
-        /**
-         * @brief Destruct the memory resource object instance.
-         */
-        virtual
-        ~lifo_inclusive ();
+    protected:
+      /**
+       * @cond ignore
+       */
 
-        /**
-         * @}
-         */
+      /**
+       * @brief The allocation arena is an array of bytes.
+       */
+      char arena_[bytes];
 
-      protected:
-
-        /**
-         * @cond ignore
-         */
-
-        /**
-         * @brief The allocation arena is an array of bytes.
-         */
-        char arena_[bytes];
-
-        /**
-         * @endcond
-         */
-
-      };
+      /**
+       * @endcond
+       */
+    };
 
     // ========================================================================
 
@@ -257,107 +250,106 @@ namespace os
      *
      * The common use case it to define dynamically allocated memory managers.
      */
-    template<typename A = os::rtos::memory::allocator<char>>
-      class lifo_allocated : public lifo
-      {
-      public:
+    template <typename A = os::rtos::memory::allocator<char>>
+    class lifo_allocated : public lifo
+    {
+    public:
+      /**
+       * @brief Standard allocator type definition.
+       */
+      using value_type = char;
 
-        /**
-         * @brief Standard allocator type definition.
-         */
-        using value_type = char;
+      /**
+       * @brief Standard allocator type definition.
+       */
+      using allocator_type = A;
 
-        /**
-         * @brief Standard allocator type definition.
-         */
-        using allocator_type = A;
+      /**
+       * @brief Standard allocator traits definition.
+       */
+      using allocator_traits = std::allocator_traits<A>;
 
-        /**
-         * @brief Standard allocator traits definition.
-         */
-        using allocator_traits = std::allocator_traits<A>;
+      // It is recommended to have the same type, but at least the types
+      // should have the same size.
+      static_assert (
+          sizeof (value_type)
+              == sizeof (typename allocator_traits::value_type),
+          "The allocator must be parametrised with a type of same size.");
 
-        // It is recommended to have the same type, but at least the types
-        // should have the same size.
-        static_assert(sizeof(value_type) == sizeof(typename allocator_traits::value_type),
-            "The allocator must be parametrised with a type of same size.");
+      /**
+       * @name Constructors & Destructor
+       * @{
+       */
 
-        /**
-         * @name Constructors & Destructor
-         * @{
-         */
+      /**
+       * @brief Construct a memory resource object instance.
+       * @param [in] bytes The size of the allocation arena.
+       * @param [in] allocator Reference to allocator. Default a
+       * local temporary instance.
+       */
+      lifo_allocated (std::size_t bytes,
+                      const allocator_type& allocator = allocator_type ());
 
-        /**
-         * @brief Construct a memory resource object instance.
-         * @param [in] bytes The size of the allocation arena.
-         * @param [in] allocator Reference to allocator. Default a
-         * local temporary instance.
-         */
-        lifo_allocated (std::size_t bytes, const allocator_type& allocator =
-                            allocator_type ());
+      /**
+       * @brief Construct a named memory resource object instance.
+       * @param [in] name Pointer to name.
+       * @param [in] bytes The size of the allocation arena.
+       * @param [in] allocator Reference to allocator. Default a
+       * local temporary instance.
+       */
+      lifo_allocated (const char* name, std::size_t bytes,
+                      const allocator_type& allocator = allocator_type ());
 
-        /**
-         * @brief Construct a named memory resource object instance.
-         * @param [in] name Pointer to name.
-         * @param [in] bytes The size of the allocation arena.
-         * @param [in] allocator Reference to allocator. Default a
-         * local temporary instance.
-         */
-        lifo_allocated (const char* name, std::size_t bytes,
-                        const allocator_type& allocator = allocator_type ());
+    public:
+      /**
+       * @cond ignore
+       */
 
-      public:
+      // The rule of five.
+      lifo_allocated (const lifo_allocated&) = delete;
+      lifo_allocated (lifo_allocated&&) = delete;
+      lifo_allocated&
+      operator= (const lifo_allocated&)
+          = delete;
+      lifo_allocated&
+      operator= (lifo_allocated&&)
+          = delete;
 
-        /**
-         * @cond ignore
-         */
+      /**
+       * @endcond
+       */
 
-        // The rule of five.
-        lifo_allocated (const lifo_allocated&) = delete;
-        lifo_allocated (lifo_allocated&&) = delete;
-        lifo_allocated&
-        operator= (const lifo_allocated&) = delete;
-        lifo_allocated&
-        operator= (lifo_allocated&&) = delete;
+      /**
+       * @brief Destruct the memory resource object instance.
+       */
+      virtual ~lifo_allocated ();
 
-        /**
-         * @endcond
-         */
+      /**
+       * @}
+       */
 
-        /**
-         * @brief Destruct the memory resource object instance.
-         */
-        virtual
-        ~lifo_allocated ();
+    protected:
+      /**
+       * @cond ignore
+       */
 
-        /**
-         * @}
-         */
+      /**
+       * @brief Pointer to allocator.
+       *
+       * @details
+       * The allocator is remembered because deallocation
+       * must be performed during destruction. A more automated
+       * solution using a unique_ptr<> would require more RAM
+       * and is considered not justified.
+       */
+      allocator_type* allocator_ = nullptr;
 
-      protected:
+      /**
+       * @endcond
+       */
+    };
 
-        /**
-         * @cond ignore
-         */
-
-        /**
-         * @brief Pointer to allocator.
-         *
-         * @details
-         * The allocator is remembered because deallocation
-         * must be performed during destruction. A more automated
-         * solution using a unique_ptr<> would require more RAM
-         * and is considered not justified.
-         */
-        allocator_type* allocator_ = nullptr;
-
-        /**
-         * @endcond
-         */
-
-      };
-
-  // -------------------------------------------------------------------------
+    // -------------------------------------------------------------------------
   } /* namespace memory */
 } /* namespace os */
 
@@ -370,19 +362,15 @@ namespace os
 
     // ========================================================================
 
-    inline
-    lifo::lifo (void* addr, std::size_t bytes) :
-        first_fit_top
-          { nullptr, addr, bytes }
+    inline lifo::lifo (void* addr, std::size_t bytes)
+        : first_fit_top{ nullptr, addr, bytes }
     {
       trace::printf ("%s(%p,%u) @%p %s\n", __func__, addr, bytes, this,
                      this->name ());
     }
 
-    inline
-    lifo::lifo (const char* name, void* addr, std::size_t bytes) :
-        first_fit_top
-          { name, addr, bytes }
+    inline lifo::lifo (const char* name, void* addr, std::size_t bytes)
+        : first_fit_top{ name, addr, bytes }
     {
       trace::printf ("%s(%p,%u) @%p %s\n", __func__, addr, bytes, this,
                      this->name ());
@@ -390,79 +378,72 @@ namespace os
 
     // ========================================================================
 
-    template<std::size_t N>
-      inline
-      lifo_inclusive<N>::lifo_inclusive () :
-          lifo_inclusive (nullptr)
-      {
-      }
+    template <std::size_t N>
+    inline lifo_inclusive<N>::lifo_inclusive () : lifo_inclusive (nullptr)
+    {
+    }
 
-    template<std::size_t N>
-      inline
-      lifo_inclusive<N>::lifo_inclusive (const char* name) :
-          lifo
-            { name }
-      {
-        trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
+    template <std::size_t N>
+    inline lifo_inclusive<N>::lifo_inclusive (const char* name) : lifo{ name }
+    {
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 
-        internal_construct_ (&arena_[0], bytes);
-      }
+      internal_construct_ (&arena_[0], bytes);
+    }
 
-    template<std::size_t N>
-      lifo_inclusive<N>::~lifo_inclusive ()
-      {
-        trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
-      }
+    template <std::size_t N>
+    lifo_inclusive<N>::~lifo_inclusive ()
+    {
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
+    }
 
     // ========================================================================
 
-    template<typename A>
-      inline
-      lifo_allocated<A>::lifo_allocated (std::size_t bytes,
-                                         const allocator_type& allocator) :
-          lifo_allocated (nullptr, bytes, allocator)
-      {
-      }
+    template <typename A>
+    inline lifo_allocated<A>::lifo_allocated (std::size_t bytes,
+                                              const allocator_type& allocator)
+        : lifo_allocated (nullptr, bytes, allocator)
+    {
+    }
 
-    template<typename A>
-      lifo_allocated<A>::lifo_allocated (const char* name, std::size_t bytes,
-                                         const allocator_type& allocator) :
-          lifo
-            { name }
-      {
-        trace::printf ("%s(%u) @%p %s\n", __func__, bytes, this, this->name ());
+    template <typename A>
+    lifo_allocated<A>::lifo_allocated (const char* name, std::size_t bytes,
+                                       const allocator_type& allocator)
+        : lifo{ name }
+    {
+      trace::printf ("%s(%u) @%p %s\n", __func__, bytes, this, this->name ());
 
-        // Remember the allocator, it'll be used by the destructor.
-        allocator_ =
-            static_cast<allocator_type*> (&const_cast<allocator_type&> (allocator));
+      // Remember the allocator, it'll be used by the destructor.
+      allocator_ = static_cast<allocator_type*> (
+          &const_cast<allocator_type&> (allocator));
 
-        void* addr = allocator_->allocate (bytes);
-        if (addr == nullptr)
-          {
-            estd::__throw_bad_alloc ();
-          }
+      void* addr = allocator_->allocate (bytes);
+      if (addr == nullptr)
+        {
+          estd::__throw_bad_alloc ();
+        }
 
-        internal_construct_ (addr, bytes);
-      }
+      internal_construct_ (addr, bytes);
+    }
 
-    template<typename A>
-      lifo_allocated<A>::~lifo_allocated ()
-      {
-        trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
+    template <typename A>
+    lifo_allocated<A>::~lifo_allocated ()
+    {
+      trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 
-        // Skip in case a derived class did the deallocation.
-        if (allocator_ != nullptr)
-          {
-            allocator_->deallocate (
-                static_cast<typename allocator_traits::pointer> (arena_addr_),
-                total_bytes_);
+      // Skip in case a derived class did the deallocation.
+      if (allocator_ != nullptr)
+        {
+          allocator_->deallocate (
+              static_cast<typename allocator_traits::pointer> (arena_addr_),
+              total_bytes_);
 
-            // Prevent another deallocation.
-            allocator_ = nullptr;
-          }
-      }
+          // Prevent another deallocation.
+          allocator_ = nullptr;
+        }
+    }
 
-  // --------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
 
   } /* namespace memory */
 } /* namespace os */

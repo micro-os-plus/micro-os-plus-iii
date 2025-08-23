@@ -15,7 +15,7 @@
 #include <stdint.h>
 
 #if defined(DEBUG)
-#define __DEBUG_BKPT()  __asm__ volatile ("bkpt 0")
+#define __DEBUG_BKPT() __asm__ volatile ("bkpt 0")
 #endif
 
 // ----------------------------------------------------------------------------
@@ -70,7 +70,7 @@ extern "C"
     uint32_t lr;
     uint32_t pc;
     uint32_t psr;
-#if  defined(__ARM_ARCH_7EM__)
+#if defined(__ARM_ARCH_7EM__)
     uint32_t s[16];
 #endif
   } exception_stack_frame_t;

@@ -105,10 +105,9 @@ namespace os
        * The deallocation function (3.7.4.2) called by a delete-expression
        * to render the value of _ptr_ invalid.
        *
-       * _ptr_ shall be a null pointer or its value shall be a value returned by
-       * an earlier call to the (possibly replaced) operator new()
-       * which has not
-       * been invalidated by an intervening call to operator delete(void*).
+       * _ptr_ shall be a null pointer or its value shall be a value returned
+       * by an earlier call to the (possibly replaced) operator new() which has
+       * not been invalidated by an intervening call to operator delete(void*).
        *
        * If _ptr_ is null, does nothing. Otherwise, reclaims the storage
        * allocated by the earlier call to operator new.
@@ -122,8 +121,8 @@ namespace os
       {
         assert (!interrupts::in_handler_mode ());
 
-         rtos::memory::allocator<char> ().deallocate (
-            static_cast<char*> (ptr), bytes);
+        rtos::memory::allocator<char> ().deallocate (static_cast<char*> (ptr),
+                                                     bytes);
       }
 
       /**

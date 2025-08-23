@@ -25,7 +25,7 @@ namespace os
 {
   namespace estd
   {
-    // ======================================================================
+    // ========================================================================
 
     enum class future_errc
     {
@@ -49,10 +49,10 @@ namespace os
       deferred
     };
 
-    template<>
-      struct is_error_code_enum<future_errc> : public true_type
-      {
-      };
+    template <>
+    struct is_error_code_enum<future_errc> : public true_type
+    {
+    };
 
     error_code
     make_error_code (future_errc e) noexcept;
@@ -66,8 +66,7 @@ namespace os
     class future_error : public logic_error
     {
     public:
-
-      future_error (error_code ec);  // exposition only
+      future_error (error_code ec); // exposition only
 
       const error_code&
       code () const noexcept;
@@ -75,452 +74,442 @@ namespace os
       what () const noexcept;
     };
 
-    template<class R>
-      class promise
-      {
-      public:
+    template <class R>
+    class promise
+    {
+    public:
+      promise ();
 
-        promise ();
+      template <class Allocator>
+      promise (allocator_arg_t, const Allocator& a);
 
-        template<class Allocator>
-          promise (allocator_arg_t, const Allocator& a);
+      promise (promise&& rhs) noexcept;
+      promise (const promise& rhs) = delete;
 
-        promise (promise&& rhs) noexcept;
-        promise (const promise& rhs) = delete;
+      ~promise ();
 
-        ~promise ();
+      // assignment
+      promise&
+      operator= (promise&& rhs) noexcept;
+      promise&
+      operator= (const promise& rhs)
+          = delete;
 
-        // assignment
-        promise&
-        operator= (promise&& rhs) noexcept;
-        promise&
-        operator= (const promise& rhs) = delete;
-
-        void
-        swap (promise& other) noexcept;
-
-        // retrieving the result
-        future<R>
-        get_future ();
-
-        // setting the result
-        void
-        set_value (const R& r);
-
-        void
-        set_value (R&& r);
-
-        void
-        set_exception (exception_ptr p);
-
-        // setting the result with deferred notification
-        void
-        set_value_at_thread_exit (const R& r);
-
-        void
-        set_value_at_thread_exit (R&& r);
-
-        void
-        set_exception_at_thread_exit (exception_ptr p);
-      };
-
-    template<class R>
-      class promise<R&>
-      {
-      public:
-
-        promise ();
-
-        template<class Allocator>
-          promise (allocator_arg_t, const Allocator& a);
-
-        promise (promise&& rhs) noexcept;
-        promise (const promise& rhs) = delete;
-
-        ~promise ();
-
-        // assignment
-        promise&
-        operator= (promise&& rhs) noexcept;
-
-        promise&
-        operator= (const promise& rhs) = delete;
-
-        void
-        swap (promise& other) noexcept;
-
-        // retrieving the result
-        future<R&>
-        get_future ();
-
-        // setting the result
-        void
-        set_value (R& r);
-
-        void
-        set_exception (exception_ptr p);
-
-        // setting the result with deferred notification
-        void
-        set_value_at_thread_exit (R&);
-
-        void
-        set_exception_at_thread_exit (exception_ptr p);
-      };
-
-    template<>
-      class promise<void>
-      {
-      public:
-
-        promise ();
-
-        template<class Allocator>
-          promise (allocator_arg_t, const Allocator& a);
-
-        promise (promise&& rhs) noexcept;
-        promise (const promise& rhs) = delete;
-
-        ~promise ();
-
-        // assignment
-        promise&
-        operator= (promise&& rhs) noexcept;
-        promise&
-        operator= (const promise& rhs) = delete;
-
-        void
-        swap (promise& other) noexcept;
-
-        // retrieving the result
-        future<void>
-        get_future ();
-
-        // setting the result
-        void
-        set_value ();
-
-        void
-        set_exception (exception_ptr p);
-
-        // setting the result with deferred notification
-        void
-        set_value_at_thread_exit ();
-
-        void
-        set_exception_at_thread_exit (exception_ptr p);
-      };
-
-    template<class R>
       void
-      swap (promise<R>& x, promise<R>& y) noexcept;
+      swap (promise& other) noexcept;
 
-    template<class R, class Alloc>
-      struct uses_allocator<promise<R>, Alloc> : public true_type
-      {
-      };
+      // retrieving the result
+      future<R>
+      get_future ();
 
-    template<class R>
-      class future
-      {
-      public:
+      // setting the result
+      void
+      set_value (const R& r);
 
-        future () noexcept;
-        future (future&&) noexcept;
-        future (const future& rhs) = delete;
-        ~future ();
-        future&
-        operator= (const future& rhs) = delete;
-        future&
-        operator= (future&&) noexcept;
+      void
+      set_value (R&& r);
 
-        shared_future<R>
-        share ();
+      void
+      set_exception (exception_ptr p);
 
-        // retrieving the value
-        R
-        get ();
+      // setting the result with deferred notification
+      void
+      set_value_at_thread_exit (const R& r);
 
-        // functions to check state
-        bool
-        valid () const noexcept;
+      void
+      set_value_at_thread_exit (R&& r);
 
-        void
-        wait () const;
+      void
+      set_exception_at_thread_exit (exception_ptr p);
+    };
 
-        template<class Rep, class Period>
-          future_status
-          wait_for (const chrono::duration<Rep, Period>& rel_time) const;
+    template <class R>
+    class promise<R&>
+    {
+    public:
+      promise ();
 
-        template<class Clock, class Duration>
-          future_status
-          wait_until (
-              const chrono::time_point<Clock, Duration>& abs_time) const;
-      };
+      template <class Allocator>
+      promise (allocator_arg_t, const Allocator& a);
 
-    template<class R>
-      class future<R&>
-      {
-      public:
+      promise (promise&& rhs) noexcept;
+      promise (const promise& rhs) = delete;
 
-        future () noexcept;
-        future (future&&) noexcept;
-        future (const future& rhs) = delete;
-        ~future ();
-        future&
-        operator= (const future& rhs) = delete;
-        future&
-        operator= (future&&) noexcept;
+      ~promise ();
 
-        shared_future<R&>
-        share ();
+      // assignment
+      promise&
+      operator= (promise&& rhs) noexcept;
 
-        // retrieving the value
-        R&
-        get ();
+      promise&
+      operator= (const promise& rhs)
+          = delete;
 
-        // functions to check state
-        bool
-        valid () const noexcept;
+      void
+      swap (promise& other) noexcept;
 
-        void
-        wait () const;
+      // retrieving the result
+      future<R&>
+      get_future ();
 
-        template<class Rep, class Period>
-          future_status
-          wait_for (const chrono::duration<Rep, Period>& rel_time) const;
+      // setting the result
+      void
+      set_value (R& r);
 
-        template<class Clock, class Duration>
-          future_status
-          wait_until (
-              const chrono::time_point<Clock, Duration>& abs_time) const;
-      };
+      void
+      set_exception (exception_ptr p);
 
-    template<>
-      class future<void>
-      {
-      public:
-        future () noexcept;
-        future (future&&) noexcept;
-        future (const future& rhs) = delete;
-        ~future ();
-        future&
-        operator= (const future& rhs) = delete;
-        future&
-        operator= (future&&) noexcept;
+      // setting the result with deferred notification
+      void
+      set_value_at_thread_exit (R&);
 
-        shared_future<void>
-        share ();
+      void
+      set_exception_at_thread_exit (exception_ptr p);
+    };
 
-        // retrieving the value
-        void
-        get ();
+    template <>
+    class promise<void>
+    {
+    public:
+      promise ();
 
-        // functions to check state
-        bool
-        valid () const noexcept;
+      template <class Allocator>
+      promise (allocator_arg_t, const Allocator& a);
 
-        void
-        wait () const;
+      promise (promise&& rhs) noexcept;
+      promise (const promise& rhs) = delete;
 
-        template<class Rep, class Period>
-          future_status
-          wait_for (const chrono::duration<Rep, Period>& rel_time) const;
+      ~promise ();
 
-        template<class Clock, class Duration>
-          future_status
-          wait_until (
-              const chrono::time_point<Clock, Duration>& abs_time) const;
-      };
+      // assignment
+      promise&
+      operator= (promise&& rhs) noexcept;
+      promise&
+      operator= (const promise& rhs)
+          = delete;
 
-    template<class R>
-      class shared_future
-      {
-      public:
+      void
+      swap (promise& other) noexcept;
 
-        shared_future () noexcept;
+      // retrieving the result
+      future<void>
+      get_future ();
 
-        shared_future (const shared_future& rhs);
-        shared_future (future<R> &&) noexcept;
-        shared_future (shared_future&& rhs) noexcept;
+      // setting the result
+      void
+      set_value ();
 
-        ~shared_future ();
+      void
+      set_exception (exception_ptr p);
 
-        shared_future&
-        operator= (const shared_future& rhs);
-        shared_future&
-        operator= (shared_future&& rhs) noexcept;
+      // setting the result with deferred notification
+      void
+      set_value_at_thread_exit ();
 
-        // retrieving the value
-        const R&
-        get () const;
+      void
+      set_exception_at_thread_exit (exception_ptr p);
+    };
 
-        // functions to check state
-        bool
-        valid () const noexcept;
+    template <class R>
+    void
+    swap (promise<R>& x, promise<R>& y) noexcept;
 
-        void
-        wait () const;
+    template <class R, class Alloc>
+    struct uses_allocator<promise<R>, Alloc> : public true_type
+    {
+    };
 
-        template<class Rep, class Period>
-          future_status
-          wait_for (const chrono::duration<Rep, Period>& rel_time) const;
+    template <class R>
+    class future
+    {
+    public:
+      future () noexcept;
+      future (future&&) noexcept;
+      future (const future& rhs) = delete;
+      ~future ();
+      future&
+      operator= (const future& rhs)
+          = delete;
+      future&
+      operator= (future&&) noexcept;
 
-        template<class Clock, class Duration>
-          future_status
-          wait_until (
-              const chrono::time_point<Clock, Duration>& abs_time) const;
-      };
+      shared_future<R>
+      share ();
 
-    template<class R>
-      class shared_future<R&>
-      {
-      public:
+      // retrieving the value
+      R
+      get ();
 
-        shared_future () noexcept;
-        shared_future (const shared_future& rhs);
-        shared_future (future<R&> &&) noexcept;
-        shared_future (shared_future&& rhs) noexcept;
-        ~shared_future ();
-        shared_future&
-        operator= (const shared_future& rhs);
-        shared_future&
-        operator= (shared_future&& rhs) noexcept;
+      // functions to check state
+      bool
+      valid () const noexcept;
 
-        // retrieving the value
-        R&
-        get () const;
+      void
+      wait () const;
 
-        // functions to check state
-        bool
-        valid () const noexcept;
+      template <class Rep, class Period>
+      future_status
+      wait_for (const chrono::duration<Rep, Period>& rel_time) const;
 
-        void
-        wait () const;
+      template <class Clock, class Duration>
+      future_status
+      wait_until (const chrono::time_point<Clock, Duration>& abs_time) const;
+    };
 
-        template<class Rep, class Period>
-          future_status
-          wait_for (const chrono::duration<Rep, Period>& rel_time) const;
+    template <class R>
+    class future<R&>
+    {
+    public:
+      future () noexcept;
+      future (future&&) noexcept;
+      future (const future& rhs) = delete;
+      ~future ();
+      future&
+      operator= (const future& rhs)
+          = delete;
+      future&
+      operator= (future&&) noexcept;
 
-        template<class Clock, class Duration>
-          future_status
-          wait_until (
-              const chrono::time_point<Clock, Duration>& abs_time) const;
-      };
+      shared_future<R&>
+      share ();
 
-    template<>
-      class shared_future<void>
-      {
-      public:
+      // retrieving the value
+      R&
+      get ();
 
-        shared_future () noexcept;
-        shared_future (const shared_future& rhs);
-        shared_future (future<void> &&) noexcept;
-        shared_future (shared_future&& rhs) noexcept;
-        ~shared_future ();
-        shared_future&
-        operator= (const shared_future& rhs);
-        shared_future&
-        operator= (shared_future&& rhs) noexcept;
+      // functions to check state
+      bool
+      valid () const noexcept;
 
-        // retrieving the value
-        void
-        get () const;
+      void
+      wait () const;
 
-        // functions to check state
-        bool
-        valid () const noexcept;
+      template <class Rep, class Period>
+      future_status
+      wait_for (const chrono::duration<Rep, Period>& rel_time) const;
 
-        void
-        wait () const;
+      template <class Clock, class Duration>
+      future_status
+      wait_until (const chrono::time_point<Clock, Duration>& abs_time) const;
+    };
 
-        template<class Rep, class Period>
-          future_status
-          wait_for (const chrono::duration<Rep, Period>& rel_time) const;
+    template <>
+    class future<void>
+    {
+    public:
+      future () noexcept;
+      future (future&&) noexcept;
+      future (const future& rhs) = delete;
+      ~future ();
+      future&
+      operator= (const future& rhs)
+          = delete;
+      future&
+      operator= (future&&) noexcept;
 
-        template<class Clock, class Duration>
-          future_status
-          wait_until (
-              const chrono::time_point<Clock, Duration>& abs_time) const;
-      };
+      shared_future<void>
+      share ();
+
+      // retrieving the value
+      void
+      get ();
+
+      // functions to check state
+      bool
+      valid () const noexcept;
+
+      void
+      wait () const;
+
+      template <class Rep, class Period>
+      future_status
+      wait_for (const chrono::duration<Rep, Period>& rel_time) const;
+
+      template <class Clock, class Duration>
+      future_status
+      wait_until (const chrono::time_point<Clock, Duration>& abs_time) const;
+    };
+
+    template <class R>
+    class shared_future
+    {
+    public:
+      shared_future () noexcept;
+
+      shared_future (const shared_future& rhs);
+      shared_future (future<R>&&) noexcept;
+      shared_future (shared_future&& rhs) noexcept;
+
+      ~shared_future ();
+
+      shared_future&
+      operator= (const shared_future& rhs);
+      shared_future&
+      operator= (shared_future&& rhs) noexcept;
+
+      // retrieving the value
+      const R&
+      get () const;
+
+      // functions to check state
+      bool
+      valid () const noexcept;
+
+      void
+      wait () const;
+
+      template <class Rep, class Period>
+      future_status
+      wait_for (const chrono::duration<Rep, Period>& rel_time) const;
+
+      template <class Clock, class Duration>
+      future_status
+      wait_until (const chrono::time_point<Clock, Duration>& abs_time) const;
+    };
+
+    template <class R>
+    class shared_future<R&>
+    {
+    public:
+      shared_future () noexcept;
+      shared_future (const shared_future& rhs);
+      shared_future (future<R&>&&) noexcept;
+      shared_future (shared_future&& rhs) noexcept;
+      ~shared_future ();
+      shared_future&
+      operator= (const shared_future& rhs);
+      shared_future&
+      operator= (shared_future&& rhs) noexcept;
+
+      // retrieving the value
+      R&
+      get () const;
+
+      // functions to check state
+      bool
+      valid () const noexcept;
+
+      void
+      wait () const;
+
+      template <class Rep, class Period>
+      future_status
+      wait_for (const chrono::duration<Rep, Period>& rel_time) const;
+
+      template <class Clock, class Duration>
+      future_status
+      wait_until (const chrono::time_point<Clock, Duration>& abs_time) const;
+    };
+
+    template <>
+    class shared_future<void>
+    {
+    public:
+      shared_future () noexcept;
+      shared_future (const shared_future& rhs);
+      shared_future (future<void>&&) noexcept;
+      shared_future (shared_future&& rhs) noexcept;
+      ~shared_future ();
+      shared_future&
+      operator= (const shared_future& rhs);
+      shared_future&
+      operator= (shared_future&& rhs) noexcept;
+
+      // retrieving the value
+      void
+      get () const;
+
+      // functions to check state
+      bool
+      valid () const noexcept;
+
+      void
+      wait () const;
+
+      template <class Rep, class Period>
+      future_status
+      wait_for (const chrono::duration<Rep, Period>& rel_time) const;
+
+      template <class Clock, class Duration>
+      future_status
+      wait_until (const chrono::time_point<Clock, Duration>& abs_time) const;
+    };
 
     // Instead of decay<F>, the standard specifies:
     // future<typename result_of<F(Args...)>::type>
 
-    template<class F, class ... Args>
-      future<typename result_of<typename decay<F>::type
-      (typename decay<Args>::type...)>::type>
-      async(F&& f, Args&&... args);
+    template <class F, class... Args>
+    future<typename result_of<
+        typename decay<F>::type (typename decay<Args>::type...)>::type>
+    async (F&& f, Args&&... args);
 
-    template<class F, class ... Args>
-      future<typename result_of<typename decay<F>::type
-      (typename decay<Args>::type...)>::type>
-      async(launch policy, F&& f, Args&&... args);
+    template <class F, class... Args>
+    future<typename result_of<
+        typename decay<F>::type (typename decay<Args>::type...)>::type>
+    async (launch policy, F&& f, Args&&... args);
 
-    template<class >
-      class packaged_task;
+    template <class>
+    class packaged_task;
     // undefined
 
-    template<class R, class ... ArgTypes>
-      class packaged_task<R
-      (ArgTypes...)>
-      {
-      public:
+    template <class R, class... ArgTypes>
+    class packaged_task<R (ArgTypes...)>
+    {
+    public:
+      typedef R result_type;
 
-        typedef R result_type;
+      // construction and destruction
+      packaged_task () noexcept;
 
-        // construction and destruction
-        packaged_task () noexcept;
+      template <class F>
+      explicit packaged_task (F&& f);
 
-        template<class F>
-          explicit
-          packaged_task (F&& f);
+      template <class F, class Allocator>
+      packaged_task (allocator_arg_t, const Allocator& a, F&& f);
 
-        template<class F, class Allocator>
-          packaged_task (allocator_arg_t, const Allocator& a, F&& f);
+      ~packaged_task ();
 
-        ~packaged_task ();
+      // no copy
+      packaged_task (const packaged_task&) = delete;
+      packaged_task&
+      operator= (const packaged_task&)
+          = delete;
 
-        // no copy
-        packaged_task (const packaged_task&) = delete;
-        packaged_task&
-        operator= (const packaged_task&) = delete;
+      // move support
+      packaged_task (packaged_task&& other) noexcept;
+      packaged_task&
+      operator= (packaged_task&& other) noexcept;
 
-        // move support
-        packaged_task (packaged_task&& other) noexcept;
-        packaged_task&
-        operator= (packaged_task&& other) noexcept;
-
-        void
-        swap (packaged_task& other) noexcept;
-
-        bool
-        valid () const noexcept;
-
-        // result retrieval
-        future<R>
-        get_future ();
-
-        // execution
-        void
-        operator() (ArgTypes...);
-
-        void
-        make_ready_at_thread_exit (ArgTypes...);
-
-        void
-        reset ();
-      };
-
-    template<class R>
       void
-      swap (packaged_task<R
-      (ArgTypes...)&, packaged_task<R(ArgTypes...)>&) noexcept;
+      swap (packaged_task& other) noexcept;
 
-    template<class R, class Alloc>
-      struct uses_allocator<packaged_task<R>, Alloc> ;
+      bool
+      valid () const noexcept;
 
-  // ----------------------------------------------------------------------
+      // result retrieval
+      future<R>
+      get_future ();
+
+      // execution
+      void
+      operator() (ArgTypes...);
+
+      void
+      make_ready_at_thread_exit (ArgTypes...);
+
+      void
+      reset ();
+    };
+
+    template <class R>
+    void
+    swap (packaged_task < R (ArgTypes...) &,
+          packaged_task<R (ArgTypes...)>&) noexcept;
+
+    template <class R, class Alloc>
+    struct uses_allocator<packaged_task<R>, Alloc>;
+
+    // ------------------------------------------------------------------------
 
   } /* namespace estd */
 } /* namespace os */

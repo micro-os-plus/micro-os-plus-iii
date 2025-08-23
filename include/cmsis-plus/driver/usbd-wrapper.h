@@ -19,10 +19,11 @@
 extern "C"
 {
   // Avoid to include <Driver_USBD.h>
-  typedef void
-  (*ARM_USBD_SignalDeviceEvent_t) (uint32_t event); /**< Pointer to device event callback. */
-  typedef void
-  (*ARM_USBD_SignalEndpointEvent_t) (uint8_t ep_addr, uint32_t event); /**< Pointer to endpoint event callback. */
+  typedef void (*ARM_USBD_SignalDeviceEvent_t) (
+      uint32_t event); /**< Pointer to device event callback. */
+  typedef void (*ARM_USBD_SignalEndpointEvent_t) (
+      uint8_t ep_addr,
+      uint32_t event); /**< Pointer to endpoint event callback. */
 
   typedef struct _ARM_DRIVER_USBD const ARM_DRIVER_USBD;
 }
@@ -46,30 +47,30 @@ namespace os
     class usbd_wrapper : public usb::Device
     {
     public:
-
       // ----------------------------------------------------------------------
 
-      usbd_wrapper (ARM_DRIVER_USBD* driver,
-                    ARM_USBD_SignalDeviceEvent_t c_cb_device_func,
-                    ARM_USBD_SignalEndpointEvent_t c_cb_endpoint_func) noexcept;
+      usbd_wrapper (
+          ARM_DRIVER_USBD* driver,
+          ARM_USBD_SignalDeviceEvent_t c_cb_device_func,
+          ARM_USBD_SignalEndpointEvent_t c_cb_endpoint_func) noexcept;
 
       usbd_wrapper (const usbd_wrapper&) = delete;
 
       usbd_wrapper (usbd_wrapper&&) = delete;
 
       usbd_wrapper&
-      operator= (const usbd_wrapper&) = delete;
+      operator= (const usbd_wrapper&)
+          = delete;
 
       usbd_wrapper&
-      operator= (usbd_wrapper&&) = delete;
+      operator= (usbd_wrapper&&)
+          = delete;
 
-      virtual
-      ~usbd_wrapper () noexcept;
+      virtual ~usbd_wrapper () noexcept;
 
       // ----------------------------------------------------------------------
 
     protected:
-
       virtual const Version&
       do_get_version (void) noexcept override;
 
@@ -101,20 +102,20 @@ namespace os
       do_get_frame_number (void) noexcept override;
 
       virtual return_t
-      do_configure_endpoint (usb::endpoint_t ep_addr,
-                             usb::Endpoint_type ep_type,
-                             usb::packet_size_t ep_max_packet_size)
-                                 noexcept override;
+      do_configure_endpoint (
+          usb::endpoint_t ep_addr, usb::Endpoint_type ep_type,
+          usb::packet_size_t ep_max_packet_size) noexcept override;
 
       virtual return_t
       do_unconfigure_endpoint (usb::endpoint_t ep_addr) noexcept override;
 
       virtual return_t
-      do_stall_endpoint (usb::endpoint_t ep_addr, bool stall) noexcept override;
+      do_stall_endpoint (usb::endpoint_t ep_addr,
+                         bool stall) noexcept override;
 
       virtual return_t
-      do_transfer (usb::endpoint_t ep_addr, uint8_t* data, std::size_t num)
-          noexcept override;
+      do_transfer (usb::endpoint_t ep_addr, uint8_t* data,
+                   std::size_t num) noexcept override;
 
       virtual std::size_t
       do_get_transfer_count (usb::endpoint_t ep_addr) noexcept override;
@@ -125,7 +126,6 @@ namespace os
       // ----------------------------------------------------------------------
 
     private:
-
       /// Pointer to CMSIS USBD Keil driver.
       ARM_DRIVER_USBD* driver_;
 
@@ -141,11 +141,9 @@ namespace os
       // (Not particularly proud of this solution, but could not find
       // a better one.)
 
-      Version version_
-        { 0, 0 };
+      Version version_{ 0, 0 };
       usb::device::Capabilities capa_;
       usb::device::Status status_;
-
     };
 
 #pragma GCC diagnostic pop
