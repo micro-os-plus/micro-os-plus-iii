@@ -11,7 +11,6 @@
 
 // ----------------------------------------------------------------------------
 
-
 #if defined(OS_USE_OS_APP_CONFIG_H)
 #include <cmsis-plus/os-app-config.h>
 #endif
@@ -19,7 +18,7 @@
 #include <cmsis-plus/cortexm/exception-handlers.h>
 #include <cmsis-plus/rtos/os-c-decls.h>
 
-void __attribute__ ((section(".after_vectors")))
+void __attribute__ ((section (".after_vectors")))
 SysTick_Handler (void)
 {
   // Call the system timer handler to keep track of time.

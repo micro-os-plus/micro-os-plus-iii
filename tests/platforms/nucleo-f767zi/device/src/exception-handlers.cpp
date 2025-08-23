@@ -11,7 +11,6 @@
 
 // ----------------------------------------------------------------------------
 
-
 #if defined(OS_USE_OS_APP_CONFIG_H)
 #include <cmsis-plus/os-app-config.h>
 #endif
@@ -21,10 +20,10 @@
 
 #include <cmsis_device.h>
 
-void __attribute__ ((section(".after_vectors")))
+void __attribute__ ((section (".after_vectors")))
 SysTick_Handler (void)
 {
-  HAL_IncTick();
+  HAL_IncTick ();
 
   // Call the system timer handler to keep track of time.
   os_systick_handler ();
