@@ -18,7 +18,7 @@
 #include <cmsis-plus/cortexm/exception-handlers.h>
 #include <cmsis-plus/rtos/os-c-decls.h>
 
-void __attribute__ ((section(".after_vectors")))
+void __attribute__ ((section (".after_vectors")))
 SysTick_Handler (void)
 {
   // DO NOT loop, just return.
