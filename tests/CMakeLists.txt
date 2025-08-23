@@ -62,20 +62,6 @@ xpack_display_greetings("${CMAKE_CURRENT_SOURCE_DIR}/../package.json")
 include("cmake/global-definitions.cmake")
 
 # -----------------------------------------------------------------------------
-# Tests.
-if(ENABLE_RTOS_APIS_TEST)
-  add_subdirectory("rtos-apis")
-endif()
-
-if(ENABLE_MUTEX_STRESS_TEST)
-  add_subdirectory("mutex-stress")
-endif()
-
-if(ENABLE_CMSIS_OS_VALIDATOR_TEST)
-  add_subdirectory("cmsis-os-validator")
-endif()
-
-# -----------------------------------------------------------------------------
 
 # Include the main CMake script, common to all projects.
 include("cmake/tests-main.cmake")
