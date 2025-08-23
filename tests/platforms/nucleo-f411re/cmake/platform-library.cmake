@@ -32,12 +32,12 @@ add_library(platform-nucleo-f411re-interface INTERFACE EXCLUDE_FROM_ALL)
 target_include_directories(platform-nucleo-f411re-interface INTERFACE
 
   # This file is included from the tests folder.
-  "platforms/${PLATFORM_NAME}/include"
+  "include"
 )
 
 target_sources(platform-nucleo-f411re-interface INTERFACE
 
-  # None
+  # None.
 )
 
 target_compile_definitions(platform-nucleo-f411re-interface INTERFACE

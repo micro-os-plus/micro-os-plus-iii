@@ -24,4 +24,7 @@ set(xpack_device_compile_definition "MICRO_OS_PLUS_DEVICE_STM32F411XE")
 
 set(xpack_platform_compile_definition "MICRO_OS_PLUS_PLATFORM_NUCLEO_F411RE")
 
+# Platform specific tests.
+set(ENABLE_BLINKY_TEST true)
+
 # -----------------------------------------------------------------------------

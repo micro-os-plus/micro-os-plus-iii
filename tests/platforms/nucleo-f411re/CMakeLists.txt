@@ -24,6 +24,8 @@ add_subdirectory("stm32f411cubemx")
 # TODO: update to separate device-stm32f4-extras, when ready.
 add_subdirectory("device")
 
+include("cmake/platform-library.cmake")
+
 # -----------------------------------------------------------------------------
 
 # Define the tests executables.
@@ -78,6 +80,7 @@ if(ENABLE_RTOS_APIS_TEST)
     NAME "rtos-apis-test"
 
     COMMAND openocd${extension}
+
     # -d3
     -c "gdb port disabled"
     -c "tcl port disabled"
@@ -164,6 +167,84 @@ if(ENABLE_CMSIS_OS_VALIDATOR_TEST)
     -c "arm semihosting_cmdline cmsis-os-validator-test"
     -c "reset"
   )
+endif()
+
+# -----------------------------------------------------------------------------
+if(ENABLE_BLINKY_TEST)
+  add_test_executable(blinky-test)
+
+  target_link_libraries(blinky-test PRIVATE
+
+    micro-os-plus::common-options
+
+    # Current test library.
+    test::blinky
+
+    # Tested library.
+    micro-os-plus::iii
+
+    # Platform specific dependencies.
+    micro-os-plus::platform
+  )
+
+  message(VERBOSE "A> blinky-test")
+
+  add_test(
+    NAME "blinky-test"
+
+    COMMAND openocd${extension}
+    -c "gdb port disabled"
+    -c "tcl port disabled"
+    -c "telnet port disabled"
+    -f interface/stlink-dap.cfg
+    -c "adapter speed 5000"
+    -f target/stm32f4x.cfg
+    -c "program blinky-test.elf verify"
+    -c "arm semihosting enable"
+    -c "arm semihosting_cmdline blinky-test 100 100"
+    -c "reset"
+  )
+
+  add_executable(blinky-rtt-test)
+
+  set_target_properties(blinky-rtt-test
+
+    PROPERTIES
+    OUTPUT_NAME "blinky-rtt-test"
+  )
+
+  target_compile_definitions(blinky-rtt-test PRIVATE
+    OS_USE_TRACE_SEGGER_RTT
+  )
+
+  # No other common compile or link options, all were defined in the
+  # libraries and will be inherited.
+  target_link_options(blinky-rtt-test PRIVATE
+    -Wl,-Map,platform-bin/blinky-rtt-test-map.txt
+
+    # -v
+  )
+
+  xpack_add_cross_custom_commands(blinky-rtt-test)
+
+  target_link_libraries(blinky-rtt-test PRIVATE
+
+    micro-os-plus::common-options
+
+    # Current test library.
+    test::blinky
+
+    # Tested library.
+    micro-os-plus::iii
+    segger::rtt
+
+    # Platform specific dependencies.
+    micro-os-plus::platform
+  )
+
+  message(VERBOSE "A> blinky-rtt-test")
+
+  # There is no automated test, it requires manual invocation using SEGGER tools.
 endif()
 
 # -----------------------------------------------------------------------------

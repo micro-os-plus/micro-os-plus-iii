@@ -18,12 +18,17 @@
 message(VERBOSE "Including tests/platforms/${PLATFORM_NAME}/cmake/dependencies-folders.cmake...")
 
 # -----------------------------------------------------------------------------
-
 set(xpack_dependencies_folders
+
+  "${CMAKE_SOURCE_DIR}/rtos-apis-test"
+  "${CMAKE_SOURCE_DIR}/mutex-stress-test"
+  "${CMAKE_SOURCE_DIR}/cmsis-os-validator-test"
+  "${CMAKE_SOURCE_DIR}/blinky-test"
 
   # Project dependencies.
   # The BINARY_DIR is the `build/<config>` folder.
   "${CMAKE_BINARY_DIR}/xpacks/@micro-os-plus/micro-os-plus-iii-cortexm"
+  "${CMAKE_BINARY_DIR}/xpacks/@xpack-segger/rtt"
 
   # The SOURCE_DIR is the `tests` folder.
   "${CMAKE_SOURCE_DIR}/xpacks/@xpacks/arm-cmsis-rtos-validator"
