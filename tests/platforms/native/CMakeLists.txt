@@ -15,6 +15,8 @@
 
 message(VERBOSE "Processing 'tests/platforms/native'...")
 
+include("cmake/platform-library.cmake")
+
 # -----------------------------------------------------------------------------
 function(add_test_executable name)
   add_executable(${name})

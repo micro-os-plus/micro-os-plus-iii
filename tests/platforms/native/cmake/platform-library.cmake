@@ -61,7 +61,7 @@ add_library(platform-native-interface INTERFACE EXCLUDE_FROM_ALL)
 target_include_directories(platform-native-interface INTERFACE
 
   # This file is included from the tests folder.
-  "platforms/${PLATFORM_NAME}/include"
+  "include"
 )
 
 target_sources(platform-native-interface INTERFACE
