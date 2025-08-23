@@ -57,7 +57,6 @@ class periodic;
 class mutex_test
 {
 public:
-
   mutex_test (const char* name);
 
   void*
@@ -70,7 +69,6 @@ public:
   }
 
 protected:
-
   friend class periodic;
 
   unsigned int min_micros_ = 10;
@@ -87,10 +85,12 @@ protected:
 
 #pragma GCC diagnostic pop
 
-mutex_test::mutex_test (const char* name) :
-    th_
-      { name, [](void* attr)-> void*
-        { return static_cast<mutex_test*> (attr)->object_main ();}, this }
+mutex_test::mutex_test (const char* name)
+    : th_{ name,
+           [] (void* attr) -> void* {
+             return static_cast<mutex_test*> (attr)->object_main ();
+           },
+           this }
 {
   trace::printf ("%s @%p %s\n", __func__, this, name);
 }
@@ -100,10 +100,12 @@ mutex_test::object_main (void)
 {
   while (!thread ().interrupted ())
     {
-      unsigned int nbusy = (static_cast<unsigned int> (rand ())
-          % (max_micros_ - min_micros_)) + min_micros_;
-      unsigned int nsleep = (static_cast<unsigned int> (rand ())
-          % (max_ticks_ - min_ticks_)) + min_ticks_;
+      unsigned int nbusy
+          = (static_cast<unsigned int> (rand ()) % (max_micros_ - min_micros_))
+            + min_micros_;
+      unsigned int nsleep
+          = (static_cast<unsigned int> (rand ()) % (max_ticks_ - min_ticks_))
+            + min_ticks_;
 
       // simulate a period of intense activity
       busy_wait (nbusy);
@@ -113,22 +115,24 @@ mutex_test::object_main (void)
       ticks_ += nsleep;
 
       mx.lock ();
-        {
-          nbusy = (static_cast<unsigned int> (rand ())
-              % (max_micros_ / 10 - min_micros_ / 10)) + min_micros_ / 10;
-          nsleep = (static_cast<unsigned int> (rand ())
-              % (max_ticks_ / 10 - min_ticks_ / 10)) + min_ticks_ / 10;
+      {
+        nbusy = (static_cast<unsigned int> (rand ())
+                 % (max_micros_ / 10 - min_micros_ / 10))
+                + min_micros_ / 10;
+        nsleep = (static_cast<unsigned int> (rand ())
+                  % (max_ticks_ / 10 - min_ticks_ / 10))
+                 + min_ticks_ / 10;
 
-          // simulate a period of intense activity
-          busy_wait (nbusy);
+        // simulate a period of intense activity
+        busy_wait (nbusy);
 
-          // simulate a period of waiting for an external event
-          sysclock.sleep_for (nsleep);
-          ticks_ += nsleep;
+        // simulate a period of waiting for an external event
+        sysclock.sleep_for (nsleep);
+        ticks_ += nsleep;
 
-          accumulated_count_++;
-          count_++;
-        }
+        accumulated_count_++;
+        count_++;
+      }
       mx.unlock ();
     }
   return nullptr;
@@ -174,11 +178,13 @@ protected:
 
 #pragma GCC diagnostic pop
 
-periodic::periodic (unsigned int seconds) :
-    seconds_ (seconds), //
-    th_
-      { "P", [](void* attr)-> void*
-        { return static_cast<periodic*> (attr)->object_main ();}, this }
+periodic::periodic (unsigned int seconds)
+    : seconds_ (seconds), //
+      th_{ "P",
+           [] (void* attr) -> void* {
+             return static_cast<periodic*> (attr)->object_main ();
+           },
+           this }
 {
   trace::printf ("%s @%p\n", __func__, this);
 }
@@ -191,55 +197,55 @@ periodic::object_main (void)
   unsigned int t = 0;
   while (true)
     {
-      //realtime_clock.sleep_for (5);
+      // realtime_clock.sleep_for (5);
       sysclock.sleep_for (5000);
       t += 5;
 
-        {
-          // ----- Enter critical section -------------------------------------
-          scheduler::critical_section scs;
+      {
+        // ----- Enter critical section -------------------------------------
+        scheduler::critical_section scs;
 
-          printf ("[%3us] ", t);
+        printf ("[%3us] ", t);
 
-          unsigned int sum = 0;
-          for (auto m : mt)
-            {
-              unsigned int cnt = m->accumulated_count_;
+        unsigned int sum = 0;
+        for (auto m : mt)
+          {
+            unsigned int cnt = m->accumulated_count_;
 
-              sum += cnt;
+            sum += cnt;
 
-              //os::core::timer::ticks_t ticks = pTask->getTicks();
-              printf ("%s:%-4u ", m->thread ().name (), cnt);
-            }
-          int average = static_cast<int> ((sum
-              + ((sizeof(mt) / sizeof(mt[0])) / 2))
-              / (sizeof(mt) / sizeof(mt[0])));
+            // os::core::timer::ticks_t ticks = pTask->getTicks();
+            printf ("%s:%-4u ", m->thread ().name (), cnt);
+          }
+        int average
+            = static_cast<int> ((sum + ((sizeof (mt) / sizeof (mt[0])) / 2))
+                                / (sizeof (mt) / sizeof (mt[0])));
 
-          printf ("sum=%u, avg=%d", sum, average);
+        printf ("sum=%u, avg=%d", sum, average);
 
-          int min = 0;
-          int max = 0;
+        int min = 0;
+        int max = 0;
 
-          for (auto m : mt)
-            {
-              int delta = static_cast<int> (m->accumulated_count_);
-              delta -= average;
+        for (auto m : mt)
+          {
+            int delta = static_cast<int> (m->accumulated_count_);
+            delta -= average;
 
-              if (delta < min)
-                min = delta;
+            if (delta < min)
+              min = delta;
 
-              if (delta > max)
-                max = delta;
-            }
+            if (delta > max)
+              max = delta;
+          }
 
-          printf (", delta in [%d,%d] [%d%%,%d%%]", min, max,
-                  (min * 100 + average / 2) / average,
-                  (max * 100 + average / 2) / average);
+        printf (", delta in [%d,%d] [%d%%,%d%%]", min, max,
+                (min * 100 + average / 2) / average,
+                (max * 100 + average / 2) / average);
 
-          puts ("");
+        puts ("");
 
-          // ----- Exit critical section --------------------------------------
-        }
+        // ----- Exit critical section --------------------------------------
+      }
 
       if (seconds_ != 0 && t > seconds_)
         break;
@@ -290,12 +296,10 @@ run_tests (unsigned int seconds)
 #pragma GCC diagnostic pop
 #endif
 
-  periodic pm
-    { seconds };
+  periodic pm{ seconds };
 
   pm.thread ().join ();
 
   puts ("Done.");
   return 0;
 }
-

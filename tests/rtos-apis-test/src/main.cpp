@@ -28,7 +28,8 @@
 // ----------------------------------------------------------------------------
 
 int
-os_main (int argc __attribute__((unused)), char* argv[] __attribute__((unused)))
+os_main (int argc __attribute__ ((unused)),
+         char* argv[] __attribute__ ((unused)))
 {
   printf ("\n");
   printf ("µOS++ RTOS simple APIs test\n");

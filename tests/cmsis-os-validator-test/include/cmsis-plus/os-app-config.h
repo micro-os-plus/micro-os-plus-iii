@@ -16,66 +16,48 @@
 
 // ----------------------------------------------------------------------------
 
-#define OS_INTEGER_SYSTICK_FREQUENCY_HZ                     (1000)
+#define OS_INTEGER_SYSTICK_FREQUENCY_HZ (1000)
 
 #if defined(__ARM_EABI__)
 
 // With 4 bits NVIC, there are 16 levels, 0 = highest, 15 = lowest
 
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
-// Disable all interrupts from 15 to 4, keep 3-2-1 enabled
-#define OS_INTEGER_RTOS_CRITICAL_SECTION_INTERRUPT_PRIORITY (4)
-#endif // defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+// assertion "port::interrupts::is_priority_valid ()" failed
+// #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+// // Disable all interrupts from 15 to 4, keep 3-2-1 enabled
+// #define OS_INTEGER_RTOS_CRITICAL_SECTION_INTERRUPT_PRIORITY (4)
+// #endif // defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
 
-#define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES               (4000)
+#define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES (4000)
 
-#define OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES           (14*1024)
-
-//#define OS_EXCLUDE_DYNAMIC_MEMORY_ALLOCATIONS
-
-#define OS_INTEGER_RTOS_ALLOC_THREAD_POOL_SIZE (3)
-#define OS_INTEGER_RTOS_ALLOC_CONDITION_VARIABLE_POOL_SIZE (3)
-#define OS_INTEGER_RTOS_ALLOC_EVENT_FLAGS_POOL_SIZE (3)
-#define OS_INTEGER_RTOS_ALLOC_MEMORY_POOL_POOL_SIZE (3)
-#define OS_INTEGER_RTOS_ALLOC_MESSAGE_QUEUE_POOL_SIZE (3)
-#define OS_INTEGER_RTOS_ALLOC_MUTEX_POOL_SIZE (3)
-#define OS_INTEGER_RTOS_ALLOC_SEMAPHORE_POOL_SIZE (3)
-#define OS_INTEGER_RTOS_ALLOC_TIMER_POOL_SIZE (3)
-
-#if defined(OS_USE_TRACE_SEGGER_RTT)
-#define OS_EXCLUDE_RTOS_IDLE_SLEEP (1)
-#endif
-
-#define OS_DISABLE_RESET_HARDWARE
+// ----------------------------------------------------------------------------
 
 #elif defined(__APPLE__) || defined(__linux__)
 
 #define OS_INCLUDE_LIBUCONTEXT
 
-#define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES               (4*os::rtos::port::stack::default_size_bytes)
+#define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES \
+  (4 * os::rtos::port::stack::default_size_bytes)
 
 #endif // architecture
-
-#define OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES  (1)
-#define OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES        (1)
 
 // ----------------------------------------------------------------------------
 
 #if defined(USE_FREERTOS)
 
 // Request the inclusion of a custom implementations.
-#define OS_USE_RTOS_PORT_SCHEDULER                      (1)
+#define OS_USE_RTOS_PORT_SCHEDULER (1)
 
 #if 1
-#define OS_USE_RTOS_PORT_TIMER                          (1)
-#define OS_USE_RTOS_PORT_CLOCK_SYSTICK_WAIT_FOR         (1)
-#define OS_USE_RTOS_PORT_MUTEX                          (1)
-#define OS_USE_RTOS_PORT_SEMAPHORE                      (1)
-#define OS_USE_RTOS_PORT_MESSAGE_QUEUE                  (1)
-#define OS_USE_RTOS_PORT_EVENT_FLAGS                    (1)
+#define OS_USE_RTOS_PORT_TIMER (1)
+#define OS_USE_RTOS_PORT_CLOCK_SYSTICK_WAIT_FOR (1)
+#define OS_USE_RTOS_PORT_MUTEX (1)
+#define OS_USE_RTOS_PORT_SEMAPHORE (1)
+#define OS_USE_RTOS_PORT_MESSAGE_QUEUE (1)
+#define OS_USE_RTOS_PORT_EVENT_FLAGS (1)
 #endif
 
-#endif // defined(USE_FREERTOS)
+#endif /* defined(USE_FREERTOS) */
 
 // ----------------------------------------------------------------------------
 
@@ -122,11 +104,6 @@
 // #define OS_TRACE_POSIX_IO_CHAN_FATFS
 
 #endif // defined(DEBUG)
-
-// ----------------------------------------------------------------------------
-
-// Chan FatFS buffer size.
-#define FF_MAX_SS (4096)
 
 // ----------------------------------------------------------------------------
 

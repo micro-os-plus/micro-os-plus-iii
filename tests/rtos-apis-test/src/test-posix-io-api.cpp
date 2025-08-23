@@ -42,12 +42,11 @@ using namespace os;
 
 // ----------------------------------------------------------------------------
 
+void*
+my_memcpy (void* dst, const void* src, std::size_t n);
 
 void*
-my_memcpy (void *dst, const void *src, std::size_t n);
-
-void*
-my_memcpy (void *dst, const void *src, std::size_t n)
+my_memcpy (void* dst, const void* src, std::size_t n)
 {
   // os::trace::printf ("%s(%p, %p, %u)\n", __func__, dst, src,
   //                    static_cast<std::size_t> (n));
@@ -64,7 +63,6 @@ my_memcpy (void *dst, const void *src, std::size_t n)
 class my_char_impl : public posix::char_device_impl
 {
 public:
-
   my_char_impl (uint8_t* buf, size_t sz);
   my_char_impl (uint8_t* buf, size_t sz, int extra);
 
@@ -72,12 +70,13 @@ public:
   my_char_impl (const my_char_impl&) = delete;
   my_char_impl (my_char_impl&&) = delete;
   my_char_impl&
-  operator= (const my_char_impl&) = delete;
+  operator= (const my_char_impl&)
+      = delete;
   my_char_impl&
-  operator= (my_char_impl&&) = delete;
+  operator= (my_char_impl&&)
+      = delete;
 
-  virtual
-  ~my_char_impl () override;
+  virtual ~my_char_impl () override;
 
   virtual bool
   do_is_opened (void) override;
@@ -102,7 +101,6 @@ public:
 
   virtual int
   do_close (void) override;
-
 };
 
 #pragma GCC diagnostic pop
@@ -197,13 +195,14 @@ my_block_impl::my_block_impl (std::size_t bsize, std::size_t esize,
 
   num_blocks_ = nblocks;
   // Align.
-  block_logical_size_bytes_ = (bsize + sizeof(elem_t) - 1)
-      & (~(sizeof(elem_t) - 1));
-  block_physical_size_bytes_ = (esize + sizeof(elem_t) - 1)
-      & (~(sizeof(elem_t) - 1));
+  block_logical_size_bytes_
+      = (bsize + sizeof (elem_t) - 1) & (~(sizeof (elem_t) - 1));
+  block_physical_size_bytes_
+      = (esize + sizeof (elem_t) - 1) & (~(sizeof (elem_t) - 1));
 
-  arena_ = new elem_t[nblocks * bsize / sizeof(elem_t)];
-  memset (static_cast<void*> (arena_), 0xFF, nblocks * bsize / sizeof(elem_t));
+  arena_ = new elem_t[nblocks * bsize / sizeof (elem_t)];
+  memset (static_cast<void*> (arena_), 0xFF,
+          nblocks * bsize / sizeof (elem_t));
 }
 
 my_block_impl::~my_block_impl ()
@@ -234,7 +233,8 @@ my_block_impl::do_read_block (void* buf, posix::block_device::blknum_t blknum,
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
-  my_memcpy (buf, &arena_[blknum * block_logical_size_bytes_ / sizeof(elem_t)],
+  my_memcpy (buf,
+             &arena_[blknum * block_logical_size_bytes_ / sizeof (elem_t)],
              nblocks * block_logical_size_bytes_);
 #pragma GCC diagnostic pop
   return static_cast<ssize_t> (nblocks);
@@ -249,8 +249,8 @@ my_block_impl::do_write_block (const void* buf,
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
-  my_memcpy (&arena_[blknum * block_logical_size_bytes_ / sizeof(elem_t)], buf,
-             nblocks * block_logical_size_bytes_);
+  my_memcpy (&arena_[blknum * block_logical_size_bytes_ / sizeof (elem_t)],
+             buf, nblocks * block_logical_size_bytes_);
 #pragma GCC diagnostic pop
   return static_cast<ssize_t> (nblocks);
 }
@@ -289,11 +289,9 @@ using my_char = posix::char_device_implementable<my_char_impl>;
 
 static uint8_t cbuf[4];
 
-static my_char mc
-  { "mc", cbuf, sizeof(cbuf) };
+static my_char mc{ "mc", cbuf, sizeof (cbuf) };
 
-static my_char mc2
-  { "mc2", cbuf, sizeof(cbuf), 7 };
+static my_char mc2{ "mc2", cbuf, sizeof (cbuf), 7 };
 
 // ----------------------------------------------------------------------------
 
@@ -304,39 +302,34 @@ template class posix::block_device_implementable<my_block_impl>;
 template class posix::block_device_lockable<my_block_impl, os::rtos::mutex>;
 using my_block = posix::block_device_lockable<my_block_impl, os::rtos::mutex>;
 
-static os::rtos::mutex mx1
-  { "mx1" };
+static os::rtos::mutex mx1{ "mx1" };
 
 // /dev/mb
-static my_block mb
-  { "mb", mx1, 512u, 512u, 2u + 3u };
+static my_block mb{ "mb", mx1, 512u, 512u, 2u + 3u };
 
 // Explicit template instantiation.
 template class posix::block_device_partition_implementable<>;
 using my_partition1 = posix::block_device_partition_implementable<>;
 
 // /dev/mb1
-static my_partition1 p1
-  { "mb-p1", mb };
+static my_partition1 p1{ "mb-p1", mb };
 
 // Explicit template instantiation.
 template class posix::block_device_partition_lockable<
     posix::block_device_partition_impl, rtos::mutex>;
-using my_partition2 = posix::block_device_partition_lockable<posix::block_device_partition_impl, rtos::mutex>;
+using my_partition2 = posix::block_device_partition_lockable<
+    posix::block_device_partition_impl, rtos::mutex>;
 
-static rtos::mutex mx2
-  { "mx2" };
+static rtos::mutex mx2{ "mx2" };
 
 // /dev/mb2
 // The mutex is not really needed, but it is used to test the template.
-static my_partition2 p2
-  { "mb-p2", mb, mx2 };
+static my_partition2 p2{ "mb-p2", mb, mx2 };
 
 // ----------
 
 // Used to allocate the C file descriptors.
-static posix::file_descriptors_manager fdm
-  { 5 };
+static posix::file_descriptors_manager fdm{ 5 };
 
 #pragma GCC diagnostic pop
 
@@ -352,7 +345,7 @@ static const char* test_name = "Test POSIX I/O";
 #endif
 
 int
-test_posix_io_api (bool extra __attribute__((unused)))
+test_posix_io_api (bool extra __attribute__ ((unused)))
 {
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -367,116 +360,116 @@ test_posix_io_api (bool extra __attribute__((unused)))
   std::size_t bsz = 0;
 
   printf ("\n%s - Block device partitions - C++ API\n", test_name);
-    {
-      posix::block_device::blknum_t bks = 0;
+  {
+    posix::block_device::blknum_t bks = 0;
 
-      // The number of blocks is known only after open().
-      res = mb.open ();
-      assert(res >= 0);
+    // The number of blocks is known only after open().
+    res = mb.open ();
+    assert (res >= 0);
 
-      bks = mb.blocks ();
-      bsz = mb.block_logical_size_bytes ();
-      assert(bsz > 0);
+    bks = mb.blocks ();
+    bsz = mb.block_logical_size_bytes ();
+    assert (bsz > 0);
 
-      res = mb.close ();
-      assert(res >= 0);
+    res = mb.close ();
+    assert (res >= 0);
 
-      static constexpr std::size_t nr = 3;
+    static constexpr std::size_t nr = 3;
 
-      // p1 is the large one.
-      p1.configure (0, bks - nr);
-      // p2 is small, nr blocks, at the end.
-      p2.configure (bks - nr, nr);
-    }
+    // p1 is the large one.
+    p1.configure (0, bks - nr);
+    // p2 is small, nr blocks, at the end.
+    p2.configure (bks - nr, nr);
+  }
 
   printf ("\n%s - Block device locked - C++ API\n", test_name);
-    {
-      res = p2.open ();
-      assert(res >= 0);
+  {
+    res = p2.open ();
+    assert (res >= 0);
 
-      for (std::size_t i = 0; i < p2.blocks (); ++i)
-        {
-          res = p2.read_block (buff, i);
-          assert(res >= 0);
-          buff[0] = static_cast<uint8_t> (i);
+    for (std::size_t i = 0; i < p2.blocks (); ++i)
+      {
+        res = p2.read_block (buff, i);
+        assert (res >= 0);
+        buff[0] = static_cast<uint8_t> (i);
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
-          buff[bsz - 1] = static_cast<uint8_t> (i);
+        buff[bsz - 1] = static_cast<uint8_t> (i);
 #pragma GCC diagnostic pop
-          res = p2.write_block (buff, i);
-          assert(res >= 0);
-        }
+        res = p2.write_block (buff, i);
+        assert (res >= 0);
+      }
 
-      for (std::size_t i = 0; i < p2.blocks (); ++i)
-        {
-          memset (buff, 0xFF, bsz);
-          res = p2.read_block (buff, i);
-          assert(res >= 0);
-          assert(buff[0] == i);
+    for (std::size_t i = 0; i < p2.blocks (); ++i)
+      {
+        memset (buff, 0xFF, bsz);
+        res = p2.read_block (buff, i);
+        assert (res >= 0);
+        assert (buff[0] == i);
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
-          assert(buff[bsz - 1] == i);
+        assert (buff[bsz - 1] == i);
 #pragma GCC diagnostic pop
-        }
+      }
 
-      res = p2.read_block (buff, p2.blocks ());
-      assert(res == -1);
+    res = p2.read_block (buff, p2.blocks ());
+    assert (res == -1);
 
-      res = p2.write_block (buff, p2.blocks ());
-      assert(res == -1);
+    res = p2.write_block (buff, p2.blocks ());
+    assert (res == -1);
 
-      p2.close ();
-    }
+    p2.close ();
+  }
 
   printf ("\n%s - Block device unlocked - C++ API\n", test_name);
-    {
-      res = p1.open ();
-      assert(res >= 0);
+  {
+    res = p1.open ();
+    assert (res >= 0);
 
-      res = p1.close ();
-      assert(res >= 0);
-    }
+    res = p1.close ();
+    assert (res >= 0);
+  }
 
   printf ("\n%s - Block device - intermixed opens - C++ API\n", test_name);
-    {
-      int res1 = p1.open ();
-      assert(res1 >= 0);
-      int res2 = p2.open ();
-      assert(res2 >= 0);
-      res1 = p1.close ();
-      assert(res1 >= 0);
+  {
+    int res1 = p1.open ();
+    assert (res1 >= 0);
+    int res2 = p2.open ();
+    assert (res2 >= 0);
+    res1 = p1.close ();
+    assert (res1 >= 0);
 
-      buff[0] = 0xFF;
-      res = p2.read_block (buff, 0);
-      assert(res >= 0);
-      assert(buff[0] == 0);
+    buff[0] = 0xFF;
+    res = p2.read_block (buff, 0);
+    assert (res >= 0);
+    assert (buff[0] == 0);
 
-      res2 = p2.close ();
-      assert(res2 >= 0);
-    }
+    res2 = p2.close ();
+    assert (res2 >= 0);
+  }
 
 #if defined(OS_IS_CROSS_BUILD) && !defined(OS_USE_SEMIHOSTING_SYSCALLS)
 
   printf ("\n%s - Block device - C API\n", test_name);
-    {
-      int fd = open ("/dev/mb2", 0);
+  {
+    int fd = open ("/dev/mb2", 0);
 
-      buff[0] = 0xFF;
-      res = read (fd, buff, bsz);
-      assert (res >= 0);
-      assert (buff[0] == 0);
+    buff[0] = 0xFF;
+    res = read (fd, buff, bsz);
+    assert (res >= 0);
+    assert (buff[0] == 0);
 
-      // Should fail due to wrong size.
-      res = read (fd, buff, bsz - 1);
-      assert (res == -1);
+    // Should fail due to wrong size.
+    res = read (fd, buff, bsz - 1);
+    assert (res == -1);
 
-      res = close (fd);
-      assert (res >= 0);
-    }
+    res = close (fd);
+    assert (res >= 0);
+  }
 
 #endif
 

@@ -32,8 +32,8 @@ void
 busy_wait (unsigned int micros)
 {
   clock::timestamp_t start = hrclock.now ();
-  clock::timestamp_t until_cycles = start
-      + hrclock.input_clock_frequency_hz() * micros / 1000000;
+  clock::timestamp_t until_cycles
+      = start + hrclock.input_clock_frequency_hz () * micros / 1000000;
 
   clock::timestamp_t now_cycles;
   do
@@ -47,21 +47,21 @@ busy_wait (unsigned int micros)
 
 void
 busy_wait (unsigned int micros)
-  {
-    /* struct */ timeval tp;
-    gettimeofday (&tp, nullptr);
-    uint64_t until_micros;
-    until_micros = static_cast<uint64_t> (tp.tv_sec * 1000000 + tp.tv_usec)
-    + micros;
+{
+  /* struct */ timeval tp;
+  gettimeofday (&tp, nullptr);
+  uint64_t until_micros;
+  until_micros
+      = static_cast<uint64_t> (tp.tv_sec * 1000000 + tp.tv_usec) + micros;
 
-    uint64_t now_micros;
-    do
-      {
-        gettimeofday (&tp, nullptr);
-        now_micros = static_cast<uint64_t> (tp.tv_sec * 1000000 + tp.tv_usec);
-      }
-    while (now_micros < until_micros);
-  }
+  uint64_t now_micros;
+  do
+    {
+      gettimeofday (&tp, nullptr);
+      now_micros = static_cast<uint64_t> (tp.tv_sec * 1000000 + tp.tv_usec);
+    }
+  while (now_micros < until_micros);
+}
 
 #endif
 
@@ -92,8 +92,8 @@ os_main (int argc, char* argv[])
   gettimeofday (&tp, nullptr);
   // Use some large prime numbers and the current time.
   // Must be a 32-bits value, to overflows and mess things further.
-  seed =
-      static_cast<uint32_t> ((tp.tv_sec + tp.tv_usec + 15485863) * 179424673);
+  seed = static_cast<uint32_t> ((tp.tv_sec + tp.tv_usec + 15485863)
+                                * 179424673);
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -109,4 +109,3 @@ os_main (int argc, char* argv[])
   return status;
 }
 #pragma GCC diagnostic pop
-
