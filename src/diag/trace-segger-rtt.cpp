@@ -51,7 +51,17 @@ namespace os
       // This does not guarantee that the WFI will not prevent
       // the J-Link to read the RTT buffer, but it is the best it
       // can be done at this level.
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#else
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+#endif
+#endif
       SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
     }
 
     // --------------------------------------------------------------------
@@ -71,8 +81,12 @@ namespace os
 
       ssize_t ret;
 
+      // SEGGER provides a `SEGGER_RTT_Write()` which implements locking
+      // with its own `SEGGER_RTT_MAX_INTERRUPT_PRIORITY`.
+      // For consistency with µOS++ interrupt handling, a µOS++ critical
+      // section is preferred.
       rtos::interrupts::critical_section ics;
-      ret = (ssize_t) SEGGER_RTT_WriteNoLock (0, buf, nbyte);
+      ret = static_cast<ssize_t>(SEGGER_RTT_WriteNoLock (0, buf, nbyte));
 
       return ret;
     }
@@ -80,6 +94,8 @@ namespace os
     void
     flush (void)
     {
+      // Busy wait until all data is sent.
+      // The buffer is empty when WrOff == RdOff.
       while (_SEGGER_RTT.aUp[0].WrOff != _SEGGER_RTT.aUp[0].RdOff)
         {
           __NOP ();
