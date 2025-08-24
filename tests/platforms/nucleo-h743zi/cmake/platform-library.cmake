@@ -31,8 +31,7 @@ add_library(platform-nucleo-h743zi-interface INTERFACE EXCLUDE_FROM_ALL)
 # -----------------------------------------------------------------------------
 target_include_directories(platform-nucleo-h743zi-interface INTERFACE
 
-  # This file is included from the tests folder.
-  "platforms/${PLATFORM_NAME}/include"
+  "include"
 )
 
 target_sources(platform-nucleo-h743zi-interface INTERFACE
@@ -49,7 +48,8 @@ target_compile_definitions(platform-nucleo-h743zi-interface INTERFACE
   _GNU_SOURCE
 )
 
-set(xpack_platform_common_args
+set(xpack_platform_common_options
+
   -mcpu=cortex-m7
   -mthumb
 
@@ -82,14 +82,14 @@ set(xpack_platform_common_args
 )
 
 target_compile_options(platform-nucleo-h743zi-interface INTERFACE
-  ${xpack_platform_common_args}
+  ${xpack_platform_common_options}
 )
 
 # When `-flto` is used, the compile options must be passed to the linker too.
 target_link_options(platform-nucleo-h743zi-interface INTERFACE
 
   -v
-  ${xpack_platform_common_args}
+  ${xpack_platform_common_options}
 
   -nostartfiles
 

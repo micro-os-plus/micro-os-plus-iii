@@ -14,8 +14,8 @@
 message(VERBOSE "Processing 'tests/platforms/nucleo-f767zi'...")
 
 # -----------------------------------------------------------------------------
-set(xpack_create_listing true)
 
+# set(xpack_create_listing true)
 # set(xpack_create_hex true)
 
 # -----------------------------------------------------------------------------
@@ -23,6 +23,8 @@ add_subdirectory("stm32f767cubemx")
 
 # TODO: update to separate device-stm32f7-extras, when ready.
 add_subdirectory("device")
+
+include("cmake/platform-library.cmake")
 
 # -----------------------------------------------------------------------------
 

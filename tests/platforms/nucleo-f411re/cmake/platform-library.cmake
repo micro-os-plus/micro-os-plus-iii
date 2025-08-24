@@ -31,7 +31,6 @@ add_library(platform-nucleo-f411re-interface INTERFACE EXCLUDE_FROM_ALL)
 # -----------------------------------------------------------------------------
 target_include_directories(platform-nucleo-f411re-interface INTERFACE
 
-  # This file is included from the tests folder.
   "include"
 )
 
@@ -49,7 +48,8 @@ target_compile_definitions(platform-nucleo-f411re-interface INTERFACE
   _GNU_SOURCE
 )
 
-set(xpack_platform_common_args
+set(xpack_platform_common_options
+
   -mcpu=cortex-m4
   -mthumb
 
@@ -82,14 +82,14 @@ set(xpack_platform_common_args
 )
 
 target_compile_options(platform-nucleo-f411re-interface INTERFACE
-  ${xpack_platform_common_args}
+  ${xpack_platform_common_options}
 )
 
 # When `-flto` is used, the compile options must be passed to the linker too.
 target_link_options(platform-nucleo-f411re-interface INTERFACE
 
   -v
-  ${xpack_platform_common_args}
+  ${xpack_platform_common_options}
 
   -nostartfiles
 
@@ -113,6 +113,7 @@ if("${CMAKE_C_COMPILER_VERSION}" VERSION_GREATER_EQUAL "12.0.0")
 endif()
 
 target_link_libraries(platform-nucleo-f411re-interface INTERFACE
+
   micro-os-plus::iii-cortexm
   micro-os-plus::device
 )

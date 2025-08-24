@@ -14,8 +14,8 @@
 message(VERBOSE "Processing 'tests/platforms/nucleo-f411re'...")
 
 # -----------------------------------------------------------------------------
-set(xpack_create_listing true)
 
+# set(xpack_create_listing true)
 # set(xpack_create_hex true)
 
 # -----------------------------------------------------------------------------

@@ -28,6 +28,7 @@ set(xpack_dependencies_folders
   # Project dependencies.
   # The BINARY_DIR is the `build/<config>` folder.
   "${CMAKE_BINARY_DIR}/xpacks/@micro-os-plus/micro-os-plus-iii-cortexm"
+  # Extra, specific to this platform.
   "${CMAKE_BINARY_DIR}/xpacks/@xpack-segger/rtt"
 
   # The SOURCE_DIR is the `tests` folder.

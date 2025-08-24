@@ -20,6 +20,10 @@ message(VERBOSE "Including tests/platforms/${PLATFORM_NAME}/cmake/dependencies-f
 # -----------------------------------------------------------------------------
 set(xpack_dependencies_folders
 
+  "${CMAKE_SOURCE_DIR}/rtos-apis-test"
+  "${CMAKE_SOURCE_DIR}/mutex-stress-test"
+  "${CMAKE_SOURCE_DIR}/cmsis-os-validator-test"
+
   # Project dependencies.
   # The BINARY_DIR is the `build/<config>` folder.
   "${CMAKE_BINARY_DIR}/xpacks/@micro-os-plus/micro-os-plus-iii-cortexm"

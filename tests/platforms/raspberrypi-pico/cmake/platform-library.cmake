@@ -31,14 +31,12 @@ add_library(platform-raspberrypi-pico-interface INTERFACE EXCLUDE_FROM_ALL)
 # -----------------------------------------------------------------------------
 target_include_directories(platform-raspberrypi-pico-interface INTERFACE
 
-  # This file is included from the tests folder.
-  "platforms/${PLATFORM_NAME}/include"
+  "include"
 )
 
 target_sources(platform-raspberrypi-pico-interface INTERFACE
 
-  # This file is included from the tests folder.
-  "platforms/${PLATFORM_NAME}/src/bs2_default_padded_checksummed.S"
+  "src/bs2_default_padded_checksummed.S"
 )
 
 target_compile_definitions(platform-raspberrypi-pico-interface INTERFACE
@@ -50,7 +48,8 @@ target_compile_definitions(platform-raspberrypi-pico-interface INTERFACE
   _GNU_SOURCE
 )
 
-set(xpack_platform_common_args
+set(xpack_platform_common_options
+
   -mcpu=cortex-m0plus
   -mthumb
 
@@ -82,14 +81,14 @@ set(xpack_platform_common_args
 )
 
 target_compile_options(platform-raspberrypi-pico-interface INTERFACE
-  ${xpack_platform_common_args}
+  ${xpack_platform_common_options}
 )
 
 # When `-flto` is used, the compile options must be passed to the linker too.
 target_link_options(platform-raspberrypi-pico-interface INTERFACE
 
   -v
-  ${xpack_platform_common_args}
+  ${xpack_platform_common_options}
 
   -nostartfiles
 

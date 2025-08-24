@@ -23,6 +23,9 @@ message(VERBOSE "Processing 'tests/platforms/qemu-cortex-m0'...")
 # set(xpack_create_hex true)
 
 # -----------------------------------------------------------------------------
+include("cmake/platform-library.cmake")
+
+# -----------------------------------------------------------------------------
 
 # Define the tests executables.
 function(add_test_executable name)
@@ -32,6 +35,10 @@ function(add_test_executable name)
 
     PROPERTIES
     OUTPUT_NAME "${name}"
+  )
+
+  target_compile_definitions(${name} PRIVATE
+    OS_USE_TRACE_SEMIHOSTING_STDOUT
   )
 
   # No other common compile or link options, all were defined in the
@@ -48,10 +55,6 @@ endfunction()
 # -----------------------------------------------------------------------------
 if(ENABLE_RTOS_APIS_TEST)
   add_test_executable(rtos-apis-test)
-
-  target_compile_definitions(rtos-apis-test PRIVATE
-    OS_USE_TRACE_SEMIHOSTING_STDOUT
-  )
 
   target_link_libraries(rtos-apis-test PRIVATE
 
@@ -91,10 +94,6 @@ endif()
 if(ENABLE_MUTEX_STRESS_TEST)
   add_test_executable(mutex-stress-test)
 
-  target_compile_definitions(mutex-stress-test PRIVATE
-    OS_USE_TRACE_SEMIHOSTING_STDOUT
-  )
-
   target_link_libraries(mutex-stress-test PRIVATE
 
     micro-os-plus::common-options
@@ -129,10 +128,6 @@ endif()
 # -----------------------------------------------------------------------------
 if(ENABLE_CMSIS_OS_VALIDATOR_TEST)
   add_test_executable(cmsis-os-validator-test)
-
-  target_compile_definitions(cmsis-os-validator-test PRIVATE
-    OS_USE_TRACE_SEMIHOSTING_STDOUT
-  )
 
   target_link_libraries(cmsis-os-validator-test PRIVATE
 

@@ -60,7 +60,6 @@ add_library(platform-native-interface INTERFACE EXCLUDE_FROM_ALL)
 
 target_include_directories(platform-native-interface INTERFACE
 
-  # This file is included from the tests folder.
   "include"
 )
 
@@ -79,7 +78,7 @@ target_compile_definitions(platform-native-interface INTERFACE
   # _LIBCPP_DISABLE_VISIBILITY_ANNOTATIONS
 )
 
-set(_local_common_options
+set(xpack_platform_common_options
   -Werror
 
   # Apple clang 13 does not support -Wunused-but-set-variable
@@ -90,7 +89,7 @@ set(_local_common_options
 )
 
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
-  list(APPEND _local_common_options
+  list(APPEND xpack_platform_common_options
     $<$<C_COMPILER_ID:Clang,AppleClang>:-Wno-used-but-marked-unused>
   )
 endif()
@@ -100,7 +99,7 @@ endif()
 # Unfortunatelly in a container it shows aarch64 instead of armv7l.
 
 # -flto seems ok now with clang too, but on Linux it requires -fuse-ld=lld
-list(APPEND _local_common_options
+list(APPEND xpack_platform_common_options
   $<$<CONFIG:Release,MinSizeRel>:-flto>
 )
 
@@ -120,14 +119,14 @@ list(APPEND _local_common_options
 # 9  0x7ff8068c2c0f  _pthread_wqthread + 257
 # ld: Assertion failed: (resultIndex < sectData.atoms.size()), function findAtom, file Relocations.cpp, line 1336.
 # collect2: error: ld returned 1 exit status
-list(APPEND _local_common_options
+list(APPEND xpack_platform_common_options
 
   $<$<AND:$<C_COMPILER_ID:GNU>,$<PLATFORM_ID:Darwin>>:-no-pie>
 )
 
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
   # https://libcxx.llvm.org/UsingLibcxx.html
-  list(APPEND _local_common_options
+  list(APPEND xpack_platform_common_options
     $<$<COMPILE_LANGUAGE:CXX>:-stdlib=libc++>
   )
 endif()
@@ -141,7 +140,7 @@ endif()
 # ~~^
 # 2 errors generated.
 target_compile_options(platform-native-interface INTERFACE
-  ${_local_common_options}
+  ${xpack_platform_common_options}
 )
 
 # On macOS, GCC 11 gets confused.
@@ -149,7 +148,7 @@ target_compile_options(platform-native-interface INTERFACE
 target_link_options(platform-native-interface INTERFACE
 
   # When `-flto` is used, the compile options must be passed to the linker too.
-  ${_local_common_options}
+  ${xpack_platform_common_options}
 
   # -v
 

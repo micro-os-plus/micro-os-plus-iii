@@ -33,8 +33,7 @@ add_library(platform-qemu-cortex-m3-interface INTERFACE EXCLUDE_FROM_ALL)
 
 target_include_directories(platform-qemu-cortex-m3-interface INTERFACE
 
-  # This file is included from the tests folder.
-  "platforms/${PLATFORM_NAME}/include"
+  "include"
 )
 
 target_sources(platform-qemu-cortex-m3-interface INTERFACE
@@ -53,7 +52,8 @@ target_compile_definitions(platform-qemu-cortex-m3-interface INTERFACE
   _GNU_SOURCE
 )
 
-set(xpack_platform_common_args
+set(xpack_platform_common_options
+
   -mcpu=cortex-m3
   -mthumb
   -mfloat-abi=soft
@@ -84,14 +84,14 @@ set(xpack_platform_common_args
 )
 
 target_compile_options(platform-qemu-cortex-m3-interface INTERFACE
-  ${xpack_platform_common_args}
+  ${xpack_platform_common_options}
 )
 
 # When `-flto` is used, the compile options must be passed to the linker too.
 target_link_options(platform-qemu-cortex-m3-interface INTERFACE
 
   # -v
-  ${xpack_platform_common_args}
+  ${xpack_platform_common_options}
 
   -nostartfiles
 
@@ -104,13 +104,6 @@ target_link_options(platform-qemu-cortex-m3-interface INTERFACE
   # nano has no exceptions.
   # -specs=nano.specs
   -Wl,--gc-sections
-
-  # Including files from other packages is not very nice, but functional.
-  # Use absolute paths, otherwise set -L.
-  -T${CMAKE_SOURCE_DIR}/device-qemu-cortexm/linker-scripts/mem-mps2-an385.ld
-  -T${CMAKE_SOURCE_DIR}/device-qemu-cortexm/linker-scripts/sections-flash.ld
-
-  # -T${CMAKE_BINARY_DIR}/xpacks/@micro-os-plus/architecture-cortexm/linker-scripts/sections-ram.ld
 )
 
 if("${CMAKE_C_COMPILER_VERSION}" VERSION_GREATER_EQUAL "12.0.0")

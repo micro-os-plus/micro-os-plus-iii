@@ -19,6 +19,9 @@ message(VERBOSE "Processing 'tests/platforms/qemu-cortex-m4f'...")
 # set(xpack_create_hex true)
 
 # -----------------------------------------------------------------------------
+include("cmake/platform-library.cmake")
+
+# -----------------------------------------------------------------------------
 
 # Define the tests executables.
 function(add_test_executable name)

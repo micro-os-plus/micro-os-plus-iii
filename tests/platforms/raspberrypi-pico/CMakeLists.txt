@@ -28,6 +28,8 @@ set(pico_openocd "pico-openocd")
 # here is a separate folder.
 add_subdirectory("device")
 
+include("cmake/platform-library.cmake")
+
 # -----------------------------------------------------------------------------
 
 # Define the tests executables.
