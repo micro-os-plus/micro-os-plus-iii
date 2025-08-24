@@ -9,6 +9,7 @@ and close existing issues and pull requests.
 ## 2025-08-24 - 7.0.1
 
 * v7.0.1 prepared
+* 72ae5a4 package.json updates
 * 2cd5b53 package.json add git-log
 * baa451c tests/mutex compute sigma
 * 9dd4579 tests/package.json bump deps
