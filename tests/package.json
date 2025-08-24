@@ -133,6 +133,7 @@
         "git -C ${HOME}/Work/xpack-3rd-party/libucontext-xpack.git pull",
         "git -C ${HOME}/Work/xpack-3rd-party/raspberrypi-pico-sdk-xpack.git pull"
       ],
+      "git-log": "git log --pretty='%cd * %h %s' --date=short", 
       "link-deps": [
         "xpm link @micro-os-plus/build-helper",
         "xpm link @xpacks/arm-cmsis-rtos-validator",
