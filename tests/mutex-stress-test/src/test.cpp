@@ -22,6 +22,7 @@
 
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/diag/trace.h>
+#include <cmath>
 
 using namespace os;
 using namespace os::rtos;
@@ -217,19 +218,22 @@ periodic::object_main (void)
             // os::core::timer::ticks_t ticks = pTask->getTicks();
             printf ("%s:%-4u ", m->thread ().name (), cnt);
           }
-        int average
-            = static_cast<int> ((sum + ((sizeof (mt) / sizeof (mt[0])) / 2))
-                                / (sizeof (mt) / sizeof (mt[0])));
+        unsigned int count = sizeof (mt) / sizeof (mt[0]);
+        int average = static_cast<int> ((sum + (count / 2)) / count);
 
         printf ("sum=%u, avg=%d", sum, average);
 
         int min = 0;
         int max = 0;
 
+        unsigned int sigma_squares_sum = 0;
+
         for (auto m : mt)
           {
             int delta = static_cast<int> (m->accumulated_count_);
             delta -= average;
+
+            sigma_squares_sum += static_cast<unsigned int> (delta * delta);
 
             if (delta < min)
               min = delta;
@@ -237,6 +241,10 @@ periodic::object_main (void)
             if (delta > max)
               max = delta;
           }
+
+        int sigma = static_cast<int> (
+            sqrt (static_cast<double> (sigma_squares_sum / count)));
+        printf (", sigma=%d", sigma);
 
         printf (", delta in [%d,%d] [%d%%,%d%%]", min, max,
                 (min * 100 + average / 2) / average,
