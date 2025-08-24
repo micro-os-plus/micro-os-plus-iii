@@ -6,8 +6,153 @@ Please check
 [GitHub](https://github.com/micro-os-plus/micro-os-plus-iii-/issues)
 and close existing issues and pull requests.
 
+## 2025-08-24 - 7.0.1
+
+* v7.0.1 prepared
+* 2cd5b53 package.json add git-log
+* baa451c tests/mutex compute sigma
+* 9dd4579 tests/package.json bump deps
+* f2d5a3a tests updates
+* e44bde2 re-format sources with clang
+
+## 2025-08-23
+
+* cb0012a tests/platforms re-format
+* 3dbdef5 tests/package.json update
+* 10cefc8 add .clang-format
+* b7dffd3 tests/CMakeLists.txt update
+* f1bb63f tests/platforms/nucleo-f411re updates with blink-rtt
+* 3afb6c2 tests/platforms/native updates
+* ef78cf5 tests/cmake/tests-main.cmake do not include platform-library
+* 84cf6ba tests/device-qemu-cortexm re-format
+* 45214cd test updates with os-app-config.h & cosmetics
+* ff7b042 trace-segger-rtt.cpp: silence warning & fix cast
+
+## 2025-08-20
+
+* 01bb68e ci.yml updates
+* de5a1eb tests/package.json fix actions
+* 23acad2 ci.yml use *-ci actions
+* 99fa12d tests/package.json add *-ci actions
+* 26f4ea0 tests/package.json bump deps
+* 5b0157c ci.yml bump deps
+* 348fd85 rename xpack-development
+* 86bad1b .vscode/settings.json update
+* 6f04568 update tests cmake & silence warnings
+* 3efeb6d silence warnings
+
+## 2025-08-18
+
+* 214a616 update copyright licenses
+
+## 2025-08-14
+
+* 74f58fc move tests to platforms
+
+## 2025-06-05
+
+* 7126cd6 cosmetics in doxygen pages
+* 9aa7d17 cosmetise doxygen pages
+
+## 2025-05-30
+
+* 65f10af @details cosmetics
+* 77ecdcb os-timer.h move some @details to header
+* 6cb4841 os-decls.h fix @brief
+* 426e0bb disable some metadata to avoid doxygen errors
+* aa43bfd move some @details to headers
+* 35b1597 device-serial-buufered.h fix @ingroup
+* c12b2d1 os-app-config.h cosmetics
+* e47df1c modules.dox add  @ingroup micro-os-plus
+* 4b5e362 rework ///< comments
+
+## 2024-06-19
+
+* 27a2a22 Merge branch 'xpack-develop' of https://github.com/micro-os-plus/micro-os-plus into xpack-develop
+* a237ad5 update to stlink-dap.cfg
+
+## 2024-06-18
+
+* cced69f top package.json updates
+* 4ff4389 package.json: re-enable F7 tests
+* 36b4074 package.json: cosmetics
+* 0870199 cmake cosmetics
+* f85c540 ci.yml: update deps
+
+## 2023-10-12
+
+* 2277fcf package-lock.json update
+* d766c69 package.json: bump deps
+
+## 2023-10-11
+
+* d3d3a12 README update
+* fdc5936 README update
+* 2babf8f rework -rpath list
+* 96988b4 package.json: reorder actions
+* 50f4ce1 package.json: bump deps
+* 7830710 Merge branch 'xpack-develop' of https://github.com/micro-os-plus/micro-os-plus-iii into xpack-develop
+* 607132a native: switch from -static-* to -rpath
+* bcfb455 pacakge.json: add clone-deps
+* d554664 pacakge.json: bump deps
+* b93e858 README update
+* 2275099 native/CMakeLists.txt: -lunwind for linux
+* c4c2d35 package.json: bump deps
+* 61cf336 Merge branch 'xpack-develop' of https://github.com/micro-os-plus/micro-os-plus into xpack-develop
+* 1e8724f README update
+* 1f22d17 CMakeLists.txt: use -static-* for Linux too
+* 623b9fc package.json: bump deps
+* dbe344f package.json: bump deps
+* 79e3cfc ci.yml: bump deps
+* db8f108 add cortex-m4f
+
+## 2023-10-10
+
+* 626b3a0 lists.cpp: silence warnings
+* 9954e66 README update
+* 5068ff4 package-lock.json update
+* a47e6ff package.json: add clang 16
+* 0500f59 package.json: add gcc13
+* b595215 package.json: hide nucleo f7, h7
+* 51a378a package.json: bump deps
+* 801259a remove local get-libraries-paths.sh
+* e5e3f7c native/CMakeLists.txt: -rtlib=compiler-rt
+* a6ef72a native/CMakeLists.txt: comments
+* e588069 silence warnings
+* ebc48ae estd/thread: disable struct hash, deprecated unary_function
+
+## 2023-09-26
+
+* d210627 tests/f767zi/README: document alternate openocd
+
+## 2023-07-22
+
+* cf67683 README update
+* ba876cb README update
+
+## 2023-07-21
+
+* c04f4cd README update
+* 26ddfca ci.yml: update paths-ignore
+* 41bc144 doxygen updates
+* 7a91fc6 README updates
+
 ## 2023-07-19
 
+* f649a2a ci.yml: test on linux & macos
+* bcbe088 ci.yml: run linux tests
+* 6d689af tests/package.json: remove meson
+* 4eb4fbb ci.yml: revert to setup-node
+* 0dd7f54 ci.yml: which npm
+* c5a8283 ci.yml: show env before nvm
+* 3a2d124 ci.yml: use nvm for node
+* 1b1afc8 ci.yml: try node 20
+* c2c7e2a ci.yml: sudo chown
+* a5763e2 ci.yml: update actions
+* d4c7572 ci.yml: -C tests
+* d2e365a add ci.yml
+* 668b58b README update
+* 867d464 CHANGELOG update
 * 43944ba README updates
 * 22f4939 package.json: move scripts to actions
 
@@ -16,7 +161,7 @@ and close existing issues and pull requests.
 * 74e207f CMakeLists cosmetics
 * 5b9e805 README update
 
-## (v7.0.0)
+## 2023-07-14 - 7.0.0
 
 * c776ff6 README update
 * 0a5cbee README update

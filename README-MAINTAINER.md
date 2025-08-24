@@ -61,7 +61,7 @@ No need to add a tag here, it'll be added when the release is created.
 
 Update the`package.json` file; add an extra field in the
 pre-release field, and initially also add `.pre`,
-for example `7.0.0-pre.1`.
+for example `7.0.1-pre.1`.
 
 ### Fix possible open issues
 
@@ -69,7 +69,11 @@ Check GitHub issues and pull requests:
 
 - <https://github.com/micro-os-plus/micro-os-plus-iii/issues/>
 
-and fix them; assign them to a milestone (like `7.0.0`).
+and fix them; assign them to a milestone (like `7.0.1`).
+
+### Update os-version.h
+
+Update the #define to represent the version.
 
 ### Update `README-MAINTAINER.md`
 
@@ -83,8 +87,8 @@ related to the new version:
 
 - open the `CHANGELOG.md` file
 - check if all previous fixed issues are in
-- add a new entry like _* v7.0.0_
-- commit with a message like _prepare v7.0.0_
+- add a new entry like _* v7.0.1 prepared_
+- commit with a message like _prepare v7.0.1_
 
 ### Push changes
 
@@ -109,7 +113,7 @@ xpm run test-all -C ~/Work/micro-os-plus/micro-os-plus-iii.git/tests
   only `package.json`, `README.md`, `LICENSE`, `CHANGELOG.md`,
   the `doxygen-awesome-*.js` and `doxygen-custom/*` files;
   possibly adjust `.npmignore`
-- `npm version 7.0.0`
+- `npm version 7.0.1`
 - push the `xpack-development` branch to GitHub
 - the `postversion` npm script should also update tags via `git push origin --tags`
 
@@ -129,7 +133,7 @@ When the package is considered stable:
 
 - in a separate browser windows, open [TweetDeck](https://tweetdeck.twitter.com/)
 - using the `@xpack_project` account
-- paste the release name like **µOS++ IIIe v7.0.0 released**
+- paste the release name like **µOS++ IIIe v7.0.1 released**
 - paste the link to the Web page
   [release](https://micro-os-plus.github.io/micro-os-plus/iii/releases/)
 - click the **Tweet** button
