@@ -487,7 +487,7 @@
         "hidden": true,
         "devDependencies": {
           "@micro-os-plus/posix-arch": {
-            "specifier": "github:micro-os-plus/micro-os-plus-iii-posix-arch#v1.0.0",
+            "specifier": "github:micro-os-plus/micro-os-plus-iii-posix-arch#v1.0.1",
             "local": "link",
             "platforms": "all"
           },
@@ -502,7 +502,7 @@
         "hidden": true,
         "devDependencies": {
           "@micro-os-plus/micro-os-plus-iii-cortexm": {
-            "specifier": "github:micro-os-plus/micro-os-plus-iii-cortexm#v1.0.0",
+            "specifier": "github:micro-os-plus/micro-os-plus-iii-cortexm#v1.0.1",
             "local": "link",
             "platforms": "all"
           }
