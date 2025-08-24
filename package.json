@@ -4,7 +4,8 @@
   "description": "A source code library with the portable part of µOS++ IIIe",
   "main": "",
   "scripts": {
-    "postversion": "git push origin --all && git push origin --tags"
+    "postversion": "git push origin --all && git push origin --tags",
+    "git-log": "git log --pretty='%cd * %h %s' --date=short"
   },
   "repository": {
     "type": "git",
