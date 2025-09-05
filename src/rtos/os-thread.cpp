@@ -1692,7 +1692,11 @@ namespace os
 
 #else
 
-        port::scheduler::reschedule ();
+        if (os::rtos::scheduler::ready_threads_list_.head ()
+            != os::rtos::scheduler::ready_threads_list_.tail ())
+          {
+            port::scheduler::reschedule ();
+          }
 
 #endif
 
