@@ -1124,6 +1124,9 @@ extern "C"
 void __attribute__ ((noreturn, weak))
 os_terminate (int code __attribute__ ((unused)))
 {
+  /* Disable interrupts, otherwise SysTick will continue to occur. */
+  __disable_irq ();
+
   /* There is only one SWI for both _exit and _kill. For _exit, call
    the SWI with the second argument set to -1, an invalid value for
    signum, so that the SWI handler can distinguish the two calls.
