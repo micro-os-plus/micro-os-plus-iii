@@ -25,6 +25,8 @@
 #include <cmsis-plus/diag/trace.h>
 #include <cmsis_device.h>
 
+#include <cmsis-plus/diag/instrumentation.h>
+
 #include <stdlib.h>
 #include <stdbool.h>
 #include "atexit.h"
@@ -118,6 +120,10 @@ _Exit (int code)
 
   // Gracefully terminate the trace session.
   trace_flush ();
+
+  os_instrumentation_exit (code);
+
+  os_instrumentation_stop ();
 
 // By default disable it, since it prevents standalone tests
 // to terminate properly.

@@ -37,6 +37,108 @@
 #define OS_INTEGER_INSTRUMENTATION_ID_EXIT \
   (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 1u)
 
+#if defined(OS_INCLUDE_INSTRUMENTATION)
+
+// Invoke SEGGER SystemView functions.
+
+#if defined(__cplusplus)
+
+namespace os
+{
+  namespace instrumentation
+  {
+    static void inline __attribute__ ((__always_inline__))
+    configure (void)
+    {
+      SEGGER_SYSVIEW_Conf ();
+    }
+
+    static void inline __attribute__ ((__always_inline__))
+    start (void)
+    {
+      SEGGER_SYSVIEW_Start ();
+    }
+
+    static void inline __attribute__ ((__always_inline__))
+    stop (void)
+    {
+      SEGGER_SYSVIEW_Stop ();
+    }
+
+    void
+    exit (int exit_code);
+
+  } // namespace instrumentation
+} // namespace os
+
+#endif // defined(__cplusplus)
+
+#if defined(__cplusplus)
+extern "C"
+{
+#endif
+
+  inline void __attribute__ ((__always_inline__))
+  os_instrumentation_stop (void)
+  {
+    SEGGER_SYSVIEW_Stop ();
+  }
+
+  extern void
+  os_instrumentation_exit (int exit_code);
+
+#if defined(__cplusplus)
+}
+#endif
+
+// ----------------------------------------------------------------------------
+#else // defined(OS_INCLUDE_INSTRUMENTATION)
+
+#if defined(__cplusplus)
+
+// All functions have empty content.
+namespace os
+{
+  namespace instrumentation
+  {
+    static void inline __attribute__ ((__always_inline__))
+    configure (void)
+    {
+    }
+
+    static void inline __attribute__ ((__always_inline__))
+    start (void)
+    {
+    }
+
+    static void inline __attribute__ ((__always_inline__))
+    stop (void)
+    {
+    }
+
+    namespace interrupt
+
+    static void inline __attribute__ ((__always_inline__))
+    exit (int exit_code)
+    {
+    }
+
+  } // namespace instrumentation
+} // namespace os
+
+#endif // defined(__cplusplus)
+
+inline void __attribute__ ((__always_inline__))
+os_instrumentation_stop (void)
+{
+}
+
+inline void __attribute__ ((__always_inline__))
+os_instrumentation_exit (int exit_code)
+{
+}
+
+#endif // defined(OS_INCLUDE_INSTRUMENTATION)
 
 // ----------------------------------------------------------------------------
 

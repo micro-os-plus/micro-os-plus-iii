@@ -74,6 +74,7 @@ namespace
 
     // Exit will run the atexit() and destructors, then
     // terminate gracefully.
+    // The main thread is still alive at this point.
     std::exit (code);
   }
 

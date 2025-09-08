@@ -26,6 +26,7 @@
 #include <cmsis-plus/rtos/os.h>
 
 #include <cmsis-plus/diag/trace.h>
+#include <cmsis-plus/diag/instrumentation.h>
 
 #include <cmsis_device.h>
 
@@ -240,6 +241,8 @@ static uint32_t volatile
 void __attribute__ ((section (".after_vectors"), noreturn, weak))
 _start (void)
 {
+  using namespace os;
+
   // After Reset the Cortex-M processor is in Thread mode,
   // priority is Privileged, and the Stack is set to Main.
 
@@ -348,6 +351,13 @@ _start (void)
 
   trace_printf ("Hardware initialised\n");
   trace_printf ("Main stack %p-%p\n", &_Heap_Limit, &__stack);
+
+  instrumentation::configure ();
+
+#if !defined(OS_DISABLE_INSTRUMENTATION_AUTOSTART)
+  // Start recording to catch system initialization.
+  instrumentation::start ();
+#endif
 
   os_startup_initialize_free_store (
       &_Heap_Begin,
