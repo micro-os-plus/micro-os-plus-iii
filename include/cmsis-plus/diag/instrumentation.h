@@ -87,6 +87,45 @@ namespace os
       }
     } // namespace interrupt
 
+    namespace thread
+    {
+      static void inline __attribute__ ((__always_inline__))
+      created (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_OnTaskCreate (reinterpret_cast<U32> (thread));
+        SYSVIEW_SendTaskInfo (thread);
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      ready (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_OnTaskStartReady (reinterpret_cast<U32> (thread));
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      suspended (os::rtos::thread* thread, unsigned int cause = 0)
+      {
+        SEGGER_SYSVIEW_OnTaskStopReady (reinterpret_cast<U32> (thread), cause);
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      active (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_OnTaskStartExec (reinterpret_cast<U32> (thread));
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      idle (void)
+      {
+        SEGGER_SYSVIEW_OnIdle ();
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      terminated (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_OnTaskTerminate (reinterpret_cast<U32> (thread));
+      }
+    } // namespace thread
 
     void
     exit (int exit_code);
@@ -151,6 +190,40 @@ namespace os
       {
       }
     } // namespace interrupt
+
+    namespace thread
+    {
+      static void inline __attribute__ ((__always_inline__))
+      created (os::rtos::thread* thread)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      ready (os::rtos::thread* thread)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      suspended (os::rtos::thread* thread, unsigned int cause = 0)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      active (os::rtos::thread* thread)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      idle (void)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      terminated (os::rtos::thread* thread)
+      {
+      }
+    } // namespace thread
+
 
     static void inline __attribute__ ((__always_inline__))
     exit (int exit_code)

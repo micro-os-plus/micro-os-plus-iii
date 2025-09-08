@@ -14,6 +14,7 @@
 #endif
 
 #include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/diag/instrumentation.h>
 
 #include <memory>
 #include <stdexcept>
@@ -485,6 +486,8 @@ namespace os
                                  const attributes& attr, void* stack_address,
                                  std::size_t stack_size_bytes)
     {
+      using namespace os;
+
       // Don't call this from interrupt handlers.
       os_assert_throw (!interrupts::in_handler_mode (), EPERM);
 
@@ -541,6 +544,8 @@ namespace os
           }
 
         stack ().initialize ();
+
+        instrumentation::thread::created (this);
 
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
@@ -629,6 +634,8 @@ namespace os
     void
     thread::resume (void)
     {
+      using namespace os;
+
 #if defined(OS_TRACE_RTOS_THREAD_CONTEXT)
       trace::printf ("%s() @%p %s %u\n", __func__, this, name (),
                      prio_assigned_);
@@ -662,6 +669,8 @@ namespace os
           }
         // ----- Exit critical section ----------------------------------------
       }
+
+      instrumentation::thread::ready (this);
 
       port::scheduler::reschedule ();
 
@@ -1042,6 +1051,8 @@ namespace os
     void
     thread::internal_suspend_ (unsigned int cause)
     {
+      using namespace os;
+
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -1057,12 +1068,16 @@ namespace os
         // ----- Exit critical section ----------------------------------------
       }
 
+      instrumentation::thread::suspended (this, cause);
+
       port::scheduler::reschedule ();
     }
 
     void
     thread::internal_exit_ (void* exit_ptr)
     {
+      using namespace os;
+
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -1108,6 +1123,8 @@ namespace os
         scheduler::terminated_threads_list_.link (ready_node_);
         // ----- Exit critical section ----------------------------------------
       }
+
+      instrumentation::thread::terminated (this);
 
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)
 
@@ -1447,6 +1464,8 @@ namespace os
                                         flags::mask_t* oflags,
                                         flags::mode_t mode)
     {
+      using namespace os;
+
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X,%u,%u) @%p %s <0x%X\n", __func__, mask, timeout,
                      mode, this, name (), event_flags_.mask ());
@@ -1518,6 +1537,9 @@ namespace os
             state_ = state::suspended;
             // ----- Exit critical section ------------------------------------
           }
+
+          instrumentation::thread::suspended (
+              this, OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_THREAD_FLAGS);
 
           port::scheduler::reschedule ();
 

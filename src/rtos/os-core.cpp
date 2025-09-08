@@ -343,6 +343,8 @@ namespace os
                           internal::waiting_thread_node& node,
                           unsigned int cause)
       {
+        using namespace os;
+
         // Remove this thread from the ready list, if there.
         port::this_thread::prepare_suspend ();
 
@@ -351,6 +353,8 @@ namespace os
         node.thread_->waiting_node_ = &node;
 
         node.thread_->state_ = thread::state::suspended;
+
+        instrumentation::thread::suspended (node.thread_, cause);
       }
 
       void
@@ -408,6 +412,8 @@ namespace os
       void
       internal_switch_threads (void)
       {
+        using namespace os;
+
 #if defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CPU_CYCLES)
 
         // Get the high resolution timestamp.
@@ -442,12 +448,17 @@ namespace os
         // current thread and return the top priority thread.
         if (!locked ())
           {
+            instrumentation::thread::suspended (
+                scheduler::current_thread_,
+                OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_SWITCH);
             // Normally the old running thread must be re-linked to ready.
             scheduler::current_thread_->internal_relink_running_ ();
 
             // The top of the ready list gives the next thread to run.
             scheduler::current_thread_
                 = scheduler::ready_threads_list_.unlink_head ();
+
+            instrumentation::thread::active (scheduler::current_thread_);
           }
 
           // ***** Pointer switched to new thread! *****

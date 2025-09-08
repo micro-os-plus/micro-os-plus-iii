@@ -368,6 +368,8 @@ namespace os
     clock::internal_wait_until_ (timestamp_t timestamp,
                                  internal::clock_timestamps_list& list)
     {
+      using namespace os;
+
       thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
@@ -388,6 +390,9 @@ namespace os
         crt_thread.state_ = thread::state::suspended;
         // ----- Exit critical section ----------------------------------------
       }
+
+      instrumentation::thread::suspended (
+          &crt_thread, OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_CLOCK);
 
       port::scheduler::reschedule ();
 
