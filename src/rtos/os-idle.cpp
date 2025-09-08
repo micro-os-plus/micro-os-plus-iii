@@ -14,6 +14,13 @@
 #endif
 
 #include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/diag/instrumentation.h>
+
+#if !defined(OS_DISABLE_WAIT_FOR_INTERRUPT) \
+    && (defined(OS_USE_TRACE_SEGGER_RTT) || defined(SEGGER_SYSVIEW_VERSION))
+// When using SEGGER RTT (for trace or SystemView), the core cannot enter WFI.
+#define OS_DISABLE_WAIT_FOR_INTERRUPT (1)
+#endif
 
 // ----------------------------------------------------------------------------
 
@@ -62,6 +69,8 @@ os_rtos_idle_enter_power_saving_mode_hook (void)
 void __attribute__ ((weak))
 os_rtos_idle_actions (void)
 {
+  using namespace os;
+
   while (!scheduler::terminated_threads_list_.empty ())
     {
       internal::waiting_thread_node* node;
@@ -84,9 +93,13 @@ os_rtos_idle_actions (void)
   assert (rtos::interrupts::stack ()->check_bottom_magic ());
 #endif
 
+  // Instrumentation requires permanent access to RAM, therefore
+  // the core cannot go to sleep.
   if (!os_rtos_idle_enter_power_saving_mode_hook ())
     {
+#if !defined(OS_DISABLE_WAIT_FOR_INTERRUPT)
       port::scheduler::wait_for_interrupt ();
+#endif
     }
 }
 
