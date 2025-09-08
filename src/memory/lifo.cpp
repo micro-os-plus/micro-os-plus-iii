@@ -16,6 +16,9 @@
 #include <cmsis-plus/memory/lifo.h>
 #include <memory>
 
+#include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/diag/instrumentation.h>
+
 // ----------------------------------------------------------------------------
 
 #if defined(__clang__)
@@ -156,6 +159,9 @@ namespace os
       trace::printf ("lifo::%s(%u,%u)=%p,%u @%p %s\n", __func__, bytes,
                      alignment, aligned_payload, alloc_size, this, name ());
 #endif
+
+      instrumentation::heap::allocated (this, aligned_payload,
+                                        alloc_size - sizeof (chunk_t));
 
       return aligned_payload;
     }

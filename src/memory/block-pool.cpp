@@ -16,6 +16,8 @@
 #include <cmsis-plus/memory/block-pool.h>
 #include <cmsis-plus/rtos/os.h>
 
+#include <cmsis-plus/diag/instrumentation.h>
+
 // ----------------------------------------------------------------------------
 
 #if defined(__clang__)
@@ -74,6 +76,8 @@ namespace os
                      block_size_bytes_, this, name ());
 #endif
 
+      instrumentation::heap::allocated (this, p, block_size_bytes_);
+
       return p;
     }
 
@@ -121,6 +125,8 @@ namespace os
       // Update statistics.
       // What is subtracted from allocated is added to free.
       internal_decrease_allocated_statistics (block_size_bytes_);
+
+      instrumentation::heap::deallocated (this, addr);
     }
 
 #pragma GCC diagnostic push
@@ -210,6 +216,8 @@ namespace os
       free_bytes_ = total_bytes_;
       allocated_chunks_ = 0;
       free_chunks_ = blocks_;
+
+      instrumentation::heap::define (this, pool_addr_, total_bytes_, 0);
     }
 
     // ------------------------------------------------------------------------

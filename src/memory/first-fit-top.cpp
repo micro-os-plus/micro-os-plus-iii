@@ -13,6 +13,9 @@
 #include <cmsis-plus/os-app-config.h>
 #endif
 
+#include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/diag/instrumentation.h>
+
 #include <cmsis-plus/memory/first-fit-top.h>
 #include <memory>
 
@@ -39,6 +42,8 @@ namespace os
     void
     first_fit_top::internal_construct_ (void* addr, std::size_t bytes)
     {
+      using namespace os;
+
       assert (bytes > chunk_minsize);
 
       arena_addr_ = addr;
@@ -55,6 +60,7 @@ namespace os
         }
       assert ((total_bytes_ % chunk_align) == 0);
 
+      // The instrumentation call was moved to internal_reset_().
       internal_reset_ ();
     }
 
@@ -76,6 +82,9 @@ namespace os
 
       // Remember first chunk as list head.
       free_list_ = chunk;
+
+      instrumentation::heap::define (this, arena_addr_, total_bytes_,
+                                     sizeof (chunk_t));
     }
 
     void
@@ -111,6 +120,8 @@ namespace os
     void*
     first_fit_top::do_allocate (std::size_t bytes, std::size_t alignment)
     {
+      using namespace os;
+
       std::size_t block_padding = calc_block_padding (alignment);
       std::size_t alloc_size = rtos::memory::align_size (bytes, chunk_align);
       alloc_size += block_padding;
@@ -210,6 +221,9 @@ namespace os
                      name ());
 #endif
 
+      instrumentation::heap::allocated (this, aligned_payload,
+                                        alloc_size - sizeof (chunk_t));
+
       return aligned_payload;
     }
 
@@ -281,6 +295,8 @@ namespace os
       // Update statistics.
       // What is subtracted from allocated is added to free.
       internal_decrease_allocated_statistics (chunk->size);
+
+      instrumentation::heap::deallocated (this, addr);
 
       // If the free list is empty, create it with the current chunk, alone.
       if (free_list_ == nullptr)

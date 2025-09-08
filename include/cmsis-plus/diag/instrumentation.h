@@ -127,6 +127,28 @@ namespace os
       }
     } // namespace thread
 
+    namespace heap
+    {
+      static void inline __attribute__ ((__always_inline__))
+      define (void* heap, void* base, std::size_t heap_size,
+              std::size_t metadata_size)
+      {
+        SEGGER_SYSVIEW_HeapDefine (heap, base, heap_size, metadata_size);
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      allocated (void* heap, void* user_data, std::size_t size)
+      {
+        SEGGER_SYSVIEW_HeapAlloc (heap, user_data, size);
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      deallocated (void* heap, void* user_data)
+      {
+        SEGGER_SYSVIEW_HeapFree (heap, user_data);
+      }
+    } // namespace heap
+
     void
     exit (int exit_code);
 
@@ -224,6 +246,24 @@ namespace os
       }
     } // namespace thread
 
+    namespace heap
+    {
+      static void inline __attribute__ ((__always_inline__))
+      define (void* heap, void* base, std::size_t heap_size,
+              std::size_t metadata_size)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      allocated (void* heap, void* user_data, std::size_t size)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      deallocated (void* heap, void* user_data)
+      {
+      }
+    } // namespace heap
 
     static void inline __attribute__ ((__always_inline__))
     exit (int exit_code)
