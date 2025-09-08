@@ -175,8 +175,17 @@ os_idle (thread::func_args_t args __attribute__ ((unused)))
     {
       os_rtos_idle_actions ();
 
-      // Possibly switch to threads that were resumed during sleep.
-      this_thread::yield ();
+      // If during sleep there were threads that were resumed,
+      // the ready list may contain more than one entry.
+      // Probably too conservative, normally awakened threads were
+      // already scheduled after the interrupts that triggered them
+      // completed.
+      // However this saves a lot of instrumentation events.
+      if (os::rtos::scheduler::ready_threads_list_.head ()
+          != os::rtos::scheduler::ready_threads_list_.tail ())
+        {
+          this_thread::yield ();
+        }
     }
 }
 
