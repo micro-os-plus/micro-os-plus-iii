@@ -14,6 +14,7 @@
 #endif
 
 #include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/diag/instrumentation.h>
 
 // ----------------------------------------------------------------------------
 
@@ -36,6 +37,9 @@ void
 os_systick_handler (void)
 {
   using namespace os::rtos;
+  using namespace os;
+
+  instrumentation::interrupt::entered ();
 
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)
   // Prevent scheduler actions before starting it.
@@ -82,6 +86,8 @@ os_systick_handler (void)
 
 #endif /* !defined(OS_USE_RTOS_PORT_SCHEDULER) */
 
+  instrumentation::interrupt::exited ();
+
 #if defined(OS_TRACE_RTOS_SYSCLOCK_TICK_BRACES)
   trace::printf (" t}");
 #endif
@@ -94,6 +100,9 @@ os_systick_handler (void)
 void
 os_rtc_handler (void)
 {
+  using namespace os;
+
+  instrumentation::interrupt::entered ();
 
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)
   // Prevent scheduler actions before starting it.
@@ -116,6 +125,8 @@ os_rtc_handler (void)
   }
 
   rtclock.internal_check_timestamps ();
+
+  instrumentation::interrupt::exited ();
 }
 
 // ----------------------------------------------------------------------------

@@ -65,6 +65,29 @@ namespace os
       SEGGER_SYSVIEW_Stop ();
     }
 
+    namespace interrupt
+    {
+      static void inline __attribute__ ((__always_inline__))
+      entered (void)
+      {
+        SEGGER_SYSVIEW_RecordEnterISR ();
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      exited (void)
+      {
+        // On Cortex-M, the interrupt may return or may be chained to PendSV,
+        // to invoke the scheduler.
+        // Since the PendSV bit is write only, it is not easy to determine
+        // if the scheduler is invoked without additional logic.
+        // Since most of the time the scheduler is invoked, use
+        // this variant of the function.
+        SEGGER_SYSVIEW_RecordExitISRToScheduler ();
+        // SEGGER_SYSVIEW_RecordExitISR ();
+      }
+    } // namespace interrupt
+
+
     void
     exit (int exit_code);
 
@@ -117,6 +140,17 @@ namespace os
     }
 
     namespace interrupt
+    {
+      static void inline __attribute__ ((__always_inline__))
+      entered (void)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      exited (void)
+      {
+      }
+    } // namespace interrupt
 
     static void inline __attribute__ ((__always_inline__))
     exit (int exit_code)
