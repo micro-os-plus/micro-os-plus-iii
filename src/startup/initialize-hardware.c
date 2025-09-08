@@ -34,6 +34,11 @@ extern unsigned int __vectors_start;
 
 // ----------------------------------------------------------------------------
 
+#if defined(OS_HAS_SYSTEMCLOCK_CONFIG)
+extern void
+SystemClock_Config (void);
+#endif
+
 /**
  * @details
  * This is the default early hardware initialisation routine.
@@ -55,6 +60,12 @@ os_startup_initialize_hardware_early (void)
 {
   // Call the CSMSIS system initialisation routine.
   SystemInit ();
+
+#if defined(OS_HAS_SYSTEMCLOCK_CONFIG)
+  // Call the CMSIS system clock configuration routine, if available.
+  // (STM32CubeMX generates it in `main.c`)
+  SystemClock_Config ();
+#endif
 
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
 
