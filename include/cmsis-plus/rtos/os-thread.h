@@ -25,6 +25,7 @@
 #include <cmsis-plus/rtos/os-decls.h>
 #include <cmsis-plus/rtos/os-clocks.h>
 #include <cmsis-plus/rtos/internal/os-flags.h>
+#include <cmsis-plus/diag/instrumentation.h>
 
 #if !defined(__ARM_EABI__)
 #include <memory>
@@ -1359,7 +1360,8 @@ namespace os
 
       friend void
       scheduler::internal_link_node (internal::waiting_threads_list& list,
-                                     internal::waiting_thread_node& node);
+                                     internal::waiting_thread_node& node,
+                                     unsigned int cause);
 
       friend void
       scheduler::internal_unlink_node (internal::waiting_thread_node& node);
@@ -1369,7 +1371,7 @@ namespace os
           internal::waiting_threads_list& list,
           internal::waiting_thread_node& node,
           internal::clock_timestamps_list& timeout_list,
-          internal::timeout_thread_node& timeout_node);
+          internal::timeout_thread_node& timeout_node, unsigned int cause);
 
       friend void
       scheduler::internal_unlink_node (
@@ -1439,7 +1441,7 @@ namespace os
        *  Nothing.
        */
       void
-      internal_suspend_ (void);
+      internal_suspend_ (unsigned int cause);
 
       /**
        * @brief Terminate thread by itself.
@@ -1925,7 +1927,8 @@ namespace os
       inline void
       suspend (void)
       {
-        this_thread::thread ().internal_suspend_ ();
+        this_thread::thread ().internal_suspend_ (
+            OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_USER);
       }
 
       /**

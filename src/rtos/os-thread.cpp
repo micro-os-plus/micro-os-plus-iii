@@ -955,7 +955,8 @@ namespace os
       while (state_ != state::destroyed)
         {
           joiner_ = this_thread::_thread ();
-          this_thread::_thread ()->internal_suspend_ ();
+          this_thread::_thread ()->internal_suspend_ (
+              OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_JOIN);
         }
 
 #if defined(OS_TRACE_RTOS_THREAD)
@@ -1039,7 +1040,7 @@ namespace os
      *  Extension to standard, no POSIX similar functionality identified.
      */
     void
-    thread::internal_suspend_ (void)
+    thread::internal_suspend_ (unsigned int cause)
     {
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
@@ -1386,7 +1387,8 @@ namespace os
             // ----- Exit critical section ------------------------------------
           }
 
-          internal_suspend_ ();
+          internal_suspend_ (
+              OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_THREAD_FLAGS);
 
           if (interrupted ())
             {

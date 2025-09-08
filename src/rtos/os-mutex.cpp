@@ -14,6 +14,7 @@
 #endif
 
 #include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/diag/instrumentation.h>
 
 // ----------------------------------------------------------------------------
 
@@ -1060,7 +1061,8 @@ namespace os
               interrupts::critical_section ics;
 
               // Add this thread to the mutex waiting list.
-              scheduler::internal_link_node (list_, node);
+              scheduler::internal_link_node (
+                  list_, node, OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_MUTEX);
               // state::suspended set in above link().
               // ----- Exit critical section ------------------------------
             }
@@ -1280,8 +1282,9 @@ namespace os
 
               // Add this thread to the mutex waiting list,
               // and the clock timeout list.
-              scheduler::internal_link_node (list_, node, clock_list,
-                                             timeout_node);
+              scheduler::internal_link_node (
+                  list_, node, clock_list, timeout_node,
+                  OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_MUTEX);
               // state::suspended set in above link().
               // ----- Exit critical section ------------------------------
             }

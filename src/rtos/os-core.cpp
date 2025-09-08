@@ -14,6 +14,7 @@
 #endif
 
 #include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/diag/instrumentation.h>
 
 // ----------------------------------------------------------------------------
 
@@ -339,7 +340,8 @@ namespace os
 
       void
       internal_link_node (internal::waiting_threads_list& list,
-                          internal::waiting_thread_node& node)
+                          internal::waiting_thread_node& node,
+                          unsigned int cause)
       {
         // Remove this thread from the ready list, if there.
         port::this_thread::prepare_suspend ();
@@ -370,16 +372,10 @@ namespace os
       internal_link_node (internal::waiting_threads_list& list,
                           internal::waiting_thread_node& node,
                           internal::clock_timestamps_list& timeout_list,
-                          internal::timeout_thread_node& timeout_node)
+                          internal::timeout_thread_node& timeout_node,
+                          unsigned int cause)
       {
-        // Remove this thread from the ready list, if there.
-        port::this_thread::prepare_suspend ();
-
-        // Add this thread to the node waiting list.
-        list.link (node);
-        node.thread_->waiting_node_ = &node;
-
-        node.thread_->state_ = thread::state::suspended;
+        internal_link_node (list, node, cause);
 
         // Add this thread to the clock timeout list.
         timeout_list.link (timeout_node);

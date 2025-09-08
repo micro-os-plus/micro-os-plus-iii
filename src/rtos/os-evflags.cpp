@@ -14,6 +14,7 @@
 #endif
 
 #include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/diag/instrumentation.h>
 
 // ----------------------------------------------------------------------------
 
@@ -295,7 +296,9 @@ namespace os
               }
 
             // Add this thread to the event flags waiting list.
-            scheduler::internal_link_node (list_, node);
+            scheduler::internal_link_node (
+                list_, node,
+                OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_EVENT_FLAGS);
             // state::suspended set in above link().
             // ----- Exit critical section ------------------------------------
           }
@@ -490,8 +493,9 @@ namespace os
 
             // Add this thread to the event flags waiting list,
             // and the clock timeout list.
-            scheduler::internal_link_node (list_, node, clock_list,
-                                           timeout_node);
+            scheduler::internal_link_node (
+                list_, node, clock_list, timeout_node,
+                OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_EVENT_FLAGS);
             // state::suspended set in above link().
             // ----- Exit critical section ------------------------------------
           }

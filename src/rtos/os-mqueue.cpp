@@ -14,6 +14,7 @@
 #endif
 
 #include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/diag/instrumentation.h>
 
 // ----------------------------------------------------------------------------
 
@@ -977,7 +978,9 @@ namespace os
               }
 
             // Add this thread to the message queue send waiting list.
-            scheduler::internal_link_node (send_list_, node);
+            scheduler::internal_link_node (
+                send_list_, node,
+                OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_MQUEUE_SEND);
             // state::suspended set in above link().
             // ----- Exit critical section ------------------------------------
           }
@@ -1190,8 +1193,9 @@ namespace os
 
             // Add this thread to the semaphore waiting list,
             // and the clock timeout list.
-            scheduler::internal_link_node (send_list_, node, clock_list,
-                                           timeout_node);
+            scheduler::internal_link_node (
+                send_list_, node, clock_list, timeout_node,
+                OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_MQUEUE_SEND);
             // state::suspended set in above link().
             // ----- Exit critical section ------------------------------------
           }
@@ -1319,7 +1323,9 @@ namespace os
               }
 
             // Add this thread to the message queue receive waiting list.
-            scheduler::internal_link_node (receive_list_, node);
+            scheduler::internal_link_node (
+                receive_list_, node,
+                OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_MQUEUE_RECEIVE);
             // state::suspended set in above link().
             // ----- Exit critical section ------------------------------------
           }
@@ -1544,8 +1550,9 @@ namespace os
 
             // Add this thread to the message queue receive waiting list,
             // and the clock timeout list.
-            scheduler::internal_link_node (receive_list_, node, clock_list,
-                                           timeout_node);
+            scheduler::internal_link_node (
+                receive_list_, node, clock_list, timeout_node,
+                OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_MQUEUE_RECEIVE);
             // state::suspended set in above link().
             // ----- Exit critical section ------------------------------------
           }
