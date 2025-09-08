@@ -85,8 +85,9 @@ namespace os
       // with its own `SEGGER_RTT_MAX_INTERRUPT_PRIORITY`.
       // For consistency with µOS++ interrupt handling, a µOS++ critical
       // section is preferred.
-      rtos::interrupts::critical_section ics;
-      ret = static_cast<ssize_t> (SEGGER_RTT_WriteNoLock (0, buf, nbyte));
+      // rtos::interrupts::critical_section ics;
+      // ret = static_cast<ssize_t> (SEGGER_RTT_WriteNoLock (0, buf, nbyte));
+      ret = static_cast<ssize_t> (SEGGER_RTT_Write (0, buf, nbyte));
 
       return ret;
     }
