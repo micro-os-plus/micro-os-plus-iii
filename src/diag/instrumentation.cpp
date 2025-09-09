@@ -79,9 +79,6 @@ namespace os
     void
     exit (int exit_code)
     {
-      // SEGGER_SYSVIEW_OnTaskStopReady (
-        //   reinterpret_cast<U32> (&os::rtos::this_thread::thread ()),
-        //   OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_SWITCH);
       SEGGER_SYSVIEW_RecordU32 (OS_INTEGER_INSTRUMENTATION_ID_EXIT,
                                 static_cast<U32> (exit_code));
     }
@@ -92,9 +89,6 @@ namespace os
 void
 os_instrumentation_exit (int exit_code)
 {
-  // SEGGER_SYSVIEW_OnTaskStopReady (
-    //   reinterpret_cast<U32> (&os::rtos::this_thread::thread ()),
-    //   OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_SWITCH);
   SEGGER_SYSVIEW_RecordU32 (OS_INTEGER_INSTRUMENTATION_ID_EXIT,
                             static_cast<U32> (exit_code));
 }
