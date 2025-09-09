@@ -467,6 +467,8 @@ namespace os
               allocated_queue_size_elements_
                   * sizeof (typename allocator_type::value_type));
         }
+
+      instrumentation::message_queue::created (this);
     }
 
     /**
@@ -512,6 +514,8 @@ namespace os
       port::message_queue::destroy (this);
 
 #endif
+
+      instrumentation::message_queue::destroyed (this);
     }
 
     /**
@@ -944,7 +948,9 @@ namespace os
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
-      return port::message_queue::send (this, msg, nbytes, mprio);
+      result_t res = port::message_queue::send (this, msg, nbytes, mprio);
+      instrumentation::message_queue::sent (this, nbytes, mprio, res);
+      return res;
 
 #else
 
@@ -954,6 +960,8 @@ namespace os
 
         if (internal_try_send_ (msg, nbytes, mprio))
           {
+            instrumentation::message_queue::sent (this, nbytes, mprio,
+                                                  result::ok);
             return result::ok;
           }
         // ----- Exit critical section ----------------------------------------
@@ -974,6 +982,8 @@ namespace os
 
             if (internal_try_send_ (msg, nbytes, mprio))
               {
+                instrumentation::message_queue::sent (this, nbytes, mprio,
+                                                      result::ok);
                 return result::ok;
               }
 
@@ -997,11 +1007,15 @@ namespace os
               trace::printf ("%s(%p,%d,%d) EINTR @%p %s\n", __func__, msg,
                              nbytes, mprio, this, name ());
 #endif
+              instrumentation::message_queue::sent (this, nbytes, mprio,
+                                                    EINTR);
               return EINTR;
             }
         }
 
       /* NOTREACHED */
+      instrumentation::message_queue::sent (this, nbytes, mprio,
+                                            ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
@@ -1055,7 +1069,9 @@ namespace os
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
-      return port::message_queue::try_send (this, msg, nbytes, mprio);
+      result_t res = port::message_queue::try_send (this, msg, nbytes, mprio);
+      instrumentation::message_queue::try_sent (this, nbytes, mprio, res);
+      return res;
 
 #else
       // Don't call this from high priority interrupts.
@@ -1067,10 +1083,14 @@ namespace os
 
         if (internal_try_send_ (msg, nbytes, mprio))
           {
+            instrumentation::message_queue::try_sent (this, nbytes, mprio,
+                                                      result::ok);
             return result::ok;
           }
         else
           {
+            instrumentation::message_queue::try_sent (this, nbytes, mprio,
+                                                      EWOULDBLOCK);
             return EWOULDBLOCK;
           }
         // ----- Exit critical section ----------------------------------------
@@ -1147,8 +1167,11 @@ namespace os
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
-      return port::message_queue::timed_send (this, msg, nbytes, timeout,
-                                              mprio);
+      result_t res = port::message_queue::timed_send (this, msg, nbytes,
+                                                      timeout, mprio);
+      instrumentation::message_queue::timed_sent (this, nbytes, mprio, timeout,
+                                                  res);
+      return res;
 
 #else
 
@@ -1160,6 +1183,8 @@ namespace os
 
         if (internal_try_send_ (msg, nbytes, mprio))
           {
+            instrumentation::message_queue::timed_sent (this, nbytes, mprio,
+                                                        timeout, result::ok);
             return result::ok;
           }
         // ----- Exit critical section ----------------------------------------
@@ -1188,6 +1213,8 @@ namespace os
 
             if (internal_try_send_ (msg, nbytes, mprio))
               {
+                instrumentation::message_queue::timed_sent (
+                    this, nbytes, mprio, timeout, result::ok);
                 return result::ok;
               }
 
@@ -1213,6 +1240,8 @@ namespace os
               trace::printf ("%s(%p,%u,%u,%u) EINTR @%p %s\n", __func__, msg,
                              nbytes, mprio, timeout, this, name ());
 #endif
+              instrumentation::message_queue::timed_sent (this, nbytes, mprio,
+                                                          timeout, EINTR);
               return EINTR;
             }
 
@@ -1222,11 +1251,15 @@ namespace os
               trace::printf ("%s(%p,%u,%u,%u) ETIMEDOUT @%p %s\n", __func__,
                              msg, nbytes, mprio, timeout, this, name ());
 #endif
+              instrumentation::message_queue::timed_sent (this, nbytes, mprio,
+                                                          timeout, ETIMEDOUT);
               return ETIMEDOUT;
             }
         }
 
       /* NOTREACHED */
+      instrumentation::message_queue::timed_sent (this, nbytes, mprio, timeout,
+                                                  ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
@@ -1287,7 +1320,9 @@ namespace os
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
-      return port::message_queue::receive (this, msg, nbytes, mprio);
+      result_t res = port::message_queue::receive (this, msg, nbytes, mprio);
+      instrumentation::message_queue::received (this, nbytes, res);
+      return res;
 
 #else
 
@@ -1299,6 +1334,8 @@ namespace os
 
         if (internal_try_receive_ (msg, nbytes, mprio))
           {
+            instrumentation::message_queue::received (this, nbytes,
+                                                      result::ok);
             return result::ok;
           }
         // ----- Exit critical section ----------------------------------------
@@ -1319,6 +1356,8 @@ namespace os
 
             if (internal_try_receive_ (msg, nbytes, mprio))
               {
+                instrumentation::message_queue::received (this, nbytes,
+                                                          result::ok);
                 return result::ok;
               }
 
@@ -1342,11 +1381,13 @@ namespace os
               trace::printf ("%s(%p,%u) EINTR @%p %s\n", __func__, msg, nbytes,
                              this, name ());
 #endif
+              instrumentation::message_queue::received (this, nbytes, EINTR);
               return EINTR;
             }
         }
 
       /* NOTREACHED */
+      instrumentation::message_queue::received (this, nbytes, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
@@ -1399,7 +1440,10 @@ namespace os
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
-      return port::message_queue::try_receive (this, msg, nbytes, mprio);
+      result_t res
+          = port::message_queue::try_receive (this, msg, nbytes, mprio);
+      instrumentation::message_queue::try_received (this, nbytes, res);
+      return res;
 
 #else
 
@@ -1412,10 +1456,14 @@ namespace os
 
         if (internal_try_receive_ (msg, nbytes, mprio))
           {
+            instrumentation::message_queue::try_received (this, nbytes,
+                                                          result::ok);
             return result::ok;
           }
         else
           {
+            instrumentation::message_queue::try_received (this, nbytes,
+                                                          EWOULDBLOCK);
             return EWOULDBLOCK;
           }
         // ----- Exit critical section ----------------------------------------
@@ -1505,8 +1553,11 @@ namespace os
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
-      return port::message_queue::timed_receive (this, msg, nbytes, timeout,
-                                                 mprio);
+      result_t res = port::message_queue::timed_receive (this, msg, nbytes,
+                                                         timeout, mprio);
+      instrumentation::message_queue::timed_received (this, nbytes, timeout,
+                                                      res);
+      return res;
 
 #else
 
@@ -1518,6 +1569,8 @@ namespace os
 
         if (internal_try_receive_ (msg, nbytes, mprio))
           {
+            instrumentation::message_queue::timed_received (
+                this, nbytes, timeout, result::ok);
             return result::ok;
           }
         // ----- Exit critical section ----------------------------------------
@@ -1545,6 +1598,8 @@ namespace os
 
             if (internal_try_receive_ (msg, nbytes, mprio))
               {
+                instrumentation::message_queue::timed_received (
+                    this, nbytes, timeout, result::ok);
                 return result::ok;
               }
 
@@ -1570,6 +1625,8 @@ namespace os
               trace::printf ("%s(%p,%u,%u) EINTR @%p %s\n", __func__, msg,
                              nbytes, timeout, this, name ());
 #endif
+              instrumentation::message_queue::timed_received (this, nbytes,
+                                                              timeout, EINTR);
               return EINTR;
             }
 
@@ -1579,11 +1636,15 @@ namespace os
               trace::printf ("%s(%p,%u,%u) ETIMEDOUT @%p %s\n", __func__, msg,
                              nbytes, timeout, this, name ());
 #endif
+              instrumentation::message_queue::timed_received (
+                  this, nbytes, timeout, ETIMEDOUT);
               return ETIMEDOUT;
             }
         }
 
       /* NOTREACHED */
+      instrumentation::message_queue::timed_received (this, nbytes, timeout,
+                                                      ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif

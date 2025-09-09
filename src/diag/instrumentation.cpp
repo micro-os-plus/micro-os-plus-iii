@@ -143,6 +143,99 @@ namespace os
       }
     } // namespace semaphore
 
+    namespace message_queue
+    {
+      void
+      created (os::rtos::message_queue* mqueue)
+      {
+        SEGGER_SYSVIEW_NameResource (reinterpret_cast<U32> (mqueue),
+                                     mqueue->name ());
+        SEGGER_SYSVIEW_RecordU32x3 (
+            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_CREATED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
+            static_cast<U32> (mqueue->capacity ()),
+            static_cast<U32> (mqueue->msg_size ()));
+      }
+
+      void
+      destroyed (os::rtos::message_queue* mqueue)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_DESTROYED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)));
+      }
+
+      void
+      sent (os::rtos::message_queue* mqueue, std::size_t nbytes,
+            unsigned int mprio, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordU32x5 (
+            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_SENT,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
+            static_cast<U32> (nbytes), static_cast<U32> (mprio),
+            static_cast<U32> (mqueue->length ()), static_cast<U32> (res));
+      }
+
+      void
+      try_sent (os::rtos::message_queue* mqueue, std::size_t nbytes,
+                unsigned int mprio, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordU32x5 (
+            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TRY_SENT,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
+            static_cast<U32> (nbytes), static_cast<U32> (mprio),
+            static_cast<U32> (mqueue->length ()), static_cast<U32> (res));
+      }
+
+      void
+      timed_sent (os::rtos::message_queue* mqueue, std::size_t nbytes,
+                  unsigned int mprio, unsigned int timeout,
+                  os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordU32x6 (
+            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TIMED_SENT,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
+            static_cast<U32> (nbytes), static_cast<U32> (mprio),
+            static_cast<U32> (timeout), static_cast<U32> (mqueue->length ()),
+            static_cast<U32> (res));
+      }
+
+      void
+      received (os::rtos::message_queue* mqueue, std::size_t nbytes,
+                os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordU32x4 (
+            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_RECEIVED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
+            static_cast<U32> (nbytes), static_cast<U32> (mqueue->length ()),
+            static_cast<U32> (res));
+      }
+
+      void
+      try_received (os::rtos::message_queue* mqueue, std::size_t nbytes,
+                    os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordU32x4 (
+            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TRY_RECEIVED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
+            static_cast<U32> (nbytes), static_cast<U32> (mqueue->length ()),
+            static_cast<U32> (res));
+      }
+
+      void
+      timed_received (os::rtos::message_queue* mqueue, std::size_t nbytes,
+                      unsigned int timeout, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordU32x5 (
+            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TIMED_RECEIVED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
+            static_cast<U32> (nbytes), static_cast<U32> (timeout),
+            static_cast<U32> (mqueue->length ()), static_cast<U32> (res));
+      }
+    } // namespace message_queue
+
+    // ------------------------------------------------------------------------
+
     void
     exit (int exit_code)
     {
@@ -152,6 +245,8 @@ namespace os
 
   } // namespace instrumentation
 } // namespace os
+
+// ----------------------------------------------------------------------------
 
 void
 os_instrumentation_exit (int exit_code)

@@ -65,6 +65,26 @@
 #define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_TIMED_WAITING \
   (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 13u)
 
+// 46
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_CREATED \
+  (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 14u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_DESTROYED \
+  (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 15u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_SENT \
+  (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 16u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TRY_SENT \
+  (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 17u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TIMED_SENT \
+  (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 18u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_RECEIVED \
+  (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 19u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TRY_RECEIVED \
+  (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 20u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TIMED_RECEIVED \
+  (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 21u)
+
+// 54
+
 #if defined(OS_INCLUDE_INSTRUMENTATION)
 
 // Invoke SEGGER SystemView functions.
@@ -218,6 +238,40 @@ namespace os
       void
       timed_waiting (os::rtos::semaphore* semaphore, os::rtos::result_t res);
     } // namespace semaphore
+
+    namespace message_queue
+    {
+      void
+      created (os::rtos::message_queue* mqueue);
+
+      void
+      destroyed (os::rtos::message_queue* mqueue);
+
+      void
+      sent (os::rtos::message_queue* mqueue, std::size_t nbytes,
+            unsigned int mprio, os::rtos::result_t res);
+
+      void
+      try_sent (os::rtos::message_queue* mqueue, std::size_t nbytes,
+                unsigned int mprio, os::rtos::result_t res);
+
+      void
+      timed_sent (os::rtos::message_queue* mqueue, std::size_t nbytes,
+                  unsigned int mprio, unsigned int timeout,
+                  os::rtos::result_t res);
+
+      void
+      received (os::rtos::message_queue* mqueue, std::size_t nbytes,
+                os::rtos::result_t res);
+
+      void
+      try_received (os::rtos::message_queue* mqueue, std::size_t nbytes,
+                    os::rtos::result_t res);
+
+      void
+      timed_received (os::rtos::message_queue* mqueue, std::size_t nbytes,
+                      unsigned int timeout, os::rtos::result_t res);
+    } // namespace message_queue
 
     void
     exit (int exit_code);
@@ -400,6 +454,58 @@ namespace os
       {
       }
     } // namespace semaphore
+
+    namespace message_queue
+    {
+      static void inline __attribute__ ((__always_inline__))
+      created (os::rtos::message_queue* mqueue)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      destroyed (os::rtos::message_queue* mqueue)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      sent (os::rtos::message_queue* mqueue, std::size_t nbytes,
+            unsigned int mprio, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      try_sent (os::rtos::message_queue* mqueue, std::size_t nbytes,
+                unsigned int mprio, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      timed_sent (os::rtos::message_queue* mqueue, std::size_t nbytes,
+                  unsigned int mprio, unsigned int timeout,
+                  os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      received (os::rtos::message_queue* mqueue, std::size_t nbytes,
+                os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      try_received (os::rtos::message_queue* mqueue, std::size_t nbytes,
+                    os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      timed_received (os::rtos::message_queue* mqueue, std::size_t nbytes,
+                      unsigned int timeout, os::rtos::result_t res)
+      {
+      }
+    } // namespace message_queue
+
+    // ------------------------------------------------------------------------
 
     static void inline __attribute__ ((__always_inline__))
     exit (int exit_code)
