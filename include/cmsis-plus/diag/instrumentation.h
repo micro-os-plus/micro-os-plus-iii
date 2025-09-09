@@ -37,6 +37,19 @@
 #define OS_INTEGER_INSTRUMENTATION_ID_EXIT \
   (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 1u)
 
+#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_CREATED \
+  (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 2u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_DESTROYED \
+  (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 3u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_LOCKED \
+  (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 4u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_TRY_LOCKED \
+  (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 5u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_TIMED_LOCKED \
+  (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 6u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_UNLOCKED \
+  (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 7u)
+
 #if defined(OS_INCLUDE_INSTRUMENTATION)
 
 // Invoke SEGGER SystemView functions.
@@ -148,6 +161,32 @@ namespace os
         SEGGER_SYSVIEW_HeapFree (heap, user_data);
       }
     } // namespace heap
+
+    namespace mutex
+    {
+      void
+      created (os::rtos::mutex* mutex);
+
+      static void inline __attribute__ ((__always_inline__))
+      destroyed (os::rtos::mutex* mutex)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_MUTEX_DESTROYED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mutex)));
+      }
+
+      void
+      locked (os::rtos::mutex* mutex, os::rtos::result_t result);
+
+      void
+      try_locked (os::rtos::mutex* mutex, os::rtos::result_t result);
+
+      void
+      timed_locked (os::rtos::mutex* mutex, os::rtos::result_t result);
+
+      void
+      unlocked (os::rtos::mutex* mutex, os::rtos::result_t result);
+    } // namespace mutex
 
     void
     exit (int exit_code);
@@ -264,6 +303,39 @@ namespace os
       {
       }
     } // namespace heap
+
+    namespace mutex
+    {
+      static void inline __attribute__ ((__always_inline__))
+      created (os::rtos::mutex* mutex)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      destroyed (os::rtos::mutex* mutex)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      locked (os::rtos::mutex* mutex, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      try_locked (os::rtos::mutex* mutex, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      timed_locked (os::rtos::mutex* mutex, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      unlocked (os::rtos::mutex* mutex, os::rtos::result_t res)
+      {
+      }
+    } // namespace mutex
 
     static void inline __attribute__ ((__always_inline__))
     exit (int exit_code)

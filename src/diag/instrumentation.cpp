@@ -25,6 +25,57 @@ namespace os
   namespace instrumentation
   {
 
+    namespace mutex
+    {
+      void
+      created (os::rtos::mutex* mutex)
+      {
+        SEGGER_SYSVIEW_NameResource (reinterpret_cast<U32> (mutex),
+                                     mutex->name ());
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_MUTEX_CREATED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mutex)),
+            mutex->type ());
+      }
+
+      void
+      locked (os::rtos::mutex* mutex, os::rtos::result_t result)
+      {
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_MUTEX_LOCKED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mutex)),
+            static_cast<U32> (result));
+      }
+
+      void
+      try_locked (os::rtos::mutex* mutex, os::rtos::result_t result)
+      {
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_MUTEX_TRY_LOCKED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mutex)),
+            static_cast<U32> (result));
+      }
+
+      void
+      timed_locked (os::rtos::mutex* mutex, os::rtos::result_t result)
+      {
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_MUTEX_TIMED_LOCKED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mutex)),
+            static_cast<U32> (result));
+      }
+
+      void
+      unlocked (os::rtos::mutex* mutex, os::rtos::result_t result)
+      {
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_MUTEX_UNLOCKED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mutex)),
+            static_cast<U32> (result));
+      }
+
+    } // namespace mutex
+
     void
     exit (int exit_code)
     {

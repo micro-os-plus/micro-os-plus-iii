@@ -513,6 +513,8 @@ namespace os
           max_count_ ((attr.mx_type == type::recursive) ? attr.mx_max_count
                                                         : 1)
     {
+      using namespace os;
+
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
@@ -546,6 +548,8 @@ namespace os
       internal_init_ ();
 
 #endif
+
+      instrumentation::mutex::created (this);
     }
 
     /**
@@ -570,6 +574,8 @@ namespace os
      */
     mutex::~mutex ()
     {
+      using namespace os;
+
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -586,6 +592,7 @@ namespace os
       assert (list_.empty ());
 
 #endif
+      instrumentation::mutex::destroyed (this);
     }
 
     /**
@@ -1003,6 +1010,8 @@ namespace os
     result_t
     mutex::lock (void)
     {
+      using namespace os;
+
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
                      &this_thread::thread (), this_thread::thread ().name ());
@@ -1015,12 +1024,15 @@ namespace os
 
       if (!recoverable_)
         {
+          instrumentation::mutex::locked (this, ENOTRECOVERABLE);
           return ENOTRECOVERABLE;
         }
 
 #if defined(OS_USE_RTOS_PORT_MUTEX)
 
-      return port::mutex::lock (this);
+      result_t res = port::mutex::lock (this);
+      instrumentation::mutex::locked (this, res);
+      return res;
 
 #else
 
@@ -1034,6 +1046,7 @@ namespace os
         res = internal_try_lock_ (&crt_thread);
         if (res != EWOULDBLOCK)
           {
+            instrumentation::mutex::locked (this, res);
             return res;
           }
         // ----- Exit critical section ----------------------------------------
@@ -1053,6 +1066,7 @@ namespace os
             res = internal_try_lock_ (&crt_thread);
             if (res != EWOULDBLOCK)
               {
+                instrumentation::mutex::locked (this, res);
                 return res;
               }
 
@@ -1080,11 +1094,13 @@ namespace os
 #if defined(OS_TRACE_RTOS_MUTEX)
               trace::printf ("%s() EINTR @%p %s\n", __func__, this, name ());
 #endif
+              instrumentation::mutex::locked (this, EINTR);
               return EINTR;
             }
         }
 
       /* NOTREACHED */
+      instrumentation::mutex::locked (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
@@ -1137,12 +1153,16 @@ namespace os
 
       if (!recoverable_)
         {
+          instrumentation::mutex::try_locked (this, ENOTRECOVERABLE);
           return ENOTRECOVERABLE;
         }
 
 #if defined(OS_USE_RTOS_PORT_MUTEX)
 
-      return port::mutex::try_lock (this);
+      result_t res = port::mutex::try_lock (this);
+
+      instrumentation::mutex::try_locked (this, res);
+      return res;
 
 #else
 
@@ -1152,7 +1172,10 @@ namespace os
         // ----- Enter critical section ---------------------------------------
         scheduler::critical_section scs;
 
-        return internal_try_lock_ (&crt_thread);
+        result_t res = internal_try_lock_ (&crt_thread);
+
+        instrumentation::mutex::try_locked (this, res);
+        return res;
         // ----- Exit critical section ----------------------------------------
       }
 
@@ -1225,12 +1248,16 @@ namespace os
 
       if (!recoverable_)
         {
+          instrumentation::mutex::timed_locked (this, ENOTRECOVERABLE);
           return ENOTRECOVERABLE;
         }
 
 #if defined(OS_USE_RTOS_PORT_MUTEX)
 
-      return port::mutex::timed_lock (this, timeout);
+      result_t res = port::mutex::timed_lock (this, timeout);
+
+      instrumentation::mutex::timed_locked (this, res);
+      return res;
 
 #else
 
@@ -1247,6 +1274,7 @@ namespace os
         res = internal_try_lock_ (&crt_thread);
         if (res != EWOULDBLOCK)
           {
+            instrumentation::mutex::timed_locked (this, res);
             return res;
           }
         // ----- Exit critical section ----------------------------------------
@@ -1273,6 +1301,7 @@ namespace os
             res = internal_try_lock_ (&crt_thread);
             if (res != EWOULDBLOCK)
               {
+                instrumentation::mutex::timed_locked (this, res);
                 return res;
               }
 
@@ -1345,11 +1374,13 @@ namespace os
                       owner_->priority (boosted_prio_);
                     }
                 }
+              instrumentation::mutex::timed_locked (this, res);
               return res;
             }
         }
 
       /* NOTREACHED */
+      instrumentation::mutex::timed_locked (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
@@ -1391,13 +1422,19 @@ namespace os
 
 #if defined(OS_USE_RTOS_PORT_MUTEX)
 
-      return port::mutex::unlock (this);
+      result_t res = port::mutex::unlock (this);
+
+      instrumentation::mutex::unlocked (this, res);
+      return res;
 
 #else
 
       thread* crt_thread = &this_thread::thread ();
 
-      return internal_unlock_ (crt_thread);
+      result_t res = internal_unlock_ (crt_thread);
+
+      instrumentation::mutex::unlocked (this, res);
+      return res;
 
 #endif
     }
