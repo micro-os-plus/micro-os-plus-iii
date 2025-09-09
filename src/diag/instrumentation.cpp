@@ -39,6 +39,14 @@ namespace os
       }
 
       void
+      destroyed (os::rtos::mutex* mutex)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_MUTEX_DESTROYED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mutex)));
+      }
+
+      void
       locked (os::rtos::mutex* mutex, os::rtos::result_t result)
       {
         SEGGER_SYSVIEW_RecordU32x2 (

@@ -167,13 +167,8 @@ namespace os
       void
       created (os::rtos::mutex* mutex);
 
-      static void inline __attribute__ ((__always_inline__))
-      destroyed (os::rtos::mutex* mutex)
-      {
-        SEGGER_SYSVIEW_RecordU32 (
-            OS_INTEGER_INSTRUMENTATION_ID_MUTEX_DESTROYED,
-            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mutex)));
-      }
+      void
+      destroyed (os::rtos::mutex* mutex);
 
       void
       locked (os::rtos::mutex* mutex, os::rtos::result_t result);
