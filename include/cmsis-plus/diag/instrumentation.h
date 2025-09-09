@@ -37,6 +37,7 @@
 #define OS_INTEGER_INSTRUMENTATION_ID_EXIT \
   (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 1u)
 
+// 34
 #define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_CREATED \
   (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 2u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_DESTROYED \
@@ -49,6 +50,20 @@
   (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 6u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_UNLOCKED \
   (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 7u)
+
+// 40
+#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_CREATED \
+  (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 8u)
+#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_DESTROYED \
+  (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 9u)
+#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_POSTED \
+  (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 10u)
+#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_WAITING \
+  (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 11u)
+#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_TRY_WAITING \
+  (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 12u)
+#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_TIMED_WAITING \
+  (OS_INTEGER_INSTRUMENTATION_ID_OFFSET + 13u)
 
 #if defined(OS_INCLUDE_INSTRUMENTATION)
 
@@ -182,6 +197,27 @@ namespace os
       void
       unlocked (os::rtos::mutex* mutex, os::rtos::result_t result);
     } // namespace mutex
+
+    namespace semaphore
+    {
+      void
+      created (os::rtos::semaphore* semaphore);
+
+      void
+      destroyed (os::rtos::semaphore* semaphore);
+
+      void
+      posted (os::rtos::semaphore* semaphore, os::rtos::result_t res);
+
+      void
+      waiting (os::rtos::semaphore* semaphore, os::rtos::result_t res);
+
+      void
+      try_waiting (os::rtos::semaphore* semaphore, os::rtos::result_t res);
+
+      void
+      timed_waiting (os::rtos::semaphore* semaphore, os::rtos::result_t res);
+    } // namespace semaphore
 
     void
     exit (int exit_code);
@@ -331,6 +367,39 @@ namespace os
       {
       }
     } // namespace mutex
+
+    namespace semaphore
+    {
+      static void inline __attribute__ ((__always_inline__))
+      created (os::rtos::semaphore* semaphore)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      destroyed (os::rtos::semaphore* semaphore)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      posted (os::rtos::semaphore* semaphore, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      waiting (os::rtos::semaphore* semaphore, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      try_waiting (os::rtos::semaphore* semaphore, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      timed_waiting (os::rtos::semaphore* semaphore, os::rtos::result_t res)
+      {
+      }
+    } // namespace semaphore
 
     static void inline __attribute__ ((__always_inline__))
     exit (int exit_code)

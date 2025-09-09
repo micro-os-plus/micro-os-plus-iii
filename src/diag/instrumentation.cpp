@@ -84,6 +84,65 @@ namespace os
 
     } // namespace mutex
 
+    namespace semaphore
+    {
+      void
+      created (os::rtos::semaphore* semaphore)
+      {
+        SEGGER_SYSVIEW_NameResource (reinterpret_cast<U32> (semaphore),
+                                     semaphore->name ());
+        SEGGER_SYSVIEW_RecordU32x3 (
+            OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_CREATED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (semaphore)),
+            static_cast<U32> (semaphore->max_value ()),
+            static_cast<U32> (semaphore->value ()));
+      }
+
+      void
+      destroyed (os::rtos::semaphore* semaphore)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_DESTROYED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (semaphore)));
+      }
+
+      void
+      posted (os::rtos::semaphore* semaphore, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordU32x3 (
+            OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_POSTED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (semaphore)),
+            static_cast<U32> (semaphore->value ()), static_cast<U32> (res));
+      }
+
+      void
+      waiting (os::rtos::semaphore* semaphore, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordU32x3 (
+            OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_WAITING,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (semaphore)),
+            static_cast<U32> (semaphore->value ()), static_cast<U32> (res));
+      }
+
+      void
+      try_waiting (os::rtos::semaphore* semaphore, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordU32x3 (
+            OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_TRY_WAITING,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (semaphore)),
+            static_cast<U32> (semaphore->value ()), static_cast<U32> (res));
+      }
+
+      void
+      timed_waiting (os::rtos::semaphore* semaphore, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordU32x3 (
+            OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_TIMED_WAITING,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (semaphore)),
+            static_cast<U32> (semaphore->value ()), static_cast<U32> (res));
+      }
+    } // namespace semaphore
+
     void
     exit (int exit_code)
     {

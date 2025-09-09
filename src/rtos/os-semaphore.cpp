@@ -195,6 +195,8 @@ namespace os
       internal_init_ ();
 
 #endif
+
+      instrumentation::semaphore::created (this);
     }
 
     /**
@@ -238,6 +240,8 @@ namespace os
       assert (list_.empty ());
 
 #endif
+
+      instrumentation::semaphore::destroyed (this);
     }
 
     /**
@@ -346,7 +350,9 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
-      return port::semaphore::post (this);
+      result_t res = port::semaphore::post (this);
+      instrumentation::semaphore::posted (this, res);
+      return res;
 
 #else
 
@@ -362,6 +368,7 @@ namespace os
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
             trace::printf ("%s() @%p %s EAGAIN\n", __func__, this, name ());
 #endif
+            instrumentation::semaphore::posted (this, EAGAIN);
             return EAGAIN;
           }
 
@@ -384,6 +391,7 @@ namespace os
       // Wake-up one thread.
       list_.resume_one ();
 
+      instrumentation::semaphore::posted (this, result::ok);
       return result::ok;
 
 #endif
@@ -435,7 +443,9 @@ namespace os
 
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
-      return port::semaphore::wait (this);
+      result_t res = port::semaphore::wait (this);
+      instrumentation::semaphore::waiting (this, res);
+      return res;
 
 #else
 
@@ -447,6 +457,7 @@ namespace os
 
         if (internal_try_wait_ ())
           {
+            instrumentation::semaphore::waiting (this, result::ok);
             return result::ok;
           }
         // ----- Exit critical section ----------------------------------------
@@ -467,6 +478,7 @@ namespace os
 
             if (internal_try_wait_ ())
               {
+                instrumentation::semaphore::waiting (this, result::ok);
                 return result::ok;
               }
 
@@ -489,11 +501,13 @@ namespace os
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
               trace::printf ("%s() EINTR @%p %s\n", __func__, this, name ());
 #endif
+              instrumentation::semaphore::waiting (this, EINTR);
               return EINTR;
             }
         }
 
       /* NOTREACHED */
+      instrumentation::semaphore::waiting (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
@@ -535,7 +549,9 @@ namespace os
 
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
-      return port::semaphore::try_wait (this);
+      result_t res = port::semaphore::try_wait (this);
+      instrumentation::semaphore::try_waiting (this, res);
+      return res;
 
 #else
 
@@ -545,10 +561,12 @@ namespace os
 
         if (internal_try_wait_ ())
           {
+            instrumentation::semaphore::try_waiting (this, result::ok);
             return result::ok;
           }
         else
           {
+            instrumentation::semaphore::try_waiting (this, EWOULDBLOCK);
             return EWOULDBLOCK;
           }
         // ----- Exit critical section ----------------------------------------
@@ -619,7 +637,9 @@ namespace os
 
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
-      return port::semaphore::timed_wait (this, timeout);
+      result_t res = port::semaphore::timed_wait (this, timeout);
+      instrumentation::semaphore::timed_waiting (this, res);
+      return res;
 
 #else
 
@@ -631,6 +651,7 @@ namespace os
 
         if (internal_try_wait_ ())
           {
+            instrumentation::semaphore::timed_waiting (this, result::ok);
             return result::ok;
           }
         // ----- Exit critical section ----------------------------------------
@@ -658,6 +679,7 @@ namespace os
 
             if (internal_try_wait_ ())
               {
+                instrumentation::semaphore::timed_waiting (this, result::ok);
                 return result::ok;
               }
 
@@ -690,6 +712,7 @@ namespace os
                              name ());
 #pragma GCC diagnostic pop
 #endif
+              instrumentation::semaphore::timed_waiting (this, EINTR);
               return EINTR;
             }
 
@@ -706,11 +729,13 @@ namespace os
                              name ());
 #pragma GCC diagnostic pop
 #endif
+              instrumentation::semaphore::timed_waiting (this, ETIMEDOUT);
               return ETIMEDOUT;
             }
         }
 
       /* NOTREACHED */
+      instrumentation::semaphore::timed_waiting (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
