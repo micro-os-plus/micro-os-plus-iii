@@ -101,9 +101,10 @@ namespace os
       void
       destroyed (os::rtos::semaphore* semaphore)
       {
-        SEGGER_SYSVIEW_RecordU32 (
+        SEGGER_SYSVIEW_RecordU32x2 (
             OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_DESTROYED,
-            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (semaphore)));
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (semaphore)),
+            static_cast<U32> (semaphore->value ()));
       }
 
       void
@@ -134,12 +135,14 @@ namespace os
       }
 
       void
-      timed_waiting (os::rtos::semaphore* semaphore, os::rtos::result_t res)
+      timed_waiting (os::rtos::semaphore* semaphore, unsigned int timeout,
+                     os::rtos::result_t res)
       {
-        SEGGER_SYSVIEW_RecordU32x3 (
+        SEGGER_SYSVIEW_RecordU32x4 (
             OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_TIMED_WAITING,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (semaphore)),
-            static_cast<U32> (semaphore->value ()), static_cast<U32> (res));
+            static_cast<U32> (timeout), static_cast<U32> (semaphore->value ()),
+            static_cast<U32> (res));
       }
     } // namespace semaphore
 

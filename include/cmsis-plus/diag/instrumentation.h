@@ -256,7 +256,8 @@ namespace os
       try_waiting (os::rtos::semaphore* semaphore, os::rtos::result_t res);
 
       void
-      timed_waiting (os::rtos::semaphore* semaphore, os::rtos::result_t res);
+      timed_waiting (os::rtos::semaphore* semaphore, unsigned int timeout,
+                     os::rtos::result_t res);
     } // namespace semaphore
 
     namespace message_queue
@@ -470,7 +471,8 @@ namespace os
       }
 
       static void inline __attribute__ ((__always_inline__))
-      timed_waiting (os::rtos::semaphore* semaphore, os::rtos::result_t res)
+      timed_waiting (os::rtos::semaphore* semaphore, unsigned int timeout,
+                     os::rtos::result_t res)
       {
       }
     } // namespace semaphore
