@@ -32,10 +32,12 @@ namespace os
       {
         SEGGER_SYSVIEW_NameResource (reinterpret_cast<U32> (mutex),
                                      mutex->name ());
-        SEGGER_SYSVIEW_RecordU32x2 (
+        SEGGER_SYSVIEW_RecordU32x4 (
             OS_INTEGER_INSTRUMENTATION_ID_MUTEX_CREATED,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mutex)),
-            mutex->type ());
+            static_cast<U32> (mutex->type ()),
+            static_cast<U32> (mutex->protocol ()),
+            static_cast<U32> (mutex->robustness ()));
       }
 
       void
@@ -49,36 +51,40 @@ namespace os
       void
       locked (os::rtos::mutex* mutex, os::rtos::result_t result)
       {
-        SEGGER_SYSVIEW_RecordU32x2 (
+        SEGGER_SYSVIEW_RecordU32x3 (
             OS_INTEGER_INSTRUMENTATION_ID_MUTEX_LOCKED,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mutex)),
+            static_cast<U32> (mutex->prio_ceiling ()),
             static_cast<U32> (result));
       }
 
       void
       try_locked (os::rtos::mutex* mutex, os::rtos::result_t result)
       {
-        SEGGER_SYSVIEW_RecordU32x2 (
+        SEGGER_SYSVIEW_RecordU32x3 (
             OS_INTEGER_INSTRUMENTATION_ID_MUTEX_TRY_LOCKED,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mutex)),
+            static_cast<U32> (mutex->prio_ceiling ()),
             static_cast<U32> (result));
       }
 
       void
       timed_locked (os::rtos::mutex* mutex, os::rtos::result_t result)
       {
-        SEGGER_SYSVIEW_RecordU32x2 (
+        SEGGER_SYSVIEW_RecordU32x3 (
             OS_INTEGER_INSTRUMENTATION_ID_MUTEX_TIMED_LOCKED,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mutex)),
+            static_cast<U32> (mutex->prio_ceiling ()),
             static_cast<U32> (result));
       }
 
       void
       unlocked (os::rtos::mutex* mutex, os::rtos::result_t result)
       {
-        SEGGER_SYSVIEW_RecordU32x2 (
+        SEGGER_SYSVIEW_RecordU32x3 (
             OS_INTEGER_INSTRUMENTATION_ID_MUTEX_UNLOCKED,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mutex)),
+            static_cast<U32> (mutex->prio_ceiling ()),
             static_cast<U32> (result));
       }
 
