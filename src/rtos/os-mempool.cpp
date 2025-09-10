@@ -303,6 +303,8 @@ namespace os
               allocated_pool_size_elements_
                   * sizeof (typename allocator_type::value_type));
         }
+
+      instrumentation::memory_pool::created (this);
     }
 
     /**
@@ -416,6 +418,8 @@ namespace os
               ->deallocate (static_cast<pointer> (allocated_pool_addr_),
                             allocated_pool_size_elements_);
         }
+
+      instrumentation::memory_pool::destroyed (this);
     }
 
     /**
@@ -534,6 +538,7 @@ namespace os
 #if defined(OS_TRACE_RTOS_MEMPOOL)
             trace::printf ("%s()=%p @%p %s\n", __func__, p, this, name ());
 #endif
+            instrumentation::memory_pool::allocated (this, p);
             return p;
           }
         // ----- Exit critical section ----------------------------------------
@@ -558,6 +563,7 @@ namespace os
 #if defined(OS_TRACE_RTOS_MEMPOOL)
                 trace::printf ("%s()=%p @%p %s\n", __func__, p, this, name ());
 #endif
+                instrumentation::memory_pool::allocated (this, p);
                 return p;
               }
 
@@ -579,6 +585,7 @@ namespace os
 #if defined(OS_TRACE_RTOS_MEMPOOL)
               trace::printf ("%s() INTR @%p %s\n", __func__, this, name ());
 #endif
+              instrumentation::memory_pool::allocated (this, nullptr);
               return nullptr;
             }
         }
@@ -625,6 +632,7 @@ namespace os
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s()=%p @%p %s\n", __func__, p, this, name ());
 #endif
+      instrumentation::memory_pool::try_allocated (this, p);
       return p;
     }
 
@@ -701,6 +709,7 @@ namespace os
 #if defined(OS_TRACE_RTOS_MEMPOOL)
             trace::printf ("%s()=%p @%p %s\n", __func__, p, this, name ());
 #endif
+            instrumentation::memory_pool::timed_allocated (this, timeout, p);
             return p;
           }
         // ----- Exit critical section ----------------------------------------
@@ -732,6 +741,8 @@ namespace os
 #if defined(OS_TRACE_RTOS_MEMPOOL)
                 trace::printf ("%s()=%p @%p %s\n", __func__, p, this, name ());
 #endif
+                instrumentation::memory_pool::timed_allocated (this, timeout,
+                                                               p);
                 return p;
               }
 
@@ -756,6 +767,8 @@ namespace os
 #if defined(OS_TRACE_RTOS_MEMPOOL)
               trace::printf ("%s() INTR @%p %s\n", __func__, this, name ());
 #endif
+              instrumentation::memory_pool::timed_allocated (this, timeout,
+                                                             nullptr);
               return nullptr;
             }
 
@@ -764,6 +777,8 @@ namespace os
 #if defined(OS_TRACE_RTOS_MEMPOOL)
               trace::printf ("%s() TMO @%p %s\n", __func__, this, name ());
 #endif
+              instrumentation::memory_pool::timed_allocated (this, timeout,
+                                                             nullptr);
               return nullptr;
             }
         }
@@ -804,6 +819,7 @@ namespace os
           trace::printf ("%s(%p) EINVAL @%p %s\n", __func__, block, this,
                          name ());
 #endif
+          instrumentation::memory_pool::deallocated (this, block, EINVAL);
           return EINVAL;
         }
 #pragma GCC diagnostic pop
@@ -837,6 +853,7 @@ namespace os
       // Wake-up one thread, if any.
       list_.resume_one ();
 
+      instrumentation::memory_pool::deallocated (this, block, result::ok);
       return result::ok;
     }
 

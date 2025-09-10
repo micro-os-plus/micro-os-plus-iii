@@ -244,6 +244,70 @@ namespace os
       }
     } // namespace message_queue
 
+    namespace memory_pool
+    {
+      void
+      created (os::rtos::memory_pool* mpool)
+      {
+        SEGGER_SYSVIEW_NameResource (reinterpret_cast<U32> (mpool),
+                                     mpool->name ());
+        SEGGER_SYSVIEW_RecordU32x3 (
+            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_CREATED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)),
+            static_cast<U32> (mpool->capacity ()),
+            static_cast<U32> (mpool->block_size ()));
+      }
+
+      void
+      destroyed (os::rtos::memory_pool* mpool)
+      {
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_DESTROYED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)),
+            static_cast<U32> (mpool->count ()));
+      }
+
+      void
+      allocated (os::rtos::memory_pool* mpool, void* addr)
+      {
+        SEGGER_SYSVIEW_RecordU32x3 (
+            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_ALLOCATED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)),
+            static_cast<U32> (mpool->count ()), reinterpret_cast<U32> (addr));
+      }
+
+      void
+      try_allocated (os::rtos::memory_pool* mpool, void* addr)
+      {
+        SEGGER_SYSVIEW_RecordU32x3 (
+            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_TRY_ALLOCATED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)),
+            static_cast<U32> (mpool->count ()), reinterpret_cast<U32> (addr));
+      }
+
+      void
+      timed_allocated (os::rtos::memory_pool* mpool, unsigned int timeout,
+                       void* addr)
+      {
+        SEGGER_SYSVIEW_RecordU32x4 (
+            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_TIMED_ALLOCATED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)),
+            static_cast<U32> (timeout), static_cast<U32> (mpool->count ()),
+            reinterpret_cast<U32> (addr));
+      }
+
+      void
+      deallocated (os::rtos::memory_pool* mpool, void* block,
+                   os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordU32x4 (
+            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_DEALLOCATED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)),
+            reinterpret_cast<U32> (block), static_cast<U32> (mpool->count ()),
+            static_cast<U32> (res));
+      }
+    } // namespace memory_pool
+
     // ------------------------------------------------------------------------
 
     void

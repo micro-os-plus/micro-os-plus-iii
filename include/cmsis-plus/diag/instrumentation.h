@@ -294,6 +294,31 @@ namespace os
                       unsigned int timeout, os::rtos::result_t res);
     } // namespace message_queue
 
+    namespace memory_pool
+    {
+      void
+      created (os::rtos::memory_pool* mpool);
+
+      void
+      destroyed (os::rtos::memory_pool* mpool);
+
+      void
+      allocated (os::rtos::memory_pool* mpool, void* addr);
+
+      void
+      try_allocated (os::rtos::memory_pool* mpool, void* addr);
+
+      void
+      timed_allocated (os::rtos::memory_pool* mpool, unsigned int timeout,
+                       void* addr);
+
+      void
+      deallocated (os::rtos::memory_pool* mpool, void* block,
+                   os::rtos::result_t res);
+    } // namespace memory_pool
+
+    // ------------------------------------------------------------------------
+
     void
     exit (int exit_code);
 
@@ -526,6 +551,41 @@ namespace os
       {
       }
     } // namespace message_queue
+
+    namespace memory_pool
+    {
+      static void inline __attribute__ ((__always_inline__))
+      created (os::rtos::memory_pool* mpool)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      destroyed (os::rtos::memory_pool* mpool)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      allocated (os::rtos::memory_pool* mpool, void* addr)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      try_allocated (os::rtos::memory_pool* mpool, void* addr)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      timed_allocated (os::rtos::memory_pool* mpool, unsigned int timeout,
+                       void* addr)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      deallocated (os::rtos::memory_pool* mpool, void* block,
+                   os::rtos::result_t res)
+      {
+      }
+    } // namespace memory_pool
 
     // ------------------------------------------------------------------------
 
