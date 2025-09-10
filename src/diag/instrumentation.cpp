@@ -169,9 +169,10 @@ namespace os
       void
       destroyed (os::rtos::message_queue* mqueue)
       {
-        SEGGER_SYSVIEW_RecordU32 (
+        SEGGER_SYSVIEW_RecordU32x2 (
             OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_DESTROYED,
-            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)));
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
+            static_cast<U32> (mqueue->length ()));
       }
 
       void
