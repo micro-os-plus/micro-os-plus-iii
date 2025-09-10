@@ -638,7 +638,7 @@ namespace os
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
       result_t res = port::semaphore::timed_wait (this, timeout);
-      instrumentation::semaphore::timed_waiting (this, res);
+      instrumentation::semaphore::timed_waiting (this, timeout, res);
       return res;
 
 #else
@@ -651,7 +651,8 @@ namespace os
 
         if (internal_try_wait_ ())
           {
-            instrumentation::semaphore::timed_waiting (this, result::ok);
+            instrumentation::semaphore::timed_waiting (this, timeout,
+                                                       result::ok);
             return result::ok;
           }
         // ----- Exit critical section ----------------------------------------
@@ -679,7 +680,8 @@ namespace os
 
             if (internal_try_wait_ ())
               {
-                instrumentation::semaphore::timed_waiting (this, result::ok);
+                instrumentation::semaphore::timed_waiting (this, timeout,
+                                                           result::ok);
                 return result::ok;
               }
 
@@ -712,7 +714,7 @@ namespace os
                              name ());
 #pragma GCC diagnostic pop
 #endif
-              instrumentation::semaphore::timed_waiting (this, EINTR);
+              instrumentation::semaphore::timed_waiting (this, timeout, EINTR);
               return EINTR;
             }
 
@@ -729,13 +731,15 @@ namespace os
                              name ());
 #pragma GCC diagnostic pop
 #endif
-              instrumentation::semaphore::timed_waiting (this, ETIMEDOUT);
+              instrumentation::semaphore::timed_waiting (this, timeout,
+                                                         ETIMEDOUT);
               return ETIMEDOUT;
             }
         }
 
       /* NOTREACHED */
-      instrumentation::semaphore::timed_waiting (this, ENOTRECOVERABLE);
+      instrumentation::semaphore::timed_waiting (this, timeout,
+                                                 ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
