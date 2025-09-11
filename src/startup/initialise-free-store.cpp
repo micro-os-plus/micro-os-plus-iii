@@ -88,7 +88,7 @@ os_startup_initialize_free_store (void* heap_address,
 
   // Construct the memory resource used for the application free store.
   new (&application_free_store)
-      application_memory_resource{ "app", heap_address, heap_size_bytes };
+      application_memory_resource{ "app-heap", heap_address, heap_size_bytes };
 
   // Configure the memory manager to throw an exception when out of memory.
   reinterpret_cast<rtos::memory::memory_resource*> (&application_free_store)
@@ -117,7 +117,7 @@ os_startup_initialize_free_store (void* heap_address,
 
     // Allocate & construct the memory resource used for the RTOS.
     rtos::memory::memory_resource* mr = new rtos_memory_resource{
-      "sys", rtos_arena, OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES
+      "sys-heap", rtos_arena, OS_INTEGER_RTOS_DYNAMIC_MEMORY_SIZE_BYTES
     };
 
     // Configure the memory manager to throw an exception when out of memory.
@@ -143,7 +143,8 @@ os_startup_initialize_free_store (void* heap_address,
                    "Mutex pool size must be >1.");
     rtos::memory::memory_resource* mr
         = new os::memory::block_pool_typed_inclusive<
-            rtos::thread, OS_INTEGER_RTOS_ALLOC_THREAD_POOL_SIZE> ("pool-th");
+            rtos::thread, OS_INTEGER_RTOS_ALLOC_THREAD_POOL_SIZE> (
+            "threads-pool");
 
     // Configure the memory manager to throw an exception when out of memory.
     mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
@@ -161,7 +162,8 @@ os_startup_initialize_free_store (void* heap_address,
     rtos::memory::memory_resource* mr
         = new os::memory::block_pool_typed_inclusive<
             rtos::condition_variable,
-            OS_INTEGER_RTOS_ALLOC_CONDITION_VARIABLE_POOL_SIZE> ("pool-cv");
+            OS_INTEGER_RTOS_ALLOC_CONDITION_VARIABLE_POOL_SIZE> (
+            "condvars-pool");
 
     // Configure the memory manager to throw an exception when out of memory.
     mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
@@ -179,7 +181,7 @@ os_startup_initialize_free_store (void* heap_address,
     rtos::memory::memory_resource* mr
         = new os::memory::block_pool_typed_inclusive<
             rtos::event_flags, OS_INTEGER_RTOS_ALLOC_EVENT_FLAGS_POOL_SIZE> (
-            "pool-ef");
+            "evflags-pool");
 
     // Configure the memory manager to throw an exception when out of memory.
     mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
@@ -197,7 +199,7 @@ os_startup_initialize_free_store (void* heap_address,
     rtos::memory::memory_resource* mr
         = new os::memory::block_pool_typed_inclusive<
             rtos::memory_pool, OS_INTEGER_RTOS_ALLOC_MEMORY_POOL_POOL_SIZE> (
-            "pool-mp");
+            "mempools-pool");
 
     // Configure the memory manager to throw an exception when out of memory.
     mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
@@ -215,7 +217,7 @@ os_startup_initialize_free_store (void* heap_address,
     rtos::memory::memory_resource* mr
         = new os::memory::block_pool_typed_inclusive<
             rtos::message_queue,
-            OS_INTEGER_RTOS_ALLOC_MESSAGE_QUEUE_POOL_SIZE> ("pool-mq");
+            OS_INTEGER_RTOS_ALLOC_MESSAGE_QUEUE_POOL_SIZE> ("mqueues-pool");
 
     // Configure the memory manager to throw an exception when out of memory.
     mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
@@ -232,7 +234,8 @@ os_startup_initialize_free_store (void* heap_address,
                    "Mutex pool size must be >1.");
     rtos::memory::memory_resource* mr
         = new os::memory::block_pool_typed_inclusive<
-            rtos::mutex, OS_INTEGER_RTOS_ALLOC_MUTEX_POOL_SIZE> ("pool-mx");
+            rtos::mutex, OS_INTEGER_RTOS_ALLOC_MUTEX_POOL_SIZE> (
+            "mutexes-pool");
 
     // Configure the memory manager to throw an exception when out of memory.
     mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
@@ -249,8 +252,8 @@ os_startup_initialize_free_store (void* heap_address,
                    "Semaphore pool size must be >1.");
     rtos::memory::memory_resource* mr
         = new os::memory::block_pool_typed_inclusive<
-            rtos::semaphore, OS_INTEGER_RTOS_ALLOC_MUTEX_POOL_SIZE> (
-            "pool-sp");
+            rtos::semaphore, OS_INTEGER_RTOS_ALLOC_SEMAPHORE_POOL_SIZE> (
+            "semaphores-pool");
 
     // Configure the memory manager to throw an exception when out of memory.
     mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
@@ -267,7 +270,8 @@ os_startup_initialize_free_store (void* heap_address,
                    "Mutex pool size must be >1.");
     rtos::memory::memory_resource* mr
         = new os::memory::block_pool_typed_inclusive<
-            rtos::timer, OS_INTEGER_RTOS_ALLOC_TIMER_POOL_SIZE> ("pool-tm");
+            rtos::timer, OS_INTEGER_RTOS_ALLOC_TIMER_POOL_SIZE> (
+            "timers-pool");
 
     // Configure the memory manager to throw an exception when out of memory.
     mr->out_of_memory_handler (os_rtos_system_out_of_memory_hook);
