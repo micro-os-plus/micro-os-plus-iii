@@ -232,7 +232,8 @@ namespace os
       try_locked (os::rtos::mutex* mutex, os::rtos::result_t result);
 
       void
-      timed_locked (os::rtos::mutex* mutex, os::rtos::result_t result);
+      timed_locked (os::rtos::mutex* mutex, unsigned int timeout,
+                    os::rtos::result_t result);
 
       void
       unlocked (os::rtos::mutex* mutex, os::rtos::result_t result);
@@ -458,7 +459,8 @@ namespace os
       }
 
       static void inline __attribute__ ((__always_inline__))
-      timed_locked (os::rtos::mutex* mutex, os::rtos::result_t res)
+      timed_locked (os::rtos::mutex* mutex, unsigned int timeout,
+                    os::rtos::result_t res)
       {
       }
 

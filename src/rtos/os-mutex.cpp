@@ -1248,7 +1248,8 @@ namespace os
 
       if (!recoverable_)
         {
-          instrumentation::mutex::timed_locked (this, ENOTRECOVERABLE);
+          instrumentation::mutex::timed_locked (this, timeout,
+                                                ENOTRECOVERABLE);
           return ENOTRECOVERABLE;
         }
 
@@ -1256,7 +1257,7 @@ namespace os
 
       result_t res = port::mutex::timed_lock (this, timeout);
 
-      instrumentation::mutex::timed_locked (this, res);
+      instrumentation::mutex::timed_locked (this, timeout, res);
       return res;
 
 #else
@@ -1274,7 +1275,7 @@ namespace os
         res = internal_try_lock_ (&crt_thread);
         if (res != EWOULDBLOCK)
           {
-            instrumentation::mutex::timed_locked (this, res);
+            instrumentation::mutex::timed_locked (this, timeout, res);
             return res;
           }
         // ----- Exit critical section ----------------------------------------
@@ -1301,7 +1302,7 @@ namespace os
             res = internal_try_lock_ (&crt_thread);
             if (res != EWOULDBLOCK)
               {
-                instrumentation::mutex::timed_locked (this, res);
+                instrumentation::mutex::timed_locked (this, timeout, res);
                 return res;
               }
 
@@ -1374,13 +1375,13 @@ namespace os
                       owner_->priority (boosted_prio_);
                     }
                 }
-              instrumentation::mutex::timed_locked (this, res);
+              instrumentation::mutex::timed_locked (this, timeout, res);
               return res;
             }
         }
 
       /* NOTREACHED */
-      instrumentation::mutex::timed_locked (this, ENOTRECOVERABLE);
+      instrumentation::mutex::timed_locked (this, timeout, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif

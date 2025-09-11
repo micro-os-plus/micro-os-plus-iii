@@ -69,11 +69,13 @@ namespace os
       }
 
       void
-      timed_locked (os::rtos::mutex* mutex, os::rtos::result_t result)
+      timed_locked (os::rtos::mutex* mutex, unsigned int timeout,
+                    os::rtos::result_t result)
       {
-        SEGGER_SYSVIEW_RecordU32x3 (
+        SEGGER_SYSVIEW_RecordU32x4 (
             OS_INTEGER_INSTRUMENTATION_ID_MUTEX_TIMED_LOCKED,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mutex)),
+            static_cast<U32> (timeout),
             static_cast<U32> (mutex->prio_ceiling ()),
             static_cast<U32> (result));
       }
