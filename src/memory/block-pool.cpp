@@ -76,7 +76,7 @@ namespace os
                      block_size_bytes_, this, name ());
 #endif
 
-      instrumentation::heap::allocated (this, p, block_size_bytes_);
+      instrumentation::memory_resource::allocated (this, p, block_size_bytes_);
 
       return p;
     }
@@ -126,7 +126,7 @@ namespace os
       // What is subtracted from allocated is added to free.
       internal_decrease_allocated_statistics (block_size_bytes_);
 
-      instrumentation::heap::deallocated (this, addr);
+      instrumentation::memory_resource::deallocated (this, addr);
     }
 
 #pragma GCC diagnostic push
@@ -217,7 +217,8 @@ namespace os
       allocated_chunks_ = 0;
       free_chunks_ = blocks_;
 
-      instrumentation::heap::define (this, pool_addr_, total_bytes_, 0);
+      instrumentation::memory_resource::define (this, pool_addr_, total_bytes_,
+                                                0);
     }
 
     // ------------------------------------------------------------------------

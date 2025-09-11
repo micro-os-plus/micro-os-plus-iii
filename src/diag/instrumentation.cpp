@@ -24,6 +24,17 @@ namespace os
 {
   namespace instrumentation
   {
+    namespace memory_resource
+    {
+      void
+      define (os::rtos::memory::memory_resource* heap, void* base,
+              std::size_t heap_size, std::size_t metadata_size)
+      {
+        SEGGER_SYSVIEW_NameResource (reinterpret_cast<U32> (heap),
+                                     heap->name ());
+        SEGGER_SYSVIEW_HeapDefine (heap, base, heap_size, metadata_size);
+      }
+    } // namespace memory_resource
 
     namespace mutex
     {

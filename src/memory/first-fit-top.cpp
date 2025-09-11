@@ -83,8 +83,8 @@ namespace os
       // Remember first chunk as list head.
       free_list_ = chunk;
 
-      instrumentation::heap::define (this, arena_addr_, total_bytes_,
-                                     sizeof (chunk_t));
+      instrumentation::memory_resource::define (
+          this, arena_addr_, total_bytes_, sizeof (chunk_t));
     }
 
     void
@@ -221,8 +221,8 @@ namespace os
                      name ());
 #endif
 
-      instrumentation::heap::allocated (this, aligned_payload,
-                                        alloc_size - sizeof (chunk_t));
+      instrumentation::memory_resource::allocated (
+          this, aligned_payload, alloc_size - sizeof (chunk_t));
 
       return aligned_payload;
     }
@@ -296,7 +296,7 @@ namespace os
       // What is subtracted from allocated is added to free.
       internal_decrease_allocated_statistics (chunk->size);
 
-      instrumentation::heap::deallocated (this, addr);
+      instrumentation::memory_resource::deallocated (this, addr);
 
       // If the free list is empty, create it with the current chunk, alone.
       if (free_list_ == nullptr)

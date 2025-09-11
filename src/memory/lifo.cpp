@@ -160,8 +160,8 @@ namespace os
                      alignment, aligned_payload, alloc_size, this, name ());
 #endif
 
-      instrumentation::heap::allocated (this, aligned_payload,
-                                        alloc_size - sizeof (chunk_t));
+      instrumentation::memory_resource::allocated (
+          this, aligned_payload, alloc_size - sizeof (chunk_t));
 
       return aligned_payload;
     }
