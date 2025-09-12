@@ -202,7 +202,7 @@ namespace os
        * @retval ENOTRECOVERABLE Wait failed.
        */
       result_t
-      wait (flags::mask_t mask, flags::mask_t* oflags,
+      wait (flags::mask_t mask, flags::mask_t* oflags = nullptr,
             flags::mode_t mode = flags::mode::all | flags::mode::clear);
 
       /**

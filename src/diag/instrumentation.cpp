@@ -321,6 +321,74 @@ namespace os
       }
     } // namespace memory_pool
 
+    namespace event_flags
+    {
+      void
+      created (os::rtos::event_flags* evflags)
+      {
+        SEGGER_SYSVIEW_NameResource (reinterpret_cast<U32> (evflags),
+                                     evflags->name ());
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_CREATED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (evflags)));
+      }
+
+      void
+      destroyed (os::rtos::event_flags* evflags)
+      {
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_DESTROYED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (evflags)),
+            evflags->get (0, 0));
+      }
+
+      void
+      waiting (os::rtos::event_flags* evflags, unsigned int mask,
+               unsigned int mode, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordU32x5 (
+            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_WAITING,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (evflags)),
+            static_cast<U32> (mask), static_cast<U32> (mode),
+            evflags->get (0, 0), static_cast<U32> (res));
+      }
+
+      void
+      try_waiting (os::rtos::event_flags* evflags, unsigned int mask,
+                   unsigned int mode, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordU32x5 (
+            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_TRY_WAITING,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (evflags)),
+            static_cast<U32> (mask), static_cast<U32> (mode),
+            evflags->get (0, 0), static_cast<U32> (res));
+      }
+
+      void
+      timed_waiting (os::rtos::event_flags* evflags, unsigned int mask,
+                     unsigned int mode, unsigned int timeout,
+                     os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordU32x6 (
+            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_TIMED_WAITING,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (evflags)),
+            static_cast<U32> (mask), static_cast<U32> (mode),
+            static_cast<U32> (timeout), evflags->get (0, 0),
+            static_cast<U32> (res));
+      }
+
+      void
+      raised (os::rtos::event_flags* evflags, unsigned int mask,
+              os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordU32x4 (
+            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_RAISED,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (evflags)),
+            static_cast<U32> (mask), evflags->get (0, 0),
+            static_cast<U32> (res));
+      }
+    } // namespace event_flags
+
     // ------------------------------------------------------------------------
 
     void

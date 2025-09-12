@@ -102,6 +102,20 @@
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 27u)
 
 // 60
+#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_CREATED \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 28u)
+#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_DESTROYED \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 29u)
+#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_WAITING \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 30u)
+#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_TRY_WAITING \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 31u)
+#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_TIMED_WAITING \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 32u)
+#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_RAISED \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 33u)
+
+// 34
 
 // ----------------------------------------------------------------------------
 
@@ -315,6 +329,32 @@ namespace os
       deallocated (os::rtos::memory_pool* mpool, void* block,
                    os::rtos::result_t res);
     } // namespace memory_pool
+
+    namespace event_flags
+    {
+      void
+      created (os::rtos::event_flags* evflags);
+
+      void
+      destroyed (os::rtos::event_flags* evflags);
+
+      void
+      waiting (os::rtos::event_flags* evflags, unsigned int mask,
+               unsigned int mode, os::rtos::result_t res);
+
+      void
+      try_waiting (os::rtos::event_flags* evflags, unsigned int mask,
+                   unsigned int mode, os::rtos::result_t res);
+
+      void
+      timed_waiting (os::rtos::event_flags* evflags, unsigned int mask,
+                     unsigned int mode, unsigned int timeout,
+                     os::rtos::result_t res);
+
+      void
+      raised (os::rtos::event_flags* evflags, unsigned int mask,
+              os::rtos::result_t res);
+    } // namespace event_flags
 
     // ------------------------------------------------------------------------
 
@@ -587,6 +627,44 @@ namespace os
       {
       }
     } // namespace memory_pool
+
+    namespace event_flags
+    {
+      static void inline __attribute__ ((__always_inline__))
+      created (os::rtos::event_flags* evflags)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      destroyed (os::rtos::event_flags* evflags)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      waiting (os::rtos::event_flags* evflags, unsigned int mask,
+               unsigned int mode, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      try_waiting (os::rtos::event_flags* evflags, unsigned int mask,
+                   unsigned int mode, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      timed_waiting (os::rtos::event_flags* evflags, unsigned int mask,
+                     unsigned int mode, unsigned int timeout,
+                     os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      raised (os::rtos::event_flags* evflags, unsigned int mask,
+              os::rtos::result_t res)
+      {
+      }
+    } // namespace event_flags
 
     // ------------------------------------------------------------------------
 
