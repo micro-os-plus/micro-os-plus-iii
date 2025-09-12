@@ -14,6 +14,8 @@
 #include <cmsis-plus/rtos/os-hooks.h>
 #include <cmsis_device.h>
 
+#include "gpio.h"
+
 // ----------------------------------------------------------------------------
 
 // This is the application hardware initialisation routine,
@@ -36,6 +38,8 @@ os_startup_initialize_hardware (void)
   // Call the CMSIS system clock routine to store the clock frequency
   // in the SystemCoreClock global RAM location.
   SystemCoreClockUpdate ();
+
+  MX_GPIO_Init();
 }
 
 // ----------------------------------------------------------------------------
