@@ -1,0 +1,353 @@
+/*********************************************************************
+*                 (c) SEGGER Microcontroller GmbH                    *
+*                      The Embedded Experts                          *
+*                         www.segger.com                             *
+**********************************************************************
+
+File          : micro-os-plus-iii.git/tests/platforms/nucleo-f411re/instrumentation.jdebug
+Created       : 12 Sep 2025 22:53
+Ozone Version : V3.38g
+*/
+
+/*********************************************************************
+*
+*       OnProjectLoad
+*
+* Function description
+*   Project load routine. Required.
+*
+**********************************************************************
+*/
+void OnProjectLoad (void) {
+  //
+  // Dialog-generated settings
+  //
+  Project.SetDevice ("STM32F411RE");
+  Project.SetHostIF ("USB", "");
+  Project.SetTargetIF ("SWD");
+  Project.SetTIFSpeed ("4 MHz");
+  // Project.AddPathSubstitute ("/Users/ilg/MyProjects/micro-os-plus.github/micro-os-plus-iii/micro-os-plus-iii.git/tests/platforms/nucleo-f411re", "$(ProjectDir)");
+  // Project.AddPathSubstitute ("/users/ilg/myprojects/micro-os-plus.github/micro-os-plus-iii/micro-os-plus-iii.git/tests/platforms/nucleo-f411re", "$(ProjectDir)");
+  //
+  // User settings
+  //
+  Edit.SysVar (VAR_BREAK_AT_THIS_SYMBOL, "os_main");
+  // File.Open ("/Users/ilg/MyProjects/micro-os-plus.github/micro-os-plus-iii/micro-os-plus-iii.git/tests/build/nucleo-f411re-cmake-debug/platform-bin/blinky-system-view-test.elf");
+  File.Open ("../../build/nucleo-f411re-cmake-debug/platform-bin/instrumentation-test.elf");
+
+}
+
+/*********************************************************************
+*
+*       OnStartupComplete
+*
+* Function description
+*   Called when program execution has reached/passed
+*   the startup completion point. Optional.
+*
+**********************************************************************
+*/
+//void OnStartupComplete (void) {
+//}
+
+/*********************************************************************
+*
+*      TargetReset
+*
+* Function description
+*   Replaces the default target device reset routine. Optional.
+*
+* Notes
+*   This example demonstrates the usage when
+*   debugging an application in RAM on a Cortex-M target device.
+*
+**********************************************************************
+*/
+//void TargetReset (void) {
+//
+//  unsigned int SP;
+//  unsigned int PC;
+//  unsigned int VectorTableAddr;
+//
+//  VectorTableAddr = Elf.GetBaseAddr();
+//  //
+//  // Set up initial stack pointer
+//  //
+//  if (VectorTableAddr != 0xFFFFFFFF) {
+//    SP = Target.ReadU32(VectorTableAddr);
+//    Target.SetReg("SP", SP);
+//  }
+//  //
+//  // Set up entry point PC
+//  //
+//  PC = Elf.GetEntryPointPC();
+//
+//  if (PC != 0xFFFFFFFF) {
+//    Target.SetReg("PC", PC);
+//  } else if (VectorTableAddr != 0xFFFFFFFF) {
+//    PC = Target.ReadU32(VectorTableAddr + 4);
+//    Target.SetReg("PC", PC);
+//  } else {
+//    Util.Error("Project file error: failed to set entry point PC", 1);
+//  }
+//}
+
+/*********************************************************************
+*
+*       BeforeTargetReset
+*
+* Function description
+*   Event handler routine. Optional.
+*
+**********************************************************************
+*/
+//void BeforeTargetReset (void) {
+//}
+
+/*********************************************************************
+*
+*       AfterTargetReset
+*
+* Function description
+*   Event handler routine. Optional.
+*   The default implementation initializes SP and PC to reset values.
+**
+**********************************************************************
+*/
+//void AfterTargetReset (void) {
+//}
+
+/*********************************************************************
+*
+*       DebugStart
+*
+* Function description
+*   Replaces the default debug session startup routine. Optional.
+*
+**********************************************************************
+*/
+//void DebugStart (void) {
+//}
+
+/*********************************************************************
+*
+*       TargetConnect
+*
+* Function description
+*   Replaces the default target IF connection routine. Optional.
+*
+**********************************************************************
+*/
+//void TargetConnect (void) {
+//}
+
+/*********************************************************************
+*
+*       BeforeTargetConnect
+*
+* Function description
+*   Event handler routine. Optional.
+*
+**********************************************************************
+*/
+//void BeforeTargetConnect (void) {
+//}
+
+/*********************************************************************
+*
+*       AfterTargetConnect
+*
+* Function description
+*   Event handler routine. Optional.
+*
+**********************************************************************
+*/
+//void AfterTargetConnect (void) {
+//}
+
+/*********************************************************************
+*
+*       TargetDownload
+*
+* Function description
+*   Replaces the default program download routine. Optional.
+*
+**********************************************************************
+*/
+//void TargetDownload (void) {
+//}
+
+/*********************************************************************
+*
+*       BeforeTargetDownload
+*
+* Function description
+*   Event handler routine. Optional.
+*
+**********************************************************************
+*/
+//void BeforeTargetDownload (void) {
+//}
+
+/*********************************************************************
+*
+*      AfterTargetDownload
+*
+* Function description
+*   Event handler routine. Optional.
+*   The default implementation initializes SP and PC to reset values.
+*
+**********************************************************************
+*/
+//void AfterTargetDownload (void) {
+//
+//  unsigned int SP;
+//  unsigned int PC;
+//  unsigned int VectorTableAddr;
+//
+//  VectorTableAddr = Elf.GetBaseAddr();
+//  //
+//  // Set up initial stack pointer
+//  //
+//  if (VectorTableAddr != 0xFFFFFFFF) {
+//    SP = Target.ReadU32(VectorTableAddr);
+//    Target.SetReg("SP", SP);
+//  } else {
+//    Util.Error("Project file error: failed to set initial SP", 1);
+//  }
+//  //
+//  // Set up entry point PC
+//  //
+//  PC = Elf.GetEntryPointPC();
+//
+//  if (PC != 0xFFFFFFFF) {
+//    Target.SetReg("PC", PC);
+//  } else if (VectorTableAddr != 0xFFFFFFFF) {
+//    PC = Target.ReadU32(VectorTableAddr + 4);
+//    Target.SetReg("PC", PC);
+//  } else {
+//    Util.Error("Project file error: failed to set entry point PC", 1);
+//  }
+//}
+
+/*********************************************************************
+*
+*       BeforeTargetDisconnect
+*
+* Function description
+*   Event handler routine. Optional.
+*
+**********************************************************************
+*/
+//void BeforeTargetDisconnect (void) {
+//}
+
+/*********************************************************************
+*
+*       AfterTargetDisconnect
+*
+* Function description
+*   Event handler routine. Optional.
+*
+**********************************************************************
+*/
+//void AfterTargetDisconnect (void) {
+//}
+
+/*********************************************************************
+*
+*       AfterTargetHalt
+*
+* Function description
+*   Event handler routine. Optional.
+*
+**********************************************************************
+*/
+//void AfterTargetHalt (void) {
+//}
+
+/*********************************************************************
+*
+*       BeforeTargetResume
+*
+* Function description
+*   Event handler routine. Optional.
+*
+**********************************************************************
+*/
+//void BeforeTargetResume (void) {
+//}
+
+/*********************************************************************
+*
+*       OnSnapshotLoad
+*
+* Function description
+*   Called upon loading a snapshot. Optional.
+*
+* Additional information
+*   This function is used to restore the target state in cases
+*   where values cannot simply be written to the target.
+*   Typical use: GPIO clock needs to be enabled, before
+*   GPIO is configured.
+*
+**********************************************************************
+*/
+//void OnSnapshotLoad (void) {
+//}
+
+/*********************************************************************
+*
+*       OnSnapshotSave
+*
+* Function description
+*   Called upon saving a snapshot. Optional.
+*
+* Additional information
+*   This function is usually used to save values of the target
+*   state which can either not be trivially read,
+*   or need to be restored in a specific way or order.
+*   Typically use: Memory Mapped Registers,
+*   such as PLL and GPIO configuration.
+*
+**********************************************************************
+*/
+//void OnSnapshotSave (void) {
+//}
+
+/*********************************************************************
+*
+*       OnError
+*
+* Function description
+*   Called when an error ocurred. Optional.
+*
+**********************************************************************
+*/
+//void OnError (void) {
+//}
+
+/*********************************************************************
+*
+*       AfterProjectLoad
+*
+* Function description
+*   After Project load routine. Optional.
+*
+**********************************************************************
+*/
+//void AfterProjectLoad (void) {
+//}
+
+/*********************************************************************
+*
+*       OnDebugStartBreakSymbolReached
+*
+* Function description
+*   Called when program execution has reached/passed
+*   the symbol to be breaked at during debug start. Optional.
+*
+**********************************************************************
+*/
+//void OnDebugStartBreakSymReached (void) {
+//}
