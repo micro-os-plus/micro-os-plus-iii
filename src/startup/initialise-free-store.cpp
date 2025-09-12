@@ -140,7 +140,7 @@ os_startup_initialize_free_store (void* heap_address,
 
   {
     static_assert (OS_INTEGER_RTOS_ALLOC_THREAD_POOL_SIZE > 1,
-                   "Mutex pool size must be >1.");
+                   "Threads pool size must be >1.");
     rtos::memory::memory_resource* mr
         = new os::memory::block_pool_typed_inclusive<
             rtos::thread, OS_INTEGER_RTOS_ALLOC_THREAD_POOL_SIZE> (
@@ -158,7 +158,7 @@ os_startup_initialize_free_store (void* heap_address,
 
   {
     static_assert (OS_INTEGER_RTOS_ALLOC_CONDITION_VARIABLE_POOL_SIZE > 1,
-                   "Mutex pool size must be >1.");
+                   "Condition variables pool size must be >1.");
     rtos::memory::memory_resource* mr
         = new os::memory::block_pool_typed_inclusive<
             rtos::condition_variable,
@@ -177,7 +177,7 @@ os_startup_initialize_free_store (void* heap_address,
 
   {
     static_assert (OS_INTEGER_RTOS_ALLOC_EVENT_FLAGS_POOL_SIZE > 1,
-                   "Mutex pool size must be >1.");
+                   "Event flags pool size must be >1.");
     rtos::memory::memory_resource* mr
         = new os::memory::block_pool_typed_inclusive<
             rtos::event_flags, OS_INTEGER_RTOS_ALLOC_EVENT_FLAGS_POOL_SIZE> (
@@ -195,7 +195,7 @@ os_startup_initialize_free_store (void* heap_address,
 
   {
     static_assert (OS_INTEGER_RTOS_ALLOC_MEMORY_POOL_POOL_SIZE > 1,
-                   "Mutex pool size must be >1.");
+                   "Memory pools pool size must be >1.");
     rtos::memory::memory_resource* mr
         = new os::memory::block_pool_typed_inclusive<
             rtos::memory_pool, OS_INTEGER_RTOS_ALLOC_MEMORY_POOL_POOL_SIZE> (
@@ -213,7 +213,7 @@ os_startup_initialize_free_store (void* heap_address,
 
   {
     static_assert (OS_INTEGER_RTOS_ALLOC_MESSAGE_QUEUE_POOL_SIZE > 1,
-                   "Mutex pool size must be >1.");
+                   "Message queues pool size must be >1.");
     rtos::memory::memory_resource* mr
         = new os::memory::block_pool_typed_inclusive<
             rtos::message_queue,
@@ -231,7 +231,7 @@ os_startup_initialize_free_store (void* heap_address,
 
   {
     static_assert (OS_INTEGER_RTOS_ALLOC_MUTEX_POOL_SIZE > 1,
-                   "Mutex pool size must be >1.");
+                   "Mutexes pool size must be >1.");
     rtos::memory::memory_resource* mr
         = new os::memory::block_pool_typed_inclusive<
             rtos::mutex, OS_INTEGER_RTOS_ALLOC_MUTEX_POOL_SIZE> (
@@ -249,7 +249,7 @@ os_startup_initialize_free_store (void* heap_address,
 
   {
     static_assert (OS_INTEGER_RTOS_ALLOC_SEMAPHORE_POOL_SIZE > 1,
-                   "Semaphore pool size must be >1.");
+                   "Semaphores pool size must be >1.");
     rtos::memory::memory_resource* mr
         = new os::memory::block_pool_typed_inclusive<
             rtos::semaphore, OS_INTEGER_RTOS_ALLOC_SEMAPHORE_POOL_SIZE> (
@@ -267,7 +267,7 @@ os_startup_initialize_free_store (void* heap_address,
 
   {
     static_assert (OS_INTEGER_RTOS_ALLOC_TIMER_POOL_SIZE > 1,
-                   "Mutex pool size must be >1.");
+                   "Timers pool size must be >1.");
     rtos::memory::memory_resource* mr
         = new os::memory::block_pool_typed_inclusive<
             rtos::timer, OS_INTEGER_RTOS_ALLOC_TIMER_POOL_SIZE> (
