@@ -50,6 +50,7 @@ target_sources(micro-os-plus-iii-interface INTERFACE
   src/diag/trace-segger-rtt.cpp
   src/diag/trace-semihosting.cpp
   src/diag/trace.cpp
+  src/diag/instrumentation.cpp
   src/driver/common.cpp
   src/driver/serial.cpp
 
