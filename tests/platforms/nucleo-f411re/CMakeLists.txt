@@ -14,8 +14,8 @@
 message(VERBOSE "Processing 'tests/platforms/nucleo-f411re'...")
 
 # -----------------------------------------------------------------------------
+set(xpack_create_listing true)
 
-# set(xpack_create_listing true)
 # set(xpack_create_hex true)
 
 # -----------------------------------------------------------------------------
@@ -204,45 +204,66 @@ if(ENABLE_BLINKY_TEST)
     -c "arm semihosting_cmdline blinky-test 100 100"
     -c "reset"
   )
+endif()
 
-  add_executable(blinky-rtt-test)
+# -----------------------------------------------------------------------------
+if(ENABLE_INSTRUMENTATION_TEST)
+  add_executable(instrumentation-test)
 
-  set_target_properties(blinky-rtt-test
+  set_target_properties(instrumentation-test
 
     PROPERTIES
-    OUTPUT_NAME "blinky-rtt-test"
+    OUTPUT_NAME "instrumentation-test"
   )
 
-  target_compile_definitions(blinky-rtt-test PRIVATE
-    OS_USE_TRACE_SEGGER_RTT
+  target_sources(instrumentation-test PRIVATE
+  )
+
+  target_compile_definitions(instrumentation-test PRIVATE
+
+    OS_HAS_SYSTEMCLOCK_CONFIG
+
+    # OS_USE_TRACE_SEGGER_RTT
+    OS_USE_TRACE_SEMIHOSTING_STDOUT
+
+    # OS_USE_TRACE_SEMIHOSTING_STDERR
+    # OS_USE_TRACE_SEMIHOSTING_ITM
+    OS_INCLUDE_INSTRUMENTATION
+
+    # OS_DISABLE_INSTRUMENTATION_AUTOSTART
   )
 
   # No other common compile or link options, all were defined in the
   # libraries and will be inherited.
-  target_link_options(blinky-rtt-test PRIVATE
-    -Wl,-Map,platform-bin/blinky-rtt-test-map.txt
+  target_link_options(instrumentation-test PRIVATE
+    -Wl,-Map,platform-bin/instrumentation-test-map.txt
 
     # -v
   )
 
-  xpack_add_cross_custom_commands(blinky-rtt-test)
+  xpack_add_cross_custom_commands(instrumentation-test)
 
-  target_link_libraries(blinky-rtt-test PRIVATE
+  target_link_libraries(instrumentation-test PRIVATE
 
     micro-os-plus::common-options
 
     # Current test library.
-    test::blinky
+    test::instrumentation
 
     # Tested library.
     micro-os-plus::iii
     segger::rtt
+    segger::system-view
 
     # Platform specific dependencies.
     micro-os-plus::platform
   )
 
-  message(VERBOSE "A> blinky-rtt-test")
+  if(COMMAND xpack_display_target_lists)
+    xpack_display_target_lists(instrumentation-test)
+  endif()
+
+  message(VERBOSE "A> instrumentation-test")
 
   # There is no automated test, it requires manual invocation using SEGGER tools.
 endif()
