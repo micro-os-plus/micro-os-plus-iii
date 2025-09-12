@@ -1447,7 +1447,7 @@ namespace os
         trace::printf ("Memory '%s' @%p: \n"
                        "\ttotal: %u bytes, \n"
                        "\tallocated: %u bytes in %u chunk(s), \n"
-                       "\tfree: %u bytes in %u chunk(s), \n"
+                       "\tfreed: %u bytes in %u chunk(s), \n"
                        "\tmax: %u bytes, \n"
                        "\tcalls: %u allocs, %u deallocs\n",
                        name (), this, total_bytes (), allocated_bytes (),
