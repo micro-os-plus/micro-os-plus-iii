@@ -34,7 +34,7 @@ target_include_directories(test-blinky-interface INTERFACE
 )
 
 target_sources(test-blinky-interface INTERFACE
-  src/main.cpp
+  "src/main.cpp"
 )
 
 target_compile_definitions(test-blinky-interface INTERFACE

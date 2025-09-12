@@ -32,7 +32,10 @@ os_main (int argc, char* argv[])
   unsigned int ticks
       = (argc > 1) ? static_cast<unsigned int> (std::atoi (argv[1])) : 100;
   unsigned int cycles
-      = (argc > 2) ? static_cast<unsigned int> (std::atoi (argv[2])) : 100;
+      = (argc > 2) ? static_cast<unsigned int> (std::atoi (argv[2])) : 10;
+
+  trace::printf ("os_main() started with %u ticks and %u cycles.\n", ticks,
+                 cycles);
 
   blink_led led;
 
