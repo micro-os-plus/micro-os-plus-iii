@@ -26,5 +26,6 @@ set(xpack_platform_compile_definition "MICRO_OS_PLUS_PLATFORM_NUCLEO_F411RE")
 
 # Platform specific tests.
 set(ENABLE_BLINKY_TEST true)
+set(ENABLE_INSTRUMENTATION_TEST true)
 
 # -----------------------------------------------------------------------------
