@@ -83,6 +83,8 @@ Reset_Handler (void)
   // For just in case, when started via QEMU.
   __asm__ (" MSR msp, %0 " : : "r"(&__stack) :);
 
+  __disable_irq ();
+  
   // SCB
   // https://developer.arm.com/documentation/dui0552/a/cortex-m3-peripherals/system-control-block
 
