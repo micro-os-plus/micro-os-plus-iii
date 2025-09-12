@@ -96,8 +96,7 @@ namespace os
     flush (void)
     {
       // Busy wait until all data is sent.
-      // The buffer is empty when WrOff == RdOff.
-      while (_SEGGER_RTT.aUp[0].WrOff != _SEGGER_RTT.aUp[0].RdOff)
+      while (SEGGER_RTT_HasData(0) != 0)
         {
           __NOP ();
         }
