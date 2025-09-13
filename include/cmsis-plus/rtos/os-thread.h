@@ -1279,6 +1279,10 @@ namespace os
       result_t
       flags_raise (flags::mask_t mask, flags::mask_t* oflags = nullptr);
 
+      flags::mask_t
+      flags_get (flags::mask_t mask,
+                 flags::mode_t mode = flags::mode::all | flags::mode::clear);
+
 #if defined(OS_INCLUDE_RTOS_THREAD_PUBLIC_FLAGS_CLEAR)
 
       // This is a kludge required to support CMSIS RTOS V1
@@ -2468,6 +2472,12 @@ namespace os
     }
 
 #endif /* defined(OS_INCLUDE_RTOS_STATISTICS_THREAD_CONTEXT_SWITCHES) */
+
+    inline flags::mask_t
+    thread::flags_get (flags::mask_t mask, flags::mode_t mode)
+    {
+      return internal_flags_get_ (mask, mode);
+    }
 
 #if defined(OS_INCLUDE_RTOS_THREAD_PUBLIC_FLAGS_CLEAR)
 
