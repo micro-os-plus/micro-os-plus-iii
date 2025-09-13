@@ -639,9 +639,21 @@ namespace os
        * life cycle is at least as long as the object life cycle.
        * A constant string (stored in flash) is preferred.
        */
-      object_named::object_named (const char* name)
-          : name_ (name != nullptr ? name : "-")
+      object_named::object_named (const char* name) : name_ (name)
       {
+      }
+
+      /**
+       * @details
+       * All objects return a non-null string; anonymous objects
+       * return `"-"`.
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
+      const char*
+      object_named::name (void) const
+      {
+        return name_ != nullptr ? name_ : "-";
       }
 
     } /* namespace internal */

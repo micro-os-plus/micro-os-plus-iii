@@ -406,6 +406,15 @@ namespace os
         name (void) const;
 
         /**
+         * @brief Check if the object has a name.
+         * @par Parameters
+         *  None.
+         * @return `true` if the object has a name, `false` otherwise.
+         */
+        bool
+        has_name (void) const;
+
+        /**
          * @}
          */
 
@@ -422,7 +431,7 @@ namespace os
         /**
          * @brief Pointer to name.
          */
-        const char* const name_ = "-";
+        const char* const name_ = nullptr;
 
         /**
          * @endcond
@@ -742,20 +751,11 @@ namespace os
     {
       // ======================================================================
 
-      /**
-       * @details
-       * All objects return a non-null string; anonymous objects
-       * return `"-"`.
-       *
-       * @note Can be invoked from Interrupt Service Routines.
-       */
-      inline const char*
-      object_named::name (void) const
+      inline bool
+      object_named::has_name (void) const
       {
-        return name_;
+        return name_ != nullptr;
       }
-
-      // ======================================================================
 
       inline object_named_system::object_named_system ()
       {
