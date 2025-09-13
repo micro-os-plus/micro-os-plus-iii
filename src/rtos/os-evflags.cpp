@@ -250,6 +250,9 @@ namespace os
     event_flags::wait (flags::mask_t mask, flags::mask_t* oflags,
                        flags::mode_t mode)
     {
+
+      instrumentation::event_flags::wait (this, mask, mode);
+
 #if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s(0x%X,%u) @%p %s <0x%X\n", __func__, mask, mode, this,
                      name (), event_flags_.mask ());
@@ -260,11 +263,10 @@ namespace os
       // Don't call this from critical regions.
       os_assert_throw (!scheduler::locked (), EPERM);
 
-      instrumentation::event_flags::wait (this, mask, mode);
-
 #if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 
       result_t res = port::event_flags::wait (this, mask, oflags, mode);
+
       instrumentation::event_flags::wait_retval (this, res);
       return res;
 
@@ -362,16 +364,17 @@ namespace os
     event_flags::try_wait (flags::mask_t mask, flags::mask_t* oflags,
                            flags::mode_t mode)
     {
+      instrumentation::event_flags::try_wait (this, mask, mode);
+
 #if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s(0x%X,%u) @%p %s <0x%X\n", __func__, mask, mode, this,
                      name (), event_flags_.mask ());
 #endif
 
-      instrumentation::event_flags::try_wait (this, mask, mode);
-
 #if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 
       result_t res = port::event_flags::try_wait (this, mask, oflags, mode);
+
       instrumentation::event_flags::try_wait_retval (this, res);
       return res;
 
@@ -450,6 +453,8 @@ namespace os
     event_flags::timed_wait (flags::mask_t mask, clock::duration_t timeout,
                              flags::mask_t* oflags, flags::mode_t mode)
     {
+      instrumentation::event_flags::timed_wait (this, mask, timeout, mode);
+
 #if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s(0x%X,%u,%u) @%p %s <0x%X\n", __func__, mask, timeout,
                      mode, this, name (), event_flags_.mask ());
@@ -460,12 +465,11 @@ namespace os
       // Don't call this from critical regions.
       os_assert_throw (!scheduler::locked (), EPERM);
 
-      instrumentation::event_flags::timed_wait (this, mask, mode, timeout);
-
 #if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 
       result_t res
           = port::event_flags::timed_wait (this, mask, timeout, oflags, mode);
+
       instrumentation::event_flags::timed_wait_retval (this, res);
       return res;
 
@@ -577,18 +581,19 @@ namespace os
     result_t
     event_flags::raise (flags::mask_t mask, flags::mask_t* oflags)
     {
+      instrumentation::event_flags::raise (this, mask);
+
 #if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s(0x%X) @%p %s <0x%X \n", __func__, mask, this, name (),
                      event_flags_.mask ());
 #endif
-
-      instrumentation::event_flags::raise (this, mask);
 
 #if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 
       os_assert_err (mask != 0, EINVAL);
 
       result_t res = port::event_flags::raise (this, mask, oflags);
+
       instrumentation::event_flags::raised (this, mask, res);
       return res;
 
