@@ -1330,6 +1330,8 @@ namespace os
     result_t
     thread::flags_raise (flags::mask_t mask, flags::mask_t* oflags)
     {
+      instrumentation::thread::flags_raise (this, mask);
+
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X) @%p %s <0x%X\n", __func__, mask, this, name (),
                      event_flags_.mask ());
@@ -1344,6 +1346,8 @@ namespace os
                      event_flags_.mask ());
 #endif
 
+      instrumentation::thread::flags_raise_retval (this, res);
+
       return res;
     }
 
@@ -1355,6 +1359,8 @@ namespace os
     thread::internal_flags_wait_ (flags::mask_t mask, flags::mask_t* oflags,
                                   flags::mode_t mode)
     {
+      instrumentation::thread::flags_wait (this, mask, mode);
+
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X,%u) @%p %s <0x%X\n", __func__, mask, mode, this,
                      name (), event_flags_.mask ());
@@ -1375,6 +1381,7 @@ namespace os
             trace::printf ("%s(0x%X,%u) @%p %s >0x%X\n", __func__, mask, mode,
                            this, name (), event_flags_.mask ());
 #endif
+            instrumentation::thread::flags_wait_retval (this, result::ok);
             return result::ok;
           }
         // ----- Exit critical section ----------------------------------------
@@ -1399,6 +1406,7 @@ namespace os
                                mask, mode, slept_ticks, this, name (),
                                event_flags_.mask ());
 #endif
+                instrumentation::thread::flags_wait_retval (this, result::ok);
                 return result::ok;
               }
             // ----- Exit critical section ------------------------------------
@@ -1413,11 +1421,13 @@ namespace os
               trace::printf ("%s(0x%X,%u) EINTR @%p %s\n", __func__, mask,
                              mode, this, name ());
 #endif
+              instrumentation::thread::flags_wait_retval (this, EINTR);
               return EINTR;
             }
         }
 
       /* NOTREACHED */
+      instrumentation::thread::flags_wait_retval (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
     }
 
@@ -1426,6 +1436,8 @@ namespace os
                                       flags::mask_t* oflags,
                                       flags::mode_t mode)
     {
+      instrumentation::thread::flags_try_wait (this, mask, mode);
+
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X,%u) @%p %s <0x%X\n", __func__, mask, mode, this,
                      name (), event_flags_.mask ());
@@ -1444,6 +1456,7 @@ namespace os
             trace::printf ("%s(0x%X,%u) @%p %s >0x%X\n", __func__, mask, mode,
                            this, name (), event_flags_.mask ());
 #endif
+            instrumentation::thread::flags_try_wait_retval (this, result::ok);
             return result::ok;
           }
         else
@@ -1452,6 +1465,7 @@ namespace os
             trace::printf ("%s(0x%X,%u) EWOULDBLOCK @%p %s \n", __func__, mask,
                            mode, this, name ());
 #endif
+            instrumentation::thread::flags_try_wait_retval (this, EWOULDBLOCK);
             return EWOULDBLOCK;
           }
         // ----- Exit critical section ----------------------------------------
@@ -1464,7 +1478,7 @@ namespace os
                                         flags::mask_t* oflags,
                                         flags::mode_t mode)
     {
-      using namespace os;
+      instrumentation::thread::flags_timed_wait (this, mask, timeout, mode);
 
 #if defined(OS_TRACE_RTOS_THREAD_FLAGS)
       trace::printf ("%s(0x%X,%u,%u) @%p %s <0x%X\n", __func__, mask, timeout,
@@ -1486,6 +1500,8 @@ namespace os
             trace::printf ("%s(0x%X,%u,%u) @%p %s >0x%X\n", __func__, mask,
                            timeout, mode, this, name (), event_flags_.mask ());
 #endif
+            instrumentation::thread::flags_timed_wait_retval (this,
+                                                              result::ok);
             return result::ok;
           }
         // ----- Exit critical section ----------------------------------------
@@ -1524,6 +1540,8 @@ namespace os
                                name (), event_flags_.mask ());
 #pragma GCC diagnostic pop
 #endif
+                instrumentation::thread::flags_timed_wait_retval (this,
+                                                                  result::ok);
                 return result::ok;
               }
 
@@ -1560,6 +1578,7 @@ namespace os
               trace::printf ("%s(0x%X,%u,%u) EINTR @%p %s\n", __func__, mask,
                              timeout, mode, this, name ());
 #endif
+              instrumentation::thread::flags_timed_wait_retval (this, EINTR);
               return EINTR;
             }
 
@@ -1569,10 +1588,13 @@ namespace os
               trace::printf ("%s(0x%X,%u,%u) ETIMEDOUT @%p %s\n", __func__,
                              mask, timeout, mode, this, name ());
 #endif
+              instrumentation::thread::flags_timed_wait_retval (this,
+                                                                ETIMEDOUT);
               return ETIMEDOUT;
             }
         }
 
+      instrumentation::thread::flags_timed_wait_retval (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
     }
 

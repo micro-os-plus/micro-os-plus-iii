@@ -24,6 +24,114 @@ namespace os
 {
   namespace instrumentation
   {
+    namespace thread
+    {
+      void
+      flags_wait (os::rtos::thread* thread, unsigned int mask,
+                  unsigned int mode)
+      {
+        SEGGER_SYSVIEW_RecordU32x3 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_WAIT,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)),
+            static_cast<U32> (mask), static_cast<U32> (mode));
+      }
+
+      void
+      flags_wait_retval (os::rtos::thread* thread, os::rtos::result_t res)
+      {
+#if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_WAIT_VALUES,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)),
+            thread->flags_get (0, 0));
+#endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_WAIT,
+            static_cast<U32> (res));
+      }
+
+      void
+      flags_try_wait (os::rtos::thread* thread, unsigned int mask,
+                      unsigned int mode)
+      {
+        SEGGER_SYSVIEW_RecordU32x3 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_TRY_WAIT,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)),
+            static_cast<U32> (mask), static_cast<U32> (mode));
+      }
+
+      void
+      flags_try_wait_retval (os::rtos::thread* thread, os::rtos::result_t res)
+      {
+#if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_TRY_WAIT_VALUES,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)),
+            thread->flags_get (0, 0));
+#endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_TRY_WAIT,
+            static_cast<U32> (res));
+      }
+
+      void
+      flags_timed_wait (os::rtos::thread* thread, unsigned int mask,
+                        unsigned int timeout, unsigned int mode)
+      {
+        SEGGER_SYSVIEW_RecordU32x4 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_TIMED_WAIT,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)),
+            static_cast<U32> (mask), static_cast<U32> (timeout),
+            static_cast<U32> (mode));
+      }
+
+      void
+      flags_timed_wait_retval (os::rtos::thread* thread,
+                               os::rtos::result_t res)
+      {
+#if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_TIMED_WAIT_VALUES,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)),
+            thread->flags_get (0, 0));
+#endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_TIMED_WAIT,
+            static_cast<U32> (res));
+      }
+    } // namespace thread
+
+    namespace thread
+    {
+
+      void
+      flags_raise (os::rtos::thread* thread, unsigned int mask)
+      {
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_RAISE,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)),
+            static_cast<U32> (mask));
+      }
+
+      void
+      flags_raise_retval (os::rtos::thread* thread, os::rtos::result_t res)
+      {
+#if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_RAISE_VALUES,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)),
+            thread->flags_get (0, 0));
+#endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_RAISE,
+            static_cast<U32> (res));
+      }
+    } // namespace thread
+
     namespace memory_resource
     {
       void
@@ -752,13 +860,13 @@ namespace os
 
       void
       timed_wait (os::rtos::event_flags* evflags, unsigned int mask,
-                  unsigned int mode, unsigned int timeout)
+                  unsigned int timeout, unsigned int mode)
       {
         SEGGER_SYSVIEW_RecordU32x4 (
             OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_TIMED_WAIT,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (evflags)),
-            static_cast<U32> (mask), static_cast<U32> (mode),
-            static_cast<U32> (timeout));
+            static_cast<U32> (mask), static_cast<U32> (timeout),
+            static_cast<U32> (mode));
       }
 
       void

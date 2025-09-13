@@ -177,7 +177,23 @@
 #define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_RAISE_VALUES \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 233u)
 
-// 34
+// 66
+#define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_WAIT \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 34u)
+#define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_WAIT_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 234u)
+#define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_TRY_WAIT \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 35u)
+#define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_TRY_WAIT_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 235u)
+#define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_TIMED_WAIT \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 36u)
+#define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_TIMED_WAIT_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 236u)
+#define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_RAISE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 37u)
+#define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_RAISE_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 237u)
 
 // ----------------------------------------------------------------------------
 
@@ -269,6 +285,34 @@ namespace os
       {
         SEGGER_SYSVIEW_OnTaskTerminate (reinterpret_cast<U32> (thread));
       }
+
+      void
+      flags_raise (os::rtos::thread* thread, unsigned int mask);
+
+      void
+      flags_raise_retval (os::rtos::thread* thread, os::rtos::result_t res);
+
+      void
+      flags_wait (os::rtos::thread* thread, unsigned int mask,
+                  unsigned int mode);
+
+      void
+      flags_wait_retval (os::rtos::thread* thread, os::rtos::result_t res);
+
+      void
+      flags_try_wait (os::rtos::thread* thread, unsigned int mask,
+                      unsigned int mode);
+
+      void
+      flags_try_wait_retval (os::rtos::thread* thread, os::rtos::result_t res);
+
+      void
+      flags_timed_wait (os::rtos::thread* thread, unsigned int mask,
+                        unsigned int mode, unsigned int timeout);
+
+      void
+      flags_timed_wait_retval (os::rtos::thread* thread,
+                               os::rtos::result_t res);
     } // namespace thread
 
     namespace memory_resource
@@ -374,7 +418,7 @@ namespace os
     {
       void
       create (os::rtos::message_queue* mqueue, std::size_t msgs,
-                                  std::size_t msg_size_bytes);
+              std::size_t msg_size_bytes);
 
       void
       create_return (os::rtos::message_queue* mqueue);
@@ -433,7 +477,7 @@ namespace os
     namespace memory_pool
     {
       void
-      create (os::rtos::memory_pool* mpool,std::size_t blocks,
+      create (os::rtos::memory_pool* mpool, std::size_t blocks,
               std::size_t block_size_bytes);
 
       void
@@ -610,6 +654,50 @@ namespace os
       terminated (os::rtos::thread* thread)
       {
       }
+
+      static void inline __attribute__ ((__always_inline__))
+      flags_wait (os::rtos::thread* thread, unsigned int mask,
+                  unsigned int mode)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      flags_wait_retval (os::rtos::thread* thread, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      flags_try_wait (os::rtos::thread* thread, unsigned int mask,
+                      unsigned int mode)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      flags_try_wait_retval (os::rtos::thread* thread, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      flags_timed_wait (os::rtos::thread* thread, unsigned int mask,
+                        unsigned int timeout, unsigned int mode)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      flags_timed_wait_retval (os::rtos::thread* thread,
+                               os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      flags_raise (os::rtos::thread* thread, unsigned int mask)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      flags_raise_retval (os::rtos::thread* thread, os::rtos::result_t res)
+      {
+      }
     } // namespace thread
 
     namespace memory_resource
@@ -763,7 +851,7 @@ namespace os
     {
       static void inline __attribute__ ((__always_inline__))
       create (os::rtos::message_queue* mqueue, std::size_t msgs,
-                                  std::size_t msg_size_bytes)
+              std::size_t msg_size_bytes)
       {
       }
 
@@ -960,7 +1048,7 @@ namespace os
 
       static void inline __attribute__ ((__always_inline__))
       timed_wait (os::rtos::event_flags* evflags, unsigned int mask,
-                  unsigned int mode, unsigned int timeout)
+                  unsigned int timeout, unsigned int mode)
       {
       }
 
