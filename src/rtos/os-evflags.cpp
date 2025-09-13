@@ -168,6 +168,8 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
 
+      instrumentation::event_flags::create (this);
+
       // Don't call this from interrupt handlers.
       os_assert_throw (!interrupts::in_handler_mode (), EPERM);
 
@@ -183,7 +185,7 @@ namespace os
 
 #endif
 
-      instrumentation::event_flags::created (this);
+      instrumentation::event_flags::create_return (this);
     }
 
 #pragma GCC diagnostic pop
@@ -207,6 +209,8 @@ namespace os
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
+      instrumentation::event_flags::destroy (this);
+
 #if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 
       port::event_flags::destroy (this);
@@ -218,7 +222,7 @@ namespace os
 
 #endif
 
-      instrumentation::event_flags::destroyed (this);
+      instrumentation::event_flags::destroy_return (this);
     }
 
     /**
@@ -256,10 +260,12 @@ namespace os
       // Don't call this from critical regions.
       os_assert_throw (!scheduler::locked (), EPERM);
 
+      instrumentation::event_flags::wait (this, mask, mode);
+
 #if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 
       result_t res = port::event_flags::wait (this, mask, oflags, mode);
-      instrumentation::event_flags::waiting (this, mask, mode, res);
+      instrumentation::event_flags::wait_retval (this, res);
       return res;
 
 #else
@@ -274,8 +280,7 @@ namespace os
             trace::printf ("%s(0x%X,%u) @%p %s >0x%X\n", __func__, mask, mode,
                            this, name (), event_flags_.mask ());
 #endif
-            instrumentation::event_flags::waiting (this, mask, mode,
-                                                   result::ok);
+            instrumentation::event_flags::wait_retval (this, result::ok);
             return result::ok;
           }
         // ----- Exit critical section ----------------------------------------
@@ -300,8 +305,7 @@ namespace os
                 trace::printf ("%s(0x%X,%u) @%p %s >0x%X\n", __func__, mask,
                                mode, this, name (), event_flags_.mask ());
 #endif
-                instrumentation::event_flags::waiting (this, mask, mode,
-                                                       result::ok);
+                instrumentation::event_flags::wait_retval (this, result::ok);
                 return result::ok;
               }
 
@@ -331,14 +335,13 @@ namespace os
               trace::printf ("%s(0x%X,%u) EINTR @%p %s\n", __func__, mask,
                              mode, this, name ());
 #endif
-              instrumentation::event_flags::waiting (this, mask, mode, EINTR);
+              instrumentation::event_flags::wait_retval (this, EINTR);
               return EINTR;
             }
         }
 
       /* NOTREACHED */
-      instrumentation::event_flags::waiting (this, mask, mode,
-                                             ENOTRECOVERABLE);
+      instrumentation::event_flags::wait_retval (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
@@ -364,10 +367,12 @@ namespace os
                      name (), event_flags_.mask ());
 #endif
 
+      instrumentation::event_flags::try_wait (this, mask, mode);
+
 #if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 
       result_t res = port::event_flags::try_wait (this, mask, oflags, mode);
-      instrumentation::event_flags::try_waiting (this, mask, mode, res);
+      instrumentation::event_flags::try_wait_retval (this, res);
       return res;
 
 #else
@@ -385,8 +390,7 @@ namespace os
             trace::printf ("%s(0x%X,%u) @%p %s >0x%X\n", __func__, mask, mode,
                            this, name (), event_flags_.mask ());
 #endif
-            instrumentation::event_flags::try_waiting (this, mask, mode,
-                                                       result::ok);
+            instrumentation::event_flags::try_wait_retval (this, result::ok);
             return result::ok;
           }
         else
@@ -395,8 +399,7 @@ namespace os
             trace::printf ("%s(0x%X,%u) EWOULDBLOCK @%p %s \n", __func__, mask,
                            mode, this, name ());
 #endif
-            instrumentation::event_flags::try_waiting (this, mask, mode,
-                                                       EWOULDBLOCK);
+            instrumentation::event_flags::try_wait_retval (this, EWOULDBLOCK);
             return EWOULDBLOCK;
           }
         // ----- Exit critical section ----------------------------------------
@@ -457,12 +460,13 @@ namespace os
       // Don't call this from critical regions.
       os_assert_throw (!scheduler::locked (), EPERM);
 
+      instrumentation::event_flags::timed_wait (this, mask, mode, timeout);
+
 #if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 
       result_t res
           = port::event_flags::timed_wait (this, mask, timeout, oflags, mode);
-      instrumentation::event_flags::timed_waiting (this, mask, mode, timeout,
-                                                   res);
+      instrumentation::event_flags::timed_wait_retval (this, res);
       return res;
 
 #else
@@ -479,8 +483,7 @@ namespace os
             trace::printf ("%s(0x%X,%u,%u) @%p %s >0x%X\n", __func__, mask,
                            timeout, mode, this, name (), event_flags_.mask ());
 #endif
-            instrumentation::event_flags::timed_waiting (this, mask, mode,
-                                                         timeout, result::ok);
+            instrumentation::event_flags::timed_wait_retval (this, result::ok);
             return result::ok;
           }
         // ----- Exit critical section ----------------------------------------
@@ -513,8 +516,8 @@ namespace os
                                timeout, mode, this, name (),
                                event_flags_.mask ());
 #endif
-                instrumentation::event_flags::timed_waiting (
-                    this, mask, mode, timeout, result::ok);
+                instrumentation::event_flags::timed_wait_retval (this,
+                                                                 result::ok);
                 return result::ok;
               }
 
@@ -540,8 +543,7 @@ namespace os
               trace::printf ("%s(0x%X,%u,%u) EINTR @%p %s 0x%X \n", __func__,
                              mask, timeout, mode, this, name ());
 #endif
-              instrumentation::event_flags::timed_waiting (this, mask, mode,
-                                                           timeout, EINTR);
+              instrumentation::event_flags::timed_wait_retval (this, EINTR);
               return EINTR;
             }
 
@@ -551,15 +553,14 @@ namespace os
               trace::printf ("%s(0x%X,%u,%u) ETIMEDOUT @%p %s 0x%X \n",
                              __func__, mask, timeout, mode, this, name ());
 #endif
-              instrumentation::event_flags::timed_waiting (this, mask, mode,
-                                                           timeout, ETIMEDOUT);
+              instrumentation::event_flags::timed_wait_retval (this,
+                                                               ETIMEDOUT);
               return ETIMEDOUT;
             }
         }
 
       /* NOTREACHED */
-      instrumentation::event_flags::timed_waiting (this, mask, mode, timeout,
-                                                   ENOTRECOVERABLE);
+      instrumentation::event_flags::timed_wait_retval (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
@@ -580,6 +581,8 @@ namespace os
       trace::printf ("%s(0x%X) @%p %s <0x%X \n", __func__, mask, this, name (),
                      event_flags_.mask ());
 #endif
+
+      instrumentation::event_flags::raise (this, mask);
 
 #if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 
@@ -603,7 +606,7 @@ namespace os
                      event_flags_.mask ());
 #endif
 
-      instrumentation::event_flags::raised (this, mask, res);
+      instrumentation::event_flags::raise_retval (this, res);
       return res;
 
 #endif

@@ -515,6 +515,8 @@ namespace os
     {
       using namespace os;
 
+      instrumentation::mutex::create (this);
+
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
@@ -549,7 +551,7 @@ namespace os
 
 #endif
 
-      instrumentation::mutex::created (this);
+      instrumentation::mutex::create_return (this);
     }
 
     /**
@@ -576,6 +578,8 @@ namespace os
     {
       using namespace os;
 
+      instrumentation::mutex::destroy (this);
+
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -592,7 +596,7 @@ namespace os
       assert (list_.empty ());
 
 #endif
-      instrumentation::mutex::destroyed (this);
+      instrumentation::mutex::destroy_return (this);
     }
 
     /**
@@ -1012,6 +1016,8 @@ namespace os
     {
       using namespace os;
 
+      instrumentation::mutex::lock (this);
+
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
                      &this_thread::thread (), this_thread::thread ().name ());
@@ -1024,14 +1030,15 @@ namespace os
 
       if (!recoverable_)
         {
-          instrumentation::mutex::locked (this, ENOTRECOVERABLE);
+          instrumentation::mutex::lock_retval (this, ENOTRECOVERABLE);
           return ENOTRECOVERABLE;
         }
 
 #if defined(OS_USE_RTOS_PORT_MUTEX)
 
       result_t res = port::mutex::lock (this);
-      instrumentation::mutex::locked (this, res);
+
+      instrumentation::mutex::lock_retval (this, res);
       return res;
 
 #else
@@ -1046,7 +1053,7 @@ namespace os
         res = internal_try_lock_ (&crt_thread);
         if (res != EWOULDBLOCK)
           {
-            instrumentation::mutex::locked (this, res);
+            instrumentation::mutex::lock_retval (this, res);
             return res;
           }
         // ----- Exit critical section ----------------------------------------
@@ -1066,7 +1073,7 @@ namespace os
             res = internal_try_lock_ (&crt_thread);
             if (res != EWOULDBLOCK)
               {
-                instrumentation::mutex::locked (this, res);
+                instrumentation::mutex::lock_retval (this, res);
                 return res;
               }
 
@@ -1094,13 +1101,13 @@ namespace os
 #if defined(OS_TRACE_RTOS_MUTEX)
               trace::printf ("%s() EINTR @%p %s\n", __func__, this, name ());
 #endif
-              instrumentation::mutex::locked (this, EINTR);
+              instrumentation::mutex::lock_retval (this, EINTR);
               return EINTR;
             }
         }
 
       /* NOTREACHED */
-      instrumentation::mutex::locked (this, ENOTRECOVERABLE);
+      instrumentation::mutex::lock_retval (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
@@ -1143,6 +1150,8 @@ namespace os
     result_t
     mutex::try_lock (void)
     {
+      instrumentation::mutex::try_lock (this);
+
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
                      &this_thread::thread (), this_thread::thread ().name ());
@@ -1153,7 +1162,7 @@ namespace os
 
       if (!recoverable_)
         {
-          instrumentation::mutex::try_locked (this, ENOTRECOVERABLE);
+          instrumentation::mutex::try_lock_retval (this, ENOTRECOVERABLE);
           return ENOTRECOVERABLE;
         }
 
@@ -1161,7 +1170,7 @@ namespace os
 
       result_t res = port::mutex::try_lock (this);
 
-      instrumentation::mutex::try_locked (this, res);
+      instrumentation::mutex::try_lock_retval (this, res);
       return res;
 
 #else
@@ -1174,7 +1183,7 @@ namespace os
 
         result_t res = internal_try_lock_ (&crt_thread);
 
-        instrumentation::mutex::try_locked (this, res);
+        instrumentation::mutex::try_lock_retval (this, res);
         return res;
         // ----- Exit critical section ----------------------------------------
       }
@@ -1229,6 +1238,8 @@ namespace os
     result_t
     mutex::timed_lock (clock::duration_t timeout)
     {
+      instrumentation::mutex::timed_lock (this, timeout);
+
 #if defined(OS_TRACE_RTOS_MUTEX)
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -1248,8 +1259,7 @@ namespace os
 
       if (!recoverable_)
         {
-          instrumentation::mutex::timed_locked (this, timeout,
-                                                ENOTRECOVERABLE);
+          instrumentation::mutex::timed_lock_retval (this, ENOTRECOVERABLE);
           return ENOTRECOVERABLE;
         }
 
@@ -1257,7 +1267,7 @@ namespace os
 
       result_t res = port::mutex::timed_lock (this, timeout);
 
-      instrumentation::mutex::timed_locked (this, timeout, res);
+      instrumentation::mutex::timed_lock_retval (this, res);
       return res;
 
 #else
@@ -1275,7 +1285,7 @@ namespace os
         res = internal_try_lock_ (&crt_thread);
         if (res != EWOULDBLOCK)
           {
-            instrumentation::mutex::timed_locked (this, timeout, res);
+            instrumentation::mutex::timed_lock_retval (this, res);
             return res;
           }
         // ----- Exit critical section ----------------------------------------
@@ -1302,7 +1312,7 @@ namespace os
             res = internal_try_lock_ (&crt_thread);
             if (res != EWOULDBLOCK)
               {
-                instrumentation::mutex::timed_locked (this, timeout, res);
+                instrumentation::mutex::timed_lock_retval (this, res);
                 return res;
               }
 
@@ -1375,13 +1385,13 @@ namespace os
                       owner_->priority (boosted_prio_);
                     }
                 }
-              instrumentation::mutex::timed_locked (this, timeout, res);
+              instrumentation::mutex::timed_lock_retval (this, res);
               return res;
             }
         }
 
       /* NOTREACHED */
-      instrumentation::mutex::timed_locked (this, timeout, ENOTRECOVERABLE);
+      instrumentation::mutex::timed_lock_retval (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
@@ -1413,6 +1423,8 @@ namespace os
     result_t
     mutex::unlock (void)
     {
+      instrumentation::mutex::unlock (this);
+
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s by %p %s\n", __func__, this, name (),
                      &this_thread::thread (), this_thread::thread ().name ());
@@ -1421,23 +1433,22 @@ namespace os
       // Don't call this from interrupt handlers.
       os_assert_err (!interrupts::in_handler_mode (), EPERM);
 
+      result_t res;
+
 #if defined(OS_USE_RTOS_PORT_MUTEX)
 
-      result_t res = port::mutex::unlock (this);
-
-      instrumentation::mutex::unlocked (this, res);
-      return res;
+      res = port::mutex::unlock (this);
 
 #else
 
       thread* crt_thread = &this_thread::thread ();
 
-      result_t res = internal_unlock_ (crt_thread);
-
-      instrumentation::mutex::unlocked (this, res);
-      return res;
+      res = internal_unlock_ (crt_thread);
 
 #endif
+
+      instrumentation::mutex::unlock_retval (this, res);
+      return res;
     }
 
     /**

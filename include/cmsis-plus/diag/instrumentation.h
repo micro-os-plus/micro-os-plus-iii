@@ -42,78 +42,140 @@
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 1u)
 
 // 34
-#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_CREATED \
+#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_CREATE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 2u)
-#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_DESTROYED \
+#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_CREATE_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 102u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_DESTROY \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 3u)
-#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_LOCKED \
+#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_LOCK \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 4u)
-#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_TRY_LOCKED \
+#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_LOCK_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 104u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_TRY_LOCK \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 5u)
-#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_TIMED_LOCKED \
+#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_TRY_LOCK_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 105u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_TIMED_LOCK \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 6u)
-#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_UNLOCKED \
+#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_TIMED_LOCK_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 106u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_UNLOCK \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 7u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_UNLOCK_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 107u)
 
 // 40
-#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_CREATED \
+#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_CREATE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 8u)
-#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_DESTROYED \
+#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_CREATE_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 108u)
+#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_DESTROY \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 9u)
-#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_POSTED \
+#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_DESTROY_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 109u)
+#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_POST \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 10u)
-#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_WAITING \
+#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_POST_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 110u)
+#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_WAIT \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 11u)
-#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_TRY_WAITING \
+#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_WAIT_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 111u)
+#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_TRY_WAIT \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 12u)
-#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_TIMED_WAITING \
+#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_TRY_WAIT_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 112u)
+#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_TIMED_WAIT \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 13u)
+#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_TIMED_WAIT_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 113u)
 
 // 46
-#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_CREATED \
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_CREATE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 14u)
-#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_DESTROYED \
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_CREATE_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 114u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_DESTROY \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 15u)
-#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_SENT \
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_DESTROY_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 115u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_SEND \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 16u)
-#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TRY_SENT \
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_SEND_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 116u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TRY_SEND \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 17u)
-#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TIMED_SENT \
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TRY_SEND_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 117u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TIMED_SEND \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 18u)
-#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_RECEIVED \
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TIMED_SEND_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 118u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_RECEIVE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 19u)
-#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TRY_RECEIVED \
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_RECEIVE_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 119u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TRY_RECEIVE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 20u)
-#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TIMED_RECEIVED \
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TRY_RECEIVE_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 120u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TIMED_RECEIVE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 21u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TIMED_RECEIVE_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 121u)
 
 // 54
-#define OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_CREATED \
+#define OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_CREATE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 22u)
-#define OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_DESTROYED \
+#define OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_CREATE_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 122u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_DESTROY \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 23u)
-#define OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_ALLOCATED \
+#define OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_DESTROY_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 123u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_ALLOC \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 24u)
-#define OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_TRY_ALLOCATED \
+#define OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_ALLOC_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 124u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_TRY_ALLOC \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 25u)
-#define OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_TIMED_ALLOCATED \
+#define OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_TRY_ALLOC_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 125u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_TIMED_ALLOC \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 26u)
-#define OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_DEALLOCATED \
+#define OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_TIMED_ALLOC_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 126u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_FREE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 27u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_FREE_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 127u)
 
 // 60
-#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_CREATED \
+#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_CREATE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 28u)
-#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_DESTROYED \
+#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_CREATE_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 128u)
+#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_DESTROY \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 29u)
-#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_WAITING \
+#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_DESTROY_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 129u)
+#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_WAIT \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 30u)
-#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_TRY_WAITING \
+#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_WAIT_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 130u)
+#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_TRY_WAIT \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 31u)
-#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_TIMED_WAITING \
+#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_TRY_WAIT_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 131u)
+#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_TIMED_WAIT \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 32u)
-#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_RAISED \
+#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_TIMED_WAIT_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 132u)
+#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_RAISE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 33u)
+#define OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_RAISE_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 133u)
 
 // 34
 
@@ -232,128 +294,223 @@ namespace os
     namespace mutex
     {
       void
-      created (os::rtos::mutex* mutex);
+      create (os::rtos::mutex* mutex);
 
       void
-      destroyed (os::rtos::mutex* mutex);
+      create_return (os::rtos::mutex* mutex);
 
       void
-      locked (os::rtos::mutex* mutex, os::rtos::result_t result);
+      destroy (os::rtos::mutex* mutex);
 
       void
-      try_locked (os::rtos::mutex* mutex, os::rtos::result_t result);
+      destroy_return (os::rtos::mutex* mutex);
 
       void
-      timed_locked (os::rtos::mutex* mutex, unsigned int timeout,
-                    os::rtos::result_t result);
+      lock (os::rtos::mutex* mutex);
 
       void
-      unlocked (os::rtos::mutex* mutex, os::rtos::result_t result);
+      lock_retval (os::rtos::mutex* mutex, os::rtos::result_t result);
+
+      void
+      try_lock (os::rtos::mutex* mutex);
+
+      void
+      try_lock_retval (os::rtos::mutex* mutex, os::rtos::result_t result);
+
+      void
+      timed_lock (os::rtos::mutex* mutex, unsigned int timeout);
+
+      void
+      timed_lock_retval (os::rtos::mutex* mutex, os::rtos::result_t result);
+
+      void
+      unlock (os::rtos::mutex* mutex);
+
+      void
+      unlock_retval (os::rtos::mutex* mutex, os::rtos::result_t result);
     } // namespace mutex
 
     namespace semaphore
     {
       void
-      created (os::rtos::semaphore* semaphore);
+      create (os::rtos::semaphore* semaphore);
 
       void
-      destroyed (os::rtos::semaphore* semaphore);
+      create_return (os::rtos::semaphore* semaphore);
 
       void
-      posted (os::rtos::semaphore* semaphore, os::rtos::result_t res);
+      destroy (os::rtos::semaphore* semaphore);
 
       void
-      waiting (os::rtos::semaphore* semaphore, os::rtos::result_t res);
+      destroy_return (os::rtos::semaphore* semaphore);
 
       void
-      try_waiting (os::rtos::semaphore* semaphore, os::rtos::result_t res);
+      post (os::rtos::semaphore* semaphore);
 
       void
-      timed_waiting (os::rtos::semaphore* semaphore, unsigned int timeout,
-                     os::rtos::result_t res);
+      post_retval (os::rtos::semaphore* semaphore, os::rtos::result_t res);
+
+      void
+      wait (os::rtos::semaphore* semaphore);
+
+      void
+      wait_retval (os::rtos::semaphore* semaphore, os::rtos::result_t res);
+
+      void
+      try_wait (os::rtos::semaphore* semaphore);
+
+      void
+      try_wait_retval (os::rtos::semaphore* semaphore, os::rtos::result_t res);
+
+      void
+      timed_wait (os::rtos::semaphore* semaphore, unsigned int timeout);
+
+      void
+      timed_wait_retval (os::rtos::semaphore* semaphore,
+                         os::rtos::result_t res);
     } // namespace semaphore
 
     namespace message_queue
     {
       void
-      created (os::rtos::message_queue* mqueue);
+      create (os::rtos::message_queue* mqueue, std::size_t msgs,
+                                  std::size_t msg_size_bytes);
 
       void
-      destroyed (os::rtos::message_queue* mqueue);
+      create_return (os::rtos::message_queue* mqueue);
 
       void
-      sent (os::rtos::message_queue* mqueue, std::size_t nbytes,
-            unsigned int mprio, os::rtos::result_t res);
+      destroy (os::rtos::message_queue* mqueue);
 
       void
-      try_sent (os::rtos::message_queue* mqueue, std::size_t nbytes,
-                unsigned int mprio, os::rtos::result_t res);
+      destroy_return (os::rtos::message_queue* mqueue);
 
       void
-      timed_sent (os::rtos::message_queue* mqueue, std::size_t nbytes,
-                  unsigned int mprio, unsigned int timeout,
-                  os::rtos::result_t res);
+      send (os::rtos::message_queue* mqueue, std::size_t nbytes,
+            unsigned int mprio);
 
       void
-      received (os::rtos::message_queue* mqueue, std::size_t nbytes,
-                os::rtos::result_t res);
+      send_retval (os::rtos::message_queue* mqueue, os::rtos::result_t res);
 
       void
-      try_received (os::rtos::message_queue* mqueue, std::size_t nbytes,
-                    os::rtos::result_t res);
+      try_send (os::rtos::message_queue* mqueue, std::size_t nbytes,
+                unsigned int mprio);
 
       void
-      timed_received (os::rtos::message_queue* mqueue, std::size_t nbytes,
-                      unsigned int timeout, os::rtos::result_t res);
+      try_send_retval (os::rtos::message_queue* mqueue,
+                       os::rtos::result_t res);
+
+      void
+      timed_send (os::rtos::message_queue* mqueue, std::size_t nbytes,
+                  unsigned int timeout, unsigned int mprio);
+
+      void
+      timed_send_retval (os::rtos::message_queue* mqueue,
+                         os::rtos::result_t res);
+
+      void
+      receive (os::rtos::message_queue* mqueue, std::size_t nbytes);
+
+      void
+      receive_retval (os::rtos::message_queue* mqueue, os::rtos::result_t res);
+
+      void
+      try_receive (os::rtos::message_queue* mqueue, std::size_t nbytes);
+
+      void
+      try_receive_retval (os::rtos::message_queue* mqueue,
+                          os::rtos::result_t res);
+
+      void
+      timed_receive (os::rtos::message_queue* mqueue, std::size_t nbytes,
+                     unsigned int timeout);
+
+      void
+      timed_receive_retval (os::rtos::message_queue* mqueue,
+                            os::rtos::result_t res);
     } // namespace message_queue
 
     namespace memory_pool
     {
       void
-      created (os::rtos::memory_pool* mpool);
+      create (os::rtos::memory_pool* mpool,std::size_t blocks,
+              std::size_t block_size_bytes);
 
       void
-      destroyed (os::rtos::memory_pool* mpool);
+      create_return (os::rtos::memory_pool* mpool);
 
       void
-      allocated (os::rtos::memory_pool* mpool, void* addr);
+      destroy (os::rtos::memory_pool* mpool);
 
       void
-      try_allocated (os::rtos::memory_pool* mpool, void* addr);
+      destroy_return (os::rtos::memory_pool* mpool);
 
       void
-      timed_allocated (os::rtos::memory_pool* mpool, unsigned int timeout,
-                       void* addr);
+      alloc (os::rtos::memory_pool* mpool);
 
       void
-      deallocated (os::rtos::memory_pool* mpool, void* block,
-                   os::rtos::result_t res);
+      alloc_retval (os::rtos::memory_pool* mpool, void* addr);
+
+      void
+      try_alloc (os::rtos::memory_pool* mpool);
+
+      void
+      try_alloc_retval (os::rtos::memory_pool* mpool, void* addr);
+
+      void
+      timed_alloc (os::rtos::memory_pool* mpool, unsigned int timeout);
+
+      void
+      timed_alloc_retval (os::rtos::memory_pool* mpool, void* addr);
+
+      void
+      free (os::rtos::memory_pool* mpool, void* block);
+
+      void
+      free_retval (os::rtos::memory_pool* mpool, os::rtos::result_t res);
     } // namespace memory_pool
 
     namespace event_flags
     {
       void
-      created (os::rtos::event_flags* evflags);
+      create (os::rtos::event_flags* evflags);
 
       void
-      destroyed (os::rtos::event_flags* evflags);
+      create_return (os::rtos::event_flags* evflags);
 
       void
-      waiting (os::rtos::event_flags* evflags, unsigned int mask,
-               unsigned int mode, os::rtos::result_t res);
+      destroy (os::rtos::event_flags* evflags);
 
       void
-      try_waiting (os::rtos::event_flags* evflags, unsigned int mask,
-                   unsigned int mode, os::rtos::result_t res);
+      destroy_return (os::rtos::event_flags* evflags);
 
       void
-      timed_waiting (os::rtos::event_flags* evflags, unsigned int mask,
-                     unsigned int mode, unsigned int timeout,
-                     os::rtos::result_t res);
+      wait (os::rtos::event_flags* evflags, unsigned int mask,
+            unsigned int mode);
 
       void
-      raised (os::rtos::event_flags* evflags, unsigned int mask,
-              os::rtos::result_t res);
+      wait_retval (os::rtos::event_flags* evflags, os::rtos::result_t res);
+
+      void
+      try_wait (os::rtos::event_flags* evflags, unsigned int mask,
+                unsigned int mode);
+
+      void
+      try_wait_retval (os::rtos::event_flags* evflags, os::rtos::result_t res);
+
+      void
+      timed_wait (os::rtos::event_flags* evflags, unsigned int mask,
+                  unsigned int mode, unsigned int timeout);
+
+      void
+      timed_wait_retval (os::rtos::event_flags* evflags,
+                         os::rtos::result_t res);
+
+      void
+      raise (os::rtos::event_flags* evflags, unsigned int mask);
+
+      void
+      raise_retval (os::rtos::event_flags* evflags, os::rtos::result_t res);
     } // namespace event_flags
 
     // ------------------------------------------------------------------------
@@ -478,33 +635,62 @@ namespace os
     namespace mutex
     {
       static void inline __attribute__ ((__always_inline__))
-      created (os::rtos::mutex* mutex)
+      create (os::rtos::mutex* mutex)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      destroyed (os::rtos::mutex* mutex)
+      create_return (os::rtos::mutex* mutex)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      locked (os::rtos::mutex* mutex, os::rtos::result_t res)
+      destroy (os::rtos::mutex* mutex)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      try_locked (os::rtos::mutex* mutex, os::rtos::result_t res)
+      destroy_return (os::rtos::mutex* mutex)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      timed_locked (os::rtos::mutex* mutex, unsigned int timeout,
-                    os::rtos::result_t res)
+      lock (os::rtos::mutex* mutex)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      unlocked (os::rtos::mutex* mutex, os::rtos::result_t res)
+      lock_retval (os::rtos::mutex* mutex, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      try_lock (os::rtos::mutex* mutex)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      try_lock_retval (os::rtos::mutex* mutex, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      timed_lock (os::rtos::mutex* mutex, unsigned int timeout)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      timed_lock_retval (os::rtos::mutex* mutex, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      unlock (os::rtos::mutex* mutex)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      unlock_retval (os::rtos::mutex* mutex, os::rtos::result_t res)
       {
       }
     } // namespace mutex
@@ -512,33 +698,63 @@ namespace os
     namespace semaphore
     {
       static void inline __attribute__ ((__always_inline__))
-      created (os::rtos::semaphore* semaphore)
+      create (os::rtos::semaphore* semaphore)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      destroyed (os::rtos::semaphore* semaphore)
+      create_return (os::rtos::semaphore* semaphore)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      posted (os::rtos::semaphore* semaphore, os::rtos::result_t res)
+      destroy (os::rtos::semaphore* semaphore)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      waiting (os::rtos::semaphore* semaphore, os::rtos::result_t res)
+      destroy_return (os::rtos::semaphore* semaphore)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      try_waiting (os::rtos::semaphore* semaphore, os::rtos::result_t res)
+      post (os::rtos::semaphore* semaphore)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      timed_waiting (os::rtos::semaphore* semaphore, unsigned int timeout,
-                     os::rtos::result_t res)
+      post_retval (os::rtos::semaphore* semaphore, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      wait (os::rtos::semaphore* semaphore)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      wait_retval (os::rtos::semaphore* semaphore, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      try_wait (os::rtos::semaphore* semaphore)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      try_wait_retval (os::rtos::semaphore* semaphore, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      timed_wait (os::rtos::semaphore* semaphore, unsigned int timeout)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      timed_wait_retval (os::rtos::semaphore* semaphore,
+                         os::rtos::result_t res)
       {
       }
     } // namespace semaphore
@@ -546,49 +762,90 @@ namespace os
     namespace message_queue
     {
       static void inline __attribute__ ((__always_inline__))
-      created (os::rtos::message_queue* mqueue)
+      create (os::rtos::message_queue* mqueue, std::size_t msgs,
+                                  std::size_t msg_size_bytes)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      destroyed (os::rtos::message_queue* mqueue)
+      create_return (os::rtos::message_queue* mqueue)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      sent (os::rtos::message_queue* mqueue, std::size_t nbytes,
-            unsigned int mprio, os::rtos::result_t res)
+      destroy (os::rtos::message_queue* mqueue)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      try_sent (os::rtos::message_queue* mqueue, std::size_t nbytes,
-                unsigned int mprio, os::rtos::result_t res)
+      destroy_return (os::rtos::message_queue* mqueue)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      timed_sent (os::rtos::message_queue* mqueue, std::size_t nbytes,
-                  unsigned int mprio, unsigned int timeout,
-                  os::rtos::result_t res)
+      send (os::rtos::message_queue* mqueue, std::size_t nbytes,
+            unsigned int mprio)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      received (os::rtos::message_queue* mqueue, std::size_t nbytes,
-                os::rtos::result_t res)
+      send_retval (os::rtos::message_queue* mqueue, os::rtos::result_t res)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      try_received (os::rtos::message_queue* mqueue, std::size_t nbytes,
-                    os::rtos::result_t res)
+      try_send (os::rtos::message_queue* mqueue, std::size_t nbytes,
+                unsigned int mprio)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      timed_received (os::rtos::message_queue* mqueue, std::size_t nbytes,
-                      unsigned int timeout, os::rtos::result_t res)
+      try_send_retval (os::rtos::message_queue* mqueue, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      timed_send (os::rtos::message_queue* mqueue, std::size_t nbytes,
+                  unsigned int timeout, unsigned int mprio)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      timed_send_retval (os::rtos::message_queue* mqueue,
+                         os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      receive (os::rtos::message_queue* mqueue, std::size_t nbytes)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      receive_retval (os::rtos::message_queue* mqueue, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      try_receive (os::rtos::message_queue* mqueue, std::size_t nbytes)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      try_receive_retval (os::rtos::message_queue* mqueue,
+                          os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      timed_receive (os::rtos::message_queue* mqueue, std::size_t nbytes,
+                     unsigned int timeout)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      timed_receive_retval (os::rtos::message_queue* mqueue,
+                            os::rtos::result_t res)
       {
       }
     } // namespace message_queue
@@ -596,34 +853,63 @@ namespace os
     namespace memory_pool
     {
       static void inline __attribute__ ((__always_inline__))
-      created (os::rtos::memory_pool* mpool)
+      create (os::rtos::memory_pool* mpool, std::size_t blocks,
+              std::size_t block_size_bytes)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      destroyed (os::rtos::memory_pool* mpool)
+      create_return (os::rtos::memory_pool* mpool)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      allocated (os::rtos::memory_pool* mpool, void* addr)
+      destroy (os::rtos::memory_pool* mpool)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      try_allocated (os::rtos::memory_pool* mpool, void* addr)
+      destroy_return (os::rtos::memory_pool* mpool)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      timed_allocated (os::rtos::memory_pool* mpool, unsigned int timeout,
-                       void* addr)
+      alloc (os::rtos::memory_pool* mpool)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      deallocated (os::rtos::memory_pool* mpool, void* block,
-                   os::rtos::result_t res)
+      alloc_retval (os::rtos::memory_pool* mpool, void* addr)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      try_alloc (os::rtos::memory_pool* mpool)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      try_alloc_retval (os::rtos::memory_pool* mpool, void* addr)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      timed_alloc (os::rtos::memory_pool* mpool, unsigned int timeout)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      timed_alloc_retval (os::rtos::memory_pool* mpool, void* addr)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      free (os::rtos::memory_pool* mpool, void* block)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      free_retval (os::rtos::memory_pool* mpool, os::rtos::result_t res)
       {
       }
     } // namespace memory_pool
@@ -631,37 +917,66 @@ namespace os
     namespace event_flags
     {
       static void inline __attribute__ ((__always_inline__))
-      created (os::rtos::event_flags* evflags)
+      create (os::rtos::event_flags* evflags)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      destroyed (os::rtos::event_flags* evflags)
+      create_return (os::rtos::event_flags* evflags)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      waiting (os::rtos::event_flags* evflags, unsigned int mask,
-               unsigned int mode, os::rtos::result_t res)
+      destroy (os::rtos::event_flags* evflags)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      try_waiting (os::rtos::event_flags* evflags, unsigned int mask,
-                   unsigned int mode, os::rtos::result_t res)
+      destroy_return (os::rtos::event_flags* evflags)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      timed_waiting (os::rtos::event_flags* evflags, unsigned int mask,
-                     unsigned int mode, unsigned int timeout,
-                     os::rtos::result_t res)
+      wait (os::rtos::event_flags* evflags, unsigned int mask,
+            unsigned int mode)
       {
       }
 
       static void inline __attribute__ ((__always_inline__))
-      raised (os::rtos::event_flags* evflags, unsigned int mask,
-              os::rtos::result_t res)
+      wait_retval (os::rtos::event_flags* evflags, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      try_wait (os::rtos::event_flags* evflags, unsigned int mask,
+                unsigned int mode)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      try_wait_retval (os::rtos::event_flags* evflags, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      timed_wait (os::rtos::event_flags* evflags, unsigned int mask,
+                  unsigned int mode, unsigned int timeout)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      timed_wait_retval (os::rtos::event_flags* evflags,
+                         os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      raise (os::rtos::event_flags* evflags, unsigned int mask)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      raise_retval (os::rtos::event_flags* evflags, os::rtos::result_t res)
       {
       }
     } // namespace event_flags

@@ -271,6 +271,8 @@ namespace os
                               const allocator_type& allocator)
         : object_named_system{ name }
     {
+      instrumentation::memory_pool::create (this, blocks, block_size_bytes);
+
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s %u %u\n", __func__, this, this->name (),
                      blocks, block_size_bytes);
@@ -304,7 +306,7 @@ namespace os
                   * sizeof (typename allocator_type::value_type));
         }
 
-      instrumentation::memory_pool::created (this);
+      instrumentation::memory_pool::create_return (this);
     }
 
     /**
@@ -403,6 +405,8 @@ namespace os
      */
     memory_pool::~memory_pool ()
     {
+      instrumentation::memory_pool::destroy (this);
+
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -419,7 +423,7 @@ namespace os
                             allocated_pool_size_elements_);
         }
 
-      instrumentation::memory_pool::destroyed (this);
+      instrumentation::memory_pool::destroy_return (this);
     }
 
     /**
@@ -515,6 +519,8 @@ namespace os
     void*
     memory_pool::alloc (void)
     {
+      instrumentation::memory_pool::alloc (this);
+
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -538,7 +544,8 @@ namespace os
 #if defined(OS_TRACE_RTOS_MEMPOOL)
             trace::printf ("%s()=%p @%p %s\n", __func__, p, this, name ());
 #endif
-            instrumentation::memory_pool::allocated (this, p);
+
+            instrumentation::memory_pool::alloc_retval (this, p);
             return p;
           }
         // ----- Exit critical section ----------------------------------------
@@ -563,7 +570,8 @@ namespace os
 #if defined(OS_TRACE_RTOS_MEMPOOL)
                 trace::printf ("%s()=%p @%p %s\n", __func__, p, this, name ());
 #endif
-                instrumentation::memory_pool::allocated (this, p);
+
+                instrumentation::memory_pool::alloc_retval (this, p);
                 return p;
               }
 
@@ -585,12 +593,14 @@ namespace os
 #if defined(OS_TRACE_RTOS_MEMPOOL)
               trace::printf ("%s() INTR @%p %s\n", __func__, this, name ());
 #endif
-              instrumentation::memory_pool::allocated (this, nullptr);
+              instrumentation::memory_pool::alloc_retval (this, nullptr);
               return nullptr;
             }
         }
 
       /* NOTREACHED */
+      instrumentation::memory_pool::alloc_retval (this, nullptr);
+      return nullptr;
     }
 
     /**
@@ -613,6 +623,8 @@ namespace os
     void*
     memory_pool::try_alloc (void)
     {
+      instrumentation::memory_pool::try_alloc (this);
+
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -632,7 +644,8 @@ namespace os
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s()=%p @%p %s\n", __func__, p, this, name ());
 #endif
-      instrumentation::memory_pool::try_allocated (this, p);
+
+      instrumentation::memory_pool::try_alloc_retval (this, p);
       return p;
     }
 
@@ -679,6 +692,8 @@ namespace os
     void*
     memory_pool::timed_alloc (clock::duration_t timeout)
     {
+      instrumentation::memory_pool::timed_alloc (this, timeout);
+
 #if defined(OS_TRACE_RTOS_MEMPOOL)
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -709,7 +724,8 @@ namespace os
 #if defined(OS_TRACE_RTOS_MEMPOOL)
             trace::printf ("%s()=%p @%p %s\n", __func__, p, this, name ());
 #endif
-            instrumentation::memory_pool::timed_allocated (this, timeout, p);
+
+            instrumentation::memory_pool::timed_alloc_retval (this, p);
             return p;
           }
         // ----- Exit critical section ----------------------------------------
@@ -741,8 +757,8 @@ namespace os
 #if defined(OS_TRACE_RTOS_MEMPOOL)
                 trace::printf ("%s()=%p @%p %s\n", __func__, p, this, name ());
 #endif
-                instrumentation::memory_pool::timed_allocated (this, timeout,
-                                                               p);
+
+                instrumentation::memory_pool::timed_alloc_retval (this, p);
                 return p;
               }
 
@@ -767,8 +783,8 @@ namespace os
 #if defined(OS_TRACE_RTOS_MEMPOOL)
               trace::printf ("%s() INTR @%p %s\n", __func__, this, name ());
 #endif
-              instrumentation::memory_pool::timed_allocated (this, timeout,
-                                                             nullptr);
+
+              instrumentation::memory_pool::timed_alloc_retval (this, nullptr);
               return nullptr;
             }
 
@@ -777,13 +793,14 @@ namespace os
 #if defined(OS_TRACE_RTOS_MEMPOOL)
               trace::printf ("%s() TMO @%p %s\n", __func__, this, name ());
 #endif
-              instrumentation::memory_pool::timed_allocated (this, timeout,
-                                                             nullptr);
+              instrumentation::memory_pool::timed_alloc_retval (this, nullptr);
               return nullptr;
             }
         }
 
       /* NOTREACHED */
+      instrumentation::memory_pool::timed_alloc_retval (this, nullptr);
+      return nullptr;
     }
 
     /**
@@ -799,6 +816,8 @@ namespace os
     result_t
     memory_pool::free (void* block)
     {
+      instrumentation::memory_pool::free (this, block);
+
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s(%p) @%p %s\n", __func__, block, this, name ());
 #endif
@@ -819,7 +838,7 @@ namespace os
           trace::printf ("%s(%p) EINVAL @%p %s\n", __func__, block, this,
                          name ());
 #endif
-          instrumentation::memory_pool::deallocated (this, block, EINVAL);
+          instrumentation::memory_pool::free_retval (this, EINVAL);
           return EINVAL;
         }
 #pragma GCC diagnostic pop
@@ -853,7 +872,7 @@ namespace os
       // Wake-up one thread, if any.
       list_.resume_one ();
 
-      instrumentation::memory_pool::deallocated (this, block, result::ok);
+      instrumentation::memory_pool::free_retval (this, result::ok);
       return result::ok;
     }
 

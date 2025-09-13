@@ -435,6 +435,8 @@ namespace os
                                   const allocator_type& allocator)
         : object_named_system{ name }
     {
+      instrumentation::message_queue::create (this, msgs, msg_size_bytes);
+
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s() @%p %s %u %u\n", __func__, this, this->name (),
                      msgs, msg_size_bytes);
@@ -468,7 +470,7 @@ namespace os
                   * sizeof (typename allocator_type::value_type));
         }
 
-      instrumentation::message_queue::created (this);
+      instrumentation::message_queue::create_return (this);
     }
 
     /**
@@ -487,6 +489,8 @@ namespace os
      */
     message_queue::~message_queue ()
     {
+      instrumentation::message_queue::destroy (this);
+
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -515,7 +519,7 @@ namespace os
 
 #endif
 
-      instrumentation::message_queue::destroyed (this);
+      instrumentation::message_queue::destroy_return (this);
     }
 
     /**
@@ -933,6 +937,8 @@ namespace os
     result_t
     message_queue::send (const void* msg, std::size_t nbytes, priority_t mprio)
     {
+      instrumentation::message_queue::send (this, nbytes, mprio);
+
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%d,%d) @%p %s\n", __func__, msg, nbytes, mprio,
                      this, name ());
@@ -949,7 +955,8 @@ namespace os
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
       result_t res = port::message_queue::send (this, msg, nbytes, mprio);
-      instrumentation::message_queue::sent (this, nbytes, mprio, res);
+
+      instrumentation::message_queue::send_retval (this, res);
       return res;
 
 #else
@@ -960,8 +967,7 @@ namespace os
 
         if (internal_try_send_ (msg, nbytes, mprio))
           {
-            instrumentation::message_queue::sent (this, nbytes, mprio,
-                                                  result::ok);
+            instrumentation::message_queue::send_retval (this, result::ok);
             return result::ok;
           }
         // ----- Exit critical section ----------------------------------------
@@ -982,8 +988,7 @@ namespace os
 
             if (internal_try_send_ (msg, nbytes, mprio))
               {
-                instrumentation::message_queue::sent (this, nbytes, mprio,
-                                                      result::ok);
+                instrumentation::message_queue::send_retval (this, result::ok);
                 return result::ok;
               }
 
@@ -1007,15 +1012,13 @@ namespace os
               trace::printf ("%s(%p,%d,%d) EINTR @%p %s\n", __func__, msg,
                              nbytes, mprio, this, name ());
 #endif
-              instrumentation::message_queue::sent (this, nbytes, mprio,
-                                                    EINTR);
+              instrumentation::message_queue::send_retval (this, EINTR);
               return EINTR;
             }
         }
 
       /* NOTREACHED */
-      instrumentation::message_queue::sent (this, nbytes, mprio,
-                                            ENOTRECOVERABLE);
+      instrumentation::message_queue::send_retval (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
@@ -1059,6 +1062,8 @@ namespace os
     message_queue::try_send (const void* msg, std::size_t nbytes,
                              priority_t mprio)
     {
+      instrumentation::message_queue::try_send (this, nbytes, mprio);
+
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%u,%u) @%p %s\n", __func__, msg, nbytes, mprio,
                      this, name ());
@@ -1070,7 +1075,8 @@ namespace os
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
       result_t res = port::message_queue::try_send (this, msg, nbytes, mprio);
-      instrumentation::message_queue::try_sent (this, nbytes, mprio, res);
+
+      instrumentation::message_queue::try_send_retval (this, res);
       return res;
 
 #else
@@ -1083,14 +1089,13 @@ namespace os
 
         if (internal_try_send_ (msg, nbytes, mprio))
           {
-            instrumentation::message_queue::try_sent (this, nbytes, mprio,
-                                                      result::ok);
+            instrumentation::message_queue::try_send_retval (this, result::ok);
             return result::ok;
           }
         else
           {
-            instrumentation::message_queue::try_sent (this, nbytes, mprio,
-                                                      EWOULDBLOCK);
+            instrumentation::message_queue::try_send_retval (this,
+                                                             EWOULDBLOCK);
             return EWOULDBLOCK;
           }
         // ----- Exit critical section ----------------------------------------
@@ -1152,9 +1157,12 @@ namespace os
     message_queue::timed_send (const void* msg, std::size_t nbytes,
                                clock::duration_t timeout, priority_t mprio)
     {
+      instrumentation::message_queue::timed_send (this, nbytes, timeout,
+                                                  mprio);
+
 #if defined(OS_TRACE_RTOS_MQUEUE)
-      trace::printf ("%s(%p,%u,%u,%u) @%p %s\n", __func__, msg, nbytes, mprio,
-                     timeout, this, name ());
+      trace::printf ("%s(%p,%u,%u,%u) @%p %s\n", __func__, msg, nbytes,
+                     timeout, mprio, this, name ());
 #endif
 
       // Don't call this from interrupt handlers.
@@ -1169,8 +1177,8 @@ namespace os
 
       result_t res = port::message_queue::timed_send (this, msg, nbytes,
                                                       timeout, mprio);
-      instrumentation::message_queue::timed_sent (this, nbytes, mprio, timeout,
-                                                  res);
+
+      instrumentation::message_queue::timed_send_retval (this, res);
       return res;
 
 #else
@@ -1183,8 +1191,8 @@ namespace os
 
         if (internal_try_send_ (msg, nbytes, mprio))
           {
-            instrumentation::message_queue::timed_sent (this, nbytes, mprio,
-                                                        timeout, result::ok);
+            instrumentation::message_queue::timed_send_retval (this,
+                                                               result::ok);
             return result::ok;
           }
         // ----- Exit critical section ----------------------------------------
@@ -1213,8 +1221,8 @@ namespace os
 
             if (internal_try_send_ (msg, nbytes, mprio))
               {
-                instrumentation::message_queue::timed_sent (
-                    this, nbytes, mprio, timeout, result::ok);
+                instrumentation::message_queue::timed_send_retval (this,
+                                                                   result::ok);
                 return result::ok;
               }
 
@@ -1240,8 +1248,7 @@ namespace os
               trace::printf ("%s(%p,%u,%u,%u) EINTR @%p %s\n", __func__, msg,
                              nbytes, mprio, timeout, this, name ());
 #endif
-              instrumentation::message_queue::timed_sent (this, nbytes, mprio,
-                                                          timeout, EINTR);
+              instrumentation::message_queue::timed_send_retval (this, EINTR);
               return EINTR;
             }
 
@@ -1251,15 +1258,15 @@ namespace os
               trace::printf ("%s(%p,%u,%u,%u) ETIMEDOUT @%p %s\n", __func__,
                              msg, nbytes, mprio, timeout, this, name ());
 #endif
-              instrumentation::message_queue::timed_sent (this, nbytes, mprio,
-                                                          timeout, ETIMEDOUT);
+              instrumentation::message_queue::timed_send_retval (this,
+                                                                 ETIMEDOUT);
               return ETIMEDOUT;
             }
         }
 
       /* NOTREACHED */
-      instrumentation::message_queue::timed_sent (this, nbytes, mprio, timeout,
-                                                  ENOTRECOVERABLE);
+      instrumentation::message_queue::timed_send_retval (this,
+                                                         ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
@@ -1305,6 +1312,8 @@ namespace os
     result_t
     message_queue::receive (void* msg, std::size_t nbytes, priority_t* mprio)
     {
+      instrumentation::message_queue::receive (this, nbytes);
+
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%u) @%p %s\n", __func__, msg, nbytes, this,
                      name ());
@@ -1321,7 +1330,8 @@ namespace os
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
       result_t res = port::message_queue::receive (this, msg, nbytes, mprio);
-      instrumentation::message_queue::received (this, nbytes, res);
+
+      instrumentation::message_queue::receive_retval (this, res);
       return res;
 
 #else
@@ -1334,8 +1344,7 @@ namespace os
 
         if (internal_try_receive_ (msg, nbytes, mprio))
           {
-            instrumentation::message_queue::received (this, nbytes,
-                                                      result::ok);
+            instrumentation::message_queue::receive_retval (this, result::ok);
             return result::ok;
           }
         // ----- Exit critical section ----------------------------------------
@@ -1356,8 +1365,8 @@ namespace os
 
             if (internal_try_receive_ (msg, nbytes, mprio))
               {
-                instrumentation::message_queue::received (this, nbytes,
-                                                          result::ok);
+                instrumentation::message_queue::receive_retval (this,
+                                                                result::ok);
                 return result::ok;
               }
 
@@ -1381,13 +1390,13 @@ namespace os
               trace::printf ("%s(%p,%u) EINTR @%p %s\n", __func__, msg, nbytes,
                              this, name ());
 #endif
-              instrumentation::message_queue::received (this, nbytes, EINTR);
+              instrumentation::message_queue::receive_retval (this, EINTR);
               return EINTR;
             }
         }
 
       /* NOTREACHED */
-      instrumentation::message_queue::received (this, nbytes, ENOTRECOVERABLE);
+      instrumentation::message_queue::receive_retval (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
@@ -1430,6 +1439,8 @@ namespace os
     message_queue::try_receive (void* msg, std::size_t nbytes,
                                 priority_t* mprio)
     {
+      instrumentation::message_queue::try_receive (this, nbytes);
+
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%u) @%p %s\n", __func__, msg, nbytes, this,
                      name ());
@@ -1442,7 +1453,8 @@ namespace os
 
       result_t res
           = port::message_queue::try_receive (this, msg, nbytes, mprio);
-      instrumentation::message_queue::try_received (this, nbytes, res);
+
+      instrumentation::message_queue::try_receive_retval (this, res);
       return res;
 
 #else
@@ -1456,14 +1468,14 @@ namespace os
 
         if (internal_try_receive_ (msg, nbytes, mprio))
           {
-            instrumentation::message_queue::try_received (this, nbytes,
-                                                          result::ok);
+            instrumentation::message_queue::try_receive_retval (this,
+                                                                result::ok);
             return result::ok;
           }
         else
           {
-            instrumentation::message_queue::try_received (this, nbytes,
-                                                          EWOULDBLOCK);
+            instrumentation::message_queue::try_receive_retval (this,
+                                                                EWOULDBLOCK);
             return EWOULDBLOCK;
           }
         // ----- Exit critical section ----------------------------------------
@@ -1538,6 +1550,8 @@ namespace os
     message_queue::timed_receive (void* msg, std::size_t nbytes,
                                   clock::duration_t timeout, priority_t* mprio)
     {
+      instrumentation::message_queue::timed_receive (this, nbytes, timeout);
+
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s(%p,%u,%u) @%p %s\n", __func__, msg, nbytes, timeout,
                      this, name ());
@@ -1555,8 +1569,8 @@ namespace os
 
       result_t res = port::message_queue::timed_receive (this, msg, nbytes,
                                                          timeout, mprio);
-      instrumentation::message_queue::timed_received (this, nbytes, timeout,
-                                                      res);
+
+      instrumentation::message_queue::timed_receive_retval (this, res);
       return res;
 
 #else
@@ -1569,8 +1583,8 @@ namespace os
 
         if (internal_try_receive_ (msg, nbytes, mprio))
           {
-            instrumentation::message_queue::timed_received (
-                this, nbytes, timeout, result::ok);
+            instrumentation::message_queue::timed_receive_retval (this,
+                                                                  result::ok);
             return result::ok;
           }
         // ----- Exit critical section ----------------------------------------
@@ -1598,8 +1612,8 @@ namespace os
 
             if (internal_try_receive_ (msg, nbytes, mprio))
               {
-                instrumentation::message_queue::timed_received (
-                    this, nbytes, timeout, result::ok);
+                instrumentation::message_queue::timed_receive_retval (
+                    this, result::ok);
                 return result::ok;
               }
 
@@ -1625,8 +1639,8 @@ namespace os
               trace::printf ("%s(%p,%u,%u) EINTR @%p %s\n", __func__, msg,
                              nbytes, timeout, this, name ());
 #endif
-              instrumentation::message_queue::timed_received (this, nbytes,
-                                                              timeout, EINTR);
+              instrumentation::message_queue::timed_receive_retval (this,
+                                                                    EINTR);
               return EINTR;
             }
 
@@ -1636,15 +1650,15 @@ namespace os
               trace::printf ("%s(%p,%u,%u) ETIMEDOUT @%p %s\n", __func__, msg,
                              nbytes, timeout, this, name ());
 #endif
-              instrumentation::message_queue::timed_received (
-                  this, nbytes, timeout, ETIMEDOUT);
+              instrumentation::message_queue::timed_receive_retval (this,
+                                                                    ETIMEDOUT);
               return ETIMEDOUT;
             }
         }
 
       /* NOTREACHED */
-      instrumentation::message_queue::timed_received (this, nbytes, timeout,
-                                                      ENOTRECOVERABLE);
+      instrumentation::message_queue::timed_receive_retval (this,
+                                                            ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif

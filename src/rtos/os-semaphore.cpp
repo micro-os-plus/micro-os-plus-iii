@@ -166,6 +166,8 @@ namespace os
           max_value_ (max_value), //
           initial_value_ (initial_value)
     {
+      instrumentation::semaphore::create (this);
+
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s %u %u\n", __func__, this, this->name (),
                      initial_value, max_value_);
@@ -196,7 +198,7 @@ namespace os
 
 #endif
 
-      instrumentation::semaphore::created (this);
+      instrumentation::semaphore::create_return (this);
     }
 
     /**
@@ -226,6 +228,8 @@ namespace os
      */
     semaphore::~semaphore ()
     {
+      instrumentation::semaphore::destroy (this);
+
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -241,7 +245,7 @@ namespace os
 
 #endif
 
-      instrumentation::semaphore::destroyed (this);
+      instrumentation::semaphore::destroy_return (this);
     }
 
     /**
@@ -344,6 +348,8 @@ namespace os
     semaphore::post (void)
     {
 
+      instrumentation::semaphore::post (this);
+
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
@@ -351,7 +357,7 @@ namespace os
 #endif
 
       result_t res = port::semaphore::post (this);
-      instrumentation::semaphore::posted (this, res);
+      instrumentation::semaphore::post_retval (this, res);
       return res;
 
 #else
@@ -368,7 +374,7 @@ namespace os
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
             trace::printf ("%s() @%p %s EAGAIN\n", __func__, this, name ());
 #endif
-            instrumentation::semaphore::posted (this, EAGAIN);
+            instrumentation::semaphore::post_retval (this, EAGAIN);
             return EAGAIN;
           }
 
@@ -391,7 +397,7 @@ namespace os
       // Wake-up one thread.
       list_.resume_one ();
 
-      instrumentation::semaphore::posted (this, result::ok);
+      instrumentation::semaphore::post_retval (this, result::ok);
       return result::ok;
 
 #endif
@@ -432,6 +438,8 @@ namespace os
     result_t
     semaphore::wait ()
     {
+      instrumentation::semaphore::wait (this);
+
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s <%u\n", __func__, this, name (), count_);
 #endif
@@ -444,7 +452,8 @@ namespace os
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
       result_t res = port::semaphore::wait (this);
-      instrumentation::semaphore::waiting (this, res);
+
+      instrumentation::semaphore::wait_retval (this, res);
       return res;
 
 #else
@@ -457,7 +466,7 @@ namespace os
 
         if (internal_try_wait_ ())
           {
-            instrumentation::semaphore::waiting (this, result::ok);
+            instrumentation::semaphore::wait_retval (this, result::ok);
             return result::ok;
           }
         // ----- Exit critical section ----------------------------------------
@@ -478,7 +487,7 @@ namespace os
 
             if (internal_try_wait_ ())
               {
-                instrumentation::semaphore::waiting (this, result::ok);
+                instrumentation::semaphore::wait_retval (this, result::ok);
                 return result::ok;
               }
 
@@ -501,13 +510,13 @@ namespace os
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
               trace::printf ("%s() EINTR @%p %s\n", __func__, this, name ());
 #endif
-              instrumentation::semaphore::waiting (this, EINTR);
+              instrumentation::semaphore::wait_retval (this, EINTR);
               return EINTR;
             }
         }
 
       /* NOTREACHED */
-      instrumentation::semaphore::waiting (this, ENOTRECOVERABLE);
+      instrumentation::semaphore::wait_retval (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
@@ -540,6 +549,8 @@ namespace os
     result_t
     semaphore::try_wait ()
     {
+      instrumentation::semaphore::try_wait (this);
+
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s <%u\n", __func__, this, name (), count_);
 #endif
@@ -550,7 +561,8 @@ namespace os
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
       result_t res = port::semaphore::try_wait (this);
-      instrumentation::semaphore::try_waiting (this, res);
+
+      instrumentation::semaphore::try_wait_retval (this, res);
       return res;
 
 #else
@@ -561,12 +573,12 @@ namespace os
 
         if (internal_try_wait_ ())
           {
-            instrumentation::semaphore::try_waiting (this, result::ok);
+            instrumentation::semaphore::try_wait_retval (this, result::ok);
             return result::ok;
           }
         else
           {
-            instrumentation::semaphore::try_waiting (this, EWOULDBLOCK);
+            instrumentation::semaphore::try_wait_retval (this, EWOULDBLOCK);
             return EWOULDBLOCK;
           }
         // ----- Exit critical section ----------------------------------------
@@ -618,6 +630,8 @@ namespace os
     result_t
     semaphore::timed_wait (clock::duration_t timeout)
     {
+      instrumentation::semaphore::timed_wait (this, timeout);
+
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -638,7 +652,8 @@ namespace os
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
       result_t res = port::semaphore::timed_wait (this, timeout);
-      instrumentation::semaphore::timed_waiting (this, timeout, res);
+
+      instrumentation::semaphore::timed_wait_retval (this, res);
       return res;
 
 #else
@@ -651,8 +666,7 @@ namespace os
 
         if (internal_try_wait_ ())
           {
-            instrumentation::semaphore::timed_waiting (this, timeout,
-                                                       result::ok);
+            instrumentation::semaphore::timed_wait_retval (this, result::ok);
             return result::ok;
           }
         // ----- Exit critical section ----------------------------------------
@@ -680,8 +694,8 @@ namespace os
 
             if (internal_try_wait_ ())
               {
-                instrumentation::semaphore::timed_waiting (this, timeout,
-                                                           result::ok);
+                instrumentation::semaphore::timed_wait_retval (this,
+                                                               result::ok);
                 return result::ok;
               }
 
@@ -714,7 +728,7 @@ namespace os
                              name ());
 #pragma GCC diagnostic pop
 #endif
-              instrumentation::semaphore::timed_waiting (this, timeout, EINTR);
+              instrumentation::semaphore::timed_wait_retval (this, EINTR);
               return EINTR;
             }
 
@@ -731,15 +745,13 @@ namespace os
                              name ());
 #pragma GCC diagnostic pop
 #endif
-              instrumentation::semaphore::timed_waiting (this, timeout,
-                                                         ETIMEDOUT);
+              instrumentation::semaphore::timed_wait_retval (this, ETIMEDOUT);
               return ETIMEDOUT;
             }
         }
 
       /* NOTREACHED */
-      instrumentation::semaphore::timed_waiting (this, timeout,
-                                                 ENOTRECOVERABLE);
+      instrumentation::semaphore::timed_wait_retval (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
