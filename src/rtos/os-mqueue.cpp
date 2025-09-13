@@ -995,7 +995,7 @@ namespace os
             // Add this thread to the message queue send waiting list.
             scheduler::internal_link_node (
                 send_list_, node,
-                OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_MQUEUE_SEND);
+                OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_MESSAGE_QUEUE_SEND);
             // state::suspended set in above link().
             // ----- Exit critical section ------------------------------------
           }
@@ -1230,7 +1230,7 @@ namespace os
             // and the clock timeout list.
             scheduler::internal_link_node (
                 send_list_, node, clock_list, timeout_node,
-                OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_MQUEUE_SEND);
+                OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_MESSAGE_QUEUE_SEND);
             // state::suspended set in above link().
             // ----- Exit critical section ------------------------------------
           }
@@ -1373,7 +1373,7 @@ namespace os
             // Add this thread to the message queue receive waiting list.
             scheduler::internal_link_node (
                 receive_list_, node,
-                OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_MQUEUE_RECEIVE);
+                OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_MESSAGE_QUEUE_RECEIVE);
             // state::suspended set in above link().
             // ----- Exit critical section ------------------------------------
           }
@@ -1621,7 +1621,7 @@ namespace os
             // and the clock timeout list.
             scheduler::internal_link_node (
                 receive_list_, node, clock_list, timeout_node,
-                OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_MQUEUE_RECEIVE);
+                OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_MESSAGE_QUEUE_RECEIVE);
             // state::suspended set in above link().
             // ----- Exit critical section ------------------------------------
           }

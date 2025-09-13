@@ -577,7 +577,8 @@ namespace os
 
             // Add this thread to the memory pool waiting list.
             scheduler::internal_link_node (
-                list_, node, OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_MEMPOOL);
+                list_, node,
+                OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_MEMORY_POOL);
             // state::suspended set in above link().
             // ----- Exit critical section ------------------------------------
           }
@@ -766,7 +767,7 @@ namespace os
             // and the clock timeout list.
             scheduler::internal_link_node (
                 list_, node, clock_list, timeout_node,
-                OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_MEMPOOL);
+                OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_MEMORY_POOL);
             // state::suspended set in above link().
             // ----- Exit critical section ------------------------------------
           }

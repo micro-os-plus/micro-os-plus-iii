@@ -436,7 +436,7 @@ namespace os
                                          mqueue->name ());
           }
         SEGGER_SYSVIEW_RecordU32x3 (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_CREATE,
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_CREATE,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
             static_cast<U32> (msgs), static_cast<U32> (msg_size_bytes));
       }
@@ -445,14 +445,14 @@ namespace os
       create_return (os::rtos::message_queue* mqueue)
       {
         SEGGER_SYSVIEW_RecordEndCall (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_CREATE);
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_CREATE);
       }
 
       void
       destroy (os::rtos::message_queue* mqueue)
       {
         SEGGER_SYSVIEW_RecordU32 (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_DESTROY,
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_DESTROY,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)));
       }
 
@@ -461,13 +461,13 @@ namespace os
       {
 #if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_DESTROY_VALUES,
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_DESTROY_VALUES,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
             static_cast<U32> (mqueue->length ()));
 #endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
 
         SEGGER_SYSVIEW_RecordEndCall (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_DESTROY);
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_DESTROY);
       }
 
       void
@@ -475,7 +475,7 @@ namespace os
             unsigned int mprio)
       {
         SEGGER_SYSVIEW_RecordU32x3 (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_SEND,
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_SEND,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
             static_cast<U32> (nbytes), static_cast<U32> (mprio));
       }
@@ -485,13 +485,14 @@ namespace os
       {
 #if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_SEND_VALUES,
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_SEND_VALUES,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
             static_cast<U32> (mqueue->length ()));
 #endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
 
         SEGGER_SYSVIEW_RecordEndCallU32 (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_SEND, static_cast<U32> (res));
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_SEND,
+            static_cast<U32> (res));
       }
 
       void
@@ -499,7 +500,7 @@ namespace os
                 unsigned int mprio)
       {
         SEGGER_SYSVIEW_RecordU32x3 (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TRY_SEND,
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_TRY_SEND,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
             static_cast<U32> (nbytes), static_cast<U32> (mprio));
       }
@@ -509,13 +510,13 @@ namespace os
       {
 #if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TRY_SEND_VALUES,
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_TRY_SEND_VALUES,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
             static_cast<U32> (mqueue->length ()));
 #endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
 
         SEGGER_SYSVIEW_RecordEndCallU32 (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TRY_SEND,
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_TRY_SEND,
             static_cast<U32> (res));
       }
 
@@ -524,7 +525,7 @@ namespace os
                   unsigned int timeout, unsigned int mprio)
       {
         SEGGER_SYSVIEW_RecordU32x4 (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TIMED_SEND,
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_TIMED_SEND,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
             static_cast<U32> (nbytes), static_cast<U32> (timeout),
             static_cast<U32> (mprio));
@@ -536,13 +537,13 @@ namespace os
       {
 #if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TIMED_SEND_VALUES,
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_TIMED_SEND_VALUES,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
             static_cast<U32> (mqueue->length ()));
 #endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
 
         SEGGER_SYSVIEW_RecordEndCallU32 (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TIMED_SEND,
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_TIMED_SEND,
             static_cast<U32> (res));
       }
 
@@ -550,7 +551,7 @@ namespace os
       receive (os::rtos::message_queue* mqueue, std::size_t nbytes)
       {
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_RECEIVE,
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_RECEIVE,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
             static_cast<U32> (nbytes));
       }
@@ -560,13 +561,13 @@ namespace os
       {
 #if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_RECEIVE_VALUES,
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_RECEIVE_VALUES,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
             static_cast<U32> (mqueue->length ()));
 #endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
 
         SEGGER_SYSVIEW_RecordEndCallU32 (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_RECEIVE,
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_RECEIVE,
             static_cast<U32> (res));
       }
 
@@ -574,7 +575,7 @@ namespace os
       try_receive (os::rtos::message_queue* mqueue, std::size_t nbytes)
       {
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TRY_RECEIVE,
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_TRY_RECEIVE,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
             static_cast<U32> (nbytes));
       }
@@ -585,13 +586,13 @@ namespace os
       {
 #if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TRY_RECEIVE_VALUES,
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_TRY_RECEIVE_VALUES,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
             static_cast<U32> (mqueue->length ()));
 #endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
 
         SEGGER_SYSVIEW_RecordEndCallU32 (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TRY_RECEIVE,
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_TRY_RECEIVE,
             static_cast<U32> (res));
       }
 
@@ -600,7 +601,7 @@ namespace os
                      unsigned int timeout)
       {
         SEGGER_SYSVIEW_RecordU32x3 (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TIMED_RECEIVE,
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_TIMED_RECEIVE,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
             static_cast<U32> (nbytes), static_cast<U32> (timeout));
       }
@@ -611,13 +612,13 @@ namespace os
       {
 #if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TIMED_RECEIVE_VALUES,
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_TIMED_RECEIVE_VALUES,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
             static_cast<U32> (mqueue->length ()));
 #endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
 
         SEGGER_SYSVIEW_RecordEndCallU32 (
-            OS_INTEGER_INSTRUMENTATION_ID_MQUEUE_TIMED_RECEIVE,
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_TIMED_RECEIVE,
             static_cast<U32> (res));
       }
 
@@ -635,7 +636,7 @@ namespace os
                                          mpool->name ());
           }
         SEGGER_SYSVIEW_RecordU32x3 (
-            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_CREATE,
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_CREATE,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)),
             static_cast<U32> (blocks), static_cast<U32> (block_size_bytes));
       }
@@ -644,14 +645,14 @@ namespace os
       create_return (os::rtos::memory_pool* mpool)
       {
         SEGGER_SYSVIEW_RecordEndCall (
-            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_CREATE);
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_CREATE);
       }
 
       void
       destroy (os::rtos::memory_pool* mpool)
       {
         SEGGER_SYSVIEW_RecordU32 (
-            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_DESTROY,
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_DESTROY,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)));
       }
 
@@ -660,20 +661,20 @@ namespace os
       {
 #if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_DESTROY_VALUES,
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_DESTROY_VALUES,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)),
             static_cast<U32> (mpool->count ()));
 #endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
 
         SEGGER_SYSVIEW_RecordEndCall (
-            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_DESTROY);
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_DESTROY);
       }
 
       void
       alloc (os::rtos::memory_pool* mpool)
       {
         SEGGER_SYSVIEW_RecordU32 (
-            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_ALLOC,
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_ALLOC,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)));
       }
 
@@ -682,13 +683,13 @@ namespace os
       {
 #if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_ALLOC_VALUES,
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_ALLOC_VALUES,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)),
             static_cast<U32> (mpool->count ()));
 #endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
 
         SEGGER_SYSVIEW_RecordEndCallU32 (
-            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_ALLOC,
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_ALLOC,
             reinterpret_cast<U32> (addr));
       }
 
@@ -696,7 +697,7 @@ namespace os
       try_alloc (os::rtos::memory_pool* mpool)
       {
         SEGGER_SYSVIEW_RecordU32 (
-            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_TRY_ALLOC,
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_TRY_ALLOC,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)));
       }
 
@@ -705,13 +706,13 @@ namespace os
       {
 #if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_TRY_ALLOC_VALUES,
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_TRY_ALLOC_VALUES,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)),
             static_cast<U32> (mpool->count ()));
 #endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
 
         SEGGER_SYSVIEW_RecordEndCallU32 (
-            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_TRY_ALLOC,
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_TRY_ALLOC,
             reinterpret_cast<U32> (addr));
       }
 
@@ -719,7 +720,7 @@ namespace os
       timed_alloc (os::rtos::memory_pool* mpool, unsigned int timeout)
       {
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_TIMED_ALLOC,
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_TIMED_ALLOC,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)),
             static_cast<U32> (timeout));
       }
@@ -729,13 +730,13 @@ namespace os
       {
 #if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_TIMED_ALLOC_VALUES,
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_TIMED_ALLOC_VALUES,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)),
             static_cast<U32> (mpool->count ()));
 #endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
 
         SEGGER_SYSVIEW_RecordEndCallU32 (
-            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_TIMED_ALLOC,
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_TIMED_ALLOC,
             reinterpret_cast<U32> (addr));
       }
 
@@ -743,7 +744,7 @@ namespace os
       free (os::rtos::memory_pool* mpool, void* block)
       {
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_FREE,
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_FREE,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)),
             reinterpret_cast<U32> (block));
       }
@@ -753,13 +754,13 @@ namespace os
       {
 #if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_FREE_VALUES,
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_FREE_VALUES,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)),
             static_cast<U32> (mpool->count ()));
 #endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
 
         SEGGER_SYSVIEW_RecordEndCallU32 (
-            OS_INTEGER_INSTRUMENTATION_ID_MEMPOOL_FREE,
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_FREE,
             static_cast<U32> (res));
       }
     } // namespace memory_pool
@@ -775,7 +776,7 @@ namespace os
                                          evflags->name ());
           }
         SEGGER_SYSVIEW_RecordU32 (
-            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_CREATE,
+            OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_CREATE,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (evflags)));
       }
 
@@ -783,14 +784,14 @@ namespace os
       create_return (os::rtos::event_flags* evflags)
       {
         SEGGER_SYSVIEW_RecordEndCall (
-            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_CREATE);
+            OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_CREATE);
       }
 
       void
       destroy (os::rtos::event_flags* evflags)
       {
         SEGGER_SYSVIEW_RecordU32 (
-            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_DESTROY,
+            OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_DESTROY,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (evflags)));
       }
 
@@ -799,13 +800,13 @@ namespace os
       {
 #if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_DESTROY_VALUES,
+            OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_DESTROY_VALUES,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (evflags)),
             evflags->get (0, 0));
 #endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
 
         SEGGER_SYSVIEW_RecordEndCall (
-            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_DESTROY);
+            OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_DESTROY);
       }
 
       void
@@ -813,7 +814,7 @@ namespace os
             unsigned int mode)
       {
         SEGGER_SYSVIEW_RecordU32x3 (
-            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_WAIT,
+            OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_WAIT,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (evflags)),
             static_cast<U32> (mask), static_cast<U32> (mode));
       }
@@ -823,13 +824,13 @@ namespace os
       {
 #if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_WAIT_VALUES,
+            OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_WAIT_VALUES,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (evflags)),
             evflags->get (0, 0));
 #endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
 
         SEGGER_SYSVIEW_RecordEndCallU32 (
-            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_WAIT,
+            OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_WAIT,
             static_cast<U32> (res));
       }
 
@@ -838,7 +839,7 @@ namespace os
                 unsigned int mode)
       {
         SEGGER_SYSVIEW_RecordU32x3 (
-            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_TRY_WAIT,
+            OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_TRY_WAIT,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (evflags)),
             static_cast<U32> (mask), static_cast<U32> (mode));
       }
@@ -848,13 +849,13 @@ namespace os
       {
 #if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_TRY_WAIT_VALUES,
+            OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_TRY_WAIT_VALUES,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (evflags)),
             evflags->get (0, 0));
 #endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
 
         SEGGER_SYSVIEW_RecordEndCallU32 (
-            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_TRY_WAIT,
+            OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_TRY_WAIT,
             static_cast<U32> (res));
       }
 
@@ -863,7 +864,7 @@ namespace os
                   unsigned int timeout, unsigned int mode)
       {
         SEGGER_SYSVIEW_RecordU32x4 (
-            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_TIMED_WAIT,
+            OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_TIMED_WAIT,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (evflags)),
             static_cast<U32> (mask), static_cast<U32> (timeout),
             static_cast<U32> (mode));
@@ -875,13 +876,13 @@ namespace os
       {
 #if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_TIMED_WAIT_VALUES,
+            OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_TIMED_WAIT_VALUES,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (evflags)),
             evflags->get (0, 0));
 #endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
 
         SEGGER_SYSVIEW_RecordEndCallU32 (
-            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_TIMED_WAIT,
+            OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_TIMED_WAIT,
             static_cast<U32> (res));
       }
 
@@ -889,7 +890,7 @@ namespace os
       raise (os::rtos::event_flags* evflags, unsigned int mask)
       {
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_RAISE,
+            OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_RAISE,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (evflags)),
             static_cast<U32> (mask));
       }
@@ -899,13 +900,13 @@ namespace os
       {
 #if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
         SEGGER_SYSVIEW_RecordU32x2 (
-            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_RAISE_VALUES,
+            OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_RAISE_VALUES,
             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (evflags)),
             evflags->get (0, 0));
 #endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
 
         SEGGER_SYSVIEW_RecordEndCallU32 (
-            OS_INTEGER_INSTRUMENTATION_ID_EVFLAGS_RAISE,
+            OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_RAISE,
             static_cast<U32> (res));
       }
     } // namespace event_flags
