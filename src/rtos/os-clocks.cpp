@@ -140,10 +140,12 @@ namespace os
 
     clock::clock (const char* name) : internal::object_named{ name }
     {
+      instrumentation::clock::create (this);
     }
 
     clock::~clock ()
     {
+      instrumentation::clock::destroy (this);
     }
 
     /**
@@ -189,6 +191,8 @@ namespace os
     result_t
     clock::sleep_for (duration_t duration)
     {
+      instrumentation::clock::sleep_for (this, duration);
+
 #if defined(OS_TRACE_RTOS_CLOCKS)
 
 #pragma GCC diagnostic push
@@ -217,19 +221,24 @@ namespace os
           timestamp_t n = steady_now ();
           if (n >= timestamp)
             {
+              instrumentation::clock::sleep_for_retval (this, ETIMEDOUT);
               return ETIMEDOUT;
             }
 
           if (this_thread::thread ().interrupted ())
             {
+              instrumentation::clock::sleep_for_retval (this, EINTR);
               return EINTR;
             }
 
           if (res != result::ok)
             {
+              instrumentation::clock::sleep_for_retval (this, res);
               return res;
             }
         }
+
+      instrumentation::clock::sleep_for_retval (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
     }
 
@@ -239,6 +248,8 @@ namespace os
     result_t
     clock::sleep_until (timestamp_t timestamp)
     {
+      instrumentation::clock::sleep_until (this, timestamp);
+
 #if defined(OS_TRACE_RTOS_CLOCKS)
       trace::printf ("%s()\n", __func__);
 #endif
@@ -256,19 +267,24 @@ namespace os
           timestamp_t nw = now ();
           if (nw >= timestamp)
             {
+              instrumentation::clock::sleep_until_retval (this, ETIMEDOUT);
               return ETIMEDOUT;
             }
 
           if (this_thread::thread ().interrupted ())
             {
+              instrumentation::clock::sleep_until_retval (this, EINTR);
               return EINTR;
             }
 
           if (res != result::ok)
             {
+              instrumentation::clock::sleep_until_retval (this, res);
               return res;
             }
         }
+
+      instrumentation::clock::sleep_until_retval (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
     }
 
@@ -278,6 +294,8 @@ namespace os
     result_t
     clock::wait_for (duration_t timeout)
     {
+      instrumentation::clock::wait_for (this, timeout);
+
 #if defined(OS_TRACE_RTOS_CLOCKS)
 
 #pragma GCC diagnostic push
@@ -304,14 +322,17 @@ namespace os
       timestamp_t nw = steady_now ();
       if (nw >= timestamp)
         {
+          instrumentation::clock::wait_for_retval (this, ETIMEDOUT);
           return ETIMEDOUT;
         }
 
       if (this_thread::thread ().interrupted ())
         {
+          instrumentation::clock::wait_for_retval (this, EINTR);
           return EINTR;
         }
 
+      instrumentation::clock::wait_for_retval (this, res);
       return res;
     }
 
@@ -342,6 +363,7 @@ namespace os
 #pragma GCC diagnostic pop
 
       internal_check_timestamps ();
+
       return steady_count_;
       // ----- Exit critical section ------------------------------------------
     }
@@ -460,6 +482,8 @@ namespace os
     result_t
     adjustable_clock::sleep_until (timestamp_t timestamp)
     {
+      instrumentation::adjustable_clock::sleep_until (this, timestamp);
+
 #if defined(OS_TRACE_RTOS_CLOCKS)
       trace::printf ("%s()\n", __func__);
 #endif
@@ -477,19 +501,28 @@ namespace os
           timestamp_t nw = now ();
           if (nw >= timestamp)
             {
+              instrumentation::adjustable_clock::sleep_until_retval (
+                  this, ETIMEDOUT);
               return ETIMEDOUT;
             }
 
           if (this_thread::thread ().interrupted ())
             {
+              instrumentation::adjustable_clock::sleep_until_retval (this,
+                                                                     EINTR);
               return EINTR;
             }
 
           if (res != result::ok)
             {
+              instrumentation::adjustable_clock::sleep_until_retval (this,
+                                                                     res);
               return res;
             }
         }
+
+      instrumentation::adjustable_clock::sleep_until_retval (this,
+                                                             ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
     }
 

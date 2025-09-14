@@ -911,6 +911,104 @@ namespace os
       }
     } // namespace event_flags
 
+    namespace clock
+    {
+      void
+      create (os::rtos::clock* clock)
+      {
+        if (clock->has_name ())
+          {
+            SEGGER_SYSVIEW_NameResource (reinterpret_cast<U32> (clock),
+                                         clock->name ());
+          }
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_CLOCK_CREATE,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (clock)));
+      }
+
+      void
+      destroy (os::rtos::clock* clock)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_CLOCK_DESTROY,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (clock)));
+      }
+
+      void
+      sleep_for (os::rtos::clock* clock, unsigned int duration)
+      {
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_CLOCK_SLEEP_FOR,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (clock)),
+            static_cast<U32> (duration));
+      }
+
+      void
+      sleep_for_retval (os::rtos::clock* clock, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_CLOCK_SLEEP_FOR,
+            static_cast<U32> (res));
+      }
+
+      void
+      sleep_until (os::rtos::clock* clock, unsigned long long timestamp)
+      {
+        SEGGER_SYSVIEW_RecordU32x3 (
+            OS_INTEGER_INSTRUMENTATION_ID_CLOCK_SLEEP_UNTIL,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (clock)),
+            static_cast<U32> (timestamp >> 32),
+            static_cast<U32> (timestamp & 0xFFFFFFFF));
+      }
+
+      void
+      sleep_until_retval (os::rtos::clock* clock, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_CLOCK_SLEEP_UNTIL,
+            static_cast<U32> (res));
+      }
+
+      void
+      wait_for (os::rtos::clock* clock, unsigned int duration)
+      {
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_CLOCK_WAIT_FOR,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (clock)),
+            static_cast<U32> (duration));
+      }
+
+      void
+      wait_for_retval (os::rtos::clock* clock, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_CLOCK_WAIT_FOR,
+            static_cast<U32> (res));
+      }
+
+    } // namespace clock
+
+    namespace adjustable_clock
+    {
+      void
+      sleep_until (os::rtos::clock* clock, unsigned long long timestamp)
+      {
+        SEGGER_SYSVIEW_RecordU32x3 (
+            OS_INTEGER_INSTRUMENTATION_ID_ADJUSTABLE_CLOCK_SLEEP_UNTIL,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (clock)),
+            static_cast<U32> (timestamp >> 32),
+            static_cast<U32> (timestamp & 0xFFFFFFFF));
+      }
+
+      void
+      sleep_until_retval (os::rtos::clock* clock, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_ADJUSTABLE_CLOCK_SLEEP_UNTIL,
+            static_cast<U32> (res));
+      }
+    } // namespace adjustable_clock
+
     // ------------------------------------------------------------------------
 
     void

@@ -195,6 +195,23 @@
 #define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_RAISE_VALUES \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 237u)
 
+// 70
+#define OS_INTEGER_INSTRUMENTATION_ID_CLOCK_CREATE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 38u)
+#define OS_INTEGER_INSTRUMENTATION_ID_CLOCK_DESTROY \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 39u)
+#define OS_INTEGER_INSTRUMENTATION_ID_CLOCK_SLEEP_FOR \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 40u)
+#define OS_INTEGER_INSTRUMENTATION_ID_CLOCK_SLEEP_UNTIL \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 41u)
+#define OS_INTEGER_INSTRUMENTATION_ID_CLOCK_WAIT_FOR \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 42u)
+
+#define OS_INTEGER_INSTRUMENTATION_ID_ADJUSTABLE_CLOCK_SLEEP_UNTIL \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 43u)
+
+// 76
+
 // ----------------------------------------------------------------------------
 
 #if defined(OS_INCLUDE_INSTRUMENTATION)
@@ -556,6 +573,44 @@ namespace os
       void
       raise_retval (os::rtos::event_flags* evflags, os::rtos::result_t res);
     } // namespace event_flags
+
+    namespace clock
+    {
+      void
+      create (os::rtos::clock* clock);
+
+      void
+      destroy (os::rtos::clock* clock);
+
+      void
+      sleep_for (os::rtos::clock* clock, unsigned int duration);
+
+      void
+      sleep_for_retval (os::rtos::clock* clock, os::rtos::result_t res);
+
+      void
+      sleep_until (os::rtos::clock* clock, unsigned long long timestamp);
+
+      void
+      sleep_until_retval (os::rtos::clock* clock, os::rtos::result_t res);
+
+      void
+      wait_for (os::rtos::clock* clock, unsigned int duration);
+
+      void
+      wait_for_retval (os::rtos::clock* clock, os::rtos::result_t res);
+
+    } // namespace clock
+
+    namespace adjustable_clock
+    {
+      void
+      sleep_until (os::rtos::clock* clock, unsigned long long timestamp);
+
+      void
+      sleep_until_retval (os::rtos::clock* clock, os::rtos::result_t res);
+
+    } // namespace adjustable_clock
 
     // ------------------------------------------------------------------------
 
@@ -1068,6 +1123,62 @@ namespace os
       {
       }
     } // namespace event_flags
+
+    namespace clock
+    {
+      static void inline __attribute__ ((__always_inline__))
+      create (os::rtos::clock* clock)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      destroy (os::rtos::clock* clock)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      sleep_for (os::rtos::clock* clock, unsigned int duration)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      sleep_for_retval (os::rtos::clock* clock, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      sleep_until (os::rtos::clock* clock, unsigned long long timestamp)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      sleep_until_retval (os::rtos::clock* clock, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      wait_for (os::rtos::clock* clock, unsigned int duration)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      wait_for_retval (os::rtos::clock* clock, os::rtos::result_t res)
+      {
+      }
+    } // namespace clock
+
+    namespace adjustable_clock
+    {
+      static void inline __attribute__ ((__always_inline__))
+      sleep_until (os::rtos::clock* clock, unsigned long long timestamp)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      sleep_until_retval (os::rtos::clock* clock, os::rtos::result_t res)
+      {
+      }
+    } // namespace adjustable_clock
 
     // ------------------------------------------------------------------------
 
