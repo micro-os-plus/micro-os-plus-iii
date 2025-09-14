@@ -805,10 +805,6 @@ namespace os
      * @cond ignore
      */
 
-    inline clock::clock (const char* name) : internal::object_named{ name }
-    {
-    }
-
     inline internal::clock_timestamps_list& __attribute__ ((always_inline))
     clock::steady_list (void)
     {

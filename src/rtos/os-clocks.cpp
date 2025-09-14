@@ -138,6 +138,10 @@ namespace os
 
     // ========================================================================
 
+    clock::clock (const char* name) : internal::object_named{ name }
+    {
+    }
+
     clock::~clock ()
     {
     }
