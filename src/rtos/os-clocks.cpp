@@ -578,7 +578,7 @@ namespace os
     /**
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    clock_systick::clock_systick () : clock{ "sysclock" }
+    clock_systick::clock_systick () : clock{ "sys-clock" }
     {
     }
 
@@ -680,7 +680,7 @@ namespace os
     /**
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    clock_rtc::clock_rtc () : adjustable_clock{ "rtclock" }
+    clock_rtc::clock_rtc () : adjustable_clock{ "rt-clock" }
     {
     }
 
@@ -730,7 +730,7 @@ namespace os
     /**
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
-    clock_highres::clock_highres () : clock{ "hrclock" }
+    clock_highres::clock_highres () : clock{ "hr-clock" }
     {
     }
 
