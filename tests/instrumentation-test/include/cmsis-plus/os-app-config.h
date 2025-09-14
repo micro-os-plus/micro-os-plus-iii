@@ -117,6 +117,8 @@
 #define OS_INTEGER_RTOS_ALLOC_SEMAPHORE_POOL_SIZE (3)
 #define OS_INTEGER_RTOS_ALLOC_TIMER_POOL_SIZE (3)
 
+#define OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES
+
 // ----------------------------------------------------------------------------
 
 #endif /* CMSIS_PLUS_RTOS_OS_APP_CONFIG_H_ */

@@ -23,7 +23,7 @@
 
 // In case there are extremely many events and the buffer overflows,
 // increase the buffer size (must be a power of 2).
-// #define SEGGER_SYSVIEW_RTT_BUFFER_SIZE (1024 * 2)
+#define SEGGER_SYSVIEW_RTT_BUFFER_SIZE (1024 * 2)
 
 // ----------------------------------------------------------------------------
 

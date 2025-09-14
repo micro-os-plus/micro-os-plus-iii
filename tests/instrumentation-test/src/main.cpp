@@ -51,6 +51,8 @@ os_main (int argc, char* argv[])
     delete mtx;
   }
 
+  sysclock.sleep_for (1);
+
   {
     semaphore* sem = new semaphore_counting ("my-semaphore", 7, 0);
 
@@ -64,6 +66,8 @@ os_main (int argc, char* argv[])
 
     delete sem;
   }
+
+  sysclock.sleep_for (1);
 
   {
     message_queue* mqueue = new message_queue ("my-mqueue", 7, sizeof (int));
@@ -85,6 +89,8 @@ os_main (int argc, char* argv[])
     delete mqueue;
   }
 
+  sysclock.sleep_for (1);
+
   {
     memory_pool* mpool = new memory_pool ("my-mpool", 7, sizeof (int));
 
@@ -98,6 +104,8 @@ os_main (int argc, char* argv[])
     delete mpool;
   }
 
+  sysclock.sleep_for (1);
+
   {
     event_flags* evf = new event_flags ("my-evflags");
 
@@ -108,6 +116,20 @@ os_main (int argc, char* argv[])
 
     delete evf;
   }
+
+    sysclock.sleep_for (1);
+
+  {
+    this_thread::thread().flags_raise (0x1248);
+    
+    this_thread::flags_wait (0x1000);
+    this_thread::flags_try_wait (0x0200);
+    this_thread::flags_timed_wait (0x0040, 42);
+  }
+
+  // Add a delay to allow the trace to be sent.
+  sysclock.sleep_for (1);
+
   return 0;
 }
 
