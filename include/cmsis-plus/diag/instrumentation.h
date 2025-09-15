@@ -211,6 +211,48 @@
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 43u)
 
 // 76
+#define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_RESET \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 44u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_RESET_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 244u)
+
+// 77
+#define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_ALLOCATED_CREATE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 45u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_ALLOCATED_CREATE_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 245u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_ALLOCATED_DESTROY \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 46u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_ALLOCATED_DESTROY_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 246u)
+
+// 79
+#define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_INCLUSIVE_CREATE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 47u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_INCLUSIVE_CREATE_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 247u)
+
+// 80
+#define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_RESET \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 48u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_RESET_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 248u)
+
+// 81
+#define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_ALLOCATED_CREATE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 49u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_CREATE_ALLOCATED_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 249u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_ALLOCATED_DESTROY \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 50u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_ALLOCATED_DESTROY_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 250u)
+
+// 83
+#define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_INCLUSIVE_CREATE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 51u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_CREATE_INCLUSIVE_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 251u)
 
 // ----------------------------------------------------------------------------
 
@@ -489,7 +531,39 @@ namespace os
       void
       timed_receive_retval (os::rtos::message_queue* mqueue,
                             os::rtos::result_t res);
+
+      void
+      reset (os::rtos::message_queue* mqueue);
+
+      void
+      reset_retval (os::rtos::message_queue* mqueue, os::rtos::result_t res);
     } // namespace message_queue
+
+    namespace message_queue_allocated
+    {
+      void
+      create (os::rtos::message_queue* mqueue, std::size_t msgs,
+              std::size_t msg_size_bytes);
+
+      void
+      create_return (os::rtos::message_queue* mqueue);
+
+      void
+      destroy (os::rtos::message_queue* mqueue);
+
+      void
+      destroy_return (os::rtos::message_queue* mqueue);
+    } // namespace message_queue_allocated
+
+    namespace message_queue_inclusive
+    {
+      void
+      create (os::rtos::message_queue* mqueue, std::size_t msgs,
+              std::size_t msg_size_bytes);
+
+      void
+      create_return (os::rtos::message_queue* mqueue);
+    } // namespace message_queue_inclusive
 
     namespace memory_pool
     {
@@ -529,7 +603,39 @@ namespace os
 
       void
       free_retval (os::rtos::memory_pool* mpool, os::rtos::result_t res);
+
+      void
+      reset (os::rtos::memory_pool* mpool);
+
+      void
+      reset_retval (os::rtos::memory_pool* mpool, os::rtos::result_t res);
     } // namespace memory_pool
+
+    namespace memory_pool_allocated
+    {
+      void
+      create (os::rtos::memory_pool* mpool, std::size_t blocks,
+              std::size_t block_size_bytes);
+
+      void
+      create_return (os::rtos::memory_pool* mpool);
+
+      void
+      destroy (os::rtos::memory_pool* mpool);
+
+      void
+      destroy_return (os::rtos::memory_pool* mpool);
+    } // namespace memory_pool_allocated
+
+    namespace memory_pool_inclusive
+    {
+      void
+      create (os::rtos::memory_pool* mpool, std::size_t blocks,
+              std::size_t block_size_bytes);
+
+      void
+      create_return (os::rtos::memory_pool* mpool);
+    } // namespace memory_pool_inclusive
 
     namespace event_flags
     {
@@ -991,7 +1097,55 @@ namespace os
                             os::rtos::result_t res)
       {
       }
+
+      static void inline __attribute__ ((__always_inline__))
+      reset (os::rtos::message_queue* mqueue)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      reset_retval (os::rtos::message_queue* mqueue, os::rtos::result_t res)
+      {
+      }
     } // namespace message_queue
+
+    namespace message_queue_allocated
+    {
+      static void inline __attribute__ ((__always_inline__))
+      create (os::rtos::message_queue* mqueue, std::size_t msgs,
+              std::size_t msg_size_bytes)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      create_return (os::rtos::message_queue* mqueue)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      destroy (os::rtos::message_queue* mqueue)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      destroy_return (os::rtos::message_queue* mqueue)
+      {
+      }
+    } // namespace message_queue_allocated
+
+    namespace message_queue_inclusive
+    {
+      static void inline __attribute__ ((__always_inline__))
+      create (os::rtos::message_queue* mqueue, std::size_t msgs,
+              std::size_t msg_size_bytes)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      create_return (os::rtos::message_queue* mqueue)
+      {
+      }
+    } // namespace message_queue_inclusive
 
     namespace memory_pool
     {
@@ -1055,7 +1209,55 @@ namespace os
       free_retval (os::rtos::memory_pool* mpool, os::rtos::result_t res)
       {
       }
+
+      static void inline __attribute__ ((__always_inline__))
+      reset (os::rtos::memory_pool* mpool)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      reset_retval (os::rtos::memory_pool* mpool, os::rtos::result_t res)
+      {
+      }
     } // namespace memory_pool
+
+    namespace memory_pool_allocated
+    {
+      static void inline __attribute__ ((__always_inline__))
+      create (os::rtos::memory_pool* mpool, std::size_t blocks,
+              std::size_t block_size_bytes)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      create_return (os::rtos::memory_pool* mpool)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      destroy (os::rtos::memory_pool* mpool)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      destroy_return (os::rtos::memory_pool* mpool)
+      {
+      }
+    } // namespace memory_pool_allocated
+
+    namespace memory_pool_inclusive
+    {
+      static void inline __attribute__ ((__always_inline__))
+      create (os::rtos::memory_pool* mpool, std::size_t blocks,
+              std::size_t block_size_bytes)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      create_return (os::rtos::memory_pool* mpool)
+      {
+      }
+    } // namespace memory_pool_inclusive
 
     namespace event_flags
     {

@@ -1412,6 +1412,9 @@ namespace os
         const attributes& attr, const allocator_type& allocator)
         : message_queue{ name }
     {
+      instrumentation::message_queue_allocated::create (this, msgs,
+                                                        msg_size_bytes);
+
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (),
                      msgs, msg_size_bytes);
@@ -1444,6 +1447,8 @@ namespace os
               allocated_queue_size_elements_
                   * sizeof (typename allocator_type::value_type));
         }
+
+      instrumentation::message_queue_allocated::create_return (this);
     }
 
     /**
@@ -1463,6 +1468,8 @@ namespace os
     template <typename Allocator>
     message_queue_allocated<Allocator>::~message_queue_allocated ()
     {
+      instrumentation::message_queue_allocated::destroy (this);
+
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -1476,6 +1483,8 @@ namespace os
 
           allocated_queue_addr_ = nullptr;
         }
+
+      instrumentation::message_queue_allocated::destroy_return (this);
     }
 
     // ========================================================================
@@ -1765,12 +1774,17 @@ namespace os
         const char* name, const attributes& attr)
         : message_queue (name)
     {
+      instrumentation::message_queue_inclusive::create (this, msgs,
+                                                        sizeof (value_type));
+
       static_assert (sizeof (T) >= sizeof (void*),
                      "Messages of message_queue need to have at least the "
                      "size of a pointer");
 
       internal_construct_ (msgs, sizeof (value_type), attr, &arena_,
                            sizeof (arena_));
+
+      instrumentation::message_queue_inclusive::create_return (this);
     }
 
     /**

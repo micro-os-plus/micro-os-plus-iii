@@ -1677,6 +1677,8 @@ namespace os
     result_t
     message_queue::reset (void)
     {
+      instrumentation::message_queue::reset (this);
+
 #if defined(OS_TRACE_RTOS_MQUEUE)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -1686,7 +1688,10 @@ namespace os
 
 #if defined(OS_USE_RTOS_PORT_MESSAGE_QUEUE)
 
-      return port::message_queue::reset (this);
+      result_t res = port::message_queue::reset (this);
+
+      instrumentation::message_queue::reset_retval (this, res);
+      return res;
 
 #else
 
@@ -1695,6 +1700,8 @@ namespace os
         interrupts::critical_section ics;
 
         internal_init_ ();
+
+        instrumentation::message_queue::reset_retval (this, result::ok);
         return result::ok;
         // ----- Exit critical section ----------------------------------------
       }

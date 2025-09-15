@@ -1028,6 +1028,9 @@ namespace os
         const attributes& attr, const allocator_type& allocator)
         : memory_pool{ name }
     {
+      instrumentation::memory_pool_allocated::create (this, blocks,
+                                                      block_size_bytes);
+
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s %d %d\n", __func__, this, this->name (),
                      blocks, block_size_bytes);
@@ -1059,6 +1062,7 @@ namespace os
               allocated_pool_size_elements_
                   * sizeof (typename allocator_type::value_type));
         }
+      instrumentation::memory_pool_allocated::create_return (this);
     }
 
     /**
@@ -1080,6 +1084,8 @@ namespace os
     template <typename Allocator>
     memory_pool_allocated<Allocator>::~memory_pool_allocated ()
     {
+      instrumentation::memory_pool_allocated::destroy (this);
+
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -1093,6 +1099,8 @@ namespace os
 
           allocated_pool_addr_ = nullptr;
         }
+
+      instrumentation::memory_pool_allocated::destroy_return (this);
     }
 
     // ========================================================================
@@ -1290,7 +1298,12 @@ namespace os
     template <typename T, std::size_t N>
     memory_pool_inclusive<T, N>::memory_pool_inclusive (const attributes& attr)
     {
+      instrumentation::memory_pool_inclusive::create (this, blocks,
+                                                      sizeof (T));
+
       internal_construct_ (blocks, sizeof (T), attr, &arena_, sizeof (arena_));
+
+      instrumentation::memory_pool_inclusive::create_return (this);
     }
 
     /**
@@ -1324,7 +1337,12 @@ namespace os
                                                         const attributes& attr)
         : memory_pool{ name }
     {
+      instrumentation::memory_pool_inclusive::create (this, blocks,
+                                                      sizeof (T));
+
       internal_construct_ (blocks, sizeof (T), attr, &arena_, sizeof (arena_));
+
+      instrumentation::memory_pool_inclusive::create_return (this);
     }
 
     /**

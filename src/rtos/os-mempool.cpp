@@ -886,6 +886,8 @@ namespace os
     result_t
     memory_pool::reset (void)
     {
+      instrumentation::memory_pool::reset (this);
+
 #if defined(OS_TRACE_RTOS_MEMPOOL)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -906,6 +908,7 @@ namespace os
       // the list is protected by inner `resume_one()`.
       list_.resume_all ();
 
+      instrumentation::memory_pool::reset_retval (this, result::ok);
       return result::ok;
     }
 

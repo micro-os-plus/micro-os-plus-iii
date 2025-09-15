@@ -622,7 +622,102 @@ namespace os
             static_cast<U32> (res));
       }
 
+      void
+      reset (os::rtos::message_queue* mqueue)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_RESET,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)));
+      }
+
+      void
+      reset_retval (os::rtos::message_queue* mqueue, os::rtos::result_t res)
+      {
+#if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_RESET_VALUES,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
+            static_cast<U32> (mqueue->length ()));
+#endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_RESET,
+            static_cast<U32> (res));
+      }
     } // namespace message_queue
+
+    namespace message_queue_allocated
+    {
+      void
+      create (os::rtos::message_queue* mqueue, std::size_t msgs,
+              std::size_t msg_size_bytes)
+      {
+        if (mqueue->has_name ())
+          {
+            SEGGER_SYSVIEW_NameResource (reinterpret_cast<U32> (mqueue),
+                                         mqueue->name ());
+          }
+        SEGGER_SYSVIEW_RecordU32x3 (
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_ALLOCATED_CREATE,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
+            static_cast<U32> (msgs), static_cast<U32> (msg_size_bytes));
+      }
+
+      void
+      create_return (os::rtos::message_queue* mqueue)
+      {
+        SEGGER_SYSVIEW_RecordEndCall (
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_ALLOCATED_CREATE);
+      }
+
+      void
+      destroy (os::rtos::message_queue* mqueue)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_ALLOCATED_DESTROY,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)));
+      }
+
+      void
+      destroy_return (os::rtos::message_queue* mqueue)
+      {
+        // Not needed, since it is displayed by the parent destructor.
+        // #if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+        //         SEGGER_SYSVIEW_RecordU32x2 (
+        //             OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_ALLOCATED_DESTROY_VALUES,
+        //             SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32>
+        //             (mqueue)), static_cast<U32> (mqueue->length ()));
+        // #endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+
+        SEGGER_SYSVIEW_RecordEndCall (
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_ALLOCATED_DESTROY);
+      }
+    } // namespace message_queue_allocated
+
+    namespace message_queue_inclusive
+    {
+      void
+      create (os::rtos::message_queue* mqueue, std::size_t msgs,
+              std::size_t msg_size_bytes)
+      {
+        if (mqueue->has_name ())
+          {
+            SEGGER_SYSVIEW_NameResource (reinterpret_cast<U32> (mqueue),
+                                         mqueue->name ());
+          }
+        SEGGER_SYSVIEW_RecordU32x3 (
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_INCLUSIVE_CREATE,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mqueue)),
+            static_cast<U32> (msgs), static_cast<U32> (msg_size_bytes));
+      }
+
+      void
+      create_return (os::rtos::message_queue* mqueue)
+      {
+        SEGGER_SYSVIEW_RecordEndCall (
+            OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_INCLUSIVE_CREATE);
+      }
+    } // namespace message_queue_inclusive
 
     namespace memory_pool
     {
@@ -763,7 +858,103 @@ namespace os
             OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_FREE,
             static_cast<U32> (res));
       }
+
+      void
+      reset (os::rtos::memory_pool* mpool)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_RESET,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)));
+      }
+
+      void
+      reset_retval (os::rtos::memory_pool* mpool, os::rtos::result_t res)
+      {
+#if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_RESET_VALUES,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)),
+            static_cast<U32> (mpool->count ()));
+#endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_RESET,
+            static_cast<U32> (res));
+      }
     } // namespace memory_pool
+
+    namespace memory_pool_allocated
+    {
+      void
+      create (os::rtos::memory_pool* mpool, std::size_t blocks,
+              std::size_t block_size_bytes)
+      {
+        if (mpool->has_name ())
+          {
+            SEGGER_SYSVIEW_NameResource (reinterpret_cast<U32> (mpool),
+                                         mpool->name ());
+          }
+        SEGGER_SYSVIEW_RecordU32x3 (
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_ALLOCATED_CREATE,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)),
+            static_cast<U32> (blocks), static_cast<U32> (block_size_bytes));
+      }
+
+      void
+      create_return (os::rtos::memory_pool* mpool)
+      {
+        SEGGER_SYSVIEW_RecordEndCall (
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_ALLOCATED_CREATE);
+      }
+
+      void
+      destroy (os::rtos::memory_pool* mpool)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_ALLOCATED_DESTROY,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)));
+      }
+
+      void
+      destroy_return (os::rtos::memory_pool* mpool)
+      {
+        // Not needed, since it is displayed by the parent destructor.
+        // #if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+        //       SEGGER_SYSVIEW_RecordU32x2 (
+        //           OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_ALLOCATED_DESTROY_VALUES,
+        //           SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)),
+        //           static_cast<U32> (mpool->count ()));
+        // #endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+
+        SEGGER_SYSVIEW_RecordEndCall (
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_ALLOCATED_DESTROY);
+      }
+    } // namespace memory_pool_allocated
+
+    namespace memory_pool_inclusive
+    {
+      void
+      create (os::rtos::memory_pool* mpool, std::size_t blocks,
+              std::size_t block_size_bytes)
+      {
+        if (mpool->has_name ())
+          {
+            SEGGER_SYSVIEW_NameResource (reinterpret_cast<U32> (mpool),
+                                         mpool->name ());
+          }
+        SEGGER_SYSVIEW_RecordU32x3 (
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_INCLUSIVE_CREATE,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mpool)),
+            static_cast<U32> (blocks), static_cast<U32> (block_size_bytes));
+      }
+
+      void
+      create_return (os::rtos::memory_pool* mpool)
+      {
+        SEGGER_SYSVIEW_RecordEndCall (
+            OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_INCLUSIVE_CREATE);
+      }
+    } // namespace memory_pool_inclusive
 
     namespace event_flags
     {
