@@ -263,23 +263,30 @@ namespace os
 
     thread::thread ()
     {
+      instrumentation::thread::create (this);
+
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
       // Must be explicit here, since they are not done in the members
       // declarations to allow th_enable_assert_reuse.
       state_ = state::initializing;
-      func_ = nullptr;
+
+      instrumentation::thread::create_return (this);
     }
 
     thread::thread (const char* name) : object_named_system{ name }
     {
+      instrumentation::thread::create (this);
+
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
       // Must be explicit here, since they are not done in the members
       // declarations to allow th_enable_assert_reuse.
       state_ = state::initializing;
+
+      instrumentation::thread::create_return (this);
     }
 
     /**
@@ -416,6 +423,8 @@ namespace os
                     const attributes& attr, const allocator_type& allocator)
         : object_named_system{ name }
     {
+      instrumentation::thread::create (this);
+
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
@@ -475,6 +484,8 @@ namespace os
                                allocated_stack_size_elements_
                                    * sizeof (stack::allocation_element_t));
         }
+
+      instrumentation::thread::create_return (this);
     }
 
     /**
@@ -599,6 +610,8 @@ namespace os
      */
     thread::~thread ()
     {
+      instrumentation::thread::destroy (this);
+
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s \n", __func__, this, name ());
 #endif
@@ -620,6 +633,8 @@ namespace os
                          this, name ());
 #endif
         }
+
+      instrumentation::thread::destroy_return (this);
     }
 
     /**
@@ -634,6 +649,8 @@ namespace os
     void
     thread::resume (void)
     {
+      instrumentation::thread::resume (this);
+
       using namespace os;
 
 #if defined(OS_TRACE_RTOS_THREAD_CONTEXT)
@@ -675,6 +692,8 @@ namespace os
       port::scheduler::reschedule ();
 
 #endif
+
+      instrumentation::thread::resume_return (this);
     }
 
     /**
@@ -742,6 +761,8 @@ namespace os
     result_t
     thread::priority (priority_t prio)
     {
+      instrumentation::thread::priority_set (this, prio);
+
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s(%u) @%p %s\n", __func__, prio, this, name ());
 #endif
@@ -755,6 +776,7 @@ namespace os
       if (prio_assigned_ == prio)
         {
           // Optimise, if priority did not change.
+          instrumentation::thread::priority_set_retval (this, result::ok);
           return result::ok;
         }
 
@@ -787,6 +809,7 @@ namespace os
 
 #endif
 
+      instrumentation::thread::priority_set_retval (this, res);
       return res;
     }
 
@@ -810,6 +833,8 @@ namespace os
     result_t
     thread::priority_inherited (priority_t prio)
     {
+      instrumentation::thread::priority_inherited_set (this, prio);
+
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s(%u) @%p %s\n", __func__, prio, this, name ());
 #endif
@@ -826,6 +851,8 @@ namespace os
       if (prio == prio_inherited_)
         {
           // Optimise, if priority did not change.
+          instrumentation::thread::priority_inherited_set_retval (this,
+                                                                  result::ok);
           return result::ok;
         }
 
@@ -834,6 +861,8 @@ namespace os
       if (prio_inherited_ < prio_assigned_)
         {
           // Optimise, no need to reschedule.
+          instrumentation::thread::priority_inherited_set_retval (this,
+                                                                  result::ok);
           return result::ok;
         }
 
@@ -864,6 +893,7 @@ namespace os
 
 #endif
 
+      instrumentation::thread::priority_inherited_set_retval (this, res);
       return res;
     }
 
@@ -891,6 +921,8 @@ namespace os
     result_t
     thread::detach (void)
     {
+      instrumentation::thread::detach (this);
+
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -903,6 +935,7 @@ namespace os
       result_t res = port::thread::detach (this);
       if (res != result::ok)
         {
+          instrumentation::thread::detach_retval (this, res);
           return res;
         }
 
@@ -912,6 +945,7 @@ namespace os
 
 #endif
 
+      instrumentation::thread::detach_retval (this, result::ok);
       return result::ok;
     }
 
@@ -949,6 +983,8 @@ namespace os
     result_t
     thread::join (void** exit_ptr)
     {
+      instrumentation::thread::join (this);
+
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -977,6 +1013,7 @@ namespace os
           *exit_ptr = func_result_;
         }
 
+      instrumentation::thread::join_retval (this, result::ok);
       return result::ok;
     }
 
@@ -1004,6 +1041,8 @@ namespace os
     result_t
     thread::cancel (void)
     {
+      instrumentation::thread::cancel (this);
+
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -1012,6 +1051,7 @@ namespace os
       os_assert_err (!interrupts::in_handler_mode (), EPERM);
 
       // TODO: implement according to POSIX specs.
+      instrumentation::thread::cancel_retval (this, result::ok);
       return result::ok;
     }
 
@@ -1029,6 +1069,8 @@ namespace os
     bool
     thread::interrupt (bool interrupt)
     {
+      instrumentation::thread::interrupt (this);
+
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -1037,6 +1079,8 @@ namespace os
       interrupted_ = interrupt;
 
       resume ();
+
+      instrumentation::thread::interrupt_retval (this, tmp);
       return tmp;
     }
 
@@ -1248,6 +1292,8 @@ namespace os
     result_t
     thread::kill (void)
     {
+      instrumentation::thread::kill (this);
+
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -1265,6 +1311,7 @@ namespace os
             trace::printf ("%s() @%p %s already gone\n", __func__, this,
                            name ());
 #endif
+            instrumentation::thread::kill_retval (this, result::ok);
             return result::ok; // Already exited itself
           }
 
@@ -1316,6 +1363,7 @@ namespace os
         // ----- Exit critical section ----------------------------------------
       }
 
+      instrumentation::thread::kill_retval (this, result::ok);
       return result::ok;
     }
 
@@ -1765,7 +1813,6 @@ namespace os
         trace::printf ("%s() to %s\n", __func__, _thread ()->name ());
 #endif
       }
-
     } /* namespace this_thread */
 
     // ------------------------------------------------------------------------

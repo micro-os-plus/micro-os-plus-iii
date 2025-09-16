@@ -288,6 +288,28 @@
 #define OS_INTEGER_INSTRUMENTATION_ID_TIMER_CALLBACK \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 64u)
 
+// 97
+#define OS_INTEGER_INSTRUMENTATION_ID_THREAD_CREATE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 65u)
+#define OS_INTEGER_INSTRUMENTATION_ID_THREAD_DESTROY \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 66u)
+#define OS_INTEGER_INSTRUMENTATION_ID_THREAD_RESUME \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 67u)
+#define OS_INTEGER_INSTRUMENTATION_ID_THREAD_PRIORITY_SET \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 68u)
+#define OS_INTEGER_INSTRUMENTATION_ID_THREAD_PRIORITY_INHERITED_SET \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 69u)
+#define OS_INTEGER_INSTRUMENTATION_ID_THREAD_DETACH \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 70u)
+#define OS_INTEGER_INSTRUMENTATION_ID_THREAD_JOIN \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 71u)
+#define OS_INTEGER_INSTRUMENTATION_ID_THREAD_CANCEL \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 72u)
+#define OS_INTEGER_INSTRUMENTATION_ID_THREAD_INTERRUPT \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 73u)
+#define OS_INTEGER_INSTRUMENTATION_ID_THREAD_KILL \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 74u)
+
 // ----------------------------------------------------------------------------
 
 #if defined(OS_INCLUDE_INSTRUMENTATION)
@@ -342,42 +364,89 @@ namespace os
 
     namespace thread
     {
-      static void inline __attribute__ ((__always_inline__))
-      created (os::rtos::thread* thread)
-      {
-        SEGGER_SYSVIEW_OnTaskCreate (reinterpret_cast<U32> (thread));
-        SYSVIEW_SendTaskInfo (thread);
-      }
+      void
+      create (os::rtos::thread* thread);
 
-      static void inline __attribute__ ((__always_inline__))
-      ready (os::rtos::thread* thread)
-      {
-        SEGGER_SYSVIEW_OnTaskStartReady (reinterpret_cast<U32> (thread));
-      }
+      void
+      create_return (os::rtos::thread* thread);
 
-      static void inline __attribute__ ((__always_inline__))
-      suspended (os::rtos::thread* thread, unsigned int cause = 0)
-      {
-        SEGGER_SYSVIEW_OnTaskStopReady (reinterpret_cast<U32> (thread), cause);
-      }
+      void
+      destroy (os::rtos::thread* thread);
 
-      static void inline __attribute__ ((__always_inline__))
-      active (os::rtos::thread* thread)
-      {
-        SEGGER_SYSVIEW_OnTaskStartExec (reinterpret_cast<U32> (thread));
-      }
+      void
+      destroy_return (os::rtos::thread* thread);
 
-      static void inline __attribute__ ((__always_inline__))
-      idle (void)
-      {
-        SEGGER_SYSVIEW_OnIdle ();
-      }
+      // ----------------------------------------------------------------------
+      // Specific API calls.
 
-      static void inline __attribute__ ((__always_inline__))
-      terminated (os::rtos::thread* thread)
-      {
-        SEGGER_SYSVIEW_OnTaskTerminate (reinterpret_cast<U32> (thread));
-      }
+      void
+      created (os::rtos::thread* thread);
+
+      void
+      ready (os::rtos::thread* thread);
+
+      void
+      suspended (os::rtos::thread* thread, unsigned int cause = 0);
+
+      void
+      active (os::rtos::thread* thread);
+
+      void
+      idle (void);
+
+      void
+      terminated (os::rtos::thread* thread);
+
+      // ----------------------------------------------------------------------
+
+      void
+      resume (os::rtos::thread* thread);
+
+      void
+      resume_return (os::rtos::thread* thread);
+
+      void
+      priority_set (os::rtos::thread* thread, unsigned int prio);
+
+      void
+      priority_set_retval (os::rtos::thread* thread, os::rtos::result_t res);
+
+      void
+      priority_inherited_set (os::rtos::thread* thread, unsigned int prio);
+
+      void
+      priority_inherited_set_retval (os::rtos::thread* thread,
+                                     os::rtos::result_t res);
+
+      void
+      detach (os::rtos::thread* thread);
+
+      void
+      detach_retval (os::rtos::thread* thread, os::rtos::result_t res);
+
+      void
+      join (os::rtos::thread* thread);
+
+      void
+      join_retval (os::rtos::thread* thread, os::rtos::result_t res);
+
+      void
+      cancel (os::rtos::thread* thread);
+
+      void
+      cancel_retval (os::rtos::thread* thread, os::rtos::result_t res);
+
+      void
+      interrupt (os::rtos::thread* thread);
+
+      void
+      interrupt_retval (os::rtos::thread* thread, os::rtos::result_t res);
+
+      void
+      kill (os::rtos::thread* thread);
+
+      void
+      kill_retval (os::rtos::thread* thread, os::rtos::result_t res);
 
       void
       flags_raise (os::rtos::thread* thread, unsigned int mask);
@@ -908,6 +977,26 @@ namespace os
     namespace thread
     {
       static void inline __attribute__ ((__always_inline__))
+      create (os::rtos::thread* thread)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      create_return (os::rtos::thread* thread)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      destroy (os::rtos::thread* thread)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      destroy_return (os::rtos::thread* thread)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
       created (os::rtos::thread* thread)
       {
       }
@@ -934,6 +1023,87 @@ namespace os
 
       static void inline __attribute__ ((__always_inline__))
       terminated (os::rtos::thread* thread)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      resume (os::rtos::thread* thread)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      resume_return (os::rtos::thread* thread)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      priority_set (os::rtos::thread* thread, unsigned int prio)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      priority_set_retval (os::rtos::thread* thread, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      priority_inherited_set (os::rtos::thread* thread, unsigned int prio)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      priority_inherited_set_retval (os::rtos::thread* thread,
+                                     os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      detach (os::rtos::thread* thread)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      detach_retval (os::rtos::thread* thread, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      join (os::rtos::thread* thread)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      join_retval (os::rtos::thread* thread, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      cancel (os::rtos::thread* thread)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      cancel_retval (os::rtos::thread* thread, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      interrupt (os::rtos::thread* thread)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      interrupt_retval (os::rtos::thread* thread, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      kill (os::rtos::thread* thread)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      kill_retval (os::rtos::thread* thread, os::rtos::result_t res)
       {
       }
 

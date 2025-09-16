@@ -27,6 +27,206 @@ namespace os
     namespace thread
     {
       void
+      create (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_CREATE,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)));
+      }
+
+      void
+      create_return (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_RecordEndCall (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_CREATE);
+      }
+
+      void
+      destroy (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_DESTROY,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)));
+      }
+
+      void
+      destroy_return (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_RecordEndCall (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_DESTROY);
+      }
+
+      // ----------------------------------------------------------------------
+      // Specific API calls.
+
+      void
+      created (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_OnTaskCreate (reinterpret_cast<U32> (thread));
+        SYSVIEW_SendTaskInfo (thread);
+      }
+
+      void
+      ready (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_OnTaskStartReady (reinterpret_cast<U32> (thread));
+      }
+
+      void
+      suspended (os::rtos::thread* thread, unsigned int cause)
+      {
+        SEGGER_SYSVIEW_OnTaskStopReady (reinterpret_cast<U32> (thread), cause);
+      }
+
+      void
+      active (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_OnTaskStartExec (reinterpret_cast<U32> (thread));
+      }
+
+      void
+      idle (void)
+      {
+        SEGGER_SYSVIEW_OnIdle ();
+      }
+
+      void
+      terminated (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_OnTaskTerminate (reinterpret_cast<U32> (thread));
+      }
+
+      // ----------------------------------------------------------------------
+
+      void
+      resume (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_RESUME,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)));
+      }
+
+      void
+      resume_return (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_RecordEndCall (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_RESUME);
+      }
+
+      void
+      priority_set (os::rtos::thread* thread, unsigned int prio)
+      {
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_PRIORITY_SET,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)),
+            static_cast<U32> (prio));
+      }
+
+      void
+      priority_set_retval (os::rtos::thread* thread, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_PRIORITY_SET,
+            static_cast<U32> (res));
+      }
+
+      void
+      priority_inherited_set (os::rtos::thread* thread, unsigned int prio)
+      {
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_PRIORITY_INHERITED_SET,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)),
+            static_cast<U32> (prio));
+      }
+
+      void
+      priority_inherited_set_retval (os::rtos::thread* thread,
+                                     os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_PRIORITY_INHERITED_SET,
+            static_cast<U32> (res));
+      }
+
+      void
+      detach (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_DETACH,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)));
+      }
+
+      void
+      detach_retval (os::rtos::thread* thread, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_DETACH,
+            static_cast<U32> (res));
+      }
+
+      void
+      join (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_JOIN,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)));
+      }
+
+      void
+      join_retval (os::rtos::thread* thread, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_JOIN, static_cast<U32> (res));
+      }
+
+      void
+      cancel (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_CANCEL,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)));
+      }
+
+      void
+      cancel_retval (os::rtos::thread* thread, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_CANCEL,
+            static_cast<U32> (res));
+      }
+
+      void
+      interrupt (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_INTERRUPT,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)));
+      }
+
+      void
+      interrupt_retval (os::rtos::thread* thread, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_INTERRUPT,
+            static_cast<U32> (res));
+      }
+
+      void
+      kill (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_KILL,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)));
+      }
+
+      void
+      kill_retval (os::rtos::thread* thread, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_KILL, static_cast<U32> (res));
+      }
+
+      void
       flags_wait (os::rtos::thread* thread, unsigned int mask,
                   unsigned int mode)
       {
@@ -102,10 +302,6 @@ namespace os
             OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_TIMED_WAIT,
             static_cast<U32> (res));
       }
-    } // namespace thread
-
-    namespace thread
-    {
 
       void
       flags_raise (os::rtos::thread* thread, unsigned int mask)
