@@ -1351,6 +1351,21 @@ namespace os
       return res;
     }
 
+#if defined(OS_INCLUDE_RTOS_THREAD_PUBLIC_FLAGS_CLEAR)
+
+    result_t
+    thread::flags_clear (flags::mask_t mask, flags::mask_t* oflags)
+    {
+      instrumentation::thread::flags_clear (this, mask);
+
+      result_t res = internal_flags_clear_ (mask, oflags);
+
+      instrumentation::thread::flags_clear_retval (this, res);
+      return res;
+    }
+
+#endif
+
     /**
      * @cond ignore
      */

@@ -2479,16 +2479,6 @@ namespace os
       return internal_flags_get_ (mask, mode);
     }
 
-#if defined(OS_INCLUDE_RTOS_THREAD_PUBLIC_FLAGS_CLEAR)
-
-    inline result_t
-    thread::flags_clear (flags::mask_t mask, flags::mask_t* oflags)
-    {
-      return internal_flags_clear_ (mask, oflags);
-    }
-
-#endif
-
     // ========================================================================
 
     /**

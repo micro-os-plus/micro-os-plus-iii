@@ -130,6 +130,30 @@ namespace os
             OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_RAISE,
             static_cast<U32> (res));
       }
+
+      void
+      flags_clear (os::rtos::thread* thread, unsigned int mask)
+      {
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_CLEAR,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)),
+            static_cast<U32> (mask));
+      }
+
+      void
+      flags_clear_retval (os::rtos::thread* thread, os::rtos::result_t res)
+      {
+#if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_CLEAR_VALUES,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)),
+            thread->flags_get (0, 0));
+#endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_CLEAR,
+            static_cast<U32> (res));
+      }
     } // namespace thread
 
     namespace memory_resource

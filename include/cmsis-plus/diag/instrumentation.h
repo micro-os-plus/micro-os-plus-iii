@@ -194,6 +194,10 @@
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 37u)
 #define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_RAISE_VALUES \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 237u)
+#define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_CLEAR \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 59u)
+#define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_CLEAR_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 259u)
 
 // 70
 #define OS_INTEGER_INSTRUMENTATION_ID_CLOCK_CREATE \
@@ -372,6 +376,12 @@ namespace os
       void
       flags_timed_wait_retval (os::rtos::thread* thread,
                                os::rtos::result_t res);
+
+      void
+      flags_clear (os::rtos::thread* thread, unsigned int mask);
+
+      void
+      flags_clear_retval (os::rtos::thread* thread, os::rtos::result_t res);
     } // namespace thread
 
     namespace memory_resource
@@ -857,6 +867,16 @@ namespace os
 
       static void inline __attribute__ ((__always_inline__))
       flags_raise_retval (os::rtos::thread* thread, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      flags_clear (os::rtos::thread* thread, unsigned int mask)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      flags_clear_retval (os::rtos::thread* thread, os::rtos::result_t res)
       {
       }
     } // namespace thread
