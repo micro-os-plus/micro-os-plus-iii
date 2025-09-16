@@ -310,6 +310,16 @@
 #define OS_INTEGER_INSTRUMENTATION_ID_THREAD_KILL \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 74u)
 
+// 107
+#define OS_INTEGER_INSTRUMENTATION_ID_SCHEDULER_LOCK \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 75u)
+#define OS_INTEGER_INSTRUMENTATION_ID_SCHEDULER_UNLOCK \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 76u)
+#define OS_INTEGER_INSTRUMENTATION_ID_SCHEDULER_LOCKED_SET \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 77u)
+#define OS_INTEGER_INSTRUMENTATION_ID_SCHEDULER_RESCHEDULE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 78u)
+
 // ----------------------------------------------------------------------------
 
 #if defined(OS_INCLUDE_INSTRUMENTATION)
@@ -339,6 +349,21 @@ namespace os
       void
       exited (void);
     } // namespace interrupt
+
+    namespace scheduler
+    {
+      void
+      lock (bool state);
+
+      void
+      unlock (bool state);
+
+      void
+      locked_set (bool state);
+
+      void
+      reschedule (void);
+    } // namespace scheduler
 
     namespace thread
     {
@@ -951,6 +976,29 @@ namespace os
       {
       }
     } // namespace interrupt
+
+    namespace scheduler
+    {
+      static void inline __attribute__ ((__always_inline__))
+      lock (bool state)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      unlock (bool state)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      locked_set (bool state)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      reschedule (void)
+      {
+      }
+    } // namespace scheduler
 
     namespace thread
     {

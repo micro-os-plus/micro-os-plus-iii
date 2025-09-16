@@ -73,6 +73,40 @@ namespace os
       }
     } // namespace interrupt
 
+    namespace scheduler
+    {
+      void
+      lock (bool state)
+      {
+        SEGGER_SYSVIEW_RecordU32 (OS_INTEGER_INSTRUMENTATION_ID_SCHEDULER_LOCK,
+                                  static_cast<U32> (state));
+      }
+
+      void
+      unlock (bool state)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_SCHEDULER_UNLOCK,
+            static_cast<U32> (state));
+      }
+
+      void
+      locked_set (bool state)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_SCHEDULER_LOCKED_SET,
+            static_cast<U32> (state));
+      }
+
+      void
+      reschedule (void)
+      {
+        SEGGER_SYSVIEW_RecordVoid (
+            OS_INTEGER_INSTRUMENTATION_ID_SCHEDULER_RESCHEDULE);
+        interrupt::exit_isr_to_scheduler = true;
+      }
+    } // namespace scheduler
+
     namespace thread
     {
       void

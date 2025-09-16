@@ -340,7 +340,9 @@ namespace os
       state_t
       lock (void)
       {
-        return port::scheduler::lock ();
+        state_t state = port::scheduler::lock ();
+        instrumentation::scheduler::lock (locked ());
+        return state;
       }
 
       /**
@@ -353,7 +355,28 @@ namespace os
       state_t
       unlock (void)
       {
-        return port::scheduler::unlock ();
+        state_t state = port::scheduler::unlock ();
+        instrumentation::scheduler::unlock (locked ());
+        return state;
+      }
+
+      /**
+       * @details
+       * Set the scheduler lock state based on the parameter and
+       * return the previous state.
+       *
+       * This allows to implement scheduler critical sections, where
+       * the scheduler is disabled and context switches are not
+       * performed.
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      state_t
+      locked (state_t state)
+      {
+        state_t out_state = port::scheduler::locked (state);
+        instrumentation::scheduler::locked_set (locked ());
+        return out_state;
       }
 
     } /* namespace scheduler */

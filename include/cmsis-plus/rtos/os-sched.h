@@ -862,23 +862,6 @@ namespace os
 
       /**
        * @details
-       * Set the scheduler lock state based on the parameter and
-       * return the previous state.
-       *
-       * This allows to implement scheduler critical sections, where
-       * the scheduler is disabled and context switches are not
-       * performed.
-       *
-       * @warning Cannot be invoked from Interrupt Service Routines.
-       */
-      inline state_t
-      locked (state_t state)
-      {
-        return port::scheduler::locked (state);
-      }
-
-      /**
-       * @details
        * Lock the scheduler and remember the initial scheduler state.
        *
        * @warning Cannot be invoked from Interrupt Service Routines.
