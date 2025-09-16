@@ -623,6 +623,8 @@ namespace os
     result_t
     event_flags::clear (flags::mask_t mask, flags::mask_t* oflags)
     {
+      instrumentation::event_flags::clear (this, mask);
+
 #if defined(OS_TRACE_RTOS_EVFLAGS)
       trace::printf ("%s(0x%X) @%p %s <0x%X \n", __func__, mask, this, name (),
                      event_flags_.mask ());
@@ -632,7 +634,10 @@ namespace os
 
       os_assert_err (mask != 0, EINVAL);
 
-      return port::event_flags::clear (this, mask, oflags);
+      result_t res = port::event_flags::clear (this, mask, oflags);
+
+      instrumentation::event_flags::clear_retval (this, res);
+      return res;
 
 #else
 
@@ -643,6 +648,7 @@ namespace os
                      event_flags_.mask ());
 #endif
 
+      instrumentation::event_flags::clear_retval (this, res);
       return res;
 
 #endif

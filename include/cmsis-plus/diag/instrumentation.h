@@ -176,6 +176,10 @@
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 33u)
 #define OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_RAISE_VALUES \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 233u)
+#define OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_CLEAR \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 58u)
+#define OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_CLEAR_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 58u)
 
 // 66
 #define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_WAIT \
@@ -688,6 +692,12 @@ namespace os
 
       void
       raise_retval (os::rtos::event_flags* evflags, os::rtos::result_t res);
+
+      void
+      clear (os::rtos::event_flags* evflags, unsigned int mask);
+
+      void
+      clear_retval (os::rtos::event_flags* evflags, os::rtos::result_t res);
     } // namespace event_flags
 
     namespace clock
@@ -1342,6 +1352,16 @@ namespace os
 
       static void inline __attribute__ ((__always_inline__))
       raise_retval (os::rtos::event_flags* evflags, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      clear (os::rtos::event_flags* evflags, unsigned int mask)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      clear_retval (os::rtos::event_flags* evflags, os::rtos::result_t res)
       {
       }
     } // namespace event_flags

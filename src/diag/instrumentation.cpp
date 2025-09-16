@@ -1124,6 +1124,30 @@ namespace os
             OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_RAISE,
             static_cast<U32> (res));
       }
+
+      void
+      clear (os::rtos::event_flags* evflags, unsigned int mask)
+      {
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_CLEAR,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (evflags)),
+            static_cast<U32> (mask));
+      }
+
+      void
+      clear_retval (os::rtos::event_flags* evflags, os::rtos::result_t res)
+      {
+#if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_CLEAR_VALUES,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (evflags)),
+            evflags->get (0, 0));
+#endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_CLEAR,
+            static_cast<U32> (res));
+      }
     } // namespace event_flags
 
     namespace clock
