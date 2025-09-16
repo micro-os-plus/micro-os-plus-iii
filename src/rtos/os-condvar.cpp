@@ -14,6 +14,7 @@
 #endif
 
 #include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/diag/instrumentation.h>
 
 // ----------------------------------------------------------------------------
 
@@ -274,12 +275,16 @@ namespace os
                                             __attribute__ ((unused)))
         : object_named_system{ name }
     {
+      instrumentation::condition_variable::create (this);
+
 #if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
 
       // Don't call this from interrupt handlers.
       os_assert_throw (!interrupts::in_handler_mode (), EPERM);
+
+      instrumentation::condition_variable::create_return (this);
     }
 
     /**
@@ -305,12 +310,16 @@ namespace os
      */
     condition_variable::~condition_variable ()
     {
+      instrumentation::condition_variable::destroy (this);
+
 #if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
 
       // There must be no threads waiting for this condition.
       assert (list_.empty ());
+
+      instrumentation::condition_variable::destroy_return (this);
     }
 
     /**
@@ -353,6 +362,8 @@ namespace os
     result_t
     condition_variable::signal ()
     {
+      instrumentation::condition_variable::signal (this);
+
 #if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -362,6 +373,7 @@ namespace os
 
       list_.resume_one ();
 
+      instrumentation::condition_variable::signal_retval (this, result::ok);
       return result::ok;
     }
 
@@ -426,6 +438,8 @@ namespace os
     result_t
     condition_variable::broadcast ()
     {
+      instrumentation::condition_variable::broadcast (this);
+
 #if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -438,6 +452,7 @@ namespace os
       // the list is protected by inner `resume_one()`.
       list_.resume_all ();
 
+      instrumentation::condition_variable::broadcast_retval (this, result::ok);
       return result::ok;
     }
 
@@ -529,6 +544,8 @@ namespace os
     result_t
     condition_variable::wait (mutex& mutex)
     {
+      instrumentation::condition_variable::wait (this);
+
 #if defined(OS_TRACE_RTOS_CONDVAR)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -552,6 +569,7 @@ namespace os
 
       if (res != result::ok)
         {
+          instrumentation::condition_variable::wait_retval (this, res);
           return res;
         }
 
@@ -568,6 +586,7 @@ namespace os
         node.unlink ();
       }
 
+      instrumentation::condition_variable::wait_retval (this, res);
       return res;
     }
 
@@ -676,6 +695,8 @@ namespace os
     result_t
     condition_variable::timed_wait (mutex& mutex, clock::duration_t timeout)
     {
+      instrumentation::condition_variable::timed_wait (this, timeout);
+
 #if defined(OS_TRACE_RTOS_CONDVAR)
 
 #pragma GCC diagnostic push
@@ -708,6 +729,7 @@ namespace os
 
       if (res != result::ok)
         {
+          instrumentation::condition_variable::timed_wait_retval (this, res);
           return res;
         }
 
@@ -724,6 +746,7 @@ namespace os
         node.unlink ();
       }
 
+      instrumentation::condition_variable::timed_wait_retval (this, res);
       return res;
     }
 

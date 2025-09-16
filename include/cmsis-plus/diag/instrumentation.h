@@ -262,6 +262,32 @@
 #define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_CREATE_INCLUSIVE_VALUES \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 251u)
 
+// 84
+#define OS_INTEGER_INSTRUMENTATION_ID_CONDITION_VARIABLE_CREATE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 52u)
+#define OS_INTEGER_INSTRUMENTATION_ID_CONDITION_VARIABLE_DESTROY \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 53u)
+#define OS_INTEGER_INSTRUMENTATION_ID_CONDITION_VARIABLE_SIGNAL \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 54u)
+#define OS_INTEGER_INSTRUMENTATION_ID_CONDITION_VARIABLE_BROADCAST \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 55u)
+#define OS_INTEGER_INSTRUMENTATION_ID_CONDITION_VARIABLE_WAIT \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 56u)
+#define OS_INTEGER_INSTRUMENTATION_ID_CONDITION_VARIABLE_TIMED_WAIT \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 57u)
+
+// 92
+#define OS_INTEGER_INSTRUMENTATION_ID_TIMER_CREATE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 60u)
+#define OS_INTEGER_INSTRUMENTATION_ID_TIMER_DESTROY \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 61u)
+#define OS_INTEGER_INSTRUMENTATION_ID_TIMER_START \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 62u)
+#define OS_INTEGER_INSTRUMENTATION_ID_TIMER_STOP \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 63u)
+#define OS_INTEGER_INSTRUMENTATION_ID_TIMER_CALLBACK \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 64u)
+
 // ----------------------------------------------------------------------------
 
 #if defined(OS_INCLUDE_INSTRUMENTATION)
@@ -737,6 +763,48 @@ namespace os
       sleep_until_retval (os::rtos::clock* clock, os::rtos::result_t res);
 
     } // namespace adjustable_clock
+
+    namespace condition_variable
+    {
+      void
+      create (os::rtos::condition_variable* cond);
+
+      void
+      create_return (os::rtos::condition_variable* cond);
+
+      void
+      destroy (os::rtos::condition_variable* cond);
+
+      void
+      destroy_return (os::rtos::condition_variable* cond);
+
+      void
+      signal (os::rtos::condition_variable* cond);
+
+      void
+      signal_retval (os::rtos::condition_variable* cond,
+                     os::rtos::result_t res);
+
+      void
+      broadcast (os::rtos::condition_variable* cond);
+
+      void
+      broadcast_retval (os::rtos::condition_variable* cond,
+                        os::rtos::result_t res);
+
+      void
+      wait (os::rtos::condition_variable* cond);
+
+      void
+      wait_retval (os::rtos::condition_variable* cond, os::rtos::result_t res);
+
+      void
+      timed_wait (os::rtos::condition_variable* cond, unsigned int timeout);
+
+      void
+      timed_wait_retval (os::rtos::condition_variable* cond,
+                         os::rtos::result_t res);
+    } // namespace condition_variable
 
     // ------------------------------------------------------------------------
 
@@ -1421,6 +1489,72 @@ namespace os
       {
       }
     } // namespace adjustable_clock
+
+    namespace condition_variable
+    {
+      static void inline __attribute__ ((__always_inline__))
+      create (os::rtos::condition_variable* cond)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      create_return (os::rtos::condition_variable* cond)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      destroy (os::rtos::condition_variable* cond)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      destroy_return (os::rtos::condition_variable* cond)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      signal (os::rtos::condition_variable* cond)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      signal_retval (os::rtos::condition_variable* cond,
+                     os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      broadcast (os::rtos::condition_variable* cond)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      broadcast_retval (os::rtos::condition_variable* cond,
+                        os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      wait (os::rtos::condition_variable* cond)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      wait_retval (os::rtos::condition_variable* cond, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      timed_wait (os::rtos::condition_variable* cond, unsigned int timeout)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      timed_wait_retval (os::rtos::condition_variable* cond,
+                         os::rtos::result_t res)
+      {
+      }
+    } // namespace condition_variable
 
     // ------------------------------------------------------------------------
 

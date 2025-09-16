@@ -1248,6 +1248,112 @@ namespace os
       }
     } // namespace adjustable_clock
 
+    namespace condition_variable
+    {
+      void
+      create (os::rtos::condition_variable* cond)
+      {
+        if (cond->has_name ())
+          {
+            SEGGER_SYSVIEW_NameResource (reinterpret_cast<U32> (cond),
+                                         cond->name ());
+          }
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_CONDITION_VARIABLE_CREATE,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (cond)));
+      }
+
+      void
+      create_return (os::rtos::condition_variable* cond)
+      {
+        SEGGER_SYSVIEW_RecordEndCall (
+            OS_INTEGER_INSTRUMENTATION_ID_CONDITION_VARIABLE_CREATE);
+      }
+
+      void
+      destroy (os::rtos::condition_variable* cond)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_CONDITION_VARIABLE_DESTROY,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (cond)));
+      }
+
+      void
+      destroy_return (os::rtos::condition_variable* cond)
+      {
+        SEGGER_SYSVIEW_RecordEndCall (
+            OS_INTEGER_INSTRUMENTATION_ID_CONDITION_VARIABLE_DESTROY);
+      }
+
+      void
+      signal (os::rtos::condition_variable* cond)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_CONDITION_VARIABLE_SIGNAL,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (cond)));
+      }
+
+      void
+      signal_retval (os::rtos::condition_variable* cond,
+                     os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_CONDITION_VARIABLE_SIGNAL,
+            static_cast<U32> (res));
+      }
+
+      void
+      broadcast (os::rtos::condition_variable* cond)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_CONDITION_VARIABLE_BROADCAST,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (cond)));
+      }
+
+      void
+      broadcast_retval (os::rtos::condition_variable* cond,
+                        os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_CONDITION_VARIABLE_BROADCAST,
+            static_cast<U32> (res));
+      }
+
+      void
+      wait (os::rtos::condition_variable* cond)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_CONDITION_VARIABLE_WAIT,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (cond)));
+      }
+
+      void
+      wait_retval (os::rtos::condition_variable* cond, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_CONDITION_VARIABLE_WAIT,
+            static_cast<U32> (res));
+      }
+
+      void
+      timed_wait (os::rtos::condition_variable* cond, unsigned int timeout)
+      {
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_CONDITION_VARIABLE_TIMED_WAIT,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (cond)),
+            static_cast<U32> (timeout));
+      }
+
+      void
+      timed_wait_retval (os::rtos::condition_variable* cond,
+                         os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_CONDITION_VARIABLE_TIMED_WAIT,
+            static_cast<U32> (res));
+      }
+    } // namespace condition_variable
+
     // ------------------------------------------------------------------------
 
     void
