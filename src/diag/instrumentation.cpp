@@ -24,6 +24,55 @@ namespace os
 {
   namespace instrumentation
   {
+    void
+    configure (void)
+    {
+      SEGGER_SYSVIEW_Conf ();
+    }
+
+    void
+    start (void)
+    {
+      SEGGER_SYSVIEW_Start ();
+    }
+
+    void
+    stop (void)
+    {
+      SEGGER_SYSVIEW_Stop ();
+    }
+
+    namespace interrupt
+    {
+      static bool exit_isr_to_scheduler = false;
+
+      void
+      entered (void)
+      {
+        SEGGER_SYSVIEW_RecordEnterISR ();
+      }
+
+      void
+      exited (void)
+      {
+        // On Cortex-M, the interrupt may return or may be chained to PendSV,
+        // to invoke the scheduler.
+        // Since the PendSV bit is write only, it is not easy to determine
+        // if the scheduler is invoked without additional logic.
+        // Since most of the time the scheduler is invoked, use
+        // this variant of the function.
+        if (exit_isr_to_scheduler)
+          {
+            SEGGER_SYSVIEW_RecordExitISRToScheduler ();
+            exit_isr_to_scheduler = false;
+          }
+        else
+          {
+            SEGGER_SYSVIEW_RecordExitISR ();
+          }
+      }
+    } // namespace interrupt
+
     namespace thread
     {
       void
