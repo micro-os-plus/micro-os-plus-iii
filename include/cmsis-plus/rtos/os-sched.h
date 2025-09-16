@@ -862,32 +862,6 @@ namespace os
 
       /**
        * @details
-       * Set the scheduler lock state to locked and
-       * return the previous state.
-       *
-       * @warning Cannot be invoked from Interrupt Service Routines.
-       */
-      inline state_t
-      lock (void)
-      {
-        return port::scheduler::lock ();
-      }
-
-      /**
-       * @details
-       * Set the scheduler lock state to unlocked and
-       * return the previous state.
-       *
-       * @warning Cannot be invoked from Interrupt Service Routines.
-       */
-      inline state_t
-      unlock (void)
-      {
-        return port::scheduler::unlock ();
-      }
-
-      /**
-       * @details
        * Set the scheduler lock state based on the parameter and
        * return the previous state.
        *
