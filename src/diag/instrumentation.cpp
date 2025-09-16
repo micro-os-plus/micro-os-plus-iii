@@ -1354,6 +1354,91 @@ namespace os
       }
     } // namespace condition_variable
 
+    namespace timer
+    {
+      void
+      create (os::rtos::timer* timer, unsigned int type)
+      {
+        if (timer->has_name ())
+          {
+            SEGGER_SYSVIEW_NameResource (reinterpret_cast<U32> (timer),
+                                         timer->name ());
+          }
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_TIMER_CREATE,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (timer)),
+            static_cast<U32> (type));
+      }
+
+      void
+      create_return (os::rtos::timer* timer)
+      {
+        SEGGER_SYSVIEW_RecordEndCall (
+            OS_INTEGER_INSTRUMENTATION_ID_TIMER_CREATE);
+      }
+
+      void
+      destroy (os::rtos::timer* timer)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_TIMER_DESTROY,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (timer)));
+      }
+
+      void
+      destroy_return (os::rtos::timer* timer)
+      {
+        SEGGER_SYSVIEW_RecordEndCall (
+            OS_INTEGER_INSTRUMENTATION_ID_TIMER_DESTROY);
+      }
+
+      void
+      start (os::rtos::timer* timer, unsigned int period)
+      {
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_TIMER_START,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (timer)),
+            static_cast<U32> (period));
+      }
+
+      void
+      start_retval (os::rtos::timer* timer, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_TIMER_START, static_cast<U32> (res));
+      }
+
+      void
+      stop (os::rtos::timer* timer)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_TIMER_STOP,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (timer)));
+      }
+
+      void
+      stop_retval (os::rtos::timer* timer, os::rtos::result_t res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_TIMER_STOP, static_cast<U32> (res));
+      }
+
+      void
+      callback (os::rtos::timer* timer)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_TIMER_CALLBACK,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (timer)));
+      }
+
+      void
+      callback_return (os::rtos::timer* timer)
+      {
+        SEGGER_SYSVIEW_RecordEndCall (
+            OS_INTEGER_INSTRUMENTATION_ID_TIMER_CALLBACK);
+      }
+    } // namespace timer
+
     // ------------------------------------------------------------------------
 
     void

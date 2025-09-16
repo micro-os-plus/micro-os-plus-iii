@@ -383,7 +383,7 @@ namespace os
       timer_node::action (void)
       {
         this->unlink ();
-        tmr.internal_interrupt_service_routine ();
+        tmr.internal_callback ();
       }
 
 #endif

@@ -14,6 +14,7 @@
 #endif
 
 #include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/diag/instrumentation.h>
 
 // ----------------------------------------------------------------------------
 
@@ -167,6 +168,8 @@ namespace os
                   const attributes& attr)
         : object_named_system{ name }
     {
+      instrumentation::timer::create (this, attr.tm_type);
+
 #if defined(OS_TRACE_RTOS_TIMER)
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 #endif
@@ -194,6 +197,8 @@ namespace os
 
 #endif
       state_ = state::initialized;
+
+      instrumentation::timer::create_return (this);
     }
 
     /**
@@ -208,6 +213,8 @@ namespace os
      */
     timer::~timer ()
     {
+      instrumentation::timer::destroy (this);
+
 #if defined(OS_TRACE_RTOS_TIMER)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -231,6 +238,8 @@ namespace os
 
 #endif
       state_ = state::destroyed;
+
+      instrumentation::timer::destroy_return (this);
     }
 
     /**
@@ -242,6 +251,8 @@ namespace os
     result_t
     timer::start (clock::duration_t period)
     {
+      instrumentation::timer::start (this, period);
+
 #if defined(OS_TRACE_RTOS_TIMER)
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -291,6 +302,8 @@ namespace os
         {
           state_ = state::running;
         }
+
+      instrumentation::timer::start_retval (this, res);
       return res;
     }
 
@@ -306,6 +319,8 @@ namespace os
     result_t
     timer::stop (void)
     {
+      instrumentation::timer::stop (this);
+
 #if defined(OS_TRACE_RTOS_TIMER)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -315,6 +330,7 @@ namespace os
 
       if (state_ != state::running)
         {
+          instrumentation::timer::stop_retval (this, EAGAIN);
           return EAGAIN;
         }
 
@@ -338,6 +354,8 @@ namespace os
 #endif
 
       state_ = state::stopped;
+
+      instrumentation::timer::stop_retval (this, res);
       return res;
     }
 
@@ -348,8 +366,9 @@ namespace os
      */
 
     void
-    timer::internal_interrupt_service_routine (void)
+    timer::internal_callback (void)
     {
+      instrumentation::timer::callback (this);
 
       if (type_ == run::periodic)
         {
@@ -370,6 +389,8 @@ namespace os
 
       // Call the user function.
       func_ (func_args_);
+
+      instrumentation::timer::callback_return (this);
     }
 
     /**

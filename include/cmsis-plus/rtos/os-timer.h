@@ -381,7 +381,7 @@ namespace os
 #if !defined(OS_USE_RTOS_PORT_TIMER)
 
       void
-      internal_interrupt_service_routine (void);
+      internal_callback (void);
 
 #endif
 

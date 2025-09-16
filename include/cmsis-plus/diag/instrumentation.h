@@ -806,6 +806,39 @@ namespace os
                          os::rtos::result_t res);
     } // namespace condition_variable
 
+    namespace timer
+    {
+      void
+      create (os::rtos::timer* timer, unsigned int type);
+
+      void
+      create_return (os::rtos::timer* timer);
+
+      void
+      destroy (os::rtos::timer* timer);
+
+      void
+      destroy_return (os::rtos::timer* timer);
+
+      void
+      start (os::rtos::timer* timer, unsigned int period);
+
+      void
+      start_retval (os::rtos::timer* timer, os::rtos::result_t res);
+
+      void
+      stop (os::rtos::timer* timer);
+
+      void
+      stop_retval (os::rtos::timer* timer, os::rtos::result_t res);
+
+      void
+      callback (os::rtos::timer* timer);
+
+      void
+      callback_return (os::rtos::timer* timer);
+    } // namespace timer
+
     // ------------------------------------------------------------------------
 
     void
@@ -1555,6 +1588,59 @@ namespace os
       {
       }
     } // namespace condition_variable
+
+    namespace timer
+    {
+      static void inline __attribute__ ((__always_inline__))
+      create (os::rtos::timer* timer, unsigned int type)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      create_return (os::rtos::timer* timer)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      destroy (os::rtos::timer* timer)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      destroy_return (os::rtos::timer* timer)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      start (os::rtos::timer* timer, unsigned int period)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      start_retval (os::rtos::timer* timer, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      stop (os::rtos::timer* timer)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      stop_retval (os::rtos::timer* timer, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      callback (os::rtos::timer* timer)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      callback_return (os::rtos::timer* timer)
+      {
+      }
+    } // namespace timer
 
     // ------------------------------------------------------------------------
 
