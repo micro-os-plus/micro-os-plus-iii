@@ -64,6 +64,11 @@
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 7u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_UNLOCK_VALUES \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 207u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_RESET \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 79u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_RESET_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 279u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_PRIO_CEILING_SET \
 
 // 40
 #define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_CREATE \
@@ -548,6 +553,13 @@ namespace os
 
       void
       unlock_retval (os::rtos::mutex* mutex, os::rtos::result_t result);
+
+      void
+      reset (os::rtos::mutex* mutex);
+
+      void
+      reset_retval (os::rtos::mutex* mutex, os::rtos::result_t result);
+
     } // namespace mutex
 
     namespace semaphore
@@ -1279,6 +1291,17 @@ namespace os
       unlock_retval (os::rtos::mutex* mutex, os::rtos::result_t res)
       {
       }
+
+      static void inline __attribute__ ((__always_inline__))
+      reset (os::rtos::mutex* mutex)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      reset_retval (os::rtos::mutex* mutex, os::rtos::result_t res)
+      {
+      }
+
     } // namespace mutex
 
     namespace semaphore

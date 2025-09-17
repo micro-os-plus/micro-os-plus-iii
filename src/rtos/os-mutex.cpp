@@ -1618,6 +1618,8 @@ namespace os
     result_t
     mutex::reset (void)
     {
+      instrumentation::mutex::reset (this);
+
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -1630,6 +1632,8 @@ namespace os
         scheduler::critical_section scs;
 
         internal_init_ ();
+
+        instrumentation::mutex::reset_retval (this, result::ok);
         return result::ok;
         // ----- Exit critical section ----------------------------------------
       }
