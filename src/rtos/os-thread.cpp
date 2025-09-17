@@ -1823,7 +1823,13 @@ namespace os
       result_t
       flags_clear (flags::mask_t mask, flags::mask_t* oflags)
       {
-        return this_thread::thread ().internal_flags_clear_ (mask, oflags);
+        instrumentation::thread::flags_clear (_thread (), mask);
+
+        result_t res
+            = this_thread::thread ().internal_flags_clear_ (mask, oflags);
+
+        instrumentation::thread::flags_clear_retval (_thread (), res);
+        return res;
       }
 
     } /* namespace this_thread */
