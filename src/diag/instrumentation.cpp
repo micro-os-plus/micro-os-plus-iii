@@ -59,12 +59,10 @@ namespace os
         // to invoke the scheduler.
         // Since the PendSV bit is write only, it is not easy to determine
         // if the scheduler is invoked without additional logic.
-        // Since most of the time the scheduler is invoked, use
-        // this variant of the function.
+        // This flag is set on reschedule() and cleared in active()
         if (exit_isr_to_scheduler)
           {
             SEGGER_SYSVIEW_RecordExitISRToScheduler ();
-            exit_isr_to_scheduler = false;
           }
         else
           {
@@ -98,6 +96,7 @@ namespace os
             static_cast<U32> (state));
       }
 
+      // Must always be called, otherwise the ISR logic fails.
       void
       reschedule (void)
       {
@@ -173,6 +172,7 @@ namespace os
       active (os::rtos::thread* thread)
       {
         SEGGER_SYSVIEW_OnTaskStartExec (reinterpret_cast<U32> (thread));
+        interrupt::exit_isr_to_scheduler = false;
       }
 
       void
