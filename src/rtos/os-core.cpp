@@ -231,6 +231,8 @@ namespace os
       bool
       preemptive (bool state)
       {
+        instrumentation::scheduler::preemptive_set (state);
+
 #if defined(OS_TRACE_RTOS_SCHEDULER)
         trace::printf ("scheduler::%s(%d) \n", __func__, state);
 #endif

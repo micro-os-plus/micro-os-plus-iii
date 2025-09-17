@@ -319,6 +319,8 @@
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 77u)
 #define OS_INTEGER_INSTRUMENTATION_ID_SCHEDULER_RESCHEDULE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 78u)
+#define OS_INTEGER_INSTRUMENTATION_ID_SCHEDULER_PREEMPTIVE_SET \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 80u)
 
 // ----------------------------------------------------------------------------
 
@@ -363,6 +365,9 @@ namespace os
 
       void
       reschedule (void);
+
+      void
+      preemptive_set (bool state);
     } // namespace scheduler
 
     namespace thread
@@ -996,6 +1001,11 @@ namespace os
 
       static void inline __attribute__ ((__always_inline__))
       reschedule (void)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      preemptive_set (bool state)
       {
       }
     } // namespace scheduler

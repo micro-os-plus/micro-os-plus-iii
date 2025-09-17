@@ -105,6 +105,14 @@ namespace os
             OS_INTEGER_INSTRUMENTATION_ID_SCHEDULER_RESCHEDULE);
         interrupt::exit_isr_to_scheduler = true;
       }
+
+      void
+      preemptive_set (bool state)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_SCHEDULER_PREEMPTIVE_SET,
+            static_cast<U32> (state));
+      }
     } // namespace scheduler
 
     namespace thread
