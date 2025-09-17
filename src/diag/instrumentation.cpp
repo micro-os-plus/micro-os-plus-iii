@@ -318,6 +318,22 @@ namespace os
       }
 
       void
+      internal_exit (os::rtos::thread* thread, void* exit_ptr)
+      {
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_INTERNAL_EXIT,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)),
+            reinterpret_cast<U32> (exit_ptr));
+      }
+
+      void
+      internal_exit_return (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_RecordEndCall (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_INTERNAL_EXIT);
+      }
+
+      void
       flags_wait (os::rtos::thread* thread, unsigned int mask,
                   unsigned int mode)
       {

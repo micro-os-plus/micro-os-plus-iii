@@ -1122,6 +1122,8 @@ namespace os
     {
       using namespace os;
 
+      instrumentation::thread::internal_exit (this, exit_ptr);
+
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -1168,6 +1170,7 @@ namespace os
         // ----- Exit critical section ----------------------------------------
       }
 
+      instrumentation::thread::internal_exit_return (this);
       instrumentation::thread::terminated (this);
 
 #if defined(OS_USE_RTOS_PORT_SCHEDULER)

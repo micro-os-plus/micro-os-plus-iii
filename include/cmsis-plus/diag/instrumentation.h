@@ -469,6 +469,12 @@ namespace os
       kill_retval (os::rtos::thread* thread, os::rtos::result_t res);
 
       void
+      internal_exit (os::rtos::thread* thread, void* exit_ptr);
+
+      void
+      internal_exit_return (os::rtos::thread* thread);
+
+      void
       flags_raise (os::rtos::thread* thread, unsigned int mask);
 
       void
@@ -1171,6 +1177,16 @@ namespace os
 
       static void inline __attribute__ ((__always_inline__))
       kill_retval (os::rtos::thread* thread, os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      internal_exit (os::rtos::thread* thread, void* exit_ptr)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      internal_exit_return (os::rtos::thread* thread)
       {
       }
 
