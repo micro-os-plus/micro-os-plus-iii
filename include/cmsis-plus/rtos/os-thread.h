@@ -2047,15 +2047,6 @@ namespace os
       }
 
       /**
-       * @warning Cannot be invoked from Interrupt Service Routines.
-       */
-      inline result_t
-      flags_clear (flags::mask_t mask, flags::mask_t* oflags)
-      {
-        return this_thread::thread ().internal_flags_clear_ (mask, oflags);
-      }
-
-      /**
        * @details
        * Terminate the calling thread and make the value _value_ptr_
        * available to any successful join with the terminating thread.

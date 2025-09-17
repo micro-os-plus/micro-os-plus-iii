@@ -1816,6 +1816,16 @@ namespace os
         trace::printf ("%s() to %s\n", __func__, _thread ()->name ());
 #endif
       }
+
+      /**
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      result_t
+      flags_clear (flags::mask_t mask, flags::mask_t* oflags)
+      {
+        return this_thread::thread ().internal_flags_clear_ (mask, oflags);
+      }
+
     } /* namespace this_thread */
 
     // ------------------------------------------------------------------------
