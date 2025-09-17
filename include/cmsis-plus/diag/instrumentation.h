@@ -98,6 +98,10 @@
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 13u)
 #define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_TIMED_WAIT_VALUES \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 213u)
+#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_RESET \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 81u)
+#define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_RESET_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 281u)
 
 // 46
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_CREATE \
@@ -609,6 +613,12 @@ namespace os
       void
       timed_wait_retval (os::rtos::semaphore* semaphore,
                          os::rtos::result_t res);
+
+      void
+      reset (os::rtos::semaphore* semaphore);
+
+      void
+      reset_retval (os::rtos::semaphore* semaphore, os::rtos::result_t res);
     } // namespace semaphore
 
     namespace message_queue
@@ -1383,6 +1393,16 @@ namespace os
       static void inline __attribute__ ((__always_inline__))
       timed_wait_retval (os::rtos::semaphore* semaphore,
                          os::rtos::result_t res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      reset (os::rtos::semaphore* semaphore)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      reset_retval (os::rtos::semaphore* semaphore, os::rtos::result_t res)
       {
       }
     } // namespace semaphore

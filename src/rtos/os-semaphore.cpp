@@ -803,6 +803,8 @@ namespace os
     result_t
     semaphore::reset (void)
     {
+      instrumentation::semaphore::reset (this);
+
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
       trace::printf ("%s() @%p %s <%u\n", __func__, this, name (), count_);
 #endif
@@ -812,7 +814,10 @@ namespace os
 
 #if defined(OS_USE_RTOS_PORT_SEMAPHORE)
 
-      return port::semaphore::reset (this);
+      result_t res = port::semaphore::reset (this);
+
+      instrumentation::semaphore::reset_retval (this, res);
+      return res;
 
 #else
 
@@ -821,6 +826,8 @@ namespace os
         interrupts::critical_section ics;
 
         internal_init_ ();
+
+        instrumentation::semaphore::reset_retval (this, result::ok);
         return result::ok;
         // ----- Exit critical section ----------------------------------------
       }

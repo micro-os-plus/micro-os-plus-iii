@@ -780,6 +780,28 @@ namespace os
             static_cast<U32> (res));
       }
 
+      void
+      reset (os::rtos::semaphore* semaphore)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_RESET,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (semaphore)));
+      }
+
+      void
+      reset_retval (os::rtos::semaphore* semaphore, os::rtos::result_t res)
+      {
+#if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_RESET_VALUES,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (semaphore)),
+            static_cast<U32> (semaphore->value ()));
+#endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_RESET,
+            static_cast<U32> (res));
+      }
     } // namespace semaphore
 
     namespace message_queue
