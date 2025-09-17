@@ -614,6 +614,30 @@ namespace os
             static_cast<U32> (result));
       }
 
+      void
+      prio_ceiling_set (os::rtos::mutex* mutex, unsigned int prio)
+      {
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_MUTEX_PRIO_CEILING_SET,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mutex)),
+            static_cast<U32> (prio));
+      }
+
+      void
+      prio_ceiling_set_retval (os::rtos::mutex* mutex,
+                               os::rtos::result_t result)
+      {
+#if defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+        SEGGER_SYSVIEW_RecordU32x2 (
+            OS_INTEGER_INSTRUMENTATION_ID_MUTEX_PRIO_CEILING_SET_VALUES,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (mutex)),
+            static_cast<U32> (mutex->prio_ceiling ()));
+#endif // defined(OS_INCLUDE_INSTRUMENTATION_EXTRA_VALUES)
+
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_MUTEX_PRIO_CEILING_SET,
+            static_cast<U32> (result));
+      }
     } // namespace mutex
 
     namespace semaphore

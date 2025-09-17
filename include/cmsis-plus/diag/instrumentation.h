@@ -69,6 +69,9 @@
 #define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_RESET_VALUES \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 279u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_PRIO_CEILING_SET \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 82u)
+#define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_PRIO_CEILING_SET_VALUES \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 282u)
 
 // 40
 #define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_CREATE \
@@ -560,6 +563,12 @@ namespace os
       void
       reset_retval (os::rtos::mutex* mutex, os::rtos::result_t result);
 
+      void
+      prio_ceiling_set (os::rtos::mutex* mutex, unsigned int prio);
+
+      void
+      prio_ceiling_set_retval (os::rtos::mutex* mutex,
+                               os::rtos::result_t result);
     } // namespace mutex
 
     namespace semaphore
@@ -1302,6 +1311,16 @@ namespace os
       {
       }
 
+      static void inline __attribute__ ((__always_inline__))
+      prio_ceiling_set (os::rtos::mutex* mutex, unsigned int prio)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      prio_ceiling_set_retval (os::rtos::mutex* mutex,
+                               os::rtos::result_t result)
+      {
+      }
     } // namespace mutex
 
     namespace semaphore

@@ -1513,6 +1513,8 @@ namespace os
     mutex::prio_ceiling (thread::priority_t prio_ceiling,
                          thread::priority_t* old_prio_ceiling)
     {
+      instrumentation::mutex::prio_ceiling_set (this, prio_ceiling);
+
 #if defined(OS_TRACE_RTOS_MUTEX)
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 #endif
@@ -1522,7 +1524,11 @@ namespace os
 
 #if defined(OS_USE_RTOS_PORT_MUTEX)
 
-      return port::mutex::prio_ceiling (this, prio_ceiling, old_prio_ceiling);
+      result_t res
+          = port::mutex::prio_ceiling (this, prio_ceiling, old_prio_ceiling);
+
+      instrumentation::mutex::prio_ceiling_set_retval (this, res);
+      return res;
 
 #else
 
@@ -1530,6 +1536,7 @@ namespace os
       result_t res = lock ();
       if (res != result::ok)
         {
+          instrumentation::mutex::prio_ceiling_set_retval (this, res);
           return res;
         }
 
@@ -1542,6 +1549,7 @@ namespace os
 
       unlock ();
 
+      instrumentation::mutex::prio_ceiling_set_retval (this, result::ok);
       return result::ok;
 
 #endif
