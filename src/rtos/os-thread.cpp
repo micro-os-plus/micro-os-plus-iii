@@ -1784,7 +1784,7 @@ namespace os
       yield (void)
       {
         instrumentation::thread::yield (_thread ());
-        
+
         // Don't call this from interrupt handlers.
         os_assert_throw (!interrupts::in_handler_mode (), EPERM);
 
@@ -1817,6 +1817,30 @@ namespace os
 #if defined(OS_TRACE_RTOS_THREAD_CONTEXT)
         trace::printf ("%s() to %s\n", __func__, _thread ()->name ());
 #endif
+      }
+
+      /**
+       * @details
+       * Remove the current running thread from the ready list and pass
+       * control to the next ready thread. The
+       * thread will not be automatically rescheduled, it requires
+       * some other tread or interrupt service routine to add it
+       * back to the READY state (via `thread::resume()`).
+       *
+       * This is different from `yield()` which automatically
+       * reschedules the current thread before passing control to
+       * the next thread (which might be the same if no other
+       * threads with at least the same priority are ready).
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines.
+       */
+      inline void
+      suspend (void)
+      {
+        os::instrumentation::thread::suspend (_thread ());
+
+        this_thread::thread ().internal_suspend_ (
+            OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_USER);
       }
 
       /**

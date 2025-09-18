@@ -1915,30 +1915,6 @@ namespace os
     {
       /**
        * @details
-       * Remove the current running thread from the ready list and pass
-       * control to the next ready thread. The
-       * thread will not be automatically rescheduled, it requires
-       * some other tread or interrupt service routine to add it
-       * back to the READY state (via `thread::resume()`).
-       *
-       * This is different from `yield()` which automatically
-       * reschedules the current thread before passing control to
-       * the next thread (which might be the same if no other
-       * threads with at least the same priority are ready).
-       *
-       * @warning Cannot be invoked from Interrupt Service Routines.
-       */
-      inline void
-      suspend (void)
-      {
-        instrumentation::thread::suspend (_thread ());
-
-        this_thread::thread ().internal_suspend_ (
-            OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_USER);
-      }
-
-      /**
-       * @details
        * If the flags::mode::all bit is set, the function expects
        * all given flags to be raised; otherwise, if the flags::mode::any
        * bit is set, the function expects any single flag to be raised.
