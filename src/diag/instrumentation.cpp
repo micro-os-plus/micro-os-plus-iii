@@ -190,6 +190,22 @@ namespace os
       // ----------------------------------------------------------------------
 
       void
+      yield (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_YIELD,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)));
+      }
+
+      void
+      suspend (os::rtos::thread* thread)
+      {
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_THREAD_SUSPEND,
+            SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (thread)));
+      }
+
+      void
       resume (os::rtos::thread* thread)
       {
         SEGGER_SYSVIEW_RecordU32 (

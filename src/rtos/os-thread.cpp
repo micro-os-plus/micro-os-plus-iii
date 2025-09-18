@@ -1783,6 +1783,8 @@ namespace os
       void
       yield (void)
       {
+        instrumentation::thread::yield (_thread ());
+        
         // Don't call this from interrupt handlers.
         os_assert_throw (!interrupts::in_handler_mode (), EPERM);
 

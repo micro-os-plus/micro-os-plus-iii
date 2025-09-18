@@ -1931,6 +1931,8 @@ namespace os
       inline void
       suspend (void)
       {
+        instrumentation::thread::suspend (_thread ());
+
         this_thread::thread ().internal_suspend_ (
             OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_USER);
       }
